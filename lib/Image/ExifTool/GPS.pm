@@ -195,3 +195,39 @@ sub DMS($)
 
 
 1;  #end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::GPS - Definitions for GPS meta information
+
+=head1 SYNOPSIS
+
+This module is loaded automatically by Image::ExifTool when required.
+
+=head1 DESCRIPTION
+
+This module contains definitions required by Image::ExifTool to interpret
+GPS (Global Positioning System) meta information in EXIF data.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item L<Image::Info|Image::Info>
+
+=back
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>,  L<Image::Info|Image::Info>
+
+=cut

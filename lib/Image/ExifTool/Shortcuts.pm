@@ -88,3 +88,32 @@ $VERSION = '1.00';
 
 
 1; # end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::Shortcuts - Definitions for Image::ExifTool shortcuts
+
+=head1 SYNOPSIS
+
+This module is required by Image::ExifTool.
+
+=head1 DESCRIPTION
+
+This module contains definitions for tag name shortcuts used by
+Image::ExifTool.  You can customize this file to add your own
+shortcuts.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>
+
+=cut

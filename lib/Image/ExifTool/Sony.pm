@@ -36,3 +36,39 @@ $VERSION = '1.01';
 
 
 1;  # end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::Sony - Definitions for Sony EXIF maker notes
+
+=head1 SYNOPSIS
+
+This module is loaded automatically by Image::ExifTool when required.
+
+=head1 DESCRIPTION
+
+This module contains definitions required by Image::ExifTool to
+interpret Sony maker notes EXIF meta information. The Sony maker notes
+use the standard EXIF IFD structure, but unfortunately the entries are
+large blocks of binary data for which I can find no documentation.  The
+only one I recognize is the PrintIM block.  To figure them out will
+require someone with a Sony camera who is willing to systematically
+change all the settings and determine where they are stored in these
+blocks.  You can use "exiftool -v -v -v" to dump these blocks in hex. 
+Please send me any information you may collect about the format of the
+Sony maker notes.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>
+
+=cut

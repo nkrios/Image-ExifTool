@@ -8,7 +8,7 @@
 # Revisions:    Nov. 12/03 - P. Harvey Created
 #               (See html/history.html for revision history)
 #
-# Legal:        Copyright (c) 2003-2004 Phil Harvey (phil@owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2004 Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ require Exporter;
 use File::RandomAccess;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '3.74';
+$VERSION = '3.82';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(ImageInfo Options ClearOptions ExtractInfo GetInfo CombineInfo
                 GetTagList GetFoundTags GetRequestedTags GetValue GetDescription
@@ -1632,9 +1632,12 @@ sub GetTagTable($)
 sub ProcessTagTable($$$)
 {
     my ($self, $tagTablePtr, $dirInfo) = @_;
-    $tagTablePtr or return 0;
-    my $processProc = $$tagTablePtr{PROCESS_PROC};
-    # process as EXIF directory unless otherwise specified
+    $tagTablePtr and $dirInfo or return 0;
+    # use processing proc if specified in directory information
+    my $processProc = $dirInfo->{ProcessProc};
+    # otherwise use default proc specified in tag table
+    $processProc or $processProc = $$tagTablePtr{PROCESS_PROC};
+    # otherwise process as an EXIF directory
     $processProc or $processProc = \&Image::ExifTool::Exif::ProcessExif;
     return &$processProc($self, $tagTablePtr, $dirInfo);
 }
@@ -1729,6 +1732,7 @@ sub GetTagInfo($$$)
 # Returns: tag key
 sub FoundTag($$$$;$$)
 {
+    local $_;
     my ($self, $tagInfo, $val, $valListPt, $valPrintPt) = @_;
     my ($tag, @val, @valPrint);
     my $verbose = $self->{OPTIONS}->{Verbose};

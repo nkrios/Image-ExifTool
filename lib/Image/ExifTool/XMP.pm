@@ -534,3 +534,42 @@ sub ProcessXMP($$$)
 
 
 1;  #end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::XMP - Definitions for XMP meta information
+
+=head1 SYNOPSIS
+
+This module is loaded automatically by Image::ExifTool when required.
+
+=head1 DESCRIPTION
+
+XMP stands for Extensible Metadata Platform.  It is a format based on XML that
+Adobe developed for embedding metadata information in image files.  This module
+contains the definitions required by Image::ExifTool to read XMP information.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
+
+=item http://www.w3.org/TR/rdf-syntax-grammar/
+
+=back
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>
+
+=cut

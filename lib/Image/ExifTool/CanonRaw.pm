@@ -604,3 +604,41 @@ sub RawInfo($$)
 
 1;  # end
 
+__END__
+
+=head1 NAME
+
+Image::ExifTool::CanonRaw - Definitions for Canon RAW file meta information
+
+=head1 SYNOPSIS
+
+This module is loaded automatically by Image::ExifTool when required.
+
+=head1 DESCRIPTION
+
+This module contains definitions required by Image::ExifTool to interpret
+meta information from Canon RAW files.  These files are written directly by
+some Canon cameras, and contain meta information similar to that found in
+the EXIF Canon maker notes.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item Lots of testing with my own camera... ;)
+
+=back
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>
+
+=cut
+

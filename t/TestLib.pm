@@ -19,27 +19,52 @@ require Exporter;
 use Image::ExifTool;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.01';
+$VERSION = '1.02';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(check testCompare);
 
 # Compare 2 files and return true and erase the 2nd file if they are the same
 # Inputs: 0) file1, 1) file2
 # Returns: true if files are the same
-sub testCompare($$)
+sub testCompare($$$)
 {
-    my ($compfile, $testfile) = @_;
+    my ($compfile, $testfile, $testnum) = @_;
     my $success = 0;
+    my $linenum;
     
     my $oldSep = $/;   
     $/ = "\x0a";        # set input line separator
     if (open(FILE1, $compfile)) {
         if (open(FILE2, $testfile)) {
             $success = 1;
+            my ($line1, $line2);
+            my $linenum = 0;
             foreach (<FILE1>) {
-                $_ eq <FILE2> or $success = 0, last;
+                ++$linenum;
+                $line1 = $_;
+                $line2 = <FILE2>;
+                unless (defined $line2 and $line1 eq $line2) {
+                    $success = 0;
+                    last;
+                }
             }
-            <FILE2> and $success = 0;   # make sure there is nothing left in file
+            if ($success) {
+                # make sure there is nothing left in file2
+                $line2 = <FILE2>;
+                if ($line2) {
+                    ++$linenum;
+                    $success = 0;
+                }
+            }
+            unless ($success) {
+                if (defined $line2) {
+                    chomp $line2;
+                    warn "\n  Test $testnum differs at line $linenum: \"$line2\"\n";
+                } else {
+                    chomp $line1;
+                    warn "\n  Test $testnum missing line $linenum: \"$line1\"\n";
+                }
+            }
             close(FILE2);
         }
         close(FILE1);
@@ -97,6 +122,10 @@ sub check($$$;$$)
         } else {
             # make sure there are no linefeeds in output
             $val =~ tr/\x0a\x0d/;/;
+            # translate unknown characters
+            $val =~ tr/\x01-\x1f\x80-\xff/\./;
+            # remove NULL chars
+            $val =~ s/\x00//g;
         }
         # (no "\n" needed since we set the output line separator above)
         if ($exifTool) {
@@ -113,7 +142,7 @@ sub check($$$;$$)
 #
 # Compare the output file to the output from the standard test (TESTNAME_#.out)
 #
-    return testCompare($compfile, $testfile);
+    return testCompare($compfile, $testfile,$testnum);
 }
 
 

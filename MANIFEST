@@ -21,9 +21,11 @@ lib/Image/ExifTool/FujiFilm.pm
 lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
 lib/Image/ExifTool/IPTC.pm
+lib/Image/ExifTool/MakerNotes.pm
 lib/Image/ExifTool/Minolta.pm
 lib/Image/ExifTool/Nikon.pm
 lib/Image/ExifTool/Olympus.pm
+lib/Image/ExifTool/Panasonic.pm
 lib/Image/ExifTool/Pentax.pm
 lib/Image/ExifTool/Photoshop.pm
 lib/Image/ExifTool/PrintIM.pm
@@ -78,6 +80,9 @@ t/Nikon_2.out
 t/Olympus.jpg
 t/Olympus.t
 t/Olympus_2.out
+t/Panasonic.jpg
+t/Panasonic.t
+t/Panasonic_2.out
 t/Pentax.jpg
 t/Pentax.t
 t/Pentax_2.out
@@ -87,4 +92,10 @@ t/Sanyo_2.out
 t/Sigma.jpg
 t/Sigma.t
 t/Sigma_2.out
+t/Sony.jpg
+t/Sony.t
+t/Sony_2.out
 t/TestLib.pm
+t/Unknown.jpg
+t/Unknown.t
+t/Unknown_2.out

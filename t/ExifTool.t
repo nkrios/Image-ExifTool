@@ -194,7 +194,7 @@ my $testnum = 1;
     }
     $/ = $oldSep;       # restore input line separator
     close(OUT);
-    print 'not ' unless testCompare("$testfile.out","$testfile.failed");
+    print 'not ' unless testCompare("$testfile.out","$testfile.failed",$testnum);
     print "ok $testnum\n";
 }
 

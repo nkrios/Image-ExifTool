@@ -74,3 +74,31 @@ sub ProcessPrintIM($$$)
 
 
 1;  # end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::PrintIM - Definitions for Print Image Matching metadata
+
+=head1 SYNOPSIS
+
+This module is loaded automatically by Image::ExifTool when required.
+
+=head1 DESCRIPTION
+
+This module contains definitions required by Image::ExifTool to interpret
+Print Image Matching metadata.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>
+
+=cut

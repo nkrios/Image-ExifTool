@@ -27,14 +27,15 @@ with tag names.  Below is an explanation of the meaning of each special key:
   table hash, 2) reference to a directory information hash, with the following
   members:
   
-    DataPt   - Reference to data block containing directory (may be undef).
-    DataLen  - Length of data block in bytes.
-    DirStart - Location of directory start in data block.
-    DirLen   - Length of directory data within block.
-    DirBase  - Base offset for pointers in directory.
-    Nesting  - Nesting depth in directory tree.
-    IfdName  - Name of IFD if this is an EXIF directory.
-    RAF      - Reference to File::RandomAccess object if available.
+    DataPt      - Reference to data block containing directory (may be undef).
+    DataLen     - Length of data block in bytes.
+    DirStart    - Location of directory start in data block.
+    DirLen      - Length of directory data within block.
+    DirBase     - Base offset for pointers in directory.
+    Nesting     - Nesting depth in directory tree.
+    IfdName     - Name of IFD if this is an EXIF directory.
+    RAF         - Reference to File::RandomAccess object if available.
+    ProcessProc - Optional reference to processing proc (to override default).
 
   GROUPS : A hash lookup for the default group names for all entries in this
   table. If not specified, the Group 0 and 1 names will be set automatically
@@ -189,6 +190,10 @@ conditions.  The following is a description of possible hash entries:
                   may be used in the expression: $val (value of the tag),
                   $dirData (reference to directory data), $subdirStart (offset
                   to subdirectory start) and $size (size of subdirectory).
+                  
+      ProcessProc : [optional] If given, specifies processing procedure used
+                  to decode this subdirectory data.  This overrides the default
+                  procedure specified by PROCESS_PROC in the tag table.
   }
 
 --------------------------------------------------------------------------------

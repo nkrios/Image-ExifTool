@@ -1,11 +1,15 @@
 #------------------------------------------------------------------------------
 # File:         Pentax.pm
 #
-# Description:  Definitions for Pentax EXIF Maker Notes
+# Description:  Definitions for Pentax/Asahi EXIF Maker Notes
 #
 # Revisions:    11/25/2003 - P. Harvey Created
 #               02/10/2004 - P. Harvey Completely re-done
 #               02/16/2004 - W. Smith Updated (See specific tag comments)
+#               11/10/2004 - P. Harvey Added support for Asahi cameras
+#
+# References:   1) Image::MakerNotes::Pentax
+#               2) http://johnst.org/sw/exiftags/ (Asahi cameras)
 #
 # Notes:        I couldn't find a good source for Pentax maker notes information
 #               so I've tried to figure out some of it myself based on sample
@@ -25,8 +29,9 @@ package Image::ExifTool::Pentax;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.01';
+$VERSION = '1.11';
 
 %Image::ExifTool::Pentax::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -67,11 +72,13 @@ $VERSION = '1.01';
         Groups => { 2 => 'Image' },
         PrintConv => {
             0 => '640x480',
+            1 => 'Full', #PH - this can mean 2048x1536 or 2240x1680 or ... ?
             2 => '1024x768',
             4 => '1600x1200',
             5 => '2048x1536',
             21 => '2592x1944',
-            '36 0' => '3008x2008',  # PH
+            22 => '2304x1728', #2
+            '36 0' => '3008x2008',  #PH
         },
     },
     # Picture Mode Tag - W. Smith 12 FEB 04
@@ -92,6 +99,12 @@ $VERSION = '1.01';
     },
     0x000d => {
         Name => 'PentaxFocusMode',
+        PrintConv => { #2
+            0 => 'Normal',
+            1 => 'Macro (1)',
+            2 => 'Macro (2)',
+            3 => 'Infinity',
+        },
     },
     # ISO Tag - Entries confirmed by W. Smith 12 FEB 04
     0x0014 => {
@@ -105,6 +118,13 @@ $VERSION = '1.01';
             15 => 800,  # Not confirmed
             18 => 1600, # Not confirmed
             21 => 3200, # Not Confirmed
+            50 => 50, #PH
+            100 => 100, #PH
+            200 => 200, #PH
+            400 => 400, #PH
+            800 => 800, #PH
+            1600 => 1600, #PH
+            3200 => 3200, #PH
         },
     },
     # AE Metering Mode Tag - W. Smith 12 FEB 04
@@ -123,6 +143,7 @@ $VERSION = '1.01';
             0 => 'Auto',
             1 => 'Daylight',
             2 => 'Shade',
+            3 => 'Fluorescent', #2
             4 => 'Tungsten',
             5 => 'Manual',
         },
@@ -156,6 +177,8 @@ $VERSION = '1.01';
             0 => 'Normal',
             1 => 'Low',
             2 => 'High',
+            3 => 'Medium Low', #2
+            4 => 'Medium High', #2
             # the *istD has pairs of values.  These are unverified - PH
             '0 0' => 'Normal',
             '1 0' => 'Low',
@@ -168,6 +191,8 @@ $VERSION = '1.01';
             0 => 'Normal',
             1 => 'Soft',
             2 => 'Hard',
+            3 => 'Medium Soft', #2
+            4 => 'Medium Hard', #2
             # the *istD has pairs of values.  These are unverified - PH
             '0 0' => 'Normal',
             '1 0' => 'Soft',
@@ -213,3 +238,53 @@ $VERSION = '1.01';
 
 
 1; # end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::Pentax - Definitions for Pentax/Asahi maker notes
+
+=head1 SYNOPSIS
+
+This module is loaded automatically by Image::ExifTool when required.
+
+=head1 DESCRIPTION
+
+This module contains definitions required by Image::ExifTool to interpret
+Pentax and Asahi maker notes in EXIF information.
+
+I couldn't find a good source for Pentax maker notes information so I've
+tried to figure out some of it myself based on sample pictures from the
+Optio 550, Optio S and *istD.  So far, what I have figured out isn't very
+complete, and some of it may be wrong.
+
+While the pentax maker notes are stored in standard EXIF format, the offsets
+used for some of the Optio cameras are wacky.  They seem to give the offset
+relative to the offset of the tag in the directory.  Very weird.  I'm just
+ignoring this peculiarity, but it doesn't affect much except the PrintIM
+data since other data is generally less than 4 bytes and therefore doesn't
+require a pointer.
+
+=head1 REFERENCES
+
+=over 4
+
+=item Image::MakerNotes::Pentax
+
+=item http://johnst.org/sw/exiftags/ (Asahi models)
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>, L<Image::Info>
+
+=cut

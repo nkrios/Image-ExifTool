@@ -71,7 +71,7 @@ sub ProcessNikon($$$);
     0x0081 => 'ToneComp',
     0x0082 => 'AuxiliaryLens',
     # 0x0083 => "LensBrand??",
-    # 6 with the D70 kit len and nikon 70-300G, 2 for 2 sigma lens and 0 for old nikon
+    # 6 with the D70 kit len and nikon 70-300G, 2 for 2 Nikon lens and 0 for old nikon
     # lens.
     0x0084 => {
         Name => "Lens",
@@ -111,8 +111,8 @@ sub ProcessNikon($$$);
         },
     },
     # 0x008b First byte depends on len used, last 3 010c00
-    #   40 with kit len, 48 with nikon 70-300G , 3c with sigma 70-300, 48 with old nikon
-    #   70-210, 44 with sigma 135 400
+    #   40 with kit len, 48 with nikon 70-300G , 3c with Nikon 70-300, 48 with old nikon
+    #   70-210, 44 with Nikon 135 400
 
     0x008c => {
         Name => 'NEFCurve1',
@@ -318,3 +318,39 @@ sub ProcessNikon($$$)
 }
 
 1;  # end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::Nikon - Definitions for Nikon EXIF maker notes
+
+=head1 SYNOPSIS
+
+This module is loaded automatically by Image::ExifTool when required.
+
+=head1 DESCRIPTION
+
+This module contains definitions required by Image::ExifTool to interpret
+Nikon maker notes in EXIF information.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+
+=back
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>
+
+=cut

@@ -6,12 +6,14 @@
 # Revisions:    11/25/2003 - P. Harvey Created
 #               02/06/2004 - P. Harvey Moved processing functions from ExifTool
 #               03/19/2004 - P. Harvey Check PreviewImage for validity
+#               11/11/2004 - P. Harvey Split off maker notes into MakerNotes.pm
 #
 # References:   1) http://partners.adobe.com/asn/developer/pdfs/tn/TIFF6.pdf
 #               2) http://www.adobe.com/products/dng/pdfs/dng_spec.pdf
 #               3) http://www.awaresystems.be/imaging/tiff/tifftags.html
 #               4) http://www.remotesensing.org/libtiff/TIFFTechNote2.html
 #               5) http://www.asmail.be/msg0054681802.html
+#               6) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -20,8 +22,9 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
                        GetByteOrder SetByteOrder ToggleByteOrder);
+use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 sub ProcessExif($$$);
 
@@ -713,122 +716,8 @@ my %lightSource = (
             8 => 'Color sequential linear',
         },
     },    0x9213 => 'ImageHistory',
-    #----------------------------------------------------------------------------
-    # decide which MakerNotes to use (based on camera make/model)
-    #
-    0x927c => [    # square brackets for a conditional list
-        {
-            Condition => '$self->{CameraMake} =~ /^Canon/',
-            Name => 'MakerNoteCanon',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Canon::Main',
-                Start => '$valuePtr',
-            },
-        },
-        {
-            # The Fuji programmers really botched this one up,
-            # but with a bit of work we can still read this directory
-            Condition => '$self->{CameraMake} =~ /^FUJIFILM/',
-            Name => 'MakerNoteFujiFilm',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::FujiFilm::Main',
-                Start => '$valuePtr',
-                # there is an 8-byte maker tag (FUJIFILM) we must skip over
-                OffsetPt => '$valuePtr+8',
-                ByteOrder => 'LittleEndian',
-                # the pointers are relative to the subdirectory start
-                # (before adding the offsetPt).  Weird - PH
-                Base => '$start',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake} =~ /^PENTAX/',
-            Name => 'MakerNotePentax',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Pentax::Main',
-                Start => '$valuePtr+6',
-                # byte order varies -- let ProcessExif() figure it out
-                ByteOrder => 'Unknown',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake} =~ /^OLYMPUS/',
-            Name => 'MakerNoteOlympus',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Olympus::Main',
-                Start => '$valuePtr+8',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake}=~/^NIKON/',
-            Name => 'MakerNoteNikon',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Nikon::Main',
-                Start => '$valuePtr',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
-            Name => 'MakerNoteCasio2',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Casio::MakerNote2',
-                Start => '$valuePtr + 6',
-                ByteOrder => 'Unknown',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake}=~/^CASIO/',
-            Name => 'MakerNoteCasio',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Casio::MakerNote1',
-                Start => '$valuePtr',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake}=~/^Minolta/',
-            Name => 'MakerNoteMinolta',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Minolta::Main',
-                Start => '$valuePtr',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake}=~/^SANYO/',
-            Name => 'MakerNoteSanyo',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Sanyo::Main',
-                Validate => '$val =~ /^SANYO/',
-                Start => '$valuePtr + 8',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake}=~/^(SIGMA|FOVEON)/',
-            Name => 'MakerNoteSigma',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Sigma::Main',
-                Validate => '$val =~ /^(SIGMA|FOVEON)/',
-                Start => '$valuePtr + 10',
-            },
-        },
-        {
-            Condition => '$self->{CameraMake}=~/^SONY/',
-            Name => 'MakerNoteSony',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Sony::Main',
-                # validate the maker note because this is sometimes garbage
-                Validate => 'defined($val) and $val =~ /^SONY DSC/',
-                Start => '$valuePtr + 12',
-            },
-        },
-        {
-            Name => 'MakerNoteUnknown',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Unknown::Main',
-                Start => '$valuePtr',
-            },
-        },
-    ],
-    #----------------------------------------------------------------------------
+    # handle maker notes as a conditional list
+    0x927c => \@Image::ExifTool::MakerNotes::Main,
     0x9286 => {
         Name => 'UserComment',
         PrintConv => 'substr($val,8)'
@@ -1669,13 +1558,14 @@ sub ProcessExif($$$)
 
                 # build information hash for new directory
                 my %newDirInfo = (
-                    DataPt   => $dirData,
-                    DataLen  => $dirLength,
-                    DirStart => $subdirStart,
-                    DirLen   => $size,
-                    DirBase  => $dirBase,
-                    Nesting  => $dirInfo->{Nesting} + 1,
-                    RAF      => $raf,
+                    DataPt      => $dirData,
+                    DataLen     => $dirLength,
+                    DirStart    => $subdirStart,
+                    DirLen      => $size,
+                    DirBase     => $dirBase,
+                    Nesting     => $dirInfo->{Nesting} + 1,
+                    RAF         => $raf,
+                    ProcessProc => $$subdir{ProcessProc},
                 );
                 
                 # set directory IFD name from group name of family 1 in tag information if it exists
@@ -1732,3 +1622,49 @@ sub ProcessExif($$$)
 }
 
 1; # end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::Exif - Definitions for EXIF meta information
+
+=head1 SYNOPSIS
+
+This module is required by Image::ExifTool.
+
+=head1 DESCRIPTION
+
+This module contains main definitions required by Image::ExifTool to
+interpret EXIF meta information.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item http://partners.adobe.com/asn/developer/pdfs/tn/TIFF6.pdf
+
+=item http://www.adobe.com/products/dng/pdfs/dng_spec.pdf
+
+=item http://www.awaresystems.be/imaging/tiff/tifftags.html
+
+=item http://www.remotesensing.org/libtiff/TIFFTechNote2.html
+
+=item http://www.asmail.be/msg0054681802.html
+
+=item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+
+=back
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>
+
+=cut

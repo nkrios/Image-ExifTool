@@ -3,6 +3,8 @@
 #
 # Description:  Definitions for IPTC information
 #
+# References:   http://brilliantlabs.com/docs/IIMV4.1.pdf
+#
 # Revisions:    Jan. 08/03 - P. Harvey Created
 #               Feb. 05/04 - P. Harvey Added support for records other than 2
 #------------------------------------------------------------------------------
@@ -571,3 +573,41 @@ sub ProcessIPTC($$$)
 }
 
 1; # end
+
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::IPTC - Definitions for IPTC meta information
+
+=head1 SYNOPSIS
+
+This module is loaded automatically by Image::ExifTool when required.
+
+=head1 DESCRIPTION
+
+This module contains definitions required by Image::ExifTool to interpret
+IPTC (International Press Telecommunications Council) meta information in
+image files.
+
+=head1 AUTHOR
+
+Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item http://brilliantlabs.com/docs/IIMV4.1.pdf
+
+=back
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>
+
+=cut
