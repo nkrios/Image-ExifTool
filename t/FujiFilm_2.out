@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
 [File, File, Image]  - File Name: FujiFilm.jpg
-[File, File, Image]  - File Size: 13KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 2KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: FUJIFILM
@@ -13,7 +14,7 @@
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2001:05:19 18:36:41
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, IFD0, Author] 33432 - Copyright:           
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 3.5
+[EXIF, ExifIFD, Image] 33437 - Aperture: 3.5
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0210
@@ -46,8 +47,8 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1447
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 10903
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1096
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, FujiFilm, Camera] 0 - Version: 0130
 [MakerNotes, FujiFilm, Camera] 4096 - Image Quality: NORMAL 
@@ -63,9 +64,9 @@
 [MakerNotes, FujiFilm, Camera] 4864 - Blur Warning: None
 [MakerNotes, FujiFilm, Camera] 4865 - Focus Warning: Good
 [MakerNotes, FujiFilm, Camera] 4866 - Exposure Warning: Good
-[Composite, Composite, Image]  - Av(Aperture Value): 3.5
+[Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.6
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/64
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 10903 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/64
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 6.0mm (35mm equivalent: 39.6mm)

@@ -13,9 +13,16 @@ package Image::ExifTool::GeoTiff;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(Get16u GetDouble);
+use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.00';
+$VERSION = '1.02';
+
+# format codes for geoTiff directory entries
+my %geoTiffFormat = (
+    0      => 'int16u',
+    0x87b0 => 'double',
+    0x87b1 => 'string',
+);
 
 my $epsg_units = {
     9001 => 'Linear Meter',
@@ -2051,7 +2058,7 @@ my $epsg_units = {
 sub ProcessGeoTiff($$$$$)
 {
     my ($exifTool, $tagTable, $dirData, $doubleData, $asciiData) = @_;
-    
+    my $verbose = $exifTool->Options('Verbose');
     my @double;
     
     if (length($$dirData) < 8 or
@@ -2064,7 +2071,11 @@ sub ProcessGeoTiff($$$$$)
     my $revision   = Get16u($dirData,2);
     my $minorRev   = Get16u($dirData,4);
     my $numEntries = Get16u($dirData,6);
-    
+
+    if ($verbose) {
+        $exifTool->{INDENT} .= '| ';
+        $exifTool->VerboseDir('GeoTiff',$numEntries);
+    }
     # generate version number tag (not a real GeoTiff tag)
     my $tagInfo = $exifTool->GetTagInfo($tagTable, 1);
     $tagInfo and $exifTool->FoundTag($tagInfo,"$version.$revision.$minorRev");
@@ -2077,20 +2088,39 @@ sub ProcessGeoTiff($$$$$)
         my $loc    = Get16u($dirData, $pt+2);
         my $count  = Get16u($dirData, $pt+4);
         my $offset = Get16u($dirData, $pt+6);
-        my $val;
-        if ($loc == 0x87b0) {       # in the double parms
-            $val = GetDouble($doubleData,$offset*8);
-            $val .= ' ' . GetDouble($doubleData,(++$offset)*8) while $count-- > 1;
-        } elsif ($loc == 0x87b1) {  # in the ASCII parms
-            $val = substr($$asciiData, $offset, $count);
+        my $format = $geoTiffFormat{$loc};
+        my ($val, $dataPt);
+        if ($format eq 'double') {          # in the double parms
+            $dataPt = $doubleData;
+            $offset *= 8;
+            $val = Image::ExifTool::ReadValue($dataPt, $offset, $format,
+                                              $count, length($doubleData)-$offset);
+        } elsif ($format eq 'string') {     # in the ASCII parms
+            $dataPt = $asciiData;
+            $val = substr($$dataPt, $offset, $count);
             $val =~ s/(\0|\|)$//;   # remove trailing terminator (NULL or '|')
-        } elsif ($loc == 0) {       # use the offset as the value
+        } elsif ($format eq 'int16u') {     # use the offset as the value
+            $dataPt = $dirData;
             $val = $offset;
+            $offset = $pt+6;
         } else {
             $exifTool->Warn("Unknown GeoTiff location: $loc");
             next;
         }
+        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+            'Table'  => $tagTable,
+            'Index'  => $i,
+            'Value'  => $val,
+            'DataPt' => $dataPt,
+            'Start'  => $offset,
+            'Format' => $format,
+            'Count'  => $count,
+            'Size'   => $count * Image::ExifTool::FormatSize($format),
+        );
         $exifTool->FoundTag($tagInfo, $val);
+    }
+    if ($verbose) {
+        $exifTool->{INDENT} = substr($exifTool->{INDENT}, 0, -2);
     }
 }
 
@@ -2116,7 +2146,7 @@ coordinates.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

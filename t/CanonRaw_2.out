@@ -1,3 +1,4 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
 [File, File, Image]  - File Name: CanonRaw.crw
 [File, File, Image]  - File Size: 6KB
 [File, File, Image]  - File Type: Canon RAW
@@ -27,8 +28,8 @@
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: 1.42
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 1.19
-[MakerNotes, Canon, Image] 21 - Av(Aperture Value): 3.6
-[MakerNotes, Canon, Image] 22 - Tv(Shutter Speed): 1/64
+[MakerNotes, Canon, Image] 21 - Aperture Value: 3.6
+[MakerNotes, Canon, Image] 22 - Shutter Speed: 1/64
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
@@ -84,7 +85,7 @@
 [MakerNotes, CanonRaw, Camera] 16 - Red Balance Shade: 2.06971
 [MakerNotes, CanonRaw, Camera] 17 - Blue Balance Shade: 0.84109
 [MakerNotes, CanonRaw, Camera] 4276 - Color Space: sRGB
-[Composite, Composite, Image]  - Av(Aperture Value): 3.6
+[Composite, Composite, Image]  - Aperture: 3.6
 [Composite, Composite, Camera]  - Flash Exposure Compensation: +2/3
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: On
@@ -94,6 +95,6 @@
 [Composite, Composite, Camera]  - Red Eye Reduction: Off
 [Composite, Composite, Camera]  - Shooting Mode: Program AE
 [Composite, Composite, Camera]  - Shutter Curtain Sync: 1st-curtain sync
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/64
+[Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Camera]  - Focal Length: 24.0mm
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm

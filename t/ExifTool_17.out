@@ -47,7 +47,7 @@ SequenceNumber : 0
 SerialNumber : 0560018150
 Sharpness : +1
 ShortFocal : 18
-WhiteBalance (1) : Auto
+WhiteBalance : Auto
 ZoomedResolution : 3072
 ZoomedResolutionBase : 3072
 ---- Composite ----
@@ -90,11 +90,11 @@ SceneCaptureType : Standard
 SensingMethod : One-chip color area
 ShutterSpeedValue : 0
 UserComment : 
-WhiteBalance : Auto
+WhiteBalance (1) : Auto
 ---- File ----
 FileName : ExifTool.jpg
-FileSize : 4KB
-FileType : JPG
+FileSize : 3KB
+FileType : JPEG
 ImageHeight : 120
 ImageWidth : 160
 ---- IFD0 ----

@@ -15,7 +15,7 @@ print "ok 1\n";
 
 ######################### End of black magic.
 
-use t::TestLib 'check';
+use t::TestLib;
 
 my $testname = 'CanonRaw';
 my $testnum = 1;

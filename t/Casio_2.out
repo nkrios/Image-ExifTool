@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
 [File, File, Image]  - File Name: Casio.jpg
-[File, File, Image]  - File Size: 12KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 2KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: CASIO
@@ -12,8 +13,8 @@
 [EXIF, IFD0, Image] 305 - Software: Ver1.000
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2000:03:31 10:44:15
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/114
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 2.0
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/114
+[EXIF, ExifIFD, Image] 33437 - Aperture: 2.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0210
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2000:03:31 10:44:15
@@ -36,12 +37,12 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 914
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 10012
-[MakerNotes, Casio, Camera] 1 - Recording Mode: SingleShutter
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 926
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
+[MakerNotes, Casio, Camera] 1 - Recording Mode: Single Shutter
 [MakerNotes, Casio, Camera] 2 - Image Quality: Fine
 [MakerNotes, Casio, Camera] 3 - Focus Mode: Auto
-[MakerNotes, Casio, Camera] 4 - Flash Mode: Red-eye reduction
+[MakerNotes, Casio, Camera] 4 - Flash Mode: Red-eye Reduction
 [MakerNotes, Casio, Camera] 5 - Flash Intensity: Normal
 [MakerNotes, Casio, Camera] 6 - Object Distance: 2500
 [MakerNotes, Casio, Camera] 7 - White Balance: Auto
@@ -50,8 +51,8 @@
 [MakerNotes, Casio, Camera] 12 - Contrast: Normal
 [MakerNotes, Casio, Camera] 13 - Saturation: Normal
 [MakerNotes, Casio, Camera] 20 - CCD Sensitivity: Normal
-[Composite, Composite, Image]  - Av(Aperture Value): 2.0
+[Composite, Composite, Image]  - Aperture: 2.0
 [Composite, Composite, Image]  - Image Size: 160x120
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/114
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 10012 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/114
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 13.3mm

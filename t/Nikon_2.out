@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
 [File, File, Image]  - File Name: Nikon.jpg
-[File, File, Image]  - File Size: 8KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 2KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Image] 270 - Image Description:           
@@ -13,8 +14,8 @@
 [EXIF, IFD0, Image] 305 - Software: E775v1.3u
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2001:08:01 12:57:23
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/213
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 9.4
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/213
+[EXIF, ExifIFD, Image] 33437 - Aperture: 9.4
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0210
@@ -41,25 +42,26 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 300
 [EXIF, IFD1, Image] 283 - Y Resolution: 300
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2036
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 4475
-[MakerNotes, Nikon, Camera] 1 - File System Version: 
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1426
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
+[MakerNotes, Nikon, Camera] 1 - File System Version: 1.00
 [MakerNotes, Nikon, Image] 2 - ISO Used: 0
-[MakerNotes, Nikon, Camera] 3 - Color Mode: COLOR
-[MakerNotes, Nikon, Camera] 4 - Quality: FINE  
-[MakerNotes, Nikon, Camera] 5 - White Balance: AUTO        
-[MakerNotes, Nikon, Camera] 6 - Sharpness: AUTO  
-[MakerNotes, Nikon, Camera] 7 - Focus Mode: AF-C  
-[MakerNotes, Nikon, Camera] 8 - Flash Setting:        
-[MakerNotes, Nikon, Camera] 15 - ISO Selection: AUTO  
-[MakerNotes, Nikon, Camera] 128 - Image Adjustment: NORMAL       
-[MakerNotes, Nikon, Camera] 130 - Auxiliary Lens: OFF         
+[MakerNotes, Nikon, Camera] 3 - Color Mode: Color
+[MakerNotes, Nikon, Camera] 4 - Quality: Fine
+[MakerNotes, Nikon, Camera] 5 - White Balance: Auto
+[MakerNotes, Nikon, Camera] 6 - Sharpness: Auto
+[MakerNotes, Nikon, Camera] 7 - Focus Mode: AF-C
+[MakerNotes, Nikon, Camera] 8 - Flash Setting: 
+[MakerNotes, Nikon, Camera] 15 - ISO Selection: Auto
+[MakerNotes, Nikon, Camera] 128 - Image Adjustment: Normal
+[MakerNotes, Nikon, Camera] 130 - Auxiliary Lens: Off
 [MakerNotes, Nikon, Camera] 133 - Manual Focus Distance: inf
 [MakerNotes, Nikon, Camera] 134 - Digital Zoom: 1
 [MakerNotes, Nikon, Camera] 136 - AF Point: Center
+[MakerNotes, Nikon, Camera] 143 - Scene Mode: 
 [MakerNotes, Nikon, Camera] 16 - Data Dump: (Binary data 122 bytes)
-[Composite, Composite, Image]  - Av(Aperture Value): 9.4
+[Composite, Composite, Image]  - Aperture: 9.4
 [Composite, Composite, Image]  - Image Size: 160x120
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/213
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 4475 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/213
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 8.6mm

@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..3\n"; }
+BEGIN { $| = 1; print "1..4\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -15,7 +15,7 @@ print "ok 1\n";
 
 ######################### End of black magic.
 
-use t::TestLib 'check';
+use t::TestLib;
 
 my $testname = 'IPTC-XMP';
 my $testnum = 1;
@@ -39,6 +39,50 @@ my $testnum = 1;
     my $expected = 'ExifTool-Test-XMP';
     unless ($values eq $expected) {
         warn "\n  Test $testnum differs with \"$values\"\n";
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 4: Test rewriting everything
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->Options(Duplicates => 1, Binary => 1, List => 1);
+    my $info = $exifTool->ImageInfo('t/IPTC-XMP.jpg');
+    my $tag;
+    foreach $tag (keys %$info) {
+        my $group = $exifTool->GetGroup($tag);
+        my $val = $info->{$tag};
+        my @values;
+        if (ref $val eq 'ARRAY') {
+            @values = @$val;
+        } elsif (ref $val eq 'SCALAR') {
+            @values = ( $$val );
+        } else {
+            @values = ( $val );
+        }
+        foreach $val (@values) {
+            # eat return values so warning don't get printed
+            my @rtns = $exifTool->SetNewValue($tag,$val,Group=>$group);
+        }
+    }
+    undef $info;
+    my $image;
+    $exifTool->WriteInfo("t/$testname.jpg",\$image);
+    
+    my $exifTool2 = new Image::ExifTool;
+    $exifTool2->Options(Duplicates => 1);
+    $info = $exifTool2->ImageInfo(\$image);
+    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    if (check($exifTool2, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        # save bad file
+        open(TESTFILE,">$testfile");
+        binmode(TESTFILE);
+        print TESTFILE $image;
+        close(TESTFILE);
         print 'not ';
     }
     print "ok $testnum\n";

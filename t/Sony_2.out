@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.32
 [File, File, Image]  - File Name: Sony.jpg
-[File, File, Image]  - File Size: 18KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 3KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Image] 270 - Image Description:                                
@@ -12,8 +13,8 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:18 13:51:33
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/250
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 7.1
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/250
+[EXIF, ExifIFD, Image] 33437 - Aperture: 7.1
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 64
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
@@ -50,21 +51,21 @@
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Time] 306 - Date/Time Of Last Modification: 2003:12:18 13:51:33
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2486
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 15216
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2502
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Sony, Camera] 8192 - Sony 0x2000: 0
-[MakerNotes, Sony, Camera] 36865 - Sony 0x9001: .
-[MakerNotes, Sony, Camera] 36866 - Sony 0x9002: .J.`
-[MakerNotes, Sony, Camera] 36867 - Sony 0x9003: ..sF
-[MakerNotes, Sony, Camera] 36868 - Sony 0x9004: .
-[MakerNotes, Sony, Camera] 36869 - Sony 0x9005: ..
-[MakerNotes, Sony, Camera] 36870 - Sony 0x9006: .
-[MakerNotes, Sony, Camera] 36871 - Sony 0x9007: .;.|.c.f.V......b......^O[...]
-[MakerNotes, Sony, Camera] 36872 - Sony 0x9008: .;..;....H[...]
+[MakerNotes, Sony, Camera] 36865 - Sony 0x9001: ...mQV..V....9.9.Ju....].^...[...]
+[MakerNotes, Sony, Camera] 36866 - Sony 0x9002: .J.`.p.V!.!....0.0.V!.Pp,..0c[...]
+[MakerNotes, Sony, Camera] 36867 - Sony 0x9003: ..sF.&...B............;..utN......(.^w.[...]
+[MakerNotes, Sony, Camera] 36868 - Sony 0x9004: ..,.,.,.,................l.o.@.o..,..,..o.3.M[...]
+[MakerNotes, Sony, Camera] 36869 - Sony 0x9005: ..@o........}[...]
+[MakerNotes, Sony, Camera] 36870 - Sony 0x9006: ....r...{...n..GeG....`z.[...]
+[MakerNotes, Sony, Camera] 36871 - Sony 0x9007: ..;.|.c.f.V......b......^O[...]
+[MakerNotes, Sony, Camera] 36872 - Sony 0x9008: ...........i....@..]:......;..;....H[...]
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000000
-[Composite, Composite, Image]  - Av(Aperture Value): 7.1
+[Composite, Composite, Image]  - Aperture: 7.1
 [Composite, Composite, Image]  - Image Size: 160x120
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/250
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 15216 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/250
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 12.5mm

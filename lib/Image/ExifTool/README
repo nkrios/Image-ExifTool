@@ -11,15 +11,15 @@ hash keys are the tag IDs (in decimal or hexadecimal if the ID is numerical as
 with EXIF tables, or the tag name if the ID is ASCII as with XMP tables).  In
 the case of a BinaryData table, the IDs are numerical and specify offsets into
 the binary data block.  The corresponding hash value provides information about
-the tag (explained later).  Each package my define a special table named
+the tag (explained later).  Each package may define a special table named
 'Composite' which contains tags whose values are calculated after all other tag
 values have been extracted from the file.
 
-Seven special keys (PROCESS_PROC, GROUPS, FORMAT, FIRST_ENTRY, TAG_PREFIX,
-PRINT_CONV and DID_TAG_ID) are used to provide additional information about a
-table.  The special keys have names that are all capitalized to avoid possible
-conflicts with tag names.  Below is an explanation of the meaning of each
-special key:
+Eleven special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
+INCREMENT, FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID and WRITABLE) are
+used to provide additional information about a table.  The special keys have
+names that are all capitalized to avoid possible conflicts with tag keys.  Below
+is an explanation of the meaning of each special key:
 
   PROCESS_PROC : Reference to a function used to process the directory for this
   table.  If PROCESS_PROC is not given, \&Image::ExifTool::Exif::ProcessExif is
@@ -27,62 +27,81 @@ special key:
   3 arguments: 0) reference to the ExifTool object, 1) reference to the tag
   table hash, 2) reference to a directory information hash, with the following
   members:
-  
-    Base        - Base offset for pointers from start of file.
-    DataPt      - Reference to data block containing directory (may be undef).
-    DataPos     - Position of data block within file (relative to Base).
-    DataLen     - Length of data block in bytes.
-    DirStart    - Offset to start of directory from start of data block.
-    DirLen      - Length of directory data within block.
-    Nesting     - Nesting depth in directory tree.
-    IfdName     - Name of IFD if this is an EXIF directory.
-    RAF         - Reference to File::RandomAccess object if available.
+
+    Name        - Tag name for this SubDirectory entry (for verbose messages)
+    Base        - Base offset for pointers from start of file
+    DataPt      - Reference to data block containing directory (may be undef)
+    DataPos     - Position of data block within file (relative to Base)
+    DataLen     - Length of data block in bytes
+    DirStart    - Offset to start of directory from start of data block
+    DirLen      - Length of directory data within block
+    Nesting     - Nesting depth in directory tree
+    DirName     - Name of this directory
+    Parent      - Name of parent directory
+    RAF         - Reference to File::RandomAccess object if available
+    Multi       - True if we should scan for multiple IFD's
+    NewDataPos  - File position of new data (write proc only)
+    Fixup       - Reference to hash of offset fixups (used in EXIF writing only)
+
+  WRITE_PROC : Reference to a function to write all new tags for this directory.
+  The write proc returns the new directory data or undefined on error.  It takes
+  the same arguments as the process proc above except that the second argument
+  (reference to directory information hash) is optional, and if specified gives
+  information about the source directory for tags to be copied to the output.
+
+  CHECK_PROC : Reference to a function which validates raw values for writing.
+  The function takes three arguments: 0) ExifTool object reference, 1) tagInfo
+  reference, 2) value reference, and returns undefined (and possibly modifies
+  the input value) if successful, or an error message if there was a format
+  problem.
 
   GROUPS : A hash lookup for the default group names for all entries in this
   table. If not specified, the Group 0 and 1 names will be set automatically
   according to the name of the module.
-  
-  FORMAT : Specifies the default tag Format and the pointer increment for
-  entries in a BinaryData table, and defaults to 'int8u' if not specified.  Can
-  also be used to override EXIF format in an EXIF table.  The possible  values
-  of FORMAT and Format are:
 
-    int8s          - Signed 8-bit integer
-    int8u          - Unsigned 8-bit integer
-    int16s         - Signed 16-bit integer
-    int16u         - Unsigned 16-bit integer
-    int32s         - Signed 32-bit integer
-    int32u         - Unsigned 32-bit integer
-    int64s         - Signed 64-bit integer
-    int64u         - Unsigned 64-bit integer
-    rational16s    - Rational consisting of 2 int16s values
-    rational16u    - Rational consisting of 2 int16u values
-    rational32s    - Rational consisting of 2 int32s values
-    rational32u    - Rational consisting of 2 int32u values
-    fixed16s       - Signed 16-bit fixed point value
-    fixed16u       - Unsigned 16-bit fixed point value
-    fixed32s       - Signed 32-bit fixed point value
-    fixed32u       - Unsigned 32-bit fixed point value
-    float          - 32-bit IEEE floating point value
-    double         - 64-bit IEEE floating point value
-    string         - Series of 8-bit ASCII characters
-    binary         - Binary data
-  
+  FORMAT : Specifies the default tag Format and corresponding pointer increment
+  for entries in a BinaryData table, and defaults to 'int8u' if not specified.
+  The possible values of FORMAT are:
+
+    int8s       - Signed 8-bit integer
+    int8u       - Unsigned 8-bit integer
+    int16s      - Signed 16-bit integer
+    int16u      - Unsigned 16-bit integer
+    int32s      - Signed 32-bit integer
+    int32u      - Unsigned 32-bit integer
+    int64s      - Signed 64-bit integer
+    int64u      - Unsigned 64-bit integer
+    rational16s - Rational consisting of 2 int16s values
+    rational16u - Rational consisting of 2 int16u values
+    rational32s - Rational consisting of 2 int32s values
+    rational32u - Rational consisting of 2 int32u values
+    fixed16s    - Signed 16-bit fixed point value
+    fixed16u    - Unsigned 16-bit fixed point value
+    fixed32s    - Signed 32-bit fixed point value
+    fixed32u    - Unsigned 32-bit fixed point value
+    float       - 32-bit IEEE floating point value
+    double      - 64-bit IEEE floating point value
+    string      - Series of 8-bit ASCII characters
+    binary      - Binary data
+
+  INCREMENT : If specified, overrides the default increment for a BinaryData
+  table.  The default increment is the number of bytes in the FORMAT type.
+
   FIRST_ENTRY : Specifies the index for the first tag entry in a binary table.
   This value is only used if the Unknown option is set to 2 or higher, and
   allows the binary data to be scanned for unknown tag entries.
-  
-  INCREMENT : If specified, overrides the default increment for a BinaryData
-  table.  The default increment is the number of bytes in the default format.
-  
+
   TAG_PREFIX : Prefix for names of unknown tags.
-  
-  PRINT_CONV : Print conversion for unknown tags. 
-  
+
+  PRINT_CONV : Default print conversion tags where PrintConv isn't specified.
+
   DID_TAG_ID : Used by GetTagID() as a flag to indicate that TagID's have been
-               defined for all tags in this table.  This may be set in the table
-               definition to prevent GetTagID() from assigning TagID's.
-  
+  defined for all tags in this table.  This may be set in the table definition
+  to prevent GetTagID() from assigning TagID's.
+
+  WRITABLE : Indicates that all tags in this table are writable.  This is the
+  same as setting the Writable flag for each individual tag in the table.
+
 The remaining entries in a tag table are the EXIF tags with their associated
 information.  The information may exist in one of three forms:  1) A simple
 scalar which is the name of the tag, 2) A reference to a hash of information
@@ -116,11 +135,54 @@ conditions.  The following is a description of possible hash entries:
                   For IPTC tables, the only valid Format type is binary,
                   otherwise the data is assumed to be string.
 
-  Flags         : [optional] Flag or list of flags to specify characteristics of
-                  this tag value.  Currently the only flag is 'List', which
-                  indicates that duplicate entries of this tag should be
-                  accumulated in a list (a comma separated string of PrintConv
-                  values and a reference to an array of ValueConv values).
+  Writable      : Indicates this tag can be written (or not written if value is
+                  set to zero), and for EXIF-type tables, gives format for
+                  writing.  With MakerNotes, format need not be specified
+                  because existing format is always used, however format
+                  information is desireable because it is used in validating the
+                  value.
+
+  Flags         : [optional] Flags to specify characteristics for this tag.  May
+                  be a simple scalar flag name, a reference to a list of flag
+                  names, or a reference to a hash of flag/value pairs. If not a
+                  hash reference, the flag value is set to 1. The available flag
+                  names are:
+ 
+                  'List' - indicates that duplicate entries of this tag should
+                  be accumulated in a list (a comma separated string of
+                  PrintConv values and a reference to an array of ValueConv
+                  values).  The value is the list type for XMP lists.
+
+                  'Priority' - indicates that the first value of this tag takes
+                  priority over subsequent values if duplicates of this tag are
+                  encountered.
+
+                  'Protected' - indicates that even though this tag may be
+                  writable, it can not be set directly by the user. (Instead,
+                  it is set via the Require tags of a composite tag.)
+
+                  'PrintHex' - specifies that unknown PrintConv values should
+                  be printed in hex (ie. "Unknown (0x0)")
+
+                  'SubIFD' - used in writing to determine that the tag specifies
+                  an offset to a sub-IFD.  When this flag is set, the Group1
+                  name gives the name of the IFD.
+
+                  'IsOffset' - flag set if the tag represents an offset to some
+                  data, and causes value will be adjusted to an absolute file
+                  offset.
+
+                  'OffsetPair' - set if the tag represents half of an offset/
+                  byte count pair.  Data for these tags must be handled
+                  separately.  Value is the tagID for the paired tag.
+
+                  'DataTag' - associated tag name containing data for offset or
+                  byte count tags.
+
+                  'MakerNotes' - set if this tag is maker note data.
+
+                  'DataMember' - name of exiftool data member associated with
+                  this tag if it should be stored as a special data member.
 
   ValueConv     : [optional] Used to convert the raw data value to a useable
                   form.  May be either a hash reference to act as a lookup table
@@ -148,6 +210,12 @@ conditions.  The following is a description of possible hash entries:
                   print conversion is only done if the PrintConv option is
                   enabled (which it is by default).
 
+  ValueConvInv  : [optional] The inverse of ValueConv.  Only necessary if
+                  ValueConv is specified and this tag is Writable.
+
+  PrintConvInv  : [optional] The inverse of PrintConv.  Only necessary if
+                  PrintConv is specified and this tag is Writable.
+
   Condition     : [optional] If given, specifies scalar which is evaluated as a
                   Perl expression to decide whether the tag is valid.  If used
                   in a list, the first list entry with a true condition is
@@ -173,7 +241,7 @@ conditions.  The following is a description of possible hash entries:
   TagID         : [reserved] This entry is used internally by GetTagID() to
                   cache tag ID numbers for speed.
 
-  SubDirectory {  [optional] If it exists, this specifies the start of a new 
+  SubDirectory {  [optional] If it exists, this specifies the start of a new
                   subdirectory.  It contains a collection of variables which
                   specify the type and location of the subdirectory.  These
                   variables are described below:
@@ -181,11 +249,11 @@ conditions.  The following is a description of possible hash entries:
       TagTable  : [optional] Specifies the name of the tag table lookup for the
                   new subdirectory.  If not specified, the current tag table is
                   used.
-                  
-      Start     : [required] The offset to the start of the subdirectory.  This
-                  is a Perl expression which may use $valuePtr to represent the
-                  location of the tag value in the file, or $val for the value
-                  itself.
+
+      Start     : [required] The offset to the start of the subdirectory
+                  relative to the current Base.  This is a Perl expression which
+                  may use $valuePtr to represent the location of the tag value
+                  in the file, or $val for the value itself.
 
       OffsetPt  : [optional] If specified, this is a Perl expression that gives
                   the position of a 32-bit word in the current directory that is
@@ -210,16 +278,20 @@ conditions.  The following is a description of possible hash entries:
                   Unknown.  If Unknown is specified, the byte order will be
                   determined from the directory count (however, this can not be
                   done if OffsetPt is specified).
-                  
+
       Validate  : [optional] If given, specifies Perl expression which is used
                   to validate the subdirectory data.  The following variables
                   may be used in the expression: $val (value of the tag),
                   $dirData (reference to directory data), $subdirStart (offset
                   to subdirectory start) and $size (size of subdirectory).
-                  
+
       ProcessProc : [optional] If given, specifies processing procedure used
                   to decode this subdirectory data.  This overrides the default
                   procedure specified by PROCESS_PROC in the tag table.
+
+      DirName   : [optional] Name of this subdirectory.  If not specified, the
+                  name is taken from the TagTable default GROUP0 name, or from
+                  the tag Group1 name if no TagTable specified.
   }
 
 --------------------------------------------------------------------------------

@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.10
 [File, File, Image]  - File Name: Unknown.jpg
 [File, File, Image]  - File Size: 4KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: Xxxxx
@@ -11,8 +12,8 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:11:30 18:05:18
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 3.2
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 5.0
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 3.2
+[EXIF, ExifIFD, Image] 33437 - Aperture: 5.0
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 200
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:11:30 18:05:18
@@ -69,8 +70,8 @@
 [MakerNotes, MakerUnknown, Camera] 18 - Unknown 0x0012: 7 7 3072 2048 3072 2048 151 151 1014 608 0 0 0 64928 64[...]
 [MakerNotes, MakerUnknown, Camera] 19 - Unknown 0x0013: 0 159 7 112
 [MakerNotes, MakerUnknown, Camera] 181 - Unknown 0x00b5: 10 2 2 1536 1024
-[Composite, Composite, Image]  - Av(Aperture Value): 5.0
+[Composite, Composite, Image]  - Aperture: 5.0
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 29.3
-[Composite, Composite, Image]  - Tv(Shutter Speed): 3.2
+[Composite, Composite, Image]  - Shutter Speed: 3.2
 [Composite, Composite, Camera]  - Focal Length: 14.0mm (35mm equivalent: 410.6mm)

@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.32
 [File, File, Image]  - File Name: Olympus.jpg
-[File, File, Image]  - File Size: 8KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 2KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Image] 270 - Image Description: OLYMPUS DIGITAL CAMERA         
@@ -13,8 +14,8 @@
 [EXIF, IFD0, Image] 305 - Software: v951p-80
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 1999:12:06 16:38:40
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/30
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 2.0
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/30
+[EXIF, ExifIFD, Image] 33437 - Aperture: 2.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0210
@@ -41,8 +42,8 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2036
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 3230
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1296
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Olympus, Camera] 512 - Special Mode: 0 0 0
 [MakerNotes, Olympus, Camera] 513 - Image Quality: HQ
 [MakerNotes, Olympus, Camera] 514 - Macro: Off
@@ -50,9 +51,9 @@
 [MakerNotes, Olympus, Camera] 519 - Software Release: SR951
 [MakerNotes, Olympus, Camera] 520 - Pict Info: [pictureInfo] Resolution=1 [Camera Info] Type=SR951
 [MakerNotes, Olympus, Camera] 521 - Camera ID: OLYMPUS DIGITAL CAMERA
-[MakerNotes, Olympus, Camera] 3840 - Data Dump: 0 0 16777216 0 61817 768 61817 29184 2990272889 27904 17408 2735364612 4093706240 2049 0 0 1628534016 0 266 0 0 0 0 2433548288 1594490921 3573703012 3507491858 1124007957 204624719 65360
-[Composite, Composite, Image]  - Av(Aperture Value): 2.0
+[MakerNotes, Olympus, Camera] 3840 - Data Dump: (Binary data 186 bytes)
+[Composite, Composite, Image]  - Aperture: 2.0
 [Composite, Composite, Image]  - Image Size: 160x120
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/30
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 3230 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/30
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 7.0mm

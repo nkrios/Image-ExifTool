@@ -5,10 +5,260 @@
 <body>
 <h1>ExifTool Version History</h1>
 
+<b>Jan. 24/05 - Version 4.36</b>
+<ul>
+<li>Added support for reading Olympus Raw Format (ORF)
+</ul>
+
+<b>Jan. 23/05 - Version 4.35</b>
+<ul>
+<li>Moved a couple of the informational warnings to verbose mode
+<li>Suppress warnings an non-critical errors with -m option
+<li>Made a few more of the EXIF tags writable
+<li>Made model-dependent tags Pentax FocalLength and Olympus Quality writable
+<li>Added ability to write CanonCustom tags
+<li>Added range check for integer values
+</ul>
+
+<b>Jan. 21/05 - Version 4.34</b>
+<ul>
+<li>Fixed problem when writing Canon maker notes with -allTagsFromFile
+<li>Added -o option to write to different file or directory
+<li>Added handler to clean up temporary file on Ctrl-C
+<li>Re-wrote routine to rationalize floating point values (it is slower now, but
+    produces much prettier fractions)
+<li>Other minor improvements to writer code
+</ul>
+
+<b>Jan. 19/05 - Version 4.33</b>
+<ul>
+<li>Added check at higher level and return warning if trying to delete
+    information from maker notes
+<li>Make GPS latitude and longitude a bit more flexible about the format they
+    accept when writing
+<li>Updates to documentation
+</ul>
+
+<b>Jan. 19/05 - Version 4.32</b>
+<ul>
+<li>Now rewrites Casio EX-Z3 maker notes properly (well, not actually
+    'properly', but the way they were written in the first place, which is
+    wrong)
+<li>Added warning when writing information if original IFD entries were not in
+    the proper sequence, which is a violation of EXIF specs.  (And surprise,
+    you'll never guess who does this too...  Yup, the EX-Z3.)
+<li>Fix parsing problem with GPSProcessingMethod and GPSAreaInformation
+<li>No longer truncates 'undef' values at first null character
+<li>Changed all DataDump tags to binary data types
+<li>Changed some warning messages
+<li>Documented the -m option (it's now official, even though it's been there
+    since version 4.10)
+<li>Added some more writer tests
+</ul>
+
+<b>Jan. 18/05 - Version 4.31</b>
+<ul>
+<li>Now also copies over preview image in Nikon NEF files
+</ul>
+
+<b>Jan. 18/05 - Version 4.30</b>
+<ul>
+<li>Now copies over preview images in EXIF data (large, external previews still
+    not copied).
+<li>Account for funny offsets in Casio EX-Z3 maker notes while extracting data
+    (but haven't figured out how to handle them when writing)
+<li>Fix but introduced in 4.20 that broke extraction of Canon PreviewImage
+</ul>
+
+<b>Jan. 17/05 - Version 4.23</b>
+<ul>
+<li>Improve handling of unrecognized maker notes when writing
+</ul>
+
+<b>Jan. 17/05 - Version 4.22</b>
+<ul>
+<li>Added check in -AllTagsFromFile to test for pointers in the maker notes
+    directory running outside the maker notes data. If they do, a warning is
+    issued and the maker notes are rebuilt properly before copying.
+<li>Fixed problem which could corrupt some values when editing maker notes.
+</ul>
+
+<b>Jan. 17/05 - Version 4.21</b>
+<ul>
+<li>Added Olympus Red/BlueBalance
+</ul>
+
+<b>Jan. 17/05 - Version 4.20</b>
+<ul>
+<li>Added ability to edit MakerNotes!
+<li>Added more validation when writing IPTC information
+<li>Fixed display of Nikon FlashExposureComp for negative values
+<li>Fixed problem where the large JPEG image in Nikon and Pentax raw files was
+    misidentified as the ThumbnailImage.  It is now extracted as JpgFromRaw.
+    This allows all 3 JPEG images contained in Pentax PEF files to be extracted:
+    ThumbnailImage, PreviewImage and JpgFromRaw.
+<li>Fixed problem on systems that use backslashes in directory names that
+    prevented exiftool from finding its libraries if not installed
+<li>Changed many Pentax tag names to remove "Pentax" prefix and conform more to
+    the other tag names (moving information between files of different formats
+    is much easier if tags have standardized names):
+    <ul>
+    <li>PentaxPictureMode =&gt; PictureMode
+    <li>PentaxFocusMode =&gt; FocusMode
+    <li>PentaxWhiteBalance =&gt; WhiteBalance
+    <li>PentaxAEMetering =&gt; MeteringMode
+    <li>PentaxFocalLength =&gt; FocalLength
+    <li>PentaxZoom =&gt; DigitalZoom
+    <li>PentaxSaturation =&gt; Saturation
+    <li>PentaxContrast =&gt; Contrast
+    <li>PentaxSharpness =&gt; Sharpness
+    </ul>
+<li>Fixed FocalLength conversion for Pentax Optio S
+<li>Fixed printout of Nikon FileSystemVersion for older Nikon models
+<li>More improvements to reliabilty of preview image extraction
+<li>Fixed Quality for Olympus E-1
+</ul>
+
+<b>Jan. 12/05 - Version 4.15</b>
+<ul>
+<li>Added Pentax LensType and RawImageSize tags
+<li>Change printing of some unknown values to hexadecimal
+<li>Now recognizes Nikon PEF files
+<li>More reliable extraction of preview and thumbnail images, particularly for
+    the various models of Pentax cameras.
+<li>Added decoding of the Canon 20D custom functions and a new Canon20D shortcut
+    (thanks to Christian Koller)
+<li>Improved write logic for EXIF information
+<li>Improved logic in determining byte ordering of maker notes
+</ul>
+
+<b>Jan. 10/05 - Version 4.14</b>
+<ul>
+<li>Fixed problem introduced in 4.13 that messed up new 4.12 features.  doh.
+    (and added test to keep this from happening again!).
+<li>No longer store bad directory data as a tag (dump in verbose output instead)
+</ul>
+
+<b>Jan. 9/05 - Version 4.13</b>
+<ul>
+<li>Added check on size of new ThumbnailImage so ExifTool doesn't try to write
+    an image that is too large (&gt;60k) into the JPEG EXIF APP1 segment.
+</ul>
+
+<b>Jan. 9/05 - Version 4.12</b>
+<ul>
+<li>-AllTagsFromFile option now copies over the maker notes
+<li>Changed some misleading warning messages
+</ul>
+
+<b>Jan. 8/05 - Version 4.11</b>
+<ul>
+<li>Improved validation of tag values with -AllTagsFromFile option
+</ul>
+
+<b>Jan. 7/05 - Version 4.10</b>
+<ul>
+<li>Added ability to write EXIF, IPTC and XMP tags in JPEG and TIFF files!
+<li>Allow Photoshop APP13 data to span multiple segments (read and write)
+<li>Added -TAG+=VALUE, -TAG-=VALUE and -TAG&lt;=VALUE syntaxes
+<li>Added -GROUP:TAG syntax to allow tag group to be specified
+<li>Added powerful -AllTagsFromFile=SRCFILE option to copy all tags from file
+<li>Added -listw option to list all writable tags
+<li>Added -E option to escape output values for HTML
+<li>Fixed -w option to only replace extension after last '.' in filename if more
+    than one '.'
+<li>Unescape XMP character codes when extracting values (and escape again when
+    writing)
+<li>Now processes all IFD's of TIFF imags (not just IFD0)
+<li>Added data length check in hex dump of verbose option
+<li>Allow group name to be specified as prefix to tag name on command line
+<li>Renamed a few Nikon tags: FlashExposureComp to FlashExposureBracketValue,
+    FEC to FlashExposureComp, and ShutterReleaseMode to ShootingMode
+<li>Extract Nikon preview image
+<li>Changed descriptions for Aperture and Shutter Speed to drop the Av/Tv Canonism
+<li>Improved logic to recognize more types of unknown maker notes
+<li>Recognize a couple more values of the Canon WhiteBalance tag
+<li>Renamed IPTC 'SupplementalCategory' to 'SupplementalCategories'
+<li>Handle timezone in times
+<li>API Changes:
+    <ul>
+    <li>Fixed problem where first tag name passed to GetInfo() was ignored
+    <li>The values returned by ImageInfo() and GetInfo() may contain array
+        references to indicate lists of values if PrintConv is disabled.
+    <li>Added a bunch of new stuff...
+    </ul>
+</ul>
+
+<b>Dec. 15/04 - Version 4.05</b>
+<ul>
+<li>Added a couple of Nikon tags
+<li>Now preserves original file by renaming to "NAME_original" when writing
+    information
+<li>Don't preserve file time by default when writing.  Added -P option to do this.
+<li>Changes to spec file
+</ul>
+
+<b>Dec. 11/04 - Version 4.04</b>
+<ul>
+<li>Fixed problem which could corrupt JPEG images when adding comments (Note: if
+    done, the damage can reversed by removing the comments with the same version
+    of ExifTool that added them.)
+</ul>
+
+<b>Dec. 6/04 - Version 4.03</b>
+<ul>
+<li>Major overhaul of verbose message output
+<li>Change -v option to allow verbose level to be specified (ie. -v3 = very very
+    verbose)
+<li>Added a new Nikon tag (SceneMode).
+<li>Count images which were unchanged when writing tags
+<li>Changed FileType 'JPG' to 'JPEG'</ul>
+
+<b>Dec. 2/04 - Version 4.02</b>
+<ul>
+<li>Fixed problem with rewriting some JPEG images
+<li>Preserve original file modification time when updating tags in a file
+<li>Report of number of files updated
+<li>API Changes:
+    <ul>
+    <li>Changed arguments of WriteInfo() and allow scalar and file references to be
+        used
+    </ul>
+</ul>
+
+<b>Dec. 1/04 - Version 4.01</b>
+<ul>
+<li>Changed -o option to -w to avoid confusion since we now write image files too
+<li>Added warning if specified image file doesn't exist
+</ul>
+
+<b>Dec. 1/04 - Version 4.00</b>
+<ul>
+<li>Started down the road of adding write support:
+    <ul>
+    <li>Allow writing of Comment tag to JPEG and GIF files
+    </ul>
+<li>API for write functions still under development and is likely to change
+<li>Clean up formatting of Nikon string tags (fix case and remove trailing spaces)
+</ul>
+
+<b>Nov. 30/04 - Version 3.96</b>
+<ul>
+<li>Changed JPEG read routine to speed things up a bit
+<li>Added a few more ICC_Profile tags
+</ul>
+
+<b>Nov. 25/04 - Version 3.95</b>
+<ul>
+<li>Improved compatibility with old Perl versions (now runs, albeit with
+    warnings, on 5.003)
+</ul>
+
 <b>Nov. 25/04 - Version 3.94</b>
 <ul>
-<li>Patched problem with reading XMP data on Debian systems (suspected Perl bug)
-<li>Put lib directory first in exiftool include list to take precidence over installed versions
+<li>Patched problem with reading XMP data using Perl 5.6.x (Perl bug)
+<li>Put lib directory first in exiftool include list to take precidence over
+    installed versions
 <li>Continue trying to parse JPEG image after an unrecognized APP1 segment
 </ul>
 
@@ -27,7 +277,8 @@
 <b>Nov. 22/04 - Version 3.92</b>
 <ul>
 <li>Fixed problem with -p option when multiple files are specified
-<li>Enhancements to ICC_Profile information, including extracting information from profile header
+<li>Enhancements to ICC_Profile information, including extracting information
+    from profile header
 <li>Subdivide ICC_Profile group in family 1
 <li>Added Minolta ImageStabilization tag
 </ul>
@@ -48,12 +299,13 @@
 <li>Added support for Minolta RAW (MRW) file format
 <li>Added support for Konica-Minolta cameras
 <li>Improved decoding for Minolta maker notes
-<li>Extract (the sometimes misleading) EXIF WhiteBalance tag even if WhiteBalance was
-    extracted from the maker notes if the Duplicates option is set.  (Previously it
-    was only extracted as an Unknown tag in this case.)
+<li>Extract (the sometimes misleading) EXIF WhiteBalance tag even if
+    WhiteBalance was extracted from the maker notes if the Duplicates option is
+    set.  (Previously it was only extracted as an Unknown tag in this case.)
 <li>API Changes:
     <ul>
-    <li>Return list of all tags in image if GetFoundTags() or GetTagList() are called before ImageInfo() or GetInfo()
+    <li>Return list of all tags in image if GetFoundTags() or GetTagList() are
+        called before ImageInfo() or GetInfo()
     </ul>
 </ul>
 
@@ -63,7 +315,8 @@
 <li>All XMP lists now comma separated (previously, 'alt' lists were separated by '|')
 <li>API Changes:
     <ul>
-    <li>GetValue() now returns reference to array if values form a list and ValueConv is specified
+    <li>GetValue() now returns reference to array if values form a list and
+        ValueConv is specified
     </ul>
 </ul>
 
@@ -131,7 +384,7 @@
 <li>Changed a few long tables to binary type
 <li>Recognize some new YCbCrSubSampling values
 <li>Display DNG LocalizedCameraModel in plain text
-<li>Patched problem in FileSource reported by Sigma cameras 
+<li>Patched problem in FileSource reported by Sigma cameras
 <li>Added information about tag format to verbose hex dump
 </ul>
 
@@ -140,8 +393,10 @@
 <li>Added support for DNG file format
 <li>Added and updated a number of EXIF tags for FAX and other uncommon images
 <li>Added Photoshop URL tag
-<li>Attempt to extract image from files with unrecognized extensions assuming TIFF format
-<li>Added "Image format error" if the image type is recognized but the format is bad
+<li>Attempt to extract image from files with unrecognized extensions assuming
+    TIFF format
+<li>Added "Image format error" if the image type is recognized but the format is
+    bad
 <li>Changed "Unknown file type" error to "Unknown image type"
 <li>Moved POD documentation into separate .pod files
 <li>Started referencing sources for tag definitions in the source code
@@ -177,7 +432,8 @@
 
 <b>Sept. 13/04 - Version 3.48</b>
 <ul>
-<li>Changed UserComment to skip first 8 bytes since the comments come after an 8 byte character code
+<li>Changed UserComment to skip first 8 bytes since the comments come after an 8
+    byte character code
 </ul>
 
 <b>Sept. 10/04 - Version 3.47</b>
@@ -193,7 +449,7 @@
 <b>June 3/04 - Version 3.45</b>
 <ul>
 <li>Recognize Canon 1D Mk II raw files (.CR2)
-<br>(Note: Not properly decoding maker notes from these files yet)
+    <br>(Note: Not properly decoding maker notes from these files yet)
 </ul>
 
 <b>May 28/04 - Version 3.44</b>
@@ -225,7 +481,7 @@
 <b>Apr. 6/04 - Version 3.37</b>
 <ul>
 <li>Added support for Sigma maker notes
-<li>Remember to add new files to MANIFEST so they get included in release.  Doh.
+<li>Remember to add new files to MANIFEST so they get included in release.  Doh
 </ul>
 
 <b>Apr. 6/04 - Version 3.36</b>
@@ -284,7 +540,9 @@
 <li>Optimized a few routines to speed things up a bit
 <li>API Changes:
     <ul>
-    <li>Changed GetDescription() documention to indicate it is called with an ExifTool object (this is still optional, but will be manditory with the next version)
+    <li>Changed GetDescription() documention to indicate it is called with an
+        ExifTool object (this is still optional, but will be mandatory with the next
+        version)
     </ul>
 </ul>
 
@@ -308,7 +566,8 @@
 <li>API Changes:
     <ul>
     <li>Added GetGroups()
-    <li>GetGroup() now returns group names for all families if used in list context and family not specified.
+    <li>GetGroup() now returns group names for all families if used in list context
+        and family not specified
     </ul>
 </ul>
 
@@ -316,7 +575,8 @@
 <ul>
 <li>API Changes:
     <ul>
-    <li>Changed GetInfo() to return list of tags like ImageInfo() if list reference provided
+    <li>Changed GetInfo() to return list of tags like ImageInfo() if list reference
+        provided
     <li>Fixed bug that caused GetInfo() to ignore specified tags
     </ul>
 </ul>
@@ -339,11 +599,12 @@
 <li>Can now specify excluded tags with leading '-' (replaces -x option)
 <li>API Changes:
     <ul>
-    <li>Added ClearOptions(), ExtractInfo(), GetInfo(), CombineInfo(), GetTagList() and GetAllGroups()
+    <li>Added ClearOptions(), ExtractInfo(), GetInfo(), CombineInfo(), GetTagList()
+        and GetAllGroups()
     <li>Removed IsVerbose() function (use Options('Verbose') instead)
     <li>Allow groups to be excluded by specifying leading '-' on group name
-    <li>ImageInfo() and GetInfo() now use specified group order to set tag precidence
-        if Duplicates option is not set
+    <li>ImageInfo() and GetInfo() now use specified group order to set tag
+        precidence if Duplicates option is not set
     <li>Change default value of Duplicates option back to 0
     </ul>
 </ul>
@@ -352,7 +613,8 @@
 <ul>
 <li>Changed format of all date and time tags to EXIF standard
 <li>Added some composite date/time tags
-<li>Fixed date formatting so -d option should now work with all combined date/time tags
+<li>Fixed date formatting so -d option should now work with all combined
+    date/time tags
 <li>Other minor changes to GPS information
 <li>Improvements to TIFF processing
 <li>Set value to "Undefined" if PrintConv evaluates to undefined value
@@ -378,7 +640,8 @@
 
 <b>Feb. 26/04 - Version 3.13</b>
 <ul>
-<li>Print out errors from exiftool script (since Image::ExifTool no longer prints them)
+<li>Print out errors from exiftool script (since Image::ExifTool no longer
+    prints them)
 <li>Added more tests
 <li>Failed tests now leave ".failed" file in "t" directory for post mortem
 </ul>
@@ -442,7 +705,8 @@ script was not changed
 <li>Avoid scanning past end of Canon binary data blocks
 <li>API changes:
     <ul>
-    <li>GetFoundTags() and GetRequestedTags() now return list instead of list reference
+    <li>GetFoundTags() and GetRequestedTags() now return list instead of list
+        reference
     </ul>
 </ul>
 
@@ -462,14 +726,15 @@ script was not changed
 
 <b>Feb. 13/04 - Version 3.00</b>
 <ul>
-<li>Removed -all option (it is now the default -- specify -common for previous default behaviour)
+<li>Removed -all option (it is now the default -- specify -common for previous
+    default behaviour)
 <li>Added -a option to allow printout of duplicate tag values
 <li>API changes:
     <ul>
     <li>I am finally happy with the API, so future major changes are less likely
         (hence the major version number)
-    <li>No longer return ARRAY reference for list of tags
-    <br>(Instead, tag values are joined in a comma separated list if tag 'List' flag is set)
+        <li>No longer return ARRAY reference for list of tags (Instead, tag values
+            are joined in a comma separated list if tag 'List' flag is set)
     <li>Added SAVE_DUPLICATES option
     <li>Added BuildCompositeTags() to EXPORT_OK list
     <li>GetFoundTags() now sorts tags in specified order
@@ -484,7 +749,7 @@ script was not changed
     <ul>
     <li>Added RandomAccessFile.pm
     <li>All image file i/o now done through a RandomAccessFile object
-    <br>--> allows proper piping and use of string i/o
+        <br>--&gt; allows proper piping and use of string i/o
     <li>Allow scalar reference to be passed to ImageInfo() (for string i/o)
     </ul>
 </ul>
@@ -494,14 +759,15 @@ script was not changed
 <li>More tweaking of Pentax maker notes
 <li>Changed API to be more object oriented:
     <ul>
-    <li>Removed SetVerbose(), ExtractUnknown(), SetDateFormat(), EnablePrintConversion(),
-        EnableCompositeTags()
+    <li>Removed SetVerbose(), ExtractUnknown(), SetDateFormat(),
+        EnablePrintConversion(), EnableCompositeTags()
     <li>Added Options() to replace above functions
     <li>Changed WarnDuplicateTags() to WarnDuplicateDescriptions()
     <li>Added GetFoundTags() and GetRequestedTags()
     <li>Many functions now take ExifTool object reference as first argument
-    <li>ImageInfo() no longer returns reference to ExifTool object when used in list context
-        (you have to use "new ExifTool" and the OO form of ImageInfo() if you want the object)
+    <li>ImageInfo() no longer returns reference to ExifTool object when used in list
+        context (you have to use "new ExifTool" and the OO form of ImageInfo() if
+        you want the object)
     </ul>
 </ul>
 
@@ -524,7 +790,7 @@ script was not changed
 <li>Read Photoshop APP13 records properly
 <li>Added -g option
 <li>Move shortcuts into separate module
-<li>Changes to API: 
+<li>Changes to API:
     <ul>
     <li>Removed LoadAllTables() and added GetAllTags()
     <li>Removed GetDescriptions() and added GetDescription()

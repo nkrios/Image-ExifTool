@@ -11,51 +11,68 @@ package Image::ExifTool::FujiFilm;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 %Image::ExifTool::FujiFilm::Main = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0x0 => 'Version',
+    0x0 => {
+        Name => 'Version',
+        Writable => 'undef',
+    },
     0x1000 => {
         Name => 'Quality',
         Description => 'Image Quality',
+        Writable => 'string',
     },
     0x1001 => {
         Name => 'Sharpness',
+        Writable => 'int16u',
         ValueConv => '$val - 2',
+        ValueConvInv => '$val + 2',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
     0x1002 => {
         Name => 'WhiteBalance',
+        Flags => 'PrintHex',
+        Writable => 'int16u',
         PrintConv => {
-            0 => 'Auto',
-            256 => 'Daylight',
-            512 => 'Cloudy',
-            768 => 'DaylightColor-fluorescent',
-            769 => 'DaywhiteColor-fluorescent',
-            770 => 'White-fluorescent',
-            1024 => 'Incandescent',
-            3840 => 'Custom',
+            0x0   => 'Auto',
+            0x100 => 'Daylight',
+            0x200 => 'Cloudy',
+            0x300 => 'DaylightColor-fluorescent',
+            0x301 => 'DaywhiteColor-fluorescent',
+            0x302 => 'White-fluorescent',
+            0x400 => 'Incandescent',
+            0xF00 => 'Custom',
         },
     },
     0x1003 => {
         Name => 'Saturation',
+        Flags => 'PrintHex',
+        Writable => 'int16u',
         PrintConv => {
-            0 => 'Normal',
-            256 => 'High',
-            512 => 'Low',
+            0x0   => 'Normal',
+            0x100 => 'High',
+            0x200 => 'Low',
         },
     },
     0x1004 => {
         Name => 'Contrast',
+        Flags => 'PrintHex',
+        Writable => 'int16u',
         PrintConv => {
-            0 => 'Normal',
-            256 => 'High',
-            512 => 'Low',
+            0x0   => 'Normal',
+            0x100 => 'High',
+            0x200 => 'Low',
         },
     },
     0x1010 => {
         Name => 'FujiFlashMode',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Auto',
             1 => 'On',
@@ -63,9 +80,13 @@ $VERSION = '1.01';
             3 => 'Red-eye reduction',
         },
     },
-    0x1011 => 'FlashStrength',
+    0x1011 => {
+        Name => 'FlashStrength',
+        Writable => 'rational32s',
+    },
     0x1020 => {
         Name => 'Macro',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'On',
@@ -73,6 +94,7 @@ $VERSION = '1.01';
     },
     0x1021 => {
         Name => 'FocusMode',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Auto',
             1 => 'Manual',
@@ -80,6 +102,7 @@ $VERSION = '1.01';
     },
     0x1030 => {
         Name => 'SlowSync',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'On',
@@ -87,20 +110,23 @@ $VERSION = '1.01';
     },
     0x1031 => {
         Name => 'PictureMode',
+        Flags => 'PrintHex',
+        Writable => 'int16u',
         PrintConv => {
-            0 => 'Auto',
-            1 => 'Portrait',
-            2 => 'Landscape',
-            4 => 'Sports',
-            5 => 'Night',
-            6 => 'Program AE',
-            256 => 'Aperture-priority AE',
-            512 => 'Shutter speed priority AE',
-            768 => 'Manual',
+            0x0 => 'Auto',
+            0x1 => 'Portrait',
+            0x2 => 'Landscape',
+            0x4 => 'Sports',
+            0x5 => 'Night',
+            0x6 => 'Program AE',
+            0x100 => 'Aperture-priority AE',
+            0x200 => 'Shutter speed priority AE',
+            0x300 => 'Manual',
         },
     },
     0x1100 => {
         Name => 'AutoBracketing',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'On',
@@ -108,6 +134,7 @@ $VERSION = '1.01';
     },
     0x1300 => {
         Name => 'BlurWarning',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'None',
             1 => 'Blur Warning',
@@ -115,6 +142,7 @@ $VERSION = '1.01';
     },
     0x1301 => {
         Name => 'FocusWarning',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Good',
             1 => 'Out of focus',
@@ -122,6 +150,7 @@ $VERSION = '1.01';
     },
     0x1302 => {
         Name => 'ExposureWarning',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Good',
             1 => 'Bad exposure',
@@ -149,7 +178,7 @@ FujiFilm maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

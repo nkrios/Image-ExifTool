@@ -1,41 +1,48 @@
-ExifTool by Phil Harvey (phil@owl.phy.queensu.ca)
-------------------------------------------------------------------------
+ExifTool by Phil Harvey (phil at owl.phy.queensu.ca)
+----------------------------------------------------------------------------
 
-ExifTool is a highly customizable Perl script that extracts EXIF, IPTC,
-XMP, GPS, GeoTIFF, ICC Profile and Photoshop IRB meta information from
-JPG, TIFF, GIF, CRW, THM, CR2, MRW, NEF and DNG images. ExifTool also
-extracts information from the maker notes of many digital cameras by
-various manufacturers including Canon, Casio, FujiFilm,
-Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica,
-Pentax/Asahi, Sanyo and Sigma/Foveon.
+ExifTool is a highly customizable Perl script that extracts EXIF, IPTC, XMP,
+GPS, GeoTIFF, ICC Profile and Photoshop IRB meta information from JPG, TIFF,
+GIF, CRW, THM, CR2, MRW, NEF, PEF and DNG images.  ExifTool also extracts
+information from the maker notes of many digital cameras by various
+manufacturers including Canon, Casio, FujiFilm, Minolta/Konica-Minolta,
+Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Sanyo and Sigma/Foveon.
+
+ExifTool can also be used to edit meta information.  Currently, EXIF, IPTC
+and XMP information can be written to JPEG, TIFF, GIF, THM, CR2, NEF, PEF
+and DNG files.  See html/index.html for more details about the ExifTool
+features.
 
 ExifTool can be downloaded from
 
-   http://owl.phy.queensu.ca/~phil/exiftool/
+   Main server URL:  http://owl.phy.queensu.ca/~phil/exiftool/
+   Alternate URL:    http://130.15.24.87/~phil/exiftool/
+
+Note:  Please do not make links to the alternate URL above, because this
+server is not permanent.
 
 RUNNING
 
 The exiftool script can be run right away without the need to install
-Image::ExifTool.  For example, if you change directory to the exiftool
-directory, you can extract information from one of the included test
-files by typing:
+Image::ExifTool.  For example, from within the exiftool directory you can
+extract the information from one of the included test files by typing:
 
    ./exiftool t/ExifTool.jpg
 
-You can move the exiftool script to wherever you like, however for the
-script to work in the new location you must also move the accompanying
-lib directory or install the Image::ExifTool package.
+If you move the exiftool script to a different directory, you must also
+either move the contents of the lib directory or install the Image::ExifTool
+package so the script can find the necessary libraries.
 
 INSTALLATION
 
-You can install the Image::ExifTool package to make it available for use
-by other Perl scripts by typing the following:
+You can install the Image::ExifTool package to make it available for use by
+other Perl scripts by typing the following:
 
    perl Makefile.PL
    make
    make test
    make install
-   
+
 Note: You need root access for the last step above.
 
 DEPENDENCIES
@@ -44,25 +51,26 @@ No special libraries needed.
 
 COPYRIGHT AND LICENCE
 
-Copyright 2003-2004, Phil Harvey
+Copyright 2003-2005, Phil Harvey
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
 
 ADDITIONAL INFORMATION
 
-Read the following files included with the ExifTool distribution
-for more information:
+Read the following files included with the ExifTool distribution for more
+information:
 
 html/index.html           - Main ExifTool documentation
 html/history.html         - ExifTool revision history
-html/tag_list.html        - List of available tag names
 html/ExifTool.html        - ExifTool API documentation
 lib/Image/ExifTool/README - ExifTool support modules documentation
 
-and if you have installed Image::ExifTool, you can also consult
+and if you have installed Image::ExifTool, you can also consult perldoc or
 the man pages:
+
+   perldoc Image::ExifTool
 
    man Image::ExifTool
 
-------------------------------------------------------------------------
+----------------------------------------------------------------------------

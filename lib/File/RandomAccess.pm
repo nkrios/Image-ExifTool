@@ -5,7 +5,8 @@
 #
 # Revisions:    02/11/04 - P. Harvey Created
 #               02/20/04 - P. Harvey Added flag to disable SeekTest in new()
-#               11/18/04 - P. Harved Fixed bug with seek relative to end of file
+#               11/18/04 - P. Harvey Fixed bug with seek relative to end of file
+#               01/02/05 - P. Harvey Added DEBUG code
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.
@@ -14,7 +15,7 @@
 #
 #               May also be used for string i/o (just pass a scalar reference)
 #
-# Legal:        Copyright (c) 2003-2004 Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2004-2005 Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -42,7 +43,7 @@ sub new($$;$)
     my ($that, $filePt, $isRandom) = @_;
     my $class = ref($that) || $that;
     my $self;
-    
+
     if (ref $filePt eq 'SCALAR') {
         # string i/o
         $self = {
@@ -66,6 +67,15 @@ sub new($$;$)
         $self->SeekTest() unless $isRandom;
     }
     return $self;
+}
+
+#------------------------------------------------------------------------------
+# Enable DEBUG code
+# Inputs: 0) reference to RandomAccess object
+sub Debug($)
+{
+    my $self = shift;
+    $self->{DEBUG} = { };
 }
 
 #------------------------------------------------------------------------------
@@ -106,14 +116,15 @@ sub Tell($)
 #------------------------------------------------------------------------------
 # Seek to position in file
 # Inputs: 0) reference to RandomAccess object
-#         1) position, 2) whence (0=from start, 1=from cur pos, 2=from end)
+#         1) position, 2) whence (0 or undef=from start, 1=from cur pos, 2=from end)
 # Returns: 1 on success
 # Notes: When buffered, this doesn't quite behave like seek() since it will return
 #        success even if you seek outside the limits of the file.  However if you
 #        do this, you will get an error on your next Read().
-sub Seek($$$)
+sub Seek($$;$)
 {
     my ($self, $num, $whence) = @_;
+    $whence = 0 unless defined $whence;
     my $rtnVal;
     if ($self->{TESTED} < 0) {
         $rtnVal = 1;
@@ -172,8 +183,15 @@ sub Read($$$)
         $_[0] = substr(${$self->{BUFF_PT}}, $self->{POS}, $rtnVal);
         $self->{POS} += $rtnVal;
     } else {
+        $_[0] = '' unless defined $_[0];
         $rtnVal = read($self->{FILE_PT}, $_[0], $len);
     }
+    if ($self->{DEBUG}) {
+        my $pos = $self->Tell() - $rtnVal;
+        unless ($self->{DEBUG}->{$pos} and $self->{DEBUG}->{$pos} > $rtnVal) {
+            $self->{DEBUG}->{$pos} = $rtnVal;
+        }
+    } 
     return $rtnVal;
 }
 
@@ -224,6 +242,12 @@ sub ReadLine($$)
             $rtnVal = 0;
         }
     }
+    if ($self->{DEBUG}) {
+        my $pos = $self->Tell() - $rtnVal;
+        unless ($self->{DEBUG}->{$pos} and $self->{DEBUG}->{$pos} > $rtnVal) {
+            $self->{DEBUG}->{$pos} = $rtnVal;
+        }
+    } 
     return $rtnVal;  
 }
 
@@ -258,6 +282,40 @@ sub BinMode($)
 sub Close($)
 {
     my $self = shift;
+    
+    if ($self->{DEBUG}) {
+        local $_;
+        if ($self->Seek(0,2)) {
+            $self->{DEBUG}->{$self->Tell()} = 0;    # set EOF marker
+            my $last;
+            my $tot = 0;
+            my $bad = 0;
+            foreach (sort { $a <=> $b} keys %{$self->{DEBUG}}) {
+                my $pos = $_;
+                my $len = $self->{DEBUG}->{$_};
+                if (defined $last and $last < $pos) {
+                    my $bytes = $pos - $last;
+                    $tot += $bytes;
+                    $self->Seek($last);
+                    my $buff;
+                    $self->Read($buff, $bytes);
+                    my $warn = '';
+                    if ($buff =~ /[^\0]/) {
+                        $bad += ($pos - $last);
+                        $warn = ' - NON-ZERO!';
+                    }
+                    printf "0x%.8x - 0x%.8x (%d bytes)$warn\n", $last, $pos, $bytes;
+                }
+                $last = $pos + $len;
+            }
+            print "$tot bytes missed";
+            $bad and print ", $bad non-zero!";
+            print "\n";
+        } else {
+            warn "File::RandomAccess DEBUG not working (file already closed?)\n";
+        }
+        delete $self->{DEBUG};
+    }
     # close the file
     if ($self->{FILE_PT}) {
         close($self->{FILE_PT});

@@ -12,10 +12,12 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 # Unknown maker notes
 %Image::ExifTool::Unknown::Main = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 1 => 'MakerUnknown', 2 => 'Camera' },
     
     # this seems to be a common fixture, so look for it in unknown maker notes
@@ -52,7 +54,7 @@ unknown manufacturers.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -17,18 +17,19 @@
 package Image::ExifTool::Photoshop;
 
 use strict;
-use vars qw($VERSION);
-use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
-                       GetByteOrder SetByteOrder);
+use vars qw($VERSION $AUTOLOAD);
+use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.07';
+$VERSION = '1.09';
 
 sub ProcessPhotoshop($$$);
+sub WritePhotoshop($$$);
 
 # Photoshop APP13 tag table
 %Image::ExifTool::Photoshop::Main = (
     GROUPS => { 2 => 'Other' },
     PROCESS_PROC => \&ProcessPhotoshop,
+    WRITE_PROC => \&WritePhotoshop,
 #    0x03e8 => 'Photoshop2Info',
 #    0x03e9 => 'MacintoshPrintInfo',
 #    0x03ea => 'XMLData?', #PH
@@ -136,6 +137,14 @@ sub ProcessPhotoshop($$$);
 
 
 #------------------------------------------------------------------------------
+# AutoLoad our writer routines when necessary
+#
+sub AUTOLOAD
+{
+    return Image::ExifTool::DoAutoLoad($AUTOLOAD, @_);
+}
+
+#------------------------------------------------------------------------------
 # Convert pascal string(s) to something we can use
 # Inputs: 1) Pascal string data
 # Returns: Strings, concatinated with ', '
@@ -169,12 +178,13 @@ sub ProcessPhotoshop($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
 
-    my $oldOrder = GetByteOrder();
-    SetByteOrder('MM');     # IPTC is always big-endian
-    
+    my $saveOrder = GetByteOrder();
+    SetByteOrder('MM');     # Photoshop is always big-endian
+    $verbose and $exifTool->VerboseDir('Photoshop', 0, $$dirInfo{DirLen});
+
     # scan through resource blocks:
     # Format: 0) Type, 4 bytes - "8BIM"
-    #         1) ID,   2 bytes - 0x0404 for IPTC data
+    #         1) TagID,2 bytes
     #         2) Name, null terminated string padded to even no. bytes
     #         3) Size, 4 bytes - N
     #         4) Data, N bytes
@@ -216,9 +226,14 @@ sub ProcessPhotoshop($$$)
         }
         $success = 1;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+            'Table'  => $tagTablePtr,
+            'DataPt' => $dataPt,
+            'Size'   => $size,
+            'Start'  => $pos,
+        );
         if ($tagInfo) {
             my $value = substr($$dataPt, $pos, $size);
-            $verbose>2 and Image::ExifTool::HexDumpTag($tag, \$value);
             my $subdir = $$tagInfo{SubDirectory};
             if ($subdir) {
                 my $newTagTable;
@@ -230,25 +245,24 @@ sub ProcessPhotoshop($$$)
                 }
                 # build directory information hash
                 my %subdirInfo = (
+                    Name     => $$tagInfo{Name},
                     DataPt   => \$value,
                     DataLen  => $size,
                     DirStart => 0,
                     DirLen   => $size,
                     Nesting  => $dirInfo->{Nesting} + 1,
+                    Parent   => $dirInfo->{DirName},
                 );
                 # process the directory
                 $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
             } else {
                 $exifTool->FoundTag($tagInfo, $value);
             }
-        } elsif ($verbose > 1) {
-            printf("  APP13 resource 0x%.4x:\n",$tag);
-            Image::ExifTool::HexDump(\substr($$dataPt, $pos, $size));
         }
         $size += 1 if $size & 0x01; # size is padded to an even # bytes
         $pos += $size;
     }
-    SetByteOrder($oldOrder);
+    SetByteOrder($saveOrder);
     return $success;
 }
 
@@ -274,7 +288,7 @@ contains the definitions to read this information.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

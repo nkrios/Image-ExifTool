@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..2\n"; }
+BEGIN { $| = 1; print "1..3\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -15,7 +15,7 @@ print "ok 1\n";
 
 ######################### End of black magic.
 
-use t::TestLib 'check';
+use t::TestLib;
 
 my $testname = 'Sony';
 my $testnum = 1;
@@ -26,6 +26,14 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     my $info = $exifTool->ImageInfo('t/Sony.jpg',{'Unknown'=>1});
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 3: Write some new information
+{
+    ++$testnum;
+    my @writeInfo = (['FlashFired','true']);
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
     print "ok $testnum\n";
 }
 

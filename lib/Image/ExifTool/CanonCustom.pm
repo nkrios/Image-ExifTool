@@ -6,6 +6,7 @@
 # Revisions:    11/25/2003  - P. Harvey Created
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+#               2) Christian Koller private communication (tests with the 20D)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonCustom;
@@ -13,16 +14,21 @@ package Image::ExifTool::CanonCustom;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.04';
 
 sub ProcessCanonCustom($$$);
+sub WriteCanonCustom($$$);
+sub CheckCanonCustom($$$);
 
 #------------------------------------------------------------------------------
 # Custom functions for the D30/D60
 # CanonCustom (keys are custom function number)
 %Image::ExifTool::CanonCustom::Functions = (
-    PROCESS_PROC => \&ProcessCanonCustom,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&ProcessCanonCustom,
+    WRITE_PROC => \&WriteCanonCustom,
+    CHECK_PROC => \&CheckCanonCustom,
+    WRITABLE => 1,
     1 => {
         Name => 'LongExposureNoiseReduction',
         PrintConv => {
@@ -109,7 +115,7 @@ sub ProcessCanonCustom($$$);
     12 => {
         Name => 'SetButtonFunction',
         PrintConv => {
-            0 => 'NotAssigned',
+            0 => 'Not assigned',
             1 => 'Change quality',
             2 => 'Change ISO speed',
             3 => 'Select parameters  ',
@@ -143,10 +149,13 @@ sub ProcessCanonCustom($$$);
 %Image::ExifTool::CanonCustom::Functions10D = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonCustom,
+    WRITE_PROC => \&WriteCanonCustom,
+    CHECK_PROC => \&CheckCanonCustom,
+    WRITABLE => 1,
     1 => {
         Name => 'SetButtonFunction',
         PrintConv => {
-            0 => 'NotAssigned',
+            0 => 'Not assigned',
             1 => 'Change quality',
             2 => 'Change parameters',
             3 => 'Menu display',
@@ -291,10 +300,164 @@ sub ProcessCanonCustom($$$);
     },
 );
 
+
+# Custom functions for the 20D (ref 2)
+# CanonCustom (keys are custom function number)
+%Image::ExifTool::CanonCustom::Functions20D = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&ProcessCanonCustom,
+    WRITE_PROC => \&WriteCanonCustom,
+    CHECK_PROC => \&CheckCanonCustom,
+    WRITABLE => 1,
+    0 => {
+        Name => 'SetFunctionWhenShooting',
+        PrintConv => {
+            0 => 'Default (no function)',
+            1 => 'Change quality',
+            2 => 'Change Parameters',
+            3 => 'Menu display',
+            4 => 'Image replay',
+        },
+    },
+    1 => {
+        Name => 'LongExposureNoiseReduction',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+        },
+    },
+    2 => {
+        Name => 'FlashSyncSpeedAv',
+        PrintConv => {
+            0 => 'Auto',
+            1 => '1/250 Fixed',
+        },
+    },
+    3 => {
+        Name => 'Shutter-AELock',
+        PrintConv => {
+            0 => 'AF/AE lock',
+            1 => 'AE lock/AF',
+            2 => 'AF/AF lock no AE lock',
+            3 => 'AE/AF,no AE lock ',
+        },
+    },
+    4 => {
+        Name => 'AFAssistBeam',
+        PrintConv => {
+            0 => 'Emitts',
+            1 => 'Does not emit',
+            2 => 'Only ext. flash emits',
+        },
+    },
+    5 => {
+        Name => 'ExposureLevelIncrements',
+        PrintConv => {
+            0 => '1/3 Stop',
+            1 => '1/2 Stop',
+        },
+    },
+    6 => {
+        Name => 'FlashFiring',
+        PrintConv => {
+            0 => 'Fires',
+            1 => 'Does not fire',
+        },
+    },
+    7 => {
+        Name => 'ISOExpansion',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+        },
+    },
+    8 => {
+        Name => 'AEBSequence',
+        PrintConv => {
+            0 => '0,-,+/Enabled',
+            1 => '0,-,+/Disabled',
+            2 => '-,0,+/Enabled',
+            3 => '-,0,+/Disabled',
+        },
+    },
+    9 => {
+        Name => 'SuperimposedDisplay',
+        PrintConv => {
+            0 => 'On',
+            1 => 'Off',
+        },
+    },
+    10 => {
+        Name => 'MenuButtonDisplayPosition',
+        PrintConv => {
+            0 => 'Previous (top if power off)',
+            1 => 'Previous',
+            2 => 'Top',
+        },
+    },
+    11 => {
+        Name => 'MirrorLockup',
+        PrintConv => {
+            0 => 'Disable',
+            1 => 'Enable',
+        },
+    },
+    12 => {
+        Name => 'AFPointSelectionMethod',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Multi-controller direct',
+            2 => 'Quick Control Dial direct',
+        },
+    },
+    13 => {
+        Name => 'ETTLII',
+        PrintConv => {
+            0 => 'Evaluative',
+            1 => 'Average',
+        },
+    },
+    14 => {
+        Name => 'ShutterCurtainSync',
+        PrintConv => {
+            0 => '1st-curtain sync',
+            1 => '2nd-curtain sync',
+        },
+    },
+    15 => {
+        Name => 'SafetyShiftInAVorTV',
+        PrintConv => {
+            0 => 'Disable',
+            1 => 'Enable',
+        },
+    },
+    16 => {
+        Name => 'LensAFStopButton',
+        PrintConv => {
+            0 => 'AF stop',
+            1 => 'AF start',
+            2 => 'AF lock while metering',
+            3 => 'AF point: M -> Auto / Auto -> ctr.',
+            4 => 'ONE SHOT <-> AI SERVO',
+            5 => 'IS start',
+        },
+    },
+    17 => {
+        Name => 'AddOriginalDecisionData',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+        },
+    },
+);
+
 # custom functions for the 1D
 %Image::ExifTool::CanonCustom::Functions1D = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonCustom,
+    WRITE_PROC => \&WriteCanonCustom,
+    CHECK_PROC => \&CheckCanonCustom,
+    WRITABLE => 1,
     0 => {
         Name => 'FocusingScreen',
         PrintConv => {
@@ -486,12 +649,14 @@ sub ProcessCanonCustom($$$)
     my $dataPt = $dirInfo->{DataPt};
     my $offset = $dirInfo->{DirStart};
     my $size = $dirInfo->{DirLen};
+    my $verbose = $exifTool->Options('Verbose');
     
     # first entry in array must be the size
     unless (Image::ExifTool::Get16u($dataPt,$offset) == $size) {
         $exifTool->Warn("Invalid CanonCustom data");
         return 0;
     }
+    $verbose and $exifTool->VerboseDir('CanonCustom', $size/2-1);
     my $pos;
     for ($pos=2; $pos<$size; $pos+=2) {
         # ($pos is position within custom directory)
@@ -499,13 +664,75 @@ sub ProcessCanonCustom($$$)
         my $tag = ($val >> 8);
         $val = ($val & 0xff);
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-        if ($tagInfo) {
-            $exifTool->FoundTag($tagInfo,$val);
-        } else {
-            $exifTool->Options('Verbose') and printf "  Custom Function $tag: $val\n";
-        }
+        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+            'Table'  => $tagTablePtr,
+            'Index'  => $pos/2-1,
+            'Value'  => $val,
+            'Format' => 'int8u',
+            'Count'  => 1,
+            'Size'   => 1,
+        );
+        $tagInfo and $exifTool->FoundTag($tagInfo,$val);
     }
     return 1;
+}
+
+#------------------------------------------------------------------------------
+# check new value for Canon custom data block
+# Inputs: 0) ExifTool object reference, 1) tagInfo hash reference,
+#         2) raw value reference
+# Returns: error string or undef (and may modify value) on success
+sub CheckCanonCustom($$$)
+{
+    my ($self, $tagInfo, $valPtr) = @_;
+    return Image::ExifTool::CheckValue($valPtr, 'int8u');
+}
+
+#------------------------------------------------------------------------------
+# write Canon custom data
+# Inputs: 0) ExifTool object reference, 1) tag table reference,
+#         2) source dirInfo reference
+# Returns: New custom data block or undefined on error
+sub WriteCanonCustom($$$)
+{
+    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    $exifTool or return 1;    # allow dummy access to autoload this package
+    my $dataPt = $dirInfo->{DataPt};
+    my $dirStart = $dirInfo->{DirStart} || 0;
+    my $dirLen = $dirInfo->{DirLen} || length($$dataPt) - $dirStart;
+    my $dirName = $dirInfo->{DirName};
+    my $verbose = $exifTool->Options('Verbose');
+    my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
+    my $tagInfo;
+    $dataPt = \$newData;
+
+    # first entry in array must be the size
+    unless (Image::ExifTool::Get16u($dataPt,0) == $dirLen) {
+        $exifTool->Warn("Invalid CanonCustom data");
+        return undef;
+    }
+    my %set;    # make hash of all tags to set in this directory
+    foreach $tagInfo ($exifTool->GetNewTagInfoList($tagTablePtr)) {
+        $set{$$tagInfo{TagID}} = $tagInfo;
+    }
+    my $pos;
+    for ($pos=2; $pos<$dirLen; $pos+=2) {
+        my $val = Image::ExifTool::Get16u($dataPt, $pos);
+        my $tag = ($val >> 8);
+        $tagInfo = $set{$tag};
+        next unless $tagInfo;
+        $val = ($val & 0xff);
+        next unless $exifTool->IsOverwriting($tagInfo, $val);
+        my $newVal = $exifTool->GetNewValues($tagInfo);
+        next unless defined $newVal;    # can't delete from a custom table
+        Image::ExifTool::Set16u(($newVal & 0xff) + ($tag << 8), $dataPt, $pos);
+        if ($verbose > 1) {
+            print "    - $dirName:$$tagInfo{Name} = '$val'\n";
+            print "    + $dirName:$$tagInfo{Name} = '$newVal'\n";
+        }
+        ++$exifTool->{CHANGED};
+    }
+    return $newData;
 }
 
 
@@ -530,7 +757,7 @@ Image::ExifTool to read this information.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -542,6 +769,11 @@ it under the same terms as Perl itself.
 =item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Christian Koller for his work in decoding the 20D custom
+functions.
 
 =head1 SEE ALSO
 

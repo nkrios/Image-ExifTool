@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
 [File, File, Image]  - File Name: Panasonic.jpg
-[File, File, Image]  - File Size: 28KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 8KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: Panasonic
@@ -11,8 +12,8 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2004:08:28 15:55:46
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/400
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 4.0
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/400
+[EXIF, ExifIFD, Image] 33437 - Aperture: 4.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 80
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
@@ -50,8 +51,8 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 6804
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 6223
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 6822
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Panasonic, Camera] 1 - Image Quality: High
 [MakerNotes, Panasonic, Camera] 2 - Firmware Version: 0.1.0.8
@@ -69,9 +70,9 @@
 [MakerNotes, Panasonic, Camera] 40 - Color Effect: Off
 [MakerNotes, Panasonic, Camera] 44 - Contrast: Standard
 [MakerNotes, Panasonic, Camera] 45 - Noise Reduction: Standard
-[Composite, Composite, Image]  - Av(Aperture Value): 4.0
+[Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 7.6
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/400
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 6223 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/400
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 4.6mm (35mm equivalent: 35.0mm)

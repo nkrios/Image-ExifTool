@@ -15,9 +15,9 @@ package Image::ExifTool::CanonRaw;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(SetByteOrder Get16u Get32u);
+use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.06';
+$VERSION = '1.10';
 
 sub ProcessCanonRaw($$$);
 
@@ -117,7 +117,9 @@ sub ProcessCanonRaw($$$);
     0x5029 => {
         Name => 'FocalLength',
         ValueConv => '$val >> 16',
+        ValueConvInv => '$val << 16',
         PrintConv => 'sprintf("%.1fmm",$val)',
+        PrintConvInv => '$val=~s/mm$//;$val',
     },
     0x580b => {
         Name => 'SerialNumber',
@@ -146,7 +148,6 @@ sub ProcessCanonRaw($$$);
         Name => 'Model',
         Format => 'string[$size-6]',
         Description => 'Camera Model Name',
-        ValueConv => '$_=$val,s/\0.*/\0/,$_',     # remove junk at end of string
     },
 );
 
@@ -188,75 +189,75 @@ sub ProcessCanonRaw($$$);
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'RedBalanceAuto',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     1 => {
         Name => 'BlueBalanceAuto',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     2 => {
         Name => 'RedBalanceDaylight',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     3 => {
         Name => 'BlueBalanceDaylight',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     4 => {
         Name => 'RedBalanceCloudy',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     5 => {
         Name => 'BlueBalanceCloudy',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     6 => {
         Name => 'RedBalanceTungsten',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     7 => {
         Name => 'BlueBalanceTungsten',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     8 => {
         Name => 'RedBalanceFluorescent',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     9 => {
         Name => 'BlueBalanceFluorescent',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     10 => {
         Name => 'RedBalanceFlash',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     11 => {
         Name => 'BlueBalanceFlash',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     12 => {
         Name => 'RedBalanceCustom',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     13 => {
         Name => 'BlueBalanceCustom',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     14 => {
         Name => 'RedBalanceB&W',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     15 => {
         Name => 'BlueBalanceB&W',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     16 => {
         Name => 'RedBalanceShade',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
     17 => {
         Name => 'BlueBalanceShade',
-        PrintConv => 'sprintf("%.5f",$val);',
+        PrintConv => 'sprintf("%.5f",$val)',
     },
 );
 
@@ -402,7 +403,7 @@ sub CleanRaw($;$)
     
     # generate temporary file name if changing the file in-place
     unless ($outfile and $outfile ne $infile) {
-        $outfile = "$infile-CleanRaw.tmp";      # write to temporary file
+        $outfile = "$infile-CleanRaw_tmp";      # write to temporary file
         $in_place = 1;                          # set in-place flag
     }
     if (-e $outfile) {
@@ -448,7 +449,6 @@ sub ProcessCanonRaw($$$)
     my $buff;
     my $verbose = $exifTool->Options('Verbose');
 
-    $verbose > 2 and printf("Raw block: start 0x%x, size 0x%x\n",$blockStart,$blockSize);
     # 4 bytes at end of block give directory position within block
     $raf->Seek($blockStart+$blockSize-4, 0) or return 0;
     $raf->Read($buff, 4) or return 0;
@@ -456,13 +456,13 @@ sub ProcessCanonRaw($$$)
     $raf->Seek($dirOffset, 0) or return 0;
     $raf->Read($buff, 2) or return 0;
     my $entries = Get16u(\$buff,0);             # get number of entries in directory
-    my $dirLen = 10 * $entries;
-    $raf->Read($buff, $dirLen) or return 0;     # read the directory
+    # read the directory (10 bytes per entry)
+    $raf->Read($buff, 10 * $entries) or return 0;
     
-    $verbose and printf("Raw directory at 0x%x with $entries entries:\n", $dirOffset);
-    
-    my $pt;
-    for ($pt=0; $pt<$dirLen; $pt+=10) {
+    $verbose and $exifTool->VerboseDir('Raw', $entries);
+    my $index;
+    for ($index=0; $index<$entries; ++$index) {
+        my $pt = 10 * $index;
         my $tag = Get16u(\$buff, $pt);
         my $size = Get32u(\$buff, $pt+2);
         my $ptrVal = Get32u(\$buff, $pt+6);
@@ -471,26 +471,34 @@ sub ProcessCanonRaw($$$)
         my $dumpHex;
         my $tagInfo = $exifTool->GetTagInfo($rawTagTable, $tag);
        
-        $verbose > 1 and printf("Entry %d) Tag: 0x%.4x  Size: 0x%.8x  Ptr: 0x%.8x\n", $pt/10,$tag,$size,$ptr);
         my $tagType = $tag >> 8;    # tags are grouped in types by value of upper byte
         if ($tagType==0x28 or $tagType==0x30) {
             # this type of tag specifies a raw subdirectory
+            my $name = sprintf("CanonRaw_0x%.4x", $tag);
             my %subdirInfo = (
+                Name     => $name,
                 DataLen  => 0,
                 DirStart => $ptr,
                 DirLen   => $size,
                 Nesting  => $dirInfo->{Nesting} + 1,
                 RAF      => $raf,
+                Parent   => $dirInfo->{DirName},
             );
-            $verbose and printf("........ Start 0x%x ........\n",$tag);
-            ProcessCanonRaw($exifTool, $rawTagTable, \%subdirInfo);
-            $verbose and printf("........ End 0x%x ........\n",$tag);
+            if ($verbose) {
+                my $fakeInfo = { Name => $name, SubDirectory => { } };
+                $exifTool->VerboseInfo($tag, $fakeInfo,
+                    'Index'  => $index,
+                    'Size'   => $size,
+                    'Start'  => $ptr,
+                );
+            }
+            $exifTool->ProcessTagTable($rawTagTable, \%subdirInfo);
             next;
         } elsif ($tagType==0x48 or $tagType==0x50 or $tagType==0x58) {
             # this type of tag stores the value in the 'size' field (weird!)
             $value = $size;
         } elsif ($size == 0) {
-            $value = $ptrVal;       # (haven't seen this, but this would make sense)
+            $value = $ptrVal;   # (I haven't seen this, but it would make sense)
         } elsif ($size <= 512 or ($verbose > 2 and $size <= 65536)
             or ($tagInfo and ($$tagInfo{SubDirectory} 
             or grep(/^$$tagInfo{Name}$/i, $exifTool->GetRequestedTags()) )))
@@ -516,13 +524,13 @@ sub ProcessCanonRaw($$$)
                 $$tagInfo{PrintConv} = '\$val';
             }
         }
-        if ($verbose > 1 or ($verbose and not defined $tagInfo)) {
-            if ($dumpHex) {
-                Image::ExifTool::HexDumpTag($tag, \$value, $size);
-            } else {
-                printf("  Tag 0x%x: %s\n", $tag, Image::ExifTool::Printable($value));
-            }
-        }
+        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+            'Table'  => $rawTagTable,
+            'Index'  => $index,
+            'Value'  => $value,
+            'DataPt' => \$value,
+            'Addr'   => $ptr,
+        );
         next unless defined $tagInfo;
         
         my $subdir = $$tagInfo{SubDirectory};
@@ -544,20 +552,20 @@ sub ProcessCanonRaw($$$)
             $subdirStart = eval $$subdir{Start} if $$subdir{Start};
             my $dirData = \$value;
             my %subdirInfo = (
+                Name     => $name,
                 DataPt   => $dirData,
                 DataLen  => $size,
                 DirStart => $subdirStart,
                 DirLen   => $size - $subdirStart,
                 Nesting  => $dirInfo->{Nesting} + 1,
                 RAF      => $raf,
+                Parent   => $dirInfo->{DirName},
             );
             #### eval Validate ($dirData, $subdirStart, $size)
             if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
                 $exifTool->Warn("Invalid $name data");
             } else {
-                $verbose and print "........ Start $name ........\n";
                 $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
-                $verbose and print "........ End $name ........\n";
             }
         } else {
             $exifTool->FoundTag($tagInfo, $value);
@@ -595,6 +603,7 @@ sub RawInfo($$)
         DirLen   => $filesize - $hlen,
         Nesting  => 0,
         RAF      => $raf,
+        Parent   => 'CRW',
     );
     
     # process the raw directory
@@ -625,7 +634,7 @@ the EXIF Canon maker notes.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

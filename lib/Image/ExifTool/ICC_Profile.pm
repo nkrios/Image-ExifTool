@@ -7,6 +7,7 @@
 #
 # References:   1) http://www.color.org/icc_specs2.html (ICC.1:2003-09)
 #               2) http://www.color.org/icc_specs2.html (ICC.1:2001-04)
+#               3) http://developer.apple.com/documentation/GraphicsImaging/Reference/ColorSync_Manager/ColorSync_Manager.pdf
 #
 # Notes:        The ICC profile information is different: the format of each
 #               tag is embedded in the information instead of in the directory
@@ -18,10 +19,9 @@ package Image::ExifTool::ICC_Profile;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
-                       GetByteOrder SetByteOrder ReadValue);
+use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.00';
+$VERSION = '1.04';
 
 sub ProcessICC_Profile($$$);
 
@@ -167,6 +167,13 @@ my %illuminantType = (
             Validate => '$type eq "view"',
         },
     },
+    # ColorSync custom tags (ref 3)
+    psvm => 'PS2CRDVMSize',
+    vcgt => 'VideoCardGamma',
+    mmod => 'MakeAndModel',
+    dscm => 'ProfileDescriptionML',
+    ndin => 'NativeDisplayInfo',
+
     # the following entry represents the ICC profile header, and doesn't
     # exist as a tag in the directory.  It is only in this table to provide
     # a link so ExifTool can locate the header tags
@@ -198,7 +205,7 @@ my %illuminantType = (
             scnr => 'Input Device Profile',
             mntr => 'Display Device Profile',
             prtr => 'Output Device Profile',
-            link => 'DeviceLink Profile',
+           'link'=> 'DeviceLink Profile',
             spac => 'ColorSpace Conversion Profile',
             abst => 'Abstract Profile',
             nmcl => 'NamedColor Profile',
@@ -428,7 +435,7 @@ sub HexID($)
     # return a simple zero if no MD5 done
     return 0 unless grep(!/^0/, @vals);
     $val = '';
-    $val .= sprintf("%.2x",$_) foreach @vals;
+    foreach (@vals) { $val .= sprintf("%.2x",$_); }
     return $val;
 }
 
@@ -552,17 +559,6 @@ sub ProcessICC_Profile($$$)
         SetByteOrder($oldOrder);
         return 0;
     }
-    # process the header block
-    my %subdirInfo = (
-        DataPt   => $dataPt,
-        DataLen  => $dirInfo->{DataLen},
-        DirStart => $dirStart,
-        DirLen   => 128,
-        Nesting  => $dirInfo->{Nesting} + 1,
-    );
-    my $newTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::ICC_Profile::Header');
-    $exifTool->ProcessTagTable($newTagTable, \%subdirInfo);
-
     my $pos = $dirStart + 128;  # position at start of table
     my $numEntries = Get32u($dataPt, $pos);
     if ($numEntries < 1 or $numEntries >= 0x100
@@ -572,8 +568,28 @@ sub ProcessICC_Profile($$$)
         SetByteOrder($oldOrder);
         return 0;
     }
+    if ($verbose) {
+        my $fakeInfo = { Name=>'ProfileHeader', SubDirectory => { } };
+        $exifTool->VerboseInfo(undef, $fakeInfo);
+    }
+    # process the header block
+    my %subdirInfo = (
+        Name     => 'ProfileHeader',
+        DataPt   => $dataPt,
+        DataLen  => $dirInfo->{DataLen},
+        DirStart => $dirStart,
+        DirLen   => 128,
+        Nesting  => $dirInfo->{Nesting} + 1,
+        Parent   => $dirInfo->{DirName},
+    );
+    my $newTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::ICC_Profile::Header');
+    $exifTool->ProcessTagTable($newTagTable, \%subdirInfo);
+
+    $verbose and $exifTool->VerboseDir('ICC_Profile', $numEntries);
+
     $pos += 4;    # skip item count
-    while ($numEntries--) {
+    my $index;
+    for ($index=0; $index<$numEntries; ++$index) {
         my $tagID  = substr($$dataPt, $pos, 4);
         my $offset = Get32u($dataPt, $pos + 4);
         my $size   = Get32u($dataPt, $pos + 8);
@@ -594,6 +610,17 @@ sub ProcessICC_Profile($$$)
         my $valuePtr = $dirStart + $offset;
 
         my $subdir = $$tagInfo{SubDirectory};
+        # format the value unless this is a subdirectory
+        my $value;
+        $value = FormatICCTag($dataPt, $valuePtr, $size) unless $subdir;
+        $verbose and $exifTool->VerboseInfo($tagID, $tagInfo,
+            'Table'  => $tagTablePtr,
+            'Index'  => $index,
+            'Value'  => $value,
+            'DataPt' => $dataPt,
+            'Size'   => $size,
+            'Start'  => $valuePtr,
+        );
         if ($subdir) {
             my $name = $$tagInfo{Name};
             undef $newTagTable;
@@ -608,34 +635,30 @@ sub ProcessICC_Profile($$$)
                 next;
             }
             %subdirInfo = (
+                Name     => $name,
                 DataPt   => $dataPt,
                 DataLen  => $dirInfo->{DataLen},
                 DirStart => $valuePtr,
                 DirLen   => $size,
                 Nesting  => $dirInfo->{Nesting} + 1,
+                Parent   => $dirInfo->{DirName},
             );
             my $type = substr($$dataPt, $valuePtr, 4);
             #### eval Validate ($type)
             if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
                 $exifTool->Warn("Invalid $name data");
             } else {
-                $verbose and print "........ Start $name ........\n";
                 $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
-                $verbose and print "........ End $name ........\n";
             }
+        } elsif (defined $value) {
+            $exifTool->FoundTag($tagInfo, $value);
         } else {
-            $verbose > 1 and Image::ExifTool::HexDump($dataPt, $size, 'Start' => $valuePtr);
-            my $value = FormatICCTag($dataPt, $valuePtr, $size);
-            if (defined $value) {
-                $exifTool->FoundTag($tagInfo, $value);
-            } else {
-                # treat unsupported formats as binary data
-                my $oldPrintConv = $$tagInfo{PrintConv};
-                $$tagInfo{PrintConv} = '\$val';
-                $value = substr($$dataPt, $valuePtr, $size);
-                $exifTool->FoundTag($tagInfo, $value);
-                $$tagInfo{PrintConv} = $oldPrintConv;
-            }
+            # treat unsupported formats as binary data
+            my $oldPrintConv = $$tagInfo{PrintConv};
+            $$tagInfo{PrintConv} = '\$val';
+            $value = substr($$dataPt, $valuePtr, $size);
+            $exifTool->FoundTag($tagInfo, $value);
+            $$tagInfo{PrintConv} = $oldPrintConv;
         }
     }
     SetByteOrder($oldOrder);
@@ -664,7 +687,7 @@ data created on one device into another device's native color space.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -674,6 +697,8 @@ it under the same terms as Perl itself.
 =over 4
 
 =item http://www.color.org/icc_specs2.html
+
+=item http://developer.apple.com/documentation/GraphicsImaging/Reference/ColorSync_Manager/ColorSync_Manager.pdf
 
 =back
 

@@ -30,6 +30,7 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
+ExifToolVersion: 4.10
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -40,9 +41,9 @@ FNumber: 14
 FNumber (1): 14.0
 FileName: ExifTool.jpg
 FileNumber: 118-1861
-FileSize: 4KB
+FileSize: 3KB
 FileSource: Digital Camera
-FileType: JPG
+FileType: JPEG
 Flash: No Flash
 FlashActivity: 0
 FlashBits: (none)

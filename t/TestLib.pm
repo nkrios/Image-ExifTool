@@ -18,11 +18,12 @@ require 5.002;
 require Exporter;
 use Image::ExifTool;
 
-use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.02';
+use vars qw($VERSION @ISA @EXPORT);
+$VERSION = '1.03';
 @ISA = qw(Exporter);
-@EXPORT_OK = qw(check testCompare);
+@EXPORT = qw(check writeCheck testCompare);
 
+#------------------------------------------------------------------------------
 # Compare 2 files and return true and erase the 2nd file if they are the same
 # Inputs: 0) file1, 1) file2
 # Returns: true if files are the same
@@ -44,8 +45,13 @@ sub testCompare($$$)
                 $line1 = $_;
                 $line2 = <FILE2>;
                 unless (defined $line2 and $line1 eq $line2) {
-                    $success = 0;
-                    last;
+                    # ignore version number differences
+                    unless ($line1 =~ /ExifTool\s*Version/ and
+                            $line2 =~ /ExifTool\s*Version/)
+                    {
+                        $success = 0;
+                        last;
+                    }
                 }
             }
             if ($success) {
@@ -77,6 +83,7 @@ sub testCompare($$$)
     return $success
 }
 
+#------------------------------------------------------------------------------
 # Compare extracted information against a standard output file
 # Inputs: 0) [optional] ExifTool object reference
 #         1) tag hash reference
@@ -86,7 +93,7 @@ sub testCompare($$$)
 # Returns: 1 if check passed
 sub check($$$;$$)
 {
-    my $exifTool = shift if ref $_[0] eq 'Image::ExifTool';
+    my $exifTool = shift if ref $_[0] ne 'HASH';
     my ($info, $testname, $testnum, $stdnum) = @_;
     return 0 unless $info;
     $stdnum = $testnum unless defined $stdnum;
@@ -110,8 +117,6 @@ sub check($$$;$$)
 # Write information to file (with filename "TESTNAME_#.failed")
 #
     foreach (@tags) {
-        # skip version number because it changes with every new version.  :)
-        next if $_ eq 'ExifToolVersion';
         my $val = $$info{$_};
         if (ref $val eq 'SCALAR') {
             if ($$val =~ /^Binary data/) {
@@ -146,5 +151,29 @@ sub check($$$;$$)
     return testCompare($stdfile, $testfile,$testnum);
 }
 
+#------------------------------------------------------------------------------
+# test writing feature by writing specified information to JPEG file
+# Inputs: 0) list reference to lists of SetNewValue arguments
+#         1) test name, 2) test number, 3) optional source file name
+# Returns: 1 if check passed
+sub writeCheck($$$;$)
+{
+    my ($writeInfo, $testname, $testnum, $srcfile) = @_;
+    $srcfile or $srcfile = "t/$testname.jpg";
+    my ($ext) = ($srcfile =~ /\.(.+?)$/);
+    my $testfile = "t/${testname}_${testnum}_failed.$ext";
+    my $exifTool = new Image::ExifTool;
+    foreach (@$writeInfo) {
+        $exifTool->SetNewValue(@$_);
+    }
+    unlink $testfile;
+    $exifTool->WriteInfo($srcfile, $testfile);
+    my $info = $exifTool->GetInfo('Error');
+    foreach (keys %$info) { warn "$$info{$_}\n"; }
+    $info = $exifTool->ImageInfo($testfile,{Duplicates=>1,Unknown=>1});
+    my $rtnVal = check($exifTool, $info, $testname, $testnum);
+    $rtnVal and unlink $testfile;
+    return $rtnVal;
+}
 
 1; #end

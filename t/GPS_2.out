@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
 [File, File, Image]  - File Name: GPS.jpg
 [File, File, Image]  - File Size: 6KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 120
 [File, File, Image]  - Image Height: 80
 [EXIF, IFD0, Image] 270 - Image Description: Communications
@@ -16,7 +17,7 @@
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, IFD0, Image] 532 - Reference Black White: 0 255 128 255 128 255
 [EXIF, IFD0, Author] 33432 - Copyright: ian Britton - FreeFoto.com
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 0.6
+[EXIF, ExifIFD, Image] 33437 - Aperture: 0.6
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Shutter speed priority AE
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 0
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0200
@@ -44,7 +45,7 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1038
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1050
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 3662
 [GPS, GPS, Location] 0 - GPS Version ID: 2.0.0.0
 [GPS, GPS, Location] 1 - GPS Latitude Ref: North
@@ -67,13 +68,13 @@
 [IPTC, IPTC, Location] 95 - Province-State:  
 [IPTC, IPTC, Location] 101 - Country-Primary Location Name: Ubited Kingdom
 [IPTC, IPTC, Other] 15 - Category: BUS
-[IPTC, IPTC, Other] 20 - Supplemental Category: Communications
+[IPTC, IPTC, Other] 20 - Supplemental Categories: Communications
 [IPTC, IPTC, Other] 10 - Urgency: 5
 [IPTC, IPTC, Other] 25 - Keywords: Communications
 [IPTC, IPTC, Author] 116 - Copyright Notice: ian Britton - FreeFoto.com
-[Composite, Composite, Image]  - Av(Aperture Value): 0.6
+[Composite, Composite, Image]  - Aperture: 0.6
 [Composite, Composite, Image]  - Image Size: 120x80
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 0.0
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/724
+[Composite, Composite, Image]  - Shutter Speed: 1/724
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 3662 bytes)
 [Composite, Composite, Camera]  - Focal Length: 0.0mm (35mm equivalent: 0.0mm)

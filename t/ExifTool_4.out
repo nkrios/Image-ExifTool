@@ -1,4 +1,4 @@
-[File, File, Image]  - File Type: TIFF
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.10
 [EXIF, IFD0, Image] 254 - Subfile Type: Full-resolution Image
 [EXIF, IFD0, Image] 256 - Image Width: 160
 [EXIF, IFD0, Image] 257 - Image Height: 120
@@ -22,7 +22,6 @@
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 120 - Caption-Abstract: The picture caption
 [IPTC, IPTC, Author] 122 - Writer-Editor: I wrote it
-[IPTC, IPTC, Other] 105 - Headline: headline
 [IPTC, IPTC, Other] 40 - Special Instructions: no instructions
 [IPTC, IPTC, Author] 80 - By-line: I'm the author
 [IPTC, IPTC, Author] 85 - By-line Title: On top
@@ -36,6 +35,7 @@
 [IPTC, IPTC, Other] 103 - Original Transmission Reference: no reference
 [IPTC, IPTC, Other] 25 - Keywords: exiftool, test, picture
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright notice
+[IPTC, IPTC, Other] 105 - Headline: headline
 [ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: Lino
 [ICC_Profile, ICC-header, Image] 8 - Profile Version: 2.1.0
 [ICC_Profile, ICC-header, Image] 12 - Profile Class: Display Device Profile

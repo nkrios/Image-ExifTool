@@ -6,9 +6,11 @@
 # Revisions:    11/25/03 - P. Harvey Created
 #               12/03/03 - P. Harvey Figured out lots more tags and added
 #                            CanonPictureInfo
-#               02/17/04 - M. Rommel Added IxusAFPoint
+#               02/17/04 - Michael Rommel Added IxusAFPoint
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+#               2) Michael Rommel private communication (tests with Digital Ixus)
+#               3) Daniel Pittman private communication (tests with PowerShot S70)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -16,10 +18,12 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.07';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x1 => {
         Name => 'CanonCameraSettings',
@@ -37,14 +41,23 @@ $VERSION = '1.03';
             TagTable => 'Image::ExifTool::Canon::ShotInfo',
         },
     },
-    0x6 => 'CanonImageType',
-    0x7 => 'CanonFirmwareVersion',
+    0x6 => {
+        Name => 'CanonImageType',
+        Writable => 'string',
+    },
+    0x7 => {
+        Name => 'CanonFirmwareVersion',
+        Writable => 'string',
+    },
     0x8 => {
         Name => 'FileNumber',
+        Writable => 'int32u',
         PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
+        PrintConvInv => '$val=~s/-//g;$val',
     },
     0x9 => {
         Name => 'OwnerName',
+        Writable => 'string',
         Description => "Owner's Name",
     },
     0xa => {
@@ -57,20 +70,25 @@ $VERSION = '1.03';
     },
     0xc => [   # square brackets for a conditional list
         {
-            Condition => '$self->{CameraModel} =~ /(300D|REBEL|10D)/',
+            Condition => '$self->{CameraModel} =~ /(300D|REBEL|10D|20D)/',
+            Writable => 'int32u',
             Name => 'SerialNumber',
             Description => 'Camera Body No.',
             PrintConv => 'sprintf("%.10d",$val)',
+            PrintConvInv => '$val',
         },
         {
             # no condition (all other models)
             Name => 'SerialNumber',
+            Writable => 'int32u',
             Description => 'Camera Body No.',
             PrintConv => 'sprintf("%x-%.5d",$val>>16,$val&0xffff)',
+            PrintConvInv => '$val=~/(.*)-(\d+)/ ? (hex($1)<<16)+$2 : undef',
         },
     ],
     0xe => {
         Name => 'CanonFileLength',
+        Writable => 'int32u',
         Groups => { 2 => 'Image' },
     },
     0xf => [
@@ -81,6 +99,15 @@ $VERSION = '1.03';
                 Start => '$valuePtr',
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions10D',
+            },
+        },
+        {
+            Condition => '$self->{CameraModel} =~ /20D/',
+            Name => 'CanonCustomFunctions20D',
+            SubDirectory => {
+                Start => '$valuePtr',
+                Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+                TagTable => 'Image::ExifTool::CanonCustom::Functions20D',
             },
         },
         {
@@ -128,6 +155,9 @@ $VERSION = '1.03';
 # BinaryData (keys are indices into the int16s array)
 %Image::ExifTool::Canon::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -141,6 +171,7 @@ $VERSION = '1.03';
     2 => {
         Name => 'Self-timer',
         ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
     },
     3 => {
         Name => 'Quality',
@@ -265,6 +296,7 @@ $VERSION = '1.03';
     },
     19 => {
         Name => 'AFPoint',
+        Flags => 'PrintHex',
         PrintConv => {
             0x3000 => 'None (MF)',
             0x3001 => 'Auto-selected',
@@ -325,6 +357,9 @@ $VERSION = '1.03';
 # BinaryData (keys are indices into the int16s array)
 %Image::ExifTool::Canon::ShotInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
@@ -353,6 +388,8 @@ $VERSION = '1.03';
             7 => 'Black & White',
             8 => 'Shade',
             9 => 'Manual temperature',
+            14 => 'Daylight Fluorescent', #3
+            17 => 'Underwater', #3
         },
     },
     9 => {
@@ -360,8 +397,9 @@ $VERSION = '1.03';
         Description => 'Sequence Number In Continuous Burst',
     },
     # AF points for Ixus and IxusV cameras - 02/17/04 M. Rommel
-    14 => {
+    14 => { #2
         Name => 'IxusAFPoint',
+        Flags => 'PrintHex',
         PrintConv => {
             0x3000 => 'None (MF)',
             0x3001 => 'Right',
@@ -376,7 +414,7 @@ $VERSION = '1.03';
     15 => {
         Name => 'FlashExposureComp',
         Description => 'Flash Exposure Compensation',
-        ValueConv => 'Image::ExifTool::Canon::CanonEv($val);',
+        ValueConv => 'Image::ExifTool::Canon::CanonEv($val)',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     16 => {
@@ -401,17 +439,17 @@ $VERSION = '1.03';
     },
     21 => {
         Name => 'FNumber',
-        Description => 'Av(Aperture Value)',
+        Description => 'Aperture Value',
         # approximate big translation table by simple calculation - PH
         ValueConv => '$val ? exp(Image::ExifTool::Canon::CanonEv($val)*log(2)/2) : undef()',
-        PrintConv => 'sprintf("%.2g",$val);',
+        PrintConv => 'sprintf("%.2g",$val)',
     },
     22 => {
         Name => 'ExposureTime',
-        Description => 'Tv(Shutter Speed)',
+        Description => 'Shutter Speed',
         # approximate big translation table by simple calculation - PH
         ValueConv => '$val ? exp(-Image::ExifTool::Canon::CanonEv($val)*log(2)) : undef()',
-        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val);',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     24 => {
         Name => 'BulbDuration',
@@ -427,6 +465,9 @@ $VERSION = '1.03';
 # picture information (EXIF tag 0x12)
 %Image::ExifTool::Canon::PictureInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
@@ -445,6 +486,9 @@ $VERSION = '1.03';
 # through this information - decoded by PH 12/14/03
 %Image::ExifTool::Canon::PreviewImageInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FORMAT => 'int32u',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
@@ -456,12 +500,22 @@ $VERSION = '1.03';
 #    1 => {
 #        Name => 'PreviewImageUnknown',
 #    },
-    2 => 'PreviewImageLength',
+    2 => {
+        Name => 'PreviewImageLength',
+        OffsetPair => 5,   # point to associated offset
+        DataTag => 'PreviewImage',
+        Protected => 1,
+        Writable => 0,  # (can't write until we add ability to WriteBinaryData())
+    },
     3 => 'PreviewImageWidth',
     4 => 'PreviewImageHeight',
     5 => {
         Name => 'PreviewImageStart',
-        ValueConv => '$val + 12',
+        Flags => [ 'IsOffset', 'Protected' ],
+        OffsetPair => 2,  # associated byte count tagID
+        DataTag => 'PreviewImage',
+        Protected => 1,
+        Writable => 0,  # (can't write until we add ability to WriteBinaryData())
     },
     6 => {
         Name => 'PreviewFocalPlaneXResolution',
@@ -487,6 +541,9 @@ $VERSION = '1.03';
 
 %Image::ExifTool::Canon::Canon1DSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -711,7 +768,7 @@ Canon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -722,9 +779,14 @@ it under the same terms as Perl itself.
 
 =item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 
-=item ...plus lots of testing with my own camera.  ;)
+=item (...plus lots of testing with my own camera!)
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks Michael Rommel and Daniel Pittman for the information
+they provided about the Digital Ixus and PowerShot S70 cameras.
 
 =head1 SEE ALSO
 

@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.30
 [File, File, Image]  - File Name: Pentax.jpg
-[File, File, Image]  - File Size: 41KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 2KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: PENTAX Corporation 
@@ -12,8 +13,8 @@
 [EXIF, IFD0, Image] 305 - Software: Optio S V1.00    
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:03:06 13:09:25
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/500
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 5.6
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/500
+[EXIF, ExifIFD, Image] 33437 - Aperture: 5.6
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:03:06 13:09:25
@@ -48,28 +49,28 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 32786
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 8338
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1416
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Pentax, Camera] 1 - Pentax Mode: Night-scene
 [MakerNotes, Pentax, Image] 2 - Preview Image Size: 320x240
-[MakerNotes, Pentax, Image] 3 - Preview Image Length: 31408
-[MakerNotes, Pentax, Image] 4 - Preview Image Start: 1266
+[MakerNotes, Pentax, Image] 3 - Preview Image Length: 26
+[MakerNotes, Pentax, Image] 4 - Preview Image Start: 1258
 [MakerNotes, Pentax, Camera] 8 - Image Quality: Better
 [MakerNotes, Pentax, Image] 9 - Pentax Image Size: 2048x1536
-[MakerNotes, Pentax, Camera] 11 - Pentax Picture Mode: Not Selected
-[MakerNotes, Pentax, Camera] 13 - Pentax Focus Mode: Normal
+[MakerNotes, Pentax, Camera] 11 - Picture Mode: Not Selected
+[MakerNotes, Pentax, Camera] 13 - Focus Mode: Normal
 [MakerNotes, Pentax, Camera] 20 - Pentax ISO: 50
-[MakerNotes, Pentax, Camera] 23 - Pentax AE Metering: Multi Segment
-[MakerNotes, Pentax, Camera] 25 - Pentax White Balance: Auto
-[MakerNotes, Pentax, Camera] 29 - Pentax Focal Length: 102
-[MakerNotes, Pentax, Camera] 30 - Pentax Zoom: 100
-[MakerNotes, Pentax, Camera] 31 - Pentax Saturation: Low
-[MakerNotes, Pentax, Camera] 32 - Pentax Contrast: Low
-[MakerNotes, Pentax, Camera] 33 - Pentax Sharpness: Soft
-[Composite, Composite, Image]  - Av(Aperture Value): 5.6
+[MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
+[MakerNotes, Pentax, Camera] 25 - White Balance: Auto
+[MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm
+[MakerNotes, Pentax, Camera] 30 - Digital Zoom: 100
+[MakerNotes, Pentax, Camera] 31 - Saturation: Low
+[MakerNotes, Pentax, Camera] 32 - Contrast: Low
+[MakerNotes, Pentax, Camera] 33 - Sharpness: Soft
+[Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Image]  - Image Size: 160x120
-[Composite, Composite, Image]  - Preview Image: (Binary data 31408 bytes)
+[Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/500
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 8338 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/500
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)

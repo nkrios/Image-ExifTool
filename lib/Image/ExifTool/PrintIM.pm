@@ -10,9 +10,9 @@ package Image::ExifTool::PrintIM;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(Get16u Get32u GetByteOrder SetByteOrder ToggleByteOrder);
+use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 sub ProcessPrintIM($$$);
 
@@ -36,6 +36,7 @@ sub ProcessPrintIM($$$)
     my $dataPt = $dirInfo->{DataPt};
     my $offset = $dirInfo->{DirStart};
     my $size = $dirInfo->{DirLen};
+    my $verbose = $exifTool->Options('Verbose');
 
     unless ($size > 15) {
         $exifTool->Warn('Bad PrintIM data');
@@ -59,12 +60,21 @@ sub ProcessPrintIM($$$)
             return 0;
         }
     }
+    $verbose and $exifTool->VerboseDir('PrintIM', $num);
     my $n;
     for ($n=0; $n<$num; ++$n) {
         my $pos = $offset + 16 + $n * 6;
         my $tag = Get16u($dataPt, $pos);
         my $val = Get32u($dataPt, $pos + 2);
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+            'Table'  => $tagTablePtr,
+            'Index'  => $n,
+            'Value'  => $val,
+            'DataPt' => $dataPt,
+            'Size'   => 4,
+            'Start'  => $pos + 2,
+        );
         $tagInfo and $exifTool->FoundTag($tagInfo,$val);
     }
     SetByteOrder($saveOrder);
@@ -92,7 +102,7 @@ Print Image Matching metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

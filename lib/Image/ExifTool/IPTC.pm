@@ -6,17 +6,53 @@
 # Revisions:    Jan. 08/03 - P. Harvey Created
 #               Feb. 05/04 - P. Harvey Added support for records other than 2
 #
-# References:   http://brilliantlabs.com/docs/IIMV4.1.pdf
+# References:   1) http://brilliantlabs.com/docs/IIMV4.1.pdf
+#               2) http://www.hugsan.com/EXIFutils/Features/EXIF_Fields/IPTC/iptc.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::IPTC;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 sub ProcessIPTC($$$);
+sub WriteIPTC($$$);
+sub CheckIPTC($$$);
+
+my %fileFormat = (
+    0 => 'No ObjectData',
+    1 => 'IPTC-NAA Digital Newsphoto Parameter Record',
+    2 => 'IPTC7901 Recommended Message Format',
+    3 => 'Tagged Image File Format (Adobe/Aldus Image data)',
+    4 => 'Illustrator (Adobe Graphics data)',
+    5 => 'AppleSingle (Apple Computer Inc)',
+    6 => 'NAA 89-3 (ANPA 1312)',
+    7 => 'MacBinary II',
+    8 => 'IPTC Unstructured Character Oriented File Format (UCOFF)',
+    9 => 'United Press International ANPA 1312 variant',
+    10 => 'United Press International Down-Load Message',
+    11 => 'JPEG File Interchange (JFIF)',
+    12 => 'Photo-CD Image-Pac (Eastman Kodak)',
+    13 => 'Bit Mapped Graphics File [.BMP] (Microsoft)',
+    14 => 'Digital Audio File [.WAV] (Microsoft & Creative Labs)',
+    15 => 'Audio plus Moving Video [.AVI] (Microsoft)',
+    16 => 'PC DOS/Windows Executable Files [.COM][.EXE]',
+    17 => 'Compressed Binary File [.ZIP] (PKWare Inc)',
+    18 => 'Audio Interchange File Format AIFF (Apple Computer Inc)',
+    19 => 'RIFF Wave (Microsoft Corporation)',
+    20 => 'Freehand (Macromedia/Aldus)',
+    21 => 'Hypertext Markup Language [.HTML] (The Internet Society)',
+    22 => 'MPEG 2 Audio Layer 2 (Musicom), ISO/IEC',
+    23 => 'MPEG 2 Audio Layer 3, ISO/IEC',
+    24 => 'Portable Document File [.PDF] Adobe',
+    25 => 'News Industry Text Format (NITF)',
+    26 => 'Tape Archive [.TAR]',
+    27 => 'Tidningarnas TelegrambyrŒ NITF version (TTNITF DTD)',
+    28 => 'Ritzaus Bureau NITF version (RBNITF DTD)',
+            29 => 'Corel Draw [.CDR]',
+);
 
 # main IPTC tag table
 # Note: ALL entries in main IPTC table (except PROCESS_PROC) must be SubDirectory
@@ -24,37 +60,38 @@ sub ProcessIPTC($$$);
 %Image::ExifTool::IPTC::Main = (
     GROUPS => { 2 => 'Image' },
     PROCESS_PROC => \&ProcessIPTC,
-    1   => {
-        Name => 'IPTCEnvelopeRecord',
+    WRITE_PROC => \&WriteIPTC,
+    1 => {
+        Name => 'IPTCEnvelope',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::EnvelopeRecord',
         },
     },
-    2   => {
-        Name => 'IPTCEditorial',
+    2 => {
+        Name => 'IPTCApplication',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::ApplicationRecord',
         },
     },
-    3   => {
+    3 => {
         Name => 'IPTCNewsPhoto',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::NewsPhoto',
         },
     },
-    7   => {
+    7 => {
         Name => 'IPTCPreObjectData',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::PreObjectData',
         },
     },
-    8   => {
+    8 => {
         Name => 'IPTCObjectData',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::ObjectData',
         },
     },
-    9   => {
+    9 => {
         Name => 'IPTCPostObjectData',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::PostObjectData',
@@ -65,137 +102,184 @@ sub ProcessIPTC($$$);
 # Record 1 -- EnvelopeRecord
 %Image::ExifTool::IPTC::EnvelopeRecord = (
     GROUPS => { 2 => 'Other' },
-    0   => {
+    WRITE_PROC => \&WriteIPTC,
+    CHECK_PROC => \&CheckIPTC,
+    WRITABLE => 1,
+    0 => {
         Name => 'EnvelopeRecordVersion',
-        Format => 'binary',
+        Format => 'binary[2]',
     },
-    5   => {
+    5 => {
         Name => 'Destination',
+        Flags => 'List',
         Groups => { 2 => 'Location' },
+        Format => 'string[0,1024]',
     },
-    20  => {
+    20 => {
         Name => 'FileFormat',
         Groups => { 2 => 'Image' },
-        Format => 'binary',
-        PrintConv => {
-            0 => 'No ObjectData',
-            1 => 'IPTC-NAA Digital Newsphoto Parameter Record',
-            2 => 'IPTC7901 Recommended Message Format',
-            3 => 'Tagged Image File Format (Adobe/Aldus Image data)',
-            4 => 'Illustrator (Adobe Graphics data)',
-            5 => 'AppleSingle (Apple Computer Inc)',
-            6 => 'NAA 89-3 (ANPA 1312)',
-            7 => 'MacBinary II',
-            8 => 'IPTC Unstructured Character Oriented File Format (UCOFF)',
-            9 => 'United Press International ANPA 1312 variant',
-            10 => 'United Press International Down-Load Message',
-            11 => 'JPEG File Interchange (JFIF)',
-            12 => 'Photo-CD Image-Pac (Eastman Kodak)',
-            13 => 'Bit Mapped Graphics File [.BMP] (Microsoft)',
-            14 => 'Digital Audio File [.WAV] (Microsoft & Creative Labs)',
-            15 => 'Audio plus Moving Video [.AVI] (Microsoft)',
-            16 => 'PC DOS/Windows Executable Files [.COM][.EXE]',
-            17 => 'Compressed Binary File [.ZIP] (PKWare Inc)',
-            18 => 'Audio Interchange File Format AIFF (Apple Computer Inc)',
-            19 => 'RIFF Wave (Microsoft Corporation)',
-            20 => 'Freehand (Macromedia/Aldus)',
-            21 => 'Hypertext Markup Language [.HTML] (The Internet Society)',
-            22 => 'MPEG 2 Audio Layer 2 (Musicom), ISO/IEC',
-            23 => 'MPEG 2 Audio Layer 3, ISO/IEC',
-            24 => 'Portable Document File [.PDF] Adobe',
-            25 => 'News Industry Text Format (NITF)',
-            26 => 'Tape Archive [.TAR]',
-            27 => 'Tidningarnas TelegrambyrŒ NITF version (TTNITF DTD)',
-            28 => 'Ritzaus Bureau NITF version (RBNITF DTD)',
-            29 => 'Corel Draw [.CDR]',
-        },
+        Format => 'binary[2]',
+        PrintConv => \%fileFormat,
     },
-    22  => {
+    22 => {
         Name => 'FileVersion',
         Groups => { 2 => 'Image' },
-        Format => 'binary',
+        Format => 'binary[2]',
     },
-    30  => 'ServiceIdentifier',
-    40  => 'EnvelopeNumber',
-    50  => 'ProductID',
-    60  => 'EnvelopePriority',
-    70  => {
+    30 => {
+        Name => 'ServiceIdentifier',
+        Format => 'string[0,10]',
+    },
+    40 => {
+        Name => 'EnvelopeNumber',
+        Format => 'digits[8]',
+    },
+    50 => {
+        Name => 'ProductID',
+        Flags => 'List',
+        Format => 'string[0,32]',
+    },
+    60 => {
+        Name => 'EnvelopePriority',
+        Format => 'digits[1]',
+    },
+    70 => {
         Name => 'DateSent',
         Groups => { 2 => 'Time' },
+        Format => 'digits[8]',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
-    80  => {
+    80 => {
         Name => 'TimeSent',
         Groups => { 2 => 'Time' },
+        Format => 'string[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
-    90  => 'CodedCharacterSet',
-    100 => 'UniqueObjectName',
+    90 => {
+        Name => 'CodedCharacterSet',
+        Format => 'string[0,32]',
+    },
+    100 => {
+        Name => 'UniqueObjectName',
+        Format => 'string[14,80]',
+    },
     120 => {
         Name => 'ARMIdentifier',
-        Format => 'binary',
+        Format => 'binary[2]',
     },
     122 => {
         Name => 'ARMVersion',
-        Format => 'binary',
+        Format => 'binary[2]',
     },
 );
 
 # Record 2 -- ApplicationRecord   
 %Image::ExifTool::IPTC::ApplicationRecord = (
     GROUPS => { 2 => 'Other' },
-    0   => {
+    WRITE_PROC => \&WriteIPTC,
+    CHECK_PROC => \&CheckIPTC,
+    WRITABLE => 1,
+    0 => {
         Name => 'ApplicationRecordVersion',
-        Format => 'binary',
+        Format => 'binary[2]',
     },
-    3   => 'ObjectTypeReference',
-    4   => 'ObjectAttributeReference',
-    5   => 'ObjectName',
-    7   => 'EditStatus',
-    8   => 'EditorialUpdate',
-    10  => 'Urgency',
-    12  => 'SubjectReference',
-    15  => 'Category',
-    20  => {
-        Name => 'SupplementalCategory',
+    3 => {
+        Name => 'ObjectTypeReference',
+        Format => 'string[3,67]',
+    },
+    4 => {
+        Name => 'ObjectAttributeReference',
         Flags => 'List',
+        Format => 'string[4,68]',
     },
-    22  => 'FixtureIdentifier',
-    25  => {
+    5 => {
+        Name => 'ObjectName',
+        Format => 'string[0,64]',
+    },
+    7 => {
+        Name => 'EditStatus',
+        Format => 'string[0,64]',
+    },
+    8 => {
+        Name => 'EditorialUpdate',
+        Format => 'digits[2]',
+    },
+    10 => {
+        Name => 'Urgency',
+        Format => 'digits[1]',
+    },
+    12 => {
+        Name => 'SubjectReference',
+        Flags => 'List',
+        Format => 'string[13,236]',
+    },
+    15 => {
+        Name => 'Category',
+        Format => 'string[0,3]',
+    },
+    20 => {
+        Name => 'SupplementalCategories',
+        Flags => 'List',
+        Format => 'string[0,32]',
+    },
+    22 => {
+        Name => 'FixtureIdentifier',
+        Format => 'string[0,32]',
+    },
+    25 => {
         Name => 'Keywords',
         Flags => 'List',
+        Format => 'string[0,64]',
     },
-    26  => {
+    26 => {
         Name => 'ContentLocationCode',
+        Flags => 'List',
         Groups => { 2 => 'Location' },
+        Format => 'string[3]',
     },
-    27  => {
+    27 => {
         Name => 'ContentLocationName',
+        Flags => 'List',
         Groups => { 2 => 'Location' },
+        Format => 'string[0,64]',
     },
-    30  => {
+    30 => {
         Name => 'ReleaseDate',
         Groups => { 2 => 'Time' },
+        Format => 'digits[8]',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
-    35  => {
+    35 => {
         Name => 'ReleaseTime',
         Groups => { 2 => 'Time' },
+        Format => 'digits[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
-    37  => {
+    37 => {
         Name => 'ExpirationDate',
         Groups => { 2 => 'Time' },
+        Format => 'digits[8]',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
-    38  => {
+    38 => {
         Name => 'ExpirationTime',
         Groups => { 2 => 'Time' },
+        Format => 'digits[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
-    40  => 'SpecialInstructions',
-    42  => {
+    40 => {
+        Name => 'SpecialInstructions',
+        Format => 'string[0,256]',
+    },
+    42 => {
         Name => 'ActionAdvised',
+        Format => 'digits[2]',
         PrintConv => {
             '' => '',
             '01' => 'Object Kill',
@@ -204,139 +288,260 @@ sub ProcessIPTC($$$);
             '04' => 'Object Reference',
         },
     },
-    45  => 'ReferenceService',
-    47  => {
+    45 => {
+        Name => 'ReferenceService',
+        Flags => 'List',
+        Format => 'string[0,10]',
+    },
+    47 => {
         Name => 'ReferenceDate',
+        Flags => 'List',
+        Format => 'digits[8]',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
-    50  => 'ReferenceNumber',
-    55  => {
+    50 => {
+        Name => 'ReferenceNumber',
+        Flags => 'List',
+        Format => 'digits[8]',
+    },
+    55 => {
         Name => 'DateCreated',
+        Format => 'digits[8]',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
-    60  => {
+    60 => {
         Name => 'TimeCreated',
         Groups => { 2 => 'Time' },
+        Format => 'digits[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
-    62  => {
+    62 => {
         Name => 'DigitalCreationDate',
         Groups => { 2 => 'Time' },
+        Format => 'digits[8]',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
-    63  => {
+    63 => {
         Name => 'DigitalCreationTime',
         Groups => { 2 => 'Time' },
+        Format => 'digits[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
+        ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
-    65  => 'OriginatingProgram',
-    70  => 'ProgramVersion',
-    75  => 'ObjectCycle',
-    80  => {
+    65 => {
+        Name => 'OriginatingProgram',
+        Format => 'string[0,32]',
+    },
+    70 => {
+        Name => 'ProgramVersion',
+        Format => 'string[0,10]',
+    },
+    75 => {
+        Name => 'ObjectCycle',
+        Format => 'string[1]',
+        PrintConv => {
+            'a' => 'Morning',
+            'p' => 'Evening',
+            'b' => 'Both Morning and Evening',
+        },
+    },
+    80 => {
         Name => 'By-line',
+        Flags => 'List',
+        Format => 'string[0,32]',
         Groups => { 2 => 'Author' },
     },
-    85  => {
+    85 => {
         Name => 'By-lineTitle',
+        Flags => 'List',
+        Format => 'string[0,32]',
         Groups => { 2 => 'Author' },
     },
-    90  => {
+    90 => {
         Name => 'City',
+        Format => 'string[0,32]',
         Groups => { 2 => 'Location' },
     },
-    92  => {
+    92 => {
         Name => 'Sub-location',
+        Format => 'string[0,32]',
         Groups => { 2 => 'Location' },
     },
-    95  => {
+    95 => {
         Name => 'Province-State',
+        Format => 'string[0,32]',
         Groups => { 2 => 'Location' },
     },
     100 => {
         Name => 'Country-PrimaryLocationCode',
+        Format => 'string[3]',
         Groups => { 2 => 'Location' },
     },
     101 => {
         Name => 'Country-PrimaryLocationName',
+        Format => 'string[0,64]',
         Groups => { 2 => 'Location' },
     },
-    103 => 'OriginalTransmissionReference',
-    105 => 'Headline',
+    103 => {
+        Name => 'OriginalTransmissionReference',
+        Format => 'string[0,32]',
+    },
+    105 => {
+        Name => 'Headline',
+        Format => 'string[0,256]',
+    },
     110 => {
         Name => 'Credit',
         Groups => { 2 => 'Author' },
+        Format => 'string[0,32]',
     },
     115 => {
         Name => 'Source',
         Groups => { 2 => 'Author' },
+        Format => 'string[0,32]',
     },
     116 => {
         Name => 'CopyrightNotice',
         Groups => { 2 => 'Author' },
+        Format => 'string[0,128]',
     },
     118 => {
         Name => 'Contact',
+        Flags => 'List',
         Groups => { 2 => 'Author' },
+        Format => 'string[0,128]',
     },
-    120 => 'Caption-Abstract',
+    120 => {
+        Name => 'Caption-Abstract',
+        Format => 'string[0,2000]',
+    },
     122 => {
         Name => 'Writer-Editor',
+        Flags => 'List',
         Groups => { 2 => 'Author' },
+        Format => 'string[0,32]',
     },
     125 => {
         Name => 'RasterizedCaption',
+        Format => 'string[7360]',
         PrintConv => '\$val',
+        PrintConvInv => '$val',
     },
     130 => {
         Name => 'ImageType',
         Groups => { 2 => 'Image' },
+        Format => 'string[2]',
     },
     131 => {
         Name => 'ImageOrientation',
         Groups => { 2 => 'Image' },
+        Format => 'string[1]',
+        PrintConv => {
+            P => 'Portrait',
+            L => 'Landscape',
+            S => 'Square',
+        },
     },
-    135 => 'LanguageIdentifier',
-    150 => 'AudioType',
-    151 => 'AudioSamplingRate',
-    152 => 'AudioSamplingResolution',
-    153 => 'AudioDuration',
-    154 => 'AudioOutcue',
+    135 => {
+        Name => 'LanguageIdentifier',
+        Format => 'string[2,3]',
+    },        
+    150 => {
+        Name => 'AudioType',
+        Format => 'string[2]',
+        PrintConv => {
+            '1A' => 'Mono Actuality',
+            '2A' => 'Stereo Actuality',
+            '1C' => 'Mono Question and Answer Session',
+            '2C' => 'Stereo Question and Answer Session',
+            '1M' => 'Mono Music',
+            '2M' => 'Stereo Music',
+            '1Q' => 'Mono Response to a Question',
+            '2Q' => 'Stereo Response to a Question',
+            '1R' => 'Mono Raw Sound',
+            '2R' => 'Stereo Raw Sound',
+            '1S' => 'Mono Scener',
+            '2S' => 'Stereo Scener',
+            '0T' => 'Text Only',
+            '1V' => 'Mono Voicer',
+            '2V' => 'Stereo Voicer',
+            '1W' => 'Mono Wrap',
+            '2W' => 'Stereo Wrap',
+        },
+    },
+    151 => {
+        Name => 'AudioSamplingRate',
+        Format => 'digits[6]',
+    },
+    152 => {
+        Name => 'AudioSamplingResolution',
+        Format => 'digits[2]',
+    },
+    153 => {
+        Name => 'AudioDuration',
+        Format => 'digits[6]',
+    },
+    154 => {
+        Name => 'AudioOutcue',
+        Format => 'string[0,64]',
+    },
     200 => {
         Name => 'ObjectPreviewFileFormat',
         Groups => { 2 => 'Image' },
-        Format => 'binary',
+        Format => 'binary[2]',
+        PrintConv => \%fileFormat,
     },
     201 => {
         Name => 'ObjectPreviewFileVersion',
         Groups => { 2 => 'Image' },
-        Format => 'binary',
+        Format => 'binary[2]',
     },
     202 => {
         Name => 'ObjectPreviewData',
         Groups => { 2 => 'Image' },
+        Format => 'string[0,256000]',
         PrintConv => '\$val',
+        PrintConvInv => '$val',
     },
 );
 
-# Record 3 -- News photo
-# Note: I can't locate the reference for this record, so I'm not
-# sure I've got the format correct.  Specifically, I'm not sure which of
-# these fields are binary and which are ASCII data.  This isn't a huge
-# loss though, because this record isn't very popular. - PH
+# Record 3 -- News photo (ref 2)
 %Image::ExifTool::IPTC::NewsPhoto = (
     GROUPS => { 2 => 'Image' },
-    0   => {
+    WRITE_PROC => \&WriteIPTC,
+    CHECK_PROC => \&CheckIPTC,
+    WRITABLE => 1,
+    0 => {
         Name => 'NewsPhotoVersion',
-        Format => 'binary',
+        Format => 'binary[2]',
     },
-    10  => 'IPTCPictureNumber',
-    20  => 'IPTCImageWidth',
-    30  => 'IPTCImageHeight',
-    40  => 'IPTCPixelWidth',
-    50  => 'IPTCPixelHeight',
-    55  => {
+    10 => {
+        Name => 'IPTCPictureNumber',
+        Format => 'string[0,16]',
+    },
+    20 => {
+        Name => 'IPTCImageWidth',
+        Format => 'binary[2]',
+    },
+    30 => {
+        Name => 'IPTCImageHeight',
+        Format => 'binary[2]',
+    },
+    40 => {
+        Name => 'IPTCPixelWidth',
+        Format => 'binary[2]',
+    },
+    50 => {
+        Name => 'IPTCPixelHeight',
+        Format => 'binary[2]',
+    },
+    55 => {
         Name => 'SupplementalType',
-        Format => 'binary',
+        Format => 'binary[1]',
         PrintConv => {
             0 => 'Main Image',
             1 => 'Reduced Resolution Image',
@@ -344,10 +549,13 @@ sub ProcessIPTC($$$);
             3 => 'Rasterized Caption',
         },
     },
-    60  => 'ColorRepresentation',
-    64  => {
+    60 => {
+        Name => 'ColorRepresentation',
+        Format => 'binary[1]',
+    },
+    64 => {
         Name => 'InterchangeColorSpace',
-        Format => 'binary',
+        Format => 'binary[1]',
         PrintConv => {
             1 => 'X,Y,Z CIE',
             2 => 'RGB SMPTE',
@@ -359,12 +567,21 @@ sub ProcessIPTC($$$);
             8 => 'sRGB',
         },
     },
-    65  => 'ColorSequence',
-    84  => 'NumIndexEntries',
-    86  => 'IPTCBitsPerSample',
-    90  => {
+    65 => {
+        Name => 'ColorSequence',
+        Format => 'binary[1]',
+    },
+    84 => {
+        Name => 'NumIndexEntries',
+        Format => 'binary[2]',
+    },
+    86 => {
+        Name => 'IPTCBitsPerSample',
+        Format => 'binary[1]',
+    },
+    90 => {
         Name => 'SampleStructure',
-        Format => 'binary',
+        Format => 'binary[1]',
         PrintConv => {
             0 => 'OrthogonalConstangSampling',
             1 => 'Orthogonal4-2-2Sampling',
@@ -373,7 +590,7 @@ sub ProcessIPTC($$$);
     },
     100 => {
         Name => 'ScanningDirection',
-        Format => 'binary',
+        Format => 'binary[1]',
         PrintConv => {
             0 => 'L-R, Top-Bottom',
             1 => 'R-L, Top-Bottom',
@@ -387,7 +604,7 @@ sub ProcessIPTC($$$);
     },
     102 => {
         Name => 'IPTCImageRotation',
-        Format => 'binary',
+        Format => 'binary[1]',
         PrintConv => {
             0 => 0,
             1 => 90,
@@ -395,10 +612,13 @@ sub ProcessIPTC($$$);
             3 => 270,
         },
     },
-    110 => 'DataCompressionMethod',
+    110 => {
+        Name => 'DataCompressionMethod',
+        Format => 'binary[1]',
+    },
     120 => {
         Name => 'QuantizationMethod',
-        Format => 'binary',
+        Format => 'binary[1]',
         PrintConv => {
             0 => 'Linear Reflectance/Transmittance',
             1 => 'Linear Density',
@@ -410,55 +630,63 @@ sub ProcessIPTC($$$);
             7 => 'Gamma Compensated',
         },
     },
-    125 => 'EndPoints',
+    125 => {
+        Name => 'EndPoints',
+        Format => 'binary[1]',
+    },
     130 => {
         Name => 'ExcursionTolerance',
-        Format => 'binary',
+        Format => 'binary[1]',
         PrintConv => {
             0 => 'Not Allowed',
             1 => 'Allowed',
         },
     },
-    135 => 'BitsPerComponent',
+    135 => {
+        Name => 'BitsPerComponent',
+        Format => 'binary[1]',
+    },
 );
 
 # Record 7 -- Pre-object Data
 %Image::ExifTool::IPTC::PreObjectData = (
-    10  => {
+    10 => {
         Name => 'SizeMode',
-        Format => 'binary',
+        Format => 'binary[1]',
         PrintConv => {
             0 => 'Size Not Known',
             1 => 'Size Known',
         },
     },
-    20  => {
+    20 => {
         Name => 'MaxSubfileSize',
-        Format => 'binary',
+        Format => 'binary[4]',
     },
-    90  => {
+    90 => {
         Name => 'ObjectSizeAnnounced',
-        Format => 'binary',
+        Format => 'binary[4]',
     },
-    95  => {
+    95 => {
         Name => 'MaximumObjectSize',
-        Format => 'binary',
+        Format => 'binary[4]',
     },
 );
 
 # Record 8 -- ObjectData
 %Image::ExifTool::IPTC::ObjectData = (
-    10  => {
+    10 => {
         Name => 'SubFile',
+        Flags => 'List',
         PrintConv => '\$val',
+        PrintConvInv => '$val',
     },
 );
 
 # Record 9 -- PostObjectData
 %Image::ExifTool::IPTC::PostObjectData = (
-    10  => {
+    10 => {
         Name => 'ConfirmedObjectSize',
-        Format => 'binary',
+        Format => 'binary[4]',
     },
 );
 
@@ -491,6 +719,14 @@ sub ProcessIPTC($$$);
 
 
 #------------------------------------------------------------------------------
+# AutoLoad our writer routines when necessary
+#
+sub AUTOLOAD
+{
+    return Image::ExifTool::DoAutoLoad($AUTOLOAD, @_);
+}
+
+#------------------------------------------------------------------------------
 # get IPTC info
 # Inputs: 0) ExifTool object reference, 1) reference to tag table
 #         2) dirInfo reference
@@ -499,11 +735,13 @@ sub ProcessIPTC($$$)
 {
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
     my $dataPt = $dirInfo->{DataPt};
-    my $pos = $dirInfo->{DirStart};
-    my $dirEnd = $pos + $dirInfo->{DirLen};
+    my $pos = $dirInfo->{DirStart} || 0;
+    my $dirLen = $dirInfo->{DirLen} || 0;
+    my $dirEnd = $pos + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
-    
+
+    $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
     while ($pos + 5 <= $dirEnd) {
         my $buff = substr($$dataPt, $pos, 5);
         my ($id, $rec, $tag, $len) = unpack("CCCn", $buff);
@@ -528,7 +766,6 @@ sub ProcessIPTC($$$)
             last;   # this shouldn't happen
         }
         $pos += 5;      # step to after field header
-        my $recordPtr = Image::ExifTool::GetTagTable($tableName);
         # handle extended IPTC entry if necessary
         if ($len & 0x8000) {
             my $n = $len & 0x7fff; # get num bytes in length field
@@ -548,17 +785,27 @@ sub ProcessIPTC($$$)
             last;
         }
         my $val = substr($$dataPt, $pos, $len);
+        my $recordPtr = Image::ExifTool::GetTagTable($tableName);
         my $tagInfo = $exifTool->GetTagInfo($recordPtr, $tag);
+        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+            'Table'  => $tagTablePtr,
+            'Value'  => $val,
+            'DataPt' => $dataPt,
+            'Size'   => $len,
+            'Start'  => $pos,
+            'Extra'  => ', ' . $tableInfo->{Name} . ' record',
+        );
         if ($tagInfo) {
-            if (ref $tagInfo eq 'HASH' and $tagInfo->{Format}) {
-                if ($tagInfo->{Format} eq 'binary') {
+            my $format = $tagInfo->{Format}; 
+            if (ref $tagInfo eq 'HASH' and $format) {
+                if ($format =~ /^binary/) {
                     $val = 0;
                     my $i;
                     for ($i=0; $i<$len; ++$i) {
                         $val = $val * 256 + ord(substr($$dataPt, $pos+$i, 1));
                     }
-                } else {
-                    $exifTool->Warn("Invalid IPTC format: $tagInfo->{Format}");
+                } elsif ($format !~ /^(string|digits)/) {
+                    warn("Invalid IPTC format: $format");
                 }
             }
         } else {
@@ -593,7 +840,7 @@ image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -603,6 +850,8 @@ it under the same terms as Perl itself.
 =over 4
 
 =item http://brilliantlabs.com/docs/IIMV4.1.pdf
+
+=item http://www.hugsan.com/EXIFutils/Features/EXIF_Fields/IPTC/iptc.html
 
 =back
 

@@ -1,5 +1,6 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.10
 [File, File, Image]  - File Name: ExifTool.jpg
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Type: JPEG
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 282 - X Resolution: 180
@@ -7,8 +8,8 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:04 06:46:52
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 4
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 14.0
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 4
+[EXIF, ExifIFD, Image] 33437 - Aperture: 14.0
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:12:04 06:46:52
@@ -40,13 +41,13 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Manual
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
-[Composite, Composite, Image]  - Av(Aperture Value): 14.3
+[Composite, Composite, Image]  - Aperture: 14.3
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
-[Composite, Composite, Image]  - Tv(Shutter Speed): 4
+[Composite, Composite, Image]  - Shutter Speed: 4
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 54.0mm)
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)

@@ -51,13 +51,13 @@ the entries are large blocks of binary data for which I can find no
 documentation.  The only one I recognize is the PrintIM block.  To figure
 them out will require someone with a Sony camera who is willing to
 systematically change all the settings and determine where they are stored
-in these blocks.  You can use "exiftool -v -v -v" to dump these blocks in
-hex. Please send me any information you may collect about the format of the
-Sony maker notes.
+in these blocks.  You can use "exiftool -v3" to dump these blocks in hex.
+Please send me any information you may collect about the format of the Sony
+maker notes.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -5,6 +5,7 @@
 #
 # Revisions:    02/07/2004 - P. Harvey Moved out of Exif.pm
 #               09/15/2004 - P. Harvey Added D70Boring from Greg Troxel
+#               01/11/2005 - P. Harvey Added Canon20D from Christian Koller
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Shortcuts;
@@ -12,7 +13,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -57,6 +58,41 @@ $VERSION = '1.00';
                 'ColorTone',
                 'FileSize',
                 'FileNumber',
+                'DriveMode',
+                'OwnerName',
+                'SerialNumber',
+    ],
+    # courtesy of Christian Koller
+    Canon20D => [  'FileName',
+                'Model',
+                'DateTimeOriginal',
+                'ShootingMode',
+                'ShutterSpeedValue', #changed for 20D
+                'ApertureValue', #changed for 20D
+                'MeteringMode',
+                'ExposureCompensation',
+                'ISO',
+                'Lens',
+                'FocalLength',
+                #'ImageSize', #wrong in CR2
+                'ExifImageWidth', #instead
+                'ExifImageLength', #instead
+                'Quality',
+                'FlashOn',
+                'FlashType', 
+                'ConditionalFEC',
+                'RedEyeReduction',
+                'ShutterCurtainHack',
+                'WhiteBalance',
+                'FocusMode',
+                'Contrast',
+                'Sharpness',
+                'Saturation',
+                'ColorTone',
+                'ColorSpace', # new
+                'longexposurenoisereduction', #new
+                'FileSize',
+                #'FileNumber', #not provided by EOS20D 
                 'DriveMode',
                 'OwnerName',
                 'SerialNumber',
@@ -107,7 +143,7 @@ shortcuts.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

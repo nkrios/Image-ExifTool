@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.32
 [File, File, Image]  - File Name: Casio2.jpg
-[File, File, Image]  - File Size: 34KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 2KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: CASIO COMPUTER CO.,LTD 
@@ -12,8 +13,8 @@
 [EXIF, IFD0, Image] 305 - Software: 1.00                 
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:04:17 11:23:49
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/400
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 4.3
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/400
+[EXIF, ExifIFD, Image] 33437 - Aperture: 4.3
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:04:17 11:23:49
@@ -42,11 +43,12 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 30164
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 3764
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1328
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Casio, Image] 2 - Preview Image Size: 320x240
-[MakerNotes, Casio, Image] 3 - Preview Image Length: 28874
-[MakerNotes, Casio, Image] 4 - Preview Image Start: 1270
+[MakerNotes, Casio, Image] 3 - Casio Preview Length: 28874
+[MakerNotes, Casio, Image] 4 - Casio Preview Start: 1260
+[MakerNotes, Casio, Camera] 8192 - Preview Image: (Binary data 26 bytes)
 [MakerNotes, Casio, Camera] 8209 - White Balance Bias: 92 78
 [MakerNotes, Casio, Camera] 8210 - White Balance: Auto?
 [MakerNotes, Casio, Camera] 8226 - Object Distance: 536870.912 m
@@ -55,16 +57,15 @@
 [MakerNotes, Casio, Camera] 12289 - Self Timer: Off
 [MakerNotes, Casio, Camera] 12290 - Quality: Fine
 [MakerNotes, Casio, Camera] 12291 - Focus Mode: Single-Area Auto Focus
-[MakerNotes, Casio, Camera] 12294 - Time Zone: 
+[MakerNotes, Casio, Camera] 12294 - Time Zone: London
 [MakerNotes, Casio, Camera] 12295 - Bestshot Mode: Off
 [MakerNotes, Casio, Camera] 12308 - CCD ISO Sensitivity: 50
 [MakerNotes, Casio, Camera] 12309 - Color Mode: Off
 [MakerNotes, Casio, Camera] 12310 - Enhancement: Off
 [MakerNotes, Casio, Camera] 12311 - Filter: Off
-[Composite, Composite, Image]  - Av(Aperture Value): 4.3
+[Composite, Composite, Image]  - Aperture: 4.3
 [Composite, Composite, Image]  - Image Size: 160x120
-[Composite, Composite, Image]  - Preview Image: (Binary data 28874 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.0
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/400
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 3764 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/400
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 5.8mm (35mm equivalent: 35.0mm)

@@ -1,0 +1,81 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
+[File, File, Image]  - File Name: GPS_3_failed.jpg
+[File, File, Image]  - File Size: 6KB
+[File, File, Image]  - File Type: JPEG
+[File, File, Image]  - Image Width: 120
+[File, File, Image]  - Image Height: 80
+[EXIF, IFD0, Image] 270 - Image Description: Communications
+[EXIF, IFD0, Camera] 271 - Make: FUJIFILM
+[EXIF, IFD0, Camera] 272 - Camera Model Name: FinePixS1Pro
+[EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] 282 - X Resolution: 300
+[EXIF, IFD0, Image] 283 - Y Resolution: 300
+[EXIF, IFD0, Image] 296 - Resolution Unit: inches
+[EXIF, IFD0, Image] 305 - Software: Adobe Photoshop 7.0
+[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2002:07:19 13:28:10
+[EXIF, IFD0, Author] 315 - Artist: Ian Britton
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
+[EXIF, IFD0, Image] 532 - Reference Black White: 0 255 128 255 128 255
+[EXIF, IFD0, Author] 33432 - Copyright: ian Britton - FreeFoto.com
+[EXIF, ExifIFD, Image] 33437 - Aperture: 0.6
+[EXIF, ExifIFD, Camera] 34850 - Exposure Program: Shutter speed priority AE
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 0
+[EXIF, ExifIFD, Image] 36864 - Exif Version: 0200
+[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2002:07:13 15:58:28
+[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2002:07:13 15:58:28
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/724
+[EXIF, ExifIFD, Image] 37378 - Aperture Value: 16.0
+[EXIF, ExifIFD, Image] 37379 - Brightness Value: 0.260156
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: -0.65
+[EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
+[EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 0.0mm
+[EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
+[EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
+[EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2400
+[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1600
+[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 12.0508
+[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 12.0508
+[EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
+[EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
+[EXIF, ExifIFD, Image] 41728 - File Source: Unknown (0)
+[EXIF, ExifIFD, Image] 41729 - Scene Type: Unknown (0)
+[EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
+[EXIF, IFD1, Image] 282 - X Resolution: 72
+[EXIF, IFD1, Image] 283 - Y Resolution: 72
+[EXIF, IFD1, Image] 296 - Resolution Unit: inches
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1050
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 3662
+[GPS, GPS, Location] 0 - GPS Version ID: 2.0.0.0
+[GPS, GPS, Location] 1 - GPS Latitude Ref: South
+[GPS, GPS, Location] 2 - GPS Latitude: 12 deg 21' 23.345"
+[GPS, GPS, Location] 3 - GPS Longitude Ref: West
+[GPS, GPS, Location] 4 - GPS Longitude: 1 deg 54.85' 0"
+[GPS, GPS, Time] 7 - GPS Time Stamp: 14:58:24
+[GPS, GPS, Location] 18 - GPS Map Datum: WGS84
+[IPTC, IPTC, Other] 0 - Application Record Version: 2
+[IPTC, IPTC, Other] 120 - Caption-Abstract: Communications
+[IPTC, IPTC, Author] 122 - Writer-Editor: Ian Britton
+[IPTC, IPTC, Other] 105 - Headline: Communications
+[IPTC, IPTC, Author] 80 - By-line: Ian Britton
+[IPTC, IPTC, Author] 85 - By-line Title: Photographer
+[IPTC, IPTC, Author] 110 - Credit: Ian Britton
+[IPTC, IPTC, Author] 115 - Source: FreeFoto.com
+[IPTC, IPTC, Other] 5 - Object Name: Communications
+[IPTC, IPTC, Other] 55 - Date Created: 2002:06:20
+[IPTC, IPTC, Location] 90 - City:  
+[IPTC, IPTC, Location] 95 - Province-State:  
+[IPTC, IPTC, Location] 101 - Country-Primary Location Name: Ubited Kingdom
+[IPTC, IPTC, Other] 15 - Category: BUS
+[IPTC, IPTC, Other] 20 - Supplemental Categories: Communications
+[IPTC, IPTC, Other] 10 - Urgency: 5
+[IPTC, IPTC, Other] 25 - Keywords: Communications
+[IPTC, IPTC, Author] 116 - Copyright Notice: ian Britton - FreeFoto.com
+[Composite, Composite, Image]  - Aperture: 0.6
+[Composite, Composite, Camera]  - Flash: Off
+[Composite, Composite, Image]  - Image Size: 120x80
+[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 0.0
+[Composite, Composite, Image]  - Shutter Speed: 1/724
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 3662 bytes)
+[Composite, Composite, Camera]  - Focal Length: 0.0mm (35mm equivalent: 0.0mm)

@@ -6,8 +6,8 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:04 06:46:52
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 4
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 14.0
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 4
+[EXIF, ExifIFD, Image] 33437 - Aperture: 14.0
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:12:04 06:46:52
@@ -37,6 +37,7 @@
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Manual
+[EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
@@ -63,7 +64,6 @@
 [MakerNotes, Canon, Camera] 36 - Zoomed Resolution: 3072
 [MakerNotes, Canon, Camera] 37 - Zoomed Resolution Base: 3072
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
-[MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 9 - Sequence Number In Continuous Burst: 0
 [MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0

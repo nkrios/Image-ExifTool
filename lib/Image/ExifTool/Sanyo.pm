@@ -13,7 +13,7 @@ package Image::ExifTool::Sanyo;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.05';
 
 my %offOn = (
     0 => 'Off',
@@ -21,12 +21,25 @@ my %offOn = (
 );
 
 %Image::ExifTool::Sanyo::Main = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0x00ff => 'MakerNoteOffset',
+    0x00ff => {
+        # this is an absolute offset in the JPG file... odd - PH
+        Name => 'MakerNoteOffset',
+        Writable => 'int32u',
+    },
     0x0100 => 'SanyoThumbnail',
-    0x0200 => 'SpecialMode',
+    0x0200 => {
+        Name => 'SpecialMode',
+        Writable => 'int32u',
+        Count => 3,
+    },
     0x0201 => {
         Name => 'SanyoQuality',
+        Flags => 'PrintHex',
+        Writable => 'int16u',
         PrintConv => {
             0x0000 => 'Normal/Very Low',
             0x0001 => 'Normal/Low',
@@ -56,6 +69,7 @@ my %offOn = (
     },
     0x0202 => {
         Name => 'Macro',
+        Writable => 'in16u',
         PrintConv => {
             0 => 'Normal',
             1 => 'Macro',
@@ -63,12 +77,16 @@ my %offOn = (
             3 => 'Manual',
         },
     },
-    0x0204 => 'DigitalZoom',
+    0x0204 => {
+        Name => 'DigitalZoom',
+        Writable => 'rational32u',
+    },
     0x0207 => 'SoftwareVersion',
     0x0208 => 'PictInfo',
     0x0209 => 'CameraID',
     0x020e => {
         Name => 'SequentialShot',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'None',
             1 => 'Standard',
@@ -78,26 +96,32 @@ my %offOn = (
     },
     0x020f => {
         Name => 'WideRange',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x0210 => {
         Name => 'ColorAdjustmentMode',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x0213 => {
         Name => 'QuickShot',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x0214 => {
         Name => 'SelfTimer',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x0216 => {
         Name => 'VoiceMemo',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x0217 => {
         Name => 'RecordShutterRelease',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Record while down',
             1 => 'Press start, press stop',
@@ -105,22 +129,27 @@ my %offOn = (
     },
     0x0218 => {
         Name => 'FlickerReduce',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x0219 => {
         Name => 'OpticalZoomOn',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x021b => {
         Name => 'DigitalZoomOn',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x021d => {
         Name => 'LightSourceSpecial',
+        Writable => 'int16u',
         PrintConv => \%offOn,
     },
     0x021e => {
         Name => 'Resaved',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'No',
             1 => 'Yes',
@@ -128,6 +157,7 @@ my %offOn = (
     },
     0x021f => {
         Name => 'SceneSelect',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'Sport',
@@ -137,9 +167,13 @@ my %offOn = (
             5 => 'User 2',
         },
     },
-    0x0223 => 'ManualFocusDistance',
+    0x0223 => {
+        Name => 'ManualFocusDistance',
+        Writable => 'rational32u',
+    },
     0x0224 => {
         Name => 'SequenceShotInterval',
+        Writable => 'int16u',
         PrintConv => {
             0 => '5 frames/sec',
             1 => '10 frames/sec',
@@ -149,6 +183,7 @@ my %offOn = (
     },
     0x0225 => {
         Name => 'FlashMode',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Auto',
             1 => 'Force',
@@ -159,12 +194,17 @@ my %offOn = (
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
+        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
             Start => '$valuePtr',
         },
     },
-#    0x0f00 => 'DataDump',
+    0x0f00 => {
+        Name => 'DataDump',
+        Writable => 0,
+        PrintConv => '\$val',
+    },
 );
 
 
@@ -187,7 +227,7 @@ Sanyo maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

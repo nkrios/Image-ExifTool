@@ -13,11 +13,14 @@ package Image::ExifTool::Minolta;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(SetByteOrder Get16u Get32u);
+use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.06';
+$VERSION = '1.10';
 
 %Image::ExifTool::Minolta::Main = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0000 => 'MakerNoteVersion',
     0x0001 => {
@@ -40,12 +43,31 @@ $VERSION = '1.06';
     # but it is an 8kB binary data block!
     0x0018 => {
         Name => 'ImageStabilization',
+        Writable => 0,
         PrintConv => '"On"',
     },
-    0x0040 => 'CompressedImageSize',
-    0x0081 => 'PreviewImageData',
-    0x0088 => 'PreviewImageStart',
-    0x0089 => 'PreviewImageLength',
+    0x0040 => {
+        Name => 'CompressedImageSize',
+        Writable => 'int32u',
+    },
+    0x0081 => {
+        Name => 'PreviewImageData',
+        Writable => 0,
+    },
+    0x0088 => {
+        Name => 'PreviewImageStart',
+        Flags => [ 'IsOffset', 'Protected' ],
+        OffsetPair => 0x0089, # point to associated byte count
+        DataTag => 'PreviewImage',
+        Writable => 'int32u',
+    },
+    0x0089 => {
+        Name => 'PreviewImageLength',
+        OffsetPair => 0x0088, # point to associated offset
+        DataTag => 'PreviewImage',
+        Writable => 'int32u',
+        Protected => 1,
+    },
     0x0101 => {
         Name => 'ColorMode',
         PrintConv => {
@@ -82,16 +104,23 @@ $VERSION = '1.06';
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
+        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
             Start => '$valuePtr',
         },
     },
-    0x0f00 => 'MinoltaCameraSettings2',
+    0x0f00 => {
+        Name => 'MinoltaCameraSettings2',
+        Writable => 0,
+    },
 );
 
 %Image::ExifTool::Minolta::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     FORMAT => 'int32u',
     FIRST_ENTRY => 0,
@@ -191,6 +220,8 @@ $VERSION = '1.06';
         Name => 'ExposureCompensation',
         ValueConv => '$val/3 - 2',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        ValueConvInv => '($val + 2) * 3',
+        PrintConvInv => 'eval $val',
     },
     14 => {
         Name => 'BracketStep',
@@ -205,11 +236,16 @@ $VERSION = '1.06';
     18 => {
         Name => 'FocalLength',
         ValueConv => '$val / 256',
+        ValueConvInv => '$val * 256',
+        PrintConv => 'sprintf("%.1fmm",$val)',
+        PrintConvInv => '$val=~s/mm$//;$val',
     },
     19 => {
         Name => 'FocusDistance',
         ValueConv => '$val / 1000',
         PrintConv => '$val ? "$val m" : "inf"',
+        ValueConvInv => '$val * 1000',
+        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/ m$//, $val',
     },
     20 => {
         Name => 'FlashFired',
@@ -221,10 +257,12 @@ $VERSION = '1.06';
     21 => {
         Name => 'MinoltaDate',
         ValueConv => 'sprintf("%4d:%.2d:%.2d",$val>>16,($val&0xff00)>>8,$val&0xff)',
+        ValueConvInv => 'my @a=($val=~/(\d+):(\d+):(\d+)/); @a ? ($a[0]<<16)+($a[1]<<8)+$a[2] : undef',
     },
     22 => {
         Name => 'MinoltaTime',
         ValueConv => 'sprintf("%2d:%.2d:%.2d",$val>>16,($val&0xff00)>>8,$val&0xff)',
+        ValueConvInv => 'my @a=($val=~/(\d+):(\d+):(\d+)/); @a ? ($a[0]<<16)+($a[1]<<8)+$a[2] : undef',
     },
     23 => {
         Name => 'MaxAperture',
@@ -242,24 +280,31 @@ $VERSION = '1.06';
     28 => {
         Name => 'ColorBalanceRed',
         ValueConv => '$val / 256',
+        ValueConvInv => '$val * 256',
     },
     29 => {
         Name => 'ColorBalanceGreen',
         ValueConv => '$val / 256',
+        ValueConvInv => '$val * 256',
     },
     30 => {
         Name => 'ColorBalanceBlue',
         ValueConv => '$val / 256',
+        ValueConvInv => '$val * 256',
     },
     31 => {
         Name => 'Saturation',
         ValueConv => '$val - 3',
+        ValueConvInv => '$val + 3',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
     32 => {
         Name => 'Contrast',
         ValueConv => '$val - 3',
+        ValueConvInv => '$val + 3',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
     33 => {
         Name => 'Sharpness',
@@ -283,8 +328,10 @@ $VERSION = '1.06';
     35 => {
         Name => 'FlashExposureComp',
         Description => 'Flash Exposure Compensation',
-        ValueConv => '($val - 6) / 3',        
+        ValueConv => '($val - 6) / 3',
+        ValueConvInv => '$val * 3 + 6',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
     },
     36 => {
         Name => 'ISOSetting',
@@ -337,6 +384,7 @@ $VERSION = '1.06';
     41 => {
         Name => 'ColorFilter',
         ValueConv => '$val - 3',
+        ValueConvInv => '$val + 3',
     },
     42 => 'BWFilter',
     43 => {
@@ -349,6 +397,7 @@ $VERSION = '1.06';
     44 => {
         Name => 'Brightness',
         ValueConv => '$val/8 - 6',
+        ValueConvInv => '($val + 6) * 8',
     },
     45 => 'SpotFocusPointX',
     46 => 'SpotFocusPointY',
@@ -443,7 +492,7 @@ sub ConvertWhiteBalance($)
         if ($type and $printConv = $minoltaWhiteBalance{$type}) {
             $printConv .= sprintf("%+.8g", ($val - $type) / 0x10000);
         } else {
-            $printConv = "Unknown ($val)";
+            $printConv = sprintf("Unknown (0x%x)", $val);
         }
     }
     return $printConv;
@@ -484,7 +533,7 @@ Minolta and Konika-Minolta maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

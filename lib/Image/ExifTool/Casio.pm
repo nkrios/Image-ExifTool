@@ -5,6 +5,9 @@
 #
 # Revisions:    12/09/2003 - P. Harvey Created
 #               09/10/2004 - P. Harvey Added MakerNote2 (thanks to Joachim Loehr)
+#
+# References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+#               2) Joachim Loehr private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Casio;
@@ -12,16 +15,20 @@ package Image::ExifTool::Casio;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.04';
 
 %Image::ExifTool::Casio::MakerNote1 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0001 => {
         Name => 'RecordingMode' ,
+        Writable => 'int16u',
         PrintConv => {
-            1 => 'SingleShutter',
+            1 => 'Single Shutter',
             2 => 'Panorama',
-            3 => 'Night scene',
+            3 => 'Night Scene',
             4 => 'Portrait',
             5 => 'Landscape',
         },
@@ -29,10 +36,12 @@ $VERSION = '1.01';
     0x0002 => { 
         Name => 'Quality',
         Description => 'Image Quality',
+        Writable => 'int16u',
         PrintConv => { 1 => 'Economy', 2 => 'Normal', 3 => 'Fine' },
     },
     0x0003 => { 
         Name => 'FocusMode',
+        Writable => 'int16u',
         PrintConv => {
             2 => 'Macro',
             3 => 'Auto',
@@ -42,15 +51,21 @@ $VERSION = '1.01';
     },
     0x0004 => { 
         Name => 'FlashMode',
-        PrintConv => { 1 => 'Auto', 2 => 'On', 3 => 'Off', 4 => 'Red-eye reduction' },
+        Writable => 'int16u',
+        PrintConv => { 1 => 'Auto', 2 => 'On', 3 => 'Off', 4 => 'Red-eye Reduction' },
     },
     0x0005 => { 
         Name => 'FlashIntensity',
+        Writable => 'int16u',
         PrintConv => { 11 => 'Weak', 13 => 'Normal', 15 => 'Strong' },
     },
-    0x0006 => 'ObjectDistance',
+    0x0006 => {
+        Name => 'ObjectDistance',
+        Writable => 'int32u',
+    },
     0x0007 => { 
         Name => 'WhiteBalance', 
+        Writable => 'int16u',
         PrintConv => {
             1 => 'Auto',
             2 => 'Tungsten',
@@ -62,51 +77,74 @@ $VERSION = '1.01';
     },
     0x000a => { 
         Name => 'DigitalZoom', 
+        Writable => 'int32u',
         PrintConv => { 65536 => 'Off', 65537 => '2X' },
     },
     0x000b => { 
         Name => 'Sharpness', 
+        Writable => 'int16u',
         PrintConv => { 0 => 'Normal', 1 => 'Soft', 2 => 'Hard' },
     },
     0x000c => { 
         Name => 'Contrast', 
+        Writable => 'int16u',
         PrintConv => { 0 => 'Normal', 1 => 'Low', 2 => 'High' },
     },
     0x000d => { 
         Name => 'Saturation', 
+        Writable => 'int16u',
         PrintConv => { 0 => 'Normal', 1 => 'Low', 2 => 'High' },
     },
     0x0014 => { 
         Name => 'CCDSensitivity',
+        Writable => 'int16u',
         PrintConv => {
             64  => 'Normal',
+            80  => 'Normal',
+            100 => 'High',
             125 => '+1.0',
             250 => '+2.0',
             244 => '+3.0',
-            80  => 'Normal',
-            100 => 'High',
         },
     },
 );
 
+# ref 2:
 %Image::ExifTool::Casio::MakerNote2 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0002 => { 
         Name => 'PreviewImageSize',
         Groups => { 2 => 'Image' },
+        Writable => 'int16u',
+        Count => 2,
         PrintConv => '$val =~ tr/ /x/; $val',
     },
     0x0003 => { 
-        Name => 'PreviewImageLength',
+        Name => 'CasioPreviewLength',
         Groups => { 2 => 'Image' },
+# Rename this tag to basically ignore these values (and those of
+# CasioPreviewStart below) because the data is duplicated in
+# the PreviewImage tag later.  If we wrote these too, the data
+# would be duplicated in the maker notes!
+#        Flags => 'Protected',
+#        OffsetPair => 0x0004, # point to associated offset
+#        Writable => 'int32u',
+#        Protected => 1,
     },
     0x0004 => { 
-        Name => 'PreviewImageStart',
-        ValueConv => '$val + 10',
+        Name => 'CasioPreviewStart',
         Groups => { 2 => 'Image' },
+        Writable => 0,
+#        Flags => [ 'IsOffset', 'Protected' ],
+#        OffsetPair => 0x0003, # point to associated byte count
+#        Writable => 'int32u',
     },
     0x0008 => { 
         Name => 'QualityMode',
+        Writable => 'int16u',
         PrintConv => {
            0 => 'Economy',
            1 => 'Normal',
@@ -116,6 +154,7 @@ $VERSION = '1.01';
     0x0009 => { 
         Name => 'CasioImageSize',
         Groups => { 2 => 'Image' },
+        Writable => 'int16u',
         PrintConv => { 
             0 => '640x480',
             4 => '1600x1200',
@@ -128,6 +167,7 @@ $VERSION = '1.01';
     },
     0x000d => { 
         Name => 'FocusMode',
+        Writable => 'int16u',
         PrintConv => {
            0 => 'Normal',
            1 => 'Macro',
@@ -136,6 +176,7 @@ $VERSION = '1.01';
     0x0014 => { 
         Name => 'ISOSetting',
         Description => 'ISO',
+        Writable => 'int16u',
         PrintConv => { 
            3 => 50,
            4 => 64,
@@ -145,6 +186,7 @@ $VERSION = '1.01';
     },
     0x0019 => { 
         Name => 'WhiteBalance',
+        Writable => 'int16u',
         PrintConv => { 
            0 => 'Auto',
            1 => 'Daylight',
@@ -157,9 +199,13 @@ $VERSION = '1.01';
     0x001d => { 
         Name => 'FocalLength',
         Description => 'Focal Length (mm)',
+        Writable => 'rational32u',
+        PrintConv => 'sprintf("%.1fmm",$val)',
+        PrintConvInv => '$val=~s/mm$//;$val',
     },
     0x001f => { 
         Name => 'Saturation',
+        Writable => 'int16u',
         PrintConv => {
            0 => '-1',
            1 => 'Normal',
@@ -168,6 +214,7 @@ $VERSION = '1.01';
     },
     0x0020 => { 
         Name => 'Contrast',
+        Writable => 'int16u',
         PrintConv => {
            0 => '-1',
            1 => 'Normal',
@@ -176,6 +223,7 @@ $VERSION = '1.01';
     },
     0x0021 => { 
         Name => 'Sharpness',
+        Writable => 'int16u',
         PrintConv => {
            0 => '-1',
            1 => 'Normal',
@@ -185,19 +233,28 @@ $VERSION = '1.01';
     0x0e00 => { 
         Name => 'PrintIM',
         Description => 'Print Image Matching',
+        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
             Start => '$valuePtr',
         },
     },
-    #0x2000 => { 
-    #    Name => 'CasioPreviewThumbnail',
-    #},
+    0x2000 => { 
+        # this is the image data referenced by tags 3 and 4
+        # (nasty that they double-reference the image!)
+        Name => 'PreviewImage',
+        Writable => 'undef',
+        PrintConv => '\$val',
+        PrintConvInv => '$val',
+    },
     0x2011 => { 
         Name => 'WhiteBalanceBias',
+        Writable => 'int16u',
+        Count => 2,
     },
     0x2012 => { 
         Name => 'WhiteBalance',
+        Writable => 'int16u',
         PrintConv => {
            12 => 'Flash',
            0 => 'Manual',
@@ -207,21 +264,26 @@ $VERSION = '1.01';
     },
     0x2022 => { 
         Name => 'ObjectDistance',
+        Writable => 'int32u',
         PrintConv => 'sprintf("%.3f m",$val/1000)',
     },
     0x2034 => { 
         Name => 'FlashDistance',
+        Writable => 'int16u',
     },
     0x3000 => { 
         Name => 'RecordMode',
+        Writable => 'int16u',
         PrintConv => { 2 => 'Normal' },
     },
     0x3001 => { 
         Name => 'SelfTimer',
+        Writable => 'int16u',
         PrintConv => { 1 => 'Off' },
     },
     0x3002 => { 
         Name => 'Quality',
+        Writable => 'int16u',
         PrintConv => { 
            1 => 'Economic',
            2 => 'Normal',
@@ -230,6 +292,7 @@ $VERSION = '1.01';
     },
     0x3003 => { 
         Name => 'FocusMode',
+        Writable => 'int16u',
         PrintConv => { 
            0 => 'Manual?',
            1 => 'Fixation?',
@@ -239,9 +302,11 @@ $VERSION = '1.01';
     },
     0x3006 => { 
         Name => 'TimeZone',
+        Writable => 'string',
     },
     0x3007 => { 
         Name => 'BestshotMode',
+        Writable => 'int16u',
         PrintConv => { 
            0 => 'Off',
            1 => 'On?',
@@ -249,18 +314,22 @@ $VERSION = '1.01';
     },
     0x3014 => { 
         Name => 'CCDISOSensitivity',
+        Writable => 'int16u',
         Description => 'CCD ISO Sensitivity',
     },
     0x3015 => { 
         Name => 'ColorMode',
+        Writable => 'int16u',
         PrintConv => { 0 => 'Off' },
     },
     0x3016 => { 
         Name => 'Enhancement',
+        Writable => 'int16u',
         PrintConv => { 0 => 'Off' },
     },
     0x3017 => { 
         Name => 'Filter',
+        Writable => 'int16u',
         PrintConv => { 0 => 'Off' },
     },
 );
@@ -284,7 +353,7 @@ Casio maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -296,6 +365,10 @@ it under the same terms as Perl itself.
 =item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Joachim Loehr for adding support for the type 2 maker notes.
 
 =head1 SEE ALSO
 

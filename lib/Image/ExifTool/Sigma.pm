@@ -13,9 +13,12 @@ package Image::ExifTool::Sigma;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 %Image::ExifTool::Sigma::Main = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0002 => 'SerialNumber',
     0x0003 => 'DriveMode',
@@ -30,39 +33,48 @@ $VERSION = '1.01';
     0x000c => {
         Name => 'ExposureCompensation',
         ValueConv => '$val =~ s/Expo:\s*//, $val',
+        ValueConvInv => 'IsFloat($val) ? sprintf("Expo:%+.1f",$val) : undef',
     },
     0x000d => {
         Name => 'Contrast',
         ValueConv => '$val =~ s/Cont:\s*//, $val',
+        ValueConvInv => 'IsFloat($val) ? sprintf("Cont:%+.1f",$val) : undef',
     },
     0x000e => {
         Name => 'Shadow',
         ValueConv => '$val =~ s/Shad:\s*//, $val',
+        ValueConvInv => 'IsFloat($val) ? sprintf("Shad:%+.1f",$val) : undef',
     },
     0x000f => {
         Name => 'Highlight',
         ValueConv => '$val =~ s/High:\s*//, $val',
+        ValueConvInv => 'IsFloat($val) ? sprintf("High:%+.1f",$val) : undef',
     },
     0x0010 => {
         Name => 'Saturation',
         ValueConv => '$val =~ s/Satu:\s*//, $val',
+        ValueConvInv => 'IsFloat($val) ? sprintf("Satu:%+.1f",$val) : undef',
     },
     0x0011 => {
         Name => 'Sharpness',
         ValueConv => '$val =~ s/Shar:\s*//, $val',
+        ValueConvInv => 'IsFloat($val) ? sprintf("Shar:%+.1f",$val) : undef',
     },
     0x0012 => {
         Name => 'X3FillLight',
         ValueConv => '$val =~ s/Fill:\s*//, $val',
+        ValueConvInv => 'IsFloat($val) ? sprintf("Fill:%+.1f",$val) : undef',
     },
     0x0014 => {
         Name => 'ColorAdjustment',
         ValueConv => '$val =~ s/CC:\s*//, $val',
+        ValueConvInv => 'IsInt($val) ? "CC:$val" : undef',
     },
     0x0015 => 'AdjustmentMode',
     0x0016 => {
         Name => 'Quality',
         ValueConv => '$val =~ s/Qual:\s*//, $val',
+        ValueConvInv => 'IsInt($val) ? "Qual:$val" : undef',
     },
     0x0017 => 'Firmware',
     0x0018 => 'Software',
@@ -88,7 +100,7 @@ Sigma and Foveon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

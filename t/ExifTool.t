@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..17\n"; }
+BEGIN { $| = 1; print "1..18\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -15,7 +15,7 @@ print "ok 1\n";
 
 ######################### End of black magic.
 
-use t::TestLib qw(check testCompare);
+use t::TestLib;
 
 my $testname = 'ExifTool';
 my $testnum = 1;
@@ -31,12 +31,12 @@ my $testnum = 1;
 # test 3: GIF file using data in memory
 {
     ++$testnum;
-    my $image;
     open(TESTFILE, 't/ExifTool.gif');
     binmode(TESTFILE);
-    read(TESTFILE, $image, 5000000);
+    my $gifImage;
+    read(TESTFILE, $gifImage, 100000);
     close(TESTFILE);
-    my $info = ImageInfo(\$image);
+    my $info = ImageInfo(\$gifImage);
     print 'not ' unless check($info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -109,7 +109,7 @@ my $testnum = 1;
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     my $info = $exifTool->ImageInfo('t/ExifTool.jpg',
-                    { Group0 => 'Canon', Group2 => '-Camera' });
+                    { Group1 => 'Canon', Group2 => '-Camera' });
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -177,7 +177,7 @@ my $testnum = 1;
 
     ++$testnum;
     my $testfile = "t/ExifTool_$testnum";
-    open(OUT,">$testfile.failed");
+    open(TESTFILE,">$testfile.failed");
     my $oldSep = $/;   
     $/ = "\x0a";        # set input line separator
     $exifTool->ExtractInfo('t/ExifTool.jpg');
@@ -186,16 +186,49 @@ my $testnum = 1;
     my $group;
     foreach $group (@groups) {
         next if $group eq 'ExifTool';
-        print OUT "---- $group ----\n";
+        print TESTFILE "---- $group ----\n";
         my $info = $exifTool->GetInfo({"Group$family" => $group});
         foreach (sort $exifTool->GetTagList($info)) {
-            print OUT "$_ : $$info{$_}\n";
+            print TESTFILE "$_ : $$info{$_}\n";
         } 
     }
     $/ = $oldSep;       # restore input line separator
-    close(OUT);
+    close(TESTFILE);
     print 'not ' unless testCompare("$testfile.out","$testfile.failed",$testnum);
     print "ok $testnum\n";
+}
+
+# test 18: Test verbose output
+{
+    ++$testnum;
+    my $testfile = "t/ExifTool_$testnum";
+    my $ok = 1;
+    my $skip = '';
+    # capture verbose output by redirecting STDOUT
+    if (open(TESTFILE,">&STDOUT") and open(STDOUT,">$testfile.tmp")) {
+        ImageInfo('t/ExifTool.jpg', { Verbose => 3 });
+        close(STDOUT);
+        open(STDOUT,">&TESTFILE"); # restore original STDOUT
+        # re-write output file to change newlines to be same as standard test file
+        # (if I was a Perl guru, maybe I would know a better way to do this)
+        open(TMPFILE,"$testfile.tmp");
+        open(TESTFILE,">$testfile.failed");
+        my $oldSep = $\;
+        $\ = "\x0a";        # set output line separator
+        while (<TMPFILE>) {
+            chomp;          # remove existing newline
+            print TESTFILE $_;  # re-write line using \x0a for newlines
+        }
+        $\ = $oldSep;       # restore output line separator
+        close(TESTFILE);
+        unlink("$testfile.tmp");
+        $ok = testCompare("$testfile.out","$testfile.failed",$testnum);
+    } else {
+        # skip this test
+        $skip = ' # Skip Can not redirect standard output to test verbose option';
+    }
+    print 'not ' unless $ok;
+    print "ok $testnum$skip\n";
 }
 
 # end

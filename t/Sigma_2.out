@@ -1,6 +1,7 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
 [File, File, Image]  - File Name: Sigma.jpg
-[File, File, Image]  - File Size: 13KB
-[File, File, Image]  - File Type: JPG
+[File, File, Image]  - File Size: 2KB
+[File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: SIGMA
@@ -12,8 +13,8 @@
 [EXIF, IFD0, Image] 305 - Software: SIGMA PhotoPro 2.0.0.1586
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2004:03:19 17:48:51
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/320
-[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 8.0
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/320
+[EXIF, ExifIFD, Image] 33437 - Aperture: 8.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
@@ -41,8 +42,8 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 180
 [EXIF, IFD1, Image] 283 - Y Resolution: 180
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 303
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 10534
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1254
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Sigma, Camera] 2 - Serial Number: 02000019
 [MakerNotes, Sigma, Camera] 3 - Drive Mode: SINGLE
@@ -67,9 +68,9 @@
 [MakerNotes, Sigma, Camera] 23 - Firmware: 2.0.4.1642 Release
 [MakerNotes, Sigma, Camera] 24 - Software: SIGMA PhotoPro 2.0.0.1586
 [MakerNotes, Sigma, Camera] 25 - Auto Bracket:  
-[Composite, Composite, Image]  - Av(Aperture Value): 8.0
+[Composite, Composite, Image]  - Aperture: 8.0
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.7
-[Composite, Composite, Image]  - Tv(Shutter Speed): 1/320
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 10534 bytes)
+[Composite, Composite, Image]  - Shutter Speed: 1/320
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 60.0mm (35mm equivalent: 102.0mm)

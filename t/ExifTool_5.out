@@ -35,7 +35,7 @@ SceneCaptureType: Standard
 SensingMethod: One-chip color area
 ShutterSpeedValue: 0
 UserComment: 
-WhiteBalance: Auto
+WhiteBalance (1): Auto
 XResolution: 180
 YCbCrPositioning: Centered
 YResolution: 180
