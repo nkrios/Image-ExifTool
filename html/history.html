@@ -1,0 +1,591 @@
+<html>
+<head>
+  <title>ExifTool Version History</title>
+</head>
+<body>
+<h1>ExifTool Version History</h1>
+
+<b>Oct. 1/04 - Version 3.60</b>
+<ul>
+<li>Changed group family 0 to divide EXIF group into individual IFD groups
+<li>Fixed typos in some Casio tag names
+<li>API Changes:
+    <ul>
+    <li>Changed name of File::RandomAccessFile to File::RandomAccess
+    <li>Changed default setting of Duplicates to 1
+    </ul>
+</ul>
+
+<b>Sept. 21/04 - Version 3.51</b>
+<ul>
+<li>Improvements to interpretation of Nikon D70 ISO settings
+</ul>
+
+<b>Sept. 16/04 - Version 3.50</b>
+<ul>
+<li>Fixed problem with duplicate tags showing up without the -a option
+<li>Changed Nikon DataDump to a binary type
+<li>Added D70Boring shortcut
+</ul>
+
+<b>Sept. 14/04 - Version 3.49</b>
+<ul>
+<li>Changed installation to also install the 'exiftool' script
+</ul>
+
+<b>Sept. 13/04 - Version 3.48</b>
+<ul>
+<li>Changed UserComment to skip first 8 bytes since the comments come after an 8 byte character code
+</ul>
+
+<b>Sept. 10/04 - Version 3.47</b>
+<ul>
+<li>Added support for second type of Casio maker notes (MakerNoteCasio2)
+</ul>
+
+<b>Sept. 1/04 - Version 3.46</b>
+<ul>
+<li>Fixed minor bug in PrintConv of FileNumber for CanonRaw files
+</ul>
+
+<b>June 3/04 - Version 3.45</b>
+<ul>
+<li>Recognize Canon 1D Mk II raw files (.CR2)
+<br>(Note: Not properly decoding maker notes from these files yet)
+</ul>
+
+<b>May 28/04 - Version 3.44</b>
+<ul>
+<li>Improved validity check of Sony maker notes
+</ul>
+
+<b>May 18/04 - Version 3.43</b>
+<ul>
+<li>A couple more changes to the Nikon maker notes
+</ul>
+
+<b>May 17/04 - Version 3.42</b>
+<ul>
+<li>Additions to Nikon maker notes for values derived from D70
+</ul>
+
+<b>Apr. 28/04 - Version 3.41</b>
+<ul>
+<li>Fixed some errors when running on older Perl versions
+</ul>
+
+<b>Apr. 7/04 - Version 3.40</b>
+<ul>
+<li>Try to extract data from unrecognized maker notes (assuming standard EXIF format)
+<li>Added tests for different maker notes
+</ul>
+
+<b>Apr. 6/04 - Version 3.37</b>
+<ul>
+<li>Added support for Sigma maker notes
+<li>Remember to add new files to MANIFEST so they get included in release.  Doh.
+</ul>
+
+<b>Apr. 6/04 - Version 3.36</b>
+<ul>
+<li>Added support for Sanyo and Minolta maker notes
+<li>Added skeleton for interpeting Sony maker notes
+<li>Interpret Pentax PrintIM
+</ul>
+
+<b>Apr. 6/04 - Version 3.35</b>
+<ul>
+<li>Added support for Nikon PrintIM
+<li>Changed names of duplicate EXIF tags
+</ul>
+
+<b>Apr. 5/04 - Version 3.34</b>
+<ul>
+<li>Added all missing tag definitions from TIFF 6 standard
+<li>Added a few more EXIF tag definitions
+<li>Interpret PrintIM IFD
+<li>Fix interpretation of Interoperability IFD
+<li>Fixed potential endless loop bug introduced in version 3.33
+</ul>
+
+<b>Apr. 5/04 - Version 3.33</b>
+<ul>
+<li>Parse SubIFD of Nikon NEF file (now extracts raw image size and thumbnail image)
+</ul>
+
+<b>Apr. 2/04 - Version 3.32</b>
+<ul>
+<li>Changes to some Nikon tag names
+<li>Added Nikon Saturation
+<li>Documentation improvements
+</ul>
+
+<b>Mar. 31/04 - Version 3.31</b>
+<ul>
+<li>Now recognizes NEF (Nikon Electronic image Format) files
+</ul>
+
+<b>Mar. 29/04 - Version 3.30</b>
+<ul>
+<li>Removed -w option
+<li>Fixed problem with some XMP tags being put in the EXIF group
+<li>More minor speed improvements
+<li>API Changes:
+    <ul>
+    <li>GetDescription() now requires an ExifTool object reference
+    <li>Removed WarnDuplicateDescriptions()
+    </ul>
+</ul>
+
+<b>Mar. 26/04 - Version 3.27</b>
+<ul>
+<li>Optimized a few routines to speed things up a bit
+<li>API Changes:
+    <ul>
+    <li>Changed GetDescription() documention to indicate it is called with an ExifTool object (this is still optional, but will be manditory with the next version)
+    </ul>
+</ul>
+
+<b>Mar. 25/04 - Version 3.26</b>
+<ul>
+<li>Don't generate warning if end of IPTC block is padded with nulls
+</ul>
+
+<b>Mar. 19/04 - Version 3.25</b>
+<ul>
+<li>Fixed problem with 'Input' sort order
+</ul>
+
+<b>Mar. 19/04 - Version 3.24</b>
+<ul>
+<li>Only return PreviewImage if it is a valid JPG (otherwise set 'Warning')
+</ul>
+
+<b>Mar. 16/04 - Version 3.23</b>
+<ul>
+<li>API Changes:
+    <ul>
+    <li>Added GetGroups()
+    <li>GetGroup() now returns group names for all families if used in list context and family not specified.
+    </ul>
+</ul>
+
+<b>Mar. 12/04 - Version 3.22</b>
+<ul>
+<li>API Changes:
+    <ul>
+    <li>Changed GetInfo() to return list of tags like ImageInfo() if list reference provided
+    <li>Fixed bug that caused GetInfo() to ignore specified tags
+    </ul>
+</ul>
+
+<b>Mar. 11/04 - Version 3.21</b>
+<ul>
+<li>Fixed problem with Composite group in family 1
+<li>Changed case of Exif to EXIF in family 1
+<li>-group option now lists Composite group as it should
+<li>Internal Changes:
+    <ul>
+    <li>Cleaned up handling of function arguments
+    </ul>
+</ul>
+
+<b>Mar. 10/04 - Version 3.20</b>
+<ul>
+<li>Added -group option
+<li>Added group families 1 and 2
+<li>Can now specify excluded tags with leading '-' (replaces -x option)
+<li>API Changes:
+    <ul>
+    <li>Added ClearOptions(), ExtractInfo(), GetInfo(), CombineInfo(), GetTagList() and GetAllGroups()
+    <li>Removed IsVerbose() function (use Options('Verbose') instead)
+    <li>Allow groups to be excluded by specifying leading '-' on group name
+    <li>ImageInfo() and GetInfo() now use specified group order to set tag precidence
+        if Duplicates option is not set
+    <li>Change default value of Duplicates option back to 0
+    </ul>
+</ul>
+
+<b>Mar. 1/04 - Version 3.15</b>
+<ul>
+<li>Changed format of all date and time tags to EXIF standard
+<li>Added some composite date/time tags
+<li>Fixed date formatting so -d option should now work with all combined date/time tags
+<li>Other minor changes to GPS information
+<li>Improvements to TIFF processing
+<li>Set value to "Undefined" if PrintConv evaluates to undefined value
+<li>Added -G option
+<li>API changes:
+    <ul>
+    <li>Changed all option names: shortened and changed to mixed case (sorry!)
+    </ul>
+<li>Internal changes:
+    <ul>
+    <li>Standardized arguments to all processing procedures
+    <li>Made call to processing procedure more automatic
+    <li>Removed TABLE_TYPE tag and added PROCESS_PROC
+    <li>Added ProcessTagTable() member function
+    </ul>
+</ul>
+
+<b>Feb. 27/04 - Version 3.14</b>
+<ul>
+<li>Added GPS tag conversions and GPS test
+<li>Values that can't be converted now show up simply as "Unknown (X)"
+</ul>
+
+<b>Feb. 26/04 - Version 3.13</b>
+<ul>
+<li>Print out errors from exiftool script (since Image::ExifTool no longer prints them)
+<li>Added more tests
+<li>Failed tests now leave ".failed" file in "t" directory for post mortem
+</ul>
+
+<b>Feb. 25/04 - Version 3.12</b>
+<ul>
+<li>Moved all image-related warnings to new Warning tag
+</ul>
+
+<b>Feb. 25/04 - Version 3.11</b>
+<ul>
+<li>Added GeoTiff support
+<li>Added -x option
+<li>Improvements to documentation
+<li>Improve XMP parsing for 'Bag' elements
+<li>Capitalize first letter of XMP tag descriptions
+<li>Patch problem with APP13 resource written by older Photoshop versions
+<li>API changes:
+    <ul>
+    <li>Added EXCLUDE and GROUP# options
+    <li>Change default value of SAVE_DUPLICATES option to 1
+    </ul>
+</ul>
+
+<b>Feb. 20/04 - Version 3.10</b>
+<ul>
+<li>Restructuring only -- the behaviour of the exiftool
+script was not changed
+<li>Moved html documentation to new html directory
+<li>API changes:
+    <ul>
+    <li>Conform to standard Perl module mechanics:
+        <ul>
+        <li>Changed ExifTool package name to Image::ExifTool
+        <li>Added Makefile.PL and other standard files
+        <li>Added Perl pod documentation
+        <li>Added standard test files
+        <li>Moved modules into lib directory
+        <li>Changed "TagTables" directory name to "ExifTool"
+        </ul>
+    <li>Added extra parameter in new RandomAccessFile
+    </ul>
+</ul>
+
+<b>Feb. 20/04 - Version 3.05</b>
+<ul>
+<li>Fixed problem where output files (-o) weren't written if -p option used
+</ul>
+
+<b>Feb. 19/04 - Version 3.04</b>
+<ul>
+<li>Added -U option to allow display of unknown values in Canon binary data blocks
+<li>Made unknown tag names more specific when -u or -U option used
+<li>Added RawData and DecoderTable tags (for Canon RAW file)
+</ul>
+
+<b>Feb. 17/04 - Version 3.03</b>
+<ul>
+<li>Fixed RandomAccessFile package name (should have been File::RandomAccessFile)
+<li>Added IxusAFPoint tag to Canon maker notes
+<li>Avoid scanning past end of Canon binary data blocks
+<li>API changes:
+    <ul>
+    <li>GetFoundTags() and GetRequestedTags() now return list instead of list reference
+    </ul>
+</ul>
+
+<b>Feb. 16/04 - Version 3.02</b>
+<ul>
+<li>Improved handling of Pentax maker notes
+</ul>
+
+<b>Feb. 15/04 - Version 3.01</b>
+<ul>
+<li>API changes:
+    <ul>
+    <li>Added GetValue() function
+    <li>Completed API documentation
+    </ul>
+</ul>
+
+<b>Feb. 13/04 - Version 3.00</b>
+<ul>
+<li>Removed -all option (it is now the default -- specify -common for previous default behaviour)
+<li>Added -a option to allow printout of duplicate tag values
+<li>API changes:
+    <ul>
+    <li>I am finally happy with the API, so future major changes are less likely
+        (hence the major version number)
+    <li>No longer return ARRAY reference for list of tags
+    <br>(Instead, tag values are joined in a comma separated list if tag 'List' flag is set)
+    <li>Added SAVE_DUPLICATES option
+    <li>Added BuildCompositeTags() to EXPORT_OK list
+    <li>GetFoundTags() now sorts tags in specified order
+    <li>GetDescriptions() longer returns undef if the description doesn't exist
+    </ul>
+</ul>
+
+<b>Feb. 12/04 - Version 2.71</b>
+<ul>
+<li>Still more playing with Pentax maker notes
+<li>More API changes:
+    <ul>
+    <li>Added RandomAccessFile.pm
+    <li>All image file i/o now done through a RandomAccessFile object
+    <br>--> allows proper piping and use of string i/o
+    <li>Allow scalar reference to be passed to ImageInfo() (for string i/o)
+    </ul>
+</ul>
+
+<b>Feb. 11/04 - Version 2.70</b>
+<ul>
+<li>More tweaking of Pentax maker notes
+<li>Changed API to be more object oriented:
+    <ul>
+    <li>Removed SetVerbose(), ExtractUnknown(), SetDateFormat(), EnablePrintConversion(),
+        EnableCompositeTags()
+    <li>Added Options() to replace above functions
+    <li>Changed WarnDuplicateTags() to WarnDuplicateDescriptions()
+    <li>Added GetFoundTags() and GetRequestedTags()
+    <li>Many functions now take ExifTool object reference as first argument
+    <li>ImageInfo() no longer returns reference to ExifTool object when used in list context
+        (you have to use "new ExifTool" and the OO form of ImageInfo() if you want the object)
+    </ul>
+</ul>
+
+<b>Feb. 10/04 - Version 2.62</b>
+<ul>
+<li>Added -u option to allow display of unknown tags
+<li>Major changes to Pentax maker notes (still needs work)
+</ul>
+
+<b>Feb. 09/04 - Version 2.61</b>
+<ul>
+<li>Allow file reference to be passed to ImageInfo()
+<li>Allow file to be read from standard input by specifying "-" as file name
+<li>Add FileType tag
+</ul>
+
+<b>Feb. 07/04 - Version 2.60</b>
+<ul>
+<li>Improve IPTC parsing and add support for more IPTC data types
+<li>Read Photoshop APP13 records properly
+<li>Added -g option
+<li>Move shortcuts into separate module
+<li>Changes to API: 
+    <ul>
+    <li>Removed LoadAllTables() and added GetAllTags()
+    <li>Removed GetDescriptions() and added GetDescription()
+    <li>Changed GetShortcuts() to return a list
+    <li>Added tag groups and GetGroup() function
+    <li>Return object data from ImageInfo() for use in GetGroup()
+    </ul>
+</ul>
+
+<b>Jan. 30/04 - Version 2.51</b>
+<ul>
+<li>Speed up JPG reading code
+<li>API no longer returns references to image-specific static data
+<li>Added ExifToolVersion tag
+</ul>
+
+<b>Jan. 29/04 - Version 2.50</b>
+<ul>
+<li>Changed API to return binary data as SCALAR reference and
+    list of values as ARRAY reference
+<li>Attempt to make case of tag descriptions more consistent
+</ul>
+
+<b>Jan. 28/04 - Version 2.41</b>
+<ul>
+<li>Scan photoshop JPG 0xe1 garbage for possible XMP information
+</ul>
+
+<b>Jan. 27/04 - Version 2.40</b>
+<ul>
+<li>Improved handling of XMP data
+<li>Changed output format and added -l option
+</ul>
+
+<b>Jan. 21/04 - Version 2.36</b>
+<ul>
+<li>Don't output trailing linefeed when -b option used
+</ul>
+
+<b>Jan. 19/04 - Version 2.35</b>
+<ul>
+<li>Changes to verbose output
+<li>Added TagTables::CanonRaw::CleanRaw() as an API utility function
+</ul>
+
+<b>Jan. 16/04 - Version 2.34</b>
+<ul>
+<li>Added 'Validate' check for Canon data fields
+<li>Changed ScaleFactor35efl to use FocalLengthIn35mmFormat if available
+</ul>
+
+<b>Jan. 15/04 - Version 2.33</b>
+<ul>
+<li>Added ScaleFactor35efl, FocalLength35efl, Lens35efl
+<li>Allow Composite tags to Require/Desire each other
+<li>Changed FlashType to use FlashBits instead of CanonFlashMode
+</ul>
+
+<b>Jan. 13/04 - Version 2.32</b>
+<ul>
+<li>Added -d (date format) option
+<li>Added -p (print format file) option
+</ul>
+
+<b>Jan. 9/04 - Version 2.31</b>
+<ul>
+<li>Exif WhiteBalance no longer overrides maker-specific WhiteBalance
+</ul>
+
+<b>Jan. 8/04 - Version 2.30</b>
+<ul>
+<li>Added support for IPTC format information
+</ul>
+
+<b>Jan. 6/04 - Version 2.25</b>
+<ul>
+<li>Fixed problem with ImageInfo() function prototype
+<li>Fixed printout of JpgFromRaw message (doesn't effect JPG extraction)
+<li>Set output files to binmode (including STDOUT) if -b option used
+</ul>
+
+<b>Jan. 1/04 - Version 2.24</b>
+<ul>
+<li>Fixed -list option to show all available tag names
+</ul>
+
+<b>Dec. 18/03 - Version 2.23</b>
+<ul>
+<li>Changed "Disable" routines to "Enable"
+</ul>
+
+<b>Dec. 17/03 - Version 2.22</b>
+<ul>
+<li>Fixed make/model tags which I broke with a recent change
+<li>Removed null terminator from returned strings
+</ul>
+
+<b>Dec. 16/03 - Version 2.21</b>
+<ul>
+<li>Fixed problem with decoding some Nikon maker notes
+<li>General improvements and tweaks to the code
+</ul>
+
+<b>Dec. 14/03 - Version 2.20</b>
+<ul>
+<li>Now extracts preview image from 300D JPG files (PreviewImage)
+<li>Changed ThumbnailData tag name to ThumbnailImage
+</ul>
+
+<b>Dec. 12/03 - Version 2.10</b>
+<ul>
+<li>ExifTool::ImageInfo now returns reference to hash instead of hash
+</ul>
+
+<b>Dec. 10/03 - Version 2.01</b>
+<ul>
+<li>Minor fixes for reading of RAW files
+</ul>
+
+<b>Dec. 09/03 - Version 2.00</b>
+<ul>
+<li>Added support Olympus, Casio and Nikon cameras
+<li>Now recognized GPS information
+<li>Moved config information to TagTables modules
+<li>Restructured API
+</ul>
+
+<b>Dec. 05/03 - Version 1.72</b>
+<ul>
+<li>Changes to composite Aperture and ShutterSpeed decisions
+</ul>
+
+<b>Dec. 05/03 - Version 1.71</b>
+<ul>
+<li>Read 10D Custom functions from CRW file too (thanks dpophyte)
+</ul>
+
+<b>Dec. 05/03 - Version 1.70</b>
+<ul>
+<li>Added custom functions for 10D and 1D
+</ul>
+
+<b>Dec. 04/03 - Version 1.62</b>
+<ul>
+<li>Decode known flash bits
+</ul>
+
+<b>Dec. 04/03 - Version 1.61</b>
+<ul>
+<li>Override ShutterSpeed with BulbDuration if available
+<li>Change -s option to add tab-separated list
+</ul>
+
+<b>Dec. 03/03 - Version 1.60</b>
+<ul>
+<li>Big improvements in reading Canon RAW files
+</ul>
+
+<b>Nov. 29/03 - Version 1.50</b>
+<ul>
+<li>Added ability to extract JPG from RAW
+<li>Added ExifData tag to allow entire EXIF block to be dumped
+</ul>
+
+<b>Nov. 26/03 - Version 1.40</b>
+<ul>
+<li>Split up config files to speed things up
+<li>Added ability to extract binary data
+<li>Added ThumbnailData tag (to allow extracting JPG thumbnails)
+</ul>
+
+<b>Nov. 25/03 - Version 1.30</b>
+<ul>
+<li>Added experimental Canon RAW file support
+</ul>
+
+<b>Nov. 22/03 - Version 1.20</b>
+<ul>
+<li>Now reads TIFF files too
+</ul>
+
+<b>Nov. 20/03 - Version 1.12</b>
+<ul>
+<li>Don't translate PhotoShop Brightness, etc
+</ul>
+
+<b>Nov. 20/03 - Version 1.11</b>
+<ul>
+<li>Attempt to fix problem on hp
+<li>clean up code a bit
+<li>added '-ver' command-line option
+</ul>
+
+<b>Nov. 20/03 - Version 1.10</b>
+<ul>
+<li>Added support for XMP format
+</ul>
+
+<b>Nov. 19/03 - Version 1.00</b>
+<ul>
+<li>Initial release
+</ul>
+
+<hr>
+</body>
+</html>

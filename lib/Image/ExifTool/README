@@ -1,0 +1,194 @@
+--------------------------------------------------------------------------------
+File:         Image/ExifTool/README
+
+Description:  ExifTool support modules documentation
+
+The ExifTool support modules are loaded by ExifTool to interpret various formats
+of meta information.
+
+The tables in these files are used as lookups based on the EXIF tag values.  The
+hash keys are the tag IDs (in decimal or hexadecimal if the ID is numerical as
+with EXIF tables, or the tag name if the ID is ASCII as with XMP tables).  In
+the case of a BinaryData table, the IDs are numerical and specify offsets into
+the binary data block.  The corresponding hash value provides information about
+the tag (explained later).  Each package my define a special table named
+'Composite' which contains tags whose values are calculated after all other tag
+values have been extracted from the file.
+
+Six special keys (PROCESS_PROC, GROUPS, FORMAT, FIRST_ENTRY, TAG_PREFIX and
+PRINT_CONV) are used to provide additional information about a table.  The
+special keys have names that are all capitalized to avoid possible conflicts
+with tag names.  Below is an explanation of the meaning of each special key:
+
+  PROCESS_PROC : Reference to a function used to process the directory for this
+  table.  If PROCESS_PROC is not given, \&Image::ExifTool::Exif::ProcessExif is
+  assumed.  The process proc returns 1 on success or 0 on failure, and takes
+  3 arguments: 0) reference to the ExifTool object, 1) reference to the tag
+  table hash, 2) reference to a directory information hash, with the following
+  members:
+  
+    DataPt   - Reference to data block containing directory (may be undef).
+    DataLen  - Length of data block in bytes.
+    DirStart - Location of directory start in data block.
+    DirLen   - Length of directory data within block.
+    DirBase  - Base offset for pointers in directory.
+    Nesting  - Nesting depth in directory tree.
+    IfdName  - Name of IFD if this is an EXIF directory.
+    RAF      - Reference to File::RandomAccess object if available.
+
+  GROUPS : A hash lookup for the default group names for all entries in this
+  table. If not specified, the Group 0 and 1 names will be set automatically
+  according to the name of the module.
+  
+  FORMAT : Specifies the default tag Format and the pointer increment for
+  entries in a BinaryData table, and defaults to 'Short' if not specified.  Can
+  also be used to override EXIF format in an EXIF table.  The possible  values
+  of FORMAT and Format are:
+
+    Char          - Signed byte
+    UChar         - Unsigned byte
+    Short         - Signed, 2-byte integer
+    UShort        - Unsigned 2-byte integer
+    Long          - Signed 4-byte integer
+    ULong         - Unsigned 4-byte integer
+    ShortRational - Rational value consisting of 2 Shorts
+    LongRational  - Rational value consisting of 2 Longs
+    String        - Series of ASCII characters
+    Binary        - Binary data (EXIF and IPTC tables only)
+  
+  FIRST_ENTRY : Specifies the index for the first tag entry in a binary table.
+  This value is only used if the Unknown option is set to 2 or higher, and
+  allows the binary data to be scanned for unknown tag entries.
+  
+  TAG_PREFIX : Prefix for names of unknown tags.
+  
+  PRINT_CONV : Print conversion for unknown tags.  
+  
+The remaining entries in a tag table are the EXIF tags with their associated
+information.  The information may exist in one of three forms:  1) A simple
+scalar which is the name of the tag, 2) A reference to a hash of information
+describing this tag, or 3) a reference to a list of hashes which contain
+Condition expressions allowing the appropriate hash to be selected to suit the
+conditions.  The following is a description of possible hash entries:
+
+  Name          : [required if tag is numerical] The tag name.  Tag names need
+                  not be unique.  If they aren't unique, duplicate tags
+                  overwrite values of previous tags unless the Duplicates option
+                  is set.  With Duplicates set, the name of the previous tag is
+                  changed to the form "TagName (N)" where N starts at 1 and
+                  increments for subsequent duplicate tags.
+
+  Description   : [optional] A more readable description of tag name.  If a tag
+                  doesn't specify a Description, then the tag Name is used
+                  instead, with spaces inserted between the words.
+
+  Format        : [optional] Only valid for BinaryData, EXIF and IPTC tables.
+                  For a Binary or EXIF table, this gives the format of the data,
+                  and is one of Char, UChar, Short, UShort, Long, ULong,
+                  ShortRational, LongRational or String[N] (where N is the
+                  string length and can only be specified in a Binary table). If
+                  not specified, the format of an EXIF entry is taken from the
+                  EXIF information, and the format of a Binary entry is taken
+                  from the FORMAT specified for the table (or Short if FORMAT is
+                  not specified).  For IPTC tables, the only valid Format type
+                  is Binary, otherwise the data is assumed to be ASCII.
+
+  Flags         : [optional] Flag or list of flags to specify characteristics of
+                  this tag value.  Currently the only flag is 'List', which
+                  indicates that duplicate entries of this tag should be
+                  accumulated in a comma-separated list.
+
+  ValueConv     : [optional] Used to convert the raw data value to a useable
+                  form.  May be either a hash reference to act as a lookup table
+                  or a scalar which is evaluated as a Perl expression. If a hash
+                  reference is used and the raw value doesn't appear as one of
+                  the keys, then the converted value is set to "Unknown (X)",
+                  where X is the raw value.  In an expression, $val is the raw
+                  value, $dataPt may be used to access the original EXIF data
+                  block, and $self is a reference to the current ExifTool
+                  object.  Composite tags which Require or Desire other tags may
+                  access the ValueConv and PrintConv values of these tags
+                  through the elements of the @val and @valPrint lists. The
+                  result of the ValueConv evaluation may be undefined to
+                  indicate the tag should be ignored.  If ValueConv is not
+                  specified, the raw value is not converted.
+
+  PrintConv     : [optional] This entry is similar to ValueConv above, except
+                  that it is used to further convert the tag value to a human
+                  readable form.  It can be either a hash lookup or a scalar
+                  Perl expression.  In this expression, $val represents the
+                  result of the ValueConv from above.  When evaluated, the
+                  expression may return either a scalar representing the a
+                  printable value, or a scalar reference to the value if it is
+                  not printable (as with a binary data block).  Note that the
+                  print conversion is only done if the PrintConv option is
+                  enabled (which it is by default).
+
+  Condition     : [optional] If given, specifies scalar which is evaluated as a
+                  Perl expression to decide whether the tag is valid.  If used
+                  in a list, the first list entry with a true condition is
+                  taken.  If no condition exists, then a 'true' condition is
+                  assumed.  The previous value for this tag is available as
+                  $oldVal for use in the logic expression.
+
+  Require       : [Composite tables only] Specifies a list of tag names for
+                  values which are required in order to calculate the composite
+                  value.  The values are stored in a @val list in the positions
+                  specified by the Require keys, and can be used in a ValueConv
+                  or PrintConv expression.  The composite value is only
+                  calculated if the values for all Require'd tags are defined.
+
+  Desire        : [Composite tables only] This is the same as Require except
+                  that the value is still calculated even if the specified tags
+                  don't exist.  Beware that the elements of @val and @valPrint
+                  may be undefined for Desire'd tags.  Both Require and Desire
+                  may exist together, however be sure to specify unique keys for
+                  each tag since they are used as indices into the @val and
+                  @valPrint lists.
+
+  SubDirectory {  [optional] If it exists, this specifies the start of a new 
+                  subdirectory.  It contains a collection of variables which
+                  specify the type and location of the subdirectory.  These
+                  variables are described below:
+
+      TagTable  : [optional] Specifies the name of the tag table lookup for the
+                  new subdirectory.  If not specified, the current tag table is
+                  used.
+                  
+      Start     : [required] The offset to the start of the subdirectory.  This
+                  is a Perl expression which should be relative to either the
+                  position of the current tag value ($valuePtr), or the position
+                  of the start of the EXIF record ($dirBase), and may use the
+                  value of the current tag ($val).
+
+      OffsetPt  : [optional] If specified, this is a Perl expression that gives
+                  the position of a 32-bit word in the current directory that is
+                  added to the Start position to get the position of the new
+                  subdirectory.  The expression should use the position of the
+                  current tag ($valuePtr).
+
+      Base      : [optional] This specifies the base offset for all pointers in
+                  the subdirectory.  This need not be specified if the offset
+                  is the same as the current directory, which is normally the
+                  case.
+
+      MaxSubdirs: [optional] Maximum number of subdirectories specified by the
+                  current tag (if the tag specifies multiple values).  If not
+                  specified, the tag value ($val) is used as-is.  If MaxSubdirs
+                  is specified, then one subdirectory is parsed for each value
+                  found up to the maximum number specified.
+
+      ByteOrder : [optional] Specifies byte ordering if different than than the
+                  rest of the file.  Must be either BigEndian, LittleEndian or
+                  Unknown.  If Unknown is specified, the byte order will be
+                  determined from the directory count (however, this can not be
+                  done if OffsetPt is specified).
+                  
+      Validate  : [optional] If given, specifies Perl expression which is used
+                  to validate the subdirectory data.  The following variables
+                  may be used in the expression: $val (value of the tag),
+                  $dirData (reference to directory data), $subdirStart (offset
+                  to subdirectory start) and $size (size of subdirectory).
+  }
+
+--------------------------------------------------------------------------------

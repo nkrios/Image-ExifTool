@@ -1,0 +1,40 @@
+[File, File, Image] File Type: TIFF
+[IFD0, EXIF, Image] Subfile Type: Full-resolution Image
+[IFD0, EXIF, Image] Image Width: 160
+[IFD0, EXIF, Image] Image Height: 120
+[IFD0, EXIF, Image] Bits Per Sample: 8 8 8
+[IFD0, EXIF, Image] Compression: LZW
+[IFD0, EXIF, Image] Photometric Interpretation: RGB
+[IFD0, EXIF, Image] Image Description: The picture caption
+[IFD0, EXIF, Camera] Make: Canon
+[IFD0, EXIF, Camera] Camera Model Name: Canon EOS DIGITAL REBEL
+[IFD0, EXIF, Image] Strip Offsets: 3814
+[IFD0, EXIF, Image] Samples Per Pixel: 3
+[IFD0, EXIF, Image] Rows Per Strip: 120
+[IFD0, EXIF, Image] Strip Byte Counts: 1048
+[IFD0, EXIF, Image] X Resolution: 180
+[IFD0, EXIF, Image] Y Resolution: 180
+[IFD0, EXIF, Image] Planar Configuration: Chunky
+[IFD0, EXIF, Image] Resolution Unit: inches
+[IFD0, EXIF, Image] Software: GraphicConverter
+[IFD0, EXIF, Time] Date/Time Of Last Modification: 2004:02:20 08:07:49
+[IFD0, EXIF, Image] Predictor: None
+[IFD0, EXIF, Image] Inter Color Profile: (Binary data 3144 bytes)
+[IPTC, IPTC, Other] Application Record Version: 2
+[IPTC, IPTC, Other] Caption-Abstract: The picture caption
+[IPTC, IPTC, Author] Writer-Editor: I wrote it
+[IPTC, IPTC, Other] Headline: headline
+[IPTC, IPTC, Other] Special Instructions: no instructions
+[IPTC, IPTC, Author] By-line: I'm the author
+[IPTC, IPTC, Author] By-line Title: On top
+[IPTC, IPTC, Author] Credit: Phil Harvey
+[IPTC, IPTC, Author] Source: My camera
+[IPTC, IPTC, Other] Object Name: This is the title
+[IPTC, IPTC, Other] Date Created: 2004:02:20
+[IPTC, IPTC, Location] City: Kingston
+[IPTC, IPTC, Location] Province-State: Ontario
+[IPTC, IPTC, Location] Country-Primary Location Name: Canada
+[IPTC, IPTC, Other] Original Transmission Reference: no reference
+[IPTC, IPTC, Other] Keywords: exiftool, test, picture
+[IPTC, IPTC, Author] Copyright Notice: Copyright notice
+[Composite, Composite, Image] Image Size: 160x120

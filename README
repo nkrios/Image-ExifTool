@@ -1,0 +1,66 @@
+ExifTool by Phil Harvey (phil@owl.phy.queensu.ca)
+------------------------------------------------------------------------
+
+ExifTool is a highly customizable Perl script that extracts meta
+information from JPG, TIFF, CRW, THM and GIF images.  ExifTool can read
+EXIF, IPTC, XMP and GeoTIFF formatted data as well as the maker notes of
+many digital cameras from various manufacturers including Canon, Casio,
+FujiFilm, Minolta, Nikon, Olympus, Pentax, Sanyo and Sigma.
+
+ExifTool can be downloaded from
+
+   http://owl.phy.queensu.ca/~phil/exiftool/
+
+RUNNING
+
+The exiftool script can be run right away without the need to install
+Image::ExifTool.  For example, if you change directory to the exiftool
+directory, you can extract information from one of the included test
+files by typing:
+
+   ./exiftool t/ExifTool.jpg
+
+You can move the exiftool script to wherever you like, however for the
+script to work in the new location you must also move the accompanying
+lib directory or install the Image::ExifTool package.
+
+INSTALLATION
+
+You can install the Image::ExifTool package to make it available for use
+by other Perl scripts by typing the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+Note: You need root access for the last step above.
+
+DEPENDENCIES
+
+No special libraries needed.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003-2004, Phil Harvey
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+ADDITIONAL INFORMATION
+
+Read the following files included with the ExifTool distribution
+for more information:
+
+html/index.html           - Main ExifTool documentation
+html/history.html         - ExifTool revision history
+html/tag_list.html        - List of available tag names
+html/ExifTool.html        - ExifTool API documentation
+lib/Image/ExifTool/README - ExifTool support modules documentation
+
+and if you have installed Image::ExifTool, you can also consult
+the man pages:
+
+   man Image::ExifTool
+
+------------------------------------------------------------------------

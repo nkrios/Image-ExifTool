@@ -1,0 +1,28 @@
+[File, File, Image] File Name: GeoTiff.tif
+[File, File, Image] File Size: 3KB
+[File, File, Image] File Type: TIFF
+[IFD0, EXIF, Image] Image Width: 25
+[IFD0, EXIF, Image] Image Height: 24
+[IFD0, EXIF, Image] Bits Per Sample: 8
+[IFD0, EXIF, Image] Compression: Uncompressed
+[IFD0, EXIF, Image] Photometric Interpretation: RGB Palette
+[IFD0, EXIF, Image] Strip Offsets: 2060
+[IFD0, EXIF, Image] Rows Per Strip: 24
+[IFD0, EXIF, Image] Strip Byte Counts: 600
+[IFD0, EXIF, Image] X Resolution: 72
+[IFD0, EXIF, Image] Y Resolution: 72
+[IFD0, EXIF, Image] Resolution Unit: inches
+[IFD0, EXIF, Image] Color Map: (Binary data 1536 bytes)
+[IFD0, EXIF, Location] Model Transform: 33.4179196429669 35.8363313794284 0 691955.165684031 35.8363313794284 -33.4179196429669 0 2791710.99012603 0 0 0 0 0 0 0 1
+[Composite, Composite, Image] Image Size: 25x24
+[GeoTiff, GeoTiff, Location] Geo Tiff Version: 1.1.0
+[GeoTiff, GeoTiff, Location] GT Model Type: Projected
+[GeoTiff, GeoTiff, Location] GT Raster Type: Pixel Is Area
+[GeoTiff, GeoTiff, Location] Geographic Type: User Defined
+[GeoTiff, GeoTiff, Location] Geog Citation: Hough UTM zone 17N
+[GeoTiff, GeoTiff, Location] Geog Geodetic Datum: User Defined
+[GeoTiff, GeoTiff, Location] Geog Semi Major Axis: 6378270
+[GeoTiff, GeoTiff, Location] Geog Semi Minor Axis: 6356794.343479
+[GeoTiff, GeoTiff, Location] Projected CS Type: User Defined
+[GeoTiff, GeoTiff, Location] PCS Citation: Hough UTM zone 17N
+[GeoTiff, GeoTiff, Location] Projection: UTM zone 17N

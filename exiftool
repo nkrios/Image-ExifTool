@@ -1,0 +1,434 @@
+#!/usr/bin/perl -w
+#------------------------------------------------------------------------------
+# File:         exiftool
+#
+# Description:  Extract EXIF information from image files
+#
+# Revisions:    Nov. 12/03 - P. Harvey Created
+#               (See html/history.html for revision history)
+#------------------------------------------------------------------------------
+use strict;
+require 5.002; 
+require Image::ExifTool;
+
+sub ScanDir($$);
+sub GetImageInfo($$);
+sub PrintTagList(@);
+sub LoadPrintFormat($);
+
+BEGIN {
+    # get exe directory
+    my $exeDir = $0;        # get exe directory from command
+    # isolate directory specification
+    $exeDir =~ s{(.*)/.*}{$1} or $exeDir = '.';
+    # add lib directory to include path
+    $INC[@INC] = "$exeDir/lib";
+}
+
+my @files;          # list of files and directories to scan
+my @tags;           # list of EXIF tags to extract
+my $outFormat = 0;  # 0=Canon format, 1=same-line, 2=tag names, 3=values only
+my $tabFormat = 0;  # non-zero for tab output format
+my $recurse;        # recurse into subdirectories
+my @ignore;         # directory names to ignore
+my $count = 0;      # count of files scanned
+my $countBad = 0;   # count of files with errors
+my $countDir = 0;   # count of directories scanned
+my $outputExt;      # extension for output file (or undef for no output)
+my $listTags;       # flag to list all tags
+my $listGroups;     # flag to list all groups
+my $forcePrint;     # force printing of tags whose values weren't found
+my $htmlOutput = 0; # flag for html-formatted output
+my $binaryOutput;   # flag for binary output
+my $showGroup;      # number of group to show (may be zero or '')
+my $allGroup;       # show group name for all tags
+my $multiFile;      # non-zero if we are scanning multiple files
+my @printFmt;       # the contents of the print format file
+my %options;        # options for Image::ExifTool::ImageInfo()
+
+#------------------------------------------------------------------------------
+# main script
+#
+
+my $exifTool = new Image::ExifTool; # create ExifTool object
+my @exclude;
+
+$exifTool->Options('Duplicates', 0);   # don't save duplicates by default
+
+# parse command-line options
+while ($_ = shift) {
+    if (s/^-//) {
+        /^list$/i and $listTags = 1, next;
+        /^group(\d*)$/i and $listGroups = $1, next;
+        /^ver$/i and print("ExifTool version $Image::ExifTool::VERSION\n"), exit 0;
+        /^all$/i and next;  # igore -all option for a while until I get used to not typing it - PH
+        /^a$/i and $exifTool->Options('Duplicates', 1), next;
+        /^b$/i and $binaryOutput = 1, next;
+        /^d$/i and $exifTool->Options('DateFormat', shift), next;
+        /^e$/i and $exifTool->Options('Composite', 0), next;
+        /^f$/i and $forcePrint = 1, next;
+        /^g(\d*)$/ and $showGroup = $1, $exifTool->Options('Sort',"Group$1"), next;
+        /^G(\d*)$/ and $showGroup = $1, $exifTool->Options('Sort',"Group$1"), $allGroup=1, next;
+        /^h$/i and $htmlOutput = 1, next;
+        /^i$/i and push(@ignore,shift), next;
+        /^l$/i and --$outFormat, next;
+        /^n$/i and $exifTool->Options('PrintConv', 0), next;
+        /^o$/i and $outputExt = shift, next;
+        /^p$/i and LoadPrintFormat(shift), next;
+        /^r$/i and $recurse = 1, next;
+        /^s$/  and ++$outFormat, next;
+        /^S$/  and $outFormat+=2, next;
+        /^t$/i and $tabFormat = 1, next;
+        /^u$/  and $exifTool->Options('Unknown', $exifTool->Options('Unknown')+1), next;
+        /^U$/  and $exifTool->Options('Unknown', 2), next;
+        /^v$/i and $exifTool->Options('Verbose',$exifTool->Options('Verbose')+1), next;
+        /^x$/i and push(@exclude,shift), next;
+        $_ eq '' and push(@files, '-'), next;  # read STDIN
+        push @tags, $_;
+    } else {
+        push @files, $_;
+    }
+}
+
+# handle '-list' command-line option
+if ($listTags) {
+    # load all TagTables to get all descriptions
+    my @tagList = Image::ExifTool::GetAllTags();
+    # list all tags alphabetically
+    print "Available tags:\n";
+    PrintTagList(@tagList);
+    @tagList = Image::ExifTool::GetShortcuts();
+    if (@tagList) {
+        print "\nCommand-line shortcuts:\n";
+        PrintTagList(@tagList);
+    }
+    exit 0;
+}
+
+# handle '-group#' command-line option
+if (defined $listGroups) {
+    $listGroups = 0 unless $listGroups;
+    # load all TagTables to get all descriptions
+    my @groupList = Image::ExifTool::GetAllGroups($listGroups);
+    print "Groups in family $listGroups:\n";
+    PrintTagList(@groupList);
+    exit 0;
+}
+
+# print help
+unless (@tags or @files) {
+    print <<_END_HELP_;
+NAME
+    exiftool - print meta information from image files
+
+SYNOPSIS
+    exiftool [OPTIONS] [-TAG or --TAG ...] FILE ...
+
+DESCRIPTION
+    Prints information for specified tags from listed files.  -TAG specifies the
+    name of a tag to extract, or --TAG to ignore.  FILE may be an image file
+    name, a directory name, or - for the standard input. Currently recognized
+    file types are JPG, TIFF, GIF, THM, CRW, CR2 and NEF.
+
+OPTIONS
+    -list   - list all valid tags
+    -group# - list all tag groups for family #
+    -ver    - print version number and exit
+    -a      - allow duplicate tag values (otherwise only last value displayed)
+    -b      - output requested data in binary format
+    -d FMT  - set date/time format (consult strftime manpage for FMT syntax)
+    -e      - print existing tags only -- don't calculate composite tags
+    -f      - force printing of tags even if their values are not found
+    -g[#]   - organize output by tag group (-g0 assumed if # not specified)
+    -G[#]   - same as -g but print group name for each tag
+    -h      - use HTML formatting for output
+    -i DIR  - ignore specified directory names
+    -l      - long output (2-line Canon-style output)
+    -n      - don't convert values for printing
+    -o EXT  - save output to file with EXT extension for each image processed
+    -p FILE - print in format specified by file (ignores other format options)
+    -r      - recursively scan subdirectories (only useful if "file" is a dir)
+    -s      - short format (add up to 3 -s options for even shorter formats)
+    -S      - same as two -s options
+    -t      - output tab-delimited list of description/values (database import)
+    -u      - extract values of unknown tags (2 to extract from data blocks)
+    -U      - same as two -u options (also extract unknown from data blocks)
+    -v      - verbose messages (add up to 3 -v options for more verbose)
+
+EXAMPLES
+    exiftool -g dir/a.jpg
+    exiftool -s -ImageSize -ExposureTime b.jpg
+    exiftool -canon c.jpg d.jpg
+    exiftool -r -o .txt -common pictures
+    exiftool -b -ThumbnailImage image.jpg >thumbnail.jpg
+    exiftool -b -JpgFromRaw -o _JFR.JPG -r .
+    exiftool -b -PreviewImage 118_1834.JPG > preview.jpg
+_END_HELP_
+    exit 0;
+}
+
+# can't do anything if no file specified
+die "No file specified" unless @files or $listTags;
+
+$multiFile = 1 if @files > 1;
+$showGroup = 0 if defined $showGroup and not $showGroup;
+@exclude and $exifTool->Options('Exclude'=>\@exclude);
+
+if ($outputExt) {
+    # add '.' before output extension if it doesn't contain one already
+    $outputExt = ".$outputExt" unless $outputExt =~ /\./;
+}
+
+if ($binaryOutput) {
+    $outFormat = 99;    # shortest possible output format
+    $exifTool->Options('PrintConv', 0);
+    binmode(STDOUT);
+}
+
+# scan through all specified files
+my $file;
+foreach $file (@files) {
+    if (-d $file) {
+        $multiFile = 1;
+        ScanDir($exifTool, $file);
+    } else {
+        GetImageInfo($exifTool, $file);
+    }
+}
+
+# print summary and exit
+if ($countDir or $count + $countBad > 1) {
+    printf("%5d directories scanned\n", $countDir) if $countDir;
+    printf("%5d image files read\n", $count) if $count>1 or $countDir or $countBad;
+    printf("%5d files could not be read\n", $countBad) if $countBad;
+    printf("%5d output files created\n", $count-$countBad) if $outputExt;
+}
+exit 0;     # all done
+
+#------------------------------------------------------------------------------
+# Get image information from EXIF data in file
+# Inputs: 0) ExifTool object reference, 1) file name
+sub GetImageInfo($$)
+{
+    my $exifTool = shift;
+    my $file = shift;
+    
+    # extract EXIF information from this file
+    my @foundTags = @tags;
+    my $info = $exifTool->ImageInfo($file, \@foundTags, \%options);
+
+    # check for file error
+    if ($info->{Error}) {
+        warn $info->{Error},": $file\n";
+        ++$countBad;
+        return;
+    }
+    
+    # open output file
+    my $fp;
+    my $outfile;
+    if ($outputExt) {
+        $outfile = $file;
+        $outfile =~ s/\.[^\/]*$//;   # remove extension if it exists
+        $outfile .= $outputExt;
+        if (-e $outfile) {
+            warn "$outfile already exists\n";
+            return;
+        }
+        open(OUTFILE, ">$outfile") or die "Error creating $outfile";
+        binmode(OUTFILE) if $binaryOutput;
+        $fp = \*OUTFILE;
+    } else {
+        unless ($binaryOutput) {
+            if ($htmlOutput) {
+                print "<!-- $file -->\n";
+            } else {
+                print "======== $file\n" if $multiFile;
+            }
+        }
+        $fp = \*STDOUT;
+    }
+
+    # print the results for this file
+    my $lineCount = 0;
+    if (@printFmt) {
+        # output using print format file (-p) option
+        my $line;
+        foreach $line (@printFmt) {
+            while ($line =~ /\$([-a-zA-Z_0-9]+)/) {
+                my $tag = $1;
+                my $val = $info->{$tag};
+                unless (defined $val) {
+                    # check for tag name with different case
+                    my ($tagCase) = grep /^$tag$/i, @foundTags;
+                    $val = $info->{$tagCase} if defined $tagCase;
+                    $val = '-' unless defined $val;
+                }
+                print $fp $`, $val;
+                $line = $';
+            }
+            ++$lineCount;
+            print $fp $line;
+        }
+    } else {
+        print $fp "<table>\n" if $htmlOutput;
+        my $tag;
+        my $lastGroup = '';
+        foreach $tag (@foundTags) {
+            my $group;
+            if (defined $showGroup) {
+                $group = $exifTool->GetGroup($tag, $showGroup);
+                unless ($allGroup) {
+                    if ($lastGroup ne $group) {
+                        if ($htmlOutput) {
+                            print $fp "<tr><td colspan=2 bgcolor='#dddddd'>$group</td></tr>\n";
+                        } else {
+                            print "---- $group ----\n";
+                        }
+                        $lastGroup = $group;
+                    }
+                    undef $group;   # undefine so we don't print it below
+                }
+            }
+            my $val = $info->{$tag};
+
+            my $description = $exifTool->GetDescription($tag);
+            if (not defined $val) {
+                # ignore tags that weren't found unless necessary
+                next if $binaryOutput;
+                next unless $forcePrint or $outFormat+$htmlOutput>=3;
+                $val = '-';     # forced to print all tag values
+            }
+            ++$lineCount;
+            
+            if ($binaryOutput) {
+                # translate scalar reference to actual binary data
+                $val = $$val if ref $val eq 'SCALAR';
+                print $fp $val;
+                next;
+            }
+            if (ref $val eq 'SCALAR') {
+                my $msg;
+                if ($$val =~ /^Binary data/) {
+                    $msg = $$val;
+                } else {
+                    $msg = 'Binary data ' . length($$val) . ' bytes';
+                }
+                $val = "($msg, use -b option to extract)";
+            }
+            # translate unprintable chars in value
+            $val =~ tr/\x01-\x1f\x80-\xff/\./;
+            $val =~ s/\x00//g;
+
+            if ($htmlOutput) {
+                print $fp "<tr>";
+                print $fp "<td>$group</td>" if defined $group;
+                if ($outFormat == 0) {
+                    print $fp "<td>$description</td><td>$val</td></tr>\n";
+                } elsif ($outFormat == 1) {
+                    print $fp "<td>$tag</td><td>$val</td></tr>\n";
+                } else {
+                    # make value html-friendly
+                    $val =~ s/&/&amp;/g;
+                    $val =~ s/</&lt;/g;
+                    $val =~ s/>/&gt;/g;
+                    print $fp "<td>$val</td></tr>\n";
+                }
+            } else {
+                if ($tabFormat) {
+                    print $fp "$group\t" if defined $group;
+                    print $fp "$description\t$val\n";
+                } elsif ($outFormat == -1) {    # long format
+                    print $fp "[$group] " if defined $group;
+                    print $fp "$description\n      $val\n";
+                } elsif ($outFormat == 0) {
+                    printf $fp "%-14s ","[$group]" if defined $group;
+                    printf $fp "%-32s: %s\n",$description,$val;
+                } elsif ($outFormat == 1) {
+                    printf $fp "%-12s ", $group if defined $group;
+                    printf $fp "%-32s %s\n",$description,$val;
+                } elsif ($outFormat == 2) {
+                    print $fp "[$group] " if defined $group;
+                    print $fp "$tag: $val\n";
+                } else {
+                    print $fp "$val\n";
+                }
+            }
+        }
+        print $fp "</table>\n" if $htmlOutput;
+    }
+    if ($outfile) {
+        close(OUTFILE);
+        $lineCount or unlink $outfile; # don't keep empty output files
+    }
+    ++$count;
+}
+
+#------------------------------------------------------------------------------
+# Load print format file
+# Inputs: 0) file name
+# - saves lines of file to @printFmt list
+# - adds tag names to @tag list
+sub LoadPrintFormat($)
+{
+    my $file = shift || die "Must specify file for -p option";
+    open(FMT_FILE, $file) or die "Can't open file: $file\n";
+    foreach (<FMT_FILE>) {
+        /^#/ and next;  # ignore comments
+        push @printFmt, $_;
+        push @tags, /\$([-a-zA-Z_0-9]+)/g;
+    }
+    close(FMT_FILE);
+    @tags or die "Print format file doesn't contain any tags names!\n";
+}
+
+#------------------------------------------------------------------------------
+# Scan directory for image files
+# Inputs: 0) ExifTool object reference, 1) directory name
+sub ScanDir($$)
+{
+    my $exifTool = shift;
+    my $dir = shift;
+    opendir(DIR_HANDLE, $dir) or die "Error opening directory $dir";
+    my @fileList = readdir(DIR_HANDLE);
+    closedir(DIR_HANDLE);
+    
+    my $file;
+    foreach $file (@fileList) {
+        my $path = "$dir/$file";
+        if (-d $path) {
+            next if $file =~ /^\./; # ignore dirs starting with "."
+            next if grep /^$file$/, @ignore;
+            $recurse and ScanDir($exifTool, $path);
+            next;
+        }
+        if ($file =~ /\.(jpg|jpeg|thm|gif|tif|tiff|crw|cr2|nef)$/i) {
+            GetImageInfo($exifTool, $path);
+        }
+    }
+    ++$countDir;
+}
+
+#------------------------------------------------------------------------------
+# Print list of tags
+# Inputs: 0) Reference to hash whose keys are the tags to print
+sub PrintTagList(@)
+{
+    my $len = 1;
+    my $tag;
+    print ' ';
+    foreach $tag (@_) {
+        my $taglen = length($tag);
+        if ($len + $taglen > 78) {
+            print "\n ";
+            $len = 1;
+        }
+        print " $tag";
+        $len += $taglen + 1;
+    }
+    $len and print "\n";
+}
+
+#------------------------------------------------------------------------------
+# end
+

@@ -1,0 +1,651 @@
+<html>
+<head>
+<title>Image::ExifTool</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h1>The Image::ExifTool Perl Library Module</h1>
+
+<h2>Background</h2>
+My main incentive for writing ExifTool instead of using existing tools (aside from
+the fact that none of the other tools supported the file types that I wanted),
+was that I needed some basic features I couldn't find in other utilities:
+
+<ul>
+<li>Ability to extract information based on a list of case-insensitive tag names
+<li>Automatically calculate common derived quantities
+<li>Methods for sorting and organizing the returned information
+<li>Make information available in either human-readable or machine-readable form
+</ul>
+
+My goal in designing ExifTool was to provide a simple and clean yet powerful and flexible API.
+While these goals can sometimes be contradictory, I think I have done a reasonable
+job in combining the best of both worlds.
+
+<hr><h2>Index</h2>
+
+<p>The following sections of this document give examples of how to use Image::ExifTool,
+and explain the following individual functions in more detail:
+
+<p><table><tr><td>
+<ul>
+<li><a href="#ImageInfo">ImageInfo</a>
+<li><a href="#new">new</a>
+<li><a href="#Options">Options</a>
+<li><a href="#ClearOptions">ClearOptions</a>
+<li><a href="#ExtractInfo">ExtractInfo</a>
+<li><a href="#GetInfo">GetInfo</a>
+<li><a href="#CombineInfo">CombineInfo</a>
+</ul>
+</td><td>
+<ul>
+<li><a href="#GetTagList">GetTagList</a>
+<li><a href="#GetFoundTags">GetFoundTags</a>
+<li><a href="#GetRequestedTags">GetRequestedTags</a>
+<li><a href="#GetValue">GetValue</a>
+<li><a href="#GetDescription">GetDescription</a>
+<li><a href="#GetGroup">GetGroup</a>
+<li><a href="#GetGroups">GetGroups</a>
+</ul>
+</td><td valign=top>
+<ul>
+<li><a href="#BuildCompositeTags">BuildCompositeTags</a>
+<li><a href="#GetTagName">GetTagName</a>
+<li><a href="#GetShortcuts">GetShortcuts</a>
+<li><a href="#GetAllTags">GetAllTags</a>
+<li><a href="#GetAllGroups">GetAllGroups</a>
+</ul>
+</td></tr></table>
+
+<hr><h2><a name="UsingExifTool">Using ExifTool</a></h2>
+
+The ExifTool module may be used by simply calling the ImageInfo() function:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+use Image::ExifTool qw(ImageInfo);
+my $info = ImageInfo("image.jpg");
+</pre></td></tr></table></blockquote>
+
+or in a more object-oriented fashion, by creating an ExifTool object:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+use Image::ExifTool;
+my $exifTool = new Image::ExifTool;
+my $info = $exifTool-&gt;ImageInfo("image.jpg");
+</pre></td></tr></table></blockquote>
+
+The object-oriented method allows more flexibility, but is slightly more
+complicated.  You choose the method that you prefer.
+
+<p>The $info value returned by ImageInfo() in the above examples is a
+reference to a hash containing the tag/value pairs.  Here is a simplified example
+which prints out this information:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+foreach (keys %$info) {
+    print "$_ =&gt; $$info{$_}\n";
+}
+</pre></td></tr></table></blockquote>
+
+See the <a href="#ImageInfo">ImageInfo</a> section for a more detailed
+description of the return values.
+
+<hr><h2><a name="ImageInfo">ImageInfo</a></h2>
+
+Obtain meta information from image.  This is the one-step function for
+obtaining meta information from an image.  Internally, <a href="#ImageInfo">ImageInfo</a> calls
+<a href="#ExtractInfo">ExtractInfo</a> to extract data from the image, and <a href="#GetInfo">GetInfo</a> and
+<a href="#GetTagList">GetTagList</a> to generate the returned information hash and tag list.
+
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>ImageInfo($;@)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) File name, file reference or scalar reference
+    <br>1-N) [optional] list of tag names to find (or tag list reference or options reference, see below)
+    <center>- or -</center>
+    0) ExifTool object reference
+    <br>1) File name, file reference or scalar reference
+    <br>2-N) [optional] list of tag names to find (or tag list reference or options reference, see below)
+</td></tr>
+<tr><td><b>Returns</b></td><td>Hash reference for tag/value pairs</td></tr>
+</table></blockquote>
+
+<b>Examples:</b>
+
+<blockquote>Non object-oriented example showing use of options and returning tag list:
+<table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+use Image::ExifTool qw(ImageInfo);
+my @ioTagList;
+my $info;
+
+$info = <b>ImageInfo</b>("image.jpg", \@ioTagList, { Sort =&gt; 'Group0' } );
+</pre></td></tr></table></blockquote>
+
+<blockquote>Object-oriented example to read from a file that is already open:
+<table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $exifTool = new Image::ExifTool;
+
+$info = $exifTool-&gt;<b>ImageInfo</b>(\*FILE_PT, 'Aperture', 'ShutterSpeed', 'ISO');
+</pre></td></tr></table></blockquote>
+
+<blockquote>Extracting information from an image already loaded into memory:
+<table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$info = $exifTool-&gt;<b>ImageInfo</b>(\$imageData);
+</pre></td></tr></table></blockquote>
+
+<blockquote>Using an ExifTool object to set the options before calling ImageInfo():
+<table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $filename = shift || die "Please specify filename\n";
+my @ioTagList = ( 'DateTimeOriginal', 'ImageSize', 'FocalLength' );
+
+$exifTool-&gt;Options( Unknown =&gt; 1, DateFormat =&gt; '%H:%M:%S %a. %b. %e, %Y' );
+$info = $exifTool-&gt;<b>ImageInfo</b>($filename, \@ioTagList);
+</pre></td></tr></table></blockquote>
+
+<b>Function Arguments:</b>
+
+<p>ImageInfo() is very flexible about the arguments passed to it,
+and interprets them based on their type.  It may be called with one
+or more arguments.
+The one required argument is either a SCALAR (the image file name),
+a GLOB reference (a reference to the image file) or a SCALAR reference
+(a reference to the image in memory).  Other arguments are optional.
+The order of the arguments is not significant, except that the first
+SCALAR is taken to be the file name unless a file reference or scalar
+reference came earlier in the argument list.
+
+<p>Below is a more detailed explanation of how the ImageInfo() function
+arguments are interpreted.  
+
+<blockquote>
+<b>ExifTool ref</b> --
+ImageInfo() may be called with an ExifTool object if desired.  The
+advantage of using the object-oriented form of this function is that
+after ImageInfo() returns, you may use the object-oriented functions
+below to obtain additional information if required.
+
+<p><b>SCALAR</b> --
+The first scalar argument is taken to be the file name unless an earlier
+argument specified the image data via a file reference (GLOB ref) or data
+reference (SCALAR ref). The remaining scalar arguments are names of tags for
+requested information.  If no tags are specified, all possible information
+is extracted.  Tag names may begin with '-' indicating tags to exclude.  The
+tag names are case-insensitive, so note that the returned tags may not be
+exactly the same as the requested tags. For this reason it is best to use
+either the keys of the returned hash or the elements of the tag array when
+accessing the return values
+
+<p><b>GLOB ref</b> --
+A reference to an open image file.  If you use this method
+of accessing a file (or a SCALAR reference), the FileName tag
+will not be returned.
+
+<p><b>SCALAR ref</b> --
+A reference to image data in memory.
+ 
+<p><b>ARRAY ref</b> --
+Reference to a list of tag names.  On entry, any elements in the
+list are added to the list of requested tags.  On return, this list
+is updated to contain a sorted list of tag names in the proper case.
+
+<p><b>HASH ref</b> --
+Reference to a hash containing the options settings.  See Options()
+documentation below for a list of available options.  Options specified
+as arguments to ImageInfo() take precidence over Options() settings.
+</blockquote>
+
+<b>Return Value:</b>
+
+<p>ImageInfo returns a reference to a hash of tag/value pairs. The keys of
+the hash are the tag identifiers, which are similar to the tag names but my
+have an embedded copy number if more than one tag with that name was found
+in the image.  Use <a href="#GetTagName">GetTagName</a> to remove the copy number from the tag.
+Note that the case of the tags may not be the same as requested. Here is a
+simple example to print out the information returned by <a href="#ImageInfo">ImageInfo</a>:
+
+<p>The example script below shows how to print out a human-friendly output for
+all returned tag values:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+foreach (keys %$info) {
+    my $val = $$info{$_};
+    if (ref $val eq 'SCALAR') {
+        if ($$val =~ /^Binary data/) {
+            $val = "($$val)";
+        } else {
+            $val = '(Binary data ' . length($$val) . ' bytes)';
+        }
+    }
+    printf("%-24s : %s\n", $_, $val);
+}
+</pre></td></tr></table></blockquote>
+
+and gives output like this:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+WhiteBalance             : Auto
+FNumber                  : 3.5
+InteroperabilityOffset   : 936
+XResolution              : 72
+ISO                      : 100
+ThumbnailImage           : (Binary data 10903 bytes)
+FlashOn                  : On
+Make                     : FUJIFILM
+ShutterSpeedValue        : 1/64
+ExposureCompensation     : 0
+Sharpness                : +1
+ResolutionUnit           : inches
+</pre></td></tr></table></blockquote>
+
+<b>Notes:</b>
+
+<p>As well as tags representing information extracted from the image,
+the following tags generated by ExifTool may be returned:
+
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>ExifToolVersion</b></td><td>The ExifTool version number</td></tr>
+<tr><td><b>Error</b></td><td>An error message if the image could not be read</td></tr>
+<tr><td><b>Warning</b></td><td>A warning message if problems were encountered while extracting information</td></tr>
+</table></blockquote>
+
+<hr><h2><a name="New">new</a></h2>
+Create a new ExifTool object.
+<p><b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $exifTool = <b>new</b> Image::ExifTool;
+</pre></td></tr></table></blockquote>
+
+<hr><table bgcolor='#aaffaa' width='100%' cellpadding=8><tr><td><center><b>
+The following functions require an ExifTool object as the first argument
+</b></center></td></tr></table>
+
+<hr><h2><a name="Options">Options</a></h2>
+Get/set ExifTool options.  This function can be called to set the default
+options for an ExifTool object.  Options set this way are in effect for
+all function calls but may be overridden by options passed as arguments
+to a specific function.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>Options($$;@)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1) Parameter name (see table below)
+    <br>2) [optional] Option value if specified
+    <br>3-N) [optional] Additional parameter/value pairs
+</td></tr>
+<tr><td><b>Returns</b></td><td>Previous value of last specified parameter</td></tr>
+</table></blockquote>
+
+<b>Available options:</b>
+
+<blockquote>
+<table border=1 cellspacing=0 cellpadding=3>
+<tr><th colspan=4 bgcolor='#dddddd'><font size='+1'>ExifTool Options</font></th></tr>
+<tr><th>Option</th><th>Description</th><th>Values</th><th>Default</th></tr>
+<tr><td>Binary</td><td>Flag to get values of all binary tags.  
+    Unless set, large binary values are only extracted for specifically requested tags.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
+<tr><td>Composite</td><td>Flag to calculate Composite tags</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td><td align=center>undef</td></tr>
+<tr><td>Duplicates</td><td>Flag to save duplicate tag values</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td>Exclude</td>
+    <td>Exclude specified tags</td>
+    <td>Tag name or reference to a list of tag names to exclude.  Case is not significant. 
+    Tags may also be excluded by preceeding their name with a '-' in the arguments to ImageInfo.</td>
+    <td align='center'>-</td></tr>
+<tr><td>Group#</td><td>Extract tags for specified groups</td>
+    <td>Group name or reference to list of group names.
+    Group name may begin with '-' to exclude a group.  Case IS significant.
+    See <a href="#GetAllGroups">GetAllGroups</a> for a list of available groups.</td>
+    <td align='center'>-</td></tr>
+<tr><td>PrintConv</td><td>Flag to enable print conversion</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td>Sort</td><td>Specifies order to sort tags in the returned tag list</td>
+    <td><table>
+    <tr><td valign='top' align=center><b>Input</b></td><td>Sort in same order as input tag arguments</td></tr>
+    <tr><td valign='top' align=center><b>Alpha</b></td><td>Sort alphabetically</td></tr>
+    <tr><td valign='top' align=center><b>File</b></td><td>Sort in order that tags were found in the file</td></tr>
+    <tr valign=top><td valign='top' align=center><b>Group#</b></td><td>Sort by tag group, 
+        where # is the group family number.  If # is not specified, Group0 is assumed. 
+        See <a href="#GetAllGroups">GetAllGroups</a> for a group list.</td></tr>
+    </table></td><td align=center>'Input'</td></tr>
+<tr><td>Unknown</td><td>Flag to get values of unknown tags</td>
+    <td><table>
+    <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Unknown tags not extracted</td></tr>
+    <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Unknown tags extracted from EXIF directories</td></tr>
+    <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Unknown tags also extracted from binary data blocks</td></tr>
+    </table></td><td align=center>0</td></tr>
+<tr><td>Verbose</td><td>Flag to print verbose messages</td><td align='center'>0 - 3 (higher # = more verbose)</td><td align=center>0</td></tr>
+</table></blockquote>
+
+<b>Examples:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$exifTool-&gt;<b>Options</b>( Exclude =&gt; 'OwnerName' );
+</pre></td></tr></table></blockquote>
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$exifTool-&gt;<b>Options</b>( Group1 =&gt; [ 'EXIF', 'MakerNotes' ] );
+</pre></td></tr></table></blockquote>
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$exifTool-&gt;<b>Options</b>( Group0 =&gt; '-XMP' );  # ignore XMP tags
+</pre></td></tr></table></blockquote>
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$exifTool-&gt;<b>Options</b>( Sort =&gt; 'Group2', Unknown =&gt; 1 );
+</pre></td></tr></table></blockquote>
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $oldSetting = $exifTool-&gt;<b>Options</b>( Duplicates =&gt; 0 );
+</pre></td></tr></table></blockquote>
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $isVerbose = $exifTool-&gt;<b>Options</b>('Verbose');
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="ClearOptions">ClearOptions</a></h2>
+Reset all options to their default values.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>ClearOptions()</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+</td></tr>
+</table></blockquote>
+
+<hr><h2><a name="ExtractInfo">ExtractInfo</a></h2>
+Extract meta information from an image.  Call <a href="#GetInfo">GetInfo</a> to access
+the information after extracting it from the image.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>ExtractInfo($;@)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1-N) Same as <a href="#ImageInfo">ImageInfo</a> except that a list of tags is
+    not returned if an ARRAY reference is given.
+</td></tr>
+<tr><td><b>Returns</b></td><td>1 if this was a valid image, 0 otherwise</td></tr>
+</table></blockquote>
+The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:
+<blockquote>
+Binary, Composite, DateFormat, PrintConv, Unknown and Verbose.
+</blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$success = $exifTool-&gt;<b>ExtractInfo</b>('image.jpg', \%options);
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="GetInfo">GetInfo</a></h2>
+<a href="#GetInfo">GetInfo</a> is called to return meta information
+after it has been extracted from the image by a previous call to
+<a href="#ExtractInfo">ExtractInfo</a> or <a href="#ImageInfo">ImageInfo</a>.
+This function may be called repeatedly after a single call to 
+<a href="#ExtractInfo">ExtractInfo</a> or <a href="#ImageInfo">ImageInfo</a>.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetInfo($;@)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1-N) Same as <a href="#ImageInfo">ImageInfo</a> except that an image
+    can not be specified
+</td></tr>
+<tr><td><b>Returns</b></td><td>Reference to information hash, the same as with
+    <a href="#ImageInfo">ImageInfo</a></td></tr>
+</table></blockquote>
+<b>Examples:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$info = $exifTool-&gt;<b>GetInfo</b>('ImageWidth', 'ImageHeight');
+</pre></td></tr></table></blockquote>
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$info = $exifTool-&gt;<b>GetInfo</b>(\@ioTagList);
+</pre></td></tr></table></blockquote>
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$info = $exifTool-&gt;<b>GetInfo</b>({Group2 =&gt; ['Author', 'Location']});
+</pre></td></tr></table></blockquote>
+The following options are effective in the call to <a href="#GetInfo">GetInfo</a>:
+<blockquote>
+Duplicates, Exclude, Group# (and Sort if tag list reference is given).
+</blockquote>
+
+<hr><h2><a name="CombineInfo">CombineInfo</a></h2>
+Combine information from more than one information hash into a single hash.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>CombineInfo($;@)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1-N) List of info hash references
+</td></tr>
+<tr><td><b>Returns</b></td><td>Reference to combined information hash</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$info = $exifTool-&gt;<b>CombineInfo</b>($info1, $info2, $info3);
+</pre></td></tr></table></blockquote>
+If the Duplicates option is disabled and duplicate tags exist, the order of
+the hashes is significant.  In this case, the value used is the first value
+found as the hashes are scanned in order of input.  The Duplicates option
+is the only option that is in effect for this function.
+
+<hr><h2><a name="GetTagList">GetTagList</a></h2>
+Get a sorted list of tags from the specified information hash or tag list.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetTagList($;$$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1) [optional] Reference to info hash or tag list
+    <br>2) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#')
+</td></tr>
+<tr><td><b>Returns</b></td><td>List of tags in specified order</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+@tags = $exifTool-&gt;<b>GetTagList</b>($info, 'Group0');
+</pre></td></tr></table></blockquote>
+If the information hash or tag list reference is not provided, then the list
+of found tags from the last call to <a href="#ImageInfo">ImageInfo</a> or
+<a href="#GetInfo">GetInfo</a> is used instead, and the result is the same as
+if <a href="#GetFoundTags">GetFoundTags</a> was called.  If sort order is not
+specified, the sort order from the current options is used.
+
+<hr><h2><a name="GetFoundTags">GetFoundTags</a></h2>
+Get list of found tags in specified sort order.  The found tags are the
+tags for the information returned from the most recent call to <a href="#ImageInfo">ImageInfo</a>
+or <a href="#GetInfo">GetInfo</a> for this object.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetFoundTags($;$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#')
+</td></tr>
+<tr><td><b>Returns</b></td><td>List of tags in specified order</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my @tags = $exifTool-&gt;<b>GetFoundTags</b>('File');
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="GetRequestedTags">GetRequestedTags</a></h2>
+Get list of requested tags.  These are the tags that were specified
+in the arguments of the most recent call to <a href="#ImageInfo">ImageInfo</a>,
+<a href="#ExtractInfo">ExtractInfo</a> or <a href="#GetInfo">GetInfo</a>,
+including tags specified via a tag list reference.  They are returned
+in the same order that they were specified.  Shortcut tags are expanded
+in the list.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetRequestedTags($)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+</td></tr>
+<tr><td><b>Returns</b></td><td>List of requested tags (empty if no tags specifically requested)
+</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my @requestedTags = $exifTool-&gt;<b>GetRequestedTags</b>();
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="GetValue">GetValue</a></h2>
+Get the value of specified tag.  By default this routine returns the human-readable
+(PrintConv) value, but optionally returns the machine-readable (ValueConv) value.
+Note that the PrintConv value will only differ from the ValueConv value if
+the PrintConv option is enabled (which it is by default).  The PrintConv
+values are the values returned by ImageInfo() in the tag/value hash.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetValue($$;$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1) Tag key
+    <br>2) [optional] Value type, 'PrintConv' (default) or 'ValueConv'
+</td></tr>
+<tr><td><b>Returns</b></td><td>Tag value</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $val = $exifTool-&gt;<b>GetValue</b>('ISO', 'ValueConv');
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="GetDescription">GetDescription</a></h2>
+Get description for specified tag.  This function will always return a defined
+value.  In the case where the description doesn't exist, the tag name is returned.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetDescription($$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1) Tag key
+</td></tr>
+<tr><td><b>Returns</b></td><td>Tag description</td></tr>
+</table></blockquote>
+
+<hr><h2><a name="GetGroup">GetGroup</a></h2>
+Get group name for specified tag.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetGroup($$;$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1) Tag key
+    <br>2) [optional] Group family number
+</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>Group name (or 'Other' if tag has no group).
+If no group family is specified, returns the name of group in family 0
+when called in scalar context, or the names of groups for all families in
+list context.  See <a href="#GetAllGroups">GetAllGroups</a> for a list of group names.
+</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $group = $exifTool-&gt;<b>GetGroup</b>($tag, 0);
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="GetGroups">GetGroups</a></h2>
+Get list of group names for all tags in specified information hash.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetGroups($;$$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1) [optional] Information hash reference (default is all extracted info)
+    <br>2) [optional] Group family number (default 0)
+</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>
+List of group names in alphabetical order.
+If information hash is not specified, the group names are returned for
+all extracted information.  See <a href="#GetAllGroups">GetAllGroups</a> for
+a complete list of group names.
+</td></tr>
+</table></blockquote>
+<b>Examples:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my @groups = $exifTool-&gt;<b>GetGroups</b>($info, $family);
+</pre></td></tr></table></blockquote>
+<blockquote>Example of one way to print information organized by group
+<table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $exifTool = new Image::ExifTool;
+$exifTool-&gt;ExtractInfo('t/ExifTool.jpg');
+
+my @groups = $exifTool-&gt;<b>GetGroups</b>(1);
+my $group;
+foreach $group (@groups) {
+    print "---- $group ----\n";
+    my $info = $exifTool-&gt;GetInfo({Group1 =&gt; $group});
+    foreach ($exifTool-&gt;GetTagList($info)) {
+        print "$_ : $$info{$_}\n";
+    } 
+}
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="BuildCompositeTags">BuildCompositeTags</a></h2>
+Builds composite tags from required tags.  The composite tags are convenience
+tags which are derived from the values of other tags.  This routine is called
+automatically by ImageInfo() if the Composite option is set.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>BuildCompositeTags($)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+</td></tr>
+<tr><td><b>Returns</b></td><td>(none)</td></tr>
+</table></blockquote>
+<b>Notes:</b> 
+<ol>
+<li>Tag values are calculated in alphabetical order unless a tag Require's
+or Desire's another composite tag, in which case the calculation is
+deferred until after the other tag is calculated.
+<li>Composite tags may need to read data from the image for their value to
+be determined, so for these BuildCompositeTags() must be called while the image
+is available.  This is only a problem if ImageInfo() is called with a filename (as opposed
+to a file reference or scalar reference) since in this case the file is closed before
+ImageInfo() returns.  However if you enable the Composite option, BuildCompositeTags() 
+is called from within ImageInfo() before the file is closed.  (Note: As of ExifTool
+version 3.10, only the PreviewImage required access to the image data.)
+</ol>
+<hr><table bgcolor='#ffaaaa' width='100%' cellpadding=8><tr><td><center><b>
+The following functions access only static data and are not called with an ExifTool object
+</b></center></td></tr></table>
+
+<hr><h2><a name="GetTagName">GetTagName</a></h2>
+Get name of tag from tag identifier.  This is a convenience function that
+strips the embedded copy number, if it exists, from the tag key.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetTagName($)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) Tag key
+</td></tr>
+<tr><td><b>Returns</b></td><td>Tag name</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$tagName = Image::ExifTool::<b>GetTagName</b>($tag);
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="GetShortcuts">GetShortcuts</a></h2>
+Get list of tag shortcut names.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetShortcuts()</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>(none)
+</td></tr>
+<tr><td><b>Returns</b></td><td>List of shortcuts</td></tr>
+</table></blockquote>
+
+<hr><h2><a name="GetAllTags">GetAllTags</a></h2>
+Get list of all available tag names.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetAllTags()</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>(none)
+</td></tr>
+<tr><td><b>Returns</b></td><td>List of all available tags in alphabetical order</td></tr>
+</table></blockquote>
+
+<hr><h2><a name="GetAllGroups">GetAllGroups</a></h2>
+Get list of all group names in specified family.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetAllGroups($)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) Group family number (0-2)
+</td></tr>
+<tr><td><b>Returns</b></td>
+<td>A list of all groups in the specified family in alphabetical order</td></tr>
+</table></blockquote>
+Three families of groups are currently defined: 0, 1 and 2.  Families 0 and
+1 are based on the file structure and are similar except that the individual
+manufacturer's groups of family 0 are combined into a single MakerNotes
+group in family 1, and the different IFD (Image File Directory) groups of
+family 0 are combined into a single EXIF group in family 1.  Family 2
+classifies information in logical groups based on what the information
+refers to.  Here is a complete list of groups for each family:
+<blockquote><table cellpadding=4 cellspacing=0 border=1>
+<tr><th>Family</th><th>Group Names</th></tr>
+<tr><th>0</th>
+<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
+FujiFilm, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD, MakerUnknown, Minolta,
+Nikon, Olympus, Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP</td></tr>
+<tr><th>1</th>
+<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, IPTC, MakerNotes, Photoshop,
+PrintIM, XMP</td></tr>
+<tr><th>2</th>
+<td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+@groupList = Image::ExifTool::<b>GetAllGroups</b>($family);
+</pre></td></tr></table></blockquote>
+
+<hr>
+</body>
+</html>
