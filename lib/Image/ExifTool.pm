@@ -21,7 +21,7 @@ require Exporter;
 use File::RandomAccess;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '3.72';
+$VERSION = '3.74';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(ImageInfo Options ClearOptions ExtractInfo GetInfo CombineInfo
                 GetTagList GetFoundTags GetRequestedTags GetValue GetDescription
@@ -68,6 +68,7 @@ my %specialTags = ( PROCESS_PROC=>1, FORMAT=>1, GROUPS=>1,
 # Inputs: 0) reference to exiftool object or ExifTool class name
 sub new
 {
+    local $_;
     my $that = shift;
     my $class = ref($that) || $that || 'Image::ExifTool';
     my $self = bless {}, $class;
@@ -99,6 +100,7 @@ sub new
 #   my $info = $exifTool->ImageInfo($file, \@tagList, {Sort=>'Group0'} );
 sub ImageInfo($;@)
 {
+    local $_;
     # get our ExifTool object ($self) or create one if necessary
     my $self;
     if (ref $_[0] eq 'Image::ExifTool') {
@@ -128,6 +130,7 @@ sub ImageInfo($;@)
 # Returns: original value of last option specified
 sub Options($$;@)
 {
+    local $_;
     my $self = shift;
     my $oldVal;
 
@@ -145,6 +148,7 @@ sub Options($$;@)
 # Inputs: 0) ExifTool object reference
 sub ClearOptions($)
 {
+    local $_;
     my $self = shift;
 
     # create options hash with default values
@@ -171,6 +175,7 @@ sub ClearOptions($)
 # Notes: pass an undefined value to avoid parsing arguments
 sub ExtractInfo($;@)
 {
+    local $_;
     my $self = shift;
     my $options = $self->{OPTIONS};     # pointer to current options
     my %saveOptions;
@@ -316,6 +321,7 @@ sub ExtractInfo($;@)
 #          tags found but Duplicates option not set.
 sub GetInfo($;@)
 {
+    local $_;
     my $self = shift;
     my %saveOptions;
     my $rtnTags;    # reference to list of tags for which we will return info
@@ -495,6 +501,7 @@ G_TAG:  foreach $tag (@allTags) {
 # Returns: Combined information hash reference
 sub CombineInfo($;@)
 {
+    local $_;
     my $self = shift;
     my (%combinedInfo, $info);
 
@@ -526,6 +533,7 @@ sub CombineInfo($;@)
 # Returns: List of tags in specified order
 sub GetTagList($;$$)
 {
+    local $_;
     my ($self, $info, $sortOrder) = @_;
 
     my $foundTags;
@@ -576,6 +584,7 @@ sub GetTagList($;$$)
 # Notes: If not specified, sort order is taken from OPTIONS
 sub GetFoundTags($;$)
 {
+    local $_;
     my $self = shift;
     my $foundTags = $self->{FOUND_TAGS} or return undef;
     return $self->GetTagList($foundTags, shift);
@@ -586,6 +595,7 @@ sub GetFoundTags($;$)
 # Inputs: 0) ExifTool object reference
 sub GetRequestedTags($)
 {
+    local $_;
     return @{$_[0]->{REQUESTED_TAGS}};
 }
 
@@ -595,6 +605,7 @@ sub GetRequestedTags($)
 #         2) Value type (PrintConv or ValueConv, defaults to PrintConv)
 sub GetValue($$;$)
 {
+    local $_;
     my ($self, $tag, $type) = @_;
     my $value;
     if ($type and $type eq 'ValueConv') {
@@ -611,6 +622,7 @@ sub GetValue($$;$)
 # Notes: Will always return a defined value, even if description isn't available
 sub GetDescription($$)
 {
+    local $_;
     my ($self, $tag) = @_;
     my $tagInfo = $self->{TAG_INFO}->{$tag};
     # ($tagInfo should be defined for any extracted tag,
@@ -646,6 +658,7 @@ sub GetDescription($$)
 #          group names for each family.
 sub GetGroup($$;$)
 {
+    local $_;
     my ($self, $tag, $family) = @_;
     my $tagInfo = $self->{TAG_INFO}->{$tag} or return 'ErrNoInfo';  # this shouldn't happen
     # fill in default groups unless already done
@@ -707,6 +720,7 @@ sub GetGroup($$;$)
 # Returns: List of group names in alphabetical order
 sub GetGroups($;$$)
 {
+    local $_;
     my $self = shift;
     my $info = shift;
     my $family;
@@ -736,6 +750,7 @@ sub GetGroups($;$$)
 #       deferred until after the other tag is calculated.
 sub BuildCompositeTags($)
 {
+    local $_;
     my $self = shift;
     my @tagList = sort keys %Image::ExifTool::compositeTags;
 
@@ -798,6 +813,7 @@ COMPOSITE_TAG:
 # Inputs: Tag key
 sub GetTagName($)
 {
+    local $_;
     $_[0] =~ /^(\S+)/;
     return $1;
 }
@@ -807,6 +823,7 @@ sub GetTagName($)
 # Returns: Shortcut list (sorted alphabetically)
 sub GetShortcuts()
 {
+    local $_;
     require Image::ExifTool::Shortcuts;
     return sort keys %Image::ExifTool::Shortcuts::Main;
 }
@@ -816,6 +833,7 @@ sub GetShortcuts()
 # Returns: tag list (sorted alphabetically)
 sub GetAllTags()
 {
+    local $_;
     my %allTags;
 
     LoadAllTables();    # first load all our tables
@@ -851,6 +869,7 @@ sub GetAllTags()
 # Returns: List of group names (sorted alphabetically)
 sub GetAllGroups($)
 {
+    local $_;
     my $family = shift || 0;
 
     LoadAllTables();    # first load all our tables

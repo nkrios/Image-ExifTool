@@ -1397,7 +1397,7 @@ sub FormattedValue($$$$)
         } elsif ($format==4) {                  # unsigned long
             $val = Get32u($dataPt, $offset);
             $offset += 4;
-        } elsif ($format==5 or $format==10) {   # unsigned or signed rational
+        } elsif ($format==5 or $format==10) {   # unsigned or signed short rational
             my $denom = Get32s($dataPt,$offset+4);
             if ($denom) {
                 $val = sprintf("%.4g",Get32s($dataPt,$offset)/$denom);

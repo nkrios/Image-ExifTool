@@ -94,6 +94,9 @@ sub check($$$;$$)
             } else {
                 $val = '(Binary data ' . length($$val) . ' bytes)';
             }
+        } else {
+            # make sure there are no linefeeds in output
+            $val =~ tr/\x0a\x0d/;/;
         }
         # (no "\n" needed since we set the output line separator above)
         if ($exifTool) {

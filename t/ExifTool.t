@@ -61,11 +61,12 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 6: test the DateFormat option and extact specified tags only
+# test 6: extract specified tags only
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
+# don't test DateFormat because strftime output is system dependent
+#    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
     my @tags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate');
     my $info = $exifTool->ImageInfo('t/ExifTool.jpg', \@tags);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
@@ -118,7 +119,8 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
+# don't test DateFormat because strftime output is system dependent
+#    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
     $exifTool->ExtractInfo('t/ExifTool.jpg');
     my @tags = ('createdate', 'datetimeoriginal', 'modifydate');
     my $info = $exifTool->GetInfo(\@tags);
