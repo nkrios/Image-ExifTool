@@ -128,7 +128,7 @@ DESCRIPTION
     Prints information for specified tags from listed files.  -TAG specifies the
     name of a tag to extract, or --TAG to ignore.  FILE may be an image file
     name, a directory name, or - for the standard input. Currently recognized
-    file types are JPG, TIFF, GIF, THM, CRW, CR2 and NEF.
+    file types are JPG, TIFF, GIF, THM, CRW, CR2, NEF and DNG.
 
 OPTIONS
     -list   - list all valid tags
@@ -342,7 +342,7 @@ sub GetImageInfo($$)
                     print $fp "[$group] " if defined $group;
                     print $fp "$description\n      $val\n";
                 } elsif ($outFormat == 0) {
-                    printf $fp "%-14s ","[$group]" if defined $group;
+                    printf $fp "%-15s ","[$group]" if defined $group;
                     printf $fp "%-32s: %s\n",$description,$val;
                 } elsif ($outFormat == 1) {
                     printf $fp "%-12s ", $group if defined $group;
@@ -402,7 +402,7 @@ sub ScanDir($$)
             $recurse and ScanDir($exifTool, $path);
             next;
         }
-        if ($file =~ /\.(jpg|jpeg|thm|gif|tif|tiff|crw|cr2|nef)$/i) {
+        if ($file =~ /\.(jpg|jpeg|thm|gif|tif|tiff|crw|cr2|nef|dng)$/i) {
             GetImageInfo($exifTool, $path);
         }
     }

@@ -11,10 +11,10 @@ package Image::ExifTool::Olympus;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 %Image::ExifTool::Olympus::Main = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0200 => 'SpecialMode',
     0x0201 => { 
         Name => 'Quality', 

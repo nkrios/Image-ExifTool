@@ -19,10 +19,10 @@ package Image::ExifTool::Sony;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 %Image::ExifTool::Sony::Main = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     
     0x0e00 => {
         Name => 'PrintIM',

@@ -3,43 +3,49 @@
 [File, File, Image] File Type: JPG
 [File, File, Image] Image Width: 120
 [File, File, Image] Image Height: 80
-[IFD0, EXIF, Image] Image Description: Communications
-[IFD0, EXIF, Camera] Make: FUJIFILM
-[IFD0, EXIF, Camera] Camera Model Name: FinePixS1Pro
-[IFD0, EXIF, Image] Orientation: Horizontal (normal)
-[IFD0, EXIF, Image] X Resolution: 300
-[IFD0, EXIF, Image] Y Resolution: 300
-[IFD0, EXIF, Image] Resolution Unit: inches
-[IFD0, EXIF, Image] Software: Adobe Photoshop 7.0
-[IFD0, EXIF, Time] Date/Time Of Last Modification: 2002:07:19 13:28:10
-[IFD0, EXIF, Author] Artist: Ian Britton
-[IFD0, EXIF, Image] Y Cb Cr Positioning: Co-sited
-[IFD0, EXIF, Image] Reference Black White: 0 255 128 255 128 255
-[IFD0, EXIF, Author] Copyright: ian Britton - FreeFoto.com
-[ExifIFD, EXIF, Image] Av(Aperture Value): 0.6
-[ExifIFD, EXIF, Camera] Exposure Program: Shutter speed priority AE
-[ExifIFD, EXIF, Image] ISO Speed: 0
-[ExifIFD, EXIF, Image] Exif Version: 0200
-[ExifIFD, EXIF, Time] Shooting Date/Time: 2002:07:13 15:58:28
-[ExifIFD, EXIF, Time] Date/Time Of Digitization: 2002:07:13 15:58:28
-[ExifIFD, EXIF, Image] Components Configuration: YCbCr
-[ExifIFD, EXIF, Image] Shutter Speed Value: 1/724
-[ExifIFD, EXIF, Image] Aperture Value: 16.0
-[ExifIFD, EXIF, Image] Brightness Value: 0.2602
-[ExifIFD, EXIF, Image] Exposure Compensation: -0.65
-[ExifIFD, EXIF, Camera] Metering Mode: Multi-segment
-[ExifIFD, EXIF, Camera] Flash: No Flash
-[ExifIFD, EXIF, Camera] Focal Length: 0.0mm
-[ExifIFD, EXIF, Image] Flash Pix Version: 0100
-[ExifIFD, EXIF, Image] Color Space: sRGB
-[ExifIFD, EXIF, Image] Exif Image Width: 2400
-[ExifIFD, EXIF, Image] Exif Image Length: 1600
-[ExifIFD, EXIF, Image] Focal Plane X Resolution: 12.05
-[ExifIFD, EXIF, Image] Focal Plane Y Resolution: 12.05
-[ExifIFD, EXIF, Camera] Focal Plane Resolution Unit: inches
-[ExifIFD, EXIF, Camera] Sensing Method: One-chip color area
-[ExifIFD, EXIF, Image] File Source: Unknown (0)
-[ExifIFD, EXIF, Image] Scene Type: Unknown (0)
+[EXIF, IFD0, Image] Image Description: Communications
+[EXIF, IFD0, Camera] Make: FUJIFILM
+[EXIF, IFD0, Camera] Camera Model Name: FinePixS1Pro
+[EXIF, IFD0, Image] Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] X Resolution: 300
+[EXIF, IFD0, Image] Y Resolution: 300
+[EXIF, IFD0, Image] Resolution Unit: inches
+[EXIF, IFD0, Image] Software: Adobe Photoshop 7.0
+[EXIF, IFD0, Time] Date/Time Of Last Modification: 2002:07:19 13:28:10
+[EXIF, IFD0, Author] Artist: Ian Britton
+[EXIF, IFD0, Image] Y Cb Cr Positioning: Co-sited
+[EXIF, IFD0, Image] Reference Black White: 0 255 128 255 128 255
+[EXIF, IFD0, Author] Copyright: ian Britton - FreeFoto.com
+[EXIF, ExifIFD, Image] Av(Aperture Value): 0.6
+[EXIF, ExifIFD, Camera] Exposure Program: Shutter speed priority AE
+[EXIF, ExifIFD, Image] ISO Speed: 0
+[EXIF, ExifIFD, Image] Exif Version: 0200
+[EXIF, ExifIFD, Time] Shooting Date/Time: 2002:07:13 15:58:28
+[EXIF, ExifIFD, Time] Date/Time Of Digitization: 2002:07:13 15:58:28
+[EXIF, ExifIFD, Image] Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] Shutter Speed Value: 1/724
+[EXIF, ExifIFD, Image] Aperture Value: 16.0
+[EXIF, ExifIFD, Image] Brightness Value: 0.2602
+[EXIF, ExifIFD, Image] Exposure Compensation: -0.65
+[EXIF, ExifIFD, Camera] Metering Mode: Multi-segment
+[EXIF, ExifIFD, Camera] Flash: No Flash
+[EXIF, ExifIFD, Camera] Focal Length: 0.0mm
+[EXIF, ExifIFD, Image] Flashpix Version: 0100
+[EXIF, ExifIFD, Image] Color Space: sRGB
+[EXIF, ExifIFD, Image] Exif Image Width: 2400
+[EXIF, ExifIFD, Image] Exif Image Length: 1600
+[EXIF, ExifIFD, Image] Focal Plane X Resolution: 12.05
+[EXIF, ExifIFD, Image] Focal Plane Y Resolution: 12.05
+[EXIF, ExifIFD, Camera] Focal Plane Resolution Unit: inches
+[EXIF, ExifIFD, Camera] Sensing Method: One-chip color area
+[EXIF, ExifIFD, Image] File Source: Unknown (0)
+[EXIF, ExifIFD, Image] Scene Type: Unknown (0)
+[EXIF, IFD1, Image] Compression: JPEG (old-style)
+[EXIF, IFD1, Image] X Resolution: 72
+[EXIF, IFD1, Image] Y Resolution: 72
+[EXIF, IFD1, Image] Resolution Unit: inches
+[EXIF, IFD1, Image] Thumbnail Offset: 1038
+[EXIF, IFD1, Image] Thumbnail Length: 3662
 [GPS, GPS, Location] GPS Version ID: 2.0.0.0
 [GPS, GPS, Location] GPS Latitude Ref: North
 [GPS, GPS, Location] GPS Latitude: 54 deg 59.38' 0"
@@ -47,12 +53,6 @@
 [GPS, GPS, Location] GPS Longitude: 1 deg 54.85' 0"
 [GPS, GPS, Time] GPS Time Stamp: 14:58:24
 [GPS, GPS, Location] GPS Map Datum: WGS84
-[IFD1, EXIF, Image] Compression: JPEG
-[IFD1, EXIF, Image] X Resolution: 72
-[IFD1, EXIF, Image] Y Resolution: 72
-[IFD1, EXIF, Image] Resolution Unit: inches
-[IFD1, EXIF, Image] Thumbnail Offset: 1038
-[IFD1, EXIF, Image] Thumbnail Length: 3662
 [IPTC, IPTC, Other] Application Record Version: 2
 [IPTC, IPTC, Other] Caption-Abstract: Communications
 [IPTC, IPTC, Author] Writer-Editor: Ian Britton

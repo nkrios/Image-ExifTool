@@ -5,6 +5,10 @@
 #
 # Revisions:    02/06/04 - P. Harvey Created
 #               02/25/04 - P. Harvey Added hack for problem with old photoshops
+#               10/04/04 - P. Harvey Added a bunch of tags (ref Image::MetaData::JPEG)
+#                          but left most of them commented out until I have enough
+#                          information to write PrintConv routines for them to
+#                          display something useful
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Photoshop;
@@ -14,18 +18,49 @@ use vars qw($VERSION);
 use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
                        GetByteOrder SetByteOrder);
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 sub ProcessPhotoshop($$$);
 
 # Photoshop APP13 tag table
 %Image::ExifTool::Photoshop::Main = (
+    GROUPS => { 2 => 'Other' },
     PROCESS_PROC => \&ProcessPhotoshop,
+#    0x03e9 => 'MacintoshPrintInfo',
+#    0x03ea => 'XMLData?',
+#    0x03ed => 'ResolutionInfo',
+#    0x03ee => 'AlphaChannelsNames',
+#    0x03ef => 'DisplayInfo',
+#    0x03f0 => 'PStringCaption',
+#    0x03f1 => 'BorderInformation',
+#    0x03f2 => 'BackgroundColor',
+#    0x03f3 => 'PrintFlags',
+#    0x03f4 => 'BW_HalftoningInfo',
+#    0x03f5 => 'ColorHalftoningInfo',
+#    0x03f6 => 'DuotoneHalftoningInfo',
+#    0x03f7 => 'BW_TransferFunc',
+#    0x03f8 => 'ColorTransferFuncs',
+#    0x03f9 => 'DuotoneTransferFuncs',
+#    0x03fa => 'DuotoneImageInfo',
+#    0x03fb => 'EffectiveBW',
+#    0x03fe => 'QuickMaskInfo',
+#    0x0400 => 'LayerStateInfo',
+#    0x0401 => 'WorkingPath',
+#    0x0402 => 'LayersGroupInfo',
     0x0404 => {
         Name => 'IPTCData',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
+    },
+#    0x0405 => 'RawImageMode',
+#    0x0406 => 'JPEG_Quality',
+#    0x0408 => 'GridGuidesInfo',
+#    0x0409 => 'ThumbnailResource',
+#    0x040a => 'CopyrightFlag',
+    0x040b => {
+        Name => 'URL',
+        Groups => { 2 => 'Author' },
     },
     0x040c => {
         Name => 'PhotoshopThumbnail',
@@ -33,6 +68,26 @@ sub ProcessPhotoshop($$$);
         ValueConv => 'substr($val, 0x1c)',
         PrintConv => '\$val',
     },
+#    0x040d => 'GlobalAngle',
+#    0x040e => 'ColorSamplersResource',
+#    0x040f => 'ICC_Profile',
+#    0x0410 => 'Watermark',
+#    0x0411 => 'ICC_Untagged',
+#    0x0412 => 'EffectsVisible',
+#    0x0413 => 'SpotHalftone',
+#    0x0414 => 'IDsBaseValue',
+#    0x0415 => 'UnicodeAlphaNames',
+#    0x0416 => 'IndexedColourTableCount',
+#    0x0417 => 'TransparentIndex',
+#    0x0419 => 'GlobalAltitude',
+#    0x041a => 'Slices',
+#    0x041b => 'WorkflowURL',
+#    0x041c => 'JumpToXPEP',
+#    0x041d => 'AlphaIdentifiers',
+#    0x041e => 'URL_List',
+#    0x0421 => 'VersionInfo',
+#    0x0bb7 => 'ClippingPathName',
+#    0x2710 => 'PrintFlagsInfo',
 );
 
 

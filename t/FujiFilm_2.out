@@ -3,66 +3,66 @@
 [File, File, Image] File Type: JPG
 [File, File, Image] Image Width: 160
 [File, File, Image] Image Height: 120
-[IFD0, EXIF, Camera] Make: FUJIFILM
-[IFD0, EXIF, Camera] Camera Model Name: FinePix2400Zoom
-[IFD0, EXIF, Image] Orientation: Horizontal (normal)
-[IFD0, EXIF, Image] X Resolution: 72
-[IFD0, EXIF, Image] Y Resolution: 72
-[IFD0, EXIF, Image] Resolution Unit: inches
-[IFD0, EXIF, Image] Software: Digital Camera FinePix2400Zoom Ver1.70
-[IFD0, EXIF, Time] Date/Time Of Last Modification: 2001:05:19 18:36:41
-[IFD0, EXIF, Image] Y Cb Cr Positioning: Co-sited
-[IFD0, EXIF, Author] Copyright:           
-[ExifIFD, EXIF, Image] Av(Aperture Value): 3.5
-[ExifIFD, EXIF, Camera] Exposure Program: Program AE
-[ExifIFD, EXIF, Image] ISO Speed: 100
-[ExifIFD, EXIF, Image] Exif Version: 0210
-[ExifIFD, EXIF, Time] Shooting Date/Time: 2001:05:19 18:36:41
-[ExifIFD, EXIF, Time] Date/Time Of Digitization: 2001:05:19 18:36:41
-[ExifIFD, EXIF, Image] Components Configuration: YCbCr
-[ExifIFD, EXIF, Image] Compressed Bits Per Pixel: 1.6
-[ExifIFD, EXIF, Image] Shutter Speed Value: 1/64
-[ExifIFD, EXIF, Image] Aperture Value: 3.5
-[ExifIFD, EXIF, Image] Brightness Value: 2
-[ExifIFD, EXIF, Image] Exposure Compensation: 0
-[ExifIFD, EXIF, Camera] Max Aperture Value: 3.5
-[ExifIFD, EXIF, Camera] Metering Mode: Multi-segment
-[ExifIFD, EXIF, Camera] Flash: Fired
-[ExifIFD, EXIF, Camera] Focal Length: 6.0mm
-[ExifIFD, EXIF, Image] Flash Pix Version: 0100
-[ExifIFD, EXIF, Image] Color Space: sRGB
-[ExifIFD, EXIF, Image] Exif Image Width: 1600
-[ExifIFD, EXIF, Image] Exif Image Length: 1200
-[ExifIFD, EXIF, Image] Focal Plane X Resolution: 3053
-[ExifIFD, EXIF, Image] Focal Plane Y Resolution: 3053
-[ExifIFD, EXIF, Camera] Focal Plane Resolution Unit: cm
-[ExifIFD, EXIF, Camera] Sensing Method: One-chip color area
-[ExifIFD, EXIF, Image] File Source: Digital Camera
-[ExifIFD, EXIF, Image] Scene Type: Directly photographed
-[FujiFilm, MakerNotes, Camera] Version: 0130
-[FujiFilm, MakerNotes, Camera] Image Quality: NORMAL 
-[FujiFilm, MakerNotes, Camera] Sharpness: +1
-[FujiFilm, MakerNotes, Camera] White Balance: Auto
-[FujiFilm, MakerNotes, Camera] Fuji Flash Mode: Red-eye reduction
-[FujiFilm, MakerNotes, Camera] Flash Strength: 0
-[FujiFilm, MakerNotes, Camera] Macro: Off
-[FujiFilm, MakerNotes, Camera] Focus Mode: Auto
-[FujiFilm, MakerNotes, Camera] Slow Sync: Off
-[FujiFilm, MakerNotes, Camera] Picture Mode: Auto
-[FujiFilm, MakerNotes, Camera] Auto Bracketing: Off
-[FujiFilm, MakerNotes, Camera] Blur Warning: None
-[FujiFilm, MakerNotes, Camera] Focus Warning: Good
-[FujiFilm, MakerNotes, Camera] Exposure Warning: Good
-[InteropIFD, EXIF, Image] Interoperability Index: R98
-[InteropIFD, EXIF, Image] Interoperability Version: 0100
-[IFD1, EXIF, Image] Compression: JPEG
-[IFD1, EXIF, Image] Orientation: Horizontal (normal)
-[IFD1, EXIF, Image] X Resolution: 72
-[IFD1, EXIF, Image] Y Resolution: 72
-[IFD1, EXIF, Image] Resolution Unit: inches
-[IFD1, EXIF, Image] Thumbnail Offset: 1447
-[IFD1, EXIF, Image] Thumbnail Length: 10903
-[IFD1, EXIF, Image] Y Cb Cr Positioning: Co-sited
+[EXIF, IFD0, Camera] Make: FUJIFILM
+[EXIF, IFD0, Camera] Camera Model Name: FinePix2400Zoom
+[EXIF, IFD0, Image] Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] X Resolution: 72
+[EXIF, IFD0, Image] Y Resolution: 72
+[EXIF, IFD0, Image] Resolution Unit: inches
+[EXIF, IFD0, Image] Software: Digital Camera FinePix2400Zoom Ver1.70
+[EXIF, IFD0, Time] Date/Time Of Last Modification: 2001:05:19 18:36:41
+[EXIF, IFD0, Image] Y Cb Cr Positioning: Co-sited
+[EXIF, IFD0, Author] Copyright:           
+[EXIF, ExifIFD, Image] Av(Aperture Value): 3.5
+[EXIF, ExifIFD, Camera] Exposure Program: Program AE
+[EXIF, ExifIFD, Image] ISO Speed: 100
+[EXIF, ExifIFD, Image] Exif Version: 0210
+[EXIF, ExifIFD, Time] Shooting Date/Time: 2001:05:19 18:36:41
+[EXIF, ExifIFD, Time] Date/Time Of Digitization: 2001:05:19 18:36:41
+[EXIF, ExifIFD, Image] Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] Compressed Bits Per Pixel: 1.6
+[EXIF, ExifIFD, Image] Shutter Speed Value: 1/64
+[EXIF, ExifIFD, Image] Aperture Value: 3.5
+[EXIF, ExifIFD, Image] Brightness Value: 2
+[EXIF, ExifIFD, Image] Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] Max Aperture Value: 3.5
+[EXIF, ExifIFD, Camera] Metering Mode: Multi-segment
+[EXIF, ExifIFD, Camera] Flash: Fired
+[EXIF, ExifIFD, Camera] Focal Length: 6.0mm
+[EXIF, ExifIFD, Image] Flashpix Version: 0100
+[EXIF, ExifIFD, Image] Color Space: sRGB
+[EXIF, ExifIFD, Image] Exif Image Width: 1600
+[EXIF, ExifIFD, Image] Exif Image Length: 1200
+[EXIF, InteropIFD, Image] Interoperability Index: R98
+[EXIF, InteropIFD, Image] Interoperability Version: 0100
+[EXIF, ExifIFD, Image] Focal Plane X Resolution: 3053
+[EXIF, ExifIFD, Image] Focal Plane Y Resolution: 3053
+[EXIF, ExifIFD, Camera] Focal Plane Resolution Unit: cm
+[EXIF, ExifIFD, Camera] Sensing Method: One-chip color area
+[EXIF, ExifIFD, Image] File Source: Digital Camera
+[EXIF, ExifIFD, Image] Scene Type: Directly photographed
+[EXIF, IFD1, Image] Compression: JPEG (old-style)
+[EXIF, IFD1, Image] Orientation: Horizontal (normal)
+[EXIF, IFD1, Image] X Resolution: 72
+[EXIF, IFD1, Image] Y Resolution: 72
+[EXIF, IFD1, Image] Resolution Unit: inches
+[EXIF, IFD1, Image] Thumbnail Offset: 1447
+[EXIF, IFD1, Image] Thumbnail Length: 10903
+[EXIF, IFD1, Image] Y Cb Cr Positioning: Co-sited
+[MakerNotes, FujiFilm, Camera] Version: 0130
+[MakerNotes, FujiFilm, Camera] Image Quality: NORMAL 
+[MakerNotes, FujiFilm, Camera] Sharpness: +1
+[MakerNotes, FujiFilm, Camera] White Balance: Auto
+[MakerNotes, FujiFilm, Camera] Fuji Flash Mode: Red-eye reduction
+[MakerNotes, FujiFilm, Camera] Flash Strength: 0
+[MakerNotes, FujiFilm, Camera] Macro: Off
+[MakerNotes, FujiFilm, Camera] Focus Mode: Auto
+[MakerNotes, FujiFilm, Camera] Slow Sync: Off
+[MakerNotes, FujiFilm, Camera] Picture Mode: Auto
+[MakerNotes, FujiFilm, Camera] Auto Bracketing: Off
+[MakerNotes, FujiFilm, Camera] Blur Warning: None
+[MakerNotes, FujiFilm, Camera] Focus Warning: Good
+[MakerNotes, FujiFilm, Camera] Exposure Warning: Good
 [Composite, Composite, Image] Av(Aperture Value): 3.5
 [Composite, Composite, Image] Image Size: 160x120
 [Composite, Composite, Camera] Scale Factor To 35mm Equivalent: 6.6

@@ -5,6 +5,42 @@
 <body>
 <h1>ExifTool Version History</h1>
 
+<b>Nov. 1/04 - Version 3.72</b>
+<ul>
+<li>Fixed minor bug in generation of family 1 XMP group names
+<li>Changes to Photoshop family 2 groups
+</ul>
+
+<b>Oct. 30/04 - Version 3.71</b>
+<ul>
+<li>Switched group families 0 and 1 so the general location is now the default
+<li>Fixed bug when sorting by order of group for any family other than 0
+<li>Added test 17 to ExifTool.t
+</ul>
+
+<b>Oct. 29/04 - Version 3.70</b>
+<ul>
+<li>Major improvements to XMP parsing
+<li>Divided XMP group in family 0 based on the XMP namespace prefix
+<li>Changed a few long tables to binary type
+<li>Recognize some new YCbCrSubSampling values
+<li>Display DNG LocalizedCameraModel in plain text
+<li>Patched problem in FileSource reported by Sigma cameras 
+<li>Added information about tag format to verbose hex dump
+</ul>
+
+<b>Oct. 22/04 - Version 3.61</b>
+<ul>
+<li>Added support for DNG file format
+<li>Added and updated a number of EXIF tags for FAX and other uncommon images
+<li>Added Photoshop URL tag
+<li>Attempt to extract image from files with unrecognized extensions assuming TIFF format
+<li>Added "Image format error" if the image type is recognized but the format is bad
+<li>Changed "Unknown file type" error to "Unknown image type"
+<li>Moved POD documentation into separate .pod files
+<li>Started referencing sources for tag definitions in the source code
+</ul>
+
 <b>Oct. 1/04 - Version 3.60</b>
 <ul>
 <li>Changed group family 0 to divide EXIF group into individual IFD groups

@@ -15,13 +15,13 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(SetByteOrder Get16u Get32u);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessCanonRaw($$$);
 
 # Canon raw file tag table 
 %Image::ExifTool::CanonRaw::Main = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonRaw,
     0x0032 => 'CanonColorInfo1',
     0x0805 => 'CanonFileDescription',
@@ -133,7 +133,7 @@ sub ProcessCanonRaw($$$);
 %Image::ExifTool::CanonRaw::MakeModel = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FORMAT => 'String',
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # (can't specify a first entry because this isn't
     # a simple binary table with fixed offsets)
     0 => {
@@ -151,7 +151,7 @@ sub ProcessCanonRaw($$$);
 %Image::ExifTool::CanonRaw::DateData = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 0,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Time' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Time' },
     0 => {
         Name => 'DateTimeOriginal',
         Format => 'ULong',
@@ -165,7 +165,7 @@ sub ProcessCanonRaw($$$);
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FORMAT => 'Short',
     FIRST_ENTRY => 1,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     1 => 'ImageWidth',
     2 => 'ImageHeight',
 );
@@ -173,7 +173,7 @@ sub ProcessCanonRaw($$$);
 %Image::ExifTool::CanonRaw::Rotation = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 1,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     6 => 'Rotation',
 );
 
@@ -182,7 +182,7 @@ sub ProcessCanonRaw($$$);
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FORMAT => 'ShortRational',
     FIRST_ENTRY => 0,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'RedBalanceAuto',
         PrintConv => 'sprintf("%.5f",$val);',

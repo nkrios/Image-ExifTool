@@ -318,11 +318,11 @@ $exifTool-&gt;<b>Options</b>( Exclude =&gt; 'OwnerName' );
 </pre></td></tr></table></blockquote>
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-$exifTool-&gt;<b>Options</b>( Group1 =&gt; [ 'EXIF', 'MakerNotes' ] );
+$exifTool-&gt;<b>Options</b>( Group0 =&gt; [ 'EXIF', 'MakerNotes' ] );
 </pre></td></tr></table></blockquote>
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-$exifTool-&gt;<b>Options</b>( Group0 =&gt; '-XMP' );  # ignore XMP tags
+$exifTool-&gt;<b>Options</b>( Group1 =&gt; '-IFD1' );  # ignore IFD1 tags
 </pre></td></tr></table></blockquote>
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
@@ -543,11 +543,12 @@ my @groups = $exifTool-&gt;<b>GetGroups</b>($info, $family);
 my $exifTool = new Image::ExifTool;
 $exifTool-&gt;ExtractInfo('t/ExifTool.jpg');
 
-my @groups = $exifTool-&gt;<b>GetGroups</b>(1);
+my $family = 1;
+my @groups = $exifTool-&gt;<b>GetGroups</b>($family);
 my $group;
 foreach $group (@groups) {
     print "---- $group ----\n";
-    my $info = $exifTool-&gt;GetInfo({Group1 =&gt; $group});
+    my $info = $exifTool-&gt;GetInfo({"Group$family" =&gt; $group});
     foreach ($exifTool-&gt;GetTagList($info)) {
         print "$_ : $$info{$_}\n";
     } 
@@ -622,24 +623,36 @@ Get list of all group names in specified family.
 <tr><td><b>Returns</b></td>
 <td>A list of all groups in the specified family in alphabetical order</td></tr>
 </table></blockquote>
-Three families of groups are currently defined: 0, 1 and 2.  Families 0 and
-1 are based on the file structure and are similar except that the individual
-manufacturer's groups of family 0 are combined into a single MakerNotes
-group in family 1, and the different IFD (Image File Directory) groups of
-family 0 are combined into a single EXIF group in family 1.  Family 2
-classifies information in logical groups based on what the information
-refers to.  Here is a complete list of groups for each family:
+Three families of groups are currently defined: 0, 1 and 2. Families 0 and 1
+are based on the file structure, and family 2 classifies information based
+on the logical category to which the information refers.
+
+<p>Families 0 and 1 are similar except that family 1 is more specific, and
+sub-divides the EXIF, MakerNotes and XMP groups to give more detail about
+the specific location where the information was found.  The EXIF group is
+split up based on the specific IFD (Image File Directory), the MakerNotes
+group is divided into groups for each manufacturer, and the XMP group is
+separated based on the XMP namespace prefix.  Note that only common XMP
+namespaces are listed below but additional namespaces may be present in some
+XMP data.  Also note that the 'XMP-xmp...' group names may appear in the
+older form 'XMP-xap...' since these names evolved as the XMP standard
+was developed.
+
+<p>Here is a complete list of groups for each family:
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
-<tr><th>0</th>
-<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD, MakerUnknown, Minolta,
-Nikon, Olympus, Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP</td></tr>
-<tr><th>1</th>
+<tr><td><b>0 (General Location)</b></td>
 <td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, IPTC, MakerNotes, Photoshop,
 PrintIM, XMP</td></tr>
-<tr><th>2</th>
-<td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown</td></tr>
+<tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
+<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
+FujiFilm, GlobParamIFD, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD,
+MakerUnknown, Minolta, Nikon, Olympus, Pentax, Photoshop, PrintIM, Sanyo,
+Sigma, Sony, SubIFD, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-photoshop,
+XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights</td></tr>
+<tr><td><b>2&nbsp;(Category)</b></td>
+<td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
+</td></tr>
 </table></blockquote>
 <b>Example:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>

@@ -14,13 +14,13 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(GetByteOrder SetByteOrder Get16u Get32u);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessNikon($$$);
 
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&ProcessNikon,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0001 => {
         Name => 'FileSystemVersion',
         PrintConv => '$_=$val;s/^(\d{2})/$1\./;s/^0//;$_;',
@@ -184,7 +184,7 @@ sub ProcessNikon($$$);
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FORMAT => 'ShortRational',
     FIRST_ENTRY => 0,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'RedBalance',
         PrintConv => 'sprintf("%.5f",$val);',
@@ -199,7 +199,7 @@ sub ProcessNikon($$$);
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FORMAT => 'ShortRational',
     FIRST_ENTRY => 0,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'RedBalance',
         PrintConv => 'sprintf("%.5f",$val);',
@@ -215,7 +215,7 @@ sub ProcessNikon($$$);
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FORMAT => 'UShort',
     FIRST_ENTRY => 0,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'RedBalance',
         ValueConv => '$val / 256',
@@ -230,7 +230,7 @@ sub ProcessNikon($$$);
 
 %Image::ExifTool::Nikon::MakerNotesB = (
     PROCESS_PROC => \&ProcessNikon,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0003 => {
         Name => 'Quality',
         Description => 'Image Quality',

@@ -8,6 +8,7 @@
 #                            it if the test passes
 #               Feb. 27/04 - P. Harvey Change print format and allow ExifTool
 #                            object to be passed instead of tags hash ref.
+#               Oct. 30/04 - P. Harvey Split testCompare() into separate sub.
 #------------------------------------------------------------------------------
 
 package t::TestLib;
@@ -18,9 +19,38 @@ require Exporter;
 use Image::ExifTool;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.00';
+$VERSION = '1.01';
 @ISA = qw(Exporter);
-@EXPORT_OK = qw(check);
+@EXPORT_OK = qw(check testCompare);
+
+# Compare 2 files and return true and erase the 2nd file if they are the same
+# Inputs: 0) file1, 1) file2
+# Returns: true if files are the same
+sub testCompare($$)
+{
+    my ($compfile, $testfile) = @_;
+    my $success = 0;
+    
+    my $oldSep = $/;   
+    $/ = "\x0a";        # set input line separator
+    if (open(FILE1, $compfile)) {
+        if (open(FILE2, $testfile)) {
+            $success = 1;
+            foreach (<FILE1>) {
+                $_ eq <FILE2> or $success = 0, last;
+            }
+            <FILE2> and $success = 0;   # make sure there is nothing left in file
+            close(FILE2);
+        }
+        close(FILE1);
+    }
+    $/ = $oldSep;       # restore input line separator
+    
+    # erase .failed file if test was successful
+    $success and unlink $testfile;
+    
+    return $success
+}
 
 # Compare extracted information against a standard output file
 # Inputs: 0) [optional] ExifTool object reference
@@ -77,30 +107,10 @@ sub check($$$;$$)
     close(FILE);
     
     $\ = $oldSep;       # restore output line separator
-    
-    $oldSep = $/;   
-    $/ = "\x0a";        # set input line separator
 #
 # Compare the output file to the output from the standard test (TESTNAME_#.out)
 #
-    my $success = 0;
-    if (open(FILE1, $compfile)) {
-        if (open(FILE2, $testfile)) {
-            $success = 1;
-            foreach (<FILE1>) {
-                $_ eq <FILE2> or $success = 0, last;
-            }
-            <FILE2> and $success = 0;   # make sure there is nothing left in file
-            close(FILE2);
-        }
-        close(FILE1);
-    }
-    $/ = $oldSep;       # restore input line separator
-    
-    # erase .failed file if test was successful
-    $success and unlink $testfile;
-    
-    return $success
+    return testCompare($compfile, $testfile);
 }
 
 

@@ -13,10 +13,10 @@ package Image::ExifTool::Minolta;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 %Image::ExifTool::Minolta::Main = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0000 => 'MakerNoteVersion',
     0x0001 => {
         Name => 'MinoltaCameraSettingsOld',
@@ -84,7 +84,7 @@ $VERSION = '1.00';
 
 %Image::ExifTool::Minolta::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     FORMAT => 'ULong',
     FIRST_ENTRY => 0,
     1 => {

@@ -3,53 +3,53 @@
 [File, File, Image] File Type: JPG
 [File, File, Image] Image Width: 160
 [File, File, Image] Image Height: 120
-[IFD0, EXIF, Camera] Make: CASIO
-[IFD0, EXIF, Camera] Camera Model Name: QV-3000EX
-[IFD0, EXIF, Image] Orientation: Horizontal (normal)
-[IFD0, EXIF, Image] X Resolution: 72
-[IFD0, EXIF, Image] Y Resolution: 72
-[IFD0, EXIF, Image] Resolution Unit: inches
-[IFD0, EXIF, Image] Software: Ver1.000
-[IFD0, EXIF, Time] Date/Time Of Last Modification: 2000:03:31 10:44:15
-[IFD0, EXIF, Image] Y Cb Cr Positioning: Centered
-[ExifIFD, EXIF, Image] Tv(Shutter Speed): 1/114
-[ExifIFD, EXIF, Image] Av(Aperture Value): 2.0
-[ExifIFD, EXIF, Camera] Exposure Program: Program AE
-[ExifIFD, EXIF, Image] Exif Version: 0210
-[ExifIFD, EXIF, Time] Shooting Date/Time: 2000:03:31 10:44:15
-[ExifIFD, EXIF, Time] Date/Time Of Digitization: 2000:03:31 10:44:15
-[ExifIFD, EXIF, Image] Components Configuration: YCbCr
-[ExifIFD, EXIF, Image] Compressed Bits Per Pixel: 3.646
-[ExifIFD, EXIF, Image] Exposure Compensation: 0
-[ExifIFD, EXIF, Camera] Max Aperture Value: 2.0
-[ExifIFD, EXIF, Camera] Metering Mode: Multi-segment
-[ExifIFD, EXIF, Camera] Flash: No Flash
-[ExifIFD, EXIF, Camera] Focal Length: 13.3mm
-[ExifIFD, EXIF, Image] Flash Pix Version: 0100
-[ExifIFD, EXIF, Image] Color Space: sRGB
-[ExifIFD, EXIF, Image] Exif Image Width: 2048
-[ExifIFD, EXIF, Image] Exif Image Length: 1536
-[ExifIFD, EXIF, Image] File Source: Digital Camera
-[Casio, MakerNotes, Camera] Recording Mode: SingleShutter
-[Casio, MakerNotes, Camera] Image Quality: Fine
-[Casio, MakerNotes, Camera] Focus Mode: Auto
-[Casio, MakerNotes, Camera] Flash Mode: Red-eye reduction
-[Casio, MakerNotes, Camera] Flash Intensity: Normal
-[Casio, MakerNotes, Camera] Object Distance: 2500
-[Casio, MakerNotes, Camera] White Balance: Auto
-[Casio, MakerNotes, Camera] Digital Zoom: Off
-[Casio, MakerNotes, Camera] Sharpness: Normal
-[Casio, MakerNotes, Camera] Contrast: Normal
-[Casio, MakerNotes, Camera] Saturation: Normal
-[Casio, MakerNotes, Camera] CCD Sensitivity: Normal
-[InteropIFD, EXIF, Image] Interoperability Index: R98
-[InteropIFD, EXIF, Image] Interoperability Version: 0100
-[IFD1, EXIF, Image] Compression: JPEG
-[IFD1, EXIF, Image] X Resolution: 72
-[IFD1, EXIF, Image] Y Resolution: 72
-[IFD1, EXIF, Image] Resolution Unit: inches
-[IFD1, EXIF, Image] Thumbnail Offset: 914
-[IFD1, EXIF, Image] Thumbnail Length: 10012
+[EXIF, IFD0, Camera] Make: CASIO
+[EXIF, IFD0, Camera] Camera Model Name: QV-3000EX
+[EXIF, IFD0, Image] Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] X Resolution: 72
+[EXIF, IFD0, Image] Y Resolution: 72
+[EXIF, IFD0, Image] Resolution Unit: inches
+[EXIF, IFD0, Image] Software: Ver1.000
+[EXIF, IFD0, Time] Date/Time Of Last Modification: 2000:03:31 10:44:15
+[EXIF, IFD0, Image] Y Cb Cr Positioning: Centered
+[EXIF, ExifIFD, Image] Tv(Shutter Speed): 1/114
+[EXIF, ExifIFD, Image] Av(Aperture Value): 2.0
+[EXIF, ExifIFD, Camera] Exposure Program: Program AE
+[EXIF, ExifIFD, Image] Exif Version: 0210
+[EXIF, ExifIFD, Time] Shooting Date/Time: 2000:03:31 10:44:15
+[EXIF, ExifIFD, Time] Date/Time Of Digitization: 2000:03:31 10:44:15
+[EXIF, ExifIFD, Image] Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] Compressed Bits Per Pixel: 3.646
+[EXIF, ExifIFD, Image] Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] Max Aperture Value: 2.0
+[EXIF, ExifIFD, Camera] Metering Mode: Multi-segment
+[EXIF, ExifIFD, Camera] Flash: No Flash
+[EXIF, ExifIFD, Camera] Focal Length: 13.3mm
+[EXIF, ExifIFD, Image] Flashpix Version: 0100
+[EXIF, ExifIFD, Image] Color Space: sRGB
+[EXIF, ExifIFD, Image] Exif Image Width: 2048
+[EXIF, ExifIFD, Image] Exif Image Length: 1536
+[EXIF, InteropIFD, Image] Interoperability Index: R98
+[EXIF, InteropIFD, Image] Interoperability Version: 0100
+[EXIF, ExifIFD, Image] File Source: Digital Camera
+[EXIF, IFD1, Image] Compression: JPEG (old-style)
+[EXIF, IFD1, Image] X Resolution: 72
+[EXIF, IFD1, Image] Y Resolution: 72
+[EXIF, IFD1, Image] Resolution Unit: inches
+[EXIF, IFD1, Image] Thumbnail Offset: 914
+[EXIF, IFD1, Image] Thumbnail Length: 10012
+[MakerNotes, Casio, Camera] Recording Mode: SingleShutter
+[MakerNotes, Casio, Camera] Image Quality: Fine
+[MakerNotes, Casio, Camera] Focus Mode: Auto
+[MakerNotes, Casio, Camera] Flash Mode: Red-eye reduction
+[MakerNotes, Casio, Camera] Flash Intensity: Normal
+[MakerNotes, Casio, Camera] Object Distance: 2500
+[MakerNotes, Casio, Camera] White Balance: Auto
+[MakerNotes, Casio, Camera] Digital Zoom: Off
+[MakerNotes, Casio, Camera] Sharpness: Normal
+[MakerNotes, Casio, Camera] Contrast: Normal
+[MakerNotes, Casio, Camera] Saturation: Normal
+[MakerNotes, Casio, Camera] CCD Sensitivity: Normal
 [Composite, Composite, Image] Av(Aperture Value): 2.0
 [Composite, Composite, Image] Image Size: 160x120
 [Composite, Composite, Image] Tv(Shutter Speed): 1/114

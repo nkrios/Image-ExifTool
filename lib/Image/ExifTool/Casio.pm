@@ -12,10 +12,10 @@ package Image::ExifTool::Casio;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 %Image::ExifTool::Casio::MakerNote1 = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0001 => {
         Name => 'RecordingMode' ,
         PrintConv => {
@@ -90,7 +90,7 @@ $VERSION = '1.00';
 );
 
 %Image::ExifTool::Casio::MakerNote2 = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0002 => { 
         Name => 'PreviewImageSize',
         Groups => { 2 => 'Image' },

@@ -21,7 +21,7 @@ require Exporter;
 use File::RandomAccess;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '3.60';
+$VERSION = '3.72';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(ImageInfo Options ClearOptions ExtractInfo GetInfo CombineInfo
                 GetTagList GetFoundTags GetRequestedTags GetValue GetDescription
@@ -191,6 +191,7 @@ sub ExtractInfo($;@)
     $self->{VALUE_CONV} = { };          # hash of converted tag values
     $self->{PRINT_CONV} = { };          # hash of print-converted values
     $self->{TAG_INFO}   = { };          # hash of tag information
+    $self->{TAG_EXTRA}  = { };          # hash of extra information about tag
     $self->{EXIF_DATA} = undef;         # the EXIF data block
 
     # load our main Exif tag table
@@ -253,27 +254,39 @@ sub ExtractInfo($;@)
                 $self->JpgInfo() and last;
             } elsif ($type =~ /\.gif$/i) {
                 $self->GifInfo() and last;
-            } elsif ($type =~ /\.tiff{0,1}$/i) {
-                # A TIFF file starts with an EXIF block -- Easy huh?
-                $self->ExifInfo('TIFF', $raf) and last;
-            } elsif ($type =~ /\.nef$/i) {
-                # An NEF file is standard TIFF format
-                $self->ExifInfo('NEF', $raf) and last;
-            } elsif ($type =~ /\.cr2$/i) {
-                # A CR2 file is standard TIFF format too
-                $self->ExifInfo('CR2', $raf) and last;
             } elsif ($type =~ /\.crw$/i) {
-                GetTagTable('Image::ExifTool::CanonRaw::Main'); # load the raw tables
+                # must be sure we have loaded CanonRaw before we can call RawInfo()
+                GetTagTable('Image::ExifTool::CanonRaw::Main');
                 Image::ExifTool::CanonRaw::RawInfo($self) and last;
             } else {
-                $self->Error('Unknown image file type');
+                # assume anything else is TIFF format (or else we can't read it)
+                my $typeName;
+                if ($type =~ /.*\.(.*)$/) {
+                    # get type name from file extension
+                    ($typeName = $1) =~ tr/a-z/A-Z/;
+                    # change 'TIF' to 'TIFF'
+                    $typeName = 'TIFF' if $typeName eq 'TIF';
+                } else {
+                    $typeName = 'TIFF'; # assume anything without an extension is TIFF
+                }
+                # extract information from TIFF image
+                $self->TiffInfo($typeName, $raf) and last;
             }
-            last unless @fileTypes;     # all done if no more types
-            # seek back to try again from the same position in the file
-            unless ($raf->Seek($pos, 0)) {
+            if (@fileTypes) {
+                # seek back to try again from the same position in the file
+                $raf->Seek($pos, 0) and next;
                 $self->Error('Error seeking in file');
                 last;
             }
+            if ($filename =~ /\.(jpg|jpeg|thm|gif|tif|tiff|crw|cr2|nef|dng)$/i) {
+                # we were given a single image with a known type,
+                # there must be a format error since we couldn't read it
+                $self->Error('Image format error');
+            } else {
+                # it is likely we don't support images of this type
+                $self->Error('Unknown image type');
+            }
+            last;     # all done since no more types
         }
         # extract binary EXIF data block only if requested
         if (defined $self->{EXIF_DATA} and
@@ -544,7 +557,7 @@ sub GetTagList($;$$)
             my $numGroups = 0;
             my $tag;
             foreach $tag (sort { $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags) {
-                my $group = $self->GetGroup($tag);
+                my $group = $self->GetGroup($tag,$family);
                 my $num = $groupCount{$group};
                 $num or $num = $groupCount{$group} = ++$numGroups;
                 $groupOrder{$tag} = $num;
@@ -578,7 +591,7 @@ sub GetRequestedTags($)
 
 #------------------------------------------------------------------------------
 # Get tag value
-# Inputs: 0) ExifTool object reference, 1) tag name
+# Inputs: 0) ExifTool object reference, 1) tag key
 #         2) Value type (PrintConv or ValueConv, defaults to PrintConv)
 sub GetValue($$;$)
 {
@@ -594,7 +607,7 @@ sub GetValue($$;$)
 
 #------------------------------------------------------------------------------
 # Get description for specified tag
-# Inputs: 0) ExifTool object reference, 1) tag name
+# Inputs: 0) ExifTool object reference, 1) tag key
 # Notes: Will always return a defined value, even if description isn't available
 sub GetDescription($$)
 {
@@ -626,7 +639,7 @@ sub GetDescription($$)
 #------------------------------------------------------------------------------
 # Get group name for specified tag
 # Inputs: 0) ExifTool object reference
-#         1) tag name
+#         1) tag key
 #         2) [optional] group family number
 # Returns: Scalar context: Group name (for family 0 if not otherwise specified)
 #          Array context: Group name if family specified, otherwise list of
@@ -656,12 +669,16 @@ sub GetGroup($$;$)
             # return all groups in array context
             my @groups;
             my $tagGroups = $$tagInfo{Groups};
-            foreach (keys %$tagGroups) {
-                $groups[$_] = $tagGroups->{$_};
-            }
-            if ($groups[0] =~ /^IFD\d+$/) {
-                # get actual IFD name for family 0 if group has name like 'IFD#'
-                $groups[0] = ($self->{IFD_NAME}->{$tag} || 'UnknownIFD');
+            $groups[$_] = $tagGroups->{$_} foreach keys %$tagGroups;
+            # make sure all groups are defined
+            defined or $_ = 'Other' foreach @groups;
+            # substitute family 1 group name if necessary
+            if ($groups[1] =~ /^XMP\b/) {
+                # add XMP namespace prefix to XMP group name
+                $groups[1] = 'XMP-' . ($self->{TAG_EXTRA}->{$tag} || 'err');
+            } elsif ($groups[1] =~ /^IFD\d+$/) {
+                # get actual IFD name for family 1 if group has name like 'IFD#'
+                $groups[1] = ($self->{TAG_EXTRA}->{$tag} || 'UnknownIFD');
             }
             return @groups;
         } else {
@@ -669,9 +686,15 @@ sub GetGroup($$;$)
         }
     }
     my $group = $tagInfo->{Groups}->{$family} || 'Other';
-    # get actual IFD name for family 0 if group has name like 'IFD#'
-    if ($family == 0 and $group =~ /^IFD\d+$/) {
-        $group = ($self->{IFD_NAME}->{$tag} || 'UnknownIFD');
+    if ($family == 1) {
+        # substitute family 1 group name if necessary
+        if ($group =~ /^XMP\b/) {
+            # add XMP namespace prefix to XMP group name
+            $group = 'XMP-' . ($self->{TAG_EXTRA}->{$tag} || 'err');
+        } elsif ($group =~ /^IFD\d+$/) {
+            # get actual IFD name for family 1 if group has name like 'IFD#'
+            $group = ($self->{TAG_EXTRA}->{$tag} || 'UnknownIFD');
+        }
     }
     return $group;
 }
@@ -757,7 +780,7 @@ COMPOSITE_TAG:
                 warn "Can't build composite tag $tag (no ValueConv)\n";
                 next;
             }
-            $self->FoundTag($tagInfo, undef, 0, \@val, \@valPrint);
+            $self->FoundTag($tagInfo, undef, \@val, \@valPrint);
         }
         last unless @deferredTags;
         if (@deferredTags == @tagList) {
@@ -842,17 +865,15 @@ sub GetAllGroups($)
         my $table = GetTagTable(pop @tableNames);
         my $defaultGroup;
         $defaultGroup = $table->{GROUPS}->{$family} if $table->{GROUPS};
-        $defaultGroup = 'Other' unless defined $defaultGroup;
-        $allGroups{$defaultGroup} = 1;
+        $allGroups{$defaultGroup} = 1 if defined $defaultGroup;
         # look for any SubDirectory tables
         foreach (TagTableKeys($table)) {
             my @infoArray = GetTagInfoArray($table,$_);
             my ($tagInfo, $groups, $group);
             foreach $tagInfo (@infoArray) {
-                unless ($groups = $$tagInfo{Groups} and $group = $$groups{$family}) {
-                    $group = $defaultGroup;
+                if ($groups = $$tagInfo{Groups} and $group = $$groups{$family}) {
+                    $allGroups{$group} = 1;
                 }
-                $allGroups{$group} = 1;
                 # recursively scan subdirectories if they exist
                 my $subdir = $$tagInfo{SubDirectory} or next;
                 my $tableName = $$subdir{TagTable} or next;
@@ -1207,13 +1228,23 @@ sub HexDump($;$%)
 #------------------------------------------------------------------------------
 # Dump tag data in hex and ASCII to console
 # Inputs: 0) Tag number, 1) data reference, 2) length, 3-N) Options (See HexDump())
+# Options: Comment => extra comment to add to heading
+#          - See HexDump() for other options
 sub HexDumpTag($$;$%)
 {
-    my $tag    = shift;
-    my $dataPt = shift;
-    my $len    = shift;
-    printf("  Tag 0x%.4x Hex Dump (%d bytes):\n",$tag, $len);
-    HexDump($dataPt, $len, @_);
+    my $tag     = shift;
+    my $dataPt  = shift;
+    my $len     = shift;
+    my %opts    = @_;
+    my $comment = $opts{Comment};
+    
+    if (defined $comment) {
+        $comment .= ' ';
+    } else {
+        $comment = '';
+    }
+    printf("  Tag 0x%.4x ${comment}Hex Dump (%d bytes):\n",$tag, $len);
+    HexDump($dataPt, $len, %opts);
 }
 
 #------------------------------------------------------------------------------
@@ -1312,8 +1343,8 @@ sub JpgInfo($)
                 }
                 # get the data block (into a common variable)
                 $self->{EXIF_DATA} = substr($buff, 6);
-                # extract the EXIF information
-                $self->ExifInfo($length-6);
+                # extract the EXIF information (it is in standard TIFF format)
+                $self->TiffInfo($length-6);
             } elsif (ord($ch) == 0xed) {        # APP13 data marker
                 if ($buff =~ /^Photoshop 3.0\0/) {
                     # process Photoshop APP13 record
@@ -1432,29 +1463,29 @@ sub GifInfo($)
 }
 
 #------------------------------------------------------------------------------
-# Process EXIF block
+# Process TIFF data
 # Inputs: 0) ExifTool object reference,
 #         1) data length (or FileType if RAF specified)
 #         2) RAF pointer if we must read the data ourself
 # Returns: 1 if this looked like a valid EXIF block, 0 otherwise
-sub ExifInfo($$;$)
+sub TiffInfo($$;$)
 {
     my ($self, $length, $raf) = @_;
     my $dataPt = \$self->{EXIF_DATA};
 
-    # read start of EXIF block from file if not done already
+    # read the image file header and offset to 0th IFD if necessary
     $raf->Read($$dataPt,8)==8 or return 0 if $raf;
 
     # set byte ordering
     SetByteOrder(substr($$dataPt,0,2)) or return 0;
 
-    # make sure our swapping works
+    # verify the byte ordering
     Get16u($dataPt, 2) == 0x2a or return 0;
 
     my $offset = Get32u($dataPt, 4);
     $offset >= 8 or return 0;
 
-    # read the EXIF data and main directory if required
+    # read the 0th IFD (image file directory) if required
     if ($raf) {
         $length and $self->FoundTag('FileType', $length);
         # read up to and including the IFD directory count
@@ -1674,12 +1705,12 @@ sub GetTagInfo($$$)
 # Inputs: 0) reference to ExifTool object
 #         1) reference to tagInfo hash or tag name
 #         2) data value (may be undefined if building composite tag)
-#         3) IFD name (if an EXIF directory)
-#         4) optional reference to list of values used to build composite tags
-#         5) optional reference to list of print values for composite tags
+#         3) optional reference to list of values used to build composite tags
+#         4) optional reference to list of print values for composite tags
+# Returns: tag key
 sub FoundTag($$$$;$$)
 {
-    my ($self, $tagInfo, $val, $ifd, $valListPt, $valPrintPt) = @_;
+    my ($self, $tagInfo, $val, $valListPt, $valPrintPt) = @_;
     my ($tag, @val, @valPrint);
     my $verbose = $self->{OPTIONS}->{Verbose};
 
@@ -1771,7 +1802,7 @@ sub FoundTag($$$$;$$)
             $self->{PRINT_CONV}->{$nextTag} = $self->{PRINT_CONV}->{$tag};
             $self->{FILE_ORDER}->{$nextTag} = $self->{FILE_ORDER}->{$tag};
             $self->{TAG_INFO}->{$nextTag} = $self->{TAG_INFO}->{$tag};
-            $self->{IFD_NAME}->{$nextTag} = $self->{IFD_NAME}->{$tag};
+            $self->{TAG_EXTRA}->{$nextTag} = $self->{TAG_EXTRA}->{$tag};
         }
     }
 
@@ -1780,13 +1811,25 @@ sub FoundTag($$$$;$$)
     $self->{PRINT_CONV}->{$tag} = $printConv;
     $self->{FILE_ORDER}->{$tag} = ++$self->{NUM_TAGS_FOUND};
     $self->{TAG_INFO}->{$tag} = $tagInfo;
-    $self->{IFD_NAME}->{$tag} = $ifd;
+    
+    return $tag;
+}
+
+#------------------------------------------------------------------------------
+# set extra information specific to this tag instance
+# Inputs: 0) reference to ExifTool object
+#         1) tag key
+#         2) extra information
+sub SetTagExtra($$$)
+{
+    my ($self, $tagKey, $extra) = @_;
+    $self->{TAG_EXTRA}->{$tagKey} = $extra;
 }
 
 #------------------------------------------------------------------------------
 # delete specified tag
 # Inputs: 0) reference to ExifTool object
-#         1) tag name
+#         1) tag key
 sub DeleteTag($$)
 {
     my ($self, $tag) = @_;
@@ -1794,6 +1837,7 @@ sub DeleteTag($$)
     delete $self->{PRINT_CONV}->{$tag};
     delete $self->{FILE_ORDER}->{$tag};
     delete $self->{TAG_INFO}->{$tag};
+    delete $self->{TAG_EXTRA}->{$tag} if exists $self->{TAG_EXTRA}->{$tag};
 }
 
 #------------------------------------------------------------------------------
@@ -1900,723 +1944,3 @@ sub ProcessBinaryData($$$)
 
 #------------------------------------------------------------------------------
 1;  # end
-
-__END__
-
-=head1 NAME
-
-Image::ExifTool - Extract meta information from image files
-
-=head1 SYNOPSIS
-
-use Image::ExifTool 'ImageInfo';
-
-$info = B<ImageInfo>('a.jpg');    # simple!
-
-$exifTool = new Image::ExifTool;
-
-$info = $exifTool-E<gt>B<ImageInfo>($file, \%options, \@tagList, $tag, ...);
-
-$oldValue = $exifTool-E<gt>B<Options>(Option =E<gt> 'Value', ...);
-
-$exifTool-E<gt>B<ClearOptions>();
-
-$success = $exifTool-E<gt>B<ExtractInfo>($file, \%options, \@tagList, ...);
-
-$info = $exifTool-E<gt>B<GetInfo>(\%options, \@tagList, $tag, ...);
-
-$combined = $exifTool-E<gt>B<CombineInfo>($info1, $info2, ...);
-
-@tagList = $exifTool-E<gt>B<GetTagList>($info, $sortOrder);
-
-@foundTags = $exifTool-E<gt>B<GetFoundTags>($sortOrder);
-
-@requestedTags = $exifTool-E<gt>B<GetRequestedTags>();
-
-$value = $exifTool-E<gt>B<GetValue>($tag, $type);
-
-$description = $exifTool-E<gt>B<GetDescription>($tag);
-
-$group = $exifTool-E<gt>B<GetGroup>($tag, $family);
-
-@groups = $exifTool-E<gt>B<GetGroups>($info, $family);
-
-$exifTool-E<gt>B<BuildCompositeTags>();
-
-$tagName = Image::ExifTool::B<GetTagName>($tag);
-
-@shortcuts = Image::ExifTool::B<GetShortcuts>();
-
-@allTags = Image::ExifTool::B<GetAllTags>();
-
-@allGroups = Image::ExifTool::B<GetAllGroups>($family);
-
-=head1 DESCRIPTION
-
-ExifTool provides an extensible set of perl modules to extract and parse
-EXIF, IPTC, XMP and GeoTIFF meta information from JPEG, GIF, TIFF, THM, CRW
-(Canon RAW), CR2 (Canon 1D Mk II RAW) and NEF (Nikon Electronic image
-Format) images.  ExifTool currently reads the maker notes of images from
-Canon, Casio, FujiFilm, Minolta, Nikon, Olympus, Pentax, Sanyo and Sigma
-digital cameras.
-
-=head1 METHODS
-
-=head2 new
-
-Creates a new ExifTool object.
-
-Example:
-    $exifTool = new Image::ExifTool;
-
-=head2 ImageInfo
-
-Obtain meta information from image.  This is the one step function for
-obtaining meta information from an image.  Internally, B<ImageInfo> calls
-B<ExtractInfo> to extract the information, B<GetInfo> to generate the
-information hash, and B<GetTagList> for the returned tag list.
-
-=over 4
-
-=item Examples:
-
-$info = ImageInfo($filename, $tag1, $tag2)
-
-$info = $exifTool-E<gt>ImageInfo(\*FILE)
-
-$info = ImageInfo(\$imageData, \@tagList, \%options)
-
-=item Inputs:
-
-B<ImageInfo> is very flexible about the input arguments, and interprets
-them based on their type.  It may be called with one or more arguments.
-The one required argument is either a SCALAR (the image file name), a GLOB
-reference (a reference to the image file) or a SCALAR reference (a
-reference to the image in memory).  Other arguments are optional.  The
-order of the arguments is not significant, except that the first SCALAR is
-taken to be the file name unless a file reference or scalar reference came
-earlier in the argument list.
-
-Below is an explanation of how the B<ImageInfo> function arguments are
-interpreted:
-
-=over 4
-
-=item ExifTool ref
-
-B<ImageInfo> may be called with an ExifTool object if desired.  The
-advantage of using the object-oriented form is that the options may be set
-before calling B<ImageInfo>, and the object may be used afterward to access
-member functions.
-
-=item SCALAR
-
-The first scalar argument is taken to be the file name unless an earlier
-argument specified the image data via a file reference (GLOB ref) or data
-reference (SCALAR ref). The remaining scalar arguments are names of tags for
-requested information.  If no tags are specified, all possible information
-is extracted.  Tag names may begin with '-' indicating tags to exclude.  The
-tag names are case-insensitive, so note that the returned tags may not be
-exactly the same as the requested tags. For this reason it is best to use
-either the keys of the returned hash or the elements of the tag array when
-accessing the return values
-
-=item GLOB ref
-
-A reference to an open image file.
-
-=item SCALAR ref
-
-A reference to image data in memory.
-
-=item ARRAY ref
-
-Reference to a list of tag names.  On entry, any elements in the list are
-added to the list of requested tags.  Tags with names beginning with '-' are
-excluded.  On return, this list is updated to contain a sorted list of tag
-names in the proper case.
-
-=item HASH ref
-
-Reference to a hash containing the options settings.  See B<Options>
-documentation below for a list of available options.  Options specified
-as arguments to B<ImageInfo> take precidence over B<Options> settings.
-
-=back
-
-=item Return Values:
-
-B<ImageInfo> returns a reference to a hash of tag/value pairs. The keys of
-the hash are the tag identifiers, which are similar to the tag names but my
-have an embedded copy number if more than one tag with that name was found
-in the image.  Use B<GetTagName> to remove the copy number from the tag.
-Note that the case of the tags may not be the same as requested. Here is a
-simple example to print out the information returned by B<ImageInfo>:
-
-    foreach (sort keys %$info) {
-        print "$_ =E<gt> $$info{$_}\n";
-    }
-
-The values of the returned hash are usually simple scalars, but a scalar
-reference is used to indicate binary data.  Note that binary values are not
-necessarily extracted unless specifically requested or the Binary option is
-set.  If not extracted the value is a reference to a string of the form
-"Binary data ##### bytes".  The code below gives an example of how to handle
-these return values, as well as illustrating the use of other ExifTool
-functions:
-
-    use Image::ExifTool;
-    my $exifTool = new Image::ExifTool;
-    $exifTool->Options(Unknown => 1);
-    my $info = $exifTool->ImageInfo('a.jpg');
-    my $group = '';
-    my $tag;
-    foreach $tag ($exifTool->GetFoundTags('Group0')) {
-        if ($group ne $exifTool->GetGroup($tag)) {
-            $group = $exifTool->GetGroup($tag);
-            print "---- $group ----\n";
-        }
-        my $val = $info->{$tag};
-        if (ref $val eq 'SCALAR') {
-            if ($$val =~ /^Binary data/) {
-                $val = "($$val)";
-            } else {
-                my $len = length($$val);
-                $val = "(Binary data $len bytes)";
-            }
-        }
-        printf("%-32s : %s\n", $exifTool->GetDescription($tag), $val);
-    }
-
-As well as tags representing information extracted from the image,
-the following tags generated by ExifTool may be returned:
-
-    ExifToolVersion - The ExifTool version number.
-
-    Error - An error message if the image could not be read.
-
-    Warning - A warning message if problems were encountered
-              while extracting information from the image.
-
-=back
-
-=head2 Options
-
-Get/set ExifTool options.  This function can be called to set the default
-options for an ExifTool object.  Options set this way are in effect for
-all function calls but may be overridden by options passed as arguments
-to a specific function.
-
-Examples:
-    $exifTool-E<gt>Options( Exclude =E<gt> 'OwnerName' );
-
-    $exifTool-E<gt>Options( Group1 =E<gt> [ 'EXIF', 'MakerNotes' ] );
-
-    $exifTool-E<gt>Options( Group0 =E<gt> '-XMP' );  # ignore XMP tags
-
-    $exifTool-E<gt>Options( Sort =E<gt> 'Group2', Unknown =E<gt> 1 );
-
-    $oldSetting = $exifTool-E<gt>Options( Duplicates =E<gt> 0 );
-
-Inputs:
-    0) ExifTool object reference.
-    1) Option parameter name.
-    2) [optional] Option parameter value.
-    3-N) [optional] Additional parameter/value pairs.
-
-=over 4
-
-=item Option Parameters:
-
-=over 4
-
-=item Binary
-
-Flag to get the value of all binary tags.  Unless set, large
-binary values may only be extracted for specifically requested tags.
-Default is 0.
-
-=item Composite
-
-Flag to calculate Composite tags automatically.  Default
-is 1.
-
-=item DateFormat
-
-Format for printing EXIF date/time.  See L<strftime> for
-details about the format string.
-
-=item Duplicates
-
-Flag to preserve values of duplicate tags (instead of
-overwriting existing value).  Default is 1.
-
-=item Group#
-
-Extract tags only for specified groups in family # (Group0 assumed if #
-not given).  The option value may be a single group name or a reference
-to a list of groups.  Case is significant in group names.  Specify a
-group to be excluded by preceeding group name with a '-'.  See
-B<GetAllGroups> for a list of available groups.
-
-=item Exclude
-
-Exclude specified tags from tags extracted from an image. The
-option value is either a tag name or reference to a list of tag names
-to exclude.  The case of tag names is not significant. This option is
-ignored for specifically requested tags.  Tags may also be excluded
-by preceeding their name with a '-' in the arguments to B<ImageInfo>.
-
-=item PrintConv
-
-Flag to enable automatic print conversion.  Default is 1.
-
-=item Sort
-
-Specifies order to sort tags in returned list:
-
-  Alpha  - Sort alphabetically
-  File   - Sort in order that tags were found in the file
-  Group# - Sort by tag group, where # is the group family
-           number.  If # is not specified, Group0 is assumed.
-           See GetGroup for a list of groups.
-  Input  - Sort in same order as input tag arguments (default)
-
-=item Unknown
-
-Flag to get the values of unknown tags.  If set to 1, unknown tags are
-extracted from EXIF directories.  If set to 2, unknown tags are also
-extracted from binary data blocks.  Default is 0.
-
-=item Verbose
-
-Flag to print verbose messages.  May be set to a value from 0 to 3 to be
-increasingly verbose.  Default is 0.
-
-=back
-
-=item Return Values:
-
-The original value of the last specified parameter.
-
-=back
-
-=head2 ClearOptions
-
-Reset all options to their default values.
-
-Example:
-    $exifTool-E<gt>ClearOptions();
-
-Inputs:
-    0) ExifTool object reference
-
-=over 4
-
-=item Return Values:
-
-(none)
-
-=back
-
-=head2 ExtractInfo
-
-Extract meta information from an image.  Call B<GetInfo> to access the
-information after extracting it from the image.
-
-Example:
-    $success = $exifTool-E<gt>ExtractInfo('image.jpg', \%options);
-
-=over 4
-
-=item Inputs:
-
-B<ExtractInfo> takes exactly the same arguments as B<ImageInfo>.  The only
-difference is that a list of tags is not returned if an ARRAY reference is
-given.  The following options are effective in the call to B<ExtractInfo>:
-
-Binary, Composite, DateFormat, PrintConv, Unknown and Verbose.
-
-=item Return Value:
-
-1 if image was valid, 0 otherwise (and 'Error' tag set).
-
-=back
-
-=head2 GetInfo
-
-B<GetInfo> is called to return meta information after it has been extracted
-from the image by a previous call to B<ExtractInfo> or B<ImageInfo>. This
-function may be called repeatedly after a single call to B<ExtractInfo> or
-B<ImageInfo>.
-
-Examples:
-    $info = $exifTool-E<gt>GetInfo('ImageWidth', 'ImageHeight');
-
-    $info = $exifTool-E<gt>GetInfo(\@ioTagList);
-
-    $info = $exifTool-E<gt>GetInfo({Group2 =E<gt> ['Author', 'Location']});
-
-=over 4
-
-=item Inputs:
-
-Inputs are the same as B<ExtractInfo> and B<ImageInfo> except that an image
-can not be specified.  Options in effect are:
-
-Duplicates, Exclude, Group#, (and Sort if tag list reference is given).
-
-=item Return Value:
-
-Reference to information hash, the same as with B<ImageInfo>.
-
-=back
-
-=head2 CombineInfo
-
-Combine information from more than one information hash into a single hash.
-
-Example:
-    $info = $exifTool-E<gt>CombineInfo($info1, $info2, $info3);
-
-Inputs:
-    0) ExifTool object reference
-    1-N) Information hash references
-
-If the Duplicates option is disabled and duplicate tags exist, the order of
-the hashes is significant.  In this case, the value used is the first value
-found as the hashes are scanned in order of input.  The Duplicates option
-is the only option that is in effect for this function.
-
-=head2 GetTagList
-
-Get a sorted list of tags from the specified information hash or tag list.
-
-Example:
-    @tags = $exifTool-E<gt>GetTagList($info, 'Group0');
-
-Inputs:
-    0) ExifTool object reference
-    1) [optional] Information hash reference or tag list reference
-    2) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#')
-
-If the information hash or tag list reference is not provided, then the list
-of found tags from the last call to B<ImageInfo> or B<GetInfo> is used
-instead, and the result is the same as if B<GetFoundTags> was called.  If
-sort order is not specified, the sort order from the current options is used.
-
-=over 4
-
-=item Return Values:
-
-A list of tags in the specified order.
-
-=back
-
-=head2 GetFoundTags
-
-Get list of found tags in specified sort order.  The found tags are the
-tags for the information returned from the most recent call to B<ImageInfo>
-or B<GetInfo> for this object.
-
-Example:
-    @tags = $exifTool-E<gt>GetFoundTags('File');
-
-Inputs:
-    0) ExifTool object reference
-    1) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#')
-
-If sort order is not specified, the sort order from the ExifTool options is
-used.
-
-=over 4
-
-=item Return Values:
-
-A list of tags in the specified order.
-
-=back
-
-=head2 GetRequestedTags
-
-Get list of requested tags.  These are the tags that were specified in the
-arguments of the most recent call to B<ImageInfo>, B<ExtractInfo> or
-B<GetInfo>, including tags specified via a tag list reference. Shortcut
-tags are expanded in the list.
-
-Example:
-    @tags = $exifTool-E<gt>GetRequestedTags();
-
-Inputs:
-    (none)
-
-=over 4
-
-=item Return Values:
-
-List of requested tags in the same order that they were specified.
-Note that this list will be empty if tags were not specifically requested
-(ie. If extracting all tags).
-
-=back
-
-=head2 GetValue
-
-Get the value of specified tag.  By default this routine returns the
-human-readable (PrintConv) value, but optionally returns the
-machine-readable (ValueConv) value. Note that the PrintConv value will
-only differ from the ValueConv value if the PrintConv option is enabled
-(which it is by default).  The PrintConv values are the values returned
-by B<ImageInfo> and B<GetInfo> in the tag/value hash.
-
-Example:
-    $val = $exifTool-E<gt>GetValue('ISO', 'ValueConv');
-
-Inputs:
-    0) ExifTool object reference
-    1) Tag key
-    2) [optional] Value type, 'PrintConv' (default) or 'ValueConv'
-
-=over 4
-
-=item Return Values:
-
-The value of the specified tag.
-
-=back
-
-=head2 GetDescription
-
-Get description for specified tag.  This function will always return a
-defined value.  In the case where the description doesn't exist, the tag
-name is returned.
-
-Inputs:
-    0) ExifTool object reference
-    1) Tag key
-
-=over 4
-
-=item Return Values:
-
-A description for the specified tag.
-
-=back
-
-=head2 GetGroup
-
-Get group name for specified tag.
-
-Example:
-    $group = $exifTool-E<gt>GetGroup($tag, 0);
-
-Inputs:
-    0) ExifTool object reference
-    1) Tag key
-    2) [optional] Group family number
-
-=over 4
-
-=item Return Values:
-
-Group name (or 'Other' if tag has no group).  If no group family is
-specified, B<GetGroup> returns the name of the group in family 0 when called
-in scalar context, or the names of groups for all families in list context.
-See B<GetAllGroups> for a list of groups in each famly.
-
-=back
-
-=head2 GetGroups
-
-Get list of group names for specified information.
-
-Example:
-    @groups = $exifTool-E<gt>GetGroups($info, 2);
-
-Inputs:
-    0) ExifTool object reference
-    1) [optional] Info hash ref (default is all extracted info)
-    2) [optional] Group family number (default 0)
-
-=over 4
-
-=item Return Values:
-
-List of group names in alphabetical order. If information hash is not
-specified, the group names are returned for all extracted information.
-
-=back
-
-=head2 BuildCompositeTags
-
-Builds composite tags from required tags.  The composite tags are
-convenience tags which are derived from the values of other tags.  This
-routine is called automatically by B<ImageInfo> and B<ExtractInfo> if the
-Composite option is set.
-
-Inputs:
-    0) ExifTool object reference
-
-=over 4
-
-=item Return Values:
-
-(none)
-
-=item Notes:
-
-Tag values are calculated in alphabetical order unless a tag Require's or
-Desire's another composite tag, in which case the calculation is deferred
-until after the other tag is calculated. Composite tags may need to read
-data from the image for their value to be determined, so for these
-B<BuildCompositeTags> must be called while the image is available.  This is
-only a problem if B<ImageInfo> is called with a filename (as opposed to a
-file reference or scalar reference) since in this case the file is closed
-before B<ImageInfo> returns.  However if you enable the Composite
-option, B<BuildCompositeTags>  is called from within B<ImageInfo> before the
-file is closed.  (Note: As of ExifTool version 3.10, only the PreviewImage
-required access to the image data.)
-
-=back
-
-=head2 GetTagName [static]
-
-Get name of tag from tag key.  This is a convenience function that
-strips the embedded copy number, if it exists, from the tag key.
-
-Note: "static" in the heading above indicates that the function does not
-require an ExifTool object reference as the first argument.  All functions
-documented below are also static.
-
-Example:
-    $tagName = Image::ExifTool::GetTagName($tag);
-
-Inputs:
-    0) Tag key
-
-=over 4
-
-=item Return Value:
-
-Tag name.  This is the same as the tag key but has the copy number removed.
-
-=back
-
-=head2 GetShortcuts [static]
-
-Get a list of shortcut tags.
-
-Inputs:
-    (none)
-
-=over 4
-
-=item Return Values:
-
-List of shortcut tags (as defined in Image::ExifTool::Shortcuts).
-
-=back
-
-=head2 GetAllTags [static]
-
-Get list of all available tag names.
-
-Example:
-    @tagList = Image::ExifTool::GetAllTags();
-
-Inputs:
-    (none)
-
-=over 4
-
-=item Return Values:
-
-A list of all available tags in alphabetical order.
-
-=back
-
-=head2 GetAllGroups [static]
-
-Get list of all group names in specified family.
-
-Example:
-    @groupList = Image::ExifTool::GetAllGroups($family);
-
-Inputs:
-    0) Group family number (0-2)
-
-=over 4
-
-=item Return Values:
-
-A list of all groups in the specified family in alphabetical order.
-
-=back
-
-Three families of groups are currently defined: 0, 1 and 2.  Families 0 and
-1 are based on the file structure and are similar except that the individual
-manufacturer's groups of family 0 are combined into a single MakerNotes
-group in family 1, and the different IFD (Image File Directory) groups of
-family 0 are combined into a single EXIF group in family 1.  Family 2
-classifies information in logical groups based on what the information
-refers to.  Here is a complete list of groups for each family:
-
-=over 4
-
-=item Family 0:
-
-Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD, MakerUnknown, Minolta,
-Nikon, Olympus, Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP
-
-=item Family 1:
-
-Composite, EXIF, ExifTool, File, GPS, GeoTiff, IPTC, MakerNotes, Photoshop,
-PrintIM, XMP
-
-=item Family 2:
-
-Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
-
-=back
-
-=head1 AUTHOR
-
-Copyright 2003-2004, Phil Harvey (phil@owl.phy.queensu.ca)
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
-=head1 CREDITS
-
-Thanks to the following people for their help:
-
-=over 4
-
-=item Malcolm Wotton for his help with the D30 Custom Functions
-
-=item David Anson for his help sorting out binary file problems on Windows
-
-=item Leon Booyens for his suggestions
-
-=item Jeremy Brown for the 35efl tags
-
-=item Dan Heller for his bug reports, detailed suggestions and guidance
-
-=item Wayne Smith for his help figuring out the Pentax maker notes
-
-=item Michael Rommel for his bug fixes and additions to the Canon maker notes
-
-=item Joseph Heled for help figuring out some of the Nikon D70 maker notes
-
-=item Joachim Loehr for adding the Casio type 2 maker notes
-
-=item Greg Troxel for his suggestions and for adding ExifTool to pkgsrc-wip
-
-=back
-
-=head1 SEE ALSO
-
-L<Image::Info|Image::Info>
-
-=cut

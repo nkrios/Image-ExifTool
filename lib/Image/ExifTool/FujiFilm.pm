@@ -11,10 +11,10 @@ package Image::ExifTool::FujiFilm;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 %Image::ExifTool::FujiFilm::Main = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0 => 'Version',
     0x1000 => {
         Name => 'Quality',

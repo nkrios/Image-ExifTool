@@ -3,78 +3,78 @@
 [File, File, Image] File Type: JPG
 [File, File, Image] Image Width: 160
 [File, File, Image] Image Height: 120
-[IFD0, EXIF, Image] Image Description: SANYO DIGITAL CAMERA
-[IFD0, EXIF, Camera] Make: SANYO Electric Co.,Ltd.
-[IFD0, EXIF, Camera] Camera Model Name: VPC-MZ3 
-[IFD0, EXIF, Image] Orientation: Horizontal (normal)
-[IFD0, EXIF, Image] X Resolution: 72
-[IFD0, EXIF, Image] Y Resolution: 72
-[IFD0, EXIF, Image] Resolution Unit: inches
-[IFD0, EXIF, Image] Software: V612P-75
-[IFD0, EXIF, Time] Date/Time Of Last Modification: 2003:10:11 12:43:05
-[IFD0, EXIF, Image] Y Cb Cr Positioning: Co-sited
-[ExifIFD, EXIF, Image] Tv(Shutter Speed): 1/185
-[ExifIFD, EXIF, Image] Av(Aperture Value): 6.9
-[ExifIFD, EXIF, Camera] Exposure Program: Program AE
-[ExifIFD, EXIF, Image] ISO Speed: 400
-[ExifIFD, EXIF, Image] Exif Version: 0220
-[ExifIFD, EXIF, Time] Shooting Date/Time: 2003:10:11 12:43:05
-[ExifIFD, EXIF, Time] Date/Time Of Digitization: 2003:10:11 12:43:05
-[ExifIFD, EXIF, Image] Components Configuration: YCbCr
-[ExifIFD, EXIF, Image] Compressed Bits Per Pixel: 2.9
-[ExifIFD, EXIF, Image] Brightness Value: 0
-[ExifIFD, EXIF, Image] Exposure Compensation: 0
-[ExifIFD, EXIF, Camera] Max Aperture Value: 2.8
-[ExifIFD, EXIF, Camera] Metering Mode: Multi-spot
-[ExifIFD, EXIF, Camera] Light Source: Unknown (9)
-[ExifIFD, EXIF, Camera] Flash: Auto, Did not fire
-[ExifIFD, EXIF, Camera] Focal Length: 23.1mm
-[ExifIFD, EXIF, Image] User Comment: 
-[ExifIFD, EXIF, Image] Flash Pix Version: 0100
-[ExifIFD, EXIF, Image] Color Space: sRGB
-[ExifIFD, EXIF, Image] Exif Image Width: 2000
-[ExifIFD, EXIF, Image] Exif Image Length: 1496
-[ExifIFD, EXIF, Image] File Source: Digital Camera
-[ExifIFD, EXIF, Image] Custom Rendered: Normal
-[ExifIFD, EXIF, Camera] Exposure Mode: Auto
-[ExifIFD, EXIF, Camera] White Balance: Manual
-[ExifIFD, EXIF, Camera] Digital Zoom Ratio: 0
-[ExifIFD, EXIF, Camera] Focal Length In 35mm Format: 11113
-[ExifIFD, EXIF, Camera] Scene Capture Type: Standard
-[ExifIFD, EXIF, Camera] Gain Control: High gain up
-[ExifIFD, EXIF, Camera] Contrast: Normal
-[ExifIFD, EXIF, Camera] Saturation: Normal
-[ExifIFD, EXIF, Camera] Sharpness: Normal
-[ExifIFD, EXIF, Camera] Subject Distance Range: Close
-[Sanyo, MakerNotes, Camera] Maker Note Offset: 1076
-[Sanyo, MakerNotes, Camera] Special Mode: 0 0 0
-[Sanyo, MakerNotes, Camera] Sanyo Quality: Fine/Very High
-[Sanyo, MakerNotes, Camera] Macro: Normal
-[Sanyo, MakerNotes, Camera] Digital Zoom: 0
-[Sanyo, MakerNotes, Camera] Sequential Shot: None
-[Sanyo, MakerNotes, Camera] Wide Range: Off
-[Sanyo, MakerNotes, Camera] Color Adjustment Mode: Off
-[Sanyo, MakerNotes, Camera] Quick Shot: Off
-[Sanyo, MakerNotes, Camera] Self Timer: Off
-[Sanyo, MakerNotes, Camera] Voice Memo: Off
-[Sanyo, MakerNotes, Camera] Record Shutter Release: Record while down
-[Sanyo, MakerNotes, Camera] Flicker Reduce: Off
-[Sanyo, MakerNotes, Camera] Optical Zoom On: On
-[Sanyo, MakerNotes, Camera] Digital Zoom On: Off
-[Sanyo, MakerNotes, Camera] Light Source Special: Off
-[Sanyo, MakerNotes, Camera] Resaved: No
-[Sanyo, MakerNotes, Camera] Scene Select: Off
-[Sanyo, MakerNotes, Camera] Manual Focus Distance: 1
-[Sanyo, MakerNotes, Camera] Sequence Shot Interval: 5 frames/sec
-[Sanyo, MakerNotes, Camera] Flash Mode: Red eye
-[InteropIFD, EXIF, Image] Interoperability Index: R98
-[InteropIFD, EXIF, Image] Interoperability Version: 0100
-[IFD1, EXIF, Image] Compression: JPEG
-[IFD1, EXIF, Image] X Resolution: 72
-[IFD1, EXIF, Image] Y Resolution: 72
-[IFD1, EXIF, Image] Resolution Unit: inches
-[IFD1, EXIF, Image] Thumbnail Offset: 1906
-[IFD1, EXIF, Image] Thumbnail Length: 10998
+[EXIF, IFD0, Image] Image Description: SANYO DIGITAL CAMERA
+[EXIF, IFD0, Camera] Make: SANYO Electric Co.,Ltd.
+[EXIF, IFD0, Camera] Camera Model Name: VPC-MZ3 
+[EXIF, IFD0, Image] Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] X Resolution: 72
+[EXIF, IFD0, Image] Y Resolution: 72
+[EXIF, IFD0, Image] Resolution Unit: inches
+[EXIF, IFD0, Image] Software: V612P-75
+[EXIF, IFD0, Time] Date/Time Of Last Modification: 2003:10:11 12:43:05
+[EXIF, IFD0, Image] Y Cb Cr Positioning: Co-sited
+[EXIF, ExifIFD, Image] Tv(Shutter Speed): 1/185
+[EXIF, ExifIFD, Image] Av(Aperture Value): 6.9
+[EXIF, ExifIFD, Camera] Exposure Program: Program AE
+[EXIF, ExifIFD, Image] ISO Speed: 400
+[EXIF, ExifIFD, Image] Exif Version: 0220
+[EXIF, ExifIFD, Time] Shooting Date/Time: 2003:10:11 12:43:05
+[EXIF, ExifIFD, Time] Date/Time Of Digitization: 2003:10:11 12:43:05
+[EXIF, ExifIFD, Image] Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] Compressed Bits Per Pixel: 2.9
+[EXIF, ExifIFD, Image] Brightness Value: 0
+[EXIF, ExifIFD, Image] Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] Max Aperture Value: 2.8
+[EXIF, ExifIFD, Camera] Metering Mode: Multi-spot
+[EXIF, ExifIFD, Camera] Light Source: Unknown (9)
+[EXIF, ExifIFD, Camera] Flash: Auto, Did not fire
+[EXIF, ExifIFD, Camera] Focal Length: 23.1mm
+[EXIF, ExifIFD, Image] User Comment: 
+[EXIF, ExifIFD, Image] Flashpix Version: 0100
+[EXIF, ExifIFD, Image] Color Space: sRGB
+[EXIF, ExifIFD, Image] Exif Image Width: 2000
+[EXIF, ExifIFD, Image] Exif Image Length: 1496
+[EXIF, InteropIFD, Image] Interoperability Index: R98
+[EXIF, InteropIFD, Image] Interoperability Version: 0100
+[EXIF, ExifIFD, Image] File Source: Digital Camera
+[EXIF, ExifIFD, Image] Custom Rendered: Normal
+[EXIF, ExifIFD, Camera] Exposure Mode: Auto
+[EXIF, ExifIFD, Camera] White Balance: Manual
+[EXIF, ExifIFD, Camera] Digital Zoom Ratio: 0
+[EXIF, ExifIFD, Camera] Focal Length In 35mm Format: 11113
+[EXIF, ExifIFD, Camera] Scene Capture Type: Standard
+[EXIF, ExifIFD, Camera] Gain Control: High gain up
+[EXIF, ExifIFD, Camera] Contrast: Normal
+[EXIF, ExifIFD, Camera] Saturation: Normal
+[EXIF, ExifIFD, Camera] Sharpness: Normal
+[EXIF, ExifIFD, Camera] Subject Distance Range: Close
+[EXIF, IFD1, Image] Compression: JPEG (old-style)
+[EXIF, IFD1, Image] X Resolution: 72
+[EXIF, IFD1, Image] Y Resolution: 72
+[EXIF, IFD1, Image] Resolution Unit: inches
+[EXIF, IFD1, Image] Thumbnail Offset: 1906
+[EXIF, IFD1, Image] Thumbnail Length: 10998
+[MakerNotes, Sanyo, Camera] Maker Note Offset: 1076
+[MakerNotes, Sanyo, Camera] Special Mode: 0 0 0
+[MakerNotes, Sanyo, Camera] Sanyo Quality: Fine/Very High
+[MakerNotes, Sanyo, Camera] Macro: Normal
+[MakerNotes, Sanyo, Camera] Digital Zoom: 0
+[MakerNotes, Sanyo, Camera] Sequential Shot: None
+[MakerNotes, Sanyo, Camera] Wide Range: Off
+[MakerNotes, Sanyo, Camera] Color Adjustment Mode: Off
+[MakerNotes, Sanyo, Camera] Quick Shot: Off
+[MakerNotes, Sanyo, Camera] Self Timer: Off
+[MakerNotes, Sanyo, Camera] Voice Memo: Off
+[MakerNotes, Sanyo, Camera] Record Shutter Release: Record while down
+[MakerNotes, Sanyo, Camera] Flicker Reduce: Off
+[MakerNotes, Sanyo, Camera] Optical Zoom On: On
+[MakerNotes, Sanyo, Camera] Digital Zoom On: Off
+[MakerNotes, Sanyo, Camera] Light Source Special: Off
+[MakerNotes, Sanyo, Camera] Resaved: No
+[MakerNotes, Sanyo, Camera] Scene Select: Off
+[MakerNotes, Sanyo, Camera] Manual Focus Distance: 1
+[MakerNotes, Sanyo, Camera] Sequence Shot Interval: 5 frames/sec
+[MakerNotes, Sanyo, Camera] Flash Mode: Red eye
 [Composite, Composite, Image] Av(Aperture Value): 6.9
 [Composite, Composite, Image] Image Size: 160x120
 [Composite, Composite, Camera] Scale Factor To 35mm Equivalent: 481.1

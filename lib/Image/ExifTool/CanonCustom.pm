@@ -11,7 +11,7 @@ package Image::ExifTool::CanonCustom;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessCanonCustom($$$);
 
@@ -20,7 +20,7 @@ sub ProcessCanonCustom($$$);
 # CanonCustom (keys are custom function number)
 %Image::ExifTool::CanonCustom::Functions = (
     PROCESS_PROC => \&ProcessCanonCustom,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     1 => {
         Name => 'LongExposureNoiseReduction',
         PrintConv => {
@@ -139,7 +139,7 @@ sub ProcessCanonCustom($$$);
 
 # custom functions for 10D
 %Image::ExifTool::CanonCustom::Functions10D = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonCustom,
     1 => {
         Name => 'SetButtonFunction',
@@ -291,7 +291,7 @@ sub ProcessCanonCustom($$$);
 
 # custom functions for the 1D
 %Image::ExifTool::CanonCustom::Functions1D = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonCustom,
     0 => {
         Name => 'FocusingScreen',

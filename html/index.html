@@ -1,20 +1,20 @@
 <html>
 <head>
   <title>ExifTool</title>
-  <meta name="KeyWords" content="ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, CRW, CR2, NEF, Canon, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters">
+  <meta name="KeyWords" content="ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, CRW, CR2, NEF, DNG, Canon, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters">
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
 <h3>
-<a href="Image-ExifTool-3.60.tar.gz">
-Download        Version 3.60</a> - Oct. 1, 2004
+<a href="Image-ExifTool-3.72.tar.gz">
+Download        Version 3.72</a> - Nov. 1, 2004
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a highly customizable Perl script that extracts meta
-information from JPG, TIFF, CRW, CR2, THM, NEF and GIF images.  ExifTool
-can read EXIF, IPTC, XMP and GeoTIFF formatted data as well as the maker
-notes of many digital cameras from various manufacturers including Canon,
-Casio, FujiFilm, Minolta, Nikon, Olympus, Pentax, Sanyo and Sigma.
+information from JPG, TIFF, GIF, CRW, THM, CR2, NEF and DNG images. 
+ExifTool can read EXIF, IPTC, XMP and GeoTIFF formatted data as well as the
+maker notes of many digital cameras from various manufacturers including
+Canon, Casio, FujiFilm, Minolta, Nikon, Olympus, Pentax, Sanyo and Sigma.
 
 
 <h2>Features</h2>
@@ -103,7 +103,7 @@ DESCRIPTION
     Prints information for specified tags from listed files.  -TAG specifies the
     name of a tag to extract, or --TAG to ignore.  FILE may be an image file
     name, a directory name, or - for the standard input. Currently recognized
-    file types are JPG, TIFF, GIF, THM, CRW, CR2 and NEF.
+    file types are JPG, TIFF, GIF, CRW, THM, CR2, NEF and DNG.
     
 OPTIONS
     -list   - list all valid tag names
@@ -131,19 +131,22 @@ OPTIONS
 </pre>
 
 The -g and -G options organize tags into different families of groups based
-on the specified family number.  Currently three families of groups are defined:
+on the specified family number.  Currently, 3 families of groups are defined:
 
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
-<tr><th>0</th>
-<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD, MakerUnknown, Minolta,
-Nikon, Olympus, Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP</td></tr>
-<tr><th>1</th>
+<tr><td><b>0 (General Location)</b></td>
 <td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, IPTC, MakerNotes, Photoshop,
 PrintIM, XMP</td></tr>
-<tr><th>2</th>
-<td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown</td></tr>
+<tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
+<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
+FujiFilm, GlobParamIFD, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD,
+MakerUnknown, Minolta, Nikon, Olympus, Pentax, Photoshop, PrintIM, Sanyo,
+Sigma, Sony, SubIFD, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-photoshop,
+XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights</td></tr>
+<tr><td><b>2&nbsp;(Category)</b></td>
+<td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
+</td></tr>
 </table></blockquote>
 
 <h2>Examples</h2>
@@ -246,6 +249,9 @@ to figure out the file formats
 <li><a href="http://www.dalibor.cz/minolta/makernote.htm">http://www.dalibor.cz/minolta/makernote.htm</a>
 <li><a href="http://www.exif.org/makernotes/SanyoMakerNote.html">http://www.exif.org/makernotes/SanyoMakerNote.html</a>
 <li><a href="http://www.x3f.info/technotes/FileDocs/MakerNoteDoc.html">http://www.x3f.info/technotes/FileDocs/MakerNoteDoc.html</a>
+<li><a href="http://search.cpan.org/~bettelli/Image-MetaData-JPEG-0.11/">http://search.cpan.org/~bettelli/Image-MetaData-JPEG-0.11/</a>
+<li><a href="http://www.adobe.com/products/dng/main.html">http://www.adobe.com/products/dng/main.html</a>
+<li><a href="http://www.awaresystems.be/imaging/tiff/tifftags.html">http://www.awaresystems.be/imaging/tiff/tifftags.html</a>
 </ul>
 
 And thanks to the following people for their help:

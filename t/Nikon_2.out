@@ -3,61 +3,61 @@
 [File, File, Image] File Type: JPG
 [File, File, Image] Image Width: 160
 [File, File, Image] Image Height: 120
-[IFD0, EXIF, Image] Image Description:           
-[IFD0, EXIF, Camera] Make: NIKON
-[IFD0, EXIF, Camera] Camera Model Name: E775
-[IFD0, EXIF, Image] Orientation: Horizontal (normal)
-[IFD0, EXIF, Image] X Resolution: 300
-[IFD0, EXIF, Image] Y Resolution: 300
-[IFD0, EXIF, Image] Resolution Unit: inches
-[IFD0, EXIF, Image] Software: E775v1.3u
-[IFD0, EXIF, Time] Date/Time Of Last Modification: 2001:08:01 12:57:23
-[IFD0, EXIF, Image] Y Cb Cr Positioning: Co-sited
-[ExifIFD, EXIF, Image] Tv(Shutter Speed): 1/213
-[ExifIFD, EXIF, Image] Av(Aperture Value): 9.4
-[ExifIFD, EXIF, Camera] Exposure Program: Program AE
-[ExifIFD, EXIF, Image] ISO Speed: 100
-[ExifIFD, EXIF, Image] Exif Version: 0210
-[ExifIFD, EXIF, Time] Shooting Date/Time: 2001:08:01 12:57:23
-[ExifIFD, EXIF, Time] Date/Time Of Digitization: 2001:08:01 12:57:23
-[ExifIFD, EXIF, Image] Components Configuration: YCbCr
-[ExifIFD, EXIF, Image] Compressed Bits Per Pixel: 3
-[ExifIFD, EXIF, Image] Exposure Compensation: 0
-[ExifIFD, EXIF, Camera] Max Aperture Value: 3.4
-[ExifIFD, EXIF, Camera] Metering Mode: Multi-segment
-[ExifIFD, EXIF, Camera] Light Source: Unknown (0)
-[ExifIFD, EXIF, Camera] Flash: No Flash
-[ExifIFD, EXIF, Camera] Focal Length: 8.6mm
-[ExifIFD, EXIF, Image] User Comment: 
-[ExifIFD, EXIF, Image] Flash Pix Version: 0100
-[ExifIFD, EXIF, Image] Color Space: sRGB
-[ExifIFD, EXIF, Image] Exif Image Width: 1600
-[ExifIFD, EXIF, Image] Exif Image Length: 1200
-[ExifIFD, EXIF, Image] File Source: Digital Camera
-[ExifIFD, EXIF, Image] Scene Type: Directly photographed
-[Nikon, MakerNotes, Camera] File System Version: 
-[Nikon, MakerNotes, Image] ISO Used: 0
-[Nikon, MakerNotes, Camera] Color Mode: COLOR
-[Nikon, MakerNotes, Camera] Quality: FINE  
-[Nikon, MakerNotes, Camera] White Balance: AUTO        
-[Nikon, MakerNotes, Camera] Sharpness: AUTO  
-[Nikon, MakerNotes, Camera] Focus Mode: AF-C  
-[Nikon, MakerNotes, Camera] Flash Setting:        
-[Nikon, MakerNotes, Camera] ISO Selection: AUTO  
-[Nikon, MakerNotes, Camera] Image Adjustment: NORMAL       
-[Nikon, MakerNotes, Camera] Auxiliary Lens: OFF         
-[Nikon, MakerNotes, Camera] Manual Focus Distance: inf
-[Nikon, MakerNotes, Camera] Digital Zoom: 1
-[Nikon, MakerNotes, Camera] AF Point: Center
-[Nikon, MakerNotes, Camera] Data Dump: (Binary data 122 bytes)
-[InteropIFD, EXIF, Image] Interoperability Index: R98
-[InteropIFD, EXIF, Image] Interoperability Version: 0100
-[IFD1, EXIF, Image] Compression: JPEG
-[IFD1, EXIF, Image] X Resolution: 300
-[IFD1, EXIF, Image] Y Resolution: 300
-[IFD1, EXIF, Image] Resolution Unit: inches
-[IFD1, EXIF, Image] Thumbnail Offset: 2036
-[IFD1, EXIF, Image] Thumbnail Length: 4475
+[EXIF, IFD0, Image] Image Description:           
+[EXIF, IFD0, Camera] Make: NIKON
+[EXIF, IFD0, Camera] Camera Model Name: E775
+[EXIF, IFD0, Image] Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] X Resolution: 300
+[EXIF, IFD0, Image] Y Resolution: 300
+[EXIF, IFD0, Image] Resolution Unit: inches
+[EXIF, IFD0, Image] Software: E775v1.3u
+[EXIF, IFD0, Time] Date/Time Of Last Modification: 2001:08:01 12:57:23
+[EXIF, IFD0, Image] Y Cb Cr Positioning: Co-sited
+[EXIF, ExifIFD, Image] Tv(Shutter Speed): 1/213
+[EXIF, ExifIFD, Image] Av(Aperture Value): 9.4
+[EXIF, ExifIFD, Camera] Exposure Program: Program AE
+[EXIF, ExifIFD, Image] ISO Speed: 100
+[EXIF, ExifIFD, Image] Exif Version: 0210
+[EXIF, ExifIFD, Time] Shooting Date/Time: 2001:08:01 12:57:23
+[EXIF, ExifIFD, Time] Date/Time Of Digitization: 2001:08:01 12:57:23
+[EXIF, ExifIFD, Image] Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] Compressed Bits Per Pixel: 3
+[EXIF, ExifIFD, Image] Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] Max Aperture Value: 3.4
+[EXIF, ExifIFD, Camera] Metering Mode: Multi-segment
+[EXIF, ExifIFD, Camera] Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] Flash: No Flash
+[EXIF, ExifIFD, Camera] Focal Length: 8.6mm
+[EXIF, ExifIFD, Image] User Comment: 
+[EXIF, ExifIFD, Image] Flashpix Version: 0100
+[EXIF, ExifIFD, Image] Color Space: sRGB
+[EXIF, ExifIFD, Image] Exif Image Width: 1600
+[EXIF, ExifIFD, Image] Exif Image Length: 1200
+[EXIF, InteropIFD, Image] Interoperability Index: R98
+[EXIF, InteropIFD, Image] Interoperability Version: 0100
+[EXIF, ExifIFD, Image] File Source: Digital Camera
+[EXIF, ExifIFD, Image] Scene Type: Directly photographed
+[EXIF, IFD1, Image] Compression: JPEG (old-style)
+[EXIF, IFD1, Image] X Resolution: 300
+[EXIF, IFD1, Image] Y Resolution: 300
+[EXIF, IFD1, Image] Resolution Unit: inches
+[EXIF, IFD1, Image] Thumbnail Offset: 2036
+[EXIF, IFD1, Image] Thumbnail Length: 4475
+[MakerNotes, Nikon, Camera] File System Version: 
+[MakerNotes, Nikon, Image] ISO Used: 0
+[MakerNotes, Nikon, Camera] Color Mode: COLOR
+[MakerNotes, Nikon, Camera] Quality: FINE  
+[MakerNotes, Nikon, Camera] White Balance: AUTO        
+[MakerNotes, Nikon, Camera] Sharpness: AUTO  
+[MakerNotes, Nikon, Camera] Focus Mode: AF-C  
+[MakerNotes, Nikon, Camera] Flash Setting:        
+[MakerNotes, Nikon, Camera] ISO Selection: AUTO  
+[MakerNotes, Nikon, Camera] Image Adjustment: NORMAL       
+[MakerNotes, Nikon, Camera] Auxiliary Lens: OFF         
+[MakerNotes, Nikon, Camera] Manual Focus Distance: inf
+[MakerNotes, Nikon, Camera] Digital Zoom: 1
+[MakerNotes, Nikon, Camera] AF Point: Center
+[MakerNotes, Nikon, Camera] Data Dump: (Binary data 122 bytes)
 [Composite, Composite, Image] Av(Aperture Value): 9.4
 [Composite, Composite, Image] Image Size: 160x120
 [Composite, Composite, Image] Tv(Shutter Speed): 1/213

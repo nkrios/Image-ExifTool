@@ -13,7 +13,7 @@ package Image::ExifTool::Sanyo;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 my %offOn = (
     0 => 'Off',
@@ -21,7 +21,7 @@ my %offOn = (
 );
 
 %Image::ExifTool::Sanyo::Main = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x00ff => 'MakerNoteOffset',
     0x0100 => 'SanyoThumbnail',
     0x0200 => 'SpecialMode',

@@ -13,14 +13,14 @@ use vars qw($VERSION);
 use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
                        GetByteOrder SetByteOrder ToggleByteOrder);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessUnknown($$$);
 
 # Unknown maker notes
 %Image::ExifTool::Unknown::Main = (
     PROCESS_PROC => \&ProcessUnknown,
-    GROUPS => { 0 => 'MakerUnknown', 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 1 => 'MakerUnknown', 2 => 'Camera' },
     
     # this seems to be a common fixture, so look for it in unknown maker notes
     0x0e00 => {

@@ -14,11 +14,11 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x1 => {
         Name => 'CanonCameraSettings',
         SubDirectory => {
@@ -125,7 +125,7 @@ $VERSION = '1.00';
 %Image::ExifTool::Canon::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 1,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     1 => {
         Name => 'MacroMode',
         PrintConv => {
@@ -321,7 +321,7 @@ $VERSION = '1.00';
 %Image::ExifTool::Canon::ShotInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 1,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     2 => {
         Name => 'ISO',
         Description => 'ISO Speed',
@@ -422,7 +422,7 @@ $VERSION = '1.00';
 %Image::ExifTool::Canon::PictureInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 1,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     2 => 'CanonImageWidth',
     3 => 'CanonImageHeight',
     4 => 'CanonImageWidthAsShot',
@@ -440,7 +440,7 @@ $VERSION = '1.00';
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FORMAT => 'ULong',
     FIRST_ENTRY => 1,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
 # the size of the preview block in 2-byte increments
 #    0 => {
 #        Name => 'PreviewImageInfoWords',
@@ -481,7 +481,7 @@ $VERSION = '1.00';
 %Image::ExifTool::Canon::Canon1DSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 1,
-    GROUPS => { 1 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     9 => 'ColorTemperature',
     10 => 'ColorMatrix',
 );

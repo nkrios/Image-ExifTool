@@ -9,7 +9,9 @@ html/history.html
 html/index.html
 html/tag_list.html
 lib/File/RandomAccess.pm
+lib/File/RandomAccess.pod
 lib/Image/ExifTool.pm
+lib/Image/ExifTool.pod
 lib/Image/ExifTool/Canon.pm
 lib/Image/ExifTool/CanonCustom.pm
 lib/Image/ExifTool/CanonRaw.pm
@@ -46,6 +48,7 @@ t/ExifTool.jpg
 t/ExifTool.t
 t/ExifTool.tif
 t/ExifTool_10.out
+t/ExifTool_17.out
 t/ExifTool_2.out
 t/ExifTool_3.out
 t/ExifTool_4.out

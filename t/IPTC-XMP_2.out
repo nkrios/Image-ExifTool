@@ -3,50 +3,50 @@
 [File, File, Image] File Type: JPG
 [File, File, Image] Image Width: 100
 [File, File, Image] Image Height: 80
-[IFD0, EXIF, Image] Image Description: A witty caption
-[IFD0, EXIF, Camera] Make: FUJIFILM
-[IFD0, EXIF, Camera] Camera Model Name: FinePix2400Zoom
-[IFD0, EXIF, Image] Orientation: Horizontal (normal)
-[IFD0, EXIF, Image] X Resolution: 72
-[IFD0, EXIF, Image] Y Resolution: 72
-[IFD0, EXIF, Image] Resolution Unit: inches
-[IFD0, EXIF, Image] Software: Adobe Photoshop 7.0
-[IFD0, EXIF, Time] Date/Time Of Last Modification: 2004:02:26 09:36:46
-[IFD0, EXIF, Author] Artist: Phil Harvey
-[IFD0, EXIF, Image] Y Cb Cr Positioning: Co-sited
-[IFD0, EXIF, Author] Copyright: Copyright 2004 Phil Harvey
-[ExifIFD, EXIF, Image] Av(Aperture Value): 3.5
-[ExifIFD, EXIF, Camera] Exposure Program: Program AE
-[ExifIFD, EXIF, Image] ISO Speed: 100
-[ExifIFD, EXIF, Image] Exif Version: 0210
-[ExifIFD, EXIF, Time] Shooting Date/Time: 2001:05:19 18:36:41
-[ExifIFD, EXIF, Time] Date/Time Of Digitization: 2001:05:19 18:36:41
-[ExifIFD, EXIF, Image] Components Configuration: YCbCr
-[ExifIFD, EXIF, Image] Compressed Bits Per Pixel: 1.6
-[ExifIFD, EXIF, Image] Shutter Speed Value: 1/64
-[ExifIFD, EXIF, Image] Aperture Value: 3.5
-[ExifIFD, EXIF, Image] Brightness Value: 2
-[ExifIFD, EXIF, Image] Exposure Compensation: 0
-[ExifIFD, EXIF, Camera] Max Aperture Value: 3.5
-[ExifIFD, EXIF, Camera] Metering Mode: Multi-segment
-[ExifIFD, EXIF, Camera] Flash: Fired
-[ExifIFD, EXIF, Camera] Focal Length: 6.0mm
-[ExifIFD, EXIF, Image] Flash Pix Version: 0100
-[ExifIFD, EXIF, Image] Color Space: sRGB
-[ExifIFD, EXIF, Image] Exif Image Width: 100
-[ExifIFD, EXIF, Image] Exif Image Length: 80
-[ExifIFD, EXIF, Image] Focal Plane X Resolution: 3053
-[ExifIFD, EXIF, Image] Focal Plane Y Resolution: 3053
-[ExifIFD, EXIF, Camera] Focal Plane Resolution Unit: cm
-[ExifIFD, EXIF, Camera] Sensing Method: One-chip color area
-[ExifIFD, EXIF, Image] File Source: Digital Camera
-[ExifIFD, EXIF, Image] Scene Type: Directly photographed
-[IFD1, EXIF, Image] Compression: JPEG
-[IFD1, EXIF, Image] X Resolution: 72
-[IFD1, EXIF, Image] Y Resolution: 72
-[IFD1, EXIF, Image] Resolution Unit: inches
-[IFD1, EXIF, Image] Thumbnail Offset: 842
-[IFD1, EXIF, Image] Thumbnail Length: 0
+[EXIF, IFD0, Image] Image Description: A witty caption
+[EXIF, IFD0, Camera] Make: FUJIFILM
+[EXIF, IFD0, Camera] Camera Model Name: FinePix2400Zoom
+[EXIF, IFD0, Image] Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] X Resolution: 72
+[EXIF, IFD0, Image] Y Resolution: 72
+[EXIF, IFD0, Image] Resolution Unit: inches
+[EXIF, IFD0, Image] Software: Adobe Photoshop 7.0
+[EXIF, IFD0, Time] Date/Time Of Last Modification: 2004:02:26 09:36:46
+[EXIF, IFD0, Author] Artist: Phil Harvey
+[EXIF, IFD0, Image] Y Cb Cr Positioning: Co-sited
+[EXIF, IFD0, Author] Copyright: Copyright 2004 Phil Harvey
+[EXIF, ExifIFD, Image] Av(Aperture Value): 3.5
+[EXIF, ExifIFD, Camera] Exposure Program: Program AE
+[EXIF, ExifIFD, Image] ISO Speed: 100
+[EXIF, ExifIFD, Image] Exif Version: 0210
+[EXIF, ExifIFD, Time] Shooting Date/Time: 2001:05:19 18:36:41
+[EXIF, ExifIFD, Time] Date/Time Of Digitization: 2001:05:19 18:36:41
+[EXIF, ExifIFD, Image] Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] Compressed Bits Per Pixel: 1.6
+[EXIF, ExifIFD, Image] Shutter Speed Value: 1/64
+[EXIF, ExifIFD, Image] Aperture Value: 3.5
+[EXIF, ExifIFD, Image] Brightness Value: 2
+[EXIF, ExifIFD, Image] Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] Max Aperture Value: 3.5
+[EXIF, ExifIFD, Camera] Metering Mode: Multi-segment
+[EXIF, ExifIFD, Camera] Flash: Fired
+[EXIF, ExifIFD, Camera] Focal Length: 6.0mm
+[EXIF, ExifIFD, Image] Flashpix Version: 0100
+[EXIF, ExifIFD, Image] Color Space: sRGB
+[EXIF, ExifIFD, Image] Exif Image Width: 100
+[EXIF, ExifIFD, Image] Exif Image Length: 80
+[EXIF, ExifIFD, Image] Focal Plane X Resolution: 3053
+[EXIF, ExifIFD, Image] Focal Plane Y Resolution: 3053
+[EXIF, ExifIFD, Camera] Focal Plane Resolution Unit: cm
+[EXIF, ExifIFD, Camera] Sensing Method: One-chip color area
+[EXIF, ExifIFD, Image] File Source: Digital Camera
+[EXIF, ExifIFD, Image] Scene Type: Directly photographed
+[EXIF, IFD1, Image] Compression: JPEG (old-style)
+[EXIF, IFD1, Image] X Resolution: 72
+[EXIF, IFD1, Image] Y Resolution: 72
+[EXIF, IFD1, Image] Resolution Unit: inches
+[EXIF, IFD1, Image] Thumbnail Offset: 842
+[EXIF, IFD1, Image] Thumbnail Length: 0
 [IPTC, IPTC, Other] Application Record Version: 2
 [IPTC, IPTC, Other] Caption-Abstract: A witty caption
 [IPTC, IPTC, Author] Writer-Editor: I wrote it
@@ -67,30 +67,30 @@
 [IPTC, IPTC, Other] Urgency: 8
 [IPTC, IPTC, Other] Keywords: ExifTool, Test, XMP
 [IPTC, IPTC, Author] Copyright Notice: Copyright 2004 Phil Harvey
-[XMP, XMP, Unknown] Caption Writer: I wrote it
-[XMP, XMP, Unknown] Headline: No headline
-[XMP, XMP, Unknown] Instructions: What instructions
-[XMP, XMP, Unknown] Authors Position: My Position
-[XMP, XMP, Unknown] Credit: My Credit
-[XMP, XMP, Unknown] Source: I&apos;m the source
-[XMP, XMP, Unknown] City: Kingston
-[XMP, XMP, Unknown] State: Ont
-[XMP, XMP, Unknown] Country: Canada
-[XMP, XMP, Unknown] Transmission Reference: What is a transmission reference?
-[XMP, XMP, Unknown] Category: 1
-[XMP, XMP, Time] Date Created: 2004:02:26
-[XMP, XMP, Unknown] Urgency: 8
-[XMP, XMP, Unknown] Supplemental Categories: amazing, image, utilities
-[XMP, XMP, Unknown] Name: My Job
-[XMP, XMP, Unknown] Job Ref: 
-[XMP, XMP, Unknown] Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
-[XMP, XMP, Unknown] Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
-[XMP, XMP, Unknown] Marked: False
-[XMP, XMP, Unknown] Description: A witty caption
-[XMP, XMP, Unknown] Creator: Phil Harvey
-[XMP, XMP, Unknown] Title: Test IPTC picture
-[XMP, XMP, Unknown] Rights: Copyright 2004 Phil Harvey
-[XMP, XMP, Unknown] Subject: ExifTool, Test, XMP
+[Photoshop, Photoshop, Author] URL: http://owl.phy.queensu.ca/~phil/exiftool/
+[XMP, XMP-photoshop, Author] Caption Writer: I wrote it
+[XMP, XMP-photoshop, Image] Headline: No headline
+[XMP, XMP-photoshop, Unknown] Instructions: What instructions
+[XMP, XMP-photoshop, Author] Authors Position: My Position
+[XMP, XMP-photoshop, Author] Credit: My Credit
+[XMP, XMP-photoshop, Author] Source: I&apos;m the source
+[XMP, XMP-photoshop, Location] City: Kingston
+[XMP, XMP-photoshop, Location] State: Ont
+[XMP, XMP-photoshop, Location] Country: Canada
+[XMP, XMP-photoshop, Image] Transmission Reference: What is a transmission reference?
+[XMP, XMP-photoshop, Image] Category: 1
+[XMP, XMP-photoshop, Time] Date Created: 2004:02:26
+[XMP, XMP-photoshop, Unknown] Urgency: 8
+[XMP, XMP-photoshop, Image] Supplemental Categories: amazing, image, utilities
+[XMP, XMP-xapBJ, Unknown] Job Ref Name: My Job
+[XMP, XMP-xapMM, Unknown] Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
+[XMP, XMP-xapRights, Author] Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
+[XMP, XMP-xapRights, Unknown] Marked: False
+[XMP, XMP-dc, Image] Description: A witty caption
+[XMP, XMP-dc, Author] Creator: Phil Harvey
+[XMP, XMP-dc, Image] Title: Test IPTC picture
+[XMP, XMP-dc, Author] Rights: Copyright 2004 Phil Harvey
+[XMP, XMP-dc, Image] Subject: ExifTool, Test, XMP
 [Composite, Composite, Image] Av(Aperture Value): 3.5
 [Composite, Composite, Image] Image Size: 100x80
 [Composite, Composite, Camera] Scale Factor To 35mm Equivalent: 103.1

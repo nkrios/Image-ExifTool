@@ -6,6 +6,12 @@
 # Revisions:    11/25/2003 - P. Harvey Created
 #               02/06/2004 - P. Harvey Moved processing functions from ExifTool
 #               03/19/2004 - P. Harvey Check PreviewImage for validity
+#
+# References:   1) http://partners.adobe.com/asn/developer/pdfs/tn/TIFF6.pdf
+#               2) http://www.adobe.com/products/dng/pdfs/dng_spec.pdf
+#               3) http://www.awaresystems.be/imaging/tiff/tifftags.html
+#               4) http://www.remotesensing.org/libtiff/TIFFTechNote2.html
+#               5) http://www.asmail.be/msg0054681802.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -15,12 +21,17 @@ use vars qw($VERSION);
 use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
                        GetByteOrder SetByteOrder ToggleByteOrder);
 
-$VERSION = '1.20';
+$VERSION = '1.23';
 
 sub ProcessExif($$$);
 
 # byte sizes for the various EXIF format types below
 my @formatSize = (0,1,1,2,4,8,1,1,2,4,8,4,8);
+
+my @formatName = ('err','UChar','String','UShort',
+                  'ULong','UShortRational','Char','Undef',
+                  'Short','Long','ShortRational','Float',
+                  'Double');
 
 # hash to look up EXIF format numbers by name
 # (lower case because string is convert to lc() before comparison)
@@ -40,9 +51,27 @@ my %formatNumber = (
     'double'        => 12,
 );
 
+# EXIF LightSource PrintConv values
+my %lightSource = (
+    1 => 'Daylight',
+    2 => 'Fluorescent',
+    3 => 'Tungsten',
+    10 => 'Flash',
+    17 => 'Standard light A',
+    18 => 'Standard light B',
+    19 => 'Standard light C',
+    20 => 'D55',
+    21 => 'D65',
+    22 => 'D75',
+    23 => 'D50',
+    24 => 'ISO Studio tungsten',
+    255 => 'Other',
+);
+
+
 # main EXIF tag table
 %Image::ExifTool::Exif::Main = (
-    GROUPS => { 0 => 'IFD0', 1 => 'EXIF', 2 => 'Image'},
+    GROUPS => { 0 => 'EXIF', 1 => 'IFD0', 2 => 'Image'},
     0x1 => {
         Name => 'InteropIndex',
         Description => 'Interoperability Index',
@@ -71,9 +100,9 @@ my %formatNumber = (
     },
     0x100 => {
         Name => 'ImageWidth',
-        # even though Group 0 is set dynamically we need to register IFD1 once
+        # even though Group 1 is set dynamically we need to register IFD1 once
         # so it will show up in the group lists
-        Groups => { 0 => 'IFD1' },
+        Groups => { 1 => 'IFD1' },
     },
     0x101 => 'ImageHeight',
     0x102 => 'BitsPerSample',
@@ -85,8 +114,27 @@ my %formatNumber = (
             3 => 'T4/Group 3 Fax',
             4 => 'T6/Group 4 Fax',
             5 => 'LZW',
-            6 => 'JPEG',
+            6 => 'JPEG (old-style)', #3
+            7 => 'JPEG', #4
+            8 => 'Adobe Deflate', #3
+            9 => 'JBIG B&W', #3
+            10 => 'JBIG Color', #3
+            32766 => 'Next', #3
+            32771 => 'CCIRLEW', #3
             32773 => 'PackBits',
+            32809 => 'Thunderscan', #3
+            32895 => 'IT8CTPAD', #3
+            32896 => 'IT8LW', #3
+            32897 => 'IT8MP', #3
+            32898 => 'IT8BL', #3
+            32908 => 'PixarFilm', #3
+            32909 => 'PixarLog', #3
+            32946 => 'Deflate', #3
+            32947 => 'DCS', #3
+            34661 => 'JBIG', #3
+            34676 => 'SGILog', #3
+            34677 => 'SGILog24', #3
+            34712 => 'JPEG 2000', #3
             34713 => 'Nikon NEF Compressed',
         },
     },
@@ -97,11 +145,16 @@ my %formatNumber = (
             1 => 'BlackIsZero',
             2 => 'RGB',
             3 => 'RGB Palette',
-            4 => 'Tansparency mask',
+            4 => 'Transparency Mask',
             5 => 'CMYK',
             6 => 'YCbCr',
             8 => 'CIELab',
-            32803 => 'Nikon NEF',
+            9 => 'ICCLab', #3
+            10 => 'ITULab', #3
+            32803 => 'Color Filter Array', #2
+            32844 => 'Pixar LogL', #3
+            32845 => 'Pixar LogLuv', #3
+            34892 => 'Linear Raw', #2
         },
     },
     0x107 => {
@@ -171,13 +224,34 @@ my %formatNumber = (
     0x11f => 'YPosition',
     0x120 => 'FreeOffsets',
     0x121 => 'FreeByteCounts',
-    0x122 => 'GrayResponseUnit',
+    0x122 => {
+        Name => 'GrayResponseUnit',
+        PrintConv => { #3
+            1 => 0.1,
+            2 => 0.001,
+            3 => 0.0001,
+            4 => 0.00001,
+            5 => 0.000001,
+        },
+    },
     0x123 => {
         Name => 'GrayResponseCurve',
         PrintConv => '\$val',
     },
-    0x124 => 'T4Options',
-    0x125 => 'T6Options',
+    0x124 => {
+        Name => 'T4Options',
+        PrintConv => q[Image::ExifTool::Exif::DecodeBits($val, {
+            0 => '2-Dimensional encoding',
+            1 => 'Uncompressed',
+            2 => 'Fill bits added',
+        } )], #3
+    },
+    0x125 => {
+        Name => 'T6Options',
+        PrintConv => q[Image::ExifTool::Exif::DecodeBits($val, {
+            1 => 'Uncompressed',
+        } )], #3
+    },
     0x128 => {
         Name => 'ResolutionUnit',
         PrintConv => {
@@ -223,18 +297,41 @@ my %formatNumber = (
     0x141 => 'HalftoneHints',
     0x142 => 'TileWidth',
     0x143 => 'TileLength',
-    0x144 => 'TileOffsets',
-    0x145 => 'TileByteCounts',
+    0x144 => {
+        Name => 'TileOffsets',
+        PrintConv => '\$val',
+    },
+    0x145 => {
+        Name => 'TileByteCounts',
+        PrintConv => '\$val',
+    },
+    0x146 => 'BadFaxLines', #3
+    0x147 => { #3
+        Name => 'CleanFaxData',
+        PrintConv => {
+            0 => 'Clean',
+            1 => 'Regenerated',
+            2 => 'Unclean',
+        },
+    },
+    0x148 => 'ConsecutiveBadFaxLines', #3
     0x14a => {
         Name => 'SubIFD',
-        Groups => { 0 => 'SubIFD' },
+        Groups => { 1 => 'SubIFD' },
         SubDirectory => {
             Start => '$dirBase + $val',
             MaxSubdirs => 2,
         },
     },
-    0x14c => 'InkSet',
-    0x14d => 'NumberofInks',
+    0x14c => {
+        Name => 'InkSet',
+        PrintConv => { #3
+            1 => 'CMYK',
+            2 => 'Not CMYK',
+        },
+    },
+    0x14d => 'InkNames', #3
+    0x14e => 'NumberofInks', #3
     0x150 => 'DotRange',
     0x151 => 'TargetPrinter',
     0x152 => 'ExtraSamples',
@@ -245,12 +342,67 @@ my %formatNumber = (
             2 => "Two's complement signed integer",
             3 => 'IEEE floating point',
             4 => 'Undefined',
+            5 => 'Complex integer', #3
+            6 => 'IEEE floating point', #3
         },
     },
     0x154 => 'SMinSampleValue',
     0x155 => 'SMaxSampleValue',
     0x156 => 'TransferRange',
+    0x157 => 'ClipPath', #3
+    0x158 => 'XClipPathUnits', #3
+    0x159 => 'YClipPathUnits', #3
+    0x15a => { #3
+        Name => 'Indexed',
+        PrintConv => { 0 => 'Not indexed', 1 => 'Indexed' },
+    },
     0x15b => 'JPEGTables',
+    0x15f => { #3
+        Name => 'OPIProxy',
+        PrintConv => {
+            0 => 'Higher resolution image does not exist',
+            1 => 'Higher resolution image exists',
+        },
+    },
+    0x190 => { #3
+        Name => 'GlobalParametersIFD',
+        Groups => { 1 => 'GlobParamIFD' },
+        SubDirectory => {
+            Start => '$dirBase + $val',
+        },
+    },
+    0x191 => { #3
+        Name => 'ProfileType',
+        PrintConv => { 0 => 'Unspecified', 1 => 'Group 3 FAX' },
+    },
+    0x192 => { #3
+        Name => 'FaxProfile',
+        PrintConv => {
+            0 => 'Unknown',
+            1 => 'Minimal B&W lossless, S',
+            2 => 'Extended B&W lossless, F',
+            3 => 'Lossless JBIG B&W, J',
+            4 => 'Lossy color and grayscale, C',
+            5 => 'Lossless color and grayscale, L',
+            6 => 'Mixed raster content, M',
+        },
+    },
+    0x193 => { #3
+        Name => 'CodingMethods',
+        PrintConv => q[Image::ExifTool::Exif::DecodeBits($val, {
+            0 => 'Unspecified compression',
+            1 => 'Modified Huffman',
+            2 => 'Modified Read',
+            3 => 'Modified MR',
+            4 => 'JBIG',
+            5 => 'Baseline JPEG',
+            6 => 'JBIG color',
+        } )],
+    },
+    0x194 => 'VersionYear', #3
+    0x195 => 'ModeNumber', #3
+    0x1b1 => 'Decode', #3
+    0x1b2 => 'DefaultImageColor', #3
     0x200 => {
         Name => 'JPEGProc',
         PrintConv => {
@@ -270,8 +422,12 @@ my %formatNumber = (
     0x212 => {
         Name => 'YCbCrSubSampling',
         PrintConv => {
-            1 => 'YCbCr4:2:2',
-            2 => 'YCbCr4:2:0',
+            '1 1' => 'YCbCr4:4:4', #PH
+            '2 1' => 'YCbCr4:2:2', #6
+            '2 2' => 'YCbCr4:2:0', #6
+            '4 1' => 'YCbCr4:1:1', #6
+            '4 2' => 'YCbCr4:1:0', #PH
+            '1 2' => 'YCbCr4:4:0', #PH
         },
     },
     0x213 => {
@@ -282,6 +438,7 @@ my %formatNumber = (
         },
     },
     0x214 => 'ReferenceBlackWhite',
+    0x22f => 'StripRowCounts',
     0x2bc => {
         Name => 'ApplicationNotes',
         # this could be an XMP block
@@ -293,6 +450,8 @@ my %formatNumber = (
     0x1000 => 'RelatedImageFileFormat',
     0x1001 => 'RelatedImageWidth',
     0x1002 => 'RelatedImageLength',
+    0x800d => 'ImageID',
+    0x80a4 => 'WangAnnotation',
     0x827d => 'Model2',
     0x828d => 'CFARepeatPatternDim',
     0x828e => 'CFAPattern2',
@@ -322,6 +481,8 @@ my %formatNumber = (
             Start => '$valuePtr',
         },
     },
+    0x8474 => 'IntergraphPacketData', #3
+    0x847f => 'IntergraphFlagRegisters', #3
     0x8480 => 'IntergraphMatrix',
     0x8482 => {
         Name => 'ModelTiePoint',
@@ -345,7 +506,7 @@ my %formatNumber = (
     },
     0x8769 => {
         Name => 'ExifOffset',
-        Groups => { 0 => 'ExifIFD' },
+        Groups => { 1 => 'ExifIFD' },
         SubDirectory => {
             Start => '$dirBase + $val',
         },
@@ -356,6 +517,7 @@ my %formatNumber = (
         # don't want to print all this because it is a big table
         PrintConv => '\$val',
     },
+    0x87ac => 'ImageLayer',
     0x87af => {
         Name => 'GeoTiffDirectory',
         Format => 'Binary',
@@ -467,21 +629,7 @@ my %formatNumber = (
     0x9208 => {
         Name => 'LightSource',
         Groups => { 2 => 'Camera' },
-        PrintConv => {
-            1 => 'Daylight',
-            2 => 'Fluorescent',
-            3 => 'Tungsten',
-            10 => 'Flash',
-            17 => 'Standard light A',
-            18 => 'Standard light B',
-            19 => 'Standard light C',
-            20 => 'D55',
-            21 => 'D65',
-            22 => 'D75',
-            23 => 'D50',
-            24 => 'ISO Studio tungsten',
-            255 => 'Other',
-        },
+        PrintConv => \%lightSource,
     },
     0x9209 => {
         Name => 'Flash',
@@ -697,6 +845,7 @@ my %formatNumber = (
         Name => 'SubSecTimeDigitized',
         Groups => { 2 => 'Time' },
     },
+    0x935c => 'ImageSourceData', #3
     0x9c9b => 'XPTitle',
     0x9c9c => 'XPComment',
     0x9c9d => {
@@ -705,7 +854,7 @@ my %formatNumber = (
     },
     0x9c9e => 'XPKeywords',
     0x9c9f => 'XPSubject',
-    0xa000 => 'FlashPixVersion',
+    0xa000 => 'FlashpixVersion',
     0xa001 => {
         Name => 'ColorSpace',
         PrintConv => {
@@ -719,7 +868,7 @@ my %formatNumber = (
     0xa004 => 'RelatedSoundFile',
     0xa005 => {
         Name => 'InteropOffset',
-        Groups => { 0 => 'InteropIFD' },
+        Groups => { 1 => 'InteropIFD' },
         Description => 'Interoperability Offset',
         SubDirectory => {
             Start => '$dirBase + $val',
@@ -776,6 +925,8 @@ my %formatNumber = (
         Name => 'FileSource',
         PrintConv => {
             3 => 'Digital Camera',
+            # handle the case where Sigma incorrectly gives this tag a count of 4
+            "\3\0\0\0" => 'Digital Camera',
         },
     },
     0xa301 => {
@@ -868,6 +1019,12 @@ my %formatNumber = (
         },
     },
     0xa420 => 'ImageUniqueID',
+    0xa480 => 'GDALMetadata', #3
+    0xa481 => 'GDALNoData', #3
+    0xc427 => 'OceScanjobDesc', #3
+    0xc428 => 'OceApplicationSelector', #3
+    0xc429 => 'OceIDNumber', #3
+    0xc42a => 'OceImageLogic', #3
     0xc4a5 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -876,6 +1033,77 @@ my %formatNumber = (
             Start => '$valuePtr',
         },
     },
+    0xc612 => 'DNGVersion', #2
+    0xc613 => 'DNGBackwardVersion', #2
+    0xc614 => 'UniqueCameraModel', #2
+    0xc615 => { #2
+        Name => 'LocalizedCameraModel',
+        Format => 'String',
+        PrintConv => 'Image::ExifTool::Printable($val)',
+    },
+    0xc616 => 'CFAPlaneColor', #2
+    0xc617 => { #2
+        Name => 'CFALayout',
+        PrintConv => {
+            1 => 'Rectangular',
+            2 => 'Even columns offset down 1/2 row',
+            3 => 'Even columns offset up 1/2 row',
+            4 => 'Even rows offset right 1/2 column',
+            5 => 'Even rows offset left 1/2 column',
+        },
+    },
+    0xc618 => { #2
+        Name => 'LinearizationTable',
+        PrintConv => '\$val',
+    },
+    0xc619 => 'BlackLevelRepeatDim', #2
+    0xc61a => 'BlackLevel', #2
+    0xc61b => 'BlackLevelDeltaH', #2
+    0xc61c => 'BlackLevelDeltaV', #2
+    0xc61d => 'WhiteLevel', #2
+    0xc61e => 'DefaultScale', #2
+    0xc61f => 'DefaultCropOrigin', #2
+    0xc620 => 'DefaultCropSize', #2
+    0xc621 => 'ColorMatrix1', #2
+    0xc622 => 'ColorMatrix2', #2
+    0xc623 => 'CameraCalibration1', #2
+    0xc624 => 'CameraCalibration2', #2
+    0xc625 => 'ReductionMatrix1', #2
+    0xc626 => 'ReductionMatrix2', #2
+    0xc627 => 'AnalogBalance', #2
+    0xc628 => 'AsShotNeutral', #2
+    0xc629 => 'AsShotWhiteXY', #2
+    0xc62a => 'BaselineExposure', #2
+    0xc62b => 'BaselineNoise', #2
+    0xc62c => 'BaselineSharpness', #2
+    0xc62d => 'BayerGreenSplit', #2
+    0xc62e => 'LinearResponseLimit', #2
+    0xc62f => 'DNGCameraSerialNumber', #2
+    0xc630 => { #2
+        Name => 'DNGLensInfo',
+        PrintConv => '$_=$val;s/(\S+) (\S+) (\S+) (\S+)/$1-$2mm f\/$3-$4/;$_',
+    },
+    0xc631 => 'ChromaBlurRadius', #2
+    0xc632 => 'AntiAliasStrength', #2
+    0xc633 => 'ShadowScale', #DNG forum at http://www.adobe.com/support/forums/main.html
+    0xc634 => 'DNGPrivateData', #2
+    0xc635 => { #2
+        Name => 'MakerNoteSafety',
+        PrintConv => {
+            0 => 'Unsafe',
+            1 => 'Safe',
+        },
+    },
+    0xc65a => { #2
+        Name => 'CalibrationIlluminant1',
+        PrintConv => \%lightSource,
+    },
+    0xc65b => { #2
+        Name => 'CalibrationIlluminant2',
+        PrintConv => \%lightSource,
+    },
+    0xc65c => 'BestQualityScale', #3 (incorrect in ref 2)
+    0xc660 => 'AliasLayerMetadata', #3
 );
 
 # the Composite tags are evaluated last, and are used
@@ -1222,6 +1450,7 @@ sub ProcessExif($$$)
     my $raf = $dirInfo->{RAF};
     my $success = 1;
     my $verbose = $exifTool->Options('Verbose');
+    my $tagKey;
 
     if ($dirInfo->{Nesting} > 4) {
         $exifTool->Warn('EXIF nesting level too deep');
@@ -1309,7 +1538,8 @@ sub ProcessExif($$$)
             }
             next;
         }
-        $verbose>2 and Image::ExifTool::HexDumpTag($tag, $valueData, $size, 'Start'=>$valuePtr);
+        $verbose>2 and Image::ExifTool::HexDumpTag($tag, $valueData, $size, 'Start'=>$valuePtr, 
+                                                   'Comment'=>"Format $format=$formatName[$format],");
 
 #..............................................................................
 # Handle SubDirectory tag types
@@ -1321,8 +1551,10 @@ sub ProcessExif($$$)
             defined $tagStr or $tagStr = sprintf("0x%x", $tag);
 
             # save the tag for debugging if specified
-            $verbose and $exifTool->FoundTag($tagInfo, $verbose>1 ? $val : '(SubDirectory)', 
-                                             $dirInfo->{IfdName});
+            if ($verbose) {
+                $tagKey = $exifTool->FoundTag($tagInfo, $verbose>1 ? $val : '(SubDirectory)');
+                $exifTool->SetTagExtra($tagKey, $dirInfo->{IfdName});
+            }
             my @values;
             if ($$subdir{MaxSubdirs}) {
                 @values = split /\s+/, $val;
@@ -1446,8 +1678,8 @@ sub ProcessExif($$$)
                     RAF      => $raf,
                 );
                 
-                # set directory IFD name from group 0 of tag information if it exists
-                $tagInfo->{Groups} and $newDirInfo{IfdName} = $tagInfo->{Groups}->{0};
+                # set directory IFD name from group name of family 1 in tag information if it exists
+                $tagInfo->{Groups} and $newDirInfo{IfdName} = $tagInfo->{Groups}->{1};
 
                 SetByteOrder($newByteOrder);        # set byte order for this subdir
                 # validate the subdirectory if necessary
@@ -1469,7 +1701,8 @@ sub ProcessExif($$$)
  #..............................................................................
 
         # save the value of this tag
-        $exifTool->FoundTag($tagInfo, $val, $dirInfo->{IfdName});
+        $tagKey = $exifTool->FoundTag($tagInfo, $val);
+        $exifTool->SetTagExtra($tagKey, $dirInfo->{IfdName});
     }
 
     # check for directory immediately following this one

@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..16\n"; }
+BEGIN { $| = 1; print "1..17\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -15,7 +15,7 @@ print "ok 1\n";
 
 ######################### End of black magic.
 
-use t::TestLib 'check';
+use t::TestLib qw(check testCompare);
 
 my $testname = 'ExifTool';
 my $testnum = 1;
@@ -56,7 +56,7 @@ my $testnum = 1;
 # test 5: test the Group option to extract EXIF info only
 {
     ++$testnum;
-    my $info = ImageInfo('t/ExifTool.jpg', {Group1 => 'EXIF'});
+    my $info = ImageInfo('t/ExifTool.jpg', {Group0 => 'EXIF'});
     print 'not ' unless check($info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -79,7 +79,7 @@ my $testnum = 1;
     $exifTool->Options(Exclude => 'ImageWidth');
     my @tagList = ( '-ImageHeight', '-Make' );
     my $info = $exifTool->ImageInfo('t/ExifTool.jpg', '-FileSize',
-                        \@tagList, {Group1 => '-MakerNotes'});
+                        \@tagList, {Group0 => '-MakerNotes'});
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -90,8 +90,8 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Duplicates => 0);  # don't allow duplicates
     $exifTool->ExtractInfo('t/ExifTool.jpg');
-    my $info1 = $exifTool->GetInfo({Group1 => 'MakerNotes'});
-    my $info2 = $exifTool->GetInfo({Group1 => 'EXIF'});
+    my $info1 = $exifTool->GetInfo({Group0 => 'MakerNotes'});
+    my $info2 = $exifTool->GetInfo({Group0 => 'EXIF'});
     my $info = $exifTool->CombineInfo($info1, $info2);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
@@ -142,18 +142,18 @@ my $testnum = 1;
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Duplicates => 0);  # don't allow duplicates
-    my $info = $exifTool->ImageInfo('t/ExifTool.jpg',{Group1=>['MakerNotes','EXIF']});
+    my $info = $exifTool->ImageInfo('t/ExifTool.jpg',{Group0=>['MakerNotes','EXIF']});
     print 'not ' unless check($exifTool, $info, $testname, $testnum, 8);
     print "ok $testnum\n";
 
     # combine information in different order
     ++$testnum;
-    $info = $exifTool->ImageInfo('t/ExifTool.jpg',{Group1=>['EXIF','MakerNotes']});
+    $info = $exifTool->ImageInfo('t/ExifTool.jpg',{Group0=>['EXIF','MakerNotes']});
     print 'not ' unless check($exifTool, $info, $testname, $testnum, 9);
     print "ok $testnum\n";
 }
 
-# test 15/16: test GetGroups()
+# test 15/16/17: test GetGroups()
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -168,12 +168,32 @@ my $testnum = 1;
     print "ok $testnum\n";
     
     ++$testnum;
-    my $info = $exifTool->GetInfo({Group1 => 'EXIF'});
-    @groups = $exifTool->GetGroups($info,1);
+    my $info = $exifTool->GetInfo({Group0 => 'EXIF'});
+    @groups = $exifTool->GetGroups($info,0);
     print 'not ' unless @groups==1 and $groups[0] eq 'EXIF';
     print "ok $testnum\n";
+
+    ++$testnum;
+    my $testfile = "t/ExifTool_$testnum";
+    open(OUT,">$testfile.failed");
+    my $oldSep = $/;   
+    $/ = "\x0a";        # set input line separator
+    $exifTool->ExtractInfo('t/ExifTool.jpg');
+    my $family = 1;
+    @groups = $exifTool->GetGroups($family);
+    my $group;
+    foreach $group (@groups) {
+        next if $group eq 'ExifTool';
+        print OUT "---- $group ----\n";
+        my $info = $exifTool->GetInfo({"Group$family" => $group});
+        foreach (sort $exifTool->GetTagList($info)) {
+            print OUT "$_ : $$info{$_}\n";
+        } 
+    }
+    $/ = $oldSep;       # restore input line separator
+    close(OUT);
+    print 'not ' unless testCompare("$testfile.out","$testfile.failed");
+    print "ok $testnum\n";
 }
-
-
 
 # end
