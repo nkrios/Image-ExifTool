@@ -3,10 +3,10 @@
 #
 # Description:  Definitions for Olympus/Epson EXIF Maker Notes
 #
-# References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
-#
 # Revisions:    12/09/2003 - P. Harvey Created
 #               11/11/2004 - P. Harvey Added Epson support
+#
+# References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;

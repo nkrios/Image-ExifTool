@@ -47,7 +47,7 @@ SequenceNumber : 0
 SerialNumber : 0560018150
 Sharpness : +1
 ShortFocal : 18
-WhiteBalance : Auto
+WhiteBalance (1) : Auto
 ZoomedResolution : 3072
 ZoomedResolutionBase : 3072
 ---- Composite ----
@@ -81,8 +81,8 @@ Flash : No Flash
 FlashpixVersion : 0100
 FocalLength : 34.0mm
 FocalPlaneResolutionUnit : inches
-FocalPlaneXResolution : 3444
-FocalPlaneYResolution : 3442
+FocalPlaneXResolution : 3443.95
+FocalPlaneYResolution : 3442.02
 ISO (1) : 100
 MaxApertureValue : 4.5
 MeteringMode (1) : Average
@@ -90,6 +90,7 @@ SceneCaptureType : Standard
 SensingMethod : One-chip color area
 ShutterSpeedValue : 0
 UserComment : 
+WhiteBalance : Auto
 ---- File ----
 FileName : ExifTool.jpg
 FileSize : 4KB

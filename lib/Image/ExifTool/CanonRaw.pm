@@ -7,6 +7,8 @@
 #               12/02/2003 - P. Harvey Completely reworked and figured out many
 #                            more tags
 #               01/19/2004 - P. Harvey Added CleanRaw()
+#
+# References:   1) http://www.cybercom.net/~dcoffin/dcraw/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonRaw;
@@ -15,7 +17,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(SetByteOrder Get16u Get32u);
 
-$VERSION = '1.01';
+$VERSION = '1.06';
 
 sub ProcessCanonRaw($$$);
 
@@ -132,17 +134,17 @@ sub ProcessCanonRaw($$$);
 # Canon binary data blocks
 %Image::ExifTool::CanonRaw::MakeModel = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'String',
+    FORMAT => 'string',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # (can't specify a first entry because this isn't
     # a simple binary table with fixed offsets)
     0 => {
         Name => 'Make',
-        Format => 'String[5]',
+        Format => 'string[5]',
     },
     6 => {
         Name => 'Model',
-        Format => 'String[32]',
+        Format => 'string[$size-6]',
         Description => 'Camera Model Name',
         ValueConv => '$_=$val,s/\0.*/\0/,$_',     # remove junk at end of string
     },
@@ -150,11 +152,11 @@ sub ProcessCanonRaw($$$);
 
 %Image::ExifTool::CanonRaw::DateData = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int32u',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Time' },
     0 => {
         Name => 'DateTimeOriginal',
-        Format => 'ULong',
         Description => 'Shooting Date/Time',
         ValueConv => 'Image::ExifTool::CanonRaw::ConvertBinaryDate($val)',
         PrintConv => '$self->ConvertDateTime($val)',
@@ -163,7 +165,7 @@ sub ProcessCanonRaw($$$);
 
 %Image::ExifTool::CanonRaw::ImageSize = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'Short',
+    FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     1 => 'ImageWidth',
@@ -172,6 +174,7 @@ sub ProcessCanonRaw($$$);
 
 %Image::ExifTool::CanonRaw::Rotation = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     6 => 'Rotation',
@@ -180,7 +183,7 @@ sub ProcessCanonRaw($$$);
 # these values are potentially useful to users of dcraw...
 %Image::ExifTool::CanonRaw::WhiteBalance = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'ShortRational',
+    FORMAT => 'rational16s',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
@@ -302,15 +305,15 @@ sub _doCleanRaw($$$$$$)
     read(RAW,$buff,4)   or return 1;    # get pointer to start of first block
     read(RAW,$sig,8)    or return 1;    # get file signature
     $sig eq "HEAPCCDR"  or return 3;    # validate signature
-    my $blockStart = Get32u(\$buff);
+    my $blockStart = Get32u(\$buff,0);
     seek(RAW, 0, 2)     or return 4;    # seek to end of file
     my $blockEnd = tell(RAW)  or return 5;  # get file size (end of main block)
     seek(RAW, $blockEnd-4, 0) or return 4;
     read(RAW, $buff, 4) or return 1;    # get offset to directory start
-    my $dirStart = Get32u(\$buff) + $blockStart;
+    my $dirStart = Get32u(\$buff,0) + $blockStart;
     seek(RAW, $dirStart, 0) or return 4;
     read(RAW, $buff, 2) or return 1;
-    my $dirEntries = Get16u(\$buff);    # number of directory entries
+    my $dirEntries = Get16u(\$buff,0);  # number of directory entries
     read(RAW, $mainDir, $dirEntries * 10) or return 1;    # read entire directory
     my $i;
     for ($i=0; $i<$dirEntries; ++$i) {
@@ -462,7 +465,7 @@ sub ProcessCanonRaw($$$)
     for ($pt=0; $pt<$dirLen; $pt+=10) {
         my $tag = Get16u(\$buff, $pt);
         my $size = Get32u(\$buff, $pt+2);
-        my $ptrVal = Get32u(\$buff,$pt+6);
+        my $ptrVal = Get32u(\$buff, $pt+6);
         my $ptr = $ptrVal + $blockStart;        # all pointers relative to block start
         my $value;
         my $dumpHex;
@@ -472,16 +475,15 @@ sub ProcessCanonRaw($$$)
         my $tagType = $tag >> 8;    # tags are grouped in types by value of upper byte
         if ($tagType==0x28 or $tagType==0x30) {
             # this type of tag specifies a raw subdirectory
-            my %newDirInfo = (
+            my %subdirInfo = (
                 DataLen  => 0,
                 DirStart => $ptr,
                 DirLen   => $size,
-                DirBase  => 0,
                 Nesting  => $dirInfo->{Nesting} + 1,
                 RAF      => $raf,
             );
             $verbose and printf("........ Start 0x%x ........\n",$tag);
-            ProcessCanonRaw($exifTool, $rawTagTable, \%newDirInfo);
+            ProcessCanonRaw($exifTool, $rawTagTable, \%subdirInfo);
             $verbose and printf("........ End 0x%x ........\n",$tag);
             next;
         } elsif ($tagType==0x48 or $tagType==0x50 or $tagType==0x58) {
@@ -538,22 +540,23 @@ sub ProcessCanonRaw($$$)
                 next;
             }
             my $subdirStart = 0;
+            #### eval Start ()
             $subdirStart = eval $$subdir{Start} if $$subdir{Start};
             my $dirData = \$value;
-            my %newDirInfo = (
+            my %subdirInfo = (
                 DataPt   => $dirData,
                 DataLen  => $size,
                 DirStart => $subdirStart,
                 DirLen   => $size - $subdirStart,
-                DirBase  => 0,
                 Nesting  => $dirInfo->{Nesting} + 1,
                 RAF      => $raf,
             );
+            #### eval Validate ($dirData, $subdirStart, $size)
             if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
                 $exifTool->Warn("Invalid $name data");
             } else {
                 $verbose and print "........ Start $name ........\n";
-                $exifTool->ProcessTagTable($newTagTable, \%newDirInfo);
+                $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
                 $verbose and print "........ End $name ........\n";
             }
         } else {
@@ -590,7 +593,6 @@ sub RawInfo($$)
         DataLen  => 0,
         DirStart => $hlen,
         DirLen   => $filesize - $hlen,
-        DirBase  => 0,
         Nesting  => 0,
         RAF      => $raf,
     );
@@ -631,6 +633,8 @@ it under the same terms as Perl itself.
 =head1 REFERENCES
 
 =over 4
+
+=item http://www.cybercom.net/~dcoffin/dcraw/
 
 =item Lots of testing with my own camera... ;)
 

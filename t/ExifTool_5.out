@@ -17,8 +17,8 @@ Flash: No Flash
 FlashpixVersion: 0100
 FocalLength: 34.0mm
 FocalPlaneResolutionUnit: inches
-FocalPlaneXResolution: 3444
-FocalPlaneYResolution: 3442
+FocalPlaneXResolution: 3443.95
+FocalPlaneYResolution: 3442.02
 ISO (1): 100
 InteropIndex: THM
 InteropVersion: 0100
@@ -35,6 +35,7 @@ SceneCaptureType: Standard
 SensingMethod: One-chip color area
 ShutterSpeedValue: 0
 UserComment: 
+WhiteBalance: Auto
 XResolution: 180
 YCbCrPositioning: Centered
 YResolution: 180

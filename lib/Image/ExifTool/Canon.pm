@@ -7,6 +7,8 @@
 #               12/03/03 - P. Harvey Figured out lots more tags and added
 #                            CanonPictureInfo
 #               02/17/04 - M. Rommel Added IxusAFPoint
+#
+# References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -14,7 +16,7 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
@@ -95,8 +97,10 @@ $VERSION = '1.01';
         Name => 'CanonPictureInfo',
         SubDirectory => {
             Start => '$valuePtr',
-            # the first word seems to be always 7, not the size as in other blocks
-            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,7)',
+            # the first word seems to be always 7, not the size as in other blocks,
+            # I've also seen 53 in a 1DMkII raw file.  odd.  (also accept $size in
+            # case Canon ever decides to standardize this block)
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,7,53,$size)',
             TagTable => 'Image::ExifTool::Canon::PictureInfo',
         },
     },
@@ -121,9 +125,10 @@ $VERSION = '1.01';
 );
 
 # Canon camera settings (EXIF tag 0x01)
-# BinaryData (keys are indices into the Short array)
+# BinaryData (keys are indices into the int16s array)
 %Image::ExifTool::Canon::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     1 => {
@@ -317,9 +322,10 @@ $VERSION = '1.01';
 );
 
 # Canon shot information (EXIF tag 0x04)
-# BinaryData (keys are indices into the Short array)
+# BinaryData (keys are indices into the int16s array)
 %Image::ExifTool::Canon::ShotInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     2 => {
@@ -409,7 +415,7 @@ $VERSION = '1.01';
     },
     24 => {
         Name => 'BulbDuration',
-        Format => 'Long',
+        Format => 'int32s',
         ValueConv => '$val / 10',
     },
     29 => {
@@ -421,6 +427,7 @@ $VERSION = '1.01';
 # picture information (EXIF tag 0x12)
 %Image::ExifTool::Canon::PictureInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     2 => 'CanonImageWidth',
@@ -438,7 +445,7 @@ $VERSION = '1.01';
 # through this information - decoded by PH 12/14/03
 %Image::ExifTool::Canon::PreviewImageInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'ULong',
+    FORMAT => 'int32u',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
 # the size of the preview block in 2-byte increments
@@ -458,12 +465,12 @@ $VERSION = '1.01';
     },
     6 => {
         Name => 'PreviewFocalPlaneXResolution',
-        Format => 'LongRational',
+        Format => 'rational32s',
         PrintConv => 'sprintf("%.1f",$val)'
     },
     8 => {
         Name => 'PreviewFocalPlaneYResolution',
-        Format => 'LongRational',
+        Format => 'rational32s',
         PrintConv => 'sprintf("%.1f",$val)'
     },
 # the following 2 values look like they are really 4 shorts
@@ -480,6 +487,7 @@ $VERSION = '1.01';
 
 %Image::ExifTool::Canon::Canon1DSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     9 => 'ColorTemperature',
@@ -596,14 +604,18 @@ $VERSION = '1.01';
 
 #------------------------------------------------------------------------------
 # Validate first word of Canon binary data
-# Inputs: 0) data pointer, 1) offset, 2) value
+# Inputs: 0) data pointer, 1) offset, 2-N) list of valid values
 # Returns: true if data value is the same
-sub Validate($$$)
+sub Validate($$@)
 {
-    my ($dataPt, $offset, $val) = @_;
+    my ($dataPt, $offset, @vals) = @_;
     # the first 16-bit value is the length of the data in bytes
     my $dataVal = Image::ExifTool::Get16u($dataPt, $offset);
-    return $val == $dataVal;
+    my $val;
+    foreach $val (@vals) {
+        return 1 if $val == $dataVal;
+    }
+    return undef;
 }
 
 #------------------------------------------------------------------------------

@@ -4,14 +4,6 @@
 # Description:  Definitions for Sony EXIF Maker Notes
 #
 # Revisions:    04/06/2004  - P. Harvey Created
-#
-# Notes:        The Sony maker notes use the standard EXIF IFD structure, but
-#               the entries are large blocks of binary data for which I can
-#               find no documentation.  The only one I recognize is the PrintIM
-#               block.  To figure them out will require someone with a Sony
-#               camera who is willing to systematically change all the settings
-#               and determine where they are stored in these blocks.  You can
-#               use "exiftool -v -v -v" to dump these blocks in hex.
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Sony;
@@ -50,14 +42,17 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to
-interpret Sony maker notes EXIF meta information. The Sony maker notes
-use the standard EXIF IFD structure, but unfortunately the entries are
-large blocks of binary data for which I can find no documentation.  The
-only one I recognize is the PrintIM block.  To figure them out will
-require someone with a Sony camera who is willing to systematically
-change all the settings and determine where they are stored in these
-blocks.  You can use "exiftool -v -v -v" to dump these blocks in hex. 
-Please send me any information you may collect about the format of the
+interpret Sony maker notes EXIF meta information. 
+
+=head1 NOTES
+
+The Sony maker notes use the standard EXIF IFD structure, but unfortunately
+the entries are large blocks of binary data for which I can find no
+documentation.  The only one I recognize is the PrintIM block.  To figure
+them out will require someone with a Sony camera who is willing to
+systematically change all the settings and determine where they are stored
+in these blocks.  You can use "exiftool -v -v -v" to dump these blocks in
+hex. Please send me any information you may collect about the format of the
 Sony maker notes.
 
 =head1 AUTHOR

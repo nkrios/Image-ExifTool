@@ -1,22 +1,21 @@
 <html>
 <head>
   <title>ExifTool</title>
-  <meta name="KeyWords" content="ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, CRW, CR2, NEF, DNG, Canon, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters">
+  <meta name="KeyWords" content="ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, CRW, CR2, MRW, NEF, DNG, Canon, maker notes, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters">
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
 <h3>
-<a href="Image-ExifTool-3.82.tar.gz">
-Download        Version 3.82</a> - Nov. 11, 2004
+<a href="Image-ExifTool-3.93.tar.gz">
+Download        Version 3.93</a> - Nov. 24, 2004
 (<a href="history.html">Version History</a>)</h3>
 
-<p>ExifTool is a highly customizable Perl script that extracts meta
-information from JPG, TIFF, GIF, CRW, THM, CR2, NEF and DNG images. 
-ExifTool can read EXIF, IPTC, XMP and GeoTIFF formatted data as well as the
-maker notes of many digital cameras from various manufacturers including
-Canon, Casio, FujiFilm, Minolta, Nikon, Olympus/Epson, Pansonic/Leica,
-Pentax/Asahi, Sanyo and Sigma/Foveon.
-
+<p>ExifTool is a highly customizable Perl script that extracts EXIF, IPTC,
+XMP, GPS, GeoTIFF, ICC Profile and Photoshop IRB meta information from JPG,
+TIFF, GIF, CRW, THM, CR2, MRW, NEF and DNG images.  ExifTool also extracts
+information from the maker notes of many digital cameras by various
+manufacturers including Canon, Casio, FujiFilm, Minolta/Konica-Minolta,
+Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Sanyo and Sigma/Foveon.
 
 <h2>Features</h2>
 <ul>
@@ -26,8 +25,7 @@ Pentax/Asahi, Sanyo and Sigma/Foveon.
 <li>option to create text output file for each image file
 <li>reads maker notes for many digital cameras
 <li>easy to add support for new camera types by editing ExifTool modules
-<li>reads EXIF, IPTC, XMP and GeoTIFF record formats
-<li>extracts GPS information
+<li>reads EXIF, IPTC, XMP, GPS and GeoTIFF record formats
 <li>extracts thumbnail images
 <li>extracts JPG image from Canon CRW files
 <li>extracts 1536x1024 preview image from Canon 300D JPG files
@@ -40,9 +38,9 @@ Run 'exiftool' with no arguments to get a description and list
 of available options.
 
 <p>Currently, ExifTool supports Asahi, Canon, Casio, Epson, Foveon,
-FujiFilm, Leica, Minolta, Nikon, Olympus, Panasonic, Pentax, Sanyo and
-Sigma maker notes, but support for new types can easily be added by
-editing the ExifTool modules.
+FujiFilm, Konica-Minolta, Leica, Minolta, Nikon, Olympus, Panasonic, Pentax,
+Sanyo and Sigma maker notes, but support for new types can easily be added
+by editing the ExifTool modules.
 
 <p>The ExifTool support modules are very readable.  The format for these
 files is documented in Image/ExifTool/README.
@@ -50,8 +48,8 @@ files is documented in Image/ExifTool/README.
 <p>If you make any useful new additions, e-mail me the 
 file so I can add the functionality to the distributed version.
 
-<p>And do drop me a note if you find ExifTool useful.  My e-mail
-address is in the README file.  Thanks.
+<p>Drop me a note if you find ExifTool useful.  My e-mail address is
+in the README file.  Thanks.
 
 <h2>Example Output</h2>
 
@@ -105,14 +103,16 @@ DESCRIPTION
     Prints information for specified tags from listed files.  -TAG specifies the
     name of a tag to extract, or --TAG to ignore.  FILE may be an image file
     name, a directory name, or - for the standard input. Currently recognized
-    file types are JPG, TIFF, GIF, CRW, THM, CR2, NEF and DNG.
+    file types are JPG, TIFF, GIF, CRW, THM, CR2, MRW, NEF and DNG.
     
 OPTIONS
     -list   - list all valid tag names
+    -group# - list all tag groups for family #
     -ver    - print version number and exit
     -a      - allow duplicate tag values (otherwise only last value displayed)
     -b      - output requested data in binary format
     -d FMT  - set date/time format (consult strftime manpage for FMT syntax)
+    -D|H    - show tag ID number in Decimal or Hexadecimal
     -e      - print existing tags only -- don't calculate composite tags
     -f      - force printing of tags even if their values are not found
     -g[#]   - organize output by tag group (-g0 assumed if # not specified)
@@ -125,11 +125,12 @@ OPTIONS
     -p FILE - print in format specified by file (ignores other format options)
     -r      - recursively scan subdirectories (only useful if "file" is a dir)
     -s      - short format (add up to 3 -s options for even shorter formats)
-    -S      - same as two -s options
+    -S      - print tag names instead of descriptions (same as two -s options)
     -t      - output tab-delimited list of description/values (database import)
     -u      - extract values of unknown tags (2 to extract from data blocks)
-    -U      - same as two -u options (also extract unknown from data blocks)
+    -U      - also extract unknown from data blocks (same as two -u options)
     -v      - verbose messages (add up to 3 -v options for more verbose)
+    -x TAG  - exclude specified tag (may be many -x options) 
 </pre>
 
 The -g and -G options organize tags into different families of groups based
@@ -138,15 +139,15 @@ on the specified family number.  Currently, 3 families of groups are defined:
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, IPTC, MakerNotes, Photoshop,
-PrintIM, XMP</td></tr>
+<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile,
+IPTC, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
 <tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
-<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GlobParamIFD, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD,
-MakerUnknown, Minolta, Nikon, Olympus, Panasonic, Pentax, Photoshop,
-PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM,
-XMP-xmpRights</td></tr>
+<td>Canon CanonCustom CanonRaw Casio Composite ExifIFD ExifTool File FujiFilm
+GPS GeoTiff GlobParamIFD ICC-header ICC-meas ICC-view ICC_Profile IFD0 IFD1
+IPTC InteropIFD MakerUnknown Minolta Nikon Olympus Panasonic Pentax
+Photoshop PrintIM Sanyo Sigma Sony SubIFD XMP XMP-aux XMP-crs XMP-dc
+XMP-exif XMP-photoshop XMP-tiff XMP-xmp XMP-xmpBJ XMP-xmpMM XMP-xmpRights
+</td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
 </td></tr>
@@ -270,6 +271,7 @@ And thanks to the following people for their help:
 <li>Joseph Heled for help figuring out some of the Nikon D70 maker notes
 <li>Joachim Loehr for adding the Casio type 2 maker notes
 <li>Greg Troxel for his suggestions and for adding ExifTool to pkgsrc-wip
+<li>Jay Al-Saadi for his discoveries with the Minolta white balance tag
 </ul>
 
 <hr>

@@ -4,6 +4,8 @@
 # Description:  Definitions for Canon Custom functions
 #
 # Revisions:    11/25/2003  - P. Harvey Created
+#
+# References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonCustom;

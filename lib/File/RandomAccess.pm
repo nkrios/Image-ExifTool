@@ -5,6 +5,7 @@
 #
 # Revisions:    02/11/04 - P. Harvey Created
 #               02/20/04 - P. Harvey Added flag to disable SeekTest in new()
+#               11/18/04 - P. Harved Fixed bug with seek relative to end of file
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.
@@ -25,7 +26,7 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.00';
+$VERSION = '1.01';
 @ISA = qw(Exporter);
 
 # constants
@@ -99,6 +100,7 @@ sub Tell($)
     } else {
         $rtnVal = tell($self->{FILE_PT});
     }
+    return $rtnVal;
 }
 
 #------------------------------------------------------------------------------
@@ -114,15 +116,20 @@ sub Seek($$$)
     my ($self, $num, $whence) = @_;
     my $rtnVal;
     if ($self->{TESTED} < 0) {
+        $rtnVal = 1;
         if ($whence == 0) {
             $self->{POS} = $num;
         } elsif ($whence == 1) {
             $self->{POS} += $num;
         } else {
-            $self->Slurp();                 # read whole file into buffer
-            $self->{POS} = $self->{LEN};    # position at end of file
+            $self->Slurp();     # read whole file into buffer
+            if ($self->{LEN} >= $num) {
+                # position relative to end of file
+                $self->{POS} = $self->{LEN} - $num;
+            } else {
+                $rtnVal = 0;    # seek error
+            }
         }
-        $rtnVal = 1;
     } else {
         $rtnVal = seek($self->{FILE_PT}, $num, $whence);
     }

@@ -3,10 +3,10 @@
 #
 # Description:  Definitions for IPTC information
 #
-# References:   http://brilliantlabs.com/docs/IIMV4.1.pdf
-#
 # Revisions:    Jan. 08/03 - P. Harvey Created
 #               Feb. 05/04 - P. Harvey Added support for records other than 2
+#
+# References:   http://brilliantlabs.com/docs/IIMV4.1.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::IPTC;
@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessIPTC($$$);
 
@@ -67,7 +67,7 @@ sub ProcessIPTC($$$);
     GROUPS => { 2 => 'Other' },
     0   => {
         Name => 'EnvelopeRecordVersion',
-        Format => 'Binary',
+        Format => 'binary',
     },
     5   => {
         Name => 'Destination',
@@ -76,7 +76,7 @@ sub ProcessIPTC($$$);
     20  => {
         Name => 'FileFormat',
         Groups => { 2 => 'Image' },
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             0 => 'No ObjectData',
             1 => 'IPTC-NAA Digital Newsphoto Parameter Record',
@@ -113,7 +113,7 @@ sub ProcessIPTC($$$);
     22  => {
         Name => 'FileVersion',
         Groups => { 2 => 'Image' },
-        Format => 'Binary',
+        Format => 'binary',
     },
     30  => 'ServiceIdentifier',
     40  => 'EnvelopeNumber',
@@ -133,11 +133,11 @@ sub ProcessIPTC($$$);
     100 => 'UniqueObjectName',
     120 => {
         Name => 'ARMIdentifier',
-        Format => 'Binary',
+        Format => 'binary',
     },
     122 => {
         Name => 'ARMVersion',
-        Format => 'Binary',
+        Format => 'binary',
     },
 );
 
@@ -146,7 +146,7 @@ sub ProcessIPTC($$$);
     GROUPS => { 2 => 'Other' },
     0   => {
         Name => 'ApplicationRecordVersion',
-        Format => 'Binary',
+        Format => 'binary',
     },
     3   => 'ObjectTypeReference',
     4   => 'ObjectAttributeReference',
@@ -304,12 +304,12 @@ sub ProcessIPTC($$$);
     200 => {
         Name => 'ObjectPreviewFileFormat',
         Groups => { 2 => 'Image' },
-        Format => 'Binary',
+        Format => 'binary',
     },
     201 => {
         Name => 'ObjectPreviewFileVersion',
         Groups => { 2 => 'Image' },
-        Format => 'Binary',
+        Format => 'binary',
     },
     202 => {
         Name => 'ObjectPreviewData',
@@ -321,13 +321,13 @@ sub ProcessIPTC($$$);
 # Record 3 -- News photo
 # Note: I can't locate the reference for this record, so I'm not
 # sure I've got the format correct.  Specifically, I'm not sure which of
-# these fields are Binary and which are ASCII data.  This isn't a huge
+# these fields are binary and which are ASCII data.  This isn't a huge
 # loss though, because this record isn't very popular. - PH
 %Image::ExifTool::IPTC::NewsPhoto = (
     GROUPS => { 2 => 'Image' },
     0   => {
         Name => 'NewsPhotoVersion',
-        Format => 'Binary',
+        Format => 'binary',
     },
     10  => 'IPTCPictureNumber',
     20  => 'IPTCImageWidth',
@@ -336,7 +336,7 @@ sub ProcessIPTC($$$);
     50  => 'IPTCPixelHeight',
     55  => {
         Name => 'SupplementalType',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             0 => 'Main Image',
             1 => 'Reduced Resolution Image',
@@ -347,7 +347,7 @@ sub ProcessIPTC($$$);
     60  => 'ColorRepresentation',
     64  => {
         Name => 'InterchangeColorSpace',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             1 => 'X,Y,Z CIE',
             2 => 'RGB SMPTE',
@@ -364,7 +364,7 @@ sub ProcessIPTC($$$);
     86  => 'IPTCBitsPerSample',
     90  => {
         Name => 'SampleStructure',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             0 => 'OrthogonalConstangSampling',
             1 => 'Orthogonal4-2-2Sampling',
@@ -373,7 +373,7 @@ sub ProcessIPTC($$$);
     },
     100 => {
         Name => 'ScanningDirection',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             0 => 'L-R, Top-Bottom',
             1 => 'R-L, Top-Bottom',
@@ -387,7 +387,7 @@ sub ProcessIPTC($$$);
     },
     102 => {
         Name => 'IPTCImageRotation',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             0 => 0,
             1 => 90,
@@ -398,7 +398,7 @@ sub ProcessIPTC($$$);
     110 => 'DataCompressionMethod',
     120 => {
         Name => 'QuantizationMethod',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             0 => 'Linear Reflectance/Transmittance',
             1 => 'Linear Density',
@@ -413,7 +413,7 @@ sub ProcessIPTC($$$);
     125 => 'EndPoints',
     130 => {
         Name => 'ExcursionTolerance',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             0 => 'Not Allowed',
             1 => 'Allowed',
@@ -426,7 +426,7 @@ sub ProcessIPTC($$$);
 %Image::ExifTool::IPTC::PreObjectData = (
     10  => {
         Name => 'SizeMode',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => {
             0 => 'Size Not Known',
             1 => 'Size Known',
@@ -434,15 +434,15 @@ sub ProcessIPTC($$$);
     },
     20  => {
         Name => 'MaxSubfileSize',
-        Format => 'Binary',
+        Format => 'binary',
     },
     90  => {
         Name => 'ObjectSizeAnnounced',
-        Format => 'Binary',
+        Format => 'binary',
     },
     95  => {
         Name => 'MaximumObjectSize',
-        Format => 'Binary',
+        Format => 'binary',
     },
 );
 
@@ -458,7 +458,7 @@ sub ProcessIPTC($$$);
 %Image::ExifTool::IPTC::PostObjectData = (
     10  => {
         Name => 'ConfirmedObjectSize',
-        Format => 'Binary',
+        Format => 'binary',
     },
 );
 
@@ -551,7 +551,7 @@ sub ProcessIPTC($$$)
         my $tagInfo = $exifTool->GetTagInfo($recordPtr, $tag);
         if ($tagInfo) {
             if (ref $tagInfo eq 'HASH' and $tagInfo->{Format}) {
-                if (lc($tagInfo->{Format}) eq 'binary') {
+                if ($tagInfo->{Format} eq 'binary') {
                     $val = 0;
                     my $i;
                     for ($i=0; $i<$len; ++$i) {

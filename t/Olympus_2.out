@@ -1,58 +1,58 @@
-[File, File, Image] File Name: Olympus.jpg
-[File, File, Image] File Size: 8KB
-[File, File, Image] File Type: JPG
-[File, File, Image] Image Width: 160
-[File, File, Image] Image Height: 120
-[EXIF, IFD0, Image] Image Description: OLYMPUS DIGITAL CAMERA         
-[EXIF, IFD0, Camera] Make: OLYMPUS OPTICAL CO.,LTD
-[EXIF, IFD0, Camera] Camera Model Name: C2000Z
-[EXIF, IFD0, Image] Orientation: Horizontal (normal)
-[EXIF, IFD0, Image] X Resolution: 72
-[EXIF, IFD0, Image] Y Resolution: 72
-[EXIF, IFD0, Image] Resolution Unit: inches
-[EXIF, IFD0, Image] Software: v951p-80
-[EXIF, IFD0, Time] Date/Time Of Last Modification: 1999:12:06 16:38:40
-[EXIF, IFD0, Image] Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] Tv(Shutter Speed): 1/30
-[EXIF, ExifIFD, Image] Av(Aperture Value): 2.0
-[EXIF, ExifIFD, Camera] Exposure Program: Program AE
-[EXIF, ExifIFD, Image] ISO Speed: 100
-[EXIF, ExifIFD, Image] Exif Version: 0210
-[EXIF, ExifIFD, Time] Shooting Date/Time: 1999:12:06 16:38:40
-[EXIF, ExifIFD, Time] Date/Time Of Digitization: 1999:12:06 16:38:40
-[EXIF, ExifIFD, Image] Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] Compressed Bits Per Pixel: 1
-[EXIF, ExifIFD, Image] Exposure Compensation: 0
-[EXIF, ExifIFD, Camera] Max Aperture Value: 2.8
-[EXIF, ExifIFD, Camera] Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] Light Source: Unknown (0)
-[EXIF, ExifIFD, Camera] Flash: Fired
-[EXIF, ExifIFD, Camera] Focal Length: 7.0mm
-[EXIF, ExifIFD, Image] User Comment: 
-[EXIF, ExifIFD, Image] Flashpix Version: 0100
-[EXIF, ExifIFD, Image] Color Space: sRGB
-[EXIF, ExifIFD, Image] Exif Image Width: 640
-[EXIF, ExifIFD, Image] Exif Image Length: 480
-[EXIF, InteropIFD, Image] Interoperability Index: R98
-[EXIF, InteropIFD, Image] Interoperability Version: 0100
-[EXIF, ExifIFD, Image] File Source: Digital Camera
-[EXIF, ExifIFD, Image] Scene Type: Directly photographed
-[EXIF, IFD1, Image] Compression: JPEG (old-style)
-[EXIF, IFD1, Image] X Resolution: 72
-[EXIF, IFD1, Image] Y Resolution: 72
-[EXIF, IFD1, Image] Resolution Unit: inches
-[EXIF, IFD1, Image] Thumbnail Offset: 2036
-[EXIF, IFD1, Image] Thumbnail Length: 3230
-[MakerNotes, Olympus, Camera] Special Mode: 0 0 0
-[MakerNotes, Olympus, Camera] Image Quality: HQ
-[MakerNotes, Olympus, Camera] Macro: Off
-[MakerNotes, Olympus, Camera] Digital Zoom: 0
-[MakerNotes, Olympus, Camera] Software Release: SR951
-[MakerNotes, Olympus, Camera] Pict Info: [pictureInfo] Resolution=1 [Camera Info] Type=SR951
-[MakerNotes, Olympus, Camera] Camera ID: OLYMPUS DIGITAL CAMERA
-[MakerNotes, Olympus, Camera] Data Dump: 0 0 16777216 0 61817 768 61817 29184 2990272889 27904 17408 2735364612 4093706240 2049 0 0 1628534016 0 266 0 0 0 0 2433548288 1594490921 3573703012 3507491858 1124007957 204624719 65360
-[Composite, Composite, Image] Av(Aperture Value): 2.0
-[Composite, Composite, Image] Image Size: 160x120
-[Composite, Composite, Image] Tv(Shutter Speed): 1/30
-[Composite, Composite, Image] Thumbnail Image: (Binary data 3230 bytes)
-[Composite, Composite, Camera] Focal Length: 7.0mm
+[File, File, Image]  - File Name: Olympus.jpg
+[File, File, Image]  - File Size: 8KB
+[File, File, Image]  - File Type: JPG
+[File, File, Image]  - Image Width: 160
+[File, File, Image]  - Image Height: 120
+[EXIF, IFD0, Image] 270 - Image Description: OLYMPUS DIGITAL CAMERA         
+[EXIF, IFD0, Camera] 271 - Make: OLYMPUS OPTICAL CO.,LTD
+[EXIF, IFD0, Camera] 272 - Camera Model Name: C2000Z
+[EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] 282 - X Resolution: 72
+[EXIF, IFD0, Image] 283 - Y Resolution: 72
+[EXIF, IFD0, Image] 296 - Resolution Unit: inches
+[EXIF, IFD0, Image] 305 - Software: v951p-80
+[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 1999:12:06 16:38:40
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
+[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/30
+[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 2.0
+[EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
+[EXIF, ExifIFD, Image] 36864 - Exif Version: 0210
+[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 1999:12:06 16:38:40
+[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 1999:12:06 16:38:40
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 1
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.8
+[EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37385 - Flash: Fired
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 7.0mm
+[EXIF, ExifIFD, Image] 37510 - User Comment: 
+[EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
+[EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
+[EXIF, ExifIFD, Image] 40962 - Exif Image Width: 640
+[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 480
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
+[EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
+[EXIF, ExifIFD, Image] 41729 - Scene Type: Directly photographed
+[EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
+[EXIF, IFD1, Image] 282 - X Resolution: 72
+[EXIF, IFD1, Image] 283 - Y Resolution: 72
+[EXIF, IFD1, Image] 296 - Resolution Unit: inches
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2036
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 3230
+[MakerNotes, Olympus, Camera] 512 - Special Mode: 0 0 0
+[MakerNotes, Olympus, Camera] 513 - Image Quality: HQ
+[MakerNotes, Olympus, Camera] 514 - Macro: Off
+[MakerNotes, Olympus, Camera] 516 - Digital Zoom: 0
+[MakerNotes, Olympus, Camera] 519 - Software Release: SR951
+[MakerNotes, Olympus, Camera] 520 - Pict Info: [pictureInfo] Resolution=1 [Camera Info] Type=SR951
+[MakerNotes, Olympus, Camera] 521 - Camera ID: OLYMPUS DIGITAL CAMERA
+[MakerNotes, Olympus, Camera] 3840 - Data Dump: 0 0 16777216 0 61817 768 61817 29184 2990272889 27904 17408 2735364612 4093706240 2049 0 0 1628534016 0 266 0 0 0 0 2433548288 1594490921 3573703012 3507491858 1124007957 204624719 65360
+[Composite, Composite, Image]  - Av(Aperture Value): 2.0
+[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Tv(Shutter Speed): 1/30
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 3230 bytes)
+[Composite, Composite, Camera]  - Focal Length: 7.0mm

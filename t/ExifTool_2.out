@@ -52,8 +52,8 @@ FlashpixVersion: 0100
 FocalLength: 34.0mm
 FocalLength35efl: 34.0mm (35mm equivalent: 54.0mm)
 FocalPlaneResolutionUnit: inches
-FocalPlaneXResolution: 3444
-FocalPlaneYResolution: 3442
+FocalPlaneXResolution: 3443.95
+FocalPlaneYResolution: 3442.02
 FocalUnits: 1
 FocusContinuous: Unknown (-1)
 FocusDistanceLower: 5.46
@@ -99,6 +99,7 @@ ShutterSpeed: 4
 ShutterSpeedValue: 0
 UserComment: 
 WhiteBalance: Auto
+WhiteBalance (1): Auto
 XResolution: 180
 YCbCrPositioning: Centered
 YResolution: 180

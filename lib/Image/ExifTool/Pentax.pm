@@ -10,19 +10,6 @@
 #
 # References:   1) Image::MakerNotes::Pentax
 #               2) http://johnst.org/sw/exiftags/ (Asahi cameras)
-#
-# Notes:        I couldn't find a good source for Pentax maker notes information
-#               so I've tried to figure out some of it myself based on sample
-#               pictures from the Optio 550, Optio S and *istD.  So far, what I
-#               have figured out isn't very complete, and some of it may be wrong.
-#
-#               While the pentax maker notes are stored in standard EXIF format,
-#               the offsets used for some of the Optio cameras are wacky.  They
-#               seem to give the offset relative to the offset of the tag in the
-#               directory.  Very weird.  I'm just ignoring this peculiarity, but
-#               it doesn't affect much except the PrintIM data since other data
-#               is generally less than 4 bytes and therefore doesn't require a
-#               pointer.
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Pentax;
@@ -254,12 +241,14 @@ This module is loaded automatically by Image::ExifTool when required.
 This module contains definitions required by Image::ExifTool to interpret
 Pentax and Asahi maker notes in EXIF information.
 
+=head1 NOTES
+
 I couldn't find a good source for Pentax maker notes information so I've
 tried to figure out some of it myself based on sample pictures from the
 Optio 550, Optio S and *istD.  So far, what I have figured out isn't very
 complete, and some of it may be wrong.
 
-While the pentax maker notes are stored in standard EXIF format, the offsets
+While the Pentax maker notes are stored in standard EXIF format, the offsets
 used for some of the Optio cameras are wacky.  They seem to give the offset
 relative to the offset of the tag in the directory.  Very weird.  I'm just
 ignoring this peculiarity, but it doesn't affect much except the PrintIM
@@ -285,6 +274,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>, L<Image::Info>
+L<Image::ExifTool|Image::ExifTool>, L<Image::Info|Image::Info>
 
 =cut

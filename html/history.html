@@ -5,6 +5,76 @@
 <body>
 <h1>ExifTool Version History</h1>
 
+<b>Nov. 24/04 - Version 3.93</b>
+<ul>
+<li>Final round of ICC_Profile updates
+<li>Increase precision of extracted rational values
+<li>Internal Changes:
+    <ul>
+    <li>Build in better support for all data formats
+    <li>Standardize data format names
+    <li>Clean up and streamline data read routine
+    </ul>
+</ul>
+
+<b>Nov. 22/04 - Version 3.92</b>
+<ul>
+<li>Fixed problem with -p option when multiple files are specified
+<li>Enhancements to ICC_Profile information, including extracting information from profile header
+<li>Subdivide ICC_Profile group in family 1
+<li>Added Minolta ImageStabilization tag
+</ul>
+
+<b>Nov. 20/04 - Version 3.91</b>
+<ul>
+<li>Fixed problem where some tags were not extracted properly from Canon CR2 files
+<li>Internal Changes:
+    <ul>
+    <li>Cleaned up and simplified pointer calculations and dirInfo members
+    </ul>
+</ul>
+
+<b>Nov. 20/04 - Version 3.90</b>
+<ul>
+<li>Extract information from ICC Profiles
+<li>Extract undocumented IFD0 Photoshop tags
+<li>Added support for Minolta RAW (MRW) file format
+<li>Added support for Konica-Minolta cameras
+<li>Improved decoding for Minolta maker notes
+<li>Extract (the sometimes misleading) EXIF WhiteBalance tag even if WhiteBalance was
+    extracted from the maker notes if the Duplicates option is set.  (Previously it
+    was only extracted as an Unknown tag in this case.)
+<li>API Changes:
+    <ul>
+    <li>Return list of all tags in image if GetFoundTags() or GetTagList() are called before ImageInfo() or GetInfo()
+    </ul>
+</ul>
+
+<b>Nov. 15/04 - Version 3.85</b>
+<ul>
+<li>Extract a couple more Photoshop tags (including PhotoshopQuality)
+<li>All XMP lists now comma separated (previously, 'alt' lists were separated by '|')
+<li>API Changes:
+    <ul>
+    <li>GetValue() now returns reference to array if values form a list and ValueConv is specified
+    </ul>
+</ul>
+
+<b>Nov. 12/04 - Version 3.84</b>
+<ul>
+<li>Added test of GetTagID()
+<li>Fixed bug in GetTagID() which was causing special tags to get overwritten
+</ul>
+
+<b>Nov. 12/04 - Version 3.83</b>
+<ul>
+<li>Added -D and -H command line options
+<li>API Changes:
+    <ul>
+    <li>Added GetTagID()
+    </ul>
+</ul>
+
 <b>Nov. 11/04 - Version 3.82</b>
 <ul>
 <li>Improved diagnostic output for failed tests in installation

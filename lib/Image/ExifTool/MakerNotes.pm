@@ -15,7 +15,7 @@ use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 # conditional list of maker notes
 # (Note: This is NOT a normal tag table)
@@ -108,7 +108,7 @@ $VERSION = '1.00';
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/^Minolta/',
+        Condition => '$self->{CameraMake}=~/^(Konica Minolta|Minolta)/',
         Name => 'MakerNoteMinolta',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::Main',

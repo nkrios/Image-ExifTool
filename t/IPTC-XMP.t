@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..2\n"; }
+BEGIN { $| = 1; print "1..3\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -29,5 +29,19 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
+# test 3: Test GetValue() in list context
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->ExtractInfo('t/IPTC-XMP.jpg', {JoinLists => 0});
+    my @values = $exifTool->GetValue('Keywords','ValueConv');
+    my $values = join '-', @values;
+    my $expected = 'ExifTool-Test-XMP';
+    unless ($values eq $expected) {
+        warn "\n  Test $testnum differs with \"$values\"\n";
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
 
 # end

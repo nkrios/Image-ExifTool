@@ -5,15 +5,17 @@
 #
 # Revisions:    04/06/2004  - P. Harvey Created
 #
-# Reference:    http://www.dalibor.cz/minolta/makernote.htm
+# References:   1) http://www.dalibor.cz/minolta/makernote.htm
+#               2) Jay Al-Saadi private communication (testing with A2)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool qw(SetByteOrder Get16u Get32u);
 
-$VERSION = '1.02';
+$VERSION = '1.06';
 
 %Image::ExifTool::Minolta::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -33,6 +35,12 @@ $VERSION = '1.02';
             TagTable => 'Image::ExifTool::Minolta::CameraSettings',
             ByteOrder => 'BigEndian',
         },
+    },
+    # it appears that image stabilization is on if this tag exists (ref 2),
+    # but it is an 8kB binary data block!
+    0x0018 => {
+        Name => 'ImageStabilization',
+        PrintConv => '"On"',
     },
     0x0040 => 'CompressedImageSize',
     0x0081 => 'PreviewImageData',
@@ -85,7 +93,7 @@ $VERSION = '1.02';
 %Image::ExifTool::Minolta::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    FORMAT => 'ULong',
+    FORMAT => 'int32u',
     FIRST_ENTRY => 0,
     1 => {
         Name => 'ExposureMode',
@@ -107,22 +115,12 @@ $VERSION = '1.02';
     },
     3 => {
         Name => 'WhiteBalance',
-        PrintConv => {
-            0 => 'Auto',
-            1 => 'Daylight',
-            2 => 'Cloudy',
-            3 => 'Tungsten',
-            5 => 'Custom',
-            7 => 'Fluorescent',
-            8 => 'Fluorescent 2',
-            11 => 'Custom 2',
-            12 => 'Custom 3',
-        },
+        PrintConv => 'Image::ExifTool::Minolta::ConvertWhiteBalance($val)',
     },
     4 => {
         Name => 'MinoltaImageSize',
         PrintConv => {
-            0 => '2560x1920 (2048x1536)',
+            0 => '2560x1920 or 2048x1536',
             1 => '1600x1200',
             2 => '1280x960',
             3 => '640x480',
@@ -309,7 +307,7 @@ $VERSION = '1.02';
             4 => 'DiMAGE 7i',
             5 => 'DiMAGE 7Hi',
             6 => 'DiMAGE A1',
-            7 => 'DiMAGE S414',
+            7 => 'DiMAGE A2', # also 'DiMAGE S414'?
         },
     },
     38 => {
@@ -408,6 +406,65 @@ $VERSION = '1.02';
 #    },
 );
 
+# basic Minolta white balance lookup
+my %minoltaWhiteBalance = (
+    0 => 'Auto',
+    1 => 'Daylight',
+    2 => 'Cloudy',
+    3 => 'Tungsten',
+    5 => 'Custom',
+    7 => 'Fluorescent',
+    8 => 'Fluorescent 2',
+    11 => 'Custom 2',
+    12 => 'Custom 3',
+    # the following come from tests with the A2 (ref 2)
+    0x0800000 => 'Auto',
+    0x1800000 => 'Daylight',
+    0x2800000 => 'Cloudy',
+    0x3800000 => 'Tungsten',
+    0x4800000 => 'Flash',
+    0x5800000 => 'Fluorescent',
+    0x6800000 => 'Shade',
+    0x7800000 => 'Custom1',
+    0x8800000 => 'Custom2',
+    0x9800000 => 'Custom3',
+);
+
+#------------------------------------------------------------------------------
+# PrintConv for Minolta white balance
+sub ConvertWhiteBalance($)
+{
+    my $val = shift;
+    my $printConv = $minoltaWhiteBalance{$val};
+    unless (defined $printConv) {
+        # the A2 values can be shifted by += 3 settings, where
+        # each setting adds or subtracts 0x001000 (ref 2)
+        my $type = ($val & 0xff000000) + 0x800000;
+        if ($type and $printConv = $minoltaWhiteBalance{$type}) {
+            $printConv .= sprintf("%+.8g", ($val - $type) / 0x10000);
+        } else {
+            $printConv = "Unknown ($val)";
+        }
+    }
+    return $printConv;
+}
+
+#------------------------------------------------------------------------------
+# get information from Minolta MRW file
+# Inputs: 0) ExifTool object reference
+#         1) RAF pointer
+# Returns: 1 if this was a valid MRW file
+sub MrwInfo($$)
+{
+    my ($exifTool, $raf) = @_;
+    my $data;
+
+    $raf->Read($data,4);
+    $data eq "\0MRM" or return 0;
+
+    return $exifTool->TiffInfo('MRW', $raf, 48);
+}
+
 1;  # end
 
 __END__
@@ -423,7 +480,7 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to interpret
-Minolta maker notes in EXIF information.
+Minolta and Konika-Minolta maker notes in EXIF information.
 
 =head1 AUTHOR
 

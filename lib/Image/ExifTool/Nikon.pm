@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(GetByteOrder SetByteOrder Get16u Get32u);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 sub ProcessNikon($$$);
 
@@ -56,7 +56,7 @@ sub ProcessNikon($$$);
     },
     0x0012 => {
         Name => 'FEC',
-        Format => 'Long',
+        Format => 'int32s',
         # just the top byte, signed
         PrintConv => 'sprintf("%.1f",($val >> 24)/6)'
     },
@@ -82,7 +82,7 @@ sub ProcessNikon($$$);
     # 0x0087 1 byte. Flash related. 9 when flash fires, 0 otherwise
     0x0088 => {
         Name => 'AFPoint',
-        Format => 'ULong',  # override format since ULong is more sensible
+        Format => 'int32u',  # override format since int32u is more sensible
         PrintConv => {
             0x0000 => 'Center',
             0x0100 => 'Top',
@@ -182,7 +182,7 @@ sub ProcessNikon($$$);
 
 %Image::ExifTool::Nikon::ColorBalanceD70 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'ShortRational',
+    FORMAT => 'rational16s',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
@@ -197,7 +197,7 @@ sub ProcessNikon($$$);
 
 %Image::ExifTool::Nikon::ColorBalanceD2H = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'ShortRational',
+    FORMAT => 'rational16s',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
@@ -213,7 +213,7 @@ sub ProcessNikon($$$);
 
 %Image::ExifTool::Nikon::ColorBalanceD100 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'UShort',
+    FORMAT => 'int16u',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
@@ -294,9 +294,14 @@ sub ProcessNikon($$$)
         }
         my $val = Get32u($dataPt, $offset+14);
 
+        # shift directory start
         $dirInfo->{DirStart} += $val + 10;  # set offset to start of directory
         $dirInfo->{DirLen} -= $val + 10;
-        $dirInfo->{DirBase} = $offset + 10; # base address for directory pointers
+
+        # shift pointer base to the data at the specified offset
+        my $shift = $dirInfo->{DataPos} + $offset + 10;
+        $dirInfo->{Base} += $shift;
+        $dirInfo->{DataPos} -= $shift;
 
         $success = Image::ExifTool::Exif::ProcessExif($exifTool, $tagTablePtr, $dirInfo);
 

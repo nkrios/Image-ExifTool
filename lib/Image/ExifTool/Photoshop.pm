@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Photoshop.pm
 #
-# Description:  Definitions for Photoshop APP13 records
+# Description:  Definitions for Photoshop IRB resource
 #
 # Revisions:    02/06/04 - P. Harvey Created
 #               02/25/04 - P. Harvey Added hack for problem with old photoshops
@@ -9,6 +9,9 @@
 #                          but left most of them commented out until I have enough
 #                          information to write PrintConv routines for them to
 #                          display something useful
+#
+# References:   1) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
+#               2) http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Photoshop;
@@ -18,7 +21,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
                        GetByteOrder SetByteOrder);
 
-$VERSION = '1.02';
+$VERSION = '1.07';
 
 sub ProcessPhotoshop($$$);
 
@@ -26,10 +29,15 @@ sub ProcessPhotoshop($$$);
 %Image::ExifTool::Photoshop::Main = (
     GROUPS => { 2 => 'Other' },
     PROCESS_PROC => \&ProcessPhotoshop,
+#    0x03e8 => 'Photoshop2Info',
 #    0x03e9 => 'MacintoshPrintInfo',
-#    0x03ea => 'XMLData?',
+#    0x03ea => 'XMLData?', #PH
+#    0x03eb => 'Photoshop2ColorTable',
 #    0x03ed => 'ResolutionInfo',
-#    0x03ee => 'AlphaChannelsNames',
+    0x03ee => {
+        Name => 'AlphaChannelsNames',
+        PrintConv => 'Image::ExifTool::Photoshop::ConvertPascalString($val)',
+    },
 #    0x03ef => 'DisplayInfo',
 #    0x03f0 => 'PStringCaption',
 #    0x03f1 => 'BorderInformation',
@@ -43,10 +51,14 @@ sub ProcessPhotoshop($$$);
 #    0x03f9 => 'DuotoneTransferFuncs',
 #    0x03fa => 'DuotoneImageInfo',
 #    0x03fb => 'EffectiveBW',
+#    0x03fc => 'ObsoletePhotoshopTag1',
+#    0x03fd => 'EPSOptions',
 #    0x03fe => 'QuickMaskInfo',
+#    0x03ff => 'ObsoletePhotoshopTag2',
 #    0x0400 => 'LayerStateInfo',
 #    0x0401 => 'WorkingPath',
 #    0x0402 => 'LayersGroupInfo',
+#    0x0403 => 'ObsoletePhotoshopTag3',
     0x0404 => {
         Name => 'IPTCData',
         SubDirectory => {
@@ -54,7 +66,12 @@ sub ProcessPhotoshop($$$);
         },
     },
 #    0x0405 => 'RawImageMode',
-#    0x0406 => 'JPEG_Quality',
+    0x0406 => { #2
+        Name => 'JPEG_Quality',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Photoshop::JPEG_Quality',
+        },
+    },
 #    0x0408 => 'GridGuidesInfo',
 #    0x0409 => 'ThumbnailResource',
 #    0x040a => 'CopyrightFlag',
@@ -90,18 +107,68 @@ sub ProcessPhotoshop($$$);
 #    0x2710 => 'PrintFlagsInfo',
 );
 
+# Photoshop JPEG quality record (ref 2)
+%Image::ExifTool::Photoshop::JPEG_Quality = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16s',
+    GROUPS => { 2 => 'Image' },
+    0 => {
+        Name => 'PhotoshopQuality',
+        PrintConv => '$val + 4',
+    },
+    1 => {
+        Name => 'PhotoshopFormat',
+        PrintConv => {
+            0x0000 => 'Standard',
+            0x0001 => 'Optimised',
+            0x0101 => 'Progressive',
+        },
+    },
+    2 => {
+        Name => 'ProgressiveScans',
+        PrintConv => {
+            1 => '3 Scans',
+            2 => '4 Scans',
+            3 => '5 Scans',
+        },
+    },
+);
+
+
+#------------------------------------------------------------------------------
+# Convert pascal string(s) to something we can use
+# Inputs: 1) Pascal string data
+# Returns: Strings, concatinated with ', '
+sub ConvertPascalString($)
+{
+    my $inStr = shift;
+    my $outStr = '';
+    my $len = length($inStr);
+    my $i=0;
+    while ($i < $len) {
+        my $n = ord(substr($inStr, $i, 1));
+        last if $i + $n >= $len;
+        $i and $outStr .= ', ';
+        $outStr .= substr($inStr, $i+1, $n);
+        $i += $n + 1;
+    }
+    return $outStr;
+}
 
 #------------------------------------------------------------------------------
 # Process Photoshop APP13 record
 # Inputs: 0) ExifTool object reference, 1) Tag table reference
 #         2) Reference to directory information
+# Returns: 1 on success
 sub ProcessPhotoshop($$$)
 {
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
     my $dataPt = $dirInfo->{DataPt};
     my $pos = $dirInfo->{DirStart};
     my $dirEnd = $pos + $dirInfo->{DirLen};
-    
+    my $verbose = $exifTool->Options('Verbose');
+    my $success = 0;
+
     my $oldOrder = GetByteOrder();
     SetByteOrder('MM');     # IPTC is always big-endian
     
@@ -147,9 +214,11 @@ sub ProcessPhotoshop($$$)
                 last;
             }
         }
+        $success = 1;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         if ($tagInfo) {
             my $value = substr($$dataPt, $pos, $size);
+            $verbose>2 and Image::ExifTool::HexDumpTag($tag, \$value);
             my $subdir = $$tagInfo{SubDirectory};
             if ($subdir) {
                 my $newTagTable;
@@ -160,20 +229,19 @@ sub ProcessPhotoshop($$$)
                     $newTagTable = $tagTablePtr;
                 }
                 # build directory information hash
-                my %newDirInfo = (
+                my %subdirInfo = (
                     DataPt   => \$value,
                     DataLen  => $size,
                     DirStart => 0,
                     DirLen   => $size,
-                    DirBase  => 0,
-                    
+                    Nesting  => $dirInfo->{Nesting} + 1,
                 );
                 # process the directory
-                $exifTool->ProcessTagTable($newTagTable, \%newDirInfo);
+                $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
             } else {
                 $exifTool->FoundTag($tagInfo, $value);
             }
-        } elsif ($exifTool->Options('Verbose') > 1) {
+        } elsif ($verbose > 1) {
             printf("  APP13 resource 0x%.4x:\n",$tag);
             Image::ExifTool::HexDump(\substr($$dataPt, $pos, $size));
         }
@@ -181,6 +249,7 @@ sub ProcessPhotoshop($$$)
         $pos += $size;
     }
     SetByteOrder($oldOrder);
+    return $success;
 }
 
 
@@ -191,7 +260,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Photoshop - Definitions for Photoshop meta information
+Image::ExifTool::Photoshop - Definitions for Photoshop IRB resource
 
 =head1 SYNOPSIS
 
@@ -199,8 +268,9 @@ This module is loaded automatically by Image::ExifTool when required.
 
 =head1 DESCRIPTION
 
-Photoshop writes its own format of meta information to the APP13 record in
-JPEG files.  This module contains the definitions to read this information.
+Photoshop writes its own format of meta information called a Photoshop IRB
+resource which is located in the APP13 record of JPEG files.  This module
+contains the definitions to read this information.
 
 =head1 AUTHOR
 
@@ -209,8 +279,18 @@ Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+=head1 REFERENCES
+
+=over 4
+
+=item http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
+
+=item http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html
+
+=back
+
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool|Image::ExifTool>, L<Image::MetaData::JPEG|Image::MetaData::JPEG>
 
 =cut

@@ -18,74 +18,43 @@ Image::ExifTool - Extract meta information from image files
 
   use Image::ExifTool 'ImageInfo';
 
-  # Get hash of tag names/values for all image meta data (procedural)
+  # ---- Simple procedural usage ----
+
+  # Get hash of meta information tag names/values from an image
   $info = ImageInfo('a.jpg');
+
+  # ---- Object-oriented usage ----
 
   # Create a new Image::ExifTool object
   $exifTool = new Image::ExifTool;
 
-  # Get hash reference for all meta information in an image (object oriented)
-  $info = $exifTool->ImageInfo($file, \%options, \@tagList, $tag, ...);
-
-  # Set options
-  $oldValue = $exifTool->Options(Option => 'Value', ...);
-
-  # Reset options
-  $exifTool->ClearOptions();
-
   # Extract meta information from an image
-  $success = $exifTool->ExtractInfo($file, \%options, \@tagList, ...);
+  $exifTool->ExtractInfo($file, \%options);
 
-  # Get hash reference to extracted meta information
-  $info = $exifTool->GetInfo(\%options, \@tagList, $tag, ...);
+  # Get list of tags in the order they were found in the file
+  @tagList = $exifTool->GetFoundTags('File');
 
-  # Combine meta information hashes
-  $combined = $exifTool->CombineInfo($info1, $info2, ...);
-
-  # Get list of tag names from information hash
-  @tagList = $exifTool->GetTagList($info, $sortOrder);
-
-  # Get list of all tags found in image
-  @foundTags = $exifTool->GetFoundTags($sortOrder);
-
-  # Get list of tags requested to be extracted from image
-  @requestedTags = $exifTool->GetRequestedTags();
-
-  # Get the data value of a specified tag
+  # Get the value of a specified tag
   $value = $exifTool->GetValue($tag, $type);
 
-  # Get the description of a tag
+  # Get a tag description
   $description = $exifTool->GetDescription($tag);
 
-  # Get the name of the group associated with this tag
+  # Get the group name associated with this tag
   $group = $exifTool->GetGroup($tag, $family);
 
-  # Get a list of all groups associated with the specified information
-  @groups = $exifTool->GetGroups($info, $family);
-
-  # Calculate tags which are derived from the values of other tags
-  $exifTool->BuildCompositeTags();
-
-  # Get the name of this tag
-  $tagName = Image::ExifTool::GetTagName($tag);
-
-  # Get a list of shortcut tag names
-  @shortcuts = Image::ExifTool::GetShortcuts();
-
-  # Get a list of all available tag names
-  @allTags = Image::ExifTool::GetAllTags();
-
-  # Get a list of all available group names
-  @allGroups = Image::ExifTool::GetAllGroups($family);
+  # ...plus a host of other useful methods...
 
 =head1 DESCRIPTION
 
 ExifTool provides an extensible set of perl modules to extract and parse
-EXIF, IPTC, XMP and GeoTIFF meta information from JPEG, TIFF, GIF, THM, CRW
-(Canon RAW), CR2 (Canon 1D Mk II RAW), NEF (Nikon Electronic image Format)
-and DNG (Digital Negative) images.  ExifTool currently reads the maker notes
-of images from Canon, Casio, FujiFilm, Minolta, Nikon, Olympus/Epson,
-Panasonic/Leica, Pentax/Asahi, Sanyo and Sigma/Foveon digital cameras.
+EXIF, IPTC, XMP, GPS, GeoTIFF, ICC Profile and Photoshop IRB meta
+information from JPEG, TIFF, GIF, THM, CRW (Canon RAW), CR2 (Canon 1D Mk II
+RAW), MRW (Minolta RAW), NEF (Nikon Electronic image Format) and DNG
+(Digital Negative) images. ExifTool also reads the maker notes of many
+digital cameras by various manufacturers including Canon, Casio, FujiFilm,
+Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
+Sanyo and Sigma/Foveon.
 
 =head1 METHODS
 
@@ -102,10 +71,10 @@ obtaining meta information from an image.  Internally, B<ImageInfo> calls
 B<ExtractInfo> to extract the information, B<GetInfo> to generate the
 information hash, and B<GetTagList> for the returned tag list.
 
-    # Return meta information for 2 tags only
+    # Return meta information for 2 tags only (procedural)
     $info = ImageInfo($filename, $tag1, $tag2)
 
-    # Return information about an open image file
+    # Return information about an open image file (object-oriented)
     $info = $exifTool->ImageInfo(\*FILE)
 
     # Return information from image data in memory for specified tags
@@ -356,8 +325,7 @@ Reset all options to their default values.
 
 =head2 ExtractInfo
 
-Extract meta information from an image.  Call B<GetInfo> to access the
-information after extracting it from the image.
+Extract all meta information from an image.
 
     $success = $exifTool->ExtractInfo('image.jpg', \%options);
 
@@ -446,9 +414,10 @@ Get a sorted list of tags from the specified information hash or tag list.
 2) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#').
 
 If the information hash or tag list reference is not provided, then the list
-of found tags from the last call to B<ImageInfo> or B<GetInfo> is used
-instead, and the result is the same as if B<GetFoundTags> was called.  If
-sort order is not specified, the sort order from the current options is used.
+of found tags from the last call to B<ImageInfo>, B<ExtractInfo> or
+B<GetInfo> is used instead, and the result is the same as if B<GetFoundTags>
+was called.  If sort order is not specified, the sort order is taken from
+the current options settings.
 
 =item Return Values:
 
@@ -459,8 +428,8 @@ A list of tags in the specified order.
 =head2 GetFoundTags
 
 Get list of found tags in specified sort order.  The found tags are the
-tags for the information returned from the most recent call to B<ImageInfo>
-or B<GetInfo> for this object.
+tags for the information obtained from the most recent call to B<ImageInfo>,
+B<ExtractInfo> or B<GetInfo> for this object.
 
     @tags = $exifTool->GetFoundTags('File');
 
@@ -508,12 +477,32 @@ Note that this list will be empty if tags were not specifically requested
 
 Get the value of specified tag.  By default this routine returns the
 human-readable (PrintConv) value, but optionally returns the
-machine-readable (ValueConv) value. Note that the PrintConv value will
-only differ from the ValueConv value if the PrintConv option is enabled
-(which it is by default).  The PrintConv values are the values returned
-by B<ImageInfo> and B<GetInfo> in the tag/value hash.
+machine-readable (ValueConv) value.  Note that the PrintConv value will only
+differ from the ValueConv value if the PrintConv option is enabled (which it
+is by default), or if the values form a list.  In the case of a list of
+values (as can happen with the 'Keywords' tag for instance), PrintConv
+returns a comma-separated string of values, while ValueConv returns a
+reference to an array of values or the array itself in list context. The
+PrintConv values are the values returned by B<ImageInfo> and B<GetInfo> in the
+tag/value hash.
 
-    $val = $exifTool->GetValue('ISO', 'ValueConv');
+    # PrintConv example
+    my $val = $exifTool-&gt;<b>GetValue</b>($tag);
+    if (ref $val eq 'SCALAR') {
+        print "$tag = (unprintable value)\n";
+    } else {
+        print "$tag = $val\n";
+    }
+
+    # ValueConv examples
+    my $val = $exifTool-&gt;<b>GetValue</b>($tag, 'ValueConv');
+    if (ref $val eq 'ARRAY') {
+        print "got a list reference for $tag\n";
+    } else {
+        print "$tag is a simple scalar\n";
+    }
+
+    my @keywords = $exifTool-&gt;<b>GetValue</b>('Keywords', 'ValueConv');
 
 =over 4
 
@@ -527,7 +516,32 @@ by B<ImageInfo> and B<GetInfo> in the tag/value hash.
 
 =item Return Values:
 
-The value of the specified tag.
+The value of the specified tag.  If the tag represents a list of values then
+a comma-separated string of values is returned for PrintConv, or a reference
+to the list of values (in scalar context) or the list itself (in list
+context) is returned for ValueConv.
+
+=back
+
+=head2 GetTagID
+
+Get the ID for the specified tag.  The ID is the IFD tag number in EXIF information,
+the property name in XMP information, or the data offset in a binary data block.
+For some tags, such as Composite tags where there is no ID, '' is returned.
+
+    $id = $exifTool->GetTagID($tag);
+
+=over 4
+
+=item Inputs:
+
+0) ExifTool object reference
+
+1) Tag key
+
+=item Return Values:
+
+Tag ID or '' of there is no ID for this tag.
 
 =back
 
@@ -712,15 +726,18 @@ are based on the file structure, and family 2 classifies information based
 on the logical category to which the information refers.
 
 Families 0 and 1 are similar except that family 1 is more specific, and
-sub-divides the EXIF, MakerNotes and XMP groups to give more detail about
-the specific location where the information was found.  The EXIF group is
-split up based on the specific IFD (Image File Directory), the MakerNotes
-group is divided into groups for each manufacturer, and the XMP group is
-separated based on the XMP namespace prefix.  Note that only common XMP
-namespaces are listed below but additional namespaces may be present in some
-XMP data.  Also note that the 'XMP-xmp...' group names may appear in the
-older form 'XMP-xap...' since these names evolved as the XMP standard
-was developed.
+sub-divides the EXIF, MakerNotes, XMP and ICC_Profile groups to give more
+detail about the specific location where the information was found.  The
+EXIF group is split up based on the specific IFD (Image File Directory), the
+MakerNotes group is divided into groups for each manufacturer, and the XMP
+group is separated based on the XMP namespace prefix.  Note that only common
+XMP namespaces are listed below but additional namespaces may be present in
+some XMP data.  Also note that the 'XMP-xmp...' group names may appear in
+the older form 'XMP-xap...' since these names evolved as the XMP standard
+was developed.  The ICC_Profile group is broken down to give information
+about the specific ICC_Profile tag from which multiple values were
+extracted. As well, information extracted from the ICC_Profile header is
+separated into the ICC-header group.
 
 Here is a complete list of groups for each family:
 
@@ -728,16 +745,16 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (General Location):
 
-Composite, EXIF, ExifTool, File, GPS, GeoTiff, IPTC, MakerNotes, Photoshop,
-PrintIM, XMP
+Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC,
+MakerNotes, Photoshop, PrintIM, XMP
 
 =item Family 1 (Detailed Location):
 
-Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GlobParamIFD, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD,
-MakerUnknown, Minolta, Nikon, Olympus, Panasonic, Pentax, Photoshop,
-PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+Canon CanonCustom CanonRaw Casio Composite ExifIFD ExifTool File FujiFilm
+GPS GeoTiff GlobParamIFD ICC-header ICC-meas ICC-view ICC_Profile IFD0 IFD1
+IPTC InteropIFD MakerUnknown Minolta Nikon Olympus Panasonic Pentax
+Photoshop PrintIM Sanyo Sigma Sony SubIFD XMP XMP-aux XMP-crs XMP-dc
+XMP-exif XMP-photoshop XMP-tiff XMP-xmp XMP-xmpBJ XMP-xmpMM XMP-xmpRights
 
 =item Family 2 (Category):
 
@@ -747,7 +764,7 @@ Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
 
 =head1 AUTHOR
 
-Copyright 2003-2004, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2004, Phil Harvey
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -776,9 +793,11 @@ B<Joachim Loehr> for adding the Casio type 2 maker notes.
 
 B<Greg Troxel> for his suggestions and for adding ExifTool to pkgsrc-wip.
 
+B<Jay Al-Saadi> for his discoveries with the Minolta white balance tag.
+
 =head1 SEE ALSO
 
-L<Image::Info|Image::Info> L<Image::MetaData::JPG|Image::MetaData::JPG>
+L<Image::Info|Image::Info>, L<Image::MetaData::JPG|Image::MetaData::JPG>
 
 =cut
 

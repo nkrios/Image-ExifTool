@@ -14,6 +14,7 @@
 #               4) http://www.remotesensing.org/libtiff/TIFFTechNote2.html
 #               5) http://www.asmail.be/msg0054681802.html
 #               6) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+#               7) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -21,35 +22,35 @@ package Image::ExifTool::Exif;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(Get16u Get16s Get32u Get32s GetFloat GetDouble
-                       GetByteOrder SetByteOrder ToggleByteOrder);
+                       GetByteOrder SetByteOrder ToggleByteOrder ReadValue);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.25';
+$VERSION = '1.31';
 
 sub ProcessExif($$$);
 
 # byte sizes for the various EXIF format types below
 my @formatSize = (0,1,1,2,4,8,1,1,2,4,8,4,8);
 
-my @formatName = ('err','UChar','String','UShort',
-                  'ULong','UShortRational','Char','Undef',
-                  'Short','Long','ShortRational','Float',
-                  'Double');
+my @formatName = ('err','int8u','string','int16u',
+                  'int32u','rational32u','int8s','undef',
+                  'int16s','int32s','rational32s','float',
+                  'double');
 
 # hash to look up EXIF format numbers by name
-# (lower case because string is convert to lc() before comparison)
+# (format types are all lower case)
 my %formatNumber = (
-    'uchar'         => 1,
+    'int8u'         => 1,
     'string'        => 2,
-    'binary'        => 2,   # (Binary is the same as String in Perl)
-    'ushort'        => 3,
-    'ulong'         => 4,
-    'ushortrational'=> 5,
-    'char'          => 6,
-    'undefined'     => 7,
-    'short'         => 8,
-    'long'          => 9,
-    'shortrational' => 10,
+    'binary'        => 2,   # (binary is the same as string in Perl)
+    'int16u'        => 3,
+    'int32u'        => 4,
+    'rational32u'   => 5,
+    'int8s'         => 6,
+    'undef'         => 7,
+    'int16s'        => 8,
+    'int32s'        => 9,
+    'rational32s'   => 10,
     'float'         => 11,
     'double'        => 12,
 );
@@ -59,15 +60,22 @@ my %lightSource = (
     1 => 'Daylight',
     2 => 'Fluorescent',
     3 => 'Tungsten',
-    10 => 'Flash',
-    17 => 'Standard light A',
-    18 => 'Standard light B',
-    19 => 'Standard light C',
+    4 => 'Flash',
+    9 => 'Fine Weather',
+    10 => 'Cloudy',
+    11 => 'Shade',
+    12 => 'Daylight Fluorescent',
+    13 => 'Day White Fluorescent',
+    14 => 'Cool White Fluorescent',
+    15 => 'White Fluorescent',
+    17 => 'Standard Light A',
+    18 => 'Standard Light B',
+    19 => 'Standard Light C',
     20 => 'D55',
     21 => 'D65',
     22 => 'D75',
     23 => 'D50',
-    24 => 'ISO Studio tungsten',
+    24 => 'ISO Studio Tungsten',
     255 => 'Other',
 );
 
@@ -294,7 +302,7 @@ my %lightSource = (
     0x13f => 'PrimaryChromaticities',
     0x140 => {
         Name => 'ColorMap',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => '\$val',
     },
     0x141 => 'HalftoneHints',
@@ -322,7 +330,7 @@ my %lightSource = (
         Name => 'SubIFD',
         Groups => { 1 => 'SubIFD' },
         SubDirectory => {
-            Start => '$dirBase + $val',
+            Start => '$val',
             MaxSubdirs => 2,
         },
     },
@@ -359,7 +367,10 @@ my %lightSource = (
         Name => 'Indexed',
         PrintConv => { 0 => 'Not indexed', 1 => 'Indexed' },
     },
-    0x15b => 'JPEGTables',
+    0x15b => {
+        Name => 'JPEGTables',
+        PrintConv => '\$val',
+    },
     0x15f => { #3
         Name => 'OPIProxy',
         PrintConv => {
@@ -371,7 +382,7 @@ my %lightSource = (
         Name => 'GlobalParametersIFD',
         Groups => { 1 => 'GlobParamIFD' },
         SubDirectory => {
-            Start => '$dirBase + $val',
+            Start => '$val',
         },
     },
     0x191 => { #3
@@ -504,31 +515,32 @@ my %lightSource = (
     },
     0x8649 => {
         Name => 'PhotoshopSettings',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => '\$val',
     },
     0x8769 => {
         Name => 'ExifOffset',
         Groups => { 1 => 'ExifIFD' },
         SubDirectory => {
-            Start => '$dirBase + $val',
+            Start => '$val',
         },
     },
     0x8773 => {
-        Name => 'InterColorProfile',
-        Format => 'Binary',
-        # don't want to print all this because it is a big table
-        PrintConv => '\$val',
+        Name => 'ICC_Profile',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::ICC_Profile::Main',
+            Start => '$valuePtr',
+        },
     },
     0x87ac => 'ImageLayer',
     0x87af => {
         Name => 'GeoTiffDirectory',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => '\$val',
     },
     0x87b0 => {
         Name => 'GeoTiffDoubleParams',
-        Format => 'Binary',
+        Format => 'binary',
         PrintConv => '\$val',
     },
     0x87b1 => {
@@ -557,7 +569,7 @@ my %lightSource = (
         Name => 'GPSInfo',
         SubDirectory => {
             TagTable => 'Image::ExifTool::GPS::Main',
-            Start => '$dirBase + $val',
+            Start => '$val',
         },
     },
     0x8827 => {
@@ -760,7 +772,7 @@ my %lightSource = (
         Groups => { 1 => 'InteropIFD' },
         Description => 'Interoperability Offset',
         SubDirectory => {
-            Start => '$dirBase + $val',
+            Start => '$val',
         },
     },
     0xa20b => {
@@ -843,8 +855,11 @@ my %lightSource = (
     },
     0xa403 => {
         Name => 'WhiteBalance',
-        Condition => 'not defined($oldVal)',    # don't override maker WhiteBalance
         Groups => { 2 => 'Camera' },
+        # don't override WhiteBalance from maker notes unless duplicates are allowed
+        # (since this tag is typically not properly set by most manufactures, and
+        #  contains much less information than available in other WhiteBalance tags)
+        Condition => 'not defined($oldVal) or $self->{OPTIONS}->{Duplicates}',
         PrintConv => {
             0 => 'Auto',
             1 => 'Manual',
@@ -914,6 +929,7 @@ my %lightSource = (
     0xc428 => 'OceApplicationSelector', #3
     0xc429 => 'OceIDNumber', #3
     0xc42a => 'OceImageLogic', #3
+    0xc44f => 'Annotations', #7
     0xc4a5 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -927,7 +943,7 @@ my %lightSource = (
     0xc614 => 'UniqueCameraModel', #2
     0xc615 => { #2
         Name => 'LocalizedCameraModel',
-        Format => 'String',
+        Format => 'string',
         PrintConv => 'Image::ExifTool::Printable($val)',
     },
     0xc616 => 'CFAPlaneColor', #2
@@ -993,6 +1009,12 @@ my %lightSource = (
     },
     0xc65c => 'BestQualityScale', #3 (incorrect in ref 2)
     0xc660 => 'AliasLayerMetadata', #3
+    
+    # tags in the range 0xfde8-0xfe58 have been observed in PS7 files
+    # generated from RAW images.  They are all strings with the 
+    # tag name at the start of the string.  To handle these types
+    # of tags, all tags with values above 0xf000 are handled specially
+    # by ProcessExif().
 );
 
 # the Composite tags are evaluated last, and are used
@@ -1267,63 +1289,6 @@ sub ExtractImage($$$$;$)
 }
 
 #------------------------------------------------------------------------------
-# get formatted value from binary data
-# Inputs: 0) data reference, 1) offset to value, 2) format, 3) number of items
-# Returns: Formatted value
-sub FormattedValue($$$$)
-{
-    my ($dataPt, $offset, $format, $count) = @_;
-    my $outVal;
-    my $i;
-    for ($i=0; $i<$count; ++$i) {
-        my $val;
-        if ($format==1 or ($format==7 and $count==1)) { # unsigned byte or single unknown byte
-            $val = unpack('C1',substr($$dataPt,$offset,1));
-            ++$offset;
-        } elsif ($format==3) {                  # unsigned short
-            $val = Get16u($dataPt, $offset);
-            $offset += 2;
-        } elsif ($format==4) {                  # unsigned long
-            $val = Get32u($dataPt, $offset);
-            $offset += 4;
-        } elsif ($format==5 or $format==10) {   # unsigned or signed short rational
-            my $denom = Get32s($dataPt,$offset+4);
-            if ($denom) {
-                $val = sprintf("%.4g",Get32s($dataPt,$offset)/$denom);
-            } else {
-                $val = 'inf';
-            }
-            $offset += 8;
-        } elsif ($format==6) {                  # signed byte
-            $val = unpack('c1',substr($$dataPt,$offset,1));
-            ++$offset;
-        } elsif ($format==8) {                  # signed short
-            $val = Get16s($dataPt, $offset);
-            $offset += 2;
-        } elsif ($format==9) {                  # signed long
-            $val = Get32s($dataPt, $offset);
-            $offset += 4;
-        } elsif ($format==11) {                 # float
-            $val = GetFloat($dataPt, $offset);
-            $offset += 4;
-        } elsif ($format==12) {                 # double
-            $val = GetDouble($dataPt, $offset);
-            $offset += 8;
-        } else {
-            # handle everything else like a string (including ascii string==2 and undefined==7)
-            $outVal = substr($$dataPt, $offset, $count);
-            last;   # already printed out the array
-        }
-        if (defined $outVal) {
-            $outVal .= " $val";
-        } else {
-            $outVal = $val;
-        }
-    }
-    return $outVal;
-}
-
-#------------------------------------------------------------------------------
 # Process EXIF directory
 # Inputs: 0) ExifTool object reference
 #         1) Pointer to tag table for this directory
@@ -1333,9 +1298,10 @@ sub ProcessExif($$$)
 {
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
     my $dataPt = $dirInfo->{DataPt};
-    my $dataLength = $dirInfo->{DataLen};
+    my $dataPos = $dirInfo->{DataPos} || 0;
+    my $dataLen = $dirInfo->{DataLen};
     my $dirStart = $dirInfo->{DirStart};
-    my $offsetBase = $dirInfo->{DirBase};
+    my $base = $dirInfo->{Base} || 0;
     my $raf = $dirInfo->{RAF};
     my $success = 1;
     my $verbose = $exifTool->Options('Verbose');
@@ -1352,7 +1318,7 @@ sub ProcessExif($$$)
     $verbose and print "Directory with $numEntries entries\n";
 
     my $dirEnd = $dirStart + 2 + 12 * $numEntries;
-    my $bytesFromEnd = $offsetBase + $dataLength - $dirEnd;
+    my $bytesFromEnd = $dataLen - $dirEnd;
     if ($bytesFromEnd < 4) {
         unless ($bytesFromEnd==2 or $bytesFromEnd==0) {
             $exifTool->Warn(sprintf"Illegal directory size (0x%x entries)",$numEntries);
@@ -1364,7 +1330,7 @@ sub ProcessExif($$$)
     my $index;
     for ($index=0; $index<$numEntries; ++$index) {
         my $entry = $dirStart + 2 + 12 * $index;
-        my $tag = Get16u($dataPt, $entry);
+        my $tagID = Get16u($dataPt, $entry);
         my $format = Get16u($dataPt, $entry+2);
         my $numItems = Get32u($dataPt, $entry+4);
         if ($format < 1 or $format > 12) {
@@ -1374,19 +1340,21 @@ sub ProcessExif($$$)
             last;   # stop now because this IFD is probably corrupt
         }
         my $size = $numItems * $formatSize[$format];
-        my $valuePtr = $entry + 8;
-        my $valueData = $dataPt;
-        my $valueDataLen = $dataLength;
+        my $valueDataPt = $dataPt;
+        my $valueDataPos = $dataPos;
+        my $valueDataLen = $dataLen;
+        my $valuePtr = $entry + 8;      # pointer to value within $$dataPt
         if ($size > 4) {
-            my $offsetVal = Get32u($dataPt, $valuePtr);
-            if ($offsetVal+$size > $dataLength) {
+            $valuePtr = Get32u($dataPt, $valuePtr) - $dataPos;
+            if ($valuePtr < 0 or $valuePtr+$size > $dataLen) {
                 # get value by seeking in file if we are allowed
                 if ($raf) {
                     my $curpos = $raf->Tell();
-                    if ($raf->Seek($offsetVal,0)) {
+                    if ($raf->Seek($base + $valuePtr + $dataPos,0)) {
                         my $buff;
                         if ($raf->Read($buff,$size) == $size) {
-                            $valueData = \$buff;
+                            $valueDataPt = \$buff;
+                            $valueDataPos = $valuePtr + $dataPos;
                             $valueDataLen = $size;
                             $valuePtr = 0;
                         }
@@ -1394,40 +1362,61 @@ sub ProcessExif($$$)
                     $raf->Seek($curpos,0);  # restore position in file
                 }
                 if ($valuePtr) {
-                    my $tagStr = sprintf("0x%x",$tag);
+                    my $tagStr = sprintf("0x%x",$tagID);
                     $exifTool->Warn("Bad EXIF directory pointer value for tag $tagStr");
                     next;
                 }
-            } else {
-                $valuePtr = $offsetBase + $offsetVal;
             }
         }
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        my $formatStr;
+        if ($format == 7) { # unknown format
+            # treat single unknown byte as int8u, otherwise treat as ASCII string
+            $formatStr = ($numItems == 1) ? 'int8u' : 'string';
+        } else {
+            $formatStr = $formatName[$format];   # get name of this format
+        }
         my $val;
-        if ($tagInfo) {
-            # override EXIF format if specified
-            if ($tagInfo->{Format}) {
-                my $newFormat = $formatNumber{lc($tagInfo->{Format})};
-                if ($newFormat) {
-                    $format = $newFormat;
-                    # must adjust number of items for new format size
-                    $numItems = $size / $formatSize[$format];
-                } else {
-                    warn "Unknown Format $tagInfo->{Format} for tag $tagInfo->{Name}\n";
+        if ($tagID > 0xf000 and not $$tagTablePtr{$tagID}
+            and $tagTablePtr eq \%Image::ExifTool::Exif::Main)
+        {
+            # handle special case of Photoshop RAW tags (0xfde8-0xfe58)
+            # --> generate tags from the value if possible
+            $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$numItems,$size);
+            if (defined $val and $val =~ /(.*): (.*)/) {
+                my $desc = $1;
+                $val = $2;
+                my $tag = $desc;
+                $tag =~ tr/a-zA-Z0-9_//cd; # remove unknown characters
+                if ($tag) {
+                    my $tagInfo = {
+                        Name => $tag,
+                        Description => $desc,
+                        PrintConv => '$_=$val;s/.*: //;$_', # remove descr
+                    };
+                    Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
                 }
             }
+        }
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
+        if ($tagInfo) {
+            # override EXIF format if specified
+            if ($$tagInfo{Format}) {
+                $formatStr = $$tagInfo{Format};
+                # must adjust number of items for new format size
+                my $newNum = $formatNumber{$$tagInfo{Format}};
+                $newNum and $numItems = $size / $formatSize[$newNum];
+            }
             # convert according to EXIF format type
-            $val = FormattedValue($valueData,$valuePtr,$format,$numItems);
+            $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$numItems,$size);
         } else {
             if ($verbose) {
-                $verbose>2 and Image::ExifTool::HexDumpTag($tag, $valueData, $size, 'Start'=>$valuePtr);
-                $val = FormattedValue($valueData,$valuePtr,$format,$numItems);
-                printf("  Tag 0x%.4x, Format $format: %s\n", $tag, 
-                       Image::ExifTool::Printable($val));
+                $verbose>2 and Image::ExifTool::HexDumpTag($tagID, $valueDataPt, $size, 'Start'=>$valuePtr);
+                $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$numItems,$size);
+                printf("  Tag 0x%.4x, Format $format: %s\n", $tagID, Image::ExifTool::Printable($val));
             }
             next;
         }
-        $verbose>2 and Image::ExifTool::HexDumpTag($tag, $valueData, $size, 'Start'=>$valuePtr, 
+        $verbose>2 and Image::ExifTool::HexDumpTag($tagID, $valueDataPt, $size, 'Start'=>$valuePtr, 
                                                    'Comment'=>"Format $format=$formatName[$format],");
 
 #..............................................................................
@@ -1437,13 +1426,8 @@ sub ProcessExif($$$)
         if ($subdir) {
 
             my $tagStr = $$tagInfo{Name};
-            defined $tagStr or $tagStr = sprintf("0x%x", $tag);
+            defined $tagStr or $tagStr = sprintf("0x%x", $tagID);
 
-            # save the tag for debugging if specified
-            if ($verbose) {
-                $tagKey = $exifTool->FoundTag($tagInfo, $verbose>1 ? $val : '(SubDirectory)');
-                $exifTool->SetTagExtra($tagKey, $dirInfo->{IfdName});
-            }
             my @values;
             if ($$subdir{MaxSubdirs}) {
                 @values = split /\s+/, $val;
@@ -1453,17 +1437,16 @@ sub ProcessExif($$$)
             }
             # loop through all sub-directories specified by this tag
             for (;;) {
-                my $dirData = $dataPt;
-                my $dirBase = $offsetBase;
-                my $dirLength = $dataLength;
-                my $subdirStart;
+                my $subdirBase = $base;
+                my $subdirDataPt = $valueDataPt;
+                my $subdirDataPos = $valueDataPos;
+                my $subdirDataLen = $valueDataLen;
+                my $subdirStart = $valuePtr;
                 if (defined $$subdir{Start}) {
-                    # directory data is in valueData block if start is relative to valuePtr
-                    if ($$subdir{Start} =~ /\$valuePtr\b/) {
-                        $dirData = $valueData;
-                        $dirLength = $valueDataLen;
-                    }
-                    $subdirStart = eval $$subdir{Start};
+                    # set local $valuePtr relative to $base for eval
+                    my $valuePtr = $subdirStart;
+                    #### eval Start ($valuePtr, $val)
+                    $subdirStart = eval($$subdir{Start});
                 } else {
                     $subdirStart = 0;
                 }
@@ -1481,8 +1464,8 @@ sub ProcessExif($$$)
                         last;
                     } else {
                         # attempt to determine the byte ordering by checking
-                        # at the number of directory entries.  This is a short
-                        # integer that should be a reasonable value.
+                        # at the number of directory entries.  This is an int16u
+                        # that should be a reasonable value.
                         my $num = Image::ExifTool::Get16u($dataPt, $subdirStart);
                         if ($num & 0xff00 and ($num>>8) > ($num&0xff)) {
                             # This looks wrong, we shouldn't have this many entries
@@ -1497,21 +1480,24 @@ sub ProcessExif($$$)
                 }
                 # set base offset if necessary
                 if ($$subdir{Base}) {
-                    my $start = $subdirStart;
-                    $dirBase = eval $$subdir{Base};
+                    # calculate subdirectory start relative to $base for eval
+                    my $start = $subdirStart + $subdirDataPos;
+                    #### eval Base ($start)
+                    $subdirBase = eval($$subdir{Base}) + $base;
                 }
                 # add offset to the start of the directory if necessary
                 if ($$subdir{OffsetPt}) {
                     SetByteOrder($newByteOrder);
-                    $subdirStart += Get32u($dataPt,eval $$subdir{OffsetPt});
+                    #### eval OffsetPt ($valuePtr)
+                    $subdirStart += Get32u($dataPt, eval $$subdir{OffsetPt});
                     SetByteOrder($oldByteOrder);
                 }
-                if ($subdirStart < $dirBase or $subdirStart > $dirBase + $dirLength) {
+                if ($subdirStart < 0 or $subdirStart + $size > $subdirDataLen) {
                     my $dirOK;
                     if ($raf) {
                         # read the directory from the file
                         my $curpos = $raf->Tell();
-                        if ($raf->Seek($subdirStart,0)) {
+                        if ($raf->Seek($subdirStart + $base,0)) {
                             my $buff;
                             if ($raf->Read($buff,2) == 2) {
                                 # get no. dir entries
@@ -1519,12 +1505,12 @@ sub ProcessExif($$$)
                                 # read dir
                                 my $buf2;
                                 if ($raf->Read($buf2,$size)) {
-                                    # set up variables to process new dir data
+                                    # set up variables to process new subdir data
                                     $buff .= $buf2;
-                                    $dirData = \$buff;
+                                    $subdirDataPt = \$buff;
+                                    $subdirDataPos = $subdirStart;
+                                    $subdirDataLen = $size + 2;
                                     $subdirStart = 0;
-                                    $dirLength = $size + 2;
-                                    $dirBase = 0;
                                     $dirOK = 1;
                                 }
                             }
@@ -1534,11 +1520,11 @@ sub ProcessExif($$$)
                     unless ($dirOK) {
                         my $msg = "Bad $tagStr SubDirectory start";
                         if ($verbose) {
-                            if ($subdirStart < $dirBase) {
-                                $msg .= " (directory start $subdirStart is before EXIF base=$dirBase)";
+                            if ($subdirStart < 0) {
+                                $msg .= " (directory start $subdirStart is before EXIF start)";
                             } else {
-                                my $end = $dirBase + $dirLength;
-                                $msg .= " (directory start $subdirStart is after EXIF end=$end)";
+                                my $end = $subdirStart + $size;
+                                $msg .= " (directory end is $subdirStart but EXIF size is only $subdirDataLen)";
                             }
                         }
                         $exifTool->Warn($msg);
@@ -1556,29 +1542,40 @@ sub ProcessExif($$$)
                     $newTagTable = $tagTablePtr;    # use existing table
                 }
 
+                # must update subdirDataPos if $base changes for this subdirectory
+                $subdirDataPos += $base - $subdirBase;
+
                 # build information hash for new directory
-                my %newDirInfo = (
-                    DataPt      => $dirData,
-                    DataLen     => $dirLength,
+                my %subdirInfo = (
+                    Base        => $subdirBase,
+                    DataPt      => $subdirDataPt,
+                    DataPos     => $subdirDataPos,
+                    DataLen     => $subdirDataLen,
                     DirStart    => $subdirStart,
                     DirLen      => $size,
-                    DirBase     => $dirBase,
                     Nesting     => $dirInfo->{Nesting} + 1,
                     RAF         => $raf,
-                    ProcessProc => $$subdir{ProcessProc},
                 );
-                
                 # set directory IFD name from group name of family 1 in tag information if it exists
-                $tagInfo->{Groups} and $newDirInfo{IfdName} = $tagInfo->{Groups}->{1};
+                $tagInfo->{Groups} and $subdirInfo{IfdName} = $tagInfo->{Groups}->{1};
 
                 SetByteOrder($newByteOrder);        # set byte order for this subdir
                 # validate the subdirectory if necessary
+                my $dirData = $subdirDataPt;    # set data pointer to be used in eval
+                #### eval Validate ($val, $dirData, $subdirStart, $size)
                 if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
                     $exifTool->Warn("Invalid $tagStr data");
                 } else {
                     # process the subdirectory
                     $verbose and print "-------- Start $tagStr --------\n";
-                    $exifTool->ProcessTagTable($newTagTable, \%newDirInfo);
+                    my $ok = $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
+                    # save entire unknown directory
+                    if (not $ok and $exifTool->{OPTIONS}->{Unknown}) {
+                        $$tagInfo{PrintConv} = '\$val'; # make a binary value
+                        # return binary information for subdirectories that couldn't be parsed
+                        $tagKey = $exifTool->FoundTag($tagInfo, substr($$subdirDataPt, $subdirStart, $size));
+                        $exifTool->SetTagExtra($tagKey, $dirInfo->{IfdName});
+                    }
                     $verbose and print "-------- End $tagStr --------\n";
                 }
                 SetByteOrder($oldByteOrder);    # restore original byte swapping
@@ -1600,8 +1597,8 @@ sub ProcessExif($$$)
     if ($bytesFromEnd >= 4 and $tagTablePtr eq \%Image::ExifTool::Exif::Main) {
         my $offset = Get32u($dataPt, $dirEnd);
         if ($offset) {
-            my $subdirStart = $offsetBase + $offset;
-            if ($subdirStart > $offsetBase+$dataLength) {
+            my $subdirStart = $offset - $dataPos;
+            if ($subdirStart > $dataLen) {
                 $exifTool->Warn("Illegal subdirectory link");
             } else {
                 # use same directory information for trailing directory,
@@ -1617,7 +1614,7 @@ sub ProcessExif($$$)
                 --$dirInfo->{Nesting};
             }
         }
-    } 
+    }
     return $success;
 }
 
@@ -1660,6 +1657,8 @@ it under the same terms as Perl itself.
 =item http://www.asmail.be/msg0054681802.html
 
 =item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+
+=item http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 
 =back
 

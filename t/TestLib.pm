@@ -28,13 +28,13 @@ $VERSION = '1.02';
 # Returns: true if files are the same
 sub testCompare($$$)
 {
-    my ($compfile, $testfile, $testnum) = @_;
+    my ($stdfile, $testfile, $testnum) = @_;
     my $success = 0;
     my $linenum;
     
     my $oldSep = $/;   
     $/ = "\x0a";        # set input line separator
-    if (open(FILE1, $compfile)) {
+    if (open(FILE1, $stdfile)) {
         if (open(FILE2, $testfile)) {
             $success = 1;
             my ($line1, $line2);
@@ -57,13 +57,13 @@ sub testCompare($$$)
                 }
             }
             unless ($success) {
-                if (defined $line2) {
-                    chomp $line2;
-                    warn "\n  Test $testnum differs at line $linenum: \"$line2\"\n";
-                } else {
-                    chomp $line1;
-                    warn "\n  Test $testnum missing line $linenum: \"$line1\"\n";
-                }
+                warn "\n  Test $testnum differs beginning at line $linenum:\n";
+                defined $line1 or $line1 = '(null)';
+                defined $line2 or $line2 = '(null)';
+                chomp $line1;
+                chomp $line2;
+                warn qq{    Test gave: "$line2"\n};
+                warn qq{    Should be: "$line1"\n};
             }
             close(FILE2);
         }
@@ -87,11 +87,11 @@ sub testCompare($$$)
 sub check($$$;$$)
 {
     my $exifTool = shift if ref $_[0] eq 'Image::ExifTool';
-    my ($info, $testname, $testnum, $compnum) = @_;
+    my ($info, $testname, $testnum, $stdnum) = @_;
     return 0 unless $info;
-    $compnum = $testnum unless defined $compnum;
+    $stdnum = $testnum unless defined $stdnum;
     my $testfile = "t/${testname}_$testnum.failed";
-    my $compfile = "t/${testname}_$compnum.out";
+    my $stdfile = "t/${testname}_$stdnum.out";
     open(FILE, ">$testfile") or return 0;
     
     # use one type of linefeed so this test works across platforms
@@ -130,8 +130,9 @@ sub check($$$;$$)
         # (no "\n" needed since we set the output line separator above)
         if ($exifTool) {
             my $groups = join ', ', $exifTool->GetGroup($_);
+            my $tagID = $exifTool->GetTagID($_);
             my $desc = $exifTool->GetDescription($_);
-            print FILE "[$groups] $desc: $val";
+            print FILE "[$groups] $tagID - $desc: $val";
         } else {
             print FILE "$_: $val";
         }
@@ -142,7 +143,7 @@ sub check($$$;$$)
 #
 # Compare the output file to the output from the standard test (TESTNAME_#.out)
 #
-    return testCompare($compfile, $testfile,$testnum);
+    return testCompare($stdfile, $testfile,$testnum);
 }
 
 

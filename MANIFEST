@@ -20,6 +20,7 @@ lib/Image/ExifTool/Exif.pm
 lib/Image/ExifTool/FujiFilm.pm
 lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
+lib/Image/ExifTool/ICC_Profile.pm
 lib/Image/ExifTool/IPTC.pm
 lib/Image/ExifTool/MakerNotes.pm
 lib/Image/ExifTool/Minolta.pm

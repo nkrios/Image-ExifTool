@@ -43,6 +43,7 @@ my $binaryOutput;   # flag for binary output
 my $showGroup;      # number of group to show (may be zero or '')
 my $allGroup;       # show group name for all tags
 my $multiFile;      # non-zero if we are scanning multiple files
+my $showTagID;      # non-zero to show tag ID's
 my @printFmt;       # the contents of the print format file
 my %options;        # options for Image::ExifTool::ImageInfo()
 
@@ -64,17 +65,19 @@ while ($_ = shift) {
         /^all$/i and next;  # igore -all option for a while until I get used to not typing it - PH
         /^a$/i and $exifTool->Options('Duplicates', 1), next;
         /^b$/i and $binaryOutput = 1, next;
-        /^d$/i and $exifTool->Options('DateFormat', shift), next;
+        /^d$/  and $exifTool->Options('DateFormat', shift || die "Expecting date format"), next;
+        /^D$/  and $showTagID = 'D', next;
         /^e$/i and $exifTool->Options('Composite', 0), next;
         /^f$/i and $forcePrint = 1, next;
         /^g(\d*)$/ and $showGroup = $1, $exifTool->Options('Sort',"Group$1"), next;
         /^G(\d*)$/ and $showGroup = $1, $exifTool->Options('Sort',"Group$1"), $allGroup=1, next;
-        /^h$/i and $htmlOutput = 1, next;
-        /^i$/i and push(@ignore,shift), next;
+        /^h$/  and $htmlOutput = 1, next;
+        /^H$/  and $showTagID = 'H', next;
+        /^i$/i and push(@ignore,shift || die "Expecting directory name"), next;
         /^l$/i and --$outFormat, next;
         /^n$/i and $exifTool->Options('PrintConv', 0), next;
-        /^o$/i and $outputExt = shift, next;
-        /^p$/i and LoadPrintFormat(shift), next;
+        /^o$/i and $outputExt = shift || die("Expecting output extension"), next;
+        /^p$/i and LoadPrintFormat(shift || die "Expecting file name"), next;
         /^r$/i and $recurse = 1, next;
         /^s$/  and ++$outFormat, next;
         /^S$/  and $outFormat+=2, next;
@@ -82,7 +85,7 @@ while ($_ = shift) {
         /^u$/  and $exifTool->Options('Unknown', $exifTool->Options('Unknown')+1), next;
         /^U$/  and $exifTool->Options('Unknown', 2), next;
         /^v$/i and $exifTool->Options('Verbose',$exifTool->Options('Verbose')+1), next;
-        /^x$/i and push(@exclude,shift), next;
+        /^x$/i and push(@exclude,shift || die "Expecting tag name"), next;
         $_ eq '' and push(@files, '-'), next;  # read STDIN
         push @tags, $_;
     } else {
@@ -128,15 +131,16 @@ DESCRIPTION
     Prints information for specified tags from listed files.  -TAG specifies the
     name of a tag to extract, or --TAG to ignore.  FILE may be an image file
     name, a directory name, or - for the standard input. Currently recognized
-    file types are JPG, TIFF, GIF, THM, CRW, CR2, NEF and DNG.
+    file types are JPG, TIFF, GIF, THM, CRW, CR2, MRW, NEF and DNG.
 
 OPTIONS
-    -list   - list all valid tags
+    -list   - list all valid tag names
     -group# - list all tag groups for family #
     -ver    - print version number and exit
     -a      - allow duplicate tag values (otherwise only last value displayed)
     -b      - output requested data in binary format
     -d FMT  - set date/time format (consult strftime manpage for FMT syntax)
+    -D|H    - show tag ID number in Decimal or Hexadecimal
     -e      - print existing tags only -- don't calculate composite tags
     -f      - force printing of tags even if their values are not found
     -g[#]   - organize output by tag group (-g0 assumed if # not specified)
@@ -149,11 +153,12 @@ OPTIONS
     -p FILE - print in format specified by file (ignores other format options)
     -r      - recursively scan subdirectories (only useful if "file" is a dir)
     -s      - short format (add up to 3 -s options for even shorter formats)
-    -S      - same as two -s options
+    -S      - print tag names instead of descriptions (same as two -s options)
     -t      - output tab-delimited list of description/values (database import)
     -u      - extract values of unknown tags (2 to extract from data blocks)
-    -U      - same as two -u options (also extract unknown from data blocks)
+    -U      - also extract unknown from data blocks (same as two -u options)
     -v      - verbose messages (add up to 3 -v options for more verbose)
+    -x TAG  - exclude specified tag (may be many -x options) 
 
 EXAMPLES
     exiftool -g dir/a.jpg
@@ -253,8 +258,8 @@ sub GetImageInfo($$)
     my $lineCount = 0;
     if (@printFmt) {
         # output using print format file (-p) option
-        my $line;
-        foreach $line (@printFmt) {
+        foreach (@printFmt) {
+            my $line = $_;
             while ($line =~ /\$([-a-zA-Z_0-9]+)/) {
                 my $tag = $1;
                 my $val = $info->{$tag};
@@ -281,7 +286,10 @@ sub GetImageInfo($$)
                 unless ($allGroup) {
                     if ($lastGroup ne $group) {
                         if ($htmlOutput) {
-                            print $fp "<tr><td colspan=2 bgcolor='#dddddd'>$group</td></tr>\n";
+                            my $cols = 1;
+                            ++$cols if $outFormat==0 or $outFormat==1;
+                            ++$cols if $showTagID;
+                            print $fp "<tr><td colspan=$cols bgcolor='#dddddd'>$group</td></tr>\n";
                         } else {
                             print "---- $group ----\n";
                         }
@@ -301,9 +309,19 @@ sub GetImageInfo($$)
             }
             ++$lineCount;
             
+            my $id;
+            if ($showTagID) {
+                $id = $exifTool->GetTagID($tag);
+                if ($id =~ /^\d/) {    # only print numeric ID's
+                    $id = sprintf("0x%.4x", $id) if $showTagID eq 'H';
+                } else {
+                    $id = '-';
+                }
+            }
             if ($binaryOutput) {
                 # translate scalar reference to actual binary data
                 $val = $$val if ref $val eq 'SCALAR';
+                print $fp "$id " if $showTagID;
                 print $fp $val;
                 next;
             }
@@ -323,7 +341,8 @@ sub GetImageInfo($$)
             if ($htmlOutput) {
                 print $fp "<tr>";
                 print $fp "<td>$group</td>" if defined $group;
-                if ($outFormat == 0) {
+                print $fp "<td>$id</td>" if $showTagID;
+                if ($outFormat <= 0) {
                     print $fp "<td>$description</td><td>$val</td></tr>\n";
                 } elsif ($outFormat == 1) {
                     print $fp "<td>$tag</td><td>$val</td></tr>\n";
@@ -337,20 +356,37 @@ sub GetImageInfo($$)
             } else {
                 if ($tabFormat) {
                     print $fp "$group\t" if defined $group;
-                    print $fp "$description\t$val\n";
-                } elsif ($outFormat == -1) {    # long format
+                    print $fp "$id\t" if $showTagID;
+                    if ($outFormat >= 2) {
+                        print $fp "$tag\t$val\n";
+                    } else {
+                        print $fp "$description\t$val\n";
+                    }
+                } elsif ($outFormat < 0) {    # long format
                     print $fp "[$group] " if defined $group;
+                    print $fp "$id " if $showTagID;
                     print $fp "$description\n      $val\n";
                 } elsif ($outFormat == 0) {
                     printf $fp "%-15s ","[$group]" if defined $group;
+                    if ($showTagID) {
+                        my $wid = ($showTagID eq 'D') ? 5 : 6;
+                        printf $fp "%${wid}s ", $id;
+                    }
                     printf $fp "%-32s: %s\n",$description,$val;
                 } elsif ($outFormat == 1) {
                     printf $fp "%-12s ", $group if defined $group;
-                    printf $fp "%-32s %s\n",$description,$val;
+                     if ($showTagID) {
+                        my $wid = ($showTagID eq 'D') ? 5 : 6;
+                        printf $fp "%${wid}s ", $id;
+                    }
+                   printf $fp "%-32s %s\n",$description,$val;
                 } elsif ($outFormat == 2) {
                     print $fp "[$group] " if defined $group;
+                    print $fp "$id " if $showTagID;
                     print $fp "$tag: $val\n";
                 } else {
+                    print $fp "$group " if defined $group;
+                    print $fp "$id " if $showTagID;
                     print $fp "$val\n";
                 }
             }
@@ -402,7 +438,7 @@ sub ScanDir($$)
             $recurse and ScanDir($exifTool, $path);
             next;
         }
-        if ($file =~ /\.(jpg|jpeg|thm|gif|tif|tiff|crw|cr2|nef|dng)$/i) {
+        if ($file =~ /\.(jpg|jpeg|thm|gif|tif|tiff|crw|cr2|mrw|nef|dng)$/i) {
             GetImageInfo($exifTool, $path);
         }
     }

@@ -1,51 +1,52 @@
-[File, File, Image] File Name: ExifTool.jpg
-[File, File, Image] File Type: JPG
-[EXIF, IFD0, Camera] Camera Model Name: Canon EOS DIGITAL REBEL
-[EXIF, IFD0, Image] Orientation: Horizontal (normal)
-[EXIF, IFD0, Image] X Resolution: 180
-[EXIF, IFD0, Image] Y Resolution: 180
-[EXIF, IFD0, Image] Resolution Unit: inches
-[EXIF, IFD0, Time] Date/Time Of Last Modification: 2003:12:04 06:46:52
-[EXIF, IFD0, Image] Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] Tv(Shutter Speed): 4
-[EXIF, ExifIFD, Image] Av(Aperture Value): 14.0
-[EXIF, ExifIFD, Image] ISO Speed: 100
-[EXIF, ExifIFD, Image] Exif Version: 0221
-[EXIF, ExifIFD, Time] Shooting Date/Time: 2003:12:04 06:46:52
-[EXIF, ExifIFD, Time] Date/Time Of Digitization: 2003:12:04 06:46:52
-[EXIF, ExifIFD, Image] Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] Compressed Bits Per Pixel: 9
-[EXIF, ExifIFD, Image] Shutter Speed Value: 0
-[EXIF, ExifIFD, Image] Aperture Value: 14.0
-[EXIF, ExifIFD, Image] Exposure Compensation: 0
-[EXIF, ExifIFD, Camera] Max Aperture Value: 4.5
-[EXIF, ExifIFD, Camera] Metering Mode: Average
-[EXIF, ExifIFD, Camera] Flash: No Flash
-[EXIF, ExifIFD, Camera] Focal Length: 34.0mm
-[EXIF, ExifIFD, Image] User Comment: 
-[EXIF, ExifIFD, Image] Flashpix Version: 0100
-[EXIF, ExifIFD, Image] Color Space: sRGB
-[EXIF, ExifIFD, Image] Exif Image Width: 160
-[EXIF, ExifIFD, Image] Exif Image Length: 120
-[EXIF, InteropIFD, Image] Interoperability Index: THM
-[EXIF, InteropIFD, Image] Interoperability Version: 0100
-[EXIF, InteropIFD, Image] Related Image Width: 3072
-[EXIF, InteropIFD, Image] Related Image Length: 2048
-[EXIF, ExifIFD, Image] Focal Plane X Resolution: 3444
-[EXIF, ExifIFD, Image] Focal Plane Y Resolution: 3442
-[EXIF, ExifIFD, Camera] Focal Plane Resolution Unit: inches
-[EXIF, ExifIFD, Camera] Sensing Method: One-chip color area
-[EXIF, ExifIFD, Image] File Source: Digital Camera
-[EXIF, ExifIFD, Image] Custom Rendered: Normal
-[EXIF, ExifIFD, Camera] Exposure Mode: Manual
-[EXIF, ExifIFD, Camera] Scene Capture Type: Standard
-[Composite, Composite, Image] Av(Aperture Value): 14.3
-[Composite, Composite, Camera] Drive Mode: Continuous shooting
-[Composite, Composite, Camera] Flash: Off
-[Composite, Composite, Image] Image Size: 160x120
-[Composite, Composite, Camera] Lens: 18.0 - 55.0mm
-[Composite, Composite, Camera] Scale Factor To 35mm Equivalent: 1.6
-[Composite, Composite, Camera] Shooting Mode: Manual
-[Composite, Composite, Image] Tv(Shutter Speed): 4
-[Composite, Composite, Camera] Focal Length: 34.0mm (35mm equivalent: 54.0mm)
-[Composite, Composite, Camera] Lens: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)
+[File, File, Image]  - File Name: ExifTool.jpg
+[File, File, Image]  - File Type: JPG
+[EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
+[EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] 282 - X Resolution: 180
+[EXIF, IFD0, Image] 283 - Y Resolution: 180
+[EXIF, IFD0, Image] 296 - Resolution Unit: inches
+[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:04 06:46:52
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
+[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 4
+[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 14.0
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
+[EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
+[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:12:04 06:46:52
+[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:12:04 06:46:52
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
+[EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
+[EXIF, ExifIFD, Image] 37378 - Aperture Value: 14.0
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 4.5
+[EXIF, ExifIFD, Camera] 37383 - Metering Mode: Average
+[EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 34.0mm
+[EXIF, ExifIFD, Image] 37510 - User Comment: 
+[EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
+[EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
+[EXIF, ExifIFD, Image] 40962 - Exif Image Width: 160
+[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 120
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM
+[EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
+[EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
+[EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
+[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.95
+[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.02
+[EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
+[EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
+[EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
+[EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
+[EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Manual
+[EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
+[EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
+[Composite, Composite, Image]  - Av(Aperture Value): 14.3
+[Composite, Composite, Camera]  - Drive Mode: Continuous shooting
+[Composite, Composite, Camera]  - Flash: Off
+[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
+[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
+[Composite, Composite, Camera]  - Shooting Mode: Manual
+[Composite, Composite, Image]  - Tv(Shutter Speed): 4
+[Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 54.0mm)
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)

@@ -1,70 +1,70 @@
-[File, File, Image] File Name: Sony.jpg
-[File, File, Image] File Size: 18KB
-[File, File, Image] File Type: JPG
-[File, File, Image] Image Width: 160
-[File, File, Image] Image Height: 120
-[EXIF, IFD0, Image] Image Description:                                
-[EXIF, IFD0, Camera] Make: SONY
-[EXIF, IFD0, Camera] Camera Model Name: DSC-F828
-[EXIF, IFD0, Image] Orientation: Horizontal (normal)
-[EXIF, IFD0, Image] X Resolution: 72
-[EXIF, IFD0, Image] Y Resolution: 72
-[EXIF, IFD0, Image] Resolution Unit: inches
-[EXIF, IFD0, Time] Date/Time Of Last Modification: 2003:12:18 13:51:33
-[EXIF, IFD0, Image] Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] Tv(Shutter Speed): 1/250
-[EXIF, ExifIFD, Image] Av(Aperture Value): 7.1
-[EXIF, ExifIFD, Camera] Exposure Program: Program AE
-[EXIF, ExifIFD, Image] ISO Speed: 64
-[EXIF, ExifIFD, Image] Exif Version: 0220
-[EXIF, ExifIFD, Time] Shooting Date/Time: 2003:12:18 13:51:33
-[EXIF, ExifIFD, Time] Date/Time Of Digitization: 2003:12:18 13:51:33
-[EXIF, ExifIFD, Image] Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] Compressed Bits Per Pixel: 8
-[EXIF, ExifIFD, Image] Exposure Compensation: 0
-[EXIF, ExifIFD, Camera] Max Aperture Value: 2.0
-[EXIF, ExifIFD, Camera] Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] Light Source: Unknown (0)
-[EXIF, ExifIFD, Camera] Flash: Off
-[EXIF, ExifIFD, Camera] Focal Length: 12.5mm
-[EXIF, ExifIFD, Image] Flashpix Version: 0100
-[EXIF, ExifIFD, Image] Color Space: sRGB
-[EXIF, ExifIFD, Image] Exif Image Width: 3264
-[EXIF, ExifIFD, Image] Exif Image Length: 2448
-[EXIF, InteropIFD, Image] Interoperability Index: R98
-[EXIF, InteropIFD, Image] Interoperability Version: 0100
-[EXIF, ExifIFD, Image] File Source: Digital Camera
-[EXIF, ExifIFD, Image] Scene Type: Directly photographed
-[EXIF, ExifIFD, Image] Custom Rendered: Normal
-[EXIF, ExifIFD, Camera] Exposure Mode: Auto bracket
-[EXIF, ExifIFD, Camera] White Balance: Auto
-[EXIF, ExifIFD, Camera] Scene Capture Type: Standard
-[EXIF, ExifIFD, Camera] Contrast: Normal
-[EXIF, ExifIFD, Camera] Saturation: Normal
-[EXIF, ExifIFD, Camera] Sharpness: Normal
-[EXIF, IFD1, Image] Compression: JPEG (old-style)
-[EXIF, IFD1, Camera] Make: SONY
-[EXIF, IFD1, Camera] Camera Model Name: DSC-F828
-[EXIF, IFD1, Image] Orientation: Horizontal (normal)
-[EXIF, IFD1, Image] X Resolution: 72
-[EXIF, IFD1, Image] Y Resolution: 72
-[EXIF, IFD1, Image] Resolution Unit: inches
-[EXIF, IFD1, Time] Date/Time Of Last Modification: 2003:12:18 13:51:33
-[EXIF, IFD1, Image] Thumbnail Offset: 2486
-[EXIF, IFD1, Image] Thumbnail Length: 15216
-[MakerNotes, Sony, Camera] Sony 0x2000: 0
-[MakerNotes, Sony, Camera] Sony 0x9001: .
-[MakerNotes, Sony, Camera] Sony 0x9002: .J.`
-[MakerNotes, Sony, Camera] Sony 0x9003: ..sF
-[MakerNotes, Sony, Camera] Sony 0x9004: .
-[MakerNotes, Sony, Camera] Sony 0x9005: ..
-[MakerNotes, Sony, Camera] Sony 0x9006: .
-[MakerNotes, Sony, Camera] Sony 0x9007: .;.|.c.f.V......b......^O[...]
-[MakerNotes, Sony, Camera] Sony 0x9008: .;..;....H[...]
-[PrintIM, PrintIM, Printing] Print IM 0x0002: 0x00000001
-[PrintIM, PrintIM, Printing] Print IM 0x0101: 0x00000000
-[Composite, Composite, Image] Av(Aperture Value): 7.1
-[Composite, Composite, Image] Image Size: 160x120
-[Composite, Composite, Image] Tv(Shutter Speed): 1/250
-[Composite, Composite, Image] Thumbnail Image: (Binary data 15216 bytes)
-[Composite, Composite, Camera] Focal Length: 12.5mm
+[File, File, Image]  - File Name: Sony.jpg
+[File, File, Image]  - File Size: 18KB
+[File, File, Image]  - File Type: JPG
+[File, File, Image]  - Image Width: 160
+[File, File, Image]  - Image Height: 120
+[EXIF, IFD0, Image] 270 - Image Description:                                
+[EXIF, IFD0, Camera] 271 - Make: SONY
+[EXIF, IFD0, Camera] 272 - Camera Model Name: DSC-F828
+[EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] 282 - X Resolution: 72
+[EXIF, IFD0, Image] 283 - Y Resolution: 72
+[EXIF, IFD0, Image] 296 - Resolution Unit: inches
+[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:18 13:51:33
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
+[EXIF, ExifIFD, Image] 33434 - Tv(Shutter Speed): 1/250
+[EXIF, ExifIFD, Image] 33437 - Av(Aperture Value): 7.1
+[EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 64
+[EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
+[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:12:18 13:51:33
+[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:12:18 13:51:33
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 8
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.0
+[EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37385 - Flash: Off
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 12.5mm
+[EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
+[EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
+[EXIF, ExifIFD, Image] 40962 - Exif Image Width: 3264
+[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2448
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
+[EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
+[EXIF, ExifIFD, Image] 41729 - Scene Type: Directly photographed
+[EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
+[EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto bracket
+[EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
+[EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
+[EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
+[EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
+[EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
+[EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
+[EXIF, IFD1, Camera] 271 - Make: SONY
+[EXIF, IFD1, Camera] 272 - Camera Model Name: DSC-F828
+[EXIF, IFD1, Image] 274 - Orientation: Horizontal (normal)
+[EXIF, IFD1, Image] 282 - X Resolution: 72
+[EXIF, IFD1, Image] 283 - Y Resolution: 72
+[EXIF, IFD1, Image] 296 - Resolution Unit: inches
+[EXIF, IFD1, Time] 306 - Date/Time Of Last Modification: 2003:12:18 13:51:33
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2486
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 15216
+[MakerNotes, Sony, Camera] 8192 - Sony 0x2000: 0
+[MakerNotes, Sony, Camera] 36865 - Sony 0x9001: .
+[MakerNotes, Sony, Camera] 36866 - Sony 0x9002: .J.`
+[MakerNotes, Sony, Camera] 36867 - Sony 0x9003: ..sF
+[MakerNotes, Sony, Camera] 36868 - Sony 0x9004: .
+[MakerNotes, Sony, Camera] 36869 - Sony 0x9005: ..
+[MakerNotes, Sony, Camera] 36870 - Sony 0x9006: .
+[MakerNotes, Sony, Camera] 36871 - Sony 0x9007: .;.|.c.f.V......b......^O[...]
+[MakerNotes, Sony, Camera] 36872 - Sony 0x9008: .;..;....H[...]
+[PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
+[PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000000
+[Composite, Composite, Image]  - Av(Aperture Value): 7.1
+[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Tv(Shutter Speed): 1/250
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 15216 bytes)
+[Composite, Composite, Camera]  - Focal Length: 12.5mm

@@ -42,12 +42,13 @@ and explain the following individual functions in more detail:
 <li><a href="#GetFoundTags">GetFoundTags</a>
 <li><a href="#GetRequestedTags">GetRequestedTags</a>
 <li><a href="#GetValue">GetValue</a>
+<li><a href="#GetTagID">GetTagID</a>
 <li><a href="#GetDescription">GetDescription</a>
 <li><a href="#GetGroup">GetGroup</a>
-<li><a href="#GetGroups">GetGroups</a>
 </ul>
 </td><td valign=top>
 <ul>
+<li><a href="#GetGroups">GetGroups</a>
 <li><a href="#BuildCompositeTags">BuildCompositeTags</a>
 <li><a href="#GetTagName">GetTagName</a>
 <li><a href="#GetShortcuts">GetShortcuts</a>
@@ -346,8 +347,7 @@ Reset all options to their default values.
 </table></blockquote>
 
 <hr><h2><a name="ExtractInfo">ExtractInfo</a></h2>
-Extract meta information from an image.  Call <a href="#GetInfo">GetInfo</a> to access
-the information after extracting it from the image.
+Extract all meta information from an image.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>ExtractInfo($;@)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
@@ -430,14 +430,16 @@ Get a sorted list of tags from the specified information hash or tag list.
 @tags = $exifTool-&gt;<b>GetTagList</b>($info, 'Group0');
 </pre></td></tr></table></blockquote>
 If the information hash or tag list reference is not provided, then the list
-of found tags from the last call to <a href="#ImageInfo">ImageInfo</a> or
-<a href="#GetInfo">GetInfo</a> is used instead, and the result is the same as
-if <a href="#GetFoundTags">GetFoundTags</a> was called.  If sort order is not
-specified, the sort order from the current options is used.
+of found tags from the last call to <a href="#ImageInfo">ImageInfo</a>,
+<a href="#ExtractInfo">ExtractInfo</a> or <a href="#GetInfo">GetInfo</a>
+is used instead, and the result is the same as if
+<a href="#GetFoundTags">GetFoundTags</a> was called.  If sort order is not
+specified, the sort order is taken from the current options settings.
 
 <hr><h2><a name="GetFoundTags">GetFoundTags</a></h2>
 Get list of found tags in specified sort order.  The found tags are the
-tags for the information returned from the most recent call to <a href="#ImageInfo">ImageInfo</a>
+tags for the information obtained from the most recent call to
+<a href="#ImageInfo">ImageInfo</a>, <a href="#ExtractInfo">ExtractInfo</a>
 or <a href="#GetInfo">GetInfo</a> for this object.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>GetFoundTags($;$)</td></tr>
@@ -471,22 +473,65 @@ my @requestedTags = $exifTool-&gt;<b>GetRequestedTags</b>();
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetValue">GetValue</a></h2>
-Get the value of specified tag.  By default this routine returns the human-readable
-(PrintConv) value, but optionally returns the machine-readable (ValueConv) value.
-Note that the PrintConv value will only differ from the ValueConv value if
-the PrintConv option is enabled (which it is by default).  The PrintConv
-values are the values returned by ImageInfo() in the tag/value hash.
+Get the value of specified tag.  By default this routine returns the
+human-readable (PrintConv) value, but optionally returns the
+machine-readable (ValueConv) value.  Note that the PrintConv value will only
+differ from the ValueConv value if the PrintConv option is enabled (which it
+is by default), or if the values form a list.  In the case of a list of
+values (as can happen with the 'Keywords' tag for instance), PrintConv
+returns a comma-separated string of values, while ValueConv returns a
+reference to an array of values or the array itself in list context. The
+PrintConv values are the values returned by ImageInfo() and GetInfo() in the
+tag/value hash.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>GetValue($$;$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
     <br>1) Tag key
     <br>2) [optional] Value type, 'PrintConv' (default) or 'ValueConv'
 </td></tr>
-<tr><td><b>Returns</b></td><td>Tag value</td></tr>
+<tr><td><b>Returns</b></td><td>
+The value of the specified tag.  For PrintConv values, this is either
+a simple scalar if printable, or a scalar reference otherwise.  For
+ValueConv this is normally a simple scalar, however if the tag
+represents a list of values then an array reference is returned in
+scalar context, or the list itself is returned in list context.
+</td></tr>
+</table></blockquote>
+<b>Examples:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+# PrintConv example
+my $val = $exifTool-&gt;<b>GetValue</b>($tag);
+if (ref $val eq 'SCALAR') {
+    print "$tag = (unprintable value)\n";
+} else {
+    print "$tag = $val\n";
+}
+
+# ValueConv examples
+my $val = $exifTool-&gt;<b>GetValue</b>($tag, 'ValueConv');
+if (ref $val eq 'ARRAY') {
+    print "got a list reference for $tag\n";
+} else {
+    print "$tag is a simple scalar\n";
+}
+
+my @keywords = $exifTool-&gt;<b>GetValue</b>('Keywords', 'ValueConv');
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="GetTagID">GetTagID</a></h2>
+Get the ID for the specified tag.  The ID is the IFD tag number in EXIF information,
+the property name in XMP information, or the data offset in a binary data block.
+For some tags, such as Composite tags where there is no ID, '' is returned.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetTagID($$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+    <br>1) Tag key
+</td></tr>
+<tr><td><b>Returns</b></td><td>Tag ID or '' of there is no ID for this tag</td></tr>
 </table></blockquote>
 <b>Example:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-my $val = $exifTool-&gt;<b>GetValue</b>('ISO', 'ValueConv');
+my $id = $exifTool-&gt;<b>GetTagID</b>($tag);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetDescription">GetDescription</a></h2>
@@ -628,29 +673,32 @@ are based on the file structure, and family 2 classifies information based
 on the logical category to which the information refers.
 
 <p>Families 0 and 1 are similar except that family 1 is more specific, and
-sub-divides the EXIF, MakerNotes and XMP groups to give more detail about
-the specific location where the information was found.  The EXIF group is
-split up based on the specific IFD (Image File Directory), the MakerNotes
-group is divided into groups for each manufacturer, and the XMP group is
-separated based on the XMP namespace prefix.  Note that only common XMP
-namespaces are listed below but additional namespaces may be present in some
-XMP data.  Also note that the 'XMP-xmp...' group names may appear in the
-older form 'XMP-xap...' since these names evolved as the XMP standard
-was developed.
+sub-divides the EXIF, MakerNotes, XMP and ICC_Profile groups to give more
+detail about the specific location where the information was found.  The
+EXIF group is split up based on the specific IFD (Image File Directory), the
+MakerNotes group is divided into groups for each manufacturer, and the XMP
+group is separated based on the XMP namespace prefix.  Note that only common
+XMP namespaces are listed below but additional namespaces may be present in
+some XMP data.  Also note that the 'XMP-xmp...' group names may appear in
+the older form 'XMP-xap...' since these names evolved as the XMP standard
+was developed.  The ICC_Profile group is broken down to give information
+about the specific ICC_Profile tag from which multiple values were
+extracted. As well, information extracted from the ICC_Profile header is
+separated into the ICC-header group.
 
 <p>Here is a complete list of groups for each family:
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, IPTC, MakerNotes, Photoshop,
-PrintIM, XMP</td></tr>
+<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile,
+IPTC, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
 <tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
-<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GlobParamIFD, GPS, GeoTiff, IFD0, IFD1, IPTC, InteropIFD,
-MakerUnknown, Minolta, Nikon, Olympus, Panasonic, Pentax, Photoshop,
-PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM,
-XMP-xmpRights</td></tr>
+<td>Canon CanonCustom CanonRaw Casio Composite ExifIFD ExifTool File FujiFilm
+GPS GeoTiff GlobParamIFD ICC-header ICC-meas ICC-view ICC_Profile IFD0 IFD1
+IPTC InteropIFD MakerUnknown Minolta Nikon Olympus Panasonic Pentax
+Photoshop PrintIM Sanyo Sigma Sony SubIFD XMP XMP-aux XMP-crs XMP-dc
+XMP-exif XMP-photoshop XMP-tiff XMP-xmp XMP-xmpBJ XMP-xmpMM XMP-xmpRights
+</td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
 </td></tr>

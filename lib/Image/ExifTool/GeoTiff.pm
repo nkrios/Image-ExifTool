@@ -3,10 +3,10 @@
 #
 # Description:  Definitions for GeoTiff tags
 #
-# Reference:    ftp://ftp.remotesensing.org/geotiff/libgeotiff/libgeotiff-1.1.4.tar.gz
-#
 # Revisions:    02/23/04 - P. Harvey Created
 #               02/25/04 - P. Harvey Added new codes from libgeotiff-1.2.1
+#
+# Reference:    ftp://ftp.remotesensing.org/geotiff/libgeotiff/libgeotiff-1.1.4.tar.gz
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::GeoTiff;

@@ -15,10 +15,11 @@ the tag (explained later).  Each package my define a special table named
 'Composite' which contains tags whose values are calculated after all other tag
 values have been extracted from the file.
 
-Six special keys (PROCESS_PROC, GROUPS, FORMAT, FIRST_ENTRY, TAG_PREFIX and
-PRINT_CONV) are used to provide additional information about a table.  The
-special keys have names that are all capitalized to avoid possible conflicts
-with tag names.  Below is an explanation of the meaning of each special key:
+Seven special keys (PROCESS_PROC, GROUPS, FORMAT, FIRST_ENTRY, TAG_PREFIX,
+PRINT_CONV and DID_TAG_ID) are used to provide additional information about a
+table.  The special keys have names that are all capitalized to avoid possible
+conflicts with tag names.  Below is an explanation of the meaning of each
+special key:
 
   PROCESS_PROC : Reference to a function used to process the directory for this
   table.  If PROCESS_PROC is not given, \&Image::ExifTool::Exif::ProcessExif is
@@ -27,43 +28,60 @@ with tag names.  Below is an explanation of the meaning of each special key:
   table hash, 2) reference to a directory information hash, with the following
   members:
   
+    Base        - Base offset for pointers from start of file.
     DataPt      - Reference to data block containing directory (may be undef).
+    DataPos     - Position of data block within file (relative to Base).
     DataLen     - Length of data block in bytes.
-    DirStart    - Location of directory start in data block.
+    DirStart    - Offset to start of directory from start of data block.
     DirLen      - Length of directory data within block.
-    DirBase     - Base offset for pointers in directory.
     Nesting     - Nesting depth in directory tree.
     IfdName     - Name of IFD if this is an EXIF directory.
     RAF         - Reference to File::RandomAccess object if available.
-    ProcessProc - Optional reference to processing proc (to override default).
 
   GROUPS : A hash lookup for the default group names for all entries in this
   table. If not specified, the Group 0 and 1 names will be set automatically
   according to the name of the module.
   
   FORMAT : Specifies the default tag Format and the pointer increment for
-  entries in a BinaryData table, and defaults to 'Short' if not specified.  Can
+  entries in a BinaryData table, and defaults to 'int8u' if not specified.  Can
   also be used to override EXIF format in an EXIF table.  The possible  values
   of FORMAT and Format are:
 
-    Char          - Signed byte
-    UChar         - Unsigned byte
-    Short         - Signed, 2-byte integer
-    UShort        - Unsigned 2-byte integer
-    Long          - Signed 4-byte integer
-    ULong         - Unsigned 4-byte integer
-    ShortRational - Rational value consisting of 2 Shorts
-    LongRational  - Rational value consisting of 2 Longs
-    String        - Series of ASCII characters
-    Binary        - Binary data (EXIF and IPTC tables only)
+    int8s          - Signed 8-bit integer
+    int8u          - Unsigned 8-bit integer
+    int16s         - Signed 16-bit integer
+    int16u         - Unsigned 16-bit integer
+    int32s         - Signed 32-bit integer
+    int32u         - Unsigned 32-bit integer
+    int64s         - Signed 64-bit integer
+    int64u         - Unsigned 64-bit integer
+    rational16s    - Rational consisting of 2 int16s values
+    rational16u    - Rational consisting of 2 int16u values
+    rational32s    - Rational consisting of 2 int32s values
+    rational32u    - Rational consisting of 2 int32u values
+    fixed16s       - Signed 16-bit fixed point value
+    fixed16u       - Unsigned 16-bit fixed point value
+    fixed32s       - Signed 32-bit fixed point value
+    fixed32u       - Unsigned 32-bit fixed point value
+    float          - 32-bit IEEE floating point value
+    double         - 64-bit IEEE floating point value
+    string         - Series of 8-bit ASCII characters
+    binary         - Binary data
   
   FIRST_ENTRY : Specifies the index for the first tag entry in a binary table.
   This value is only used if the Unknown option is set to 2 or higher, and
   allows the binary data to be scanned for unknown tag entries.
   
+  INCREMENT : If specified, overrides the default increment for a BinaryData
+  table.  The default increment is the number of bytes in the default format.
+  
   TAG_PREFIX : Prefix for names of unknown tags.
   
-  PRINT_CONV : Print conversion for unknown tags.  
+  PRINT_CONV : Print conversion for unknown tags. 
+  
+  DID_TAG_ID : Used by GetTagID() as a flag to indicate that TagID's have been
+               defined for all tags in this table.  This may be set in the table
+               definition to prevent GetTagID() from assigning TagID's.
   
 The remaining entries in a tag table are the EXIF tags with their associated
 information.  The information may exist in one of three forms:  1) A simple
@@ -85,19 +103,24 @@ conditions.  The following is a description of possible hash entries:
 
   Format        : [optional] Only valid for BinaryData, EXIF and IPTC tables.
                   For a Binary or EXIF table, this gives the format of the data,
-                  and is one of Char, UChar, Short, UShort, Long, ULong,
-                  ShortRational, LongRational or String[N] (where N is the
-                  string length and can only be specified in a Binary table). If
-                  not specified, the format of an EXIF entry is taken from the
-                  EXIF information, and the format of a Binary entry is taken
-                  from the FORMAT specified for the table (or Short if FORMAT is
-                  not specified).  For IPTC tables, the only valid Format type
-                  is Binary, otherwise the data is assumed to be ASCII.
+                  and is one of the FORMAT types specified above.  For
+                  BinaryData tables, the format may have a size in trailing
+                  brackets which is a perl expression to be evaluated.  The
+                  expression may access any of the previous table entries
+                  through a %val hash, or the data size via $size. For example,
+                  'string[$val{3}]' defines a string with length given by the
+                  table entry with tag index '3'. If not specified, the format
+                  of an EXIF entry is taken from the EXIF information, and the
+                  format of a BinaryData entry is taken from the FORMAT
+                  specified for the table (or int8u if FORMAT is not specified).
+                  For IPTC tables, the only valid Format type is binary,
+                  otherwise the data is assumed to be string.
 
   Flags         : [optional] Flag or list of flags to specify characteristics of
                   this tag value.  Currently the only flag is 'List', which
                   indicates that duplicate entries of this tag should be
-                  accumulated in a comma-separated list.
+                  accumulated in a list (a comma separated string of PrintConv
+                  values and a reference to an array of ValueConv values).
 
   ValueConv     : [optional] Used to convert the raw data value to a useable
                   form.  May be either a hash reference to act as a lookup table
@@ -147,6 +170,9 @@ conditions.  The following is a description of possible hash entries:
                   each tag since they are used as indices into the @val and
                   @valPrint lists.
 
+  TagID         : [reserved] This entry is used internally by GetTagID() to
+                  cache tag ID numbers for speed.
+
   SubDirectory {  [optional] If it exists, this specifies the start of a new 
                   subdirectory.  It contains a collection of variables which
                   specify the type and location of the subdirectory.  These
@@ -157,10 +183,9 @@ conditions.  The following is a description of possible hash entries:
                   used.
                   
       Start     : [required] The offset to the start of the subdirectory.  This
-                  is a Perl expression which should be relative to either the
-                  position of the current tag value ($valuePtr), or the position
-                  of the start of the EXIF record ($dirBase), and may use the
-                  value of the current tag ($val).
+                  is a Perl expression which may use $valuePtr to represent the
+                  location of the tag value in the file, or $val for the value
+                  itself.
 
       OffsetPt  : [optional] If specified, this is a Perl expression that gives
                   the position of a 32-bit word in the current directory that is
@@ -171,7 +196,8 @@ conditions.  The following is a description of possible hash entries:
       Base      : [optional] This specifies the base offset for all pointers in
                   the subdirectory.  This need not be specified if the offset
                   is the same as the current directory, which is normally the
-                  case.
+                  case.  May use $start to represent the subdirectory start
+                  location relative to the current base.
 
       MaxSubdirs: [optional] Maximum number of subdirectories specified by the
                   current tag (if the tag specifies multiple values).  If not

@@ -31,7 +31,7 @@ package Image::ExifTool::XMP;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.11';
+$VERSION = '1.15';
 
 sub ProcessXMP($$$);
 sub ParseXMPElement($$$;$);
@@ -41,6 +41,7 @@ sub DecodeBase64($);
 my %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1 );
 
 # XMP tags need only be specified if a conversion or name change is necessary
+# (Note: 'List' attribute is set automatically for any 'rdf:li' resource)
 %Image::ExifTool::XMP::Main = (
     GROUPS => { 2 => 'Unknown' },
     PROCESS_PROC => \&ProcessXMP,
@@ -398,14 +399,11 @@ sub FoundXMP($$$$)
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         unless ($tagInfo) {
             # construct tag information (use the default groups)
-            $tagInfo = {
-                'Name' => $tag,
-                'Groups' => $$tagTablePtr{GROUPS},
-                'GotGroups' => 1,
-                'Table' => $tagTablePtr,
-            };
-            $$tagTablePtr{$tag} = $tagInfo; # add to this table for next time
+            $tagInfo = { Name => $tag };
+            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
+        # set 'List' attribute in tagInfo if this is a list
+        $$tagInfo{List} = ($$nameList[-1] eq 'rdf:li');
         $tag = $exifTool->FoundTag($tagInfo, $val);
         $exifTool->SetTagExtra($tag, $namespace);
     }
@@ -425,7 +423,6 @@ sub ParseXMPElement($$$;$)
     my $dataPt = shift;
     my $nameListPt = shift || [ ];
     my $count = 0;
-    my ($listVal, $listSep);
 
     Element: while ($$dataPt =~ m/<([\w:]+)(.*?)>/sg) {
         my ($name, $attrs) = ($1, $2);
@@ -480,26 +477,10 @@ sub ParseXMPElement($$$;$)
         # look for additional elements contained within this one
         if (!ParseXMPElement($exifTool, $tagTablePtr, \$val, $nameListPt)) {
             # there are no contained elements, so this must be a simple property value
-            if ($name eq 'rdf:li') {
-                # handle list items
-                if (defined $listVal) {
-                    $listVal .= $listSep . $val;    # add value to list
-                } elsif (@$nameListPt > 2) {
-                    $listVal = $val;    # first value in list
-                    # use '|' to separate alt lists and ', ' for other lists
-                    $listSep = ($$nameListPt[-2] eq 'rdf:Alt' ? '|' : ', ');
-                }
-            } else {
-                # save this normally-formatted XMP property
-                FoundXMP($exifTool, $tagTablePtr, $nameListPt, $val);
-            }
+            FoundXMP($exifTool, $tagTablePtr, $nameListPt, $val);
         }
         pop @$nameListPt;
         ++$count;
-    }
-    if (defined $listVal) {
-        # save the combined list item XMP properties
-        FoundXMP($exifTool, $tagTablePtr, $nameListPt, $listVal);
     }
     return $count;  # return the number of elements found at this level
 }

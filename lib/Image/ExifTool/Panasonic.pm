@@ -3,11 +3,11 @@
 #
 # Description:  Definitions for Panasonic/Leica Maker Notes
 #
+# Revisions:    11/10/2004 - P. Harvey Created
+#
 # References:   1) http://www.compton.nu/panasonic.html (based on FZ10)
 #               2) Derived from DMC-FZ3 samples from dpreview.com
 #               3) http://johnst.org/sw/exiftags/
-#
-# Revisions:    11/10/2004 - P. Harvey Created
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Panasonic;
@@ -15,7 +15,7 @@ package Image::ExifTool::Panasonic;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 %Image::ExifTool::Panasonic::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -30,7 +30,7 @@ $VERSION = '1.00';
     },
     0x02 => {
         Name => 'FirmwareVersion',
-        Format => 'UChar',
+        Format => 'int8u',
         PrintConv => '$_=$val; s/ /\./g; $_',
     },
     0x03 => {
@@ -101,13 +101,13 @@ $VERSION = '1.00';
     },
     0x23 => {
         Name => 'WhiteBalanceBias',
-        Format => 'Short',
+        Format => 'int16s',
         ValueConv => '$val / 3',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x24 => {
         Name => 'FlashBias',
-        Format => 'Short',
+        Format => 'int16s',
     },
     0x25 => 'SerialNumber', #2
     0x28 => {
