@@ -26,7 +26,6 @@ $VERSION = '1.10';
     0x0001 => {
         Name => 'MinoltaCameraSettingsOld',
         SubDirectory => {
-            Start => '$valuePtr',
             TagTable => 'Image::ExifTool::Minolta::CameraSettings',
             ByteOrder => 'BigEndian',
         },
@@ -34,7 +33,6 @@ $VERSION = '1.10';
     0x0003 => {
         Name => 'MinoltaCameraSettings',
         SubDirectory => {
-            Start => '$valuePtr',
             TagTable => 'Image::ExifTool::Minolta::CameraSettings',
             ByteOrder => 'BigEndian',
         },
@@ -107,7 +105,6 @@ $VERSION = '1.10';
         Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
-            Start => '$valuePtr',
         },
     },
     0x0f00 => {

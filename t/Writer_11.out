@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.50
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.54
 [File, File, Image]  - File Name: Writer_11_failed.jpg
 [File, File, Image]  - File Size: 7KB
 [File, File, Image]  - File Type: JPEG
@@ -51,11 +51,12 @@
 [EXIF, ExifIFD, Camera] 41992 - Contrast: +1
 [EXIF, ExifIFD, Camera] 41993 - Saturation: +1
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: +1
+[EXIF, ExifIFD, Image] 65000 - Owner Name: Cindy Harvey
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 300
 [EXIF, IFD1, Image] 283 - Y Resolution: 300
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2382
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2422
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
@@ -100,6 +101,7 @@
 [MakerNotes, Canon, Image] 21 - Aperture Value: 14
 [MakerNotes, Canon, Image] 22 - Shutter Speed: 128
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
+[MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
@@ -125,6 +127,7 @@
 [MakerNotes, Canon, Camera] 15 - Blue Balance B&W: 0.84024
 [MakerNotes, Canon, Camera] 16 - Red Balance Shade: 2.06971
 [MakerNotes, Canon, Camera] 17 - Blue Balance Shade: 0.84109
+[MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072

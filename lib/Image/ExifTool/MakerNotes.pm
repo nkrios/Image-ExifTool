@@ -27,7 +27,6 @@ $VERSION = '1.04';
         Name => 'MakerNoteCanon',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::Main',
-            Start => '$valuePtr',
             ByteOrder => 'Unknown',
         },
     },
@@ -38,7 +37,6 @@ $VERSION = '1.04';
         Name => 'MakerNoteFujiFilm',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FujiFilm::Main',
-            Start => '$valuePtr',
             # there is an 8-byte maker tag (FUJIFILM) we must skip over
             OffsetPt => '$valuePtr+8',
             ByteOrder => 'LittleEndian',
@@ -55,8 +53,6 @@ $VERSION = '1.04';
             # process as Unknown maker notes because the start offset and
             # byte ordering are so variable
             ProcessProc => \&ProcessUnknown,
-            # only need to set Start pointer for processing unknown
-            Start => '$valuePtr',
             ByteOrder => 'Unknown',
         },
     },
@@ -93,7 +89,6 @@ $VERSION = '1.04';
         Name => 'MakerNoteNikon',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
-            Start => '$valuePtr',
             # (note: ProcessNikon sets ByteOrder, so we don't need to do it here)
         },
     },
@@ -102,9 +97,9 @@ $VERSION = '1.04';
             $self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/ and 
             $self->{CameraModel}=~/^EX-Z3/
         },
-        Name => 'MakerNoteCasio2',
+        Name => 'MakerNoteCasioEX-Z3',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Casio::MakerNote2',
+            TagTable => 'Image::ExifTool::Casio::Type2',
             Start => '$valuePtr + 6',
             # Casio really messed this up for the EX-Z3, and made the
             # offsets relative to somewhere in the APP0 JFIF segment... doh!
@@ -116,7 +111,7 @@ $VERSION = '1.04';
         Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
         Name => 'MakerNoteCasio2',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Casio::MakerNote2',
+            TagTable => 'Image::ExifTool::Casio::Type2',
             Start => '$valuePtr + 6',
             ByteOrder => 'Unknown',
         },
@@ -125,8 +120,7 @@ $VERSION = '1.04';
         Condition => '$self->{CameraMake}=~/^CASIO/',
         Name => 'MakerNoteCasio',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Casio::MakerNote1',
-            Start => '$valuePtr',
+            TagTable => 'Image::ExifTool::Casio::Type1',
             ByteOrder => 'Unknown',
         },
     },
@@ -135,7 +129,6 @@ $VERSION = '1.04';
         Name => 'MakerNoteMinolta',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::Main',
-            Start => '$valuePtr',
             ByteOrder => 'Unknown',
         },
     },
@@ -175,7 +168,6 @@ $VERSION = '1.04';
         SubDirectory => {
             TagTable => 'Image::ExifTool::Unknown::Main',
             ProcessProc => \&ProcessUnknown,
-            Start => '$valuePtr',
             ByteOrder => 'Unknown',
         },
     },

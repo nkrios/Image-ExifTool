@@ -49,9 +49,9 @@ my %fileFormat = (
     24 => 'Portable Document File [.PDF] Adobe',
     25 => 'News Industry Text Format (NITF)',
     26 => 'Tape Archive [.TAR]',
-    27 => 'Tidningarnas TelegrambyrŒ NITF version (TTNITF DTD)',
+    27 => 'Tidningarnas Telegrambyra NITF version (TTNITF DTD)',
     28 => 'Ritzaus Bureau NITF version (RBNITF DTD)',
-            29 => 'Corel Draw [.CDR]',
+    29 => 'Corel Draw [.CDR]',
 );
 
 # main IPTC tag table
@@ -175,7 +175,7 @@ my %fileFormat = (
     },
 );
 
-# Record 2 -- ApplicationRecord   
+# Record 2 -- ApplicationRecord
 %Image::ExifTool::IPTC::ApplicationRecord = (
     GROUPS => { 2 => 'Other' },
     WRITE_PROC => \&WriteIPTC,
@@ -449,7 +449,7 @@ my %fileFormat = (
     135 => {
         Name => 'LanguageIdentifier',
         Format => 'string[2,3]',
-    },        
+    },
     150 => {
         Name => 'AudioType',
         Format => 'string[2]',
@@ -717,6 +717,9 @@ my %fileFormat = (
     },
 );
 
+# add our composite tags
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::IPTC::Composite);
+
 
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary
@@ -796,7 +799,7 @@ sub ProcessIPTC($$$)
             'Extra'  => ', ' . $tableInfo->{Name} . ' record',
         );
         if ($tagInfo) {
-            my $format = $tagInfo->{Format}; 
+            my $format = $tagInfo->{Format};
             if (ref $tagInfo eq 'HASH' and $format) {
                 if ($format =~ /^binary/) {
                     $val = 0;
@@ -813,7 +816,7 @@ sub ProcessIPTC($$$)
         }
         $exifTool->FoundTag($tagInfo, $val);
         $success = 1;
-        
+
         $pos += $len;   # increment to next field
     }
     return $success;

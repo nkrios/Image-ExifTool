@@ -19,7 +19,7 @@ require Exporter;
 use Image::ExifTool qw{ImageInfo};
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.04';
+$VERSION = '1.05';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare testVerbose);
 
@@ -50,7 +50,7 @@ sub testCompare($$$)
                     next if $line1 =~ /ExifTool\s*Version/ and
                             $line2 =~ /ExifTool\s*Version/;
                     # some systems use 3 digits in exponents... grrr
-                    if ($line2 =~ s/e(\+|-)0/e$10/) {
+                    if ($line2 =~ s/e(\+|-)0/e$1/) {
                         next if $line1 eq $line2;
                     }
                 }

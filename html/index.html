@@ -1,29 +1,29 @@
 <html>
 <head>
   <title>ExifTool</title>
-  <meta name="KeyWords" content="ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, CRW, CR2, MRW, NEF, PEF, DNG, ORF, Canon, maker notes, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters, write, edit">
+  <meta name="KeyWords" content="meta, information, ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, JP2, GIF, CRW, CR2, MRW, NEF, PEF, DNG, ORF, Canon, maker notes, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters, write, edit">
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
 <h3>
-<a href="Image-ExifTool-4.53.tar.gz">
-Download        Version 4.53</a> - Feb. 7, 2005
+<a href="Image-ExifTool-4.64.tar.gz">
+Download        Version 4.64</a> - Feb. 17, 2005
 (<a href="history.html">Version History</a>)</h3>
 
-<p>ExifTool is a highly customizable Perl script that extracts EXIF, GPS, IPTC,
-XMP, GeoTIFF, ICC Profile and Photoshop IRB meta information from JPG, TIFF,
-GIF, CRW, THM, CR2, MRW, NEF, PEF, ORF and DNG images.  ExifTool also extracts
-information from the maker notes of many digital cameras by various
+<p>ExifTool is a Perl module with an included application script that allow you
+to read and write meta information in image files.  It reads EXIF, GPS, IPTC,
+XMP, GeoTIFF, ICC Profile and Photoshop IRB meta information from JPG, JP2,
+TIFF, GIF, CRW, THM, CR2, MRW, NEF, PEF, ORF and DNG images.  ExifTool also
+extracts information from the maker notes of many digital cameras by various
 manufacturers including Canon, Casio, FujiFilm, Minolta/Konica-Minolta, Nikon,
 Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Sanyo and Sigma/Foveon.
 
-<p><b><font color='#cc0000'>NEW:</font></b> ExifTool now also has the ability to
-edit EXIF, GPS, IPTC, XMP and MakerNotes meta information in JPEG, TIFF, GIF,
-CRW, THM, CR2, NEF, PEF and DNG images.  When a file is written, the original
-file is saved with "_original" added to the file name.  Be sure to verify that
-the new file is OK before erasing the original version.
-<a href="writing.html">Read here</a> for some ramblings on the subject of writing
-meta information.
+<p>ExifTool has the ability to write EXIF, GPS, IPTC, XMP and MakerNotes meta
+information to JPEG, TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG images.  When
+writing, ExifTool preserves the original file by adding "_original" to the file
+name.  You should keep a copy of the original, or thoroughly validate the new
+file before erasing the original.  <a href="writing.html">Read here</a> for some
+ramblings on the subject of writing meta information.
 
 <h2>Features</h2>
 <ul>
@@ -39,12 +39,11 @@ meta information.
 <li>extracts JPG image from Canon CRW files
 <li>extracts large preview from Canon, Casio, Minolta, Nikon and Pentax images
 <li>ability to organize output into groups
+<li>recognizes over <a href="TagNames.html">1000 different tags</a>
 </ul>
 
 <h2><font color='#cc0000'>Writer Limitations</font></h2>
 <ul>
-<li>The write feature is currently under development, and not all tags are
-currently writable.
 <li>ExifTool will not rewrite a file if it detects a problem with the file format.
 <li>ExifTool has been tested with a wide range of different images, but since it
 is not possible to test it with every known image type, there is the possibility
@@ -53,7 +52,7 @@ that it will corrupt some files.  Be sure to keep backups of your files.
 still possible to write illegal values which may cause problems when reading the
 images with other software.  So take care to verify the information you are
 writing.
-<li>Currently, only UTF-8 (ASCII) encoded XMP information is supported.
+<li>Currently, only UTF-8 encoded XMP information is supported.
 </ul>
 
 <h2>Running ExifTool</h2>
@@ -127,25 +126,27 @@ DESCRIPTION
     Prints or writes information for specified tags from/to listed files. -TAG
     specifies the name of a tag to extract or --TAG to ignore.  FILE may be an
     image file name, a directory name, or - for the standard input. Supported
-    file types are JPG, TIFF, GIF, THM, CRW, CR2, MRW, NEF, PEF, ORF and DNG.
+    file types are JPG, JP2, TIFF, GIF, THM, CRW, CR2, MRW, NEF, PEF, ORF and
+    DNG.
 
     -TAG=VALUE sets the value of a tag, and -TAG= deletes a tag.  -TAG+=VALUE
     adds a value to a list without replacing existing values, and -TAG-=VALUE
-    deletes a specific value from a list.  Use "-TAG&lt;=FILENAME" to set the value
-    of a tag from the contents of a file (the quotes prevent shell redirection).
-    The tag is written to all groups where it is valid if no group is specified.
-    A special (and powerful) variation of this syntax, -AllTagsFromFile=SRCFILE,
-    allows all writable tags to be set from information in another file.
+    deletes a specific value from a list.  Use "-TAG&lt;=FILENAME" to set the
+    value of a tag from the contents of a file (the quotes prevent shell
+    redirection). The tag is written to all groups where it is valid if no group
+    is specified. A special (and powerful) variation of this syntax,
+    -AllTagsFromFile=SRCFILE, allows all writable tags to be set from
+    information in another file.
 
     Any tag name may be prefixed by a group name to specify the location (ie.
     -GROUP:TAG).  While reading information, any group name in family 0 or 1 may
     be used.  For writing, valid groups are EXIF, GPS, IPTC, XMP, MakerNotes, or
     any EXIF IFD name.
 
-    Note: The writing feature is under development.  Currently, EXIF, GPS, IPTC,
-    XMP and MakerNotes tags may be written to JPG, TIFF, GIF, CRW, THM, CR2,
-    NEF, PEF and DNG files.  Take care to verify that the new file is OK before
-    erasing the original (which is renamed to FILE_original).
+    Currently, EXIF, GPS, IPTC, XMP and MakerNotes tags may be written to JPG,
+    TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG files.  Be sure to verify that
+    the new file is OK before erasing the original (which is renamed to
+    FILE_original).
 
 OPTIONS
     -list   - list all valid tag names
@@ -331,7 +332,7 @@ binary data.  The simple script above does not handle this case.
 
 <p>See the <a href="ExifTool.html">Image::ExifTool Documentation</a> for more details.
 
-<h2>Available Tag Names</h2>
+<h2><a href="TagNames.html">ExifTool Tag Names</a></h2>
 
 Tag names are entered on the command line with a leading '-' in the order you
 want them displayed. Case is not significant.  The tag name may be prefixed by a
@@ -339,9 +340,14 @@ group name and a colon to specify a location for the tag.
 
 <p>ie) "exiftool -filename -imagesize -exif:fnumber image.jpg"
 
-<p>Current lists of <a href="tag_list.html">available tag names</a> or
-<a href="write_list.html">writable tag names</a> are obtained using
-the -list or -listw options.
+<p>A complete list of <a href="TagNames.html">ExifTool Tag Names</a>
+accompanies this documentation.  As well, current lists of available tag
+names and writable tag names may also be obtained using the exiftool -list
+and -listw options.  But perhaps the easiest way to determine a tag name is
+to use the -S option to print the tag names instead of descriptions for all
+information in a file.  It may also be useful to use the -G option to
+display the group names, and the -H or -D option to print the numerical tag
+ID's for reference.
 
 <p><b>Notes:</b> 
 
@@ -414,6 +420,7 @@ No translation between similar tags with different names is done.
 <h2>Addition Documentation</h2>
 <ul>
 <li><a href="history.html">ExifTool Revision History</a>
+<li><a href="TagNames.html">ExifTool Tag Names</a>
 <li><a href="ExifTool.html">Image::ExifTool Module Documentation</a>
 <li><a href="writing.html">Comments on the Subject of Writing Meta Information</a>
 <li><a href="canon_raw.html">Canon RAW (CRW) File Format Specification</a>
@@ -471,6 +478,7 @@ And thanks to the following people for their help:
 <li>Daniel Pittman for his additions to the Canon WhiteBalance conversion
 <li>Christian Koller for decoding the 20D custom functions
 <li>Juha Eskelinen for figuring out the 20D FileNumber
+<li>Matt Madrid for his testing and feedback
 </ul>
 
 <hr>

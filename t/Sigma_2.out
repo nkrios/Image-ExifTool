@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.63
 [File, File, Image]  - File Name: Sigma.jpg
 [File, File, Image]  - File Size: 2KB
 [File, File, Image]  - File Type: JPEG
@@ -31,7 +31,7 @@
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2268
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1512
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
-[EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
+[EXIF, ExifIFD, Image] 41728 - File Source: Sigma Digital Camera
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Custom
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Manual

@@ -11,88 +11,91 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <p><table border=1 cellpadding=4 cellspacing=0><tr><th>Name</th><th>Description</th></tr>
 
-<tr><td>ADD_DIRS</td><td>hash of parent directories for each directory added during
+<tr><td>ADD_DIRS</td><td>Hash of parent directories for each directory added during
 	writing (Note: entry may exist but be undefined for top-level
 	directory!)</td></tr>
 
-<tr><td>CHANGED</td><td>number of tags changed during writing</td></tr>
+<tr><td>CHANGED</td><td>Number of tags changed during writing</td></tr>
 
-<tr><td>CameraMake</td><td>camera make set during reading and writing</td></tr>
+<tr><td>CameraMake</td><td>Camera make set during reading and writing</td></tr>
 
-<tr><td>CameraModel</td><td>camera model name set during reading and writing</td></tr>
+<tr><td>CameraModel</td><td>Camera model name set during reading and writing</td></tr>
 
-<tr><td>DIR_NAME</td><td>name of directory currently being processed</td></tr>
+<tr><td>DIR_NAME</td><td>Name of directory currently being processed</td></tr>
 
-<tr><td>EDIT_DIRS</td><td>hash of parent directories for each directory edited during
+<tr><td>EDIT_DIRS</td><td>Hash of parent directories for each directory edited during
 	writing (Note: entry may exist but be undefined for top-level
 	directory!)</td></tr>
 
-<tr><td>EXIF_DATA</td><td>reference to EXIF data while reading file</td></tr>
+<tr><td>EXIF_BYTE_ORDER</td><td>Byte ordering for main EXIF directory</td></tr>
 
-<tr><td>FILENAME</td><td>name of input file while extracting (only if we opened it, '' otherwise)</td></tr>
+<tr><td>EXIF_DATA</td><td>Reference to EXIF data while reading file</td></tr>
 
-<tr><td>FILE_ORDER</td><td>hash of numbers to give the sequence the tags were
+<tr><td>FILENAME</td><td>Name of input file while extracting (only if we opened it, '' otherwise)</td></tr>
+
+<tr><td>FILE_ORDER</td><td>Hash of numbers to give the sequence the tags were
     extracted from file, keyed by tag key</td></tr>
 
-<tr><td>FILE_TYPE</td><td>file type (JPEG, TIFF, etc...)</td></tr>
+<tr><td>FILE_TYPE</td><td>File type (JPEG, TIFF, etc...)</td></tr>
 
-<tr><td>FOUND_TAGS</td><td>found tags with proper case and order</td></tr>
+<tr><td>FOUND_TAGS</td><td>Found tags with proper case and order</td></tr>
 
-<tr><td>INDENT</td><td>indent string for verbose output</td></tr>
+<tr><td>INDENT</td><td>Indent string for verbose output</td></tr>
 
-<tr><td>IO_TAG_LIST</td><td>list for output of requested tags in proper case and order</td></tr>
+<tr><td>IO_TAG_LIST</td><td>List for output of requested tags in proper case and order</td></tr>
 
-<tr><td>MAKER_NOTE_ENTRIES</td><td>used by Image::ExifTool::CanonRaw as temporary storage for
+<tr><td>MAKER_NOTE_ENTRIES</td><td>Used by Image::ExifTool::CanonRaw as temporary storage for
     maker note directory entries when synthesizing maker notes from CRW file with the
     MakerNotes option</td></tr>
 
-<tr><td>MAKER_NOTE_POS</td><td>position of maker note in source file set if maker notes are
+<tr><td>MAKER_NOTE_POS</td><td>Position of maker note in source file set if maker notes are
     extracted with MakerNotes option.  Used by SetNewValuesFromFile() to adjust offsets in
     maker note IFD</td></tr>
 
-<tr><td>MAKER_NOTE_VAL_BUFF</td><td>used by Image::ExifTool::CanonRaw as temporary storage for
+<tr><td>MAKER_NOTE_VAL_BUFF</td><td>Used by Image::ExifTool::CanonRaw as temporary storage for
     maker note value information when synthesizing maker notes from CRW file with the
     MakerNotes option</td></tr>
 
-<tr><td>MAKER_NOTE_WARN</td><td>warning flag set if pointers in maker notes directory run
+<tr><td>MAKER_NOTE_WARN</td><td>Warning flag set if pointers in maker notes directory run
     outside of maker notes data</td></tr>
 
-<tr><td>NEW_VALUE</td><td>hash of new value information keyed by tag info reference
+<tr><td>NEW_VALUE</td><td>Hash of new value information keyed by tag info reference
 	Elements of new value information hash are:
-            
-    <table><tr><td>TagInfo</td><td>tag information reference</td></tr>
-    <tr><td>DelValue</td><td>list of specific values to delete</td></tr>
-    <tr><td>Value</td><td>list of values to add</td></tr>
-    <tr><td>IsCreating</td><td>must be set for the tag to be added.  otherwise just
+    <table><tr><td>TagInfo</td><td>- tag information reference</td></tr>
+    <tr><td>DelValue</td><td>- list of specific values to delete</td></tr>
+    <tr><td>Value</td><td>- list of values to add</td></tr>
+    <tr><td>IsCreating</td><td>- must be set for the tag to be added.  otherwise just
     	changed if it already exists</td></tr></table>
 
-<tr><td>NUM_FOUND</td><td>number of tags found</td></tr>
+<tr><td>NUM_FOUND</td><td>Number of tags found</td></tr>
 
 <tr><td>OPTIONS</td><td>ExifTool options</td></tr>
 
-<tr><td>PRINT_CONV</td><td>hash of PrintConv values keyed by tag key</td></tr>
+<tr><td>PRINT_CONV</td><td>Hash of PrintConv values keyed by tag key</td></tr>
 
-<tr><td>RAF</td><td>random access file object for reading from input file</td></tr>
+<tr><td>PRIORITY</td><td>Hash of tag Priority values for current tag, keyed by tag name (not tag key!)</td></tr>
 
-<tr><td>REQUESTED_TAGS</td><td>list of requested tags in original case</td></tr>
+<tr><td>RAF</td><td>Random access file object for reading from input file</td></tr>
 
-<tr><td>TAG_EXTRA</td><td>hash of extra information (IFD name or XMP namespace) keyed by
+<tr><td>REQUESTED_TAGS</td><td>List of requested tags in original case</td></tr>
+
+<tr><td>TAG_EXTRA</td><td>Hash of extra information (IFD name or XMP namespace) keyed by
 	tag key</td></tr>
 
-<tr><td>TAG_INFO</td><td> hash of tagInfo hash references, keyed by tag key</td></tr>
+<tr><td>TAG_INFO</td><td>Hash of tagInfo hash references, keyed by tag key</td></tr>
 
-<tr><td>VALUE_CONV</td><td>hash of ValueConv values keyed by tag key</td></tr>
+<tr><td>VALUE_CONV</td><td>Hash of ValueConv values keyed by tag key</td></tr>
 
-<tr><td>WRITE_GROUPS</td><td>list of write groups in order of priority</td></tr>
+<tr><td>WRITE_GROUPS</td><td>List of write groups in order of priority</td></tr>
 
-<tr><td>WRITE_PRIORITY</td><td>hash of write priority values keyed by group name</td></tr>
+<tr><td>WRITE_PRIORITY</td><td>Hash of write priority values keyed by group name</td></tr>
 
-<tr><td>XMP_CAPTURE</td><td>hash of tag information (value, attribute hash) keyed by XMP
+<tr><td>XMP_CAPTURE</td><td>Hash of tag information (value, attribute hash) keyed by XMP
 	property path, used by XMP module during writing</td></tr>
 
-<tr><td>XMP_ERROR</td><td>error string used by XMP module during writing</td></tr>
+<tr><td>XMP_ERROR</td><td>Error string used by XMP module during writing</td></tr>
 
-<tr><td>XMP_NS</td><td>hash of URI's keyed by namespace prefix, used by XMP module
+<tr><td>XMP_NS</td><td>Hash of URI's keyed by namespace prefix, used by XMP module
 	during writing to remember all used namespaces</td></tr>
 
 </table>

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.34
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.54
 [File, File, Image]  - File Name: Writer_12_failed.jpg
 [File, File, Image]  - File Size: 6KB
 [File, File, Image]  - File Type: JPEG
@@ -16,7 +16,7 @@
 [EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/500
 [EXIF, ExifIFD, Image] 33437 - Aperture: 5.6
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
-[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 50
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:03:06 13:09:25
 [EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:03:06 13:09:25
@@ -64,7 +64,7 @@
 [MakerNotes, Pentax, Image] 9 - Pentax Image Size: 2048x1536
 [MakerNotes, Pentax, Camera] 11 - Picture Mode: Not Selected
 [MakerNotes, Pentax, Camera] 13 - Focus Mode: Normal
-[MakerNotes, Pentax, Camera] 20 - Pentax ISO: 50
+[MakerNotes, Pentax, Camera] 20 - ISO Speed: 50
 [MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
 [MakerNotes, Pentax, Camera] 25 - White Balance: Auto
 [MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm

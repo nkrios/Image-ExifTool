@@ -15,7 +15,7 @@ package Image::ExifTool::Olympus;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 %Image::ExifTool::Olympus::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -55,7 +55,10 @@ $VERSION = '1.06';
     },
     0x0207 => 'SoftwareRelease',
     0x0208 => 'PictInfo',
-    0x0209 => 'CameraID',
+    0x0209 => {
+        Name => 'CameraID',
+        Format => 'string', # this really should have been a string
+    },
     0x020b => {
         Name => 'EpsonImageWidth', #PH
         Writable => 'int16u',

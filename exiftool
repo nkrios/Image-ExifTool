@@ -190,7 +190,8 @@ DESCRIPTION
     Prints or writes information for specified tags from/to listed files. -TAG
     specifies the name of a tag to extract or --TAG to ignore.  FILE may be an
     image file name, a directory name, or - for the standard input. Supported
-    file types are JPG, TIFF, GIF, THM, CRW, CR2, MRW, NEF, PEF, ORF and DNG.
+    file types are JPG, JP2, TIFF, GIF, THM, CRW, CR2, MRW, NEF, PEF, ORF and
+    DNG.
 
     -TAG=VALUE sets the value of a tag, and -TAG= deletes a tag.  -TAG+=VALUE
     adds a value to a list without replacing existing values, and -TAG-=VALUE
@@ -532,7 +533,7 @@ sub GetImageInfo($$)
             warn "File not found: $file\n";
             return;
         }
-        unless ($binaryOutput or $outputExt) {
+        unless ($binaryOutput or $outputExt or @printFmt) {
             if ($htmlOutput) {
                 print "<!-- $file -->\n";
             } else {

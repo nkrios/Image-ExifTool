@@ -21,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessICC_Profile($$$);
 
@@ -505,7 +505,11 @@ sub FormatICCTag($$$)
     # textDescriptionType (ref 2, replaced by multiLocalizedUnicodeType)
     if ($type eq 'desc' and $size >= 12) {
         my $len = Get32u($dataPt, $offset+8);
-        return substr($$dataPt, $offset+12, $len) if $size >= $len + 12;
+        if ($size >= $len + 12) {
+            my $str = substr($$dataPt, $offset+12, $len);
+            $str =~ s/\0.*//;   # truncate at null terminator
+            return $str;
+        }
     }
     # u16Fixed16ArrayType
     if ($type eq 'uf32') {

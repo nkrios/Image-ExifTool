@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.46
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.54
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - File Size: 6KB
 [File, File, Image]  - File Type: JPEG
@@ -50,7 +50,7 @@
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: +2
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown (0)
 [MakerNotes, Nikon, Camera] 1 - File System Version: 2.10
-[MakerNotes, Nikon, Image] 2 - ISO: 200
+[MakerNotes, Nikon, Image] 2 - ISO Speed: 200
 [MakerNotes, Nikon, Camera] 4 - Quality: Fine
 [MakerNotes, Nikon, Camera] 5 - White Balance: Auto
 [MakerNotes, Nikon, Camera] 6 - Sharpness: Med.H

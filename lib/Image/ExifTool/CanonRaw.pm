@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -172,6 +172,7 @@ sub BuildMakerNotes($$$$$$);
             TagTable => 'Image::ExifTool::Canon::WhiteBalance',
         },
     },
+    0x10ae => 'ColorTemperature',
     0x10b4 => {
         Name => 'ColorSpace',
         PrintConv => {
@@ -261,34 +262,41 @@ sub BuildMakerNotes($$$$$$);
         PrintConv => '\$val',
         PrintConvInv => '$val',
     },
-    # the following entries are actually subdirectories --
-    # 0x28 and 0x30 tag types are handled automatically by the decoding logic
+    # the following entries are subdirectories
+    # (any 0x28 and 0x30 tag types are handled automatically by the decoding logic)
     0x2804 => {
         Name => 'ImageDescription',
+        SubDirectory => { },
         Writable => 0,
     },
     0x2807 => { #3
         Name => 'CameraObject',
+        SubDirectory => { },
         Writable => 0,
     },
     0x3002 => { #3
         Name => 'ShootingRecord',
+        SubDirectory => { },
         Writable => 0,
     },
     0x3003 => { #3
         Name => 'MeasuredInfo',
+        SubDirectory => { },
         Writable => 0,
     },
     0x3004 => { #3
         Name => 'CameraSpecification',
+        SubDirectory => { },
         Writable => 0,
     },
     0x300a => { #3
         Name => 'ImageProps',
+        SubDirectory => { },
         Writable => 0,
     },
     0x300b => {
         Name => 'ExifInformation',
+        SubDirectory => { },
         Writable => 0,
     },
 );

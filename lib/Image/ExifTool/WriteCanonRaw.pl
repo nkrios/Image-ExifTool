@@ -28,7 +28,7 @@ my %mapRawTag = (
     0x10a8 => 0xa8,
     0x10a9 => 0xa9, # WhiteBalanceTable
     0x10aa => 0xaa,
-    0x10ae => 0xae,
+    0x10ae => 0xae, # ColorTemperature
     0x10b4 => 0xb4, # ColorSpace
     0x10b5 => 0xb5,
     0x10c0 => 0xc0,
@@ -303,7 +303,7 @@ sub WriteCanonRaw($$$)
         }
         # edit subdirectory if necessary
         if ($tagInfo) {
-            if ($subdir) {
+            if ($subdir and $$subdir{TagTable}) {
                 my $name = $$tagInfo{Name};
                 my $newTagTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
                 return undef unless $newTagTable;

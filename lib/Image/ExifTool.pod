@@ -55,8 +55,8 @@ Image::ExifTool - Read and write meta information in image files
 
 ExifTool provides an extensible set of perl modules to read and write meta
 information in image files.  It reads EXIF, GPS, IPTC, XMP, GeoTIFF, ICC Profile
-and Photoshop IRB meta information from JPEG, TIFF, GIF, THM, CRW (Canon RAW),
-CR2 (Canon 1D Mk II RAW), MRW (Minolta RAW), NEF (Nikon Electronic image
+and Photoshop IRB meta information from JPEG, JP2, TIFF, GIF, THM, CRW (Canon
+RAW), CR2 (Canon 1D Mk II RAW), MRW (Minolta RAW), NEF (Nikon Electronic image
 Format), PEF (Pentax RAW), ORF (Olympus RAW Format) and DNG (Digital Negative)
 images, as well as the maker notes of many digital cameras by various
 manufacturers including Canon, Casio, FujiFilm, Minolta/Konica-Minolta, Nikon,
@@ -132,7 +132,9 @@ is extracted.  Tag names may begin with '-' indicating tags to exclude.  The
 tag names are case-insensitive, so note that the returned tags may not be
 exactly the same as the requested tags. For this reason it is best to use
 either the keys of the returned hash or the elements of the tag array when
-accessing the return values
+accessing the return values.  See
+L<Image::ExifTool::TagNames|Image::ExifTool::TagNames> for a complete list
+of ExifTool tag names.
 
 =item GLOB ref
 
@@ -1019,16 +1021,16 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (General Location):
 
-Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC, MakerNotes,
-Photoshop, PrintIM, XMP
+Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC, Jpeg2000,
+MakerNotes, Photoshop, PrintIM, XMP
 
 =item Family 1 (Detailed Location):
 
 Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
 FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, MakerUnknown, Minolta,
-Nikon, NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM, Sanyo,
-Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-pdf,
+ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000, MakerUnknown,
+Minolta, Nikon, NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM,
+Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-pdf,
 XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
 
 =item Family 2 (Category):
@@ -1072,7 +1074,8 @@ people who have contributed to this project.
 
 =head1 SEE ALSO
 
-L<Image::Info|Image::Info>, L<Image::MetaData::JPEG|Image::MetaData::JPEG>
+L<ExifTool Tag Names|Image::ExifTool::TagNames>, L<Image::Info|Image::Info>,
+L<Image::MetaData::JPEG|Image::MetaData::JPEG>
 
 =cut
 

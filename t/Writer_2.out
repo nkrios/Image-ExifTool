@@ -4,6 +4,7 @@ AFPointsUsed: 0 ()
 Aperture: 14.3
 ApertureValue: 14.0
 AutoExposureBracketing: Off
+AutoRotate: None
 BlueBalanceAuto: 0.83939
 BlueBalanceB&W: 0.84024
 BlueBalanceCloudy: 0.99047
@@ -26,6 +27,7 @@ CanonImageType: CRW:EOS DIGITAL REBEL CMOS RAW
 CanonImageWidth: 3072
 CanonImageWidthAsShot: 3072
 ColorSpace: sRGB
+ColorTemperature: 5200
 ColorTone: Normal
 Comment: New comment in JPG file
 ComponentsConfiguration: YCbCr
@@ -40,7 +42,7 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 4.50
+ExifToolVersion: 4.54
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0

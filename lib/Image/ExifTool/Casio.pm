@@ -15,9 +15,9 @@ package Image::ExifTool::Casio;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
-%Image::ExifTool::Casio::MakerNote1 = (
+%Image::ExifTool::Casio::Type1 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
@@ -110,7 +110,7 @@ $VERSION = '1.04';
 );
 
 # ref 2:
-%Image::ExifTool::Casio::MakerNote2 = (
+%Image::ExifTool::Casio::Type2 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
@@ -174,8 +174,9 @@ $VERSION = '1.04';
         },
     },
     0x0014 => { 
-        Name => 'ISOSetting',
-        Description => 'ISO',
+        Name => 'ISO',
+        Description => 'ISO Speed',
+        Priority => 0,
         Writable => 'int16u',
         PrintConv => { 
            3 => 50,
@@ -236,7 +237,6 @@ $VERSION = '1.04';
         Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
-            Start => '$valuePtr',
         },
     },
     0x2000 => { 

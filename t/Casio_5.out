@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.32
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.64
 [File, File, Image]  - File Name: Casio_5_failed.jpg
 [File, File, Image]  - File Size: 2KB
 [File, File, Image]  - File Type: JPEG
@@ -53,37 +53,37 @@
 [MakerNotes, Casio, Image] 3 - Casio Preview Length: 28874
 [MakerNotes, Casio, Image] 4 - Casio Preview Start: 1260
 [MakerNotes, Casio, Camera] 8192 - Preview Image: (Binary data 26 bytes)
-[MakerNotes, Casio, Camera] 8193 - Casio Maker Note 2 0x2001: 
-[MakerNotes, Casio, Camera] 8194 - Casio Maker Note 2 0x2002: .
-[MakerNotes, Casio, Camera] 8195 - Casio Maker Note 2 0x2003: 
+[MakerNotes, Casio, Camera] 8193 - Casio Type 2 0x2001: 
+[MakerNotes, Casio, Camera] 8194 - Casio Type 2 0x2002: .
+[MakerNotes, Casio, Camera] 8195 - Casio Type 2 0x2003: 
 [MakerNotes, Casio, Camera] 8209 - White Balance Bias: 92 78
 [MakerNotes, Casio, Camera] 8210 - White Balance: Auto?
-[MakerNotes, Casio, Camera] 8211 - Casio Maker Note 2 0x2013: 2
-[MakerNotes, Casio, Camera] 8225 - Casio Maker Note 2 0x2021: 176 352 120 240
+[MakerNotes, Casio, Camera] 8211 - Casio Type 2 0x2013: 2
+[MakerNotes, Casio, Camera] 8225 - Casio Type 2 0x2021: 176 352 120 240
 [MakerNotes, Casio, Camera] 8226 - Object Distance: 536870.912 m
-[MakerNotes, Casio, Camera] 8227 - Casio Maker Note 2 0x2023: 1
-[MakerNotes, Casio, Camera] 8241 - Casio Maker Note 2 0x2031: 
-[MakerNotes, Casio, Camera] 8242 - Casio Maker Note 2 0x2032: .
-[MakerNotes, Casio, Camera] 8243 - Casio Maker Note 2 0x2033: 1
+[MakerNotes, Casio, Camera] 8227 - Casio Type 2 0x2023: 1
+[MakerNotes, Casio, Camera] 8241 - Casio Type 2 0x2031: 
+[MakerNotes, Casio, Camera] 8242 - Casio Type 2 0x2032: .
+[MakerNotes, Casio, Camera] 8243 - Casio Type 2 0x2033: 1
 [MakerNotes, Casio, Camera] 8244 - Flash Distance: 0
 [MakerNotes, Casio, Camera] 12288 - Record Mode: Normal
 [MakerNotes, Casio, Camera] 12289 - Self Timer: Off
 [MakerNotes, Casio, Camera] 12290 - Quality: Fine
 [MakerNotes, Casio, Camera] 12291 - Focus Mode: Single-Area Auto Focus
-[MakerNotes, Casio, Camera] 12293 - Casio Maker Note 2 0x3005: 0 1
+[MakerNotes, Casio, Camera] 12293 - Casio Type 2 0x3005: 0 1
 [MakerNotes, Casio, Camera] 12294 - Time Zone: EST5EDT
 [MakerNotes, Casio, Camera] 12295 - Bestshot Mode: Off
-[MakerNotes, Casio, Camera] 12305 - Casio Maker Note 2 0x3011: 
-[MakerNotes, Casio, Camera] 12306 - Casio Maker Note 2 0x3012: 
-[MakerNotes, Casio, Camera] 12307 - Casio Maker Note 2 0x3013: 
+[MakerNotes, Casio, Camera] 12305 - Casio Type 2 0x3011: 
+[MakerNotes, Casio, Camera] 12306 - Casio Type 2 0x3012: 
+[MakerNotes, Casio, Camera] 12307 - Casio Type 2 0x3013: 
 [MakerNotes, Casio, Camera] 12308 - CCD ISO Sensitivity: 50
 [MakerNotes, Casio, Camera] 12309 - Color Mode: Off
 [MakerNotes, Casio, Camera] 12310 - Enhancement: Off
 [MakerNotes, Casio, Camera] 12311 - Filter: Off
-[MakerNotes, Casio, Camera] 12312 - Casio Maker Note 2 0x3018: 0
-[MakerNotes, Casio, Camera] 12313 - Casio Maker Note 2 0x3019: 1
-[MakerNotes, Casio, Camera] 12314 - Casio Maker Note 2 0x301a: 0
-[MakerNotes, Casio, Camera] 12315 - Casio Maker Note 2 0x301b: 0
+[MakerNotes, Casio, Camera] 12312 - Casio Type 2 0x3018: 0
+[MakerNotes, Casio, Camera] 12313 - Casio Type 2 0x3019: 1
+[MakerNotes, Casio, Camera] 12314 - Casio Type 2 0x301a: 0
+[MakerNotes, Casio, Camera] 12315 - Casio Type 2 0x301b: 0
 [Composite, Composite, Image]  - Aperture: 4.3
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120

@@ -26,7 +26,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.40';
+$VERSION = '1.44';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -180,13 +180,13 @@ sub Rationalize($;$);
         # even though Group 1 is set dynamically we need to register IFD1 once
         # so it will show up in the group lists
         Groups => { 1 => 'IFD1' },
-        # set Priority flag so the value found in the first IFD (IFD0) doesn't
+        # set Priority to zero so the value found in the first IFD (IFD0) doesn't
         # get overwritten by subsequent IFD's (same for ImageHeight below)
-        Flags => 'Priority',
+        Priority => 0,
     },
     0x101 => {
         Name => 'ImageHeight',
-        Flags => 'Priority',
+        Priority => 0,
     },
     0x102 => 'BitsPerSample',
     0x103 => {
@@ -551,7 +551,6 @@ sub Rationalize($;$);
         # this could be an XMP block
         SubDirectory => {
             TagTable => 'Image::ExifTool::XMP::Main',
-            Start => '$valuePtr',
         },
     },
     0x1000 => 'RelatedImageFileFormat',
@@ -585,7 +584,6 @@ sub Rationalize($;$);
         Name => 'IPTC-NAA',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::Main',
-            Start => '$valuePtr',
         },
     },
     0x8474 => 'IntergraphPacketData', #3
@@ -599,7 +597,6 @@ sub Rationalize($;$);
         Name => 'IPTC-NAA2',
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::Main',
-            Start => '$valuePtr',
             DirName => 'IPTC2',     # change name because this isn't the IPTC we want to write
         },
     },
@@ -624,7 +621,6 @@ sub Rationalize($;$);
         Name => 'ICC_Profile',
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
-            Start => '$valuePtr',
         },
     },
     0x87ac => 'ImageLayer',
@@ -846,14 +842,32 @@ sub Rationalize($;$);
         Groups => { 2 => 'Time' },
     },
     0x935c => 'ImageSourceData', #3
-    0x9c9b => 'XPTitle',
-    0x9c9c => 'XPComment',
+    0x9c9b => {
+        Name => 'XPTitle',
+        Format => 'undef',
+        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+    },
+    0x9c9c => {
+        Name => 'XPComment',
+        Format => 'undef',
+        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+    },
     0x9c9d => {
         Name => 'XPAuthor',
         Groups => { 2 => 'Author' },
+        Format => 'undef',
+        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
     },
-    0x9c9e => 'XPKeywords',
-    0x9c9f => 'XPSubject',
+    0x9c9e => {
+        Name => 'XPKeywords',
+        Format => 'undef',
+        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+    },
+    0x9c9f => {
+        Name => 'XPSubject',
+        Format => 'undef',
+        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+    },
     0xa000 => 'FlashpixVersion',
     0xa001 => {
         Name => 'ColorSpace',
@@ -927,7 +941,7 @@ sub Rationalize($;$);
         PrintConv => {
             3 => 'Digital Camera',
             # handle the case where Sigma incorrectly gives this tag a count of 4
-            "\3\0\0\0" => 'Digital Camera',
+            "\3\0\0\0" => 'Sigma Digital Camera',
         },
     },
     0xa301 => {
@@ -936,7 +950,10 @@ sub Rationalize($;$);
             1 => 'Directly photographed',
         },
     },
-    0xa302 => 'CFAPattern',
+    0xa302 => {
+        Name => 'CFAPattern',
+        PrintConv => 'Image::ExifTool::Exif::PrintCFAPattern($val)',
+    },
     0xa401 => {
         Name => 'CustomRendered',
         PrintConv => {
@@ -956,10 +973,10 @@ sub Rationalize($;$);
     0xa403 => {
         Name => 'WhiteBalance',
         Groups => { 2 => 'Camera' },
-        # set flag to keep the first WhiteBalance tag found, since the MakerNotes
-        # white balance comes before the EXIF WhiteBalance and is more accurate
-        # and contains more information (if it exists)
-        Flags => 'Priority',
+        # set Priority to zero to keep this WhiteBalance from overriding the
+        # MakerNotes WhiteBalance, since the MakerNotes WhiteBalance and is more
+        # accurate and contains more information (if it exists)
+        Priority => 0,
         PrintConv => {
             0 => 'Auto',
             1 => 'Manual',
@@ -1035,7 +1052,6 @@ sub Rationalize($;$);
         Description => 'Print Image Matching',
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
-            Start => '$valuePtr',
         },
     },
     0xc612 => 'DNGVersion', #2
@@ -1216,7 +1232,7 @@ sub Rationalize($;$);
         },
         ValueConv => '"$val[0]x$val[1]"',
     },
-    ProcessGeoTiffDirectory => {
+    ProcessGeoTiff => {
         Require => {
             0 => 'GeoTiffDirectory',
         },
@@ -1237,6 +1253,9 @@ sub Rationalize($;$);
         },
     },
 );
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Exif::Composite);
 
 
 #------------------------------------------------------------------------------
@@ -1280,7 +1299,6 @@ sub CalcScaleFactor35efl
 
 #------------------------------------------------------------------------------
 # Convert exposure compensation fraction
-#
 sub ConvertFraction($)
 {
     my $val = shift;
@@ -1329,6 +1347,32 @@ sub PrintExposureTime($)
     $_ = sprintf("%.1f",$secs);
     s/\.0$//;
     return $_;
+}
+
+#------------------------------------------------------------------------------
+# Print CFA Pattern
+sub PrintCFAPattern($)
+{
+    my $val = shift;
+    return '<truncated data>' unless length $val > 4;
+    my ($nx, $ny) = (Get16u(\$val, 0), Get16u(\$val, 2));
+    return '<zero pattern size>' unless $nx and $ny;
+    my $end = 4 + $nx * $ny;
+    if ($end > length $val) {
+        # try swapping byte order (I have seen this order different than in EXIF)
+        ($nx, $ny) = unpack('n2',pack('v2',$nx,$ny));
+        $end = 4 + $nx * $ny;
+        return '<invalid pattern size>' if $end > length $val;
+    }
+    my @cfaColor = ('Red','Green','Blue','Cyan','Magenta','Yellow','White');
+    my ($pos, $rtnVal) = (4, '[');
+    for (;;) {
+        $rtnVal .= $cfaColor[Get8u(\$val,$pos)] || 'Unknown';
+        last if ++$pos >= $end;
+        ($pos - 4) % $ny and $rtnVal .= ',', next;
+        $rtnVal .= '][';
+    }
+    return $rtnVal . ']';
 }
 
 #------------------------------------------------------------------------------
@@ -1552,12 +1596,13 @@ sub ProcessExif($$$)
                 my $desc = $1;
                 $val = $2;
                 my $tag = $desc;
+                $tag =~ s/'s//; # remove 's (so "Owner's Name" becomes "OwnerName")
                 $tag =~ tr/a-zA-Z0-9_//cd; # remove unknown characters
                 if ($tag) {
                     my $tagInfo = {
                         Name => $tag,
                         Description => $desc,
-                        PrintConv => '$_=$val;s/.*: //;$_', # remove descr
+                        ValueConv => '$_=$val;s/.*: //;$_', # remove descr
                     };
                     Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
                 }
@@ -1623,8 +1668,6 @@ sub ProcessExif($$$)
                     $subdirStart = eval($$subdir{Start});
                     # convert back to relative to $subdirDataPt
                     $subdirStart -= $subdirDataPos;
-                } else {
-                    $subdirStart = 0;
                 }
                 # this is a pain, but some maker notes are always a specific
                 # byte order, regardless of the byte order of the file

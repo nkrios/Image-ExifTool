@@ -222,6 +222,26 @@ my %writeTable = (
     0x9291 => 'string',     # SubSecTimeOriginal
     0x9292 => 'string',     # SubSecTimeDigitized
 #    0x9928 => 'undef',      # Opto-ElectricConversionFactor
+    0x9c9b => {             # XPTitle
+        Writable => 'int8u',
+        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+    },
+    0x9c9c => {             # XPComment
+        Writable => 'int8u',
+        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+    },
+    0x9c9d => {             # XPAuthor
+        Writable => 'int8u',
+        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+    },
+    0x9c9e => {             # XPKeywords
+        Writable => 'int8u',
+        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+    },
+    0x9c9f => {             # XPSubject
+        Writable => 'int8u',
+        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+    },
     0xa000 => 'undef',      # FlashpixVersion
     0xa001 => 'int16u',     # ColorSpace
     0xa002 => 'int16u',     # ExifImageWidth (could also be int32u)
@@ -273,6 +293,16 @@ my %writeTable = (
 #
 # DNG stuff (back in IFD0)
 #
+    0xc612 => {             # DNGVersion
+        Writable => 'int8u',
+        WriteGroup => 'IFD0',
+        Count => 4,
+    },
+    0xc612 => {             # DNGBackwardVersion
+        Writable => 'int8u',
+        WriteGroup => 'IFD0',
+        Count => 4,
+    },
     0xc614 => {             # UniqueCameraModel
         Writable => 'string',
         WriteGroup => 'IFD0',
@@ -281,6 +311,11 @@ my %writeTable = (
         Writable => 'string',
         WriteGroup => 'IFD0',
         PrintConvInv => '$val',
+    },
+    0xc61e => {             # DefaultScale
+        Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+        Count => 2,
     },
     0xc61f => {             # DefaultCropOrigin
         Writable => 'int32u',
@@ -292,6 +327,26 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Count => 2,
     },
+    0xc62a => {             # BaselineExposure
+        Writable => 'rational32s',
+        WriteGroup => 'IFD0',
+    },
+    0xc62b => {             # BaselineNoise
+        Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+    },
+    0xc62c => {             # BaselineSharpness
+        Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+    },
+    0xc62d => {             # BayerGreenSplit
+        Writable => 'int32u',
+        WriteGroup => 'IFD0',
+    },
+    0xc62e => {             # LinearResponseLimit
+        Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+    },
     0xc62f => {             # DNGCameraSerialNumber
         Writable => 'string',
         WriteGroup => 'IFD0',
@@ -301,6 +356,126 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Count => 4,
         PrintConvInv => '$_=$val;s/(-|mm f)/ /g;$_',
+    },
+    0xc631 => {             # ChromaBlurRadius
+        Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+    },
+    0xc632 => {             # AntiAliasStrength
+        Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+    },
+    0xc633 => {             # ShadowScale
+        Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+    },
+    0xc635 => {             # MakerNoteSafety
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0xc65c => {             # BestQualityScale
+        Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+    },
+    # tags produced by Photoshop Camera RAW
+    # (avoid creating these tags unless there is no other option)
+    0xfde8 => {
+        Name => 'OwnerName',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Owner's Name: $val"},
+    },
+    0xfde9 => {
+        Name => 'SerialNumber',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Serial Number: $val"},
+    },
+    0xfdea => {
+        Name => 'Lens',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Lens: $val"},
+    },
+    0xfe4c => {
+        Name => 'RawFile',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Raw File: $val"},
+    },
+    0xfe4d => {
+        Name => 'Converter',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Converter: $val"},
+    },
+    0xfe4e => {
+        Name => 'WhiteBalance',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"White Balance: $val"},
+    },
+    0xfe51 => {
+        Name => 'Exposure',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Exposure: $val"},
+    },
+    0xfe52 => {
+        Name => 'Shadows',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Shadows: $val"},
+    },
+    0xfe53 => {
+        Name => 'Brightness',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Brightness: $val"},
+    },
+    0xfe54 => {
+        Name => 'Contrast',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Contrast: $val"},
+    },
+    0xfe55 => {
+        Name => 'Saturation',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Saturation: $val"},
+    },
+    0xfe56 => {
+        Name => 'Sharpness',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Sharpness: $val"},
+    },
+    0xfe57 => {
+        Name => 'Smoothness',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Smoothness: $val"},
+    },
+    0xfe58 => {
+        Name => 'MoireFilter',
+        Avoid => 1,
+        Writable => 'string',
+        ValueConv => '$val=~s/.*: //;$val',
+        ValueConvInv => q{"Moire Filter: $val"},
     },
 );
 
@@ -316,7 +491,7 @@ InsertWritableProperties('Image::ExifTool::Exif::Main', \%writeTable, 'ExifIFD',
 sub CheckExif($$$)
 {
     my ($exifTool, $tagInfo, $valPtr) = @_;
-    my $format = $$tagInfo{Writable};
+    my $format = $$tagInfo{Format} || $$tagInfo{Writable};
     if (not $format or $format eq '1') {
         if ($tagInfo->{Groups}->{0} eq 'MakerNotes') {
             return undef;   # OK to have no format for makernotes
@@ -337,22 +512,60 @@ sub InsertWritableProperties($$;$$)
     my $tag;
     my $tagTablePtr = GetTagTable($tableName);
     $checkProc and $tagTablePtr->{CHECK_PROC} = $checkProc;
-    foreach $tag (TagTableKeys($tagTablePtr)) {
-        my $writeInfo = $$writeTablePtr{$tag} or next;
+    foreach $tag (keys %$writeTablePtr) {
+        my $writeInfo = $$writeTablePtr{$tag};
         my @infoList = GetTagInfoList($tagTablePtr, $tag);
-        my $tagInfo;
-        foreach $tagInfo (@infoList) {
-            $writeGroup and $$tagInfo{WriteGroup} = $writeGroup;
-            if (ref $writeInfo) {
-                my $key;
-                foreach $key (%$writeInfo) {
-                    $$tagInfo{$key} = $$writeInfo{$key};
+        if (@infoList) {
+            my $tagInfo;
+            foreach $tagInfo (@infoList) {
+                $writeGroup and $$tagInfo{WriteGroup} = $writeGroup;
+                if (ref $writeInfo) {
+                    my $key;
+                    foreach $key (%$writeInfo) {
+                        $$tagInfo{$key} = $$writeInfo{$key};
+                    }
+                } else {
+                    $$tagInfo{Writable} = $writeInfo;
                 }
-            } else {
-                $$tagInfo{Writable} = $writeInfo;
             }
+        } else {
+            if ($writeGroup and not $$writeInfo{WriteGroup}) {
+                $$writeInfo{WriteGroup} = $writeGroup;
+            }
+            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $writeInfo);
         }
     }
+}
+
+#------------------------------------------------------------------------------
+# convert XP characters to pseudo-UTF8
+# Inputs: 0) XP character string (2 bytes per char, LSB first)
+# Returns: pseudo-UTF8 encoded string (high characters are probably nonsense)
+# Notes: We override the Format for XP values to read them as 'undef' since
+#        it makes a lot more sense.
+sub XPtoUTF8($)
+{
+    my $val = shift;
+    my $outVal;
+    if ($] >= 5.6) {
+        $outVal = pack('U*',unpack('v*',$val));
+        $outVal =~ s/\0.*//;    # truncate at null terminator
+    } else {
+        # pack('U',...) didn't exist before Perl 5.6
+        ($outVal = $val) =~ s/\0//g;    # quick and dirty
+    }
+    return $outVal;
+}
+
+#------------------------------------------------------------------------------
+# convert pseudo-UTF8 encoded string to XP character codes
+# Input: 0) pseudo-UTF8 string
+# Returns: XP byte sequence as string of decimal numbers separated by spaces
+sub UTF8toXP($)
+{
+    my $str = shift;
+    my $fmt = ($] >= 5.6) ? 'U' : 'C';  # 'U' only available in 5.6 or later
+    return pack('v*',unpack("$fmt*",$str)) . "\0\0";
 }
 
 #------------------------------------------------------------------------------
@@ -669,6 +882,7 @@ sub WriteExif($$$)
             my $newInfo = $oldInfo;
             my $newFormat = $oldFormat;
             my $newFormName = $oldFormName;
+            my $ifdFormName;
             my $newCount = $oldCount;
             my $newValue;
             my $newValuePt = $isNew >= 0 ? \$newValue : \$oldValue;
@@ -687,10 +901,17 @@ sub WriteExif($$$)
                     if ($isNew > 0) {
                         # don't create new entry unless requested
                         next unless Image::ExifTool::IsCreating($newValueHash);
-                        # write in new format
-                        unless ($newFormName = $$newInfo{Writable}) {
-                            warn("No format for $dirName $$newInfo{Name}\n");
-                            next;
+                        # convert using new format
+                        $newFormName = $$newInfo{Format};
+                        if ($newFormName) {
+                            # use Writable flag to specify IFD format code
+                            $ifdFormName = $$newInfo{Writable};
+                        } else {
+                            $newFormName = $$newInfo{Writable};
+                            unless ($newFormName) {
+                                warn("No format for $dirName $$newInfo{Name}\n");
+                                next;
+                            }
                         }
                         $newFormat = $formatNumber{$newFormName};
                     } else {
@@ -734,6 +955,11 @@ sub WriteExif($$$)
                     } else {
                         next if $isNew > 0;
                         $isNew = -1;        # rewrite existing tag
+                    }
+                    # set format for EXIF IFD if different than conversion format
+                    if ($ifdFormName) {
+                        $newFormName = $ifdFormName;
+                        $newFormat = $formatNumber{$newFormName};
                     }
 
                 } elsif ($isNew > 0) {
@@ -1002,7 +1228,8 @@ sub WriteExif($$$)
                     $newValuePt = \$newValue;
 
                 } elsif ($$newInfo{SubDirectory} and
-                    $newInfo->{SubDirectory}->{Start} eq '$valuePtr' and
+                    (not defined $newInfo->{SubDirectory}->{Start} or
+                    $newInfo->{SubDirectory}->{Start} eq '$valuePtr') and
                     $newInfo->{SubDirectory}->{TagTable})
                 {
 #

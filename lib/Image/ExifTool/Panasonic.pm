@@ -171,7 +171,6 @@ $VERSION = '1.03';
         Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
-            Start => '$valuePtr',
         },
     },
 );

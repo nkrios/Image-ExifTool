@@ -133,7 +133,7 @@ sub SetNewValue($;$$%)
     }
     # determine the groups for all tags found, and the tag with
     # the highest priority group
-    my (@tagInfoList, %writeGroup, %preferred, %tagPriority);
+    my (@tagInfoList, %writeGroup, %preferred, %tagPriority, $avoid);
     my $highestPriority = -1;
     foreach $tagInfo (@matchingTags) {
         $tag = $tagInfo->{Name};    # set tag so warnings will use proper case
@@ -174,9 +174,12 @@ sub SetNewValue($;$$%)
         if ($priority > $highestPriority) {
             $highestPriority = $priority;
             %preferred = ( $tagInfo => 1 );
+            $avoid = 0;
+            ++$avoid if $$tagInfo{Avoid};
         } elsif ($priority == $highestPriority) {
             # create all tags with highest priority
             $preferred{$tagInfo} = 1;
+            ++$avoid if $$tagInfo{Avoid};
         }
         push @tagInfoList, $tagInfo;
         $writeGroup{$tagInfo} = $writeGroup;
@@ -184,6 +187,38 @@ sub SetNewValue($;$$%)
     # don't create tags with priority 0 if group priorities are set
     if ($highestPriority == 0 and %{$self->{WRITE_PRIORITY}}) {
         undef %preferred;
+    }
+    # avoid creating tags with 'Avoid' flag set if there are other alternatives
+    if ($avoid and %preferred) {
+        if ($avoid < scalar(keys %preferred)) {
+            # just remove the 'Avoid' tags since there are other preferred tags
+            foreach $tagInfo (@tagInfoList) {
+                delete $preferred{$tagInfo} if $$tagInfo{Avoid};
+            }
+        } elsif ($highestPriority < 1000) {
+            # look for another priority tag to create instead
+            my $nextHighest = 0;
+            my @nextBestTags;
+            foreach $tagInfo (@tagInfoList) {
+                my $priority = $tagPriority{$tagInfo} or next;
+                next if $priority == $highestPriority;
+                next if $priority < $nextHighest;
+                next if $$tagInfo{Avoid} or $$tagInfo{Permanent};
+                next if $writeGroup{$tagInfo} eq 'MakerNotes';
+                if ($nextHighest < $priority) {
+                    $nextHighest = $priority;
+                    undef @nextBestTags;
+                }
+                push @nextBestTags, $tagInfo;
+            }
+            if (@nextBestTags) {
+                # change our preferred tags to the next best tags
+                undef %preferred;
+                foreach $tagInfo (@nextBestTags) {
+                    $preferred{$tagInfo} = 1;
+                }
+            }
+        }
     }
     my $numSet = 0;
     my $prioritySet;
@@ -277,9 +312,9 @@ sub SetNewValue($;$$%)
                 my $table = $tagInfo->{Table};
                 if ($table and $table->{CHECK_PROC}) {
                     my $checkProc = $table->{CHECK_PROC};
-                    $err = &$checkProc($self, $tagInfo, \$val);
-                    if ($err) {
-                        $err = "$err for $writeGroup:$tag";
+                    my $err2 = &$checkProc($self, $tagInfo, \$val);
+                    if ($err2) {
+                        $err = "$err2 for $writeGroup:$tag";
                         $verbose > 2 and print "$err\n";
                         undef $val; # value was invalid
                     }
@@ -499,8 +534,8 @@ sub SetNewGroups($;@)
     foreach (@groups) {
         $priority{lc($_)} = $count--;
     }
-    $priority{file} = 10;   # 'File' group is always written (Comment)
-    $priority{composite} = 10;   # 'Composite' group is always written
+    $priority{file} = 10;       # 'File' group is always written (Comment)
+    $priority{composite} = 10;  # 'Composite' group is always written
     # set write priority (higher # is higher priority)
     $self->{WRITE_PRIORITY} = \%priority;
     $self->{WRITE_GROUPS} = \@groups;
@@ -866,6 +901,7 @@ sub LoadAllTables()
         GetTagTable('Image::ExifTool::CanonRaw::Main');
         GetTagTable('Image::ExifTool::Photoshop::Main');
         GetTagTable('Image::ExifTool::GeoTiff::Main');
+        GetTagTable('Image::ExifTool::Jpeg2000::Main');
         GetTagTable('Image::ExifTool::extraTags');
         GetTagTable('Image::ExifTool::compositeTags');
         # recursively load all tables referenced by the current tables

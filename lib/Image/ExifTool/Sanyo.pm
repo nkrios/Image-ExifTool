@@ -197,7 +197,6 @@ my %offOn = (
         Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
-            Start => '$valuePtr',
         },
     },
     0x0f00 => {

@@ -5,13 +5,12 @@ Makefile.PL
 README
 exiftool
 html/ExifTool.html
+html/TagNames.html
 html/canon_raw.html
 html/data_members.html
 html/history.html
 html/index.html
-html/tag_list.html
 html/verbose.html
-html/write_list.html
 html/writing.html
 lib/File/RandomAccess.pm
 lib/File/RandomAccess.pod
@@ -29,6 +28,7 @@ lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
 lib/Image/ExifTool/ICC_Profile.pm
 lib/Image/ExifTool/IPTC.pm
+lib/Image/ExifTool/Jpeg2000.pm
 lib/Image/ExifTool/MakerNotes.pm
 lib/Image/ExifTool/Minolta.pm
 lib/Image/ExifTool/Nikon.pm
@@ -43,6 +43,7 @@ lib/Image/ExifTool/Shortcuts.pm
 lib/Image/ExifTool/Sigma.pm
 lib/Image/ExifTool/Sony.pm
 lib/Image/ExifTool/TagLookup.pm
+lib/Image/ExifTool/TagNames.pod
 lib/Image/ExifTool/Unknown.pm
 lib/Image/ExifTool/WriteCanonRaw.pl
 lib/Image/ExifTool/WriteExif.pl
@@ -95,6 +96,9 @@ t/IPTC-XMP.jpg
 t/IPTC-XMP.t
 t/IPTC-XMP_2.out
 t/IPTC-XMP_4.out
+t/Jpeg2000.jp2
+t/Jpeg2000.t
+t/Jpeg2000_2.out
 t/Minolta.jpg
 t/Minolta.t
 t/Minolta_2.out

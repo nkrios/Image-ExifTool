@@ -30,10 +30,13 @@
 package Image::ExifTool::XMP;
 
 use strict;
-use vars qw($VERSION $AUTOLOAD %ignoreNamespace);
+use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace);
 use Image::ExifTool::Exif;
+require Exporter;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
 sub ProcessXMP($$$);
 sub WriteXMP($$$);
@@ -950,7 +953,6 @@ sub DecodeBase64($);
         Writable => 'Rational',
     },
     GPSDestDistanceRef => {
-        Name => 'GPSDestDistanceRef',
         Groups => { 2 => 'Location' },
         PrintConv => {
             K => 'Kilometers',
@@ -965,7 +967,6 @@ sub DecodeBase64($);
     GPSProcessingMethod => { Groups => { 2 => 'Location' } },
     GPSAreaInformation  => { Groups => { 2 => 'Location' } },
     GPSDifferential => {
-        Name => 'GPSDifferential',
         Groups => { 2 => 'Location' },
         PrintConv => {
             0 => 'No Correction',
@@ -1001,6 +1002,9 @@ sub DecodeBase64($);
         PrintConv => '$valPrint[0]',
     },
 );
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::XMP::Composite);
 
 
 #------------------------------------------------------------------------------
@@ -1096,6 +1100,11 @@ sub GetXMPTagName($)
             next unless $prop =~ /^rdf:(_\d+)$/;
             $tag .= $1;
         } else {
+            # all uppercase is ugly, so convert it
+            unless ($Image::ExifTool::XMP::Main{$nm} or $nm =~ /[a-z]/) {
+                $nm = lc($nm);
+                $nm =~ s/_([a-z])/\u$1/g;
+            }
             $tag .= ucfirst($nm);       # add to tag name
         }
         # save namespace of first property to contribute to tag name

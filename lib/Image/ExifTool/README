@@ -11,9 +11,7 @@ hash keys are the tag IDs (in decimal or hexadecimal if the ID is numerical as
 with EXIF tables, or the tag name if the ID is ASCII as with XMP tables).  In
 the case of a BinaryData table, the IDs are numerical and specify offsets into
 the binary data block.  The corresponding hash value provides information about
-the tag (explained later).  Each package may define a special table named
-'Composite' which contains tags whose values are calculated after all other tag
-values have been extracted from the file.
+the tag (explained later).
 
 Eleven special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
 INCREMENT, FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID and WRITABLE) are
@@ -136,11 +134,14 @@ conditions.  The following is a description of possible hash entries:
                   otherwise the data is assumed to be string.
 
   Writable      : Indicates this tag can be written (or not written if value is
-                  set to zero), and for EXIF-type tables, gives format for
-                  writing.  With MakerNotes, format need not be specified
-                  because existing format is always used, however format
-                  information is desireable because it is used in validating the
-                  value.
+                  set to zero), and for EXIF-type tables gives format for
+                  writing.  Writable may be set to 1 for MakerNotes information
+                  because the existing format is always used, however providing
+                  a format is desireable because it is used in validating the
+                  value.  For EXIF tables, the Writable flag may be different
+                  than the Format flag, in which case Format is used for
+                  converting the value and Writable specifies the format code
+                  written to the EXIF IFD.
 
   Flags         : [optional] Flags to specify characteristics for this tag.  May
                   be a simple scalar flag name, a reference to a list of flag
@@ -153,9 +154,11 @@ conditions.  The following is a description of possible hash entries:
                   PrintConv values and a reference to an array of ValueConv
                   values).  The value is the list type for XMP lists.
 
-                  'Priority' - indicates that the first value of this tag takes
-                  priority over subsequent values if duplicates of this tag are
-                  encountered.
+                  'Priority' - gives the priority of this tag while reading.  If
+                  set to zero, this tag will not override the value of previous
+                  tags with the same name.  If the priority is greater than
+                  zero, this tag won't be overridden by subsequent tags unless
+                  their priority is equal to or greater than this priority.
 
                   'Protected' - indicates that even though this tag may be
                   writable, it can not be set directly by the user. (Instead,
@@ -187,6 +190,8 @@ conditions.  The following is a description of possible hash entries:
                   'Permanent' - flag indicates that a tag is permanent, and
                   can't be added or deleted from the file.  By default, all
                   MakerNotes tags are permanent unless otherwise specified.
+                  
+                  'Avoid' - avoid creating this tag if possible.
 
   ValueConv     : [optional] Used to convert the raw data value to a useable
                   form.  May be either a hash reference to act as a lookup table
@@ -254,10 +259,11 @@ conditions.  The following is a description of possible hash entries:
                   new subdirectory.  If not specified, the current tag table is
                   used.
 
-      Start     : [required] The offset to the start of the subdirectory
+      Start     : [optional] The offset to the start of the subdirectory
                   relative to the current Base.  This is a Perl expression which
                   may use $valuePtr to represent the location of the tag value
-                  in the file, or $val for the value itself.
+                  in the file, or $val for the value itself.  If not specified,
+                  a Start of '$valuePtr' is assumed.
 
       OffsetPt  : [optional] If specified, this is a Perl expression that gives
                   the position of a 32-bit word in the current directory that is

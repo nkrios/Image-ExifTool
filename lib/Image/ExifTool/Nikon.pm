@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessNikon($$$);
 
@@ -50,7 +50,9 @@ sub ProcessNikon($$$);
         # this is the ISO actually used by the camera
         # (may be different than ISO setting if auto)
         Name => 'ISO',
+        Description => 'ISO Speed',
         Writable => 'int16u',
+        Priority => 0,  # the EXIF ISO is more reliable
         Count => 2,
         Groups => { 2 => 'Image' },
         PrintConv => '$_=$val;s/^0 //;$_',
@@ -283,7 +285,6 @@ sub ProcessNikon($$$);
         Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
-            Start => '$valuePtr',
         },
     },
     # 0x0e01 I don't know what this is, but in D70 NEF files produced by Nikon

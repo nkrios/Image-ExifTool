@@ -257,6 +257,9 @@ $VERSION = '1.05';
     },
 );
 
+# add our composite tags
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::GPS::Composite);
+
 # Convert to DMS format
 sub DMS($)
 {

@@ -3,6 +3,7 @@ AEBBracketValue : 0
 AFPoint : Unknown (0)
 AFPointsUsed : 0 ()
 AutoExposureBracketing : Off
+AutoRotate : None
 BlueBalanceAuto : 0.83939
 BlueBalanceB&W : 0.84024
 BlueBalanceCloudy : 0.99047
@@ -24,6 +25,7 @@ CanonImageSize : Large
 CanonImageType : CRW:EOS DIGITAL REBEL CMOS RAW
 CanonImageWidth : 3072
 CanonImageWidthAsShot : 3072
+ColorTemperature : 5200
 ColorTone : Normal
 ContinuousDrive : Continuous
 Contrast : +1

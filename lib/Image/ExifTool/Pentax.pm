@@ -114,8 +114,10 @@ $VERSION = '1.14';
     },
     # ISO Tag - Entries confirmed by W. Smith 12 FEB 04
     0x0014 => {
-        Name => 'PentaxISO',
+        Name => 'ISO',
+        Description => 'ISO Speed',
         Writable => 'int16u',
+        Priority => 0,
         PrintConv => {
             3 => 50,    # Not confirmed
             4 => 64,
@@ -331,7 +333,6 @@ $VERSION = '1.14';
         Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
-            Start => '$valuePtr',
         },
     },
 );

@@ -21,8 +21,8 @@ require Exporter;
 use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
-            $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '4.53';
+            @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
+$VERSION = '4.64';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -34,14 +34,15 @@ $VERSION = '4.53';
         GetFileType
     )],
     DataAccess => [qw(
-        ReadValue GetByteOrder SetByteOrder ToggleByteOrder Get16u Get16s
-        Get32u Get32s GetFloat GetDouble WriteValue Set8u Set8s Set16u Set32u
+        ReadValue GetByteOrder SetByteOrder ToggleByteOrder Get8u Get8s Get16u
+        Get16s Get32u Get32s GetFloat GetDouble WriteValue Set8u Set8s Set16u
+        Set32u
     )],
     Utils => [qw(
         GetTagTable TagTableKeys GetTagInfoList GenerateTagIDs
     )],
     Vars => [qw(
-        %allTables @fileTypes
+        %allTables @tableOrder @fileTypes
     )],
 );
 # set all of our EXPORT_TAGS in EXPORT_OK
@@ -74,7 +75,7 @@ sub WriteBinaryData($$$);
 sub CheckBinaryData($$$);
 
 # recognized file types (in the order we test unknown files)
-@fileTypes = ( 'JPEG', 'TIFF', 'CRW', 'MRW', 'ORF', 'GIF' );
+@fileTypes = ( 'JPEG', 'TIFF', 'CRW', 'MRW', 'ORF', 'GIF', 'JPEG2000' );
 
 # headers for various segment types
 $exifAPP1hdr = "Exif\0\0";
@@ -97,6 +98,8 @@ my %fileTypeLookup = (
     PEF  => 'TIFF', # Pentax RAW format is TIFF
     ORF  => 'ORF',  # Olympus RAW format
     DNG  => 'TIFF', # Digital Negative is TIFF
+    JP2  => 'JPEG2000', # JPEG2000 file
+    JPX  => 'JPEG2000',
 );
 
 # group hash for ExifTool-generated tags
@@ -137,6 +140,7 @@ sub DummyWriteProc { return 1; }
 # static private ExifTool variables
 
 %allTables = ( );   # list of all tables loaded (except composite tags)
+@tableOrder = ( );  # order the tables were loaded
 
 my $didTagID;       # flag indicating we are accessing tag ID's
 
@@ -365,6 +369,9 @@ sub ExtractInfo($;@)
             $self->{FILE_TYPE} = $fileType;
             if ($type eq 'JPEG') {
                 $self->JpegInfo() and last;
+            } elsif ($type eq 'JPEG2000') {
+                require Image::ExifTool::Jpeg2000;
+                Image::ExifTool::Jpeg2000::Jpeg2000Info($self) and last;
             } elsif ($type eq 'GIF') {
                 $self->GifInfo() and last;
             } elsif ($type eq 'CRW') {
@@ -850,7 +857,9 @@ sub Init($)
     $self->{PRINT_CONV} = { };      # hash of print-converted values
     $self->{TAG_INFO}   = { };      # hash of tag information
     $self->{TAG_EXTRA}  = { };      # hash of extra information about tag
+    $self->{PRIORITY}   = { };      # priority of current tags
     $self->{EXIF_DATA}  = undef;    # the EXIF data block
+    $self->{EXIF_BYTE_ORDER} = undef;# the EXIF byte ordering
     $self->{NUM_FOUND}  = 0;        # total number of tags found (incl. duplicates)
     $self->{CHANGED}    = 0;        # number of tags changed (writer only)
     $self->{CameraModel} = '';
@@ -1472,7 +1481,8 @@ sub FormatSize($) { return $formatSize{$_[0]}; }
 #------------------------------------------------------------------------------
 # read value from binary data (with current byte ordering)
 # Inputs: 1) data reference, 2) value offset, 3) format string,
-#         4) number of values, 5) valid data length relative to offset
+#         4) number of values (or undef to use all data)
+#         5) valid data length relative to offset
 # Returns: converted value, or undefined if data isn't there
 sub ReadValue($$$$$)
 {
@@ -1483,6 +1493,7 @@ sub ReadValue($$$$$)
         warn "Unknown format $format";
         $len = 1;
     }
+    $count = int($size / $len) unless defined $count;
     # make sure entry is inside data
     if ($len * $count > $size) {
         $count = int($size / $len);     # shorten count if necessary
@@ -1800,13 +1811,9 @@ sub JpegInfo($)
                 # all messed up, so we ignore it
             } else {
                 $self->Warn('Unknown APP13 data');
-                $verbose > 2 and HexDump($segDataPt, undef, %dumpParms);
             }
         } elsif ($marker == 0xfe) {         # COM (JPEG comment)
             $self->FoundTag('Comment',$$segDataPt);
-            $verbose > 2 and HexDump($segDataPt, undef, %dumpParms);
-        } elsif ($verbose > 2 and $marker) {
-            HexDump($segDataPt, undef, %dumpParms);
         }
         undef $$segDataPt;
     }
@@ -1995,6 +2002,8 @@ sub TiffInfo($$;$$$)
     }
     # set byte ordering
     SetByteOrder(substr($$dataPt,0,2)) or return 0;
+    # save EXIF byte ordering
+    $self->{EXIF_BYTE_ORDER} = GetByteOrder();
 
     # verify the byte ordering
     my $identifier = Get16u($dataPt, 2);
@@ -2084,13 +2093,7 @@ sub GetTagTable($)
             # try to load module for this table
             if ($tableName =~ /(.*)::/) {
                 my $module = $1;
-                if (eval "require $module") {
-                    # look for 'Composite' table and add it to our composites
-                    if (defined %{"${module}::Composite"}) {
-                        no strict 'refs';
-                        AddCompositeTags(\%{"${module}::Composite"});
-                    }
-                } else {
+                unless (eval "require $module") {
                     $@ and warn $@;
                 }
             }
@@ -2128,6 +2131,8 @@ sub GetTagTable($)
         SetupTagTable($table);
         # generate tag ID's if necessary
         GenerateTagIDs($table) if $didTagID;
+        # remember order we loaded the tables in
+        push @tableOrder, $tableName;
         # insert newly loaded table into list
         $allTables{$tableName} = $table;
     }
@@ -2345,7 +2350,7 @@ sub FoundTag($$$$;$$)
             if (ref($printConversion) eq 'HASH') {
                 $printConv = $$printConversion{$val};
                 unless (defined $printConv) {
-                    $$tagInfo{PrintHex} and $val and $val = sprintf("0x%x",$val);
+                    $$tagInfo{PrintHex} and $val and $val = sprintf('0x%x',$val);
                     $printConv = "Unknown ($val)";
                 }
             } else {
@@ -2390,18 +2395,34 @@ sub FoundTag($$$$;$$)
                 $nextTag = "$tag ($i)";
                 last unless exists $printConvHash->{$nextTag};
             }
-            # keep the first instance current if specified
-            if ($$tagInfo{Priority}) {
-                $tag = $nextTag;
+            # take tag with highest priority
+            my $priority = $$tagInfo{Priority};
+            if (defined $priority) {
+                my $oldPriority = $self->{PRIORITY}->{$tag} || 1;
+                if ($priority >= $oldPriority) {
+                    $self->{PRIORITY}->{$tag} = $priority;
+                } else {
+                    $priority = 0;  # existing tag takes priority
+                }
+            } elsif ($self->{PRIORITY}->{$tag}) {
+                $priority = 0;      # existing tag takes priority
             } else {
+                $priority = 1;      # this tag takes priority
+            }
+            if ($priority) {
                 # change the name of existing tags in all hashes
                 $valueConvHash->{$nextTag} = $valueConvHash->{$tag};
                 $printConvHash->{$nextTag} = $printConvHash->{$tag};
                 $self->{FILE_ORDER}->{$nextTag} = $self->{FILE_ORDER}->{$tag};
                 $self->{TAG_INFO}->{$nextTag} = $self->{TAG_INFO}->{$tag};
                 $self->{TAG_EXTRA}->{$nextTag} = $self->{TAG_EXTRA}->{$tag};
+            } else {
+                $tag = $nextTag;    # don't override the previous tag
             }
         }
+    } elsif ($$tagInfo{Priority}) {
+        # set tag priority
+        $self->{PRIORITY}->{$tag} = $$tagInfo{Priority};
     }
 
     # save the converted values, file order, and tag groups

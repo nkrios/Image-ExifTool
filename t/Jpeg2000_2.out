@@ -1,0 +1,25 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.61
+[File, File, Image]  - File Name: Jpeg2000.jp2
+[File, File, Image]  - File Size: 1KB
+[Jpeg2000, Jpeg2000] 0 - Image Height: 16
+[Jpeg2000, Jpeg2000] 4 - Image Width: 16
+[Jpeg2000, Jpeg2000] 8 - Number Of Components: 3
+[Jpeg2000, Jpeg2000] 10 - Bits Per Component: 8 Bits, Unsigned
+[Jpeg2000, Jpeg2000] 11 - Compression: JPEG 2000
+[EXIF, IFD0, Image] 256 - Image Width: 1
+[EXIF, IFD0, Image] 257 - Image Height: 1
+[EXIF, IFD0, Image] 258 - Bits Per Sample: 8
+[EXIF, IFD0, Image] 259 - Compression: Uncompressed
+[EXIF, IFD0, Image] 273 - Strip Offsets: 0
+[EXIF, IFD0, Image] 277 - Samples Per Pixel: 1
+[EXIF, IFD0, Image] 279 - Strip Byte Counts: 0
+[EXIF, IFD0, Image] 284 - Planar Configuration: Chunky
+[EXIF, IFD0, Image] 33550 - Pixel Scale: 1 1 0
+[EXIF, IFD0, Location] 33922 - Model Tie Point: 0 0 0 334159.28 4429865.18 0
+[Composite, Composite, Image]  - Image Size: 16x16
+[GeoTiff, GeoTiff, Location] 1 - Geo Tiff Version: 1.1.0
+[GeoTiff, GeoTiff, Location] 1024 - GT Model Type: Projected
+[GeoTiff, GeoTiff, Location] 1025 - GT Raster Type: Pixel Is Area
+[GeoTiff, GeoTiff, Location] 1026 - GT Citation: NAD83 / UTM zone 18N
+[GeoTiff, GeoTiff, Location] 3072 - Projected CS Type: NAD83 UTM zone 18N
+[GeoTiff, GeoTiff, Location] 3076 - Proj Linear Units: Linear Meter

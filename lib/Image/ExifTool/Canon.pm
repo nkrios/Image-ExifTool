@@ -15,6 +15,7 @@
 #               3) Daniel Pittman private communication (tests with PowerShot S70)
 #               4) http://www.wonderland.org/crw/
 #               5) Juha Eskelinen private communication (tests with 20D)
+#               6) Richard S. Smith private communication (tests with 20D)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -22,7 +23,7 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
@@ -32,7 +33,6 @@ $VERSION = '1.10';
     0x1 => {
         Name => 'CanonCameraSettings',
         SubDirectory => {
-            Start => '$valuePtr',
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::Canon::CameraSettings',
         },
@@ -40,14 +40,12 @@ $VERSION = '1.10';
     0x2 => {
         Name => 'CanonFocalLength',
         SubDirectory => {
-            Start => '$valuePtr',
             TagTable => 'Image::ExifTool::Canon::FocalLength',
         },
     },
     0x4 => {
         Name => 'CanonShotInfo',
         SubDirectory => {
-            Start => '$valuePtr',
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::Canon::ShotInfo',
         },
@@ -72,16 +70,15 @@ $VERSION = '1.10';
         Description => "Owner's Name",
     },
     0xa => {
-        Name => 'Canon1DSettings',
+        Name => 'CanonColorInfoD30',
         SubDirectory => {
-            Start => '$valuePtr',
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
-            TagTable => 'Image::ExifTool::Canon::Canon1DSettings',
+            TagTable => 'Image::ExifTool::Canon::ColorInfoD30',
         },
     },
     0xc => [   # square brackets for a conditional list
         {
-            Condition => '$self->{CameraModel} =~ /(300D|REBEL|10D|20D)/',
+            Condition => '$self->{CameraModel} =~ /\b(300D|REBEL|10D|20D)/',
             Writable => 'int32u',
             Name => 'SerialNumber',
             Description => 'Camera Body No.',
@@ -104,19 +101,17 @@ $VERSION = '1.10';
     },
     0xf => [
         {
-            Condition => '$self->{CameraModel} =~ /10D/',
+            Condition => '$self->{CameraModel} =~ /\b10D/',
             Name => 'CanonCustomFunctions10D',
             SubDirectory => {
-                Start => '$valuePtr',
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions10D',
             },
         },
         {
-            Condition => '$self->{CameraModel} =~ /20D/',
+            Condition => '$self->{CameraModel} =~ /\b20D/',
             Name => 'CanonCustomFunctions20D',
             SubDirectory => {
-                Start => '$valuePtr',
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions20D',
             },
@@ -125,7 +120,6 @@ $VERSION = '1.10';
             # assume everything else is a D30/D60
             Name => 'CanonCustomFunctions',
             SubDirectory => {
-                Start => '$valuePtr',
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions',
             },
@@ -134,7 +128,6 @@ $VERSION = '1.10';
     0x12 => {
         Name => 'CanonPictureInfo',
         SubDirectory => {
-            Start => '$valuePtr',
             # the first word seems to be always 7, not the size as in other blocks,
             # I've also seen 53 in a 1DMkII raw file, and 9 in 20D.  So I have to
             # handle validation differently for this block
@@ -145,7 +138,6 @@ $VERSION = '1.10';
     0x90 => {
         Name => 'CanonCustomFunctions1D',
         SubDirectory => {
-            Start => '$valuePtr',
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::CanonCustom::Functions1D',
         },
@@ -153,25 +145,34 @@ $VERSION = '1.10';
     0x93 => {
         Name => 'CanonFileInfo',
         SubDirectory => {
-            Start => '$valuePtr',
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::Canon::FileInfo',
+        },
+    },
+    0xa0 => {
+        Name => 'CanonColorInfo',
+        SubDirectory => {
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+            TagTable => 'Image::ExifTool::Canon::ColorInfo',
         },
     },
     0xa9 => {
         Name => 'WhiteBalanceTable',
         SubDirectory => {
-            # this offset is necessary because the table contains short rationals
+            # this offset is necessary because the table is interpreted as short rationals
             # (4 bytes long) but the first entry is 2 bytes into the table.
             Start => '$valuePtr + 2',
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart-2,$size)',
             TagTable => 'Image::ExifTool::Canon::WhiteBalance',
         },
-    },    
+    },
+    0xae => {
+        Name => 'ColorTemperature',
+        Writable => 'int16u',
+    },
     0xb6 => {
         Name => 'PreviewImageInfo',
         SubDirectory => {
-            Start => '$valuePtr',
             # Note: first word if this block is the total number of words, not bytes!
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size/2)',
             TagTable => 'Image::ExifTool::Canon::PreviewImageInfo',
@@ -179,7 +180,8 @@ $VERSION = '1.10';
     },
 );
 
-# Canon camera settings (EXIF tag 0x01)
+#..............................................................................
+# Canon camera settings (MakerNotes tag 0x01)
 # BinaryData (keys are indices into the int16s array)
 %Image::ExifTool::Canon::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -204,7 +206,7 @@ $VERSION = '1.10';
     3 => {
         Name => 'Quality',
         Description => 'Image Quality',
-        PrintConv => { 
+        PrintConv => {
             2 => 'Normal',
             3 => 'Fine',
             4 => 'RAW',
@@ -428,6 +430,7 @@ $VERSION = '1.10';
     },
 );
 
+# focal length information (MakerNotes tag 0x02)
 %Image::ExifTool::Canon::FocalLength = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -438,8 +441,8 @@ $VERSION = '1.10';
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     1 => {
         Name => 'FocalLength',
-        # the EXIF FocalLength is more reliable, so it takes priority
-        Priority => 1,
+        # the EXIF FocalLength is more reliable, so set this priority to zero
+        Priority => 0,
         PrintConv => '"${val}mm"',
         PrintConvInv => '$val=~s/mm//;$val',
     },
@@ -460,7 +463,7 @@ $VERSION = '1.10';
     },
 );
 
-# Canon shot information (EXIF tag 0x04)
+# Canon shot information (MakerNotes tag 0x04)
 # BinaryData (keys are indices into the int16s array)
 %Image::ExifTool::Canon::ShotInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -580,6 +583,16 @@ $VERSION = '1.10';
         ValueConv => '$val / 10',
         ValueConvInv => '$val * 10',
     },
+    27 => {
+        Name => 'AutoRotate',
+        PrintConv => {
+           -1 => 'Rotated by Software',
+            0 => 'None',
+            1 => 'Rotate 90',
+            2 => 'Rotate 180',
+            3 => 'Rotate 270',
+        },
+    },
     29 => {
         Name => 'Self-timer2',
         ValueConv => '$val >= 0 ? $val / 10 : undef()',
@@ -587,7 +600,7 @@ $VERSION = '1.10';
     },
 );
 
-# picture information (EXIF tag 0x12)
+# picture information (MakerNotes tag 0x12)
 %Image::ExifTool::Canon::PictureInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -607,8 +620,9 @@ $VERSION = '1.10';
     },
 );
 
-# The 300D writes a 1536x1024 preview image that is accessed
-# through this information - decoded by PH 12/14/03
+# Preview image information (MakerNotes tag 0xb6)
+# - The 300D writes a 1536x1024 preview image that is accessed
+#   through this information - decoded by PH 12/14/03
 %Image::ExifTool::Canon::PreviewImageInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -666,7 +680,57 @@ $VERSION = '1.10';
 #    },
 );
 
-%Image::ExifTool::Canon::Canon1DSettings = (
+# File number information (MakerNotes tag 0x93)
+%Image::ExifTool::Canon::FileInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int16s',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    1 => { #5
+        Name => 'FileNumber',
+        Condition => '$self->{CameraModel} =~ /\b20D/',
+        Format => 'int32u',
+        # Thanks to Juha Eskelinen for figuring this out:
+        # this is an odd bit mapping -- it looks like the file number exists as a
+        # 16-bit integer containing the high bits, followed by an 8-bit integer
+        # with the low bits.  But it is more convenient to have this in a single
+        # word, so some bit manipulations are necessary...
+        # The bit pattern of the 32-bit word is:
+        #   31....24 23....16 15.....8 7......0
+        #   00000000 ffffffff DDDDDDDD ddFFFFFF
+        #     0 = zero bits (not part of the file number?)
+        #     f/F = low/high bits of file number
+        #     d/D = low/high bits of directory number
+        # The directory and file number are then converted into decimal
+        # and separated by a '-' to give the file number used in the 20D
+        ValueConv => '(($val&0xffc0)>>6)*10000+(($val>>16)&0xff)+(($val&0x3f)<<8)',
+        ValueConvInv => q{
+            my $d = int($val/10000);
+            my $f = $val - $d * 10000;
+            return ($d << 6) + (($f & 0xff)<<16) + (($f >> 8) & 0x3f);
+        },
+        PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
+        PrintConvInv => '$val=~s/-//g;$val',
+    },
+);
+
+# color information (MakerNotes tag 0xa0)
+%Image::ExifTool::Canon::ColorInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int16s',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    9 => 'ColorTemperature', #6
+);
+
+# D30 color information (MakerNotes tag 0x0a)
+%Image::ExifTool::Canon::ColorInfoD30 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -676,6 +740,38 @@ $VERSION = '1.10';
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     9 => 'ColorTemperature',
     10 => 'ColorMatrix',
+);
+
+# White balance information (MakerNotes tag 0xa9)
+# these values are potentially useful to users of dcraw...
+%Image::ExifTool::Canon::WhiteBalance = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    # Note: Don't make this table writable because the absolute values
+    # of the numerator/denominators are crutial for generating the RAW
+    # image, and they aren't preserved when written as a simple rational
+    FORMAT => 'rational16u',
+    FIRST_ENTRY => 0,
+    PRINT_CONV => 'sprintf("%.5f",$val)',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # red,green1,green2,blue (ref 2)
+    0 => 'RedBalanceAuto',
+    1 => 'BlueBalanceAuto',
+    2 => 'RedBalanceDaylight',
+    3 => 'BlueBalanceDaylight',
+    4 => 'RedBalanceCloudy',
+    5 => 'BlueBalanceCloudy',
+    6 => 'RedBalanceTungsten',
+    7 => 'BlueBalanceTungsten',
+    8 => 'RedBalanceFluorescent',
+    9 => 'BlueBalanceFluorescent',
+    10 => 'RedBalanceFlash',
+    11 => 'BlueBalanceFlash',
+    12 => 'RedBalanceCustom',
+    13 => 'BlueBalanceCustom',
+    14 => 'RedBalanceB&W',
+    15 => 'BlueBalanceB&W',
+    16 => 'RedBalanceShade',
+    17 => 'BlueBalanceShade',
 );
 
 # canon composite tags
@@ -786,72 +882,9 @@ $VERSION = '1.10';
     },
 );
 
-%Image::ExifTool::Canon::FileInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FORMAT => 'int16s',
-    FIRST_ENTRY => 1,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    1 => { #5
-        Name => 'FileNumber',
-        Condition => '$self->{CameraModel} =~ /20D/',
-        Format => 'int32u',
-        # Thanks to Juha Eskelinen for figuring this out:
-        # this is an odd bit mapping -- it looks like the file number exists as a
-        # 16-bit integer containing the high bits, followed by an 8-bit integer
-        # with the low bits.  But it is more convenient to have this in a single
-        # word, so some bit manipulations are necessary...
-        # The bit pattern of the 32-bit word is:
-        #   31....24 23....16 15.....8 7......0
-        #   00000000 ffffffff DDDDDDDD ddFFFFFF
-        #     0 = zero bits (not part of the file number?)
-        #     f/F = low/high bits of file number
-        #     d/D = low/high bits of directory number
-        # The directory and file number are then converted into decimal
-        # and separated by a '-' to give the file number used in the 20D
-        ValueConv => '(($val&0xffc0)>>6)*10000+(($val>>16)&0xff)+(($val&0x3f)<<8)',
-        ValueConvInv => q{
-            my $d = int($val/10000);
-            my $f = $val - $d * 10000;
-            return ($d << 6) + (($f & 0xff)<<16) + (($f >> 8) & 0x3f);
-        },
-        PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
-        PrintConvInv => '$val=~s/-//g;$val',
-    },
-);
+# add our composite tags
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Canon::Composite);
 
-# these values are potentially useful to users of dcraw...
-%Image::ExifTool::Canon::WhiteBalance = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    # Note: Don't make this table writable because the absolute values
-    # of the numerator/denominators are crutial for generating the RAW
-    # image, and they aren't preserved when written as a simple rational
-    FORMAT => 'rational16u',
-    FIRST_ENTRY => 0,
-    PRINT_CONV => 'sprintf("%.5f",$val)',
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    # red,green1,green2,blue (ref 2)
-    0 => 'RedBalanceAuto',
-    1 => 'BlueBalanceAuto',
-    2 => 'RedBalanceDaylight',
-    3 => 'BlueBalanceDaylight',
-    4 => 'RedBalanceCloudy',
-    5 => 'BlueBalanceCloudy',
-    6 => 'RedBalanceTungsten',
-    7 => 'BlueBalanceTungsten',
-    8 => 'RedBalanceFluorescent',
-    9 => 'BlueBalanceFluorescent',
-    10 => 'RedBalanceFlash',
-    11 => 'BlueBalanceFlash',
-    12 => 'RedBalanceCustom',
-    13 => 'BlueBalanceCustom',
-    14 => 'RedBalanceB&W',
-    15 => 'BlueBalanceB&W',
-    16 => 'RedBalanceShade',
-    17 => 'BlueBalanceShade',
-);
 
 #------------------------------------------------------------------------------
 # Validate first word of Canon binary data
@@ -896,7 +929,7 @@ sub ValidatePictureInfo($$$)
 sub PrintFocalRange(@)
 {
     my ($short, $long, $units, $scale) = @_;
-    
+
     $scale and $units /= $scale;    # correct for 35efl scaling factor if given
     if ($short == $long) {
         return sprintf("%.1fmm", $short / $units);
@@ -923,7 +956,7 @@ sub PrintAFPoints($)
 sub FlashOn(@)
 {
     my @val = @_;
-    
+
     if (defined $val[0]) {
         return $val[0] ? 1 : 0;
     }
