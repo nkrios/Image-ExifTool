@@ -21,8 +21,8 @@ BEGIN {
     my $exeDir = $0;        # get exe directory from command
     # isolate directory specification
     $exeDir =~ s{(.*)/.*}{$1} or $exeDir = '.';
-    # add lib directory to include path
-    $INC[@INC] = "$exeDir/lib";
+    # add lib directory at start of include path
+    unshift @INC, "$exeDir/lib";
 }
 
 my @files;          # list of files and directories to scan

@@ -21,7 +21,7 @@ require Exporter;
 use File::RandomAccess;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '3.93';
+$VERSION = '3.94';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(ImageInfo Options ClearOptions ExtractInfo GetInfo CombineInfo
                 GetTagList GetFoundTags GetRequestedTags GetValue GetTagID
@@ -424,28 +424,26 @@ sub GetTagList($;$$)
     # return original list if no sort order specified
     return @$foundTags unless $sortOrder and $sortOrder ne 'Input';
 
-    my %groupOrder;
     my $fileOrder = $self->{FILE_ORDER};
 
     if ($sortOrder eq 'Alpha') {
         return sort @$foundTags;
-    } else {
-        if ($sortOrder =~ /^Group(\d*)/) {
-            my $family = $1 || 0;
-            # want to maintain a basic file order with the groups
-            # ordered in the way they appear in the file
-            my %groupCount;
-            my $numGroups = 0;
-            my $tag;
-            foreach $tag (sort { $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags) {
-                my $group = $self->GetGroup($tag,$family);
-                my $num = $groupCount{$group};
-                $num or $num = $groupCount{$group} = ++$numGroups;
-                $groupOrder{$tag} = $num;
-            }
-            return sort { $groupOrder{$a} <=> $groupOrder{$b} or
-                           $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags;
+    } elsif ($sortOrder =~ /^Group(\d*)/) {
+        my $family = $1 || 0;
+        # want to maintain a basic file order with the groups
+        # ordered in the way they appear in the file
+        my (%groupCount, %groupOrder);
+        my $numGroups = 0;
+        my $tag;
+        foreach $tag (sort { $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags) {
+            my $group = $self->GetGroup($tag,$family);
+            my $num = $groupCount{$group};
+            $num or $num = $groupCount{$group} = ++$numGroups;
+            $groupOrder{$tag} = $num;
         }
+        return sort { $groupOrder{$a} <=> $groupOrder{$b} or
+                      $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags;
+    } else {
         return sort { $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags;
     }
 }
@@ -1561,7 +1559,7 @@ sub JpgInfo($)
             last unless $raf->Read($s, 2) == 2;
             ($a, $b) = unpack("C"x2,$s);
             $length = ($a << 8) | $b;   # get length
-            last if (!defined($length) || $length < 2);
+            last unless defined($length) and $length >= 2;
             $length -= 2;   # get length of data alone
             last unless $raf->Read($buff, $length) == $length;
             $verbose > 2 and printf("JPG marker 0x%x, len $length\n",ord($ch));
@@ -1587,7 +1585,6 @@ sub JpgInfo($)
                         next if $self->ProcessTagTable($tagTablePtr, \%dirInfo);
                     }
                     $verbose and $self->Warn("Ignored EXIF block length $length (bad header)");
-                    last;
                 }
             } elsif (ord($ch) == 0xe2) {        # APP2
                 if ($buff =~ /ICC_PROFILE\0/) {

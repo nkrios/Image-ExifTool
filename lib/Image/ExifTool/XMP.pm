@@ -432,8 +432,14 @@ sub ParseXMPElement($$$;$)
         if ($attrs !~ s/\/$//) {
             my $nesting = 1;
             for (;;) {
-                $$dataPt =~ m/(.*?)<\/$name>/sg or last Element;
-                my $val2 = $1;
+# this match fails on Debian systems (perl bug?), but it works without
+# the '(.*?)', so do it the hard way instead...
+#                $$dataPt =~ m/(.*?)<\/$name>/sg or last Element;
+#                my $val2 = $1;
+                my $pos = pos($$dataPt);
+                $$dataPt =~ m/<\/$name>/sg or last Element;
+                my $len = pos($$dataPt) - $pos - length($name) - 3;
+                my $val2 = substr($$dataPt, $pos, $len);
                 # increment nesting level for each contained similar opening token
                 ++$nesting while $val2 =~ m/<$name\b.*?(\/{0,1})>/sg and $1 ne '/';
                 $val .= $val2;

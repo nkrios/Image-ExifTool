@@ -236,24 +236,22 @@ to a specific function.
 
 =item Binary
 
-Flag to get the value of all binary tags.  Unless set, large
-binary values may only be extracted for specifically requested tags.
-Default is 0.
+Flag to get the value of all binary tags.  Unless set, large binary values
+may only be extracted for specifically requested tags. Default is 0.
 
 =item Composite
 
-Flag to calculate Composite tags automatically.  Default
-is 1.
+Flag to calculate Composite tags automatically.  Default is 1.
 
 =item DateFormat
 
-Format for printing EXIF date/time.  See L<strftime> for
-details about the format string.
+Format for printing EXIF date/time.  See C<strftime> in the L<POSIX>
+package for details about the format string.
 
 =item Duplicates
 
-Flag to preserve values of duplicate tags (instead of
-overwriting existing value).  Default is 1.
+Flag to preserve values of duplicate tags (instead of overwriting
+existing value).  Default is 1.
 
 =item Group#
 
@@ -797,7 +795,7 @@ B<Jay Al-Saadi> for his discoveries with the Minolta white balance tag.
 
 =head1 SEE ALSO
 
-L<Image::Info|Image::Info>, L<Image::MetaData::JPG|Image::MetaData::JPG>
+L<Image::Info|Image::Info>, L<Image::MetaData::JPEG|Image::MetaData::JPEG>
 
 =cut
 
