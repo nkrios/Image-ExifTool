@@ -68,6 +68,7 @@ my $tmpFile;        # temporary file to delete on exit
 my $binaryStdout;   # flag set if we output binary to stdout
 my $isWriting = 0;  # flag set if we are writing tags
 my $outOpt;         # output file or directory name
+my $doUnzip;        # flag to extract info from .gz and .bz2 files
 
 # define Cleanup and SigInt routines
 sub Cleanup()
@@ -130,6 +131,7 @@ while ($_ = shift) {
         }
         /^w$/i and $outputExt = shift || die("Expecting output extension\n"), next;
         /^x$/i and AddExclude(shift), next;
+        /^z$/i and $doUnzip = 1, next;
         $_ eq '' and push(@files, '-'), next;   # read STDIN
         if (/=/) {
             push @newValues, $_;
@@ -200,12 +202,13 @@ DESCRIPTION
 
     Any tag name may be prefixed by a group name to specify the location (ie.
     -GROUP:TAG).  While reading information, any group name in family 0 or 1 may
-    be used.  For writing, valid groups are EXIF, GPS, IPTC, XMP and MakerNotes.
+    be used.  For writing, valid groups are EXIF, GPS, IPTC, XMP, MakerNotes, or
+    and EXIF IFD name.
 
     Note: The writing feature is under development.  Currently, EXIF, GPS, IPTC,
-    XMP and MakerNotes tags may be written to JPG, TIFF, GIF, THM, CR2, NEF, PEF
-    and DNG files.  Take care to verify that the new file is OK before erasing
-    the original (which is renamed to FILE_original).
+    XMP and MakerNotes tags may be written to JPG, TIFF, GIF, CRW, THM, CR2,
+    NEF, PEF and DNG files.  Take care to verify that the new file is OK before
+    erasing the original (which is renamed to FILE_original).
 
 OPTIONS
     -list   - list all valid tag names
@@ -238,6 +241,7 @@ OPTIONS
     -v[#]   - verbose messages (# may be 1-4, higher is more verbose)
     -w EXT  - write console output to file with EXT extension for each image
     -x TAG  - exclude specified tag (may be many -x options)
+    -z      - extract information from .gz and .bz2 compressed images
 
 EXAMPLES
     # print all EXIF information sorted by group (for family 0):
@@ -344,7 +348,11 @@ if (@newValues) {
             close(INFILE);
         }
         $tag =~ s/\+// and $opts{AddValue} = 1;
-        $tag =~ s/-$// and $opts{DelValue} = 1;
+        if ($tag =~ s/-$//) {
+            $opts{DelValue} = 1;
+            # set $newVal to '' if deleting nothing
+            $newVal = '' unless defined $newVal;
+        }
         if ($tag =~ /(.*?):(.*)/) {
             $opts{Group} = $1;
             $tag = $2;
@@ -480,9 +488,17 @@ sub SetImageInfo($$)
 sub GetImageInfo($$)
 {
     my ($exifTool, $file) = @_;
-    my (@foundTags, $info);
-    my $writeOnly;
+    my (@foundTags, $info, $writeOnly);
+    my $pipe = $file;
 
+    if ($doUnzip) {
+        # pipe through gzip or bzip2 if necessary
+        if ($file =~ /\.gz$/i) {
+            $pipe = qq{gzip -dc "$file" |};
+        } elsif ($file =~ /\.bz2$/i) {
+            $pipe = qq{bzip2 -dc "$file" |};
+        }
+    }
     if ($isWriting and not @tags) {
         my $success = SetImageInfo($exifTool, $file);
         unless ($success and $exifTool->Options('IgnoreMinorErrors')) {
@@ -524,7 +540,7 @@ sub GetImageInfo($$)
             }
         }
         # extract the information!
-        $info = $exifTool->ImageInfo($file, \@foundTags, \%options);
+        $info = $exifTool->ImageInfo($pipe, \@foundTags, \%options);
 
         # get tags for the specified groups if required
         if ($doGroup) {
@@ -677,7 +693,7 @@ sub GetImageInfo($$)
                 $val = join(', ',@$val);
             }
             # translate unprintable chars in value
-            $val =~ tr/\x01-\x1f\x80-\xff/\./;
+            $val =~ tr/\x01-\x1f\x7f/./;
             $val =~ s/\x00//g;
 
             if ($htmlOutput) {
@@ -874,7 +890,11 @@ sub ScanDir($$)
             next;
         }
         # get information for this file if it is a recognized type
-        GetImageInfo($exifTool, $path) if Image::ExifTool::GetFileType($file);
+        unless (Image::ExifTool::GetFileType($file)) {
+            next unless $doUnzip;
+            next unless $file =~ /\.(gz|bz2)$/i;
+        }
+        GetImageInfo($exifTool, $path);
     }
     ++$countDir;
 }

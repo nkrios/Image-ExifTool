@@ -1123,7 +1123,7 @@ sub FoundXMP($$$$)
     return unless $tag;     # ignore things that aren't valid tags
 
     # convert quotient and date values to a more sensible format
-    if ($val =~ /^(-{0,1}\d+)\/(-{0,1}\d+)/) {
+    if ($val =~ /^(-?\d+)\/(-?\d+)/) {
         $val = $1 / $2 if $2;       # calculate quotient
     } elsif ($val =~ /^(\d{4})-(\d{2})-(\d{2}).{1}(\d{2}:\d{2}:\d{2})(\S*)/) {
         $val = "$1:$2:$3 $4$5";     # convert back to EXIF time format
@@ -1194,7 +1194,7 @@ sub ParseXMPElement($$$;$$)
                 my $len = pos($$dataPt) - $pos - length($prop) - 3;
                 my $val2 = substr($$dataPt, $pos, $len);
                 # increment nesting level for each contained similar opening token
-                ++$nesting while $val2 =~ m/<$prop\b.*?(\/{0,1})>/sg and $1 ne '/';
+                ++$nesting while $val2 =~ m/<$prop\b.*?(\/?)>/sg and $1 ne '/';
                 $val .= $val2;
                 --$nesting or last;
                 $val .= "</$prop>";

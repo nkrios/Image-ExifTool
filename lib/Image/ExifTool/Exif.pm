@@ -32,7 +32,7 @@ sub ProcessExif($$$);
 sub WriteExif($$$);
 sub CheckExif($$$);
 sub RebuildMakerNotes($$$);
-sub Rationalize($);
+sub Rationalize($;$);
 
 # byte sizes for the various EXIF format types below
 @formatSize = (0,1,1,2,4,8,1,1,2,4,8,4,8);
@@ -135,13 +135,13 @@ sub Rationalize($);
 
 %orientation = (
     1 => 'Horizontal (normal)',
-    2 => 'Mirrored horizontal',
-    3 => 'Rotated 180',
-    4 => 'Mirrored vertical',
-    5 => 'Mirrored horizontal then rotated 90 CCW',
-    6 => 'Rotated 90 CW',
-    7 => 'Mirrored horizontal then rotated 90 CW',
-    8 => 'Rotated 90 CCW',
+    2 => 'Mirror horizontal',
+    3 => 'Rotate 180',
+    4 => 'Mirror vertical',
+    5 => 'Mirror horizontal and rotate 90 CCW',
+    6 => 'Rotate 90 CW',
+    7 => 'Mirror horizontal and rotate 90 CW',
+    8 => 'Rotate 90 CCW',
 );
 
 

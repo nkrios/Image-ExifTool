@@ -6,8 +6,8 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
 <h3>
-<a href="Image-ExifTool-4.36.tar.gz">
-Download        Version 4.36</a> - Jan. 24, 2005
+<a href="Image-ExifTool-4.53.tar.gz">
+Download        Version 4.53</a> - Feb. 7, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a highly customizable Perl script that extracts EXIF, GPS, IPTC,
@@ -19,17 +19,18 @@ Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Sanyo and Sigma/Foveon.
 
 <p><b><font color='#cc0000'>NEW:</font></b> ExifTool now also has the ability to
 edit EXIF, GPS, IPTC, XMP and MakerNotes meta information in JPEG, TIFF, GIF,
-THM, CR2, NEF, PEF and DNG images.  When a file is written, the original file is
-saved with "_original" added to the file name.  Be sure to verify that the new
-file is OK before erasing the original version.  <a href="writing.html">Read
-here</a> for some ramblings on the subject of writing meta information.
+CRW, THM, CR2, NEF, PEF and DNG images.  When a file is written, the original
+file is saved with "_original" added to the file name.  Be sure to verify that
+the new file is OK before erasing the original version.
+<a href="writing.html">Read here</a> for some ramblings on the subject of writing
+meta information.
 
 <h2>Features</h2>
 <ul>
 <li>powerful, fast, and easy to use
 <li>reads EXIF, GPS, IPTC, XMP, MakerNotes, GeoTIFF, ICC Profile and Photoshop IRB records
 <li>writes EXIF, GPS, IPTC, XMP and MakerNotes information
-<li>reads maker notes for many digital cameras
+<li>reads and writes maker notes for many digital cameras
 <li>highly customizable, can extract exactly what you want
 <li>scans entire directory trees
 <li>easy to add support for new camera types by editing ExifTool modules
@@ -138,12 +139,13 @@ DESCRIPTION
 
     Any tag name may be prefixed by a group name to specify the location (ie.
     -GROUP:TAG).  While reading information, any group name in family 0 or 1 may
-    be used.  For writing, valid groups are EXIF, GPS, IPTC, XMP and MakerNotes.
+    be used.  For writing, valid groups are EXIF, GPS, IPTC, XMP, MakerNotes, or
+    any EXIF IFD name.
 
     Note: The writing feature is under development.  Currently, EXIF, GPS, IPTC,
-    XMP and MakerNotes tags may be written to JPG, TIFF, GIF, THM, CR2, NEF, PEF
-    and DNG files.  Take care to verify that the new file is OK before erasing
-    the original (which is renamed to FILE_original).
+    XMP and MakerNotes tags may be written to JPG, TIFF, GIF, CRW, THM, CR2,
+    NEF, PEF and DNG files.  Take care to verify that the new file is OK before
+    erasing the original (which is renamed to FILE_original).
 
 OPTIONS
     -list   - list all valid tag names
@@ -176,6 +178,7 @@ OPTIONS
     -v[#]   - <a href="verbose.html">verbose messages</a> (# may be 1-4, higher is more verbose)
     -w EXT  - write console output to file with EXT extension for each image
     -x TAG  - exclude specified tag (may be many -x options)
+    -z      - extract information from .gz and .bz2 compressed images
 </pre>
 
 <p>The -g and -G options organize tags into different families of groups based
@@ -268,6 +271,9 @@ IPTC group since the City tag exists in both, and IPTC has priority):
 
 <p># delete LightSource tag only if it is unknown with a value of 0:
 <br><b>exiftool -LightSource-="Unknown (0)" dst.tiff</b>
+
+<p># add DocumentName tag only if it didn't exist before
+<br><b>exiftool -DocumentName-= DocumentName='My Document' dst.jpg</b>
 
 <p># set WhiteBalance to Tungsten only if it was previously Auto
 <br><b>exiftool -whitebalance-=auto -WhiteBalance=tung dst.jpg</b>
@@ -362,14 +368,19 @@ where the tag already existed).  The priority of the groups is given by the list
 above.  Information is added preferentially to the EXIF or GPS group (there are
 no common tag names between these two groups).  If the tag isn't valid in either
 of these two groups, the information is added to the IPTC group, or finally the
-XMP group.  The MakerNotes group is special:  Information in this group may be
-changed but not added or deleted.  The reason for this is to avoid confusing
-manufacturer-specific software which may be very inflexible about the
-information it expects in the maker notes.
+XMP group.  The Makernotes group is special, see the note below.
 
 <p>Alternatively, information may be written to a specific group only, bypassing
 these priorities, by providing a group name for the tag.  The section below
 gives the syntax rules for exiftool command-line arguments to do this.
+
+<p><b>Note:</b> Information in the MakerNotes may be edited, but not added or
+deleted.  The reason for this is to avoid confusing manufacturer-specific
+software which may be very inflexible about the information it expects in the
+maker notes.  The exception is the JpgFromRaw image, which may be added or
+deleted from Canon CRW files.  This has been tested and doesn't cause problems
+for me with the Canon software or Photoshop, however it does confuse Capture One
+somewhat if this image is missing, so beware.
 
 <h3>Argument Syntax for Writing Information</h3>
 
@@ -400,9 +411,24 @@ Depending on the formats of the source and destination files, some of tags read
 may not be valid in the destination file, in which case they won't be written. 
 No translation between similar tags with different names is done.
 
+<h2>Addition Documentation</h2>
+<ul>
+<li><a href="history.html">ExifTool Revision History</a>
+<li><a href="ExifTool.html">Image::ExifTool Module Documentation</a>
+<li><a href="writing.html">Comments on the Subject of Writing Meta Information</a>
+<li><a href="canon_raw.html">Canon RAW (CRW) File Format Specification</a>
+</ul>
+
 <h2>License</h2>
 
 It's free, and you're free to use it however you want.
+
+<h2>Boldly Go where No Man has Gone Before...</h2>
+
+There is still much unknown information in the maker notes for many camera
+models.  (To see this information, run exiftool with the -U option.)  If you
+manage to figure out what any of it means, send me an e-mail and I'll update
+ExifTool to decode this information.  Many thanks to all who have helped so far.
 
 <h2>Acknowledgements</h2>
 
@@ -444,6 +470,7 @@ And thanks to the following people for their help:
 <li>Brian Ristuccia for more information about some Nikon tags
 <li>Daniel Pittman for his additions to the Canon WhiteBalance conversion
 <li>Christian Koller for decoding the 20D custom functions
+<li>Juha Eskelinen for figuring out the 20D FileNumber
 </ul>
 
 <hr>

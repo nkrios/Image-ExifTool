@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WriteIPTC.pl
 #
-# Description:  Definitions for writing IPTC meta information
+# Description:  Routines for writing IPTC meta information
 #
 # Revisions:    12/15/2004 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -214,11 +214,21 @@ sub WriteIPTC($$$)
             # (write out our tags in numberical order even though
             # this isn't required by the IPTC spec)
             last if defined $rec and $rec <= $newRec;
-            # only add new values if tag existed before or IsCreating is true
-            my @values;
-            if ($foundRec{$newRec}->{$newTag} or $exifTool->IsCreating($tagInfo)) {
-                @values = $exifTool->GetNewValues($tagInfo);
+            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+            # only add new values if...
+            my ($doSet, @values);
+            my $found = $foundRec{$newRec}->{$newTag} || 0;
+            if ($found == 2) {
+                # ...tag existed before and was deleted
+                $doSet = 1;
+            } elsif ($$tagInfo{List}) {
+                # ...tag is List and it existed before or we are creating it
+                $doSet = 1 if $found or Image::ExifTool::IsCreating($newValueHash);
+            } else {
+                # ...tag didn't exist before and we are creating it
+                $doSet = 1 if not $found and Image::ExifTool::IsCreating($newValueHash);
             }
+            $doSet and @values = Image::ExifTool::GetNewValues($newValueHash);
             # write tags for each value in list
             my $value;
             foreach $value (@values) {
@@ -249,6 +259,7 @@ sub WriteIPTC($$$)
         # write out this record unless we are setting it with a new value
         $tagInfo = $set{$rec}->{$tag};
         if ($tagInfo) {
+            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
             $foundRec{$rec}->{$tag} = 1;
             $len = $pos - $valuePtr;
             my $val = substr($$dataPt, $valuePtr, $len);
@@ -259,9 +270,11 @@ sub WriteIPTC($$$)
                     $val = $val * 256 + ord(substr($$dataPt, $valuePtr+$i, 1));
                 }
             }
-            if ($exifTool->IsOverwriting($tagInfo, $val)) {
+            if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
                 $verbose > 1 and print "    - IPTC:$$tagInfo{Name} = '$val'\n";
                 ++$exifTool->{CHANGED};
+                # increment foundRec to indicate we found and deleted this tag
+                ++$foundRec{$rec}->{$tag};
                 next;
             }
         }
@@ -276,7 +289,7 @@ sub WriteIPTC($$$)
             return undef unless $exifTool->Options('IgnoreMinorErrors');
         }
         # add back a bit of zero padding ourselves
-        $newData .= "\0" x 100;
+        $newData .= "\0" x 100 unless $exifTool->Options('Compact');
     }
     return $newData;
 }
@@ -288,7 +301,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WriteIPTC.pl - Definitions for writing IPTC meta information
+Image::ExifTool::WriteIPTC.pl - Routines for writing IPTC meta information
 
 =head1 SYNOPSIS
 

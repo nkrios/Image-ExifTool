@@ -16,12 +16,12 @@ package t::TestLib;
 use strict;
 require 5.002;
 require Exporter;
-use Image::ExifTool;
+use Image::ExifTool qw{ImageInfo};
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.03';
+$VERSION = '1.04';
 @ISA = qw(Exporter);
-@EXPORT = qw(check writeCheck testCompare);
+@EXPORT = qw(check writeCheck testCompare testVerbose);
 
 #------------------------------------------------------------------------------
 # Compare 2 files and return true and erase the 2nd file if they are the same
@@ -44,15 +44,18 @@ sub testCompare($$$)
                 ++$linenum;
                 $line1 = $_;
                 $line2 = <FILE2>;
-                unless (defined $line2 and $line1 eq $line2) {
+                if (defined $line2) {
+                    next if $line1 eq $line2;
                     # ignore version number differences
-                    unless ($line1 =~ /ExifTool\s*Version/ and
-                            $line2 =~ /ExifTool\s*Version/)
-                    {
-                        $success = 0;
-                        last;
+                    next if $line1 =~ /ExifTool\s*Version/ and
+                            $line2 =~ /ExifTool\s*Version/;
+                    # some systems use 3 digits in exponents... grrr
+                    if ($line2 =~ s/e(\+|-)0/e$10/) {
+                        next if $line1 eq $line2;
                     }
                 }
+                $success = 0;
+                last;
             }
             if ($success) {
                 # make sure there is nothing left in file2
@@ -175,5 +178,42 @@ sub writeCheck($$$;$)
     $rtnVal and unlink $testfile;
     return $rtnVal;
 }
+
+#------------------------------------------------------------------------------
+# test verbose output
+# Inputs: 0) test name, 1) test number, 2) Input file, 3) verbose level
+# Returns: 0) ok value, 1) skip string if test must be skipped
+sub testVerbose($$$$)
+{
+    my ($testname, $testnum, $infile, $verbose) = @_;
+    my $testfile = "t/${testname}_$testnum";
+    my $ok = 1;
+    my $skip = '';
+    # capture verbose output by redirecting STDOUT
+    if (open(TESTFILE,">&STDOUT") and open(STDOUT,">$testfile.tmp")) {
+        ImageInfo($infile, { Verbose => $verbose });
+        close(STDOUT);
+        open(STDOUT,">&TESTFILE"); # restore original STDOUT
+        # re-write output file to change newlines to be same as standard test file
+        # (if I was a Perl guru, maybe I would know a better way to do this)
+        open(TMPFILE,"$testfile.tmp");
+        open(TESTFILE,">$testfile.failed");
+        my $oldSep = $\;
+        $\ = "\x0a";        # set output line separator
+        while (<TMPFILE>) {
+            chomp;          # remove existing newline
+            print TESTFILE $_;  # re-write line using \x0a for newlines
+        }
+        $\ = $oldSep;       # restore output line separator
+        close(TESTFILE);
+        unlink("$testfile.tmp");
+        $ok = testCompare("$testfile.out","$testfile.failed",$testnum);
+    } else {
+        # skip this test
+        $skip = ' # Skip Can not redirect standard output to test verbose output';
+    }
+    return ($ok, $skip);
+}
+
 
 1; #end

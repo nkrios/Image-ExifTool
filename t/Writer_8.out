@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.10
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.53
 [File, File, Image]  - File Name: Writer_8_failed.jpg
 [File, File, Image]  - File Size: 7KB
 [File, File, Image]  - File Type: JPEG
@@ -63,6 +63,7 @@
 [MakerNotes, Canon, Camera] 18 - Focus Type: Auto (2)
 [MakerNotes, Canon, Camera] 19 - AF Point: Unknown (0)
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Manual
+[MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
@@ -72,12 +73,14 @@
 [MakerNotes, Canon, Camera] 36 - Zoomed Resolution: 3072
 [MakerNotes, Canon, Camera] 37 - Zoomed Resolution Base: 3072
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
-[MakerNotes, Canon, Camera] 2 - Canon 0x0002: 0 34 914 610
+[MakerNotes, Canon, Image] 1 - Focal Length: 34mm
+[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
+[MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
 [MakerNotes, Canon, Camera] 3 - Canon 0x0003: 100 0 0 0
 [MakerNotes, Canon, Image] 2 - ISO Speed: 100
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
-[MakerNotes, Canon, Image] 9 - Sequence Number In Continuous Burst: 0
+[MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
 [MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
@@ -88,7 +91,6 @@
 [MakerNotes, Canon, Image] 22 - Shutter Speed: 128
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
-[MakerNotes, Canon, Camera] 147 - Canon 0x0093: 18 0 0 0 0 0 65535 65535 65535
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
@@ -103,7 +105,24 @@
 [MakerNotes, Canon, Camera] 193 - Canon 0x00c1: 26 299 375 375 170 202 394 395 240 153 453 454 375
 [MakerNotes, Canon, Camera] 170 - Canon 0x00aa: 10 998 1022 1026 808
 [MakerNotes, Canon, Camera] 168 - Canon 0x00a8: 20 5190 5190 7000 5987 3214 3897 6203 5190 5200
-[MakerNotes, Canon, Camera] 169 - Canon 0x00a9: 82 1719 832 831 990 1722 832 831 989 2035 832 831 839 1[...]
+[MakerNotes, Canon, Camera] 0 - Red Balance Auto: 2.06611
+[MakerNotes, Canon, Camera] 1 - Blue Balance Auto: 0.83939
+[MakerNotes, Canon, Camera] 2 - Red Balance Daylight: 2.06971
+[MakerNotes, Canon, Camera] 3 - Blue Balance Daylight: 0.84024
+[MakerNotes, Canon, Camera] 4 - Red Balance Cloudy: 2.44591
+[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99047
+[MakerNotes, Canon, Camera] 6 - Red Balance Tungsten: 2.25721
+[MakerNotes, Canon, Camera] 7 - Blue Balance Tungsten: 0.92027
+[MakerNotes, Canon, Camera] 8 - Red Balance Fluorescent: 1.34502
+[MakerNotes, Canon, Camera] 9 - Blue Balance Fluorescent: 0.54676
+[MakerNotes, Canon, Camera] 10 - Red Balance Flash: 1.78860
+[MakerNotes, Canon, Camera] 11 - Blue Balance Flash: 0.60898
+[MakerNotes, Canon, Camera] 12 - Red Balance Custom: 2.32332
+[MakerNotes, Canon, Camera] 13 - Blue Balance Custom: 0.92849
+[MakerNotes, Canon, Camera] 14 - Red Balance B&W: 2.06971
+[MakerNotes, Canon, Camera] 15 - Blue Balance B&W: 0.84024
+[MakerNotes, Canon, Camera] 16 - Red Balance Shade: 2.06971
+[MakerNotes, Canon, Camera] 17 - Blue Balance Shade: 0.84109
 [MakerNotes, Canon, Camera] 174 - Canon 0x00ae: 5200
 [MakerNotes, Canon, Camera] 180 - Canon 0x00b4: 1
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072

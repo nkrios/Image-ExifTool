@@ -61,8 +61,8 @@ Format), PEF (Pentax RAW), ORF (Olympus RAW Format) and DNG (Digital Negative)
 images, as well as the maker notes of many digital cameras by various
 manufacturers including Canon, Casio, FujiFilm, Minolta/Konica-Minolta, Nikon,
 Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Sanyo and Sigma/Foveon. It writes
-EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG, TIFF, GIF, THM, CR2,
-NEF, PEF and DNG files.
+EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG, TIFF, GIF, CRW, THM,
+CR2, NEF, PEF and DNG files.
 
 =head1 METHODS
 
@@ -261,6 +261,12 @@ to a specific function.
 
 Flag to get the value of all binary tags.  Unless set, large binary values
 may only be extracted for specifically requested tags. Default is 0.
+
+=item Compact
+
+Write compact output.  Default is 0.  Some data formats (XMP, IPTC) specify
+that the data be padded with blanks to allow in-place editing.  By setting
+this flag, 2kB is saved for files with XMP data, and 100 bytes for IPTC.
 
 =item Composite
 
@@ -1046,6 +1052,7 @@ Get type of file given file name.
 =item Return Value:
 
 A string, based on the file extension, which represents the type of file.
+Returns undefined value if file type is not supported by ExifTool.
 
 =back
 
@@ -1058,37 +1065,10 @@ it under the same terms as Perl itself.
 
 =head1 CREDITS
 
-Thanks to the following people for their help:
-
-B<Malcolm Wotton> for his help with the D30 Custom Functions.
-
-B<David Anson> for his help sorting out binary file problems on Windows.
-
-B<Leon Booyens> for his suggestions.
-
-B<Jeremy Brown> for the 35efl tags.
-
-B<Dan Heller> for his bug reports, detailed suggestions and guidance.
-
-B<Wayne Smith> for his help figuring out the Pentax maker notes.
-
-B<Michael Rommel> for his bug fixes and additions to the Canon maker notes.
-
-B<Joseph Heled> for help figuring out some of the Nikon D70 maker notes.
-
-B<Joachim Loehr> for adding the Casio type 2 maker notes.
-
-B<Greg Troxel> for his suggestions and for adding ExifTool to pkgsrc-wip.
-
-B<Jay Al-Saadi> for his discoveries with the Minolta white balance tag.
-
-B<Thomas Walter> for figuring out some Nikon tags.
-
-B<Brian Ristuccia> for more information about some Nikon tags.
-
-B<Daniel Pittman> for his additions to the Canon WhiteBalance conversion.
-
-B<Christian Koller> for decoding the 20D custom functions.
+Many people have helped in the development of ExifTool through their bug
+reports, comments and suggestions, and/or additions to the code.  See
+html/index.html in the Image::ExifTool distribution package for a list of
+people who have contributed to this project.
 
 =head1 SEE ALSO
 

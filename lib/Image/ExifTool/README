@@ -183,6 +183,10 @@ conditions.  The following is a description of possible hash entries:
 
                   'DataMember' - name of exiftool data member associated with
                   this tag if it should be stored as a special data member.
+                  
+                  'Permanent' - flag indicates that a tag is permanent, and
+                  can't be added or deleted from the file.  By default, all
+                  MakerNotes tags are permanent unless otherwise specified.
 
   ValueConv     : [optional] Used to convert the raw data value to a useable
                   form.  May be either a hash reference to act as a lookup table

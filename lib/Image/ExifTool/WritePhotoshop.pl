@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WritePhotoshop.pl
 #
-# Description:  Definitions for writing Photoshop IRB resource
+# Description:  Routines for writing Photoshop IRB resource
 #
 # Revisions:    12/17/2004 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -32,13 +32,9 @@ sub WritePhotoshop($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $newData = '';
 
-    my @tagInfoList = $exifTool->GetNewTagInfoList($tagTablePtr);
     # make a hash of new tag info, keyed on tagID
-    my (%newTagInfo, $tagInfo, $tagID);
-    Image::ExifTool::GenerateTagIDs($tagTablePtr);  # make sure IDs are generated
-    foreach $tagInfo (@tagInfoList) {
-        $newTagInfo{$tagInfo->{TagID}} = $tagInfo;
-    }
+    my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
+
     my ($addDirs, $editDirs) = $exifTool->GetAddDirHash($tagTablePtr);
 
     my $saveOrder = GetByteOrder();
@@ -52,7 +48,7 @@ sub WritePhotoshop($$$)
     #         2) Name, null terminated string padded to even no. bytes
     #         3) Size, 4 bytes - N
     #         4) Data, N bytes
-    my ($pos, $value, $size);
+    my ($pos, $value, $size, $tagInfo, $tagID);
     for ($pos=$start; $pos+8<$dirEnd; $pos+=$size) {
         # each entry must be on same even byte boundary as directory start
         ++$pos if ($pos ^ $start) & 0x01;
@@ -94,14 +90,15 @@ sub WritePhotoshop($$$)
                 last;
             }
         }
-        if ($newTagInfo{$tagID}) {
-            $tagInfo = $newTagInfo{$tagID};
-            delete $newTagInfo{$tagID};
+        if ($$newTags{$tagID}) {
+            $tagInfo = $$newTags{$tagID};
+            delete $$newTags{$tagID};
+            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
             # check to see if we are overwriting this tag
             $value = substr($$dataPt, $pos, $size);
-            if ($exifTool->IsOverwriting($tagInfo, $value)) {
+            if (Image::ExifTool::IsOverwriting($newValueHash, $value)) {
                 $verbose > 1 and print "    - Photoshop:$$tagInfo{Name} = '$value'\n";
-                $value = $exifTool->GetNewValues($tagInfo);
+                $value = Image::ExifTool::GetNewValues($newValueHash);
                 ++$exifTool->{CHANGED};
                 next unless defined $value;     # next if tag is being deleted
             }
@@ -133,14 +130,15 @@ sub WritePhotoshop($$$)
 # write any remaining entries we didn't find in the old directory
 # (might as well write them in numerical tag order)
 #
-    my @tagsLeft = sort { $a <=> $b } keys(%newTagInfo), keys(%$addDirs);
+    my @tagsLeft = sort { $a <=> $b } keys(%$newTags), keys(%$addDirs);
     foreach $tagID (@tagsLeft) {
-        if ($newTagInfo{$tagID}) {
-            $tagInfo = $newTagInfo{$tagID};
-            $value = $exifTool->GetNewValues($tagInfo);
+        if ($$newTags{$tagID}) {
+            $tagInfo = $$newTags{$tagID};
+            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+            $value = Image::ExifTool::GetNewValues($newValueHash);
             next unless defined $value;     # next if tag is being deleted
             # don't add this tag unless specified
-            next unless $exifTool->IsCreating($tagInfo);
+            next unless Image::ExifTool::IsCreating($newValueHash);
             $verbose > 1 and print "    + Photoshop:$$tagInfo{Name} = '$value'\n";
             ++$exifTool->{CHANGED};
         } else {

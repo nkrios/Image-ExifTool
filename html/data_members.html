@@ -17,9 +17,9 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>CHANGED</td><td>number of tags changed during writing</td></tr>
 
-<tr><td>CameraMake</td><td>camera make set during reading</td></tr>
+<tr><td>CameraMake</td><td>camera make set during reading and writing</td></tr>
 
-<tr><td>CameraModel</td><td>camera model name set during reading</td></tr>
+<tr><td>CameraModel</td><td>camera model name set during reading and writing</td></tr>
 
 <tr><td>DIR_NAME</td><td>name of directory currently being processed</td></tr>
 
@@ -42,8 +42,17 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>IO_TAG_LIST</td><td>list for output of requested tags in proper case and order</td></tr>
 
-<tr><td>MAKER_NOTE_POS</td><td>position of maker note in source file, used by SetNewValuesFromFile()
-    to adjust offsets in maker note IFD</td></tr>
+<tr><td>MAKER_NOTE_ENTRIES</td><td>used by Image::ExifTool::CanonRaw as temporary storage for
+    maker note directory entries when synthesizing maker notes from CRW file with the
+    MakerNotes option</td></tr>
+
+<tr><td>MAKER_NOTE_POS</td><td>position of maker note in source file set if maker notes are
+    extracted with MakerNotes option.  Used by SetNewValuesFromFile() to adjust offsets in
+    maker note IFD</td></tr>
+
+<tr><td>MAKER_NOTE_VAL_BUFF</td><td>used by Image::ExifTool::CanonRaw as temporary storage for
+    maker note value information when synthesizing maker notes from CRW file with the
+    MakerNotes option</td></tr>
 
 <tr><td>MAKER_NOTE_WARN</td><td>warning flag set if pointers in maker notes directory run
     outside of maker notes data</td></tr>

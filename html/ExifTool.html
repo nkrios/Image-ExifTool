@@ -309,6 +309,9 @@ to a specific function.
 <tr><th>Option</th><th>Description</th><th>Values</th><th>Default</th></tr>
 <tr><td>Binary</td><td>Flag to get values of all binary tags.
     Unless set, large binary values are only extracted for specifically requested tags.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
+<tr><td>Compact</td><td>Write compact output.  Some data formats (XMP, IPTC) specify
+    that the data be padded with blanks to allow in-place editing.  By setting this
+    flag, 2kB is saved for files with XMP data, and 100 bytes for IPTC data.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Composite</td><td>Flag to calculate Composite tags</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td><td align=center>undef</td></tr>
 <tr><td>Duplicates</td><td>Flag to save duplicate tag values</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
@@ -927,7 +930,8 @@ Get type of file given file name.
 <tr><td valign='top'><b>Inputs</b></td><td>0) File name (or just an extension)
 </td></tr>
 <tr><td><b>Returns</b></td><td>A string, based on the file extension, which
-represents the type of file.
+represents the type of file, or undefined if the file type isn't supported by
+ExifTool.
 </td></tr>
 </table></blockquote>
 <b>Example:</b>

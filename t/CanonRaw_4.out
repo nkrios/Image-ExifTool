@@ -1,9 +1,9 @@
 [ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.51
-[ExifTool, ExifTool, ExifTool]  - Warning: JpgFromRaw is not a valid image
-[File, File, Image]  - File Name: CanonRaw.crw
+[File, File, Image]  - File Name: CanonRaw_4_failed.crw
 [File, File, Image]  - File Size: 6KB
 [File, File, Image]  - File Type: Canon RAW
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
+[MakerNotes, CanonRaw, Camera] 8199 - Jpg From Raw: (Binary data 16 bytes)
 [MakerNotes, CanonRaw, Image] 0 - File Format: CRW
 [MakerNotes, CanonRaw, Image] 1 - Target Compression Ratio: 10
 [MakerNotes, CanonRaw, Image] 0 - Image Width: 3072
@@ -15,8 +15,8 @@
 [MakerNotes, CanonRaw, Image] 6 - Color BW: 257
 [MakerNotes, CanonRaw, Camera] 4106 - Target Image Type: 0
 [MakerNotes, CanonRaw, Camera] 6148 - Record ID: 0
-[MakerNotes, CanonRaw, Image] 6167 - File Number: 116-1602
-[MakerNotes, CanonRaw, Time] 0 - Shooting Date/Time: 2003:11:10 17:39:26
+[MakerNotes, CanonRaw, Image] 6167 - File Number: 118-1861
+[MakerNotes, CanonRaw, Time] 0 - Shooting Date/Time: 2003:12:04 06:46:52
 [MakerNotes, CanonRaw, Time] 1 - Time Zone Code: 0
 [MakerNotes, CanonRaw, Time] 2 - Time Zone Info: 0
 [MakerNotes, CanonRaw, Camera] 2070 - Original File Name: CRW_1602.CRW
@@ -25,36 +25,36 @@
 [MakerNotes, CanonRaw, Camera] 6164 - Measured EV: -0.375
 [MakerNotes, CanonRaw, Camera] 2053 - Canon File Description: EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, CanonRaw, Camera] 2069 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
-[MakerNotes, CanonRaw, Camera] 2064 - Owner's Name: Cindy Harvey
+[MakerNotes, CanonRaw, Camera] 2064 - Owner's Name: Phil Harvey
 [MakerNotes, CanonRaw, Camera] 0 - Make: Canon
 [MakerNotes, CanonRaw, Camera] 6 - Camera Model Name: Canon EOS DIGITAL REBEL
-[MakerNotes, CanonRaw, Camera] 6155 - Camera Body No.: 0560018150
+[MakerNotes, CanonRaw, Camera] 6155 - Camera Body No.: 0000001234
 [MakerNotes, CanonRaw, Camera] 4124 - Base ISO: 100
-[MakerNotes, CanonRaw, Camera] 2061 - ROM Operation Mode: USA
+[MakerNotes, CanonRaw, Camera] 2061 - ROM Operation Mode: CDN
 [MakerNotes, CanonRaw, Camera] 2059 - Canon Firmware Version: Firmware Version 1.1.1
-[MakerNotes, Canon, Image] 1 - Focal Length: 24mm
-[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
+[MakerNotes, Canon, Image] 1 - Focal Length: 34mm
+[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 35.00mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
 [MakerNotes, Canon, Image] 2 - ISO Speed: 100
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
 [MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
-[MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: +2/3
+[MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
-[MakerNotes, Canon, Image] 19 - Focus Distance Upper: 1.42
-[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 1.19
-[MakerNotes, Canon, Image] 21 - Aperture Value: 3.6
-[MakerNotes, Canon, Image] 22 - Shutter Speed: 1/64
-[MakerNotes, Canon, Image] 24 - Bulb Duration: 0
+[MakerNotes, Canon, Image] 19 - Focus Distance Upper: -0.01
+[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
+[MakerNotes, Canon, Image] 21 - Aperture Value: 14
+[MakerNotes, Canon, Image] 22 - Shutter Speed: 128
+[MakerNotes, Canon, Image] 24 - Bulb Duration: 4
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
 [MakerNotes, Canon, Camera] 3 - Image Quality: RAW
-[MakerNotes, Canon, Camera] 4 - Canon Flash Mode: On
+[MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
-[MakerNotes, Canon, Camera] 7 - Focus Mode: AI Focus AF
+[MakerNotes, Canon, Camera] 7 - Focus Mode: Manual Focus
 [MakerNotes, Canon, Camera] 10 - Canon Image Size: Large
 [MakerNotes, Canon, Camera] 11 - Easy Mode: Manual
 [MakerNotes, Canon, Camera] 12 - Digital Zoom: Unknown (-1)
@@ -62,10 +62,10 @@
 [MakerNotes, Canon, Camera] 14 - Saturation: +1
 [MakerNotes, Canon, Camera] 15 - Sharpness: +1
 [MakerNotes, Canon, Camera] 16 - Camera ISO: Use shot ISO instead
-[MakerNotes, Canon, Camera] 17 - Metering Mode: Evaluative
+[MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
 [MakerNotes, Canon, Camera] 18 - Focus Type: Auto (2)
-[MakerNotes, Canon, Camera] 19 - AF Point: Manual AF point selection
-[MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Program AE
+[MakerNotes, Canon, Camera] 19 - AF Point: Unknown (0)
+[MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Manual
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18
@@ -107,16 +107,16 @@
 [MakerNotes, Canon, Camera] 16 - Red Balance Shade: 2.06971
 [MakerNotes, Canon, Camera] 17 - Blue Balance Shade: 0.84109
 [MakerNotes, CanonRaw, Camera] 4276 - Color Space: sRGB
-[Composite, Composite, Image]  - Aperture: 3.6
-[Composite, Composite, Camera]  - Flash Exposure Compensation: +2/3
+[Composite, Composite, Image]  - Aperture: 14.3
+[Composite, Composite, Camera]  - Flash Exposure Compensation: 0
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Camera]  - Flash Type: Built-In Flash
 [Composite, Composite, Image]  - Image Size: 3072x2048
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Red Eye Reduction: Off
-[Composite, Composite, Camera]  - Shooting Mode: Program AE
+[Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Camera]  - Shutter Curtain Sync: 1st-curtain sync
-[Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Camera]  - Focal Length: 24.0mm
+[Composite, Composite, Image]  - Shutter Speed: 4
+[Composite, Composite, Camera]  - Focal Length: 34.0mm
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm

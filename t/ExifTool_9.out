@@ -55,6 +55,7 @@
 [MakerNotes, Canon, Camera] 18 - Focus Type: Auto (2)
 [MakerNotes, Canon, Camera] 19 - AF Point: Unknown (0)
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Manual
+[MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
@@ -64,7 +65,9 @@
 [MakerNotes, Canon, Camera] 36 - Zoomed Resolution: 3072
 [MakerNotes, Canon, Camera] 37 - Zoomed Resolution Base: 3072
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
-[MakerNotes, Canon, Image] 9 - Sequence Number In Continuous Burst: 0
+[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
+[MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
+[MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
 [MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
@@ -79,6 +82,24 @@
 [MakerNotes, Canon, Camera] 8 - File Number: 118-1861
 [MakerNotes, Canon, Camera] 9 - Owner's Name: Cindy Harvey
 [MakerNotes, Canon, Image] 14 - Canon File Length: 4480822
+[MakerNotes, Canon, Camera] 0 - Red Balance Auto: 2.06611
+[MakerNotes, Canon, Camera] 1 - Blue Balance Auto: 0.83939
+[MakerNotes, Canon, Camera] 2 - Red Balance Daylight: 2.06971
+[MakerNotes, Canon, Camera] 3 - Blue Balance Daylight: 0.84024
+[MakerNotes, Canon, Camera] 4 - Red Balance Cloudy: 2.44591
+[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99047
+[MakerNotes, Canon, Camera] 6 - Red Balance Tungsten: 2.25721
+[MakerNotes, Canon, Camera] 7 - Blue Balance Tungsten: 0.92027
+[MakerNotes, Canon, Camera] 8 - Red Balance Fluorescent: 1.34502
+[MakerNotes, Canon, Camera] 9 - Blue Balance Fluorescent: 0.54676
+[MakerNotes, Canon, Camera] 10 - Red Balance Flash: 1.78860
+[MakerNotes, Canon, Camera] 11 - Blue Balance Flash: 0.60898
+[MakerNotes, Canon, Camera] 12 - Red Balance Custom: 2.32332
+[MakerNotes, Canon, Camera] 13 - Blue Balance Custom: 0.92849
+[MakerNotes, Canon, Camera] 14 - Red Balance B&W: 2.06971
+[MakerNotes, Canon, Camera] 15 - Blue Balance B&W: 0.84024
+[MakerNotes, Canon, Camera] 16 - Red Balance Shade: 2.06971
+[MakerNotes, Canon, Camera] 17 - Blue Balance Shade: 0.84109
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072

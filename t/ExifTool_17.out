@@ -3,6 +3,15 @@ AEBBracketValue : 0
 AFPoint : Unknown (0)
 AFPointsUsed : 0 ()
 AutoExposureBracketing : Off
+BlueBalanceAuto : 0.83939
+BlueBalanceB&W : 0.84024
+BlueBalanceCloudy : 0.99047
+BlueBalanceCustom : 0.92849
+BlueBalanceDaylight : 0.84024
+BlueBalanceFlash : 0.60898
+BlueBalanceFluorescent : 0.54676
+BlueBalanceShade : 0.84109
+BlueBalanceTungsten : 0.92027
 BulbDuration : 4
 CameraISO : Use shot ISO instead
 CanonExposureMode : Manual
@@ -27,6 +36,9 @@ FileNumber : 118-1861
 FlashActivity : 0
 FlashBits : (none)
 FlashExposureComp : 0
+FocalLength (1) : 34mm
+FocalPlaneXSize : 23.22mm
+FocalPlaneYSize : 15.49mm
 FocalUnits : 1
 FocusContinuous : Unknown (-1)
 FocusDistanceLower : 5.46
@@ -35,11 +47,21 @@ FocusMode : Manual Focus
 FocusType : Auto (2)
 ISO : 100
 IxusAFPoint : Unknown (0)
+LensType : Unknown (-1)
 LongFocal : 55
 MacroMode : Unknown (0)
 MeteringMode : Center-weighted averaging
 OwnerName : Cindy Harvey
 Quality : RAW
+RedBalanceAuto : 2.06611
+RedBalanceB&W : 2.06971
+RedBalanceCloudy : 2.44591
+RedBalanceCustom : 2.32332
+RedBalanceDaylight : 2.06971
+RedBalanceFlash : 1.78860
+RedBalanceFluorescent : 1.34502
+RedBalanceShade : 2.06971
+RedBalanceTungsten : 2.25721
 Saturation : +1
 Self-timer : 0
 Self-timer2 : 0

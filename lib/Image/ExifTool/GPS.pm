@@ -16,7 +16,7 @@ package Image::ExifTool::GPS;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 %Image::ExifTool::GPS::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -60,12 +60,11 @@ $VERSION = '1.04';
         Writable => 'rational32u',
         Count => 3,
         PrintConv => 'Image::ExifTool::GPS::DMS($val)',
-        PrintConvInv => '$_=$val;tr/-+0-9.	/ /c;$_',
+        PrintConvInv => '$_=$val;tr/-+0-9.\t/ /c;$_',
     },
     0x0005 => {
         Name => 'GPSAltitudeRef',
         Writable => 'int8u',
-        # don't need to remove "\0" here -- not a string
         PrintConv => {
             0 => 'Above Sea Level',
             1 => 'Below Sea Level',
@@ -75,6 +74,7 @@ $VERSION = '1.04';
         Name => 'GPSAltitude',
         Writable => 'rational32u',
         PrintConv => '"$val metres"',
+        PrintConvInv => '$val=~s/\s*m.*//;$val',
     },
     0x0007 => {
         Name => 'GPSTimeStamp',
@@ -82,6 +82,7 @@ $VERSION = '1.04';
         Count => 3,
         Groups => { 2 => 'Time' },
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
+        ValueConvInv => '$val=~tr/:/ /;$val',
     },
     0x0008 => {
         Name => 'GPSSatellites',
@@ -167,7 +168,7 @@ $VERSION = '1.04';
         Writable => 'rational32u',
         Count => 3,
         PrintConv => 'Image::ExifTool::GPS::DMS($val)',
-        PrintConvInv => '$_=$val;tr/-+0-9.	/ /c;$_',
+        PrintConvInv => '$_=$val;tr/-+0-9.\t/ /c;$_',
     },
     0x0015 => {
         Name => 'GPSDestLongitudeRef',
@@ -183,7 +184,7 @@ $VERSION = '1.04';
         Writable => 'rational32u',
         Count => 3,
         PrintConv => 'Image::ExifTool::GPS::DMS($val)',
-        PrintConvInv => '$_=$val;tr/-+0-9.	/ /c;$_',
+        PrintConvInv => '$_=$val;tr/-+0-9.\t/ /c;$_',
     },
     0x0017 => {
         Name => 'GPSDestBearingRef',
@@ -230,6 +231,7 @@ $VERSION = '1.04';
         Count => 11,
         Groups => { 2 => 'Time' },
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        ValueConvInv => '$val',
     },
     0x001E => {
         Name => 'GPSDifferential',

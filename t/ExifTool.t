@@ -201,32 +201,7 @@ my $testnum = 1;
 # test 18: Test verbose output
 {
     ++$testnum;
-    my $testfile = "t/ExifTool_$testnum";
-    my $ok = 1;
-    my $skip = '';
-    # capture verbose output by redirecting STDOUT
-    if (open(TESTFILE,">&STDOUT") and open(STDOUT,">$testfile.tmp")) {
-        ImageInfo('t/ExifTool.jpg', { Verbose => 3 });
-        close(STDOUT);
-        open(STDOUT,">&TESTFILE"); # restore original STDOUT
-        # re-write output file to change newlines to be same as standard test file
-        # (if I was a Perl guru, maybe I would know a better way to do this)
-        open(TMPFILE,"$testfile.tmp");
-        open(TESTFILE,">$testfile.failed");
-        my $oldSep = $\;
-        $\ = "\x0a";        # set output line separator
-        while (<TMPFILE>) {
-            chomp;          # remove existing newline
-            print TESTFILE $_;  # re-write line using \x0a for newlines
-        }
-        $\ = $oldSep;       # restore output line separator
-        close(TESTFILE);
-        unlink("$testfile.tmp");
-        $ok = testCompare("$testfile.out","$testfile.failed",$testnum);
-    } else {
-        # skip this test
-        $skip = ' # Skip Can not redirect standard output to test verbose option';
-    }
+    my ($ok, $skip) = testVerbose($testname, $testnum, 't/ExifTool.jpg', 3);
     print 'not ' unless $ok;
     print "ok $testnum$skip\n";
 }

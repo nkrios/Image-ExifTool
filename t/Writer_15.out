@@ -1,54 +1,24 @@
 [ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.51
-[ExifTool, ExifTool, ExifTool]  - Warning: JpgFromRaw is not a valid image
-[File, File, Image]  - File Name: CanonRaw.crw
-[File, File, Image]  - File Size: 6KB
-[File, File, Image]  - File Type: Canon RAW
-[MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
-[MakerNotes, CanonRaw, Image] 0 - File Format: CRW
-[MakerNotes, CanonRaw, Image] 1 - Target Compression Ratio: 10
-[MakerNotes, CanonRaw, Image] 0 - Image Width: 3072
-[MakerNotes, CanonRaw, Image] 1 - Image Height: 2048
-[MakerNotes, CanonRaw, Image] 2 - Pixel Aspect Ratio: 1
-[MakerNotes, CanonRaw, Image] 3 - Rotation: 0
-[MakerNotes, CanonRaw, Image] 4 - Component Bit Depth: 8
-[MakerNotes, CanonRaw, Image] 5 - Color Bit Depth: 24
-[MakerNotes, CanonRaw, Image] 6 - Color BW: 257
-[MakerNotes, CanonRaw, Camera] 4106 - Target Image Type: 0
-[MakerNotes, CanonRaw, Camera] 6148 - Record ID: 0
-[MakerNotes, CanonRaw, Image] 6167 - File Number: 116-1602
-[MakerNotes, CanonRaw, Time] 0 - Shooting Date/Time: 2003:11:10 17:39:26
-[MakerNotes, CanonRaw, Time] 1 - Time Zone Code: 0
-[MakerNotes, CanonRaw, Time] 2 - Time Zone Info: 0
-[MakerNotes, CanonRaw, Camera] 2070 - Original File Name: CRW_1602.CRW
-[MakerNotes, CanonRaw, Camera] 2071 - Thumbnail File Name: CRW_1602.THM
-[MakerNotes, CanonRaw, Camera] 2053 - User Comment: 
-[MakerNotes, CanonRaw, Camera] 6164 - Measured EV: -0.375
-[MakerNotes, CanonRaw, Camera] 2053 - Canon File Description: EOS DIGITAL REBEL CMOS RAW
-[MakerNotes, CanonRaw, Camera] 2069 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
-[MakerNotes, CanonRaw, Camera] 2064 - Owner's Name: Cindy Harvey
-[MakerNotes, CanonRaw, Camera] 0 - Make: Canon
-[MakerNotes, CanonRaw, Camera] 6 - Camera Model Name: Canon EOS DIGITAL REBEL
-[MakerNotes, CanonRaw, Camera] 6155 - Camera Body No.: 0560018150
-[MakerNotes, CanonRaw, Camera] 4124 - Base ISO: 100
-[MakerNotes, CanonRaw, Camera] 2061 - ROM Operation Mode: USA
-[MakerNotes, CanonRaw, Camera] 2059 - Canon Firmware Version: Firmware Version 1.1.1
-[MakerNotes, Canon, Image] 1 - Focal Length: 24mm
-[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
-[MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
-[MakerNotes, Canon, Image] 2 - ISO Speed: 100
-[MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
-[MakerNotes, Canon, Image] 7 - White Balance: Auto
-[MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
-[MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
-[MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: +2/3
-[MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
-[MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
-[MakerNotes, Canon, Image] 19 - Focus Distance Upper: 1.42
-[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 1.19
-[MakerNotes, Canon, Image] 21 - Aperture Value: 3.6
-[MakerNotes, Canon, Image] 22 - Shutter Speed: 1/64
-[MakerNotes, Canon, Image] 24 - Bulb Duration: 0
-[MakerNotes, Canon, Image] 29 - Self-timer 2: 0
+[File, File, Image]  - File Name: Writer_15_failed.jpg
+[File, File, Image]  - File Size: 5KB
+[File, File, Image]  - File Type: JPEG
+[File, File, Image]  - Image Width: 16
+[File, File, Image]  - Image Height: 16
+[EXIF, IFD0, Camera] 271 - Make: Canon
+[EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
+[EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/64
+[EXIF, ExifIFD, Image] 33437 - Aperture: 3.6
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
+[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:11:10 17:39:26
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 24.0mm
+[EXIF, ExifIFD, Image] 37510 - User Comment: 
+[EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
+[EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
+[EXIF, ExifIFD, Camera] 41992 - Contrast: +1
+[EXIF, ExifIFD, Camera] 41993 - Saturation: +1
+[EXIF, ExifIFD, Camera] 41994 - Sharpness: +1
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
 [MakerNotes, Canon, Camera] 3 - Image Quality: RAW
@@ -76,13 +46,28 @@
 [MakerNotes, Canon, Camera] 36 - Zoomed Resolution: 3072
 [MakerNotes, Canon, Camera] 37 - Zoomed Resolution Base: 3072
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
-[MakerNotes, CanonRaw, Image] 1 - Sensor Width: 3152
-[MakerNotes, CanonRaw, Image] 2 - Sensor Height: 2068
-[MakerNotes, CanonRaw, Image] 5 - Sensor Left Border: 72
-[MakerNotes, CanonRaw, Image] 6 - Sensor Top Border: 16
-[MakerNotes, CanonRaw, Image] 7 - Sensor Right Border: 3143
-[MakerNotes, CanonRaw, Image] 8 - Sensor Bottom Border: 2063
-[MakerNotes, CanonRaw, Camera] 6197 - Decoder Table: 1 0 514 4120111
+[MakerNotes, Canon, Image] 1 - Focal Length: 24mm
+[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
+[MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
+[MakerNotes, Canon, Image] 2 - ISO Speed: 100
+[MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
+[MakerNotes, Canon, Image] 7 - White Balance: Auto
+[MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
+[MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
+[MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: +2/3
+[MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
+[MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
+[MakerNotes, Canon, Image] 19 - Focus Distance Upper: 1.42
+[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 1.19
+[MakerNotes, Canon, Image] 21 - Aperture Value: 3.6
+[MakerNotes, Canon, Image] 22 - Shutter Speed: 1/64
+[MakerNotes, Canon, Image] 24 - Bulb Duration: 0
+[MakerNotes, Canon, Image] 29 - Self-timer 2: 0
+[MakerNotes, Canon, Camera] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
+[MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
+[MakerNotes, Canon, Camera] 8 - File Number: 116-1602
+[MakerNotes, Canon, Camera] 9 - Owner's Name: Cindy Harvey
+[MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
@@ -106,13 +91,16 @@
 [MakerNotes, Canon, Camera] 15 - Blue Balance B&W: 0.84024
 [MakerNotes, Canon, Camera] 16 - Red Balance Shade: 2.06971
 [MakerNotes, Canon, Camera] 17 - Blue Balance Shade: 0.84109
-[MakerNotes, CanonRaw, Camera] 4276 - Color Space: sRGB
+[XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0mm
+[XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
+[XMP, XMP-tiff, Image] ImageLength - Image Height: 2048
+[XMP, XMP-tiff, Image] ImageWidth - Image Width: 3072
 [Composite, Composite, Image]  - Aperture: 3.6
 [Composite, Composite, Camera]  - Flash Exposure Compensation: +2/3
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Camera]  - Flash Type: Built-In Flash
-[Composite, Composite, Image]  - Image Size: 3072x2048
+[Composite, Composite, Image]  - Image Size: 16x16
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Red Eye Reduction: Off
 [Composite, Composite, Camera]  - Shooting Mode: Program AE

@@ -5,7 +5,98 @@
 <body>
 <h1>ExifTool Version History</h1>
 
-<b>Jan. 24/05 - Version 4.36</b>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-4.53.tar.gz">Version 4.36</a>.<p>
+
+<b>Feb. 7/05 - Version 4.53</b> (production release)
+<ul>
+<li>Added FileNumber for Canon 20D (decoded by Juha Eskelinen)
+<li>Removed CanonA0Tag
+</ul>
+
+<b>Feb. 4/05 - Version 4.52</b>
+<ul>
+<li>Added another CanonRaw test
+<li>Changes to Canon CRW documentation
+</ul>
+
+<b>Feb. 4/05 - Version 4.51</b>
+<ul>
+<li>Finally found documentation for Canon CRW files (CIFF format)!!
+<li>Changed CanonRaw to bring code up to CIFF specification
+<li>Added a bunch more CanonRaw tags
+<li>Updated Canon CRW documentation
+</ul>
+
+<b>Feb. 2/05 - Version 4.50</b>
+<ul>
+<li>Allow writing to specific IFD
+<li>Allow permanent tags (ie. MakerNotes tags) 'deleted' by setting them to an
+    empty string if '' is a valid value for the tag
+<li>Added test for rewriting Nikon D70 information
+<li>Added missing inverse conversion routines for GPS tags (now they are all writable)
+<li>Decoded a few more Canon and CanonRaw tags
+<li>Added -z option to extract information from images in compressed files
+<li>Improved CanonRaw verbose output
+<li>Remove garbage after null terminator in CanonRaw string-type tags
+</ul>
+
+<b>Jan. 30/05 - Version 4.45</b>
+<ul>
+<li>Added a few more Canon tags
+<li>Fixed bug with divide by zero error (in Perl, '0.0' is a true value -- doh!)
+</ul>
+
+<b>Jan. 30/05 - Version 4.44</b>
+<ul>
+<li>Sort entries in synthesized Canon MakerNotes directory
+<li>Interpret Canon custom functions for models other than 10D in CRW files
+</ul>
+
+<b>Jan. 29/05 - Version 4.43</b>
+<ul>
+<li>Synthesize Canon MakerNotes information when using -allTagsFromFile for a
+    CRW file
+<li>Decode WhiteBalance table in Canon maker notes
+<li>Rename CanonRaw CanonFileType tag to CanonImageType
+</ul>
+
+<b>Jan. 28/05 - Version 4.42</b>
+<ul>
+<li>Fixed problem where multiple IPTC tags could be created if replacing
+    specific IPTC tag values with 'TAG-=VALUE'.
+<li>Made EXIF SceneType writable
+<li>Changed name of Nikon ISOUsed tag to ISO
+<li>Added documention of Canon RAW (CRW) file format
+</ul>
+
+<b>Jan. 27/05 - Version 4.41</b>
+<ul>
+<li>Added write support for Canon exposure parameters
+<li>Change validation of CanonPictureInfo to get it working for Canon 20D
+</ul>
+
+<b>Jan. 26/05 - Version 4.40</b>
+<ul>
+<li>Added ability to write Canon RAW (CRW) files.  With this format you aren't
+    allowed to add or delete any new tags (just as with the MakerNotes), except
+    for JpgFromRaw, which I like to be able to delete to save disk space.
+<li>Added validation of JpgFromRaw images
+<li>Relax filtering on non-ASCII characters by exiftool script to allow
+    high-ASCII characters to be printed.
+<li>Changed the tense of Orientation values to try to make the meaning more
+    clear.  This tag can be a bit confusing. It gives the rotation that must be
+    applied to the image to view it properly (hence the rotation of the camera
+    when the picture was taken).
+<li>Patched problem which was causing failed tests on some platforms (floating
+    point format has 3 digits in exponent on Perl 5.8.5 MSWin32-x86, grrrr...)
+<li>API Changes:
+    <ul>
+    <li>Added 'Compact' option to not write blank padding as per XMP and IPTC
+        specs.
+    </ul>
+</ul>
+
+<b>Jan. 24/05 - Version 4.36</b> (production release)
 <ul>
 <li>Added support for reading Olympus Raw Format (ORF)
 </ul>
@@ -254,7 +345,7 @@
     warnings, on 5.003)
 </ul>
 
-<b>Nov. 25/04 - Version 3.94</b>
+<b>Nov. 25/04 - Version 3.94</b> (production release)
 <ul>
 <li>Patched problem with reading XMP data using Perl 5.6.x (Perl bug)
 <li>Put lib directory first in exiftool include list to take precidence over
@@ -262,7 +353,7 @@
 <li>Continue trying to parse JPEG image after an unrecognized APP1 segment
 </ul>
 
-<b>Nov. 24/04 - Version 3.93</b>
+<b>Nov. 24/04 - Version 3.93</b> (production release)
 <ul>
 <li>Final round of ICC_Profile updates
 <li>Increase precision of extracted rational values
@@ -335,7 +426,7 @@
     </ul>
 </ul>
 
-<b>Nov. 11/04 - Version 3.82</b>
+<b>Nov. 11/04 - Version 3.82</b> (production release)
 <ul>
 <li>Improved diagnostic output for failed tests in installation
 </ul>
@@ -354,7 +445,7 @@
 <li>Decode a couple more Minolta camera model types
 </ul>
 
-<b>Nov. 4/04 - Version 3.74</b>
+<b>Nov. 4/04 - Version 3.74</b> (production release)
 <ul>
 <li>Properly localize $_ in public Image::ExifTool subroutines
 </ul>
@@ -364,7 +455,7 @@
 <li>Changes to tests to avoid false failures on MSWin32-x86-multi-thread 4.0
 </ul>
 
-<b>Nov. 1/04 - Version 3.72</b>
+<b>Nov. 1/04 - Version 3.72</b> (production release)
 <ul>
 <li>Fixed minor bug in generation of family 1 XMP group names
 <li>Changes to Photoshop family 2 groups
@@ -402,7 +493,7 @@
 <li>Started referencing sources for tag definitions in the source code
 </ul>
 
-<b>Oct. 1/04 - Version 3.60</b>
+<b>Oct. 1/04 - Version 3.60</b> (production release)
 <ul>
 <li>Changed group family 0 to divide EXIF group into individual IFD groups
 <li>Fixed typos in some Casio tag names

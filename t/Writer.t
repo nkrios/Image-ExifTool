@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..14\n"; }
+BEGIN { $| = 1; print "1..15\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -283,6 +283,23 @@ sub binaryCompare($$)
     if (binaryCompare('t/Writer.jpg', $testfile2)) {
         unlink $testfile1 if $success;
         unlink $testfile2;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 15: Copy tags from CRW file to JPG
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/CanonRaw.crw');
+    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/Writer.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
     } else {
         print 'not ';
     }

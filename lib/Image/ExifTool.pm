@@ -22,7 +22,7 @@ use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '4.36';
+$VERSION = '4.53';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -35,10 +35,10 @@ $VERSION = '4.36';
     )],
     DataAccess => [qw(
         ReadValue GetByteOrder SetByteOrder ToggleByteOrder Get16u Get16s
-        Get32u Get32s GetFloat GetDouble Set8u Set8s Set16u Set32u
+        Get32u Get32s GetFloat GetDouble WriteValue Set8u Set8s Set16u Set32u
     )],
     Utils => [qw(
-        GetTagTable TagTableKeys GetTagInfoList GetFileType GenerateTagIDs
+        GetTagTable TagTableKeys GetTagInfoList GenerateTagIDs
     )],
     Vars => [qw(
         %allTables @fileTypes
@@ -52,18 +52,21 @@ Exporter::export_ok_tags(keys %EXPORT_TAGS);
 # autoloaded when any of these are called.
 sub SetNewValue($;$$%);
 sub SetNewValuesFromFile($$);
-sub GetNewValues($$;$);
+sub GetNewValues($;$$);
 sub GetAllTags();
 sub GetWritableTags();
 sub GetAllGroups($);
 # non-public routines below
 sub LoadAllTables();
 sub GetNewTagInfoList($;$);
+sub GetNewTagInfoHash($$);
 sub Get64s($$);
 sub Get64u($$);
 sub HexDump($;$%);
 sub VerboseInfo($$$%);
 sub VerboseDir($$;$);
+sub Rationalize($;$);
+sub WriteValue($$;$$$$);
 sub WriteTagTable($$;$$);
 sub WriteInfo($$$);
 sub CheckExtraTags($$$);
@@ -308,6 +311,8 @@ sub ExtractInfo($;@)
         if ($filename) {
             unless ($filename eq '-') {
                 my $name = $filename;
+                # extract file name from pipe if necessary
+                $name =~ /\|$/ and $name =~ s/.*?"(.*)".*/$1/;
                 $name =~ s/.*\///;  # remove path
                 $self->FoundTag('FileName', $name);
                 my $fileSize = -s $filename;
@@ -363,9 +368,9 @@ sub ExtractInfo($;@)
             } elsif ($type eq 'GIF') {
                 $self->GifInfo() and last;
             } elsif ($type eq 'CRW') {
-                # must be sure we have loaded CanonRaw before we can call RawInfo()
+                # must be sure we have loaded CanonRaw before we can call CrwInfo()
                 GetTagTable('Image::ExifTool::CanonRaw::Main');
-                Image::ExifTool::CanonRaw::RawInfo($self) and last;
+                Image::ExifTool::CanonRaw::CrwInfo($self) and last;
             } elsif ($type eq 'MRW') {
                 # must be sure we have loaded Minolta tables before we can call MrwInfo()
                 GetTagTable('Image::ExifTool::Minolta::Main');
@@ -839,17 +844,17 @@ sub GetFileType($)
 sub Init($)
 {
     my $self = shift;
-    $self->{FOUND_TAGS} = undef;        # list of found tags
-    $self->{FILE_ORDER} = { };          # hash of tag order in file
-    $self->{VALUE_CONV} = { };          # hash of converted tag values
-    $self->{PRINT_CONV} = { };          # hash of print-converted values
-    $self->{TAG_INFO}   = { };          # hash of tag information
-    $self->{TAG_EXTRA}  = { };          # hash of extra information about tag
-    $self->{EXIF_DATA}  = undef;        # the EXIF data block
-    $self->{NUM_FOUND}  = 0;            # total number of tags found (incl. duplicates)
+    $self->{FOUND_TAGS} = undef;    # list of found tags
+    $self->{FILE_ORDER} = { };      # hash of tag order in file
+    $self->{VALUE_CONV} = { };      # hash of converted tag values
+    $self->{PRINT_CONV} = { };      # hash of print-converted values
+    $self->{TAG_INFO}   = { };      # hash of tag information
+    $self->{TAG_EXTRA}  = { };      # hash of extra information about tag
+    $self->{EXIF_DATA}  = undef;    # the EXIF data block
+    $self->{NUM_FOUND}  = 0;        # total number of tags found (incl. duplicates)
+    $self->{CHANGED}    = 0;        # number of tags changed (writer only)
     $self->{CameraModel} = '';
     $self->{CameraMake} = '';
-    $self->{CHANGED} = 0;               # number of tags changed (writer only)
 }
 
 #------------------------------------------------------------------------------
@@ -1299,6 +1304,18 @@ sub DoUnpack(@)
     return unpack($template,$val);
 }
 
+# Swap bytes in data if necessary
+# Inputs: 0) data
+# Returns: swapped data
+sub SwapBytes($$)
+{
+    return $_[0] unless $swapBytes;
+    my ($val, $bytes) = @_;
+    my $newVal = '';
+    $newVal .= substr($val, $bytes, 1) while $bytes--;
+    return $newVal;
+}
+
 # Inputs: 0) data reference, 1) offset into data
 sub Get8s($$)     { return DoUnpackStd('c', @_); }
 sub Get8u($$)     { return DoUnpackStd('C', @_); }
@@ -1430,7 +1447,7 @@ my %formatSize = (
     binary => 1,
    'undef' => 1,
 );
-my %readProc = (
+my %readValueProc = (
     int8s => \&Get8s,
     int8u => \&Get8u,
     int16s => \&Get16s,
@@ -1472,7 +1489,7 @@ sub ReadValue($$$$$)
         $count < 1 and return undef;    # return undefined if no data
     }
     my $val;
-    my $proc = $readProc{$format};
+    my $proc = $readValueProc{$format};
     if ($proc) {
         $val = '';
         for (;;) {
@@ -1484,7 +1501,7 @@ sub ReadValue($$$$$)
     } else {
         # treat as binary/string if no proc
         $val = substr($$dataPt, $offset, $count);
-        # terminate string at null terminator if necessary
+        # truncate string at null terminator if necessary
         $val =~ s/\0.*// if $format eq 'string';
     }
     return $val;
@@ -2209,7 +2226,7 @@ sub GetTagInfo($$$)
         return $tagInfo;
     }
     # generate information for unknown tags (numerical only) if required
-    if ($self->{OPTIONS}->{Unknown} and $tagID =~ /^\d+$/ and not @infoArray) {
+    if (not $tagInfo and $self->{OPTIONS}->{Unknown} and $tagID =~ /^\d+$/) {
         my $printConv;
         if (defined $$tagTablePtr{PRINT_CONV}) {
             $printConv = $$tagTablePtr{PRINT_CONV};
@@ -2235,17 +2252,14 @@ sub GetTagInfo($$$)
 
 #------------------------------------------------------------------------------
 # add new tag to table (must use this routine to add new tags to a table)
-# Inputs: 0) reference to tag table
-#         1) tag ID
+# Inputs: 0) reference to tag table, 1) tag ID
 #         2) reference to tag information hash
-# Notes: Info need contain no entries when this routine is called
+# Notes: - will not overwrite existing entry in table
+# - info need contain no entries when this routine is called
 sub AddTagToTable($$$)
 {
     my ($tagTablePtr, $tagID, $tagInfo) = @_;
 
-    # never overwrite existing entries (this could potentially happen if someone
-    # thinks there isn't any tagInfo because a condition wasn't satisfied)
-    return if defined $$tagTablePtr{$tagID};
     # define necessary entries in information hash
     $$tagInfo{Groups} or $$tagInfo{Groups} = $$tagTablePtr{GROUPS};
     $$tagInfo{GotGroups} = 1,
@@ -2257,8 +2271,9 @@ sub AddTagToTable($$$)
         # make description to prevent tagID from getting mangled by MakeDescription()
         $$tagInfo{Description} = MakeDescription($prefix, $tagID);
     }
-    # add to the table
-    $$tagTablePtr{$tagID} = $tagInfo;
+    # add tag to table, but never overwrite existing entries (could potentially happen
+    # if someone thinks there isn't any tagInfo because a condition wasn't satisfied)
+    $$tagTablePtr{$tagID} = $tagInfo unless defined $$tagTablePtr{$tagID};
 }
 
 #------------------------------------------------------------------------------
@@ -2500,6 +2515,7 @@ sub ProcessBinaryData($$$)
     my $size = $dirInfo->{DirLen};
     my $base = $dirInfo->{Base} || 0;
     my $verbose = $self->{OPTIONS}->{Verbose};
+    my $unknown = $self->{OPTIONS}->{Unknown};
 
     $verbose and $self->VerboseDir('BinaryData', undef, $size);
 
@@ -2513,7 +2529,7 @@ sub ProcessBinaryData($$$)
     }
     # prepare list of tag number to extract
     my @tags;
-    if ($self->{OPTIONS}->{Unknown} > 1 and defined $$tagTablePtr{FIRST_ENTRY}) {
+    if ($unknown > 1 and defined $$tagTablePtr{FIRST_ENTRY}) {
         # scan through entire binary table
         @tags = ($$tagTablePtr{FIRST_ENTRY}..(int($size/$increment) - 1));
     } else {
@@ -2525,6 +2541,7 @@ sub ProcessBinaryData($$$)
     foreach $index (@tags) {
         my $tagInfo = $self->GetTagInfo($tagTablePtr, $index);
         next unless $tagInfo;
+        next if $$tagInfo{Unknown} and $unknown < 2;
         my $count = 1;
         my $format = $$tagInfo{Format};
         if ($format) {

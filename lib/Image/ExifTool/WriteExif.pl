@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WriteExif.pl
 #
-# Description:  Definitions for writing EXIF meta information
+# Description:  Routines for writing EXIF meta information
 #
 # Revisions:    12/13/2004 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -14,7 +14,6 @@ use Image::ExifTool::Fixup;
 
 sub InsertWritableProperties($$;$$);
 sub BuildFixup($$$);
-sub AssembleRational($$@);
 
 # some information may be stored in different IFD's with the same meaning.
 # Use this lookup to decide when we should delete information that is stored
@@ -245,7 +244,7 @@ my %writeTable = (
         PrintConvInv => 3,
     },
     0xa301 => {             # SceneType
-        Writeable => 'undef',
+        Writable => 'undef',
         ValueConvInv => 'chr($val)',
     },
 #    0xa302 => 'undef',      # CFAPattern
@@ -308,119 +307,6 @@ my %writeTable = (
 # insert our writable properties into main EXIF tag table
 InsertWritableProperties('Image::ExifTool::Exif::Main', \%writeTable, 'ExifIFD', \&CheckExif);
 
-
-#------------------------------------------------------------------------------
-# assemble a continuing fraction into a rational value
-# Inputs: 0) numerator, 1) denominator
-#         2-N) list of fraction denominators, deepest first
-sub AssembleRational($$@)
-{
-    @_ < 3 and return @_;
-    my ($num, $denom, $frac) = splice(@_, 0, 3);
-    return AssembleRational($frac*$num+$denom, $num, @_);
-}
-    
-#------------------------------------------------------------------------------
-# convert a floating point number into a rational
-# Inputs: 0) floating point number
-# Returns: numberator, denominator (in list context)
-# Notes: these routines were a bit tricky, but fun to write!
-sub Rationalize($)
-{
-    my $val = shift;
-    return (0, 1) unless $val;
-    my $sign = $val < 0 ? ($val = -$val, -1) : 1;
-    my ($num, $denom, @fracs);
-    my $frac = $val;
-    my $maxInt = 0x7fffffff;
-    for (;;) {
-        my ($n, $d) = AssembleRational(int($frac + 0.5), 1, @fracs);
-        if ($n > $maxInt or $d > $maxInt) {
-            last if defined $num;
-            return ($sign, $maxInt) if $val < 0;
-            return ($sign * $maxInt, 1);
-        }
-        ($num, $denom) = ($n, $d);      # save last good values
-        my $err = ($n/$d-$val) / $val;  # get error of this rational
-        last if abs($err) < 1e-8;       # all done if error is small
-        my $int = int($frac);
-        unshift @fracs, $int;
-        last unless $frac -= $int;
-        $frac = 1 / $frac;
-    }
-    return ($num * $sign, $denom);
-}
-
-#------------------------------------------------------------------------------
-# read value from binary data (with current byte ordering)
-# Inputs: 0) value, 1) format string
-#         2) optional number of values (1 or string length if not specified)
-#         3) optional data reference, 4) value offset
-# Returns: packed value (and sets value in data) or undef on error
-sub WriteValue($$;$$$$)
-{
-    my ($val, $format, $count, $dataPt, $offset) = @_;
-    if ($format eq 'string' or $format eq 'undef') {
-        $format eq 'string' and $val .= "\0";   # null-terminate strings
-        if (defined $count) {
-            my $diff = $count - length($val);
-            if ($diff) {
-                #warn "wrong string length!\n";
-                # adjust length of string to match specified count
-                if ($diff < 0) {
-                    $val = substr($val, 0, $count);
-                } else {
-                    $val .= "\0" x $diff;
-                }
-            }
-        } else {
-            $count = length($val);
-        }
-        $dataPt and substr($$dataPt, $offset, $count) = $val;
-        return $val;
-    }
-    my $packed = '';
-    my @vals = split(' ',$val);
-    $count or $count = 1;   # assume 1 if count not specified
-    while ($count--) {
-        $val = shift @vals;
-        #warn...
-        return undef unless defined $val;
-        if ($format =~ /^int/) {
-            return undef unless Image::ExifTool::IsInt($val);
-        } else {
-            return undef unless Image::ExifTool::IsFloat($val);
-        }
-        if ($format eq 'int16u') {
-            $packed .= Set16u($val);
-        } elsif ($format eq 'int16s') {
-            $val < 0 and $val += 0x10000;
-            $packed .= Set16u($val);
-        } elsif ($format eq 'int32u') {
-            $packed .= Set32u($val);
-        } elsif ($format eq 'int32s') {
-            $val < 0 and $val += 0xffffffff, ++$val;
-            $packed .= Set32u($val);
-        } elsif ($format eq 'int8u') {
-            $packed .= pack('C', $val);
-        } elsif ($format eq 'int8s') {
-            $packed .= pack('c', $val);
-        } elsif ($format eq 'rational32u') {
-            my ($numer,$denom) = Rationalize($val);
-            $packed .= Set32u($numer) . Set32u($denom);
-        } elsif ($format eq 'rational32s') {
-            my ($numer,$denom) = Rationalize($val);
-            # convert to equivalent positive 32-bit value
-            $numer < 0 and $numer += 0xffffffff, ++$numer;
-            $packed .= Set32u($numer) . Set32u($denom);
-        } else {
-            warn "Can't currently write format $format";
-            return undef;
-        }
-    }
-    $dataPt and substr($$dataPt, $offset, length($packed)) = $packed;
-    return $packed;
-}
 
 #------------------------------------------------------------------------------
 # validate raw values for writing
@@ -608,12 +494,12 @@ sub WriteExif($$$)
                 next unless $tagInfo eq $curInfo;
             }
             if ($tableGroup eq 'EXIF') {
-                # write EXIF stuff in proper IFD
-                my $writeGroup = $$tagInfo{WriteGroup} or next;
-                unless ($writeGroup eq $dirName) {
-                    my $wrongDir = $crossDelete{$writeGroup};
-                    next unless $wrongDir and $wrongDir eq $dirName;
-                    next unless $exifTool->IsOverwriting($tagInfo) > 0;
+                my $newValueHash = $exifTool->GetNewValueHash($tagInfo, $dirName);
+                unless ($newValueHash) {
+                    # delete stuff from the wrong directory if setting somewhere else
+                    my $wrongDir = $crossDelete{$dirName} or next;
+                    $newValueHash = $exifTool->GetNewValueHash($tagInfo, $wrongDir);
+                    next unless Image::ExifTool::IsOverwriting($newValueHash) > 0;
                     # remove this tag if found in this IFD
                     $delete{$tagID} = 1;
                 }
@@ -797,9 +683,10 @@ sub WriteExif($$$)
                     $newInfo = $set{$newID};
                     $newCount = $$newInfo{Count};
                     my $val;
+                    my $newValueHash = $exifTool->GetNewValueHash($newInfo, $dirName);
                     if ($isNew > 0) {
                         # don't create new entry unless requested
-                        next unless $exifTool->IsCreating($newInfo);
+                        next unless Image::ExifTool::IsCreating($newValueHash);
                         # write in new format
                         unless ($newFormName = $$newInfo{Writable}) {
                             warn("No format for $dirName $$newInfo{Name}\n");
@@ -816,8 +703,8 @@ sub WriteExif($$$)
                         }
                         $val = ReadValue(\$oldValue, 0, $oldFormName, $oldCount, $oldSize);
                     }
-                    if ($exifTool->IsOverwriting($newInfo, $val)) {
-                        my $newVal = $exifTool->GetNewValues($newInfo);
+                    if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
+                        my $newVal = Image::ExifTool::GetNewValues($newValueHash);
                         # value undefined if deleting this tag
                         if ($delete{$newID} or not defined $newVal) {
                             unless ($isNew) {
@@ -1108,10 +995,7 @@ sub WriteExif($$$)
                             Where => $where,
                         };
                     }
-                    unless (length $newValue) {
-                        $verbose and print "  Deleting $subdirName\n";
-                        next;
-                    }
+                    next unless length $newValue;
                     # set new format to int32u
                     $newFormName = 'int32u';
                     $newFormat = $formatNumber{$newFormName};
@@ -1260,6 +1144,7 @@ sub WriteExif($$$)
         } else {
             # create IFD1 if necessary
             last unless $dirName eq 'IFD0' and $exifTool->{ADD_DIRS}->{'IFD1'};
+            $verbose and print "  Creating IFD1\n";
             my $ifd1 = '\0' x 2;  # empty IFD1 data (zero entry count)
             $dataPt = \$ifd1;
             $dirStart = 0;
@@ -1269,6 +1154,7 @@ sub WriteExif($$$)
         if ($dirName =~ /^IFD(\d+)$/) {
             $dirName = 'IFD' . ($1+1);
             $exifTool->{DIR_NAME} = $dirName;
+            $offset and $verbose and print "  Rewriting $dirName\n";
         }
     }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1380,7 +1266,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WriteExif.pl - Definitions for writing EXIF meta information
+Image::ExifTool::WriteExif.pl - Routines for writing EXIF meta information
 
 =head1 SYNOPSIS
 

@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessNikon($$$);
 
@@ -49,7 +49,7 @@ sub ProcessNikon($$$);
     0x0002 => {
         # this is the ISO actually used by the camera
         # (may be different than ISO setting if auto)
-        Name => 'ISOUsed',
+        Name => 'ISO',
         Writable => 'int16u',
         Count => 2,
         Groups => { 2 => 'Image' },

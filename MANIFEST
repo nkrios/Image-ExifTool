@@ -5,6 +5,7 @@ Makefile.PL
 README
 exiftool
 html/ExifTool.html
+html/canon_raw.html
 html/data_members.html
 html/history.html
 html/index.html
@@ -43,6 +44,7 @@ lib/Image/ExifTool/Sigma.pm
 lib/Image/ExifTool/Sony.pm
 lib/Image/ExifTool/TagLookup.pm
 lib/Image/ExifTool/Unknown.pm
+lib/Image/ExifTool/WriteCanonRaw.pl
 lib/Image/ExifTool/WriteExif.pl
 lib/Image/ExifTool/WriteIPTC.pl
 lib/Image/ExifTool/WritePhotoshop.pl
@@ -53,6 +55,8 @@ perl-Image-ExifTool.spec
 t/CanonRaw.crw
 t/CanonRaw.t
 t/CanonRaw_2.out
+t/CanonRaw_4.out
+t/CanonRaw_5.out
 t/Casio.jpg
 t/Casio.t
 t/Casio2.jpg
@@ -97,8 +101,10 @@ t/Minolta_2.out
 t/Minolta_3.out
 t/Nikon.jpg
 t/Nikon.t
+t/NikonD70.jpg
 t/Nikon_2.out
 t/Nikon_3.out
+t/Nikon_4.out
 t/Olympus.jpg
 t/Olympus.t
 t/Olympus_2.out
@@ -133,6 +139,7 @@ t/Writer.t
 t/Writer_11.out
 t/Writer_12.out
 t/Writer_13.out
+t/Writer_15.out
 t/Writer_2.out
 t/Writer_4.out
 t/Writer_6.out

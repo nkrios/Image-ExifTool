@@ -145,6 +145,12 @@ This module is used to generate the tag lookup tables in
 Image::ExifTool::TagLookup.pm.  It is run before a new ExifTool
 release to update the lookup tables.
 
+=head1 SYNOPSIS
+
+    use Image::ExifTool::BuildTagLookup qw(BuildTagLookup);
+
+    $success = BuildTagLookup('lib/Image/ExifTool/TagLookup.pm');
+
 =head1 AUTHOR
 
 Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)

@@ -4,6 +4,15 @@ AFPointsUsed: 0 ()
 Aperture: 14.3
 ApertureValue: 14.0
 AutoExposureBracketing: Off
+BlueBalanceAuto: 0.83939
+BlueBalanceB&W: 0.84024
+BlueBalanceCloudy: 0.99047
+BlueBalanceCustom: 0.92849
+BlueBalanceDaylight: 0.84024
+BlueBalanceFlash: 0.60898
+BlueBalanceFluorescent: 0.54676
+BlueBalanceShade: 0.84109
+BlueBalanceTungsten: 0.92027
 BulbDuration: 4
 CameraISO: Use shot ISO instead
 CanonExposureMode: Manual
@@ -30,7 +39,7 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 4.10
+ExifToolVersion: 4.50
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -51,10 +60,13 @@ FlashExposureComp: 0
 FlashOn: Off
 FlashpixVersion: 0100
 FocalLength: 34.0mm
+FocalLength (1): 34mm
 FocalLength35efl: 34.0mm (35mm equivalent: 54.0mm)
 FocalPlaneResolutionUnit: inches
 FocalPlaneXResolution: 3443.95
+FocalPlaneXSize: 23.22mm
 FocalPlaneYResolution: 3442.02
+FocalPlaneYSize: 15.49mm
 FocalUnits: 1
 FocusContinuous: Unknown (-1)
 FocusDistanceLower: 5.46
@@ -71,6 +83,7 @@ InteropVersion: 0100
 IxusAFPoint: Unknown (0)
 Lens: 18.0 - 55.0mm
 Lens35efl: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)
+LensType: Unknown (-1)
 LongFocal: 55
 MacroMode: Unknown (0)
 Make: Canon
@@ -82,6 +95,15 @@ ModifyDate: 2003:12:04 06:46:52
 Orientation: Horizontal (normal)
 OwnerName: Cindy Harvey
 Quality: RAW
+RedBalanceAuto: 2.06611
+RedBalanceB&W: 2.06971
+RedBalanceCloudy: 2.44591
+RedBalanceCustom: 2.32332
+RedBalanceDaylight: 2.06971
+RedBalanceFlash: 1.78860
+RedBalanceFluorescent: 1.34502
+RedBalanceShade: 2.06971
+RedBalanceTungsten: 2.25721
 RelatedImageLength: 2048
 RelatedImageWidth: 3072
 ResolutionUnit: inches

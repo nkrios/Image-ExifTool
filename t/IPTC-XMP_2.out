@@ -1,6 +1,6 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.36
 [File, File, Image]  - File Name: IPTC-XMP.jpg
-[File, File, Image]  - File Size: 22KB
+[File, File, Image]  - File Size: 17KB
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 100
 [File, File, Image]  - Image Height: 80
@@ -65,36 +65,36 @@
 [IPTC, IPTC, Other] 103 - Original Transmission Reference: What is a transmission reference
 [IPTC, IPTC, Other] 15 - Category: 1
 [IPTC, IPTC, Other] 20 - Supplemental Categories: amazing, image, utilities
-[IPTC, IPTC, Other] 10 - Urgency: 8
 [IPTC, IPTC, Other] 25 - Keywords: ExifTool, Test, XMP
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright 2004 Phil Harvey
+[IPTC, IPTC, Other] 10 - Urgency: 8
 [Photoshop, Photoshop, Author] 1035 - URL: http://owl.phy.queensu.ca/~phil/exiftool/
 [Photoshop, Photoshop, Image] 0 - Photoshop Quality: 7
 [Photoshop, Photoshop, Image] 1 - Photoshop Format: Standard
 [Photoshop, Photoshop, Image] 2 - Progressive Scans: 3 Scans
-[XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
-[XMP, XMP-photoshop, Image] Headline - Headline: No headline
-[XMP, XMP-photoshop, Unknown] Instructions - Instructions: What instructions
-[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
-[XMP, XMP-photoshop, Author] Credit - Credit: My Credit
-[XMP, XMP-photoshop, Author] Source - Source: I'm the source
-[XMP, XMP-photoshop, Location] City - City: Kingston
-[XMP, XMP-photoshop, Location] State - State: Ont
-[XMP, XMP-photoshop, Location] Country - Country: Canada
-[XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference?
-[XMP, XMP-photoshop, Image] Category - Category: 1
-[XMP, XMP-photoshop, Time] DateCreated - Date Created: 2004:02:26
-[XMP, XMP-photoshop, Unknown] Urgency - Urgency: 8
-[XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
-[XMP, XMP-xapBJ, Unknown] JobRefName - Job Ref Name: My Job
-[XMP, XMP-xapMM, Unknown] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
-[XMP, XMP-xapRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
-[XMP, XMP-xapRights, Unknown] Marked - Marked: False
-[XMP, XMP-dc, Image] Description - Description: A witty caption
 [XMP, XMP-dc, Author] Creator - Creator: Phil Harvey
-[XMP, XMP-dc, Image] Title - Title: Test IPTC picture
+[XMP, XMP-dc, Image] Description - Description: A witty caption
 [XMP, XMP-dc, Author] Rights - Rights: Copyright 2004 Phil Harvey
 [XMP, XMP-dc, Image] Subject - Subject: ExifTool, Test, XMP
+[XMP, XMP-dc, Image] Title - Title: Test IPTC picture
+[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
+[XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
+[XMP, XMP-photoshop, Image] Category - Category: 1
+[XMP, XMP-photoshop, Location] City - City: Kingston
+[XMP, XMP-photoshop, Location] Country - Country: Canada
+[XMP, XMP-photoshop, Author] Credit - Credit: My Credit
+[XMP, XMP-photoshop, Time] DateCreated - Date Created: 2004:02:26
+[XMP, XMP-photoshop, Image] Headline - Headline: No headline
+[XMP, XMP-photoshop, Unknown] Instructions - Instructions: What instructions
+[XMP, XMP-photoshop, Author] Source - Source: I'm the source
+[XMP, XMP-photoshop, Location] State - State: Ont
+[XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
+[XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference?
+[XMP, XMP-photoshop, Unknown] Urgency - Urgency: 8
+[XMP, XMP-xapBJ, Unknown] JobRefName - Job Ref Name: My Job
+[XMP, XMP-xapMM, Unknown] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
+[XMP, XMP-xapRights, Unknown] Marked - Marked: False
+[XMP, XMP-xapRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
 [ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: Lino
 [ICC_Profile, ICC-header, Image] 8 - Profile Version: 2.1.0
 [ICC_Profile, ICC-header, Image] 12 - Profile Class: Display Device Profile

@@ -16,6 +16,8 @@ use strict;
 
 use Image::ExifTool::TagLookup qw(FindTagInfo);
 
+sub AssembleRational($$@);
+
 my $loadedAllTables;    # flag indicating we loaded all tables
 my $evalWarning;        # eval warning message
 
@@ -54,6 +56,16 @@ my %dirMap = (
         MakerNotes   => 'ExifIFD',
     },
 );
+# names of valid EXIF directories:
+my %exifDirs = (
+    ifd0         => 'IFD0',
+    ifd1         => 'IFD1',
+    exififd      => 'ExifIFD',
+    subifd       => 'SubIFD',
+    globparamifd => 'GlobParamIFD',
+    interopifd   => 'InteropIFD',
+    makernotes   => 'MakerNotes',
+);
 # min/max values for integer formats
 my %intRange = (
     'int8u'  => [0, 0xff],
@@ -86,6 +98,8 @@ my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 #           Value - list ref for values to add
 #           IsCreating - must be set for the tag to be added.  otherwise just
 #                      changed if it already exists
+#           WriteGroup - group name where information is being written
+#           Next - pointer to next newValueHash (if more than one)
 sub SetNewValue($;$$%)
 {
     local $_;
@@ -112,19 +126,26 @@ sub SetNewValue($;$$%)
     }
     # get group name that we're looking for
     my $foundMatch = 0;
-    my $wantGroup;
-    $options{Group} and $wantGroup = $options{Group};
+    my ($wantGroup, $ifdName);
+    if ($options{Group}) {
+        $wantGroup = $options{Group};
+        $ifdName = $exifDirs{lc($wantGroup)};
+    }
     # determine the groups for all tags found, and the tag with
     # the highest priority group
-    my (@tagInfoList, %tagGroup, %preferred, %tagPriority);
+    my (@tagInfoList, %writeGroup, %preferred, %tagPriority);
     my $highestPriority = -1;
     foreach $tagInfo (@matchingTags) {
         $tag = $tagInfo->{Name};    # set tag so warnings will use proper case
-        my $group;
+        my ($writeGroup, $priority);
         if ($wantGroup) {
             # only set tag in specified group
-            $group = $self->GetGroup($tagInfo, 0);
-            next unless $group =~ /^$wantGroup$/i;
+            $writeGroup = $self->GetGroup($tagInfo, 0);
+            unless ($writeGroup =~ /^$wantGroup$/i) {
+                next unless $writeGroup eq 'EXIF' and $ifdName;
+                $writeGroup = $ifdName;  # write to the specified IFD
+            }
+            $priority = 1000;   # highest priority since group was specified
         }
         ++$foundMatch;
         # must do a dummy call to the write proc to autoload write package
@@ -135,13 +156,19 @@ sub SetNewValue($;$$%)
         my $writable = $tagInfo->{Writable};
         next unless $writable or ($table->{WRITABLE} and not defined $writable);
         next if $tagInfo->{Protected} and not $options{Protected};
-        # get the tag group
-        $group or $group = $self->GetGroup($tagInfo, 0);
-        my $priority;
-        if ($wantGroup) {
-            $priority = 1000;       # this is the priority group!
-        } else {
-            $priority = $self->{WRITE_PRIORITY}->{lc($group)} || 0;
+        # set specific write group (if we didn't already)
+        unless ($writeGroup and $writeGroup ne 'EXIF') {
+            $writeGroup = $tagInfo->{WriteGroup};   # use default write group
+            # use group 0 name if no WriteGroup specified
+            my $group0 = $self->GetGroup($tagInfo, 0);
+            $writeGroup or $writeGroup = $group0;
+            # get priority for this group
+            unless ($priority) {
+                $priority = $self->{WRITE_PRIORITY}->{lc($writeGroup)};
+                unless ($priority) {
+                    $priority = $self->{WRITE_PRIORITY}->{lc($group0)} || 0;
+                }
+            }
         }
         $tagPriority{$tagInfo} = $priority;
         if ($priority > $highestPriority) {
@@ -152,7 +179,7 @@ sub SetNewValue($;$$%)
             $preferred{$tagInfo} = 1;
         }
         push @tagInfoList, $tagInfo;
-        $tagGroup{$tagInfo} = $group;
+        $writeGroup{$tagInfo} = $writeGroup;
     }
     # don't create tags with priority 0 if group priorities are set
     if ($highestPriority == 0 and %{$self->{WRITE_PRIORITY}}) {
@@ -166,12 +193,14 @@ sub SetNewValue($;$$%)
     @tagInfoList = sort { $tagPriority{$a} <=> $tagPriority{$b} } @tagInfoList;
     # loop through all valid tags to find the one(s) to write
     SetTagLoop: foreach $tagInfo (@tagInfoList) {
-        my $group = $tagGroup{$tagInfo};
-        my $isMakerNotes;
-        $isMakerNotes = 1 if $group eq 'MakerNotes';
+        my $writeGroup = $writeGroup{$tagInfo};
+        my $permanent = $$tagInfo{Permanent};
+        $writeGroup eq 'MakerNotes' and $permanent = 1 unless defined $permanent;
         $tag = $tagInfo->{Name};    # get proper case for tag name
         # convert the value
         my $val = $value;
+        # can't delete permanent tags, so set value to empty string instead
+        $val = '' if not defined $val and $permanent;
         my $type = $options{Type};
         $type or $type = $self->Options('PrintConv') ? 'PrintConv' : 'ValueConv';
         while (defined $val) {
@@ -184,18 +213,16 @@ sub SetNewValue($;$$%)
                 #### eval PrintConvInv/ValueConvInv ($val)
                 $val = eval $convInv;
                 if ($@ or $evalWarning) {
-                    if ($@) {
-                        $evalWarning = $@;
-                    } else {
-                        $evalWarning =~ s/ at \(eval .*//s;
-                    }
-                    $err = "$evalWarning in $group:$tag (in ${type}Inv)";
-                    $verbose > 3 and print "$err\n";
+                    $@ and $evalWarning = $@;
+                    chomp $evalWarning;
+                    $evalWarning =~ s/ at \(eval .*//s;
+                    $err = "$evalWarning in $writeGroup:$tag (in ${type}Inv)";
+                    $verbose > 2 and print "$err\n";
                     undef $val;
                     last;
                 } elsif (not defined $val) {
-                    $err = "Error converting value for $group:$tag (in ${type}Inv)";
-                    $verbose > 3 and print "$err\n";
+                    $err = "Error converting value for $writeGroup:$tag (in ${type}Inv)";
+                    $verbose > 2 and print "$err\n";
                     last;
                 }
             } elsif ($conv) {
@@ -224,8 +251,8 @@ sub SetNewValue($;$$%)
                             last;
                         }
                         unless ($found) {
-                            $err = "Can't convert $group:$tag ";
-                            $verbose > 3 and print "$err\n";
+                            $err = "Can't convert $writeGroup:$tag ";
+                            $verbose > 2 and print "$err\n";
                             if ($matches > 1) {
                                 $err .= "(matches more than one $type)";
                             } else {
@@ -236,8 +263,8 @@ sub SetNewValue($;$$%)
                         }
                     }
                 } else {
-                    $err = "Can't convert value for $group:$tag (no ${type}Inv)";
-                    $verbose > 3 and print "$err\n";
+                    $err = "Can't convert value for $writeGroup:$tag (no ${type}Inv)";
+                    $verbose > 2 and print "$err\n";
                     undef $val;
                     last;
                 }
@@ -252,17 +279,17 @@ sub SetNewValue($;$$%)
                     my $checkProc = $table->{CHECK_PROC};
                     $err = &$checkProc($self, $tagInfo, \$val);
                     if ($err) {
-                        $err = "$err for $group:$tag";
-                        $verbose > 3 and print "$err\n";
-                        next SetTagLoop;
+                        $err = "$err for $writeGroup:$tag";
+                        $verbose > 2 and print "$err\n";
+                        undef $val; # value was invalid
                     }
                 } else {
-                    warn "No check proc for $group:$tag\n";
+                    warn "No check proc for $writeGroup:$tag\n";
                 }
                 last;
             }
         }
-        if (defined $value and not defined $val) {
+        if (not defined $val and defined $value) {
             # if value conversion failed, we must still add a NEW_VALUE
             # entry for this tag it it was a DelValue
             next unless $options{DelValue};
@@ -270,32 +297,27 @@ sub SetNewValue($;$$%)
         }
         $self->{NEW_VALUE} or $self->{NEW_VALUE} = { };
         if ($options{Replace}) {
-            delete $self->{NEW_VALUE}->{$tagInfo};
+            $self->GetNewValueHash($tagInfo, $writeGroup, 'delete');
             next if $options{Replace} == 2;
         }
-        my $writeGroup = $tagInfo->{WriteGroup} || $group;
 
         # set value in NEW_VALUE hash
         if (defined $val) {
-            my $newValueHash = $self->{NEW_VALUE}->{$tagInfo};
-            unless (defined $newValueHash) {
-                $newValueHash = { TagInfo => $tagInfo };
-                $self->{NEW_VALUE}->{$tagInfo} = $newValueHash;
-            }
+            my $newValueHash = $self->GetNewValueHash($tagInfo, $writeGroup, 'create');
             if ($options{DelValue} or $options{AddValue}) {
                 if ($options{DelValue}) {
                     # don't create if we are replacing a specific value
-                    $newValueHash->{IsCreating} = 0;
+                    $newValueHash->{IsCreating} = 0 unless $val eq '';
                     # add delete value to list
                     push @{$newValueHash->{DelValue}}, $val;
                     if ($verbose > 1) {
-                        my $verb = $isMakerNotes ? 'Replacing' : 'Deleting';
+                        my $verb = $permanent ? 'Replacing' : 'Deleting';
                         my $fromList = $tagInfo->{List} ? ' from list' : '';
                         print "$verb $writeGroup:$tag$fromList if value is '$val'\n";
                     }
                 } elsif ($options{AddValue} and not $tagInfo->{List}) {
                     $err = "Can't add $writeGroup:$tag (not a List type)";
-                    $verbose > 3 and print "$err\n";
+                    $verbose > 2 and print "$err\n";
                     next;
                 }
                 # flag any AddValue or DelValue by creating the DelValue list
@@ -305,11 +327,14 @@ sub SetNewValue($;$$%)
             # (will only create the priority tag if it doesn't exist,
             #  others get changed only if they already exist)
             if ($preferred{$tagInfo}) {
-                if ($isMakerNotes) {
-                    # don't create tag in maker notes but define IsCreating
+                if ($permanent) {
+                    # don't create permanent tag but define IsCreating
                     # so we know that it is the preferred tag
                     $newValueHash->{IsCreating} = 0;
-                } elsif (not ($newValueHash->{DelValue} and @{$newValueHash->{DelValue}})) {
+                } elsif (not ($newValueHash->{DelValue} and @{$newValueHash->{DelValue}}) or
+                         # also create tag if any DelValue value is empty ('')
+                         grep(/^$/,@{$newValueHash->{DelValue}}))
+                {
                     $newValueHash->{IsCreating} = 1;
                 }
             }
@@ -331,15 +356,16 @@ sub SetNewValue($;$$%)
                     }
                 }
             }
-        } elsif ($isMakerNotes) {
-            $err = "Can't delete $tag from MakerNotes";
+        } elsif ($permanent) {
+            $err = "Can't delete $tag";
             $verbose > 1 and print "$err\n";
             next;
         } elsif ($options{AddValue} or $options{DelValue}) {
             $verbose > 1 and print "Adding/Deleting nothing does nothing\n";
         } else {
-            # set marker indicating tag will be deleted
-            $self->{NEW_VALUE}->{$tagInfo} = { TagInfo => $tagInfo };
+            # create empty new value hash entry to delete this tag
+            $self->GetNewValueHash($tagInfo, $writeGroup, 'delete');
+            $self->GetNewValueHash($tagInfo, $writeGroup, 'create');
             $verbose > 1 and print "Deleting $writeGroup:$tag\n";
         }
         ++$numSet;
@@ -422,36 +448,41 @@ sub SetNewValuesFromFile($$)
 # Get new value(s) for tag
 # Inputs: 0) ExifTool object reference, 1) tag key, tag name, or tagInfo hash ref
 #         2) optional pointer to return new value hash reference (not part of public API)
+#    or   0) new value hash reference (not part of public API)
 # Returns: List of new Raw values (list may be empty if tag is being deleted)
-sub GetNewValues($$;$)
+sub GetNewValues($;$$)
 {
     local $_;
-    my ($self, $tagInfo, $newValueHashPt) = @_;
-    my (@newValues, $newValueHash);
-
-    if ($self->{NEW_VALUE}) {
-        unless (ref $tagInfo) {
-            my @tagInfoList = FindTagInfo($tagInfo);
-            # choose the one that we are creating
-            foreach $tagInfo (@tagInfoList) {
-                next unless $newValueHash = $self->{NEW_VALUE}->{$tagInfo};
-                last if defined $newValueHash->{IsCreating};
-            }
-        } else {
-            $newValueHash = $self->{NEW_VALUE}->{$tagInfo};
-        }
-        if ($newValueHash and $newValueHash->{Value}) {
-            @newValues = @{$newValueHash->{Value}};
-        }
-    }
-    # return new value hash if requested
-    $newValueHashPt and $$newValueHashPt = $newValueHash;
-    # return our value(s)
-    if (wantarray) {
-        return @newValues;
+    my $newValueHash;
+    if (ref $_[0] eq 'HASH') {
+        $newValueHash = shift;
     } else {
-        return $newValues[0];
+        my ($self, $tagInfo, $newValueHashPt) = @_;
+        if ($self->{NEW_VALUE}) {
+            unless (ref $tagInfo) {
+                my @tagInfoList = FindTagInfo($tagInfo);
+                # choose the one that we are creating
+                foreach $tagInfo (@tagInfoList) {
+                    next unless $newValueHash = $self->GetNewValueHash($tagInfo);
+                    last if defined $newValueHash->{IsCreating};
+                }
+            } else {
+                $newValueHash = $self->GetNewValueHash($tagInfo);
+            }
+        }
+        # return new value hash if requested
+        $newValueHashPt and $$newValueHashPt = $newValueHash;
     }
+    if ($newValueHash and $newValueHash->{Value}) {
+        # return our value(s)
+        if (wantarray) {
+            return @{$newValueHash->{Value}};
+        } else {
+            return $newValueHash->{Value}->[0];
+        }
+    }
+    return () if wantarray;  # return empty list
+    return undef;
 }
 
 #------------------------------------------------------------------------------
@@ -567,6 +598,10 @@ sub WriteInfo($$$)
                 $rtnVal = $self->TiffInfo($type, $raf, 0, $outRef);
             } elsif ($type eq 'GIF') {
                 $rtnVal = $self->GifInfo($outRef);
+            } elsif ($type eq 'CRW') {
+                # must be sure we have loaded CanonRaw before we can call CrwInfo()
+                GetTagTable('Image::ExifTool::CanonRaw::Main');
+                $rtnVal = Image::ExifTool::CanonRaw::WriteCRW($self, $outRef);
             } else {
                 $rtnVal = 0;
             }
@@ -586,7 +621,7 @@ sub WriteInfo($$$)
         }
         # print file format errors
         unless ($rtnVal) {
-            if ($fileType and $fileType =~ /^(JPEG|GIF|TIFF)$/) {
+            if ($fileType and $fileType =~ /^(JPEG|GIF|TIFF|CRW)$/) {
                 unless ($self->{PRINT_CONV}->{Error}) {
                     $self->Error("Format error in file");
                 }
@@ -723,17 +758,14 @@ sub GetAllGroups($)
 
 #------------------------------------------------------------------------------
 # Return true if we are deleting or overwriting the specified tag
-# Inputs: 0) ExifTool object reference
-#         1) reference to tag info hash
+# Inputs: 0) new value hash reference
 #         2) optional tag value if deleting specific values
 # Returns: >0 - tag should be deleted
 #          =0 - the tag should be preserved
 #          <0 - not sure, we need the value to know
-sub IsOverwriting($$;$)
+sub IsOverwriting($;$)
 {
-    my ($self, $tagInfo, $value) = @_;
-    return 0 unless $self->{NEW_VALUE};
-    my $newValueHash = $self->{NEW_VALUE}->{$tagInfo};
+    my ($newValueHash, $value) = @_;
     return 0 unless $newValueHash;
     # overwrite regardless if no DelValues specified
     return 1 unless $newValueHash->{DelValue};
@@ -747,13 +779,81 @@ sub IsOverwriting($$;$)
 
 #------------------------------------------------------------------------------
 # Return true if we are creating the specified tag even if it didn't exist before
-# Inputs: 0) ExifTool object reference
-#         1) reference to tag info hash
+# Inputs: 0) new value hash reference
 # Returns: true if we should add the tag
-sub IsCreating($$)
+sub IsCreating($)
 {
-    my ($self, $tagInfo) = @_;
-    return $self->{NEW_VALUE}->{$tagInfo}->{IsCreating};
+    return $_[0]->{IsCreating};
+}
+
+#------------------------------------------------------------------------------
+# Get write group for specified tag
+# Inputs: 0) new value hash reference
+# Returns: Write group name
+sub GetWriteGroup($)
+{
+    return $_[0]->{WriteGroup};
+}
+
+#------------------------------------------------------------------------------
+# Get new value hash for specified tagInfo/writeGroup
+# Inputs: 0) ExifTool object reference, 1) reference to tag info hash
+#         2) Write group name, 3) Options: 'delete' or 'create'
+# Returns: new value hash reference for specified write group
+#          (or first new value hash in linked list if write group not specified)
+sub GetNewValueHash($$;$$)
+{
+    my ($exifTool, $tagInfo, $writeGroup, $opts) = @_;
+    $writeGroup = '' unless defined $writeGroup;
+    $opts = '' unless defined $opts;
+    my $newValueHash = $exifTool->{NEW_VALUE}->{$tagInfo};
+    if (not defined $newValueHash) {
+        if ($opts eq 'create') {
+            $newValueHash = $exifTool->{NEW_VALUE}->{$tagInfo} = {
+                TagInfo => $tagInfo,
+                WriteGroup => $writeGroup,
+            };
+        }
+    } elsif ($writeGroup and $newValueHash->{WriteGroup} ne $writeGroup) {
+        # loop through all hashes in this linked list, looking for our writegroup
+        for (;;) {
+            my $lastHash = $newValueHash;
+            $newValueHash = $lastHash->{Next};
+            if (not defined $newValueHash) {
+                if ($opts eq 'create') {
+                    # didn't find match in list, so create a new entry
+                    $newValueHash = {
+                        TagInfo => $tagInfo,
+                        WriteGroup => $writeGroup,
+                    };
+                    # insert in linked list
+                    $lastHash->{Next} = $newValueHash;
+                } else {
+                    undef $newValueHash;
+                }
+                last;
+            }
+            last if $newValueHash->{WriteGroup} eq $writeGroup;
+        }
+    }
+    if (defined $newValueHash and $opts eq 'delete') {
+        my $firstHash = $exifTool->{NEW_VALUE}->{$tagInfo};
+        if ($newValueHash eq $firstHash) {
+            # remove first entry from linked list
+            if ($newValueHash->{Next}) {
+                $exifTool->{NEW_VALUE}->{$tagInfo} = $newValueHash->{Next};
+            } else {
+                delete $exifTool->{NEW_VALUE}->{$tagInfo};
+            }
+        } else {
+            # find the list element pointing to this hash
+            $firstHash = $firstHash->{Next} while $firstHash->{Next} ne $newValueHash;
+            # remove from linked list
+            $firstHash->{Next} = $newValueHash->{Next};
+        }
+        undef $newValueHash;
+    }
+    return $newValueHash;
 }
 
 #------------------------------------------------------------------------------
@@ -805,6 +905,26 @@ sub GetNewTagInfoList($;$)
         }
     }
     return @tagInfoList;
+}
+
+#------------------------------------------------------------------------------
+# Get hash of tagInfo references keyed on tagID for a specific table
+# Inputs: 0) ExifTool object reference, 1) tag table pointer
+# Returns: hash reference
+sub GetNewTagInfoHash($$)
+{
+    my ($self, $tagTablePtr) = @_;
+    my %tagInfoHash;
+    if ($self->{NEW_VALUE}) {
+        my $hashKey;
+        GenerateTagIDs($tagTablePtr);  # make sure IDs are generated
+        foreach $hashKey (keys %{$self->{NEW_VALUE}}) {
+            my $tagInfo = $self->{NEW_VALUE}->{$hashKey}->{TagInfo};
+            next if $tagTablePtr and $tagTablePtr ne $tagInfo->{Table};
+            $tagInfoHash{$$tagInfo{TagID}} = $tagInfo;
+        }
+    }
+    return \%tagInfoHash;
 }
 
 #------------------------------------------------------------------------------
@@ -868,23 +988,31 @@ sub InitWriteDirs($$)
     my @tagInfoList = $self->GetNewTagInfoList();
     my $tagInfo;
     for $tagInfo (@tagInfoList) {
-        # are we creating this tag (otherwise just deleting or editing it)
-        my $isCreating = $self->{NEW_VALUE}->{$tagInfo}->{IsCreating};
-        # tag belongs to directory specified by WriteGroup, or by
-        # the Group0 name if WriteGroup not defined
-        my $dirName = $tagInfo->{WriteGroup} || $self->GetGroup($tagInfo, 0);
-        while ($dirName) {
-            my $parent = $$fileDirs{$dirName};
-            $$editDirs{$dirName} = $parent;
-            $$addDirs{$dirName} = $parent if $isCreating;
-            $dirName = $parent;     # go up one level
+        my $newValueHash = $self->GetNewValueHash($tagInfo);
+        for (;;) {
+            # are we creating this tag? (otherwise just deleting or editing it)
+            my $isCreating = $newValueHash->{IsCreating};
+            # tag belongs to directory specified by WriteGroup, or by
+            # the Group0 name if WriteGroup not defined
+            my $dirName = $newValueHash->{WriteGroup};
+            while ($dirName) {
+                my $parent = $$fileDirs{$dirName};
+                $$editDirs{$dirName} = $parent;
+                $$addDirs{$dirName} = $parent if $isCreating;
+                $dirName = $parent;     # go up one level
+            }
+            last unless $newValueHash->{Next};
+            # cycle through all hashes in linked list
+            $newValueHash = $newValueHash->{Next};
         }
     }
     if ($self->{OPTIONS}->{Verbose}) {
         print "  Editing tags in: ";
-        foreach (sort keys %$editDirs) {
-            print "$_ ";
-        }
+        foreach (sort keys %$editDirs) { print "$_ "; }
+        print "\n";
+        return unless $self->{OPTIONS}->{Verbose} > 1;
+        print "  Creating tags in: ";
+        foreach (sort keys %$addDirs) { print "$_ "; }
         print "\n";
     }
 }
@@ -1107,6 +1235,164 @@ sub VerboseDir($$;$)
 }
 
 #------------------------------------------------------------------------------
+# assemble a continuing fraction into a rational value
+# Inputs: 0) numerator, 1) denominator
+#         2-N) list of fraction denominators, deepest first
+sub AssembleRational($$@)
+{
+    @_ < 3 and return @_;
+    my ($num, $denom, $frac) = splice(@_, 0, 3);
+    return AssembleRational($frac*$num+$denom, $num, @_);
+}
+    
+#------------------------------------------------------------------------------
+# convert a floating point number into a rational
+# Inputs: 0) floating point number, 1) optional maximum value (defaults to 0x7fffffff)
+# Returns: numberator, denominator (in list context)
+# Notes: these routines were a bit tricky, but fun to write!
+sub Rationalize($;$)
+{
+    my ($val, $maxInt) = @_;
+    # Note: Just testing "if $val" doesn't work because '0.0' is true!  (ugghh!)
+    return (0, 1) if $val == 0;
+    my $sign = $val < 0 ? ($val = -$val, -1) : 1;
+    my ($num, $denom, @fracs);
+    my $frac = $val;
+    $maxInt or $maxInt = 0x7fffffff;
+    for (;;) {
+        my ($n, $d) = AssembleRational(int($frac + 0.5), 1, @fracs);
+        if ($n > $maxInt or $d > $maxInt) {
+            last if defined $num;
+            return ($sign, $maxInt) if $val < 1;
+            return ($sign * $maxInt, 1);
+        }
+        ($num, $denom) = ($n, $d);      # save last good values
+        my $err = ($n/$d-$val) / $val;  # get error of this rational
+        last if abs($err) < 1e-8;       # all done if error is small
+        my $int = int($frac);
+        unshift @fracs, $int;
+        last unless $frac -= $int;
+        $frac = 1 / $frac;
+    }
+    return ($num * $sign, $denom);
+}
+
+#------------------------------------------------------------------------------
+# Utility routines to for writing binary data values
+sub Set16s($;$$)
+{
+    my $val = shift;
+    $val < 0 and $val += 0x10000;
+    return Set16u($val, @_);
+}
+sub Set32s($;$$)
+{
+    my $val = shift;
+    $val < 0 and $val += 0xffffffff, ++$val;
+    return Set32u($val, @_);
+}
+sub SetRational32u($;$$) {
+    my ($numer,$denom) = Rationalize($_[0],0xffffffff);
+    my $val = Set32u($numer) . Set32u($denom);
+    $_[1] and substr(${$_[1]}, $_[2], length($val)) = $val;
+    return $val;
+}
+sub SetRational32s($;$$) {
+    my ($numer,$denom) = Rationalize($_[0]);
+    my $val = Set32s($numer) . Set32u($denom);
+    $_[1] and substr(${$_[1]}, $_[2], length($val)) = $val;
+    return $val;
+}
+sub SetRational16u($;$$) {
+    my ($numer,$denom) = Rationalize($_[0],0xffff);
+    my $val = Set16u($numer) . Set16u($denom);
+    $_[1] and substr(${$_[1]}, $_[2], length($val)) = $val;
+    return $val;
+}
+sub SetRational16s($;$$) {
+    my ($numer,$denom) = Rationalize($_[0],0xffff);
+    my $val = Set16s($numer) . Set16u($denom);
+    $_[1] and substr(${$_[1]}, $_[2], length($val)) = $val;
+    return $val;
+}
+sub SetFloat($;$$) {
+    return SwapBytes(pack('f',$_[0]), 4);
+}
+#------------------------------------------------------------------------------
+# hash lookups for writing binary data values
+my %writeValueProc = (
+    int8s => \&Set8s,
+    int8u => \&Set8u,
+    int16s => \&Set16s,
+    int16u => \&Set16u,
+    int32s => \&Set32s,
+    int32u => \&Set32u,
+    rational16s => \&SetRational16s,
+    rational16u => \&SetRational16u,
+    rational32s => \&SetRational32s,
+    rational32u => \&SetRational32u,
+    float => \&SetFloat,
+);
+#------------------------------------------------------------------------------
+# write binary data value (with current byte ordering)
+# Inputs: 0) value, 1) format string
+#         2) optional number of values (1 or string length if not specified)
+#         3) optional data reference, 4) value offset
+# Returns: packed value (and sets value in data) or undef on error
+sub WriteValue($$;$$$$)
+{
+    my ($val, $format, $count, $dataPt, $offset) = @_;
+    my $proc = $writeValueProc{$format};
+    my $packed;
+
+    if ($proc) {
+        my @vals = split(' ',$val);
+        $count or $count = 1;   # assume 1 if count not specified
+        $packed = '';
+        while ($count--) {
+            $val = shift @vals;
+            #warn...
+            return undef unless defined $val;
+            # validate numerical formats
+            if ($format =~ /^int/) {
+                return undef unless Image::ExifTool::IsInt($val);
+            } else {
+                return undef unless Image::ExifTool::IsFloat($val);
+            }
+            $packed .= &$proc($val);
+        }
+    } elsif ($format eq 'string' or $format eq 'undef') {
+        $format eq 'string' and $val .= "\0";   # null-terminate strings
+        if (defined $count) {
+            my $diff = $count - length($val);
+            if ($diff) {
+                #warn "wrong string length!\n";
+                # adjust length of string to match specified count
+                if ($diff < 0) {
+                    if ($format eq 'string') {
+                        return undef unless $count;
+                        $val = substr($val, 0, $count - 1) . "\0";
+                    } else {
+                        $val = substr($val, 0, $count);
+                    }
+                } else {
+                    $val .= "\0" x $diff;
+                }
+            }
+        } else {
+            $count = length($val);
+        }
+        $dataPt and substr($$dataPt, $offset, $count) = $val;
+        return $val;
+    } else {
+        warn "Can't currently write format $format";
+        return undef;
+    }
+    $dataPt and substr($$dataPt, $offset, length($packed)) = $packed;
+    return $packed;
+}
+
+#------------------------------------------------------------------------------
 # write to file or memory
 # Inputs: 0) file or scalar reference, 1-N) list of stuff to write
 # Returns: true on success
@@ -1163,7 +1449,6 @@ sub WriteJPEG($$)
     my ($ch,$s,$length);
     my $verbose = $self->{OPTIONS}->{Verbose};
     my $raf = $self->{RAF};
-    my $icc_profile;
     my $rtnVal = 0;
     my %doneDir;
     my ($err, %dumpParms);
@@ -1337,16 +1622,25 @@ sub WriteJPEG($$)
                 }
             }
             # finally, COM segment
-            if (exists $$addDirs{COM} and not $doneDir{COM}) {
+            while (exists $$editDirs{COM} and not $doneDir{COM}) {
                 $doneDir{COM} = 1;
+                my $tagInfo = $Image::ExifTool::extraTags{Comment};
+                my $oldComment = $markerName eq 'COM' ? $$segDataPt : '';
+                $oldComment =~ s/\0.*//;
+                $markerName eq 'COM' and ($oldComment = $$segDataPt) =~ s/\0.*//;
+                my $newValueHash = $self->GetNewValueHash($tagInfo);
+                unless (IsOverwriting($newValueHash)) {
+                    delete $$editDirs{COM}; # we aren't editing COM after all
+                    last;
+                }
                 $verbose and print "Creating COM:\n";
                 # write out the comments now:
                 # need room for the comment, plus null terminator, plus size word (2 bytes)
                 # and the total size must be less than 0xffff to fit in one record
                 # so split up longer comments into multiple records
-                my $newComment = $self->GetNewValues('Comment');
-                $verbose > 1 and print "    + Comment = '$newComment'\n";
+                my $newComment = GetNewValues($newValueHash);
                 if (defined $newComment and length($newComment)) {
+                    $verbose > 1 and print "    + Comment = '$newComment'\n";
                     my $len = length($newComment);
                     my $n;
                     for ($n=0; $n<$len; $n+=$maxSegmentLen-1) {
@@ -1358,6 +1652,7 @@ sub WriteJPEG($$)
                     }
                     ++$self->{CHANGED};
                 }
+                last;
             }
             last;   # didn't want to loop anyway
         }
@@ -1463,22 +1758,22 @@ sub WriteJPEG($$)
                     # must concatinate blocks of profile
                     my $block_num = ord(substr($$segDataPt, 12, 1));
                     my $blocks_tot = ord(substr($$segDataPt, 13, 1));
-                    $icc_profile = '' if $block_num == 1;
-                    if (defined $icc_profile) {
-                        $icc_profile .= substr($$segDataPt, 14);
+                    $combinedSegData = '' if $block_num == 1;
+                    if (defined $combinedSegData) {
+                        $combinedSegData .= substr($$segDataPt, 14);
                         if ($block_num == $blocks_tot) {
                             my $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
                             my %dirInfo = (
-                                DataPt   => \$icc_profile,
-                                DataLen  => length($icc_profile),
+                                DataPt   => \$combinedSegData,
+                                DataLen  => length($combinedSegData),
                                 DirStart => 0,
-                                DirLen   => length($icc_profile),
+                                DirLen   => length($combinedSegData),
                                 Nesting  => 0,
                                 Parent   => $markerName,
                             );
                             # we don't support writing ICC_Profile (yet)
                             # $newData = $self->WriteTagTable($tagTablePtr, \%dirInfo);
-                            undef $icc_profile;
+                            undef $combinedSegData;
                         }
                     }
                 }
@@ -1615,7 +1910,7 @@ sub CheckValue($$;$)
     if ($format eq 'string') {
         return undef unless $count;
         my $len = length($$valPtr);
-        $len > $count and return 'String too long';
+        $len >= $count and return 'String too long';
         if ($len < $count) {
             $$valPtr .= "\0" x ($count - $len);
         }
@@ -1640,6 +1935,9 @@ sub CheckValue($$;$)
         } elsif ($format =~ /^rational/ or $format eq 'float' or $format eq 'double') {
             # make sure the value is a valid floating point number
             return 'Not a floating point number' unless IsFloat($val);
+            if ($format =~ /^rational\d+u$/ and $val < 0) {
+                return 'Must be a positive number';
+            }
         }
     }
     return undef;   # success!
@@ -1667,6 +1965,8 @@ sub CheckBinaryData($$$)
     if ($format =~ /(.*)\[(.*)\]/) {
         $format = $1;
         $count = $2;
+        # can't evaluate $count now because we don't know $size yet
+        undef $count if $count =~ /\$size/;
     }
     return CheckValue($valPtr, $format, $count);
 }
@@ -1704,6 +2004,11 @@ sub WriteBinaryData($$$)
             if ($format =~ /(.*)\[(.*)\]/) {
                 $format = $1;
                 $count = $2;
+                my $size = $dirLen; # used in eval
+                # evaluate count to allow count to be based on previous values
+                #### eval Format size (%val, $size)
+                $count = eval $count;
+                $@ and warn($@), next;
             }
         } else {
             $format = $defaultFormat;
@@ -1711,10 +2016,11 @@ sub WriteBinaryData($$$)
         my $entry = $tagID * $increment;        # relative offset of this entry
         my $val = ReadValue($dataPt, $entry, $format, $count, $dirLen-$entry);
         next unless defined $val;
-        next unless $exifTool->IsOverwriting($tagInfo, $val);
-        my $newVal = $exifTool->GetNewValues($tagInfo);
+        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+        next unless IsOverwriting($newValueHash);
+        my $newVal = GetNewValues($newValueHash);
         next unless defined $newVal;    # can't delete from a binary table
-        my $rtnVal = Image::ExifTool::Exif::WriteValue($newVal, $format, $count, $dataPt, $entry);
+        my $rtnVal = WriteValue($newVal, $format, $count, $dataPt, $entry);
         if (defined $rtnVal) {
             if ($verbose > 1) {
                 print "    - $dirName:$$tagInfo{Name} = '$val'\n";
@@ -1732,7 +2038,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Writer.pl - ExifTool write routines
+Image::ExifTool::Writer.pl - ExifTool routines for writing meta information
 
 =head1 SYNOPSIS
 

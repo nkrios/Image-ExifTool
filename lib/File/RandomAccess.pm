@@ -27,7 +27,7 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.01';
+$VERSION = '1.02';
 @ISA = qw(Exporter);
 
 # constants
@@ -306,7 +306,8 @@ sub Close($)
                     }
                     printf "0x%.8x - 0x%.8x (%d bytes)$warn\n", $last, $pos, $bytes;
                 }
-                $last = $pos + $len;
+                my $cur = $pos + $len;
+                $last = $cur unless defined $last and $last > $cur;
             }
             print "$tot bytes missed";
             $bad and print ", $bad non-zero!";

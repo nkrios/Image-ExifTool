@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WriteXMP.pl
 #
-# Description:  Definitions for writing XMP metadata
+# Description:  Routines for writing XMP metadata
 #
 # Revisions:    12/19/2004 - P. Harvey Created
 #
@@ -214,9 +214,7 @@ my $xmpOpen = "<x:xmpmeta xmlns:x='$nsURI{x}' $x_toolkit>\n";
 my $rdfOpen = "<rdf:RDF xmlns:rdf='$nsURI{rdf}' xmlns:iX='$nsURI{iX}'>\n";
 my $rdfClose = "</rdf:RDF>\n";
 my $xmpClose = "</x:xmpmeta>\n";
-# (the XMP standard recommends writing 2k-4k of white space before the
-# packet trailer, with a newline every 100 characters)
-my $pktClose = ((' ' x 100) . "\n") x 24 . "<?xpacket end='w'?>";
+my $pktClose =  "<?xpacket end='w'?>";
 
 # generate "PropertyPath" for tags in main XMP table when this file is loaded
 {
@@ -259,7 +257,7 @@ sub CheckXMP($$$)
         unless ($$valPtr =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/) {
             return 'Not a floating point number';
         }
-        $$valPtr = join('/', Image::ExifTool::Exif::Rationalize($$valPtr));
+        $$valPtr = join('/', Image::ExifTool::Rationalize($$valPtr));
     } elsif ($format eq 'Integer') {
         # make sure the value is integer
         return 'Not an integer' unless $$valPtr =~ /^[+-]?\d+$/;
@@ -550,13 +548,14 @@ sub WriteXMP($$$)
         $path = ConformPathToNamespace($exifTool, $path);
         # find existing property
         my $capList = $capture{$path};
-        my @newValues = $exifTool->GetNewValues($tagInfo);
+        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+        my @newValues = Image::ExifTool::GetNewValues($newValueHash);
         my %attrs;
         # delete existing entry if necessary
         if ($capList) {
             # take attributes from old values if they exist
             %attrs = %{$capList->[1]};
-            my $overwrite = $exifTool->IsOverwriting($tagInfo);
+            my $overwrite = Image::ExifTool::IsOverwriting($newValueHash);
             if ($overwrite) {
                 my ($delPath, @matchingPaths);
                 # check to see if this is an indexed list item
@@ -571,7 +570,7 @@ sub WriteXMP($$$)
                     my ($val, $attrs) = @{$capture{$path}};
                     if ($overwrite < 0) {
                         # only overwrite specific values
-                        next unless $exifTool->IsOverwriting($tagInfo, $val);
+                        next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
                     }
                     $verbose > 1 and print "    - XMP:$$tagInfo{Name} = '$val'\n";
                     # save attributes and path from this deleted property
@@ -595,7 +594,7 @@ sub WriteXMP($$$)
         }
         next unless @newValues; # done if no new values specified
         # don't add new tag if it didn't exist before unless specified
-        next unless $capList or $exifTool->IsCreating($tagInfo);
+        next unless $capList or Image::ExifTool::IsCreating($newValueHash);
 
         # set default language attribute for LangAlt lists
         # (currently on support changing the default language)
@@ -726,7 +725,11 @@ sub WriteXMP($$$)
         $prop =~ s/ .*//;   # remove list index if it exists
         $newData .= (' ' x scalar(@curPropList)) . " </$prop>\n";
     }
-    $newData .= $rdfClose . $xmpClose . $pktClose;
+    $newData .= $rdfClose . $xmpClose;
+    # (the XMP standard recommends writing 2k-4k of white space before the
+    # packet trailer, with a newline every 100 characters)
+    $newData .= ((' ' x 100) . "\n") x 24 unless $exifTool->Options('Compact');
+    $newData .= $pktClose;
 #
 # clean up and return our data
 #
@@ -753,7 +756,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WriteXMP.pl - Definitions for writing XMP metadata
+Image::ExifTool::WriteXMP.pl - Routines for writing XMP metadata
 
 =head1 SYNOPSIS
 

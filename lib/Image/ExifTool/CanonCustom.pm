@@ -703,7 +703,6 @@ sub WriteCanonCustom($$$)
     my $dirName = $dirInfo->{DirName};
     my $verbose = $exifTool->Options('Verbose');
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
-    my $tagInfo;
     $dataPt = \$newData;
 
     # first entry in array must be the size
@@ -711,19 +710,17 @@ sub WriteCanonCustom($$$)
         $exifTool->Warn("Invalid CanonCustom data");
         return undef;
     }
-    my %set;    # make hash of all tags to set in this directory
-    foreach $tagInfo ($exifTool->GetNewTagInfoList($tagTablePtr)) {
-        $set{$$tagInfo{TagID}} = $tagInfo;
-    }
+    my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
     my $pos;
     for ($pos=2; $pos<$dirLen; $pos+=2) {
         my $val = Image::ExifTool::Get16u($dataPt, $pos);
         my $tag = ($val >> 8);
-        $tagInfo = $set{$tag};
+        my $tagInfo = $$newTags{$tag};
         next unless $tagInfo;
+        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
         $val = ($val & 0xff);
-        next unless $exifTool->IsOverwriting($tagInfo, $val);
-        my $newVal = $exifTool->GetNewValues($tagInfo);
+        next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
+        my $newVal = Image::ExifTool::GetNewValues($newValueHash);
         next unless defined $newVal;    # can't delete from a custom table
         Image::ExifTool::Set16u(($newVal & 0xff) + ($tag << 8), $dataPt, $pos);
         if ($verbose > 1) {

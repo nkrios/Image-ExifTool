@@ -9,150 +9,320 @@
 #               01/19/2004 - P. Harvey Added CleanRaw()
 #
 # References:   1) http://www.cybercom.net/~dcoffin/dcraw/
+#               2) http://www.wonderland.org/crw/
+#               3) http://xyrion.org/ciff/CIFFspecV1R04.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonRaw;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.10';
+$VERSION = '1.17';
 
+sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
+sub WriteCanonRaw($$$);
+sub CheckCanonRaw($$$);
+sub InitMakerNotes($);
+sub SaveMakerNotes($);
+sub BuildMakerNotes($$$$$$);
 
-# Canon raw file tag table 
+# formats for CRW tag types (($tag >> 8) & 0x38)
+# Note: don't define format for undefined types
+%crwTagFormat = (
+    0x00 => 'int8u',
+    0x08 => 'string',
+    0x10 => 'int16u',
+    0x18 => 'int32u',
+  # 0x20 => 'undef',
+  # 0x28 => 'undef',
+  # 0x30 => 'undef',
+);
+
+# Canon raw file tag table
+# Note: Tag ID's have upper 2 bits set to zero, since these 2 bits
+# just specify the location of the information
 %Image::ExifTool::CanonRaw::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonRaw,
-    0x0032 => 'CanonColorInfo1',
-    0x0805 => 'CanonFileDescription',
+    WRITE_PROC => \&WriteCanonRaw,
+    CHECK_PROC => \&CheckCanonRaw,
+    WRITABLE => 1,
+    0x0000 => 'NullRecord', #3
+    0x0001 => 'FreeBytes', #3
+    0x0032 => { Name => 'CanonColorInfo1', Writable => 0 },
+    0x0805 => [
+        # this tag is found in more than one directory...
+        {
+            Condition => '$self->{DIR_NAME} eq "ImageDescription"',
+            Name => 'CanonFileDescription',
+        },
+        {
+            Name => 'UserComment',
+        },
+    ],
     0x080a => {
         Name => 'CanonRawMakeModel',
+        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::CanonRaw::MakeModel',
         },
     },
     0x080b => 'CanonFirmwareVersion',
+    0x080c => 'ComponentVersion', #3
+    0x080d => 'ROMOperationMode', #3
     0x0810 => {
         Name => 'OwnerName',
         Description => "Owner's Name",
     },
-    0x0815 => 'CanonFileType',
+    0x0815 => 'CanonImageType',
     0x0816 => 'OriginalFileName',
     0x0817 => 'ThumbnailFileName',
+    0x100a => 'TargetImageType', #3
+    0x1010 => { #3
+        Name => 'ShutterReleaseMethod',
+        PrintConv => {
+            0 => 'Single Shot',
+            2 => 'Continuous Shooting',
+        },
+    },
+    0x1011 => { #3
+        Name => 'ShutterReleaseTiming',
+        PrintConv => {
+            0 => 'Priority on shutter',
+            1 => 'Priority on focus',
+        },
+    },
+    0x1016 => 'ReleaseSetting', #3
+    0x101c => 'BaseISO', #3
+    0x1029 => {
+        Name => 'CanonFocalLength',
+        Writable => 0,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Canon::FocalLength',
+        },
+    },
     0x102a => {
         Name => 'CanonShotInfo',
+        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::ShotInfo',
         },
     },
-    0x102c => 'CanonColorInfo2',
+    0x102c => { Name => 'CanonColorInfo2', Writable => 0 },
     0x102d => {
         Name => 'CanonCameraSettings',
+        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::CameraSettings',
         },
     },
     0x1031 => {
-        Name => 'RawImageSize',
+        Name => 'SensorInfo',
+        Writable => 0,
         SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonRaw::ImageSize',
+            TagTable => 'Image::ExifTool::CanonRaw::SensorInfo',
         },
     },
-    0x1033 => {
-        Name => 'CanonCustomFunctions10D',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonCustom::Functions10D',
+    # this tag has only be verified for the 10D in CRW files, but this
+    # is the way it works for the other models with JPG files...
+    0x1033 => [
+        {
+            Condition => '$self->{CameraModel} =~ /10D/',
+            Name => 'CanonCustomFunctions10D',
+            Writable => 0,
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::CanonCustom::Functions10D',
+            },
         },
-    },
+        {
+            Condition => '$self->{CameraModel} =~ /20D/',
+            Name => 'CanonCustomFunctions20D',
+            Writable => 0,
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::CanonCustom::Functions20D',
+            },
+        },
+        {
+            # assume everything else is a D30/D60
+            Name => 'CanonCustomFunctions',
+            Writable => 0,
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::CanonCustom::Functions',
+            },
+        },
+    ],
     0x1038 => {
         Name => 'CanonPictureInfo',
+        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::PictureInfo',
         },
     },
     0x10a9 => {
         Name => 'WhiteBalanceTable',
+        Writable => 0,
         SubDirectory => {
             # this offset is necessary because the table contains short rationals
             # (4 bytes long) but the first entry is 2 bytes into the table.
             Start => '2',
-            TagTable => 'Image::ExifTool::CanonRaw::WhiteBalance',
+            TagTable => 'Image::ExifTool::Canon::WhiteBalance',
         },
     },
     0x10b4 => {
         Name => 'ColorSpace',
-        ValueConv => 'Get16u(\$val,0)',
         PrintConv => {
             1 => 'sRGB',
             2 => 'Adobe RGB',
             0xffff => 'Uncalibrated',
         },
     },
-    0x180e => {
-        Name => 'CanonRawDateData',
+    0x1803 => { #3
+        Name => 'ImageFormat',
+        Writable => 0,
         SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonRaw::DateData',
+            TagTable => 'Image::ExifTool::CanonRaw::ImageFormat',
+        },
+    },
+    0x1804 => 'RecordID', #3
+    0x1806 => { #3
+        Name => 'SelfTimerTime',
+        ValueConv => '$val / 1000',
+        ValueConvInv => '$val * 1000',
+        PrintConv => '"$val sec"',
+        PrintConvInv => '$val=~s/\s*sec.*//;$val',
+    },
+    0x1807 => {
+        Name => 'TargetDistanceSetting',
+        Format => 'float',
+        PrintConv => '"$val mm"',
+        PrintConvInv => '$val=~s/\s*mm//;$val',
+    },
+    0x180b => {
+        Name => 'SerialNumber',
+        Description => 'Camera Body No.',
+        PrintConv => 'sprintf("%.10d",$val)',
+        PrintConvInv => '$val',
+    },
+    0x180e => {
+        Name => 'TimeStamp',
+        Writable => 0,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::CanonRaw::TimeStamp',
         },
     },
     0x1810 => {
-        Name => 'CanonRawRotation',
+        Name => 'ImageInfo',
+        Writable => 0,
         SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonRaw::Rotation',
+            TagTable => 'Image::ExifTool::CanonRaw::ImageInfo',
+        },
+    },
+    0x1813 => { #3
+        Name => 'FlashInfo',
+        Writable => 0,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::CanonRaw::FlashInfo',
+        },
+    },
+    0x1814 => { #3
+        Name => 'MeasuredEV',
+        Format => 'float',
+    },
+    0x1817 => {
+        Name => 'FileNumber',
+        Groups => { 2 => 'Image' },
+        PrintConv => '$_=$val;s/(\d+)(\d{4})/$1-$2/;$_',
+        PrintConvInv => '$_=$val;s/-//;$_',
+    },
+    0x1818 => { #3
+        Name => 'ExposureInfo',
+        Writable => 0,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::CanonRaw::ExposureInfo',
         },
     },
     0x1835 => {
         Name => 'DecoderTable',
-        PrintConv => '\$val',
+        Writable => 0,
     },
     0x2005 => {
         Name => 'RawData',
+        Writable => 0,
         PrintConv => '\$val',
     },
     0x2007 => {
         Name => 'JpgFromRaw',
+        Writable => 'resize',  # 'resize' allows this value to change size
+        Permanent => 0,
         PrintConv => '\$val',
+        PrintConvInv => '$val',
     },
-    0x5029 => {
-        Name => 'FocalLength',
-        ValueConv => '$val >> 16',
-        ValueConvInv => '$val << 16',
-        PrintConv => 'sprintf("%.1fmm",$val)',
-        PrintConvInv => '$val=~s/mm$//;$val',
+    # the following entries are actually subdirectories --
+    # 0x28 and 0x30 tag types are handled automatically by the decoding logic
+    0x2804 => {
+        Name => 'ImageDescription',
+        Writable => 0,
     },
-    0x580b => {
-        Name => 'SerialNumber',
-        Description => 'Camera Body No.',
-        PrintConv => 'sprintf("%.10d",$val)',
+    0x2807 => { #3
+        Name => 'CameraObject',
+        Writable => 0,
     },
-    0x5817 => {
-        Name => 'FileNumber',
-        Groups => { 2 => 'Image' },
-        PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
+    0x3002 => { #3
+        Name => 'ShootingRecord',
+        Writable => 0,
+    },
+    0x3003 => { #3
+        Name => 'MeasuredInfo',
+        Writable => 0,
+    },
+    0x3004 => { #3
+        Name => 'CameraSpecification',
+        Writable => 0,
+    },
+    0x300a => { #3
+        Name => 'ImageProps',
+        Writable => 0,
+    },
+    0x300b => {
+        Name => 'ExifInformation',
+        Writable => 0,
     },
 );
 
 # Canon binary data blocks
 %Image::ExifTool::CanonRaw::MakeModel = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FORMAT => 'string',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # (can't specify a first entry because this isn't
     # a simple binary table with fixed offsets)
     0 => {
         Name => 'Make',
-        Format => 'string[5]',
+        Format => 'string[6]',  # "Canon\0"
+        ValueConv => '$self->{CameraMake} = $val',
+        ValueConvInv => '$val',
     },
     6 => {
         Name => 'Model',
         Format => 'string[$size-6]',
         Description => 'Camera Model Name',
+        ValueConv => '$self->{CameraModel} = $val',
+        ValueConvInv => '$val',
     },
 );
 
-%Image::ExifTool::CanonRaw::DateData = (
+%Image::ExifTool::CanonRaw::TimeStamp = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FORMAT => 'int32u',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Time' },
@@ -160,106 +330,112 @@ sub ProcessCanonRaw($$$);
         Name => 'DateTimeOriginal',
         Description => 'Shooting Date/Time',
         ValueConv => 'Image::ExifTool::CanonRaw::ConvertBinaryDate($val)',
+        ValueConvInv => 'Image::ExifTool::CanonRaw::GetBinaryDate($val)',
         PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$val',
     },
+    1 => { #3
+        Name => 'TimeZoneCode',
+        Format => 'int32s',
+        ValueConv => '$val / 3600',
+        ValueConvInv => '$val * 3600',
+    },
+    2 => 'TimeZoneInfo', #3
 );
 
-%Image::ExifTool::CanonRaw::ImageSize = (
+%Image::ExifTool::CanonRaw::ImageFormat = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'int16s',
-    FIRST_ENTRY => 1,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    1 => 'ImageWidth',
-    2 => 'ImageHeight',
-);
-
-%Image::ExifTool::CanonRaw::Rotation = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'int16s',
-    FIRST_ENTRY => 1,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    6 => 'Rotation',
-);
-
-# these values are potentially useful to users of dcraw...
-%Image::ExifTool::CanonRaw::WhiteBalance = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'rational16s',
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int32u',
     FIRST_ENTRY => 0,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     0 => {
-        Name => 'RedBalanceAuto',
-        PrintConv => 'sprintf("%.5f",$val)',
+        Name => 'FileFormat',
+        Flags => 'PrintHex',
+        PrintConv => {
+            0x00010000 => 'JPEG (lossy)',
+            0x00010002 => 'JPEG (non-quantization)',
+            0x00010003 => 'JPEG (lossy/non-quantization toggled)',
+            0x00020001 => 'CRW',
+        },
     },
     1 => {
-        Name => 'BlueBalanceAuto',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    2 => {
-        Name => 'RedBalanceDaylight',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    3 => {
-        Name => 'BlueBalanceDaylight',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    4 => {
-        Name => 'RedBalanceCloudy',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    5 => {
-        Name => 'BlueBalanceCloudy',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    6 => {
-        Name => 'RedBalanceTungsten',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    7 => {
-        Name => 'BlueBalanceTungsten',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    8 => {
-        Name => 'RedBalanceFluorescent',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    9 => {
-        Name => 'BlueBalanceFluorescent',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    10 => {
-        Name => 'RedBalanceFlash',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    11 => {
-        Name => 'BlueBalanceFlash',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    12 => {
-        Name => 'RedBalanceCustom',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    13 => {
-        Name => 'BlueBalanceCustom',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    14 => {
-        Name => 'RedBalanceB&W',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    15 => {
-        Name => 'BlueBalanceB&W',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    16 => {
-        Name => 'RedBalanceShade',
-        PrintConv => 'sprintf("%.5f",$val)',
-    },
-    17 => {
-        Name => 'BlueBalanceShade',
-        PrintConv => 'sprintf("%.5f",$val)',
+        Name => 'TargetCompressionRatio',
+        Format => 'float',
     },
 );
+
+%Image::ExifTool::CanonRaw::FlashInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'float',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0 => 'FlashGuideNumber',
+    1 => 'FlashThreshold',
+);
+
+%Image::ExifTool::CanonRaw::ExposureInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'float',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0 => 'ExposureCompensation',
+    1 => 'TvValue',
+    2 => 'AvValue',
+);
+
+%Image::ExifTool::CanonRaw::SensorInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16s',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    # Note: Don't make these writable because it confuses Canon decoding software
+    # if these are changed
+    1 => 'SensorWidth',
+    2 => 'SensorHeight',
+    5 => 'SensorLeftBorder', #2
+    6 => 'SensorTopBorder', #2
+    7 => 'SensorRightBorder', #2
+    8 => 'SensorBottomBorder', #2
+);
+
+%Image::ExifTool::CanonRaw::ImageInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int32u',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    # Note: Don't make these writable because it confuses Canon decoding software
+    # if these are changed
+    0 => 'ImageWidth', #3
+    1 => 'ImageHeight', #3
+    2 => { #3
+        Name => 'PixelAspectRatio',
+        Format => 'float',
+    },
+    3 => {
+        Name => 'Rotation',
+        Format => 'int32s',
+    },
+    4 => 'ComponentBitDepth', #3
+    5 => 'ColorBitDepth', #3
+    6 => 'ColorBW', #3
+);
+
+#------------------------------------------------------------------------------
+# AutoLoad our writer routines when necessary
+#
+sub AUTOLOAD
+{
+    return Image::ExifTool::DoAutoLoad($AUTOLOAD, @_);
+}
 
 #------------------------------------------------------------------------------
 # Convert binary date to string
@@ -274,165 +450,16 @@ sub ConvertBinaryDate($)
 }
 
 #------------------------------------------------------------------------------
-# Do the work for CleanRaw()
-# Inputs: I'm not gonna tell because you shouldn't call this routine
-# Notes:  This routine should be called only from CleanRaw() below
-sub _doCleanRaw($$$$$$)
+# get binary date from string
+# Inputs: 0) string
+# Returns: Binary date or undefined on error
+sub GetBinaryDate($)
 {
-    my $infile = shift;
-    my $outfile = shift;
-    my $in_place = shift;
-    my $inref = shift;
-    my $outref = shift;
-    my $outJpgLen = shift;
-    my ($buff, $sig, $mainDir);
-    my ($jpgLen, $jpgPtr);
-    my ($pk16, $pk32);
-    
-    open(RAW,$infile)   or return 6;
-    binmode(RAW);
-    $$inref = \*RAW;                    # save file reference for cleanup
-    
-    read(RAW,$buff,2)   or return 1;    # get byte order
-    SetByteOrder($buff) or return 2;
-    # set order for repacking binary data
-    if ($buff eq 'MM') {
-        $pk16 = 'n';      # big endian (Motorola/Network order)
-        $pk32 = 'N';
-    } else {
-        $pk16 = 'v';      # little endian (Intel/Vax order)
-        $pk32 = 'V'
-    }
-    read(RAW,$buff,4)   or return 1;    # get pointer to start of first block
-    read(RAW,$sig,8)    or return 1;    # get file signature
-    $sig eq "HEAPCCDR"  or return 3;    # validate signature
-    my $blockStart = Get32u(\$buff,0);
-    seek(RAW, 0, 2)     or return 4;    # seek to end of file
-    my $blockEnd = tell(RAW)  or return 5;  # get file size (end of main block)
-    seek(RAW, $blockEnd-4, 0) or return 4;
-    read(RAW, $buff, 4) or return 1;    # get offset to directory start
-    my $dirStart = Get32u(\$buff,0) + $blockStart;
-    seek(RAW, $dirStart, 0) or return 4;
-    read(RAW, $buff, 2) or return 1;
-    my $dirEntries = Get16u(\$buff,0);  # number of directory entries
-    read(RAW, $mainDir, $dirEntries * 10) or return 1;    # read entire directory
-    my $i;
-    for ($i=0; $i<$dirEntries; ++$i) {
-        my $offset = $i * 10;
-        my $tag = Get16u(\$mainDir, $offset);
-        next unless $tag == 0x2007;     # look for JPG tag
-        $jpgLen = Get32u(\$mainDir, $offset + 2);
-        $jpgPtr = Get32u(\$mainDir, $offset + 6) + $blockStart;
-        $$outJpgLen = $jpgLen;          # we found the embedded JPG!
-        last;
-    }
-    # nothing to do if outfile is the same as infile and no JPG data
-    return 0 if $in_place and not $jpgLen;
-    
-    seek(RAW, 0, 0) or return 5;        # rewind to start of input file
-    open(OUT,">$outfile") or return 10;
-    binmode(OUT);
-    $$outref = \*OUT;                   # save reference for cleanup
-
-    if ($jpgLen) {
-        # copy the RAW file, removing the JPG image
-        read(RAW, $buff, $blockStart) or return 1;
-        print OUT $buff or return 11;
-        my $newDir = pack($pk16, $dirEntries-1);
-        my $i;
-        for ($i=0; $i<$dirEntries; ++$i) {
-            my $offset = $i * 10;
-            my $tag = Get16u(\$mainDir, $offset);
-            next if $tag == 0x2007;     # don't copy JPG preview
-            my $type = $tag >> 8;
-            # make sure the block type is something we know how to deal with
-            return 9 unless $type == 0x20 or $type == 0x28 or $type == 0x30;
-            # get the data length and position
-            my $len = Get32u(\$mainDir, $offset + 2);
-            my $ptr = Get32u(\$mainDir, $offset + 6) + $blockStart;
-            # read the data block
-            seek(RAW, $ptr, 0) or return 5;
-            read(RAW, $buff, $len) or return 1;
-            # we must shift this pointer if it comes after the JPG
-            $ptr -= $jpgLen if $ptr > $jpgPtr;
-            # construct new directory entry
-            $newDir .= pack($pk16, $tag) . pack($pk32, $len) . 
-                       pack($pk32, $ptr-$blockStart);
-            # write the block
-            seek(OUT, $ptr, 0) or return 12;
-            print OUT $buff or return 11;
-        }
-        # with current RAW files the main directory is at the end, but
-        # do the test anyway in case this changes in the future
-        $dirStart -= $jpgLen if $dirStart > $jpgPtr;
-        seek(OUT, $dirStart, 0) or return 12;
-        # write the main directory
-        print OUT $newDir or return 11;
-        $buff = pack($pk32, $dirStart - $blockStart);
-        # we should already be at the end of file, but we seek there
-        # anyway to be safe in case the main directory moves in future
-        # versions of Canon RAW files
-        seek(OUT, 0, 2) or return 12;   # seek to end of file
-        # write the main directory pointer (last thing in file)
-        print OUT $buff or return 11;
-    } else {
-        # do a straight copy of the file
-        my $len;
-        while ($len = read(OUT, $buff, 65536)) {
-            print OUT $buff or return 11;
-        }
-        return 1 unless defined $len;
-    }
-    return 0;               # file copied OK
-}
-
-#------------------------------------------------------------------------------
-# Rewrite a Canon RAW (.CRW) file, removing embedded JPG preview image
-# Inputs: 0) source file name, 1) dest file name (or undef to clean in place)
-# Returns: 0=failure, 1=success, >1 size of JPG removed
-# Note: This is a convenience routine, not used by exiftool
-sub CleanRaw($;$)
-{
-    my $infile = shift;
-    my $outfile = shift;
-    my $in_place;   # flag that file is being modified in place
-    my $inref;      # reference to input file
-    my $outref;     # reference to output file
-    my $jpgLen;
-    my $err;
-    
-    # generate temporary file name if changing the file in-place
-    unless ($outfile and $outfile ne $infile) {
-        $outfile = "$infile-CleanRaw_tmp";      # write to temporary file
-        $in_place = 1;                          # set in-place flag
-    }
-    if (-e $outfile) {
-        $err = 20;  # don't overwrite existing file
-    } else {
-        $err = _doCleanRaw($infile, $outfile, $in_place, \$inref, \$outref, \$jpgLen);
-    }
-    # clean up any open files
-    if ($inref) {
-        close $inref or $err = 21;
-    }
-    if ($outref) {
-        close $outref or $err = 22;
-        if ($in_place and not $err) {
-            # replace the original file only if everything went OK
-            rename $outfile, $infile or $err = 23;
-        }
-        # erase bad (or dummy) output file
-        unlink $outfile if $err;
-    }
-    # return success code
-    if ($err) {
-        warn "CleanRaw() error $err for $infile\n";
-        return 0;
-    } elsif ($jpgLen) {
-        return $jpgLen;
-    } else {
-        return 1;
-    }
+    my $timeStr = shift;
+    return undef unless $timeStr =~ /^(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
+    my ($yr,$mon,$day,$hr,$min,$sec) = ($1,$2,$3,$4,$5,$6);
+    return undef unless eval 'require Time::Local';
+    return Time::Local::timegm($sec,$min,$hr,$day,$mon-1,$yr-1900);
 }
 
 #------------------------------------------------------------------------------
@@ -448,6 +475,7 @@ sub ProcessCanonRaw($$$)
     my $raf = $dirInfo->{RAF} or return 0;
     my $buff;
     my $verbose = $exifTool->Options('Verbose');
+    my $buildMakerNotes = $exifTool->Options('MakerNotes');
 
     # 4 bytes at end of block give directory position within block
     $raf->Seek($blockStart+$blockSize-4, 0) or return 0;
@@ -455,7 +483,7 @@ sub ProcessCanonRaw($$$)
     my $dirOffset = Get32u(\$buff,0) + $blockStart;
     $raf->Seek($dirOffset, 0) or return 0;
     $raf->Read($buff, 2) or return 0;
-    my $entries = Get16u(\$buff,0);             # get number of entries in directory
+    my $entries = Get16u(\$buff,0);         # get number of entries in directory
     # read the directory (10 bytes per entry)
     $raf->Read($buff, 10 * $entries) or return 0;
     
@@ -465,18 +493,23 @@ sub ProcessCanonRaw($$$)
         my $pt = 10 * $index;
         my $tag = Get16u(\$buff, $pt);
         my $size = Get32u(\$buff, $pt+2);
-        my $ptrVal = Get32u(\$buff, $pt+6);
-        my $ptr = $ptrVal + $blockStart;        # all pointers relative to block start
-        my $value;
-        my $dumpHex;
-        my $tagInfo = $exifTool->GetTagInfo($rawTagTable, $tag);
-       
-        my $tagType = $tag >> 8;    # tags are grouped in types by value of upper byte
-        if ($tagType==0x28 or $tagType==0x30) {
+        my $valuePtr = Get32u(\$buff, $pt+6);
+        my $ptr = $valuePtr + $blockStart;  # all pointers relative to block start
+        if ($tag & 0x8000) {
+            $exifTool->Warn('Bad CRW directory entry');
+            return 1;
+        }
+        my $tagID = $tag & 0x3fff;          # get tag ID
+        my $tagType = ($tag >> 8) & 0x38;   # get tag type
+        my $valueInDir = ($tag & 0x4000);   # flag for value in directory
+        my $tagInfo = $exifTool->GetTagInfo($rawTagTable, $tagID);
+        if (($tagType==0x28 or $tagType==0x30) and not $valueInDir) {
             # this type of tag specifies a raw subdirectory
-            my $name = sprintf("CanonRaw_0x%.4x", $tag);
+            my $name;
+            $tagInfo and $name = $$tagInfo{Name};
+            $name or $name = sprintf("CanonRaw_0x%.4x", $tag);
             my %subdirInfo = (
-                Name     => $name,
+                DirName  => $name,
                 DataLen  => 0,
                 DirStart => $ptr,
                 DirLen   => $size,
@@ -494,46 +527,80 @@ sub ProcessCanonRaw($$$)
             }
             $exifTool->ProcessTagTable($rawTagTable, \%subdirInfo);
             next;
-        } elsif ($tagType==0x48 or $tagType==0x50 or $tagType==0x58) {
-            # this type of tag stores the value in the 'size' field (weird!)
-            $value = $size;
-        } elsif ($size == 0) {
-            $value = $ptrVal;   # (I haven't seen this, but it would make sense)
-        } elsif ($size <= 512 or ($verbose > 2 and $size <= 65536)
-            or ($tagInfo and ($$tagInfo{SubDirectory} 
-            or grep(/^$$tagInfo{Name}$/i, $exifTool->GetRequestedTags()) )))
-        {
-            # read value if size is small or specifically requested
-            # or if this is a SubDirectory
-            unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size)) {
-                $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
-                next;
-            }
-            $dumpHex = 1;
+        }
+        my ($valueDataPos, $count, $subdir);
+        my $format = $crwTagFormat{$tagType};
+        if ($tagInfo) {
+            $subdir = $$tagInfo{SubDirectory};
+            $format = $$tagInfo{Format} if $$tagInfo{Format};
+            $count = $$tagInfo{Count};
+        }
+        # get value data
+        my $value;
+        if ($valueInDir) {  # is the value data in the directory?
+            # this type of tag stores the value in the 'size' and 'ptr' fields
+            $valueDataPos = $dirOffset + $valuePtr;
+            $size = 8;
+            $value = substr($buff, $pt+2, $size);
+            # set count to 1 by default for normal values in directory
+            $count = 1 if not defined $count and $format and
+                          $format ne 'string' and not $subdir;
         } else {
-            $value = "Binary data $size bytes";
-            if ($tagInfo) {
-                if ($exifTool->{OPTIONS}->{ALL_BINARY}) {
-                    # read the value anyway
-                    unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size)) {
-                        $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
-                        next;
-                    }
+            $valueDataPos = $ptr;
+            if ($size <= 512 or ($verbose > 2 and $size <= 65536)
+                or ($tagInfo and ($$tagInfo{SubDirectory} 
+                or grep(/^$$tagInfo{Name}$/i, $exifTool->GetRequestedTags()) )))
+            {
+                # read value if size is small or specifically requested
+                # or if this is a SubDirectory
+                unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size)) {
+                    $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
+                    next;
                 }
-                # force this to be a binary (scalar reference)
-                $$tagInfo{PrintConv} = '\$val';
+            } else {
+                $value = "Binary data $size bytes";
+                if ($tagInfo) {
+                    if ($exifTool->Options('Binary')) {
+                        # read the value anyway
+                        unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size)) {
+                            $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
+                            next;
+                        }
+                    }
+                    # force this to be a binary (scalar reference)
+                    $$tagInfo{PrintConv} = '\$val';
+                }
+                $size = length $value;
+                undef $format;
             }
         }
-        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
-            'Table'  => $rawTagTable,
-            'Index'  => $index,
-            'Value'  => $value,
-            'DataPt' => \$value,
-            'Addr'   => $ptr,
-        );
+        # set count from tagInfo count if necessary
+        if ($format and not $count) {
+            # set count according to format and size
+            my $fnum = $Image::ExifTool::Exif::formatNumber{$format};
+            my $fsiz = $Image::ExifTool::Exif::formatSize[$fnum];
+            $count = int($size / $fsiz);
+        }
+        if ($verbose) {
+            my $val = $value;
+            $format and $val = ReadValue(\$val, 0, $format, $count, $size);
+            $exifTool->VerboseInfo($tag, $tagInfo,
+                'Table'  => $rawTagTable,
+                'Index'  => $index,
+                'Value'  => $val,
+                'DataPt' => \$value,
+                'Addr'   => $blockStart + $valueDataPos,
+                'Size'   => $size,
+                'Format' => $format,
+                'Count'  => $count,
+            );
+        }
+        if ($buildMakerNotes) {
+            # build maker notes information if requested
+            BuildMakerNotes($exifTool, $tagID, $tagInfo, \$value, $format, $count);
+        }
         next unless defined $tagInfo;
-        
-        my $subdir = $$tagInfo{SubDirectory};
+
         if ($subdir) {
             my $name = $$tagInfo{Name};
             my $newTagTable;
@@ -568,7 +635,17 @@ sub ProcessCanonRaw($$$)
                 $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
             }
         } else {
-            $exifTool->FoundTag($tagInfo, $value);
+            # convert to specified format if necessary
+            $format and $value = ReadValue(\$value, 0, $format, $count, $size);
+            # check for valid JpgFromRaw image
+            if ($$tagInfo{Name} ne 'JpgFromRaw' or
+                $value =~ /^(Binary|\xff\xd8)/ or
+                $exifTool->Options('IgnoreMinorErrors'))
+            {
+                $exifTool->FoundTag($tagInfo, $value);
+            } else {
+                $exifTool->Warn('JpgFromRaw is not a valid image');   
+            }
         }
     }
     return 1;
@@ -578,11 +655,12 @@ sub ProcessCanonRaw($$$)
 # get information from raw file
 # Inputs: 0) ExifTool object reference
 # Returns: 1 if this was a valid Canon RAW file
-sub RawInfo($$)
+sub CrwInfo($$)
 {
     my $exifTool = shift;
     my ($buff, $sig);
     my $raf = $exifTool->{RAF};
+    my $buildMakerNotes = $exifTool->Options('MakerNotes');
     
     $raf->Read($buff,2) == 2      or return 0; 
     SetByteOrder($buff)           or return 0;
@@ -591,9 +669,12 @@ sub RawInfo($$)
     $sig eq 'HEAPCCDR'            or return 0;  # validate signature
     my $hlen = Get32u(\$buff, 0);
     
-    $raf->Seek(0, 2)              or return 0;
+    $raf->Seek(0, 2)              or return 0;  # seek to end of file
     my $filesize = $raf->Tell()   or return 0;
-    
+
+    # initialize maker note data if building maker notes
+    $buildMakerNotes and InitMakerNotes($exifTool);
+
     $exifTool->FoundTag('FileType', 'Canon RAW');  # set file type
     
     # build directory information for main raw directory
@@ -609,7 +690,10 @@ sub RawInfo($$)
     # process the raw directory
     my $rawTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
     $exifTool->ProcessTagTable($rawTagTable, \%dirInfo);
-    
+
+    # finish building maker notes if necessary
+    $buildMakerNotes and SaveMakerNotes($exifTool);
+
     return 1;
 }
 
@@ -644,6 +728,10 @@ it under the same terms as Perl itself.
 =over 4
 
 =item http://www.cybercom.net/~dcoffin/dcraw/
+
+=item http://www.wonderland.org/crw/
+
+=item http://xyrion.org/ciff/
 
 =item Lots of testing with my own camera... ;)
 

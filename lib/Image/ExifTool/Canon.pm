@@ -7,10 +7,14 @@
 #               12/03/03 - P. Harvey Figured out lots more tags and added
 #                            CanonPictureInfo
 #               02/17/04 - Michael Rommel Added IxusAFPoint
+#               01/27/05 - P. Harvey Disable validation of CanonPictureInfo
+#               01/30/05 - P. Harvey Added a few more tags from ref #4
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               2) Michael Rommel private communication (tests with Digital Ixus)
 #               3) Daniel Pittman private communication (tests with PowerShot S70)
+#               4) http://www.wonderland.org/crw/
+#               5) Juha Eskelinen private communication (tests with 20D)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -18,7 +22,7 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.10';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
@@ -31,6 +35,13 @@ $VERSION = '1.07';
             Start => '$valuePtr',
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::Canon::CameraSettings',
+        },
+    },
+    0x2 => {
+        Name => 'CanonFocalLength',
+        SubDirectory => {
+            Start => '$valuePtr',
+            TagTable => 'Image::ExifTool::Canon::FocalLength',
         },
     },
     0x4 => {
@@ -125,9 +136,9 @@ $VERSION = '1.07';
         SubDirectory => {
             Start => '$valuePtr',
             # the first word seems to be always 7, not the size as in other blocks,
-            # I've also seen 53 in a 1DMkII raw file.  odd.  (also accept $size in
-            # case Canon ever decides to standardize this block)
-            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,7,53,$size)',
+            # I've also seen 53 in a 1DMkII raw file, and 9 in 20D.  So I have to
+            # handle validation differently for this block
+            Validate => 'Image::ExifTool::Canon::ValidatePictureInfo($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::Canon::PictureInfo',
         },
     },
@@ -139,7 +150,24 @@ $VERSION = '1.07';
             TagTable => 'Image::ExifTool::CanonCustom::Functions1D',
         },
     },
-    0xa0 => 'CanonA0Tag',
+    0x93 => {
+        Name => 'CanonFileInfo',
+        SubDirectory => {
+            Start => '$valuePtr',
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+            TagTable => 'Image::ExifTool::Canon::FileInfo',
+        },
+    },
+    0xa9 => {
+        Name => 'WhiteBalanceTable',
+        SubDirectory => {
+            # this offset is necessary because the table contains short rationals
+            # (4 bytes long) but the first entry is 2 bytes into the table.
+            Start => '$valuePtr + 2',
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart-2,$size)',
+            TagTable => 'Image::ExifTool::Canon::WhiteBalance',
+        },
+    },    
     0xb6 => {
         Name => 'PreviewImageInfo',
         SubDirectory => {
@@ -252,14 +280,17 @@ $VERSION = '1.07';
     13 => {
         Name => 'Contrast',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
     14 => {
         Name => 'Saturation',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
     15 => {
         Name => 'Sharpness',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
     16 => {
         Name => 'CameraISO',
@@ -318,12 +349,55 @@ $VERSION = '1.07';
             5 => 'Depth-of-field AE',
         },
     },
+    22 => { #4
+        Name => 'LensType',
+        PrintConv => {
+            1 => 'Canon EF 50mm f/1.8',
+            2 => 'Canon EF 28mm f/2.8',
+            4 => 'Sigma UC Zoom 35-135mm f/4-5.6',
+            6 => 'Tokina AF193-2 19-35mm f/3.5-4.5',
+            10 => 'Sigma 50mm f/2.8 EX / 28mm f/1.8',
+            21 => 'Canon EF 80-200mm f/2.8L',
+            26 => 'Cosina 100mm f/3.5 Macro AF',
+            28 => 'Tamron AF Aspherical 28-200mm f/3.8-5.6',
+            29 => 'Canon EF 50mm f/1.8 MkII',
+            39 => 'Canon EF 75-300mm f/4-5.6',
+            40 => 'Canon EF 28-80mm f/3.5-5.6',
+            125 => 'Canon TS-E 24mm f/3.5L',
+            131 => 'Sigma 17-35mm f2.8-4 EX Aspherical HSM',
+            135 => 'Canon EF 200mm f/1.8L',
+            136 => 'Canon EF 300mm f/2.8L',
+            139 => 'Canon EF 400mm f/2.8L',
+            141 => 'Canon EF 500mm f/4.5L',
+            150 => 'Sigma 20mm EX f/1.8',
+            151 => 'Canon EF 200mm f/2.8L USM',
+            155 => 'Canon EF 85mm f/1.8 USM',
+            156 => 'Canon EF 28-105mm f/3.5-4.5 USM',
+            160 => 'Canon EF 20-35mm f/3.5-4.5 USM',
+            161 => 'Canon EF 28-70mm f/2.8mm L USM / Sigma 24-70mm EX f/2.8',
+            165 => 'Canon EF 70-200mm f/2.8 L',
+            166 => 'Canon EF 70-200mm f/2.8 L + x1.4',
+            167 => 'Canon EF 70-200mm f/2.8 L + x2',
+            169 => 'Sigma 15-30mm f/3.5-4.5 EX DG Aspherical',
+            173 => 'Sigma 180mm EX HSM Macro f/3.5',
+            176 => 'Canon EF 24-85mm f/3.5-4.5 USM',
+            178 => 'Canon EF 28-135mm f/3.5-5.6 IS',
+            182 => 'Canon EF 100-400mm f/4.5-5.6 L IS + x2',
+            183 => 'Canon EF 100-400mm f/4.5-5.6 L IS',
+            190 => 'Canon EF 100mm f/2.8 Macro',
+            197 => 'Canon EF 75-300mm f/4-5.6 IS',
+            202 => 'Canon EF 28-80 f/3.5-5.6 USM IV',
+            213 => 'Canon EF 90-300mm f/4.5-5.6',
+            231 => 'Canon EF 17-40mm f/4L',
+        },
+    },
     23 => 'LongFocal',
     24 => 'ShortFocal',
     25 => 'FocalUnits',
     28 => {
         Name => 'FlashActivity',
         ValueConv => '$val==-1 ? undef() : $val',
+        ValueConvInv => '$val',
     },
     29 => {
         Name => 'FlashBits',
@@ -350,6 +424,39 @@ $VERSION = '1.07';
     42 => {
         Name => 'ColorTone',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+    },
+);
+
+%Image::ExifTool::Canon::FocalLength = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    1 => {
+        Name => 'FocalLength',
+        # the EXIF FocalLength is more reliable, so it takes priority
+        Priority => 1,
+        PrintConv => '"${val}mm"',
+        PrintConvInv => '$val=~s/mm//;$val',
+    },
+    2 => { #4
+        Name => 'FocalPlaneXSize',
+        # focal plane image dimensions in 1/1000 inch -- convert to mm
+        ValueConv => '$val * 25.4 / 1000',
+        ValueConvInv => 'int($val * 1000 / 25.4 + 0.5)',
+        PrintConv => 'sprintf("%.2fmm",$val)',
+        PrintConvInv => '$val=~s/\s*mm.*//;$val',
+    },
+    3 => {
+        Name => 'FocalPlaneYSize',
+        ValueConv => '$val * 25.4 / 1000',
+        ValueConvInv => 'int($val * 1000 / 25.4 + 0.5)',
+        PrintConv => 'sprintf("%.2fmm",$val)',
+        PrintConvInv => '$val=~s/\s*mm.*//;$val',
     },
 );
 
@@ -368,12 +475,18 @@ $VERSION = '1.07';
         Description => 'ISO Speed',
         # lookup tables can't predict new values, so calculate ISO instead - PH
         ValueConv => 'exp(Image::ExifTool::Canon::CanonEv($val)*log(2))*100/32',
+        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(log($val*32/100)/log(2))',
         PrintConv => 'sprintf("%.0f",$val)',
+        PrintConvInv => '$val',
     },
+   # 4 => 'TargetAperture'; #2 ?
+   # 5 => 'TargetExposureTime'; #2 ?
     6 => {
         Name => 'ExposureCompensation',
         ValueConv => 'Image::ExifTool::Canon::CanonEv($val)',
+        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv($val)',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
     },
     7 => {
         Name => 'WhiteBalance',
@@ -394,7 +507,7 @@ $VERSION = '1.07';
     },
     9 => {
         Name => 'SequenceNumber',
-        Description => 'Sequence Number In Continuous Burst',
+        Description => 'Shot Number In Continuous Burst',
     },
     # AF points for Ixus and IxusV cameras - 02/17/04 M. Rommel
     14 => { #2
@@ -415,7 +528,9 @@ $VERSION = '1.07';
         Name => 'FlashExposureComp',
         Description => 'Flash Exposure Compensation',
         ValueConv => 'Image::ExifTool::Canon::CanonEv($val)',
+        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv($val)',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
     },
     16 => {
         Name => 'AutoExposureBracketing',
@@ -427,38 +542,48 @@ $VERSION = '1.07';
     17 => {
         Name => 'AEBBracketValue',
         ValueConv => 'Image::ExifTool::Canon::CanonEv($val)',
+        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv($val)',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
     },
     19 => {
         Name => 'FocusDistanceUpper',
         ValueConv => '$val * 0.01',
+        ValueConvInv => '$val / 0.01',
     },
     20 => {
         Name => 'FocusDistanceLower',
         ValueConv => '$val * 0.01',
+        ValueConvInv => '$val / 0.01',
     },
     21 => {
         Name => 'FNumber',
         Description => 'Aperture Value',
         # approximate big translation table by simple calculation - PH
         ValueConv => '$val ? exp(Image::ExifTool::Canon::CanonEv($val)*log(2)/2) : undef()',
+        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(log($val)*2/log(2))',
         PrintConv => 'sprintf("%.2g",$val)',
+        PrintConvInv => '$val',
     },
     22 => {
         Name => 'ExposureTime',
         Description => 'Shutter Speed',
         # approximate big translation table by simple calculation - PH
         ValueConv => '$val ? exp(-Image::ExifTool::Canon::CanonEv($val)*log(2)) : undef()',
+        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val)/log(2))',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
     },
     24 => {
         Name => 'BulbDuration',
         Format => 'int32s',
         ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
     },
     29 => {
         Name => 'Self-timer2',
         ValueConv => '$val >= 0 ? $val / 10 : undef()',
+        ValueConvInv => '$val',
     },
 );
 
@@ -468,7 +593,7 @@ $VERSION = '1.07';
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     WRITABLE => 1,
-    FORMAT => 'int16s',
+    FORMAT => 'int16u',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     2 => 'CanonImageWidth',
@@ -520,12 +645,14 @@ $VERSION = '1.07';
     6 => {
         Name => 'PreviewFocalPlaneXResolution',
         Format => 'rational32s',
-        PrintConv => 'sprintf("%.1f",$val)'
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
     },
     8 => {
         Name => 'PreviewFocalPlaneYResolution',
         Format => 'rational32s',
-        PrintConv => 'sprintf("%.1f",$val)'
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
     },
 # the following 2 values look like they are really 4 shorts
 # taking the values of 1,4,4 and 2 respectively - don't know what they are though
@@ -659,6 +786,73 @@ $VERSION = '1.07';
     },
 );
 
+%Image::ExifTool::Canon::FileInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int16s',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    1 => { #5
+        Name => 'FileNumber',
+        Condition => '$self->{CameraModel} =~ /20D/',
+        Format => 'int32u',
+        # Thanks to Juha Eskelinen for figuring this out:
+        # this is an odd bit mapping -- it looks like the file number exists as a
+        # 16-bit integer containing the high bits, followed by an 8-bit integer
+        # with the low bits.  But it is more convenient to have this in a single
+        # word, so some bit manipulations are necessary...
+        # The bit pattern of the 32-bit word is:
+        #   31....24 23....16 15.....8 7......0
+        #   00000000 ffffffff DDDDDDDD ddFFFFFF
+        #     0 = zero bits (not part of the file number?)
+        #     f/F = low/high bits of file number
+        #     d/D = low/high bits of directory number
+        # The directory and file number are then converted into decimal
+        # and separated by a '-' to give the file number used in the 20D
+        ValueConv => '(($val&0xffc0)>>6)*10000+(($val>>16)&0xff)+(($val&0x3f)<<8)',
+        ValueConvInv => q{
+            my $d = int($val/10000);
+            my $f = $val - $d * 10000;
+            return ($d << 6) + (($f & 0xff)<<16) + (($f >> 8) & 0x3f);
+        },
+        PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
+        PrintConvInv => '$val=~s/-//g;$val',
+    },
+);
+
+# these values are potentially useful to users of dcraw...
+%Image::ExifTool::Canon::WhiteBalance = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    # Note: Don't make this table writable because the absolute values
+    # of the numerator/denominators are crutial for generating the RAW
+    # image, and they aren't preserved when written as a simple rational
+    FORMAT => 'rational16u',
+    FIRST_ENTRY => 0,
+    PRINT_CONV => 'sprintf("%.5f",$val)',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # red,green1,green2,blue (ref 2)
+    0 => 'RedBalanceAuto',
+    1 => 'BlueBalanceAuto',
+    2 => 'RedBalanceDaylight',
+    3 => 'BlueBalanceDaylight',
+    4 => 'RedBalanceCloudy',
+    5 => 'BlueBalanceCloudy',
+    6 => 'RedBalanceTungsten',
+    7 => 'BlueBalanceTungsten',
+    8 => 'RedBalanceFluorescent',
+    9 => 'BlueBalanceFluorescent',
+    10 => 'RedBalanceFlash',
+    11 => 'BlueBalanceFlash',
+    12 => 'RedBalanceCustom',
+    13 => 'BlueBalanceCustom',
+    14 => 'RedBalanceB&W',
+    15 => 'BlueBalanceB&W',
+    16 => 'RedBalanceShade',
+    17 => 'BlueBalanceShade',
+);
+
 #------------------------------------------------------------------------------
 # Validate first word of Canon binary data
 # Inputs: 0) data pointer, 1) offset, 2-N) list of valid values
@@ -673,6 +867,27 @@ sub Validate($$@)
         return 1 if $val == $dataVal;
     }
     return undef;
+}
+
+#------------------------------------------------------------------------------
+# Validate CanonPictureInfo
+# Inputs: 0) data pointer, 1) offset, 2) size
+# Returns: true if data appears valid
+sub ValidatePictureInfo($$$)
+{
+    my ($dataPt, $offset, $size) = @_;
+    return 0 if $size < 46; # must be at least 46 bytes long
+    my $w1 = Image::ExifTool::Get16u($dataPt, $offset + 4);
+    my $h1 = Image::ExifTool::Get16u($dataPt, $offset + 6);
+    my $w2 = Image::ExifTool::Get16u($dataPt, $offset + 8);
+    my $h2 = Image::ExifTool::Get16u($dataPt, $offset + 10);
+    return 0 unless $h1 and $w1 and $h2 and $w2;
+    # validate by checking picture aspect ratio
+    return 0 if $w1 eq $h1;
+    my ($f1, $f2) = ($w1/$h1, $w2/$h2);
+    return 1 if abs(1-$f1/$f2) < 0.01;
+    return 1 if abs(1-$f1*$f2) < 0.01;
+    return 0;
 }
 
 #------------------------------------------------------------------------------
@@ -749,6 +964,33 @@ sub CanonEv($)
 }
 
 #------------------------------------------------------------------------------
+# Convert number to Canon hex-based EV (modulo 0x20)
+# Inputs: 0) number
+# Returns: Canon EV code
+sub CanonEvInv($)
+{
+    my $num = shift;
+    my $sign;
+    # temporarily make the number positive
+    if ($num < 0) {
+        $num = -$num;
+        $sign = -1;
+    } else {
+        $sign = 1;
+    }
+    my $val = int($num);
+    my $frac = $num - $val;
+    if (abs($frac - 0.33) < 0.05) {
+        $frac = 0x0c
+    } elsif (abs($frac - 0.67) < 0.05) {
+        $frac = 0x14;
+    } else {
+        $frac = int($frac * 0x20 + 0.5);
+    }
+    return $sign * ($val * 0x20 + $frac);
+}
+
+#------------------------------------------------------------------------------
 1;  # end
 
 __END__
@@ -779,14 +1021,17 @@ it under the same terms as Perl itself.
 
 =item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 
+=item http://www.wonderland.org/crw/
+
 =item (...plus lots of testing with my own camera!)
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks Michael Rommel and Daniel Pittman for the information
-they provided about the Digital Ixus and PowerShot S70 cameras.
+Thanks Michael Rommel and Daniel Pittman for the information they provided
+about the Digital Ixus and PowerShot S70 cameras, and Juha Eskelinen for
+figuring out the 20D FileNumber.
 
 =head1 SEE ALSO
 

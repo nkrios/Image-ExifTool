@@ -16,10 +16,10 @@ be stored in different places within a single format.  Couple this with the fact
 that many manufacturers store meta information in undocumented formats which
 must be reverse engineered, and you have a very complex situation.
 
-<p>ExifTool attempts to make this simplify this situation as much as possible by
-making reasonable decisions about where to write the information you specify,
-yet it maintains flexibility by allowing you to configure its priorities if
-necessary, or even override the decision making process entirely.
+<p>ExifTool attempts to simplify this situation as much as possible by making
+reasonable decisions about where to write the information you specify, yet it
+maintains flexibility by allowing you to configure its priorities if necessary,
+or even override the decision making process entirely.
 
 <h3>Background</h3>
 For a long time, I resisted adding write abilities to ExifTool even though it
@@ -89,10 +89,10 @@ will also create the tag in the preferred group if it didn't exist there before.
 By default, the preferred group is the first of the following where the tag is
 found: 1) EXIF, 2) GPS, 3) IPTC, 4) XMP, 5) MakerNotes.  Alternatively, the
 desired group can be specified so ExifTool only writes the tag to a single
-location.  Currently, only family 0 group names can be specified (EXIF, GPS,
-IPTC, XMP, MakerNotes), but I plan to eventually upgrade this so you can use
-family 1 group names to get more specific about where the information is written
-(IFD0, IFD1, XMP-dc, etc...).
+location.  Currently, family 0 group names (EXIF, GPS, IPTC, XMP, MakerNotes)
+and family 1 EXIF directory names (IFD0, IFD1, ExifIFD, GlobParamIFD,
+InteropIFD, SubIFD) may be specified, but I plan to eventually allow other
+family 1 group names to be used as well.
 
 <p>If a tag is added to a group that doesn't exist, the new group is created in
 the file.  Conversely, if the last tag is deleted from a group, the group is
@@ -114,7 +114,6 @@ didn't exist before.
 
 <ol>
 <li>Fix the preview image problem.
-<li>Add support for writing CRW files.
 <li>Write mandatory tags automatically when creating a new group.
 </ol>
 
