@@ -19,10 +19,20 @@ which the information is found.
 Anything but an &quot;N&quot; in this column means the tag is writable.  A &quot;Y&quot;
 indicates writable information that is either unformatted or written using
 the existing format.  Other expressions give details about the information
-format, and vary depending on the general type of information.  An asterisk
-(<code>*</code>) indicates that the information is not writable directly, but is set
-via a composite tag.  The HTML version of this document also lists possible
-<b>Values</b> for all tags which have a discrete set of values.
+format, and vary depending on the general type of information.  The format
+name may be followed by a number in square brackets to indicate the number
+of values written, or the number of characters in a fixed-length string
+(including a null terminator which is added if required).
+
+<p>An asterisk (<code>*</code>) indicates a &apos;protected&apos; tag which is not writable
+directly, but instead is set via a Composite tag.  A tilde (<code>~</code>) indicates
+a tag that is considered unsafe to write under normal circumstances.  These
+&apos;unsafe&apos; tags are not set when calling SetNewValuesFromFile() or when using
+the exiftool -AllTagsFromFile option, and care should be taken when editing
+them manually since they may affect the way an image is rendered.
+
+<p>The HTML version of this document also lists possible <b>Values</b> for all tags
+which have a discrete set of values, or gives <b>Notes</b> for some tags.
 
 <p><b>Note</b>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -113,56 +123,63 @@ ExifTool family 1 group names.  When writing EXIF information, the
 default <b>Group</b> listed below is used unless another group is specified.
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Group</th><th>Values</th></tr>
+<th>Writable</th><th>Group</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>InteropIndex</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>string~</td>
+<td align='center'>InteropIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0002</td>
 <td>InteropVersion</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>undef~</td>
+<td align='center'>InteropIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x00fe</td>
 <td>SubfileType</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td align='center'>int32u~</td>
+<td align='center'>IFD0</td>
+<td><font size='-1'>0 = Full-resolution Image
+  <br>1 = Reduced-resolution image
+  <br>2 = Single page of multi-page image
+  <br>3 = Single page of multi-page reduced-resolution image
+  <br>4 = Transparency mask
+  <br>5 = Transparency mask of reduced-resolution image
+  <br>6 = Transparency mask of multi-page image
+  <br>7 = Transparency mask of reduced-resolution multi-page image</font></td></tr>
 <tr valign='top'>
 <td>0x00ff</td>
 <td>OldSubfileType</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = Full-resolution image
   <br>2 = Reduced-resolution image
   <br>3 = Single page of multi-page image</font></td></tr>
 <tr valign='top'>
 <td>0x0100</td>
 <td>ImageWidth</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int32u~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0101</td>
 <td>ImageHeight</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int32u~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0102</td>
 <td>BitsPerSample</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u[3]~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0103</td>
 <td>Compression</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = Uncompressed
   <br>2 = CCITT 1D
   <br>3 = T4/Group 3 Fax
@@ -193,8 +210,8 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x0106</td>
 <td>PhotometricInterpretation</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>0 = WhiteIsZero
   <br>1 = BlackIsZero
   <br>2 = RGB
@@ -212,28 +229,28 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x0107</td>
 <td>Thresholding</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = No dithering or halftoning
   <br>2 = Ordered dither or halftone
   <br>3 = Randomized dither</font></td></tr>
 <tr valign='top'>
 <td>0x0108</td>
 <td>CellWidth</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0109</td>
 <td>CellLength</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x010a</td>
 <td>FillOrder</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = Normal
   <br>2 = Reversed</font></td></tr>
 <tr valign='top'>
@@ -262,10 +279,11 @@ default <b>Group</b> listed below is used unless another group is specified.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0111</td>
-<td>StripOffsets</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td>StripOffsets
+  <br>PreviewImageStart</td>
+<td align='center'>N<br>N</td>
+<td align='center'>-<br>-</td>
+<td><font size='-1'><font color="#666666">(PreviewImageStart in IFD0 of CR2 files)</font></font></td></tr>
 <tr valign='top'>
 <td>0x0112</td>
 <td>Orientation</td>
@@ -282,21 +300,22 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x0115</td>
 <td>SamplesPerPixel</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0116</td>
 <td>RowsPerStrip</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int32u~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0117</td>
-<td>StripByteCounts</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td>StripByteCounts
+  <br>PreviewImageLength</td>
+<td align='center'>N<br>N</td>
+<td align='center'>-<br>-</td>
+<td><font size='-1'><font color="#666666">(PreviewImageLength in IFD0 of CR2 files)</font></font></td></tr>
 <tr valign='top'>
 <td>0x0118</td>
 <td>MinSampleValue</td>
@@ -324,8 +343,8 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x011c</td>
 <td>PlanarConfiguration</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = Chunky
   <br>2 = Planar</font></td></tr>
 <tr valign='top'>
@@ -397,8 +416,14 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x0129</td>
 <td>PageNumber</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td align='center'>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x012c</td>
+<td>ColorResponseUnit</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x012d</td>
@@ -433,20 +458,20 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x013d</td>
 <td>Predictor</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = None
   <br>2 = Horizontal differencing</font></td></tr>
 <tr valign='top'>
 <td>0x013e</td>
 <td>WhitePoint</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[2]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x013f</td>
 <td>PrimaryChromaticities</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[6]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -458,20 +483,20 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x0141</td>
 <td>HalftoneHints</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0142</td>
 <td>TileWidth</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int32u~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0143</td>
 <td>TileLength</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int32u~</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0144</td>
@@ -742,8 +767,8 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x0212</td>
 <td>YCbCrSubSampling</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u[2]~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>&apos;1 1&apos; = YCbCr4:4:4
   <br>&apos;1 2&apos; = YCbCr4:4:0
   <br>&apos;2 1&apos; = YCbCr4:2:2
@@ -753,8 +778,8 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x0213</td>
 <td>YCbCrPositioning</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = Centered
   <br>2 = Co-sited</font></td></tr>
 <tr valign='top'>
@@ -784,14 +809,14 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x1001</td>
 <td>RelatedImageWidth</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>InteropIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x1002</td>
 <td>RelatedImageLength</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u~</td>
+<td align='center'>InteropIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x800d</td>
@@ -802,6 +827,30 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x80a4</td>
 <td>WangAnnotation</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x80e3</td>
+<td>Matteing</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x80e4</td>
+<td>DataType</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x80e5</td>
+<td>ImageDepth</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x80e6</td>
+<td>TileDepth</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
@@ -880,6 +929,96 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x8482</td>
 <td>ModelTiePoint</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e0</td>
+<td>Site</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e1</td>
+<td>ColorSequence</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e2</td>
+<td>IT8Header</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e3</td>
+<td>RasterPadding</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e4</td>
+<td>BitsPerRunLength</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e5</td>
+<td>BitsPerExtendedRunLength</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e6</td>
+<td>ColorTable</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e7</td>
+<td>ImageColorIndicator</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e8</td>
+<td>BackgroundColorIndicator</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84e9</td>
+<td>ImageColorValue</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84ea</td>
+<td>BackgroundColorValue</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84eb</td>
+<td>PixelIntensityRange</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84ec</td>
+<td>TransparencyIndicator</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84ed</td>
+<td>ColorCharacterization</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x84ee</td>
+<td>HCUsage</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
@@ -993,6 +1132,24 @@ default <b>Group</b> listed below is used unless another group is specified.
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x885c</td>
+<td>FaxRecvParams</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x885d</td>
+<td>FaxSubAddress</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x885e</td>
+<td>FaxRecvTime</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0x9000</td>
 <td>ExifVersion</td>
 <td align='center'>undef</td>
@@ -1013,8 +1170,8 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x9101</td>
 <td>ComponentsConfiguration</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>undef~</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9102</td>
@@ -1188,7 +1345,7 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x9214</td>
 <td>SubjectLocation</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1215,6 +1372,12 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>5 = Color sequential area
   <br>7 = Trilinear
   <br>8 = Color sequential linear</font></td></tr>
+<tr valign='top'>
+<td>0x923f</td>
+<td>StoNits</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x927c</td>
 <td>MakerNoteCanon
@@ -1407,7 +1570,7 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0xa214</td>
 <td>SubjectLocation</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1560,7 +1723,7 @@ default <b>Group</b> listed below is used unless another group is specified.
 <td>FilmProductCode</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(tags 0xc350-0xc41a, 0xc46c, 0xc46e are Kodak APP3 Meta tags)</font></font></td></tr>
 <tr valign='top'>
 <td>0xc351</td>
 <td>ImageSourceEK</td>
@@ -1798,7 +1961,7 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0xc612</td>
 <td>DNGVersion</td>
-<td align='center'>int8u</td>
+<td align='center'>int8u[4]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1874,19 +2037,19 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0xc61e</td>
 <td>DefaultScale</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[2]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc61f</td>
 <td>DefaultCropOrigin</td>
-<td align='center'>int32u</td>
+<td align='center'>int32u[2]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc620</td>
 <td>DefaultCropSize</td>
-<td align='center'>int32u</td>
+<td align='center'>int32u[2]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1982,7 +2145,7 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0xc630</td>
 <td>DNGLensInfo</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[4]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -2083,7 +2246,9 @@ default <b>Group</b> listed below is used unless another group is specified.
 <td>OwnerName</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(tags 0xfde8-0xfe58 are generated by Photoshop Camera RAW --
+                   some names are the same as other EXIF tags, but ExifTool will
+                   avoid writing these unless they already exist in the file)</font></font></td></tr>
 <tr valign='top'>
 <td>0xfde9</td>
 <td>SerialNumber</td>
@@ -2183,7 +2348,7 @@ XMP:Contrast is specified, information will be written to both
 XMP-crs:Contrast and XMP-exif:Contrast.
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag Name</th>
-<th>Writable</th><th>Group</th><th>Values</th></tr>
+<th>Writable</th><th>Group</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>Advisory</td>
 <td align='center'>string</td>
@@ -2300,7 +2465,8 @@ XMP-crs:Contrast and XMP-exif:Contrast.
 <td align='center'>exif</td>
 <td><font size='-1'>1 = sRGB
   <br>2 = Adobe RGB
-  <br>65535 = Uncalibrated</font></td></tr>
+  <br>65535 = Uncalibrated
+  <br>4294967295 = Uncalibrated</font></td></tr>
 <tr valign='top'>
 <td>ComponentsConfiguration</td>
 <td align='center'>string</td>
@@ -2839,9 +3005,10 @@ XMP-crs:Contrast and XMP-exif:Contrast.
 <td align='center'>exif</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>Identifier</td>
-<td align='center'>string</td>
-<td align='center'>dc</td>
+<td>Identifier
+  <br>Identifier</td>
+<td align='center'>string<br>string</td>
+<td align='center'>dc<br>xmp</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>ImageDescription</td>
@@ -3594,40 +3761,41 @@ XMP-crs:Contrast and XMP-exif:Contrast.
 The IPTC specification dictates a length for ASCII (<code>string</code> or <code>digits</code>)
 values.  These lengths are given in square brackets after the <b>Writable</b>
 format name.  For tags where a range of lengths is allowed, the minimum and
-maximum lengths are separated by a comma within the brackets.
+maximum lengths are separated by a comma within the brackets.  IPTC strings
+are not null terminated.
 
 <p>IPTC information is separated into different records, each of which has its
 own set of tags.
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Record</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>0x0001</td>
+<td align='right'>1</td>
 <td>IPTCEnvelope</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='#IPTC_EnvelopeRecord'>IPTC EnvelopeRecord Tags</a></td></tr>
 <tr valign='top'>
-<td>0x0002</td>
+<td align='right'>2</td>
 <td>IPTCApplication</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='#IPTC_ApplicationRecord'>IPTC ApplicationRecord Tags</a></td></tr>
 <tr valign='top'>
-<td>0x0003</td>
+<td align='right'>3</td>
 <td>IPTCNewsPhoto</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='#IPTC_NewsPhoto'>IPTC NewsPhoto Tags</a></td></tr>
 <tr valign='top'>
-<td>0x0007</td>
+<td align='right'>7</td>
 <td>IPTCPreObjectData</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='#IPTC_PreObjectData'>IPTC PreObjectData Tags</a></td></tr>
 <tr valign='top'>
-<td>0x0008</td>
+<td align='right'>8</td>
 <td>IPTCObjectData</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='#IPTC_ObjectData'>IPTC ObjectData Tags</a></td></tr>
 <tr valign='top'>
-<td>0x0009</td>
+<td align='right'>9</td>
 <td>IPTCPostObjectData</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='#IPTC_PostObjectData'>IPTC PostObjectData Tags</a></td></tr>
@@ -3636,19 +3804,19 @@ own set of tags.
 <h3><a name='IPTC_EnvelopeRecord'>IPTC EnvelopeRecord Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>0x0000</td>
+<td align='right'>0</td>
 <td>EnvelopeRecordVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0005</td>
+<td align='right'>5</td>
 <td>Destination</td>
 <td align='center'>string[0,1024]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0014</td>
+<td align='right'>20</td>
 <td>FileFormat</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = No ObjectData
@@ -3682,57 +3850,57 @@ own set of tags.
   <br>28 = Ritzaus Bureau NITF version (RBNITF DTD)
   <br>29 = Corel Draw [.CDR]</font></td></tr>
 <tr valign='top'>
-<td>0x0016</td>
+<td align='right'>22</td>
 <td>FileVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x001e</td>
+<td align='right'>30</td>
 <td>ServiceIdentifier</td>
 <td align='center'>string[0,10]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0028</td>
+<td align='right'>40</td>
 <td>EnvelopeNumber</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0032</td>
+<td align='right'>50</td>
 <td>ProductID</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x003c</td>
+<td align='right'>60</td>
 <td>EnvelopePriority</td>
 <td align='center'>digits[1]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0046</td>
+<td align='right'>70</td>
 <td>DateSent</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0050</td>
+<td align='right'>80</td>
 <td>TimeSent</td>
 <td align='center'>string[11]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x005a</td>
+<td align='right'>90</td>
 <td>CodedCharacterSet</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0064</td>
+<td align='right'>100</td>
 <td>UniqueObjectName</td>
 <td align='center'>string[14,80]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0078</td>
+<td align='right'>120</td>
 <td>ARMIdentifier</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x007a</td>
+<td align='right'>122</td>
 <td>ARMVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
@@ -3741,104 +3909,104 @@ own set of tags.
 <h3><a name='IPTC_ApplicationRecord'>IPTC ApplicationRecord Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>0x0000</td>
+<td align='right'>0</td>
 <td>ApplicationRecordVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0003</td>
+<td align='right'>3</td>
 <td>ObjectTypeReference</td>
 <td align='center'>string[3,67]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0004</td>
+<td align='right'>4</td>
 <td>ObjectAttributeReference</td>
 <td align='center'>string[4,68]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0005</td>
+<td align='right'>5</td>
 <td>ObjectName</td>
 <td align='center'>string[0,64]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0007</td>
+<td align='right'>7</td>
 <td>EditStatus</td>
 <td align='center'>string[0,64]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0008</td>
+<td align='right'>8</td>
 <td>EditorialUpdate</td>
 <td align='center'>digits[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x000a</td>
+<td align='right'>10</td>
 <td>Urgency</td>
 <td align='center'>digits[1]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x000c</td>
+<td align='right'>12</td>
 <td>SubjectReference</td>
 <td align='center'>string[13,236]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x000f</td>
+<td align='right'>15</td>
 <td>Category</td>
 <td align='center'>string[0,3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0014</td>
+<td align='right'>20</td>
 <td>SupplementalCategories</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0016</td>
+<td align='right'>22</td>
 <td>FixtureIdentifier</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0019</td>
+<td align='right'>25</td>
 <td>Keywords</td>
 <td align='center'>string[0,64]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x001a</td>
+<td align='right'>26</td>
 <td>ContentLocationCode</td>
 <td align='center'>string[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x001b</td>
+<td align='right'>27</td>
 <td>ContentLocationName</td>
 <td align='center'>string[0,64]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x001e</td>
+<td align='right'>30</td>
 <td>ReleaseDate</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0023</td>
+<td align='right'>35</td>
 <td>ReleaseTime</td>
 <td align='center'>digits[11]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0025</td>
+<td align='right'>37</td>
 <td>ExpirationDate</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0026</td>
+<td align='right'>38</td>
 <td>ExpirationTime</td>
 <td align='center'>digits[11]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0028</td>
+<td align='right'>40</td>
 <td>SpecialInstructions</td>
 <td align='center'>string[0,256]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x002a</td>
+<td align='right'>42</td>
 <td>ActionAdvised</td>
 <td align='center'>digits[2]</td>
 <td><font size='-1'>01 = Object Kill
@@ -3846,156 +4014,156 @@ own set of tags.
   <br>03 = Ojbect Append
   <br>04 = Object Reference</font></td></tr>
 <tr valign='top'>
-<td>0x002d</td>
+<td align='right'>45</td>
 <td>ReferenceService</td>
 <td align='center'>string[0,10]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x002f</td>
+<td align='right'>47</td>
 <td>ReferenceDate</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0032</td>
+<td align='right'>50</td>
 <td>ReferenceNumber</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0037</td>
+<td align='right'>55</td>
 <td>DateCreated</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x003c</td>
+<td align='right'>60</td>
 <td>TimeCreated</td>
 <td align='center'>digits[11]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x003e</td>
+<td align='right'>62</td>
 <td>DigitalCreationDate</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x003f</td>
+<td align='right'>63</td>
 <td>DigitalCreationTime</td>
 <td align='center'>digits[11]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0041</td>
+<td align='right'>65</td>
 <td>OriginatingProgram</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0046</td>
+<td align='right'>70</td>
 <td>ProgramVersion</td>
 <td align='center'>string[0,10]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x004b</td>
+<td align='right'>75</td>
 <td>ObjectCycle</td>
 <td align='center'>string[1]</td>
 <td><font size='-1'>&apos;a&apos; = Morning
   <br>&apos;b&apos; = Both Morning and Evening
   <br>&apos;p&apos; = Evening</font></td></tr>
 <tr valign='top'>
-<td>0x0050</td>
+<td align='right'>80</td>
 <td>By-line</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0055</td>
+<td align='right'>85</td>
 <td>By-lineTitle</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x005a</td>
+<td align='right'>90</td>
 <td>City</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x005c</td>
+<td align='right'>92</td>
 <td>Sub-location</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x005f</td>
+<td align='right'>95</td>
 <td>Province-State</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0064</td>
+<td align='right'>100</td>
 <td>Country-PrimaryLocationCode</td>
 <td align='center'>string[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0065</td>
+<td align='right'>101</td>
 <td>Country-PrimaryLocationName</td>
 <td align='center'>string[0,64]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0067</td>
+<td align='right'>103</td>
 <td>OriginalTransmissionReference</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0069</td>
+<td align='right'>105</td>
 <td>Headline</td>
 <td align='center'>string[0,256]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x006e</td>
+<td align='right'>110</td>
 <td>Credit</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0073</td>
+<td align='right'>115</td>
 <td>Source</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0074</td>
+<td align='right'>116</td>
 <td>CopyrightNotice</td>
 <td align='center'>string[0,128]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0076</td>
+<td align='right'>118</td>
 <td>Contact</td>
 <td align='center'>string[0,128]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0078</td>
+<td align='right'>120</td>
 <td>Caption-Abstract</td>
 <td align='center'>string[0,2000]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x007a</td>
+<td align='right'>122</td>
 <td>Writer-Editor</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x007d</td>
+<td align='right'>125</td>
 <td>RasterizedCaption</td>
 <td align='center'>string[7360]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0082</td>
+<td align='right'>130</td>
 <td>ImageType</td>
 <td align='center'>string[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0083</td>
+<td align='right'>131</td>
 <td>ImageOrientation</td>
 <td align='center'>string[1]</td>
 <td><font size='-1'>&apos;L&apos; = Landscape
   <br>&apos;P&apos; = Portrait
   <br>&apos;S&apos; = Square</font></td></tr>
 <tr valign='top'>
-<td>0x0087</td>
+<td align='right'>135</td>
 <td>LanguageIdentifier</td>
 <td align='center'>string[2,3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0096</td>
+<td align='right'>150</td>
 <td>AudioType</td>
 <td align='center'>string[2]</td>
 <td><font size='-1'>&apos;0T&apos; = Text Only
@@ -4016,27 +4184,27 @@ own set of tags.
   <br>&apos;2V&apos; = Stereo Voicer
   <br>&apos;2W&apos; = Stereo Wrap</font></td></tr>
 <tr valign='top'>
-<td>0x0097</td>
+<td align='right'>151</td>
 <td>AudioSamplingRate</td>
 <td align='center'>digits[6]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0098</td>
+<td align='right'>152</td>
 <td>AudioSamplingResolution</td>
 <td align='center'>digits[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0099</td>
+<td align='right'>153</td>
 <td>AudioDuration</td>
 <td align='center'>digits[6]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x009a</td>
+<td align='right'>154</td>
 <td>AudioOutcue</td>
 <td align='center'>string[0,64]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x00c8</td>
+<td align='right'>200</td>
 <td>ObjectPreviewFileFormat</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = No ObjectData
@@ -4070,12 +4238,12 @@ own set of tags.
   <br>28 = Ritzaus Bureau NITF version (RBNITF DTD)
   <br>29 = Corel Draw [.CDR]</font></td></tr>
 <tr valign='top'>
-<td>0x00c9</td>
+<td align='right'>201</td>
 <td>ObjectPreviewFileVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x00ca</td>
+<td align='right'>202</td>
 <td>ObjectPreviewData</td>
 <td align='center'>string[0,256000]</td>
 <td>&nbsp;</td></tr>
@@ -4084,39 +4252,39 @@ own set of tags.
 <h3><a name='IPTC_NewsPhoto'>IPTC NewsPhoto Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>0x0000</td>
+<td align='right'>0</td>
 <td>NewsPhotoVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x000a</td>
+<td align='right'>10</td>
 <td>IPTCPictureNumber</td>
-<td align='center'>string[0,16]</td>
-<td>&nbsp;</td></tr>
+<td align='center'>string[16]</td>
+<td><font size='-1'><font color="#666666">(4 numbers: 1-Manufacturer ID, 2-Equipment ID, 3-Date, 4-Sequence)</font></font></td></tr>
 <tr valign='top'>
-<td>0x0014</td>
+<td align='right'>20</td>
 <td>IPTCImageWidth</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x001e</td>
+<td align='right'>30</td>
 <td>IPTCImageHeight</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0028</td>
+<td align='right'>40</td>
 <td>IPTCPixelWidth</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0032</td>
+<td align='right'>50</td>
 <td>IPTCPixelHeight</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0037</td>
+<td align='right'>55</td>
 <td>SupplementalType</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = Main Image
@@ -4124,12 +4292,25 @@ own set of tags.
   <br>2 = Logo
   <br>3 = Rasterized Caption</font></td></tr>
 <tr valign='top'>
-<td>0x003c</td>
+<td align='right'>60</td>
 <td>ColorRepresentation</td>
-<td align='center'>int8u</td>
-<td>&nbsp;</td></tr>
+<td align='center'>int16u</td>
+<td><font size='-1'>0x0 = No Image, Single Frame
+  <br>0x100 = Monochrome, Single Frame
+  <br>0x300 = 3 Components, Single Frame
+  <br>0x301 = 3 Components, Frame Sequential in Multiple Objects
+  <br>0x302 = 3 Components, Frame Sequential in One Object
+  <br>0x303 = 3 Components, Line Sequential
+  <br>0x304 = 3 Components, Pixel Sequential
+  <br>0x305 = 3 Components, Special Interleaving
+  <br>0x400 = 4 Components, Single Frame
+  <br>0x401 = 4 Components, Frame Sequential in Multiple Objects
+  <br>0x402 = 4 Components, Frame Sequential in One Object
+  <br>0x403 = 4 Components, Line Sequential
+  <br>0x404 = 4 Components, Pixel Sequential
+  <br>0x405 = 4 Components, Special Interleaving</font></td></tr>
 <tr valign='top'>
-<td>0x0040</td>
+<td align='right'>64</td>
 <td>InterchangeColorSpace</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>1 = X,Y,Z CIE
@@ -4141,29 +4322,49 @@ own set of tags.
   <br>7 = YCbCr
   <br>8 = sRGB</font></td></tr>
 <tr valign='top'>
-<td>0x0041</td>
+<td align='right'>65</td>
 <td>ColorSequence</td>
 <td align='center'>int8u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0054</td>
+<td align='right'>66</td>
+<td>ICCProfile</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>70</td>
+<td>ColorCalibrationMatrix</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>80</td>
+<td>LookupTable</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>84</td>
 <td>NumIndexEntries</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0056</td>
+<td align='right'>85</td>
+<td>ColorPalette</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>86</td>
 <td>IPTCBitsPerSample</td>
 <td align='center'>int8u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x005a</td>
+<td align='right'>90</td>
 <td>SampleStructure</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = OrthogonalConstangSampling
   <br>1 = Orthogonal4-2-2Sampling
   <br>2 = CompressionDependent</font></td></tr>
 <tr valign='top'>
-<td>0x0064</td>
+<td align='right'>100</td>
 <td>ScanningDirection</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = L-R, Top-Bottom
@@ -4175,7 +4376,7 @@ own set of tags.
   <br>6 = Top-Bottom, R-L
   <br>7 = Bottom-Top, R-L</font></td></tr>
 <tr valign='top'>
-<td>0x0066</td>
+<td align='right'>102</td>
 <td>IPTCImageRotation</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = 0
@@ -4183,12 +4384,12 @@ own set of tags.
   <br>2 = 180
   <br>3 = 270</font></td></tr>
 <tr valign='top'>
-<td>0x006e</td>
+<td align='right'>110</td>
 <td>DataCompressionMethod</td>
-<td align='center'>int8u</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0078</td>
+<td align='right'>120</td>
 <td>QuantizationMethod</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = Linear Reflectance/Transmittance
@@ -4200,45 +4401,55 @@ own set of tags.
   <br>6 = Color Space Specific
   <br>7 = Gamma Compensated</font></td></tr>
 <tr valign='top'>
-<td>0x007d</td>
+<td align='right'>125</td>
 <td>EndPoints</td>
-<td align='center'>int8u</td>
+<td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x0082</td>
+<td align='right'>130</td>
 <td>ExcursionTolerance</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = Not Allowed
   <br>1 = Allowed</font></td></tr>
 <tr valign='top'>
-<td>0x0087</td>
+<td align='right'>135</td>
 <td>BitsPerComponent</td>
 <td align='center'>int8u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>140</td>
+<td>MaximumDensityRange</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>145</td>
+<td>GammaCompensatedValue</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 </table></blockquote>
 
 <h3><a name='IPTC_PreObjectData'>IPTC PreObjectData Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>0x000a</td>
+<td align='right'>10</td>
 <td>SizeMode</td>
 <td align='center'>N</td>
 <td><font size='-1'>0 = Size Not Known
   <br>1 = Size Known</font></td></tr>
 <tr valign='top'>
-<td>0x0014</td>
+<td align='right'>20</td>
 <td>MaxSubfileSize</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x005a</td>
+<td align='right'>90</td>
 <td>ObjectSizeAnnounced</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x005f</td>
+<td align='right'>95</td>
 <td>MaximumObjectSize</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
@@ -4247,9 +4458,9 @@ own set of tags.
 <h3><a name='IPTC_ObjectData'>IPTC ObjectData Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>0x000a</td>
+<td align='right'>10</td>
 <td>SubFile</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
@@ -4258,9 +4469,9 @@ own set of tags.
 <h3><a name='IPTC_PostObjectData'>IPTC PostObjectData Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>0x000a</td>
+<td align='right'>10</td>
 <td>ConfirmedObjectSize</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
@@ -4269,7 +4480,7 @@ own set of tags.
 <h3><a name='ICC_Profile'>ICC_Profile Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'A2B0'</td>
 <td>AToB0</td>
@@ -4566,7 +4777,7 @@ own set of tags.
 <h3><a name='ICC_Profile_Header'>ICC_Profile Header Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>4</td>
 <td>ProfileCMMType</td>
@@ -4665,7 +4876,7 @@ own set of tags.
 <h3><a name='ICC_Profile_Chromaticity'>ICC_Profile Chromaticity Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>8</td>
 <td>ChromaticityChannels</td>
@@ -4704,7 +4915,7 @@ own set of tags.
 <h3><a name='ICC_Profile_ColorantTable'>ICC_Profile ColorantTable Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>8</td>
 <td>ColorantCount</td>
@@ -4745,7 +4956,7 @@ own set of tags.
 <h3><a name='ICC_Profile_Measurement'>ICC_Profile Measurement Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>8</td>
 <td>MeasurementObserver</td>
@@ -4785,7 +4996,7 @@ own set of tags.
 <h3><a name='ICC_Profile_ViewingConditions'>ICC_Profile ViewingConditions Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>8</td>
 <td>ViewingCondIlluminant</td>
@@ -4811,35 +5022,41 @@ own set of tags.
 </table></blockquote>
 
 <h3><a name='GPS'>GPS Tags</a></h3>
+
+ExifTool is very flexible about the input format for lat/long coordinates,
+and will accept 3 floating point numbers separated by just about anything.
+Many other GPS tags have values which are fixed-length strings.  For these,
+the indicated string lengths include a null terminator which is added
+automatically by ExifTool.
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>GPSVersionID</td>
-<td align='center'>int8u</td>
+<td align='center'>int8u[4]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>GPSLatitudeRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;N&apos; = North
   <br>&apos;S&apos; = South</font></td></tr>
 <tr valign='top'>
 <td>0x0002</td>
 <td>GPSLatitude</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0003</td>
 <td>GPSLongitudeRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;E&apos; = East
   <br>&apos;W&apos; = West</font></td></tr>
 <tr valign='top'>
 <td>0x0004</td>
 <td>GPSLongitude</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0005</td>
@@ -4855,7 +5072,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0007</td>
 <td>GPSTimeStamp</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0008</td>
@@ -4865,13 +5082,13 @@ own set of tags.
 <tr valign='top'>
 <td>0x0009</td>
 <td>GPSStatus</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;A&apos; = Measurement In Progress
   <br>&apos;V&apos; = Measurement Interoperability</font></td></tr>
 <tr valign='top'>
 <td>0x000a</td>
 <td>GPSMeasureMode</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>2 = 2-Dimensional Measurement
   <br>3 = 3-Dimensional Measurement</font></td></tr>
 <tr valign='top'>
@@ -4882,7 +5099,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x000c</td>
 <td>GPSSpeedRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;K&apos; = km/h
   <br>&apos;M&apos; = mph
   <br>&apos;N&apos; = knots</font></td></tr>
@@ -4894,7 +5111,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x000e</td>
 <td>GPSTrackRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;M&apos; = Magnetic North
   <br>&apos;T&apos; = True North</font></td></tr>
 <tr valign='top'>
@@ -4905,7 +5122,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0010</td>
 <td>GPSImgDirectionRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;M&apos; = Magnetic North
   <br>&apos;T&apos; = True North</font></td></tr>
 <tr valign='top'>
@@ -4921,29 +5138,29 @@ own set of tags.
 <tr valign='top'>
 <td>0x0013</td>
 <td>GPSDestLatitudeRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;N&apos; = North
   <br>&apos;S&apos; = South</font></td></tr>
 <tr valign='top'>
 <td>0x0014</td>
 <td>GPSDestLatitude</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0015</td>
 <td>GPSDestLongitudeRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;E&apos; = East
   <br>&apos;W&apos; = West</font></td></tr>
 <tr valign='top'>
 <td>0x0016</td>
 <td>GPSDestLongitude</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0017</td>
 <td>GPSDestBearingRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;M&apos; = Magnetic North
   <br>&apos;T&apos; = True North</font></td></tr>
 <tr valign='top'>
@@ -4954,7 +5171,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0019</td>
 <td>GPSDestDistanceRef</td>
-<td align='center'>string</td>
+<td align='center'>string[2]</td>
 <td><font size='-1'>&apos;K&apos; = Kilometers
   <br>&apos;M&apos; = Miles
   <br>&apos;N&apos; = Nautical Miles</font></td></tr>
@@ -4976,7 +5193,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x001d</td>
 <td>GPSDateStamp</td>
-<td align='center'>string</td>
+<td align='center'>string[11]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x001e</td>
@@ -4989,7 +5206,7 @@ own set of tags.
 <h3><a name='Canon'>Canon Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>CanonCameraSettings</td>
@@ -5089,7 +5306,7 @@ own set of tags.
 <h3><a name='Canon_CameraSettings'>Canon CameraSettings Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>1</td>
 <td>MacroMode</td>
@@ -5326,7 +5543,7 @@ own set of tags.
 <h3><a name='Canon_FocalLength'>Canon FocalLength Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>1</td>
 <td>FocalLength</td>
@@ -5347,7 +5564,7 @@ own set of tags.
 <h3><a name='Canon_ShotInfo'>Canon ShotInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>2</td>
 <td>ISO</td>
@@ -5451,7 +5668,7 @@ own set of tags.
 <h3><a name='Canon_ColorInfoD30'>Canon ColorInfoD30 Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>9</td>
 <td>ColorTemperature</td>
@@ -5467,7 +5684,7 @@ own set of tags.
 <h3><a name='CanonCustom_Functions10D'>CanonCustom Functions10D Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>SetButtonFunction</td>
@@ -5599,7 +5816,7 @@ own set of tags.
 <h3><a name='CanonCustom_Functions20D'>CanonCustom Functions20D Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>SetFunctionWhenShooting</td>
@@ -5727,7 +5944,7 @@ own set of tags.
 <h3><a name='CanonCustom_Functions'>CanonCustom Functions Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>LongExposureNoiseReduction</td>
@@ -5831,7 +6048,7 @@ own set of tags.
 <h3><a name='Canon_PictureInfo'>Canon PictureInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>2</td>
 <td>CanonImageWidth</td>
@@ -5862,7 +6079,7 @@ own set of tags.
 <h3><a name='CanonCustom_Functions1D'>CanonCustom Functions1D Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>FocusingScreen</td>
@@ -6019,7 +6236,7 @@ own set of tags.
 <h3><a name='Canon_FileInfo'>Canon FileInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>1</td>
 <td>FileNumber</td>
@@ -6030,7 +6247,7 @@ own set of tags.
 <h3><a name='Canon_ColorInfo'>Canon ColorInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>9</td>
 <td>ColorTemperature</td>
@@ -6041,7 +6258,7 @@ own set of tags.
 <h3><a name='Canon_WhiteBalance'>Canon WhiteBalance Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>RedBalanceAuto</td>
@@ -6137,7 +6354,7 @@ own set of tags.
 <h3><a name='Canon_PreviewImageInfo'>Canon PreviewImageInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>2</td>
 <td>PreviewImageLength</td>
@@ -6173,7 +6390,7 @@ own set of tags.
 <h3><a name='Casio_Type1'>Casio Type1 Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>RecordingMode</td>
@@ -6270,16 +6487,16 @@ own set of tags.
 <h3><a name='Casio_Type2'>Casio Type2 Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0002</td>
 <td>PreviewImageSize</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0003</td>
 <td>CasioPreviewLength</td>
-<td align='center'>Y</td>
+<td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0004</td>
@@ -6367,7 +6584,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x2011</td>
 <td>WhiteBalanceBias</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x2012</td>
@@ -6448,13 +6665,13 @@ own set of tags.
 <h3><a name='PrintIM'>PrintIM Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 </table></blockquote>
 
 <h3><a name='FujiFilm'>FujiFilm Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>Version</td>
@@ -6569,11 +6786,11 @@ own set of tags.
 <h3><a name='Olympus'>Olympus Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0200</td>
 <td>SpecialMode</td>
-<td align='center'>int32u</td>
+<td align='center'>int32u[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0201</td>
@@ -6585,7 +6802,8 @@ own set of tags.
   <br>4 = RAW
   <br>0 = SQ
   <br>1 = HQ
-  <br>2 = SHQ</font></td></tr>
+  <br>2 = SHQ
+  <br>6 = RAW</font></td></tr>
 <tr valign='top'>
 <td>0x0202</td>
 <td>Macro</td>
@@ -6635,19 +6853,19 @@ own set of tags.
 <tr valign='top'>
 <td>0x1017</td>
 <td>RedBalance</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x1018</td>
 <td>BlueBalance</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 </table></blockquote>
 
 <h3><a name='Panasonic'>Panasonic Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>ImageQuality</td>
@@ -6659,7 +6877,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0002</td>
 <td>FirmwareVersion</td>
-<td align='center'>int8u</td>
+<td align='center'>int8u[4]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0003</td>
@@ -6681,7 +6899,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x000f</td>
 <td>SpotMode</td>
-<td align='center'>int8u</td>
+<td align='center'>int8u[2]</td>
 <td><font size='-1'>&apos;0 1&apos; = Spot Mode On
   <br>&apos;0 16&apos; = Spot Mode Off</font></td></tr>
 <tr valign='top'>
@@ -6778,7 +6996,7 @@ own set of tags.
 <h3><a name='Pentax'>Pentax Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>PentaxMode</td>
@@ -6789,7 +7007,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0002</td>
 <td>PreviewImageSize</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0003</td>
@@ -6925,12 +7143,12 @@ own set of tags.
 <tr valign='top'>
 <td>0x0039</td>
 <td>RawImageSize</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x003f</td>
 <td>LensType</td>
-<td align='center'>int8u</td>
+<td align='center'>int8u[2]</td>
 <td><font size='-1'>&apos;1 0&apos; = K,M Lens
   <br>&apos;3 0&apos; = SIGMA
   <br>&apos;3 17&apos; = smc PENTAX-FA SOFT 85mmF2.8
@@ -7027,7 +7245,7 @@ own set of tags.
 <h3><a name='Nikon'>Nikon Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>FileSystemVersion</td>
@@ -7036,7 +7254,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0002</td>
 <td>ISO</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0003</td>
@@ -7106,7 +7324,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0013</td>
 <td>ISOSetting</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0016</td>
@@ -7146,7 +7364,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0084</td>
 <td>Lens</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational32u[4]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0085</td>
@@ -7247,7 +7465,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0099</td>
 <td>NEFThumbnailSize</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x00a0</td>
@@ -7289,7 +7507,7 @@ own set of tags.
 <h3><a name='Nikon_PreviewImage'>Nikon PreviewImage Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0103</td>
 <td>Compression</td>
@@ -7359,7 +7577,7 @@ own set of tags.
 <h3><a name='Nikon_ColorBalanceD70'>Nikon ColorBalanceD70 Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>RedBalance</td>
@@ -7375,7 +7593,7 @@ own set of tags.
 <h3><a name='Nikon_ColorBalanceD2H'>Nikon ColorBalanceD2H Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>RedBalance</td>
@@ -7391,7 +7609,7 @@ own set of tags.
 <h3><a name='Nikon_ColorBalanceD100'>Nikon ColorBalanceD100 Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>RedBalance</td>
@@ -7407,7 +7625,7 @@ own set of tags.
 <h3><a name='Nikon_NikonCaptureOffsets'>Nikon NikonCaptureOffsets Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>IFD0_Offset</td>
@@ -7428,7 +7646,7 @@ own set of tags.
 <h3><a name='Minolta'>Minolta Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>MakerNoteVersion</td>
@@ -7513,7 +7731,7 @@ own set of tags.
 <h3><a name='Minolta_CameraSettings'>Minolta CameraSettings Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>1</td>
 <td>ExposureMode</td>
@@ -7818,7 +8036,7 @@ own set of tags.
 <h3><a name='Sanyo'>Sanyo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x00ff</td>
 <td>MakerNoteOffset</td>
@@ -7832,7 +8050,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0200</td>
 <td>SpecialMode</td>
-<td align='center'>int32u</td>
+<td align='center'>int32u[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0201</td>
@@ -7865,7 +8083,7 @@ own set of tags.
 <tr valign='top'>
 <td>0x0202</td>
 <td>Macro</td>
-<td align='center'>in16u</td>
+<td align='center'>int16u</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Macro
   <br>2 = View
@@ -8010,7 +8228,7 @@ own set of tags.
 <h3><a name='Sigma'>Sigma Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0002</td>
 <td>SerialNumber</td>
@@ -8131,7 +8349,7 @@ own set of tags.
 <h3><a name='Sony'>Sony Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
@@ -8142,7 +8360,7 @@ own set of tags.
 <h3><a name='Unknown'>Unknown Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
@@ -8153,7 +8371,7 @@ own set of tags.
 <h3><a name='Kodak_SpecialEffects'>Kodak SpecialEffects Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>DigitalEffectsVersion</td>
@@ -8174,7 +8392,7 @@ own set of tags.
 <h3><a name='Kodak_Borders'>Kodak Borders Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>BordersVersion</td>
@@ -8211,11 +8429,11 @@ own set of tags.
 
 When writing CanonRaw information, the length of the information is
 preserved (and the new information is truncated or padded as required)
-unless <b>Writable</b> is <code>resize</code>.  Currently, only JpgFromRaw is allowed to
-change size.
+unless <b>Writable</b> is <code>resize</code>.  Currently, only JpgFromRaw and
+ThumbnailImage are allowed to change size.
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>NullRecord</td>
@@ -8431,6 +8649,11 @@ change size.
 <td align='center'>resize</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x2008</td>
+<td>ThumbnailImage</td>
+<td align='center'>resize</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0x2804</td>
 <td>ImageDescription</td>
 <td align='center'>-</td>
@@ -8470,7 +8693,7 @@ change size.
 <h3><a name='CanonRaw_MakeModel'>CanonRaw MakeModel Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>Make</td>
@@ -8486,7 +8709,7 @@ change size.
 <h3><a name='CanonRaw_SensorInfo'>CanonRaw SensorInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>1</td>
 <td>SensorWidth</td>
@@ -8522,7 +8745,7 @@ change size.
 <h3><a name='CanonRaw_ImageFormat'>CanonRaw ImageFormat Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>FileFormat</td>
@@ -8541,7 +8764,7 @@ change size.
 <h3><a name='CanonRaw_TimeStamp'>CanonRaw TimeStamp Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>DateTimeOriginal</td>
@@ -8562,7 +8785,7 @@ change size.
 <h3><a name='CanonRaw_ImageInfo'>CanonRaw ImageInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>ImageWidth</td>
@@ -8603,7 +8826,7 @@ change size.
 <h3><a name='CanonRaw_FlashInfo'>CanonRaw FlashInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>FlashGuideNumber</td>
@@ -8619,7 +8842,7 @@ change size.
 <h3><a name='CanonRaw_ExposureInfo'>CanonRaw ExposureInfo Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>ExposureCompensation</td>
@@ -8640,7 +8863,7 @@ change size.
 <h3><a name='Photoshop'>Photoshop Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x03ee</td>
 <td>AlphaChannelsNames</td>
@@ -8671,7 +8894,7 @@ change size.
 <h3><a name='Photoshop_JPEG_Quality'>Photoshop JPEG_Quality Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>PhotoshopQuality</td>
@@ -8696,7 +8919,7 @@ change size.
 <h3><a name='GeoTiff'>GeoTiff Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>GeoTiffVersion</td>
@@ -10913,7 +11136,7 @@ change size.
 <h3><a name='Jpeg2000'>Jpeg2000 Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'asoc'</td>
 <td>Association</td>
@@ -11142,7 +11365,7 @@ change size.
 <h3><a name='Jpeg2000_ImageHeader'>Jpeg2000 ImageHeader Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>ImageHeight</td>
@@ -11181,7 +11404,7 @@ change size.
 <h3><a name='Jpeg2000_CaptureResolution'>Jpeg2000 CaptureResolution Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>CaptureYResolution</td>
@@ -11225,7 +11448,7 @@ change size.
 <h3><a name='Jpeg2000_DisplayResolution'>Jpeg2000 DisplayResolution Tags</a></h3>
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>DisplayYResolution</td>
@@ -11272,11 +11495,11 @@ The extra tags represent information found in the image but not associated
 with any other tag group.
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag Name</th>
-<th>Writable</th><th>Values</th></tr>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>Comment</td>
 <td align='center'>Y</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(comment embedded in JPEG or GIF89a image)</font></font></td></tr>
 <tr valign='top'>
 <td>Error</td>
 <td align='center'>N</td>
@@ -11326,7 +11549,7 @@ These are convenience tags which are calculated after all other information
 is extracted.
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Tag Name</th>
-<th>Writable</th><th>Derived From</th><th>Values</th></tr>
+<th>Writable</th><th>Derived From</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>Aperture</td>
 <td align='center'>N</td>
@@ -11376,7 +11599,7 @@ is extracted.
 <td align='center'>N</td>
 <td>FocalLength
   <br>ScaleFactor35efl</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(this value may be incorrect if image has been resized)</font></font></td></tr>
 <tr valign='top'>
 <td>GPSDateTime</td>
 <td align='center'>N</td>
@@ -11451,7 +11674,7 @@ is extracted.
   <br>ExifImageLength
   <br>ImageWidth
   <br>ImageHeight</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(this value may be incorrect if image has been resized)</font></font></td></tr>
 <tr valign='top'>
 <td>ShootingMode</td>
 <td align='center'>N</td>
@@ -11482,6 +11705,6 @@ is extracted.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 1, 2005</i>
+<br><i>Last revised Mar 15, 2005</i>
 </body>
 </html>

@@ -172,16 +172,14 @@ simple example to print out the information returned by B<ImageInfo>:
         print "$_ => $$info{$_}\n";
     }
 
-With the PrintConv option enabled, values of the returned hash are usually
-simple scalars but a scalar reference is used to indicate binary data. Also,
-the value may be an array reference if the List option is set.  With the
-List option disabled (the default), list values are joined by commas into a
-single string.  Note that binary values are not necessarily extracted unless
-specifically requested or the Binary option is set.  If not extracted the
-value is a reference to a string of the form "Binary data ##### bytes".
-
-With the PrintConv option disabled, the values are either simple scalars or
-array references to indicate lists of values.
+Values of the returned hash are usually simple scalars, but a scalar
+reference is used to indicate binary data and an array reference may be used
+to indicate a list.  Lists of values are joined by commas into a single
+string if and only if the PrintConv option is enabled and the List option is
+disabled (which are the defaults).  Note that binary values are not
+necessarily extracted unless specifically requested or the Binary option is
+set.  If not extracted the value is a reference to a string of the form
+"Binary data ##### bytes".
 
 The code below gives an example of how to handle these return values, as
 well as illustrating the use of other ExifTool functions:
@@ -437,8 +435,9 @@ Reference to information hash, the same as with B<ImageInfo>.
 =head2 WriteInfo
 
 Write meta information to a file.  The specified source file is rewritten to
-the destination file.  The meta information in the file new file is changed
-as specified by previous calls to B<SetNewValue>.
+the destination file with the new information specified in previous calls to
+B<SetNewValue>.  The necessary segments and/or directories are created in
+the destination file as required to store the specified information.
 
     $exifTool->WriteInfo($srcfile, $dstfile);
 
@@ -577,8 +576,8 @@ is by default), or if the values form a list.  In the case of a list of
 values (as can happen with the 'Keywords' tag for instance), PrintConv
 returns a comma-separated string of values, while ValueConv returns a
 reference to an array of values or the array itself in list context. The
-PrintConv values are the values returned by B<ImageInfo> and B<GetInfo> in the
-tag/value hash.
+PrintConv values are the values returned by B<ImageInfo> and B<GetInfo> in
+the tag/value hash.
 
     # PrintConv example
     my $val = $exifTool->GetValue($tag);
@@ -591,7 +590,9 @@ tag/value hash.
     # ValueConv examples
     my $val = $exifTool->GetValue($tag, 'ValueConv');
     if (ref $val eq 'ARRAY') {
-        print "got a list reference for $tag\n";
+        print "$tag is a list of values\n";
+    } elsif (ref $val eq 'SCALAR') {
+        print "$tag represents binary data\n";
     } else {
         print "$tag is a simple scalar\n";
     }
@@ -613,8 +614,8 @@ tag/value hash.
 The value of the specified tag.  If the tag represents a list of values then
 a comma-separated string of values is returned for PrintConv if the List
 option is disabled, otherwise a reference to the list of values is returned
-in scalar context, or the list itself is returned in list context.  PrintConv
-values may also be scalar references to binary data.
+in scalar context, or the list itself is returned in list context.  Values
+may also be scalar references to binary data.
 
 =back
 
@@ -678,9 +679,17 @@ Delete the exisiting tag if it has the specified value.  Valid values are
 
 =item Group
 
-Specifies group name where tag should be written. If not specified, tag is
+Specifies group name where tag should be written.  If not specified, tag is
 written to hightest priority group as specified by SetNewGroups().  Any
 family 0 or 1 group name may be used.  Case is not significant.
+
+=item Protected
+
+Bit mask for tag protection levels to write.  Bit 0x01 allows writing of
+'unsafe' tags.  Bit 0x02 allows writing of 'protected' tags, and should only
+be used internally by ExifTool.  See
+L<Image::ExifTool::TagNames|Image::ExifTool::TagNames>, for a list of tag
+names indicating 'unsafe' and 'protected' tags.  Default is 0.
 
 =item Replace
 
@@ -902,10 +911,9 @@ data from the image for their value to be determined, so for these
 B<BuildCompositeTags> must be called while the image is available.  This is
 only a problem if B<ImageInfo> is called with a filename (as opposed to a
 file reference or scalar reference) since in this case the file is closed
-before B<ImageInfo> returns.  However if you enable the Composite
-option, B<BuildCompositeTags>  is called from within B<ImageInfo> before the
-file is closed.  (Note: As of ExifTool version 3.10, only the PreviewImage
-required access to the image data.)
+before B<ImageInfo> returns.  However if you enable the Composite option,
+B<BuildCompositeTags> is called from within B<ImageInfo> before the file is
+closed.
 
 =back
 
@@ -1081,7 +1089,8 @@ people who have contributed to this project.
 
 =head1 SEE ALSO
 
-L<ExifTool Tag Names|Image::ExifTool::TagNames>, L<Image::Info|Image::Info>,
+L<ExifTool Tag Names|Image::ExifTool::TagNames>,
+L<Shortcut Tags|Image::ExifTool::Shortcuts>, L<Image::Info|Image::Info>,
 L<Image::MetaData::JPEG|Image::MetaData::JPEG>
 
 =cut

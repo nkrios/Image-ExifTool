@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess);
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # conditional list of maker notes
 # Notes:
@@ -183,8 +183,8 @@ foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
     # set up this tag so we can write it
     $$tagInfo{Writable} = 'undef';
     $$tagInfo{WriteGroup} = 'ExifIFD';
-    $$tagInfo{PrintConv} = '\$val';
-    $$tagInfo{PrintConvInv} = '$val';
+    $$tagInfo{ValueConv} = '\$val';
+    $$tagInfo{ValueConvInv} = '$val';
     $$tagInfo{MakerNotes} = 1;
 }
 

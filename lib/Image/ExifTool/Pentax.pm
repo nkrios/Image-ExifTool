@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 %Image::ExifTool::Pentax::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -49,11 +49,12 @@ $VERSION = '1.14';
         DataTag => 'PreviewImage',
         Groups => { 2 => 'Image' },
         Writable => 'int32u',
-        Protected => 1,
+        Protected => 2,
     },
     0x0004 => {
         Name => 'PreviewImageStart',
-        Flags => [ 'IsOffset', 'Protected' ],
+        Flags => 'IsOffset',
+        Protected => 2,
         OffsetPair => 0x0003, # point to associated byte count
         DataTag => 'PreviewImage',
         Groups => { 2 => 'Image' },

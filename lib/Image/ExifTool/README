@@ -118,24 +118,25 @@ conditions.  The following is a description of possible hash entries:
                   doesn't specify a Description, then the tag Name is used
                   instead, with spaces inserted between the words.
 
+  Notes         : [optional] Notes for html TagNames documentation.
+
   Groups        : [optional] Hash lookup for group names for this tag.
 
   Format        : [optional] Only valid for BinaryData, EXIF and IPTC tables.
-                  For a Binary or EXIF table, this gives the format of the data,
-                  and is one of the FORMAT types specified above.  For
-                  BinaryData tables, the format may have a size in trailing
-                  brackets which is a perl expression to be evaluated.  The
-                  expression may access any of the previous table entries
+                  For a Binary or EXIF table, this gives the format for the
+                  extracted data, and is one of the FORMAT types specified
+                  above. For BinaryData tables, the format may have a size in
+                  trailing brackets which is a perl expression to be evaluated.
+                  The expression may access any of the previous table entries
                   through a %val hash, or the data size via $size. For example,
                   'string[$val{3}]' defines a string with length given by the
                   table entry with tag index '3'. If not specified, the format
                   of an EXIF entry is taken from the EXIF information, and the
                   format of a BinaryData entry is taken from the FORMAT
                   specified for the table (or int8u if FORMAT is not specified).
-                  For IPTC tables, the only valid Format type is binary,
-                  otherwise the data is assumed to be string.
 
-  Count         : [optional] Count to override count in EXIF IFD entry.
+  Count         : [optional] Count for the number of values to write, or the
+                  number of characters in a fixed-length string.
 
   Flags         : [optional] Flags to specify characteristics for this tag.  May
                   be a simple scalar flag name, a reference to a list of flag
@@ -154,9 +155,10 @@ conditions.  The following is a description of possible hash entries:
                   zero, this tag won't be overridden by subsequent tags unless
                   their priority is equal to or greater than this priority.
 
-                  'Protected' - indicates that even though this tag may be
-                  writable, it can not be set directly by the user. (Instead,
-                  it is set via the Require tags of a composite tag.)
+                  'Protected' - bit mask to protect tags from writing.  Bit 0x01
+                  is set to indicate an 'unsafe' tag, which is not written by
+                  SetNewValuesFromFile().  Bit 0x02 indicates a 'protected' tag,
+                  which should not be set directly by the user.
 
                   'PrintHex' - specifies that unknown PrintConv values should
                   be printed in hex (ie. "Unknown (0x0)")
@@ -195,23 +197,24 @@ conditions.  The following is a description of possible hash entries:
                   where X is the raw value.  In an expression, $val is the raw
                   value, $dataPt may be used to access the original EXIF data
                   block, and $self is a reference to the current ExifTool
-                  object.  Composite tags which Require or Desire other tags may
-                  access the ValueConv and PrintConv values of these tags
-                  through the elements of the @val and @valPrint lists. The
-                  result of the ValueConv evaluation may be undefined to
-                  indicate the tag should be ignored.  If ValueConv is not
+                  object.  When evaluated, the expression may return either a
+                  scalar representing the a printable value, or a scalar
+                  reference to the value if it is not printable (as with a
+                  binary data block).  Composite tags which Require or Desire
+                  other tags may access the ValueConv and PrintConv values of
+                  these tags through the elements of the @val and @valPrint
+                  lists. The result of the ValueConv evaluation may be undefined
+                  to indicate the tag should be ignored.  If ValueConv is not
                   specified, the raw value is not converted.
 
   PrintConv     : [optional] This entry is similar to ValueConv above, except
                   that it is used to further convert the tag value to a human
                   readable form.  It can be either a hash lookup or a scalar
                   Perl expression.  In this expression, $val represents the
-                  result of the ValueConv from above.  When evaluated, the
-                  expression may return either a scalar representing the a
-                  printable value, or a scalar reference to the value if it is
-                  not printable (as with a binary data block).  Note that the
-                  print conversion is only done if the PrintConv option is
-                  enabled (which it is by default).
+                  result of the ValueConv from above.  Note that the print
+                  conversion is only done if the PrintConv option is enabled
+                  (which it is by default), and if the result of the ValueConv
+                  is not a scalar reference.
 
   ValueConvInv  : [optional] The inverse of ValueConv.  Only necessary if
                   ValueConv is specified and this tag is Writable.

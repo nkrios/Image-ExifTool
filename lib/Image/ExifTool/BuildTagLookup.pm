@@ -16,8 +16,10 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.05';
+$VERSION = '1.08';
 @ISA = qw(Exporter);
+
+my $noteFont = '<font color="#666666">';
 
 # Descriptions for the TagNames documentation
 # Note: POD headers in these descriptions start with '~' instead of '=' to keep
@@ -51,10 +53,20 @@ The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an "N" in this column means the tag is writable.  A "Y"
 indicates writable information that is either unformatted or written using
 the existing format.  Other expressions give details about the information
-format, and vary depending on the general type of information.  An asterisk
-(C<*>) indicates that the information is not writable directly, but is set
-via a composite tag.  The HTML version of this document also lists possible
-B<Values> for all tags which have a discrete set of values.
+format, and vary depending on the general type of information.  The format
+name may be followed by a number in square brackets to indicate the number
+of values written, or the number of characters in a fixed-length string
+(including a null terminator which is added if required).
+
+An asterisk (C<*>) indicates a 'protected' tag which is not writable
+directly, but instead is set via a Composite tag.  A tilde (C<~>) indicates
+a tag that is considered unsafe to write under normal circumstances.  These
+'unsafe' tags are not set when calling SetNewValuesFromFile() or when using
+the exiftool -AllTagsFromFile option, and care should be taken when editing
+them manually since they may affect the way an image is rendered.
+
+The HTML version of this document also lists possible B<Values> for all tags
+which have a discrete set of values, or gives B<Notes> for some tags.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -68,6 +80,13 @@ EXIF meta information may exist within different Image File Directories
 (IFD's) of an image.  The names of these IFD's correspond to the
 ExifTool family 1 group names.  When writing EXIF information, the
 default B<Group> listed below is used unless another group is specified.
+},
+    GPS => q{
+ExifTool is very flexible about the input format for lat/long coordinates,
+and will accept 3 floating point numbers separated by just about anything.
+Many other GPS tags have values which are fixed-length strings.  For these,
+the indicated string lengths include a null terminator which is added
+automatically by ExifTool.
 },
     XMP => q{
 All XMP information is stored as character strings.  An C<integer> in this
@@ -90,7 +109,8 @@ XMP-crs:Contrast and XMP-exif:Contrast.
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
 values.  These lengths are given in square brackets after the B<Writable>
 format name.  For tags where a range of lengths is allowed, the minimum and
-maximum lengths are separated by a comma within the brackets.
+maximum lengths are separated by a comma within the brackets.  IPTC strings
+are not null terminated.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.
@@ -98,8 +118,8 @@ own set of tags.
     CanonRaw => q{
 When writing CanonRaw information, the length of the information is
 preserved (and the new information is truncated or padded as required)
-unless B<Writable> is C<resize>.  Currently, only JpgFromRaw is allowed to
-change size.
+unless B<Writable> is C<resize>.  Currently, only JpgFromRaw and
+ThumbnailImage are allowed to change size.
 },
     Extra => q{
 The extra tags represent information found in the image but not associated
@@ -199,6 +219,7 @@ sub new
             my (@require, @writeGroup, @writable);
             $format = $table->{FORMAT};
             foreach $tagInfo (@infoArray) {
+                push @values, "($$tagInfo{Notes})" if $$tagInfo{Notes};
                 my $writeGroup;
                 if ($short eq 'XMP') {
                     ($writeGroup = $tagInfo->{Groups}->{1}) =~ s/XMP-//;
@@ -257,8 +278,12 @@ sub new
                     } elsif ($writable eq '1') {
                         $writable = $format ? $format : 'Y';
                     }
-                    # add a '*' if this tag is protected
-                    $writable .= '*' if $$tagInfo{Protected};
+                    $writable .= "[$$tagInfo{Count}]" if $$tagInfo{Count};
+                    # add a '*' if this tag is protected or a '~' for unsafe tags
+                    if ($$tagInfo{Protected}) {
+                        $writable .= '*' if $$tagInfo{Protected} & 0x02;
+                        $writable .= '~' if $$tagInfo{Protected} & 0x01;
+                    }
                 }
                 # don't duplicate a tag name unless an entry is different
                 my $name = $$tagInfo{Name};
@@ -293,7 +318,7 @@ sub new
 #
             my $tagIDstr;
             if ($tagID =~ /^\d+$/) {
-                if ($binaryTable) {
+                if ($binaryTable or $short =~ /^IPTC\b/) {
                     $tagIDstr = $tagID;
                 } else {
                     $tagIDstr = sprintf("0x%.4x",$tagID);
@@ -550,7 +575,7 @@ sub WriteTagNames($$)
         print HTMLFILE Doc2Html($docs{$short}) if $docs{$short};
         print HTMLFILE "<blockquote><table border=1 cellspacing=0 cellpadding=2>\n";
         print HTMLFILE "<tr bgcolor='#dddddd'>$hid<th>Tag Name</th>\n";
-        print HTMLFILE "<th>Writable</th>$derived<th>Values</th></tr>\n";
+        print HTMLFILE "<th>Writable</th>$derived<th>Values / ${noteFont}Notes</font></th></tr>\n";
         my $infoList;
         foreach $infoList (@$info) {
             my ($tagIDstr, $tagNames, $writable, $values, $require, $writeGroup) = @$infoList;
@@ -616,7 +641,9 @@ sub WriteTagNames($$)
                     }
                 } else {
                     foreach (@$values) {
-                        push @values, EscapeHTML($_);
+                        $_ = EscapeHTML($_);
+                        /^\(/ and $_ = "$noteFont$_</font>";
+                        push @values, $_;
                     }
                     print HTMLFILE "<font size='-1'>";
                     $close = '</font>';

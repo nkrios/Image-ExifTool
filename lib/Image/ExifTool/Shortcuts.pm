@@ -6,6 +6,7 @@
 # Revisions:    02/07/2004 - P. Harvey Moved out of Exif.pm
 #               09/15/2004 - P. Harvey Added D70Boring from Greg Troxel
 #               01/11/2005 - P. Harvey Added Canon20D from Christian Koller
+#               03/03/2005 - P. Harvey Added user defined shortcuts
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Shortcuts;
@@ -13,7 +14,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -125,6 +126,19 @@ $VERSION = '1.03';
     ],
 );
 
+# load user-defined shortcuts if available
+Image::ExifTool::LoadConfig();
+if (defined %Image::ExifTool::Shortcuts::UserDefined) {
+    my $shortcut;
+    foreach $shortcut (keys %Image::ExifTool::Shortcuts::UserDefined) {
+        my $val = $Image::ExifTool::Shortcuts::UserDefined{$shortcut};
+        # also allow simple aliases
+        $val = [ $val ] unless ref $val eq 'ARRAY';
+        # save the user-defined shortcut or alias
+        $Image::ExifTool::Shortcuts::Main{$shortcut} = $val;
+    }
+}
+
 
 1; # end
 
@@ -141,8 +155,23 @@ This module is required by Image::ExifTool.
 =head1 DESCRIPTION
 
 This module contains definitions for tag name shortcuts used by
-Image::ExifTool.  You can customize this file to add your own
-shortcuts.
+Image::ExifTool.  You can customize this file to add your own shortcuts.
+
+Individual users may also add their own shortcuts to the .ExifTool_config
+file in their home directory.  The shortcuts are defined in a hash called
+%Image::ExifTool::Shortcuts::UserDefined.  The keys of the hash are the
+shortcut names, and the elements are either tag names or references to lists
+of tag names.
+
+An example shortcut definition in .ExifTool_config:
+
+    %Image::ExifTool::Shortcuts::UserDefined = (
+        MyShortcut => ['createdate','exposuretime','aperture'],
+        MyAlias => 'FocalLengthIn35mmFormat',
+    );
+
+In this example, MyShortcut is a shortcut for the CreateDate, ExposureTime
+and Aperture tags, and MyAlias is a shortcut for FocalLengthIn35mmFormat.
 
 =head1 AUTHOR
 

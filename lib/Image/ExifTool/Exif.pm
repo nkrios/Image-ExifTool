@@ -17,6 +17,7 @@
 #               6) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               7) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 #               8) http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
+#               9) http://hul.harvard.edu/jhove/tiff-tags.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -27,7 +28,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.46';
+$VERSION = '1.50';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -160,13 +161,16 @@ sub Rationalize($;$);
     },
     0xfe => {
         Name => 'SubfileType',
-        PrintConv => q[$val ? Image::ExifTool::Exif::DecodeBits($val,
-            {
-                0 => 'Reduced-resolution image',
-                1 => 'Single page of multi-page image',
-                2 => 'Transparency mask',
-            }
-        ) : 'Full-resolution Image' ],
+        PrintConv => {
+            0 => 'Full-resolution Image',
+            1 => 'Reduced-resolution image',
+            2 => 'Single page of multi-page image',
+            3 => 'Single page of multi-page reduced-resolution image',
+            4 => 'Transparency mask',
+            5 => 'Transparency mask of reduced-resolution image',
+            6 => 'Transparency mask of multi-page image',
+            7 => 'Transparency mask of reduced-resolution multi-page image',
+        },
     },
     0xff => {
         Name => 'OldSubfileType',
@@ -232,21 +236,38 @@ sub Rationalize($;$);
         # save this value as an ExifTool member variable
         ValueConv => '$self->{CameraModel} = $val',
     },
-    0x111 => {
-        Name => 'StripOffsets',
-        Flags => 'IsOffset',
-        OffsetPair => 0x117,  # point to associated byte counts
-    },
+    0x111 => [
+        {
+            Condition => '$self->{TIFF_TYPE} ne "CR2" or $self->{DIR_NAME} ne "IFD0"',
+            Name => 'StripOffsets',
+            Flags => 'IsOffset',
+            OffsetPair => 0x117,  # point to associated byte counts
+        },
+        {
+            Name => 'PreviewImageStart',
+            Flags => 'IsOffset',
+            OffsetPair => 0x117,
+            Notes => 'PreviewImageStart in IFD0 of CR2 files',
+        },
+    ],
     0x112 => {
         Name => 'Orientation',
         PrintConv => \%orientation,
     },
     0x115 => 'SamplesPerPixel',
     0x116 => 'RowsPerStrip',
-    0x117 => {
-        Name => 'StripByteCounts',
-        OffsetPair => 0x111,   # point to associated offset
-    },
+    0x117 => [
+        {
+            Condition => '$self->{TIFF_TYPE} ne "CR2" or $self->{DIR_NAME} ne "IFD0"',
+            Name => 'StripByteCounts',
+            OffsetPair => 0x111,   # point to associated offset
+        },
+        {
+            Name => 'PreviewImageLength',
+            OffsetPair => 0x111,
+            Notes => 'PreviewImageLength in IFD0 of CR2 files',
+        },
+    ],
     0x118 => 'MinSampleValue',
     0x119 => 'MaxSampleValue',
     0x11a => 'XResolution',
@@ -282,7 +303,7 @@ sub Rationalize($;$);
     },
     0x123 => {
         Name => 'GrayResponseCurve',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x124 => {
         Name => 'T4Options',
@@ -307,9 +328,10 @@ sub Rationalize($;$);
         },
     },
     0x129 => 'PageNumber',
+    0x12c => 'ColorResponseUnit', #9
     0x12d => {
         Name => 'TransferFunction',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x131 => 'Software',
     0x132 => {
@@ -338,7 +360,7 @@ sub Rationalize($;$);
     0x140 => {
         Name => 'ColorMap',
         Format => 'binary',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x141 => 'HalftoneHints',
     0x142 => 'TileWidth',
@@ -347,12 +369,12 @@ sub Rationalize($;$);
         Name => 'TileOffsets',
         Flags => 'IsOffset',
         OffsetPair => 0x145,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x145 => {
         Name => 'TileByteCounts',
         OffsetPair => 0x144,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x146 => 'BadFaxLines', #3
     0x147 => { #3
@@ -408,7 +430,7 @@ sub Rationalize($;$);
     },
     0x15b => {
         Name => 'JPEGTables',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x15f => { #3
         Name => 'OPIProxy',
@@ -468,42 +490,46 @@ sub Rationalize($;$);
         {
             Name => 'ThumbnailOffset',
             Condition => '$self->{DIR_NAME} eq "IFD1"',
-            Flags => [ 'IsOffset', 'Protected' ],
+            Flags => 'IsOffset',
             OffsetPair => 0x202,
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
+            Protected => 2,
         },
         {
             Name => 'PreviewImageStart',
             Condition => '$self->{DIR_NAME} eq "MakerNotes"',
-            Flags => [ 'IsOffset', 'Protected' ],
+            Flags => 'IsOffset',
             OffsetPair => 0x202,
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'MakerNotes',
+            Protected => 2,
         },
         {
             Name => 'JpgFromRawStart',
             Condition => '$self->{DIR_NAME} eq "SubIFD"',
-            Flags => [ 'IsOffset', 'Protected' ],
+            Flags => 'IsOffset',
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'SubIFD',
             # JpgFromRaw is in SubIFD of NEF files
             WriteCondition => '$self->{TIFF_TYPE} eq "NEF"',
+            Protected => 2,
         },
         {
             Name => 'JpgFromRawStart',
             Condition => '$self->{DIR_NAME} eq "IFD2"',
-            Flags => [ 'IsOffset', 'Protected' ],
+            Flags => 'IsOffset',
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'IFD2',
             # JpgFromRaw is in IFD2 of PEF files
             WriteCondition => '$self->{TIFF_TYPE} eq "PEF"',
+            Protected => 2,
         },
         {
             Name => 'OtherImageStart',
@@ -514,40 +540,40 @@ sub Rationalize($;$);
         {
             Name => 'ThumbnailLength',
             Condition => '$self->{DIR_NAME} eq "IFD1"',
-            Flags => 'Protected',
             OffsetPair => 0x201,
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
+            Protected => 2,
         },
         {
             Name => 'PreviewImageLength',
             Condition => '$self->{DIR_NAME} eq "MakerNotes"',
-            Flags => 'Protected',
             OffsetPair => 0x201,
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'MakerNotes',
+            Protected => 2,
         },
         {
             Name => 'JpgFromRawLength',
             Condition => '$self->{DIR_NAME} eq "SubIFD"',
-            Flags => 'Protected',
             OffsetPair => 0x201,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'SubIFD',
             WriteCondition => '$self->{TIFF_TYPE} eq "NEF"',
+            Protected => 2,
         },
         {
             Name => 'JpgFromRawLength',
             Condition => '$self->{DIR_NAME} eq "IFD2"',
-            Flags => 'Protected',
             OffsetPair => 0x201,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'IFD2',
             WriteCondition => '$self->{TIFF_TYPE} eq "PEF"',
+            Protected => 2,
         },
         {
             Name => 'OtherImageLength',
@@ -593,6 +619,10 @@ sub Rationalize($;$);
     0x1002 => 'RelatedImageLength',
     0x800d => 'ImageID',
     0x80a4 => 'WangAnnotation',
+    0x80e3 => 'Matteing', #9
+    0x80e4 => 'DataType', #9
+    0x80e5 => 'ImageDepth', #9
+    0x80e6 => 'TileDepth', #9
     0x827d => 'Model2',
     0x828d => 'CFARepeatPatternDim',
     0x828e => 'CFAPattern2',
@@ -628,6 +658,21 @@ sub Rationalize($;$);
         Name => 'ModelTiePoint',
         Groups => { 2 => 'Location' },
     },
+    0x84e0 => 'Site', #9
+    0x84e1 => 'ColorSequence', #9
+    0x84e2 => 'IT8Header', #9
+    0x84e3 => 'RasterPadding', #9
+    0x84e4 => 'BitsPerRunLength', #9
+    0x84e5 => 'BitsPerExtendedRunLength', #9
+    0x84e6 => 'ColorTable', #9
+    0x84e7 => 'ImageColorIndicator', #9
+    0x84e8 => 'BackgroundColorIndicator', #9
+    0x84e9 => 'ImageColorValue', #9
+    0x84ea => 'BackgroundColorValue', #9
+    0x84eb => 'PixelIntensityRange', #9
+    0x84ec => 'TransparencyIndicator', #9
+    0x84ed => 'ColorCharacterization', #9
+    0x84ee => 'HCUsage', #9
     0x8568 => {
         Name => 'IPTC-NAA2',
         SubDirectory => {
@@ -642,7 +687,7 @@ sub Rationalize($;$);
     0x8649 => {
         Name => 'PhotoshopSettings',
         Format => 'binary',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x8769 => {
         Name => 'ExifOffset',
@@ -662,16 +707,16 @@ sub Rationalize($;$);
     0x87af => {
         Name => 'GeoTiffDirectory',
         Format => 'binary',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x87b0 => {
         Name => 'GeoTiffDoubleParams',
         Format => 'binary',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x87b1 => {
         Name => 'GeoTiffAsciiParams',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x8822 => {
         Name => 'ExposureProgram',
@@ -710,6 +755,9 @@ sub Rationalize($;$);
     0x8829 => 'Interlace',
     0x882a => 'TimeZoneOffset',
     0x882b => 'SelfTimerMode',
+    0x885c => 'FaxRecvParams', #9
+    0x885d => 'FaxSubAddress', #9
+    0x885e => 'FaxRecvTime', #9
     0x9000 => 'ExifVersion',
     0x9003 => {
         Name => 'DateTimeOriginal',
@@ -858,6 +906,7 @@ sub Rationalize($;$);
         },
     },
     0x9213 => 'ImageHistory',
+    0x923f => 'StoNits', #9
     # handle maker notes as a conditional list
     0x927c => \@Image::ExifTool::MakerNotes::Main,
     0x9286 => {
@@ -1077,8 +1126,11 @@ sub Rationalize($;$);
     0xa420 => 'ImageUniqueID',
     0xa480 => 'GDALMetadata', #3
     0xa481 => 'GDALNoData', #3
-    # 0xc350 thru 0xc41a plus 0xc46c,0xc46e are Kodak APP13 tags (ref 8)
-    0xc350 => 'FilmProductCode',
+    # 0xc350 thru 0xc41a plus 0xc46c,0xc46e are Kodak APP3 tags (ref 8)
+    0xc350 => {
+        Name => 'FilmProductCode',
+        Notes => 'tags 0xc350-0xc41a, 0xc46c, 0xc46e are Kodak APP3 Meta tags',
+    },
     0xc351 => 'ImageSourceEK',
     0xc352 => 'CaptureConditionsPAR',
     0xc353 => {
@@ -1166,7 +1218,7 @@ sub Rationalize($;$);
     },
     0xc618 => { #2
         Name => 'LinearizationTable',
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0xc619 => 'BlackLevelRepeatDim', #2
     0xc61a => 'BlackLevel', #2
@@ -1283,6 +1335,7 @@ sub Rationalize($;$);
     },
     FocalLength35efl => {
         Description => 'Focal Length',
+        Notes => 'this value may be incorrect if image has been resized',
         Groups => { 2 => 'Camera' },
         Require => {
             0 => 'FocalLength',
@@ -1295,6 +1348,7 @@ sub Rationalize($;$);
     },
     ScaleFactor35efl => {
         Description => 'Scale Factor To 35mm Equivalent',
+        Notes => 'this value may be incorrect if image has been resized',
         Groups => { 2 => 'Camera' },
         Desire => {
             0 => 'FocalLength',
@@ -1321,8 +1375,6 @@ sub Rationalize($;$);
         # retrieve the thumbnail from our EXIF data
         ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"ThumbnailImage",$dataPt)',
         ValueConvInv => '$val',
-        PrintConv => '\$val',
-        PrintConvInv => '$val',
     },
     PreviewImage => {
         Writable => 1,
@@ -1332,8 +1384,6 @@ sub Rationalize($;$);
         },
         ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"PreviewImage")',
         ValueConvInv => '$val',
-        PrintConv => '\$val',
-        PrintConvInv => '$val',
     },
     JpgFromRaw => {
         Writable => 1,
@@ -1343,8 +1393,6 @@ sub Rationalize($;$);
         },
         ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"JpgFromRaw")',
         ValueConvInv => '$val',
-        PrintConv => '\$val',
-        PrintConvInv => '$val',
     },
     PreviewImageSize => {
         Require => {
@@ -1363,7 +1411,7 @@ sub Rationalize($;$);
         },
         ValueConv => q{
             my $tagTable = GetTagTable("Image::ExifTool::GeoTiff::Main");
-            Image::ExifTool::GeoTiff::ProcessGeoTiff($self, $tagTable, \$val[0], \$val[1], \$val[2]);
+            Image::ExifTool::GeoTiff::ProcessGeoTiff($self, $tagTable, $val[0], $val[1], $val[2]);
             unless ($self->Options('Verbose')) {
                 # this is duplicate information so delete it unless verbose
                 $self->DeleteTag('GeoTiffDirectory');
@@ -1576,7 +1624,7 @@ sub DecodeBits($$)
 # extract image from file
 # Inputs: 0) ExifTool object reference, 1) data offset, 2) data length
 #         3) [optional] tag name, 4) Optional data pointer
-# Returns: Image if specifically requested or "Binary data" message
+# Returns: Reference to Image if specifically requested or "Binary data" message
 #          Returns undef if there was an error loading the image
 sub ExtractImage($$$$;$)
 {
@@ -1599,7 +1647,7 @@ sub ExtractImage($$$$;$)
             }
         }
     }
-    return $image;
+    return \$image;
 }
 
 #------------------------------------------------------------------------------
@@ -1933,17 +1981,7 @@ sub ProcessExif($$$)
                 }
                 # print debugging information if there were errors
                 if (not $ok and $verbose > 1 and $subdirStart != $valuePtr) {
-                    $exifTool->VerboseInfo($tagID, $tagInfo,
-                        Value  => $val,
-                        DataPt => $subdirDataPt,
-                        Size   => $subdirDataLen - $subdirStart,
-                        Start  => $subdirStart,
-                        Format => $formatStr,
-                        Count  => $count,
-                        Index  => $index,
-                        Table  => $tagTablePtr,
-                        Extra  => '(Bad SubDirectory data)',
-                    );
+                    printf "%s    (SubDirectory start = 0x%x)\n", $exifTool->{INDENT}, $subdirStart;
                 }
                 SetByteOrder($oldByteOrder);    # restore original byte swapping
 
@@ -2054,6 +2092,8 @@ it under the same terms as Perl itself.
 =item http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 
 =item http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
+
+=item http://hul.harvard.edu/jhove/tiff-tags.html
 
 =back
 

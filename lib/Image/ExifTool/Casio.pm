@@ -15,7 +15,7 @@ package Image::ExifTool::Casio;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.07';
 
 %Image::ExifTool::Casio::Type1 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -125,22 +125,23 @@ $VERSION = '1.05';
     0x0003 => {
         Name => 'CasioPreviewLength',
         Groups => { 2 => 'Image' },
+        Writable => 0,
 # Rename this tag to basically ignore these values (and those of
 # CasioPreviewStart below) because the data is duplicated in
 # the PreviewImage tag later.  If we wrote these too, the data
 # would be duplicated in the maker notes!
-#        Flags => 'Protected',
 #        OffsetPair => 0x0004, # point to associated offset
 #        Writable => 'int32u',
-#        Protected => 1,
+#        Protected => 2,
     },
     0x0004 => {
         Name => 'CasioPreviewStart',
         Groups => { 2 => 'Image' },
         Writable => 0,
-#        Flags => [ 'IsOffset', 'Protected' ],
+#        Flags => 'IsOffset',
 #        OffsetPair => 0x0003, # point to associated byte count
 #        Writable => 'int32u',
+#        Protected => 2,
     },
     0x0008 => {
         Name => 'QualityMode',
@@ -244,8 +245,8 @@ $VERSION = '1.05';
         # (nasty that they double-reference the image!)
         Name => 'PreviewImage',
         Writable => 'undef',
-        PrintConv => '\$val',
-        PrintConvInv => '$val',
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
     },
     0x2011 => {
         Name => 'WhiteBalanceBias',

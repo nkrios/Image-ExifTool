@@ -6,8 +6,8 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
 <h3>
-<a href="Image-ExifTool-4.73.tar.gz">
-Download        Version 4.73</a> - Mar. 1, 2005
+<a href="Image-ExifTool-4.87.tar.gz">
+Download        Version 4.87</a> - Mar. 15, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a Perl module with an included application script that allow you
@@ -35,9 +35,7 @@ ramblings on the subject of writing meta information.
 <li>scans entire directory trees
 <li>easy to add support for new camera types by editing ExifTool modules
 <li>option to create text output file for each image file
-<li>extracts thumbnail images
-<li>extracts JPG image from Canon CRW files
-<li>extracts large preview from Canon, Casio, Minolta, Nikon and Pentax images
+<li>extracts thumbnail images, preview images, and JPEG images embedded in RAW files
 <li>ability to organize output into groups
 <li>recognizes over <a href="TagNames.html">1000 different tags</a>
 </ul>
@@ -62,16 +60,13 @@ options.
 <p>Currently, ExifTool supports Asahi, Canon, Casio, Epson, Foveon,
 FujiFilm, Konica-Minolta, Leica, Minolta, Nikon, Olympus, Panasonic, Pentax,
 Sanyo and Sigma maker notes, but support for new types can easily be added
-by editing the ExifTool modules.
+by editing the ExifTool modules.  The ExifTool support modules are very
+readable, and the format for these files is documented in
+Image/ExifTool/README.  If you make any useful new additions, send me the
+details so I can add the functionality to the distributed version.
 
-<p>The ExifTool support modules are very readable.  The format for these
-files is documented in Image/ExifTool/README.
-
-<p>If you make any useful new additions, e-mail me the
-file so I can add the functionality to the distributed version.
-
-<p>Drop me a note if you find ExifTool useful.  My e-mail address is
-in the README file.  Thanks.
+<p>Drop me a note if you find ExifTool useful, or if you have any comments
+or suggestions.  My e-mail address is in the README file.  Thanks.
 
 <h2>Example Output</h2>
 
@@ -130,7 +125,7 @@ DESCRIPTION
 
     -TAG=VALUE sets the value of a tag, and -TAG= deletes a tag.  -TAG+=VALUE
     adds a value to a list without replacing existing values, and -TAG-=VALUE
-    deletes a specific value from a list.  Use "-TAG<=FILENAME" to set the value
+    deletes a specific value from a list.  Use "-TAG&lt;=FILENAME" to set the value
     of a tag from the contents of a file (the quotes prevent shell redirection).
     The tag is written to all groups where it is valid if no group is specified.
     A group is specified using -GROUP:TAG, where GROUP is any valid family 0 or
@@ -339,15 +334,14 @@ group name and a colon to specify a location for the tag.
 <p>ie) "exiftool -filename -imagesize -exif:fnumber image.jpg"
 
 <p>A complete list of <a href="TagNames.html">ExifTool Tag Names</a>
-accompanies this documentation.  As well, current lists of available tag
-names and writable tag names may also be obtained using the exiftool -list
-and -listw options.  But perhaps the easiest way to determine a tag name is
-to use the -S option to print the tag names instead of descriptions for all
-information in a file.  It may also be useful to use the -G option to
-display the group names, and the -H or -D option to print the numerical tag
-ID's for reference.
+accompanies this documentation.  As well, current lists of available tag names
+and writable tag names may be obtained using the exiftool -list and -listw
+options.  But perhaps the easiest way to determine a tag name is to use the -S
+option to print the tag names instead of descriptions for all information in a
+file.  It may also be helpful to use the -G option to display the group names,
+and the -H or -D option to print the numerical tag ID's for reference.
 
-<p><b>Notes:</b> 
+<p><b>Notes:</b>
 
 <ol><li>Tag names sometimes differ from their descriptions.  Use the '-S'
 command-line option to see the actual tag names instead of the descriptions
@@ -355,6 +349,27 @@ when extracting information.
 <li>Values are only displayed for tags that exist in the specified file when
 extracting information (unless the -f option is used).
 </ol>
+
+<h3>Shortcut Tags</h3>
+Shortcuts tags represent one or more other tags, and are used like any other
+tag when extracting information.
+
+<p>ExifTool defines a few shortcut tags in the Image::ExifTool::Shortcuts
+module, and allows users to define their own shortcuts by adding a
+definition to the .ExifTool_config file in their home directory.  Here is a
+simple example that defines two shortcuts:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+%Image::ExifTool::Shortcuts::UserDefined = (
+    MyShortcut => ['createdate','exposuretime','aperture'],
+    MyAlias => 'FocalLengthIn35mmFormat',
+);
+</pre></td></tr></table></blockquote>
+
+In this example, MyShortcut is a shortcut for the CreateDate, ExposureTime
+and Aperture tags, and MyAlias is a shortcut for FocalLengthIn35mmFormat.
+
+<p>The current shortcuts may be listed with the -list option.
 
 <h2>Writing Meta Information</h2>
 
@@ -376,7 +391,9 @@ XMP group.  The Makernotes group is special, see the note below.
 
 <p>Alternatively, information may be written to a specific group only, bypassing
 these priorities, by providing a group name for the tag.  The section below
-gives the syntax rules for exiftool command-line arguments to do this.
+gives the syntax rules for exiftool command-line arguments to do this.  Any
+family 0 or 1 group name may be used when writing information, although not all
+groups are writable.
 
 <p><b>Note:</b> Information in the MakerNotes may be edited, but not added or
 deleted.  The reason for this is to avoid confusing manufacturer-specific
@@ -391,7 +408,7 @@ somewhat if this image is missing, so beware.
 <p>Tag values are writen rather than being extracted if the tag name ends with a '='
 symbol.  The '=' may be prefixed by '+', '-' or '&lt;' to add a value, remove a value
 or set a value from file.  The following table outlines the different write syntaxes:
- 
+
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Syntax</th><th>Result</th></tr>
 <tr><td>-TAG=</td><td>Deletes all occurrances of TAG</td></tr>
@@ -412,8 +429,14 @@ The command-line syntax for doing this is "-AllTagsFromFile=SRCFILE".  This
 option is very simple, yet very powerful.  This option reads all information
 from SRCFILE and attempts to write each tag found to the destination file.
 Depending on the formats of the source and destination files, some of tags read
-may not be valid in the destination file, in which case they won't be written. 
+may not be valid in the destination file, in which case they won't be written.
 No translation between similar tags with different names is done.
+
+<h2>Deleting All Meta Information from an Image</h2>
+
+ExifTool can be used to delete individual pieces of information, but if you
+want to remove ALL meta information from a JPEG image check out my
+<a href="http://owl.phy.queensu.ca/~phil/utils/">image utility scripts</a>.
 
 <h2>Addition Documentation</h2>
 <ul>

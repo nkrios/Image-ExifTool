@@ -13,7 +13,7 @@ package Image::ExifTool::Sanyo;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 my %offOn = (
     0 => 'Off',
@@ -69,7 +69,7 @@ my %offOn = (
     },
     0x0202 => {
         Name => 'Macro',
-        Writable => 'in16u',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Normal',
             1 => 'Macro',
@@ -202,7 +202,7 @@ my %offOn = (
     0x0f00 => {
         Name => 'DataDump',
         Writable => 0,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
 );
 

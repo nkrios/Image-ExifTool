@@ -207,16 +207,14 @@ embedded copy number if more than one tag with that name was found in the image.
  Use <a href="#GetTagName">GetTagName</a> to remove the copy number from the
 tag. Note that the case of the tags may not be the same as requested.
 
-<p>With the PrintConv option enabled, values of the returned hash are usually
-simple scalars but a scalar reference is used to indicate binary data. Also,
-the value may be an array reference if the List option is set.  With the
-List option disabled (the default), list values are joined by commas into a
-single string.  Note that binary values are not necessarily extracted unless
-specifically requested or the Binary option is set.  If not extracted the
-value is a reference to a string of the form "Binary data ##### bytes".
-
-<p>With the PrintConv option disabled, the values are either simple scalars or
-array references to indicate lists of values.
+<p>Values of the returned hash are usually simple scalars, but a scalar
+reference is used to indicate binary data and an array reference may be used
+to indicate a list.  Lists of values are joined by commas into a single
+string if and only if the PrintConv option is enabled and the List option is
+disabled (which are the defaults).  Note that binary values are not
+necessarily extracted unless specifically requested or the Binary option is
+set.  If not extracted the value is a reference to a string of the form
+"Binary data ##### bytes".
 
 <p>Here is a simple example to print out the information returned by
 <a href="#ImageInfo">ImageInfo</a>.  It shows how to print out a human-friendly
@@ -452,8 +450,10 @@ Duplicates, Exclude, Group# (and Sort if tag list reference is given).
 
 <hr><h2><a name="WriteInfo">WriteInfo</a></h2>
 Write meta information to a file.  The specified source file is rewritten to
-the destination file.  The meta information in the file new file is changed
-as specified by previous calls to <a href="#SetNewValue">SetNewValue</a>.
+the destination file with the new information specified in previous calls to
+<a href="#SetNewValue">SetNewValue</a>.  The necessary segments and/or
+directories are created in the destination file as required to store the
+specified information.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>WriteInfo($$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
@@ -573,8 +573,8 @@ tag/value hash.
 The value of the specified tag.  If the tag represents a list of values then
 a comma-separated string of values is returned for PrintConv if the List
 option is disabled, otherwise a reference to the list of values is returned
-in scalar context, or the list itself is returned in list context.  PrintConv
-values may also be scalar references to binary data.
+in scalar context, or the list itself is returned in list context.  Values
+may also be scalar references to binary data.
 </td></tr>
 </table></blockquote>
 <b>Examples:</b>
@@ -590,7 +590,9 @@ if (ref $val eq 'SCALAR') {
 # ValueConv examples
 my $val = $exifTool-&gt;<b>GetValue</b>($tag, 'ValueConv');
 if (ref $val eq 'ARRAY') {
-    print "got a list reference for $tag\n";
+    print "$tag is a list of values\n";
+} elsif (ref $val eq 'SCALAR') {
+    print "$tag represents binary data\n";
 } else {
     print "$tag is a simple scalar\n";
 }
@@ -627,6 +629,14 @@ scalar context, or the number of tags set and the error string in list context.
     If not specified, tag is written to hightest priority group as specified
     by SetNewGroups().  Case is not significant</td>
     <td>Any family 0 or 1 group name</td><td align=center>-</td></tr>
+<tr><td>Protected</td><td>Allow protected tags to be written</td>
+    <td>Bitmask of tag protection levels to write:
+    <table>
+    <tr><td valign='top' align=center><b>0x01</b>&nbsp;=</td>
+    <td>Write '<a href="TagNames.html">unsafe</a>' tags</td></tr>
+    <tr><td valign='top' align=center><b>0x02</b>&nbsp;=</td>
+    <td>Write '<a href="TagNames.html">protected</a>' tags</td></tr>
+    </table><td align=center>0</td></tr>
 <tr><td>Replace</td><td>Replace previous new value for this tag</td>
     <td><table>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Don't replace</td></tr>
@@ -824,12 +834,12 @@ automatically by ImageInfo() if the Composite option is set.
 or Desire's another composite tag, in which case the calculation is
 deferred until after the other tag is calculated.
 <li>Composite tags may need to read data from the image for their value to
-be determined, so for these BuildCompositeTags() must be called while the image
-is available.  This is only a problem if ImageInfo() is called with a filename (as opposed
-to a file reference or scalar reference) since in this case the file is closed before
-ImageInfo() returns.  However if you enable the Composite option, BuildCompositeTags()
-is called from within ImageInfo() before the file is closed.  (Note: As of ExifTool
-version 3.10, only the PreviewImage required access to the image data.)
+be determined, so for these BuildCompositeTags() must be called while the
+image is available.  This is only a problem if ImageInfo() is called with a
+filename (as opposed to a file reference or scalar reference) since in this
+case the file is closed before ImageInfo() returns.  However if you enable
+the Composite option, BuildCompositeTags() is called from within ImageInfo()
+before the file is closed.
 </ol>
 <hr><table bgcolor='#ffaaaa' width='100%' cellpadding=8><tr><td><center><b>
 The following functions access only static data and are not called with an ExifTool object

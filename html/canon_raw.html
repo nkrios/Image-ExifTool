@@ -9,7 +9,8 @@ This is a description of the Canon CRW file format.
 
 <p>After writing this document, I finally found an old copy of Canon's own file
 format specification.  The format is called CIFF, and the original Canon
-documentation can be downloaded from http://xyrion.org/ciff/.
+documentation can be downloaded from
+<a href="http://xyrion.org/ciff/">http://xyrion.org/ciff/</a>.
 
 <h3>Comments about the CRW Format</h3>
 
@@ -45,7 +46,7 @@ maker notes!
 The bottom line is that rewriting a Canon CRW file is about 20 times easier,
 and much less prone to errors than rewriting a TIFF or JPEG.
 
-<h2>CRW Format Specification</h2>
+<h2>CRW (CIFF) Format Specification</h2>
 <h3>File Header</h3>
 A Canon CRW file starts with the following byte sequence:
 <blockquote>
@@ -162,132 +163,136 @@ Together, the <b>DataFormat</b> and <b>TagIndex</b> fields form a <b>TagID</b>
 which can be used to identify tags within the CRW file. The following is a list
 of known <b>TagID</b> values and their corresponding tag numbers in the <b>EXIF</b>
 maker notes when found in a JPEG or TIFF image.  Also listed is the TagID of the
-<b>SubDir</b>ectory where the information is found.
+<b>SubDir</b>ectory where the information is found.  The <b>Size</b> listed
+below is an observed size of the value data, and is not necessarily expected to
+remain constant for all camera models.
 
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>TagID</th><th>EXIF</th><th>SubDir</th><th>Name</th><th>Description</th></tr>
-<tr bgcolor='#eeeeee'><th colspan=5>1-Byte Alignment</th></tr>
-<tr align='center'><td>0x0000</td><td>-</td><td>Any</td><td>NullRecord</td>
+<tr bgcolor='#dddddd'><th>TagID</th><th>EXIF</th><th>SubDir</th><th>Name</th><th>Size</th><th>Description</th></tr>
+<tr bgcolor='#eeeeee'><th colspan=6>1-Byte Alignment</th></tr>
+<tr align='center'><td>0x0000</td><td>-</td><td>Any</td><td>NullRecord</td><td>0</td>
     <td align='left'>This is a null directory entry</td></tr>
-<tr align='center'><td>0x0001</td><td>-</td><td>Any</td><td>FreeBytes</td>
+<tr align='center'><td>0x0001</td><td>-</td><td>Any</td><td>FreeBytes</td><td>Varies</td>
     <td align='left'>Unused bytes in the <b>ValueData</b></td></tr>
-<tr align='center'><td>0x0032</td><td>-</td><td>?</td><td>CanonColorInfo1</td>
+<tr align='center'><td>0x0032</td><td>-</td><td>0x300b</td><td>CanonColorInfo1</td><td>2048</td>
     <td align='left'>Block of color information (format unknown)</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=5>ASCII Strings</th></tr>
-<tr align='center'><td>0x0805</td><td>0x0d</td><td>0x2804</td><td>CanonFileDescription</td>
-    <td align='left'>An ASCII description of the file format
+<tr bgcolor='#eeeeee'><th colspan=6>ASCII Strings</th></tr>
+<tr align='center'><td>0x0805</td><td>0x0d</td><td>0x2804</td><td>CanonFileDescription</td><td>32</td>
+    <td align='left'>Description of the file format.
     ie) "EOS DIGITAL REBEL CMOS RAW"</td></tr>
-<tr align='center'><td>0x0805</td><td>-</td><td>0x300a</td><td>UserComment</td>
-    <td align='left'>An ASCII user comment</td></tr>
-<tr align='center'><td>0x080a</td><td>-</td><td>0x2807</td><td>CanonRawMakeModel</td>
-    <td align='left'>Two end-to-end null-terminated ASCII strings giving the camera make and model
+<tr align='center'><td>0x0805</td><td>-</td><td>0x300a</td><td>UserComment</td><td>256</td>
+    <td align='left'>User comment (usually blank)</td></tr>
+<tr align='center'><td>0x080a</td><td>-</td><td>0x2807</td><td>CanonRawMakeModel</td><td>32</td>
+    <td align='left'>Two end-to-end null-terminated ASCII strings giving the camera make and model.
     ie) "Canon","Canon EOS DIGITAL REBEL"</td></tr>
-<tr align='center'><td>0x080b</td><td>0x07</td><td>0x3004</td><td>CanonFirmwareVersion</td>
+<tr align='center'><td>0x080b</td><td>0x07</td><td>0x3004</td><td>CanonFirmwareVersion</td><td>32</td>
     <td align='left'>Firmware version. ie) "Firmware Version 1.1.1"</td></tr>
-<tr align='center'><td>0x080c</td><td>-</td><td>?</td><td>ComponentVersion</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x080d</td><td>-</td><td>0x3004</td><td>ROMOperationMode</td>
+<tr align='center'><td>0x080c</td><td>-</td><td>?</td><td>ComponentVersion</td><td>?</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x080d</td><td>-</td><td>0x3004</td><td>ROMOperationMode</td><td>4</td>
     <td align='left'>ie) The string "USA" for 300D's sold in North America</td></tr>
-<tr align='center'><td>0x0810</td><td>0x09</td><td>0x2807</td><td>OwnerName</td>
+<tr align='center'><td>0x0810</td><td>0x09</td><td>0x2807</td><td>OwnerName</td><td>32</td>
     <td align='left'>Owner's name. ie) "Phil Harvey"</td></tr>
-<tr align='center'><td>0x0815</td><td>0x06</td><td>0x2804</td><td>CanonImageType</td>
+<tr align='center'><td>0x0815</td><td>0x06</td><td>0x2804</td><td>CanonImageType</td><td>32</td>
     <td align='left'>Type of file. ie) "CRW:EOS DIGITAL REBEL CMOS RAW"</td></tr>
-<tr align='center'><td>0x0816</td><td>-</td><td>0x300a</td><td>OriginalFileName</td>
+<tr align='center'><td>0x0816</td><td>-</td><td>0x300a</td><td>OriginalFileName</td><td>32</td>
     <td align='left'>Original file name. ie) "CRW_1834.CRW"</td></tr>
-<tr align='center'><td>0x0817</td><td>-</td><td>0x300a</td><td>ThumbnailFileName</td>
+<tr align='center'><td>0x0817</td><td>-</td><td>0x300a</td><td>ThumbnailFileName</td><td>32</td>
     <td align='left'>Thumbnail file name. ie) "CRW_1834.THM"</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=5>2-Byte Alignment</th></tr>
-<tr align='center'><td>0x100a</td><td>-</td><td>0x300a</td><td>TargetImageType</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x1010</td><td>-</td><td>0x3002</td><td>ShutterReleaseMethod</td>
+<tr bgcolor='#eeeeee'><th colspan=6>2-Byte Alignment</th></tr>
+<tr align='center'><td>0x100a</td><td>-</td><td>0x300a</td><td>TargetImageType</td><td>2</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x1010</td><td>-</td><td>0x3002</td><td>ShutterReleaseMethod</td><td>2</td>
     <td align='left'>0=single shot, 1=continuous shooting</td></tr>
-<tr align='center'><td>0x1011</td><td>-</td><td>0x3002</td><td>ShutterReleaseTiming</td>
+<tr align='center'><td>0x1011</td><td>-</td><td>0x3002</td><td>ShutterReleaseTiming</td><td>2</td>
     <td align='left'>0=priority on shutter, 1=priority on focus</td></tr>
-<tr align='center'><td>0x1016</td><td>-</td><td>0x3002</td><td>ReleaseSetting</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x101c</td><td>-</td><td>0x3004</td><td>BaseISO</td>
+<tr align='center'><td>0x1016</td><td>-</td><td>0x3002</td><td>ReleaseSetting</td><td>2</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x101c</td><td>-</td><td>0x3004</td><td>BaseISO</td><td>2</td>
     <td align='left'>The camera body's base ISO sensitivity</td></tr>
-<tr align='center'><td>0x1028</td><td>0x03</td><td>?</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x1029</td><td>0x02</td><td>0x300b</td><td>FocalLength</td>
+<tr align='center'><td>0x1028</td><td>0x03</td><td>?</td><td>?</td><td>?</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x1029</td><td>0x02</td><td>0x300b</td><td>FocalLength</td><td>8</td>
     <td align='left'>Four 16 bit integers: 0) unknown, 1) focal length in mm, 2-3) sensor width
     and height in units of 1/1000 inch</td></tr>
-<tr align='center'><td>0x102a</td><td>0x04</td><td>0x300b</td><td>CanonShotInfo</td>
+<tr align='center'><td>0x102a</td><td>0x04</td><td>0x300b</td><td>CanonShotInfo</td><td>Varies</td>
     <td align='left'>Data block giving <a href="TagNames.html#Canon_ShotInfo">shot information</a></td></tr>
-<tr align='center'><td>0x102c</td><td>-</td><td>?</td><td>CanonColorInfo2</td>
+<tr align='center'><td>0x102c</td><td>-</td><td>?</td><td>CanonColorInfo2</td><td>?</td>
     <td align='left'>Data block of color information (format unknown)</td></tr>
-<tr align='center'><td>0x102d</td><td>0x01</td><td>0x300b</td><td>CanonCameraSettings</td>
+<tr align='center'><td>0x102d</td><td>0x01</td><td>0x300b</td><td>CanonCameraSettings</td><td>92</td>
     <td align='left'>Data block giving <a href="TagNames.html#Canon_CameraSettings">camera settings</a></td></tr>
-<tr align='center'><td>0x1031</td><td>-</td><td>0x300b</td><td>SensorInfo</td>
+<tr align='center'><td>0x1031</td><td>-</td><td>0x300b</td><td>SensorInfo</td><td>34</td>
     <td align='left'><a href="TagNames.html#CanonRaw_SensorInfo">Sensor size and resolution information</a></td></tr>
-<tr align='center'><td>0x1033</td><td>0x0f</td><td>0x300b</td><td>CanonCustomFunctions</td>
+<tr align='center'><td>0x1033</td><td>0x0f</td><td>0x300b</td><td>CanonCustomFunctions</td><td>Varies</td>
     <td align='left'>Data block giving <a href="TagNames.html#CanonCustom_Functions10D">Canon custom settings</a></td></tr>
-<tr align='center'><td>0x1038</td><td>0x12</td><td>0x300b</td><td>CanonPictureInfo</td>
+<tr align='center'><td>0x1038</td><td>0x12</td><td>0x300b</td><td>CanonPictureInfo</td><td>Varies</td>
     <td align='left'>Data block giving <a href="TagNames.html#Canon_PictureInfo">picture-specific information</a></td></tr>
-<tr align='center'><td>0x1039</td><td>0x13</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x1093</td><td>0x93</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x10a8</td><td>0xa8</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x10a9</td><td>0xa9</td><td>0x300b</td><td>WhiteBalanceTable</td>
+<tr align='center'><td>0x1039</td><td>0x13</td><td>0x300b</td><td>?</td><td>8</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x1093</td><td>0x93</td><td>0x300b</td><td>?</td><td>18</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x10a8</td><td>0xa8</td><td>0x300b</td><td>?</td><td>20</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x10a9</td><td>0xa9</td><td>0x300b</td><td>WhiteBalanceTable</td><td>82</td>
     <td align='left'>Table of red/blue balance levels for all WhiteBalance menu entries,
     as a series of 16-bit integers which are combined in pairs to form rational values</td></tr>
-<tr align='center'><td>0x10aa</td><td>0xaa</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x10ae</td><td>0xae</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x10b4</td><td>0xb4</td><td>0x300b</td><td>ColorSpace</td>
-    <td align='left'>A 2-byte integer specifying the color space
+<tr align='center'><td>0x10aa</td><td>0xaa</td><td>0x300b</td><td>?</td><td>10</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x10ae</td><td>0xae</td><td>0x300b</td><td>ColorTemperature</td><td>2</td>
+    <td align='left'>16-bit integer giving the color temperature</td></tr>
+<tr align='center'><td>0x10b4</td><td>0xb4</td><td>0x300b</td><td>ColorSpace</td><td>2</td>
+    <td align='left'>16-bit integer specifying the color space
     (1=sRGB, 2=Adobe RGB, 0xffff=uncalibrated)</td></tr>
-<tr align='center'><td>0x10b5</td><td>0xb5</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x10c0</td><td>0xc0</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x10c1</td><td>0xc1</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=5>4-Byte Alignment</th></tr>
-<tr align='center'><td>0x1803</td><td>-</td><td>0x300a</td><td>ImageFormat</td>
+<tr align='center'><td>0x10b5</td><td>0xb5</td><td>0x300b</td><td>?</td><td>10</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x10c0</td><td>0xc0</td><td>0x300b</td><td>?</td><td>26</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x10c1</td><td>0xc1</td><td>0x300b</td><td>?</td><td>26</td><td align='left'>-</td></tr>
+<tr bgcolor='#eeeeee'><th colspan=6>4-Byte Alignment</th></tr>
+<tr align='center'><td>0x1803</td><td>-</td><td>0x300a</td><td>ImageFormat</td><td>8</td>
     <td align='left'>32-bit integer specifying image format (0x20001 for CRW), followed
     by 32-bit float giving target compression ratio</td></tr>
-<tr align='center'><td>0x1804</td><td>-</td><td>0x300a</td><td>RecordID</td>
+<tr align='center'><td>0x1804</td><td>-</td><td>0x300a</td><td>RecordID</td><td>4</td>
     <td align='left'>The number of pictures taken since the camera was manufactured</td></tr>
-<tr align='center'><td>0x1806</td><td>-</td><td>0x3002</td><td>SelfTimerTime</td>
+<tr align='center'><td>0x1806</td><td>-</td><td>0x3002</td><td>SelfTimerTime</td><td>4</td>
     <td align='left'>32-bit integer giving self-timer time in milliseconds</td></tr>
-<tr align='center'><td>0x1807</td><td>-</td><td>0x3002</td><td>TargetDistanceSetting</td>
+<tr align='center'><td>0x1807</td><td>-</td><td>0x3002</td><td>TargetDistanceSetting</td><td>4</td>
     <td align='left'>32-bit float giving target distance in mm</td></tr>
-<tr align='center'><td>0x180b</td><td>0x0c</td><td>0x2807</td><td>SerialNumber</td>
+<tr align='center'><td>0x180b</td><td>0x0c</td><td>0x2807</td><td>SerialNumber</td><td>4</td>
     <td align='left'>The camera body number. ie) 00560012345</td></tr>
-<tr align='center'><td>0x180e</td><td>-</td><td>0x300a</td><td>TimeStamp</td>
+<tr align='center'><td>0x180e</td><td>-</td><td>0x300a</td><td>TimeStamp</td><td>12</td>
     <td align='left'>32-bit integer giving the time in seconds when the picture was taken,
     followed by a 32-bit timezone in seconds</td></tr>
-<tr align='center'><td>0x1810</td><td>-</td><td>0x300a</td><td>ImageInfo</td>
+<tr align='center'><td>0x1810</td><td>-</td><td>0x300a</td><td>ImageInfo</td><td>28</td>
     <td align='left'>Data block containing <a href="TagNames.html#CanonRaw_ImageInfo">image information, including rotation</a></td></tr>
-<tr align='center'><td>0x1813</td><td>-</td><td>0x3002</td><td>FlashInfo</td>
+<tr align='center'><td>0x1813</td><td>-</td><td>0x3002</td><td>FlashInfo</td><td>8</td>
     <td align='left'>Two 32-bit floats: The flash guide number and the flash threshold</td></tr>
-<tr align='center'><td>0x1814</td><td>-</td><td>0x3003</td><td>MeasuredEV</td>
-    <td align='left'>A 32-bit floats giving the measured EV</td></tr>
-<tr align='center'><td>0x1817</td><td>0x08</td><td>0x300a</td><td>FileNumber</td>
-    <td align='left'>An integer giving the number of this file. ie) 1181834</td></tr>
-<tr align='center'><td>0x1818</td><td>-</td><td>0x3002</td><td>ExposureInfo</td>
+<tr align='center'><td>0x1814</td><td>-</td><td>0x3003</td><td>MeasuredEV</td><td>4</td>
+    <td align='left'>32-bit float giving the measured EV</td></tr>
+<tr align='center'><td>0x1817</td><td>0x08</td><td>0x300a</td><td>FileNumber</td><td>4</td>
+    <td align='left'>32-bit integer giving the number of this file. ie) 1181834</td></tr>
+<tr align='center'><td>0x1818</td><td>-</td><td>0x3002</td><td>ExposureInfo</td><td>12</td>
     <td align='left'>Three 32-bit floats: Exposure compensation, Tv, Av</td></tr>
-<tr align='center'><td>0x1834</td><td>0x10</td><td>?</td><td>?</td><td align='left'>-</td></tr>
-<tr align='center'><td>0x1835</td><td>-</td><td>0x300b</td><td>DecoderTable</td>
+<tr align='center'><td>0x1834</td><td>0x10</td><td>?</td><td>?</td><td>?</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x1835</td><td>-</td><td>0x300b</td><td>DecoderTable</td><td>16</td>
     <td align='left'>RAW decoder table</td></tr>
-<tr align='center'><td>0x183b</td><td>0x15</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=5>Mixed Data Records</th></tr>
-<tr align='center'><td>0x2005</td><td>-</td><td>Root</td><td>RawData</td>
+<tr align='center'><td>0x183b</td><td>0x15</td><td>0x300b</td><td>?</td><td>4</td><td align='left'>? (observed with a value of 0x90000000)</td></tr>
+<tr bgcolor='#eeeeee'><th colspan=6>Mixed Data Records</th></tr>
+<tr align='center'><td>0x2005</td><td>-</td><td>Root</td><td>RawData</td><td>Varies</td>
     <td align='left'>The raw data itself (the bulk of the CRW file)</td></tr>
-<tr align='center'><td>0x2007</td><td>-</td><td>Root</td><td>JpgFromRaw</td>
+<tr align='center'><td>0x2007</td><td>-</td><td>Root</td><td>JpgFromRaw</td><td>Varies</td>
     <td align='left'>The embedded JPEG image (2048x1360 pixels for the 300D with Canon firmware)</td></tr>
-<tr align='center'><td>0x2008</td><td>-</td><td>Root</td><td>?</td><td align='left'>-</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=5>SubDirectory Blocks</th></tr>
-<tr align='center'><td>0x2804</td><td>-</td><td>0x300a</td><td>ImageDescription</td>
+<tr align='center'><td>0x2008</td><td>-</td><td>Root</td><td>ThumbnailImage</td><td>Varies</td>
+    <td align='left'>Thumbnail image (JPEG, 160x120 pixels)</td></tr>
+<tr bgcolor='#eeeeee'><th colspan=6>SubDirectory Blocks</th></tr>
+<tr align='center'><td>0x2804</td><td>-</td><td>0x300a</td><td>ImageDescription</td><td>Varies</td>
     <td align='left'>The image description subdirectory</td></tr>
-<tr align='center'><td>0x2807</td><td>-</td><td>0x300a</td><td>CameraObject</td>
+<tr align='center'><td>0x2807</td><td>-</td><td>0x300a</td><td>CameraObject</td><td>Varies</td>
     <td align='left'>The camera object subdirectory</td></tr>
-<tr align='center'><td>0x3002</td><td>-</td><td>0x300a</td><td>ShootingRecord</td>
+<tr align='center'><td>0x3002</td><td>-</td><td>0x300a</td><td>ShootingRecord</td><td>Varies</td>
     <td align='left'>The shooting record subdirectory</td></tr>
-<tr align='center'><td>0x3003</td><td>-</td><td>0x300a</td><td>MeasuredInfo</td>
+<tr align='center'><td>0x3003</td><td>-</td><td>0x300a</td><td>MeasuredInfo</td><td>Varies</td>
     <td align='left'>The measured information subdirectory</td></tr>
-<tr align='center'><td>0x3004</td><td>-</td><td>0x2807</td><td>CameraSpecification</td>
+<tr align='center'><td>0x3004</td><td>-</td><td>0x2807</td><td>CameraSpecification</td><td>Varies</td>
     <td align='left'>The camera specification subdirectory</td></tr>
-<tr align='center'><td>0x300a</td><td>-</td><td>Root</td><td>ImageProps</td>
+<tr align='center'><td>0x300a</td><td>-</td><td>Root</td><td>ImageProps</td><td>Varies</td>
     <td align='left'>The main subdirectory containing all meta information</td></tr>
-<tr align='center'><td>0x300b</td><td>-</td><td>0x300a</td><td>ExifInformation</td>
+<tr align='center'><td>0x300b</td><td>-</td><td>0x300a</td><td>ExifInformation</td><td>Varies</td>
     <td align='left'>The subdirectory containing most of the JPEG/TIFF EXIF information</td></tr>
 </table></blockquote>
 
 <p><hr>
 Please e-mail me if you find any errors or omissions in this document.  My address is phil at owl.phy.queensu.ca - Thanks!
-<p><i>P. Harvey - Last revised Feb. 18, 2005</i>
+<p><i>P. Harvey - Last revised Mar. 8, 2005</i>
 </body>
 </html>

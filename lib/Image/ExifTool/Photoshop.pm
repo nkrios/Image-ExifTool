@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -83,8 +83,7 @@ sub WritePhotoshop($$$);
     0x040c => {
         Name => 'PhotoshopThumbnail',
         Groups => { 2 => 'Image' },
-        ValueConv => 'substr($val, 0x1c)',
-        PrintConv => '\$val',
+        ValueConv => 'my $img=substr($val, 0x1c);\$img',
     },
 #    0x040d => 'GlobalAngle',
 #    0x040e => 'ColorSamplersResource',

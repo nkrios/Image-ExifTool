@@ -10,6 +10,34 @@ package Image::ExifTool::IPTC;
 
 use strict;
 
+# mandatory IPTC tags for each record
+my %mandatory = (
+    1 => {
+        0 => 4,     # EnvelopeRecordVersion
+    },
+    2 => {
+        0 => 4,     # ApplicationRecordVersion
+    },
+    3 => {
+        0 => 4,     # NewsPhotoVersion
+    },
+);
+
+# manufacturer strings for IPTCPictureNumber
+my %manufacturer = (
+    1 => 'Associated Press, USA',
+    2 => 'Eastman Kodak Co, USA',
+    3 => 'Hasselblad Electronic Imaging, Sweden',
+    4 => 'Tecnavia SA, Switzerland',
+    5 => 'Nikon Corporation, Japan',
+    6 => 'Coatsworth Communications Inc, Canada',
+    7 => 'Agence France Presse, France',
+    8 => 'T/One Inc, USA',
+    9 => 'Associated Newspapers, UK',
+    10 => 'Reuters London',
+    11 => 'Sandia Imaging Systems Inc, USA',
+    12 => 'Visualize, Spain',
+);
 
 #------------------------------------------------------------------------------
 # validate raw values for writing
@@ -21,8 +49,11 @@ sub CheckIPTC($$$)
     my ($exifTool, $tagInfo, $valPtr) = @_;
     my $format = $$tagInfo{Format};
     if ($format =~ /^int(\d+)/) {
-        my $val = $$valPtr;
         my $bytes = int(($1 || 0) / 8);
+        if ($bytes ne 1 and $bytes ne 2 and $bytes ne 4) {
+            return "Can't write $bytes-byte integer";
+        }
+        my $val = $$valPtr;
         return 'Not an integer' unless Image::ExifTool::IsInt($val);
         my $n;
         for ($n=0; $n<$bytes; ++$n) { $val >>= 8; }
@@ -54,13 +85,12 @@ sub FormatIPTC($$)
     my ($tagInfo, $valPtr) = @_;
     if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^int(\d+)/) {
         my $len = int(($1 || 0) / 8);
-        if ($len == 1) {      # 1 byte
-            $$valPtr = ord($$valPtr);
-        } elsif ($len == 4) { # 4-byte integer
-            $$valPtr = pack('N', $$valPtr);
-        } else {            # pack as 2-byte by default
+        if ($len == 1) {        # 1 byte
+            $$valPtr = chr($$valPtr);
+        } elsif ($len == 2) {   # 2-byte integer
             $$valPtr = pack('n', $$valPtr);
-            warn "Bad format for $$tagInfo{Name}\n" unless $len == 2;
+        } else {                # 4-byte integer
+            $$valPtr = pack('N', $$valPtr);
         }
     }
 }
@@ -93,6 +123,50 @@ sub IptcTime($)
         }
     } else {
         undef $val;     # time format error
+    }
+    return $val;
+}
+
+#------------------------------------------------------------------------------
+# Convert picture number
+# Inputs: 0) value
+# Returns: Converted value
+sub ConvertPictureNumber($)
+{
+    my $val = shift;
+    if ($val eq "\0" x 16) {
+        $val = 'Unknown';
+    } elsif (length $val >= 16) {
+        my @vals = unpack('nNA8n', $val);
+        $val = $vals[0];
+        my $manu = $manufacturer{$val};
+        $val .= " ($manu)" if $manu;
+        $val .= ', equip ' . $vals[1];
+        $vals[2] =~ s/(\d{4})(\d{2})(\d{2})/$1:$2:$3/;
+        $val .= ", $vals[2], no. $vals[3]";
+    } else {
+        $val = '<format error>'
+    }
+    return $val;
+}
+
+#------------------------------------------------------------------------------
+# Inverse picture number conversion
+# Inputs: 0) value
+# Returns: Converted value (or undef on error)
+sub InvConvertPictureNumber($)
+{
+    my $val = shift;
+    $val =~ s/\(.*\)//g;    # remove manufacturer description
+    $val =~ tr/://d;        # remove date separators
+    $val =~ tr/0-9/ /c;     # turn remaining non-numbers to spaces
+    my @vals = split /\s+/, $val;
+    if (@vals >= 4) {
+        $val = pack('nNA8n', @vals);
+    } elsif ($val =~ /unknown/i) {
+        $val = "\0" x 16;
+    } else {
+        undef $val;
     }
     return $val;
 }
@@ -307,7 +381,8 @@ This file is autoloaded by Image::ExifTool::IPTC.
 
 =head1 DESCRIPTION
 
-This file contains routines to write IPTC metadata.
+This file contains routines to write IPTC metadata, plus a few other
+seldom-used routines.
 
 =head1 AUTHOR
 

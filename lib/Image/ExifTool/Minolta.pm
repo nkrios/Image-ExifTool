@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.10';
+$VERSION = '1.12';
 
 %Image::ExifTool::Minolta::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -42,7 +42,7 @@ $VERSION = '1.10';
     0x0018 => {
         Name => 'ImageStabilization',
         Writable => 0,
-        PrintConv => '"On"',
+        ValueConv => '"On"',
     },
     0x0040 => {
         Name => 'CompressedImageSize',
@@ -54,17 +54,18 @@ $VERSION = '1.10';
     },
     0x0088 => {
         Name => 'PreviewImageStart',
-        Flags => [ 'IsOffset', 'Protected' ],
+        Flags => 'IsOffset',
         OffsetPair => 0x0089, # point to associated byte count
         DataTag => 'PreviewImage',
         Writable => 'int32u',
+        Protected => 2,
     },
     0x0089 => {
         Name => 'PreviewImageLength',
         OffsetPair => 0x0088, # point to associated offset
         DataTag => 'PreviewImage',
         Writable => 'int32u',
-        Protected => 1,
+        Protected => 2,
     },
     0x0101 => {
         Name => 'ColorMode',

@@ -98,6 +98,7 @@ while ($_ = shift) {
         /^listw$/i and $listTags = 2, next;
         /^group(\d*)$/i and $listGroups = $1, next;
         /^ver$/i and print("ExifTool version $Image::ExifTool::VERSION\n"), exit 0;
+        /^alltagsfromfile$/i and push(@newValues, "$_=" . (@ARGV ? shift : '')), next;
         /^a$/i and $exifTool->Options(Duplicates => 1), next;
         /^b$/i and $binaryOutput = 1, next;
         /^d$/  and $exifTool->Options('DateFormat', shift || die "Expecting date format\n"), next;
@@ -327,7 +328,9 @@ if (@newValues) {
     foreach (@newValues) {
         /(.*?)=(.*)/ or next;
         my ($tag, $newVal) = ($1, $2);
+        $newVal eq '' and undef $newVal;    # undefined to delete tag
         if ($tag =~ /^AllTagsFromFile$/i) {
+            die "Need file name for -AllTagsFromFile\n" unless defined $newVal;
             my $info = $exifTool->SetNewValuesFromFile($newVal);
             $info->{Error} and die "Error: $info->{Error} - $newVal\n";
             if ($info->{Warning}) {
@@ -338,8 +341,7 @@ if (@newValues) {
             %$info or warn "No writable tags found - $newVal\n";
             next;
         }
-        $newVal eq '' and undef $newVal;    # undefined to delete tag
-        my %opts;
+        my %opts = ( Protected => 1 );      # allow writing of 'unsafe' tags
         if ($tag =~ s/<// and defined $newVal) {
             # read new value from file
             my $file = $newVal;
@@ -637,6 +639,7 @@ sub GetImageInfo($$)
         my $lastGroup = '';
         my $tag;
         foreach $tag (@foundTags) {
+            my $tagName = Image::ExifTool::GetTagName($tag);
             my $group;
             if (defined $showGroup) {
                 $group = $exifTool->GetGroup($tag, $showGroup);
@@ -704,7 +707,7 @@ sub GetImageInfo($$)
                 if ($outFormat <= 0) {
                     print $fp "<td>$description</td><td>$val</td></tr>\n";
                 } elsif ($outFormat == 1) {
-                    print $fp "<td>$tag</td><td>$val</td></tr>\n";
+                    print $fp "<td>$tagName</td><td>$val</td></tr>\n";
                 } else {
                     # make value html-friendly
                     $val =~ s/&/&amp;/g;
@@ -717,7 +720,7 @@ sub GetImageInfo($$)
                     print $fp "$group\t" if defined $group;
                     print $fp "$id\t" if $showTagID;
                     if ($outFormat >= 2) {
-                        print $fp "$tag\t$val\n";
+                        print $fp "$tagName\t$val\n";
                     } else {
                         print $fp "$description\t$val\n";
                     }
@@ -742,7 +745,7 @@ sub GetImageInfo($$)
                 } elsif ($outFormat == 2) {
                     print $fp "[$group] " if defined $group;
                     print $fp "$id " if $showTagID;
-                    print $fp "$tag: $val\n";
+                    print $fp "$tagName: $val\n";
                 } else {
                     print $fp "$group " if defined $group;
                     print $fp "$id " if $showTagID;

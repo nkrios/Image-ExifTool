@@ -15,7 +15,7 @@ package Image::ExifTool::Olympus;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 %Image::ExifTool::Olympus::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -41,7 +41,8 @@ $VERSION = '1.07';
             Name => 'Quality',
             Description => 'Image Quality',
             Writable => 'int16u',
-            PrintConv => { 0 => 'SQ', 1 => 'HQ', 2 => 'SHQ' },
+            # 6 = RAW for C5060WZ
+            PrintConv => { 0 => 'SQ', 1 => 'HQ', 2 => 'SHQ', 6 => 'RAW' },
         },
     ],
     0x0202 => {
@@ -71,7 +72,7 @@ $VERSION = '1.07';
     0x0f00 => {
         Name => 'DataDump',
         Writable => 0,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x1017 => { #2
         Name => 'RedBalance',

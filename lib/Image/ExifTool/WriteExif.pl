@@ -19,32 +19,109 @@ sub BuildFixup($$$);
 # Use this lookup to decide when we should delete information that is stored
 # in another IFD when we write it to the preferred IFD.
 my %crossDelete = (
-    'ExifIFD' => 'IFD0',
-    'IFD0'    => 'ExifIFD',
+    ExifIFD => 'IFD0',
+    IFD0    => 'ExifIFD',
 );
+
+# mandatory tag default values
+my %mandatory = (
+    IFD0 => {
+        0x011a => 72,       # XResolution
+        0x011b => 72,       # YResolution
+        0x0128 => 2,        # Resoution unit (inches)
+        0x0213 => 1,        # YCbCrPositioning (centered)
+    },
+    IFD1 => {
+        0x0103 => 6,        # Compression (JPEG)
+        0x011a => 72,       # XResolution
+        0x011b => 72,       # YResolution
+        0x0128 => 2,        # Resoution unit (inches)
+    },
+    ExifIFD => {
+        0x9000 => '0220',   # ExifVersion
+        0x9101 => "\1\2\3\0", # ComponentsConfiguration
+        0xa000 => '0100',   # FlashpixVersion
+        0xa001 => 0xffff,   # ColorSpace (uncalibrated)
+       # 0xa002 => ????,     # ExifImageWidth
+       # 0xa003 => ????,     # ExifImageLength
+    },
+    GPS => {
+        0x0000 => '2 2 0 0',# GPSVersionID
+    },
+);
+    
 # The main EXIF table is unique because the tags from this table may appear
 # in many different directories.  For this reason, we introduce a
 # "WriteGroup" member to the tagInfo that tells us the preferred location
 # for writing each tag.  Here is the lookup for Writable flag (format)
 # and WriteGroup for all writable tags
 # - WriteGroup is ExifIFD unless otherwise specified
+# - Protected is 1 if the tag shouldn't be copied with SetNewValuesFromFile()
 my %writeTable = (
-    # IFD0 tags we can set:
-    0x0112 => {             # Orientation
+    0x0001 => {             # InteropIndex
+        Protected => 1,
+        Writable => 'string',
+        WriteGroup => 'InteropIFD',
+    },
+    0x0002 => {             # InteropVersion
+        Protected => 1,
+        Writable => 'undef',
+        WriteGroup => 'InteropIFD',
+    },
+    0x00fe => {             # SubfileType
+        Protected => 1,
+        Writable => 'int32u',
+        WriteGroup => 'IFD0',
+    },
+    0x00ff => {             # OldSubfileType
+        Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'IFD0',
     },
-    0x011a => {             # XResolution
-        Writable => 'rational32u',
+    0x0100 => {             # ImageWidth
+        Protected => 1,
+        Writable => 'int32u',
         WriteGroup => 'IFD0',
     },
-    0x011b => {             # YResolution
-        Writable => 'rational32u',
+    0x0101 => {             # ImageHeigth
+        Protected => 1,
+        Writable => 'int32u',
         WriteGroup => 'IFD0',
     },
-    0x0132 => {             # ModifyDate
-        Writable => 'string',
-        PrintConvInv => '$val',   # (only works if date format not set)
+    0x0102 => {             # BitsPerSample
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+        Count => 3,
+    },
+    0x0103 => {             # Compression
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0x0106 => {             # PhotometricInterpretation
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0x0107 => {             # Thresholding
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0x0108 => {             # CellWidth
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0x0109 => {             # CellLength
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0x010a => {             # FillOrder
+        Protected => 1,
+        Writable => 'int16u',
         WriteGroup => 'IFD0',
     },
     0x010d => {             # DocumentName
@@ -65,12 +142,31 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         ValueConvInv => '$val',
     },
+    0x0112 => {             # Orientation
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0x0115 => {             # SamplesPerPixel
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0x0116 => {             # RowsPerStrip
+        Protected => 1,
+        Writable => 'int32u',
+        WriteGroup => 'IFD0',
+    },
     0x011a => {             # XResolution
         Writable => 'rational32u',
         WriteGroup => 'IFD0',
     },
     0x011b => {             # YResolution
         Writable => 'rational32u',
+        WriteGroup => 'IFD0',
+    },
+    0x011c => {             # PlanarConfiguration
+        Protected => 1,
+        Writable => 'int16u',
         WriteGroup => 'IFD0',
     },
     0x011d => {             # PageName
@@ -105,7 +201,7 @@ my %writeTable = (
     0x0132 => {             # ModifyDate
         Writable => 'string',
         WriteGroup => 'IFD0',
-        PrintConvInv => '$val',
+        PrintConvInv => '$val',   # (only works if date format not set)
     },
     0x013b => {             # Artist
         Writable => 'string',
@@ -115,19 +211,34 @@ my %writeTable = (
         Writable => 'string',
         WriteGroup => 'IFD0',
     },
+    0x013d => {             # Predictor
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
     0x013e => {             # WhitePoint
         Writable => 'rational32u',
-        Count => 2,
         WriteGroup => 'IFD0',
+        Count => 2,
     },
     0x013f => {             # PrimaryChromaticities
         Writable => 'rational32u',
-        Count => 6,
         WriteGroup => 'IFD0',
+        Count => 6,
     },
     0x0141 => {             # HalftoneHints
         Writable => 'int16u',
+        WriteGroup => 'IFD0',
         Count => 2,
+    },
+    0x0142 => {             # TileWidth
+        Protected => 1,
+        Writable => 'int32u',
+        WriteGroup => 'IFD0',
+    },
+    0x0143 => {             # TileLength
+        Protected => 1,
+        Writable => 'int32u',
         WriteGroup => 'IFD0',
     },
     0x014c => {             # InkSet
@@ -141,6 +252,27 @@ my %writeTable = (
     0x013c => {             # HostComputer
         Writable => 'string',
         WriteGroup => 'IFD0',
+    },
+    0x0212 => {             # YCbCrSubSampling
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+        Count => 2,
+    },
+    0x0213 => {             # YCbCrPositioning
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+    },
+    0x1001 => {             # RelatedImageWidth
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'InteropIFD',
+    },
+    0x1002 => {             # RelatedImageHeight
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'InteropIFD',
     },
     0x8298 => {             # Copyright
         Writable => 'string',
@@ -175,7 +307,10 @@ my %writeTable = (
         Writable => 'string',
         PrintConvInv => '$val',   # (only works if date format not set)
     },
-#    0x9101 => 'undef',      # ComponentsConfiguration
+    0x9101 => {             # ComponentsConfiguration
+        Protected => 1,
+        Writable => 'undef',
+    },
     0x9201 => {             # ShutterSpeedValue
         Writable => 'rational32s',
         ValueConvInv => '$val>0 ? -log($val)/log(2) : -100',
@@ -385,6 +520,9 @@ my %writeTable = (
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Owner's Name: $val"},
+        Notes => q{tags 0xfde8-0xfe58 are generated by Photoshop Camera RAW --
+                   some names are the same as other EXIF tags, but ExifTool will
+                   avoid writing these unless they already exist in the file},
     },
     0xfde9 => {
         Name => 'SerialNumber',
@@ -656,6 +794,7 @@ sub WriteExif($$$)
     my (@offsetInfo, %delete);
     my $newData = '';   # initialize buffer to receive new directory data
     my ($nextIfdPos, %offsetData, $inMakerNotes);
+    my $deleteAll = 0;
 
     $inMakerNotes = 1 if $dirName eq 'MakerNotes';
     my $ifd;
@@ -696,20 +835,6 @@ sub WriteExif($$$)
             }
             $set{$tagID} = $tagInfo;
         }
-        my ($addDirs, @newTags);
-        if ($inMakerNotes) {
-            $addDirs = { };
-        } else {
-            # get a hash of directories we will be writing in this one
-            $addDirs = $exifTool->GetAddDirHash($tagTablePtr, $dirName);
-            # make a union of tags & dirs (can set whole dirs, like MakerNotes)
-            my %allTags = %set;
-            foreach (keys %$addDirs) {
-                $allTags{$_} = $$addDirs{$_};
-            }
-            # make sorted list of new tags to be added
-            @newTags = sort { $a <=> $b } keys(%allTags);
-        }
         # save pointer to start of this IFD within the newData
         my $newStart = length($newData);
         my @subdirs;    # list of subdirectory data and tag table pointers
@@ -746,6 +871,34 @@ sub WriteExif($$$)
             $len = 2 + 12 * $numEntries;
         } else {
             $numEntries = $len = 0;
+        }
+        # initialize variables to handle mandatory tags
+        my $mandatory = $mandatory{$dirName};
+        my $allMandatory;
+        if ($mandatory) {
+            $allMandatory = 0;  # initialize to zero
+            # add mandatory tags if creating a new directory
+            unless ($numEntries) {
+                foreach (keys %$mandatory) {
+                    $set{$_} or $set{$_} = $$tagTablePtr{$_};
+                }
+            }
+        } else {
+            undef $deleteAll;   # don't remove directory (no mandatory entries)
+        }
+        my ($addDirs, @newTags);
+        if ($inMakerNotes) {
+            $addDirs = { };
+        } else {
+            # get a hash of directories we will be writing in this one
+            $addDirs = $exifTool->GetAddDirHash($tagTablePtr, $dirName);
+            # make a union of tags & dirs (can set whole dirs, like MakerNotes)
+            my %allTags = %set;
+            foreach (keys %$addDirs) {
+                $allTags{$_} = $$addDirs{$_};
+            }
+            # make sorted list of new tags to be added
+            @newTags = sort { $a <=> $b } keys(%allTags);
         }
         if ($dirStart + $len > $dataLen) {
             $exifTool->Error("Truncated $dirName directory");
@@ -875,9 +1028,16 @@ sub WriteExif($$$)
                     $newCount = $$newInfo{Count};
                     my $val;
                     my $newValueHash = $exifTool->GetNewValueHash($newInfo, $dirName);
+                    my ($isOverwriting, $newVal);
                     if ($isNew > 0) {
                         # don't create new entry unless requested
-                        next unless Image::ExifTool::IsCreating($newValueHash);
+                        if ($newValueHash) {
+                            next unless Image::ExifTool::IsCreating($newValueHash);
+                            $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash);
+                        } else {
+                            $newVal = $$mandatory{$newID};  # get value for mandatory tag
+                            $isOverwriting = 1;
+                        }
                         # convert using new format
                         $newFormName = $$newInfo{Format};
                         if ($newFormName) {
@@ -891,7 +1051,7 @@ sub WriteExif($$$)
                             }
                         }
                         $newFormat = $formatNumber{$newFormName};
-                    } else {
+                    } elsif ($newValueHash) {
                         # write in existing format
                         if ($inMakerNotes and $oldFormName ne 'string' and
                             $oldFormName ne 'undef')
@@ -906,9 +1066,10 @@ sub WriteExif($$$)
                             $ifdFormName = $oldFormName unless $ifdFormName and $ifdFormName ne '1';
                             $newFormName = $$newInfo{Format};
                         }
+                        $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash, $val);
                     }
-                    if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
-                        my $newVal = Image::ExifTool::GetNewValues($newValueHash);
+                    if ($isOverwriting) {
+                        $newVal = Image::ExifTool::GetNewValues($newValueHash) unless defined $newVal;
                         # value undefined if deleting this tag
                         if ($delete{$newID} or not defined $newVal) {
                             unless ($isNew) {
@@ -1108,6 +1269,125 @@ sub WriteExif($$$)
                     }
                     SetByteOrder($saveOrder);
 
+                } elsif ($$newInfo{SubDirectory} && $isNew <= 0) {
+                
+                    if ($$newInfo{SubIFD}) {
+#
+# rewrite existing sub IFD's
+#
+                        my $subdirName = $newInfo->{Groups}->{1};
+                        # must handle sub-IFD's specially since the values
+                        # are actually offsets to subdirectories
+                        unless ($oldCount) {   # can't have zero count
+                            $exifTool->Error("$dirName entry $index has zero count");
+                            return undef;
+                        }
+                        my $i;
+                        $newValue = '';    # reset value because we regenerate it below
+                        for ($i=0; $i<$oldCount; ++$i) {
+                            my $pt = Image::ExifTool::ReadValue($valueDataPt,
+                                            $valuePtr + $i * $formatSize[$oldFormat],
+                                            $formatName[$oldFormat], 1, $oldSize);
+                            my $subdirStart = $pt - $dataPos;
+                            my %subdirInfo = (
+                                Base => $base,
+                                DataPt => $dataPt,
+                                DirStart => $subdirStart,
+                                DataPos => $dataPos,
+                                DataLen => $dataLen,
+                                DirName => $subdirName,
+                                Fixup => new Image::ExifTool::Fixup,
+                                RAF => $raf,
+                            );
+                            # read subdirectory from file if necessary
+                            if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
+                                my ($buff, $buf2, $subSize);
+                                unless ($raf and $raf->Seek($pt + $base, 0) and
+                                        $raf->Read($buff,2) == 2 and
+                                        $subSize = 12 * Get16u(\$buff, 0) and
+                                        $raf->Read($buf2,$subSize) == $subSize)
+                                {
+                                    $exifTool->Error("Can't read $subdirName data");
+                                    return undef;
+                                }
+                                $buff .= $buf2;
+                                # change subdirectory information to data we just read
+                                $subdirInfo{DataPt} = \$buff;
+                                $subdirInfo{DirStart} = 0;
+                                $subdirInfo{DataPos} = $pt;
+                                $subdirInfo{DataLen} = $subSize + 2;
+                            }
+                            my $subTable = $tagTablePtr;
+                            if ($newInfo->{SubDirectory}->{TagTable}) {
+                                $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
+                            }
+                            my $subdir = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+                            return undef unless defined $subdir;
+                            next unless length($subdir);
+                            # temporarily set value to subdirectory index
+                            # (will set to actual offset later when we know what it is)
+                            $newValue .= Set32u(0xfeedf00d);
+                            my ($offset, $where);
+                            if ($oldCount > 1) {
+                                $offset = length($valBuff) + $i * 4;
+                                $where = 'valBuff';
+                            } else {
+                                $offset = length($dirBuff) + 8;
+                                $where = 'dirBuff';
+                            }
+                            # add to list of subdirectories we will add later
+                            push @subdirs, {
+                                DataPt => \$subdir,
+                                Table => $subTable,
+                                Fixup => $subdirInfo{Fixup},
+                                Offset => $offset,
+                                Where => $where,
+                            };
+                        }
+                        next unless length $newValue;
+                        # set new format to int32u
+                        $newFormName = 'int32u';
+                        $newFormat = $formatNumber{$newFormName};
+                        $newValuePt = \$newValue;
+    
+                    } elsif ((not defined $newInfo->{SubDirectory}->{Start} or
+                             $newInfo->{SubDirectory}->{Start} eq '$valuePtr') and
+                             $newInfo->{SubDirectory}->{TagTable})
+                    {
+#
+# rewrite other existing subdirectories ('$valuePtr' type only)
+#
+                        my $subFixup = new Image::ExifTool::Fixup;
+                        my %subdirInfo = (
+                            Base => $base,
+                            DataPt => $valueDataPt,
+                            DirStart => $valuePtr,
+                            DataPos => $valueDataPos,
+                            DataLen => $valueDataLen,
+                            DirLen => $oldSize,
+                            RAF => $raf,
+                            Parent => $dirInfo->{DirName},
+                            Fixup => $subFixup,
+                        );
+                        my $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
+                        if ($subTable) {
+                            $subTable = GetTagTable($subTable);
+                        } else {
+                            $subTable = $tagTablePtr;
+                        }
+                        $newValue = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+                        $newValuePt = \$newValue if defined $newValue;
+                        unless (defined $$newValuePt) {
+                            $exifTool->Error("Internal error writing $$dirInfo{DirName}");
+                            return undef;
+                        }
+                        next unless length $$newValuePt;
+                        if ($subFixup->{Pointers} and $subdirInfo{Base} == $base) {
+                            $subFixup->{Start} += length $valBuff;
+                            push @valFixups, $subFixup;
+                        }
+                    }
+
                 } elsif ($$newInfo{OffsetPair}) {
 #
 # keep track of offsets
@@ -1131,119 +1411,6 @@ sub WriteExif($$$)
                     $newCount or $newCount = 1; # make sure count is set for offsetInfo
                     # save value pointer and value count for each tag
                     $offsetInfo->{$newID} = [$newInfo, $ptr, $newCount, $newFormat];
-
-                } elsif ($$newInfo{SubIFD} and $isNew <= 0) {
-#
-# rewrite existing sub IFD's
-#
-                    my $subdirName = $newInfo->{Groups}->{1};
-                    # must handle sub-IFD's specially since the values
-                    # are actually offsets to subdirectories
-                    unless ($oldCount) {   # can't have zero count
-                        $exifTool->Error("$dirName entry $index has zero count");
-                        return undef;
-                    }
-                    my $i;
-                    $newValue = '';    # reset value because we regenerate it below
-                    for ($i=0; $i<$oldCount; ++$i) {
-                        my $pt = Image::ExifTool::ReadValue($valueDataPt,
-                                        $valuePtr + $i * $formatSize[$oldFormat],
-                                        $formatName[$oldFormat], 1, $oldSize);
-                        my $subdirStart = $pt - $dataPos;
-                        my %subdirInfo = (
-                            Base => $base,
-                            DataPt => $dataPt,
-                            DirStart => $subdirStart,
-                            DataPos => $dataPos,
-                            DataLen => $dataLen,
-                            DirName => $subdirName,
-                            Fixup => new Image::ExifTool::Fixup,
-                            RAF => $raf,
-                        );
-                        # read subdirectory from file if necessary
-                        if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
-                            my ($buff, $buf2, $subSize);
-                            unless ($raf and $raf->Seek($pt + $base, 0) and
-                                    $raf->Read($buff,2) == 2 and
-                                    $subSize = 12 * Get16u(\$buff, 0) and
-                                    $raf->Read($buf2,$subSize) == $subSize)
-                            {
-                                $exifTool->Error("Can't read $subdirName data");
-                                return undef;
-                            }
-                            $buff .= $buf2;
-                            # change subdirectory information to data we just read
-                            $subdirInfo{DataPt} = \$buff;
-                            $subdirInfo{DirStart} = 0;
-                            $subdirInfo{DataPos} = $pt;
-                            $subdirInfo{DataLen} = $subSize + 2;
-                        }
-                        my $subTable = $tagTablePtr;
-                        if ($newInfo->{SubDirectory}->{TagTable}) {
-                            $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
-                        }
-                        my $subdir = $exifTool->WriteTagTable($subTable, \%subdirInfo);
-                        return undef unless defined $subdir;
-                        next unless length($subdir);
-                        # temporarily set value to subdirectory index
-                        # (will set to actual offset later when we know what it is)
-                        $newValue .= Set32u(0xfeedf00d);
-                        my ($offset, $where);
-                        if ($oldCount > 1) {
-                            $offset = length($valBuff) + $i * 4;
-                            $where = 'valBuff';
-                        } else {
-                            $offset = length($dirBuff) + 8;
-                            $where = 'dirBuff';
-                        }
-                        # add to list of subdirectories we will add later
-                        push @subdirs, {
-                            DataPt => \$subdir,
-                            Table => $subTable,
-                            Fixup => $subdirInfo{Fixup},
-                            Offset => $offset,
-                            Where => $where,
-                        };
-                    }
-                    next unless length $newValue;
-                    # set new format to int32u
-                    $newFormName = 'int32u';
-                    $newFormat = $formatNumber{$newFormName};
-                    $newValuePt = \$newValue;
-
-                } elsif ($$newInfo{SubDirectory} and
-                    (not defined $newInfo->{SubDirectory}->{Start} or
-                    $newInfo->{SubDirectory}->{Start} eq '$valuePtr') and
-                    $newInfo->{SubDirectory}->{TagTable})
-                {
-#
-# rewrite other subdirectories ('$valuePtr' type only)
-#
-                    my $subFixup = new Image::ExifTool::Fixup;
-                    my %subdirInfo = (
-                        Base => $base,
-                        DataPt => $valueDataPt,
-                        DirStart => $valuePtr,
-                        DataPos => $valueDataPos,
-                        DataLen => $valueDataLen,
-                        DirLen => $oldSize,
-                        RAF => $raf,
-                        Parent => $dirInfo->{DirName},
-                        Fixup => $subFixup,
-                    );
-                    my $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
-                    if ($subTable) {
-                        $subTable = GetTagTable($subTable);
-                    } else {
-                        $subTable = $tagTablePtr;
-                    }
-                    $newValue = $exifTool->WriteTagTable($subTable, \%subdirInfo);
-                    $newValuePt = \$newValue if defined $newValue;
-                    next unless length $$newValuePt;
-                    if ($subFixup->{Pointers} and $subdirInfo{Base} == $base) {
-                        $subFixup->{Start} += length $valBuff;
-                        push @valFixups, $subFixup;
-                    }
 
                 } elsif ($$newInfo{DataMember}) {
 
@@ -1277,12 +1444,34 @@ sub WriteExif($$$)
             # write new directory entry
             $dirBuff .= Set16u($newID) . Set16u($newFormat) .
                         Set32u($newCount) . $offsetVal;
+            # update flag to keep track of mandatory tags
+            while (defined $allMandatory) {
+                if (defined $$mandatory{$newID}) {
+                    # values must correspond to mandatory values
+                    my $mandVal = WriteValue($$mandatory{$newID}, $newFormName, $newCount);
+                    if ($mandVal eq $$newValuePt) {
+                        ++$allMandatory;        # count mandatory tags
+                        last;
+                    }
+                }
+                undef $deleteAll;
+                undef $allMandatory;
+            }
         }
 #..............................................................................
 # write directory counts and nextIFD pointer and add value data to end of IFD
 #
         # calculate number of entries in new directory
         my $newEntries = length($dirBuff) / 12;
+        # delete entire directory if only mandatory tags remain
+        if ($newEntries < $numEntries and $allMandatory) {
+            $newEntries = 0;
+            $dirBuff = '';
+            $valBuff = '';
+            undef $dirFixup;    # no fixups in this directory
+            ++$deleteAll if defined $deleteAll;
+            $verbose > 1 and print "    - $allMandatory mandatory tag(s)\n";
+        }
         if ($ifd and not $newEntries) {
             $verbose and print "  Deleting IFD1\n";
             last;   # don't write IFD1 if empty
@@ -1332,9 +1521,11 @@ sub WriteExif($$$)
         }
         # add fixup for all offsets in directory according to value data position
         # (which is at the end of this directory)
-        $dirFixup->{Start} = $newStart + 2;
-        $dirFixup->{Shift} = $valPos - $dirFixup->{Start};
-        $fixup->AddFixup($dirFixup);
+        if ($dirFixup) {
+            $dirFixup->{Start} = $newStart + 2;
+            $dirFixup->{Shift} = $valPos - $dirFixup->{Start};
+            $fixup->AddFixup($dirFixup);
+        }
         # add valueData fixups, adjusting for position of value data
         my $valFixup;
         foreach $valFixup (@valFixups) {
@@ -1463,6 +1654,8 @@ sub WriteExif($$$)
     if (not $dirInfo->{Fixup} and $dirInfo->{NewDataPos}) {
         $fixup->{Shift} += $dirInfo->{NewDataPos};
         $fixup->ApplyFixup(\$newData);
+        # delete both IFD0 and IFD1 if only mandatory tags remain
+        $newData = '' if defined $newData and $deleteAll;
     }
     # return empty string if no entries in directory
     # (could be up to 10 bytes and still be empty)

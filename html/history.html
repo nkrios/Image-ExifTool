@@ -5,7 +5,71 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-4.73.tar.gz">Version 4.73</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-4.87.tar.gz">Version 4.87</a>.<p>
+
+<b>Mar. 15/05 - Version 4.87</b> (production release)
+<ul>
+<li>Add notes to TagNames documentation
+</ul>
+
+<b>Mar. 11/05 - Version 4.86</b>
+<ul>
+<li>Extract PreviewImage from CR2 files
+<li>Create mandatory GPS tags when adding new GPS directory
+<li>Bring IPTC newsphoto support up to spec (as if anyone uses this crap)
+<li>Fixed problem when setting 8-bit integer IPTC values
+</ul>
+
+<b>Mar. 10/05 - Version 4.85</b>
+<ul>
+<li>Create most mandatory EXIF entries automatically when a new EXIF directory
+    is created
+<li>Fix problem which caused an error when adding XMP information to a TIFF file
+    which didn't previously contain XMP
+<li>Make '=' optional with -AllTagsFromFile option
+<li>Fix problem with verbose dump of zero-length directory (ie. Sony F717 maker
+    notes)
+</ul>
+
+<b>Mar. 9/05 - Version 4.84</b>
+<ul>
+<li>Interpret Olympus ImageQuality of 6 as RAW.
+<li>Remove validation of TIFF identifier to allow forward compatibility with
+    untested RAW file formats (ORF files in particular seem to fiddle with this
+    identifier)
+</ul>
+
+<b>Mar. 8/05 - Version 4.83</b>
+<ul>
+<li>Extract ThumbnailImage from Canon CRW files written by some cameras
+<li>Recognize ORF files from Olympus C5060WZ (and hopefully some others too!)
+</ul>
+
+<b>Mar. 7/05 - Version 4.82</b>
+<ul>
+<li>Made a number of new EXIF tags writable, but classify them as 'unsafe' so
+    they aren't copied over with the -AllTagsFromFile option
+<li>Recognize a number of new and very uncommon EXIF tags
+<li>Remove copy number from tag name when using the -S option
+<li>Interpret Photoshop XMP:ColorSpace value of 4294967295 as 'Uncalibrated'
+</ul>
+
+<b>Mar. 4/05 - Version 4.81</b>
+<ul>
+<li>Added user-definable shortcuts
+<li>Fix problem with XMP:Identifier (should have existed in both XMP-dc and
+    XMP-xmp)
+</ul>
+
+<b>Mar. 2/05 - Version 4.80</b>
+<ul>
+<li>The -n option now prints binary data values as "Binary data #### bytes"
+<li>API Changes: (NOTE: Change in API behaviour for binary data values)
+    <ul>
+    <li>Changed returned ValueConv values so that binary data is now returned as
+        a SCALAR reference, the same as with PrintConv values
+    </ul>
+</ul>
 
 <b>Mar. 1/05 - Version 4.73</b> (production release)
 <ul>

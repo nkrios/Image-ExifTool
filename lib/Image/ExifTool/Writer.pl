@@ -88,6 +88,7 @@ my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 #           DelValue => 0 or 1 - delete this existing value value from a list
 #           Group => EXIF, IPTC or XMP - tag group (case insensitive)
 #           Replace => 0, 1 or 2 - overwrite previous new values (2=reset)
+#           Protected => bitmask to write tags with specified protections
 # Returns: number of tags set (plus error string in list context)
 # Notes: For tag lists (like Keywords), call repeatedly with the same tag name for
 #        each value in the list.  Internally, the new information is stored in
@@ -105,6 +106,7 @@ sub SetNewValue($;$$%)
     my ($self, $tag, $value, %options) = @_;
     my ($err, $tagInfo);
     my $verbose = $self->Options('Verbose');
+    my $protected = $options{Protected} || 0;
 
     unless (defined $tag) {
         # remove any existing set values
@@ -171,7 +173,8 @@ sub SetNewValue($;$$%)
         next unless $writeProc and &$writeProc();
         my $writable = $tagInfo->{Writable};
         next unless $writable or ($table->{WRITABLE} and not defined $writable);
-        next if $tagInfo->{Protected} and not $options{Protected};
+        # don't write tag if protected
+        next if $tagInfo->{Protected} and not ($tagInfo->{Protected} & $protected);
         # set specific write group (if we didn't already)
         unless ($writeGroup and $writeGroup ne 'EXIF') {
             $writeGroup = $tagInfo->{WriteGroup};   # use default write group
@@ -284,40 +287,13 @@ sub SetNewValue($;$$%)
                 }
             } elsif ($conv) {
                 if (ref $conv eq 'HASH') {
-                    if ($val =~ /^Unknown\s*\((.+)\)$/i) {
-                        $val = $1;    # was unknown
-                        if ($val =~ /^0x([\da-fA-F]+)$/) {
-                            $val = hex($val);   # convert hex value
-                        }
-                    } else {
-                        my @patterns = ("^\Q$val\E\$", "^(?i)\Q$val\E\$",
-                                        "^(?i)\Q$val\E","(?i)\Q$val\E");
-                        my ($pattern, $found, $matches);
-                        Pattern: foreach $pattern (@patterns) {
-                            $matches = scalar grep /$pattern/, values(%$conv);
-                            next unless $matches;
-                            # multiple matches are bad unless they were exact
-                            last if $matches > 1 and $pattern ne $patterns[0];
-                            foreach (sort keys %$conv) {
-                                if ($$conv{$_} =~ /$pattern/) {
-                                    $val = $_;
-                                    $found = 1;
-                                    last Pattern;
-                                }
-                            }
-                            last;
-                        }
-                        unless ($found) {
-                            $err = "Can't convert $wgrp1:$tag ";
-                            $verbose > 2 and print "$err\n";
-                            if ($matches > 1) {
-                                $err .= "(matches more than one $type)";
-                            } else {
-                                $err .= "(not in $type)";
-                            }
-                            undef $val;
-                            last;
-                        }
+                    my $multi;
+                    ($val, $multi) = ReverseLookup($conv, $val);
+                    unless (defined $val) {
+                        $err = "Can't convert $wgrp1:$tag (" .
+                               ($multi ? 'matches more than one' : 'not in') . " $type)";
+                        $verbose > 2 and print "$err\n";
+                        last;
                     }
                 } else {
                     $err = "Can't convert value for $wgrp1:$tag (no ${type}Inv)";
@@ -435,8 +411,8 @@ sub SetNewValue($;$$%)
         }
     }
     # print warning if we couldn't set our priority tag
-    if ($err and ((not $numSet or not $prioritySet) or $verbose)) {
-        warn "$err\n" unless wantarray;
+    if ($err and not $prioritySet) {
+        warn "$err\n" unless wantarray or $verbose > 2;
     } elsif (not $numSet) {
         if ($foundMatch) {
             $err = "Sorry, $tag is not writable";
@@ -450,7 +426,7 @@ sub SetNewValue($;$$%)
         # set marker to 'feed' value later
         $value = 0xfeedfeed if defined $value;
         foreach $tag (@requireTags) {
-            $self->SetNewValue($tag, $value, Protected=>1);
+            $self->SetNewValue($tag, $value, Protected=>0x02);
         }
     }
     if (wantarray) {
@@ -489,7 +465,7 @@ sub SetNewValuesFromFile($$)
         }
         my $replace = 1;
         foreach $val (@values) {
-            my @rtnVals = $self->SetNewValue($tag, $val, 'Replace', $replace);
+            my @rtnVals = $self->SetNewValue($tag, $val, Replace=>$replace);
             unless ($rtnVals[0]) {
                 # delete this tag since we couldn't set it
                 delete $info->{$tag};
@@ -814,6 +790,53 @@ sub GetAllGroups($)
 
 #==============================================================================
 # Functions below this are not part of the public API
+
+#------------------------------------------------------------------------------
+# Reverse hash lookup
+# Inputs: 0) hash reference, 1) value
+# Returns: Hash key or undef if not found (plus flag for multiple matches in list context)
+sub ReverseLookup($$)
+{
+    my ($conv, $val) = @_;
+    my $multi;
+    if ($val =~ /^Unknown\s*\((.+)\)$/i) {
+        $val = $1;    # was unknown
+        if ($val =~ /^0x([\da-fA-F]+)$/) {
+            $val = hex($val);   # convert hex value
+        }
+    } else {
+        my @patterns = (
+            "^\Q$val\E\$",      # exact match
+            "^(?i)\Q$val\E\$",  # case-insensitive
+            "^(?i)\Q$val\E",    # beginning of string
+            "(?i)\Q$val\E",     # substring
+        );
+        my ($pattern, $found, $matches);
+        foreach $pattern (@patterns) {
+            $matches = scalar grep /$pattern/, values(%$conv);
+            next unless $matches;
+            # multiple matches are bad unless they were exact
+            last if $matches > 1 and $pattern !~ /\$$/;
+            foreach (sort keys %$conv) {
+                if ($$conv{$_} =~ /$pattern/) {
+                    $val = $_;
+                    $found = 1;
+                    last;
+                }
+            }
+            last;
+        }
+        unless ($found) {
+            undef $val;
+            $multi = 1 if $matches > 1;
+        }
+    }
+    if (wantarray) {
+        return ($val, $multi);
+    } else {
+        return $val;
+    }
+}
 
 #------------------------------------------------------------------------------
 # Return true if we are deleting or overwriting the specified tag
@@ -1221,7 +1244,7 @@ sub VerboseInfo($$$%)
     }
     my $dataPt = $parms{DataPt};
     my $size = $parms{Size};
-    $size or ($dataPt and $size = length $$dataPt);
+    $size = length $$dataPt unless defined $size or not $dataPt;
     my $indent = $self->{INDENT};
 
     # Level 1: print tag/value information
@@ -1249,9 +1272,9 @@ sub VerboseInfo($$$%)
         $line .= '- Tag ' . ($hexID ? $hexID : "'$tagID'");
         $line .= $parms{Extra} if defined $parms{Extra};
         my $format = $parms{Format};
-        if ($format or $size) {
+        if ($format or defined $size) {
             $line .= ' (';
-            if ($size) {
+            if (defined $size) {
                 $line .= "$size bytes";
                 $line .= ', ' if $format;
             }

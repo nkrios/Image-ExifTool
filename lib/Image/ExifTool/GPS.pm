@@ -4,11 +4,6 @@
 # Description:  Definitions for EXIF GPS tags
 #
 # Revisions:    12/09/2003  - P. Harvey Created
-#
-# Notes:        It is unfortunate, but string values all seem to be terminated
-#               with "\0" (darn C programmers think they own the world),
-#               so we have to strip this off manually before we use them.
-#               Pain in the butt really.
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::GPS;

@@ -106,7 +106,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(Headline => 'A different headline');
     $exifTool->SetNewValue(ImageDescription => 'Modified TIFF');
     $exifTool->SetNewValue(Keywords => 'another keyword', AddValue => 1);
-    $exifTool->SetNewValue(SupplementalCategories => 'new XMP info');
+    $exifTool->SetNewValue(SupplementalCategories => 'new XMP info', Group => 'XMP');
     $exifTool->WriteInfo('t/ExifTool.tif', \$newtiff);
     my $info = $exifTool->ImageInfo(\$newtiff);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);

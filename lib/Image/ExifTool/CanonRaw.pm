@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.18';
+$VERSION = '1.20';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -253,14 +253,21 @@ sub BuildMakerNotes($$$$$$);
     0x2005 => {
         Name => 'RawData',
         Writable => 0,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x2007 => {
         Name => 'JpgFromRaw',
         Writable => 'resize',  # 'resize' allows this value to change size
         Permanent => 0,
-        PrintConv => '\$val',
-        PrintConvInv => '$val',
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
+    },
+    0x2008 => {
+        Name => 'ThumbnailImage',
+        Writable => 'resize',  # 'resize' allows this value to change size
+        Permanent => 0,
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
     },
     # the following entries are subdirectories
     # (any 0x28 and 0x30 tag types are handled automatically by the decoding logic)
@@ -576,7 +583,7 @@ sub ProcessCanonRaw($$$)
                         }
                     }
                     # force this to be a binary (scalar reference)
-                    $$tagInfo{PrintConv} = '\$val';
+                    $$tagInfo{ValueConv} = '\$val';
                 }
                 $size = length $value;
                 undef $format;
@@ -645,14 +652,14 @@ sub ProcessCanonRaw($$$)
         } else {
             # convert to specified format if necessary
             $format and $value = ReadValue(\$value, 0, $format, $count, $size);
-            # check for valid JpgFromRaw image
-            if ($$tagInfo{Name} ne 'JpgFromRaw' or
-                $value =~ /^(Binary|\xff\xd8)/ or
-                $exifTool->Options('IgnoreMinorErrors'))
+            my $tagName = $$tagInfo{Name};
+            # check for valid image
+            if (($tagName eq 'JpgFromRaw' or $tagName eq 'ThumbnailImage') and not
+                ($value =~ /^(Binary|\xff\xd8)/ or $exifTool->Options('IgnoreMinorErrors')))
             {
-                $exifTool->FoundTag($tagInfo, $value);
+                $exifTool->Warn("$tagName is not a valid image");
             } else {
-                $exifTool->Warn('JpgFromRaw is not a valid image');
+                $exifTool->FoundTag($tagInfo, $value);
             }
         }
     }

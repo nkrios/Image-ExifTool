@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.54
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.85
 [File, File, Image]  - File Name: Writer_15_failed.jpg
 [File, File, Image]  - File Size: 5KB
 [File, File, Image]  - File Type: JPEG
@@ -7,13 +7,20 @@
 [EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
+[EXIF, IFD0, Image] 282 - X Resolution: 72
+[EXIF, IFD0, Image] 283 - Y Resolution: 72
+[EXIF, IFD0, Image] 296 - Resolution Unit: inches
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
 [EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/64
 [EXIF, ExifIFD, Image] 33437 - Aperture: 3.6
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
+[EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:11:10 17:39:26
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 24.0mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
+[EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41992 - Contrast: +1

@@ -149,7 +149,7 @@ sub CheckCanonRaw($$$)
     my ($exifTool, $tagInfo, $valPtr) = @_;
     Image::ExifTool::GenerateTagIDs($$tagInfo{Table});
     my $tagName = $$tagInfo{Name};
-    if ($tagName eq 'JpgFromRaw') {
+    if ($tagName eq 'JpgFromRaw' or $tagName eq 'ThumbnailImage') {
         unless ($$valPtr =~ /^\xff\xd8/ or $exifTool->Options('IgnoreMinorErrors')) {
             return 'Not a valid image';
         }
@@ -203,8 +203,8 @@ sub WriteCanonRaw($$$)
     # get hash of new information keyed by tagID
     my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
 
-    # generate list of tags to add or delete (currently, we only allow one tag,
-    # JpgFromRaw, to be added or deleted from the root CanonRaw directory)
+    # generate list of tags to add or delete (currently, we only allow JpgFromRaw
+    # and ThumbnailImage, to be added or deleted from the root CanonRaw directory)
     my (@addTags, %delTag);
     if ($dirInfo->{Nesting} == 0) {
         my $tagID;
@@ -487,12 +487,13 @@ These routines are autoloaded by Image::ExifTool::CanonRaw.
 
 =head1 DESCRIPTION
 
-This file contains routines to write Canon RAW (CRW) files and metadata.
+This file contains routines used by ExifTool to write Canon RAW (CRW) files
+and metadata.
 
 =head1 NOTES
 
-This format is a pleasure to work with.  All pointer offsets are relative to
-the start of the data for each directory.  If TIFF/EXIF had implemented
+The CRW format is a pleasure to work with.  All pointer offsets are relative
+to the start of the data for each directory.  If TIFF/EXIF had implemented
 pointers in this way, it would be MUCH easier to read and write TIFF/JPEG
 files, and would lead to far fewer problems with corrupted metadata.
 
@@ -505,6 +506,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool|Image::ExifTool>,
+http://owl.phy.queensu.ca/~phil/exiftool/canon_raw.html
 
 =cut

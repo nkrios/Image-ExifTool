@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.54
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.85
 [File, File, Image]  - File Name: Writer_12_failed.jpg
 [File, File, Image]  - File Size: 6KB
 [File, File, Image]  - File Type: JPEG
@@ -54,7 +54,11 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Distant
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1696
+[EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
+[EXIF, IFD1, Image] 282 - X Resolution: 72
+[EXIF, IFD1, Image] 283 - Y Resolution: 72
+[EXIF, IFD1, Image] 296 - Resolution Unit: inches
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1760
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Pentax, Camera] 1 - Pentax Mode: Night-scene
 [MakerNotes, Pentax, Image] 2 - Preview Image Size: 320x240

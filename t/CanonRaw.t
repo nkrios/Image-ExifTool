@@ -35,7 +35,7 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(PrintConv => 0, IgnoreMinorErrors => 1);
     my $info = $exifTool->ImageInfo('t/CanonRaw.crw','JpgFromRaw');
-    print 'not ' unless $info->{JpgFromRaw} eq '<Dummy JpgFromRaw image data>';
+    print 'not ' unless ${$info->{JpgFromRaw}} eq '<Dummy JpgFromRaw image data>';
     print "ok $testnum\n";
 }
 

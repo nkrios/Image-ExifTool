@@ -23,7 +23,7 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
@@ -643,18 +643,18 @@ $VERSION = '1.11';
         Name => 'PreviewImageLength',
         OffsetPair => 5,   # point to associated offset
         DataTag => 'PreviewImage',
-        Protected => 1,
         Writable => 0,  # (can't write until we add ability to WriteBinaryData())
+        Protected => 2,
     },
     3 => 'PreviewImageWidth',
     4 => 'PreviewImageHeight',
     5 => {
         Name => 'PreviewImageStart',
-        Flags => [ 'IsOffset', 'Protected' ],
+        Flags => 'IsOffset',
         OffsetPair => 2,  # associated byte count tagID
         DataTag => 'PreviewImage',
-        Protected => 1,
         Writable => 0,  # (can't write until we add ability to WriteBinaryData())
+        Protected => 2,
     },
     6 => {
         Name => 'PreviewFocalPlaneXResolution',

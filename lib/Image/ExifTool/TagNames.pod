@@ -25,10 +25,20 @@ The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an "N" in this column means the tag is writable.  A "Y"
 indicates writable information that is either unformatted or written using
 the existing format.  Other expressions give details about the information
-format, and vary depending on the general type of information.  An asterisk
-(C<*>) indicates that the information is not writable directly, but is set
-via a composite tag.  The HTML version of this document also lists possible
-B<Values> for all tags which have a discrete set of values.
+format, and vary depending on the general type of information.  The format
+name may be followed by a number in square brackets to indicate the number
+of values written, or the number of characters in a fixed-length string
+(including a null terminator which is added if required).
+
+An asterisk (C<*>) indicates a 'protected' tag which is not writable
+directly, but instead is set via a Composite tag.  A tilde (C<~>) indicates
+a tag that is considered unsafe to write under normal circumstances.  These
+'unsafe' tags are not set when calling SetNewValuesFromFile() or when using
+the exiftool -AllTagsFromFile option, and care should be taken when editing
+them manually since they may affect the way an image is rendered.
+
+The HTML version of this document also lists possible B<Values> for all tags
+which have a discrete set of values, or gives B<Notes> for some tags.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -46,33 +56,35 @@ default B<Group> listed below is used unless another group is specified.
 
   Tag ID   Tag Name                  Group      Writable
   ------   --------                  -----      --------
-  0x0001   InteropIndex              -          N
-  0x0002   InteropVersion            -          N
-  0x00fe   SubfileType               -          N
-  0x00ff   OldSubfileType            -          N
-  0x0100   ImageWidth                -          N
-  0x0101   ImageHeight               -          N
-  0x0102   BitsPerSample             -          N
-  0x0103   Compression               -          N
-  0x0106   PhotometricInterpretation -          N
-  0x0107   Thresholding              -          N
-  0x0108   CellWidth                 -          N
-  0x0109   CellLength                -          N
-  0x010a   FillOrder                 -          N
+  0x0001   InteropIndex              InteropIFD string~
+  0x0002   InteropVersion            InteropIFD undef~
+  0x00fe   SubfileType               IFD0       int32u~
+  0x00ff   OldSubfileType            IFD0       int16u~
+  0x0100   ImageWidth                IFD0       int32u~
+  0x0101   ImageHeight               IFD0       int32u~
+  0x0102   BitsPerSample             IFD0       int16u[3]~
+  0x0103   Compression               IFD0       int16u~
+  0x0106   PhotometricInterpretation IFD0       int16u~
+  0x0107   Thresholding              IFD0       int16u~
+  0x0108   CellWidth                 IFD0       int16u~
+  0x0109   CellLength                IFD0       int16u~
+  0x010a   FillOrder                 IFD0       int16u~
   0x010d   DocumentName              IFD0       string
   0x010e   ImageDescription          IFD0       string
   0x010f   Make                      IFD0       string
   0x0110   Model                     IFD0       string
   0x0111   StripOffsets              -          N
+           PreviewImageStart         -          N
   0x0112   Orientation               IFD0       int16u
-  0x0115   SamplesPerPixel           -          N
-  0x0116   RowsPerStrip              -          N
+  0x0115   SamplesPerPixel           IFD0       int16u~
+  0x0116   RowsPerStrip              IFD0       int32u~
   0x0117   StripByteCounts           -          N
+           PreviewImageLength        -          N
   0x0118   MinSampleValue            -          N
   0x0119   MaxSampleValue            -          N
   0x011a   XResolution               IFD0       rational32u
   0x011b   YResolution               IFD0       rational32u
-  0x011c   PlanarConfiguration       -          N
+  0x011c   PlanarConfiguration       IFD0       int16u~
   0x011d   PageName                  IFD0       string
   0x011e   XPosition                 IFD0       rational32u
   0x011f   YPosition                 IFD0       rational32u
@@ -83,19 +95,20 @@ default B<Group> listed below is used unless another group is specified.
   0x0124   T4Options                 -          N
   0x0125   T6Options                 -          N
   0x0128   ResolutionUnit            IFD0       int16u
-  0x0129   PageNumber                IFD0       int16u
+  0x0129   PageNumber                IFD0       int16u[2]
+  0x012c   ColorResponseUnit         -          N
   0x012d   TransferFunction          -          N
   0x0131   Software                  IFD0       string
   0x0132   ModifyDate                IFD0       string
   0x013b   Artist                    IFD0       string
   0x013c   HostComputer              IFD0       string
-  0x013d   Predictor                 -          N
-  0x013e   WhitePoint                IFD0       rational32u
-  0x013f   PrimaryChromaticities     IFD0       rational32u
+  0x013d   Predictor                 IFD0       int16u~
+  0x013e   WhitePoint                IFD0       rational32u[2]
+  0x013f   PrimaryChromaticities     IFD0       rational32u[6]
   0x0140   ColorMap                  -          N
-  0x0141   HalftoneHints             IFD0       int16u
-  0x0142   TileWidth                 -          N
-  0x0143   TileLength                -          N
+  0x0141   HalftoneHints             IFD0       int16u[2]
+  0x0142   TileWidth                 IFD0       int32u~
+  0x0143   TileLength                IFD0       int32u~
   0x0144   TileOffsets               -          N
   0x0145   TileByteCounts            -          N
   0x0146   BadFaxLines               -          N
@@ -144,16 +157,20 @@ default B<Group> listed below is used unless another group is specified.
   0x0208   JPEGDCTables              -          N
   0x0209   JPEGACTables              -          N
   0x0211   YCbCrCoefficients         -          N
-  0x0212   YCbCrSubSampling          -          N
-  0x0213   YCbCrPositioning          -          N
+  0x0212   YCbCrSubSampling          IFD0       int16u[2]~
+  0x0213   YCbCrPositioning          IFD0       int16u~
   0x0214   ReferenceBlackWhite       -          N
   0x022f   StripRowCounts            -          N
   0x02bc   ApplicationNotes          -          XMP
   0x1000   RelatedImageFileFormat    -          N
-  0x1001   RelatedImageWidth         -          N
-  0x1002   RelatedImageLength        -          N
+  0x1001   RelatedImageWidth         InteropIFD int16u~
+  0x1002   RelatedImageLength        InteropIFD int16u~
   0x800d   ImageID                   -          N
   0x80a4   WangAnnotation            -          N
+  0x80e3   Matteing                  -          N
+  0x80e4   DataType                  -          N
+  0x80e5   ImageDepth                -          N
+  0x80e6   TileDepth                 -          N
   0x827d   Model2                    -          N
   0x828d   CFARepeatPatternDim       -          N
   0x828e   CFAPattern2               -          N
@@ -167,6 +184,21 @@ default B<Group> listed below is used unless another group is specified.
   0x847f   IntergraphFlagRegisters   -          N
   0x8480   IntergraphMatrix          -          N
   0x8482   ModelTiePoint             -          N
+  0x84e0   Site                      -          N
+  0x84e1   ColorSequence             -          N
+  0x84e2   IT8Header                 -          N
+  0x84e3   RasterPadding             -          N
+  0x84e4   BitsPerRunLength          -          N
+  0x84e5   BitsPerExtendedRunLength  -          N
+  0x84e6   ColorTable                -          N
+  0x84e7   ImageColorIndicator       -          N
+  0x84e8   BackgroundColorIndicator  -          N
+  0x84e9   ImageColorValue           -          N
+  0x84ea   BackgroundColorValue      -          N
+  0x84eb   PixelIntensityRange       -          N
+  0x84ec   TransparencyIndicator     -          N
+  0x84ed   ColorCharacterization     -          N
+  0x84ee   HCUsage                   -          N
   0x8568   IPTC-NAA2                 -          IPTC
   0x85d8   ModelTransform            -          N
   0x8649   PhotoshopSettings         -          N
@@ -184,10 +216,13 @@ default B<Group> listed below is used unless another group is specified.
   0x8829   Interlace                 -          N
   0x882a   TimeZoneOffset            ExifIFD    int16s
   0x882b   SelfTimerMode             ExifIFD    int16u
+  0x885c   FaxRecvParams             -          N
+  0x885d   FaxSubAddress             -          N
+  0x885e   FaxRecvTime               -          N
   0x9000   ExifVersion               ExifIFD    undef
   0x9003   DateTimeOriginal          ExifIFD    string
   0x9004   CreateDate                ExifIFD    string
-  0x9101   ComponentsConfiguration   -          N
+  0x9101   ComponentsConfiguration   ExifIFD    undef~
   0x9102   CompressedBitsPerPixel    -          N
   0x9201   ShutterSpeedValue         ExifIFD    rational32s
   0x9202   ApertureValue             ExifIFD    rational32u
@@ -208,10 +243,11 @@ default B<Group> listed below is used unless another group is specified.
   0x9211   ImageNumber               -          N
   0x9212   SecurityClassification    -          N
   0x9213   ImageHistory              -          N
-  0x9214   SubjectLocation           ExifIFD    int16u
+  0x9214   SubjectLocation           ExifIFD    int16u[2]
   0x9215   ExposureIndex             -          N
   0x9216   TIFF-EPStandardID         -          N
   0x9217   SensingMethod             -          N
+  0x923f   StoNits                   -          N
   0x927c   MakerNoteCanon            ExifIFD    Canon
            MakerNoteCasio            ExifIFD    Casio Type1
            MakerNoteCasio2           ExifIFD    Casio Type2
@@ -252,7 +288,7 @@ default B<Group> listed below is used unless another group is specified.
   0xa211   ImageNumber               -          N
   0xa212   SecurityClassification    -          N
   0xa213   ImageHistory              -          N
-  0xa214   SubjectLocation           ExifIFD    int16u
+  0xa214   SubjectLocation           ExifIFD    int16u[2]
   0xa215   ExposureIndex             ExifIFD    rational32u
   0xa216   TIFF-EPStandardID         -          N
   0xa217   SensingMethod             ExifIFD    int16u
@@ -314,7 +350,7 @@ default B<Group> listed below is used unless another group is specified.
   0xc46c   PrintQuality              -          N
   0xc46e   ImagePrintStatus          -          N
   0xc4a5   PrintIM                   -          PrintIM
-  0xc612   DNGVersion                IFD0       int8u
+  0xc612   DNGVersion                IFD0       int8u[4]
   0xc613   DNGBackwardVersion        -          N
   0xc614   UniqueCameraModel         IFD0       string
   0xc615   LocalizedCameraModel      IFD0       string
@@ -326,9 +362,9 @@ default B<Group> listed below is used unless another group is specified.
   0xc61b   BlackLevelDeltaH          -          N
   0xc61c   BlackLevelDeltaV          -          N
   0xc61d   WhiteLevel                -          N
-  0xc61e   DefaultScale              IFD0       rational32u
-  0xc61f   DefaultCropOrigin         IFD0       int32u
-  0xc620   DefaultCropSize           IFD0       int32u
+  0xc61e   DefaultScale              IFD0       rational32u[2]
+  0xc61f   DefaultCropOrigin         IFD0       int32u[2]
+  0xc620   DefaultCropSize           IFD0       int32u[2]
   0xc621   ColorMatrix1              -          N
   0xc622   ColorMatrix2              -          N
   0xc623   CameraCalibration1        -          N
@@ -344,7 +380,7 @@ default B<Group> listed below is used unless another group is specified.
   0xc62d   BayerGreenSplit           IFD0       int32u
   0xc62e   LinearResponseLimit       IFD0       rational32u
   0xc62f   DNGCameraSerialNumber     IFD0       string
-  0xc630   DNGLensInfo               IFD0       rational32u
+  0xc630   DNGLensInfo               IFD0       rational32u[4]
   0xc631   ChromaBlurRadius          IFD0       rational32u
   0xc632   AntiAliasStrength         IFD0       rational32u
   0xc633   ShadowScale               IFD0       rational32u
@@ -508,6 +544,7 @@ XMP-crs:Contrast and XMP-exif:Contrast.
   HistoryWhen                        xmpMM      date
   ISO                                exif       integer
   Identifier                         dc         string
+  Identifier                         xmp        string
   ImageDescription                   tiff       lang-alt
   ImageHeight                        tiff       integer
   ImageUniqueID                      exif       string
@@ -652,146 +689,153 @@ XMP-crs:Contrast and XMP-exif:Contrast.
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
 values.  These lengths are given in square brackets after the B<Writable>
 format name.  For tags where a range of lengths is allowed, the minimum and
-maximum lengths are separated by a comma within the brackets.
+maximum lengths are separated by a comma within the brackets.  IPTC strings
+are not null terminated.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.
 
   Record   Tag Name                             Writable
   ------   --------                             --------
-  0x0001   IPTCEnvelope                         IPTC EnvelopeRecord
-  0x0002   IPTCApplication                      IPTC ApplicationRecord
-  0x0003   IPTCNewsPhoto                        IPTC NewsPhoto
-  0x0007   IPTCPreObjectData                    IPTC PreObjectData
-  0x0008   IPTCObjectData                       IPTC ObjectData
-  0x0009   IPTCPostObjectData                   IPTC PostObjectData
+      1    IPTCEnvelope                         IPTC EnvelopeRecord
+      2    IPTCApplication                      IPTC ApplicationRecord
+      3    IPTCNewsPhoto                        IPTC NewsPhoto
+      7    IPTCPreObjectData                    IPTC PreObjectData
+      8    IPTCObjectData                       IPTC ObjectData
+      9    IPTCPostObjectData                   IPTC PostObjectData
 
 =head2 IPTC EnvelopeRecord Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   EnvelopeRecordVersion                int16u
-  0x0005   Destination                          string[0,1024]
-  0x0014   FileFormat                           int16u
-  0x0016   FileVersion                          int16u
-  0x001e   ServiceIdentifier                    string[0,10]
-  0x0028   EnvelopeNumber                       digits[8]
-  0x0032   ProductID                            string[0,32]
-  0x003c   EnvelopePriority                     digits[1]
-  0x0046   DateSent                             digits[8]
-  0x0050   TimeSent                             string[11]
-  0x005a   CodedCharacterSet                    string[0,32]
-  0x0064   UniqueObjectName                     string[14,80]
-  0x0078   ARMIdentifier                        int16u
-  0x007a   ARMVersion                           int16u
+      0    EnvelopeRecordVersion                int16u
+      5    Destination                          string[0,1024]
+     20    FileFormat                           int16u
+     22    FileVersion                          int16u
+     30    ServiceIdentifier                    string[0,10]
+     40    EnvelopeNumber                       digits[8]
+     50    ProductID                            string[0,32]
+     60    EnvelopePriority                     digits[1]
+     70    DateSent                             digits[8]
+     80    TimeSent                             string[11]
+     90    CodedCharacterSet                    string[0,32]
+    100    UniqueObjectName                     string[14,80]
+    120    ARMIdentifier                        int16u
+    122    ARMVersion                           int16u
 
 =head2 IPTC ApplicationRecord Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   ApplicationRecordVersion             int16u
-  0x0003   ObjectTypeReference                  string[3,67]
-  0x0004   ObjectAttributeReference             string[4,68]
-  0x0005   ObjectName                           string[0,64]
-  0x0007   EditStatus                           string[0,64]
-  0x0008   EditorialUpdate                      digits[2]
-  0x000a   Urgency                              digits[1]
-  0x000c   SubjectReference                     string[13,236]
-  0x000f   Category                             string[0,3]
-  0x0014   SupplementalCategories               string[0,32]
-  0x0016   FixtureIdentifier                    string[0,32]
-  0x0019   Keywords                             string[0,64]
-  0x001a   ContentLocationCode                  string[3]
-  0x001b   ContentLocationName                  string[0,64]
-  0x001e   ReleaseDate                          digits[8]
-  0x0023   ReleaseTime                          digits[11]
-  0x0025   ExpirationDate                       digits[8]
-  0x0026   ExpirationTime                       digits[11]
-  0x0028   SpecialInstructions                  string[0,256]
-  0x002a   ActionAdvised                        digits[2]
-  0x002d   ReferenceService                     string[0,10]
-  0x002f   ReferenceDate                        digits[8]
-  0x0032   ReferenceNumber                      digits[8]
-  0x0037   DateCreated                          digits[8]
-  0x003c   TimeCreated                          digits[11]
-  0x003e   DigitalCreationDate                  digits[8]
-  0x003f   DigitalCreationTime                  digits[11]
-  0x0041   OriginatingProgram                   string[0,32]
-  0x0046   ProgramVersion                       string[0,10]
-  0x004b   ObjectCycle                          string[1]
-  0x0050   By-line                              string[0,32]
-  0x0055   By-lineTitle                         string[0,32]
-  0x005a   City                                 string[0,32]
-  0x005c   Sub-location                         string[0,32]
-  0x005f   Province-State                       string[0,32]
-  0x0064   Country-PrimaryLocationCode          string[3]
-  0x0065   Country-PrimaryLocationName          string[0,64]
-  0x0067   OriginalTransmissionReference        string[0,32]
-  0x0069   Headline                             string[0,256]
-  0x006e   Credit                               string[0,32]
-  0x0073   Source                               string[0,32]
-  0x0074   CopyrightNotice                      string[0,128]
-  0x0076   Contact                              string[0,128]
-  0x0078   Caption-Abstract                     string[0,2000]
-  0x007a   Writer-Editor                        string[0,32]
-  0x007d   RasterizedCaption                    string[7360]
-  0x0082   ImageType                            string[2]
-  0x0083   ImageOrientation                     string[1]
-  0x0087   LanguageIdentifier                   string[2,3]
-  0x0096   AudioType                            string[2]
-  0x0097   AudioSamplingRate                    digits[6]
-  0x0098   AudioSamplingResolution              digits[2]
-  0x0099   AudioDuration                        digits[6]
-  0x009a   AudioOutcue                          string[0,64]
-  0x00c8   ObjectPreviewFileFormat              int16u
-  0x00c9   ObjectPreviewFileVersion             int16u
-  0x00ca   ObjectPreviewData                    string[0,256000]
+      0    ApplicationRecordVersion             int16u
+      3    ObjectTypeReference                  string[3,67]
+      4    ObjectAttributeReference             string[4,68]
+      5    ObjectName                           string[0,64]
+      7    EditStatus                           string[0,64]
+      8    EditorialUpdate                      digits[2]
+     10    Urgency                              digits[1]
+     12    SubjectReference                     string[13,236]
+     15    Category                             string[0,3]
+     20    SupplementalCategories               string[0,32]
+     22    FixtureIdentifier                    string[0,32]
+     25    Keywords                             string[0,64]
+     26    ContentLocationCode                  string[3]
+     27    ContentLocationName                  string[0,64]
+     30    ReleaseDate                          digits[8]
+     35    ReleaseTime                          digits[11]
+     37    ExpirationDate                       digits[8]
+     38    ExpirationTime                       digits[11]
+     40    SpecialInstructions                  string[0,256]
+     42    ActionAdvised                        digits[2]
+     45    ReferenceService                     string[0,10]
+     47    ReferenceDate                        digits[8]
+     50    ReferenceNumber                      digits[8]
+     55    DateCreated                          digits[8]
+     60    TimeCreated                          digits[11]
+     62    DigitalCreationDate                  digits[8]
+     63    DigitalCreationTime                  digits[11]
+     65    OriginatingProgram                   string[0,32]
+     70    ProgramVersion                       string[0,10]
+     75    ObjectCycle                          string[1]
+     80    By-line                              string[0,32]
+     85    By-lineTitle                         string[0,32]
+     90    City                                 string[0,32]
+     92    Sub-location                         string[0,32]
+     95    Province-State                       string[0,32]
+    100    Country-PrimaryLocationCode          string[3]
+    101    Country-PrimaryLocationName          string[0,64]
+    103    OriginalTransmissionReference        string[0,32]
+    105    Headline                             string[0,256]
+    110    Credit                               string[0,32]
+    115    Source                               string[0,32]
+    116    CopyrightNotice                      string[0,128]
+    118    Contact                              string[0,128]
+    120    Caption-Abstract                     string[0,2000]
+    122    Writer-Editor                        string[0,32]
+    125    RasterizedCaption                    string[7360]
+    130    ImageType                            string[2]
+    131    ImageOrientation                     string[1]
+    135    LanguageIdentifier                   string[2,3]
+    150    AudioType                            string[2]
+    151    AudioSamplingRate                    digits[6]
+    152    AudioSamplingResolution              digits[2]
+    153    AudioDuration                        digits[6]
+    154    AudioOutcue                          string[0,64]
+    200    ObjectPreviewFileFormat              int16u
+    201    ObjectPreviewFileVersion             int16u
+    202    ObjectPreviewData                    string[0,256000]
 
 =head2 IPTC NewsPhoto Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   NewsPhotoVersion                     int16u
-  0x000a   IPTCPictureNumber                    string[0,16]
-  0x0014   IPTCImageWidth                       int16u
-  0x001e   IPTCImageHeight                      int16u
-  0x0028   IPTCPixelWidth                       int16u
-  0x0032   IPTCPixelHeight                      int16u
-  0x0037   SupplementalType                     int8u
-  0x003c   ColorRepresentation                  int8u
-  0x0040   InterchangeColorSpace                int8u
-  0x0041   ColorSequence                        int8u
-  0x0054   NumIndexEntries                      int16u
-  0x0056   IPTCBitsPerSample                    int8u
-  0x005a   SampleStructure                      int8u
-  0x0064   ScanningDirection                    int8u
-  0x0066   IPTCImageRotation                    int8u
-  0x006e   DataCompressionMethod                int8u
-  0x0078   QuantizationMethod                   int8u
-  0x007d   EndPoints                            int8u
-  0x0082   ExcursionTolerance                   int8u
-  0x0087   BitsPerComponent                     int8u
+      0    NewsPhotoVersion                     int16u
+     10    IPTCPictureNumber                    string[16]
+     20    IPTCImageWidth                       int16u
+     30    IPTCImageHeight                      int16u
+     40    IPTCPixelWidth                       int16u
+     50    IPTCPixelHeight                      int16u
+     55    SupplementalType                     int8u
+     60    ColorRepresentation                  int16u
+     64    InterchangeColorSpace                int8u
+     65    ColorSequence                        int8u
+     66    ICCProfile                           N
+     70    ColorCalibrationMatrix               N
+     80    LookupTable                          N
+     84    NumIndexEntries                      int16u
+     85    ColorPalette                         N
+     86    IPTCBitsPerSample                    int8u
+     90    SampleStructure                      int8u
+    100    ScanningDirection                    int8u
+    102    IPTCImageRotation                    int8u
+    110    DataCompressionMethod                int32u
+    120    QuantizationMethod                   int8u
+    125    EndPoints                            N
+    130    ExcursionTolerance                   int8u
+    135    BitsPerComponent                     int8u
+    140    MaximumDensityRange                  int16u
+    145    GammaCompensatedValue                int16u
 
 =head2 IPTC PreObjectData Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x000a   SizeMode                             N
-  0x0014   MaxSubfileSize                       N
-  0x005a   ObjectSizeAnnounced                  N
-  0x005f   MaximumObjectSize                    N
+     10    SizeMode                             N
+     20    MaxSubfileSize                       N
+     90    ObjectSizeAnnounced                  N
+     95    MaximumObjectSize                    N
 
 =head2 IPTC ObjectData Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x000a   SubFile                              N
+     10    SubFile                              N
 
 =head2 IPTC PostObjectData Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x000a   ConfirmedObjectSize                  N
+     10    ConfirmedObjectSize                  N
 
 =head2 ICC_Profile Tags
 
@@ -916,38 +960,44 @@ own set of tags.
 
 =head2 GPS Tags
 
+ExifTool is very flexible about the input format for lat/long coordinates,
+and will accept 3 floating point numbers separated by just about anything.
+Many other GPS tags have values which are fixed-length strings.  For these,
+the indicated string lengths include a null terminator which is added
+automatically by ExifTool.
+
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   GPSVersionID                         int8u
-  0x0001   GPSLatitudeRef                       string
-  0x0002   GPSLatitude                          rational32u
-  0x0003   GPSLongitudeRef                      string
-  0x0004   GPSLongitude                         rational32u
+  0x0000   GPSVersionID                         int8u[4]
+  0x0001   GPSLatitudeRef                       string[2]
+  0x0002   GPSLatitude                          rational32u[3]
+  0x0003   GPSLongitudeRef                      string[2]
+  0x0004   GPSLongitude                         rational32u[3]
   0x0005   GPSAltitudeRef                       int8u
   0x0006   GPSAltitude                          rational32u
-  0x0007   GPSTimeStamp                         rational32u
+  0x0007   GPSTimeStamp                         rational32u[3]
   0x0008   GPSSatellites                        string
-  0x0009   GPSStatus                            string
-  0x000a   GPSMeasureMode                       string
+  0x0009   GPSStatus                            string[2]
+  0x000a   GPSMeasureMode                       string[2]
   0x000b   GPSDOP                               rational32u
-  0x000c   GPSSpeedRef                          string
+  0x000c   GPSSpeedRef                          string[2]
   0x000d   GPSSpeed                             rational32u
-  0x000e   GPSTrackRef                          string
+  0x000e   GPSTrackRef                          string[2]
   0x000f   GPSTrack                             rational32u
-  0x0010   GPSImgDirectionRef                   string
+  0x0010   GPSImgDirectionRef                   string[2]
   0x0011   GPSImgDirection                      rational32u
   0x0012   GPSMapDatum                          string
-  0x0013   GPSDestLatitudeRef                   string
-  0x0014   GPSDestLatitude                      rational32u
-  0x0015   GPSDestLongitudeRef                  string
-  0x0016   GPSDestLongitude                     rational32u
-  0x0017   GPSDestBearingRef                    string
+  0x0013   GPSDestLatitudeRef                   string[2]
+  0x0014   GPSDestLatitude                      rational32u[3]
+  0x0015   GPSDestLongitudeRef                  string[2]
+  0x0016   GPSDestLongitude                     rational32u[3]
+  0x0017   GPSDestBearingRef                    string[2]
   0x0018   GPSDestBearing                       rational32u
-  0x0019   GPSDestDistanceRef                   string
+  0x0019   GPSDestDistanceRef                   string[2]
   0x001a   GPSDestDistance                      rational32u
   0x001b   GPSProcessingMethod                  undef
   0x001c   GPSAreaInformation                   undef
-  0x001d   GPSDateStamp                         string
+  0x001d   GPSDateStamp                         string[11]
   0x001e   GPSDifferential                      int16u
 
 =head2 Canon Tags
@@ -1210,8 +1260,8 @@ own set of tags.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0002   PreviewImageSize                     int16u
-  0x0003   CasioPreviewLength                   Y
+  0x0002   PreviewImageSize                     int16u[2]
+  0x0003   CasioPreviewLength                   N
   0x0004   CasioPreviewStart                    N
   0x0008   QualityMode                          int16u
   0x0009   CasioImageSize                       int16u
@@ -1224,7 +1274,7 @@ own set of tags.
   0x0021   Sharpness                            int16u
   0x0e00   PrintIM                              PrintIM
   0x2000   PreviewImage                         undef
-  0x2011   WhiteBalanceBias                     int16u
+  0x2011   WhiteBalanceBias                     int16u[2]
   0x2012   WhiteBalance                         int16u
   0x2022   ObjectDistance                       int32u
   0x2034   FlashDistance                        int16u
@@ -1269,7 +1319,7 @@ own set of tags.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0200   SpecialMode                          int32u
+  0x0200   SpecialMode                          int32u[3]
   0x0201   Quality                              int16u
   0x0202   Macro                                int16u
   0x0204   DigitalZoom                          rational32u
@@ -1280,18 +1330,18 @@ own set of tags.
   0x020c   EpsonImageHeight                     int16u
   0x020d   EpsonSoftware                        Y
   0x0f00   DataDump                             N
-  0x1017   RedBalance                           int16u
-  0x1018   BlueBalance                          int16u
+  0x1017   RedBalance                           int16u[2]
+  0x1018   BlueBalance                          int16u[2]
 
 =head2 Panasonic Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0001   ImageQuality                         int16u
-  0x0002   FirmwareVersion                      int8u
+  0x0002   FirmwareVersion                      int8u[4]
   0x0003   WhiteBalance                         int16u
   0x0007   FocusMode                            int16u
-  0x000f   SpotMode                             int8u
+  0x000f   SpotMode                             int8u[2]
   0x001a   ImageStabilizer                      int16u
   0x001c   MacroMode                            int16u
   0x001f   ShootingMode                         int16u
@@ -1310,7 +1360,7 @@ own set of tags.
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0001   PentaxMode                           int16u
-  0x0002   PreviewImageSize                     int16u
+  0x0002   PreviewImageSize                     int16u[2]
   0x0003   PreviewImageLength                   int32u*
   0x0004   PreviewImageStart                    int32u*
   0x0008   Quality                              int16u
@@ -1325,8 +1375,8 @@ own set of tags.
   0x001f   Saturation                           int16u
   0x0020   Contrast                             int16u
   0x0021   Sharpness                            int16u
-  0x0039   RawImageSize                         int16u
-  0x003f   LensType                             int8u
+  0x0039   RawImageSize                         int16u[2]
+  0x003f   LensType                             int8u[2]
   0x0e00   PrintIM                              PrintIM
 
 =head2 Nikon Tags
@@ -1334,7 +1384,7 @@ own set of tags.
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0001   FileSystemVersion                    undef
-  0x0002   ISO                                  int16u
+  0x0002   ISO                                  int16u[2]
   0x0003   ColorMode                            Y
   0x0004   Quality                              Y
   0x0005   WhiteBalance                         Y
@@ -1348,7 +1398,7 @@ own set of tags.
   0x0010   DataDump                             N
   0x0011   NikonPreview                         Nikon PreviewImage
   0x0012   FlashExposureComp                    int32s
-  0x0013   ISOSetting                           int16u
+  0x0013   ISOSetting                           int16u[2]
   0x0016   ImageBoundry                         Y
   0x0018   FlashExposureBracketValue            int32s
   0x0019   ExposureBracketValue                 rational32s
@@ -1356,7 +1406,7 @@ own set of tags.
   0x0081   ToneComp                             Y
   0x0082   AuxiliaryLens                        Y
   0x0083   LensType                             int8u
-  0x0084   Lens                                 rational32u
+  0x0084   Lens                                 rational32u[4]
   0x0085   ManualFocusDistance                  rational32u
   0x0086   DigitalZoom                          rational32u
   0x0087   FlashMode                            int8u
@@ -1374,7 +1424,7 @@ own set of tags.
            ColorBalanceD2H                      Nikon ColorBalanceD2H
            ColorBalanceD100                     Nikon ColorBalanceD100
            ColorBalanceUnknown
-  0x0099   NEFThumbnailSize                     int16u
+  0x0099   NEFThumbnailSize                     int16u[2]
   0x00a0   SerialNumber                         Y
   0x00a7   ShutterCount                         int32u
   0x00a9   ImageOptimization                    Y
@@ -1500,9 +1550,9 @@ own set of tags.
   ------   --------                             --------
   0x00ff   MakerNoteOffset                      int32u
   0x0100   SanyoThumbnail                       Y
-  0x0200   SpecialMode                          int32u
+  0x0200   SpecialMode                          int32u[3]
   0x0201   SanyoQuality                         int16u
-  0x0202   Macro                                in16u
+  0x0202   Macro                                int16u
   0x0204   DigitalZoom                          rational32u
   0x0207   SoftwareVersion                      Y
   0x0208   PictInfo                             Y
@@ -1589,8 +1639,8 @@ own set of tags.
 
 When writing CanonRaw information, the length of the information is
 preserved (and the new information is truncated or padded as required)
-unless B<Writable> is C<resize>.  Currently, only JpgFromRaw is allowed to
-change size.
+unless B<Writable> is C<resize>.  Currently, only JpgFromRaw and
+ThumbnailImage are allowed to change size.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1638,6 +1688,7 @@ change size.
   0x1835   DecoderTable                         N
   0x2005   RawData                              N
   0x2007   JpgFromRaw                           resize
+  0x2008   ThumbnailImage                       resize
   0x2804   ImageDescription                     CanonRaw
   0x2807   CameraObject                         CanonRaw
   0x3002   ShootingRecord                       CanonRaw

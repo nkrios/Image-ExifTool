@@ -6,8 +6,7 @@
 # Revisions:    Jan. 08/03 - P. Harvey Created
 #               Feb. 05/04 - P. Harvey Added support for records other than 2
 #
-# References:   1) http://brilliantlabs.com/docs/IIMV4.1.pdf
-#               2) http://www.hugsan.com/EXIFutils/Features/EXIF_Fields/IPTC/iptc.html
+# References:   1) http://www.iptc.org/IIM/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::IPTC;
@@ -15,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.05';
+$VERSION = '1.07';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -428,8 +427,8 @@ my %fileFormat = (
     125 => {
         Name => 'RasterizedCaption',
         Format => 'string[7360]',
-        PrintConv => '\$val',
-        PrintConvInv => '$val',
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
     },
     130 => {
         Name => 'ImageType',
@@ -504,12 +503,12 @@ my %fileFormat = (
         Name => 'ObjectPreviewData',
         Groups => { 2 => 'Image' },
         Format => 'string[0,256000]',
-        PrintConv => '\$val',
-        PrintConvInv => '$val',
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
     },
 );
 
-# Record 3 -- News photo (ref 2)
+# Record 3 -- News photo
 %Image::ExifTool::IPTC::NewsPhoto = (
     GROUPS => { 2 => 'Image' },
     WRITE_PROC => \&WriteIPTC,
@@ -521,7 +520,10 @@ my %fileFormat = (
     },
     10 => {
         Name => 'IPTCPictureNumber',
-        Format => 'string[0,16]',
+        Format => 'string[16]',
+        Notes => '4 numbers: 1-Manufacturer ID, 2-Equipment ID, 3-Date, 4-Sequence',
+        PrintConv => 'Image::ExifTool::IPTC::ConvertPictureNumber($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InvConvertPictureNumber($val)',
     },
     20 => {
         Name => 'IPTCImageWidth',
@@ -551,7 +553,24 @@ my %fileFormat = (
     },
     60 => {
         Name => 'ColorRepresentation',
-        Format => 'int8u',
+        Format => 'int16u',
+        PrintHex => 1,
+        PrintConv => {
+            0x000 => 'No Image, Single Frame',
+            0x100 => 'Monochrome, Single Frame',
+            0x300 => '3 Components, Single Frame',
+            0x301 => '3 Components, Frame Sequential in Multiple Objects',
+            0x302 => '3 Components, Frame Sequential in One Object',
+            0x303 => '3 Components, Line Sequential',
+            0x304 => '3 Components, Pixel Sequential',
+            0x305 => '3 Components, Special Interleaving',
+            0x400 => '4 Components, Single Frame',
+            0x401 => '4 Components, Frame Sequential in Multiple Objects',
+            0x402 => '4 Components, Frame Sequential in One Object',
+            0x403 => '4 Components, Line Sequential',
+            0x404 => '4 Components, Pixel Sequential',
+            0x405 => '4 Components, Special Interleaving',
+        },
     },
     64 => {
         Name => 'InterchangeColorSpace',
@@ -571,9 +590,30 @@ my %fileFormat = (
         Name => 'ColorSequence',
         Format => 'int8u',
     },
+    66 => {
+        Name => 'ICCProfile',
+        # ...could add SubDirectory support to read into this (if anybody cares)
+        Writable => 0,
+        ValueConv => '\$val',
+    },
+    70 => {
+        Name => 'ColorCalibrationMatrix',
+        Writable => 0,
+        ValueConv => '\$val',
+    },
+    80 => {
+        Name => 'LookupTable',
+        Writable => 0,
+        ValueConv => '\$val',
+    },
     84 => {
         Name => 'NumIndexEntries',
         Format => 'int16u',
+    },
+    85 => {
+        Name => 'ColorPalette',
+        Writable => 0,
+        ValueConv => '\$val',
     },
     86 => {
         Name => 'IPTCBitsPerSample',
@@ -614,7 +654,7 @@ my %fileFormat = (
     },
     110 => {
         Name => 'DataCompressionMethod',
-        Format => 'int8u',
+        Format => 'int32u',
     },
     120 => {
         Name => 'QuantizationMethod',
@@ -632,7 +672,8 @@ my %fileFormat = (
     },
     125 => {
         Name => 'EndPoints',
-        Format => 'int8u',
+        Writable => 0,
+        ValueConv => '\$val',
     },
     130 => {
         Name => 'ExcursionTolerance',
@@ -645,6 +686,14 @@ my %fileFormat = (
     135 => {
         Name => 'BitsPerComponent',
         Format => 'int8u',
+    },
+    140 => {
+        Name => 'MaximumDensityRange',
+        Format => 'int16u',
+    },
+    145 => {
+        Name => 'GammaCompensatedValue',
+        Format => 'int16u',
     },
 );
 
@@ -677,8 +726,8 @@ my %fileFormat = (
     10 => {
         Name => 'SubFile',
         Flags => 'List',
-        PrintConv => '\$val',
-        PrintConvInv => '$val',
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
     },
 );
 
@@ -852,9 +901,7 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://brilliantlabs.com/docs/IIMV4.1.pdf
-
-=item http://www.hugsan.com/EXIFutils/Features/EXIF_Fields/IPTC/iptc.html
+=item http://www.iptc.org/IIM/
 
 =back
 

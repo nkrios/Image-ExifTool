@@ -21,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessICC_Profile($$$);
 
@@ -657,12 +657,12 @@ sub ProcessICC_Profile($$$)
         } elsif (defined $value) {
             $exifTool->FoundTag($tagInfo, $value);
         } else {
-            # treat unsupported formats as binary data
-            my $oldPrintConv = $$tagInfo{PrintConv};
-            $$tagInfo{PrintConv} = '\$val';
             $value = substr($$dataPt, $valuePtr, $size);
+            # treat unsupported formats as binary data
+            my $oldValueConv = $$tagInfo{ValueConv};
+            $$tagInfo{ValueConv} = '\$val';
             $exifTool->FoundTag($tagInfo, $value);
-            $$tagInfo{PrintConv} = $oldPrintConv;
+            $$tagInfo{ValueConv} = $oldValueConv;
         }
     }
     SetByteOrder($oldOrder);

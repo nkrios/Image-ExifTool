@@ -22,7 +22,7 @@ use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '4.73';
+$VERSION = '4.87';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -113,25 +113,30 @@ sub DummyWriteProc { return 1; }
     DID_TAG_ID => 1,   # tag ID's aren't meaningful for these tags
     WRITE_PROC => \&DummyWriteProc,
     CHECK_PROC => \&CheckExtraTags,
-    Comment     => { Name => 'Comment', Flags => 'Writable', WriteGroup => 'Comment' },
+    Comment => {
+        Name => 'Comment',
+        Notes => 'comment embedded in JPEG or GIF89a image', 
+        Flags => 'Writable',
+        WriteGroup => 'Comment',
+    },
     FileName    => { Name => 'FileName' },
     FileSize    => { Name => 'FileSize',  PrintConv => 'sprintf("%.0fKB",$val/1024)' },
     FileType    => { Name => 'FileType' },
     ImageWidth  => { Name => 'ImageWidth' },
     ImageHeight => { Name => 'ImageHeight' },
-    ExifData    => { Name => 'ExifData',  PrintConv => '\$val' },
+    ExifData    => { Name => 'ExifData',  ValueConv => '\$val' },
     ExifToolVersion => {
         Name        => 'ExifToolVersion',
         Description => 'ExifTool Version Number',
         Groups      => \%allGroupsExifTool
     },
-    PreviewImage=> {
+    PreviewImage => {
         Name        => 'PreviewImage',
        # TEST!!!! (disable writing for now)
        # Flags       => 'Writable',
         WriteGroup  => 'PreviewImage',
-        PrintConv   => '\$val',
-        PrintConvInv => '$val',
+        ValueConv   => '\$val',
+        ValueConvInv => '$val',
     },
     Error       => { Name => 'Error',   Groups => \%allGroupsExifTool },
     Warning     => { Name => 'Warning', Groups => \%allGroupsExifTool },
@@ -313,7 +318,7 @@ sub ExtractInfo($;@)
 
     unless ($raf) {
         # save file name
-        if ($filename) {
+        if (defined $filename and $filename ne '') {
             unless ($filename eq '-') {
                 my $name = $filename;
                 # extract file name from pipe if necessary
@@ -862,7 +867,7 @@ sub Init($)
     $self->{CHANGED}    = 0;        # number of tags changed (writer only)
     $self->{TIFF_TYPE}  = '';       # type of TIFF data (APP1, TIFF, NEF, etc...)
     $self->{CameraMake} = '';       # camera make
-    $self->{CameraModel} = '';      # camera model
+    $self->{CameraModel}= '';       # camera model
 }
 
 #------------------------------------------------------------------------------
@@ -1134,8 +1139,7 @@ sub AUTOLOAD
 
 #------------------------------------------------------------------------------
 # Add warning tag
-# Inputs: 0) reference to ExifTool object
-#         1) warning message
+# Inputs: 0) ExifTool object reference, 1) warning message
 sub Warn($$)
 {
     $_[0]->FoundTag('Warning', $_[1]);
@@ -1143,8 +1147,7 @@ sub Warn($$)
 
 #------------------------------------------------------------------------------
 # Add error tag
-# Inputs: 0) reference to ExifTool object
-#         1) error message
+# Inputs: 0) ExifTool object reference, 1) error message
 sub Error($$)
 {
     $_[0]->FoundTag('Error', $_[1]);
@@ -1406,7 +1409,7 @@ sub SetByteOrder($)
     } else {
         return 0;
     }
-    my $val = unpack('S',"A ");
+    my $val = unpack('S','A ');
     my $nativeOrder;
     if ($val == 0x4120) {       # big endian
         $nativeOrder = 'MM';
@@ -2012,9 +2015,10 @@ sub TiffInfo($$;$$$)
     $self->{EXIF_BYTE_ORDER} = GetByteOrder();
 
     # verify the byte ordering
-    my $identifier = Get16u($dataPt, 2);
-    # identifier is 0x2a for TIFF and 0x4f52 for ORF
-    $identifier == 0x2a or $identifier == 0x4f52 or return 0;
+  # no longer do this because ORF files use different values
+  #  my $identifier = Get16u($dataPt, 2);
+    # identifier is 0x2a for TIFF and 0x4f52 or 0x5352 or ?? for ORF
+  #  return 0 unless $identifier == 0x2a;
 
     # get offset to IFD0
     my $offset = Get32u($dataPt, 4);
@@ -2060,6 +2064,21 @@ sub TiffInfo($$;$$$)
     $self->ProcessTagTable($tagTablePtr, \%dirInfo);
 
     return 1;
+}
+
+#------------------------------------------------------------------------------
+# Load .ExifTool_config file from user's home directory
+# Returns: true if config file existed
+my $configLoaded;
+sub LoadConfig()
+{
+    unless (defined $configLoaded) {
+        $configLoaded = 0;
+        # load config file if it exists
+        my $configFile = ($ENV{HOME} || '.') . '/.ExifTool_config';
+        -r $configFile and eval("require '$configFile'"), ++$configLoaded;
+    }
+    return $configLoaded;
 }
 
 #------------------------------------------------------------------------------
@@ -2355,6 +2374,7 @@ sub FoundTag($$$$;$$)
             $@ and warn $@;
             # treat it as if the tag doesn't exist if ValueConv returns undef
             return undef unless defined $valueConv;
+            # WARNING: $valueConv may now be a reference to $val
         }
     } elsif (defined $val) {
         $valueConv = $val;
@@ -2363,18 +2383,16 @@ sub FoundTag($$$$;$$)
         $self->{OPTIONS}->{Verbose} and warn "Can't get value for $tag\n";
         return undef;
     }
-    $val = $valueConv;
-    # do the print conversion if required
+    # do the print conversion if required (and if not a binary value)
     my $printConv;
-    if (not $self->{OPTIONS}->{PrintConv}) {
-        $printConv = $val;
-    } else {
+    if ($self->{OPTIONS}->{PrintConv}) {
         my $printConversion = $$tagInfo{PrintConv};
         unless (defined $printConversion) {
             my $tagTablePtr = $$tagInfo{Table};
             $printConversion = $$tagTablePtr{PRINT_CONV};
         }
-        if (defined $printConversion) {
+        if (defined $printConversion and ref($valueConv) ne 'SCALAR') {
+            $val = $valueConv;
             if (ref($printConversion) eq 'HASH') {
                 $printConv = $$printConversion{$val};
                 unless (defined $printConv) {
@@ -2391,8 +2409,10 @@ sub FoundTag($$$$;$$)
                 # could be a reference to $val for binary data types)
             }
         } else {
-            $printConv = $val;
+            $printConv = $valueConv;
         }
+    } else {
+        $printConv = $valueConv;
     }
     # handle duplicate tag names
     if (defined $self->{PRINT_CONV}->{$tag}) {

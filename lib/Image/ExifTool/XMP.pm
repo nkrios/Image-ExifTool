@@ -30,7 +30,7 @@ use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.22';
+$VERSION = '1.25';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -73,7 +73,10 @@ sub DecodeBase64($);
     },
     Description     => { Groups => { 2 => 'Image'  }, Writable => 'lang-alt' },
     Format          => { Groups => { 2 => 'Image'  } },
-    Identifier      => { Groups => { 2 => 'Image'  } },
+    Identifier      => [
+        { Groups => { 2 => 'Image'  }, Namespace => 'dc' },
+        { List => 'Bag' , Namespace => 'xmp' },
+    ],
     Language        => { List => 'Bag' },
     Publisher       => { Groups => { 2 => 'Author' }, List => 'Bag' },
     Relation        => { List => 'Bag' },
@@ -96,7 +99,7 @@ sub DecodeBase64($);
         PrintConv => '$self->ConvertDateTime($val)',
     },
     CreatorTool     => { },
-    Identifier      => { List => 'Bag' },
+    # Identifier (covered by dc)
     MetadataDate    => {
         Groups => { 2 => 'Time'  },
         Writable => 'date',
@@ -123,7 +126,6 @@ sub DecodeBase64($);
         Groups => { 2 => 'Image' },
         # translate Base64-encoded thumbnail
         ValueConv => 'Image::ExifTool::XMP::DecodeBase64($val)',
-        PrintConv => '\$val',
     },
 #
 # - XMP Rights Management schema properties (xmpRights)
@@ -458,6 +460,7 @@ sub DecodeBase64($);
             1 => 'sRGB',
             2 => 'Adobe RGB',
             0xffff => 'Uncalibrated',
+            0xffffffff => 'Uncalibrated',
         },
     },
     ComponentsConfiguration => {
@@ -1044,7 +1047,7 @@ sub UnescapeHTML($)
 #------------------------------------------------------------------------------
 # Utility routine to decode a base64 string
 # Inputs: 0) base64 string
-# Returns:   decoded data
+# Returns:   reference to decoded data
 sub DecodeBase64($)
 {
     local($^W) = 0; # unpack("u",...) gives bogus warning in 5.00[123]
@@ -1074,7 +1077,7 @@ sub DecodeBase64($)
         $substr = substr($str, $i, $len-$i);        # get the last partial chunk
         $dat .= unpack("u", $uuLen . $substr);      # decode it
     }
-    return($dat);
+    return \$dat;
 }
 
 #------------------------------------------------------------------------------

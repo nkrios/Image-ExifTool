@@ -15,7 +15,7 @@ package Image::ExifTool::Panasonic;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 %Image::ExifTool::Panasonic::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -113,7 +113,7 @@ $VERSION = '1.03';
     0x21 => { #2
         Name => 'DataDump',
         Writable => 0,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x23 => {
         Name => 'WhiteBalanceBias',

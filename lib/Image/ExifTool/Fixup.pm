@@ -146,7 +146,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Fixup.pm - Utility to handle pointer fixups
+Image::ExifTool::Fixup - Utility to handle pointer fixups
 
 =head1 SYNOPSIS
 

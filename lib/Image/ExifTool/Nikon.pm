@@ -24,7 +24,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.16';
+$VERSION = '1.18';
 
 sub ProcessNikon($$$);
 
@@ -78,7 +78,7 @@ sub ProcessNikon($$$);
     0x0010 => {
         Name => 'DataDump',
         Writable => 0,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x0011 => {
         Name => 'NikonPreview',
@@ -211,7 +211,7 @@ sub ProcessNikon($$$);
     0x008c => {
         Name => 'NEFCurve1',
         Writable => 0,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x008d => 'ColorHue' , #2
     # SceneMode takes on the following values: PORTRAIT, PARTY/INDOOR, NIGHT PORTRAIT,
@@ -230,7 +230,7 @@ sub ProcessNikon($$$);
     0x0096 => {
         Name => 'NEFCurve2',
         Writable => 0,
-        PrintConv => '\$val',
+        ValueConv => '\$val',
     },
     0x0097 => [ #4
         {
@@ -419,19 +419,21 @@ sub ProcessNikon($$$);
     },
     0x201 => {
         Name => 'PreviewImageStart',
-        Flags => [ 'IsOffset', 'Protected', 'Permanent' ],
+        Flags => [ 'IsOffset', 'Permanent' ],
         OffsetPair => 0x202, # point to associated byte count
         DataTag => 'PreviewImage',
         Writable => 'int32u',
         WriteGroup => 'NikonPreview',
+        Protected => 2,
     },
     0x202 => {
         Name => 'PreviewImageLength',
-        Flags => [ 'Protected', 'Permanent' ],
+        Flags => 'Permanent' ,
         OffsetPair => 0x201, # point to associated offset
         DataTag => 'PreviewImage',
         Writable => 'int32u',
         WriteGroup => 'NikonPreview',
+        Protected => 2,
     },
     0x213 => {
         Name => 'YCbCrPositioning',
