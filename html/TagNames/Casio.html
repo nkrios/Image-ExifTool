@@ -1,0 +1,286 @@
+<html>
+<head>
+<title>Casio Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='Casio'>Casio Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>RecordingMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Single Shutter
+  <br>2 = Panorama
+  <br>3 = Night Scene
+  <br>4 = Portrait
+  <br>5 = Landscape</font></td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>Quality</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Economy
+  <br>2 = Normal
+  <br>3 = Fine</font></td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>FocusMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>2 = Macro
+  <br>3 = Auto
+  <br>4 = Manual
+  <br>5 = Infinity</font></td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>FlashMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Auto
+  <br>2 = On
+  <br>3 = Off
+  <br>4 = Red-eye Reduction</font></td></tr>
+<tr valign='top'>
+<td>0x0005</td>
+<td>FlashIntensity</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>11 = Weak
+  <br>13 = Normal
+  <br>15 = Strong</font></td></tr>
+<tr valign='top'>
+<td>0x0006</td>
+<td>ObjectDistance</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0007</td>
+<td>WhiteBalance</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Auto
+  <br>2 = Tungsten
+  <br>3 = Daylight
+  <br>4 = Fluorescent
+  <br>5 = Shade
+  <br>129 = Manual</font></td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>DigitalZoom</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>65536 = Off
+  <br>65537 = 2X</font></td></tr>
+<tr valign='top'>
+<td>0x000b</td>
+<td>Sharpness</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Soft
+  <br>2 = Hard</font></td></tr>
+<tr valign='top'>
+<td>0x000c</td>
+<td>Contrast</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Low
+  <br>2 = High</font></td></tr>
+<tr valign='top'>
+<td>0x000d</td>
+<td>Saturation</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Low
+  <br>2 = High</font></td></tr>
+<tr valign='top'>
+<td>0x0014</td>
+<td>CCDSensitivity</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>64 = Normal
+  <br>80 = Normal
+  <br>100 = High
+  <br>125 = +1.0
+  <br>244 = +3.0
+  <br>250 = +2.0</font></td></tr>
+</table></blockquote>
+
+<h2><a name='Type2'>Casio Type2 Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>PreviewImageSize</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>CasioPreviewLength</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>CasioPreviewStart</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>QualityMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Economy
+  <br>1 = Normal
+  <br>2 = Fine</font></td></tr>
+<tr valign='top'>
+<td>0x0009</td>
+<td>CasioImageSize</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = 640x480
+  <br>4 = 1600x1200
+  <br>5 = 2048x1536
+  <br>20 = 2288x1712
+  <br>21 = 2592x1944
+  <br>22 = 2304x1728
+  <br>36 = 3008x2008</font></td></tr>
+<tr valign='top'>
+<td>0x000d</td>
+<td>FocusMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Macro</font></td></tr>
+<tr valign='top'>
+<td>0x0014</td>
+<td>ISO</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>3 = 50
+  <br>4 = 64
+  <br>6 = 100
+  <br>9 = 200</font></td></tr>
+<tr valign='top'>
+<td>0x0019</td>
+<td>WhiteBalance</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Shade
+  <br>3 = Tungsten
+  <br>4 = Fluorescent
+  <br>5 = Manual</font></td></tr>
+<tr valign='top'>
+<td>0x001d</td>
+<td>FocalLength</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x001f</td>
+<td>Saturation</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = -1
+  <br>1 = Normal
+  <br>2 = +1</font></td></tr>
+<tr valign='top'>
+<td>0x0020</td>
+<td>Contrast</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = -1
+  <br>1 = Normal
+  <br>2 = +1</font></td></tr>
+<tr valign='top'>
+<td>0x0021</td>
+<td>Sharpness</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = -1
+  <br>1 = Normal
+  <br>2 = +1</font></td></tr>
+<tr valign='top'>
+<td>0x0e00</td>
+<td>PrintIM</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
+<tr valign='top'>
+<td>0x2000</td>
+<td>PreviewImage</td>
+<td align='center'>undef</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2011</td>
+<td>WhiteBalanceBias</td>
+<td align='center'>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2012</td>
+<td>WhiteBalance</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Manual
+  <br>1 = Auto?
+  <br>4 = Flash?
+  <br>12 = Flash</font></td></tr>
+<tr valign='top'>
+<td>0x2022</td>
+<td>ObjectDistance</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2034</td>
+<td>FlashDistance</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x3000</td>
+<td>RecordMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>2 = Normal</font></td></tr>
+<tr valign='top'>
+<td>0x3001</td>
+<td>SelfTimer</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Off</font></td></tr>
+<tr valign='top'>
+<td>0x3002</td>
+<td>Quality</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Economic
+  <br>2 = Normal
+  <br>3 = Fine</font></td></tr>
+<tr valign='top'>
+<td>0x3003</td>
+<td>FocusMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Manual?
+  <br>1 = Fixation?
+  <br>3 = Single-Area Auto Focus
+  <br>6 = Multi-Area Auto Focus</font></td></tr>
+<tr valign='top'>
+<td>0x3006</td>
+<td>TimeZone</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x3007</td>
+<td>BestshotMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On?</font></td></tr>
+<tr valign='top'>
+<td>0x3014</td>
+<td>CCDISOSensitivity</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x3015</td>
+<td>ColorMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off</font></td></tr>
+<tr valign='top'>
+<td>0x3016</td>
+<td>Enhancement</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off</font></td></tr>
+<tr valign='top'>
+<td>0x3017</td>
+<td>Filter</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off</font></td></tr>
+</table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Apr 2, 2005</i>
+</body>
+</html>

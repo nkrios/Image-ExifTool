@@ -11,12 +11,16 @@ specific meta information that is extracted or written in an image.
 
 =head1 TAG TABLES
 
-The tables below list the names of all tags recognized by ExifTool
-(excluding shortcut and unknown tags).  Case is not significant for tag
-names.  Where applicable, the corresponding B<Tag ID> or B<Index> is also
-given.  A B<Tag ID> is the computer-readable equivalent of a tag name, and
-is the identifier that is actually stored in the file.  B<Index> gives the
-location of the information if it is located at a fixed position in a
+The tables below list the names of all tags recognized by ExifTool,
+excluding shortcut and unknown tags.  Case is not significant for tag names.
+A question mark after a tag name indicates that the information is either
+not understood or not verified -- these tags are not extracted by ExifTool
+unless the Unknown (-u) option is enabled.
+
+Where applicable, a corresponding B<Tag ID> or B<Index> is also given for
+each tag.  The B<Tag ID> is the computer-readable equivalent of a tag name,
+and is the identifier that is actually stored in the file.  B<Index> gives
+the location of the information if it is located at a fixed position in a
 record.  In some instances, more than one tag name may correspond to a
 single ID.  In these cases, the actual tag name depends on the context in
 which the information is found.
@@ -222,7 +226,7 @@ default B<Group> listed below is used unless another group is specified.
   0x9000   ExifVersion               ExifIFD    undef
   0x9003   DateTimeOriginal          ExifIFD    string
   0x9004   CreateDate                ExifIFD    string
-  0x9101   ComponentsConfiguration   ExifIFD    undef~
+  0x9101   ComponentsConfiguration   ExifIFD    N~
   0x9102   CompressedBitsPerPixel    -          N
   0x9201   ShutterSpeedValue         ExifIFD    rational32s
   0x9202   ApertureValue             ExifIFD    rational32u
@@ -249,16 +253,27 @@ default B<Group> listed below is used unless another group is specified.
   0x9217   SensingMethod             -          N
   0x923f   StoNits                   -          N
   0x927c   MakerNoteCanon            ExifIFD    Canon
-           MakerNoteCasio            ExifIFD    Casio Type1
+           MakerNoteCasio            ExifIFD    Casio
            MakerNoteCasio2           ExifIFD    Casio Type2
            MakerNoteCasioEX-Z3       ExifIFD    Casio Type2
            MakerNoteFujiFilm         ExifIFD    FujiFilm
-           MakerNoteOlympus          ExifIFD    Olympus
-           MakerNotePanasonic        ExifIFD    Panasonic
-           MakerNoteLeica            ExifIFD    Panasonic
-           MakerNotePentax           ExifIFD    Pentax
-           MakerNoteNikon            ExifIFD    Nikon
+           MakerNoteKodak            ExifIFD    Kodak
+           MakerNoteKodak1           ExifIFD    Kodak
+           MakerNoteKodak2           ExifIFD    Kodak Type2
+           MakerNoteKodak3           ExifIFD    Kodak Type3
+           MakerNoteKodak4           ExifIFD    Kodak Type4
+           MakerNoteKodak5           ExifIFD    Kodak Type5
+           MakerNoteKodakUnknown     ExifIFD    Kodak Unknown
            MakerNoteMinolta          ExifIFD    Minolta
+           MakerNoteNikon            ExifIFD    Nikon
+           MakerNoteNikon2           ExifIFD    Nikon MakerNotesB
+           MakerNoteNikon3           ExifIFD    Nikon
+           MakerNoteOlympus          ExifIFD    Olympus
+           MakerNoteLeica            ExifIFD    Panasonic
+           MakerNotePanasonic        ExifIFD    Panasonic
+           MakerNotePentax           ExifIFD    Pentax
+           MakerNoteRicoh            ExifIFD    Ricoh
+           MakerNoteRicoh2           ExifIFD    Ricoh TextMakerNote
            MakerNoteSanyo            ExifIFD    Sanyo
            MakerNoteSigma            ExifIFD    Sigma
            MakerNoteSony             ExifIFD    Sony
@@ -416,12 +431,16 @@ C<lang-alt> is a list of string alternatives in different languages.
 Currently, ExifTool only writes the 'x-default' language in C<lang-alt>
 lists.
 
-The B<Group> column below gives the XMP schema name for each tag.  The
-family 1 group names are composed from these schema names with a leading
-"XMP-" added.  If the same XMP tag name exists in more than one group, all
-groups are written unless a family 1 group name is specified.  ie) If
-XMP:Contrast is specified, information will be written to both
+The B<Group> column below gives the XMP schema namespace prefix for each
+tag.  The family 1 group names are composed from these schema names with a
+leading "XMP-" added.  If the same XMP tag name exists in more than one
+group, all groups are written unless a family 1 group name is specified. 
+ie) If XMP:Contrast is specified, information will be written to both
 XMP-crs:Contrast and XMP-exif:Contrast.
+
+Note: that the actual IPTC Core namespace schema prefix is C<Iptc4xmpCore>,
+which is the name used in the file, but ExifTool uses C<IptcCore> to
+generate the family 1 group name because C<Iptc4xmpCore> is a bit lengthy.
 
   Tag Name                           Group      Writable
   --------                           -----      --------
@@ -456,10 +475,20 @@ XMP-crs:Contrast and XMP-exif:Contrast.
   Contributor                        dc         string
   Copyright                          tiff       lang-alt
   Country                            photoshop  string
+  CountryCode                        IptcCore   string
   Coverage                           dc         string
   CreateDate                         xmp        date
   CreationDate                       pdf        date
   Creator                            dc         string
+  CreatorContactInfo                 IptcCore   N
+  CreatorContactInfoCiAdrCity        IptcCore   string
+  CreatorContactInfoCiAdrCtry        IptcCore   string
+  CreatorContactInfoCiAdrExtadr      IptcCore   string
+  CreatorContactInfoCiAdrPcode       IptcCore   string
+  CreatorContactInfoCiAdrRegion      IptcCore   string
+  CreatorContactInfoCiEmailWork      IptcCore   string
+  CreatorContactInfoCiTelWork        IptcCore   string
+  CreatorContactInfoCiUrlWork        IptcCore   string
   CreatorTool                        xmp        string
   Credit                             photoshop  string
   CustomRendered                     exif       string
@@ -550,6 +579,7 @@ XMP-crs:Contrast and XMP-exif:Contrast.
   ImageUniqueID                      exif       string
   ImageWidth                         tiff       integer
   Instructions                       photoshop  string
+  IntellectualGenre                  IptcCore   string
   JobRef                             xmpBJ      N
   JobRefId                           xmpBJ      string
   JobRefName                         xmpBJ      string
@@ -559,6 +589,7 @@ XMP-crs:Contrast and XMP-exif:Contrast.
   LastURL                            xmpMM      string
   Lens                               aux        string
   LightSource                        exif       string
+  Location                           IptcCore   string
   LuminanceSmoothing                 crs        string
   Make                               tiff       string
   MakerNote                          exif       string
@@ -623,6 +654,7 @@ XMP-crs:Contrast and XMP-exif:Contrast.
   Saturation                         crs        string
   Saturation                         exif       string
   SaveID                             xmpMM      integer
+  Scene                              IptcCore   string
   SceneCaptureType                   exif       string
   SceneType                          exif       string
   SensingMethod                      exif       string
@@ -644,6 +676,7 @@ XMP-crs:Contrast and XMP-exif:Contrast.
   State                              photoshop  string
   Subject                            dc         string
   SubjectArea                        exif       integer
+  SubjectCode                        IptcCore   string
   SubjectDistance                    exif       rational
   SubjectDistanceRange               exif       string
   SubjectLocation                    exif       integer
@@ -651,7 +684,7 @@ XMP-crs:Contrast and XMP-exif:Contrast.
   Thumbnails                         xmp        N
   ThumbnailsFormat                   xmp        string
   ThumbnailsHeight                   xmp        string
-  ThumbnailsImage                    xmp        string
+  ThumbnailsImage                    xmp        N
   ThumbnailsWidth                    xmp        string
   Title                              dc         lang-alt
   TransferFunction                   tiff       integer
@@ -1051,7 +1084,7 @@ automatically by ExifTool.
      24    ShortFocal                           int16s
      25    FocalUnits                           int16s
      28    FlashActivity                        int16s
-     29    FlashBits                            int16s
+     29    FlashBits                            N
      32    FocusContinuous                      int16s
      36    ZoomedResolution                     int16s
      37    ZoomedResolutionBase                 int16s
@@ -1165,7 +1198,7 @@ automatically by ExifTool.
       3    CanonImageHeight                     int16u
       4    CanonImageWidthAsShot                int16u
       5    CanonImageHeightAsShot               int16u
-     22    AFPointsUsed                         int16u
+     22    AFPointsUsed                         N
 
 =head2 CanonCustom Functions1D Tags
 
@@ -1239,7 +1272,7 @@ automatically by ExifTool.
       6    PreviewFocalPlaneXResolution         rational32s
       8    PreviewFocalPlaneYResolution         rational32s
 
-=head2 Casio Type1 Tags
+=head2 Casio Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1260,7 +1293,7 @@ automatically by ExifTool.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0002   PreviewImageSize                     int16u[2]
+  0x0002   PreviewImageSize                     N
   0x0003   CasioPreviewLength                   N
   0x0004   CasioPreviewStart                    N
   0x0008   QualityMode                          int16u
@@ -1276,7 +1309,7 @@ automatically by ExifTool.
   0x2000   PreviewImage                         undef
   0x2011   WhiteBalanceBias                     int16u[2]
   0x2012   WhiteBalance                         int16u
-  0x2022   ObjectDistance                       int32u
+  0x2022   ObjectDistance                       N
   0x2034   FlashDistance                        int16u
   0x3000   RecordMode                           int16u
   0x3001   SelfTimer                            int16u
@@ -1290,6 +1323,9 @@ automatically by ExifTool.
   0x3017   Filter                               int16u
 
 =head2 PrintIM Tags
+
+The format of the PrintIM information is known, however no PrintIM tags have
+been decoded.  Use the Unknown (-u) option to extract PrintIM information.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1315,69 +1351,167 @@ automatically by ExifTool.
   0x1301   FocusWarning                         int16u
   0x1302   ExposureWarning                      int16u
 
-=head2 Olympus Tags
+=head2 Kodak Tags
+
+Kodak maker notes are a real pain because they aren't in standard IFD format
+and change frequently with new models.  Some information has been decoded,
+but the Kodak support still needs a lot of work.
+
+These tags used by a number of CX, DC, DX and LS models.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    KodakModel                           string[8]
+      9    Compression                          int8u
+     10    BurstMode                            int8u
+     11    MacroMode                            int8u
+     12    KodakImageWidth                      int16u
+     14    KodakImageHeight                     int16u
+     16    Date                                 undef[4]
+     20    Time                                 int8u[4]
+     24    BurstMode2?                          int16u
+     27    ShutterMode                          int8u
+     28    MeteringMode                         int8u
+     29    SequenceNumber                       int8u
+     30    Aperture                             int16u
+     32    KodakExposure?                       int32u
+     36    ExposureBias                         int16s
+     38    VariousModes?                        int16u
+     40    Distance1?                           int32u
+     44    Distance2?                           int32u
+     48    Distance3?                           int32u
+     52    Distance4?                           int32u
+     56    FocusMode                            int8u
+     58    VariousModes2?                       int16u
+     60    PanoramaMode                         int16u
+     62    SubjectDistance                      int16u
+     64    WhiteBalance                         int8u
+     92    FlashMode                            int8u
+     93    FlashFired                           int8u
+     94    ISOSetting                           int16u
+     96    ISOUsed                              int16u
+     98    TotalZoomFactor                      int16u
+    100    DateTimeStamp                        int16u
+    102    ColorMode                            int16u
+    104    DigitalZoomFactor                    int16u
+    107    Sharpness                            int8s
+
+=head2 Kodak Type2 Tags
+
+These tags used by the DC265 and DC290.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      8    KodakMaker                           string[32]
+     40    KodakModel                           string[32]
+
+=head2 Kodak Type3 Tags
+
+These tags used by the DC280, DC3400 and DC5000.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     12    Date                                 undef[4]
+     16    Time                                 int8u[4]
+
+=head2 Kodak Type4 Tags
+
+These tags used by the DC200.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     32    OriginalFileName                     string[12]
+
+=head2 Kodak Type5 Tags
+
+These tags used by the CX4200.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     26    WhiteBalance                         int8u
+     30    ISOUsed                              int16u
+     32    TotalZoomFactor                      int16u
+     34    DigitalZoomFactor                    int16u
+     39    FlashMode                            int8u
+     42    ImageRotated                         int8u
+     43    Macro                                int8u
+
+=head2 Kodak Unknown Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+
+=head2 Minolta Tags
+
+These tags are used by Minolta and Konica/Minolta cameras.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0200   SpecialMode                          int32u[3]
-  0x0201   Quality                              int16u
-  0x0202   Macro                                int16u
-  0x0204   DigitalZoom                          rational32u
-  0x0207   SoftwareRelease                      Y
-  0x0208   PictInfo                             Y
-  0x0209   CameraID                             string
-  0x020b   EpsonImageWidth                      int16u
-  0x020c   EpsonImageHeight                     int16u
-  0x020d   EpsonSoftware                        Y
-  0x0f00   DataDump                             N
-  0x1017   RedBalance                           int16u[2]
-  0x1018   BlueBalance                          int16u[2]
-
-=head2 Panasonic Tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0001   ImageQuality                         int16u
-  0x0002   FirmwareVersion                      int8u[4]
-  0x0003   WhiteBalance                         int16u
-  0x0007   FocusMode                            int16u
-  0x000f   SpotMode                             int8u[2]
-  0x001a   ImageStabilizer                      int16u
-  0x001c   MacroMode                            int16u
-  0x001f   ShootingMode                         int16u
-  0x0020   Audio                                int16u
-  0x0021   DataDump                             N
-  0x0023   WhiteBalanceBias                     int16s
-  0x0024   FlashBias                            int16s
-  0x0025   SerialNumber                         Y
-  0x0028   ColorEffect                          int16u
-  0x002c   Contrast                             int16u
-  0x002d   NoiseReduction                       int16u
+  0x0000   MakerNoteVersion                     Y
+  0x0001   MinoltaCameraSettingsOld             Minolta CameraSettings
+  0x0003   MinoltaCameraSettings                Minolta CameraSettings
+  0x0018   ImageStabilization                   N
+  0x0040   CompressedImageSize                  int32u
+  0x0081   PreviewImageData                     N
+  0x0088   PreviewImageStart                    int32u*
+  0x0089   PreviewImageLength                   int32u*
+  0x0101   ColorMode                            Y
+  0x0102   MinoltaQuality                       Y
+  0x0103   MinoltaQuality                       Y
   0x0e00   PrintIM                              PrintIM
+  0x0f00   MinoltaCameraSettings2               N
 
-=head2 Pentax Tags
+=head2 Minolta CameraSettings Tags
 
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0001   PentaxMode                           int16u
-  0x0002   PreviewImageSize                     int16u[2]
-  0x0003   PreviewImageLength                   int32u*
-  0x0004   PreviewImageStart                    int32u*
-  0x0008   Quality                              int16u
-  0x0009   PentaxImageSize                      int16u
-  0x000b   PictureMode                          int16u
-  0x000d   FocusMode                            int16u
-  0x0014   ISO                                  int16u
-  0x0017   MeteringMode                         int16u
-  0x0019   WhiteBalance                         int16u
-  0x001d   FocalLength                          int32u
-  0x001e   DigitalZoom                          int16u
-  0x001f   Saturation                           int16u
-  0x0020   Contrast                             int16u
-  0x0021   Sharpness                            int16u
-  0x0039   RawImageSize                         int16u[2]
-  0x003f   LensType                             int8u[2]
-  0x0e00   PrintIM                              PrintIM
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    ExposureMode                         int32u
+      2    FlashMode                            int32u
+      3    WhiteBalance                         N
+      4    MinoltaImageSize                     int32u
+      5    MinoltaQuality                       int32u
+      6    DriveMode                            int32u
+      7    MeteringMode                         int32u
+      8    MinoltaISO                           N
+      9    MinoltaShutterSpeed                  N
+     10    MinoltaAperture                      N
+     11    MacroMode                            int32u
+     12    DigitalZoom                          int32u
+     13    ExposureCompensation                 int32u
+     14    BracketStep                          int32u
+     16    IntervalLength                       int32u
+     17    IntervalNumber                       int32u
+     18    FocalLength                          int32u
+     19    FocusDistance                        int32u
+     20    FlashFired                           int32u
+     21    MinoltaDate                          int32u
+     22    MinoltaTime                          int32u
+     23    MaxAperture                          N
+     26    FileNumberMemory                     int32u
+     27    LastFileNumber                       int32u
+     28    ColorBalanceRed                      int32u
+     29    ColorBalanceGreen                    int32u
+     30    ColorBalanceBlue                     int32u
+     31    Saturation                           int32u
+     32    Contrast                             int32u
+     33    Sharpness                            int32u
+     34    SubjectProgram                       int32u
+     35    FlashExposureComp                    int32u
+     36    ISOSetting                           int32u
+     37    MinoltaModel                         int32u
+     38    IntervalMode                         int32u
+     39    FolderName                           int32u
+     40    ColorMode                            int32u
+     41    ColorFilter                          int32u
+     42    BWFilter                             int32u
+     43    InternalFlash                        int32u
+     44    Brightness                           int32u
+     45    SpotFocusPointX                      int32u
+     46    SpotFocusPointY                      int32u
+     47    WideFocusZone                        int32u
+     48    FocusMode                            int32u
+     49    FocusArea                            int32u
+     50    DECPosition                          int32u
 
 =head2 Nikon Tags
 
@@ -1397,11 +1531,11 @@ automatically by ExifTool.
   0x000f   ISOSelection                         Y
   0x0010   DataDump                             N
   0x0011   NikonPreview                         Nikon PreviewImage
-  0x0012   FlashExposureComp                    int32s
+  0x0012   FlashExposureComp                    N
   0x0013   ISOSetting                           int16u[2]
-  0x0016   ImageBoundry                         Y
-  0x0018   FlashExposureBracketValue            int32s
-  0x0019   ExposureBracketValue                 rational32s
+  0x0016   ImageBoundary                        Y
+  0x0018   FlashExposureBracketValue            N
+  0x0019   ExposureBracketValue                 N
   0x0080   ImageAdjustment                      Y
   0x0081   ToneComp                             Y
   0x0082   AuxiliaryLens                        Y
@@ -1411,7 +1545,7 @@ automatically by ExifTool.
   0x0086   DigitalZoom                          rational32u
   0x0087   FlashMode                            int8u
   0x0088   AFPoint                              int32u
-  0x0089   ShootingMode                         int16u
+  0x0089   ShootingMode                         N
   0x008c   NEFCurve1                            N
   0x008d   ColorHue                             Y
   0x008f   SceneMode                            Y
@@ -1457,14 +1591,14 @@ automatically by ExifTool.
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    RedBalance                           rational16s
-      1    BlueBalance                          rational16s
+      1    BlueBalance                          N
 
 =head2 Nikon ColorBalanceD100 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    RedBalance                           int16u
-      1    BlueBalance                          int16u
+      0    RedBalance                           N
+      1    BlueBalance                          N
 
 =head2 Nikon NikonCaptureOffsets Tags
 
@@ -1474,75 +1608,225 @@ automatically by ExifTool.
   0x0002   PreviewIFD_Offset                    N
   0x0003   SubIFD_Offset                        N
 
-=head2 Minolta Tags
+=head2 Nikon MakerNotesB Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0003   Quality                              Y
+  0x0004   ColorMode                            Y
+  0x0005   ImageAdjustment                      Y
+  0x0006   CCDSensitivity                       Y
+  0x0007   WhiteBalance                         Y
+  0x0008   Focus                                Y
+  0x000a   DigitalZoom                          Y
+  0x000b   Converter                            Y
+
+=head2 Olympus Tags
+
+Tags 0x0000 through 0x0103 are used by some older Olympus cameras, and are
+the same as Konica/Minolta tags.  The Olympus tags are also used for Epson
+and Agfa cameras.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0000   MakerNoteVersion                     Y
   0x0001   MinoltaCameraSettingsOld             Minolta CameraSettings
   0x0003   MinoltaCameraSettings                Minolta CameraSettings
-  0x0018   ImageStabilization                   N
   0x0040   CompressedImageSize                  int32u
   0x0081   PreviewImageData                     N
-  0x0088   PreviewImageStart                    int32u*
-  0x0089   PreviewImageLength                   int32u*
+  0x0088   PreviewImageStart                    N*
+  0x0089   PreviewImageLength                   N*
+  0x0100   ThumbnailImage                       Y
   0x0101   ColorMode                            Y
   0x0102   MinoltaQuality                       Y
   0x0103   MinoltaQuality                       Y
+  0x0200   SpecialMode                          N
+  0x0201   Quality                              int16u
+  0x0202   Macro                                int16u
+  0x0204   DigitalZoom                          rational32u
+  0x0207   FirmwareVersion                      Y
+  0x0208   PictureInfo                          Y
+  0x0209   CameraID                             string
+  0x020b   EpsonImageWidth                      int16u
+  0x020c   EpsonImageHeight                     int16u
+  0x020d   EpsonSoftware                        Y
   0x0e00   PrintIM                              PrintIM
-  0x0f00   MinoltaCameraSettings2               N
+  0x0f00   DataDump                             N
+  0x1004   FlashMode                            Y
+  0x1006   Bracket                              Y
+  0x100b   FocusMode                            Y
+  0x100c   FocusDistance                        Y
+  0x100d   Zoom                                 Y
+  0x100e   MacroFocus                           Y
+  0x100f   SharpnessFactor                      Y
+  0x1011   ColorMatrix                          Y
+  0x1012   BlackLevel                           Y
+  0x1015   WhiteBalance                         Y
+  0x1017   RedBalance                           int16u[2]
+  0x1018   BlueBalance                          int16u[2]
+  0x101a   SerialNumber                         Y
+  0x1023   FlashBias                            Y
+  0x1029   Contrast                             Y
+  0x102a   SharpnessFactor                      Y
+  0x102b   ColorControl                         Y
+  0x102c   ValidBits                            Y
+  0x102d   CoringFilter                         Y
+  0x102e   OlympusImageWidth                    Y
+  0x102f   OlympusImageHeight                   Y
+  0x1034   CompressionRatio                     Y
+  0x2010   Equipment                            Olympus Equipment
+  0x2020   CameraSettings                       Olympus CameraSettings
+  0x2030   Subdir3                              Olympus Subdir3
+  0x2040   ImageProcessing                      Olympus ImageProcessing
+  0x2050   FocusInfo                            Olympus FocusInfo
 
-=head2 Minolta CameraSettings Tags
+=head2 Olympus Equipment Tags
 
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      1    ExposureMode                         int32u
-      2    FlashMode                            int32u
-      3    WhiteBalance                         int32u
-      4    MinoltaImageSize                     int32u
-      5    MinoltaQuality                       int32u
-      6    DriveMode                            int32u
-      7    MeteringMode                         int32u
-      8    MinoltaISO                           int32u
-      9    MinoltaShutterSpeed                  int32u
-     10    MinoltaAperture                      int32u
-     11    MacroMode                            int32u
-     12    DigitalZoom                          int32u
-     13    ExposureCompensation                 int32u
-     14    BracketStep                          int32u
-     16    IntervalLength                       int32u
-     17    IntervalNumber                       int32u
-     18    FocalLength                          int32u
-     19    FocusDistance                        int32u
-     20    FlashFired                           int32u
-     21    MinoltaDate                          int32u
-     22    MinoltaTime                          int32u
-     23    MaxAperture                          int32u
-     26    FileNumberMemory                     int32u
-     27    LastFileNumber                       int32u
-     28    ColorBalanceRed                      int32u
-     29    ColorBalanceGreen                    int32u
-     30    ColorBalanceBlue                     int32u
-     31    Saturation                           int32u
-     32    Contrast                             int32u
-     33    Sharpness                            int32u
-     34    SubjectProgram                       int32u
-     35    FlashExposureComp                    int32u
-     36    ISOSetting                           int32u
-     37    MinoltaModel                         int32u
-     38    IntervalMode                         int32u
-     39    FolderName                           int32u
-     40    ColorMode                            int32u
-     41    ColorFilter                          int32u
-     42    BWFilter                             int32u
-     43    InternalFlash                        int32u
-     44    Brightness                           int32u
-     45    SpotFocusPointX                      int32u
-     46    SpotFocusPointY                      int32u
-     47    WideFocusZone                        int32u
-     48    FocusMode                            int32u
-     49    FocusArea                            int32u
-     50    DECPosition                          int32u
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   EquipmentVersion                     Y
+  0x0100   FirmwareVersion2                     Y
+  0x0101   SerialNumber                         Y
+  0x0202   LensSerialNumber                     Y
+  0x0206   MaxApertureAtMaxFocal                Y
+  0x0207   MinFocalLength                       Y
+  0x0208   MaxFocalLength                       Y
+  0x0302   ExtenderSerialNumber                 Y
+  0x1003   FlashSerialNumber                    Y
+
+=head2 Olympus CameraSettings Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   CameraSettingsVersion                Y
+  0x0101   PreviewImageStart                    int32u*
+  0x0102   PreviewImageLength                   int32u*
+  0x0200   ExposureMode                         Y
+  0x0202   MeteringMode                         Y
+  0x0301   ContinuousAutoFocus                  N
+  0x0304   AFAreas                              N
+  0x0501   WhiteBalanceTemperature              Y
+  0x0502   WhiteBalanceBracket                  Y
+  0x0503   CustomSaturation                     N
+  0x0504   ModifiedSaturation                   Y
+  0x0505   ContrastSetting                      Y
+  0x0506   SharpnessSetting                     Y
+  0x0507   ColorSpace                           Y
+  0x050a   NoiseFilter                          Y
+  0x050c   ShadingCompensation                  Y
+  0x050d   CompressionFactor                    Y
+  0x0600   Sequence                             N
+  0x0603   ImageQuality2                        Y
+
+=head2 Olympus Subdir3 Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   Subdir3Version                       Y
+
+=head2 Olympus ImageProcessing Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   ImageProcessingVersion               Y
+  0x0300   SmoothingParameter1                  Y
+  0x0310   SmoothingParameter2                  Y
+  0x0600   SmoothingThresholds                  Y
+  0x0610   SmoothingThreshold2                  Y
+  0x0614   OlympusImageWidth2                   Y
+  0x0615   OlympusImageHeight2                  Y
+  0x1010   NoiseFilter2                         Y
+  0x1012   ShadingCompensation2                 Y
+
+=head2 Olympus FocusInfo Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   FocusInfoVersion                     Y
+  0x0209   AutoFocus                            Y
+  0x0305   FocusDistance                        int32u[2]
+
+=head2 Panasonic Tags
+
+Panasonic tags are also used for Leica cameras.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0001   ImageQuality                         int16u
+  0x0002   FirmwareVersion                      int8u[4]
+  0x0003   WhiteBalance                         int16u
+  0x0007   FocusMode                            int16u
+  0x000f   SpotMode                             int8u[2]
+  0x001a   ImageStabilizer                      int16u
+  0x001c   MacroMode                            int16u
+  0x001f   ShootingMode                         int16u
+  0x0020   Audio                                int16u
+  0x0021   DataDump                             N
+  0x0023   WhiteBalanceBias                     int16s
+  0x0024   FlashBias                            int16s
+  0x0025   SerialNumber                         Y
+  0x0028   ColorEffect                          int16u
+  0x002c   Contrast                             int16u
+  0x002d   NoiseReduction                       int16u
+  0x0e00   PrintIM                              PrintIM
+
+=head2 Pentax Tags
+
+The Pentax tags are also used in Asahi cameras.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0001   PentaxMode                           int16u
+  0x0002   PreviewImageSize                     N
+  0x0003   PreviewImageLength                   int32u*
+  0x0004   PreviewImageStart                    int32u*
+  0x0006   Date                                 Y
+  0x0007   Time                                 Y
+  0x0008   Quality                              int16u
+  0x0009   PentaxImageSize                      int16u
+  0x000b   PictureMode                          int16u
+  0x000d   FocusMode                            int16u
+  0x0014   ISO                                  int16u
+  0x0017   MeteringMode                         int16u
+  0x0019   WhiteBalance                         int16u
+  0x001a   WhiteBalanceMode                     Y
+  0x001d   FocalLength                          int32u
+  0x001e   DigitalZoom                          int16u
+  0x001f   Saturation                           int16u
+  0x0020   Contrast                             int16u
+  0x0021   Sharpness                            int16u
+  0x0029   FrameNumber                          Y
+  0x0039   RawImageSize                         N
+  0x003f   LensType                             int8u[2]
+  0x0200   BlackPoint                           int16u[4]
+  0x0201   WhitePoint                           int16u[4]
+  0x0402   ToneCurve                            N
+  0x0403   ToneCurves                           N
+  0x0e00   PrintIM                              PrintIM
+
+=head2 Ricoh Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0001   MakerNoteType                        Y
+  0x0002   MakerNoteVersion                     Y
+  0x0e00   PrintIM                              PrintIM
+  0x2001   RicohSubdir                          Ricoh Subdir
+           RicohRR1Subdir                       Ricoh Subdir
+
+=head2 Ricoh Subdir Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0004   RicohDateTime1                       N
+  0x0005   RicohDateTime2                       N
+
+=head2 Ricoh TextMakerNote Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'Rev'    Revision                             N
+  'Rv'     Revision                             N
 
 =head2 Sanyo Tags
 
@@ -1578,6 +1862,8 @@ automatically by ExifTool.
 
 =head2 Sigma Tags
 
+These tags are used in Sigma/Foveon cameras.
+
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0002   SerialNumber                         Y
@@ -1606,17 +1892,26 @@ automatically by ExifTool.
 
 =head2 Sony Tags
 
+While current Sony camera models contain a wealth of information, very
+little is known about the Sony tags.
+
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0e00   PrintIM                              PrintIM
 
 =head2 Unknown Tags
 
+The following tags are decoded in unsupported maker notes.  Use the Unknown
+(-u) option to display other unknown tags.
+
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0e00   PrintIM                              PrintIM
 
 =head2 Kodak SpecialEffects Tags
+
+The Kodak SpecialEffects and Borders tags are found in sub-IFD's within
+the Kodak "Meta" JPEG APP3 segment.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1758,6 +2053,10 @@ ThumbnailImage are allowed to change size.
       2    AvValue                              float
 
 =head2 Photoshop Tags
+
+The meanings of many Photoshop tags are known, however very few provide useful
+information about the image, so many are not decoded by ExifTool.  The tags
+listed below are those which are decoded by ExifTool.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1914,6 +2213,7 @@ with any other tag group.
   Tag Name                                      Writable
   --------                                      --------
   Comment                                       Y
+  Directory                                     N
   Error                                         N
   ExifData                                      N
   ExifToolVersion                               N
@@ -1961,6 +2261,8 @@ is extracted.
                        FocalUnits
                        Lens
                        ScaleFactor35efl
+  LensSpec             Nikon:Lens               N
+                       Nikon:LensType
   PreviewImage         PreviewImageStart        Y
                        PreviewImageLength
   PreviewImageSize     PreviewImageWidth        N
@@ -1988,6 +2290,8 @@ is extracted.
   ShutterSpeed         ExposureTime             N
                        ShutterSpeedValue
                        BulbDuration
+  SubSecDateTimeOriginal DateTimeOriginal         N
+                       SubSecTimeOriginal
   ThumbnailImage       ThumbnailOffset          Y
                        ThumbnailLength
 

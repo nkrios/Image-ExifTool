@@ -9,6 +9,7 @@
 #               12/01/2004 - P. Harvey Added default PRINT_CONV
 #               12/06/2004 - P. Harvey Added SceneMode
 #               01/01/2005 - P. Harvey Decode preview image and preview IFD
+#               03/35/2005 - T. Christiansen additions
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               2) Joseph Heled private communication (tests with D70)
@@ -16,6 +17,7 @@
 #               4) http://www.cybercom.net/~dcoffin/dcraw/
 #               5) Brian Ristuccia private communication (tests with D70)
 #               6) Danek Duvall private communication (tests with D70)
+#               7) Tom Christiansen private communication (tchrist@perl.com)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -24,12 +26,9 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.18';
-
-sub ProcessNikon($$$);
+$VERSION = '1.19';
 
 %Image::ExifTool::Nikon::Main = (
-    PROCESS_PROC => \&ProcessNikon,
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
@@ -104,8 +103,8 @@ sub ProcessNikon($$$);
         PrintConv => '$_=$val;s/^0 //;$_',
         PrintConvInv => '"0 $val"',
     },
-    # D70 Image boundry?? top x,y bot-right x,y
-    0x0016 => 'ImageBoundry', #2
+    # D70 Image boundary?? top x,y bot-right x,y
+    0x0016 => 'ImageBoundary', #2
     0x0018 => { #5
         Name => 'FlashExposureBracketValue',
         Format => 'int32s',
@@ -122,25 +121,37 @@ sub ProcessNikon($$$);
     0x0082 => 'AuxiliaryLens',
     0x0083 => {
         Name => 'LensType',
-        Flags => 'PrintHex',
         Writable => 'int8u',
-        PrintConv => {
-            # observed values of this field:
-            # 0x00 => old nikon 70-210 (ref 2)
-            # 0x01 => completely manual Sigma 400mm (ref 6)
-            # 0x02 => nikon 70-300, nikon 135-400 (ref 2)
-            # 0x02 => Micro Nikkor 60mm (and 105mm) 2.8D (ref 6)
-            # 0x06 => D70 kit lens (refs 2,5), 70-300G (ref 2)
-            # 0x0e => G type lens (ref 5)
-        },
+        # credit to Tom Christiansen (ref 7) for figuring this out...
+        PrintConv => q[$_ = $val ? Image::ExifTool::Exif::DecodeBits($val,
+            {
+                0 => 'MF',
+                1 => 'D',
+                2 => 'G',
+                3 => 'VR',
+            }) : 'AF';
+            # remove commas and change "D G" to just "G"
+            s/,//g; s/\bD G\b/G/; $_
+        ],
+        PrintConvInv => q[
+            my $bits = 0;
+            $bits |= 0x01 if $val =~ /\bMF\b/i;
+            $bits |= 0x02 if $val =~ /\bD\b/i;
+            $bits |= 0x06 if $val =~ /\bG\b/i;
+            $bits |= 0x08 if $val =~ /\bVR\b/i;
+            return $bits;
+        ],
     },
     0x0084 => { #2
         Name => "Lens",
         Writable => 'rational32u',
         Count => 4,
-        # short long ap short ap long
-        PrintConv => '$_=$val;s/(\S+) (\S+) (\S+) (\S+)/$1-$2mm f\/$3-$4/;$_',
-        PrintConvInv => '$_=$val;s/-//;s/mm f\// /;$_',
+        # short focal, long focal, aperture at short focal, aperture at long focal
+        PrintConv => q{
+            my ($a,$b,$c,$d) = split /\s+/, $val;
+            ($a==$b ? $a : "$a-$b") . "mm f/" . ($c==$d ? $c : "$c-$d")
+        },
+        PrintConvInv => '$_=$val; tr/a-z\///d; s/(^|\s)([0-9.]+)(?=\s|$)/$1$2-$2/g; s/-/ /g; $_',
     },
     0x0085 => {
         Name => 'ManualFocusDistance',
@@ -194,16 +205,29 @@ sub ProcessNikon($$$);
     0x0089 => { #5
         Name => 'ShootingMode',
         Writable => 'int16u',
-        PrintConv => q[$val ? Image::ExifTool::Exif::DecodeBits($val,
+        # credit to Tom Christiansen (ref 7) for figuring this out...
+        # The (new?) bit 5 seriously complicates our life here: after firmwareB's
+        # 1.03, bit 5 turns on when you ask for BUT DO NOT USE the long-range
+        # noise reduction feature, probably because even not using it, it still
+        # slows down your drive operation to 50% (1.5fps max not 3fps).  But no
+        # longer does !$val alone indicate single-frame operation. - TC
+        PrintConv => q[
+            $_ = '';
+            unless ($val & 0x87) {
+                return 'Single-Frame' unless $val;
+                $_ = 'Single-Frame, ';
+            }
+            return $_ . Image::ExifTool::Exif::DecodeBits($val,
             {
                 0 => 'Continuous',
                 1 => 'Delay',
-                #0x03 => 'Remote with Delay',
-                2 => 'Remote',
+                2 => 'PC Control',
                 4 => 'Exposure Bracketing',
-                6 => 'White Balance Bracketing',
-            }
-        ) : 'Single' ],
+                5 => 'Unused LE-NR Slowdown',
+                6 => 'White-Balance Bracketing',
+                7 => 'IR Control',
+            });
+        ],
     },
     # 0x008b First byte depends on len used, last 3 010c00 (ref 2)
     #   40 with kit len, 48 with nikon 70-300G , 3c with Nikon 70-300, 48 with old nikon
@@ -267,7 +291,7 @@ sub ProcessNikon($$$);
             Writable => 0,
         },
     ],
-    # D70 gussing here
+    # D70 guessing here
     0x0099 => { #2
         Name => 'NEFThumbnailSize',
         Writable => 'int16u',
@@ -379,7 +403,6 @@ sub ProcessNikon($$$);
 );
 
 %Image::ExifTool::Nikon::MakerNotesB = (
-    PROCESS_PROC => \&ProcessNikon,
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
@@ -444,6 +467,24 @@ sub ProcessNikon($$$);
     },
 );
 
+# Nikon composite tags
+%Image::ExifTool::Nikon::Composite = (
+    GROUPS => { 2 => 'Camera' },
+    LensSpec => {
+        Description => 'Lens',
+        Require => {
+            0 => 'Nikon:Lens',
+            1 => 'Nikon:LensType',
+        },
+        ValueConv => '"$val[0] $val[1]"',
+        PrintConv => '"$valPrint[0] $valPrint[1]"',
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Nikon::Composite);
+
+
 #------------------------------------------------------------------------------
 # process Nikon IFD
 # Inputs: 0) ExifTool object reference, 1) pointer to tag table
@@ -506,88 +547,6 @@ sub FormatString($)
     return $str;
 }
 
-#------------------------------------------------------------------------------
-# process Nikon maker notes
-# Inputs: 0) ExifTool object reference, 1) pointer to tag table
-#         2) reference to directory information
-# Returns: 1 on success
-# Notes: This routine is necessary because Nikon is horribly inconsistent in
-#        its maker notes format from one camera to the next, so the logic is
-#        complicated enough that it warrants a subroutine of its own.
-sub ProcessNikon($$$)
-{
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart};
-    my $size = $dirInfo->{DirLen};
-    my $success = 0;
-
-    my $saveOrder = GetByteOrder();
-
-    # get start of maker notes data
-    my $header = substr($$dataPt, $dirStart, 10);
-
-    # figure out what type of maker notes we are dealing with
-    if ($header =~ /^Nikon\x00\x01/) {
-
-        # this is a type A1 header -- ie)
-        # 4e 69 6b 6f 6e 00 01 00 0b 00 02 00 02 00 06 00 [Nikon...........]
-
-        SetByteOrder('II');
-        # add offset to start of directory
-        $dirInfo->{DirStart} += 8;
-        $dirInfo->{DirLen} -= 8;
-        # use table B
-        my $table2 = Image::ExifTool::GetTagTable('Image::ExifTool::Nikon::MakerNotesB');
-        $success = Image::ExifTool::Exif::ProcessExif($exifTool, $table2, $dirInfo);
-
-    } elsif ($header =~ /^Nikon\x00\x02/) {
-
-        # this is a type B2 header (NEF file) -- ie)
-        # 4e 69 6b 6f 6e 00 02 10 00 00 4d 4d 00 2a 00 00 [Nikon.....MM.*..]
-        # 00 08 00 2b 00 01 00 07 00 00 00 04 30 32 31 30 [...+........0210]
-
-        # set our byte ordering
-        unless (SetByteOrder(substr($$dataPt,$dirStart+10,2))) {
-            $exifTool->Warn('Bad Nikon type 2 maker notes');
-            SetByteOrder($saveOrder);
-            return 0;
-        }
-        unless (Get16u($dataPt, $dirStart+12) == 42) {
-            $exifTool->Warn('Invalid magic number for Nikon maker notes');
-            SetByteOrder($saveOrder);
-            return 0;
-        }
-        my $ptr = Get32u($dataPt, $dirStart+14);
-
-        # shift directory start
-        $dirInfo->{DirStart} += $ptr + 10;  # set offset to start of directory
-        $dirInfo->{DirLen} -= $ptr + 10;
-
-        # shift pointer base to the data at the specified offset
-        my $shift = $dirInfo->{DataPos} + $dirStart + 10;
-        $dirInfo->{Base} += $shift;
-        $dirInfo->{DataPos} -= $shift;
-
-        $success = Image::ExifTool::Exif::ProcessExif($exifTool, $tagTablePtr, $dirInfo);
-
-    } elsif ($header =~ /^Nikon/) {
-
-        $exifTool->Warn('Unrecognized Nikon maker notes');
-
-    } else {
-
-        # this is a type B header -- ie)
-        # 12 00 01 00 07 00 04 00 00 00 00 01 00 00 02 00 [................]
-
-        SetByteOrder('II');
-        # process main Nikon table as standard EXIF
-        $success = Image::ExifTool::Exif::ProcessExif($exifTool, $tagTablePtr, $dirInfo);
-    }
-    SetByteOrder($saveOrder);           # restore original byte order
-
-    return $success;
-}
 
 1;  # end
 
@@ -625,8 +584,8 @@ it under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Joseph Heled, Thomas Walter and Brian Ristuccia for their help
-figuring out some Nikon tags.
+Thanks to Joseph Heled, Thomas Walter, Brian Ristuccia, Danek Duvall and
+Tom Christiansen for their help figuring out some Nikon tags.
 
 =head1 SEE ALSO
 

@@ -10,6 +10,7 @@
 # References:   1) http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
 #               2) http://www.w3.org/TR/rdf-syntax-grammar/  (20040210)
 #               3) http://www.portfoliofaq.com/pfaq/v7mappings.htm
+#               4) http://www.iptc.org/IPTC4XMP/
 #
 # Notes:      - I am handling property qualifiers as if they were separate
 #               properties (with no associated namespace).
@@ -26,11 +27,11 @@
 package Image::ExifTool::XMP;
 
 use strict;
-use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace);
+use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace %niceNamespace);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -41,6 +42,9 @@ sub DecodeBase64($);
 
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
 %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
+
+# translate ugly XMP namespaces to nicer ones for family 1 group names
+%niceNamespace = ( 'Iptc4xmpCore' => 'IptcCore' );
 
 # main XMP tag table
 %Image::ExifTool::XMP::Main = (
@@ -972,6 +976,52 @@ sub DecodeBase64($);
             1 => 'Differential Corrected',
         },
     },
+#
+# - IPTC Core schema properties (Iptc4xmpCore) 
+#
+    CountryCode         => { Groups => { 1 => 'XMP-IptcCore', 2 => 'Location' } },
+    # CreatorContactInfo - structure (ContactInfo=CiAdrCity,CiAdrCtry,CiAdrExtadr,
+    #                       CiAdrPcode, CiAdrRegion, CiEmailWork, CiTelWork, CiUrlWork)
+    CreatorContactInfo => {
+        Groups => { 2 => 'Other' },
+        Writable => 0,
+    },
+    CreatorContactInfoCiAdrCity => {
+        Description => 'Creator City',
+        Groups => { 2 => 'Other' }
+    },
+    CreatorContactInfoCiAdrCtry => {
+        Description => 'Creator Country',
+        Groups => { 2 => 'Other' }
+    },
+    CreatorContactInfoCiAdrExtadr => {
+        Description => 'Creator Address',
+        Groups => { 2 => 'Other' }
+    },
+    CreatorContactInfoCiAdrPcode => {
+        Description => 'Creator Postal Code',
+        Groups => { 2 => 'Other' }
+    },
+    CreatorContactInfoCiAdrRegion => {
+        Description => 'Creator Region',
+        Groups => { 2 => 'Other' }
+    },
+    CreatorContactInfoCiEmailWork => {
+        Description => 'Creator Work Email',
+        Groups => { 2 => 'Other' }
+    },
+    CreatorContactInfoCiTelWork => {
+        Description => 'Creator Work Telephone',
+        Groups => { 2 => 'Other' }
+    },
+    CreatorContactInfoCiUrlWork => {
+        Description => 'Creator Work URL',
+        Groups => { 2 => 'Other' }
+    },
+    IntellectualGenre   => { Groups => { 2 => 'Other' } },
+    Location            => { Groups => { 2 => 'Location' } },
+    Scene               => { Groups => { 2 => 'Other' }, List => 'Bag' },
+    SubjectCode         => { Groups => { 2 => 'Other' }, List => 'Bag' },
 );
 
 # composite tags
@@ -1156,6 +1206,8 @@ sub FoundXMP($$$$)
         Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
     }
     $tag = $exifTool->FoundTag($tagInfo, UnescapeHTML($val));
+    # translate namespace if necessary
+    $namespace = $niceNamespace{$namespace} if $niceNamespace{$namespace};
     $exifTool->SetTagExtra($tag, $namespace);
 
     if ($exifTool->Options('Verbose')) {
@@ -1383,6 +1435,8 @@ it under the same terms as Perl itself.
 =item http://www.w3.org/TR/rdf-syntax-grammar/
 
 =item http://www.portfoliofaq.com/pfaq/v7mappings.htm
+
+=item http://www.iptc.org/IPTC4XMP/
 
 =back
 

@@ -31,6 +31,8 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>EXIF_DATA</td><td>Reference to EXIF data while reading file</td></tr>
 
+<tr><td>EXIF_POS</td><td>Position of EXIF data in file</td></tr>
+
 <tr><td>FILENAME</td><td>Name of input file while extracting (only if we opened it, '' otherwise)</td></tr>
 
 <tr><td>FILE_ORDER</td><td>Hash of numbers to give the sequence the tags were
@@ -47,6 +49,8 @@ header file.  (but this is Perl, so I couldn't do that...)
 <tr><td>MAKER_NOTE_ENTRIES</td><td>Used by Image::ExifTool::CanonRaw as temporary storage for
     maker note directory entries when synthesizing maker notes from CRW file with the
     MakerNotes option</td></tr>
+
+<tr><td>MAKER_NOTE_HEADER</td><td>First 48 bytes of maker note data.  Used for identification</td></tr>
 
 <tr><td>MAKER_NOTE_POS</td><td>Position of maker note in source file set if maker notes are
     extracted with MakerNotes option.  Used by SetNewValuesFromFile() to adjust offsets in

@@ -1,5 +1,6 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.54
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.93
 [File, File, Image]  - File Name: CanonRaw_4_failed.crw
+[File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6KB
 [File, File, Image]  - File Type: Canon RAW
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
@@ -45,7 +46,7 @@
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: -0.01
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
-[MakerNotes, Canon, Image] 21 - Aperture Value: 14
+[MakerNotes, Canon, Image] 21 - Aperture: 14
 [MakerNotes, Canon, Image] 22 - Shutter Speed: 128
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None

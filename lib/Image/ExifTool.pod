@@ -59,10 +59,10 @@ and Photoshop IRB meta information from JPEG, JP2, TIFF, GIF, THM, CRW (Canon
 RAW), CR2 (Canon 1D Mk II RAW), MRW (Minolta RAW), NEF (Nikon Electronic image
 Format), PEF (Pentax RAW), ORF (Olympus RAW Format) and DNG (Digital Negative)
 images, as well as the maker notes of many digital cameras by various
-manufacturers including Canon, Casio, FujiFilm, Minolta/Konica-Minolta, Nikon,
-Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Sanyo and Sigma/Foveon. It writes
-EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG, TIFF, GIF, CRW, THM,
-CR2, NEF, PEF and DNG files.
+manufacturers including Canon, Casio, FujiFilm, Kodak, Minolta/Konica-Minolta,
+Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and
+Sigma/Foveon. It writes EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG,
+TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG files.
 
 =head1 METHODS
 
@@ -1042,11 +1042,12 @@ MakerNotes, Photoshop, PrintIM, XMP
 
 Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
 FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
-ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD,
-KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon, NikonPreview,
-Olympus, Panasonic, Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD,
-XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-pdf, XMP-photoshop, XMP-tiff,
-XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
+Kodak, KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon,
+NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
+Sigma, Sony, SubIFD, XMP, XMP-IptcCore, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
+XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM,
+XMP-xmpRights
 
 =item Family 2 (Category):
 

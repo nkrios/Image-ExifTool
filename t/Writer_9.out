@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.54
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.93
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -84,11 +84,12 @@
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: -0.01
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
-[MakerNotes, Canon, Image] 21 - Aperture Value: 14
+[MakerNotes, Canon, Image] 21 - Aperture: 14
 [MakerNotes, Canon, Image] 22 - Shutter Speed: 128
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
+[MakerNotes, Canon, Image] 1 - Canon File Info 0x0001: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150

@@ -1,5 +1,6 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.85
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
+[File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6KB
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 16
@@ -69,11 +70,11 @@
 [MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -1.7
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 200
-[MakerNotes, Nikon, Camera] 22 - Image Boundry: 0 0 3008 2000
+[MakerNotes, Nikon, Camera] 22 - Image Boundary: 0 0 3008 2000
 [MakerNotes, Nikon, Camera] 24 - Flash Exposure Bracket Value: 0.0
 [MakerNotes, Nikon, Camera] 25 - Exposure Bracket Value: 0
 [MakerNotes, Nikon, Camera] 129 - Tone Comp: CS
-[MakerNotes, Nikon, Camera] 131 - Lens Type: Unknown (0x6)
+[MakerNotes, Nikon, Camera] 131 - Lens Type: G
 [MakerNotes, Nikon, Camera] 132 - Lens: 18-70mm f/3.5-4.5
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Fired, TTL Mode
 [MakerNotes, Nikon, Camera] 136 - AF Point: Single Area, Center
@@ -98,7 +99,9 @@
 [Composite, Composite, Image]  - Aperture: 5.0
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Image]  - Image Size: 16x16
+[Composite, Composite, Camera]  - Lens: 18-70mm f/3.5-4.5 G
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/60
 [Composite, Composite, Camera]  - Focal Length: 56.0mm (35mm equivalent: 84.0mm)
+[Composite, Composite, Image]  - Shooting Date/Time: 2005:01:14 08:57:59.20

@@ -1,0 +1,551 @@
+<html>
+<head>
+<title>Olympus Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='Olympus'>Olympus Tags</a></h2>
+
+Tags 0x0000 through 0x0103 are used by some older Olympus cameras, and are
+the same as Konica/Minolta tags.  The Olympus tags are also used for Epson
+and Agfa cameras.
+
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>MakerNoteVersion</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>MinoltaCameraSettingsOld</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>MinoltaCameraSettings</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0040</td>
+<td>CompressedImageSize</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0081</td>
+<td>PreviewImageData</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0088</td>
+<td>PreviewImageStart</td>
+<td align='center'>N*</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0089</td>
+<td>PreviewImageLength</td>
+<td align='center'>N*</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0100</td>
+<td>ThumbnailImage</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0101</td>
+<td>ColorMode</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Natural color
+  <br>1 = Black&amp;white
+  <br>2 = Vivid color
+  <br>3 = Solarization
+  <br>4 = Adobe RGB</font></td></tr>
+<tr valign='top'>
+<td>0x0102</td>
+<td>MinoltaQuality</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Raw
+  <br>1 = Superfine
+  <br>2 = Fine
+  <br>3 = Standard
+  <br>4 = Economy
+  <br>5 = Extra fine</font></td></tr>
+<tr valign='top'>
+<td>0x0103</td>
+<td>MinoltaQuality</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Raw
+  <br>1 = Superfine
+  <br>2 = Fine
+  <br>3 = Standard
+  <br>4 = Economy
+  <br>5 = Extra fine</font></td></tr>
+<tr valign='top'>
+<td>0x0200</td>
+<td>SpecialMode</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(3 numbers: 1) Shooting mode: 0=Normal, 2=Fast, 3=Panorama;
+                   2) Sequence Number; 3) Panorama Direction: 1=Left-Right,
+                   2=Right-Left, 3=Bottom-Top, 4=Top-Bottom)</font></font></td></tr>
+<tr valign='top'>
+<td>0x0201</td>
+<td>Quality</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = SQ
+  <br>2 = HQ
+  <br>3 = SHQ
+  <br>4 = RAW
+  <br>0 = SQ
+  <br>1 = HQ
+  <br>2 = SHQ
+  <br>6 = RAW</font></td></tr>
+<tr valign='top'>
+<td>0x0202</td>
+<td>Macro</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>0x0204</td>
+<td>DigitalZoom</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0207</td>
+<td>FirmwareVersion</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0208</td>
+<td>PictureInfo</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0209</td>
+<td>CameraID</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x020b</td>
+<td>EpsonImageWidth</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x020c</td>
+<td>EpsonImageHeight</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x020d</td>
+<td>EpsonSoftware</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0e00</td>
+<td>PrintIM</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0f00</td>
+<td>DataDump</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1004</td>
+<td>FlashMode</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1006</td>
+<td>Bracket</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x100b</td>
+<td>FocusMode</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x100c</td>
+<td>FocusDistance</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x100d</td>
+<td>Zoom</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x100e</td>
+<td>MacroFocus</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x100f</td>
+<td>SharpnessFactor</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1011</td>
+<td>ColorMatrix</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1012</td>
+<td>BlackLevel</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1015</td>
+<td>WhiteBalance</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1017</td>
+<td>RedBalance</td>
+<td align='center'>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1018</td>
+<td>BlueBalance</td>
+<td align='center'>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x101a</td>
+<td>SerialNumber</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1023</td>
+<td>FlashBias</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1029</td>
+<td>Contrast</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x102a</td>
+<td>SharpnessFactor</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x102b</td>
+<td>ColorControl</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x102c</td>
+<td>ValidBits</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x102d</td>
+<td>CoringFilter</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x102e</td>
+<td>OlympusImageWidth</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x102f</td>
+<td>OlympusImageHeight</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1034</td>
+<td>CompressionRatio</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2010</td>
+<td>Equipment</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Olympus.html#Equipment'>Olympus Equipment Tags</a></td></tr>
+<tr valign='top'>
+<td>0x2020</td>
+<td>CameraSettings</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Olympus.html#CameraSettings'>Olympus CameraSettings Tags</a></td></tr>
+<tr valign='top'>
+<td>0x2030</td>
+<td>Subdir3</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Olympus.html#Subdir3'>Olympus Subdir3 Tags</a></td></tr>
+<tr valign='top'>
+<td>0x2040</td>
+<td>ImageProcessing</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Olympus.html#ImageProcessing'>Olympus ImageProcessing Tags</a></td></tr>
+<tr valign='top'>
+<td>0x2050</td>
+<td>FocusInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Olympus.html#FocusInfo'>Olympus FocusInfo Tags</a></td></tr>
+</table></blockquote>
+
+<h2><a name='Equipment'>Olympus Equipment Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>EquipmentVersion</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0100</td>
+<td>FirmwareVersion2</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0101</td>
+<td>SerialNumber</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0202</td>
+<td>LensSerialNumber</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0206</td>
+<td>MaxApertureAtMaxFocal</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0207</td>
+<td>MinFocalLength</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0208</td>
+<td>MaxFocalLength</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0302</td>
+<td>ExtenderSerialNumber</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1003</td>
+<td>FlashSerialNumber</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='CameraSettings'>Olympus CameraSettings Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>CameraSettingsVersion</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0101</td>
+<td>PreviewImageStart</td>
+<td align='center'>int32u*</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0102</td>
+<td>PreviewImageLength</td>
+<td align='center'>int32u*</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0200</td>
+<td>ExposureMode</td>
+<td align='center'>Y</td>
+<td><font size='-1'>1 = Manual
+  <br>3 = Aperture-priority AE
+  <br>4 = Shutter speed priority AE
+  <br>5 = Program AE</font></td></tr>
+<tr valign='top'>
+<td>0x0202</td>
+<td>MeteringMode</td>
+<td align='center'>Y</td>
+<td><font size='-1'>2 = Center Weighted
+  <br>3 = Spot
+  <br>5 = ESP</font></td></tr>
+<tr valign='top'>
+<td>0x0301</td>
+<td>ContinuousAutoFocus</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0304</td>
+<td>AFAreas</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0501</td>
+<td>WhiteBalanceTemperature</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0502</td>
+<td>WhiteBalanceBracket</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0503</td>
+<td>CustomSaturation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0504</td>
+<td>ModifiedSaturation</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Off
+  <br>1 = CM1 (Red Enhance)
+  <br>2 = CM2 (Green Enhance)
+  <br>3 = CM3 (Blue Enhance)
+  <br>4 = CM4 (Skin Tones)</font></td></tr>
+<tr valign='top'>
+<td>0x0505</td>
+<td>ContrastSetting</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0506</td>
+<td>SharpnessSetting</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0507</td>
+<td>ColorSpace</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Adobe RGB
+  <br>1 = sRGB</font></td></tr>
+<tr valign='top'>
+<td>0x050a</td>
+<td>NoiseFilter</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Off
+  <br>1 = Noise Filter
+  <br>2 = Noise Reduction</font></td></tr>
+<tr valign='top'>
+<td>0x050c</td>
+<td>ShadingCompensation</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>0x050d</td>
+<td>CompressionFactor</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0600</td>
+<td>Sequence</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0603</td>
+<td>ImageQuality2</td>
+<td align='center'>Y</td>
+<td><font size='-1'>1 = SQ
+  <br>2 = HQ
+  <br>3 = SHQ
+  <br>4 = RAW</font></td></tr>
+</table></blockquote>
+
+<h2><a name='Subdir3'>Olympus Subdir3 Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>Subdir3Version</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='ImageProcessing'>Olympus ImageProcessing Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>ImageProcessingVersion</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0300</td>
+<td>SmoothingParameter1</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0310</td>
+<td>SmoothingParameter2</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0600</td>
+<td>SmoothingThresholds</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0610</td>
+<td>SmoothingThreshold2</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0614</td>
+<td>OlympusImageWidth2</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0615</td>
+<td>OlympusImageHeight2</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1010</td>
+<td>NoiseFilter2</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Off
+  <br>1 = Noise Filter
+  <br>2 = Noise Reduction</font></td></tr>
+<tr valign='top'>
+<td>0x1012</td>
+<td>ShadingCompensation2</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+</table></blockquote>
+
+<h2><a name='FocusInfo'>Olympus FocusInfo Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>FocusInfoVersion</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0209</td>
+<td>AutoFocus</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>0x0305</td>
+<td>FocusDistance</td>
+<td align='center'>int32u[2]</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Apr 2, 2005</i>
+</body>
+</html>

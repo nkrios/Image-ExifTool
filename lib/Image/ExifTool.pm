@@ -22,7 +22,7 @@ use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '4.87';
+$VERSION = '4.93';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -75,7 +75,7 @@ sub WriteBinaryData($$$);
 sub CheckBinaryData($$$);
 
 # recognized file types (in the order we test unknown files)
-@fileTypes = ( 'JPEG', 'TIFF', 'CRW', 'MRW', 'ORF', 'GIF', 'JP2' );
+@fileTypes = ( 'JPEG', 'CRW', 'TIFF', 'MRW', 'ORF', 'GIF', 'JP2' );
 
 # headers for various segment types
 $exifAPP1hdr = "Exif\0\0";
@@ -120,6 +120,7 @@ sub DummyWriteProc { return 1; }
         WriteGroup => 'Comment',
     },
     FileName    => { Name => 'FileName' },
+    Directory   => { Name => 'Directory' },
     FileSize    => { Name => 'FileSize',  PrintConv => 'sprintf("%.0fKB",$val/1024)' },
     FileType    => { Name => 'FileType' },
     ImageWidth  => { Name => 'ImageWidth' },
@@ -161,7 +162,7 @@ my $didTagID;       # flag indicating we are accessing tag ID's
 my %specialTags = (
     PROCESS_PROC=>1, WRITE_PROC=>1, CHECK_PROC=>1, GROUPS=>1, FORMAT=>1,
     INCREMENT=>1, FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1, DID_TAG_ID=>1,
-    WRITABLE=>1,
+    WRITABLE=>1, NOTES=>1,
 );
 
 #------------------------------------------------------------------------------
@@ -307,6 +308,7 @@ sub ExtractInfo($;@)
 
     delete $self->{MAKER_NOTE_POS};     # position of maker notes if extracting
     delete $self->{MAKER_NOTE_WARN};    # warning for wandering maker note pointers
+    delete $self->{MAKER_NOTE_HEADER};  # maker note header
 
     my $filename = $self->{FILENAME};   # image file name ('' if already open)
     my $raf = $self->{RAF};             # RandomAccess object
@@ -323,8 +325,10 @@ sub ExtractInfo($;@)
                 my $name = $filename;
                 # extract file name from pipe if necessary
                 $name =~ /\|$/ and $name =~ s/.*?"(.*)".*/$1/;
-                $name =~ s/.*\///;  # remove path
+                $name =~ s/(.*)\///;  # remove path
+                my $dir = $1;
                 $self->FoundTag('FileName', $name);
+                $self->FoundTag('Directory', $dir) if $dir;
                 my $fileSize = -s $filename;
                 $self->FoundTag('FileSize', $fileSize) if defined $fileSize;
             }
@@ -759,7 +763,7 @@ sub BuildCompositeTags($)
     my $self = shift;
     my @tagList = sort keys %Image::ExifTool::compositeTags;
 
-    my $dataPt = \$self->{EXIF_DATA};   # set data ptr to be used in eval
+    my $valueConv = $self->{VALUE_CONV};
     for (;;) {
         my %notBuilt;
         foreach (@tagList) {
@@ -781,17 +785,29 @@ COMPOSITE_TAG:
                 my $index;
                 foreach $index (keys %$req) {
                     my $reqTag = $$req{$index};
+                    # allow tag group to be specified
+                    if ($reqTag =~ /(.+?):(.+)/) {
+                        my ($reqGroup, $name) = ($1, $2);
+                        my $i = 0;
+                        for (;;++$i) {
+                            $reqTag = $name;
+                            $reqTag .= " ($i)" if $i;
+                            last unless defined $valueConv->{$reqTag};
+                            last if $reqGroup eq $self->GetGroup($reqTag,0) or
+                                    $reqGroup eq $self->GetGroup($reqTag,1);
+                        }
+                    }
                     # calculate this tag later if it relies on another
                     # Composite tag which hasn't been calculated yet
                     if ($notBuilt{$reqTag}) {
                         push @deferredTags, $tag;
                         next COMPOSITE_TAG;
                     }
-                    unless (defined $self->{VALUE_CONV}->{$reqTag}) {
+                    unless (defined $valueConv->{$reqTag}) {
                         # don't continue if we require this tag
                         $type eq 'Require' and next COMPOSITE_TAG;
                     }
-                    $val[$index] = $self->{VALUE_CONV}->{$reqTag};
+                    $val[$index] = $valueConv->{$reqTag};
                     $valPrint[$index] = $self->{PRINT_CONV}->{$reqTag};
                 }
             }
@@ -856,6 +872,7 @@ sub Init($)
     my $self = shift;
     delete $self->{FOUND_TAGS};     # list of found tags
     delete $self->{EXIF_DATA};      # the EXIF data block
+    delete $self->{EXIF_POS};       # EXIF position in file
     delete $self->{EXIF_BYTE_ORDER};# the EXIF byte ordering
     $self->{FILE_ORDER} = { };      # hash of tag order in file
     $self->{VALUE_CONV} = { };      # hash of converted tag values
@@ -1457,6 +1474,7 @@ my %formatSize = (
     string => 1,
     binary => 1,
    'undef' => 1,
+    ifd => 4,
 );
 my %readValueProc = (
     int8s => \&Get8s,
@@ -1477,6 +1495,7 @@ my %readValueProc = (
     fixed32u => \&GetFixed32u,
     float => \&GetFloat,
     double => \&GetDouble,
+    ifd => \&Get32u,
 );
 sub FormatSize($) { return $formatSize{$_[0]}; }
 
@@ -1515,7 +1534,7 @@ sub ReadValue($$$$$)
         # treat as binary/string if no proc
         $val = substr($$dataPt, $offset, $count);
         # truncate string at null terminator if necessary
-        $val =~ s/\0.*// if $format eq 'string';
+        $val =~ s/\0.*//s if $format eq 'string';
     }
     return $val;
 }
@@ -1716,11 +1735,12 @@ sub JpegInfo($)
             $verbose > 2 and HexDump($segDataPt, undef, %dumpParms);
         }
         if ($marker == 0xe1) {             # APP1 (EXIF, XMP)
-            if ($$segDataPt =~ /^$exifAPP1hdr/) {
+            if ($$segDataPt =~ /^Exif\0/) { # (some Kodak cameras don't put a second \0)
                 # this is EXIF data --
                 # get the data block (into a common variable)
                 my $hdrLen = length($exifAPP1hdr);
                 $self->{EXIF_DATA} = substr($$segDataPt, $hdrLen);
+                $self->{EXIF_POS} = $segPos + $hdrLen;
                 # extract the EXIF information (it is in standard TIFF format)
                 $self->TiffInfo($markerName, undef, $segPos+$hdrLen);
             } else {
@@ -1770,6 +1790,7 @@ sub JpegInfo($)
         } elsif ($marker == 0xe3) {         # APP3 (other EXIF info)
             if ($$segDataPt =~ /^(Exif|Meta|META)\0\0/) {
                 $self->{EXIF_DATA} = substr($$segDataPt, 6);
+                $self->{EXIF_POS} = $segPos + 6;
                 $self->TiffInfo($markerName,undef,$segPos+6);
             }
         } elsif ($marker == 0xe5) {         # APP5 (PreviewImage)
@@ -1991,13 +2012,13 @@ sub TiffInfo($$;$$$)
 {
     my ($self, $fileType, $raf, $base, $outfile) = @_;
     my $dataPt = \$self->{EXIF_DATA};
-    my $dataPos = 0;
     my ($length, $err);
 
     $base = 0 unless defined $base;
 
     # read the image file header and offset to 0th IFD if necessary
     if ($raf) {
+        $self->{EXIF_POS} = $base;
         if ($outfile) {
             $raf->Seek(0, 0) or return 0;
             if ($base) {
@@ -2292,6 +2313,7 @@ sub GetTagInfo($$$)
             Name => "${prefix}_$hex",
             Description => MakeDescription($prefix, $hex),
             Unknown => 1,
+            Writable => 0,  # can't write unknown tags
             PrintConv => $printConv,
         };
         # add tag information to table
@@ -2368,8 +2390,7 @@ sub FoundTag($$$$;$$)
             $valueConv = $$valueConversion{$val};
             defined $valueConv or $valueConv = "Unknown ($val)";
         } else {
-            my $dataPt = \$self->{EXIF_DATA};   # set $dataPt for use in eval
-            #### eval ValueConv ($val, $dataPt, $self, @val, @valPrint)
+            #### eval ValueConv ($val, $self, @val, @valPrint)
             $valueConv = eval $valueConversion;
             $@ and warn $@;
             # treat it as if the tag doesn't exist if ValueConv returns undef
@@ -2400,8 +2421,7 @@ sub FoundTag($$$$;$$)
                     $printConv = "Unknown ($val)";
                 }
             } else {
-                my $dataPt = \$self->{EXIF_DATA};   # set $dataPt for use in eval
-                #### eval PrintConv ($val, $dataPt, $self, @val, @valPrint)
+                #### eval PrintConv ($val, $self, @val, @valPrint)
                 $printConv = eval $printConversion;
                 $@ and warn $@;
                 $printConv = 'Undefined' unless defined $printConv;
@@ -2608,9 +2628,16 @@ sub ProcessBinaryData($$$)
     my $index;
     my %val;
     foreach $index (@tags) {
-        my $tagInfo = $self->GetTagInfo($tagTablePtr, $index);
-        next unless $tagInfo;
-        next if $$tagInfo{Unknown} and $unknown < 2;
+        my $tagInfo;
+        if ($$tagTablePtr{$index}) {
+            $tagInfo = $self->GetTagInfo($tagTablePtr, $index) or next;
+        } else {
+            # don't generate unknown tags in binary tables unless Unknown > 1
+            next unless $unknown > 1;
+            $tagInfo = $self->GetTagInfo($tagTablePtr, $index) or next;
+            $$tagInfo{Unknown} = 2;    # set unknown to 2 for binary unknowns
+        }
+        next if $$tagInfo{Unknown} and $$tagInfo{Unknown} > $unknown;
         my $count = 1;
         my $format = $$tagInfo{Format};
         if ($format) {

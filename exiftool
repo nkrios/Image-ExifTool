@@ -181,142 +181,9 @@ if (defined $listGroups) {
 
 # print help
 unless (@tags or @files or @newValues) {
-    print <<_END_HELP_;
-NAME
-    exiftool - print/modify meta information in image files
-
-SYNOPSIS
-    exiftool [OPTIONS] [-TAG[[+-<]=[VALUE]] or --TAG...] FILE ...
-
-DESCRIPTION
-    Prints or writes information for specified tags from/to listed files. -TAG
-    specifies the name of a tag to extract or --TAG to ignore.  FILE may be an
-    image file name, a directory name, or - for the standard input. Supported
-    file types are JPG, JP2, TIFF, GIF, THM, CRW, CR2, MRW, NEF, PEF, ORF and
-    DNG.
-
-    -TAG=VALUE sets the value of a tag, and -TAG= deletes a tag.  -TAG+=VALUE
-    adds a value to a list without replacing existing values, and -TAG-=VALUE
-    deletes a specific value from a list.  Use "-TAG<=FILENAME" to set the value
-    of a tag from the contents of a file (the quotes prevent shell redirection).
-    The tag is written to all groups where it is valid if no group is specified.
-    A group is specified using -GROUP:TAG, where GROUP is any valid family 0 or
-    1 group name.  Special feature: -AllTagsFromFile=SRCFILE sets the value of
-    all writable tags from information in the specified source file.
-
-    Currently, EXIF, GPS, IPTC, XMP and MakerNotes tags may be written to JPG,
-    TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG files.  Be sure to verify that
-    the new file is OK before erasing the original (renamed to FILE_original).
-
-OPTIONS
-    -list   - list all valid tag names
-    -listw  - list all writable tag names
-    -group# - list all tag groups for family #
-    -ver    - print version number and exit
-    -a      - allow duplicate tag values (otherwise only last value displayed)
-    -b      - output requested data in binary format
-    -d FMT  - set date/time format (consult strftime manpage for FMT syntax)
-    -D|H    - show tag ID number in Decimal or Hexadecimal
-    -e      - print existing tags only -- don't calculate composite tags
-    -E      - escape characters in output values for HTML
-    -f      - force printing of tags even if their values are not found
-    -g[#]   - organize output by tag group (-g0 assumed if # not specified)
-    -G[#]   - same as -g but print group name for each tag
-    -h      - use HTML formatting for output (implies -E option)
-    -i DIR  - ignore specified directory names
-    -l      - long output (2-line Canon-style output)
-    -L      - convert Unicode characters to WinLatin1 instead of UTF8
-    -m      - ignore minor errors (allows writing if minor errors occur)
-    -n      - don't convert values for printing
-    -o FILE - output file or dir name for writing (otherwise edits input file)
-    -p FILE - print in format specified by file (ignores other format options)
-    -P      - preserve date/time of original file when writing
-    -r      - recursively scan subdirectories (only useful if "file" is a dir)
-    -s      - short format (add up to 3 -s options for even shorter formats)
-    -S      - print tag names instead of descriptions (same as two -s options)
-    -t      - output tab-delimited list of description/values (database import)
-    -u      - extract values of unknown tags (2 to extract from data blocks)
-    -U      - also extract unknown from data blocks (same as two -u options)
-    -v[#]   - verbose messages (# may be 1-4, higher is more verbose)
-    -w EXT  - write console output to file with EXT extension for each image
-    -x TAG  - exclude specified tag (may be many -x options)
-    -z      - extract information from .gz and .bz2 compressed images
-
-EXAMPLES
-    # print all EXIF information sorted by group (for family 0):
-    exiftool -g a.jpg
-
-    # print common EXIF information for all images in "dir":
-    exiftool -common dir
-
-    # print ImageSize and ExposureTime tag names and values
-    exiftool -S -ImageSize -ExposureTime b.jpg
-
-    # print standard Canon information from 2 image files:
-    exiftool -l -canon c.jpg d.jpg
-
-    # recursively save common EXIF information for files in "pictures" directory
-    # into files with the same names as the images but with a ".txt" extension:
-    exiftool -r -w .txt -common pictures
-
-    # save thumbnail image from "image.jpg" to the file "thumbnail.jpg":
-    exiftool -b -ThumbnailImage image.jpg > thumbnail.jpg
-
-    # recursively extract JPG from all Canon RAW files in the current directory,
-    adding "_JFR.JPG" for the name of the output JPG files:
-    exiftool -b -JpgFromRaw -w _JFR.JPG -r .
-
-    # extract preview image from JPG file and write it to "preview.jpg":
-    exiftool -b -PreviewImage 118_1834.JPG > preview.jpg
-
-    # print formatted date/time for all JPG files in a directory:
-    exiftool -d "%r %a, %B %e, %Y" -DateTimeOriginal -S -s *.jpg
-
-    # extract image resolution from IFD1:
-    exiftool -IFD1:XResolution -IFD1:YResolution
-
-WRITING EXAMPLES
-    # set comment in file (replaces any existing comment):
-    exiftool -comment="This is a new comment" dst.jpg
-
-    # remove comment from all JPG files
-    exiftool -comment= *.jpg
-
-    # replace existing keyword list with two new keywords (EXIF, editor):
-    exiftool -keywords=EXIF -keywords=editor dst.jpg</b>
-
-    # add a keyword (word) to the current list of keywords:
-    exiftool -keywords+=word dst.jpg
-
-    # delete only the specified category (xxx) from all files in directory:
-    exiftool -category-=xxx dir
-
-    # set all writable tags from information in another file:
-    exiftool -AllTagsFromFile=src.crw dst.jpg
-
-    # set thumbnail image from specified file (note: quotes are neccessary):
-    exiftool "-ThumbnailImage<=thumb.jpg" dst.jpg
-
-    # write a tag to the XMP group (otherwise it would get written to the
-    # IPTC group since the City tag exists in both, and IPTC has priority):
-    exiftool -xmp:city=Kingston dst.jpg
-
-    # set ISO only in Canon maker notes
-    exiftool -Canon:ISO=100 dst.jpg
-
-    # delete LightSource tag only if it is unknown with a value of 0:
-    exiftool -LightSource-="Unknown (0)" dst.tiff
-
-    # set WhiteBalance to Tungsten only if it was previously Auto
-    exiftool -whitebalance-=auto -WhiteBalance=tung dst.jpg
-
-PIPING EXAMPLES
-    # extract information from stdin:
-    cat a.jpg | exiftool -
-
-    # add an IPTC keyword in a pipeline, saving output to a new file
-    cat a.jpg | exiftool -iptc:keywords+=fantastic - > b.jpg
-_END_HELP_
+    if (system "perldoc '$0'") {
+        print "Run 'perldoc exiftool' for help on exiftool.\n";
+    }
     exit 0;
 }
 
@@ -326,7 +193,7 @@ die "No file specified\n" unless @files or $listTags;
 # validate all tags we're writing
 if (@newValues) {
     foreach (@newValues) {
-        /(.*?)=(.*)/ or next;
+        /(.*?)=(.*)/s or next;
         my ($tag, $newVal) = ($1, $2);
         $newVal eq '' and undef $newVal;    # undefined to delete tag
         if ($tag =~ /^AllTagsFromFile$/i) {
@@ -651,7 +518,7 @@ sub GetImageInfo($$)
                             ++$cols if $showTagID;
                             print $fp "<tr><td colspan=$cols bgcolor='#dddddd'>$group</td></tr>\n";
                         } else {
-                            print "---- $group ----\n";
+                            print $fp "---- $group ----\n";
                         }
                         $lastGroup = $group;
                     }
@@ -923,6 +790,368 @@ sub PrintTagList(@)
     $len and print "\n";
 }
 
+__END__
+
+=head1 NAME
+
+exiftool - Read/write meta information in image files
+
+=head1 SYNOPSIS
+
+exiftool [OPTIONS] [-TAG[[+-E<lt>]=[VALUE]] or --TAG...] FILE ...
+
+=head1 DESCRIPTION
+
+Read or write meta information in image files.  C<FILE> may be an image file
+name, a directory name, or C<-> for the standard input.  Information is read
+from the specified file and output in readable form to the console (or
+written to an output text file with the C<-w> option).
+
+To write information in an image file, specify new values using either the
+C<-TAG=VALUE> syntax or the C<-AllTagsFromFile> option.  This causes
+exiftool to rewrite C<FILE> with the specified information, preserving the
+original file by renaming it to C<FILE_original>.  (Note: Be sure to verify
+that the new file is OK before erasing the original.)
+
+Below is a list of meta information formats and file types supported by
+exiftool (r = read support, w = write support):
+
+     Meta Information                   File Types
+    ------------------          --------------------------
+    EXIF           r/w          JPEG   r/w      NEF    r/w
+    GPS            r/w          JP2    r        ORF    r
+    IPTC           r/w          TIFF   r/w      PEF    r/w
+    XMP            r/w          GIF    r/w
+    MakerNotes     r/w          THM    r/w
+    GeoTIFF        r            CRW    r/w
+    ICC Profile    r            CR2    r/w
+    Photoshop IRB  r            DNG    r/w
+    PrintIM        r            MRW    r
+
+=head1 OPTIONS
+
+Note:  Case is not significant for any command-line option (including tag
+and group names), except for certain single-character options where the
+corresponding upper case option is defined.
+
+=over 5
+
+=item B<->I<TAG>
+
+Extract information for specified tag.  See
+L<Image::ExifTool::TagNames|Image::ExifTool::TagNames> for documentation on
+available tag names.  The tag name may begin with an optional group name
+followed by a colon.  (ie. C<-TAG:GROUP>, where C<GROUP> is any valid family
+0 or 1 group name.  Use the C<-group> option to list valid group names.)  If
+no tags are specified, all available information is extracted.
+
+=item B<-->I<TAG>
+
+Exclude specified tag from extracted information.  Same as the C<-x> option.
+
+=item B<->I<TAG>[+-E<lt>]B<=>[I<VALUE>]
+
+Writes a new value for the specified tag, or deletes the tag if C<VALUE> is
+not specified.  Use C<+=> to add a value to a list without replacing
+existing values, and C<-=> to delete a specific value from a list.  Use
+C<E<lt>=> to set the value of a tag from the contents of a file with name
+C<VALUE>.  (Note: Quotes are required around the argument in this case to
+prevent shell redirection.)
+
+=item B<-a>
+
+B<A>llow duplicate tag names in the output (otherwise duplicates are
+suppressed).
+
+=item B<-AllTagsFromFile> I<SRCFILE>
+
+Set the value of all writable tags from information in the specified source
+file.
+
+=item B<-b>
+
+Output requested data in B<b>inary format.  Mainly used for extracting
+embedded images.
+
+=item B<-d> I<FMT>
+
+Set B<d>ate/time format (consult strftime man page for FMT syntax).
+
+=item B<-D>
+
+Show tag ID number in B<D>ecimal.
+
+=item B<-e>
+
+Print B<e>xisting tags only -- don't calculate composite tags.
+
+=item B<-E>
+
+B<E>scape characters in output values for HTML.
+
+=item B<-f>
+
+B<F>orce printing of tags even if their values are not found.
+
+=item B<-g>[#]
+
+Organize output by tag B<g>roup (-g0 assumed if # not specified).
+
+=item B<-G>[#]
+
+Same as -g but print B<G>roup name for each tag.
+
+=item B<-H>
+
+Show tag ID number in B<H>exadecimal.
+
+=item B<-group>[#]
+
+List all tag groups for family #.  Family 0 assumed if # not specified.
+
+=item B<-h>
+
+Use B<H>TML formatting for output (implies -E option).
+
+=item B<-i> I<DIR>
+
+B<I>gnore specified directory name.  May be multiple C<-i> options.
+
+=item B<-l>
+
+Use B<l>ong output format (2-line Canon-style output).
+
+=item B<-L>
+
+Convert Unicode characters in output to Windows B<L>atin1 (cp1252) instead
+of the default UTF8.
+
+=item B<-list>
+
+List all valid tag names.
+
+=item B<-listw>
+
+List all writable tag names.
+
+=item B<-m>
+
+Ignore B<m>inor errors (allows writing if some minor errors occur, or
+extraction of embedded images that aren't in standard JPG format).
+
+=item B<-n>
+
+Do B<n>ot apply print conversion to displayed tag values.
+
+=item B<-o> I<OUTFILE>
+
+Set B<o>utput file or directory name when writing information (otherwise the
+source file is renamed to C<FILE_original> and the output file is C<FILE>).
+
+=item B<-p> I<FMTFILE>
+
+B<P>rint output in the format specified by the given file (and ignore other
+format options).  Tag names in the format file begin with a C<$> symbol and
+may contain an optional group name.  Case is not significant.  Lines beginning
+with C<#> are ignored.  For example, this format file:
+
+    # this is a comment line
+    File $FileName was created on $DateTimeOriginal
+    (f/$Aperture, $ShutterSpeed sec, ISO $EXIF:ISO)
+
+produces output like this:
+
+    File test.jpg was created on 2003:10:31 15:44:19
+    (f/5.6, 1/60 sec, ISO 100)
+
+=item B<-P>
+
+B<P>reserve date/time of original file when writing.
+
+=item B<-r>
+
+B<R>ecursively scan subdirectories (only meaningful if C<FILE> is a
+directory name).
+
+=item B<-s>
+
+Use B<s>hort output format (add up to 3 -s options for even shorter
+formats).
+
+=item B<-S>
+
+Print tag names instead of descriptions (very B<s>hort format, same as two
+-s options).
+
+=item B<-t>
+
+Output a B<t>ab-delimited list of description/values (useful for database
+import).
+
+=item B<-u>
+
+Extract values of B<u>nknown tags (add another C<-u> to also extract unknown
+information from binary data blocks).
+
+=item B<-U>
+
+Extract values of B<u>nknown tags as well as unknown information from binary
+data blocks (same as two C<-u> options).
+
+=item B<-v>[#]
+
+Print B<v>erbose messages (# may be 1-4, higher is more verbose).
+
+=item B<-ver>
+
+Print version number and exit.
+
+=item B<-w> I<EXT>
+
+B<W>rite console output to a file with name ending in C<EXT> for each source
+file.  The output file name is obtained by replacing the source file
+extension (including the C<.>) with the specified extension.
+
+=item B<-x> I<TAG>
+
+EB<x>clude specified tag (may be many -x options).  Same as C<--TAG>.
+
+=item B<-z>
+
+Extract information from .gB<z> and .bB<z>2 compressed images.
+
+=back
+
+=head1 EXAMPLES
+
+=over 5
+
+=item exiftool -g a.jpg
+
+Print all EXIF information sorted by group (for family 0).
+
+=item exiftool -common dir
+
+Print common EXIF information for all images in C<dir>.
+
+=item exiftool -S -ImageSize -ExposureTime b.jpg
+
+Print ImageSize and ExposureTime tag names and values.
+
+=item exiftool -l -canon c.jpg d.jpg
+
+Print standard Canon information from 2 image files.
+
+=item exiftool -r -w .txt -common pictures
+
+Recursively save common EXIF information for files in C<pictures> directory
+into files with the same names as the images but with a C<.txt> extension.
+
+=item exiftool -b -ThumbnailImage image.jpg > thumbnail.jpg
+
+Save thumbnail image from C<image.jpg> to a file called C<thumbnail.jpg>.
+
+=item exiftool -b -JpgFromRaw -w _JFR.JPG -r .
+
+Recursively extract JPG image from all Canon RAW files in the current
+directory, adding '_JFR.JPG' for the name of the output JPG files.
+
+=item exiftool -b -PreviewImage 118_1834.JPG > preview.jpg
+
+Extract preview image from JPG file and write it to C<preview.jpg>.
+
+=item exiftool -d '%r %a, %B %e, %Y' -DateTimeOriginal -S -s *.jpg
+
+Print formatted date/time for all JPG files in a directory.
+
+=item exiftool -IFD1:XResolution -IFD1:YResolution
+
+Extract image resolution from IFD1.
+
+=back
+
+=head1 WRITING EXAMPLES
+
+=over 5
+
+=item exiftool -comment='This is a new comment' dst.jpg
+
+Set comment in file (replaces any existing comment).
+
+=item exiftool -comment= *.jpg
+
+Remove comment from all JPG files.
+
+=item exiftool -keywords=EXIF -keywords=editor dst.jpg
+
+Replace existing keyword list with two new keywords (C<EXIF> and C<editor>).
+
+=item exiftool -keywords+=word dst.jpg
+
+Add a keyword (C<word>) to the current list of keywords.
+
+=item exiftool -category-=xxx dir
+
+Delete only the specified category (C<xxx>) from all files in directory.
+
+=item exiftool -AllTagsFromFile src.crw dst.jpg
+
+Set the values of all writable tags from information in C<src.crw>, and
+update C<dst.jpg> with this new information.
+
+=item exiftool '-ThumbnailImageE<lt>=thumb.jpg' dst.jpg
+
+Set the thumbnail image from specified file (Note: The quotes are neccessary
+to prevent shell redirection).
+
+=item exiftool -xmp:city=Kingston dst.jpg
+
+Write a tag to the XMP group (otherwise in this case the tag would get
+written to the IPTC group since C<City> exists in both, and IPTC has
+priority).
+
+=item exiftool -Canon:ISO=100 dst.jpg
+
+Set C<ISO> only in the Canon maker notes.
+
+=item exiftool -LightSource-='Unknown (0)' dst.tiff
+
+Delete C<LightSource> tag only if it is unknown with a value of 0.
+
+=item exiftool -whitebalance-=auto -WhiteBalance=tung dst.jpg
+
+Set C<WhiteBalance> to C<Tungsten> only if it was previously C<Auto>.
+
+=back
+
+=head1 PIPING EXAMPLES
+
+=over 5
+
+=item cat a.jpg | exiftool -
+
+Extract information from stdin.
+
+=item cat a.jpg | exiftool -iptc:keywords+=fantastic - > b.jpg
+
+Add an IPTC keyword in a pipeline, saving output to a new file.
+
+=back
+
+=head1 AUTHOR
+
+Copyright 2003-2005, Phil Harvey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Image::ExifTool|Image::ExifTool>,
+L<ExifTool Tag Names|Image::ExifTool::TagNames>,
+L<Shortcut Tags|Image::ExifTool::Shortcuts>
+
+=cut
+
 #------------------------------------------------------------------------------
 # end
-

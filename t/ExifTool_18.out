@@ -1,5 +1,6 @@
-  ExifToolVersion = 4.60
+  ExifToolVersion = 4.92
   FileName = ExifTool.jpg
+  Directory = t
   FileSize = 3475
   FileType = JPEG
 JPEG APP1 (2442 bytes):

@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 @ISA = qw(Exporter);
 
 my $noteFont = '<font color="#666666">';
@@ -38,13 +38,17 @@ specific meta information that is extracted or written in an image.
 
 ~head1 TAG TABLES
 },
-    Description => q{
-The tables below list the names of all tags recognized by ExifTool
-(excluding shortcut and unknown tags).  Case is not significant for tag
-names.  Where applicable, the corresponding B<Tag ID> or B<Index> is also
-given.  A B<Tag ID> is the computer-readable equivalent of a tag name, and
-is the identifier that is actually stored in the file.  B<Index> gives the
-location of the information if it is located at a fixed position in a
+    ExifTool => q{
+The tables below list the names of all tags recognized by ExifTool,
+excluding shortcut and unknown tags.  Case is not significant for tag names.
+A question mark after a tag name indicates that the information is either
+not understood or not verified -- these tags are not extracted by ExifTool
+unless the Unknown (-u) option is enabled.
+
+Where applicable, a corresponding B<Tag ID> or B<Index> is also given for
+each tag.  The B<Tag ID> is the computer-readable equivalent of a tag name,
+and is the identifier that is actually stored in the file.  B<Index> gives
+the location of the information if it is located at a fixed position in a
 record.  In some instances, more than one tag name may correspond to a
 single ID.  In these cases, the actual tag name depends on the context in
 which the information is found.
@@ -98,12 +102,16 @@ C<lang-alt> is a list of string alternatives in different languages.
 Currently, ExifTool only writes the 'x-default' language in C<lang-alt>
 lists.
 
-The B<Group> column below gives the XMP schema name for each tag.  The
-family 1 group names are composed from these schema names with a leading
-"XMP-" added.  If the same XMP tag name exists in more than one group, all
-groups are written unless a family 1 group name is specified.  ie) If
-XMP:Contrast is specified, information will be written to both
+The B<Group> column below gives the XMP schema namespace prefix for each
+tag.  The family 1 group names are composed from these schema names with a
+leading "XMP-" added.  If the same XMP tag name exists in more than one
+group, all groups are written unless a family 1 group name is specified. 
+ie) If XMP:Contrast is specified, information will be written to both
 XMP-crs:Contrast and XMP-exif:Contrast.
+
+Note: that the actual IPTC Core namespace schema prefix is C<Iptc4xmpCore>,
+which is the name used in the file, but ExifTool uses C<IptcCore> to
+generate the family 1 group name because C<Iptc4xmpCore> is a bit lengthy.
 },
     IPTC => q{
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
@@ -115,11 +123,54 @@ are not null terminated.
 IPTC information is separated into different records, each of which has its
 own set of tags.
 },
+    Photoshop => q{
+The meanings of many Photoshop tags are known, however very few provide useful
+information about the image, so many are not decoded by ExifTool.  The tags
+listed below are those which are decoded by ExifTool.
+},
+    PrintIM => q{
+The format of the PrintIM information is known, however no PrintIM tags have
+been decoded.  Use the Unknown (-u) option to extract PrintIM information.
+},
+    Kodak => q{
+Kodak maker notes are a real pain because they aren't in standard IFD format
+and change frequently with new models.  Some information has been decoded,
+but the Kodak support still needs a lot of work.
+},
+    'Kodak SpecialEffects' => q{
+The Kodak SpecialEffects and Borders tags are found in sub-IFD's within
+the Kodak "Meta" JPEG APP3 segment.
+},
+    Minolta => q{
+These tags are used by Minolta and Konica/Minolta cameras.
+},
+    Olympus => q{
+Tags 0x0000 through 0x0103 are used by some older Olympus cameras, and are
+the same as Konica/Minolta tags.  The Olympus tags are also used for Epson
+and Agfa cameras.
+},
+    Panasonic => q{
+Panasonic tags are also used for Leica cameras.
+},
+    Pentax => q{
+The Pentax tags are also used in Asahi cameras.
+},
+    Sigma => q{
+These tags are used in Sigma/Foveon cameras.
+},
+    Sony => q{
+While current Sony camera models contain a wealth of information, very
+little is known about the Sony tags.
+},
     CanonRaw => q{
 When writing CanonRaw information, the length of the information is
 preserved (and the new information is truncated or padded as required)
 unless B<Writable> is C<resize>.  Currently, only JpgFromRaw and
 ThumbnailImage are allowed to change size.
+},
+    Unknown => q{
+The following tags are decoded in unsupported maker notes.  Use the Unknown
+(-u) option to display other unknown tags.
 },
     Extra => q{
 The extra tags represent information found in the image but not associated
@@ -213,11 +264,17 @@ sub new
         } else {
             @keys = sort { $a <=> $b } @keys;
         }
+        my $defFormat = $table->{FORMAT};
+        if (not $defFormat and $table->{PROCESS_PROC} and
+            $table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData)
+        {
+            $defFormat = 'int8u';   # use default format for binary data tables
+        }
         foreach $tagID (@keys) {
             my @infoArray = GetTagInfoList($table,$tagID);
             my ($tagInfo, @tagNames, $subdir, $format, @values);
             my (@require, @writeGroup, @writable);
-            $format = $table->{FORMAT};
+            $format = $defFormat;
             foreach $tagInfo (@infoArray) {
                 push @values, "($$tagInfo{Notes})" if $$tagInfo{Notes};
                 my $writeGroup;
@@ -273,12 +330,22 @@ sub new
                     } else {
                         $writable = $$table{WRITABLE};
                     }
+                    # not writable if we can't do the inverse conversions
+                    if ($writable) {
+                        foreach ('PrintConv','ValueConv') {
+                            next unless $$tagInfo{$_};
+                            next if $$tagInfo{$_ . 'Inv'};
+                            next if ref $$tagInfo{$_} eq 'HASH';
+                            undef $writable;
+                            last;
+                        }
+                    }
                     if (not $writable) {
                         $writable = 'N';
-                    } elsif ($writable eq '1') {
-                        $writable = $format ? $format : 'Y';
+                    } else {
+                        $writable eq '1' and $writable = $format ? $format : 'Y';
+                        $writable .= "[$$tagInfo{Count}]" if $$tagInfo{Count};
                     }
-                    $writable .= "[$$tagInfo{Count}]" if $$tagInfo{Count};
                     # add a '*' if this tag is protected or a '~' for unsafe tags
                     if ($$tagInfo{Protected}) {
                         $writable .= '*' if $$tagInfo{Protected} & 0x02;
@@ -287,6 +354,7 @@ sub new
                 }
                 # don't duplicate a tag name unless an entry is different
                 my $name = $$tagInfo{Name};
+                $name .= '?' if $$tagInfo{Unknown};
                 unless (@tagNames and $tagNames[-1] eq $name and
                     $writeGroup[-1] eq $writeGroup and $writable[-1] eq $writable)
                 {
@@ -493,27 +561,84 @@ sub GetTableOrder()
 }
 
 #------------------------------------------------------------------------------
+# Open HTMLFILE and print header and description
+# Inputs: 0) Filename, 1) optional category
+# Returns: True on success
+my %createdFiles;
+sub OpenHtmlFile($;$)
+{
+    my ($htmldir, $category) = @_;
+    my ($htmlFile, $title, $url);
+
+    if ($category) {
+        my @names = split /\s+/, $category;
+        my $class = shift @names;
+        $htmlFile = "$htmldir/TagNames/$class.html";
+        $title = "$category Tags";
+        $url = @names ? join '_', @names : $class;
+    } else {
+        $htmlFile = "$htmldir/TagNames/index.html";
+        $category = 'ExifTool';
+        $title = 'ExifTool Tag Names';
+        $url = "ExifTool";
+    }
+    if ($createdFiles{$htmlFile}) {
+        open(HTMLFILE,">>$htmlFile") or return 0;
+    } else {
+        open(HTMLFILE,">$htmlFile") or return 0;
+        print HTMLFILE "<html>\n<head>\n<title>$title</title>\n</head>\n";
+        print HTMLFILE "<body text='#000000' bgcolor='#ffffff'>\n";
+    }
+    print HTMLFILE "<h2><a name='$url'>$title</a></h2>\n" or return 0;
+    print HTMLFILE Doc2Html($docs{$category}),"\n" if $docs{$category};
+    $createdFiles{$htmlFile} = 1;
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Close all html files and write trailers
+# Returns: true on success
+sub CloseHtmlFiles()
+{
+    my $success = 1;
+    # get the date
+    my ($sec,$min,$hr,$day,$mon,$yr) = localtime;
+    my @month = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+    $yr += 1900;
+    my $date = "$month[$mon] $day, $yr";
+    foreach (keys %createdFiles) {
+        open(HTMLFILE,">>$_") or $success = 0, next;
+        # write the trailers
+        print HTMLFILE "<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>\n" unless /index/;
+        print HTMLFILE "<hr>\n";
+        print HTMLFILE "(This document generated automatically by Image::ExifTool::BuildTagLookup)\n";
+        print HTMLFILE "<br><i>Last revised $date</i>\n</body>\n</html>\n" or $success = 0;
+        close HTMLFILE or $success = 0;
+    }
+    return $success;
+}
+
+#------------------------------------------------------------------------------
 # Write the TagName HTML documentation
 # Inputs: 0) BuildTagLookup object reference
 #         1) output pod file (ie. 'lib/Image/ExifTool/TagNames.pod')
-#         2) output html file (ie. 'html/TagNames.html')
+#         2) output html directory (ie. 'html')
 # Returns: true on success
 sub WriteTagNames($$)
 {
-    my ($self, $podFile, $htmlFile) = @_;
+    my ($self, $podFile, $htmldir) = @_;
     my ($tableName, $short, $url);
     my $tagNameInfo = $self->{TAG_NAME_INFO} or return 0;
     my $idTitle = $self->{TAG_ID};
     my $shortName = $self->{SHORT_NAME};
     my $success = 1;
+    my %htmlFiles;
 
     # open the file and write the header
     open(PODFILE,">$podFile") or return 0;
-    print PODFILE Doc2Pod($docs{PodHeader}), $docs{Description};
-    open(HTMLFILE,">$htmlFile") or close(PODFILE), return 0;
-    print HTMLFILE "<html>\n<head>\n<title>ExifTool Tag Names</title>\n</head>\n";
-    print HTMLFILE "<body text='#000000' bgcolor='#ffffff'>\n";
-    print HTMLFILE "<h1>ExifTool Tag Names</h1>\n", Doc2Html($docs{Description}),"\n";
+    print PODFILE Doc2Pod($docs{PodHeader}), $docs{ExifTool};
+    mkdir "$htmldir/TagNames";
+    OpenHtmlFile($htmldir) or return 0;
     print HTMLFILE "<h3>Tag Table Index</h3>\n<table><tr valign='top'><td>\n";
     # write the index
     my @tableNames = GetTableOrder();
@@ -521,8 +646,11 @@ sub WriteTagNames($$)
     my $lines = int((scalar(@tableNames) + 2) / 3);
     foreach $tableName (@tableNames) {
         $short = $$shortName{$tableName};
-        ($url = $short) =~ tr/ /_/;
-        print HTMLFILE "<a href='#$url'>$short</a>\n";
+        my @names = split /\s+/, $short;
+        my $class = shift @names;
+        $url = "$class.html";
+        @names and $url .= '#' . join '_', @names;
+        print HTMLFILE "<a href='$url'>$short</a>\n";
         if (++$count % $lines) {
             print HTMLFILE '<br>';
         } else {
@@ -533,7 +661,6 @@ sub WriteTagNames($$)
     # write all the tag tables
     foreach $tableName (@tableNames) {
         $short = $$shortName{$tableName};
-        ($url = $short) =~ tr/ /_/;
         my $info = $$tagNameInfo{$tableName};
         my $id = $$idTitle{$tableName};
         my ($hid, $showGrp);
@@ -561,6 +688,9 @@ sub WriteTagNames($$)
         }
         print PODFILE "\n=head2 $short Tags\n";
         print PODFILE $docs{$short} if $docs{$short};
+        my $table = GetTagTable($tableName);
+        my $notes = $$table{NOTES};
+        print PODFILE $notes if $notes;
         my $line = "\n";
         $line .= sprintf " %${wID}s ", $id if $id;
         $line .= sprintf "  %-${wTag}s", 'Tag Name';
@@ -571,8 +701,12 @@ sub WriteTagNames($$)
         $line =~ s/\S/-/g;
         $line =~ s/- -/---/g;
         print PODFILE $line,"\n";
-        print HTMLFILE "<h3><a name='$url'>$short Tags</a></h3>\n";
-        print HTMLFILE Doc2Html($docs{$short}) if $docs{$short};
+        close HTMLFILE;
+        OpenHtmlFile($htmldir, $short) or $success = 0;
+        if ($notes) {
+            print HTMLFILE "<p>" if $docs{$short};
+            print HTMLFILE Doc2Html($$table{NOTES})
+        }
         print HTMLFILE "<blockquote><table border=1 cellspacing=0 cellpadding=2>\n";
         print HTMLFILE "<tr bgcolor='#dddddd'>$hid<th>Tag Name</th>\n";
         print HTMLFILE "<th>Writable</th>$derived<th>Values / ${noteFont}Notes</font></th></tr>\n";
@@ -636,8 +770,10 @@ sub WriteTagNames($$)
             if (@$values) {
                 if ($$writable[0] eq '-') {
                     foreach (@$values) {
-                        ($url = $_) =~ tr/ /_/;
-                        push @values, "--&gt; <a href='#$url'>$_ Tags</a>";
+                        my @names = split /\s+/;
+                        $url = (shift @names) . '.html';
+                        @names and $url .= '#' . join '_', @names;
+                        push @values, "--&gt; <a href='$url'>$_ Tags</a>";
                     }
                 } else {
                     foreach (@$values) {
@@ -655,17 +791,10 @@ sub WriteTagNames($$)
         }
         print HTMLFILE "</table></blockquote>\n\n";
     }
-    # write the trailers
-    my ($sec,$min,$hr,$day,$mon,$yr) = localtime;
-    my @month = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
-    $yr += 1900;
-    my $date = "$month[$mon] $day, $yr";
-    print HTMLFILE "<hr>\n";
-    print HTMLFILE "(This document generated automatically by Image::ExifTool::BuildTagLookup)\n";
-    print HTMLFILE "<br><i>Last revised $date</i>\n</body>\n</html>\n" or $success = 0;
+    close(HTMLFILE) or $success = 0;
+    CloseHtmlFiles() or $success = 0;
     print PODFILE Doc2Pod($docs{PodTrailer}) or $success = 0;
     close(PODFILE) or $success = 0;
-    close(HTMLFILE) or $success = 0;
     return $success;
 }
 
@@ -694,8 +823,7 @@ documentation.
 
   $ok = $builder->WriteTagLookup('lib/Image/ExifTool/TagLookup.pm');
 
-  $ok = $builder->WriteTagNames('lib/Image/ExifTool/TagNames.pod',
-                                'html/TagNames.html');
+  $ok = $builder->WriteTagNames('lib/Image/ExifTool/TagNames.pod','html');
 
 =head1 AUTHOR
 

@@ -507,7 +507,7 @@ sub FormatICCTag($$$)
         my $len = Get32u($dataPt, $offset+8);
         if ($size >= $len + 12) {
             my $str = substr($$dataPt, $offset+12, $len);
-            $str =~ s/\0.*//;   # truncate at null terminator
+            $str =~ s/\0.*//s;   # truncate at null terminator
             return $str;
         }
     }

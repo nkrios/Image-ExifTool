@@ -688,20 +688,23 @@ sub BuildFixup($$$)
     my $dataPt = $dirInfo->{DataPt};
     my $dirStart = $dirInfo->{DirStart} || 0;
     my $dataLen = $dirInfo->{DataLen} || length($$dataPt);
+    my $dataPos = $dirInfo->{DataPos};
     my $fixup = new Image::ExifTool::Fixup;
 
     my $numEntries = Get16u($dataPt, $dirStart);
     my $dirEnd = $dirStart + 2 + 12 * $numEntries;
     if ($dirEnd > $dataLen) {
-        $exifTool->Warn("Directory longer than data $dirStart $dataLen $numEntries");
+        $exifTool->Warn("Directory longer than data");
         return undef;
     }
     my $index;
     for ($index=0; $index<$numEntries; ++$index) {
         my $entry = $dirStart + 2 + 12 * $index;
+        my $tagID = Get16u($dataPt, $entry);
         my $format = Get16u($dataPt, $entry+2);
         my $count = Get32u($dataPt, $entry+4);
-        if ($format < 1 or $format > 12) {
+        my $valuePtr = $entry + 8;
+        if ($format < 1 or $format > 13) {
             # allow zero padding (some manufacturers do this) - grrrr
             last unless $format or $count or not $index;
             $exifTool->Warn("Bad format ($format) for IFD entry");
@@ -710,15 +713,42 @@ sub BuildFixup($$$)
         my $size = $count * $formatSize[$format];
         if ($size > 4) {
             # save pointer to this offset
-            $fixup->AddFixup($entry + 8);
+            $fixup->AddFixup($valuePtr);
+            $valuePtr = Get32u($dataPt, $valuePtr) - $dataPos;
         }
+        # recurse into EXIF-type subdirectories
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
+        next unless $tagInfo and $$tagInfo{SubDirectory};
+        my $subdir = $$tagInfo{SubDirectory};
+        next unless $$subdir{TagTable};
+        my $subTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
+        next if $$subTable{PROCESS_PROC} and $$subTable{PROCESS_PROC} ne \&ProcessExif;
+        my %subdirInfo = %$dirInfo;
+        my $subdirDataPos = $dataPos;
+        my $subdirStart = $valuePtr;
+        if (defined $$subdir{Start}) {
+            if ($valuePtr < 0 or $valuePtr + $size > $dataLen) {
+                $exifTool->Warn('Error building fixup (pointer outside data)');
+                next;
+            }
+            my $val = ReadValue($dataPt,$valuePtr,$formatName[$format],$count,$size);
+            # set local $valuePtr relative to file $base for eval
+            my $valuePtr = $subdirStart + $subdirDataPos;
+            #### eval Start ($valuePtr, $val)
+            $subdirStart = eval($$subdir{Start});
+            # convert back to relative to $subdirDataPt
+            $subdirStart -= $subdirDataPos;
+        }
+        $subdirInfo{DirStart} = $subdirStart;
+        my $subFixup = BuildFixup($exifTool, $subTable, \%subdirInfo);
+        $fixup->AddFixup($subFixup);
     }
     return $fixup;
 }
 
 #------------------------------------------------------------------------------
 # rebuild maker notes to properly contain all value data
-# (some manufacturers put value data outsize maker notes!!)
+# (some manufacturers put value data outside maker notes!!)
 # Inputs: 0) ExifTool object reference, 1) tag table reference,
 #         2) dirInfo reference
 # Returns: new maker note data, or undef on error
@@ -929,7 +959,7 @@ sub WriteExif($$$)
                     $oldID = Get16u($dataPt, $entry);
                     $oldFormat = Get16u($dataPt, $entry+2);
                     $oldCount = Get32u($dataPt, $entry+4);
-                    if ($oldFormat < 1 or $oldFormat > 12) {
+                    if ($oldFormat < 1 or $oldFormat > 13) {
                         # don't write out null directory entry
                         unless ($oldFormat or $oldCount or not $index) {
                             ++$index;
@@ -967,6 +997,11 @@ sub WriteExif($$$)
                                 $exifTool->Error("Bad EXIF directory pointer for $dirName entry $index");
                                 return undef;
                             }
+                        }
+                        # save maker note header
+                        if ($oldID == 0x927c and $tagTablePtr eq \%Image::ExifTool::Exif::Main) {
+                            my $hdrLen = $oldSize < 48 ? $oldSize : 48;
+                            $exifTool->{MAKER_NOTE_HEADER} = substr($$valueDataPt, $valuePtr, $hdrLen);
                         }
                     }
                     # read value if we haven't already
@@ -1053,18 +1088,19 @@ sub WriteExif($$$)
                         $newFormat = $formatNumber{$newFormName};
                     } elsif ($newValueHash) {
                         # write in existing format
-                        if ($inMakerNotes and $oldFormName ne 'string' and
-                            $oldFormName ne 'undef')
-                        {
-                            # use existing count in maker notes unless string or binary
-                            $newCount = $oldCount;
-                        }
                         $val = ReadValue(\$oldValue, 0, $oldFormName, $oldCount, $oldSize);
                         if ($$newInfo{Format}) {
                             # override existing format if necessary
                             $ifdFormName = $$newInfo{Writable};
                             $ifdFormName = $oldFormName unless $ifdFormName and $ifdFormName ne '1';
                             $newFormName = $$newInfo{Format};
+                            $newFormat = $formatNumber{$newFormName};
+                        }
+                        if ($inMakerNotes and $oldFormName ne 'string' and
+                            $oldFormName ne 'undef')
+                        {
+                            # keep same size in maker notes unless string or binary
+                            $newCount = $oldCount * $formatSize[$oldFormat] / $formatSize[$newFormat];
                         }
                         $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash, $val);
                     }
@@ -1204,7 +1240,11 @@ sub WriteExif($$$)
                             if (defined $loc and not $subdirInfo{Relative}) {
                                 $subdirInfo{DirStart} = $loc;
                                 $subdirInfo{DirLen} -= $loc;
-                                my $makerFixup = BuildFixup($exifTool, undef, \%subdirInfo);
+                                my $subTable;
+                                $subTable = $newInfo->{SubDirectory}->{TagTable} if $$newInfo{SubDirectory};
+                                $subTable = 'Image::ExifTool::Exif' unless $subTable;
+                                $subTable = Image::ExifTool::GetTagTable($subTable);
+                                my $makerFixup = BuildFixup($exifTool, $subTable, \%subdirInfo);
                                 if ($makerFixup) {
                                     my $valLen = length($valBuff);
                                     $makerFixup->{Start} += $valLen;
@@ -1227,44 +1267,61 @@ sub WriteExif($$$)
                             DirName => 'MakerNotes',
                             RAF => $raf,
                         );
+                        # get the proper tag table for these maker notes
+                        my $subInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID);
+                        my $subTable;
+                        if ($subInfo and $subInfo->{SubDirectory}) {
+                            $subTable = $subInfo->{SubDirectory}->{TagTable};
+                            $subTable and $subTable = Image::ExifTool::GetTagTable($subTable);
+                        } else {
+                            $exifTool->Warn('Internal problem getting maker notes tag table');
+                        }
+                        $subTable or $subTable = $tagTablePtr;
+                        my $subdir;
+                        # look for IFD-style maker notes
                         my $loc = Image::ExifTool::MakerNotes::LocateIFD(\%subdirInfo);
                         if (defined $loc) {
-                            # get the proper tag table for these maker notes
-                            my $subInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID);
-                            my $subTable;
-                            if ($subInfo and $subInfo->{SubDirectory}) {
-                                $subTable = $subInfo->{SubDirectory}->{TagTable};
-                                $subTable and $subTable = Image::ExifTool::GetTagTable($subTable);
-                            } else {
-                                $exifTool->Warn('Internal problem getting maker notes tag table');
-                            }
-                            $subTable or $subTable = $tagTablePtr;
                             # we need fixup data for this subdirectory
                             $subdirInfo{Fixup} = new Image::ExifTool::Fixup;
                             # rewrite maker notes
-                            my $subdir = $exifTool->WriteTagTable($subTable, \%subdirInfo);
-                            if (defined $subdir and length $subdir) {
-                                my $valLen = length($valBuff);
-                                # restore existing header and substitute the new
-                                # maker notes for the old value
-                                $newValue = substr($oldValue, 0, $loc) . $subdir;
-                                my $makerFixup = $subdirInfo{Fixup};
-                                if (not $subdirInfo{Relative}) {
-                                    $makerFixup->{Start} += $valLen + $loc;
-                                    $makerFixup->{Shift} += $base - $subdirInfo{Base};
-                                    push @valFixups, $makerFixup;
-                                } elsif ($loc) {
-                                    # apply a one-time fixup to $loc since offsets are relative
-                                    $makerFixup->{Start} += $loc;
-                                    # shift all offsets to be relative to new base
-                                    $makerFixup->{Shift} += $valueDataPos + $valuePtr +
-                                                            $base - $subdirInfo{Base};
-                                    $makerFixup->ApplyFixup(\$newValue);
-                                }
-                                $newValuePt = \$newValue;   # write new value
+                            $subdir = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+                        } elsif ($$subTable{PROCESS_PROC} and
+                                 $$subTable{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData)
+                        {
+                            my $sub = $subInfo->{SubDirectory};
+                            if (defined $$sub{Start}) {
+                                #### eval Start ($valuePtr)
+                                my $start = eval($$sub{Start});
+                                $loc = $start - $valuePtr;
+                                $subdirInfo{DirStart} = $start;
+                                $subdirInfo{DirLen} -= $loc;
+                            } else {
+                                $loc = 0;
                             }
+                            # rewrite maker notes
+                            $subdir = $exifTool->WriteTagTable($subTable, \%subdirInfo);
                         } else {
                             $exifTool->Warn('Maker notes could not be parsed');
+                        }
+                        if (defined $subdir and length $subdir) {
+                            my $valLen = length($valBuff);
+                            # restore existing header and substitute the new
+                            # maker notes for the old value
+                            $newValue = substr($oldValue, 0, $loc) . $subdir;
+                            my $makerFixup = $subdirInfo{Fixup};
+                            if (not $subdirInfo{Relative}) {
+                                $makerFixup->{Start} += $valLen + $loc;
+                                $makerFixup->{Shift} += $base - $subdirInfo{Base};
+                                push @valFixups, $makerFixup;
+                            } elsif ($loc) {
+                                # apply a one-time fixup to $loc since offsets are relative
+                                $makerFixup->{Start} += $loc;
+                                # shift all offsets to be relative to new base
+                                $makerFixup->{Shift} += $valueDataPos + $valuePtr +
+                                                        $base - $subdirInfo{Base};
+                                $makerFixup->ApplyFixup(\$newValue);
+                            }
+                            $newValuePt = \$newValue;   # write new value
                         }
                     }
                     SetByteOrder($saveOrder);
@@ -1351,17 +1408,22 @@ sub WriteExif($$$)
                         $newValuePt = \$newValue;
     
                     } elsif ((not defined $newInfo->{SubDirectory}->{Start} or
-                             $newInfo->{SubDirectory}->{Start} eq '$valuePtr') and
+                             $newInfo->{SubDirectory}->{Start} =~ /\$valuePtr/) and
                              $newInfo->{SubDirectory}->{TagTable})
                     {
 #
 # rewrite other existing subdirectories ('$valuePtr' type only)
 #
+                        my $subdirStart = $valuePtr;
+                        if ($newInfo->{SubDirectory}->{Start}) {
+                            #### eval Start ($valuePtr)
+                            $subdirStart = eval($newInfo->{SubDirectory}->{Start});
+                        }
                         my $subFixup = new Image::ExifTool::Fixup;
                         my %subdirInfo = (
                             Base => $base,
                             DataPt => $valueDataPt,
-                            DirStart => $valuePtr,
+                            DirStart => $subdirStart,
                             DataPos => $valueDataPos,
                             DataLen => $valueDataLen,
                             DirLen => $oldSize,
@@ -1376,7 +1438,14 @@ sub WriteExif($$$)
                             $subTable = $tagTablePtr;
                         }
                         $newValue = $exifTool->WriteTagTable($subTable, \%subdirInfo);
-                        $newValuePt = \$newValue if defined $newValue;
+                        if (defined $newValue) {
+                            my $hdrLen = $subdirStart - $valuePtr;
+                            if ($hdrLen) {
+                                $newValue = substr($$valueDataPt, $valuePtr, $hdrLen) . $newValue;
+                                $subFixup->{Start} += $hdrLen;
+                            }
+                            $newValuePt = \$newValue;
+                        }
                         unless (defined $$newValuePt) {
                             $exifTool->Error("Internal error writing $$dirInfo{DirName}");
                             return undef;

@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -704,7 +704,9 @@ sub CrwInfo($$)
 
     # process the raw directory
     my $rawTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
-    $exifTool->ProcessTagTable($rawTagTable, \%dirInfo);
+    unless ($exifTool->ProcessTagTable($rawTagTable, \%dirInfo)) {
+        $exifTool->Warn("CRW file format error");
+    }
 
     # finish building maker notes if necessary
     $buildMakerNotes and SaveMakerNotes($exifTool);

@@ -1,0 +1,532 @@
+<html>
+<head>
+<title>CanonCustom Functions10D Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='Functions10D'>CanonCustom Functions10D Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>SetButtonFunction</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Not assigned
+  <br>1 = Change quality
+  <br>2 = Change parameters
+  <br>3 = Menu display
+  <br>4 = Image replay </font></td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>ShutterReleaseNoCFCard</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Yes
+  <br>1 = No</font></td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>FlashSyncSpeedAv</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = 1/200 (Fixed)</font></td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>Shutter-AELock</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = AF/AE lock
+  <br>1 = AE lock/AF
+  <br>2 = AF/AF lock, No AE Lock
+  <br>3 = AE/AF, No AE Lock</font></td></tr>
+<tr valign='top'>
+<td>0x0005</td>
+<td>AFAssist</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Emits/Fires
+  <br>1 = Does Not Emit/Fires
+  <br>2 = Only Ext. Flash Emits/Fires
+  <br>3 = Emits/Does Not Fire</font></td></tr>
+<tr valign='top'>
+<td>0x0006</td>
+<td>ExposureLevelIncrements</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 1/2 Stop
+  <br>1 = 1/3 Stop</font></td></tr>
+<tr valign='top'>
+<td>0x0007</td>
+<td>AFPointRegistration</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Center
+  <br>1 = Bottom
+  <br>2 = Right
+  <br>3 = Extreme Right
+  <br>4 = Automatic
+  <br>5 = Extreme Left
+  <br>6 = Left
+  <br>7 = Top</font></td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>RawAndJpgRecording</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = RAW+Small/Normal
+  <br>1 = RAW+Small/Fine
+  <br>2 = RAW+Medium/Normal
+  <br>3 = RAW+Medium/Fine
+  <br>4 = RAW+Large/Normal
+  <br>5 = RAW+Large/Fine</font></td></tr>
+<tr valign='top'>
+<td>0x0009</td>
+<td>AEBSequence</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 0,-,+/Enabled
+  <br>1 = 0,-,+/Disabled
+  <br>2 = -,0,+/Enabled
+  <br>3 = -,0,+/Disabled</font></td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>SuperimposedDisplay</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = On
+  <br>1 = Off</font></td></tr>
+<tr valign='top'>
+<td>0x000b</td>
+<td>MenuButtonDisplayPosition</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Previous (Volatile)
+  <br>1 = Previous
+  <br>2 = Top</font></td></tr>
+<tr valign='top'>
+<td>0x000c</td>
+<td>MirrorLockup</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Disable
+  <br>1 = Enable</font></td></tr>
+<tr valign='top'>
+<td>0x000d</td>
+<td>AssistButtonFunction</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Select Home Position
+  <br>2 = Select HP (while pressing)
+  <br>3 = Av+/- (AF point by QCD)
+  <br>4 = FE lock</font></td></tr>
+<tr valign='top'>
+<td>0x000e</td>
+<td>FillFlashAutoReduction</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Enable
+  <br>1 = Disable</font></td></tr>
+<tr valign='top'>
+<td>0x000f</td>
+<td>ShutterCurtainSync</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 1st-curtain sync
+  <br>1 = 2nd-curtain sync</font></td></tr>
+<tr valign='top'>
+<td>0x0010</td>
+<td>SafetyShiftInAvOrTv</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Disable
+  <br>1 = Enable</font></td></tr>
+<tr valign='top'>
+<td>0x0011</td>
+<td>LensAFStopButton</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = AF Stop
+  <br>1 = Operate AF
+  <br>2 = Lock AE and start timer  </font></td></tr>
+</table></blockquote>
+
+<h2><a name='Functions20D'>CanonCustom Functions20D Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>SetFunctionWhenShooting</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Default (no function)
+  <br>1 = Change quality
+  <br>2 = Change Parameters
+  <br>3 = Menu display
+  <br>4 = Image replay</font></td></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>LongExposureNoiseReduction</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>FlashSyncSpeedAv</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = 1/250 Fixed</font></td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>Shutter-AELock</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = AF/AE lock
+  <br>1 = AE lock/AF
+  <br>2 = AF/AF lock no AE lock
+  <br>3 = AE/AF,no AE lock </font></td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>AFAssistBeam</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Emitts
+  <br>1 = Does not emit
+  <br>2 = Only ext. flash emits</font></td></tr>
+<tr valign='top'>
+<td>0x0005</td>
+<td>ExposureLevelIncrements</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 1/3 Stop
+  <br>1 = 1/2 Stop</font></td></tr>
+<tr valign='top'>
+<td>0x0006</td>
+<td>FlashFiring</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Fires
+  <br>1 = Does not fire</font></td></tr>
+<tr valign='top'>
+<td>0x0007</td>
+<td>ISOExpansion</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>AEBSequence</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 0,-,+/Enabled
+  <br>1 = 0,-,+/Disabled
+  <br>2 = -,0,+/Enabled
+  <br>3 = -,0,+/Disabled</font></td></tr>
+<tr valign='top'>
+<td>0x0009</td>
+<td>SuperimposedDisplay</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = On
+  <br>1 = Off</font></td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>MenuButtonDisplayPosition</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Previous (top if power off)
+  <br>1 = Previous
+  <br>2 = Top</font></td></tr>
+<tr valign='top'>
+<td>0x000b</td>
+<td>MirrorLockup</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Disable
+  <br>1 = Enable</font></td></tr>
+<tr valign='top'>
+<td>0x000c</td>
+<td>AFPointSelectionMethod</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Multi-controller direct
+  <br>2 = Quick Control Dial direct</font></td></tr>
+<tr valign='top'>
+<td>0x000d</td>
+<td>ETTLII</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Evaluative
+  <br>1 = Average</font></td></tr>
+<tr valign='top'>
+<td>0x000e</td>
+<td>ShutterCurtainSync</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 1st-curtain sync
+  <br>1 = 2nd-curtain sync</font></td></tr>
+<tr valign='top'>
+<td>0x000f</td>
+<td>SafetyShiftInAVorTV</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Disable
+  <br>1 = Enable</font></td></tr>
+<tr valign='top'>
+<td>0x0010</td>
+<td>LensAFStopButton</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = AF stop
+  <br>1 = AF start
+  <br>2 = AF lock while metering
+  <br>3 = AF point: M -&gt; Auto / Auto -&gt; ctr.
+  <br>4 = ONE SHOT &lt;-&gt; AI SERVO
+  <br>5 = IS start</font></td></tr>
+<tr valign='top'>
+<td>0x0011</td>
+<td>AddOriginalDecisionData</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+</table></blockquote>
+
+<h2><a name='Functions'>CanonCustom Functions Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>LongExposureNoiseReduction</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>Shutter-AELock</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = AF/AE lock
+  <br>1 = AE lock/AF
+  <br>2 = AF/AF lock
+  <br>3 = AE+release/AE+AF  </font></td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>MirrorLockup</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Disable
+  <br>1 = Enable</font></td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>ExposureLevelIncrements</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 1/2 Stop
+  <br>1 = 1/3 Stop</font></td></tr>
+<tr valign='top'>
+<td>0x0005</td>
+<td>AFAssist</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Off</font></td></tr>
+<tr valign='top'>
+<td>0x0006</td>
+<td>FlashSyncSpeedAv</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = 1/200 Fixed</font></td></tr>
+<tr valign='top'>
+<td>0x0007</td>
+<td>AEBSequence</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 0,-,+/Enabled
+  <br>1 = 0,-,+/Disabled
+  <br>2 = -,0,+/Enabled
+  <br>3 = -,0,+/Disabled</font></td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>ShutterCurtainSync</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 1st-curtain sync
+  <br>1 = 2nd-curtain sync</font></td></tr>
+<tr valign='top'>
+<td>0x0009</td>
+<td>LensAFStopButton</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = AF Stop
+  <br>1 = Operate AF
+  <br>2 = Lock AE and start timer  </font></td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>FillFlashAutoReduction</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Enable
+  <br>1 = Disable</font></td></tr>
+<tr valign='top'>
+<td>0x000b</td>
+<td>MenuButtonReturn</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Top
+  <br>1 = Previous (volatile)
+  <br>2 = Previous</font></td></tr>
+<tr valign='top'>
+<td>0x000c</td>
+<td>SetButtonFunction</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Not assigned
+  <br>1 = Change quality
+  <br>2 = Change ISO speed
+  <br>3 = Select parameters  </font></td></tr>
+<tr valign='top'>
+<td>0x000d</td>
+<td>SensorCleaning</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Disable
+  <br>1 = Enable</font></td></tr>
+<tr valign='top'>
+<td>0x000e</td>
+<td>SuperimposedDisplay</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = On
+  <br>1 = Off</font></td></tr>
+<tr valign='top'>
+<td>0x000f</td>
+<td>ShutterReleaseNoCFCard</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Yes
+  <br>1 = No</font></td></tr>
+</table></blockquote>
+
+<h2><a name='Functions1D'>CanonCustom Functions1D Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>FocusingScreen</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Ec-N, R
+  <br>1 = Ec-A,B,C,CII,CIII,D,H,I,L</font></td></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>FinderDisplayDuringExposure</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>ShutterReleaseNoCFCard</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Yes
+  <br>1 = No</font></td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>ISOSpeedExpansion</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>ShutterAELButton</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = AF/AE Lock Stop
+  <br>1 = AE Lock/AF
+  <br>2 = AF/AF Lock, No AE Lock
+  <br>3 = AE/AF, No AE Lock</font></td></tr>
+<tr valign='top'>
+<td>0x0005</td>
+<td>ManualTv</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Tv=Main/Av=Control
+  <br>1 = Tv=Control/Av=Main
+  <br>2 = Tv=Main/Av=Main w/o Lens
+  <br>3 = Tv=Control/Av=Main w/o Lens</font></td></tr>
+<tr valign='top'>
+<td>0x0006</td>
+<td>ExposureLevelIncrements</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 1/3-Stop Set, 1/3-Stop Comp
+  <br>1 = 1-Stop Set, 1/3-Stop Comp
+  <br>2 = 1/2-Stop Set, 1/2-Stop Comp</font></td></tr>
+<tr valign='top'>
+<td>0x0007</td>
+<td>USMLensElectronicMF</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Turns On After One-Shot AF
+  <br>1 = Turns Off After One-Shot AF
+  <br>2 = Always Turned Off</font></td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>LCDPanels</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Remain. Shots/File No.
+  <br>1 = ISO/Remain. Shots
+  <br>2 = ISO/File No.
+  <br>3 = Shots In Folder/Remain. Shots</font></td></tr>
+<tr valign='top'>
+<td>0x0009</td>
+<td>AEBSequence</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 0,-,+/Enabled
+  <br>1 = 0,-,+/Disabled
+  <br>2 = -,0,+/Enabled
+  <br>3 = -,0,+/Disabled</font></td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>AFPointIllumination</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = On
+  <br>1 = Off
+  <br>2 = On Without Dimming
+  <br>3 = Brighter</font></td></tr>
+<tr valign='top'>
+<td>0x000b</td>
+<td>AFPointSelection</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = H=AF+Main/V=AF+Command
+  <br>1 = H=Comp+Main/V=Comp+Command
+  <br>2 = H=Command Only/V=Assist+Main
+  <br>3 = H=FEL+Main/V=FEL+Command</font></td></tr>
+<tr valign='top'>
+<td>0x000c</td>
+<td>MirrorLockup</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Disable
+  <br>1 = Enable</font></td></tr>
+<tr valign='top'>
+<td>0x000d</td>
+<td>AFPointSpotMetering</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 45/Center AF Point
+  <br>1 = 11/Active AF Point
+  <br>2 = 11/Center AF Point
+  <br>3 = 9/Active AF Point</font></td></tr>
+<tr valign='top'>
+<td>0x000e</td>
+<td>FillFlashAutoReduction</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Enable
+  <br>1 = Disable</font></td></tr>
+<tr valign='top'>
+<td>0x000f</td>
+<td>ShutterCurtainSync</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = 1st-curtain sync
+  <br>1 = 2nd-curtain sync</font></td></tr>
+<tr valign='top'>
+<td>0x0010</td>
+<td>SafetyShiftInAvOrTv</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Disable
+  <br>1 = Enable</font></td></tr>
+<tr valign='top'>
+<td>0x0011</td>
+<td>AFPointActivationArea</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Single AF Point
+  <br>1 = Expanded (TTL. of 7 AF Points)
+  <br>2 = Automatic Expanded (Max. 13)</font></td></tr>
+<tr valign='top'>
+<td>0x0012</td>
+<td>SwitchToRegisteredAFPoint</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Assist + AF
+  <br>1 = Assist
+  <br>2 = Only While Pressing Assist</font></td></tr>
+<tr valign='top'>
+<td>0x0013</td>
+<td>LensAFStopButton</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = AF Stop
+  <br>1 = AF Start
+  <br>2 = AE Lock While Metering
+  <br>3 = AF Point: M-&gt;Auto/Auto-&gt;Ctr
+  <br>4 = AF Mode: ONESHOT&lt;-&gt;SERVO
+  <br>5 = IS Start</font></td></tr>
+<tr valign='top'>
+<td>0x0014</td>
+<td>AIServoTrackingSensitivity</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Standard
+  <br>1 = Slow
+  <br>2 = Moderately Slow
+  <br>3 = Moderately Fast
+  <br>4 = Fast</font></td></tr>
+</table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Apr 2, 2005</i>
+</body>
+</html>

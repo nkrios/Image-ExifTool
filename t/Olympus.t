@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..3\n"; }
+BEGIN { $| = 1; print "1..5\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -37,6 +37,26 @@ my $testnum = 1;
         [Quality => 'SHQ'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 4: Extract information from OlympusE1.jpg
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/OlympusE1.jpg');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 5: Rewrite Olympus E1 image
+{
+    ++$testnum;
+    my @writeInfo = (
+        [LensSerialNumber => '012345678'],
+        [CoringFilter => 0],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/OlympusE1.jpg');
     print "ok $testnum\n";
 }
 

@@ -5,13 +5,16 @@
 #
 # Revisions:    11/25/2003 - P. Harvey Created
 #               02/10/2004 - P. Harvey Completely re-done
-#               02/16/2004 - W. Smith Updated (See specific tag comments)
+#               02/16/2004 - W. Smith Updated (see ref 3)
 #               11/10/2004 - P. Harvey Added support for Asahi cameras
-#               01/10/2005 - P. Harvey Added NikonLens with values from ref 3.
+#               01/10/2005 - P. Harvey Added NikonLens with values from ref 4
+#               03/30/2005 - P. Harvey Added new tags from ref 5
 #
 # References:   1) Image::MakerNotes::Pentax
 #               2) http://johnst.org/sw/exiftags/ (Asahi cameras)
-#               3) http://kobe1995.jp/~kaz/astro/istD.html
+#               3) Wayne Smith private communication (tests with Optio 550)
+#               4) http://kobe1995.jp/~kaz/astro/istD.html
+#               5) John Francis private communication (tests with ist-D/ist-DS)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Pentax;
@@ -20,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.15';
+$VERSION = '1.17';
 
 %Image::ExifTool::Pentax::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -60,6 +63,16 @@ $VERSION = '1.15';
         Groups => { 2 => 'Image' },
         Writable => 'int32u',
     },
+    0x0006 => { #5
+        Name => 'Date',
+        ValueConv => 'length($val)==4 ? sprintf("%.4d:%.2d:%.2d",Get16u(\$val,0),unpack("x2C2",$val)) : "Unknown ($val)"',
+        ValueConvInv => 'my @v=split /:/, $val;Set16u($v[0]) . pack("C2",$v[1],$v[2])',
+    },
+    0x0007 => { #5
+        Name => 'Time',
+        ValueConv => 'length($val)>=3 ? sprintf("%.2d:%.2d:%.2d",unpack("C3",$val)) : "Unknown ($val)"',
+        ValueConvInv => 'pack("C3",split(/:/,$val))',
+    },
     0x0008 => {
         Name => 'Quality',
         Description => 'Image Quality',
@@ -68,10 +81,11 @@ $VERSION = '1.15';
             0 => 'Good',
             1 => 'Better',
             2 => 'Best',
+            3 => 'TIFF', #5
+            4 => 'RAW', #5
         },
     },
-    # Recorded Pixels - W. Smith 16 FEB 04
-    0x0009 => {
+    0x0009 => { #3
         Name => 'PentaxImageSize',
         Groups => { 2 => 'Image' },
         Writable => 'int16u',
@@ -86,8 +100,7 @@ $VERSION = '1.15';
             '36 0' => '3008x2008',  #PH
         },
     },
-    # Picture Mode Tag - W. Smith 12 FEB 04
-    0x000b => {
+    0x000b => { #3
         Name => 'PictureMode',
         Writable => 'int16u',
         PrintConv => {
@@ -125,7 +138,7 @@ $VERSION = '1.15';
             6 => 100,
             9 => 200,
             12 => 400,
-            15 => 800,  # Not confirmed
+            15 => 800,
             18 => 1600, # Not confirmed
             21 => 3200, # Not Confirmed
             50 => 50, #PH
@@ -158,6 +171,14 @@ $VERSION = '1.15';
             3 => 'Fluorescent', #2
             4 => 'Tungsten',
             5 => 'Manual',
+        },
+    },
+    0x001a => { #5
+        Name => 'WhiteBalanceMode',
+        PrintConv => {
+            1 => 'Auto',
+            2 => 'Auto (2)',    # Observed in Optio-S file - PH
+            0xffff => 'User-Selected',
         },
     },
     # Would be nice if there was a general way to determine units for FocalLength.
@@ -229,6 +250,7 @@ $VERSION = '1.15';
             '2 0' => 'Hard',
         },
     },
+    0x0029 => 'FrameNumber', #5
     0x0039 => { #PH
         Name => 'RawImageSize',
         Writable => 'int16u',
@@ -239,7 +261,7 @@ $VERSION = '1.15';
         Name => 'LensType',
         Writable => 'int8u',
         Count => 2,
-        PrintConv => {  #3
+        PrintConv => {  #4
             '3 17' => 'smc PENTAX-FA SOFT 85mmF2.8',
             '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
             '3 19' => 'smc PENTAX-F 24-50mmF4',
@@ -328,6 +350,24 @@ $VERSION = '1.15';
             '4 45' => 'TAMRON 28-300mm F3.5-6.3 Ultra zoom XR',
         },
     },
+    0x0200 => {
+        Name => 'BlackPoint', #5
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x0201 => {
+        Name => 'WhitePoint', #5
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x0402 => { #5
+        Name => 'ToneCurve',
+        PrintConv => '\$val',
+    },
+    0x0403 => { #5
+        Name => 'ToneCurves',
+        PrintConv => '\$val',
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -408,6 +448,11 @@ require a pointer.
 =item http://kobe1995.jp/~kaz/astro/istD.html
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Wayne Smith and John Francis for help figuring out some Pentax
+tags.
 
 =head1 AUTHOR
 

@@ -1,5 +1,6 @@
-  ExifToolVersion = 4.54
+  ExifToolVersion = 4.92
   FileName = CanonRaw.crw
+  Directory = t
   FileSize = 6255
   FileType = Canon RAW
   + [Raw directory with 3 entries]

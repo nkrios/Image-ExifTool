@@ -5,7 +5,63 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-4.87.tar.gz">Version 4.87</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-4.93.tar.gz">Version 4.93</a>.<p>
+
+<b>Apr. 2/05 - Version 4.93</b>
+<ul>
+<li>Added IPTC XMP Core support
+<li>Added support for Kodak CX4200 plus other minor Kodak changes
+<li>Made Kodak maker notes writable
+<li>Minor changes to Olympus tag names and decoding
+<li>Split HTML TagNames documentation into separate files
+</ul>
+
+<b>Mar. 31/05 - Version 4.92</b>
+<ul>
+<li>Added support for Kodak and Ricoh cameras
+<li>Decode still more Olympus E-1/E-300 tags
+<li>Added 'Directory' tag
+<li>Decode a few more Pentax tags (thanks to John Francis)
+<li>Allow newlines in tag values on command line when writing
+<li>Fixed problem rewriting makernotes with sub directories (ie. Olympus)
+</ul>
+
+<b>Mar. 28/05 - Version 4.91</b>
+<ul>
+<li>Decode yet more Olympus E-1/E-300 tags
+<li>Changed decoding of Olympus E-300 Quality tag
+<li>Patched bug in Olympus maker notes that was causing ExifTool to report an
+    error when reading ORF files
+<li>Fixed problem where strings weren't being properly truncated at the null
+    terminator if there was a newline after the terminator
+<li>Improved decoding for some Nikon tags (credit Tom Christiansen)
+<li>Added Nikon shortcut
+<li>Added composite SubSecDateTimeOriginal tag
+<li>Fixed problem where CRW file without file extension wasn't being identified
+    properly
+<li>Fixed problem extracting thumbnail from some (specifically Olympus) images
+<li>Changed verbose output to always show original EXIF format
+<li>Skip over EXIF entries with unknown format instead of aborting (while
+    reading only)
+<li>Recognize TIFF field type 13
+</ul>
+
+<b>Mar. 24/05 - Version 4.90</b>
+<ul>
+<li>Extract Olympus PreviewImage, and decode a bunch more Olympus tags
+<li>Improvements to documentation
+</ul>
+
+<b>Mar. 23/05 - Version 4.89</b>
+<ul>
+<li>Decode subdirectories in Olympus maker notes (now much more information is
+    extracted for E-1 and E-300 cameras, although most is still unknown).
+</ul>
+
+<b>Mar. 22/05 - Version 4.88</b>
+<ul>
+<li>Convert exiftool help to POD format
+</ul>
 
 <b>Mar. 15/05 - Version 4.87</b> (production release)
 <ul>

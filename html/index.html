@@ -6,38 +6,44 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
 <h3>
-<a href="Image-ExifTool-4.87.tar.gz">
-Download        Version 4.87</a> - Mar. 15, 2005
+<a href="Image-ExifTool-4.93.tar.gz">
+Download        Version 4.93</a> - Apr. 2, 2005
 (<a href="history.html">Version History</a>)</h3>
 
-<p>ExifTool is a Perl module with an included application script that allow you
-to read and write meta information in image files.  It reads EXIF, GPS, IPTC,
-XMP, GeoTIFF, ICC Profile and Photoshop IRB meta information from JPG, JP2,
-TIFF, GIF, CRW, THM, CR2, MRW, NEF, PEF, ORF and DNG images.  ExifTool also
-extracts information from the maker notes of many digital cameras by various
-manufacturers including Canon, Casio, FujiFilm, Minolta/Konica-Minolta, Nikon,
-Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Sanyo and Sigma/Foveon.
+<p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
+<a href="exiftool_pod.html">command-line application</a> for reading and
+writing meta information in image files.  It reads EXIF, GPS, IPTC, XMP,
+GeoTIFF, ICC Profile and Photoshop IRB meta information from JPG, JP2, TIFF,
+GIF, CRW, THM, CR2, MRW, NEF, PEF, ORF and DNG images.  ExifTool also extracts
+information from the maker notes of many digital cameras by various
+manufacturers including Canon, Casio, FujiFilm, Kodak, Minolta/Konica-Minolta,
+Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and
+Sigma/Foveon.
 
-<p>ExifTool has the ability to write EXIF, GPS, IPTC, XMP and MakerNotes meta
-information to JPEG, TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG images.  When
-writing, ExifTool preserves the original file by adding "_original" to the file
-name.  You should keep a copy of the original, or thoroughly validate the new
-file before erasing the original.  <a href="writing.html">Read here</a> for some
+<p>ExifTool writes EXIF, GPS, IPTC, XMP and MakerNotes meta information to
+JPEG, TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG images.  When writing,
+ExifTool preserves the original file by adding "_original" to the file name.
+ You should keep a copy of the original, or thoroughly validate the new file
+before erasing the original.  <a href="writing.html">Read here</a> for some
 ramblings on the subject of writing meta information.
+
+<p>Drop me a note if you find ExifTool useful, or if you have any comments
+or suggestions.  My e-mail address is in the README file.  Thanks.
 
 <h2>Features</h2>
 <ul>
 <li>powerful, fast, and easy to use
 <li>reads EXIF, GPS, IPTC, XMP, MakerNotes, GeoTIFF, ICC Profile and Photoshop IRB records
 <li>writes EXIF, GPS, IPTC, XMP and MakerNotes information
-<li>reads and writes maker notes for many digital cameras
+<li>reads and writes maker notes of many digital cameras
+<li>transfers meta information between files with different formats
 <li>highly customizable, can extract exactly what you want
 <li>scans entire directory trees
 <li>easy to add support for new camera types by editing ExifTool modules
 <li>option to create text output file for each image file
 <li>extracts thumbnail images, preview images, and JPEG images embedded in RAW files
 <li>ability to organize output into groups
-<li>recognizes over <a href="TagNames.html">1000 different tags</a>
+<li>recognizes over <a href="TagNames/index.html">1000 different tags</a>
 </ul>
 
 <h2><font color='#cc0000'>Writer Limitations</font></h2>
@@ -52,21 +58,24 @@ images with other software.  So take care to verify the information you are
 writing.
 </ul>
 
-<h2>Running ExifTool</h2>
+<h2>Running exiftool</h2>
 
-Run 'exiftool' with no arguments to get a description and list of available
-options.
+The <a href="exiftool_pod.html">exiftool application</a> provides a convenient
+command-line interface for the <a href="ExifTool.html">Image::ExifTool</a> Perl
+module (both included in the distribution package). Once you have downloaded and
+extracted the ExifTool package, you can immediately run exiftool (even before it
+is built and installed) by typing "DIR/exiftool FILE", where DIR is the
+directory where exiftool was extracted, and FILE is the name of an image file.
 
-<p>Currently, ExifTool supports Asahi, Canon, Casio, Epson, Foveon,
-FujiFilm, Konica-Minolta, Leica, Minolta, Nikon, Olympus, Panasonic, Pentax,
-Sanyo and Sigma maker notes, but support for new types can easily be added
-by editing the ExifTool modules.  The ExifTool support modules are very
-readable, and the format for these files is documented in
-Image/ExifTool/README.  If you make any useful new additions, send me the
-details so I can add the functionality to the distributed version.
+<p>Many command-line options are available to give control over the output
+formatting and to allow reading or writing of specific information.  Run
+exiftool with no arguments for a <a href="exiftool_pod.html">description of
+exiftool, complete list of available options, and examples</a>.
 
-<p>Drop me a note if you find ExifTool useful, or if you have any comments
-or suggestions.  My e-mail address is in the README file.  Thanks.
+<p><b>Windows users:</b> You will need to install a perl interpreter to run
+ExifTool (a good, free Perl interpreter for Windows can be obtained from
+<a href="www.activeperl.com">activeperl.com</a>). <b>Everyone else:</b> Don't
+worry, you already have everything you need.
 
 <h2>Example Output</h2>
 
@@ -107,233 +116,21 @@ or suggestions.  My e-mail address is in the README file.  Thanks.
 </table>
 </blockquote>
 
-<h2>Command Line</h2>
+<h3>Verbose Output</h3>
 
-<pre>
-NAME
-    exiftool - print/modify meta information in image files
+The <a href="verbose.html">verbose option</a> (-v) prints additional information
+that is useful for debugging or when decoding new tags.
 
-SYNOPSIS
-    exiftool [OPTIONS] [-TAG[[+-&lt;]=[VALUE]] or --TAG...] FILE ...
+<h2><a href="TagNames/index.html">ExifTool Tag Names</a></h2>
 
-DESCRIPTION
-    Prints or writes information for specified tags from/to listed files. -TAG
-    specifies the name of a tag to extract or --TAG to ignore.  FILE may be an
-    image file name, a directory name, or - for the standard input. Supported
-    file types are JPG, JP2, TIFF, GIF, THM, CRW, CR2, MRW, NEF, PEF, ORF and
-    DNG.
+Tag names are entered on the command line with a leading '-' in the order
+you want them displayed. Case is not significant.  The tag name may be
+prefixed by a group name from family 0 or 1, separated by a colon, to
+specify a location for the information.
 
-    -TAG=VALUE sets the value of a tag, and -TAG= deletes a tag.  -TAG+=VALUE
-    adds a value to a list without replacing existing values, and -TAG-=VALUE
-    deletes a specific value from a list.  Use "-TAG&lt;=FILENAME" to set the value
-    of a tag from the contents of a file (the quotes prevent shell redirection).
-    The tag is written to all groups where it is valid if no group is specified.
-    A group is specified using -GROUP:TAG, where GROUP is any valid family 0 or
-    1 group name.  Special feature: -AllTagsFromFile=SRCFILE sets the value of
-    all writable tags from information in the specified source file.
+<blockquote>ie) "exiftool -filename -imagesize -exif:fnumber image.jpg"</blockquote>
 
-    Currently, EXIF, GPS, IPTC, XMP and MakerNotes tags may be written to JPG,
-    TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG files.  Be sure to verify that
-    the new file is OK before erasing the original (renamed to FILE_original).
-
-OPTIONS
-    -list   - list all valid tag names
-    -listw  - list all writable tag names
-    -group# - list all tag groups for family #
-    -ver    - print version number and exit
-    -a      - allow duplicate tag values (otherwise only last value displayed)
-    -b      - output requested data in binary format
-    -d FMT  - set date/time format (consult strftime manpage for FMT syntax)
-    -D|H    - show tag ID number in Decimal or Hexadecimal
-    -e      - print existing tags only -- don't calculate composite tags
-    -E      - escape characters in output values for HTML
-    -f      - force printing of tags even if their values are not found
-    -g[#]   - organize output by tag group (-g0 assumed if # not specified)
-    -G[#]   - same as -g but print group name for each tag
-    -h      - use HTML formatting for output (implies -E option)
-    -i DIR  - ignore specified directory names
-    -l      - long output (2-line Canon-style output)
-    -L      - convert Unicode characters to WinLatin1 instead of UTF8
-    -m      - ignore minor errors (allows writing if minor errors occur)
-    -n      - don't convert values for printing
-    -o FILE - output file or dir name for writing (otherwise edits input file)
-    -p FILE - print in format specified by file (ignores other format options)
-    -P      - preserve date/time of original file when writing
-    -r      - recursively scan subdirectories (only useful if "file" is a dir)
-    -s      - short format (add up to 3 -s options for even shorter formats)
-    -S      - print tag names instead of descriptions (same as two -s options)
-    -t      - output tab-delimited list of description/values (database import)
-    -u      - extract values of unknown tags (2 to extract from data blocks)
-    -U      - also extract unknown from data blocks (same as two -u options)
-    -v[#]   - <a href="verbose.html">verbose messages</a> (# may be 1-4, higher is more verbose)
-    -w EXT  - write console output to file with EXT extension for each image
-    -x TAG  - exclude specified tag (may be many -x options)
-    -z      - extract information from .gz and .bz2 compressed images
-</pre>
-
-<p>The -g and -G options organize tags into different families of groups based
-on the specified family number.  Currently, 3 families of groups are defined:
-
-<blockquote><table cellpadding=4 cellspacing=0 border=1>
-<tr><th>Family</th><th>Group Names</th></tr>
-<tr><td><b>0 (General Location)</b></td>
-<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile,
-IPTC, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
-<tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
-<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, KodakBordersIFD,
-KodakEffectsIFD, MakerUnknown, Minolta, Nikon, NikonPreview, Olympus, Panasonic,
-Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs,
-XMP-dc, XMP-exif, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ,
-XMP-xmpMM, XMP-xmpRights
-</td></tr>
-<tr><td><b>2&nbsp;(Category)</b></td>
-<td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
-</td></tr>
-</table></blockquote>
-
-<h2>Examples</h2>
-
-<h3>Reading:</h3>
-<blockquote>
-# print common EXIF information from "dir/a.jpg":
-<br><b>exiftool -common dir/a.jpg</b>
-
-<p># print all EXIF information from "dir/a.jpg" sorted by group (for group family 0):
-<br><b>exiftool -g dir/a.jpg</b>
-
-<p># print ImageSize and ExposureTime tags without colon separators:
-<br><b>exiftool -s -ImageSize -ExposureTime b.jpg</b>
-
-<p># print standard Canon information from 2 image files:
-<br><b>exiftool -l -canon c.jpg d.jpg</b>
-
-<p># save common EXIF information for each file in the "pictures" directory and all subdirectories
-into files with the same names as the images but with a ".txt" extension:
-<br><b>exiftool -r -w .txt -common pictures</b>
-
-<p># extract thumbnail image from "image.jpg" and save it to the file "thumbnail.jpg":
-<br><b>exiftool -b -ThumbnailImage image.jpg &gt;thumbnail.jpg</b>
-
-<p># recursively extract JPG from all Canon RAW files in the current directory,
-adding "_JFR.JPG" for the name of the output JPG files:
-<br><b>exiftool -b -JpgFromRaw -w _JFR.JPG -r .</b>
-
-<p># extract preview image from JPG write it to "preview.jpg" (this is the 1536x1024 review
-image for the Canon 300D):
-<br><b>exiftool -b -PreviewImage 118_1834.JPG &gt; preview.jpg</b>
-
-<p># print formatted date/time for all JPG files in a directory:
-<br><b>exiftool -d "%r %a, %B %e, %Y" -DateTimeOriginal -S -s *.jpg</b>
-
-<p># extract image resolution from IFD1:
-<br><b>exiftool -IFD1:XResolution -IFD1:YResolution</b>
-
-</blockquote>
-
-<h3>Writing:</h3>
-
-<blockquote>
-# set comment in file (replaces any existing comment):
-<br><b>exiftool -comment="This is a new comment" dst.jpg</b>
-
-<p># remove comment from all JPG files:
-<br><b>exiftool -comment= *.jpg</b>
-
-<p># replace existing keyword list with two new keywords (EXIF, editor):
-<br><b>exiftool -keywords=EXIF -keywords=editor dst.jpg</b>
-
-<p># add a keyword (word) to the current list of keywords:
-<br><b>exiftool -keywords+=word dst.jpg</b>
-
-<p># delete only the specified category (xxx) from all files in directory:
-<br><b>exiftool -category-=xxx dir</b>
-
-<p># set all writable tags from information in another file:
-<br><b>exiftool -AllTagsFromFile=src.crw dst.jpg</b>
-
-<p># set thumbnail image from specified file (note: quotes are neccessary):
-<br><b>exiftool "-ThumbnailImage&lt;=thumb.jpg" dst.jpg</b>
-
-<p># write a tag to the XMP group (otherwise it would get written to the
-IPTC group since the City tag exists in both, and IPTC has priority):
-<br><b>exiftool -xmp:city=Kingston dst.jpg</b>
-
-<p># set ISO only in Canon maker notes
-<br><b>exiftool -Canon:ISO=100 dst.jpg</b>
-
-<p># delete LightSource tag only if it is unknown with a value of 0:
-<br><b>exiftool -LightSource-="Unknown (0)" dst.tiff</b>
-
-<p># add DocumentName tag only if it didn't exist before
-<br><b>exiftool -DocumentName-= DocumentName='My Document' dst.jpg</b>
-
-<p># set WhiteBalance to Tungsten only if it was previously Auto
-<br><b>exiftool -whitebalance-=auto -WhiteBalance=tung dst.jpg</b>
-</blockquote>
-
-<h3>Piping:</h3>
-
-<blockquote>
-# extract information from stdin:
-<br><b>cat a.jpg | exiftool -</b>
-
-<p># add an IPTC keyword in a pipeline, saving output to a new file
-<br><b>cat a.jpg | exiftool -iptc:keywords+=fantastic - &gt; b.jpg</b>
-</blockquote>
-
-<h2>Print Format File Syntax (the -p option)</h2>
-The -p option specifies a file to use for formatting the printed output. Tag
-names in the file begin with a '$' symbol.  Tag names may be prefixed by 'GROUP:'
-just like on the command line (ie. '$IPTC:Keywords'). Lines beginning with
-'#' are ignored. For example, the following print format file
-
-<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-# this is a comment line
-File $FileName was created on $DateTimeOriginal
-(f/$Aperture, $ShutterSpeed sec, ISO $EXIF:ISO)
-</pre></td></tr></table></blockquote>
-
-produces output like this
-
-<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-File test.jpg was created on 2003:10:31 15:44:19
-(f/5.6, 1/60 sec, ISO 100)
-</pre></td></tr></table></blockquote>
-
-<h2>The Image::ExifTool Perl Library Module</h2>
-
-The 'exiftool' script is essentially just a command-line interface to the
-Image::ExifTool Perl library module which is part of the ExifTool distribution.
-The Image::ExifTool module can be used in any Perl script to provide easy access
-to meta information in images.  Here is an example a very simple script that uses
-Image::ExifTool to print out all recognized meta information in a file:
-
-<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-#!/usr/bin/perl -w
-use Image::ExifTool 'ImageInfo';
-my $file = shift or die "Please specify filename";
-my $info = ImageInfo($file);
-foreach (keys %$info) {
-    print "$_ : $info-&gt;{$_}\n";
-}
-</pre></td></tr></table></blockquote>
-
-Note that some tag values may be returned as SCALAR references indicating
-binary data.  The simple script above does not handle this case.
-
-<p>See the <a href="ExifTool.html">Image::ExifTool Documentation</a> for more details.
-
-<h2><a href="TagNames.html">ExifTool Tag Names</a></h2>
-
-Tag names are entered on the command line with a leading '-' in the order you
-want them displayed. Case is not significant.  The tag name may be prefixed by a
-group name and a colon to specify a location for the tag.
-
-<p>ie) "exiftool -filename -imagesize -exif:fnumber image.jpg"
-
-<p>A complete list of <a href="TagNames.html">ExifTool Tag Names</a>
+<p>A complete list of <a href="TagNames/index.html">ExifTool Tag Names</a>
 accompanies this documentation.  As well, current lists of available tag names
 and writable tag names may be obtained using the exiftool -list and -listw
 options.  But perhaps the easiest way to determine a tag name is to use the -S
@@ -370,6 +167,33 @@ In this example, MyShortcut is a shortcut for the CreateDate, ExposureTime
 and Aperture tags, and MyAlias is a shortcut for FocalLengthIn35mmFormat.
 
 <p>The current shortcuts may be listed with the -list option.
+
+<h2>Groups</h2>
+
+ExifTool classifies tags into groups in three different families. 
+These groups are:
+
+<blockquote><table cellpadding=4 cellspacing=0 border=1>
+<tr><th>Family</th><th>Group Names</th></tr>
+<tr><td><b>0 (General Location)</b></td>
+<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile,
+IPTC, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
+<tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
+<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
+FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
+ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
+Kodak, KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon,
+NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
+Sigma, Sony, SubIFD, XMP, XMP-IptcCore, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
+XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+</td></tr>
+<tr><td><b>2&nbsp;(Category)</b></td>
+<td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
+</td></tr>
+</table></blockquote>
+
+The exiftool output can be organized based on these groups using the -g or
+-G option.
 
 <h2>Writing Meta Information</h2>
 
@@ -424,13 +248,13 @@ whole argument if the '&lt;=' syntax is used (to prevent shell redirection).
 
 <h3>AllTagsFromFile</h3>
 
-A special option of ExifTool allows copying all tags from one file to another.
-The command-line syntax for doing this is "-AllTagsFromFile=SRCFILE".  This
-option is very simple, yet very powerful.  This option reads all information
-from SRCFILE and attempts to write each tag found to the destination file.
-Depending on the formats of the source and destination files, some of tags read
-may not be valid in the destination file, in which case they won't be written.
-No translation between similar tags with different names is done.
+A special ExifTool option allows copying all tags from one file to another.
+The command-line syntax for doing this is "-AllTagsFromFile SRCFILE".  This
+option is very simple, yet very powerful.  It reads all information from
+SRCFILE and attempts to write each tag found to the destination file.
+Depending on the formats of the source and destination files, some of tags
+read may not be valid in the destination file, in which case they aren't
+written. No translation between similar tags with different names is done.
 
 <h2>Deleting All Meta Information from an Image</h2>
 
@@ -438,10 +262,34 @@ ExifTool can be used to delete individual pieces of information, but if you
 want to remove ALL meta information from a JPEG image check out my
 <a href="http://owl.phy.queensu.ca/~phil/utils/">image utility scripts</a>.
 
+<h2>The Image::ExifTool Perl Library Module</h2>
+
+The 'exiftool' script is essentially just a command-line interface to the
+Image::ExifTool Perl library module which is part of the ExifTool distribution.
+The Image::ExifTool module can be used in any Perl script to provide easy access
+to meta information in images.  Here is an example a very simple script that uses
+Image::ExifTool to print out all recognized meta information in a file:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+#!/usr/bin/perl -w
+use Image::ExifTool 'ImageInfo';
+my $file = shift or die "Please specify filename";
+my $info = ImageInfo($file);
+foreach (keys %$info) {
+    print "$_ : $info-&gt;{$_}\n";
+}
+</pre></td></tr></table></blockquote>
+
+Note that some tag values may be returned as SCALAR references indicating
+binary data.  The simple script above does not handle this case.
+
+<p>See the <a href="ExifTool.html">Image::ExifTool Documentation</a> for more details.
+
 <h2>Addition Documentation</h2>
 <ul>
 <li><a href="history.html">ExifTool Revision History</a>
-<li><a href="TagNames.html">ExifTool Tag Names</a>
+<li><a href="exiftool_pod.html">exiftool Application Script</a>
+<li><a href="TagNames/index.html">ExifTool Tag Names</a>
 <li><a href="ExifTool.html">Image::ExifTool Module Documentation</a>
 <li><a href="writing.html">Comments on the Subject of Writing Meta Information</a>
 <li><a href="canon_raw.html">Canon RAW (CRW) File Format Specification</a>
@@ -500,6 +348,8 @@ And thanks to the following people for their help:
 <li>Christian Koller for decoding the 20D custom functions
 <li>Juha Eskelinen for figuring out the 20D FileNumber
 <li>Matt Madrid for his testing and feedback
+<li>Tom Christiansen for his help decoding some Nikon tags
+<li>Markku H&auml;nninen for help decoding tags for the Olympus E-1
 </ul>
 
 <hr>

@@ -116,6 +116,7 @@ ShutterSpeedValue : 0
 UserComment : 
 WhiteBalance (1) : Auto
 ---- File ----
+Directory : t
 FileName : ExifTool.jpg
 FileSize : 3KB
 FileType : JPEG

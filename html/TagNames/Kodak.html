@@ -1,0 +1,374 @@
+<html>
+<head>
+<title>Kodak Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='Kodak'>Kodak Tags</a></h2>
+
+Kodak maker notes are a real pain because they aren&apos;t in standard IFD format
+and change frequently with new models.  Some information has been decoded,
+but the Kodak support still needs a lot of work.
+
+<p>
+These tags used by a number of CX, DC, DX and LS models.
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>KodakModel</td>
+<td align='center'>string[8]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>9</td>
+<td>Compression</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>1 = Normal
+  <br>2 = High</font></td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>BurstMode</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td align='right'>11</td>
+<td>MacroMode</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>KodakImageWidth</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>KodakImageHeight</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>16</td>
+<td>Date</td>
+<td align='center'>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>20</td>
+<td>Time</td>
+<td align='center'>int8u[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>24</td>
+<td>BurstMode2?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>27</td>
+<td>ShutterMode</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto?
+  <br>32 = Manual?</font></td></tr>
+<tr valign='top'>
+<td align='right'>28</td>
+<td>MeteringMode</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Multi-pattern
+  <br>1 = Center-Weighted
+  <br>2 = Spot</font></td></tr>
+<tr valign='top'>
+<td align='right'>29</td>
+<td>SequenceNumber</td>
+<td align='center'>int8u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>30</td>
+<td>Aperture</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>32</td>
+<td>KodakExposure?</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>36</td>
+<td>ExposureBias</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>38</td>
+<td>VariousModes?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>40</td>
+<td>Distance1?</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>44</td>
+<td>Distance2?</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>48</td>
+<td>Distance3?</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>52</td>
+<td>Distance4?</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>56</td>
+<td>FocusMode</td>
+<td align='center'>int8u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>58</td>
+<td>VariousModes2?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>60</td>
+<td>PanoramaMode</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>62</td>
+<td>SubjectDistance</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>64</td>
+<td>WhiteBalance</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight?
+  <br>2 = Tungsten?
+  <br>3 = Fluorescent?</font></td></tr>
+<tr valign='top'>
+<td align='right'>92</td>
+<td>FlashMode</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = On
+  <br>2 = Off
+  <br>3 = Red-Eye</font></td></tr>
+<tr valign='top'>
+<td align='right'>93</td>
+<td>FlashFired</td>
+<td align='center'>int8u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>94</td>
+<td>ISOSetting</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>96</td>
+<td>ISOUsed</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>98</td>
+<td>TotalZoomFactor</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>100</td>
+<td>DateTimeStamp</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>102</td>
+<td>ColorMode</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>104</td>
+<td>DigitalZoomFactor</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>107</td>
+<td>Sharpness</td>
+<td align='center'>int8s</td>
+<td><font size='-1'>-1 = Soft
+  <br>0 = Normal
+  <br>1 = Sharp</font></td></tr>
+</table></blockquote>
+
+<h2><a name='Type2'>Kodak Type2 Tags</a></h2>
+
+These tags used by the DC265 and DC290.
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>KodakMaker</td>
+<td align='center'>string[32]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>40</td>
+<td>KodakModel</td>
+<td align='center'>string[32]</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='Type3'>Kodak Type3 Tags</a></h2>
+
+These tags used by the DC280, DC3400 and DC5000.
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>Date</td>
+<td align='center'>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>16</td>
+<td>Time</td>
+<td align='center'>int8u[4]</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='Type4'>Kodak Type4 Tags</a></h2>
+
+These tags used by the DC200.
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>32</td>
+<td>OriginalFileName</td>
+<td align='center'>string[12]</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='Type5'>Kodak Type5 Tags</a></h2>
+
+These tags used by the CX4200.
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>26</td>
+<td>WhiteBalance</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0x1 = Daylight
+  <br>0x2 = Flash
+  <br>0x3 = Tungsten</font></td></tr>
+<tr valign='top'>
+<td align='right'>30</td>
+<td>ISOUsed</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>32</td>
+<td>TotalZoomFactor</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>34</td>
+<td>DigitalZoomFactor</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>39</td>
+<td>FlashMode</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = On
+  <br>2 = Off
+  <br>3 = Red-Eye</font></td></tr>
+<tr valign='top'>
+<td align='right'>42</td>
+<td>ImageRotated</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+<tr valign='top'>
+<td align='right'>43</td>
+<td>Macro</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = On
+  <br>1 = Off</font></td></tr>
+</table></blockquote>
+
+<h2><a name='Unknown'>Kodak Unknown Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+</table></blockquote>
+
+<h2><a name='SpecialEffects'>Kodak SpecialEffects Tags</a></h2>
+
+The Kodak SpecialEffects and Borders tags are found in sub-IFD&apos;s within
+the Kodak &quot;Meta&quot; JPEG APP3 segment.
+
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>DigitalEffectsVersion</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>DigitalEffectsName</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>DigitalEffectsType</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='Borders'>Kodak Borders Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>BordersVersion</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>BorderName</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>BorderID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>BorderLocation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>BorderType</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>WatermarkType</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Apr 2, 2005</i>
+</body>
+</html>

@@ -293,6 +293,7 @@ sub ProcessExifUUID($$$)
     my $dataPt = $$dirInfo{DataPt};
     # get the data block (into a common variable)
     $exifTool->{EXIF_DATA} = substr($$dataPt, 16);
+    $exifTool->{EXIF_POS} = 0;  # must set this properly if any data requires it
     # extract the EXIF information (it is in standard TIFF format)
     my $success = $exifTool->TiffInfo('JP2');
     SetByteOrder('MM'); # return byte order to big-endian
@@ -431,6 +432,13 @@ This module is used by Image::ExifTool
 
 This module contains routines required by Image::ExifTool to read JPEG 2000
 files.
+
+=head1 NOTES
+
+The JPEG 2000 code should be considered experimental, because I haven't
+found many JPEG 2000 images to test it on.  If you have any images that
+aren't decoded properly, please send them to me so I can improve the JPEG
+2000 support.  Thanks.
 
 =head1 AUTHOR
 

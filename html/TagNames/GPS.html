@@ -1,0 +1,194 @@
+<html>
+<head>
+<title>GPS Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='GPS'>GPS Tags</a></h2>
+
+ExifTool is very flexible about the input format for lat/long coordinates,
+and will accept 3 floating point numbers separated by just about anything.
+Many other GPS tags have values which are fixed-length strings.  For these,
+the indicated string lengths include a null terminator which is added
+automatically by ExifTool.
+
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>GPSVersionID</td>
+<td align='center'>int8u[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>GPSLatitudeRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;N&apos; = North
+  <br>&apos;S&apos; = South</font></td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>GPSLatitude</td>
+<td align='center'>rational32u[3]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>GPSLongitudeRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;E&apos; = East
+  <br>&apos;W&apos; = West</font></td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>GPSLongitude</td>
+<td align='center'>rational32u[3]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0005</td>
+<td>GPSAltitudeRef</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Above Sea Level
+  <br>1 = Below Sea Level</font></td></tr>
+<tr valign='top'>
+<td>0x0006</td>
+<td>GPSAltitude</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0007</td>
+<td>GPSTimeStamp</td>
+<td align='center'>rational32u[3]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>GPSSatellites</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0009</td>
+<td>GPSStatus</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;A&apos; = Measurement In Progress
+  <br>&apos;V&apos; = Measurement Interoperability</font></td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>GPSMeasureMode</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>2 = 2-Dimensional Measurement
+  <br>3 = 3-Dimensional Measurement</font></td></tr>
+<tr valign='top'>
+<td>0x000b</td>
+<td>GPSDOP</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x000c</td>
+<td>GPSSpeedRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;K&apos; = km/h
+  <br>&apos;M&apos; = mph
+  <br>&apos;N&apos; = knots</font></td></tr>
+<tr valign='top'>
+<td>0x000d</td>
+<td>GPSSpeed</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x000e</td>
+<td>GPSTrackRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;M&apos; = Magnetic North
+  <br>&apos;T&apos; = True North</font></td></tr>
+<tr valign='top'>
+<td>0x000f</td>
+<td>GPSTrack</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0010</td>
+<td>GPSImgDirectionRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;M&apos; = Magnetic North
+  <br>&apos;T&apos; = True North</font></td></tr>
+<tr valign='top'>
+<td>0x0011</td>
+<td>GPSImgDirection</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0012</td>
+<td>GPSMapDatum</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0013</td>
+<td>GPSDestLatitudeRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;N&apos; = North
+  <br>&apos;S&apos; = South</font></td></tr>
+<tr valign='top'>
+<td>0x0014</td>
+<td>GPSDestLatitude</td>
+<td align='center'>rational32u[3]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0015</td>
+<td>GPSDestLongitudeRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;E&apos; = East
+  <br>&apos;W&apos; = West</font></td></tr>
+<tr valign='top'>
+<td>0x0016</td>
+<td>GPSDestLongitude</td>
+<td align='center'>rational32u[3]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0017</td>
+<td>GPSDestBearingRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;M&apos; = Magnetic North
+  <br>&apos;T&apos; = True North</font></td></tr>
+<tr valign='top'>
+<td>0x0018</td>
+<td>GPSDestBearing</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0019</td>
+<td>GPSDestDistanceRef</td>
+<td align='center'>string[2]</td>
+<td><font size='-1'>&apos;K&apos; = Kilometers
+  <br>&apos;M&apos; = Miles
+  <br>&apos;N&apos; = Nautical Miles</font></td></tr>
+<tr valign='top'>
+<td>0x001a</td>
+<td>GPSDestDistance</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x001b</td>
+<td>GPSProcessingMethod</td>
+<td align='center'>undef</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x001c</td>
+<td>GPSAreaInformation</td>
+<td align='center'>undef</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x001d</td>
+<td>GPSDateStamp</td>
+<td align='center'>string[11]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x001e</td>
+<td>GPSDifferential</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = No Correction
+  <br>1 = Differential Corrected</font></td></tr>
+</table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Apr 2, 2005</i>
+</body>
+</html>

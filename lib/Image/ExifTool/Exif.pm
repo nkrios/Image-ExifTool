@@ -18,6 +18,7 @@
 #               7) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 #               8) http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
 #               9) http://hul.harvard.edu/jhove/tiff-tags.html
+#              10) http://partners.adobe.com/public/developer/en/tiff/TIFFPM6.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -28,7 +29,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.50';
+$VERSION = '1.53';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -37,13 +38,13 @@ sub RebuildMakerNotes($$$);
 sub Rationalize($;$);
 
 # byte sizes for the various EXIF format types below
-@formatSize = (0,1,1,2,4,8,1,1,2,4,8,4,8);
+@formatSize = (0,1,1,2,4,8,1,1,2,4,8,4,8,4);
 
 @formatName = (
     'err','int8u','string','int16u',
     'int32u','rational32u','int8s','undef',
     'int16s','int32s','rational32s','float',
-    'double'
+    'double', 'ifd'
 );
 
 # hash to look up EXIF format numbers by name
@@ -62,6 +63,7 @@ sub Rationalize($;$);
     'rational32s'   => 10,  # SRATIONAL
     'float'         => 11,  # FLOAT
     'double'        => 12,  # DOUBLE
+    'ifd'           => 13,  # IFD (with int32u format)
 );
 
 # EXIF LightSource PrintConv values
@@ -432,7 +434,7 @@ sub Rationalize($;$);
         Name => 'JPEGTables',
         ValueConv => '\$val',
     },
-    0x15f => { #3
+    0x15f => { #10
         Name => 'OPIProxy',
         PrintConv => {
             0 => 'Higher resolution image does not exist',
@@ -617,7 +619,7 @@ sub Rationalize($;$);
     0x1000 => 'RelatedImageFileFormat',
     0x1001 => 'RelatedImageWidth',
     0x1002 => 'RelatedImageLength',
-    0x800d => 'ImageID',
+    0x800d => 'ImageID', #10
     0x80a4 => 'WangAnnotation',
     0x80e3 => 'Matteing', #9
     0x80e4 => 'DataType', #9
@@ -773,7 +775,7 @@ sub Rationalize($;$);
     },
     0x9101 => {
         Name => 'ComponentsConfiguration',
-        PrintConv => '$_=$val;s/\0.*//;tr/\x01-\x06/YbrRGB/;s/b/Cb/g;s/r/Cr/g;$_',
+        PrintConv => '$_=$val;s/\0.*//s;tr/\x01-\x06/YbrRGB/;s/b/Cb/g;s/r/Cr/g;$_',
     },
     0x9102 => 'CompressedBitsPerPixel',
     0x9201 => {
@@ -1129,7 +1131,7 @@ sub Rationalize($;$);
     # 0xc350 thru 0xc41a plus 0xc46c,0xc46e are Kodak APP3 tags (ref 8)
     0xc350 => {
         Name => 'FilmProductCode',
-        Notes => 'tags 0xc350-0xc41a, 0xc46c, 0xc46e are Kodak APP3 Meta tags',
+        Notes => 'tags 0xc350-0xc41a, 0xc46c, 0xc46e are Kodak APP3 "Meta" tags',
     },
     0xc351 => 'ImageSourceEK',
     0xc352 => 'CaptureConditionsPAR',
@@ -1373,7 +1375,7 @@ sub Rationalize($;$);
             1 => 'ThumbnailLength',
         },
         # retrieve the thumbnail from our EXIF data
-        ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"ThumbnailImage",$dataPt)',
+        ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"ThumbnailImage")',
         ValueConvInv => '$val',
     },
     PreviewImage => {
@@ -1420,6 +1422,15 @@ sub Rationalize($;$);
             }
             return undef;       # don't generate a tag value
         },
+    },
+    SubSecDateTimeOriginal => {
+        Description => 'Shooting Date/Time',
+        Require => {
+            0 => 'DateTimeOriginal',
+            1 => 'SubSecTimeOriginal',
+        },
+        # be careful here in case there is a timezone following the seconds
+        ValueConv => '$_=$val[0];s/(.*:\d{2})/$1\.$val[1]/;$_',
     },
 );
 
@@ -1504,7 +1515,7 @@ sub ConvertExifText($$)
         $str = $exifTool->Unicode2Byte($str);
     } else {
         # assume everything else is ASCII (Don't convert JIS... yet)
-        $str =~ s/\0.*//;   # truncate at null terminator
+        $str =~ s/\0.*//s;   # truncate at null terminator
     }
     return $str;
 }
@@ -1622,18 +1633,20 @@ sub DecodeBits($$)
 
 #------------------------------------------------------------------------------
 # extract image from file
-# Inputs: 0) ExifTool object reference, 1) data offset, 2) data length
-#         3) [optional] tag name, 4) Optional data pointer
+# Inputs: 0) ExifTool object reference, 1) data offset (in file), 2) data length
+#         3) [optional] tag name
 # Returns: Reference to Image if specifically requested or "Binary data" message
 #          Returns undef if there was an error loading the image
-sub ExtractImage($$$$;$)
+sub ExtractImage($$$$)
 {
-    my ($exifTool, $offset, $len, $tag, $dataPt) = @_;
-
+    my ($exifTool, $offset, $len, $tag) = @_;
+    my $dataPt = \$exifTool->{EXIF_DATA};
+    my $dataPos = $exifTool->{EXIF_POS};
     my $image;
 
-    if ($dataPt and $offset+$len < length($$dataPt)) {
-        $image = substr($$dataPt, $offset, $len);
+    # take data from EXIF block if possible
+    if (defined $dataPos and $offset>$dataPos and $offset+$len<$dataPos+length($$dataPt)) {
+        $image = substr($$dataPt, $offset-$dataPos, $len);
     } else {
         $image = $exifTool->ExtractBinary($offset, $len, $tag);
         if (defined $image) {
@@ -1679,8 +1692,24 @@ sub ProcessExif($$$)
     } elsif ($dirInfo->{DirName} eq 'MakerNotes') {
         $warnOutside = 1;
     }
-    # read IFD from file if necessary
+    my ($numEntries, $dirEnd, $readFromFile);
     if ($dirStart < 0 or $dirStart > $dataLen-2) {
+        $readFromFile = 1;
+    } else {
+        # make sure data is large enough (patches bug in Olympus subdirectory lengths)
+        $numEntries = Get16u($dataPt, $dirStart);
+        my $dirSize = 2 + 12 * $numEntries;
+        $dirEnd = $dirStart + $dirSize;
+        if ($dirSize > $dirLen) {
+            if ($dirLen > 4 and $verbose) {
+                my $short = $dirSize - $dirLen;
+                $exifTool->Warn("Short directory size (missing $short bytes)");
+            }
+            $readFromFile = 1 if $dirEnd > $dataLen;
+        }
+    }
+    # read IFD from file if necessary
+    if ($readFromFile) {
         $success = 0;
         if ($raf) {
             # read the count of entries in this IFD
@@ -1708,12 +1737,10 @@ sub ProcessExif($$$)
             $exifTool->Warn("Bad $$dirInfo{DirName} directory");
             return 0;
         }
+        $numEntries = Get16u($dataPt, $dirStart);
+        $dirEnd = $dirStart + 2 + 12 * $numEntries;
     }
-
-    my $numEntries = Get16u($dataPt, $dirStart);
-
     $verbose and $exifTool->VerboseDir($dirInfo->{DirName}, $numEntries);
-    my $dirEnd = $dirStart + 2 + 12 * $numEntries;
     my $bytesFromEnd = $dataLen - $dirEnd;
     if ($bytesFromEnd < 4) {
         unless ($bytesFromEnd==2 or $bytesFromEnd==0) {
@@ -1729,11 +1756,12 @@ sub ProcessExif($$$)
         my $tagID = Get16u($dataPt, $entry);
         my $format = Get16u($dataPt, $entry+2);
         my $count = Get32u($dataPt, $entry+4);
-        if ($format < 1 or $format > 12) {
+        if ($format < 1 or $format > 13) {
             # warn unless the IFD was just padded with zeros
-            $format and $exifTool->Warn("Bad EXIF directory entry format ($format)");
-            return 0 unless $index; # no success if this is our first entry
-            last;   # stop now because this IFD could be corrupt
+            $format and $exifTool->Warn(
+                sprintf("Unknown format ($format) for $$dirInfo{DirName} tag 0x%x",$tagID));
+            return 0 unless $index; # assume corrupted IFD if this is our first entry
+            next;   # stop now because this IFD could be corrupt
         }
         my $size = $count * $formatSize[$format];
         my $valueDataPt = $dataPt;
@@ -1769,6 +1797,11 @@ sub ProcessExif($$$)
                 $exifTool->{MAKER_NOTE_WARN} = 1;
                 undef $warnOutside;
             }
+            # save maker note header
+            if ($tagID == 0x927c and $tagTablePtr eq \%Image::ExifTool::Exif::Main) {
+                my $hdrLen = $size < 48 ? $size : 48;
+                $exifTool->{MAKER_NOTE_HEADER} = substr($$valueDataPt, $valuePtr, $hdrLen);
+            }
         }
         my $formatStr = $formatName[$format];   # get name of this format
         # treat single unknown byte as int8u
@@ -1800,12 +1833,14 @@ sub ProcessExif($$$)
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
         next unless $tagInfo or $verbose;
         # override EXIF format if specified
+        my $origFormStr;
         if ($tagInfo) {
             if ($$tagInfo{Format}) {
                 $formatStr = $$tagInfo{Format};
                 # must adjust number of items for new format size
                 my $newNum = $formatNumber{$$tagInfo{Format}};
                 if ($newNum) {
+                    $origFormStr = $formatName[$format] . '[' . $count . ']';
                     $format = $newNum;
                     $count = $size / $formatSize[$format];
                 }
@@ -1817,6 +1852,8 @@ sub ProcessExif($$$)
         $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$size);
 
         if ($verbose) {
+            my $fstr = $formatName[$format];
+            $origFormStr and $fstr = "$origFormStr read as $fstr";
             $exifTool->VerboseInfo($tagID, $tagInfo,
                 Table  => $tagTablePtr,
                 Index  => $index,
@@ -1824,7 +1861,7 @@ sub ProcessExif($$$)
                 DataPt => $valueDataPt,
                 Size   => $size,
                 Start  => $valuePtr,
-                Format => $formatName[$format],
+                Format => $fstr,
                 Count  => $count,
             );
             next unless $tagInfo;
@@ -2078,6 +2115,8 @@ it under the same terms as Perl itself.
 =over 4
 
 =item http://partners.adobe.com/asn/developer/pdfs/tn/TIFF6.pdf
+
+=item http://partners.adobe.com/public/developer/en/tiff/TIFFPM6.pdf
 
 =item http://www.adobe.com/products/dng/pdfs/dng_spec.pdf
 

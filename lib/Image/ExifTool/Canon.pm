@@ -561,7 +561,7 @@ $VERSION = '1.12';
     },
     21 => {
         Name => 'FNumber',
-        Description => 'Aperture Value',
+        Description => 'Aperture',
         # approximate big translation table by simple calculation - PH
         ValueConv => '$val ? exp(Image::ExifTool::Canon::CanonEv($val)*log(2)/2) : undef()',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(log($val)*2/log(2))',
@@ -775,7 +775,6 @@ $VERSION = '1.12';
 );
 
 # canon composite tags
-# (the main script looks for the special 'Composite' hash)
 %Image::ExifTool::Canon::Composite = (
     GROUPS => { 2 => 'Camera' },
     DriveMode => {

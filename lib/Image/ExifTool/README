@@ -13,9 +13,9 @@ the case of a BinaryData table, the IDs are numerical and specify offsets into
 the binary data block.  The corresponding hash value provides information about
 the tag (explained later).
 
-Eleven special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
-INCREMENT, FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID and WRITABLE) are
-used to provide additional information about a table.  The special keys have
+Twelve special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
+INCREMENT, FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE and NOTES)
+are used to provide additional information about a table.  The special keys have
 names that are all capitalized to avoid possible conflicts with tag keys.  Below
 is an explanation of the meaning of each special key:
 
@@ -99,6 +99,8 @@ is an explanation of the meaning of each special key:
 
   WRITABLE : Indicates that all tags in this table are writable.  This is the
   same as setting the Writable flag for each individual tag in the table.
+
+  NOTES : Notes for TagNames documentation.
 
 The remaining entries in a tag table are the EXIF tags with their associated
 information.  The information may exist in one of three forms:  1) A simple
@@ -188,6 +190,9 @@ conditions.  The following is a description of possible hash entries:
                   MakerNotes tags are permanent unless otherwise specified.
 
                   'Avoid' - avoid creating this tag if possible.
+                  
+                  'Unknown' - this is an unknown tag (only extracted when the
+                  Unknown option is set.
 
   ValueConv     : [optional] Used to convert the raw data value to a useable
                   form.  May be either a hash reference to act as a lookup table
@@ -195,8 +200,7 @@ conditions.  The following is a description of possible hash entries:
                   reference is used and the raw value doesn't appear as one of
                   the keys, then the converted value is set to "Unknown (X)",
                   where X is the raw value.  In an expression, $val is the raw
-                  value, $dataPt may be used to access the original EXIF data
-                  block, and $self is a reference to the current ExifTool
+                  value, and $self is a reference to the current ExifTool
                   object.  When evaluated, the expression may return either a
                   scalar representing the a printable value, or a scalar
                   reference to the value if it is not printable (as with a
@@ -235,6 +239,9 @@ conditions.  The following is a description of possible hash entries:
                   specified by the Require keys, and can be used in a ValueConv
                   or PrintConv expression.  The composite value is only
                   calculated if the values for all Require'd tags are defined.
+                  Require and Desire tag names may be prefixed by an optional
+                  group family 0 or 1 name followed by a colon.  Case is
+                  significant.
 
   Desire        : [Composite tables only] This is the same as Require except
                   that the value is still calculated even if the specified tags

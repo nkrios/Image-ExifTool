@@ -1,5 +1,6 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.93
 [File, File, Image]  - File Name: Casio_4_failed.jpg
+[File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
@@ -46,18 +47,18 @@
 [MakerNotes, Casio, Camera] 5 - Flash Intensity: Normal
 [MakerNotes, Casio, Camera] 6 - Object Distance: 2500
 [MakerNotes, Casio, Camera] 7 - White Balance: Auto
-[MakerNotes, Casio, Camera] 8 - Casio Type 1 0x0008: 1
-[MakerNotes, Casio, Camera] 9 - Casio Type 1 0x0009: 1
+[MakerNotes, Casio, Camera] 8 - Casio 0x0008: 1
+[MakerNotes, Casio, Camera] 9 - Casio 0x0009: 1
 [MakerNotes, Casio, Camera] 10 - Digital Zoom: Off
 [MakerNotes, Casio, Camera] 11 - Sharpness: Normal
 [MakerNotes, Casio, Camera] 12 - Contrast: Normal
 [MakerNotes, Casio, Camera] 13 - Saturation: Normal
-[MakerNotes, Casio, Camera] 14 - Casio Type 1 0x000e: 0
-[MakerNotes, Casio, Camera] 15 - Casio Type 1 0x000f: 0
-[MakerNotes, Casio, Camera] 16 - Casio Type 1 0x0010: 0
-[MakerNotes, Casio, Camera] 17 - Casio Type 1 0x0011: 8126553
-[MakerNotes, Casio, Camera] 18 - Casio Type 1 0x0012: 16
-[MakerNotes, Casio, Camera] 19 - Casio Type 1 0x0013: 16
+[MakerNotes, Casio, Camera] 14 - Casio 0x000e: 0
+[MakerNotes, Casio, Camera] 15 - Casio 0x000f: 0
+[MakerNotes, Casio, Camera] 16 - Casio 0x0010: 0
+[MakerNotes, Casio, Camera] 17 - Casio 0x0011: 8126553
+[MakerNotes, Casio, Camera] 18 - Casio 0x0012: 16
+[MakerNotes, Casio, Camera] 19 - Casio 0x0013: 16
 [MakerNotes, Casio, Camera] 20 - CCD Sensitivity: Normal
 [Composite, Composite, Image]  - Aperture: 2.0
 [Composite, Composite, Camera]  - Flash: Off

@@ -17,7 +17,7 @@ use vars qw($VERSION);
 
 $VERSION = '1.07';
 
-%Image::ExifTool::Casio::Type1 = (
+%Image::ExifTool::Casio::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,

@@ -7,6 +7,7 @@
 #               09/15/2004 - P. Harvey Added D70Boring from Greg Troxel
 #               01/11/2005 - P. Harvey Added Canon20D from Christian Koller
 #               03/03/2005 - P. Harvey Added user defined shortcuts
+#               03/26/2005 - P. Harvey Added Nikon from Tom Christiansen
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Shortcuts;
@@ -14,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -100,6 +101,36 @@ $VERSION = '1.04';
         'DriveMode',
         'OwnerName',
         'SerialNumber',
+    ],
+    Nikon => [
+        'Model',
+        'SubSecDateTimeOriginal',
+        'ShutterCount',
+        'LensSpec',
+        'FocalLength',
+        'ImageSize',
+        'ShutterSpeed',
+        'Aperture',
+        'ISO',
+        'NoiseReduction',
+        'ExposureProgram',
+        'ExposureCompensation',
+        'WhiteBalance',
+        'WhiteBalanceFineTune',
+        'ShootingMode',
+        'Quality',
+        'MeteringMode',
+        'FocusMode',
+        'ImageOptimization',
+        'ToneComp',
+        'ColorHue',
+        'ColorSpace',
+        'HueAdjustment',
+        'Saturation',
+        'Sharpness',
+        'Flash',
+        'FlashMode',
+        'FlashExposureComp',
     ],
     # This shortcut intends to remove tags which contain no useful
     #  information given that the file was created with a Nikon D70.

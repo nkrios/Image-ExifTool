@@ -449,6 +449,7 @@ sub SetNewValuesFromFile($$)
     $opts->{IgnoreMinorErrors} = $self->Options('IgnoreMinorErrors');
     my $info = $srcExifTool->ImageInfo($srcFile, $opts);
     $self->{MAKER_NOTE_POS} = $srcExifTool->{MAKER_NOTE_POS};
+    $self->{MAKER_NOTE_HEADER} = $srcExifTool->{MAKER_NOTE_HEADER};
     # sort tags in reverse order so we get priority tag last
     my @tags = reverse sort keys %$info;
     my $tag;
@@ -885,13 +886,13 @@ sub GetWriteGroup($)
 #          (or first new value hash in linked list if write group not specified)
 sub GetNewValueHash($$;$$)
 {
-    my ($exifTool, $tagInfo, $writeGroup, $opts) = @_;
+    my ($self, $tagInfo, $writeGroup, $opts) = @_;
     $writeGroup = '' unless defined $writeGroup;
     $opts = '' unless defined $opts;
-    my $newValueHash = $exifTool->{NEW_VALUE}->{$tagInfo};
+    my $newValueHash = $self->{NEW_VALUE}->{$tagInfo};
     if (not defined $newValueHash) {
         if ($opts eq 'create') {
-            $newValueHash = $exifTool->{NEW_VALUE}->{$tagInfo} = {
+            $newValueHash = $self->{NEW_VALUE}->{$tagInfo} = {
                 TagInfo => $tagInfo,
                 WriteGroup => $writeGroup,
             };
@@ -919,13 +920,13 @@ sub GetNewValueHash($$;$$)
         }
     }
     if (defined $newValueHash and $opts eq 'delete') {
-        my $firstHash = $exifTool->{NEW_VALUE}->{$tagInfo};
+        my $firstHash = $self->{NEW_VALUE}->{$tagInfo};
         if ($newValueHash eq $firstHash) {
             # remove first entry from linked list
             if ($newValueHash->{Next}) {
-                $exifTool->{NEW_VALUE}->{$tagInfo} = $newValueHash->{Next};
+                $self->{NEW_VALUE}->{$tagInfo} = $newValueHash->{Next};
             } else {
-                delete $exifTool->{NEW_VALUE}->{$tagInfo};
+                delete $self->{NEW_VALUE}->{$tagInfo};
             }
         } else {
             # find the list element pointing to this hash
@@ -1341,7 +1342,7 @@ sub Unicode2Latin($$)
     }
     # repack as a Latin string
     my $outVal = pack('C*',@uni);
-    $outVal =~ s/\0.*//;    # truncate at null terminator
+    $outVal =~ s/\0.*//s;    # truncate at null terminator
     return $outVal;
 }
 
@@ -1379,7 +1380,7 @@ sub Unicode2UTF8($$)
     my $outVal;
     # repack as a UTF8 string
     $outVal = pack('C0U*',unpack("$fmt*",$val));
-    $outVal =~ s/\0.*//;    # truncate at null terminator
+    $outVal =~ s/\0.*//s;    # truncate at null terminator
     return $outVal;
 }
 
@@ -1402,10 +1403,10 @@ sub UTF82Unicode($$)
 # Returns: 8-bit character string
 my %unpackShort = ( 'II' => 'v', 'MM' => 'n' );
 sub Unicode2Byte($$;$) {
-    my ($exifTool, $val, $byteOrder) = @_;
+    my ($self, $val, $byteOrder) = @_;
     my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
     # convert to Latin if specified or if no UTF8 support in this Perl version
-    if ($exifTool->Options('Charset') eq 'Latin' or $] < 5.006001) {
+    if ($self->Options('Charset') eq 'Latin' or $] < 5.006001) {
         return Unicode2Latin($val, $fmt);
     } else {
         return Unicode2UTF8($val, $fmt);
@@ -1418,9 +1419,9 @@ sub Unicode2Byte($$;$) {
 # Returns: 16-bit unicode character string (in specified byte order)
 sub Byte2Unicode($$;$)
 {
-    my ($exifTool, $val, $byteOrder) = @_;
+    my ($self, $val, $byteOrder) = @_;
     my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
-    if ($exifTool->Options('Charset') eq 'Latin' or $] < 5.006001) {
+    if ($self->Options('Charset') eq 'Latin' or $] < 5.006001) {
         return Latin2Unicode($val, $fmt);
     } else {
         return UTF82Unicode($val, $fmt);
@@ -1525,6 +1526,7 @@ my %writeValueProc = (
     rational32s => \&SetRational32s,
     rational32u => \&SetRational32u,
     float => \&SetFloat,
+    ifd => \&Set32u,
 );
 #------------------------------------------------------------------------------
 # write binary data value (with current byte ordering)
@@ -1820,8 +1822,8 @@ sub WriteJPEG($$)
                 $doneDir{COM} = 1;
                 my $tagInfo = $Image::ExifTool::extraTags{Comment};
                 my $oldComment = $markerName eq 'COM' ? $$segDataPt : '';
-                $oldComment =~ s/\0.*//;
-                $markerName eq 'COM' and ($oldComment = $$segDataPt) =~ s/\0.*//;
+                $oldComment =~ s/\0.*//s;
+                $markerName eq 'COM' and ($oldComment = $$segDataPt) =~ s/\0.*//s;
                 my $newValueHash = $self->GetNewValueHash($tagInfo);
                 unless (IsOverwriting($newValueHash)) {
                     delete $$editDirs{COM}; # we aren't editing COM after all
@@ -1907,6 +1909,7 @@ sub WriteJPEG($$)
                     last unless $$editDirs{IFD0} or $$editDirs{IFD1};
                     # save the EXIF data block into a common variable
                     $self->{EXIF_DATA} = substr($$segDataPt, 6);
+                    $self->{EXIF_POS} = $segPos + 6;
                     # write new EXIF data to memory
                     $$segDataPt = $exifAPP1hdr; # start with EXIF APP1 header
                     # rewrite as if this were a TIFF file in memory
@@ -2102,10 +2105,14 @@ sub CheckValue($$;$)
     my ($valPtr, $format, $count) = @_;
     my (@vals, $n);
 
-    if ($format eq 'string') {
+    if ($format eq 'string' or $format eq 'undef') {
         return undef unless $count;
         my $len = length($$valPtr);
-        $len >= $count and return 'String too long';
+        if ($format eq 'string') {
+            $len >= $count and return 'String too long';
+        } else {
+            $len > $count and return 'Data too long';
+        }
         if ($len < $count) {
             $$valPtr .= "\0" x ($count - $len);
         }
@@ -2173,8 +2180,8 @@ sub CheckBinaryData($$$)
 # Returns: Binary data block or undefined on error
 sub WriteBinaryData($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    $exifTool or return 1;    # allow dummy access to autoload this package
+    my ($self, $tagTablePtr, $dirInfo) = @_;
+    $self or return 1;    # allow dummy access to autoload this package
 
     # get default format ('int8u' unless specified)
     my $defaultFormat = $$tagTablePtr{FORMAT} || 'int8u';
@@ -2188,11 +2195,14 @@ sub WriteBinaryData($$$)
     my $dirLen = $dirInfo->{DirLen} || length($$dataPt) - $dirStart;
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
     my $dirName = $dirInfo->{DirName};
-    my $verbose = $exifTool->Options('Verbose');
+    my $verbose = $self->Options('Verbose');
     my $tagInfo;
     $dataPt = \$newData;
-    foreach $tagInfo ($exifTool->GetNewTagInfoList($tagTablePtr)) {
+    foreach $tagInfo ($self->GetNewTagInfoList($tagTablePtr)) {
         my $tagID = $tagInfo->{TagID};
+        # must check to be sure this tagInfo applies (ie. evaluate the condition!)
+        my $writeInfo = $self->GetTagInfo($tagTablePtr, $tagID);
+        next unless $writeInfo and $writeInfo eq $tagInfo;
         my $count = 1;
         my $format = $$tagInfo{Format};
         if ($format) {
@@ -2211,7 +2221,7 @@ sub WriteBinaryData($$$)
         my $entry = $tagID * $increment;        # relative offset of this entry
         my $val = ReadValue($dataPt, $entry, $format, $count, $dirLen-$entry);
         next unless defined $val;
-        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+        my $newValueHash = $self->GetNewValueHash($tagInfo);
         next unless IsOverwriting($newValueHash);
         my $newVal = GetNewValues($newValueHash);
         next unless defined $newVal;    # can't delete from a binary table
@@ -2221,7 +2231,7 @@ sub WriteBinaryData($$$)
                 print "    - $dirName:$$tagInfo{Name} = '$val'\n";
                 print "    + $dirName:$$tagInfo{Name} = '$newVal'\n";
             }
-            ++$exifTool->{CHANGED};
+            ++$self->{CHANGED};
         }
     }
     return $newData;

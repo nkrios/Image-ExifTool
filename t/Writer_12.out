@@ -1,5 +1,6 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.85
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
 [File, File, Image]  - File Name: Writer_12_failed.jpg
+[File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6KB
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
@@ -64,6 +65,8 @@
 [MakerNotes, Pentax, Image] 2 - Preview Image Size: 320x240
 [MakerNotes, Pentax, Image] 3 - Preview Image Length: 26
 [MakerNotes, Pentax, Image] 4 - Preview Image Start: 1258
+[MakerNotes, Pentax, Camera] 6 - Date: 2003:03:06
+[MakerNotes, Pentax, Camera] 7 - Time: 13:09:25
 [MakerNotes, Pentax, Camera] 8 - Image Quality: Better
 [MakerNotes, Pentax, Image] 9 - Pentax Image Size: 2048x1536
 [MakerNotes, Pentax, Camera] 11 - Picture Mode: Not Selected
@@ -71,11 +74,13 @@
 [MakerNotes, Pentax, Camera] 20 - ISO Speed: 50
 [MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
 [MakerNotes, Pentax, Camera] 25 - White Balance: Auto
+[MakerNotes, Pentax, Camera] 26 - White Balance Mode: Auto
 [MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm
 [MakerNotes, Pentax, Camera] 30 - Digital Zoom: 100
 [MakerNotes, Pentax, Camera] 31 - Saturation: Low
 [MakerNotes, Pentax, Camera] 32 - Contrast: Low
 [MakerNotes, Pentax, Camera] 33 - Sharpness: Soft
+[XMP, XMP-dc, Time] Date - Date: 2003-03-06
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 0.358073000192443
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 120

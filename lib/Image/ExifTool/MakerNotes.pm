@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess);
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # conditional list of maker notes
 # Notes:
@@ -38,7 +38,7 @@ $VERSION = '1.05';
         Condition => '$self->{CameraMake}=~/^CASIO(?! COMPUTER CO.,LTD)/',
         Name => 'MakerNoteCasio',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Casio::Type1',
+            TagTable => 'Image::ExifTool::Casio::Main',
             ByteOrder => 'Unknown',
         },
     },
@@ -82,20 +82,133 @@ $VERSION = '1.05';
         },
     },
     {
-        Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON)/',
-        Name => 'MakerNoteOlympus',
+        Condition => q{
+            $self->{CameraMake}=~/^EASTMAN KODAK/ and
+            $self->{MAKER_NOTE_HEADER}=~/^KDK INFO/
+        },
+        Name => 'MakerNoteKodak',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::Main',
-            Start => '$valuePtr+8',
+            TagTable => 'Image::ExifTool::Kodak::Main',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    {
+        Condition => q{
+            $self->{CameraMake}=~/^EASTMAN KODAK/ and
+            $self->{MAKER_NOTE_HEADER}=~/^KDK/
+        },
+        Name => 'MakerNoteKodak1',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Main',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    {
+        Condition => q{
+            $self->{CameraMake}=~/^EASTMAN KODAK/i and
+            $self->{MAKER_NOTE_HEADER}=~/^.{8}Eastman/s
+        },
+        Name => 'MakerNoteKodak2',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type2',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    {
+        # not much to key on here, but we know the
+        # upper byte of the year should be 0x07:
+        Condition => q{
+            $self->{CameraMake}=~/^EASTMAN KODAK/ and
+            $self->{MAKER_NOTE_HEADER}=~/^.{12}\x07/s
+        },
+        Name => 'MakerNoteKodak3',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type3',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    {
+        Condition => q{
+            $self->{CameraMake}=~/^Eastman Kodak/ and
+            $self->{MAKER_NOTE_HEADER}=~/^.{41}JPG/s
+        },
+        Name => 'MakerNoteKodak4',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type4',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    {
+        Condition => q{
+            $self->{CameraMake}=~/^EASTMAN KODAK/ and
+            $self->{MAKER_NOTE_HEADER}=~/^\0(\x1a\x18|\x3a\x08)\0/
+        },
+        Name => 'MakerNoteKodak5',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type5',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    {
+        Condition => '$self->{CameraMake}=~/Kodak/i',
+        Name => 'MakerNoteKodakUnknown',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Unknown',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    {
+        Condition => '$self->{CameraMake}=~/^(Konica Minolta|Minolta)/',
+        Name => 'MakerNoteMinolta',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Minolta::Main',
             ByteOrder => 'Unknown',
         },
     },
     {
-        Condition => '$self->{CameraMake} =~ /^Panasonic/',
-        Name => 'MakerNotePanasonic',
+        # this maker notes starts with a standard TIFF header at offset 0x0a
+        Condition => q{
+            $self->{CameraMake}=~/^NIKON/ and
+            $self->{MAKER_NOTE_HEADER}=~/^Nikon\x00\x02/
+        },
+        Name => 'MakerNoteNikon',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Panasonic::Main',
-            Start => '$valuePtr+12',
+            TagTable => 'Image::ExifTool::Nikon::Main',
+            Start => '$valuePtr + 18',
+            ByteOrder => 'Unknown',
+            Base => '$start - 8',
+        },
+    },
+    {
+        # older Nikon maker notes
+        Condition => q{
+            $self->{CameraMake}=~/^NIKON/ and
+            $self->{MAKER_NOTE_HEADER}=~/^Nikon\x00\x01/
+        },
+        Name => 'MakerNoteNikon2',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::MakerNotesB',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    {
+        # Headerless Nikon maker notes
+        Condition => '$self->{CameraMake}=~/^NIKON/',
+        Name => 'MakerNoteNikon3',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::Main',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    {
+        Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON|AGFA )/',
+        Name => 'MakerNoteOlympus',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::Main',
+            Start => '$valuePtr+8',
             ByteOrder => 'Unknown',
         },
     },
@@ -106,6 +219,15 @@ $VERSION = '1.05';
             # Leica uses the same format as Panasonic
             TagTable => 'Image::ExifTool::Panasonic::Main',
             Start => '$valuePtr+8',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Condition => '$self->{CameraMake} =~ /^Panasonic/',
+        Name => 'MakerNotePanasonic',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Main',
+            Start => '$valuePtr+12',
             ByteOrder => 'Unknown',
         },
     },
@@ -121,18 +243,22 @@ $VERSION = '1.05';
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/^NIKON/',
-        Name => 'MakerNoteNikon',
+        Condition => q{
+            $self->{CameraMake}=~/^RICOH/ and
+            $self->{MAKER_NOTE_HEADER}=~/^Ricoh/i
+        },
+        Name => 'MakerNoteRicoh',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Nikon::Main',
-            # (note: ProcessNikon sets ByteOrder, so we don't need to do it here)
+            TagTable => 'Image::ExifTool::Ricoh::Main',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'Unknown',
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/^(Konica Minolta|Minolta)/',
-        Name => 'MakerNoteMinolta',
+        Condition => '$self->{CameraMake}=~/^RICOH/',
+        Name => 'MakerNoteRicoh2',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Minolta::Main',
+            TagTable => 'Image::ExifTool::Ricoh::TextMakerNote',
             ByteOrder => 'Unknown',
         },
     },

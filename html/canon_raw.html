@@ -5,12 +5,13 @@
 <body bgcolor='#ffffff'>
 <h1>The Canon RAW (CRW) File Format</h1>
 
-This is a description of the Canon CRW file format.
-
-<p>After writing this document, I finally found an old copy of Canon's own file
-format specification.  The format is called CIFF, and the original Canon
-documentation can be downloaded from
-<a href="http://xyrion.org/ciff/">http://xyrion.org/ciff/</a>.
+This is a description of the Canon CRW file format.  CRW files are written in
+CIFF format.  The original Canon CIFF documentation can be downloaded from
+<a href="http://xyrion.org/ciff/">http://xyrion.org/ciff/</a> (which I finally
+discovered after writing this document!).  Note that Canon uses two different
+RAW formats, and some camera models produce CR2 instead of CRW files.  The CR2
+files use a TIFF format, which is different than the CRW CIFF format documented
+here.
 
 <h3>Comments about the CRW Format</h3>
 
@@ -212,17 +213,17 @@ remain constant for all camera models.
     <td align='left'>Four 16 bit integers: 0) unknown, 1) focal length in mm, 2-3) sensor width
     and height in units of 1/1000 inch</td></tr>
 <tr align='center'><td>0x102a</td><td>0x04</td><td>0x300b</td><td>CanonShotInfo</td><td>Varies</td>
-    <td align='left'>Data block giving <a href="TagNames.html#Canon_ShotInfo">shot information</a></td></tr>
+    <td align='left'>Data block giving <a href="TagNames/Canon.html#ShotInfo">shot information</a></td></tr>
 <tr align='center'><td>0x102c</td><td>-</td><td>?</td><td>CanonColorInfo2</td><td>?</td>
     <td align='left'>Data block of color information (format unknown)</td></tr>
 <tr align='center'><td>0x102d</td><td>0x01</td><td>0x300b</td><td>CanonCameraSettings</td><td>92</td>
-    <td align='left'>Data block giving <a href="TagNames.html#Canon_CameraSettings">camera settings</a></td></tr>
+    <td align='left'>Data block giving <a href="TagNames/Canon.html#CameraSettings">camera settings</a></td></tr>
 <tr align='center'><td>0x1031</td><td>-</td><td>0x300b</td><td>SensorInfo</td><td>34</td>
-    <td align='left'><a href="TagNames.html#CanonRaw_SensorInfo">Sensor size and resolution information</a></td></tr>
+    <td align='left'><a href="TagNames/CanonRaw.html#SensorInfo">Sensor size and resolution information</a></td></tr>
 <tr align='center'><td>0x1033</td><td>0x0f</td><td>0x300b</td><td>CanonCustomFunctions</td><td>Varies</td>
-    <td align='left'>Data block giving <a href="TagNames.html#CanonCustom_Functions10D">Canon custom settings</a></td></tr>
+    <td align='left'>Data block giving <a href="TagNames/CanonCustom.html#Functions10D">Canon custom settings</a></td></tr>
 <tr align='center'><td>0x1038</td><td>0x12</td><td>0x300b</td><td>CanonPictureInfo</td><td>Varies</td>
-    <td align='left'>Data block giving <a href="TagNames.html#Canon_PictureInfo">picture-specific information</a></td></tr>
+    <td align='left'>Data block giving <a href="TagNames/Canon.html#PictureInfo">picture-specific information</a></td></tr>
 <tr align='center'><td>0x1039</td><td>0x13</td><td>0x300b</td><td>?</td><td>8</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1093</td><td>0x93</td><td>0x300b</td><td>?</td><td>18</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10a8</td><td>0xa8</td><td>0x300b</td><td>?</td><td>20</td><td align='left'>-</td></tr>
@@ -254,7 +255,7 @@ remain constant for all camera models.
     <td align='left'>32-bit integer giving the time in seconds when the picture was taken,
     followed by a 32-bit timezone in seconds</td></tr>
 <tr align='center'><td>0x1810</td><td>-</td><td>0x300a</td><td>ImageInfo</td><td>28</td>
-    <td align='left'>Data block containing <a href="TagNames.html#CanonRaw_ImageInfo">image information, including rotation</a></td></tr>
+    <td align='left'>Data block containing <a href="TagNames/CanonRaw.html#ImageInfo">image information, including rotation</a></td></tr>
 <tr align='center'><td>0x1813</td><td>-</td><td>0x3002</td><td>FlashInfo</td><td>8</td>
     <td align='left'>Two 32-bit floats: The flash guide number and the flash threshold</td></tr>
 <tr align='center'><td>0x1814</td><td>-</td><td>0x3003</td><td>MeasuredEV</td><td>4</td>
@@ -293,6 +294,6 @@ remain constant for all camera models.
 
 <p><hr>
 Please e-mail me if you find any errors or omissions in this document.  My address is phil at owl.phy.queensu.ca - Thanks!
-<p><i>P. Harvey - Last revised Mar. 8, 2005</i>
+<p><i>P. Harvey - Last revised Apr. 2, 2005</i>
 </body>
 </html>

@@ -1,0 +1,1513 @@
+<html>
+<head>
+<title>XMP Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='XMP'>XMP Tags</a></h2>
+
+All XMP information is stored as character strings.  An <code>integer</code> in this
+format is a string of digits, possibly beginning with a &apos;+&apos; or &apos;-&apos;, and a
+<code>rational</code> is composed of two <code>integer</code> strings separated by a &apos;/&apos;
+character.  A <code>date</code> is a date and/or time string in the format &apos;YYYY:MM:DD
+HH:MM:SS[+/-HH:MM]&apos;.  A <code>boolean</code> is either &apos;True&apos; or &apos;False&apos;, and
+<code>lang-alt</code> is a list of string alternatives in different languages.
+Currently, ExifTool only writes the &apos;x-default&apos; language in <code>lang-alt</code>
+lists.
+
+<p>The <b>Group</b> column below gives the XMP schema namespace prefix for each
+tag.  The family 1 group names are composed from these schema names with a
+leading &quot;XMP-&quot; added.  If the same XMP tag name exists in more than one
+group, all groups are written unless a family 1 group name is specified. 
+ie) If XMP:Contrast is specified, information will be written to both
+XMP-crs:Contrast and XMP-exif:Contrast.
+
+<p>Note: that the actual IPTC Core namespace schema prefix is <code>Iptc4xmpCore</code>,
+which is the name used in the file, but ExifTool uses <code>IptcCore</code> to
+generate the family 1 group name because <code>Iptc4xmpCore</code> is a bit lengthy.
+
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag Name</th>
+<th>Writable</th><th>Group</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>Advisory</td>
+<td align='center'>string</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ApertureValue</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Artist</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Author</td>
+<td align='center'>string</td>
+<td align='center'>pdf</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>AuthorsPosition</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>BaseURL</td>
+<td align='center'>string</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>BitsPerSample</td>
+<td align='center'>integer</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>BlueHue</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>BlueSaturation</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Brightness</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>BrightnessValue</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CFAPattern</td>
+<td align='center'>N</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CFAPatternColumns</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CFAPatternRows</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CFAPatternValues</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CaptionWriter</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Category</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Certificate</td>
+<td align='center'>string</td>
+<td align='center'>xmpRights</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ChromaticAberrationB</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ChromaticAberrationR</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>City</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ColorNoiseReduction</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ColorSpace</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>1 = sRGB
+  <br>2 = Adobe RGB
+  <br>65535 = Uncalibrated
+  <br>4294967295 = Uncalibrated</font></td></tr>
+<tr valign='top'>
+<td>ComponentsConfiguration</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = .
+  <br>1 = Y
+  <br>2 = Cb
+  <br>3 = Cr
+  <br>4 = R
+  <br>5 = G
+  <br>6 = B</font></td></tr>
+<tr valign='top'>
+<td>CompressedBitsPerPixel</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Compression</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td><font size='-1'>1 = Uncompressed
+  <br>2 = CCITT 1D
+  <br>3 = T4/Group 3 Fax
+  <br>4 = T6/Group 4 Fax
+  <br>5 = LZW
+  <br>6 = JPEG (old-style)
+  <br>7 = JPEG
+  <br>8 = Adobe Deflate
+  <br>9 = JBIG B&amp;W
+  <br>10 = JBIG Color
+  <br>32766 = Next
+  <br>32771 = CCIRLEW
+  <br>32773 = PackBits
+  <br>32809 = Thunderscan
+  <br>32895 = IT8CTPAD
+  <br>32896 = IT8LW
+  <br>32897 = IT8MP
+  <br>32898 = IT8BL
+  <br>32908 = PixarFilm
+  <br>32909 = PixarLog
+  <br>32946 = Deflate
+  <br>32947 = DCS
+  <br>34661 = JBIG
+  <br>34676 = SGILog
+  <br>34677 = SGILog24
+  <br>34712 = JPEG 2000
+  <br>34713 = Nikon NEF Compressed</font></td></tr>
+<tr valign='top'>
+<td>Contrast
+  <br>Contrast</td>
+<td align='center'>string<br>string</td>
+<td align='center'>crs<br>exif</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Soft
+  <br>2 = Hard</font></td></tr>
+<tr valign='top'>
+<td>Contributor</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Copyright</td>
+<td align='center'>lang-alt</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Country</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CountryCode</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Coverage</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreateDate</td>
+<td align='center'>date</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreationDate</td>
+<td align='center'>date</td>
+<td align='center'>pdf</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Creator</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfo</td>
+<td align='center'>N</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfoCiAdrCity</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfoCiAdrCtry</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfoCiAdrExtadr</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfoCiAdrPcode</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfoCiAdrRegion</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfoCiEmailWork</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfoCiTelWork</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorContactInfoCiUrlWork</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CreatorTool</td>
+<td align='center'>string</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Credit</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CustomRendered</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Custom</font></td></tr>
+<tr valign='top'>
+<td>Date</td>
+<td align='center'>date</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DateCreated</td>
+<td align='center'>date</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DateTime</td>
+<td align='center'>date</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DateTimeDigitized</td>
+<td align='center'>date</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DateTimeOriginal</td>
+<td align='center'>date</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFrom</td>
+<td align='center'>N</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromDocumentID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromInstanceID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromManageTo</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromManageUI</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromManager</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromManagerVariant</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromRenditionClass</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromRenditionParams</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DerivedFromVersionID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Description</td>
+<td align='center'>lang-alt</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DeviceSettingDescription</td>
+<td align='center'>N</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DeviceSettingDescriptionColumns</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DeviceSettingDescriptionRows</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DeviceSettingDescriptionSettings</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DigitalZoomRatio</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DocumentID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ExifVersion</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Exposure</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ExposureCompensation</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ExposureIndex</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ExposureMode</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Manual
+  <br>2 = Auto bracket</font></td></tr>
+<tr valign='top'>
+<td>ExposureProgram</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>1 = Manual
+  <br>2 = Program AE
+  <br>3 = Aperture-priority AE
+  <br>4 = Shutter speed priority AE
+  <br>5 = Creative (Slow speed)
+  <br>6 = Action (High speed)
+  <br>7 = Portrait
+  <br>8 = Landscape</font></td></tr>
+<tr valign='top'>
+<td>ExposureTime</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FNumber</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FileSource</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>3 = Digital Camera</font></td></tr>
+<tr valign='top'>
+<td>Flash</td>
+<td align='center'>N</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FlashEnergy</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FlashFired</td>
+<td align='center'>boolean</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FlashFunction</td>
+<td align='center'>boolean</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FlashMode</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = Unknown
+  <br>1 = On
+  <br>2 = Off
+  <br>3 = Auto</font></td></tr>
+<tr valign='top'>
+<td>FlashRedEyeMode</td>
+<td align='center'>boolean</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FlashReturn</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = No return detection
+  <br>2 = Return not detected
+  <br>3 = Return detected</font></td></tr>
+<tr valign='top'>
+<td>FlashpixVersion</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FocalLength</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FocalLengthIn35mmFormat</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FocalPlaneResolutionUnit</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>&apos;0.001&apos; = um
+  <br>1 = mm
+  <br>10 = cm
+  <br>&apos;25.4&apos; = inches</font></td></tr>
+<tr valign='top'>
+<td>FocalPlaneXResolution</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FocalPlaneYResolution</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Format</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSAltitude</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSAltitudeRef</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = Above Sea Level
+  <br>1 = Below Sea Level</font></td></tr>
+<tr valign='top'>
+<td>GPSAreaInformation</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSDestBearing</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSDestBearingRef</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>&apos;M&apos; = Magnetic North
+  <br>&apos;T&apos; = True North</font></td></tr>
+<tr valign='top'>
+<td>GPSDestDistance</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSDestDistanceRef</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>&apos;K&apos; = Kilometers
+  <br>&apos;M&apos; = Miles
+  <br>&apos;N&apos; = Nautical Miles</font></td></tr>
+<tr valign='top'>
+<td>GPSDestLatitude</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSDestLongitude</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSDifferential</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = No Correction
+  <br>1 = Differential Corrected</font></td></tr>
+<tr valign='top'>
+<td>GPSImgDirection</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSImgDirectionRef</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>&apos;M&apos; = Magnetic North
+  <br>&apos;T&apos; = True North</font></td></tr>
+<tr valign='top'>
+<td>GPSLatitude</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSLongitude</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSMapDatum</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSProcessingMethod</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSSatellites</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSSpeed</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSSpeedRef</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>&apos;K&apos; = km/h
+  <br>&apos;M&apos; = mph
+  <br>&apos;N&apos; = knots</font></td></tr>
+<tr valign='top'>
+<td>GPSStatus</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>&apos;A&apos; = Measurement In Progress
+  <br>&apos;V&apos; = Measurement Interoperability</font></td></tr>
+<tr valign='top'>
+<td>GPSTimeStamp</td>
+<td align='center'>date</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSTrack</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GPSTrackRef</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>&apos;M&apos; = Magnetic North
+  <br>&apos;T&apos; = True North</font></td></tr>
+<tr valign='top'>
+<td>GPSVersionID</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GainControl</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = None
+  <br>1 = Low gain up
+  <br>2 = High gain up
+  <br>3 = Low gain down
+  <br>4 = High gain down</font></td></tr>
+<tr valign='top'>
+<td>GreenHue</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>GreenSaturation</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Headline</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>History</td>
+<td align='center'>N</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>HistoryAction</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>HistoryInstanceID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>HistoryParameters</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>HistorySoftwareAgent</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>HistoryWhen</td>
+<td align='center'>date</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ISO</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Identifier
+  <br>Identifier</td>
+<td align='center'>string<br>string</td>
+<td align='center'>dc<br>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ImageDescription</td>
+<td align='center'>lang-alt</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ImageHeight</td>
+<td align='center'>integer</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ImageUniqueID</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ImageWidth</td>
+<td align='center'>integer</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Instructions</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>IntellectualGenre</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>JobRef</td>
+<td align='center'>N</td>
+<td align='center'>xmpBJ</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>JobRefId</td>
+<td align='center'>string</td>
+<td align='center'>xmpBJ</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>JobRefName</td>
+<td align='center'>string</td>
+<td align='center'>xmpBJ</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>JobRefUrl</td>
+<td align='center'>string</td>
+<td align='center'>xmpBJ</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Keywords</td>
+<td align='center'>string</td>
+<td align='center'>pdf</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Language</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>LastURL</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Lens</td>
+<td align='center'>string</td>
+<td align='center'>aux</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>LightSource</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>1 = Daylight
+  <br>2 = Fluorescent
+  <br>3 = Tungsten
+  <br>4 = Flash
+  <br>9 = Fine Weather
+  <br>10 = Cloudy
+  <br>11 = Shade
+  <br>12 = Daylight Fluorescent
+  <br>13 = Day White Fluorescent
+  <br>14 = Cool White Fluorescent
+  <br>15 = White Fluorescent
+  <br>17 = Standard Light A
+  <br>18 = Standard Light B
+  <br>19 = Standard Light C
+  <br>20 = D55
+  <br>21 = D65
+  <br>22 = D75
+  <br>23 = D50
+  <br>24 = ISO Studio Tungsten
+  <br>255 = Other</font></td></tr>
+<tr valign='top'>
+<td>Location</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>LuminanceSmoothing</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Make</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>MakerNote</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManageTo</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManageUI</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFrom</td>
+<td align='center'>N</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromDocumentID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromInstanceID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromManageTo</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromManageUI</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromManager</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromManagerVariant</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromRenditionClass</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromRenditionParams</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagedFromVersionID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Manager</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ManagerVariant</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Marked</td>
+<td align='center'>boolean</td>
+<td align='center'>xmpRights</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>MaxApertureValue</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>MetadataDate</td>
+<td align='center'>date</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>MeteringMode</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>1 = Average
+  <br>2 = Center-weighted average
+  <br>3 = Spot
+  <br>4 = Multi-spot
+  <br>5 = Multi-segment
+  <br>6 = Partial
+  <br>255 = Other</font></td></tr>
+<tr valign='top'>
+<td>ModDate</td>
+<td align='center'>date</td>
+<td align='center'>pdf</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Model</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ModifyDate</td>
+<td align='center'>date</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Nickname</td>
+<td align='center'>string</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Opto-ElectricConvFactor</td>
+<td align='center'>N</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>OECFColumns</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>OECFNames</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>OECFRows</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>OECFValues</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Orientation</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td><font size='-1'>1 = Horizontal (normal)
+  <br>2 = Mirror horizontal
+  <br>3 = Rotate 180
+  <br>4 = Mirror vertical
+  <br>5 = Mirror horizontal and rotate 90 CCW
+  <br>6 = Rotate 90 CW
+  <br>7 = Mirror horizontal and rotate 90 CW
+  <br>8 = Rotate 90 CCW</font></td></tr>
+<tr valign='top'>
+<td>Owner</td>
+<td align='center'>string</td>
+<td align='center'>xmpRights</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>PDFVersion</td>
+<td align='center'>string</td>
+<td align='center'>pdf</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>PhotometricInterpretation</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td><font size='-1'>0 = WhiteIsZero
+  <br>1 = BlackIsZero
+  <br>2 = RGB
+  <br>3 = RGB Palette
+  <br>4 = Transparency Mask
+  <br>5 = CMYK
+  <br>6 = YCbCr
+  <br>8 = CIELab
+  <br>9 = ICCLab
+  <br>10 = ITULab
+  <br>32803 = Color Filter Array
+  <br>32844 = Pixar LogL
+  <br>32845 = Pixar LogLuv
+  <br>34892 = Linear Raw</font></td></tr>
+<tr valign='top'>
+<td>ExifImageWidth</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ExifImageHeight</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>PlanarConfiguration</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td><font size='-1'>1 = Chunky
+  <br>2 = Planar</font></td></tr>
+<tr valign='top'>
+<td>PrimaryChromaticities</td>
+<td align='center'>rational</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Producer</td>
+<td align='center'>string</td>
+<td align='center'>pdf</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Publisher</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RawFileName</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RedHue</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RedSaturation</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ReferenceBlackWhite</td>
+<td align='center'>rational</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RelatedSoundFile</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Relation</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionClass</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOf</td>
+<td align='center'>N</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfDocumentID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfInstanceID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfManageTo</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfManageUI</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfManager</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfManagerVariant</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfRenditionClass</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfRenditionParams</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionOfVersionID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RenditionParams</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ResolutionUnit</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td><font size='-1'>1 = None
+  <br>2 = inches
+  <br>3 = cm</font></td></tr>
+<tr valign='top'>
+<td>Rights</td>
+<td align='center'>lang-alt</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SamplesPerPixel</td>
+<td align='center'>integer</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Saturation
+  <br>Saturation</td>
+<td align='center'>string<br>string</td>
+<td align='center'>crs<br>exif</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Low
+  <br>2 = High</font></td></tr>
+<tr valign='top'>
+<td>SaveID</td>
+<td align='center'>integer</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Scene</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SceneCaptureType</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = Standard
+  <br>1 = Landscape
+  <br>2 = Portrait
+  <br>3 = Night</font></td></tr>
+<tr valign='top'>
+<td>SceneType</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>1 = Directly photographed</font></td></tr>
+<tr valign='top'>
+<td>SensingMethod</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>1 = Not defined
+  <br>2 = One-chip color area
+  <br>3 = Two-chip color area
+  <br>4 = Three-chip color area
+  <br>5 = Color sequential area
+  <br>7 = Trilinear
+  <br>8 = Color sequential linear</font></td></tr>
+<tr valign='top'>
+<td>SerialNumber</td>
+<td align='center'>string</td>
+<td align='center'>aux</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ShadowTint</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Shadows</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Sharpness
+  <br>Sharpness</td>
+<td align='center'>string<br>string</td>
+<td align='center'>crs<br>exif</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Soft
+  <br>2 = Hard</font></td></tr>
+<tr valign='top'>
+<td>ShutterSpeedValue</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Software</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Source
+  <br>Source</td>
+<td align='center'>string<br>string</td>
+<td align='center'>dc<br>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SpatialFrequencyResponse</td>
+<td align='center'>N</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SpatialFrequencyResponseColumns</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SpatialFrequencyResponseNames</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SpatialFrequencyResponseRows</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SpatialFrequencyResponseValues</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SpectralSensitivity</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>State</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Subject</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SubjectArea</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SubjectCode</td>
+<td align='center'>string</td>
+<td align='center'>IptcCore</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SubjectDistance</td>
+<td align='center'>rational</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SubjectDistanceRange</td>
+<td align='center'>string</td>
+<td align='center'>exif</td>
+<td><font size='-1'>0 = Unknown
+  <br>1 = Macro
+  <br>2 = Close
+  <br>3 = Distant</font></td></tr>
+<tr valign='top'>
+<td>SubjectLocation</td>
+<td align='center'>integer</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SupplementalCategories</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Thumbnails</td>
+<td align='center'>N</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ThumbnailsFormat</td>
+<td align='center'>string</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ThumbnailsHeight</td>
+<td align='center'>string</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ThumbnailsImage</td>
+<td align='center'>N</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ThumbnailsWidth</td>
+<td align='center'>string</td>
+<td align='center'>xmp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Title</td>
+<td align='center'>lang-alt</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>TransferFunction</td>
+<td align='center'>integer</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>TransmissionReference</td>
+<td align='center'>string</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Type</td>
+<td align='center'>string</td>
+<td align='center'>dc</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Urgency</td>
+<td align='center'>integer</td>
+<td align='center'>photoshop</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>UsageTerms</td>
+<td align='center'>lang-alt</td>
+<td align='center'>xmpRights</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>UserComment</td>
+<td align='center'>lang-alt</td>
+<td align='center'>exif</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Version</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Versions</td>
+<td align='center'>N</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsComments</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsEvent</td>
+<td align='center'>N</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsEventAction</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsEventInstanceID</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsEventParameters</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsEventSoftwareAgent</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsEventWhen</td>
+<td align='center'>date</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsModifier</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsModifyDate</td>
+<td align='center'>date</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VersionsVersion</td>
+<td align='center'>string</td>
+<td align='center'>xmpMM</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VignetteAmount</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VignetteMidpoint</td>
+<td align='center'>string</td>
+<td align='center'>crs</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>WebStatement</td>
+<td align='center'>string</td>
+<td align='center'>xmpRights</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>WhiteBalance
+  <br>WhiteBalance</td>
+<td align='center'>string<br>string</td>
+<td align='center'>crs<br>exif</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Manual</font></td></tr>
+<tr valign='top'>
+<td>WhitePoint</td>
+<td align='center'>rational</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>XResolution</td>
+<td align='center'>rational</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>YCbCrCoefficients</td>
+<td align='center'>rational</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>YCbCrSubSampling</td>
+<td align='center'>string</td>
+<td align='center'>tiff</td>
+<td><font size='-1'>&apos;1 1&apos; = YCbCr4:4:4
+  <br>&apos;1 2&apos; = YCbCr4:4:0
+  <br>&apos;2 1&apos; = YCbCr4:2:2
+  <br>&apos;2 2&apos; = YCbCr4:2:0
+  <br>&apos;4 1&apos; = YCbCr4:1:1
+  <br>&apos;4 2&apos; = YCbCr4:1:0</font></td></tr>
+<tr valign='top'>
+<td>YResolution</td>
+<td align='center'>rational</td>
+<td align='center'>tiff</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Apr 2, 2005</i>
+</body>
+</html>

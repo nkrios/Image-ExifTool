@@ -1,0 +1,521 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>exiftool Application Documentation</title>
+<link rev="made" href="mailto:root@hampsten.nonet" />
+</head>
+
+<body style="background-color: white">
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" style="background-color: #cccccc" valign="middle">
+<big><strong><span class="block">&nbsp;exiftool Application Documentation</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#writing_examples">WRITING EXAMPLES</a></li>
+	<li><a href="#piping_examples">PIPING EXAMPLES</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>exiftool - Read/write meta information in image files</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>exiftool [OPTIONS] [-TAG[[+-&lt;]=[VALUE]] or --TAG...] FILE ...</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Read or write meta information in image files.  <code>FILE</code> may be an image file
+name, a directory name, or <code>-</code> for the standard input.  Information is read
+from the specified file and output in readable form to the console (or
+written to an output text file with the <code>-w</code> option).</p>
+<p>To write information in an image file, specify new values using either the
+<code>-TAG=VALUE</code> syntax or the <code>-AllTagsFromFile</code> option.  This causes
+exiftool to rewrite <code>FILE</code> with the specified information, preserving the
+original file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify
+that the new file is OK before erasing the original.)</p>
+<p>Below is a list of meta information formats and file types supported by
+exiftool (r = read support, w = write support):</p>
+<pre>
+     Meta Information                   File Types
+    ------------------          --------------------------
+    EXIF           r/w          JPEG   r/w      NEF    r/w
+    GPS            r/w          JP2    r        ORF    r
+    IPTC           r/w          TIFF   r/w      PEF    r/w
+    XMP            r/w          GIF    r/w
+    MakerNotes     r/w          THM    r/w
+    GeoTIFF        r            CRW    r/w
+    ICC Profile    r            CR2    r/w
+    Photoshop IRB  r            DNG    r/w
+    PrintIM        r            MRW    r</pre>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<p>Note:  Case is not significant for any command-line option (including tag
+and group names), except for certain single-character options where the
+corresponding upper case option is defined.</p>
+<dl>
+<dt><strong><a name="item__2dtag"><strong>-</strong><em>TAG</em></a></strong><br />
+</dt>
+<dd>
+Extract information for specified tag.  See
+<a href="TagNames.html">Image::ExifTool::TagNames</a> for documentation on
+available tag names.  The tag name may begin with an optional group name
+followed by a colon.  (ie. <code>-TAG:GROUP</code>, where <code>GROUP</code> is any valid family
+0 or 1 group name.  Use the <code>-group</code> option to list valid group names.)  If
+no tags are specified, all available information is extracted.
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_2dtag"><strong>--</strong><em>TAG</em></a></strong><br />
+</dt>
+<dd>
+Exclude specified tag from extracted information.  Same as the <code>-x</code> option.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dtag_5b_2b_2d_3c_5d_3d_5bvalue_5d"><strong>-</strong><em>TAG</em>[+-&lt;]<strong>=</strong>[<em>VALUE</em>]</a></strong><br />
+</dt>
+<dd>
+Writes a new value for the specified tag, or deletes the tag if <code>VALUE</code> is
+not specified.  Use <code>+=</code> to add a value to a list without replacing
+existing values, and <code>-=</code> to delete a specific value from a list.  Use
+<code>&lt;=</code> to set the value of a tag from the contents of a file with name
+<code>VALUE</code>.  (Note: Quotes are required around the argument in this case to
+prevent shell redirection.)
+</dd>
+<p></p>
+<dt><strong><a name="item__2da"><strong>-a</strong></a></strong><br />
+</dt>
+<dd>
+<strong>A</strong>llow duplicate tag names in the output (otherwise duplicates are
+suppressed).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dalltagsfromfile_srcfile"><strong>-AllTagsFromFile</strong> <em>SRCFILE</em></a></strong><br />
+</dt>
+<dd>
+Set the value of all writable tags from information in the specified source
+file.
+</dd>
+<p></p>
+<dt><strong><a name="item__2db"><strong>-b</strong></a></strong><br />
+</dt>
+<dd>
+Output requested data in <strong>b</strong>inary format.  Mainly used for extracting
+embedded images.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dd_fmt"><strong>-d</strong> <em>FMT</em></a></strong><br />
+</dt>
+<dd>
+Set <strong>d</strong>ate/time format (consult strftime man page for FMT syntax).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dd"><strong>-D</strong></a></strong><br />
+</dt>
+<dd>
+Show tag ID number in <strong>D</strong>ecimal.
+</dd>
+<p></p>
+<dt><strong><a name="item__2de"><strong>-e</strong></a></strong><br />
+</dt>
+<dd>
+Print <strong>e</strong>xisting tags only -- don't calculate composite tags.
+</dd>
+<p></p>
+<dt><strong><a name="item__2de"><strong>-E</strong></a></strong><br />
+</dt>
+<dd>
+<strong>E</strong>scape characters in output values for HTML.
+</dd>
+<p></p>
+<dt><strong><a name="item__2df"><strong>-f</strong></a></strong><br />
+</dt>
+<dd>
+<strong>F</strong>orce printing of tags even if their values are not found.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dg_5b_23_5d"><strong>-g</strong>[#]</a></strong><br />
+</dt>
+<dd>
+Organize output by tag <strong>g</strong>roup (-g0 assumed if # not specified).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dg_5b_23_5d"><strong>-G</strong>[#]</a></strong><br />
+</dt>
+<dd>
+Same as -g but print <strong>G</strong>roup name for each tag.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dh"><strong>-H</strong></a></strong><br />
+</dt>
+<dd>
+Show tag ID number in <strong>H</strong>exadecimal.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dgroup_5b_23_5d"><strong>-group</strong>[#]</a></strong><br />
+</dt>
+<dd>
+List all tag groups for family #.  Family 0 assumed if # not specified.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dh"><strong>-h</strong></a></strong><br />
+</dt>
+<dd>
+Use <strong>H</strong>TML formatting for output (implies -E option).
+</dd>
+<p></p>
+<dt><strong><a name="item__2di_dir"><strong>-i</strong> <em>DIR</em></a></strong><br />
+</dt>
+<dd>
+<strong>I</strong>gnore specified directory name.  May be multiple <code>-i</code> options.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dl"><strong>-l</strong></a></strong><br />
+</dt>
+<dd>
+Use <strong>l</strong>ong output format (2-line Canon-style output).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dl"><strong>-L</strong></a></strong><br />
+</dt>
+<dd>
+Convert Unicode characters in output to Windows <strong>L</strong>atin1 (cp1252) instead
+of the default UTF8.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dlist"><strong>-list</strong></a></strong><br />
+</dt>
+<dd>
+List all valid tag names.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dlistw"><strong>-listw</strong></a></strong><br />
+</dt>
+<dd>
+List all writable tag names.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dm"><strong>-m</strong></a></strong><br />
+</dt>
+<dd>
+Ignore <strong>m</strong>inor errors (allows writing if some minor errors occur, or
+extraction of embedded images that aren't in standard JPG format).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dn"><strong>-n</strong></a></strong><br />
+</dt>
+<dd>
+Do <strong>n</strong>ot apply print conversion to displayed tag values.
+</dd>
+<p></p>
+<dt><strong><a name="item__2do_outfile"><strong>-o</strong> <em>OUTFILE</em></a></strong><br />
+</dt>
+<dd>
+Set <strong>o</strong>utput file or directory name when writing information (otherwise the
+source file is renamed to <code>FILE_original</code> and the output file is <code>FILE</code>).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dp_fmtfile"><strong>-p</strong> <em>FMTFILE</em></a></strong><br />
+</dt>
+<dd>
+<strong>P</strong>rint output in the format specified by the given file (and ignore other
+format options).  Tag names in the format file begin with a <code>$</code> symbol and
+may contain an optional group name.  Case is not significant.  Lines beginning
+with <code>#</code> are ignored.  For example, this format file:
+</dd>
+<dd>
+<pre>
+    # this is a comment line
+    File $FileName was created on $DateTimeOriginal
+    (f/$Aperture, $ShutterSpeed sec, ISO $EXIF:ISO)</pre>
+</dd>
+<dd>
+<p>produces output like this:</p>
+</dd>
+<dd>
+<pre>
+    File test.jpg was created on 2003:10:31 15:44:19
+    (f/5.6, 1/60 sec, ISO 100)</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item__2dp"><strong>-P</strong></a></strong><br />
+</dt>
+<dd>
+<strong>P</strong>reserve date/time of original file when writing.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dr"><strong>-r</strong></a></strong><br />
+</dt>
+<dd>
+<strong>R</strong>ecursively scan subdirectories (only meaningful if <code>FILE</code> is a
+directory name).
+</dd>
+<p></p>
+<dt><strong><a name="item__2ds"><strong>-s</strong></a></strong><br />
+</dt>
+<dd>
+Use <strong>s</strong>hort output format (add up to 3 -s options for even shorter
+formats).
+</dd>
+<p></p>
+<dt><strong><a name="item__2ds"><strong>-S</strong></a></strong><br />
+</dt>
+<dd>
+Print tag names instead of descriptions (very <strong>s</strong>hort format, same as two
+-s options).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dt"><strong>-t</strong></a></strong><br />
+</dt>
+<dd>
+Output a <strong>t</strong>ab-delimited list of description/values (useful for database
+import).
+</dd>
+<p></p>
+<dt><strong><a name="item__2du"><strong>-u</strong></a></strong><br />
+</dt>
+<dd>
+Extract values of <strong>u</strong>nknown tags (add another <a href="#item__2du"><code>-u</code></a> to also extract unknown
+information from binary data blocks).
+</dd>
+<p></p>
+<dt><strong><a name="item__2du"><strong>-U</strong></a></strong><br />
+</dt>
+<dd>
+Extract values of <strong>u</strong>nknown tags as well as unknown information from binary
+data blocks (same as two <a href="#item__2du"><code>-u</code></a> options).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dv_5b_23_5d"><strong>-v</strong>[#]</a></strong><br />
+</dt>
+<dd>
+Print <strong>v</strong>erbose messages (# may be 1-4, higher is more verbose).
+</dd>
+<p></p>
+<dt><strong><a name="item__2dver"><strong>-ver</strong></a></strong><br />
+</dt>
+<dd>
+Print version number and exit.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dw_ext"><strong>-w</strong> <em>EXT</em></a></strong><br />
+</dt>
+<dd>
+<strong>W</strong>rite console output to a file with name ending in <code>EXT</code> for each source
+file.  The output file name is obtained by replacing the source file
+extension (including the <code>.</code>) with the specified extension.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dx_tag"><strong>-x</strong> <em>TAG</em></a></strong><br />
+</dt>
+<dd>
+E<strong>x</strong>clude specified tag (may be many -x options).  Same as <a href="#item__2d_2dtag"><code>--TAG</code></a>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dz"><strong>-z</strong></a></strong><br />
+</dt>
+<dd>
+Extract information from .g<strong>z</strong> and .b<strong>z</strong>2 compressed images.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<dl>
+<dt><strong><a name="item_exiftool__2dg_a_2ejpg">exiftool -g a.jpg</a></strong><br />
+</dt>
+<dd>
+Print all EXIF information sorted by group (for family 0).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dcommon_dir">exiftool -common dir</a></strong><br />
+</dt>
+<dd>
+Print common EXIF information for all images in <code>dir</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2ds__2dimagesize__2dexposuretime_b_2ejpg">exiftool -S -ImageSize -ExposureTime b.jpg</a></strong><br />
+</dt>
+<dd>
+Print ImageSize and ExposureTime tag names and values.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dl__2dcanon_c_2ejpg_d_2ejpg">exiftool -l -canon c.jpg d.jpg</a></strong><br />
+</dt>
+<dd>
+Print standard Canon information from 2 image files.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dr__2dw__2etxt__2dcommon_pictures">exiftool -r -w .txt -common pictures</a></strong><br />
+</dt>
+<dd>
+Recursively save common EXIF information for files in <code>pictures</code> directory
+into files with the same names as the images but with a <code>.txt</code> extension.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2db__2dthumbnailimage_image_2ejpg__3e_th">exiftool -b -ThumbnailImage image.jpg &gt; thumbnail.jpg</a></strong><br />
+</dt>
+<dd>
+Save thumbnail image from <code>image.jpg</code> to a file called <code>thumbnail.jpg</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2db__2djpgfromraw__2dw__jfr_2ejpg__2dr__">exiftool -b -JpgFromRaw -w _JFR.JPG -r .</a></strong><br />
+</dt>
+<dd>
+Recursively extract JPG image from all Canon RAW files in the current
+directory, adding '_JFR.JPG' for the name of the output JPG files.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2db__2dpreviewimage_118_1834_2ejpg__3e_p">exiftool -b -PreviewImage 118_1834.JPG &gt; preview.jpg</a></strong><br />
+</dt>
+<dd>
+Extract preview image from JPG file and write it to <code>preview.jpg</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dd__27_25r__25a_2c__25b__25e_2c__25y_27">exiftool -d '%r %a, %B %e, %Y' -DateTimeOriginal -S -s *.jpg</a></strong><br />
+</dt>
+<dd>
+Print formatted date/time for all JPG files in a directory.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2difd1_3axresolution__2difd1_3ayresoluti">exiftool -IFD1:XResolution -IFD1:YResolution</a></strong><br />
+</dt>
+<dd>
+Extract image resolution from IFD1.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="writing_examples">WRITING EXAMPLES</a></h1>
+<dl>
+<dt><strong><a name="item_exiftool__2dcomment_3d_27this_is_a_new_comment_27_">exiftool -comment='This is a new comment' dst.jpg</a></strong><br />
+</dt>
+<dd>
+Set comment in file (replaces any existing comment).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dcomment_3d__2a_2ejpg">exiftool -comment= *.jpg</a></strong><br />
+</dt>
+<dd>
+Remove comment from all JPG files.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dkeywords_3dexif__2dkeywords_3deditor_d">exiftool -keywords=EXIF -keywords=editor dst.jpg</a></strong><br />
+</dt>
+<dd>
+Replace existing keyword list with two new keywords (<code>EXIF</code> and <code>editor</code>).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dkeywords_2b_3dword_dst_2ejpg">exiftool -keywords+=word dst.jpg</a></strong><br />
+</dt>
+<dd>
+Add a keyword (<code>word</code>) to the current list of keywords.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dcategory_2d_3dxxx_dir">exiftool -category-=xxx dir</a></strong><br />
+</dt>
+<dd>
+Delete only the specified category (<code>xxx</code>) from all files in directory.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dalltagsfromfile_src_2ecrw_dst_2ejpg">exiftool -AllTagsFromFile src.crw dst.jpg</a></strong><br />
+</dt>
+<dd>
+Set the values of all writable tags from information in <code>src.crw</code>, and
+update <code>dst.jpg</code> with this new information.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__27_2dthumbnailimage_3c_3dthumb_2ejpg_27_">exiftool '-ThumbnailImage&lt;=thumb.jpg' dst.jpg</a></strong><br />
+</dt>
+<dd>
+Set the thumbnail image from specified file (Note: The quotes are neccessary
+to prevent shell redirection).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dxmp_3acity_3dkingston_dst_2ejpg">exiftool -xmp:city=Kingston dst.jpg</a></strong><br />
+</dt>
+<dd>
+Write a tag to the XMP group (otherwise in this case the tag would get
+written to the IPTC group since <code>City</code> exists in both, and IPTC has
+priority).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dcanon_3aiso_3d100_dst_2ejpg">exiftool -Canon:ISO=100 dst.jpg</a></strong><br />
+</dt>
+<dd>
+Set <code>ISO</code> only in the Canon maker notes.
+</dd>
+<p></p>
+<dt><strong><a name="item_unknown">exiftool -LightSource-='Unknown (0)' dst.tiff</a></strong><br />
+</dt>
+<dd>
+Delete <code>LightSource</code> tag only if it is unknown with a value of 0.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dwhitebalance_2d_3dauto__2dwhitebalance">exiftool -whitebalance-=auto -WhiteBalance=tung dst.jpg</a></strong><br />
+</dt>
+<dd>
+Set <code>WhiteBalance</code> to <code>Tungsten</code> only if it was previously <code>Auto</code>.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="piping_examples">PIPING EXAMPLES</a></h1>
+<dl>
+<dt><strong><a name="item_cat_a_2ejpg__7c_exiftool__2d">cat a.jpg | exiftool -</a></strong><br />
+</dt>
+<dd>
+Extract information from stdin.
+</dd>
+<p></p>
+<dt><strong><a name="item_cat_a_2ejpg__7c_exiftool__2diptc_3akeywords_2b_3df">cat a.jpg | exiftool -iptc:keywords+=fantastic - &gt; b.jpg</a></strong><br />
+</dt>
+<dd>
+Add an IPTC keyword in a pipeline, saving output to a new file.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Copyright 2003-2005, Phil Harvey</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="ExifTool.html">Image::ExifTool</a>,
+<a href="TagNames.html">ExifTool Tag Names</a>,
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shortcuts.pm">Shortcut Tags</a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" style="background-color: #cccccc" valign="middle">
+<big><strong><span class="block">&nbsp;exiftool Application Documentation</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

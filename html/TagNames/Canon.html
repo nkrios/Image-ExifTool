@@ -1,0 +1,674 @@
+<html>
+<head>
+<title>Canon Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='Canon'>Canon Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>CanonCameraSettings</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#CameraSettings'>Canon CameraSettings Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>CanonFocalLength</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#FocalLength'>Canon FocalLength Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>CanonShotInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#ShotInfo'>Canon ShotInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0006</td>
+<td>CanonImageType</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0007</td>
+<td>CanonFirmwareVersion</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>FileNumber</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0009</td>
+<td>OwnerName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>CanonColorInfoD30</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#ColorInfoD30'>Canon ColorInfoD30 Tags</a></td></tr>
+<tr valign='top'>
+<td>0x000c</td>
+<td>SerialNumber</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x000e</td>
+<td>CanonFileLength</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x000f</td>
+<td>CanonCustomFunctions10D
+  <br>CanonCustomFunctions20D
+  <br>CanonCustomFunctions</td>
+<td align='center'>-<br>-<br>-</td>
+<td>--&gt; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#Functions'>CanonCustom Functions Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0012</td>
+<td>CanonPictureInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#PictureInfo'>Canon PictureInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0090</td>
+<td>CanonCustomFunctions1D</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0093</td>
+<td>CanonFileInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#FileInfo'>Canon FileInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x00a0</td>
+<td>CanonColorInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#ColorInfo'>Canon ColorInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x00a9</td>
+<td>WhiteBalanceTable</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Tags</a></td></tr>
+<tr valign='top'>
+<td>0x00ae</td>
+<td>ColorTemperature</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x00b6</td>
+<td>PreviewImageInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#PreviewImageInfo'>Canon PreviewImageInfo Tags</a></td></tr>
+</table></blockquote>
+
+<h2><a name='CameraSettings'>Canon CameraSettings Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>1</td>
+<td>MacroMode</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>1 = Macro
+  <br>2 = Normal</font></td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>Self-timer</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>Quality</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>2 = Normal
+  <br>3 = Fine
+  <br>4 = RAW
+  <br>5 = Superfine</font></td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>CanonFlashMode</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Off
+  <br>1 = Auto
+  <br>2 = On
+  <br>3 = Red-eye reduction
+  <br>4 = Slow-sync
+  <br>5 = Red-eye reduction (Auto)
+  <br>6 = Red-eye reduction (On)
+  <br>16 = External flash</font></td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>ContinuousDrive</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Single
+  <br>1 = Continuous</font></td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>FocusMode</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = One-shot AF
+  <br>1 = AI Servo AF
+  <br>2 = AI Focus AF
+  <br>3 = Manual Focus
+  <br>4 = Single
+  <br>5 = Continuous
+  <br>6 = Manual Focus</font></td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>CanonImageSize</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Large
+  <br>1 = Medium
+  <br>2 = Small</font></td></tr>
+<tr valign='top'>
+<td align='right'>11</td>
+<td>EasyMode</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Full auto
+  <br>1 = Manual
+  <br>2 = Landscape
+  <br>3 = Fast shutter
+  <br>4 = Slow shutter
+  <br>5 = Night
+  <br>6 = Black &amp; White
+  <br>7 = Sepia
+  <br>8 = Portrait
+  <br>9 = Sports
+  <br>10 = Macro
+  <br>11 = Pan focus</font></td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>DigitalZoom</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = None
+  <br>1 = x2
+  <br>2 = x4
+  <br>3 = Other</font></td></tr>
+<tr valign='top'>
+<td align='right'>13</td>
+<td>Contrast</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>Saturation</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>15</td>
+<td>Sharpness</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>16</td>
+<td>CameraISO</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Use shot ISO instead
+  <br>15 = Auto
+  <br>16 = 50
+  <br>17 = 100
+  <br>18 = 200
+  <br>19 = 400</font></td></tr>
+<tr valign='top'>
+<td align='right'>17</td>
+<td>MeteringMode</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Default
+  <br>1 = Spot
+  <br>3 = Evaluative
+  <br>4 = Partial
+  <br>5 = Center-weighted averaging</font></td></tr>
+<tr valign='top'>
+<td align='right'>18</td>
+<td>FocusType</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Manual
+  <br>1 = Auto (1)
+  <br>2 = Auto (2)
+  <br>3 = Macro Mode
+  <br>7 = Infinity Mode
+  <br>8 = Locked (Pan Mode)</font></td></tr>
+<tr valign='top'>
+<td align='right'>19</td>
+<td>AFPoint</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0x2005 = Manual AF point selection
+  <br>0x3000 = None (MF)
+  <br>0x3001 = Auto-selected
+  <br>0x3002 = Right
+  <br>0x3003 = Center
+  <br>0x3004 = Left
+  <br>0x4001 = Auto AF point selection</font></td></tr>
+<tr valign='top'>
+<td align='right'>20</td>
+<td>CanonExposureMode</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Easy
+  <br>1 = Program AE
+  <br>2 = Shutter Speed Priority AE
+  <br>3 = Aperture-Priority AE
+  <br>4 = Manual
+  <br>5 = Depth-of-field AE</font></td></tr>
+<tr valign='top'>
+<td align='right'>22</td>
+<td>LensType</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>1 = Canon EF 50mm f/1.8
+  <br>2 = Canon EF 28mm f/2.8
+  <br>4 = Sigma UC Zoom 35-135mm f/4-5.6
+  <br>6 = Tokina AF193-2 19-35mm f/3.5-4.5
+  <br>10 = Sigma 50mm f/2.8 EX / 28mm f/1.8
+  <br>21 = Canon EF 80-200mm f/2.8L
+  <br>26 = Cosina 100mm f/3.5 Macro AF
+  <br>28 = Tamron AF Aspherical 28-200mm f/3.8-5.6
+  <br>29 = Canon EF 50mm f/1.8 MkII
+  <br>39 = Canon EF 75-300mm f/4-5.6
+  <br>40 = Canon EF 28-80mm f/3.5-5.6
+  <br>125 = Canon TS-E 24mm f/3.5L
+  <br>131 = Sigma 17-35mm f2.8-4 EX Aspherical HSM
+  <br>135 = Canon EF 200mm f/1.8L
+  <br>136 = Canon EF 300mm f/2.8L
+  <br>139 = Canon EF 400mm f/2.8L
+  <br>141 = Canon EF 500mm f/4.5L
+  <br>150 = Sigma 20mm EX f/1.8
+  <br>151 = Canon EF 200mm f/2.8L USM
+  <br>155 = Canon EF 85mm f/1.8 USM
+  <br>156 = Canon EF 28-105mm f/3.5-4.5 USM
+  <br>160 = Canon EF 20-35mm f/3.5-4.5 USM
+  <br>161 = Canon EF 28-70mm f/2.8mm L USM / Sigma 24-70mm EX f/2.8
+  <br>165 = Canon EF 70-200mm f/2.8 L
+  <br>166 = Canon EF 70-200mm f/2.8 L + x1.4
+  <br>167 = Canon EF 70-200mm f/2.8 L + x2
+  <br>169 = Sigma 15-30mm f/3.5-4.5 EX DG Aspherical
+  <br>173 = Sigma 180mm EX HSM Macro f/3.5
+  <br>176 = Canon EF 24-85mm f/3.5-4.5 USM
+  <br>178 = Canon EF 28-135mm f/3.5-5.6 IS
+  <br>182 = Canon EF 100-400mm f/4.5-5.6 L IS + x2
+  <br>183 = Canon EF 100-400mm f/4.5-5.6 L IS
+  <br>190 = Canon EF 100mm f/2.8 Macro
+  <br>197 = Canon EF 75-300mm f/4-5.6 IS
+  <br>202 = Canon EF 28-80 f/3.5-5.6 USM IV
+  <br>213 = Canon EF 90-300mm f/4.5-5.6
+  <br>231 = Canon EF 17-40mm f/4L</font></td></tr>
+<tr valign='top'>
+<td align='right'>23</td>
+<td>LongFocal</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>24</td>
+<td>ShortFocal</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>25</td>
+<td>FocalUnits</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>28</td>
+<td>FlashActivity</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>29</td>
+<td>FlashBits</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>32</td>
+<td>FocusContinuous</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Single
+  <br>1 = Continuous</font></td></tr>
+<tr valign='top'>
+<td align='right'>36</td>
+<td>ZoomedResolution</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>37</td>
+<td>ZoomedResolutionBase</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>42</td>
+<td>ColorTone</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='FocalLength'>Canon FocalLength Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>1</td>
+<td>FocalLength</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>FocalPlaneXSize</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>FocalPlaneYSize</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='ShotInfo'>Canon ShotInfo Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>ISO</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>ExposureCompensation</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>WhiteBalance</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Cloudy
+  <br>3 = Tungsten
+  <br>4 = Fluorescent
+  <br>5 = Flash
+  <br>6 = Custom
+  <br>7 = Black &amp; White
+  <br>8 = Shade
+  <br>9 = Manual temperature
+  <br>14 = Daylight Fluorescent
+  <br>17 = Underwater</font></td></tr>
+<tr valign='top'>
+<td align='right'>9</td>
+<td>SequenceNumber</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>IxusAFPoint</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0x3000 = None (MF)
+  <br>0x3001 = Right
+  <br>0x3002 = Center
+  <br>0x3003 = Center+Right
+  <br>0x3004 = Left
+  <br>0x3005 = Left+Right
+  <br>0x3006 = Left+Center
+  <br>0x3007 = All</font></td></tr>
+<tr valign='top'>
+<td align='right'>15</td>
+<td>FlashExposureComp</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>16</td>
+<td>AutoExposureBracketing</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>-1 = On
+  <br>0 = Off</font></td></tr>
+<tr valign='top'>
+<td align='right'>17</td>
+<td>AEBBracketValue</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>19</td>
+<td>FocusDistanceUpper</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>20</td>
+<td>FocusDistanceLower</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>21</td>
+<td>FNumber</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>22</td>
+<td>ExposureTime</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>24</td>
+<td>BulbDuration</td>
+<td align='center'>int32s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>27</td>
+<td>AutoRotate</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>-1 = Rotated by Software
+  <br>0 = None
+  <br>1 = Rotate 90
+  <br>2 = Rotate 180
+  <br>3 = Rotate 270</font></td></tr>
+<tr valign='top'>
+<td align='right'>29</td>
+<td>Self-timer2</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='ColorInfoD30'>Canon ColorInfoD30 Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>9</td>
+<td>ColorTemperature</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>ColorMatrix</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='PictureInfo'>Canon PictureInfo Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>CanonImageWidth</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>CanonImageHeight</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>CanonImageWidthAsShot</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>CanonImageHeightAsShot</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>22</td>
+<td>AFPointsUsed</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='FileInfo'>Canon FileInfo Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>1</td>
+<td>FileNumber</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='ColorInfo'>Canon ColorInfo Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>9</td>
+<td>ColorTemperature</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='WhiteBalance'>Canon WhiteBalance Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>RedBalanceAuto</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>1</td>
+<td>BlueBalanceAuto</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>RedBalanceDaylight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>BlueBalanceDaylight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>RedBalanceCloudy</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>BlueBalanceCloudy</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>RedBalanceTungsten</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>BlueBalanceTungsten</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>RedBalanceFluorescent</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>9</td>
+<td>BlueBalanceFluorescent</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>RedBalanceFlash</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>11</td>
+<td>BlueBalanceFlash</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>RedBalanceCustom</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>13</td>
+<td>BlueBalanceCustom</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>RedBalanceB&amp;W</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>15</td>
+<td>BlueBalanceB&amp;W</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>16</td>
+<td>RedBalanceShade</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>17</td>
+<td>BlueBalanceShade</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<h2><a name='PreviewImageInfo'>Canon PreviewImageInfo Tags</a></h2>
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>PreviewImageLength</td>
+<td align='center'>N*</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>PreviewImageWidth</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>PreviewImageHeight</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>PreviewImageStart</td>
+<td align='center'>N*</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>PreviewFocalPlaneXResolution</td>
+<td align='center'>rational32s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>PreviewFocalPlaneYResolution</td>
+<td align='center'>rational32s</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Apr 2, 2005</i>
+</body>
+</html>

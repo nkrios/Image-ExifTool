@@ -1,0 +1,185 @@
+<html>
+<head>
+<title>Composite Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='Composite'>Composite Tags</a></h2>
+
+The values of the composite tags are derived from the values of other tags.
+These are convenience tags which are calculated after all other information
+is extracted.
+
+<blockquote><table border=1 cellspacing=0 cellpadding=2>
+<tr bgcolor='#dddddd'><th>Tag Name</th>
+<th>Writable</th><th>Derived From</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>Aperture</td>
+<td align='center'>N</td>
+<td>FNumber
+  <br>ApertureValue</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ConditionalFEC</td>
+<td align='center'>N</td>
+<td>FlashExposureComp
+  <br>FlashBits</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DateTimeCreated</td>
+<td align='center'>N</td>
+<td>DateCreated
+  <br>TimeCreated</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DateTimeOriginal</td>
+<td align='center'>N</td>
+<td>DateTimeCreated</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>DriveMode</td>
+<td align='center'>N</td>
+<td>ContinuousDrive
+  <br>Self-timer</td>
+<td><font size='-1'>0 = Continuous shooting
+  <br>1 = Self-timer Operation
+  <br>2 = Single-frame shooting</font></td></tr>
+<tr valign='top'>
+<td>FlashOn</td>
+<td align='center'>N</td>
+<td>FlashBits
+  <br>Flash</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>FlashType</td>
+<td align='center'>N</td>
+<td>FlashBits</td>
+<td><font size='-1'>0 = Built-In Flash
+  <br>1 = External</font></td></tr>
+<tr valign='top'>
+<td>FocalLength35efl</td>
+<td align='center'>N</td>
+<td>FocalLength
+  <br>ScaleFactor35efl</td>
+<td><font size='-1'><font color="#666666">(this value may be incorrect if image has been resized)</font></font></td></tr>
+<tr valign='top'>
+<td>GPSDateTime</td>
+<td align='center'>N</td>
+<td>GPSDateStamp
+  <br>GPSTimeStamp</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ImageSize</td>
+<td align='center'>N</td>
+<td>ImageWidth
+  <br>ImageHeight</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>JpgFromRaw</td>
+<td align='center'>Y</td>
+<td>JpgFromRawStart
+  <br>JpgFromRawLength</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Lens</td>
+<td align='center'>N</td>
+<td>ShortFocal
+  <br>LongFocal
+  <br>FocalUnits</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Lens35efl</td>
+<td align='center'>N</td>
+<td>ShortFocal
+  <br>LongFocal
+  <br>FocalUnits
+  <br>Lens
+  <br>ScaleFactor35efl</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>LensSpec</td>
+<td align='center'>N</td>
+<td>Nikon:Lens
+  <br>Nikon:LensType</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>PreviewImage</td>
+<td align='center'>Y</td>
+<td>PreviewImageStart
+  <br>PreviewImageLength</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>PreviewImageSize</td>
+<td align='center'>N</td>
+<td>PreviewImageWidth
+  <br>PreviewImageHeight</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ProcessGeoTiff</td>
+<td align='center'>N</td>
+<td>GeoTiffDirectory
+  <br>GeoTiffDoubleParams
+  <br>GeoTiffAsciiParams</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RedEyeReduction</td>
+<td align='center'>N</td>
+<td>CanonFlashMode
+  <br>FlashBits</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td>ScaleFactor35efl</td>
+<td align='center'>N</td>
+<td>FocalLength
+  <br>FocalLengthIn35mmFormat
+  <br>FocalPlaneResolutionUnit
+  <br>FocalPlaneXResolution
+  <br>FocalPlaneYResolution
+  <br>CanonImageWidthAsShot
+  <br>CanonImageHeightAsShot
+  <br>ExifImageWidth
+  <br>ExifImageLength
+  <br>ImageWidth
+  <br>ImageHeight</td>
+<td><font size='-1'><font color="#666666">(this value may be incorrect if image has been resized)</font></font></td></tr>
+<tr valign='top'>
+<td>ShootingMode</td>
+<td align='center'>N</td>
+<td>CanonExposureMode
+  <br>EasyMode</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ShutterCurtainHack</td>
+<td align='center'>N</td>
+<td>FlashBits
+  <br>ShutterCurtainSync</td>
+<td><font size='-1'>0 = 1st-curtain sync
+  <br>1 = 2nd-curtain sync</font></td></tr>
+<tr valign='top'>
+<td>ShutterSpeed</td>
+<td align='center'>N</td>
+<td>ExposureTime
+  <br>ShutterSpeedValue
+  <br>BulbDuration</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>SubSecDateTimeOriginal</td>
+<td align='center'>N</td>
+<td>DateTimeOriginal
+  <br>SubSecTimeOriginal</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ThumbnailImage</td>
+<td align='center'>Y</td>
+<td>ThumbnailOffset
+  <br>ThumbnailLength</td>
+<td>&nbsp;</td></tr>
+</table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Apr 2, 2005</i>
+</body>
+</html>

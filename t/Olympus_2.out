@@ -1,5 +1,6 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.32
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
 [File, File, Image]  - File Name: Olympus.jpg
+[File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
@@ -44,12 +45,12 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1296
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
-[MakerNotes, Olympus, Camera] 512 - Special Mode: 0 0 0
+[MakerNotes, Olympus, Camera] 512 - Special Mode: Normal, Sequence: 0, Panorama: (none)
 [MakerNotes, Olympus, Camera] 513 - Image Quality: HQ
 [MakerNotes, Olympus, Camera] 514 - Macro: Off
 [MakerNotes, Olympus, Camera] 516 - Digital Zoom: 0
-[MakerNotes, Olympus, Camera] 519 - Software Release: SR951
-[MakerNotes, Olympus, Camera] 520 - Pict Info: [pictureInfo] Resolution=1 [Camera Info] Type=SR951
+[MakerNotes, Olympus, Camera] 519 - Firmware Version: SR951
+[MakerNotes, Olympus, Camera] 520 - Picture Info: [pictureInfo] Resolution=1 [Camera Info] Type=SR951
 [MakerNotes, Olympus, Camera] 521 - Camera ID: OLYMPUS DIGITAL CAMERA
 [MakerNotes, Olympus, Camera] 3840 - Data Dump: (Binary data 186 bytes)
 [Composite, Composite, Image]  - Aperture: 2.0

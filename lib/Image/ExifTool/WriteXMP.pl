@@ -45,7 +45,7 @@ my %xmpResourceRef = (
 my %xmpResourceEvent = (
     stEvt => [
         'action', 'instanceID', 'parameters', 'softwareAgent', 'when',
-    ]
+    ],
 );
 my %xmpJobRef = (
     stJob => [ 'name', 'id', 'url' ],
@@ -82,6 +82,13 @@ my %xmpCFAPattern = (
 );
 my %xmpDeviceSettings = (
     exif => [ 'Columns', 'Rows', 'Settings' ],
+);
+# Iptc4xmpCore structures
+my %xmpContactInfo = (
+    Iptc4xmpCore => [
+        'CiAdrCity', 'CiAdrCtry', 'CiAdrExtadr', 'CiAdrPcode',
+        'CiAdrRegion', 'CiEmailWork', 'CiTelWork', 'CiUrlWork',
+    ],
 );
 
 # complete lookup for all tags of each XMP namespace
@@ -158,6 +165,10 @@ my %writableXMP = (
         'GPSDestDistanceRef', 'GPSDestDistance', 'GPSProcessingMethod',
         'GPSAreaInformation', 'GPSDifferential',
     ],
+    Iptc4xmpCore => [
+        'CountryCode', ['CreatorContactInfo', \%xmpContactInfo], 'IntellectualGenre',
+        'Location', 'Scene', 'SubjectCode',
+    ],
 );
 
 # Lookup to translate our namespace prefixes into URI's.  This
@@ -186,6 +197,7 @@ my %nsURI = (
     xmpRights => 'http://ns.adobe.com/xap/1.0/rights/',
     xmpTPg    => 'http://ns.adobe.com/xap/1.0/t/pg/',
     xmpidq    => 'http://ns/adobe.com/xmp/Identifier/qual/1.0',
+    Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
 );
 
 # these are the attributes that we handle for properties that contain
@@ -333,6 +345,8 @@ sub SetPropertyPath($$$)
                 pop @$propList;
                 next;
             }
+            # translate necessary namespaces
+            $group1 = $niceNamespace{$group1} if $niceNamespace{$group1};
             $tagInfo->{Groups}->{1} = 'XMP-' . $group1;   # set group1 name
             # the 'List' entry in XMP table gives the specific type of
             # list, and is one of Bag, Seq, Alt or 1.  If '1', this is just
