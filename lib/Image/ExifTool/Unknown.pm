@@ -19,7 +19,7 @@ $VERSION = '1.13';
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 1 => 'MakerUnknown', 2 => 'Camera' },
-    
+
     # this seems to be a common fixture, so look for it in unknown maker notes
     0x0e00 => {
         Name => 'PrintIM',

@@ -5,14 +5,13 @@
 #
 # Revisions:    11/25/2003 - P. Harvey Created
 #               10/28/2004 - P. Harvey Major overhaul to conform with XMP spec
+#               02/27/2005 - P. Harvey Also read UTF-16 and UTF-32 XMP
 #
 # References:   1) http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
 #               2) http://www.w3.org/TR/rdf-syntax-grammar/  (20040210)
 #               3) http://www.portfoliofaq.com/pfaq/v7mappings.htm
 #
-# Notes:      - Only UTF-8 (ASCII) encoded XMP is supported
-#
-#             - I am handling property qualifiers as if they were separate
+# Notes:      - I am handling property qualifiers as if they were separate
 #               properties (with no associated namespace).
 #
 #             - Currently, there is no special treatment of the following
@@ -22,9 +21,6 @@
 #
 #             - The family 2 group names will be set to 'Unknown' for any XMP
 #               tags not found in the XMP or Exif tag tables.
-#
-#             - The 'ThumbnailImage' is untested since I can't find a file
-#               with an embedded XMP thumbnail.
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::XMP;
@@ -34,7 +30,7 @@ use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -44,14 +40,14 @@ sub ParseXMPElement($$$;$$);
 sub DecodeBase64($);
 
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
-%ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1 );
+%ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
 
 # main XMP tag table
 %Image::ExifTool::XMP::Main = (
     GROUPS => { 2 => 'Unknown' },
     PROCESS_PROC => \&ProcessXMP,
     WRITE_PROC => \&WriteXMP,
-    WRITABLE => 1,
+    WRITABLE => 'string',
 #
 # Define tags for necessary schema properties
 # (only need to define tag if we want to change the default group
@@ -61,7 +57,7 @@ sub DecodeBase64($);
 #  Family 1 groups are generated from the property namespace.)
 #
 # Writable - only need to define this for writable tags if not plain text
-#            (Boolean, Integer, Rational, Date or LangAlt)
+#            (boolean, integer, rational, date or lang-alt)
 # List - XMP list type (Bag, Seq or Alt)
 #
 # - Dublin Core schema properties (dc)
@@ -71,23 +67,23 @@ sub DecodeBase64($);
     Creator         => { Groups => { 2 => 'Author' }, List => 'Seq' },
     Date            => {
         Groups => { 2 => 'Time'   },
-        Writable => 'Date',
+        Writable => 'date',
         List => 'Seq',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    Description     => { Groups => { 2 => 'Image'  }, Writable => 'LangAlt' },
+    Description     => { Groups => { 2 => 'Image'  }, Writable => 'lang-alt' },
     Format          => { Groups => { 2 => 'Image'  } },
     Identifier      => { Groups => { 2 => 'Image'  } },
     Language        => { List => 'Bag' },
     Publisher       => { Groups => { 2 => 'Author' }, List => 'Bag' },
     Relation        => { List => 'Bag' },
-    Rights          => { Groups => { 2 => 'Author' }, Writable => 'LangAlt' },
+    Rights          => { Groups => { 2 => 'Author' }, Writable => 'lang-alt' },
     Source          => [
         { Groups => { 2 => 'Author' }, Namespace => 'dc' },
         { Groups => { 2 => 'Author' }, Namespace => 'photoshop' },
     ],
     Subject         => { Groups => { 2 => 'Image'  }, List => 'Bag' },
-    Title           => { Groups => { 2 => 'Image'  }, Writable => 'LangAlt' },
+    Title           => { Groups => { 2 => 'Image'  }, Writable => 'lang-alt' },
     Type            => { Groups => { 2 => 'Image'  }, List => 'Bag' },
 #
 # - XMP Basic schema properties (xmp (was xap))
@@ -96,19 +92,19 @@ sub DecodeBase64($);
     BaseURL         => { },
     CreateDate      => {
         Groups => { 2 => 'Time'  },
-        Writable => 'Date',
+        Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     CreatorTool     => { },
     Identifier      => { List => 'Bag' },
     MetadataDate    => {
         Groups => { 2 => 'Time'  },
-        Writable => 'Date',
+        Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ModifyDate => {
         Groups => { 2 => 'Time' },
-        Writable => 'Date',
+        Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Nickname        => { },
@@ -133,9 +129,9 @@ sub DecodeBase64($);
 # - XMP Rights Management schema properties (xmpRights)
 #
     Certificate     => { Groups => { 1 => 'XMP-xmpRights', 2 => 'Author' } },
-    Marked          => { Writable => 'Boolean' },
+    Marked          => { Writable => 'boolean' },
     Owner           => { Groups => { 2 => 'Author' }, List => 'Bag' },
-    UsageTerms      => { Writable => 'LangAlt' },
+    UsageTerms      => { Writable => 'lang-alt' },
     WebStatement    => { Groups => { 2 => 'Author' } },
 #
 # - XMP Media Management schema properties (xmpMM)
@@ -159,7 +155,7 @@ sub DecodeBase64($);
     HistoryInstanceID       => { },
     HistoryParameters       => { },
     HistorySoftwareAgent    => { },
-    HistoryWhen             => { Groups => { 2 => 'Time'  }, Writable => 'Date' },
+    HistoryWhen             => { Groups => { 2 => 'Time'  }, Writable => 'date' },
   # ManagedFrom - structure (ResourceRef)
     ManagedFrom     => { Writable => 0 },
     ManagedFromInstanceID       => { },
@@ -186,8 +182,8 @@ sub DecodeBase64($);
     VersionsEventInstanceID     => { },
     VersionsEventParameters     => { },
     VersionsEventSoftwareAgent  => { },
-    VersionsEventWhen           => { Groups => { 2 => 'Time' }, Writable => 'Date' },
-    VersionsModifyDate  => { Groups => { 2 => 'Time' }, Writable => 'Date' },
+    VersionsEventWhen           => { Groups => { 2 => 'Time' }, Writable => 'date' },
+    VersionsModifyDate  => { Groups => { 2 => 'Time' }, Writable => 'date' },
     VersionsModifier    => { },
     VersionsVersion     => { },
     LastURL         => { },
@@ -201,7 +197,7 @@ sub DecodeBase64($);
     RenditionOfManagerVariant   => { },
     RenditionOfManageTo         => { },
     RenditionOfManageUI         => { },
-    SaveID          => { Writable => 'Integer' },
+    SaveID          => { Writable => 'integer' },
 #
 # - XMP Basic Job Ticket schema properties (xmpBJ)
 #
@@ -220,12 +216,12 @@ sub DecodeBase64($);
     Author          => { Groups => { 1 => 'XMP-pdf', 2 => 'Author' } }, #PH
     ModDate => { #PH
         Groups => { 2 => 'Time' },
-        Writable => 'Date',
+        Writable => 'date',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
     },
     CreationDate => { #PH
         Groups => { 2 => 'Time' },
-        Writable => 'Date',
+        Writable => 'date',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
     },
   # Creator (covered by dc) #PH
@@ -245,7 +241,7 @@ sub DecodeBase64($);
     Credit          => { Groups => { 2 => 'Author' } },
     DateCreated => {
         Groups => { 2 => 'Time' },
-        Writable => 'Date',
+        Writable => 'date',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
     },
     Headline        => { Groups => { 2 => 'Image'  } },
@@ -256,7 +252,7 @@ sub DecodeBase64($);
     # way Photoshop7.0 writes it - PH
     SupplementalCategories  => { Groups => { 2 => 'Image' }, List => 'Bag' },
     TransmissionReference   => { Groups => { 2 => 'Image' } },
-    Urgency         => { Writable => 'Integer' },
+    Urgency         => { Writable => 'integer' },
 #
 # - Photoshop Raw Converter schema properties (crs) - not documented
 #
@@ -337,16 +333,16 @@ sub DecodeBase64($);
 #
     ImageWidth => {
         Groups => { 1 => 'XMP-tiff', 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     ImageLength => {
         Name => 'ImageHeight',
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     BitsPerSample => {
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
         List => 'Seq',
     },
     Compression => {
@@ -363,7 +359,7 @@ sub DecodeBase64($);
     },
     SamplesPerPixel => {
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     PlanarConfiguration => {
         Groups => { 2 => 'Image' },
@@ -385,11 +381,11 @@ sub DecodeBase64($);
     },
     XResolution => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     YResolution => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     ResolutionUnit => {
         Groups => { 2 => 'Image' },
@@ -401,38 +397,38 @@ sub DecodeBase64($);
     },
     TransferFunction => {
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
         List => 'Seq',
     },
     WhitePoint => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         List => 'Seq',
     },
     PrimaryChromaticities => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         List => 'Seq',
     },
     YCbCrCoefficients => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         List => 'Seq',
     },
     ReferenceBlackWhite => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         List => 'Seq',
     },
     DateTime => {
         Description => 'Date/Time Of Last Modification',
         Groups => { 2 => 'Time' },
-        Writable => 'Date',
+        Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ImageDescription => {
         Groups => { 2 => 'Image' },
-        Writable => 'LangAlt',
+        Writable => 'lang-alt',
     },
     Make => {
         Groups => { 2 => 'Camera' },
@@ -449,7 +445,7 @@ sub DecodeBase64($);
     },
     Copyright => {
         Groups => { 2 => 'Author' },
-        Writable => 'LangAlt',
+        Writable => 'lang-alt',
     },
 #
 # - Exif schema properties (exif)
@@ -479,45 +475,45 @@ sub DecodeBase64($);
     },
     CompressedBitsPerPixel => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     PixelXDimension => {
         Name => 'ExifImageWidth',
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     PixelYDimension => {
         Name => 'ExifImageHeight',
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     MakerNote => { Groups => { 2 => 'Image' } },
     UserComment => {
         Groups => { 2 => 'Image' },
-        Writable => 'LangAlt',
+        Writable => 'lang-alt',
     },
     RelatedSoundFile => { },
     DateTimeOriginal => {
         Groups => { 2 => 'Time' },
-        Writable => 'Date',
+        Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     DateTimeDigitized => {
         Description => 'Date/Time Digitized',
         Groups => { 2 => 'Time' },
-        Writable => 'Date',
+        Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ExposureTime => {
         Description => 'Shutter Speed',
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
     FNumber => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         Description => 'Aperture',
         PrintConv => 'sprintf("%.1f",$val)',
         PrintConvInv => '$val',
@@ -540,7 +536,7 @@ sub DecodeBase64($);
     },
     ISOSpeedRatings => {
         Name => 'ISO',
-        Writable => 'Integer',
+        Writable => 'integer',
         List => 'Seq',
         Description => 'ISO Speed',
         Groups => { 2 => 'Image' },
@@ -553,11 +549,11 @@ sub DecodeBase64($);
     },
     OECFColumns => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     OECFRows => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     OECFNames => {
         Groups => { 2 => 'Camera' },
@@ -565,12 +561,12 @@ sub DecodeBase64($);
     },
     OECFValues => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Rational',
+        Writable => 'rational',
         List => 'Seq',
     },
     ShutterSpeedValue => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         ValueConvInv => '$val>0 ? -log($val)/log(2) : 0',
@@ -579,7 +575,7 @@ sub DecodeBase64($);
     },
     ApertureValue => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         ValueConv => 'sqrt(2) ** $val',
         PrintConv => 'sprintf("%.1f",$val)',
         ValueConvInv => '$val>0 ? 2*log($val)/log(2) : 0',
@@ -587,18 +583,18 @@ sub DecodeBase64($);
     },
     BrightnessValue => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     ExposureBiasValue => {
         Name => 'ExposureCompensation',
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         PrintConvInv => '$val',
     },
     MaxApertureValue => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Rational',
+        Writable => 'rational',
         ValueConv => 'sqrt(2) ** $val',
         PrintConv => 'sprintf("%.1f",$val)',
         ValueConvInv => '$val>0 ? 2*log($val)/log(2) : 0',
@@ -606,7 +602,7 @@ sub DecodeBase64($);
     },
     SubjectDistance => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Rational',
+        Writable => 'rational',
         PrintConv => '"$val m"',
         PrintConvInv => '$val=~s/ m$//;$val',
     },
@@ -633,7 +629,7 @@ sub DecodeBase64($);
     },
     FlashFired => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Boolean',
+        Writable => 'boolean',
     },
     FlashReturn => {
         Groups => { 2 => 'Camera' },
@@ -654,26 +650,26 @@ sub DecodeBase64($);
     },
     FlashFunction => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Boolean',
+        Writable => 'boolean',
     },
     FlashRedEyeMode => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Boolean',
+        Writable => 'boolean',
     },
     FocalLength=> {
         Groups => { 2 => 'Camera' },
-        Writable => 'Rational',
+        Writable => 'rational',
         PrintConv => 'sprintf("%.1fmm",$val)',
         PrintConvInv => '$val=~s/mm$//;$val',
     },
     SubjectArea => {
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
         List => 'Seq',
     },
     FlashEnergy => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     # SpatialFrequencyResponse - structure (OECF/SFR=Columns,Rows,Names,Values)
     SpatialFrequencyResponse => {
@@ -682,11 +678,11 @@ sub DecodeBase64($);
     },
     SpatialFrequencyResponseColumns => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     SpatialFrequencyResponseRows => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     SpatialFrequencyResponseNames => {
         Groups => { 2 => 'Camera' },
@@ -694,16 +690,16 @@ sub DecodeBase64($);
     },
     SpatialFrequencyResponseValues => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Rational',
+        Writable => 'rational',
         List => 'Seq',
     },
     FocalPlaneXResolution => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     FocalPlaneYResolution => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     FocalPlaneResolutionUnit => {
         Groups => { 2 => 'Camera' },
@@ -723,12 +719,12 @@ sub DecodeBase64($);
     },
     SubjectLocation => {
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
         List => 'Seq',
     },
     ExposureIndex => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     SensingMethod => {
         Groups => { 2 => 'Camera' },
@@ -761,16 +757,16 @@ sub DecodeBase64($);
     },
     CFAPatternColumns => {
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     CFAPatternRows => {
         Groups => { 2 => 'Image' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     CFAPatternValues => {
         Groups => { 2 => 'Image' },
         List => 'Seq',
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     CustomRendered => {
         Groups => { 2 => 'Image' },
@@ -797,11 +793,11 @@ sub DecodeBase64($);
 #    },
     DigitalZoomRatio => {
         Groups => { 2 => 'Image' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     FocalLengthIn35mmFilm => {
         Name => 'FocalLengthIn35mmFormat',
-        Writable => 'Integer',
+        Writable => 'integer',
         Groups => { 2 => 'Camera' },
     },
     SceneCaptureType => {
@@ -857,11 +853,11 @@ sub DecodeBase64($);
     },
     DeviceSettingDescriptionColumns => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     DeviceSettingDescriptionRows => {
         Groups => { 2 => 'Camera' },
-        Writable => 'Integer',
+        Writable => 'integer',
     },
     DeviceSettingDescriptionSettings => {
         Groups => { 2 => 'Camera' },
@@ -889,12 +885,12 @@ sub DecodeBase64($);
     },
     GPSAltitude     => {
         Groups => { 2 => 'Location' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     GPSVersionID    => { Groups => { 2 => 'Location' } },
     GPSTimeStamp    => {
         Groups => { 2 => 'Time' },
-        Writable => 'Date',
+        Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     GPSSatellites   => { Groups => { 2 => 'Location' } },
@@ -915,7 +911,7 @@ sub DecodeBase64($);
     },
     GPSSpeed => {
         Groups => { 2 => 'Location' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     GPSTrackRef => {
         Groups => { 2 => 'Location' },
@@ -926,7 +922,7 @@ sub DecodeBase64($);
     },
     GPSTrack => {
         Groups => { 2 => 'Location' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     GPSImgDirectionRef => {
         PrintConv => {
@@ -936,7 +932,7 @@ sub DecodeBase64($);
     },
     GPSImgDirection => {
         Groups => { 2 => 'Location' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     GPSMapDatum     => { Groups => { 2 => 'Location' } },
     GPSDestLatitude => { Groups => { 2 => 'Location' } },
@@ -950,7 +946,7 @@ sub DecodeBase64($);
     },
     GPSDestBearing => {
         Groups => { 2 => 'Location' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     GPSDestDistanceRef => {
         Groups => { 2 => 'Location' },
@@ -962,7 +958,7 @@ sub DecodeBase64($);
     },
     GPSDestDistance => {
         Groups => { 2 => 'Location' },
-        Writable => 'Rational',
+        Writable => 'rational',
     },
     GPSProcessingMethod => { Groups => { 2 => 'Location' } },
     GPSAreaInformation  => { Groups => { 2 => 'Location' } },
@@ -1277,19 +1273,73 @@ sub ProcessXMP($$$)
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
     my $dataPt = $dirInfo->{DataPt};
     my $dirStart = $dirInfo->{DirStart} || 0;
-    my $buff;
+    my $dirLen = $dirInfo->{DirLen};
     my $rtnVal = 0;
+    my $buff;
 
     return 0 unless $tagTablePtr;
     # take substring if necessary
-    if ($dirInfo->{DataLen} != $dirStart + $dirInfo->{DirLen}) {
-        $buff = substr($$dataPt, $dirStart, $dirInfo->{DirLen});
+    if ($dirInfo->{DataLen} != $dirStart + $dirLen) {
+        $buff = substr($$dataPt, $dirStart, $dirLen);
         $dataPt = \$buff;
         $dirStart = 0;
     }
-    if ($exifTool->Options('Verbose')) {
-        $exifTool->VerboseDir('XMP', 0, $$dirInfo{DirLen});
+    if ($exifTool->Options('Verbose') and not $exifTool->{XMP_CAPTURE}) {
+        $exifTool->VerboseDir('XMP', 0, $dirLen);
     }
+#
+# convert UTF16 or UTF32 encoded XMP to UTF8 if necessary
+#
+    my $begin = '<?xpacket begin=';
+    pos($$dataPt) = $dirStart;
+    unless ($$dataPt =~ /\G\Q$begin\E/) {
+        my ($fmt, $len);
+        # check for UTF16 encoding (insert one \0 between characters)
+        $begin = join "\0", split //, $begin;
+        if ($$dataPt =~ /\G(\0)?\Q$begin\E\0./g) {
+            # validate byte ordering by checking for U+FEFF character
+            if ($1) {
+                # should be big-endian since we had a leading \0
+                $fmt = 'n' if $$dataPt =~ /\G\xfe\xff/;
+            } else {
+                $fmt = 'v' if $$dataPt =~ /\G\0\xff\xfe/;
+            }
+        } else {
+            # check for UTF32 encoding (with three \0's between characters)
+            $begin =~ s/\0/\0\0\0/g;
+            # must reset pos because it was killed by previous unsuccessful //g match
+            pos($$dataPt) = $dirStart;
+            if ($$dataPt !~ /\G(\0\0\0)?\Q$begin\E\0\0\0./g) {
+                $fmt = 0;   # set format to zero as indication we didn't find encoded XMP
+            } elsif ($1) {
+                # should be big-endian
+                $fmt = 'N' if $$dataPt =~ /\G\0\0\xfe\xff/;
+            } else {
+                $fmt = 'V' if $$dataPt =~ /\G\0\0\0\xff\xfe\0\0/;
+            }
+        }
+        if ($fmt) {
+            # translate into UTF8
+            if ($] >= 5.006001) {
+                $buff = pack('C0U*',unpack("x$dirStart$fmt*",$$dataPt));
+            } else {
+                # hack for pre 5.6.1 (because the code to do the
+                # translation properly is unnecesarily bulky)
+                my @unpk = unpack("x$dirStart$fmt*",$$dataPt);
+                foreach (@unpk) {
+                    $_ > 0xff and $_ = ord('?');
+                }
+                $buff = pack('C*', @unpk);
+            }
+            $dataPt = \$buff;
+            $dirStart = 0;
+        } else {
+            defined $fmt or $exifTool->Warn('XMP character encoding error');
+        }
+    }
+#
+# extract the information
+#
     $rtnVal = 1 if ParseXMPElement($exifTool, $tagTablePtr, $dataPt, $dirStart);
 
     return $rtnVal;
@@ -1328,6 +1378,8 @@ it under the same terms as Perl itself.
 =item http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
 
 =item http://www.w3.org/TR/rdf-syntax-grammar/
+
+=item http://www.portfoliofaq.com/pfaq/v7mappings.htm
 
 =back
 

@@ -15,7 +15,7 @@ $VERSION = '1.01';
 
 %Image::ExifTool::Sony::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    
+
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -41,7 +41,7 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to
-interpret Sony maker notes EXIF meta information. 
+interpret Sony maker notes EXIF meta information.
 
 =head1 NOTES
 

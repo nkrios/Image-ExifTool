@@ -16,6 +16,7 @@
 #               5) http://www.asmail.be/msg0054681802.html
 #               6) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               7) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
+#               8) http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -26,7 +27,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.44';
+$VERSION = '1.46';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -472,7 +473,6 @@ sub Rationalize($;$);
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
-            Count => 1,
         },
         {
             Name => 'PreviewImageStart',
@@ -482,13 +482,32 @@ sub Rationalize($;$);
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'MakerNotes',
-            Count => 1,
         },
         {
             Name => 'JpgFromRawStart',
+            Condition => '$self->{DIR_NAME} eq "SubIFD"',
             Flags => [ 'IsOffset', 'Protected' ],
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD',
+            # JpgFromRaw is in SubIFD of NEF files
+            WriteCondition => '$self->{TIFF_TYPE} eq "NEF"',
+        },
+        {
+            Name => 'JpgFromRawStart',
+            Condition => '$self->{DIR_NAME} eq "IFD2"',
+            Flags => [ 'IsOffset', 'Protected' ],
+            OffsetPair => 0x202,
+            DataTag => 'JpgFromRaw',
+            Writable => 'int32u',
+            WriteGroup => 'IFD2',
+            # JpgFromRaw is in IFD2 of PEF files
+            WriteCondition => '$self->{TIFF_TYPE} eq "PEF"',
+        },
+        {
+            Name => 'OtherImageStart',
+            OffsetPair => 0x202,
         },
     ],
     0x202 => [
@@ -500,7 +519,6 @@ sub Rationalize($;$);
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
-            Count => 1,
         },
         {
             Name => 'PreviewImageLength',
@@ -510,13 +528,30 @@ sub Rationalize($;$);
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'MakerNotes',
-            Count => 1,
         },
         {
             Name => 'JpgFromRawLength',
+            Condition => '$self->{DIR_NAME} eq "SubIFD"',
             Flags => 'Protected',
             OffsetPair => 0x201,
             DataTag => 'JpgFromRaw',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD',
+            WriteCondition => '$self->{TIFF_TYPE} eq "NEF"',
+        },
+        {
+            Name => 'JpgFromRawLength',
+            Condition => '$self->{DIR_NAME} eq "IFD2"',
+            Flags => 'Protected',
+            OffsetPair => 0x201,
+            DataTag => 'JpgFromRaw',
+            Writable => 'int32u',
+            WriteGroup => 'IFD2',
+            WriteCondition => '$self->{TIFF_TYPE} eq "PEF"',
+        },
+        {
+            Name => 'OtherImageLength',
+            OffsetPair => 0x201,
         },
     ],
     0x203 => 'JPEGRestartInterval',
@@ -827,7 +862,7 @@ sub Rationalize($;$);
     0x927c => \@Image::ExifTool::MakerNotes::Main,
     0x9286 => {
         Name => 'UserComment',
-        PrintConv => '$_=substr($val,8);s/\0.*//;$_',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
     },
     0x9290 => {
         Name => 'SubSecTime',
@@ -845,28 +880,28 @@ sub Rationalize($;$);
     0x9c9b => {
         Name => 'XPTitle',
         Format => 'undef',
-        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+        ValueConv => '$self->Unicode2Byte($val,"II")',
     },
     0x9c9c => {
         Name => 'XPComment',
         Format => 'undef',
-        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+        ValueConv => '$self->Unicode2Byte($val,"II")',
     },
     0x9c9d => {
         Name => 'XPAuthor',
         Groups => { 2 => 'Author' },
         Format => 'undef',
-        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+        ValueConv => '$self->Unicode2Byte($val,"II")',
     },
     0x9c9e => {
         Name => 'XPKeywords',
         Format => 'undef',
-        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+        ValueConv => '$self->Unicode2Byte($val,"II")',
     },
     0x9c9f => {
         Name => 'XPSubject',
         Format => 'undef',
-        ValueConv => 'Image::ExifTool::Exif::XPtoUTF8($val)',
+        ValueConv => '$self->Unicode2Byte($val,"II")',
     },
     0xa000 => 'FlashpixVersion',
     0xa001 => {
@@ -1042,11 +1077,67 @@ sub Rationalize($;$);
     0xa420 => 'ImageUniqueID',
     0xa480 => 'GDALMetadata', #3
     0xa481 => 'GDALNoData', #3
+    # 0xc350 thru 0xc41a plus 0xc46c,0xc46e are Kodak APP13 tags (ref 8)
+    0xc350 => 'FilmProductCode',
+    0xc351 => 'ImageSourceEK',
+    0xc352 => 'CaptureConditionsPAR',
+    0xc353 => {
+        Name => 'CameraOwner',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+    },
+    0xc354 => {
+        Name => 'SerialNumber',
+        Groups => { 2 => 'Camera' },
+    },
+    0xc355 => 'UserSelectGroupTitle',
+    0xc356 => 'DealerIDNumber',
+    0xc357 => 'CaptureDeviceFID',
+    0xc358 => 'EnvelopeNumber',
+    0xc359 => 'FrameNumber',
+    0xc35a => 'FilmCategory',
+    0xc35b => 'FilmGencode',
+    0xc35c => 'ModelAndVersion',
+    0xc35d => 'FilmSize',
+    0xc35e => 'SBA_RGBShifts',
+    0xc35f => 'SBAInputImageColorspace',
+    0xc360 => 'SBAInputImageBitDepth',
+    0xc361 => 'SBAExposureRecord',
+    0xc362 => 'UserAdjSBA_RGBShifts',
+    0xc363 => 'ImageRotationStatus',
+    0xc364 => 'RollGuidElements',
+    0xc365 => 'MetadataNumber',
+    0xc366 => 'EditTagArray',
+    0xc367 => 'Magnification',
+    0xc36c => 'NativeXResolution',
+    0xc36d => 'NativeYResolution',
+    0xc36e => {
+        Name => 'KodakEffectsIFD',
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SpecialEffects',
+            Start => '$val',
+        },
+    },
+    0xc36f => {
+        Name => 'KodakBordersIFD',
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Borders',
+            Start => '$val',
+        },
+    },
+    0xc37a => 'NativeResolutionUnit',
+    0xc418 => 'SourceImageDirectory',
+    0xc419 => 'SourceImageFileName',
+    0xc41a => 'SourceImageVolumeName',
+    # (end Kodak APP3 tags)
     0xc427 => 'OceScanjobDesc', #3
     0xc428 => 'OceApplicationSelector', #3
     0xc429 => 'OceIDNumber', #3
     0xc42a => 'OceImageLogic', #3
     0xc44f => 'Annotations', #7
+    0xc46c => 'PrintQuality', #8 (Kodak APP3)
+    0xc46e => 'ImagePrintStatus', #8 (Kodak APP3)
     0xc4a5 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -1099,9 +1190,13 @@ sub Rationalize($;$);
     0xc62c => 'BaselineSharpness', #2
     0xc62d => 'BayerGreenSplit', #2
     0xc62e => 'LinearResponseLimit', #2
-    0xc62f => 'DNGCameraSerialNumber', #2
+    0xc62f => { #2
+        Name => 'DNGCameraSerialNumber',
+        Groups => { 2 => 'Camera' },
+    },
     0xc630 => { #2
         Name => 'DNGLensInfo',
+        Groups => { 2 => 'Camera' },
         PrintConv => '$_=$val;s/(\S+) (\S+) (\S+) (\S+)/$1-$2mm f\/$3-$4/;$_',
     },
     0xc631 => 'ChromaBlurRadius', #2
@@ -1131,6 +1226,29 @@ sub Rationalize($;$);
     # tag name at the start of the string.  To accomodate these types
     # of tags, all tags with values above 0xf000 are handled specially
     # by ProcessExif().
+);
+
+# Kodak Sub-IFD's (ref 8) - (put them here for convenience)
+%Image::ExifTool::Kodak::SpecialEffects = (
+    GROUPS => { 0 => 'EXIF', 1 => 'KodakEffectsIFD', 2 => 'Image'},
+    0 => 'DigitalEffectsVersion',
+    1 => {
+        Name => 'DigitalEffectsName',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+    },
+    2 => 'DigitalEffectsType',
+);
+%Image::ExifTool::Kodak::Borders = (
+    GROUPS => { 0 => 'EXIF', 1 => 'KodakBordersIFD', 2 => 'Image'},
+    0 => 'BordersVersion',
+    1 => {
+        Name => 'BorderName',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+    },
+    2 => 'BorderID',
+    3 => 'BorderLocation',
+    4 => 'BorderType',
+    8 => 'WatermarkType',
 );
 
 # the Composite tags are evaluated last, and are used
@@ -1218,12 +1336,15 @@ sub Rationalize($;$);
         PrintConvInv => '$val',
     },
     JpgFromRaw => {
+        Writable => 1,
         Require => {
             0 => 'JpgFromRawStart',
             1 => 'JpgFromRawLength',
         },
         ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"JpgFromRaw")',
+        ValueConvInv => '$val',
         PrintConv => '\$val',
+        PrintConvInv => '$val',
     },
     PreviewImageSize => {
         Require => {
@@ -1316,6 +1437,26 @@ sub ConvertFraction($)
         } else {
             $str = sprintf("%.3g", $val);
         }
+    }
+    return $str;
+}
+
+#------------------------------------------------------------------------------
+# Convert EXIF text to something readable
+# Inputs: 0) ExifTool object reference, 1) EXIF text
+# Returns: UTF8 or Latin text
+sub ConvertExifText($$)
+{
+    my ($exifTool, $val) = @_;
+    return $val if length($val) < 8;
+    my $id = substr($val, 0, 8);
+    my $str = substr($val, 8);
+    if ($id eq "UNICODE\0") {
+        # convert from unicode
+        $str = $exifTool->Unicode2Byte($str);
+    } else {
+        # assume everything else is ASCII (Don't convert JIS... yet)
+        $str =~ s/\0.*//;   # truncate at null terminator
     }
     return $str;
 }
@@ -1911,6 +2052,8 @@ it under the same terms as Perl itself.
 =item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 
 =item http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
+
+=item http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
 
 =back
 

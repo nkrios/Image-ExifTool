@@ -309,6 +309,11 @@ to a specific function.
 <tr><th>Option</th><th>Description</th><th>Values</th><th>Default</th></tr>
 <tr><td>Binary</td><td>Flag to get values of all binary tags.
     Unless set, large binary values are only extracted for specifically requested tags.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
+<tr><td>Charset</td><td>Character set for converting XP characters.</td>
+    <td><table>
+    <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF8 characters</td></tr>
+    <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
+    </table></td><td align=center>'UTF8'</td></tr>
 <tr><td>Compact</td><td>Write compact output.  Some data formats (XMP, IPTC) specify
     that the data be padded with blanks to allow in-place editing.  By setting this
     flag, 2kB is saved for files with XMP data, and 100 bytes for IPTC data.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
@@ -621,7 +626,7 @@ scalar context, or the number of tags set and the error string in list context.
 <tr><td>Group</td><td>Specifies group name where tag should be written.
     If not specified, tag is written to hightest priority group as specified
     by SetNewGroups().  Case is not significant</td>
-    <td>EXIF, GPS, IPTC, XMP or MakerNotes</td><td align=center>-</td></tr>
+    <td>Any family 0 or 1 group name</td><td align=center>-</td></tr>
 <tr><td>Replace</td><td>Replace previous new value for this tag</td>
     <td><table>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Don't replace</td></tr>
@@ -693,7 +698,7 @@ my @rawVals = $exifTool-&gt;<b>GetNewValues</b>($tag);
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
 Set priority for tag groups in subsequent calls to SetNewValue().
 Default priority is EXIF, GPS, IPTC, XMP, MakerNotes, in that order. 
-Case is not significant.
+Any family 0 group name may be used.  Case is not significant.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>SetNewGroups($;@)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
@@ -909,10 +914,11 @@ IPTC, Jpeg2000, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
 <tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
 <td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
 FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000, MakerUnknown,
-Minolta, Nikon, NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM,
-Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-pdf,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, KodakBordersIFD,
+KodakEffectsIFD, MakerUnknown, Minolta, Nikon, NikonPreview, Olympus, Panasonic,
+Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs,
+XMP-dc, XMP-exif, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ,
+XMP-xmpMM, XMP-xmpRights
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown

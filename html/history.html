@@ -2,10 +2,61 @@
 <head>
   <title>ExifTool Version History</title>
 </head>
-<body><!-- Use line width of 86 -->
+<body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-4.64.tar.gz">Version 4.64</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-4.73.tar.gz">Version 4.73</a>.<p>
+
+<b>Mar. 1/05 - Version 4.73</b> (production release)
+<ul>
+<li>Minor changes to XMP parsing to increase speed and improve validation
+</ul>
+
+<b>Feb. 28/05 - Version 4.72</b>
+<ul>
+<li>Extract info from UTF-16 and UTF-32 encoded XMP
+<li>Convert EXIF text fields if encoded in Unicode
+<li>Fixed a few incorrect XP character translation codes
+<li>Fixed name of Nikon ColorBalanceD2H tag
+</ul>
+
+<b>Feb. 25/05 - Version 4.71</b>
+<ul>
+<li>Fixed bug introduced in 4.70 which caused error when transferring
+    information using -AllTagsFromFile from a RAW file to a JPEG file
+</ul>
+
+<b>Feb. 24/05 - Version 4.70</b>
+<ul>
+<li>Allow family 1 group name to be specified for any tag while writing
+<li>Fix problem with writing Nikon PreviewImage to NEF files
+</ul>
+
+<b>Feb. 23/05 - Version 4.67</b>
+<ul>
+<li>Add -L option to allow XP characters to be converted to Latin character set
+    instead of UTF8.  (Now XP characters can be displayed properly in terminal
+    windows which use either the UTF8 or WinLatin1 character set.)
+<li>Make JpgFromRaw image writable in Nikon NEF files
+</ul>
+
+<b>Feb. 21/05 - Version 4.66</b>
+<ul>
+<li>Recognize JPEG 2000 XMP UUID information
+<li>Extract Meta information from JPEG APP3
+<li>Yet more playing with XP characters (this has been a learning process for
+    me). Now special characters show up properly in my OSX terminal window, and
+    the reverse translation works so now they get written properly as well (for
+    Perl 5.6.1 or greater anyway... Earlier versions don't have the required
+    UTF8 support to handle these special characters)
+<li>Improvements to TagNames documentation (including changing format names to
+    make them more consistent across different types of meta information)
+</ul>
+
+<b>Feb. 18/05 - Version 4.65</b>
+<ul>
+<li>Fixed problem in translating XP characters
+</ul>
 
 <b>Feb. 17/05 - Version 4.64</b> (production release)
 <ul>
@@ -22,11 +73,11 @@
 
 <b>Feb. 14/05 - Version 4.62</b>
 <ul>
-<li>Convert XPTitle, XPComment, XPKeywords etc from XP character codes and add write
-    support for these tags
+<li>Convert XPTitle, XPComment, XPKeywords etc from XP character codes and add
+    write support for these tags
 <li>Decode JPEG 2000 Resolution, Label and URL information
-<li>Another try at patching 3 digit exponent situation which causes failed tests on
-    MSWin32-x86
+<li>Another try at patching 3 digit exponent situation which causes failed tests
+    on MSWin32-x86
 <li>Removed .J2K from recognized extensions (since apparently this is a raw JP2
     codestream, and doesn't contain any metadata that ExifTool can extract)
 </ul>
@@ -49,8 +100,8 @@
 <li>Added ColorTemperature tag for many Canon models
 <li>Added AutoRotate for Canon 10D and 300D
 <li>Lowered priority of Nikon ISO so that EXIF ISO is used instead if both exist
-<li>Changed names of PentaxISO and Casio ISOSetting to ISO, and lowered priority as
-    with Nikon ISO
+<li>Changed names of PentaxISO and Casio ISOSetting to ISO, and lowered priority
+    as with Nikon ISO
 <li>Made Photoshop EXIF Camera RAW tags writable
 </ul>
 
@@ -80,7 +131,8 @@
 <li>Allow permanent tags (ie. MakerNotes tags) 'deleted' by setting them to an
     empty string if '' is a valid value for the tag
 <li>Added test for rewriting Nikon D70 information
-<li>Added missing inverse conversion routines for GPS tags (now they are all writable)
+<li>Added missing inverse conversion routines for GPS tags (now they are all
+    writable)
 <li>Decoded a few more Canon and CanonRaw tags
 <li>Added -z option to extract information from images in compressed files
 <li>Improved CanonRaw verbose output
@@ -313,7 +365,8 @@
 <li>Renamed a few Nikon tags: FlashExposureComp to FlashExposureBracketValue,
     FEC to FlashExposureComp, and ShutterReleaseMode to ShootingMode
 <li>Extract Nikon preview image
-<li>Changed descriptions for Aperture and Shutter Speed to drop the Av/Tv Canonism
+<li>Changed descriptions for Aperture and Shutter Speed to drop the Av/Tv
+    Canonism
 <li>Improved logic to recognize more types of unknown maker notes
 <li>Recognize a couple more values of the Canon WhiteBalance tag
 <li>Renamed IPTC 'SupplementalCategory' to 'SupplementalCategories'
@@ -332,7 +385,8 @@
 <li>Added a couple of Nikon tags
 <li>Now preserves original file by renaming to "NAME_original" when writing
     information
-<li>Don't preserve file time by default when writing.  Added -P option to do this.
+<li>Don't preserve file time by default when writing.  Added -P option to do
+    this.
 <li>Changes to spec file
 </ul>
 
@@ -359,14 +413,15 @@
 <li>Report of number of files updated
 <li>API Changes:
     <ul>
-    <li>Changed arguments of WriteInfo() and allow scalar and file references to be
-        used
+    <li>Changed arguments of WriteInfo() and allow scalar and file references to
+        be used
     </ul>
 </ul>
 
 <b>Dec. 1/04 - Version 4.01</b>
 <ul>
-<li>Changed -o option to -w to avoid confusion since we now write image files too
+<li>Changed -o option to -w to avoid confusion since we now write image files
+    too
 <li>Added warning if specified image file doesn't exist
 </ul>
 
@@ -377,7 +432,8 @@
     <li>Allow writing of Comment tag to JPEG and GIF files
     </ul>
 <li>API for write functions still under development and is likely to change
-<li>Clean up formatting of Nikon string tags (fix case and remove trailing spaces)
+<li>Clean up formatting of Nikon string tags (fix case and remove trailing
+    spaces)
 </ul>
 
 <b>Nov. 30/04 - Version 3.96</b>
@@ -423,7 +479,8 @@
 
 <b>Nov. 20/04 - Version 3.91</b>
 <ul>
-<li>Fixed problem where some tags were not extracted properly from Canon CR2 files
+<li>Fixed problem where some tags were not extracted properly from Canon CR2
+    files
 <li>Internal Changes:
     <ul>
     <li>Cleaned up and simplified pointer calculations and dirInfo members
@@ -450,7 +507,8 @@
 <b>Nov. 15/04 - Version 3.85</b>
 <ul>
 <li>Extract a couple more Photoshop tags (including PhotoshopQuality)
-<li>All XMP lists now comma separated (previously, 'alt' lists were separated by '|')
+<li>All XMP lists now comma separated (previously, 'alt' lists were separated by
+    '|')
 <li>API Changes:
     <ul>
     <li>GetValue() now returns reference to array if values form a list and
@@ -612,7 +670,8 @@
 
 <b>Apr. 7/04 - Version 3.40</b>
 <ul>
-<li>Try to extract data from unrecognized maker notes (assuming standard EXIF format)
+<li>Try to extract data from unrecognized maker notes (assuming standard EXIF
+    format)
 <li>Added tests for different maker notes
 </ul>
 
@@ -646,7 +705,8 @@
 
 <b>Apr. 5/04 - Version 3.33</b>
 <ul>
-<li>Parse SubIFD of Nikon NEF file (now extracts raw image size and thumbnail image)
+<li>Parse SubIFD of Nikon NEF file (now extracts raw image size and thumbnail
+    image)
 </ul>
 
 <b>Apr. 2/04 - Version 3.32</b>
@@ -679,8 +739,8 @@
 <li>API Changes:
     <ul>
     <li>Changed GetDescription() documention to indicate it is called with an
-        ExifTool object (this is still optional, but will be mandatory with the next
-        version)
+        ExifTool object (this is still optional, but will be mandatory with the
+        next version)
     </ul>
 </ul>
 
@@ -704,8 +764,8 @@
 <li>API Changes:
     <ul>
     <li>Added GetGroups()
-    <li>GetGroup() now returns group names for all families if used in list context
-        and family not specified
+    <li>GetGroup() now returns group names for all families if used in list
+        context and family not specified
     </ul>
 </ul>
 
@@ -713,8 +773,8 @@
 <ul>
 <li>API Changes:
     <ul>
-    <li>Changed GetInfo() to return list of tags like ImageInfo() if list reference
-        provided
+    <li>Changed GetInfo() to return list of tags like ImageInfo() if list
+        reference provided
     <li>Fixed bug that caused GetInfo() to ignore specified tags
     </ul>
 </ul>
@@ -737,8 +797,8 @@
 <li>Can now specify excluded tags with leading '-' (replaces -x option)
 <li>API Changes:
     <ul>
-    <li>Added ClearOptions(), ExtractInfo(), GetInfo(), CombineInfo(), GetTagList()
-        and GetAllGroups()
+    <li>Added ClearOptions(), ExtractInfo(), GetInfo(), CombineInfo(),
+        GetTagList() and GetAllGroups()
     <li>Removed IsVerbose() function (use Options('Verbose') instead)
     <li>Allow groups to be excluded by specifying leading '-' on group name
     <li>ImageInfo() and GetInfo() now use specified group order to set tag
@@ -831,14 +891,16 @@ script was not changed
 
 <b>Feb. 19/04 - Version 3.04</b>
 <ul>
-<li>Added -U option to allow display of unknown values in Canon binary data blocks
+<li>Added -U option to allow display of unknown values in Canon binary data
+    blocks
 <li>Made unknown tag names more specific when -u or -U option used
 <li>Added RawData and DecoderTable tags (for Canon RAW file)
 </ul>
 
 <b>Feb. 17/04 - Version 3.03</b>
 <ul>
-<li>Fixed RandomAccessFile package name (should have been File::RandomAccessFile)
+<li>Fixed RandomAccessFile package name (should have been
+    File::RandomAccessFile)
 <li>Added IxusAFPoint tag to Canon maker notes
 <li>Avoid scanning past end of Canon binary data blocks
 <li>API changes:
@@ -871,8 +933,9 @@ script was not changed
     <ul>
     <li>I am finally happy with the API, so future major changes are less likely
         (hence the major version number)
-        <li>No longer return ARRAY reference for list of tags (Instead, tag values
-            are joined in a comma separated list if tag 'List' flag is set)
+        <li>No longer return ARRAY reference for list of tags (Instead, tag
+            values are joined in a comma separated list if tag 'List' flag is
+            set)
     <li>Added SAVE_DUPLICATES option
     <li>Added BuildCompositeTags() to EXPORT_OK list
     <li>GetFoundTags() now sorts tags in specified order
@@ -903,9 +966,9 @@ script was not changed
     <li>Changed WarnDuplicateTags() to WarnDuplicateDescriptions()
     <li>Added GetFoundTags() and GetRequestedTags()
     <li>Many functions now take ExifTool object reference as first argument
-    <li>ImageInfo() no longer returns reference to ExifTool object when used in list
-        context (you have to use "new ExifTool" and the OO form of ImageInfo() if
-        you want the object)
+    <li>ImageInfo() no longer returns reference to ExifTool object when used in
+        list context (you have to use "new ExifTool" and the OO form of
+        ImageInfo() if you want the object)
     </ul>
 </ul>
 

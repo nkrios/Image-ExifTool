@@ -156,7 +156,7 @@ Image::ExifTool::Fixup.pm - Utility to handle pointer fixups
 
     # add a new fixup to a pointer at the specified offset in data
     $fixup->AddFixup($offset);
-    
+
     # add a new Fixup object to the tree
     $fixup->AddFixup($subFixup);
 
@@ -166,7 +166,7 @@ Image::ExifTool::Fixup.pm - Utility to handle pointer fixups
 
     # recursively apply fixups to the specified data
     $fixup->ApplyFixups(\$data);
-    
+
     $fixup->Dump();               # dump debugging information
 
 =head1 DESCRIPTION

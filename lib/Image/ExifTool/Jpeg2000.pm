@@ -15,10 +15,10 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.04';
 
 sub ProcessJpeg2000($$$);
-sub ProcessUUID($$$);
+sub ProcessExifUUID($$$);
 
 my %jp2ResolutionUnit = (
     -3 => 'km',
@@ -133,13 +133,36 @@ my %jp2ResolutionUnit = (
             TagTable => 'Image::ExifTool::XMP::Main',
         },
     },
-    uuid => {
-        Name => 'UUID',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Exif::Main',
-            ProcessProc => \&ProcessUUID,
+    uuid => [
+        {
+            Name => 'UUID-GeoJP2',
+            # ref http://www.remotesensing.org/jpeg2000/
+            Condition => q{
+                my $id = "\xb1\x4b\xf8\xbd\x08\x3d\x4b\x43\xa5\xae\x8c\xd7\xd5\xa6\xce\x03";
+                Image::ExifTool::Jpeg2000::CheckUUID($dataPt, $valuePtr, $id);
+            },
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Exif::Main',
+                ProcessProc => \&ProcessExifUUID,
+                DirStart => '$valuePtr + 16',
+            },
         },
-    },
+        {
+            Name => 'UUID-XMP',
+            # ref http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
+            Condition => q{
+                my $id = "\xbe\x7a\xcf\xcb\x97\xa9\x42\xe8\x9c\x71\x99\x94\x91\xe3\xaf\xac";
+                Image::ExifTool::Jpeg2000::CheckUUID($dataPt, $valuePtr, $id);
+            },
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::XMP::Main',
+                DirStart => '$valuePtr + 16',
+            },
+        },
+        {
+            Name => 'UUID-Unknown',
+        },
+    ],
     uinf => {
         Name => 'UUIDInfo',
         SubDirectory => { },
@@ -248,14 +271,26 @@ sub ProcessColorSpecification($$$)
 }
 
 #------------------------------------------------------------------------------
-# Process JPEG 2000 UUID box
+# Check UUID type
+# Inputs: 0) data reference, 1) box start, 2) 16-byte ID
+# Returns: true if this the UUID ID matches
+sub CheckUUID($$$)
+{
+    my ($dataPt, $valuePtr, $id) = @_;
+    if (length($$dataPt) - $valuePtr >= 16) {
+        return 1 if substr($$dataPt, $valuePtr, 16) eq $id;
+    }
+    return 0;
+}
+
+#------------------------------------------------------------------------------
+# Process JPEG 2000 Exif UUID box
 # Inputs: 0) ExifTool object reference, 1) Pointer to tag table, 2) DirInfo reference
 # Returns: 1 on success
-sub ProcessUUID($$$)
+sub ProcessExifUUID($$$)
 {
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    return 0 unless $$dirInfo{DataLen} > 16;
     # get the data block (into a common variable)
     $exifTool->{EXIF_DATA} = substr($$dataPt, 16);
     # extract the EXIF information (it is in standard TIFF format)
@@ -283,7 +318,7 @@ sub ProcessJpeg2000($$$)
     # loop through all contained boxes
     my ($pos, $boxLen);
     for ($pos=$dirStart; ; $pos+=$boxLen) {
-        my ($boxID, $buff, $valuePos);
+        my ($boxID, $buff, $valuePtr);
         if ($raf) {
             $raf->Read($buff,8) == 8 or last;
             $dataPt = \$buff;
@@ -309,29 +344,34 @@ sub ProcessJpeg2000($$$)
         if ($raf) {
             # read the box data
             $raf->Read($buff,$boxLen);
-            $valuePos = 0;
+            $valuePtr = 0;
             $dataLen = $boxLen;
         } else {
             return 0 if $boxLen + $pos > $dirStart + $dirLen;
-            $valuePos = $pos;
+            $valuePtr = $pos;
         }
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID);
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID, $dataPt, $valuePtr);
         if ($verbose) {
             $exifTool->VerboseInfo($boxID, $tagInfo,
                 Table  => $tagTablePtr,
                 DataPt => $dataPt,
                 Size   => $boxLen,
-                Start  => $valuePos,
+                Start  => $valuePtr,
             );
         }
         next unless $tagInfo;
         if ($$tagInfo{SubDirectory}) {
             my $subdir = $$tagInfo{SubDirectory};
+            my $subdirStart = $valuePtr;
+            if (defined $$subdir{Start}) {
+                #### eval Start ($valuePtr)
+                $subdirStart = eval($$subdir{Start});
+            }
             my %subdirInfo = (
                 DataPt => $dataPt,
                 DataLen => $dataLen,
-                DirStart => $valuePos,
-                DirLen => $boxLen,
+                DirStart => $subdirStart,
+                DirLen => $boxLen - ($subdirStart - $valuePtr),
                 Nesting => $nesting + 1,
                 DirName => $$tagInfo{Name},
             );
@@ -343,7 +383,7 @@ sub ProcessJpeg2000($$$)
             }
         } elsif ($$tagInfo{Format}) {
             # only save tag values if Format was specified
-            my $val = ReadValue($dataPt, $valuePos, $$tagInfo{Format}, undef, $boxLen);
+            my $val = ReadValue($dataPt, $valuePtr, $$tagInfo{Format}, undef, $boxLen);
             $exifTool->FoundTag($tagInfo, $val) if defined $val;
         }
     }
@@ -351,9 +391,9 @@ sub ProcessJpeg2000($$$)
 }
 
 #------------------------------------------------------------------------------
-# Jpeg2000Info : extract meta information from a JPEG2000 image
+# Jpeg2000Info : extract meta information from a JPEG 2000 image
 # Inputs: 0) ExifTool object reference
-# Returns: 1 on success, 0 if this wasn't a valid JPEG2000 file
+# Returns: 1 on success, 0 if this wasn't a valid JPEG 2000 file
 sub Jpeg2000Info($)
 {
     my $exifTool = shift;

@@ -17,9 +17,11 @@ sub ProcessUnknown($$$);
 $VERSION = '1.04';
 
 # conditional list of maker notes
-# (Note: This is NOT a normal tag table)
-# Another note: All byte orders are now specified because we can now
-# write maker notes into a file with different byte ordering!
+# Notes:
+# - This is NOT a normal tag table!
+# - All byte orders are now specified because we can now
+#   write maker notes into a file with different byte ordering!
+# - Put these in alphabetical order to make TagNames documentation nicer.
 @Image::ExifTool::MakerNotes::Main = (
     # decide which MakerNotes to use (based on camera make/model)
     {
@@ -27,6 +29,40 @@ $VERSION = '1.04';
         Name => 'MakerNoteCanon',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::Main',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        # do negative lookahead assertion just to get tags
+        # in a nice order for documentation
+        Condition => '$self->{CameraMake}=~/^CASIO(?! COMPUTER CO.,LTD)/',
+        Name => 'MakerNoteCasio',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Casio::Type1',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Condition => q{
+            $self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/ and
+            $self->{CameraModel}!~/^EX-Z3/
+        },
+        Name => 'MakerNoteCasio2',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Casio::Type2',
+            Start => '$valuePtr + 6',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
+        Name => 'MakerNoteCasioEX-Z3',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Casio::Type2',
+            Start => '$valuePtr + 6',
+            # Casio really messed this up for the EX-Z3, and made the
+            # offsets relative to somewhere in the APP0 JFIF segment... doh!
+            Base => '-20',
             ByteOrder => 'Unknown',
         },
     },
@@ -43,17 +79,6 @@ $VERSION = '1.04';
             # the pointers are relative to the subdirectory start
             # (before adding the offsetPt) - PH
             Base => '$start',
-        },
-    },
-    {
-        Condition => '$self->{CameraMake} =~ /^(PENTAX|AOC|Asahi)/',
-        Name => 'MakerNotePentax',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::Main',
-            # process as Unknown maker notes because the start offset and
-            # byte ordering are so variable
-            ProcessProc => \&ProcessUnknown,
-            ByteOrder => 'Unknown',
         },
     },
     {
@@ -85,43 +110,22 @@ $VERSION = '1.04';
         },
     },
     {
+        Condition => '$self->{CameraMake} =~ /^(PENTAX|AOC|Asahi)/',
+        Name => 'MakerNotePentax',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::Main',
+            # process as Unknown maker notes because the start offset and
+            # byte ordering are so variable
+            ProcessProc => \&ProcessUnknown,
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
         Condition => '$self->{CameraMake}=~/^NIKON/',
         Name => 'MakerNoteNikon',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             # (note: ProcessNikon sets ByteOrder, so we don't need to do it here)
-        },
-    },
-    {
-        Condition => q{
-            $self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/ and 
-            $self->{CameraModel}=~/^EX-Z3/
-        },
-        Name => 'MakerNoteCasioEX-Z3',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Casio::Type2',
-            Start => '$valuePtr + 6',
-            # Casio really messed this up for the EX-Z3, and made the
-            # offsets relative to somewhere in the APP0 JFIF segment... doh!
-            Base => '-20',
-            ByteOrder => 'Unknown',
-        },
-    },
-    {
-        Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
-        Name => 'MakerNoteCasio2',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Casio::Type2',
-            Start => '$valuePtr + 6',
-            ByteOrder => 'Unknown',
-        },
-    },
-    {
-        Condition => '$self->{CameraMake}=~/^CASIO/',
-        Name => 'MakerNoteCasio',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Casio::Type1',
-            ByteOrder => 'Unknown',
         },
     },
     {

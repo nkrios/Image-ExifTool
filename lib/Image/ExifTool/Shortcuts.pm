@@ -82,7 +82,7 @@ $VERSION = '1.03';
         'ExifImageLength', #instead
         'Quality',
         'FlashOn',
-        'FlashType', 
+        'FlashType',
         'ConditionalFEC',
         'RedEyeReduction',
         'ShutterCurtainHack',

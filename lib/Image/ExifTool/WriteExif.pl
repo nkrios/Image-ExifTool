@@ -224,23 +224,23 @@ my %writeTable = (
 #    0x9928 => 'undef',      # Opto-ElectricConversionFactor
     0x9c9b => {             # XPTitle
         Writable => 'int8u',
-        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+        ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0x9c9c => {             # XPComment
         Writable => 'int8u',
-        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+        ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0x9c9d => {             # XPAuthor
         Writable => 'int8u',
-        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+        ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0x9c9e => {             # XPKeywords
         Writable => 'int8u',
-        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+        ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0x9c9f => {             # XPSubject
         Writable => 'int8u',
-        ValueConvInv => 'Image::ExifTool::Exif::UTF8toXP($val)',
+        ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0xa000 => 'undef',      # FlashpixVersion
     0xa001 => 'int16u',     # ColorSpace
@@ -538,37 +538,6 @@ sub InsertWritableProperties($$;$$)
 }
 
 #------------------------------------------------------------------------------
-# convert XP characters to pseudo-UTF8
-# Inputs: 0) XP character string (2 bytes per char, LSB first)
-# Returns: pseudo-UTF8 encoded string (high characters are probably nonsense)
-# Notes: We override the Format for XP values to read them as 'undef' since
-#        it makes a lot more sense.
-sub XPtoUTF8($)
-{
-    my $val = shift;
-    my $outVal;
-    if ($] >= 5.6) {
-        $outVal = pack('U*',unpack('v*',$val));
-        $outVal =~ s/\0.*//;    # truncate at null terminator
-    } else {
-        # pack('U',...) didn't exist before Perl 5.6
-        ($outVal = $val) =~ s/\0//g;    # quick and dirty
-    }
-    return $outVal;
-}
-
-#------------------------------------------------------------------------------
-# convert pseudo-UTF8 encoded string to XP character codes
-# Input: 0) pseudo-UTF8 string
-# Returns: XP byte sequence as string of decimal numbers separated by spaces
-sub UTF8toXP($)
-{
-    my $str = shift;
-    my $fmt = ($] >= 5.6) ? 'U' : 'C';  # 'U' only available in 5.6 or later
-    return pack('v*',unpack("$fmt*",$str)) . "\0\0";
-}
-
-#------------------------------------------------------------------------------
 # build fixup table for specified directory
 # Inputs: 0) ExifTool object reference, 1) tag table reference,
 #         2) dirInfo reference
@@ -705,6 +674,14 @@ sub WriteExif($$$)
                 my $curInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
                 # don't set this tag unless valid for the current condition
                 next unless $tagInfo eq $curInfo;
+            }
+            if ($$tagInfo{WriteCondition}) {
+                my $self = $exifTool;   # set $self to be used in eval
+                #### eval WriteCondition ($self)
+                unless (eval $$tagInfo{WriteCondition}) {
+                    $@ and warn $@;
+                    next;
+                }
             }
             if ($tableGroup eq 'EXIF') {
                 my $newValueHash = $exifTool->GetNewValueHash($tagInfo, $dirName);
@@ -923,6 +900,12 @@ sub WriteExif($$$)
                             $newCount = $oldCount;
                         }
                         $val = ReadValue(\$oldValue, 0, $oldFormName, $oldCount, $oldSize);
+                        if ($$newInfo{Format}) {
+                            # override existing format if necessary
+                            $ifdFormName = $$newInfo{Writable};
+                            $ifdFormName = $oldFormName unless $ifdFormName and $ifdFormName ne '1';
+                            $newFormName = $$newInfo{Format};
+                        }
                     }
                     if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
                         my $newVal = Image::ExifTool::GetNewValues($newValueHash);
@@ -938,7 +921,7 @@ sub WriteExif($$$)
                         # convert to binary format
                         $newValue = WriteValue($newVal, $newFormName, $newCount);
                         unless (defined $newValue) {
-                            $exifTool->Warn("Error writing $dirName::$$newInfo{Name}");
+                            $exifTool->Warn("Error writing $dirName:$$newInfo{Name}");
                             next if $isNew > 0;
                             $isNew = -1;        # rewrite existing tag
                         }
@@ -1145,6 +1128,7 @@ sub WriteExif($$$)
                     # (notice we add 10 instead of 8 for valuePtr because
                     # we will put a 2-byte count at start of directory later)
                     my $ptr = $newStart + length($dirBuff) + 10;
+                    $newCount or $newCount = 1; # make sure count is set for offsetInfo
                     # save value pointer and value count for each tag
                     $offsetInfo->{$newID} = [$newInfo, $ptr, $newCount, $newFormat];
 

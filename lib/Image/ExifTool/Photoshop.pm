@@ -197,7 +197,7 @@ sub ProcessPhotoshop($$$)
         my $tag = Get16u($dataPt, $pos + 4);
         $pos += 6;
         # get resource block name (null-terminated, padded to an even # of bytes)
-        my $name = '';  
+        my $name = '';
         my $bytes;
         while ($pos + 2 < $dirEnd) {
             $bytes = substr($$dataPt, $pos, 2);

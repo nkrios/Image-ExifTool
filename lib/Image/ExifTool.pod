@@ -264,6 +264,13 @@ to a specific function.
 Flag to get the value of all binary tags.  Unless set, large binary values
 may only be extracted for specifically requested tags. Default is 0.
 
+=item Charset
+
+Character set for converting XP characters.  Valid values are:
+
+  UTF8  - UTF8 characters (the default)
+  Latin - Windows Latin1 (cp1252)
+
 =item Compact
 
 Write compact output.  Default is 0.  Some data formats (XMP, IPTC) specify
@@ -672,9 +679,8 @@ Delete the exisiting tag if it has the specified value.  Valid values are
 =item Group
 
 Specifies group name where tag should be written. If not specified, tag is
-written to hightest priority group as specified by SetNewGroups().  Valid
-groups for writing are EXIF, GPS, IPTC, XMP or MakerNotes.  Case is not
-significant.
+written to hightest priority group as specified by SetNewGroups().  Any
+family 0 or 1 group name may be used.  Case is not significant.
 
 =item Replace
 
@@ -741,8 +747,8 @@ deleted (ie. if SetNewValue was called without a value).
 =head2 SetNewGroups
 
 Set priority for tag groups in subsequent calls to SetNewValue().  Default
-priority is EXIF, GPS, IPTC, XMP, MakerNotes, in that order.  Case is not
-significant.
+priority is EXIF, GPS, IPTC, XMP, MakerNotes, in that order.  Any family 0
+group name may be used.  Case is not significant.
 
     $exifTool->SetNewGroups('XMP','EXIF','IPTC');
 
@@ -1027,11 +1033,12 @@ MakerNotes, Photoshop, PrintIM, XMP
 =item Family 1 (Detailed Location):
 
 Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000, MakerUnknown,
-Minolta, Nikon, NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM,
-Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-pdf,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
+ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD,
+KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon, NikonPreview,
+Olympus, Panasonic, Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD,
+XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-pdf, XMP-photoshop, XMP-tiff,
+XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
 
 =item Family 2 (Category):
 

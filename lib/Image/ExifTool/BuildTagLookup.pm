@@ -4,7 +4,7 @@
 # Description:  Utility to build tag lookup tables in Image::ExifTool::TagLookup.pm
 #
 # Revisions:    12/31/2004 - P. Harvey Created
-#               02/15/2005 - PH Added ability to write TagNames documentation 
+#               02/15/2005 - PH Added ability to generate TagNames documentation
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::BuildTagLookup;
@@ -16,12 +16,27 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.02';
+$VERSION = '1.05';
 @ISA = qw(Exporter);
 
 # Descriptions for the TagNames documentation
+# Note: POD headers in these descriptions start with '~' instead of '=' to keep
+# from confusing POD parsers which apparently parse inside quoted strings.
 my %docs = (
-    Header => q{
+    PodHeader => q{
+~head1 NAME
+
+Image::ExifTool::TagNames - ExifTool tag name documentation
+
+~head1 DESCRIPTION
+
+This document contains a complete list of ExifTool tag names, organized into
+tables based on information type.  Tag names are used to indicate the
+specific meta information that is extracted or written in an image.
+
+~head1 TAG TABLES
+},
+    Description => q{
 The tables below list the names of all tags recognized by ExifTool
 (excluding shortcut and unknown tags).  Case is not significant for tag
 names.  Where applicable, the corresponding B<Tag ID> or B<Index> is also
@@ -33,30 +48,49 @@ single ID.  In these cases, the actual tag name depends on the context in
 which the information is found.
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
-Anything but an B<N> in this column means the tag is writable.  A B<Y>
+Anything but an "N" in this column means the tag is writable.  A "Y"
 indicates writable information that is either unformatted or written using
 the existing format.  Other expressions give details about the information
 format, and vary depending on the general type of information.  An asterisk
-(*) indicates that the information is not writable directly, but is set via
-a composite tag.  The HTML version of this document also lists all B<Values>
-for tags which have a discreet set of values.
+(C<*>) indicates that the information is not writable directly, but is set
+via a composite tag.  The HTML version of this document also lists possible
+B<Values> for all tags which have a discrete set of values.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
-be surprised to find that some ExifTool tags have different names than you
-expect.  The usual reason for this is to make the tag names more consistent
-across different types of meta information.  To determine a tag name, either
-consult this documentation or run B<exiftool> with the B<-S> option on a
-file containing the information in question.
+find that some ExifTool tag names are different than expected.  The usual
+reason for this is to make the tag names more consistent across different
+types of meta information.  To determine a tag name, either consult this
+documentation or run C<exiftool -S> on a file containing the information in
+question.
 },
     EXIF => q{
-This is the type of meta information that gave ExifTool its name, although
-subsequently ExifTool has evolved to read may other types.
+EXIF meta information may exist within different Image File Directories
+(IFD's) of an image.  The names of these IFD's correspond to the
+ExifTool family 1 group names.  When writing EXIF information, the
+default B<Group> listed below is used unless another group is specified.
+},
+    XMP => q{
+All XMP information is stored as character strings.  An C<integer> in this
+format is a string of digits, possibly beginning with a '+' or '-', and a
+C<rational> is composed of two C<integer> strings separated by a '/'
+character.  A C<date> is a date and/or time string in the format 'YYYY:MM:DD
+HH:MM:SS[+/-HH:MM]'.  A C<boolean> is either 'True' or 'False', and
+C<lang-alt> is a list of string alternatives in different languages.
+Currently, ExifTool only writes the 'x-default' language in C<lang-alt>
+lists.
+
+The B<Group> column below gives the XMP schema name for each tag.  The
+family 1 group names are composed from these schema names with a leading
+"XMP-" added.  If the same XMP tag name exists in more than one group, all
+groups are written unless a family 1 group name is specified.  ie) If
+XMP:Contrast is specified, information will be written to both
+XMP-crs:Contrast and XMP-exif:Contrast.
 },
     IPTC => q{
-The IPTC specification dictates a length for most ASCII (string or digits)
-and integer (binary) values.  These lengths are given in square brackets
-after the B<Writable> format name.  Where a minimum and maximum length are
-specified, both values are given, separated by a comma.
+The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
+values.  These lengths are given in square brackets after the B<Writable>
+format name.  For tags where a range of lengths is allowed, the minimum and
+maximum lengths are separated by a comma within the brackets.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.
@@ -64,7 +98,7 @@ own set of tags.
     CanonRaw => q{
 When writing CanonRaw information, the length of the information is
 preserved (and the new information is truncated or padded as required)
-unless B<Writable> is 'resize'.  Currently, only JpgFromRaw is allowed to
+unless B<Writable> is C<resize>.  Currently, only JpgFromRaw is allowed to
 change size.
 },
     Extra => q{
@@ -76,24 +110,24 @@ The values of the composite tags are derived from the values of other tags.
 These are convenience tags which are calculated after all other information
 is extracted.
 },
-    Trailer => q{
-=head1 NOTES
+    PodTrailer => q{
+~head1 NOTES
 
 This document generated automatically by
 L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
-=head1 AUTHOR
+~head1 AUTHOR
 
 Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 SEE ALSO
+~head1 SEE ALSO
 
 L<Image::ExifTool|Image::ExifTool>
 
-=cut
+~cut
 },
 );
 
@@ -150,7 +184,7 @@ sub new
             $id{$tableName} = 'Index';
         } elsif ($short eq 'IPTC') {
             $id{$tableName} = 'Record';
-        } elsif ($short ne 'Composite') {
+        } elsif ($short !~ /^(Composite|Extra|XMP)$/) {
             $id{$tableName} = 'Tag ID';
         }
         my @keys = TagTableKeys($table);
@@ -161,11 +195,16 @@ sub new
         }
         foreach $tagID (@keys) {
             my @infoArray = GetTagInfoList($table,$tagID);
-            my ($tagInfo, @tagNames, $subdir, $format, @values, @require);
-            my $writable = $$table{WRITABLE};
-            my $protected = '';
+            my ($tagInfo, @tagNames, $subdir, $format, @values);
+            my (@require, @writeGroup, @writable);
+            $format = $table->{FORMAT};
             foreach $tagInfo (@infoArray) {
-                $writable = $$tagInfo{Writable} if defined $$tagInfo{Writable};
+                my $writeGroup;
+                if ($short eq 'XMP') {
+                    ($writeGroup = $tagInfo->{Groups}->{1}) =~ s/XMP-//;
+                } else {
+                    $writeGroup = $$tagInfo{WriteGroup} || '-';
+                }
                 $format = $$tagInfo{Format} if defined $$tagInfo{Format};
                 if ($$tagInfo{SubDirectory}) {
                     $subdir = 1;
@@ -204,10 +243,31 @@ sub new
                         push @values, "$index = " . $$printConv{$_};
                     }
                 }
-                $protected = '*' if $$tagInfo{Protected};
+                my $writable;
+                if ($subdir) {
+                    $writable = '-';
+                } else {
+                    if (defined $$tagInfo{Writable}) {
+                        $writable = $$tagInfo{Writable};
+                    } else {
+                        $writable = $$table{WRITABLE};
+                    }
+                    if (not $writable) {
+                        $writable = 'N';
+                    } elsif ($writable eq '1') {
+                        $writable = $format ? $format : 'Y';
+                    }
+                    # add a '*' if this tag is protected
+                    $writable .= '*' if $$tagInfo{Protected};
+                }
+                # don't duplicate a tag name unless an entry is different
                 my $name = $$tagInfo{Name};
-                unless (@tagNames and $tagNames[-1] eq $name) {
+                unless (@tagNames and $tagNames[-1] eq $name and
+                    $writeGroup[-1] eq $writeGroup and $writable[-1] eq $writable)
+                {
                     push @tagNames, $name;
+                    push @writeGroup, $writeGroup;
+                    push @writable, $writable;
                 }
                 my $lcName = lc($name);
                 $tagLookup{$lcName} = { } unless $tagLookup{$lcName};
@@ -243,20 +303,7 @@ sub new
                 next if $tagID =~ /[\x00-\x1f\x80-\xff]/;
                 $tagIDstr = "'$tagID'";
             }
-            if ($writable) {
-                if ($writable eq '1') {
-                    if ($format) {
-                        $writable = $format;
-                    } else {
-                        $writable = 'Y';
-                    }
-                }
-            } else {
-                $writable = 'N';
-            }
-            $writable .= $protected;
-            $writable = '-' if $subdir;
-            push @$info, [ $tagIDstr, \@tagNames, $writable, \@values, \@require ];
+            push @$info, [ $tagIDstr, \@tagNames, \@writable, \@values, \@require, \@writeGroup ];
         }
     }
     return $self;
@@ -276,10 +323,12 @@ sub WriteTagLookup($$)
 # open/create necessary files and transfer file headers
 #
     my $tmpFile = "${file}_tmp";
-    my $err;
-    -e $file or $err = 'File not found';
-    open(INFILE,$file) or $err = "Can't open $file";
-    open(OUTFILE,">$tmpFile") or $err = "Can't create temporary file $tmpFile";
+    open(INFILE,$file) or warn("Can't open $file\n"), return 0;
+    unless (open(OUTFILE,">$tmpFile")) {
+        warn "Can't create temporary file $tmpFile\n";
+        close(INFILE);
+        return 0;
+    }
     my $success;
     while (<INFILE>) {
         print OUTFILE $_ or last;
@@ -350,20 +399,32 @@ sub WriteTagLookup($$)
         rename($tmpFile, $file);
     } else {
         unlink($tmpFile);
-        $err or $err = 'Error rewriting file';
-        warn "$err\n";
+        warn "Error rewriting file\n";
     }
     return $success;
 }
 
 #------------------------------------------------------------------------------
+# Convert pod documentation to pod
+# (funny, I know, but the pod headings must be hidden to prevent confusing
+#  the pod parser)
+# Inputs: 0) string
+sub Doc2Pod($)
+{
+    my $doc = shift;
+    $doc =~ s/\n~/\n=/g;
+    return $doc;
+}
+
+#------------------------------------------------------------------------------
 # Convert pod documentation to html
 # Inputs: 0) string
-sub DocToHtml($)
+sub Doc2Html($)
 {
     my $doc = EscapeHTML(shift);
     $doc =~ s/\n\n/\n\n<p>/g;
     $doc =~ s/B&lt;(.*?)&gt;/<b>$1<\/b>/sg;
+    $doc =~ s/C&lt;(.*?)&gt;/<code>$1<\/code>/sg;
     return $doc;
 }
 
@@ -420,17 +481,15 @@ sub WriteTagNames($$)
     my $idTitle = $self->{TAG_ID};
     my $shortName = $self->{SHORT_NAME};
     my $success = 1;
-#
-# write the TagName documentation
-#
+
     # open the file and write the header
     open(PODFILE,">$podFile") or return 0;
-    print PODFILE "=head1 ExifTool Tag Names\n", $docs{Header};
-    open(HTMLFILE,">$htmlFile") or return 0;
+    print PODFILE Doc2Pod($docs{PodHeader}), $docs{Description};
+    open(HTMLFILE,">$htmlFile") or close(PODFILE), return 0;
     print HTMLFILE "<html>\n<head>\n<title>ExifTool Tag Names</title>\n</head>\n";
     print HTMLFILE "<body text='#000000' bgcolor='#ffffff'>\n";
-    print HTMLFILE "<h1>ExifTool Tag Names</h1>\n", DocToHtml($docs{Header}),"\n";
-    print HTMLFILE "<h3>Tag Table Index</h3>\n<table><tr><td>\n";
+    print HTMLFILE "<h1>ExifTool Tag Names</h1>\n", Doc2Html($docs{Description}),"\n";
+    print HTMLFILE "<h3>Tag Table Index</h3>\n<table><tr valign='top'><td>\n";
     # write the index
     my @tableNames = GetTableOrder();
     my $count = 0;
@@ -446,68 +505,92 @@ sub WriteTagNames($$)
         }
     }
     print HTMLFILE "</td></tr></table>\n\n";
+    # write all the tag tables
     foreach $tableName (@tableNames) {
         $short = $$shortName{$tableName};
         ($url = $short) =~ tr/ /_/;
         my $info = $$tagNameInfo{$tableName};
         my $id = $$idTitle{$tableName};
-        my ($hid, $derived);
-        my ($wID,$wTag,$wVal,$wReq) = (8,33,0,24);
+        my ($hid, $showGrp);
+        # widths of the different columns in the POD documentation
+        my ($wID,$wTag,$wReq,$wGrp) = (7,36,24,10);
+        my $composite = $short eq 'Composite';
+        my $derived = $composite ? '<th>Derived From</th>' : '';
         if ($id) {
             $hid = "<th>$id</th>";
-            $derived = '';
+        } elsif ($short eq 'Extra') {
+            $wTag += 9;
+            $hid = '';
         } else {
             $hid = '';
-            $derived = '<th>Derived From</th>';
-            $wTag = 18;
+            $wTag += $wID - $wReq + 1 if $composite;
+        }
+        if ($short eq 'EXIF' or $short eq 'XMP') {
+            $derived = '<th>Group</th>';
+            $showGrp = 1;
+            if ($short eq 'XMP') {
+                $wTag -= 2;
+            } else {
+                $wTag -= $wGrp + 1;
+            }
         }
         print PODFILE "\n=head2 $short Tags\n";
         print PODFILE $docs{$short} if $docs{$short};
         my $line = "\n";
-        $line .= sprintf "  %6s  ", $id if $id;
+        $line .= sprintf " %${wID}s ", $id if $id;
         $line .= sprintf "  %-${wTag}s", 'Tag Name';
-        $line .= sprintf " %-${wReq}s", 'Derived From' unless $id;
+        $line .= sprintf " %-${wReq}s", 'Derived From' if $composite;
+        $line .= sprintf " %-${wGrp}s", 'Group' if $showGrp;
         $line .= ' Writable';
         print PODFILE $line;
         $line =~ s/\S/-/g;
         $line =~ s/- -/---/g;
         print PODFILE $line,"\n";
         print HTMLFILE "<h3><a name='$url'>$short Tags</a></h3>\n";
-        print HTMLFILE DocToHtml($docs{$short}) if $docs{$short};
+        print HTMLFILE Doc2Html($docs{$short}) if $docs{$short};
         print HTMLFILE "<blockquote><table border=1 cellspacing=0 cellpadding=2>\n";
         print HTMLFILE "<tr bgcolor='#dddddd'>$hid<th>Tag Name</th>\n";
         print HTMLFILE "<th>Writable</th>$derived<th>Values</th></tr>\n";
         my $infoList;
         foreach $infoList (@$info) {
-            my ($tagIDstr, $tagNames, $format, $values, $require) = @$infoList;
-            my ($align, $fmt);
-            if ($tagIDstr =~ /^\d+$/) {
-                $fmt = sprintf "%dd  ",$wID-2;
+            my ($tagIDstr, $tagNames, $writable, $values, $require, $writeGroup) = @$infoList;
+            my ($align, $idStr, $w);
+            if (not $id) {
+                $idStr = '  ';
+            } elsif ($tagIDstr =~ /^\d+$/) {
+                $w = $wID - 2;
+                $idStr = sprintf "  %${w}d    ", $tagIDstr;
                 $align = " align='right'";
             } else {
-                $tagIDstr = '-' if $short eq 'XMP' or $short eq 'Extra';
-                $fmt = "-${wID}s";
+                $w = $wID + 1;
+                $idStr = sprintf "  %-${w}s ", $tagIDstr;
                 $align = '';
             }
+            my @reqs;
             my @tags = @$tagNames;
-            my (@reqs, @vals);
-            my $forStr = $format;
-            if ($forStr eq '-') {
+            my @wGrp = @$writeGroup;
+            my @vals = @$writable;
+            my $wrStr = shift @vals;
+            my $subdir;
+            # if this is a subdirectory, print subdir name (from values) instead of writable
+            if ($wrStr eq '-') {
+                $subdir = 1;
                 @vals = @$values;
-                $forStr = shift @vals;
+                $wrStr = shift @vals;
             }
-            printf PODFILE "  %$fmt", $tagIDstr if $id;
-            printf PODFILE "  %-${wTag}s", shift(@tags);
-            unless ($id) {
+            printf PODFILE "%s%-${wTag}s", $idStr, shift(@tags);
+            printf PODFILE " %-${wGrp}s", shift(@wGrp) || '-' if $showGrp;
+            if ($composite) {
                 @reqs = @$require;
                 printf PODFILE " %-${wReq}s", shift(@reqs) || '';
             }
-            printf PODFILE " $forStr\n";
+            printf PODFILE " $wrStr\n";
             while (@tags or @reqs or @vals) {
                 $line = '  ';
                 $line .= ' 'x($wID+2) if $id;
                 $line .= sprintf("%-${wTag}s", shift(@tags) || '');
-                $line .= sprintf(" %-${wReq}s", shift(@reqs) || '') unless $id;
+                $line .= sprintf(" %-${wReq}s", shift(@reqs) || '') if $composite;
+                $line .= sprintf(" %-${wGrp}s", shift(@wGrp) || '-') if $showGrp;
                 $line .= sprintf(" %s", shift(@vals)) if @vals;
                 $line =~ s/\s+$//;  # trim trailing white space
                 print PODFILE "$line\n";
@@ -519,13 +602,14 @@ sub WriteTagNames($$)
             print HTMLFILE "<tr valign='top'>\n";
             print HTMLFILE "<td$align>$tagIDstr</td>\n" if $id;
             print HTMLFILE "<td>", join("\n  <br>",@htmlTags), "</td>\n";
-            print HTMLFILE "<td align='center'>$format</td>\n";
-            print HTMLFILE '<td>',join("\n  <br>",@$require),"</td>\n" unless $id;
+            print HTMLFILE "<td align='center'>",join('<br>',@$writable),"</td>\n";
+            print HTMLFILE '<td>',join("\n  <br>",@$require),"</td>\n" if $composite;
+            print HTMLFILE "<td align='center'>",join('<br>',@$writeGroup),"</td>\n" if $showGrp;
             print HTMLFILE "<td>";
             my $close = '';
             my @values;
             if (@$values) {
-                if ($format eq '-') {
+                if ($$writable[0] eq '-') {
                     foreach (@$values) {
                         ($url = $_) =~ tr/ /_/;
                         push @values, "--&gt; <a href='#$url'>$_ Tags</a>";
@@ -544,6 +628,7 @@ sub WriteTagNames($$)
         }
         print HTMLFILE "</table></blockquote>\n\n";
     }
+    # write the trailers
     my ($sec,$min,$hr,$day,$mon,$yr) = localtime;
     my @month = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
     $yr += 1900;
@@ -551,7 +636,7 @@ sub WriteTagNames($$)
     print HTMLFILE "<hr>\n";
     print HTMLFILE "(This document generated automatically by Image::ExifTool::BuildTagLookup)\n";
     print HTMLFILE "<br><i>Last revised $date</i>\n</body>\n</html>\n" or $success = 0;
-    print PODFILE $docs{Trailer} or $success = 0;
+    print PODFILE Doc2Pod($docs{PodTrailer}) or $success = 0;
     close(PODFILE) or $success = 0;
     close(HTMLFILE) or $success = 0;
     return $success;
@@ -568,9 +653,11 @@ Image::ExifTool::BuildTagLookup - Utility to build tag lookup tables
 
 =head1 DESCRIPTION
 
-This module is used to generate the tag lookup tables and tag name
-documentation for Image::ExifTool::TagLookup.pm.  It is run before each new
-ExifTool release to update the lookup tables and documentation.
+This module is used to generate the tag lookup tables in
+Image::ExifTool::TagLookup.pm and tag name documentation in
+Image::ExifTool::TagNames.pod, as well as HTML tag name documentation.  It
+is used before each new ExifTool release to update the lookup tables and
+documentation.
 
 =head1 SYNOPSIS
 

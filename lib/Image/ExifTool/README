@@ -118,6 +118,8 @@ conditions.  The following is a description of possible hash entries:
                   doesn't specify a Description, then the tag Name is used
                   instead, with spaces inserted between the words.
 
+  Groups        : [optional] Hash lookup for group names for this tag.
+
   Format        : [optional] Only valid for BinaryData, EXIF and IPTC tables.
                   For a Binary or EXIF table, this gives the format of the data,
                   and is one of the FORMAT types specified above.  For
@@ -133,22 +135,14 @@ conditions.  The following is a description of possible hash entries:
                   For IPTC tables, the only valid Format type is binary,
                   otherwise the data is assumed to be string.
 
-  Writable      : Indicates this tag can be written (or not written if value is
-                  set to zero), and for EXIF-type tables gives format for
-                  writing.  Writable may be set to 1 for MakerNotes information
-                  because the existing format is always used, however providing
-                  a format is desireable because it is used in validating the
-                  value.  For EXIF tables, the Writable flag may be different
-                  than the Format flag, in which case Format is used for
-                  converting the value and Writable specifies the format code
-                  written to the EXIF IFD.
+  Count         : [optional] Count to override count in EXIF IFD entry.
 
   Flags         : [optional] Flags to specify characteristics for this tag.  May
                   be a simple scalar flag name, a reference to a list of flag
                   names, or a reference to a hash of flag/value pairs. If not a
                   hash reference, the flag value is set to 1. The available flag
                   names are:
- 
+
                   'List' - indicates that duplicate entries of this tag should
                   be accumulated in a list (a comma separated string of
                   PrintConv values and a reference to an array of ValueConv
@@ -186,11 +180,11 @@ conditions.  The following is a description of possible hash entries:
 
                   'DataMember' - name of exiftool data member associated with
                   this tag if it should be stored as a special data member.
-                  
+
                   'Permanent' - flag indicates that a tag is permanent, and
                   can't be added or deleted from the file.  By default, all
                   MakerNotes tags are permanent unless otherwise specified.
-                  
+
                   'Avoid' - avoid creating this tag if possible.
 
   ValueConv     : [optional] Used to convert the raw data value to a useable
@@ -249,6 +243,28 @@ conditions.  The following is a description of possible hash entries:
 
   TagID         : [reserved] This entry is used internally by GetTagID() to
                   cache tag ID numbers for speed.
+
+  Writable      : [optional] Indicates this tag can be written (or not written
+                  if value is set to zero), and for EXIF-type tables gives
+                  format for writing.  Writable may be set to 1 for MakerNotes
+                  information because the existing format is always used,
+                  however providing a format is desireable because it is used in
+                  validating the value.  For EXIF tables, the Writable flag may
+                  be different than the Format flag, in which case Format is
+                  used for converting the value and Writable specifies the
+                  format code written to the EXIF IFD.
+
+  WriteGroup    : [optional] Required for writable EXIF tags to specify the IFD
+                  where the information gets written.
+
+  WriteCondition: [optional] Only meaningful for writable EXIF tags.  Specifies
+                  a condition to be evaluated before the tag can be written.
+
+  OffsetPair    : [optional] Used in EXIF table to specify the tagID for the
+                  corresponding offset or length tag.
+
+  DataTag       : [optional] Used in EXIF table to specify the tag name of the
+                  data associated with offset/length tags.
 
   SubDirectory {  [optional] If it exists, this specifies the start of a new
                   subdirectory.  It contains a collection of variables which

@@ -77,7 +77,6 @@ my %intRange = (
 );
 my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 
-
 #------------------------------------------------------------------------------
 # Set tag value
 # Inputs: 0) ExifTool object reference
@@ -130,6 +129,12 @@ sub SetNewValue($;$$%)
     if ($options{Group}) {
         $wantGroup = $options{Group};
         $ifdName = $exifDirs{lc($wantGroup)};
+        if ($wantGroup =~ /^XMP\b/i) {
+            # must load XMP table to set group1 names
+            my $table = GetTagTable('Image::ExifTool::XMP::Main');
+            my $writeProc = $table->{WRITE_PROC};
+            $writeProc and &$writeProc();
+        }
     }
     # determine the groups for all tags found, and the tag with
     # the highest priority group
@@ -139,11 +144,22 @@ sub SetNewValue($;$$%)
         $tag = $tagInfo->{Name};    # set tag so warnings will use proper case
         my ($writeGroup, $priority);
         if ($wantGroup) {
+            my $lcWant = lc($wantGroup);
             # only set tag in specified group
             $writeGroup = $self->GetGroup($tagInfo, 0);
-            unless ($writeGroup =~ /^$wantGroup$/i) {
-                next unless $writeGroup eq 'EXIF' and $ifdName;
-                $writeGroup = $ifdName;  # write to the specified IFD
+            unless (lc($writeGroup) eq $lcWant) {
+                if ($writeGroup eq 'EXIF') {
+                    next unless $ifdName;
+                    $writeGroup = $ifdName;  # write to the specified IFD
+                } else {
+                    # allow group1 name to be specified
+                    my $grp1 = $self->GetGroup($tagInfo, 0);
+                    unless ($grp1 and lc($grp1) eq $lcWant) {
+                        # must also check group1 name directly in case it is different
+                        $grp1 = $tagInfo->{Groups}->{1};
+                        next unless $grp1 and lc($grp1) eq $lcWant;
+                    }
+                }
             }
             $priority = 1000;   # highest priority since group was specified
         }
@@ -231,6 +247,12 @@ sub SetNewValue($;$$%)
         my $writeGroup = $writeGroup{$tagInfo};
         my $permanent = $$tagInfo{Permanent};
         $writeGroup eq 'MakerNotes' and $permanent = 1 unless defined $permanent;
+        my $wgrp1;
+        if ($writeGroup eq 'MakerNotes' or $writeGroup eq 'XMP') {
+            $wgrp1 = $self->GetGroup($tagInfo, 1);
+        } else {
+            $wgrp1 = $writeGroup;
+        }
         $tag = $tagInfo->{Name};    # get proper case for tag name
         # convert the value
         my $val = $value;
@@ -251,12 +273,12 @@ sub SetNewValue($;$$%)
                     $@ and $evalWarning = $@;
                     chomp $evalWarning;
                     $evalWarning =~ s/ at \(eval .*//s;
-                    $err = "$evalWarning in $writeGroup:$tag (in ${type}Inv)";
+                    $err = "$evalWarning in $wgrp1:$tag (in ${type}Inv)";
                     $verbose > 2 and print "$err\n";
                     undef $val;
                     last;
                 } elsif (not defined $val) {
-                    $err = "Error converting value for $writeGroup:$tag (in ${type}Inv)";
+                    $err = "Error converting value for $wgrp1:$tag (in ${type}Inv)";
                     $verbose > 2 and print "$err\n";
                     last;
                 }
@@ -286,7 +308,7 @@ sub SetNewValue($;$$%)
                             last;
                         }
                         unless ($found) {
-                            $err = "Can't convert $writeGroup:$tag ";
+                            $err = "Can't convert $wgrp1:$tag ";
                             $verbose > 2 and print "$err\n";
                             if ($matches > 1) {
                                 $err .= "(matches more than one $type)";
@@ -298,7 +320,7 @@ sub SetNewValue($;$$%)
                         }
                     }
                 } else {
-                    $err = "Can't convert value for $writeGroup:$tag (no ${type}Inv)";
+                    $err = "Can't convert value for $wgrp1:$tag (no ${type}Inv)";
                     $verbose > 2 and print "$err\n";
                     undef $val;
                     last;
@@ -314,12 +336,12 @@ sub SetNewValue($;$$%)
                     my $checkProc = $table->{CHECK_PROC};
                     my $err2 = &$checkProc($self, $tagInfo, \$val);
                     if ($err2) {
-                        $err = "$err2 for $writeGroup:$tag";
+                        $err = "$err2 for $wgrp1:$tag";
                         $verbose > 2 and print "$err\n";
                         undef $val; # value was invalid
                     }
                 } else {
-                    warn "No check proc for $writeGroup:$tag\n";
+                    warn "No check proc for $wgrp1:$tag\n";
                 }
                 last;
             }
@@ -348,10 +370,10 @@ sub SetNewValue($;$$%)
                     if ($verbose > 1) {
                         my $verb = $permanent ? 'Replacing' : 'Deleting';
                         my $fromList = $tagInfo->{List} ? ' from list' : '';
-                        print "$verb $writeGroup:$tag$fromList if value is '$val'\n";
+                        print "$verb $wgrp1:$tag$fromList if value is '$val'\n";
                     }
                 } elsif ($options{AddValue} and not $tagInfo->{List}) {
-                    $err = "Can't add $writeGroup:$tag (not a List type)";
+                    $err = "Can't add $wgrp1:$tag (not a List type)";
                     $verbose > 2 and print "$err\n";
                     next;
                 }
@@ -385,9 +407,9 @@ sub SetNewValue($;$$%)
                 if ($verbose > 1) {
                     my $ifExists = $newValueHash->{IsCreating} ? '' : ' if tag already exists';
                     if ($options{AddValue}) {
-                        print "Adding to $writeGroup:$tag$ifExists\n";
+                        print "Adding to $wgrp1:$tag$ifExists\n";
                     } else {
-                        print "Writing $writeGroup:$tag$ifExists\n";
+                        print "Writing $wgrp1:$tag$ifExists\n";
                     }
                 }
             }
@@ -401,7 +423,7 @@ sub SetNewValue($;$$%)
             # create empty new value hash entry to delete this tag
             $self->GetNewValueHash($tagInfo, $writeGroup, 'delete');
             $self->GetNewValueHash($tagInfo, $writeGroup, 'create');
-            $verbose > 1 and print "Deleting $writeGroup:$tag\n";
+            $verbose > 1 and print "Deleting $wgrp1:$tag\n";
         }
         ++$numSet;
         $prioritySet = 1 if $preferred{$tagInfo};
@@ -561,7 +583,7 @@ sub WriteInfo($$$)
 {
     local $_;
     my ($self, $infile, $outfile) = @_;
-    my ($fileType, @fileTypeList);
+    my (@fileTypeList, $fileType, $tiffType);
     my ($inRef, $outRef, $outPos);
     my $oldRaf = $self->{RAF};
     my $rtnVal = 1;
@@ -584,9 +606,11 @@ sub WriteInfo($$$)
         $fileType = GetFileType($infile);
     }
     if ($fileType) {
-        @fileTypeList = ($fileType);
+        @fileTypeList = ( $fileType );
+        $tiffType = GetFileExtension($infile);
     } else {
         @fileTypeList = @fileTypes;
+        $tiffType = 'TIFF';
     }
     # set up output file
     if (ref $outfile) {
@@ -624,13 +648,13 @@ sub WriteInfo($$$)
         for (;;) {
             my $type = shift @fileTypeList;
             # save file type in member variable
-            $self->{FILE_TYPE} = $fileType;
+            $self->{FILE_TYPE} = $type;
             # determine which directories we must write for this file type
             $self->InitWriteDirs($type);
             if ($type eq 'JPEG') {
                 $rtnVal = $self->WriteJPEG($outRef);
             } elsif ($type eq 'TIFF') {
-                $rtnVal = $self->TiffInfo($type, $raf, 0, $outRef);
+                $rtnVal = $self->TiffInfo($tiffType, $raf, 0, $outRef);
             } elsif ($type eq 'GIF') {
                 $rtnVal = $self->GifInfo($outRef);
             } elsif ($type eq 'CRW') {
@@ -1271,6 +1295,116 @@ sub VerboseDir($$;$)
 }
 
 #------------------------------------------------------------------------------
+# convert unicode characters to Windows Latin1 (cp1252)
+# Inputs: 0) 16-bit unicode character string, 1) unpack format
+# Returns: 8-bit Windows Latin1 encoded string
+my %unicode2latin = (
+    0x20ac => 0x80,  0x0160 => 0x8a,  0x2013 => 0x96,
+    0x201a => 0x82,  0x2039 => 0x8b,  0x2014 => 0x97,
+    0x0192 => 0x83,  0x0152 => 0x8c,  0x02dc => 0x98,
+    0x201e => 0x84,  0x017d => 0x8e,  0x2122 => 0x99,
+    0x2026 => 0x85,  0x2018 => 0x91,  0x0161 => 0x9a,
+    0x2020 => 0x86,  0x2019 => 0x92,  0x203a => 0x9b,
+    0x2021 => 0x87,  0x201c => 0x93,  0x0153 => 0x9c,
+    0x02c6 => 0x88,  0x201d => 0x94,  0x017e => 0x9e,
+    0x2030 => 0x89,  0x2022 => 0x95,  0x0178 => 0x9f,
+);
+sub Unicode2Latin($$)
+{
+    my ($val, $fmt) = @_;
+    my @uni = unpack("$fmt*",$val);
+    foreach (@uni) {
+        $_ = $unicode2latin{$_} || ord('?') if $_ > 0xff;
+    }
+    # repack as a Latin string
+    my $outVal = pack('C*',@uni);
+    $outVal =~ s/\0.*//;    # truncate at null terminator
+    return $outVal;
+}
+
+#------------------------------------------------------------------------------
+# convert Windows Latin1 characters to unicode
+# Inputs: 0) 8-bit Windows Latin1 character string (cp1252), 1) unpack format
+# Returns: 16-bit unicode character string
+my %latin2unicode;
+sub Latin2Unicode($$)
+{
+    # create reverse lookup table if necessary
+    unless (%latin2unicode) {
+        foreach (keys %unicode2latin) {
+            $latin2unicode{$unicode2latin{$_}} = $_;
+        }
+    }
+    my ($val, $fmt) = @_;
+    my @latin = unpack('C*',$val);
+    foreach (@latin) {
+        $_ = $latin2unicode{$_} if $latin2unicode{$_};
+    }
+    # repack as a 16-bit unicode string (plus null terminator)
+    my $outVal = pack("$fmt*",@latin) . "\0\0";
+    return $outVal;
+}
+
+#------------------------------------------------------------------------------
+# convert 16-bit unicode characters to UTF8
+# Inputs: 0) 16-bit unicode character string, 1) short unpack format
+# Returns: UTF8 encoded string
+# Notes: Only works for Perl 5.6.1 or later
+sub Unicode2UTF8($$)
+{
+    my ($val, $fmt) = @_;
+    my $outVal;
+    # repack as a UTF8 string
+    $outVal = pack('C0U*',unpack("$fmt*",$val));
+    $outVal =~ s/\0.*//;    # truncate at null terminator
+    return $outVal;
+}
+
+#------------------------------------------------------------------------------
+# convert UTF8 encoded string to 16-bit unicode (Perl 5.6.1 or later)
+# Input: 0) UTF8 string, 1) short unpack format
+# Returns: 16-bit unicode character string
+sub UTF82Unicode($$)
+{
+    my ($str, $fmt) = @_;
+    # repack UTF8 string as 16-bit integers
+    $str = pack("$fmt*",unpack('U0U*',$str)) . "\0\0";
+    return $str;
+}
+
+#------------------------------------------------------------------------------
+# convert 16-bit unicode character string to 8-bit (Latin or UTF8)
+# Inputs: 0) ExifTool object reference, 1) 16-bit unicode string (in specified byte order)
+#         2) Optional byte order (current byte order used if not specified)
+# Returns: 8-bit character string
+my %unpackShort = ( 'II' => 'v', 'MM' => 'n' );
+sub Unicode2Byte($$;$) {
+    my ($exifTool, $val, $byteOrder) = @_;
+    my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
+    # convert to Latin if specified or if no UTF8 support in this Perl version
+    if ($exifTool->Options('Charset') eq 'Latin' or $] < 5.006001) {
+        return Unicode2Latin($val, $fmt);
+    } else {
+        return Unicode2UTF8($val, $fmt);
+    }
+}
+
+#------------------------------------------------------------------------------
+# convert 8-bit character string to 16-bit unicode
+# Inputs: 0) ExifTool object reference, 1) Latin or UTF8 string, 2) optional byte order
+# Returns: 16-bit unicode character string (in specified byte order)
+sub Byte2Unicode($$;$)
+{
+    my ($exifTool, $val, $byteOrder) = @_;
+    my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
+    if ($exifTool->Options('Charset') eq 'Latin' or $] < 5.006001) {
+        return Latin2Unicode($val, $fmt);
+    } else {
+        return UTF82Unicode($val, $fmt);
+    }
+}
+
+#------------------------------------------------------------------------------
 # assemble a continuing fraction into a rational value
 # Inputs: 0) numerator, 1) denominator
 #         2-N) list of fraction denominators, deepest first
@@ -1280,7 +1414,7 @@ sub AssembleRational($$@)
     my ($num, $denom, $frac) = splice(@_, 0, 3);
     return AssembleRational($frac*$num+$denom, $num, @_);
 }
-    
+
 #------------------------------------------------------------------------------
 # convert a floating point number into a rational
 # Inputs: 0) floating point number, 1) optional maximum value (defaults to 0x7fffffff)
@@ -1582,6 +1716,7 @@ sub WriteJPEG($$)
                 $doneDir{IFD0} = $doneDir{IFD1} = 1;
                 $verbose and print "Creating APP1:\n";
                 # write new EXIF data
+                $self->{TIFF_TYPE} = 'APP1';
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
                 SetByteOrder('MM');     # use good byte ordering ;)
                 my %dirInfo = (
@@ -1766,13 +1901,14 @@ sub WriteJPEG($$)
                 } elsif ($$segDataPt =~ /^$xmpAPP1hdr/) {
                     $doneDir{XMP} = 1;
                     last unless $$editDirs{XMP};
+                    my $start = length $xmpAPP1hdr;
                     my $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
                     my %dirInfo = (
                         Base     => 0,
                         DataPt   => $segDataPt,
                         DataLen  => $length,
-                        DirStart => length $xmpAPP1hdr,
-                        DirLen   => $length - length($xmpAPP1hdr),
+                        DirStart => $start,
+                        DirLen   => $length - $start,
                         Nesting  => 0,
                         Parent   => $markerName,
                     );
@@ -1907,7 +2043,7 @@ sub CheckExtraTags($$$)
 {
     my ($self, $tagInfo, $valPtr) = @_;
     my $tag = $$tagInfo{Name};
-    if ($tag eq 'ThumbnailImage' or $tag eq 'PreviewImage') {
+    if ($tag eq 'ThumbnailImage' or $tag eq 'PreviewImage' or $tag eq 'JpgFromRaw') {
         unless ($$valPtr =~ /^\xff\xd8/ or $self->Options('IgnoreMinorErrors')) {
             return 'Not a valid image';
         }

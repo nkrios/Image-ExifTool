@@ -20,9 +20,9 @@ sub CheckIPTC($$$)
 {
     my ($exifTool, $tagInfo, $valPtr) = @_;
     my $format = $$tagInfo{Format};
-    if ($format =~ /^binary\[?(\d*)\]?/) {
+    if ($format =~ /^int(\d+)/) {
         my $val = $$valPtr;
-        my $bytes = $1 || 0;
+        my $bytes = int(($1 || 0) / 8);
         return 'Not an integer' unless Image::ExifTool::IsInt($val);
         my $n;
         for ($n=0; $n<$bytes; ++$n) { $val >>= 8; }
@@ -52,17 +52,15 @@ sub CheckIPTC($$$)
 sub FormatIPTC($$)
 {
     my ($tagInfo, $valPtr) = @_;
-    if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^binary\[?(\d*)\]?/) {
-        my $len = $1 || 0;
-        if ($1 == 1) {  # 1 byte
+    if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^int(\d+)/) {
+        my $len = int(($1 || 0) / 8);
+        if ($len == 1) {      # 1 byte
             $$valPtr = ord($$valPtr);
-        } elsif ($1 == 2) { # 2-byte integer
-            $$valPtr = pack('n', $$valPtr);
-        } elsif ($1 == 4) { # 4-byte integer
+        } elsif ($len == 4) { # 4-byte integer
             $$valPtr = pack('N', $$valPtr);
-        } else {
-            $$valPtr = pack('n', $$valPtr);   # pack as 2-byte by default
-            warn "Bad format for $$tagInfo{Name}\n";
+        } else {            # pack as 2-byte by default
+            $$valPtr = pack('n', $$valPtr);
+            warn "Bad format for $$tagInfo{Name}\n" unless $len == 2;
         }
     }
 }
@@ -187,7 +185,7 @@ sub WriteIPTC($$$)
                 if ($len & 0x8000) {
                     my $n = $len & 0x7fff;  # get num bytes in length field
                     if ($pos + $n <= $dirEnd and $n <= 8) {
-                        # determine length (a big-endian, variable sized binary number)
+                        # determine length (a big-endian, variable sized int)
                         for ($len = 0; $n; ++$pos, --$n) {
                             $len = $len * 256 + ord(substr($$dataPt, $pos, 1));
                         }
@@ -233,7 +231,7 @@ sub WriteIPTC($$$)
             my $value;
             foreach $value (@values) {
                 $verbose > 1 and print "    + IPTC:$$tagInfo{Name} = '$value'\n";
-                # convert to binary if necessary
+                # convert to int if necessary
                 FormatIPTC($tagInfo, \$value);
                 # (note: IPTC string values are NOT null terminated)
                 $len = length $value;
@@ -263,7 +261,7 @@ sub WriteIPTC($$$)
             $foundRec{$rec}->{$tag} = 1;
             $len = $pos - $valuePtr;
             my $val = substr($$dataPt, $valuePtr, $len);
-            if ($tagInfo->{Format} and $tagInfo->{Format} =~ /^binary/) {
+            if ($tagInfo->{Format} and $tagInfo->{Format} =~ /^int/) {
                 $val = 0;
                 my $i;
                 for ($i=0; $i<$len; ++$i) {

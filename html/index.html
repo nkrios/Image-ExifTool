@@ -6,8 +6,8 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
 <h3>
-<a href="Image-ExifTool-4.64.tar.gz">
-Download        Version 4.64</a> - Feb. 17, 2005
+<a href="Image-ExifTool-4.73.tar.gz">
+Download        Version 4.73</a> - Mar. 1, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a Perl module with an included application script that allow you
@@ -52,7 +52,6 @@ that it will corrupt some files.  Be sure to keep backups of your files.
 still possible to write illegal values which may cause problems when reading the
 images with other software.  So take care to verify the information you are
 writing.
-<li>Currently, only UTF-8 encoded XMP information is supported.
 </ul>
 
 <h2>Running ExifTool</h2>
@@ -131,22 +130,16 @@ DESCRIPTION
 
     -TAG=VALUE sets the value of a tag, and -TAG= deletes a tag.  -TAG+=VALUE
     adds a value to a list without replacing existing values, and -TAG-=VALUE
-    deletes a specific value from a list.  Use "-TAG&lt;=FILENAME" to set the
-    value of a tag from the contents of a file (the quotes prevent shell
-    redirection). The tag is written to all groups where it is valid if no group
-    is specified. A special (and powerful) variation of this syntax,
-    -AllTagsFromFile=SRCFILE, allows all writable tags to be set from
-    information in another file.
-
-    Any tag name may be prefixed by a group name to specify the location (ie.
-    -GROUP:TAG).  While reading information, any group name in family 0 or 1 may
-    be used.  For writing, valid groups are EXIF, GPS, IPTC, XMP, MakerNotes, or
-    any EXIF IFD name.
+    deletes a specific value from a list.  Use "-TAG<=FILENAME" to set the value
+    of a tag from the contents of a file (the quotes prevent shell redirection).
+    The tag is written to all groups where it is valid if no group is specified.
+    A group is specified using -GROUP:TAG, where GROUP is any valid family 0 or
+    1 group name.  Special feature: -AllTagsFromFile=SRCFILE sets the value of
+    all writable tags from information in the specified source file.
 
     Currently, EXIF, GPS, IPTC, XMP and MakerNotes tags may be written to JPG,
     TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG files.  Be sure to verify that
-    the new file is OK before erasing the original (which is renamed to
-    FILE_original).
+    the new file is OK before erasing the original (renamed to FILE_original).
 
 OPTIONS
     -list   - list all valid tag names
@@ -165,6 +158,7 @@ OPTIONS
     -h      - use HTML formatting for output (implies -E option)
     -i DIR  - ignore specified directory names
     -l      - long output (2-line Canon-style output)
+    -L      - convert Unicode characters to WinLatin1 instead of UTF8
     -m      - ignore minor errors (allows writing if minor errors occur)
     -n      - don't convert values for printing
     -o FILE - output file or dir name for writing (otherwise edits input file)
@@ -193,10 +187,11 @@ IPTC, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
 <tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
 <td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
 FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, MakerUnknown, Minolta,
-Nikon, NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM, Sanyo,
-Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-pdf,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, KodakBordersIFD,
+KodakEffectsIFD, MakerUnknown, Minolta, Nikon, NikonPreview, Olympus, Panasonic,
+Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs,
+XMP-dc, XMP-exif, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ,
+XMP-xmpMM, XMP-xmpRights
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
@@ -269,6 +264,9 @@ image for the Canon 300D):
 <p># write a tag to the XMP group (otherwise it would get written to the
 IPTC group since the City tag exists in both, and IPTC has priority):
 <br><b>exiftool -xmp:city=Kingston dst.jpg</b>
+
+<p># set ISO only in Canon maker notes
+<br><b>exiftool -Canon:ISO=100 dst.jpg</b>
 
 <p># delete LightSource tag only if it is unknown with a value of 0:
 <br><b>exiftool -LightSource-="Unknown (0)" dst.tiff</b>

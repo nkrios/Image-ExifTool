@@ -209,17 +209,17 @@ maker notes when found in a JPEG or TIFF image.  Also listed is the TagID of the
     <td align='left'>Four 16 bit integers: 0) unknown, 1) focal length in mm, 2-3) sensor width
     and height in units of 1/1000 inch</td></tr>
 <tr align='center'><td>0x102a</td><td>0x04</td><td>0x300b</td><td>CanonShotInfo</td>
-    <td align='left'>Data block giving shot information (see note)</td></tr>
+    <td align='left'>Data block giving <a href="TagNames.html#Canon_ShotInfo">shot information</a></td></tr>
 <tr align='center'><td>0x102c</td><td>-</td><td>?</td><td>CanonColorInfo2</td>
     <td align='left'>Data block of color information (format unknown)</td></tr>
 <tr align='center'><td>0x102d</td><td>0x01</td><td>0x300b</td><td>CanonCameraSettings</td>
-    <td align='left'>Data block giving camera settings (see note)</td></tr>
+    <td align='left'>Data block giving <a href="TagNames.html#Canon_CameraSettings">camera settings</a></td></tr>
 <tr align='center'><td>0x1031</td><td>-</td><td>0x300b</td><td>SensorInfo</td>
-    <td align='left'>Sensor size and resolution information (see note)</td></tr>
+    <td align='left'><a href="TagNames.html#CanonRaw_SensorInfo">Sensor size and resolution information</a></td></tr>
 <tr align='center'><td>0x1033</td><td>0x0f</td><td>0x300b</td><td>CanonCustomFunctions</td>
-    <td align='left'>Data block giving Canon custom settings (see note)</td></tr>
+    <td align='left'>Data block giving <a href="TagNames.html#CanonCustom_Functions10D">Canon custom settings</a></td></tr>
 <tr align='center'><td>0x1038</td><td>0x12</td><td>0x300b</td><td>CanonPictureInfo</td>
-    <td align='left'>Data block giving picture-specific information (see note)</td></tr>
+    <td align='left'>Data block giving <a href="TagNames.html#Canon_PictureInfo">picture-specific information</a></td></tr>
 <tr align='center'><td>0x1039</td><td>0x13</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1093</td><td>0x93</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10a8</td><td>0xa8</td><td>0x300b</td><td>?</td><td align='left'>-</td></tr>
@@ -250,7 +250,7 @@ maker notes when found in a JPEG or TIFF image.  Also listed is the TagID of the
     <td align='left'>32-bit integer giving the time in seconds when the picture was taken,
     followed by a 32-bit timezone in seconds</td></tr>
 <tr align='center'><td>0x1810</td><td>-</td><td>0x300a</td><td>ImageInfo</td>
-    <td align='left'>Data block containing image information, including rotation (see note)</td></tr>
+    <td align='left'>Data block containing <a href="TagNames.html#CanonRaw_ImageInfo">image information, including rotation</a></td></tr>
 <tr align='center'><td>0x1813</td><td>-</td><td>0x3002</td><td>FlashInfo</td>
     <td align='left'>Two 32-bit floats: The flash guide number and the flash threshold</td></tr>
 <tr align='center'><td>0x1814</td><td>-</td><td>0x3003</td><td>MeasuredEV</td>
@@ -286,15 +286,8 @@ maker notes when found in a JPEG or TIFF image.  Also listed is the TagID of the
     <td align='left'>The subdirectory containing most of the JPEG/TIFF EXIF information</td></tr>
 </table></blockquote>
 
-<b>Note:</b> The formats of these data blocks are known, however a description
-of these formats is outside the scope of this document.  These data blocks are
-the same format as within the maker notes section in the EXIF information of
-Canon JPEG and TIFF files.  Detailed information about these formats is
-contained within the Image::ExifTool::Canon.pm and Image::ExifTool::CanonRaw.pm
-modules.
-
 <p><hr>
 Please e-mail me if you find any errors or omissions in this document.  My address is phil at owl.phy.queensu.ca - Thanks!
-<p><i>P. Harvey - Last revised Feb. 8, 2005</i>
+<p><i>P. Harvey - Last revised Feb. 18, 2005</i>
 </body>
 </html>

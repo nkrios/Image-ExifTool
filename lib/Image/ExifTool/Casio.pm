@@ -33,13 +33,13 @@ $VERSION = '1.05';
             5 => 'Landscape',
         },
     },
-    0x0002 => { 
+    0x0002 => {
         Name => 'Quality',
         Description => 'Image Quality',
         Writable => 'int16u',
         PrintConv => { 1 => 'Economy', 2 => 'Normal', 3 => 'Fine' },
     },
-    0x0003 => { 
+    0x0003 => {
         Name => 'FocusMode',
         Writable => 'int16u',
         PrintConv => {
@@ -49,12 +49,12 @@ $VERSION = '1.05';
             5 => 'Infinity',
         },
     },
-    0x0004 => { 
+    0x0004 => {
         Name => 'FlashMode',
         Writable => 'int16u',
         PrintConv => { 1 => 'Auto', 2 => 'On', 3 => 'Off', 4 => 'Red-eye Reduction' },
     },
-    0x0005 => { 
+    0x0005 => {
         Name => 'FlashIntensity',
         Writable => 'int16u',
         PrintConv => { 11 => 'Weak', 13 => 'Normal', 15 => 'Strong' },
@@ -63,8 +63,8 @@ $VERSION = '1.05';
         Name => 'ObjectDistance',
         Writable => 'int32u',
     },
-    0x0007 => { 
-        Name => 'WhiteBalance', 
+    0x0007 => {
+        Name => 'WhiteBalance',
         Writable => 'int16u',
         PrintConv => {
             1 => 'Auto',
@@ -75,27 +75,27 @@ $VERSION = '1.05';
             129 => 'Manual',
         },
     },
-    0x000a => { 
-        Name => 'DigitalZoom', 
+    0x000a => {
+        Name => 'DigitalZoom',
         Writable => 'int32u',
         PrintConv => { 65536 => 'Off', 65537 => '2X' },
     },
-    0x000b => { 
-        Name => 'Sharpness', 
+    0x000b => {
+        Name => 'Sharpness',
         Writable => 'int16u',
         PrintConv => { 0 => 'Normal', 1 => 'Soft', 2 => 'Hard' },
     },
-    0x000c => { 
-        Name => 'Contrast', 
+    0x000c => {
+        Name => 'Contrast',
         Writable => 'int16u',
         PrintConv => { 0 => 'Normal', 1 => 'Low', 2 => 'High' },
     },
-    0x000d => { 
-        Name => 'Saturation', 
+    0x000d => {
+        Name => 'Saturation',
         Writable => 'int16u',
         PrintConv => { 0 => 'Normal', 1 => 'Low', 2 => 'High' },
     },
-    0x0014 => { 
+    0x0014 => {
         Name => 'CCDSensitivity',
         Writable => 'int16u',
         PrintConv => {
@@ -115,14 +115,14 @@ $VERSION = '1.05';
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0x0002 => { 
+    0x0002 => {
         Name => 'PreviewImageSize',
         Groups => { 2 => 'Image' },
         Writable => 'int16u',
         Count => 2,
         PrintConv => '$val =~ tr/ /x/; $val',
     },
-    0x0003 => { 
+    0x0003 => {
         Name => 'CasioPreviewLength',
         Groups => { 2 => 'Image' },
 # Rename this tag to basically ignore these values (and those of
@@ -134,7 +134,7 @@ $VERSION = '1.05';
 #        Writable => 'int32u',
 #        Protected => 1,
     },
-    0x0004 => { 
+    0x0004 => {
         Name => 'CasioPreviewStart',
         Groups => { 2 => 'Image' },
         Writable => 0,
@@ -142,7 +142,7 @@ $VERSION = '1.05';
 #        OffsetPair => 0x0003, # point to associated byte count
 #        Writable => 'int32u',
     },
-    0x0008 => { 
+    0x0008 => {
         Name => 'QualityMode',
         Writable => 'int16u',
         PrintConv => {
@@ -151,11 +151,11 @@ $VERSION = '1.05';
            2 => 'Fine',
         },
     },
-    0x0009 => { 
+    0x0009 => {
         Name => 'CasioImageSize',
         Groups => { 2 => 'Image' },
         Writable => 'int16u',
-        PrintConv => { 
+        PrintConv => {
             0 => '640x480',
             4 => '1600x1200',
             5 => '2048x1536',
@@ -165,7 +165,7 @@ $VERSION = '1.05';
             36 => '3008x2008',
         },
     },
-    0x000d => { 
+    0x000d => {
         Name => 'FocusMode',
         Writable => 'int16u',
         PrintConv => {
@@ -173,22 +173,22 @@ $VERSION = '1.05';
            1 => 'Macro',
         },
     },
-    0x0014 => { 
+    0x0014 => {
         Name => 'ISO',
         Description => 'ISO Speed',
         Priority => 0,
         Writable => 'int16u',
-        PrintConv => { 
+        PrintConv => {
            3 => 50,
            4 => 64,
            6 => 100,
            9 => 200,
         },
     },
-    0x0019 => { 
+    0x0019 => {
         Name => 'WhiteBalance',
         Writable => 'int16u',
-        PrintConv => { 
+        PrintConv => {
            0 => 'Auto',
            1 => 'Daylight',
            2 => 'Shade',
@@ -197,14 +197,14 @@ $VERSION = '1.05';
            5 => 'Manual',
         },
     },
-    0x001d => { 
+    0x001d => {
         Name => 'FocalLength',
         Description => 'Focal Length (mm)',
         Writable => 'rational32u',
         PrintConv => 'sprintf("%.1fmm",$val)',
         PrintConvInv => '$val=~s/mm$//;$val',
     },
-    0x001f => { 
+    0x001f => {
         Name => 'Saturation',
         Writable => 'int16u',
         PrintConv => {
@@ -213,7 +213,7 @@ $VERSION = '1.05';
            2 => '+1',
         },
     },
-    0x0020 => { 
+    0x0020 => {
         Name => 'Contrast',
         Writable => 'int16u',
         PrintConv => {
@@ -222,7 +222,7 @@ $VERSION = '1.05';
            2 => '+1',
         },
     },
-    0x0021 => { 
+    0x0021 => {
         Name => 'Sharpness',
         Writable => 'int16u',
         PrintConv => {
@@ -231,7 +231,7 @@ $VERSION = '1.05';
            2 => '+1',
         },
     },
-    0x0e00 => { 
+    0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
         Writable => 0,
@@ -239,7 +239,7 @@ $VERSION = '1.05';
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
-    0x2000 => { 
+    0x2000 => {
         # this is the image data referenced by tags 3 and 4
         # (nasty that they double-reference the image!)
         Name => 'PreviewImage',
@@ -247,12 +247,12 @@ $VERSION = '1.05';
         PrintConv => '\$val',
         PrintConvInv => '$val',
     },
-    0x2011 => { 
+    0x2011 => {
         Name => 'WhiteBalanceBias',
         Writable => 'int16u',
         Count => 2,
     },
-    0x2012 => { 
+    0x2012 => {
         Name => 'WhiteBalance',
         Writable => 'int16u',
         PrintConv => {
@@ -262,72 +262,72 @@ $VERSION = '1.05';
            4 => 'Flash?',
         },
     },
-    0x2022 => { 
+    0x2022 => {
         Name => 'ObjectDistance',
         Writable => 'int32u',
         PrintConv => 'sprintf("%.3f m",$val/1000)',
     },
-    0x2034 => { 
+    0x2034 => {
         Name => 'FlashDistance',
         Writable => 'int16u',
     },
-    0x3000 => { 
+    0x3000 => {
         Name => 'RecordMode',
         Writable => 'int16u',
         PrintConv => { 2 => 'Normal' },
     },
-    0x3001 => { 
+    0x3001 => {
         Name => 'SelfTimer',
         Writable => 'int16u',
         PrintConv => { 1 => 'Off' },
     },
-    0x3002 => { 
+    0x3002 => {
         Name => 'Quality',
         Writable => 'int16u',
-        PrintConv => { 
+        PrintConv => {
            1 => 'Economic',
            2 => 'Normal',
            3 => 'Fine',
         },
     },
-    0x3003 => { 
+    0x3003 => {
         Name => 'FocusMode',
         Writable => 'int16u',
-        PrintConv => { 
+        PrintConv => {
            0 => 'Manual?',
            1 => 'Fixation?',
            3 => 'Single-Area Auto Focus',
            6 => 'Multi-Area Auto Focus',
         },
     },
-    0x3006 => { 
+    0x3006 => {
         Name => 'TimeZone',
         Writable => 'string',
     },
-    0x3007 => { 
+    0x3007 => {
         Name => 'BestshotMode',
         Writable => 'int16u',
-        PrintConv => { 
+        PrintConv => {
            0 => 'Off',
            1 => 'On?',
         },
     },
-    0x3014 => { 
+    0x3014 => {
         Name => 'CCDISOSensitivity',
         Writable => 'int16u',
         Description => 'CCD ISO Sensitivity',
     },
-    0x3015 => { 
+    0x3015 => {
         Name => 'ColorMode',
         Writable => 'int16u',
         PrintConv => { 0 => 'Off' },
     },
-    0x3016 => { 
+    0x3016 => {
         Name => 'Enhancement',
         Writable => 'int16u',
         PrintConv => { 0 => 'Off' },
     },
-    0x3017 => { 
+    0x3017 => {
         Name => 'Filter',
         Writable => 'int16u',
         PrintConv => { 0 => 'Off' },

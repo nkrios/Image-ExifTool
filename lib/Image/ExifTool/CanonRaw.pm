@@ -494,7 +494,7 @@ sub ProcessCanonRaw($$$)
     my $entries = Get16u(\$buff,0);         # get number of entries in directory
     # read the directory (10 bytes per entry)
     $raf->Read($buff, 10 * $entries) or return 0;
-    
+
     $verbose and $exifTool->VerboseDir('Raw', $entries);
     my $index;
     for ($index=0; $index<$entries; ++$index) {
@@ -556,7 +556,7 @@ sub ProcessCanonRaw($$$)
         } else {
             $valueDataPos = $ptr;
             if ($size <= 512 or ($verbose > 2 and $size <= 65536)
-                or ($tagInfo and ($$tagInfo{SubDirectory} 
+                or ($tagInfo and ($$tagInfo{SubDirectory}
                 or grep(/^$$tagInfo{Name}$/i, $exifTool->GetRequestedTags()) )))
             {
                 # read value if size is small or specifically requested
@@ -652,7 +652,7 @@ sub ProcessCanonRaw($$$)
             {
                 $exifTool->FoundTag($tagInfo, $value);
             } else {
-                $exifTool->Warn('JpgFromRaw is not a valid image');   
+                $exifTool->Warn('JpgFromRaw is not a valid image');
             }
         }
     }
@@ -669,14 +669,14 @@ sub CrwInfo($$)
     my ($buff, $sig);
     my $raf = $exifTool->{RAF};
     my $buildMakerNotes = $exifTool->Options('MakerNotes');
-    
-    $raf->Read($buff,2) == 2      or return 0; 
+
+    $raf->Read($buff,2) == 2      or return 0;
     SetByteOrder($buff)           or return 0;
     $raf->Read($buff,4) == 4      or return 0;
     $raf->Read($sig,8) == 8       or return 0;  # get file signature
     $sig eq 'HEAPCCDR'            or return 0;  # validate signature
     my $hlen = Get32u(\$buff, 0);
-    
+
     $raf->Seek(0, 2)              or return 0;  # seek to end of file
     my $filesize = $raf->Tell()   or return 0;
 
@@ -684,7 +684,7 @@ sub CrwInfo($$)
     $buildMakerNotes and InitMakerNotes($exifTool);
 
     $exifTool->FoundTag('FileType', 'Canon RAW');  # set file type
-    
+
     # build directory information for main raw directory
     my %dirInfo = (
         DataLen  => 0,
@@ -694,7 +694,7 @@ sub CrwInfo($$)
         RAF      => $raf,
         Parent   => 'CRW',
     );
-    
+
     # process the raw directory
     my $rawTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
     $exifTool->ProcessTagTable($rawTagTable, \%dirInfo);

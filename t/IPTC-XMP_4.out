@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.73
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 100
 [File, File, Image]  - Image Height: 80
@@ -71,7 +71,7 @@
 [Photoshop, Photoshop, Image] 1 - Photoshop Format: Standard
 [Photoshop, Photoshop, Image] 2 - Progressive Scans: 3 Scans
 [XMP, XMP-dc, Author] Creator - Creator: Phil Harvey
-[XMP, XMP-dc, Image] Description - Description: A witty caption
+[XMP, XMP-dc, Image] Description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] Rights - Rights: Copyright 2004 Phil Harvey
 [XMP, XMP-dc, Author] Source - Source: I'm the source
 [XMP, XMP-dc, Image] Subject - Subject: ExifTool, Test, XMP

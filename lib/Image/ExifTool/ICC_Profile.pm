@@ -161,7 +161,7 @@ my %illuminantType = (
     },
     vued => 'ViewingCondDesc',
     view => {
-        Name => 'ViewingConditions', 
+        Name => 'ViewingConditions',
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::ViewingConditions',
             Validate => '$type eq "view"',
@@ -178,7 +178,7 @@ my %illuminantType = (
     # exist as a tag in the directory.  It is only in this table to provide
     # a link so ExifTool can locate the header tags
     Header => {
-        Name => 'ProfileHeader', 
+        Name => 'ProfileHeader',
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::Header',
         },
@@ -606,7 +606,7 @@ sub ProcessICC_Profile($$$)
             Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
         }
         next unless defined $tagInfo;
-        
+
         if ($offset + $size > $dirLen) {
             $exifTool->Warn("Bad ICC_Profile table (truncated)");
             last;

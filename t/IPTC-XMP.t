@@ -69,7 +69,7 @@ my $testnum = 1;
     }
     undef $info;
     my $image;
-    $exifTool->WriteInfo("t/$testname.jpg",\$image);
+    $exifTool->WriteInfo('t/IPTC-XMP.jpg',\$image);
     
     my $exifTool2 = new Image::ExifTool;
     $exifTool2->Options(Duplicates => 1);

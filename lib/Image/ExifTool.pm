@@ -22,7 +22,7 @@ use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '4.64';
+$VERSION = '4.73';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -75,7 +75,7 @@ sub WriteBinaryData($$$);
 sub CheckBinaryData($$$);
 
 # recognized file types (in the order we test unknown files)
-@fileTypes = ( 'JPEG', 'TIFF', 'CRW', 'MRW', 'ORF', 'GIF', 'JPEG2000' );
+@fileTypes = ( 'JPEG', 'TIFF', 'CRW', 'MRW', 'ORF', 'GIF', 'JP2' );
 
 # headers for various segment types
 $exifAPP1hdr = "Exif\0\0";
@@ -98,8 +98,8 @@ my %fileTypeLookup = (
     PEF  => 'TIFF', # Pentax RAW format is TIFF
     ORF  => 'ORF',  # Olympus RAW format
     DNG  => 'TIFF', # Digital Negative is TIFF
-    JP2  => 'JPEG2000', # JPEG2000 file
-    JPX  => 'JPEG2000',
+    JP2  => 'JP2',  # JPEG 2000 file
+    JPX  => 'JP2',
 );
 
 # group hash for ExifTool-generated tags
@@ -263,6 +263,7 @@ sub ClearOptions($)
     $self->{OPTIONS} = {
         Binary      => 0,       # flag to extract binary values even if tag not specified
         Composite   => 1,       # flag to calculate Composite tags
+        Charset     => 'UTF8',  # character set for converting XP characters
     #   DateFormat  => undef,   # format for date/time
         Duplicates  => 1,       # flag to save duplicate tag values
     #   Exclude     => undef,   # tags to exclude
@@ -342,18 +343,12 @@ sub ExtractInfo($;@)
         $raf->BinMode();    # set binary mode before we start reading
 
         # read tags from the file
-        my (@fileTypeList, $fileType, $fileExt, $pos);
-        if ($filename and $filename =~ /.*\.(.+)$/) {
-            $fileExt = uc($1);   # change extension to upper case
-            # convert TIF extension to TIFF because we use the
-            # extension for the file type tag of TIFF images
-            $fileExt eq 'TIF' and $fileExt = 'TIFF';
-            # test for file type specified by the extension
-            $fileType = $fileTypeLookup{$fileExt};
-        }
+        my (@fileTypeList, $tiffType, $pos);
+        my $fileType = GetFileType($filename);
         if ($fileType) {
             # only test type specified by file extension
             @fileTypeList = ( $fileType );
+            $tiffType = GetFileExtension($filename);
         } else {
             # scan through all recognized file types
             @fileTypeList = @fileTypes;
@@ -361,15 +356,16 @@ sub ExtractInfo($;@)
             # since we will be testing multiple file types
             $raf->SeekTest();
             $pos = $raf->Tell();    # get file position so we can rewind
+            $tiffType = 'TIFF';
         }
         # loop through list of extensions to test
         for (;;) {
             my $type = shift @fileTypeList;
             # save file type in member variable
-            $self->{FILE_TYPE} = $fileType;
+            $self->{FILE_TYPE} = $type;
             if ($type eq 'JPEG') {
                 $self->JpegInfo() and last;
-            } elsif ($type eq 'JPEG2000') {
+            } elsif ($type eq 'JP2') {
                 require Image::ExifTool::Jpeg2000;
                 Image::ExifTool::Jpeg2000::Jpeg2000Info($self) and last;
             } elsif ($type eq 'GIF') {
@@ -384,7 +380,7 @@ sub ExtractInfo($;@)
                 Image::ExifTool::Minolta::MrwInfo($self, $raf) and last;
             } else {
                 # assume anything else is TIFF format (or else we can't read it)
-                $self->TiffInfo($fileExt, $raf) and last;
+                $self->TiffInfo($tiffType, $raf) and last;
             }
             if (@fileTypeList) {
                 # seek back to try again from the same position in the file
@@ -690,7 +686,8 @@ sub GetGroup($$;$)
             # substitute family 1 group name if necessary
             if ($groups[1] =~ /^XMP\b/) {
                 # add XMP namespace prefix to XMP group name
-                $groups[1] = 'XMP-' . ($self->{TAG_EXTRA}->{$tag} || 'err');
+                my $ns = $self->{TAG_EXTRA}->{$tag};
+                $groups[1] = $ns ? "XMP-$ns" : ($tagInfo->{Groups}->{1} || 'XMP');
             } elsif ($groups[1] =~ /^IFD\d+$/) {
                 # get actual IFD name for family 1 if group has name like 'IFD#'
                 $groups[1] = ($self->{TAG_EXTRA}->{$tag} || 'UnknownIFD');
@@ -705,7 +702,8 @@ sub GetGroup($$;$)
         # substitute family 1 group name if necessary
         if ($group =~ /^XMP\b/) {
             # add XMP namespace prefix to XMP group name
-            $group = 'XMP-' . ($self->{TAG_EXTRA}->{$tag} || 'err');
+            my $ns = $self->{TAG_EXTRA}->{$tag};
+            $group = $ns ? "XMP-$ns" : ($tagInfo->{Groups}->{1} || 'XMP');
         } elsif ($group =~ /^IFD\d+$/) {
             # get actual IFD name for family 1 if group has name like 'IFD#'
             $group = ($self->{TAG_EXTRA}->{$tag} || 'UnknownIFD');
@@ -839,8 +837,8 @@ sub GetFileType($)
 {
     local $_;
     my $file = shift;
-    $file =~ /.*\.(.*)/ and $file = $1; # isolate the file extension
-    return $fileTypeLookup{uc($file)};  # look up the file type
+    my $fileExt = GetFileExtension($file) or return undef;
+    return $fileTypeLookup{$fileExt};   # look up the file type
 }
 
 #==============================================================================
@@ -851,19 +849,20 @@ sub GetFileType($)
 sub Init($)
 {
     my $self = shift;
-    $self->{FOUND_TAGS} = undef;    # list of found tags
+    delete $self->{FOUND_TAGS};     # list of found tags
+    delete $self->{EXIF_DATA};      # the EXIF data block
+    delete $self->{EXIF_BYTE_ORDER};# the EXIF byte ordering
     $self->{FILE_ORDER} = { };      # hash of tag order in file
     $self->{VALUE_CONV} = { };      # hash of converted tag values
     $self->{PRINT_CONV} = { };      # hash of print-converted values
     $self->{TAG_INFO}   = { };      # hash of tag information
     $self->{TAG_EXTRA}  = { };      # hash of extra information about tag
     $self->{PRIORITY}   = { };      # priority of current tags
-    $self->{EXIF_DATA}  = undef;    # the EXIF data block
-    $self->{EXIF_BYTE_ORDER} = undef;# the EXIF byte ordering
     $self->{NUM_FOUND}  = 0;        # total number of tags found (incl. duplicates)
     $self->{CHANGED}    = 0;        # number of tags changed (writer only)
-    $self->{CameraModel} = '';
-    $self->{CameraMake} = '';
+    $self->{TIFF_TYPE}  = '';       # type of TIFF data (APP1, TIFF, NEF, etc...)
+    $self->{CameraMake} = '';       # camera make
+    $self->{CameraModel} = '';      # camera model
 }
 
 #------------------------------------------------------------------------------
@@ -1693,7 +1692,7 @@ sub JpegInfo($)
         if (($marker & 0xf0) == 0xc0 and ($marker == 0xc0 or $marker & 0x03)) {
             $verbose and print "JPEG $markerName:\n";
             # get the image size;
-            my ($h, $w) = unpack('n'x2,substr($$segDataPt, 3));
+            my ($h, $w) = unpack('n'x2, substr($$segDataPt, 3));
             $self->FoundTag('ImageWidth', $w);
             $self->FoundTag('ImageHeight', $h);
             next;
@@ -1717,20 +1716,22 @@ sub JpegInfo($)
             if ($$segDataPt =~ /^$exifAPP1hdr/) {
                 # this is EXIF data --
                 # get the data block (into a common variable)
-                $self->{EXIF_DATA} = substr($$segDataPt, 6);
+                my $hdrLen = length($exifAPP1hdr);
+                $self->{EXIF_DATA} = substr($$segDataPt, $hdrLen);
                 # extract the EXIF information (it is in standard TIFF format)
-                $self->TiffInfo($markerName,undef,$segPos+6);
+                $self->TiffInfo($markerName, undef, $segPos+$hdrLen);
             } else {
                 # Hmmm.  Could be XMP, let's see
                 my $processed;
                 if ($$segDataPt =~ /^http/ or $$segDataPt =~ /<exif:/) {
+                    my $start = ($$segDataPt =~ /^$xmpAPP1hdr/) ? length($xmpAPP1hdr) : 0;
                     my $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
                     my %dirInfo = (
                         Base     => 0,
                         DataPt   => $segDataPt,
                         DataLen  => $length,
-                        DirStart => 0,
-                        DirLen   => $length,
+                        DirStart => $start,
+                        DirLen   => $length - $start,
                         Nesting  => 0,
                         Parent   => $markerName,
                     );
@@ -1762,6 +1763,11 @@ sub JpegInfo($)
                         undef $icc_profile;
                     }
                 }
+            }
+        } elsif ($marker == 0xe3) {         # APP3 (other EXIF info)
+            if ($$segDataPt =~ /^(Exif|Meta|META)\0\0/) {
+                $self->{EXIF_DATA} = substr($$segDataPt, 6);
+                $self->TiffInfo($markerName,undef,$segPos+6);
             }
         } elsif ($marker == 0xe5) {         # APP5 (PreviewImage)
             if ($$segDataPt =~ /^$myAPP5hdr/) {
@@ -2021,6 +2027,8 @@ sub TiffInfo($$;$$$)
         # no RAF pointer, so get length from data
         $length = length $$dataPt;
     }
+    # remember where we found the TIFF data (APP1, APP3, TIFF, NEF, etc...)
+    $self->{TIFF_TYPE} = $fileType;
 
     # get reference to the main EXIF table
     my $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
@@ -2168,6 +2176,23 @@ sub ProcessTagTable($$$;$)
 }
 
 #------------------------------------------------------------------------------
+# get standardized file extension
+# Inputs: 0) file name
+# Returns: standardized extension (all uppercase)
+sub GetFileExtension($)
+{
+    my $filename = shift;
+    my $fileExt;
+    if ($filename and $filename =~ /.*\.(.+)$/) {
+        $fileExt = uc($1);   # change extension to upper case
+        # convert TIF extension to TIFF because we use the
+        # extension for the file type tag of TIFF images
+        $fileExt eq 'TIF' and $fileExt = 'TIFF';
+    }
+    return $fileExt;
+}
+
+#------------------------------------------------------------------------------
 # Return special tag
 # Inputs: 0) Tag name
 sub GetSpecialTag($)
@@ -2202,12 +2227,15 @@ sub GetTagInfoList($$)
 #------------------------------------------------------------------------------
 # Find tag information, processing conditional tags
 # Inputs: 0) ExifTool object reference, 1) tagTable pointer, 2) tag ID
+#         3) optional data reference, 4) optional value pointer
 # Returns: pointer to tagInfo hash, or undefined if none found
 # Notes: You should always call this routine to find a tag in a table because
 # this routine will evaluate conditional tags.
+# Arguments 3 and 4 are only required if the information type allows conditions
+# based on value.
 sub GetTagInfo($$$)
 {
-    my ($self, $tagTablePtr, $tagID) = @_;
+    my ($self, $tagTablePtr, $tagID, $dataPt, $valuePtr) = @_;
 
     my @infoArray = GetTagInfoList($tagTablePtr, $tagID);
     # evaluate condition
@@ -2217,7 +2245,7 @@ sub GetTagInfo($$$)
         if ($condition) {
             # set old value for use in condition if needed
             my $oldVal = $self->{VALUE_CONV}->{$$tagInfo{Name}};
-            #### eval Condition ($self, $oldVal)
+            #### eval Condition ($self, $oldVal, [$dataPt, $valuePtr])
             unless (eval $condition) {
                 $@ and warn $@;
                 next;

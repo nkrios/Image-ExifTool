@@ -5,18 +5,16 @@
 #
 # Revisions:    12/19/2004 - P. Harvey Created
 #
-# Limitations:- only handles UTF-8 formatted text
-#             - only writes x-default language in Alt Lang lists
-#             - doesn't yet handle properties which exist in multiple schemas
+# Limitations:  - only writes x-default language in Alt Lang lists
 #------------------------------------------------------------------------------
 #
 # Syntax names
 #
-#   RDF Description ID about parseType resource li nodeID datatype 
+#   RDF Description ID about parseType resource li nodeID datatype
 #
 # Class names
 #
-#   Seq Bag Alt Statement Property XMLLiteral List 
+#   Seq Bag Alt Statement Property XMLLiteral List
 #
 # Property names
 #
@@ -25,7 +23,7 @@
 #
 # Resource names
 #
-#   nil 
+#   nil
 #
 package Image::ExifTool::XMP;
 
@@ -233,7 +231,7 @@ my $pktClose =  "<?xpacket end='w'?>";
         my $tagInfo;
         foreach $tagInfo (@tagInfoList) {
             my $format = $$tagInfo{Writable};
-            next unless $format and $format eq 'Date';
+            next unless $format and $format eq 'date';
             # add dummy conversion for dates (for now...)
             $$tagInfo{PrintConvInv} = '$val' unless $$tagInfo{PrintConvInv};
             $$tagInfo{ValueConvInv} = '$val' unless $$tagInfo{ValueConvInv};
@@ -247,22 +245,22 @@ my $pktClose =  "<?xpacket end='w'?>";
 #         2) raw value reference
 # Returns: error string or undef (and may change value) on success
 sub CheckXMP($$$)
-{   
+{
     my ($exifTool, $tagInfo, $valPtr) = @_;
-    my $format = $tagInfo->{Writable};    
+    my $format = $tagInfo->{Writable};
     # if no format specified, value is a simple string
     return undef unless $format;
-    if ($format eq 'Rational') {
+    if ($format eq 'rational') {
         # make sure the value is a valid floating point number
         unless ($$valPtr =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/) {
             return 'Not a floating point number';
         }
         $$valPtr = join('/', Image::ExifTool::Rationalize($$valPtr));
-    } elsif ($format eq 'Integer') {
+    } elsif ($format eq 'integer') {
         # make sure the value is integer
         return 'Not an integer' unless $$valPtr =~ /^[+-]?\d+$/;
         $$valPtr = int($$valPtr);
-    } elsif ($format eq 'Date') {
+    } elsif ($format eq 'date') {
         if ($$valPtr =~ /(\d{4}):(\d{2}):(\d{2}) (\d{2}:\d{2}:\d{2})(.*)/) {
             my ($y, $m, $d, $t, $tz) = ($1, $2, $3, $4, $5);
             # use 'Z' for timezone unless otherwise specified
@@ -279,9 +277,9 @@ sub CheckXMP($$$)
         } else {
             return "Invalid date or time format (should be YYYY:MM:DD HH:MM:SS[+/-HH:MM])";
         }
-    } elsif ($format eq 'LangAlt') {
+    } elsif ($format eq 'lang-alt') {
         # nothing to do
-    } elsif ($format eq 'Boolean') {
+    } elsif ($format eq 'boolean') {
         if (not $$valPtr or $$valPtr =~ /false/i or $$valPtr =~ /^no$/i) {
             $$valPtr = 'False';
         } else {
@@ -303,6 +301,12 @@ sub SetPropertyPath($$$)
     my ($table, $nsHash, $propList) = @_;
     my ($prop, $tag, $ns);
     foreach $ns (keys %$nsHash) {
+        my $group1;
+        if (@$propList) {
+            ($group1 = $$propList[0]) =~ s/:.*//;
+        } else {
+            $group1 = $ns;
+        }
         my $tagList = $$nsHash{$ns};
         foreach (@$tagList) {
             my $tag = $_;
@@ -329,15 +333,16 @@ sub SetPropertyPath($$$)
                 pop @$propList;
                 next;
             }
+            $tagInfo->{Groups}->{1} = 'XMP-' . $group1;   # set group1 name
             # the 'List' entry in XMP table gives the specific type of
             # list, and is one of Bag, Seq, Alt or 1.  If '1', this is just
             # a property in a list of structures, so a list property has
             # already been generated.
             my $listType = $$tagInfo{List};
-            # LangAlt lists are handled specially, signified by Writable='LangAlt'
+            # lang-alt lists are handled specially, signified by Writable='lang-alt'
             # (they aren't true lists since we currently only allow setting of
             # the default language.)
-            if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'LangAlt') {
+            if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt') {
                 $listType = 'Alt';
             }
             # add required properties if this is a list
@@ -375,7 +380,7 @@ sub CaptureShorthand($$$$;$)
         if ($attr =~ /^xmlns:(.*)/) {
             # remember all namespaces (except x and iX which we open ourselves)
             my $ns = $1;
-            my $nsUsed = $exifTool->{XMP_NS}; 
+            my $nsUsed = $exifTool->{XMP_NS};
             unless ($ns eq 'x' or $ns eq 'iX' or defined $$nsUsed{$ns}) {
                 $$nsUsed{$ns} = $$attrs{$attr};
             }
@@ -502,16 +507,9 @@ sub WriteXMP($$$)
     $exifTool->{XMP_NS} = \%nsUsed;
 
     if ($dataPt) {
-        # take substring if necessary
-        if ($dirInfo->{DataLen} != $dirStart + $dirInfo->{DirLen}) {
-            my $buf = substr($$dataPt, $dirStart, $dirInfo->{DirLen});
-            $dataPt = \$buf;
-            $dirStart = 0;
-        }
         delete $exifTool->{XMP_ERROR};
-        # set XMP_CAPTURE flag to call CaptureXMP() for each tag
-        # extract all existing XMP information
-        my $success = ParseXMPElement($exifTool, $tagTablePtr, $dataPt, $dirStart);
+        # extract all existing XMP information (to the XMP_CAPTURE hash)
+        my $success = ProcessXMP($exifTool, $tagTablePtr, $dirInfo);
         # don't continue if there is nothing to parse or if we had a parsing error
         unless ($success and not $exifTool->{XMP_ERROR}) {
             if ($exifTool->{XMP_ERROR}) {
@@ -579,7 +577,7 @@ sub WriteXMP($$$)
                     $delPath = $path;
                     delete $capture{$path};
                     ++$changed;
-                }            
+                }
                 next unless $delPath or $$tagInfo{List};
                 if ($delPath) {
                     $path = $delPath;
@@ -596,9 +594,9 @@ sub WriteXMP($$$)
         # don't add new tag if it didn't exist before unless specified
         next unless $capList or Image::ExifTool::IsCreating($newValueHash);
 
-        # set default language attribute for LangAlt lists
+        # set default language attribute for lang-alt lists
         # (currently on support changing the default language)
-        if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'LangAlt') {
+        if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt') {
             $attrs{'xml:lang'} = 'x-default';
         }
         for (;;) {

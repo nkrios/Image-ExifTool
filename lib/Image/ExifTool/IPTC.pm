@@ -15,7 +15,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -107,7 +107,7 @@ my %fileFormat = (
     WRITABLE => 1,
     0 => {
         Name => 'EnvelopeRecordVersion',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     5 => {
         Name => 'Destination',
@@ -118,13 +118,13 @@ my %fileFormat = (
     20 => {
         Name => 'FileFormat',
         Groups => { 2 => 'Image' },
-        Format => 'binary[2]',
+        Format => 'int16u',
         PrintConv => \%fileFormat,
     },
     22 => {
         Name => 'FileVersion',
         Groups => { 2 => 'Image' },
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     30 => {
         Name => 'ServiceIdentifier',
@@ -167,11 +167,11 @@ my %fileFormat = (
     },
     120 => {
         Name => 'ARMIdentifier',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     122 => {
         Name => 'ARMVersion',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
 );
 
@@ -183,7 +183,7 @@ my %fileFormat = (
     WRITABLE => 1,
     0 => {
         Name => 'ApplicationRecordVersion',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     3 => {
         Name => 'ObjectTypeReference',
@@ -492,13 +492,13 @@ my %fileFormat = (
     200 => {
         Name => 'ObjectPreviewFileFormat',
         Groups => { 2 => 'Image' },
-        Format => 'binary[2]',
+        Format => 'int16u',
         PrintConv => \%fileFormat,
     },
     201 => {
         Name => 'ObjectPreviewFileVersion',
         Groups => { 2 => 'Image' },
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     202 => {
         Name => 'ObjectPreviewData',
@@ -517,7 +517,7 @@ my %fileFormat = (
     WRITABLE => 1,
     0 => {
         Name => 'NewsPhotoVersion',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     10 => {
         Name => 'IPTCPictureNumber',
@@ -525,23 +525,23 @@ my %fileFormat = (
     },
     20 => {
         Name => 'IPTCImageWidth',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     30 => {
         Name => 'IPTCImageHeight',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     40 => {
         Name => 'IPTCPixelWidth',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     50 => {
         Name => 'IPTCPixelHeight',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     55 => {
         Name => 'SupplementalType',
-        Format => 'binary[1]',
+        Format => 'int8u',
         PrintConv => {
             0 => 'Main Image',
             1 => 'Reduced Resolution Image',
@@ -551,11 +551,11 @@ my %fileFormat = (
     },
     60 => {
         Name => 'ColorRepresentation',
-        Format => 'binary[1]',
+        Format => 'int8u',
     },
     64 => {
         Name => 'InterchangeColorSpace',
-        Format => 'binary[1]',
+        Format => 'int8u',
         PrintConv => {
             1 => 'X,Y,Z CIE',
             2 => 'RGB SMPTE',
@@ -569,19 +569,19 @@ my %fileFormat = (
     },
     65 => {
         Name => 'ColorSequence',
-        Format => 'binary[1]',
+        Format => 'int8u',
     },
     84 => {
         Name => 'NumIndexEntries',
-        Format => 'binary[2]',
+        Format => 'int16u',
     },
     86 => {
         Name => 'IPTCBitsPerSample',
-        Format => 'binary[1]',
+        Format => 'int8u',
     },
     90 => {
         Name => 'SampleStructure',
-        Format => 'binary[1]',
+        Format => 'int8u',
         PrintConv => {
             0 => 'OrthogonalConstangSampling',
             1 => 'Orthogonal4-2-2Sampling',
@@ -590,7 +590,7 @@ my %fileFormat = (
     },
     100 => {
         Name => 'ScanningDirection',
-        Format => 'binary[1]',
+        Format => 'int8u',
         PrintConv => {
             0 => 'L-R, Top-Bottom',
             1 => 'R-L, Top-Bottom',
@@ -604,7 +604,7 @@ my %fileFormat = (
     },
     102 => {
         Name => 'IPTCImageRotation',
-        Format => 'binary[1]',
+        Format => 'int8u',
         PrintConv => {
             0 => 0,
             1 => 90,
@@ -614,11 +614,11 @@ my %fileFormat = (
     },
     110 => {
         Name => 'DataCompressionMethod',
-        Format => 'binary[1]',
+        Format => 'int8u',
     },
     120 => {
         Name => 'QuantizationMethod',
-        Format => 'binary[1]',
+        Format => 'int8u',
         PrintConv => {
             0 => 'Linear Reflectance/Transmittance',
             1 => 'Linear Density',
@@ -632,11 +632,11 @@ my %fileFormat = (
     },
     125 => {
         Name => 'EndPoints',
-        Format => 'binary[1]',
+        Format => 'int8u',
     },
     130 => {
         Name => 'ExcursionTolerance',
-        Format => 'binary[1]',
+        Format => 'int8u',
         PrintConv => {
             0 => 'Not Allowed',
             1 => 'Allowed',
@@ -644,7 +644,7 @@ my %fileFormat = (
     },
     135 => {
         Name => 'BitsPerComponent',
-        Format => 'binary[1]',
+        Format => 'int8u',
     },
 );
 
@@ -652,7 +652,7 @@ my %fileFormat = (
 %Image::ExifTool::IPTC::PreObjectData = (
     10 => {
         Name => 'SizeMode',
-        Format => 'binary[1]',
+        Format => 'int8u',
         PrintConv => {
             0 => 'Size Not Known',
             1 => 'Size Known',
@@ -660,15 +660,15 @@ my %fileFormat = (
     },
     20 => {
         Name => 'MaxSubfileSize',
-        Format => 'binary[4]',
+        Format => 'int32u',
     },
     90 => {
         Name => 'ObjectSizeAnnounced',
-        Format => 'binary[4]',
+        Format => 'int32u',
     },
     95 => {
         Name => 'MaximumObjectSize',
-        Format => 'binary[4]',
+        Format => 'int32u',
     },
 );
 
@@ -686,7 +686,7 @@ my %fileFormat = (
 %Image::ExifTool::IPTC::PostObjectData = (
     10 => {
         Name => 'ConfirmedObjectSize',
-        Format => 'binary[4]',
+        Format => 'int32u',
     },
 );
 
@@ -777,7 +777,7 @@ sub ProcessIPTC($$$)
                 $success = 0;
                 last;
             }
-            # determine length (a big-endian, variable sized binary number)
+            # determine length (a big-endian, variable sized int)
             for ($len = 0; $n; ++$pos, --$n) {
                 $len = $len * 256 + ord(substr($$dataPt, $pos, 1));
             }
@@ -801,7 +801,7 @@ sub ProcessIPTC($$$)
         if ($tagInfo) {
             my $format = $tagInfo->{Format};
             if (ref $tagInfo eq 'HASH' and $format) {
-                if ($format =~ /^binary/) {
+                if ($format =~ /^int/) {
                     $val = 0;
                     my $i;
                     for ($i=0; $i<$len; ++$i) {

@@ -28,7 +28,7 @@ sub CheckCanonCustom($$$);
     PROCESS_PROC => \&ProcessCanonCustom,
     WRITE_PROC => \&WriteCanonCustom,
     CHECK_PROC => \&CheckCanonCustom,
-    WRITABLE => 1,
+    WRITABLE => 'int8u',
     1 => {
         Name => 'LongExposureNoiseReduction',
         PrintConv => {
@@ -151,7 +151,7 @@ sub CheckCanonCustom($$$);
     PROCESS_PROC => \&ProcessCanonCustom,
     WRITE_PROC => \&WriteCanonCustom,
     CHECK_PROC => \&CheckCanonCustom,
-    WRITABLE => 1,
+    WRITABLE => 'int8u',
     1 => {
         Name => 'SetButtonFunction',
         PrintConv => {
@@ -251,7 +251,7 @@ sub CheckCanonCustom($$$);
             2 => 'Top',
         },
     },
-    
+
     12 => {
         Name => 'MirrorLockup',
         PrintConv => {
@@ -308,7 +308,7 @@ sub CheckCanonCustom($$$);
     PROCESS_PROC => \&ProcessCanonCustom,
     WRITE_PROC => \&WriteCanonCustom,
     CHECK_PROC => \&CheckCanonCustom,
-    WRITABLE => 1,
+    WRITABLE => 'int8u',
     0 => {
         Name => 'SetFunctionWhenShooting',
         PrintConv => {
@@ -457,7 +457,7 @@ sub CheckCanonCustom($$$);
     PROCESS_PROC => \&ProcessCanonCustom,
     WRITE_PROC => \&WriteCanonCustom,
     CHECK_PROC => \&CheckCanonCustom,
-    WRITABLE => 1,
+    WRITABLE => 'int8u',
     0 => {
         Name => 'FocusingScreen',
         PrintConv => {
@@ -650,7 +650,7 @@ sub ProcessCanonCustom($$$)
     my $offset = $dirInfo->{DirStart};
     my $size = $dirInfo->{DirLen};
     my $verbose = $exifTool->Options('Verbose');
-    
+
     # first entry in array must be the size
     unless (Image::ExifTool::Get16u($dataPt,$offset) == $size) {
         $exifTool->Warn("Invalid CanonCustom data");

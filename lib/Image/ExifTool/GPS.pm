@@ -16,7 +16,7 @@ package Image::ExifTool::GPS;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 %Image::ExifTool::GPS::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -216,13 +216,13 @@ $VERSION = '1.05';
     0x001B => {
         Name => 'GPSProcessingMethod',
         Writable => 'undef',
-        PrintConv => '$_=substr($val,8);s/\0.*//;$_',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
         PrintConvInv => '"ASCII\0\0\0$val\0"',
     },
     0x001C => {
         Name => 'GPSAreaInformation',
         Writable => 'undef',
-        PrintConv => '$_=substr($val,8);s/\0.*//;$_',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
         PrintConvInv => '"ASCII\0\0\0$val\0"',
     },
     0x001D => {

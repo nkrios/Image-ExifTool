@@ -15,6 +15,7 @@
 #               3) Thomas Walter private communication (tests with Coolpix 5400)
 #               4) http://www.cybercom.net/~dcoffin/dcraw/
 #               5) Brian Ristuccia private communication (tests with D70)
+#               6) Danek Duvall private communication (tests with D70)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -126,7 +127,9 @@ sub ProcessNikon($$$);
         PrintConv => {
             # observed values of this field:
             # 0x00 => old nikon 70-210 (ref 2)
+            # 0x01 => completely manual Sigma 400mm (ref 6)
             # 0x02 => nikon 70-300, nikon 135-400 (ref 2)
+            # 0x02 => Micro Nikkor 60mm (and 105mm) 2.8D (ref 6)
             # 0x06 => D70 kit lens (refs 2,5), 70-300G (ref 2)
             # 0x0e => G type lens (ref 5)
         },
@@ -243,7 +246,7 @@ sub ProcessNikon($$$);
         },
         {
             Condition => '$self->{CameraModel} =~ /NIKON D2H/',
-            Name => 'ColorBalance2DH',
+            Name => 'ColorBalanceD2H',
             Writable => 0,
             SubDirectory => {
                 Start => '$valuePtr + 10',
@@ -416,17 +419,19 @@ sub ProcessNikon($$$);
     },
     0x201 => {
         Name => 'PreviewImageStart',
-        Flags => [ 'IsOffset', 'Protected' ],
+        Flags => [ 'IsOffset', 'Protected', 'Permanent' ],
         OffsetPair => 0x202, # point to associated byte count
         DataTag => 'PreviewImage',
         Writable => 'int32u',
+        WriteGroup => 'NikonPreview',
     },
     0x202 => {
         Name => 'PreviewImageLength',
+        Flags => [ 'Protected', 'Permanent' ],
         OffsetPair => 0x201, # point to associated offset
         DataTag => 'PreviewImage',
         Writable => 'int32u',
-        Protected => 1,
+        WriteGroup => 'NikonPreview',
     },
     0x213 => {
         Name => 'YCbCrPositioning',
