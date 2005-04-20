@@ -32,8 +32,8 @@ Contrast : +1
 DigitalZoom : Unknown (-1)
 EasyMode : Manual
 ExposureCompensation : 0
-ExposureTime : 128
-FNumber : 14
+ExposureTime (1) : 128
+FNumber (1) : 14
 FileNumber : 118-1861
 FlashActivity : 0
 FlashBits : (none)
@@ -53,7 +53,7 @@ LensType : Unknown (-1)
 LongFocal : 55
 MacroMode : Unknown (0)
 MeteringMode : Center-weighted averaging
-OwnerName : Cindy Harvey
+OwnerName : Phil Harvey
 Quality : RAW
 RedBalanceAuto : 2.06611
 RedBalanceB&W : 2.06971
@@ -75,7 +75,7 @@ WhiteBalance : Auto
 ZoomedResolution : 3072
 ZoomedResolutionBase : 3072
 ---- Composite ----
-Aperture : 14.3
+Aperture : 14.0
 DriveMode : Continuous shooting
 FlashOn : Off
 FocalLength35efl : 34.0mm (35mm equivalent: 54.0mm)
@@ -98,8 +98,8 @@ ExifImageWidth : 160
 ExifVersion : 0221
 ExposureCompensation (1) : 0
 ExposureMode : Manual
-ExposureTime (1) : 4
-FNumber (1) : 14.0
+ExposureTime : 4
+FNumber : 14.0
 FileSource : Digital Camera
 Flash : No Flash
 FlashpixVersion : 0100

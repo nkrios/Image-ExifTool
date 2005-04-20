@@ -4,15 +4,16 @@
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h2><a name='Nikon'>Nikon Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>FileSystemVersion</td>
 <td align='center'>undef</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0002</td>
 <td>ISO</td>
 <td align='center'>int16u[2]</td>
@@ -22,7 +23,7 @@
 <td>ColorMode</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0004</td>
 <td>Quality</td>
 <td align='center'>Y</td>
@@ -32,7 +33,7 @@
 <td>WhiteBalance</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0006</td>
 <td>Sharpness</td>
 <td align='center'>Y</td>
@@ -42,7 +43,7 @@
 <td>FocusMode</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0008</td>
 <td>FlashSetting</td>
 <td align='center'>Y</td>
@@ -52,7 +53,7 @@
 <td>FlashType</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x000b</td>
 <td>WhiteBalanceFineTune</td>
 <td align='center'>int16u</td>
@@ -62,7 +63,7 @@
 <td>ColorBalance1</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x000f</td>
 <td>ISOSelection</td>
 <td align='center'>Y</td>
@@ -72,7 +73,7 @@
 <td>DataDump</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0011</td>
 <td>NikonPreview</td>
 <td align='center'>-</td>
@@ -80,9 +81,9 @@
 <tr valign='top'>
 <td>0x0012</td>
 <td>FlashExposureComp</td>
-<td align='center'>N</td>
+<td align='center'>int32s~</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0013</td>
 <td>ISOSetting</td>
 <td align='center'>int16u[2]</td>
@@ -92,17 +93,17 @@
 <td>ImageBoundary</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0018</td>
 <td>FlashExposureBracketValue</td>
-<td align='center'>N</td>
+<td align='center'>int32s~</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0019</td>
 <td>ExposureBracketValue</td>
-<td align='center'>N</td>
+<td align='center'>rational32s~</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0080</td>
 <td>ImageAdjustment</td>
 <td align='center'>Y</td>
@@ -112,7 +113,7 @@
 <td>ToneComp</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0082</td>
 <td>AuxiliaryLens</td>
 <td align='center'>Y</td>
@@ -122,7 +123,7 @@
 <td>LensType</td>
 <td align='center'>int8u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0084</td>
 <td>Lens</td>
 <td align='center'>rational32u[4]</td>
@@ -132,7 +133,7 @@
 <td>ManualFocusDistance</td>
 <td align='center'>rational32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0086</td>
 <td>DigitalZoom</td>
 <td align='center'>rational32u</td>
@@ -144,7 +145,7 @@
 <td><font size='-1'>0 = Did Not Fire
   <br>8 = Fired, Commander Mode
   <br>9 = Fired, TTL Mode</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0088</td>
 <td>AFPoint</td>
 <td align='center'>int32u</td>
@@ -171,14 +172,19 @@
 <tr valign='top'>
 <td>0x0089</td>
 <td>ShootingMode</td>
-<td align='center'>N</td>
+<td align='center'>int16u~</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x008b</td>
+<td>LensFStops</td>
+<td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x008c</td>
 <td>NEFCurve1</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x008d</td>
 <td>ColorHue</td>
 <td align='center'>Y</td>
@@ -188,7 +194,7 @@
 <td>SceneMode</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0090</td>
 <td>LightSource</td>
 <td align='center'>Y</td>
@@ -198,7 +204,7 @@
 <td>HueAdjustment</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0094</td>
 <td>Saturation</td>
 <td align='center'>Y</td>
@@ -208,7 +214,7 @@
 <td>NoiseReduction</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0096</td>
 <td>NEFCurve2</td>
 <td align='center'>N</td>
@@ -223,7 +229,7 @@
 <td>--&gt; <a href='Nikon.html#ColorBalanceD70'>Nikon ColorBalanceD70 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalanceD2H'>Nikon ColorBalanceD2H Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalanceD100'>Nikon ColorBalanceD100 Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0099</td>
 <td>NEFThumbnailSize</td>
 <td align='center'>int16u[2]</td>
@@ -233,7 +239,7 @@
 <td>SerialNumber</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00a7</td>
 <td>ShutterCount</td>
 <td align='center'>int32u</td>
@@ -243,7 +249,7 @@
 <td>ImageOptimization</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00aa</td>
 <td>Saturation</td>
 <td align='center'>Y</td>
@@ -253,7 +259,7 @@
 <td>VariProgram</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td align='center'>-</td>
@@ -263,11 +269,12 @@
 <td>NikonCaptureOffsets</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Nikon.html#NikonCaptureOffsets'>Nikon NikonCaptureOffsets Tags</a></td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='PreviewImage'>Nikon PreviewImage Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0103</td>
@@ -300,7 +307,7 @@
   <br>34677 = SGILog24
   <br>34712 = JPEG 2000
   <br>34713 = Nikon NEF Compressed</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x011a</td>
 <td>XResolution</td>
 <td align='center'>N</td>
@@ -310,7 +317,7 @@
 <td>YResolution</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0128</td>
 <td>ResolutionUnit</td>
 <td align='center'>N</td>
@@ -322,7 +329,7 @@
 <td>PreviewImageStart</td>
 <td align='center'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0202</td>
 <td>PreviewImageLength</td>
 <td align='center'>int32u*</td>
@@ -333,66 +340,70 @@
 <td align='center'>N</td>
 <td><font size='-1'>1 = Centered
   <br>2 = Co-sited</font></td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='ColorBalanceD70'>Nikon ColorBalanceD70 Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>RedBalance</td>
 <td align='center'>rational16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
 <td>BlueBalance</td>
 <td align='center'>rational16s</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='ColorBalanceD2H'>Nikon ColorBalanceD2H Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>RedBalance</td>
 <td align='center'>rational16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
 <td>BlueBalance</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='ColorBalanceD100'>Nikon ColorBalanceD100 Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>RedBalance</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
 <td>BlueBalance</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='NikonCaptureOffsets'>Nikon NikonCaptureOffsets Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
 <td>IFD0_Offset</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0002</td>
 <td>PreviewIFD_Offset</td>
 <td align='center'>N</td>
@@ -402,18 +413,19 @@
 <td>SubIFD_Offset</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='MakerNotesB'>Nikon MakerNotesB Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0003</td>
 <td>Quality</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0004</td>
 <td>ColorMode</td>
 <td align='center'>Y</td>
@@ -423,7 +435,7 @@
 <td>ImageAdjustment</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0006</td>
 <td>CCDSensitivity</td>
 <td align='center'>Y</td>
@@ -433,7 +445,7 @@
 <td>WhiteBalance</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0008</td>
 <td>Focus</td>
 <td align='center'>Y</td>
@@ -443,16 +455,16 @@
 <td>DigitalZoom</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x000b</td>
 <td>Converter</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 2, 2005</i>
+<br><i>Last revised Apr 19, 2005</i>
 </body>
 </html>

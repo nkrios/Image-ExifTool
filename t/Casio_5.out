@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.00
 [File, File, Image]  - File Name: Casio_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
@@ -44,15 +44,15 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1312
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1286
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00140014
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x01000000
 [PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x05000000
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x01000000
 [MakerNotes, Casio, Image] 2 - Preview Image Size: 320x240
-[MakerNotes, Casio, Image] 3 - Casio Preview Length: 28874
-[MakerNotes, Casio, Image] 4 - Casio Preview Start: 1260
+[MakerNotes, Casio, Image] 3 - Preview Image Length: 26
+[MakerNotes, Casio, Image] 4 - Preview Image Start: 1314
 [MakerNotes, Casio, Camera] 8192 - Preview Image: (Binary data 26 bytes)
 [MakerNotes, Casio, Camera] 8193 - Casio Type 2 0x2001: 
 [MakerNotes, Casio, Camera] 8194 - Casio Type 2 0x2002: .
@@ -88,6 +88,7 @@
 [Composite, Composite, Image]  - Aperture: 4.3
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.0
 [Composite, Composite, Image]  - Shutter Speed: 1/400
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

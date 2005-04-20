@@ -10,8 +10,8 @@ ExifImageWidth: 160
 ExifVersion: 0221
 ExposureCompensation (1): 0
 ExposureMode: Manual
-ExposureTime (1): 4
-FNumber (1): 14.0
+ExposureTime: 4
+FNumber: 14.0
 FileSource: Digital Camera
 Flash: No Flash
 FlashpixVersion: 0100

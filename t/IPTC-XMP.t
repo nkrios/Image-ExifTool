@@ -67,6 +67,8 @@ my $testnum = 1;
             my @rtns = $exifTool->SetNewValue($tag,$val,Group=>$group);
         }
     }
+    # also test out an IPTC Core tag
+    $exifTool->SetNewValue(CreatorContactInfoCiAdrCtry => 'Canada');
     undef $info;
     my $image;
     $exifTool->WriteInfo('t/IPTC-XMP.jpg',\$image);

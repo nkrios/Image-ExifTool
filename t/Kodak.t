@@ -34,7 +34,7 @@ my $testnum = 1;
     ++$testnum;
     my @writeInfo = (
         [Date => '2005:03:31', Group => 'Kodak'],
-        [PanoramaMode => '1'],
+        [DigitalZoom => '2'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
     print "ok $testnum\n";

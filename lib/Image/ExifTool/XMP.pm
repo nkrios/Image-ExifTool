@@ -31,7 +31,7 @@ use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace %niceNamespace);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -44,7 +44,7 @@ sub DecodeBase64($);
 %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
 
 # translate ugly XMP namespaces to nicer ones for family 1 group names
-%niceNamespace = ( 'Iptc4xmpCore' => 'IptcCore' );
+%niceNamespace = ( 'Iptc4xmpCore' => 'iptcCore' );
 
 # main XMP tag table
 %Image::ExifTool::XMP::Main = (
@@ -979,44 +979,44 @@ sub DecodeBase64($);
 #
 # - IPTC Core schema properties (Iptc4xmpCore) 
 #
-    CountryCode         => { Groups => { 1 => 'XMP-IptcCore', 2 => 'Location' } },
+    CountryCode         => { Groups => { 1 => 'XMP-iptcCore', 2 => 'Location' } },
     # CreatorContactInfo - structure (ContactInfo=CiAdrCity,CiAdrCtry,CiAdrExtadr,
     #                       CiAdrPcode, CiAdrRegion, CiEmailWork, CiTelWork, CiUrlWork)
     CreatorContactInfo => {
-        Groups => { 2 => 'Other' },
+        Groups => { 2 => 'Author' },
         Writable => 0,
     },
     CreatorContactInfoCiAdrCity => {
         Description => 'Creator City',
-        Groups => { 2 => 'Other' }
+        Groups => { 2 => 'Author' }
     },
     CreatorContactInfoCiAdrCtry => {
         Description => 'Creator Country',
-        Groups => { 2 => 'Other' }
+        Groups => { 2 => 'Author' }
     },
     CreatorContactInfoCiAdrExtadr => {
         Description => 'Creator Address',
-        Groups => { 2 => 'Other' }
+        Groups => { 2 => 'Author' }
     },
     CreatorContactInfoCiAdrPcode => {
         Description => 'Creator Postal Code',
-        Groups => { 2 => 'Other' }
+        Groups => { 2 => 'Author' }
     },
     CreatorContactInfoCiAdrRegion => {
         Description => 'Creator Region',
-        Groups => { 2 => 'Other' }
+        Groups => { 2 => 'Author' }
     },
     CreatorContactInfoCiEmailWork => {
         Description => 'Creator Work Email',
-        Groups => { 2 => 'Other' }
+        Groups => { 2 => 'Author' }
     },
     CreatorContactInfoCiTelWork => {
         Description => 'Creator Work Telephone',
-        Groups => { 2 => 'Other' }
+        Groups => { 2 => 'Author' }
     },
     CreatorContactInfoCiUrlWork => {
         Description => 'Creator Work URL',
-        Groups => { 2 => 'Other' }
+        Groups => { 2 => 'Author' }
     },
     IntellectualGenre   => { Groups => { 2 => 'Other' } },
     Location            => { Groups => { 2 => 'Location' } },
@@ -1442,6 +1442,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/XMP Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

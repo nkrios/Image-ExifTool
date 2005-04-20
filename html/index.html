@@ -5,9 +5,18 @@
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
+
+<table bgcolor='#cc0000'><tr><td>
+<font color='#ffffff' size='+1'>ExifTool Version 5 is Here!</font>
+</td></tr></table>
+
+<p>ExifTool versions 4.00 through 4.95 were an evolution of the writing
+abilities, but with the release of version 5 all of the major planned
+writing features have now been incorporated!
+
 <h3>
-<a href="Image-ExifTool-4.93.tar.gz">
-Download        Version 4.93</a> - Apr. 2, 2005
+<a href="Image-ExifTool-5.05.tar.gz">
+Download        Version 5.05</a> - Apr. 20, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
@@ -23,7 +32,7 @@ Sigma/Foveon.
 <p>ExifTool writes EXIF, GPS, IPTC, XMP and MakerNotes meta information to
 JPEG, TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG images.  When writing,
 ExifTool preserves the original file by adding "_original" to the file name.
- You should keep a copy of the original, or thoroughly validate the new file
+You should keep a copy of the original, or thoroughly validate the new file
 before erasing the original.  <a href="writing.html">Read here</a> for some
 ramblings on the subject of writing meta information.
 
@@ -36,6 +45,7 @@ or suggestions.  My e-mail address is in the README file.  Thanks.
 <li>reads EXIF, GPS, IPTC, XMP, MakerNotes, GeoTIFF, ICC Profile and Photoshop IRB records
 <li>writes EXIF, GPS, IPTC, XMP and MakerNotes information
 <li>reads and writes maker notes of many digital cameras
+<li>deletes meta information individually, in groups, or all together
 <li>transfers meta information between files with different formats
 <li>highly customizable, can extract exactly what you want
 <li>scans entire directory trees
@@ -72,10 +82,10 @@ formatting and to allow reading or writing of specific information.  Run
 exiftool with no arguments for a <a href="exiftool_pod.html">description of
 exiftool, complete list of available options, and examples</a>.
 
-<p><b>Windows users:</b> You will need to install a perl interpreter to run
+<p><b>Windows users:</b> You will need to install a Perl interpreter to run
 ExifTool (a good, free Perl interpreter for Windows can be obtained from
-<a href="www.activeperl.com">activeperl.com</a>). <b>Everyone else:</b> Don't
-worry, you already have everything you need.
+<a href="http://www.activeperl.com/Products/ActivePerl/">activeperl.com</a>).
+<b>Everyone else:</b> Don't worry, you already have everything you need.
 
 <h2>Example Output</h2>
 
@@ -123,10 +133,12 @@ that is useful for debugging or when decoding new tags.
 
 <h2><a href="TagNames/index.html">ExifTool Tag Names</a></h2>
 
-Tag names are entered on the command line with a leading '-' in the order
-you want them displayed. Case is not significant.  The tag name may be
-prefixed by a group name from family 0 or 1, separated by a colon, to
-specify a location for the information.
+Tag names are entered on the command line with a leading '-' in the order you
+want them displayed.  Case is not significant.  The tag name may be prefixed by
+a group name from family 0 or 1, separated by a colon, to specify a location for
+the information.  A special tag name of 'All' may be used to when deleting
+information to delete all tags, or all tags in a specified group (for family 0
+groups only).
 
 <blockquote>ie) "exiftool -filename -imagesize -exif:fnumber image.jpg"</blockquote>
 
@@ -158,8 +170,8 @@ simple example that defines two shortcuts:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 %Image::ExifTool::Shortcuts::UserDefined = (
-    MyShortcut => ['createdate','exposuretime','aperture'],
-    MyAlias => 'FocalLengthIn35mmFormat',
+    MyShortcut =&gt; ['createdate','exposuretime','aperture'],
+    MyAlias =&gt; 'FocalLengthIn35mmFormat',
 );
 </pre></td></tr></table></blockquote>
 
@@ -184,7 +196,7 @@ FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
 ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
 Kodak, KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon,
 NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
-Sigma, Sony, SubIFD, XMP, XMP-IptcCore, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
+Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore,
 XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
@@ -236,7 +248,9 @@ or set a value from file.  The following table outlines the different write synt
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Syntax</th><th>Result</th></tr>
 <tr><td>-TAG=</td><td>Deletes all occurrances of TAG</td></tr>
+<tr><td>-all=</td><td>Deletes all meta information!</td></tr>
 <tr><td>-GROUP:TAG=</td><td>Deletes TAG only in specified group</td></tr>
+<tr><td>-GROUP:all=</td><td>Deletes all information in specified group</td></tr>
 <tr><td>-[GROUP:]TAG=VALUE</td><td>Sets value of TAG (only in GROUP if specified)</td></tr>
 <tr><td>-[GROUP:]TAG+=VALUE</td><td>Adds value to a tag list (only valid for List type tags)</td></tr>
 <tr><td>-[GROUP:]TAG-=VALUE</td><td>Deletes TAG only if it has the specified value</td></tr>
@@ -255,12 +269,6 @@ SRCFILE and attempts to write each tag found to the destination file.
 Depending on the formats of the source and destination files, some of tags
 read may not be valid in the destination file, in which case they aren't
 written. No translation between similar tags with different names is done.
-
-<h2>Deleting All Meta Information from an Image</h2>
-
-ExifTool can be used to delete individual pieces of information, but if you
-want to remove ALL meta information from a JPEG image check out my
-<a href="http://owl.phy.queensu.ca/~phil/utils/">image utility scripts</a>.
 
 <h2>The Image::ExifTool Perl Library Module</h2>
 
@@ -350,6 +358,7 @@ And thanks to the following people for their help:
 <li>Matt Madrid for his testing and feedback
 <li>Tom Christiansen for his help decoding some Nikon tags
 <li>Markku H&auml;nninen for help decoding tags for the Olympus E-1
+<li>Frank Ledwon for decoding many new Olympus tags
 </ul>
 
 <hr>

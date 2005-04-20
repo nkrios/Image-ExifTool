@@ -583,7 +583,6 @@ sub ProcessICC_Profile($$$)
         DataLen  => $dirInfo->{DataLen},
         DirStart => $dirStart,
         DirLen   => 128,
-        Nesting  => $dirInfo->{Nesting} + 1,
         Parent   => $dirInfo->{DirName},
     );
     my $newTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::ICC_Profile::Header');
@@ -641,10 +640,10 @@ sub ProcessICC_Profile($$$)
             %subdirInfo = (
                 Name     => $name,
                 DataPt   => $dataPt,
+                DataPos  => $dirInfo->{DataPos},
                 DataLen  => $dirInfo->{DataLen},
                 DirStart => $valuePtr,
                 DirLen   => $size,
-                Nesting  => $dirInfo->{Nesting} + 1,
                 Parent   => $dirInfo->{DirName},
             );
             my $type = substr($$dataPt, $valuePtr, 4);
@@ -708,6 +707,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/ICC_Profile Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

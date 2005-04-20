@@ -1,7 +1,7 @@
 AEBBracketValue: 0
 AFPoint: Unknown (0)
 AFPointsUsed: 0 ()
-Aperture: 14.3
+Aperture: 14.0
 ApertureValue: 14.0
 AutoExposureBracketing: Off
 AutoRotate: None
@@ -43,15 +43,15 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 4.92
+ExifToolVersion: 5.03
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
 ExposureMode: Manual
-ExposureTime: 128
-ExposureTime (1): 4
-FNumber: 14
-FNumber (1): 14.0
+ExposureTime: 4
+ExposureTime (1): 128
+FNumber: 14.0
+FNumber (1): 14
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FileSize: 3KB
@@ -97,7 +97,7 @@ MeteringMode (1): Average
 Model: Canon EOS DIGITAL REBEL
 ModifyDate: 2003:12:04 06:46:52
 Orientation: Horizontal (normal)
-OwnerName: Cindy Harvey
+OwnerName: Phil Harvey
 Quality: RAW
 RedBalanceAuto: 2.06611
 RedBalanceB&W: 2.06971

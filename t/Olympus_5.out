@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.93
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.01
 [File, File, Image]  - File Name: Olympus_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 8KB
@@ -50,14 +50,14 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 7088
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 7062
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Olympus, Camera] 512 - Special Mode: Fast, Sequence: 2, Panorama: (none)
 [MakerNotes, Olympus, Camera] 513 - Image Quality: SHQ
 [MakerNotes, Olympus, Camera] 514 - Macro: Off
-[MakerNotes, Olympus, Camera] 515 - Olympus 0x0203: 0
-[MakerNotes, Olympus, Camera] 516 - Digital Zoom: 0
-[MakerNotes, Olympus, Camera] 517 - Olympus 0x0205: 21.6
+[MakerNotes, Olympus, Camera] 515 - Black & White Mode: Off
+[MakerNotes, Olympus, Camera] 516 - Digital Zoom: 0.0
+[MakerNotes, Olympus, Camera] 517 - Focal Plane Diagonal: 21.6 mm
 [MakerNotes, Olympus, Camera] 518 - Olympus 0x0206: 0 0 0 0 0 0
 [MakerNotes, Olympus, Camera] 519 - Firmware Version: D4040
 [MakerNotes, Olympus, Camera] 521 - Camera ID: OLYMPUS DIGITAL CAMERA         
@@ -77,37 +77,37 @@
 [MakerNotes, Olympus, Camera] 256 - Firmware Version 2: D4040
 [MakerNotes, Olympus, Camera] 257 - Serial Number: 143008611
 [MakerNotes, Olympus, Camera] 258 - Olympus Equipment 0x0102: 4001310004375102               
-[MakerNotes, Olympus, Camera] 259 - Olympus Equipment 0x0103: 21.6
-[MakerNotes, Olympus, Camera] 260 - Olympus Equipment 0x0104: 4864
-[MakerNotes, Olympus, Camera] 513 - Olympus Equipment 0x0201: 0 0 5 0 0 0
+[MakerNotes, Olympus, Camera] 259 - Focal Plane Diagonal: 21.6 mm
+[MakerNotes, Olympus, Camera] 260 - Body Firmware Version: 1.300
+[MakerNotes, Olympus, Camera] 513 - Lens: Olympus Zuiko Digital 14-54mm F2.8-3.5 (production)
 [MakerNotes, Olympus, Camera] 514 - Lens Serial Number: 012345678
-[MakerNotes, Olympus, Camera] 516 - Olympus Equipment 0x0204: 4352
+[MakerNotes, Olympus, Camera] 516 - Lens Firmware Version: 1.100
 [MakerNotes, Olympus, Camera] 518 - Max Aperture At Max Focal: 3.5
 [MakerNotes, Olympus, Camera] 519 - Min Focal Length: 14
 [MakerNotes, Olympus, Camera] 520 - Max Focal Length: 54
 [MakerNotes, Olympus, Camera] 522 - Olympus Equipment 0x020a: 755
 [MakerNotes, Olympus, Camera] 523 - Olympus Equipment 0x020b: 49219
-[MakerNotes, Olympus, Camera] 769 - Olympus Equipment 0x0301: 0 0 0 0 0 0
+[MakerNotes, Olympus, Camera] 769 - Extender: None
 [MakerNotes, Olympus, Camera] 770 - Extender Serial Number: 
-[MakerNotes, Olympus, Camera] 772 - Olympus Equipment 0x0304: 0
-[MakerNotes, Olympus, Camera] 4096 - Olympus Equipment 0x1000: 0
-[MakerNotes, Olympus, Camera] 4097 - Olympus Equipment 0x1001: 0
+[MakerNotes, Olympus, Camera] 772 - Extender Firmware Version: 0
+[MakerNotes, Olympus, Camera] 4096 - Flash Type: None
+[MakerNotes, Olympus, Camera] 4097 - Flash Model: None
 [MakerNotes, Olympus, Camera] 4098 - Olympus Equipment 0x1002: 0
 [MakerNotes, Olympus, Camera] 4099 - Flash Serial Number: 
 [MakerNotes, Olympus, Camera] 0 - Camera Settings Version: 010
-[MakerNotes, Olympus, Camera] 256 - Olympus Camera Settings 0x0100: 1
-[MakerNotes, Olympus, Camera] 257 - Preview Image Start: 2568
+[MakerNotes, Olympus, Camera] 256 - Preview Image Valid: Yes
+[MakerNotes, Olympus, Camera] 257 - Preview Image Start: 7090
 [MakerNotes, Olympus, Camera] 258 - Preview Image Length: 26
 [MakerNotes, Olympus, Camera] 512 - Exposure Mode: Unknown (2)
 [MakerNotes, Olympus, Camera] 513 - Olympus Camera Settings 0x0201: 0
 [MakerNotes, Olympus, Camera] 514 - Metering Mode: ESP
-[MakerNotes, Olympus, Camera] 768 - Olympus Camera Settings 0x0300: 0
-[MakerNotes, Olympus, Camera] 769 - Continuous Auto Focus: Off
-[MakerNotes, Olympus, Camera] 770 - Olympus Camera Settings 0x0302: 1
-[MakerNotes, Olympus, Camera] 771 - Olympus Camera Settings 0x0303: 1
+[MakerNotes, Olympus, Camera] 768 - Macro Mode: Off
+[MakerNotes, Olympus, Camera] 769 - Focus Mode: Single AF
+[MakerNotes, Olympus, Camera] 770 - Focus Process: AF Used
+[MakerNotes, Olympus, Camera] 771 - AF Search: Ready
 [MakerNotes, Olympus, Camera] 772 - AF Areas: Center (121,121)-(133,133)
-[MakerNotes, Olympus, Camera] 1024 - Olympus Camera Settings 0x0400: 0
-[MakerNotes, Olympus, Camera] 1025 - Olympus Camera Settings 0x0401: 0
+[MakerNotes, Olympus, Camera] 1024 - Flash Mode: 0
+[MakerNotes, Olympus, Camera] 1025 - Flash Exposure Compensation: 0
 [MakerNotes, Olympus, Camera] 1026 - Olympus Camera Settings 0x0402: 0
 [MakerNotes, Olympus, Camera] 1280 - Olympus Camera Settings 0x0500: 0
 [MakerNotes, Olympus, Camera] 1281 - White Balance Temperature: Auto
@@ -116,38 +116,38 @@
 [MakerNotes, Olympus, Camera] 1284 - Modified Saturation: Off
 [MakerNotes, Olympus, Camera] 1285 - Contrast Setting: 0 (min -2, max 2)
 [MakerNotes, Olympus, Camera] 1286 - Sharpness Setting: 1 (min -3, max 5)
-[MakerNotes, Olympus, Camera] 1287 - Color Space: Adobe RGB
+[MakerNotes, Olympus, Camera] 1287 - Color Space: sRGB
 [MakerNotes, Olympus, Camera] 1288 - Olympus Camera Settings 0x0508: 0
-[MakerNotes, Olympus, Camera] 1290 - Noise Filter: Off
-[MakerNotes, Olympus, Camera] 1291 - Olympus Camera Settings 0x050b: 0
+[MakerNotes, Olympus, Camera] 1290 - Noise Reduction: Off
+[MakerNotes, Olympus, Camera] 1291 - Distortion Correction: Off
 [MakerNotes, Olympus, Camera] 1292 - Shading Compensation: Off
 [MakerNotes, Olympus, Camera] 1293 - Compression Factor: 2.7
 [MakerNotes, Olympus, Camera] 1294 - Olympus Camera Settings 0x050e: 1
 [MakerNotes, Olympus, Camera] 1536 - Sequence: Continuous Shooting, Shot 2
 [MakerNotes, Olympus, Camera] 1539 - Image Quality 2: SHQ
-[MakerNotes, Olympus, Camera] 0 - Subdir 3 Version: 010
-[MakerNotes, Olympus, Camera] 256 - Olympus Subdir 3 0x0100: 0
-[MakerNotes, Olympus, Camera] 257 - Olympus Subdir 3 0x0101: 0
-[MakerNotes, Olympus, Camera] 258 - Olympus Subdir 3 0x0102: 0
-[MakerNotes, Olympus, Camera] 259 - Olympus Subdir 3 0x0103: 0 0 0
-[MakerNotes, Olympus, Camera] 260 - Olympus Subdir 3 0x0104: 0 0 0
-[MakerNotes, Olympus, Camera] 261 - Olympus Subdir 3 0x0105: 0
-[MakerNotes, Olympus, Camera] 262 - Olympus Subdir 3 0x0106: 0 0 0
-[MakerNotes, Olympus, Camera] 263 - Olympus Subdir 3 0x0107: 0 0 0
-[MakerNotes, Olympus, Camera] 264 - Olympus Subdir 3 0x0108: 0
-[MakerNotes, Olympus, Camera] 265 - Olympus Subdir 3 0x0109: 0
-[MakerNotes, Olympus, Camera] 266 - Olympus Subdir 3 0x010a: 0
-[MakerNotes, Olympus, Camera] 267 - Olympus Subdir 3 0x010b: 0
-[MakerNotes, Olympus, Camera] 268 - Olympus Subdir 3 0x010c: 0
+[MakerNotes, Olympus, Camera] 0 - Raw Dev Version: 010
+[MakerNotes, Olympus, Camera] 256 - Raw Dev Exposure Bias Value: 0
+[MakerNotes, Olympus, Camera] 257 - Raw Dev White Balance Value: 0
+[MakerNotes, Olympus, Camera] 258 - Raw Dev WB Fine Adjustment: 0
+[MakerNotes, Olympus, Camera] 259 - Raw Dev Gray Point: 0 0 0
+[MakerNotes, Olympus, Camera] 260 - Raw Dev Saturation Emphasis: 0 0 0
+[MakerNotes, Olympus, Camera] 261 - Raw Dev Memory Color Emphasis: 0
+[MakerNotes, Olympus, Camera] 262 - Raw Dev Contrast Value: 0 0 0
+[MakerNotes, Olympus, Camera] 263 - Raw Dev Sharpness Value: 0 0 0
+[MakerNotes, Olympus, Camera] 264 - Raw Dev Color Space: 0
+[MakerNotes, Olympus, Camera] 265 - Raw Dev Engine: 0
+[MakerNotes, Olympus, Camera] 266 - Raw Dev Noise Reduction: 0
+[MakerNotes, Olympus, Camera] 267 - Raw Dev Edit Status: 0
+[MakerNotes, Olympus, Camera] 268 - Raw Dev Settings: 0
 [MakerNotes, Olympus, Camera] 0 - Image Processing Version: 010
-[MakerNotes, Olympus, Camera] 256 - Olympus Image Processing 0x0100: 412 290
+[MakerNotes, Olympus, Camera] 256 - Red Blue Bias: 412 290
 [MakerNotes, Olympus, Camera] 287 - Olympus Image Processing 0x011f: 256
-[MakerNotes, Olympus, Camera] 512 - Olympus Image Processing 0x0200: 356 65502 65470 65514 308 65506 6 65410 376
+[MakerNotes, Olympus, Camera] 512 - Color Matrix: 356 65502 65470 65514 308 65506 6 65410 376
 [MakerNotes, Olympus, Camera] 768 - Smoothing Parameter 1: 576
 [MakerNotes, Olympus, Camera] 784 - Smoothing Parameter 2: 1536
 [MakerNotes, Olympus, Camera] 1536 - Smoothing Thresholds: 69 69 69 68
 [MakerNotes, Olympus, Camera] 1552 - Smoothing Threshold 2: 256
-[MakerNotes, Olympus, Camera] 1553 - Olympus Image Processing 0x0611: 12 0
+[MakerNotes, Olympus, Camera] 1553 - Valid Bits: 12 0
 [MakerNotes, Olympus, Camera] 1554 - Olympus Image Processing 0x0612: 0 0
 [MakerNotes, Olympus, Camera] 1555 - Olympus Image Processing 0x0613: 0 0
 [MakerNotes, Olympus, Camera] 1556 - Olympus Image Width 2: 2560
@@ -186,7 +186,7 @@
 [MakerNotes, Olympus, Camera] 531 - Olympus Focus Info 0x0213: 0
 [MakerNotes, Olympus, Camera] 532 - Olympus Focus Info 0x0214: 0
 [MakerNotes, Olympus, Camera] 533 - Olympus Focus Info 0x0215: 27641
-[MakerNotes, Olympus, Camera] 768 - Olympus Focus Info 0x0300: 3
+[MakerNotes, Olympus, Camera] 768 - Zoom Position: 3
 [MakerNotes, Olympus, Camera] 769 - Olympus Focus Info 0x0301: 332
 [MakerNotes, Olympus, Camera] 770 - Olympus Focus Info 0x0302: 0
 [MakerNotes, Olympus, Camera] 773 - Focus Distance: 0.705 m
@@ -205,14 +205,14 @@
 [MakerNotes, Olympus, Camera] 795 - Olympus Focus Info 0x031b: 0
 [MakerNotes, Olympus, Camera] 1026 - Olympus Focus Info 0x0402: 0
 [MakerNotes, Olympus, Camera] 4608 - Olympus Focus Info 0x1200: 0
-[MakerNotes, Olympus, Camera] 4609 - Olympus Focus Info 0x1201: 0 0
+[MakerNotes, Olympus, Camera] 4609 - External Flash: Off
 [MakerNotes, Olympus, Camera] 4610 - Olympus Focus Info 0x1202: 0
 [MakerNotes, Olympus, Camera] 4611 - Olympus Focus Info 0x1203: 0
 [MakerNotes, Olympus, Camera] 4612 - Olympus Focus Info 0x1204: 0
 [MakerNotes, Olympus, Camera] 4613 - Olympus Focus Info 0x1205: 0
 [MakerNotes, Olympus, Camera] 4614 - Olympus Focus Info 0x1206: 0
 [MakerNotes, Olympus, Camera] 4615 - Olympus Focus Info 0x1207: 0
-[MakerNotes, Olympus, Camera] 4616 - Olympus Focus Info 0x1208: 0
+[MakerNotes, Olympus, Camera] 4616 - Internal Flash: Off
 [MakerNotes, Olympus, Camera] 5376 - Olympus Focus Info 0x1500: 20
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00140014
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
@@ -238,6 +238,7 @@
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
+[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 2.0
 [Composite, Composite, Image]  - Shutter Speed: 1/100
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - Focal Length: 20.0mm
+[Composite, Composite, Camera]  - Focal Length: 20.0mm (35mm equivalent: 40.1mm)

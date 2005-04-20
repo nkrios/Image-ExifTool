@@ -43,12 +43,13 @@
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>Read or write meta information in image files.  <code>FILE</code> may be an image file
-name, a directory name, or <code>-</code> for the standard input.  Information is read
-from the specified file and output in readable form to the console (or
-written to an output text file with the <code>-w</code> option).</p>
+<p>A command-line interface to <a href="ExifTool.html">Image::ExifTool</a> used for
+reading and writing meta information in image files.  <code>FILE</code> may be an
+image file name, a directory name, or <code>-</code> for the standard input.
+Information is read from the specified file and output in readable form to
+the console (or written to an output text file with the <code>-w</code> option).</p>
 <p>To write information in an image file, specify new values using either the
-<code>-TAG=VALUE</code> syntax or the <code>-AllTagsFromFile</code> option.  This causes
+<code>-TAG=[VALUE]</code> syntax or the <code>-AllTagsFromFile</code> option.  This causes
 exiftool to rewrite <code>FILE</code> with the specified information, preserving the
 original file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify
 that the new file is OK before erasing the original.)</p>
@@ -71,14 +72,14 @@ exiftool (r = read support, w = write support):</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <p>Note:  Case is not significant for any command-line option (including tag
-and group names), except for certain single-character options where the
+and group names), except for single-character options where the
 corresponding upper case option is defined.</p>
 <dl>
 <dt><strong><a name="item__2dtag"><strong>-</strong><em>TAG</em></a></strong><br />
 </dt>
 <dd>
 Extract information for specified tag.  See
-<a href="TagNames.html">Image::ExifTool::TagNames</a> for documentation on
+<a href="TagNames/index.html">Image::ExifTool::TagNames</a> for documentation on
 available tag names.  The tag name may begin with an optional group name
 followed by a colon.  (ie. <code>-TAG:GROUP</code>, where <code>GROUP</code> is any valid family
 0 or 1 group name.  Use the <code>-group</code> option to list valid group names.)  If
@@ -101,6 +102,24 @@ existing values, and <code>-=</code> to delete a specific value from a list.  Us
 <code>VALUE</code>.  (Note: Quotes are required around the argument in this case to
 prevent shell redirection.)
 </dd>
+<dd>
+<p>A special tag name of <code>All</code> may be used if no <code>VALUE</code> is specified to
+delete all meta information, or all information in a specified group with
+<code>-GROUP:All=</code> (for family 0 groups only).  Note that within an image, some
+groups may be contained within others.  These groups are also removed if the
+super group is deleted.  Below are lists of these group dependencies:</p>
+</dd>
+<dd>
+<pre>
+  JPEG Image:
+  - deleting EXIF also deletes MakerNotes, GPS and PrintIM
+  - deleting Photoshop also deletes IPTC</pre>
+</dd>
+<dd>
+<pre>
+  TIFF Image:
+  - deleting EXIF also deletes MakerNotes</pre>
+</dd>
 <p></p>
 <dt><strong><a name="item__2da"><strong>-a</strong></a></strong><br />
 </dt>
@@ -113,20 +132,26 @@ suppressed).
 </dt>
 <dd>
 Set the value of all writable tags from information in the specified source
-file.
+file.  Note that the maker note information is set as a block, so it isn't
+effected like other information by subsequent tag assignments on the command
+line.  For example, to copy all information but the thumbnail image, use
+<code>-ThumbnailImage=</code> after <code>-AllTagsFromFile</code> on the command line.  Since
+the preview image is referenced from the maker notes and may be rather
+large, it is not copied.  Instead, the preview image must be transferred
+separately if desired.
 </dd>
 <p></p>
 <dt><strong><a name="item__2db"><strong>-b</strong></a></strong><br />
 </dt>
 <dd>
 Output requested data in <strong>b</strong>inary format.  Mainly used for extracting
-embedded images.
+embedded images.  Suppresses output of tag names and descriptions.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dd_fmt"><strong>-d</strong> <em>FMT</em></a></strong><br />
 </dt>
 <dd>
-Set <strong>d</strong>ate/time format (consult strftime man page for FMT syntax).
+Set <strong>d</strong>ate/time format (consult <code>strftime</code> man page for FMT syntax).
 </dd>
 <p></p>
 <dt><strong><a name="item__2dd"><strong>-D</strong></a></strong><br />
@@ -144,7 +169,8 @@ Print <strong>e</strong>xisting tags only -- don't calculate composite tags.
 <dt><strong><a name="item__2de"><strong>-E</strong></a></strong><br />
 </dt>
 <dd>
-<strong>E</strong>scape characters in output values for HTML.
+<strong>E</strong>scape characters in output values for HTML (implied with the <a href="#item__2dh"><code>-h</code></a>
+option).
 </dd>
 <p></p>
 <dt><strong><a name="item__2df"><strong>-f</strong></a></strong><br />
@@ -162,7 +188,7 @@ Organize output by tag <strong>g</strong>roup (-g0 assumed if # not specified).
 <dt><strong><a name="item__2dg_5b_23_5d"><strong>-G</strong>[#]</a></strong><br />
 </dt>
 <dd>
-Same as -g but print <strong>G</strong>roup name for each tag.
+Same as <code>-g</code> but print <strong>G</strong>roup name for each tag.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dh"><strong>-H</strong></a></strong><br />
@@ -180,7 +206,7 @@ List all tag groups for family #.  Family 0 assumed if # not specified.
 <dt><strong><a name="item__2dh"><strong>-h</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>H</strong>TML formatting for output (implies -E option).
+Use <strong>H</strong>TML formatting for output (implies <a href="#item__2de"><code>-E</code></a> option).
 </dd>
 <p></p>
 <dt><strong><a name="item__2di_dir"><strong>-i</strong> <em>DIR</em></a></strong><br />
@@ -224,7 +250,8 @@ extraction of embedded images that aren't in standard JPG format).
 <dt><strong><a name="item__2dn"><strong>-n</strong></a></strong><br />
 </dt>
 <dd>
-Do <strong>n</strong>ot apply print conversion to displayed tag values.
+Do <strong>n</strong>ot apply the print conversion to displayed tag values, or the inverse
+print conversion to written tag values.
 </dd>
 <p></p>
 <dt><strong><a name="item__2do_outfile"><strong>-o</strong> <em>OUTFILE</em></a></strong><br />
@@ -273,7 +300,7 @@ directory name).
 <dt><strong><a name="item__2ds"><strong>-s</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>s</strong>hort output format (add up to 3 -s options for even shorter
+Use <strong>s</strong>hort output format (add up to 3 <a href="#item__2ds"><code>-s</code></a> options for even shorter
 formats).
 </dd>
 <p></p>
@@ -328,7 +355,7 @@ extension (including the <code>.</code>) with the specified extension.
 <dt><strong><a name="item__2dx_tag"><strong>-x</strong> <em>TAG</em></a></strong><br />
 </dt>
 <dd>
-E<strong>x</strong>clude specified tag (may be many -x options).  Same as <a href="#item__2d_2dtag"><code>--TAG</code></a>.
+E<strong>x</strong>clude specified tag (may be many <code>-x</code> options).  Same as <a href="#item__2d_2dtag"><code>--TAG</code></a>.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dz"><strong>-z</strong></a></strong><br />
@@ -439,11 +466,31 @@ Add a keyword (<code>word</code>) to the current list of keywords.
 Delete only the specified category (<code>xxx</code>) from all files in directory.
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2dall_3d_dst_2ejpg">exiftool -all= dst.jpg</a></strong><br />
+</dt>
+<dd>
+Delete all meta information from an image.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dphotoshop_3aall_3d_dst_2ejpg">exiftool -photoshop:all= dst.jpg</a></strong><br />
+</dt>
+<dd>
+Delete Photoshop meta information from an image (note that the Photoshop
+information also includes IPTC).
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__2dalltagsfromfile_src_2ecrw_dst_2ejpg">exiftool -AllTagsFromFile src.crw dst.jpg</a></strong><br />
 </dt>
 <dd>
 Set the values of all writable tags from information in <code>src.crw</code>, and
 update <code>dst.jpg</code> with this new information.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dalltagsfromfile_a_2ejpg__2dxmp_3aall_3">exiftool -AllTagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg</a></strong><br />
+</dt>
+<dd>
+Copy all meta information from a.jpg to b.jpg except the thumbnail image and
+the XMP information.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__27_2dthumbnailimage_3c_3dthumb_2ejpg_27_">exiftool '-ThumbnailImage&lt;=thumb.jpg' dst.jpg</a></strong><br />
@@ -508,8 +555,8 @@ it under the same terms as Perl itself.</p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p><a href="ExifTool.html">Image::ExifTool</a>,
-<a href="TagNames.html">ExifTool Tag Names</a>,
-<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shortcuts.pm">Shortcut Tags</a></p>
+<a href="TagNames/index.html">Image::ExifTool::TagNames</a>,
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shortcuts.pm">Image::ExifTool::Shortcuts</a></p>
 <table border="0" width="100%" cellspacing="0" cellpadding="3">
 <tr><td class="block" style="background-color: #cccccc" valign="middle">
 <big><strong><span class="block">&nbsp;exiftool Application Documentation</span></strong></big>

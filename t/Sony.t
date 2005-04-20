@@ -32,7 +32,10 @@ my $testnum = 1;
 # test 3: Write some new information
 {
     ++$testnum;
-    my @writeInfo = (['FlashFired','true']);
+    my @writeInfo = (
+        [FlashFired => 'true'],
+        [ISO => undef],
+    );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
     print "ok $testnum\n";
 }

@@ -23,7 +23,7 @@ sub CheckCanonCustom($$$);
 #------------------------------------------------------------------------------
 # Custom functions for the D30/D60
 # CanonCustom (keys are custom function number)
-%Image::ExifTool::CanonCustom::Functions = (
+%Image::ExifTool::CanonCustom::FunctionsD30 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonCustom,
     WRITE_PROC => \&WriteCanonCustom,
@@ -774,6 +774,7 @@ functions.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/Canon Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

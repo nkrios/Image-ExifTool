@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.00
 [File, File, Image]  - File Name: Casio2.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
@@ -44,11 +44,11 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1328
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1302
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Casio, Image] 2 - Preview Image Size: 320x240
-[MakerNotes, Casio, Image] 3 - Casio Preview Length: 28874
-[MakerNotes, Casio, Image] 4 - Casio Preview Start: 1260
+[MakerNotes, Casio, Image] 3 - Preview Image Length: 26
+[MakerNotes, Casio, Image] 4 - Preview Image Start: 1330
 [MakerNotes, Casio, Camera] 8192 - Preview Image: (Binary data 26 bytes)
 [MakerNotes, Casio, Camera] 8209 - White Balance Bias: 92 78
 [MakerNotes, Casio, Camera] 8210 - White Balance: Auto?
@@ -66,6 +66,7 @@
 [MakerNotes, Casio, Camera] 12311 - Filter: Off
 [Composite, Composite, Image]  - Aperture: 4.3
 [Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.0
 [Composite, Composite, Image]  - Shutter Speed: 1/400
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

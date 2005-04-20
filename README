@@ -66,8 +66,8 @@ information:
 
 html/index.html           - Main ExifTool documentation
 html/history.html         - ExifTool revision history
-html/TagNames.html        - ExifTool tag name documentation
 html/ExifTool.html        - ExifTool API documentation
+html/TagNames/index.html  - ExifTool tag name documentation
 lib/Image/ExifTool/README - ExifTool support modules documentation
 
 and if you have installed Image::ExifTool, you can also consult perldoc or
@@ -75,8 +75,10 @@ the man pages:
 
    perldoc exiftool
    perldoc Image::ExifTool
+   perldoc Image::ExifTool::TagNames
 
    man exiftool
    man Image::ExifTool
+   man Image::ExifTool::TagNames
 
 ----------------------------------------------------------------------------

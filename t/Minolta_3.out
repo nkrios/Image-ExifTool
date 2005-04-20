@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.00
 [File, File, Image]  - File Name: Minolta_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 14KB
@@ -53,7 +53,7 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 13224
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 13198
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Centered
 [MakerNotes, Minolta, Camera] 0 - Maker Note Version: MLT0
@@ -107,7 +107,7 @@
 [MakerNotes, Minolta, Camera] 16 - Minolta 0x0010: .............P...~............[...]
 [MakerNotes, Minolta, Camera] 32 - Minolta 0x0020: ...m.n.nn.../&#.......(,;...k(S.[...]
 [MakerNotes, Minolta, Camera] 64 - Compressed Image Size: 2396300
-[MakerNotes, Minolta, Camera] 136 - Preview Image Start: 13042
+[MakerNotes, Minolta, Camera] 136 - Preview Image Start: 13226
 [MakerNotes, Minolta, Camera] 137 - Preview Image Length: 26
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x01000000
@@ -118,6 +118,7 @@
 [PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x01000000
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000000
 [IPTC, IPTC, Other] 120 - Caption-Abstract: A new caption/abstract
+[IPTC, IPTC, Other] 0 - Application Record Version: 4
 [Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120

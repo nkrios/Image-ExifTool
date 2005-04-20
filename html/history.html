@@ -5,9 +5,98 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-4.93.tar.gz">Version 4.93</a>.<p>
+<i>(I'll be away from about Apr. 22 to May 8/05, so don't expect any more
+upgrades or reponses to e-mails until I get back - PH)</i><p>
 
-<b>Apr. 2/05 - Version 4.93</b>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.05.tar.gz">Version 5.05</a>.<p>
+
+<b>Apr. 20/05 - Version 5.05</b> (production release)
+<ul>
+<li>Added Nikon LensFStops tag (thanks to Robert Rottmerhusen)
+<li>Reliability improvements for writing maker notes information
+<li>exiftool now returns error status if there were errors reading/writing files
+</ul>
+
+<b>Apr. 18/05 - Version 5.04</b>
+<ul>
+<li>Fixed problem where maker notes of Olympus C2500L could get corrupted when
+    writing
+</ul>
+
+<b>Apr. 18/05 - Version 5.03</b>
+<ul>
+<li>ExifTool now requires Perl version 5.004 or higher (previously 5.002 was OK)
+<li>Restrict the size of preview images where data is referenced directly as
+    the value data of an IFD entry (only effects Casio images)
+<li>Fix problems rewriting some Casio maker notes
+<li>Change priority of orientation (and a number of other tags which may appear
+    in IFD1) so value in IFD0 takes precedence of value in IFD1 if it exists
+<li>API Changes:
+    <ul>
+    <li>Allow any file reference, not only GLOB references, to be used in
+        function calls
+    </ul>
+</ul>
+
+<b>Apr. 16/05 - Version 5.02</b>
+<ul>
+<li>Fixed problem rewriting Pentax *istD preview image
+</ul>
+
+<b>Apr. 15/05 - Version 5.01</b>
+<ul>
+<li>Major speed improvements for writing large JPEG files with preview images
+<li>Fixed problem rewriting preview in Olympus E-1 and E-300 images
+<li>Old large preview is now properly removed when writing new small preview
+<li>Allow PreviewImage to be deleted (ie. set length to zero)
+<li>Don't extract images that have zero length
+<li>Deleting MakerNotes group now works in conjunction with -allTagsFromFile
+<li>Change image validation again to only validate images for tags that were
+    specifically requested
+<li>Separate lookups by manufacturer for Olympus lens information
+</ul>
+
+<b>Apr. 14/05 - Version 5.00</b>
+<ul>
+<li>ALL MAJOR PLANNED WRITING FEATURES NOW IMPLEMENTED!
+<li>Finally solved problem of writing large preview images in JPEG files
+<li>-AllTagsFromFile now sets PreviewImage to 'dummy' if it exists in the maker
+    notes to avoid writing a large preview to the destination file (now you have
+    to do this manually afterwards if this is what you want)
+<li>Fix problem rewriting Olympus E1 maker note subdirectories
+<li>Only validate extracted images when Binary (-b) option is used
+<li>Rename Olympus PreviewImageAvailable to PreviewImageValid, and check/set
+    this tag when reading/writing the preview image
+<li>Change priority of X/YResolution tags so IFD0 value takes precedence
+<li>Changes to Olympus Lens decoding
+</ul>
+
+<b>Apr. 11/05 - Version 4.95</b>
+<ul>
+<li>Add ability to delete all meta information, or all information in a group
+<li>Create some mandatory IPTC tags automatically when writing IPTC information
+<li>Decode a bunch more Olympus tags (thanks to Frank Ledwon)
+<li>Decode a couple more Canon 1D MkII tags (thanks to Denny Priebe)
+<li>Fixed problem where Sony maker notes could be corrupted when rewriting file
+<li>Fixed problem that could cause wrong tag description to be printed for
+    missing tags when the -f option is used
+<li>Account for different encoding of Canon ExposureTime in 20D and 350D, and
+    lower priority of Canon ExposureTime and FNumber so regular EXIF values take
+    precedence because it appears these values may be model dependent (I hate it
+    when that happens)
+</ul>
+
+<b>Apr. 6/05 - Version 4.94</b>
+<ul>
+<li>Added support for Kodak DX3215 and DX3700
+<li>Improved Kodak decoding and changed some Kodak tag names
+<li>Improved logic to guard against cyclical recursion in EXIF directories
+<li>Allow tags to be edited in IFD2, IFD3, etc...
+<li>Patched problem when writing Canon 350D images due to probable bug in 350D
+    firmware (version 1.0.1) that writes an incorrect ThumbnailLength in IFD1
+</ul>
+
+<b>Apr. 2/05 - Version 4.93</b> (production release)
 <ul>
 <li>Added IPTC XMP Core support
 <li>Added support for Kodak CX4200 plus other minor Kodak changes
@@ -571,7 +660,7 @@
 <b>Nov. 25/04 - Version 3.94</b> (production release)
 <ul>
 <li>Patched problem with reading XMP data using Perl 5.6.x (Perl bug)
-<li>Put lib directory first in exiftool include list to take precidence over
+<li>Put lib directory first in exiftool include list to take precedence over
     installed versions
 <li>Continue trying to parse JPEG image after an unrecognized APP1 segment
 </ul>
@@ -922,7 +1011,7 @@
     <li>Removed IsVerbose() function (use Options('Verbose') instead)
     <li>Allow groups to be excluded by specifying leading '-' on group name
     <li>ImageInfo() and GetInfo() now use specified group order to set tag
-        precidence if Duplicates option is not set
+        precedence if Duplicates option is not set
     <li>Change default value of Duplicates option back to 0
     </ul>
 </ul>

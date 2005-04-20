@@ -153,7 +153,7 @@ $info = $exifTool-&gt;<b>ImageInfo</b>($filename, \@ioTagList);
 and interprets them based on their type.  It may be called with one
 or more arguments.
 The one required argument is either a SCALAR (the image file name),
-a GLOB reference (a reference to the image file) or a SCALAR reference
+a file reference (a reference to the image file) or a SCALAR reference
 (a reference to the image in memory).  Other arguments are optional.
 The order of the arguments is not significant, except that the first
 SCALAR is taken to be the file name unless a file reference or scalar
@@ -171,7 +171,7 @@ below to obtain additional information if required.
 
 <p><b>SCALAR</b> --
 The first scalar argument is taken to be the file name unless an earlier
-argument specified the image data via a file reference (GLOB ref) or data
+argument specified the image data via a file reference (file ref) or data
 reference (SCALAR ref). The remaining scalar arguments are names of tags for
 requested information.  If no tags are specified, all possible information
 is extracted.  Tag names may begin with '-' indicating tags to exclude.  The
@@ -180,7 +180,7 @@ exactly the same as the requested tags. For this reason it is best to use
 either the keys of the returned hash or the elements of the tag array when
 accessing the return values
 
-<p><b>GLOB ref</b> --
+<p><b>File ref</b> --
 A reference to an open image file.  If you use this method
 of accessing a file (or a SCALAR reference), the FileName tag
 will not be returned.
@@ -608,7 +608,9 @@ each value in the list.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>SetNewValue($;$$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
- <br>1) [optional] Tag key or tag name, or undefined to clear all new values
+ <br>1) [optional] Tag key or tag name, or undefined to clear all new values.
+A tag name of 'All' can be used when deleting tags to delete all tags, or all
+tags in a specified group (for family 0 groups only).
  <br>2) [optional] New value for tag.  Undefined to delete tag from file.
  <br>3-N) [optional] SetNewValue options hash entries (see below)
 </td></tr>
@@ -683,6 +685,9 @@ reading the input file.
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 my $info = $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile);
 </pre></td></tr></table></blockquote>
+<b>Notes:</b>
+<p>If a preview image exists, it is not copied.  The preview image must be
+transferred separately if desired.
 
 <hr><h2><a name="GetNewValues">GetNewValues</a></h2>
 Get list of new Raw values for the specified tag.  These are the values
@@ -926,8 +931,8 @@ IPTC, Jpeg2000, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
 FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
 ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, KodakBordersIFD,
 KodakEffectsIFD, MakerUnknown, Minolta, Nikon, NikonPreview, Olympus, Panasonic,
-Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-IptcCore,
-XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
+Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs,
+XMP-dc, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
 XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>

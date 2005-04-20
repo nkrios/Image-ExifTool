@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.93
 [File, File, Image]  - File Name: GPS.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 6KB
+[File, File, Image]  - File Size: 2KB
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 120
 [File, File, Image]  - Image Height: 80
@@ -47,7 +47,7 @@
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1050
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 3662
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [GPS, GPS, Location] 0 - GPS Version ID: 2.0.0.0
 [GPS, GPS, Location] 1 - GPS Latitude Ref: North
 [GPS, GPS, Location] 2 - GPS Latitude: 54 deg 59.38' 0"
@@ -77,5 +77,5 @@
 [Composite, Composite, Image]  - Image Size: 120x80
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 0.0
 [Composite, Composite, Image]  - Shutter Speed: 1/724
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 3662 bytes)
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 0.0mm (35mm equivalent: 0.0mm)

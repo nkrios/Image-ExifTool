@@ -11,9 +11,11 @@ package Image::ExifTool::Sony;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 %Image::ExifTool::Sony::Main = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
 
     0x0e00 => {
@@ -63,6 +65,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/Sony Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

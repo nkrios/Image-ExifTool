@@ -11,15 +11,16 @@ Many other GPS tags have values which are fixed-length strings.  For these,
 the indicated string lengths include a null terminator which is added
 automatically by ExifTool.
 
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>GPSVersionID</td>
 <td align='center'>int8u[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0001</td>
 <td>GPSLatitudeRef</td>
 <td align='center'>string[2]</td>
@@ -30,7 +31,7 @@ automatically by ExifTool.
 <td>GPSLatitude</td>
 <td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0003</td>
 <td>GPSLongitudeRef</td>
 <td align='center'>string[2]</td>
@@ -41,7 +42,7 @@ automatically by ExifTool.
 <td>GPSLongitude</td>
 <td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0005</td>
 <td>GPSAltitudeRef</td>
 <td align='center'>int8u</td>
@@ -52,7 +53,7 @@ automatically by ExifTool.
 <td>GPSAltitude</td>
 <td align='center'>rational32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0007</td>
 <td>GPSTimeStamp</td>
 <td align='center'>rational32u[3]</td>
@@ -62,7 +63,7 @@ automatically by ExifTool.
 <td>GPSSatellites</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0009</td>
 <td>GPSStatus</td>
 <td align='center'>string[2]</td>
@@ -74,7 +75,7 @@ automatically by ExifTool.
 <td align='center'>string[2]</td>
 <td><font size='-1'>2 = 2-Dimensional Measurement
   <br>3 = 3-Dimensional Measurement</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x000b</td>
 <td>GPSDOP</td>
 <td align='center'>rational32u</td>
@@ -86,7 +87,7 @@ automatically by ExifTool.
 <td><font size='-1'>&apos;K&apos; = km/h
   <br>&apos;M&apos; = mph
   <br>&apos;N&apos; = knots</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x000d</td>
 <td>GPSSpeed</td>
 <td align='center'>rational32u</td>
@@ -97,7 +98,7 @@ automatically by ExifTool.
 <td align='center'>string[2]</td>
 <td><font size='-1'>&apos;M&apos; = Magnetic North
   <br>&apos;T&apos; = True North</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x000f</td>
 <td>GPSTrack</td>
 <td align='center'>rational32u</td>
@@ -108,7 +109,7 @@ automatically by ExifTool.
 <td align='center'>string[2]</td>
 <td><font size='-1'>&apos;M&apos; = Magnetic North
   <br>&apos;T&apos; = True North</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0011</td>
 <td>GPSImgDirection</td>
 <td align='center'>rational32u</td>
@@ -118,7 +119,7 @@ automatically by ExifTool.
 <td>GPSMapDatum</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0013</td>
 <td>GPSDestLatitudeRef</td>
 <td align='center'>string[2]</td>
@@ -129,7 +130,7 @@ automatically by ExifTool.
 <td>GPSDestLatitude</td>
 <td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0015</td>
 <td>GPSDestLongitudeRef</td>
 <td align='center'>string[2]</td>
@@ -140,7 +141,7 @@ automatically by ExifTool.
 <td>GPSDestLongitude</td>
 <td align='center'>rational32u[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0017</td>
 <td>GPSDestBearingRef</td>
 <td align='center'>string[2]</td>
@@ -151,7 +152,7 @@ automatically by ExifTool.
 <td>GPSDestBearing</td>
 <td align='center'>rational32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0019</td>
 <td>GPSDestDistanceRef</td>
 <td align='center'>string[2]</td>
@@ -163,7 +164,7 @@ automatically by ExifTool.
 <td>GPSDestDistance</td>
 <td align='center'>rational32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x001b</td>
 <td>GPSProcessingMethod</td>
 <td align='center'>undef</td>
@@ -173,7 +174,7 @@ automatically by ExifTool.
 <td>GPSAreaInformation</td>
 <td align='center'>undef</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x001d</td>
 <td>GPSDateStamp</td>
 <td align='center'>string[11]</td>
@@ -184,11 +185,11 @@ automatically by ExifTool.
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = No Correction
   <br>1 = Differential Corrected</font></td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 2, 2005</i>
+<br><i>Last revised Apr 11, 2005</i>
 </body>
 </html>

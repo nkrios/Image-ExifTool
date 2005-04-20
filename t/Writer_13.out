@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.95
 [File, File, Image]  - File Name: Writer_13_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4KB
@@ -17,5 +17,6 @@
 [GPS, GPS, Location] 0 - GPS Version ID: 2.2.0.0
 [GPS, GPS, Location] 2 - GPS Latitude: 44 deg 14' 12.25"
 [IPTC, IPTC, Image] 22 - File Version: 12
+[IPTC, IPTC, Other] 0 - Envelope Record Version: 4
 [XMP, XMP-dc, Author] Contributor - Contributor: Guess who
 [Composite, Composite, Image]  - Image Size: 16x16

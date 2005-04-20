@@ -29,7 +29,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.53';
+$VERSION = '1.59';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -195,14 +195,19 @@ sub Rationalize($;$);
         Name => 'ImageHeight',
         Priority => 0,
     },
-    0x102 => 'BitsPerSample',
+    0x102 => {
+        Name => 'BitsPerSample',
+        Priority => 0,
+    },
     0x103 => {
         Name => 'Compression',
         PrintConv => \%compression,
+        Priority => 0,
     },
     0x106 => {
         Name => 'PhotometricInterpretation',
         PrintConv => \%photometricInterpretation,
+        Priority => 0,
     },
     0x107 => {
         Name => 'Thresholding',
@@ -222,7 +227,10 @@ sub Rationalize($;$);
         },
     },
     0x10d => 'DocumentName',
-    0x10e => 'ImageDescription',
+    0x10e => {
+        Name => 'ImageDescription',
+        Priority => 0,
+    },
     0x10f => {
         Name => 'Make',
         Groups => { 2 => 'Camera' },
@@ -250,14 +258,25 @@ sub Rationalize($;$);
             Flags => 'IsOffset',
             OffsetPair => 0x117,
             Notes => 'PreviewImageStart in IFD0 of CR2 files',
+            DataTag => 'PreviewImage',
+            Writable => 'int32u',
+            WriteGroup => 'IFD0',
+            Protected => 2,
         },
     ],
     0x112 => {
         Name => 'Orientation',
         PrintConv => \%orientation,
+        Priority => 0,  # so IFD1 doesn't take precedence
     },
-    0x115 => 'SamplesPerPixel',
-    0x116 => 'RowsPerStrip',
+    0x115 => {
+        Name => 'SamplesPerPixel',
+        Priority => 0,
+    },
+    0x116 => {
+        Name => 'RowsPerStrip',
+        Priority => 0,
+    },
     0x117 => [
         {
             Condition => '$self->{TIFF_TYPE} ne "CR2" or $self->{DIR_NAME} ne "IFD0"',
@@ -268,18 +287,29 @@ sub Rationalize($;$);
             Name => 'PreviewImageLength',
             OffsetPair => 0x111,
             Notes => 'PreviewImageLength in IFD0 of CR2 files',
+            DataTag => 'PreviewImage',
+            Writable => 'int32u',
+            WriteGroup => 'IFD0',
+            Protected => 2,
         },
     ],
     0x118 => 'MinSampleValue',
     0x119 => 'MaxSampleValue',
-    0x11a => 'XResolution',
-    0x11b => 'YResolution',
+    0x11a => {
+        Name => 'XResolution',
+        Priority => 0,  # so IFD0 takes priority over IFD1
+    },
+    0x11b => {
+        Name => 'YResolution',
+        Priority => 0,
+    },
     0x11c => {
         Name => 'PlanarConfiguration',
         PrintConv => {
             1 => 'Chunky',
             2 => 'Planar',
         },
+        Priority => 0,
     },
     0x11d => 'PageName',
     0x11e => 'XPosition',
@@ -328,6 +358,7 @@ sub Rationalize($;$);
             2 => 'inches',
             3 => 'cm',
         },
+        Priority => 0,
     },
     0x129 => 'PageNumber',
     0x12c => 'ColorResponseUnit', #9
@@ -335,7 +366,9 @@ sub Rationalize($;$);
         Name => 'TransferFunction',
         ValueConv => '\$val',
     },
-    0x131 => 'Software',
+    0x131 => {
+        Name => 'Software',
+    },
     0x132 => {
         Name => 'ModifyDate',
         Description => 'Date/Time Of Last Modification',
@@ -358,7 +391,10 @@ sub Rationalize($;$);
         Name => 'WhitePoint',
         Groups => { 2 => 'Camera' },
     },
-    0x13f => 'PrimaryChromaticities',
+    0x13f => {
+        Name => 'PrimaryChromaticities',
+        Priority => 0,
+    },
     0x140 => {
         Name => 'ColorMap',
         Format => 'binary',
@@ -588,7 +624,10 @@ sub Rationalize($;$);
     0x207 => 'JPEGQTables',
     0x208 => 'JPEGDCTables',
     0x209 => 'JPEGACTables',
-    0x211 => 'YCbCrCoefficients',
+    0x211 => {
+        Name => 'YCbCrCoefficients',
+        Priority => 0,
+    },
     0x212 => {
         Name => 'YCbCrSubSampling',
         PrintConv => {
@@ -599,6 +638,7 @@ sub Rationalize($;$);
             '4 2' => 'YCbCr4:1:0', #PH
             '1 2' => 'YCbCr4:4:0', #PH
         },
+        Priority => 0,
     },
     0x213 => {
         Name => 'YCbCrPositioning',
@@ -606,8 +646,12 @@ sub Rationalize($;$);
             1 => 'Centered',
             2 => 'Co-sited',
         },
+        Priority => 0,
     },
-    0x214 => 'ReferenceBlackWhite',
+    0x214 => {
+        Name => 'ReferenceBlackWhite',
+        Priority => 0,
+    },
     0x22f => 'StripRowCounts',
     0x2bc => {
         Name => 'ApplicationNotes',
@@ -1355,21 +1399,23 @@ sub Rationalize($;$);
         Desire => {
             0 => 'FocalLength',
             1 => 'FocalLengthIn35mmFormat',
-            2 => 'FocalPlaneResolutionUnit',
-            3 => 'FocalPlaneXResolution',
-            4 => 'FocalPlaneYResolution',
-            5 => 'CanonImageWidthAsShot',
-            6 => 'CanonImageHeightAsShot',
-            7 => 'ExifImageWidth',
-            8 => 'ExifImageLength',
-            9 => 'ImageWidth',
-           10 => 'ImageHeight',
+            2 => 'FocalPlaneDiagonal',
+            3 => 'FocalPlaneResolutionUnit',
+            4 => 'FocalPlaneXResolution',
+            5 => 'FocalPlaneYResolution',
+            6 => 'CanonImageWidthAsShot',
+            7 => 'CanonImageHeightAsShot',
+            8 => 'ExifImageWidth',
+            9 => 'ExifImageLength',
+           10 => 'ImageWidth',
+           11 => 'ImageHeight',
         },
         ValueConv => 'Image::ExifTool::Exif::CalcScaleFactor35efl(@val)',
         PrintConv => 'sprintf("%.1f", $val)',
     },
     ThumbnailImage => {
         Writable => 1,
+        WriteCheck => '$self->CheckImage(\$val)',
         Require => {
             0 => 'ThumbnailOffset',
             1 => 'ThumbnailLength',
@@ -1380,15 +1426,26 @@ sub Rationalize($;$);
     },
     PreviewImage => {
         Writable => 1,
+        WriteCheck => '$self->CheckImage(\$val)',
         Require => {
             0 => 'PreviewImageStart',
             1 => 'PreviewImageLength',
         },
-        ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"PreviewImage")',
+        Desire => {
+            2 => 'PreviewImageValid',
+        },
+        WriteAlso => {
+            PreviewImageValid => 'defined $val and length $val ? 1 : 0',
+        },
+        ValueConv => q{
+            return undef if defined $val[2] and not $val[2];
+            return Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],'PreviewImage');
+        },
         ValueConvInv => '$val',
     },
     JpgFromRaw => {
         Writable => 1,
+        WriteCheck => '$self->CheckImage(\$val)',
         Require => {
             0 => 'JpgFromRawStart',
             1 => 'JpgFromRawLength',
@@ -1450,9 +1507,10 @@ sub AUTOLOAD
 # Calculate scale factor for 35mm effective focal length
 # Inputs: 0) Focal length
 #         1) Focal length in 35mm format
-#         2) focal plane resolution units (in mm)
-#         3/4) Focal plane X/Y resolution
-#         5/6,7/8...) Image width/height in order of precidence (first valid pair is used)
+#         2) Focal plane diagonal size (in mm)
+#         3) focal plane resolution units (in mm)
+#         4/5) Focal plane X/Y resolution
+#         6/7,8/9...) Image width/height in order of precidence (first valid pair is used)
 # Returns: 35mm conversion factor (or undefined if it can't be calculated)
 sub CalcScaleFactor35efl
 {
@@ -1461,20 +1519,24 @@ sub CalcScaleFactor35efl
 
     return $foc35 / $focal if $focal and $foc35;
 
-    my $units = shift || return undef;
-    my $x_res = shift || return undef;
-    my $y_res = shift || return undef;
-    my ($w, $h);
-    for (;;) {
-        @_ < 2 and return undef;
-        $w = shift;
-        $h = shift;
-        last if $w and $h;
+    my $diag = shift;
+    unless ($diag) {
+        my $units = shift || return undef;
+        my $x_res = shift || return undef;
+        my $y_res = shift || return undef;
+        my ($w, $h);
+        for (;;) {
+            @_ < 2 and return undef;
+            $w = shift;
+            $h = shift;
+            last if $w and $h;
+        }
+        # calculate focal plane size in mm
+        $w *= $units / $x_res;
+        $h *= $units / $y_res;
+        $diag = sqrt($w*$w+$h*$h);
     }
-    # calculate focal plane size in mm
-    $w *= $units / $x_res;
-    $h *= $units / $y_res;
-    return sqrt(36*36+24*24) / sqrt($w*$w+$h*$h);
+    return sqrt(36*36+24*24) / $diag;
 }
 
 #------------------------------------------------------------------------------
@@ -1644,20 +1706,22 @@ sub ExtractImage($$$$)
     my $dataPos = $exifTool->{EXIF_POS};
     my $image;
 
+    return undef unless $len;   # no image if length is zero
+
     # take data from EXIF block if possible
     if (defined $dataPos and $offset>$dataPos and $offset+$len<$dataPos+length($$dataPt)) {
         $image = substr($$dataPt, $offset-$dataPos, $len);
     } else {
         $image = $exifTool->ExtractBinary($offset, $len, $tag);
-        if (defined $image) {
-            # make sure this is a good image if we loaded it
-            unless ($image =~ /^(Binary data|\xff\xd8)/ or
-                    $exifTool->Options('IgnoreMinorErrors'))
-            {
-                $tag = 'PreviewImage' unless $tag;
-                $exifTool->Warn("$tag is not a valid image");
-                return undef;
-            }
+        return undef unless defined $image;
+    }
+    unless ($image =~ /^(Binary data|\xff\xd8)/ or
+            $exifTool->Options('IgnoreMinorErrors'))
+    {
+        $tag = 'PreviewImage' unless $tag;
+        if (grep /^$tag$/i, @{$exifTool->{REQUESTED_TAGS}}) {
+            $exifTool->Warn("$tag is not a valid image");
+            return undef;
         }
     }
     return \$image;
@@ -1681,16 +1745,10 @@ sub ProcessExif($$$)
     my $raf = $dirInfo->{RAF};
     my $success = 1;
     my $verbose = $exifTool->Options('Verbose');
-    my ($tagKey, $warnOutside);
+    my $tagKey;
 
-    if ($dirInfo->{Nesting} > 4) {
-        $exifTool->Warn('EXIF nesting level too deep');
-        return 0;
-    }
     if ($dirInfo->{DirName} eq 'EXIF') {
         $dirInfo->{DirName} = 'IFD0';
-    } elsif ($dirInfo->{DirName} eq 'MakerNotes') {
-        $warnOutside = 1;
     }
     my ($numEntries, $dirEnd, $readFromFile);
     if ($dirStart < 0 or $dirStart > $dataLen-2) {
@@ -1774,28 +1832,24 @@ sub ProcessExif($$$)
             if ($valuePtr < 0 or $valuePtr+$size > $dataLen) {
                 # get value by seeking in file if we are allowed
                 if ($raf) {
-                    if ($raf->Seek($base + $valuePtr + $dataPos,0)) {
-                        my $buff;
-                        if ($raf->Read($buff,$size) == $size) {
-                            $valueDataPt = \$buff;
-                            $valueDataPos = $valuePtr + $dataPos;
-                            $valueDataLen = $size;
-                            $valuePtr = 0;
-                        }
+                    my $buff;
+                    if ($raf->Seek($base + $valuePtr + $dataPos,0) and
+                        $raf->Read($buff,$size) == $size)
+                    {
+                        $valueDataPt = \$buff;
+                        $valueDataPos = $valuePtr + $dataPos;
+                        $valueDataLen = $size;
+                        $valuePtr = 0;
+                    } else {
+                        $exifTool->Error("Error reading value for $$dirInfo{DirName} entry $index");
+                        return undef;
                     }
-                }
-                if ($valuePtr) {
+                } else {
                     my $tagStr = sprintf("0x%x",$tagID);
-                    $exifTool->Warn("Bad EXIF directory pointer value for tag $tagStr");
+                    $exifTool->Warn("Bad $$dirInfo{DirName} directory pointer for tag $tagStr");
                     next;
                 }
                 $didRead = 1;
-            }
-            if ($warnOutside and ($didRead or $valuePtr < $dirStart or
-                $valuePtr+$size > $dirStart+$dirLen))
-            {
-                $exifTool->{MAKER_NOTE_WARN} = 1;
-                undef $warnOutside;
             }
             # save maker note header
             if ($tagID == 0x927c and $tagTablePtr eq \%Image::ExifTool::Exif::Main) {
@@ -1998,7 +2052,6 @@ sub ProcessExif($$$)
                     DataLen  => $subdirDataLen,
                     DirStart => $subdirStart,
                     DirLen   => $size,
-                    Nesting  => $dirInfo->{Nesting} + 1,
                     RAF      => $raf,
                     Parent   => $dirInfo->{DirName},
                 );
@@ -2026,30 +2079,27 @@ sub ProcessExif($$$)
                 $val = shift @values;           # continue with next subdir
             }
             next unless $exifTool->Options('MakerNotes') and $$tagInfo{MakerNotes};
-            if ($exifTool->{MAKER_NOTE_WARN}) {
-                # this is a pain, but we must rebuild maker notes to include
-                # all the value data if data was outside the maker notes
-                my %makerDirInfo = (
-                    Name     => $tagStr,
-                    Base     => $base,
-                    DataPt   => $valueDataPt,
-                    DataPos  => $valueDataPos,
-                    DataLen  => $valueDataLen,
-                    DirStart => $valuePtr,
-                    DirLen   => $size,
-                    RAF      => $raf,
-                    Parent   => $dirInfo->{DirName},
-                    DirName  => 'MakerNotes',
-                );
-                my $val2 = RebuildMakerNotes($exifTool, $newTagTable, \%makerDirInfo);
-                if (defined $val2) {
-                    $val = $val2;
-                    $verbose and $exifTool->Warn('Maker notes were not self-contained --> Rebuilt');
-                } else {
-                    $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
-                }
+            # this is a pain, but we must rebuild maker notes to include
+            # all the value data if data was outside the maker notes
+            my %makerDirInfo = (
+                Name     => $tagStr,
+                Base     => $base,
+                DataPt   => $valueDataPt,
+                DataPos  => $valueDataPos,
+                DataLen  => $valueDataLen,
+                DirStart => $valuePtr,
+                DirLen   => $size,
+                RAF      => $raf,
+                Parent   => $dirInfo->{DirName},
+                DirName  => 'MakerNotes',
+                TagInfo  => $tagInfo,
+            );
+            my $val2 = RebuildMakerNotes($exifTool, $newTagTable, \%makerDirInfo);
+            if (defined $val2) {
+                $val = $val2;
+            } else {
+                $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
             }
-            $exifTool->{MAKER_NOTE_POS} = $valueDataPos + $valuePtr;
         }
  #..............................................................................
         # convert to absolute offsets if this tag is an offset
@@ -2074,7 +2124,6 @@ sub ProcessExif($$$)
             # but change the start location and increment the nesting
             # to avoid recursively processing the same directory
             my %newDirInfo = %$dirInfo;
-            ++$newDirInfo{Nesting};
             # increment IFD number if necessary
             if ($newDirInfo{DirName} =~ /^IFD(\d+)$/) {
                 $newDirInfo{DirName} = 'IFD' . ($1 + 1);
@@ -2138,6 +2187,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/EXIF Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.95
 [File, File, Image]  - File Name: Panasonic_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 8KB
@@ -94,6 +94,7 @@
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000001
 [PrintIM, PrintIM, Printing] 272 - Print IM 0x0110: 0x00000080
 [IPTC, IPTC, Other] 25 - Keywords: cool
+[IPTC, IPTC, Other] 0 - Application Record Version: 4
 [Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120

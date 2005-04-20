@@ -4,6 +4,16 @@
 # Description:  Utility to handle pointer fixups
 #
 # Revisions:    01/19/2005 - P. Harvey Created
+#               04/11/2005 - P. Harvey Allow fixups to be tagged with a marker,
+#                            and add new marker-related routines
+#
+# Data Members:
+#
+#   Start     - Position in data where a zero pointer points to.
+#   Shift     - Amount to shift offsets (relative to Start).
+#   Fixups    - List of Fixup object references to to shift relative to this Fixup.
+#   Pointers  - Hash of references to fixup pointer arrays, keyed by ByteOrder
+#               string (with "_$marker" added if tagged with a marker name).
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Fixup;
@@ -12,9 +22,9 @@ use strict;
 use Image::ExifTool qw(GetByteOrder SetByteOrder Get32u Set32u);
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
-sub AddFixup($$);
+sub AddFixup($$;$);
 sub ApplyFixup($$);
 sub Dump($;$);
 
@@ -36,19 +46,50 @@ sub new
 }
 
 #------------------------------------------------------------------------------
+# Clone this object
+# Inputs: 0) reference to Fixup object or Fixup class name
+# Returns: reference to new Fixup object
+sub Clone($)
+{
+    my $self = shift;
+    my $clone = new Image::ExifTool::Fixup;
+    $clone->{Start} = $self->{Start};
+    $clone->{Shift} = $self->{Shift};
+    my $phash = $self->{Pointers};
+    if ($phash) {
+        $clone->{Pointers} = { };
+        my $byteOrder;
+        foreach $byteOrder (keys %$phash) {
+            my @pointers = @{$phash->{$byteOrder}};
+            $clone->{Pointers}->{$byteOrder} = \@pointers;
+        }
+    }
+    if ($self->{Fixups}) {
+        $clone->{Fixups} = [ ];
+        my $subFixup;
+        foreach $subFixup (@{$self->{Fixups}}) {
+            push @{$clone->{Fixups}}, $subFixup->Clone();
+        }
+    }
+    return $clone;
+}
+
+#------------------------------------------------------------------------------
 # Add fixup pointer or another fixup object below this one
 # Inputs: 0) Fixup object reference
 #         1) Scalar for pointer offset, or reference to Fixup object
+#         2) Optional marker name for the pointer
 # Notes: Byte ordering must be set properly for the pointer being added (must keep
 # track of the byte order of each offset since MakerNotes may have different byte order!)
-sub AddFixup($$)
+sub AddFixup($$;$)
 {
-    my ($self, $pointer) = @_;
+    my ($self, $pointer, $marker) = @_;
     if (ref $pointer) {
         $self->{Fixups} or $self->{Fixups} = [ ];
         push @{$self->{Fixups}}, $pointer;
     } else {
         my $byteOrder = GetByteOrder();
+        $byteOrder .= "_$marker" if defined $marker;
         my $phash = $self->{Pointers};
         $phash or $phash = $self->{Pointers} = { };
         $phash->{$byteOrder} or $phash->{$byteOrder} = [ ];
@@ -60,11 +101,6 @@ sub AddFixup($$)
 # fix up pointer offsets
 # Inputs: 0) Fixup object reference, 1) data reference
 # Outputs: Collapses fixup hierarchy into linear lists of fixup pointers
-# Fixup hash elements:
-#     Start - position in data where a zero pointer points to
-#     Shift - amount to shift offsets (relative to Start)
-#     Fixups - list of Fixup object references to to shift relative to this Fixup
-#     Pointers - hash of references to fixup pointers, keyed by ByteOrder string
 sub ApplyFixup($$)
 {
     my ($self, $dataPt) = @_;
@@ -78,7 +114,7 @@ sub ApplyFixup($$)
         my $saveOrder = GetByteOrder(); # save original byte ordering
         my ($byteOrder, $ptr);
         foreach $byteOrder (keys %$phash) {
-            SetByteOrder($byteOrder);
+            SetByteOrder(substr($byteOrder,0,2));
             foreach $ptr (@{$phash->{$byteOrder}}) {
                 $ptr += $start;         # update pointer to new start location
                 next unless $shift;
@@ -117,6 +153,88 @@ sub ApplyFixup($$)
 }
 
 #------------------------------------------------------------------------------
+# Does specified marker exist?
+# Inputs: 0) Fixup object reference, 1) marker name
+# Returns: True if fixup contains specified marker name
+sub HasMarker($$)
+{
+    my ($self, $marker) = @_;
+    my $phash = $self->{Pointers};
+    return 0 unless $phash;
+    return 1 if $phash->{"MM_$marker"} or $phash->{"II_$marker"};
+    return 0 unless $self->{Fixups};
+    my $subFixup;
+    foreach $subFixup (@{$self->{Fixups}}) {
+        return 1 if $subFixup->HasMarker($marker);
+    }
+    return 0;
+}
+
+#------------------------------------------------------------------------------
+# Set all marker pointers to specified value
+# Inputs: 0) Fixup object reference, 1) data reference
+#         2) marker name, 3) pointer value, 4) offset to start of data
+sub SetMarkerPointers($$$$;$)
+{
+    my ($self, $dataPt, $marker, $value, $startOffset) = @_;
+    my $start = $self->{Start} + ($startOffset || 0);
+    my $phash = $self->{Pointers};
+
+    if ($phash) {
+        my $saveOrder = GetByteOrder(); # save original byte ordering
+        my ($byteOrder, $ptr);
+        foreach $byteOrder (keys %$phash) {
+            next unless $byteOrder =~ /^(II|MM)_$marker$/;
+            SetByteOrder($1);
+            foreach $ptr (@{$phash->{$byteOrder}}) {
+                Set32u($value, $dataPt, $ptr + $start);
+            }
+        }
+        SetByteOrder($saveOrder);       # restore original byte ordering
+    }
+    if ($self->{Fixups}) {
+        my $subFixup;
+        foreach $subFixup (@{$self->{Fixups}}) {
+            $subFixup->SetMarkerPointers($dataPt, $marker, $value, $start);
+        }
+    }
+}
+
+#------------------------------------------------------------------------------
+# Get pointer values for specified marker
+# Inputs: 0) Fixup object reference, 1) data reference,
+#          2) marker name, 3) offset to start of data
+# Returns: List of marker pointers in list context, or first marker pointer otherwise
+sub GetMarkerPointers($$$;$)
+{
+    my ($self, $dataPt, $marker, $startOffset) = @_;
+    my $start = $self->{Start} + ($startOffset || 0);
+    my $phash = $self->{Pointers};
+    my @pointers;
+
+    if ($phash) {
+        my $saveOrder = GetByteOrder();
+        my ($byteOrder, $ptr);
+        foreach $byteOrder (grep /_$marker$/, keys %$phash) {
+            SetByteOrder(substr($byteOrder,0,2));
+            foreach $ptr (@{$phash->{$byteOrder}}) {
+                push @pointers, Get32u($dataPt, $ptr + $start);
+            }
+            push @pointers, @{$phash->{$byteOrder}};
+        }
+        SetByteOrder($saveOrder);       # restore original byte ordering
+    }
+    if ($self->{Fixups}) {
+        my $subFixup;
+        foreach $subFixup (@{$self->{Fixups}}) {
+            push @pointers, $subFixup->GetMarkerPointers($dataPt, $marker, $start);
+        }
+    }
+    return @pointers if wantarray;
+    return $pointers[0];
+}
+
+#------------------------------------------------------------------------------
 # Dump fixup to console for debugging
 # Inputs: 0) Fixup object reference, 1) optional initial indent string
 sub Dump($;$)
@@ -127,7 +245,7 @@ sub Dump($;$)
     my $phash = $self->{Pointers};
     if ($phash) {
         my $byteOrder;
-        foreach $byteOrder (keys %$phash) {
+        foreach $byteOrder (sort keys %$phash) {
             print "$indent  $byteOrder: ", join(' ',@{$phash->{$byteOrder}}),"\n";
         }
     }
@@ -194,6 +312,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

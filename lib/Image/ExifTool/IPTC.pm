@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -907,6 +907,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/IPTC Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

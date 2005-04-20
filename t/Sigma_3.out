@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.95
 [File, File, Image]  - File Name: Sigma_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
@@ -70,6 +70,7 @@
 [MakerNotes, Sigma, Camera] 24 - Software: SIGMA PhotoPro 2.0.0.1586
 [MakerNotes, Sigma, Camera] 25 - Auto Bracket:  
 [IPTC, IPTC, Image] 40 - IPTC Pixel Width: 200
+[IPTC, IPTC, Image] 0 - News Photo Version: 4
 [Composite, Composite, Image]  - Aperture: 8.0
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120

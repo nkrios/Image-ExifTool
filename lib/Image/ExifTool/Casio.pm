@@ -15,7 +15,7 @@ package Image::ExifTool::Casio;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.10';
 
 %Image::ExifTool::Casio::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -123,25 +123,21 @@ $VERSION = '1.07';
         PrintConv => '$val =~ tr/ /x/; $val',
     },
     0x0003 => {
-        Name => 'CasioPreviewLength',
+        Name => 'PreviewImageLength',
         Groups => { 2 => 'Image' },
-        Writable => 0,
-# Rename this tag to basically ignore these values (and those of
-# CasioPreviewStart below) because the data is duplicated in
-# the PreviewImage tag later.  If we wrote these too, the data
-# would be duplicated in the maker notes!
-#        OffsetPair => 0x0004, # point to associated offset
-#        Writable => 'int32u',
-#        Protected => 2,
+        OffsetPair => 0x0004, # point to associated offset
+        DataTag => 'PreviewImage',
+        Writable => 'int32u',
+        Protected => 2,
     },
     0x0004 => {
-        Name => 'CasioPreviewStart',
+        Name => 'PreviewImageStart',
         Groups => { 2 => 'Image' },
-        Writable => 0,
-#        Flags => 'IsOffset',
-#        OffsetPair => 0x0003, # point to associated byte count
-#        Writable => 'int32u',
-#        Protected => 2,
+        Flags => 'IsOffset',
+        OffsetPair => 0x0003, # point to associated byte count
+        DataTag => 'PreviewImage',
+        Writable => 'int32u',
+        Protected => 2,
     },
     0x0008 => {
         Name => 'QualityMode',
@@ -241,12 +237,18 @@ $VERSION = '1.07';
         },
     },
     0x2000 => {
-        # this is the image data referenced by tags 3 and 4
+        # this image data is also referenced by tags 3 and 4
         # (nasty that they double-reference the image!)
         Name => 'PreviewImage',
         Writable => 'undef',
-        ValueConv => '\$val',
-        ValueConvInv => '$val',
+        # a value of 'none' is ok...
+        WriteCheck => '$val eq "none" ? undef : $self->CheckImage(\$val)',
+        DataTag => 'PreviewImage',
+        # we allow preview image to be set to '', but we don't want a zero-length value
+        # in the IFD, so set it temorarily to 'none'.  Note that the length is <= 4,
+        # so this value will fit in the IFD so the preview fixup won't be generated.
+        ValueConv => '$val eq "none" and $val="";\$val',
+        ValueConvInv => '$val eq "" and $val="none";$val',
     },
     0x2011 => {
         Name => 'WhiteBalanceBias',
@@ -373,6 +375,7 @@ Thanks to Joachim Loehr for adding support for the type 2 maker notes.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/Casio Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

@@ -8,7 +8,7 @@
 #               (See html/history.html for revision history)
 #------------------------------------------------------------------------------
 use strict;
-require 5.002;
+require 5.004;
 require Image::ExifTool;
 
 sub ScanDir($$);
@@ -78,7 +78,7 @@ sub Cleanup()
 sub SigInt()
 {
     Cleanup();
-    exit(1);
+    exit 1;
 }
 
 #------------------------------------------------------------------------------
@@ -207,6 +207,9 @@ if (@newValues) {
             ++$isWriting;
             %$info or warn "No writable tags found - $newVal\n";
             next;
+        } elsif ($tag =~ /^PreviewImage$/i) {
+            # can't delete preview image, so we can set it to ''
+            $newVal = '' unless defined $newVal;
         }
         my %opts = ( Protected => 1 );      # allow writing of 'unsafe' tags
         if ($tag =~ s/<// and defined $newVal) {
@@ -276,6 +279,9 @@ if (($countDir or $totWr or $tot > 1) and not $binaryStdout) {
     printf("%5d files could not be read\n", $countBad) if $countBad;
     printf("%5d output files created\n", $count-$countBad) if $outputExt;
 }
+# return error status if we had any errors
+exit 1 if $countBadWr or $countBad;
+
 exit 0;     # all done
 
 #------------------------------------------------------------------------------
@@ -802,13 +808,14 @@ exiftool [OPTIONS] [-TAG[[+-E<lt>]=[VALUE]] or --TAG...] FILE ...
 
 =head1 DESCRIPTION
 
-Read or write meta information in image files.  C<FILE> may be an image file
-name, a directory name, or C<-> for the standard input.  Information is read
-from the specified file and output in readable form to the console (or
-written to an output text file with the C<-w> option).
+A command-line interface to L<Image::ExifTool|Image::ExifTool> used for
+reading and writing meta information in image files.  C<FILE> may be an
+image file name, a directory name, or C<-> for the standard input.
+Information is read from the specified file and output in readable form to
+the console (or written to an output text file with the C<-w> option).
 
 To write information in an image file, specify new values using either the
-C<-TAG=VALUE> syntax or the C<-AllTagsFromFile> option.  This causes
+C<-TAG=[VALUE]> syntax or the C<-AllTagsFromFile> option.  This causes
 exiftool to rewrite C<FILE> with the specified information, preserving the
 original file by renaming it to C<FILE_original>.  (Note: Be sure to verify
 that the new file is OK before erasing the original.)
@@ -831,7 +838,7 @@ exiftool (r = read support, w = write support):
 =head1 OPTIONS
 
 Note:  Case is not significant for any command-line option (including tag
-and group names), except for certain single-character options where the
+and group names), except for single-character options where the
 corresponding upper case option is defined.
 
 =over 5
@@ -858,6 +865,19 @@ C<E<lt>=> to set the value of a tag from the contents of a file with name
 C<VALUE>.  (Note: Quotes are required around the argument in this case to
 prevent shell redirection.)
 
+A special tag name of C<All> may be used if no C<VALUE> is specified to
+delete all meta information, or all information in a specified group with
+C<-GROUP:All=> (for family 0 groups only).  Note that within an image, some
+groups may be contained within others.  These groups are also removed if the
+super group is deleted.  Below are lists of these group dependencies:
+
+  JPEG Image:
+  - deleting EXIF also deletes MakerNotes, GPS and PrintIM
+  - deleting Photoshop also deletes IPTC
+
+  TIFF Image:
+  - deleting EXIF also deletes MakerNotes
+
 =item B<-a>
 
 B<A>llow duplicate tag names in the output (otherwise duplicates are
@@ -866,16 +886,22 @@ suppressed).
 =item B<-AllTagsFromFile> I<SRCFILE>
 
 Set the value of all writable tags from information in the specified source
-file.
+file.  Note that the maker note information is set as a block, so it isn't
+effected like other information by subsequent tag assignments on the command
+line.  For example, to copy all information but the thumbnail image, use
+C<-ThumbnailImage=> after C<-AllTagsFromFile> on the command line.  Since
+the preview image is referenced from the maker notes and may be rather
+large, it is not copied.  Instead, the preview image must be transferred
+separately if desired.
 
 =item B<-b>
 
 Output requested data in B<b>inary format.  Mainly used for extracting
-embedded images.
+embedded images.  Suppresses output of tag names and descriptions.
 
 =item B<-d> I<FMT>
 
-Set B<d>ate/time format (consult strftime man page for FMT syntax).
+Set B<d>ate/time format (consult C<strftime> man page for FMT syntax).
 
 =item B<-D>
 
@@ -887,7 +913,8 @@ Print B<e>xisting tags only -- don't calculate composite tags.
 
 =item B<-E>
 
-B<E>scape characters in output values for HTML.
+B<E>scape characters in output values for HTML (implied with the C<-h>
+option).
 
 =item B<-f>
 
@@ -899,7 +926,7 @@ Organize output by tag B<g>roup (-g0 assumed if # not specified).
 
 =item B<-G>[#]
 
-Same as -g but print B<G>roup name for each tag.
+Same as C<-g> but print B<G>roup name for each tag.
 
 =item B<-H>
 
@@ -911,7 +938,7 @@ List all tag groups for family #.  Family 0 assumed if # not specified.
 
 =item B<-h>
 
-Use B<H>TML formatting for output (implies -E option).
+Use B<H>TML formatting for output (implies C<-E> option).
 
 =item B<-i> I<DIR>
 
@@ -941,7 +968,8 @@ extraction of embedded images that aren't in standard JPG format).
 
 =item B<-n>
 
-Do B<n>ot apply print conversion to displayed tag values.
+Do B<n>ot apply the print conversion to displayed tag values, or the inverse
+print conversion to written tag values.
 
 =item B<-o> I<OUTFILE>
 
@@ -975,7 +1003,7 @@ directory name).
 
 =item B<-s>
 
-Use B<s>hort output format (add up to 3 -s options for even shorter
+Use B<s>hort output format (add up to 3 C<-s> options for even shorter
 formats).
 
 =item B<-S>
@@ -1014,7 +1042,7 @@ extension (including the C<.>) with the specified extension.
 
 =item B<-x> I<TAG>
 
-EB<x>clude specified tag (may be many -x options).  Same as C<--TAG>.
+EB<x>clude specified tag (may be many C<-x> options).  Same as C<--TAG>.
 
 =item B<-z>
 
@@ -1094,10 +1122,24 @@ Add a keyword (C<word>) to the current list of keywords.
 
 Delete only the specified category (C<xxx>) from all files in directory.
 
+=item exiftool -all= dst.jpg
+
+Delete all meta information from an image.
+
+=item exiftool -photoshop:all= dst.jpg
+
+Delete Photoshop meta information from an image (note that the Photoshop
+information also includes IPTC).
+
 =item exiftool -AllTagsFromFile src.crw dst.jpg
 
 Set the values of all writable tags from information in C<src.crw>, and
 update C<dst.jpg> with this new information.
+
+=item exiftool -AllTagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg
+
+Copy all meta information from a.jpg to b.jpg except the thumbnail image and
+the XMP information.
 
 =item exiftool '-ThumbnailImageE<lt>=thumb.jpg' dst.jpg
 
@@ -1148,8 +1190,8 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Image::ExifTool|Image::ExifTool>,
-L<ExifTool Tag Names|Image::ExifTool::TagNames>,
-L<Shortcut Tags|Image::ExifTool::Shortcuts>
+L<Image::ExifTool::TagNames|Image::ExifTool::TagNames>,
+L<Image::ExifTool::Shortcuts|Image::ExifTool::Shortcuts>
 
 =cut
 

@@ -463,6 +463,8 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>, L<Image::Info|Image::Info>
+L<Image::ExifTool::TagNames/Pentax Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>,
+L<Image::Info(3pm)|Image::Info>
 
 =cut

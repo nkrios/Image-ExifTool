@@ -13,7 +13,7 @@ package Image::ExifTool::Ricoh;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessRicohText($$$);
 
@@ -61,15 +61,21 @@ sub ProcessRicohText($$$);
 # special code to handle the funny start location and base offset
 %Image::ExifTool::Ricoh::Subdir = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     0x0004 => 'RicohDateTime1', #PH
     0x0005 => 'RicohDateTime2', #PH
 );
 
-%Image::ExifTool::Ricoh::TextMakerNote = (
+# Ricoh text-type maker notes (PH)
+%Image::ExifTool::Ricoh::Text = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessRicohText,
     Rev => 'Revision',
     Rv => 'Revision',
+    Rg => 'RedGain',
+    Gg => 'GreenGain',
+    Bg => 'BlueGain',
 );
 
 #------------------------------------------------------------------------------
@@ -108,7 +114,7 @@ sub ProcessRicohText($$$)
         unless ($tagInfo) {
             next unless $exifTool->{OPTIONS}->{Unknown};
             $tagInfo = {
-                Name => "Ricoh_$tag",
+                Name => "Ricoh_Text_$tag",
                 Unknown => 1,
                 PrintConv => 'length($val) > 60 ? substr($val,0,55) . "[...]" : $val',
             };
@@ -154,6 +160,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/Ricoh Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

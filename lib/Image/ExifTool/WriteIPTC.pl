@@ -237,11 +237,13 @@ sub WriteIPTC($$$)
     # (the IPTC specification states that records must occur in
     # numerical order, but tags within records need not be ordered)
     my $pos = $start;
-    my $tail = $pos;   # old data written up to this point
+    my $tail = $pos;    # old data written up to this point
     my $dirEnd = $start + $dirLen;
     my $newData = '';
     my $lastRec = -1;
-    my %foundRec;
+    my $lastRecPos = 0;
+    my $allMandatory = 0;
+    my %foundRec;       # found flags: 0x01-existed before, 0x02-deleted, 0x04-created
     for (;;$tail=$pos) {
         # get next IPTC record from input directory
         my ($id, $rec, $tag, $len, $valuePtr);
@@ -253,7 +255,6 @@ sub WriteIPTC($$$)
                     $exifTool->Warn("IPTC doesn't conform to spec: Records out of sequence");
                     return undef unless $exifTool->Options('IgnoreMinorErrors');
                 }
-                $lastRec = $rec;
                 # handle extended IPTC entry if necessary
                 $pos += 5;      # step to after field header
                 if ($len & 0x8000) {
@@ -276,63 +277,122 @@ sub WriteIPTC($$$)
                 undef $rec;
             }
         }
-        # write out all our records that come before this one
-        for (;;) {
-            last unless @recordList;
-            my $newRec = $recordList[0];
-            $tagInfo = ${$iptcInfo{$newRec}}[0];
-            my $newTag = $tagInfo->{TagID};
-            # compare current entry with entry next in line to write out
-            # (write out our tags in numberical order even though
-            # this isn't required by the IPTC spec)
-            last if defined $rec and $rec <= $newRec;
-            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-            # only add new values if...
-            my ($doSet, @values);
-            my $found = $foundRec{$newRec}->{$newTag} || 0;
-            if ($found == 2) {
-                # ...tag existed before and was deleted
-                $doSet = 1;
-            } elsif ($$tagInfo{List}) {
-                # ...tag is List and it existed before or we are creating it
-                $doSet = 1 if $found or Image::ExifTool::IsCreating($newValueHash);
-            } else {
-                # ...tag didn't exist before and we are creating it
-                $doSet = 1 if not $found and Image::ExifTool::IsCreating($newValueHash);
-            }
-            $doSet and @values = Image::ExifTool::GetNewValues($newValueHash);
-            # write tags for each value in list
-            my $value;
-            foreach $value (@values) {
-                $verbose > 1 and print "    + IPTC:$$tagInfo{Name} = '$value'\n";
-                # convert to int if necessary
-                FormatIPTC($tagInfo, \$value);
-                # (note: IPTC string values are NOT null terminated)
-                $len = length $value;
-                # generate our new entry
-                my $entry = pack("CCC", 0x1c, $newRec, $newTag);
-                if ($len <= 0x7fff) {
-                    $entry .= pack("n", $len);
-                } else {
-                    # extended dataset tag
-                    $entry .= pack("nN", 0x8004, $len);
+        if (not defined $rec or $rec != $lastRec) {
+            # write out all our records that come before this one
+            for (;;) {
+                my $newRec = $recordList[0];
+                if (not defined $newRec or $newRec != $lastRec) {
+                    # handle mandatory tags in last record unless it was empty
+                    if (length $newData > $lastRecPos) {
+                        if ($allMandatory > 1) {
+                            # entire lastRec contained mandatory tags, and at least one tag
+                            # was deleted, so delete entire record unless we specifically
+                            # added a mandatory tag
+                            my $num = 0;
+                            foreach (keys %{$foundRec{$lastRec}}) {
+                                my $code = $foundRec{$lastRec}->{$_};
+                                $num = 0, last if $code & 0x04;
+                                ++$num if ($code & 0x03) == 0x01;
+                            }
+                            if ($num) {
+                                $newData = substr($newData, 0, $lastRecPos);
+                                $verbose > 1 and print "    - $num mandatory tags\n";
+                            }
+                        } elsif ($mandatory{$lastRec}) {
+                            # add required mandatory tags
+                            my $mandatory = $mandatory{$lastRec};
+                            my ($mandTag, $subTablePtr);
+                            foreach $mandTag (sort keys %$mandatory) {
+                                next if $foundRec{$lastRec}->{$mandTag};
+                                unless ($subTablePtr) {
+                                    $tagInfo = $tagTablePtr->{$lastRec};
+                                    $tagInfo and $$tagInfo{SubDirectory} or warn("WriteIPTC: Internal error 1\n"), next;
+                                    $tagInfo->{SubDirectory}->{TagTable} or next;
+                                    $subTablePtr = Image::ExifTool::GetTagTable($tagInfo->{SubDirectory}->{TagTable});
+                                }
+                                $tagInfo = $subTablePtr->{$mandTag} or warn("WriteIPTC: Internal error 2\n"), next;
+                                my $value = $mandatory->{$mandTag};
+                                $verbose > 1 and print "    + IPTC:$$tagInfo{Name} = '$value' (mandatory)\n";
+                                # convert to int if necessary
+                                FormatIPTC($tagInfo, \$value);
+                                $len = length $value;
+                                # generate our new entry
+                                my $entry = pack("CCCn", 0x1c, $lastRec, $mandTag, length($value));
+                                $newData .= $entry . $value;    # add entry to new IPTC data
+                                ++$exifTool->{CHANGED};
+                            }
+                        }
+                    }
+                    last unless defined $newRec;
+                    $lastRec = $newRec;
+                    $lastRecPos = length $newData;
+                    $allMandatory = 1;
                 }
-                $entry .= $value;
-                ++$exifTool->{CHANGED};
-                $newData .= $entry; # add entry to new IPTC data
+                $tagInfo = ${$iptcInfo{$newRec}}[0];
+                my $newTag = $tagInfo->{TagID};
+                # compare current entry with entry next in line to write out
+                # (write out our tags in numerical order even though
+                # this isn't required by the IPTC spec)
+                last if defined $rec and $rec <= $newRec;
+                my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+                # only add new values if...
+                my ($doSet, @values);
+                my $found = $foundRec{$newRec}->{$newTag} || 0;
+                if ($found & 0x02) {
+                    # ...tag existed before and was deleted
+                    $doSet = 1;
+                } elsif ($$tagInfo{List}) {
+                    # ...tag is List and it existed before or we are creating it
+                    $doSet = 1 if $found or Image::ExifTool::IsCreating($newValueHash);
+                } else {
+                    # ...tag didn't exist before and we are creating it
+                    $doSet = 1 if not $found and Image::ExifTool::IsCreating($newValueHash);
+                }
+                if ($doSet) {
+                    @values = Image::ExifTool::GetNewValues($newValueHash);
+                    @values and $foundRec{$newRec}->{$newTag} = $found | 0x04;
+                    # write tags for each value in list
+                    my $value;
+                    foreach $value (@values) {
+                        $verbose > 1 and print "    + IPTC:$$tagInfo{Name} = '$value'\n";
+                        # reset allMandatory flag if a non-mandatory tag is written
+                        if ($allMandatory) {
+                            my $mandatory = $mandatory{$newRec};
+                            $allMandatory = 0 unless $mandatory and $mandatory->{$newTag};
+                        }
+                        # convert to int if necessary
+                        FormatIPTC($tagInfo, \$value);
+                        # (note: IPTC string values are NOT null terminated)
+                        $len = length $value;
+                        # generate our new entry
+                        my $entry = pack("CCC", 0x1c, $newRec, $newTag);
+                        if ($len <= 0x7fff) {
+                            $entry .= pack("n", $len);
+                        } else {
+                            # extended dataset tag
+                            $entry .= pack("nN", 0x8004, $len);
+                        }
+                        $newData .= $entry . $value;    # add entry to new IPTC data
+                        ++$exifTool->{CHANGED};
+                    }
+                }
+                # remove this tagID from the sorted write list
+                shift @{$iptcInfo{$newRec}};
+                shift @recordList unless @{$iptcInfo{$newRec}};
             }
-            # remove this tagID from the sorted write list
-            shift @{$iptcInfo{$newRec}};
-            shift @recordList unless @{$iptcInfo{$newRec}};
+            # all done if no more records to write
+            last unless defined $rec;
+            # update last record variables
+            $lastRec = $rec;
+            $lastRecPos = length $newData;
+            $allMandatory = 1;
         }
-        # all done if no more records to write
-        last unless defined $rec;
-
+        # set flag indicating we found this tag
+        $foundRec{$rec}->{$tag} = 1;
         # write out this record unless we are setting it with a new value
         $tagInfo = $set{$rec}->{$tag};
         if ($tagInfo) {
             my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-            $foundRec{$rec}->{$tag} = 1;
             $len = $pos - $valuePtr;
             my $val = substr($$dataPt, $valuePtr, $len);
             if ($tagInfo->{Format} and $tagInfo->{Format} =~ /^int/) {
@@ -345,10 +405,17 @@ sub WriteIPTC($$$)
             if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
                 $verbose > 1 and print "    - IPTC:$$tagInfo{Name} = '$val'\n";
                 ++$exifTool->{CHANGED};
-                # increment foundRec to indicate we found and deleted this tag
-                ++$foundRec{$rec}->{$tag};
+                # set deleted flag to indicate we found and deleted this tag
+                $foundRec{$rec}->{$tag} |= 0x02;
+                # set allMandatory flag to 2 indicating a tag was removed
+                $allMandatory and ++$allMandatory;
                 next;
             }
+        }
+        # reset allMandatory flag if a non-mandatory tag is written
+        if ($allMandatory) {
+            my $mandatory = $mandatory{$rec};
+            $allMandatory = 0 unless $mandatory and $mandatory->{$tag};
         }
         # write out the record
         $newData .= substr($$dataPt, $tail, $pos-$tail);
@@ -361,7 +428,7 @@ sub WriteIPTC($$$)
             return undef unless $exifTool->Options('IgnoreMinorErrors');
         }
         # add back a bit of zero padding ourselves
-        $newData .= "\0" x 100 unless $exifTool->Options('Compact');
+        $newData .= "\0" x 100 if length($newData) and not $exifTool->Options('Compact');
     }
     return $newData;
 }
@@ -393,6 +460,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

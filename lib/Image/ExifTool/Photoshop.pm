@@ -246,10 +246,10 @@ sub ProcessPhotoshop($$$)
                 my %subdirInfo = (
                     Name     => $$tagInfo{Name},
                     DataPt   => \$value,
+                    DataPos  => $dirInfo->{DataPos} + $pos,
                     DataLen  => $size,
                     DirStart => 0,
                     DirLen   => $size,
-                    Nesting  => $dirInfo->{Nesting} + 1,
                     Parent   => $dirInfo->{DirName},
                 );
                 # process the directory
@@ -304,6 +304,8 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>, L<Image::MetaData::JPEG|Image::MetaData::JPEG>
+L<Image::ExifTool::TagNames/Photoshop Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>,
+L<Image::MetaData::JPEG(3pm)|Image::MetaData::JPEG>
 
 =cut

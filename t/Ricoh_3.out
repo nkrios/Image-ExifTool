@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.05
 [File, File, Image]  - File Name: Ricoh_3_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 8KB
+[File, File, Image]  - File Size: 3KB
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -42,8 +42,8 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1626
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 5212
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1630
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Ricoh, Camera] 1 - Maker Note Type: RDC
 [MakerNotes, Ricoh, Camera] 2 - Maker Note Version: Rev1234
 [MakerNotes, Ricoh, Camera] 3 - Ricoh 0x0003: 3
@@ -82,5 +82,5 @@
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Image]  - Shutter Speed: 1/274
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 5212 bytes)
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 7.5mm

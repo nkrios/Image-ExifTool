@@ -1,4 +1,4 @@
-  ExifToolVersion = 4.92
+  ExifToolVersion = 5.03
   FileName = ExifTool.jpg
   Directory = t
   FileSize = 3475
@@ -280,9 +280,9 @@ JPEG APP1 (2442 bytes):
   | | | 9)  FileNumber = 1181861
   | | |     - Tag 0x0008 (4 bytes, int32u[1]):
   | | |         0314: a5 08 12 00                                     [....]
-  | | | 10) OwnerName = Cindy Harvey
+  | | | 10) OwnerName = Phil Harvey
   | | |     - Tag 0x0009 (32 bytes, string[32]):
-  | | |         04dc: 43 69 6e 64 79 20 48 61 72 76 65 79 00 00 00 00 [Cindy Harvey....]
+  | | |         04dc: 50 68 69 6c 20 48 61 72 76 65 79 00 00 00 00 00 [Phil Harvey.....]
   | | |         04ec: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
   | | | 11) Canon_0x0010 = 2147484016
   | | |     - Tag 0x0010 (4 bytes, int32u[1]):

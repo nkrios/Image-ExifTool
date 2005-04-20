@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.93
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.03
 [File, File, Image]  - File Name: Writer_11_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 7KB
@@ -15,7 +15,7 @@
 [EXIF, IFD0, Image] 305 - Software: E775v1.3u
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:04 06:46:52
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 128
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 4
 [EXIF, ExifIFD, Image] 33437 - Aperture: 14.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
@@ -52,12 +52,12 @@
 [EXIF, ExifIFD, Camera] 41992 - Contrast: +1
 [EXIF, ExifIFD, Camera] 41993 - Saturation: +1
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: +1
-[EXIF, ExifIFD, Image] 65000 - Owner Name: Cindy Harvey
+[EXIF, ExifIFD, Image] 65000 - Owner Name: Phil Harvey
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 300
 [EXIF, IFD1, Image] 283 - Y Resolution: 300
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2422
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2420
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
@@ -108,7 +108,7 @@
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
 [MakerNotes, Canon, Camera] 8 - File Number: 118-1861
-[MakerNotes, Canon, Camera] 9 - Owner's Name: Cindy Harvey
+[MakerNotes, Canon, Camera] 9 - Owner's Name: Phil Harvey
 [MakerNotes, Canon, Image] 14 - Canon File Length: 4480822
 [MakerNotes, Canon, Camera] 0 - Red Balance Auto: 2.06611
 [MakerNotes, Canon, Camera] 1 - Blue Balance Auto: 0.83939
@@ -139,7 +139,7 @@
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 9
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 120
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 160
-[Composite, Composite, Image]  - Aperture: 14.3
+[Composite, Composite, Image]  - Aperture: 14.0
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120

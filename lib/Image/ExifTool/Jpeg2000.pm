@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessJpeg2000($$$);
 sub ProcessExifUUID($$$);
@@ -293,7 +293,7 @@ sub ProcessExifUUID($$$)
     my $dataPt = $$dirInfo{DataPt};
     # get the data block (into a common variable)
     $exifTool->{EXIF_DATA} = substr($$dataPt, 16);
-    $exifTool->{EXIF_POS} = 0;  # must set this properly if any data requires it
+    $exifTool->{EXIF_POS} = $$dirInfo{DataPos} + 16;
     # extract the EXIF information (it is in standard TIFF format)
     my $success = $exifTool->TiffInfo('JP2');
     SetByteOrder('MM'); # return byte order to big-endian
@@ -308,8 +308,8 @@ sub ProcessJpeg2000($$$)
 {
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my $nesting = $$dirInfo{Nesting};
     my $dataLen = $$dirInfo{DataLen};
+    my $dataPos = $$dirInfo{DataPos};
     my $dirLen = $$dirInfo{DirLen} || 0;
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $raf = $$dirInfo{RAF};
@@ -321,6 +321,7 @@ sub ProcessJpeg2000($$$)
     for ($pos=$dirStart; ; $pos+=$boxLen) {
         my ($boxID, $buff, $valuePtr);
         if ($raf) {
+            $dataPos = $raf->Tell();
             $raf->Read($buff,8) == 8 or last;
             $dataPt = \$buff;
             $dirLen = 8;
@@ -370,10 +371,10 @@ sub ProcessJpeg2000($$$)
             }
             my %subdirInfo = (
                 DataPt => $dataPt,
+                DataPos => $dataPos,
                 DataLen => $dataLen,
                 DirStart => $subdirStart,
                 DirLen => $boxLen - ($subdirStart - $valuePtr),
-                Nesting => $nesting + 1,
                 DirName => $$tagInfo{Name},
             );
             my $subTable = GetTagTable($$subdir{TagTable}) || $tagTablePtr;
@@ -410,7 +411,6 @@ sub Jpeg2000Info($)
     my %dirInfo = (
         RAF => $raf,
         DirName => 'JP2',
-        Nesting => 0,
     );
     my $tagTablePtr = GetTagTable('Image::ExifTool::Jpeg2000::Main');
     return $exifTool->ProcessTagTable($tagTablePtr, \%dirInfo);
@@ -459,7 +459,8 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/Jpeg2000 Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut
 

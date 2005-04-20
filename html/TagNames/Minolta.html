@@ -7,15 +7,16 @@
 
 These tags are used by Minolta and Konica/Minolta cameras.
 
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
 <td>MakerNoteVersion</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0001</td>
 <td>MinoltaCameraSettingsOld</td>
 <td align='center'>-</td>
@@ -25,7 +26,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>MinoltaCameraSettings</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0018</td>
 <td>ImageStabilization</td>
 <td align='center'>N</td>
@@ -35,7 +36,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>CompressedImageSize</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0081</td>
 <td>PreviewImageData</td>
 <td align='center'>N</td>
@@ -45,7 +46,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>PreviewImageStart</td>
 <td align='center'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0089</td>
 <td>PreviewImageLength</td>
 <td align='center'>int32u*</td>
@@ -59,7 +60,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>2 = Vivid color
   <br>3 = Solarization
   <br>4 = Adobe RGB</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0102</td>
 <td>MinoltaQuality</td>
 <td align='center'>Y</td>
@@ -79,7 +80,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>3 = Standard
   <br>4 = Economy
   <br>5 = Extra fine</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td align='center'>-</td>
@@ -89,11 +90,12 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>MinoltaCameraSettings2</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Minolta CameraSettings Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Index</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>1</td>
@@ -103,7 +105,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>1 = Aperture priority
   <br>2 = Shutter priority
   <br>3 = Manual</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>2</td>
 <td>FlashMode</td>
 <td align='center'>int32u</td>
@@ -114,9 +116,9 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <tr valign='top'>
 <td align='right'>3</td>
 <td>WhiteBalance</td>
-<td align='center'>N</td>
+<td align='center'>int32u~</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>4</td>
 <td>MinoltaImageSize</td>
 <td align='center'>int32u</td>
@@ -134,7 +136,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>3 = Standard
   <br>4 = Economy
   <br>5 = Extra fine</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>6</td>
 <td>DriveMode</td>
 <td align='center'>int32u</td>
@@ -152,20 +154,20 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td><font size='-1'>0 = multi-segment
   <br>1 = center weighted
   <br>2 = spot</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>8</td>
 <td>MinoltaISO</td>
-<td align='center'>N</td>
+<td align='center'>int32u~</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>9</td>
 <td>MinoltaShutterSpeed</td>
-<td align='center'>N</td>
+<td align='center'>int32u~</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>10</td>
 <td>MinoltaAperture</td>
-<td align='center'>N</td>
+<td align='center'>int32u~</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>11</td>
@@ -173,7 +175,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>12</td>
 <td>DigitalZoom</td>
 <td align='center'>int32u</td>
@@ -185,7 +187,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>ExposureCompensation</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>14</td>
 <td>BracketStep</td>
 <td align='center'>int32u</td>
@@ -197,7 +199,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>IntervalLength</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>17</td>
 <td>IntervalNumber</td>
 <td align='center'>int32u</td>
@@ -207,7 +209,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>FocalLength</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>19</td>
 <td>FocusDistance</td>
 <td align='center'>int32u</td>
@@ -218,7 +220,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = No
   <br>1 = Yes</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>21</td>
 <td>MinoltaDate</td>
 <td align='center'>int32u</td>
@@ -228,10 +230,10 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>MinoltaTime</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>23</td>
 <td>MaxAperture</td>
-<td align='center'>N</td>
+<td align='center'>int32u~</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>26</td>
@@ -239,7 +241,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>27</td>
 <td>LastFileNumber</td>
 <td align='center'>int32u</td>
@@ -249,7 +251,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>ColorBalanceRed</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>29</td>
 <td>ColorBalanceGreen</td>
 <td align='center'>int32u</td>
@@ -259,7 +261,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>ColorBalanceBlue</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>31</td>
 <td>Saturation</td>
 <td align='center'>int32u</td>
@@ -269,7 +271,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>Contrast</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>33</td>
 <td>Sharpness</td>
 <td align='center'>int32u</td>
@@ -286,7 +288,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>3 = Night portrait
   <br>4 = Sunset
   <br>5 = Sports action</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>35</td>
 <td>FlashExposureComp</td>
 <td align='center'>int32u</td>
@@ -301,7 +303,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>3 = 800
   <br>4 = auto
   <br>5 = 64</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>37</td>
 <td>MinoltaModel</td>
 <td align='center'>int32u</td>
@@ -319,7 +321,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = Still Image
   <br>1 = Time-lapse Movie</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>39</td>
 <td>FolderName</td>
 <td align='center'>int32u</td>
@@ -334,7 +336,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>2 = Vivid color
   <br>3 = Solarization
   <br>4 = Adobe RGB</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>41</td>
 <td>ColorFilter</td>
 <td align='center'>int32u</td>
@@ -344,7 +346,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>BWFilter</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>43</td>
 <td>InternalFlash</td>
 <td align='center'>int32u</td>
@@ -355,7 +357,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>Brightness</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>45</td>
 <td>SpotFocusPointX</td>
 <td align='center'>int32u</td>
@@ -365,7 +367,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>SpotFocusPointY</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>47</td>
 <td>WideFocusZone</td>
 <td align='center'>int32u</td>
@@ -380,7 +382,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = AF
   <br>1 = MF</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>49</td>
 <td>FocusArea</td>
 <td align='center'>int32u</td>
@@ -394,11 +396,11 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>1 = contrast
   <br>2 = saturation
   <br>3 = filter</font></td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 2, 2005</i>
+<br><i>Last revised Apr 11, 2005</i>
 </body>
 </html>

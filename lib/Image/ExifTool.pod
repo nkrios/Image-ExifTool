@@ -103,7 +103,7 @@ information hash, and B<GetTagList> for the returned tag list.
 
 B<ImageInfo> is very flexible about the input arguments, and interprets
 them based on their type.  It may be called with one or more arguments.
-The one required argument is either a SCALAR (the image file name), a GLOB
+The one required argument is either a SCALAR (the image file name), a file
 reference (a reference to the image file) or a SCALAR reference (a
 reference to the image in memory).  Other arguments are optional.  The
 order of the arguments is not significant, except that the first SCALAR is
@@ -125,7 +125,7 @@ member functions.
 =item SCALAR
 
 The first scalar argument is taken to be the file name unless an earlier
-argument specified the image data via a file reference (GLOB ref) or data
+argument specified the image data via a file reference (file ref) or data
 reference (SCALAR ref). The remaining scalar arguments are names of tags for
 requested information.  If no tags are specified, all possible information
 is extracted.  Tag names may begin with '-' indicating tags to exclude.  The
@@ -136,7 +136,7 @@ accessing the return values.  See
 L<Image::ExifTool::TagNames|Image::ExifTool::TagNames> for a complete list
 of ExifTool tag names.
 
-=item GLOB ref
+=item File ref
 
 A reference to an open image file.
 
@@ -652,7 +652,9 @@ each value in the list.
 
 0) ExifTool object reference
 
-1) [optional] Tag key or tag name, or undefined to clear all new values
+1) [optional] Tag key or tag name, or undefined to clear all new values.  A
+tag name of 'All' can be used when deleting tags to delete all tags, or all
+tags in a specified group (for family 0 groups only).
 
 2) [optional] New value for tag.  Undefined to delete tag from file.
 
@@ -725,6 +727,11 @@ from information found in the specified file.
 
 A hash of information that was set successfully.  May include Warning or
 Error entries if there were problems reading the input file.
+
+=item Notes:
+
+If a preview image exists, it is not copied.  The preview image must be
+transferred separately if desired.
 
 =back
 
@@ -1045,7 +1052,7 @@ FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
 ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
 Kodak, KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon,
 NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
-Sigma, Sony, SubIFD, XMP, XMP-IptcCore, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
+Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore,
 XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM,
 XMP-xmpRights
 
@@ -1090,9 +1097,11 @@ people who have contributed to this project.
 
 =head1 SEE ALSO
 
-L<ExifTool Tag Names|Image::ExifTool::TagNames>,
-L<Shortcut Tags|Image::ExifTool::Shortcuts>, L<Image::Info|Image::Info>,
-L<Image::MetaData::JPEG|Image::MetaData::JPEG>
+L<exiftool(1)|exiftool>,
+L<Image::ExifTool::TagNames(3pm)|Image::ExifTool::TagNames>,
+L<Image::ExifTool::Shortcuts(3pm)|Image::ExifTool::Shortcuts>,
+L<Image::Info(3pm)|Image::Info>,
+L<Image::MetaData::JPEG(3pm)|Image::MetaData::JPEG>
 
 =cut
 

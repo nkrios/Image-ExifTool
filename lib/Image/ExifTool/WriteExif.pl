@@ -13,7 +13,6 @@ use strict;
 use Image::ExifTool::Fixup;
 
 sub InsertWritableProperties($$;$$);
-sub BuildFixup($$$);
 
 # some information may be stored in different IFD's with the same meaning.
 # Use this lookup to decide when we should delete information that is stored
@@ -676,77 +675,6 @@ sub InsertWritableProperties($$;$$)
 }
 
 #------------------------------------------------------------------------------
-# build fixup table for specified directory
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) dirInfo reference
-# Returns: fixup object reference, or undef if not fixup needed.
-#          -> Fixup start is relative to the start of the data.
-# Notes: Sets a Warning if any problems were encountered
-sub BuildFixup($$$)
-{
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart} || 0;
-    my $dataLen = $dirInfo->{DataLen} || length($$dataPt);
-    my $dataPos = $dirInfo->{DataPos};
-    my $fixup = new Image::ExifTool::Fixup;
-
-    my $numEntries = Get16u($dataPt, $dirStart);
-    my $dirEnd = $dirStart + 2 + 12 * $numEntries;
-    if ($dirEnd > $dataLen) {
-        $exifTool->Warn("Directory longer than data");
-        return undef;
-    }
-    my $index;
-    for ($index=0; $index<$numEntries; ++$index) {
-        my $entry = $dirStart + 2 + 12 * $index;
-        my $tagID = Get16u($dataPt, $entry);
-        my $format = Get16u($dataPt, $entry+2);
-        my $count = Get32u($dataPt, $entry+4);
-        my $valuePtr = $entry + 8;
-        if ($format < 1 or $format > 13) {
-            # allow zero padding (some manufacturers do this) - grrrr
-            last unless $format or $count or not $index;
-            $exifTool->Warn("Bad format ($format) for IFD entry");
-            return undef;
-        }
-        my $size = $count * $formatSize[$format];
-        if ($size > 4) {
-            # save pointer to this offset
-            $fixup->AddFixup($valuePtr);
-            $valuePtr = Get32u($dataPt, $valuePtr) - $dataPos;
-        }
-        # recurse into EXIF-type subdirectories
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
-        next unless $tagInfo and $$tagInfo{SubDirectory};
-        my $subdir = $$tagInfo{SubDirectory};
-        next unless $$subdir{TagTable};
-        my $subTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
-        next if $$subTable{PROCESS_PROC} and $$subTable{PROCESS_PROC} ne \&ProcessExif;
-        my %subdirInfo = %$dirInfo;
-        my $subdirDataPos = $dataPos;
-        my $subdirStart = $valuePtr;
-        if (defined $$subdir{Start}) {
-            if ($valuePtr < 0 or $valuePtr + $size > $dataLen) {
-                $exifTool->Warn('Error building fixup (pointer outside data)');
-                next;
-            }
-            my $val = ReadValue($dataPt,$valuePtr,$formatName[$format],$count,$size);
-            # set local $valuePtr relative to file $base for eval
-            my $valuePtr = $subdirStart + $subdirDataPos;
-            #### eval Start ($valuePtr, $val)
-            $subdirStart = eval($$subdir{Start});
-            # convert back to relative to $subdirDataPt
-            $subdirStart -= $subdirDataPos;
-        }
-        $subdirInfo{DirStart} = $subdirStart;
-        my $subFixup = BuildFixup($exifTool, $subTable, \%subdirInfo);
-        $fixup->AddFixup($subFixup);
-    }
-    return $fixup;
-}
-
-#------------------------------------------------------------------------------
 # rebuild maker notes to properly contain all value data
 # (some manufacturers put value data outside maker notes!!)
 # Inputs: 0) ExifTool object reference, 1) tag table reference,
@@ -762,18 +690,30 @@ sub RebuildMakerNotes($$$)
     my $rtnValue;
     my %subdirInfo = %$dirInfo;
 
+    delete $exifTool->{MAKER_NOTE_FIXUP};
+
     my $saveOrder = GetByteOrder();
-    my $loc = Image::ExifTool::MakerNotes::LocateIFD(\%subdirInfo);
+    my $loc = Image::ExifTool::MakerNotes::LocateIFD($exifTool,\%subdirInfo);
     if (defined $loc) {
         my $makerFixup = $subdirInfo{Fixup} = new Image::ExifTool::Fixup;
         # create new exiftool object to rewrite the directory without changing it
         my $newTool = new Image::ExifTool;
-        # might need these two member variables...
+        # don't copy over preview image
+        $newTool->SetNewValue(PreviewImage => '');
+        # must set a few member variables used while writing...
         $newTool->{CameraMake} = $exifTool->{CameraMake};
         $newTool->{CameraModel} = $exifTool->{CameraModel};
+        # set FILE_TYPE to JPEG so PREVIEW_INFO will be generated
+        $newTool->{FILE_TYPE} = 'JPEG';
         # rewrite maker notes
         $rtnValue = $newTool->WriteTagTable($tagTablePtr, \%subdirInfo);
         if (defined $rtnValue and length $rtnValue) {
+            # add the dummy preview image if necessary
+            if ($newTool->{PREVIEW_INFO}) {
+                $makerFixup->SetMarkerPointers(\$rtnValue, 'PreviewImage', length($rtnValue));
+                $rtnValue .= $newTool->{PREVIEW_INFO}->{Data};
+                delete $newTool->{PREVIEW_INFO};
+            }
             # add makernote header
             $loc and $rtnValue = substr($$dataPt, $dirStart, $loc) . $rtnValue;
             # adjust fixup for shift in start position
@@ -784,6 +724,12 @@ sub RebuildMakerNotes($$$)
                                     $dirInfo->{Base} - $subdirInfo{Base};
             # fix up pointers to the specified offset
             $makerFixup->ApplyFixup(\$rtnValue);
+        }
+        # save fixup information unless offsets were relative
+        unless ($subdirInfo{Relative}) {
+            # set shift so offsets are all relative to start of maker notes
+            $makerFixup->{Shift} -= $dataPos + $dirStart;
+            $exifTool->{MAKER_NOTE_FIXUP} = $makerFixup;    # save fixup for later
         }
     }
     SetByteOrder($saveOrder);
@@ -868,8 +814,16 @@ sub WriteExif($$$)
         # save pointer to start of this IFD within the newData
         my $newStart = length($newData);
         my @subdirs;    # list of subdirectory data and tag table pointers
+        # determine if directory is contained within our data
+        my $mustRead;
+        if ($dirStart < 0 or $dirStart > $dataLen-2) {
+            $mustRead = 1;
+        } else {
+            my $len = 2 + 12 * Get16u($dataPt, $dirStart);
+            $mustRead = 1 if $dirStart + $len > $dataLen;
+        }
         # read IFD from file if necessary
-        if ($raf and ($dirStart < 0 or $dirStart > $dataLen-2)) {
+        if ($raf and $mustRead) {
             # read the count of entries in this IFD
             my $offset = $dirStart + $dataPos;
             my ($buff, $buf2);
@@ -1115,6 +1069,10 @@ sub WriteExif($$$)
                             }
                             next;
                         }
+                        unless (length $newVal) {
+                            $exifTool->Error("Can't write zero length $$newInfo{Name} in $tagTablePtr->{GROUPS}->{1} IFD");
+                            return undef;
+                        }
                         # convert to binary format
                         $newValue = WriteValue($newVal, $newFormName, $newCount);
                         unless (defined $newValue) {
@@ -1203,7 +1161,9 @@ sub WriteExif($$$)
                         $offsetData{$dataTag} = $exifTool->GetNewValues($dataTag);
                         my $err;
                         if (defined $offsetData{$dataTag}) {
-                            if ($exifTool->{FILE_TYPE} eq 'JPEG' and length($offsetData{$dataTag}) > 60000) {
+                            if ($exifTool->{FILE_TYPE} eq 'JPEG' and
+                                $dataTag ne 'PreviewImage' and length($offsetData{$dataTag}) > 60000)
+                            {
                                 delete $offsetData{$dataTag};
                                 $err = "$dataTag not written (too large for JPEG segment)";
                             }
@@ -1221,50 +1181,35 @@ sub WriteExif($$$)
 # write maker notes
 #
                 if ($$newInfo{MakerNotes}) {
+                    # don't write new makernotes if we are deleting this group
+                    if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{MakerNotes}) {
+                        if ($isNew <= 0) {
+                            ++$exifTool->{CHANGED};
+                            $verbose and print "  Deleting MakerNotes\n";
+                        }
+                        next;
+                    }
                     my $saveOrder = GetByteOrder();
                     if ($isNew >= 0 and $set{$newID}) {
                         # we are writing a whole new maker note block
-                        my $oldPos = $exifTool->{MAKER_NOTE_POS};
-                        if (defined $oldPos) {
-                            my %subdirInfo = (
-                                DataPt => \$newValue,
-                                DirStart => 0,
-                                DataLen => length($newValue),
-                                DirLen => length($newValue),
-                                DataPos => $oldPos,
-                                Base => 0,
-                            );
-                            my $loc = Image::ExifTool::MakerNotes::LocateIFD(\%subdirInfo);
-                            # don't need to shift IFD pointers if this is a TIFF-type Makernote
-                            # (in which case the Relative will be set)
-                            if (defined $loc and not $subdirInfo{Relative}) {
-                                $subdirInfo{DirStart} = $loc;
-                                $subdirInfo{DirLen} -= $loc;
-                                my $subTable;
-                                $subTable = $newInfo->{SubDirectory}->{TagTable} if $$newInfo{SubDirectory};
-                                $subTable = 'Image::ExifTool::Exif' unless $subTable;
-                                $subTable = Image::ExifTool::GetTagTable($subTable);
-                                my $makerFixup = BuildFixup($exifTool, $subTable, \%subdirInfo);
-                                if ($makerFixup) {
-                                    my $valLen = length($valBuff);
-                                    $makerFixup->{Start} += $valLen;
-                                    $makerFixup->{Shift} -= $oldPos;
-                                    push @valFixups, $makerFixup;
-                                }
-                            }
-                        } else {
-                            $exifTool->Warn("Can't shift new MakerNotes offsets (position not known)");
+                        # --> add fixup information if necessary
+                        if ($exifTool->{MAKER_NOTE_FIXUP}) {
+                            my $makerFixup = $exifTool->{MAKER_NOTE_FIXUP}->Clone();
+                            my $valLen = length($valBuff);
+                            $makerFixup->{Start} += $valLen;
+                            push @valFixups, $makerFixup;
                         }
                     } else {
                         # update maker notes if possible
                         my %subdirInfo = (
                             Base => $base,
                             DataPt => $valueDataPt,
-                            DirStart => $valuePtr,
                             DataPos => $valueDataPos,
                             DataLen => $valueDataLen,
+                            DirStart => $valuePtr,
                             DirLen => $oldSize,
                             DirName => 'MakerNotes',
+                            TagInfo => $newInfo,
                             RAF => $raf,
                         );
                         # get the proper tag table for these maker notes
@@ -1279,7 +1224,7 @@ sub WriteExif($$$)
                         $subTable or $subTable = $tagTablePtr;
                         my $subdir;
                         # look for IFD-style maker notes
-                        my $loc = Image::ExifTool::MakerNotes::LocateIFD(\%subdirInfo);
+                        my $loc = Image::ExifTool::MakerNotes::LocateIFD($exifTool,\%subdirInfo);
                         if (defined $loc) {
                             # we need fixup data for this subdirectory
                             $subdirInfo{Fixup} = new Image::ExifTool::Fixup;
@@ -1291,7 +1236,7 @@ sub WriteExif($$$)
                             my $sub = $subInfo->{SubDirectory};
                             if (defined $$sub{Start}) {
                                 #### eval Start ($valuePtr)
-                                my $start = eval($$sub{Start});
+                                my $start = eval $$sub{Start};
                                 $loc = $start - $valuePtr;
                                 $subdirInfo{DirStart} = $start;
                                 $subdirInfo{DirLen} -= $loc;
@@ -1303,30 +1248,48 @@ sub WriteExif($$$)
                         } else {
                             $exifTool->Warn('Maker notes could not be parsed');
                         }
-                        if (defined $subdir and length $subdir) {
+                        if (defined $subdir) {
+                            next unless length $subdir;
                             my $valLen = length($valBuff);
                             # restore existing header and substitute the new
                             # maker notes for the old value
                             $newValue = substr($oldValue, 0, $loc) . $subdir;
                             my $makerFixup = $subdirInfo{Fixup};
+                            my $previewInfo = $exifTool->{PREVIEW_INFO};
                             if (not $subdirInfo{Relative}) {
+                                my $baseShift = $base - $subdirInfo{Base};
                                 $makerFixup->{Start} += $valLen + $loc;
-                                $makerFixup->{Shift} += $base - $subdirInfo{Base};
+                                $makerFixup->{Shift} += $baseShift;
                                 push @valFixups, $makerFixup;
+                                $previewInfo and $previewInfo->{BaseShift} = $baseShift;
                             } elsif ($loc) {
                                 # apply a one-time fixup to $loc since offsets are relative
                                 $makerFixup->{Start} += $loc;
                                 # shift all offsets to be relative to new base
-                                $makerFixup->{Shift} += $valueDataPos + $valuePtr +
-                                                        $base - $subdirInfo{Base};
+                                my $baseShift = $valueDataPos + $valuePtr + $base - $subdirInfo{Base};
+                                $makerFixup->{Shift} += $baseShift;
                                 $makerFixup->ApplyFixup(\$newValue);
+                                if ($previewInfo) {
+                                    # remove all but PreviewImage fixup (since others shouldn't change)
+                                    foreach (keys %{$makerFixup->{Pointers}}) {
+                                        /_PreviewImage$/ or delete $makerFixup->{Pointers}->{$_};
+                                    }
+                                    # zero pointer so we can see how it gets shifted later
+                                    $makerFixup->SetMarkerPointers(\$newValue, 'PreviewImage', 0);
+                                    # set the pointer to the start of the EXIF information
+                                    # add preview image fixup to list of value fixups
+                                    $makerFixup->{Start} += $valLen;
+                                    push @valFixups, $makerFixup;
+                                    $previewInfo->{BaseShift} = $baseShift;
+                                    $previewInfo->{Relative} = 1;
+                                }
                             }
                             $newValuePt = \$newValue;   # write new value
                         }
                     }
                     SetByteOrder($saveOrder);
 
-                } elsif ($$newInfo{SubDirectory} && $isNew <= 0) {
+                } elsif ($$newInfo{SubDirectory} and $isNew <= 0) {
                 
                     if ($$newInfo{SubIFD}) {
 #
@@ -1349,9 +1312,9 @@ sub WriteExif($$$)
                             my %subdirInfo = (
                                 Base => $base,
                                 DataPt => $dataPt,
-                                DirStart => $subdirStart,
                                 DataPos => $dataPos,
                                 DataLen => $dataLen,
+                                DirStart => $subdirStart,
                                 DirName => $subdirName,
                                 Fixup => new Image::ExifTool::Fixup,
                                 RAF => $raf,
@@ -1414,29 +1377,31 @@ sub WriteExif($$$)
 #
 # rewrite other existing subdirectories ('$valuePtr' type only)
 #
+                        # set subdirectory Start and Base
                         my $subdirStart = $valuePtr;
                         if ($newInfo->{SubDirectory}->{Start}) {
                             #### eval Start ($valuePtr)
-                            $subdirStart = eval($newInfo->{SubDirectory}->{Start});
+                            $subdirStart = eval $newInfo->{SubDirectory}->{Start};
+                        }
+                        my $subdirBase = $base;
+                        if ($newInfo->{SubDirectory}->{Base}) {
+                            my $start = $subdirStart + $dataPos;
+                            #### eval Base ($start)
+                            $subdirBase += eval $newInfo->{SubDirectory}->{Base};
                         }
                         my $subFixup = new Image::ExifTool::Fixup;
                         my %subdirInfo = (
-                            Base => $base,
+                            Base => $subdirBase,
                             DataPt => $valueDataPt,
-                            DirStart => $subdirStart,
-                            DataPos => $valueDataPos,
+                            DataPos => $valueDataPos - $subdirBase + $base,
                             DataLen => $valueDataLen,
+                            DirStart => $subdirStart,
                             DirLen => $oldSize,
-                            RAF => $raf,
                             Parent => $dirInfo->{DirName},
                             Fixup => $subFixup,
+                            RAF => $raf,
                         );
                         my $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
-                        if ($subTable) {
-                            $subTable = GetTagTable($subTable);
-                        } else {
-                            $subTable = $tagTablePtr;
-                        }
                         $newValue = $exifTool->WriteTagTable($subTable, \%subdirInfo);
                         if (defined $newValue) {
                             my $hdrLen = $subdirStart - $valuePtr;
@@ -1454,6 +1419,9 @@ sub WriteExif($$$)
                         if ($subFixup->{Pointers} and $subdirInfo{Base} == $base) {
                             $subFixup->{Start} += length $valBuff;
                             push @valFixups, $subFixup;
+                        } else {
+                            # apply fixup in case we added a header ($hdrLen above)
+                            $subFixup->ApplyFixup(\$newValue);
                         }
                     }
 
@@ -1502,15 +1470,28 @@ sub WriteExif($$$)
                     ++$newSize;
                 }
                 $offsetVal = Set32u(length $valBuff);
+                my $dataTag;
+                if ($newInfo and $$newInfo{DataTag}) {
+                    $dataTag = $$newInfo{DataTag};
+                    if ($dataTag eq 'PreviewImage' and $exifTool->{FILE_TYPE} eq 'JPEG') {
+                        # hold onto the PreviewImage until we can determine if it fits
+                        $exifTool->{PREVIEW_INFO} or $exifTool->{PREVIEW_INFO} = { };
+                        $exifTool->{PREVIEW_INFO}->{Data} = $$newValuePt;
+                        if ($$newInfo{Name} eq 'PreviewImage') {
+                            $exifTool->{PREVIEW_INFO}->{IsValue} = 1;
+                        }
+                        $$newValuePt = '';
+                    }
+                }
                 $valBuff .= $$newValuePt;       # add value data to buffer
                 # must save a fixup pointer for every pointer in the directory
-                $dirFixup->AddFixup(length($dirBuff) + 8);
+                $dirFixup->AddFixup(length($dirBuff) + 8, $dataTag);
             } else {
                 $offsetVal = $$newValuePt;      # save value in offset if 4 bytes or less
                 # must pad value with zeros if less than 4 bytes
                 $newSize < 4 and $offsetVal .= "\0" x (4 - $newSize);
             }
-            # write new directory entry
+            # write the directory entry
             $dirBuff .= Set16u($newID) . Set16u($newFormat) .
                         Set32u($newCount) . $offsetVal;
             # update flag to keep track of mandatory tags
@@ -1694,13 +1675,20 @@ sub WriteExif($$$)
                         unless ($raf and $raf->Seek($offset+$base+$dataPos,0) and
                                 $raf->Read($buff,$size) == $size)
                         {
-                            my $dataName = $$tagInfo{DataTag} || $$tagInfo{Name};
-                            my $str = "Error reading $dataName data in $dirName";
-                            if ($$tagInfo{Name} eq 'PreviewImageStart') {
-                                $exifTool->Warn($str);
-                                $buff = '<invalid preview image>';
+                            if ($$tagInfo{Name} eq 'ThumbnailOffset' and $offset>=0 and $offset<$dataLen) {
+                                # Grrr.  The Canon 350D writes the thumbnail with an incorrect byte count
+                                my $diff = $offset + $size - $dataLen;
+                                $exifTool->Warn("ThumbnailImage runs outside EXIF data by $diff bytes -- Truncated");
+                                # set the size to the available data
+                                $size -= $diff;
+                                WriteValue($size, $formatStr, 1, \$newData, $byteCountPos);
+                                # get the truncated image
+                                $buff = substr($$dataPt, $offset, $size);
+                            } elsif ($$tagInfo{Name} eq 'PreviewImageStart' and $exifTool->{FILE_TYPE} eq 'JPEG') {
+                                $buff = 'LOAD';     # flag indicating we must load PreviewImage
                             } else {
-                                $exifTool->Error($str);
+                                my $dataName = $$tagInfo{DataTag} || $$tagInfo{Name};
+                                $exifTool->Error("Error reading $dataName data in $dirName");
                                 return undef;
                             }
                         }
@@ -1708,10 +1696,16 @@ sub WriteExif($$$)
                         # take data from old dir data buffer
                         $buff = substr($$dataPt, $offset, $size);
                     }
+                    if ($$tagInfo{Name} eq 'PreviewImageStart' and $exifTool->{FILE_TYPE} eq 'JPEG') {
+                        # hold onto the PreviewImage until we can determine if it fits
+                        $exifTool->{PREVIEW_INFO} or $exifTool->{PREVIEW_INFO} = { };
+                        $exifTool->{PREVIEW_INFO}->{Data} = $buff;
+                        $buff = '';
+                    }
                     # update offset accordingly and add to end of new data
                     Set32u(length($newData), \$newData, $offsets + $n*4);
-                    # add a pointer to fix up this offset value
-                    $fixup->AddFixup($offsets + $n*4);
+                    # add a pointer to fix up this offset value (marked with DataTag name)
+                    $fixup->AddFixup($offsets + $n*4, $$tagInfo{DataTag});
                     $buff .= "\0" if $size & 0x01;  # must be even size
                     # add this strip to the data
                     $newData .= $buff;
@@ -1720,11 +1714,42 @@ sub WriteExif($$$)
         }
     }
     # apply final shift to new data position if this is the top level IFD
-    if (not $dirInfo->{Fixup} and $dirInfo->{NewDataPos}) {
-        $fixup->{Shift} += $dirInfo->{NewDataPos};
-        $fixup->ApplyFixup(\$newData);
-        # delete both IFD0 and IFD1 if only mandatory tags remain
-        $newData = '' if defined $newData and $deleteAll;
+    if (not $dirInfo->{Fixup}) {
+        if ($dirInfo->{NewDataPos}) {
+            $fixup->{Shift} += $dirInfo->{NewDataPos};
+            $fixup->ApplyFixup(\$newData);
+        }
+        # save fixup for PreviewImage in JPEG file if necessary
+        my $previewInfo = $exifTool->{PREVIEW_INFO};
+        if ($previewInfo) {
+            my $pt = \$previewInfo->{Data}; # image data or 'LOAD' flag
+            # now that we know the size of the EXIF data, first test to see if our new image fits
+            # inside the EXIF segment (remember about the TIFF and EXIF headers: 8+6 bytes)
+            if (($$pt ne 'LOAD' and length($$pt) + length($newData) + 14 <= 0xfffd) or
+                $previewInfo->{IsValue})
+            {
+                # It fits! (or must exist in EXIF segment), so fixup the
+                # PreviewImage pointers and stuff the preview image in here
+                my $newPos = length($newData) + ($dirInfo->{NewDataPos} || 0);
+                $newPos += ($previewInfo->{BaseShift} || 0);
+                if ($previewInfo->{Relative}) {
+                    # calculate our base by looking at how far the pointer got shifted
+                    $newPos -= $fixup->GetMarkerPointers(\$newData, 'PreviewImage');
+                }
+                $fixup->SetMarkerPointers(\$newData, 'PreviewImage', $newPos);
+                $newData .= $$pt;
+                delete $exifTool->{PREVIEW_INFO};   # done with our preview data
+                $exifTool->{DEL_PREVIEW} = 1;       # set flag to delete old preview
+            } else {
+                # Doesn't fit, or we still don't know, so save fixup information
+                # and put the preview at the end of the file
+                $previewInfo->{Fixup} or $previewInfo->{Fixup} = new Image::ExifTool::Fixup;
+                $previewInfo->{Fixup}->AddFixup($fixup);
+            }
+        } else {
+            # delete both IFD0 and IFD1 if only mandatory tags remain
+            $newData = '' if defined $newData and $deleteAll;
+        }
     }
     # return empty string if no entries in directory
     # (could be up to 10 bytes and still be empty)
@@ -1758,6 +1783,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

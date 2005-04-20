@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.93
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.03
 [File, File, Image]  - File Name: Writer_8_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 7KB
@@ -99,7 +99,7 @@
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
 [MakerNotes, Canon, Camera] 21 - Canon 0x0015: 2415919104
 [MakerNotes, Canon, Camera] 8 - File Number: 118-1861
-[MakerNotes, Canon, Camera] 9 - Owner's Name: Cindy Harvey
+[MakerNotes, Canon, Camera] 9 - Owner's Name: Phil Harvey
 [MakerNotes, Canon, Camera] 16 - Canon 0x0010: 2147484016
 [MakerNotes, Canon, Image] 14 - Canon File Length: 4480822
 [MakerNotes, Canon, Camera] 13 - Canon 0x000d: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0[...]
@@ -137,9 +137,10 @@
 [MakerNotes, Canon, Camera] 181 - Canon 0x00b5: 10 3 1 2048 1360
 [MakerNotes, Canon, Camera] 0 - Canon 0x0000: 0 0 0 0 0 0 3072000 892 2048000 595 65540 262146
 [IPTC, IPTC, Other] 15 - Category: IPTC test
+[IPTC, IPTC, Other] 0 - Application Record Version: 4
 [XMP, XMP-crs, Image] Contrast - Contrast: +2
 [XMP, XMP-dc, Image] Description - Description: New description
-[Composite, Composite, Image]  - Aperture: 14.3
+[Composite, Composite, Image]  - Aperture: 14.0
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120

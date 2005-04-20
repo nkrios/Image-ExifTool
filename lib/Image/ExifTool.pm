@@ -16,13 +16,13 @@
 package Image::ExifTool;
 
 use strict;
-require 5.002;
+require 5.004;  # require 5.004 for UNIVERSAL::isa (otherwise 5.002 would do)
 require Exporter;
 use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '4.93';
+$VERSION = '5.05';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -70,7 +70,6 @@ sub Rationalize($;$);
 sub WriteValue($$;$$$$);
 sub WriteTagTable($$;$$);
 sub WriteInfo($$$);
-sub CheckExtraTags($$$);
 sub WriteBinaryData($$$);
 sub CheckBinaryData($$$);
 
@@ -81,7 +80,6 @@ sub CheckBinaryData($$$);
 $exifAPP1hdr = "Exif\0\0";
 $xmpAPP1hdr = "http://ns.adobe.com/xap/1.0/\0";
 $psAPP13hdr = "Photoshop 3.0\0";
-$myAPP5hdr = "Image::ExifTool\0PreviewImage\0";
 
 # hash of file types for all recognized file extensions
 my %fileTypeLookup = (
@@ -112,7 +110,6 @@ sub DummyWriteProc { return 1; }
     GROUPS => { 0 => 'File', 1 => 'File', 2 => 'Image' },
     DID_TAG_ID => 1,   # tag ID's aren't meaningful for these tags
     WRITE_PROC => \&DummyWriteProc,
-    CHECK_PROC => \&CheckExtraTags,
     Comment => {
         Name => 'Comment',
         Notes => 'comment embedded in JPEG or GIF89a image', 
@@ -131,14 +128,6 @@ sub DummyWriteProc { return 1; }
         Description => 'ExifTool Version Number',
         Groups      => \%allGroupsExifTool
     },
-    PreviewImage => {
-        Name        => 'PreviewImage',
-       # TEST!!!! (disable writing for now)
-       # Flags       => 'Writable',
-        WriteGroup  => 'PreviewImage',
-        ValueConv   => '\$val',
-        ValueConvInv => '$val',
-    },
     Error       => { Name => 'Error',   Groups => \%allGroupsExifTool },
     Warning     => { Name => 'Warning', Groups => \%allGroupsExifTool },
 );
@@ -155,14 +144,13 @@ my $didTagID;       # flag indicating we are accessing tag ID's
     GROUPS => { 0 => 'Composite', 1 => 'Composite' },
     DID_TAG_ID => 1,    # want empty tagID's for composite tags
     WRITE_PROC => \&DummyWriteProc,
-    CHECK_PROC => \&CheckExtraTags,
 );
 
 # special tag names (not used for tag info)
 my %specialTags = (
     PROCESS_PROC=>1, WRITE_PROC=>1, CHECK_PROC=>1, GROUPS=>1, FORMAT=>1,
-    INCREMENT=>1, FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1, DID_TAG_ID=>1,
-    WRITABLE=>1, NOTES=>1,
+    FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1, DID_TAG_ID=>1,
+    WRITABLE=>1, NOTES=>1, IS_OFFSET=>1,
 );
 
 #------------------------------------------------------------------------------
@@ -213,10 +201,7 @@ sub ImageInfo($;@)
     local $_;
     # get our ExifTool object ($self) or create one if necessary
     my $self;
-    my $ref = ref $_[0];
-    if ($ref and $ref ne 'GLOB' and $ref ne 'SCALAR') {
-        # assume this is an object (can't check explicitely for
-        # 'Image::ExifTool' because our object may be a derived class)
+    if (ref $_[0] and UNIVERSAL::isa($_[0],'Image::ExifTool')) {
         $self = shift;
     } else {
         $self = new Image::ExifTool;
@@ -306,8 +291,7 @@ sub ExtractInfo($;@)
     # initialize ExifTool object members
     $self->Init();
 
-    delete $self->{MAKER_NOTE_POS};     # position of maker notes if extracting
-    delete $self->{MAKER_NOTE_WARN};    # warning for wandering maker note pointers
+    delete $self->{MAKER_NOTE_FIXUP};   # fixup information for extracted maker notes
     delete $self->{MAKER_NOTE_HEADER};  # maker note header
 
     my $filename = $self->{FILENAME};   # image file name ('' if already open)
@@ -639,7 +623,8 @@ sub GetDescription($$)
     my $tagInfo = $self->{TAG_INFO}->{$tag};
     # ($tagInfo should be defined for any extracted tag,
     # but we might as well handle the case where it isn't)
-    my $desc = $$tagInfo{Description} if $tagInfo;
+    my $desc;
+    $desc = $$tagInfo{Description} if $tagInfo;
     # just make the tag more readable if description doesn't exist
     unless ($desc) {
         $desc = MakeDescription(GetTagName($tag));
@@ -880,6 +865,7 @@ sub Init($)
     $self->{TAG_INFO}   = { };      # hash of tag information
     $self->{TAG_EXTRA}  = { };      # hash of extra information about tag
     $self->{PRIORITY}   = { };      # priority of current tags
+    $self->{PROCESSED}  = { };      # hash of processed directory start positions
     $self->{NUM_FOUND}  = 0;        # total number of tags found (incl. duplicates)
     $self->{CHANGED}    = 0;        # number of tags changed (writer only)
     $self->{TIFF_TYPE}  = '';       # type of TIFF data (APP1, TIFF, NEF, etc...)
@@ -928,7 +914,7 @@ sub ParseArguments($;@)
                     $options->{$opt} = $$arg{$opt};
                     $opt eq 'Exclude' and $wasExcludeOpt = 1;
                 }
-            } elsif (ref $arg eq 'GLOB' or ref $arg eq 'SCALAR') {
+            } elsif (ref $arg eq 'SCALAR' or UNIVERSAL::isa($arg,'GLOB')) {
                 next if defined $self->{RAF};
                 $self->{RAF} = new File::RandomAccess($arg);
                 # set filename to empty string to indicate that
@@ -1646,6 +1632,7 @@ sub JpegInfo($)
     my $raf = $self->{RAF};
     my $icc_profile;
     my $rtnVal = 0;
+    my $wantPreview;
     my %dumpParms;
 
     # check to be sure this is a valid JPG file
@@ -1668,9 +1655,9 @@ sub JpegInfo($)
         undef $nextMarker;
         undef $nextSegDataPt;
 #
-# read ahead to the next segment unless we have reached SOS
+# read ahead to the next segment unless we have reached EOI or SOS
 #
-        unless ($marker and $marker == 0xda) {
+        unless ($marker and ($marker==0xd9 or ($marker==0xda and not $wantPreview))) {
             # read up to next marker (JPEG markers begin with 0xff)
             my $buff;
             $raf->ReadLine($buff) or last;
@@ -1687,9 +1674,9 @@ sub JpegInfo($)
             {
                 last unless $raf->Read($buff, 7) == 7;
                 $nextSegDataPt = \$buff;
-            # read data for all markers except 0xda (SOS) and stand-alone
+            # read data for all markers except 0xd9 (EOI) and stand-alone
             # markers 0x00, 0x01 and 0xd0-0xd7 (NULL, TEM, RST0-RST7)
-            } elsif ($nextMarker!=0xda and $nextMarker!=0x00 and $nextMarker!=0x01 and
+            } elsif ($nextMarker!=0xd9 and $nextMarker!=0x00 and $nextMarker!=0x01 and
                     ($nextMarker<0xd0 or $nextMarker>0xd7))
             {
                 # read record length word
@@ -1718,8 +1705,31 @@ sub JpegInfo($)
             $self->FoundTag('ImageWidth', $w);
             $self->FoundTag('ImageHeight', $h);
             next;
+        } elsif ($marker == 0xd9) {         # EOI
+            $verbose and print "JPEG EOI\n";
+            $rtnVal = 1;
+            my $buff;
+            $raf->Read($buff, 2) or last;
+            if ($buff eq "\xff\xd8") {
+                # adjust PreviewImageStart to this location
+                my $start = $self->{PRINT_CONV}->{PreviewImageStart};
+                if ($start) {
+                    my $actual = $raf->Tell() - 2;
+                    if ($start ne $actual) {
+                        $verbose>1 and print "(Fixed PreviewImage location: $start -> $actual)\n";
+                        $self->{PRINT_CONV}->{PreviewImageStart} = $actual;
+                        $self->{VALUE_CONV}->{PreviewImageStart} = $actual;
+                    }
+                }
+            }
+            last;   # all done parsing file
         } elsif ($marker == 0xda) {         # SOS
-            $verbose and print "JPEG SOS (end of parsing)\n";
+            if ($wantPreview) {
+                $verbose and print "JPEG SOS (continue parsing for PreviewImage)\n";
+                next;
+            } else {
+                $verbose and print "JPEG SOS (end of parsing)\n";
+            }
             # nothing interesting to parse after start of scan (SOS)
             $rtnVal = 1;
             last;   # all done parsing file
@@ -1743,6 +1753,18 @@ sub JpegInfo($)
                 $self->{EXIF_POS} = $segPos + $hdrLen;
                 # extract the EXIF information (it is in standard TIFF format)
                 $self->TiffInfo($markerName, undef, $segPos+$hdrLen);
+                # avoid looking for preview unless necessary because it really slows
+                # us down -- only look for it if we found pointer, and preview is
+                # outside EXIF, and PreviewImage is specifically requested
+                if ($self->{PRINT_CONV}->{PreviewImageStart} and
+                    $self->{PRINT_CONV}->{PreviewImageLength} and
+                    $self->{PRINT_CONV}->{PreviewImageStart} +
+                    $self->{PRINT_CONV}->{PreviewImageLength} >
+                    $self->{EXIF_POS} + length($self->{EXIF_DATA}) and
+                    grep /^PreviewImage$/i, @{$self->{REQUESTED_TAGS}})
+                {
+                    $wantPreview = 1;
+                }
             } else {
                 # Hmmm.  Could be XMP, let's see
                 my $processed;
@@ -1752,10 +1774,10 @@ sub JpegInfo($)
                     my %dirInfo = (
                         Base     => 0,
                         DataPt   => $segDataPt,
+                        DataPos  => $segPos,
                         DataLen  => $length,
                         DirStart => $start,
                         DirLen   => $length - $start,
-                        Nesting  => 0,
                         Parent   => $markerName,
                     );
                     $processed = $self->ProcessTagTable($tagTablePtr, \%dirInfo);
@@ -1776,10 +1798,10 @@ sub JpegInfo($)
                         my $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
                         my %dirInfo = (
                             DataPt   => \$icc_profile,
+                            DataPos  => $segPos + 14,
                             DataLen  => length($icc_profile),
                             DirStart => 0,
                             DirLen   => length($icc_profile),
-                            Nesting  => 0,
                             Parent   => $markerName,
                         );
                         $self->ProcessTagTable($tagTablePtr, \%dirInfo);
@@ -1792,23 +1814,6 @@ sub JpegInfo($)
                 $self->{EXIF_DATA} = substr($$segDataPt, 6);
                 $self->{EXIF_POS} = $segPos + 6;
                 $self->TiffInfo($markerName,undef,$segPos+6);
-            }
-        } elsif ($marker == 0xe5) {         # APP5 (PreviewImage)
-            if ($$segDataPt =~ /^$myAPP5hdr/) {
-                # add this data to the combined data if it exists
-                if (defined $combinedSegData) {
-                    $combinedSegData .= substr($$segDataPt,length($myAPP5hdr));
-                    $segDataPt = \$combinedSegData;
-                    $length = length $combinedSegData;  # update length
-                }
-                # peek ahead to see if the next segment is photoshop data too
-                if ($nextMarker == $marker and $$nextSegDataPt =~ /^$myAPP5hdr/) {
-                    # initialize combined data if necessary
-                    $combinedSegData = $$segDataPt unless defined $combinedSegData;
-                    next;   # will handle the combined data the next time around
-                }
-                my $previewImage = substr($$segDataPt, length($myAPP5hdr));
-                $self->FoundTag('PreviewImage', $previewImage);
             }
         } elsif ($marker == 0xed) {         # APP13 (Photoshop)
             if ($$segDataPt =~ /^$psAPP13hdr/) {
@@ -1828,10 +1833,10 @@ sub JpegInfo($)
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
                 my %dirInfo = (
                     DataPt   => $segDataPt,
+                    DataPos  => $segPos,
                     DataLen  => $length,
                     DirStart => 14,     # directory starts after identifier
                     DirLen   => $length-14,
-                    Nesting  => 0,
                     Parent   => $markerName,
                 );
                 $self->ProcessTagTable($tagTablePtr, \%dirInfo);
@@ -1862,6 +1867,7 @@ sub GifInfo($;$)
     my ($type, $a, $s, $ch, $length, $buff);
     my $raf = $self->{RAF};
     my $rtnVal = 0;
+    my $verbose = $self->{Options}->{Verbose};
     my ($err, $newComment, $setComment);
 
     # verify this is a valid GIF file
@@ -1870,12 +1876,16 @@ sub GifInfo($;$)
         and $type =~ /^GIF8[79]a$/
         and $self->{RAF}->Read($s, 4) == 4;
 
-    $self->{OPTIONS}->{Verbose} and print "GIF file version $type\n";
+    $verbose and print "GIF file version $type\n";
     if ($outfile) {
         Write($outfile, $type, $s) or $err = 1;
-        my $newValueHash;
-        $newComment = $self->GetNewValues('Comment', \$newValueHash);
-        $setComment = 1 if $newValueHash;
+        if ($self->{DEL_GROUP} and $self->{DEL_GROUP}->{File}) {
+            $setComment = 1;
+        } else {
+            my $newValueHash;
+            $newComment = $self->GetNewValues('Comment', \$newValueHash);
+            $setComment = 1 if $newValueHash;
+        }
     }
     $self->FoundTag('FileType','GIF');     # set file type
     my ($w, $h) = unpack("v"x2, $s);
@@ -2066,7 +2076,6 @@ sub TiffInfo($$;$$$)
         DataPos  => 0,
         DirStart => $offset,
         DirLen   => $length,
-        Nesting  => 0,
         RAF      => $raf,
         Multi    => 1,
         DirName  => 'IFD0',
@@ -2203,6 +2212,16 @@ sub ProcessTagTable($$$;$)
     $processProc or $processProc = $$tagTablePtr{PROCESS_PROC};
     # set directory name from default group0 name if not done already
     $dirInfo->{DirName} or $dirInfo->{DirName} = $tagTablePtr->{GROUPS}->{0};
+    # guard against cyclical recursion into the same directory
+    if (defined $dirInfo->{DirStart} and defined $dirInfo->{DataPos}) {
+        my $processed = $dirInfo->{DirStart} + $dirInfo->{DataPos} + ($dirInfo->{Base}||0);
+        if ($self->{PROCESSED}->{$processed}) {
+            $self->Warn("$$dirInfo{DirName} pointer references previous $self->{PROCESSED}->{$processed} directory");
+            return 0;
+        } else {
+            $self->{PROCESSED}->{$processed} = $dirInfo->{DirName};
+        }
+    }
     #printf "%-12s => '%s',\n",$dirInfo->{DirName},$dirInfo->{Parent};
     # otherwise process as an EXIF directory
     $processProc or $processProc = \&Image::ExifTool::Exif::ProcessExif;
@@ -2610,7 +2629,7 @@ sub ProcessBinaryData($$$)
 
     # get default format ('int8u' unless specified)
     my $defaultFormat = $$tagTablePtr{FORMAT} || 'int8u';
-    my $increment = $$tagTablePtr{INCREMENT} || $formatSize{$defaultFormat};
+    my $increment = $formatSize{$defaultFormat};
     unless ($increment) {
         warn "Unknown format $defaultFormat\n";
         $defaultFormat = 'int8u';
@@ -2626,18 +2645,20 @@ sub ProcessBinaryData($$$)
         @tags = sort { $a <=> $b } TagTableKeys($tagTablePtr);
     }
     my $index;
+    my $nextIndex = 0;
     my %val;
     foreach $index (@tags) {
         my $tagInfo;
         if ($$tagTablePtr{$index}) {
             $tagInfo = $self->GetTagInfo($tagTablePtr, $index) or next;
+            next if $$tagInfo{Unknown} and $$tagInfo{Unknown} > $unknown;
         } else {
             # don't generate unknown tags in binary tables unless Unknown > 1
             next unless $unknown > 1;
+            next if $index < $nextIndex;    # skip if data already used
             $tagInfo = $self->GetTagInfo($tagTablePtr, $index) or next;
             $$tagInfo{Unknown} = 2;    # set unknown to 2 for binary unknowns
         }
-        next if $$tagInfo{Unknown} and $$tagInfo{Unknown} > $unknown;
         my $count = 1;
         my $format = $$tagInfo{Format};
         if ($format) {
@@ -2651,6 +2672,10 @@ sub ProcessBinaryData($$$)
             }
         } else {
             $format = $defaultFormat;
+        }
+        if ($unknown > 1) {
+            # calculate next valid index for unknown tag
+            $nextIndex = $index + ($formatSize{$format} * $count) / $increment;
         }
         my $entry = $index * $increment;        # relative offset of this entry
         my $val = ReadValue($dataPt, $entry+$offset, $format, $count, $size-$entry);

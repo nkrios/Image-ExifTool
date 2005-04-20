@@ -212,6 +212,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/Panasonic Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

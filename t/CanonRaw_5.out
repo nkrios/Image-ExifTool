@@ -1,4 +1,4 @@
-  ExifToolVersion = 4.92
+  ExifToolVersion = 5.03
   FileName = CanonRaw.crw
   Directory = t
   FileSize = 6255
@@ -42,7 +42,7 @@
   | | | 1)  CanonImageType = CRW:EOS DIGITAL REBEL CMOS RAW
   | | 11) CameraObject (SubDirectory) -->
   | | + [Raw directory with 3 entries]
-  | | | 0)  OwnerName = Cindy Harvey
+  | | | 0)  OwnerName = Phil Harvey
   | | | 1)  CanonRawMakeModel (SubDirectory) -->
   | | | + [BinaryData directory, 32 bytes]
   | | | | Make = Canon

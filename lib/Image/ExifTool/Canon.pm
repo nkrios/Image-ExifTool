@@ -16,6 +16,7 @@
 #               4) http://www.wonderland.org/crw/
 #               5) Juha Eskelinen private communication (tests with 20D)
 #               6) Richard S. Smith private communication (tests with 20D)
+#               7) Denny Priebe private communication (tests with 1D MkII)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -23,7 +24,7 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
@@ -78,11 +79,21 @@ $VERSION = '1.12';
     },
     0xc => [   # square brackets for a conditional list
         {
-            Condition => '$self->{CameraModel} =~ /\b(300D|REBEL|10D|20D)/',
+            Condition => '$self->{CameraModel} =~ /\b(300D|350D|REBEL|10D|20D)/',
             Writable => 'int32u',
             Name => 'SerialNumber',
             Description => 'Camera Body No.',
             PrintConv => 'sprintf("%.10d",$val)',
+            PrintConvInv => '$val',
+        },
+        {
+            # serial number of 1D/1Ds/1D Mark II/1Ds Mark II is usually
+            # displayed w/o leeding zeros (ref 7)
+            Condition => '$self->{CameraModel} =~ /\b1D.*/',
+            Writable => 'int32u',
+            Name => 'SerialNumber',
+            Description => 'Camera Body No.',
+            PrintConv => 'sprintf("%d",$val)',
             PrintConvInv => '$val',
         },
         {
@@ -118,10 +129,10 @@ $VERSION = '1.12';
         },
         {
             # assume everything else is a D30/D60
-            Name => 'CanonCustomFunctions',
+            Name => 'CanonCustomFunctionsD30',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
-                TagTable => 'Image::ExifTool::CanonCustom::Functions',
+                TagTable => 'Image::ExifTool::CanonCustom::FunctionsD30',
             },
         },
     ],
@@ -562,21 +573,37 @@ $VERSION = '1.12';
     21 => {
         Name => 'FNumber',
         Description => 'Aperture',
+        Priority => 0,
         # approximate big translation table by simple calculation - PH
         ValueConv => '$val ? exp(Image::ExifTool::Canon::CanonEv($val)*log(2)/2) : undef()',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(log($val)*2/log(2))',
         PrintConv => 'sprintf("%.2g",$val)',
         PrintConvInv => '$val',
     },
-    22 => {
-        Name => 'ExposureTime',
-        Description => 'Shutter Speed',
-        # approximate big translation table by simple calculation - PH
-        ValueConv => '$val ? exp(-Image::ExifTool::Canon::CanonEv($val)*log(2)) : undef()',
-        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val)/log(2))',
-        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
-    },
+    22 => [
+        {
+            Name => 'ExposureTime',
+            Description => 'Shutter Speed',
+            # encoding is different for 20D and 350D (darn!)
+            Condition => '$self->{CameraModel} =~ /\b(20D|350D|REBEL XT)/',
+            Priority => 0,
+            # approximate big translation table by simple calculation - PH
+            ValueConv => '$val ? exp(-Image::ExifTool::Canon::CanonEv($val)*log(2))*1000/32 : undef()',
+            ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val*32/1000)/log(2))',
+            PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+            PrintConvInv => 'eval $val',
+        },
+        {
+            Name => 'ExposureTime',
+            Description => 'Shutter Speed',
+            Priority => 0,
+            # approximate big translation table by simple calculation - PH
+            ValueConv => '$val ? exp(-Image::ExifTool::Canon::CanonEv($val)*log(2)) : undef()',
+            ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val)/log(2))',
+            PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+            PrintConvInv => 'eval $val',
+        },
+    ],
     24 => {
         Name => 'BulbDuration',
         Format => 'int32s',
@@ -630,6 +657,7 @@ $VERSION = '1.12';
     WRITABLE => 1,
     FORMAT => 'int32u',
     FIRST_ENTRY => 1,
+    IS_OFFSET => [ 5 ],   # tag 5 is 'IsOffset'
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
 # the size of the preview block in 2-byte increments
 #    0 => {
@@ -643,7 +671,6 @@ $VERSION = '1.12';
         Name => 'PreviewImageLength',
         OffsetPair => 5,   # point to associated offset
         DataTag => 'PreviewImage',
-        Writable => 0,  # (can't write until we add ability to WriteBinaryData())
         Protected => 2,
     },
     3 => 'PreviewImageWidth',
@@ -653,7 +680,6 @@ $VERSION = '1.12';
         Flags => 'IsOffset',
         OffsetPair => 2,  # associated byte count tagID
         DataTag => 'PreviewImage',
-        Writable => 0,  # (can't write until we add ability to WriteBinaryData())
         Protected => 2,
     },
     6 => {
@@ -689,32 +715,46 @@ $VERSION = '1.12';
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    1 => { #5
-        Name => 'FileNumber',
-        Condition => '$self->{CameraModel} =~ /\b20D/',
-        Format => 'int32u',
-        # Thanks to Juha Eskelinen for figuring this out:
-        # this is an odd bit mapping -- it looks like the file number exists as a
-        # 16-bit integer containing the high bits, followed by an 8-bit integer
-        # with the low bits.  But it is more convenient to have this in a single
-        # word, so some bit manipulations are necessary...
-        # The bit pattern of the 32-bit word is:
-        #   31....24 23....16 15.....8 7......0
-        #   00000000 ffffffff DDDDDDDD ddFFFFFF
-        #     0 = zero bits (not part of the file number?)
-        #     f/F = low/high bits of file number
-        #     d/D = low/high bits of directory number
-        # The directory and file number are then converted into decimal
-        # and separated by a '-' to give the file number used in the 20D
-        ValueConv => '(($val&0xffc0)>>6)*10000+(($val>>16)&0xff)+(($val&0x3f)<<8)',
-        ValueConvInv => q{
-            my $d = int($val/10000);
-            my $f = $val - $d * 10000;
-            return ($d << 6) + (($f & 0xff)<<16) + (($f >> 8) & 0x3f);
+    1 => [
+        { #5
+            Name => 'FileNumber',
+            Condition => '$self->{CameraModel} =~ /\b20D/',
+            Format => 'int32u',
+            # Thanks to Juha Eskelinen for figuring this out:
+            # this is an odd bit mapping -- it looks like the file number exists as a
+            # 16-bit integer containing the high bits, followed by an 8-bit integer
+            # with the low bits.  But it is more convenient to have this in a single
+            # word, so some bit manipulations are necessary...
+            # The bit pattern of the 32-bit word is:
+            #   31....24 23....16 15.....8 7......0
+            #   00000000 ffffffff DDDDDDDD ddFFFFFF
+            #     0 = zero bits (not part of the file number?)
+            #     f/F = low/high bits of file number
+            #     d/D = low/high bits of directory number
+            # The directory and file number are then converted into decimal
+            # and separated by a '-' to give the file number used in the 20D
+            ValueConv => '(($val&0xffc0)>>6)*10000+(($val>>16)&0xff)+(($val&0x3f)<<8)',
+            ValueConvInv => q{
+                my $d = int($val/10000);
+                my $f = $val - $d * 10000;
+                return ($d << 6) + (($f & 0xff)<<16) + (($f >> 8) & 0x3f);
+            },
+            PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
+            PrintConvInv => '$val=~s/-//g;$val',
         },
-        PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
-        PrintConvInv => '$val=~s/-//g;$val',
-    },
+        { #7
+            Name => 'ShutterCount',
+            Condition => '$self->{CameraModel} =~ /\b1Ds? Mark II/',
+            Format => 'int32u',
+            ValueConv => '($val>>16)|(($val&0xffff)<<16)',
+            ValueConvInv => '($val>>16)|(($val&0xffff)<<16)',
+        },
+        { #7
+            Name => 'ShutterCount',
+            Condition => '$self->{CameraModel} =~ /\b1DS?$/',
+            Format => 'int32u',
+        },
+    ],
 );
 
 # color information (MakerNotes tag 0xa0)
@@ -1062,11 +1102,13 @@ it under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks Michael Rommel and Daniel Pittman for the information they provided
-about the Digital Ixus and PowerShot S70 cameras, and Juha Eskelinen for
-figuring out the 20D FileNumber.
+about the Digital Ixus and PowerShot S70 cameras, Juha Eskelinen for
+figuring out the 20D FileNumber, and Denny Priebe for figuring out a couple
+of 1D tags.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/Canon Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

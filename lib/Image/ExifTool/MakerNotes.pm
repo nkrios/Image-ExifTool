@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess);
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.06';
+$VERSION = '1.10';
 
 # conditional list of maker notes
 # Notes:
@@ -25,29 +25,29 @@ $VERSION = '1.06';
 @Image::ExifTool::MakerNotes::Main = (
     # decide which MakerNotes to use (based on camera make/model)
     {
-        Condition => '$self->{CameraMake} =~ /^Canon/',
         Name => 'MakerNoteCanon',
+        Condition => '$self->{CameraMake} =~ /^Canon/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::Main',
             ByteOrder => 'Unknown',
         },
     },
     {
+        Name => 'MakerNoteCasio',
         # do negative lookahead assertion just to get tags
         # in a nice order for documentation
         Condition => '$self->{CameraMake}=~/^CASIO(?! COMPUTER CO.,LTD)/',
-        Name => 'MakerNoteCasio',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Main',
             ByteOrder => 'Unknown',
         },
     },
     {
+        Name => 'MakerNoteCasio2',
         Condition => q{
             $self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/ and
             $self->{CameraModel}!~/^EX-Z3/
         },
-        Name => 'MakerNoteCasio2',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Type2',
             Start => '$valuePtr + 6',
@@ -55,8 +55,8 @@ $VERSION = '1.06';
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
         Name => 'MakerNoteCasioEX-Z3',
+        Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Type2',
             Start => '$valuePtr + 6',
@@ -69,8 +69,8 @@ $VERSION = '1.06';
     {
         # The Fuji programmers really botched this one up,
         # but with a bit of work we can still read this directory
-        Condition => '$self->{CameraMake} =~ /^FUJIFILM/',
         Name => 'MakerNoteFujiFilm',
+        Condition => '$self->{CameraMake} =~ /^FUJIFILM/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FujiFilm::Main',
             # there is an 8-byte maker tag (FUJIFILM) we must skip over
@@ -82,11 +82,11 @@ $VERSION = '1.06';
         },
     },
     {
+        Name => 'MakerNoteKodak1a',
         Condition => q{
             $self->{CameraMake}=~/^EASTMAN KODAK/ and
             $self->{MAKER_NOTE_HEADER}=~/^KDK INFO/
         },
-        Name => 'MakerNoteKodak',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Main',
             Start => '$valuePtr + 8',
@@ -94,11 +94,11 @@ $VERSION = '1.06';
         },
     },
     {
+        Name => 'MakerNoteKodak1b',
         Condition => q{
             $self->{CameraMake}=~/^EASTMAN KODAK/ and
             $self->{MAKER_NOTE_HEADER}=~/^KDK/
         },
-        Name => 'MakerNoteKodak1',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Main',
             Start => '$valuePtr + 8',
@@ -106,11 +106,11 @@ $VERSION = '1.06';
         },
     },
     {
+        Name => 'MakerNoteKodak2',
         Condition => q{
             $self->{CameraMake}=~/^EASTMAN KODAK/i and
             $self->{MAKER_NOTE_HEADER}=~/^.{8}Eastman/s
         },
-        Name => 'MakerNoteKodak2',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type2',
             ByteOrder => 'BigEndian',
@@ -119,49 +119,73 @@ $VERSION = '1.06';
     {
         # not much to key on here, but we know the
         # upper byte of the year should be 0x07:
+        Name => 'MakerNoteKodak3',
         Condition => q{
             $self->{CameraMake}=~/^EASTMAN KODAK/ and
             $self->{MAKER_NOTE_HEADER}=~/^.{12}\x07/s
         },
-        Name => 'MakerNoteKodak3',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type3',
             ByteOrder => 'BigEndian',
         },
     },
     {
+        Name => 'MakerNoteKodak4',
         Condition => q{
             $self->{CameraMake}=~/^Eastman Kodak/ and
             $self->{MAKER_NOTE_HEADER}=~/^.{41}JPG/s
         },
-        Name => 'MakerNoteKodak4',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type4',
             ByteOrder => 'BigEndian',
         },
     },
     {
+        Name => 'MakerNoteKodak5',
         Condition => q{
             $self->{CameraMake}=~/^EASTMAN KODAK/ and
-            $self->{MAKER_NOTE_HEADER}=~/^\0(\x1a\x18|\x3a\x08)\0/
+            ($self->{CameraModel}=~/(CX4200|CX4230|CX6200)/ or
+            # try to pick up similar models we haven't tested yet
+            $self->{MAKER_NOTE_HEADER}=~/^\0(\x1a\x18|\x3a\x08|\x59\xf8)\0/)
         },
-        Name => 'MakerNoteKodak5',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type5',
             ByteOrder => 'BigEndian',
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/Kodak/i',
+        Name => 'MakerNoteKodak6a',
+        Condition => q{
+            $self->{CameraMake}=~/^EASTMAN KODAK/ and
+            $self->{CameraModel}=~/DX3215/
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type6',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    {
+        Name => 'MakerNoteKodak6b',
+        Condition => q{
+            $self->{CameraMake}=~/^EASTMAN KODAK/ and
+            $self->{CameraModel}=~/DX3700/
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type6',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    {
         Name => 'MakerNoteKodakUnknown',
+        Condition => '$self->{CameraMake}=~/Kodak/i',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Unknown',
             ByteOrder => 'BigEndian',
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/^(Konica Minolta|Minolta)/',
         Name => 'MakerNoteMinolta',
+        Condition => '$self->{CameraMake}=~/^(Konica Minolta|Minolta)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::Main',
             ByteOrder => 'Unknown',
@@ -169,11 +193,11 @@ $VERSION = '1.06';
     },
     {
         # this maker notes starts with a standard TIFF header at offset 0x0a
+        Name => 'MakerNoteNikon',
         Condition => q{
             $self->{CameraMake}=~/^NIKON/ and
             $self->{MAKER_NOTE_HEADER}=~/^Nikon\x00\x02/
         },
-        Name => 'MakerNoteNikon',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             Start => '$valuePtr + 18',
@@ -183,11 +207,11 @@ $VERSION = '1.06';
     },
     {
         # older Nikon maker notes
+        Name => 'MakerNoteNikon2',
         Condition => q{
             $self->{CameraMake}=~/^NIKON/ and
             $self->{MAKER_NOTE_HEADER}=~/^Nikon\x00\x01/
         },
-        Name => 'MakerNoteNikon2',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::MakerNotesB',
             Start => '$valuePtr + 8',
@@ -196,16 +220,16 @@ $VERSION = '1.06';
     },
     {
         # Headerless Nikon maker notes
-        Condition => '$self->{CameraMake}=~/^NIKON/',
         Name => 'MakerNoteNikon3',
+        Condition => '$self->{CameraMake}=~/^NIKON/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             ByteOrder => 'LittleEndian',
         },
     },
     {
-        Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON|AGFA )/',
         Name => 'MakerNoteOlympus',
+        Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON|AGFA )/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Olympus::Main',
             Start => '$valuePtr+8',
@@ -213,8 +237,8 @@ $VERSION = '1.06';
         },
     },
     {
-        Condition => '$self->{CameraMake} =~ /^LEICA/',
         Name => 'MakerNoteLeica',
+        Condition => '$self->{CameraMake} =~ /^LEICA/',
         SubDirectory => {
             # Leica uses the same format as Panasonic
             TagTable => 'Image::ExifTool::Panasonic::Main',
@@ -223,8 +247,8 @@ $VERSION = '1.06';
         },
     },
     {
-        Condition => '$self->{CameraMake} =~ /^Panasonic/',
         Name => 'MakerNotePanasonic',
+        Condition => '$self->{CameraMake} =~ /^Panasonic/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Main',
             Start => '$valuePtr+12',
@@ -232,8 +256,8 @@ $VERSION = '1.06';
         },
     },
     {
-        Condition => '$self->{CameraMake} =~ /^(PENTAX|AOC|Asahi)/',
         Name => 'MakerNotePentax',
+        Condition => '$self->{CameraMake} =~ /^(PENTAX|AOC|Asahi)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::Main',
             # process as Unknown maker notes because the start offset and
@@ -243,11 +267,11 @@ $VERSION = '1.06';
         },
     },
     {
+        Name => 'MakerNoteRicoh',
         Condition => q{
             $self->{CameraMake}=~/^RICOH/ and
             $self->{MAKER_NOTE_HEADER}=~/^Ricoh/i
         },
-        Name => 'MakerNoteRicoh',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Ricoh::Main',
             Start => '$valuePtr + 8',
@@ -255,16 +279,16 @@ $VERSION = '1.06';
         },
     },
     {
+        Name => 'MakerNoteRicohText',
         Condition => '$self->{CameraMake}=~/^RICOH/',
-        Name => 'MakerNoteRicoh2',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Ricoh::TextMakerNote',
+            TagTable => 'Image::ExifTool::Ricoh::Text',
             ByteOrder => 'Unknown',
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/^SANYO/',
         Name => 'MakerNoteSanyo',
+        Condition => '$self->{CameraMake}=~/^SANYO/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sanyo::Main',
             Validate => '$val =~ /^SANYO/',
@@ -273,8 +297,8 @@ $VERSION = '1.06';
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/^(SIGMA|FOVEON)/',
         Name => 'MakerNoteSigma',
+        Condition => '$self->{CameraMake}=~/^(SIGMA|FOVEON)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sigma::Main',
             Validate => '$val =~ /^(SIGMA|FOVEON)/',
@@ -283,8 +307,8 @@ $VERSION = '1.06';
         },
     },
     {
-        Condition => '$self->{CameraMake}=~/^SONY/',
         Name => 'MakerNoteSony',
+        Condition => '$self->{CameraMake}=~/^SONY/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
             # validate the maker note because this is sometimes garbage
@@ -318,37 +342,83 @@ foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
 # Find start of IFD in unknown maker notes
 # Inputs: 0) reference to directory information
 # Returns: offset to IFD on success, undefined otherwise
+# - dirInfo may contain TagInfo reference for tag associated with directory
 # - on success, updates DirStart, DirLen, Base and DataPos in dirInfo
 # - also sets Relative flag in dirInfo if offsets are relative to IFD
 # Note: Changes byte ordering!
-sub LocateIFD($)
+sub LocateIFD($$)
 {
-    my $dirInfo = shift;
+    my ($exifTool, $dirInfo) = @_;
     my $dataPt = $dirInfo->{DataPt};
     my $dirStart = $dirInfo->{DirStart} || 0;
     my $size = $dirInfo->{DirLen} || ($dirInfo->{DataLen} - $dirStart);
+    my $tagInfo = $$dirInfo{TagInfo};
+    my $ifdOffsetPos;
+    # the IFD should be within the first 32 bytes
+    # (Kyocera sets the current record at 22 bytes)
+    my ($firstTry, $lastTry) = (0, 32);
 
-    # scan for something that looks like an IFD
-    if ($size >= 14) {  # minimum size for an IFD
+    # make sure Base and DataPos are defined
+    $dirInfo->{Base} or $dirInfo->{Base} = 0;
+    $dirInfo->{DataPos} or $dirInfo->{DataPos} = 0;
+#
+# use tag information (if provided) to determine directory location
+#
+    if ($tagInfo and $$tagInfo{SubDirectory}) {
+        my $subdir = $$tagInfo{SubDirectory};
+        unless ($$subdir{ProcessProc} and $$subdir{ProcessProc} eq \&ProcessUnknown) {
+            # look for the IFD at the "Start" specified in our SubDirectory information
+            my $valuePtr = $dirStart;
+            my $newStart = $dirStart;
+            if (defined $$subdir{Start}) {
+                #### eval Start ($valuePtr)
+                $newStart = eval($$subdir{Start});
+            }
+            if ($$subdir{Base}) {
+                # calculate subdirectory start relative to $base for eval
+                my $start = $newStart + $$dirInfo{DataPos};
+                #### eval Base ($start)
+                my $baseShift = eval($$subdir{Base});
+                # shift directory base (note: we may do this again below
+                # if an OffsetPt is defined, but that doesn't matter since
+                # the base shift is relative to DataPos, which we set too)
+                $$dirInfo{Base} += $baseShift;
+                $$dirInfo{DataPos} -= $baseShift;
+                # this is a relative directory if Base depends on $start
+                $$dirInfo{Relative} = 1 if $$subdir{Base} =~ /\$start\b/;
+            }
+            # add offset to the start of the directory if necessary
+            if ($$subdir{OffsetPt}) {
+                if ($$subdir{ByteOrder} =~ /^Little/i) {
+                    SetByteOrder('II');
+                } elsif ($$subdir{ByteOrder} =~ /^Big/i) {
+                    SetByteOrder('MM');
+                } else {
+                    warn "Can't have variable byte ordering for SubDirectories using OffsetPt\n";
+                    return undef;
+                }
+                #### eval OffsetPt ($valuePtr)
+                $ifdOffsetPos = eval($$subdir{OffsetPt}) - $dirStart;
+            }
+            # pinpoint position to look for this IFD
+            $firstTry = $lastTry = $newStart - $dirStart;
+        }
+    }
+#
+# scan for something that looks like an IFD
+#
+    if ($size >= 14 + $firstTry) {  # minimum size for an IFD
         my $offset;
-        # the IFD should be within the first 32 bytes
-        # (Kyocera sets the current record at 22 bytes)
-IFD_TRY: for ($offset=0; $offset<=32; $offset+=2) {
+IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
             last if $offset + 14 > $size;    # 14 bytes is minimum size for an IFD
             my $pos = $dirStart + $offset;
 #
-# look for a standard TIFF header (used by some Nikon maker notes),
-# or a FUJIFILM mess (which is similar to a TIFF, except that the 4-byte TIFF
-# header is replaced by 'FUJIFILM' and the byte order is always little endian)
+# look for a standard TIFF header (Nikon uses it, others may as well),
 #
-            my $ifdOffsetPos;
             if (SetByteOrder(substr($$dataPt, $pos, 2)) and
                 Get16u($dataPt, $pos + 2) == 0x2a)
             {
                 $ifdOffsetPos = 4;
-            } elsif ($offset == 0 and substr($$dataPt, $dirStart, 8) eq 'FUJIFILM') {
-                SetByteOrder('II');
-                $ifdOffsetPos = 8;
             }
             if (defined $ifdOffsetPos) {
                 # get pointer to IFD
@@ -357,9 +427,6 @@ IFD_TRY: for ($offset=0; $offset<=32; $offset+=2) {
                     # shift directory start and shorten dirLen accordingly
                     $dirInfo->{DirStart} += $ptr + $offset;
                     $dirInfo->{DirLen} -= $ptr + $offset;
-                    # make sure Base and DataPos are defined
-                    $dirInfo->{Base} or $dirInfo->{Base} = 0;
-                    $dirInfo->{DataPos} or $dirInfo->{DataPos} = 0;
                     # shift pointer base to the start of the TIFF header
                     my $shift = $dirInfo->{DataPos} + $dirStart + $offset;
                     $dirInfo->{Base} += $shift;
@@ -367,6 +434,7 @@ IFD_TRY: for ($offset=0; $offset<=32; $offset+=2) {
                     $dirInfo->{Relative} = 1;   # set "relative offsets" flag
                     return $ptr + $offset;
                 }
+                undef $ifdOffsetPos;
             }
 #
 # look for a standard IFD (starts with 2-byte entry count)
@@ -399,19 +467,12 @@ IFD_TRY: for ($offset=0; $offset<=32; $offset+=2) {
                 #  sort entries in order of tag ID so we don't have much of
                 #  a handle to verify this field)
                 # verify format
-                next IFD_TRY if $format < 1 or $format > 12;
+                next IFD_TRY if $format < 1 or $format > 13;
                 # count must be reasonable
                 next IFD_TRY if $count == 0 or $count > 0x10000;
             }
             $dirInfo->{DirStart} += $offset;    # update directory start
             $dirInfo->{DirLen} -= $offset;
-            # patch for Casio EX-Z3.  silly Casio programmers...
-            if ($offset == 6 and substr($$dataPt, $dirStart, 4) eq "QVC\0") {
-                $dirInfo->{Base} or $dirInfo->{Base} = 0;
-                $dirInfo->{DataPos} or $dirInfo->{DataPos} = 0;
-                $dirInfo->{Base} -= 20;
-                $dirInfo->{DataPos} += 20;
-            }
             return $offset;   # success!!
         }
     }
@@ -429,7 +490,7 @@ sub ProcessUnknown($$$)
     my $success = 0;
 
     my $saveOrder = GetByteOrder();
-    my $loc = LocateIFD($dirInfo);
+    my $loc = LocateIFD($exifTool,$dirInfo);
     if (defined $loc) {
         if ($exifTool->Options('Verbose') > 1) {
             my $indent = $exifTool->{INDENT};
@@ -471,6 +532,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames(3pm)|Image::ExifTool::TagNames>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

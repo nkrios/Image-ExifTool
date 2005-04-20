@@ -8,6 +8,7 @@
 package Image::ExifTool::CanonRaw;
 
 use strict;
+use Image::ExifTool::Fixup;
 
 # mappings to from RAW tagID to MakerNotes tagID
 # (Note: upper two bits of RawTagID are zero)
@@ -53,8 +54,11 @@ my %mapRotation = (
 sub InitMakerNotes($)
 {
     my $exifTool = shift;
-    $exifTool->{MAKER_NOTE_ENTRIES} = { };
-    $exifTool->{MAKER_NOTE_VAL_BUFF} = '';
+    $exifTool->{MAKER_NOTE_INFO} = {
+        Entries => { },     # directory entries keyed by tagID
+        ValBuff => ' ',     # value data buffer
+        FixupTags => { },   # flags for tags with data in value buffer
+    };
 }
 
 #------------------------------------------------------------------------------
@@ -90,17 +94,21 @@ sub BuildMakerNotes($$$$$$)
         $value = $$valuePt;
     }
     my $offsetVal;
+    my $makerInfo = $exifTool->{MAKER_NOTE_INFO};
     if ($size > 4) {
-        $offsetVal = Set32u(length($exifTool->{MAKER_NOTE_VAL_BUFF}));
-        $exifTool->{MAKER_NOTE_VAL_BUFF} .= $value;
+        my $len = length $makerInfo->{ValBuff};
+        $offsetVal = Set32u($len);
+        $makerInfo->{ValBuff} .= $value;
         # pad to an even number of bytes
-        $size & 0x01 and $exifTool->{MAKER_NOTE_VAL_BUFF} .= "\0";
+        $size & 0x01 and $makerInfo->{ValBuff} .= "\0";
+        # set flag indicating that this tag needs a fixup
+        $makerInfo->{FixupTags}->{$tagID} = 1;
     } else {
         $offsetVal = $value;
         $size < 4 and $offsetVal .= "\0" x (4 - $size);
     }
-    $exifTool->{MAKER_NOTE_ENTRIES}->{$tagID} = Set16u($tagID) . Set16u($format) .
-                                                Set32u($count) . $offsetVal;
+    $makerInfo->{Entries}->{$tagID} = Set16u($tagID) . Set16u($format) .
+                                      Set32u($count) . $offsetVal;
 }
 
 #------------------------------------------------------------------------------
@@ -110,8 +118,11 @@ sub SaveMakerNotes($)
 {
     my $exifTool = shift;
     # save maker notes
-    my $dirEntries = $exifTool->{MAKER_NOTE_ENTRIES};
+    my $makerInfo = $exifTool->{MAKER_NOTE_INFO};
+    delete $exifTool->{MAKER_NOTE_INFO};
+    my $dirEntries = $makerInfo->{Entries};
     my $numEntries = scalar(keys %$dirEntries);
+    my $fixup = new Image::ExifTool::Fixup;
     return unless $numEntries;
     # build the MakerNotes directory
     my $makerNotes = Set16u($numEntries);
@@ -119,18 +130,24 @@ sub SaveMakerNotes($)
     # write the entries in proper tag order (even though Canon doesn't do this...)
     foreach $tagID (sort { $a <=> $b } keys %$dirEntries) {
         $makerNotes .= $$dirEntries{$tagID};
+        next unless $makerInfo->{FixupTags}->{$tagID};
+        # add fixup for this pointer
+        $fixup->AddFixup(length($makerNotes) - 4);
     }
     # save position of maker notes for pointer fixups
-    $exifTool->{MAKER_NOTE_POS} = -length($makerNotes);
+    $fixup->{Shift} += length($makerNotes);
+    $exifTool->{MAKER_NOTE_FIXUP} = $fixup;
     # add value data
-    $makerNotes .= $exifTool->{MAKER_NOTE_VAL_BUFF};
+    $makerNotes .= $makerInfo->{ValBuff};
     # get MakerNotes tag info
     my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Exif::Main');
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, 0x927c);
     # save the MakerNotes
     $exifTool->FoundTag($tagInfo, $makerNotes);
-    delete $exifTool->{MAKER_NOTE_ENTRIES};
-    delete $exifTool->{MAKER_NOTE_VAL_BUFF};
+    # save the garbage collection some work later
+    delete $makerInfo->{Entries};
+    delete $makerInfo->{ValBuff};
+    delete $makerInfo->{FixupTags};
     # also generate Orientation tag since Rotation isn't transferred from RAW info
     my $rotation = $exifTool->GetValue('Rotation', 'ValueConv');
     if (defined $rotation and defined $mapRotation{$rotation}) {
@@ -445,6 +462,11 @@ sub WriteCRW($$)
     $raf->Seek(0, 2)         or return 0;   # seek to end of file
     my $filesize = $raf->Tell() or return 0;
 
+    if ($exifTool->{DEL_GROUP}) {
+        $exifTool->Error("Can't delete groups in CRW file");
+        return 0;
+    }
+
     # build directory information for main raw directory
     my %dirInfo = (
         DataLen  => 0,
@@ -467,7 +489,7 @@ sub WriteCRW($$)
             $rtnVal = 1;    # success!
         }
     } else {
-        $exifTool->Error('Error rewriting RAW file');
+        $exifTool->Error('Error rewriting CRW file');
     }
     return $rtnVal;
 }
@@ -506,7 +528,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>,
-http://owl.phy.queensu.ca/~phil/exiftool/canon_raw.html
+L<Image::ExifTool(3pm)|Image::ExifTool>,
+L<http://owl.phy.queensu.ca/~phil/exiftool/canon_raw.html>
 
 =cut

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.01
 [File, File, Image]  - File Name: Writer_12_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6KB
@@ -59,12 +59,12 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1760
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1734
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Pentax, Camera] 1 - Pentax Mode: Night-scene
 [MakerNotes, Pentax, Image] 2 - Preview Image Size: 320x240
-[MakerNotes, Pentax, Image] 3 - Preview Image Length: 26
-[MakerNotes, Pentax, Image] 4 - Preview Image Start: 1258
+[MakerNotes, Pentax, Image] 3 - Preview Image Length: 0
+[MakerNotes, Pentax, Image] 4 - Preview Image Start: 1306
 [MakerNotes, Pentax, Camera] 6 - Date: 2003:03:06
 [MakerNotes, Pentax, Camera] 7 - Time: 13:09:25
 [MakerNotes, Pentax, Camera] 8 - Image Quality: Better
@@ -88,7 +88,6 @@
 [Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
-[Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
 [Composite, Composite, Image]  - Shutter Speed: 1/500
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

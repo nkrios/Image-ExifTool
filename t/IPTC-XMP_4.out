@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.02
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 100
 [File, File, Image]  - Image Height: 80
@@ -70,6 +70,7 @@
 [Photoshop, Photoshop, Image] 0 - Photoshop Quality: 7
 [Photoshop, Photoshop, Image] 1 - Photoshop Format: Standard
 [Photoshop, Photoshop, Image] 2 - Progressive Scans: 3 Scans
+[XMP, XMP-iptcCore, Author] CreatorContactInfoCiAdrCtry - Creator Country: Canada
 [XMP, XMP-dc, Author] Creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] Description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] Rights - Rights: Copyright 2004 Phil Harvey
@@ -138,5 +139,4 @@
 [Composite, Composite, Image]  - Image Size: 100x80
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 103.1
 [Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 0 bytes)
 [Composite, Composite, Camera]  - Focal Length: 6.0mm (35mm equivalent: 618.9mm)

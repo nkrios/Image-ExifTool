@@ -18,6 +18,7 @@
 #               5) Brian Ristuccia private communication (tests with D70)
 #               6) Danek Duvall private communication (tests with D70)
 #               7) Tom Christiansen private communication (tchrist@perl.com)
+#               8) Robert Rottmerhusen private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -26,7 +27,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 %Image::ExifTool::Nikon::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -229,9 +230,15 @@ $VERSION = '1.19';
             });
         ],
     },
-    # 0x008b First byte depends on len used, last 3 010c00 (ref 2)
-    #   40 with kit len, 48 with nikon 70-300G , 3c with Nikon 70-300, 48 with old nikon
-    #   70-210, 44 with Nikon 135 400
+    0x008b => { #8
+        Name => 'LensFStops',
+        ValueConv => 'my ($a,$b,$c)=unpack("C3",$val); $c ? $a*($b/$c) : 0',
+        ValueConvInv => 'my $a=int($val*12+0.5);$a<256 ? pack("C4",$a,1,12,0) : undef',
+        PrintConv => 'sprintf("%.2f", $val)',
+        PrintConvInv => '$val',
+        Writable => 'undef',
+        Count => 4,
+    },
     0x008c => {
         Name => 'NEFCurve1',
         Writable => 0,
@@ -584,11 +591,13 @@ it under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Joseph Heled, Thomas Walter, Brian Ristuccia, Danek Duvall and
-Tom Christiansen for their help figuring out some Nikon tags.
+Thanks to Joseph Heled, Thomas Walter, Brian Ristuccia, Danek Duvall, Tom
+Christiansen and Robert Rottmerhusen for their help figuring out some Nikon
+tags.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/Nikon Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -148,10 +148,10 @@ sub BuildMakerNotes($$$$$$);
         },
         {
             # assume everything else is a D30/D60
-            Name => 'CanonCustomFunctions',
+            Name => 'CanonCustomFunctionsD30',
             Writable => 0,
             SubDirectory => {
-                TagTable => 'Image::ExifTool::CanonCustom::Functions',
+                TagTable => 'Image::ExifTool::CanonCustom::FunctionsD30',
             },
         },
     ],
@@ -265,6 +265,7 @@ sub BuildMakerNotes($$$$$$);
     0x2008 => {
         Name => 'ThumbnailImage',
         Writable => 'resize',  # 'resize' allows this value to change size
+        WriteCheck => '$self->CheckImage(\$val)',
         Permanent => 0,
         ValueConv => '\$val',
         ValueConvInv => '$val',
@@ -720,7 +721,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::CanonRaw - Definitions for Canon RAW file meta information
+Image::ExifTool::CanonRaw - Definitions for Canon CRW file meta information
 
 =head1 SYNOPSIS
 
@@ -729,9 +730,15 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to interpret
-meta information from Canon RAW files.  These files are written directly by
-some Canon cameras, and contain meta information similar to that found in
+meta information from Canon CRW raw files.  These files are written directly
+by some Canon cameras, and contain meta information similar to that found in
 the EXIF Canon maker notes.
+
+=head1 NOTES
+
+The CR2 format written by some Canon cameras is very different the CRW
+format processed by this module.  (CR2 is TIFF-based and uses standard EXIF
+tags.)
 
 =head1 AUTHOR
 
@@ -750,13 +757,14 @@ it under the same terms as Perl itself.
 
 =item http://xyrion.org/ciff/
 
-=item Lots of testing with my own camera... ;)
+=item http://owl.phy.queensu.ca/~phil/exiftool/canon_raw.html
 
 =back
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool::TagNames/CanonRaw Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut
 

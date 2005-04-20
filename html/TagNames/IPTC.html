@@ -14,15 +14,16 @@ are not null terminated.
 <p>IPTC information is separated into different records, each of which has its
 own set of tags.
 
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Record</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Record</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>1</td>
 <td>IPTCEnvelope</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='IPTC.html#EnvelopeRecord'>IPTC EnvelopeRecord Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>2</td>
 <td>IPTCApplication</td>
 <td align='center'>-</td>
@@ -32,7 +33,7 @@ own set of tags.
 <td>IPTCNewsPhoto</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='IPTC.html#NewsPhoto'>IPTC NewsPhoto Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>7</td>
 <td>IPTCPreObjectData</td>
 <td align='center'>-</td>
@@ -42,23 +43,24 @@ own set of tags.
 <td>IPTCObjectData</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='IPTC.html#ObjectData'>IPTC ObjectData Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>9</td>
 <td>IPTCPostObjectData</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='IPTC.html#PostObjectData'>IPTC PostObjectData Tags</a></td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='EnvelopeRecord'>IPTC EnvelopeRecord Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>EnvelopeRecordVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>5</td>
 <td>Destination</td>
 <td align='center'>string[0,1024]</td>
@@ -97,7 +99,7 @@ own set of tags.
   <br>27 = Tidningarnas Telegrambyra NITF version (TTNITF DTD)
   <br>28 = Ritzaus Bureau NITF version (RBNITF DTD)
   <br>29 = Corel Draw [.CDR]</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>22</td>
 <td>FileVersion</td>
 <td align='center'>int16u</td>
@@ -107,7 +109,7 @@ own set of tags.
 <td>ServiceIdentifier</td>
 <td align='center'>string[0,10]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>40</td>
 <td>EnvelopeNumber</td>
 <td align='center'>digits[8]</td>
@@ -117,7 +119,7 @@ own set of tags.
 <td>ProductID</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>60</td>
 <td>EnvelopePriority</td>
 <td align='center'>digits[1]</td>
@@ -127,7 +129,7 @@ own set of tags.
 <td>DateSent</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>80</td>
 <td>TimeSent</td>
 <td align='center'>string[11]</td>
@@ -137,7 +139,7 @@ own set of tags.
 <td>CodedCharacterSet</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>100</td>
 <td>UniqueObjectName</td>
 <td align='center'>string[14,80]</td>
@@ -147,23 +149,24 @@ own set of tags.
 <td>ARMIdentifier</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>122</td>
 <td>ARMVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='ApplicationRecord'>IPTC ApplicationRecord Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>ApplicationRecordVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>3</td>
 <td>ObjectTypeReference</td>
 <td align='center'>string[3,67]</td>
@@ -173,7 +176,7 @@ own set of tags.
 <td>ObjectAttributeReference</td>
 <td align='center'>string[4,68]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>5</td>
 <td>ObjectName</td>
 <td align='center'>string[0,64]</td>
@@ -183,7 +186,7 @@ own set of tags.
 <td>EditStatus</td>
 <td align='center'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>8</td>
 <td>EditorialUpdate</td>
 <td align='center'>digits[2]</td>
@@ -193,7 +196,7 @@ own set of tags.
 <td>Urgency</td>
 <td align='center'>digits[1]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>12</td>
 <td>SubjectReference</td>
 <td align='center'>string[13,236]</td>
@@ -203,7 +206,7 @@ own set of tags.
 <td>Category</td>
 <td align='center'>string[0,3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>20</td>
 <td>SupplementalCategories</td>
 <td align='center'>string[0,32]</td>
@@ -213,7 +216,7 @@ own set of tags.
 <td>FixtureIdentifier</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>25</td>
 <td>Keywords</td>
 <td align='center'>string[0,64]</td>
@@ -223,7 +226,7 @@ own set of tags.
 <td>ContentLocationCode</td>
 <td align='center'>string[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>27</td>
 <td>ContentLocationName</td>
 <td align='center'>string[0,64]</td>
@@ -233,7 +236,7 @@ own set of tags.
 <td>ReleaseDate</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>35</td>
 <td>ReleaseTime</td>
 <td align='center'>digits[11]</td>
@@ -243,7 +246,7 @@ own set of tags.
 <td>ExpirationDate</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>38</td>
 <td>ExpirationTime</td>
 <td align='center'>digits[11]</td>
@@ -253,7 +256,7 @@ own set of tags.
 <td>SpecialInstructions</td>
 <td align='center'>string[0,256]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>42</td>
 <td>ActionAdvised</td>
 <td align='center'>digits[2]</td>
@@ -266,7 +269,7 @@ own set of tags.
 <td>ReferenceService</td>
 <td align='center'>string[0,10]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>47</td>
 <td>ReferenceDate</td>
 <td align='center'>digits[8]</td>
@@ -276,7 +279,7 @@ own set of tags.
 <td>ReferenceNumber</td>
 <td align='center'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>55</td>
 <td>DateCreated</td>
 <td align='center'>digits[8]</td>
@@ -286,7 +289,7 @@ own set of tags.
 <td>TimeCreated</td>
 <td align='center'>digits[11]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>62</td>
 <td>DigitalCreationDate</td>
 <td align='center'>digits[8]</td>
@@ -296,7 +299,7 @@ own set of tags.
 <td>DigitalCreationTime</td>
 <td align='center'>digits[11]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>65</td>
 <td>OriginatingProgram</td>
 <td align='center'>string[0,32]</td>
@@ -306,7 +309,7 @@ own set of tags.
 <td>ProgramVersion</td>
 <td align='center'>string[0,10]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>75</td>
 <td>ObjectCycle</td>
 <td align='center'>string[1]</td>
@@ -318,7 +321,7 @@ own set of tags.
 <td>By-line</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>85</td>
 <td>By-lineTitle</td>
 <td align='center'>string[0,32]</td>
@@ -328,7 +331,7 @@ own set of tags.
 <td>City</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>92</td>
 <td>Sub-location</td>
 <td align='center'>string[0,32]</td>
@@ -338,7 +341,7 @@ own set of tags.
 <td>Province-State</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>100</td>
 <td>Country-PrimaryLocationCode</td>
 <td align='center'>string[3]</td>
@@ -348,7 +351,7 @@ own set of tags.
 <td>Country-PrimaryLocationName</td>
 <td align='center'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>103</td>
 <td>OriginalTransmissionReference</td>
 <td align='center'>string[0,32]</td>
@@ -358,7 +361,7 @@ own set of tags.
 <td>Headline</td>
 <td align='center'>string[0,256]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>110</td>
 <td>Credit</td>
 <td align='center'>string[0,32]</td>
@@ -368,7 +371,7 @@ own set of tags.
 <td>Source</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>116</td>
 <td>CopyrightNotice</td>
 <td align='center'>string[0,128]</td>
@@ -378,7 +381,7 @@ own set of tags.
 <td>Contact</td>
 <td align='center'>string[0,128]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>120</td>
 <td>Caption-Abstract</td>
 <td align='center'>string[0,2000]</td>
@@ -388,7 +391,7 @@ own set of tags.
 <td>Writer-Editor</td>
 <td align='center'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>125</td>
 <td>RasterizedCaption</td>
 <td align='center'>string[7360]</td>
@@ -398,7 +401,7 @@ own set of tags.
 <td>ImageType</td>
 <td align='center'>string[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>131</td>
 <td>ImageOrientation</td>
 <td align='center'>string[1]</td>
@@ -410,7 +413,7 @@ own set of tags.
 <td>LanguageIdentifier</td>
 <td align='center'>string[2,3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>150</td>
 <td>AudioType</td>
 <td align='center'>string[2]</td>
@@ -436,7 +439,7 @@ own set of tags.
 <td>AudioSamplingRate</td>
 <td align='center'>digits[6]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>152</td>
 <td>AudioSamplingResolution</td>
 <td align='center'>digits[2]</td>
@@ -446,7 +449,7 @@ own set of tags.
 <td>AudioDuration</td>
 <td align='center'>digits[6]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>154</td>
 <td>AudioOutcue</td>
 <td align='center'>string[0,64]</td>
@@ -485,7 +488,7 @@ own set of tags.
   <br>27 = Tidningarnas Telegrambyra NITF version (TTNITF DTD)
   <br>28 = Ritzaus Bureau NITF version (RBNITF DTD)
   <br>29 = Corel Draw [.CDR]</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>201</td>
 <td>ObjectPreviewFileVersion</td>
 <td align='center'>int16u</td>
@@ -495,18 +498,19 @@ own set of tags.
 <td>ObjectPreviewData</td>
 <td align='center'>string[0,256000]</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='NewsPhoto'>IPTC NewsPhoto Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
 <td>NewsPhotoVersion</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>10</td>
 <td>IPTCPictureNumber</td>
 <td align='center'>string[16]</td>
@@ -516,7 +520,7 @@ own set of tags.
 <td>IPTCImageWidth</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>30</td>
 <td>IPTCImageHeight</td>
 <td align='center'>int16u</td>
@@ -526,7 +530,7 @@ own set of tags.
 <td>IPTCPixelWidth</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>50</td>
 <td>IPTCPixelHeight</td>
 <td align='center'>int16u</td>
@@ -539,7 +543,7 @@ own set of tags.
   <br>1 = Reduced Resolution Image
   <br>2 = Logo
   <br>3 = Rasterized Caption</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>60</td>
 <td>ColorRepresentation</td>
 <td align='center'>int16u</td>
@@ -569,7 +573,7 @@ own set of tags.
   <br>6 = Lab (K) CIE
   <br>7 = YCbCr
   <br>8 = sRGB</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>65</td>
 <td>ColorSequence</td>
 <td align='center'>int8u</td>
@@ -579,7 +583,7 @@ own set of tags.
 <td>ICCProfile</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>70</td>
 <td>ColorCalibrationMatrix</td>
 <td align='center'>N</td>
@@ -589,7 +593,7 @@ own set of tags.
 <td>LookupTable</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>84</td>
 <td>NumIndexEntries</td>
 <td align='center'>int16u</td>
@@ -599,7 +603,7 @@ own set of tags.
 <td>ColorPalette</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>86</td>
 <td>IPTCBitsPerSample</td>
 <td align='center'>int8u</td>
@@ -611,7 +615,7 @@ own set of tags.
 <td><font size='-1'>0 = OrthogonalConstangSampling
   <br>1 = Orthogonal4-2-2Sampling
   <br>2 = CompressionDependent</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>100</td>
 <td>ScanningDirection</td>
 <td align='center'>int8u</td>
@@ -631,7 +635,7 @@ own set of tags.
   <br>1 = 90
   <br>2 = 180
   <br>3 = 270</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>110</td>
 <td>DataCompressionMethod</td>
 <td align='center'>int32u</td>
@@ -648,7 +652,7 @@ own set of tags.
   <br>5 = Compression Method Specific
   <br>6 = Color Space Specific
   <br>7 = Gamma Compensated</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>125</td>
 <td>EndPoints</td>
 <td align='center'>N</td>
@@ -659,7 +663,7 @@ own set of tags.
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = Not Allowed
   <br>1 = Allowed</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>135</td>
 <td>BitsPerComponent</td>
 <td align='center'>int8u</td>
@@ -669,16 +673,17 @@ own set of tags.
 <td>MaximumDensityRange</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>145</td>
 <td>GammaCompensatedValue</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='PreObjectData'>IPTC PreObjectData Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>10</td>
@@ -686,7 +691,7 @@ own set of tags.
 <td align='center'>N</td>
 <td><font size='-1'>0 = Size Not Known
   <br>1 = Size Known</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>20</td>
 <td>MaxSubfileSize</td>
 <td align='center'>N</td>
@@ -696,38 +701,40 @@ own set of tags.
 <td>ObjectSizeAnnounced</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>95</td>
 <td>MaximumObjectSize</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='ObjectData'>IPTC ObjectData Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>10</td>
 <td>SubFile</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <h2><a name='PostObjectData'>IPTC PostObjectData Tags</a></h2>
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Tag ID</th><th>Tag Name</th>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>10</td>
 <td>ConfirmedObjectSize</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-</table></blockquote>
+</table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 2, 2005</i>
+<br><i>Last revised Apr 11, 2005</i>
 </body>
 </html>

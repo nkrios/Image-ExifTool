@@ -21,6 +21,10 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>CameraModel</td><td>Camera model name set during reading and writing</td></tr>
 
+<tr><td>DEL_GROUP</td><td>Hash of groups to delete</td></tr>
+
+<tr><td>DEL_PREVIEW</td><td>Flag to delete preview from after JPEG EOI</td></tr>
+
 <tr><td>DIR_NAME</td><td>Name of directory currently being processed</td></tr>
 
 <tr><td>EDIT_DIRS</td><td>Hash of parent directories for each directory edited during
@@ -46,34 +50,40 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>IO_TAG_LIST</td><td>List for output of requested tags in proper case and order</td></tr>
 
-<tr><td>MAKER_NOTE_ENTRIES</td><td>Used by Image::ExifTool::CanonRaw as temporary storage for
-    maker note directory entries when synthesizing maker notes from CRW file with the
-    MakerNotes option</td></tr>
+<tr><td>MAKER_NOTE_INFO</td><td>Used by Image::ExifTool::CanonRaw as temporary storage for
+    maker note information when synthesizing maker notes from CRW file with the
+    MakerNotes option.</td></tr>
+
+<tr><td>MAKER_NOTE_FIXUP</td><td>Fixup information for maker notes extracted with the MakerNotes
+    option.  Used by SetNewValuesFromFile() to adjust offsets in maker note IFD</td></tr>
 
 <tr><td>MAKER_NOTE_HEADER</td><td>First 48 bytes of maker note data.  Used for identification</td></tr>
 
-<tr><td>MAKER_NOTE_POS</td><td>Position of maker note in source file set if maker notes are
-    extracted with MakerNotes option.  Used by SetNewValuesFromFile() to adjust offsets in
-    maker note IFD</td></tr>
-
-<tr><td>MAKER_NOTE_VAL_BUFF</td><td>Used by Image::ExifTool::CanonRaw as temporary storage for
-    maker note value information when synthesizing maker notes from CRW file with the
-    MakerNotes option</td></tr>
-
-<tr><td>MAKER_NOTE_WARN</td><td>Warning flag set if pointers in maker notes directory run
-    outside of maker notes data</td></tr>
-
 <tr><td>NEW_VALUE</td><td>Hash of new value information keyed by tag info reference
 	Elements of new value information hash are:
-    <table><tr><td>TagInfo</td><td>- tag information reference</td></tr>
-    <tr><td>DelValue</td><td>- list of specific values to delete</td></tr>
-    <tr><td>Value</td><td>- list of values to add</td></tr>
-    <tr><td>IsCreating</td><td>- must be set for the tag to be added.  otherwise just
-    	changed if it already exists</td></tr></table>
+    <table><tr><td>TagInfo</td><td>-</td><td>tag information reference</td></tr>
+    <tr><td>DelValue</td><td>-</td><td>list of specific values to delete</td></tr>
+    <tr><td>Value</td><td>-</td><td>list of values to add</td></tr>
+    <tr valign='top'><td>IsCreating</td><td>-</td><td>must be set for the tag to be added.  otherwise just
+    	changed if it already exists</td></tr>
+    </table></td></tr>
 
 <tr><td>NUM_FOUND</td><td>Number of tags found</td></tr>
 
 <tr><td>OPTIONS</td><td>ExifTool options</td></tr>
+
+<tr><td>PREVIEW_INFO</td><td>Information about preview image used while writing JPEG
+    images only.  This is a reference to a hash with the following entries:
+    <table>
+    <tr><td>BaseShift</td><td>-</td><td>shift for base of pointer offsets</td></tr>
+    <tr valign='top'><td>Data</td><td>-</td><td>data for PreviewImage to be written (may either be data
+    for the old or new image, or 'LOAD' to indicate that the data must be loaded from outside
+    the EXIF segment)</td></tr>
+    <tr><td>Fixup</td><td>-</td><td>fixup for PreviewImage pointers when writing JPEG images</td></tr>
+    <tr valign='top'><td>IsValue</td><td>-</td><td>flag indicates that image was referenced as the value
+    of an IFD pointer, which means the image must fit inside the EXIF segment</td></tr>
+    <tr><td>Relative</td><td>-</td><td>flag to indicate that pointer offsets are relative</td></tr>
+    </table></td></tr>
 
 <tr><td>PRINT_CONV</td><td>Hash of PrintConv values keyed by tag key</td></tr>
 

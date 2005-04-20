@@ -1,7 +1,11 @@
 [ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 4.95
-[File, File, Image]  - File Name: ExifTool.jpg
+[File, File, Image]  - File Name: Writer_16_failed.jpg
 [File, File, Image]  - Directory: t
+[File, File, Image]  - File Size: 2KB
 [File, File, Image]  - File Type: JPEG
+[File, File, Image]  - Image Width: 160
+[File, File, Image]  - Image Height: 120
+[EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 282 - X Resolution: 180
@@ -43,12 +47,8 @@
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [Composite, Composite, Image]  - Aperture: 14.0
-[Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
-[Composite, Composite, Camera]  - Shooting Mode: Manual
+[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 29.3
 [Composite, Composite, Image]  - Shutter Speed: 4
-[Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 54.0mm)
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)
+[Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 997.1mm)
