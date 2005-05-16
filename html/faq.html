@@ -1,0 +1,67 @@
+<html>
+<head>
+  <title>ExifTool FAQ</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h1>ExifTool FAQ</h1>
+
+<h4>Is there a forum for discussing ExifTool issues?</h4>
+
+<blockquote>
+An ExifTool forum is provided by CPAN at
+<a href="http://www.cpanforum.com/dist/Image-ExifTool">http://www.cpanforum.com/dist/Image-ExifTool</a>
+</blockquote>
+
+<h4>ExifTool reports the wrong value for a tag, or doesn't write a tag properly</h4>
+
+<blockquote>
+Make sure you are looking at the right information.  Many tags are duplicated in
+different locations within an image.  When in doubt, use
+<code><font color='#880000'>"exiftool -a -G1 FILENAME"</font></code> to show all
+tags and their locations in the file.  In this command,
+<code><font color='#880000'>"-a"</font></code> allows duplicate tags to be
+displayed, <code><font color='#880000'>"-G1"</font></code> shows the family 1
+group name (ie. the location) of each tag, and
+<code><font color='#880000'>"FILENAME"</font></code> is the name of your image
+file.
+
+<p>You can read or write information in a specific location if necessary by
+prefixing the tag name on the command line with the desired group name.  ie)
+<code><font color='#880000'>"-ExifIFD:DateTimeOriginal"</font></code>
+</blockquote>
+
+<h4>ExifTool reports more than one shutter speed or aperture value, and
+they are slightly different</h4>
+
+<blockquote>
+There are a number of different ways that aperture and shutter speed information
+get saved in an image.  The standard EXIF values (EXIF:FNumber and
+EXIF:ExposureTime) should correspond to the values displayed by your camera, but
+these values may have been rounded off.  The APEX values (EXIF:ApertureValue and
+EXIF:ShutterSpeedValue) may be different due to their own round-off errors.  If
+available, the MakerNotes values are the typically the most accurate because
+they haven't been rounded off at all, but you may see odd values like 1/102
+instead of 1/100, etc.
+</blockquote>
+
+<h4>I can't delete all EXIF information from a TIFF file using
+<code><font color='#880000'>"exiftool -exif:all= img.tif"</font></code></h4>
+
+<blockquote>
+This is because of the way a TIFF file is structured.  With a JPEG image, this
+command will remove IFD0 (the main Image File Directory) as well as any
+subdirectories, thus removing all EXIF information.  But with the TIFF format,
+the main image itself is stored in IFD0, so deleting this directory would
+destroy the image.  Instead, ExifTool just deletes the ExifIFD subdirectory, so
+any information stored in other directories is preserved.
+
+<p>Use <code><font color='#880000'>"exiftool -a -G1 img.tif"</font></code> to
+see where the information is stored.  Any information remaining in other IFD's
+must be deleted separately from a TIFF file if desired.
+</blockquote>
+
+<hr>
+<i>Last revised May 4, 2005</i>
+<p><a href="index.html">&lt;-- Back to ExifTool home page</a>
+</body>
+</html>

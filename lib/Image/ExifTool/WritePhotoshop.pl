@@ -187,6 +187,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
+L<Image::ExifTool::Photoshop(3pm)|Image::ExifTool::Photoshop>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

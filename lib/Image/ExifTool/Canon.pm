@@ -24,7 +24,7 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
@@ -718,7 +718,7 @@ $VERSION = '1.13';
     1 => [
         { #5
             Name => 'FileNumber',
-            Condition => '$self->{CameraModel} =~ /\b20D/',
+            Condition => '$self->{CameraModel} =~ /\b(20D|REBEL XT|350D)/',
             Format => 'int32u',
             # Thanks to Juha Eskelinen for figuring this out:
             # this is an odd bit mapping -- it looks like the file number exists as a
@@ -1091,9 +1091,9 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+=item L<http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html>
 
-=item http://www.wonderland.org/crw/
+=item L<http://www.wonderland.org/crw/>
 
 =item (...plus lots of testing with my own camera!)
 

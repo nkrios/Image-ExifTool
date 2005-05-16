@@ -365,7 +365,7 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+=item L<http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html>
 
 =back
 

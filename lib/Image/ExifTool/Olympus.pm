@@ -1036,11 +1036,11 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+=item L<http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html>
 
-=item http://www.cybercom.net/~dcoffin/dcraw/
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
-=item http://www.ozhiker.com/electronics/pjmt/jpeg_info/olympus_mn.html
+=item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/olympus_mn.html>
 
 =back
 

@@ -1,7 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.03
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
 [File, File, Image]  - File Name: Writer_8_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 7KB
+[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:23:22
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -17,7 +18,6 @@
 [EXIF, ExifIFD, Image] 33437 - Aperture: 14.0
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2005:01:01 00:00:00
 [EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:12:04 06:46:52
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
@@ -47,6 +47,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Manual
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
+[EXIF, IFD0, Time] 36867 - Shooting Date/Time: 2005:01:01 00:00:00
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
 [MakerNotes, Canon, Camera] 3 - Image Quality: RAW

@@ -7,7 +7,7 @@
 <h1>ExifTool by Phil Harvey</h1>
 
 <table bgcolor='#cc0000'><tr><td>
-<font color='#ffffff' size='+1'>ExifTool Version 5 is Here!</font>
+<font color='#ffffff' size='+1'><b>ExifTool Version 5 is Here!</b></font>
 </td></tr></table>
 
 <p>ExifTool versions 4.00 through 4.95 were an evolution of the writing
@@ -15,8 +15,8 @@ abilities, but with the release of version 5 all of the major planned
 writing features have now been incorporated!
 
 <h3>
-<a href="Image-ExifTool-5.05.tar.gz">
-Download        Version 5.05</a> - Apr. 20, 2005
+<a href="Image-ExifTool-5.18.tar.gz">
+Download        Version 5.18</a> - May 16, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
@@ -46,7 +46,8 @@ or suggestions.  My e-mail address is in the README file.  Thanks.
 <li>writes EXIF, GPS, IPTC, XMP and MakerNotes information
 <li>reads and writes maker notes of many digital cameras
 <li>deletes meta information individually, in groups, or all together
-<li>transfers meta information between files with different formats
+<li>copies meta information between files (even if they are different formats)
+<li>allows information to be rewritten to any specified tag or location
 <li>highly customizable, can extract exactly what you want
 <li>scans entire directory trees
 <li>easy to add support for new camera types by editing ExifTool modules
@@ -54,6 +55,7 @@ or suggestions.  My e-mail address is in the README file.  Thanks.
 <li>extracts thumbnail images, preview images, and JPEG images embedded in RAW files
 <li>ability to organize output into groups
 <li>recognizes over <a href="TagNames/index.html">1000 different tags</a>
+<li>sets the file modification date from EXIF information
 </ul>
 
 <h2><font color='#cc0000'>Writer Limitations</font></h2>
@@ -136,11 +138,10 @@ that is useful for debugging or when decoding new tags.
 Tag names are entered on the command line with a leading '-' in the order you
 want them displayed.  Case is not significant.  The tag name may be prefixed by
 a group name from family 0 or 1, separated by a colon, to specify a location for
-the information.  A special tag name of 'All' may be used to when deleting
-information to delete all tags, or all tags in a specified group (for family 0
-groups only).
+the information.  A special tag name of 'All' may be used to represent all tags,
+or all tags in a specified group.
 
-<blockquote>ie) "exiftool -filename -imagesize -exif:fnumber image.jpg"</blockquote>
+<blockquote>ie) "exiftool -filename -imagesize -exif:fnumber -xmp:all image.jpg"</blockquote>
 
 <p>A complete list of <a href="TagNames/index.html">ExifTool Tag Names</a>
 accompanies this documentation.  As well, current lists of available tag names
@@ -260,15 +261,17 @@ or set a value from file.  The following table outlines the different write synt
 <p>Note that quotes are required around VALUE if it contains spaces, and around the
 whole argument if the '&lt;=' syntax is used (to prevent shell redirection).
 
-<h3>AllTagsFromFile</h3>
+<h3>The "-TagsFromFile" Option</h3>
 
-A special ExifTool option allows copying all tags from one file to another.
-The command-line syntax for doing this is "-AllTagsFromFile SRCFILE".  This
-option is very simple, yet very powerful.  It reads all information from
-SRCFILE and attempts to write each tag found to the destination file.
-Depending on the formats of the source and destination files, some of tags
-read may not be valid in the destination file, in which case they aren't
-written. No translation between similar tags with different names is done.
+A special ExifTool option allows copying tags from one file to another. The
+command-line syntax for doing this is "-TagsFromFile SRCFILE".  Any tags
+specifed after this option on the command line are extracted from source file
+and written to the destination file.  If no tags are specified, then all writable
+tags are copied.  This option is very simple, yet very powerful.  Depending on
+the formats of the source and destination files, some of tags read may not be
+valid in the destination file, in which case they aren't written.  No
+translation between similar tags with different names is done, although
+information may be transferred between same-named tags in different groups.
 
 <h2>The Image::ExifTool Perl Library Module</h2>
 
@@ -293,8 +296,9 @@ binary data.  The simple script above does not handle this case.
 
 <p>See the <a href="ExifTool.html">Image::ExifTool Documentation</a> for more details.
 
-<h2>Addition Documentation</h2>
+<h2>Addition Documentation/Help</h2>
 <ul>
+<li><a href="faq.html">ExifTool FAQ</a>
 <li><a href="history.html">ExifTool Revision History</a>
 <li><a href="exiftool_pod.html">exiftool Application Script</a>
 <li><a href="TagNames/index.html">ExifTool Tag Names</a>
@@ -302,6 +306,9 @@ binary data.  The simple script above does not handle this case.
 <li><a href="writing.html">Comments on the Subject of Writing Meta Information</a>
 <li><a href="canon_raw.html">Canon RAW (CRW) File Format Specification</a>
 </ul>
+
+Also, visit the <a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool
+Forum</a> at CPAN.
 
 <h2>License</h2>
 
@@ -359,6 +366,7 @@ And thanks to the following people for their help:
 <li>Tom Christiansen for his help decoding some Nikon tags
 <li>Markku H&auml;nninen for help decoding tags for the Olympus E-1
 <li>Frank Ledwon for decoding many new Olympus tags
+<li>Robert Rottmerhusen for decoding many tricky Nikon lens data tags
 </ul>
 
 <hr>

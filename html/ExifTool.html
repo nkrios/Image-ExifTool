@@ -307,7 +307,7 @@ to a specific function.
 <tr><th>Option</th><th>Description</th><th>Values</th><th>Default</th></tr>
 <tr><td>Binary</td><td>Flag to get values of all binary tags.
     Unless set, large binary values are only extracted for specifically requested tags.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
-<tr><td>Charset</td><td>Character set for converting XP characters.</td>
+<tr><td>Charset</td><td>Character set for converting Unicode character strings.</td>
     <td><table>
     <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF8 characters</td></tr>
     <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
@@ -335,7 +335,8 @@ to a specific function.
     <td align='center'>-</td></tr>
 <tr><td>List</td><td>Flag to extract lists of PrintConv values into arrays instead of concatinating
     them into comma-separated strings.</td><td align='center'>0 or 1</td><td align='center'>0</td></tr>
-<tr><td>MakerNotes</td><td>Flag to cause MakerNotes data to be extracted as a separate binary data value.</td>
+<tr><td>MakerNotes</td><td>Flag to cause MakerNotes data and other writable subdirectories
+    (such as PrintIM) to be extracted as a data block.</td>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>PrintConv</td><td>Flag to enable print conversion.  Also enables inverse print
     conversion for writing.</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
@@ -609,8 +610,8 @@ each value in the list.
 <tr><td><b>Prototype</b></td><td>SetNewValue($;$$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
  <br>1) [optional] Tag key or tag name, or undefined to clear all new values.
-A tag name of 'All' can be used when deleting tags to delete all tags, or all
-tags in a specified group (for family 0 groups only).
+ A tag name of '*' can be used when deleting tags to delete all tags, or all
+ tags in a specified group.
  <br>2) [optional] New value for tag.  Undefined to delete tag from file.
  <br>3-N) [optional] SetNewValue options hash entries (see below)
 </td></tr>
@@ -638,13 +639,13 @@ scalar context, or the number of tags set and the error string in list context.
     <td>Write '<a href="TagNames/index.html">unsafe</a>' tags</td></tr>
     <tr><td valign='top' align=center><b>0x02</b>&nbsp;=</td>
     <td>Write '<a href="TagNames/index.html">protected</a>' tags</td></tr>
-    </table><td align=center>0</td></tr>
+    </table></td><td align=center>0</td></tr>
 <tr><td>Replace</td><td>Replace previous new value for this tag</td>
     <td><table>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Don't replace</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Replace with specified new value</td></tr>
     <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Reset previous new value only</td></tr>
-    </table><td align=center>0</td></tr>
+    </table></td><td align=center>0</td></tr>
 </table></blockquote>
 <b>Examples:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
@@ -669,12 +670,23 @@ $exifTool-&gt;SetNewValue('Headline', $val, Group=&gt;'XMP');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewValuesFromFile">SetNewValuesFromFile</a></h2>
-A very powerful routine that attempts to set the new value for all tags
-from information found in the specified file.
+A very powerful routine that sets new values for tags from information found
+in a specified file.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
-<tr><td><b>Prototype</b></td><td>SetNewValuesFromFile($$)</td></tr>
+<tr><td><b>Prototype</b></td><td>SetNewValuesFromFile($$;@)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
  <br>1) File name, file reference, or scalar reference
+ <br>2-N) [optional] List of tag names to set.  All writable tags are set if
+ none are specified.  The tag names are not case sensitive, and may be prefixed
+ by an optional family 0 or 1 group name, separated by a colon (ie. 'exif:iso').
+ A leading '-' indicates tags to be excuded (ie. '-comment').  An asterisk ('*')
+ may be used for the tag name, and is useful when a group is specified to set
+ all tags from a group (ie. 'XMP:*').  A special feature allows tag names of the
+ form 'SRCTAG>DSTTAG' to be specified to copy information to a tag with a
+ different name or a specified group.  Both 'SRCTAG' and 'DSTTAG' may use '*'
+ and/or be prefixed by a group name (ie. 'modifyDate>fileModifyDate' or
+ '*>xmp:*').  Tags are evaluated in order, so exclusions apply only to tags
+ included earlier in the list.
 </td></tr>
 <tr><td><b>Returns</b></td><td>A hash of information that was set
 successfully.  May include Warning or Error entries if there were problems
@@ -683,7 +695,7 @@ reading the input file.
 </table></blockquote>
 <b>Examples:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-my $info = $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile);
+my $info = $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile, @tags);
 </pre></td></tr></table></blockquote>
 <b>Notes:</b>
 <p>If a preview image exists, it is not copied.  The preview image must be
@@ -712,7 +724,7 @@ my @rawVals = $exifTool-&gt;<b>GetNewValues</b>($tag);
 
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
 Set priority for tag groups in subsequent calls to SetNewValue().
-Default priority is EXIF, GPS, IPTC, XMP, MakerNotes, in that order. 
+Default priority is EXIF, GPS, IPTC, XMP, MakerNotes, in that order.
 Any family 0 group name may be used.  Case is not significant.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>SetNewGroups($;@)</td></tr>

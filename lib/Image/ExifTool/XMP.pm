@@ -977,7 +977,7 @@ sub DecodeBase64($);
         },
     },
 #
-# - IPTC Core schema properties (Iptc4xmpCore) 
+# - IPTC Core schema properties (Iptc4xmpCore)
 #
     CountryCode         => { Groups => { 1 => 'XMP-iptcCore', 2 => 'Location' } },
     # CreatorContactInfo - structure (ContactInfo=CiAdrCity,CiAdrCtry,CiAdrExtadr,
@@ -1430,13 +1430,13 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
+=item L<http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf>
 
-=item http://www.w3.org/TR/rdf-syntax-grammar/
+=item L<http://www.w3.org/TR/rdf-syntax-grammar/>
 
-=item http://www.portfoliofaq.com/pfaq/v7mappings.htm
+=item L<http://www.portfoliofaq.com/pfaq/v7mappings.htm>
 
-=item http://www.iptc.org/IPTC4XMP/
+=item L<http://www.iptc.org/IPTC4XMP/>
 
 =back
 

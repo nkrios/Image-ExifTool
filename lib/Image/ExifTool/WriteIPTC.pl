@@ -460,6 +460,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
+L<Image::ExifTool::IPTC(3pm)|Image::ExifTool::IPTC>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

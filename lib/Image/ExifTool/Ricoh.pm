@@ -154,7 +154,7 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.ozhiker.com/electronics/pjmt/jpeg_info/ricoh_mn.html
+=item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/ricoh_mn.html>
 
 =back
 

@@ -12,7 +12,7 @@
 
 =head1 NAME
 
-Image::ExifTool - Read and write meta information in image files
+Image::ExifTool - Read and write meta information in images
 
 =head1 SYNOPSIS
 
@@ -264,7 +264,7 @@ may only be extracted for specifically requested tags. Default is 0.
 
 =item Charset
 
-Character set for converting XP characters.  Valid values are:
+Character set for converting Unicode character strings.  Valid values are:
 
   UTF8  - UTF8 characters (the default)
   Latin - Windows Latin1 (cp1252)
@@ -319,8 +319,8 @@ concatinating them into comma-separated strings.  Default is 0.
 
 =item MakerNotes
 
-Flag to cause MakerNotes data to be extracted as a separate binary
-data value.
+Flag to cause MakerNotes data and other writable subdirectories (such as
+PrintIM) to be extracted as a data block.
 
 =item PrintConv
 
@@ -653,8 +653,8 @@ each value in the list.
 0) ExifTool object reference
 
 1) [optional] Tag key or tag name, or undefined to clear all new values.  A
-tag name of 'All' can be used when deleting tags to delete all tags, or all
-tags in a specified group (for family 0 groups only).
+tag name of '*' can be used when deleting tags to delete all tags, or all
+tags in a specified group.
 
 2) [optional] New value for tag.  Undefined to delete tag from file.
 
@@ -710,10 +710,10 @@ returns number of tags set and the error string in list context
 
 =head2 SetNewValuesFromFile
 
-A very powerful routine that attempts to set the new value for all tags
-from information found in the specified file.
+A very powerful routine that sets new values for tags from information found
+in a specified file.
 
-    $info = $exifTool->SetNewValuesFromFile($srcFile);
+    $info = $exifTool->SetNewValuesFromFile($srcFile, @tags);
 
 =over 4
 
@@ -722,6 +722,18 @@ from information found in the specified file.
 0) ExifTool object reference
 
 1) File name, file reference, or scalar reference
+
+2-N) [optional] List of tag names to set.  All writable tags are set if none
+are specified.  The tag names are not case sensitive, and may be prefixed by
+an optional family 0 or 1 group name, separated by a colon (ie. 'exif:iso').
+A leading '-' indicates tags to be excuded (ie. '-comment').  An asterisk
+('*') may be used for the tag name, and is useful when a group is specified
+to set all tags from a group (ie. 'XMP:*').  A special feature allows tag
+names of the form 'SRCTAG>DSTTAG' to be specified to copy information to a
+tag with a different name or a specified group.  Both 'SRCTAG' and 'DSTTAG'
+may use '*' and/or be prefixed by a group name (ie.
+'modifyDate>fileModifyDate' or '*>xmp:*').  Tags are evaluated in order, so
+exclusions apply only to tags included earlier in the list.
 
 =item Return Values:
 

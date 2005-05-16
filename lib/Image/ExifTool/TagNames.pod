@@ -43,12 +43,12 @@ which is not writable directly, but is set via a Composite tag.  A tilde
 disabled (by setting PrintConv to 0, or using the -n option).  An
 exclamation point (C<!>) indicates a tag that is considered unsafe to write
 under normal circumstances.  These 'unsafe' tags are not set when calling
-SetNewValuesFromFile() or when using the exiftool -AllTagsFromFile option,
-and care should be taken when editing them manually since they may affect
-the way an image is rendered.
+SetNewValuesFromFile() or when using the exiftool -TagsFromFile option, and
+care should be taken when editing them manually since they may affect the
+way an image is rendered.
 
-The HTML version of this document also lists possible B<Values> for all tags
-which have a discrete set of values, or gives B<Notes> for some tags.
+The HTML version of these tables also list possible B<Values> for all tags
+which have a discrete set of values, and give B<Notes> for some tags.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -66,13 +66,13 @@ default B<Group> listed below is used unless another group is specified.
 
   Tag ID   Tag Name                  Group      Writable
   ------   --------                  -----      --------
-  0x0001   InteropIndex              InteropIFD string!
-  0x0002   InteropVersion            InteropIFD undef!
+  0x0001   InteropIndex              InteropIFD string
+  0x0002   InteropVersion            InteropIFD undef
   0x00fe   SubfileType               IFD0       int32u!
   0x00ff   OldSubfileType            IFD0       int16u!
   0x0100   ImageWidth                IFD0       int32u!
   0x0101   ImageHeight               IFD0       int32u!
-  0x0102   BitsPerSample             IFD0       int16u[3]!
+  0x0102   BitsPerSample             IFD0       int16u[-1]!
   0x0103   Compression               IFD0       int16u!
   0x0106   PhotometricInterpretation IFD0       int16u!
   0x0107   Thresholding              IFD0       int16u!
@@ -90,8 +90,8 @@ default B<Group> listed below is used unless another group is specified.
   0x0116   RowsPerStrip              IFD0       int32u!
   0x0117   StripByteCounts           -          N
            PreviewImageLength        IFD0       int32u*
-  0x0118   MinSampleValue            -          N
-  0x0119   MaxSampleValue            -          N
+  0x0118   MinSampleValue            IFD0       int16u
+  0x0119   MaxSampleValue            IFD0       int16u
   0x011a   XResolution               IFD0       rational32u
   0x011b   YResolution               IFD0       rational32u
   0x011c   PlanarConfiguration       IFD0       int16u!
@@ -166,15 +166,15 @@ default B<Group> listed below is used unless another group is specified.
   0x0207   JPEGQTables               -          N
   0x0208   JPEGDCTables              -          N
   0x0209   JPEGACTables              -          N
-  0x0211   YCbCrCoefficients         -          N
+  0x0211   YCbCrCoefficients         IFD0       rational32u[3]
   0x0212   YCbCrSubSampling          IFD0       int16u[2]!
-  0x0213   YCbCrPositioning          IFD0       int16u!
-  0x0214   ReferenceBlackWhite       -          N
+  0x0213   YCbCrPositioning          IFD0       int16u
+  0x0214   ReferenceBlackWhite       IFD0       rational32u[6]
   0x022f   StripRowCounts            -          N
   0x02bc   ApplicationNotes          -          XMP
   0x1000   RelatedImageFileFormat    -          N
-  0x1001   RelatedImageWidth         InteropIFD int16u!
-  0x1002   RelatedImageLength        InteropIFD int16u!
+  0x1001   RelatedImageWidth         InteropIFD int16u
+  0x1002   RelatedImageLength        InteropIFD int16u
   0x800d   ImageID                   -          N
   0x80a4   WangAnnotation            -          N
   0x80e3   Matteing                  -          N
@@ -232,8 +232,8 @@ default B<Group> listed below is used unless another group is specified.
   0x9000   ExifVersion               ExifIFD    undef
   0x9003   DateTimeOriginal          ExifIFD    string
   0x9004   CreateDate                ExifIFD    string
-  0x9101   ComponentsConfiguration   ExifIFD    undef~!
-  0x9102   CompressedBitsPerPixel    -          N
+  0x9101   ComponentsConfiguration   ExifIFD    undef
+  0x9102   CompressedBitsPerPixel    ExifIFD    rational32u
   0x9201   ShutterSpeedValue         ExifIFD    rational32s
   0x9202   ApertureValue             ExifIFD    rational32u
   0x9203   BrightnessValue           ExifIFD    rational32s
@@ -253,7 +253,7 @@ default B<Group> listed below is used unless another group is specified.
   0x9211   ImageNumber               -          N
   0x9212   SecurityClassification    -          N
   0x9213   ImageHistory              -          N
-  0x9214   SubjectLocation           ExifIFD    int16u[2]
+  0x9214   SubjectLocation           ExifIFD    int16u[4]
   0x9215   ExposureIndex             -          N
   0x9216   TIFF-EPStandardID         -          N
   0x9217   SensingMethod             -          N
@@ -317,7 +317,7 @@ default B<Group> listed below is used unless another group is specified.
   0xa217   SensingMethod             ExifIFD    int16u
   0xa300   FileSource                ExifIFD    undef
   0xa301   SceneType                 ExifIFD    undef
-  0xa302   CFAPattern                -          N
+  0xa302   CFAPattern                ExifIFD    undef
   0xa401   CustomRendered            ExifIFD    int16u
   0xa402   ExposureMode              ExifIFD    int16u
   0xa403   WhiteBalance              ExifIFD    int16u
@@ -333,6 +333,7 @@ default B<Group> listed below is used unless another group is specified.
   0xa420   ImageUniqueID             ExifIFD    string
   0xa480   GDALMetadata              -          N
   0xa481   GDALNoData                -          N
+  0xa500   Gamma                     ExifIFD    rational32u
   0xc350   FilmProductCode           -          N
   0xc351   ImageSourceEK             -          N
   0xc352   CaptureConditionsPAR      -          N
@@ -372,7 +373,7 @@ default B<Group> listed below is used unless another group is specified.
   0xc44f   Annotations               -          N
   0xc46c   PrintQuality              -          N
   0xc46e   ImagePrintStatus          -          N
-  0xc4a5   PrintIM                   -          PrintIM
+  0xc4a5   PrintIM                   IFD0       PrintIM
   0xc612   DNGVersion                IFD0       int8u[4]
   0xc613   DNGBackwardVersion        -          N
   0xc614   UniqueCameraModel         IFD0       string
@@ -442,7 +443,7 @@ lists.
 The B<Group> column below gives the XMP schema namespace prefix for each
 tag.  The family 1 group names are composed from these schema names with a
 leading "XMP-" added.  If the same XMP tag name exists in more than one
-group, all groups are written unless a family 1 group name is specified. 
+group, all groups are written unless a family 1 group name is specified.
 ie) If XMP:Contrast is specified, information will be written to both
 XMP-crs:Contrast and XMP-exif:Contrast.
 
@@ -1371,7 +1372,7 @@ Kodak camera models have been tested and found to use these tags:  CX6330,
 CX7330, CX7430, CX7530, DC4800, DC4900, DX3500, DX3600, DX3900, DX4330,
 DX4530, DX4900, DX6340, DX6440, DX6490, DX7440, DX7590, DX7630, LS420,
 LS443, LS743 and LS753.
-    
+
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    KodakModel                           string[8]
@@ -1571,6 +1572,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   0x0016   ImageBoundary                        Y
   0x0018   FlashExposureBracketValue            int32s~
   0x0019   ExposureBracketValue                 rational32s~
+  0x001d   SerialNumber                         N
   0x0080   ImageAdjustment                      Y
   0x0081   ToneComp                             Y
   0x0082   AuxiliaryLens                        Y
@@ -1590,13 +1592,16 @@ These tags are used by Minolta and Konica/Minolta cameras.
   0x0094   Saturation                           Y
   0x0095   NoiseReduction                       Y
   0x0096   NEFCurve2                            N
-  0x0097   ColorBalanceD70                      Nikon ColorBalanceD70
-           ColorBalanceD2H                      Nikon ColorBalanceD2H
-           ColorBalanceD100                     Nikon ColorBalanceD100
+  0x0097   ColorBalance0100                     Nikon ColorBalance0100
+           ColorBalance0102                     Nikon ColorBalance0102
+           ColorBalance0103                     Nikon ColorBalance0103
            ColorBalanceUnknown
+  0x0098   LensData0101                         Nikon LensData
+           LensData0201                         Nikon LensData
+           LensDataUnknown
   0x0099   NEFThumbnailSize                     int16u[2]
   0x00a0   SerialNumber                         Y
-  0x00a7   ShutterCount                         int32u
+  0x00a7   ShutterCount                         N
   0x00a9   ImageOptimization                    Y
   0x00aa   Saturation                           Y
   0x00ab   VariProgram                          Y
@@ -1615,26 +1620,49 @@ These tags are used by Minolta and Konica/Minolta cameras.
   0x0202   PreviewImageLength                   int32u*
   0x0213   YCbCrPositioning                     N
 
-=head2 Nikon ColorBalanceD70 Tags
+=head2 Nikon ColorBalance0100 Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    RedBalance                           int16u
+      1    BlueBalance                          int16u
+
+=head2 Nikon ColorBalance0102 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    RedBalance                           rational16s
       1    BlueBalance                          rational16s
 
-=head2 Nikon ColorBalanceD2H Tags
+=head2 Nikon ColorBalance0103 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    RedBalance                           rational16s
-      1    BlueBalance                          N
+      1    BlueBalance                          rational16s
 
-=head2 Nikon ColorBalanceD100 Tags
+=head2 Nikon LensData Tags
+
+Nikon encrypts the LensData information below if LensDataVersion is 0201,
+but  the decryption algorithm is known so the information can be extracted.
+It isn't yet writable, however, because the encryption adds complications
+which make writing more difficult.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    RedBalance                           N
-      1    BlueBalance                          N
+      0    LensDataVersion                      N
+      5    AFAperture                           N
+      8    FocusPosition                        N
+      9    FocusDistance                        N
+     10    FocalLength                          N
+     11    LensID                               N
+     12    LensFStops                           N
+     13    MinFocalLength                       N
+     14    MaxFocalLength                       N
+     15    MaxApertureAtMinFocal                N
+     16    MaxApertureAtMaxFocal                N
+     17    MCUVersion                           N
+     18    EffectiveMaxAperture                 N
 
 =head2 Nikon NikonCaptureOffsets Tags
 
@@ -1872,6 +1900,8 @@ The Pentax tags are also used in Asahi cameras.
   0x0017   MeteringMode                         int16u
   0x0019   WhiteBalance                         int16u
   0x001a   WhiteBalanceMode                     Y
+  0x001b   BlueBalance                          Y
+  0x001c   RedBalance                           Y
   0x001d   FocalLength                          int32u
   0x001e   DigitalZoom                          int16u
   0x001f   Saturation                           int16u
@@ -2303,6 +2333,7 @@ with any other tag group.
   Error                                         N
   ExifData                                      N
   ExifToolVersion                               N
+  FileModifyDate                                Y
   FileName                                      N
   FileSize                                      N
   FileType                                      N
@@ -2320,6 +2351,8 @@ is extracted.
   --------             ------------             --------
   Aperture             FNumber                  N
                        ApertureValue
+  CFAPattern           CFARepeatPatternDim      N
+                       CFAPattern2
   ConditionalFEC       FlashExposureComp        N
                        FlashBits
   DateTimeCreated      DateCreated              N
@@ -2396,6 +2429,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

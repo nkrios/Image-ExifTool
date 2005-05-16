@@ -540,7 +540,7 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.dalibor.cz/minolta/makernote.htm
+=item L<http://www.dalibor.cz/minolta/makernote.htm>
 
 =back
 

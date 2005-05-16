@@ -52,16 +52,16 @@ and much less prone to errors than rewriting a TIFF or JPEG.
 A Canon CRW file starts with the following byte sequence:
 <blockquote>
 <table border=1 cellspacing=0 cellpadding=2><tr bgcolor='#dddddd'><th>Offset</th>
-<th>Number<br>of bytes</th><th>Value</th><th>Name</th><th>Description</th></tr>
+<th>Number<br>of&nbsp;bytes</th><th>Value</th><th>Name</th><th>Description</th></tr>
 <tr align='center'><td>0</td><td>2</td><td>"II"</td><td>ByteOrder</td>
 <td align='left'>"II" means Intel (little-endian) order, which is the only order I've
 seen since Canon is using x86 processors in its current cameras, but
 presumably this could be "MM" for future models.
 </td></tr>
-<tr align='center'><td>4</td><td>4</td><td>0x0000001a</td><td>BlockStart</td>
+<tr align='center'><td>2</td><td>4</td><td>0x0000001a</td><td>BlockStart</td>
 <td align='left'>32-bit integer giving the offset from the start of the file to the start of
 the root directory block.  This value may change for future camera models.</td></tr>
-<tr align='center'><td>8</td><td>8</td><td>"HEAPCCDR"</td><td>Signature</td>
+<tr align='center'><td>6</td><td>8</td><td>"HEAPCCDR"</td><td>Signature</td>
 <td align='left'>This series of characters identifies the file as a Canon CRW
 file.</td></tr>
 </table></blockquote>
@@ -218,6 +218,8 @@ remain constant for all camera models.
     <td align='left'>Data block of color information (format unknown)</td></tr>
 <tr align='center'><td>0x102d</td><td>0x01</td><td>0x300b</td><td>CanonCameraSettings</td><td>92</td>
     <td align='left'>Data block giving <a href="TagNames/Canon.html#CameraSettings">camera settings</a></td></tr>
+<tr align='center'><td>0x1030</td><td>-</td><td>?</td><td>WhiteSample</td><td>?</td>
+    <td align='left'>Encrypted 8x8 white sample</td></tr>
 <tr align='center'><td>0x1031</td><td>-</td><td>0x300b</td><td>SensorInfo</td><td>34</td>
     <td align='left'><a href="TagNames/CanonRaw.html#SensorInfo">Sensor size and resolution information</a></td></tr>
 <tr align='center'><td>0x1033</td><td>0x0f</td><td>0x300b</td><td>CanonCustomFunctions</td><td>Varies</td>
@@ -228,8 +230,11 @@ remain constant for all camera models.
 <tr align='center'><td>0x1093</td><td>0x93</td><td>0x300b</td><td>?</td><td>18</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10a8</td><td>0xa8</td><td>0x300b</td><td>?</td><td>20</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10a9</td><td>0xa9</td><td>0x300b</td><td>WhiteBalanceTable</td><td>82</td>
-    <td align='left'>Table of red/blue balance levels for all WhiteBalance menu entries,
-    as a series of 16-bit integers which are combined in pairs to form rational values</td></tr>
+    <td align='left'>Table of 16-bit integers. The first integer (like many other data blocks) is
+    the number of bytes in the record. This is followed by red, green1, green2 and blue levels for
+    all WhiteBalance menu entries: auto, daylight, cloudy, tungsten, fluorescent, flash, custom,
+    b&amp;w and shade. The final 4 entries appear to be some sort of baseline red, green1, green2
+    and blue levels.</td></tr>
 <tr align='center'><td>0x10aa</td><td>0xaa</td><td>0x300b</td><td>?</td><td>10</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10ae</td><td>0xae</td><td>0x300b</td><td>ColorTemperature</td><td>2</td>
     <td align='left'>16-bit integer giving the color temperature</td></tr>
@@ -294,6 +299,6 @@ remain constant for all camera models.
 
 <p><hr>
 Please e-mail me if you find any errors or omissions in this document.  My address is phil at owl.phy.queensu.ca - Thanks!
-<p><i>P. Harvey - Last revised Apr. 2, 2005</i>
+<p><i>P. Harvey - Last revised May 7, 2005</i>
 </body>
 </html>

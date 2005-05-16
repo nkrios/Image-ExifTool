@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess);
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 # conditional list of maker notes
 # Notes:
@@ -26,6 +26,7 @@ $VERSION = '1.10';
     # decide which MakerNotes to use (based on camera make/model)
     {
         Name => 'MakerNoteCanon',
+        # put $valPt in the first condition to load the value early for speed
         Condition => '$self->{CameraMake} =~ /^Canon/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::Main',
@@ -83,10 +84,7 @@ $VERSION = '1.10';
     },
     {
         Name => 'MakerNoteKodak1a',
-        Condition => q{
-            $self->{CameraMake}=~/^EASTMAN KODAK/ and
-            $self->{MAKER_NOTE_HEADER}=~/^KDK INFO/
-        },
+        Condition => '$self->{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^KDK INFO/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Main',
             Start => '$valuePtr + 8',
@@ -95,10 +93,7 @@ $VERSION = '1.10';
     },
     {
         Name => 'MakerNoteKodak1b',
-        Condition => q{
-            $self->{CameraMake}=~/^EASTMAN KODAK/ and
-            $self->{MAKER_NOTE_HEADER}=~/^KDK/
-        },
+        Condition => '$self->{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^KDK/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Main',
             Start => '$valuePtr + 8',
@@ -107,10 +102,7 @@ $VERSION = '1.10';
     },
     {
         Name => 'MakerNoteKodak2',
-        Condition => q{
-            $self->{CameraMake}=~/^EASTMAN KODAK/i and
-            $self->{MAKER_NOTE_HEADER}=~/^.{8}Eastman/s
-        },
+        Condition => '$self->{CameraMake}=~/^EASTMAN KODAK/i and $$valPt=~/^.{8}Eastman/s',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type2',
             ByteOrder => 'BigEndian',
@@ -120,10 +112,7 @@ $VERSION = '1.10';
         # not much to key on here, but we know the
         # upper byte of the year should be 0x07:
         Name => 'MakerNoteKodak3',
-        Condition => q{
-            $self->{CameraMake}=~/^EASTMAN KODAK/ and
-            $self->{MAKER_NOTE_HEADER}=~/^.{12}\x07/s
-        },
+        Condition => '$self->{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^.{12}\x07/s',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type3',
             ByteOrder => 'BigEndian',
@@ -131,10 +120,7 @@ $VERSION = '1.10';
     },
     {
         Name => 'MakerNoteKodak4',
-        Condition => q{
-            $self->{CameraMake}=~/^Eastman Kodak/ and
-            $self->{MAKER_NOTE_HEADER}=~/^.{41}JPG/s
-        },
+        Condition => '$self->{CameraMake}=~/^Eastman Kodak/ and $$valPt=~/^.{41}JPG/s',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type4',
             ByteOrder => 'BigEndian',
@@ -146,7 +132,7 @@ $VERSION = '1.10';
             $self->{CameraMake}=~/^EASTMAN KODAK/ and
             ($self->{CameraModel}=~/(CX4200|CX4230|CX6200)/ or
             # try to pick up similar models we haven't tested yet
-            $self->{MAKER_NOTE_HEADER}=~/^\0(\x1a\x18|\x3a\x08|\x59\xf8)\0/)
+            $$valPt=~/^\0(\x1a\x18|\x3a\x08|\x59\xf8)\0/)
         },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type5',
@@ -194,10 +180,7 @@ $VERSION = '1.10';
     {
         # this maker notes starts with a standard TIFF header at offset 0x0a
         Name => 'MakerNoteNikon',
-        Condition => q{
-            $self->{CameraMake}=~/^NIKON/ and
-            $self->{MAKER_NOTE_HEADER}=~/^Nikon\x00\x02/
-        },
+        Condition => '$self->{CameraMake}=~/^NIKON/ and $$valPt=~/^Nikon\x00\x02/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             Start => '$valuePtr + 18',
@@ -208,10 +191,7 @@ $VERSION = '1.10';
     {
         # older Nikon maker notes
         Name => 'MakerNoteNikon2',
-        Condition => q{
-            $self->{CameraMake}=~/^NIKON/ and
-            $self->{MAKER_NOTE_HEADER}=~/^Nikon\x00\x01/
-        },
+        Condition => '$self->{CameraMake}=~/^NIKON/ and $$valPt=~/^Nikon\x00\x01/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::MakerNotesB',
             Start => '$valuePtr + 8',
@@ -268,10 +248,7 @@ $VERSION = '1.10';
     },
     {
         Name => 'MakerNoteRicoh',
-        Condition => q{
-            $self->{CameraMake}=~/^RICOH/ and
-            $self->{MAKER_NOTE_HEADER}=~/^Ricoh/i
-        },
+        Condition => '$self->{CameraMake}=~/^RICOH/ and $$valPt=~/^Ricoh/i',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Ricoh::Main',
             Start => '$valuePtr + 8',

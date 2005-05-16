@@ -47,8 +47,11 @@ sub testCompare($$$)
                 if (defined $line2) {
                     next if $line1 eq $line2;
                     # ignore version number differences
-                    next if $line1 =~ /ExifTool\s*Version/ and
-                            $line2 =~ /ExifTool\s*Version/;
+                    next if $line1 =~ /ExifTool\s?Version/ and
+                            $line2 =~ /ExifTool\s?Version/;
+                    # ignore different FileModifyDate's
+                    next if $line1 =~ /File\s?Modif.*Date/ and
+                            $line2 =~ /File\s?Modif.*Date/;
                     # some systems use 3 digits in exponents... grrr
                     if ($line2 =~ s/e(\+|-)0/e$1/) {
                         next if $line1 eq $line2;

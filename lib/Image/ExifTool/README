@@ -141,7 +141,9 @@ conditions.  The following is a description of possible hash entries:
 
   Count         : [optional] Used when writing EXIF information to specify the
                   number values to write, or the number of characters in a
-                  fixed-length string.
+                  fixed-length string.  A value of -1 indicates that the count
+                  is variable and should be determined by the number of values
+                  provided.
 
   Flags         : [optional] Flags to specify characteristics for this tag.  May
                   be a simple scalar flag name, a reference to a list of flag
@@ -239,7 +241,13 @@ conditions.  The following is a description of possible hash entries:
                   in a list, the first list entry with a true condition is
                   taken.  If no condition exists, then a 'true' condition is
                   assumed.  The previous value for this tag is available as
-                  $oldVal for use in the logic expression.
+                  $oldVal for use in the logic expression.  The first 48 bytes
+                  of the raw data value are accessible through the reference
+                  $valPt for EXIF and Jpeg2000 tags only.  Note that if the
+                  value is writable and $valPt is used, the tag must have a
+                  Format (unless 'undef' or 'string'), and a Count (unless 1 or
+                  length of the 'undef' or 'string'), so the raw data may be
+                  generated for evaluating the Condition.
 
   Require       : [Composite tables only] Specifies a list of tag names for
                   values which are required in order to calculate the composite

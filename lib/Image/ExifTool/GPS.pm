@@ -212,13 +212,13 @@ $VERSION = '1.06';
         Name => 'GPSProcessingMethod',
         Writable => 'undef',
         PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-        PrintConvInv => '"ASCII\0\0\0$val\0"',
+        PrintConvInv => '"ASCII\0\0\0$val"',
     },
     0x001C => {
         Name => 'GPSAreaInformation',
         Writable => 'undef',
         PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-        PrintConvInv => '"ASCII\0\0\0$val\0"',
+        PrintConvInv => '"ASCII\0\0\0$val"',
     },
     0x001D => {
         Name => 'GPSDateStamp',

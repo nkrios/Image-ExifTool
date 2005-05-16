@@ -29,7 +29,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.59';
+$VERSION = '1.63';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -829,7 +829,7 @@ sub Rationalize($;$);
     },
     0x9202 => {
         Name => 'ApertureValue',
-        ValueConv => 'sqrt(2) ** $val',
+        ValueConv => '2 ** ($val / 2)',
         PrintConv => 'sprintf("%.1f",$val)',
     },
     0x9203 => {
@@ -842,7 +842,7 @@ sub Rationalize($;$);
     0x9205 => {
         Name => 'MaxApertureValue',
         Groups => { 2 => 'Camera' },
-        ValueConv => 'sqrt(2) ** $val',
+        ValueConv => '2 ** ($val / 2)',
         PrintConv => 'sprintf("%.1f",$val)',
     },
     0x9206 => {
@@ -1172,6 +1172,7 @@ sub Rationalize($;$);
     0xa420 => 'ImageUniqueID',
     0xa480 => 'GDALMetadata', #3
     0xa481 => 'GDALNoData', #3
+    0xa500 => 'Gamma',
     # 0xc350 thru 0xc41a plus 0xc46c,0xc46e are Kodak APP3 tags (ref 8)
     0xc350 => {
         Name => 'FilmProductCode',
@@ -1238,6 +1239,8 @@ sub Rationalize($;$);
     0xc46e => 'ImagePrintStatus', #8 (Kodak APP3)
     0xc4a5 => {
         Name => 'PrintIM',
+        # must set Writable here so this tag will be saved with MakerNotes option
+        Writable => 'undef',
         Description => 'Print Image Matching',
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
@@ -1489,6 +1492,20 @@ sub Rationalize($;$);
         # be careful here in case there is a timezone following the seconds
         ValueConv => '$_=$val[0];s/(.*:\d{2})/$1\.$val[1]/;$_',
     },
+    CFAPattern => {
+        Require => {
+            0 => 'CFARepeatPatternDim',
+            1 => 'CFAPattern2',
+        },
+        # generate CFAPattern
+        ValueConv => q{
+            my @a = split / /, $val[0];
+            my @b = split / /, $val[1];
+            return undef unless @a==2 and @b==$a[0]*$a[1];
+            return Set16u($a[0]) . Set16u($a[1]) . pack('C*', @b);
+        },
+        PrintConv => 'Image::ExifTool::Exif::PrintCFAPattern($val)',
+    },
 );
 
 # add our composite tags
@@ -1716,6 +1733,9 @@ sub ExtractImage($$$$)
         return undef unless defined $image;
     }
     unless ($image =~ /^(Binary data|\xff\xd8)/ or
+            # the first byte of the preview in my sample MRW file is zeroed,
+            # so check for this and set it back to 0xff if necessary
+            $image =~ s/^\x00\xd8\xff\xdb/\xff\xd8\xff\xdb/ or
             $exifTool->Options('IgnoreMinorErrors'))
     {
         $tag = 'PreviewImage' unless $tag;
@@ -1851,11 +1871,6 @@ sub ProcessExif($$$)
                 }
                 $didRead = 1;
             }
-            # save maker note header
-            if ($tagID == 0x927c and $tagTablePtr eq \%Image::ExifTool::Exif::Main) {
-                my $hdrLen = $size < 48 ? $size : 48;
-                $exifTool->{MAKER_NOTE_HEADER} = substr($$valueDataPt, $valuePtr, $hdrLen);
-            }
         }
         my $formatStr = $formatName[$format];   # get name of this format
         # treat single unknown byte as int8u
@@ -1885,10 +1900,14 @@ sub ProcessExif($$$)
             }
         }
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
-        next unless $tagInfo or $verbose;
+        if (defined $tagInfo and not $tagInfo) {
+            # GetTagInfo() required the value for a Condition
+            my $tmpVal = substr($$valueDataPt, $valuePtr, $size < 48 ? $size : 48);
+            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$tmpVal);
+        }
         # override EXIF format if specified
         my $origFormStr;
-        if ($tagInfo) {
+        if (defined $tagInfo) {
             if ($$tagInfo{Format}) {
                 $formatStr = $$tagInfo{Format};
                 # must adjust number of items for new format size
@@ -2001,15 +2020,16 @@ sub ProcessExif($$$)
                             my $buff;
                             if ($raf->Read($buff,2) == 2) {
                                 # get no. dir entries
-                                my $size = 12 * Get16u(\$buff, 0);
+                                $size = 12 * Get16u(\$buff, 0);
                                 # read dir
                                 my $buf2;
                                 if ($raf->Read($buf2,$size) == $size) {
                                     # set up variables to process new subdir data
+                                    $size += 2;
                                     $buff .= $buf2;
                                     $subdirDataPt = \$buff;
                                     $subdirDataPos = $subdirStart;
-                                    $subdirDataLen = $size + 2;
+                                    $subdirDataLen = $size;
                                     $subdirStart = 0;
                                     $dirOK = 1;
                                 }
@@ -2078,27 +2098,32 @@ sub ProcessExif($$$)
                 @values or last;
                 $val = shift @values;           # continue with next subdir
             }
-            next unless $exifTool->Options('MakerNotes') and $$tagInfo{MakerNotes};
-            # this is a pain, but we must rebuild maker notes to include
-            # all the value data if data was outside the maker notes
-            my %makerDirInfo = (
-                Name     => $tagStr,
-                Base     => $base,
-                DataPt   => $valueDataPt,
-                DataPos  => $valueDataPos,
-                DataLen  => $valueDataLen,
-                DirStart => $valuePtr,
-                DirLen   => $size,
-                RAF      => $raf,
-                Parent   => $dirInfo->{DirName},
-                DirName  => 'MakerNotes',
-                TagInfo  => $tagInfo,
-            );
-            my $val2 = RebuildMakerNotes($exifTool, $newTagTable, \%makerDirInfo);
-            if (defined $val2) {
-                $val = $val2;
+            next unless $exifTool->Options('MakerNotes');
+            if ($$tagInfo{MakerNotes}) {
+                # this is a pain, but we must rebuild maker notes to include
+                # all the value data if data was outside the maker notes
+                my %makerDirInfo = (
+                    Name     => $tagStr,
+                    Base     => $base,
+                    DataPt   => $valueDataPt,
+                    DataPos  => $valueDataPos,
+                    DataLen  => $valueDataLen,
+                    DirStart => $valuePtr,
+                    DirLen   => $size,
+                    RAF      => $raf,
+                    Parent   => $dirInfo->{DirName},
+                    DirName  => 'MakerNotes',
+                    TagInfo  => $tagInfo,
+                );
+                my $val2 = RebuildMakerNotes($exifTool, $newTagTable, \%makerDirInfo);
+                if (defined $val2) {
+                    $val = $val2;
+                } else {
+                    $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                }
             } else {
-                $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                # extract this directory as a block if specified
+                next unless $$tagInfo{Writable};
             }
         }
  #..............................................................................
@@ -2163,25 +2188,25 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://partners.adobe.com/asn/developer/pdfs/tn/TIFF6.pdf
+=item L<http://partners.adobe.com/asn/developer/pdfs/tn/TIFF6.pdf>
 
-=item http://partners.adobe.com/public/developer/en/tiff/TIFFPM6.pdf
+=item L<http://partners.adobe.com/public/developer/en/tiff/TIFFPM6.pdf>
 
-=item http://www.adobe.com/products/dng/pdfs/dng_spec.pdf
+=item L<http://www.adobe.com/products/dng/pdfs/dng_spec.pdf>
 
-=item http://www.awaresystems.be/imaging/tiff/tifftags.html
+=item L<http://www.awaresystems.be/imaging/tiff/tifftags.html>
 
-=item http://www.remotesensing.org/libtiff/TIFFTechNote2.html
+=item L<http://www.remotesensing.org/libtiff/TIFFTechNote2.html>
 
-=item http://www.asmail.be/msg0054681802.html
+=item L<http://www.asmail.be/msg0054681802.html>
 
-=item http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+=item L<http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html>
 
-=item http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
+=item L<http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf>
 
-=item http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
+=item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html>
 
-=item http://hul.harvard.edu/jhove/tiff-tags.html
+=item L<http://hul.harvard.edu/jhove/tiff-tags.html>
 
 =back
 

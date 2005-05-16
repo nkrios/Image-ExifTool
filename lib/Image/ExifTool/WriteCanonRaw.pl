@@ -528,6 +528,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
+L<Image::ExifTool::CanonRaw(3pm)|Image::ExifTool::CanonRaw>,
 L<Image::ExifTool(3pm)|Image::ExifTool>,
 L<http://owl.phy.queensu.ca/~phil/exiftool/canon_raw.html>
 

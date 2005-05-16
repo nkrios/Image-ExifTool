@@ -55,10 +55,11 @@ my %dirMap = (
         MakerNotes   => 'ExifIFD',
     },
 );
-# groups we are allowed to delete
-my @delGroups = (
-    'EXIF', 'File', 'GPS', 'ICC_Profile', 'IPTC',
-    'MakerNotes', 'Photoshop', 'PrintIM', 'XMP', 
+# groups we are allowed to delete (Note: these names must either
+# exist in %dirMap, or be translated in InitWriteDirs())
+my @delGroups = qw(
+    EXIF ExifIFD File GlobParamIFD GPS IFD0 IFD1 InteropIFD
+    ICC_Profile IPTC MakerNotes Photoshop PrintIM SubIFD XMP
 );
 # names of valid EXIF directories:
 my %exifDirs = (
@@ -82,7 +83,7 @@ my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 #------------------------------------------------------------------------------
 # Set tag value
 # Inputs: 0) ExifTool object reference
-#         1) tag key, tag name, 'all', or undef to reset all previous SetNewValue() calls
+#         1) tag key, tag name, '*', or undef to reset all previous SetNewValue() calls
 #         2) new value, or undef to delete tag
 #         3-N) Options:
 #           Type => PrintConv, ValueConv or Raw - specifies value type
@@ -121,10 +122,10 @@ sub SetNewValue($;$$%)
     $tag =~ s/ .*//;    # convert from tag key to tag name if necessary
     my @matchingTags = FindTagInfo($tag);
     unless (@matchingTags) {
-        if (lc($tag) eq 'all') {
+        if ($tag eq '*' or lc($tag) eq 'all') {
             # set groups to delete
             if (defined $value) {
-                $err = "Can't set value for 'All'";
+                $err = "Can't set value for all tags";
             } else {
                 my (@del, $grp);
                 if ($options{Group}) {
@@ -313,12 +314,12 @@ sub SetNewValue($;$$%)
                     $@ and $evalWarning = $@;
                     chomp $evalWarning;
                     $evalWarning =~ s/ at \(eval .*//s;
-                    $err = "$evalWarning in $wgrp1:$tag (in ${type}Inv)";
+                    $err = "$evalWarning in $wgrp1:$tag (${type}Inv)";
                     $verbose > 2 and print "$err\n";
                     undef $val;
                     last;
                 } elsif (not defined $val) {
-                    $err = "Error converting value for $wgrp1:$tag (in ${type}Inv)";
+                    $err = "Error converting value for $wgrp1:$tag (${type}Inv)";
                     $verbose > 2 and print "$err\n";
                     last;
                 }
@@ -504,44 +505,161 @@ sub SetNewValue($;$$%)
 #------------------------------------------------------------------------------
 # set new values from information in specified file
 # Inputs: 0) ExifTool object reference, 1) source file name or reference, etc
+#         2) List of tags to set (or all if none specified)
 # Returns: Hash of information set successfully (includes Warning or Error messages)
-sub SetNewValuesFromFile($$)
+# Notes: Tag names may contain group prefix and/or leading '-' to exclude from copy,
+#        and the tag name '*' may be used to represent all tags in a group.
+#        Also, a tag name may end with '>DSTTAG' to copy the information to a
+#        different tag, or a tag with a specified group.
+sub SetNewValuesFromFile($$;@)
 {
-    my ($self, $srcFile) = @_;
-    # read set all tags from specified file
+    my ($self, $srcFile, @setTags) = @_;
+
+    # get all tags from source file (including MakerNotes block)
     my $srcExifTool = new Image::ExifTool;
     my $opts = {MakerNotes=>1, Binary=>1, Duplicates=>1, List=>1};
     $opts->{IgnoreMinorErrors} = $self->Options('IgnoreMinorErrors');
+    $opts->{PrintConv} = $self->Options('PrintConv');
     my $info = $srcExifTool->ImageInfo($srcFile, $opts);
+
     # transfer necessary information to this object
     $self->{MAKER_NOTE_FIXUP} = $srcExifTool->{MAKER_NOTE_FIXUP};
-    $self->{MAKER_NOTE_HEADER} = $srcExifTool->{MAKER_NOTE_HEADER};
+
     # sort tags in reverse order so we get priority tag last
     my @tags = reverse sort keys %$info;
     my $tag;
+#
+# simply transfer all tags from source image if no tags specified
+#
+    unless (@setTags) {
+        foreach $tag (@tags) {
+            # don't try to set Warning's or Error's
+            next if $tag =~ /^Warning\b/ or $tag =~ /^Error\b/;
+            my (@values, %opts, $val, $wasSet);
+            # get all values for this tag
+            if (ref $info->{$tag} eq 'ARRAY') {
+                @values = @{$info->{$tag}};
+            } elsif (ref $info->{$tag} eq 'SCALAR') {
+                @values = ( ${$info->{$tag}} );
+            } else {
+                @values = ( $info->{$tag} );
+            }
+            $opts{Replace} = 1;     # replace the first value found
+            # set all values for this tag
+            foreach $val (@values) {
+                my @rtnVals = $self->SetNewValue($tag, $val, %opts);
+                last unless $rtnVals[0];
+                $wasSet = 1;
+                $opts{Replace} = 0;
+            }
+            # delete this tag if we could't set it
+            $wasSet or delete $info->{$tag};
+        }
+        return $info;
+    }
+#
+# transfer specified tags in the proper order
+#
+    # 1) loop through input list of tags to set, and build @setList
+    my (@setList, $set, %setMatches);
+    foreach (@setTags) {
+        $tag = lc($_);  # change tag name to all lower case
+        $tag =~ s/\ball\b/\*/g;     # replace 'all' with '*' in tag/group names
+        my ($grp, $dst, $dstGrp, $dstTag);
+        # handle redirection to another tag
+        if ($tag =~ /(.+?)\s*>\s*(.+)/) {
+            ($tag, $dstTag) = ($1, $2);
+            $dstGrp = '';
+            ($dstGrp, $dstTag) = ($1, $2) if $dstTag =~ /(.+?):(.+)/;
+        }
+        my $isExclude = ($tag =~ s/^-//) ? 1 : 0;
+        if ($tag =~ /(.+?):(.+)/) {
+            ($grp, $tag) = ($1, $2);
+        } else {
+            $grp = '';  # flag for don't care about group
+        }
+        # redirect, exclude or set this tag (Note: $grp is '' if we don't care)
+        if ($dstTag) {
+            # redirect this tag
+            $isExclude and return { Error => "Can't redirect excluded tag" };
+            if ($tag eq '*' and $dstTag ne '*') {
+                return { Error => "Can't redirect from all tags to one tag" };
+            }
+            # set destination group the same as source if necessary
+            $dstGrp = $grp if $dstGrp eq '*' or $dstGrp eq '';
+            # write to specified destination group/tag
+            $dst = [ $dstGrp, $dstTag ];
+        } elsif ($isExclude) {
+            # implicitly assume 'all' if first entry is an exclusion
+            unshift @setList, [ '*', '*', [ '', '*' ] ] unless @setList;
+            # exclude this tag by leaving $dst undefined
+        } else {
+            # copy to same group/tag
+            $dst = [ $grp, $tag ];
+        }
+        $grp or $grp = '*';     # use '*' for any group
+        # save in reverse order so we don't set tags before an exclude
+        unshift @setList, [ $grp, $tag, $dst ];
+    }
+    # 2) initialize lists of matching tags for each condition
+    foreach $set (@setList) {
+        $$set[2] and $setMatches{$$set[2]} = [ ];
+    }
+    # 3) loop through all tags in source image and save tags matching each condition
     foreach $tag (@tags) {
         # don't try to set Warning's or Error's
         next if $tag =~ /^Warning\b/ or $tag =~ /^Error\b/;
-        my ($val, @values);
-        if (ref $info->{$tag} eq 'ARRAY') {
-            @values = @{$info->{$tag}};
-        } elsif (ref $info->{$tag} eq 'SCALAR') {
-            @values = ( ${$info->{$tag}} );
-        } else {
-            @values = ( $info->{$tag} );
-        }
-        my $replace = 1;
-        foreach $val (@values) {
-            my @rtnVals = $self->SetNewValue($tag, $val, Replace=>$replace);
-            unless ($rtnVals[0]) {
-                # delete this tag since we couldn't set it
-                delete $info->{$tag};
-                last;
+        my @dstList;
+        # only set specified tags
+        my $lcTag = lc(GetTagName($tag));
+        my ($grp0, $grp1);
+        foreach $set (@setList) {
+            # check first for matching tag
+            next unless $$set[1] eq $lcTag or $$set[1] eq '*';
+            # then check for matching group
+            unless ($$set[0] eq '*') {
+                # get lower case group names if not done already
+                unless ($grp0) {
+                    $grp0 = lc($srcExifTool->GetGroup($tag, 0));
+                    $grp1 = lc($srcExifTool->GetGroup($tag, 1));
+                }
+                next unless $$set[0] eq $grp0 or $$set[0] eq $grp1;
             }
-            $replace = 0;
+            last unless $$set[2];   # all done if we hit an exclude
+            # add to the list of tags matching this condition
+            push @{$setMatches{$set}}, $tag;
         }
     }
-    return $info;
+    # 4) loop through each condition in original order, setting new tag values
+    my %rtnInfo;
+    foreach $set (reverse @setList) {
+        foreach $tag (@{$setMatches{$set}}) {
+            my (@values, %opts, $val);
+            # get all values for this tag
+            if (ref $info->{$tag} eq 'ARRAY') {
+                @values = @{$info->{$tag}};
+            } elsif (ref $info->{$tag} eq 'SCALAR') {
+                @values = ( ${$info->{$tag}} );
+            } else {
+                @values = ( $info->{$tag} );
+            }
+            my ($dstGrp, $dstTag) = @{$$set[2]};
+            if ($dstGrp) {
+                $dstGrp = $srcExifTool->GetGroup($tag, 1) if $dstGrp eq '*';
+                $opts{Group} = $dstGrp;
+            }
+            $dstTag = $tag if $dstTag eq '*';
+            $opts{Replace} = 1;     # replace the first value found
+            # set all values for this tag
+            foreach $val (@values) {
+                my @rtnVals = $self->SetNewValue($dstTag, $val, %opts);
+                last unless $rtnVals[0];
+                $rtnInfo{$tag} = $info->{$tag}; # tag was set successfully
+                $opts{Replace} = 0;
+            }
+        }
+    }
+    return \%rtnInfo;   # return information that we set
 }
 
 #------------------------------------------------------------------------------
@@ -744,10 +862,20 @@ sub WriteInfo($$$)
         $rtnVal and $rtnVal = -1 unless close($outRef);
         # erase the output file unless we were successful
         $rtnVal <= 0 and unlink $outfile;
+        # set FileModifyDate if requested
+        my $val = $self->GetNewValues('FileModifyDate');
+        if (defined $val) {
+            if (utime($val, $val, $outfile)) {
+                ++$self->{CHANGED};
+                $self->{OPTIONS}->{Verbose} > 1 and print "    + FileModifyDate = '$val'\n";
+            } else {
+                $self->Warn('Error setting FileModifyDate');
+            }
+        }
     }
     # if $rtnVal<0 there was a write error
     if ($rtnVal < 0) {
-        $self->Warn('Error writing output file');
+        $self->Error('Error writing output file');
         $rtnVal = 0;    # return 0 on failure
     } elsif ($rtnVal > 0) {
         ++$rtnVal unless $self->{CHANGED};
@@ -1197,17 +1325,26 @@ sub WriteTagTable($$;$$)
     # set directory name from default group0 name if not done already
     $dirInfo->{DirName} or $dirInfo->{DirName} = $tagTablePtr->{GROUPS}->{0};
     if ($self->{DEL_GROUP}) {
+        my $delGroupPtr = $self->{DEL_GROUP};
         # delete entire directory if specified
-        my $grp = $dirInfo->{DirName};
-        if ($self->{FILE_TYPE} eq 'JPEG') {
-            $grp eq 'IFD0' and $grp = 'EXIF';       # EXIF means remove JPEG IFD0
-        } else {
-            $grp eq 'ExifIFD' and $grp = 'EXIF';    # EXIF means remove TIFF ExifIFD
-        }
-        if ($self->{DEL_GROUP}->{$grp}) {
-            ++$self->{CHANGED};
-            $verbose and print "  Deleting $$dirInfo{DirName}\n";
-            return '';
+        my $grp0 = $tagTablePtr->{GROUPS}->{0};
+        my $grp1 = $dirInfo->{DirName};
+        if ($$delGroupPtr{$grp0} or $$delGroupPtr{$grp1}) {
+            if ($self->{FILE_TYPE} ne 'JPEG') {
+                # restrict delete logic to prevent entire tiff image from being killed
+                # (don't allow IFD0 to be deleted, and delete only ExifIFD if EXIF specified)
+                if ($grp1 eq 'IFD0') {
+                    $$delGroupPtr{IFD0} and $self->Warn("Can't delete IFD0 from $self->{FILE_TYPE} image");
+                    undef $grp1;
+                } elsif ($grp0 eq 'EXIF' and $$delGroupPtr{$grp0}) {
+                    undef $grp1 unless $$delGroupPtr{$grp1} or $grp1 eq 'ExifIFD';
+                }
+            }
+            if ($grp1) {
+                ++$self->{CHANGED};
+                $verbose and print "  Deleting $grp1\n";
+                return '';
+            }
         }
     }
     # use default proc from tag table if no proc specified
@@ -1646,7 +1783,11 @@ sub WriteValue($$;$$$$)
 
     if ($proc) {
         my @vals = split(' ',$val);
-        $count or $count = 1;   # assume 1 if count not specified
+        if ($count) {
+            $count = @vals if $count < 0;
+        } else {
+            $count = 1;   # assume 1 if count not specified
+        }
         $packed = '';
         while ($count--) {
             $val = shift @vals;
@@ -1662,7 +1803,7 @@ sub WriteValue($$;$$$$)
         }
     } elsif ($format eq 'string' or $format eq 'undef') {
         $format eq 'string' and $val .= "\0";   # null-terminate strings
-        if (defined $count) {
+        if ($count and $count > 0) {
             my $diff = $count - length($val);
             if ($diff) {
                 #warn "wrong string length!\n";
@@ -1927,11 +2068,10 @@ sub WriteJPEG($$)
                 $doneDir{COM} = 1;
                 last if $self->{DEL_GROUP} and $self->{DEL_GROUP}->{File};
                 my $tagInfo = $Image::ExifTool::extraTags{Comment};
-                my $oldComment = $markerName eq 'COM' ? $$segDataPt : '';
-                $oldComment =~ s/\0.*//s;
+                my $oldComment = '';
                 $markerName eq 'COM' and ($oldComment = $$segDataPt) =~ s/\0.*//s;
                 my $newValueHash = $self->GetNewValueHash($tagInfo);
-                unless (IsOverwriting($newValueHash)) {
+                unless (IsOverwriting($newValueHash, $oldComment)) {
                     delete $$editDirs{COM}; # we aren't editing COM after all
                     last;
                 }
@@ -1945,12 +2085,12 @@ sub WriteJPEG($$)
                     $verbose > 1 and print "    + Comment = '$newComment'\n";
                     my $len = length($newComment);
                     my $n;
-                    for ($n=0; $n<$len; $n+=$maxSegmentLen-1) {
+                    for ($n=0; $n<$len; $n+=$maxSegmentLen) {
                         my $size = $len - $n;
-                        $size >= $maxSegmentLen and $size = $maxSegmentLen - 1;
-                        my $comHdr = "\xff\xfe" . pack('n', $size + 3);
+                        $size >= $maxSegmentLen and $size = $maxSegmentLen;
+                        my $comHdr = "\xff\xfe" . pack('n', $size + 2);
                         my $str = substr($newComment,$n,$size);
-                        Write($outfile, $comHdr, $str, "\0") or $err = 1;
+                        Write($outfile, $comHdr, $str) or $err = 1;
                     }
                     ++$self->{CHANGED};
                 }
@@ -2285,7 +2425,7 @@ sub CheckValue($$;$)
     my (@vals, $n);
 
     if ($format eq 'string' or $format eq 'undef') {
-        return undef unless $count;
+        return undef unless $count and $count > 0;
         my $len = length($$valPtr);
         if ($format eq 'string') {
             $len >= $count and return 'String too long';
@@ -2297,16 +2437,18 @@ sub CheckValue($$;$)
         }
         return undef;
     }
-    if ($count and $count > 1) {
+    if ($count and $count != 1) {
         @vals = split(' ',$$valPtr);
+        $count < 0 and ($count = @vals or return undef);
     } else {
         $count = 1;
         @vals = ( $$valPtr );
     }
+    return "Too many values specified ($count required)" if @vals > $count;
+    return "Not enough values specified ($count required)" if @vals < $count;
     my $val;
     for ($n=0; $n<$count; ++$n) {
         $val = shift @vals;
-        defined $val or return "Not enough values specified ($count required)";
         if ($format =~ /^int/) {
             # make sure the value is integer
             return 'Not an integer' unless IsInt($val);

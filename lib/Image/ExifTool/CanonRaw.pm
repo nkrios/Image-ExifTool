@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -345,8 +345,8 @@ sub BuildMakerNotes($$$$$$);
     0 => {
         Name => 'DateTimeOriginal',
         Description => 'Shooting Date/Time',
-        ValueConv => 'Image::ExifTool::CanonRaw::ConvertBinaryDate($val)',
-        ValueConvInv => 'Image::ExifTool::CanonRaw::GetBinaryDate($val)',
+        ValueConv => 'ConvertUnixTime($val,"GMT")',
+        ValueConvInv => 'GetUnixTime($val,"GMT")',
         PrintConv => '$self->ConvertDateTime($val)',
         PrintConvInv => '$val',
     },
@@ -451,31 +451,6 @@ sub BuildMakerNotes($$$$$$);
 sub AUTOLOAD
 {
     return Image::ExifTool::DoAutoLoad($AUTOLOAD, @_);
-}
-
-#------------------------------------------------------------------------------
-# Convert binary date to string
-# Inputs: 0) Long date value
-sub ConvertBinaryDate($)
-{
-    my $time = shift;
-    my @time = gmtime($time);
-    return sprintf("%4d:%.2d:%.2d %.2d:%.2d:%.2d",
-                   $time[5]+1900,$time[4]+1,$time[3],
-                   $time[2],$time[1],$time[0]);
-}
-
-#------------------------------------------------------------------------------
-# get binary date from string
-# Inputs: 0) string
-# Returns: Binary date or undefined on error
-sub GetBinaryDate($)
-{
-    my $timeStr = shift;
-    return undef unless $timeStr =~ /^(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/;
-    my ($yr,$mon,$day,$hr,$min,$sec) = ($1,$2,$3,$4,$5,$6);
-    return undef unless eval 'require Time::Local';
-    return Time::Local::timegm($sec,$min,$hr,$day,$mon-1,$yr-1900);
 }
 
 #------------------------------------------------------------------------------
@@ -751,13 +726,13 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.cybercom.net/~dcoffin/dcraw/
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
-=item http://www.wonderland.org/crw/
+=item L<http://www.wonderland.org/crw/>
 
-=item http://xyrion.org/ciff/
+=item L<http://xyrion.org/ciff/>
 
-=item http://owl.phy.queensu.ca/~phil/exiftool/canon_raw.html
+=item L<http://owl.phy.queensu.ca/~phil/exiftool/canon_raw.html>
 
 =back
 

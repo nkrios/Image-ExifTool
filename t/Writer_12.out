@@ -1,7 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.01
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.17
 [File, File, Image]  - File Name: Writer_12_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6KB
+[File, File, Time]  - File Modification Date/Time: 2005:01:18 17:08:36
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -22,7 +23,7 @@
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:03:06 13:09:25
 [EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:03:06 13:09:25
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.358073
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 14.0
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
@@ -36,7 +37,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2048
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1536
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
@@ -59,12 +60,12 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1734
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1786
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Pentax, Camera] 1 - Pentax Mode: Night-scene
 [MakerNotes, Pentax, Image] 2 - Preview Image Size: 320x240
 [MakerNotes, Pentax, Image] 3 - Preview Image Length: 0
-[MakerNotes, Pentax, Image] 4 - Preview Image Start: 1306
+[MakerNotes, Pentax, Image] 4 - Preview Image Start: 1358
 [MakerNotes, Pentax, Camera] 6 - Date: 2003:03:06
 [MakerNotes, Pentax, Camera] 7 - Time: 13:09:25
 [MakerNotes, Pentax, Camera] 8 - Image Quality: Better
@@ -75,13 +76,14 @@
 [MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
 [MakerNotes, Pentax, Camera] 25 - White Balance: Auto
 [MakerNotes, Pentax, Camera] 26 - White Balance Mode: Auto
+[MakerNotes, Pentax, Camera] 27 - Blue Balance: 0.30859375
+[MakerNotes, Pentax, Camera] 28 - Red Balance: 0.37109375
 [MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm
 [MakerNotes, Pentax, Camera] 30 - Digital Zoom: 100
 [MakerNotes, Pentax, Camera] 31 - Saturation: Low
 [MakerNotes, Pentax, Camera] 32 - Contrast: Low
 [MakerNotes, Pentax, Camera] 33 - Sharpness: Soft
 [XMP, XMP-dc, Time] Date - Date: 2003-03-06
-[XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 0.358073000192443
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 120
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 160

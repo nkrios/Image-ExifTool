@@ -1,7 +1,8 @@
-  ExifToolVersion = 5.03
+  ExifToolVersion = 5.12
   FileName = CanonRaw.crw
   Directory = t
   FileSize = 6255
+  FileModifyDate = 2005:04:16 10:31:40
   FileType = Canon RAW
   + [Raw directory with 3 entries]
   | 0)  RawData = <Dummy raw image data>

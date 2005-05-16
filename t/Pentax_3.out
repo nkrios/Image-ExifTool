@@ -1,7 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.16
 [File, File, Image]  - File Name: Pentax_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
+[File, File, Time]  - File Modification Date/Time: 2005:05:08 12:44:13
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -69,8 +70,8 @@
 [MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
 [MakerNotes, Pentax, Camera] 25 - White Balance: Tungsten
 [MakerNotes, Pentax, Camera] 26 - White Balance Mode: Auto
-[MakerNotes, Pentax, Camera] 27 - Pentax 0x001b: 79
-[MakerNotes, Pentax, Camera] 28 - Pentax 0x001c: 95
+[MakerNotes, Pentax, Camera] 27 - Blue Balance: 0.30859375
+[MakerNotes, Pentax, Camera] 28 - Red Balance: 0.37109375
 [MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm
 [MakerNotes, Pentax, Camera] 30 - Digital Zoom: 100
 [MakerNotes, Pentax, Camera] 31 - Saturation: Low

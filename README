@@ -46,7 +46,12 @@ other Perl scripts by typing the following:
    make test
    make install
 
-Note: You need root access for the last step above.
+Notes:
+   i) You need root access for the last step above.  
+   ii) Some Perl installations (like the standard OSX installation) may not
+   contain the necessary files to complete the first step above.  But no
+   worries:  You can install ExifTool manually by moving 'exiftool' and the
+   'lib' directory to any directory in your current PATH.
 
 DEPENDENCIES
 

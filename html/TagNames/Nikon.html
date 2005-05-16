@@ -104,48 +104,53 @@
 <td align='center'>rational32s~</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x001d</td>
+<td>SerialNumber</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(Not writable because this value is used as a key to decrypt other information)</font></font></td></tr>
+<tr valign='top'>
 <td>0x0080</td>
 <td>ImageAdjustment</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0081</td>
 <td>ToneComp</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0082</td>
 <td>AuxiliaryLens</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0083</td>
 <td>LensType</td>
 <td align='center'>int8u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0084</td>
 <td>Lens</td>
 <td align='center'>rational32u[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0085</td>
 <td>ManualFocusDistance</td>
 <td align='center'>rational32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0086</td>
 <td>DigitalZoom</td>
 <td align='center'>rational32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0087</td>
 <td>FlashMode</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = Did Not Fire
   <br>8 = Fired, Commander Mode
   <br>9 = Fired, TTL Mode</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0088</td>
 <td>AFPoint</td>
 <td align='center'>int32u</td>
@@ -169,66 +174,74 @@
   <br>0x2020004 = Closest Subject, Bottom
   <br>0x2030008 = Closest Subject, Left
   <br>0x2040010 = Closest Subject, Right</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0089</td>
 <td>ShootingMode</td>
 <td align='center'>int16u~</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x008b</td>
 <td>LensFStops</td>
 <td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x008c</td>
 <td>NEFCurve1</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x008d</td>
 <td>ColorHue</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x008f</td>
 <td>SceneMode</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0090</td>
 <td>LightSource</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0092</td>
 <td>HueAdjustment</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0094</td>
 <td>Saturation</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0095</td>
 <td>NoiseReduction</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0096</td>
 <td>NEFCurve2</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0097</td>
-<td>ColorBalanceD70
-  <br>ColorBalanceD2H
-  <br>ColorBalanceD100
+<td>ColorBalance0100
+  <br>ColorBalance0102
+  <br>ColorBalance0103
   <br>ColorBalanceUnknown</td>
 <td align='center'>-<br>-<br>-<br>-</td>
-<td>--&gt; <a href='Nikon.html#ColorBalanceD70'>Nikon ColorBalanceD70 Tags</a>
-  <br>--&gt; <a href='Nikon.html#ColorBalanceD2H'>Nikon ColorBalanceD2H Tags</a>
-  <br>--&gt; <a href='Nikon.html#ColorBalanceD100'>Nikon ColorBalanceD100 Tags</a></td></tr>
+<td>--&gt; <a href='Nikon.html#ColorBalance0100'>Nikon ColorBalance0100 Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalance0102'>Nikon ColorBalance0102 Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalance0103'>Nikon ColorBalance0103 Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0098</td>
+<td>LensData0101
+  <br>LensData0201
+  <br>LensDataUnknown</td>
+<td align='center'>-<br>-<br>-</td>
+<td>--&gt; <a href='Nikon.html#LensData'>Nikon LensData Tags</a>
+  <br>--&gt; <a href='Nikon.html#LensData'>Nikon LensData Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0099</td>
 <td>NEFThumbnailSize</td>
@@ -242,8 +255,8 @@
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x00a7</td>
 <td>ShutterCount</td>
-<td align='center'>int32u</td>
-<td>&nbsp;</td></tr>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(Not writable because this value is used as a key to decrypt other information)</font></font></td></tr>
 <tr valign='top'>
 <td>0x00a9</td>
 <td>ImageOptimization</td>
@@ -342,7 +355,24 @@
   <br>2 = Co-sited</font></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='ColorBalanceD70'>Nikon ColorBalanceD70 Tags</a></h2>
+<h2><a name='ColorBalance0100'>Nikon ColorBalance0100 Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>RedBalance</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>BlueBalance</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ColorBalance0102'>Nikon ColorBalance0102 Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
@@ -359,7 +389,7 @@
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='ColorBalanceD2H'>Nikon ColorBalanceD2H Tags</a></h2>
+<h2><a name='ColorBalance0103'>Nikon ColorBalance0103 Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
@@ -372,23 +402,147 @@
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
 <td>BlueBalance</td>
-<td align='center'>N</td>
+<td align='center'>rational16s</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='ColorBalanceD100'>Nikon ColorBalanceD100 Tags</a></h2>
+<h2><a name='LensData'>Nikon LensData Tags</a></h2>
+
+Nikon encrypts the LensData information below if LensDataVersion is 0201,
+but  the decryption algorithm is known so the information can be extracted.
+It isn&apos;t yet writable, however, because the encryption adds complications
+which make writing more difficult.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
-<td>RedBalance</td>
+<td>LensDataVersion</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>1</td>
-<td>BlueBalance</td>
+<td align='right'>5</td>
+<td>AFAperture</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>FocusPosition</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>9</td>
+<td>FocusDistance</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>FocalLength</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>11</td>
+<td>LensID</td>
+<td align='center'>N</td>
+<td><font size='-1'>2 = Unknown Nikkor or Sigma non D-type
+  <br>7 = Nikkor AF 28-85/3.5-4.5
+  <br>8 = Nikkor AF 35-105/3.5-4.5
+  <br>9 = Nikkor AF 24/2.8
+  <br>11 = Nikkor AF 180/2.8 IF-ED
+  <br>15 = Nikkor AF 50/1.8
+  <br>16 = Nikkor AF 300/4 IF-ED
+  <br>19 = Nikkor AF 24-50/3.3-4.5
+  <br>20 = Nikkor AF 80-200/2.8 ED
+  <br>27 = Nikkor AF 75-300/4.5-5.6
+  <br>28 = Nikkor AF 20/2.8
+  <br>29 = Nikkor AF 35-70/3.3-4.5 N
+  <br>30 = Nikkor AF 60/2.8 Micro
+  <br>34 = Nikkor AF 70-210/4-5.6 D
+  <br>38 = Unkown Nikkor or Sigma D-type
+  <br>42 = Nikkor AF 28/1.4 D
+  <br>44 = Nikkor AF 105/2 D DC-Nikkor
+  <br>45 = Nikkor AF 200/4 D IF-ED Micro
+  <br>47 = Nikkor AF 20-35/2.8 D IF
+  <br>49 = Nikkor AF 60/2.8 D Micro
+  <br>50 = Nikkor AF 105/2.8 D Micro
+  <br>51 = Nikkor AF 18/2.8 D
+  <br>52 = Unknown Nikkor or Tameron
+  <br>54 = Nikkor AF 24/2.8 D
+  <br>55 = Nikkor AF 20/2.8 D
+  <br>56 = Nikkor AF 85/1.8 D
+  <br>59 = Nikkor AF 35-70/2.8 D
+  <br>66 = Nikkor AF 35/2 D
+  <br>67 = Nikkor AF 50/1.4 D
+  <br>69 = Nikkor AF 35-80/4-5.6 D
+  <br>72 = Nikkor AF-S 300/2.8 D IF-ED
+  <br>74 = Nikkor AF 85/1.4 D IF
+  <br>76 = Nikkor AF 24-120/3.5-5.6 D IF
+  <br>77 = Nikkor AF 28-200/3.5-5.6 D IF
+  <br>78 = Nikkor AF 135/2 D DC-Nikkor
+  <br>83 = Nikkor AF 80-200/2.8 D ED N
+  <br>84 = Nikkor AF 70-180/4.5-5.6 D ED Micro
+  <br>86 = Nikkor AF 70-300/4-5.6 D ED
+  <br>93 = Nikkor AF-S 28-70/2.8 D IF-ED
+  <br>94 = Nikkor AF-S 80-200/2.8 D IF-ED
+  <br>99 = Nikkor AF-S 17-35/2.8 D IF-ED
+  <br>101 = Nikkor AF 80-400/4.5-5.6 D ED VR
+  <br>102 = Nikkor AF 18-35/3.5-4.5 D IF-ED
+  <br>103 = Nikkor AF 24-85/2.8-4 D IF
+  <br>104 = Nikkor AF 28-80/3.3-5.6 G
+  <br>105 = Nikkor AF 70-300/4-5.6 G
+  <br>106 = Nikkor AF-S 300/4 D IF-ED
+  <br>109 = Nikkor AF-S 300/2.8 D IF-ED II
+  <br>110 = Nikkor AF-S 400/2.8 D IF-ED II
+  <br>112 = Nikkor AF-S 600/4 D IF-ED
+  <br>114 = Nikkor 45mm F/2.8
+  <br>116 = Nikkor AF-S 24-85/3.5-4.5 G IF-ED
+  <br>118 = Nikkor AF 50/1.8 D
+  <br>119 = Nikkor AF-S 70-200/2.8 G IF-ED VR
+  <br>120 = Nikkor AF-S 24-120/3.5-5.6 G IF-ED VR
+  <br>121 = Nikkor AF 28-200/3.5-5.6 G IF-ED
+  <br>122 = Nikkor AF-S 12-24/4 G IF-ED DX
+  <br>123 = Nikkor AF-S 200-400/4 G IF-ED VR
+  <br>125 = Nikkor AF-S 17-55/2.8 G IF-ED DX
+  <br>127 = Nikkor AF-S 18-70/3.5-4.5 G IF-ED DX
+  <br>128 = Nikkor AF 10.5/2.8 G ED DX Fisheye
+  <br>129 = Nikkor AF-S 200/2 G IF-ED VR
+  <br>130 = Nikkor AF-S 300/2.8 G IF-ED VR
+  <br>137 = Nikkor 55-200mm F/4-5.6G
+  <br>140 = Nikkor 18-55mm F/3.5-5.6G</font></td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>LensFStops</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>13</td>
+<td>MinFocalLength</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>MaxFocalLength</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>15</td>
+<td>MaxApertureAtMinFocal</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>16</td>
+<td>MaxApertureAtMaxFocal</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>17</td>
+<td>MCUVersion</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>18</td>
+<td>EffectiveMaxAperture</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -465,6 +619,6 @@
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 19, 2005</i>
+<br><i>Last revised May 16, 2005</i>
 </body>
 </html>

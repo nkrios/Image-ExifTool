@@ -21,8 +21,9 @@
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#options">OPTIONS</a></li>
-	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#reading_examples">READING EXAMPLES</a></li>
 	<li><a href="#writing_examples">WRITING EXAMPLES</a></li>
+	<li><a href="#copying_examples">COPYING EXAMPLES</a></li>
 	<li><a href="#piping_examples">PIPING EXAMPLES</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
@@ -33,7 +34,7 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>exiftool - Read/write meta information in image files</p>
+<p>exiftool - Read/write meta information in images</p>
 <p>
 </p>
 <hr />
@@ -49,10 +50,10 @@ image file name, a directory name, or <code>-</code> for the standard input.
 Information is read from the specified file and output in readable form to
 the console (or written to an output text file with the <code>-w</code> option).</p>
 <p>To write information in an image file, specify new values using either the
-<code>-TAG=[VALUE]</code> syntax or the <code>-AllTagsFromFile</code> option.  This causes
-exiftool to rewrite <code>FILE</code> with the specified information, preserving the
-original file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify
-that the new file is OK before erasing the original.)</p>
+<code>-TAG=[VALUE]</code> syntax or the <code>-TagsFromFile</code> option.  This causes exiftool
+to rewrite <code>FILE</code> with the specified information, preserving the original
+file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify that the
+new file is OK before erasing the original.)</p>
 <p>Below is a list of meta information formats and file types supported by
 exiftool (r = read support, w = write support):</p>
 <pre>
@@ -85,11 +86,19 @@ followed by a colon.  (ie. <code>-TAG:GROUP</code>, where <code>GROUP</code> is 
 0 or 1 group name.  Use the <code>-group</code> option to list valid group names.)  If
 no tags are specified, all available information is extracted.
 </dd>
+<dd>
+<p>A special tag name of <code>All</code> may be used to indicate all meta information.
+This is particularly useful when a group name is specified to extract all
+information in a group.  (<code>*</code> is a synonym for <code>All</code>, but must be quoted
+if used on the command line to prevent shell globbing.)</p>
+</dd>
 <p></p>
 <dt><strong><a name="item__2d_2dtag"><strong>--</strong><em>TAG</em></a></strong><br />
 </dt>
 <dd>
 Exclude specified tag from extracted information.  Same as the <code>-x</code> option.
+May also be used following a <code>-TagsFromFile</code> option to exclude tags from
+being extracted from the source file.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dtag_5b_2b_2d_3c_5d_3d_5bvalue_5d"><strong>-</strong><em>TAG</em>[+-&lt;]<strong>=</strong>[<em>VALUE</em>]</a></strong><br />
@@ -97,28 +106,46 @@ Exclude specified tag from extracted information.  Same as the <code>-x</code> o
 <dd>
 Writes a new value for the specified tag, or deletes the tag if <code>VALUE</code> is
 not specified.  Use <code>+=</code> to add a value to a list without replacing
-existing values, and <code>-=</code> to delete a specific value from a list.  Use
+existing values, and <code>-=</code> to delete the specifiied value only.  Use
 <code>&lt;=</code> to set the value of a tag from the contents of a file with name
-<code>VALUE</code>.  (Note: Quotes are required around the argument in this case to
+<code>VALUE</code>. (Note: Quotes are required around the argument in this case to
 prevent shell redirection.)
 </dd>
 <dd>
-<p>A special tag name of <code>All</code> may be used if no <code>VALUE</code> is specified to
-delete all meta information, or all information in a specified group with
-<code>-GROUP:All=</code> (for family 0 groups only).  Note that within an image, some
-groups may be contained within others.  These groups are also removed if the
-super group is deleted.  Below are lists of these group dependencies:</p>
+<p>If a group name is not specified for <code>TAG</code>, then the information is written
+to the first group in the following list where <code>TAG</code> is valid:  1) EXIF, 2)
+GPS, 3) IPTC, 4) XMP, 5) MakerNotes.</p>
+</dd>
+<dd>
+<p>The special <code>All</code> tag may be used only if a <code>VALUE</code> is NOT specified.  This
+causes all meta information to be deleted (or all information in a group if
+<code>-GROUP:All=</code> is used).  Note that not all groups are deletable.  Also,
+within an image some groups may be contained within others, and these groups
+are removed if the super group is deleted.  Below are lists of these group
+dependencies:</p>
 </dd>
 <dd>
 <pre>
   JPEG Image:
-  - deleting EXIF also deletes MakerNotes, GPS and PrintIM
-  - deleting Photoshop also deletes IPTC</pre>
+  - Deleting EXIF or IFD0 also deletes ExifIFD, GlobParamIFD,
+    GPS, IFD1, InteropIFD, MakerNotes, PrintIM and SubIFD.
+  - Deleting ExifIFD also deletes InteropIFD and MakerNotes.
+  - Deleting Photoshop also deletes IPTC.</pre>
 </dd>
 <dd>
 <pre>
   TIFF Image:
-  - deleting EXIF also deletes MakerNotes</pre>
+  - Deleting EXIF only removes ExifIFD which also deletes
+    InteropIFD and MakerNotes.</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item__2d_40_argfile"><strong>-@</strong> <em>ARGFILE</em></a></strong><br />
+</dt>
+<dd>
+Read command-line arguments from the specified file.  The file contains one
+argument per line.  Blank lines and lines beginning with <code>#</code> and are
+ignored.  <code>ARGFILE</code> may exist relative to either the current directory or
+the exiftool directory unless an absolute pathname is given.
 </dd>
 <p></p>
 <dt><strong><a name="item__2da"><strong>-a</strong></a></strong><br />
@@ -126,19 +153,6 @@ super group is deleted.  Below are lists of these group dependencies:</p>
 <dd>
 <strong>A</strong>llow duplicate tag names in the output (otherwise duplicates are
 suppressed).
-</dd>
-<p></p>
-<dt><strong><a name="item__2dalltagsfromfile_srcfile"><strong>-AllTagsFromFile</strong> <em>SRCFILE</em></a></strong><br />
-</dt>
-<dd>
-Set the value of all writable tags from information in the specified source
-file.  Note that the maker note information is set as a block, so it isn't
-effected like other information by subsequent tag assignments on the command
-line.  For example, to copy all information but the thumbnail image, use
-<code>-ThumbnailImage=</code> after <code>-AllTagsFromFile</code> on the command line.  Since
-the preview image is referenced from the maker notes and may be rather
-large, it is not copied.  Instead, the preview image must be transferred
-separately if desired.
 </dd>
 <p></p>
 <dt><strong><a name="item__2db"><strong>-b</strong></a></strong><br />
@@ -258,7 +272,8 @@ print conversion to written tag values.
 </dt>
 <dd>
 Set <strong>o</strong>utput file or directory name when writing information (otherwise the
-source file is renamed to <code>FILE_original</code> and the output file is <code>FILE</code>).
+source file is renamed to <code>FILE_original</code> and the output file is <code>FILE</code> in
+the original directory).
 </dd>
 <p></p>
 <dt><strong><a name="item__2dp_fmtfile"><strong>-p</strong> <em>FMTFILE</em></a></strong><br />
@@ -318,6 +333,53 @@ Output a <strong>t</strong>ab-delimited list of description/values (useful for d
 import).
 </dd>
 <p></p>
+<dt><strong><a name="item__2dtagsfromfile_srcfile"><strong>-TagsFromFile</strong> <em>SRCFILE</em></a></strong><br />
+</dt>
+<dd>
+Set the value of writable tags from information in the specified source
+file.  Tag names on the command line after this option specify information
+to be extracted (or excluded) from the source file.  If no tags are
+specified, then all tags found in the source file are used.  More than one
+<code>-TagsFromFile</code> option may be specified to set tag values from information
+in different files.
+</dd>
+<dd>
+<p>By default, this option will commute information between same-named tags in
+different groups, allowing information to be translated between images with
+different formats.  This behaviour may be defeated by specifying a group
+name for extracted tags (even if 'All' is used as a group name), in which
+case the information is written to the original group, unless redirected to
+a different group.</p>
+</dd>
+<dd>
+<p>A powerful information redirection feature allows a destination tag to be
+specified for each extracted tag.  With this feature, information may be
+written to a tag with a different name, or to a specific group.  This is
+done using &quot;<code>'-SRCTAG&gt;DSTTAG'</code>&quot; on the command line after
+<code>-TagsFromFile</code>.  (Note that this argument must be quoted to prevent shell
+redirection, and there is no <code>=</code> sign since this is a special feature to
+control <em>extracted</em> information.)  Both source and destination tags may be
+prefixed by a group name, and <code>All</code> may be used as a tag name.</p>
+</dd>
+<dd>
+<p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples of how to use this option.</p>
+</dd>
+<dd>
+<p>Be aware of the difference between excluding a tag from being copied
+(<a href="#item__2d_2dtag"><code>--TAG</code></a>), and deleting a tag (<code>-TAG=</code>).  Excluding a tag will prevent it
+from being copied to the destination image, but deleting a tag will remove
+it if it already exists.</p>
+</dd>
+<dd>
+<p>Note that the maker note information is set as a block, so it isn't effected
+like other information by subsequent tag assignments on the command line.
+For example, to copy all information but the thumbnail image, use
+<code>-ThumbnailImage=</code> after <code>-TagsFromFile</code> on the command line.  Since the
+preview image is referenced from the maker notes and may be rather large, it
+is not copied.  Instead, the preview image must be transferred separately if
+desired.</p>
+</dd>
+<p></p>
 <dt><strong><a name="item__2du"><strong>-u</strong></a></strong><br />
 </dt>
 <dd>
@@ -335,7 +397,9 @@ data blocks (same as two <a href="#item__2du"><code>-u</code></a> options).
 <dt><strong><a name="item__2dv_5b_23_5d"><strong>-v</strong>[#]</a></strong><br />
 </dt>
 <dd>
-Print <strong>v</strong>erbose messages (# may be 1-4, higher is more verbose).
+Print <strong>v</strong>erbose messages (# may be 1-4, higher is more verbose).  This
+option suppresses normal console output unless specific tags are being
+extracted.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dver"><strong>-ver</strong></a></strong><br />
@@ -355,7 +419,10 @@ extension (including the <code>.</code>) with the specified extension.
 <dt><strong><a name="item__2dx_tag"><strong>-x</strong> <em>TAG</em></a></strong><br />
 </dt>
 <dd>
-E<strong>x</strong>clude specified tag (may be many <code>-x</code> options).  Same as <a href="#item__2d_2dtag"><code>--TAG</code></a>.
+E<strong>x</strong>clude the specified tag.  There may be multiple <code>-x</code> options.  This
+has the same effect as <a href="#item__2d_2dtag"><code>--TAG</code></a> on the command line.  May also be used
+following a <code>-TagsFromFile</code> option to exclude tags from being extracted
+from the source file.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dz"><strong>-z</strong></a></strong><br />
@@ -367,7 +434,7 @@ Extract information from .g<strong>z</strong> and .b<strong>z</strong>2 compress
 <p>
 </p>
 <hr />
-<h1><a name="examples">EXAMPLES</a></h1>
+<h1><a name="reading_examples">READING EXAMPLES</a></h1>
 <dl>
 <dt><strong><a name="item_exiftool__2dg_a_2ejpg">exiftool -g a.jpg</a></strong><br />
 </dt>
@@ -436,16 +503,17 @@ Extract image resolution from IFD1.
 <hr />
 <h1><a name="writing_examples">WRITING EXAMPLES</a></h1>
 <dl>
-<dt><strong><a name="item_exiftool__2dcomment_3d_27this_is_a_new_comment_27_">exiftool -comment='This is a new comment' dst.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2dcomment_3d_27this_is_a_new_comment_27_">exiftool -Comment='This is a new comment' dst.jpg</a></strong><br />
 </dt>
 <dd>
 Set comment in file (replaces any existing comment).
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dcomment_3d__2a_2ejpg">exiftool -comment= *.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2dcomment_3d__2do_newdir__2a_2ejpg">exiftool -comment= -o newdir *.jpg</a></strong><br />
 </dt>
 <dd>
-Remove comment from all JPG files.
+Remove comment from all JPG files in the current directory, writing the
+modified files to a new directory.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dkeywords_3dexif__2dkeywords_3deditor_d">exiftool -keywords=EXIF -keywords=editor dst.jpg</a></strong><br />
@@ -454,10 +522,11 @@ Remove comment from all JPG files.
 Replace existing keyword list with two new keywords (<code>EXIF</code> and <code>editor</code>).
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dkeywords_2b_3dword_dst_2ejpg">exiftool -keywords+=word dst.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2dkeywords_2b_3dword__2do_newfile_2ejpg_">exiftool -Keywords+=word -o newfile.jpg src.jpg</a></strong><br />
 </dt>
 <dd>
-Add a keyword (<code>word</code>) to the current list of keywords.
+Copy a source image to a new file, and add a keyword (<code>word</code>) to the
+current list of keywords.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dcategory_2d_3dxxx_dir">exiftool -category-=xxx dir</a></strong><br />
@@ -472,25 +541,11 @@ Delete only the specified category (<code>xxx</code>) from all files in director
 Delete all meta information from an image.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dphotoshop_3aall_3d_dst_2ejpg">exiftool -photoshop:all= dst.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2dphotoshop_3aall_3d_dst_2ejpg">exiftool -Photoshop:All= dst.jpg</a></strong><br />
 </dt>
 <dd>
 Delete Photoshop meta information from an image (note that the Photoshop
 information also includes IPTC).
-</dd>
-<p></p>
-<dt><strong><a name="item_exiftool__2dalltagsfromfile_src_2ecrw_dst_2ejpg">exiftool -AllTagsFromFile src.crw dst.jpg</a></strong><br />
-</dt>
-<dd>
-Set the values of all writable tags from information in <code>src.crw</code>, and
-update <code>dst.jpg</code> with this new information.
-</dd>
-<p></p>
-<dt><strong><a name="item_exiftool__2dalltagsfromfile_a_2ejpg__2dxmp_3aall_3">exiftool -AllTagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg</a></strong><br />
-</dt>
-<dd>
-Copy all meta information from a.jpg to b.jpg except the thumbnail image and
-the XMP information.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__27_2dthumbnailimage_3c_3dthumb_2ejpg_27_">exiftool '-ThumbnailImage&lt;=thumb.jpg' dst.jpg</a></strong><br />
@@ -529,6 +584,74 @@ Set <code>WhiteBalance</code> to <code>Tungsten</code> only if it was previously
 <p>
 </p>
 <hr />
+<h1><a name="copying_examples">COPYING EXAMPLES</a></h1>
+<dl>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ecrw_dst_2ejpg">exiftool -TagsFromFile src.crw dst.jpg</a></strong><br />
+</dt>
+<dd>
+Copy the values of all writable tags from <code>src.crw</code> to <code>dst.jpg</code>, writing
+the information to the preferred groups.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile__2dall_3aall_src_2ecrw_ds">exiftool -TagsFromFile -all:all src.crw dst.jpg</a></strong><br />
+</dt>
+<dd>
+Copy the values of all writable tags from <code>src.crw</code> to <code>dst.jpg</code>,
+preserving the original tag groups.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2dxmp_3aall_3d__">exiftool -tagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg</a></strong><br />
+</dt>
+<dd>
+Copy all meta information from a.jpg to b.jpg, but do not write the
+thumbnail image or XMP information.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__2dtitle__2daut">exiftool -TagsFromFile src.jpg -title -author=Phil dst.jpg</a></strong><br />
+</dt>
+<dd>
+Copy title from one image to another and set a new author name.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2diso__2dtagsfro">exiftool -TagsFromFile a.jpg -ISO -TagsFromFile b.jpg -comment
+dst.jpg</a></strong><br />
+</dt>
+<dd>
+Copy ISO from one image and Comment from another image to a destination
+image.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__2dexif_3aall__">exiftool -tagsfromfile src.jpg -exif:all --subifd:all dst.jpg</a></strong><br />
+</dt>
+<dd>
+Copy only the EXIF information from one image to another, excluding SubIFD
+tags.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__27_2dmodifydate_">exiftool -tagsfromfile a.jpg '-ModifyDate&gt;FileModifyDate' a.jpg</a></strong><br />
+</dt>
+<dd>
+Use the EXIF or XMP modification date to set the same file's filesystem
+modification date.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__27_2dall_3exmp">exiftool -TagsFromFile src.jpg '-all&gt;xmp:all' dst.jpg</a></strong><br />
+</dt>
+<dd>
+Translate all possible information into XMP format, and update dst.jpg with
+the new information.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2d_40_iptc2xmp_2">exiftool -tagsFromFile a.jpg -@ iptc2xmp.args -iptc:all= a.jpg</a></strong><br />
+</dt>
+<dd>
+Translate IPTC information to XMP with appropriate tag name conversions, and
+delete the original IPTC information in an image.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
 <h1><a name="piping_examples">PIPING EXAMPLES</a></h1>
 <dl>
 <dt><strong><a name="item_cat_a_2ejpg__7c_exiftool__2d">cat a.jpg | exiftool -</a></strong><br />
@@ -554,9 +677,9 @@ it under the same terms as Perl itself.</p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p><a href="ExifTool.html">Image::ExifTool</a>,
-<a href="TagNames/index.html">Image::ExifTool::TagNames</a>,
-<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shortcuts.pm">Image::ExifTool::Shortcuts</a></p>
+<p><a href="ExifTool.html">Image::ExifTool(3pm)</a>,
+<a href="TagNames/index.html">Image::ExifTool::TagNames(3pm)</a>,
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shortcuts.pm">Image::ExifTool::Shortcuts(3pm)</a></p>
 <table border="0" width="100%" cellspacing="0" cellpadding="3">
 <tr><td class="block" style="background-color: #cccccc" valign="middle">
 <big><strong><span class="block">&nbsp;exiftool Application Documentation</span></strong></big>

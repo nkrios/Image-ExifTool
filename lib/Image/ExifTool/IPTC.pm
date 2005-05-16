@@ -901,7 +901,7 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.iptc.org/IIM/
+=item L<http://www.iptc.org/IIM/>
 
 =back
 

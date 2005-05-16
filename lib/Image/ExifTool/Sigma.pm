@@ -109,7 +109,7 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.x3f.info/technotes/FileDocs/MakerNoteDoc.html
+=item L<http://www.x3f.info/technotes/FileDocs/MakerNoteDoc.html>
 
 =back
 

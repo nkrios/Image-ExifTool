@@ -5,10 +5,76 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<i>(I'll be away from about Apr. 22 to May 8/05, so don't expect any more
-upgrades or reponses to e-mails until I get back - PH)</i><p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.18.tar.gz">Version 5.18</a>.<p>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.05.tar.gz">Version 5.05</a>.<p>
+<b>May 16/05 - Version 5.18</b> (production release)
+<ul>
+<li>Added -@ option and two utility files (iptc2xmp.args and xmp2iptc.args) to
+    use with this option for translating between IPTC and XMP tag names
+<li>Disable normal console output if -v option used and no tags specified
+<li>Repair incorrect first byte of MRW preview images when extracting
+<li>More tweaking of -TagsFromFile order of operations
+</ul>
+
+<b>May 14/05 - Version 5.17</b>
+<ul>
+<li>Allow 'All' to be used as a group name with '-TagsFromFile' option to
+    preserve original tag groups (ie. '-all:all')
+<li>PrintIM information is now copied with -TagsFromFile
+<li>Decode EXIF:Gamma tag
+<li>Decode Canon 350D FileNumber
+<li>Made a few more tags writable
+<li>Don't rewrite TIFF files which could be Canon 1D RAW files since this
+    format currently isn't supported (can use the -m option to write anyway,
+    which will remove the RAW image data if this is a 1D file)
+<li>Don't add null terminator to UserComment, GPSProcessingMethod or
+    GPSAreaInformation
+<li>Improved logic for handling command line tag names and exclusions,
+    especially when associated with the -TagsFromFile option
+</ul>
+
+<b>May 10/05 - Version 5.16</b>
+<ul>
+<li>Decode a number of new Nikon lens-related tags (thanks again Robert
+    Rottmerhusen)
+<li>Various other improvements
+</ul>
+
+<b>May 7/05 - Version 5.15</b>
+<ul>
+<li>Added powerful new information redirection feature to -TagsFromFile option
+<li>Added writable File:FileModifyDate tag which represents the filesystem
+    date/time of last modification
+<li>Allow '*' to also be used as well as 'all' to represent all tags, although
+    this feature is not documented for the command-line options because 'all' is
+    more convenient since '*' must be quoted to prevent shell globbing
+</ul>
+
+<b>May 5/05 - Version 5.11</b>
+<ul>
+<li>Fixed problem where the proper tags weren't excluded from being extracted if
+    -GROUP:All and --TAG options are used together on the command line
+</ul>
+
+<b>May 5/05 - Version 5.10</b>
+<ul>
+<li>Changed -AllTagsFromFile option to -TagsFromFile and allow copied tags to be
+    specified on the command line.  (-AllTagsFromFile is preserved as an alias
+    to -TagsFromFile for backward compatibility.)
+<li>Allow -GROUP:All and --GROUP:All on command line to extract or exclude all
+    tags in specified group
+<li>Allow family 1 group names to be used when deleting groups with -GROUP:All=
+<li>Added composite CFAPattern derived from CFARepeatPatternDim and CFAPattern2
+<li>Fixed problem where tags which can exist in both IFD0 and ExifIFD weren't
+    being properly removed from one IFD when written to the other
+<li>Added FAQ
+</ul>
+
+<b>May 2/05 - Version 5.06</b>
+<ul>
+<li>Made a few more EXIF tags writable
+<li>No longer add null-terminator to JPEG comment (was confusing xv)
+</ul>
 
 <b>Apr. 20/05 - Version 5.05</b> (production release)
 <ul>
@@ -28,7 +94,7 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 <li>ExifTool now requires Perl version 5.004 or higher (previously 5.002 was OK)
 <li>Restrict the size of preview images where data is referenced directly as
     the value data of an IFD entry (only effects Casio images)
-<li>Fix problems rewriting some Casio maker notes
+<li>Fixed problems rewriting some Casio maker notes
 <li>Change priority of orientation (and a number of other tags which may appear
     in IFD1) so value in IFD0 takes precedence of value in IFD1 if it exists
 <li>API Changes:
@@ -63,7 +129,7 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 <li>-AllTagsFromFile now sets PreviewImage to 'dummy' if it exists in the maker
     notes to avoid writing a large preview to the destination file (now you have
     to do this manually afterwards if this is what you want)
-<li>Fix problem rewriting Olympus E1 maker note subdirectories
+<li>Fixed problem rewriting Olympus E1 maker note subdirectories
 <li>Only validate extracted images when Binary (-b) option is used
 <li>Rename Olympus PreviewImageAvailable to PreviewImageValid, and check/set
     this tag when reading/writing the preview image
@@ -73,10 +139,10 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 
 <b>Apr. 11/05 - Version 4.95</b>
 <ul>
-<li>Add ability to delete all meta information, or all information in a group
+<li>Added ability to delete all meta information, or all information in a group
 <li>Create some mandatory IPTC tags automatically when writing IPTC information
-<li>Decode a bunch more Olympus tags (thanks to Frank Ledwon)
-<li>Decode a couple more Canon 1D MkII tags (thanks to Denny Priebe)
+<li>Decoded a bunch more Olympus tags (thanks to Frank Ledwon)
+<li>Decoded a couple more Canon 1D MkII tags (thanks to Denny Priebe)
 <li>Fixed problem where Sony maker notes could be corrupted when rewriting file
 <li>Fixed problem that could cause wrong tag description to be printed for
     missing tags when the -f option is used
@@ -154,7 +220,7 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 
 <b>Mar. 15/05 - Version 4.87</b> (production release)
 <ul>
-<li>Add notes to TagNames documentation
+<li>Added notes to TagNames documentation
 </ul>
 
 <b>Mar. 11/05 - Version 4.86</b>
@@ -169,11 +235,11 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 <ul>
 <li>Create most mandatory EXIF entries automatically when a new EXIF directory
     is created
-<li>Fix problem which caused an error when adding XMP information to a TIFF file
-    which didn't previously contain XMP
-<li>Make '=' optional with -AllTagsFromFile option
-<li>Fix problem with verbose dump of zero-length directory (ie. Sony F717 maker
-    notes)
+<li>Fixed problem which caused an error when adding XMP information to a TIFF
+    file which didn't previously contain XMP
+<li>Made '=' optional with -AllTagsFromFile option
+<li>Fixed problem with verbose dump of zero-length directory (ie. Sony F717
+    maker notes)
 </ul>
 
 <b>Mar. 9/05 - Version 4.84</b>
@@ -202,7 +268,7 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 <b>Mar. 4/05 - Version 4.81</b>
 <ul>
 <li>Added user-definable shortcuts
-<li>Fix problem with XMP:Identifier (should have existed in both XMP-dc and
+<li>Fixed problem with XMP:Identifier (should have existed in both XMP-dc and
     XMP-xmp)
 </ul>
 
@@ -238,14 +304,14 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 <b>Feb. 24/05 - Version 4.70</b>
 <ul>
 <li>Allow family 1 group name to be specified for any tag while writing
-<li>Fix problem with writing Nikon PreviewImage to NEF files
+<li>Fixed problem with writing Nikon PreviewImage to NEF files
 </ul>
 
 <b>Feb. 23/05 - Version 4.67</b>
 <ul>
-<li>Add -L option to allow XP characters to be converted to Latin character set
-    instead of UTF8.  (Now XP characters can be displayed properly in terminal
-    windows which use either the UTF8 or WinLatin1 character set.)
+<li>Added -L option to allow XP characters to be converted to Latin character
+    set instead of UTF8.  (Now XP characters can be displayed properly in
+    terminal windows which use either the UTF8 or WinLatin1 character set.)
 <li>Make JpgFromRaw image writable in Nikon NEF files
 </ul>
 
@@ -446,7 +512,7 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 <li>Added warning when writing information if original IFD entries were not in
     the proper sequence, which is a violation of EXIF specs.  (And surprise,
     you'll never guess who does this too...  Yup, the EX-Z3.)
-<li>Fix parsing problem with GPSProcessingMethod and GPSAreaInformation
+<li>Fixed parsing problem with GPSProcessingMethod and GPSAreaInformation
 <li>No longer truncates 'undef' values at first null character
 <li>Changed all DataDump tags to binary data types
 <li>Changed some warning messages
@@ -466,7 +532,7 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
     not copied).
 <li>Account for funny offsets in Casio EX-Z3 maker notes while extracting data
     (but haven't figured out how to handle them when writing)
-<li>Fix but introduced in 4.20 that broke extraction of Canon PreviewImage
+<li>Fixed bug introduced in 4.20 that broke extraction of Canon PreviewImage
 </ul>
 
 <b>Jan. 17/05 - Version 4.23</b>
@@ -908,7 +974,7 @@ upgrades or reponses to e-mails until I get back - PH)</i><p>
 <li>Added all missing tag definitions from TIFF 6 standard
 <li>Added a few more EXIF tag definitions
 <li>Interpret PrintIM IFD
-<li>Fix interpretation of Interoperability IFD
+<li>Fixed interpretation of Interoperability IFD
 <li>Fixed potential endless loop bug introduced in version 3.33
 </ul>
 
@@ -1191,7 +1257,7 @@ script was not changed
 <ul>
 <li>Allow file reference to be passed to ImageInfo()
 <li>Allow file to be read from standard input by specifying "-" as file name
-<li>Add FileType tag
+<li>Added FileType tag
 </ul>
 
 <b>Feb. 07/04 - Version 2.60</b>

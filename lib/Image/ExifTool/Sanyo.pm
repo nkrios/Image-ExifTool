@@ -235,7 +235,7 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.exif.org/makernotes/SanyoMakerNote.html
+=item L<http://www.exif.org/makernotes/SanyoMakerNote.html>
 
 =back
 

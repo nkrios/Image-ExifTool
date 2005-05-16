@@ -204,9 +204,9 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.compton.nu/panasonic.html
+=item L<http://www.compton.nu/panasonic.html>
 
-=item http://johnst.org/sw/exiftags/
+=item L<http://johnst.org/sw/exiftags/>
 
 =back
 

@@ -15,6 +15,7 @@
 #               3) Wayne Smith private communication (tests with Optio 550)
 #               4) http://kobe1995.jp/~kaz/astro/istD.html
 #               5) John Francis private communication (tests with ist-D/ist-DS)
+#               6) http://www.cybercom.net/~dcoffin/dcraw/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Pentax;
@@ -23,7 +24,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 %Image::ExifTool::Pentax::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -180,6 +181,16 @@ $VERSION = '1.17';
             2 => 'Auto (2)',    # Observed in Optio-S file - PH
             0xffff => 'User-Selected',
         },
+    },
+    0x001b => { #6
+        Name => 'BlueBalance',
+        ValueConv => '$val / 256',
+        ValueConvInv => 'int($val * 256 + 0.5)',
+    },
+    0x001c => { #6
+        Name => 'RedBalance',
+        ValueConv => '$val / 256',
+        ValueConvInv => 'int($val * 256 + 0.5)',
     },
     # Would be nice if there was a general way to determine units for FocalLength.
     # Optio 550 uses .1mm while *istD and Optio S use .01 - PH
@@ -441,12 +452,13 @@ require a pointer.
 
 =over 4
 
-=item Image::MakerNotes::Pentax
+=item L<Image::MakerNotes::Pentax|Image::MakerNotes::Pentax>
 
-=item http://johnst.org/sw/exiftags/ (Asahi models)
+=item L<http://johnst.org/sw/exiftags/> (Asahi models)
 
-=item http://kobe1995.jp/~kaz/astro/istD.html
+=item L<http://kobe1995.jp/~kaz/astro/istD.html>
 
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
 =back
 
 =head1 ACKNOWLEDGEMENTS

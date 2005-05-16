@@ -699,9 +699,9 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.color.org/icc_specs2.html
+=item L<http://www.color.org/icc_specs2.html>
 
-=item http://developer.apple.com/documentation/GraphicsImaging/Reference/ColorSync_Manager/ColorSync_Manager.pdf
+=item L<http://developer.apple.com/documentation/GraphicsImaging/Reference/ColorSync_Manager/ColorSync_Manager.pdf>
 
 =back
 

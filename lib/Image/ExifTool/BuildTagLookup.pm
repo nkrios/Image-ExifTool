@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 @ISA = qw(Exporter);
 
 # colors for html pages
@@ -75,12 +75,12 @@ which is not writable directly, but is set via a Composite tag.  A tilde
 disabled (by setting PrintConv to 0, or using the -n option).  An
 exclamation point (C<!>) indicates a tag that is considered unsafe to write
 under normal circumstances.  These 'unsafe' tags are not set when calling
-SetNewValuesFromFile() or when using the exiftool -AllTagsFromFile option,
-and care should be taken when editing them manually since they may affect
-the way an image is rendered.
+SetNewValuesFromFile() or when using the exiftool -TagsFromFile option, and
+care should be taken when editing them manually since they may affect the
+way an image is rendered.
 
-The HTML version of this document also lists possible B<Values> for all tags
-which have a discrete set of values, or gives B<Notes> for some tags.
+The HTML version of these tables also list possible B<Values> for all tags
+which have a discrete set of values, and give B<Notes> for some tags.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -115,7 +115,7 @@ lists.
 The B<Group> column below gives the XMP schema namespace prefix for each
 tag.  The family 1 group names are composed from these schema names with a
 leading "XMP-" added.  If the same XMP tag name exists in more than one
-group, all groups are written unless a family 1 group name is specified. 
+group, all groups are written unless a family 1 group name is specified.
 ie) If XMP:Contrast is specified, information will be written to both
 XMP-crs:Contrast and XMP-exif:Contrast.
 
@@ -207,7 +207,7 @@ it under the same terms as Perl itself.
 
 ~head1 SEE ALSO
 
-L<Image::ExifTool|Image::ExifTool>
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 ~cut
 },
@@ -334,7 +334,9 @@ sub new
                 }
                 my $writable;
                 if ($subdir) {
-                    $writable = '-';
+                    # flag a subdirectory by setting writable to '-'
+                    # (if this is a writable subdirectory, prefix writable by '-')
+                    $writable = '-' . ($$tagInfo{Writable} || '');
                 } else {
                     if (defined $$tagInfo{Writable}) {
                         $writable = $$tagInfo{Writable};
@@ -639,19 +641,23 @@ sub CloseHtmlFiles()
         my $useNewFile;
         if ($success) {
             open (TEMPFILE, $tmpFile) or $success = 0, last;
-            open (HTMLFILE, $htmlFile) or $useNewFile = 1, close(TEMPFILE), last;
-            while (<HTMLFILE>) {
-                my $newLine = <TEMPFILE>;
-                if (defined $newLine) {
-                    next if /^<br><i>Last revised/;
-                    next if $_ eq $newLine;
+            if (open (HTMLFILE, $htmlFile)) {
+                while (<HTMLFILE>) {
+                    my $newLine = <TEMPFILE>;
+                    if (defined $newLine) {
+                        next if /^<br><i>Last revised/;
+                        next if $_ eq $newLine;
+                    }
+                    # files are different -- use the new file
+                    $useNewFile = 1;
+                    last;
                 }
-                # files are different -- use the new file
+                $useNewFile = 1 if <TEMPFILE>;
+                close HTMLFILE;
+            } else {
                 $useNewFile = 1;
-                last;
             }
             close TEMPFILE;
-            close HTMLFILE;
             if ($useNewFile) {
                 rename $tmpFile, $htmlFile or warn("Error renaming temporary file\n"), $success = 0;
             } else {
@@ -742,7 +748,10 @@ sub WriteTagNames($$)
         print PODFILE $docs{$short} if $docs{$short};
         my $table = GetTagTable($tableName);
         my $notes = $$table{NOTES};
-        print PODFILE $notes if $notes;
+        if ($notes) {
+            $notes =~ s/\s+$//s;
+            print PODFILE $notes, "\n";
+        }
         my $line = "\n";
         $line .= sprintf " %${wID}s ", $id if $id;
         $line .= sprintf "  %-${wTag}s", 'Tag Name';
@@ -757,7 +766,7 @@ sub WriteTagNames($$)
         OpenHtmlFile($htmldir, $short) or $success = 0;
         if ($notes) {
             print HTMLFILE "<p>" if $docs{$short};
-            print HTMLFILE Doc2Html($$table{NOTES})
+            print HTMLFILE Doc2Html($notes), "\n";
         }
         print HTMLFILE "<blockquote>\n";
         print HTMLFILE "<table $bgHeading cellspacing=2 cellpadding=0><tr $bgBody><td>\n";
@@ -786,7 +795,7 @@ sub WriteTagNames($$)
             my $wrStr = shift @vals;
             my $subdir;
             # if this is a subdirectory, print subdir name (from values) instead of writable
-            if ($wrStr eq '-') {
+            if ($wrStr =~ /^-/) {
                 $subdir = 1;
                 @vals = @$values;
                 $wrStr = shift @vals;
@@ -816,6 +825,11 @@ sub WriteTagNames($$)
                 push @htmlTags, EscapeHTML($_);
             }
             $rowCol = $rowCol ? '' : " $bgRow";
+            my $isSubdir;
+            if ($$writable[0] =~ /^-/) {
+                $isSubdir = 1;
+                $$writable[0] = substr($$writable[0], 1) unless $$writable[0] eq '-';
+            }
             print HTMLFILE "<tr$rowCol valign='top'>\n";
             print HTMLFILE "<td$align>$tagIDstr</td>\n" if $id;
             print HTMLFILE "<td>", join("\n  <br>",@htmlTags), "</td>\n";
@@ -826,7 +840,7 @@ sub WriteTagNames($$)
             my $close = '';
             my @values;
             if (@$values) {
-                if ($$writable[0] eq '-') {
+                if ($isSubdir) {
                     foreach (@$values) {
                         my @names = split /\s+/;
                         $url = (shift @names) . '.html';

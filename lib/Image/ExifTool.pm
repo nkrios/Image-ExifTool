@@ -22,7 +22,7 @@ use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '5.05';
+$VERSION = '5.18';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -52,7 +52,7 @@ Exporter::export_ok_tags(keys %EXPORT_TAGS);
 # here so their prototypes will be available.  The Writer routines will be
 # autoloaded when any of these are called.
 sub SetNewValue($;$$%);
-sub SetNewValuesFromFile($$);
+sub SetNewValuesFromFile($$;@);
 sub GetNewValues($;$$);
 sub GetAllTags();
 sub GetWritableTags();
@@ -115,11 +115,22 @@ sub DummyWriteProc { return 1; }
         Notes => 'comment embedded in JPEG or GIF89a image', 
         Flags => 'Writable',
         WriteGroup => 'Comment',
+        Priority => 0,  # to preserve order of JPEG COM segments
     },
     FileName    => { Name => 'FileName' },
     Directory   => { Name => 'Directory' },
     FileSize    => { Name => 'FileSize',  PrintConv => 'sprintf("%.0fKB",$val/1024)' },
     FileType    => { Name => 'FileType' },
+    FileModifyDate => {
+        Name => 'FileModifyDate',
+        Description => 'File Modification Date/Time',
+        Groups => { 2 => 'Time' },
+        Writable => 1,
+        ValueConv => 'ConvertUnixTime($val)',
+        ValueConvInv => 'GetUnixTime($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$val',
+    },
     ImageWidth  => { Name => 'ImageWidth' },
     ImageHeight => { Name => 'ImageHeight' },
     ExifData    => { Name => 'ExifData',  ValueConv => '\$val' },
@@ -292,7 +303,6 @@ sub ExtractInfo($;@)
     $self->Init();
 
     delete $self->{MAKER_NOTE_FIXUP};   # fixup information for extracted maker notes
-    delete $self->{MAKER_NOTE_HEADER};  # maker note header
 
     my $filename = $self->{FILENAME};   # image file name ('' if already open)
     my $raf = $self->{RAF};             # RandomAccess object
@@ -313,8 +323,6 @@ sub ExtractInfo($;@)
                 my $dir = $1;
                 $self->FoundTag('FileName', $name);
                 $self->FoundTag('Directory', $dir) if $dir;
-                my $fileSize = -s $filename;
-                $self->FoundTag('FileSize', $fileSize) if defined $fileSize;
             }
             # open the file
             if (open(EXIFTOOL_FILE,$filename)) {
@@ -332,6 +340,13 @@ sub ExtractInfo($;@)
     }
 
     if ($raf) {
+        if ($raf->{FILE_PT}) {
+            # get file size and last modified time
+            my $fileSize = -s $raf->{FILE_PT};
+            $self->FoundTag('FileSize', $fileSize) if defined $fileSize;
+            my $fileTime = -M $raf->{FILE_PT};
+            $self->FoundTag('FileModifyDate', $^T - $fileTime*(24*3600)) if defined $fileTime;
+        }
         # process the image
         $raf->BinMode();    # set binary mode before we start reading
 
@@ -1580,6 +1595,34 @@ sub ConvertDateTime($$)
 }
 
 #------------------------------------------------------------------------------
+# Convert Unix time to EXIF date/time string
+# Inputs: 0) Unix time value, 1) non-zero to use GMT instead of local time
+# Returns: EXIF date/time string
+sub ConvertUnixTime($;$)
+{
+    my $time = shift;
+    my @tm = shift() ? gmtime($time) : localtime($time);
+    return sprintf("%4d:%.2d:%.2d %.2d:%.2d:%.2d", $tm[5]+1900, $tm[4]+1,
+                   $tm[3], $tm[2], $tm[1], $tm[0]);
+}
+
+#------------------------------------------------------------------------------
+# Get Unix time from EXIF-formatted date/time string
+# Inputs: 0) EXIF date/time string, 1) non-zero to use GMT instead of local time
+# Returns: Unix time or undefined on error
+sub GetUnixTime($;$)
+{
+    my $timeStr = shift;
+    my @tm = ($timeStr =~ /^(\d+):(\d+):(\d+)\s+(\d+):(\d+):(\d+)/);
+    return undef unless @tm == 6;
+    return undef unless eval 'require Time::Local';
+    $tm[0] -= 1900;     # convert year
+    $tm[1] -= 1;        # convert month
+    @tm = reverse @tm;  # change to order required by timelocal()
+    return shift() ? Time::Local::timegm(@tm) : Time::Local::timelocal(@tm);
+}
+
+#------------------------------------------------------------------------------
 # JPEG constants
 my %jpegMarker = (
     0x01 => 'TEM',
@@ -1848,7 +1891,7 @@ sub JpegInfo($)
                 $self->Warn('Unknown APP13 data');
             }
         } elsif ($marker == 0xfe) {         # COM (JPEG comment)
-            $self->FoundTag('Comment',$$segDataPt);
+            $self->FoundTag('Comment', $$segDataPt);
         }
         undef $$segDataPt;
     }
@@ -2082,6 +2125,10 @@ sub TiffInfo($$;$$$)
         Parent   => $fileType,
     );
     if ($outfile) {
+        if ($offset == 16 and not $self->Options('IgnoreMinorErrors')) {
+            $self->Warn("Possibly a Canon RAW file; may lose RAW data if rewritten");
+            return -1;
+        }
         # write TIFF header (8 bytes to be immediately followed by IFD)
         my $header = substr($$dataPt, 0, 4) . Set32u(8);
         $dirInfo{NewDataPos} = 8;
@@ -2286,15 +2333,15 @@ sub GetTagInfoList($$)
 #------------------------------------------------------------------------------
 # Find tag information, processing conditional tags
 # Inputs: 0) ExifTool object reference, 1) tagTable pointer, 2) tag ID
-#         3) optional data reference, 4) optional value pointer
-# Returns: pointer to tagInfo hash, or undefined if none found
+#         3) optional value reference
+# Returns: pointer to tagInfo hash, undefined if none found, or '' if $valPt needed
 # Notes: You should always call this routine to find a tag in a table because
 # this routine will evaluate conditional tags.
-# Arguments 3 and 4 are only required if the information type allows conditions
-# based on value.
-sub GetTagInfo($$$)
+# Argument 3 is only required if the information type allows $valPt in a Condition
+# and if not given when needed, this routine returns ''.
+sub GetTagInfo($$$;$)
 {
-    my ($self, $tagTablePtr, $tagID, $dataPt, $valuePtr) = @_;
+    my ($self, $tagTablePtr, $tagID, $valPt) = @_;
 
     my @infoArray = GetTagInfoList($tagTablePtr, $tagID);
     # evaluate condition
@@ -2302,11 +2349,12 @@ sub GetTagInfo($$$)
     foreach $tagInfo (@infoArray) {
         my $condition = $$tagInfo{Condition};
         if ($condition) {
+            return '' if $condition =~ /\$valPt\b/ and not $valPt;
             # set old value for use in condition if needed
             my $oldVal = $self->{VALUE_CONV}->{$$tagInfo{Name}};
-            #### eval Condition ($self, $oldVal, [$dataPt, $valuePtr])
+            #### eval Condition ($self, $oldVal, [$valPt])
             unless (eval $condition) {
-                $@ and warn $@;
+                $@ and warn "Condition $$tagInfo{Name}: $@";
                 next;
             }
         }
@@ -2411,7 +2459,7 @@ sub FoundTag($$$$;$$)
         } else {
             #### eval ValueConv ($val, $self, @val, @valPrint)
             $valueConv = eval $valueConversion;
-            $@ and warn $@;
+            $@ and warn "ValueConv $tag: $@";
             # treat it as if the tag doesn't exist if ValueConv returns undef
             return undef unless defined $valueConv;
             # WARNING: $valueConv may now be a reference to $val
@@ -2442,7 +2490,7 @@ sub FoundTag($$$$;$$)
             } else {
                 #### eval PrintConv ($val, $self, @val, @valPrint)
                 $printConv = eval $printConversion;
-                $@ and warn $@;
+                $@ and warn "PrintConv $tag: $@";
                 $printConv = 'Undefined' unless defined $printConv;
                 # WARNING: do not change $val after this (because $printConv
                 # could be a reference to $val for binary data types)
@@ -2668,7 +2716,7 @@ sub ProcessBinaryData($$$)
                 # evaluate count to allow count to be based on previous values
                 #### eval Format size (%val, $size)
                 $count = eval $count;
-                $@ and warn($@), next;
+                $@ and warn("Format $$tagInfo{Name}: $@"), next;
             }
         } else {
             $format = $defaultFormat;

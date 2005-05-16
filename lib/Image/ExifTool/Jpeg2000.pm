@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessJpeg2000($$$);
 sub ProcessExifUUID($$$);
@@ -137,10 +137,7 @@ my %jp2ResolutionUnit = (
         {
             Name => 'UUID-GeoJP2',
             # ref http://www.remotesensing.org/jpeg2000/
-            Condition => q{
-                my $id = "\xb1\x4b\xf8\xbd\x08\x3d\x4b\x43\xa5\xae\x8c\xd7\xd5\xa6\xce\x03";
-                Image::ExifTool::Jpeg2000::CheckUUID($dataPt, $valuePtr, $id);
-            },
+            Condition => '$$valPt=~/^\xb1\x4b\xf8\xbd\x08\x3d\x4b\x43\xa5\xae\x8c\xd7\xd5\xa6\xce\x03/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Exif::Main',
                 ProcessProc => \&ProcessExifUUID,
@@ -150,10 +147,7 @@ my %jp2ResolutionUnit = (
         {
             Name => 'UUID-XMP',
             # ref http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
-            Condition => q{
-                my $id = "\xbe\x7a\xcf\xcb\x97\xa9\x42\xe8\x9c\x71\x99\x94\x91\xe3\xaf\xac";
-                Image::ExifTool::Jpeg2000::CheckUUID($dataPt, $valuePtr, $id);
-            },
+            Condition => '$$valPt=~/^\xbe\x7a\xcf\xcb\x97\xa9\x42\xe8\x9c\x71\x99\x94\x91\xe3\xaf\xac/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::XMP::Main',
                 DirStart => '$valuePtr + 16',
@@ -271,19 +265,6 @@ sub ProcessColorSpecification($$$)
 }
 
 #------------------------------------------------------------------------------
-# Check UUID type
-# Inputs: 0) data reference, 1) box start, 2) 16-byte ID
-# Returns: true if this the UUID ID matches
-sub CheckUUID($$$)
-{
-    my ($dataPt, $valuePtr, $id) = @_;
-    if (length($$dataPt) - $valuePtr >= 16) {
-        return 1 if substr($$dataPt, $valuePtr, 16) eq $id;
-    }
-    return 0;
-}
-
-#------------------------------------------------------------------------------
 # Process JPEG 2000 Exif UUID box
 # Inputs: 0) ExifTool object reference, 1) Pointer to tag table, 2) DirInfo reference
 # Returns: 1 on success
@@ -352,7 +333,13 @@ sub ProcessJpeg2000($$$)
             return 0 if $boxLen + $pos > $dirStart + $dirLen;
             $valuePtr = $pos;
         }
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID, $dataPt, $valuePtr);
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID);
+        if (defined $tagInfo and not $tagInfo) {
+            # GetTagInfo() required the value for a Condition
+            my $size = $boxLen - $valuePtr;
+            my $tmpVal = substr($$dataPt, $valuePtr, $size < 48 ? $size : 48);
+            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID, \$tmpVal);
+        }
         if ($verbose) {
             $exifTool->VerboseInfo($boxID, $tagInfo,
                 Table  => $tagTablePtr,
@@ -451,9 +438,9 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.jpeg.org/public/fcd15444-2.pdf
+=item L<http://www.jpeg.org/public/fcd15444-2.pdf>
 
-=item ftp://ftp.remotesensing.org/jpeg2000/fcd15444-1.pdf
+=item L<ftp://ftp.remotesensing.org/jpeg2000/fcd15444-1.pdf>
 
 =back
 

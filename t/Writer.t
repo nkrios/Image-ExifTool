@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..16\n"; }
+BEGIN { $| = 1; print "1..20\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -140,7 +140,7 @@ sub binaryCompare($$)
     $exifTool->Options(Duplicates => 1, Unknown => 1);
     my $testfile1 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile1;
-    $exifTool->SetNewValue(DateTimeOriginal => '2005:01:01 00:00:00');
+    $exifTool->SetNewValue(DateTimeOriginal => '2005:01:01 00:00:00', Group => 'IFD0');
     $exifTool->SetNewValue(Contrast => '+2', Group => 'XMP');
     $exifTool->SetNewValue(ExposureCompensation => 999, Group => 'EXIF');
     $exifTool->SetNewValue(LightSource => 'cloud');
@@ -323,5 +323,47 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
+# test 17: Copy a specific set of tags
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my @copyTags = qw(exififd:all -lightSource ifd0:software);
+    $exifTool->SetNewValuesFromFile('t/Olympus.jpg', @copyTags);
+    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/ExifTool.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# tests 18-20: Test SetNewValuesFromFile() order of operations
+{
+    my @argsList = (
+        [ 'ifd0:xresolution>xmp:*', 'ifd1:xresolution>xmp:*' ],
+        [ 'ifd1:xresolution>xmp:*', 'ifd0:xresolution>xmp:*' ],
+        [ '*:xresolution', '-ifd0:xresolution', 'xresolution>xmp:*' ],
+    );
+    my $args;
+    foreach $args (@argsList) {
+        ++$testnum;
+        my $exifTool = new Image::ExifTool;
+        $exifTool->SetNewValuesFromFile('t/GPS.jpg', @$args);
+        my $testfile = "t/${testname}_${testnum}_failed.jpg";
+        unlink $testfile;
+        $exifTool->WriteInfo('t/Writer.jpg', $testfile);
+        my $info = $exifTool->ImageInfo($testfile, 'xresolution');
+        if (check($exifTool, $info, $testname, $testnum)) {
+            unlink $testfile;
+        } else {
+            print 'not ';
+        }
+        print "ok $testnum\n";
+    }
+}
 
 # end

@@ -296,9 +296,9 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
+=item L<http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf>
 
-=item http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html
+=item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html>
 
 =back
 
