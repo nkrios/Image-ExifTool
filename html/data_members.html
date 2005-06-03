@@ -57,13 +57,18 @@ header file.  (but this is Perl, so I couldn't do that...)
 <tr><td>MAKER_NOTE_FIXUP</td><td>Fixup information for maker notes extracted with the MakerNotes
     option.  Used by SetNewValuesFromFile() to adjust offsets in maker note IFD</td></tr>
 
-<tr><td>NEW_VALUE</td><td>Hash of new value information keyed by tag info reference
+<tr><td>NEW_VALUE</td><td>Hash of new value information keyed by tag info reference.
 	Elements of new value information hash are:
     <table><tr><td>TagInfo</td><td>-</td><td>tag information reference</td></tr>
     <tr><td>DelValue</td><td>-</td><td>list of specific values to delete</td></tr>
     <tr><td>Value</td><td>-</td><td>list of values to add</td></tr>
     <tr valign='top'><td>IsCreating</td><td>-</td><td>must be set for the tag to be added.  otherwise just
     	changed if it already exists</td></tr>
+    <tr valign='top'><td>Next</td><td>-</td><td>reference to next new value hash in linked list
+        if there is more than one new value hash (for writing to different groups) for this
+        tagInfo</td></tr>
+    <tr valign='top'><td>Save</td><td>-</td><td>flag set by call to SaveNewValues() if this value
+        should be saved</td></tr>
     </table></td></tr>
 
 <tr><td>NUM_FOUND</td><td>Number of tags found</td></tr>
@@ -87,9 +92,16 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>PRIORITY</td><td>Hash of tag Priority values for current tag, keyed by tag name (not tag key!)</td></tr>
 
+<tr><td>PRIORITY_DIR</td><td>Name of priority IFD (ie. the IFD for the full resolution image)</td></tr>
+
 <tr><td>RAF</td><td>Random access file object for reading from input file</td></tr>
 
 <tr><td>REQUESTED_TAGS</td><td>List of requested tags in original case</td></tr>
+
+<tr><td>REQ_TAG_LOOKUP</td><td>Hash for looking up requested tags (keys are lower case tag names)</td></tr>
+
+<tr><td>SAVE_NEW_VALUE</td><td>Hash of new value information which was overwritten after
+    a call to SaveNewValues()</td></tr>
 
 <tr><td>TAG_EXTRA</td><td>Hash of extra information (IFD name or XMP namespace) keyed by
 	tag key</td></tr>

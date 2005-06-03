@@ -1,0 +1,75 @@
+<html>
+<head>
+<title>Image Format Idiosyncracies</title>
+</head>
+<body>
+<h1>Image Format Idiosyncracies</h1>
+
+It really is suprising how stupid some (...many, ...most?) manufacturers seem to
+be when it comes to writing what should be a fairly simple file format.
+
+<p>One positive thing is that most manufacturers seem to have adopted the use of
+an EXIF-like IFD (Image File Directory) structure for their maker notes.  But
+many problems arise because of a fundamental design flaw in the EXIF/TIFF
+format.  Values longer than 4 bytes are stored at a location referenced by an
+offset from an absolute position in the file (where offset 0 is the start of the
+EXIF/TIFF information).
+
+<p>The difficulty is that these offsets must be recalculated when a file is
+rewritten, but in general this is not possible (particularly for the maker
+notes) because the format of not all information is known.  Some manufacturers
+have attempted to avoid this problem using offsets which are relative to the
+start of the maker note IFD instead of the usual start of EXIF.  This is a good
+idea if implemented properly, but this is not done consistently.  (And some
+manufacturers are not even consistent about how the offsets are calculated from
+one camera model to the next!)
+
+<blockquote>Technical aside: If EXIF were designed properly, all offsets would
+be relative to 4 bytes after the end of the IFD, which is the normal position
+for values to be stored, and all value data for the IFD would be stored in a
+block at this location.  If this was done, an entire IFD could be relocated
+easily without causing problems.</blockquote>
+
+Below is a list of idiosyncracies in files written by the digital cameras of
+various manufacturers.  Many of these quirks relate to the offset problem
+mentioned above.
+
+<hr>
+
+<p><b>Canon:</b> The 350D (firmware 1.0.1) gets the size of the thumbnail image
+wrong and reports it to be 10 bytes too long.  This can cause the reported
+thumbnail image data to run off the end of the APP1 segment.
+
+<p><b>Casio:</b> EX-Z3 files have incorrect offsets in the maker notes.  They
+are all off by +20 bytes. This is not a problem with the EX-P700 which uses the
+same maker notes tags.
+
+<p><b>Casio:</b> The preview image is referenced by two different offsets (the
+PreviewImage tag plus a PreviewImageStart/PreviewImageLength pair).
+
+<p><b>Kodak:</b> Professional DCS Photo Desk software writes a cyclical EXIF
+directory such that the InteropIFD pointer points back to IFD0.
+
+<p><b>Nikon:</b> D2H NEF files have huge blocks with all zero data (3.7 MB in
+my test file!).
+
+<p><b>Olympus:</b> The E-1 and E-300 have subdirectories in the maker notes,
+but not only does the data size of these subdirectories exclude the subdirectory
+value data, but also it is 2 bytes too small for the directory information
+itself (doh! -- they forgot to include the entry count).
+
+<p><b>Pentax:</b> The Optio 330 uses a base which is relative to the start of
+the directory entry (egad!).
+
+<p><b>Pentax:</b> The Optio 550 uses different offset bases for different
+entries in the IFD.  Tag 0x0027 has a base offset at the end of the IFD, but
+0x0e00 (PrintIM) uses a different base entirely (double EGAD!!).
+
+<p><b>Ricoh:</b> An IFD subdirectory in the Ricoh maker notes of both the
+Caplio RR30 and RR1.  The RR30 uses standard EXIF offsets (relative to the start
+of the EXIF data), but for the RR1 the offsets are relative to the start of the
+subdirectory.
+
+<hr>
+</body>
+</html>

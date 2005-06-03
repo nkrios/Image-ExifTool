@@ -24,9 +24,9 @@ A B<Tag Name> is the handle by which the information is accessed.  In some
 instances, more than one name may correspond to a single tag ID.  In these
 cases, the actual name used depends on the context in which the information
 is found.  Case is not significant for tag names.  A question mark after a
-tag name indicates that the information is either not understood or not
-verified -- these tags are not extracted by ExifTool unless the Unknown (-u)
-option is enabled.
+tag name indicates that the information is either not understood, not
+verified, or not very useful -- these tags are not extracted by ExifTool
+unless the Unknown (-u) option is enabled.
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an "N" in this column means the tag is writable.  A "Y"
@@ -72,7 +72,7 @@ default B<Group> listed below is used unless another group is specified.
   0x00ff   OldSubfileType            IFD0       int16u!
   0x0100   ImageWidth                IFD0       int32u!
   0x0101   ImageHeight               IFD0       int32u!
-  0x0102   BitsPerSample             IFD0       int16u[-1]!
+  0x0102   BitsPerSample             IFD0       int16u[n]!
   0x0103   Compression               IFD0       int16u!
   0x0106   PhotometricInterpretation IFD0       int16u!
   0x0107   Thresholding              IFD0       int16u!
@@ -272,6 +272,7 @@ default B<Group> listed below is used unless another group is specified.
            MakerNoteKodak6a          ExifIFD    Kodak Type6
            MakerNoteKodak6b          ExifIFD    Kodak Type6
            MakerNoteKodakUnknown     ExifIFD    Kodak Unknown
+           MakerNoteKyocera          ExifIFD    Unknown
            MakerNoteMinolta          ExifIFD    Minolta
            MakerNoteNikon            ExifIFD    Nikon
            MakerNoteNikon2           ExifIFD    Nikon MakerNotesB
@@ -282,6 +283,7 @@ default B<Group> listed below is used unless another group is specified.
            MakerNotePentax           ExifIFD    Pentax
            MakerNoteRicoh            ExifIFD    Ricoh
            MakerNoteRicohText        ExifIFD    Ricoh Text
+           PreviewImage              ExifIFD    undef
            MakerNoteSanyo            ExifIFD    Sanyo
            MakerNoteSigma            ExifIFD    Sigma
            MakerNoteSony             ExifIFD    Sony
@@ -784,18 +786,18 @@ own set of tags.
      26    ContentLocationCode                  string[3]
      27    ContentLocationName                  string[0,64]
      30    ReleaseDate                          digits[8]
-     35    ReleaseTime                          digits[11]
+     35    ReleaseTime                          string[11]
      37    ExpirationDate                       digits[8]
-     38    ExpirationTime                       digits[11]
+     38    ExpirationTime                       string[11]
      40    SpecialInstructions                  string[0,256]
      42    ActionAdvised                        digits[2]
      45    ReferenceService                     string[0,10]
      47    ReferenceDate                        digits[8]
      50    ReferenceNumber                      digits[8]
      55    DateCreated                          digits[8]
-     60    TimeCreated                          digits[11]
+     60    TimeCreated                          string[11]
      62    DigitalCreationDate                  digits[8]
-     63    DigitalCreationTime                  digits[11]
+     63    DigitalCreationTime                  string[11]
      65    OriginatingProgram                   string[0,32]
      70    ProgramVersion                       string[0,10]
      75    ObjectCycle                          string[1]
@@ -813,6 +815,7 @@ own set of tags.
     116    CopyrightNotice                      string[0,128]
     118    Contact                              string[0,128]
     120    Caption-Abstract                     string[0,2000]
+    121    LocalCaption                         string[0,256]
     122    Writer-Editor                        string[0,32]
     125    RasterizedCaption                    string[7360]
     130    ImageType                            string[2]
@@ -823,9 +826,19 @@ own set of tags.
     152    AudioSamplingResolution              digits[2]
     153    AudioDuration                        digits[6]
     154    AudioOutcue                          string[0,64]
+    184    JobID                                string[0,64]
+    185    MasterDocumentID                     string[0,256]
+    186    ShortDocumentID                      string[0,64]
+    187    UniqueDocumentID                     string[0,128]
+    188    OwnerID                              string[0,128]
     200    ObjectPreviewFileFormat              int16u
     201    ObjectPreviewFileVersion             int16u
     202    ObjectPreviewData                    string[0,256000]
+    225    ClassifyState                        string[0,64]
+    228    SimilarityIndex                      string[0,32]
+    230    DocumentNotes                        string[0,1024]
+    231    DocumentHistory                      string[0,256]
+    232    ExifCameraInfo                       string[0,4096]
 
 =head2 IPTC NewsPhoto Tags
 
@@ -1003,10 +1016,10 @@ own set of tags.
 =head2 GPS Tags
 
 ExifTool is very flexible about the input format for lat/long coordinates,
-and will accept 3 floating point numbers separated by just about anything.
-Many other GPS tags have values which are fixed-length strings.  For these,
-the indicated string lengths include a null terminator which is added
-automatically by ExifTool.
+and will accept 3 floating point numbers (for degrees, minutes and seconds)
+separated by just about anything.  Many other GPS tags have values which are
+fixed-length strings.  For these, the indicated string lengths include a
+null terminator which is added automatically by ExifTool.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1477,6 +1490,15 @@ These tags are used by the DX3215 and DX3700.
    Index   Tag Name                             Writable
    -----   --------                             --------
 
+=head2 Unknown Tags
+
+The following tags are decoded in unsupported maker notes.  Use the Unknown
+(-u) option to display other unknown tags.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0e00   PrintIM                              PrintIM
+
 =head2 Minolta Tags
 
 These tags are used by Minolta and Konica/Minolta cameras.
@@ -1564,6 +1586,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   0x0009   FlashType                            Y
   0x000b   WhiteBalanceFineTune                 int16u
   0x000c   ColorBalance1                        Y
+  0x000e   ExposureDifference                   undef[4]
   0x000f   ISOSelection                         Y
   0x0010   DataDump                             N
   0x0011   NikonPreview                         Nikon PreviewImage
@@ -1890,31 +1913,45 @@ The Pentax tags are also used in Asahi cameras.
   0x0002   PreviewImageSize                     int16u[2]~
   0x0003   PreviewImageLength                   int32u*
   0x0004   PreviewImageStart                    int32u*
-  0x0006   Date                                 Y
-  0x0007   Time                                 Y
+  0x0006   Date                                 undef[4]
+  0x0007   Time                                 undef[3]
   0x0008   Quality                              int16u
   0x0009   PentaxImageSize                      int16u
   0x000b   PictureMode                          int16u
+  0x000c   FlashMode                            int16u
   0x000d   FocusMode                            int16u
+  0x000f   AutoAFPoint                          int16u
+  0x0010   FocusPosition                        int16u
+  0x0012   ExposureTime                         int32u
+  0x0013   FNumber                              int16u
   0x0014   ISO                                  int16u
+  0x0016   ExposureCompensation                 int16u
   0x0017   MeteringMode                         int16u
   0x0019   WhiteBalance                         int16u
-  0x001a   WhiteBalanceMode                     Y
-  0x001b   BlueBalance                          Y
-  0x001c   RedBalance                           Y
+  0x001a   WhiteBalanceMode                     int16u
+  0x001b   BlueBalance                          int16u
+  0x001c   RedBalance                           int16u
   0x001d   FocalLength                          int32u
   0x001e   DigitalZoom                          int16u
   0x001f   Saturation                           int16u
   0x0020   Contrast                             int16u
   0x0021   Sharpness                            int16u
-  0x0029   FrameNumber                          Y
+  0x0022   WorldTimeLocation                    int16u
+  0x0023   HometownCity                         int16u
+  0x0024   DestinationCity                      int16u
+  0x0025   HometownDST                          int16u
+  0x0026   DestinationDST                       int16u
+  0x0029   FrameNumber                          int32u
   0x0039   RawImageSize                         int16u[2]~
   0x003f   LensType                             int8u[2]
   0x0200   BlackPoint                           int16u[4]
   0x0201   WhitePoint                           int16u[4]
+  0x03fe   DataDump                             N
   0x0402   ToneCurve                            Y~
   0x0403   ToneCurves                           Y~
   0x0e00   PrintIM                              PrintIM
+  0x1000   HometownCityCode                     undef[4]
+  0x1001   DestinationCityCode                  undef[4]
 
 =head2 Ricoh Tags
 
@@ -2009,15 +2046,6 @@ These tags are used in Sigma/Foveon cameras.
 
 While current Sony camera models contain a wealth of information, very
 little is known about the Sony tags.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0e00   PrintIM                              PrintIM
-
-=head2 Unknown Tags
-
-The following tags are decoded in unsupported maker notes.  Use the Unknown
-(-u) option to display other unknown tags.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -2170,17 +2198,68 @@ change size.
 
 =head2 Photoshop Tags
 
-The meanings of many Photoshop tags are known, however very few provide useful
-information about the image, so many are not decoded by ExifTool.  The tags
-listed below are those which are decoded by ExifTool.
+Many Photoshop tags are marked as Unknown (indicated by a question mark
+after the tag name) because the information they provide is not very useful
+under normal circumstances.  Unknown tags are not extracted unless the
+Unknown (-u) option is used.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  0x03e8   Photoshop2Info?                      N
+  0x03e9   MacintoshPrintInfo?                  N
+  0x03ea   XMLData?                             N
+  0x03eb   Photoshop2ColorTable?                N
+  0x03ed   ResolutionInfo?                      N
   0x03ee   AlphaChannelsNames                   N
+  0x03ef   DisplayInfo?                         N
+  0x03f0   PStringCaption?                      N
+  0x03f1   BorderInformation?                   N
+  0x03f2   BackgroundColor?                     N
+  0x03f3   PrintFlags?                          N
+  0x03f4   BW_HalftoningInfo?                   N
+  0x03f5   ColorHalftoningInfo?                 N
+  0x03f6   DuotoneHalftoningInfo?               N
+  0x03f7   BW_TransferFunc?                     N
+  0x03f8   ColorTransferFuncs?                  N
+  0x03f9   DuotoneTransferFuncs?                N
+  0x03fa   DuotoneImageInfo?                    N
+  0x03fb   EffectiveBW?                         N
+  0x03fc   ObsoletePhotoshopTag1?               N
+  0x03fd   EPSOptions?                          N
+  0x03fe   QuickMaskInfo?                       N
+  0x03ff   ObsoletePhotoshopTag2?               N
+  0x0400   LayerStateInfo?                      N
+  0x0401   WorkingPath?                         N
+  0x0402   LayersGroupInfo?                     N
+  0x0403   ObsoletePhotoshopTag3?               N
   0x0404   IPTCData                             IPTC
+  0x0405   RawImageMode?                        N
   0x0406   JPEG_Quality                         Photoshop JPEG_Quality
-  0x040b   URL                                  N
+  0x0408   GridGuidesInfo?                      N
+  0x0409   ThumbnailResource?                   N
+  0x040a   CopyrightFlag?                       N
+  0x040b   URL                                  Y
   0x040c   PhotoshopThumbnail                   N
+  0x040d   GlobalAngle?                         N
+  0x040e   ColorSamplersResource?               N
+  0x040f   ICC_Profile?                         N
+  0x0410   Watermark?                           N
+  0x0411   ICC_Untagged?                        N
+  0x0412   EffectsVisible?                      N
+  0x0413   SpotHalftone?                        N
+  0x0414   IDsBaseValue?                        N
+  0x0415   UnicodeAlphaNames?                   N
+  0x0416   IndexedColourTableCount?             N
+  0x0417   TransparentIndex?                    N
+  0x0419   GlobalAltitude?                      N
+  0x041a   Slices?                              N
+  0x041b   WorkflowURL?                         N
+  0x041c   JumpToXPEP?                          N
+  0x041d   AlphaIdentifiers?                    N
+  0x041e   URL_List?                            N
+  0x0421   VersionInfo?                         N
+  0x0bb7   ClippingPathName?                    N
+  0x2710   PrintFlagsInfo?                      N
 
 =head2 Photoshop JPEG_Quality Tags
 
@@ -2330,8 +2409,8 @@ with any other tag group.
   --------                                      --------
   Comment                                       Y
   Directory                                     N
+  EXIF                                          N
   Error                                         N
-  ExifData                                      N
   ExifToolVersion                               N
   FileModifyDate                                Y
   FileName                                      N
@@ -2340,6 +2419,7 @@ with any other tag group.
   ImageHeight                                   N
   ImageWidth                                    N
   Warning                                       N
+  XMP                                           Y
 
 =head2 Composite Tags
 

@@ -113,13 +113,13 @@ sub IptcDate($)
 sub IptcTime($)
 {
     my $val = shift;
-    if ($val =~ /\s*\b(\d{2}):(\d{2}):(\d{2})(\S*)/) {
-        $val = "$1$2$3";
+    if ($val =~ /\s*\b(\d{1,2}):(\d{1,2}):(\d{1,2})(\S*)/) {
+        $val = sprintf("%.2d%.2d%.2d",$1,$2,$3);
         my $tz = $4;
-        if ($tz =~ /([+-]\d{2}:\d{2})/) {
-            $val .= $tz;
+        if ($tz =~ /([+-]\d{1,2}):(\d{1,2})/) {
+            $val .= sprintf("%+.2d%.2d",$1,$2);
         } else {
-            $val .= '+00:00';    # don't know the time zone
+            $val .= '+0000';    # don't know the time zone
         }
     } else {
         undef $val;     # time format error
@@ -160,7 +160,7 @@ sub InvConvertPictureNumber($)
     $val =~ s/\(.*\)//g;    # remove manufacturer description
     $val =~ tr/://d;        # remove date separators
     $val =~ tr/0-9/ /c;     # turn remaining non-numbers to spaces
-    my @vals = split /\s+/, $val;
+    my @vals = split ' ', $val;
     if (@vals >= 4) {
         $val = pack('nNA8n', @vals);
     } elsif ($val =~ /unknown/i) {

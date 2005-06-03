@@ -74,7 +74,9 @@ exiftool (r = read support, w = write support):</p>
 <h1><a name="options">OPTIONS</a></h1>
 <p>Note:  Case is not significant for any command-line option (including tag
 and group names), except for single-character options where the
-corresponding upper case option is defined.</p>
+corresponding upper case option is defined.  Multiple options can NOT be
+combined into a single argument, because this would be interpreted as a tag
+name.</p>
 <dl>
 <dt><strong><a name="item__2dtag"><strong>-</strong><em>TAG</em></a></strong><br />
 </dt>
@@ -113,16 +115,16 @@ prevent shell redirection.)
 </dd>
 <dd>
 <p>If a group name is not specified for <code>TAG</code>, then the information is written
-to the first group in the following list where <code>TAG</code> is valid:  1) EXIF, 2)
-GPS, 3) IPTC, 4) XMP, 5) MakerNotes.</p>
+to the preferred group, which is the first group in the following list where
+<code>TAG</code> is valid:  1) EXIF, 2) GPS, 3) IPTC, 4) XMP, 5) MakerNotes.</p>
 </dd>
 <dd>
-<p>The special <code>All</code> tag may be used only if a <code>VALUE</code> is NOT specified.  This
-causes all meta information to be deleted (or all information in a group if
-<code>-GROUP:All=</code> is used).  Note that not all groups are deletable.  Also,
-within an image some groups may be contained within others, and these groups
-are removed if the super group is deleted.  Below are lists of these group
-dependencies:</p>
+<p>The special <code>All</code> tag may be used in this syntax only if a <code>VALUE</code> is NOT
+given.  This causes all meta information to be deleted (or all information
+in a group if <code>-GROUP:All=</code> is used).  Note that not all groups are
+deletable.  Also, within an image some groups may be contained within
+others, and these groups are removed if the super group is deleted.  Below
+are lists of these group dependencies:</p>
 </dd>
 <dd>
 <pre>
@@ -276,6 +278,14 @@ source file is renamed to <code>FILE_original</code> and the output file is <cod
 the original directory).
 </dd>
 <p></p>
+<dt><strong><a name="item__2doverwrite_original"><strong>-overwrite_original</strong></a></strong><br />
+</dt>
+<dd>
+Overwrite the original file instead of renaming it to <code>FILE_original</code> when
+writing information to an image.  Caution:  This option should only be used
+if you already have separate backup copies of your image files.
+</dd>
+<p></p>
 <dt><strong><a name="item__2dp_fmtfile"><strong>-p</strong> <em>FMTFILE</em></a></strong><br />
 </dt>
 <dd>
@@ -346,20 +356,29 @@ in different files.
 <dd>
 <p>By default, this option will commute information between same-named tags in
 different groups, allowing information to be translated between images with
-different formats.  This behaviour may be defeated by specifying a group
-name for extracted tags (even if 'All' is used as a group name), in which
+different formats.  This behaviour may be modified by specifying a group
+name for extracted tags (even if <code>All</code> is used as a group name), in which
 case the information is written to the original group, unless redirected to
 a different group.</p>
 </dd>
 <dd>
 <p>A powerful information redirection feature allows a destination tag to be
 specified for each extracted tag.  With this feature, information may be
-written to a tag with a different name, or to a specific group.  This is
-done using &quot;<code>'-SRCTAG&gt;DSTTAG'</code>&quot; on the command line after
+written to a tag with a different name or group.  This is done using
+&quot;<code>'-SRCTAG&gt;DSTTAG'</code>&quot; on the command line after
 <code>-TagsFromFile</code>.  (Note that this argument must be quoted to prevent shell
 redirection, and there is no <code>=</code> sign since this is a special feature to
 control <em>extracted</em> information.)  Both source and destination tags may be
-prefixed by a group name, and <code>All</code> may be used as a tag name.</p>
+prefixed by a group name, and <code>All</code> or <code>*</code> may be used as a tag or group
+name.  If no destination group is specified, then the information is written
+to the preferred group.</p>
+</dd>
+<dd>
+<p><code>SRCFILE</code> may be the same as the target file to move information around
+within a file.  <code>@</code> may be used to represent the target file name (ie.
+<code>-TagsFromFile @</code>), allowing this to be done when batch processing multiple
+files.  Specified tags are then set from each target file in turn as it is
+rewritten.</p>
 </dd>
 <dd>
 <p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples of how to use this option.</p>
@@ -397,7 +416,7 @@ data blocks (same as two <a href="#item__2du"><code>-u</code></a> options).
 <dt><strong><a name="item__2dv_5b_23_5d"><strong>-v</strong>[#]</a></strong><br />
 </dt>
 <dd>
-Print <strong>v</strong>erbose messages (# may be 1-4, higher is more verbose).  This
+Print <strong>v</strong>erbose messages (# may be 1-5, higher is more verbose).  This
 option suppresses normal console output unless specific tags are being
 extracted.
 </dd>
@@ -496,6 +515,14 @@ Print formatted date/time for all JPG files in a directory.
 </dt>
 <dd>
 Extract image resolution from IFD1.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dxmp__2db_a_2ejpg__3e_xmp_2eout">exiftool -xmp -b a.jpg &gt; xmp.out</a></strong><br />
+</dt>
+<dd>
+Extract complete XMP data record intact from a.jpg and write it to xmp.out
+using the special <code>XMP</code> tag (see the Extra tags in
+<a href="TagNames/index.html">Image::ExifTool::TagNames</a>).
 </dd>
 <p></p></dl>
 <p>
@@ -628,11 +655,11 @@ Copy only the EXIF information from one image to another, excluding SubIFD
 tags.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__27_2dmodifydate_">exiftool -tagsfromfile a.jpg '-ModifyDate&gt;FileModifyDate' a.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2dtagsfromfile__40__27_2dmodifydate_3efi">exiftool -tagsfromfile @ '-ModifyDate&gt;FileModifyDate' dir</a></strong><br />
 </dt>
 <dd>
-Use the EXIF or XMP modification date to set the same file's filesystem
-modification date.
+Use the modification date from the meta information to set the same file's
+filesystem modification date for all images in a directory.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__27_2dall_3exmp">exiftool -TagsFromFile src.jpg '-all&gt;xmp:all' dst.jpg</a></strong><br />

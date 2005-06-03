@@ -68,7 +68,7 @@ LS443, LS743 and LS753.
     0x14 => {
         Name => 'Time',
         Format => 'int8u[4]',
-        ValueConv => 'sprintf("%2d:%.2d:%.2d.%.2d",split(/\s+/, $val))',
+        ValueConv => 'sprintf("%2d:%.2d:%.2d.%.2d",split(" ", $val))',
         ValueConvInv => '$val=~tr/:./ /;$val',
     },
     0x18 => {
@@ -290,7 +290,7 @@ LS443, LS743 and LS753.
     0x10 => { #PH
         Name => 'Time',
         Format => 'int8u[4]',
-        ValueConv => 'sprintf("%2d:%.2d:%.2d.%.2d",split(/\s+/, $val))',
+        ValueConv => 'sprintf("%2d:%.2d:%.2d.%.2d",split(" ", $val))',
         ValueConvInv => '$val=~tr/:./ /;$val',
     },
     0x1e => { #PH
@@ -498,6 +498,8 @@ it under the same terms as Perl itself.
 =over 4
 
 =item L<Image::MetaData::JPEG|Image::MetaData::JPEG>
+
+=item (...plus lots of testing with my daughter's CX4200!)
 
 =back
 

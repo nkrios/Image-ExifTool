@@ -42,7 +42,7 @@ sub CheckCanonCustom($$$);
             0 => 'AF/AE lock',
             1 => 'AE lock/AF',
             2 => 'AF/AF lock',
-            3 => 'AE+release/AE+AF  ',
+            3 => 'AE+release/AE+AF',
         },
     },
     3 => {
@@ -94,7 +94,7 @@ sub CheckCanonCustom($$$);
         PrintConv => {
             0 => 'AF Stop',
             1 => 'Operate AF',
-            2 => 'Lock AE and start timer  ',
+            2 => 'Lock AE and start timer',
         },
     },
     10 => {
@@ -118,7 +118,7 @@ sub CheckCanonCustom($$$);
             0 => 'Not assigned',
             1 => 'Change quality',
             2 => 'Change ISO speed',
-            3 => 'Select parameters  ',
+            3 => 'Select parameters',
         },
     },
     13 => {
@@ -159,7 +159,7 @@ sub CheckCanonCustom($$$);
             1 => 'Change quality',
             2 => 'Change parameters',
             3 => 'Menu display',
-            4 => 'Image replay ',
+            4 => 'Image replay',
         },
     },
     2 => {
@@ -295,7 +295,7 @@ sub CheckCanonCustom($$$);
         PrintConv => {
             0 => 'AF Stop',
             1 => 'Operate AF',
-            2 => 'Lock AE and start timer  ',
+            2 => 'Lock AE and start timer',
         },
     },
 );
@@ -339,7 +339,7 @@ sub CheckCanonCustom($$$);
             0 => 'AF/AE lock',
             1 => 'AE lock/AF',
             2 => 'AF/AF lock no AE lock',
-            3 => 'AE/AF,no AE lock ',
+            3 => 'AE/AF,no AE lock',
         },
     },
     4 => {

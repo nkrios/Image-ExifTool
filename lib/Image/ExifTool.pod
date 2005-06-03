@@ -84,9 +84,9 @@ Image::ExifTool::DoAutoLoad().  ie)
 =head2 ImageInfo
 
 Obtain meta information from image.  This is the one step function for
-obtaining meta information from an image.  Internally, B<ImageInfo> calls
-B<ExtractInfo> to extract the information, B<GetInfo> to generate the
-information hash, and B<GetTagList> for the returned tag list.
+obtaining meta information from an image.  Internally, L</ImageInfo> calls
+L</ExtractInfo> to extract the information, L</GetInfo> to generate the
+information hash, and L</GetTagList> for the returned tag list.
 
     # Return meta information for 2 tags only (procedural)
     $info = ImageInfo($filename, $tag1, $tag2)
@@ -101,7 +101,7 @@ information hash, and B<GetTagList> for the returned tag list.
 
 =item Inputs:
 
-B<ImageInfo> is very flexible about the input arguments, and interprets
+L</ImageInfo> is very flexible about the input arguments, and interprets
 them based on their type.  It may be called with one or more arguments.
 The one required argument is either a SCALAR (the image file name), a file
 reference (a reference to the image file) or a SCALAR reference (a
@@ -110,16 +110,16 @@ order of the arguments is not significant, except that the first SCALAR is
 taken to be the file name unless a file reference or scalar reference came
 earlier in the argument list.
 
-Below is an explanation of how the B<ImageInfo> function arguments are
+Below is an explanation of how the L</ImageInfo> function arguments are
 interpreted:
 
 =over 4
 
 =item ExifTool ref
 
-B<ImageInfo> may be called with an ExifTool object if desired.  The
+L</ImageInfo> may be called with an ExifTool object if desired.  The
 advantage of using the object-oriented form is that the options may be set
-before calling B<ImageInfo>, and the object may be used afterward to access
+before calling L</ImageInfo>, and the object may be used afterward to access
 member functions.
 
 =item SCALAR
@@ -153,20 +153,20 @@ names in the proper case.
 
 =item HASH ref
 
-Reference to a hash containing the options settings.  See B<Options>
+Reference to a hash containing the options settings.  See L</Options>
 documentation below for a list of available options.  Options specified
-as arguments to B<ImageInfo> take precidence over B<Options> settings.
+as arguments to L</ImageInfo> take precidence over L</Options> settings.
 
 =back
 
 =item Return Values:
 
-B<ImageInfo> returns a reference to a hash of tag/value pairs. The keys of
+L</ImageInfo> returns a reference to a hash of tag/value pairs. The keys of
 the hash are the tag identifiers, which are similar to the tag names but my
 have an embedded copy number if more than one tag with that name was found
-in the image.  Use B<GetTagName> to remove the copy number from the tag.
+in the image.  Use L</GetTagName> to remove the copy number from the tag.
 Note that the case of the tags may not be the same as requested. Here is a
-simple example to print out the information returned by B<ImageInfo>:
+simple example to print out the information returned by L</ImageInfo>:
 
     foreach (sort keys %$info) {
         print "$_ => $$info{$_}\n";
@@ -295,7 +295,7 @@ Exclude specified tags from tags extracted from an image. The
 option value is either a tag name or reference to a list of tag names
 to exclude.  The case of tag names is not significant. This option is
 ignored for specifically requested tags.  Tags may also be excluded
-by preceeding their name with a '-' in the arguments to B<ImageInfo>.
+by preceeding their name with a '-' in the arguments to L</ImageInfo>.
 
 =item IgnoreMinorErrors
 
@@ -310,7 +310,7 @@ Extract tags only for specified groups in family # (Group0 assumed if #
 not given).  The option value may be a single group name or a reference
 to a list of groups.  Case is significant in group names.  Specify a
 group to be excluded by preceeding group name with a '-'.  See
-B<GetAllGroups> for a list of available groups.
+L</GetAllGroups> for a list of available groups.
 
 =item List
 
@@ -346,12 +346,13 @@ extracted from binary data blocks.  Default is 0.
 
 =item Verbose
 
-Flag to print verbose messages.  May be set to a value from 0 to 4 to be
-increasingly verbose.  Default is 0.  With the verbose option set,
-messages are printed to the console as the file is parsed.  Level 1
-prints the tag names and raw values.  Level 2 adds more details about
-the tags.  Level 3 adds a hex dump of the tag data with a limit on the
-number of bytes dumped, and level 4 removes this length limit.
+Flag to print verbose messages.  May be set to a value from 0 to 5 to be
+increasingly verbose.  Default is 0.  With the verbose option set, messages
+are printed to the console as the file is parsed.  Level 1 prints the tag
+names and raw values.  Level 2 adds more details about the tags.  Level 3
+adds a hex dump of the tag data, but with limits on the number of bytes
+dumped.  Levels 4 and 5 remove the dump limit on tag values and JPEG segment
+data respectively.
 
 =back
 
@@ -389,9 +390,9 @@ Extract all meta information from an image.
 
 =item Inputs:
 
-B<ExtractInfo> takes exactly the same arguments as B<ImageInfo>.  The only
+L</ExtractInfo> takes exactly the same arguments as L</ImageInfo>.  The only
 difference is that a list of tags is not returned if an ARRAY reference is
-given.  The following options are effective in the call to B<ExtractInfo>:
+given.  The following options are effective in the call to L</ExtractInfo>:
 
 Binary, Composite, DateFormat, PrintConv, Unknown and Verbose.
 
@@ -403,10 +404,10 @@ Binary, Composite, DateFormat, PrintConv, Unknown and Verbose.
 
 =head2 GetInfo
 
-B<GetInfo> is called to return meta information after it has been extracted
-from the image by a previous call to B<ExtractInfo> or B<ImageInfo>. This
-function may be called repeatedly after a single call to B<ExtractInfo> or
-B<ImageInfo>.
+L</GetInfo> is called to return meta information after it has been extracted
+from the image by a previous call to L</ExtractInfo> or L</ImageInfo>. This
+function may be called repeatedly after a single call to L</ExtractInfo> or
+L</ImageInfo>.
 
     # Get image width and hieght only
     $info = $exifTool->GetInfo('ImageWidth', 'ImageHeight');
@@ -421,14 +422,14 @@ B<ImageInfo>.
 
 =item Inputs:
 
-Inputs are the same as B<ExtractInfo> and B<ImageInfo> except that an image
-can not be specified.  Options in effect are:
+Inputs are the same as L</ExtractInfo> and L</ImageInfo> except that an
+image can not be specified.  Options in effect are:
 
 Duplicates, Exclude, Group#, (and Sort if tag list reference is given).
 
 =item Return Value:
 
-Reference to information hash, the same as with B<ImageInfo>.
+Reference to information hash, the same as with L</ImageInfo>.
 
 =back
 
@@ -436,8 +437,10 @@ Reference to information hash, the same as with B<ImageInfo>.
 
 Write meta information to a file.  The specified source file is rewritten to
 the destination file with the new information specified in previous calls to
-B<SetNewValue>.  The necessary segments and/or directories are created in
-the destination file as required to store the specified information.
+L</SetNewValue>.  The necessary segments and/or directories are created in
+the destination file as required to store the specified information.  May be
+called repeatedly to write the same information to additional files without
+the need to call L</SetNewValue> again.
 
     $exifTool->WriteInfo($srcfile, $dstfile);
 
@@ -507,10 +510,10 @@ Get a sorted list of tags from the specified information hash or tag list.
 2) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#').
 
 If the information hash or tag list reference is not provided, then the list
-of found tags from the last call to B<ImageInfo>, B<ExtractInfo> or
-B<GetInfo> is used instead, and the result is the same as if B<GetFoundTags>
-was called.  If sort order is not specified, the sort order is taken from
-the current options settings.
+of found tags from the last call to L</ImageInfo>, L</ExtractInfo> or
+L</GetInfo> is used instead, and the result is the same as if
+L</GetFoundTags> was called.  If sort order is not specified, the sort order
+is taken from the current options settings.
 
 =item Return Values:
 
@@ -520,9 +523,9 @@ A list of tags in the specified order.
 
 =head2 GetFoundTags
 
-Get list of found tags in specified sort order.  The found tags are the
-tags for the information obtained from the most recent call to B<ImageInfo>,
-B<ExtractInfo> or B<GetInfo> for this object.
+Get list of found tags in specified sort order.  The found tags are the tags
+for the information obtained from the most recent call to L</ImageInfo>,
+L</ExtractInfo> or L</GetInfo> for this object.
 
     @tags = $exifTool->GetFoundTags('File');
 
@@ -546,8 +549,8 @@ A list of tags in the specified order.
 =head2 GetRequestedTags
 
 Get list of requested tags.  These are the tags that were specified in the
-arguments of the most recent call to B<ImageInfo>, B<ExtractInfo> or
-B<GetInfo>, including tags specified via a tag list reference. Shortcut
+arguments of the most recent call to L</ImageInfo>, L</ExtractInfo> or
+L</GetInfo>, including tags specified via a tag list reference. Shortcut
 tags are expanded in the list.
 
     @tags = $exifTool->GetRequestedTags();
@@ -576,7 +579,7 @@ is by default), or if the values form a list.  In the case of a list of
 values (as can happen with the 'Keywords' tag for instance), PrintConv
 returns a comma-separated string of values, while ValueConv returns a
 reference to an array of values or the array itself in list context. The
-PrintConv values are the values returned by B<ImageInfo> and B<GetInfo> in
+PrintConv values are the values returned by L</ImageInfo> and L</GetInfo> in
 the tag/value hash.
 
     # PrintConv example
@@ -622,7 +625,7 @@ may also be scalar references to binary data.
 =head2 SetNewValue
 
 Set the new value for a tag.  The new value is the value that will be written
-for this tag in subsequent calls to B<WriteInfo>.
+for this tag in subsequent calls to L</WriteInfo>.
 
 For tag lists (like Keywords), call repeatedly with the same tag name for
 each value in the list.
@@ -654,7 +657,9 @@ each value in the list.
 
 1) [optional] Tag key or tag name, or undefined to clear all new values.  A
 tag name of '*' can be used when deleting tags to delete all tags, or all
-tags in a specified group.
+tags in a specified group.  The tag name may be prefixed by group name,
+separated by a colon (ie. 'GROUP:TAG'), which is equivalent to using a
+'Group' option argument.
 
 2) [optional] New value for tag.  Undefined to delete tag from file.
 
@@ -682,7 +687,7 @@ Delete the exisiting tag if it has the specified value.  Valid values are
 =item Group
 
 Specifies group name where tag should be written.  If not specified, tag is
-written to hightest priority group as specified by SetNewGroups().  Any
+written to hightest priority group as specified by L</SetNewGroups>.  Any
 family 0 or 1 group name may be used.  Case is not significant.
 
 =item Protected
@@ -772,9 +777,49 @@ deleted (ie. if SetNewValue was called without a value).
 
 =back
 
+=head2 SaveNewValues
+
+Save state of new values to be later restored by L</RestoreNewValues>.
+
+    $exifTool->SaveNewValues();         # save state of new values
+    $exifTool->SetNewValue(ISO => 100); # set new value for ISO
+    $exifTool->WriteInfo('a.jpg');      # write ISO + previous new values
+    $exifTool->RestoreNewValues();      # restore previous new values
+    $exifTool->WriteInfo('b.jpg');      # write previous new values only
+
+=over 4
+
+=item Inputs:
+
+0) ExifTool object reference
+
+=item Return Value:
+
+None.
+
+=back
+
+=head2 RestoreNewValues
+
+Restore new values to the settings that existed when L</SaveNewValues> was
+last called.  May be called repeatedly after a single call to
+L</SaveNewValues>.  See L</SaveNewValues> above for an example.
+
+=over 4
+
+=item Inputs:
+
+0) ExifTool object reference
+
+=item Return Value:
+
+None.
+
+=back
+
 =head2 SetNewGroups
 
-Set priority for tag groups in subsequent calls to SetNewValue().  Default
+Set priority for tag groups in subsequent calls to L</SetNewValue>.  Default
 priority is EXIF, GPS, IPTC, XMP, MakerNotes, in that order.  Any family 0
 group name may be used.  Case is not significant.
 
@@ -875,9 +920,9 @@ Get group name for specified tag.
 =item Return Values:
 
 Group name (or 'Other' if tag has no group).  If no group family is
-specified, B<GetGroup> returns the name of the group in family 0 when called
-in scalar context, or the names of groups for all families in list context.
-See B<GetAllGroups> for a list of groups in each famly.
+specified, L</GetGroup> returns the name of the group in family 0 when
+called in scalar context, or the names of groups for all families in list
+context. See L</GetAllGroups> for a list of groups in each famly.
 
 =back
 
@@ -908,7 +953,7 @@ specified, the group names are returned for all extracted information.
 
 Builds composite tags from required tags.  The composite tags are
 convenience tags which are derived from the values of other tags.  This
-routine is called automatically by B<ImageInfo> and B<ExtractInfo> if the
+routine is called automatically by L</ImageInfo> and L</ExtractInfo> if the
 Composite option is set.
 
 =over 4
@@ -927,12 +972,12 @@ Tag values are calculated in alphabetical order unless a tag Require's or
 Desire's another composite tag, in which case the calculation is deferred
 until after the other tag is calculated. Composite tags may need to read
 data from the image for their value to be determined, so for these
-B<BuildCompositeTags> must be called while the image is available.  This is
-only a problem if B<ImageInfo> is called with a filename (as opposed to a
+L</BuildCompositeTags> must be called while the image is available.  This is
+only a problem if L</ImageInfo> is called with a filename (as opposed to a
 file reference or scalar reference) since in this case the file is closed
-before B<ImageInfo> returns.  However if you enable the Composite option,
-B<BuildCompositeTags> is called from within B<ImageInfo> before the file is
-closed.
+before L</ImageInfo> returns.  However if you enable the Composite option,
+L</BuildCompositeTags> is called from within L</ImageInfo> before the file
+is closed.
 
 =back
 
@@ -1008,7 +1053,7 @@ Get list of all writable tag names.
 =item Return Values:
 
 A list of all writable tags in alphabetical order.  These are the
-tags for which the values may be set through SetNewValue().
+tags for which the values may be set through L</SetNewValue>.
 
 =back
 

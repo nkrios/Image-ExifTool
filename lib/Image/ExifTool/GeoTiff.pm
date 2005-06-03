@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 # format codes for geoTiff directory entries
 my %geoTiffFormat = (
@@ -2097,7 +2097,7 @@ sub ProcessGeoTiff($$$$$)
             $dataPt = $doubleData;
             $offset *= 8;
             $val = Image::ExifTool::ReadValue($dataPt, $offset, $format,
-                                              $count, length($doubleData)-$offset);
+                                              $count, length($$doubleData)-$offset);
         } elsif ($format eq 'string') {     # in the ASCII parms
             $dataPt = $asciiData;
             $val = substr($$dataPt, $offset, $count);

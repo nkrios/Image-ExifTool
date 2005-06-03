@@ -69,11 +69,13 @@ my %writeTable = (
         Protected => 1,
         Writable => 'int32u',
         WriteGroup => 'IFD0',
+        ValueConvInv => '$val',
     },
     0x00ff => {             # OldSubfileType
         Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'IFD0',
+        ValueConvInv => '$val',
     },
     0x0100 => {             # ImageWidth
         Protected => 1,
@@ -821,6 +823,7 @@ sub WriteExif($$$)
     my $raf = $dirInfo->{RAF};
     my $dirName = $dirInfo->{DirName} || 'unknown';
     my $fixup = $dirInfo->{Fixup} || new Image::ExifTool::Fixup;
+    my $fixBase = $dirInfo->{FixBase};
     my $verbose = $exifTool->Options('Verbose');
     my (@offsetInfo, %xDelete);
     my $newData = '';   # initialize buffer to receive new directory data
@@ -997,6 +1000,18 @@ sub WriteExif($$$)
                     my $readFromFile;
                     if ($oldSize > 4) {
                         $valuePtr = Get32u($dataPt, $valuePtr) - $dataPos;
+                        if ($fixBase) {
+                            my $diff = $dirStart + 2 + 12 * $numEntries + 4 - $valuePtr;
+                            if ($diff) {
+                                $verbose and $exifTool->Warn("Adjusted $$dirInfo{DirName} base by $diff");
+                                $valuePtr += $diff;
+                                $dirInfo->{Base} = $base = $base + $diff;
+                                $dirInfo->{DataPos} = $dataPos = $dataPos - $diff;
+                                # set relative flag if base is inside maker notes
+                                $dirInfo->{Relative} = 1 if $base > $base+$dataPos+$dirStart;
+                            }
+                            undef $fixBase;  # only fix it once
+                        }
                         # get value by seeking in file if we are allowed
                         if ($valuePtr < 0 or $valuePtr+$oldSize > $dataLen) {
                             if ($raf) {
@@ -1065,6 +1080,7 @@ sub WriteExif($$$)
             my $newCount = $oldCount;
             my $newValue;
             my $newValuePt = $isNew >= 0 ? \$newValue : \$oldValue;
+            my $isOverwriting;
 
             if ($isNew >= 0) {
                 # add, edit or delete this tag
@@ -1075,9 +1091,8 @@ sub WriteExif($$$)
 #
                     $newInfo = $set{$newID};
                     $newCount = $$newInfo{Count};
-                    my $val;
+                    my ($val, $newVal);
                     my $newValueHash = $exifTool->GetNewValueHash($newInfo, $dirName);
-                    my ($isOverwriting, $newVal);
                     if ($isNew > 0) {
                         # don't create new entry unless requested
                         if ($newValueHash) {
@@ -1284,6 +1299,9 @@ sub WriteExif($$$)
                             TagInfo => $newInfo,
                             RAF => $raf,
                         );
+                        if ($$newInfo{SubDirectory} and $newInfo->{SubDirectory}->{FixBase}) {
+                            $subdirInfo{FixBase} = 1;
+                        }
                         # get the proper tag table for these maker notes
                         my $subTable;
                         if ($oldInfo and $oldInfo->{SubDirectory}) {
@@ -1333,7 +1351,7 @@ sub WriteExif($$$)
                                 $makerFixup->{Shift} += $baseShift;
                                 push @valFixups, $makerFixup;
                                 $previewInfo and $previewInfo->{BaseShift} = $baseShift;
-                            } elsif ($loc) {
+                            } else {
                                 # apply a one-time fixup to $loc since offsets are relative
                                 $makerFixup->{Start} += $loc;
                                 # shift all offsets to be relative to new base
@@ -1360,7 +1378,8 @@ sub WriteExif($$$)
                     }
                     SetByteOrder($saveOrder);
 
-                } elsif ($$newInfo{SubDirectory} and $isNew <= 0) {
+                # process existing subdirectory unless we are overwriting it entirely
+                } elsif ($$newInfo{SubDirectory} and $isNew <= 0 and not $isOverwriting) {
                 
                     if ($$newInfo{SubIFD}) {
 #
@@ -1386,7 +1405,7 @@ sub WriteExif($$$)
                                 DataPos => $dataPos,
                                 DataLen => $dataLen,
                                 DirStart => $subdirStart,
-                                DirName => $subdirName,
+                                DirName => $subdirName . ($i ? $i : ''),
                                 Fixup => new Image::ExifTool::Fixup,
                                 RAF => $raf,
                             );
@@ -1483,7 +1502,7 @@ sub WriteExif($$$)
                             $newValuePt = \$newValue;
                         }
                         unless (defined $$newValuePt) {
-                            $exifTool->Error("Internal error writing $$dirInfo{DirName}");
+                            $exifTool->Error("Internal error writing $$dirInfo{DirName}:$$newInfo{Name}");
                             return undef;
                         }
                         next unless length $$newValuePt;

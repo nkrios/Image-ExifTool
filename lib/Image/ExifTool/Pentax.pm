@@ -16,6 +16,8 @@
 #               4) http://kobe1995.jp/~kaz/astro/istD.html
 #               5) John Francis private communication (tests with ist-D/ist-DS)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
+#
+# Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Pentax;
@@ -24,7 +26,81 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
+
+# Pentax city codes - PH (from Optio WP)
+my %pentaxCities = (
+    0 => 'Pago Pago',
+    1 => 'Honolulu',
+    2 => 'Anchorage',
+    3 => 'Vancouver',
+    4 => 'San Fransisco',
+    5 => 'Los Angeles',
+    6 => 'Calgary',
+    7 => 'Denver',
+    8 => 'Mexico City',
+    9 => 'Chicago',
+    10 => 'Miami',
+    11 => 'Toronto',
+    12 => 'New York',
+    13 => 'Santiago',
+    14 => 'Caracus',
+    15 => 'Halifax',
+    16 => 'Buenos Aires',
+    17 => 'Sao Paulo',
+    18 => 'Rio de Janeiro',
+    19 => 'Madrid',
+    20 => 'London',
+    21 => 'Paris',
+    22 => 'Milan',
+    23 => 'Rome',
+    24 => 'Berlin',
+    25 => 'Johannesburg',
+    26 => 'Istanbul',
+    27 => 'Cairo',
+    28 => 'Jerusalem',
+    29 => 'Moscow',
+    30 => 'Jeddah',
+    31 => 'Tehran',
+    32 => 'Dubai',
+    33 => 'Karachi',
+    34 => 'Kabul',
+    35 => 'Male',
+    36 => 'Delhi',
+    37 => 'Colombo',
+    38 => 'Kathmandu',
+    39 => 'Dacca',
+    40 => 'Yangon',
+    41 => 'Bangkok',
+    42 => 'Kuala Lumpur',
+    43 => 'Vientiane',
+    44 => 'Singapore',
+    45 => 'Phnom Penh',
+    46 => 'Ho Chi Minh',
+    47 => 'Jakarta',
+    48 => 'Hong Kong',
+    49 => 'Perth',
+    50 => 'Beijing',
+    51 => 'Shanghai',
+    52 => 'Manila',
+    53 => 'Taipei',
+    54 => 'Seoul',
+    55 => 'Adelaide',
+    56 => 'Tokyo',
+    57 => 'Guam',
+    58 => 'Sydney',
+    59 => 'Noumea',
+    60 => 'Wellington',
+    61 => 'Auckland',
+    62 => 'Lima',
+    63 => 'Dakar',
+    64 => 'Algiers',
+    65 => 'Helsinki',
+    66 => 'Athens',
+    67 => 'Nairobi',
+    68 => 'Amsterdam',
+    69 => 'Stockholm',
+);
 
 %Image::ExifTool::Pentax::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -65,12 +141,17 @@ $VERSION = '1.18';
         Writable => 'int32u',
     },
     0x0006 => { #5
+        # Note: Year is int16u in MM byte ordering regardless of EXIF byte order
         Name => 'Date',
-        ValueConv => 'length($val)==4 ? sprintf("%.4d:%.2d:%.2d",Get16u(\$val,0),unpack("x2C2",$val)) : "Unknown ($val)"',
-        ValueConvInv => 'my @v=split /:/, $val;Set16u($v[0]) . pack("C2",$v[1],$v[2])',
+        Writable => 'undef',
+        Count => 4,
+        ValueConv => 'length($val)==4 ? sprintf("%.4d:%.2d:%.2d",unpack("nC2",$val)) : "Unknown ($val)"',
+        ValueConvInv => 'my @v=split /:/, $val;pack("nC2",$v[0],$v[1],$v[2])',
     },
     0x0007 => { #5
         Name => 'Time',
+        Writable => 'undef',
+        Count => 3,
         ValueConv => 'length($val)>=3 ? sprintf("%.2d:%.2d:%.2d",unpack("C3",$val)) : "Unknown ($val)"',
         ValueConvInv => 'pack("C3",split(/:/,$val))',
     },
@@ -94,8 +175,11 @@ $VERSION = '1.18';
             0 => '640x480',
             1 => 'Full', #PH - this can mean 2048x1536 or 2240x1680 or ... ?
             2 => '1024x768',
+            3 => '1280x960', #PH (Optio WP)
             4 => '1600x1200',
             5 => '2048x1536',
+            8 => '2560x1920', #PH (Optio WP)
+            19 => '320x240', #PH (Optio WP)
             21 => '2592x1944',
             22 => '2304x1728', #2
             '36 0' => '3008x2008',  #PH
@@ -105,27 +189,114 @@ $VERSION = '1.18';
         Name => 'PictureMode',
         Writable => 'int16u',
         PrintConv => {
-            0 => 'Not Selected',
+            0 => 'Program', #PH
             5 => 'Portrait',
             6 => 'Landscape',
+            8 => 'Sport', #PH
             9 => 'Night Scene',
+            11 => 'Soft', #PH
             12 => 'Surf & Snow',
             13 => 'Sunset',
             14 => 'Autumn',
             15 => 'Flower',
             17 => 'Fireworks',
             18 => 'Text',
+            19 => 'Panorama', #PH
+            30 => 'Self Portrait', #PH
+            37 => 'Museum', #PH
+            38 => 'Food', #PH
+            40 => 'Green Mode', #PH
+            49 => 'Light Pet', #PH
+            50 => 'Dark Pet', #PH
+            51 => 'Medium Pet', #PH
+            53 => 'Underwater', #PH
+            54 => 'Candlelight', #PH
+            55 => 'Natural Skin Tone', #PH
+            56 => 'Syncro Sound Record', #PH
         },
     },
-    0x000d => {
-        Name => 'FocusMode',
+    0x000c => { #PH
+        Name => 'FlashMode',
         Writable => 'int16u',
-        PrintConv => { #2
-            0 => 'Normal',
-            1 => 'Macro (1)',
-            2 => 'Macro (2)',
-            3 => 'Infinity',
+        PrintHex => 1,
+        PrintConv => {
+            0x000 => 'Auto, Did not fire',
+            0x001 => 'Off',
+            0x003 => 'Auto, Did not fire, Red-eye reduction',
+            0x100 => 'Auto, Fired',
+            0x102 => 'On',
+            0x103 => 'Auto, Fired, Red-eye reduction',
+            0x104 => 'On, Red-eye reduction',
+            0x108 => 'On, Soft',
         },
+    },
+    0x000d => [
+        {
+            Condition => '$self->{CameraMake} =~ /^PENTAX/',
+            Name => 'FocusMode',
+            Notes => 'Pentax models',
+            Writable => 'int16u',
+            PrintConv => { #PH
+                0 => 'Normal',
+                1 => 'Macro',
+                2 => 'Infinity',
+                3 => 'Manual',
+                5 => 'Pan Focus',
+            },
+        },
+        {
+            Name => 'FocusMode',
+            Writable => 'int16u',
+            Notes => 'Asahi models',
+            PrintConv => { #2
+                0 => 'Normal',
+                1 => 'Macro (1)',
+                2 => 'Macro (2)',
+                3 => 'Infinity',
+            },
+        },
+    ],
+    0x000f => { #PH
+        Name => 'AutoAFPoint',
+        Writable => 'int16u',
+        PrintHex => 1,
+        PrintConv => {
+            0xffff => 'None',
+            1 => 'Top-left',
+            2 => 'Top-center',
+            3 => 'Top-right',
+            4 => 'Left',
+            5 => 'Center',
+            6 => 'Right',
+            7 => 'Bottom-left',
+            8 => 'Bottom-center',
+            9 => 'Bottom-right',
+        },
+    },
+    0x0010 => { #PH
+        Name => 'FocusPosition',
+        Writable => 'int16u',
+        Notes => 'Related to focus distance but effected by focal length',
+    },
+    0x0012 => { #PH
+        Name => 'ExposureTime',
+        Description => 'Shutter Speed',
+        Writable => 'int32u',
+        Priority => 0,
+        ValueConv => '$val * 1e-5',
+        ValueConvInv => '$val * 1e5',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x0013 => { #PH
+        Name => 'FNumber',
+        Description => 'Aperture',
+        Writable => 'int16u',
+        Priority => 0,
+        ValueConv => '$val * 0.1',
+        ValueConvInv => '$val * 10',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
     },
     # ISO Tag - Entries confirmed by W. Smith 12 FEB 04
     0x0014 => {
@@ -134,14 +305,23 @@ $VERSION = '1.18';
         Writable => 'int16u',
         Priority => 0,
         PrintConv => {
-            3 => 50,    # Not confirmed
+            3 => 50, #(NC=Not Confirmed)
             4 => 64,
+            5 => 80, #(NC)
             6 => 100,
+            7 => 125, #PH
+            8 => 160, #PH
             9 => 200,
+            10 => 250, #(NC)
+            11 => 320, #(NC)
             12 => 400,
+            13 => 500, #(NC)
+            14 => 640, #(NC)
             15 => 800,
-            18 => 1600, # Not confirmed
-            21 => 3200, # Not Confirmed
+            16 => 1000, #(NC)
+            17 => 1250, #(NC)
+            18 => 1600, #(NC)
+            21 => 3200, #(NC)
             50 => 50, #PH
             100 => 100, #PH
             200 => 200, #PH
@@ -151,6 +331,15 @@ $VERSION = '1.18';
             3200 => 3200, #PH
         },
     },
+    # 0x0015 - Related to measured EV? ranges from -2 to 6 if interpreted as signed int (PH)
+    0x0016 => { #PH
+        Name => 'ExposureCompensation',
+        Writable => 'int16u',
+        ValueConv => '($val - 50) * 0.1',
+        ValueConvInv => 'int($val * 10 + 50.5)',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
+    }, 
     # AE Metering Mode Tag - W. Smith 12 FEB 04
     0x0017 => {
         Name => 'MeteringMode',
@@ -176,27 +365,33 @@ $VERSION = '1.18';
     },
     0x001a => { #5
         Name => 'WhiteBalanceMode',
+        Writable => 'int16u',
         PrintConv => {
-            1 => 'Auto',
-            2 => 'Auto (2)',    # Observed in Optio-S file - PH
+            1 => 'Auto (Daylight?)',
+            2 => 'Auto (Shade?)',
+            3 => 'Auto (Flash?)',
+            4 => 'Auto (Tungsten?)',
             0xffff => 'User-Selected',
+            0xfffe => 'Preset (Fireworks?)', #PH
         },
     },
     0x001b => { #6
         Name => 'BlueBalance',
+        Writable => 'int16u',
         ValueConv => '$val / 256',
         ValueConvInv => 'int($val * 256 + 0.5)',
     },
     0x001c => { #6
         Name => 'RedBalance',
+        Writable => 'int16u',
         ValueConv => '$val / 256',
         ValueConvInv => 'int($val * 256 + 0.5)',
     },
     # Would be nice if there was a general way to determine units for FocalLength.
-    # Optio 550 uses .1mm while *istD and Optio S use .01 - PH
+    # Optio 550 uses .1mm while *istD, Optio S and Optio WP use .01 - PH
     0x001d => [
         {
-            Condition => '$self->{CameraModel} =~ /(\*ist D|Optio S)/',
+            Condition => '$self->{CameraModel} =~ /(\*ist D|Optio [A-Z])/',
             Name => 'FocalLength',
             Writable => 'int32u',
             ValueConv => '$val * 0.01',
@@ -261,7 +456,41 @@ $VERSION = '1.18';
             '2 0' => 'Hard',
         },
     },
-    0x0029 => 'FrameNumber', #5
+    0x0022 => { #PH
+        Name => 'WorldTimeLocation',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Hometown',
+            1 => 'Destination',
+        },
+    },
+    0x0023 => { #PH
+        Name => 'HometownCity',
+        Writable => 'int16u',
+        PrintConv => \%pentaxCities,
+    },
+    0x0024 => { #PH
+        Name => 'DestinationCity',
+        Writable => 'int16u',
+        PrintConv => \%pentaxCities,
+    },
+    0x0025 => { #PH
+        Name => 'HometownDST',
+        Writable => 'int16u',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
+    0x0026 => { #PH
+        Name => 'DestinationDST',
+        Writable => 'int16u',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
+    # 0x0027 - could be a 5-byte string software version number for the Optio 550,
+    #          but the offsets are wacky so it is hard to tell (PH)
+    0x0029 => { #5
+        Name => 'FrameNumber',
+        Writable => 'int32u',
+    },
+    # 0x0032 - normally 4 zero bytes, but "\x02\0\0\0" for a cropped pic (PH)
     0x0039 => { #PH
         Name => 'RawImageSize',
         Writable => 'int16u',
@@ -361,6 +590,7 @@ $VERSION = '1.18';
             '4 45' => 'TAMRON 28-300mm F3.5-6.3 Ultra zoom XR',
         },
     },
+    # 0x0041 - increments for each cropped pic (PH)
     0x0200 => {
         Name => 'BlackPoint', #5
         Writable => 'int16u',
@@ -370,6 +600,11 @@ $VERSION = '1.18';
         Name => 'WhitePoint', #5
         Writable => 'int16u',
         Count => 4,
+    },
+    0x03fe => { #PH
+        Name => 'DataDump',
+        Writable => 0,
+        PrintConv => '\$val',
     },
     0x0402 => { #5
         Name => 'ToneCurve',
@@ -386,6 +621,16 @@ $VERSION = '1.18';
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
+    },
+    0x1000 => {
+        Name => 'HometownCityCode', #PH
+        Writable => 'undef',
+        Count => 4,
+    },
+    0x1001 => {
+        Name => 'DestinationCityCode', #PH(NC)
+        Writable => 'undef',
+        Count => 4,
     },
 );
 
@@ -416,7 +661,6 @@ $VERSION = '1.18';
 #        },
 #    },
 
-
 1; # end
 
 __END__
@@ -436,17 +680,22 @@ Pentax and Asahi maker notes in EXIF information.
 
 =head1 NOTES
 
-I couldn't find a good source for Pentax maker notes information so I've
-tried to figure out some of it myself based on sample pictures from the
-Optio 550, Optio S and *istD.  So far, what I have figured out isn't very
-complete, and some of it may be wrong.
+I couldn't find a good source for Pentax maker notes information, but I've
+managed to discover a fair bit of information by analyzing sample pictures
+from the Optio 330, Optio 550, Optio S, *istD, *istDs, and through tests
+with my own Optio WP, and with help provided by other ExifTool users (see
+L<ACKNOWLEDGEMENTS>).
 
-While the Pentax maker notes are stored in standard EXIF format, the offsets
-used for some of the Optio cameras are wacky.  They seem to give the offset
-relative to the offset of the tag in the directory.  Very weird.  I'm just
-ignoring this peculiarity, but it doesn't affect much except the PrintIM
-data since other data is generally less than 4 bytes and therefore doesn't
-require a pointer.
+The Pentax maker notes are stored in standard EXIF format, but the offsets
+used for some of their cameras are wacky.  The Optio 330 gives the offset
+relative to the offset of the tag in the directory, the Optio WP uses a base
+offset in the middle of nowhere, and the Optio 550 uses different (and
+totally illogical) bases for different menu entries.  Very weird.  (It
+wouldn't surprise me if Pentax can't read their own maker notes!)  Luckily,
+there are only a few entries in the maker notes which are large enough to
+require offsets, so this doesn't effect much useful information.  ExifTool
+attempts to make sense of this fiasco by making an assumption about where
+the information should be stored to deduce the correct offsets.
 
 =head1 REFERENCES
 
@@ -459,6 +708,9 @@ require a pointer.
 =item L<http://kobe1995.jp/~kaz/astro/istD.html>
 
 =item L<http://www.cybercom.net/~dcoffin/dcraw/>
+
+=item (...plus lots of testing with my Optio WP!)
+
 =back
 
 =head1 ACKNOWLEDGEMENTS

@@ -39,6 +39,7 @@ is an explanation of the meaning of each special key:
     Multi       - True if we should scan for multiple IFD's
     NewDataPos  - File position of new data (write proc only)
     Fixup       - Reference to hash of offset fixups (used in EXIF writing only)
+    FixBase     - Flag set to attempt to fix base offsets
 
   WRITE_PROC : Reference to a function to write all new tags for this directory.
   The write proc returns the new directory data or undefined on error.  It takes
@@ -162,7 +163,10 @@ conditions.  The following is a description of possible hash entries:
                   set to zero, this tag will not override the value of previous
                   tags with the same name.  If the priority is greater than
                   zero, this tag won't be overridden by subsequent tags unless
-                  their priority is equal to or greater than this priority.
+                  their priority is equal to or greater than this priority.  A
+                  special feature is that Priority 0 tags are automatically
+                  incremented to Priority 1 if they exist in the IFD of the full
+                  resolution image (as determined by SubFileType).
 
                   'Protected' - bit mask to protect tags from writing.  Bit 0x01
                   is set to indicate an 'unsafe' tag, which is not written by
@@ -280,8 +284,8 @@ conditions.  The following is a description of possible hash entries:
                   used for converting the binary value and Writable specifies
                   the format code written to the EXIF IFD.
 
-  WriteAlso     : [optional] Used for writable tag to specify other tags that
-                  must be written when this tag is written.  The value is a hash
+  WriteAlso     : [optional] Used for writable tag to specify other tags to
+                  write when this tag is written.  The value is a hash
                   reference.  The hash is keys are the names of the tags that
                   must be written, and the values are evaluated to return the
                   ValueConv value of the specified tag (or returns undef to
@@ -363,6 +367,8 @@ conditions.  The following is a description of possible hash entries:
      DirName    : [optional] Name of this subdirectory.  If not specified, the
                   name is taken from the TagTable default GROUP0 name, or from
                   the tag Group1 name if no TagTable specified.
+                  
+     FixBase    : [optional] Flag set if base offsets should be fixed.
   }
 
 --------------------------------------------------------------------------------

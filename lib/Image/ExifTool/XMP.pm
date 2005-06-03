@@ -1265,7 +1265,7 @@ sub ParseXMPElement($$$;$$)
 
         if ($isWriting) {
             my %attrs;
-            $attrs{$1} = $3 while $attrs =~ m/(\S+)=('|")(.*?)\2/sg;
+            $attrs{$1} = $3 while $attrs =~ m/(\S+)=(['"])(.*?)\2/sg;
             # add index to list items so we can keep them in order
             # (this also enables us to keep structure elements grouped properly
             # for lists of structures, like JobRef)
@@ -1283,7 +1283,7 @@ sub ParseXMPElement($$$;$$)
             }
             # handle properties inside element attributes (RDF shorthand format):
             # (attributes take the form a:b='c' or a:b="c")
-            while ($attrs =~ m/(\S+)=('|")(.*?)\2/sg) {
+            while ($attrs =~ m/(\S+)=(['"])(.*?)\2/sg) {
                 my ($shortName, $shortVal) = ($1, $3);
                 my $ns;
                 if ($shortName =~ /(.*?):/) {
@@ -1305,8 +1305,8 @@ sub ParseXMPElement($$$;$$)
             }
             # if element value is empty, take value from 'resource' attribute
             # (preferentially) or 'about' attribute (if no 'resource')
-            $val = $2 if $val eq '' and ($attrs =~ /\bresource=('|")(.*?)\1/ or
-                                         $attrs =~ /\babout=('|")(.*?)\1/);
+            $val = $2 if $val eq '' and ($attrs =~ /\bresource=(['"])(.*?)\1/ or
+                                         $attrs =~ /\babout=(['"])(.*?)\1/);
             # look for additional elements contained within this one
             if (!ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt)) {
                 # there are no contained elements, so this must be a simple property value
@@ -1338,6 +1338,9 @@ sub ProcessXMP($$$)
         $buff = substr($$dataPt, $dirStart, $dirLen);
         $dataPt = \$buff;
         $dirStart = 0;
+    }
+    if ($exifTool->{REQ_TAG_LOOKUP}->{xmp}) {
+        $exifTool->FoundTag('XMP', substr($$dataPt, $dirStart, $dirLen));
     }
     if ($exifTool->Options('Verbose') and not $exifTool->{XMP_CAPTURE}) {
         $exifTool->VerboseDir('XMP', 0, $dirLen);

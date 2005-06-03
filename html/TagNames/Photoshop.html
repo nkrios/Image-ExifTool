@@ -5,17 +5,148 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h2><a name='Photoshop'>Photoshop Tags</a></h2>
 
-The meanings of many Photoshop tags are known, however very few provide useful
-information about the image, so many are not decoded by ExifTool.  The tags
-listed below are those which are decoded by ExifTool.
+Many Photoshop tags are marked as Unknown (indicated by a question mark
+after the tag name) because the information they provide is not very useful
+under normal circumstances.  Unknown tags are not extracted unless the
+Unknown (-u) option is used.
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td>0x03e8</td>
+<td>Photoshop2Info?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03e9</td>
+<td>MacintoshPrintInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03ea</td>
+<td>XMLData?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03eb</td>
+<td>Photoshop2ColorTable?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03ed</td>
+<td>ResolutionInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x03ee</td>
 <td>AlphaChannelsNames</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03ef</td>
+<td>DisplayInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03f0</td>
+<td>PStringCaption?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03f1</td>
+<td>BorderInformation?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03f2</td>
+<td>BackgroundColor?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03f3</td>
+<td>PrintFlags?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03f4</td>
+<td>BW_HalftoningInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03f5</td>
+<td>ColorHalftoningInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03f6</td>
+<td>DuotoneHalftoningInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03f7</td>
+<td>BW_TransferFunc?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03f8</td>
+<td>ColorTransferFuncs?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03f9</td>
+<td>DuotoneTransferFuncs?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03fa</td>
+<td>DuotoneImageInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03fb</td>
+<td>EffectiveBW?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03fc</td>
+<td>ObsoletePhotoshopTag1?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03fd</td>
+<td>EPSOptions?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03fe</td>
+<td>QuickMaskInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x03ff</td>
+<td>ObsoletePhotoshopTag2?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0400</td>
+<td>LayerStateInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0401</td>
+<td>WorkingPath?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0402</td>
+<td>LayersGroupInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0403</td>
+<td>ObsoletePhotoshopTag3?</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -24,18 +155,138 @@ listed below are those which are decoded by ExifTool.
 <td align='center'>-</td>
 <td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
 <tr valign='top'>
+<td>0x0405</td>
+<td>RawImageMode?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0406</td>
 <td>JPEG_Quality</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Photoshop.html#JPEG_Quality'>Photoshop JPEG_Quality Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0408</td>
+<td>GridGuidesInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0409</td>
+<td>ThumbnailResource?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x040a</td>
+<td>CopyrightFlag?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x040b</td>
 <td>URL</td>
-<td align='center'>N</td>
+<td align='center'>Y</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x040c</td>
 <td>PhotoshopThumbnail</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x040d</td>
+<td>GlobalAngle?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x040e</td>
+<td>ColorSamplersResource?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x040f</td>
+<td>ICC_Profile?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0410</td>
+<td>Watermark?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0411</td>
+<td>ICC_Untagged?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0412</td>
+<td>EffectsVisible?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0413</td>
+<td>SpotHalftone?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0414</td>
+<td>IDsBaseValue?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0415</td>
+<td>UnicodeAlphaNames?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0416</td>
+<td>IndexedColourTableCount?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0417</td>
+<td>TransparentIndex?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0419</td>
+<td>GlobalAltitude?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x041a</td>
+<td>Slices?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x041b</td>
+<td>WorkflowURL?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x041c</td>
+<td>JumpToXPEP?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x041d</td>
+<td>AlphaIdentifiers?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x041e</td>
+<td>URL_List?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0421</td>
+<td>VersionInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0bb7</td>
+<td>ClippingPathName?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2710</td>
+<td>PrintFlagsInfo?</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -69,6 +320,6 @@ listed below are those which are decoded by ExifTool.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 11, 2005</i>
+<br><i>Last revised May 31, 2005</i>
 </body>
 </html>

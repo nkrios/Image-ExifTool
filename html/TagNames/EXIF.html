@@ -62,7 +62,7 @@ default <b>Group</b> listed below is used unless another group is specified.
 <tr valign='top'>
 <td>0x0102</td>
 <td>BitsPerSample</td>
-<td align='center'>int16u[-1]!</td>
+<td align='center'>int16u[n]!</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -1210,9 +1210,9 @@ default <b>Group</b> listed below is used unless another group is specified.
 <td>FocalPlaneResolutionUnit</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
-<td><font size='-1'>&apos;0.001&apos; = um
-  <br>1 = mm
+<td><font size='-1'>1 = mm
   <br>10 = cm
+  <br>&apos;0.001&apos; = um
   <br>&apos;25.4&apos; = inches</font></td></tr>
 <tr valign='top'>
 <td>0x9211</td>
@@ -1284,6 +1284,7 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>MakerNoteKodak6a
   <br>MakerNoteKodak6b
   <br>MakerNoteKodakUnknown
+  <br>MakerNoteKyocera
   <br>MakerNoteMinolta
   <br>MakerNoteNikon
   <br>MakerNoteNikon2
@@ -1294,12 +1295,13 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>MakerNotePentax
   <br>MakerNoteRicoh
   <br>MakerNoteRicohText
+  <br>PreviewImage
   <br>MakerNoteSanyo
   <br>MakerNoteSigma
   <br>MakerNoteSony
   <br>MakerNoteUnknown</td>
-<td align='center'>undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef<br>-undef</td>
-<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -1314,6 +1316,7 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>--&gt; <a href='Kodak.html#Type6'>Kodak Type6 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type6'>Kodak Type6 Tags</a>
   <br>--&gt; <a href='Kodak.html#Unknown'>Kodak Unknown Tags</a>
+  <br>--&gt; <a href='Unknown.html'>Unknown Tags</a>
   <br>--&gt; <a href='Minolta.html'>Minolta Tags</a>
   <br>--&gt; <a href='Nikon.html'>Nikon Tags</a>
   <br>--&gt; <a href='Nikon.html#MakerNotesB'>Nikon MakerNotesB Tags</a>
@@ -1324,6 +1327,7 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>--&gt; <a href='Pentax.html'>Pentax Tags</a>
   <br>--&gt; <a href='Ricoh.html'>Ricoh Tags</a>
   <br>--&gt; <a href='Ricoh.html#Text'>Ricoh Text Tags</a>
+  <br><font color="#666666">(Samsung preview image)</font>
   <br>--&gt; <a href='Sanyo.html'>Sanyo Tags</a>
   <br>--&gt; <a href='Sigma.html'>Sigma Tags</a>
   <br>--&gt; <a href='Sony.html'>Sony Tags</a>
@@ -1461,9 +1465,9 @@ default <b>Group</b> listed below is used unless another group is specified.
 <td>FocalPlaneResolutionUnit</td>
 <td align='center'>int16u</td>
 <td align='center'>ExifIFD</td>
-<td><font size='-1'>&apos;0.001&apos; = um
-  <br>1 = mm
+<td><font size='-1'>1 = mm
   <br>10 = cm
+  <br>&apos;0.001&apos; = um
   <br>&apos;25.4&apos; = inches</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa211</td>
@@ -2254,6 +2258,6 @@ default <b>Group</b> listed below is used unless another group is specified.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 16, 2005</i>
+<br><i>Last revised Jun 1, 2005</i>
 </body>
 </html>

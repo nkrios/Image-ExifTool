@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess);
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 # conditional list of maker notes
 # Notes:
@@ -26,7 +26,7 @@ $VERSION = '1.11';
     # decide which MakerNotes to use (based on camera make/model)
     {
         Name => 'MakerNoteCanon',
-        # put $valPt in the first condition to load the value early for speed
+        # (starts with an IFD)
         Condition => '$self->{CameraMake} =~ /^Canon/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::Main',
@@ -37,6 +37,7 @@ $VERSION = '1.11';
         Name => 'MakerNoteCasio',
         # do negative lookahead assertion just to get tags
         # in a nice order for documentation
+        # (starts with an IFD)
         Condition => '$self->{CameraMake}=~/^CASIO(?! COMPUTER CO.,LTD)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Main',
@@ -45,6 +46,7 @@ $VERSION = '1.11';
     },
     {
         Name => 'MakerNoteCasio2',
+        # (starts with "QVC\0")
         Condition => q{
             $self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/ and
             $self->{CameraModel}!~/^EX-Z3/
@@ -57,6 +59,7 @@ $VERSION = '1.11';
     },
     {
         Name => 'MakerNoteCasioEX-Z3',
+        # (starts with "QVC\0")
         Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Type2',
@@ -71,6 +74,7 @@ $VERSION = '1.11';
         # The Fuji programmers really botched this one up,
         # but with a bit of work we can still read this directory
         Name => 'MakerNoteFujiFilm',
+        # (starts with "FUJIFILM")
         Condition => '$self->{CameraMake} =~ /^FUJIFILM/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FujiFilm::Main',
@@ -170,8 +174,19 @@ $VERSION = '1.11';
         },
     },
     {
+        Name => 'MakerNoteKyocera',
+        # (starts with "KYOCERA")
+        Condition => '$self->{CameraMake}=~/^KYOCERA/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Unknown::Main',
+            Start => '$valuePtr + 22',
+            Base => '$start + 14',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
         Name => 'MakerNoteMinolta',
-        Condition => '$self->{CameraMake}=~/^(Konica Minolta|Minolta)/',
+        Condition => '$self->{CameraMake}=~/^(Konica Minolta|Minolta)/i',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::Main',
             ByteOrder => 'Unknown',
@@ -209,6 +224,9 @@ $VERSION = '1.11';
     },
     {
         Name => 'MakerNoteOlympus',
+        # (if Make is 'SEIKO EPSON CORP.', starts with "EPSON\0")
+        # (if Make is 'OLYMPUS OPTICAL CO.,LTD' or 'OLYMPUS CORPORATION',
+        #  starts with "OLYMP\0")
         Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON|AGFA )/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Olympus::Main',
@@ -218,6 +236,7 @@ $VERSION = '1.11';
     },
     {
         Name => 'MakerNoteLeica',
+        # (starts with "LEICA\0")
         Condition => '$self->{CameraMake} =~ /^LEICA/',
         SubDirectory => {
             # Leica uses the same format as Panasonic
@@ -228,6 +247,7 @@ $VERSION = '1.11';
     },
     {
         Name => 'MakerNotePanasonic',
+        # (starts with "Panasonic\0")
         Condition => '$self->{CameraMake} =~ /^Panasonic/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Main',
@@ -237,6 +257,8 @@ $VERSION = '1.11';
     },
     {
         Name => 'MakerNotePentax',
+        # (if Make is 'PENTAX Corporation', starts with "AOC\0")
+        # (if Make is 'Asahi Optical Co.,Ltd', starts with an IFD)
         Condition => '$self->{CameraMake} =~ /^(PENTAX|AOC|Asahi)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::Main',
@@ -244,6 +266,9 @@ $VERSION = '1.11';
             # byte ordering are so variable
             ProcessProc => \&ProcessUnknown,
             ByteOrder => 'Unknown',
+            # offsets can be totally whacky for Pentax maker notes,
+            # so attempt to fix the offset base if possible
+            FixBase => 1,
         },
     },
     {
@@ -264,7 +289,20 @@ $VERSION = '1.11';
         },
     },
     {
+        Name => 'PreviewImage',
+        Condition => '$self->{CameraMake}=~/^Samsung/ and $self->{CameraModel}=~/^<Digimax V700/',
+        WriteCheck => '$val eq "none" ? undef : $self->CheckImage(\$val)',
+        DataTag => 'PreviewImage',
+        Notes => 'Samsung preview image',
+        # we allow preview image to be set to '', but we don't want a zero-length value
+        # in the IFD, so set it temorarily to 'none'.  Note that the length is <= 4,
+        # so this value will fit in the IFD so the preview fixup won't be generated.
+        ValueConv => '$val eq "none" and $val="";\$val',
+        ValueConvInv => '$val eq "" and $val="none";$val',
+    },
+    {
         Name => 'MakerNoteSanyo',
+        # (starts with "SANYO\0")
         Condition => '$self->{CameraMake}=~/^SANYO/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sanyo::Main',
@@ -275,6 +313,7 @@ $VERSION = '1.11';
     },
     {
         Name => 'MakerNoteSigma',
+        # (starts with "SIGMA\0")
         Condition => '$self->{CameraMake}=~/^(SIGMA|FOVEON)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sigma::Main',
@@ -285,6 +324,7 @@ $VERSION = '1.11';
     },
     {
         Name => 'MakerNoteSony',
+        # (starts with "SONY DSC \0")
         Condition => '$self->{CameraMake}=~/^SONY/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
@@ -307,9 +347,10 @@ $VERSION = '1.11';
 # insert writable properties so we can write our maker notes
 my $tagInfo;
 foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
-    # set up this tag so we can write it
     $$tagInfo{Writable} = 'undef';
     $$tagInfo{WriteGroup} = 'ExifIFD';
+    next unless $$tagInfo{SubDirectory};
+    # set up this tag so we can write it
     $$tagInfo{ValueConv} = '\$val';
     $$tagInfo{ValueConvInv} = '$val';
     $$tagInfo{MakerNotes} = 1;
@@ -472,7 +513,7 @@ sub ProcessUnknown($$$)
         if ($exifTool->Options('Verbose') > 1) {
             my $indent = $exifTool->{INDENT};
             $indent =~ s/\| $/  /;
-            print "${indent}Found IFD at offset $$dirInfo{DirStart} in Unknown maker notes:\n";
+            printf "${indent}Found IFD at offset 0x%.4x in Unknown maker notes:\n", $$dirInfo{DirStart};
         }
         $success = Image::ExifTool::Exif::ProcessExif($exifTool, $tagTablePtr, $dirInfo);
     } else {

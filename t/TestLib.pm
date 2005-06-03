@@ -9,6 +9,7 @@
 #               Feb. 27/04 - P. Harvey Change print format and allow ExifTool
 #                            object to be passed instead of tags hash ref.
 #               Oct. 30/04 - P. Harvey Split testCompare() into separate sub.
+#               May  18/05 - P. Harvey Tolerate round-off errors in floats.
 #------------------------------------------------------------------------------
 
 package t::TestLib;
@@ -16,12 +17,14 @@ package t::TestLib;
 use strict;
 require 5.002;
 require Exporter;
-use Image::ExifTool qw{ImageInfo};
+use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
 $VERSION = '1.05';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare testVerbose);
+
+sub closeEnough($$);
 
 #------------------------------------------------------------------------------
 # Compare 2 files and return true and erase the 2nd file if they are the same
@@ -46,16 +49,7 @@ sub testCompare($$$)
                 $line2 = <FILE2>;
                 if (defined $line2) {
                     next if $line1 eq $line2;
-                    # ignore version number differences
-                    next if $line1 =~ /ExifTool\s?Version/ and
-                            $line2 =~ /ExifTool\s?Version/;
-                    # ignore different FileModifyDate's
-                    next if $line1 =~ /File\s?Modif.*Date/ and
-                            $line2 =~ /File\s?Modif.*Date/;
-                    # some systems use 3 digits in exponents... grrr
-                    if ($line2 =~ s/e(\+|-)0/e$1/) {
-                        next if $line1 eq $line2;
-                    }
+                    next if closeEnough($line1, $line2);
                 }
                 $success = 0;
                 last;
@@ -87,6 +81,48 @@ sub testCompare($$$)
     $success and unlink $testfile;
     
     return $success
+}
+
+#------------------------------------------------------------------------------
+# Return true if two test lines are close enough
+# Inputs: 1) line 1, 2) line 2
+# Returns: true if lines are similar enough to pass test
+sub closeEnough($$)
+{
+    my ($line1, $line2) = @_;
+
+    # allow version number differences
+    return 1 if $line1 =~ /ExifTool\s?Version/ and
+                $line2 =~ /ExifTool\s?Version/;
+
+    # allow different FileModifyDate's
+    return 1 if $line1 =~ /File\s?Modif.*Date/ and
+                $line2 =~ /File\s?Modif.*Date/;
+
+    # analyze every token in the line, and allow rounding
+    # or format differences in floating point numbers
+    my @toks1 = split /\s+/, $line1;
+    my @toks2 = split /\s+/, $line2;
+    my $lenChanged = 0;
+    for (;;) {
+        return 1 unless @toks1 or @toks2;   # all tokens were OK
+        last unless @toks1 and @toks2;
+        my $tok1 = shift @toks1;
+        my $tok2 = shift @toks2;
+        next if $tok1 eq $tok2;
+        # can't compare any more if either line was truncated (ie. ends with '[...]')
+        return $lenChanged if $tok1 =~ /\Q[...]\E$/ or $tok2 =~ /\Q[...]\E$/;
+        # check to see if both tokens are floating point numbers (with decimal points!)
+        last unless Image::ExifTool::IsFloat($tok1) and
+                    Image::ExifTool::IsFloat($tok2) and
+                    $tok1 =~ /\./ and $tok2 =~ /\./;
+        # numbers are bad if not the same to 5 significant figures
+        last if $tok1 == 0 or $tok2 == 0;
+        last if abs(($tok1-$tok2)/($tok1+$tok2)) > 1e-5;
+        # set flag if length changed
+        $lenChanged = 1 if length($tok1) ne length($tok2);
+    }
+    return 0;
 }
 
 #------------------------------------------------------------------------------

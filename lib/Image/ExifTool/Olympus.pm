@@ -124,7 +124,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int32u',
         Count => 3,
         PrintConv => q{ #3
-            my @v = split /\s+/, $val;
+            my @v = split ' ', $val;
             return $val unless @v >= 3;
             my @v0 = ('Normal','Unknown (1)','Fast','Panorama');
             my @v2 = ('(none)','Left to Right','Right to Left','Bottom to Top','Top to Bottom');
@@ -615,7 +615,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16s',
         Count => 3,
         Notes => '3 numbers: 1. CS Value, 2. Min, 3. Max',
-        PrintConv => 'my ($a,$b,$c)=split /\s+/,$val; $a-=$b; $c-=$b; "CS$a (min CS0, max CS$c)"',
+        PrintConv => 'my ($a,$b,$c)=split " ",$val; $a-=$b; $c-=$b; "CS$a (min CS0, max CS$c)"',
     },
     0x504 => { #PH/4
         Name => 'ModifiedSaturation',
@@ -633,7 +633,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16s',
         Count => 3,
         Notes => '3 numbers: 1. Contrast, 2. Min, 3. Max',
-        PrintConv => 'my @v=split /\s+/,$val; "$v[0] (min $v[1], max $v[2])"',
+        PrintConv => 'my @v=split " ",$val; "$v[0] (min $v[1], max $v[2])"',
         PrintConvInv => '$val=$tr/-0-9 //dc;$val',
     },
     0x506 => { #PH/4
@@ -641,7 +641,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16s',
         Count => 3,
         Notes => '3 numbers: 1. Sharpness, 2. Min, 3. Max',
-        PrintConv => 'my @v=split /\s+/,$val; "$v[0] (min $v[1], max $v[2])"',
+        PrintConv => 'my @v=split " ",$val; "$v[0] (min $v[1], max $v[2])"',
         PrintConvInv => '$val=$tr/-0-9 //dc;$val',
     },
     0x507 => { #PH/4
@@ -713,7 +713,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Count => 2,
         Notes => '2 numbers: 1. Mode, 2. Sequence Number',
         PrintConv => q{
-            my ($a,$b) = split /\s+/,$val;
+            my ($a,$b) = split ' ',$val;
             return 'Single Shot' unless $a;
             my %a = (
                 1 => 'Continuous Shooting',
@@ -901,7 +901,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Format => 'int32u',
         Count => 2,
         PrintConv => q{
-            my ($a,$b) = split /\s+/,$val;
+            my ($a,$b) = split ' ',$val;
             return "inf" if $a == 0xffffffff;
             return $a / 1000 . ' m';
         },
@@ -937,7 +937,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 sub PrintLensInfo($$)
 {
     my ($val, $type) = @_;
-    my @info = split /\s+/, $val;
+    my @info = split ' ', $val;
     return "Unknown ($val)" unless @info >= 4;
     return 'None' unless $info[2];
     my %make = (
@@ -988,7 +988,7 @@ sub PrintLensInfo($$)
 sub PrintAFAreas($)
 {
     my $val = shift;
-    my @points = split /\s+/, $val;
+    my @points = split ' ', $val;
     my %afPointNames = (
         0x36794285 => 'Left',
         0x79798585 => 'Center',

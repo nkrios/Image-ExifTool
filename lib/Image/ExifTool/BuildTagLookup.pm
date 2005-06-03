@@ -16,8 +16,10 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 @ISA = qw(Exporter);
+
+sub NumbersFirst;
 
 # colors for html pages
 my $noteFont = '<font color="#666666">';
@@ -56,9 +58,9 @@ A B<Tag Name> is the handle by which the information is accessed.  In some
 instances, more than one name may correspond to a single tag ID.  In these
 cases, the actual name used depends on the context in which the information
 is found.  Case is not significant for tag names.  A question mark after a
-tag name indicates that the information is either not understood or not
-verified -- these tags are not extracted by ExifTool unless the Unknown (-u)
-option is enabled.
+tag name indicates that the information is either not understood, not
+verified, or not very useful -- these tags are not extracted by ExifTool
+unless the Unknown (-u) option is enabled.
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an "N" in this column means the tag is writable.  A "Y"
@@ -97,10 +99,10 @@ default B<Group> listed below is used unless another group is specified.
 },
     GPS => q{
 ExifTool is very flexible about the input format for lat/long coordinates,
-and will accept 3 floating point numbers separated by just about anything.
-Many other GPS tags have values which are fixed-length strings.  For these,
-the indicated string lengths include a null terminator which is added
-automatically by ExifTool.
+and will accept 3 floating point numbers (for degrees, minutes and seconds)
+separated by just about anything.  Many other GPS tags have values which are
+fixed-length strings.  For these, the indicated string lengths include a
+null terminator which is added automatically by ExifTool.
 },
     XMP => q{
 All XMP information is stored as character strings.  An C<integer> in this
@@ -134,9 +136,10 @@ IPTC information is separated into different records, each of which has its
 own set of tags.
 },
     Photoshop => q{
-The meanings of many Photoshop tags are known, however very few provide useful
-information about the image, so many are not decoded by ExifTool.  The tags
-listed below are those which are decoded by ExifTool.
+Many Photoshop tags are marked as Unknown (indicated by a question mark
+after the tag name) because the information they provide is not very useful
+under normal circumstances.  Unknown tags are not extracted unless the
+Unknown (-u) option is used.
 },
     PrintIM => q{
 The format of the PrintIM information is known, however no PrintIM tags have
@@ -269,12 +272,7 @@ sub new
         } elsif ($short !~ /^(Composite|Extra|XMP)$/) {
             $id{$tableName} = 'Tag ID';
         }
-        my @keys = TagTableKeys($table);
-        if (grep /[^0-9]/, @keys) {
-            @keys = sort @keys;
-        } else {
-            @keys = sort { $a <=> $b } @keys;
-        }
+        my @keys = sort NumbersFirst TagTableKeys($table);
         my $defFormat = $table->{FORMAT};
         if (not $defFormat and $table->{PROCESS_PROC} and
             $table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData)
@@ -287,7 +285,11 @@ sub new
             my (@require, @writeGroup, @writable);
             $format = $defFormat;
             foreach $tagInfo (@infoArray) {
-                push @values, "($$tagInfo{Notes})" if $$tagInfo{Notes};
+                if ($$tagInfo{Notes}) {
+                    my $note = $$tagInfo{Notes};
+                    $note =~ s/(^\s+|\s+$)//sg;
+                    push @values, "($note)";
+                }
                 my $writeGroup;
                 if ($short eq 'XMP') {
                     ($writeGroup = $tagInfo->{Groups}->{1}) =~ s/XMP-//;
@@ -311,12 +313,7 @@ sub new
                 }
                 my $printConv = $$tagInfo{PrintConv};
                 if (ref $printConv eq 'HASH') {
-                    my @pk;
-                    if (grep(!/^\d+$/, keys %$printConv)) {
-                        @pk = sort keys %$printConv;
-                    } else {
-                        @pk = sort { $a <=> $b } keys %$printConv;
-                    }
+                    my @pk = sort NumbersFirst keys %$printConv;
                     foreach (@pk) {
                         next if $_ eq '';
                         my $index;
@@ -363,7 +360,11 @@ sub new
                         $writable = 'N';
                     } else {
                         $writable eq '1' and $writable = $format ? $format : 'Y';
-                        $writable .= "[$$tagInfo{Count}]" if $$tagInfo{Count};
+                        my $count = $$tagInfo{Count};
+                        if ($count) {
+                            $count = 'n' if $count < 0;
+                            $writable .= "[$count]";
+                        }
                         $writable .= '~' if $noPrintConvInv;
                     }
                     # add a '*' if this tag is protected or a '~' for unsafe tags
@@ -374,6 +375,7 @@ sub new
                 }
                 # don't duplicate a tag name unless an entry is different
                 my $name = $$tagInfo{Name};
+                my $lcName = lc($name);
                 $name .= '?' if $$tagInfo{Unknown};
                 unless (@tagNames and $tagNames[-1] eq $name and
                     $writeGroup[-1] eq $writeGroup and $writable[-1] eq $writable)
@@ -382,7 +384,6 @@ sub new
                     push @writeGroup, $writeGroup;
                     push @writable, $writable;
                 }
-                my $lcName = lc($name);
                 $tagLookup{$lcName} = { } unless $tagLookup{$lcName};
                 # remember number for this table
                 my $tagIDs = $tagLookup{$lcName}->{$tableNum};
@@ -477,7 +478,10 @@ sub WriteTagLookup($$)
                     if (/^\d+$/) {
                         $_ = sprintf("0x%x",$_);
                     } else {
-                        $_ = "'$_'";
+                        my $quot = "'";
+                        # escape non-printable characters in tag ID if necessary
+                        $quot = '"' if s/[\x00-\x1f,\x7f-\xff]/sprintf('\\x%.2x',ord($&))/ge;
+                        $_ = $quot . $_ . $quot;
                     }
                 }
                 $entry = '[' . join(',', @tagIDs) . ']';
@@ -515,6 +519,17 @@ sub WriteTagLookup($$)
         warn "Error rewriting file\n";
     }
     return $success;
+}
+
+#------------------------------------------------------------------------------
+# sort numbers first numerically, then strings alphabetically
+sub NumbersFirst
+{
+    if ($a =~ /^-?[0-9]+$/) {
+        return ($b =~ /^-?[0-9]+$/) ? $a <=> $b : -1;
+    } else {
+        return ($b !~ /^-?[0-9]+$/) ? $a cmp $b : 1;
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -559,12 +574,7 @@ sub GetTableOrder()
         my $table = GetTagTable($tableName);
         # recursively scan through tables in subdirectories
         my @moreTables;
-        my @keys = TagTableKeys($table);
-        if (grep /[^0-9]/, @keys) {
-            @keys = sort @keys;
-        } else {
-            @keys = sort { $a <=> $b } @keys;
-        }
+        my @keys = sort NumbersFirst TagTableKeys($table);
         foreach (@keys) {
             my @infoArray = GetTagInfoList($table,$_);
             my $tagInfo;
@@ -591,7 +601,7 @@ sub OpenHtmlFile($;$)
     my ($htmlFile, $title, $url);
 
     if ($category) {
-        my @names = split /\s+/, $category;
+        my @names = split ' ', $category;
         my $class = shift @names;
         $htmlFile = "$htmldir/TagNames/$class.html";
         $title = "$category Tags";
@@ -708,7 +718,7 @@ sub WriteTagNames($$)
             }
         }
         $short = $$shortName{$tableName};
-        my @names = split /\s+/, $short;
+        my @names = split ' ', $short;
         my $class = shift @names;
         $url = "$class.html";
         @names and $url .= '#' . join '_', @names;
@@ -810,15 +820,25 @@ sub WriteTagNames($$)
                 printf PODFILE " %-${w}s", shift(@reqs) || '';
             }
             printf PODFILE " $wrStr\n";
+            my $n = 0;
             while (@tags or @reqs or @vals) {
                 $line = '  ';
                 $line .= ' 'x($wID+2) if $id;
                 $line .= sprintf("%-${wTag}s", shift(@tags) || '');
                 $line .= sprintf(" %-${wReq}s", shift(@reqs) || '') if $composite;
                 $line .= sprintf(" %-${wGrp}s", shift(@wGrp) || '-') if $showGrp;
-                $line .= sprintf(" %s", shift(@vals)) if @vals;
+                if (@vals) {
+                    my $val = shift @vals;
+                    # use writable if this is a note
+                    if ($subdir and $val =~ /^\(/) {
+                        $val = $$writable[$n];
+                        $val =~ s/^-// if defined $val;
+                    }
+                    $line .= " $val" if defined $val;
+                }
                 $line =~ s/\s+$//;  # trim trailing white space
                 print PODFILE "$line\n";
+                ++$n;
             }
             my @htmlTags;
             foreach (@$tagNames) {
@@ -828,7 +848,9 @@ sub WriteTagNames($$)
             my $isSubdir;
             if ($$writable[0] =~ /^-/) {
                 $isSubdir = 1;
-                $$writable[0] = substr($$writable[0], 1) unless $$writable[0] eq '-';
+                foreach (@$writable) {
+                    s/^-(.+)/$1/;
+                }
             }
             print HTMLFILE "<tr$rowCol valign='top'>\n";
             print HTMLFILE "<td$align>$tagIDstr</td>\n" if $id;
@@ -842,7 +864,8 @@ sub WriteTagNames($$)
             if (@$values) {
                 if ($isSubdir) {
                     foreach (@$values) {
-                        my @names = split /\s+/;
+                        /^\(/ and push(@values,"$noteFont$_</font>"), next;
+                        my @names = split;
                         $url = (shift @names) . '.html';
                         @names and $url .= '#' . join '_', @names;
                         push @values, "--&gt; <a href='$url'>$_ Tags</a>";

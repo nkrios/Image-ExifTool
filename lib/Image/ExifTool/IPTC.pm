@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.08';
+$VERSION = '1.11';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -254,7 +254,7 @@ my %fileFormat = (
     35 => {
         Name => 'ReleaseTime',
         Groups => { 2 => 'Time' },
-        Format => 'digits[11]',
+        Format => 'string[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -268,7 +268,7 @@ my %fileFormat = (
     38 => {
         Name => 'ExpirationTime',
         Groups => { 2 => 'Time' },
-        Format => 'digits[11]',
+        Format => 'string[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -313,7 +313,7 @@ my %fileFormat = (
     60 => {
         Name => 'TimeCreated',
         Groups => { 2 => 'Time' },
-        Format => 'digits[11]',
+        Format => 'string[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -327,7 +327,7 @@ my %fileFormat = (
     63 => {
         Name => 'DigitalCreationTime',
         Groups => { 2 => 'Time' },
-        Format => 'digits[11]',
+        Format => 'string[11]',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -418,6 +418,16 @@ my %fileFormat = (
         Name => 'Caption-Abstract',
         Format => 'string[0,2000]',
     },
+    121 => { # (format not certain)
+        Name => 'LocalCaption',
+        Format => 'string[0,256]',
+        Notes => q{
+I haven't found a reference for the format of tags 121, 184-188 and 225-232,
+so I have just make them writable as strings with reasonable length.  Beware
+that if this is wrong, other utilities won't be able to read these tags as
+written by ExifTool.
+        },
+    },
     122 => {
         Name => 'Writer-Editor',
         Flags => 'List',
@@ -488,6 +498,26 @@ my %fileFormat = (
         Name => 'AudioOutcue',
         Format => 'string[0,64]',
     },
+    184 => { # (format not certain)
+        Name => 'JobID',
+        Format => 'string[0,64]',
+    },
+    185 => { # (format not certain)
+        Name => 'MasterDocumentID',
+        Format => 'string[0,256]',
+    },
+    186 => { # (format not certain)
+        Name => 'ShortDocumentID',
+        Format => 'string[0,64]',
+    },
+    187 => { # (format not certain)
+        Name => 'UniqueDocumentID',
+        Format => 'string[0,128]',
+    },
+    188 => { # (format not certain)
+        Name => 'OwnerID',
+        Format => 'string[0,128]',
+    },
     200 => {
         Name => 'ObjectPreviewFileFormat',
         Groups => { 2 => 'Image' },
@@ -505,6 +535,26 @@ my %fileFormat = (
         Format => 'string[0,256000]',
         ValueConv => '\$val',
         ValueConvInv => '$val',
+    },
+    225 => { # (format not certain)
+        Name => 'ClassifyState',
+        Format => 'string[0,64]',
+    },
+    228 => { # (format not certain)
+        Name => 'SimilarityIndex',
+        Format => 'string[0,32]',
+    },
+    230 => { # (format not certain)
+        Name => 'DocumentNotes',
+        Format => 'string[0,1024]',
+    },
+    231 => { # (format not certain)
+        Name => 'DocumentHistory',
+        Format => 'string[0,256]',
+    },
+    232 => { # (format not certain)
+        Name => 'ExifCameraInfo',
+        Format => 'string[0,4096]',
     },
 );
 

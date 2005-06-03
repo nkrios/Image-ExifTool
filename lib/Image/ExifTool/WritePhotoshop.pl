@@ -101,6 +101,7 @@ sub WritePhotoshop($$$)
                 $value = Image::ExifTool::GetNewValues($newValueHash);
                 ++$exifTool->{CHANGED};
                 next unless defined $value;     # next if tag is being deleted
+                $verbose > 1 and print "    + Photoshop:$$tagInfo{Name} = '$value'\n";
             }
         } elsif ($$editDirs{$tagID}) {
             $tagInfo = $$editDirs{$tagID};

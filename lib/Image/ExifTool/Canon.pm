@@ -24,7 +24,7 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
@@ -951,12 +951,18 @@ sub ValidatePictureInfo($$$)
     return 0 if $size < 46; # must be at least 46 bytes long
     my $w1 = Image::ExifTool::Get16u($dataPt, $offset + 4);
     my $h1 = Image::ExifTool::Get16u($dataPt, $offset + 6);
+    return 0 unless $h1 and $w1;
+    my $f1 = $w1 / $h1;
+    # Check for normal aspect ratio
+    return 1 if abs($f1 - 1.33) < 0.01;
+    return 1 if abs($f1 - 1.67) < 0.01;
     my $w2 = Image::ExifTool::Get16u($dataPt, $offset + 8);
     my $h2 = Image::ExifTool::Get16u($dataPt, $offset + 10);
-    return 0 unless $h1 and $w1 and $h2 and $w2;
-    # validate by checking picture aspect ratio
+    return 0 unless $h2 and $w2;
+    # compare aspect ratio with as-shot image dimensions
+    # (the Powershot G6 as-shot height is wacky, hence the test above)
     return 0 if $w1 eq $h1;
-    my ($f1, $f2) = ($w1/$h1, $w2/$h2);
+    my $f2 = $w2 / $h2;
     return 1 if abs(1-$f1/$f2) < 0.01;
     return 1 if abs(1-$f1*$f2) < 0.01;
     return 0;
@@ -1095,7 +1101,7 @@ it under the same terms as Perl itself.
 
 =item L<http://www.wonderland.org/crw/>
 
-=item (...plus lots of testing with my own camera!)
+=item (...plus lots of testing with my 300D!)
 
 =back
 

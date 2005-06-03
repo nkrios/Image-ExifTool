@@ -189,6 +189,8 @@ it under the same terms as Perl itself.
 
 =item L<http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html>
 
+=item (...plus some testing with my FinePix 2400 Zoom)
+
 =back
 
 =head1 SEE ALSO

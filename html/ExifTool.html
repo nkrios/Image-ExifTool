@@ -35,14 +35,16 @@ and explain the following individual functions in more detail:
 <li><a href="#SetNewValue">SetNewValue</a>
 <li><a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>
 <li><a href="#GetNewValues">GetNewValues</a>
+<li><a href="#SaveNewValues">SaveNewValues</a>
+<li><a href="#RestoreNewValues">RestoreNewValues</a>
 <li><a href="#SetNewGroups">SetNewGroups</a>
 <li><a href="#GetNewGroups">GetNewGroups</a>
 <li><a href="#GetTagID">GetTagID</a>
-<li><a href="#GetDescription">GetDescription</a>
-<li><a href="#GetGroup">GetGroup</a>
 </ul>
 </td><td valign=top>
 <ul>
+<li><a href="#GetDescription">GetDescription</a>
+<li><a href="#GetGroup">GetGroup</a>
 <li><a href="#GetGroups">GetGroups</a>
 <li><a href="#BuildCompositeTags">BuildCompositeTags</a>
 <li><a href="#GetTagName">GetTagName</a>
@@ -360,8 +362,9 @@ to a specific function.
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>No verbose messages</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Print tag names and raw values</td></tr>
     <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Add additional tag details</td></tr>
-    <tr><td valign='top' align=center><b>3</b>&nbsp;=</td><td>Add hex dump of tag data (with length limit)</td></tr>
-    <tr><td valign='top' align=center><b>4</b>&nbsp;=</td><td>Remove length limit from hex dump</td></tr>
+    <tr><td valign='top' align=center><b>3</b>&nbsp;=</td><td>Add hex dump of tag data (with length limits)</td></tr>
+    <tr><td valign='top' align=center><b>4</b>&nbsp;=</td><td>Remove length limit on dump of tag values</td></tr>
+    <tr><td valign='top' align=center><b>5</b>&nbsp;=</td><td>Remove length limit on dump of JPEG segments</td></tr>
     </table><td align=center>0</td></tr>
 </table></blockquote>
 
@@ -454,7 +457,10 @@ Write meta information to a file.  The specified source file is rewritten to
 the destination file with the new information specified in previous calls to
 <a href="#SetNewValue">SetNewValue</a>.  The necessary segments and/or
 directories are created in the destination file as required to store the
-specified information.
+specified information.  May be called repeatedly to write the same information
+to additional files without the need to call <a href="#SetNewValue">SetNewValue</a>
+again.
+
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>WriteInfo($$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
@@ -611,7 +617,9 @@ each value in the list.
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
  <br>1) [optional] Tag key or tag name, or undefined to clear all new values.
  A tag name of '*' can be used when deleting tags to delete all tags, or all
- tags in a specified group.
+ tags in a specified group.  The tag name may be prefixed by group name,
+ separated by a colon (ie. 'GROUP:TAG'), which is equivalent to using a
+ 'Group' option argument.
  <br>2) [optional] New value for tag.  Undefined to delete tag from file.
  <br>3-N) [optional] SetNewValue options hash entries (see below)
 </td></tr>
@@ -706,7 +714,7 @@ Get list of new Raw values for the specified tag.  These are the values
 that will be written to file.  Only tags which support a 'List' may return
 more than one value.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
-<tr><td><b>Prototype</b></td><td>GetNewValues($)</td></tr>
+<tr><td><b>Prototype</b></td><td>GetNewValues($$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
  <br>1) Tag key or tag name
 </td></tr>
@@ -721,6 +729,32 @@ my $rawVal = $exifTool-&gt;<b>GetNewValues</b>($tag);
 
 my @rawVals = $exifTool-&gt;<b>GetNewValues</b>($tag);
 </pre></td></tr></table></blockquote>
+
+<hr><h2><a name="SaveNewValues">SaveNewValues</a></h2>
+Save state of new values to be later restored by RestoreNewValues().
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>SaveNewValues($)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$exifTool-&gt;<b>SaveNewValues</b>();         # save state of new values
+$exifTool-&gt;SetNewValue(ISO =&gt; 100); # set new value for ISO
+$exifTool-&gt;WriteInfo('a.jpg');      # write ISO plus any previous new values
+$exifTool-&gt;<b>RestoreNewValues</b>();      # restore previous new values
+$exifTool-&gt;WriteInfo('b.jpg');      # write previous new values only
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="RestoreNewValues">RestoreNewValues</a></h2>
+Restore new values to the settings that existed when SaveNewValues() was
+last called.  May be called repeatedly after a single call to
+SaveNewValues(). See SaveNewValues() above for an example.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>RestoreNewValues($)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+</td></tr>
+</table></blockquote>
 
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
 Set priority for tag groups in subsequent calls to SetNewValue().

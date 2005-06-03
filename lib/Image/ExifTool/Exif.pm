@@ -29,7 +29,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.63';
+$VERSION = '1.64';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -163,6 +163,8 @@ sub Rationalize($;$);
     },
     0xfe => {
         Name => 'SubfileType',
+        # set priority directory if this is the full resolution image
+        ValueConv => '$val == 0 and $self->SetPriorityDir(); $val',
         PrintConv => {
             0 => 'Full-resolution Image',
             1 => 'Reduced-resolution image',
@@ -176,6 +178,8 @@ sub Rationalize($;$);
     },
     0xff => {
         Name => 'OldSubfileType',
+        # set priority directory if this is the full resolution image
+        ValueConv => '$val == 1 and $self->SetPriorityDir(); $val',
         PrintConv => {
             1 => 'Full-resolution image',
             2 => 'Reduced-resolution image',
@@ -1371,7 +1375,7 @@ sub Rationalize($;$);
             1 => 'ShutterSpeedValue',
             2 => 'BulbDuration',
         },
-        ValueConv => '$val[2] ? $val[2] : (defined($val[0]) ? $val[0] : $val[1])',
+        ValueConv => '($val[2] and $val[2]>0) ? $val[2] : (defined($val[0]) ? $val[0] : $val[1])',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     Aperture => {
@@ -1546,7 +1550,9 @@ sub CalcScaleFactor35efl
             @_ < 2 and return undef;
             $w = shift;
             $h = shift;
-            last if $w and $h;
+            next unless $w and $h;
+            my $a = $w / $h;
+            last if $a > 0.5 and $a < 2; # stop if we get a reasonable value
         }
         # calculate focal plane size in mm
         $w *= $units / $x_res;
@@ -1739,7 +1745,7 @@ sub ExtractImage($$$$)
             $exifTool->Options('IgnoreMinorErrors'))
     {
         $tag = 'PreviewImage' unless $tag;
-        if (grep /^$tag$/i, @{$exifTool->{REQUESTED_TAGS}}) {
+        if ($exifTool->{REQ_TAG_LOOKUP}->{lc($tag)}) {
             $exifTool->Warn("$tag is not a valid image");
             return undef;
         }
@@ -1763,6 +1769,7 @@ sub ProcessExif($$$)
     my $dirLen = $dirInfo->{DirLen} || $dataLen - $dirStart;
     my $base = $dirInfo->{Base} || 0;
     my $raf = $dirInfo->{RAF};
+    my $fixBase = $dirInfo->{FixBase};
     my $success = 1;
     my $verbose = $exifTool->Options('Verbose');
     my $tagKey;
@@ -1849,6 +1856,20 @@ sub ProcessExif($$$)
         if ($size > 4) {
             my $didRead;
             $valuePtr = Get32u($dataPt, $valuePtr) - $dataPos;
+            if ($fixBase) {
+                my $diff = $dirEnd + 4 - $valuePtr;
+                if ($diff) {
+                    $valuePtr += $diff;
+                    $dirInfo->{Base} = $base = $base + $diff;
+                    $dirInfo->{DataPos} = $dataPos = $dataPos - $diff;
+                    $dirInfo->{Relative} = 1 if $base > $base+$dataPos+$dirStart;
+                    if ($verbose) {
+                        my $rel = $dirInfo->{Relative} ? 'relative' : 'absolute';
+                        $exifTool->Warn("Adjusted $$dirInfo{DirName} base by $diff ($rel)");
+                    }
+                }
+                undef $fixBase;  # only fix it once
+            }
             if ($valuePtr < 0 or $valuePtr+$size > $dataLen) {
                 # get value by seeking in file if we are allowed
                 if ($raf) {
@@ -1947,14 +1968,14 @@ sub ProcessExif($$$)
             my $tagStr = $$tagInfo{Name};
             my @values;
             if ($$subdir{MaxSubdirs}) {
-                @values = split /\s+/, $val;
+                @values = split ' ', $val;
                 # limit the number of subdirectories we parse
                 pop @values while @values > $$subdir{MaxSubdirs};
                 $val = shift @values;
             }
             # loop through all sub-directories specified by this tag
-            my $newTagTable;
-            for (;;) {
+            my ($newTagTable, $dirNum);
+            for ($dirNum=0; ; ++$dirNum) {
                 my $subdirBase = $base;
                 my $subdirDataPt = $valueDataPt;
                 my $subdirDataPos = $valueDataPos;
@@ -2074,10 +2095,14 @@ sub ProcessExif($$$)
                     DirLen   => $size,
                     RAF      => $raf,
                     Parent   => $dirInfo->{DirName},
+                    FixBase  => $$subdir{FixBase},
                 );
                 # set directory IFD name from group name of family 1 in tag information if it exists
-                $$tagInfo{Groups} and $subdirInfo{DirName} = $tagInfo->{Groups}->{1};
-
+                if ($$tagInfo{Groups}) {
+                    $subdirInfo{DirName} = $tagInfo->{Groups}->{1};
+                    # number multiple subdirectories
+                    $dirNum and $subdirInfo{DirName} .= $dirNum;
+                }
                 SetByteOrder($newByteOrder);        # set byte order for this subdir
                 # validate the subdirectory if necessary
                 my $dirData = $subdirDataPt;    # set data pointer to be used in eval
@@ -2098,7 +2123,8 @@ sub ProcessExif($$$)
                 @values or last;
                 $val = shift @values;           # continue with next subdir
             }
-            next unless $exifTool->Options('MakerNotes');
+            next unless $exifTool->Options('MakerNotes') or
+                        $exifTool->{REQ_TAG_LOOKUP}->{lc($$tagInfo{Name})};
             if ($$tagInfo{MakerNotes}) {
                 # this is a pain, but we must rebuild maker notes to include
                 # all the value data if data was outside the maker notes
@@ -2115,6 +2141,9 @@ sub ProcessExif($$$)
                     DirName  => 'MakerNotes',
                     TagInfo  => $tagInfo,
                 );
+                if ($$tagInfo{SubDirectory} and $tagInfo->{SubDirectory}->{FixBase}) {
+                    $makerDirInfo{FixBase} = 1;
+                }
                 my $val2 = RebuildMakerNotes($exifTool, $newTagTable, \%makerDirInfo);
                 if (defined $val2) {
                     $val = $val2;

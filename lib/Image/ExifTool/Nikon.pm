@@ -10,6 +10,7 @@
 #               12/06/2004 - P. Harvey Added SceneMode
 #               01/01/2005 - P. Harvey Decode preview image and preview IFD
 #               03/35/2005 - T. Christiansen additions
+#               05/10/2005 - P. Harvey Decode encrypted lens data
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               2) Joseph Heled private communication (tests with D70)
@@ -28,7 +29,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
@@ -75,7 +76,19 @@ $VERSION = '1.22';
         Writable => 'int16u',
     },
     0x000c => 'ColorBalance1',
-    # 0x000e last 3 bytes '010c00', first byte changes from shot to shot.
+    0x000e => {
+        Name => 'ExposureDifference',
+        Writable => 'undef',
+        Count => 4,
+        ValueConv => 'my ($a,$b,$c)=unpack("c3",$val); $c ? $a*($b/$c) : 0',
+        ValueConvInv => q{
+            my $a = int($val*12 + ($val>0 ? 0.5 : -0.5));
+            return undef if $a<-128 or $a>127;
+            return pack("c4",$a,1,12,0);
+        },
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
     0x000f => 'ISOSelection', #2
     0x0010 => {
         Name => 'DataDump',
@@ -158,7 +171,7 @@ $VERSION = '1.22';
         Count => 4,
         # short focal, long focal, aperture at short focal, aperture at long focal
         PrintConv => q{
-            my ($a,$b,$c,$d) = split /\s+/, $val;
+            my ($a,$b,$c,$d) = split ' ', $val;
             ($a==$b ? $a : "$a-$b") . "mm f/" . ($c==$d ? $c : "$c-$d")
         },
         PrintConvInv => '$_=$val; tr/a-z\///d; s/(^|\s)([0-9.]+)(?=\s|$)/$1$2-$2/g; s/-/ /g; $_',

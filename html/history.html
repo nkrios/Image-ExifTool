@@ -5,7 +5,82 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.18.tar.gz">Version 5.18</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.25.tar.gz">Version 5.25</a>.<p>
+
+<b>June 3/05 - Version 5.25</b>
+<ul>
+<li>Fixed problem with writing IPTC Time tags
+<li>Changed Composite ShutterSpeed to ignore bulb duration if it is negative
+<li>API Changes:
+    <ul>
+    <li>Allow tag name to be prefixed by group in calls to SetNewValue()
+    </ul>
+</ul>
+
+<b>June 1/05 - Version 5.24</b>
+<ul>
+<li>Added new "XMP" tag to allow read/write of XMP data as a block
+<li>Changed name of ExifData tag to EXIF (but didn't make it writable as a block
+    like XMP)
+<li>Give priority to tags in full resolution image (whichever TIFF directory
+    this is in)
+<li>Added numbers to subsequent SubIFD group names to allow tags in various
+    SubIFD's to be accessed individually
+<li>Recognize maker notes from more Konika Minolta cameras
+<li>Extract PreviewImage for Samsung Digimax V700, Kenox V10 and Digimax V10
+<li>Changed validation of CanonPictureInfo to work with more PowerShot cameras
+    (Note: for these cameras, CanonImageHeightAsShot may not be meaningful)
+<li>Added a number of new IPTC ApplicationRecord tags
+<li>Added Nikon ExposureDifference tag
+<li>Removed trailing white space in values printed by exiftool
+</ul>
+
+<b>May 27/05 - Version 5.23</b>
+<ul>
+<li>Changed behaviour of -tagsfromfile slightly so that '-GROUP:TAG&gt;DSTTAG' now
+    commutes information between different groups unless a destination group is
+    specified
+<li>Improved reliability of calculating offsets in Pentax maker notes
+</ul>
+
+<b>May 26/05 - Version 5.22</b>
+<ul>
+<li>Fixed problem with new '-tagsFromFile @' feature which occurred when
+    simultaneously copying tags and writing new values to multiple target files
+    (the new values were only getting written to the first file)
+</ul>
+
+<b>May 25/05 - Version 5.21</b>
+<ul>
+<li>Allow target file to be specified by '@' with -TagsFromFile option
+<li>Fixed bug which caused internal error when using -TagsFromFile option to
+    copy PrintIM information to a file that already contained PrintIM data
+<li>Fixed problem which broke the (now deprecated) -allTagsFromFile=FILE syntax
+<li>Fixed problem decoding Pentax Date for some Optio cameras
+<li>Fixed problem in GeoTiff decoding which could cause some tags to be missed
+<li>Decode a number of new Pentax tags (using my new Optio WP!)
+<li>Made Photoshop URL writable
+<li>Limit length of JPEG segment dump at Verbose=4, and add Verbose=5 level
+<li>API Changes:
+    <ul>
+    <li>Added SaveNewValues() and RestoreNewValues()
+    </ul>
+</ul>
+
+<b>May 20/05 - Version 5.20</b>
+<ul>
+<li>Give names to many Photoshop tags, but leave them marked as 'Unknown' so
+    they aren't extracted under normal circumstances (must use the -u option)
+<li>Read/write Kyocera maker notes properly (although Kyocera information
+    remains unknown)
+<li>Changed installation tests to tolerate rounding-off errors or format
+    differences in floating point numbers
+</ul>
+
+<b>May 17/05 - Version 5.19</b>
+<ul>
+<li>Added -overwrite_original option
+</ul>
 
 <b>May 16/05 - Version 5.18</b> (production release)
 <ul>

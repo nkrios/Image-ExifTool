@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..20\n"; }
+BEGIN { $| = 1; print "1..21\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -106,7 +106,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(Headline => 'A different headline');
     $exifTool->SetNewValue(ImageDescription => 'Modified TIFF');
     $exifTool->SetNewValue(Keywords => 'another keyword', AddValue => 1);
-    $exifTool->SetNewValue(SupplementalCategories => 'new XMP info', Group => 'XMP');
+    $exifTool->SetNewValue('xmp:SupplementalCategories' => 'new XMP info');
     $exifTool->WriteInfo('t/ExifTool.tif', \$newtiff);
     my $info = $exifTool->ImageInfo(\$newtiff);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
@@ -364,6 +364,30 @@ sub binaryCompare($$)
         }
         print "ok $testnum\n";
     }
+}
+
+# test 21: Test SaveNewValues()/RestoreNewValues()
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue(ISO => 25);
+    $exifTool->SetNewValue(Sharpness => '+1');
+    $exifTool->SetNewValue(Artist => 'Phil', Group => 'IFD0');
+    $exifTool->SetNewValue(Artist => 'Harvey', Group => 'ExifIFD');
+    $exifTool->SaveNewValues();
+    $exifTool->SetNewValue(Artist => 'nobody');
+    $exifTool->SetNewValuesFromFile('t/FujiFilm.jpg');
+    $exifTool->RestoreNewValues();
+    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/Writer.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
 }
 
 # end

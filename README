@@ -36,6 +36,10 @@ If you move the exiftool script to a different directory, you must also
 either move the contents of the lib directory or install the Image::ExifTool
 package so the script can find the necessary libraries.
 
+Note:  On some systems you may need to rename 'exiftool' to 'exiftool.pl' to
+run it directly from the command line.  Alternatively, you can run exiftool
+with the command 'perl exiftool'.
+
 INSTALLATION
 
 You can install the Image::ExifTool package to make it available for use by

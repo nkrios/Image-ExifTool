@@ -38,6 +38,7 @@ html/data_members.html
 html/exiftool_pod.html
 html/faq.html
 html/history.html
+html/idiosyncracies.html
 html/index.html
 html/verbose.html
 html/writing.html
@@ -195,6 +196,7 @@ t/Writer_18.out
 t/Writer_19.out
 t/Writer_2.out
 t/Writer_20.out
+t/Writer_21.out
 t/Writer_4.out
 t/Writer_6.out
 t/Writer_8.out

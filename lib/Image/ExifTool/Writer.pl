@@ -17,6 +17,7 @@ use strict;
 use Image::ExifTool::TagLookup qw(FindTagInfo);
 
 sub AssembleRational($$@);
+sub LastInList($);
 
 my $loadedAllTables;    # flag indicating we loaded all tables
 my $evalWarning;        # eval warning message
@@ -30,6 +31,7 @@ my %dirMap = (
         XMP          => 'APP1',
         ICC_Profile  => 'APP2',
         Photoshop    => 'APP13',
+        EXIF         => 'IFD0', # to write EXIF as a block
         ExifIFD      => 'IFD0',
         GPS          => 'IFD0',
         SubIFD       => 'IFD0',
@@ -83,7 +85,8 @@ my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 #------------------------------------------------------------------------------
 # Set tag value
 # Inputs: 0) ExifTool object reference
-#         1) tag key, tag name, '*', or undef to reset all previous SetNewValue() calls
+#         1) tag key, tag name, or '*' (optionally prefixed by group name),
+#            or undef to reset all previous SetNewValue() calls
 #         2) new value, or undef to delete tag
 #         3-N) Options:
 #           Type => PrintConv, ValueConv or Raw - specifies value type
@@ -118,6 +121,11 @@ sub SetNewValue($;$$%)
         delete $self->{DEL_GROUP};
         $verbose > 1 and print "Cleared new values\n";
         return 1;
+    }
+    # set group name in options if specified
+    if ($tag =~ /(.+?):(.+)/) {
+        $options{Group} = $1 if $1 ne '*' and lc($1) ne 'all';
+        $tag = $2;
     }
     $tag =~ s/ .*//;    # convert from tag key to tag name if necessary
     my @matchingTags = FindTagInfo($tag);
@@ -164,9 +172,11 @@ sub SetNewValue($;$$%)
     my ($wantGroup, $ifdName);
     if ($options{Group}) {
         $wantGroup = $options{Group};
-        # set $ifdName if this group is a valid IFD name
+        # set $ifdName if this group is a valid IFD or SubIFD name
         if ($wantGroup =~ /^IFD(\d+)$/i) {
             $ifdName = "IFD$1";
+        } elsif ($wantGroup =~ /^SubIFD(\d+)$/i) {
+            $ifdName = "SubIFD$1";
         } else {
             $ifdName = $exifDirs{lc($wantGroup)};
         }
@@ -586,11 +596,11 @@ sub SetNewValuesFromFile($$;@)
                 return { Error => "Can't redirect from all tags to one tag" };
             }
             # set destination group the same as source if necessary
-            $dstGrp = $grp if $dstGrp eq '*' or $dstGrp eq '';
+            $dstGrp = $grp if $dstGrp eq '*' and $grp;
             # write to specified destination group/tag
             $dst = [ $dstGrp, $dstTag ];
         } elsif ($isExclude) {
-            # implicitly assume 'all' if first entry is an exclusion
+            # implicitly assume '*' if first entry is an exclusion
             unshift @setList, [ '*', '*', [ '', '*' ] ] unless @setList;
             # exclude this tag by leaving $dst undefined
         } else {
@@ -704,24 +714,73 @@ sub GetNewValues($;$$)
 }
 
 #------------------------------------------------------------------------------
-# set priority for group where new values are written
-# Inputs: 0) ExifTool object reference,
-#         1-N) group names (reset to default if no groups specified)
-sub SetNewGroups($;@)
+# Save new values for subsequent restore
+# Inputs: 0) ExifTool object reference
+sub SaveNewValues($)
 {
-    local $_;
-    my ($self, @groups) = @_;
-    @groups or @groups = ('EXIF','GPS','IPTC','XMP','MakerNotes');
-    my $count = @groups;
-    my %priority;
-    foreach (@groups) {
-        $priority{lc($_)} = $count--;
+    my $self = shift;
+    my $newValues = $self->{NEW_VALUE};
+    my $key;
+    foreach $key (keys %$newValues) {
+        my $newValueHash = $$newValues{$key};
+        while ($newValueHash) {
+            $newValueHash->{Save} = 1;  # set Save flag
+            $newValueHash = $newValueHash->{Next};
+        }            
     }
-    $priority{file} = 10;       # 'File' group is always written (Comment)
-    $priority{composite} = 10;  # 'Composite' group is always written
-    # set write priority (higher # is higher priority)
-    $self->{WRITE_PRIORITY} = \%priority;
-    $self->{WRITE_GROUPS} = \@groups;
+    # initialize hash for saving overwritten new values
+    $self->{SAVE_NEW_VALUE} = { };
+}
+
+#------------------------------------------------------------------------------
+# Restore new values to last saved state
+# Inputs: 0) ExifTool object reference
+# Notes: Restores saved new values, but currently doesn't restore them in the
+# orginal order, so there may be some minor side-effects when restoring tags
+# with overlapping groups. ie) XMP:Identifier, XMP-dc:Identifier
+sub RestoreNewValues($)
+{
+    my $self = shift;
+    my $newValues = $self->{NEW_VALUE};
+    my $savedValues = $self->{SAVE_NEW_VALUE};
+    my $key;
+    # 1) remove any new values which don't have the Save flag set
+    if ($newValues) {
+        my @keys = keys %$newValues;
+        foreach $key (@keys) {
+            my $lastHash;
+            my $newValueHash = $$newValues{$key};
+            while ($newValueHash) {
+                if ($newValueHash->{Save}) {
+                    $lastHash = $newValueHash;
+                } else {
+                    # remove this entry from the list
+                    if ($lastHash) {
+                        $lastHash->{Next} = $newValueHash->{Next};
+                    } elsif ($newValueHash->{Next}) {
+                        $$newValues{$key} = $newValueHash->{Next};
+                    } else {
+                        delete $$newValues{$key};
+                    }
+                }
+                $newValueHash = $newValueHash->{Next};
+            }
+        }
+    }
+    # 2) restore saved new values
+    if ($savedValues) {
+        $newValues or $newValues = $self->{NEW_VALUE} = { };
+        foreach $key (keys %$savedValues) {
+            if ($$newValues{$key}) {
+                # add saved values to end of list
+                my $newValueHash = LastInList($$newValues{$key});
+                $newValueHash->{Next} = $$savedValues{$key};
+            } else {
+                $$newValues{$key} = $$savedValues{$key};
+            }
+        }
+        $self->{SAVE_NEW_VALUE} = { };  # reset saved new values
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -1081,39 +1140,24 @@ sub GetWriteGroup($)
 sub GetNewValueHash($$;$$)
 {
     my ($self, $tagInfo, $writeGroup, $opts) = @_;
-    $writeGroup = '' unless defined $writeGroup;
-    $opts = '' unless defined $opts;
+    my $saveHash = $self->{SAVE_NEW_VALUE};
     my $newValueHash = $self->{NEW_VALUE}->{$tagInfo};
-    if (not defined $newValueHash) {
-        if ($opts eq 'create') {
-            $newValueHash = $self->{NEW_VALUE}->{$tagInfo} = {
-                TagInfo => $tagInfo,
-                WriteGroup => $writeGroup,
-            };
-        }
-    } elsif ($writeGroup and $newValueHash->{WriteGroup} ne $writeGroup) {
-        # loop through all hashes in this linked list, looking for our writegroup
-        for (;;) {
-            my $lastHash = $newValueHash;
-            $newValueHash = $lastHash->{Next};
-            if (not defined $newValueHash) {
-                if ($opts eq 'create') {
-                    # didn't find match in list, so create a new entry
-                    $newValueHash = {
-                        TagInfo => $tagInfo,
-                        WriteGroup => $writeGroup,
-                    };
-                    # insert in linked list
-                    $lastHash->{Next} = $newValueHash;
-                } else {
-                    undef $newValueHash;
-                }
-                last;
-            }
-            last if $newValueHash->{WriteGroup} eq $writeGroup;
+
+    my %opts;   # quick lookup for options
+    $opts and $opts{$opts} = 1;
+    $writeGroup = '' unless defined $writeGroup;
+
+    if ($writeGroup) {
+        # find the new value in the list with the specified write group
+        while ($newValueHash and $newValueHash->{WriteGroup} ne $writeGroup) {
+            $newValueHash = $newValueHash->{Next};
         }
     }
-    if (defined $newValueHash and $opts eq 'delete') {
+    # remove this entry if deleting, or if creating a new entry and
+    # this entry is marked with "Save" flag
+    if (defined $newValueHash and ($opts{'delete'} or
+        ($opts{'create'} and $saveHash and $newValueHash->{Save})))
+    {
         my $firstHash = $self->{NEW_VALUE}->{$tagInfo};
         if ($newValueHash eq $firstHash) {
             # remove first entry from linked list
@@ -1128,7 +1172,28 @@ sub GetNewValueHash($$;$$)
             # remove from linked list
             $firstHash->{Next} = $newValueHash->{Next};
         }
+        # save the existing entry if necessary
+        if ($saveHash and $newValueHash->{Save}) {
+            # add to linked list of saved new value hashes
+            $newValueHash->{Next} = $saveHash->{$tagInfo};
+            $saveHash->{$tagInfo} = $newValueHash;
+        }
         undef $newValueHash;
+    }
+    if (not defined $newValueHash and $opts{'create'}) {
+        # create a new entry
+        $newValueHash = {
+            TagInfo => $tagInfo,
+            WriteGroup => $writeGroup,
+        };
+        # add entry to our NEW_VALUE hash
+        if ($self->{NEW_VALUE}->{$tagInfo}) {
+            # add to end of linked list
+            my $lastHash = LastInList($self->{NEW_VALUE}->{$tagInfo});
+            $lastHash->{Next} = $newValueHash;
+        } else {
+            $self->{NEW_VALUE}->{$tagInfo} = $newValueHash;
+        }
     }
     return $newValueHash;
 }
@@ -1323,12 +1388,13 @@ sub WriteTagTable($$;$$)
     $tagTablePtr or return undef;
     my $verbose = $self->{OPTIONS}->{Verbose};
     # set directory name from default group0 name if not done already
-    $dirInfo->{DirName} or $dirInfo->{DirName} = $tagTablePtr->{GROUPS}->{0};
+    my $dirName = $dirInfo->{DirName};
+    my $grp0 = $tagTablePtr->{GROUPS}->{0};
+    $dirName or $dirName = $dirInfo->{DirName} = $grp0;
     if ($self->{DEL_GROUP}) {
         my $delGroupPtr = $self->{DEL_GROUP};
         # delete entire directory if specified
-        my $grp0 = $tagTablePtr->{GROUPS}->{0};
-        my $grp1 = $dirInfo->{DirName};
+        my $grp1 = $dirName;
         if ($$delGroupPtr{$grp0} or $$delGroupPtr{$grp1}) {
             if ($self->{FILE_TYPE} ne 'JPEG') {
                 # restrict delete logic to prevent entire tiff image from being killed
@@ -1347,30 +1413,38 @@ sub WriteTagTable($$;$$)
             }
         }
     }
+    # copy new directory as a block if specified
+    my $tagInfo = $Image::ExifTool::extraTags{$grp0};
+    if ($tagInfo and $self->{NEW_VALUE}->{$tagInfo}) {
+        my $newVal = GetNewValues($self->{NEW_VALUE}->{$tagInfo});
+        if (defined $newVal and length $newVal) {
+            $verbose and print "  Writing $grp0 as a block\n";
+            ++$self->{CHANGED};
+            return $newVal;
+        }
+    }
     # use default proc from tag table if no proc specified
     $writeProc or $writeProc = $$tagTablePtr{WRITE_PROC} or return undef;
     # guard against cyclical recursion into the same directory
     if (defined $dirInfo->{DataPt} and defined $dirInfo->{DirStart} and defined $dirInfo->{DataPos}) {
         my $processed = $dirInfo->{DirStart} + $dirInfo->{DataPos} + ($dirInfo->{Base}||0);
         if ($self->{PROCESSED}->{$processed}) {
-            $self->Warn("$$dirInfo{DirName} pointer references previous $self->{PROCESSED}->{$processed} directory");
+            $self->Warn("$dirName pointer references previous $self->{PROCESSED}->{$processed} directory");
             return 0;
         } else {
-            $self->{PROCESSED}->{$processed} = $dirInfo->{DirName};
+            $self->{PROCESSED}->{$processed} = $dirName;
         }
     }
     # be sure the tag ID's are generated, because the write proc will need them
     GenerateTagIDs($tagTablePtr);
     my $oldDir = $self->{DIR_NAME};
-    if ($verbose and (not defined $oldDir or $oldDir ne $dirInfo->{DirName})) {
-        print '  ', ($dirInfo->{DataPt} ? 'Rewriting' : 'Creating'), " $$dirInfo{DirName}\n";
+    if ($verbose and (not defined $oldDir or $oldDir ne $dirName)) {
+        print '  ', ($dirInfo->{DataPt} ? 'Rewriting' : 'Creating'), " $dirName\n";
     }
-    $self->{DIR_NAME} = $dirInfo->{DirName};
+    $self->{DIR_NAME} = $dirName;
     my $newData = &$writeProc($self, $tagTablePtr, $dirInfo);
     $self->{DIR_NAME} = $oldDir;
-    if ($verbose and defined $newData and not length $newData) {
-        print "  Deleting $$dirInfo{DirName}\n";
-    }
+    print "  Deleting $dirName\n" if $verbose and defined $newData and not length $newData;
     return $newData;
 }
 
@@ -1537,6 +1611,19 @@ sub VerboseInfo($$$%)
         $parms{MaxLen} = 96 unless $verbose > 3;
         HexDump($dataPt, $size, %parms);
     }
+}
+
+#------------------------------------------------------------------------------
+# Find last element in linked list
+# Inputs: 0) element in list
+# Returns: Last element in list
+sub LastInList($)
+{
+    my $element = shift;
+    while ($element->{Next}) {
+        $element = $element->{Next};
+    }
+    return $element;
 }
 
 #------------------------------------------------------------------------------

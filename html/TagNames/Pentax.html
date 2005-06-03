@@ -36,12 +36,12 @@ The Pentax tags are also used in Asahi cameras.
 <tr valign='top'>
 <td>0x0006</td>
 <td>Date</td>
-<td align='center'>Y</td>
+<td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0007</td>
 <td>Time</td>
-<td align='center'>Y</td>
+<td align='center'>undef[3]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0008</td>
@@ -59,43 +59,117 @@ The Pentax tags are also used in Asahi cameras.
 <td><font size='-1'>0 = 640x480
   <br>1 = Full
   <br>2 = 1024x768
+  <br>3 = 1280x960
+  <br>4 = 1600x1200
+  <br>5 = 2048x1536
+  <br>8 = 2560x1920
+  <br>19 = 320x240
   <br>21 = 2592x1944
   <br>22 = 2304x1728
-  <br>&apos;36 0&apos; = 3008x2008
-  <br>4 = 1600x1200
-  <br>5 = 2048x1536</font></td></tr>
+  <br>&apos;36 0&apos; = 3008x2008</font></td></tr>
 <tr valign='top'>
 <td>0x000b</td>
 <td>PictureMode</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>0 = Not Selected
+<td><font size='-1'>0 = Program
   <br>5 = Portrait
   <br>6 = Landscape
+  <br>8 = Sport
   <br>9 = Night Scene
+  <br>11 = Soft
   <br>12 = Surf &amp; Snow
   <br>13 = Sunset
   <br>14 = Autumn
   <br>15 = Flower
   <br>17 = Fireworks
-  <br>18 = Text</font></td></tr>
+  <br>18 = Text
+  <br>19 = Panorama
+  <br>30 = Self Portrait
+  <br>37 = Museum
+  <br>38 = Food
+  <br>40 = Green Mode
+  <br>49 = Light Pet
+  <br>50 = Dark Pet
+  <br>51 = Medium Pet
+  <br>53 = Underwater
+  <br>54 = Candlelight
+  <br>55 = Natural Skin Tone
+  <br>56 = Syncro Sound Record</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x000c</td>
+<td>FlashMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0x0 = Auto, Did not fire
+  <br>0x1 = Off
+  <br>0x3 = Auto, Did not fire, Red-eye reduction
+  <br>0x100 = Auto, Fired
+  <br>0x102 = On
+  <br>0x103 = Auto, Fired, Red-eye reduction
+  <br>0x104 = On, Red-eye reduction
+  <br>0x108 = On, Soft</font></td></tr>
+<tr valign='top'>
 <td>0x000d</td>
 <td>FocusMode</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>0 = Normal
+<td><font size='-1'><font color="#666666">(Pentax models)</font>
+  <br>0 = Normal
+  <br>1 = Macro
+  <br>2 = Infinity
+  <br>3 = Manual
+  <br>5 = Pan Focus
+  <br><font color="#666666">(Asahi models)</font>
+  <br>0 = Normal
   <br>1 = Macro (1)
   <br>2 = Macro (2)
   <br>3 = Infinity</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x000f</td>
+<td>AutoAFPoint</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0x1 = Top-left
+  <br>0x2 = Top-center
+  <br>0x3 = Top-right
+  <br>0x4 = Left
+  <br>0x5 = Center
+  <br>0x6 = Right
+  <br>0x7 = Bottom-left
+  <br>0x8 = Bottom-center
+  <br>0x9 = Bottom-right
+  <br>0xffff = None</font></td></tr>
 <tr valign='top'>
+<td>0x0010</td>
+<td>FocusPosition</td>
+<td align='center'>int16u</td>
+<td><font size='-1'><font color="#666666">(Related to focus distance but effected by focal length)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0012</td>
+<td>ExposureTime</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0013</td>
+<td>FNumber</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0014</td>
 <td>ISO</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>3 = 50
   <br>4 = 64
+  <br>5 = 80
   <br>6 = 100
+  <br>7 = 125
+  <br>8 = 160
   <br>9 = 200
+  <br>10 = 250
+  <br>11 = 320
   <br>12 = 400
+  <br>13 = 500
+  <br>14 = 640
   <br>15 = 800
+  <br>16 = 1000
+  <br>17 = 1250
   <br>18 = 1600
   <br>21 = 3200
   <br>50 = 50
@@ -105,6 +179,11 @@ The Pentax tags are also used in Asahi cameras.
   <br>800 = 800
   <br>1600 = 1600
   <br>3200 = 3200</font></td></tr>
+<tr valign='top'>
+<td>0x0016</td>
+<td>ExposureCompensation</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0017</td>
 <td>MeteringMode</td>
@@ -125,19 +204,22 @@ The Pentax tags are also used in Asahi cameras.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x001a</td>
 <td>WhiteBalanceMode</td>
-<td align='center'>Y</td>
-<td><font size='-1'>1 = Auto
-  <br>2 = Auto (2)
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Auto (Daylight?)
+  <br>2 = Auto (Shade?)
+  <br>3 = Auto (Flash?)
+  <br>4 = Auto (Tungsten?)
+  <br>65534 = Preset (Fireworks?)
   <br>65535 = User-Selected</font></td></tr>
 <tr valign='top'>
 <td>0x001b</td>
 <td>BlueBalance</td>
-<td align='center'>Y</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x001c</td>
 <td>RedBalance</td>
-<td align='center'>Y</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x001d</td>
@@ -154,46 +236,212 @@ The Pentax tags are also used in Asahi cameras.
 <td>Saturation</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Normal
-  <br>&apos;0 0&apos; = Normal
   <br>1 = Low
-  <br>&apos;1 0&apos; = Low
   <br>2 = High
+  <br>&apos;0 0&apos; = Normal
+  <br>&apos;1 0&apos; = Low
   <br>&apos;2 0&apos; = High</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0020</td>
 <td>Contrast</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Normal
-  <br>&apos;0 0&apos; = Normal
   <br>1 = Low
-  <br>&apos;1 0&apos; = Low
   <br>2 = High
-  <br>&apos;2 0&apos; = High
   <br>3 = Medium Low
-  <br>4 = Medium High</font></td></tr>
+  <br>4 = Medium High
+  <br>&apos;0 0&apos; = Normal
+  <br>&apos;1 0&apos; = Low
+  <br>&apos;2 0&apos; = High</font></td></tr>
 <tr valign='top'>
 <td>0x0021</td>
 <td>Sharpness</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Normal
-  <br>&apos;0 0&apos; = Normal
   <br>1 = Soft
-  <br>&apos;1 0&apos; = Soft
   <br>2 = Hard
-  <br>&apos;2 0&apos; = Hard
   <br>3 = Medium Soft
-  <br>4 = Medium Hard</font></td></tr>
+  <br>4 = Medium Hard
+  <br>&apos;0 0&apos; = Normal
+  <br>&apos;1 0&apos; = Soft
+  <br>&apos;2 0&apos; = Hard</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0022</td>
+<td>WorldTimeLocation</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Hometown
+  <br>1 = Destination</font></td></tr>
+<tr valign='top'>
+<td>0x0023</td>
+<td>HometownCity</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Pago Pago
+  <br>1 = Honolulu
+  <br>2 = Anchorage
+  <br>3 = Vancouver
+  <br>4 = San Fransisco
+  <br>5 = Los Angeles
+  <br>6 = Calgary
+  <br>7 = Denver
+  <br>8 = Mexico City
+  <br>9 = Chicago
+  <br>10 = Miami
+  <br>11 = Toronto
+  <br>12 = New York
+  <br>13 = Santiago
+  <br>14 = Caracus
+  <br>15 = Halifax
+  <br>16 = Buenos Aires
+  <br>17 = Sao Paulo
+  <br>18 = Rio de Janeiro
+  <br>19 = Madrid
+  <br>20 = London
+  <br>21 = Paris
+  <br>22 = Milan
+  <br>23 = Rome
+  <br>24 = Berlin
+  <br>25 = Johannesburg
+  <br>26 = Istanbul
+  <br>27 = Cairo
+  <br>28 = Jerusalem
+  <br>29 = Moscow
+  <br>30 = Jeddah
+  <br>31 = Tehran
+  <br>32 = Dubai
+  <br>33 = Karachi
+  <br>34 = Kabul
+  <br>35 = Male
+  <br>36 = Delhi
+  <br>37 = Colombo
+  <br>38 = Kathmandu
+  <br>39 = Dacca
+  <br>40 = Yangon
+  <br>41 = Bangkok
+  <br>42 = Kuala Lumpur
+  <br>43 = Vientiane
+  <br>44 = Singapore
+  <br>45 = Phnom Penh
+  <br>46 = Ho Chi Minh
+  <br>47 = Jakarta
+  <br>48 = Hong Kong
+  <br>49 = Perth
+  <br>50 = Beijing
+  <br>51 = Shanghai
+  <br>52 = Manila
+  <br>53 = Taipei
+  <br>54 = Seoul
+  <br>55 = Adelaide
+  <br>56 = Tokyo
+  <br>57 = Guam
+  <br>58 = Sydney
+  <br>59 = Noumea
+  <br>60 = Wellington
+  <br>61 = Auckland
+  <br>62 = Lima
+  <br>63 = Dakar
+  <br>64 = Algiers
+  <br>65 = Helsinki
+  <br>66 = Athens
+  <br>67 = Nairobi
+  <br>68 = Amsterdam
+  <br>69 = Stockholm</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0024</td>
+<td>DestinationCity</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Pago Pago
+  <br>1 = Honolulu
+  <br>2 = Anchorage
+  <br>3 = Vancouver
+  <br>4 = San Fransisco
+  <br>5 = Los Angeles
+  <br>6 = Calgary
+  <br>7 = Denver
+  <br>8 = Mexico City
+  <br>9 = Chicago
+  <br>10 = Miami
+  <br>11 = Toronto
+  <br>12 = New York
+  <br>13 = Santiago
+  <br>14 = Caracus
+  <br>15 = Halifax
+  <br>16 = Buenos Aires
+  <br>17 = Sao Paulo
+  <br>18 = Rio de Janeiro
+  <br>19 = Madrid
+  <br>20 = London
+  <br>21 = Paris
+  <br>22 = Milan
+  <br>23 = Rome
+  <br>24 = Berlin
+  <br>25 = Johannesburg
+  <br>26 = Istanbul
+  <br>27 = Cairo
+  <br>28 = Jerusalem
+  <br>29 = Moscow
+  <br>30 = Jeddah
+  <br>31 = Tehran
+  <br>32 = Dubai
+  <br>33 = Karachi
+  <br>34 = Kabul
+  <br>35 = Male
+  <br>36 = Delhi
+  <br>37 = Colombo
+  <br>38 = Kathmandu
+  <br>39 = Dacca
+  <br>40 = Yangon
+  <br>41 = Bangkok
+  <br>42 = Kuala Lumpur
+  <br>43 = Vientiane
+  <br>44 = Singapore
+  <br>45 = Phnom Penh
+  <br>46 = Ho Chi Minh
+  <br>47 = Jakarta
+  <br>48 = Hong Kong
+  <br>49 = Perth
+  <br>50 = Beijing
+  <br>51 = Shanghai
+  <br>52 = Manila
+  <br>53 = Taipei
+  <br>54 = Seoul
+  <br>55 = Adelaide
+  <br>56 = Tokyo
+  <br>57 = Guam
+  <br>58 = Sydney
+  <br>59 = Noumea
+  <br>60 = Wellington
+  <br>61 = Auckland
+  <br>62 = Lima
+  <br>63 = Dakar
+  <br>64 = Algiers
+  <br>65 = Helsinki
+  <br>66 = Athens
+  <br>67 = Nairobi
+  <br>68 = Amsterdam
+  <br>69 = Stockholm</font></td></tr>
+<tr valign='top'>
+<td>0x0025</td>
+<td>HometownDST</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0026</td>
+<td>DestinationDST</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+<tr valign='top'>
 <td>0x0029</td>
 <td>FrameNumber</td>
-<td align='center'>Y</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0039</td>
 <td>RawImageSize</td>
 <td align='center'>int16u[2]~</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x003f</td>
 <td>LensType</td>
 <td align='center'>int8u[2]</td>
@@ -283,15 +531,20 @@ The Pentax tags are also used in Asahi cameras.
   <br>&apos;6 7&apos; = smc PENTAX-FA*80-200mmF2.8ED[IF]
   <br>&apos;6 8&apos; = smc PENTAX-FA 28-70mmF4AL
   <br>&apos;6 9&apos; = smc PENTAX-FA 20mmF2.8</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0200</td>
 <td>BlackPoint</td>
 <td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0201</td>
 <td>WhitePoint</td>
 <td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x03fe</td>
+<td>DataDump</td>
+<td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0402</td>
@@ -308,11 +561,21 @@ The Pentax tags are also used in Asahi cameras.
 <td>PrintIM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1000</td>
+<td>HometownCityCode</td>
+<td align='center'>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1001</td>
+<td>DestinationCityCode</td>
+<td align='center'>undef[4]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 9, 2005</i>
+<br><i>Last revised May 25, 2005</i>
 </body>
 </html>
