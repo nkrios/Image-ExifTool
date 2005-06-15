@@ -1,7 +1,7 @@
 <html>
 <head>
-  <title>ExifTool</title>
-  <meta name="KeyWords" content="meta, information, ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, JP2, GIF, CRW, CR2, MRW, NEF, PEF, DNG, ORF, Canon, maker notes, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters, write, edit">
+  <title>ExifTool by Phil Harvey</title>
+  <meta name="KeyWords" content="meta, information, ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, JP2, PNG, GIF, MIFF, CRW, CR2, MRW, NEF, PEF, DNG, ORF, Canon, maker notes, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters, write, edit">
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
@@ -16,15 +16,15 @@ abilities, but with the release of version 5 all of the major planned
 writing features have now been incorporated!
 
 <h3>
-<a href="Image-ExifTool-5.25.tar.gz">
-Download        Version 5.25</a> - June 3, 2005
+<a href="Image-ExifTool-5.32.tar.gz">
+Download        Version 5.32</a> - June 15, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
-<a href="exiftool_pod.html">command-line application</a> for reading and
-writing meta information in image files.  It reads EXIF, GPS, IPTC, XMP,
-GeoTIFF, ICC Profile and Photoshop IRB meta information from JPG, JP2, TIFF,
-GIF, CRW, THM, CR2, MRW, NEF, PEF, ORF and DNG images.  ExifTool also extracts
+<a href="exiftool_pod.html">command-line application</a> for reading and writing
+meta information in image files.  It reads EXIF, GPS, IPTC, XMP, GeoTIFF, ICC
+Profile and Photoshop IRB meta information from JPG, JP2, TIFF, PNG, GIF, MIFF,
+CRW, THM, CR2, MRW, NEF, PEF, ORF and DNG images.  ExifTool also extracts
 information from the maker notes of many digital cameras by various
 manufacturers including Canon, Casio, FujiFilm, Kodak, Minolta/Konica-Minolta,
 Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and
@@ -55,7 +55,7 @@ or suggestions.  My e-mail address is in the README file.  Thanks.
 <li>option to create text output file for each image file
 <li>extracts thumbnail images, preview images, and JPEG images embedded in RAW files
 <li>ability to organize output into groups
-<li>recognizes over <a href="TagNames/index.html">1300 different tags</a>
+<li>recognizes over <a href="TagNames/index.html">1400 different tags</a>
 <li>sets the file modification date from EXIF information
 </ul>
 
@@ -194,13 +194,13 @@ These groups are:
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
 <td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile,
-IPTC, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
-<tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
+IPTC, Jpeg2000, MIFF, MakerNotes, PNG, Photoshop, PrintIM, XMP</td></tr>
+<tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
 FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
 ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
-Kodak, KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon,
-NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
+Kodak, KodakBordersIFD, KodakEffectsIFD, MIFF, MakerUnknown, Minolta, Nikon,
+NikonPreview, Olympus, PNG, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
 Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore,
 XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
 </td></tr>
@@ -300,7 +300,13 @@ binary data.  The simple script above does not handle this case.
 
 <p>See the <a href="ExifTool.html">Image::ExifTool Documentation</a> for more details.
 
-<h2>Addition Documentation/Help</h2>
+<h2>Related Utilities</h2>
+
+<ul><li><a href="http://owl.phy.queensu.ca/~phil/exiftool/Extract%20Preview.sit">Download</a>
+a stand-alone Mac OS X droplet to extract preview images from RAW files (thanks to Brett Gross)
+</ul>
+
+<h2>Additional Documentation/Help</h2>
 <ul>
 <li><a href="faq.html">ExifTool FAQ</a>
 <li><a href="history.html">ExifTool Revision History</a>

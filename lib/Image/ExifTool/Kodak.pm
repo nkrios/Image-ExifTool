@@ -252,7 +252,7 @@ LS443, LS743 and LS753.
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    NOTES => "\nThese tags are used by the DC265 and DC290.\n",
+    NOTES => 'These tags are used by the DC265 and DC290.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     0x08 => { #PH
@@ -278,7 +278,7 @@ LS443, LS743 and LS753.
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    NOTES => "\nThese tags are used by the DC280, DC3400 and DC5000.\n",
+    NOTES => 'These tags are used by the DC280, DC3400 and DC5000.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     0x0c => { #PH
@@ -333,7 +333,7 @@ LS443, LS743 and LS753.
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    NOTES => "\nThese tags are used by the DC200 and DC215.\n",
+    NOTES => 'These tags are used by the DC200 and DC215.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     0x20 => { #PH
@@ -345,7 +345,7 @@ LS443, LS743 and LS753.
 %Image::ExifTool::Kodak::Type5 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    NOTES => "\nThese tags are used by the CX4200, CX4230 and CX6200.\n",
+    NOTES => 'These tags are used by the CX4200, CX4230 and CX6200.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     0x14 => { #PH
@@ -411,7 +411,7 @@ LS443, LS743 and LS753.
 %Image::ExifTool::Kodak::Type6 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    NOTES => "\nThese tags are used by the DX3215 and DX3700.\n",
+    NOTES => 'These tags are used by the DX3215 and DX3700.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     0x10 => { #PH

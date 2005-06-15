@@ -29,7 +29,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.64';
+$VERSION = '1.65';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -142,10 +142,10 @@ sub Rationalize($;$);
     2 => 'Mirror horizontal',
     3 => 'Rotate 180',
     4 => 'Mirror vertical',
-    5 => 'Mirror horizontal and rotate 90 CCW',
+    5 => 'Mirror horizontal and rotate 270 CW',
     6 => 'Rotate 90 CW',
     7 => 'Mirror horizontal and rotate 90 CW',
-    8 => 'Rotate 90 CCW',
+    8 => 'Rotate 270 CW',
 );
 
 
@@ -256,6 +256,7 @@ sub Rationalize($;$);
             Name => 'StripOffsets',
             Flags => 'IsOffset',
             OffsetPair => 0x117,  # point to associated byte counts
+            ValueConv => 'length($val) > 32 ? \$val : $val',
         },
         {
             Name => 'PreviewImageStart',
@@ -286,6 +287,7 @@ sub Rationalize($;$);
             Condition => '$self->{TIFF_TYPE} ne "CR2" or $self->{DIR_NAME} ne "IFD0"',
             Name => 'StripByteCounts',
             OffsetPair => 0x111,   # point to associated offset
+            ValueConv => 'length($val) > 32 ? \$val : $val',
         },
         {
             Name => 'PreviewImageLength',
@@ -322,10 +324,12 @@ sub Rationalize($;$);
         Name => 'FreeOffsets',
         Flags => 'IsOffset',
         OffsetPair => 0x121,
+        ValueConv => 'length($val) > 32 ? \$val : $val',
     },
     0x121 => {
         Name => 'FreeByteCounts',
         OffsetPair => 0x120,
+        ValueConv => 'length($val) > 32 ? \$val : $val',
     },
     0x122 => {
         Name => 'GrayResponseUnit',
@@ -411,12 +415,12 @@ sub Rationalize($;$);
         Name => 'TileOffsets',
         Flags => 'IsOffset',
         OffsetPair => 0x145,
-        ValueConv => '\$val',
+        ValueConv => 'length($val) > 32 ? \$val : $val',
     },
     0x145 => {
         Name => 'TileByteCounts',
         OffsetPair => 0x144,
-        ValueConv => '\$val',
+        ValueConv => 'length($val) > 32 ? \$val : $val',
     },
     0x146 => 'BadFaxLines', #3
     0x147 => { #3
@@ -1495,6 +1499,7 @@ sub Rationalize($;$);
         },
         # be careful here in case there is a timezone following the seconds
         ValueConv => '$_=$val[0];s/(.*:\d{2})/$1\.$val[1]/;$_',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     CFAPattern => {
         Require => {
@@ -1557,7 +1562,7 @@ sub CalcScaleFactor35efl
         # calculate focal plane size in mm
         $w *= $units / $x_res;
         $h *= $units / $y_res;
-        $diag = sqrt($w*$w+$h*$h);
+        $diag = sqrt($w*$w+$h*$h) || return undef;
     }
     return sqrt(36*36+24*24) / $diag;
 }
@@ -1732,7 +1737,7 @@ sub ExtractImage($$$$)
     return undef unless $len;   # no image if length is zero
 
     # take data from EXIF block if possible
-    if (defined $dataPos and $offset>$dataPos and $offset+$len<$dataPos+length($$dataPt)) {
+    if (defined $dataPos and $offset>=$dataPos and $offset+$len<=$dataPos+length($$dataPt)) {
         $image = substr($$dataPt, $offset-$dataPos, $len);
     } else {
         $image = $exifTool->ExtractBinary($offset, $len, $tag);

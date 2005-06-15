@@ -16,7 +16,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -229,9 +229,10 @@ sub new
 #
 # loop through all tables, accumulating TagLookup and TagName information
 #
-    my (%tagNameInfo, %id, %shortName, %tableNum, %tagLookup);
+    my (%tagNameInfo, %id, %longID, %shortName, %tableNum, %tagLookup);
     $self->{TAG_NAME_INFO} = \%tagNameInfo;
     $self->{TAG_ID} = \%id;
+    $self->{LONG_ID} = \%longID;
     $self->{SHORT_NAME} = \%shortName;
     $self->{TABLE_NUM} = \%tableNum;
     $self->{TAG_LOOKUP} = \%tagLookup;
@@ -257,6 +258,7 @@ sub new
         my $info = $tagNameInfo{$tableName} = [ ];
         my $table = GetTagTable($tableName);
         my $tableNum = $tableNum{$tableName};
+        $longID{$tableName} = 0;
         # call write proc if it exists in case it adds tags to the table
         my $writeProc = $table->{WRITE_PROC};
         $writeProc and &$writeProc();
@@ -269,7 +271,7 @@ sub new
             $id{$tableName} = 'Index';
         } elsif ($short eq 'IPTC') {
             $id{$tableName} = 'Record';
-        } elsif ($short !~ /^(Composite|Extra|XMP)$/) {
+        } elsif ($short !~ /^(Composite|XMP|Extra)$/) {
             $id{$tableName} = 'Tag ID';
         }
         my @keys = sort NumbersFirst TagTableKeys($table);
@@ -417,6 +419,8 @@ sub new
                 next if $tagID =~ /[\x00-\x1f\x80-\xff]/;
                 $tagIDstr = "'$tagID'";
             }
+            my $len = length $tagIDstr;
+            $longID{$tableName} = $len if $longID{$tableName} < $len;
             push @$info, [ $tagIDstr, \@tagNames, \@writable, \@values, \@require, \@writeGroup ];
         }
     }
@@ -733,17 +737,21 @@ sub WriteTagNames($$)
         my $id = $$idTitle{$tableName};
         my ($hid, $showGrp);
         # widths of the different columns in the POD documentation
-        my ($wID,$wTag,$wReq,$wGrp) = (7,36,24,10);
+        my ($wID,$wTag,$wReq,$wGrp) = (8,36,24,10);
         my $composite = $short eq 'Composite';
         my $derived = $composite ? '<th>Derived From</th>' : '';
+        my $podIdLen = $self->{LONG_ID}->{$tableName};
+        $podIdLen = $wID if $podIdLen < $wID;
         if ($id) {
             $hid = "<th>$id</th>";
+            $wTag -= $podIdLen - $wID;
+            $wID = $podIdLen;
         } elsif ($short eq 'Extra') {
             $wTag += 9;
             $hid = '';
         } else {
             $hid = '';
-            $wTag += $wID - $wReq + 1 if $composite;
+            $wTag += $wID - $wReq if $composite;
         }
         if ($short eq 'EXIF' or $short eq 'XMP') {
             $derived = '<th>Group</th>';
@@ -759,12 +767,18 @@ sub WriteTagNames($$)
         my $table = GetTagTable($tableName);
         my $notes = $$table{NOTES};
         if ($notes) {
-            $notes =~ s/\s+$//s;
-            print PODFILE $notes, "\n";
+            $notes =~ s/(^\s+|\s+$)//sg;
+            print PODFILE "\n$notes\n";
         }
         my $line = "\n";
-        $line .= sprintf " %${wID}s ", $id if $id;
-        $line .= sprintf "  %-${wTag}s", 'Tag Name';
+        if ($id) {
+            # shift over 'Index' heading by one character for a bit more balance
+            $id = " $id" if $id eq 'Index';
+            $line .= sprintf "  %-${wID}s", $id;
+        } else {
+            $line .= ' ';
+        }
+        $line .= sprintf " %-${wTag}s", 'Tag Name';
         $line .= sprintf " %-${wReq}s", 'Derived From' if $composite;
         $line .= sprintf " %-${wGrp}s", 'Group' if $showGrp;
         $line .= ' Writable';
@@ -790,11 +804,11 @@ sub WriteTagNames($$)
             if (not $id) {
                 $idStr = '  ';
             } elsif ($tagIDstr =~ /^\d+$/) {
-                $w = $wID - 2;
+                $w = $wID - 3;
                 $idStr = sprintf "  %${w}d    ", $tagIDstr;
                 $align = " align='right'";
             } else {
-                $w = $wID + 1;
+                $w = $wID;
                 $idStr = sprintf "  %-${w}s ", $tagIDstr;
                 $align = '';
             }
@@ -823,7 +837,7 @@ sub WriteTagNames($$)
             my $n = 0;
             while (@tags or @reqs or @vals) {
                 $line = '  ';
-                $line .= ' 'x($wID+2) if $id;
+                $line .= ' 'x($wID+1) if $id;
                 $line .= sprintf("%-${wTag}s", shift(@tags) || '');
                 $line .= sprintf(" %-${wReq}s", shift(@reqs) || '') if $composite;
                 $line .= sprintf(" %-${wGrp}s", shift(@wGrp) || '-') if $showGrp;

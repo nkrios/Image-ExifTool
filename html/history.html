@@ -5,9 +5,56 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.25.tar.gz">Version 5.25</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.32.tar.gz">Version 5.32</a>.<p>
 
-<b>June 3/05 - Version 5.25</b>
+<b>June 15/05 - Version 5.32</b> (production release)
+<ul>
+<li>Changes to a few PNG and MIFF tag names
+<li>Improved PNG/MIFF documentation
+</ul>
+
+<b>June 14/05 - Version 5.31</b>
+<ul>
+<li>Decode compressed information in PNG images if Compress::Zlib is available
+<li>Decode profile information (including EXIF, XMP, IPTC and ICC_Profile
+    information) from PNG and MIFF images
+<li>Updated Nikon LensID strings and decode D50 lens info (thanks Robert
+    Rottmerhusen)
+</ul>
+
+<b>June 10/05 - Version 5.30</b>
+<ul>
+<li>Added PNG and MIFF read support
+<li>Decode Nikon SensorPixelSize
+</ul>
+
+<b>June 9/05 - Version 5.27</b>
+<ul>
+<li>Added -q option
+</ul>
+
+<b>June 8/05 - Version 5.26</b>
+<ul>
+<li>Automatically fix out-of-sequence entries in IFD when writing to comply with
+    the TIFF specification (but not in maker notes)
+<li>Create new EXIF information using the same byte order as the maker notes
+    when using -tagsFromFile to copy maker notes to a file which previously
+    contained no EXIF information
+<li>Fixed problem which could copy corrupted maker notes if using multiple
+    -tagsFromFile options in a single command
+<li>Changed Orientation "Rotate 90 CCW" to "Rotate 270 CW", and changed Canon
+    AutoRotate strings to match
+<li>Made StripOffsets and StripByteCounts binary data if output is too long
+<li>Allow "-TagsFromFile '-TAG&lt;SRCTAG'" as well as the current '-SRCTAG&gt;TAG'
+<li>Recognize some more Nikon lenses
+<li>API Changes:
+    <ul>
+    <li>Added ByteOrder option to specify byte ordering when creating new EXIF
+        segment in a JPEG file
+    </ul>
+</ul>
+
+<b>June 3/05 - Version 5.25</b> (production release)
 <ul>
 <li>Fixed problem with writing IPTC Time tags
 <li>Changed Composite ShutterSpeed to ignore bulb duration if it is negative

@@ -1575,30 +1575,30 @@ These tags are used by Minolta and Konica/Minolta cameras.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0001   FileSystemVersion                    undef
+  0x0001   FileSystemVersion                    undef[4]
   0x0002   ISO                                  int16u[2]
-  0x0003   ColorMode                            Y
-  0x0004   Quality                              Y
-  0x0005   WhiteBalance                         Y
-  0x0006   Sharpness                            Y
-  0x0007   FocusMode                            Y
-  0x0008   FlashSetting                         Y
-  0x0009   FlashType                            Y
+  0x0003   ColorMode                            string
+  0x0004   Quality                              string
+  0x0005   WhiteBalance                         string
+  0x0006   Sharpness                            string
+  0x0007   FocusMode                            string
+  0x0008   FlashSetting                         string
+  0x0009   FlashType                            string[13]
   0x000b   WhiteBalanceFineTune                 int16u
-  0x000c   ColorBalance1                        Y
+  0x000c   ColorBalance1                        rational32u[4]
   0x000e   ExposureDifference                   undef[4]
-  0x000f   ISOSelection                         Y
+  0x000f   ISOSelection                         string
   0x0010   DataDump                             N
   0x0011   NikonPreview                         Nikon PreviewImage
   0x0012   FlashExposureComp                    int32s~
   0x0013   ISOSetting                           int16u[2]
-  0x0016   ImageBoundary                        Y
+  0x0016   ImageBoundary                        int16u[4]
   0x0018   FlashExposureBracketValue            int32s~
   0x0019   ExposureBracketValue                 rational32s~
   0x001d   SerialNumber                         N
-  0x0080   ImageAdjustment                      Y
-  0x0081   ToneComp                             Y
-  0x0082   AuxiliaryLens                        Y
+  0x0080   ImageAdjustment                      string
+  0x0081   ToneComp                             string
+  0x0082   AuxiliaryLens                        string
   0x0083   LensType                             int8u
   0x0084   Lens                                 rational32u[4]
   0x0085   ManualFocusDistance                  rational32u
@@ -1608,26 +1608,28 @@ These tags are used by Minolta and Konica/Minolta cameras.
   0x0089   ShootingMode                         int16u~
   0x008b   LensFStops                           undef[4]
   0x008c   NEFCurve1                            N
-  0x008d   ColorHue                             Y
-  0x008f   SceneMode                            Y
-  0x0090   LightSource                          Y
+  0x008d   ColorHue                             string
+  0x008f   SceneMode                            string
+  0x0090   LightSource                          string
   0x0092   HueAdjustment                        int16s
-  0x0094   Saturation                           Y
-  0x0095   NoiseReduction                       Y
+  0x0094   Saturation                           int16s
+  0x0095   NoiseReduction                       string
   0x0096   NEFCurve2                            N
   0x0097   ColorBalance0100                     Nikon ColorBalance0100
            ColorBalance0102                     Nikon ColorBalance0102
            ColorBalance0103                     Nikon ColorBalance0103
            ColorBalanceUnknown
-  0x0098   LensData0101                         Nikon LensData
-           LensData0201                         Nikon LensData
+  0x0098   LensData0100                         Nikon LensData00
+           LensData0101                         Nikon LensData01
+           LensData0201                         Nikon LensData01
            LensDataUnknown
   0x0099   NEFThumbnailSize                     int16u[2]
-  0x00a0   SerialNumber                         Y
+  0x009a   SensorPixelSize                      rational32u[2]
+  0x00a0   SerialNumber                         string
   0x00a7   ShutterCount                         N
-  0x00a9   ImageOptimization                    Y
-  0x00aa   Saturation                           Y
-  0x00ab   VariProgram                          Y
+  0x00a9   ImageOptimization                    string[16]
+  0x00aa   Saturation                           string
+  0x00ab   VariProgram                          string
   0x0e00   PrintIM                              PrintIM
   0x0e0e   NikonCaptureOffsets                  Nikon NikonCaptureOffsets
 
@@ -1664,7 +1666,22 @@ These tags are used by Minolta and Konica/Minolta cameras.
       0    RedBalance                           rational16s
       1    BlueBalance                          rational16s
 
-=head2 Nikon LensData Tags
+=head2 Nikon LensData00 Tags
+
+This structure is used by the D100 and newer D1X models.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    LensDataVersion                      undef[4]
+      6    LensID                               int8u
+      7    LensFStops                           int8u
+      8    MinFocalLength                       int8u
+      9    MaxFocalLength                       int8u
+     10    MaxApertureAtMinFocal                int8u
+     11    MaxApertureAtMaxFocal                int8u
+     12    MCUVersion                           int8u
+
+=head2 Nikon LensData01 Tags
 
 Nikon encrypts the LensData information below if LensDataVersion is 0201,
 but  the decryption algorithm is known so the information can be extracted.
@@ -2399,6 +2416,120 @@ Unknown (-u) option is used.
       4    DisplayXResolution                   N
       8    DisplayYResolutionUnit               N
       9    DisplayXResolutionUnit               N
+
+=head2 PNG Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'IHDR'   ImageHeader                          PNG ImageHeader
+  'cHRM'   PrimaryChromaticities                PNG PrimaryChromaticities
+  'gAMA'   Gamma                                N
+  'iCCP'   ICC_Profile                          ICC_Profile
+  'iTXt'   InternationalText                    PNG TextualData
+  'pHYs'   PhysicalPixel                        PNG PhysicalPixel
+  'sRGB'   SRGBRendering                        N
+  'tEXt'   TextualData                          PNG TextualData
+  'tIME'   ModifyDate                           N
+  'zTXt'   CompressedText                       PNG TextualData
+
+=head2 PNG ImageHeader Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ImageWidth                           N
+      4    ImageHeight                          N
+      8    BitDepth                             N
+      9    ColorType                            N
+     10    Compression                          N
+     11    Filter                               N
+     12    Interlace                            N
+
+=head2 PNG PrimaryChromaticities Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    WhitePointX                          N
+      1    WhitePointY                          N
+      2    RedX                                 N
+      3    RedY                                 N
+      4    GreenX                               N
+      5    GreenY                               N
+      6    BlueX                                N
+      7    BlueY                                N
+
+=head2 PNG TextualData Tags
+
+The PNG TextualData format allows aribrary tag names to be used.  Only the
+standard tag names are listed below, however ExifTool will decode any tags
+found in the image.
+
+  Tag ID                  Tag Name              Writable
+  ------                  --------              --------
+  'Author'                Author                N
+  'Comment'               Comment               N
+  'Copyright'             Copyright             N
+  'Creation Time'         CreationTime          N
+  'Description'           Description           N
+  'Disclaimer'            Disclaimer            N
+  'Raw profile type APP1' RawProfileTypeAPP1    EXIF
+                                                XMP
+  'Raw profile type exif' RawProfileTypeEXIF    EXIF
+  'Raw profile type icc'  RawProfileTypeICC     ICC_Profile
+  'Raw profile type iptc' RawProfileTypeIPTC    Photoshop
+  'Raw profile type xmp'  RawProfileTypeXMP     XMP
+  'Software'              Software              N
+  'Source'                Source                N
+  'Title'                 Title                 N
+
+=head2 PNG PhysicalPixel Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    PixelsPerUnitX                       N
+      4    PixelsPerUnitY                       N
+      8    PixelUnits                           N
+
+=head2 MIFF Tags
+
+The MIFF format allows aribrary tag names to be used.  Only the standard tag
+names are listed below, however ExifTool will decode any tags found in the
+image.
+
+  Tag ID             Tag Name                   Writable
+  ------             --------                   --------
+  'background-color' BackgroundColor            N
+  'blue-primary'     BluePrimary                N
+  'border-color'     BorderColor                N
+  'class'            Class                      N
+  'colors'           Colors                     N
+  'colorspace'       Colorspace                 N
+  'columns'          ImageWidth                 N
+  'compression'      Compression                N
+  'delay'            Delay                      N
+  'depth'            Depth                      N
+  'dispose'          Dispose                    N
+  'gamma'            Gamma                      N
+  'green-primary'    GreenPrimary               N
+  'id'               ID                         N
+  'iterations'       Iterations                 N
+  'label'            Label                      N
+  'matt-color'       MattColor                  N
+  'matte'            Matte                      N
+  'montage'          Montage                    N
+  'packets'          Packets                    N
+  'page'             Page                       N
+  'profile-APP1'     ProfileAPP1                EXIF
+                                                XMP
+  'profile-icc'      ProfileICC                 ICC_Profile
+  'profile-iptc'     ProfileIPTC                Photoshop
+  'red-primary'      RedPrimary                 N
+  'rendering-intent' RenderingIntent            N
+  'resolution'       Resolution                 N
+  'rows'             ImageHeight                N
+  'scene'            Scene                      N
+  'signature'        Signature                  N
+  'units'            Units                      N
+  'white-point'      WhitePoint                 N
 
 =head2 Extra Tags
 

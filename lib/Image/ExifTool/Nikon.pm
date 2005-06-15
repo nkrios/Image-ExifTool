@@ -21,6 +21,7 @@
 #               7) Tom Christiansen private communication (tchrist@perl.com)
 #               8) Robert Rottmerhusen private communication
 #               9) http://members.aol.com/khancock/pilot/nbuddy/
+#              10) Werner Kober private communication (D2H, D2X, D100, D70)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -29,7 +30,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.23';
+$VERSION = '1.26';
 
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
@@ -43,6 +44,7 @@ $VERSION = '1.23';
         # but for the E775 it is binary: "\x00\x01\x00\x00"
         Name => 'FileSystemVersion',
         Writable => 'undef',
+        Count => 4,
         # convert to string if binary
         ValueConv => '$_=$val; /^[\x00-\x09]/ and $_=join("",unpack("CCCC",$_)); $_',
         ValueConvInv => '$val',
@@ -62,20 +64,25 @@ $VERSION = '1.23';
         PrintConv => '$_=$val;s/^0 //;$_',
         PrintConvInv => '"0 $val"',
     },
-    0x0003 => 'ColorMode',
-    0x0004 => 'Quality',
-    0x0005 => 'WhiteBalance',
-    0x0006 => 'Sharpness',
-    0x0007 => 'FocusMode',
-    0x0008 => 'FlashSetting',
+    0x0003 => { Name => 'ColorMode',    Writable => 'string' },
+    0x0004 => { Name => 'Quality',      Writable => 'string' },
+    0x0005 => { Name => 'WhiteBalance', Writable => 'string' },
+    0x0006 => { Name => 'Sharpness',    Writable => 'string' },
+    0x0007 => { Name => 'FocusMode',    Writable => 'string' },
+    0x0008 => { Name => 'FlashSetting', Writable => 'string' },
     # FlashType shows 'Built-in,TTL' when builtin flash fires,
     # and 'Optional,TTL' when external flash is used (ref 2)
-    0x0009 => 'FlashType', #2
-    0x000b => { #2
-        Name => 'WhiteBalanceFineTune',
-        Writable => 'int16u',
+    0x0009 => { #2
+        Name => 'FlashType',
+        Writable => 'string',
+        Count => 13,
     },
-    0x000c => 'ColorBalance1',
+    0x000b => { Name => 'WhiteBalanceFineTune', Writable => 'int16u' }, #2
+    0x000c => {
+        Name => 'ColorBalance1',
+        Writable => 'rational32u',
+        Count => 4,
+    },
     0x000e => {
         Name => 'ExposureDifference',
         Writable => 'undef',
@@ -89,7 +96,7 @@ $VERSION = '1.23';
         PrintConv => 'sprintf("%.1f",$val)',
         PrintConvInv => '$val',
     },
-    0x000f => 'ISOSelection', #2
+    0x000f => { Name => 'ISOSelection', Writable => 'string' }, #2
     0x0010 => {
         Name => 'DataDump',
         Writable => 0,
@@ -120,7 +127,11 @@ $VERSION = '1.23';
         PrintConvInv => '"0 $val"',
     },
     # D70 Image boundary?? top x,y bot-right x,y
-    0x0016 => 'ImageBoundary', #2
+    0x0016 => { #2
+        Name => 'ImageBoundary',
+        Writable => 'int16u',
+        Count => 4,
+    },
     0x0018 => { #5
         Name => 'FlashExposureBracketValue',
         Format => 'int32s',
@@ -139,9 +150,9 @@ $VERSION = '1.23';
         ValueConv => '$self->{NikonInfo}->{SerialNumber} = $val',
         ValueConvInv => '$val',
     },
-    0x0080 => 'ImageAdjustment',
-    0x0081 => 'ToneComp', #2
-    0x0082 => 'AuxiliaryLens',
+    0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
+    0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
+    0x0082 => { Name => 'AuxiliaryLens',    Writable => 'string' },
     0x0083 => {
         Name => 'LensType',
         Writable => 'int8u',
@@ -266,20 +277,20 @@ $VERSION = '1.23';
         Writable => 0,
         ValueConv => '\$val',
     },
-    0x008d => 'ColorHue' , #2
+    0x008d => { Name => 'ColorHue' ,        Writable => 'string' }, #2
     # SceneMode takes on the following values: PORTRAIT, PARTY/INDOOR, NIGHT PORTRAIT,
     # BEACH/SNOW, LANDSCAPE, SUNSET, NIGHT SCENE, MUSEUM, FIREWORKS, CLOSE UP, COPY,
     # BACK LIGHT, PANORAMA ASSIST, SPORT, DAWN/DUSK
-    0x008f => 'SceneMode', #2
+    0x008f => { Name => 'SceneMode',        Writable => 'string' }, #2
     # LightSource shows 3 values COLORED SPEEDLIGHT NATURAL.
     # (SPEEDLIGHT when flash goes. Have no idea about difference between other two.)
-    0x0090 => 'LightSource', #2
+    0x0090 => { Name => 'LightSource',      Writable => 'string' }, #2
     0x0092 => { #2
         Name => 'HueAdjustment',
         Writable => 'int16s',
     },
-    0x0094 => 'Saturation',
-    0x0095 => 'NoiseReduction',
+    0x0094 => { Name => 'Saturation',       Writable => 'int16s' },
+    0x0095 => { Name => 'NoiseReduction',   Writable => 'string' },
     0x0096 => {
         Name => 'NEFCurve2',
         Writable => 0,
@@ -322,10 +333,17 @@ $VERSION = '1.23';
     ],
     0x0098 => [
         { #8
+            Condition => '$$valPt =~ /^0100/',
+            Name => 'LensData0100',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::LensData00',
+            },
+        },
+        { #8
             Condition => '$$valPt =~ /^0101/',
             Name => 'LensData0101',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Nikon::LensData',
+                TagTable => 'Image::ExifTool::Nikon::LensData01',
             },
         },
         # note: his information is encrypted if the version is 02xx
@@ -333,7 +351,7 @@ $VERSION = '1.23';
             Condition => '$$valPt =~ /^0201/',
             Name => 'LensData0201',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Nikon::LensData',
+                TagTable => 'Image::ExifTool::Nikon::LensData01',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
             },
         },
@@ -347,8 +365,14 @@ $VERSION = '1.23';
         Writable => 'int16u',
         Count => 2,
     },
-    # 0x009a unknown shows '7.8 7.8' on all my shots (ref 2)
-    0x00a0 => 'SerialNumber', #2
+    0x009a => { #10
+        Name => 'SensorPixelSize',
+        Writable => 'rational32u',
+        Count => 2,
+        PrintConv => '$val=~s/ / x /;"$val um"',
+        PrintConvInv => '$val=~tr/a-zA-Z/ /;$val',
+    },
+    0x00a0 => { Name => 'SerialNumber',     Writable => 'string' }, #2
     0x00a7 => { # Number of shots taken by camera so far (ref 2)
         Name => 'ShutterCount',
         Writable => 0,
@@ -356,9 +380,13 @@ $VERSION = '1.23';
         ValueConv => '$self->{NikonInfo}->{ShutterCount} = $val',
         ValueConvInv => '$val',
     },
-    0x00a9 => 'ImageOptimization', #2
-    0x00aa => 'Saturation', #2
-    0x00ab => 'VariProgram', #2
+    0x00a9 => { #2
+        Name => 'ImageOptimization',
+        Writable => 'string',
+        Count => 16,
+    },
+    0x00aa => { Name => 'Saturation',       Writable => 'string' }, #2
+    0x00ab => { Name => 'VariProgram',      Writable => 'string' }, #2
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -370,7 +398,7 @@ $VERSION = '1.23';
     # 0x0e01 I don't know what this is, but in D70 NEF files produced by Nikon
     # Capture, the data for this tag extends 4 bytes past the end of the maker notes.
     # Very odd.  I hope these 4 bytes aren't useful because they will get lost by any
-    # utility that just copies the maker notes - PH
+    # utility that blindly copies the maker notes (not ExifTool) - PH
     # 0x0e0e is in D70 Nikon Capture files (not out-of-the-camera D70 files) - PH
     0x0e0e => { #PH
         Name => 'NikonCaptureOffsets',
@@ -545,9 +573,136 @@ my %nikonFocalConversions = (
     PrintConv => 'sprintf("%.1fmm",$val)',
     PrintConvInv => '$val=~s/\s*mm$//;$val',
 );
+# nikon lens ID numbers (ref 8)
+my %nikonLensIDs = (
+    0 => 'Unknown Nikkor or Tokina',
+    1 => 'AF Nikkor 50mm f/1.8',
+    2 => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5 or Sigma non-D',
+    3 => 'Unknown Nikkor or Soligor',
+    4 => 'AF Nikkor 28mm f/2.8',
+    5 => 'AF Nikkor 50mm f/1.4',
+    7 => 'AF Zoom-Nikkor 28-85mm f/3.5-4.5',
+    8 => 'AF Zoom-Nikkor 35-105mm f/3.5-4.5',
+    9 => 'AF Nikkor 24mm f/2.8',
+    10 => 'AF Nikkor 300mm f/2.8 IF-ED',
+    11 => 'AF Nikkor 180mm f/2.8 IF-ED',
+    14 => 'AF Zoom-Nikkor 70-210mm f/4',
+    15 => 'AF Nikkor 50mm f/1.8 N',
+    16 => 'AF Nikkor 300mm f/4 IF-ED',
+    18 => 'AF Nikkor 70-210mm f/4-5.6',
+    19 => 'AF Zoom-Nikkor 24-50mm f/3.3-4.5',
+    20 => 'AF Zoom-Nikkor 80-200mm f/2.8 ED',
+    21 => 'AF Nikkor 85mm f/1.8',
+    27 => 'AF Zoom-Nikkor 75-300mm f/4.5-5.6',
+    28 => 'AF Nikkor 20mm f/2.8',
+    29 => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5 N',
+    30 => 'AF Micro-Nikkor 60mm f/2.8',
+    37 => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
+    38 => 'Unknown Nikkor or Sigma D-type',
+    39 => 'AF-I Nikkor 300mm f/2.8D IF-ED',
+    42 => 'AF Nikkor 28mm f/1.4D',
+    44 => 'AF DC-Nikkor 105mm f/2D',
+    45 => 'AF Micro-Nikkor 200mm f/4D IF-ED',
+    49 => 'AF Micro-Nikkor 60mm f/2.8D',
+    50 => 'AF Micro-Nikkor 105mm f/2.8D or Tamron',
+    51 => 'AF Nikkor 18mm f/2.8D',
+    52 => 'Unknown Nikkor or Tameron',
+    54 => 'AF Nikkor 24mm f/2.8D',
+    55 => 'AF Nikkor 20mm f/2.8D',
+    56 => 'AF Nikkor 85mm f/1.8D',
+    59 => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
+    62 => 'AF Nikkor 28mm f/2.8D',
+    65 => 'AF Nikkor 180mm f/2.8D IF-ED',
+    66 => 'AF Nikkor 35mm f/2D',
+    67 => 'AF Nikkor 50mm f/1.4D',
+    70 => 'AF Zoom-Nikkor 35-80mm f/4-5.6D',
+    72 => 'AF-S Nikkor 300mm f/2.8D IF-ED or Sigma HSM',
+    74 => 'AF Nikkor 85mm f/1.4D IF',
+    76 => 'AF Zoom-Nikkor 24-120mm f/3.5-5.6D IF',
+    77 => 'AF Zoom-Nikkor 28-200mm f/3.5-5.6D IF or Tamron',
+    78 => 'AF DC-Nikkor 135mm f/2D',
+    83 => 'AF Zoom-Nikkor 80-200mm f/2.8D ED',
+    84 => 'AF Zoom-Micro Nikkor 70-180mm f/4.5-5.6D ED',
+    86 => 'AF Zoom-Nikkor 70-300mm f/4-5.6D ED',
+    89 => 'AF-S Nikkor 400mm f/2.8D IF-ED',
+    90 => 'IX-Nikkor 30-60mm f/4-5.6',
+    93 => 'AF-S Zoom-Nikkor 28-70mm f/2.8D IF-ED',
+    94 => 'AF-S Zoom-Nikkor 80-200mm f/2.8D IF-ED',
+    95 => 'AF Zoom-Nikkor 28-105mm f/3.5-4.5D IF',
+    99 => 'AF-S Nikkor 17-35mm f/2.8D IF-ED',
+    100 => 'PC Micro-Nikkor 85mm f/2.8D',
+    101 => 'AF VR Zoom-Nikkor 80-400mm f/4.5-5.6D ED',
+    102 => 'AF Zoom-Nikkor 18-35mm f/3.5-4.5D IF-ED',
+    103 => 'AF Zoom-Nikkor 24-85mm f/2.8-4D IF',
+    104 => 'AF Zoom-Nikkor 28-80mm f/3.3-5.6G',
+    105 => 'AF Zoom-Nikkor 70-300mm f/4-5.6G',
+    106 => 'AF-S Nikkor 300mm f/4D IF-ED',
+    109 => 'AF-S Nikkor 300mm f/2.8D IF-ED II',
+    110 => 'AF-S Nikkor 400mm f/2.8D IF-ED II',
+    112 => 'AF-S Nikkor 600mm f/4D IF-ED',
+    114 => 'Nikkor 45mm f/2.8 P',
+    116 => 'AF-S Zoom-Nikkor 24-85mm f/3.5-4.5G IF-ED',
+    117 => 'AF Zoom-Nikkor 28-100mm f/3.5-5.6G',
+    118 => 'AF Nikkor 50mm f/1.8D',
+    119 => 'AF-S VR Zoom-Nikkor 70-200mm f/2.8G IF-ED or Sigma OS',
+    120 => 'AF-S VR Zoom-Nikkor 24-120mm f/3.5-5.6G IF-ED',
+    121 => 'AF Zoom-Nikkor 28-200mm f/3.5-5.6G IF-ED',
+    122 => 'AF-S DX Zoom-Nikkor 12-24mm f/4G IF-ED',
+    123 => 'AF-S VR Zoom-Nikkor 200-400mm f/4G IF-ED',
+    125 => 'AF-S DX Zoom-Nikkor 17-55mm f/2.8G IF-ED',
+    127 => 'AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED',
+    128 => 'AF DX Fisheye-Nikkor 10.5mm f/2.8G ED',
+    129 => 'AF-S VR Nikkor 200mm f/2G IF-ED',
+    130 => 'AF-S VR Nikkor 300mm f/2.8G IF-ED',
+    137 => 'AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED',
+    140 => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
+);
+
+# Version 100 Nikon lens data
+%Image::ExifTool::Nikon::LensData00 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    NOTES => 'This structure is used by the D100 and newer D1X models.',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x00 => {
+        Name => 'LensDataVersion',
+        Format => 'undef[4]',
+    },
+    0x06 => { #8
+        Name => 'LensID',
+        PrintConv => \%nikonLensIDs,
+    },
+    0x07 => { #8
+        Name => 'LensFStops',
+        ValueConv => '$val / 12',
+        ValueConvInv => '$val * 12',
+        PrintConv => 'sprintf("%.2f", $val)',
+        PrintConvInv => '$val',
+    },
+    0x08 => { #8/9
+        Name => 'MinFocalLength',
+        %nikonFocalConversions,
+    },
+    0x09 => { #8/9
+        Name => 'MaxFocalLength',
+        %nikonFocalConversions,
+    },
+    0x0a => { #8
+        Name => 'MaxApertureAtMinFocal',
+        %nikonApertureConversions,
+    },
+    0x0b => { #8
+        Name => 'MaxApertureAtMaxFocal',
+        %nikonApertureConversions,
+    },
+    0x0c => 'MCUVersion', #8
+);
 
 # Nikon lens data (note: needs decrypting if LensDataVersion is 0201)
-%Image::ExifTool::Nikon::LensData = (
+%Image::ExifTool::Nikon::LensData01 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 0,
     NOTES => q{
@@ -580,75 +735,7 @@ which make writing more difficult.
     },
     0x0b => { #8
         Name => 'LensID',
-        PrintConv => {
-            2 => 'Unknown Nikkor or Sigma non D-type',
-            7 => 'Nikkor AF 28-85/3.5-4.5',
-            8 => 'Nikkor AF 35-105/3.5-4.5',
-            9 => 'Nikkor AF 24/2.8',
-            11 => 'Nikkor AF 180/2.8 IF-ED',
-            15 => 'Nikkor AF 50/1.8',
-            15 => 'Nikkor AF 50/1.8',
-            16 => 'Nikkor AF 300/4 IF-ED',
-            19 => 'Nikkor AF 24-50/3.3-4.5',
-            20 => 'Nikkor AF 80-200/2.8 ED',
-            27 => 'Nikkor AF 75-300/4.5-5.6',
-            28 => 'Nikkor AF 20/2.8',
-            29 => 'Nikkor AF 35-70/3.3-4.5 N',
-            30 => 'Nikkor AF 60/2.8 Micro',
-            34 => 'Nikkor AF 70-210/4-5.6 D',
-            38 => 'Unkown Nikkor or Sigma D-type',
-            42 => 'Nikkor AF 28/1.4 D',
-            44 => 'Nikkor AF 105/2 D DC-Nikkor',
-            45 => 'Nikkor AF 200/4 D IF-ED Micro',
-            47 => 'Nikkor AF 28-70/3.5-4.5 D',
-            47 => 'Nikkor AF 20-35/2.8 D IF',
-            49 => 'Nikkor AF 60/2.8 D Micro',
-            50 => 'Nikkor AF 105/2.8 D Micro',
-            51 => 'Nikkor AF 18/2.8 D',
-            52 => 'Unknown Nikkor or Tameron',
-            54 => 'Nikkor AF 24/2.8 D',
-            55 => 'Nikkor AF 20/2.8 D',
-            56 => 'Nikkor AF 85/1.8 D',
-            59 => 'Nikkor AF 35-70/2.8 D',
-            66 => 'Nikkor AF 35/2 D',
-            67 => 'Nikkor AF 50/1.4 D',
-            69 => 'Nikkor AF 35-80/4-5.6 D',
-            72 => 'Nikkor AF-S 300/2.8 D IF-ED',
-            74 => 'Nikkor AF 85/1.4 D IF',
-            76 => 'Nikkor AF 24-120/3.5-5.6 D IF',
-            77 => 'Nikkor AF 28-200/3.5-5.6 D IF',
-            78 => 'Nikkor AF 135/2 D DC-Nikkor',
-            83 => 'Nikkor AF 80-200/2.8 D ED N',
-            84 => 'Nikkor AF 70-180/4.5-5.6 D ED Micro',
-            86 => 'Nikkor AF 70-300/4-5.6 D ED',
-            93 => 'Nikkor AF-S 28-70/2.8 D IF-ED',
-            94 => 'Nikkor AF-S 80-200/2.8 D IF-ED',
-            99 => 'Nikkor AF-S 17-35/2.8 D IF-ED',
-            101 => 'Nikkor AF 80-400/4.5-5.6 D ED VR',
-            102 => 'Nikkor AF 18-35/3.5-4.5 D IF-ED',
-            103 => 'Nikkor AF 24-85/2.8-4 D IF',
-            104 => 'Nikkor AF 28-80/3.3-5.6 G',
-            105 => 'Nikkor AF 70-300/4-5.6 G',
-            106 => 'Nikkor AF-S 300/4 D IF-ED',
-            109 => 'Nikkor AF-S 300/2.8 D IF-ED II',
-            110 => 'Nikkor AF-S 400/2.8 D IF-ED II',
-            112 => 'Nikkor AF-S 600/4 D IF-ED',
-            114 => 'Nikkor 45mm F/2.8',
-            116 => 'Nikkor AF-S 24-85/3.5-4.5 G IF-ED',
-            118 => 'Nikkor AF 50/1.8 D',
-            119 => 'Nikkor AF-S 70-200/2.8 G IF-ED VR',
-            120 => 'Nikkor AF-S 24-120/3.5-5.6 G IF-ED VR',
-            121 => 'Nikkor AF 28-200/3.5-5.6 G IF-ED',
-            122 => 'Nikkor AF-S 12-24/4 G IF-ED DX',
-            123 => 'Nikkor AF-S 200-400/4 G IF-ED VR',
-            125 => 'Nikkor AF-S 17-55/2.8 G IF-ED DX',
-            127 => 'Nikkor AF-S 18-70/3.5-4.5 G IF-ED DX',
-            128 => 'Nikkor AF 10.5/2.8 G ED DX Fisheye',
-            129 => 'Nikkor AF-S 200/2 G IF-ED VR',
-            130 => 'Nikkor AF-S 300/2.8 G IF-ED VR',
-            137 => 'Nikkor 55-200mm F/4-5.6G',
-            140 => 'Nikkor 18-55mm F/3.5-5.6G',
-        },
+        PrintConv => \%nikonLensIDs,
     },
     0x0c => { #8
         Name => 'LensFStops',
@@ -765,6 +852,8 @@ my @xlat = (
 sub DecryptNikonData($$$;$$)
 {
     my ($dataPt, $serial, $count, $start, $len) = @_;
+    # patch for pre-production D50 (ref 8)
+    $serial =~ /^\d+$/ or $serial = 0x22;
     $start or $start = 0;
     my $end = $len ? $start + $len : length($$dataPt);
     my $i;
@@ -917,8 +1006,8 @@ it under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Joseph Heled, Thomas Walter, Brian Ristuccia, Danek Duvall, Tom
-Christiansen and Robert Rottmerhusen for their help figuring out some Nikon
-tags.
+Christiansen, Robert Rottmerhusen and Werner Kober for their help figuring
+out some Nikon tags.
 
 =head1 SEE ALSO
 

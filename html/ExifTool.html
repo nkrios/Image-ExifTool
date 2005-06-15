@@ -107,10 +107,7 @@ obtaining meta information from an image.  Internally, <a href="#ImageInfo">Imag
 
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>ImageInfo($;@)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) File name, file reference or scalar reference
-    <br>1-N) [optional] list of tag names to find (or tag list reference or options reference, see below)
-    <center>- or -</center>
-    0) ExifTool object reference
+<tr><td valign='top'><b>Inputs</b></td><td>0) [optional] ExifTool object reference
     <br>1) File name, file reference or scalar reference
     <br>2-N) [optional] list of tag names to find (or tag list reference or options reference, see below)
 </td></tr>
@@ -308,7 +305,13 @@ to a specific function.
 <tr><th colspan=4 bgcolor='#dddddd'><font size='+1'>ExifTool Options</font></th></tr>
 <tr><th>Option</th><th>Description</th><th>Values</th><th>Default</th></tr>
 <tr><td>Binary</td><td>Flag to get values of all binary tags.
-    Unless set, large binary values are only extracted for specifically requested tags.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
+    Unless set, large binary values are only extracted for specifically requested tags.</td>
+    <td align='center'>0 or 1</td><td align=center>0</td></tr>
+<tr><td>ByteOrder</td><td>The byte order for newly created EXIF segments when writing.
+    If EXIF information already exists, the existing order is used instead.  If not
+    defined, the order of the maker notes is used (if maker notes are copied), otherwise
+    it defaults to 'MM'.</td>
+    <td align='center'>'MM','II' or undef</td><td align=center>-</td></tr>
 <tr><td>Charset</td><td>Character set for converting Unicode character strings.</td>
     <td><table>
     <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF8 characters</td></tr>
@@ -318,7 +321,7 @@ to a specific function.
     that the data be padded with blanks to allow in-place editing.  By setting this
     flag, 2kB is saved for files with XMP data, and 100 bytes for IPTC data.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Composite</td><td>Flag to calculate Composite tags</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
-<tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td><td align=center>undef</td></tr>
+<tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td><td align=center>-</td></tr>
 <tr><td>Duplicates</td><td>Flag to save duplicate tag values</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>Exclude</td>
     <td>Exclude specified tags</td>
@@ -648,7 +651,8 @@ scalar context, or the number of tags set and the error string in list context.
     <tr><td valign='top' align=center><b>0x02</b>&nbsp;=</td>
     <td>Write '<a href="TagNames/index.html">protected</a>' tags</td></tr>
     </table></td><td align=center>0</td></tr>
-<tr><td>Replace</td><td>Replace previous new value for this tag</td>
+<tr><td>Replace</td><td>Replace previous new value for this tag (ie. replace the value
+    set in a previous call to <a href="#SetNewValue">SetNewValue</a></td>
     <td><table>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Don't replace</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Replace with specified new value</td></tr>
@@ -674,7 +678,7 @@ $exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, DelValue=&gt;1);
 $exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, AddValue=&gt;1);
 
 # set a tag in a specific group
-$exifTool-&gt;SetNewValue('Headline', $val, Group=&gt;'XMP');
+$exifTool-&gt;<b>SetNewValue</b>('Headline', $val, Group=&gt;'XMP');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewValuesFromFile">SetNewValuesFromFile</a></h2>
@@ -690,18 +694,25 @@ in a specified file.
  A leading '-' indicates tags to be excuded (ie. '-comment').  An asterisk ('*')
  may be used for the tag name, and is useful when a group is specified to set
  all tags from a group (ie. 'XMP:*').  A special feature allows tag names of the
- form 'SRCTAG>DSTTAG' to be specified to copy information to a tag with a
- different name or a specified group.  Both 'SRCTAG' and 'DSTTAG' may use '*'
- and/or be prefixed by a group name (ie. 'modifyDate>fileModifyDate' or
- '*>xmp:*').  Tags are evaluated in order, so exclusions apply only to tags
- included earlier in the list.
+ form 'SRCTAG&gt;DSTTAG' (or 'DSTTAG&lt;SRCTAG') to be specified to copy
+ information to a tag with a different name or a specified group.  Both 'SRCTAG'
+ and 'DSTTAG' may use '*' and/or be prefixed by a group name (ie.
+ 'modifyDate>fileModifyDate' or '*>xmp:*').  Tags are evaluated in order, so
+ exclusions apply only to tags included earlier in the list.
 </td></tr>
 <tr><td><b>Returns</b></td><td>A hash of information that was set
 successfully.  May include Warning or Error entries if there were problems
 reading the input file.
 </td></tr>
 </table></blockquote>
-<b>Examples:</b>
+By default, this routine will commute information between same-named tags in
+different groups, allowing information to be translated between images with
+different formats.  This behaviour may be modified by specifying a group name
+for extracted tags (even if '*' is used as a group name), in which case the
+information is written to the original group, unless redirected to a different
+group.  (For example, a tag name of '*:*' may be specified to copy all
+information while preserving the original groups.)
+<p><b>Examples:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 my $info = $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile, @tags);
 </pre></td></tr></table></blockquote>
@@ -971,15 +982,15 @@ separated into the ICC-header group.
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
 <td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile,
-IPTC, Jpeg2000, MakerNotes, Photoshop, PrintIM, XMP</td></tr>
-<tr><td><b>1&nbsp;(Detailed&nbsp;Location)</b></td>
+IPTC, Jpeg2000, MIFF, MakerNotes, PNG, Photoshop, PrintIM, XMP</td></tr>
+<tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
 FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, KodakBordersIFD,
-KodakEffectsIFD, MakerUnknown, Minolta, Nikon, NikonPreview, Olympus, Panasonic,
-Pentax, Photoshop, PrintIM, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs,
-XMP-dc, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
-XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000, Kodak,
+KodakBordersIFD, KodakEffectsIFD, MIFF, MakerUnknown, Minolta, Nikon,
+NikonPreview, Olympus, PNG, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
+Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore,
+XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown

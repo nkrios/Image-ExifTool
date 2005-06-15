@@ -573,6 +573,7 @@ sub ProcessICC_Profile($$$)
         return 0;
     }
     if ($verbose) {
+        $exifTool->VerboseDir('ICC_Profile', $numEntries, $dirLen);
         my $fakeInfo = { Name=>'ProfileHeader', SubDirectory => { } };
         $exifTool->VerboseInfo(undef, $fakeInfo);
     }
@@ -587,8 +588,6 @@ sub ProcessICC_Profile($$$)
     );
     my $newTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::ICC_Profile::Header');
     $exifTool->ProcessTagTable($newTagTable, \%subdirInfo);
-
-    $verbose and $exifTool->VerboseDir('ICC_Profile', $numEntries);
 
     $pos += 4;    # skip item count
     my $index;

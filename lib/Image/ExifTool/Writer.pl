@@ -520,7 +520,7 @@ sub SetNewValue($;$$%)
 # Notes: Tag names may contain group prefix and/or leading '-' to exclude from copy,
 #        and the tag name '*' may be used to represent all tags in a group.
 #        Also, a tag name may end with '>DSTTAG' to copy the information to a
-#        different tag, or a tag with a specified group.
+#        different tag, or a tag with a specified group.  (Also allow 'DSTTAG<TAG'.)
 sub SetNewValuesFromFile($$;@)
 {
     my ($self, $srcFile, @setTags) = @_;
@@ -532,9 +532,6 @@ sub SetNewValuesFromFile($$;@)
     $opts->{PrintConv} = $self->Options('PrintConv');
     my $info = $srcExifTool->ImageInfo($srcFile, $opts);
 
-    # transfer necessary information to this object
-    $self->{MAKER_NOTE_FIXUP} = $srcExifTool->{MAKER_NOTE_FIXUP};
-
     # sort tags in reverse order so we get priority tag last
     my @tags = reverse sort keys %$info;
     my $tag;
@@ -542,6 +539,9 @@ sub SetNewValuesFromFile($$;@)
 # simply transfer all tags from source image if no tags specified
 #
     unless (@setTags) {
+        # transfer maker note information to this object
+        $self->{MAKER_NOTE_FIXUP} = $srcExifTool->{MAKER_NOTE_FIXUP};
+        $self->{MAKER_NOTE_BYTE_ORDER} = $srcExifTool->{MAKER_NOTE_BYTE_ORDER};
         foreach $tag (@tags) {
             # don't try to set Warning's or Error's
             next if $tag =~ /^Warning\b/ or $tag =~ /^Error\b/;
@@ -577,9 +577,9 @@ sub SetNewValuesFromFile($$;@)
         $tag =~ s/\ball\b/\*/g;     # replace 'all' with '*' in tag/group names
         my ($grp, $dst, $dstGrp, $dstTag);
         # handle redirection to another tag
-        if ($tag =~ /(.+?)\s*>\s*(.+)/) {
-            ($tag, $dstTag) = ($1, $2);
+        if ($tag =~ /(.+?)\s*(>|<)\s*(.+)/) {
             $dstGrp = '';
+            ($tag, $dstTag) = ($2 eq '>') ? ($1, $3) : ($3, $1);
             ($dstGrp, $dstTag) = ($1, $2) if $dstTag =~ /(.+?):(.+)/;
         }
         my $isExclude = ($tag =~ s/^-//) ? 1 : 0;
@@ -658,6 +658,11 @@ sub SetNewValuesFromFile($$;@)
                 $dstGrp = $srcExifTool->GetGroup($tag, 1) if $dstGrp eq '*';
                 $opts{Group} = $dstGrp;
             }
+            # transfer maker note information if setting this tag
+            if ($srcExifTool->{TAG_INFO}->{$tag}->{MakerNotes}) {
+                $self->{MAKER_NOTE_FIXUP} = $srcExifTool->{MAKER_NOTE_FIXUP};
+                $self->{MAKER_NOTE_BYTE_ORDER} = $srcExifTool->{MAKER_NOTE_BYTE_ORDER};
+            }
             $dstTag = $tag if $dstTag eq '*';
             $opts{Replace} = 1;     # replace the first value found
             # set all values for this tag
@@ -691,7 +696,8 @@ sub GetNewValues($;$$)
                 my @tagInfoList = FindTagInfo($tagInfo);
                 # choose the one that we are creating
                 foreach $tagInfo (@tagInfoList) {
-                    next unless $newValueHash = $self->GetNewValueHash($tagInfo);
+                    my $nvh = $self->GetNewValueHash($tagInfo) or next;
+                    $newValueHash = $nvh;
                     last if defined $newValueHash->{IsCreating};
                 }
             } else {
@@ -1209,6 +1215,8 @@ sub LoadAllTables()
         GetTagTable('Image::ExifTool::Photoshop::Main');
         GetTagTable('Image::ExifTool::GeoTiff::Main');
         GetTagTable('Image::ExifTool::Jpeg2000::Main');
+        GetTagTable('Image::ExifTool::PNG::Main');
+        GetTagTable('Image::ExifTool::MIFF::Main');
         GetTagTable('Image::ExifTool::extraTags');
         GetTagTable('Image::ExifTool::compositeTags');
         # recursively load all tables referenced by the current tables
@@ -1520,7 +1528,7 @@ sub HexDump($;$%)
         $wid > $len-$i and $wid = $len-$i;
         printf "$prefix%8.4x: ", $addr+$i;
         my $dat = substr($$dataPt, $i+$start, $wid);
-        printf $format, join(' ',unpack("H*",$dat) =~ /../g);
+        printf $format, join(' ',unpack('H*',$dat) =~ /../g);
         $dat =~ tr /\x00-\x1f\x7f-\xff/./;
         print "[$dat]\n";
     }
@@ -1760,6 +1768,7 @@ sub Byte2Unicode($$;$)
 # assemble a continuing fraction into a rational value
 # Inputs: 0) numerator, 1) denominator
 #         2-N) list of fraction denominators, deepest first
+# Returns: numerator, denominator (in list context)
 sub AssembleRational($$@)
 {
     @_ < 3 and return @_;
@@ -1770,7 +1779,7 @@ sub AssembleRational($$@)
 #------------------------------------------------------------------------------
 # convert a floating point number into a rational
 # Inputs: 0) floating point number, 1) optional maximum value (defaults to 0x7fffffff)
-# Returns: numberator, denominator (in list context)
+# Returns: numerator, denominator (in list context)
 # Notes: these routines were a bit tricky, but fun to write!
 sub Rationalize($;$)
 {
@@ -2082,7 +2091,13 @@ sub WriteJPEG($$)
                 # write new EXIF data
                 $self->{TIFF_TYPE} = 'APP1';
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
-                SetByteOrder('MM');     # use good byte ordering ;)
+                # use specified byte ordering or ordering from maker notes if set
+                my $byteOrder = $self->Options('ByteOrder') || $self->{MAKER_NOTE_BYTE_ORDER} || 'MM';
+                unless (SetByteOrder($byteOrder)) {
+                    warn "Invalid byte order '$byteOrder'\n";
+                    $byteOrder = $self->{MAKER_NOTE_BYTE_ORDER} || 'MM';
+                    SetByteOrder($byteOrder);
+                }
                 my %dirInfo = (
                     NewDataPos => 8,    # new data will come after TIFF header
                     Parent   => $markerName,
@@ -2091,7 +2106,7 @@ sub WriteJPEG($$)
                 );
                 my $buff = $self->WriteTagTable($tagTablePtr, \%dirInfo);
                 if (defined $buff and length $buff) {
-                    my $tiffHdr = 'MM' . Set16u(42) . Set32u(8); # standard TIFF header
+                    my $tiffHdr = $byteOrder . Set16u(42) . Set32u(8); # standard TIFF header
                     my $size = length($buff) + length($tiffHdr) + length($exifAPP1hdr);
                     if ($size <= $maxSegmentLen) {
                         # switch to buffered output if required

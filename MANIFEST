@@ -19,9 +19,11 @@ html/TagNames/ICC_Profile.html
 html/TagNames/IPTC.html
 html/TagNames/Jpeg2000.html
 html/TagNames/Kodak.html
+html/TagNames/MIFF.html
 html/TagNames/Minolta.html
 html/TagNames/Nikon.html
 html/TagNames/Olympus.html
+html/TagNames/PNG.html
 html/TagNames/Panasonic.html
 html/TagNames/Pentax.html
 html/TagNames/Photoshop.html
@@ -61,10 +63,12 @@ lib/Image/ExifTool/ICC_Profile.pm
 lib/Image/ExifTool/IPTC.pm
 lib/Image/ExifTool/Jpeg2000.pm
 lib/Image/ExifTool/Kodak.pm
+lib/Image/ExifTool/MIFF.pm
 lib/Image/ExifTool/MakerNotes.pm
 lib/Image/ExifTool/Minolta.pm
 lib/Image/ExifTool/Nikon.pm
 lib/Image/ExifTool/Olympus.pm
+lib/Image/ExifTool/PNG.pm
 lib/Image/ExifTool/Panasonic.pm
 lib/Image/ExifTool/Pentax.pm
 lib/Image/ExifTool/Photoshop.pm
@@ -136,6 +140,9 @@ t/Kodak.jpg
 t/Kodak.t
 t/Kodak_2.out
 t/Kodak_3.out
+t/MIFF.miff
+t/MIFF.t
+t/MIFF_2.out
 t/Minolta.jpg
 t/Minolta.t
 t/Minolta_2.out
@@ -155,6 +162,9 @@ t/Olympus_2.out
 t/Olympus_3.out
 t/Olympus_4.out
 t/Olympus_5.out
+t/PNG.png
+t/PNG.t
+t/PNG_2.out
 t/Panasonic.jpg
 t/Panasonic.t
 t/Panasonic_2.out

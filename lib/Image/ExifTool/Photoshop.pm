@@ -248,12 +248,14 @@ sub ProcessPhotoshop($$$)
                 my %subdirInfo = (
                     Name     => $$tagInfo{Name},
                     DataPt   => \$value,
-                    DataPos  => $dirInfo->{DataPos} + $pos,
                     DataLen  => $size,
                     DirStart => 0,
                     DirLen   => $size,
                     Parent   => $dirInfo->{DirName},
                 );
+                if (defined $dirInfo->{DataPos}) {
+                    $subdirInfo{DataPos} = $dirInfo->{DataPos} + $pos,
+                }
                 # process the directory
                 $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
             } else {

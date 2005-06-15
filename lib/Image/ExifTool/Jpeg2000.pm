@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 sub ProcessJpeg2000($$$);
 sub ProcessExifUUID($$$);
@@ -171,6 +171,7 @@ my %jp2ResolutionUnit = (
 
 %Image::ExifTool::Jpeg2000::ImageHeader = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
     0 => {
         Name => 'ImageHeight',
         Format => 'int32u',
@@ -209,6 +210,7 @@ my %jp2ResolutionUnit = (
 
 %Image::ExifTool::Jpeg2000::CaptureResolution = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
     FORMAT => 'int8s',
     0 => {
         Name => 'CaptureYResolution',
@@ -230,6 +232,7 @@ my %jp2ResolutionUnit = (
 
 %Image::ExifTool::Jpeg2000::DisplayResolution = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
     FORMAT => 'int8s',
     0 => {
         Name => 'DisplayYResolution',
@@ -394,6 +397,7 @@ sub Jpeg2000Info($)
     return 0 unless $raf->Read($hdr,12) == 12;
     return 0 unless $hdr eq "\x00\x00\x00\x0cjP  \x0d\x0a\x87\x0a" or     # (ref 1)
                     $hdr eq "\x00\x00\x00\x0cjP\x1a\x1a\x0d\x0a\x87\x0a"; # (ref 2)
+    $exifTool->FoundTag('FileType', 'JPEG 2000');
     SetByteOrder('MM'); # JPEG 2000 files are big-endian
     my %dirInfo = (
         RAF => $raf,

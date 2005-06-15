@@ -54,15 +54,16 @@ Image::ExifTool - Read and write meta information in images
 =head1 DESCRIPTION
 
 ExifTool provides an extensible set of perl modules to read and write meta
-information in image files.  It reads EXIF, GPS, IPTC, XMP, GeoTIFF, ICC Profile
-and Photoshop IRB meta information from JPEG, JP2, TIFF, GIF, THM, CRW (Canon
-RAW), CR2 (Canon 1D Mk II RAW), MRW (Minolta RAW), NEF (Nikon Electronic image
-Format), PEF (Pentax RAW), ORF (Olympus RAW Format) and DNG (Digital Negative)
-images, as well as the maker notes of many digital cameras by various
-manufacturers including Canon, Casio, FujiFilm, Kodak, Minolta/Konica-Minolta,
-Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and
-Sigma/Foveon. It writes EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG,
-TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG files.
+information in image files.  It reads EXIF, GPS, IPTC, XMP, GeoTIFF, ICC
+Profile and Photoshop IRB meta information from JPEG, JP2, TIFF, PNG, GIF,
+THM, CRW (Canon RAW), CR2 (Canon 1D Mk II RAW), MRW (Minolta RAW), NEF
+(Nikon Electronic image Format), PEF (Pentax RAW), ORF (Olympus RAW Format)
+and DNG (Digital Negative) images, as well as the maker notes of many
+digital cameras by various manufacturers including Canon, Casio, FujiFilm,
+Kodak, Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica,
+Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon. It writes EXIF, GPS, IPTC, XMP
+and MakerNotes information to JPEG, TIFF, GIF, CRW, THM, CR2, NEF, PEF and
+DNG files.
 
 =head1 METHODS
 
@@ -262,6 +263,14 @@ to a specific function.
 Flag to get the value of all binary tags.  Unless set, large binary values
 may only be extracted for specifically requested tags. Default is 0.
 
+=item ByteOrder
+
+The byte order for newly created EXIF segments when writing. If EXIF
+information already exists, the existing order is used instead.  Valid
+values are 'MM', 'II' and undef.  If not defined, the order of the maker
+notes is used (if maker notes are copied), otherwise 'MM' is used. Default
+is undef.
+
 =item Charset
 
 Character set for converting Unicode character strings.  Valid values are:
@@ -281,21 +290,21 @@ Flag to calculate Composite tags automatically.  Default is 1.
 
 =item DateFormat
 
-Format for printing EXIF date/time.  See C<strftime> in the L<POSIX>
-package for details about the format string.
+Format for printing EXIF date/time.  See C<strftime> in the L<POSIX> package
+for details about the format string.
 
 =item Duplicates
 
-Flag to preserve values of duplicate tags (instead of overwriting
-existing value).  Default is 1.
+Flag to preserve values of duplicate tags (instead of overwriting existing
+value).  Default is 1.
 
 =item Exclude
 
-Exclude specified tags from tags extracted from an image. The
-option value is either a tag name or reference to a list of tag names
-to exclude.  The case of tag names is not significant. This option is
-ignored for specifically requested tags.  Tags may also be excluded
-by preceeding their name with a '-' in the arguments to L</ImageInfo>.
+Exclude specified tags from tags extracted from an image. The option value
+is either a tag name or reference to a list of tag names to exclude.  The
+case of tag names is not significant. This option is ignored for
+specifically requested tags.  Tags may also be excluded by preceeding their
+name with a '-' in the arguments to L</ImageInfo>.
 
 =item IgnoreMinorErrors
 
@@ -671,13 +680,13 @@ separated by a colon (ie. 'GROUP:TAG'), which is equivalent to using a
 
 =item Type
 
-The type of value being set.  Valid values are PrintConv, ValueConv
-or Raw.  Default is PrintConv.
+The type of value being set.  Valid values are PrintConv, ValueConv or Raw.
+Default is PrintConv.
 
 =item AddValue
 
-Specifies that the value be added to an existing list rather than
-replacing the list.  Valid values are 0 or 1.  Default is 0.
+Specifies that the value be added to an existing list rather than replacing
+the list.  Valid values are 0 or 1.  Default is 0.
 
 =item DelValue
 
@@ -700,16 +709,17 @@ names indicating 'unsafe' and 'protected' tags.  Default is 0.
 
 =item Replace
 
-Flag to replace the previous new value for this tag.  Valid values are 0
-(don't repace), 1 (replace with specified new value) or 2 (reset previous
-new value only).
+Flag to replace the previous new value for this tag (ie. replace the value
+set in a previous call to L</SetNewValue>).  Valid values are 0 (don't
+repace), 1 (replace with specified new value) or 2 (reset previous new value
+only).
 
 =back
 
 =item Return Values:
 
 The number of tags set and prints any errors in scalar context, or the
-returns number of tags set and the error string in list context
+number of tags set and the error string in list context.
 
 =back
 
@@ -734,11 +744,19 @@ an optional family 0 or 1 group name, separated by a colon (ie. 'exif:iso').
 A leading '-' indicates tags to be excuded (ie. '-comment').  An asterisk
 ('*') may be used for the tag name, and is useful when a group is specified
 to set all tags from a group (ie. 'XMP:*').  A special feature allows tag
-names of the form 'SRCTAG>DSTTAG' to be specified to copy information to a
-tag with a different name or a specified group.  Both 'SRCTAG' and 'DSTTAG'
-may use '*' and/or be prefixed by a group name (ie.
-'modifyDate>fileModifyDate' or '*>xmp:*').  Tags are evaluated in order, so
-exclusions apply only to tags included earlier in the list.
+names of the form 'SRCTAG>DSTTAG' (or 'DSTTAGE<lt>SRCTAG') to be specified
+to copy information to a tag with a different name or a specified group.
+Both 'SRCTAG' and 'DSTTAG' may use '*' and/or be prefixed by a group name
+(ie. 'modifyDate>fileModifyDate' or '*>xmp:*').  Tags are evaluated in
+order, so exclusions apply only to tags included earlier in the list.
+
+By default, this routine will commute information between same-named tags in
+different groups, allowing information to be translated between images with
+different formats.  This behaviour may be modified by specifying a group
+name for extracted tags (even if '*' is used as a group name), in which case
+the information is written to the original group, unless redirected to a
+different group.  (For example, a tag name of '*:*' may be specified to copy
+all information while preserving the original groups.)
 
 =item Return Values:
 
@@ -1100,18 +1118,18 @@ Here is a complete list of groups for each family:
 =item Family 0 (General Location):
 
 Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC, Jpeg2000,
-MakerNotes, Photoshop, PrintIM, XMP
+MakerNotes, PNG, Photoshop, PrintIM, XMP
 
-=item Family 1 (Detailed Location):
+=item Family 1 (Specific Location):
 
 Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
 FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
 ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
 Kodak, KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon,
-NikonPreview, Olympus, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
-Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore,
-XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM,
-XMP-xmpRights
+NikonPreview, Olympus, PNG, Panasonic, Pentax, Photoshop, PrintIM, Ricoh,
+Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
+XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ,
+XMP-xmpMM, XMP-xmpRights
 
 =item Family 2 (Category):
 

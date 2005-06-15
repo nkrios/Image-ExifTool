@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.25
 [File, File, Image]  - File Name: Casio_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:22:51
+[File, File, Time]  - File Modification Date/Time: 2005:06:07 14:57:56
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -47,10 +47,6 @@
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1286
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
-[PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00140014
-[PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x01000000
-[PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x05000000
-[PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x01000000
 [MakerNotes, Casio, Image] 2 - Preview Image Size: 320x240
 [MakerNotes, Casio, Image] 3 - Preview Image Length: 26
 [MakerNotes, Casio, Image] 4 - Preview Image Start: 1314
@@ -86,6 +82,10 @@
 [MakerNotes, Casio, Camera] 12313 - Casio Type 2 0x3019: 1
 [MakerNotes, Casio, Camera] 12314 - Casio Type 2 0x301a: 0
 [MakerNotes, Casio, Camera] 12315 - Casio Type 2 0x301b: 0
+[PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00140014
+[PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x01000000
+[PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x05000000
+[PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x01000000
 [Composite, Composite, Image]  - Aperture: 4.3
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120

@@ -16,6 +16,7 @@
 #               4) http://kobe1995.jp/~kaz/astro/istD.html
 #               5) John Francis private communication (tests with ist-D/ist-DS)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
+#               7) Douglas O'Brien private communication (tests with *istD)
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -182,6 +183,10 @@ my %pentaxCities = (
             19 => '320x240', #PH (Optio WP)
             21 => '2592x1944',
             22 => '2304x1728', #2
+            '32 2' => '960x640', #7
+            '33 2' => '1152x768', #7
+            '34 2' => '1536x1024', #7
+            '35 1' => '2400x1600', #7
             '36 0' => '3008x2008',  #PH
         },
     },
@@ -577,6 +582,7 @@ my %pentaxCities = (
             '6 13' => 'smc PENTAX-FA*400mmF5.6ED[IF]',
             '6 14' => 'smc PENTAX-FA* MACRO 200mmF4ED[IF]',
             '1 0' => 'K,M Lens',
+            '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mmF5.6)
             '3 0' => 'SIGMA',
             '3 36' => 'SIGMA 20mm F1.8 EX DG ASPHERICAL RF',
             '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
@@ -715,8 +721,8 @@ the information should be stored to deduce the correct offsets.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Wayne Smith and John Francis for help figuring out some Pentax
-tags.
+Thanks to Wayne Smith, John Francis and Douglas O'Brien for help figuring
+out some Pentax tags.
 
 =head1 AUTHOR
 

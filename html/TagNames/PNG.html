@@ -1,0 +1,268 @@
+<html>
+<head>
+<title>PNG Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='PNG'>PNG Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'IHDR'</td>
+<td>ImageHeader</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PNG.html#ImageHeader'>PNG ImageHeader Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'cHRM'</td>
+<td>PrimaryChromaticities</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PNG.html#PrimaryChromaticities'>PNG PrimaryChromaticities Tags</a></td></tr>
+<tr valign='top'>
+<td>'gAMA'</td>
+<td>Gamma</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'iCCP'</td>
+<td>ICC_Profile</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<tr valign='top'>
+<td>'iTXt'</td>
+<td>InternationalText</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'pHYs'</td>
+<td>PhysicalPixel</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel Tags</a></td></tr>
+<tr valign='top'>
+<td>'sRGB'</td>
+<td>SRGBRendering</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = sRGB Perceptual
+  <br>1 = sRGB Relative Colorimetric
+  <br>2 = sRGB Saturation
+  <br>3 = sRGB Absolute Colorimetric</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'tEXt'</td>
+<td>TextualData</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
+<tr valign='top'>
+<td>'tIME'</td>
+<td>ModifyDate</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'zTXt'</td>
+<td>CompressedText</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ImageHeader'>PNG ImageHeader Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>BitDepth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>9</td>
+<td>ColorType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Grayscale
+  <br>2 = RGB
+  <br>3 = Palette
+  <br>4 = Grayscale with Alpha
+  <br>6 = RGB with Alpha</font></td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>Compression</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Deflate/Inflate</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>11</td>
+<td>Filter</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Adaptive</font></td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>Interlace</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = No
+  <br>1 = Adam7 Interlace</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='PrimaryChromaticities'>PNG PrimaryChromaticities Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>WhitePointX</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>WhitePointY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>RedX</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>3</td>
+<td>RedY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>GreenX</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>5</td>
+<td>GreenY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>BlueX</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>7</td>
+<td>BlueY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='TextualData'>PNG TextualData Tags</a></h2>
+The PNG TextualData format allows aribrary tag names to be used.  Only the
+standard tag names are listed below, however ExifTool will decode any tags
+found in the image.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Author'</td>
+<td>Author</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Comment'</td>
+<td>Comment</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Copyright'</td>
+<td>Copyright</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Creation Time'</td>
+<td>CreationTime</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Description'</td>
+<td>Description</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Disclaimer'</td>
+<td>Disclaimer</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Raw profile type APP1'</td>
+<td>RawProfileTypeAPP1</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a>
+  <br>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Raw profile type exif'</td>
+<td>RawProfileTypeEXIF</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
+<tr valign='top'>
+<td>'Raw profile type icc'</td>
+<td>RawProfileTypeICC</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Raw profile type iptc'</td>
+<td>RawProfileTypeIPTC</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
+<tr valign='top'>
+<td>'Raw profile type xmp'</td>
+<td>RawProfileTypeXMP</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Software'</td>
+<td>Software</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Source'</td>
+<td>Source</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Title'</td>
+<td>Title</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='PhysicalPixel'>PNG PhysicalPixel Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>PixelsPerUnitX</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>PixelsPerUnitY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>PixelUnits</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = meter</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Jun 15, 2005</i>
+</body>
+</html>

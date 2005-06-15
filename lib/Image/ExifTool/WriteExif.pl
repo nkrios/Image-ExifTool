@@ -789,9 +789,38 @@ sub RebuildMakerNotes($$$)
             $exifTool->{MAKER_NOTE_FIXUP} = $makerFixup;    # save fixup for later
         }
     }
+    $exifTool->{MAKER_NOTE_BYTE_ORDER} = GetByteOrder();    # save maker note byte ordering
     SetByteOrder($saveOrder);
 
     return $rtnValue;
+}
+
+#------------------------------------------------------------------------------
+# Sort IFD directory entries
+# Inputs: 0) data reference, 1) directory start, 2) number of entries
+sub SortIFD($$$)
+{
+    my ($dataPt, $dirStart, $numEntries) = @_;
+    my ($index, %entries);
+    # split the directory into separate entries
+    my ($padding, $newDir) = ('','');
+    for ($index=0; $index<$numEntries; ++$index) {
+        my $entry = $dirStart + 2 + 12 * $index;
+        my $tagID = Get16u($dataPt, $entry);
+        my $entryData = substr($$dataPt, $entry, 12);
+        # silly software can pad directories with zero entries -- put these at the end
+        $tagID = 0x10000 unless $tagID or $index == 0;
+        # add new entry (allow for duplicate tag ID's, which shouldn't normally happen)
+        $entries{$tagID} or $entries{$tagID} = '';
+        $entries{$tagID} .= $entryData;
+    }
+    # sort the directory entries
+    my @sortedTags = sort { $a <=> $b } keys %entries;
+    foreach (@sortedTags) {
+        $newDir .= $entries{$_};
+    }
+    # replace original directory with new, sorted one
+    substr($$dataPt, $dirStart + 2, 12 * $numEntries) = $newDir . $padding;
 }
 
 #------------------------------------------------------------------------------
@@ -921,6 +950,25 @@ sub WriteExif($$$)
         if ($dirStart + 4 < $dataLen) {
             $numEntries = Get16u($dataPt, $dirStart);
             $len = 2 + 12 * $numEntries;
+            if ($dirStart + $len > $dataLen) {
+                $exifTool->Error("Truncated $dirName directory");
+                return undef;
+            }
+            # sort entries if necessary (but not in maker notes IFDs)
+            unless ($inMakerNotes) {
+                my $index;
+                my $lastID = -1;
+                for ($index=0; $index<$numEntries; ++$index) {
+                    my $tagID = Get16u($dataPt, $dirStart + 2 + 12 * $index);
+                    # check for proper sequence (but ignore null entries at end)
+                    if ($tagID < $lastID and $tagID) {
+                        SortIFD($dataPt, $dirStart, $numEntries);
+                        $exifTool->Warn("Entries in $dirName were out of sequence. Fixed.");
+                        last;
+                    }
+                    $lastID = $tagID;
+                }
+            }
         } else {
             $numEntries = $len = 0;
         }
@@ -951,10 +999,6 @@ sub WriteExif($$$)
             }
             # make sorted list of new tags to be added
             @newTags = sort { $a <=> $b } keys(%allTags);
-        }
-        if ($dirStart + $len > $dataLen) {
-            $exifTool->Error("Truncated $dirName directory");
-            return undef;
         }
         my $dirBuff = '';   # buffer for directory data
         my $valBuff = '';   # buffer for value data

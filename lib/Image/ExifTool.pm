@@ -22,7 +22,7 @@ use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '5.25';
+$VERSION = '5.32';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -76,7 +76,7 @@ sub WriteBinaryData($$$);
 sub CheckBinaryData($$$);
 
 # recognized file types (in the order we test unknown files)
-@fileTypes = ( 'JPEG', 'CRW', 'TIFF', 'MRW', 'ORF', 'GIF', 'JP2' );
+@fileTypes = ( 'JPEG', 'CRW', 'TIFF', 'MRW', 'ORF', 'GIF', 'JP2', 'PNG', 'MIFF' );
 
 # headers for various segment types
 $exifAPP1hdr = "Exif\0\0";
@@ -99,7 +99,10 @@ my %fileTypeLookup = (
     ORF  => 'ORF',  # Olympus RAW format
     DNG  => 'TIFF', # Digital Negative is TIFF
     JP2  => 'JP2',  # JPEG 2000 file
-    JPX  => 'JP2',
+    JPX  => 'JP2',  # JPEG 2000 file
+    PNG  => 'PNG',  # Portable Network Graphics
+    MIF  => 'MIFF', # Magick Image File Format
+    MIFF => 'MIFF', # Magick Image File Format
 );
 
 # group hash for ExifTool-generated tags
@@ -285,6 +288,7 @@ sub ClearOptions($)
     # (commented out options don't need initializing)
     $self->{OPTIONS} = {
         Binary      => 0,       # flag to extract binary values even if tag not specified
+    #   ByteOrder   => undef,   # default byte order when creating EXIF information
         Composite   => 1,       # flag to calculate Composite tags
         Charset     => 'UTF8',  # character set for converting XP characters
     #   DateFormat  => undef,   # format for date/time
@@ -324,6 +328,7 @@ sub ExtractInfo($;@)
     $self->Init();
 
     delete $self->{MAKER_NOTE_FIXUP};   # fixup information for extracted maker notes
+    delete $self->{MAKER_NOTE_BYTE_ORDER};
 
     my $filename = $self->{FILENAME};   # image file name ('' if already open)
     my $raf = $self->{RAF};             # RandomAccess object
@@ -407,6 +412,12 @@ sub ExtractInfo($;@)
                 # must be sure we have loaded Minolta tables before we can call MrwInfo()
                 GetTagTable('Image::ExifTool::Minolta::Main');
                 Image::ExifTool::Minolta::MrwInfo($self, $raf) and last;
+            } elsif ($type eq 'PNG') {
+                GetTagTable('Image::ExifTool::PNG::Main');
+                Image::ExifTool::PNG::PngInfo($self) and last;
+            } elsif ($type eq 'MIFF') {
+                GetTagTable('Image::ExifTool::MIFF::Main');
+                Image::ExifTool::MIFF::MiffInfo($self) and last;
             } else {
                 # assume anything else is TIFF format (or else we can't read it)
                 $self->TiffInfo($tiffType, $raf) and last;
@@ -2306,7 +2317,7 @@ sub ProcessTagTable($$$;$)
 {
     my ($self, $tagTablePtr, $dirInfo, $processProc) = @_;
 
-    $tagTablePtr and $dirInfo or return 0;
+    return 0 unless $tagTablePtr and $dirInfo;
     # use default proc from tag table if no proc specified
     $processProc or $processProc = $$tagTablePtr{PROCESS_PROC};
     # set directory name from default group0 name if not done already
@@ -2321,14 +2332,14 @@ sub ProcessTagTable($$$;$)
             $self->{PROCESSED}->{$processed} = $dirInfo->{DirName};
         }
     }
-    #printf "%-12s => '%s',\n",$dirInfo->{DirName},$dirInfo->{Parent};
     # otherwise process as an EXIF directory
     $processProc or $processProc = \&Image::ExifTool::Exif::ProcessExif;
+    my $oldIndent = $self->{INDENT};
     my $oldDir = $self->{DIR_NAME};
-    $self->{DIR_NAME} = $dirInfo->{DirName};
     $self->{INDENT} .= '| ';
+    $self->{DIR_NAME} = $dirInfo->{DirName};
     my $rtnVal = &$processProc($self, $tagTablePtr, $dirInfo);
-    $self->{INDENT} = substr($self->{INDENT}, 0, -2);
+    $self->{INDENT} = $oldIndent;
     $self->{DIR_NAME} = $oldDir;
     return $rtnVal;
 }

@@ -54,20 +54,20 @@ the console (or written to an output text file with the <code>-w</code> option).
 to rewrite <code>FILE</code> with the specified information, preserving the original
 file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify that the
 new file is OK before erasing the original.)</p>
-<p>Below is a list of meta information formats and file types supported by
-exiftool (r = read support, w = write support):</p>
+<p>Below is a list of meta information formats and file types currently
+supported by exiftool (r = read support, w = write support):</p>
 <pre>
      Meta Information                   File Types
     ------------------          --------------------------
-    EXIF           r/w          JPEG   r/w      NEF    r/w
-    GPS            r/w          JP2    r        ORF    r
-    IPTC           r/w          TIFF   r/w      PEF    r/w
-    XMP            r/w          GIF    r/w
-    MakerNotes     r/w          THM    r/w
-    GeoTIFF        r            CRW    r/w
-    ICC Profile    r            CR2    r/w
-    Photoshop IRB  r            DNG    r/w
-    PrintIM        r            MRW    r</pre>
+    EXIF           r/w          JPEG   r/w      JP2    r   
+    GPS            r/w          TIFF   r/w      PNG    r    
+    IPTC           r/w          GIF    r/w      MIFF   r
+    XMP            r/w          THM    r/w      MRW    r
+    MakerNotes     r/w          CRW    r/w      ORF    r  
+    GeoTIFF        r            CR2    r/w
+    ICC Profile    r            DNG    r/w
+    Photoshop IRB  r            NEF    r/w
+    PrintIM        r            PEF    r/w</pre>
 <p>
 </p>
 <hr />
@@ -198,7 +198,10 @@ option).
 <dt><strong><a name="item__2dg_5b_23_5d"><strong>-g</strong>[#]</a></strong><br />
 </dt>
 <dd>
-Organize output by tag <strong>g</strong>roup (-g0 assumed if # not specified).
+Organize output by tag <strong>g</strong>roup.  <code>#</code> specifies the group family number,
+and may be 0 (general location), 1 (specific location) or 2 (category).  If
+not specified, <code>-g0</code> is assumed.  Use the <code>-group</code> option to list all
+group names for a specified family.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dg_5b_23_5d"><strong>-G</strong>[#]</a></strong><br />
@@ -266,8 +269,24 @@ extraction of embedded images that aren't in standard JPG format).
 <dt><strong><a name="item__2dn"><strong>-n</strong></a></strong><br />
 </dt>
 <dd>
-Do <strong>n</strong>ot apply the print conversion to displayed tag values, or the inverse
-print conversion to written tag values.
+Read and write values as <strong>n</strong>umbers instead of words.  This option disables
+the print conversion that is applied when extracting values to make them
+more readable, and the inverse print conversion when writing.  For example:
+</dd>
+<dd>
+<pre>
+    &gt; exiftool -Orientation -S a.jpg
+    Orientation: Rotate 90 CW
+    &gt; exiftool -Orientation -S -n a.jpg
+    Orientation: 6</pre>
+</dd>
+<dd>
+<p>and the following two writing commands have the same effect</p>
+</dd>
+<dd>
+<pre>
+    &gt; exiftool -Orientation='Rotate 90 CW' a.jpg
+    &gt; exiftool -Orientation=6 -n a.jpg</pre>
 </dd>
 <p></p>
 <dt><strong><a name="item__2do_outfile"><strong>-o</strong> <em>OUTFILE</em></a></strong><br />
@@ -313,6 +332,13 @@ with <code>#</code> are ignored.  For example, this format file:
 </dt>
 <dd>
 <strong>P</strong>reserve date/time of original file when writing.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dq"><strong>-q</strong></a></strong><br />
+</dt>
+<dd>
+<strong>Q</strong>uiet processing.  One <a href="#item__2dq"><code>-q</code></a> suppresses normal informational messages,
+and a second <a href="#item__2dq"><code>-q</code></a> suppresses warnings as well.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dr"><strong>-r</strong></a></strong><br />
@@ -366,19 +392,19 @@ a different group.</p>
 specified for each extracted tag.  With this feature, information may be
 written to a tag with a different name or group.  This is done using
 &quot;<code>'-SRCTAG&gt;DSTTAG'</code>&quot; on the command line after
-<code>-TagsFromFile</code>.  (Note that this argument must be quoted to prevent shell
-redirection, and there is no <code>=</code> sign since this is a special feature to
-control <em>extracted</em> information.)  Both source and destination tags may be
-prefixed by a group name, and <code>All</code> or <code>*</code> may be used as a tag or group
-name.  If no destination group is specified, then the information is written
-to the preferred group.</p>
+<code>-TagsFromFile</code> (&quot;<code>'-DSTTAG&lt;SRCTAG'</code>&quot; also works).  Note
+that this argument must be quoted to prevent shell redirection, and there is
+no <code>=</code> sign as there is when setting new values.  Both source and
+destination tags may be prefixed by a group name, and <code>All</code> or <code>*</code> may be
+used as a tag or group name.  If no destination group is specified, then the
+information is written to the preferred group.</p>
 </dd>
 <dd>
 <p><code>SRCFILE</code> may be the same as the target file to move information around
 within a file.  <code>@</code> may be used to represent the target file name (ie.
-<code>-TagsFromFile @</code>), allowing this to be done when batch processing multiple
-files.  Specified tags are then set from each target file in turn as it is
-rewritten.</p>
+<code>-TagsFromFile @</code>), permitting this feature to be used when batch
+processing multiple files.  Specified tags are then copied from each target
+file in turn as it is rewritten.</p>
 </dd>
 <dd>
 <p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples of how to use this option.</p>
@@ -685,6 +711,12 @@ delete the original IPTC information in an image.
 </dt>
 <dd>
 Extract information from stdin.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool_image_2ejpg__2dthumbnailimage__2db__7c_ex">exiftool image.jpg -thumbnailimage -b | exiftool -</a></strong><br />
+</dt>
+<dd>
+Extract information from an embedded thumbnail image.
 </dd>
 <p></p>
 <dt><strong><a name="item_cat_a_2ejpg__7c_exiftool__2diptc_3akeywords_2b_3df">cat a.jpg | exiftool -iptc:keywords+=fantastic - &gt; b.jpg</a></strong><br />

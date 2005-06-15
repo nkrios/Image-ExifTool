@@ -137,6 +137,7 @@ sub SaveMakerNotes($)
     # save position of maker notes for pointer fixups
     $fixup->{Shift} += length($makerNotes);
     $exifTool->{MAKER_NOTE_FIXUP} = $fixup;
+    $exifTool->{MAKER_NOTE_BYTE_ORDER} = GetByteOrder();
     # add value data
     $makerNotes .= $makerInfo->{ValBuff};
     # get MakerNotes tag info

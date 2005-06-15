@@ -24,7 +24,7 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 # Canon EXIF Maker Notes
 %Image::ExifTool::Canon::Main = (
@@ -615,9 +615,9 @@ $VERSION = '1.15';
         PrintConv => {
            -1 => 'Rotated by Software',
             0 => 'None',
-            1 => 'Rotate 90',
+            1 => 'Rotate 90 CW',
             2 => 'Rotate 180',
-            3 => 'Rotate 270',
+            3 => 'Rotate 270 CW',
         },
     },
     29 => {

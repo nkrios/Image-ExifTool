@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.24
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.31
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6KB
@@ -99,7 +99,7 @@
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 33
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 0.63 m
 [MakerNotes, Nikon, Camera] 10 - Focal Length: 56.6mm
-[MakerNotes, Nikon, Camera] 11 - Lens ID: Nikkor AF-S 18-70/3.5-4.5 G IF-ED DX
+[MakerNotes, Nikon, Camera] 11 - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
 [MakerNotes, Nikon, Camera] 12 - Lens F Stops: 5.33
 [MakerNotes, Nikon, Camera] 13 - Min Focal Length: 18.3mm
 [MakerNotes, Nikon, Camera] 14 - Max Focal Length: 71.3mm
@@ -107,6 +107,7 @@
 [MakerNotes, Nikon, Camera] 16 - Max Aperture At Max Focal: 4.5
 [MakerNotes, Nikon, Camera] 17 - MCU Version: 132
 [MakerNotes, Nikon, Camera] 18 - Effective Max Aperture: 4.5
+[MakerNotes, Nikon, Camera] 154 - Sensor Pixel Size: 7.8 x 7.8 um
 [MakerNotes, Nikon, Camera] 160 - Serial Number: No= 20025585
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 526
 [MakerNotes, Nikon, Camera] 169 - Image Optimization: Custom
