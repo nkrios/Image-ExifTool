@@ -15,7 +15,7 @@ package Image::ExifTool::Panasonic;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 %Image::ExifTool::Panasonic::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -27,7 +27,7 @@ $VERSION = '1.04';
         Writable => 'int16u',
         PrintConv => {
             2 => 'High',
-            3 => 'Standard',
+            3 => 'Normal',
             6 => 'Very High', #3 (Leica)
             7 => 'Raw', #3 (Leica)
         },
@@ -142,20 +142,32 @@ $VERSION = '1.04';
         },
     },
     # 0x29 => 'SubjectDistance?',
-    0x2c => {
-        Name => 'Contrast',
-        Flags => 'PrintHex',
-        Writable => 'int16u',
-        PrintConv => {
-            0 => 'Standard',
-            1 => 'Low',
-            2 => 'High',
-            #3 (Leica)
-            0x100 => 'Low',
-            0x110 => 'Standard',
-            0x120 => 'High',
+    0x2c => [
+        {
+            Name => 'Contrast',
+            Condition => '$self->{CameraMake} =~ /^Panasonic/i',
+            Notes => 'Panasonic models',
+            Flags => 'PrintHex',
+            Writable => 'int16u',
+            PrintConv => {
+                0 => 'Normal',
+                1 => 'Low',
+                2 => 'High',
+            }
         },
-    },
+        {
+            Name => 'Contrast',
+            Notes => 'Leica models',
+            Flags => 'PrintHex',
+            Writable => 'int16u',
+            PrintConv => {
+                #3 (Leica)
+                0x100 => 'Low',
+                0x110 => 'Normal',
+                0x120 => 'High',
+            }
+        },
+    ],
     0x2d => {
         Name => 'NoiseReduction',
         Writable => 'int16u',

@@ -15,7 +15,7 @@ package Image::ExifTool::Casio;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.12';
 
 %Image::ExifTool::Casio::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -205,27 +205,27 @@ $VERSION = '1.10';
         Name => 'Saturation',
         Writable => 'int16u',
         PrintConv => {
-           0 => '-1',
+           0 => 'Low',
            1 => 'Normal',
-           2 => '+1',
+           2 => 'High',
         },
     },
     0x0020 => {
         Name => 'Contrast',
         Writable => 'int16u',
         PrintConv => {
-           0 => '-1',
+           0 => 'Low',
            1 => 'Normal',
-           2 => '+1',
+           2 => 'High',
         },
     },
     0x0021 => {
         Name => 'Sharpness',
         Writable => 'int16u',
         PrintConv => {
-           0 => '-1',
+           0 => 'Soft',
            1 => 'Normal',
-           2 => '+1',
+           2 => 'Hard',
         },
     },
     0x0e00 => {
@@ -239,16 +239,7 @@ $VERSION = '1.10';
     0x2000 => {
         # this image data is also referenced by tags 3 and 4
         # (nasty that they double-reference the image!)
-        Name => 'PreviewImage',
-        Writable => 'undef',
-        # a value of 'none' is ok...
-        WriteCheck => '$val eq "none" ? undef : $self->CheckImage(\$val)',
-        DataTag => 'PreviewImage',
-        # we allow preview image to be set to '', but we don't want a zero-length value
-        # in the IFD, so set it temorarily to 'none'.  Note that the length is <= 4,
-        # so this value will fit in the IFD so the preview fixup won't be generated.
-        ValueConv => '$val eq "none" and $val="";\$val',
-        ValueConvInv => '$val eq "" and $val="none";$val',
+        %Image::ExifTool::previewImageTagInfo,
     },
     0x2011 => {
         Name => 'WhiteBalanceBias',

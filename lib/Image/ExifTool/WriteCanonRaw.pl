@@ -14,7 +14,6 @@ use Image::ExifTool::Fixup;
 # (Note: upper two bits of RawTagID are zero)
 my %mapRawTag = (
   # RawTagID => Canon TagID
-    0x0805 => 0x0d, # CanonFileDescription / UserComment
     0x080b => 0x07, # CanonFirmwareVersion
     0x0810 => 0x09, # OwnerName
     0x0815 => 0x06, # CanonImageType
@@ -209,13 +208,13 @@ sub WriteCanonRaw($$$)
 
     # 4 bytes at end of block give directory position within block
     $raf->Seek($blockStart+$blockSize-4, 0) or return undef;
-    $raf->Read($buff, 4) or return undef;
+    $raf->Read($buff, 4) == 4 or return undef;
     my $dirOffset = Get32u(\$buff,0) + $blockStart;
     $raf->Seek($dirOffset, 0) or return undef;
-    $raf->Read($buff, 2) or return undef;
+    $raf->Read($buff, 2) == 2 or return undef;
     my $entries = Get16u(\$buff,0);             # get number of entries in directory
     # read the directory (10 bytes per entry)
-    $raf->Read($buff, 10 * $entries) or return undef;
+    $raf->Read($buff, 10 * $entries) == 10 * $entries or return undef;
     my $newDir = '';
 
     # get hash of new information keyed by tagID
@@ -309,7 +308,7 @@ sub WriteCanonRaw($$$)
                 $valuePtr + $size <= $blockSize or return undef;
                 # read value from file
                 $raf->Seek($ptr, 0) or return undef;
-                $raf->Read($value, $size) or return undef;
+                $raf->Read($value, $size) == $size or return undef;
             }
         }
         # set count from tagInfo count if necessary
@@ -418,7 +417,7 @@ sub WriteCanonRaw($$$)
             $valuePtr = $outPos - $outBase;
             # write out value data
             Image::ExifTool::Write($outfile, $value) or return undef;
-            $outPos += $size;   # update current position in outfile
+            $outPos += length($value);  # update current position in outfile
         }
         # create new directory entry
         $newDir .= Set16u($tag) . Set32u($size) . Set32u($valuePtr);
@@ -457,7 +456,7 @@ sub WriteCRW($$)
 
     # write header
     $raf->Seek(0, 0)         or return 0;
-    $raf->Read($buff, $hlen) or return 0;
+    $raf->Read($buff, $hlen) == $hlen or return 0;
     Image::ExifTool::Write($outfile, $buff) or $err = 1;
 
     $raf->Seek(0, 2)         or return 0;   # seek to end of file

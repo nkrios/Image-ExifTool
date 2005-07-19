@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: Unknown_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:23:20
+[File, File, Time]  - File Modification Date/Time: 2005:06:27 12:09:01
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -77,4 +77,6 @@
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 29.3
 [Composite, Composite, Image]  - Shutter Speed: 3.2
+[Composite, Composite, Image]  - Circle Of Confusion: 0.001 mm
 [Composite, Composite, Camera]  - Focal Length: 200.0mm (35mm equivalent: 5865.3mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 7808.33 m

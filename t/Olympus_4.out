@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: OlympusE1.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 8KB
-[File, File, Time]  - File Modification Date/Time: 2005:04:02 20:14:24
+[File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -46,7 +46,7 @@
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: High gain up
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
-[EXIF, ExifIFD, Camera] 41994 - Sharpness: +2
+[EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
@@ -66,7 +66,7 @@
 [MakerNotes, Olympus, Camera] 4114 - Black Level: 69 69 69 68
 [MakerNotes, Olympus, Camera] 4119 - Red Balance: 1.609375
 [MakerNotes, Olympus, Camera] 4120 - Blue Balance: 1.1328125
-[MakerNotes, Olympus, Camera] 4137 - Contrast: 1
+[MakerNotes, Olympus, Camera] 4137 - Contrast: Normal
 [MakerNotes, Olympus, Camera] 4138 - Sharpness Factor: 576
 [MakerNotes, Olympus, Camera] 4139 - Color Control: 96 4096 2944 4096 16 128
 [MakerNotes, Olympus, Camera] 4140 - Valid Bits: 12 0
@@ -154,4 +154,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 2.0
 [Composite, Composite, Image]  - Shutter Speed: 1/100
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Image]  - Circle Of Confusion: 0.015 mm
+[Composite, Composite, Image]  - Depth of Field: 0.17 m (0.63 - 0.80)
 [Composite, Composite, Camera]  - Focal Length: 20.0mm (35mm equivalent: 40.1mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 5.93 m

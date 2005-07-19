@@ -47,26 +47,10 @@ $VERSION = '1.12';
     {
         Name => 'MakerNoteCasio2',
         # (starts with "QVC\0")
-        Condition => q{
-            $self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/ and
-            $self->{CameraModel}!~/^EX-Z3/
-        },
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Casio::Type2',
-            Start => '$valuePtr + 6',
-            ByteOrder => 'Unknown',
-        },
-    },
-    {
-        Name => 'MakerNoteCasioEX-Z3',
-        # (starts with "QVC\0")
         Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Type2',
             Start => '$valuePtr + 6',
-            # Casio really messed this up for the EX-Z3, and made the
-            # offsets relative to somewhere in the APP0 JFIF segment... doh!
-            Base => '-20',
             ByteOrder => 'Unknown',
         },
     },
@@ -289,16 +273,10 @@ $VERSION = '1.12';
         },
     },
     {
-        Name => 'PreviewImage',
+        # Samsung PreviewImage
+        %Image::ExifTool::previewImageTagInfo,
         Condition => '$self->{CameraMake}=~/^Samsung/ and $self->{CameraModel}=~/^<Digimax V700/',
-        WriteCheck => '$val eq "none" ? undef : $self->CheckImage(\$val)',
-        DataTag => 'PreviewImage',
         Notes => 'Samsung preview image',
-        # we allow preview image to be set to '', but we don't want a zero-length value
-        # in the IFD, so set it temorarily to 'none'.  Note that the length is <= 4,
-        # so this value will fit in the IFD so the preview fixup won't be generated.
-        ValueConv => '$val eq "none" and $val="";\$val',
-        ValueConvInv => '$val eq "" and $val="none";$val',
     },
     {
         Name => 'MakerNoteSanyo',

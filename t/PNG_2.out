@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.31
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.35
 [File, File, Image]  - File Name: PNG.png
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 0KB
@@ -10,6 +10,7 @@
 [PNG, PNG, Image] 9 - Color Type: Grayscale
 [PNG, PNG, Image] 10 - Compression: Deflate/Inflate
 [PNG, PNG, Image] 11 - Filter: Adaptive
-[PNG, PNG, Image] 12 - Interlace: No
+[PNG, PNG, Image] 12 - Interlace: Noninterlaced
+[PNG, PNG, Image] bKGD - Background Color: 0
 [PNG, PNG, Image] comment - Comment: test comment
 [Composite, Composite, Image]  - Image Size: 16x16

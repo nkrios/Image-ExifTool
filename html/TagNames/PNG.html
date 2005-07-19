@@ -14,49 +14,114 @@
 <td align='center'>-</td>
 <td>--&gt; <a href='PNG.html#ImageHeader'>PNG ImageHeader Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>'PLTE'</td>
+<td>Palette</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'bKGD'</td>
+<td>BackgroundColor</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>'cHRM'</td>
 <td>PrimaryChromaticities</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PNG.html#PrimaryChromaticities'>PNG PrimaryChromaticities Tags</a></td></tr>
 <tr valign='top'>
+<td>'fRAc'</td>
+<td>FractalParameters</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>'gAMA'</td>
 <td>Gamma</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'gIFg'</td>
+<td>GIFGraphicControlExtension</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>'gIFt'</td>
+<td>GIFPlainTextExtension</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'gIFx'</td>
+<td>GIFApplicationExtension</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'hIST'</td>
+<td>PaletteHistogram</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>'iCCP'</td>
 <td>ICC_Profile</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>'iTXt'</td>
 <td>InternationalText</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
+<tr valign='top'>
+<td>'oFFs'</td>
+<td>ImageOffset</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>'pCAL'</td>
+<td>PixelCalibration</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>'pHYs'</td>
 <td>PhysicalPixel</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'sBIT'</td>
+<td>SignificantBits</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>'sPLT'</td>
+<td>SuggestedPalette</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>'sRGB'</td>
 <td>SRGBRendering</td>
 <td align='center'>N</td>
-<td><font size='-1'>0 = sRGB Perceptual
-  <br>1 = sRGB Relative Colorimetric
-  <br>2 = sRGB Saturation
-  <br>3 = sRGB Absolute Colorimetric</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td><font size='-1'>0 = Perceptual
+  <br>1 = Relative Colorimetric
+  <br>2 = Saturation
+  <br>3 = Absolute Colorimetric</font></td></tr>
+<tr valign='top'>
 <td>'tEXt'</td>
 <td>TextualData</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>'tIME'</td>
 <td>ModifyDate</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'tRNS'</td>
+<td>Transparency</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>'tXMP'</td>
+<td>XMP</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+<tr valign='top'>
 <td>'zTXt'</td>
 <td>CompressedText</td>
 <td align='center'>-</td>
@@ -106,7 +171,7 @@
 <td align='right'>12</td>
 <td>Interlace</td>
 <td align='center'>N</td>
-<td><font size='-1'>0 = No
+<td><font size='-1'>0 = Noninterlaced
   <br>1 = Adam7 Interlace</font></td></tr>
 </table></td></tr></table></blockquote>
 
@@ -197,28 +262,28 @@ found in the image.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>'Raw profile type APP1'</td>
-<td>RawProfileTypeAPP1</td>
+<td>APP1_Profile</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a>
   <br>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>'Raw profile type exif'</td>
-<td>RawProfileTypeEXIF</td>
+<td>EXIF_Profile</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
 <tr valign='top'>
 <td>'Raw profile type icc'</td>
-<td>RawProfileTypeICC</td>
+<td>ICC_Profile</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>'Raw profile type iptc'</td>
-<td>RawProfileTypeIPTC</td>
+<td>IPTC_Profile</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
 <tr valign='top'>
 <td>'Raw profile type xmp'</td>
-<td>RawProfileTypeXMP</td>
+<td>XMP_Profile</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -234,6 +299,11 @@ found in the image.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>'Title'</td>
 <td>Title</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Warning'</td>
+<td>PNGWarning</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -257,12 +327,13 @@ found in the image.
 <td align='right'>8</td>
 <td>PixelUnits</td>
 <td align='center'>N</td>
-<td><font size='-1'>1 = meter</font></td></tr>
+<td><font size='-1'>0 = Unknown
+  <br>1 = Meter</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 15, 2005</i>
+<br><i>Last revised Jul 6, 2005</i>
 </body>
 </html>

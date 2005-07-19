@@ -20,7 +20,7 @@ package Image::ExifTool::Olympus;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -95,7 +95,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             0 => 'Raw',
             1 => 'Superfine',
             2 => 'Fine',
-            3 => 'Standard',
+            3 => 'Normal',
             4 => 'Economy',
             5 => 'Extra fine',
         },
@@ -108,7 +108,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             0 => 'Raw',
             1 => 'Superfine',
             2 => 'Fine',
-            3 => 'Standard',
+            3 => 'Normal',
             4 => 'Economy',
             5 => 'Extra fine',
         },
@@ -281,6 +281,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x1029 => { #3
         Name => 'Contrast',
         Writable => 'int16u',
+        PrintConv => { #PH (works with E1)
+            0 => 'High',
+            1 => 'Normal',
+            2 => 'Low',
+        },
     },
     0x102a => { #3
         Name => 'SharpnessFactor',
@@ -900,17 +905,18 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         # denominator we are consistently in mm - PH
         Format => 'int32u',
         Count => 2,
-        PrintConv => q{
+        ValueConv => q{
             my ($a,$b) = split ' ',$val;
-            return "inf" if $a == 0xffffffff;
-            return $a / 1000 . ' m';
+            return 0 if $a == 0xffffffff;
+            return $a / 1000;
         },
-        PrintConvInv => q{
-            return '4294967295 1' if $val =~ /inf/i;
-            $val =~ s/\s.*//;
+        ValueConvInv => q{
+            return '4294967295 1' unless $val;
             $val = int($val * 1000 + 0.5);
             return "$val 1";
         },
+        PrintConv => '$val ? "$val m" : "inf"',
+        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/\s.*//, $val',
     },
     # 0x31a Continuous AF parameters?
     # 0x1200-0x1209 Flash information:

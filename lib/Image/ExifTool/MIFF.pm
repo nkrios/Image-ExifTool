@@ -54,33 +54,45 @@ image.
     page => 'Page',
     # profile tags.  Note the SubDirectory is not used by MiffInfo(),
     # but is inserted for documentation purposes only
-   'profile-icc' => {
-        Name => 'ProfileICC',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::ICC_Profile::Main',
-        },
-    },
-   'profile-iptc' => {
-        Name => 'ProfileIPTC',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Photoshop::Main',
-        },
-    },
    'profile-APP1' => [
         # [this list is just for the sake of the documentation]
         {
-            Name => 'ProfileAPP1',
+            Name => 'APP1_Profile',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Exif::Main',
             },
         },
         {
-            Name => 'ProfileAPP1',
+            Name => 'APP1_Profile',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::XMP::Main',
             },
         },
     ],
+   'profile-exif' => { # haven't seen this, but it would make sense - PH
+        Name => 'EXIF_Profile',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+        },
+    },
+   'profile-icc' => {
+        Name => 'ICC_Profile',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::ICC_Profile::Main',
+        },
+    },
+   'profile-iptc' => {
+        Name => 'IPTC_Profile',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Photoshop::Main',
+        },
+    },
+   'profile-xmp' => { # haven't seen this, but it would make sense - PH
+        Name => 'XMP_Profile',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::XMP::Main',
+        },
+    },
    'red-primary' => 'RedPrimary',
    'rendering-intent' => 'RenderingIntent',
     resolution => 'Resolution',
@@ -106,7 +118,7 @@ sub MiffInfo($)
     # characters, but this starting sequence is strongly suggested.)
     return 0 unless $raf->Read($hdr, 14) == 14;
     return 0 unless $hdr eq 'id=ImageMagick';
-    $exifTool->FoundTag('FileType', 'MIFF');
+    $exifTool->SetFileType();   # set the FileType tag
 
     # set end-of-line character sequence to read to end of the TEXT
     # section for new-type MIFF files (text ends with Colon+Ctrl-Z)

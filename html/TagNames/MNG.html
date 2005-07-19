@@ -1,0 +1,822 @@
+<html>
+<head>
+<title>MNG Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2><a name='MNG'>MNG Tags</a></h2>
+This table contains definitions for tags found in MNG and JNG images.  MNG
+is a superset of PNG and JNG, so a MNG image may contain any of these tags
+as well as any PNG tags.  Conversely, only some of these tags are valid for
+JNG images.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'BACK'</td>
+<td>Background</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#Background'>MNG Background Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'BASI'</td>
+<td>BasisObject</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#BasisObject'>MNG BasisObject Tags</a></td></tr>
+<tr valign='top'>
+<td>'CLIP'</td>
+<td>ClipObjects</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#ClipObjects'>MNG ClipObjects Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'CLON'</td>
+<td>CloneObject</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#CloneObject'>MNG CloneObject Tags</a></td></tr>
+<tr valign='top'>
+<td>'DBYK'</td>
+<td>DropByKeyword</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'DEFI'</td>
+<td>DefineObject</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#DefineObject'>MNG DefineObject Tags</a></td></tr>
+<tr valign='top'>
+<td>'DHDR'</td>
+<td>DeltaPNGHeader</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#DeltaPNGHeader'>MNG DeltaPNGHeader Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'DISC'</td>
+<td>DiscardObjects</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'DROP'</td>
+<td>DropChunks</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'FRAM'</td>
+<td>Frame</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'JHDR'</td>
+<td>JNGHeader</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#JNGHeader'>MNG JNGHeader Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'LOOP'</td>
+<td>Loop</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#Loop'>MNG Loop Tags</a></td></tr>
+<tr valign='top'>
+<td>'MAGN'</td>
+<td>MagnifyObject</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#MagnifyObject'>MNG MagnifyObject Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'MHDR'</td>
+<td>MNGHeader</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#MNGHeader'>MNG MNGHeader Tags</a></td></tr>
+<tr valign='top'>
+<td>'MOVE'</td>
+<td>MoveObjects</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#MoveObjects'>MNG MoveObjects Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ORDR'</td>
+<td>OrderingRestrictions</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'PAST'</td>
+<td>PasteImage</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#PasteImage'>MNG PasteImage Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'PPLT'</td>
+<td>PartialPalette</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'PROM'</td>
+<td>PromoteParent</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#PromoteParent'>MNG PromoteParent Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'SAVE'</td>
+<td>SaveObjects</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'SEEK'</td>
+<td>SeekPoint</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'SHOW'</td>
+<td>ShowObjects</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#ShowObjects'>MNG ShowObjects Tags</a></td></tr>
+<tr valign='top'>
+<td>'TERM'</td>
+<td>TerminationAction</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#TerminationAction'>MNG TerminationAction Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'eXPi'</td>
+<td>ExportImage</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#ExportImage'>MNG ExportImage Tags</a></td></tr>
+<tr valign='top'>
+<td>'fPRI'</td>
+<td>FramePriority</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MNG.html#FramePriority'>MNG FramePriority Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'nEED'</td>
+<td>ResourcesNeeded</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'pHYg'</td>
+<td>GlobalPixelSize</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Background'>MNG Background Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>BackgroundColor</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>6</td>
+<td>MandatoryBackground</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Color and Image Advisory
+  <br>1 = Color Mandatory, Image Advisory
+  <br>2 = Color Advisory, Image Mandatory
+  <br>3 = Color and Image Mandatory</font></td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>BackgroundImageID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>9</td>
+<td>BackgroundTiling</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='BasisObject'>MNG BasisObject Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>BitDepth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>9</td>
+<td>ColorType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Grayscale
+  <br>2 = RGB
+  <br>3 = Palette
+  <br>4 = Grayscale with Alpha
+  <br>6 = RGB with Alpha</font></td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>Compression</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Deflate/Inflate</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>11</td>
+<td>Filter</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Adaptive</font></td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>Interlace</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Noninterlaced
+  <br>1 = Adam7 Interlace</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>13</td>
+<td>RedSample</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>17</td>
+<td>GreenSample</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>21</td>
+<td>BlueSample</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>25</td>
+<td>AlphaSample</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>26</td>
+<td>Viewable</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ClipObjects'>MNG ClipObjects Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>FirstObject</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>LastObject</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>DeltaType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Absolute
+  <br>1 = Relative</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>5</td>
+<td>ClipBoundary</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CloneObject'>MNG CloneObject Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>SourceID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>CloneID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>CloneType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Full
+  <br>1 = Parital
+  <br>2 = Renumber object</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>5</td>
+<td>DoNotShow</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>ConcreteFlag</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>7</td>
+<td>LocalDeltaType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Absolute
+  <br>1 = Relative</font></td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>DeltaXY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='DefineObject'>MNG DefineObject Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>ObjectID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>DoNotShow</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>ConcreteFlag</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>XYLocation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>ClippingBoundary</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='DeltaPNGHeader'>MNG DeltaPNGHeader Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>ObjectID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>ImageType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Unspecified
+  <br>1 = PNG
+  <br>2 = JNG</font></td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>DeltaType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Full Replacement
+  <br>1 = Pixel Addition
+  <br>2 = Alpha Addition
+  <br>3 = Color Addition
+  <br>4 = Pixel Replacement
+  <br>5 = Alpha Replacement
+  <br>6 = Color Replacement
+  <br>7 = No Change</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>BlockSize</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>BlockLocation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='JNGHeader'>MNG JNGHeader Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>ColorType</td>
+<td align='center'>N</td>
+<td><font size='-1'>8 = Gray
+  <br>10 = Color
+  <br>12 = Gray Alpha
+  <br>14 = Color Alpha</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>9</td>
+<td>BitDepth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>Compression</td>
+<td align='center'>N</td>
+<td><font size='-1'>8 = Huffman-coded baseline JPEG</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>11</td>
+<td>Interlace</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Sequential
+  <br>8 = Progressive</font></td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>AlphaBitDepth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>13</td>
+<td>AlphaCompression</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = MNG Grayscale IDAT
+  <br>8 = JNG 8-bit Grayscale JDAA</font></td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>AlphaFilter</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Adaptive MNG (N/A for JPEG)</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>15</td>
+<td>AlphaInterlace</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Noninterlaced</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Loop'>MNG Loop Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>NestLevel</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>IterationCount</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>TerminationCondition</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Deterministic, not cacheable
+  <br>1 = Decoder discretion, not cacheable
+  <br>2 = User discretion, not cacheable
+  <br>3 = External signal, not cacheable
+  <br>4 = Deterministic, cacheable
+  <br>5 = Decoder discretion, cacheable
+  <br>6 = User discretion, cacheable
+  <br>7 = External signal, cacheable</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>6</td>
+<td>IterationMinMax</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>SignalNumber</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MagnifyObject'>MNG MagnifyObject Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>FirstObjectID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>LastObjectID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>XMethod</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = No Magnification
+  <br>1 = Pixel Replication
+  <br>2 = Linear Interpolation
+  <br>3 = Closest Pixel
+  <br>4 = Color Linear Interpolation and Alpha Closest Pixel
+  <br>5 = Color Closest Pixel and Alpha Linear Interpolation</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>5</td>
+<td>XMag</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>YMag</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>9</td>
+<td>LeftMag</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>11</td>
+<td>RightMag</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>13</td>
+<td>TopMag</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>15</td>
+<td>BottomMag</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>17</td>
+<td>YMethod</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = No Magnification
+  <br>1 = Pixel Replication
+  <br>2 = Linear Interpolation
+  <br>3 = Closest Pixel
+  <br>4 = Color Linear Interpolation and Alpha Closest Pixel
+  <br>5 = Color Closest Pixel and Alpha Linear Interpolation</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MNGHeader'>MNG MNGHeader Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>TicksPerSecond</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>3</td>
+<td>NominalLayerCount</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>NominalFrameCount</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>5</td>
+<td>NominalPlayTime</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>SimplicityProfile</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MoveObjects'>MNG MoveObjects Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>FirstObject</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>LastObject</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>DeltaType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Absolute
+  <br>1 = Relative</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>5</td>
+<td>DeltaXY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='PasteImage'>MNG PasteImage Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>DestinationID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>TargetDeltaType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Absolute
+  <br>1 = Relative</font></td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>TargetXY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>11</td>
+<td>SourceID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>13</td>
+<td>CompositionMode</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Over
+  <br>1 = Replace
+  <br>2 = Under</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>14</td>
+<td>Orientation</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Same as source
+  <br>2 = Flipped left-right, then up-down
+  <br>4 = Flipped left-right
+  <br>6 = Flipped up-down
+  <br>8 = Tiled</font></td></tr>
+<tr valign='top'>
+<td align='right'>15</td>
+<td>OffsetOrigin</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Desination Origin
+  <br>1 = Target Origin</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>16</td>
+<td>OffsetXY</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>24</td>
+<td>BoundaryOrigin</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Desination Origin
+  <br>1 = Target Origin</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>25</td>
+<td>PastClippingBoundary</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='PromoteParent'>MNG PromoteParent Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>NewColorType</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>NewBitDepth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>FillMethod</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Bit Replication
+  <br>1 = Zero Fill</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ShowObjects'>MNG ShowObjects Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>FirstObject</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>LastObject</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>ShowMode</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='TerminationAction'>MNG TerminationAction Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>TerminationAction</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Show Last Frame
+  <br>1 = Display Nothing
+  <br>2 = Show First Frame
+  <br>3 = Repeat Sequence</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>IterationEndAction</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Show Last Frame
+  <br>1 = Display Nothing
+  <br>2 = Show First Frame</font></td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>Delay</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>6</td>
+<td>IterationMax</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ExportImage'>MNG ExportImage Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>SnapshotID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>SnapshotName</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FramePriority'>MNG FramePriority Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>DeltaType</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Absolute
+  <br>1 = Relative</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>Priority</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Jun 29, 2005</i>
+</body>
+</html>

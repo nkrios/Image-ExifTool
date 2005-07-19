@@ -1,0 +1,144 @@
+#------------------------------------------------------------------------------
+# File:         BMP.pm
+#
+# Description:  Routines for reading BMP images
+#
+# Revisions:    07/16/2005 - P. Harvey Created
+#
+# References:   1) http://www.fortunecity.com/skyscraper/windows/364/bmpffrmt.html
+#------------------------------------------------------------------------------
+
+package Image::ExifTool::BMP;
+
+use strict;
+use vars qw($VERSION);
+use Image::ExifTool qw(:DataAccess :Utils);
+
+$VERSION = '1.01';
+
+# BMP chunks
+%Image::ExifTool::BMP::Main = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
+    NOTES => q{
+There really isn't much meta information in a BMP file as such, just a bit
+of image related information.
+    },
+    4 => {
+        Name => 'ImageWidth',
+        Format => 'int32u',
+    },
+    8 => {
+        Name => 'ImageHeight',
+        Format => 'int32u',
+    },
+    12 => {
+        Name => 'Planes',
+        Format => 'int16u',
+    },
+    14 => {
+        Name => 'BitDepth',
+        Format => 'int16u',
+    },
+    16 => {
+        Name => 'Compression',
+        Format => 'int32u',
+        PrintConv => {
+            0 => 'None',
+            1 => '8-Bit RLE',
+            2 => '4-Bit RLE',
+            3 => 'Bitfields',
+        },
+    },
+    20 => {
+        Name => 'ImageLength',
+        Format => 'int32u',
+    },
+    24 => {
+        Name => 'PixelsPerMeterX',
+        Format => 'int32u',
+    },
+    28 => {
+        Name => 'PixelsPerMeterY',
+        Format => 'int32u',
+    },
+    32 => {
+        Name => 'NumColors',
+        Format => 'int32u',
+        PrintConv => '$val ? $val : "Use BitDepth"',
+    },
+    36 => {
+        Name => 'NumImportantColors',
+        Format => 'int32u',
+        PrintConv => '$val ? $val : "All"',
+    },
+);
+
+#------------------------------------------------------------------------------
+# BmpInfo : extract EXIF information from a BMP image
+# Inputs: 0) ExifTool object reference
+# Returns: 1 on success, 0 if this wasn't a valid BMP file
+sub BmpInfo($)
+{
+    my $exifTool = shift;
+    my $raf = $exifTool->{RAF};
+    my $verbose = $exifTool->Options('Verbose');
+    my $buff;
+
+    # verify this is a valid BMP file
+    return 0 unless $raf->Read($buff, 14) == 14;
+    return 0 unless $buff =~ /^BM/;
+    return 0 unless $raf->Read($buff, 40) == 40;
+    SetByteOrder('II');
+    return 0 unless Get32u(\$buff, 0) >= 40;    # make sure info is at least 40 bytes
+    $exifTool->SetFileType();   # set the FileType tag
+    my %dirInfo = (
+        DataPt => \$buff,
+        DirStart => 0,
+        DirLen => length($buff),
+    );
+    my $tagTablePtr = GetTagTable('Image::ExifTool::BMP::Main');
+    $exifTool->ProcessTagTable($tagTablePtr, \%dirInfo);
+    return 1;
+}
+
+1;  # end
+
+__END__
+
+=head1 NAME
+
+Image::ExifTool::BMP - Routines for reading BMP images
+
+=head1 SYNOPSIS
+
+This module is used by Image::ExifTool
+
+=head1 DESCRIPTION
+
+This module contains definitions required by Image::ExifTool to read BMP
+(Windows Bitmap) images.
+
+=head1 AUTHOR
+
+Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item L<http://www.fortunecity.com/skyscraper/windows/364/bmpffrmt.html>
+
+=back
+
+=head1 SEE ALSO
+
+L<Image::ExifTool::TagNames/BMP Tags>,
+L<Image::ExifTool::TagNames/PNG Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
+
+=cut
+

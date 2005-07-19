@@ -1,0 +1,55 @@
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.45
+[File, File, Image]  - File Name: PDF.pdf
+[File, File, Image]  - Directory: t
+[File, File, Image]  - File Size: 9KB
+[File, File, Time]  - File Modification Date/Time: 2005:07:18 15:37:57
+[File, File, Image]  - File Type: PDF
+[IPTC, IPTC, Other] 0 - Application Record Version: 2
+[IPTC, IPTC, Other] 120 - Caption-Abstract: A witty caption
+[IPTC, IPTC, Author] 122 - Writer-Editor: I wrote it
+[IPTC, IPTC, Other] 105 - Headline: No headline
+[IPTC, IPTC, Other] 40 - Special Instructions: What instructions
+[IPTC, IPTC, Author] 80 - By-line: Phil Harvey
+[IPTC, IPTC, Author] 85 - By-line Title: My Position
+[IPTC, IPTC, Author] 110 - Credit: My Credit
+[IPTC, IPTC, Author] 115 - Source: I'm the source
+[IPTC, IPTC, Other] 5 - Object Name: Test IPTC picture
+[IPTC, IPTC, Other] 55 - Date Created: 2004:02:26
+[IPTC, IPTC, Location] 90 - City: Kingston
+[IPTC, IPTC, Location] 95 - Province-State: Ont
+[IPTC, IPTC, Location] 101 - Country-Primary Location Name: Canada
+[IPTC, IPTC, Other] 103 - Original Transmission Reference: What is a transmission reference
+[IPTC, IPTC, Other] 15 - Category: 1
+[IPTC, IPTC, Other] 20 - Supplemental Categories: amazing, image, utilities
+[IPTC, IPTC, Other] 10 - Urgency: 8
+[IPTC, IPTC, Other] 25 - Keywords: ExifTool, Test, XMP
+[IPTC, IPTC, Author] 116 - Copyright Notice: Copyright 2004 Phil Harvey
+[Photoshop, Photoshop, Author] 1035 - URL: http://owl.phy.queensu.ca/~phil/exiftool/
+[Photoshop, Photoshop, Other] 1058 - TIFF Thumbnail: (Binary data 842 bytes)
+[PDF, PDF, Image] Count - Page Count: 1
+[PDF, PDF, Image] Creator - Creator: Adobe Photoshop 7.0
+[PDF, PDF, Time] CreationDate - Create Date: 2005:07:18 14:30:45-04:00
+[PDF, PDF, Time] ModDate - Modify Date: 2005:07:18 14:30:45-04:00
+[PDF, PDF, Image] Producer - Producer: Adobe Photoshop for Macintosh
+[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
+[XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
+[XMP, XMP-photoshop, Image] Category - Category: 1
+[XMP, XMP-photoshop, Location] City - City: Kingston
+[XMP, XMP-photoshop, Location] Country - Country: Canada
+[XMP, XMP-photoshop, Author] Credit - Credit: My Credit
+[XMP, XMP-photoshop, Time] DateCreated - Date Created: 2004:02:26
+[XMP, XMP-photoshop, Image] Headline - Headline: No headline
+[XMP, XMP-photoshop, Unknown] Instructions - Instructions: What instructions
+[XMP, XMP-photoshop, Author] Source - Source: I'm the source
+[XMP, XMP-photoshop, Location] State - State: Ont
+[XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference
+[XMP, XMP-photoshop, Unknown] Urgency - Urgency: 8
+[XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
+[XMP, XMP-xmpBJ, Unknown] JobRefName - Job Ref Name: My Job
+[XMP, XMP-xmpMM, Unknown] DocumentID - Document ID: adobe:docid:photoshop:cbcc2a62-f127-11d9-ac4d-e8be6f73552e
+[XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
+[XMP, XMP-dc, Author] Creator - Creator: Phil Harvey
+[XMP, XMP-dc, Image] Description - Description: A witty caption
+[XMP, XMP-dc, Author] Rights - Rights: Copyright 2004 Phil Harvey
+[XMP, XMP-dc, Image] Title - Title: Test IPTC picture
+[XMP, XMP-dc, Image] Subject - Subject: ExifTool, Test, XMP

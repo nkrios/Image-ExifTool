@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.21
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.32
 [File, File, Image]  - File Name: Writer_21_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:24 19:45:08
+[File, File, Time]  - File Modification Date/Time: 2005:06:16 12:52:38
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 16
 [File, File, Image]  - Image Height: 16
@@ -17,5 +17,5 @@
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: Uncalibrated
-[EXIF, ExifIFD, Camera] 41994 - Sharpness: +1
+[EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [Composite, Composite, Image]  - Image Size: 16x16

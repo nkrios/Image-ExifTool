@@ -12,20 +12,31 @@ An ExifTool forum is provided by CPAN at
 <a href="http://www.cpanforum.com/dist/Image-ExifTool">http://www.cpanforum.com/dist/Image-ExifTool</a>
 </blockquote>
 
+<h4>"How do I determine the tag name for some information?"</h4>
+
+<blockquote>
+When you run exiftool, by default it prints descriptions, not tag names, for
+the information it extracts.  To print the tag names instead, use the
+<code><font color='#880000'>'-S'</font></code> option.  Also, see the
+<a href="TagNames/index.html">tag names documentation</a> for a complete list
+of available tag names.
+</blockquote>
+
 <h4>"ExifTool reports the wrong value for a tag",
 <br>"ExifTool doesn't write a tag properly", or
 <br>"Other software can't read information written by ExifTool"</h4>
 
 <blockquote>
-Make sure you are looking at the right information.  Many tags are duplicated in
-different locations within an image.  When in doubt, use
+Make sure you are looking at the right information.  Information may be
+duplicated in different locations within an image.  When in doubt, use
 <code><font color='#880000'>'exiftool -a -G1 FILENAME'</font></code> to show all
-tags and their locations in the file.  In this command,
+information and the locations in the file.  In this command,
 <code><font color='#880000'>'-a'</font></code> allows duplicate tags to be
 displayed, <code><font color='#880000'>'-G1'</font></code> shows the family 1
 group name (ie. the location) of each tag, and
 <code><font color='#880000'>'FILENAME'</font></code> is the name of your image
-file.
+file.  Also, you may want to add <code><font color='#880000'>'-S'</font></code>
+to show the actual tag names instead of the descriptions.
 
 <p>You can read or write information in a specific location if necessary by
 prefixing the tag name on the command line with the desired group name.  ie)

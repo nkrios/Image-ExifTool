@@ -19,10 +19,20 @@
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#FocalLength'>Canon FocalLength Tags</a></td></tr>
 <tr valign='top'>
+<td>0x0003</td>
+<td>CanonFlashInfo?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0004</td>
 <td>CanonShotInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#ShotInfo'>Canon ShotInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0005</td>
+<td>CanonPanorama</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#Panorama'>Canon Panorama Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0006</td>
 <td>CanonImageType</td>
@@ -54,11 +64,16 @@
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x000d</td>
+<td>CanonLensInfo1D</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#LensInfo1D'>Canon LensInfo1D Tags</a></td></tr>
+<tr valign='top'>
 <td>0x000e</td>
 <td>CanonFileLength</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x000f</td>
 <td>CanonCustomFunctions10D
   <br>CanonCustomFunctions20D
@@ -67,37 +82,37 @@
 <td>--&gt; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0012</td>
 <td>CanonPictureInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#PictureInfo'>Canon PictureInfo Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0090</td>
 <td>CanonCustomFunctions1D</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0093</td>
 <td>CanonFileInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#FileInfo'>Canon FileInfo Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00a0</td>
 <td>CanonColorInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#ColorInfo'>Canon ColorInfo Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x00a9</td>
 <td>WhiteBalanceTable</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00ae</td>
 <td>ColorTemperature</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x00b6</td>
 <td>PreviewImageInfo</td>
 <td align='center'>-</td>
@@ -179,7 +194,8 @@
   <br>8 = Portrait
   <br>9 = Sports
   <br>10 = Macro
-  <br>11 = Pan focus</font></td></tr>
+  <br>11 = Pan focus
+  <br>15 = Flash Off</font></td></tr>
 <tr valign='top'>
 <td align='right'>12</td>
 <td>DigitalZoom</td>
@@ -262,37 +278,51 @@
   <br>4 = Sigma UC Zoom 35-135mm f/4-5.6
   <br>6 = Tokina AF193-2 19-35mm f/3.5-4.5
   <br>10 = Sigma 50mm f/2.8 EX / 28mm f/1.8
+  <br>11 = Canon EF 35mm f/2
+  <br>13 = Canon EF 15mm f/2.8
   <br>21 = Canon EF 80-200mm f/2.8L
   <br>26 = Cosina 100mm f/3.5 Macro AF
   <br>28 = Tamron AF Aspherical 28-200mm f/3.8-5.6
   <br>29 = Canon EF 50mm f/1.8 MkII
   <br>39 = Canon EF 75-300mm f/4-5.6
   <br>40 = Canon EF 28-80mm f/3.5-5.6
+  <br>124 = Canon EF 65mm Macro Explorer f/2.8
   <br>125 = Canon TS-E 24mm f/3.5L
   <br>131 = Sigma 17-35mm f2.8-4 EX Aspherical HSM
   <br>135 = Canon EF 200mm f/1.8L
   <br>136 = Canon EF 300mm f/2.8L
   <br>139 = Canon EF 400mm f/2.8L
   <br>141 = Canon EF 500mm f/4.5L
+  <br>149 = Canon EF 100mm f/2
   <br>150 = Sigma 20mm EX f/1.8
-  <br>151 = Canon EF 200mm f/2.8L USM
+  <br>151 = Canon EF 200mm f/2.8L
+  <br>153 = Canon EF 35-350mm 3.5-5.6L
   <br>155 = Canon EF 85mm f/1.8 USM
   <br>156 = Canon EF 28-105mm f/3.5-4.5 USM
   <br>160 = Canon EF 20-35mm f/3.5-4.5 USM
-  <br>161 = Canon EF 28-70mm f/2.8mm L USM / Sigma 24-70mm EX f/2.8
+  <br>161 = Canon EF 28-70mm f/2.8L / Sigma 24-70mm EX f/2.8
   <br>165 = Canon EF 70-200mm f/2.8 L
   <br>166 = Canon EF 70-200mm f/2.8 L + x1.4
   <br>167 = Canon EF 70-200mm f/2.8 L + x2
   <br>169 = Sigma 15-30mm f/3.5-4.5 EX DG Aspherical
-  <br>173 = Sigma 180mm EX HSM Macro f/3.5
+  <br>170 = Canon EF 200mm f/2.8L II
+  <br>173 = Canon EF 180mm Macro f/3.5L / Sigma 180mm EX HSM Macro f/3.5
+  <br>174 = Canon EF 135mm f/2L
   <br>176 = Canon EF 24-85mm f/3.5-4.5 USM
+  <br>177 = Canon EF 300mm f/4L IS
   <br>178 = Canon EF 28-135mm f/3.5-5.6 IS
-  <br>182 = Canon EF 100-400mm f/4.5-5.6 L IS + x2
-  <br>183 = Canon EF 100-400mm f/4.5-5.6 L IS
+  <br>180 = Canon EF 35mm f/1.4L
+  <br>182 = Canon EF 100-400mm f/4.5-5.6L IS + x2
+  <br>183 = Canon EF 100-400mm f/4.5-5.6L IS
+  <br>186 = Canon EF 70-200mm f/4L
   <br>190 = Canon EF 100mm f/2.8 Macro
+  <br>191 = Canon EF 400mm f/4 DO IS
   <br>197 = Canon EF 75-300mm f/4-5.6 IS
+  <br>198 = Canon EF 50mm f/1.4
   <br>202 = Canon EF 28-80 f/3.5-5.6 USM IV
   <br>213 = Canon EF 90-300mm f/4.5-5.6
+  <br>229 = Canon EF 16-35mm 2.8L
+  <br>230 = Canon EF 24-70mm f/2.8L
   <br>231 = Canon EF 17-40mm f/4L</font></td></tr>
 <tr valign='top'>
 <td align='right'>23</td>
@@ -310,32 +340,37 @@
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>26</td>
+<td>MaxAperture</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td align='right'>28</td>
 <td>FlashActivity</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>29</td>
 <td>FlashBits</td>
 <td align='center'>int16s~</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>32</td>
 <td>FocusContinuous</td>
 <td align='center'>int16s</td>
 <td><font size='-1'>0 = Single
   <br>1 = Continuous</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>36</td>
 <td>ZoomedResolution</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>37</td>
 <td>ZoomedResolutionBase</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>42</td>
 <td>ColorTone</td>
 <td align='center'>int16s</td>
@@ -348,16 +383,23 @@
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td align='right'>0</td>
+<td>FocalType</td>
+<td align='center'>int16u</td>
+<td><font size='-1'><font color="#666666">(1D Mark II only)</font>
+  <br>1 = Fixed
+  <br>2 = Zoom</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
 <td>FocalLength</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>2</td>
 <td>FocalPlaneXSize</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>3</td>
 <td>FocalPlaneYSize</td>
 <td align='center'>int16u</td>
@@ -372,6 +414,16 @@
 <tr valign='top'>
 <td align='right'>2</td>
 <td>ISO</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>TargetAperture</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>TargetExposureTime</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -469,6 +521,27 @@
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Panorama'>Canon Panorama Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>PanoramaFrame</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>5</td>
+<td>PanoramaDirection</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Left to Right
+  <br>1 = Right to Left
+  <br>2 = Bottom to Top
+  <br>3 = Top to Bottom
+  <br>4 = 2x2 Matrix (Clockwise)</font></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='ColorInfoD30'>Canon ColorInfoD30 Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -484,6 +557,96 @@
 <td>ColorMatrix</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='LensInfo1D'>Canon LensInfo1D Tags</a></h2>
+Lens information for the 1D, 1DS and 1D Mark II only.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>ExposureTime</td>
+<td align='center'>int8u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>10</td>
+<td>FocalLength</td>
+<td align='center'>int8u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>13</td>
+<td>LensType</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>1 = Canon EF 50mm f/1.8
+  <br>2 = Canon EF 28mm f/2.8
+  <br>4 = Sigma UC Zoom 35-135mm f/4-5.6
+  <br>6 = Tokina AF193-2 19-35mm f/3.5-4.5
+  <br>10 = Sigma 50mm f/2.8 EX / 28mm f/1.8
+  <br>11 = Canon EF 35mm f/2
+  <br>13 = Canon EF 15mm f/2.8
+  <br>21 = Canon EF 80-200mm f/2.8L
+  <br>26 = Cosina 100mm f/3.5 Macro AF
+  <br>28 = Tamron AF Aspherical 28-200mm f/3.8-5.6
+  <br>29 = Canon EF 50mm f/1.8 MkII
+  <br>39 = Canon EF 75-300mm f/4-5.6
+  <br>40 = Canon EF 28-80mm f/3.5-5.6
+  <br>124 = Canon EF 65mm Macro Explorer f/2.8
+  <br>125 = Canon TS-E 24mm f/3.5L
+  <br>131 = Sigma 17-35mm f2.8-4 EX Aspherical HSM
+  <br>135 = Canon EF 200mm f/1.8L
+  <br>136 = Canon EF 300mm f/2.8L
+  <br>139 = Canon EF 400mm f/2.8L
+  <br>141 = Canon EF 500mm f/4.5L
+  <br>149 = Canon EF 100mm f/2
+  <br>150 = Sigma 20mm EX f/1.8
+  <br>151 = Canon EF 200mm f/2.8L
+  <br>153 = Canon EF 35-350mm 3.5-5.6L
+  <br>155 = Canon EF 85mm f/1.8 USM
+  <br>156 = Canon EF 28-105mm f/3.5-4.5 USM
+  <br>160 = Canon EF 20-35mm f/3.5-4.5 USM
+  <br>161 = Canon EF 28-70mm f/2.8L / Sigma 24-70mm EX f/2.8
+  <br>165 = Canon EF 70-200mm f/2.8 L
+  <br>166 = Canon EF 70-200mm f/2.8 L + x1.4
+  <br>167 = Canon EF 70-200mm f/2.8 L + x2
+  <br>169 = Sigma 15-30mm f/3.5-4.5 EX DG Aspherical
+  <br>170 = Canon EF 200mm f/2.8L II
+  <br>173 = Canon EF 180mm Macro f/3.5L / Sigma 180mm EX HSM Macro f/3.5
+  <br>174 = Canon EF 135mm f/2L
+  <br>176 = Canon EF 24-85mm f/3.5-4.5 USM
+  <br>177 = Canon EF 300mm f/4L IS
+  <br>178 = Canon EF 28-135mm f/3.5-5.6 IS
+  <br>180 = Canon EF 35mm f/1.4L
+  <br>182 = Canon EF 100-400mm f/4.5-5.6L IS + x2
+  <br>183 = Canon EF 100-400mm f/4.5-5.6L IS
+  <br>186 = Canon EF 70-200mm f/4L
+  <br>190 = Canon EF 100mm f/2.8 Macro
+  <br>191 = Canon EF 400mm f/4 DO IS
+  <br>197 = Canon EF 75-300mm f/4-5.6 IS
+  <br>198 = Canon EF 50mm f/1.4
+  <br>202 = Canon EF 28-80 f/3.5-5.6 USM IV
+  <br>213 = Canon EF 90-300mm f/4.5-5.6
+  <br>229 = Canon EF 16-35mm 2.8L
+  <br>230 = Canon EF 24-70mm f/2.8L
+  <br>231 = Canon EF 17-40mm f/4L</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>18</td>
+<td>ShortFocal</td>
+<td align='center'>int8u</td>
+<td><font size='-1'><font color="#666666">(1D Mark II only)</font></font></td></tr>
+<tr valign='top'>
+<td align='right'>20</td>
+<td>LongFocal</td>
+<td align='center'>int8u</td>
+<td><font size='-1'><font color="#666666">(1D Mark II only)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>45</td>
+<td>FocalType</td>
+<td align='center'>int8u</td>
+<td><font size='-1'><font color="#666666">(1D Mark II only)</font>
+  <br>0 = Fixed
+  <br>2 = Zoom</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PictureInfo'>Canon PictureInfo Tags</a></h2>
@@ -515,7 +678,7 @@
 <td align='right'>22</td>
 <td>AFPointsUsed</td>
 <td align='center'>int16u~</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(bits 6-0 correspond to focus points 1-7 respectively)</font></font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FileInfo'>Canon FileInfo Tags</a></h2>
@@ -680,6 +843,6 @@
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 7, 2005</i>
+<br><i>Last revised Jul 19, 2005</i>
 </body>
 </html>

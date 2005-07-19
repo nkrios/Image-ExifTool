@@ -1,7 +1,7 @@
 <html>
 <head>
   <title>ExifTool by Phil Harvey</title>
-  <meta name="KeyWords" content="meta, information, ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, JP2, PNG, GIF, MIFF, CRW, CR2, MRW, NEF, PEF, DNG, ORF, Canon, maker notes, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters, write, edit">
+  <meta name="KeyWords" content="meta, information, ExifTool, EXIF, GPS, exif, XMP, IPTC, GeoTIFF, JPG, JP2, GIF, PNG, MNG, JNG, MIFF, EPS, PS, AI, PDF, PSD, BMP, CRW, CR2, MRW, NEF, PEF, DNG, ORF, Canon, maker notes, THM, RAW, TIFF, Perl, script, extract, thumbnail, parameters, write, edit">
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
@@ -16,22 +16,22 @@ abilities, but with the release of version 5 all of the major planned
 writing features have now been incorporated!
 
 <h3>
-<a href="Image-ExifTool-5.32.tar.gz">
-Download        Version 5.32</a> - June 15, 2005
+<a href="Image-ExifTool-5.46.tar.gz">
+Download        Version 5.46</a> - July 19, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
 <a href="exiftool_pod.html">command-line application</a> for reading and writing
 meta information in image files.  It reads EXIF, GPS, IPTC, XMP, GeoTIFF, ICC
-Profile and Photoshop IRB meta information from JPG, JP2, TIFF, PNG, GIF, MIFF,
-CRW, THM, CR2, MRW, NEF, PEF, ORF and DNG images.  ExifTool also extracts
-information from the maker notes of many digital cameras by various
-manufacturers including Canon, Casio, FujiFilm, Kodak, Minolta/Konica-Minolta,
-Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and
-Sigma/Foveon.
+Profile and Photoshop IRB meta information from JPG, JP2, TIFF, GIF, PNG, MNG,
+JNG, MIFF, EPS, PS, AI, PDF, PSD, BMP, THM, CRW, CR2, MRW, NEF, PEF, ORF and DNG
+images. ExifTool also extracts information from the maker notes of many digital
+cameras by various manufacturers including Canon, Casio, FujiFilm, Kodak,
+Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
+Ricoh, Sanyo and Sigma/Foveon.
 
 <p>ExifTool writes EXIF, GPS, IPTC, XMP and MakerNotes meta information to
-JPEG, TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG images.  When writing,
+JPEG, TIFF, GIF, THM, CRW, CR2, NEF, PEF and DNG images.  When writing,
 ExifTool preserves the original file by adding "_original" to the file name.
 You should keep a copy of the original, or thoroughly validate the new file
 before erasing the original.  <a href="writing.html">Read here</a> for some
@@ -55,7 +55,7 @@ or suggestions.  My e-mail address is in the README file.  Thanks.
 <li>option to create text output file for each image file
 <li>extracts thumbnail images, preview images, and JPEG images embedded in RAW files
 <li>ability to organize output into groups
-<li>recognizes over <a href="TagNames/index.html">1400 different tags</a>
+<li>recognizes over <a href="TagNames/index.html">1500 different tags</a>
 <li>sets the file modification date from EXIF information
 </ul>
 
@@ -193,16 +193,17 @@ These groups are:
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile,
-IPTC, Jpeg2000, MIFF, MakerNotes, PNG, Photoshop, PrintIM, XMP</td></tr>
-<tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
-ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
-Kodak, KodakBordersIFD, KodakEffectsIFD, MIFF, MakerUnknown, Minolta, Nikon,
-NikonPreview, Olympus, PNG, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
-Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore,
-XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+<td>APP12, Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC,
+Jpeg2000, MIFF, MNG, MakerNotes, PNG, Photoshop, PostScript, PrintIM,
+XMP</td></tr> <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
+<td>APP12, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool,
+File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
+ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000, Kodak,
+KodakBordersIFD, KodakEffectsIFD, MIFF, MNG, MakerUnknown, Minolta, Nikon,
+NikonPreview, Olympus, PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM,
+Ricoh, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
+XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM,
+XMP-xmpRights
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
@@ -329,7 +330,7 @@ It's free, and you're free to use it however you want.
 There is still much unknown information in the maker notes for many camera
 models.  (To see this information, run exiftool with the -U option.)  If you
 manage to figure out what any of it means, send me an e-mail and I'll update
-ExifTool to decode this information.  Many thanks to all who have helped so far.
+ExifTool to decode this information.  Many thanks to all who have helped so far...
 
 <h2>Acknowledgements</h2>
 
@@ -377,6 +378,7 @@ And thanks to the following people for their help:
 <li>Markku H&auml;nninen for help decoding tags for the Olympus E-1
 <li>Frank Ledwon for decoding many new Olympus tags
 <li>Robert Rottmerhusen for decoding many tricky Nikon lens data tags
+<li>Michael Tiemann for decoded a number of new Canon tags
 </ul>
 
 <hr>

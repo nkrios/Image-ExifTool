@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: ExifTool.jpg
 [File, File, Image]  - Directory: t
-[File, File, Time]  - File Modification Date/Time: 2005:04:16 10:33:27
+[File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
 [File, File, Image]  - File Type: JPEG
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -51,5 +51,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4
+[Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 54.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 4.37 m
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)

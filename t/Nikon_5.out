@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.31
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4KB
@@ -120,6 +120,9 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/125
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Image]  - Circle Of Confusion: 0.020 mm
+[Composite, Composite, Image]  - Depth of Field: 0.03 m (0.69 - 0.72)
 [Composite, Composite, Camera]  - Focal Length: 50.0mm (35mm equivalent: 75.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 31.20 m
 [Composite, Composite, Camera]  - Lens: 50mm f/1.8 D
 [Composite, Composite, Image]  - Shooting Date/Time: 2005:03:18 02:55:18.16

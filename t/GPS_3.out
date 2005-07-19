@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: GPS_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:22:59
+[File, File, Time]  - File Modification Date/Time: 2005:06:27 12:08:35
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 120
 [File, File, Image]  - Image Height: 80
@@ -77,7 +77,6 @@
 [Composite, Composite, Image]  - Aperture: 0.6
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 120x80
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 0.0
 [Composite, Composite, Image]  - Shutter Speed: 1/724
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - Focal Length: 0.0mm (35mm equivalent: 0.0mm)
+[Composite, Composite, Camera]  - Focal Length: 0.0mm

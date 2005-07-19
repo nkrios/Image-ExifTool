@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: Panasonic_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 8KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:23:11
+[File, File, Time]  - File Modification Date/Time: 2005:06:27 12:08:50
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -76,7 +76,7 @@
 [MakerNotes, Panasonic, Camera] 41 - Panasonic 0x0029: 696
 [MakerNotes, Panasonic, Camera] 42 - Panasonic 0x002a: 0
 [MakerNotes, Panasonic, Camera] 43 - Panasonic 0x002b: 0
-[MakerNotes, Panasonic, Camera] 44 - Contrast: Standard
+[MakerNotes, Panasonic, Camera] 44 - Contrast: Normal
 [MakerNotes, Panasonic, Camera] 45 - Noise Reduction: Standard
 [MakerNotes, Panasonic, Camera] 46 - Panasonic 0x002e: 1
 [MakerNotes, Panasonic, Camera] 47 - Panasonic 0x002f: 4
@@ -102,4 +102,6 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 7.6
 [Composite, Composite, Image]  - Shutter Speed: 1/400
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Image]  - Circle Of Confusion: 0.004 mm
 [Composite, Composite, Camera]  - Focal Length: 4.6mm (35mm equivalent: 35.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 1.34 m

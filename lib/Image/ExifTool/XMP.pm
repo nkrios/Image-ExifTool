@@ -27,11 +27,11 @@
 package Image::ExifTool::XMP;
 
 use strict;
-use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace %niceNamespace);
+use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace %xlatNamespace);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.27';
+$VERSION = '1.30';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -43,8 +43,16 @@ sub DecodeBase64($);
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
 %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
 
-# translate ugly XMP namespaces to nicer ones for family 1 group names
-%niceNamespace = ( 'Iptc4xmpCore' => 'iptcCore' );
+# translate XMP namespaces for use in family 1 group names
+%xlatNamespace = (
+    # shorten ugly IPTC Core namespace prefix
+    'Iptc4xmpCore' => 'iptcCore',
+    # also translate older 'xap...' prefixes to 'xmp...'
+    'xap'          => 'xmp',
+    'xapBJ'        => 'xmpBJ',
+    'xapMM'        => 'xmpMM',
+    'xapRights'    => 'xmpRights',
+);
 
 # main XMP tag table
 %Image::ExifTool::XMP::Main = (
@@ -287,9 +295,10 @@ sub DecodeBase64($);
             Namespace => 'exif',
             PrintConv => {
                 0 => 'Normal',
-                1 => 'Soft',
-                2 => 'Hard',
+                1 => 'Low',
+                2 => 'High',
             },
+            PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
         },
     ],
     Saturation => [
@@ -302,6 +311,7 @@ sub DecodeBase64($);
                 1 => 'Low',
                 2 => 'High',
             },
+            PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
         },
     ],
     Sharpness => [
@@ -314,6 +324,7 @@ sub DecodeBase64($);
                 1 => 'Soft',
                 2 => 'Hard',
             },
+            PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
         },
     ],
     LuminanceSmoothing  => { Groups => { 2 => 'Image' } },
@@ -1100,7 +1111,7 @@ sub UnescapeHTML($)
 # Returns:   reference to decoded data
 sub DecodeBase64($)
 {
-    local($^W) = 0; # unpack("u",...) gives bogus warning in 5.00[123]
+    local($^W) = 0; # unpack('u',...) gives bogus warning in 5.00[123]
     my $str = shift;
 
     # truncate at first unrecognized character (base 64 data
@@ -1111,21 +1122,21 @@ sub DecodeBase64($)
 
     # convert the data to binary in chunks
     my $chunkSize = 60;
-    my $uuLen = pack("c", 32 + $chunkSize * 3 / 4); # calculate length byte
+    my $uuLen = pack('c', 32 + $chunkSize * 3 / 4); # calculate length byte
     my $dat = '';
     my ($i, $substr);
     # loop through the whole chunks
     my $len = length($str) - $chunkSize;
     for ($i=0; $i<=$len; $i+=$chunkSize) {
         $substr = substr($str, $i, $chunkSize);     # get a chunk of the data
-        $dat .= unpack("u", $uuLen . $substr);      # decode it
+        $dat .= unpack('u', $uuLen . $substr);      # decode it
     }
     $len += $chunkSize;
     # handle last partial chunk if necessary
     if ($i < $len) {
-        $uuLen = pack("c", 32 + ($len-$i) * 3 / 4); # recalculate length
+        $uuLen = pack('c', 32 + ($len-$i) * 3 / 4); # recalculate length
         $substr = substr($str, $i, $len-$i);        # get the last partial chunk
-        $dat .= unpack("u", $uuLen . $substr);      # decode it
+        $dat .= unpack('u', $uuLen . $substr);      # decode it
     }
     return \$dat;
 }
@@ -1207,14 +1218,12 @@ sub FoundXMP($$$$)
     }
     $tag = $exifTool->FoundTag($tagInfo, UnescapeHTML($val));
     # translate namespace if necessary
-    $namespace = $niceNamespace{$namespace} if $niceNamespace{$namespace};
+    $namespace = $xlatNamespace{$namespace} if $xlatNamespace{$namespace};
     $exifTool->SetTagExtra($tag, $namespace);
 
     if ($exifTool->Options('Verbose')) {
         my $tagID = join('/',@$props);
-        $exifTool->VerboseInfo($tagID, $tagInfo,
-            'Value'  => $val,
-        );
+        $exifTool->VerboseInfo($tagID, $tagInfo, Value=>$val);
     }
 }
 

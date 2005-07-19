@@ -5,6 +5,10 @@
 #
 # Revisions:    12/31/2004 - P. Harvey Created
 #               02/15/2005 - PH Added ability to generate TagNames documentation
+#
+# Notes:        Documentation for the tag tables may either be placed in the
+#               %docs hash below or in a NOTES entry in the table itself, and
+#               individual tags may have their own Notes entry.
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::BuildTagLookup;
@@ -16,7 +20,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.14';
+$VERSION = '1.17';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -60,7 +64,10 @@ cases, the actual name used depends on the context in which the information
 is found.  Case is not significant for tag names.  A question mark after a
 tag name indicates that the information is either not understood, not
 verified, or not very useful -- these tags are not extracted by ExifTool
-unless the Unknown (-u) option is enabled.
+unless the Unknown (-u) option is enabled.  Be aware that some tag names are
+different than the descriptions printed out by default when extracting
+information with "exiftool".  To see the tag names instead of the
+descriptions, use "exiftool -S".
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an "N" in this column means the tag is writable.  A "Y"
@@ -81,14 +88,14 @@ SetNewValuesFromFile() or when using the exiftool -TagsFromFile option, and
 care should be taken when editing them manually since they may affect the
 way an image is rendered.
 
-The HTML version of these tables also list possible B<Values> for all tags
-which have a discrete set of values, and give B<Notes> for some tags.
+The HTML version of this document also lists possible B<Values> for all tags
+which have a discrete set of values, and gives B<Notes> for some tags.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
 reason for this is to make the tag names more consistent across different
 types of meta information.  To determine a tag name, either consult this
-documentation or run C<exiftool -S> on a file containing the information in
+documentation or run "exiftool -S" on a file containing the information in
 question.
 },
     EXIF => q{
@@ -116,14 +123,17 @@ lists.
 
 The B<Group> column below gives the XMP schema namespace prefix for each
 tag.  The family 1 group names are composed from these schema names with a
-leading "XMP-" added.  If the same XMP tag name exists in more than one
+leading C<XMP-> added.  If the same XMP tag name exists in more than one
 group, all groups are written unless a family 1 group name is specified.
 ie) If XMP:Contrast is specified, information will be written to both
 XMP-crs:Contrast and XMP-exif:Contrast.
 
-Note: that the actual IPTC Core namespace schema prefix is C<Iptc4xmpCore>,
+Note:  The actual IPTC Core namespace schema prefix is C<Iptc4xmpCore>,
 which is the name used in the file, but ExifTool uses C<iptcCore> to
 generate the family 1 group name because C<Iptc4xmpCore> is a bit lengthy.
+Also, if the older C<xap>, C<xapRights>, C<xapMM> or C<xapBJ> prefixes are
+found, they are translated to the newer C<xmp>, C<xmpRights>, C<xmpMM> and
+C<xmpBJ> in family 1 group names.
 },
     IPTC => q{
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
@@ -155,7 +165,11 @@ The Kodak SpecialEffects and Borders tags are found in sub-IFD's within
 the Kodak "Meta" JPEG APP3 segment.
 },
     Minolta => q{
-These tags are used by Minolta and Konica/Minolta cameras.
+These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn't
+make things easy for decoders because the meaning of some tags and the
+location where some information is stored is different for different camera
+models.  (Take MinoltaQuality for example, which may be located in 3
+different places.)
 },
     Olympus => q{
 Tags 0x0000 through 0x0103 are used by some older Olympus cameras, and are
@@ -173,7 +187,8 @@ These tags are used in Sigma/Foveon cameras.
 },
     Sony => q{
 While current Sony camera models contain a wealth of information, very
-little is known about the Sony tags.
+little is known about the Sony tags.  I believe that Sony is attempting to
+hide information in their maker notes by encrypting it.  Idiots.
 },
     CanonRaw => q{
 These tags apply to Canon CRW-format RAW files.  When writing CanonRaw
@@ -185,6 +200,16 @@ change size.
     Unknown => q{
 The following tags are decoded in unsupported maker notes.  Use the Unknown
 (-u) option to display other unknown tags.
+},
+    PDF => q{
+The tags listed in the PDF tables below are those which are used by ExifTool
+to extract meta information, but they are only a small fraction of the total
+number of available PDF tags.
+},
+    APP12 => q{
+The JPEG APP12 segment may contain ASCI-based meta information.  ExifTool
+does not pre-define the names of these tags, but will extract the
+information for any tags found in this segment.
 },
     Extra => q{
 The extra tags represent information found in the image but not associated
@@ -568,11 +593,18 @@ sub GetTableOrder()
     my %gotTable;
     my $count = 0;
     my @tableNames = @tableOrder;
-    my @orderedTables;
+    my (@orderedTables, %mainTables, @outOfOrder);
+    my $lastTable = '';
 
     while (@tableNames) {
         my $tableName = shift @tableNames;
         next if $gotTable{$tableName};
+        if ($tableName =~ /^Image::ExifTool::(\w+)::Main/) {
+            $mainTables{$1} = 1;
+        } elsif ($lastTable and not $tableName =~ /^${lastTable}::/) {
+            push @outOfOrder, $tableName;
+        }
+        ($lastTable) = ($tableName =~ /^(Image::ExifTool::\w+)/);
         push @orderedTables, $tableName;
         $gotTable{$tableName} = 1;
         my $table = GetTagTable($tableName);
@@ -591,7 +623,30 @@ sub GetTableOrder()
         }
         unshift @tableNames, @moreTables;
     }
-    return @orderedTables
+    # clean up the order for tables which are out of order
+    # (groups all Canon and Kodak tables together)
+    my %fixOrder;
+    foreach (@outOfOrder) {
+        next unless /^Image::ExifTool::(\w+)/;
+        # only re-order tables which have a corresponding main table
+        next unless $mainTables{$1};
+        $fixOrder{$1} = [];     # fix the order of these tables
+    }
+    my (@sortedTables, %fixPos);
+    foreach (@orderedTables) {
+        if (/^Image::ExifTool::(\w+)/ and $fixOrder{$1}) {
+            my $fix = $fixOrder{$1};
+            @$fix or $fixPos{scalar(@sortedTables)} = $1;
+            push @{$fix}, $_;
+        } else {
+            push @sortedTables, $_;
+        }
+    }
+    # insert back in better order
+    foreach (reverse sort { $a <=> $b } keys %fixPos) {
+        splice(@sortedTables, $_, 0, @{$fixOrder{$fixPos{$_}}});
+    }
+    return @sortedTables
 }
 
 #------------------------------------------------------------------------------
@@ -684,7 +739,7 @@ sub CloseHtmlFiles()
 }
 
 #------------------------------------------------------------------------------
-# Write the TagName HTML documentation
+# Write the TagName HTML and POD documentation
 # Inputs: 0) BuildTagLookup object reference
 #         1) output pod file (ie. 'lib/Image/ExifTool/TagNames.pod')
 #         2) output html directory (ie. 'html')
@@ -725,8 +780,12 @@ sub WriteTagNames($$)
         my @names = split ' ', $short;
         my $class = shift @names;
         $url = "$class.html";
-        @names and $url .= '#' . join '_', @names;
-        print HTMLFILE "<a href='$url'>$short</a>\n";
+        my $indent = '';
+        if (@names) {
+            $url .= '#' . join '_', @names;
+            $indent = '&nbsp; &nbsp; ';
+        }
+        print HTMLFILE "$indent<a href='$url'>$short</a>\n";
         ++$count;
     }
     print HTMLFILE "</td></tr></table></td></tr></table></blockquote>\n\n";
@@ -741,7 +800,13 @@ sub WriteTagNames($$)
         my $composite = $short eq 'Composite';
         my $derived = $composite ? '<th>Derived From</th>' : '';
         my $podIdLen = $self->{LONG_ID}->{$tableName};
-        $podIdLen = $wID if $podIdLen < $wID;
+        if ($podIdLen <= $wID) {
+            $podIdLen = $wID;
+        } else {
+            # align tag names at the secondary column if possible
+            my $col = 20;
+            $podIdLen = $col if $podIdLen < $col;
+        }
         if ($id) {
             $hid = "<th>$id</th>";
             $wTag -= $podIdLen - $wID;
@@ -762,7 +827,8 @@ sub WriteTagNames($$)
                 $wTag -= $wGrp + 1;
             }
         }
-        print PODFILE "\n=head2 $short Tags\n";
+        my $head = ($short =~ / /) ? 'head3' : 'head2';
+        print PODFILE "\n=$head $short Tags\n";
         print PODFILE $docs{$short} if $docs{$short};
         my $table = GetTagTable($tableName);
         my $notes = $$table{NOTES};
@@ -797,8 +863,10 @@ sub WriteTagNames($$)
         print HTMLFILE "<table cellspacing=1 cellpadding=2><tr $bgHeading>$hid<th>Tag Name</th>\n";
         print HTMLFILE "<th>Writable</th>$derived<th>Values / ${noteFont}Notes</font></th></tr>\n";
         my $rowCol = 1;
+        my $infoCount = 0;
         my $infoList;
         foreach $infoList (@$info) {
+            ++$infoCount;
             my ($tagIDstr, $tagNames, $writable, $values, $require, $writeGroup) = @$infoList;
             my ($align, $idStr, $w);
             if (not $id) {
@@ -826,6 +894,7 @@ sub WriteTagNames($$)
             }
             my $tag = shift @tags;
             printf PODFILE "%s%-${wTag}s", $idStr, $tag;
+            warn "Warning: Pushed $tag\n" if $id and length($tag) > $wTag;
             printf PODFILE " %-${wGrp}s", shift(@wGrp) || '-' if $showGrp;
             if ($composite) {
                 @reqs = @$require;
@@ -897,6 +966,13 @@ sub WriteTagNames($$)
                 push @values, '&nbsp;';
             }
             print HTMLFILE join("\n  <br>",@values),"$close</td></tr>\n";
+        }
+        unless ($infoCount) {
+            printf PODFILE "  [no tags defined]\n";
+            my $cols = 3;
+            ++$cols if $hid;
+            ++$cols if $derived;
+            print HTMLFILE "<tr><td colspan=$cols align='center'>[no tags defined]</td></tr>\n";
         }
         print HTMLFILE "</table></td></tr></table></blockquote>\n\n";
     }

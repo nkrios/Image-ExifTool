@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.46
 [File, File, Image]  - File Name: Writer_15_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:23:26
+[File, File, Time]  - File Modification Date/Time: 2005:04:16 10:37:10
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 16
 [File, File, Image]  - Image Height: 16
@@ -25,9 +25,9 @@
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
-[EXIF, ExifIFD, Camera] 41992 - Contrast: +1
-[EXIF, ExifIFD, Camera] 41993 - Saturation: +1
-[EXIF, ExifIFD, Camera] 41994 - Sharpness: +1
+[EXIF, ExifIFD, Camera] 41992 - Contrast: High
+[EXIF, ExifIFD, Camera] 41993 - Saturation: High
+[EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [EXIF, ExifIFD, Image] 65000 - Owner Name: Phil Harvey
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
@@ -50,6 +50,7 @@
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 26 - Max Aperture: 3.6
 [MakerNotes, Canon, Camera] 28 - Flash Activity: 0
 [MakerNotes, Canon, Camera] 29 - Flash Bits: On, Internal flash
 [MakerNotes, Canon, Camera] 32 - Focus Continuous: Unknown (-1)
@@ -60,6 +61,8 @@
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
 [MakerNotes, Canon, Image] 2 - ISO Speed: 100
+[MakerNotes, Canon, Image] 4 - Target Aperture: 3.6
+[MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/60
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0

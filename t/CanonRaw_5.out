@@ -1,8 +1,8 @@
-  ExifToolVersion = 5.12
+  ExifToolVersion = 5.46
   FileName = CanonRaw.crw
   Directory = t
   FileSize = 6255
-  FileModifyDate = 2005:04:16 10:31:40
+  FileModifyDate = 1113662230
   FileType = Canon RAW
   + [Raw directory with 3 entries]
   | 0)  RawData = <Dummy raw image data>
@@ -65,6 +65,8 @@
   | | | 2)  CanonShotInfo (SubDirectory) -->
   | | | + [BinaryData directory, 66 bytes]
   | | | | ISO = 160
+  | | | | TargetAperture = 116
+  | | | | TargetExposureTime = 189
   | | | | ExposureCompensation = 0
   | | | | WhiteBalance = 0
   | | | | SequenceNumber = 0
@@ -103,6 +105,7 @@
   | | | | LongFocal = 55
   | | | | ShortFocal = 18
   | | | | FocalUnits = 1
+  | | | | MaxAperture = 116
   | | | | FlashActivity = 0
   | | | | FlashBits = 8200
   | | | | FocusContinuous = -1

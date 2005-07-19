@@ -26,6 +26,7 @@ CanonImageSize: Large
 CanonImageType: CRW:EOS DIGITAL REBEL CMOS RAW
 CanonImageWidth: 3072
 CanonImageWidthAsShot: 3072
+CircleOfConfusion: 0.019 mm
 ColorSpace: sRGB
 ColorTemperature: 5200
 ColorTone: Normal
@@ -42,7 +43,7 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 5.12
+ExifToolVersion: 5.46
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -51,7 +52,7 @@ ExposureTime: 4
 ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
-FileModifyDate: 2005:04:16 10:33:27
+FileModifyDate: 2005:05:25 13:40:58
 FileName: ExifTool.jpg
 FileNumber: 118-1861
 FileSize: 3KB
@@ -77,6 +78,7 @@ FocusDistanceLower: 5.46
 FocusDistanceUpper: -0.01
 FocusMode: Manual Focus
 FocusType: Auto (2)
+HyperfocalDistance: 4.37 m
 ISO: 100
 ISO (1): 100
 ImageHeight: 120
@@ -91,6 +93,7 @@ LensType: Unknown (-1)
 LongFocal: 55
 MacroMode: Unknown (0)
 Make: Canon
+MaxAperture: 4
 MaxApertureValue: 4.5
 MeteringMode: Center-weighted averaging
 MeteringMode (1): Average
@@ -124,6 +127,7 @@ ShootingMode: Manual
 ShortFocal: 18
 ShutterSpeed: 4
 ShutterSpeedValue: 0
+TargetAperture: 14
 UserComment: 
 WhiteBalance: Auto
 WhiteBalance (1): Auto

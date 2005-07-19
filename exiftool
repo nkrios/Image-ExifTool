@@ -81,7 +81,7 @@ my $quiet = 0;      # flag to disable printing of informational messages / warni
 my $overwriteOriginal; # flag to overwrite original file
 
 # my warn and die routines
-sub Warn { $quiet < 2 and warn @_; }
+sub Warn { warn(@_) if $quiet < 2 or $_[0] =~ /^Error/; }
 sub Die  { Warn @_; exit 1; }
 
 # define Cleanup and SigInt routines
@@ -119,6 +119,7 @@ while ($_ = shift) {
             }
             foreach (<ARGFILE>) {
                 s/^\s+//; s/\s+$//s; # remove leading/trailing white space
+                s/\s*=\s*/=/;        # remove white space around '=' sign
                 s/('|")(.*?)\1/$2/g; # remove quotes
                 push @ARGV, $_ unless $_ eq '' or /^#/;
             }
@@ -302,6 +303,16 @@ $multiFile = 1 if @files > 1;
 $showGroup = 0 if defined $showGroup and not $showGroup;
 @exclude and $mainTool->Options(Exclude => \@exclude);
 
+if ($binaryOutput) {
+    $outFormat = 99;    # shortest possible output format
+    $mainTool->Options(PrintConv => 0);
+    binmode(STDOUT);
+    $binaryStdout = 1;
+    # disable conflicting options
+    undef $showGroup;
+    $htmlOutput = 0;
+}
+
 # sort by groups to look nicer depending on options
 if (defined $showGroup and not (@tags and $allGroup)) {
     $mainTool->Options(Sort => "Group$showGroup"),
@@ -310,13 +321,6 @@ if (defined $showGroup and not (@tags and $allGroup)) {
 if ($outputExt) {
     # add '.' before output extension if it doesn't contain one already
     $outputExt = ".$outputExt" unless $outputExt =~ /\./;
-}
-
-if ($binaryOutput) {
-    $outFormat = 99;    # shortest possible output format
-    $mainTool->Options(PrintConv => 0);
-    binmode(STDOUT);
-    $binaryStdout = 1;
 }
 
 # scan through all specified files
@@ -524,7 +528,9 @@ sub GetImageInfo($$)
     if ($binaryOutput or not %$info) {
         my $warns = $exifTool->GetInfo('Warning', 'Error');
         foreach (sort keys %$warns) {
-            Warn "$_: $$warns{$_} - $file\n";
+            my $type = $_;
+            $type =~ s/ .*//;
+            Warn "$type: $$warns{$_} - $file\n";
         }
     }
     # escape characters for html if requested
@@ -623,10 +629,15 @@ sub GetImageInfo($$)
                 }
             }
 
-            my $description = $exifTool->GetDescription($tag);
-            ++$lineCount;
+            ++$lineCount;           # we are printing something meaningful
 
             my $id;
+            if ($binaryOutput) {
+                # translate scalar reference to actual binary data
+                $val = $$val if ref $val eq 'SCALAR';
+                print $fp $val;
+                next;
+            }
             if ($showTagID) {
                 $id = $exifTool->GetTagID($tag);
                 if ($id =~ /^\d/) {    # only print numeric ID's
@@ -634,13 +645,6 @@ sub GetImageInfo($$)
                 } else {
                     $id = '-';
                 }
-            }
-            if ($binaryOutput) {
-                # translate scalar reference to actual binary data
-                $val = $$val if ref $val eq 'SCALAR';
-                print $fp "$id " if $showTagID;
-                print $fp $val;
-                next;
             }
             if (ref $val eq 'SCALAR') {
                 my $msg;
@@ -657,6 +661,9 @@ sub GetImageInfo($$)
             $val =~ tr/\x01-\x1f\x7f/./;
             $val =~ s/\x00//g;
             $val =~ s/\s+$//;
+
+            # get description in case we need it
+            my $description = $exifTool->GetDescription($tag);
 
             if ($htmlOutput) {
                 print $fp "<tr>";
@@ -949,17 +956,17 @@ new file is OK before erasing the original.)
 Below is a list of meta information formats and file types currently
 supported by exiftool (r = read support, w = write support):
 
-     Meta Information                   File Types
-    ------------------          --------------------------
-    EXIF           r/w          JPEG   r/w      JP2    r   
-    GPS            r/w          TIFF   r/w      PNG    r    
-    IPTC           r/w          GIF    r/w      MIFF   r
-    XMP            r/w          THM    r/w      MRW    r
-    MakerNotes     r/w          CRW    r/w      ORF    r  
-    GeoTIFF        r            CR2    r/w
-    ICC Profile    r            DNG    r/w
-    Photoshop IRB  r            NEF    r/w
-    PrintIM        r            PEF    r/w  
+     Meta Information                         File Type
+    ------------------          --------------------------------------
+    EXIF           r/w          JPEG   r/w      JP2    r      PDF    r
+    GPS            r/w          TIFF   r/w      BMP    r      PSD    r
+    IPTC           r/w          GIF    r/w      PNG    r      MRW    r
+    XMP            r/w          THM    r/w      MNG    r      ORF    r
+    MakerNotes     r/w          CRW    r/w      JNG    r
+    Photoshop IRB  r/w          CR2    r/w      MIFF   r
+    GeoTIFF        r            DNG    r/w      EPS    r
+    ICC Profile    r            NEF    r/w      PS     r
+    PrintIM        r            PEF    r/w      AI     r
 
 =head1 OPTIONS
 
@@ -1159,7 +1166,8 @@ B<P>reserve date/time of original file when writing.
 =item B<-q>
 
 B<Q>uiet processing.  One C<-q> suppresses normal informational messages,
-and a second C<-q> suppresses warnings as well.
+and a second C<-q> suppresses warnings as well.  Error messages can not be
+suppressed.
 
 =item B<-r>
 
@@ -1429,7 +1437,11 @@ the new information.
 =item exiftool -tagsFromFile a.jpg -@ iptc2xmp.args -iptc:all= a.jpg
 
 Translate IPTC information to XMP with appropriate tag name conversions, and
-delete the original IPTC information in an image.
+delete the original IPTC information from an image.  This example uses
+iptc2xmp.args, which is a file included with the ExifTool distribution that
+contains the required arguments to convert IPTC information to XMP format.
+Also included with the distribution is xmp2iptc.args, which performs the
+inverse conversion.
 
 =back
 

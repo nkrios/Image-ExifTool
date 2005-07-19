@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.39
 [File, File, Image]  - File Name: Casio2.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
-[File, File, Time]  - File Modification Date/Time: 2005:04:13 19:33:39
+[File, File, Time]  - File Modification Date/Time: 2005:07:06 09:12:04
 [File, File, Image]  - File Type: JPEG
-[File, File, Image]  - Image Width: 160
-[File, File, Image]  - Image Height: 120
+[File, File, Image]  - Image Width: 16
+[File, File, Image]  - Image Height: 16
 [EXIF, IFD0, Camera] 271 - Make: CASIO COMPUTER CO.,LTD 
 [EXIF, IFD0, Camera] 272 - Camera Model Name: EX-Z3  
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -13,14 +13,14 @@
 [EXIF, IFD0, Image] 283 - Y Resolution: 72
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: 1.00                 
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:04:17 11:23:49
+[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:06:18 16:54:37
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/400
-[EXIF, ExifIFD, Image] 33437 - Aperture: 4.3
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/80
+[EXIF, ExifIFD, Image] 33437 - Aperture: 3.9
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:04:17 11:23:49
-[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:04:17 11:23:49
+[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:06:18 16:54:37
+[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:06:18 16:54:37
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.533203
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
@@ -28,47 +28,54 @@
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 5.8mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 12.2mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2048
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1536
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
-[EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
+[EXIF, ExifIFD, Camera] 41987 - White Balance: Manual
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: inf
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 35
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 74
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: None
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1302
-[EXIF, IFD1, Image] 514 - Thumbnail Length: 28
+[EXIF, IFD1, Image] 282 - X Resolution: 72
+[EXIF, IFD1, Image] 283 - Y Resolution: 72
+[EXIF, IFD1, Image] 296 - Resolution Unit: inches
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1396
+[EXIF, IFD1, Image] 514 - Thumbnail Length: 26
 [MakerNotes, Casio, Image] 2 - Preview Image Size: 320x240
 [MakerNotes, Casio, Image] 3 - Preview Image Length: 26
-[MakerNotes, Casio, Image] 4 - Preview Image Start: 1330
+[MakerNotes, Casio, Image] 4 - Preview Image Start: 1422
 [MakerNotes, Casio, Camera] 8192 - Preview Image: (Binary data 26 bytes)
-[MakerNotes, Casio, Camera] 8209 - White Balance Bias: 92 78
-[MakerNotes, Casio, Camera] 8210 - White Balance: Auto?
-[MakerNotes, Casio, Camera] 8226 - Object Distance: 536870.912 m
+[MakerNotes, Casio, Camera] 8209 - White Balance Bias: 87 93
+[MakerNotes, Casio, Camera] 8210 - White Balance: Unknown (13)
+[MakerNotes, Casio, Camera] 8226 - Object Distance: 1.000 m
 [MakerNotes, Casio, Camera] 8244 - Flash Distance: 0
 [MakerNotes, Casio, Camera] 12288 - Record Mode: Normal
 [MakerNotes, Casio, Camera] 12289 - Self Timer: Off
 [MakerNotes, Casio, Camera] 12290 - Quality: Fine
 [MakerNotes, Casio, Camera] 12291 - Focus Mode: Single-Area Auto Focus
-[MakerNotes, Casio, Camera] 12294 - Time Zone: London
+[MakerNotes, Casio, Camera] 12294 - Time Zone: New York
 [MakerNotes, Casio, Camera] 12295 - Bestshot Mode: Off
 [MakerNotes, Casio, Camera] 12308 - CCD ISO Sensitivity: 50
 [MakerNotes, Casio, Camera] 12309 - Color Mode: Off
 [MakerNotes, Casio, Camera] 12310 - Enhancement: Off
 [MakerNotes, Casio, Camera] 12311 - Filter: Off
-[Composite, Composite, Image]  - Aperture: 4.3
-[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Aperture: 3.9
+[Composite, Composite, Image]  - Image Size: 16x16
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.0
-[Composite, Composite, Image]  - Shutter Speed: 1/400
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - Focal Length: 5.8mm (35mm equivalent: 35.0mm)
+[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
+[Composite, Composite, Image]  - Shutter Speed: 1/80
+[Composite, Composite, Image]  - Thumbnail Image: (Binary data 26 bytes)
+[Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
+[Composite, Composite, Camera]  - Focal Length: 12.2mm (35mm equivalent: 74.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 7.70 m

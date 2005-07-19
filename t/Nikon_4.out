@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.31
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.45
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6KB
@@ -55,8 +55,8 @@
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: None
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
-[EXIF, ExifIFD, Camera] 41993 - Saturation: +2
-[EXIF, ExifIFD, Camera] 41994 - Sharpness: +2
+[EXIF, ExifIFD, Camera] 41993 - Saturation: High
+[EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown (0)
 [EXIF, ExifIFD, Image] 42240 - Gamma: 2.2
 [MakerNotes, Nikon, Camera] 1 - File System Version: 2.10
@@ -73,7 +73,7 @@
 [MakerNotes, NikonPreview, Image] 282 - X Resolution: 300
 [MakerNotes, NikonPreview, Image] 283 - Y Resolution: 300
 [MakerNotes, NikonPreview, Image] 296 - Resolution Unit: inches
-[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2480
+[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2460
 [MakerNotes, NikonPreview, Image] 514 - Preview Image Length: 0
 [MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -1.7
@@ -124,5 +124,8 @@
 [Composite, Composite, Camera]  - Lens: 18-70mm f/3.5-4.5 G
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/60
+[Composite, Composite, Image]  - Circle Of Confusion: 0.020 mm
+[Composite, Composite, Image]  - Depth of Field: 0.02 m (0.62 - 0.64)
 [Composite, Composite, Camera]  - Focal Length: 56.0mm (35mm equivalent: 84.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 31.31 m
 [Composite, Composite, Image]  - Shooting Date/Time: 2005:01:14 08:57:59.20

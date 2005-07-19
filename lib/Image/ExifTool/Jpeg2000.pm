@@ -397,7 +397,7 @@ sub Jpeg2000Info($)
     return 0 unless $raf->Read($hdr,12) == 12;
     return 0 unless $hdr eq "\x00\x00\x00\x0cjP  \x0d\x0a\x87\x0a" or     # (ref 1)
                     $hdr eq "\x00\x00\x00\x0cjP\x1a\x1a\x0d\x0a\x87\x0a"; # (ref 2)
-    $exifTool->FoundTag('FileType', 'JPEG 2000');
+    $exifTool->SetFileType('JPEG 2000');
     SetByteOrder('MM'); # JPEG 2000 files are big-endian
     my %dirInfo = (
         RAF => $raf,

@@ -20,9 +20,9 @@ require 5.004;  # require 5.004 for UNIVERSAL::isa (otherwise 5.002 would do)
 require Exporter;
 use File::RandomAccess;
 
-use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
-            @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr);
-$VERSION = '5.32';
+use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables @tableOrder
+            $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr @loadAllTables);
+$VERSION = '5.46';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -39,7 +39,7 @@ $VERSION = '5.32';
         Set32u
     )],
     Utils => [qw(
-        GetTagTable TagTableKeys GetTagInfoList GenerateTagIDs
+        GetTagTable TagTableKeys GetTagInfoList GenerateTagIDs SetFileType
     )],
     Vars => [qw(
         %allTables @tableOrder @fileTypes
@@ -75,43 +75,75 @@ sub WriteInfo($$$);
 sub WriteBinaryData($$$);
 sub CheckBinaryData($$$);
 
-# recognized file types (in the order we test unknown files)
-@fileTypes = ( 'JPEG', 'CRW', 'TIFF', 'MRW', 'ORF', 'GIF', 'JP2', 'PNG', 'MIFF' );
+# recognized file types, in the order we test unknown files
+# (Note: There is no need to test for MNG, JNG, PS or AI separately here
+# because they are parsed by the PNG and EPS code.)
+@fileTypes = qw(JPEG CRW TIFF MRW ORF GIF JP2 PNG MIFF EPS PDF PSD BMP);
+
+# file type lookup for all recognized file extensions
+my %fileTypeLookup = (
+    AI   => 'AI',   # Adobe Illustrator (PS-like)
+    BMP  => 'BMP',  # Windows BitMaP
+    CR2  => 'TIFF', # Canon RAW 2 format (tiff-like)
+    CRW  => 'CRW',  # Canon RAW format
+    DIB  => 'BMP',  # Device Independent Bitmap (aka. BMP)
+    DNG  => 'TIFF', # Digital Negative (TIFF-like)
+    EPS  => 'EPS',  # Encapsulated PostScript Format (.3)
+    EPSF => 'EPS',  # Encapsulated PostScript Format (.4)
+    GIF  => 'GIF',  # Compuserve Graphics Interchange Format
+    JNG  => 'JNG',  # JPG Network Graphics
+    JP2  => 'JP2',  # JPEG 2000 file
+    JPEG => 'JPEG', # Joint Photographic Experts Group (.4)
+    JPG  => 'JPEG', # Joint Photographic Experts Group (.3)
+    JPX  => 'JP2',  # JPEG 2000 file
+    MIF  => 'MIFF', # Magick Image File Format (.3)
+    MIFF => 'MIFF', # Magick Image File Format (.4)
+    MNG  => 'MNG',  # Multiple-image Network Graphics
+    MRW  => 'MRW',  # Minolta RAW format
+    NEF  => 'TIFF', # Nikon (RAW) Electronic Format (TIFF-like)
+    ORF  => 'ORF',  # Olympus RAW format
+    PDF  => 'PDF',  # Adobe Portable Document Format
+    PEF  => 'TIFF', # Pentax (RAW) Electronic Format (TIFF-like)
+    PNG  => 'PNG',  # Portable Network Graphics
+    PS   => 'PS',   # PostScript
+    PSD  => 'PSD',  # PhotoShop Drawing
+    THM  => 'JPEG', # Canon Thumbnail (aka. JPG)
+    TIF  => 'TIFF', # Tagged Image File Format (.3)
+    TIFF => 'TIFF', # Tagged Image File Format (.4)
+);
+
+# list of main tag tables to load in LoadAllTables() (sub-tables are recursed
+# automatically).  Note: They will appear in this order in the documentation,
+# so put the Exif Table first.
+@loadAllTables = qw(Exif CanonRaw Photoshop GeoTiff Jpeg2000 BMP PNG MNG MIFF
+                    PDF PostScript);
+
+# default group priority for writing
+my @defaultWriteGroups = ('EXIF','GPS','IPTC','XMP','MakerNotes','Photoshop');
+
+# group hash for ExifTool-generated tags
+my %allGroupsExifTool = ( 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'ExifTool' );
 
 # headers for various segment types
 $exifAPP1hdr = "Exif\0\0";
 $xmpAPP1hdr = "http://ns.adobe.com/xap/1.0/\0";
 $psAPP13hdr = "Photoshop 3.0\0";
 
-# hash of file types for all recognized file extensions
-my %fileTypeLookup = (
-    JPG  => 'JPEG', # normal JPEG extension
-    JPEG => 'JPEG', # JPEG 4-char extension
-    THM  => 'JPEG', # Canan thumbnail is JPG format
-    GIF  => 'GIF',  # Compuserve GIF
-    TIF  => 'TIFF', # normal TIFF extension
-    TIFF => 'TIFF', # TIFF 4-char extension
-    CR2  => 'TIFF', # Canan 1D Mk II RAW format is TIFF
-    MRW  => 'MRW',  # Minolta RAW format
-    CRW  => 'CRW',  # Canon RAW format
-    NEF  => 'TIFF', # Nikon RAW format is TIFF
-    PEF  => 'TIFF', # Pentax RAW format is TIFF
-    ORF  => 'ORF',  # Olympus RAW format
-    DNG  => 'TIFF', # Digital Negative is TIFF
-    JP2  => 'JP2',  # JPEG 2000 file
-    JPX  => 'JP2',  # JPEG 2000 file
-    PNG  => 'PNG',  # Portable Network Graphics
-    MIF  => 'MIFF', # Magick Image File Format
-    MIFF => 'MIFF', # Magick Image File Format
-);
-
-# group hash for ExifTool-generated tags
-my %allGroupsExifTool = ( 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'ExifTool' );
-
-# default group priority for writing
-my @defaultWriteGroups = ('EXIF','GPS','IPTC','XMP','MakerNotes','Photoshop');
-
 sub DummyWriteProc { return 1; }
+
+# tag information for preview image
+%Image::ExifTool::previewImageTagInfo = (
+    Name => 'PreviewImage',
+    Writable => 'undef',
+    # a value of 'none' is ok...
+    WriteCheck => '$val eq "none" ? undef : $self->CheckImage(\$val)',
+    DataTag => 'PreviewImage',
+    # we allow preview image to be set to '', but we don't want a zero-length value
+    # in the IFD, so set it temorarily to 'none'.  Note that the length is <= 4,
+    # so this value will fit in the IFD so the preview fixup won't be generated.
+    ValueConv => '$self->ValidateImage(\$val)',
+    ValueConvInv => '$val eq "" and $val="none"; $val',
+);
 
 # extra tags that aren't truly EXIF tags, but are generated by the script
 # Note: any tag in this list with a name corresponding to a Group0 name is
@@ -164,8 +196,8 @@ sub DummyWriteProc { return 1; }
         Description => 'ExifTool Version Number',
         Groups      => \%allGroupsExifTool
     },
-    Error       => { Name => 'Error',   Groups => \%allGroupsExifTool },
-    Warning     => { Name => 'Warning', Groups => \%allGroupsExifTool },
+    Error       => { Name => 'Error',   Priority => 0, Groups => \%allGroupsExifTool },
+    Warning     => { Name => 'Warning', Priority => 0, Groups => \%allGroupsExifTool },
 );
 
 # static private ExifTool variables
@@ -174,12 +206,18 @@ sub DummyWriteProc { return 1; }
 @tableOrder = ( );  # order the tables were loaded
 
 my $didTagID;       # flag indicating we are accessing tag ID's
+my $evalWarning;    # eval warning message
 
 # composite tags (accumulation of all Composite tag tables)
 %Image::ExifTool::compositeTags = (
     GROUPS => { 0 => 'Composite', 1 => 'Composite' },
     DID_TAG_ID => 1,    # want empty tagID's for composite tags
     WRITE_PROC => \&DummyWriteProc,
+);
+
+# empty hash to receive APP12 tags
+%Image::ExifTool::APP12 = (
+    GROUPS => { 0 => 'APP12', 1 => 'APP12', 2 => 'Image' },
 );
 
 # special tag names (not used for tag info)
@@ -366,11 +404,11 @@ sub ExtractInfo($;@)
     }
 
     if ($raf) {
-        if ($raf->{FILE_PT}) {
-            # get file size and last modified time
-            my $fileSize = -s $raf->{FILE_PT};
+        # get file size and last modified time if this is a plain file
+        if ($raf->{FILE_PT} and -f $raf->{FILE_PT}) {
+            my $fileSize = -s _;
+            my $fileTime = -M _;
             $self->FoundTag('FileSize', $fileSize) if defined $fileSize;
-            my $fileTime = -M $raf->{FILE_PT};
             $self->FoundTag('FileModifyDate', $^T - $fileTime*(24*3600)) if defined $fileTime;
         }
         # process the image
@@ -397,6 +435,8 @@ sub ExtractInfo($;@)
             my $type = shift @fileTypeList;
             # save file type in member variable
             $self->{FILE_TYPE} = $type;
+            # extract information from our file
+            # Note: be sure to load modules using GetTagTable() if they contain tables!
             if ($type eq 'JPEG') {
                 $self->JpegInfo() and last;
             } elsif ($type eq 'JP2') {
@@ -405,19 +445,31 @@ sub ExtractInfo($;@)
             } elsif ($type eq 'GIF') {
                 $self->GifInfo() and last;
             } elsif ($type eq 'CRW') {
-                # must be sure we have loaded CanonRaw before we can call CrwInfo()
                 GetTagTable('Image::ExifTool::CanonRaw::Main');
                 Image::ExifTool::CanonRaw::CrwInfo($self) and last;
             } elsif ($type eq 'MRW') {
-                # must be sure we have loaded Minolta tables before we can call MrwInfo()
                 GetTagTable('Image::ExifTool::Minolta::Main');
-                Image::ExifTool::Minolta::MrwInfo($self, $raf) and last;
-            } elsif ($type eq 'PNG') {
+                Image::ExifTool::Minolta::MrwInfo($self) and last;
+            } elsif ($type =~ /^(PNG|MNG|JNG)$/) {
                 GetTagTable('Image::ExifTool::PNG::Main');
                 Image::ExifTool::PNG::PngInfo($self) and last;
+                # 'convert' can produce JNG images in regular JPEG format...
+                $type eq 'JNG' and $self->JpegInfo() and last;
             } elsif ($type eq 'MIFF') {
                 GetTagTable('Image::ExifTool::MIFF::Main');
                 Image::ExifTool::MIFF::MiffInfo($self) and last;
+            } elsif ($type =~ /^(PS|EPS|AI)$/) {
+                GetTagTable('Image::ExifTool::PostScript::Main');
+                Image::ExifTool::PostScript::PostScriptInfo($self) and last;
+            } elsif ($type eq 'PDF') {
+                GetTagTable('Image::ExifTool::PDF::Main');
+                Image::ExifTool::PDF::PdfInfo($self) and last;
+            } elsif ($type eq 'PSD') {
+                GetTagTable('Image::ExifTool::Photoshop::Main');
+                Image::ExifTool::Photoshop::PsdInfo($self) and last;
+            } elsif ($type eq 'BMP') {
+                GetTagTable('Image::ExifTool::BMP::Main');
+                Image::ExifTool::BMP::BmpInfo($self) and last;
             } else {
                 # assume anything else is TIFF format (or else we can't read it)
                 $self->TiffInfo($tiffType, $raf) and last;
@@ -456,7 +508,7 @@ sub ExtractInfo($;@)
 #         1-N) options hash reference, tag list reference or tag names
 # Returns: Reference to information hash
 # Notes: - pass an undefined value to avoid parsing arguments
-#        - If groups are specified, first groups take precidence if duplicate
+#        - If groups are specified, first groups take precedence if duplicate
 #          tags found but Duplicates option not set.
 sub GetInfo($;@)
 {
@@ -1247,7 +1299,7 @@ EXPAND_TAG:
     foreach $entry (@$tagList) {
         ($tag = $entry) =~ s/^-//;  # remove leading '-'
         foreach (keys %Image::ExifTool::Shortcuts::Main) {
-            /^$tag$/i or next;
+            /^\Q$tag\E$/i or next;
             if ($tag eq $entry) {
                 push @expandedTags, @{$Image::ExifTool::Shortcuts::Main{$_}};
             } else {
@@ -1342,6 +1394,27 @@ sub SetupTagTable($)
             }
         }
     }
+}
+
+#------------------------------------------------------------------------------
+# Utilities to check for numerical types
+# Inputs: 0) value;  Returns: true if value is a numerical type
+sub IsFloat($) {
+    return scalar($_[0] =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/);
+}
+sub IsInt($)   { return scalar($_[0] =~ /^[+-]?\d+$/); }
+
+#------------------------------------------------------------------------------
+# Utility to convert a string to a to floating point number
+# Inputs: 0) string;  Returns: floating point value (or undef if no float found)
+sub ToFloat($)
+{
+    my $val = shift;
+    return undef unless defined $val;
+    return $val if IsFloat($val);
+    # extract the first float we find
+    return $& if $val =~ /([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?/;
+    return undef;
 }
 
 #------------------------------------------------------------------------------
@@ -1600,6 +1673,31 @@ sub ReadValue($$$$$)
 }
 
 #------------------------------------------------------------------------------
+# Validate an extracted image and repair if necessary
+# Inputs: 0) ExifTool object reference, 1) image reference,
+#         2) optional tag name (defaults to 'PreviewImage')
+# Returns: image reference or undef if it wasn't valid
+sub ValidateImage($$$)
+{
+    my ($self, $imagePt, $tag) = @_;
+    return undef if $$imagePt eq 'none';
+    unless ($$imagePt =~ /^(Binary data|\xff\xd8)/ or
+            # the first byte of the preview of some Minolta cameras is wrong,
+            # so check for this and set it back to 0xff if necessary
+            $$imagePt =~ s/^.\xd8\xff\xdb/\xff\xd8\xff\xdb/ or
+            $self->Options('IgnoreMinorErrors'))
+    {
+        # issue warning only if the tag was specifically requested
+        $tag or $tag = 'PreviewImage';
+        if ($self->{REQ_TAG_LOOKUP}->{lc($tag)}) {
+            $self->Warn("$tag is not a valid image");
+            return undef;
+        }
+    }
+    return $imagePt;
+}
+
+#------------------------------------------------------------------------------
 # make description from a tag name
 # Inputs: 0) tag name 1) optional tagID to add at end of description
 # Returns: description
@@ -1740,7 +1838,7 @@ sub JpegInfo($)
     # check to be sure this is a valid JPG file
     return 0 unless $raf->Read($s,2) == 2 and $s eq "\xff\xd8";
     $dumpParms{MaxLen} = 128 if $verbose < 4;
-    $self->FoundTag('FileType', 'JPEG');   # set file type
+    $self->SetFileType();   # set FileType tag
 
     # set input record separator to 0xff (the JPEG marker) to make reading quicker
     my $oldsep = $/;
@@ -1811,7 +1909,7 @@ sub JpegInfo($)
             $verbose and print "JPEG EOI\n";
             $rtnVal = 1;
             my $buff;
-            $raf->Read($buff, 2) or last;
+            $raf->Read($buff, 2) == 2 or last;
             if ($buff eq "\xff\xd8") {
                 # adjust PreviewImageStart to this location
                 my $start = $self->{PRINT_CONV}->{PreviewImageStart};
@@ -1921,6 +2019,19 @@ sub JpegInfo($)
                 $self->{EXIF_POS} = $segPos + 6;
                 $self->TiffInfo($markerName,undef,$segPos+6);
             }
+        } elsif ($marker == 0xec) {         # APP12 (ASCII meta information)
+            my @lines = split /[\x0d\x0a]+/, $$segDataPt;
+            my $tagTablePtr = GetTagTable('Image::ExifTool::APP12');
+            foreach (@lines) {
+                /(\w+)=(.+)/ or next;
+                my ($tag, $val) = ($1, $2);
+                my $tagInfo = $self->GetTagInfo($tagTablePtr, $tag);
+                unless ($tagInfo) {
+                    $tagInfo = { Name => $tag };
+                    AddTagToTable($tagTablePtr, $tag, $tagInfo);
+                }
+                $self->FoundTag($tagInfo, $val);
+            }
         } elsif ($marker == 0xed) {         # APP13 (Photoshop)
             if ($$segDataPt =~ /^$psAPP13hdr/) {
                 # add this data to the combined data if it exists
@@ -2002,7 +2113,7 @@ sub GifInfo($;$)
         if (ord($s) & 0x80) { # does this image contain a color table?
             # calculate color table size
             $length = 3 * (2 << (ord($s) & 0x07));
-            $raf->Read($buff, $length) or return 0;  # skip color table
+            $raf->Read($buff, $length) == $length or return 0; # skip color table
             Write($outfile, $buff) or $err = 1 if $outfile;
             # write the comment first if necessary
             if ($outfile and defined $newComment) {
@@ -2138,7 +2249,7 @@ sub TiffInfo($$;$$$)
         if ($outfile) {
             $raf->Seek(0, 0) or return 0;
             if ($base) {
-                $raf->Read($$dataPt,$base) or return 0;
+                $raf->Read($$dataPt,$base) == $base or return 0;
                 Write($outfile, $$dataPt) or $err = 1;
             }
         } else {
@@ -2487,7 +2598,7 @@ sub AddTagToTable($$$)
 #         2) data value (may be undefined if building composite tag)
 #         3) optional reference to list of values used to build composite tags
 #         4) optional reference to list of print values for composite tags
-# Returns: tag key
+# Returns: tag key or undef if no value
 sub FoundTag($$$$;$$)
 {
     local $_;
@@ -2495,7 +2606,7 @@ sub FoundTag($$$$;$$)
     my ($tag, @val, @valPrint);
 
     if (ref($tagInfo) eq 'HASH') {
-        $tag = $$tagInfo{Name} or warn("No tag name\n"), return;
+        $tag = $$tagInfo{Name} or warn("No tag name\n"), return undef;
     } else {
         $tag = $tagInfo;
         # look for tag in extraTags
@@ -2551,9 +2662,17 @@ sub FoundTag($$$$;$$)
                     $printConv = "Unknown ($val)";
                 }
             } else {
+                local $SIG{__WARN__} = sub { $evalWarning = $_[0]; };
+                undef $evalWarning;
                 #### eval PrintConv ($val, $self, @val, @valPrint)
                 $printConv = eval $printConversion;
-                $@ and warn "PrintConv $tag: $@";
+                if ($@ or $evalWarning) {
+                    $@ and $evalWarning = $@;
+                    chomp $evalWarning;
+                    $evalWarning =~ s/ at \(eval .*//s;
+                    delete $SIG{__WARN__};
+                    warn "PrintConv $tag: $evalWarning\n";
+                }
                 $printConv = 'Undefined' unless defined $printConv;
                 # WARNING: do not change $val after this (because $printConv
                 # could be a reference to $val for binary data types)
@@ -2568,7 +2687,9 @@ sub FoundTag($$$$;$$)
     if (defined $self->{PRINT_CONV}->{$tag}) {
         my $valueConvHash = $self->{VALUE_CONV};
         my $printConvHash = $self->{PRINT_CONV};
-        if ($$tagInfo{List} and $tagInfo eq $self->{TAG_INFO}->{$tag}) {
+        if ($$tagInfo{List} and $tagInfo eq $self->{TAG_INFO}->{$tag} and
+            not $self->{NO_LIST})
+        {
             # make lists from adjacent tags with the same information:
             # PrintConv: a comma separated list unless 'List' option set
             if ($self->{OPTIONS}->{List}) {
@@ -2597,7 +2718,8 @@ sub FoundTag($$$$;$$)
             my $priority = $$tagInfo{Priority};
             if (defined $priority) {
                 # increase priority for zero priority tags if this is the priority dir
-                $priority = 1 if $priority == 0 and $self->{DIR_NAME} eq $self->{PRIORITY_DIR};
+                $priority = 1 if $priority == 0 and $self->{DIR_NAME} and
+                    $self->{PRIORITY_DIR} and $self->{DIR_NAME} eq $self->{PRIORITY_DIR};
                 my $oldPriority = $self->{PRIORITY}->{$tag} || 1;
                 if ($priority >= $oldPriority) {
                     $self->{PRIORITY}->{$tag} = $priority;
@@ -2707,6 +2829,16 @@ sub DeleteTag($$)
 }
 
 #------------------------------------------------------------------------------
+# Set the FileType tag
+# Inputs: 0) ExifTool object reference
+#         1) Optional file type (uses FILE_TYPE if not specified)
+sub SetFileType()
+{
+    my ($self, $fileType) = @_;
+    $self->FoundTag('FileType', $fileType || $self->{FILE_TYPE});
+}
+
+#------------------------------------------------------------------------------
 # extract binary data from file
 # 0) ExifTool object reference, 1) offset, 2) length, 3) tag name if conditional
 # Returns: binary data, or undef on error
@@ -2783,6 +2915,7 @@ sub ProcessBinaryData($$$)
         }
         my $count = 1;
         my $format = $$tagInfo{Format};
+        my $entry = $index * $increment;        # relative offset of this entry
         if ($format) {
             if ($format =~ /(.*)\[(.*)\]/) {
                 $format = $1;
@@ -2791,6 +2924,9 @@ sub ProcessBinaryData($$$)
                 #### eval Format size (%val, $size)
                 $count = eval $count;
                 $@ and warn("Format $$tagInfo{Name}: $@"), next;
+            } elsif ($format eq 'string') {
+                # allow string with no specified count to run to end of block
+                $count = ($size > $entry) ? $size - $entry : 0;
             }
         } else {
             $format = $defaultFormat;
@@ -2799,7 +2935,6 @@ sub ProcessBinaryData($$$)
             # calculate next valid index for unknown tag
             $nextIndex = $index + ($formatSize{$format} * $count) / $increment;
         }
-        my $entry = $index * $increment;        # relative offset of this entry
         my $val = ReadValue($dataPt, $entry+$offset, $format, $count, $size-$entry);
         next unless defined $val;
         if ($verbose) {

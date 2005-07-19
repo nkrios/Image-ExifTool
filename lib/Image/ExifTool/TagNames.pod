@@ -26,7 +26,10 @@ cases, the actual name used depends on the context in which the information
 is found.  Case is not significant for tag names.  A question mark after a
 tag name indicates that the information is either not understood, not
 verified, or not very useful -- these tags are not extracted by ExifTool
-unless the Unknown (-u) option is enabled.
+unless the Unknown (-u) option is enabled.  Be aware that some tag names are
+different than the descriptions printed out by default when extracting
+information with "exiftool".  To see the tag names instead of the
+descriptions, use "exiftool -S".
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an "N" in this column means the tag is writable.  A "Y"
@@ -47,14 +50,14 @@ SetNewValuesFromFile() or when using the exiftool -TagsFromFile option, and
 care should be taken when editing them manually since they may affect the
 way an image is rendered.
 
-The HTML version of these tables also list possible B<Values> for all tags
-which have a discrete set of values, and give B<Notes> for some tags.
+The HTML version of this document also lists possible B<Values> for all tags
+which have a discrete set of values, and gives B<Notes> for some tags.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
 reason for this is to make the tag names more consistent across different
 types of meta information.  To determine a tag name, either consult this
-documentation or run C<exiftool -S> on a file containing the information in
+documentation or run "exiftool -S" on a file containing the information in
 question.
 
 =head2 EXIF Tags
@@ -211,7 +214,7 @@ default B<Group> listed below is used unless another group is specified.
   0x84ee   HCUsage                   -          N
   0x8568   IPTC-NAA2                 -          IPTC
   0x85d8   ModelTransform            -          N
-  0x8649   PhotoshopSettings         -          N
+  0x8649   PhotoshopSettings         -          Photoshop
   0x8769   ExifOffset                -          EXIF
   0x8773   ICC_Profile               -          ICC_Profile
   0x87ac   ImageLayer                -          N
@@ -261,7 +264,6 @@ default B<Group> listed below is used unless another group is specified.
   0x927c   MakerNoteCanon            ExifIFD    Canon
            MakerNoteCasio            ExifIFD    Casio
            MakerNoteCasio2           ExifIFD    Casio Type2
-           MakerNoteCasioEX-Z3       ExifIFD    Casio Type2
            MakerNoteFujiFilm         ExifIFD    FujiFilm
            MakerNoteKodak1a          ExifIFD    Kodak
            MakerNoteKodak1b          ExifIFD    Kodak
@@ -293,11 +295,11 @@ default B<Group> listed below is used unless another group is specified.
   0x9291   SubSecTimeOriginal        ExifIFD    string
   0x9292   SubSecTimeDigitized       ExifIFD    string
   0x935c   ImageSourceData           -          N
-  0x9c9b   XPTitle                   ExifIFD    undef
-  0x9c9c   XPComment                 ExifIFD    undef
-  0x9c9d   XPAuthor                  ExifIFD    undef
-  0x9c9e   XPKeywords                ExifIFD    undef
-  0x9c9f   XPSubject                 ExifIFD    undef
+  0x9c9b   XPTitle                   IFD0       undef
+  0x9c9c   XPComment                 IFD0       undef
+  0x9c9d   XPAuthor                  IFD0       undef
+  0x9c9e   XPKeywords                IFD0       undef
+  0x9c9f   XPSubject                 IFD0       undef
   0xa000   FlashpixVersion           ExifIFD    undef
   0xa001   ColorSpace                ExifIFD    int16u
   0xa002   ExifImageWidth            ExifIFD    int16u
@@ -444,14 +446,17 @@ lists.
 
 The B<Group> column below gives the XMP schema namespace prefix for each
 tag.  The family 1 group names are composed from these schema names with a
-leading "XMP-" added.  If the same XMP tag name exists in more than one
+leading C<XMP-> added.  If the same XMP tag name exists in more than one
 group, all groups are written unless a family 1 group name is specified.
 ie) If XMP:Contrast is specified, information will be written to both
 XMP-crs:Contrast and XMP-exif:Contrast.
 
-Note: that the actual IPTC Core namespace schema prefix is C<Iptc4xmpCore>,
+Note:  The actual IPTC Core namespace schema prefix is C<Iptc4xmpCore>,
 which is the name used in the file, but ExifTool uses C<iptcCore> to
 generate the family 1 group name because C<Iptc4xmpCore> is a bit lengthy.
+Also, if the older C<xap>, C<xapRights>, C<xapMM> or C<xapBJ> prefixes are
+found, they are translated to the newer C<xmp>, C<xmpRights>, C<xmpMM> and
+C<xmpBJ> in family 1 group names.
 
   Tag Name                           Group      Writable
   --------                           -----      --------
@@ -748,7 +753,7 @@ own set of tags.
       8    IPTCObjectData                       IPTC ObjectData
       9    IPTCPostObjectData                   IPTC PostObjectData
 
-=head2 IPTC EnvelopeRecord Tags
+=head3 IPTC EnvelopeRecord Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -767,7 +772,7 @@ own set of tags.
     120    ARMIdentifier                        int16u
     122    ARMVersion                           int16u
 
-=head2 IPTC ApplicationRecord Tags
+=head3 IPTC ApplicationRecord Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -840,7 +845,7 @@ own set of tags.
     231    DocumentHistory                      string[0,256]
     232    ExifCameraInfo                       string[0,4096]
 
-=head2 IPTC NewsPhoto Tags
+=head3 IPTC NewsPhoto Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -871,7 +876,7 @@ own set of tags.
     140    MaximumDensityRange                  int16u
     145    GammaCompensatedValue                int16u
 
-=head2 IPTC PreObjectData Tags
+=head3 IPTC PreObjectData Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -880,17 +885,92 @@ own set of tags.
      90    ObjectSizeAnnounced                  N
      95    MaximumObjectSize                    N
 
-=head2 IPTC ObjectData Tags
+=head3 IPTC ObjectData Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
      10    SubFile                              N
 
-=head2 IPTC PostObjectData Tags
+=head3 IPTC PostObjectData Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
      10    ConfirmedObjectSize                  N
+
+=head2 Photoshop Tags
+
+Many Photoshop tags are marked as Unknown (indicated by a question mark
+after the tag name) because the information they provide is not very useful
+under normal circumstances.  Unknown tags are not extracted unless the
+Unknown (-u) option is used.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x03e8   Photoshop2Info?                      N
+  0x03e9   MacintoshPrintInfo?                  N
+  0x03ea   XMLData?                             N
+  0x03eb   Photoshop2ColorTable?                N
+  0x03ed   ResolutionInfo?                      N
+  0x03ee   AlphaChannelsNames                   N
+  0x03ef   DisplayInfo?                         N
+  0x03f0   PStringCaption?                      N
+  0x03f1   BorderInformation?                   N
+  0x03f2   BackgroundColor?                     N
+  0x03f3   PrintFlags?                          N
+  0x03f4   BW_HalftoningInfo?                   N
+  0x03f5   ColorHalftoningInfo?                 N
+  0x03f6   DuotoneHalftoningInfo?               N
+  0x03f7   BW_TransferFunc?                     N
+  0x03f8   ColorTransferFuncs?                  N
+  0x03f9   DuotoneTransferFuncs?                N
+  0x03fa   DuotoneImageInfo?                    N
+  0x03fb   EffectiveBW?                         N
+  0x03fc   ObsoletePhotoshopTag1?               N
+  0x03fd   EPSOptions?                          N
+  0x03fe   QuickMaskInfo?                       N
+  0x03ff   ObsoletePhotoshopTag2?               N
+  0x0400   LayerStateInfo?                      N
+  0x0401   WorkingPath?                         N
+  0x0402   LayersGroupInfo?                     N
+  0x0403   ObsoletePhotoshopTag3?               N
+  0x0404   IPTCData                             IPTC
+  0x0405   RawImageMode?                        N
+  0x0406   JPEG_Quality                         Photoshop JPEG_Quality
+  0x0408   GridGuidesInfo?                      N
+  0x0409   ThumbnailResource?                   N
+  0x040a   CopyrightFlag                        Y
+  0x040b   URL                                  Y
+  0x040c   PhotoshopThumbnail                   N
+  0x040d   GlobalAngle?                         N
+  0x040e   ColorSamplersResource?               N
+  0x040f   ICC_Profile?                         N
+  0x0410   Watermark?                           N
+  0x0411   ICC_Untagged?                        N
+  0x0412   EffectsVisible?                      N
+  0x0413   SpotHalftone?                        N
+  0x0414   IDsBaseValue?                        N
+  0x0415   UnicodeAlphaNames?                   N
+  0x0416   IndexedColourTableCount?             N
+  0x0417   TransparentIndex?                    N
+  0x0419   GlobalAltitude?                      N
+  0x041a   Slices?                              N
+  0x041b   WorkflowURL?                         N
+  0x041c   JumpToXPEP?                          N
+  0x041d   AlphaIdentifiers?                    N
+  0x041e   URL_List?                            N
+  0x0421   VersionInfo?                         N
+  0x0422   TIFFThumbnail                        N
+  0x0424   XMP                                  XMP
+  0x0bb7   ClippingPathName?                    N
+  0x2710   PrintFlagsInfo?                      N
+
+=head3 Photoshop JPEG_Quality Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    PhotoshopQuality                     N
+      1    PhotoshopFormat                      N
+      2    ProgressiveScans                     N
 
 =head2 ICC_Profile Tags
 
@@ -951,7 +1031,7 @@ own set of tags.
   'vued'   ViewingCondDesc                      N
   'wtpt'   MediaWhitePoint                      N
 
-=head2 ICC_Profile Header Tags
+=head3 ICC_Profile Header Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -972,7 +1052,7 @@ own set of tags.
      80    ProfileCreator                       N
      84    ProfileID                            N
 
-=head2 ICC_Profile Chromaticity Tags
+=head3 ICC_Profile Chromaticity Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -983,7 +1063,7 @@ own set of tags.
      28    ChromaticityChannel3                 N
      36    ChromaticityChannel4                 N
 
-=head2 ICC_Profile ColorantTable Tags
+=head3 ICC_Profile ColorantTable Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -995,7 +1075,7 @@ own set of tags.
      88    Colorant3Name                        N
     120    Colorant3Coordinates                 N
 
-=head2 ICC_Profile Measurement Tags
+=head3 ICC_Profile Measurement Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -1005,7 +1085,7 @@ own set of tags.
      28    MeasurementFlare                     N
      32    MeasurementIlluminant                N
 
-=head2 ICC_Profile ViewingConditions Tags
+=head3 ICC_Profile ViewingConditions Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -1061,13 +1141,16 @@ null terminator which is added automatically by ExifTool.
   ------   --------                             --------
   0x0001   CanonCameraSettings                  Canon CameraSettings
   0x0002   CanonFocalLength                     Canon FocalLength
+  0x0003   CanonFlashInfo?                      N
   0x0004   CanonShotInfo                        Canon ShotInfo
+  0x0005   CanonPanorama                        Canon Panorama
   0x0006   CanonImageType                       string
   0x0007   CanonFirmwareVersion                 string
   0x0008   FileNumber                           int32u
   0x0009   OwnerName                            string
   0x000a   CanonColorInfoD30                    Canon ColorInfoD30
   0x000c   SerialNumber                         int32u
+  0x000d   CanonLensInfo1D                      Canon LensInfo1D
   0x000e   CanonFileLength                      int32u
   0x000f   CanonCustomFunctions10D              CanonCustom Functions10D
            CanonCustomFunctions20D              CanonCustom Functions20D
@@ -1080,7 +1163,7 @@ null terminator which is added automatically by ExifTool.
   0x00ae   ColorTemperature                     int16u
   0x00b6   PreviewImageInfo                     Canon PreviewImageInfo
 
-=head2 Canon CameraSettings Tags
+=head3 Canon CameraSettings Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -1105,6 +1188,7 @@ null terminator which is added automatically by ExifTool.
      23    LongFocal                            int16s
      24    ShortFocal                           int16s
      25    FocalUnits                           int16s
+     26    MaxAperture                          int16s
      28    FlashActivity                        int16s
      29    FlashBits                            int16s~
      32    FocusContinuous                      int16s
@@ -1112,19 +1196,22 @@ null terminator which is added automatically by ExifTool.
      37    ZoomedResolutionBase                 int16s
      42    ColorTone                            int16s
 
-=head2 Canon FocalLength Tags
+=head3 Canon FocalLength Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+      0    FocalType                            int16u
       1    FocalLength                          int16u
       2    FocalPlaneXSize                      int16u
       3    FocalPlaneYSize                      int16u
 
-=head2 Canon ShotInfo Tags
+=head3 Canon ShotInfo Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       2    ISO                                  int16s
+      4    TargetAperture                       int16s
+      5    TargetExposureTime                   int16s
       6    ExposureCompensation                 int16s
       7    WhiteBalance                         int16s
       9    SequenceNumber                       int16s
@@ -1140,14 +1227,91 @@ null terminator which is added automatically by ExifTool.
      27    AutoRotate                           int16s
      29    Self-timer2                          int16s
 
-=head2 Canon ColorInfoD30 Tags
+=head3 Canon Panorama Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      2    PanoramaFrame                        int16s
+      5    PanoramaDirection                    int16s
+
+=head3 Canon ColorInfoD30 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       9    ColorTemperature                     int16s
      10    ColorMatrix                          int16s
 
-=head2 CanonCustom Functions10D Tags
+=head3 Canon LensInfo1D Tags
+
+Lens information for the 1D, 1DS and 1D Mark II only.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      4    ExposureTime                         int8u
+     10    FocalLength                          int8u
+     13    LensType                             int8u
+     18    ShortFocal                           int8u
+     20    LongFocal                            int8u
+     45    FocalType                            int8u
+
+=head3 Canon PictureInfo Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      2    CanonImageWidth                      int16u
+      3    CanonImageHeight                     int16u
+      4    CanonImageWidthAsShot                int16u
+      5    CanonImageHeightAsShot               int16u
+     22    AFPointsUsed                         int16u~
+
+=head3 Canon FileInfo Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    FileNumber                           int32u
+           ShutterCount                         int32u
+
+=head3 Canon ColorInfo Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      9    ColorTemperature                     int16s
+
+=head3 Canon WhiteBalance Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    RedBalanceAuto                       N
+      1    BlueBalanceAuto                      N
+      2    RedBalanceDaylight                   N
+      3    BlueBalanceDaylight                  N
+      4    RedBalanceCloudy                     N
+      5    BlueBalanceCloudy                    N
+      6    RedBalanceTungsten                   N
+      7    BlueBalanceTungsten                  N
+      8    RedBalanceFluorescent                N
+      9    BlueBalanceFluorescent               N
+     10    RedBalanceFlash                      N
+     11    BlueBalanceFlash                     N
+     12    RedBalanceCustom                     N
+     13    BlueBalanceCustom                    N
+     14    RedBalanceB&W                        N
+     15    BlueBalanceB&W                       N
+     16    RedBalanceShade                      N
+     17    BlueBalanceShade                     N
+
+=head3 Canon PreviewImageInfo Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      2    PreviewImageLength                   int32u*
+      3    PreviewImageWidth                    int32u
+      4    PreviewImageHeight                   int32u
+      5    PreviewImageStart                    int32u*
+      6    PreviewFocalPlaneXResolution         rational32s
+      8    PreviewFocalPlaneYResolution         rational32s
+
+=head3 CanonCustom Functions10D Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1169,7 +1333,7 @@ null terminator which is added automatically by ExifTool.
   0x0010   SafetyShiftInAvOrTv                  int8u
   0x0011   LensAFStopButton                     int8u
 
-=head2 CanonCustom Functions20D Tags
+=head3 CanonCustom Functions20D Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1192,7 +1356,7 @@ null terminator which is added automatically by ExifTool.
   0x0010   LensAFStopButton                     int8u
   0x0011   AddOriginalDecisionData              int8u
 
-=head2 CanonCustom FunctionsD30 Tags
+=head3 CanonCustom FunctionsD30 Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1212,17 +1376,7 @@ null terminator which is added automatically by ExifTool.
   0x000e   SuperimposedDisplay                  int8u
   0x000f   ShutterReleaseNoCFCard               int8u
 
-=head2 Canon PictureInfo Tags
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      2    CanonImageWidth                      int16u
-      3    CanonImageHeight                     int16u
-      4    CanonImageWidthAsShot                int16u
-      5    CanonImageHeightAsShot               int16u
-     22    AFPointsUsed                         int16u~
-
-=head2 CanonCustom Functions1D Tags
+=head3 CanonCustom Functions1D Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1248,53 +1402,6 @@ null terminator which is added automatically by ExifTool.
   0x0013   LensAFStopButton                     int8u
   0x0014   AIServoTrackingSensitivity           int8u
 
-=head2 Canon FileInfo Tags
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      1    FileNumber                           int32u
-           ShutterCount                         int32u
-
-=head2 Canon ColorInfo Tags
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      9    ColorTemperature                     int16s
-
-=head2 Canon WhiteBalance Tags
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      0    RedBalanceAuto                       N
-      1    BlueBalanceAuto                      N
-      2    RedBalanceDaylight                   N
-      3    BlueBalanceDaylight                  N
-      4    RedBalanceCloudy                     N
-      5    BlueBalanceCloudy                    N
-      6    RedBalanceTungsten                   N
-      7    BlueBalanceTungsten                  N
-      8    RedBalanceFluorescent                N
-      9    BlueBalanceFluorescent               N
-     10    RedBalanceFlash                      N
-     11    BlueBalanceFlash                     N
-     12    RedBalanceCustom                     N
-     13    BlueBalanceCustom                    N
-     14    RedBalanceB&W                        N
-     15    BlueBalanceB&W                       N
-     16    RedBalanceShade                      N
-     17    BlueBalanceShade                     N
-
-=head2 Canon PreviewImageInfo Tags
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      2    PreviewImageLength                   int32u*
-      3    PreviewImageWidth                    int32u
-      4    PreviewImageHeight                   int32u
-      5    PreviewImageStart                    int32u*
-      6    PreviewFocalPlaneXResolution         rational32s
-      8    PreviewFocalPlaneYResolution         rational32s
-
 =head2 Casio Tags
 
   Tag ID   Tag Name                             Writable
@@ -1312,7 +1419,7 @@ null terminator which is added automatically by ExifTool.
   0x000d   Saturation                           int16u
   0x0014   CCDSensitivity                       int16u
 
-=head2 Casio Type2 Tags
+=head3 Casio Type2 Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1352,6 +1459,7 @@ been decoded.  Use the Unknown (-u) option to extract PrintIM information.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  [no tags defined]
 
 =head2 FujiFilm Tags
 
@@ -1422,7 +1530,7 @@ LS443, LS743 and LS753.
     104    DigitalZoom                          int16u
     107    Sharpness                            int8s
 
-=head2 Kodak Type2 Tags
+=head3 Kodak Type2 Tags
 
 These tags are used by the DC265 and DC290.
 
@@ -1433,7 +1541,7 @@ These tags are used by the DC265 and DC290.
     108    KodakImageWidth                      int32u
     112    KodakImageHeight                     int32u
 
-=head2 Kodak Type3 Tags
+=head3 Kodak Type3 Tags
 
 These tags are used by the DC280, DC3400 and DC5000.
 
@@ -1447,7 +1555,7 @@ These tags are used by the DC280, DC3400 and DC5000.
      60    FNumber                              int16u
      78    ISO                                  int16u
 
-=head2 Kodak Type4 Tags
+=head3 Kodak Type4 Tags
 
 These tags are used by the DC200 and DC215.
 
@@ -1455,7 +1563,7 @@ These tags are used by the DC200 and DC215.
    -----   --------                             --------
      32    OriginalFileName                     string[12]
 
-=head2 Kodak Type5 Tags
+=head3 Kodak Type5 Tags
 
 These tags are used by the CX4200, CX4230 and CX6200.
 
@@ -1471,7 +1579,7 @@ These tags are used by the CX4200, CX4230 and CX6200.
      42    ImageRotated                         int8u
      43    Macro                                int8u
 
-=head2 Kodak Type6 Tags
+=head3 Kodak Type6 Tags
 
 These tags are used by the DX3215 and DX3700.
 
@@ -1485,10 +1593,33 @@ These tags are used by the DX3215 and DX3700.
      30    DigitalZoom                          int16u
      34    Flash                                int16u
 
-=head2 Kodak Unknown Tags
+=head3 Kodak Unknown Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+  [no tags defined]
+
+=head3 Kodak SpecialEffects Tags
+
+The Kodak SpecialEffects and Borders tags are found in sub-IFD's within
+the Kodak "Meta" JPEG APP3 segment.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   DigitalEffectsVersion                N
+  0x0001   DigitalEffectsName                   N
+  0x0002   DigitalEffectsType                   N
+
+=head3 Kodak Borders Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   BordersVersion                       N
+  0x0001   BorderName                           N
+  0x0002   BorderID                             N
+  0x0003   BorderLocation                       N
+  0x0004   BorderType                           N
+  0x0008   WatermarkType                        N
 
 =head2 Unknown Tags
 
@@ -1501,25 +1632,31 @@ The following tags are decoded in unsupported maker notes.  Use the Unknown
 
 =head2 Minolta Tags
 
-These tags are used by Minolta and Konica/Minolta cameras.
+These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn't
+make things easy for decoders because the meaning of some tags and the
+location where some information is stored is different for different camera
+models.  (Take MinoltaQuality for example, which may be located in 3
+different places.)
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   MakerNoteVersion                     Y
+  0x0000   MakerNoteVersion                     undef[4]
   0x0001   MinoltaCameraSettingsOld             Minolta CameraSettings
   0x0003   MinoltaCameraSettings                Minolta CameraSettings
   0x0018   ImageStabilization                   N
   0x0040   CompressedImageSize                  int32u
-  0x0081   PreviewImageData                     N
+  0x0081   PreviewImage                         undef
   0x0088   PreviewImageStart                    int32u*
   0x0089   PreviewImageLength                   int32u*
-  0x0101   ColorMode                            Y
-  0x0102   MinoltaQuality                       Y
-  0x0103   MinoltaQuality                       Y
+  0x0101   ColorMode                            int32u
+  0x0102   MinoltaQuality                       int32u
+  0x0103   MinoltaQuality                       int32u
+           MinoltaImageSize                     int32u
+  0x010c   LensID                               int32u
   0x0e00   PrintIM                              PrintIM
   0x0f00   MinoltaCameraSettings2               N
 
-=head2 Minolta CameraSettings Tags
+=head3 Minolta CameraSettings Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -1570,6 +1707,8 @@ These tags are used by Minolta and Konica/Minolta cameras.
      48    FocusMode                            int32u
      49    FocusArea                            int32u
      50    DECPosition                          int32u
+     51    ColorProfile                         int32u
+     52    DataImprint                          int32u
 
 =head2 Nikon Tags
 
@@ -1633,7 +1772,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
   0x0e00   PrintIM                              PrintIM
   0x0e0e   NikonCaptureOffsets                  Nikon NikonCaptureOffsets
 
-=head2 Nikon PreviewImage Tags
+=head3 Nikon PreviewImage Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1645,28 +1784,28 @@ These tags are used by Minolta and Konica/Minolta cameras.
   0x0202   PreviewImageLength                   int32u*
   0x0213   YCbCrPositioning                     N
 
-=head2 Nikon ColorBalance0100 Tags
+=head3 Nikon ColorBalance0100 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    RedBalance                           int16u
       1    BlueBalance                          int16u
 
-=head2 Nikon ColorBalance0102 Tags
+=head3 Nikon ColorBalance0102 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    RedBalance                           rational16s
       1    BlueBalance                          rational16s
 
-=head2 Nikon ColorBalance0103 Tags
+=head3 Nikon ColorBalance0103 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    RedBalance                           rational16s
       1    BlueBalance                          rational16s
 
-=head2 Nikon LensData00 Tags
+=head3 Nikon LensData00 Tags
 
 This structure is used by the D100 and newer D1X models.
 
@@ -1681,7 +1820,7 @@ This structure is used by the D100 and newer D1X models.
      11    MaxApertureAtMaxFocal                int8u
      12    MCUVersion                           int8u
 
-=head2 Nikon LensData01 Tags
+=head3 Nikon LensData01 Tags
 
 Nikon encrypts the LensData information below if LensDataVersion is 0201,
 but  the decryption algorithm is known so the information can be extracted.
@@ -1704,7 +1843,7 @@ which make writing more difficult.
      17    MCUVersion                           N
      18    EffectiveMaxAperture                 N
 
-=head2 Nikon NikonCaptureOffsets Tags
+=head3 Nikon NikonCaptureOffsets Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1712,7 +1851,7 @@ which make writing more difficult.
   0x0002   PreviewIFD_Offset                    N
   0x0003   SubIFD_Offset                        N
 
-=head2 Nikon MakerNotesB Tags
+=head3 Nikon MakerNotesB Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1793,7 +1932,7 @@ and Agfa cameras.
   0x2040   ImageProcessing                      Olympus ImageProcessing
   0x2050   FocusInfo                            Olympus FocusInfo
 
-=head2 Olympus Equipment Tags
+=head3 Olympus Equipment Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1816,7 +1955,7 @@ and Agfa cameras.
   0x1003   FlashSerialNumber                    string[32]
   0x1004   FlashFirmwareVersion                 int32u
 
-=head2 Olympus CameraSettings Tags
+=head3 Olympus CameraSettings Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1849,7 +1988,7 @@ and Agfa cameras.
   0x0600   Sequence                             int16u[2]~
   0x0603   ImageQuality2                        int16u
 
-=head2 Olympus RawDevelopment Tags
+=head3 Olympus RawDevelopment Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1868,7 +2007,7 @@ and Agfa cameras.
   0x010b   RawDevEditStatus                     int16u
   0x010c   RawDevSettings                       int16u
 
-=head2 Olympus ImageProcessing Tags
+=head3 Olympus ImageProcessing Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1885,7 +2024,7 @@ and Agfa cameras.
   0x1010   NoiseFilter2                         int16u
   0x1012   ShadingCompensation2                 int16u
 
-=head2 Olympus FocusInfo Tags
+=head3 Olympus FocusInfo Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1980,14 +2119,14 @@ The Pentax tags are also used in Asahi cameras.
   0x2001   RicohSubdir                          Ricoh Subdir
            RicohRR1Subdir                       Ricoh Subdir
 
-=head2 Ricoh Subdir Tags
+=head3 Ricoh Subdir Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0004   RicohDateTime1                       N
   0x0005   RicohDateTime2                       N
 
-=head2 Ricoh Text Tags
+=head3 Ricoh Text Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -2062,33 +2201,12 @@ These tags are used in Sigma/Foveon cameras.
 =head2 Sony Tags
 
 While current Sony camera models contain a wealth of information, very
-little is known about the Sony tags.
+little is known about the Sony tags.  I believe that Sony is attempting to
+hide information in their maker notes by encrypting it.  Idiots.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0e00   PrintIM                              PrintIM
-
-=head2 Kodak SpecialEffects Tags
-
-The Kodak SpecialEffects and Borders tags are found in sub-IFD's within
-the Kodak "Meta" JPEG APP3 segment.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0000   DigitalEffectsVersion                N
-  0x0001   DigitalEffectsName                   N
-  0x0002   DigitalEffectsType                   N
-
-=head2 Kodak Borders Tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0000   BordersVersion                       N
-  0x0001   BorderName                           N
-  0x0002   BorderID                             N
-  0x0003   BorderLocation                       N
-  0x0004   BorderType                           N
-  0x0008   WatermarkType                        N
 
 =head2 CanonRaw Tags
 
@@ -2153,14 +2271,14 @@ change size.
   0x300a   ImageProps                           CanonRaw
   0x300b   ExifInformation                      CanonRaw
 
-=head2 CanonRaw MakeModel Tags
+=head3 CanonRaw MakeModel Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    Make                                 string[6]
       6    Model                                string[$size-6]
 
-=head2 CanonRaw SensorInfo Tags
+=head3 CanonRaw SensorInfo Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2171,14 +2289,14 @@ change size.
       7    SensorRightBorder                    N
       8    SensorBottomBorder                   N
 
-=head2 CanonRaw ImageFormat Tags
+=head3 CanonRaw ImageFormat Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    FileFormat                           int32u
       1    TargetCompressionRatio               float
 
-=head2 CanonRaw TimeStamp Tags
+=head3 CanonRaw TimeStamp Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2186,7 +2304,7 @@ change size.
       1    TimeZoneCode                         int32s
       2    TimeZoneInfo                         int32u
 
-=head2 CanonRaw ImageInfo Tags
+=head3 CanonRaw ImageInfo Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2198,93 +2316,20 @@ change size.
       5    ColorBitDepth                        N
       6    ColorBW                              N
 
-=head2 CanonRaw FlashInfo Tags
+=head3 CanonRaw FlashInfo Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    FlashGuideNumber                     float
       1    FlashThreshold                       float
 
-=head2 CanonRaw ExposureInfo Tags
+=head3 CanonRaw ExposureInfo Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    ExposureCompensation                 float
       1    TvValue                              float
       2    AvValue                              float
-
-=head2 Photoshop Tags
-
-Many Photoshop tags are marked as Unknown (indicated by a question mark
-after the tag name) because the information they provide is not very useful
-under normal circumstances.  Unknown tags are not extracted unless the
-Unknown (-u) option is used.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x03e8   Photoshop2Info?                      N
-  0x03e9   MacintoshPrintInfo?                  N
-  0x03ea   XMLData?                             N
-  0x03eb   Photoshop2ColorTable?                N
-  0x03ed   ResolutionInfo?                      N
-  0x03ee   AlphaChannelsNames                   N
-  0x03ef   DisplayInfo?                         N
-  0x03f0   PStringCaption?                      N
-  0x03f1   BorderInformation?                   N
-  0x03f2   BackgroundColor?                     N
-  0x03f3   PrintFlags?                          N
-  0x03f4   BW_HalftoningInfo?                   N
-  0x03f5   ColorHalftoningInfo?                 N
-  0x03f6   DuotoneHalftoningInfo?               N
-  0x03f7   BW_TransferFunc?                     N
-  0x03f8   ColorTransferFuncs?                  N
-  0x03f9   DuotoneTransferFuncs?                N
-  0x03fa   DuotoneImageInfo?                    N
-  0x03fb   EffectiveBW?                         N
-  0x03fc   ObsoletePhotoshopTag1?               N
-  0x03fd   EPSOptions?                          N
-  0x03fe   QuickMaskInfo?                       N
-  0x03ff   ObsoletePhotoshopTag2?               N
-  0x0400   LayerStateInfo?                      N
-  0x0401   WorkingPath?                         N
-  0x0402   LayersGroupInfo?                     N
-  0x0403   ObsoletePhotoshopTag3?               N
-  0x0404   IPTCData                             IPTC
-  0x0405   RawImageMode?                        N
-  0x0406   JPEG_Quality                         Photoshop JPEG_Quality
-  0x0408   GridGuidesInfo?                      N
-  0x0409   ThumbnailResource?                   N
-  0x040a   CopyrightFlag?                       N
-  0x040b   URL                                  Y
-  0x040c   PhotoshopThumbnail                   N
-  0x040d   GlobalAngle?                         N
-  0x040e   ColorSamplersResource?               N
-  0x040f   ICC_Profile?                         N
-  0x0410   Watermark?                           N
-  0x0411   ICC_Untagged?                        N
-  0x0412   EffectsVisible?                      N
-  0x0413   SpotHalftone?                        N
-  0x0414   IDsBaseValue?                        N
-  0x0415   UnicodeAlphaNames?                   N
-  0x0416   IndexedColourTableCount?             N
-  0x0417   TransparentIndex?                    N
-  0x0419   GlobalAltitude?                      N
-  0x041a   Slices?                              N
-  0x041b   WorkflowURL?                         N
-  0x041c   JumpToXPEP?                          N
-  0x041d   AlphaIdentifiers?                    N
-  0x041e   URL_List?                            N
-  0x0421   VersionInfo?                         N
-  0x0bb7   ClippingPathName?                    N
-  0x2710   PrintFlagsInfo?                      N
-
-=head2 Photoshop JPEG_Quality Tags
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      0    PhotoshopQuality                     N
-      1    PhotoshopFormat                      N
-      2    ProgressiveScans                     N
 
 =head2 GeoTiff Tags
 
@@ -2389,7 +2434,7 @@ Unknown (-u) option is used.
            UUID-Unknown
   'xml '   XML                                  XMP
 
-=head2 Jpeg2000 ImageHeader Tags
+=head3 Jpeg2000 ImageHeader Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2399,7 +2444,7 @@ Unknown (-u) option is used.
      10    BitsPerComponent                     N
      11    Compression                          N
 
-=head2 Jpeg2000 CaptureResolution Tags
+=head3 Jpeg2000 CaptureResolution Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2408,7 +2453,7 @@ Unknown (-u) option is used.
       8    CaptureYResolutionUnit               N
       9    CaptureXResolutionUnit               N
 
-=head2 Jpeg2000 DisplayResolution Tags
+=head3 Jpeg2000 DisplayResolution Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2417,22 +2462,53 @@ Unknown (-u) option is used.
       8    DisplayYResolutionUnit               N
       9    DisplayXResolutionUnit               N
 
+=head2 BMP Tags
+
+There really isn't much meta information in a BMP file as such, just a bit
+of image related information.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      4    ImageWidth                           N
+      8    ImageHeight                          N
+     12    Planes                               N
+     14    BitDepth                             N
+     16    Compression                          N
+     20    ImageLength                          N
+     24    PixelsPerMeterX                      N
+     28    PixelsPerMeterY                      N
+     32    NumColors                            N
+     36    NumImportantColors                   N
+
 =head2 PNG Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   'IHDR'   ImageHeader                          PNG ImageHeader
+  'PLTE'   Palette                              N
+  'bKGD'   BackgroundColor                      N
   'cHRM'   PrimaryChromaticities                PNG PrimaryChromaticities
+  'fRAc'   FractalParameters                    N
   'gAMA'   Gamma                                N
+  'gIFg'   GIFGraphicControlExtension           N
+  'gIFt'   GIFPlainTextExtension                N
+  'gIFx'   GIFApplicationExtension              N
+  'hIST'   PaletteHistogram                     N
   'iCCP'   ICC_Profile                          ICC_Profile
   'iTXt'   InternationalText                    PNG TextualData
+  'oFFs'   ImageOffset                          N
+  'pCAL'   PixelCalibration                     N
   'pHYs'   PhysicalPixel                        PNG PhysicalPixel
+  'sBIT'   SignificantBits                      N
+  'sPLT'   SuggestedPalette                     N
   'sRGB'   SRGBRendering                        N
   'tEXt'   TextualData                          PNG TextualData
   'tIME'   ModifyDate                           N
+  'tRNS'   Transparency                         N
+  'tXMP'   XMP                                  XMP
   'zTXt'   CompressedText                       PNG TextualData
 
-=head2 PNG ImageHeader Tags
+=head3 PNG ImageHeader Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2444,7 +2520,7 @@ Unknown (-u) option is used.
      11    Filter                               N
      12    Interlace                            N
 
-=head2 PNG PrimaryChromaticities Tags
+=head3 PNG PrimaryChromaticities Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2457,7 +2533,7 @@ Unknown (-u) option is used.
       6    BlueX                                N
       7    BlueY                                N
 
-=head2 PNG TextualData Tags
+=head3 PNG TextualData Tags
 
 The PNG TextualData format allows aribrary tag names to be used.  Only the
 standard tag names are listed below, however ExifTool will decode any tags
@@ -2471,17 +2547,18 @@ found in the image.
   'Creation Time'         CreationTime          N
   'Description'           Description           N
   'Disclaimer'            Disclaimer            N
-  'Raw profile type APP1' RawProfileTypeAPP1    EXIF
+  'Raw profile type APP1' APP1_Profile          EXIF
                                                 XMP
-  'Raw profile type exif' RawProfileTypeEXIF    EXIF
-  'Raw profile type icc'  RawProfileTypeICC     ICC_Profile
-  'Raw profile type iptc' RawProfileTypeIPTC    Photoshop
-  'Raw profile type xmp'  RawProfileTypeXMP     XMP
+  'Raw profile type exif' EXIF_Profile          EXIF
+  'Raw profile type icc'  ICC_Profile           ICC_Profile
+  'Raw profile type iptc' IPTC_Profile          Photoshop
+  'Raw profile type xmp'  XMP_Profile           XMP
   'Software'              Software              N
   'Source'                Source                N
   'Title'                 Title                 N
+  'Warning'               PNGWarning            N
 
-=head2 PNG PhysicalPixel Tags
+=head3 PNG PhysicalPixel Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2489,47 +2566,394 @@ found in the image.
       4    PixelsPerUnitY                       N
       8    PixelUnits                           N
 
+=head2 MNG Tags
+
+This table contains definitions for tags found in MNG and JNG images.  MNG
+is a superset of PNG and JNG, so a MNG image may contain any of these tags
+as well as any PNG tags.  Conversely, only some of these tags are valid for
+JNG images.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'BACK'   Background                           MNG Background
+  'BASI'   BasisObject                          MNG BasisObject
+  'CLIP'   ClipObjects                          MNG ClipObjects
+  'CLON'   CloneObject                          MNG CloneObject
+  'DBYK'   DropByKeyword                        N
+  'DEFI'   DefineObject                         MNG DefineObject
+  'DHDR'   DeltaPNGHeader                       MNG DeltaPNGHeader
+  'DISC'   DiscardObjects                       N
+  'DROP'   DropChunks                           N
+  'FRAM'   Frame                                N
+  'JHDR'   JNGHeader                            MNG JNGHeader
+  'LOOP'   Loop                                 MNG Loop
+  'MAGN'   MagnifyObject                        MNG MagnifyObject
+  'MHDR'   MNGHeader                            MNG MNGHeader
+  'MOVE'   MoveObjects                          MNG MoveObjects
+  'ORDR'   OrderingRestrictions                 N
+  'PAST'   PasteImage                           MNG PasteImage
+  'PPLT'   PartialPalette                       N
+  'PROM'   PromoteParent                        MNG PromoteParent
+  'SAVE'   SaveObjects                          N
+  'SEEK'   SeekPoint                            N
+  'SHOW'   ShowObjects                          MNG ShowObjects
+  'TERM'   TerminationAction                    MNG TerminationAction
+  'eXPi'   ExportImage                          MNG ExportImage
+  'fPRI'   FramePriority                        MNG FramePriority
+  'nEED'   ResourcesNeeded                      N
+  'pHYg'   GlobalPixelSize                      PNG PhysicalPixel
+
+=head3 MNG Background Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    BackgroundColor                      N
+      6    MandatoryBackground                  N
+      7    BackgroundImageID                    N
+      9    BackgroundTiling                     N
+
+=head3 MNG BasisObject Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ImageWidth                           N
+      4    ImageHeight                          N
+      8    BitDepth                             N
+      9    ColorType                            N
+     10    Compression                          N
+     11    Filter                               N
+     12    Interlace                            N
+     13    RedSample                            N
+     17    GreenSample                          N
+     21    BlueSample                           N
+     25    AlphaSample                          N
+     26    Viewable                             N
+
+=head3 MNG ClipObjects Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    FirstObject                          N
+      2    LastObject                           N
+      4    DeltaType                            N
+      5    ClipBoundary                         N
+
+=head3 MNG CloneObject Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    SourceID                             N
+      2    CloneID                              N
+      4    CloneType                            N
+      5    DoNotShow                            N
+      6    ConcreteFlag                         N
+      7    LocalDeltaType                       N
+      8    DeltaXY                              N
+
+=head3 MNG DefineObject Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ObjectID                             N
+      2    DoNotShow                            N
+      3    ConcreteFlag                         N
+      4    XYLocation                           N
+     12    ClippingBoundary                     N
+
+=head3 MNG DeltaPNGHeader Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ObjectID                             N
+      2    ImageType                            N
+      3    DeltaType                            N
+      4    BlockSize                            N
+     12    BlockLocation                        N
+
+=head3 MNG JNGHeader Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ImageWidth                           N
+      4    ImageHeight                          N
+      8    ColorType                            N
+      9    BitDepth                             N
+     10    Compression                          N
+     11    Interlace                            N
+     12    AlphaBitDepth                        N
+     13    AlphaCompression                     N
+     14    AlphaFilter                          N
+     15    AlphaInterlace                       N
+
+=head3 MNG Loop Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    NestLevel                            N
+      1    IterationCount                       N
+      5    TerminationCondition                 N
+      6    IterationMinMax                      N
+     14    SignalNumber                         N
+
+=head3 MNG MagnifyObject Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    FirstObjectID                        N
+      2    LastObjectID                         N
+      4    XMethod                              N
+      5    XMag                                 N
+      7    YMag                                 N
+      9    LeftMag                              N
+     11    RightMag                             N
+     13    TopMag                               N
+     15    BottomMag                            N
+     17    YMethod                              N
+
+=head3 MNG MNGHeader Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ImageWidth                           N
+      1    ImageHeight                          N
+      2    TicksPerSecond                       N
+      3    NominalLayerCount                    N
+      4    NominalFrameCount                    N
+      5    NominalPlayTime                      N
+      6    SimplicityProfile                    N
+
+=head3 MNG MoveObjects Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    FirstObject                          N
+      2    LastObject                           N
+      4    DeltaType                            N
+      5    DeltaXY                              N
+
+=head3 MNG PasteImage Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    DestinationID                        N
+      2    TargetDeltaType                      N
+      3    TargetXY                             N
+     11    SourceID                             N
+     13    CompositionMode                      N
+     14    Orientation                          N
+     15    OffsetOrigin                         N
+     16    OffsetXY                             N
+     24    BoundaryOrigin                       N
+     25    PastClippingBoundary                 N
+
+=head3 MNG PromoteParent Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    NewColorType                         N
+      1    NewBitDepth                          N
+      2    FillMethod                           N
+
+=head3 MNG ShowObjects Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    FirstObject                          N
+      2    LastObject                           N
+      4    ShowMode                             N
+
+=head3 MNG TerminationAction Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    TerminationAction                    N
+      1    IterationEndAction                   N
+      2    Delay                                N
+      6    IterationMax                         N
+
+=head3 MNG ExportImage Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    SnapshotID                           N
+      2    SnapshotName                         N
+
+=head3 MNG FramePriority Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    DeltaType                            N
+      2    Priority                             N
+
 =head2 MIFF Tags
 
 The MIFF format allows aribrary tag names to be used.  Only the standard tag
 names are listed below, however ExifTool will decode any tags found in the
 image.
 
-  Tag ID             Tag Name                   Writable
-  ------             --------                   --------
-  'background-color' BackgroundColor            N
-  'blue-primary'     BluePrimary                N
-  'border-color'     BorderColor                N
-  'class'            Class                      N
-  'colors'           Colors                     N
-  'colorspace'       Colorspace                 N
-  'columns'          ImageWidth                 N
-  'compression'      Compression                N
-  'delay'            Delay                      N
-  'depth'            Depth                      N
-  'dispose'          Dispose                    N
-  'gamma'            Gamma                      N
-  'green-primary'    GreenPrimary               N
-  'id'               ID                         N
-  'iterations'       Iterations                 N
-  'label'            Label                      N
-  'matt-color'       MattColor                  N
-  'matte'            Matte                      N
-  'montage'          Montage                    N
-  'packets'          Packets                    N
-  'page'             Page                       N
-  'profile-APP1'     ProfileAPP1                EXIF
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'background-color'   BackgroundColor          N
+  'blue-primary'       BluePrimary              N
+  'border-color'       BorderColor              N
+  'class'              Class                    N
+  'colors'             Colors                   N
+  'colorspace'         Colorspace               N
+  'columns'            ImageWidth               N
+  'compression'        Compression              N
+  'delay'              Delay                    N
+  'depth'              Depth                    N
+  'dispose'            Dispose                  N
+  'gamma'              Gamma                    N
+  'green-primary'      GreenPrimary             N
+  'id'                 ID                       N
+  'iterations'         Iterations               N
+  'label'              Label                    N
+  'matt-color'         MattColor                N
+  'matte'              Matte                    N
+  'montage'            Montage                  N
+  'packets'            Packets                  N
+  'page'               Page                     N
+  'profile-APP1'       APP1_Profile             EXIF
                                                 XMP
-  'profile-icc'      ProfileICC                 ICC_Profile
-  'profile-iptc'     ProfileIPTC                Photoshop
-  'red-primary'      RedPrimary                 N
-  'rendering-intent' RenderingIntent            N
-  'resolution'       Resolution                 N
-  'rows'             ImageHeight                N
-  'scene'            Scene                      N
-  'signature'        Signature                  N
-  'units'            Units                      N
-  'white-point'      WhitePoint                 N
+  'profile-exif'       EXIF_Profile             EXIF
+  'profile-icc'        ICC_Profile              ICC_Profile
+  'profile-iptc'       IPTC_Profile             Photoshop
+  'profile-xmp'        XMP_Profile              XMP
+  'red-primary'        RedPrimary               N
+  'rendering-intent'   RenderingIntent          N
+  'resolution'         Resolution               N
+  'rows'               ImageHeight              N
+  'scene'              Scene                    N
+  'signature'          Signature                N
+  'units'              Units                    N
+  'white-point'        WhitePoint               N
+
+=head2 PDF Tags
+
+The tags listed in the PDF tables below are those which are used by ExifTool
+to extract meta information, but they are only a small fraction of the total
+number of available PDF tags.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'Info'   Info                                 PDF Info
+  'Root'   Root                                 PDF Root
+
+=head3 PDF Info Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Author'             Author                   N
+  'CreationDate'       CreateDate               N
+  'Creator'            Creator                  N
+  'Keywords'           Keywords                 N
+  'ModDate'            ModifyDate               N
+  'Producer'           Producer                 N
+  'Subject'            Subject                  N
+  'Title'              Title                    N
+  'Trapped'            Trapped                  N
+
+=head3 PDF Root Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Metadata'           Metadata                 PDF Metadata
+  'Pages'              Pages                    PDF Pages
+
+=head3 PDF Metadata Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'XML_stream'         XMP                      XMP
+
+=head3 PDF Pages Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'Count'  PageCount                            N
+  'Kids'   Kids                                 PDF Kids
+
+=head3 PDF Kids Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'PieceInfo'          PieceInfo                PDF PieceInfo
+  'Resources'          Resources                PDF Resources
+
+=head3 PDF PieceInfo Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'AdobePhotoshop'     AdobePhotoshop           PDF AdobePhotoshop
+
+=head3 PDF AdobePhotoshop Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Private'            Private                  PDF Private
+
+=head3 PDF Private Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'ImageResources'     ImageResources           PDF ImageResources
+
+=head3 PDF ImageResources Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'stream' stream                               Photoshop
+
+=head3 PDF Resources Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'ColorSpace'         ColorSpace               PDF ColorSpace
+
+=head3 PDF ColorSpace Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'DefaultRGB'         DefaultRGB               PDF DefaultRGB
+
+=head3 PDF DefaultRGB Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'ICCBased'           ICCBased                 PDF ICCBased
+
+=head3 PDF ICCBased Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'stream' stream                               ICC_Profile
+
+=head2 PostScript Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Author'             Author                   N
+  'BeginICCProfile'    ICC_Profile              ICC_Profile
+  'BeginPhotoshop'     PhotoshopData            Photoshop
+  'CreationDate'       CreateDate               N
+  'Creator'            Creator                  N
+  'For'                For                      N
+  'Keywords'           Keywords                 N
+  'ModDate'            ModifyDate               N
+  'Subject'            Subject                  N
+  'Title'              Title                    N
+  'begin_xml_packet'   XMP                      XMP
+
+=head2 APP12 Tags
+
+The JPEG APP12 segment may contain ASCI-based meta information.  ExifTool
+does not pre-define the names of these tags, but will extract the
+information for any tags found in this segment.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags defined]
 
 =head2 Extra Tags
 
@@ -2564,8 +2988,13 @@ is extracted.
                        ApertureValue
   CFAPattern           CFARepeatPatternDim      N
                        CFAPattern2
+  CircleOfConfusion    ScaleFactor35efl         N
   ConditionalFEC       FlashExposureComp        N
                        FlashBits
+  DOF                  FocusDistance            N
+                       FocalLength
+                       Aperture
+                       CircleOfConfusion
   DateTimeCreated      DateCreated              N
                        TimeCreated
   DateTimeOriginal     DateTimeCreated          N
@@ -2578,6 +3007,9 @@ is extracted.
                        ScaleFactor35efl
   GPSDateTime          GPSDateStamp             N
                        GPSTimeStamp
+  HyperfocalDistance   FocalLength              N
+                       Aperture
+                       CircleOfConfusion
   ImageSize            ImageWidth               N
                        ImageHeight
   JpgFromRaw           JpgFromRawStart          Y

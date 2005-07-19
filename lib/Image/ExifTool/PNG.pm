@@ -1,15 +1,16 @@
 #------------------------------------------------------------------------------
 # File:         PNG.pm
 #
-# Description:  Routines for reading PNG (Portable Network Graphics) images
+# Description:  Routines for reading PNG, MNG and JNG images
 #
 # Revisions:    06/10/2005 - P. Harvey Created
+#               06/23/2005 - P. Harvey Added MNG and JNG support
 #
 # References:   1) http://www.libpng.org/pub/png/spec/1.2/
+#               2) http://www.faqs.org/docs/png/
+#               3) http://www.libpng.org/pub/mng/
 #
-# Notes:        Doesn't yet decompress compressed information.
-#
-#               I haven't found a sample PNG image with a 'iTXt' chunk, so
+# Notes:        I haven't found a sample PNG image with a 'iTXt' chunk, so
 #               this part of the code is still untested.
 #------------------------------------------------------------------------------
 
@@ -19,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.06';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -27,16 +28,50 @@ sub ProcessPNG_Compressed($$$);
 
 my $noCompressLib;
 
+# look up for file type, header chunk and end chunk, based on file signature
+my %pngLookup = (
+    "\x89PNG\r\n\x1a\n" => ['PNG', 'IHDR', 'IEND' ],
+    "\x8aMNG\r\n\x1a\n" => ['MNG', 'MHDR', 'MEND' ],
+    "\x8bJNG\r\n\x1a\n" => ['JNG', 'JHDR', 'IEND' ],
+);
+
+# color type of current image
+$Image::ExifTool::PNG::colorType = -1;
+
 # PNG chunks
 %Image::ExifTool::PNG::Main = (
     GROUPS => { 2 => 'Image' },
+    bKGD => {
+        Name => 'BackgroundColor',
+        ValueConv => 'join(" ",unpack(length($val) < 2 ? "C" : "n*", $val))',
+    },
     cHRM => {
         Name => 'PrimaryChromaticities',
         SubDirectory => { TagTable => 'Image::ExifTool::PNG::PrimaryChromaticities' },
     },
-    IHDR => {
-        Name => 'ImageHeader',
-        SubDirectory => { TagTable => 'Image::ExifTool::PNG::ImageHeader' },
+    fRAc => {
+        Name => 'FractalParameters',
+        ValueConv => '\$val',
+    },
+    gAMA => {
+        Name => 'Gamma',
+        ValueConv => 'my $a=unpack("N",$val);$a ? int(1e9/$a+0.5)/1e4 : $val',
+    },
+    gIFg => {
+        Name => 'GIFGraphicControlExtension',
+        ValueConv => '\$val',
+    },
+    gIFt => {
+        Name => 'GIFPlainTextExtension',
+        ValueConv => '\$val',
+    },
+    gIFx => {
+        Name => 'GIFApplicationExtension',
+        ValueConv => '\$val',
+    },
+    hIST => {
+        Name => 'PaletteHistogram',
+        ValueConv => '\$val',
     },
     iCCP => {
         Name => 'ICC_Profile',
@@ -45,6 +80,12 @@ my $noCompressLib;
             ProcessProc => \&ProcessPNG_Compressed,
         },
     },
+#   IDAT
+#   IEND
+    IHDR => {
+        Name => 'ImageHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::PNG::ImageHeader' },
+    },
     iTXt => {
         Name => 'InternationalText',
         SubDirectory => {
@@ -52,22 +93,43 @@ my $noCompressLib;
             ProcessProc => \&ProcessPNG_iTXt,
         },
     },
-    gAMA => {
-        Name => 'Gamma',
-        ValueConv => 'my $a=unpack("N",$val);$a ? int(1e9/$a+0.5)/1e4 : $val',
+    oFFs => {
+        Name => 'ImageOffset',
+        ValueConv => q{
+            my @a = unpack("NNC",$val);
+            $a[2] = ($a[2] ? "microns" : "pixels");
+            return "$a[0], $a[1] ($a[2])";
+        },
+    },
+    pCAL => {
+        Name => 'PixelCalibration',
+        ValueConv => '\$val',
     },
     pHYs => {
         Name => 'PhysicalPixel',
         SubDirectory => { TagTable => 'Image::ExifTool::PNG::PhysicalPixel' },
     },
+    PLTE => {
+        Name => 'Palette',
+        ValueConv => 'length($val) <= 3 ? join(" ",unpack("C*",$val)) : \$val',
+    },
+    sBIT => {
+        Name => 'SignificantBits',
+        ValueConv => 'join(" ",unpack("C*",$val))',
+    },
+    sPLT => {
+        Name => 'SuggestedPalette',
+        ValueConv => '\$val',
+        PrintConv => 'split("\0",$$val,1)', # extract palette name
+    },
     sRGB => {
         Name => 'SRGBRendering',
         ValueConv => 'unpack("C",$val)',
         PrintConv => {
-            0 => 'sRGB Perceptual',
-            1 => 'sRGB Relative Colorimetric',
-            2 => 'sRGB Saturation',
-            3 => 'sRGB Absolute Colorimetric',
+            0 => 'Perceptual',
+            1 => 'Relative Colorimetric',
+            2 => 'Saturation',
+            3 => 'Absolute Colorimetric',
         },
     },
     tEXt => {
@@ -80,6 +142,17 @@ my $noCompressLib;
         Groups => { 2 => 'Time' },
         ValueConv => 'sprintf("%.4d:%.2d:%.2d %.2d:%.2d:%.2d", unpack("nC5", $val))',
         PrintConv => '$self->ConvertDateTime($val)',
+    },
+    tRNS => {
+        Name => 'Transparency',
+        ValueConv => q{
+            return \$val if length($val) > 6;
+            join(" ",unpack($Image::ExifTool::PNG::colorType == 3 ? "C*" : "n*", $val));
+        },
+    },
+    tXMP => {
+        Name => 'XMP',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
     zTXt => {
         Name => 'CompressedText',
@@ -105,6 +178,7 @@ my $noCompressLib;
     8 => 'BitDepth',
     9 => {
         Name => 'ColorType',
+        ValueConv => '$Image::ExifTool::PNG::colorType = $val',
         PrintConv => {
             0 => 'Grayscale',
             2 => 'RGB',
@@ -123,7 +197,7 @@ my $noCompressLib;
     },
     12 => {
         Name => 'Interlace',
-        PrintConv => { 0 => 'No', 1 => 'Adam7 Interlace' },
+        PrintConv => { 0 => 'Noninterlaced', 1 => 'Adam7 Interlace' },
     },
 );
 
@@ -156,7 +230,7 @@ my $noCompressLib;
     },
     8 => {
         Name => 'PixelUnits',
-        PrintConv => { 1 => 'meter' },
+        PrintConv => { 0 => 'Unknown', 1 => 'Meter' },
     },
 );
 
@@ -183,20 +257,21 @@ found in the image.
     },
     Software => 'Software',
     Disclaimer => 'Disclaimer',
+    Warning => 'PNGWarning',    # change name to differentiate from ExifTool Warning
     Source => 'Source',
     Comment => 'Comment',
    'Raw profile type APP1' => [
         {
             # EXIF table must come first because we key on this in ProcessProfile()
             # (No condition because this is just for BuildTagLookup)
-            Name => 'RawProfileTypeAPP1',
+            Name => 'APP1_Profile',
             SubDirectory => {
                 TagTable=>'Image::ExifTool::Exif::Main',
                 ProcessProc => \&ProcessProfile,
             },
         },
         {
-            Name => 'RawProfileTypeAPP1',
+            Name => 'APP1_Profile',
             SubDirectory => {
                 TagTable=>'Image::ExifTool::XMP::Main',
                 ProcessProc => \&ProcessProfile,
@@ -204,34 +279,64 @@ found in the image.
         },
     ],
    'Raw profile type exif' => {
-        Name => 'RawProfileTypeEXIF',
+        Name => 'EXIF_Profile',
         SubDirectory => {
             TagTable=>'Image::ExifTool::Exif::Main',
             ProcessProc => \&ProcessProfile,
         },
     },
    'Raw profile type icc' => {
-        Name => 'RawProfileTypeICC',
+        Name => 'ICC_Profile',
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
             ProcessProc => \&ProcessProfile,
         },
     },
    'Raw profile type iptc' => {
-        Name => 'RawProfileTypeIPTC',
+        Name => 'IPTC_Profile',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Photoshop::Main',
             ProcessProc => \&ProcessProfile,
         },
     },
    'Raw profile type xmp' => {
-        Name => 'RawProfileTypeXMP',
+        Name => 'XMP_Profile',
         SubDirectory => {
             TagTable => 'Image::ExifTool::XMP::Main',
             ProcessProc => \&ProcessProfile,
         },
     },
 );
+
+#------------------------------------------------------------------------------
+# Calculate CRC or update running CRC (ref 1)
+# Inputs: 0) data reference, 1) running crc to update (undef intially)
+#         2) data position (undef for 0), 3) data length (undef for all data),
+# Returns: updated CRC
+my @crcTable;
+sub CalculateCRC($;$$$)
+{
+    my ($dataPt, $crc, $pos, $len) = @_;
+    $crc = 0 unless defined $crc;
+    $pos = 0 unless defined $pos;
+    $len = length($$dataPt) - $pos unless defined $len;
+    $crc ^= 0xffffffff;         # undo 1's complement
+    # build lookup table unless done already
+    unless (@crcTable) {
+        my ($c, $n, $k);
+        for ($n=0; $n<256; ++$n) {
+            for ($k=0, $c=$n; $k<8; ++$k) {
+                $c = ($c & 1) ? 0xedb88320 ^ ($c >> 1) : $c >> 1;
+            }
+            $crcTable[$n] = $c;
+        }
+    }
+    # calculate the CRC
+    foreach (unpack("x${pos}C$len", $$dataPt)) {
+        $crc = $crcTable[($crc^$_) & 0xff] ^ ($crc >> 8);
+    }
+    return $crc ^ 0xffffffff;   # return 1's complement
+}
 
 #------------------------------------------------------------------------------
 # Found a PNG tag -- extract info from subdirectory or decompress data if necessary
@@ -255,7 +360,7 @@ sub FoundPNG($$$$;$)
                 my $v2;
                 my $inflate = Compress::Zlib::inflateInit();
                 $inflate and ($v2) = $inflate->inflate($val);
-                if (defined $v2) {
+                if ($v2) {
                     $val = $v2;
                     $compressed = 0;
                     $wasCompressed = 1;
@@ -282,14 +387,16 @@ sub FoundPNG($$$$;$)
         if ($$tagInfo{SubDirectory} and not $compressed) {
             my $len = length $val;
             if ($verbose and $exifTool->{INDENT} ne '  ') {
-                my $name = $$tagInfo{Name};
-                $wasCompressed and $name = "Decompressed $name";
-                $exifTool->VerboseDir($name, 0, $len);
                 if ($wasCompressed and $verbose > 2) {
+                    my $name = $$tagInfo{Name};
+                    $wasCompressed and $name = "Decompressed $name";
+                    $exifTool->VerboseDir($name, 0, $len);
                     my %parms = ( Prefix => $exifTool->{INDENT} );
                     $parms{MaxLen} = 96 unless $verbose > 3;
                     Image::ExifTool::HexDump(\$val, undef, %parms);
                 }
+                # don't indent next directory (since it is really the same data)
+                $exifTool->{INDENT} = substr($exifTool->{INDENT}, 0, -2);
             }
             my $subdir = $$tagInfo{SubDirectory};
             my %subdirInfo = (
@@ -320,10 +427,15 @@ sub FoundPNG($$$$;$)
 # store this tag information
 #
     if ($verbose) {
+        # temporarily remove subdirectory so it isn't printed in verbose information
+        # since we aren't decoding it anyway;
+        my $subdir = $$tagInfo{SubDirectory};
+        delete $$tagInfo{SubDirectory};
         $exifTool->VerboseInfo($tag, $tagInfo,
             Table  => $tagTablePtr,
             DataPt => \$val,
         );
+        $$tagInfo{SubDirectory} = $subdir if $subdir;
     }
     # set the ValueConv dynamically depending on whether this is binary or not
     my $delValueConv;
@@ -344,31 +456,37 @@ sub ProcessProfile($$$)
 {
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
     my $dataPt = $$dirInfo{DataPt};
+    my $tagInfo = $$dirInfo{TagInfo};
     
     return 0 unless $$dataPt =~ /^\n(\S* ?profile)\n\s+(\d+)\n(.*)/s;
     my ($profileType, $len) = ($1, $2);
     # data is encoded in hex, so change back to binary
     my $buff = pack('H*', join('',split(' ',$3)));
-    my $processed = 0;
-    my %dirInfo = (
-        Base     => 0,
-        DataPt   => \$buff,
-        DataLen  => length($buff),
-        DirStart => 0,
-        DirLen   => length($buff),
-        Parent   => 'PNG',
-    );
-    # avoid double indenting for this directory in verbose mode
+    my $actualLen = length $buff;
+    if ($len ne $actualLen) {
+        $exifTool->Warn("$$tagInfo{Name} is wrong size (should be $len bytes but is $actualLen)");
+        $len = $actualLen;
+    }
     my $verbose = $exifTool->Options('Verbose');
     if ($verbose) {
-        my $tagInfo = $$dirInfo{TagInfo};
-        $exifTool->VerboseDir("Decoded $$tagInfo{Name}", 0, $len);
         if ($verbose > 2) {
+            $exifTool->VerboseDir("Decoded $$tagInfo{Name}", 0, $len);
             my %parms = ( Prefix => $exifTool->{INDENT} );
             $parms{MaxLen} = 96 unless $verbose > 3;
             Image::ExifTool::HexDump(\$buff, undef, %parms);
         }
+        # don't indent next directory (since it is really the same data)
+        $exifTool->{INDENT} = substr($exifTool->{INDENT}, 0, -2);
     }
+    my %dirInfo = (
+        Base     => 0,
+        DataPt   => \$buff,
+        DataLen  => $len,
+        DirStart => 0,
+        DirLen   => $len,
+        Parent   => 'PNG',
+    );
+    my $processed = 0;
     my $exifTable = GetTagTable('Image::ExifTool::Exif::Main');
     if ($tagTablePtr ne $exifTable) {
         # process non-EXIF/APP1 tables as-is
@@ -453,67 +571,88 @@ sub PngInfo($)
     my $exifTool = shift;
     my $raf = $exifTool->{RAF};
     my $rtnVal = 0;
-    my $hdr;
-    my $idatCount = 0;
-    my $idatBytes = 0;
+    my $sig;
+    my $datChunk = '';
+    my $datCount = 0;
+    my $datBytes = 0;
 
-    # check to be sure this is a valid PNG image
-    return 0 unless $raf->Read($hdr,8) == 8;
-    return 0 unless $hdr eq "\x89PNG\r\n\x1a\n";
-    $exifTool->FoundTag('FileType', 'PNG');
+    # check to be sure this is a valid PNG/MNG/JNG image
+    return 0 unless $raf->Read($sig,8) == 8 and $pngLookup{$sig};
+    my ($fileType, $hdrChunk, $endChunk) = @{$pngLookup{$sig}};
+    $exifTool->SetFileType($fileType);  # set the FileType tag
     SetByteOrder('MM'); # PNG files are big-endian
     my %dirInfo = (
         RAF => $raf,
-        DirName => 'PNG',
+        DirName => $fileType,
     );
     my $tagTablePtr = GetTagTable('Image::ExifTool::PNG::Main');
+    my $mngTablePtr;
+    if ($fileType ne 'PNG') {
+        $mngTablePtr = GetTagTable('Image::ExifTool::MNG::Main');
+    }
     my $verbose = $exifTool->{OPTIONS}->{Verbose};
-    my ($buff, $crc, $foundHdr);
+    my ($hbuf, $dbuf, $cbuf, $foundHdr);
 
-    # process the PNG chunks
+    # process the PNG/MNG/JNG chunks
     undef $noCompressLib;
     for (;;) {
-        $raf->Read($hdr,8) == 8 or $exifTool->Warn('Truncated PNG image'), last;
-        my ($len, $type) = unpack('Na4',$hdr);
-        $len > 0x7fffffff and $exifTool->Warn('Invalid PGN box size'), last;
+        $raf->Read($hbuf,8) == 8 or $exifTool->Warn("Truncated $fileType image"), last;
+        my ($len, $chunk) = unpack('Na4',$hbuf);
+        $len > 0x7fffffff and $exifTool->Warn("Invalid $fileType box size"), last;
         if ($verbose) {
-            if ($type eq 'IDAT') {
-                $idatCount++;
-                $idatBytes += $len;
-            } elsif ($idatCount) {
-                print "PNG IDAT chunks ($idatCount chunks, total $idatBytes bytes)\n";
-                $idatCount = $idatBytes = 0;
+            # don't dump image data chunks in verbose mode (only give count instead)
+            if ($datCount and $chunk ne $datChunk) {
+                my $s = $datCount > 1 ? 's' : '';
+                print "$fileType $datChunk ($datCount chunk$s, total $datBytes bytes)\n";
+                $datCount = $datBytes = 0;
+                $datChunk = '';
+            }
+            if ($chunk =~ /^(IDAT|JDAT|JDAA)$/) {
+                $datChunk = $chunk;
+                $datCount++;
+                $datBytes += $len;
             }
         }
-        if ($type eq 'IEND') {
-            $verbose and print "PNG IEND chunk (end of file)\n";
+        if ($chunk eq $endChunk) {
+            $verbose and print "$fileType $chunk (end of image)\n";
             last;
         }
         # read chunk data and CRC
-        unless ($raf->Read($buff,$len)==$len and $raf->Read($crc, 4)==4) {
-            $exifTool->Warn('Corrupted PNG image');
+        unless ($raf->Read($dbuf,$len)==$len and $raf->Read($cbuf, 4)==4) {
+            $exifTool->Warn('Corrupted $fileType image');
             last;
         }
-        if ($type eq 'IHDR') {
-            $foundHdr = 1;
-        } elsif (not $foundHdr) {
-            $exifTool->Warn('PNG image did not start with IHDR');
-            last;
+        unless ($foundHdr) {
+            if ($chunk eq $hdrChunk) {
+                $foundHdr = 1;
+            } else {
+                $exifTool->Warn("$fileType image did not start with $hdrChunk");
+                last;
+            }
         }
         if ($verbose) {
-            next if $type eq 'IDAT';
-            print "PNG $type chunk (length $len bytes):\n";
+            # check CRC when in verbose mode (since we don't care about speed)
+            my $crc = CalculateCRC(\$hbuf, undef, 4);
+            $crc = CalculateCRC(\$dbuf, $crc);
+            unless ($crc == unpack('N',$cbuf)) {
+                $exifTool->Warn("Bad CRC for $chunk chunk");
+            }
+            next if $datChunk;
+            print "$fileType $chunk ($len bytes):\n";
             if ($verbose > 2) {
                 my %dumpParms;
                 $dumpParms{MaxLen} = 96 if $verbose <= 4;
-                Image::ExifTool::HexDump(\$buff, undef, %dumpParms);
+                Image::ExifTool::HexDump(\$dbuf, undef, %dumpParms);
             }
         }
-        # only extract information from chunks in our table
-        next unless $$tagTablePtr{$type};
-        FoundPNG($exifTool, $tagTablePtr, $type, $buff);
+        # only extract information from chunks in our tables
+        if ($$tagTablePtr{$chunk}) {
+            FoundPNG($exifTool, $tagTablePtr, $chunk, $dbuf);
+        } elsif ($mngTablePtr and $$mngTablePtr{$chunk}) {
+            FoundPNG($exifTool, $mngTablePtr, $chunk, $dbuf);
+        }
     }
-    return 1;   # this was a valid PNG image
+    return 1;   # this was a valid PNG/MNG/JNG image
 }
 
 1;  # end
@@ -522,7 +661,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PNG - Routines for reading PNG images
+Image::ExifTool::PNG - Routines for reading PNG, MNG and JNG images
 
 =head1 SYNOPSIS
 
@@ -531,7 +670,8 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains routines required by Image::ExifTool to read PNG
-(Portable Network Graphics) images.
+(Portable Network Graphics), MNG (Multi-image Network Graphics) and JNG
+(JPEG Network Graphics) images.
 
 =head1 AUTHOR
 
@@ -546,11 +686,16 @@ it under the same terms as Perl itself.
 
 =item L<http://www.libpng.org/pub/png/spec/1.2/>
 
+=item L<http://www.faqs.org/docs/png/>
+
+=item L<http://www.libpng.org/pub/mng/>
+
 =back
 
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/PNG Tags>,
+L<Image::ExifTool::TagNames/MNG Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

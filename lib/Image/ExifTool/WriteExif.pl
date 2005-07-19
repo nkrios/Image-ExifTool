@@ -380,22 +380,32 @@ my %writeTable = (
 #    0x9928 => 'undef',      # Opto-ElectricConversionFactor
     0x9c9b => {             # XPTitle
         Writable => 'int8u',
+        WriteGroup => 'IFD0',
+        Notes => q{
+tags 0x9c9b-0x9c9f are used by Windows Explorer; special characters in these
+values are converted to UTF-8 by default, or Windows Latin1 with the -L option
+        },
         ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0x9c9c => {             # XPComment
         Writable => 'int8u',
+        WriteGroup => 'IFD0',
         ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0x9c9d => {             # XPAuthor
         Writable => 'int8u',
+        WriteGroup => 'IFD0',
+        Notes => 'ignored by Windows Explorer if Artist exists',
         ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0x9c9e => {             # XPKeywords
         Writable => 'int8u',
+        WriteGroup => 'IFD0',
         ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0x9c9f => {             # XPSubject
         Writable => 'int8u',
+        WriteGroup => 'IFD0',
         ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
     0xa000 => 'undef',      # FlashpixVersion
@@ -436,15 +446,15 @@ my %writeTable = (
     0xa407 => 'int16u',     # GainControl
     0xa408 => {             # Contrast
         Writable => 'int16u',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
     },
     0xa409 => {             # Saturation
         Writable => 'int16u',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
     },
     0xa40a => {             # Sharpness
         Writable => 'int16u',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
     },
 #    0xa40b => 'undef',      # DeviceSettingDescription
     0xa40c => 'int16u',     # SubjectDistanceRange
@@ -873,7 +883,7 @@ sub WriteExif($$$)
         foreach $tagInfo ($exifTool->GetNewTagInfoList($tagTablePtr)) {
             my $tagID = $$tagInfo{TagID};
             # evaluate conditional lists now if necessary
-            if (ref $tagTablePtr->{$tagID} eq 'ARRAY') {
+            if (ref $tagTablePtr->{$tagID} eq 'ARRAY' or $$tagInfo{Condition}) {
                 my $curInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
                 if (defined $curInfo and not $curInfo) {
                     # need value to evaluate the condition
@@ -1081,7 +1091,8 @@ sub WriteExif($$$)
                     $oldValue = substr($$valueDataPt, $valuePtr, $oldSize) unless $readFromFile;
                     # get tagInfo if available
                     $oldInfo = $$tagTablePtr{$oldID};
-                    if ($oldInfo and ref $oldInfo ne 'HASH') {
+                    # must evaluate condition if necessary
+                    if ($oldInfo and (ref $oldInfo ne 'HASH' or $$oldInfo{Condition})) {
                         $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \$oldValue);
                     }
                     if ($oldID <= $lastTagID and not $inMakerNotes) {
@@ -1516,6 +1527,8 @@ sub WriteExif($$$)
                         if ($newInfo->{SubDirectory}->{Start}) {
                             #### eval Start ($valuePtr)
                             $subdirStart = eval $newInfo->{SubDirectory}->{Start};
+                            # must adjust directory size if start changed
+                            $oldSize -= $subdirStart - $valuePtr;
                         }
                         my $subdirBase = $base;
                         if ($newInfo->{SubDirectory}->{Base}) {

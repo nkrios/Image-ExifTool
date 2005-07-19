@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.46
 [File, File, Image]  - File Name: CanonRaw_4_failed.crw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:22:49
+[File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
 [File, File, Image]  - File Type: Canon RAW
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
 [MakerNotes, CanonRaw, Camera] 8199 - Jpg From Raw: (Binary data 16 bytes)
@@ -15,7 +15,7 @@
 [MakerNotes, CanonRaw, Image] 4 - Component Bit Depth: 8
 [MakerNotes, CanonRaw, Image] 5 - Color Bit Depth: 24
 [MakerNotes, CanonRaw, Image] 6 - Color BW: 257
-[MakerNotes, CanonRaw, Camera] 4106 - Target Image Type: 0
+[MakerNotes, CanonRaw, Camera] 4106 - Target Image Type: Real-world Subject
 [MakerNotes, CanonRaw, Camera] 6148 - Record ID: 0
 [MakerNotes, CanonRaw, Image] 6167 - File Number: 118-1861
 [MakerNotes, CanonRaw, Time] 0 - Shooting Date/Time: 2003:12:04 06:46:52
@@ -38,6 +38,8 @@
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 35.00mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
 [MakerNotes, Canon, Image] 2 - ISO Speed: 100
+[MakerNotes, Canon, Image] 4 - Target Aperture: 14
+[MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/60
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
@@ -73,6 +75,7 @@
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 26 - Max Aperture: 4
 [MakerNotes, Canon, Camera] 28 - Flash Activity: 0
 [MakerNotes, Canon, Camera] 29 - Flash Bits: On, Internal flash
 [MakerNotes, Canon, Camera] 32 - Focus Continuous: Unknown (-1)

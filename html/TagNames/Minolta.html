@@ -5,7 +5,11 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h2><a name='Minolta'>Minolta Tags</a></h2>
 
-These tags are used by Minolta and Konica/Minolta cameras.
+These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn&apos;t
+make things easy for decoders because the meaning of some tags and the
+location where some information is stored is different for different camera
+models.  (Take MinoltaQuality for example, which may be located in 3
+different places.)
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -14,7 +18,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <tr valign='top'>
 <td>0x0000</td>
 <td>MakerNoteVersion</td>
-<td align='center'>Y</td>
+<td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0001</td>
@@ -38,8 +42,8 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0081</td>
-<td>PreviewImageData</td>
-<td align='center'>N</td>
+<td>PreviewImage</td>
+<td align='center'>undef</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0088</td>
@@ -54,7 +58,7 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <tr valign='top'>
 <td>0x0101</td>
 <td>ColorMode</td>
-<td align='center'>Y</td>
+<td align='center'>int32u</td>
 <td><font size='-1'>0 = Natural color
   <br>1 = Black&amp;white
   <br>2 = Vivid color
@@ -63,29 +67,90 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0102</td>
 <td>MinoltaQuality</td>
-<td align='center'>Y</td>
+<td align='center'>int32u</td>
 <td><font size='-1'>0 = Raw
-  <br>1 = Superfine
+  <br>1 = Super Fine
   <br>2 = Fine
   <br>3 = Standard
   <br>4 = Economy
   <br>5 = Extra fine</font></td></tr>
 <tr valign='top'>
 <td>0x0103</td>
-<td>MinoltaQuality</td>
-<td align='center'>Y</td>
-<td><font size='-1'>0 = Raw
-  <br>1 = Superfine
+<td>MinoltaQuality
+  <br>MinoltaImageSize</td>
+<td align='center'>int32u<br>int32u</td>
+<td><font size='-1'><font color="#666666">(quality for DiMAGE A2/7Hi)</font>
+  <br>0 = Raw
+  <br>1 = Super Fine
   <br>2 = Fine
   <br>3 = Standard
   <br>4 = Economy
-  <br>5 = Extra fine</font></td></tr>
+  <br>5 = Extra fine
+  <br><font color="#666666">(image size for other models except A200)</font>
+  <br>1 = 1600x1200
+  <br>2 = 1280x960
+  <br>3 = 640x480
+  <br>5 = 2560x1920
+  <br>6 = 2272x1704
+  <br>7 = 2048x1536</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x010c</td>
+<td>LensID</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>1 = AF80-200mm F2.8G
+  <br>2 = AF28-70mm F2.8G
+  <br>6 = AF24-85mm F3.5-4.5
+  <br>7 = AF100-400mm F4.5-6.7(D)
+  <br>11 = AF300mm F4G
+  <br>12 = AF100mm F2.8 Soft
+  <br>15 = AF400mm F4.5G
+  <br>16 = AF17-35mm F3.5G
+  <br>19 = AF35mm/1.4
+  <br>20 = STF135mm F2.8[T4.5]
+  <br>23 = AF200mm F4G Macro
+  <br>24 = AF24-105mm F3.5-4.5(D) or SIGMA 18-50mm F2.8
+  <br>25 = AF100-300mm F4.5-5.6(D)
+  <br>27 = AF85mm F1.4G
+  <br>28 = AF100mm F2.8 Macro(D)
+  <br>29 = AF75-300mm F4.5-5.6(D)
+  <br>30 = AF28-80mm F3.5-5.6(D)
+  <br>31 = AF50mm F2.8 Macro(D) or AF50mm F3.5 Macro
+  <br>32 = AF100-400mm F4.5-6.7(D) x1.5
+  <br>33 = AF70-200mm F2.8G SSM
+  <br>35 = AF85mm F1.4G(D) Limited
+  <br>38 = AF17-35mm F2.8-4(D)
+  <br>39 = AF28-75mm F2.8(D)
+  <br>128 = TAMRON 18-200, 28-300 or 80-300mm F3.5-6.3
+  <br>25521 = TOKINA 19-35mm F3.5-4.5
+  <br>25541 = AF35-105mm F3.5-4.5
+  <br>25581 = AF24-50mm F4
+  <br>25611 = SIGMA 70-300mm F4-5.6
+  <br>25621 = AF50mm F1.4 NEW
+  <br>25631 = AF300mm F2.8G
+  <br>25641 = AF50mm F2.8 Macro
+  <br>25661 = AF24mm F2.8
+  <br>25721 = AF500mm F8 Reflex
+  <br>25781 = AF16mm F2.8 Fisheye or SIGMA 8mm F4 Fisheye
+  <br>25791 = AF20mm F2.8
+  <br>25811 = AF100mm F2.8 Macro(D), TAMRON 90mm F2.8 Macro or SIGMA 180mm F5.6 Macro
+  <br>25858 = TAMRON 24-135mm F3.5-5.6
+  <br>25891 = TOKINA 80-200mm F2.8
+  <br>25921 = AF85mm F1.4G(D)
+  <br>25931 = AF200mm F2.8G
+  <br>25961 = AF28mm F2
+  <br>25981 = AF100mm F2
+  <br>26061 = AF100-300mm F4.5-5.6(D)
+  <br>26081 = AF300mm F2.8G
+  <br>26121 = AF200mm F2.8G(D)
+  <br>26131 = AF50mm F1.7
+  <br>26241 = AF35-80mm F4-5.6
+  <br>45741 = AF200mm F2.8G x2 or TOKINA 300mm F2.8 x2</font></td></tr>
+<tr valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0f00</td>
 <td>MinoltaCameraSettings2</td>
 <td align='center'>N</td>
@@ -122,16 +187,19 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td align='right'>4</td>
 <td>MinoltaImageSize</td>
 <td align='center'>int32u</td>
-<td><font size='-1'>0 = 2560x1920 or 2048x1536
+<td><font size='-1'>0 = Full
   <br>1 = 1600x1200
   <br>2 = 1280x960
-  <br>3 = 640x480</font></td></tr>
+  <br>3 = 640x480
+  <br>6 = 2080x1560
+  <br>7 = 2560x1920
+  <br>8 = 3264x2176</font></td></tr>
 <tr valign='top'>
 <td align='right'>5</td>
 <td>MinoltaQuality</td>
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = Raw
-  <br>1 = Superfine
+  <br>1 = Super Fine
   <br>2 = Fine
   <br>3 = Standard
   <br>4 = Economy
@@ -307,14 +375,14 @@ These tags are used by Minolta and Konica/Minolta cameras.
 <td align='right'>37</td>
 <td>MinoltaModel</td>
 <td align='center'>int32u</td>
-<td><font size='-1'>0 = DiMAGE 7
+<td><font size='-1'>0 = DiMAGE 7 or X31
   <br>1 = DiMAGE 5
   <br>2 = DiMAGE S304
   <br>3 = DiMAGE S404
   <br>4 = DiMAGE 7i
   <br>5 = DiMAGE 7Hi
   <br>6 = DiMAGE A1
-  <br>7 = DiMAGE A2</font></td></tr>
+  <br>7 = DiMAGE A2 or S414</font></td></tr>
 <tr valign='top'>
 <td align='right'>38</td>
 <td>IntervalMode</td>
@@ -396,11 +464,28 @@ These tags are used by Minolta and Konica/Minolta cameras.
   <br>1 = contrast
   <br>2 = saturation
   <br>3 = filter</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>51</td>
+<td>ColorProfile</td>
+<td align='center'>int32u</td>
+<td><font size='-1'><font color="#666666">(DiMAGE 7Hi only)</font>
+  <br>0 = Not Embedded
+  <br>1 = Embedded</font></td></tr>
+<tr valign='top'>
+<td align='right'>52</td>
+<td>DataImprint</td>
+<td align='center'>int32u</td>
+<td><font size='-1'><font color="#666666">(DiMAGE 7Hi only)</font>
+  <br>0 = None
+  <br>1 = YYYY/MM/DD
+  <br>2 = MM/DD/HH:MM
+  <br>3 = Text
+  <br>4 = Text + ID#</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 11, 2005</i>
+<br><i>Last revised Jul 7, 2005</i>
 </body>
 </html>

@@ -9,9 +9,12 @@
 #                          but left most of them commented out until I have enough
 #                          information to write PrintConv routines for them to
 #                          display something useful
+#               07/08/05 - P. Harvey Add support for reading PSD files
 #
 # References:   1) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 #               2) http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html
+#               3) Matt Mueller private communication (tests with PS CS2)
+#               4) http://www.fileformat.info/format/psd/egff.htm
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Photoshop;
@@ -20,7 +23,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.11';
+$VERSION = '1.15';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -76,7 +79,17 @@ sub WritePhotoshop($$$);
     },
     0x0408 => { Unknown => 1, Name => 'GridGuidesInfo' },
     0x0409 => { Unknown => 1, Name => 'ThumbnailResource' },
-    0x040a => { Unknown => 1, Name => 'CopyrightFlag' },
+    0x040a => {
+        Name => 'CopyrightFlag',
+        Writable => 1,
+        Groups => { 2 => 'Author' },
+        ValueConv => 'join(" ",unpack("C*", $val))',
+        ValueConvInv => 'pack("C*",split(" ",$val))',
+        PrintConv => { #3
+            0 => 'False',
+            1 => 'True',
+        },
+    },
     0x040b => {
         Name => 'URL',
         Writable => 1,
@@ -105,6 +118,16 @@ sub WritePhotoshop($$$);
     0x041d => { Unknown => 1, Name => 'AlphaIdentifiers' },
     0x041e => { Unknown => 1, Name => 'URL_List' },
     0x0421 => { Unknown => 1, Name => 'VersionInfo' },
+    0x0422 => {
+        Name => 'TIFFThumbnail', #PH (Found in DOS-style EPS file)
+        ValueConv => '\$val',
+    },
+    0x0424 => {
+        Name => 'XMP',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::XMP::Main',
+        },
+    },
     0x0bb7 => { Unknown => 1, Name => 'ClippingPathName' },
     0x2710 => { Unknown => 1, Name => 'PrintFlagsInfo' },
 );
@@ -192,7 +215,7 @@ sub ProcessPhotoshop($$$)
     while ($pos + 8 < $dirEnd) {
         my $type = substr($$dataPt, $pos, 4);
         if ($type ne '8BIM') {
-            $exifTool->Warn("Bad APP13 data $type");
+            $exifTool->Warn("Bad Photoshop data $type");
             last;
         }
         my $tag = Get16u($dataPt, $pos + 4);
@@ -207,7 +230,7 @@ sub ProcessPhotoshop($$$)
             last if $bytes =~ /\0/;
         }
         if ($pos + 4 > $dirEnd) {
-            $exifTool->Warn("Bad APP13 resource block");
+            $exifTool->Warn("Bad Photoshop resource block");
             last;
         }
         my $size = Get32u($dataPt, $pos);
@@ -221,7 +244,7 @@ sub ProcessPhotoshop($$$)
                 $size = Get32u($dataPt, $pos-4);
             }
             if ($size + $pos > $dirEnd) {
-                $exifTool->Warn("Bad APP13 resource data size $size");
+                $exifTool->Warn("Bad Photoshop resource data size $size");
                 last;
             }
         }
@@ -269,6 +292,34 @@ sub ProcessPhotoshop($$$)
     return $success;
 }
 
+#------------------------------------------------------------------------------
+# extract information from Photoshop PSD file
+# Inputs: 0) ExifTool object reference
+# Returns: 1 if this was a valid PSD file
+sub PsdInfo($)
+{
+    my $exifTool = shift;
+    my $raf = $exifTool->{RAF};
+    my $data;
+
+    $raf->Read($data, 30) == 30 or return 0;
+    $data =~ /^8BPS/ or return 0;
+    SetByteOrder('MM');
+    my $len = Get32u(\$data, 26);
+    $raf->Seek($len, 1) or return 0;
+    $raf->Read($data, 4) == 4 or return 0;
+    $len = Get32u(\$data, 0);
+    $raf->Read($data, $len) == $len or return 0;
+    $exifTool->SetFileType('Photoshop');    # set the FileType tag
+    my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Main');
+    my %dirInfo = (
+        DataPt => \$data,
+        DirStart => 0,
+        DirLen => $len,
+        DirName => 'PSD',
+    );
+    return ProcessPhotoshop($exifTool, $tagTablePtr, \%dirInfo);
+}
 
 1; # end
 
@@ -303,6 +354,8 @@ it under the same terms as Perl itself.
 =item L<http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf>
 
 =item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html>
+
+=item L<http://www.fileformat.info/format/psd/egff.htm>
 
 =back
 

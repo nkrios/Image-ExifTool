@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: Unknown.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4KB
-[File, File, Time]  - File Modification Date/Time: 2004:11:11 11:03:55
+[File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -76,4 +76,6 @@
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 29.3
 [Composite, Composite, Image]  - Shutter Speed: 3.2
+[Composite, Composite, Image]  - Circle Of Confusion: 0.001 mm
 [Composite, Composite, Camera]  - Focal Length: 14.0mm (35mm equivalent: 410.6mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 38.26 m

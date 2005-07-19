@@ -1,9 +1,9 @@
 #
-# File:         xmp2iptc.arg
+# File:         xmp2iptc.args
 #
 # Description:  Tag name translations for converting from XMP to IPTC
 #
-# Usage:        exiftool -tagsFromFile src.jpg -@ xmp2iptc.arg dst.jpg
+# Usage:        exiftool -tagsFromFile src.jpg -@ xmp2iptc.args dst.jpg
 #
 # Author:       2005/05/14 - P. Harvey
 #

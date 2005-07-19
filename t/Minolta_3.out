@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.38
 [File, File, Image]  - File Name: Minolta_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 14KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:23:04
+[File, File, Time]  - File Modification Date/Time: 2005:07:04 08:30:33
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -61,7 +61,7 @@
 [MakerNotes, Minolta, Camera] 1 - Exposure Mode: Program
 [MakerNotes, Minolta, Camera] 2 - Flash Mode: Fill flash
 [MakerNotes, Minolta, Camera] 3 - White Balance: Auto
-[MakerNotes, Minolta, Camera] 4 - Minolta Image Size: 2560x1920 or 2048x1536
+[MakerNotes, Minolta, Camera] 4 - Minolta Image Size: Full
 [MakerNotes, Minolta, Camera] 5 - Minolta Quality: Fine
 [MakerNotes, Minolta, Camera] 6 - Drive Mode: single
 [MakerNotes, Minolta, Camera] 7 - Metering Mode: multi-segment
@@ -105,6 +105,8 @@
 [MakerNotes, Minolta, Camera] 48 - Focus Mode: AF
 [MakerNotes, Minolta, Camera] 49 - Focus Area: Wide Focus (normal)
 [MakerNotes, Minolta, Camera] 50 - DEC Position: exposure
+[MakerNotes, Minolta, Camera] 51 - Minolta Camera Settings 0x0033: 0
+[MakerNotes, Minolta, Camera] 52 - Minolta Camera Settings 0x0034: 1
 [MakerNotes, Minolta, Camera] 16 - Minolta 0x0010: .............P...~............[...]
 [MakerNotes, Minolta, Camera] 32 - Minolta 0x0020: ...m.n.nn.../&#.......(,;...k(S.[...]
 [MakerNotes, Minolta, Camera] 64 - Compressed Image Size: 2396300
@@ -127,4 +129,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 4.0
 [Composite, Composite, Image]  - Shutter Speed: 1/180
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Image]  - Circle Of Confusion: 0.007 mm
+[Composite, Composite, Image]  - Depth of Field: 0.19 m (1.91 - 2.10)
 [Composite, Composite, Camera]  - Focal Length: 41.4mm (35mm equivalent: 167.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 41.06 m

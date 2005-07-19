@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: FujiFilm_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:06 12:22:56
+[File, File, Time]  - File Modification Date/Time: 2005:06:27 12:08:31
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -54,7 +54,7 @@
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, FujiFilm, Camera] 0 - Version: 0130
 [MakerNotes, FujiFilm, Camera] 4096 - Image Quality: NORMAL 
-[MakerNotes, FujiFilm, Camera] 4097 - Sharpness: +1
+[MakerNotes, FujiFilm, Camera] 4097 - Sharpness: Normal
 [MakerNotes, FujiFilm, Camera] 4098 - White Balance: DaywhiteColor-fluorescent
 [MakerNotes, FujiFilm, Camera] 4112 - Fuji Flash Mode: Red-eye reduction
 [MakerNotes, FujiFilm, Camera] 4113 - Flash Strength: 0
@@ -73,4 +73,6 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.6
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
 [Composite, Composite, Camera]  - Focal Length: 6.0mm (35mm equivalent: 39.6mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 2.26 m

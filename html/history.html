@@ -5,7 +5,123 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.32.tar.gz">Version 5.32</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.46.tar.gz">Version 5.46</a>.<p>
+
+<b>July 19/05 - Version 5.46</b> (production release)
+<ul>
+<li>Fixed bug which could cause CRW file to be corrupted under some conditions
+    when writing and rewriting the same file
+<li>Added new Canon MaxAperture tag and a few more Canon LensType's (thanks
+    Michael Tiemann)
+<li>Changed PDF decoding to follow 'Next' links at the same level to avoid deep
+    recursion in long linked lists
+</ul>
+
+<b>July 19/05 - Version 5.45</b>
+<ul>
+<li>Set FileType tags properly for newly added formats
+<li>Added Canon TargetAperture and TargetExposureTime and decode Canon 1D Mark
+    II lens information structure (thanks Michael Tiemann)
+<li>Decode more Canon lenses and Canon TargetImageType
+<li>Changed Priority of Error and Warning tags so that first message takes
+    precedence
+<li>Fixed problem where Nikon D70 files grew by 20 bytes each time they were
+    written
+<li>Minor changes to BMP tags
+<li>Added support for AI (Adobe Illustrator) file format
+<li>Added BMP, PDF, Photoshop and PostScript tests
+</ul>
+
+<b>July 16/05 - Version 5.44</b>
+<ul>
+<li>Added read support for BMP (and DIB) images
+</ul>
+
+<b>July 16/05 - Version 5.43</b>
+<ul>
+<li>Allow shortcut tags to be used with -tagsFromFile
+</ul>
+
+<b>July 15/05 - Version 5.42</b>
+<ul>
+<li>Added ability to read PostScript (EPS and PS) and PDF images
+<li>Decode PhotoshopSettings in TIFF images
+</ul>
+
+<b>July 8/05 - Version 5.41</b>
+<ul>
+<li>Added ability to read Photoshop PSD images
+</ul>
+
+<b>July 8/05 - Version 5.40</b>
+<ul>
+<li>Improved decoding of Minolta MRW files to support new cameras
+<li>Changed Minolta ImageQuality values to conform with Minolta terminology
+    (thanks to Niels Kristian Bech Jensen)
+<li>Write Windows XP tags to IFD0 instead of ExifIFD (they worked fine in the
+    ExifIFD, but Windows writes them to IFD0 so they really should go there)
+<li>Really quiet option (-q -q) still suppresses warnings, but no longer
+    suppresses errors
+</ul>
+
+<b>July 6/05 - Version 5.39</b>
+<ul>
+<li>Using -b option now disables -h, -H and -g options
+<li>Decode Canon Panorama information
+<li>Improved maker note decoding for some Minolta camera models
+<li>Changed base offset for Casio EX-Z3 to fix problems decoding some maker note
+    information (it looks like the samples from dpreview.com I had used to code
+    this originally had been corrupted by 3rd party software because new samples
+    downloaded from another web site didn't have the same problem)
+<li>Improved validation of PreviewImage
+</ul>
+
+<b>July 4/05 - Version 5.38</b>
+<ul>
+<li>Translate older 'xap' XMP namespace prefixes (xap, xapRights, xapMM and
+    xapBJ) to their newer 'xmp' counterparts (xmp, xmpRights, xmpMM and xmpBJ)
+    when generating XMP family 1 group names
+<li>Added Minolta LensID (thanks to Shingo Noguchi)
+<li>Other changes to Minolta tags (and fix incorrect spellings of Konica, thanks
+    Niels Kristian Bech Jensen)
+<li>Updated Nikon LensID's (thanks Robert Rottmerhusen)
+</ul>
+
+<b>June 29/05 - Version 5.37</b>
+<ul>
+<li>Removed unknown status from Photoshop CopyrightFlag and made it writable
+<li>Decode a new Canon EasyMode value
+</ul>
+
+<b>June 28/05 - Version 5.36</b>
+<ul>
+<li>Added new composite tags: DOF, CircleOfConfusion and HyperfocalDistance
+<li>Minor changes to simplify and improve generated XMP when writing
+<li>Convert FocusDistance tag values to meters
+<li>Reject ScaleFactor35efl if outside reasonable limits
+<li>Added a few more Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Ignore white space around '=' sign of arguments in '-@' file
+</ul>
+
+<b>June 24/05 - Version 5.35</b>
+<ul>
+<li>Added support for MNG and JNG images
+<li>Added a few new PNG tags
+</ul>
+
+<b>June 21/05 - Version 5.34</b>
+<ul>
+<li>Decode ASCII-based APP12 information (tested with Agfa and Polaroid images)
+<li>Decode remaining PNG chunks in original spec except for IDAT (image data)
+<li>Only generate FileSize and FileModifyDate tags for plain files
+</ul>
+
+<b>June 16/05 - Version 5.33</b>
+<ul>
+<li>Changed print conversions for Contrast, Saturation and Sharpness throughout
+    to be more consistent and to better conform with the EXIF specification
+<li>Decode Minolta Dimage Z2 MinoltaImageSize
+</ul>
 
 <b>June 15/05 - Version 5.32</b> (production release)
 <ul>
@@ -73,7 +189,7 @@
     this is in)
 <li>Added numbers to subsequent SubIFD group names to allow tags in various
     SubIFD's to be accessed individually
-<li>Recognize maker notes from more Konika Minolta cameras
+<li>Recognize maker notes from more Konica Minolta cameras
 <li>Extract PreviewImage for Samsung Digimax V700, Kenox V10 and Digimax V10
 <li>Changed validation of CanonPictureInfo to work with more PowerShot cameras
     (Note: for these cameras, CanonImageHeightAsShot may not be meaningful)
@@ -1330,9 +1446,8 @@ script was not changed
     <ul>
     <li>I am finally happy with the API, so future major changes are less likely
         (hence the major version number)
-        <li>No longer return ARRAY reference for list of tags (Instead, tag
-            values are joined in a comma separated list if tag 'List' flag is
-            set)
+    <li>No longer return ARRAY reference for list of tags (Instead, tag values
+        are joined in a comma separated list if tag 'List' flag is set)
     <li>Added SAVE_DUPLICATES option
     <li>Added BuildCompositeTags() to EXPORT_OK list
     <li>GetFoundTags() now sorts tags in specified order

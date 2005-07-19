@@ -55,15 +55,15 @@ Image::ExifTool - Read and write meta information in images
 
 ExifTool provides an extensible set of perl modules to read and write meta
 information in image files.  It reads EXIF, GPS, IPTC, XMP, GeoTIFF, ICC
-Profile and Photoshop IRB meta information from JPEG, JP2, TIFF, PNG, GIF,
-THM, CRW (Canon RAW), CR2 (Canon 1D Mk II RAW), MRW (Minolta RAW), NEF
-(Nikon Electronic image Format), PEF (Pentax RAW), ORF (Olympus RAW Format)
-and DNG (Digital Negative) images, as well as the maker notes of many
-digital cameras by various manufacturers including Canon, Casio, FujiFilm,
-Kodak, Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica,
-Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon. It writes EXIF, GPS, IPTC, XMP
-and MakerNotes information to JPEG, TIFF, GIF, CRW, THM, CR2, NEF, PEF and
-DNG files.
+Profile and Photoshop IRB meta information from JPEG, JP2, TIFF, GIF, BMP,
+PNG, MNG, JNG, MIFF, EPS, PS, AI, PDF, PSD, THM, CRW (Canon RAW), CR2 (Canon
+RAW 2), MRW (Minolta RAW), NEF (Nikon Electronic image Format), PEF (Pentax
+RAW), ORF (Olympus RAW Format) and DNG (Digital Negative) images, as well as
+the maker notes of many digital cameras by various manufacturers including
+Canon, Casio, FujiFilm, Kodak, Minolta/Konica-Minolta, Nikon, Olympus/Epson,
+Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.  It writes
+EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG, TIFF, GIF, CRW,
+THM, CR2, NEF, PEF and DNG files.
 
 =head1 METHODS
 
@@ -97,6 +97,10 @@ information hash, and L</GetTagList> for the returned tag list.
 
     # Return information from image data in memory for specified tags
     $info = ImageInfo(\$imageData, \@tagList, \%options)
+
+    # Extract information from an embedded thumbnail image
+    $info = ImageInfo('image.jpg', 'thumbnailimage');
+    $thumbInfo = ImageInfo($$info{ThumbnailImage});
 
 =over 4
 
@@ -139,7 +143,10 @@ of ExifTool tag names.
 
 =item File ref
 
-A reference to an open image file.
+A reference to an open image file.  If you use this method (or a SCALAR
+reference) to access information in an image, the FileName and Directory
+tags will not be returned.  (Also, the FileSize and FileModifyDate tags will
+not be returned unless it is a plain file.)
 
 =item SCALAR ref
 
@@ -156,7 +163,7 @@ names in the proper case.
 
 Reference to a hash containing the options settings.  See L</Options>
 documentation below for a list of available options.  Options specified
-as arguments to L</ImageInfo> take precidence over L</Options> settings.
+as arguments to L</ImageInfo> take precedence over L</Options> settings.
 
 =back
 
@@ -228,19 +235,22 @@ all function calls but may be overridden by options passed as arguments
 to a specific function.
 
     # Exclude the 'OwnerName' tag from returned information
-    $exifTool->Options( Exclude => 'OwnerName' );
+    $exifTool->Options(Exclude => 'OwnerName');
 
     # Only get information in EXIF or MakerNotes groups
-    $exifTool->Options( Group0 => [ 'EXIF', 'MakerNotes' ] );
+    $exifTool->Options(Group0 => ['EXIF', 'MakerNotes']);
 
     # Ignore information from IFD1
-    $exifTool->Options( Group1 => '-IFD1' );
+    $exifTool->Options(Group1 => '-IFD1');
 
     # Sort by groups in family 2, and extract unknown tags
-    $exifTool->Options( Sort => 'Group2', Unknown => 1 );
+    $exifTool->Options(Sort => 'Group2', Unknown => 1);
 
     # Do not extract duplicate tag names
-    $oldSetting = $exifTool->Options( Duplicates => 0 );
+    $oldSetting = $exifTool->Options(Duplicates => 0);
+
+    # Get current setting
+    $isVerbose = $exifTool->Options('Verbose');
 
 =over 4
 
@@ -260,8 +270,10 @@ to a specific function.
 
 =item Binary
 
-Flag to get the value of all binary tags.  Unless set, large binary values
-may only be extracted for specifically requested tags. Default is 0.
+Flag to extract the value data for all binary tags.  Tag values representing
+large binary data blocks (ie. ThumbnailImage) are not necessarily extracted
+unless this option is set or the tag is specifically requested by name.
+Default is 0.
 
 =item ByteOrder
 
@@ -639,9 +651,9 @@ for this tag in subsequent calls to L</WriteInfo>.
 For tag lists (like Keywords), call repeatedly with the same tag name for
 each value in the list.
 
-    $success = $exifTool->SetNewValue($tag,$value);
+    $success = $exifTool->SetNewValue($tag, $value);
 
-    ($success, $errStr) = $exifTool->SetNewValue($tag,$value);
+    ($success, $errStr) = $exifTool->SetNewValue($tag, $value);
 
     # delete a tag (also resets AddValue and DelValue options for this tag)
     $exifTool->SetNewValue($tag);
@@ -650,13 +662,13 @@ each value in the list.
     $exifTool->SetNewValue();
 
     # delete a single keyword
-    $exifTool->SetNewValue('Keywords', $word, DelValue=>1);
+    $exifTool->SetNewValue('Keywords', $word, DelValue => 1);
 
     # add a keyword without replacing existing keywords
-    $exifTool->SetNewValue('Keywords', $word, AddValue=>1);
+    $exifTool->SetNewValue(Keywords => $word, AddValue => 1);
 
     # set a tag in a specific group
-    $exifTool->SetNewValue('Headline', $val, Group=>'XMP');
+    $exifTool->SetNewValue(Headline => $val, Group => 'XMP');
 
 =over 4
 
@@ -801,9 +813,9 @@ Save state of new values to be later restored by L</RestoreNewValues>.
 
     $exifTool->SaveNewValues();         # save state of new values
     $exifTool->SetNewValue(ISO => 100); # set new value for ISO
-    $exifTool->WriteInfo('a.jpg');      # write ISO + previous new values
+    $exifTool->WriteInfo($src, $dst1);  # write ISO + previous new values
     $exifTool->RestoreNewValues();      # restore previous new values
-    $exifTool->WriteInfo('b.jpg');      # write previous new values only
+    $exifTool->WriteInfo($src, $dst2);  # write previous new values only
 
 =over 4
 
@@ -1117,19 +1129,20 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (General Location):
 
-Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC, Jpeg2000,
-MakerNotes, PNG, Photoshop, PrintIM, XMP
+APP12, Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC,
+Jpeg2000, MIFF, MNG, MakerNotes, PDF, PNG, Photoshop, PostScript, PrintIM,
+XMP
 
 =item Family 1 (Specific Location):
 
-Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
+APP12, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool,
+File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
 ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
-Kodak, KodakBordersIFD, KodakEffectsIFD, MakerUnknown, Minolta, Nikon,
-NikonPreview, Olympus, PNG, Panasonic, Pentax, Photoshop, PrintIM, Ricoh,
-Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif,
-XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ,
-XMP-xmpMM, XMP-xmpRights
+Kodak, KodakBordersIFD, KodakEffectsIFD, MIFF, MNG, MakerUnknown, Minolta,
+Nikon, NikonPreview, Olympus, DF, PNG, Panasonic, Pentax, Photoshop,
+PostScript, PrintIM, Ricoh, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux,
+XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff,
+XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
 
 =item Family 2 (Category):
 

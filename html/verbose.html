@@ -16,22 +16,25 @@ Multiple -v options are allowed, so the following two examples give the
 same result:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
-exiftool -v -v -v test.jpg
+exiftool -v -v -v t/ExifTool.jpg
 
-exiftool -v3 test.jpg
+exiftool -v3 t/ExifTool.jpg
 </pre></td></tr></table></blockquote>
 
 <p>Below are example outputs for different Verbose settings.
 
 <h3>Verbose = 1</h3>
-Prints tag names and extracted values.  For unknown tags, the tag
-numbers are printed instead of a name.  Also printed are details
-of the file and directory structure:
+Prints tag names and extracted values.  The values are the raw values straight
+from the file, before any conversions are applied.  For unknown tags, the tag
+numbers are printed instead of a name.  Also printed are details of the file and
+directory structure:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
-  ExifToolVersion = 5.05
-  FileName = test.jpg
+  ExifToolVersion = 5.32
+  FileName = ExifTool.jpg
+  Directory = t
   FileSize = 3475
+  FileModifyDate = 1117042858
   FileType = JPEG
 JPEG APP1 (2442 bytes):
   + [IFD0 directory with 9 entries]
@@ -58,9 +61,11 @@ Prints all of the information from Verbose = 1, plus additional information
 about the tag number, data size and format:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
-  ExifToolVersion = 5.05
-  FileName = test.jpg
+  ExifToolVersion = 5.32
+  FileName = ExifTool.jpg
+  Directory = t
   FileSize = 3475
+  FileModifyDate = 1117042858
   FileType = JPEG
 JPEG APP1 (2442 bytes):
   + [IFD0 directory with 9 entries]
@@ -97,13 +102,18 @@ JPEG APP1 (2442 bytes):
 </pre></td></tr></table></blockquote>
 
 <h3>Verbose = 3</h3>
-Adds a hex dump of the binary data associated with each tag.  If the
-data is very long, only the first few lines of the dump are printed:
+Adds a hex dump of the binary data associated with each tag.  For information in
+EXIF directories, the hex dumps offsets are relative to the start of the TIFF
+header (for a JPEG image, this is 6 bytes into the EXIF APP1 segment), which
+corresponds to the offsets stored in the IFD entries.  If the data is very long,
+only the first few lines of the dump are printed:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
-  ExifToolVersion = 5.05
-  FileName = test.jpg
+  ExifToolVersion = 5.32
+  FileName = ExifTool.jpg
+  Directory = t
   FileSize = 3475
+  FileModifyDate = 1117042858
   FileType = JPEG
 JPEG APP1 (2442 bytes):
     0000: 45 78 69 66 00 00 49 49 2a 00 08 00 00 00 09 00 [Exif..II*.......]

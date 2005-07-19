@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: GPS.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
-[File, File, Time]  - File Modification Date/Time: 2005:04:02 20:14:19
+[File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 120
 [File, File, Image]  - Image Height: 80
@@ -76,7 +76,6 @@
 [IPTC, IPTC, Author] 116 - Copyright Notice: ian Britton - FreeFoto.com
 [Composite, Composite, Image]  - Aperture: 0.6
 [Composite, Composite, Image]  - Image Size: 120x80
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 0.0
 [Composite, Composite, Image]  - Shutter Speed: 1/724
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - Focal Length: 0.0mm (35mm equivalent: 0.0mm)
+[Composite, Composite, Camera]  - Focal Length: 0.0mm

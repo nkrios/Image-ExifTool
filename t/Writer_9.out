@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.03
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.46
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -64,17 +64,20 @@
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 26 - Max Aperture: 4
 [MakerNotes, Canon, Camera] 28 - Flash Activity: 0
 [MakerNotes, Canon, Camera] 29 - Flash Bits: (none)
 [MakerNotes, Canon, Camera] 32 - Focus Continuous: Unknown (-1)
 [MakerNotes, Canon, Camera] 36 - Zoomed Resolution: 3072
 [MakerNotes, Canon, Camera] 37 - Zoomed Resolution Base: 3072
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
+[MakerNotes, Canon, Image] 0 - Canon Focal Length 0x0000: 0
 [MakerNotes, Canon, Image] 1 - Focal Length: 34mm
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
-[MakerNotes, Canon, Camera] 3 - Canon 0x0003: 100 0 0 0
+[MakerNotes, Canon, Camera] 3 - Canon Flash Info: 100 0 0 0
 [MakerNotes, Canon, Image] 2 - ISO Speed: 100
+[MakerNotes, Canon, Image] 4 - Target Aperture: 14
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
@@ -140,5 +143,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4
+[Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 54.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 4.37 m
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)

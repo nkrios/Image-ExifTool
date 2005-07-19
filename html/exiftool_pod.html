@@ -57,17 +57,17 @@ new file is OK before erasing the original.)</p>
 <p>Below is a list of meta information formats and file types currently
 supported by exiftool (r = read support, w = write support):</p>
 <pre>
-     Meta Information                   File Types
-    ------------------          --------------------------
-    EXIF           r/w          JPEG   r/w      JP2    r   
-    GPS            r/w          TIFF   r/w      PNG    r    
-    IPTC           r/w          GIF    r/w      MIFF   r
-    XMP            r/w          THM    r/w      MRW    r
-    MakerNotes     r/w          CRW    r/w      ORF    r  
-    GeoTIFF        r            CR2    r/w
-    ICC Profile    r            DNG    r/w
-    Photoshop IRB  r            NEF    r/w
-    PrintIM        r            PEF    r/w</pre>
+     Meta Information                         File Type
+    ------------------          --------------------------------------
+    EXIF           r/w          JPEG   r/w      JP2    r      PDF    r
+    GPS            r/w          TIFF   r/w      BMP    r      PSD    r
+    IPTC           r/w          GIF    r/w      PNG    r      MRW    r
+    XMP            r/w          THM    r/w      MNG    r      ORF    r
+    MakerNotes     r/w          CRW    r/w      JNG    r
+    Photoshop IRB  r/w          CR2    r/w      MIFF   r
+    GeoTIFF        r            DNG    r/w      EPS    r
+    ICC Profile    r            NEF    r/w      PS     r
+    PrintIM        r            PEF    r/w      AI     r</pre>
 <p>
 </p>
 <hr />
@@ -338,7 +338,8 @@ with <code>#</code> are ignored.  For example, this format file:
 </dt>
 <dd>
 <strong>Q</strong>uiet processing.  One <a href="#item__2dq"><code>-q</code></a> suppresses normal informational messages,
-and a second <a href="#item__2dq"><code>-q</code></a> suppresses warnings as well.
+and a second <a href="#item__2dq"><code>-q</code></a> suppresses warnings as well.  Error messages can not be
+suppressed.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dr"><strong>-r</strong></a></strong><br />
@@ -699,7 +700,11 @@ the new information.
 </dt>
 <dd>
 Translate IPTC information to XMP with appropriate tag name conversions, and
-delete the original IPTC information in an image.
+delete the original IPTC information from an image.  This example uses
+iptc2xmp.args, which is a file included with the ExifTool distribution that
+contains the required arguments to convert IPTC information to XMP format.
+Also included with the distribution is xmp2iptc.args, which performs the
+inverse conversion.
 </dd>
 <p></p></dl>
 <p>

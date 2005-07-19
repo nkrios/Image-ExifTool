@@ -7,6 +7,9 @@
 #
 # References:   1) http://www.dalibor.cz/minolta/makernote.htm
 #               2) Jay Al-Saadi private communication (testing with A2)
+#               3) Shingo Noguchi, PhotoXP (http://www.daifukuya.com/photoxp/)
+#               4) Niels Kristian Bech Jensen private communication
+#               5) http://www.cybercom.net/~dcoffin/dcraw/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
@@ -15,14 +18,18 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.12';
+$VERSION = '1.16';
 
 %Image::ExifTool::Minolta::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0x0000 => 'MakerNoteVersion',
+    0x0000 => {
+        Name => 'MakerNoteVersion',
+        Writable => 'undef',
+        Count => 4,
+    },
     0x0001 => {
         Name => 'MinoltaCameraSettingsOld',
         SubDirectory => {
@@ -32,6 +39,8 @@ $VERSION = '1.12';
     },
     0x0003 => {
         Name => 'MinoltaCameraSettings',
+        # These camera settings are different for the DiMAGE X31
+        Condition => '$self->{CameraModel} ne "DiMAGE X31"',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::CameraSettings',
             ByteOrder => 'BigEndian',
@@ -49,8 +58,9 @@ $VERSION = '1.12';
         Writable => 'int32u',
     },
     0x0081 => {
-        Name => 'PreviewImageData',
-        Writable => 0,
+        # preview image in TIFF format files
+        %Image::ExifTool::previewImageTagInfo,
+        Permanent => 1,     # don't add this to a file because it doesn't exist in JPEG images
     },
     0x0088 => {
         Name => 'PreviewImageStart',
@@ -69,6 +79,8 @@ $VERSION = '1.12';
     },
     0x0101 => {
         Name => 'ColorMode',
+        Priority => 0, # Other ColorMode is more reliable for A2
+        Writable => 'int32u',
         PrintConv => {
             0 => 'Natural color',
             1 => 'Black&white',
@@ -79,25 +91,103 @@ $VERSION = '1.12';
     },
     0x0102 => {
         Name => 'MinoltaQuality',
+        Writable => 'int32u',
+        # PrintConv strings conform with Minolta reference manual (ref 4)
+        # (note that Minolta calls an uncompressed TIFF image "Super fine")
         PrintConv => {
             0 => 'Raw',
-            1 => 'Superfine',
+            1 => 'Super Fine',
             2 => 'Fine',
             3 => 'Standard',
             4 => 'Economy',
             5 => 'Extra fine',
         },
     },
-    # (0x0103 is the same as 0x0102 above)
-    0x0103 => {
-        Name => 'MinoltaQuality',
+    # (0x0103 is the same as 0x0102 above) -- this is true for some
+    # cameras (A2/7Hi), but not others - PH
+    0x0103 => [
+        {
+            Name => 'MinoltaQuality',
+            Writable => 'int32u',
+            Condition => '$self->{CameraModel} =~ /^DiMAGE (A2|7Hi)$/',
+            Notes => 'quality for DiMAGE A2/7Hi',
+            Priority => 0, # lower priority because this doesn't work for A200
+            PrintConv => { #4
+                0 => 'Raw',
+                1 => 'Super Fine',
+                2 => 'Fine',
+                3 => 'Standard',
+                4 => 'Economy',
+                5 => 'Extra fine',
+            },
+        },
+        { #PH
+            Name => 'MinoltaImageSize',
+            Writable => 'int32u',
+            Condition => '$self->{CameraModel} !~ /^DiMAGE A200$/',
+            Notes => 'image size for other models except A200',
+            PrintConv => {
+                1 => '1600x1200',
+                2 => '1280x960',
+                3 => '640x480',
+                5 => '2560x1920',
+                6 => '2272x1704',
+                7 => '2048x1536',
+            },
+        },
+    ],
+    0x010c => { #3 (Alpha 7)
+        Name => 'LensID',
+        Writable => 'int32u',
         PrintConv => {
-            0 => 'Raw',
-            1 => 'Superfine',
-            2 => 'Fine',
-            3 => 'Standard',
-            4 => 'Economy',
-            5 => 'Extra fine',
+            1 => 'AF80-200mm F2.8G',
+            2 => 'AF28-70mm F2.8G',
+            6 => 'AF24-85mm F3.5-4.5',
+            7 => 'AF100-400mm F4.5-6.7(D)',
+            11 => 'AF300mm F4G',
+            12 => 'AF100mm F2.8 Soft',
+            15 => 'AF400mm F4.5G',
+            16 => 'AF17-35mm F3.5G',
+            19 => 'AF35mm/1.4',
+            20 => 'STF135mm F2.8[T4.5]',
+            23 => 'AF200mm F4G Macro',
+            24 => 'AF24-105mm F3.5-4.5(D) or SIGMA 18-50mm F2.8',
+            25 => 'AF100-300mm F4.5-5.6(D)',
+            27 => 'AF85mm F1.4G',
+            28 => 'AF100mm F2.8 Macro(D)',
+            29 => 'AF75-300mm F4.5-5.6(D)',
+            30 => 'AF28-80mm F3.5-5.6(D)',
+            31 => 'AF50mm F2.8 Macro(D) or AF50mm F3.5 Macro',
+            32 => 'AF100-400mm F4.5-6.7(D) x1.5',
+            33 => 'AF70-200mm F2.8G SSM',
+            35 => 'AF85mm F1.4G(D) Limited',
+            38 => 'AF17-35mm F2.8-4(D)',
+            39 => 'AF28-75mm F2.8(D)',
+            128 => 'TAMRON 18-200, 28-300 or 80-300mm F3.5-6.3',
+            25521 => 'TOKINA 19-35mm F3.5-4.5',
+            25541 => 'AF35-105mm F3.5-4.5',
+            25581 => 'AF24-50mm F4',
+            25611 => 'SIGMA 70-300mm F4-5.6',
+            25621 => 'AF50mm F1.4 NEW',
+            25631 => 'AF300mm F2.8G',
+            25641 => 'AF50mm F2.8 Macro',
+            25661 => 'AF24mm F2.8',
+            25721 => 'AF500mm F8 Reflex',
+            25781 => 'AF16mm F2.8 Fisheye or SIGMA 8mm F4 Fisheye',
+            25791 => 'AF20mm F2.8',
+            25811 => 'AF100mm F2.8 Macro(D), TAMRON 90mm F2.8 Macro or SIGMA 180mm F5.6 Macro',
+            25858 => 'TAMRON 24-135mm F3.5-5.6',
+            25891 => 'TOKINA 80-200mm F2.8',
+            25921 => 'AF85mm F1.4G(D)',
+            25931 => 'AF200mm F2.8G',
+            25961 => 'AF28mm F2',
+            25981 => 'AF100mm F2',
+            26061 => 'AF100-300mm F4.5-5.6(D)',
+            26081 => 'AF300mm F2.8G',
+            26121 => 'AF200mm F2.8G(D)',
+            26131 => 'AF50mm F1.7',
+            26241 => 'AF35-80mm F4-5.6',
+            45741 => 'AF200mm F2.8G x2 or TOKINA 300mm F2.8 x2',
         },
     },
     0x0e00 => {
@@ -147,17 +237,20 @@ $VERSION = '1.12';
     4 => {
         Name => 'MinoltaImageSize',
         PrintConv => {
-            0 => '2560x1920 or 2048x1536',
+            0 => 'Full',
             1 => '1600x1200',
             2 => '1280x960',
             3 => '640x480',
+            6 => '2080x1560', #PH (A2)
+            7 => '2560x1920', #PH (A2)
+            8 => '3264x2176', #PH (A2)
         },
     },
     5 => {
         Name => 'MinoltaQuality',
-        PrintConv => {
+        PrintConv => { #4
             0 => 'Raw',
-            1 => 'Superfine',
+            1 => 'Super Fine',
             2 => 'Fine',
             3 => 'Standard',
             4 => 'Economy',
@@ -241,9 +334,9 @@ $VERSION = '1.12';
     19 => {
         Name => 'FocusDistance',
         ValueConv => '$val / 1000',
-        PrintConv => '$val ? "$val m" : "inf"',
         ValueConvInv => '$val * 1000',
-        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/ m$//, $val',
+        PrintConv => '$val ? "$val m" : "inf"',
+        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/\s.*//, $val',
     },
     20 => {
         Name => 'FlashFired',
@@ -259,7 +352,7 @@ $VERSION = '1.12';
     },
     22 => {
         Name => 'MinoltaTime',
-        ValueConv => 'sprintf("%2d:%.2d:%.2d",$val>>16,($val&0xff00)>>8,$val&0xff)',
+        ValueConv => 'sprintf("%.2d:%.2d:%.2d",$val>>16,($val&0xff00)>>8,$val&0xff)',
         ValueConvInv => 'my @a=($val=~/(\d+):(\d+):(\d+)/); @a ? ($a[0]<<16)+($a[1]<<8)+$a[2] : undef',
     },
     23 => {
@@ -292,15 +385,15 @@ $VERSION = '1.12';
     },
     31 => {
         Name => 'Saturation',
-        ValueConv => '$val - 3',
-        ValueConvInv => '$val + 3',
+        ValueConv => '$val - ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConvInv => '$val + ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
         PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
     32 => {
         Name => 'Contrast',
-        ValueConv => '$val - 3',
-        ValueConvInv => '$val + 3',
+        ValueConv => '$val - ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConvInv => '$val + ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
         PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
@@ -345,14 +438,14 @@ $VERSION = '1.12';
     37 => {
         Name => 'MinoltaModel',
         PrintConv => {
-            0 => 'DiMAGE 7',
+            0 => 'DiMAGE 7 or X31',
             1 => 'DiMAGE 5',
             2 => 'DiMAGE S304',
             3 => 'DiMAGE S404',
             4 => 'DiMAGE 7i',
             5 => 'DiMAGE 7Hi',
             6 => 'DiMAGE A1',
-            7 => 'DiMAGE A2', # also 'DiMAGE S414'?
+            7 => 'DiMAGE A2 or S414',
         },
     },
     38 => {
@@ -381,8 +474,8 @@ $VERSION = '1.12';
     },
     41 => {
         Name => 'ColorFilter',
-        ValueConv => '$val - 3',
-        ValueConvInv => '$val + 3',
+        ValueConv => '$val - ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConvInv => '$val + ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
     },
     42 => 'BWFilter',
     43 => {
@@ -432,25 +525,29 @@ $VERSION = '1.12';
             3 => 'filter',
         },
     },
-# D7Hi only:
-#    51 => {
-#        Name => 'ColorProfile',
-#        PrintConv => {
-#            0 => 'Not Embedded',
-#            1 => 'Embedded',
-#        },
-#    },
-# entry 52 for D7Hi:
-#    51 => {
-#        Name => 'DataImprint',
-#        PrintConv => {
-#            0 => 'none',
-#            1 => 'yyyy/mm/dd',
-#            2 => 'mm/dd/hr:min',
-#            3 => 'text',
-#            4 => 'text + id#',
-#        },
-#    },
+    # 7Hi only:
+    51 => {
+        Name => 'ColorProfile',
+        Condition => '$self->{CameraModel} eq "DiMAGE 7Hi"',
+        Notes => 'DiMAGE 7Hi only',
+        PrintConv => {
+            0 => 'Not Embedded',
+            1 => 'Embedded',
+        },
+    },
+    # (the following may be entry 51 for other models?)
+    52 => {
+        Name => 'DataImprint',
+        Condition => '$self->{CameraModel} eq "DiMAGE 7Hi"',
+        Notes => 'DiMAGE 7Hi only',
+        PrintConv => {
+            0 => 'None',
+            1 => 'YYYY/MM/DD',
+            2 => 'MM/DD/HH:MM',
+            3 => 'Text',
+            4 => 'Text + ID#',
+        },
+    },
 );
 
 # basic Minolta white balance lookup
@@ -499,17 +596,31 @@ sub ConvertWhiteBalance($)
 #------------------------------------------------------------------------------
 # get information from Minolta MRW file
 # Inputs: 0) ExifTool object reference
-#         1) RAF pointer
 # Returns: 1 if this was a valid MRW file
-sub MrwInfo($$)
+sub MrwInfo($)
 {
-    my ($exifTool, $raf) = @_;
+    my $exifTool = shift;
+    my $raf = $exifTool->{RAF};
     my $data;
 
-    $raf->Read($data,4);
-    $data eq "\0MRM" or return 0;
-
-    return $exifTool->TiffInfo('MRW', $raf, 48);
+    $raf->Read($data,8) == 8 or return 0;
+    $data =~ /^\0MRM/ or return 0;
+    SetByteOrder('MM');
+    my $offset = Get32u(\$data, 4) + 8;
+    my $pos = 8;
+    # decode MRW structure to locate start of TIFF-format image (ref 5)
+    while ($pos < $offset) {
+        $raf->Read($data,8) == 8 or return 0;
+        my $tag = substr($data, 0, 4);
+        my $len = Get32u(\$data, 4);
+        if ($tag eq "\0TTW") {
+            # parse the TIFF structure after the TTW tag
+            return $exifTool->TiffInfo('MRW', $raf, $pos + 8);
+        }
+        $pos += $len + 8;
+        $raf->Seek($len, 1) or return 0;
+    }
+    return 0;
 }
 
 1;  # end
@@ -527,7 +638,7 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to interpret
-Minolta and Konika-Minolta maker notes in EXIF information.
+Minolta and Konica-Minolta maker notes in EXIF information.
 
 =head1 AUTHOR
 
@@ -542,7 +653,14 @@ it under the same terms as Perl itself.
 
 =item L<http://www.dalibor.cz/minolta/makernote.htm>
 
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
+
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Jay Al-Saadi, Niels Kristian Bech Jensen and Shingo Noguchi for
+the information they provided.
 
 =head1 SEE ALSO
 

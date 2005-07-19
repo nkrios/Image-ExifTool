@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -842,6 +842,7 @@ sub ProcessIPTC($$$)
     my $dirEnd = $pos + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
+    my %listTags;
 
     $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
     while ($pos + 5 <= $dirEnd) {
@@ -910,10 +911,17 @@ sub ProcessIPTC($$$)
                     warn("Invalid IPTC format: $format");
                 }
             }
+            # prevent adding tags to list from another IPTC directory
+            if ($$tagInfo{List}) {
+                $exifTool->{NO_LIST} = 1 unless $listTags{$tagInfo};
+                $listTags{$tagInfo} = 1;    # list the next one we see
+            }
         } else {
-            $tagInfo = sprintf("IPTC_%d", $tag);
+            $tagInfo = { Name => sprintf("IPTC_%d", $tag) };
+            Image::ExifTool::AddTagToTable($recordPtr, $tag, $tagInfo);
         }
         $exifTool->FoundTag($tagInfo, $val);
+        delete $exifTool->{NO_LIST};
         $success = 1;
 
         $pos += $len;   # increment to next field

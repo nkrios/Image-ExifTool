@@ -525,6 +525,8 @@ sub SetNewValuesFromFile($$;@)
 {
     my ($self, $srcFile, @setTags) = @_;
 
+    # expand shortcuts
+    @setTags and ExpandShortcuts(\@setTags);
     # get all tags from source file (including MakerNotes block)
     my $srcExifTool = new Image::ExifTool;
     my $opts = {MakerNotes=>1, Binary=>1, Duplicates=>1, List=>1};
@@ -1209,20 +1211,19 @@ sub GetNewValueHash($$;$$)
 sub LoadAllTables()
 {
     unless ($loadedAllTables) {
-        # load all of our non-referenced tables (Exif table first)
-        GetTagTable('Image::ExifTool::Exif::Main');
-        GetTagTable('Image::ExifTool::CanonRaw::Main');
-        GetTagTable('Image::ExifTool::Photoshop::Main');
-        GetTagTable('Image::ExifTool::GeoTiff::Main');
-        GetTagTable('Image::ExifTool::Jpeg2000::Main');
-        GetTagTable('Image::ExifTool::PNG::Main');
-        GetTagTable('Image::ExifTool::MIFF::Main');
+        # load all of our non-referenced tables (first our modules)
+        my $table;
+        foreach $table (@loadAllTables) {
+            GetTagTable("Image::ExifTool::${table}::Main");
+        }
+        # (then our special tables)
+        GetTagTable('Image::ExifTool::APP12');
         GetTagTable('Image::ExifTool::extraTags');
         GetTagTable('Image::ExifTool::compositeTags');
         # recursively load all tables referenced by the current tables
         my @tableNames = ( keys %allTables );
         while (@tableNames) {
-            my $table = GetTagTable(pop @tableNames);
+            $table = GetTagTable(pop @tableNames);
             # recursively scan through tables in subdirectories
             foreach (TagTableKeys($table)) {
                 my @infoArray = GetTagInfoList($table,$_);
@@ -1556,15 +1557,23 @@ sub VerboseInfo($$$%)
     my ($tag, $tagDesc, $line, $hexID);
 
     # generate hex number if tagID is numerical
-    $tagID =~ /^\d+$/ and $hexID = sprintf("0x%.4x", $tagID) if defined $tagID;
+    if (defined $tagID) {
+        $tagID =~ /^\d+$/ and $hexID = sprintf("0x%.4x", $tagID);
+    } else {
+        $tagID = 'Unknown';
+    }
     # get tag name
     if ($tagInfo and $$tagInfo{Name}) {
         $tag = $$tagInfo{Name};
     } else {
         my $prefix;
         $prefix = $parms{Table}->{TAG_PREFIX} if $parms{Table};
-        $prefix = 'Unknown' unless $prefix;
-        $tag = $prefix . '_' . ($hexID ? $hexID : $tagID);
+        if ($prefix or $hexID) {
+            $prefix = 'Unknown' unless $prefix;
+            $tag = $prefix . '_' . ($hexID ? $hexID : $tagID);
+        } else {
+            $tag = $tagID;
+        }
     }
     my $dataPt = $parms{DataPt};
     my $size = $parms{Size};
@@ -1591,7 +1600,9 @@ sub VerboseInfo($$$%)
     print "$line\n";
 
     # Level 2: print detailed information about the tag
-    if ($verbose > 1 and defined $tagID) {
+    if ($verbose > 1 and ($parms{Extra} or $parms{Format} or
+        $parms{DataPt} or defined $size))
+    {
         $line = $indent;
         $line .= '- Tag ' . ($hexID ? $hexID : "'$tagID'");
         $line .= $parms{Extra} if defined $parms{Extra};
@@ -1891,9 +1902,9 @@ sub WriteValue($$;$$$$)
             return undef unless defined $val;
             # validate numerical formats
             if ($format =~ /^int/) {
-                return undef unless Image::ExifTool::IsInt($val);
+                return undef unless IsInt($val);
             } else {
-                return undef unless Image::ExifTool::IsFloat($val);
+                return undef unless IsFloat($val);
             }
             $packed .= &$proc($val);
         }
@@ -2476,7 +2487,8 @@ sub WriteJPEG($$)
             undef $$segDataPt;  # free the buffer
         }
     }
-    $oldOutfile and warn("Internal error in WriteJPEG\n"), return 0;
+    # if oldOutfile is still set, there was an error copying the JPEG
+    $oldOutfile and return 0;
     $/ = $oldsep;     # restore separator to original value
     # set return value to -1 if we only had a write error
     $rtnVal = -1 if $rtnVal and $err;
@@ -2484,7 +2496,7 @@ sub WriteJPEG($$)
 }
 
 #------------------------------------------------------------------------------
-# Validate an image
+# Validate an image for writing
 # Inputs: 0) ExifTool object reference, 1) raw value reference
 # Returns: error string or undef on success
 sub CheckImage($$)
@@ -2499,28 +2511,11 @@ sub CheckImage($$)
 }
 
 #------------------------------------------------------------------------------
-# is a number floating point?
-# Inputs: 0) value
-# Returns: true if it is floating point
-sub IsInt($)
-{
-    return scalar($_[0] =~ /^[+-]?\d+$/);
-}
-
-#------------------------------------------------------------------------------
-# is a number floating point?
-# Inputs: 0) value
-# Returns: true if it is floating point
-sub IsFloat($)
-{
-    return scalar($_[0] =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/);
-}
-
-#------------------------------------------------------------------------------
 # check a value for validity
 # Inputs: 0) value reference, 1) format string, 2) optional count
 # Returns: error string, or undef on success
-# Notes: if a count is specified for a string, it is null-padded to the specified length
+# Notes: May modify value (if a count is specified for a string, it is null-padded
+# to the specified length, and floating point values are rounded to integer if required)
 sub CheckValue($$;$)
 {
     my ($valPtr, $format, $count) = @_;
@@ -2553,7 +2548,11 @@ sub CheckValue($$;$)
         $val = shift @vals;
         if ($format =~ /^int/) {
             # make sure the value is integer
-            return 'Not an integer' unless IsInt($val);
+            unless (IsInt($val)) {
+                # round single floating point values to the nearest integer
+                return 'Not an integer' unless IsFloat($val) and $count == 1;
+                $val = $$valPtr = int($val + ($val < 0 ? -0.5 : 0.5));
+            }
             my ($min, $max) = @{$intRange{$format}};
             return "Value below $format minimum" if $val < $min;
             return "Value above $format maximum" if $val > $max;

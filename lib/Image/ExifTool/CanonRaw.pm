@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -81,7 +81,13 @@ sub BuildMakerNotes($$$$$$);
     0x0815 => 'CanonImageType',
     0x0816 => 'OriginalFileName',
     0x0817 => 'ThumbnailFileName',
-    0x100a => 'TargetImageType', #3
+    0x100a => { #3
+        Name => 'TargetImageType',
+        PrintConv => {
+            0 => 'Real-world Subject',
+            1 => 'Written Document',
+        },
+    },
     0x1010 => { #3
         Name => 'ShutterReleaseMethod',
         PrintConv => {
@@ -470,13 +476,13 @@ sub ProcessCanonRaw($$$)
 
     # 4 bytes at end of block give directory position within block
     $raf->Seek($blockStart+$blockSize-4, 0) or return 0;
-    $raf->Read($buff, 4) or return 0;
+    $raf->Read($buff, 4) == 4 or return 0;
     my $dirOffset = Get32u(\$buff,0) + $blockStart;
     $raf->Seek($dirOffset, 0) or return 0;
-    $raf->Read($buff, 2) or return 0;
+    $raf->Read($buff, 2) == 2 or return 0;
     my $entries = Get16u(\$buff,0);         # get number of entries in directory
     # read the directory (10 bytes per entry)
-    $raf->Read($buff, 10 * $entries) or return 0;
+    $raf->Read($buff, 10 * $entries) == 10 * $entries or return 0;
 
     $verbose and $exifTool->VerboseDir('Raw', $entries);
     my $index;
@@ -544,7 +550,7 @@ sub ProcessCanonRaw($$$)
             {
                 # read value if size is small or specifically requested
                 # or if this is a SubDirectory
-                unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size)) {
+                unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size) == $size) {
                     $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
                     next;
                 }
@@ -553,7 +559,7 @@ sub ProcessCanonRaw($$$)
                 if ($tagInfo) {
                     if ($exifTool->Options('Binary')) {
                         # read the value anyway
-                        unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size)) {
+                        unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size) == $size) {
                             $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
                             next;
                         }
@@ -666,7 +672,7 @@ sub CrwInfo($$)
     # initialize maker note data if building maker notes
     $buildMakerNotes and InitMakerNotes($exifTool);
 
-    $exifTool->FoundTag('FileType', 'Canon RAW');  # set file type
+    $exifTool->SetFileType('Canon RAW');    # set the FileType tag
 
     # build directory information for main raw directory
     my %dirInfo = (
@@ -681,7 +687,7 @@ sub CrwInfo($$)
     # process the raw directory
     my $rawTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
     unless ($exifTool->ProcessTagTable($rawTagTable, \%dirInfo)) {
-        $exifTool->Warn("CRW file format error");
+        $exifTool->Warn('CRW file format error');
     }
 
     # finish building maker notes if necessary

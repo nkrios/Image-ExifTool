@@ -52,6 +52,7 @@ IxusAFPoint : Unknown (0)
 LensType : Unknown (-1)
 LongFocal : 55
 MacroMode : Unknown (0)
+MaxAperture : 4
 MeteringMode : Center-weighted averaging
 OwnerName : Phil Harvey
 Quality : RAW
@@ -71,14 +72,17 @@ SequenceNumber : 0
 SerialNumber : 0560018150
 Sharpness : +1
 ShortFocal : 18
+TargetAperture : 14
 WhiteBalance : Auto
 ZoomedResolution : 3072
 ZoomedResolutionBase : 3072
 ---- Composite ----
 Aperture : 14.0
+CircleOfConfusion : 0.019 mm
 DriveMode : Continuous shooting
 FlashOn : Off
 FocalLength35efl : 34.0mm (35mm equivalent: 54.0mm)
+HyperfocalDistance : 4.37 m
 ImageSize : 160x120
 Lens : 18.0 - 55.0mm
 Lens35efl : 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)
@@ -117,7 +121,7 @@ UserComment :
 WhiteBalance (1) : Auto
 ---- File ----
 Directory : t
-FileModifyDate : 2005:04:16 10:33:27
+FileModifyDate : 2005:05:25 13:40:58
 FileName : ExifTool.jpg
 FileSize : 3KB
 FileType : JPEG

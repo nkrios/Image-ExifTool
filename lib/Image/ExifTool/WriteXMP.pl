@@ -218,10 +218,9 @@ my $rdfDesc = 'rdf:Description';
 #
 # packet/xmp/rdf headers and trailers
 #
-my $pktOpen = "<?xpacket begin='\xef\xbb\xbf' id='W5M0MpCehiHzreSzNTczkc9d'?>\n" .
-              '<?adobe-xap-filters esc="CR"?>' . "\n";
+my $pktOpen = "<?xpacket begin='\xef\xbb\xbf' id='W5M0MpCehiHzreSzNTczkc9d'?>\n";
 my $xmpOpen = "<x:xmpmeta xmlns:x='$nsURI{x}' $x_toolkit>\n";
-my $rdfOpen = "<rdf:RDF xmlns:rdf='$nsURI{rdf}' xmlns:iX='$nsURI{iX}'>\n";
+my $rdfOpen = "<rdf:RDF xmlns:rdf='$nsURI{rdf}'>\n";
 my $rdfClose = "</rdf:RDF>\n";
 my $xmpClose = "</x:xmpmeta>\n";
 my $pktClose =  "<?xpacket end='w'?>";
@@ -345,8 +344,8 @@ sub SetPropertyPath($$$)
                 pop @$propList;
                 next;
             }
-            # translate necessary namespaces
-            $group1 = $niceNamespace{$group1} if $niceNamespace{$group1};
+            # translate necessary namespace prefixes
+            $group1 = $xlatNamespace{$group1} if $xlatNamespace{$group1};
             $tagInfo->{Groups}->{1} = 'XMP-' . $group1;   # set group1 name
             # the 'List' entry in XMP table gives the specific type of
             # list, and is one of Bag, Seq, Alt or 1.  If '1', this is just
@@ -392,7 +391,7 @@ sub CaptureShorthand($$$$;$)
     my @attrList = keys %$attrs;
     foreach $attr (@attrList) {
         if ($attr =~ /^xmlns:(.*)/) {
-            # remember all namespaces (except x and iX which we open ourselves)
+            # remember all namespaces (except x which we open ourselves)
             my $ns = $1;
             my $nsUsed = $exifTool->{XMP_NS};
             unless ($ns eq 'x' or $ns eq 'iX' or defined $$nsUsed{$ns}) {
@@ -636,27 +635,9 @@ sub WriteXMP($$$)
     # start writing the XMP data
     my $newData = $pktOpen . $xmpOpen . $rdfOpen;
 
-    # generate a (pseudo) unique ID
-    my $n;
-    my $time = time();
-    unless ($seeded) {
-        my $seed = $time ^ ($$ + ($$ << 15));
-        srand($seed);
-        $seeded = 1;
-    }
-    # some system-dependent strings to futher randomize the ID
-    my @strs = ( sprintf("%x  ",$time), scalar($exifTool),
-                 scalar($dirInfo), scalar(\%nsUsed) );
-    my $str = join('', map {substr($_, -6, 4)} @strs);
-    my $uniqueID = '';
-    for ($n=0; $n<16; ++$n) {
-        $uniqueID .= '-' if $n>2 and $n<12 and not ($n&0x01);
-        $uniqueID .= sprintf("%.2x", int(rand(256) + unpack("x$n C",$str)) & 0xff);
-    }
-
     # initialize current property path list
     my @curPropList;
-    my (%nsCur, $path, $prop);
+    my (%nsCur, $path, $prop, $n);
 
     foreach $path (sort keys %capture) {
         my @propList = split('/',$path); # get property list
@@ -696,7 +677,7 @@ sub WriteXMP($$$)
             # open the new description
             $prop = $rdfDesc;
             %nsCur = %nsNew;            # save current namespaces
-            $newData .= "\n <$prop about='uuid:$uniqueID'";
+            $newData .= "\n <$prop about=''";
             foreach (sort keys %nsCur) {
                 $newData .= "\n  xmlns:$_='$nsCur{$_}'";
             }
@@ -727,7 +708,7 @@ sub WriteXMP($$$)
         # print out attributes
         foreach $attr (sort keys %$attrs) {
             my $attrVal = $$attrs{$attr};
-            my $quot = ($attrVal =~ /'/) ? "'" : '"';
+            my $quot = ($attrVal =~ /'/) ? '"' : "'";
             $newData .= " $attr=$quot$attrVal$quot";
         }
         $newData .= ">$val</$prop2>\n";

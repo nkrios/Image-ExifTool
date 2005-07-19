@@ -22,6 +22,7 @@
 #               8) Robert Rottmerhusen private communication
 #               9) http://members.aol.com/khancock/pilot/nbuddy/
 #              10) Werner Kober private communication (D2H, D2X, D100, D70)
+#              11) http://www.rottmerhusen.com/objektives/lensid/nikkor.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -30,7 +31,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.26';
+$VERSION = '1.28';
 
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
@@ -573,7 +574,7 @@ my %nikonFocalConversions = (
     PrintConv => 'sprintf("%.1fmm",$val)',
     PrintConvInv => '$val=~s/\s*mm$//;$val',
 );
-# nikon lens ID numbers (ref 8)
+# nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
     0 => 'Unknown Nikkor or Tokina',
     1 => 'AF Nikkor 50mm f/1.8',
@@ -581,7 +582,8 @@ my %nikonLensIDs = (
     3 => 'Unknown Nikkor or Soligor',
     4 => 'AF Nikkor 28mm f/2.8',
     5 => 'AF Nikkor 50mm f/1.4',
-    7 => 'AF Zoom-Nikkor 28-85mm f/3.5-4.5',
+    6 => 'AF Micro-Nikkor 55mm f/2.8 or Cosina',
+    7 => 'AF Zoom-Nikkor 28-85mm f/3.5-4.5 or Tamron',
     8 => 'AF Zoom-Nikkor 35-105mm f/3.5-4.5',
     9 => 'AF Nikkor 24mm f/2.8',
     10 => 'AF Nikkor 300mm f/2.8 IF-ED',
@@ -593,20 +595,25 @@ my %nikonLensIDs = (
     19 => 'AF Zoom-Nikkor 24-50mm f/3.3-4.5',
     20 => 'AF Zoom-Nikkor 80-200mm f/2.8 ED',
     21 => 'AF Nikkor 85mm f/1.8',
+    23 => 'Nikkor 500mm f/4 P',
+    24 => 'AF Zoom-Nikkor 35-135mm f/3.5-4.5',
     27 => 'AF Zoom-Nikkor 75-300mm f/4.5-5.6',
     28 => 'AF Nikkor 20mm f/2.8',
     29 => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5 N',
-    30 => 'AF Micro-Nikkor 60mm f/2.8',
+    30 => 'AF Micro-Nikkor 60mm f/2.8 or third party lens',
+    32 => 'Unknown Nikkor or Tamron',
     37 => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
-    38 => 'Unknown Nikkor or Sigma D-type',
+    38 => 'Unknown Nikkor or Sigma D',
     39 => 'AF-I Nikkor 300mm f/2.8D IF-ED',
     42 => 'AF Nikkor 28mm f/1.4D',
     44 => 'AF DC-Nikkor 105mm f/2D',
     45 => 'AF Micro-Nikkor 200mm f/4D IF-ED',
+    46 => 'AF Nikkor 70-210mm f/4-5.6D',
+    47 => 'Unknown Nikkor or third party lens',
     49 => 'AF Micro-Nikkor 60mm f/2.8D',
-    50 => 'AF Micro-Nikkor 105mm f/2.8D or Tamron',
+    50 => 'AF Micro-Nikkor 105mm f/2.8D or Sigma Macro D',
     51 => 'AF Nikkor 18mm f/2.8D',
-    52 => 'Unknown Nikkor or Tameron',
+    52 => 'Unknown Nikkor or Tamron',
     54 => 'AF Nikkor 24mm f/2.8D',
     55 => 'AF Nikkor 20mm f/2.8D',
     56 => 'AF Nikkor 85mm f/1.8D',
@@ -623,7 +630,7 @@ my %nikonLensIDs = (
     78 => 'AF DC-Nikkor 135mm f/2D',
     83 => 'AF Zoom-Nikkor 80-200mm f/2.8D ED',
     84 => 'AF Zoom-Micro Nikkor 70-180mm f/4.5-5.6D ED',
-    86 => 'AF Zoom-Nikkor 70-300mm f/4-5.6D ED',
+    86 => 'AF Zoom-Nikkor 70-300mm f/4-5.6D ED or Sigma D',
     89 => 'AF-S Nikkor 400mm f/2.8D IF-ED',
     90 => 'IX-Nikkor 30-60mm f/4-5.6',
     93 => 'AF-S Zoom-Nikkor 28-70mm f/2.8D IF-ED',
@@ -639,6 +646,7 @@ my %nikonLensIDs = (
     106 => 'AF-S Nikkor 300mm f/4D IF-ED',
     109 => 'AF-S Nikkor 300mm f/2.8D IF-ED II',
     110 => 'AF-S Nikkor 400mm f/2.8D IF-ED II',
+    111 => 'AF-S Nikkor 500mm f/4D IF-ED',
     112 => 'AF-S Nikkor 600mm f/4D IF-ED',
     114 => 'Nikkor 45mm f/2.8 P',
     116 => 'AF-S Zoom-Nikkor 24-85mm f/3.5-4.5G IF-ED',
@@ -723,10 +731,10 @@ which make writing more difficult.
     0x08 => 'FocusPosition', #8
     0x09 => { #8/9
         Name => 'FocusDistance',
-        ValueConv => '10**($val/40)', # in cm
-        ValueConvInv => '$val>0 ? 40*log($val)/log(10) : 0',
-        PrintConv => 'sprintf("%.2f m",$val / 100)',
-        PrintConvInv => '$val=~s/\s.*//; $val * 100',
+        ValueConv => '0.01 * 10**($val/40)', # in m
+        ValueConvInv => '$val>0 ? 40*log($val*100)/log(10) : 0',
+        PrintConv => '$val ? sprintf("%.2f m",$val) : "inf"',
+        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/\s.*//, $val',
     },
     0x0a => { #8/9
         Name => 'FocalLength',
@@ -1000,6 +1008,8 @@ it under the same terms as Perl itself.
 =item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
 =item L<http://members.aol.com/khancock/pilot/nbuddy/>
+
+=item L<http://www.rottmerhusen.com/objektives/lensid/nikkor.html>
 
 =back
 

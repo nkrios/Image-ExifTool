@@ -16,14 +16,17 @@ lists.
 
 <p>The <b>Group</b> column below gives the XMP schema namespace prefix for each
 tag.  The family 1 group names are composed from these schema names with a
-leading &quot;XMP-&quot; added.  If the same XMP tag name exists in more than one
+leading <code>XMP-</code> added.  If the same XMP tag name exists in more than one
 group, all groups are written unless a family 1 group name is specified.
 ie) If XMP:Contrast is specified, information will be written to both
 XMP-crs:Contrast and XMP-exif:Contrast.
 
-<p>Note: that the actual IPTC Core namespace schema prefix is <code>Iptc4xmpCore</code>,
+<p>Note:  The actual IPTC Core namespace schema prefix is <code>Iptc4xmpCore</code>,
 which is the name used in the file, but ExifTool uses <code>iptcCore</code> to
 generate the family 1 group name because <code>Iptc4xmpCore</code> is a bit lengthy.
+Also, if the older <code>xap</code>, <code>xapRights</code>, <code>xapMM</code> or <code>xapBJ</code> prefixes are
+found, they are translated to the newer <code>xmp</code>, <code>xmpRights</code>, <code>xmpMM</code> and
+<code>xmpBJ</code> in family 1 group names.
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -200,8 +203,8 @@ generate the family 1 group name because <code>Iptc4xmpCore</code> is a bit leng
 <td align='center'>string<br>string</td>
 <td align='center'>crs<br>exif</td>
 <td><font size='-1'>0 = Normal
-  <br>1 = Soft
-  <br>2 = Hard</font></td></tr>
+  <br>1 = Low
+  <br>2 = High</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Contributor</td>
 <td align='center'>string</td>
@@ -1509,6 +1512,6 @@ generate the family 1 group name because <code>Iptc4xmpCore</code> is a bit leng
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 7, 2005</i>
+<br><i>Last revised Jul 18, 2005</i>
 </body>
 </html>

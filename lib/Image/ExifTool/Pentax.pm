@@ -27,7 +27,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -217,7 +217,7 @@ my %pentaxCities = (
             53 => 'Underwater', #PH
             54 => 'Candlelight', #PH
             55 => 'Natural Skin Tone', #PH
-            56 => 'Syncro Sound Record', #PH
+            56 => 'Synchro Sound Record', #PH
         },
     },
     0x000c => { #PH
@@ -420,44 +420,49 @@ my %pentaxCities = (
     },
     0x001f => {
         Name => 'Saturation',
+        Notes => 'Pentax models',
         Writable => 'int16u',
         PrintConv => {
-            0 => 'Normal',
-            1 => 'Low',
-            2 => 'High',
-            # the *istD has pairs of values.  These are unverified - PH
-            '0 0' => 'Normal',
-            '1 0' => 'Low',
+            0 => 'Low', #PH
+            1 => 'Normal', #PH
+            2 => 'High', #PH
+            3 => 'Med Low', #2
+            4 => 'Med High', #2
+            # the *istD has pairs of values - PH
+            '0 0' => 'Low',
+            '1 0' => 'Normal',
             '2 0' => 'High',
         },
     },
     0x0020 => {
         Name => 'Contrast',
+        Notes => 'Pentax models',
         Writable => 'int16u',
         PrintConv => {
-            0 => 'Normal',
-            1 => 'Low',
-            2 => 'High',
-            3 => 'Medium Low', #2
-            4 => 'Medium High', #2
-            # the *istD has pairs of values.  These are unverified - PH
-            '0 0' => 'Normal',
-            '1 0' => 'Low',
+            0 => 'Low', #PH
+            1 => 'Normal', #PH
+            2 => 'High', #PH
+            3 => 'Med Low', #2
+            4 => 'Med High', #2
+            # the *istD has pairs of values - PH
+            '0 0' => 'Low',
+            '1 0' => 'Normal',
             '2 0' => 'High',
         },
     },
     0x0021 => {
         Name => 'Sharpness',
+        Notes => 'Pentax models',
         Writable => 'int16u',
         PrintConv => {
-            0 => 'Normal',
-            1 => 'Soft',
-            2 => 'Hard',
-            3 => 'Medium Soft', #2
-            4 => 'Medium Hard', #2
-            # the *istD has pairs of values.  These are unverified - PH
-            '0 0' => 'Normal',
-            '1 0' => 'Soft',
+            0 => 'Soft', #PH
+            1 => 'Normal', #PH
+            2 => 'Hard', #PH
+            3 => 'Med Soft', #2
+            4 => 'Med Hard', #2
+            # the *istD has pairs of values - PH
+            '0 0' => 'Soft',
+            '1 0' => 'Normal',
             '2 0' => 'Hard',
         },
     },

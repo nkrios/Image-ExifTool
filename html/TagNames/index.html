@@ -20,7 +20,10 @@ cases, the actual name used depends on the context in which the information
 is found.  Case is not significant for tag names.  A question mark after a
 tag name indicates that the information is either not understood, not
 verified, or not very useful -- these tags are not extracted by ExifTool
-unless the Unknown (-u) option is enabled.
+unless the Unknown (-u) option is enabled.  Be aware that some tag names are
+different than the descriptions printed out by default when extracting
+information with &quot;exiftool&quot;.  To see the tag names instead of the
+descriptions, use &quot;exiftool -S&quot;.
 
 <p>The <b>Writable</b> column indicates whether the tag is writable by ExifTool.
 Anything but an &quot;N&quot; in this column means the tag is writable.  A &quot;Y&quot;
@@ -41,14 +44,14 @@ SetNewValuesFromFile() or when using the exiftool -TagsFromFile option, and
 care should be taken when editing them manually since they may affect the
 way an image is rendered.
 
-<p>The HTML version of these tables also list possible <b>Values</b> for all tags
-which have a discrete set of values, and give <b>Notes</b> for some tags.
+<p>The HTML version of this document also lists possible <b>Values</b> for all tags
+which have a discrete set of values, and gives <b>Notes</b> for some tags.
 
 <p><b>Note</b>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
 reason for this is to make the tag names more consistent across different
 types of meta information.  To determine a tag name, either consult this
-documentation or run <code>exiftool -S</code> on a file containing the information in
+documentation or run &quot;exiftool -S&quot; on a file containing the information in
 question.
 
 <blockquote>
@@ -59,101 +62,138 @@ question.
 <a href='EXIF.html'>EXIF</a>
 <br><a href='XMP.html'>XMP</a>
 <br><a href='IPTC.html'>IPTC</a>
-<br><a href='IPTC.html#EnvelopeRecord'>IPTC EnvelopeRecord</a>
-<br><a href='IPTC.html#ApplicationRecord'>IPTC ApplicationRecord</a>
-<br><a href='IPTC.html#NewsPhoto'>IPTC NewsPhoto</a>
-<br><a href='IPTC.html#PreObjectData'>IPTC PreObjectData</a>
-<br><a href='IPTC.html#ObjectData'>IPTC ObjectData</a>
-<br><a href='IPTC.html#PostObjectData'>IPTC PostObjectData</a>
+<br>&nbsp; &nbsp; <a href='IPTC.html#EnvelopeRecord'>IPTC EnvelopeRecord</a>
+<br>&nbsp; &nbsp; <a href='IPTC.html#ApplicationRecord'>IPTC ApplicationRecord</a>
+<br>&nbsp; &nbsp; <a href='IPTC.html#NewsPhoto'>IPTC NewsPhoto</a>
+<br>&nbsp; &nbsp; <a href='IPTC.html#PreObjectData'>IPTC PreObjectData</a>
+<br>&nbsp; &nbsp; <a href='IPTC.html#ObjectData'>IPTC ObjectData</a>
+<br>&nbsp; &nbsp; <a href='IPTC.html#PostObjectData'>IPTC PostObjectData</a>
+<br><a href='Photoshop.html'>Photoshop</a>
+<br>&nbsp; &nbsp; <a href='Photoshop.html#JPEG_Quality'>Photoshop JPEG_Quality</a>
 <br><a href='ICC_Profile.html'>ICC_Profile</a>
-<br><a href='ICC_Profile.html#Header'>ICC_Profile Header</a>
-<br><a href='ICC_Profile.html#Chromaticity'>ICC_Profile Chromaticity</a>
-<br><a href='ICC_Profile.html#ColorantTable'>ICC_Profile ColorantTable</a>
-<br><a href='ICC_Profile.html#Measurement'>ICC_Profile Measurement</a>
-<br><a href='ICC_Profile.html#ViewingConditions'>ICC_Profile ViewingConditions</a>
+<br>&nbsp; &nbsp; <a href='ICC_Profile.html#Header'>ICC_Profile Header</a>
+<br>&nbsp; &nbsp; <a href='ICC_Profile.html#Chromaticity'>ICC_Profile Chromaticity</a>
+<br>&nbsp; &nbsp; <a href='ICC_Profile.html#ColorantTable'>ICC_Profile ColorantTable</a>
+<br>&nbsp; &nbsp; <a href='ICC_Profile.html#Measurement'>ICC_Profile Measurement</a>
+<br>&nbsp; &nbsp; <a href='ICC_Profile.html#ViewingConditions'>ICC_Profile ViewingConditions</a>
 <br><a href='GPS.html'>GPS</a>
 <br><a href='Canon.html'>Canon</a>
-<br><a href='Canon.html#CameraSettings'>Canon CameraSettings</a>
-<br><a href='Canon.html#FocalLength'>Canon FocalLength</a>
-<br><a href='Canon.html#ShotInfo'>Canon ShotInfo</a>
-<br><a href='Canon.html#ColorInfoD30'>Canon ColorInfoD30</a>
-<br><a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D</a>
-<br><a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D</a>
-<br><a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30</a>
-<br><a href='Canon.html#PictureInfo'>Canon PictureInfo</a>
-<br><a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D</a>
-<br><a href='Canon.html#FileInfo'>Canon FileInfo</a>
-<br><a href='Canon.html#ColorInfo'>Canon ColorInfo</a>
-<br><a href='Canon.html#WhiteBalance'>Canon WhiteBalance</a>
-<br><a href='Canon.html#PreviewImageInfo'>Canon PreviewImageInfo</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#CameraSettings'>Canon CameraSettings</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#FocalLength'>Canon FocalLength</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#ShotInfo'>Canon ShotInfo</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#Panorama'>Canon Panorama</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#ColorInfoD30'>Canon ColorInfoD30</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#LensInfo1D'>Canon LensInfo1D</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#PictureInfo'>Canon PictureInfo</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#FileInfo'>Canon FileInfo</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#ColorInfo'>Canon ColorInfo</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance</a>
+<br>&nbsp; &nbsp; <a href='Canon.html#PreviewImageInfo'>Canon PreviewImageInfo</a>
+<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D</a>
+<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D</a>
+<br>&nbsp; &nbsp; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30</a>
+<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D</a>
 <br><a href='Casio.html'>Casio</a>
-</td><td>
-<a href='Casio.html#Type2'>Casio Type2</a>
+<br>&nbsp; &nbsp; <a href='Casio.html#Type2'>Casio Type2</a>
 <br><a href='PrintIM.html'>PrintIM</a>
 <br><a href='FujiFilm.html'>FujiFilm</a>
 <br><a href='Kodak.html'>Kodak</a>
-<br><a href='Kodak.html#Type2'>Kodak Type2</a>
-<br><a href='Kodak.html#Type3'>Kodak Type3</a>
-<br><a href='Kodak.html#Type4'>Kodak Type4</a>
-<br><a href='Kodak.html#Type5'>Kodak Type5</a>
-<br><a href='Kodak.html#Type6'>Kodak Type6</a>
-<br><a href='Kodak.html#Unknown'>Kodak Unknown</a>
+<br>&nbsp; &nbsp; <a href='Kodak.html#Type2'>Kodak Type2</a>
+<br>&nbsp; &nbsp; <a href='Kodak.html#Type3'>Kodak Type3</a>
+<br>&nbsp; &nbsp; <a href='Kodak.html#Type4'>Kodak Type4</a>
+<br>&nbsp; &nbsp; <a href='Kodak.html#Type5'>Kodak Type5</a>
+</td><td>
+&nbsp; &nbsp; <a href='Kodak.html#Type6'>Kodak Type6</a>
+<br>&nbsp; &nbsp; <a href='Kodak.html#Unknown'>Kodak Unknown</a>
+<br>&nbsp; &nbsp; <a href='Kodak.html#SpecialEffects'>Kodak SpecialEffects</a>
+<br>&nbsp; &nbsp; <a href='Kodak.html#Borders'>Kodak Borders</a>
 <br><a href='Unknown.html'>Unknown</a>
 <br><a href='Minolta.html'>Minolta</a>
-<br><a href='Minolta.html#CameraSettings'>Minolta CameraSettings</a>
+<br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings</a>
 <br><a href='Nikon.html'>Nikon</a>
-<br><a href='Nikon.html#PreviewImage'>Nikon PreviewImage</a>
-<br><a href='Nikon.html#ColorBalance0100'>Nikon ColorBalance0100</a>
-<br><a href='Nikon.html#ColorBalance0102'>Nikon ColorBalance0102</a>
-<br><a href='Nikon.html#ColorBalance0103'>Nikon ColorBalance0103</a>
-<br><a href='Nikon.html#LensData00'>Nikon LensData00</a>
-<br><a href='Nikon.html#LensData01'>Nikon LensData01</a>
-<br><a href='Nikon.html#NikonCaptureOffsets'>Nikon NikonCaptureOffsets</a>
-<br><a href='Nikon.html#MakerNotesB'>Nikon MakerNotesB</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#PreviewImage'>Nikon PreviewImage</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance0100'>Nikon ColorBalance0100</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance0102'>Nikon ColorBalance0102</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance0103'>Nikon ColorBalance0103</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#LensData00'>Nikon LensData00</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#LensData01'>Nikon LensData01</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#NikonCaptureOffsets'>Nikon NikonCaptureOffsets</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#MakerNotesB'>Nikon MakerNotesB</a>
 <br><a href='Olympus.html'>Olympus</a>
-<br><a href='Olympus.html#Equipment'>Olympus Equipment</a>
-<br><a href='Olympus.html#CameraSettings'>Olympus CameraSettings</a>
-<br><a href='Olympus.html#RawDevelopment'>Olympus RawDevelopment</a>
-<br><a href='Olympus.html#ImageProcessing'>Olympus ImageProcessing</a>
-<br><a href='Olympus.html#FocusInfo'>Olympus FocusInfo</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#Equipment'>Olympus Equipment</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#CameraSettings'>Olympus CameraSettings</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#RawDevelopment'>Olympus RawDevelopment</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#ImageProcessing'>Olympus ImageProcessing</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#FocusInfo'>Olympus FocusInfo</a>
 <br><a href='Panasonic.html'>Panasonic</a>
 <br><a href='Pentax.html'>Pentax</a>
 <br><a href='Ricoh.html'>Ricoh</a>
-</td><td>
-<a href='Ricoh.html#Subdir'>Ricoh Subdir</a>
-<br><a href='Ricoh.html#Text'>Ricoh Text</a>
+<br>&nbsp; &nbsp; <a href='Ricoh.html#Subdir'>Ricoh Subdir</a>
+<br>&nbsp; &nbsp; <a href='Ricoh.html#Text'>Ricoh Text</a>
 <br><a href='Sanyo.html'>Sanyo</a>
 <br><a href='Sigma.html'>Sigma</a>
 <br><a href='Sony.html'>Sony</a>
-<br><a href='Kodak.html#SpecialEffects'>Kodak SpecialEffects</a>
-<br><a href='Kodak.html#Borders'>Kodak Borders</a>
 <br><a href='CanonRaw.html'>CanonRaw</a>
-<br><a href='CanonRaw.html#MakeModel'>CanonRaw MakeModel</a>
-<br><a href='CanonRaw.html#SensorInfo'>CanonRaw SensorInfo</a>
-<br><a href='CanonRaw.html#ImageFormat'>CanonRaw ImageFormat</a>
-<br><a href='CanonRaw.html#TimeStamp'>CanonRaw TimeStamp</a>
-<br><a href='CanonRaw.html#ImageInfo'>CanonRaw ImageInfo</a>
-<br><a href='CanonRaw.html#FlashInfo'>CanonRaw FlashInfo</a>
-<br><a href='CanonRaw.html#ExposureInfo'>CanonRaw ExposureInfo</a>
-<br><a href='Photoshop.html'>Photoshop</a>
-<br><a href='Photoshop.html#JPEG_Quality'>Photoshop JPEG_Quality</a>
+<br>&nbsp; &nbsp; <a href='CanonRaw.html#MakeModel'>CanonRaw MakeModel</a>
+<br>&nbsp; &nbsp; <a href='CanonRaw.html#SensorInfo'>CanonRaw SensorInfo</a>
+<br>&nbsp; &nbsp; <a href='CanonRaw.html#ImageFormat'>CanonRaw ImageFormat</a>
+<br>&nbsp; &nbsp; <a href='CanonRaw.html#TimeStamp'>CanonRaw TimeStamp</a>
+<br>&nbsp; &nbsp; <a href='CanonRaw.html#ImageInfo'>CanonRaw ImageInfo</a>
+<br>&nbsp; &nbsp; <a href='CanonRaw.html#FlashInfo'>CanonRaw FlashInfo</a>
+<br>&nbsp; &nbsp; <a href='CanonRaw.html#ExposureInfo'>CanonRaw ExposureInfo</a>
 <br><a href='GeoTiff.html'>GeoTiff</a>
 <br><a href='Jpeg2000.html'>Jpeg2000</a>
-<br><a href='Jpeg2000.html#ImageHeader'>Jpeg2000 ImageHeader</a>
-<br><a href='Jpeg2000.html#CaptureResolution'>Jpeg2000 CaptureResolution</a>
-<br><a href='Jpeg2000.html#DisplayResolution'>Jpeg2000 DisplayResolution</a>
+<br>&nbsp; &nbsp; <a href='Jpeg2000.html#ImageHeader'>Jpeg2000 ImageHeader</a>
+<br>&nbsp; &nbsp; <a href='Jpeg2000.html#CaptureResolution'>Jpeg2000 CaptureResolution</a>
+<br>&nbsp; &nbsp; <a href='Jpeg2000.html#DisplayResolution'>Jpeg2000 DisplayResolution</a>
+</td><td>
+<a href='BMP.html'>BMP</a>
 <br><a href='PNG.html'>PNG</a>
-<br><a href='PNG.html#ImageHeader'>PNG ImageHeader</a>
-<br><a href='PNG.html#PrimaryChromaticities'>PNG PrimaryChromaticities</a>
-<br><a href='PNG.html#TextualData'>PNG TextualData</a>
-<br><a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel</a>
+<br>&nbsp; &nbsp; <a href='PNG.html#ImageHeader'>PNG ImageHeader</a>
+<br>&nbsp; &nbsp; <a href='PNG.html#PrimaryChromaticities'>PNG PrimaryChromaticities</a>
+<br>&nbsp; &nbsp; <a href='PNG.html#TextualData'>PNG TextualData</a>
+<br>&nbsp; &nbsp; <a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel</a>
+<br><a href='MNG.html'>MNG</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#Background'>MNG Background</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#BasisObject'>MNG BasisObject</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#ClipObjects'>MNG ClipObjects</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#CloneObject'>MNG CloneObject</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#DefineObject'>MNG DefineObject</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#DeltaPNGHeader'>MNG DeltaPNGHeader</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#JNGHeader'>MNG JNGHeader</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#Loop'>MNG Loop</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#MagnifyObject'>MNG MagnifyObject</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#MNGHeader'>MNG MNGHeader</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#MoveObjects'>MNG MoveObjects</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#PasteImage'>MNG PasteImage</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#PromoteParent'>MNG PromoteParent</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#ShowObjects'>MNG ShowObjects</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#TerminationAction'>MNG TerminationAction</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#ExportImage'>MNG ExportImage</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#FramePriority'>MNG FramePriority</a>
 <br><a href='MIFF.html'>MIFF</a>
+<br><a href='PDF.html'>PDF</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#Info'>PDF Info</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#Root'>PDF Root</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#Metadata'>PDF Metadata</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#Pages'>PDF Pages</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#Kids'>PDF Kids</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#PieceInfo'>PDF PieceInfo</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#AdobePhotoshop'>PDF AdobePhotoshop</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#Private'>PDF Private</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#ImageResources'>PDF ImageResources</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#Resources'>PDF Resources</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#ColorSpace'>PDF ColorSpace</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#DefaultRGB'>PDF DefaultRGB</a>
+<br>&nbsp; &nbsp; <a href='PDF.html#ICCBased'>PDF ICCBased</a>
+<br><a href='PostScript.html'>PostScript</a>
+<br><a href='APP12.html'>APP12</a>
 <br><a href='Extra.html'>Extra</a>
 <br><a href='Composite.html'>Composite</a>
 </td></tr></table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 14, 2005</i>
+<br><i>Last revised Jul 19, 2005</i>
 </body>
 </html>

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.21
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
 [File, File, Image]  - File Name: Pentax_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:22 19:20:51
+[File, File, Time]  - File Modification Date/Time: 2005:06:27 12:08:52
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
@@ -74,9 +74,9 @@
 [MakerNotes, Pentax, Camera] 28 - Red Balance: 0.37109375
 [MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm
 [MakerNotes, Pentax, Camera] 30 - Digital Zoom: 100
-[MakerNotes, Pentax, Camera] 31 - Saturation: Low
-[MakerNotes, Pentax, Camera] 32 - Contrast: Low
-[MakerNotes, Pentax, Camera] 33 - Sharpness: Soft
+[MakerNotes, Pentax, Camera] 31 - Saturation: Normal
+[MakerNotes, Pentax, Camera] 32 - Contrast: Normal
+[MakerNotes, Pentax, Camera] 33 - Sharpness: Normal
 [MakerNotes, Pentax, Camera] 34 - World Time Location: Destination
 [MakerNotes, Pentax, Camera] 35 - Hometown City: London
 [MakerNotes, Pentax, Camera] 36 - Destination City: Los Angeles
@@ -97,4 +97,6 @@
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
 [Composite, Composite, Image]  - Shutter Speed: 1/500
+[Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
 [Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 3.76 m

@@ -11,7 +11,7 @@ package Image::ExifTool::FujiFilm;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -30,10 +30,13 @@ $VERSION = '1.03';
     0x1001 => {
         Name => 'Sharpness',
         Writable => 'int16u',
-        ValueConv => '$val - 2',
-        ValueConvInv => '$val + 2',
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        PrintConv => {
+            1 => 'Soft',
+            2 => 'Soft2',
+            3 => 'Normal',
+            4 => 'Hard',
+            5 => 'Hard2',
+        },
     },
     0x1002 => {
         Name => 'WhiteBalance',
@@ -189,7 +192,7 @@ it under the same terms as Perl itself.
 
 =item L<http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html>
 
-=item (...plus some testing with my FinePix 2400 Zoom)
+=item (...plus testing with my own FinePix 2400 Zoom)
 
 =back
 

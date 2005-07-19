@@ -29,13 +29,12 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.65';
+$VERSION = '1.69';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
 sub CheckExif($$$);
 sub RebuildMakerNotes($$$);
-sub Rationalize($;$);
 
 # byte sizes for the various EXIF format types below
 @formatSize = (0,1,1,2,4,8,1,1,2,4,8,4,8,4);
@@ -741,7 +740,9 @@ sub Rationalize($;$);
     0x8649 => {
         Name => 'PhotoshopSettings',
         Format => 'binary',
-        ValueConv => '\$val',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Photoshop::Main',
+        },
     },
     0x8769 => {
         Name => 'ExifOffset',
@@ -1152,17 +1153,29 @@ sub Rationalize($;$);
     0xa408 => {
         Name => 'Contrast',
         Groups => { 2 => 'Camera' },
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Low',
+            2 => 'High',
+        },
     },
     0xa409 => {
         Name => 'Saturation',
         Groups => { 2 => 'Camera' },
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Low',
+            2 => 'High',
+        },
     },
     0xa40a => {
         Name => 'Sharpness',
         Groups => { 2 => 'Camera' },
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Soft',
+            2 => 'Hard',
+        },
     },
     0xa40b => {
         Name => 'DeviceSettingDescription',
@@ -1387,8 +1400,9 @@ sub Rationalize($;$);
             0 => 'FNumber',
             1 => 'ApertureValue',
         },
-        ValueConv => '$val[0] ? $val[0] : $val[1]',
-        PrintConv => 'sprintf("%.1f",$val)',
+        # convert to a float (could start with 'F' if it was a string value)
+        ValueConv => 'my $a=ToFloat($val[0]); $a || $val[1]',
+        PrintConv => 'sprintf("%.1f", $val)',
     },
     FocalLength35efl => {
         Description => 'Focal Length',
@@ -1405,7 +1419,7 @@ sub Rationalize($;$);
     },
     ScaleFactor35efl => {
         Description => 'Scale Factor To 35mm Equivalent',
-        Notes => 'this value may be incorrect if image has been resized',
+        Notes => 'this value and any derived values may be incorrect if image has been resized',
         Groups => { 2 => 'Camera' },
         Desire => {
             0 => 'FocalLength',
@@ -1423,6 +1437,51 @@ sub Rationalize($;$);
         },
         ValueConv => 'Image::ExifTool::Exif::CalcScaleFactor35efl(@val)',
         PrintConv => 'sprintf("%.1f", $val)',
+    },
+    CircleOfConfusion => {
+        Notes => 'this value may be incorrect if image has been resized',
+        Require => {
+            0 => 'ScaleFactor35efl',
+        },
+        ValueConv => 'sqrt(24*24+36*36) / ($val[0] * 1440)',
+        PrintConv => 'sprintf("%.3f mm",$val)',
+    },
+    HyperfocalDistance => {
+        Notes => 'this value may be incorrect if image has been resized',
+        Require => {
+            0 => 'FocalLength',
+            1 => 'Aperture',
+            2 => 'CircleOfConfusion',
+        },
+        ValueConv => q{
+            return undef unless $val[1] and $val[2];
+            return $val[0] * $val[0] / ($val[1] * $val[2] * 1000);
+        },
+        PrintConv => 'sprintf("%.2f m", $val)',
+    },
+    DOF => {
+        Description => 'Depth of Field',
+        Notes => 'this value may be incorrect if image has been resized',
+        Require => {
+            0 => 'FocusDistance', # FocusDistance in meters, 0 means 'inf'
+            1 => 'FocalLength',
+            2 => 'Aperture',
+            3 => 'CircleOfConfusion',
+        },
+        ValueConv => q{
+            return undef unless $val[1] and $val[3];
+            $val[0] or $val[0] = 1e10;  # use a large number for 'inf'
+            my ($s, $f) = ($val[0], $val[1]);
+            my $t = $val[2] * $val[3] * ($s * 1000 - $f) / ($f * $f);
+            my @v = ($s / (1 + $t), $s / (1 - $t));
+            $v[1] < 0 and $v[1] = 0; # 0 means 'inf'
+            return join(' ',@v);
+        },
+        PrintConv => q{
+            my @v = split ' ', $val;
+            $v[1] or return sprintf("inf (%.2f m - inf)", $v[0]);
+            return sprintf("%.2f m (%.2f - %.2f)",$v[1]-$v[0],$v[0],$v[1]);
+        },
     },
     ThumbnailImage => {
         Writable => 1,
@@ -1536,7 +1595,7 @@ sub AUTOLOAD
 #         2) Focal plane diagonal size (in mm)
 #         3) focal plane resolution units (in mm)
 #         4/5) Focal plane X/Y resolution
-#         6/7,8/9...) Image width/height in order of precidence (first valid pair is used)
+#         6/7,8/9...) Image width/height in order of precedence (first valid pair is used)
 # Returns: 35mm conversion factor (or undefined if it can't be calculated)
 sub CalcScaleFactor35efl
 {
@@ -1546,7 +1605,7 @@ sub CalcScaleFactor35efl
     return $foc35 / $focal if $focal and $foc35;
 
     my $diag = shift;
-    unless ($diag) {
+    unless ($diag and Image::ExifTool::IsFloat($diag)) {
         my $units = shift || return undef;
         my $x_res = shift || return undef;
         my $y_res = shift || return undef;
@@ -1562,7 +1621,9 @@ sub CalcScaleFactor35efl
         # calculate focal plane size in mm
         $w *= $units / $x_res;
         $h *= $units / $y_res;
-        $diag = sqrt($w*$w+$h*$h) || return undef;
+        $diag = sqrt($w*$w+$h*$h);
+        # make sure size is reasonable
+        return undef unless $diag > 1 and $diag < 100;
     }
     return sqrt(36*36+24*24) / $diag;
 }
@@ -1611,8 +1672,9 @@ sub ConvertExifText($$)
 }
 
 #------------------------------------------------------------------------------
-# Print parameter value (with sign, or 'Normal' for zero)
-sub PrintParameter($) {
+# Print numerical parameter value (with sign, or 'Normal' for zero)
+sub PrintParameter($)
+{
     my $val = shift;
     if ($val > 0) {
         if ($val > 0xfff0) {    # a negative value in disguise?
@@ -1624,6 +1686,23 @@ sub PrintParameter($) {
         $val = 'Normal';
     }
     return $val;
+}
+
+#------------------------------------------------------------------------------
+# Convert parameter back to standard EXIF value
+#   0 or "Normal" => 0
+#   -1,-2,etc or "Soft" or "Low" => 1
+#   +1,+2,1,2,etc or "Hard" or "High" => 2
+sub ConvertParameter($)
+{
+    my $val = shift;
+    # normal is a value of zero
+    return 0 if $val =~ /\bn/i or not $val;
+    # "soft", "low" or any negative number is a value of 1
+    return 1 if $val =~ /\b(s|l|-)/i;
+    # "hard", "high" or any positive number is a vail of 2
+    return 2 if $val =~ /\b(h|\+|\d)/i;
+    return undef; 
 }
 
 #------------------------------------------------------------------------------
@@ -1743,19 +1822,7 @@ sub ExtractImage($$$$)
         $image = $exifTool->ExtractBinary($offset, $len, $tag);
         return undef unless defined $image;
     }
-    unless ($image =~ /^(Binary data|\xff\xd8)/ or
-            # the first byte of the preview in my sample MRW file is zeroed,
-            # so check for this and set it back to 0xff if necessary
-            $image =~ s/^\x00\xd8\xff\xdb/\xff\xd8\xff\xdb/ or
-            $exifTool->Options('IgnoreMinorErrors'))
-    {
-        $tag = 'PreviewImage' unless $tag;
-        if ($exifTool->{REQ_TAG_LOOKUP}->{lc($tag)}) {
-            $exifTool->Warn("$tag is not a valid image");
-            return undef;
-        }
-    }
-    return \$image;
+    return $exifTool->ValidateImage(\$image, $tag);
 }
 
 #------------------------------------------------------------------------------
@@ -1960,6 +2027,7 @@ sub ProcessExif($$$)
                 DataPt => $valueDataPt,
                 Size   => $size,
                 Start  => $valuePtr,
+                Addr   => $valuePtr + $valueDataPos,
                 Format => $fstr,
                 Count  => $count,
             );
@@ -2171,7 +2239,7 @@ sub ProcessExif($$$)
         }
         # save the value of this tag
         $tagKey = $exifTool->FoundTag($tagInfo, $val);
-        $exifTool->SetTagExtra($tagKey, $dirInfo->{DirName});
+        $exifTool->SetTagExtra($tagKey, $dirInfo->{DirName}) if defined $tagKey;
     }
 
     # scan for subsequent IFD's if specified
@@ -2243,6 +2311,10 @@ it under the same terms as Perl itself.
 =item L<http://hul.harvard.edu/jhove/tiff-tags.html>
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Matt Madrid for his help with the XP character code conversions.
 
 =head1 SEE ALSO
 

@@ -94,7 +94,7 @@ description of the info hash entries.
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 use Image::ExifTool;
 my $exifTool = <a href="#new">new</a> Image::ExifTool;
-$exifTool-&gt;<a href="#SetNewValue">SetNewValue</a>('Author', 'Phil Harvey');
+$exifTool-&gt;<a href="#SetNewValue">SetNewValue</a>(Author =&gt; 'Phil Harvey');
 $exifTool-&gt;<a href="#WriteInfo">WriteInfo</a>('image.jpg','modified_image.jpg');
 </pre></td></tr></table></blockquote>
 
@@ -122,7 +122,7 @@ use Image::ExifTool qw(ImageInfo);
 my @ioTagList;
 my $info;
 
-$info = <b>ImageInfo</b>("image.jpg", \@ioTagList, { Sort =&gt; 'Group0' } );
+$info = <b>ImageInfo</b>('image.jpg', \@ioTagList, {Sort =&gt; 'Group0'});
 </pre></td></tr></table></blockquote>
 
 <blockquote>Object-oriented example to read from a file that is already open:
@@ -132,17 +132,23 @@ my $exifTool = new Image::ExifTool;
 $info = $exifTool-&gt;<b>ImageInfo</b>(\*FILE_PT, 'Aperture', 'ShutterSpeed', 'ISO');
 </pre></td></tr></table></blockquote>
 
-<blockquote>Extracting information from an image already loaded into memory:
+<blockquote>Extract information from an image in memory:
 <table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 $info = $exifTool-&gt;<b>ImageInfo</b>(\$imageData);
+</pre></td></tr></table></blockquote>
+
+<blockquote>Extract information from an embedded thumbnail image:
+<table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+$info = <b>ImageInfo</b>('image.jpg', 'thumbnailimage');
+my $thumbInfo = <b>ImageInfo</b>($$info{ThumbnailImage});
 </pre></td></tr></table></blockquote>
 
 <blockquote>Using an ExifTool object to set the options before calling ImageInfo():
 <table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 my $filename = shift || die "Please specify filename\n";
-my @ioTagList = ( 'DateTimeOriginal', 'ImageSize', 'FocalLength' );
+my @ioTagList = ('DateTimeOriginal', 'ImageSize', 'FocalLength');
 
-$exifTool-&gt;Options( Unknown =&gt; 1, DateFormat =&gt; '%H:%M:%S %a. %b. %e, %Y' );
+$exifTool-&gt;Options(Unknown =&gt; 1, DateFormat =&gt; '%H:%M:%S %a. %b. %e, %Y');
 $info = $exifTool-&gt;<b>ImageInfo</b>($filename, \@ioTagList);
 </pre></td></tr></table></blockquote>
 
@@ -180,9 +186,10 @@ either the keys of the returned hash or the elements of the tag array when
 accessing the return values
 
 <p><b>File ref</b> --
-A reference to an open image file.  If you use this method
-of accessing a file (or a SCALAR reference), the FileName tag
-will not be returned.
+A reference to an open image file.  If you use this method (or a SCALAR
+reference) to access information in an image, the FileName and Directory tags
+will not be returned.  (Also, the FileSize and FileModifyDate tags will not be
+returned unless it is a plain file.)
 
 <p><b>SCALAR ref</b> --
 A reference to image data in memory.
@@ -195,7 +202,7 @@ is updated to contain a sorted list of tag names in the proper case.
 <p><b>HASH ref</b> --
 Reference to a hash containing the options settings.  See Options()
 documentation below for a list of available options.  Options specified
-as arguments to ImageInfo() take precidence over Options() settings.
+as arguments to ImageInfo() take precedence over Options() settings.
 </blockquote>
 
 <b>Return Value:</b>
@@ -246,7 +253,7 @@ FlashOn                  : On
 Make                     : FUJIFILM
 ShutterSpeedValue        : 1/64
 ExposureCompensation     : 0
-Sharpness                : +1
+Sharpness                : Soft
 ResolutionUnit           : inches
 </pre></td></tr></table></blockquote>
 
@@ -304,8 +311,10 @@ to a specific function.
 <table border=1 cellspacing=0 cellpadding=3>
 <tr><th colspan=4 bgcolor='#dddddd'><font size='+1'>ExifTool Options</font></th></tr>
 <tr><th>Option</th><th>Description</th><th>Values</th><th>Default</th></tr>
-<tr><td>Binary</td><td>Flag to get values of all binary tags.
-    Unless set, large binary values are only extracted for specifically requested tags.</td>
+<tr><td>Binary</td><td>Flag to extract the value data for all binary tags.
+    Tag values representing large binary data blocks (ie. ThumbnailImage)
+    are not necessarily extracted unless this option is set or the tag is
+    specifically requested by name.</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>ByteOrder</td><td>The byte order for newly created EXIF segments when writing.
     If EXIF information already exists, the existing order is used instead.  If not
@@ -373,23 +382,23 @@ to a specific function.
 
 <b>Examples:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-$exifTool-&gt;<b>Options</b>( Exclude =&gt; 'OwnerName' );
+$exifTool-&gt;<b>Options</b>(Exclude =&gt; 'OwnerName');
 </pre></td></tr></table></blockquote>
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-$exifTool-&gt;<b>Options</b>( Group0 =&gt; [ 'EXIF', 'MakerNotes' ] );
+$exifTool-&gt;<b>Options</b>(Group0 =&gt; ['EXIF', 'MakerNotes']);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-$exifTool-&gt;<b>Options</b>( Group1 =&gt; '-IFD1' );  # ignore IFD1 tags
+$exifTool-&gt;<b>Options</b>(Group1 =&gt; '-IFD1');  # ignore IFD1 tags
 </pre></td></tr></table></blockquote>
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-$exifTool-&gt;<b>Options</b>( Sort =&gt; 'Group2', Unknown =&gt; 1 );
+$exifTool-&gt;<b>Options</b>(Sort =&gt; 'Group2', Unknown =&gt; 1);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-my $oldSetting = $exifTool-&gt;<b>Options</b>( Duplicates =&gt; 0 );
+my $oldSetting = $exifTool-&gt;<b>Options</b>(Duplicates =&gt; 0);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
@@ -652,7 +661,7 @@ scalar context, or the number of tags set and the error string in list context.
     <td>Write '<a href="TagNames/index.html">protected</a>' tags</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr><td>Replace</td><td>Replace previous new value for this tag (ie. replace the value
-    set in a previous call to <a href="#SetNewValue">SetNewValue</a></td>
+    set in a previous call to <a href="#SetNewValue">SetNewValue</a>)</td>
     <td><table>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Don't replace</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Replace with specified new value</td></tr>
@@ -661,9 +670,9 @@ scalar context, or the number of tags set and the error string in list context.
 </table></blockquote>
 <b>Examples:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
-$success = $exifTool-&gt;<b>SetNewValue</b>($tag,$value);
+$success = $exifTool-&gt;<b>SetNewValue</b>($tag, $value);
 
-($success, $errStr) = $exifTool-&gt;<b>SetNewValue</b>($tag,$value);
+($success, $errStr) = $exifTool-&gt;<b>SetNewValue</b>($tag, $value);
 
 # delete a tag (also resets AddValue and DelValue options for this tag)
 $exifTool-&gt;<b>SetNewValue</b>($tag);
@@ -672,13 +681,13 @@ $exifTool-&gt;<b>SetNewValue</b>($tag);
 $exifTool-&gt;<b>SetNewValue</b>();
 
 # delete a single keyword
-$exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, DelValue=&gt;1);
+$exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, DelValue =&gt; 1);
 
 # add a keyword without replacing existing keywords
-$exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, AddValue=&gt;1);
+$exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; $word, AddValue =&gt; 1);
 
 # set a tag in a specific group
-$exifTool-&gt;<b>SetNewValue</b>('Headline', $val, Group=&gt;'XMP');
+$exifTool-&gt;<b>SetNewValue</b>(Headline =&gt; $val, Group =&gt; 'XMP');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewValuesFromFile">SetNewValuesFromFile</a></h2>
@@ -697,8 +706,8 @@ in a specified file.
  form 'SRCTAG&gt;DSTTAG' (or 'DSTTAG&lt;SRCTAG') to be specified to copy
  information to a tag with a different name or a specified group.  Both 'SRCTAG'
  and 'DSTTAG' may use '*' and/or be prefixed by a group name (ie.
- 'modifyDate>fileModifyDate' or '*>xmp:*').  Tags are evaluated in order, so
- exclusions apply only to tags included earlier in the list.
+ 'modifyDate&gt;fileModifyDate' or '*&gt;xmp:*').  Tags are evaluated in order,
+ so exclusions apply only to tags included earlier in the list.
 </td></tr>
 <tr><td><b>Returns</b></td><td>A hash of information that was set
 successfully.  May include Warning or Error entries if there were problems
@@ -752,9 +761,9 @@ Save state of new values to be later restored by RestoreNewValues().
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 $exifTool-&gt;<b>SaveNewValues</b>();         # save state of new values
 $exifTool-&gt;SetNewValue(ISO =&gt; 100); # set new value for ISO
-$exifTool-&gt;WriteInfo('a.jpg');      # write ISO plus any previous new values
+$exifTool-&gt;WriteInfo($src, $dst1);  # write ISO plus any previous new values
 $exifTool-&gt;<b>RestoreNewValues</b>();      # restore previous new values
-$exifTool-&gt;WriteInfo('b.jpg');      # write previous new values only
+$exifTool-&gt;WriteInfo($src, $dst2);  # write previous new values only
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="RestoreNewValues">RestoreNewValues</a></h2>
@@ -981,16 +990,17 @@ separated into the ICC-header group.
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile,
-IPTC, Jpeg2000, MIFF, MakerNotes, PNG, Photoshop, PrintIM, XMP</td></tr>
-<tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool, File,
-FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000, Kodak,
-KodakBordersIFD, KodakEffectsIFD, MIFF, MakerUnknown, Minolta, Nikon,
-NikonPreview, Olympus, PNG, Panasonic, Pentax, Photoshop, PrintIM, Ricoh, Sanyo,
-Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore,
-XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+<td>APP12, Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC,
+Jpeg2000, MIFF, MNG, MakerNotes, PDF, PNG, Photoshop, PostScript, PrintIM,
+XMP</td></tr> <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
+<td>APP12, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool,
+File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
+ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000, Kodak,
+KodakBordersIFD, KodakEffectsIFD, MIFF, MNG, MakerUnknown, Minolta, Nikon,
+NikonPreview, Olympus, PDF, PNG, Panasonic, Pentax, Photoshop, PostScript,
+PrintIM, Ricoh, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc,
+XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ,
+XMP-xmpMM, XMP-xmpRights
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
