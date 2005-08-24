@@ -1577,7 +1577,7 @@ sub RebuildMakerNotes($$$);
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Exif::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Exif::Composite');
 
 
 #------------------------------------------------------------------------------

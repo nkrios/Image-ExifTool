@@ -18,6 +18,11 @@ $VERSION = '1.06';
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
     GROUPS => { 2 => 'Location' },
+    NOTES => q{
+When adding GPS information to an image, it is important to set all of the
+following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
+GPSAltitude and GPSAltitudeRef.
+    },
     0x0000 => {
         Name => 'GPSVersionID',
         Writable => 'int8u',

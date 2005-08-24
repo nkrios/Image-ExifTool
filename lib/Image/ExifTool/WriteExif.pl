@@ -383,7 +383,9 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Notes => q{
 tags 0x9c9b-0x9c9f are used by Windows Explorer; special characters in these
-values are converted to UTF-8 by default, or Windows Latin1 with the -L option
+values are converted to UTF-8 by default, or Windows Latin1 with the -L option.
+XPTitle is ignored by Windows Explorer if ImageDescription exists',
+
         },
         ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },

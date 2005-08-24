@@ -287,7 +287,7 @@ is undef.
 
 Character set for converting Unicode character strings.  Valid values are:
 
-  UTF8  - UTF8 characters (the default)
+  UTF8  - UTF-8 characters (the default)
   Latin - Windows Latin1 (cp1252)
 
 =item Compact
@@ -807,6 +807,24 @@ deleted (ie. if SetNewValue was called without a value).
 
 =back
 
+=head2 CountNewValues
+
+Return the total number of new values set.
+
+    $numSet = $exifTool->CountNewValues();
+
+=over 4
+
+=item Inputs:
+
+0) ExifTool object reference
+
+=item Return Values:
+
+The total number of tags with new values set.
+
+=back
+
 =head2 SaveNewValues
 
 Save state of new values to be later restored by L</RestoreNewValues>.
@@ -844,6 +862,27 @@ L</SaveNewValues>.  See L</SaveNewValues> above for an example.
 =item Return Value:
 
 None.
+
+=back
+
+=head2 SetFileModifyDate
+
+Set the file modification time from the new value of the FileModifyDate tag.
+
+    $result = $exifTool->SetFileModifyDate($file);
+
+=over 4
+
+=item Inputs:
+
+0) ExifTool object reference
+
+1) File name
+
+=item Return Value:
+
+1 if the time was changed, 0 if the FileModifyDate tag wasn't set, or -1 if
+there was an error setting the time.
 
 =back
 
@@ -1165,7 +1204,9 @@ Get type of file given file name.
 =item Return Value:
 
 A string, based on the file extension, which represents the type of file.
-Returns undefined value if file type is not supported by ExifTool.
+Returns undefined value if file type is not supported by ExifTool.  In array
+context, may return more than one file type if the file may be different
+formats.
 
 =back
 

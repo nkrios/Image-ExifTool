@@ -496,6 +496,8 @@ sub SetNewValue($;$$%)
             $err = "Tag '$wantGroup:$tag' does not exist";
         }
         warn "$err\n" unless wantarray;
+    } elsif ($err and not $verbose) {
+        undef $err;
     }
     # set markers to create all required tags too
     if (@requireTags) {
@@ -533,6 +535,7 @@ sub SetNewValuesFromFile($$;@)
     $opts->{IgnoreMinorErrors} = $self->Options('IgnoreMinorErrors');
     $opts->{PrintConv} = $self->Options('PrintConv');
     my $info = $srcExifTool->ImageInfo($srcFile, $opts);
+    return $info if $info->{Error} and $info->{Error} eq 'Error opening file';
 
     # sort tags in reverse order so we get priority tag last
     my @tags = reverse sort keys %$info;
@@ -722,6 +725,19 @@ sub GetNewValues($;$$)
 }
 
 #------------------------------------------------------------------------------
+# Return the total number of new values set
+# Inputs: 0) ExifTool object reference
+# Returns: Number of new values that have been set
+sub CountNewValues($)
+{
+    my $self = shift;
+    my $num = 0;
+    $num += scalar keys %{$self->{NEW_VALUE}} if $self->{NEW_VALUE};
+    $num += scalar keys %{$self->{DEL_GROUP}} if $self->{DEL_GROUP};
+    return $num;
+}
+
+#------------------------------------------------------------------------------
 # Save new values for subsequent restore
 # Inputs: 0) ExifTool object reference
 sub SaveNewValues($)
@@ -789,6 +805,24 @@ sub RestoreNewValues($)
         }
         $self->{SAVE_NEW_VALUE} = { };  # reset saved new values
     }
+}
+
+#------------------------------------------------------------------------------
+# Set file modification time from FileModifyDate tag
+# Inputs: 0) ExifTool object reference, 1) file name
+# Returns: 1=time changed OK, 0=FileModifyDate not set, -1=error setting time
+sub SetFileModifyDate($$)
+{
+    my ($self, $file) = @_;
+    my $val = $self->GetNewValues('FileModifyDate');
+    return 0 unless defined $val;
+    unless (utime($val, $val, $file)) {
+        $self->Warn('Error setting FileModifyDate');
+        return -1;
+    }
+    ++$self->{CHANGED};
+    $self->{OPTIONS}->{Verbose} > 1 and print "    + FileModifyDate = '$val'\n";
+    return 1;
 }
 
 #------------------------------------------------------------------------------
@@ -927,17 +961,12 @@ sub WriteInfo($$$)
     if ($outRef and $outRef ne $outfile) {
         # close file and set $rtnVal to -1 if there was an error
         $rtnVal and $rtnVal = -1 unless close($outRef);
-        # erase the output file unless we were successful
-        $rtnVal <= 0 and unlink $outfile;
-        # set FileModifyDate if requested
-        my $val = $self->GetNewValues('FileModifyDate');
-        if (defined $val) {
-            if (utime($val, $val, $outfile)) {
-                ++$self->{CHANGED};
-                $self->{OPTIONS}->{Verbose} > 1 and print "    + FileModifyDate = '$val'\n";
-            } else {
-                $self->Warn('Error setting FileModifyDate');
-            }
+        if ($rtnVal > 0) {
+            # set FileModifyDate if requested
+            $self->SetFileModifyDate($outfile);
+        } else {
+            # erase the output file since we weren't successful
+            unlink $outfile;
         }
     }
     # if $rtnVal<0 there was a write error
@@ -1218,8 +1247,8 @@ sub LoadAllTables()
         }
         # (then our special tables)
         GetTagTable('Image::ExifTool::APP12');
-        GetTagTable('Image::ExifTool::extraTags');
-        GetTagTable('Image::ExifTool::compositeTags');
+        GetTagTable('Image::ExifTool::Extra');
+        GetTagTable('Image::ExifTool::Composite');
         # recursively load all tables referenced by the current tables
         my @tableNames = ( keys %allTables );
         while (@tableNames) {
@@ -1423,7 +1452,7 @@ sub WriteTagTable($$;$$)
         }
     }
     # copy new directory as a block if specified
-    my $tagInfo = $Image::ExifTool::extraTags{$grp0};
+    my $tagInfo = $Image::ExifTool::Extra{$grp0};
     if ($tagInfo and $self->{NEW_VALUE}->{$tagInfo}) {
         my $newVal = GetNewValues($self->{NEW_VALUE}->{$tagInfo});
         if (defined $newVal and length $newVal) {
@@ -1650,7 +1679,7 @@ sub LastInList($)
 # Inputs: 0) ExifTool object reference, 1) directory name
 #         2) number of entries in directory (or 0 if unknown)
 #         3) optional size of directory in bytes
-sub VerboseDir($$;$)
+sub VerboseDir($$;$$)
 {
     my ($self, $name, $entries, $size) = @_;
     my $indent = substr($self->{INDENT}, 0, -2);
@@ -1717,34 +1746,34 @@ sub Latin2Unicode($$)
 }
 
 #------------------------------------------------------------------------------
-# convert 16-bit unicode characters to UTF8
+# convert 16-bit unicode characters to UTF-8
 # Inputs: 0) 16-bit unicode character string, 1) short unpack format
-# Returns: UTF8 encoded string
+# Returns: UTF-8 encoded string
 # Notes: Only works for Perl 5.6.1 or later
 sub Unicode2UTF8($$)
 {
     my ($val, $fmt) = @_;
     my $outVal;
-    # repack as a UTF8 string
+    # repack as a UTF-8 string
     $outVal = pack('C0U*',unpack("$fmt*",$val));
     $outVal =~ s/\0.*//s;    # truncate at null terminator
     return $outVal;
 }
 
 #------------------------------------------------------------------------------
-# convert UTF8 encoded string to 16-bit unicode (Perl 5.6.1 or later)
-# Input: 0) UTF8 string, 1) short unpack format
+# convert UTF-8 encoded string to 16-bit unicode (Perl 5.6.1 or later)
+# Input: 0) UTF-8 string, 1) short unpack format
 # Returns: 16-bit unicode character string
 sub UTF82Unicode($$)
 {
     my ($str, $fmt) = @_;
-    # repack UTF8 string as 16-bit integers
+    # repack UTF-8 string as 16-bit integers
     $str = pack("$fmt*",unpack('U0U*',$str)) . "\0\0";
     return $str;
 }
 
 #------------------------------------------------------------------------------
-# convert 16-bit unicode character string to 8-bit (Latin or UTF8)
+# convert 16-bit unicode character string to 8-bit (Latin or UTF-8)
 # Inputs: 0) ExifTool object reference, 1) 16-bit unicode string (in specified byte order)
 #         2) Optional byte order (current byte order used if not specified)
 # Returns: 8-bit character string
@@ -1752,7 +1781,7 @@ my %unpackShort = ( 'II' => 'v', 'MM' => 'n' );
 sub Unicode2Byte($$;$) {
     my ($self, $val, $byteOrder) = @_;
     my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
-    # convert to Latin if specified or if no UTF8 support in this Perl version
+    # convert to Latin if specified or if no UTF-8 support in this Perl version
     if ($self->Options('Charset') eq 'Latin' or $] < 5.006001) {
         return Unicode2Latin($val, $fmt);
     } else {
@@ -1762,7 +1791,7 @@ sub Unicode2Byte($$;$) {
 
 #------------------------------------------------------------------------------
 # convert 8-bit character string to 16-bit unicode
-# Inputs: 0) ExifTool object reference, 1) Latin or UTF8 string, 2) optional byte order
+# Inputs: 0) ExifTool object reference, 1) Latin or UTF-8 string, 2) optional byte order
 # Returns: 16-bit unicode character string (in specified byte order)
 sub Byte2Unicode($$;$)
 {
@@ -2180,7 +2209,7 @@ sub WriteJPEG($$)
             while (exists $$editDirs{COM} and not $doneDir{COM}) {
                 $doneDir{COM} = 1;
                 last if $self->{DEL_GROUP} and $self->{DEL_GROUP}->{File};
-                my $tagInfo = $Image::ExifTool::extraTags{Comment};
+                my $tagInfo = $Image::ExifTool::Extra{Comment};
                 my $oldComment = '';
                 $markerName eq 'COM' and ($oldComment = $$segDataPt) =~ s/\0.*//s;
                 my $newValueHash = $self->GetNewValueHash($tagInfo);

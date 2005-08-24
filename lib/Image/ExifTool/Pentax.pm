@@ -17,6 +17,7 @@
 #               5) John Francis private communication (tests with ist-D/ist-DS)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
 #               7) Douglas O'Brien private communication (tests with *istD)
+#               8) Denis Bourez private communication
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -27,7 +28,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.20';
+$VERSION = '1.22';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -512,6 +513,9 @@ my %pentaxCities = (
         Writable => 'int8u',
         Count => 2,
         PrintConv => {  #4
+            '1 0' => 'K,M Lens',
+            '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mmF5.6)
+            '3 0' => 'SIGMA',
             '3 17' => 'smc PENTAX-FA SOFT 85mmF2.8',
             '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
             '3 19' => 'smc PENTAX-F 24-50mmF4',
@@ -531,18 +535,26 @@ my %pentaxCities = (
             '3 33' => 'smc PENTAX-F 50mmF1.7',
             '3 34' => 'smc PENTAX-F 135mmF2.8[IF]',
             '3 35' => 'smc PENTAX-F 28mmF2.8',
+            '3 36' => 'SIGMA 20mm F1.8 EX DG ASPHERICAL RF',
             '3 38' => 'smc PENTAX-F*300mmF4.5ED[IF]',
             '3 39' => 'smc PENTAX-F*600mmF4ED[IF]',
             '3 40' => 'smc PENTAX-F MACRO 100mmF2.8',
             '3 41' => 'smc PENTAX-F MACRO 50mmF2.8',
+            '3 44' => 'SIGMA 18-50mm F3.5-5.6 DC',
+            '3 46' => 'SIGMA APO 70-200mm F2.8 EX',
             '3 50' => 'smc PENTAX-FA 28-70mmF4AL',
+            '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
             '3 52' => 'smc PENTAX-FA 28-200mmF3.8-5.6AL[IF]',
             '3 53' => 'smc PENTAX-FA 28-80mmF3.5-5.6AL',
+            '3 253' => 'smc PENTAX-DA 14mmF2.8ED[IF]',
+            '3 254' => 'smc PENTAX-DA 16-45mmF4ED AL',
+            '3 255' => 'SIGMA 18-200mm F3.5-6.3 DC', #8
             '4 1' => 'smc PENTAX-FA SOFT 28mmF2.8',
             '4 2' => 'smc PENTAX-FA 80-320mmF4.5-5.6',
             '4 3' => 'smc PENTAX-FA 43mmF1.9 Limited',
             '4 6' => 'smc PENTAX-FA 35-80mmF4-5.6',
             '4 15' => 'smc PENTAX-FA 28-105mmF4-5.6[IF]',
+            '4 19' => 'TAMRON SP AF90mm F/2.8',
             '4 20' => 'smc PENTAX-FA 28-80mmF3.5-5.6',
             '4 23' => 'smc PENTAX-FA 20-35mmF4AL',
             '4 24' => 'smc PENTAX-FA 77mmF1.8 Limited',
@@ -552,10 +564,15 @@ my %pentaxCities = (
             '4 35' => 'smc PENTAX-FA 100-300mmF4.7-5.8',
             '4 38' => 'smc PENTAX-FA 28-105mmF3.2-4.5AL[IF]',
             '4 39' => 'smc PENTAX-FA 31mmF1.8AL Limited',
+            '4 41' => 'TAMRON AF28-200mm Super Zoom F/3.8-5.6 Aspherical XR [IF] MACRO (A03)',
             '4 43' => 'smc PENTAX-FA 28-90mmF3.5-5.6',
             '4 44' => 'smc PENTAX-FA J 75-300mmF4.5-5.8AL',
+            '4 45' => 'TAMRON 28-300mm F3.5-6.3 Ultra zoom XR',
             '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6AL',
             '4 47' => 'smc PENTAX-FA J 18-35mmF4-5.6AL',
+            '4 49' => 'TAMRON SP AF28-75mm F/2.8 XR Di (A09)',
+            '4 250' => 'smc PENTAX-DA 50-200mm f/4-5.6 ED', #8
+            '4 252' => 'smc PENTAX-DA 18-55mmF3.5-5.6 AL', #8
             '4 253' => 'smc PENTAX-DA 14mmF2.8ED[IF]',
             '4 254' => 'smc PENTAX-DA 16-45mmF4ED AL',
             '5 1' => 'smc PENTAX-FA*24mmF2 AL[IF]',
@@ -586,19 +603,6 @@ my %pentaxCities = (
             '6 10' => 'smc PENTAX-FA*400mmF5.6ED[IF]',
             '6 13' => 'smc PENTAX-FA*400mmF5.6ED[IF]',
             '6 14' => 'smc PENTAX-FA* MACRO 200mmF4ED[IF]',
-            '1 0' => 'K,M Lens',
-            '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mmF5.6)
-            '3 0' => 'SIGMA',
-            '3 36' => 'SIGMA 20mm F1.8 EX DG ASPHERICAL RF',
-            '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
-            '3 44' => 'SIGMA 18-50mm F3.5-5.6 DC',
-            '3 46' => 'SIGMA APO 70-200mm F2.8 EX',
-            '3 253' => 'smc PENTAX-DA 14mmF2.8ED[IF]',
-            '3 254' => 'smc PENTAX-DA 16-45mmF4ED AL',
-            '4 41' => 'TAMRON AF28-200mm Super Zoom F/3.8-5.6 Aspherical XR [IF] MACRO (A03)',
-            '4 49' => 'TAMRON SP AF28-75mm F/2.8 XR Di (A09)',
-            '4 19' => 'TAMRON SP AF90mm F/2.8',
-            '4 45' => 'TAMRON 28-300mm F3.5-6.3 Ultra zoom XR',
         },
     },
     # 0x0041 - increments for each cropped pic (PH)

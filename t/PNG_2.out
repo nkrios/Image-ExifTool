@@ -1,9 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.35
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
 [File, File, Image]  - File Name: PNG.png
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 0KB
 [File, File, Time]  - File Modification Date/Time: 2005:06:13 14:35:52
 [File, File, Image]  - File Type: PNG
+[File, File, Image]  - Mime Type: image/png
 [PNG, PNG, Image] 0 - Image Width: 16
 [PNG, PNG, Image] 4 - Image Height: 16
 [PNG, PNG, Image] 8 - Bit Depth: 1

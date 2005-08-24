@@ -20,7 +20,7 @@ package Image::ExifTool::Olympus;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -415,7 +415,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConvInv => '$val=~s/\.//;hex($val)',
     },
     0x201 => { #6
-        Name => 'Lens',
+        Name => 'LensType',
         Writable => 'int8u',
         Count => 6,
         Notes => '6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown',

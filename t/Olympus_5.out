@@ -1,9 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.54
 [File, File, Image]  - File Name: Olympus_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 8KB
-[File, File, Time]  - File Modification Date/Time: 2005:06:27 16:17:51
+[File, File, Time]  - File Modification Date/Time: 2005:08:22 11:01:43
 [File, File, Image]  - File Type: JPEG
+[File, File, Image]  - Mime Type: image/jpeg
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Image] 270 - Image Description: OLYMPUS DIGITAL CAMERA         
@@ -80,7 +81,7 @@
 [MakerNotes, Olympus, Camera] 258 - Olympus Equipment 0x0102: 4001310004375102               
 [MakerNotes, Olympus, Camera] 259 - Focal Plane Diagonal: 21.6 mm
 [MakerNotes, Olympus, Camera] 260 - Body Firmware Version: 1.300
-[MakerNotes, Olympus, Camera] 513 - Lens: Olympus Zuiko Digital 14-54mm F2.8-3.5 (production)
+[MakerNotes, Olympus, Camera] 513 - Lens Type: Olympus Zuiko Digital 14-54mm F2.8-3.5 (production)
 [MakerNotes, Olympus, Camera] 514 - Lens Serial Number: 012345678
 [MakerNotes, Olympus, Camera] 516 - Lens Firmware Version: 1.100
 [MakerNotes, Olympus, Camera] 518 - Max Aperture At Max Focal: 3.5

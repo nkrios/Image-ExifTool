@@ -79,6 +79,8 @@ my $allInGroup;     # flag to show all tags in a group
 my $disableOutput;  # flag to disable normal output
 my $quiet = 0;      # flag to disable printing of informational messages / warnings
 my $overwriteOriginal; # flag to overwrite original file
+my $filterFlag = 0; # file filter flag (0x01=allow extensions, 0x02=deny extensions)
+my %filterExt;      # lookup for filtered extensions
 
 # my warn and die routines
 sub Warn { warn(@_) if $quiet < 2 or $_[0] =~ /^Error/; }
@@ -131,6 +133,15 @@ while ($_ = shift) {
         /^d$/  and $mainTool->Options('DateFormat', shift || Die "Expecting date format for -d option\n"), next;
         /^D$/  and $showTagID = 'D', next;
         /^e$/  and $mainTool->Options(Composite => 0), next;
+        if (/^-?ext$/i) {
+            my $ext = shift;
+            defined $ext or Die "Expecting extension for -ext option\n";
+            $ext =~ s/^\.//;    # remove leading '.' if it exists
+            my $flag = /^-/ ? 0 : 1;
+            $filterFlag |= (0x01 << $flag);
+            $filterExt{uc($ext)} = $flag;
+            next;
+        }
         /^E$/  and $escapeHTML = 1, next;
         /^f$/i and $forcePrint = 1, next;
         /^g(\d*)$/ and $showGroup = $1, next;
@@ -179,6 +190,13 @@ while ($_ = shift) {
             push @newValues, $_;
         } else {
             s/\ball\b/\*/ig;    # replace 'all' with '*' in tag names
+            if (not $setTagsFile and /(<|>)/) {
+                # assume '-tagsFromFile @' if tags are being redirected
+                # and -tagsFromFile hasn't already been specified
+                $setTagsFile = '@';
+                push(@newValues, "TagsFromFile=@");
+                $setTags{$setTagsFile} or $setTags{$setTagsFile} = [];
+            }
             if ($setTagsFile) {
                 push @{$setTags{$setTagsFile}}, $_;
             } elsif (/^-(.*)/) {
@@ -365,13 +383,16 @@ sub SetImageInfo($$)
         $exifTool->RestoreNewValues();
         # add new values from the current file
         my $info = $exifTool->SetNewValuesFromFile($file, @{$setTags{'@'}});
-        $info->{Error} and Warn("Error: $info->{Error} - $file\n"), return 0;
+        if ($info->{Error}) {
+            Warn("Error: $info->{Error} - $file\n");
+            ++$countBadWr;
+            return 0;
+        }
         if ($info->{Warning}) {
             Warn "Warning: $info->{Warning} - $file\n";
             delete $info->{Warning};
         }
     }
-    # only need to rewrite file if we set a valid tag
     my $outfile;
     # get output file name
     if (defined $outOpt and $outOpt ne '-') {
@@ -387,7 +408,8 @@ sub SetImageInfo($$)
         }
         if (-e $outfile) {
             Warn "Error: File already exists: $outfile\n";
-            return;
+            ++$countBadWr;
+            return 0;
         }
         $tmpFile = $outfile;
     } elsif ($file eq '-' or $outOpt) {
@@ -397,6 +419,21 @@ sub SetImageInfo($$)
         $binaryStdout = 1;
         undef $tmpFile;
     } else {
+        # only need to rewrite file if we set a valid tag
+        my $numSet = $exifTool->CountNewValues();
+        $numSet or ++$countSameWr, return 1;
+        if ($numSet == 1) {
+            # just set file timestamp if this is the only tag we are writing
+            my $result = $exifTool->SetFileModifyDate($file);
+            if ($result > 0) {
+                ++$countGoodWr;
+                return 1;
+            } elsif ($result < 0) {
+                Warn "Error setting file time - $file\n";
+                ++$countBadWr;
+                return 0;
+            }
+        }
         $outfile = "${file}_exiftool_tmp";  # write to temporary file
         $tmpFile = $outfile;
     }
@@ -412,7 +449,7 @@ sub SetImageInfo($$)
             if ($preserveTime) {
                 my $modTime = $^T - (-M $file) * (24 * 3600);
                 my $accTime = $^T - (-A $file) * (24 * 3600);
-                utime($accTime, $modTime, $tmpFile) or Warn "Error setting file time\n";
+                utime($accTime, $modTime, $tmpFile) or Warn "Error setting file time - $file\n";
             }
             unless (defined $outOpt) {
                 # move original out of the way
@@ -425,7 +462,7 @@ sub SetImageInfo($$)
                     }
                 }
                 unless (rename($tmpFile, $file)) {
-                    Warn "Error renaming temporary file\n";
+                    Warn "Error renaming temporary file to $file\n";
                     unlink $tmpFile;
                 }
             }
@@ -451,6 +488,13 @@ sub GetImageInfo($$)
     my (@foundTags, $info, $writeOnly);
     my $pipe = $file;
 
+    # filter out unwanted file extensions
+    if ($filterFlag) {
+        my $ext = ($file =~ /.*\.(.+)$/) ? uc($1) : '';
+        if ($filterFlag & 0x02 or defined $filterExt{$ext}) {
+            return unless $filterExt{$ext};
+        }
+    }
     if ($doUnzip) {
         # pipe through gzip or bzip2 if necessary
         if ($file =~ /\.gz$/i) {
@@ -956,17 +1000,17 @@ new file is OK before erasing the original.)
 Below is a list of meta information formats and file types currently
 supported by exiftool (r = read support, w = write support):
 
-     Meta Information                         File Type
-    ------------------          --------------------------------------
-    EXIF           r/w          JPEG   r/w      JP2    r      PDF    r
-    GPS            r/w          TIFF   r/w      BMP    r      PSD    r
-    IPTC           r/w          GIF    r/w      PNG    r      MRW    r
-    XMP            r/w          THM    r/w      MNG    r      ORF    r
-    MakerNotes     r/w          CRW    r/w      JNG    r
-    Photoshop IRB  r/w          CR2    r/w      MIFF   r
-    GeoTIFF        r            DNG    r/w      EPS    r
-    ICC Profile    r            NEF    r/w      PS     r
-    PrintIM        r            PEF    r/w      AI     r
+     Meta Information                        File Type
+    ------------------          -----------------------------------
+    EXIF           r/w          JPEG  r/w      JP2   r      PDF   r
+    GPS            r/w          TIFF  r/w      BMP   r      PSD   r
+    IPTC           r/w          GIF   r/w      PNG   r      MRW   r
+    XMP            r/w          THM   r/w      MNG   r      ORF   r
+    MakerNotes     r/w          CRW   r/w      JNG   r
+    Photoshop IRB  r/w          CR2   r/w      MIFF  r
+    GeoTIFF        r            DNG   r/w      EPS   r
+    ICC Profile    r            NEF   r/w      PS    r
+    PrintIM        r            PEF   r/w      AI    r
 
 =head1 OPTIONS
 
@@ -1062,6 +1106,16 @@ Print B<e>xisting tags only -- don't calculate composite tags.
 B<E>scape characters in output values for HTML (implied with the C<-h>
 option).
 
+=item B<-ext> I<EXT> (or B<--ext> I<EXT>)
+
+Process only files with the specified extension, or use C<--ext> to exclude
+files.  There may be multiple C<-ext> or C<--ext> options. Extensions may
+begin with a leading '.', and case is not significant.  For example:
+
+    exiftool -ext .JPG *            # process only JPG files
+    exiftool --ext crw --ext dng *  # process all but CRW and DNG
+    exiftool --ext . *              # ignore if no extension
+
 =item B<-f>
 
 B<F>orce printing of tags even if their values are not found.
@@ -1100,7 +1154,7 @@ Use B<l>ong output format (2-line Canon-style output).
 =item B<-L>
 
 Convert Unicode characters in output to Windows B<L>atin1 (cp1252) instead
-of the default UTF8.
+of the default UTF-8.
 
 =item B<-list>
 
@@ -1220,7 +1274,9 @@ C<SRCFILE> may be the same as the target file to move information around
 within a file.  C<@> may be used to represent the target file name (ie.
 C<-TagsFromFile @>), permitting this feature to be used when batch
 processing multiple files.  Specified tags are then copied from each target
-file in turn as it is rewritten.
+file in turn as it is rewritten.  As a convenience, C<-TagsFromFile @> is
+assumed for any redirected tags which are specified without a prior
+C<-TagsFromFile> option.
 
 See L</COPYING EXAMPLES> for examples of how to use this option.
 
@@ -1424,10 +1480,12 @@ image.
 Copy only the EXIF information from one image to another, excluding SubIFD
 tags.
 
-=item exiftool -tagsfromfile @ '-ModifyDate>FileModifyDate' dir
+=item exiftool '-DateTimeOriginal>FileModifyDate' dir
 
-Use the modification date from the meta information to set the same file's
-filesystem modification date for all images in a directory.
+Use the original date from the meta information to set the same file's
+filesystem modification date for all images in a directory.  (Note that
+C<-TagsFromFile @> has been omitted from this command since it is assumed
+when redirecting information unless another C<-TagsFromFile> is specified.)
 
 =item exiftool -TagsFromFile src.jpg '-all>xmp:all' dst.jpg
 

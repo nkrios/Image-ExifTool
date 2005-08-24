@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
@@ -587,21 +587,24 @@ my %nikonLensIDs = (
     8 => 'AF Zoom-Nikkor 35-105mm f/3.5-4.5',
     9 => 'AF Nikkor 24mm f/2.8',
     10 => 'AF Nikkor 300mm f/2.8 IF-ED',
-    11 => 'AF Nikkor 180mm f/2.8 IF-ED',
+    11 => 'AF Nikkor 180mm f/2.8 IF-ED or third party lens',
+    13 => 'AF Zoom-Nikkor 35-135mm f/3.5-4.5',
     14 => 'AF Zoom-Nikkor 70-210mm f/4',
     15 => 'AF Nikkor 50mm f/1.8 N',
     16 => 'AF Nikkor 300mm f/4 IF-ED',
+    17 => 'AF Zoom-Nikkor 35-70mm f/2.8',
     18 => 'AF Nikkor 70-210mm f/4-5.6',
     19 => 'AF Zoom-Nikkor 24-50mm f/3.3-4.5',
     20 => 'AF Zoom-Nikkor 80-200mm f/2.8 ED',
     21 => 'AF Nikkor 85mm f/1.8',
     23 => 'Nikkor 500mm f/4 P',
-    24 => 'AF Zoom-Nikkor 35-135mm f/3.5-4.5',
+    24 => 'AF Zoom-Nikkor 35-135mm f/3.5-4.5 N',
     27 => 'AF Zoom-Nikkor 75-300mm f/4.5-5.6',
     28 => 'AF Nikkor 20mm f/2.8',
     29 => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5 N',
     30 => 'AF Micro-Nikkor 60mm f/2.8 or third party lens',
     32 => 'Unknown Nikkor or Tamron',
+    36 => 'AF Zoom-Nikkor ED 80-200mm f/2.8D',
     37 => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
     38 => 'Unknown Nikkor or Sigma D',
     39 => 'AF-I Nikkor 300mm f/2.8D IF-ED',
@@ -628,6 +631,7 @@ my %nikonLensIDs = (
     76 => 'AF Zoom-Nikkor 24-120mm f/3.5-5.6D IF',
     77 => 'AF Zoom-Nikkor 28-200mm f/3.5-5.6D IF or Tamron',
     78 => 'AF DC-Nikkor 135mm f/2D',
+    79 => 'IX-Nikkor 24-70mm f/3.5-5.6',
     83 => 'AF Zoom-Nikkor 80-200mm f/2.8D ED',
     84 => 'AF Zoom-Micro Nikkor 70-180mm f/4.5-5.6D ED',
     86 => 'AF Zoom-Nikkor 70-300mm f/4-5.6D ED or Sigma D',
@@ -636,6 +640,7 @@ my %nikonLensIDs = (
     93 => 'AF-S Zoom-Nikkor 28-70mm f/2.8D IF-ED',
     94 => 'AF-S Zoom-Nikkor 80-200mm f/2.8D IF-ED',
     95 => 'AF Zoom-Nikkor 28-105mm f/3.5-4.5D IF',
+    97 => 'AF Zoom-Nikkor 75-240mm f/4.5-5.6D',
     99 => 'AF-S Nikkor 17-35mm f/2.8D IF-ED',
     100 => 'PC Micro-Nikkor 85mm f/2.8D',
     101 => 'AF VR Zoom-Nikkor 80-400mm f/4.5-5.6D ED',
@@ -790,7 +795,7 @@ which make writing more difficult.
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Nikon::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Nikon::Composite');
 
 
 #------------------------------------------------------------------------------

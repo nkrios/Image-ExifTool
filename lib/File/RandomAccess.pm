@@ -136,7 +136,7 @@ sub Seek($$;$)
             $self->Slurp();     # read whole file into buffer
             if ($self->{LEN} >= $num) {
                 # position relative to end of file
-                $self->{POS} = $self->{LEN} - $num;
+                $self->{POS} = $self->{LEN} + $num;
             } else {
                 $rtnVal = 0;    # seek error
             }

@@ -5,7 +5,77 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.46.tar.gz">Version 5.46</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.55.tar.gz">Version 5.55</a>.<p>
+
+<b>Aug. 24/05 - Version 5.55</b> (production release)
+<ul>
+<li>Added patch to fix word ordering when unpacking doubles on ARM systems with
+    little-endian byte order but big-endian word order (thanks Riku Voipio)
+<li>Added another lens to the Pentax LensType list
+</ul>
+
+<b>Aug. 22/05 - Version 5.54</b>
+<ul>
+<li>Fixed problem introduced in version 5.50 which broke ability to delete
+    groups of information
+<li>Added a couple of new Pentax LensType's
+<li>Changed name of Olympus 'Lens' tag to 'LensType'
+</ul>
+
+<b>July 29/05 - Version 5.53</b>
+<ul>
+<li>Added -ext option to allow files to be processed or excluded from processing
+    based on their extension
+<li>Added MimeType tag
+<li>Convert PDF UTF-16 character strings to UTF-8 (or Windows Latin1 if '-L'
+    option used)
+</ul>
+
+<b>July 28/05 - Version 5.52</b>
+<ul>
+<li>Removed warning message when writing CR2 files that was intended only for
+    Canon 1D TIFF files.
+</ul>
+
+<b>July 27/05 - Version 5.51</b>
+<ul>
+<li>Assume '-TagsFromFile @' for any redirected tags (ie. '-SRCTAG&gt;DSTTAG' or
+    '-DSTTAG&lt;SRCTAG') which are specified without a prior '-TagsFromFile'
+</ul>
+
+<b>July 27/05 - Version 5.50</b>
+<ul>
+<li>Don't rewrite entire file if only FileModifyDate is being changed
+<li>API Changes:
+    <ul>
+    <li>Added CountNewValues() and SetFileModifyDate()
+    </ul>
+</ul>
+
+<b>July 26/05 - Version 5.49</b>
+<ul>
+<li>Decode encrypted PDF documents
+<li>Extract metadata from individual PDF pages
+<li>Speed up parsing of PDF files which use cross-reference streams
+<li>Improvements to verbose PDF output
+<li>Updated Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Minor changes to Canon LensType strings (thanks Michael Tiemann)
+</ul>
+
+<b>July 21/05 - Version 5.48</b>
+<ul>
+<li>Fixed parsing of XMP-pdf CreationDate and ModDate tags
+</ul>
+
+<b>July 21/05 - Version 5.47</b>
+<ul>
+<li>Fixed problem where existing item in list was getting overwritten when
+    adding to XMP lists with '-TAG+=VALUE' syntax
+<li>Improved verbose output for PDF files and recurse into all Kids dictionaries
+<li>Don't print warnings when setting the values of non-priority tags unless
+    verbose
+<li>Added support for PDF-like Adobe Illustrator (.AI) files
+</ul>
 
 <b>July 19/05 - Version 5.46</b> (production release)
 <ul>
@@ -548,8 +618,8 @@
 <b>Feb. 23/05 - Version 4.67</b>
 <ul>
 <li>Added -L option to allow XP characters to be converted to Latin character
-    set instead of UTF8.  (Now XP characters can be displayed properly in
-    terminal windows which use either the UTF8 or WinLatin1 character set.)
+    set instead of UTF-8.  (Now XP characters can be displayed properly in
+    terminal windows which use either the UTF-8 or WinLatin1 character set.)
 <li>Make JpgFromRaw image writable in Nikon NEF files
 </ul>
 
@@ -561,7 +631,7 @@
     me). Now special characters show up properly in my OSX terminal window, and
     the reverse translation works so now they get written properly as well (for
     Perl 5.6.1 or greater anyway... Earlier versions don't have the required
-    UTF8 support to handle these special characters)
+    UTF-8 support to handle these special characters)
 <li>Improvements to TagNames documentation (including changing format names to
     make them more consistent across different types of meta information)
 </ul>

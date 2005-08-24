@@ -1,9 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.30
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
 [File, File, Image]  - File Name: Jpeg2000.jp2
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1KB
 [File, File, Time]  - File Modification Date/Time: 2005:02:11 12:03:12
 [File, File, Image]  - File Type: JPEG 2000
+[File, File, Image]  - Mime Type: image/jpeg2000
 [Jpeg2000, Jpeg2000, Image] 0 - Image Height: 16
 [Jpeg2000, Jpeg2000, Image] 4 - Image Width: 16
 [Jpeg2000, Jpeg2000, Image] 8 - Number Of Components: 3

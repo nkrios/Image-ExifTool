@@ -43,7 +43,7 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 5.46
+ExifToolVersion: 5.53
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -97,6 +97,7 @@ MaxAperture: 4
 MaxApertureValue: 4.5
 MeteringMode: Center-weighted averaging
 MeteringMode (1): Average
+MimeType: image/jpeg
 Model: Canon EOS DIGITAL REBEL
 ModifyDate: 2003:12:04 06:46:52
 Orientation: Horizontal (normal)

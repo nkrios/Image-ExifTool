@@ -127,6 +127,7 @@ FileSize : 3KB
 FileType : JPEG
 ImageHeight : 120
 ImageWidth : 160
+MimeType : image/jpeg
 ---- IFD0 ----
 Make : Canon
 Model : Canon EOS DIGITAL REBEL

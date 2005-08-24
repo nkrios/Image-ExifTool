@@ -26,14 +26,14 @@ package Image::ExifTool::Canon;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
     2 => 'Canon EF 28mm f/2.8',
     4 => 'Sigma UC Zoom 35-135mm f/4-5.6',
     6 => 'Tokina AF193-2 19-35mm f/3.5-4.5',
-    10 => 'Sigma 50mm f/2.8 EX / 28mm f/1.8',
+    10 => 'Sigma 50mm f/2.8 EX or 28mm f/1.8',
     11 => 'Canon EF 35mm f/2', #9
     13 => 'Canon EF 15mm f/2.8', #9
     21 => 'Canon EF 80-200mm f/2.8L',
@@ -42,7 +42,7 @@ my %canonLensTypes = ( #4
     29 => 'Canon EF 50mm f/1.8 MkII',
     39 => 'Canon EF 75-300mm f/4-5.6',
     40 => 'Canon EF 28-80mm f/3.5-5.6',
-    124 => 'Canon EF 65mm Macro Explorer f/2.8', #9
+    124 => 'Canon MP-E 65mm f/2.8 1-5x Macro Photo', #9
     125 => 'Canon TS-E 24mm f/3.5L',
     131 => 'Sigma 17-35mm f2.8-4 EX Aspherical HSM',
     135 => 'Canon EF 200mm f/1.8L',
@@ -52,17 +52,17 @@ my %canonLensTypes = ( #4
     149 => 'Canon EF 100mm f/2', #9
     150 => 'Sigma 20mm EX f/1.8',
     151 => 'Canon EF 200mm f/2.8L',
-    153 => 'Canon EF 35-350mm 3.5-5.6L', #PH
+    153 => 'Canon EF 35-350mm f/3.5-5.6L', #PH
     155 => 'Canon EF 85mm f/1.8 USM',
     156 => 'Canon EF 28-105mm f/3.5-4.5 USM',
     160 => 'Canon EF 20-35mm f/3.5-4.5 USM',
-    161 => 'Canon EF 28-70mm f/2.8L / Sigma 24-70mm EX f/2.8',
+    161 => 'Canon EF 28-70mm f/2.8L or Sigma 24-70mm EX f/2.8',
     165 => 'Canon EF 70-200mm f/2.8 L',
     166 => 'Canon EF 70-200mm f/2.8 L + x1.4',
     167 => 'Canon EF 70-200mm f/2.8 L + x2',
     169 => 'Sigma 15-30mm f/3.5-4.5 EX DG Aspherical',
     170 => 'Canon EF 200mm f/2.8L II', #9
-    173 => 'Canon EF 180mm Macro f/3.5L / Sigma 180mm EX HSM Macro f/3.5', #9
+    173 => 'Canon EF 180mm Macro f/3.5L or Sigma 180mm EX HSM Macro f/3.5', #9
     174 => 'Canon EF 135mm f/2L', #9
     176 => 'Canon EF 24-85mm f/3.5-4.5 USM',
     177 => 'Canon EF 300mm f/4L IS', #9
@@ -77,7 +77,7 @@ my %canonLensTypes = ( #4
     198 => 'Canon EF 50mm f/1.4', #9
     202 => 'Canon EF 28-80 f/3.5-5.6 USM IV',
     213 => 'Canon EF 90-300mm f/4.5-5.6',
-    229 => 'Canon EF 16-35mm 2.8L', #PH
+    229 => 'Canon EF 16-35mm f/2.8L', #PH
     230 => 'Canon EF 24-70mm f/2.8L', #9
     231 => 'Canon EF 17-40mm f/4L',
 );
@@ -1086,7 +1086,7 @@ my %canonLensTypes = ( #4
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Canon::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Canon::Composite');
 
 
 #------------------------------------------------------------------------------

@@ -13,11 +13,11 @@ the case of a BinaryData table, the IDs are numerical and specify offsets into
 the binary data block.  The corresponding hash value provides information about
 the tag (explained later).
 
-Twelve special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
-FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE, NOTES and IS_OFFSET)
-are used to provide additional information about a table.  The special keys have
-names that are all capitalized to avoid possible conflicts with tag keys.  Below
-is an explanation of the meaning of each special key:
+13 special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
+FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE, NOTES, IS_OFFSET and
+EXTRACT_UNKNOWN) are used to provide additional information about a table.  The
+special keys have names that are all capitalized to avoid possible conflicts
+with tag keys.  Below is an explanation of the meaning of each special key:
 
   PROCESS_PROC : Reference to a function used to process the directory for this
   table.  If PROCESS_PROC is not given, \&Image::ExifTool::Exif::ProcessExif is
@@ -103,6 +103,9 @@ is an explanation of the meaning of each special key:
 
   IS_OFFSET : Reference to list of TagID's representing offsets for binary
   data tables only.  Not used for EXIF tables.
+
+  EXTRACT_UNKNOWN : Used in PDF tables to specify a directory where all unknown
+  tags should be extracted.
 
 The remaining entries in a tag table are the EXIF tags with their associated
 information.  The information may exist in one of three forms:  1) A simple

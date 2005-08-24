@@ -40,7 +40,7 @@ my %jp2ResolutionUnit = (
    'jP  ' => 'JP2Signature', # (ref 1)
    "jP\x1a\x1a" => 'JP2Signature', # (ref 2)
     prfl => 'Profile',
-    ftyp => 'FileType',
+    ftyp => { Name => 'FileType', Priority => 0 },
     rreq => 'ReaderRequirements',
     jp2h => {
         Name => 'JP2Header',

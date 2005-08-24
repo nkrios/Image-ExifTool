@@ -2039,8 +2039,8 @@ my $epsg_units = {
     4098 => {
         Name => 'VerticalDatum',
         PrintConv => {
-            1 => 'VerticalDatumBase',
-            32767 => 'UserDefined',
+            1 => 'Vertical Datum Base',
+            32767 => 'User Defined',
         },
     },
     4099 => {

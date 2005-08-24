@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.36
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
 [File, File, Image]  - File Name: ExifTool.jpg
 [File, File, Image]  - Directory: t
 [File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
 [File, File, Image]  - File Type: JPEG
+[File, File, Image]  - Mime Type: image/jpeg
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 282 - X Resolution: 180

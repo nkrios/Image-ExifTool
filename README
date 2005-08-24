@@ -80,8 +80,8 @@ Notes:
 DEPENDENCIES
 
 Requires Perl version 5.004 or later.  No other special libraries are
-required, however Compress::Zlib is used if available to decode PNG
-compressed information.
+required, however Compress::Zlib and Digest::MD5 are used if available to
+extract compressed and/or encrypted information from PNG and PDF files.
 
 COPYRIGHT AND LICENCE
 
@@ -95,11 +95,11 @@ ADDITIONAL INFORMATION
 Read the following files included with the ExifTool distribution for more
 information:
 
-html/index.html           - Main ExifTool documentation
-html/history.html         - ExifTool revision history
-html/ExifTool.html        - ExifTool API documentation
-html/TagNames/index.html  - ExifTool tag name documentation
-lib/Image/ExifTool/README - ExifTool support modules documentation
+html/index.html             - Main ExifTool documentation
+html/history.html           - ExifTool revision history
+html/ExifTool.html          - ExifTool API documentation
+html/TagNames/index.html    - ExifTool tag name documentation
+lib/Image/ExifTool/README   - ExifTool support modules documentation
 
 and if you have installed Image::ExifTool, you can also consult perldoc or
 the man pages:

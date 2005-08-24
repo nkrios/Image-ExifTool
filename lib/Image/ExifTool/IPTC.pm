@@ -817,7 +817,7 @@ written by ExifTool.
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::IPTC::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::IPTC::Composite');
 
 
 #------------------------------------------------------------------------------

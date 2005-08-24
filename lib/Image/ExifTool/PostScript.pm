@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # PostScript tag table
 %Image::ExifTool::PostScript::Main = (
@@ -114,21 +114,23 @@ sub PostScriptInfo($)
 # determine postscript file type
 #
     $raf->Read($data, 4) == 4 or return 0;
-    # check for DOS binary file header
+    # accept either ASCII or DOS binary postscript file format
+    return 0 unless $data =~ /^(%!PS|\xc5\xd0\xd3\xc6)/;
+    # this appears to be in PostScript format
+    $exifTool->SetFileType('PostScript');
+    # process DOS binary file header
     if ($data =~ /^\xc5\xd0\xd3\xc6/) {
-        $raf->Read($data, 26) == 26 or return 0;
+        $raf->Read($data, 26) == 26 or return PSErr($exifTool,'truncated header');
         SetByteOrder('II');
         # extract information from embedded TIFF file
-        $exifTool->TiffInfo('PostScript', $raf, Get32u(\$data, 16));
+        # (set fileType to '' to avoid setting FileType tag again)
+        $exifTool->TiffInfo('', $raf, Get32u(\$data, 16));
         # extract information from PostScript section
         $raf->Seek(Get32u(\$data, 0), 0);
         unless ($raf->Read($data, 4) == 4 and $data =~ /^%!/) {
             return PSErr($exifTool, 'invalid PS header');
         }
-    } elsif ($data !~ /^%!PS/) {
-        return 0;   # doesn't look like a PostScript file
     }
-    $exifTool->SetFileType();   # set FileType tag (EPS, PS or AI)
 #
 # set the newline type based on the first newline found in the file
 #

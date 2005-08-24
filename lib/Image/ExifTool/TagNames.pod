@@ -1101,6 +1101,10 @@ separated by just about anything.  Many other GPS tags have values which are
 fixed-length strings.  For these, the indicated string lengths include a
 null terminator which is added automatically by ExifTool.
 
+When adding GPS information to an image, it is important to set all of the
+following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
+GPSAltitude and GPSAltitudeRef.
+
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0000   GPSVersionID                         int8u[4]
@@ -1941,7 +1945,7 @@ and Agfa cameras.
   0x0101   SerialNumber                         string[32]
   0x0103   FocalPlaneDiagonal                   rational32u
   0x0104   BodyFirmwareVersion                  int32u
-  0x0201   Lens                                 int8u[6]~
+  0x0201   LensType                             int8u[6]~
   0x0202   LensSerialNumber                     string[32]
   0x0204   LensFirmwareVersion                  int32u
   0x0206   MaxApertureAtMaxFocal                int16u
@@ -2842,6 +2846,11 @@ number of available PDF tags.
 
 =head3 PDF Info Tags
 
+As well as the tags listed below, the PDF specification allows for
+user-defined tags to exist in the Info dictionary.  These tags, which should
+have corresponding XMP-pdfx entries in the PDF Metadata, are also extracted
+by ExifTool.
+
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
   'Author'             Author                   N
@@ -2855,6 +2864,8 @@ number of available PDF tags.
   'Trapped'            Trapped                  N
 
 =head3 PDF Root Tags
+
+This is the PDF document catalog.
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
@@ -2878,6 +2889,7 @@ number of available PDF tags.
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
+  'Metadata'           Metadata                 PDF Metadata
   'PieceInfo'          PieceInfo                PDF PieceInfo
   'Resources'          Resources                PDF Resources
 
@@ -2965,6 +2977,7 @@ with any other tag group.
   Comment                                       Y
   Directory                                     N
   EXIF                                          N
+  Encryption                                    N
   Error                                         N
   ExifToolVersion                               N
   FileModifyDate                                Y
@@ -2973,6 +2986,7 @@ with any other tag group.
   FileType                                      N
   ImageHeight                                   N
   ImageWidth                                    N
+  MimeType                                      N
   Warning                                       N
   XMP                                           Y
 

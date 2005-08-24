@@ -57,17 +57,17 @@ new file is OK before erasing the original.)</p>
 <p>Below is a list of meta information formats and file types currently
 supported by exiftool (r = read support, w = write support):</p>
 <pre>
-     Meta Information                         File Type
-    ------------------          --------------------------------------
-    EXIF           r/w          JPEG   r/w      JP2    r      PDF    r
-    GPS            r/w          TIFF   r/w      BMP    r      PSD    r
-    IPTC           r/w          GIF    r/w      PNG    r      MRW    r
-    XMP            r/w          THM    r/w      MNG    r      ORF    r
-    MakerNotes     r/w          CRW    r/w      JNG    r
-    Photoshop IRB  r/w          CR2    r/w      MIFF   r
-    GeoTIFF        r            DNG    r/w      EPS    r
-    ICC Profile    r            NEF    r/w      PS     r
-    PrintIM        r            PEF    r/w      AI     r</pre>
+     Meta Information                        File Type
+    ------------------          -----------------------------------
+    EXIF           r/w          JPEG  r/w      JP2   r      PDF   r
+    GPS            r/w          TIFF  r/w      BMP   r      PSD   r
+    IPTC           r/w          GIF   r/w      PNG   r      MRW   r
+    XMP            r/w          THM   r/w      MNG   r      ORF   r
+    MakerNotes     r/w          CRW   r/w      JNG   r
+    Photoshop IRB  r/w          CR2   r/w      MIFF  r
+    GeoTIFF        r            DNG   r/w      EPS   r
+    ICC Profile    r            NEF   r/w      PS    r
+    PrintIM        r            PEF   r/w      AI    r</pre>
 <p>
 </p>
 <hr />
@@ -189,6 +189,20 @@ Print <strong>e</strong>xisting tags only -- don't calculate composite tags.
 option).
 </dd>
 <p></p>
+<dt><strong><a name="item_ext"><strong>-ext</strong> <em>EXT</em> (or <strong>--ext</strong> <em>EXT</em>)</a></strong><br />
+</dt>
+<dd>
+Process only files with the specified extension, or use <code>--ext</code> to exclude
+files.  There may be multiple <code>-ext</code> or <code>--ext</code> options. Extensions may
+begin with a leading '.', and case is not significant.  For example:
+</dd>
+<dd>
+<pre>
+    exiftool -ext .JPG *            # process only JPG files
+    exiftool --ext crw --ext dng *  # process all but CRW and DNG
+    exiftool --ext . *              # ignore if no extension</pre>
+</dd>
+<p></p>
 <dt><strong><a name="item__2df"><strong>-f</strong></a></strong><br />
 </dt>
 <dd>
@@ -244,7 +258,7 @@ Use <strong>l</strong>ong output format (2-line Canon-style output).
 </dt>
 <dd>
 Convert Unicode characters in output to Windows <strong>L</strong>atin1 (cp1252) instead
-of the default UTF8.
+of the default UTF-8.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dlist"><strong>-list</strong></a></strong><br />
@@ -405,7 +419,9 @@ information is written to the preferred group.</p>
 within a file.  <code>@</code> may be used to represent the target file name (ie.
 <code>-TagsFromFile @</code>), permitting this feature to be used when batch
 processing multiple files.  Specified tags are then copied from each target
-file in turn as it is rewritten.</p>
+file in turn as it is rewritten.  As a convenience, <code>-TagsFromFile @</code> is
+assumed for any redirected tags which are specified without a prior
+<code>-TagsFromFile</code> option.</p>
 </dd>
 <dd>
 <p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples of how to use this option.</p>
@@ -457,7 +473,7 @@ Print version number and exit.
 <dt><strong><a name="item__2dw_ext"><strong>-w</strong> <em>EXT</em></a></strong><br />
 </dt>
 <dd>
-<strong>W</strong>rite console output to a file with name ending in <code>EXT</code> for each source
+<strong>W</strong>rite console output to a file with name ending in <a href="#item_ext"><code>EXT</code></a> for each source
 file.  The output file name is obtained by replacing the source file
 extension (including the <code>.</code>) with the specified extension.
 </dd>
@@ -682,11 +698,13 @@ Copy only the EXIF information from one image to another, excluding SubIFD
 tags.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dtagsfromfile__40__27_2dmodifydate_3efi">exiftool -tagsfromfile @ '-ModifyDate&gt;FileModifyDate' dir</a></strong><br />
+<dt><strong><a name="item_exiftool__27_2ddatetimeoriginal_3efilemodifydate_2">exiftool '-DateTimeOriginal&gt;FileModifyDate' dir</a></strong><br />
 </dt>
 <dd>
-Use the modification date from the meta information to set the same file's
-filesystem modification date for all images in a directory.
+Use the original date from the meta information to set the same file's
+filesystem modification date for all images in a directory.  (Note that
+<code>-TagsFromFile @</code> has been omitted from this command since it is assumed
+when redirecting information unless another <code>-TagsFromFile</code> is specified.)
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__27_2dall_3exmp">exiftool -TagsFromFile src.jpg '-all&gt;xmp:all' dst.jpg</a></strong><br />

@@ -27,16 +27,18 @@ and explain the following individual functions in more detail:
 <li><a href="#CombineInfo">CombineInfo</a>
 <li><a href="#GetTagList">GetTagList</a>
 <li><a href="#GetFoundTags">GetFoundTags</a>
+<li><a href="#GetRequestedTags">GetRequestedTags</a>
 </ul>
 </td><td>
 <ul>
-<li><a href="#GetRequestedTags">GetRequestedTags</a>
 <li><a href="#GetValue">GetValue</a>
 <li><a href="#SetNewValue">SetNewValue</a>
 <li><a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>
 <li><a href="#GetNewValues">GetNewValues</a>
+<li><a href="#CountNewValues">CountNewValues</a>
 <li><a href="#SaveNewValues">SaveNewValues</a>
 <li><a href="#RestoreNewValues">RestoreNewValues</a>
+<li><a href="#SetFileModifyDate">SetFileModifyDate</a>
 <li><a href="#SetNewGroups">SetNewGroups</a>
 <li><a href="#GetNewGroups">GetNewGroups</a>
 <li><a href="#GetTagID">GetTagID</a>
@@ -323,7 +325,7 @@ to a specific function.
     <td align='center'>'MM','II' or undef</td><td align=center>-</td></tr>
 <tr><td>Charset</td><td>Character set for converting Unicode character strings.</td>
     <td><table>
-    <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF8 characters</td></tr>
+    <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF-8 characters</td></tr>
     <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
     </table></td><td align=center>'UTF8'</td></tr>
 <tr><td>Compact</td><td>Write compact output.  Some data formats (XMP, IPTC) specify
@@ -750,6 +752,20 @@ my $rawVal = $exifTool-&gt;<b>GetNewValues</b>($tag);
 my @rawVals = $exifTool-&gt;<b>GetNewValues</b>($tag);
 </pre></td></tr></table></blockquote>
 
+<hr><h2><a name="CountNewValues">CountNewValues</a></h2>
+Return the total number of new values set.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>CountNewValues($)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+</td></tr>
+<tr><td><b>Returns</b></td><td>The total number of tags with new values set.
+</td></tr>
+</table></blockquote>
+<b>Examples:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $numSet = $exifTool-&gt;<b>CountNewValues</b>();
+</pre></td></tr></table></blockquote>
+
 <hr><h2><a name="SaveNewValues">SaveNewValues</a></h2>
 Save state of new values to be later restored by RestoreNewValues().
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
@@ -775,6 +791,22 @@ SaveNewValues(). See SaveNewValues() above for an example.
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
 </td></tr>
 </table></blockquote>
+
+<hr><h2><a name="SetFileModifyDate">SetFileModifyDate</a></h2>
+Set the file modification time from the new value of the FileModifyDate tag.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>SetFileModifyDate($$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+ <br>1) File name
+</td></tr>
+<tr><td><b>Returns</b></td><td>1 if the time was changed, 0 if the FileModifyDate
+tag wasn't set, or -1 if there was an error setting the time.
+</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $result = $exifTool-&gt;<b>SetFileModifyDate</b>($file);
+</pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
 Set priority for tag groups in subsequent calls to SetNewValue().
@@ -1019,7 +1051,8 @@ Get type of file given file name.
 </td></tr>
 <tr><td><b>Returns</b></td><td>A string, based on the file extension, which
 represents the type of file, or undefined if the file type isn't supported by
-ExifTool.
+ExifTool.  In array context, may return more than one file type if the file
+may be different formats.
 </td></tr>
 </table></blockquote>
 <b>Example:</b>

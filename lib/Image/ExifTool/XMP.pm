@@ -31,7 +31,7 @@ use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace %xlatNamespace);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -231,12 +231,12 @@ sub DecodeBase64($);
     ModDate => { #PH
         Groups => { 2 => 'Time' },
         Writable => 'date',
-        ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     CreationDate => { #PH
         Groups => { 2 => 'Time' },
         Writable => 'date',
-        ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
   # Creator (covered by dc) #PH
   # Subject (covered by dc) #PH
@@ -1064,7 +1064,7 @@ sub DecodeBase64($);
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::XMP::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::XMP::Composite');
 
 
 #------------------------------------------------------------------------------
@@ -1355,13 +1355,13 @@ sub ProcessXMP($$$)
         $exifTool->VerboseDir('XMP', 0, $dirLen);
     }
 #
-# convert UTF16 or UTF32 encoded XMP to UTF8 if necessary
+# convert UTF-16 or UTF-32 encoded XMP to UTF-8 if necessary
 #
     my $begin = '<?xpacket begin=';
     pos($$dataPt) = $dirStart;
     unless ($$dataPt =~ /\G\Q$begin\E/) {
         my ($fmt, $len);
-        # check for UTF16 encoding (insert one \0 between characters)
+        # check for UTF-16 encoding (insert one \0 between characters)
         $begin = join "\0", split //, $begin;
         if ($$dataPt =~ /\G(\0)?\Q$begin\E\0./g) {
             # validate byte ordering by checking for U+FEFF character
@@ -1372,7 +1372,7 @@ sub ProcessXMP($$$)
                 $fmt = 'v' if $$dataPt =~ /\G\0\xff\xfe/;
             }
         } else {
-            # check for UTF32 encoding (with three \0's between characters)
+            # check for UTF-32 encoding (with three \0's between characters)
             $begin =~ s/\0/\0\0\0/g;
             # must reset pos because it was killed by previous unsuccessful //g match
             pos($$dataPt) = $dirStart;
@@ -1386,7 +1386,7 @@ sub ProcessXMP($$$)
             }
         }
         if ($fmt) {
-            # translate into UTF8
+            # translate into UTF-8
             if ($] >= 5.006001) {
                 $buff = pack('C0U*',unpack("x$dirStart$fmt*",$$dataPt));
             } else {

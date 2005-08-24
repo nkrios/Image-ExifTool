@@ -1,9 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.12
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
 [File, File, Image]  - File Name: GeoTiff.tif
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3KB
 [File, File, Time]  - File Modification Date/Time: 2004:02:26 09:17:44
 [File, File, Image]  - File Type: TIFF
+[File, File, Image]  - Mime Type: image/tiff
 [EXIF, IFD0, Image] 256 - Image Width: 25
 [EXIF, IFD0, Image] 257 - Image Height: 24
 [EXIF, IFD0, Image] 258 - Bits Per Sample: 8

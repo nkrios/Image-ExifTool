@@ -26,6 +26,10 @@ number of available PDF tags.
 </table></td></tr></table></blockquote>
 
 <h2><a name='Info'>PDF Info Tags</a></h2>
+As well as the tags listed below, the PDF specification allows for
+user-defined tags to exist in the Info dictionary.  These tags, which should
+have corresponding XMP-pdfx entries in the PDF Metadata, are also extracted
+by ExifTool.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
@@ -78,6 +82,7 @@ number of available PDF tags.
 </table></td></tr></table></blockquote>
 
 <h2><a name='Root'>PDF Root Tags</a></h2>
+This is the PDF document catalog.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
@@ -129,11 +134,16 @@ number of available PDF tags.
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td>'Metadata'</td>
+<td>Metadata</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PDF.html#Metadata'>PDF Metadata Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>'PieceInfo'</td>
 <td>PieceInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PDF.html#PieceInfo'>PDF PieceInfo Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>'Resources'</td>
 <td>Resources</td>
 <td align='center'>-</td>
@@ -239,6 +249,6 @@ number of available PDF tags.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 15, 2005</i>
+<br><i>Last revised Jul 26, 2005</i>
 </body>
 </html>

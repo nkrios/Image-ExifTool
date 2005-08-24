@@ -17,15 +17,9 @@ use Image::ExifTool qw(:DataAccess :Utils);
 
 $VERSION = '1.02';
 
-sub ProcessMIFF($$$);
-sub ProcessText($$$);
-sub ProcessCompressedText($$$);
-sub ProcessInternationalText($$$);
-
 # MIFF chunks
 %Image::ExifTool::MIFF::Main = (
     GROUPS => { 2 => 'Image' },
-    PROCESS_PROC => \&ProcessMIFF,
     NOTES => q{
 The MIFF format allows aribrary tag names to be used.  Only the standard tag
 names are listed below, however ExifTool will decode any tags found in the

@@ -181,6 +181,7 @@ my %nsURI = (
     exif      => 'http://ns.adobe.com/exif/1.0/',
     iX        => 'http://ns.adobe.com/iX/1.0/',
     pdf       => 'http://ns.adobe.com/pdf/1.3/',
+    pdfx      => 'http://ns.adobe.com/pdfx/1.3/',
     photoshop => 'http://ns.adobe.com/photoshop/1.0/',
     rdf       => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
     stDim     => 'http://ns.adobe.com/xap/1.0/sType/Dimensions#',
@@ -601,6 +602,9 @@ sub WriteXMP($$$)
                     $path =~ m/ \d{3}/g or warn "Internal error: no list index!\n", next;
                     substr($path, pos($path)-3, 3) = $listIndex++;
                 }
+            } elsif ($path =~ m/ \d{3}/g) {
+                # add to end of list
+                substr($path, pos($path)-3, 3) = $listIndex++;
             }
         }
         next unless @newValues; # done if no new values specified
