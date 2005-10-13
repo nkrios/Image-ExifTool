@@ -332,6 +332,12 @@ to a specific function.
     that the data be padded with blanks to allow in-place editing.  By setting this
     flag, 2kB is saved for files with XMP data, and 100 bytes for IPTC data.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Composite</td><td>Flag to calculate Composite tags</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td>CoordFormat</td><td>Format for GPS coordinates</td><td> Format for
+    printing GPS coordinates.  This is a printf format string with specifiers
+    for degrees, minutes and seconds in that order, however minutes and seconds
+    may be omitted.  The default is equivalent to using a format string of
+    q{%d&nbsp;deg&nbsp;%d'&nbsp;%.2f"}.
+    </td><td align=center>-</td></tr>
 <tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td><td align=center>-</td></tr>
 <tr><td>Duplicates</td><td>Flag to save duplicate tag values</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>Exclude</td>
@@ -809,9 +815,10 @@ my $result = $exifTool-&gt;<b>SetFileModifyDate</b>($file);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
-Set priority for tag groups in subsequent calls to SetNewValue().
-Default priority is EXIF, GPS, IPTC, XMP, MakerNotes, in that order.
-Any family 0 group name may be used.  Case is not significant.
+Set the order of the preferred groups when adding new information.  In
+subsequent calls to SetNewValue(), new information will be created in the
+first valid group of this list.  The default order is EXIF, GPS, IPTC, XMP and
+MakerNotes.  Any family 0 group name may be used.  Case is not significant.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>SetNewGroups($;@)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
@@ -1022,20 +1029,25 @@ separated into the ICC-header group.
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>APP12, Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC,
-Jpeg2000, MIFF, MNG, MakerNotes, PDF, PNG, Photoshop, PostScript, PrintIM,
-XMP</td></tr> <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>APP12, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool,
-File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
-ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000, Kodak,
-KodakBordersIFD, KodakEffectsIFD, MIFF, MNG, MakerUnknown, Minolta, Nikon,
-NikonPreview, Olympus, PDF, PNG, Panasonic, Pentax, Photoshop, PostScript,
-PrintIM, Ricoh, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux, XMP-crs, XMP-dc,
-XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ,
-XMP-xmpMM, XMP-xmpRights
+<td>APP12, BMP, Canon, Composite, EXIF, ExifTool, File, GPS, GeoTiff,
+ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG, MakerNotes, PICT,
+PDF, PNG, Pentax, Photoshop, PostScript, PrintIM, QuickTime, WAV,
+XMP</td></tr>
+<tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
+<td>APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD,
+ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt,
+ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3,
+ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, Jpeg2000, Kodak,
+KodakBordersIFD, KodakEffectsIFD, Leaf, LeafSubIFD, MIFF, MNG, MakerUnknown,
+Minolta, Nikon, NikonPreview, Olympus, PICT, PDF, PNG, Panasonic, Pentax,
+Photoshop, PostScript, PrintIM, QuickTime, SRF#, Ricoh, Sanyo, Sigma, Sony,
+SubIFD, Track#, WAV, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
+XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
+XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
-<td>Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
+<td>Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,
+Unknown
 </td></tr>
 </table></blockquote>
 <b>Example:</b>

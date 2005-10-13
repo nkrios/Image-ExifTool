@@ -790,7 +790,8 @@ sub RC4Crypt($$)
 
 #------------------------------------------------------------------------------
 # Initialize decryption
-# Inputs: 0) Encrypt dictionary reference, 1) ID from file trailer dictionary
+# Inputs: 0) ExifTool object reference, 1) Encrypt dictionary reference,
+#         2) ID from file trailer dictionary
 # Returns: error string or undef on success
 sub DecryptInit($$$)
 {
@@ -1063,19 +1064,19 @@ sub ProcessDict($$$$;$)
         Parent => 'PDF',
     );
     my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-    unless ($exifTool->ProcessTagTable($subTablePtr, \%dirInfo)) {
+    unless ($exifTool->ProcessDirectory(\%dirInfo, $subTablePtr)) {
         $exifTool->Warn("Error processing $$tagInfo{Name} information");
     }
 }
 
 #------------------------------------------------------------------------------
 # Extract information from PDF file
-# Inputs: 0) ExifTool object reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 0 if not a PDF file, 1 on success, otherwise a negative error number
-sub ReadPDF($)
+sub ReadPDF($$)
 {
-    my $exifTool = shift;
-    my $raf = $exifTool->{RAF};
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
     my $verbose = $exifTool->Options('Verbose');
     my ($data, $encrypt, $id);
 #
@@ -1219,14 +1220,14 @@ my %pdfWarning = (
 
 #------------------------------------------------------------------------------
 # Extract information from PDF file
-# Inputs: 0) ExifTool object reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 if this was a valid PDF file
-sub PdfInfo($)
+sub ProcessPDF($$)
 {
-    my $exifTool = shift;
+    my ($exifTool, $dirInfo) = @_;
 
     my $oldsep = $/;
-    my $result = ReadPDF($exifTool);
+    my $result = ReadPDF($exifTool, $dirInfo);
     $/ = $oldsep;   # restore input record separator in case it was changed
     if ($result < 0) {
         $exifTool->Warn($pdfWarning{$result}) if $pdfWarning{$result};

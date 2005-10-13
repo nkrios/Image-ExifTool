@@ -12,6 +12,7 @@ package Image::ExifTool::Sigma;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::Exif;
 
 $VERSION = '1.02';
 

@@ -5,7 +5,107 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.55.tar.gz">Version 5.55</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.67.tar.gz">Version 5.67</a>.<p>
+
+<b>Oct. 13/05 - Version 5.67</b> (production release)
+<ul>
+<li>Fixed a problem when writing information via the ExifTool API if using Perl
+    5.8 or later and passing a UTF-8 encoded string to SetNewValue().  The
+    problem generated an error which prevented the file from being written.
+<li>Fixed timezone problem in timestamps of QuickTime images which was causing
+    a failed test
+</ul>
+
+<b>Oct. 10/05 - Version 5.66</b>
+<ul>
+<li>Enhance -tagsFromFile option to allow %d, %f and %e in filenames
+<li>Extract a few more tags from Canon EOS 5D images
+<li>Allow multiple ICC_Profiles to be extracted from same image and add a number
+    to the group1 name for subsequent profiles to make the tag locations unique
+<li>Changed Photoshop PixelsPerInchX/Y and QuickTime DotsPerInchX/Y tag names to
+    X/YResolution.  Neither has a corresponding ResolutionUnit tag, so inches
+    should be assumed if no resolution unit is present.
+<li>Added tests of Nikon, Sony and PDF decryption algorithms
+</ul>
+
+<b>Oct. 7/05 - Version 5.65</b>
+<ul>
+<li>Added read support for QuickTime MOV videos (and QTIF images if anyone
+    cares)
+<li>Extract maker note information from Sony SRF raw images
+<li>Improvements to Jpeg2000 decoding
+<li>Decode a few more Photoshop tags
+<li>Issue an error if there is extra data after the normal end of file when
+    rewriting TIFF images (avoids possible data loss if attempting to write an
+    unsuported RAW image with a TIFF-like data structure)
+<li>Added ability to replace existing tags with user defined tags
+<li>Denote minor errors/warnings by adding '[minor]' to the message (these are
+    the errors which can be ignored with the -m option)
+<li>Fixed problem of missing LeafSubIFD when rewriting MOS images
+<li>Removed hack to write Leaf maker note information at start of image
+</ul>
+
+<b>Sept. 30/05 - Version 5.64</b>
+<ul>
+<li>Improved writing of Canon CR2 images to preserve CR2 header and editing
+    information written by Canon Digital Photo Professional software
+<li>Extract information from JPEG APP0 JFIF segments
+<li>Added support for extracting Creo Leaf meta information from MOS images
+<li>Added ability to define new tags in .ExifTool_config file and added a sample
+    ExifTool_config file to the distribution
+<li>Extended the -w option to allow an expression to be specified
+<li>Allow tag aliases to be used when writing
+<li>Changed print conversion of FileSize tag
+<li>Internal changes to tag lookup to improve speed when writing information
+<li>Decode Photoshop resolution information
+</ul>
+
+<b>Sept. 21/05 - Version 5.63</b>
+<ul>
+<li>Added read support for MP3 and WAV audio files (Oops... ExifTool has
+    expanded beyond its "Image" roots!)
+<li>Added write support for PNG and MRW (Minolta RAW) images
+<li>Improved decoding of PNG profile information and added a few new PNG tags
+<li>Changes to handling of GPS coordinates:
+    <ul>
+    <li>Added -c (CoordFormat) option to format output of GPS coordinates
+    <li>Added GPSPosition composite tag
+    <li>GPS coordinates now show as decimal degrees with the -n option
+    <li>Much more flexible about the input coordinate format when writing
+    <li>Enforce proper formatting of XMP GPS coordinates
+    </ul>
+<li>Added XMP-xmp Rating and Label tags, and a few missing XMP-exif GPS tags
+<li>Added new XMP-dex group
+<li>Added two new lenses to the Minolta LensID list (thanks Pedro Corte-Real)
+<li>Added a new lens to the Olympus list (thanks Shingo Noguchi)
+</ul>
+
+<b>Sept. 7/05 - Version 5.62</b>
+<ul>
+<li>Fixed problem reading FujiFilm maker notes from RAF images
+<li>Extract comments from PPM/PGM/PBM images and add write support
+<li>Extract maker notes from Nikon Coolscan scanner images
+</ul>
+
+<b>Sept. 3/05 - Version 5.61</b>
+<ul>
+<li>Added read support for PBM, PGM and PPM file formats
+<li>Added read support for RAF (FujiFilm RAW) file format
+</ul>
+
+<b>Sept. 2/05 - Version 5.60</b>
+<ul>
+<li>Fixed bug where tag was deleted if TAG+=VALUE used for a non-list type tag
+<li>Fixed problem where reading some CRW files could generate a "Use of
+    uninitialized value in concatenation" warning
+<li>Restructured XMP to separate tags by namespace
+<li>Added XMP-xmpTPg, XMP-cc, XMP-xmpPLUS and XMP-PixelLive groups
+<li>Improved logic for editing XMP list-type tags
+<li>Removed SubDirectory tags from -list option output
+<li>More updates to Pentax LensType list
+<li>Changed Nikon FileSystemVersion tag name to FirmwareVersion
+<li>Added NikonCaptureData and NikonCaptureVersion tags
+</ul>
 
 <b>Aug. 24/05 - Version 5.55</b> (production release)
 <ul>

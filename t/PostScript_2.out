@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
 [File, File, Image]  - File Name: PostScript.eps
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 13KB
-[File, File, Time]  - File Modification Date/Time: 2005:07:18 15:42:36
+[File, File, Image]  - File Size: 13 kB
+[File, File, Time]  - File Modification Date/Time: 2005:07:18 15:45:26
 [File, File, Image]  - File Type: PostScript
-[File, File, Image]  - Mime Type: application/postscript
+[File, File, Image]  - MIME Type: application/postscript
 [PostScript, PostScript, Image] Creator - Creator: Adobe Photoshop Version 7.0.1
 [PostScript, PostScript, Image] Title - Title: c.eps
 [PostScript, PostScript, Time] CreationDate - Create Date: 7/18/05 2:33 PM
@@ -36,17 +36,17 @@
 [XMP, XMP-photoshop, Author] Credit - Credit: My Credit
 [XMP, XMP-photoshop, Time] DateCreated - Date Created: 2004:02:26
 [XMP, XMP-photoshop, Image] Headline - Headline: No headline
-[XMP, XMP-photoshop, Unknown] Instructions - Instructions: What instructions
+[XMP, XMP-photoshop, Image] Instructions - Instructions: What instructions
 [XMP, XMP-photoshop, Author] Source - Source: I'm the source
 [XMP, XMP-photoshop, Location] State - State: Ont
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference
-[XMP, XMP-photoshop, Unknown] Urgency - Urgency: 8
+[XMP, XMP-photoshop, Image] Urgency - Urgency: 8
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
-[XMP, XMP-xmpBJ, Unknown] JobRefName - Job Ref Name: My Job
-[XMP, XMP-xmpMM, Unknown] DocumentID - Document ID: adobe:docid:photoshop:cbcc2a62-f127-11d9-ac4d-e8be6f73552e
+[XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
+[XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:cbcc2a62-f127-11d9-ac4d-e8be6f73552e
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
-[XMP, XMP-dc, Author] Creator - Creator: Phil Harvey
-[XMP, XMP-dc, Image] Description - Description: A witty caption
-[XMP, XMP-dc, Author] Rights - Rights: Copyright 2004 Phil Harvey
-[XMP, XMP-dc, Image] Title - Title: Test IPTC picture
-[XMP, XMP-dc, Image] Subject - Subject: ExifTool, Test, XMP
+[XMP, XMP-dc, Author] creator - Creator: Phil Harvey
+[XMP, XMP-dc, Image] description - Description: A witty caption
+[XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
+[XMP, XMP-dc, Image] title - Title: Test IPTC picture
+[XMP, XMP-dc, Image] subject - Subject: ExifTool, Test, XMP

@@ -75,14 +75,13 @@ of image related information.
 );
 
 #------------------------------------------------------------------------------
-# BmpInfo : extract EXIF information from a BMP image
-# Inputs: 0) ExifTool object reference
+# Extract EXIF information from a BMP image
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid BMP file
-sub BmpInfo($)
+sub ProcessBMP($$)
 {
-    my $exifTool = shift;
-    my $raf = $exifTool->{RAF};
-    my $verbose = $exifTool->Options('Verbose');
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
     my $buff;
 
     # verify this is a valid BMP file
@@ -98,7 +97,7 @@ sub BmpInfo($)
         DirLen => length($buff),
     );
     my $tagTablePtr = GetTagTable('Image::ExifTool::BMP::Main');
-    $exifTool->ProcessTagTable($tagTablePtr, \%dirInfo);
+    $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
     return 1;
 }
 
@@ -137,7 +136,6 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/BMP Tags>,
-L<Image::ExifTool::TagNames/PNG Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

@@ -13,18 +13,19 @@ the case of a BinaryData table, the IDs are numerical and specify offsets into
 the binary data block.  The corresponding hash value provides information about
 the tag (explained later).
 
-13 special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
-FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE, NOTES, IS_OFFSET and
-EXTRACT_UNKNOWN) are used to provide additional information about a table.  The
-special keys have names that are all capitalized to avoid possible conflicts
-with tag keys.  Below is an explanation of the meaning of each special key:
+Sixteen special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
+FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE, NOTES, IS_OFFSET,
+EXTRACT_UNKNOWN, NAMESPACE, PREFERRED and PARENT) are used to provide additional
+information about a table.  The special keys have names that are all capitalized
+to avoid possible conflicts with tag keys.  Below is an explanation of the
+meaning of each special key:
 
   PROCESS_PROC : Reference to a function used to process the directory for this
   table.  If PROCESS_PROC is not given, \&Image::ExifTool::Exif::ProcessExif is
-  assumed.  The process proc returns 1 on success or 0 on failure, and takes
-  3 arguments: 0) reference to the ExifTool object, 1) reference to the tag
-  table hash, 2) reference to a directory information hash, with the following
-  members:
+  assumed.  If PROCESS_PROC is set to 0, the tags are not added to the lookup.
+  The process proc returns 1 on success or 0 on failure, and takes 3 arguments:
+  0) reference to the ExifTool object, 1) reference to a directory information
+  hash, 2) reference to the tag table hash, with the following members:
 
     Name        - Tag name for this SubDirectory entry (for verbose messages)
     Base        - Base offset for pointers from start of file
@@ -34,12 +35,14 @@ with tag keys.  Below is an explanation of the meaning of each special key:
     DirStart    - Offset to start of directory from start of data block
     DirLen      - Length of directory data within block
     DirName     - Name of this directory
+    OutFile     - Output file or scalar reference
     Parent      - Name of parent directory
     RAF         - Reference to File::RandomAccess object if available
     Multi       - True if we should scan for multiple IFD's
     NewDataPos  - File position of new data (write proc only)
     Fixup       - Reference to hash of offset fixups (used in EXIF writing only)
     FixBase     - Flag set to attempt to fix base offsets
+    LastIFD     - Used by WriteExif() to return offset of last IFD written
 
   WRITE_PROC : Reference to a function to write all new tags for this directory.
   The write proc returns the new directory data or undefined on error.  It takes
@@ -106,6 +109,15 @@ with tag keys.  Below is an explanation of the meaning of each special key:
 
   EXTRACT_UNKNOWN : Used in PDF tables to specify a directory where all unknown
   tags should be extracted.
+
+  NAMESPACE : Namespace prefix for tags in the XMP table.  May be a reference to
+  a list of the namespace prefix and URI if the URI needs specifying.
+
+  PREFERRED : Set to true if the tags in this table should always be added when
+  writing information.  Overrides the order specified by SetNewGroups().
+
+  PARENT : Used internally to store the parent table name of a user-defined tag
+  table so the appropriate module can be loaded as required.
 
 The remaining entries in a tag table are the EXIF tags with their associated
 information.  The information may exist in one of three forms:  1) A simple
@@ -202,37 +214,40 @@ conditions.  The following is a description of possible hash entries:
                   'Permanent' - flag indicates that a tag is permanent, and
                   can't be added or deleted from the file.  By default, all
                   MakerNotes tags are permanent unless otherwise specified.
-
+                  
                   'Avoid' - avoid creating this tag if possible.
 
                   'Unknown' - this is an unknown tag (only extracted when the
                   Unknown option is set.
-
+                  
   ValueConv     : [optional] Used to convert the raw data value to a useable
-                  form.  May be either a hash reference to act as a lookup table
-                  or a scalar which is evaluated as a Perl expression. If a hash
-                  reference is used and the raw value doesn't appear as one of
-                  the keys, then the converted value is set to "Unknown (X)",
-                  where X is the raw value.  In an expression, $val is the raw
-                  value, and $self is a reference to the current ExifTool
-                  object.  When evaluated, the expression may return either a
-                  scalar representing the a printable value, or a scalar
-                  reference to the value if it is not printable (as with a
-                  binary data block).  Composite tags which Require or Desire
-                  other tags may access the ValueConv and PrintConv values of
-                  these tags through the elements of the @val and @valPrint
-                  lists. The result of the ValueConv evaluation may be undefined
-                  to indicate the tag should be ignored.  If ValueConv is not
-                  specified, the raw value is not converted.
+                  form.  May be a hash reference to act as a lookup table, a
+                  scalar which is evaluated as a Perl expression, or a code
+                  reference to a subroutine. If a hash reference is used and the
+                  raw value doesn't appear as one of the keys, then the
+                  converted value is set to "Unknown (X)", where X is the raw
+                  value.  In an expression, $val is the raw value, and $self is
+                  a reference to the current ExifTool object.  The subroutine
+                  takes 2 arguments: a reference to the  and the value to
+                  convert ExifTool object.  When evaluated, the expression or
+                  subroutine may return either a scalar representing the a
+                  printable value, or a scalar reference to the value if it is
+                  not printable (as with a binary data block).  Composite tags
+                  which Require or Desire other tags may access the ValueConv
+                  and PrintConv values of these tags through the elements of the
+                  @val and @valPrint lists. The result of the ValueConv
+                  evaluation may be undefined to indicate the tag should be
+                  ignored.  If ValueConv is not specified, the raw value is not
+                  converted.
 
   PrintConv     : [optional] This entry is similar to ValueConv above, except
                   that it is used to further convert the tag value to a human
-                  readable form.  It can be either a hash lookup or a scalar
-                  Perl expression.  In this expression, $val represents the
-                  result of the ValueConv from above.  Note that the print
-                  conversion is only done if the PrintConv option is enabled
-                  (which it is by default), and if the result of the ValueConv
-                  is not a scalar reference.
+                  readable form.  It can be either a hash lookup, a scalar Perl
+                  expression or a code reference.  In this expression, $val
+                  represents the result of the ValueConv from above.  Note that
+                  the print conversion is only done if the PrintConv option is
+                  enabled (which it is by default), and if the result of the
+                  ValueConv is not a scalar reference.
 
   ValueConvInv  : [optional] The inverse of ValueConv.  Only necessary if
                   ValueConv is specified and this tag is Writable.  Note that
@@ -274,9 +289,6 @@ conditions.  The following is a description of possible hash entries:
                   each tag since they are used as indices into the @val and
                   @valPrint lists.
 
-  TagID         : [reserved] This entry is used internally by GetTagID() to
-                  cache tag ID numbers for speed.
-
   Writable      : [optional] Indicates this tag can be written (or not written
                   if value is set to zero), and for EXIF-type tables gives
                   format for writing.  Writable may be set to 1 for MakerNotes
@@ -304,7 +316,7 @@ conditions.  The following is a description of possible hash entries:
   WriteCondition: [optional] Only meaningful for writable EXIF tags.  Specifies
                   a condition to be evaluated before the tag can be written to a
                   specific file.  The condition may use $self to reference the
-                  ExifTool object, and returns true if it is OK for writing. 
+                  ExifTool object, and returns true if it is OK for writing.
                   Unlike WriteCheck which is done only once when the new value
                   is set, this condition is evaluated before the information is
                   written in each file.
@@ -317,6 +329,17 @@ conditions.  The following is a description of possible hash entries:
 
   DataTag       : [optional] Used in EXIF table to specify the tag name of the
                   data associated with offset/length tags.
+
+  Struct        : [optional] Used by XMP writer code to specify name of XMP
+                  structure so the PropertyPath can be determined.
+
+  TagID         : [reserved] This entry is used internally by GetTagID() to
+                  cache tag ID numbers for speed.
+
+  Table         : [reserved] Reference to parent tag table.
+
+  PropertyPath  : [reserved] Used internally by XMP writer to save property
+                  path name.
 
   SubDirectory {  [optional] If it exists, this specifies the start of a new
                   subdirectory.  It contains a collection of variables which
@@ -370,7 +393,7 @@ conditions.  The following is a description of possible hash entries:
      DirName    : [optional] Name of this subdirectory.  If not specified, the
                   name is taken from the TagTable default GROUP0 name, or from
                   the tag Group1 name if no TagTable specified.
-                  
+
      FixBase    : [optional] Flag set if base offsets should be fixed.
   }
 

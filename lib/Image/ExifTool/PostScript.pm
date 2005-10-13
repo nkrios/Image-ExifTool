@@ -101,13 +101,13 @@ sub SetInputRecordSeparator($)
 }
 
 #------------------------------------------------------------------------------
-# extract information from EPS, PS or AI file
-# Inputs: 0) ExifTool object reference
+# Extract information from EPS, PS or AI file
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 if this was a valid PostScript file
-sub PostScriptInfo($)
+sub ProcessPS($$)
 {
-    my $exifTool = shift;
-    my $raf = $exifTool->{RAF};
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
     my $verbose = $exifTool->Options('Verbose');
     my $data;
 #
@@ -123,8 +123,13 @@ sub PostScriptInfo($)
         $raf->Read($data, 26) == 26 or return PSErr($exifTool,'truncated header');
         SetByteOrder('II');
         # extract information from embedded TIFF file
-        # (set fileType to '' to avoid setting FileType tag again)
-        $exifTool->TiffInfo('', $raf, Get32u(\$data, 16));
+        # (set Parent to '' to avoid setting FileType tag again)
+        my %dirInfo = (
+            Parent => '',
+            RAF => $raf,
+            Base => Get32u(\$data, 16),
+        );
+        $exifTool->ProcessTIFF(\%dirInfo);
         # extract information from PostScript section
         $raf->Seek(Get32u(\$data, 0), 0);
         unless ($raf->Read($data, 4) == 4 and $data =~ /^%!/) {
@@ -198,7 +203,7 @@ sub PostScriptInfo($)
             Parent => 'PostScript',
         );
         my $subTablePtr = GetTagTable("Image::ExifTool::${mode}::Main");
-        unless ($exifTool->ProcessTagTable($subTablePtr, \%dirInfo)) {
+        unless ($exifTool->ProcessDirectory(\%dirInfo, $subTablePtr)) {
             $exifTool->Warn("Error processing $mode information in PostScript file");
         }
         undef $mode;

@@ -12,6 +12,7 @@ package Image::ExifTool::Ricoh;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::Exif;
 
 $VERSION = '1.01';
 
@@ -81,16 +82,16 @@ sub ProcessRicohText($$$);
 #------------------------------------------------------------------------------
 # Process Ricoh text-based maker notes
 # Inputs: 0) ExifTool object reference
-#         1) Pointer to tag table for this directory
-#         2) Reference to directory information hash
+#         1) Reference to directory information hash
+#         2) Pointer to tag table for this directory
 # Returns: 1 on success, otherwise returns 0 and sets a Warning
 sub ProcessRicohText($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $dataLen = $dirInfo->{DataLen};
-    my $dirStart = $dirInfo->{DirStart} || 0;
-    my $dirLen = $dirInfo->{DirLen} || $dataLen - $dirStart;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dataLen = $$dirInfo{DataLen};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen} || $dataLen - $dirStart;
     my $verbose = $exifTool->Options('Verbose');
     
     my $data = substr($$dataPt, $dirStart, $dirLen);

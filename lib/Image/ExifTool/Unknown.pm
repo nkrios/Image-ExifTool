@@ -11,6 +11,7 @@ package Image::ExifTool::Unknown;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
+use Image::ExifTool::Exif;
 
 $VERSION = '1.13';
 

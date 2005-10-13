@@ -1,0 +1,276 @@
+<html>
+<head>
+<title>WAV Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2>WAV Tags</h2>
+WAV is the native digital audio format for Windows.  This is a RIFF-based
+format which supports meta information embedded in two types of RIFF <code>LIST</code>
+chunks: <code>INFO</code> and <code>exif</code>.  As well, some information about the audio
+content is extracted from the <code>fmt </code> chunk.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'LIST'</td>
+<td>List</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='WAV.html#List'>WAV List Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'fmt '</td>
+<td>Format</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='WAV.html#Format'>WAV Format Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='List'>WAV List Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'INFO'</td>
+<td>Info</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='WAV.html#Info'>WAV Info Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'exif'</td>
+<td>Exif</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='WAV.html#Exif'>WAV Exif Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Info'>WAV Info Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'IARL'</td>
+<td>ArchivalLocation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IART'</td>
+<td>Artist</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ICMS'</td>
+<td>Commissioned</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ICMT'</td>
+<td>Comment</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ICOP'</td>
+<td>Copyright</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ICRD'</td>
+<td>DateCreated</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ICRP'</td>
+<td>Cropped</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IDIM'</td>
+<td>Dimensions</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'IDPI'</td>
+<td>DotsPerInch</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IENG'</td>
+<td>Engineer</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'IGNR'</td>
+<td>Genre</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IKEY'</td>
+<td>Keywords</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ILGT'</td>
+<td>Lightness</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IMED'</td>
+<td>Medium</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'INAM'</td>
+<td>Title</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IPLT'</td>
+<td>NumColors</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'IPRD'</td>
+<td>Product</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ISBJ'</td>
+<td>Subject</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ISFT'</td>
+<td>Software</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ISHP'</td>
+<td>Sharpness</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ISRC'</td>
+<td>Source</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ISRF'</td>
+<td>SourceForm</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ITCH'</td>
+<td>Technician</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Exif'>WAV Exif Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'ecor'</td>
+<td>Make</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'emdl'</td>
+<td>Model</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'emnt'</td>
+<td>MakerNotes</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'erel'</td>
+<td>RelatedImageFile</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'etim'</td>
+<td>TimeCreated</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'eucm'</td>
+<td>UserComment</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ever'</td>
+<td>ExifVersion</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Format'>WAV Format Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>Encoding</td>
+<td align='center'>N</td>
+<td><font size='-1'>0x1 = PCM
+  <br>0x2 = ADPCM
+  <br>0x3 = IEEE float
+  <br>0x4 = VSELP
+  <br>0x5 = IBM CVSD
+  <br>0x6 = a-Law
+  <br>0x7 = u-Law
+  <br>0x8 = DTS
+  <br>0x9 = DRM
+  <br>0x10 = OKI-ADPCM
+  <br>0x11 = IMA-ADPCM
+  <br>0x12 = Mediaspace ADPCM
+  <br>0x13 = Sierra ADPCM
+  <br>0x14 = G723 ADPCM
+  <br>0x15 = DIGISTD
+  <br>0x16 = DIGIFIX
+  <br>0x30 = Dolby AC2
+  <br>0x31 = GSM610
+  <br>0x3b = Rockwell ADPCM
+  <br>0x3c = Rockwell DIGITALK
+  <br>0x40 = G721 ADPCM
+  <br>0x41 = G728 CELP
+  <br>0x50 = MPEG
+  <br>0x52 = RT24
+  <br>0x53 = PAC
+  <br>0x55 = MP3
+  <br>0x64 = G726 ADPCM
+  <br>0x65 = G722 ADPCM
+  <br>0x101 = IBM u-Law
+  <br>0x102 = IBM a-Law
+  <br>0x103 = IBM ADPCM
+  <br>0xffff = Development</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>NumChannels</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>SampleRate</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>AvgBytesPerSec</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>BitsPerSample</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Sep 15, 2005</i>
+</body>
+</html>

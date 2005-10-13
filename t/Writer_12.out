@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
 [File, File, Image]  - File Name: Writer_12_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 6KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
+[File, File, Image]  - File Size: 6 kB
+[File, File, Time]  - File Modification Date/Time: 2005:01:19 16:23:21
 [File, File, Image]  - File Type: JPEG
-[File, File, Image]  - Mime Type: image/jpeg
+[File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: PENTAX Corporation 
@@ -95,7 +95,7 @@
 [MakerNotes, Pentax, Camera] 36 - Destination City: Los Angeles
 [MakerNotes, Pentax, Camera] 37 - Hometown DST: Yes
 [MakerNotes, Pentax, Camera] 38 - Destination DST: Yes
-[XMP, XMP-dc, Time] Date - Date: 2003-03-06
+[XMP, XMP-dc, Time] date - Date: 2003-03-06
 [XMP, XMP-exif, Camera] FlashMode - Flash Mode: Off
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 120

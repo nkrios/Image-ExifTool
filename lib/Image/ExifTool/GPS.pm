@@ -10,8 +10,16 @@ package Image::ExifTool::GPS;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.06';
+$VERSION = '1.07';
+
+my %coordConv = (
+    ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
+    ValueConvInv => 'Image::ExifTool::GPS::ToDMS($self, $val)',
+    PrintConv    => 'Image::ExifTool::GPS::ToDMS($self, $val, 1)',
+    PrintConvInv => 'Image::ExifTool::GPS::ToDegrees($val)',
+);
 
 %Image::ExifTool::GPS::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -43,8 +51,7 @@ GPSAltitude and GPSAltitudeRef.
         Name => 'GPSLatitude',
         Writable => 'rational32u',
         Count => 3,
-        PrintConv => 'Image::ExifTool::GPS::DMS($val)',
-        PrintConvInv => '$_=$val;tr/-+0-9.\t/ /c;$_',
+        %coordConv,
     },
     0x0003 => {
         Name => 'GPSLongitudeRef',
@@ -59,8 +66,7 @@ GPSAltitude and GPSAltitudeRef.
         Name => 'GPSLongitude',
         Writable => 'rational32u',
         Count => 3,
-        PrintConv => 'Image::ExifTool::GPS::DMS($val)',
-        PrintConvInv => '$_=$val;tr/-+0-9.\t/ /c;$_',
+        %coordConv,
     },
     0x0005 => {
         Name => 'GPSAltitudeRef',
@@ -167,8 +173,7 @@ GPSAltitude and GPSAltitudeRef.
         Name => 'GPSDestLatitude',
         Writable => 'rational32u',
         Count => 3,
-        PrintConv => 'Image::ExifTool::GPS::DMS($val)',
-        PrintConvInv => '$_=$val;tr/-+0-9.\t/ /c;$_',
+        %coordConv,
     },
     0x0015 => {
         Name => 'GPSDestLongitudeRef',
@@ -183,8 +188,7 @@ GPSAltitude and GPSAltitudeRef.
         Name => 'GPSDestLongitude',
         Writable => 'rational32u',
         Count => 3,
-        PrintConv => 'Image::ExifTool::GPS::DMS($val)',
-        PrintConvInv => '$_=$val;tr/-+0-9.\t/ /c;$_',
+        %coordConv,
     },
     0x0017 => {
         Name => 'GPSDestBearingRef',
@@ -255,17 +259,95 @@ GPSAltitude and GPSAltitudeRef.
         ValueConv => '"$val[0] $val[1]"',
         PrintConv => '$self->ConvertDateTime($val)',
     },
+    GPSPosition => {
+        Require => {
+            0 => 'GPSLatitude',
+            1 => 'GPSLongitude',
+        },
+        Desire => {
+            2 => 'GPSLatitudeRef',
+            3 => 'GPSLongitudeRef',
+        },
+        ValueConv => q{
+            foreach (0..1) {
+                # set sign from lat/long reference direction if it exists
+                next unless $val[$_+2];
+                $val[$_] = abs($val[$_]);
+                $val[$_] = -$val[$_] if $val[$_+2] =~ /^(S|W)/i;
+            }
+            return "$val[0] $val[1]";
+        },
+        PrintConv => q{
+            require Image::ExifTool::XMP;
+            my @vals = split ' ', $val;
+            my $lat  = Image::ExifTool::GPS::ToDMS($self, $val[0], 1, "N");
+            my $long = Image::ExifTool::GPS::ToDMS($self, $val[1], 1, "E");
+            return "$lat, $long";
+        },
+    },
 );
 
 # add our composite tags
 Image::ExifTool::AddCompositeTags(\%Image::ExifTool::GPS::Composite);
 
-# Convert to DMS format
-sub DMS($)
+#------------------------------------------------------------------------------
+# Convert degrees to DMS, or whatever the current settings are
+# Inputs: 0) ExifTool reference, 1) Value in degrees,
+#         2) format code (0=no format, 1=CoordFormat, 2=XMP format)
+#         3) 'N' or 'E' if sign is significant and N/S/E/W should be added
+# Returns: DMS string
+sub ToDMS($$;$$)
 {
-    my $val = shift;
-    $val =~ s/^(\S+) (\S+) (.*)/$1 deg $2' $3"/;
-    return $val;
+    my ($exifTool, $val, $doPrintConv, $ref) = @_;
+    my ($fmt, $num);
+
+    if ($ref) {
+        if ($val < 0) {
+            $val = -$val;
+            $ref = {N => 'S', E => 'W'}->{$ref};
+        }
+        $ref = " $ref" unless $doPrintConv and $doPrintConv eq '2';
+    } else {
+        $ref = '';
+    }
+    if ($doPrintConv) {
+        if ($doPrintConv eq '1') {
+            $fmt = ($exifTool->Options('CoordFormat') || q{%d deg %d' %.2f"}) . $ref;
+        } else {
+            $fmt = "%d,%.2f$ref";   # use XMP standard format
+        }
+        # count the number of format specifiers
+        $num = ($fmt =~ tr/%/%/);
+    } else {
+        $num = 3;
+    }
+    my ($d, $m, $s);
+    $d = $val;
+    if ($num > 1) {
+        $d = int($d);
+        $m = ($val - $d) * 60;
+        if ($num > 2) {
+            $m = int($m);
+            $s = ($val - $d - $m / 60) * 3600;
+        }
+    }
+    return $doPrintConv ? sprintf($fmt, $d, $m, $s) : "$d $m $s$ref";
+}
+
+#------------------------------------------------------------------------------
+# Convert to decimal degrees
+# Inputs: 0) a string containing 1-3 decimal numbers and any amount of other garbage
+#         1) true if value should be negative if coordinate ends in 'S' or 'W'
+# Returns: Coordinate in degrees
+sub ToDegrees($;$)
+{
+    my ($val, $doSign) = @_;
+    # extract decimal values out of any other garbage
+    my ($d, $m, $s) = ($val =~ /((?:[+-]?)(?=\d|\.\d)\d*(?:\.\d*)?)/g);
+    my $deg = ($d || 0) + (($m || 0) + ($s || 0)/60) / 60;
+    # make negative if S or W coordinate
+    $deg = -$deg if $doSign and $val =~ /[^A-Z](S|W)$/i;
+    return $deg;
 }
 
 

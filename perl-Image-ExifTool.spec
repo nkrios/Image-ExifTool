@@ -1,6 +1,6 @@
 Summary: perl module for image data extraction 
 Name: perl-Image-ExifTool
-Version: 5.55
+Version: 5.67
 Release: 1
 License: Free
 Group: Development/Libraries/Perl
@@ -12,16 +12,18 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 ExifTool is a highly customizable Perl script for reading and writing meta
 information in images.
 
-ExifTool reads EXIF, GPS, IPTC, XMP, GeoTIFF, ICC Profile and Photoshop IRB
-meta information from JPG, JP2, TIFF, GIF, BMP, PNG, MNG, JNG, MIFF, EPS,
-PS, AI, PDF, PSD, THM, CRW, CR2, MRW, NEF, PEF, ORF and DNG images. 
+ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop
+IRB and ID3 meta information from JPG, JP2, TIFF, GIF, BMP, PPM, PGM, PBM,
+PNG, MNG, JNG, MIFF, EPS, PS, AI, PDF, PSD, THM, CRW, CR2, MRW, NEF, PEF,
+ORF, RAF, SRF, MOS and DNG images, MP3 and WAV audio files, and MOV videos. 
 ExifTool also extracts information from the maker notes of many digital
 cameras by various manufacturers including Canon, Casio, FujiFilm, Kodak,
 Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
 Ricoh, Sanyo and Sigma/Foveon.
 
 ExifTool writes EXIF, GPS, IPTC, XMP and MakerNotes meta information to
-JPEG, TIFF, GIF, CRW, THM, CR2, NEF, PEF and DNG images.
+JPEG, TIFF, GIF, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, MRW, NEF, PEF,
+MOS and DNG images.
 
 See html/index.html for more details about ExifTool features.
 

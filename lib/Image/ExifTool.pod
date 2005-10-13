@@ -54,16 +54,19 @@ Image::ExifTool - Read and write meta information in images
 =head1 DESCRIPTION
 
 ExifTool provides an extensible set of perl modules to read and write meta
-information in image files.  It reads EXIF, GPS, IPTC, XMP, GeoTIFF, ICC
-Profile and Photoshop IRB meta information from JPEG, JP2, TIFF, GIF, BMP,
-PNG, MNG, JNG, MIFF, EPS, PS, AI, PDF, PSD, THM, CRW (Canon RAW), CR2 (Canon
-RAW 2), MRW (Minolta RAW), NEF (Nikon Electronic image Format), PEF (Pentax
-RAW), ORF (Olympus RAW Format) and DNG (Digital Negative) images, as well as
-the maker notes of many digital cameras by various manufacturers including
-Canon, Casio, FujiFilm, Kodak, Minolta/Konica-Minolta, Nikon, Olympus/Epson,
-Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.  It writes
-EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG, TIFF, GIF, CRW,
-THM, CR2, NEF, PEF and DNG files.
+information in image files.  It reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF,
+ICC Profile, Photoshop IRB and ID3 meta information from JPEG, JP2, TIFF,
+GIF, BMP, PGM, PGM, PBM, PNG, MNG, JNG, MIFF, PICT, EPS, PS, AI, PDF, PSD,
+THM, CRW (Canon RAW), CR2 (Canon RAW 2), MRW (Minolta RAW), NEF (Nikon
+Electronic image Format), PEF (Pentax RAW), ORF (Olympus RAW Format), RAF
+(FujiFilm RAW Format), SRF (Sony Raw Format), MOS (Leaf Mosaic) and DNG
+(Digital Negative) images, MP3 and WAV audio files, and MOV videos. 
+ExifTool also extracts information from the maker notes of many digital
+cameras by various manufacturers including Canon, Casio, FujiFilm, Kodak,
+Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
+Ricoh, Sanyo and Sigma/Foveon.  It writes EXIF, GPS, IPTC, XMP and
+MakerNotes information to JPEG, TIFF, GIF, PPM, PGM, PBM, PNG, MNG, JNG,
+CRW, THM, CR2, MRW, NEF, PEF, MOS and DNG files.
 
 =head1 METHODS
 
@@ -300,10 +303,24 @@ this flag, 2kB is saved for files with XMP data, and 100 bytes for IPTC.
 
 Flag to calculate Composite tags automatically.  Default is 1.
 
+=item CoordFormat
+
+Format for printing GPS coordinates.  This is a printf format string with
+specifiers for degrees, minutes and seconds in that order, however minutes
+and seconds may be omitted.  For example, the following table gives the
+output for the same coordinate using various formats:
+
+        CoordFormat              Output
+    -------------------    ------------------
+    q{%d deg %d' %.2f"}    54 deg 59' 22.80"   (the default)
+    q{%d deg %.4f min}     54 deg 59.3800 min
+    q{%.6f degrees}        54.989667 degrees
+
 =item DateFormat
 
 Format for printing EXIF date/time.  See C<strftime> in the L<POSIX> package
-for details about the format string.
+for details about the format string.  The default format is equivalent to
+"%Y:%m:%d %H:%M:%S".
 
 =item Duplicates
 
@@ -320,10 +337,11 @@ name with a '-' in the arguments to L</ImageInfo>.
 
 =item IgnoreMinorErrors
 
-Causes some minor errors to be ignored.  This option is provided mainly
-to allow writing of files when minor errors occur, but also allows
-thumbnail and preview images to be extracted even if they don't have
-a recognizable header.
+Causes minor errors to be downgraded to warnings, and minor warnings to be
+ignored.  This option is provided mainly to allow writing of files when
+minor errors occur, but also allows thumbnail and preview images to be
+extracted even if they don't have a recognizable header.  Minor
+errors/warnings are denoted by '[minor]' at the start of the message.
 
 =item Group#
 
@@ -888,9 +906,10 @@ there was an error setting the time.
 
 =head2 SetNewGroups
 
-Set priority for tag groups in subsequent calls to L</SetNewValue>.  Default
-priority is EXIF, GPS, IPTC, XMP, MakerNotes, in that order.  Any family 0
-group name may be used.  Case is not significant.
+Set the order of the preferred groups when adding new information.  In
+subsequent calls to L</SetNewValue>, new information will be created in the
+first valid group of this list.  The default order is EXIF, GPS, IPTC, XMP and
+MakerNotes.  Any family 0 group name may be used.  Case is not significant.
 
     $exifTool->SetNewGroups('XMP','EXIF','IPTC');
 
@@ -1168,24 +1187,27 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (General Location):
 
-APP12, Composite, EXIF, ExifTool, File, GPS, GeoTiff, ICC_Profile, IPTC,
-Jpeg2000, MIFF, MNG, MakerNotes, PDF, PNG, Photoshop, PostScript, PrintIM,
-XMP
+APP12, BMP, Canon, Composite, EXIF, ExifTool, File, GPS, GeoTiff,
+ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG, MakerNotes, PICT,
+PDF, PNG, Pentax, Photoshop, PostScript, PrintIM, QuickTime, WAV, XMP
 
 =item Family 1 (Specific Location):
 
-APP12, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD, ExifTool,
-File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header,
-ICC-meas, ICC-view, ICC_Profile, IFD0, IFD1, IPTC, InteropIFD, Jpeg2000,
-Kodak, KodakBordersIFD, KodakEffectsIFD, MIFF, MNG, MakerUnknown, Minolta,
-Nikon, NikonPreview, Olympus, DF, PNG, Panasonic, Pentax, Photoshop,
-PostScript, PrintIM, Ricoh, Sanyo, Sigma, Sony, SubIFD, XMP, XMP-aux,
-XMP-crs, XMP-dc, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff,
-XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpRights
+APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD,
+ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt,
+ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3,
+ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, Jpeg2000, Kodak,
+KodakBordersIFD, KodakEffectsIFD, Leaf, LeafSubIFD, MIFF, MNG, MakerUnknown,
+Minolta, Nikon, NikonPreview, Olympus, PICT, PDF, PNG, Panasonic, Pentax,
+Photoshop, PostScript, PrintIM, QuickTime, Ricoh, SRF#, Sanyo, Sigma, Sony,
+SubIFD, Track#, WAV, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
+XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
+XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 
-Author, Camera, ExifTool, Image, Location, Other, Printing, Time, Unknown
+Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,
+Unknown
 
 =back
 

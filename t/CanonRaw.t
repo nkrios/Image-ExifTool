@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..5\n"; }
+BEGIN { $| = 1; print "1..6\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -20,7 +20,7 @@ use t::TestLib;
 my $testname = 'CanonRaw';
 my $testnum = 1;
 
-# test 2: Extract information from CanonRaw.crw
+# test 2: Extract information from CRW
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -29,7 +29,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 3: Extract JpgFromRaw
+# test 3: Extract JpgFromRaw from CRW
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -39,7 +39,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 4: Write a whole pile of tags
+# test 4: Write a whole pile of tags to a CRW
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -69,6 +69,45 @@ my $testnum = 1;
     my ($ok, $skip) = testVerbose($testname, $testnum, 't/CanonRaw.crw', 1);
     print 'not ' unless $ok;
     print "ok $testnum$skip\n";
+}
+
+# test 6: Write to CR2 file
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    # set IgnoreMinorErrors option to allow invalid JpgFromRaw to be written
+    $exifTool->SetNewValue(Keywords => 'CR2 test');
+    $exifTool->SetNewValue(OwnerName => 'Phil Harvey');
+    $exifTool->SetNewValue(FocalPlaneXSize => '35mm');
+    my $testfile = "t/${testname}_${testnum}_failed.cr2";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/CanonRaw.cr2', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    my $success = check($exifTool, $info, $testname, $testnum);
+    # make sure file suffix was copied properly
+    while ($success) {
+        open(TESTFILE, $testfile) or last;
+        binmode(TESTFILE);
+        my $endStr = '<Dummy preview image data>Non-TIFF data test';
+        my $len = length $endStr;
+        seek(TESTFILE, -$len, 2) or last;
+        my $buff;
+        read(TESTFILE, $buff, $len) == $len or last;
+        close(TESTFILE);
+        if ($buff eq $endStr) {
+            unlink $testfile;
+            $success = 2;
+        } else {
+            warn "\n  Test $testnum failed to copy file suffix:\n";
+            warn "    Test gave: '$buff'\n";
+            warn "    Should be: '$endStr'\n";
+            $success = 0;
+        }
+        last;
+    }
+    warn "\n  Test $testnum: Error reading file suffix\n" if $success == 1;
+    print 'not ' unless $success == 2;
+    print "ok $testnum\n";
 }
 
 # end

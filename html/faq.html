@@ -57,6 +57,38 @@ they haven't been rounded off at all, but you may see odd values like 1/102
 instead of 1/100, etc.
 </blockquote>
 
+<h4>"I get the following error when writing a tag:
+<code><font color='#880000'>'Can't convert TAG (not in PrintConv)'</font></code>"</h4>
+
+<blockquote>
+ExifTool applies a print conversion (PrintConv) to the printed values of all
+tags. These print conversions are documented for all tags in the <b>Values</b>
+column of the <a href="TagNames/index.html">Tag Name documentation</a>.  For
+example, the GPSAltitudeRef tag defines the following conversions:
+<pre>    0 = Above Sea Level
+    1 = Below Sea Level
+</pre>
+For this tag, a value of '0' is printed as 'Above Sea Level', and '1' is printed
+as 'Below Sea Level'.  Reading and writing with ExifTool is symmetrical, so a
+value that is printed as 'Above Sea Level' must also be written in that form.
+(ie. The inverse print conversion is applied when writing values.) For example,
+to write GPSAltitudeRef you can type:
+<font color='#880000'>
+<pre>    exiftool -gpsaltituderef='Above Sea Level' image.jpg
+</pre></font>
+or any unambiguous short form may be used and ExifTool will know what you mean, ie)
+<font color='#880000'>
+<pre>    exiftool -gpsaltituderef=above image.jpg
+</pre></font>
+Alternatively, the print conversion can be disabled with the <code>
+<font color='#880000'>'-n'</font></code> option. In this case the printed value of
+GPSAltitudeRef will be '0' or '1', and the value is written in the same way. So
+the following command has exactly the same effect as the commands above:
+<font color='#880000'>
+<pre>    exiftool -gpsaltituderef=0 -n image.jpg
+</pre></font>
+</blockquote>
+
 <h4>"I can't delete all EXIF information from a TIFF file using
 <code><font color='#880000'>'exiftool -exif:all= img.tif'</font></code>"</h4>
 
@@ -68,7 +100,7 @@ the main image itself is stored in IFD0, so deleting this directory would
 destroy the image.  Instead, ExifTool just deletes the ExifIFD subdirectory, so
 any information stored in other directories is preserved.
 
-<p>Use <code><font color='#880000'>'exiftool -a -G1 img.tif'</font></code> to
+<p>Use <code><font color='#880000'>'exiftool -a -G1 -S img.tif'</font></code> to
 see where the information is stored.  Any information remaining in other IFD's
 must be deleted separately from a TIFF file if desired.
 </blockquote>

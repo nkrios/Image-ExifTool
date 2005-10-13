@@ -3,12 +3,15 @@
 <title>EXIF Tags</title>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
-<h2><a name='EXIF'>EXIF Tags</a></h2>
+<h2>EXIF Tags</h2>
 
-EXIF meta information may exist within different Image File Directories
-(IFD&apos;s) of an image.  The names of these IFD&apos;s correspond to the
-ExifTool family 1 group names.  When writing EXIF information, the
-default <b>Group</b> listed below is used unless another group is specified.
+EXIF stands for &apos;Exchangeable Image File Format&apos;.  This type of information
+may be found in JPG, TIFF, PNG, MIFF and DNG images.
+
+<p>The EXIF meta information is organized into different Image File Directories
+(IFD&apos;s) within an image.  The names of these IFD&apos;s correspond to the
+ExifTool family 1 group names.  When writing EXIF information, the default
+<b>Group</b> listed below is used unless another group is specified.
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -925,48 +928,54 @@ default <b>Group</b> listed below is used unless another group is specified.
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x8606</td>
+<td>LeafData</td>
+<td align='center'>-</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Leaf.html'>Leaf Tags</a></td></tr>
+<tr valign='top'>
 <td>0x8649</td>
 <td>PhotoshopSettings</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8769</td>
 <td>ExifOffset</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8773</td>
 <td>ICC_Profile</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x87ac</td>
 <td>ImageLayer</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x87af</td>
 <td>GeoTiffDirectory</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x87b0</td>
 <td>GeoTiffDoubleParams</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x87b1</td>
 <td>GeoTiffAsciiParams</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8822</td>
 <td>ExposureProgram</td>
 <td align='center'>int16u</td>
@@ -979,66 +988,72 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>6 = Action (High speed)
   <br>7 = Portrait
   <br>8 = Landscape</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8824</td>
 <td>SpectralSensitivity</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8825</td>
 <td>GPSInfo</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='GPS.html'>GPS Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8827</td>
 <td>ISO</td>
 <td align='center'>int16u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8828</td>
 <td>Opto-ElectricConvFactor</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8829</td>
 <td>Interlace</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x882a</td>
 <td>TimeZoneOffset</td>
 <td align='center'>int16s</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x882b</td>
 <td>SelfTimerMode</td>
 <td align='center'>int16u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x885c</td>
 <td>FaxRecvParams</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x885d</td>
 <td>FaxSubAddress</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x885e</td>
 <td>FaxRecvTime</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x888a</td>
+<td>LeafSubIFD</td>
+<td align='center'>-</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Leaf.html#SubIFD'>Leaf SubIFD Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9000</td>
 <td>ExifVersion</td>
@@ -1298,9 +1313,10 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>MakerNoteSanyo
   <br>MakerNoteSigma
   <br>MakerNoteSony
+  <br>MakerNoteSonySRF
   <br>MakerNoteUnknown</td>
-<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -1317,7 +1333,7 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a>
   <br>--&gt; <a href='Minolta.html'>Minolta Tags</a>
   <br>--&gt; <a href='Nikon.html'>Nikon Tags</a>
-  <br>--&gt; <a href='Nikon.html#MakerNotesB'>Nikon MakerNotesB Tags</a>
+  <br>--&gt; <a href='Nikon.html#Type2'>Nikon Type2 Tags</a>
   <br>--&gt; <a href='Nikon.html'>Nikon Tags</a>
   <br>--&gt; <a href='Olympus.html'>Olympus Tags</a>
   <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
@@ -1329,6 +1345,7 @@ default <b>Group</b> listed below is used unless another group is specified.
   <br>--&gt; <a href='Sanyo.html'>Sanyo Tags</a>
   <br>--&gt; <a href='Sigma.html'>Sigma Tags</a>
   <br>--&gt; <a href='Sony.html'>Sony Tags</a>
+  <br>--&gt; <a href='Sony.html#SRF'>Sony SRF Tags</a>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9286</td>
@@ -1367,7 +1384,7 @@ default <b>Group</b> listed below is used unless another group is specified.
 <td align='center'>IFD0</td>
 <td><font size='-1'><font color="#666666">(tags 0x9c9b-0x9c9f are used by Windows Explorer; special characters in these
 values are converted to UTF-8 by default, or Windows Latin1 with the -L option.
-XPTitle is ignored by Windows Explorer if ImageDescription exists&apos;,)</font></font></td></tr>
+XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9c9c</td>
 <td>XPComment</td>
@@ -2264,6 +2281,6 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists&apos;,)</font>
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Aug 22, 2005</i>
+<br><i>Last revised Oct 7, 2005</i>
 </body>
 </html>

@@ -27,15 +27,15 @@ sub ProcessPrintIM($$$);
 
 #------------------------------------------------------------------------------
 # Process PrintIM IFD
-# Inputs: 0) ExifTool object reference, 1) pointer to tag table
-#         2) reference to directory information
+# Inputs: 0) ExifTool object reference, 1) reference to directory information
+#         2) pointer to tag table
 # Returns: 1 on success
 sub ProcessPrintIM($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $offset = $dirInfo->{DirStart};
-    my $size = $dirInfo->{DirLen};
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $offset = $$dirInfo{DirStart};
+    my $size = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
 
     unless ($size > 15) {
@@ -48,7 +48,6 @@ sub ProcessPrintIM($$$)
         return 0;
     }
     # check size of PrintIM block
-    my $saveOrder = GetByteOrder();
     my $num = Get16u($dataPt, $offset + 14);
     if ($size < 16 + $num * 6) {
         # size is too big, maybe byte ordering is wrong
@@ -56,7 +55,6 @@ sub ProcessPrintIM($$$)
         $num = Get16u($dataPt, $offset + 14);
         if ($size < 16 + $num * 6) {
             $exifTool->Warn('Bad PrintIM size');
-            SetByteOrder($saveOrder);
             return 0;
         }
     }
@@ -77,7 +75,6 @@ sub ProcessPrintIM($$$)
         );
         $tagInfo and $exifTool->FoundTag($tagInfo,$val);
     }
-    SetByteOrder($saveOrder);
     return 1;
 }
 

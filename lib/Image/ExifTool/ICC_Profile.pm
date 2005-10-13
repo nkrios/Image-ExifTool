@@ -542,15 +542,15 @@ sub FormatICCTag($$$)
 
 #------------------------------------------------------------------------------
 # Process ICC_Profile APP13 record
-# Inputs: 0) ExifTool object reference, 1) Tag table reference
-#         2) Reference to directory information
+# Inputs: 0) ExifTool object reference, 1) Reference to directory information
+#         2) Tag table reference
 # Returns: 1 on success
 sub ProcessICC_Profile($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart};
-    my $dirLen = $dirInfo->{DirLen};
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart};
+    my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
 
     my $oldOrder = GetByteOrder();
@@ -577,17 +577,20 @@ sub ProcessICC_Profile($$$)
         my $fakeInfo = { Name=>'ProfileHeader', SubDirectory => { } };
         $exifTool->VerboseInfo(undef, $fakeInfo);
     }
+    if ($exifTool->{ICC_COUNT}++) {
+        $exifTool->{SET_TAG_EXTRA} = '+' . $exifTool->{ICC_COUNT};
+    }
     # process the header block
     my %subdirInfo = (
         Name     => 'ProfileHeader',
         DataPt   => $dataPt,
-        DataLen  => $dirInfo->{DataLen},
+        DataLen  => $$dirInfo{DataLen},
         DirStart => $dirStart,
         DirLen   => 128,
-        Parent   => $dirInfo->{DirName},
+        Parent   => $$dirInfo{DirName},
     );
     my $newTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::ICC_Profile::Header');
-    $exifTool->ProcessTagTable($newTagTable, \%subdirInfo);
+    $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable);
 
     $pos += 4;    # skip item count
     my $index;
@@ -639,18 +642,18 @@ sub ProcessICC_Profile($$$)
             %subdirInfo = (
                 Name     => $name,
                 DataPt   => $dataPt,
-                DataPos  => $dirInfo->{DataPos},
-                DataLen  => $dirInfo->{DataLen},
+                DataPos  => $$dirInfo{DataPos},
+                DataLen  => $$dirInfo{DataLen},
                 DirStart => $valuePtr,
                 DirLen   => $size,
-                Parent   => $dirInfo->{DirName},
+                Parent   => $$dirInfo{DirName},
             );
             my $type = substr($$dataPt, $valuePtr, 4);
             #### eval Validate ($type)
             if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
                 $exifTool->Warn("Invalid $name data");
             } else {
-                $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
+                $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable, $$subdir{ProcessProc});
             }
         } elsif (defined $value) {
             $exifTool->FoundTag($tagInfo, $value);
@@ -664,6 +667,7 @@ sub ProcessICC_Profile($$$)
         }
     }
     SetByteOrder($oldOrder);
+    delete $exifTool->{SET_TAG_EXTRA};
     return 1;
 }
 

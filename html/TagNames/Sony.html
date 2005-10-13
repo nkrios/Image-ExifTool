@@ -3,11 +3,12 @@
 <title>Sony Tags</title>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
-<h2><a name='Sony'>Sony Tags</a></h2>
+<h2>Sony Tags</h2>
 
-While current Sony camera models contain a wealth of information, very
-little is known about the Sony tags.  I believe that Sony is attempting to
-hide information in their maker notes by encrypting it.  Idiots.
+The maker notes in images from current Sony camera models contain a wealth
+of information, but very little is known about these tags.  Use the ExifTool
+Unknown (-u) or Verbose (-v) options to see information about the unknown
+tags.
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -20,9 +21,30 @@ hide information in their maker notes by encrypting it.  Idiots.
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='SRF'>Sony SRF Tags</a></h2>
+The maker notes in SRF (Sony Raw Format) images contain 7 IFD&apos;s (with family
+1 group names SRF0 through SRF6).  SRF0 through SRF5 use these Sony tags,
+while SRF6 uses standard EXIF tags.  All information other than SRF0 is
+encrypted, but thanks to Dave Coffin the decryption algorithm is known.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>SRF2_Key</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(key to decrypt maker notes from the start of SRF2)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0001</td>
+<td>DataKey</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(key to decrypt the rest of the file from the end of the maker notes)</font></font></td></tr>
+</table></td></tr></table></blockquote>
+
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 5, 2005</i>
+<br><i>Last revised Oct 7, 2005</i>
 </body>
 </html>

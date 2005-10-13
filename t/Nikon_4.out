@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 6KB
-[File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
+[File, File, Image]  - File Size: 6 kB
+[File, File, Time]  - File Modification Date/Time: 2005:01:31 11:57:40
 [File, File, Image]  - File Type: JPEG
-[File, File, Image]  - Mime Type: image/jpeg
+[File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 16
 [File, File, Image]  - Image Height: 16
 [EXIF, IFD0, Camera] 271 - Make: NIKON CORPORATION
@@ -60,7 +60,7 @@
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown (0)
 [EXIF, ExifIFD, Image] 42240 - Gamma: 2.2
-[MakerNotes, Nikon, Camera] 1 - File System Version: 2.10
+[MakerNotes, Nikon, Camera] 1 - Firmware Version: 2.10
 [MakerNotes, Nikon, Image] 2 - ISO Speed: 200
 [MakerNotes, Nikon, Camera] 4 - Quality: Fine
 [MakerNotes, Nikon, Camera] 5 - White Balance: Auto
@@ -110,6 +110,7 @@
 [MakerNotes, Nikon, Camera] 18 - Effective Max Aperture: 4.5
 [MakerNotes, Nikon, Camera] 154 - Sensor Pixel Size: 7.8 x 7.8 um
 [MakerNotes, Nikon, Camera] 160 - Serial Number: No= 20025585
+[MakerNotes, Nikon, Camera] 162 - Image Data Size: 2361498
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 526
 [MakerNotes, Nikon, Camera] 169 - Image Optimization: Custom
 [MakerNotes, Nikon, Camera] 170 - Saturation: Enhanced

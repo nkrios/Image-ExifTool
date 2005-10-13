@@ -25,8 +25,9 @@ package Image::ExifTool::Canon;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
@@ -145,28 +146,29 @@ my %canonLensTypes = ( #4
     },
     0xc => [   # square brackets for a conditional list
         {
-            Condition => '$self->{CameraModel} =~ /\b(300D|350D|REBEL|10D|20D)/',
-            Writable => 'int32u',
             Name => 'SerialNumber',
             Description => 'Camera Body No.',
+            Condition => '$self->{CameraModel} =~ /\b(300D|350D|REBEL|10D|20D)/',
+            Writable => 'int32u',
             PrintConv => 'sprintf("%.10d",$val)',
             PrintConvInv => '$val',
         },
         {
             # serial number of 1D/1Ds/1D Mark II/1Ds Mark II is usually
             # displayed w/o leeding zeros (ref 7)
-            Condition => '$self->{CameraModel} =~ /\b1D.*/',
-            Writable => 'int32u',
+            # (use this for any other EOS models too, except D30 and D60)
             Name => 'SerialNumber',
             Description => 'Camera Body No.',
+            Condition => '$self->{CameraModel} =~ /\bEOS.(?!(D30|D60))\b/',
+            Writable => 'int32u',
             PrintConv => 'sprintf("%d",$val)',
             PrintConvInv => '$val',
         },
         {
             # no condition (all other models)
             Name => 'SerialNumber',
-            Writable => 'int32u',
             Description => 'Camera Body No.',
+            Writable => 'int32u',
             PrintConv => 'sprintf("%x-%.5d",$val>>16,$val&0xffff)',
             PrintConvInv => '$val=~/(.*)-(\d+)/ ? (hex($1)<<16)+$2 : undef',
         },
@@ -185,16 +187,16 @@ my %canonLensTypes = ( #4
     },
     0xf => [
         {
-            Condition => '$self->{CameraModel} =~ /\b10D/',
             Name => 'CanonCustomFunctions10D',
+            Condition => '$self->{CameraModel} =~ /\b10D/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions10D',
             },
         },
         {
-            Condition => '$self->{CameraModel} =~ /\b20D/',
             Name => 'CanonCustomFunctions20D',
+            Condition => '$self->{CameraModel} =~ /\b20D/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions20D',
@@ -233,6 +235,7 @@ my %canonLensTypes = ( #4
             TagTable => 'Image::ExifTool::Canon::FileInfo',
         },
     },
+    0x95 => 'LensType', #PH (observed in 5D sample image)
     0xa0 => {
         Name => 'CanonColorInfo',
         SubDirectory => {
@@ -906,17 +909,17 @@ my %canonLensTypes = ( #4
             PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
             PrintConvInv => '$val=~s/-//g;$val',
         },
-        { #7
+        { #7 (1Ds)
             Name => 'ShutterCount',
-            Condition => '$self->{CameraModel} =~ /\b1Ds? Mark II/',
+            Condition => 'GetByteOrder() eq "MM"',
+            Format => 'int32u',
+        },
+        { #7 (1DmkII, 1DsMkII, 1DsMkIIN, 5D... + future models?)
+            Name => 'ShutterCount',
+            Condition => '$self->{CameraModel} !~ /\b(10D|300D|REBEL)\b/',
             Format => 'int32u',
             ValueConv => '($val>>16)|(($val&0xffff)<<16)',
             ValueConvInv => '($val>>16)|(($val&0xffff)<<16)',
-        },
-        { #7
-            Name => 'ShutterCount',
-            Condition => '$self->{CameraModel} =~ /\b1DS?$/',
-            Format => 'int32u',
         },
     ],
 );

@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.66
 [File, File, Image]  - File Name: MIFF.miff
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 4KB
+[File, File, Image]  - File Size: 4 kB
 [File, File, Time]  - File Modification Date/Time: 2005:07:21 08:19:48
 [File, File, Image]  - File Type: MIFF
-[File, File, Image]  - Mime Type: application/x-magick-image
+[File, File, Image]  - MIME Type: application/x-magick-image
 [MIFF, MIFF, Image] id - ID: ImageMagick
 [MIFF, MIFF, Image] class - Class: DirectClass
 [MIFF, MIFF, Image] matte - Matte: False
@@ -25,6 +25,12 @@
 [IPTC, IPTC, Other] 10 - Urgency: 8
 [IPTC, IPTC, Other] 25 - Keywords: ExifTool, Test, MIFF
 [IPTC, IPTC, Other] 120 - Caption-Abstract: MIFF test
+[Photoshop, Photoshop, Image] 0 - X Resolution: 72
+[Photoshop, Photoshop, Image] 2 - Displayed Units X: inches
+[Photoshop, Photoshop, Image] 4 - Y Resolution: 72
+[Photoshop, Photoshop, Image] 6 - Displayed Units Y: inches
+[Photoshop, Photoshop, Image] 1037 - Global Angle: 30
+[Photoshop, Photoshop, Image] 1049 - Global Altitude: 30
 [Photoshop, Photoshop, Author] 1034 - Copyright Flag: False
 [Photoshop, Photoshop, Author] 1035 - URL: http://owl.phy.queensu.ca/~phil/exiftool/
 [Photoshop, Photoshop, Image] 0 - Photoshop Quality: 2
@@ -74,20 +80,20 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 854
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 0
-[XMP, XMP-dc, Author] Creator - Creator: Phil Harvey
-[XMP, XMP-dc, Image] Description - Description: UTF-16 (big-endian) encoded XMP
-[XMP, XMP-dc, Author] Rights - Rights: Copyright 2004 Phil Harvey
-[XMP, XMP-dc, Image] Subject - Subject: MIFF, Test
-[XMP, XMP-dc, Image] Title - Title: Test IPTC picture
+[XMP, XMP-dc, Author] creator - Creator: Phil Harvey
+[XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
+[XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
+[XMP, XMP-dc, Image] subject - Subject: MIFF, Test
+[XMP, XMP-dc, Image] title - Title: Test IPTC picture
 [XMP, XMP-photoshop, Image] Category - Category: 1
 [XMP, XMP-photoshop, Location] City - City: Kingston
 [XMP, XMP-photoshop, Location] Country - Country: Canada
 [XMP, XMP-photoshop, Author] Credit - Credit: My Credit
 [XMP, XMP-photoshop, Time] DateCreated - Date Created: 2004:02:26
-[XMP, XMP-photoshop, Unknown] Urgency - Urgency: 8
-[XMP, XMP-xmpBJ, Unknown] JobRefName - Job Ref Name: My Job
-[XMP, XMP-xmpMM, Unknown] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
-[XMP, XMP-xmpRights, Unknown] Marked - Marked: False
+[XMP, XMP-photoshop, Image] Urgency - Urgency: 8
+[XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
+[XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
+[XMP, XMP-xmpRights, Author] Marked - Marked: False
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Image Size: 8x8

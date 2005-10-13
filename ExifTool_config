@@ -1,0 +1,61 @@
+#------------------------------------------------------------------------------
+# File:         ExifTool_config  -->  ~/.ExifTool_config
+#
+# Description:  Sample user configuration file for Image::ExifTool
+#
+# Notes:        To activate this file, copy it to ".ExifTool_config" in your
+#               home directory.
+#
+#               ExifTool automatically loads a file named ".ExifTool_config"
+#               if it exists in your home directory.  This example file shows
+#               how to define your own shortcuts and add new XMP and PNG tags.
+#
+#               For detailed information on the definition of tag tables and
+#               tag information hashes, see lib/Image/ExifTool/README.
+#------------------------------------------------------------------------------
+
+# Shortcut tags are used when extracting information to simplify
+# commonly used commands.  They can be used to represent groups
+# of tags, or to provide an alias for a tag name.
+%Image::ExifTool::Shortcuts::UserDefined = (
+    MyShortcut => ['createdate','exposuretime','aperture'],
+    MyAlias => 'FocalLengthIn35mmFormat',
+);
+
+# This is a basic example of the definition for a new XMP namespace.
+# After defining this table (which may have any name), a corresponding
+# "SubDirectory" entry must be added to the Main XMP table through
+# the %Image::ExifTool::UserDefined definition below.
+%Image::ExifTool::UserDefined::xxx = (
+    GROUPS => { 0 => 'XMP', 1 => 'XMP-xxx', 2 => 'Image' },
+    NAMESPACE => [ 'xxx' => 'http://ns.myname.com/xxx/1.0/' ],
+    WRITABLE => 'string',
+    NewXMPxxxTag1 => { },
+    NewXMPxxxTag2 => { Groups => { 2 => 'Author' } },
+    NewXMPxxxTag3 => { },
+);
+
+# The %Image::ExifTool::UserDefined hash defines new tags to be
+# added to existing tables.
+%Image::ExifTool::UserDefined = (
+    # new XMP namespaces must be added to the Main XMP table
+    'Image::ExifTool::XMP::Main' => {
+        xxx => {
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::UserDefined::xxx',
+            },
+        },
+    },
+    # XMP tags may also be added to existing namespaces
+    'Image::ExifTool::XMP::xmp' => {
+        NewXMPxmpTag => { Groups => { 2 => 'Author' } },
+    },
+    # new PNG tags are added to the PNG::TextualData table
+    'Image::ExifTool::PNG::TextualData' => {
+        NewPngTag1 => { },
+        NewPngTag2 => { },
+        NewPngTag3 => { },
+    },
+);
+
+#------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WriteCanonRaw.pl
 #
-# Description:  Routines for writing Canon RAW (CRW) files
+# Description:  Routines for writing Canon RAW (CRW and CR2) files
 #
 # Revisions:    01/25/2005 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ sub CheckCanonRaw($$$)
     my $tagName = $$tagInfo{Name};
     if ($tagName eq 'JpgFromRaw' or $tagName eq 'ThumbnailImage') {
         unless ($$valPtr =~ /^\xff\xd8/ or $exifTool->Options('IgnoreMinorErrors')) {
-            return 'Not a valid image';
+            return '[minor] Not a valid image';
         }
     } else {
         my $format = $$tagInfo{Format};
@@ -183,9 +183,51 @@ sub CheckCanonRaw($$$)
 }
 
 #------------------------------------------------------------------------------
+# Write CR2 file
+# Inputs: 0) ExifTool ref, 1) dirInfo reference (must have read first 16 bytes)
+#         2) tag table reference
+# Returns: true on success
+sub WriteCR2($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt} or return 0;
+    my $raf = $$dirInfo{RAF} or return 0;
+    my $outfile = $$dirInfo{OutFile} or return 0;
+
+    # check CR2 signature
+    my $sig = substr($$dataPt, 8, 4);
+    return 0 if $sig ne "CR\x02\0" and
+        $exifTool->Warn("Unsupported Canon RAW file. May cause problems if rewritten", 1);
+    # CR2 has a 16-byte header
+    $$dirInfo{NewDataPos} = 16;
+    my $newData = $exifTool->WriteDirectory($dirInfo, $tagTablePtr);
+    return 0 unless defined $newData and $$dirInfo{LastIFD};
+
+    if (length($newData)) {
+        # build 16 byte header for Canon RAW file
+        my $header = substr($$dataPt, 0, 16);
+        # last 4 bytes is pointer to last IFD
+        Set32u($$dirInfo{LastIFD}, \$header, 12);
+        Write($outfile, $header, $newData) or return 0;
+        # write anything after the end of a Canon RAW image
+        $raf->Seek($exifTool->{TIFF_END}, 0) or return 0;
+        my $extra = 0;
+        while ($raf->Read($newData, 65536)) {
+            Write($outfile, $newData) or return 0;
+            $extra += length $newData;
+        }
+        if ($extra and $exifTool->{OPTIONS}->{Verbose}) {
+            print "Note: $extra extra bytes copied after normal end of CR2\n";
+        }
+    }
+    undef $exifTool->{TIFF_END};
+    return 1;
+}
+
+#------------------------------------------------------------------------------
 # Write CanonRaw information
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) source dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
+#         2) tag table reference
 # Returns: undefined on error, else success message
 # Notes: Increments ExifTool CHANGED flag for each tag changed This routine is
 # different from all of the other write routines because Canon RAW files are
@@ -195,13 +237,13 @@ sub CheckCanonRaw($$$)
 # Outfile on the fly --> much faster, efficient, and less demanding on memory!
 sub WriteCanonRaw($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
-    my $blockStart = $dirInfo->{DirStart};
-    my $blockSize = $dirInfo->{DirLen};
-    my $raf = $dirInfo->{RAF} or return undef;
-    my $outfile = $dirInfo->{OutFile} or return undef;
-    my $outPos = $dirInfo->{OutPos} or return undef;
+    my $blockStart = $$dirInfo{DirStart};
+    my $blockSize = $$dirInfo{DirLen};
+    my $raf = $$dirInfo{RAF} or return undef;
+    my $outfile = $$dirInfo{OutFile} or return undef;
+    my $outPos = $$dirInfo{OutPos} or return undef;
     my $outBase = $outPos;
     my $verbose = $exifTool->Options('Verbose');
     my ($buff, $tagInfo);
@@ -223,7 +265,7 @@ sub WriteCanonRaw($$$)
     # generate list of tags to add or delete (currently, we only allow JpgFromRaw
     # and ThumbnailImage, to be added or deleted from the root CanonRaw directory)
     my (@addTags, %delTag);
-    if ($dirInfo->{Nesting} == 0) {
+    if ($$dirInfo{Nesting} == 0) {
         my $tagID;
         foreach $tagID (keys %$newTags) {
             my $permanent = $newTags->{$tagID}->{Permanent};
@@ -252,7 +294,7 @@ sub WriteCanonRaw($$$)
                 $newDir .= Set16u($addTag) . Set32u(length($newVal)) .
                            Set32u($outPos - $outBase);
                 # write new value data
-                Image::ExifTool::Write($outfile, $newVal) or return undef;
+                Write($outfile, $newVal) or return undef;
                 $outPos += length($newVal);     # update current position
                 $verbose > 1 and print "    + CanonRaw:$$tagInfo{Name}\n";
                 ++$exifTool->{CHANGED};
@@ -291,13 +333,13 @@ sub WriteCanonRaw($$$)
                     DataLen  => 0,
                     DirStart => $ptr,
                     DirLen   => $size,
-                    Nesting  => $dirInfo->{Nesting} + 1,
+                    Nesting  => $$dirInfo{Nesting} + 1,
                     RAF      => $raf,
-                    Parent   => $dirInfo->{DirName},
+                    Parent   => $$dirInfo{DirName},
                     OutFile  => $outfile,
                     OutPos   => $outPos,
                 );
-                my $result = $exifTool->WriteTagTable($tagTablePtr, \%subdirInfo);
+                my $result = $exifTool->WriteDirectory(\%subdirInfo, $tagTablePtr);
                 return undef unless $result;
                 # set size and pointer for this new directory
                 $size = $subdirInfo{OutPos} - $outPos;
@@ -334,15 +376,15 @@ sub WriteCanonRaw($$$)
                     DataLen  => $size,
                     DirStart => $subdirStart,
                     DirLen   => $size - $subdirStart,
-                    Nesting  => $dirInfo->{Nesting} + 1,
+                    Nesting  => $$dirInfo{Nesting} + 1,
                     RAF      => $raf,
-                    Parent   => $dirInfo->{DirName},
+                    Parent   => $$dirInfo{DirName},
                 );
                 #### eval Validate ($dirData, $subdirStart, $size)
                 if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
                     $exifTool->Warn("Invalid $name data");
                 } else {
-                    $subdir = $exifTool->WriteTagTable($newTagTable, \%subdirInfo);
+                    $subdir = $exifTool->WriteDirectory(\%subdirInfo, $newTagTable);
                     if (defined $subdir and length $subdir) {
                         if ($subdirStart) {
                             # add header before data directory
@@ -416,7 +458,7 @@ sub WriteCanonRaw($$$)
             $value .= "\0" if $size & 0x01;
             $valuePtr = $outPos - $outBase;
             # write out value data
-            Image::ExifTool::Write($outfile, $value) or return undef;
+            Write($outfile, $value) or return undef;
             $outPos += length($value);  # update current position in outfile
         }
         # create new directory entry
@@ -426,24 +468,25 @@ sub WriteCanonRaw($$$)
     $entries = length($newDir) / 10;
     $newDir = Set16u($entries) . $newDir . Set32u($outPos - $outBase);
     # write directory data
-    Image::ExifTool::Write($outfile, $newDir) or return undef;
+    Write($outfile, $newDir) or return undef;
 
     # update current output file position in dirInfo
-    $dirInfo->{OutPos} = $outPos + length($newDir);
+    $$dirInfo{OutPos} = $outPos + length($newDir);
 
     return 'Success';
 }
 
 #------------------------------------------------------------------------------
 # write Canon RAW (CRW) file
-# Inputs: 0) ExifTool object reference, 1) output file or scalar reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid CRW file,
 #          or -1 if a write error occurred
 sub WriteCRW($$)
 {
-    my ($exifTool, $outfile) = @_;
+    my ($exifTool, $dirInfo) = @_;
+    my $outfile = $$dirInfo{OutFile};
+    my $raf = $$dirInfo{RAF};
     my $verbose = $exifTool->{OPTIONS}->{Verbose};
-    my $raf = $exifTool->{RAF};
     my $rtnVal = 0;
     my ($buff, $err, $sig);
 
@@ -457,7 +500,7 @@ sub WriteCRW($$)
     # write header
     $raf->Seek(0, 0)         or return 0;
     $raf->Read($buff, $hlen) == $hlen or return 0;
-    Image::ExifTool::Write($outfile, $buff) or $err = 1;
+    Write($outfile, $buff) or $err = 1;
 
     $raf->Seek(0, 2)         or return 0;   # seek to end of file
     my $filesize = $raf->Tell() or return 0;
@@ -481,7 +524,7 @@ sub WriteCRW($$)
 
     # process the raw directory
     my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
-    my $msg = $exifTool->WriteTagTable($tagTablePtr, \%dirInfo);
+    my $msg = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
     if ($msg) {
         if ($err) {
             $rtnVal = -1;
@@ -501,7 +544,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WriteCanonRaw.pl - Routines for writing Canon RAW (CRW) files
+Image::ExifTool::WriteCanonRaw.pl - Routines for writing Canon CRW and CR2 files
 
 =head1 SYNOPSIS
 
@@ -509,8 +552,8 @@ These routines are autoloaded by Image::ExifTool::CanonRaw.
 
 =head1 DESCRIPTION
 
-This file contains routines used by ExifTool to write Canon RAW (CRW) files
-and metadata.
+This file contains routines used by ExifTool to write Canon CRW and CR2
+files and metadata.
 
 =head1 NOTES
 

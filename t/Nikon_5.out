@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 4KB
+[File, File, Image]  - File Size: 4 kB
 [File, File, Time]  - File Modification Date/Time: 2005:05:25 13:40:58
 [File, File, Image]  - File Type: JPEG
-[File, File, Image]  - Mime Type: image/jpeg
+[File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 16
 [File, File, Image]  - Image Height: 16
 [EXIF, IFD0, Camera] 271 - Make: NIKON CORPORATION
@@ -63,7 +63,7 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 3202
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
-[MakerNotes, Nikon, Camera] 1 - File System Version: 2.10
+[MakerNotes, Nikon, Camera] 1 - Firmware Version: 2.10
 [MakerNotes, Nikon, Image] 2 - ISO Speed: 800
 [MakerNotes, Nikon, Camera] 4 - Quality: Fine
 [MakerNotes, Nikon, Camera] 5 - White Balance: Preset0
@@ -98,6 +98,7 @@
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
 [MakerNotes, Nikon, Camera] 151 - Color Balance Unknown: 0206[...]
 [MakerNotes, Nikon, Camera] 154 - Sensor Pixel Size: 9.4 x 9.4 um
+[MakerNotes, Nikon, Camera] 162 - Image Data Size: 1369271
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 2
 [MakerNotes, Nikon, Camera] 170 - Saturation: Normal
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0201
@@ -117,6 +118,7 @@
 [Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 16x16
+[Composite, Composite, Camera]  - Lens: 50mm f/1.8 D
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/125
@@ -125,5 +127,4 @@
 [Composite, Composite, Image]  - Depth of Field: 0.03 m (0.69 - 0.72)
 [Composite, Composite, Camera]  - Focal Length: 50.0mm (35mm equivalent: 75.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 31.20 m
-[Composite, Composite, Camera]  - Lens: 50mm f/1.8 D
 [Composite, Composite, Image]  - Shooting Date/Time: 2005:03:18 02:55:18.16

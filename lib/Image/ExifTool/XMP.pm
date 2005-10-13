@@ -6,11 +6,14 @@
 # Revisions:    11/25/2003 - P. Harvey Created
 #               10/28/2004 - P. Harvey Major overhaul to conform with XMP spec
 #               02/27/2005 - P. Harvey Also read UTF-16 and UTF-32 XMP
+#               08/30/2005 - P. Harvey Split tag tables into separate namespaces
 #
 # References:   1) http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
 #               2) http://www.w3.org/TR/rdf-syntax-grammar/  (20040210)
 #               3) http://www.portfoliofaq.com/pfaq/v7mappings.htm
 #               4) http://www.iptc.org/IPTC4XMP/
+#               5) http://creativecommons.org/technology/xmp
+#               6) http://www.optimasc.com/products/fileid/xmp-extensions.pdf
 #
 # Notes:      - I am handling property qualifiers as if they were separate
 #               properties (with no associated namespace).
@@ -31,7 +34,7 @@ use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace %xlatNamespace);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.31';
+$VERSION = '1.41';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -39,6 +42,37 @@ sub ProcessXMP($$$);
 sub WriteXMP($$$);
 sub ParseXMPElement($$$;$$);
 sub DecodeBase64($);
+
+# conversions for GPS coordinates
+sub ToDegrees
+{
+    require Image::ExifTool::GPS;
+    Image::ExifTool::GPS::ToDegrees($_[1], 1);
+}
+my %latConv = (
+    ValueConv    => \&ToDegrees,
+    ValueConvInv => q{
+        require Image::ExifTool::GPS;
+        Image::ExifTool::GPS::ToDMS($self, $val, 2, "N");
+    },
+    PrintConv    => q{
+        require Image::ExifTool::GPS;
+        Image::ExifTool::GPS::ToDMS($self, $val, 1, "N");
+    },
+    PrintConvInv => \&ToDegrees,
+);
+my %longConv = (
+    ValueConv    => \&ToDegrees,
+    ValueConvInv => q{
+        require Image::ExifTool::GPS;
+        Image::ExifTool::GPS::ToDMS($self, $val, 2, "E");
+    },
+    PrintConv    => q{
+        require Image::ExifTool::GPS;
+        Image::ExifTool::GPS::ToDMS($self, $val, 1, "E");
+    },
+    PrintConvInv => \&ToDegrees,
+);
 
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
 %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
@@ -59,60 +93,140 @@ sub DecodeBase64($);
     GROUPS => { 2 => 'Unknown' },
     PROCESS_PROC => \&ProcessXMP,
     WRITE_PROC => \&WriteXMP,
-    WRITABLE => 'string',
+    dc => {
+        Name => 'dc', # (otherwise generated name would be 'Dc')
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::dc' },
+    },
+    xmp => {
+        Name => 'xmp',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::xmp' },
+    },
+    xmpRights => {
+        Name => 'xmpRights',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::xmpRights' },
+    },
+    xmpMM => {
+        Name => 'xmpMM',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::xmpMM' },
+    },
+    xmpBJ => {
+        Name => 'xmpBJ',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::xmpBJ' },
+    },
+    xmpTPg => {
+        Name => 'xmpTPg',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::xmpTPg' },
+    },
+    pdf => {
+        Name => 'pdf',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::pdf' },
+    },
+    photoshop => {
+        Name => 'photoshop',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::photoshop' },
+    },
+    crs => {
+        Name => 'crs',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::crs' },
+    },
+    aux => {
+        Name => 'aux',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::aux' },
+    },
+    tiff => {
+        Name => 'tiff',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::tiff' },
+    },
+    exif => {
+        Name => 'exif',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::exif' },
+    },
+    iptcCore => {
+        Name => 'iptcCore',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::iptcCore' },
+    },
+    PixelLive => {
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::PixelLive' },
+    },
+    xmpPLUS => {
+        Name => 'xmpPLUS',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::xmpPLUS' },
+    },
+    cc => {
+        Name => 'cc',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::cc' },
+    },
+    dex => {
+        Name => 'dex',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::dex' },
+    },
+);
+
 #
-# Define tags for necessary schema properties
-# (only need to define tag if we want to change the default group
-#  or any other tag information, or if we want the tag name to show
-#  up in the complete list of tags.  Also, we give the family 1 group
-#  name for one of the properties so it will show up in the group list.
-#  Family 1 groups are generated from the property namespace.)
+# Tag tables for all XMP schemas:
 #
 # Writable - only need to define this for writable tags if not plain text
-#            (boolean, integer, rational, date or lang-alt)
-# List - XMP list type (Bag, Seq or Alt)
+#            (boolean, integer, rational, real, date or lang-alt)
+# List - XMP list type (Bag, Seq or Alt, or set to 1 for elements in Struct lists)
 #
-# - Dublin Core schema properties (dc)
-#
-    Contributor     => { Groups => { 1 => 'XMP-dc', 2 => 'Author' }, List => 'Bag' },
-    Coverage        => { },
-    Creator         => { Groups => { 2 => 'Author' }, List => 'Seq' },
-    Date            => {
+# (Note that family 1 group names are generated from the property namespace, not
+#  the group1 names below which exist so the groups will appear in the list.)
+# 
+
+# Dublin Core schema properties (dc)
+%Image::ExifTool::XMP::dc = (
+    GROUPS => { 1 => 'XMP-dc', 2 => 'Other' },
+    NAMESPACE => 'dc',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'Dublin Core schema tags.',
+    contributor => { Groups => { 2 => 'Author' }, List => 'Bag' },
+    coverage    => { },
+    creator     => { Groups => { 2 => 'Author' }, List => 'Seq' },
+    date        => {
         Groups => { 2 => 'Time'   },
         Writable => 'date',
         List => 'Seq',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    Description     => { Groups => { 2 => 'Image'  }, Writable => 'lang-alt' },
-    Format          => { Groups => { 2 => 'Image'  } },
-    Identifier      => [
-        { Groups => { 2 => 'Image'  }, Namespace => 'dc' },
-        { List => 'Bag' , Namespace => 'xmp' },
-    ],
-    Language        => { List => 'Bag' },
-    Publisher       => { Groups => { 2 => 'Author' }, List => 'Bag' },
-    Relation        => { List => 'Bag' },
-    Rights          => { Groups => { 2 => 'Author' }, Writable => 'lang-alt' },
-    Source          => [
-        { Groups => { 2 => 'Author' }, Namespace => 'dc' },
-        { Groups => { 2 => 'Author' }, Namespace => 'photoshop' },
-    ],
-    Subject         => { Groups => { 2 => 'Image'  }, List => 'Bag' },
-    Title           => { Groups => { 2 => 'Image'  }, Writable => 'lang-alt' },
-    Type            => { Groups => { 2 => 'Image'  }, List => 'Bag' },
-#
-# - XMP Basic schema properties (xmp (was xap))
-#
-    Advisory        => { Groups => { 1 => 'XMP-xmp' }, List => 'Bag' },
-    BaseURL         => { },
-    CreateDate      => {
+    description => { Groups => { 2 => 'Image'  }, Writable => 'lang-alt' },
+   'format'     => { Groups => { 2 => 'Image'  } },
+    identifier  => { Groups => { 2 => 'Image'  } },
+    language    => { List => 'Bag' },
+    publisher   => { Groups => { 2 => 'Author' }, List => 'Bag' },
+    relation    => { List => 'Bag' },
+    rights      => { Groups => { 2 => 'Author' }, Writable => 'lang-alt' },
+    source      => { Groups => { 2 => 'Author' } },
+    subject     => { Groups => { 2 => 'Image'  }, List => 'Bag' },
+    title       => { Groups => { 2 => 'Image'  }, Writable => 'lang-alt' },
+    type        => { Groups => { 2 => 'Image'  }, List => 'Bag' },
+);
+
+# XMP Basic schema properties (xmp, xap)
+%Image::ExifTool::XMP::xmp = (
+    GROUPS => { 1 => 'XMP-xmp', 2 => 'Image' },
+    NAMESPACE => 'xmp',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => q{
+XMP Basic schema tags.  If the older C<xap>, C<xapBJ>, C<xapMM> or
+C<xapRights> namespace prefixes are found, they are translated to the newer
+C<xmp>, C<xmpBJ>, C<xmpMM> and C<xmpRights> prefixes for use in family 1
+group names.
+    },
+    Advisory    => { List => 'Bag' },
+    BaseURL     => { },
+    CreateDate  => {
         Groups => { 2 => 'Time'  },
         Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    CreatorTool     => { },
-    # Identifier (covered by dc)
-    MetadataDate    => {
+    CreatorTool => { },
+    Identifier  => { List => 'Bag' },
+    Label       => {
+        Notes => 'not in original spec',
+    },
+    MetadataDate => {
         Groups => { 2 => 'Time'  },
         Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
@@ -122,37 +236,54 @@ sub DecodeBase64($);
         Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    Nickname        => { },
-    # Thumbnails - structure (Height,Width,Format,Image)
-    Thumbnails      => {
-        Writable => 0,
+    Nickname    => { },
+    Rating      => {
+        Writable => 'integer',
+        Notes => 'not in original spec',
+    },
+    Thumbnails => {
+        SubDirectory => { },
+        Struct => 'Thumbnail',
         List => 'Alt',
     },
-    ThumbnailsHeight    => { Groups => { 2 => 'Image'  } },
-    ThumbnailsWidth     => { Groups => { 2 => 'Image'  } },
-    ThumbnailsFormat    => { Groups => { 2 => 'Image'  } },
+    ThumbnailsHeight    => { List => 1 },
+    ThumbnailsWidth     => { List => 1 },
+    ThumbnailsFormat    => { List => 1 },
     ThumbnailsImage     => {
         # Eventually may want to handle this like a normal thumbnail image
-        # -- but not yet!  (need to write EncodeBase64() routine....
+        # -- but not yet!  (need to write EncodeBase64() routine....)
         # Name => 'ThumbnailImage',
-        Groups => { 2 => 'Image' },
+        List => 1,
         # translate Base64-encoded thumbnail
         ValueConv => 'Image::ExifTool::XMP::DecodeBase64($val)',
     },
-#
-# - XMP Rights Management schema properties (xmpRights)
-#
-    Certificate     => { Groups => { 1 => 'XMP-xmpRights', 2 => 'Author' } },
+);
+
+# XMP Rights Management schema properties (xmpRights, xapRights)
+%Image::ExifTool::XMP::xmpRights = (
+    GROUPS => { 1 => 'XMP-xmpRights', 2 => 'Author' },
+    NAMESPACE => 'xmpRights',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'XMP Rights Management schema tags.',
+    Certificate     => { },
     Marked          => { Writable => 'boolean' },
-    Owner           => { Groups => { 2 => 'Author' }, List => 'Bag' },
+    Owner           => { List => 'Bag' },
     UsageTerms      => { Writable => 'lang-alt' },
-    WebStatement    => { Groups => { 2 => 'Author' } },
-#
-# - XMP Media Management schema properties (xmpMM)
-#
-  # DerivedFrom - structure (ResourceRef=InstanceID,DocumentID,VersionID,RenditionClass
-  #              RenditionParams,Manager,ManagerVariant,ManageTo,ManageUI)
-    DerivedFrom     => { Groups => { 1 => 'XMP-xmpMM'}, Writable => 0 },
+    WebStatement    => { },
+);
+
+# XMP Media Management schema properties (xmpMM, xapMM)
+%Image::ExifTool::XMP::xmpMM = (
+    GROUPS => { 1 => 'XMP-xmpMM', 2 => 'Other' },
+    NAMESPACE => 'xmpMM',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'XMP Media Management schema tags.',
+    DerivedFrom     => {
+        SubDirectory => { },
+        Struct => 'ResourceRef',
+    },
     DerivedFromInstanceID       => { },
     DerivedFromDocumentID       => { },
     DerivedFromVersionID        => { },
@@ -163,15 +294,17 @@ sub DecodeBase64($);
     DerivedFromManageTo         => { },
     DerivedFromManageUI         => { },
     DocumentID      => { },
-  # History - structure (ResourceEvent=Action,InstanceID,Parameters,SoftwareAgent,When)
-    History         => { List => 'Seq', Writable => 0 },
-    HistoryAction           => { },
-    HistoryInstanceID       => { },
-    HistoryParameters       => { },
-    HistorySoftwareAgent    => { },
-    HistoryWhen             => { Groups => { 2 => 'Time'  }, Writable => 'date' },
-  # ManagedFrom - structure (ResourceRef)
-    ManagedFrom     => { Writable => 0 },
+    History         => {
+        SubDirectory => { },
+        Struct => 'ResourceEvent',
+        List => 'Seq',
+    },
+    HistoryAction           => { List => 1 },   # we treat these like list items
+    HistoryInstanceID       => { List => 1 },
+    HistoryParameters       => { List => 1 },
+    HistorySoftwareAgent    => { List => 1 },
+    HistoryWhen             => { List => 1, Groups => { 2 => 'Time'  }, Writable => 'date' },
+    ManagedFrom     => { SubDirectory => { }, Struct => 'ResourceRef' },
     ManagedFromInstanceID       => { },
     ManagedFromDocumentID       => { },
     ManagedFromVersionID        => { },
@@ -188,20 +321,23 @@ sub DecodeBase64($);
     RenditionClass  => { },
     RenditionParams => { },
     VersionID       => { },
-  # Versions - structure (Version=Comments,Event,ModifyDate,Modifier,Version)
-    Versions        => { List => 'Seq', Writable => 0 },
-    VersionsComments    => { },
-    VersionsEvent       => { Writable => 0 },
-    VersionsEventAction         => { },
-    VersionsEventInstanceID     => { },
-    VersionsEventParameters     => { },
-    VersionsEventSoftwareAgent  => { },
-    VersionsEventWhen           => { Groups => { 2 => 'Time' }, Writable => 'date' },
-    VersionsModifyDate  => { Groups => { 2 => 'Time' }, Writable => 'date' },
-    VersionsModifier    => { },
-    VersionsVersion     => { },
+    Versions        => {
+        SubDirectory => { },
+        Struct => 'Version',
+        List => 'Seq',
+    },
+    VersionsComments    => { List => 1 },   # we treat these like list items
+    VersionsEvent       => { SubDirectory => { }, Struct => 'ResourceEvent' },
+    VersionsEventAction         => { List => 1 },
+    VersionsEventInstanceID     => { List => 1 },
+    VersionsEventParameters     => { List => 1 },
+    VersionsEventSoftwareAgent  => { List => 1 },
+    VersionsEventWhen           => { List => 1, Groups => { 2 => 'Time' }, Writable => 'date' },
+    VersionsModifyDate  => { List => 1, Groups => { 2 => 'Time' }, Writable => 'date' },
+    VersionsModifier    => { List => 1 },
+    VersionsVersion     => { List => 1 },
     LastURL         => { },
-    RenditionOf     => { Writable => 0 },
+    RenditionOf     => { SubDirectory => { }, Struct => 'ResourceRef' },
     RenditionOfInstanceID       => { },
     RenditionOfDocumentID       => { },
     RenditionOfVersionID        => { },
@@ -212,22 +348,56 @@ sub DecodeBase64($);
     RenditionOfManageTo         => { },
     RenditionOfManageUI         => { },
     SaveID          => { Writable => 'integer' },
-#
-# - XMP Basic Job Ticket schema properties (xmpBJ)
-#
-  # JobRef - structure (Job=Name,Id,Url)
+);
+
+# XMP Basic Job Ticket schema properties (xmpBJ, xapBJ)
+%Image::ExifTool::XMP::xmpBJ = (
+    GROUPS => { 1 => 'XMP-xmpBJ', 2 => 'Other' },
+    NAMESPACE => 'xmpBJ',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'XMP Basic Job Ticket schema tags.',
     # Note: JobRef is a List of structures.  To accomplish this, we set the XMP
-    # List=>'Bag', but Writable=>0 since we don't write the top level structure
+    # List=>'Bag', but since SubDirectory is defined, this tag isn't writable
     # directly.  Then we need to set List=>1 for the members so the Writer logic
     # will allow us to add list elements.
-    JobRef          => { Groups => { 1 => 'XMP-xmpBJ'}, List => 'Bag', Writable => 0 },
-    JobRefName          => { List => 1 },   # we treat this like a list item
-    JobRefId            => { List => 1 },
-    JobRefUrl           => { List => 1 },
-#
-# - PDF schema properties (pdf)
-#
-    Author          => { Groups => { 1 => 'XMP-pdf', 2 => 'Author' } }, #PH
+    JobRef => {
+        SubDirectory => { },
+        Struct => 'JobRef',
+        List => 'Bag',
+    },
+    JobRefName  => { List => 1 },   # we treat these like list items
+    JobRefId    => { List => 1 },
+    JobRefUrl   => { List => 1 },
+);
+
+# XMP Paged-Text schema properties (xmpTPg)
+%Image::ExifTool::XMP::xmpTPg = (
+    GROUPS => { 1 => 'XMP-xmpTPg', 2 => 'Image' },
+    NAMESPACE => 'xmpTPg',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'XMP Paged-Text schema tags.',
+    MaxPageSize => { SubDirectory => { }, Struct => 'Dimensions' },
+    MaxPageSizeW    => { Writable => 'real' },
+    MaxPageSizeH    => { Writable => 'real' },
+    MaxPageSizeUnit => { },
+    NPages      => { Writable => 'integer' },
+);
+
+# PDF schema properties (pdf)
+%Image::ExifTool::XMP::pdf = (
+    GROUPS => { 1 => 'XMP-pdf', 2 => 'Image' },
+    NAMESPACE => 'pdf',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => q{
+Adobe PDF schema tags.  The official XMP specification only defines
+Keywords, PDFVersion and Producer.  The other tags are included because they
+have been observed in PDF files, but Creator, Subject and Title aren't made
+writable because their names conflict with XMP-dc tags.
+    },
+    Author          => { Groups => { 2 => 'Author' } }, #PH
     ModDate => { #PH
         Groups => { 2 => 'Time' },
         Writable => 'date',
@@ -238,18 +408,24 @@ sub DecodeBase64($);
         Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-  # Creator (covered by dc) #PH
-  # Subject (covered by dc) #PH
-  # Title (covered by dc) #PH
-    Keywords        => { Groups => { 2 => 'Image' } },
-    PDFVersion      => { },
-    Producer        => { Groups => { 2 => 'Author' } },
-#
-# - Photoshop schema properties (photoshop)
-#
-    AuthorsPosition => { Groups => { 1 => 'XMP-photoshop', 2 => 'Author' } },
+    Creator     => { Groups => { 2 => 'Author' }, Writable => 0 },
+    Subject     => { Writable => 0 },
+    Title       => { Writable => 0 },
+    Keywords    => { },
+    PDFVersion  => { },
+    Producer    => { Groups => { 2 => 'Author' } },
+);
+
+# Photoshop schema properties (photoshop)
+%Image::ExifTool::XMP::photoshop = (
+    GROUPS => { 1 => 'XMP-photoshop', 2 => 'Image' },
+    NAMESPACE => 'photoshop',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'Adobe Photoshop schema tags.',
+    AuthorsPosition => { Groups => { 2 => 'Author' } },
     CaptionWriter   => { Groups => { 2 => 'Author' } },
-    Category        => { Groups => { 2 => 'Image'  } },
+    Category        => { },
     City            => { Groups => { 2 => 'Location' } },
     Country         => { Groups => { 2 => 'Location' } },
     Credit          => { Groups => { 2 => 'Author' } },
@@ -258,135 +434,93 @@ sub DecodeBase64($);
         Writable => 'date',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
     },
-    Headline        => { Groups => { 2 => 'Image'  } },
+    Headline        => { },
     Instructions    => { },
-  # Source (covered by dc)
+    Source          => { Groups => { 2 => 'Author' } },
     State           => { Groups => { 2 => 'Location' } },
     # the documentation doesn't show this as a 'Bag', but that's the
     # way Photoshop7.0 writes it - PH
-    SupplementalCategories  => { Groups => { 2 => 'Image' }, List => 'Bag' },
-    TransmissionReference   => { Groups => { 2 => 'Image' } },
+    SupplementalCategories  => { List => 'Bag' },
+    TransmissionReference   => { },
     Urgency         => { Writable => 'integer' },
-#
-# - Photoshop Raw Converter schema properties (crs) - not documented
-#
-    Version         => { Groups => { 1 => 'XMP-crs', 2 => 'Image' } },
-    RawFileName     => { Groups => { 2 => 'Image' } },
-    # we handle tags which are common to more than one namespace
-    # by using a tag list
-    WhiteBalance => [
-        { Groups => { 2 => 'Image' }, Namespace => 'crs' },
-        {
-            Groups => { 2 => 'Camera' },
-            Namespace => 'exif',
-            PrintConv => {
-                0 => 'Auto',
-                1 => 'Manual',
-            },
-        },
-    ],
-    Exposure        => { Groups => { 2 => 'Image' } },
-    Shadows         => { Groups => { 2 => 'Image' } },
-    Brightness      => { Groups => { 2 => 'Image' } },
-    Contrast => [
-        { Groups => { 2 => 'Image' }, Namespace => 'crs' },
-        {
-            Groups => { 2 => 'Camera' },
-            Namespace => 'exif',
-            PrintConv => {
-                0 => 'Normal',
-                1 => 'Low',
-                2 => 'High',
-            },
-            PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
-        },
-    ],
-    Saturation => [
-        { Groups => { 2 => 'Image' }, Namespace => 'crs' },
-        {
-            Groups => { 2 => 'Camera' },
-            Namespace => 'exif',
-            PrintConv => {
-                0 => 'Normal',
-                1 => 'Low',
-                2 => 'High',
-            },
-            PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
-        },
-    ],
-    Sharpness => [
-        { Groups => { 2 => 'Image' }, Namespace => 'crs' },
-        {
-            Groups => { 2 => 'Camera' },
-            Namespace => 'exif',
-            PrintConv => {
-                0 => 'Normal',
-                1 => 'Soft',
-                2 => 'Hard',
-            },
-            PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
-        },
-    ],
-    LuminanceSmoothing  => { Groups => { 2 => 'Image' } },
-    ColorNoiseReduction => { Groups => { 2 => 'Image' } },
-    ChromaticAberrationR=> { Groups => { 2 => 'Image' } },
-    ChromaticAberrationB=> { Groups => { 2 => 'Image' } },
-    VignetteAmount  => { Groups => { 2 => 'Image' } },
-    VignetteMidpoint=> { Groups => { 2 => 'Image' } },
-    ShadowTint      => { Groups => { 2 => 'Image' } },
-    RedHue          => { Groups => { 2 => 'Image' } },
-    RedSaturation   => { Groups => { 2 => 'Image' } },
-    GreenHue        => { Groups => { 2 => 'Image' } },
-    GreenSaturation => { Groups => { 2 => 'Image' } },
-    BlueHue         => { Groups => { 2 => 'Image' } },
-    BlueSaturation  => { Groups => { 2 => 'Image' } },
-#
-# - Auxiliary schema properties (aux) - not documented
-#
-    Lens            => { Groups => { 1 => 'XMP-aux', 2 => 'Camera' } },
-    SerialNumber    => { Groups => { 2 => 'Camera' } },
-#
-# - Tiff schema properties (tiff)
-#
-    ImageWidth => {
-        Groups => { 1 => 'XMP-tiff', 2 => 'Image' },
-        Writable => 'integer',
-    },
+);
+
+# Photoshop Camera Raw Schema properties (crs) - not documented
+%Image::ExifTool::XMP::crs = (
+    GROUPS => { 1 => 'XMP-crs', 2 => 'Image' },
+    NAMESPACE => 'crs',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'Photoshop Camera Raw Schema tags.',
+    Version         => { },
+    RawFileName     => { },
+    WhiteBalance    => { },
+    Exposure        => { },
+    Shadows         => { },
+    Brightness      => { },
+    Contrast        => { },
+    Saturation      => { },
+    Sharpness       => { },
+    LuminanceSmoothing  => { },
+    ColorNoiseReduction => { },
+    ChromaticAberrationR=> { },
+    ChromaticAberrationB=> { },
+    VignetteAmount  => { },
+    VignetteMidpoint=> { },
+    ShadowTint      => { },
+    RedHue          => { },
+    RedSaturation   => { },
+    GreenHue        => { },
+    GreenSaturation => { },
+    BlueHue         => { },
+    BlueSaturation  => { },
+);
+
+# Auxiliary schema properties (aux) - not documented
+%Image::ExifTool::XMP::aux = (
+    GROUPS => { 1 => 'XMP-aux', 2 => 'Camera' },
+    NAMESPACE => 'aux',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'Photoshop Auxiliary schema tags.',
+    Lens            => { },
+    SerialNumber    => { },
+);
+
+# Tiff schema properties (tiff)
+%Image::ExifTool::XMP::tiff = (
+    GROUPS => { 1 => 'XMP-tiff', 2 => 'Image' },
+    NAMESPACE => 'tiff',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'EXIF schema for TIFF tags.',
+    ImageWidth  => { Writable => 'integer' },
     ImageLength => {
         Name => 'ImageHeight',
-        Groups => { 2 => 'Image' },
         Writable => 'integer',
     },
-    BitsPerSample => {
-        Groups => { 2 => 'Image' },
-        Writable => 'integer',
-        List => 'Seq',
-    },
+    BitsPerSample => { Writable => 'integer', List => 'Seq' },
     Compression => {
-        Groups => { 2 => 'Image' },
+        Writable => 'integer',
         PrintConv => \%Image::ExifTool::Exif::compression,
     },
     PhotometricInterpretation => {
-        Groups => { 2 => 'Image' },
+        Writable => 'integer',
         PrintConv => \%Image::ExifTool::Exif::photometricInterpretation,
     },
     Orientation => {
-        Groups => { 2 => 'Image' },
+        Writable => 'integer',
         PrintConv => \%Image::ExifTool::Exif::orientation,
     },
-    SamplesPerPixel => {
-        Groups => { 2 => 'Image' },
-        Writable => 'integer',
-    },
+    SamplesPerPixel => { Writable => 'integer' },
     PlanarConfiguration => {
-        Groups => { 2 => 'Image' },
+        Writable => 'integer',
         PrintConv => {
             1 => 'Chunky',
             2 => 'Planar',
         },
     },
     YCbCrSubSampling => {
-        Groups => { 2 => 'Image' },
         PrintConv => {
             '1 1' => 'YCbCr4:4:4',
             '2 1' => 'YCbCr4:2:2',
@@ -396,81 +530,52 @@ sub DecodeBase64($);
             '1 2' => 'YCbCr4:4:0',
         },
     },
-    XResolution => {
-        Groups => { 2 => 'Image' },
-        Writable => 'rational',
-    },
-    YResolution => {
-        Groups => { 2 => 'Image' },
-        Writable => 'rational',
-    },
+    XResolution => { Writable => 'rational' },
+    YResolution => { Writable => 'rational' },
     ResolutionUnit => {
-        Groups => { 2 => 'Image' },
+        Writable => 'integer',
         PrintConv => {
             1 => 'None',
             2 => 'inches',
             3 => 'cm',
         },
     },
-    TransferFunction => {
-        Groups => { 2 => 'Image' },
-        Writable => 'integer',
-        List => 'Seq',
-    },
-    WhitePoint => {
-        Groups => { 2 => 'Image' },
-        Writable => 'rational',
-        List => 'Seq',
-    },
-    PrimaryChromaticities => {
-        Groups => { 2 => 'Image' },
-        Writable => 'rational',
-        List => 'Seq',
-    },
-    YCbCrCoefficients => {
-        Groups => { 2 => 'Image' },
-        Writable => 'rational',
-        List => 'Seq',
-    },
-    ReferenceBlackWhite => {
-        Groups => { 2 => 'Image' },
-        Writable => 'rational',
-        List => 'Seq',
-    },
+    TransferFunction      => { Writable => 'integer',  List => 'Seq' },
+    WhitePoint            => { Writable => 'rational', List => 'Seq' },
+    PrimaryChromaticities => { Writable => 'rational', List => 'Seq' },
+    YCbCrCoefficients     => { Writable => 'rational', List => 'Seq' },
+    ReferenceBlackWhite   => { Writable => 'rational', List => 'Seq' },
     DateTime => {
         Description => 'Date/Time Of Last Modification',
         Groups => { 2 => 'Time' },
         Writable => 'date',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    ImageDescription => {
-        Groups => { 2 => 'Image' },
-        Writable => 'lang-alt',
-    },
-    Make => {
-        Groups => { 2 => 'Camera' },
-    },
+    ImageDescription => { Writable => 'lang-alt' },
+    Make  => { Groups => { 2 => 'Camera' } },
     Model => {
         Description => 'Camera Model Name',
         Groups => { 2 => 'Camera' },
     },
-    Software => {
-        Groups => { 2 => 'Image' },
-    },
-    Artist => {
-        Groups => { 2 => 'Author' },
-    },
+    Software  => { },
+    Artist    => { Groups => { 2 => 'Author' } },
     Copyright => {
         Groups => { 2 => 'Author' },
         Writable => 'lang-alt',
     },
-#
-# - Exif schema properties (exif)
-#
-    ExifVersion     => { Groups => { 1 => 'XMP-exif', 2 => 'Image' } },
-    FlashpixVersion => { Groups => { 2 => 'Image' } },
+);
+
+# Exif schema properties (exif)
+%Image::ExifTool::XMP::exif = (
+    GROUPS => { 1 => 'XMP-exif', 2 => 'Image' },
+    NAMESPACE => 'exif',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'EXIF schema for EXIF tags.',
+    ExifVersion     => { },
+    FlashpixVersion => { },
     ColorSpace => {
-        Groups => { 2 => 'Image' },
+        Writable => 'integer',
         PrintConv => {
             1 => 'sRGB',
             2 => 'Adobe RGB',
@@ -479,8 +584,8 @@ sub DecodeBase64($);
         },
     },
     ComponentsConfiguration => {
-        Groups => { 2 => 'Image' },
         List => 'Seq',
+        Writable => 'integer',
         PrintConv => {
             0 => '.',
             1 => 'Y',
@@ -492,22 +597,18 @@ sub DecodeBase64($);
         },
     },
     CompressedBitsPerPixel => {
-        Groups => { 2 => 'Image' },
         Writable => 'rational',
     },
     PixelXDimension => {
         Name => 'ExifImageWidth',
-        Groups => { 2 => 'Image' },
         Writable => 'integer',
     },
     PixelYDimension => {
         Name => 'ExifImageHeight',
-        Groups => { 2 => 'Image' },
         Writable => 'integer',
     },
-    MakerNote => { Groups => { 2 => 'Image' } },
+    MakerNote => { },
     UserComment => {
-        Groups => { 2 => 'Image' },
         Writable => 'lang-alt',
     },
     RelatedSoundFile => { },
@@ -524,20 +625,19 @@ sub DecodeBase64($);
     },
     ExposureTime => {
         Description => 'Shutter Speed',
-        Groups => { 2 => 'Image' },
         Writable => 'rational',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
     FNumber => {
-        Groups => { 2 => 'Image' },
-        Writable => 'rational',
         Description => 'Aperture',
+        Writable => 'rational',
         PrintConv => 'sprintf("%.1f",$val)',
         PrintConvInv => '$val',
     },
     ExposureProgram => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             1 => 'Manual',
             2 => 'Program AE',
@@ -557,13 +657,12 @@ sub DecodeBase64($);
         Writable => 'integer',
         List => 'Seq',
         Description => 'ISO Speed',
-        Groups => { 2 => 'Image' },
     },
-    # OECF - structure (OECF/SFR=Columns,Rows,Names,Values)
     OECF => {
         Name => 'Opto-ElectricConvFactor',
         Groups => { 2 => 'Camera' },
-        Writable => 0,  # (this is a structure)
+        SubDirectory => { },
+        Struct => 'OECF',
     },
     OECFColumns => {
         Groups => { 2 => 'Camera' },
@@ -583,7 +682,6 @@ sub DecodeBase64($);
         List => 'Seq',
     },
     ShutterSpeedValue => {
-        Groups => { 2 => 'Image' },
         Writable => 'rational',
         ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
@@ -592,7 +690,6 @@ sub DecodeBase64($);
         PrintConvInv => 'eval $val',
     },
     ApertureValue => {
-        Groups => { 2 => 'Image' },
         Writable => 'rational',
         ValueConv => 'sqrt(2) ** $val',
         PrintConv => 'sprintf("%.1f",$val)',
@@ -600,12 +697,10 @@ sub DecodeBase64($);
         PrintConvInv => '$val',
     },
     BrightnessValue => {
-        Groups => { 2 => 'Image' },
         Writable => 'rational',
     },
     ExposureBiasValue => {
         Name => 'ExposureCompensation',
-        Groups => { 2 => 'Image' },
         Writable => 'rational',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         PrintConvInv => '$val',
@@ -626,6 +721,7 @@ sub DecodeBase64($);
     },
     MeteringMode => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             1 => 'Average',
             2 => 'Center-weighted average',
@@ -640,10 +736,10 @@ sub DecodeBase64($);
         Groups => { 2 => 'Camera' },
         PrintConv =>  \%Image::ExifTool::Exif::lightSource,
     },
-    # Flash - structure (Flash=Fired,Return,Mode,Function,RedEyeMode)
     Flash => {
         Groups => { 2 => 'Camera' },
-        Writable => 0,
+        SubDirectory => { },
+        Struct => 'Flash',
     },
     FlashFired => {
         Groups => { 2 => 'Camera' },
@@ -651,6 +747,7 @@ sub DecodeBase64($);
     },
     FlashReturn => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'No return detection',
             2 => 'Return not detected',
@@ -659,6 +756,7 @@ sub DecodeBase64($);
     },
     FlashMode => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'Unknown',
             1 => 'On',
@@ -681,7 +779,6 @@ sub DecodeBase64($);
         PrintConvInv => '$val=~s/mm$//;$val',
     },
     SubjectArea => {
-        Groups => { 2 => 'Image' },
         Writable => 'integer',
         List => 'Seq',
     },
@@ -689,10 +786,10 @@ sub DecodeBase64($);
         Groups => { 2 => 'Camera' },
         Writable => 'rational',
     },
-    # SpatialFrequencyResponse - structure (OECF/SFR=Columns,Rows,Names,Values)
     SpatialFrequencyResponse => {
         Groups => { 2 => 'Camera' },
-        Writable => 0,  # (this is a structure)
+        SubDirectory => { },
+        Struct => 'OECF',
     },
     SpatialFrequencyResponseColumns => {
         Groups => { 2 => 'Camera' },
@@ -721,6 +818,7 @@ sub DecodeBase64($);
     },
     FocalPlaneResolutionUnit => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         ValueConv => {
             1 => '25.4',
             2 => '25.4',
@@ -736,16 +834,15 @@ sub DecodeBase64($);
         },
     },
     SubjectLocation => {
-        Groups => { 2 => 'Image' },
         Writable => 'integer',
         List => 'Seq',
     },
     ExposureIndex => {
-        Groups => { 2 => 'Image' },
         Writable => 'rational',
     },
     SensingMethod => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             1 => 'Not defined',
             2 => 'One-chip color area',
@@ -756,38 +853,17 @@ sub DecodeBase64($);
             8 => 'Color sequential linear',
         },
     },
-    FileSource => {
-        Groups => { 2 => 'Image' },
-        PrintConv => {
-            3 => 'Digital Camera',
-        },
-    },
-    SceneType => {
-        Groups => { 2 => 'Image' },
-        PrintConv => {
-            1 => 'Directly photographed',
-        },
-    },
-    # CFAPattern - structure (CFAPattern=Columns,Rows,Values)
+    FileSource => { Writable => 'integer', PrintConv => { 3 => 'Digital Camera' } },
+    SceneType  => { Writable => 'integer', PrintConv => { 1 => 'Directly photographed' } },
     CFAPattern => {
-        Groups => { 2 => 'Image' },
-        Writable => 0,
+        SubDirectory => { },
+        Struct => 'CFAPattern',
     },
-    CFAPatternColumns => {
-        Groups => { 2 => 'Image' },
-        Writable => 'integer',
-    },
-    CFAPatternRows => {
-        Groups => { 2 => 'Image' },
-        Writable => 'integer',
-    },
-    CFAPatternValues => {
-        Groups => { 2 => 'Image' },
-        List => 'Seq',
-        Writable => 'integer',
-    },
+    CFAPatternColumns   => { Writable => 'integer' },
+    CFAPatternRows      => { Writable => 'integer' },
+    CFAPatternValues    => { List => 'Seq', Writable => 'integer' },
     CustomRendered => {
-        Groups => { 2 => 'Image' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'Normal',
             1 => 'Custom',
@@ -795,24 +871,22 @@ sub DecodeBase64($);
     },
     ExposureMode => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'Auto',
             1 => 'Manual',
             2 => 'Auto bracket',
         },
     },
-# (covered by crs)
-#    WhiteBalance => {
-#        Groups => { 2 => 'Camera' },
-#        PrintConv => {
-#            0 => 'Auto',
-#            1 => 'Manual',
-#        },
-#    },
-    DigitalZoomRatio => {
-        Groups => { 2 => 'Image' },
-        Writable => 'rational',
+    WhiteBalance => {
+        Groups => { 2 => 'Camera' },
+        Writable => 'integer',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Manual',
+        },
     },
+    DigitalZoomRatio => { Writable => 'rational' },
     FocalLengthIn35mmFilm => {
         Name => 'FocalLengthIn35mmFormat',
         Writable => 'integer',
@@ -820,6 +894,7 @@ sub DecodeBase64($);
     },
     SceneCaptureType => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'Standard',
             1 => 'Landscape',
@@ -829,6 +904,7 @@ sub DecodeBase64($);
     },
     GainControl => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'None',
             1 => 'Low gain up',
@@ -837,37 +913,40 @@ sub DecodeBase64($);
             4 => 'High gain down',
         },
     },
-# (covered by crs)
-#    Contrast => {
-#        Groups => { 2 => 'Camera' },
-#        PrintConv => {
-#            0 => 'Normal',
-#            1 => 'Soft',
-#            2 => 'Hard',
-#        },
-#    },
-# (covered by crs)
-#    Saturation => {
-#        Groups => { 2 => 'Camera' },
-#        PrintConv => {
-#            0 => 'Normal',
-#            1 => 'Low',
-#            2 => 'High',
-#        },
-#    },
-# (covered by crs)
-#    Sharpness => {
-#        Groups => { 2 => 'Camera' },
-#        PrintConv => {
-#            0 => 'Normal',
-#            1 => 'Soft',
-#            2 => 'Hard',
-#        },
-#    },
-    # DeviceSettingDescription (DeviceSettings structure=Columns,Rows,Settings)
+    Contrast => {
+        Groups => { 2 => 'Camera' },
+        Writable => 'integer',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Low',
+            2 => 'High',
+        },
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
+    },
+    Saturation => {
+        Groups => { 2 => 'Camera' },
+        Writable => 'integer',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Low',
+            2 => 'High',
+        },
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
+    },
+    Sharpness => {
+        Groups => { 2 => 'Camera' },
+        Writable => 'integer',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Soft',
+            2 => 'Hard',
+        },
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertParameter($val)',
+    },
     DeviceSettingDescription => {
         Groups => { 2 => 'Camera' },
-        Writable => 0,
+        SubDirectory => { },
+        Struct => 'DeviceSettings',
     },
     DeviceSettingDescriptionColumns => {
         Groups => { 2 => 'Camera' },
@@ -883,6 +962,7 @@ sub DecodeBase64($);
     },
     SubjectDistanceRange => {
         Groups => { 2 => 'Camera' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'Unknown',
             1 => 'Macro',
@@ -890,12 +970,13 @@ sub DecodeBase64($);
             3 => 'Distant',
         },
     },
-    ImageUniqueID   => { Groups => { 2 => 'Image' } },
+    ImageUniqueID   => { },
     GPSVersionID    => { Groups => { 2 => 'Location' } },
-    GPSLatitude     => { Groups => { 2 => 'Location' } },
-    GPSLongitude    => { Groups => { 2 => 'Location' } },
+    GPSLatitude     => { Groups => { 2 => 'Location' }, %latConv },
+    GPSLongitude    => { Groups => { 2 => 'Location' }, %longConv },
     GPSAltitudeRef  => {
         Groups => { 2 => 'Location' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'Above Sea Level',
             1 => 'Below Sea Level',
@@ -905,7 +986,6 @@ sub DecodeBase64($);
         Groups => { 2 => 'Location' },
         Writable => 'rational',
     },
-    GPSVersionID    => { Groups => { 2 => 'Location' } },
     GPSTimeStamp    => {
         Groups => { 2 => 'Time' },
         Writable => 'date',
@@ -918,6 +998,18 @@ sub DecodeBase64($);
             A => 'Measurement In Progress',
             V => 'Measurement Interoperability',
         },
+    },
+    GPSMeasureMode => {
+        Groups => { 2 => 'Location' },
+        Writable => 'integer',
+        PrintConv => {
+            2 => '2-Dimensional',
+            3 => '3-Dimensional',
+        },
+    },
+    GPSDOP => {
+        Groups => { 2 => 'Location' },
+        Writable => 'rational',
     },
     GPSSpeedRef => {
         Groups => { 2 => 'Location' },
@@ -953,8 +1045,8 @@ sub DecodeBase64($);
         Writable => 'rational',
     },
     GPSMapDatum     => { Groups => { 2 => 'Location' } },
-    GPSDestLatitude => { Groups => { 2 => 'Location' } },
-    GPSDestLongitude=> { Groups => { 2 => 'Location' } },
+    GPSDestLatitude => { Groups => { 2 => 'Location' }, %latConv },
+    GPSDestLongitude=> { Groups => { 2 => 'Location' }, %longConv },
     GPSDestBearingRef => {
         Groups => { 2 => 'Location' },
         PrintConv => {
@@ -982,89 +1074,122 @@ sub DecodeBase64($);
     GPSAreaInformation  => { Groups => { 2 => 'Location' } },
     GPSDifferential => {
         Groups => { 2 => 'Location' },
+        Writable => 'integer',
         PrintConv => {
             0 => 'No Correction',
             1 => 'Differential Corrected',
         },
     },
-#
-# - IPTC Core schema properties (Iptc4xmpCore)
-#
-    CountryCode         => { Groups => { 1 => 'XMP-iptcCore', 2 => 'Location' } },
-    # CreatorContactInfo - structure (ContactInfo=CiAdrCity,CiAdrCtry,CiAdrExtadr,
-    #                       CiAdrPcode, CiAdrRegion, CiEmailWork, CiTelWork, CiUrlWork)
+);
+
+# IPTC Core schema properties (Iptc4xmpCore)
+%Image::ExifTool::XMP::iptcCore = (
+    GROUPS => { 1 => 'XMP-iptcCore', 2 => 'Author' },
+    NAMESPACE => 'Iptc4xmpCore',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => q{
+IPTC Core schema tags.  The actual IPTC Core namespace schema prefix is
+C<Iptc4xmpCore>, which is the name used in the file, but ExifTool uses
+C<iptcCore> to generate the family 1 group name of XMP-iptcCore because
+XMP-Iptc4xmpCore is a bit lengthy.
+    },
+    CountryCode         => { Groups => { 2 => 'Location' } },
     CreatorContactInfo => {
-        Groups => { 2 => 'Author' },
-        Writable => 0,
+        SubDirectory => { },
+        Struct => 'ContactInfo',
     },
-    CreatorContactInfoCiAdrCity => {
-        Description => 'Creator City',
-        Groups => { 2 => 'Author' }
-    },
-    CreatorContactInfoCiAdrCtry => {
-        Description => 'Creator Country',
-        Groups => { 2 => 'Author' }
-    },
-    CreatorContactInfoCiAdrExtadr => {
-        Description => 'Creator Address',
-        Groups => { 2 => 'Author' }
-    },
-    CreatorContactInfoCiAdrPcode => {
-        Description => 'Creator Postal Code',
-        Groups => { 2 => 'Author' }
-    },
-    CreatorContactInfoCiAdrRegion => {
-        Description => 'Creator Region',
-        Groups => { 2 => 'Author' }
-    },
-    CreatorContactInfoCiEmailWork => {
-        Description => 'Creator Work Email',
-        Groups => { 2 => 'Author' }
-    },
-    CreatorContactInfoCiTelWork => {
-        Description => 'Creator Work Telephone',
-        Groups => { 2 => 'Author' }
-    },
-    CreatorContactInfoCiUrlWork => {
-        Description => 'Creator Work URL',
-        Groups => { 2 => 'Author' }
-    },
+    CreatorContactInfoCiAdrCity   => { Description => 'Creator City' },
+    CreatorContactInfoCiAdrCtry   => { Description => 'Creator Country' },
+    CreatorContactInfoCiAdrExtadr => { Description => 'Creator Address' },
+    CreatorContactInfoCiAdrPcode  => { Description => 'Creator Postal Code' },
+    CreatorContactInfoCiAdrRegion => { Description => 'Creator Region' },
+    CreatorContactInfoCiEmailWork => { Description => 'Creator Work Email' },
+    CreatorContactInfoCiTelWork   => { Description => 'Creator Work Telephone' },
+    CreatorContactInfoCiUrlWork   => { Description => 'Creator Work URL' },
     IntellectualGenre   => { Groups => { 2 => 'Other' } },
     Location            => { Groups => { 2 => 'Location' } },
     Scene               => { Groups => { 2 => 'Other' }, List => 'Bag' },
     SubjectCode         => { Groups => { 2 => 'Other' }, List => 'Bag' },
 );
 
-# composite tags
-# (the main script looks for the special 'Composite' hash)
-%Image::ExifTool::XMP::Composite = (
-    # Note: the following 2 composite tags are duplicated in Image::ExifTool::IPTC
-    # (only the first loaded definition is used)
-    DateTimeCreated => {
-        Description => 'Date/Time Created',
-        Groups => { 2 => 'Time' },
-        Require => {
-            0 => 'DateCreated',
-            1 => 'TimeCreated',
-        },
-        ValueConv => '"$val[0] $val[1]"',
-        PrintConv => '$self->ConvertDateTime($val)',
+# PixelLive schema properties (PixelLive) (ref 3)
+%Image::ExifTool::XMP::PixelLive = (
+    GROUPS => { 1 => 'XMP-PixelLive', 2 => 'Image' },
+    NAMESPACE => 'PixelLive',
+    WRITE_PROC => \&WriteXMP,
+    NOTES => q{
+PixelLive schema tags.  These tags are not writable because they are
+uncommon and there are name conflicts with other more common tags.
     },
-    # set the original date/time from DateTimeCreated if not set already
-    DateTimeOriginal => {
-        Condition => 'not defined($oldVal)',
-        Description => 'Shooting Date/Time',
-        Groups => { 2 => 'Time' },
-        Require => {
-            0 => 'DateTimeCreated',
-        },
-        ValueConv => '$val[0]',
-        PrintConv => '$valPrint[0]',
-    },
+    AUTHOR    => { Name => 'Author', Groups => { 2 => 'Author'} },
+    COMMENTS  => { Name => 'Comments' },
+    COPYRIGHT => { Name => 'Copyright' },
+    DATE      => { Name => 'Date', Groups => { 2 => 'Time'} },
+    GENRE     => { Name => 'Genre' },
+    TITLE     => { Name => 'Title' },
 );
 
-# add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::XMP::Composite');
+# Picture Licensing Universal System schema properties (xmpPLUS)
+%Image::ExifTool::XMP::xmpPLUS = (
+    GROUPS => { 1 => 'XMP-xmpPLUS', 2 => 'Author' },
+    NAMESPACE => 'xmpPLUS',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'XMP Picture Licensing Universal System (PLUS) schema tags.',
+    CreditLineReq   => { Writable => 'boolean' },
+    ReuseAllowed    => { Writable => 'boolean' },
+);
+
+# Creative Commons schema properties (cc) (ref 5)
+%Image::ExifTool::XMP::cc = (
+    GROUPS => { 1 => 'XMP-cc', 2 => 'Author' },
+    NAMESPACE => 'cc',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'Creative Commons schema tags.',
+    license => { },
+);
+
+# Description Explorer schema properties (dex) (ref 6)
+%Image::ExifTool::XMP::dex = (
+    GROUPS => { 1 => 'XMP-dex', 2 => 'Image' },
+    NAMESPACE => 'dex',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => q{
+Description Explorer schema tags.  These tags are not very common, and some
+are not made writable due to name conflicts with other XMP tags.
+    },
+    crc32       => { Name => 'CRC32', Writable => 'integer' },
+    source      => { Writable => 0 },
+    shortdescription => {
+        Name => 'ShortDescription',
+        Writable => 'lang-alt',
+    },
+    licensetype => {
+        Name => 'LicenseType',
+        PrintConv => {
+            unknown        => 'Unknown',
+            shareware      => 'Shareware',
+            freeware       => 'Freeware',
+            adware         => 'Adware',
+            demo           => 'Demo',
+            commercial     => 'Commercial',
+           'public domain' => 'Public Domain',
+           'open source'   => 'Open Source',
+        },
+    },
+    revision    => { },
+    rating      => { Writable => 0 },
+    os          => { Name => 'OS', Writable => 'integer' },
+    ffid        => { Name => 'FFID' },
+);
+
+# table to add tags in other namespaces
+%Image::ExifTool::XMP::other = (
+    GROUPS => { 2 => 'Unknown' },
+);
 
 
 #------------------------------------------------------------------------------
@@ -1144,13 +1269,11 @@ sub DecodeBase64($)
 #------------------------------------------------------------------------------
 # Generate a name for this XMP tag
 # Inputs: 0) reference to tag property name list
-# Returns: tag name and outtermost interesting namespace
-sub GetXMPTagName($)
+# Returns: tagID and outtermost interesting namespace
+sub GetXMPTagID($)
 {
     my $props = shift;
-    my $tag = '';
-    my $prop;
-    my $namespace;
+    my ($tag, $prop, $namespace);
     foreach $prop (@$props) {
         # split name into namespace and property name
         # (Note: namespace can be '' for property qualifiers)
@@ -1161,11 +1284,23 @@ sub GetXMPTagName($)
             $tag .= $1;
         } else {
             # all uppercase is ugly, so convert it
-            unless ($Image::ExifTool::XMP::Main{$nm} or $nm =~ /[a-z]/) {
-                $nm = lc($nm);
-                $nm =~ s/_([a-z])/\u$1/g;
+            if ($nm !~ /[a-z]/) {
+                my $xlatNS = $xlatNamespace{$ns} || $ns;
+                my $info = $Image::ExifTool::XMP::Main{$xlatNS};
+                my $table;
+                if (ref $info eq 'HASH' and $info->{SubDirectory}) {
+                    $table = Image::ExifTool::GetTagTable($info->{SubDirectory}->{TagTable});
+                }
+                unless ($table and $table->{$nm}) {
+                    $nm = lc($nm);
+                    $nm =~ s/_([a-z])/\u$1/g;
+                }
             }
-            $tag .= ucfirst($nm);       # add to tag name
+            if (defined $tag) {
+                $tag .= ucfirst($nm);       # add to tag name
+            } else {
+                $tag = $nm;
+            }
         }
         # save namespace of first property to contribute to tag name
         $namespace = $ns unless defined $namespace;
@@ -1188,8 +1323,20 @@ sub FoundXMP($$$$)
     local $_;
     my ($exifTool, $tagTablePtr, $props, $val) = @_;
 
-    my ($tag, $namespace) = GetXMPTagName($props);
+    my ($tag, $namespace) = GetXMPTagID($props);
     return unless $tag;     # ignore things that aren't valid tags
+
+    # translate namespace if necessary
+    $namespace = $xlatNamespace{$namespace} if $xlatNamespace{$namespace};
+    my $info = $tagTablePtr->{$namespace};
+    my $table;
+    if ($info) {
+        $table = $info->{SubDirectory}->{TagTable} or warn "Missing TagTable for $tag!\n";
+    } else {
+        $table = 'Image::ExifTool::XMP::other';
+    }
+    # change pointer to the table for this namespace
+    $tagTablePtr = Image::ExifTool::GetTagTable($table);
 
     # convert quotient and date values to a more sensible format
     if ($val =~ /^(-?\d+)\/(-?\d+)/) {
@@ -1197,29 +1344,15 @@ sub FoundXMP($$$$)
     } elsif ($val =~ /^(\d{4})-(\d{2})-(\d{2}).{1}(\d{2}:\d{2}:\d{2})(\S*)/) {
         $val = "$1:$2:$3 $4$5";     # convert back to EXIF time format
     }
-    # look up this tag in the XMP table
-    my $tagInfo;
-    my @tagInfoList = Image::ExifTool::GetTagInfoList($tagTablePtr, $tag);
-    if (@tagInfoList == 1) {
-        $tagInfo = $tagInfoList[0];
-    } elsif (@tagInfoList > 1) {
-        # decide which tag this is (decide based on group1 name)
-        foreach (@tagInfoList) {
-            next unless $_->{Namespace} and $_->{Namespace} eq $namespace;
-            $tagInfo = $_;
-            last;
-        }
-        # take first one from list if we didn't get a match
-        $tagInfo or $tagInfo = $tagInfoList[0];
-    } else {
+    # look up this tag in the appropriate table
+    my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+    unless ($tagInfo) {
         # construct tag information for this unknown tag
-        $tagInfo = { Name => $tag };
+        $tagInfo = { Name => ucfirst($tag) };
         Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
     }
     $tag = $exifTool->FoundTag($tagInfo, UnescapeHTML($val));
-    # translate namespace if necessary
-    $namespace = $xlatNamespace{$namespace} if $xlatNamespace{$namespace};
-    $exifTool->SetTagExtra($tag, $namespace);
+    $exifTool->SetTagExtra($tag, "XMP-$namespace") if $namespace;
 
     if ($exifTool->Options('Verbose')) {
         my $tagID = join('/',@$props);
@@ -1283,7 +1416,7 @@ sub ParseXMPElement($$$;$$)
             }
             # undefine value if we found more properties within this one
             undef $val if ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt);
-            CaptureXMP($exifTool, $tagTablePtr, $propListPt, $val, \%attrs);
+            CaptureXMP($exifTool, $propListPt, $val, \%attrs);
         } else {
             # trim comments and whitespace from rdf:Description properties only
             if ($prop eq 'rdf:Description') {
@@ -1330,20 +1463,20 @@ sub ParseXMPElement($$$;$$)
 
 #------------------------------------------------------------------------------
 # Process XMP data
-# Inputs: 0) ExifTool object reference, 1) Pointer to tag table, 2) DirInfo reference
+# Inputs: 0) ExifTool object reference, 1) DirInfo reference, 2) Pointer to tag table
 # Returns: 1 on success
 sub ProcessXMP($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart} || 0;
-    my $dirLen = $dirInfo->{DirLen};
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen};
     my $rtnVal = 0;
     my $buff;
 
     return 0 unless $tagTablePtr;
     # take substring if necessary
-    if ($dirInfo->{DataLen} != $dirStart + $dirLen) {
+    if ($$dirInfo{DataLen} != $dirStart + $dirLen) {
         $buff = substr($$dataPt, $dirStart, $dirLen);
         $dataPt = \$buff;
         $dirStart = 0;
@@ -1449,6 +1582,10 @@ it under the same terms as Perl itself.
 =item L<http://www.portfoliofaq.com/pfaq/v7mappings.htm>
 
 =item L<http://www.iptc.org/IPTC4XMP/>
+
+=item L<http://creativecommons.org/technology/xmp>
+
+=item L<http://www.optimasc.com/products/fileid/xmp-extensions.pdf>
 
 =back
 

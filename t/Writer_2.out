@@ -44,7 +44,7 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 5.53
+ExifToolVersion: 5.64
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -53,10 +53,10 @@ ExposureTime: 4
 ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
-FileModifyDate: 2005:07:29 07:32:51
+FileModifyDate: 2005:09:21 19:36:10
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
-FileSize: 3KB
+FileSize: 3 kB
 FileSource: Digital Camera
 FileType: JPEG
 Flash: No Flash
@@ -92,13 +92,13 @@ Lens: 18.0 - 55.0mm
 Lens35efl: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)
 LensType: Unknown (-1)
 LongFocal: 55
+MIMEType: image/jpeg
 MacroMode: Unknown (0)
 Make: Canon
 MaxAperture: 4
 MaxApertureValue: 4.5
 MeteringMode: Center-weighted averaging
 MeteringMode (1): Average
-MimeType: image/jpeg
 Model: Canon EOS DIGITAL REBEL
 ModifyDate: 2003:12:04 06:46:52
 Orientation: Horizontal (normal)

@@ -108,10 +108,15 @@ header file.  (but this is Perl, so I couldn't do that...)
 <tr><td>SAVE_NEW_VALUE</td><td>Hash of new value information which was overwritten after
     a call to SaveNewValues()</td></tr>
 
+<tr><td>SET_TAG_EXTRA</td><td>Value to use for TAG_EXTRA when new tags are found.  May start with
+    a '+' sign to add to existing group name</td></tr>
+
 <tr><td>TAG_EXTRA</td><td>Hash of extra information (IFD name or XMP namespace) keyed by
 	tag key</td></tr>
 
 <tr><td>TAG_INFO</td><td>Hash of tagInfo hash references, keyed by tag key</td></tr>
+
+<tr><td>TIFF_END</td><td>Location of end of regular TIFF file set by WriteExif()</td></tr>
 
 <tr><td>TIFF_TYPE</td><td>Type of TIFF data, only set if FILE_TYPE is TIFF.  Valid values
     are APP1, APP3, TIFF, CR2, MRW, JP2, JPX, NEF, PEF, ORF or DNG.</td></tr>

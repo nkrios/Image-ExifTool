@@ -102,7 +102,7 @@ sub FormatIPTC($$)
 sub IptcDate($)
 {
     my $val = shift;
-    $val =~ s/.*(\d{4}):(\d{2}):(\d{2}).*/$1$2$3/ or undef $val;
+    $val =~ s/.*(\d{4}):?(\d{2}):?(\d{2}).*/$1$2$3/ or undef $val;
     return $val;
 }
 
@@ -113,10 +113,10 @@ sub IptcDate($)
 sub IptcTime($)
 {
     my $val = shift;
-    if ($val =~ /\s*\b(\d{1,2}):(\d{1,2}):(\d{1,2})(\S*)/) {
+    if ($val =~ /\s*\b(\d{1,2}):?(\d{1,2}):?(\d{1,2})(\S*)/) {
         $val = sprintf("%.2d%.2d%.2d",$1,$2,$3);
         my $tz = $4;
-        if ($tz =~ /([+-]\d{1,2}):(\d{1,2})/) {
+        if ($tz =~ /([+-]\d{1,2}):?(\d{1,2})/) {
             $val .= sprintf("%+.2d%.2d",$1,$2);
         } else {
             $val .= '+0000';    # don't know the time zone
@@ -173,27 +173,27 @@ sub InvConvertPictureNumber($)
 
 #------------------------------------------------------------------------------
 # Write IPTC data record
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) source dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
+#         2) tag table reference
 # Returns: IPTC data block (may be empty if no IPTC data)
 # Notes: Increments ExifTool CHANGED flag for each tag changed
 sub WriteIPTC($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
-    my $dataPt = $dirInfo->{DataPt};
+    my $dataPt = $$dirInfo{DataPt};
     unless ($dataPt) {
         my $emptyData = '';
         $dataPt = \$emptyData;
     }
-    my $start = $dirInfo->{DirStart} || 0;
-    my $dirLen = $dirInfo->{DirLen};
+    my $start = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
     my ($tagInfo, %iptcInfo, $tag);
 
     # make sure our dataLen is defined (note: allow zero length directory)
     unless (defined $dirLen) {
-        my $dataLen = $dirInfo->{DataLen};
+        my $dataLen = $$dirInfo{DataLen};
         $dataLen = length($$dataPt) unless defined $dataLen;
         $dirLen = $dataLen - $start;
     }
@@ -252,8 +252,7 @@ sub WriteIPTC($$$)
             ($id, $rec, $tag, $len) = unpack("CCCn", $buff);
             if ($id == 0x1c) {
                 if ($rec < $lastRec) {
-                    $exifTool->Warn("IPTC doesn't conform to spec: Records out of sequence");
-                    return undef unless $exifTool->Options('IgnoreMinorErrors');
+                    return undef if $exifTool->Warn("IPTC doesn't conform to spec: Records out of sequence", 1);
                 }
                 # handle extended IPTC entry if necessary
                 $pos += 5;      # step to after field header
@@ -424,8 +423,7 @@ sub WriteIPTC($$$)
     if ($tail < $dirEnd) {
         my $trailer = substr($$dataPt, $tail, $dirEnd-$tail);
         if ($trailer =~ /[^\0]/) {
-            $exifTool->Warn('Unrecognized data in IPTC trailer');
-            return undef unless $exifTool->Options('IgnoreMinorErrors');
+            return undef if $exifTool->Warn('Unrecognized data in IPTC trailer', 1);
         }
         # add back a bit of zero padding ourselves
         $newData .= "\0" x 100 if length($newData) and not $exifTool->Options('Compact');

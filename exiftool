@@ -9,13 +9,25 @@
 #------------------------------------------------------------------------------
 use strict;
 require 5.004;
-require Image::ExifTool;
+
+# add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
+my $exeDir;
+BEGIN {
+    # get exe directory
+    ($exeDir = $0) =~ tr/\\/\//;    # for systems that use backslashes
+    # isolate directory specification
+    $exeDir =~ s/(.*)\/.*/$1/ or $exeDir = '.';
+    # add lib directory at start of include path
+    unshift @INC, "$exeDir/lib";
+}
+use Image::ExifTool;
 
 sub ScanDir($$);
 sub GetImageInfo($$);
 sub PrintTagList(@);
 sub LoadPrintFormat($);
 sub FilterGroups($$$);
+sub FilenameSPrintf($$);
 sub AddExclude($);
 sub IsExcluded($$);
 sub Cleanup();
@@ -23,17 +35,6 @@ sub SigInt();
 
 # do cleanup on Ctrl-C
 $SIG{INT} = 'SigInt';
-
-my $exeDir;
-BEGIN {
-    # get exe directory
-    $exeDir = $0;           # get exe directory from command
-    $exeDir =~ tr/\\/\//;   # for systems that use backslashes
-    # isolate directory specification
-    $exeDir =~ s/(.*)\/.*/$1/ or $exeDir = '.';
-    # add lib directory at start of include path
-    unshift @INC, "$exeDir/lib";
-}
 
 END {
     Cleanup();
@@ -72,6 +73,7 @@ my $isWriting = 0;  # flag set if we are writing tags
 my $outOpt;         # output file or directory name
 my $doUnzip;        # flag to extract info from .gz and .bz2 files
 my %setTags;        # hash of list references for tags to set from files
+my @dynamicFiles;   # list of files with dynamic names
 my $setTagsFile;    # filename for last TagsFromFile option
 my @exclude;        # list of excluded tags
 my %excludeGrp;     # hash of tags excluded by group
@@ -81,6 +83,7 @@ my $quiet = 0;      # flag to disable printing of informational messages / warni
 my $overwriteOriginal; # flag to overwrite original file
 my $filterFlag = 0; # file filter flag (0x01=allow extensions, 0x02=deny extensions)
 my %filterExt;      # lookup for filtered extensions
+my $verbose = 0;    # verbose setting
 
 # my warn and die routines
 sub Warn { warn(@_) if $quiet < 2 or $_[0] =~ /^Error/; }
@@ -130,6 +133,7 @@ while ($_ = shift) {
         }
         /^a$/i and $mainTool->Options(Duplicates => 1), next;
         /^b$/i and $binaryOutput = 1, next;
+        /^c$/  and $mainTool->Options('CoordFormat', shift || Die "Expecting coordinate format for -c option\n"), next;
         /^d$/  and $mainTool->Options('DateFormat', shift || Die "Expecting date format for -d option\n"), next;
         /^D$/  and $showTagID = 'D', next;
         /^e$/  and $mainTool->Options(Composite => 0), next;
@@ -165,10 +169,8 @@ while ($_ = shift) {
         /^u$/  and $mainTool->Options(Unknown => $mainTool->Options('Unknown')+1), next;
         /^U$/  and $mainTool->Options(Unknown => 2), next;
         if (/^v(\d*)$/i) {
-            my $ver = $1;
-            # -v with no # increments the verbosity
-            $ver eq '' and $ver = $mainTool->Options('Verbose') + 1;
-            $mainTool->Options(Verbose => $ver);
+            $verbose = $1 eq '' ? $verbose + 1 : $1;
+            $mainTool->Options(Verbose => $verbose);
             next;
         }
         /^w$/i and $outputExt = shift || Die("Expecting output extension for -w option\n"), next;
@@ -263,9 +265,13 @@ if (@newValues) {
         if ($tag =~ /^(All)?TagsFromFile$/i) {
             Die "Need file name for -TagsFromFile\n" unless defined $newVal;
             ++$isWriting;
-            next if $newVal eq '@'; # set tags from destination file later
+            if ($newVal =~ /(@|%(d|f|e))/) {
+                push @dynamicFiles, $newVal;
+                next;   # set tags from dynamic file later
+            }
             -e $newVal or Die "File '$newVal' does not exist for -TagsFromFile option\n";
             # set specified tags from this file
+            $verbose and print("Setting new values from $newVal\n");
             my $info = $mainTool->SetNewValuesFromFile($newVal, @{$setTags{$newVal}});
             $info->{Error} and Die "Error: $info->{Error} - $newVal\n";
             if ($info->{Warning}) {
@@ -310,7 +316,7 @@ if (@newValues) {
 }
 
 # disable console output if -v option used and no tags specified
-if ($mainTool->Options('Verbose') and not (@tags or @exclude or $outputExt)) {
+if ($verbose and not (@tags or @exclude or $outputExt)) {
     $disableOutput = 1;
 }
 
@@ -337,8 +343,9 @@ if (defined $showGroup and not (@tags and $allGroup)) {
 }
 
 if ($outputExt) {
-    # add '.' before output extension if it doesn't contain one already
-    $outputExt = ".$outputExt" unless $outputExt =~ /\./;
+    $outputExt =~ tr/\\/\//;    # make all forward slashes
+    # add '.' before output extension if necessary
+    $outputExt = ".$outputExt" unless $outputExt =~ /[.%]/;
 }
 
 # scan through all specified files
@@ -371,25 +378,34 @@ exit 0;     # all done
 
 #------------------------------------------------------------------------------
 # Set information in file
-# Inputs: 0) ExifTool object reference, 1) file name
+# Inputs: 0) ExifTool object reference, 1) source file name
 # Returns: true on success
 sub SetImageInfo($$)
 {
     my ($exifTool, $file) = @_;
 
     # set tags from destination file if required
-    if ($setTags{'@'}) {
+    my $dyFile;
+    foreach $dyFile (@dynamicFiles) {
+        my $fromFile;
+        if ($dyFile eq '@') {
+            $fromFile = $file;
+        } else {
+            $fromFile = FilenameSPrintf($dyFile, $file);
+            ++$countBadWr, return 0 unless defined $fromFile;
+        }
         # restore previous values if necessary
         $exifTool->RestoreNewValues();
         # add new values from the current file
-        my $info = $exifTool->SetNewValuesFromFile($file, @{$setTags{'@'}});
+        $verbose and print "Setting new values from $fromFile\n";
+        my $info = $exifTool->SetNewValuesFromFile($fromFile, @{$setTags{$dyFile}});
         if ($info->{Error}) {
-            Warn("Error: $info->{Error} - $file\n");
+            Warn("Error: $info->{Error} - $fromFile\n");
             ++$countBadWr;
             return 0;
         }
         if ($info->{Warning}) {
-            Warn "Warning: $info->{Warning} - $file\n";
+            Warn "Warning: $info->{Warning} - $fromFile\n";
             delete $info->{Warning};
         }
     }
@@ -477,6 +493,27 @@ sub SetImageInfo($$)
     }
     undef $tmpFile;
     return $success;
+}
+
+#------------------------------------------------------------------------------
+# A sort of sprintf for filenames
+# Inputs: 0) format string (%d=dir, %f=file name, %e=ext), 1) source filename
+# Returns: new filename or undef on error
+sub FilenameSPrintf($$)
+{
+    my ($fmt, $file) = @_;
+    $file =~ s/\\/\//g; # make sure we are using forward slashes
+    # split filename into directory, file, extension
+    my @parts = ($file =~ /^(.*?)([^\/]*?)[.]?([^.\/]*)$/);
+    unless (@parts) {
+        Warn "Error: Bad pattern match for file $file\n";
+        return undef;
+    }
+    foreach ('d','f','e') {
+        my $part = shift @parts;
+        $fmt =~ s/%$_/$part/g;
+    }
+    return $fmt;
 }
 
 #------------------------------------------------------------------------------
@@ -589,9 +626,29 @@ sub GetImageInfo($$)
     my $fp;
     my $outfile;
     if ($outputExt) {
-        $outfile = $file;
-        $outfile =~ s/\.[^.\/\\]*$//; # remove extension if it exists
-        $outfile .= $outputExt;
+        ($outfile = $file) =~ tr/\\/\//;
+        if ($outputExt =~ /%(d|f|e)/) {
+            # make filename from printf-like $outputExt
+            $outfile = FilenameSPrintf($outputExt, $file);
+            # create directory if necessary
+            my $dir;
+            ($dir = $outfile) =~ s/[^\/]*$//;
+            if ($dir and not -d $dir) {
+                my @parts = split /\//, $dir;
+                $dir = '';
+                foreach (@parts) {
+                    $dir .= $_;
+                    if ($dir and not -d $dir) {
+                        # create directory since it doesn't exist
+                        mkdir($dir, 0777) or Die "Error creating directory $dir\n";
+                    }
+                    $dir .= '/';
+                }
+            }
+        } else {
+            $outfile =~ s/\.[^.\/]*$//; # remove extension if it exists
+            $outfile .= $outputExt;
+        }
         if (-e $outfile) {
             Warn "Output file $outfile already exists for $file\n";
             return;
@@ -610,11 +667,12 @@ sub GetImageInfo($$)
         foreach (@printFmt) {
             my $line = $_;  # copy the print format line
             while ($line =~ /(.*?)\$([-a-zA-Z_0-9]+)(.*)/s) {
-                my ($pre, $tag, $group);
+                my ($pre, $tag, $group, $family);
                 ($pre, $tag, $line) = ($1, $2, $3);
                 # check to see if this is a group name
                 if ($line =~ /^:([-a-zA-Z_0-9]+)(.*)/s) {
                     $group = lc($tag);
+                    $family = $1 if $group =~ s/^(\d+)//;
                     ($tag, $line) = ($1, $2);
                 }
                 my $val;
@@ -622,8 +680,8 @@ sub GetImageInfo($$)
                     # find the specified tag
                     my @matches = grep /^$tag(\s|$)/i, @foundTags;
                     foreach $tag (@matches) {
-                        next unless ($group eq lc($exifTool->GetGroup($tag, 0)) or
-                                     $group eq lc($exifTool->GetGroup($tag, 1)));
+                        my @groups = $exifTool->GetGroup($tag, $family);
+                        next unless grep /^$group$/i, @groups;
                         $val = $info->{$tag};
                     }
                 } else {
@@ -797,7 +855,10 @@ sub FilterGroups($$$)
         my $numFound = scalar @newFoundTags;
         if ($groupTag =~ /(.+?):(.+)/) {
             my $group = lc($1);
-            if ($2 eq '*') {
+            my $t = $2;
+            my $family;
+            $family = $1 if $group =~ s/^(\d+)//;
+            if ($t eq '*') {
                 # add all tags from specified group
                 unless ($allInfo) {
                     # get all information
@@ -808,8 +869,8 @@ sub FilterGroups($$$)
                 my $tag2;
                 my %addedTag;
                 foreach $tag2 (@allTags) {
-                    next unless ($group eq lc($exifTool->GetGroup($tag2, 0)) or
-                                 $group eq lc($exifTool->GetGroup($tag2, 1)));
+                    my @groups = $exifTool->GetGroup($tag2, $family);
+                    next unless grep /^$group$/i, @groups;
                     next if IsExcluded($exifTool, $tag2);
                     # don't allow duplicates within a group unless specified
                     unless ($dups) {
@@ -823,7 +884,6 @@ sub FilterGroups($$$)
                 $tag = shift @$foundTags;   # continue with next tag
             } else {
                 # only allow the specific GROUP:TAG requested
-                my $group = lc($1);
                 my (@matches, $addDummy);
                 for (;;) {
                     unless (IsExcluded($exifTool, $tag)) {
@@ -831,10 +891,11 @@ sub FilterGroups($$$)
                         if ($group eq '*') {
                             # allow duplicates for individual tag if group is '*'
                             push @newFoundTags, $tag;
-                        } elsif ($group eq lc($exifTool->GetGroup($tag, 0)) or
-                                 $group eq lc($exifTool->GetGroup($tag, 1)))
-                        {
-                            push @matches, $tag;
+                        } else {
+                            my @groups = $exifTool->GetGroup($tag, $family);
+                            if (grep /^$group$/i, @groups) {
+                                push @matches, $tag;
+                            }
                         }
                     }
                     $tag = shift @$foundTags;
@@ -1002,22 +1063,24 @@ supported by exiftool (r = read support, w = write support):
 
      Meta Information                        File Type
     ------------------          -----------------------------------
-    EXIF           r/w          JPEG  r/w      JP2   r      PDF   r
-    GPS            r/w          TIFF  r/w      BMP   r      PSD   r
-    IPTC           r/w          GIF   r/w      PNG   r      MRW   r
-    XMP            r/w          THM   r/w      MNG   r      ORF   r
-    MakerNotes     r/w          CRW   r/w      JNG   r
-    Photoshop IRB  r/w          CR2   r/w      MIFF  r
-    GeoTIFF        r            DNG   r/w      EPS   r
-    ICC Profile    r            NEF   r/w      PS    r
-    PrintIM        r            PEF   r/w      AI    r
+    EXIF           r/w          JPEG  r/w     PNG   r/w     PDF   r
+    GPS            r/w          TIFF  r/w     MNG   r/w     PS    r
+    IPTC           r/w          GIF   r/w     JNG   r/w     EPS   r
+    XMP            r/w          THM   r/w     PPM   r/w     AI    r
+    MakerNotes     r/w          CRW   r/w     PGM   r/w     PSD   r
+    Photoshop IRB  r/w          CR2   r/w     PBM   r/w     MIFF  r
+    JFIF           r            NEF   r/w     JP2   r       PICT  r
+    GeoTIFF        r            PEF   r/w     BMP   r       MP3   r
+    ICC Profile    r            MRW   r/w     ORF   r       WAV   r
+    PrintIM        r            MOS   r/w     RAF   r       MOV   r
+    ID3            r            DNG   r/w     SRF   r
 
 =head1 OPTIONS
 
 Note:  Case is not significant for any command-line option (including tag
 and group names), except for single-character options where the
 corresponding upper case option is defined.  Multiple options can NOT be
-combined into a single argument, because this would be interpreted as a tag
+combined into a single argument, because that would be interpreted as a tag
 name.
 
 =over 5
@@ -1089,9 +1152,24 @@ suppressed).
 Output requested data in B<b>inary format.  Mainly used for extracting
 embedded images.  Suppresses output of tag names and descriptions.
 
+=item B<-c> I<FMT>
+
+Set the print format for GPS B<c>oordinates.  C<FMT> uses the same syntax as
+the C<printf> format string.  The specifiers correspond to degrees, minutes
+and seconds in that order, but minutes and seconds are optional.  For
+example, the following table gives the output for the same coordinate using
+various formats:
+
+            FMT                  Output
+    -------------------    ------------------
+    "%d deg %d' %.2f"\"    54 deg 59' 22.80"   (the default)
+    "%d deg %.4f min"      54 deg 59.3800 min
+    "%.6f degrees"         54.989667 degrees
+
 =item B<-d> I<FMT>
 
-Set B<d>ate/time format (consult C<strftime> man page for FMT syntax).
+Set B<d>ate/time format (consult C<strftime> man page for FMT syntax).  The
+default format is equivalent to "%Y:%m:%d %H:%M:%S".
 
 =item B<-D>
 
@@ -1243,7 +1321,7 @@ Print tag names instead of descriptions (very B<s>hort format, same as two
 Output a B<t>ab-delimited list of description/values (useful for database
 import).
 
-=item B<-TagsFromFile> I<SRCFILE>
+=item B<-TagsFromFile> I<SRCFILE> or I<FMT>
 
 Set the value of writable tags from information in the specified source
 file.  Tag names on the command line after this option specify information
@@ -1277,6 +1355,10 @@ processing multiple files.  Specified tags are then copied from each target
 file in turn as it is rewritten.  As a convenience, C<-TagsFromFile @> is
 assumed for any redirected tags which are specified without a prior
 C<-TagsFromFile> option.
+
+For advanced batch use, the source file name may also be specified using a
+C<FMT> string in which %d, %f and %e represent the directory, file name and
+extension of the target file (similar to the C<-w> option).
 
 See L</COPYING EXAMPLES> for examples of how to use this option.
 
@@ -1313,11 +1395,20 @@ extracted.
 
 Print version number and exit.
 
-=item B<-w> I<EXT>
+=item B<-w> I<EXT> or I<FMT>
 
 B<W>rite console output to a file with name ending in C<EXT> for each source
 file.  The output file name is obtained by replacing the source file
-extension (including the C<.>) with the specified extension.
+extension (including the C<.>) with the specified extension.  Alternatively,
+a format statement may be used to give more control over the output file
+name and directory.  In this case, C<FMT> is a string specifying the output
+file name.  In this string, %d, %f and %e represent the directory, filename
+and extension of the source file.  Output directories are created
+automatically if necessary.  For example:
+
+    -w %d%f.txt       # same effect as "-w txt"
+    -w dir/%f_%e.out  # writes files to "dir" as "FILE_EXT.out"
+    -w dir2/%d%f.txt  # writes to "dir2", keeping dir structure
 
 =item B<-x> I<TAG>
 
@@ -1455,7 +1546,7 @@ Set C<WhiteBalance> to C<Tungsten> only if it was previously C<Auto>.
 Copy the values of all writable tags from C<src.crw> to C<dst.jpg>, writing
 the information to the preferred groups.
 
-=item exiftool -TagsFromFile -all:all src.crw dst.jpg
+=item exiftool -TagsFromFile src.crw -all:all dst.jpg
 
 Copy the values of all writable tags from C<src.crw> to C<dst.jpg>,
 preserving the original tag groups.
@@ -1484,8 +1575,8 @@ tags.
 
 Use the original date from the meta information to set the same file's
 filesystem modification date for all images in a directory.  (Note that
-C<-TagsFromFile @> has been omitted from this command since it is assumed
-when redirecting information unless another C<-TagsFromFile> is specified.)
+C<-TagsFromFile @> is assumed if no other C<-TagsFromFile> is specified when
+redirecting information as in this example.)
 
 =item exiftool -TagsFromFile src.jpg '-all>xmp:all' dst.jpg
 
@@ -1500,6 +1591,11 @@ iptc2xmp.args, which is a file included with the ExifTool distribution that
 contains the required arguments to convert IPTC information to XMP format.
 Also included with the distribution is xmp2iptc.args, which performs the
 inverse conversion.
+
+=item exiftool -tagsfromfile %d%f.CRW -r -ext JPG dir
+
+Recursively rewrite all C<JPG> images in C<dir> with information copied from
+the corresponding C<CRW> images in the same directories.
 
 =back
 

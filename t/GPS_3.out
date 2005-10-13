@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.66
 [File, File, Image]  - File Name: GPS_3_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 2KB
-[File, File, Time]  - File Modification Date/Time: 2005:07:29 07:32:22
+[File, File, Image]  - File Size: 2 kB
+[File, File, Time]  - File Modification Date/Time: 2005:10:08 20:19:00
 [File, File, Image]  - File Type: JPEG
-[File, File, Image]  - Mime Type: image/jpeg
+[File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 120
 [File, File, Image]  - Image Height: 80
 [EXIF, IFD0, Image] 270 - Image Description: Communications
@@ -52,9 +52,9 @@
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [GPS, GPS, Location] 0 - GPS Version ID: 2.0.0.0
 [GPS, GPS, Location] 1 - GPS Latitude Ref: South
-[GPS, GPS, Location] 2 - GPS Latitude: 12 deg 21' 23.345"
+[GPS, GPS, Location] 2 - GPS Latitude: 12 deg 21' 23.34"
 [GPS, GPS, Location] 3 - GPS Longitude Ref: West
-[GPS, GPS, Location] 4 - GPS Longitude: 1 deg 54.85' 0"
+[GPS, GPS, Location] 4 - GPS Longitude: 1 deg 54' 51.00"
 [GPS, GPS, Time] 7 - GPS Time Stamp: 14:58:24
 [GPS, GPS, Location] 18 - GPS Map Datum: WGS84
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
@@ -77,6 +77,7 @@
 [IPTC, IPTC, Author] 116 - Copyright Notice: ian Britton - FreeFoto.com
 [Composite, Composite, Image]  - Aperture: 0.6
 [Composite, Composite, Camera]  - Flash: Off
+[Composite, Composite, Other]  - GPS Position: 12 deg 21' 23.34" S, 1 deg 54' 51.00" W
 [Composite, Composite, Image]  - Image Size: 120x80
 [Composite, Composite, Image]  - Shutter Speed: 1/724
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

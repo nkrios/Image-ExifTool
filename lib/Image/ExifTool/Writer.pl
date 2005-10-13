@@ -14,7 +14,7 @@ package Image::ExifTool;
 
 use strict;
 
-use Image::ExifTool::TagLookup qw(FindTagInfo);
+use Image::ExifTool::TagLookup qw(FindTagInfo TagExists);
 
 sub AssembleRational($$@);
 sub LastInList($);
@@ -24,44 +24,47 @@ my $evalWarning;        # eval warning message
 
 # the following is a road map of where we write each directory
 # in the different types of files.
-my %dirMap = (
-    JPEG => {
-        IFD0         => 'APP1',
-        IFD1         => 'APP1',
-        XMP          => 'APP1',
-        ICC_Profile  => 'APP2',
-        Photoshop    => 'APP13',
-        EXIF         => 'IFD0', # to write EXIF as a block
-        ExifIFD      => 'IFD0',
-        GPS          => 'IFD0',
-        SubIFD       => 'IFD0',
-        GlobParamIFD => 'IFD0',
-        PrintIM      => 'IFD0',
-        IPTC         => 'Photoshop',
-        InteropIFD   => 'ExifIFD',
-        MakerNotes   => 'ExifIFD',
-        Comment      => 'COM',
-    },
-    TIFF => {
-        IFD0         => 'TIFF',
-        IFD1         => 'TIFF',
-        XMP          => 'IFD0',
-        ICC_Profile  => 'IFD0',
-        ExifIFD      => 'IFD0',
-        GPS          => 'IFD0',
-        SubIFD       => 'IFD0',
-        GlobParamIFD => 'IFD0',
-        PrintIM      => 'IFD0',
-        IPTC         => 'IFD0',
-        InteropIFD   => 'ExifIFD',
-        MakerNotes   => 'ExifIFD',
-    },
+my %tiffMap = (
+    IFD0         => 'TIFF',
+    IFD1         => 'IFD0',
+    XMP          => 'IFD0',
+    ICC_Profile  => 'IFD0',
+    ExifIFD      => 'IFD0',
+    GPS          => 'IFD0',
+    SubIFD       => 'IFD0',
+    GlobParamIFD => 'IFD0',
+    PrintIM      => 'IFD0',
+    IPTC         => 'IFD0',
+    InteropIFD   => 'ExifIFD',
+    MakerNotes   => 'ExifIFD',
 );
+my %jpegMap = (
+    IFD0         => 'APP1',
+    IFD1         => 'IFD0',
+    XMP          => 'APP1',
+    ICC_Profile  => 'APP2',
+    Photoshop    => 'APP13',
+    EXIF         => 'IFD0', # to write EXIF as a block
+    ExifIFD      => 'IFD0',
+    GPS          => 'IFD0',
+    SubIFD       => 'IFD0',
+    GlobParamIFD => 'IFD0',
+    PrintIM      => 'IFD0',
+    IPTC         => 'Photoshop',
+    InteropIFD   => 'ExifIFD',
+    MakerNotes   => 'ExifIFD',
+    Comment      => 'COM',
+);
+my %dirMap = (
+    JPEG => \%jpegMap,
+    TIFF => \%tiffMap,
+);
+
 # groups we are allowed to delete (Note: these names must either
 # exist in %dirMap, or be translated in InitWriteDirs())
 my @delGroups = qw(
     EXIF ExifIFD File GlobParamIFD GPS IFD0 IFD1 InteropIFD
-    ICC_Profile IPTC MakerNotes Photoshop PrintIM SubIFD XMP
+    ICC_Profile IPTC MakerNotes PNG Photoshop PrintIM SubIFD XMP
 );
 # names of valid EXIF directories:
 my %exifDirs = (
@@ -115,6 +118,12 @@ sub SetNewValue($;$$%)
     my $protected = $options{Protected} || 0;
     my $numSet = 0;
 
+    # make sure the Perl UTF-8 flag is OFF for the value with perl 5.8 or greater
+    # (otherwise our byte manipulations get corrupted!!)
+    if ($] >= 5.008 and defined $value) {
+        require Encode;
+        Encode::_utf8_off($value);
+    }
     unless (defined $tag) {
         # remove any existing set values
         delete $self->{NEW_VALUE};
@@ -127,17 +136,18 @@ sub SetNewValue($;$$%)
         $options{Group} = $1 if $1 ne '*' and lc($1) ne 'all';
         $tag = $2;
     }
+    my $wantGroup = $options{Group};
     $tag =~ s/ .*//;    # convert from tag key to tag name if necessary
     my @matchingTags = FindTagInfo($tag);
-    unless (@matchingTags) {
+    until (@matchingTags) {
         if ($tag eq '*' or lc($tag) eq 'all') {
             # set groups to delete
             if (defined $value) {
                 $err = "Can't set value for all tags";
             } else {
                 my (@del, $grp);
-                if ($options{Group}) {
-                    @del = grep /^$options{Group}$/i, @delGroups;
+                if ($wantGroup) {
+                    @del = grep /^$wantGroup$/i, @delGroups;
                 } else {
                     push @del, @delGroups;
                 }
@@ -154,11 +164,25 @@ sub SetNewValue($;$$%)
                         }
                     }
                 } else {
-                    $err = "Not a deletable group: $options{Group}";
+                    $err = "Not a deletable group: $wantGroup";
                 }
             }
         } else {
-            $err = "Tag '$tag' does not exist";
+            require Image::ExifTool::Shortcuts;
+            my ($match) = grep /^\Q$tag\E$/i, keys %Image::ExifTool::Shortcuts::Main;
+            # allow an alias to be used
+            if ($match and @{$Image::ExifTool::Shortcuts::Main{$match}} == 1) {
+                $tag = $Image::ExifTool::Shortcuts::Main{$match}->[0];
+                @matchingTags = FindTagInfo($tag);
+                last if @matchingTags;
+            }
+            if (not TagExists($tag)) {
+                $err = "Tag '$tag' does not exist";
+            } elsif ($wantGroup) {
+                $err = "Sorry, $wantGroup:$tag doesn't exist or isn't writable";
+            } else {
+                $err = "Sorry, $tag is not writable";
+            }
         }
         if (wantarray) {
             return ($numSet, $err);
@@ -169,9 +193,8 @@ sub SetNewValue($;$$%)
     }
     # get group name that we're looking for
     my $foundMatch = 0;
-    my ($wantGroup, $ifdName);
-    if ($options{Group}) {
-        $wantGroup = $options{Group};
+    my $ifdName;
+    if ($wantGroup) {
         # set $ifdName if this group is a valid IFD or SubIFD name
         if ($wantGroup =~ /^IFD(\d+)$/i) {
             $ifdName = "IFD$1";
@@ -219,7 +242,13 @@ sub SetNewValue($;$$%)
         # before checking Writable flag
         my $table = $tagInfo->{Table};
         my $writeProc = $table->{WRITE_PROC};
+        # load parent table if this was a user-defined table
+        if ($table->{PARENT}) {
+            my $parent = GetTagTable($table->{PARENT});
+            $writeProc = $parent->{WRITE_PROC} unless $writeProc;
+        }
         next unless $writeProc and &$writeProc();
+        # must still check writable flags in case of UserDefined tags
         my $writable = $tagInfo->{Writable};
         next unless $writable or ($table->{WRITABLE} and not defined $writable);
         # don't write tag if protected
@@ -318,10 +347,14 @@ sub SetNewValue($;$$%)
                 # capture eval warnings too
                 local $SIG{__WARN__} = sub { $evalWarning = $_[0]; };
                 undef $evalWarning;
-                #### eval PrintConvInv/ValueConvInv ($val)
-                $val = eval $convInv;
-                if ($@ or $evalWarning) {
+                if (ref($convInv) eq 'CODE') {
+                    $val = &$convInv($val, $self);
+                } else {
+                    #### eval PrintConvInv/ValueConvInv ($val)
+                    $val = eval $convInv;
                     $@ and $evalWarning = $@;
+                }
+                if ($evalWarning) {
                     chomp $evalWarning;
                     $evalWarning =~ s/ at \(eval .*//s;
                     $err = "$evalWarning in $wgrp1:$tag (${type}Inv)";
@@ -399,6 +432,12 @@ sub SetNewValue($;$$%)
 
         # set value in NEW_VALUE hash
         if (defined $val) {
+            if ($options{AddValue} and not $tagInfo->{List}) {
+                $err = "Can't add $wgrp1:$tag (not a List type)";
+                $verbose > 2 and print "$err\n";
+                next;
+            }
+            # we are editing this tag, so create a NEW_VALUE hash entry
             my $newValueHash = $self->GetNewValueHash($tagInfo, $writeGroup, 'create');
             if ($options{DelValue} or $options{AddValue}) {
                 if ($options{DelValue}) {
@@ -411,10 +450,6 @@ sub SetNewValue($;$$%)
                         my $fromList = $tagInfo->{List} ? ' from list' : '';
                         print "$verb $wgrp1:$tag$fromList if value is '$val'\n";
                     }
-                } elsif ($options{AddValue} and not $tagInfo->{List}) {
-                    $err = "Can't add $wgrp1:$tag (not a List type)";
-                    $verbose > 2 and print "$err\n";
-                    next;
                 }
                 # flag any AddValue or DelValue by creating the DelValue list
                 $newValueHash->{DelValue} or $newValueHash->{DelValue} = [ ];
@@ -422,7 +457,7 @@ sub SetNewValue($;$$%)
             # set priority flag to add only the high priority info
             # (will only create the priority tag if it doesn't exist,
             #  others get changed only if they already exist)
-            if ($preferred{$tagInfo}) {
+            if ($preferred{$tagInfo} or $tagInfo->{Table}->{PREFERRED}) {
                 if ($permanent) {
                     # don't create permanent tag but define IsCreating
                     # so we know that it is the preferred tag
@@ -491,7 +526,8 @@ sub SetNewValue($;$$%)
         warn "$err\n" unless wantarray or $verbose > 2;
     } elsif (not $numSet) {
         if ($foundMatch) {
-            $err = "Sorry, $tag is not writable";
+            my $pre = $wantGroup ? "$wantGroup:" : '';
+            $err = "Sorry, $pre$tag is not writable";
         } else {
             $err = "Tag '$wantGroup:$tag' does not exist";
         }
@@ -903,26 +939,40 @@ sub WriteInfo($$$)
         # (note: disable buffering for a normal file -- $infile ne '-')
         my $isRandom = (ref $infile or $infile eq '-') ? 0 : 1;
         my $raf = new File::RandomAccess($inRef, $isRandom);
-     #   $raf->Debug();
+       # $raf->Debug() and warn "  RAF debugging enabled!\n";
         my $inPos = $raf->Tell();
         $raf->BinMode();
         $self->{RAF} = $raf;
+        my %dirInfo = (
+            RAF => $raf,
+            OutFile => $outRef,
+        );
         for (;;) {
             my $type = shift @fileTypeList;
             # save file type in member variable
-            $self->{FILE_TYPE} = $type;
+            $dirInfo{Parent} = $self->{FILE_TYPE} = $type;
             # determine which directories we must write for this file type
             $self->InitWriteDirs($type);
             if ($type eq 'JPEG') {
-                $rtnVal = $self->WriteJPEG($outRef);
+                $rtnVal = $self->WriteJPEG(\%dirInfo);
             } elsif ($type eq 'TIFF') {
-                $rtnVal = $self->TiffInfo($tiffType, $raf, 0, $outRef);
+                $dirInfo{Parent} = $tiffType;
+                $rtnVal = $self->ProcessTIFF(\%dirInfo);
             } elsif ($type eq 'GIF') {
-                $rtnVal = $self->GifInfo($outRef);
+                $rtnVal = $self->ProcessGIF(\%dirInfo);
             } elsif ($type eq 'CRW') {
-                # must be sure we have loaded CanonRaw before we can call CrwInfo()
+                # must be sure we have loaded CanonRaw before we can call WriteCRW()
                 GetTagTable('Image::ExifTool::CanonRaw::Main');
-                $rtnVal = Image::ExifTool::CanonRaw::WriteCRW($self, $outRef);
+                $rtnVal = Image::ExifTool::CanonRaw::WriteCRW($self, \%dirInfo);
+            } elsif ($type eq 'MRW') {
+                GetTagTable('Image::ExifTool::Minolta::Main');
+                $rtnVal = Image::ExifTool::Minolta::ProcessMRW($self, \%dirInfo);
+            } elsif ($type eq 'PNG') {
+                GetTagTable('Image::ExifTool::PNG::Main');
+                $rtnVal = Image::ExifTool::PNG::ProcessPNG($self, \%dirInfo);
+            } elsif ($type eq 'PPM') {
+                require Image::ExifTool::PPM;
+                $rtnVal = Image::ExifTool::PPM::ProcessPPM($self, \%dirInfo);
             } else {
                 $rtnVal = 0;
             }
@@ -1004,7 +1054,10 @@ sub GetAllTags()
             my $tagInfo;
             foreach $tagInfo (@infoArray) {
                 my $tag = $$tagInfo{Name} || die "no name for tag!\n";
-                $allTags{$tag} = 1;
+                # don't list subdirectories unless they are writable
+                if ($$tagInfo{Writable} or not $$tagInfo{SubDirectory}) {
+                    $allTags{$tag} = 1;
+                }
             }
         }
     }
@@ -1069,6 +1122,9 @@ sub GetAllGroups($)
         foreach (TagTableKeys($table)) {
             my @infoArray = GetTagInfoList($table,$_);
             my ($tagInfo, $groups, $group);
+            if ($groups = $$table{GROUPS} and $group = $$groups{$family}) {
+                $allGroups{$group} = 1;
+            }
             foreach $tagInfo (@infoArray) {
                 if ($groups = $$tagInfo{Groups} and $group = $$groups{$family}) {
                     $allGroups{$group} = 1;
@@ -1243,9 +1299,13 @@ sub LoadAllTables()
         # load all of our non-referenced tables (first our modules)
         my $table;
         foreach $table (@loadAllTables) {
-            GetTagTable("Image::ExifTool::${table}::Main");
+            my $tableName = "Image::ExifTool::$table";
+            $tableName .= '::Main' unless $table =~ /:/;
+            GetTagTable($tableName);
         }
         # (then our special tables)
+        GetTagTable('Image::ExifTool::JFIF::Main');
+        GetTagTable('Image::ExifTool::JFIF::Extension');
         GetTagTable('Image::ExifTool::APP12');
         GetTagTable('Image::ExifTool::Extra');
         GetTagTable('Image::ExifTool::Composite');
@@ -1413,28 +1473,26 @@ sub InitWriteDirs($$)
 }
 
 #------------------------------------------------------------------------------
-# Write tags from specified tag table
-# Inputs: 0) ExifTool object reference
-#         1) tag table reference
-#         2) optional source directory information reference
-#         3) optional reference to writing procedure
+# Write an image directory
+# Inputs: 0) ExifTool object reference, 1) source directory information reference
+#         2) tag table reference, 3) optional reference to writing procedure
 # Returns: New directory data or undefined on error
-sub WriteTagTable($$;$$)
+sub WriteDirectory($$;$$)
 {
-    my ($self, $tagTablePtr, $dirInfo, $writeProc) = @_;
+    my ($self, $dirInfo, $tagTablePtr, $writeProc) = @_;
 
     $tagTablePtr or return undef;
     my $verbose = $self->{OPTIONS}->{Verbose};
     # set directory name from default group0 name if not done already
-    my $dirName = $dirInfo->{DirName};
+    my $dirName = $$dirInfo{DirName};
     my $grp0 = $tagTablePtr->{GROUPS}->{0};
-    $dirName or $dirName = $dirInfo->{DirName} = $grp0;
+    $dirName or $dirName = $$dirInfo{DirName} = $grp0;
     if ($self->{DEL_GROUP}) {
         my $delGroupPtr = $self->{DEL_GROUP};
         # delete entire directory if specified
         my $grp1 = $dirName;
         if ($$delGroupPtr{$grp0} or $$delGroupPtr{$grp1}) {
-            if ($self->{FILE_TYPE} ne 'JPEG') {
+            if ($self->{FILE_TYPE} ne 'JPEG' and $self->{FILE_TYPE} ne 'PNG') {
                 # restrict delete logic to prevent entire tiff image from being killed
                 # (don't allow IFD0 to be deleted, and delete only ExifIFD if EXIF specified)
                 if ($grp1 eq 'IFD0') {
@@ -1464,8 +1522,8 @@ sub WriteTagTable($$;$$)
     # use default proc from tag table if no proc specified
     $writeProc or $writeProc = $$tagTablePtr{WRITE_PROC} or return undef;
     # guard against cyclical recursion into the same directory
-    if (defined $dirInfo->{DataPt} and defined $dirInfo->{DirStart} and defined $dirInfo->{DataPos}) {
-        my $processed = $dirInfo->{DirStart} + $dirInfo->{DataPos} + ($dirInfo->{Base}||0);
+    if (defined $$dirInfo{DataPt} and defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos}) {
+        my $processed = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0);
         if ($self->{PROCESSED}->{$processed}) {
             $self->Warn("$dirName pointer references previous $self->{PROCESSED}->{$processed} directory");
             return 0;
@@ -1477,11 +1535,14 @@ sub WriteTagTable($$;$$)
     GenerateTagIDs($tagTablePtr);
     my $oldDir = $self->{DIR_NAME};
     if ($verbose and (not defined $oldDir or $oldDir ne $dirName)) {
-        print '  ', ($dirInfo->{DataPt} ? 'Rewriting' : 'Creating'), " $dirName\n";
+        my $verb = ($$dirInfo{DataPt} or $$dirInfo{DirLen}) ? 'Rewriting' : 'Creating';
+        print "  $verb $dirName\n";
     }
+    my $saveOrder = GetByteOrder();
     $self->{DIR_NAME} = $dirName;
-    my $newData = &$writeProc($self, $tagTablePtr, $dirInfo);
+    my $newData = &$writeProc($self, $dirInfo, $tagTablePtr);
     $self->{DIR_NAME} = $oldDir;
+    SetByteOrder($saveOrder);
     print "  Deleting $dirName\n" if $verbose and defined $newData and not length $newData;
     return $newData;
 }
@@ -1630,7 +1691,7 @@ sub VerboseInfo($$$%)
 
     # Level 2: print detailed information about the tag
     if ($verbose > 1 and ($parms{Extra} or $parms{Format} or
-        $parms{DataPt} or defined $size))
+        $parms{DataPt} or defined $size or $tagID =~ /\//))
     {
         $line = $indent;
         $line .= '- Tag ' . ($hexID ? $hexID : "'$tagID'");
@@ -2016,15 +2077,16 @@ sub WriteMultiSegment($$$$)
 
 #------------------------------------------------------------------------------
 # WriteJPEG : Write JPEG image
-# Inputs: 0) ExifTool object reference, 1) output file or scalar reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid JPEG file, or -1 if
 #          an output file was specified and a write error occurred
 sub WriteJPEG($$)
 {
-    my ($self, $outfile) = @_;
+    my ($self, $dirInfo) = @_;
+    my $outfile = $$dirInfo{OutFile};
+    my $raf = $$dirInfo{RAF};
     my ($ch,$s,$length);
     my $verbose = $self->{OPTIONS}->{Verbose};
-    my $raf = $self->{RAF};
     my $rtnVal = 0;
     my %doneDir;
     my ($err, %dumpParms);
@@ -2123,10 +2185,8 @@ sub WriteJPEG($$)
                 }
             }
             # EXIF information must come immediately after APP0
-            if ((exists $$addDirs{IFD0} and not $doneDir{IFD0}) or
-                (exists $$addDirs{IFD1} and not $doneDir{IFD1}))
-            {
-                $doneDir{IFD0} = $doneDir{IFD1} = 1;
+            if (exists $$addDirs{IFD0} and not $doneDir{IFD0}) {
+                $doneDir{IFD0} = 1;
                 $verbose and print "Creating APP1:\n";
                 # write new EXIF data
                 $self->{TIFF_TYPE} = 'APP1';
@@ -2140,11 +2200,11 @@ sub WriteJPEG($$)
                 }
                 my %dirInfo = (
                     NewDataPos => 8,    # new data will come after TIFF header
-                    Parent   => $markerName,
-                    DirName  => 'IFD0',
-                    Multi => 1,
+                    DirName => 'IFD0',
+                    Parent  => $markerName,
+                    Multi   => 1,
                 );
-                my $buff = $self->WriteTagTable($tagTablePtr, \%dirInfo);
+                my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                 if (defined $buff and length $buff) {
                     my $tiffHdr = $byteOrder . Set16u(42) . Set32u(8); # standard TIFF header
                     my $size = length($buff) + length($tiffHdr) + length($exifAPP1hdr);
@@ -2177,7 +2237,7 @@ sub WriteJPEG($$)
                 my %dirInfo = (
                     Parent => $markerName,
                 );
-                my $buff = $self->WriteTagTable($tagTablePtr, \%dirInfo);
+                my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                 if (defined $buff and length $buff) {
                     my $num = WriteMultiSegment($outfile, 0xed, $psAPP13hdr, $buff);
                     $num or $err = 1;
@@ -2193,7 +2253,7 @@ sub WriteJPEG($$)
                 my %dirInfo = (
                     Parent   => $markerName,
                 );
-                my $buff = $self->WriteTagTable($tagTablePtr, \%dirInfo);
+                my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                 if (defined $buff and length $buff) {
                     my $size = length($buff) + length($xmpAPP1hdr);
                     if ($size <= $maxSegmentLen) {
@@ -2358,15 +2418,21 @@ sub WriteJPEG($$)
                         # duplicate EXIF segments in the file
                         return 0;
                     }
-                    $doneDir{IFD0} = $doneDir{IFD1} = 1;
-                    last unless $$editDirs{IFD0} or $$editDirs{IFD1};
-                    # save the EXIF data block into a common variable
-                    $self->{EXIF_DATA} = substr($$segDataPt, 6);
-                    $self->{EXIF_POS} = $segPos + 6;
+                    $doneDir{IFD0} = 1;
+                    last unless $$editDirs{IFD0};
                     # write new EXIF data to memory
-                    $$segDataPt = $exifAPP1hdr; # start with EXIF APP1 header
+                    my $buff = $exifAPP1hdr; # start with EXIF APP1 header
                     # rewrite EXIF as if this were a TIFF file in memory
-                    my $result = $self->TiffInfo($markerName,undef,$segPos+6,$segDataPt);
+                    my %dirInfo = (
+                        Parent => $markerName,
+                        DataPt => $segDataPt,
+                        DataPos => $segPos,
+                        DirStart => 6,
+                        Base => $segPos + 6,
+                        OutFile => \$buff,
+                    );
+                    my $result = $self->ProcessTIFF(\%dirInfo);
+                    $segDataPt = \$buff;
                     unless ($result) { # check for problems writing the EXIF
                         last Marker unless $self->Options('IgnoreMinorErrors');
                         $$segDataPt = $exifAPP1hdr . $self->{EXIF_DATA}; # restore original EXIF
@@ -2400,7 +2466,7 @@ sub WriteJPEG($$)
                         DirLen   => $length - $start,
                         Parent   => $markerName,
                     );
-                    my $newData = $self->WriteTagTable($tagTablePtr, \%dirInfo);
+                    my $newData = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                     if (defined $newData) {
                         undef $$segDataPt;  # free the old buffer
                         # add header to new segment unless empty
@@ -2439,7 +2505,7 @@ sub WriteJPEG($$)
                                 Parent   => $markerName,
                             );
                             # we don't support writing ICC_Profile (yet)
-                            # $newData = $self->WriteTagTable($tagTablePtr, \%dirInfo);
+                            # $newData = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                             undef $combinedSegData;
                         }
                     }
@@ -2469,7 +2535,7 @@ sub WriteJPEG($$)
                         DirLen   => $length-14,
                         Parent   => $markerName,
                     );
-                    my $newData = $self->WriteTagTable($tagTablePtr, \%dirInfo);
+                    my $newData = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                     if (defined $newData) {
                         undef $$segDataPt;  # free the old buffer
                         $segDataPt = \$newData;
@@ -2534,7 +2600,7 @@ sub CheckImage($$)
     if (length($$valPtr) and $$valPtr!~/^\xff\xd8/ and not
         $self->Options('IgnoreMinorErrors'))
     {
-        return 'Not a valid image';
+        return '[minor] Not a valid image';
     }
     return undef;
 }
@@ -2626,12 +2692,12 @@ sub CheckBinaryData($$$)
 
 #------------------------------------------------------------------------------
 # write to binary data block
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) source dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
+#         2) tag table reference
 # Returns: Binary data block or undefined on error
 sub WriteBinaryData($$$)
 {
-    my ($self, $tagTablePtr, $dirInfo) = @_;
+    my ($self, $dirInfo, $tagTablePtr) = @_;
     $self or return 1;    # allow dummy access to autoload this package
 
     # get default format ('int8u' unless specified)
@@ -2641,11 +2707,11 @@ sub WriteBinaryData($$$)
         warn "Unknown format $defaultFormat\n";
         return undef;
     }
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart} || 0;
-    my $dirLen = $dirInfo->{DirLen} || length($$dataPt) - $dirStart;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
-    my $dirName = $dirInfo->{DirName};
+    my $dirName = $$dirInfo{DirName};
     my $verbose = $self->Options('Verbose');
     my $tagInfo;
     $dataPt = \$newData;
@@ -2692,8 +2758,8 @@ sub WriteBinaryData($$$)
         }
     }
     # add necessary fixups for any offsets
-    if ($tagTablePtr->{IS_OFFSET} and $dirInfo->{Fixup}) {
-        my $fixup = $dirInfo->{Fixup};
+    if ($tagTablePtr->{IS_OFFSET} and $$dirInfo{Fixup}) {
+        my $fixup = $$dirInfo{Fixup};
         my $tagID;
         foreach $tagID (@{$tagTablePtr->{IS_OFFSET}}) {
             $tagInfo = $self->GetTagInfo($tagTablePtr, $tagID) or next;

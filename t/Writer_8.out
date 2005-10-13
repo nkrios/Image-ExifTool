@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
 [File, File, Image]  - File Name: Writer_8_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 7KB
-[File, File, Time]  - File Modification Date/Time: 2005:07:29 07:32:52
+[File, File, Image]  - File Size: 7 kB
+[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:36:11
 [File, File, Image]  - File Type: JPEG
-[File, File, Image]  - Mime Type: image/jpeg
+[File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
 [File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: Canon
@@ -144,7 +144,7 @@
 [IPTC, IPTC, Other] 15 - Category: IPTC test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
 [XMP, XMP-crs, Image] Contrast - Contrast: +2
-[XMP, XMP-dc, Image] Description - Description: New description
+[XMP, XMP-dc, Image] description - Description: New description
 [XMP, XMP-exif, Camera] Contrast - Contrast: High
 [Composite, Composite, Image]  - Aperture: 14.0
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting

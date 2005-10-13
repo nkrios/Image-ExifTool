@@ -15,10 +15,9 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
-sub ProcessJpeg2000($$$);
-sub ProcessExifUUID($$$);
+sub ProcessJpeg2000Box($$$);
 
 my %jp2ResolutionUnit = (
     -3 => 'km',
@@ -36,7 +35,7 @@ my %jp2ResolutionUnit = (
 # JPEG 2000 "box" (ie. segment) names
 %Image::ExifTool::Jpeg2000::Main = (
     GROUPS => { 2 => 'Image' },
-    PROCESS_PROC => \&ProcessJpeg2000,
+    PROCESS_PROC => \&ProcessJpeg2000Box,
    'jP  ' => 'JP2Signature', # (ref 1)
    "jP\x1a\x1a" => 'JP2Signature', # (ref 2)
     prfl => 'Profile',
@@ -54,13 +53,31 @@ my %jp2ResolutionUnit = (
             },
         },
         bpcc => 'BitsPerComponent',
-        colr => {
-            Name => 'ColorSpecification',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::ICC_Profile::Main',
-                ProcessProc => \&ProcessColorSpecification,
+        colr => [
+            {
+                Name => 'ICC_Profile',
+                Condition => '$$valPt =~ /^(\x02|\x03)/',
+                SubDirectory => {
+                    TagTable => 'Image::ExifTool::ICC_Profile::Main',
+                    Start => '$valuePtr + 3',
+                },
             },
-        },
+            {
+                Name => 'Colorspace',
+                Condition => '$$valPt =~ /^\x01/',
+                Format => 'binary',
+                ValueConv => 'Get32u(\$val, 3)',
+                PrintConv => {
+                    16 => 'sRGB',
+                    17 => 'Greyscale',
+                    18 => 'sYCC',
+                },
+            },
+            {
+                Name => 'ColorSpecification',
+                ValueConv => '\$val',
+            },
+        ],
         pclr => 'Palette',
         cdef => 'ComponentDefinition',
        'res '=> {
@@ -140,8 +157,8 @@ my %jp2ResolutionUnit = (
             Condition => '$$valPt=~/^\xb1\x4b\xf8\xbd\x08\x3d\x4b\x43\xa5\xae\x8c\xd7\xd5\xa6\xce\x03/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Exif::Main',
-                ProcessProc => \&ProcessExifUUID,
-                DirStart => '$valuePtr + 16',
+                ProcessProc => \&Image::ExifTool::ProcessTIFF,
+                Start => '$valuePtr + 16',
             },
         },
         {
@@ -150,7 +167,7 @@ my %jp2ResolutionUnit = (
             Condition => '$$valPt=~/^\xbe\x7a\xcf\xcb\x97\xa9\x42\xe8\x9c\x71\x99\x94\x91\xe3\xaf\xac/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::XMP::Main',
-                DirStart => '$valuePtr + 16',
+                Start => '$valuePtr + 16',
             },
         },
         {
@@ -253,44 +270,12 @@ my %jp2ResolutionUnit = (
 );
 
 #------------------------------------------------------------------------------
-# Process JPEG 2000 ColorSpecification box (may contain ICC profile)
-# Inputs: 0) ExifTool object reference, 1) Pointer to tag table, 2) DirInfo reference
-# Returns: 1 on success
-sub ProcessColorSpecification($$$)
-{
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $$dirInfo{DataPt};
-    return 0 unless $$dirInfo{DataLen} > 3;
-    my $meth = Get8u($dataPt, 0);
-    return 1 unless $meth == 2 or $meth == 3;
-    $$dirInfo{DirStart} += 3;
-    return $exifTool->ProcessTagTable($tagTablePtr, $dirInfo);
-}
-
-#------------------------------------------------------------------------------
-# Process JPEG 2000 Exif UUID box
-# Inputs: 0) ExifTool object reference, 1) Pointer to tag table, 2) DirInfo reference
-# Returns: 1 on success
-sub ProcessExifUUID($$$)
-{
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $$dirInfo{DataPt};
-    # get the data block (into a common variable)
-    $exifTool->{EXIF_DATA} = substr($$dataPt, 16);
-    $exifTool->{EXIF_POS} = $$dirInfo{DataPos} + 16;
-    # extract the EXIF information (it is in standard TIFF format)
-    my $success = $exifTool->TiffInfo('JP2');
-    SetByteOrder('MM'); # return byte order to big-endian
-    return $success;
-}
-
-#------------------------------------------------------------------------------
 # Process JPEG 2000 box
-# Inputs: 0) ExifTool object reference, 1) Pointer to tag table, 2) DirInfo reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference, 2) Pointer to tag table
 # Returns: 1 on success
-sub ProcessJpeg2000($$$)
+sub ProcessJpeg2000Box($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dataLen = $$dirInfo{DataLen};
     my $dataPos = $$dirInfo{DataPos};
@@ -298,8 +283,8 @@ sub ProcessJpeg2000($$$)
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $raf = $$dirInfo{RAF};
     my $verbose = $exifTool->{OPTIONS}->{Verbose};
-
     my $dirEnd = $dirStart + $dirLen;
+
     # loop through all contained boxes
     my ($pos, $boxLen);
     for ($pos=$dirStart; ; $pos+=$boxLen) {
@@ -329,6 +314,7 @@ sub ProcessJpeg2000($$$)
         return 0 if $boxLen < 0;
         if ($raf) {
             # read the box data
+            $dataPos = $raf->Tell();
             $raf->Read($buff,$boxLen);
             $valuePtr = 0;
             $dataLen = $boxLen;
@@ -339,8 +325,7 @@ sub ProcessJpeg2000($$$)
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID);
         if (defined $tagInfo and not $tagInfo) {
             # GetTagInfo() required the value for a Condition
-            my $size = $boxLen - $valuePtr;
-            my $tmpVal = substr($$dataPt, $valuePtr, $size < 48 ? $size : 48);
+            my $tmpVal = substr($$dataPt, $valuePtr, $boxLen < 48 ? $boxLen : 48);
             $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID, \$tmpVal);
         }
         if ($verbose) {
@@ -360,15 +345,17 @@ sub ProcessJpeg2000($$$)
                 $subdirStart = eval($$subdir{Start});
             }
             my %subdirInfo = (
+                Parent => 'JP2',
                 DataPt => $dataPt,
                 DataPos => $dataPos,
                 DataLen => $dataLen,
                 DirStart => $subdirStart,
                 DirLen => $boxLen - ($subdirStart - $valuePtr),
                 DirName => $$tagInfo{Name},
+                Base => $dataPos + $subdirStart,
             );
             my $subTable = GetTagTable($$subdir{TagTable}) || $tagTablePtr;
-            my $ok = $exifTool->ProcessTagTable($subTable, \%subdirInfo, $$subdir{ProcessProc});
+            my $ok = $exifTool->ProcessDirectory(\%subdirInfo, $subTable, $$subdir{ProcessProc});
             unless ($ok) {
                 return 0 if $subTable eq $tagTablePtr;
                 $exifTool->Warn("Unrecognized $$tagInfo{Name} box");
@@ -383,14 +370,14 @@ sub ProcessJpeg2000($$$)
 }
 
 #------------------------------------------------------------------------------
-# Jpeg2000Info : extract meta information from a JPEG 2000 image
-# Inputs: 0) ExifTool object reference
+# Extract meta information from a JPEG 2000 image
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid JPEG 2000 file
-sub Jpeg2000Info($)
+sub ProcessJpeg2000($$)
 {
-    my $exifTool = shift;
+    my ($exifTool, $dirInfo) = @_;
     my $hdr;
-    my $raf = $exifTool->{RAF};
+    my $raf = $$dirInfo{RAF};
     my $rtnVal = 0;
 
     # check to be sure this is a valid JPG2000 file
@@ -404,7 +391,7 @@ sub Jpeg2000Info($)
         DirName => 'JP2',
     );
     my $tagTablePtr = GetTagTable('Image::ExifTool::Jpeg2000::Main');
-    return $exifTool->ProcessTagTable($tagTablePtr, \%dirInfo);
+    return $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
 }
 
 1;  # end

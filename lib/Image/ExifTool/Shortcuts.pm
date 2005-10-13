@@ -158,7 +158,6 @@ $VERSION = '1.05';
 );
 
 # load user-defined shortcuts if available
-Image::ExifTool::LoadConfig();
 if (defined %Image::ExifTool::Shortcuts::UserDefined) {
     my $shortcut;
     foreach $shortcut (keys %Image::ExifTool::Shortcuts::UserDefined) {

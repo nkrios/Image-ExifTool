@@ -13,14 +13,16 @@
 #               5) RŽmi Guyomarch from http://forums.dpreview.com/forums/read.asp?forum=1022&message=12790396
 #               6) Frank Ledwon private communication (tests with E/C-series cameras)
 #               7) Michael Meissner private communication
+#               8) Shingo Noguchi, PhotoXP (http://www.daifukuya.com/photoxp/)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -939,7 +941,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 #------------------------------------------------------------------------------
 # Print lens information (ref 6)
-# Inputs: 0) Lens info (string of integers), 1) 'Lens' or 'Extender'
+# Inputs: 0) Lens info (string of integers: Make, Unknown, Model, Release, ...)
+#         1) 'Lens' or 'Extender'
 sub PrintLensInfo($$)
 {
     my ($val, $type) = @_;
@@ -952,27 +955,26 @@ sub PrintLensInfo($$)
     );
     my %model = (
         Lens => {
-            0 => { # Olympus lenses
-                1 => 'Zuiko Digital ED 50mm F2.0 Macro',
-                2 => 'Zuiko Digital ED 150mm F2.0',
-                3 => 'Zuiko Digital ED 300mm F2.8',
-                5 => 'Zuiko Digital 14-54mm F2.8-3.5',
-                6 => 'Zuiko Digital ED 50-200mm F2.8-3.5',
-                7 => 'Zuiko Digital 11-22mm F2.8-3.5',
-                21 => 'Zuiko Digital ED 7-14mm F4.0',
-                24 => 'Zuiko Digital 14-45mm F3.5-5.6',
-            },
-            1 => { # Sigma lenses
-                2 => '55-200mm F4.0-5.6 DC',
-                3 => '18-125mm F3.5-5.6 DC',
-                4 => '18-125mm F3.5-5.6', # (ref 7)
-            },
+            # Olympus lenses (key is "make model" with optional "release")
+            '0 1 0' => 'Zuiko Digital ED 50mm F2.0 Macro',
+            '0 1 1' => 'Zuiko Digital 40-150mm F3.5-4.5', #8
+            '0 2'   => 'Zuiko Digital ED 150mm F2.0',
+            '0 3'   => 'Zuiko Digital ED 300mm F2.8',
+            '0 5'   => 'Zuiko Digital 14-54mm F2.8-3.5',
+            '0 6'   => 'Zuiko Digital ED 50-200mm F2.8-3.5',
+            '0 7'   => 'Zuiko Digital 11-22mm F2.8-3.5',
+            '0 21'  => 'Zuiko Digital ED 7-14mm F4.0',
+            '0 24'  => 'Zuiko Digital 14-45mm F3.5-5.6',
+            # Sigma lenses
+            '1 1'   => '18-50mm F3.5-5.6', #8
+            '1 2'   => '55-200mm F4.0-5.6 DC',
+            '1 3'   => '18-125mm F3.5-5.6 DC',
+            '1 4'   => '18-125mm F3.5-5.6', #7
         },
         Extender => {
-            0 => { # Olympus extenders
-                4 => 'Zuiko Digital EC-14 1.4x Teleconverter',
-                8 => 'EX-25 Extension Tube',
-            },
+            # Olympus extenders
+            '0 4'   => 'Zuiko Digital EC-14 1.4x Teleconverter',
+            '0 8'   => 'EX-25 Extension Tube',
         },
     );
     my %release = (
@@ -980,7 +982,8 @@ sub PrintLensInfo($$)
         1 => '(pre-release)',
     );
     my $make = $make{$info[0]} || "Unknown Make ($info[0])";
-    my $model = $model{$type}->{$info[0]}->{$info[2]} || "Unknown Model ($info[2])";
+    my $str = "$info[0] $info[2]";
+    my $model = $model{$type}->{"$str $info[3]"} || $model{$type}->{$str} || "Unknown Model ($str)";
     my $rel = $release{$info[3]} || "Unknown Release ($info[3])";
     return "$make $model $rel";
 }

@@ -10,8 +10,10 @@ package Image::ExifTool::FujiFilm;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -161,6 +163,28 @@ $VERSION = '1.04';
     },
 );
 
+#------------------------------------------------------------------------------
+# get information from FujiFilm RAW file
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Returns: 1 if this was a valid FujiFilm RAW file
+sub ProcessRAF($$)
+{
+    my ($exifTool, $dirInfo) = @_;
+    my $buff;
+    my $raf = $$dirInfo{RAF};
+    $raf->Read($buff,8) == 8    or return 0;
+    $buff eq 'FUJIFILM'         or return 0;
+    $raf->Seek(84, 0)           or return 0;
+    $raf->Read($buff, 4) == 4   or return 0;
+    SetByteOrder('MM');
+    my $base = Get32u(\$buff, 0) + 12;
+    my %dirInfo = (
+        Parent => 'RAF',
+        RAF    => $raf,
+        Base   => $base,
+    );
+    return $exifTool->ProcessTIFF(\%dirInfo);
+}
 
 1; # end
 

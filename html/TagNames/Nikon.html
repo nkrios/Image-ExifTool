@@ -3,14 +3,14 @@
 <title>Nikon Tags</title>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
-<h2><a name='Nikon'>Nikon Tags</a></h2>
+<h2>Nikon Tags</h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
-<td>FileSystemVersion</td>
+<td>FirmwareVersion</td>
 <td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -235,7 +235,7 @@
   <br>ColorBalance0102
   <br>ColorBalance0103
   <br>ColorBalanceUnknown</td>
-<td align='center'>-<br>-<br>-<br>-</td>
+<td align='center'>-<br>-<br>-<br>N</td>
 <td>--&gt; <a href='Nikon.html#ColorBalance0100'>Nikon ColorBalance0100 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance0102'>Nikon ColorBalance0102 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance0103'>Nikon ColorBalance0103 Tags</a></td></tr>
@@ -245,7 +245,7 @@
   <br>LensData0101
   <br>LensData0201
   <br>LensDataUnknown</td>
-<td align='center'>-<br>-<br>-<br>-</td>
+<td align='center'>-<br>-<br>-<br>N</td>
 <td>--&gt; <a href='Nikon.html#LensData00'>Nikon LensData00 Tags</a>
   <br>--&gt; <a href='Nikon.html#LensData01'>Nikon LensData01 Tags</a>
   <br>--&gt; <a href='Nikon.html#LensData01'>Nikon LensData01 Tags</a></td></tr>
@@ -265,31 +265,46 @@
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x00a2</td>
+<td>ImageDataSize</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0x00a7</td>
 <td>ShutterCount</td>
 <td align='center'>N</td>
 <td><font size='-1'><font color="#666666">(Not writable because this value is used as a key to decrypt other information)</font></font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00a9</td>
 <td>ImageOptimization</td>
 <td align='center'>string[16]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x00aa</td>
 <td>Saturation</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00ab</td>
 <td>VariProgram</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0e01</td>
+<td>NikonCaptureData</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x0e09</td>
+<td>NikonCaptureVersion</td>
+<td align='center'>Y</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0e0e</td>
 <td>NikonCaptureOffsets</td>
 <td align='center'>-</td>
@@ -748,7 +763,7 @@ which make writing more difficult.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='MakerNotesB'>Nikon MakerNotesB Tags</a></h2>
+<h2><a name='Type2'>Nikon Type2 Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
@@ -798,6 +813,6 @@ which make writing more difficult.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 26, 2005</i>
+<br><i>Last revised Oct 4, 2005</i>
 </body>
 </html>

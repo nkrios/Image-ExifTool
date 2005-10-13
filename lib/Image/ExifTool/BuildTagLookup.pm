@@ -16,11 +16,16 @@ package Image::ExifTool::BuildTagLookup;
 use strict;
 require Exporter;
 
+BEGIN {
+    # prevent ExifTool from loading the user config file
+    $Image::ExifTool::noConfig = 1;
+}
+
 use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.17';
+$VERSION = '1.21';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -30,6 +35,8 @@ my $noteFont = '<font color="#666666">';
 my $bgHeading = q{bgcolor='#ffbb77'};
 my $bgBody = q{bgcolor='#ffffff'};
 my $bgRow = q{bgcolor='#ffeebb'};
+
+my $caseInsensitive;    # flag to ignore case when sorting tag names
 
 # Descriptions for the TagNames documentation
 # Note: POD headers in these descriptions start with '~' instead of '=' to keep
@@ -99,12 +106,18 @@ documentation or run "exiftool -S" on a file containing the information in
 question.
 },
     EXIF => q{
-EXIF meta information may exist within different Image File Directories
-(IFD's) of an image.  The names of these IFD's correspond to the
-ExifTool family 1 group names.  When writing EXIF information, the
-default B<Group> listed below is used unless another group is specified.
+EXIF stands for 'Exchangeable Image File Format'.  This type of information
+may be found in JPG, TIFF, PNG, MIFF and DNG images.
+
+The EXIF meta information is organized into different Image File Directories
+(IFD's) within an image.  The names of these IFD's correspond to the
+ExifTool family 1 group names.  When writing EXIF information, the default
+B<Group> listed below is used unless another group is specified.
 },
     GPS => q{
+These GPS tags are part of the EXIF standard, and are stored in a separate
+IFD within the EXIF information.
+
 ExifTool is very flexible about the input format for lat/long coordinates,
 and will accept 3 floating point numbers (for degrees, minutes and seconds)
 separated by just about anything.  Many other GPS tags have values which are
@@ -112,30 +125,41 @@ fixed-length strings.  For these, the indicated string lengths include a
 null terminator which is added automatically by ExifTool.
 },
     XMP => q{
-All XMP information is stored as character strings.  An C<integer> in this
-format is a string of digits, possibly beginning with a '+' or '-', and a
-C<rational> is composed of two C<integer> strings separated by a '/'
-character.  A C<date> is a date and/or time string in the format 'YYYY:MM:DD
-HH:MM:SS[+/-HH:MM]'.  A C<boolean> is either 'True' or 'False', and
-C<lang-alt> is a list of string alternatives in different languages.
-Currently, ExifTool only writes the 'x-default' language in C<lang-alt>
-lists.
+XMP stands for 'Extensible Metadata Platform', an XML/RDF-based metadata
+format which is being pushed by Adobe.  Information in this format can be
+embedded in many different image file types including JPG, JP2, TIFF, PNG,
+MIFF, PS, PDF, PSD and DNG.
 
-The B<Group> column below gives the XMP schema namespace prefix for each
-tag.  The family 1 group names are composed from these schema names with a
-leading C<XMP-> added.  If the same XMP tag name exists in more than one
-group, all groups are written unless a family 1 group name is specified.
-ie) If XMP:Contrast is specified, information will be written to both
-XMP-crs:Contrast and XMP-exif:Contrast.
+The XMP B<Tag ID>'s aren't listed because in most cases they are identical
+to the B<Tag Name>.
 
-Note:  The actual IPTC Core namespace schema prefix is C<Iptc4xmpCore>,
-which is the name used in the file, but ExifTool uses C<iptcCore> to
-generate the family 1 group name because C<Iptc4xmpCore> is a bit lengthy.
-Also, if the older C<xap>, C<xapRights>, C<xapMM> or C<xapBJ> prefixes are
-found, they are translated to the newer C<xmp>, C<xmpRights>, C<xmpMM> and
-C<xmpBJ> in family 1 group names.
+All XMP information is stored as character strings.  The B<Writable> column
+specifies the information format:  C<integer> is a string of digits
+(possibly beginning with a '+' or '-'), C<real> is a floating point number,
+C<rational> is two C<integer> strings separated by a '/' character, C<date>
+is a date/time string in the format 'YYYY:MM:DD HH:MM:SS[+/-HH:MM]',
+C<boolean> is either 'True' or 'False', and C<lang-alt> is a list of string
+alternatives in different languages. Currently, ExifTool only writes the
+'x-default' language in C<lang-alt> lists.
+
+The XMP tags are organized according to schema namespace in the following
+tables. The table names correspond to the XMP namespace prefixes, which are
+used to generate the family 1 group names by adding the prefix 'XMP-'.  If
+the same XMP tag name exists in more than one group, all groups are written
+unless a family 1 group name is specified. ie) If XMP:Contrast is specified,
+information will be written to both XMP-crs:Contrast and XMP-exif:Contrast.
+
+ExifTool will extract XMP information even if it is not listed in these
+tables.  For example, the C<pdfx> namespace doesn't have a predefined set of
+tag names because it is used to store application-defined PDF information,
+but this information is extracted by ExifTool anyway.
 },
     IPTC => q{
+IPTC stands for 'International Press Telecommunications Council'.  This is
+an older meta information format that is slowly being phased out in favor of
+XMP. IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS, PDF, PSD
+and DNG images.
+
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
 values.  These lengths are given in square brackets after the B<Writable>
 format name.  For tags where a range of lengths is allowed, the minimum and
@@ -146,6 +170,9 @@ IPTC information is separated into different records, each of which has its
 own set of tags.
 },
     Photoshop => q{
+Photoshop tags are found in PSD files, as well as inside embedded Photoshop
+information in many other file types (JPEG, TIFF, PDF, PNG to name a few).
+
 Many Photoshop tags are marked as Unknown (indicated by a question mark
 after the tag name) because the information they provide is not very useful
 under normal circumstances.  Unknown tags are not extracted unless the
@@ -186,12 +213,13 @@ The Pentax tags are also used in Asahi cameras.
 These tags are used in Sigma/Foveon cameras.
 },
     Sony => q{
-While current Sony camera models contain a wealth of information, very
-little is known about the Sony tags.  I believe that Sony is attempting to
-hide information in their maker notes by encrypting it.  Idiots.
+The maker notes in images from current Sony camera models contain a wealth
+of information, but very little is known about these tags.  Use the ExifTool
+Unknown (-u) or Verbose (-v) options to see information about the unknown
+tags.
 },
     CanonRaw => q{
-These tags apply to Canon CRW-format RAW files.  When writing CanonRaw
+These tags apply only to CRW-format Canon RAW files.  When writing CanonRaw
 information, the length of the information is preserved (and the new
 information is truncated or padded as required) unless B<Writable> is
 C<resize>.  Currently, only JpgFromRaw and ThumbnailImage are allowed to
@@ -251,16 +279,24 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that || 'Image::ExifTool::BuildTagLookup';
     my $self = bless {}, $class;
+    my %subdirs;
+    my %count = (
+        'unique tag names' => 0,
+        'total tags' => 0,
+    );
 #
 # loop through all tables, accumulating TagLookup and TagName information
 #
-    my (%tagNameInfo, %id, %longID, %shortName, %tableNum, %tagLookup);
+    my (%tagNameInfo, %id, %longID, %shortName, %tableNum,
+        %tagLookup, %tagExists, %tableWritable);
     $self->{TAG_NAME_INFO} = \%tagNameInfo;
     $self->{TAG_ID} = \%id;
     $self->{LONG_ID} = \%longID;
     $self->{SHORT_NAME} = \%shortName;
     $self->{TABLE_NUM} = \%tableNum;
     $self->{TAG_LOOKUP} = \%tagLookup;
+    $self->{TAG_EXISTS} = \%tagExists;
+    $self->{TABLE_WRITABLE} = \%tableWritable;
 
     Image::ExifTool::LoadAllTables();
     my @tableNames = sort keys %allTables;
@@ -273,7 +309,7 @@ sub new
         $short =~ s/::Main$//;
         $short =~ s/::/ /;
         $short =~ s/(.*)Tags$/\u$1/;
-        $short = 'EXIF' if $short eq 'Exif';
+        $short =~ s/^Exif\b/EXIF/;
         $shortName{$tableName} = $short;    # remember short name
         $tableNum{$tableName} = $tableNum++;
     }
@@ -299,6 +335,7 @@ sub new
         } elsif ($short !~ /^(Composite|XMP|Extra)$/) {
             $id{$tableName} = 'Tag ID';
         }
+        $caseInsensitive = ($tableName =~ /::XMP::/);
         my @keys = sort NumbersFirst TagTableKeys($table);
         my $defFormat = $table->{FORMAT};
         if (not $defFormat and $table->{PROCESS_PROC} and
@@ -306,7 +343,7 @@ sub new
         {
             $defFormat = 'int8u';   # use default format for binary data tables
         }
-        foreach $tagID (@keys) {
+TagID:  foreach $tagID (@keys) {
             my @infoArray = GetTagInfoList($table,$tagID);
             my ($tagInfo, @tagNames, $subdir, $format, @values);
             my (@require, @writeGroup, @writable);
@@ -318,16 +355,16 @@ sub new
                     push @values, "($note)";
                 }
                 my $writeGroup;
-                if ($short eq 'XMP') {
-                    ($writeGroup = $tagInfo->{Groups}->{1}) =~ s/XMP-//;
-                } else {
-                    $writeGroup = $$tagInfo{WriteGroup} || '-';
-                }
+                $writeGroup = $$tagInfo{WriteGroup} || '-';
                 $format = $$tagInfo{Format} if defined $$tagInfo{Format};
                 if ($$tagInfo{SubDirectory}) {
+                    # don't show XMP structure tags
+                    next TagID if $short =~ /^XMP /;
                     $subdir = 1;
                     my $subTable = $tagInfo->{SubDirectory}->{TagTable} || $tableName;
                     push @values, $shortName{$subTable}
+                } else {
+                    $subdir = 0;
                 }
                 my $type;
                 foreach $type ('Require','Desire') {
@@ -340,6 +377,7 @@ sub new
                 }
                 my $printConv = $$tagInfo{PrintConv};
                 if (ref $printConv eq 'HASH') {
+                    $caseInsensitive = 0;
                     my @pk = sort NumbersFirst keys %$printConv;
                     foreach (@pk) {
                         next if $_ eq '';
@@ -411,7 +449,26 @@ sub new
                     push @writeGroup, $writeGroup;
                     push @writable, $writable;
                 }
-                $tagLookup{$lcName} = { } unless $tagLookup{$lcName};
+#
+# add this tag to the tag lookup unless PROCESS_PROC is 0
+#
+                next if defined $$table{PROCESS_PROC} and not $$table{PROCESS_PROC};
+                # count our tags
+                if ($$tagInfo{SubDirectory}) {
+                    $subdirs{$lcName} or $subdirs{$lcName} = 0;
+                    ++$subdirs{$lcName};
+                } else {
+                    ++$count{'total tags'};
+                    unless ($tagExists{$lcName} and (not $subdirs{$lcName} or $subdirs{$lcName} == $tagExists{$lcName})) {
+                        ++$count{'unique tag names'};
+                    }
+                }
+                $tagExists{$lcName} or $tagExists{$lcName} = 0;
+                ++$tagExists{$lcName};
+                # only add writable tags to lookup table (for speed)
+                my $wflag = $$tagInfo{Writable};
+                next unless $writeProc and ($wflag or ($$table{WRITABLE} and not defined $wflag));
+                $tagLookup{$lcName} or $tagLookup{$lcName} = { };
                 # remember number for this table
                 my $tagIDs = $tagLookup{$lcName}->{$tableNum};
                 # must allow for duplicate tags with the same name in a single table!
@@ -427,6 +484,7 @@ sub new
                 } else {
                     $tagIDs = $tagID;
                 }
+                $tableWritable{$tableName} = 1;
                 $tagLookup{$lcName}->{$tableNum} = $tagIDs;
             }
 #
@@ -440,15 +498,20 @@ sub new
                     $tagIDstr = sprintf("0x%.4x",$tagID);
                 }
             } else {
-                # ignore tags with non-printable characters in ID
-                next if $tagID =~ /[\x00-\x1f\x80-\xff]/;
-                $tagIDstr = "'$tagID'";
+                # convert non-printable characters to hex escape sequences
+                if ($tagID =~ s/([\x00-\x1f\x7f-\xff])/'\x'.unpack('H*',$1)/eg) {
+                    next if $tagID eq 'jP\x1a\x1a'; # ignore abnormal JP2 signature tag
+                    $tagIDstr = qq{"$tagID"};
+                } else {
+                    $tagIDstr = "'$tagID'";
+                }
             }
             my $len = length $tagIDstr;
             $longID{$tableName} = $len if $longID{$tableName} < $len;
             push @$info, [ $tagIDstr, \@tagNames, \@writable, \@values, \@require, \@writeGroup ];
         }
     }
+    $self->{COUNT} = \%count;
     return $self;
 }
 
@@ -462,6 +525,8 @@ sub WriteTagLookup($$)
     local $_;
     my ($self, $file) = @_;
     my $tagLookup = $self->{TAG_LOOKUP};
+    my $tagExists = $self->{TAG_EXISTS};
+    my $tableWritable = $self->{TABLE_WRITABLE};
 #
 # open/create necessary files and transfer file headers
 #
@@ -480,22 +545,30 @@ sub WriteTagLookup($$)
             last;
         }
     }
-    print OUTFILE "\nmy \@tableList = (\n";
+    print OUTFILE "\n# list of tables containing writable tags\n";
+    print OUTFILE "my \@tableList = (\n";
 #
 # write table list
 #
     my @tableNames = sort keys %allTables;
     my $tableName;
+    my %wrNum;      # translate from allTables index to writable tables index
+    my $count = 0;
+    my $num = 0;
     foreach $tableName (@tableNames) {
-        print OUTFILE "    '$tableName',\n";
+        if ($$tableWritable{$tableName}) {
+            print OUTFILE "\t'$tableName',\n";
+            $wrNum{$count} = $num++;
+        }
+        $count++;
     }
 #
 # write the tag lookup table
 #
-    print OUTFILE ");\n\nmy \%tagLookup = (\n";
     my $tag;
+    print OUTFILE ");\n\n# lookup for all writable tags\nmy \%tagLookup = (\n";
     foreach $tag (sort keys %$tagLookup) {
-        print OUTFILE "    '$tag' => { ";
+        print OUTFILE "\t'$tag' => { ";
         my @tableNums = sort { $a <=> $b } keys %{$$tagLookup{$tag}};
         my (@entries, $tableNum);
         foreach $tableNum (@tableNums) {
@@ -519,14 +592,24 @@ sub WriteTagLookup($$)
             } else {
                 $entry = "'$tagID'";
             }
-            push @entries, "$tableNum => $entry";
+            my $wrNum = $wrNum{$tableNum};
+            push @entries, "$wrNum => $entry";
         }
         print OUTFILE join(', ', @entries);
         print OUTFILE " },\n";
     }
+#
+# write tag exists lookup
+#
+    print OUTFILE ");\n\n# lookup for non-writable tags to check if the name exists\n";
+    print OUTFILE "my \%tagExists = (\n";
+    foreach $tag (sort keys %$tagExists) {
+        next if $$tagLookup{$tag};
+        print OUTFILE "\t'$tag' => 1,\n";
+    }
     print OUTFILE ");\n\n";
 #
-# finish writing TagLookup and clean up
+# finish writing TagLookup.pm and clean up
 #
     if ($success) {
         $success = 0;
@@ -551,13 +634,18 @@ sub WriteTagLookup($$)
 }
 
 #------------------------------------------------------------------------------
-# sort numbers first numerically, then strings alphabetically
+# sort numbers first numerically, then strings alphabetically (case insensitive)
 sub NumbersFirst
 {
+    my $rtnVal;
+    my $bNum = ($b =~ /^-?[0-9]+$/);
     if ($a =~ /^-?[0-9]+$/) {
-        return ($b =~ /^-?[0-9]+$/) ? $a <=> $b : -1;
+        $rtnVal = ($bNum ? $a <=> $b : -1);
+    } elsif ($bNum) {
+        $rtnVal = 1;
     } else {
-        return ($b !~ /^-?[0-9]+$/) ? $a cmp $b : 1;
+        $caseInsensitive and $rtnVal = (lc($a) cmp lc($b));
+        $rtnVal or $rtnVal = ($a cmp $b);
     }
 }
 
@@ -610,6 +698,7 @@ sub GetTableOrder()
         my $table = GetTagTable($tableName);
         # recursively scan through tables in subdirectories
         my @moreTables;
+        $caseInsensitive = ($tableName =~ /::XMP::/);
         my @keys = sort NumbersFirst TagTableKeys($table);
         foreach (@keys) {
             my @infoArray = GetTagInfoList($table,$_);
@@ -664,12 +753,11 @@ sub OpenHtmlFile($;$)
         my $class = shift @names;
         $htmlFile = "$htmldir/TagNames/$class.html";
         $title = "$category Tags";
-        $url = @names ? join '_', @names : $class;
+        @names and $url = join '_', @names;
     } else {
         $htmlFile = "$htmldir/TagNames/index.html";
         $category = 'ExifTool';
         $title = 'ExifTool Tag Names';
-        $url = "ExifTool";
     }
     if ($createdFiles{$htmlFile}) {
         open(HTMLFILE,">>${htmlFile}_tmp") or return 0;
@@ -678,7 +766,8 @@ sub OpenHtmlFile($;$)
         print HTMLFILE "<html>\n<head>\n<title>$title</title>\n</head>\n";
         print HTMLFILE "<body text='#000000' $bgBody>\n";
     }
-    print HTMLFILE "<h2><a name='$url'>$title</a></h2>\n" or return 0;
+    $title = "<a name='$url'>$title</a>" if $url;
+    print HTMLFILE "<h2>$title</h2>\n" or return 0;
     print HTMLFILE Doc2Html($docs{$category}),"\n" if $docs{$category};
     $createdFiles{$htmlFile} = 1;
     return 1;
@@ -800,6 +889,13 @@ sub WriteTagNames($$)
         my $composite = $short eq 'Composite';
         my $derived = $composite ? '<th>Derived From</th>' : '';
         my $podIdLen = $self->{LONG_ID}->{$tableName};
+        my $table = GetTagTable($tableName);
+        my $notes = $$table{NOTES};
+        my $prefix;
+        if ($notes and $notes =~ /leading '(.*?_)' which/) {
+            $prefix = $1;
+            $podIdLen -= length $prefix;
+        }
         if ($podIdLen <= $wID) {
             $podIdLen = $wID;
         } else {
@@ -807,31 +903,26 @@ sub WriteTagNames($$)
             my $col = 20;
             $podIdLen = $col if $podIdLen < $col;
         }
+        $id = '' if $short =~ /^XMP/;
         if ($id) {
             $hid = "<th>$id</th>";
             $wTag -= $podIdLen - $wID;
             $wID = $podIdLen;
-        } elsif ($short eq 'Extra') {
+        } elsif ($short eq 'Extra' or $short =~ /^XMP/) {
             $wTag += 9;
             $hid = '';
         } else {
             $hid = '';
             $wTag += $wID - $wReq if $composite;
         }
-        if ($short eq 'EXIF' or $short eq 'XMP') {
+        if ($short eq 'EXIF') {
             $derived = '<th>Group</th>';
             $showGrp = 1;
-            if ($short eq 'XMP') {
-                $wTag -= 2;
-            } else {
-                $wTag -= $wGrp + 1;
-            }
+            $wTag -= $wGrp + 1;
         }
         my $head = ($short =~ / /) ? 'head3' : 'head2';
         print PODFILE "\n=$head $short Tags\n";
         print PODFILE $docs{$short} if $docs{$short};
-        my $table = GetTagTable($tableName);
-        my $notes = $$table{NOTES};
         if ($notes) {
             $notes =~ s/(^\s+|\s+$)//sg;
             print PODFILE "\n$notes\n";
@@ -844,7 +935,8 @@ sub WriteTagNames($$)
         } else {
             $line .= ' ';
         }
-        $line .= sprintf " %-${wTag}s", 'Tag Name';
+        my $tagNameHeading = ($short eq 'XMP') ? 'Namespace' : 'Tag Name';
+        $line .= sprintf " %-${wTag}s", $tagNameHeading;
         $line .= sprintf " %-${wReq}s", 'Derived From' if $composite;
         $line .= sprintf " %-${wGrp}s", 'Group' if $showGrp;
         $line .= ' Writable';
@@ -860,7 +952,7 @@ sub WriteTagNames($$)
         }
         print HTMLFILE "<blockquote>\n";
         print HTMLFILE "<table $bgHeading cellspacing=2 cellpadding=0><tr $bgBody><td>\n";
-        print HTMLFILE "<table cellspacing=1 cellpadding=2><tr $bgHeading>$hid<th>Tag Name</th>\n";
+        print HTMLFILE "<table cellspacing=1 cellpadding=2><tr $bgHeading>$hid<th>$tagNameHeading</th>\n";
         print HTMLFILE "<th>Writable</th>$derived<th>Values / ${noteFont}Notes</font></th></tr>\n";
         my $rowCol = 1;
         my $infoCount = 0;
@@ -876,6 +968,7 @@ sub WriteTagNames($$)
                 $idStr = sprintf "  %${w}d    ", $tagIDstr;
                 $align = " align='right'";
             } else {
+                $tagIDstr =~ s/^'$prefix/'/ if $prefix;
                 $w = $wID;
                 $idStr = sprintf "  %-${w}s ", $tagIDstr;
                 $align = '';
@@ -905,23 +998,30 @@ sub WriteTagNames($$)
             printf PODFILE " $wrStr\n";
             my $n = 0;
             while (@tags or @reqs or @vals) {
+                my $more = (@tags or @reqs);
                 $line = '  ';
                 $line .= ' 'x($wID+1) if $id;
                 $line .= sprintf("%-${wTag}s", shift(@tags) || '');
                 $line .= sprintf(" %-${wReq}s", shift(@reqs) || '') if $composite;
                 $line .= sprintf(" %-${wGrp}s", shift(@wGrp) || '-') if $showGrp;
+                ++$n;
                 if (@vals) {
                     my $val = shift @vals;
                     # use writable if this is a note
-                    if ($subdir and $val =~ /^\(/) {
-                        $val = $$writable[$n];
-                        $val =~ s/^-// if defined $val;
+                    my $wrStr = $$writable[$n];
+                    if ($subdir and ($val =~ /^\(/ or $val =~ /=/ or ($wrStr and $wrStr !~ /^-/))) {
+                        $val = $wrStr;
+                        if (defined $val) {
+                            $val =~ s/^-//;
+                        } else {
+                            # done with tag if nothing else to print
+                            last unless $more;
+                        }
                     }
                     $line .= " $val" if defined $val;
                 }
                 $line =~ s/\s+$//;  # trim trailing white space
                 print PODFILE "$line\n";
-                ++$n;
             }
             my @htmlTags;
             foreach (@$tagNames) {
@@ -948,6 +1048,7 @@ sub WriteTagNames($$)
                 if ($isSubdir) {
                     foreach (@$values) {
                         /^\(/ and push(@values,"$noteFont$_</font>"), next;
+                        /=/ and push(@values, $_), next;
                         my @names = split;
                         $url = (shift @names) . '.html';
                         @names and $url .= '#' . join '_', @names;

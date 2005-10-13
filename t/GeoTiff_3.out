@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
 [File, File, Image]  - File Name: GeoTiff_3_failed.tif
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 3KB
-[File, File, Time]  - File Modification Date/Time: 2005:07:29 07:50:31
+[File, File, Image]  - File Size: 3 kB
+[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:35:27
 [File, File, Image]  - File Type: TIFF
-[File, File, Image]  - Mime Type: image/tiff
+[File, File, Image]  - MIME Type: image/tiff
 [EXIF, IFD0, Image] 256 - Image Width: 25
 [EXIF, IFD0, Image] 257 - Image Height: 24
 [EXIF, IFD0, Image] 258 - Bits Per Sample: 8

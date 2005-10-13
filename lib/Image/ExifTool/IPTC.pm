@@ -641,7 +641,7 @@ written by ExifTool.
         Format => 'int8u',
     },
     66 => {
-        Name => 'ICCProfile',
+        Name => 'ICC_Profile',
         # ...could add SubDirectory support to read into this (if anybody cares)
         Writable => 0,
         ValueConv => '\$val',
@@ -789,36 +789,6 @@ written by ExifTool.
     },
 );
 
-# Composite IPTC tags
-%Image::ExifTool::IPTC::Composite = (
-    # Note: the following 2 composite tags are duplicated in Image::ExifTool::XMP
-    # (only the first loaded definition is used)
-    DateTimeCreated => {
-        Description => 'Date/Time Created',
-        Groups => { 2 => 'Time' },
-        Require => {
-            0 => 'DateCreated',
-            1 => 'TimeCreated',
-        },
-        ValueConv => '"$val[0] $val[1]"',
-        PrintConv => '$self->ConvertDateTime($val)',
-    },
-    # set the original date/time from DateTimeCreated if not set already
-    DateTimeOriginal => {
-        Condition => 'not defined($oldVal)',
-        Description => 'Shooting Date/Time',
-        Groups => { 2 => 'Time' },
-        Require => {
-            0 => 'DateTimeCreated',
-        },
-        ValueConv => '$val[0]',
-        PrintConv => '$valPrint[0]',
-    },
-);
-
-# add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::IPTC::Composite');
-
 
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary
@@ -830,15 +800,15 @@ sub AUTOLOAD
 
 #------------------------------------------------------------------------------
 # get IPTC info
-# Inputs: 0) ExifTool object reference, 1) reference to tag table
-#         2) dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+#         2) reference to tag table
 # Returns: 1 on success, 0 otherwise
 sub ProcessIPTC($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $pos = $dirInfo->{DirStart} || 0;
-    my $dirLen = $dirInfo->{DirLen} || 0;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen} || 0;
     my $dirEnd = $pos + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;

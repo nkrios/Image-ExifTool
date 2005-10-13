@@ -3,13 +3,16 @@
 #
 # Description:  Definitions for Minolta EXIF Maker Notes
 #
-# Revisions:    04/06/2004  - P. Harvey Created
+# Revisions:    04/06/2004 - P. Harvey Created
+#               09/09/2005 - P. Harvey Added ability to write MRW files
 #
 # References:   1) http://www.dalibor.cz/minolta/makernote.htm
 #               2) Jay Al-Saadi private communication (testing with A2)
 #               3) Shingo Noguchi, PhotoXP (http://www.daifukuya.com/photoxp/)
 #               4) Niels Kristian Bech Jensen private communication
 #               5) http://www.cybercom.net/~dcoffin/dcraw/
+#               6) Pedro Corte-Real private communication
+#               7) ExifTool forum post by bronek (http://www.cpanforum.com/posts/1118)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
@@ -17,8 +20,9 @@ package Image::ExifTool::Minolta;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.16';
+$VERSION = '1.19';
 
 %Image::ExifTool::Minolta::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -163,11 +167,14 @@ $VERSION = '1.16';
             35 => 'AF85mm F1.4G(D) Limited',
             38 => 'AF17-35mm F2.8-4(D)',
             39 => 'AF28-75mm F2.8(D)',
+            40 => 'AFDT18-70mm F3.5-5.6(D)', #6
             128 => 'TAMRON 18-200, 28-300 or 80-300mm F3.5-6.3',
-            25521 => 'TOKINA 19-35mm F3.5-4.5',
+            25501 => 'AF50mm F1.7', #7
+            25521 => 'TOKINA 19-35mm F3.5-4.5 or TOKINA 28-70mm F2.8 AT-X', #3/7
             25541 => 'AF35-105mm F3.5-4.5',
+            25551 => 'AF70-210mm F4 Macro or SIGMA 70-210mm F4-5.6 APO', #7/6
             25581 => 'AF24-50mm F4',
-            25611 => 'SIGMA 70-300mm F4-5.6',
+            25611 => 'SIGMA 70-300mm F4-5.6 or SIGMA 300mm F4 APO Macro', #3/7
             25621 => 'AF50mm F1.4 NEW',
             25631 => 'AF300mm F2.8G',
             25641 => 'AF50mm F2.8 Macro',
@@ -260,11 +267,11 @@ $VERSION = '1.16';
     6 => {
         Name => 'DriveMode',
         PrintConv => {
-            0 => 'single',
-            1 => 'continuous',
-            2 => 'self-timer',
-            4 => 'bracketing',
-            5 => 'interval',
+            0 => 'Single',
+            1 => 'Continuous',
+            2 => 'Self-timer',
+            4 => 'Bracketing',
+            5 => 'Interval',
             6 => 'UHS continuous',
             7 => 'HS continuous',
         },
@@ -272,9 +279,9 @@ $VERSION = '1.16';
     7 => {
         Name => 'MeteringMode',
         PrintConv => {
-            0 => 'multi-segment',
-            1 => 'center weighted',
-            2 => 'spot',
+            0 => 'Multi-segment',
+            1 => 'Center weighted',
+            2 => 'Spot',
         },
     },
     8 => {
@@ -519,10 +526,10 @@ $VERSION = '1.16';
     50 => {
         Name => 'DECPosition',
         PrintConv => {
-            0 => 'exposure',
-            1 => 'contrast',
-            2 => 'saturation',
-            3 => 'filter',
+            0 => 'Exposure',
+            1 => 'Contrast',
+            2 => 'Saturation',
+            3 => 'Filter',
         },
     },
     # 7Hi only:
@@ -594,31 +601,58 @@ sub ConvertWhiteBalance($)
 }
 
 #------------------------------------------------------------------------------
-# get information from Minolta MRW file
-# Inputs: 0) ExifTool object reference
-# Returns: 1 if this was a valid MRW file
-sub MrwInfo($)
+# Read or write Minolta MRW file
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Returns: 1 on success, 0 if this wasn't a valid MRW file, or -1 on write error
+sub ProcessMRW($$)
 {
-    my $exifTool = shift;
-    my $raf = $exifTool->{RAF};
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
+    my $outfile = $$dirInfo{OutFile};
     my $data;
 
     $raf->Read($data,8) == 8 or return 0;
     $data =~ /^\0MRM/ or return 0;
     SetByteOrder('MM');
+    $outfile and $exifTool->InitWriteDirs('TIFF'); # use same write dirs as TIFF
     my $offset = Get32u(\$data, 4) + 8;
     my $pos = 8;
     # decode MRW structure to locate start of TIFF-format image (ref 5)
     while ($pos < $offset) {
         $raf->Read($data,8) == 8 or return 0;
+        $pos += 8;
         my $tag = substr($data, 0, 4);
         my $len = Get32u(\$data, 4);
         if ($tag eq "\0TTW") {
             # parse the TIFF structure after the TTW tag
-            return $exifTool->TiffInfo('MRW', $raf, $pos + 8);
+            my %dirInfo = (
+                Parent => 'MRW',
+                RAF    => $raf,
+                Base   => $pos,
+            );
+            # rewrite the EXIF information (plus the file header)
+            my $buff = '';
+            $dirInfo{OutFile} = \$buff if $outfile;
+            my $rtnVal = $exifTool->ProcessTIFF(\%dirInfo);
+            return $rtnVal unless $outfile;
+            if ($rtnVal == 1) {
+                # adjust offset for new EXIF length
+                my $newLen = length($buff) - $pos;
+                $offset += $newLen - $len;
+                Set32u($offset - 8, \$buff, 4);
+                Set32u($newLen, \$buff, $pos - 4);
+                Write($outfile, $buff) or $rtnVal = -1;
+                # rewrite the rest of the file
+                $pos += $len;
+                $raf->Seek($pos, 0) or return 0;
+                while ($raf->Read($buff, 65536)) {
+                    Write($outfile, $buff) or $rtnVal = -1;
+                }
+            }
+            return $rtnVal;
         }
-        $pos += $len + 8;
-        $raf->Seek($len, 1) or return 0;
+        $pos += $len;
+        $raf->Seek($pos, 0) or return 0;
     }
     return 0;
 }
@@ -638,7 +672,8 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to interpret
-Minolta and Konica-Minolta maker notes in EXIF information.
+Minolta and Konica-Minolta maker notes in EXIF information, and to read
+and write Minolta RAW (MRW) files.
 
 =head1 AUTHOR
 
@@ -659,8 +694,8 @@ it under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Jay Al-Saadi, Niels Kristian Bech Jensen and Shingo Noguchi for
-the information they provided.
+Thanks to Jay Al-Saadi, Niels Kristian Bech Jensen, Shingo Noguchi and Pedro
+Corte-Real for the information they provided.
 
 =head1 SEE ALSO
 

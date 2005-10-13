@@ -220,7 +220,6 @@ sub GetMarkerPointers($$$;$)
             foreach $ptr (@{$phash->{$byteOrder}}) {
                 push @pointers, Get32u($dataPt, $ptr + $start);
             }
-            push @pointers, @{$phash->{$byteOrder}};
         }
         SetByteOrder($saveOrder);       # restore original byte ordering
     }

@@ -1,0 +1,69 @@
+<html>
+<head><title>~/.ExifTool_config</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<pre>
+<font color='#aa0000'>#------------------------------------------------------------------------------
+# File:         ExifTool_config  --&gt;  ~/.ExifTool_config
+#
+# Description:  Sample user configuration file for Image::ExifTool
+#
+# Notes:        To activate this file, copy it to ".ExifTool_config" in your
+#               home directory.
+#
+#               ExifTool automatically loads a file named ".ExifTool_config"
+#               if it exists in your home directory.  This example file shows
+#               how to define your own shortcuts and add new XMP and PNG tags.
+#
+#               For detailed information on the definition of tag tables and
+#               tag information hashes, see lib/Image/ExifTool/README.
+#------------------------------------------------------------------------------
+
+# Shortcut tags are used when extracting information to simplify
+# commonly used commands.  They can be used to represent groups
+# of tags, or to provide an alias for a tag name.</font>
+%Image::ExifTool::Shortcuts::UserDefined = (
+    MyShortcut =&gt; ['createdate','exposuretime','aperture'],
+    MyAlias =&gt; 'FocalLengthIn35mmFormat',
+);
+
+<font color='#aa0000'># This is a basic example of the definition for a new XMP namespace.
+# After defining this table (which may have any name), a corresponding
+# "SubDirectory" entry must be added to the Main XMP table through
+# the %Image::ExifTool::UserDefined definition below.</font>
+%Image::ExifTool::UserDefined::xxx = (
+    GROUPS =&gt; { 0 =&gt; 'XMP', 1 =&gt; 'XMP-xxx', 2 =&gt; 'Image' },
+    NAMESPACE =&gt; [ 'xxx' =&gt; 'http://ns.myname.com/xxx/1.0/' ],
+    WRITABLE =&gt; 'string',
+    NewXMPxxxTag1 =&gt; { },
+    NewXMPxxxTag2 =&gt; { Groups =&gt; { 2 =&gt; 'Author' } },
+    NewXMPxxxTag3 =&gt; { },
+);
+
+<font color='#aa0000'># The %Image::ExifTool::UserDefined hash defines new tags to be
+# added to existing tables.</font>
+%Image::ExifTool::UserDefined = (
+    <font color='#aa0000'># new XMP namespaces must be added to the Main XMP table</font>
+    'Image::ExifTool::XMP::Main' =&gt; {
+        xxx =&gt; {
+            SubDirectory =&gt; {
+                TagTable =&gt; 'Image::ExifTool::UserDefined::xxx',
+            },
+        },
+    },
+    <font color='#aa0000'># XMP tags may also be added to existing namespaces</font>
+    'Image::ExifTool::XMP::xmp' =&gt; {
+        NewXMPxmpTag =&gt; { Groups =&gt; { 2 =&gt; 'Author' } },
+    },
+    <font color='#aa0000'># new PNG tags are added to the PNG::TextualData table</font>
+    'Image::ExifTool::PNG::TextualData' =&gt; {
+        NewPngTag1 =&gt; { },
+        NewPngTag2 =&gt; { },
+        NewPngTag3 =&gt; { },
+    },
+);
+
+<font color='#aa0000'>#------------------------------------------------------------------------------</font>
+</pre>
+</body>
+</html>

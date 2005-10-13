@@ -3,7 +3,7 @@
 <title>Minolta Tags</title>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
-<h2><a name='Minolta'>Minolta Tags</a></h2>
+<h2>Minolta Tags</h2>
 
 These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn&apos;t
 make things easy for decoders because the meaning of some tags and the
@@ -120,11 +120,14 @@ different places.)
   <br>35 = AF85mm F1.4G(D) Limited
   <br>38 = AF17-35mm F2.8-4(D)
   <br>39 = AF28-75mm F2.8(D)
+  <br>40 = AFDT18-70mm F3.5-5.6(D)
   <br>128 = TAMRON 18-200, 28-300 or 80-300mm F3.5-6.3
-  <br>25521 = TOKINA 19-35mm F3.5-4.5
+  <br>25501 = AF50mm F1.7
+  <br>25521 = TOKINA 19-35mm F3.5-4.5 or TOKINA 28-70mm F2.8 AT-X
   <br>25541 = AF35-105mm F3.5-4.5
+  <br>25551 = AF70-210mm F4 Macro or SIGMA 70-210mm F4-5.6 APO
   <br>25581 = AF24-50mm F4
-  <br>25611 = SIGMA 70-300mm F4-5.6
+  <br>25611 = SIGMA 70-300mm F4-5.6 or SIGMA 300mm F4 APO Macro
   <br>25621 = AF50mm F1.4 NEW
   <br>25631 = AF300mm F2.8G
   <br>25641 = AF50mm F2.8 Macro
@@ -208,20 +211,20 @@ different places.)
 <td align='right'>6</td>
 <td>DriveMode</td>
 <td align='center'>int32u</td>
-<td><font size='-1'>0 = single
-  <br>1 = continuous
-  <br>2 = self-timer
-  <br>4 = bracketing
-  <br>5 = interval
+<td><font size='-1'>0 = Single
+  <br>1 = Continuous
+  <br>2 = Self-timer
+  <br>4 = Bracketing
+  <br>5 = Interval
   <br>6 = UHS continuous
   <br>7 = HS continuous</font></td></tr>
 <tr valign='top'>
 <td align='right'>7</td>
 <td>MeteringMode</td>
 <td align='center'>int32u</td>
-<td><font size='-1'>0 = multi-segment
-  <br>1 = center weighted
-  <br>2 = spot</font></td></tr>
+<td><font size='-1'>0 = Multi-segment
+  <br>1 = Center weighted
+  <br>2 = Spot</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>8</td>
 <td>MinoltaISO</td>
@@ -460,10 +463,10 @@ different places.)
 <td align='right'>50</td>
 <td>DECPosition</td>
 <td align='center'>int32u</td>
-<td><font size='-1'>0 = exposure
-  <br>1 = contrast
-  <br>2 = saturation
-  <br>3 = filter</font></td></tr>
+<td><font size='-1'>0 = Exposure
+  <br>1 = Contrast
+  <br>2 = Saturation
+  <br>3 = Filter</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>51</td>
 <td>ColorProfile</td>
@@ -486,6 +489,6 @@ different places.)
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 7, 2005</i>
+<br><i>Last revised Oct 4, 2005</i>
 </body>
 </html>

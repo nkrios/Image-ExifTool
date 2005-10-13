@@ -14,6 +14,7 @@ package Image::ExifTool::Panasonic;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::Exif;
 
 $VERSION = '1.05';
 

@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..2\n"; }
+BEGIN { $| = 1; print "1..3\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -29,5 +29,28 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
+# test 3: Write a bunch of new information to the PNG
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/IPTC-XMP.jpg');
+    # must write image to memory because size is variable (depends on Zlib
+    # availability), and images in memory don't generate a 'FileSize' tag.
+    my $image;  
+    my $rtnVal = $exifTool->WriteInfo('t/PNG.png', \$image);
+    my $info = $exifTool->ImageInfo(\$image);
+    my $testfile = "t/${testname}_${testnum}_failed.png";
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;   # erase results of any bad test
+    } else {
+        # save the bad image
+        open(TESTFILE,">$testfile");
+        binmode(TESTFILE);
+        print TESTFILE $image;
+        close(TESTFILE);
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
 
 # end

@@ -3,9 +3,12 @@
 <title>Photoshop Tags</title>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
-<h2><a name='Photoshop'>Photoshop Tags</a></h2>
+<h2>Photoshop Tags</h2>
 
-Many Photoshop tags are marked as Unknown (indicated by a question mark
+Photoshop tags are found in PSD files, as well as inside embedded Photoshop
+information in many other file types (JPEG, TIFF, PDF, PNG to name a few).
+
+<p>Many Photoshop tags are marked as Unknown (indicated by a question mark
 after the tag name) because the information they provide is not very useful
 under normal circumstances.  Unknown tags are not extracted unless the
 Unknown (-u) option is used.
@@ -36,9 +39,9 @@ Unknown (-u) option is used.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x03ed</td>
-<td>ResolutionInfo?</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
+<td>ResolutionInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Photoshop.html#Resolution'>Photoshop Resolution Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x03ee</td>
 <td>AlphaChannelsNames</td>
@@ -192,7 +195,7 @@ Unknown (-u) option is used.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x040d</td>
-<td>GlobalAngle?</td>
+<td>GlobalAngle</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -202,9 +205,9 @@ Unknown (-u) option is used.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x040f</td>
-<td>ICC_Profile?</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
+<td>ICC_Profile</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
 <tr valign='top'>
 <td>0x0410</td>
 <td>Watermark?</td>
@@ -247,7 +250,7 @@ Unknown (-u) option is used.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0419</td>
-<td>GlobalAltitude?</td>
+<td>GlobalAltitude</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -282,9 +285,9 @@ Unknown (-u) option is used.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0422</td>
-<td>TIFFThumbnail</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
+<td>EXIFInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
 <tr valign='top'>
 <td>0x0424</td>
 <td>XMP</td>
@@ -300,6 +303,35 @@ Unknown (-u) option is used.
 <td>PrintFlagsInfo?</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Resolution'>Photoshop Resolution Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>XResolution</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>DisplayedUnitsX</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = inches
+  <br>2 = cm</font></td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>YResolution</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>6</td>
+<td>DisplayedUnitsY</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = inches
+  <br>2 = cm</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='JPEG_Quality'>Photoshop JPEG_Quality Tags</a></h2>
@@ -331,6 +363,6 @@ Unknown (-u) option is used.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 9, 2005</i>
+<br><i>Last revised Oct 7, 2005</i>
 </body>
 </html>

@@ -1,20 +1,21 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.53
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.65
 [File, File, Image]  - File Name: Jpeg2000.jp2
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 1KB
+[File, File, Image]  - File Size: 619 bytes
 [File, File, Time]  - File Modification Date/Time: 2005:02:11 12:03:12
 [File, File, Image]  - File Type: JPEG 2000
-[File, File, Image]  - Mime Type: image/jpeg2000
+[File, File, Image]  - MIME Type: image/jpeg2000
 [Jpeg2000, Jpeg2000, Image] 0 - Image Height: 16
 [Jpeg2000, Jpeg2000, Image] 4 - Image Width: 16
 [Jpeg2000, Jpeg2000, Image] 8 - Number Of Components: 3
 [Jpeg2000, Jpeg2000, Image] 10 - Bits Per Component: 8 Bits, Unsigned
 [Jpeg2000, Jpeg2000, Image] 11 - Compression: JPEG 2000
+[Jpeg2000, Jpeg2000, Image] colr - Colorspace: sRGB
 [EXIF, IFD0, Image] 256 - Image Width: 1
 [EXIF, IFD0, Image] 257 - Image Height: 1
 [EXIF, IFD0, Image] 258 - Bits Per Sample: 8
 [EXIF, IFD0, Image] 259 - Compression: Uncompressed
-[EXIF, IFD0, Image] 273 - Strip Offsets: 0
+[EXIF, IFD0, Image] 273 - Strip Offsets: 101
 [EXIF, IFD0, Image] 277 - Samples Per Pixel: 1
 [EXIF, IFD0, Image] 279 - Strip Byte Counts: 0
 [EXIF, IFD0, Image] 284 - Planar Configuration: Chunky

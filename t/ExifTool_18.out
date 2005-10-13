@@ -1,10 +1,10 @@
-  ExifToolVersion = 5.53
+  ExifToolVersion = 5.61
   FileName = ExifTool.jpg
   Directory = t
   FileSize = 3475
-  FileModifyDate = 1117042858
+  FileModifyDate = 1113859443
   FileType = JPEG
-  MimeType = image/jpeg
+  MIMEType = image/jpeg
 JPEG APP1 (2442 bytes):
     0000: 45 78 69 66 00 00 49 49 2a 00 08 00 00 00 09 00 [Exif..II*.......]
     0010: 0f 01 02 00 06 00 00 00 7a 00 00 00 10 01 02 00 [........z.......]

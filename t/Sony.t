@@ -5,11 +5,12 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..3\n"; }
+BEGIN { $| = 1; print "1..4\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
 use Image::ExifTool 'ImageInfo';
+use Image::ExifTool::Sony;
 $loaded = 1;
 print "ok 1\n";
 
@@ -40,5 +41,19 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
+# test 4: Test Sony decryption
+{
+    ++$testnum;
+    my $data = pack('N', 0x34a290d3);
+    Image::ExifTool::Sony::Decrypt(\$data, 0, 4, 0x12345678);
+    my $expected = 0x20677968;
+    my $got = unpack('N', $data);
+    unless ($got == $expected) {
+        warn "\n  Test $testnum (decryption) returned wrong value:\n";
+        warn sprintf("    Expected 0x%x but got 0x%x\n", $expected, $got);
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
 
 # end

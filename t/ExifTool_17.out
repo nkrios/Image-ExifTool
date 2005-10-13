@@ -121,13 +121,13 @@ UserComment :
 WhiteBalance (1) : Auto
 ---- File ----
 Directory : t
-FileModifyDate : 2005:05:25 13:40:58
+FileModifyDate : 2005:04:18 17:24:03
 FileName : ExifTool.jpg
-FileSize : 3KB
+FileSize : 3 kB
 FileType : JPEG
 ImageHeight : 120
 ImageWidth : 160
-MimeType : image/jpeg
+MIMEType : image/jpeg
 ---- IFD0 ----
 Make : Canon
 Model : Canon EOS DIGITAL REBEL

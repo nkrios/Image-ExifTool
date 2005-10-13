@@ -11,10 +11,11 @@ package Image::ExifTool::MakerNotes;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.12';
+$VERSION = '1.14';
 
 # conditional list of maker notes
 # Notes:
@@ -179,7 +180,7 @@ $VERSION = '1.12';
     {
         # this maker notes starts with a standard TIFF header at offset 0x0a
         Name => 'MakerNoteNikon',
-        Condition => '$self->{CameraMake}=~/^NIKON/ and $$valPt=~/^Nikon\x00\x02/',
+        Condition => '$self->{CameraMake}=~/^NIKON/i and $$valPt=~/^Nikon\x00\x02/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             Start => '$valuePtr + 18',
@@ -192,7 +193,7 @@ $VERSION = '1.12';
         Name => 'MakerNoteNikon2',
         Condition => '$self->{CameraMake}=~/^NIKON/ and $$valPt=~/^Nikon\x00\x01/',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Nikon::MakerNotesB',
+            TagTable => 'Image::ExifTool::Nikon::Type2',
             Start => '$valuePtr + 8',
             ByteOrder => 'LittleEndian',
         },
@@ -303,13 +304,21 @@ $VERSION = '1.12';
     {
         Name => 'MakerNoteSony',
         # (starts with "SONY DSC \0")
-        Condition => '$self->{CameraMake}=~/^SONY/',
+        Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE} ne "SRF"',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
             # validate the maker note because this is sometimes garbage
             Validate => 'defined($val) and $val =~ /^SONY DSC/',
             Start => '$valuePtr + 12',
             ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteSonySRF',
+        Condition => '$self->{CameraMake}=~/^SONY/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sony::SRF',
+            Start => '$valuePtr',
         },
     },
     {
@@ -345,9 +354,9 @@ foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
 sub LocateIFD($$)
 {
     my ($exifTool, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart} || 0;
-    my $size = $dirInfo->{DirLen} || ($dirInfo->{DataLen} - $dirStart);
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $size = $$dirInfo{DirLen} || ($$dirInfo{DataLen} - $dirStart);
     my $tagInfo = $$dirInfo{TagInfo};
     my $ifdOffsetPos;
     # the IFD should be within the first 32 bytes
@@ -355,8 +364,8 @@ sub LocateIFD($$)
     my ($firstTry, $lastTry) = (0, 32);
 
     # make sure Base and DataPos are defined
-    $dirInfo->{Base} or $dirInfo->{Base} = 0;
-    $dirInfo->{DataPos} or $dirInfo->{DataPos} = 0;
+    $$dirInfo{Base} or $$dirInfo{Base} = 0;
+    $$dirInfo{DataPos} or $$dirInfo{DataPos} = 0;
 #
 # use tag information (if provided) to determine directory location
 #
@@ -421,13 +430,13 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
                 my $ptr = Get32u($dataPt, $pos + $ifdOffsetPos);
                 if ($ptr >= $ifdOffsetPos + 4 and $ptr + $offset + 14 <= $size) {
                     # shift directory start and shorten dirLen accordingly
-                    $dirInfo->{DirStart} += $ptr + $offset;
-                    $dirInfo->{DirLen} -= $ptr + $offset;
+                    $$dirInfo{DirStart} += $ptr + $offset;
+                    $$dirInfo{DirLen} -= $ptr + $offset;
                     # shift pointer base to the start of the TIFF header
-                    my $shift = $dirInfo->{DataPos} + $dirStart + $offset;
-                    $dirInfo->{Base} += $shift;
-                    $dirInfo->{DataPos} -= $shift;
-                    $dirInfo->{Relative} = 1;   # set "relative offsets" flag
+                    my $shift = $$dirInfo{DataPos} + $dirStart + $offset;
+                    $$dirInfo{Base} += $shift;
+                    $$dirInfo{DataPos} -= $shift;
+                    $$dirInfo{Relative} = 1;   # set "relative offsets" flag
                     return $ptr + $offset;
                 }
                 undef $ifdOffsetPos;
@@ -467,8 +476,8 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
                 # count must be reasonable
                 next IFD_TRY if $count == 0 or $count > 0x10000;
             }
-            $dirInfo->{DirStart} += $offset;    # update directory start
-            $dirInfo->{DirLen} -= $offset;
+            $$dirInfo{DirStart} += $offset;    # update directory start
+            $$dirInfo{DirLen} -= $offset;
             return $offset;   # success!!
         }
     }
@@ -477,15 +486,14 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
 
 #------------------------------------------------------------------------------
 # Process unknown maker notes assuming it is in EXIF IFD format
-# Inputs: 0) ExifTool object reference, 1) pointer to tag table
-#         2) reference to directory information
+# Inputs: 0) ExifTool object reference, 1) reference to directory information
+#         2) pointer to tag table
 # Returns: 1 on success, and updates $dirInfo if necessary for new directory
 sub ProcessUnknown($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $success = 0;
 
-    my $saveOrder = GetByteOrder();
     my $loc = LocateIFD($exifTool,$dirInfo);
     if (defined $loc) {
         if ($exifTool->Options('Verbose') > 1) {
@@ -493,11 +501,10 @@ sub ProcessUnknown($$$)
             $indent =~ s/\| $/  /;
             printf "${indent}Found IFD at offset 0x%.4x in Unknown maker notes:\n", $$dirInfo{DirStart};
         }
-        $success = Image::ExifTool::Exif::ProcessExif($exifTool, $tagTablePtr, $dirInfo);
+        $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
     } else {
         $exifTool->Warn("Bad $$dirInfo{DirName} SubDirectory");
     }
-    SetByteOrder($saveOrder);
     return $success;
 }
 

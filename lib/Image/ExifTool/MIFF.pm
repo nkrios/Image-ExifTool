@@ -46,7 +46,7 @@ image.
     montage => 'Montage',
     packets => 'Packets',
     page => 'Page',
-    # profile tags.  Note the SubDirectory is not used by MiffInfo(),
+    # profile tags.  Note the SubDirectory is not used by ProcessMIFF(),
     # but is inserted for documentation purposes only
    'profile-APP1' => [
         # [this list is just for the sake of the documentation]
@@ -98,13 +98,13 @@ image.
 );
 
 #------------------------------------------------------------------------------
-# MiffInfo : extract meta information from a MIFF image
-# Inputs: 0) ExifTool object reference
+# Extract meta information from a MIFF image
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid MIFF image
-sub MiffInfo($)
+sub ProcessMIFF($$)
 {
-    my $exifTool = shift;
-    my $raf = $exifTool->{RAF};
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
     my $verbose = $exifTool->{OPTIONS}->{Verbose};
     my ($hdr, $buff);
 
@@ -189,23 +189,22 @@ sub MiffInfo($)
         }
         my $processed = 0;
         my %dirInfo = (
-            Base     => 0,
+            Parent   => 'PNG',
             DataPt   => \$buff,
             DataPos  => $raf->Tell() - $len,
             DataLen  => $len,
             DirStart => 0,
             DirLen   => $len,
-            Parent   => 'PNG',
         );
         if ($type eq 'icc') {
             # ICC Profile information
             my $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
-            $processed = $exifTool->ProcessTagTable($tagTablePtr, \%dirInfo);
+            $processed = $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
         } elsif ($type eq 'iptc') {
             if ($buff =~ /^8BIM/) {
                 # Photoshop information
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
-                $processed = $exifTool->ProcessTagTable($tagTablePtr, \%dirInfo);
+                $processed = $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
             }
         # I haven't seen 'exif' or 'xmp' profile types yet, but I have seen them
         # in newer PNG files so presumably they are possible here as well - PH
@@ -213,18 +212,19 @@ sub MiffInfo($)
             if ($buff =~ /^$Image::ExifTool::exifAPP1hdr/) {
                 # APP1 EXIF
                 my $hdrLen = length($Image::ExifTool::exifAPP1hdr);
-                $exifTool->{EXIF_DATA} = substr($buff, 6);
+                $dirInfo{DirStart} += $hdrLen;
+                $dirInfo{DirLen} -= $hdrLen;
                 # use the usual position for EXIF data: 12 bytes from start of file
                 # (this may be wrong, but I can't see where the PNG stores this information)
-                $exifTool->{EXIF_POS} = 12; # this is the usual value
-                $processed = $exifTool->TiffInfo('PNG', undef, 12);
+                $dirInfo{Base} = 12; # this is the usual value
+                $processed = $exifTool->ProcessTIFF(\%dirInfo);
             } elsif ($buff =~ /^$Image::ExifTool::xmpAPP1hdr/) {
                 # APP1 XMP
                 my $hdrLen = length($Image::ExifTool::xmpAPP1hdr);
                 my $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
                 $dirInfo{DirStart} += $hdrLen;
                 $dirInfo{DirLen} -= $hdrLen;
-                $processed = $exifTool->ProcessTagTable($tagTablePtr, \%dirInfo);
+                $processed = $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
             }
         }
         unless ($processed) {

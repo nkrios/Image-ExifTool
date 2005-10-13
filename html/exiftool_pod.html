@@ -59,15 +59,17 @@ supported by exiftool (r = read support, w = write support):</p>
 <pre>
      Meta Information                        File Type
     ------------------          -----------------------------------
-    EXIF           r/w          JPEG  r/w      JP2   r      PDF   r
-    GPS            r/w          TIFF  r/w      BMP   r      PSD   r
-    IPTC           r/w          GIF   r/w      PNG   r      MRW   r
-    XMP            r/w          THM   r/w      MNG   r      ORF   r
-    MakerNotes     r/w          CRW   r/w      JNG   r
-    Photoshop IRB  r/w          CR2   r/w      MIFF  r
-    GeoTIFF        r            DNG   r/w      EPS   r
-    ICC Profile    r            NEF   r/w      PS    r
-    PrintIM        r            PEF   r/w      AI    r</pre>
+    EXIF           r/w          JPEG  r/w     PNG   r/w     PDF   r
+    GPS            r/w          TIFF  r/w     MNG   r/w     PS    r
+    IPTC           r/w          GIF   r/w     JNG   r/w     EPS   r
+    XMP            r/w          THM   r/w     PPM   r/w     AI    r
+    MakerNotes     r/w          CRW   r/w     PGM   r/w     PSD   r
+    Photoshop IRB  r/w          CR2   r/w     PBM   r/w     MIFF  r
+    JFIF           r            NEF   r/w     JP2   r       PICT  r
+    GeoTIFF        r            PEF   r/w     BMP   r       MP3   r
+    ICC Profile    r            MRW   r/w     ORF   r       WAV   r
+    PrintIM        r            MOS   r/w     RAF   r       MOV   r
+    ID3            r            DNG   r/w     SRF   r</pre>
 <p>
 </p>
 <hr />
@@ -75,7 +77,7 @@ supported by exiftool (r = read support, w = write support):</p>
 <p>Note:  Case is not significant for any command-line option (including tag
 and group names), except for single-character options where the
 corresponding upper case option is defined.  Multiple options can NOT be
-combined into a single argument, because this would be interpreted as a tag
+combined into a single argument, because that would be interpreted as a tag
 name.</p>
 <dl>
 <dt><strong><a name="item__2dtag"><strong>-</strong><em>TAG</em></a></strong><br />
@@ -164,10 +166,29 @@ Output requested data in <strong>b</strong>inary format.  Mainly used for extrac
 embedded images.  Suppresses output of tag names and descriptions.
 </dd>
 <p></p>
+<dt><strong><a name="item__2dc_fmt"><strong>-c</strong> <em>FMT</em></a></strong><br />
+</dt>
+<dd>
+Set the print format for GPS <strong>c</strong>oordinates.  <code>FMT</code> uses the same syntax as
+the <code>printf</code> format string.  The specifiers correspond to degrees, minutes
+and seconds in that order, but minutes and seconds are optional.  For
+example, the following table gives the output for the same coordinate using
+various formats:
+</dd>
+<dd>
+<pre>
+            FMT                  Output
+    -------------------    ------------------
+    &quot;%d deg %d' %.2f&quot;\&quot;    54 deg 59' 22.80&quot;   (the default)
+    &quot;%d deg %.4f min&quot;      54 deg 59.3800 min
+    &quot;%.6f degrees&quot;         54.989667 degrees</pre>
+</dd>
+<p></p>
 <dt><strong><a name="item__2dd_fmt"><strong>-d</strong> <em>FMT</em></a></strong><br />
 </dt>
 <dd>
-Set <strong>d</strong>ate/time format (consult <code>strftime</code> man page for FMT syntax).
+Set <strong>d</strong>ate/time format (consult <code>strftime</code> man page for FMT syntax).  The
+default format is equivalent to ``%Y:%m:%d %H:%M:%S''.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dd"><strong>-D</strong></a></strong><br />
@@ -384,7 +405,7 @@ Output a <strong>t</strong>ab-delimited list of description/values (useful for d
 import).
 </dd>
 <p></p>
-<dt><strong><a name="item__2dtagsfromfile_srcfile"><strong>-TagsFromFile</strong> <em>SRCFILE</em></a></strong><br />
+<dt><strong><a name="item__2dtagsfromfile_srcfile_or_fmt"><strong>-TagsFromFile</strong> <em>SRCFILE</em> or <em>FMT</em></a></strong><br />
 </dt>
 <dd>
 Set the value of writable tags from information in the specified source
@@ -422,6 +443,11 @@ processing multiple files.  Specified tags are then copied from each target
 file in turn as it is rewritten.  As a convenience, <code>-TagsFromFile @</code> is
 assumed for any redirected tags which are specified without a prior
 <code>-TagsFromFile</code> option.</p>
+</dd>
+<dd>
+<p>For advanced batch use, the source file name may also be specified using a
+<code>FMT</code> string in which %d, %f and %e represent the directory, file name and
+extension of the target file (similar to the <code>-w</code> option).</p>
 </dd>
 <dd>
 <p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples of how to use this option.</p>
@@ -470,12 +496,23 @@ extracted.
 Print version number and exit.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dw_ext"><strong>-w</strong> <em>EXT</em></a></strong><br />
+<dt><strong><a name="item__2dw_ext_or_fmt"><strong>-w</strong> <em>EXT</em> or <em>FMT</em></a></strong><br />
 </dt>
 <dd>
 <strong>W</strong>rite console output to a file with name ending in <a href="#item_ext"><code>EXT</code></a> for each source
 file.  The output file name is obtained by replacing the source file
-extension (including the <code>.</code>) with the specified extension.
+extension (including the <code>.</code>) with the specified extension.  Alternatively,
+a format statement may be used to give more control over the output file
+name and directory.  In this case, <code>FMT</code> is a string specifying the output
+file name.  In this string, %d, %f and %e represent the directory, filename
+and extension of the source file.  Output directories are created
+automatically if necessary.  For example:
+</dd>
+<dd>
+<pre>
+    -w %d%f.txt       # same effect as &quot;-w txt&quot;
+    -w dir/%f_%e.out  # writes files to &quot;dir&quot; as &quot;FILE_EXT.out&quot;
+    -w dir2/%d%f.txt  # writes to &quot;dir2&quot;, keeping dir structure</pre>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dx_tag"><strong>-x</strong> <em>TAG</em></a></strong><br />
@@ -663,7 +700,7 @@ Copy the values of all writable tags from <code>src.crw</code> to <code>dst.jpg<
 the information to the preferred groups.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dtagsfromfile__2dall_3aall_src_2ecrw_ds">exiftool -TagsFromFile -all:all src.crw dst.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ecrw__2dall_3aall_ds">exiftool -TagsFromFile src.crw -all:all dst.jpg</a></strong><br />
 </dt>
 <dd>
 Copy the values of all writable tags from <code>src.crw</code> to <code>dst.jpg</code>,
@@ -703,8 +740,8 @@ tags.
 <dd>
 Use the original date from the meta information to set the same file's
 filesystem modification date for all images in a directory.  (Note that
-<code>-TagsFromFile @</code> has been omitted from this command since it is assumed
-when redirecting information unless another <code>-TagsFromFile</code> is specified.)
+<code>-TagsFromFile @</code> is assumed if no other <code>-TagsFromFile</code> is specified when
+redirecting information as in this example.)
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__27_2dall_3exmp">exiftool -TagsFromFile src.jpg '-all&gt;xmp:all' dst.jpg</a></strong><br />
@@ -723,6 +760,13 @@ iptc2xmp.args, which is a file included with the ExifTool distribution that
 contains the required arguments to convert IPTC information to XMP format.
 Also included with the distribution is xmp2iptc.args, which performs the
 inverse conversion.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile__25d_25f_2ecrw__2dr__2dex">exiftool -tagsfromfile %d%f.CRW -r -ext JPG dir</a></strong><br />
+</dt>
+<dd>
+Recursively rewrite all <code>JPG</code> images in <code>dir</code> with information copied from
+the corresponding <code>CRW</code> images in the same directories.
 </dd>
 <p></p></dl>
 <p>

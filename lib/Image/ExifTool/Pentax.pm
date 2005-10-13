@@ -9,6 +9,7 @@
 #               11/10/2004 - P. Harvey Added support for Asahi cameras
 #               01/10/2005 - P. Harvey Added NikonLens with values from ref 4
 #               03/30/2005 - P. Harvey Added new tags from ref 5
+#               10/04/2005 - P. Harvey Added MOV tags
 #
 # References:   1) Image::MakerNotes::Pentax
 #               2) http://johnst.org/sw/exiftags/ (Asahi cameras)
@@ -18,6 +19,7 @@
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
 #               7) Douglas O'Brien private communication (tests with *istD)
 #               8) Denis Bourez private communication
+#               9) Kazumichi Kawabata private communication
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -28,7 +30,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.22';
+$VERSION = '1.24';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -191,6 +193,7 @@ my %pentaxCities = (
             '36 0' => '3008x2008',  #PH
         },
     },
+    # 0x000a - (See note below)
     0x000b => { #3
         Name => 'PictureMode',
         Writable => 'int16u',
@@ -345,7 +348,7 @@ my %pentaxCities = (
         ValueConvInv => 'int($val * 10 + 50.5)',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         PrintConvInv => 'eval $val',
-    }, 
+    },
     # AE Metering Mode Tag - W. Smith 12 FEB 04
     0x0017 => {
         Name => 'MeteringMode',
@@ -514,95 +517,96 @@ my %pentaxCities = (
         Count => 2,
         PrintConv => {  #4
             '1 0' => 'K,M Lens',
-            '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mmF5.6)
+            '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mm F5.6)
             '3 0' => 'SIGMA',
-            '3 17' => 'smc PENTAX-FA SOFT 85mmF2.8',
+            '3 17' => 'smc PENTAX-FA SOFT 85mm F2.8',
             '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
-            '3 19' => 'smc PENTAX-F 24-50mmF4',
-            '3 20' => 'smc PENTAX-F 35-80mmF4-5.6',
-            '3 21' => 'smc PENTAX-F 80-200mmF4.7-5.6',
-            '3 22' => 'smc PENTAX-F FISH-EYE17-28mmF3.5-4.5',
-            '3 23' => 'smc PENTAX-F 100-300mmF4.5-5.6',
-            '3 24' => 'smc PENTAX-F 35-135mmF3.5-4.5',
-            '3 25' => 'smc PENTAX-F 35-105mmF4-5.6',
-            '3 26' => 'smc PENTAX-F*250-600mmF5.6ED[IF]',
-            '3 27' => 'smc PENTAX-F 28-80mmF3.5-4.5',
-            '3 28' => 'smc PENTAX-F 35-70mmF3.5-4.5',
-            '3 29' => 'PENTAX-F 28-80mmF3.5-4.5',
-            '3 30' => 'PENTAX-F 70-200mmF4-5.6',
-            '3 31' => 'smc PENTAX-F 70-210mmF4-5.6',
-            '3 32' => 'smc PENTAX-F 50mmF1.4',
-            '3 33' => 'smc PENTAX-F 50mmF1.7',
-            '3 34' => 'smc PENTAX-F 135mmF2.8[IF]',
-            '3 35' => 'smc PENTAX-F 28mmF2.8',
+            '3 19' => 'smc PENTAX-F 24-50mm F4',
+            '3 20' => 'smc PENTAX-F 35-80mm F4-5.6',
+            '3 21' => 'smc PENTAX-F 80-200mm F4.7-5.6',
+            '3 22' => 'smc PENTAX-F FISH-EYE 17-28mm F3.5-4.5',
+            '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6',
+            '3 24' => 'smc PENTAX-F 35-135mm F3.5-4.5',
+            '3 25' => 'smc PENTAX-F 35-105mm F4-5.6',
+            '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
+            '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5',
+            '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5',
+            '3 29' => 'PENTAX-F 28-80mm F3.5-4.5',
+            '3 30' => 'PENTAX-F 70-200mm F4-5.6',
+            '3 31' => 'smc PENTAX-F 70-210mm F4-5.6',
+            '3 32' => 'smc PENTAX-F 50mm F1.4',
+            '3 33' => 'smc PENTAX-F 50mm F1.7',
+            '3 34' => 'smc PENTAX-F 135mm F2.8 [IF]',
+            '3 35' => 'smc PENTAX-F 28mm F2.8',
             '3 36' => 'SIGMA 20mm F1.8 EX DG ASPHERICAL RF',
-            '3 38' => 'smc PENTAX-F*300mmF4.5ED[IF]',
-            '3 39' => 'smc PENTAX-F*600mmF4ED[IF]',
-            '3 40' => 'smc PENTAX-F MACRO 100mmF2.8',
-            '3 41' => 'smc PENTAX-F MACRO 50mmF2.8',
+            '3 38' => 'smc PENTAX-F* 300mm F4.5 ED[IF]',
+            '3 39' => 'smc PENTAX-F* 600mm F4 ED[IF]',
+            '3 40' => 'smc PENTAX-F MACRO 100mm F2.8',
+            '3 41' => 'smc PENTAX-F MACRO 50mm F2.8',
             '3 44' => 'SIGMA 18-50mm F3.5-5.6 DC',
             '3 46' => 'SIGMA APO 70-200mm F2.8 EX',
-            '3 50' => 'smc PENTAX-FA 28-70mmF4AL',
+            '3 50' => 'smc PENTAX-FA 28-70mm F4 AL',
             '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
-            '3 52' => 'smc PENTAX-FA 28-200mmF3.8-5.6AL[IF]',
-            '3 53' => 'smc PENTAX-FA 28-80mmF3.5-5.6AL',
-            '3 253' => 'smc PENTAX-DA 14mmF2.8ED[IF]',
-            '3 254' => 'smc PENTAX-DA 16-45mmF4ED AL',
+            '3 52' => 'smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF]',
+            '3 53' => 'smc PENTAX-FA 28-80mm F3.5-5.6 AL',
+            '3 253' => 'smc PENTAX-DA 14mm F2.8 ED[IF]',
+            '3 254' => 'smc PENTAX-DA 16-45mm F4 ED AL',
             '3 255' => 'SIGMA 18-200mm F3.5-6.3 DC', #8
-            '4 1' => 'smc PENTAX-FA SOFT 28mmF2.8',
-            '4 2' => 'smc PENTAX-FA 80-320mmF4.5-5.6',
-            '4 3' => 'smc PENTAX-FA 43mmF1.9 Limited',
-            '4 6' => 'smc PENTAX-FA 35-80mmF4-5.6',
-            '4 15' => 'smc PENTAX-FA 28-105mmF4-5.6[IF]',
-            '4 19' => 'TAMRON SP AF90mm F/2.8',
-            '4 20' => 'smc PENTAX-FA 28-80mmF3.5-5.6',
-            '4 23' => 'smc PENTAX-FA 20-35mmF4AL',
-            '4 24' => 'smc PENTAX-FA 77mmF1.8 Limited',
-            '4 26' => 'smc PENTAX-FA MACRO 100mmF3.5',
-            '4 28' => 'smc PENTAX-FA 35mmF2AL',
-            '4 34' => 'smc PENTAX-FA 24-90mmF3.5-4.5AL[IF]',
-            '4 35' => 'smc PENTAX-FA 100-300mmF4.7-5.8',
-            '4 38' => 'smc PENTAX-FA 28-105mmF3.2-4.5AL[IF]',
-            '4 39' => 'smc PENTAX-FA 31mmF1.8AL Limited',
-            '4 41' => 'TAMRON AF28-200mm Super Zoom F/3.8-5.6 Aspherical XR [IF] MACRO (A03)',
-            '4 43' => 'smc PENTAX-FA 28-90mmF3.5-5.6',
-            '4 44' => 'smc PENTAX-FA J 75-300mmF4.5-5.8AL',
+            '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
+            '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
+            '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
+            '4 6' => 'smc PENTAX-FA 35-80mm F4-5.6',
+            '4 15' => 'smc PENTAX-FA 28-105mm F4-5.6 [IF]',
+            '4 19' => 'TAMRON SP AF 90mm F2.8',
+            '4 20' => 'smc PENTAX-FA 28-80mm F3.5-5.6',
+            '4 23' => 'smc PENTAX-FA 20-35mm F4 AL',
+            '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
+            '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
+            '4 28' => 'smc PENTAX-FA 35mm F2 AL',
+            '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
+            '4 35' => 'smc PENTAX-FA 100-300mm F4.7-5.8',
+            '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
+            '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
+            '4 41' => 'TAMRON AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] MACRO (A03)',
+            '4 43' => 'smc PENTAX-FA 28-90mm F3.5-5.6',
+            '4 44' => 'smc PENTAX-FA J 75-300mm F4.5-5.8 AL',
             '4 45' => 'TAMRON 28-300mm F3.5-6.3 Ultra zoom XR',
-            '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6AL',
-            '4 47' => 'smc PENTAX-FA J 18-35mmF4-5.6AL',
-            '4 49' => 'TAMRON SP AF28-75mm F/2.8 XR Di (A09)',
-            '4 250' => 'smc PENTAX-DA 50-200mm f/4-5.6 ED', #8
-            '4 252' => 'smc PENTAX-DA 18-55mmF3.5-5.6 AL', #8
-            '4 253' => 'smc PENTAX-DA 14mmF2.8ED[IF]',
-            '4 254' => 'smc PENTAX-DA 16-45mmF4ED AL',
-            '5 1' => 'smc PENTAX-FA*24mmF2 AL[IF]',
-            '5 2' => 'smc PENTAX-FA 28mmF2.8 AL',
-            '5 3' => 'smc PENTAX-FA 50mmF1.7',
-            '5 4' => 'smc PENTAX-FA 50mmF1.4',
-            '5 5' => 'smc PENTAX-FA*600mmF4ED[IF]',
-            '5 6' => 'smc PENTAX-FA*300mmF4.5ED[IF]',
-            '5 7' => 'smc PENTAX-FA 135mmF2.8[IF]',
-            '5 8' => 'smc PENTAX-FA MACRO 50mmF2.8',
-            '5 9' => 'smc PENTAX-FA MACRO 100mmF2.8',
-            '5 10' => 'smc PENTAX-FA*85mmF1.4[IF]',
-            '5 11' => 'smc PENTAX-FA*200mmF2.8ED[IF]',
-            '5 12' => 'smc PENTAX-FA 28-80mmF3.5-4.7',
-            '5 13' => 'smc PENTAX-FA 70-200mmF4-5.6',
-            '5 14' => 'smc PENTAX-FA* 250-600mmF5.6ED[IF]',
-            '5 15' => 'smc PENTAX-FA 28-105mmF4-5.6',
-            '5 16' => 'smc PENTAX-FA 100-300mmF4.5-5.6',
-            '6 1' => 'smc PENTAX-FA*85mmF1.4[IF]',
-            '6 2' => 'smc PENTAX-FA*200mmF2.8ED[IF]',
-            '6 3' => 'smc PENTAX-FA*300mmF2.8ED[IF]',
-            '6 4' => 'smc PENTAX-FA*28-70mmF2.8AL',
-            '6 5' => 'smc PENTAX-FA*80-200mmF2.8ED[IF]',
-            '6 6' => 'smc PENTAX-FA*28-70mmF2.8AL',
-            '6 7' => 'smc PENTAX-FA*80-200mmF2.8ED[IF]',
-            '6 8' => 'smc PENTAX-FA 28-70mmF4AL',
-            '6 9' => 'smc PENTAX-FA 20mmF2.8',
-            '6 10' => 'smc PENTAX-FA*400mmF5.6ED[IF]',
-            '6 13' => 'smc PENTAX-FA*400mmF5.6ED[IF]',
-            '6 14' => 'smc PENTAX-FA* MACRO 200mmF4ED[IF]',
+            '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
+            '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
+            '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
+            '4 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED', #8
+            '4 251' => 'smc PENTAX-DA 40mm F2.8 Limited', #9
+            '4 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL', #8
+            '4 253' => 'smc PENTAX-DA 14mm F2.8 ED[IF]',
+            '4 254' => 'smc PENTAX-DA 16-45mm F4 ED AL',
+            '5 1' => 'smc PENTAX-FA* 24mm F2 AL[IF]',
+            '5 2' => 'smc PENTAX-FA 28mm F2.8 AL',
+            '5 3' => 'smc PENTAX-FA 50mm F1.7',
+            '5 4' => 'smc PENTAX-FA 50mm F1.4',
+            '5 5' => 'smc PENTAX-FA* 600mm F4 ED[IF]',
+            '5 6' => 'smc PENTAX-FA* 300mm F4.5 ED[IF]',
+            '5 7' => 'smc PENTAX-FA 135mm F2.8 [IF]',
+            '5 8' => 'smc PENTAX-FA MACRO 50mm F2.8',
+            '5 9' => 'smc PENTAX-FA MACRO 100mm F2.8',
+            '5 10' => 'smc PENTAX-FA* 85mm F1.4 [IF]',
+            '5 11' => 'smc PENTAX-FA* 200mmF2.8 ED[IF]',
+            '5 12' => 'smc PENTAX-FA 28-80mm F3.5-4.7',
+            '5 13' => 'smc PENTAX-FA 70-200mm F4-5.6',
+            '5 14' => 'smc PENTAX-FA* 250-600mm F5.6 ED[IF]',
+            '5 15' => 'smc PENTAX-FA 28-105mm F4-5.6',
+            '5 16' => 'smc PENTAX-FA 100-300mm F4.5-5.6',
+            '6 1' => 'smc PENTAX-FA* 85mm F1.4[IF]',
+            '6 2' => 'smc PENTAX-FA* 200mm F2.8 ED[IF]',
+            '6 3' => 'smc PENTAX-FA* 300mm F2.8 ED[IF]',
+            '6 4' => 'smc PENTAX-FA* 28-70mm F2.8 AL',
+            '6 5' => 'smc PENTAX-FA* 80-200mm F2.8 ED[IF]',
+            '6 6' => 'smc PENTAX-FA* 28-70mm F2.8 AL',
+            '6 7' => 'smc PENTAX-FA* 80-200mm F2.8 ED[IF]',
+            '6 8' => 'smc PENTAX-FA 28-70mm F4AL',
+            '6 9' => 'smc PENTAX-FA 20mm F2.8',
+            '6 10' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
+            '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
+            '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
         },
     },
     # 0x0041 - increments for each cropped pic (PH)
@@ -643,13 +647,13 @@ my %pentaxCities = (
         Count => 4,
     },
     0x1001 => {
-        Name => 'DestinationCityCode', #PH(NC)
+        Name => 'DestinationCityCode', #PH
         Writable => 'undef',
         Count => 4,
     },
 );
 
-# These are from Image::MakerNotes::Pentax.pm, but they don't seem to work - PH
+# NOTE: These are from Image::MakerNotes::Pentax.pm, but they don't seem to work - PH
 #    0x0003 => {
 #        Name => 'Focus',
 #        PrintConv => {
@@ -675,6 +679,57 @@ my %pentaxCities = (
 #            3 => 'Sepia',
 #        },
 #    },
+
+# tags in Pentax MOV videos (PH - tests with Optio WP)
+%Image::ExifTool::Pentax::MOV = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Camera' },
+    NOTES => 'This information is found in Pentax MOV video images.',
+    0x26 => {
+        Name => 'ExposureTime',
+        Description => 'Shutter Speed',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x2a => {
+        Name => 'FNumber',
+        Description => 'Aperture',
+        Format => 'int32u',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x32 => {
+        Name => 'ExposureCompensation',
+        Format => 'int32s',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    0x44 => {
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Daylight',
+            2 => 'Shade',
+            3 => 'Fluorescent', #2
+            4 => 'Tungsten',
+            5 => 'Manual',
+        },
+    },
+    0x48 => {
+        Name => 'FocalLength',
+        Writable => 'int32u',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'sprintf("%.1fmm",$val)',
+    },
+    0xaf => {
+        Name => 'ISO',
+        Description => 'ISO Speed',
+        Format => 'int16u',
+    },
+);
+
 
 1; # end
 
@@ -731,7 +786,8 @@ the information should be stored to deduce the correct offsets.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Wayne Smith, John Francis and Douglas O'Brien for help figuring
-out some Pentax tags.
+out some Pentax tags, and to Denis Bourez and Kazumichi Kawabata for adding
+to the LensType list.
 
 =head1 AUTHOR
 

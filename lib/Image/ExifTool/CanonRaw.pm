@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -351,8 +351,8 @@ sub BuildMakerNotes($$$$$$);
     0 => {
         Name => 'DateTimeOriginal',
         Description => 'Shooting Date/Time',
-        ValueConv => 'ConvertUnixTime($val,"GMT")',
-        ValueConvInv => 'GetUnixTime($val,"GMT")',
+        ValueConv => 'ConvertUnixTime($val)',
+        ValueConvInv => 'GetUnixTime($val)',
         PrintConv => '$self->ConvertDateTime($val)',
         PrintConvInv => '$val',
     },
@@ -462,14 +462,14 @@ sub AUTOLOAD
 #------------------------------------------------------------------------------
 # Process Raw file directory
 # Inputs: 0) ExifTool object reference
-#         1) tag table reference, 2) directory information reference
+#         1) directory information reference, 2) tag table reference
 # Returns: 1 on success
 sub ProcessCanonRaw($$$)
 {
-    my ($exifTool, $rawTagTable, $dirInfo) = @_;
-    my $blockStart = $dirInfo->{DirStart};
-    my $blockSize = $dirInfo->{DirLen};
-    my $raf = $dirInfo->{RAF} or return 0;
+    my ($exifTool, $dirInfo, $rawTagTable) = @_;
+    my $blockStart = $$dirInfo{DirStart};
+    my $blockSize = $$dirInfo{DirLen};
+    my $raf = $$dirInfo{RAF} or return 0;
     my $buff;
     my $verbose = $exifTool->Options('Verbose');
     my $buildMakerNotes = $exifTool->Options('MakerNotes');
@@ -510,9 +510,9 @@ sub ProcessCanonRaw($$$)
                 DataLen  => 0,
                 DirStart => $ptr,
                 DirLen   => $size,
-                Nesting  => $dirInfo->{Nesting} + 1,
+                Nesting  => $$dirInfo{Nesting} + 1,
                 RAF      => $raf,
-                Parent   => $dirInfo->{DirName},
+                Parent   => $$dirInfo{DirName},
             );
             if ($verbose) {
                 my $fakeInfo = { Name => $name, SubDirectory => { } };
@@ -522,7 +522,7 @@ sub ProcessCanonRaw($$$)
                     'Start'  => $ptr,
                 );
             }
-            $exifTool->ProcessTagTable($rawTagTable, \%subdirInfo);
+            $exifTool->ProcessDirectory(\%subdirInfo, $rawTagTable);
             next;
         }
         my ($valueDataPos, $count, $subdir);
@@ -621,15 +621,15 @@ sub ProcessCanonRaw($$$)
                 DataLen  => $size,
                 DirStart => $subdirStart,
                 DirLen   => $size - $subdirStart,
-                Nesting  => $dirInfo->{Nesting} + 1,
+                Nesting  => $$dirInfo{Nesting} + 1,
                 RAF      => $raf,
-                Parent   => $dirInfo->{DirName},
+                Parent   => $$dirInfo{DirName},
             );
             #### eval Validate ($dirData, $subdirStart, $size)
             if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
                 $exifTool->Warn("Invalid $name data");
             } else {
-                $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
+                $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable, $$subdir{ProcessProc});
             }
         } else {
             # convert to specified format if necessary
@@ -639,7 +639,7 @@ sub ProcessCanonRaw($$$)
             if (($tagName eq 'JpgFromRaw' or $tagName eq 'ThumbnailImage') and not
                 ($value =~ /^(Binary|\xff\xd8)/ or $exifTool->Options('IgnoreMinorErrors')))
             {
-                $exifTool->Warn("$tagName is not a valid image");
+                $exifTool->Warn("$tagName is not a valid image", 1);
             } else {
                 $exifTool->FoundTag($tagInfo, $value);
             }
@@ -650,13 +650,13 @@ sub ProcessCanonRaw($$$)
 
 #------------------------------------------------------------------------------
 # get information from raw file
-# Inputs: 0) ExifTool object reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 if this was a valid Canon RAW file
-sub CrwInfo($$)
+sub ProcessCRW($$)
 {
-    my $exifTool = shift;
+    my ($exifTool, $dirInfo) = @_;
     my ($buff, $sig);
-    my $raf = $exifTool->{RAF};
+    my $raf = $$dirInfo{RAF};
     my $buildMakerNotes = $exifTool->Options('MakerNotes');
 
     $raf->Read($buff,2) == 2      or return 0;
@@ -686,7 +686,7 @@ sub CrwInfo($$)
 
     # process the raw directory
     my $rawTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
-    unless ($exifTool->ProcessTagTable($rawTagTable, \%dirInfo)) {
+    unless ($exifTool->ProcessDirectory(\%dirInfo, $rawTagTable)) {
         $exifTool->Warn('CRW file format error');
     }
 

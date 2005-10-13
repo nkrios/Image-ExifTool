@@ -13,21 +13,21 @@ use strict;
 
 #------------------------------------------------------------------------------
 # Write Photoshop IRB resource
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) source dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
+#         2) tag table reference
 # Returns: IRB resource data (may be empty if no Photoshop data)
 # Notes: Increments ExifTool CHANGED flag for each tag changed
 sub WritePhotoshop($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
-    my $dataPt = $dirInfo->{DataPt};
+    my $dataPt = $$dirInfo{DataPt};
     unless ($dataPt) {
         my $emptyData = '';
         $dataPt = \$emptyData;
     }
-    my $start = $dirInfo->{DirStart} || 0;
-    my $dirLen = $dirInfo->{DirLen} || (length($$dataPt) - $start);
+    my $start = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $start);
     my $dirEnd = $start + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
     my $newData = '';
@@ -37,7 +37,6 @@ sub WritePhotoshop($$$)
 
     my ($addDirs, $editDirs) = $exifTool->GetAddDirHash($tagTablePtr);
 
-    my $saveOrder = GetByteOrder();
     SetByteOrder('MM');     # Photoshop is always big-endian
 #
 # rewrite existing tags in the old directory, deleting ones as necessary
@@ -111,10 +110,10 @@ sub WritePhotoshop($$$)
                 DirStart => $pos,
                 DataLen => $dirLen,
                 DirLen => $size,
-                Parent => $dirInfo->{DirName},
+                Parent => $$dirInfo{DirName},
             );
             my $subTable = Image::ExifTool::GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-            my $newValue = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+            my $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
             if (defined $newValue) {
                 next unless length $newValue;   # remove subdirectory entry
                 $value = $newValue;
@@ -146,10 +145,10 @@ sub WritePhotoshop($$$)
             $tagInfo = $$addDirs{$tagID};
             # create new directory
             my %subdirInfo = (
-                Parent => $dirInfo->{DirName},
+                Parent => $$dirInfo{DirName},
             );
             my $subTable = Image::ExifTool::GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-            $value = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+            $value = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
             next unless $value;
         }
         $size = length($value);
@@ -158,7 +157,6 @@ sub WritePhotoshop($$$)
         $newData .= "\0" if $size & 0x01;   # must null pad to even numbered byte
         ++$exifTool->{CHANGED};
     }
-    SetByteOrder($saveOrder);               # restore original byte ordering
     return $newData;
 }
 

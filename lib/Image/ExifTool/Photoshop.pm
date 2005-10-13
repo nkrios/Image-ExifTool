@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.15';
+$VERSION = '1.18';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -31,14 +31,19 @@ sub WritePhotoshop($$$);
 # Photoshop APP13 tag table
 # (set Unknown flag for information we don't want to display normally)
 %Image::ExifTool::Photoshop::Main = (
-    GROUPS => { 2 => 'Other' },
+    GROUPS => { 2 => 'Image' },
     PROCESS_PROC => \&ProcessPhotoshop,
     WRITE_PROC => \&WritePhotoshop,
     0x03e8 => { Unknown => 1, Name => 'Photoshop2Info' },
     0x03e9 => { Unknown => 1, Name => 'MacintoshPrintInfo' },
     0x03ea => { Unknown => 1, Name => 'XMLData' }, #PH
     0x03eb => { Unknown => 1, Name => 'Photoshop2ColorTable' },
-    0x03ed => { Unknown => 1, Name => 'ResolutionInfo' },
+    0x03ed => {
+        Name => 'ResolutionInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Photoshop::Resolution',
+        },
+    },
     0x03ee => {
         Name => 'AlphaChannelsNames',
         PrintConv => 'Image::ExifTool::Photoshop::ConvertPascalString($val)',
@@ -97,12 +102,19 @@ sub WritePhotoshop($$$);
     },
     0x040c => {
         Name => 'PhotoshopThumbnail',
-        Groups => { 2 => 'Image' },
-        ValueConv => 'my $img=substr($val, 0x1c);\$img',
+        ValueConv => 'my $img=substr($val,0x1c);$self->ValidateImage(\$img,"PhotoshopThumbnail")',
     },
-    0x040d => { Unknown => 1, Name => 'GlobalAngle' },
+    0x040d => {
+        Name => 'GlobalAngle',
+        ValueConv => 'unpack("N",$val)',
+    },
     0x040e => { Unknown => 1, Name => 'ColorSamplersResource' },
-    0x040f => { Unknown => 1, Name => 'ICC_Profile' },
+    0x040f => {
+        Name => 'ICC_Profile',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::ICC_Profile::Main',
+        },
+    },
     0x0410 => { Unknown => 1, Name => 'Watermark' },
     0x0411 => { Unknown => 1, Name => 'ICC_Untagged' },
     0x0412 => { Unknown => 1, Name => 'EffectsVisible' },
@@ -111,7 +123,10 @@ sub WritePhotoshop($$$);
     0x0415 => { Unknown => 1, Name => 'UnicodeAlphaNames' },
     0x0416 => { Unknown => 1, Name => 'IndexedColourTableCount' },
     0x0417 => { Unknown => 1, Name => 'TransparentIndex' },
-    0x0419 => { Unknown => 1, Name => 'GlobalAltitude' },
+    0x0419 => {
+        Name => 'GlobalAltitude',
+        ValueConv => 'unpack("N",$val)',
+    },
     0x041a => { Unknown => 1, Name => 'Slices' },
     0x041b => { Unknown => 1, Name => 'WorkflowURL' },
     0x041c => { Unknown => 1, Name => 'JumpToXPEP' },
@@ -119,8 +134,11 @@ sub WritePhotoshop($$$);
     0x041e => { Unknown => 1, Name => 'URL_List' },
     0x0421 => { Unknown => 1, Name => 'VersionInfo' },
     0x0422 => {
-        Name => 'TIFFThumbnail', #PH (Found in DOS-style EPS file)
-        ValueConv => '\$val',
+        Name => 'EXIFInfo', #PH (Found in DOS-style EPS file and PSD files)
+        SubDirectory => {
+            TagTable=> 'Image::ExifTool::Exif::Main',
+            ProcessProc => \&Image::ExifTool::ProcessTIFF,
+        },
     },
     0x0424 => {
         Name => 'XMP',
@@ -159,6 +177,42 @@ sub WritePhotoshop($$$);
     },
 );
 
+# Photoshop resolution information #PH
+%Image::ExifTool::Photoshop::Resolution = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 2 => 'Image' },
+    0 => {
+        Name => 'XResolution',
+        Format => 'int32u',
+        Priority => 0,
+        ValueConv => '$val / 0x10000',
+        PrintConv => 'int($val * 100 + 0.5) / 100',
+    },
+    2 => {
+        Name => 'DisplayedUnitsX',
+        PrintConv => {
+            1 => 'inches',
+            2 => 'cm',
+        },
+    },
+    4 => {
+        Name => 'YResolution',
+        Format => 'int32u',
+        Priority => 0,
+        ValueConv => '$val / 0x10000',
+        PrintConv => 'int($val * 100 + 0.5) / 100',
+    },
+    6 => {
+        Name => 'DisplayedUnitsY',
+        PrintConv => {
+            1 => 'inches',
+            2 => 'cm',
+        },
+    },
+);
+
 
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary
@@ -190,19 +244,18 @@ sub ConvertPascalString($)
 
 #------------------------------------------------------------------------------
 # Process Photoshop APP13 record
-# Inputs: 0) ExifTool object reference, 1) Tag table reference
-#         2) Reference to directory information
+# Inputs: 0) ExifTool object reference, 1) Reference to directory information
+#         2) Tag table reference
 # Returns: 1 on success
 sub ProcessPhotoshop($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $pos = $dirInfo->{DirStart};
-    my $dirEnd = $pos + $dirInfo->{DirLen};
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = $$dirInfo{DirStart};
+    my $dirEnd = $pos + $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
 
-    my $saveOrder = GetByteOrder();
     SetByteOrder('MM');     # Photoshop is always big-endian
     $verbose and $exifTool->VerboseDir('Photoshop', 0, $$dirInfo{DirLen});
 
@@ -274,13 +327,13 @@ sub ProcessPhotoshop($$$)
                     DataLen  => $size,
                     DirStart => 0,
                     DirLen   => $size,
-                    Parent   => $dirInfo->{DirName},
+                    Parent   => $$dirInfo{DirName},
                 );
-                if (defined $dirInfo->{DataPos}) {
-                    $subdirInfo{DataPos} = $dirInfo->{DataPos} + $pos,
+                if (defined $$dirInfo{DataPos}) {
+                    $subdirInfo{DataPos} = $$dirInfo{DataPos} + $pos,
                 }
                 # process the directory
-                $exifTool->ProcessTagTable($newTagTable, \%subdirInfo, $$subdir{ProcessProc});
+                $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable, $$subdir{ProcessProc});
             } else {
                 $exifTool->FoundTag($tagInfo, $value);
             }
@@ -288,18 +341,17 @@ sub ProcessPhotoshop($$$)
         $size += 1 if $size & 0x01; # size is padded to an even # bytes
         $pos += $size;
     }
-    SetByteOrder($saveOrder);
     return $success;
 }
 
 #------------------------------------------------------------------------------
 # extract information from Photoshop PSD file
-# Inputs: 0) ExifTool object reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 if this was a valid PSD file
-sub PsdInfo($)
+sub ProcessPSD($$)
 {
-    my $exifTool = shift;
-    my $raf = $exifTool->{RAF};
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
     my $data;
 
     $raf->Read($data, 30) == 30 or return 0;
@@ -318,7 +370,7 @@ sub PsdInfo($)
         DirLen => $len,
         DirName => 'PSD',
     );
-    return ProcessPhotoshop($exifTool, $tagTablePtr, \%dirInfo);
+    return ProcessPhotoshop($exifTool, \%dirInfo, $tagTablePtr);
 }
 
 1; # end

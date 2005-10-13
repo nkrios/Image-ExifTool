@@ -30,152 +30,114 @@ package Image::ExifTool::XMP;
 use strict;
 
 sub CheckXMP($$$);
-sub SetPropertyPath($$$);
-sub CaptureXMP($$$$;$);
+sub SetPropertyPath($$;$$);
+sub CaptureXMP($$$;$);
 
 my $debug = 0;
 
-# namespace/property definitions for all writable XMP tags
-my %xmpResourceRef = (
-    stRef => [
-        'InstanceID', 'DocumentID', 'VersionID', 'RenditionClass',
-        'RenditionParams', 'Manager', 'ManagerVariant', 'ManageTo', 'ManageUI',
-    ],
-);
-my %xmpResourceEvent = (
-    stEvt => [
-        'action', 'instanceID', 'parameters', 'softwareAgent', 'when',
-    ],
-);
-my %xmpJobRef = (
-    stJob => [ 'name', 'id', 'url' ],
-);
-my %xmpVersion = (
-    stVer => [
-        'comments',
-        [ 'event', \%xmpResourceEvent ],
-        'modifyDate', 'modifier', 'version',
-    ],
-);
-my %xmpThumbnail = (
-    xapGImg => [ 'height', 'width', 'format', 'image' ],
-);
-my %xmpPagedTex = (
-    xmpTPg => [ 'maxPageSize', 'NPages' ],
-);
-my %xmpIdentifierScheme = (
-    xmpidq => [ 'Scheme' ], # qualifier for xmp:Scheme only
-);
-my %xmpDimensions = (
-    stDim => [ 'w', 'h', 'unit' ],
-);
-# the following stuctures are funny -- they don't have their own namespaces defined
-# (apparently they use the 'exif' namespace)
-my %xmpFlash = (
-    exif => [ 'Fired', 'Return', 'Mode', 'Function', 'RedEyeMode' ],
-);
-my %xmpOECF = (
-    exif => [ 'Columns', 'Rows', 'Names', 'Values' ],
-);
-my %xmpCFAPattern = (
-    exif => [ 'Columns', 'Rows', 'Values' ],
-);
-my %xmpDeviceSettings = (
-    exif => [ 'Columns', 'Rows', 'Settings' ],
-);
-# Iptc4xmpCore structures
-my %xmpContactInfo = (
-    Iptc4xmpCore => [
-        'CiAdrCity', 'CiAdrCtry', 'CiAdrExtadr', 'CiAdrPcode',
-        'CiAdrRegion', 'CiEmailWork', 'CiTelWork', 'CiUrlWork',
-    ],
-);
-
-# complete lookup for all tags of each XMP namespace
-my %writableXMP = (
-    dc => [
-        'contributor', 'coverage', 'creator', 'date', 'description', 'format',
-        'identifier', 'language', 'publisher','relation', 'rights', 'source',
-        'subject', 'title', 'type',
-    ],
-    xmp => ['Advisory', 'BaseURL', 'CreateDate', 'CreatorTool', 'Identifier',
-        'MetadataDate', 'ModifyDate', 'Nickname', [ 'Thumbnails', \%xmpThumbnail ],
-    ],
-    xmpRights => [
-        'Certificate', 'Marked', 'Owner', 'UsageTerms', 'WebStatement',
-    ],
-    xmpMM => [
-        [ 'DerivedFrom', \%xmpResourceRef ], 'DocumentID',
-        [ 'History', \%xmpResourceEvent ], [ 'ManagedFrom', \%xmpResourceRef ],
-        'Manager', 'ManageTo', 'ManageUI', 'ManagerVariant', 'RenditionClass',
-        'RenditionParams', 'VersionID', [ 'Versions', \%xmpVersion ], 'LastURL',
-        [ 'RenditionOf', \%xmpResourceRef ], 'SaveID',
-    ],
-    xmpBJ => [
-        [ 'JobRef', \%xmpJobRef ],
-    ],
-    pdf => [
-        'Author', 'ModDate', 'CreationDate', 'PDFVersion', 'Producer', 'Keywords',
-        # These are undocumented and conflict with dc tags, so we won't write them:
-        # 'Creator', 'Subject', 'Title',
-    ],
-    photoshop => [
-        'AuthorsPosition', 'CaptionWriter', 'Category', 'City', 'Country', 'Credit',
-        'DateCreated', 'Headline', 'Instructions', 'Source', 'State',
-        'SupplementalCategories', 'TransmissionReference', 'Urgency',
-    ],
-    crs => [
-        'Version', 'RawFileName', 'WhiteBalance', 'Exposure', 'Shadows',
-        'Brightness', 'Contrast', 'Saturation', 'Sharpness', 'LuminanceSmoothing',
-        'ColorNoiseReduction', 'ChromaticAberrationR', 'ChromaticAberrationB',
-        'VignetteAmount', 'VignetteMidpoint', 'ShadowTint', 'RedHue',
-        'RedSaturation', 'GreenHue', 'GreenSaturation', 'BlueHue', 'BlueSaturation',
-    ],
-    aux => [
-        'Lens', 'SerialNumber',
-    ],
-    tiff => [
-        'ImageWidth', 'ImageLength', 'BitsPerSample', 'Compression',
-        'PhotometricInterpretation', 'Orientation', 'SamplesPerPixel',
-        'PlanarConfiguration', 'YCbCrSubSampling', 'XResolution', 'YResolution',
-        'ResolutionUnit', 'TransferFunction', 'WhitePoint', 'PrimaryChromaticities',
-        'YCbCrCoefficients', 'ReferenceBlackWhite', 'DateTime', 'ImageDescription',
-        'Make', 'Model', 'Software', 'Artist', 'Copyright',
-    ],
-    exif => [
-        'ExifVersion', 'FlashpixVersion', 'ColorSpace', 'ComponentsConfiguration',
-        'CompressedBitsPerPixel', 'PixelXDimension', 'PixelYDimension', 'MakerNote',
-        'UserComment', 'RelatedSoundFile', 'DateTimeOriginal', 'DateTimeDigitized',
-        'ExposureTime', 'FNumber', 'ExposureProgram', 'SpectralSensitivity',
-        'ISOSpeedRatings', ['OECF', \%xmpOECF], 'ShutterSpeedValue', 'ApertureValue',
-        'BrightnessValue', 'ExposureBiasValue', 'MaxApertureValue', 'SubjectDistance',
-        'MeteringMode', 'LightSource', ['Flash', \%xmpFlash], 'FocalLength',
-        'SubjectArea', 'FlashEnergy', ['SpatialFrequencyResponse', \%xmpOECF],
-        'FocalPlaneXResolution', 'FocalPlaneYResolution', 'FocalPlaneResolutionUnit',
-        'SubjectLocation', 'ExposureIndex', 'SensingMethod', 'FileSource',
-        'SceneType', ['CFAPattern', \%xmpCFAPattern], 'CustomRendered',
-        'ExposureMode', 'WhiteBalance', 'DigitalZoomRatio', 'FocalLengthIn35mmFilm',
-        'SceneCaptureType', 'GainControl', 'Contrast', 'Saturation', 'Sharpness',
-        ['DeviceSettingDescription', \%xmpDeviceSettings], 'SubjectDistanceRange',
-        'ImageUniqueID', 'GPSVersionID', 'GPSLatitude', 'GPSLongitude',
-        'GPSAltitudeRef', 'GPSAltitude', 'GPSVersionID', 'GPSTimeStamp',
-        'GPSSatellites', 'GPSStatus', 'GPSSpeedRef', 'GPSSpeed', 'GPSTrackRef',
-        'GPSTrack', 'GPSImgDirectionRef', 'GPSImgDirection', 'GPSMapDatum',
-        'GPSDestLatitude', 'GPSDestLongitude', 'GPSDestBearingRef', 'GPSDestBearing',
-        'GPSDestDistanceRef', 'GPSDestDistance', 'GPSProcessingMethod',
-        'GPSAreaInformation', 'GPSDifferential',
-    ],
-    Iptc4xmpCore => [
-        'CountryCode', ['CreatorContactInfo', \%xmpContactInfo], 'IntellectualGenre',
-        'Location', 'Scene', 'SubjectCode',
-    ],
+# XMP structures (each structure is similar to a tag table so we can
+# recurse through them in SetPropertyPath() as if they were tag tables)
+my %xmpStruct = (
+    ResourceRef => {
+        NAMESPACE => 'stRef',
+        InstanceID      => { },
+        DocumentID      => { },
+        VersionID       => { },
+        RenditionClass  => { },
+        RenditionParams => { },
+        Manager         => { },
+        ManagerVariant  => { },
+        ManageTo        => { },
+        ManageUI        => { },
+    },
+    ResourceEvent => {
+        NAMESPACE => 'stEvt',
+        action          => { },
+        instanceID      => { },
+        parameters      => { },
+        softwareAgent   => { },
+        when            => { },
+    },
+    JobRef => {
+        NAMESPACE => 'stJob',
+        name        => { },
+        id          => { },
+        url         => { },
+    },
+    Version => {
+        NAMESPACE => 'stVer',
+        comments    => { },
+        event       => { Struct => 'ResourceEvent' },
+        modifyDate  => { },
+        modifier    => { },
+        version     => { },
+    },
+    Thumbnail => {
+        NAMESPACE => 'xapGImg',
+        height      => { },
+        width       => { },
+       'format'     => { },
+        image       => { },
+    },
+    IdentifierScheme => {
+        NAMESPACE => 'xmpidq',
+        Scheme      => { }, # qualifier for xmp:Identifier only
+    },
+    Dimensions => {
+        NAMESPACE => 'stDim',
+        w           => { },
+        h           => { },
+        unit        => { },
+    },
+    # the following stuctures are different:  They don't have
+    # their own namespaces -- instead they use the parent namespace
+    Flash => {
+        NAMESPACE => 'exif',
+        Fired       => { },
+        Return      => { },
+        Mode        => { },
+        Function    => { },
+        RedEyeMode  => { },
+    },
+    OECF => {
+        NAMESPACE => 'exif',
+        Columns     => { },
+        Rows        => { },
+        Names       => { },
+        Values      => { },
+    },
+    CFAPattern => {
+        NAMESPACE => 'exif',
+        Columns     => { },
+        Rows        => { },
+        Values      => { },
+    },
+    DeviceSettings => {
+        NAMESPACE => 'exif',
+        Columns     => { },
+        Rows        => { },
+        Settings    => { },
+    },
+    # Iptc4xmpCore structures
+    ContactInfo => {
+        NAMESPACE => 'Iptc4xmpCore',
+        CiAdrCity   => { },
+        CiAdrCtry   => { },
+        CiAdrExtadr => { },
+        CiAdrPcode  => { },
+        CiAdrRegion => { },
+        CiEmailWork => { },
+        CiTelWork   => { },
+        CiUrlWork   => { },
+    },
 );
 
-# Lookup to translate our namespace prefixes into URI's.  This
-# list need not be complete, but it must contain an entry for each
-# namespace prefix used in the above tables
+# Lookup to translate our namespace prefixes into URI's.  This list need
+# not be complete, but it must contain an entry for each namespace prefix
+# (NAMESPACE) for writable tags in the XMP tables or the table above
 my %nsURI = (
     aux       => 'http://ns.adobe.com/exif/1.0/aux/',
+    cc        => 'http://web.resource.org/cc/',
     crs       => 'http://ns.adobe.com/camera-raw-settings/1.0/',
     dc        => 'http://purl.org/dc/elements/1.1/',
     exif      => 'http://ns.adobe.com/exif/1.0/',
@@ -199,6 +161,8 @@ my %nsURI = (
     xmpTPg    => 'http://ns.adobe.com/xap/1.0/t/pg/',
     xmpidq    => 'http://ns/adobe.com/xmp/Identifier/qual/1.0',
     Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
+    xmpPLUS   => 'http://ns.adobe.com/xap/1.0/PLUS/',
+    dex       => 'http://ns.optimasc.com/dex/1.0/',
 );
 
 # these are the attributes that we handle for properties that contain
@@ -226,22 +190,34 @@ my $rdfClose = "</rdf:RDF>\n";
 my $xmpClose = "</x:xmpmeta>\n";
 my $pktClose =  "<?xpacket end='w'?>";
 
-# generate "PropertyPath" for tags in main XMP table when this file is loaded
+# Update XMP tag tables when this library is loaded:
+# - generate all TagID's (required when writing)
+# - generate PropertyPath for structure elements
+# - add necessary inverse conversion routines
 {
-    my $ns;
-    my $table = Image::ExifTool::GetTagTable('Image::ExifTool::XMP::Main');
-    SetPropertyPath($table, \%writableXMP, []);
-}
-
-# add inverse conversion routines for entries in main table
-{
-    my $table = Image::ExifTool::GetTagTable('Image::ExifTool::XMP::Main');
-    my $tag;
-    $table->{CHECK_PROC} = \&CheckXMP; # add our write check routine
-    foreach $tag (Image::ExifTool::TagTableKeys($table)) {
-        my @tagInfoList = Image::ExifTool::GetTagInfoList($table, $tag) or next;
-        my $tagInfo;
-        foreach $tagInfo (@tagInfoList) {
+    my $mainTable = Image::ExifTool::GetTagTable('Image::ExifTool::XMP::Main');
+    Image::ExifTool::GenerateTagIDs($mainTable);
+    my $mainTag;
+    foreach $mainTag (keys %$mainTable) {
+        my $mainInfo = $mainTable->{$mainTag};
+        next unless ref $mainInfo eq 'HASH' and $mainInfo->{SubDirectory};
+        my $table = Image::ExifTool::GetTagTable($mainInfo->{SubDirectory}->{TagTable});
+        # add new namespace if NAMESPACE is ns/uri pair
+        if (ref $$table{NAMESPACE} eq 'ARRAY') {
+            my $ns = $table->{NAMESPACE}->[0];
+            $nsURI{$ns} = $table->{NAMESPACE}->[1];
+            $$table{NAMESPACE} = $ns;
+        }
+        $$table{WRITE_PROC} = \&WriteXMP;   # set WRITE_PROC for all tables
+        Image::ExifTool::GenerateTagIDs($table);
+        my $tag;
+        $table->{CHECK_PROC} = \&CheckXMP; # add our write check routine
+        foreach $tag (Image::ExifTool::TagTableKeys($table)) {
+            my $tagInfo = $$table{$tag};
+            next unless ref $tagInfo eq 'HASH';
+            # must set PropertyPath now for all tags that are Struct elements
+            # (normal tags will get set later if they are actually written)
+            SetPropertyPath($table, $tag) if $$tagInfo{Struct};
             my $format = $$tagInfo{Writable};
             next unless $format and $format eq 'date';
             # add dummy conversion for dates (for now...)
@@ -261,13 +237,15 @@ sub CheckXMP($$$)
     my ($exifTool, $tagInfo, $valPtr) = @_;
     my $format = $tagInfo->{Writable};
     # if no format specified, value is a simple string
-    return undef unless $format;
-    if ($format eq 'rational') {
+    return undef unless $format and $format ne 'string';
+    if ($format eq 'rational' or $format eq 'real') {
         # make sure the value is a valid floating point number
         unless ($$valPtr =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/) {
             return 'Not a floating point number';
         }
-        $$valPtr = join('/', Image::ExifTool::Rationalize($$valPtr));
+        if ($format eq 'rational') {
+            $$valPtr = join('/', Image::ExifTool::Rationalize($$valPtr));
+        }
     } elsif ($format eq 'integer') {
         # make sure the value is integer
         return 'Not an integer' unless $$valPtr =~ /^[+-]?\d+$/;
@@ -304,79 +282,69 @@ sub CheckXMP($$$)
 }
 
 #------------------------------------------------------------------------------
-# Set PropertyPath in tag information of specified table
-# Inputs: 0) tag table reference, 1) reference to namespace hash
-#         2) reference to array of property names (starting after rdf:Description)
-sub SetPropertyPath($$$)
+# Get PropertyPath for specified tagInfo
+# Inputs: 0) tagInfo reference
+# Returns: PropertyPath string
+sub GetPropertyPath($)
 {
-    local $_;
-    my ($table, $nsHash, $propList) = @_;
-    my ($prop, $tag, $ns);
-    foreach $ns (keys %$nsHash) {
-        my $group1;
-        if (@$propList) {
-            ($group1 = $$propList[0]) =~ s/:.*//;
-        } else {
-            $group1 = $ns;
-        }
-        my $tagList = $$nsHash{$ns};
-        foreach (@$tagList) {
-            my $tag = $_;
-            my $nsHash2;
-            # handle the contained properties
-            ($tag, $nsHash2) = @$tag if ref $tag eq 'ARRAY';
-            my $prop = "$ns:$tag";
-            push @$propList, $prop;     # add to list of properties
-            $tag = GetXMPTagName($propList);
-            my $tagInfo;
-            my @tagInfoList = Image::ExifTool::GetTagInfoList($table,$tag);
-            if (@tagInfoList == 1) {
-                $tagInfo = $tagInfoList[0];
-            } else {
-                foreach (@tagInfoList) {
-                    next unless $_->{Namespace};
-                    next unless $ns eq $_->{Namespace};
-                    $tagInfo = $_;
-                    last;
-                }
-            }
-            unless ($tagInfo) {
-                warn("Can't find info for XMP tag $tag\n");
-                pop @$propList;
-                next;
-            }
-            # translate necessary namespace prefixes
-            $group1 = $xlatNamespace{$group1} if $xlatNamespace{$group1};
-            $tagInfo->{Groups}->{1} = 'XMP-' . $group1;   # set group1 name
-            # the 'List' entry in XMP table gives the specific type of
-            # list, and is one of Bag, Seq, Alt or 1.  If '1', this is just
-            # a property in a list of structures, so a list property has
-            # already been generated.
-            my $listType = $$tagInfo{List};
-            # lang-alt lists are handled specially, signified by Writable='lang-alt'
-            # (they aren't true lists since we currently only allow setting of
-            # the default language.)
-            if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt') {
-                $listType = 'Alt';
-            }
-            # add required properties if this is a list
-            if ($listType) {
-                if ($listType eq '1') {
-                    undef $listType;    # '1' is used for elements of structures in lists
-                } else {
-                    push @$propList, "rdf:$listType", 'rdf:li 000';
-                }
-            }
-            # set property path for this tag
-            $$tagInfo{PropertyPath} = join('/',@$propList);
-            # recurse into the sub-property
-            if ($nsHash2) {
-                SetPropertyPath($table, $nsHash2, $propList);
-            }
-            $#$propList -= 2 if $listType;  # pop off list properties
-            --$#$propList;  # pop off this property
+    my $tagInfo = shift;
+    unless ($$tagInfo{PropertyPath}) {
+        SetPropertyPath($$tagInfo{Table}, $$tagInfo{TagID});
+    }
+    return $$tagInfo{PropertyPath};
+}
+
+#------------------------------------------------------------------------------
+# Set PropertyPath for specified tag (also for any structure elements)
+# Inputs: 0) tagTable reference, 1) tagID, 2) structure reference (or undef),
+#         3) property list up to this point (or undef), 4) true if tag is a list
+sub SetPropertyPath($$;$$)
+{
+    my ($tagTablePtr, $tagID, $structPtr, $propList) = @_;
+    my $table = $structPtr || $tagTablePtr;
+    my $tagInfo = $$table{$tagID};
+    my $ns = $$table{NAMESPACE};
+    # don't override existing main table entry if already set by a Struct
+    return if not $structPtr and $$tagInfo{PropertyPath};
+    $ns or warn("No namespace for $tagID\n"), return;
+    my (@propList, $listType);
+    $propList and @propList = @$propList;
+    push @propList, "$ns:$tagID";
+    # lang-alt lists are handled specially, signified by Writable='lang-alt'
+    # (they aren't true lists since we currently only allow setting of
+    # the default language.)
+    if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt') {
+        $listType = 'Alt';
+    } else {
+        $listType = $$tagInfo{List};
+    }
+    # add required properties if this is a list
+    push @propList, "rdf:$listType", 'rdf:li 000' if $listType and $listType ne '1';
+    # set PropertyPath for all elements of this structure if necessary
+    if ($$tagInfo{Struct}) {
+        my $struct = $xmpStruct{$$tagInfo{Struct}};
+        $struct or warn("No XMP $$tagInfo{Struct} structure!\n"), return;
+        my $tag;
+        foreach $tag (keys %$struct) {
+            next if $tag eq 'NAMESPACE';
+            SetPropertyPath($tagTablePtr, $tag, $struct, \@propList);
         }
     }
+    # use tagInfo for combined tag name if this was a Struct
+    if ($structPtr) {
+        my $tagName = GetXMPTagID(\@propList);
+        $$tagTablePtr{$tagName} or warn("Tag $tagName not found!\n"), return;
+        $tagInfo = $$tagTablePtr{$tagName};
+        # must check again for List's at this level
+        if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt') {
+            $listType = 'Alt';
+        } else {
+            $listType = $$tagInfo{List};
+        }
+        push @propList, "rdf:$listType", 'rdf:li 000' if $listType and $listType ne '1';
+    }
+    # set property path for tagInfo in main table
+    $$tagInfo{PropertyPath} = join '/', @propList;
 }
 
 #------------------------------------------------------------------------------
@@ -385,9 +353,9 @@ sub SetPropertyPath($$$)
 #         2) reference to array of XMP property path (last is current property)
 #         3) reference to hash of property attributes
 #         4) true to set error on unrecognized attributes
-sub CaptureShorthand($$$$;$)
+sub CaptureShorthand($$$;$)
 {
-    my ($exifTool, $tagTablePtr, $propList, $attrs, $setError) = @_;
+    my ($exifTool, $propList, $attrs, $setError) = @_;
     my $attr;
     my @attrList = keys %$attrs;
     foreach $attr (@attrList) {
@@ -409,10 +377,12 @@ sub CaptureShorthand($$$$;$)
                 $ns = $1 if $prop =~ /(.*):/;   # take namespace from enclosing property
                 $name = $attr;
             }
-            if ($ns and $writableXMP{$ns}) {
+            if ($ns and ($Image::ExifTool::XMP::Main{$ns} or ($xlatNamespace{$ns} and
+                $Image::ExifTool::XMP::Main{$xlatNamespace{$ns}})))
+            {
                 # save this shorthand property
                 push @$propList, "$ns:$name";
-                CaptureXMP($exifTool, $tagTablePtr, $propList, $$attrs{$attr});
+                CaptureXMP($exifTool, $propList, $$attrs{$attr});
                 pop @$propList;
                 # remove this attribute from list since we handled it
                 delete $$attrs{$attr};
@@ -428,9 +398,9 @@ sub CaptureShorthand($$$$;$)
 # Inputs: 0) ExifTool object reference, 1) Pointer to tag table
 #         2) reference to array of XMP property path (last is current property)
 #         3) property value, 4) optional reference to hash of property attributes
-sub CaptureXMP($$$$;$)
+sub CaptureXMP($$$;$)
 {
-    my ($exifTool, $tagTablePtr, $propList, $val, $attrs) = @_;
+    my ($exifTool, $propList, $val, $attrs) = @_;
     $attrs or $attrs = { };
 
     if (defined $val) {
@@ -440,7 +410,7 @@ sub CaptureXMP($$$$;$)
             $$propList[2] eq $rdfDesc)
         {
             # capture any shorthand properties in the attribute list
-            CaptureShorthand($exifTool, $tagTablePtr, $propList, $attrs);
+            CaptureShorthand($exifTool, $propList, $attrs);
             # no properties to save yet if this is just the description
             return unless @$propList > 3;
             # save information about this property
@@ -457,7 +427,7 @@ sub CaptureXMP($$$$;$)
     } else {
         # this property has sub-properties, so just handle the attributes
         # (set an error on any unrecognized attributes here, because they will be lost)
-        CaptureShorthand($exifTool, $tagTablePtr, $propList, $attrs, 1);
+        CaptureShorthand($exifTool, $propList, $attrs, 1);
     }
 }
 
@@ -493,20 +463,19 @@ sub ConformPathToNamespace($$)
 
 #------------------------------------------------------------------------------
 # Write XMP information
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) source dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
+#         2) tag table reference
 # Returns: new XMP data (may be empty if no XMP data) or undef on error
 # Notes: Increments ExifTool CHANGED flag for each tag changed
 sub WriteXMP($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
     $tagTablePtr or return undef;
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart} || 0;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
     my (%capture, %nsUsed, $xmpErr);
     my $changed = 0;
-    my $listIndex = '500';    # list index for newly added items
     my $verbose = $exifTool->Options('Verbose');
 #
 # extract existing XMP information into %capture hash
@@ -523,13 +492,13 @@ sub WriteXMP($$$)
     if ($dataPt) {
         delete $exifTool->{XMP_ERROR};
         # extract all existing XMP information (to the XMP_CAPTURE hash)
-        my $success = ProcessXMP($exifTool, $tagTablePtr, $dirInfo);
+        my $success = ProcessXMP($exifTool, $dirInfo, $tagTablePtr);
         # don't continue if there is nothing to parse or if we had a parsing error
         unless ($success and not $exifTool->{XMP_ERROR}) {
             if ($exifTool->{XMP_ERROR}) {
-                $exifTool->Warn($exifTool->{XMP_ERROR});
+                $exifTool->Warn($exifTool->{XMP_ERROR}, 1);
             } else {
-                $exifTool->Warn('Error parsing XMP');
+                $exifTool->Warn('Error parsing XMP', 1);
             }
             unless ($success and $exifTool->Options('IgnoreMinorErrors')) {
                 delete $exifTool->{XMP_CAPTURE};
@@ -545,12 +514,12 @@ sub WriteXMP($$$)
 # add, delete or change information as specified
 #
     # get hash of all information we want to change
-    my @tagInfoList = $exifTool->GetNewTagInfoList($tagTablePtr);
-    Image::ExifTool::GenerateTagIDs($tagTablePtr);   # make sure IDs are generated
+    my @tagInfoList = $exifTool->GetNewTagInfoList();
     my $tagInfo;
     foreach $tagInfo (@tagInfoList) {
+        next unless $exifTool->GetGroup($tagInfo, 0) eq 'XMP';
         my $tag = $tagInfo->{TagID};
-        my $path = $$tagInfo{PropertyPath};
+        my $path = GetPropertyPath($tagInfo);
         unless ($path) {
             $exifTool->Warn("Can't write XMP:$tag (namespace unknown)");
             next;
@@ -588,7 +557,7 @@ sub WriteXMP($$$)
                     # save attributes and path from this deleted property
                     # so we can replace it exactly
                     %attrs = %$attrs;
-                    $delPath = $path;
+                    $delPath = $path unless $delPath;
                     delete $capture{$path};
                     ++$changed;
                 }
@@ -599,12 +568,22 @@ sub WriteXMP($$$)
                     # don't change tag if we couldn't delete old copy unless this is a list
                     next unless $$tagInfo{List};
                     # add to end of list (give it a large list index)
-                    $path =~ m/ \d{3}/g or warn "Internal error: no list index!\n", next;
-                    substr($path, pos($path)-3, 3) = $listIndex++;
+                    $path =~ m/ (\d{3})/g or warn "Internal error: no list index!\n", next;
+                    my $listIndex = $1;
+                    my $pos = pos($path) - 3;
+                    for (;;) {
+                        substr($path, $pos, 3) = ++$listIndex;
+                        last unless $capture{$path};
+                    }
                 }
-            } elsif ($path =~ m/ \d{3}/g) {
+            } elsif ($path =~ m/ (\d{3})/g) {
                 # add to end of list
-                substr($path, pos($path)-3, 3) = $listIndex++;
+                my $listIndex = $1;
+                my $pos = pos($path) - 3;
+                for (;;) {
+                    substr($path, $pos, 3) = ++$listIndex;
+                    last unless $capture{$path};
+                }
             }
         }
         next unless @newValues; # done if no new values specified
@@ -622,9 +601,14 @@ sub WriteXMP($$$)
             $verbose > 1 and print "    + XMP:$$tagInfo{Name} = '$newValue'\n";
             ++$changed;
             last unless @newValues;
-            $path =~ m/ \d{3}/g or warn "Internal error: no list index!\n", next;
-            substr($path, pos($path)-3, 3) = $listIndex++;
-            $capture{$path} and warn "Too many entries in XMP list!\n", next;
+            $path =~ m/ (\d{3})/g or warn("Internal error: no list index!\n"), next;
+            my $listIndex = $1;
+            my $pos = pos($path) - 3;
+            for (;;) {
+                substr($path, $pos, 3) = ++$listIndex;
+                last unless $capture{$path};
+            }
+            $capture{$path} and warn("Too many entries in XMP list!\n"), next;
         }
     }
     # remove the ExifTool members we created

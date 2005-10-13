@@ -384,8 +384,7 @@ my %writeTable = (
         Notes => q{
 tags 0x9c9b-0x9c9f are used by Windows Explorer; special characters in these
 values are converted to UTF-8 by default, or Windows Latin1 with the -L option.
-XPTitle is ignored by Windows Explorer if ImageDescription exists',
-
+XPTitle is ignored by Windows Explorer if ImageDescription exists
         },
         ValueConvInv => '$self->Byte2Unicode($val,"II")',
     },
@@ -752,10 +751,10 @@ sub InsertWritableProperties($$;$$)
 sub RebuildMakerNotes($$$)
 {
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dirStart = $dirInfo->{DirStart};
-    my $dirLen = $dirInfo->{DirLen};
-    my $dataPt = $dirInfo->{DataPt};
-    my $dataPos = $dirInfo->{DataPos} || 0;
+    my $dirStart = $$dirInfo{DirStart};
+    my $dirLen = $$dirInfo{DirLen};
+    my $dataPt = $$dirInfo{DataPt};
+    my $dataPos = $$dirInfo{DataPos} || 0;
     my $rtnValue;
     my %subdirInfo = %$dirInfo;
 
@@ -775,7 +774,7 @@ sub RebuildMakerNotes($$$)
         # set FILE_TYPE to JPEG so PREVIEW_INFO will be generated
         $newTool->{FILE_TYPE} = 'JPEG';
         # rewrite maker notes
-        $rtnValue = $newTool->WriteTagTable($tagTablePtr, \%subdirInfo);
+        $rtnValue = $newTool->WriteDirectory(\%subdirInfo, $tagTablePtr);
         if (defined $rtnValue and length $rtnValue) {
             # add the dummy preview image if necessary
             if ($newTool->{PREVIEW_INFO}) {
@@ -790,7 +789,7 @@ sub RebuildMakerNotes($$$)
             # shift offsets according to original position of maker notes,
             # and relative to the makernotes Base
             $makerFixup->{Shift} += $dataPos + $dirStart +
-                                    $dirInfo->{Base} - $subdirInfo{Base};
+                                    $$dirInfo{Base} - $subdirInfo{Base};
             # fix up pointers to the specified offset
             $makerFixup->ApplyFixup(\$rtnValue);
         }
@@ -836,11 +835,25 @@ sub SortIFD($$$)
 }
 
 #------------------------------------------------------------------------------
+# Update TIFF_END member if defined
+# Inputs: 0) ExifTool ref, 1) end of valid TIFF data
+sub UpdateTiffEnd($$)
+{
+    my ($exifTool, $end) = @_;
+    if (defined $exifTool->{TIFF_END} and
+        $exifTool->{TIFF_END} < $end)
+    {
+        $exifTool->{TIFF_END} = $end;
+    }
+}
+
+#------------------------------------------------------------------------------
 # Write EXIF directory
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) source dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
+#         2) tag table reference
 # Returns: Exif data block (may be empty if no Exif data) or undef on error
-# Notes: Increments ExifTool CHANGED flag for each tag changed
+# Notes: Increments ExifTool CHANGED flag for each tag changed.  Also updates
+#        TIFF_END if defined with location of end of original TIFF image.
 # Returns IFD data in the following order:
 #   1. IFD0 directory followed by its data
 #   2. SubIFD directory followed by its data, thumbnail and image
@@ -849,22 +862,22 @@ sub SortIFD($$$)
 #   5. Thumbnail and/or image data for each IFD, with IFD0 image last
 sub WriteExif($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
-    my $dataPt = $dirInfo->{DataPt};
+    my $dataPt = $$dirInfo{DataPt};
     unless ($dataPt) {
         my $emptyData = '';
         $dataPt = \$emptyData;
     }
-    my $dirStart = $dirInfo->{DirStart} || 0;
-    my $dataLen = $dirInfo->{DataLen} || length($$dataPt);
-    my $dirLen = $dirInfo->{DirLen} || ($dataLen - $dirStart);
-    my $base = $dirInfo->{Base} || 0;
-    my $dataPos = $dirInfo->{DataPos} || 0;
-    my $raf = $dirInfo->{RAF};
-    my $dirName = $dirInfo->{DirName} || 'unknown';
-    my $fixup = $dirInfo->{Fixup} || new Image::ExifTool::Fixup;
-    my $fixBase = $dirInfo->{FixBase};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dataLen = $$dirInfo{DataLen} || length($$dataPt);
+    my $dirLen = $$dirInfo{DirLen} || ($dataLen - $dirStart);
+    my $base = $$dirInfo{Base} || 0;
+    my $dataPos = $$dirInfo{DataPos} || 0;
+    my $raf = $$dirInfo{RAF};
+    my $dirName = $$dirInfo{DirName} || 'unknown';
+    my $fixup = $$dirInfo{Fixup} || new Image::ExifTool::Fixup;
+    my $fixBase = $$dirInfo{FixBase};
     my $verbose = $exifTool->Options('Verbose');
     my (@offsetInfo, %xDelete);
     my $newData = '';   # initialize buffer to receive new directory data
@@ -942,21 +955,22 @@ sub WriteExif($$$)
             }
             my $len = 12 * Get16u(\$buff,0);
             # also read next IFD pointer if reading multiple IFD's
-            $len += 4 if $dirInfo->{Multi};
+            $len += 4 if $$dirInfo{Multi};
             unless ($raf->Read($buf2, $len) == $len) {
                 $exifTool->Error("Error reading $dirName");
                 return undef;
             }
+            UpdateTiffEnd($exifTool, $offset+$base+2+$len);
             $buff .= $buf2;
             # make copy of dirInfo since we're going to modify it
             my %newDirInfo = %$dirInfo;
             $dirInfo = \%newDirInfo;
             # update directory parameters for the newly loaded IFD
-            $dataPt = $dirInfo->{DataPt} = \$buff;
-            $dirStart = $dirInfo->{DirStart} = 0;
-            $dataPos = $dirInfo->{DataPos} = $offset;
-            $dataLen = $dirInfo->{DataLen} = $len + 2;
-            $dirLen = $dirInfo->{DirLen} = $dataLen;
+            $dataPt = $$dirInfo{DataPt} = \$buff;
+            $dirStart = $$dirInfo{DirStart} = 0;
+            $dataPos = $$dirInfo{DataPos} = $offset;
+            $dataLen = $$dirInfo{DataLen} = $len + 2;
+            $dirLen = $$dirInfo{DirLen} = $dataLen;
         }
         my ($len, $numEntries);
         if ($dirStart + 4 < $dataLen) {
@@ -1061,10 +1075,10 @@ sub WriteExif($$$)
                             if ($diff) {
                                 $verbose and $exifTool->Warn("Adjusted $$dirInfo{DirName} base by $diff");
                                 $valuePtr += $diff;
-                                $dirInfo->{Base} = $base = $base + $diff;
-                                $dirInfo->{DataPos} = $dataPos = $dataPos - $diff;
+                                $$dirInfo{Base} = $base = $base + $diff;
+                                $$dirInfo{DataPos} = $dataPos = $dataPos - $diff;
                                 # set relative flag if base is inside maker notes
-                                $dirInfo->{Relative} = 1 if $base > $base+$dataPos+$dirStart;
+                                $$dirInfo{Relative} = 1 if $base > $base+$dataPos+$dirStart;
                             }
                             undef $fixBase;  # only fix it once
                         }
@@ -1074,6 +1088,7 @@ sub WriteExif($$$)
                                 if ($raf->Seek($base + $valuePtr + $dataPos, 0) and
                                     $raf->Read($oldValue, $oldSize) == $oldSize)
                                 {
+                                    UpdateTiffEnd($exifTool, $base+$valuePtr+$dataPos+$oldSize);
                                     $valueDataPt = \$oldValue;
                                     $valueDataPos = $valuePtr + $dataPos;
                                     $valueDataLen = $oldSize;
@@ -1129,6 +1144,14 @@ sub WriteExif($$$)
                 }
             } else {
                 $isNew = $oldID <=> $newID;
+            }
+            # override format we use to read the value if specified
+            if ($oldInfo and $$oldInfo{Format}) {
+                $oldFormName = $$oldInfo{Format};
+                # must adjust number of items for new format size
+                $oldFormat = $formatNumber{$oldFormName};
+                $oldFormat or $exifTool->Error("Bad format name $oldFormName"), return undef;
+                $oldCount = $oldSize / $formatSize[$oldFormat];
             }
             my $newInfo = $oldInfo;
             my $newFormat = $oldFormat;
@@ -1259,11 +1282,11 @@ sub WriteExif($$$)
                     }
                     # create empty source directory
                     my %sourceDir = (
-                        Parent => $dirInfo->{DirName},
+                        Parent => $$dirInfo{DirName},
                         Fixup => new Image::ExifTool::Fixup,
                     );
                     $sourceDir{DirName} = $newInfo->{Groups}->{1} if $$newInfo{SubIFD};
-                    $newValue = $exifTool->WriteTagTable($subTable, \%sourceDir);
+                    $newValue = $exifTool->WriteDirectory(\%sourceDir, $subTable);
                     # only add new directory if it isn't empty
                     next unless defined $newValue and length($newValue);
                     # set the fixup start location
@@ -1375,7 +1398,7 @@ sub WriteExif($$$)
                             # we need fixup data for this subdirectory
                             $subdirInfo{Fixup} = new Image::ExifTool::Fixup;
                             # rewrite maker notes
-                            $subdir = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+                            $subdir = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                         } elsif ($$subTable{PROCESS_PROC} and
                                  $$subTable{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData)
                         {
@@ -1390,7 +1413,7 @@ sub WriteExif($$$)
                                 $loc = 0;
                             }
                             # rewrite maker notes
-                            $subdir = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+                            $subdir = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                         } else {
                             $exifTool->Warn('Maker notes could not be parsed');
                         }
@@ -1452,9 +1475,9 @@ sub WriteExif($$$)
                         my $i;
                         $newValue = '';    # reset value because we regenerate it below
                         for ($i=0; $i<$oldCount; ++$i) {
-                            my $pt = Image::ExifTool::ReadValue($valueDataPt,
-                                            $valuePtr + $i * $formatSize[$oldFormat],
-                                            $formatName[$oldFormat], 1, $oldSize);
+                            my $off = $i * $formatSize[$oldFormat];
+                            my $pt = Image::ExifTool::ReadValue($valueDataPt, $valuePtr + $off,
+                                            $oldFormName, 1, $oldSize - $off);
                             my $subdirStart = $pt - $dataPos;
                             my %subdirInfo = (
                                 Base => $base,
@@ -1477,6 +1500,7 @@ sub WriteExif($$$)
                                     $exifTool->Error("Can't read $subdirName data");
                                     return undef;
                                 }
+                                UpdateTiffEnd($exifTool, $pt+$base+2+$subSize);
                                 $buff .= $buf2;
                                 # change subdirectory information to data we just read
                                 $subdirInfo{DataPt} = \$buff;
@@ -1488,7 +1512,7 @@ sub WriteExif($$$)
                             if ($newInfo->{SubDirectory}->{TagTable}) {
                                 $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
                             }
-                            my $subdir = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+                            my $subdir = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                             return undef unless defined $subdir;
                             next unless length($subdir);
                             # temporarily set value to subdirectory index
@@ -1512,7 +1536,7 @@ sub WriteExif($$$)
                             };
                         }
                         next unless length $newValue;
-                        # set new format to int32u
+                        # set new format to int32u for IFD
                         $newFormName = 'int32u';
                         $newFormat = $formatNumber{$newFormName};
                         $newValuePt = \$newValue;
@@ -1546,12 +1570,12 @@ sub WriteExif($$$)
                             DataLen => $valueDataLen,
                             DirStart => $subdirStart,
                             DirLen => $oldSize,
-                            Parent => $dirInfo->{DirName},
+                            Parent => $$dirInfo{DirName},
                             Fixup => $subFixup,
                             RAF => $raf,
                         );
                         my $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
-                        $newValue = $exifTool->WriteTagTable($subTable, \%subdirInfo);
+                        $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                         if (defined $newValue) {
                             my $hdrLen = $subdirStart - $valuePtr;
                             if ($hdrLen) {
@@ -1579,15 +1603,19 @@ sub WriteExif($$$)
 # keep track of offsets
 #
                     my $offsetInfo = $offsetInfo[$ifd];
+                    # save original values (for updating TIFF_END later)
+                    my @vals;
+                    if ($isNew <= 0) {
+                        @vals = ReadValue(\$oldValue, 0, $oldFormName, $oldCount, $oldSize);
+                    }
                     # only support int32 pointers (for now)
                     if ($formatSize[$newFormat] != 4 and $$newInfo{IsOffset}) {
                         die "Internal error (Offset not int32)" if $isNew > 0;
                         die "Wrong count!" if $newCount != $oldCount;
                         # change to int32
-                        my $val = ReadValue(\$oldValue, 0, $oldFormName, $oldCount, $oldSize);
                         $newFormName = 'int32u';
                         $newFormat = $formatNumber{$newFormName};
-                        $newValue = WriteValue($val, $newFormName, $newCount);
+                        $newValue = WriteValue(join(' ',@vals), $newFormName, $newCount);
                     }
                     $offsetInfo or $offsetInfo = $offsetInfo[$ifd] = { };
                     # save location of valuePtr in new directory
@@ -1596,7 +1624,7 @@ sub WriteExif($$$)
                     my $ptr = $newStart + length($dirBuff) + 10;
                     $newCount or $newCount = 1; # make sure count is set for offsetInfo
                     # save value pointer and value count for each tag
-                    $offsetInfo->{$newID} = [$newInfo, $ptr, $newCount, $newFormat];
+                    $offsetInfo->{$newID} = [$newInfo, $ptr, $newCount, \@vals, $newFormat];
 
                 } elsif ($$newInfo{DataMember}) {
 
@@ -1684,7 +1712,7 @@ sub WriteExif($$$)
         if ($nextIfdPos) {
             # set offset to next IFD
             Set32u($newStart, \$newData, $nextIfdPos);
-            $fixup->AddFixup($nextIfdPos);  # add fixup for this offset in newData
+            $fixup->AddFixup($nextIfdPos,'NextIFD');    # add fixup for this offset in newData
         }
         # remember position of 'next IFD' pointer so we can set it next time around
         $nextIfdPos = $valPos - 4;
@@ -1732,7 +1760,7 @@ sub WriteExif($$$)
             $fixup->AddFixup($valFixup);
         }
         # stop if no next IFD pointer
-        last unless $dirInfo->{Multi};  # stop unless scanning for multiple IFD's
+        last unless $$dirInfo{Multi};  # stop unless scanning for multiple IFD's
         my $offset;
         if ($dirStart + $len + 4 <= $dataLen) {
             $offset = Get32u($dataPt, $dirStart + $len);
@@ -1781,9 +1809,10 @@ sub WriteExif($$$)
             # loop through all tags in reverse order so we save thumbnail
             # data before main image data if both exist in the same IFD
             foreach $tagID (reverse sort keys %$offsetInfo) {
-                my ($tagInfo, $offsets, $count) = @{$offsetInfo->{$tagID}};
+                my ($tagInfo, $offsets, $count, $oldOffset) = @{$offsetInfo->{$tagID}};
                 next unless $$tagInfo{IsOffset}; # handle byte counts with offsets
-                my ($cntInfo, $byteCounts, $count2, $format) = @{$offsetInfo->{$$tagInfo{OffsetPair}}};
+                my $sizeInfo = $offsetInfo->{$$tagInfo{OffsetPair}};
+                my ($cntInfo, $byteCounts, $count2, $oldSize, $format) = @$sizeInfo;
                 # must be the same number of offset and byte count values
                 unless ($count == $count2) {
                     $exifTool->Error("Offset/byteCounts disagree on count for $$tagInfo{Name}");
@@ -1800,6 +1829,10 @@ sub WriteExif($$$)
                 # transfer the data referenced by all offsets of this tag
                 my $n;
                 for ($n=0; $n<$count; ++$n) {
+                    # update TIFF_END as if we had read this data from file
+                    if (@$oldOffset and @$oldSize) {
+                        UpdateTiffEnd($exifTool, $$oldOffset[$n]+$base+$$oldSize[$n]);
+                    }
                     my $offset = Get32u(\$newData, $offsets + $n*4) - $dataPos;
                     my $byteCountPos = $byteCounts + $n * $formatSize[$format];
                     my $size = ReadValue(\$newData, $byteCountPos, $formatStr, 1, 4);
@@ -1871,9 +1904,10 @@ sub WriteExif($$$)
         }
     }
     # apply final shift to new data position if this is the top level IFD
-    if (not $dirInfo->{Fixup}) {
-        if ($dirInfo->{NewDataPos}) {
-            $fixup->{Shift} += $dirInfo->{NewDataPos};
+    unless ($$dirInfo{Fixup}) {
+        my $newDataPos = $$dirInfo{NewDataPos} || 0;
+        if ($newDataPos) {
+            $fixup->{Shift} += $newDataPos;
             $fixup->ApplyFixup(\$newData);
         }
         # save fixup for PreviewImage in JPEG file if necessary
@@ -1887,7 +1921,7 @@ sub WriteExif($$$)
             {
                 # It fits! (or must exist in EXIF segment), so fixup the
                 # PreviewImage pointers and stuff the preview image in here
-                my $newPos = length($newData) + ($dirInfo->{NewDataPos} || 0);
+                my $newPos = length($newData) + ($newDataPos || 0);
                 $newPos += ($previewInfo->{BaseShift} || 0);
                 if ($previewInfo->{Relative}) {
                     # calculate our base by looking at how far the pointer got shifted
@@ -1906,6 +1940,11 @@ sub WriteExif($$$)
         } else {
             # delete both IFD0 and IFD1 if only mandatory tags remain
             $newData = '' if defined $newData and $deleteAll;
+        }
+        # save location of last IFD for use in Canon RAW header
+        if ($newDataPos == 16) {
+            my @ifdPos = $fixup->GetMarkerPointers(\$newData,'NextIFD');
+            $_[1]->{LastIFD} = pop @ifdPos;
         }
     }
     # return empty string if no entries in directory

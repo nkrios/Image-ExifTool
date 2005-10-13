@@ -20,10 +20,11 @@ use t::TestLib;
 my $testname = 'GPS';
 my $testnum = 1;
 
-# test 2: Extract information from GPS.jpg
+# test 2: Extract information from GPS.jpg with specified coordinate format
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
+    $exifTool->Options(CoordFormat => '%d degrees %.2f minutes');
     my $info = $exifTool->ImageInfo('t/GPS.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";

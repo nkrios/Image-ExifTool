@@ -23,6 +23,7 @@
 #               9) http://members.aol.com/khancock/pilot/nbuddy/
 #              10) Werner Kober private communication (D2H, D2X, D100, D70)
 #              11) http://www.rottmerhusen.com/objektives/lensid/nikkor.html
+#              12) http://libexif.sourceforge.net/internals/mnote-olympus-tag_8h-source.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -30,8 +31,9 @@ package Image::ExifTool::Nikon;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
@@ -43,7 +45,7 @@ $VERSION = '1.29';
     0x0001 => { #2
         # the format differs for different models.  for D70, this is a string '0210',
         # but for the E775 it is binary: "\x00\x01\x00\x00"
-        Name => 'FileSystemVersion',
+        Name => 'FirmwareVersion',
         Writable => 'undef',
         Count => 4,
         # convert to string if binary
@@ -52,7 +54,6 @@ $VERSION = '1.29';
         PrintConv => '$_=$val;s/^(\d{2})/$1\./;s/^0//;$_',
         PrintConvInv => '$_=$val;s/\.//;"0$_"',
     },
-    # 0x0001 - unknown. Always 0210 for D70. Might be a version number? (ref 2)
     0x0002 => {
         # this is the ISO actually used by the camera
         # (may be different than ISO setting if auto)
@@ -358,6 +359,7 @@ $VERSION = '1.29';
         },
         {
             Name => 'LensDataUnknown',
+            Writable => 0,
         },
     ],
     # D70 guessing here
@@ -374,6 +376,7 @@ $VERSION = '1.29';
         PrintConvInv => '$val=~tr/a-zA-Z/ /;$val',
     },
     0x00a0 => { Name => 'SerialNumber',     Writable => 'string' }, #2
+    0x00a2 => { Name => 'ImageDataSize' }, # size of compressed image data plus EOI segment (ref 10)
     0x00a7 => { # Number of shots taken by camera so far (ref 2)
         Name => 'ShutterCount',
         Writable => 0,
@@ -400,6 +403,12 @@ $VERSION = '1.29';
     # Capture, the data for this tag extends 4 bytes past the end of the maker notes.
     # Very odd.  I hope these 4 bytes aren't useful because they will get lost by any
     # utility that blindly copies the maker notes (not ExifTool) - PH
+    0x0e01 => {
+        Name => 'NikonCaptureData',
+        Writable => 0,
+        ValueConv => '\$val',
+    },
+    0x0e09 => 'NikonCaptureVersion', #12
     # 0x0e0e is in D70 Nikon Capture files (not out-of-the-camera D70 files) - PH
     0x0e0e => { #PH
         Name => 'NikonCaptureOffsets',
@@ -487,7 +496,7 @@ $VERSION = '1.29';
     },
 );
 
-%Image::ExifTool::Nikon::MakerNotesB = (
+%Image::ExifTool::Nikon::Type2 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
@@ -862,7 +871,7 @@ my @xlat = (
 #         4) optional start offset (default 0)
 #         5) optional number of bytes to decode (default to the end of the data)
 # Returns: Decrypted data block
-sub DecryptNikonData($$$;$$)
+sub Decrypt($$$;$$)
 {
     my ($dataPt, $serial, $count, $start, $len) = @_;
     # patch for pre-production D50 (ref 8)
@@ -888,16 +897,16 @@ sub DecryptNikonData($$$;$$)
 
 #------------------------------------------------------------------------------
 # process Nikon IFD
-# Inputs: 0) ExifTool object reference, 1) pointer to tag table
-#         2) reference to directory information
+# Inputs: 0) ExifTool object reference, 1) reference to directory information
+#         2) pointer to tag table
 # Returns: 1 on success
 # Notes: This isn't a normal IFD, but is close...
 sub ProcessNikonCaptureOffsets($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart};
-    my $dirLen = $dirInfo->{DirLen};
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart};
+    my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
     return 0 unless $dirLen > 2;
@@ -928,12 +937,12 @@ sub ProcessNikonCaptureOffsets($$$)
 
 #------------------------------------------------------------------------------
 # process Nikon Encrypted data block
-# Inputs: 0) ExifTool object reference, 1) pointer to tag table
-#         2) reference to directory information
+# Inputs: 0) ExifTool object reference, 1) reference to directory information
+#         2) pointer to tag table
 # Returns: 1 on success
 sub ProcessNikonEncrypted($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     # get the encrypted directory data
     my $buff = substr(${$$dirInfo{DataPt}}, $$dirInfo{DirStart}, $$dirInfo{DirLen});
     # save it until we have enough information to decrypt it later
@@ -944,17 +953,17 @@ sub ProcessNikonEncrypted($$$)
 #------------------------------------------------------------------------------
 # Process Nikon Makernotes directory
 # Inputs: 0) ExifTool object reference
-#         1) Pointer to tag table for this directory
-#         2) Reference to directory information hash
+#         1) Reference to directory information hash
+#         2) Pointer to tag table for this directory
 # Returns: 1 on success, otherwise returns 0 and sets a Warning
 sub ProcessNikon($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $verbose = $exifTool->Options('Verbose');
     my $nikonInfo = $exifTool->{NikonInfo} = { };
     my @encrypted;  # list to save encrypted data
     $$nikonInfo{Encrypted} = \@encrypted;
-    my $rtnVal = Image::ExifTool::Exif::ProcessExif($exifTool, $tagTablePtr, $dirInfo);
+    my $rtnVal = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
     # process any encrypted information we found
     my $encryptedDir;
     if (@encrypted) {
@@ -966,14 +975,14 @@ sub ProcessNikon($$$)
         }
         foreach $encryptedDir (@encrypted) {
             my ($subTablePtr, $data) = @$encryptedDir;
-            $data = DecryptNikonData(\$data, $serial, $count, 4);
+            $data = Decrypt(\$data, $serial, $count, 4);
             my %subdirInfo = (
                 DataPt   => \$data,
                 DirStart => 0,
                 DirLen   => length($data),
             );
             # process the decrypted information
-            $exifTool->ProcessBinaryData($subTablePtr, \%subdirInfo);
+            $exifTool->ProcessBinaryData(\%subdirInfo, $subTablePtr);
         }
     }
     delete $exifTool->{NikonInfo};

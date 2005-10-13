@@ -640,15 +640,15 @@ sub CheckCanonCustom($$$);
 
 #------------------------------------------------------------------------------
 # process Canon custom
-# Inputs: 0) ExifTool object reference, 1) pointer to tag table
-#         2) reference to directory information
+# Inputs: 0) ExifTool object reference, 1) reference to directory information
+#         2) pointer to tag table
 # Returns: 1 on success
 sub ProcessCanonCustom($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
-    my $dataPt = $dirInfo->{DataPt};
-    my $offset = $dirInfo->{DirStart};
-    my $size = $dirInfo->{DirLen};
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $offset = $$dirInfo{DirStart};
+    my $size = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
 
     # first entry in array must be the size
@@ -690,17 +690,17 @@ sub CheckCanonCustom($$$)
 
 #------------------------------------------------------------------------------
 # write Canon custom data
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) source dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) ,
+#         2) tag table referencesource dirInfo reference
 # Returns: New custom data block or undefined on error
 sub WriteCanonCustom($$$)
 {
-    my ($exifTool, $tagTablePtr, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
-    my $dataPt = $dirInfo->{DataPt};
-    my $dirStart = $dirInfo->{DirStart} || 0;
-    my $dirLen = $dirInfo->{DirLen} || length($$dataPt) - $dirStart;
-    my $dirName = $dirInfo->{DirName};
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
+    my $dirName = $$dirInfo{DirName};
     my $verbose = $exifTool->Options('Verbose');
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
     $dataPt = \$newData;

@@ -1,5 +1,5 @@
 # Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/ExifTool.t'
+# `make test'. After `make install' it should work as `perl t/Writer.t'
 
 ######################### We start with some black magic to print on failure.
 
@@ -109,7 +109,14 @@ sub binaryCompare($$)
     $exifTool->SetNewValue('xmp:SupplementalCategories' => 'new XMP info');
     $exifTool->WriteInfo('t/ExifTool.tif', \$newtiff);
     my $info = $exifTool->ImageInfo(\$newtiff);
-    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    unless (check($exifTool, $info, $testname, $testnum)) {
+        my $testfile = "t/${testname}_${testnum}_failed.tif";
+        open(TESTFILE,">$testfile");
+        binmode(TESTFILE);
+        print TESTFILE $newtiff;
+        close(TESTFILE);
+        print 'not ';
+    }
     print "ok $testnum\n";
     
     ++$testnum;

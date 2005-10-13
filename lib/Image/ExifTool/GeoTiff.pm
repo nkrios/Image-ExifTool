@@ -2052,7 +2052,7 @@ my $epsg_units = {
 #------------------------------------------------------------------------------
 # Inputs: 0) ExifTool object reference
 #         1) tag table reference
-#         2) reference to directory data
+#         2) reference to GeoTIFF directory data
 #         3) reference to GeoTiff double parameters data
 #         4) reference to GeoTiff ASCII parameters data
 sub ProcessGeoTiff($$$$$)
