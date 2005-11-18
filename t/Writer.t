@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..21\n"; }
+BEGIN { $| = 1; print "1..22\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -19,6 +19,7 @@ use t::TestLib;
 
 my $testname = 'Writer';
 my $testnum = 1;
+my $testfile;
 
 # compare 2 binary files
 # Inputs: 0) file name 1, 1) file name 2
@@ -52,7 +53,7 @@ sub binaryCompare($$)
     my $testFile1 = "t/${testname}_${testnum}_failed.jpg";
     -e $testFile1 and unlink $testFile1;
     $exifTool->SetNewValue('Comment','New comment in JPG file');
-    $exifTool->WriteInfo('t/ExifTool.jpg', $testFile1);
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testFile1);
     my $info = ImageInfo($testFile1);
     print 'not ' unless check($info, $testname, $testnum);
     print "ok $testnum\n";
@@ -62,7 +63,7 @@ sub binaryCompare($$)
     -e $testFile2 and unlink $testFile2;
     $exifTool->SetNewValue('Comment');
     $exifTool->WriteInfo($testFile1, $testFile2);
-    if (binaryCompare($testFile2, 't/ExifTool.jpg')) {
+    if (binaryCompare($testFile2, 't/images/ExifTool.jpg')) {
         unlink $testFile1;
         unlink $testFile2;
     } else {
@@ -71,33 +72,7 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# tests 4/5: Test removing comment then adding it back again to GIF in memory
-{
-    ++$testnum;
-    open(TESTFILE, 't/ExifTool.gif');
-    binmode(TESTFILE);
-    my $gifImage;
-    read(TESTFILE, $gifImage, 100000);
-    close(TESTFILE);
-    my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValue('Comment');
-    my $image1;
-    $exifTool->WriteInfo(\$gifImage, \$image1);
-    my $info = ImageInfo(\$image1);
-    print 'not ' unless check($info, $testname, $testnum);
-    print "ok $testnum\n";
-
-    ++$testnum;
-    $info = ImageInfo(\$gifImage);
-    my $gifComment = $info->{Comment};
-    $exifTool->SetNewValue('Comment',$gifComment);
-    my $image2;
-    $exifTool->WriteInfo(\$image1, \$image2);
-    print 'not ' unless $image2 eq $gifImage;
-    print "ok $testnum\n";
-}
-
-# tests 6/7: Test editing a TIFF in memory then changing it back again
+# tests 4/5: Test editing a TIFF in memory then changing it back again
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -107,10 +82,10 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(ImageDescription => 'Modified TIFF');
     $exifTool->SetNewValue(Keywords => 'another keyword', AddValue => 1);
     $exifTool->SetNewValue('xmp:SupplementalCategories' => 'new XMP info');
-    $exifTool->WriteInfo('t/ExifTool.tif', \$newtiff);
+    $exifTool->WriteInfo('t/images/ExifTool.tif', \$newtiff);
     my $info = $exifTool->ImageInfo(\$newtiff);
     unless (check($exifTool, $info, $testname, $testnum)) {
-        my $testfile = "t/${testname}_${testnum}_failed.tif";
+        $testfile = "t/${testname}_${testnum}_failed.tif";
         open(TESTFILE,">$testfile");
         binmode(TESTFILE);
         print TESTFILE $newtiff;
@@ -118,7 +93,7 @@ sub binaryCompare($$)
         print 'not ';
     }
     print "ok $testnum\n";
-    
+
     ++$testnum;
     my $newtiff2;
     $exifTool->SetNewValue();   # clear all the changes
@@ -127,12 +102,12 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(Keywords => 'another keyword', DelValue => 1);
     $exifTool->SetNewValue(SupplementalCategories);
     $exifTool->WriteInfo(\$newtiff, \$newtiff2);
-    my $testfile = "t/${testname}_${testnum}_failed.tif";
+    $testfile = "t/${testname}_${testnum}_failed.tif";
     open(TESTFILE,">$testfile");
     binmode(TESTFILE);
     print TESTFILE $newtiff2;
     close(TESTFILE);
-    if (binaryCompare($testfile,'t/ExifTool.tif')) {
+    if (binaryCompare($testfile,'t/images/ExifTool.tif')) {
         unlink $testfile;
     } else {
         print 'not ';
@@ -140,7 +115,7 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# test 8/9: Test rewriting a JPEG file then changing it back again
+# test 6/7: Test rewriting a JPEG file then changing it back again
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -151,10 +126,11 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(Contrast => '+2', Group => 'XMP');
     $exifTool->SetNewValue(ExposureCompensation => 999, Group => 'EXIF');
     $exifTool->SetNewValue(LightSource => 'cloud');
+    $exifTool->SetNewValue(Flash => '0x1', Type => 'ValueConv');
     $exifTool->SetNewValue(FocalPlaneResolutionUnit => 'mm');
     $exifTool->SetNewValue(Category => 'IPTC test');
     $exifTool->SetNewValue(Description => 'New description');
-    $exifTool->WriteInfo('t/ExifTool.jpg', $testfile1);
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile1);
     my $info = $exifTool->ImageInfo($testfile1);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
@@ -165,6 +141,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(Contrast => undef, Group => 'XMP');
     $exifTool->SetNewValue(ExposureCompensation => 0, Group => 'EXIF');
     $exifTool->SetNewValue(LightSource);
+    $exifTool->SetNewValue(Flash => '0x0', Type => 'ValueConv');
     $exifTool->SetNewValue(FocalPlaneResolutionUnit => 'in');
     $exifTool->SetNewValue(Category);
     $exifTool->SetNewValue(Description);
@@ -186,12 +163,12 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# test 10: Test rewriting everything in a JPEG file
+# test 8: Test rewriting everything in a JPEG file
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Duplicates => 1, Binary => 1, List => 1);
-    my $info = $exifTool->ImageInfo('t/ExifTool.jpg');
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg');
     my $tag;
     foreach $tag (keys %$info) {
         my $group = $exifTool->GetGroup($tag);
@@ -211,11 +188,11 @@ sub binaryCompare($$)
     }
     undef $info;
     my $image;
-    $exifTool->WriteInfo('t/ExifTool.jpg', \$image);
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', \$image);
     $exifTool->Options(Unknown => 1, Binary => 0, List => 0);
     $info = $exifTool->ImageInfo(\$image);
-    my $testfile = "t/${testname}_${testnum}_failed.jpg";
-    if (check($exifTool, $info, $testname, $testnum, 9)) {
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    if (check($exifTool, $info, $testname, $testnum, 7)) {
         unlink $testfile;
     } else {
         # save bad file
@@ -228,14 +205,14 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# test 11: Test copying over information with SetNewValuesFromFile()
+# test 9: Test copying over information with SetNewValuesFromFile()
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValuesFromFile('t/ExifTool.jpg');
-    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    $exifTool->SetNewValuesFromFile('t/images/ExifTool.jpg');
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/Nikon.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/Nikon.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -245,15 +222,15 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# test 12: Another SetNewValuesFromFile() test
+# test 10: Another SetNewValuesFromFile() test
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options('IgnoreMinorErrors' => 1);
-    $exifTool->SetNewValuesFromFile('t/Pentax.jpg');
-    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    $exifTool->SetNewValuesFromFile('t/images/Pentax.jpg');
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/ExifTool.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -263,7 +240,7 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# tests 13/14: Try creating something from nothing and removing it again
+# tests 11/12: Try creating something from nothing and removing it again
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -273,7 +250,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(GPSLatitude => q{44 deg 14' 12.25"}, Group => 'GPS');
     my $testfile1 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile1;
-    $exifTool->WriteInfo('t/Writer.jpg', $testfile1);
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile1);
     my $info = $exifTool->ImageInfo($testfile1);
     my $success = check($exifTool, $info, $testname, $testnum);
     print 'not ' unless $success;
@@ -287,7 +264,7 @@ sub binaryCompare($$)
     my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile2;
     $exifTool->WriteInfo($testfile1, $testfile2);
-    if (binaryCompare('t/Writer.jpg', $testfile2)) {
+    if (binaryCompare('t/images/Writer.jpg', $testfile2)) {
         unlink $testfile1 if $success;
         unlink $testfile2;
     } else {
@@ -296,14 +273,14 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# test 15: Copy tags from CRW file to JPG
+# test 13: Copy tags from CRW file to JPG
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValuesFromFile('t/CanonRaw.crw');
-    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    $exifTool->SetNewValuesFromFile('t/images/CanonRaw.crw');
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/Writer.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -313,14 +290,14 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# test 16: Delete all information in a group
+# test 14: Delete all information in a group
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValue('All' => undef, Group => 'MakerNotes');
-    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/ExifTool.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -330,15 +307,15 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# test 17: Copy a specific set of tags
+# test 15: Copy a specific set of tags
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     my @copyTags = qw(exififd:all -lightSource ifd0:software);
-    $exifTool->SetNewValuesFromFile('t/Olympus.jpg', @copyTags);
-    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    $exifTool->SetNewValuesFromFile('t/images/Olympus.jpg', @copyTags);
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/ExifTool.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -348,7 +325,7 @@ sub binaryCompare($$)
     print "ok $testnum\n";
 }
 
-# tests 18-20: Test SetNewValuesFromFile() order of operations
+# tests 16-18: Test SetNewValuesFromFile() order of operations
 {
     my @argsList = (
         [ 'ifd0:xresolution>xmp:*', 'ifd1:xresolution>xmp:*' ],
@@ -359,10 +336,10 @@ sub binaryCompare($$)
     foreach $args (@argsList) {
         ++$testnum;
         my $exifTool = new Image::ExifTool;
-        $exifTool->SetNewValuesFromFile('t/GPS.jpg', @$args);
-        my $testfile = "t/${testname}_${testnum}_failed.jpg";
+        $exifTool->SetNewValuesFromFile('t/images/GPS.jpg', @$args);
+        $testfile = "t/${testname}_${testnum}_failed.jpg";
         unlink $testfile;
-        $exifTool->WriteInfo('t/Writer.jpg', $testfile);
+        $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
         my $info = $exifTool->ImageInfo($testfile, 'xresolution');
         if (check($exifTool, $info, $testname, $testnum)) {
             unlink $testfile;
@@ -373,7 +350,8 @@ sub binaryCompare($$)
     }
 }
 
-# test 21: Test SaveNewValues()/RestoreNewValues()
+# test 19: Test SaveNewValues()/RestoreNewValues()
+my $testOK;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -383,17 +361,82 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(Artist => 'Harvey', Group => 'ExifIFD');
     $exifTool->SaveNewValues();
     $exifTool->SetNewValue(Artist => 'nobody');
-    $exifTool->SetNewValuesFromFile('t/FujiFilm.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/FujiFilm.jpg');
     $exifTool->RestoreNewValues();
-    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/Writer.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
-        unlink $testfile;
+        $testOK = 1;
     } else {
         print 'not ';
     }
+    print "ok $testnum\n";
+}
+
+# test 20/21: Test edit in place (using the file from the last test)
+{
+    my ($skip, $size);
+    ++$testnum;
+    $skip = '';
+    if ($testOK) {
+        my $exifTool = new Image::ExifTool;
+        my $newComment = 'This is a new test comment';
+        $exifTool->SetNewValue(Comment => $newComment);
+        $exifTool->WriteInfo($testfile);
+        my $info = $exifTool->ImageInfo($testfile, 'Comment');
+        if ($$info{Comment} and $$info{Comment} eq $newComment) {
+            $size = -s $testfile;
+        } else {
+            $testOK = 0;
+            print 'not ';
+        }
+    } else {
+        $skip = ' # skip Relies on previous test';
+    }
+    print "ok $testnum$skip\n";
+
+    # test in-place edit of file passed by handle
+    ++$testnum;
+    $skip = '';
+    if ($testOK) {
+        my $exifTool = new Image::ExifTool;
+        my $shortComment = 'short comment';
+        $exifTool->SetNewValue(Comment => $shortComment);
+        open FILE, "+<$testfile";   # open test file for update
+        $exifTool->WriteInfo(\*FILE);
+        close FILE;
+        my $info = $exifTool->ImageInfo($testfile, 'Comment');
+        if ($$info{Comment} and $$info{Comment} eq $shortComment) {
+            my $newSize = -s $testfile;
+            unless ($newSize < $size) {
+                # test to see if the file got shorter as it should have
+                $testOK = 0;
+                $skip = ' # skip truncate() not supported on this system';
+            }
+        } else {
+            $testOK = 0;
+            print 'not ';
+        }
+    } else {
+        $skip = ' # skip Relies on previous test';
+    }
+    print "ok $testnum$skip\n";
+
+    $testOK and unlink $testfile;   # erase test file if all tests passed
+}
+
+# test 22: Test time shift feature
+{
+    ++$testnum;
+    my @writeInfo = (
+        ['DateTimeOriginal' => '1:2', 'Shift' => 1],
+        ['ModifyDate' => '2:1: 3:4', 'Shift' => 1],
+        ['CreateDate' => '200 0', 'Shift' => -1],
+        ['DateCreated' => '20:', 'Shift' => -1],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/IPTC-XMP.jpg', 1);
     print "ok $testnum\n";
 }
 

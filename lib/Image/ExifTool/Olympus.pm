@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Olympus.pm
 #
-# Description:  Definitions for Olympus/Epson EXIF Maker Notes
+# Description:  Olympus/Epson EXIF maker notes tags
 #
 # Revisions:    12/09/2003 - P. Harvey Created
 #               11/11/2004 - P. Harvey Added Epson support
@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -964,6 +964,7 @@ sub PrintLensInfo($$)
             '0 6'   => 'Zuiko Digital ED 50-200mm F2.8-3.5',
             '0 7'   => 'Zuiko Digital 11-22mm F2.8-3.5',
             '0 21'  => 'Zuiko Digital ED 7-14mm F4.0',
+            '0 23'  => 'Zuiko Digital Pro ED 35-100mm F2.0', #7
             '0 24'  => 'Zuiko Digital 14-45mm F3.5-5.6',
             # Sigma lenses
             '1 1'   => '18-50mm F3.5-5.6', #8
@@ -1016,6 +1017,15 @@ sub PrintAFAreas($)
     return $val;
 }
 
+#------------------------------------------------------------------------------
+# Process ORF file
+# Inputs: 0) ExifTool object reference, 1) directory information reference
+# Returns: 1 if this looked like a valid ORF file, 0 otherwise
+sub ProcessORF($$)
+{
+    my ($exifTool, $dirInfo) = @_;
+    return $exifTool->ProcessTIFF($dirInfo);
+}
 
 1;  # end
 
@@ -1023,7 +1033,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Olympus - Definitions for Olympus/Epson maker notes
+Image::ExifTool::Olympus - Olympus/Epson maker notes tags
 
 =head1 SYNOPSIS
 

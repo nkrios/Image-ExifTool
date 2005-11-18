@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..4\n"; }
+BEGIN { $| = 1; print "1..7\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -24,7 +24,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/IPTC-XMP.jpg', {Duplicates => 1});
+    my $info = $exifTool->ImageInfo('t/images/IPTC-XMP.jpg', {Duplicates => 1});
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -33,7 +33,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->ExtractInfo('t/IPTC-XMP.jpg', {JoinLists => 0});
+    $exifTool->ExtractInfo('t/images/IPTC-XMP.jpg', {JoinLists => 0});
     my @values = $exifTool->GetValue('Keywords','ValueConv');
     my $values = join '-', @values;
     my $expected = 'ExifTool-Test-XMP';
@@ -49,7 +49,7 @@ my $testnum = 1;
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Duplicates => 1, Binary => 1, List => 1);
-    my $info = $exifTool->ImageInfo('t/IPTC-XMP.jpg');
+    my $info = $exifTool->ImageInfo('t/images/IPTC-XMP.jpg');
     my $tag;
     foreach $tag (keys %$info) {
         my $group = $exifTool->GetGroup($tag);
@@ -71,7 +71,7 @@ my $testnum = 1;
     $exifTool->SetNewValue(CreatorContactInfoCiAdrCtry => 'Canada');
     undef $info;
     my $image;
-    $exifTool->WriteInfo('t/IPTC-XMP.jpg',\$image);
+    $exifTool->WriteInfo('t/images/IPTC-XMP.jpg',\$image);
     
     my $exifTool2 = new Image::ExifTool;
     $exifTool2->Options(Duplicates => 1);
@@ -85,6 +85,41 @@ my $testnum = 1;
         binmode(TESTFILE);
         print TESTFILE $image;
         close(TESTFILE);
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# tests 5/6: Test extracting then reading XMP data as a block
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/images/IPTC-XMP.jpg','XMP');
+    print 'not ' unless $$info{XMP};
+    print "ok $testnum\n";
+
+    ++$testnum;
+    my $pass;
+    if ($$info{XMP}) {
+        $info = $exifTool->ImageInfo($$info{XMP});
+        $pass = check($exifTool, $info, $testname, $testnum);
+    }
+    print 'not ' unless $pass;
+    print "ok $testnum\n";
+}
+
+# test 7: Test copying information to a new XMP data file
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg');
+    my $testfile = "t/${testname}_${testnum}_failed.xmp";
+    unlink $testfile;
+    $exifTool->WriteInfo(undef,$testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
         print 'not ';
     }
     print "ok $testnum\n";

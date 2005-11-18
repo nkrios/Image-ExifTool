@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Ricoh.pm
 #
-# Description:  Definitions for Ricoh EXIF Maker Notes
+# Description:  Ricoh EXIF maker notes tags
 #
 # Revisions:    03/28/2005  - P. Harvey Created
 #
@@ -133,7 +133,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Ricoh - Definitions for Ricoh EXIF maker notes
+Image::ExifTool::Ricoh - Ricoh EXIF maker notes tags
 
 =head1 SYNOPSIS
 

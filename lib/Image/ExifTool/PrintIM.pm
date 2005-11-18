@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         PrintIM.pm
 #
-# Description:  Definitions for PrintIM IFD
+# Description:  Read PrintIM meta information
 #
 # Revisions:    04/07/2004  - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessPrintIM($$$);
 
@@ -64,16 +64,12 @@ sub ProcessPrintIM($$$)
         my $pos = $offset + 16 + $n * 6;
         my $tag = Get16u($dataPt, $pos);
         my $val = Get32u($dataPt, $pos + 2);
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
-            'Table'  => $tagTablePtr,
-            'Index'  => $n,
-            'Value'  => $val,
-            'DataPt' => $dataPt,
-            'Size'   => 4,
-            'Start'  => $pos + 2,
+        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+            Index  => $n,
+            DataPt => $dataPt,
+            Size   => 4,
+            Start  => $pos + 2,
         );
-        $tagInfo and $exifTool->FoundTag($tagInfo,$val);
     }
     return 1;
 }
@@ -86,7 +82,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PrintIM - Definitions for Print Image Matching metadata
+Image::ExifTool::PrintIM - Read PrintIM meta information
 
 =head1 SYNOPSIS
 
@@ -95,7 +91,7 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to interpret
-Print Image Matching metadata.
+Print Image Matching meta information.
 
 =head1 AUTHOR
 

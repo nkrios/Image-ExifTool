@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Canon.pm
 #
-# Description:  Definitions for Canon EXIF Maker notes
+# Description:  Canon EXIF maker notes tags
 #
 # Revisions:    11/25/03 - P. Harvey Created
 #               12/03/03 - P. Harvey Figured out lots more tags and added
@@ -19,6 +19,7 @@
 #               7) Denny Priebe private communication (tests with 1D MkII)
 #               8) Irwin Poche private communication
 #               9) Michael Tiemann private communication (tests with 1D MkII)
+#              10) Volker Gering private communication (tests with 1D MkII)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -34,24 +35,28 @@ my %canonLensTypes = ( #4
     2 => 'Canon EF 28mm f/2.8',
     4 => 'Sigma UC Zoom 35-135mm f/4-5.6',
     6 => 'Tokina AF193-2 19-35mm f/3.5-4.5',
-    10 => 'Sigma 50mm f/2.8 EX or 28mm f/1.8',
+    10 => 'Canon EF 50mm f/2.5 Macro or Sigma 50mm f/2.8 EX or 28mm f/1.8', #10/4
     11 => 'Canon EF 35mm f/2', #9
     13 => 'Canon EF 15mm f/2.8', #9
     21 => 'Canon EF 80-200mm f/2.8L',
     26 => 'Cosina 100mm f/3.5 Macro AF',
     28 => 'Tamron AF Aspherical 28-200mm f/3.8-5.6',
     29 => 'Canon EF 50mm f/1.8 MkII',
+    32 => 'Canon EF 24mm f/2.8', #10
     39 => 'Canon EF 75-300mm f/4-5.6',
     40 => 'Canon EF 28-80mm f/3.5-5.6',
+    43 => 'Canon EF 28-105mm f/4-5.6', #10
     124 => 'Canon MP-E 65mm f/2.8 1-5x Macro Photo', #9
     125 => 'Canon TS-E 24mm f/3.5L',
+    130 => 'Canon EF 50mm 5/1.0 USM', #10
     131 => 'Sigma 17-35mm f2.8-4 EX Aspherical HSM',
     135 => 'Canon EF 200mm f/1.8L',
     136 => 'Canon EF 300mm f/2.8L',
+    137 => 'Canon EF 85mm f/1.2L', #10
     139 => 'Canon EF 400mm f/2.8L',
     141 => 'Canon EF 500mm f/4.5L',
     149 => 'Canon EF 100mm f/2', #9
-    150 => 'Sigma 20mm EX f/1.8',
+    150 => 'Canon EF 14mm f/2.8L or Sigma 20mm EX f/1.8', #10/4
     151 => 'Canon EF 200mm f/2.8L',
     153 => 'Canon EF 35-350mm f/3.5-5.6L', #PH
     155 => 'Canon EF 85mm f/1.8 USM',
@@ -75,7 +80,7 @@ my %canonLensTypes = ( #4
     190 => 'Canon EF 100mm f/2.8 Macro',
     191 => 'Canon EF 400mm f/4 DO IS', #9
     197 => 'Canon EF 75-300mm f/4-5.6 IS',
-    198 => 'Canon EF 50mm f/1.4', #9
+    198 => 'Canon EF 50mm f/1.4 USM', #9
     202 => 'Canon EF 28-80 f/3.5-5.6 USM IV',
     213 => 'Canon EF 90-300mm f/4.5-5.6',
     229 => 'Canon EF 16-35mm f/2.8L', #PH
@@ -1242,7 +1247,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Canon - Definitions for Canon EXIF maker notes
+Image::ExifTool::Canon - Canon EXIF maker notes tags
 
 =head1 SYNOPSIS
 

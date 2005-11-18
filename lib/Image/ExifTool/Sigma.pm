@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Sigma.pm
 #
-# Description:  Definitions for Sigma/Foveon EXIF Maker Notes
+# Description:  Sigma/Foveon EXIF maker notes tags
 #
 # Revisions:    04/06/2004  - P. Harvey Created
 #
@@ -88,7 +88,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Sigma - Definitions for Sigma/Foveon EXIF maker notes
+Image::ExifTool::Sigma - Sigma/Foveon EXIF maker notes tags
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Nikon.pm
 #
-# Description:  Definitions for Nikon EXIF Maker Notes
+# Description:  Nikon EXIF maker notes tags
 #
 # Revisions:    12/09/2003 - P. Harvey Created
 #               05/17/2004 - P. Harvey Added information from Joseph Heled
@@ -21,7 +21,7 @@
 #               7) Tom Christiansen private communication (tchrist@perl.com)
 #               8) Robert Rottmerhusen private communication
 #               9) http://members.aol.com/khancock/pilot/nbuddy/
-#              10) Werner Kober private communication (D2H, D2X, D100, D70)
+#              10) Werner Kober private communication (D2H, D2X, D100, D70, D200)
 #              11) http://www.rottmerhusen.com/objektives/lensid/nikkor.html
 #              12) http://libexif.sourceforge.net/internals/mnote-olympus-tag_8h-source.html
 #------------------------------------------------------------------------------
@@ -30,10 +30,10 @@ package Image::ExifTool::Nikon;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.30';
+$VERSION = '1.35';
 
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
@@ -149,8 +149,7 @@ $VERSION = '1.30';
         Name => 'SerialNumber',
         Writable => 0,
         Notes => 'Not writable because this value is used as a key to decrypt other information',
-        ValueConv => '$self->{NikonInfo}->{SerialNumber} = $val',
-        ValueConvInv => '$val',
+        RawConv => '$self->{NikonInfo}->{SerialNumber} = $val',
     },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
     0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
@@ -184,6 +183,7 @@ $VERSION = '1.30';
         Count => 4,
         # short focal, long focal, aperture at short focal, aperture at long focal
         PrintConv => q{
+            $val =~ tr/,/./;    # in case locale is whacky
             my ($a,$b,$c,$d) = split ' ', $val;
             ($a==$b ? $a : "$a-$b") . "mm f/" . ($c==$d ? $c : "$c-$d")
         },
@@ -305,7 +305,7 @@ $VERSION = '1.30';
             Writable => 0,
             SubDirectory => {
                 Start => '$valuePtr + 72',
-                TagTable => 'Image::ExifTool::Nikon::ColorBalance0100',
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance1',
             },
         },
         {
@@ -314,7 +314,7 @@ $VERSION = '1.30';
             Writable => 0,
             SubDirectory => {
                 Start => '$valuePtr + 10',
-                TagTable => 'Image::ExifTool::Nikon::ColorBalance0102',
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
             },
         },
         {
@@ -325,7 +325,31 @@ $VERSION = '1.30';
             # v[0]/v[1] , v[2]/v[3] are the red/blue multipliers.
             SubDirectory => {
                 Start => '$valuePtr + 20',
-                TagTable => 'Image::ExifTool::Nikon::ColorBalance0103',
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance3',
+            },
+        },
+        {
+            Condition => '$$valPt =~ /^0205/', # (D50)
+            Name => 'ColorBalance0205',
+            Writable => 0,
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 4,
+                DecryptLen => 22, # 324 bytes encrypted, but don't need to decrypt it all
+                DirOffset => 14,
+            },
+        },
+        {
+            Condition => '$$valPt =~ /^02/', # (0204=D2X,0206=D2Hs,0207=D200)
+            Name => 'ColorBalance02',
+            Writable => 0,
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 284,
+                DecryptLen => 14, # 324 bytes encrypted, but don't need to decrypt it all
+                DirOffset => 6,
             },
         },
         {
@@ -348,13 +372,14 @@ $VERSION = '1.30';
                 TagTable => 'Image::ExifTool::Nikon::LensData01',
             },
         },
-        # note: his information is encrypted if the version is 02xx
+        # note: this information is encrypted if the version is 02xx
         { #8
             Condition => '$$valPt =~ /^0201/',
             Name => 'LensData0201',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensData01',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 4,
             },
         },
         {
@@ -377,12 +402,12 @@ $VERSION = '1.30';
     },
     0x00a0 => { Name => 'SerialNumber',     Writable => 'string' }, #2
     0x00a2 => { Name => 'ImageDataSize' }, # size of compressed image data plus EOI segment (ref 10)
+    # the sum of 0xa5 and 0xa6 is equal to 0xa7 ShutterCount (D2X,D2Hs,D2H,D200, ref 10)
     0x00a7 => { # Number of shots taken by camera so far (ref 2)
         Name => 'ShutterCount',
         Writable => 0,
         Notes => 'Not writable because this value is used as a key to decrypt other information',
-        ValueConv => '$self->{NikonInfo}->{ShutterCount} = $val',
-        ValueConvInv => '$val',
+        RawConv => '$self->{NikonInfo}->{ShutterCount} = $val',
     },
     0x00a9 => { #2
         Name => 'ImageOptimization',
@@ -406,7 +431,9 @@ $VERSION = '1.30';
     0x0e01 => {
         Name => 'NikonCaptureData',
         Writable => 0,
-        ValueConv => '\$val',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::NikonCapture::Main',
+        },
     },
     0x0e09 => 'NikonCaptureVersion', #12
     # 0x0e0e is in D70 Nikon Capture files (not out-of-the-camera D70 files) - PH
@@ -414,7 +441,7 @@ $VERSION = '1.30';
         Name => 'NikonCaptureOffsets',
         Writable => 0,
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Nikon::NikonCaptureOffsets',
+            TagTable => 'Image::ExifTool::Nikon::CaptureOffsets',
             Validate => '$val =~ /^0100/',
             Start => '$valuePtr + 4',
         },
@@ -422,15 +449,16 @@ $VERSION = '1.30';
 );
 
 # ref PH
-%Image::ExifTool::Nikon::NikonCaptureOffsets = (
-    PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonCaptureOffsets,
+%Image::ExifTool::Nikon::CaptureOffsets = (
+    PROCESS_PROC => \&ProcessNikonCaptureOffsets,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     1 => 'IFD0_Offset',
     2 => 'PreviewIFD_Offset',
     3 => 'SubIFD_Offset',
 );
 
-%Image::ExifTool::Nikon::ColorBalance0100 = (
+# ref 4
+%Image::ExifTool::Nikon::ColorBalance1 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -454,7 +482,8 @@ $VERSION = '1.30';
     },
 );
 
-%Image::ExifTool::Nikon::ColorBalance0102 = (
+# ref 4
+%Image::ExifTool::Nikon::ColorBalance2 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -476,7 +505,8 @@ $VERSION = '1.30';
     },
 );
 
-%Image::ExifTool::Nikon::ColorBalance0103 = (
+# ref 4
+%Image::ExifTool::Nikon::ColorBalance3 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -677,6 +707,7 @@ my %nikonLensIDs = (
     129 => 'AF-S VR Nikkor 200mm f/2G IF-ED',
     130 => 'AF-S VR Nikkor 300mm f/2.8G IF-ED',
     137 => 'AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED',
+    139 => 'AF-S VR Zoom-Nikkor 18-200mm f/3.5-5.6G', #10
     140 => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
 );
 
@@ -874,8 +905,6 @@ my @xlat = (
 sub Decrypt($$$;$$)
 {
     my ($dataPt, $serial, $count, $start, $len) = @_;
-    # patch for pre-production D50 (ref 8)
-    $serial =~ /^\d+$/ or $serial = 0x22;
     $start or $start = 0;
     my $end = $len ? $start + $len : length($$dataPt);
     my $i;
@@ -896,46 +925,6 @@ sub Decrypt($$$;$$)
 }
 
 #------------------------------------------------------------------------------
-# process Nikon IFD
-# Inputs: 0) ExifTool object reference, 1) reference to directory information
-#         2) pointer to tag table
-# Returns: 1 on success
-# Notes: This isn't a normal IFD, but is close...
-sub ProcessNikonCaptureOffsets($$$)
-{
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $dataPt = $$dirInfo{DataPt};
-    my $dirStart = $$dirInfo{DirStart};
-    my $dirLen = $$dirInfo{DirLen};
-    my $verbose = $exifTool->Options('Verbose');
-    my $success = 0;
-    return 0 unless $dirLen > 2;
-    my $count = Get16u($dataPt, $dirStart);
-    return 0 unless $count and $count * 12 + 2 <= $dirLen;
-    my $index;
-    for ($index=0; $index<$count; ++$index) {
-        my $pos = $dirStart + 12 * $index + 2;
-        my $tagID = Get32u($dataPt, $pos);
-        my $value = Get32u($dataPt, $pos + 4);
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
-        if ($verbose) {
-            $exifTool->VerboseInfo($tagID, $tagInfo,
-                'Table'  => $tagTablePtr,
-                'Index'  => $index,
-                'Value'  => $value,
-                'DataPt' => $dataPt,
-                'Size'   => 12,
-                'Start'  => $pos,
-            );
-        }
-        next unless $tagInfo;
-        $exifTool->FoundTag($tagInfo, $value);
-        $success = 1;
-    }
-    return $success;
-}
-
-#------------------------------------------------------------------------------
 # process Nikon Encrypted data block
 # Inputs: 0) ExifTool object reference, 1) reference to directory information
 #         2) pointer to tag table
@@ -946,8 +935,43 @@ sub ProcessNikonEncrypted($$$)
     # get the encrypted directory data
     my $buff = substr(${$$dirInfo{DataPt}}, $$dirInfo{DirStart}, $$dirInfo{DirLen});
     # save it until we have enough information to decrypt it later
-    push @{$exifTool->{NikonInfo}->{Encrypted}}, [ $tagTablePtr, $buff ];
+    push @{$exifTool->{NikonInfo}->{Encrypted}}, [ $tagTablePtr, $buff, $$dirInfo{TagInfo}];
+    if ($exifTool->Options('Verbose')) {
+        my $indent = substr($exifTool->{INDENT}, 0, -2);
+        print $indent, "[$dirInfo->{TagInfo}->{Name} directory to be decrypted later]\n";
+    }
     return 1;
+}
+
+#------------------------------------------------------------------------------
+# process Nikon Capture Offsets IFD (ref PH)
+# Inputs: 0) ExifTool object reference, 1) reference to directory information
+#         2) pointer to tag table
+# Returns: 1 on success
+# Notes: This isn't a normal IFD, but is close...
+sub ProcessNikonCaptureOffsets($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart};
+    my $dirLen = $$dirInfo{DirLen};
+    my $success = 0;
+    return 0 unless $dirLen > 2;
+    my $count = Get16u($dataPt, $dirStart);
+    return 0 unless $count and $count * 12 + 2 <= $dirLen;
+    my $index;
+    for ($index=0; $index<$count; ++$index) {
+        my $pos = $dirStart + 12 * $index + 2;
+        my $tagID = Get32u($dataPt, $pos);
+        my $value = Get32u($dataPt, $pos + 4);
+        $exifTool->HandleTag($tagTablePtr, $tagID, $value,
+            Index  => $index,
+            DataPt => $dataPt,
+            Start  => $pos,
+            Size   => 12,
+        ) and $success = 1;
+    }
+    return $success;
 }
 
 #------------------------------------------------------------------------------
@@ -974,13 +998,46 @@ sub ProcessNikon($$$)
             undef @encrypted;
         }
         foreach $encryptedDir (@encrypted) {
-            my ($subTablePtr, $data) = @$encryptedDir;
-            $data = Decrypt(\$data, $serial, $count, 4);
+            my ($subTablePtr, $data, $tagInfo) = @$encryptedDir;
+            my ($start, $len, $offset);
+            if ($tagInfo and $$tagInfo{SubDirectory}) {
+                $start = $tagInfo->{SubDirectory}->{DecryptStart};
+                $len = $tagInfo->{SubDirectory}->{DecryptLen};
+                $offset = $tagInfo->{SubDirectory}->{DirOffset};
+            }
+            $start or $start = 0;
+            if (defined $offset) {
+                # offset, if specified, is releative to start of encrypted data
+                $offset += $start;
+            } else {
+                $offset = 0;
+            }
+            my $maxLen = length($data) - $start;
+            if ($len) {
+                $len = $maxLen if $len > $maxLen;
+            } else {
+                $len = $maxLen;
+            }
+            # use fixed serial numbers if no good serial number found
+            unless ($serial =~ /^\d+$/) {
+                if ($exifTool->{CameraModel} =~ /\bD200$/) {
+                    $serial = 0x60; # D200 (ref 10)
+                } else {
+                    $serial = 0x22; # D50 (ref 8)
+                }
+            }
+            $data = Decrypt(\$data, $serial, $count, $start, $len);
             my %subdirInfo = (
                 DataPt   => \$data,
-                DirStart => 0,
+                DirStart => $offset,
                 DirLen   => length($data),
             );
+            if ($verbose > 2) {
+                $exifTool->VerboseDir("Decrypted $$tagInfo{Name}");
+                my %parms = ( Prefix => $exifTool->{INDENT} );
+                $parms{MaxLen} = 96 unless $verbose > 3;
+                Image::ExifTool::HexDump(\$data, undef, %parms);
+            }
             # process the decrypted information
             $exifTool->ProcessBinaryData(\%subdirInfo, $subTablePtr);
         }
@@ -995,7 +1052,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Nikon - Definitions for Nikon EXIF maker notes
+Image::ExifTool::Nikon - Nikon EXIF maker notes tags
 
 =head1 SYNOPSIS
 
@@ -1036,6 +1093,7 @@ out some Nikon tags.
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/Nikon Tags>,
+L<Image::ExifTool::TagNames/NikonCapture Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

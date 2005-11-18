@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..3\n"; }
+BEGIN { $| = 1; print "1..4\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -24,7 +24,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/Sigma.jpg');
+    my $info = $exifTool->ImageInfo('t/images/Sigma.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -37,6 +37,15 @@ my $testnum = 1;
         ['Sharpness' => 2, 'Group' => 'MakerNotes'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 4: Test reading X3F image
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/images/Sigma.x3f');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 

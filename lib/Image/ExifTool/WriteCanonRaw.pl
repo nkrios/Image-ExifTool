@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WriteCanonRaw.pl
 #
-# Description:  Routines for writing Canon RAW (CRW and CR2) files
+# Description:  Write Canon RAW (CRW and CR2) meta information
 #
 # Revisions:    01/25/2005 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -544,7 +544,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WriteCanonRaw.pl - Routines for writing Canon CRW and CR2 files
+Image::ExifTool::WriteCanonRaw.pl - Write Canon RAW (CRW and CR2) information
 
 =head1 SYNOPSIS
 

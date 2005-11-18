@@ -6,6 +6,9 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:04 06:46:52
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 4
+[EXIF, ExifIFD, Image] 33437 - Aperture: 14.0
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:12:04 06:46:52
 [EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:12:04 06:46:52
@@ -13,8 +16,11 @@
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 14.0
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 4.5
+[EXIF, ExifIFD, Camera] 37383 - Metering Mode: Average
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 34.0mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
@@ -24,13 +30,14 @@
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.95
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.02
+[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.946
+[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.017
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Manual
+[EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
@@ -45,7 +52,6 @@
 [MakerNotes, Canon, Camera] 14 - Saturation: +1
 [MakerNotes, Canon, Camera] 15 - Sharpness: +1
 [MakerNotes, Canon, Camera] 16 - Camera ISO: Use shot ISO instead
-[MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
 [MakerNotes, Canon, Camera] 18 - Focus Type: Auto (2)
 [MakerNotes, Canon, Camera] 19 - AF Point: Unknown (0)
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Manual
@@ -60,13 +66,9 @@
 [MakerNotes, Canon, Camera] 36 - Zoomed Resolution: 3072
 [MakerNotes, Canon, Camera] 37 - Zoomed Resolution Base: 3072
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
-[MakerNotes, Canon, Image] 1 - Focal Length: 34mm
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
-[MakerNotes, Canon, Image] 2 - ISO Speed: 100
 [MakerNotes, Canon, Image] 4 - Target Aperture: 14
-[MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
-[MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
 [MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
@@ -74,8 +76,6 @@
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: -0.01
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
-[MakerNotes, Canon, Image] 21 - Aperture: 14
-[MakerNotes, Canon, Image] 22 - Shutter Speed: 128
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
@@ -90,7 +90,7 @@
 [MakerNotes, Canon, Camera] 2 - Red Balance Daylight: 2.06971
 [MakerNotes, Canon, Camera] 3 - Blue Balance Daylight: 0.84024
 [MakerNotes, Canon, Camera] 4 - Red Balance Cloudy: 2.44591
-[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99047
+[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99046
 [MakerNotes, Canon, Camera] 6 - Red Balance Tungsten: 2.25721
 [MakerNotes, Canon, Camera] 7 - Blue Balance Tungsten: 0.92027
 [MakerNotes, Canon, Camera] 8 - Red Balance Fluorescent: 1.34502

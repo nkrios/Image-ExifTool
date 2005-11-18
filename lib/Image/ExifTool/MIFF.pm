@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         MIFF.pm
 #
-# Description:  Routines for reading MIFF (Magick Image File Format) images
+# Description:  Read MIFF (Magick Image File Format) meta information
 #
 # Revisions:    06/10/2005 - P. Harvey Created
 #
@@ -244,7 +244,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::MIFF - Routines for reading MIFF images
+Image::ExifTool::MIFF - Read MIFF meta information
 
 =head1 SYNOPSIS
 

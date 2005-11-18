@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Jpeg2000.pm
 #
-# Description:  Routines for reading JPEG 2000 files
+# Description:  Read JPEG 2000 meta information
 #
 # Revisions:    02/11/2005 - P. Harvey Created
 #
@@ -66,7 +66,7 @@ my %jp2ResolutionUnit = (
                 Name => 'Colorspace',
                 Condition => '$$valPt =~ /^\x01/',
                 Format => 'binary',
-                ValueConv => 'Get32u(\$val, 3)',
+                ValueConv => 'unpack("x3N", $val)',
                 PrintConv => {
                     16 => 'sRGB',
                     17 => 'Greyscale',
@@ -373,7 +373,7 @@ sub ProcessJpeg2000Box($$$)
 # Extract meta information from a JPEG 2000 image
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid JPEG 2000 file
-sub ProcessJpeg2000($$)
+sub ProcessJP2($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $hdr;
@@ -400,7 +400,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Jpeg2000 - Routines for reading JPEG 2000 files
+Image::ExifTool::Jpeg2000 - Read JPEG 2000 meta information
 
 =head1 SYNOPSIS
 

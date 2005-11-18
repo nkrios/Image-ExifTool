@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.69
 [File, File, Image]  - File Name: Casio_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1896 bytes
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:35:20
+[File, File, Time]  - File Modification Date/Time: 2005:10:19 09:45:19
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 16
@@ -23,7 +23,7 @@
 [EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:06:18 16:54:37
 [EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:06:18 16:54:37
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.533203
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.5332031
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.6
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment

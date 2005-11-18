@@ -1,0 +1,321 @@
+<html>
+<head>
+<title>SigmaRaw Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2>SigmaRaw Tags</h2>
+These tags are used in Sigma and Foveon RAW (.X3F) images.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Header'</td>
+<td>Header</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='SigmaRaw.html#Header'>SigmaRaw Header Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'HeaderExt'</td>
+<td>HeaderExt</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='SigmaRaw.html#HeaderExt'>SigmaRaw HeaderExt Tags</a></td></tr>
+<tr valign='top'>
+<td>'IMA2'</td>
+<td>PreviewImage</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IMAG'</td>
+<td>PreviewImage</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'PROP'</td>
+<td>Properties</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='SigmaRaw.html#Properties'>SigmaRaw Properties Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Header'>SigmaRaw Header Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>FileVersion</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0007</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0009</td>
+<td>Rotation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>WhiteBalance</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='HeaderExt'>SigmaRaw HeaderExt Tags</a></h2>
+Extended header data found in version 2.1 and 2.2 files
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0000</td>
+<td>Unused</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0001</td>
+<td>ExposureAdjust</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0002</td>
+<td>Contrast</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0003</td>
+<td>Shadow</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0004</td>
+<td>Highlight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0005</td>
+<td>Saturation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0006</td>
+<td>Sharpness</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0007</td>
+<td>RedAdjust</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0008</td>
+<td>GreenAdjust</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0009</td>
+<td>BlueAdjust</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x000a</td>
+<td>X3FillLight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Properties'>SigmaRaw Properties Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'AEMODE'</td>
+<td>MeteringMode</td>
+<td align='center'>N</td>
+<td><font size='-1'>8 = 8-segment
+  <br>&apos;A&apos; = Average
+  <br>&apos;C&apos; = Center-weighted average</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'AFMODE'</td>
+<td>FocusMode</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'APERTURE'</td>
+<td>FNumber</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'AP_DESC'</td>
+<td>ApertureDisplayed</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'BRACKET'</td>
+<td>BracketShot</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'BURST'</td>
+<td>BurstShot</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'CAMMANUF'</td>
+<td>Make</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'CAMMODEL'</td>
+<td>Model</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'CAMNAME'</td>
+<td>CameraName</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'CAMSERIAL'</td>
+<td>SerialNumber</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'DRIVE'</td>
+<td>DriveMode</td>
+<td align='center'>N</td>
+<td><font size='-1'>&apos;10S&apos; = 10-sec Timer
+  <br>&apos;2S&apos; = 2-sec Timer
+  <br>&apos;AB&apos; = Auto Bracket
+  <br>&apos;MULTI&apos; = Multi Shot
+  <br>&apos;OFF&apos; = Off
+  <br>&apos;SINGLE&apos; = Single Shot
+  <br>&apos;UP&apos; = Mirror Up</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'EXPCOMP'</td>
+<td>ExposureCompensation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'EXPNET'</td>
+<td>NetExposureCompensation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'EXPTIME'</td>
+<td>IntegrationTime</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'FIRMVERS'</td>
+<td>FirmwareVersion</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'FLASH'</td>
+<td>FlashMode</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'FLENGTH'</td>
+<td>FocalLength</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'FLEQ35MM'</td>
+<td>FocalLengthIn35mmFormat</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'FOCUS'</td>
+<td>Focus</td>
+<td align='center'>N</td>
+<td><font size='-1'>&apos;AF&apos; = Auto-focus Locked
+  <br>&apos;M&apos; = Manual
+  <br>&apos;NO LOCK&apos; = Auto-focus Didn&apos;t Lock</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IMAGERBOARDID'</td>
+<td>ImagerBoardID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'IMAGERTEMP'</td>
+<td>SensorTemperature</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ISO'</td>
+<td>ISO</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'LENSARANGE'</td>
+<td>LensApertureRange</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'LENSFRANGE'</td>
+<td>LensFocalRange</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'LENSMODEL'</td>
+<td>LensID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'PMODE'</td>
+<td>ExposureProgram</td>
+<td align='center'>N</td>
+<td><font size='-1'>&apos;A&apos; = Aperture Priority
+  <br>&apos;M&apos; = Manual
+  <br>&apos;P&apos; = Program
+  <br>&apos;S&apos; = Shutter Priority</font></td></tr>
+<tr valign='top'>
+<td>'RESOLUTION'</td>
+<td>Quality</td>
+<td align='center'>N</td>
+<td><font size='-1'>&apos;HI&apos; = High
+  <br>&apos;LOW&apos; = Low
+  <br>&apos;MED&apos; = Medium</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'SENSORID'</td>
+<td>SensorID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'SHUTTER'</td>
+<td>ExposureTime</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'SH_DESC'</td>
+<td>ShutterSpeedDisplayed</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'TIME'</td>
+<td>DateTimeOriginal</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'WB_DESC'</td>
+<td>WhiteBalance</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Nov 14, 2005</i>
+</body>
+</html>

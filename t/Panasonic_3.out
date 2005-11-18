@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.70
 [File, File, Image]  - File Name: Panasonic_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 8 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:35:47
+[File, File, Time]  - File Modification Date/Time: 2005:10:22 20:54:55
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -98,7 +98,6 @@
 [IPTC, IPTC, Other] 25 - Keywords: cool
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
 [Composite, Composite, Image]  - Aperture: 4.0
-[Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 7.6
 [Composite, Composite, Image]  - Shutter Speed: 1/400

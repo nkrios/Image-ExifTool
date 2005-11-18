@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WriteExif.pl
 #
-# Description:  Routines for writing EXIF meta information
+# Description:  Write EXIF meta information
 #
 # Revisions:    12/13/2004 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -134,12 +134,10 @@ my %writeTable = (
     0x010f => {             # Make
         Writable => 'string',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$val',
     },
     0x0110 => {             # Model
         Writable => 'string',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$val',
     },
     0x0112 => {             # Orientation
         Writable => 'int16u',
@@ -207,6 +205,7 @@ my %writeTable = (
     },
     0x0132 => {             # ModifyDate
         Writable => 'string',
+        Shift => 'Time',
         WriteGroup => 'IFD0',
         PrintConvInv => '$val',   # (only works if date format not set)
     },
@@ -315,10 +314,12 @@ my %writeTable = (
     0x9000 => 'undef',      # ExifVersion
     0x9003 => {             # DateTimeOriginal
         Writable => 'string',
+        Shift => 'Time',
         PrintConvInv => '$val',   # (only works if date format not set)
     },
-    0x9004 => {             # DateTimeDigitized
+    0x9004 => {             # CreateDate
         Writable => 'string',
+        Shift => 'Time',
         PrintConvInv => '$val',   # (only works if date format not set)
     },
     0x9101 => {             # ComponentsConfiguration
@@ -1056,6 +1057,8 @@ sub WriteExif($$$)
                         unless ($oldFormat or $oldCount or not $index) {
                             ++$index;
                             $newID = $oldID;    # pretend we wrote this
+                            # must keep same directory size to avoid messing up our fixed offsets
+                            $dirBuff .= ("\0" x 12) if $$dirInfo{FixBase};
                             next;
                         }
                         $exifTool->Error("Bad format ($oldFormat) for $dirName entry $index");
@@ -1078,7 +1081,7 @@ sub WriteExif($$$)
                                 $$dirInfo{Base} = $base = $base + $diff;
                                 $$dirInfo{DataPos} = $dataPos = $dataPos - $diff;
                                 # set relative flag if base is inside maker notes
-                                $$dirInfo{Relative} = 1 if $base > $base+$dataPos+$dirStart;
+                                $$dirInfo{Relative} = 1 if $dataPos + $dirStart < 0;
                             }
                             undef $fixBase;  # only fix it once
                         }
@@ -1960,7 +1963,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WriteExif.pl - Routines for writing EXIF meta information
+Image::ExifTool::WriteExif.pl - Write EXIF meta information
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.65
-[ExifTool, ExifTool, ExifTool]  - Warning: [minor] JpgFromRaw is not a valid image
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
 [File, File, Image]  - File Name: CanonRaw.crw
-[File, File, Image]  - Directory: t
+[File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2005:04:16 10:31:40
+[File, File, Time]  - File Modification Date/Time: 2005:04:16 10:37:10
 [File, File, Image]  - File Type: Canon RAW
 [File, File, Image]  - MIME Type: application/unknown
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
+[MakerNotes, CanonRaw, Camera] 8199 - Jpg From Raw: (Binary data 29 bytes)
 [MakerNotes, CanonRaw, Image] 0 - File Format: CRW
 [MakerNotes, CanonRaw, Image] 1 - Target Compression Ratio: 10
 [MakerNotes, CanonRaw, Image] 0 - Image Width: 3072
@@ -101,7 +101,7 @@
 [MakerNotes, Canon, Camera] 2 - Red Balance Daylight: 2.06971
 [MakerNotes, Canon, Camera] 3 - Blue Balance Daylight: 0.84024
 [MakerNotes, Canon, Camera] 4 - Red Balance Cloudy: 2.44591
-[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99047
+[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99046
 [MakerNotes, Canon, Camera] 6 - Red Balance Tungsten: 2.25721
 [MakerNotes, Canon, Camera] 7 - Blue Balance Tungsten: 0.92027
 [MakerNotes, Canon, Camera] 8 - Red Balance Fluorescent: 1.34502

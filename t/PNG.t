@@ -24,7 +24,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/PNG.png');
+    my $info = $exifTool->ImageInfo('t/images/PNG.png');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -33,11 +33,11 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValuesFromFile('t/IPTC-XMP.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg');
     # must write image to memory because size is variable (depends on Zlib
     # availability), and images in memory don't generate a 'FileSize' tag.
     my $image;  
-    my $rtnVal = $exifTool->WriteInfo('t/PNG.png', \$image);
+    my $rtnVal = $exifTool->WriteInfo('t/images/PNG.png', \$image);
     my $info = $exifTool->ImageInfo(\$image);
     my $testfile = "t/${testname}_${testnum}_failed.png";
     if (check($exifTool, $info, $testname, $testnum)) {

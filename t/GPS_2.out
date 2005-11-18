@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.66
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
 [File, File, Image]  - File Name: GPS.jpg
-[File, File, Image]  - Directory: t
+[File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2005:04:02 20:14:19
+[File, File, Time]  - File Modification Date/Time: 2005:04:02 19:20:31
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 120
@@ -29,7 +29,7 @@
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/724
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 16.0
-[EXIF, ExifIFD, Image] 37379 - Brightness Value: 0.260156
+[EXIF, ExifIFD, Image] 37379 - Brightness Value: 0.2601562
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: -0.65
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
@@ -38,8 +38,8 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2400
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1600
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 12.0508
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 12.0508
+[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 12.05078
+[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 12.05078
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Unknown (0)
@@ -66,7 +66,7 @@
 [IPTC, IPTC, Author] 110 - Credit: Ian Britton
 [IPTC, IPTC, Author] 115 - Source: FreeFoto.com
 [IPTC, IPTC, Other] 5 - Object Name: Communications
-[IPTC, IPTC, Other] 55 - Date Created: 2002:06:20
+[IPTC, IPTC, Time] 55 - Date Created: 2002:06:20
 [IPTC, IPTC, Location] 90 - City:  
 [IPTC, IPTC, Location] 95 - Province-State:  
 [IPTC, IPTC, Location] 101 - Country-Primary Location Name: Ubited Kingdom

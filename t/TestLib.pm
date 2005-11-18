@@ -196,23 +196,26 @@ sub check($$$;$$)
 #------------------------------------------------------------------------------
 # test writing feature by writing specified information to JPEG file
 # Inputs: 0) list reference to lists of SetNewValue arguments
-#         1) test name, 2) test number, 3) optional source file name
+#         1) test name, 2) test number, 3) optional source file name,
+#         4) true to only check tags which were written
 # Returns: 1 if check passed
-sub writeCheck($$$;$)
+sub writeCheck($$$;$$)
 {
-    my ($writeInfo, $testname, $testnum, $srcfile) = @_;
-    $srcfile or $srcfile = "t/$testname.jpg";
+    my ($writeInfo, $testname, $testnum, $srcfile, $onlyWritten) = @_;
+    $srcfile or $srcfile = "t/images/$testname.jpg";
     my ($ext) = ($srcfile =~ /\.(.+?)$/);
     my $testfile = "t/${testname}_${testnum}_failed.$ext";
     my $exifTool = new Image::ExifTool;
+    my @tags;
     foreach (@$writeInfo) {
         $exifTool->SetNewValue(@$_);
+        push @tags, $$_[0] if $onlyWritten;
     }
     unlink $testfile;
     $exifTool->WriteInfo($srcfile, $testfile);
     my $info = $exifTool->GetInfo('Error');
     foreach (keys %$info) { warn "$$info{$_}\n"; }
-    $info = $exifTool->ImageInfo($testfile,{Duplicates=>1,Unknown=>1});
+    $info = $exifTool->ImageInfo($testfile,{Duplicates=>1,Unknown=>1},@tags);
     my $rtnVal = check($exifTool, $info, $testname, $testnum);
     $rtnVal and unlink $testfile;
     return $rtnVal;

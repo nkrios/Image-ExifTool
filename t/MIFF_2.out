@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.66
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
 [File, File, Image]  - File Name: MIFF.miff
-[File, File, Image]  - Directory: t
+[File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2005:07:21 08:19:48
+[File, File, Time]  - File Modification Date/Time: 2005:07:21 10:04:25
 [File, File, Image]  - File Type: MIFF
 [File, File, Image]  - MIME Type: application/x-magick-image
 [MIFF, MIFF, Image] id - ID: ImageMagick
@@ -17,7 +17,7 @@
 [IPTC, IPTC, Author] 122 - Writer-Editor: I wrote it
 [IPTC, IPTC, Author] 80 - By-line: Phil Harvey
 [IPTC, IPTC, Author] 110 - Credit: My Credit
-[IPTC, IPTC, Other] 55 - Date Created: 2004:02:26
+[IPTC, IPTC, Time] 55 - Date Created: 2004:02:26
 [IPTC, IPTC, Location] 90 - City: Kingston
 [IPTC, IPTC, Location] 95 - Province-State: Ont
 [IPTC, IPTC, Location] 101 - Country-Primary Location Name: Canada

@@ -25,6 +25,8 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>DEL_PREVIEW</td><td>Flag to delete preview from after JPEG EOI</td></tr>
 
+<tr><td>DIR_COUNT</td><td>Hash reference for counters of various types of directorys (ICC, IPTC,...)</td></tr>
+
 <tr><td>DIR_NAME</td><td>Name of directory currently being processed</td></tr>
 
 <tr><td>EDIT_DIRS</td><td>Hash of parent directories for each directory edited during
@@ -45,6 +47,9 @@ header file.  (but this is Perl, so I couldn't do that...)
 <tr><td>FILE_TYPE</td><td>File type (JPEG, TIFF, etc...)</td></tr>
 
 <tr><td>FOUND_TAGS</td><td>Found tags with proper case and order</td></tr>
+
+<tr><td>GROUP1</td><td>Hash of family 1 gruop names (ie. IFD name or XMP namespace),
+    keyed by tag key</td></tr>
 
 <tr><td>INDENT</td><td>Indent string for verbose output</td></tr>
 
@@ -93,8 +98,6 @@ header file.  (but this is Perl, so I couldn't do that...)
     <tr><td>Relative</td><td>-</td><td>flag to indicate that pointer offsets are relative</td></tr>
     </table></td></tr>
 
-<tr><td>PRINT_CONV</td><td>Hash of PrintConv values keyed by tag key</td></tr>
-
 <tr><td>PRIORITY</td><td>Hash of tag Priority values for current tag, keyed by tag name (not tag key!)</td></tr>
 
 <tr><td>PRIORITY_DIR</td><td>Name of priority IFD (ie. the IFD for the full resolution image)</td></tr>
@@ -108,11 +111,8 @@ header file.  (but this is Perl, so I couldn't do that...)
 <tr><td>SAVE_NEW_VALUE</td><td>Hash of new value information which was overwritten after
     a call to SaveNewValues()</td></tr>
 
-<tr><td>SET_TAG_EXTRA</td><td>Value to use for TAG_EXTRA when new tags are found.  May start with
-    a '+' sign to add to existing group name</td></tr>
-
-<tr><td>TAG_EXTRA</td><td>Hash of extra information (IFD name or XMP namespace) keyed by
-	tag key</td></tr>
+<tr><td>SET_GROUP1</td><td>Value to use for family 1 group name when new tags
+    are found.  May start with a '+' sign to add to existing group name</td></tr>
 
 <tr><td>TAG_INFO</td><td>Hash of tagInfo hash references, keyed by tag key</td></tr>
 
@@ -121,7 +121,7 @@ header file.  (but this is Perl, so I couldn't do that...)
 <tr><td>TIFF_TYPE</td><td>Type of TIFF data, only set if FILE_TYPE is TIFF.  Valid values
     are APP1, APP3, TIFF, CR2, MRW, JP2, JPX, NEF, PEF, ORF or DNG.</td></tr>
 
-<tr><td>VALUE_CONV</td><td>Hash of ValueConv values keyed by tag key</td></tr>
+<tr><td>VALUE</td><td>Hash of raw tag values keyed by tag key</td></tr>
 
 <tr><td>WRITE_GROUPS</td><td>List of write groups in order of priority</td></tr>
 

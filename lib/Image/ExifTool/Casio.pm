@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Casio.pm
 #
-# Description:  Definitions for Casio EXIF Maker Notes
+# Description:  Casio EXIF maker notes tags
 #
 # Revisions:    12/09/2003 - P. Harvey Created
 #               09/10/2004 - P. Harvey Added MakerNote2 (thanks to Joachim Loehr)
@@ -335,7 +335,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Casio - Definitions for Casio EXIF maker notes
+Image::ExifTool::Casio - Casio EXIF maker notes tags
 
 =head1 SYNOPSIS
 

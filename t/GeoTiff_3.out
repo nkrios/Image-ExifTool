@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.70
 [File, File, Image]  - File Name: GeoTiff_3_failed.tif
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:35:27
+[File, File, Time]  - File Modification Date/Time: 2005:10:20 14:09:35
 [File, File, Image]  - File Type: TIFF
 [File, File, Image]  - MIME Type: image/tiff
 [EXIF, IFD0, Image] 256 - Image Width: 25
@@ -18,7 +18,6 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: cm
 [EXIF, IFD0, Image] 320 - Color Map: (Binary data 1536 bytes)
 [EXIF, IFD0, Location] 34264 - Model Transform: 33.4179196429669 35.8363313794284 0 691955.165684031 35.8363313794284 -33.4179196429669 0 2791710.99012603 0 0 0 0 0 0 0 1
-[Composite, Composite, Image]  - Image Size: 25x24
 [GeoTiff, GeoTiff, Location] 1 - Geo Tiff Version: 1.1.0
 [GeoTiff, GeoTiff, Location] 1024 - GT Model Type: Projected
 [GeoTiff, GeoTiff, Location] 1025 - GT Raster Type: Pixel Is Area
@@ -30,3 +29,4 @@
 [GeoTiff, GeoTiff, Location] 3072 - Projected CS Type: User Defined
 [GeoTiff, GeoTiff, Location] 3073 - PCS Citation: Hough UTM zone 17N
 [GeoTiff, GeoTiff, Location] 3074 - Projection: UTM zone 17N
+[Composite, Composite, Image]  - Image Size: 25x24

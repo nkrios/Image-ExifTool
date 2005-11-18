@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
 [File, File, Image]  - File Name: Minolta.jpg
-[File, File, Image]  - Directory: t
+[File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 14 kB
-[File, File, Time]  - File Modification Date/Time: 2005:01:19 16:23:17
+[File, File, Time]  - File Modification Date/Time: 2005:01:18 15:44:29
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -78,8 +78,8 @@
 [MakerNotes, Minolta, Camera] 18 - Focal Length: 41.4mm
 [MakerNotes, Minolta, Camera] 19 - Focus Distance: 2 m
 [MakerNotes, Minolta, Camera] 20 - Flash Fired: No
-[MakerNotes, Minolta, Camera] 21 - Minolta Date: 2002:06:01
-[MakerNotes, Minolta, Camera] 22 - Minolta Time: 12:37:27
+[MakerNotes, Minolta, Time] 21 - Minolta Date: 2002:06:01
+[MakerNotes, Minolta, Time] 22 - Minolta Time: 12:37:27
 [MakerNotes, Minolta, Camera] 23 - Max Aperture: 3.4
 [MakerNotes, Minolta, Camera] 26 - File Number Memory: On
 [MakerNotes, Minolta, Camera] 27 - Last File Number: 32

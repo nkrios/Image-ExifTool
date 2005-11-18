@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Exif.pm
 #
-# Description:  Definitions for EXIF tags
+# Description:  Read EXIF meta information
 #
 # Revisions:    11/25/2003 - P. Harvey Created
 #               02/06/2004 - P. Harvey Moved processing functions from ExifTool
@@ -30,7 +30,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.72';
+$VERSION = '1.74';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -52,7 +52,7 @@ sub RebuildMakerNotes($$$);
 %formatNumber = (
     'int8u'         => 1,   # BYTE
     'string'        => 2,   # ASCII
-    'binary'        => 2,   # (binary is the same as string in Perl)
+    'binary'        => 2,   # (binary is the same as string in Perl, but watch out for UTF8)
     'int16u'        => 3,   # SHORT
     'int32u'        => 4,   # LONG
     'rational32u'   => 5,   # RATIONAL
@@ -164,7 +164,7 @@ sub RebuildMakerNotes($$$);
     0xfe => {
         Name => 'SubfileType',
         # set priority directory if this is the full resolution image
-        ValueConv => '$val == 0 and $self->SetPriorityDir(); $val',
+        RawConv => '$self->SetPriorityDir() if $val == 0; $val',
         PrintConv => {
             0 => 'Full-resolution Image',
             1 => 'Reduced-resolution image',
@@ -179,7 +179,7 @@ sub RebuildMakerNotes($$$);
     0xff => {
         Name => 'OldSubfileType',
         # set priority directory if this is the full resolution image
-        ValueConv => '$val == 1 and $self->SetPriorityDir(); $val',
+        RawConv => '$self->SetPriorityDir() if $val == 1; $val',
         PrintConv => {
             1 => 'Full-resolution image',
             2 => 'Reduced-resolution image',
@@ -240,7 +240,7 @@ sub RebuildMakerNotes($$$);
         Groups => { 2 => 'Camera' },
         DataMember => 'CameraMake',
         # save this value as an ExifTool member variable
-        ValueConv => '$self->{CameraMake} = $val',
+        RawConv => '$self->{CameraMake} = $val',
     },
     0x110 => {
         Name => 'Model',
@@ -248,7 +248,7 @@ sub RebuildMakerNotes($$$);
         Groups => { 2 => 'Camera' },
         DataMember => 'CameraModel',
         # save this value as an ExifTool member variable
-        ValueConv => '$self->{CameraModel} = $val',
+        RawConv => '$self->{CameraModel} = $val',
     },
     0x111 => [
         {
@@ -490,6 +490,7 @@ sub RebuildMakerNotes($$$);
         Groups => { 1 => 'GlobParamIFD' },
         Flags => 'SubIFD',
         SubDirectory => {
+            DirName => 'GlobParamIFD',
             Start => '$val',
         },
     },
@@ -665,6 +666,7 @@ sub RebuildMakerNotes($$$);
         Name => 'ApplicationNotes',
         # this could be an XMP block
         SubDirectory => {
+            DirName => 'XMP',
             TagTable => 'Image::ExifTool::XMP::Main',
         },
     },
@@ -702,6 +704,7 @@ sub RebuildMakerNotes($$$);
     0x83bb => {
         Name => 'IPTC-NAA',
         SubDirectory => {
+            DirName => 'IPTC',
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
@@ -730,8 +733,8 @@ sub RebuildMakerNotes($$$);
     0x8568 => {
         Name => 'IPTC-NAA2',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::IPTC::Main',
             DirName => 'IPTC2',     # change name because this isn't the IPTC we want to write
+            TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
     0x85d8 => {
@@ -742,6 +745,7 @@ sub RebuildMakerNotes($$$);
         Name => 'LeafData',
         Format => 'undef',    # avoid converting huge block to string of int8u's!
         SubDirectory => {
+            DirName => 'LeafIFD',
             TagTable => 'Image::ExifTool::Leaf::Main',
         },
     },
@@ -749,6 +753,7 @@ sub RebuildMakerNotes($$$);
         Name => 'PhotoshopSettings',
         Format => 'binary',
         SubDirectory => {
+            DirName => 'Photoshop',
             TagTable => 'Image::ExifTool::Photoshop::Main',
         },
     },
@@ -757,6 +762,7 @@ sub RebuildMakerNotes($$$);
         Groups => { 1 => 'ExifIFD' },
         Flags => 'SubIFD',
         SubDirectory => {
+            DirName => 'ExifIFD',
             Start => '$val',
         },
     },
@@ -804,6 +810,7 @@ sub RebuildMakerNotes($$$);
         Groups => { 1 => 'GPS' },
         Flags => 'SubIFD',
         SubDirectory => {
+            DirName => 'GPS',
             TagTable => 'Image::ExifTool::GPS::Main',
             Start => '$val',
         },
@@ -1043,6 +1050,7 @@ sub RebuildMakerNotes($$$);
         Flags => 'SubIFD',
         Description => 'Interoperability Offset',
         SubDirectory => {
+            DirName => 'InteropIFD',
             Start => '$val',
         },
     },
@@ -1212,70 +1220,11 @@ sub RebuildMakerNotes($$$);
     0xa480 => 'GDALMetadata', #3
     0xa481 => 'GDALNoData', #3
     0xa500 => 'Gamma',
-    # 0xc350 thru 0xc41a plus 0xc46c,0xc46e are Kodak APP3 tags (ref 8)
-    0xc350 => {
-        Name => 'FilmProductCode',
-        Notes => 'tags 0xc350-0xc41a, 0xc46c, 0xc46e are Kodak APP3 "Meta" tags',
-    },
-    0xc351 => 'ImageSourceEK',
-    0xc352 => 'CaptureConditionsPAR',
-    0xc353 => {
-        Name => 'CameraOwner',
-        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-    },
-    0xc354 => {
-        Name => 'SerialNumber',
-        Groups => { 2 => 'Camera' },
-    },
-    0xc355 => 'UserSelectGroupTitle',
-    0xc356 => 'DealerIDNumber',
-    0xc357 => 'CaptureDeviceFID',
-    0xc358 => 'EnvelopeNumber',
-    0xc359 => 'FrameNumber',
-    0xc35a => 'FilmCategory',
-    0xc35b => 'FilmGencode',
-    0xc35c => 'ModelAndVersion',
-    0xc35d => 'FilmSize',
-    0xc35e => 'SBA_RGBShifts',
-    0xc35f => 'SBAInputImageColorspace',
-    0xc360 => 'SBAInputImageBitDepth',
-    0xc361 => 'SBAExposureRecord',
-    0xc362 => 'UserAdjSBA_RGBShifts',
-    0xc363 => 'ImageRotationStatus',
-    0xc364 => 'RollGuidElements',
-    0xc365 => 'MetadataNumber',
-    0xc366 => 'EditTagArray',
-    0xc367 => 'Magnification',
-    0xc36c => 'NativeXResolution',
-    0xc36d => 'NativeYResolution',
-    0xc36e => {
-        Name => 'KodakEffectsIFD',
-        Flags => 'SubIFD',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Kodak::SpecialEffects',
-            Start => '$val',
-        },
-    },
-    0xc36f => {
-        Name => 'KodakBordersIFD',
-        Flags => 'SubIFD',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Kodak::Borders',
-            Start => '$val',
-        },
-    },
-    0xc37a => 'NativeResolutionUnit',
-    0xc418 => 'SourceImageDirectory',
-    0xc419 => 'SourceImageFileName',
-    0xc41a => 'SourceImageVolumeName',
-    # (end Kodak APP3 tags)
     0xc427 => 'OceScanjobDesc', #3
     0xc428 => 'OceApplicationSelector', #3
     0xc429 => 'OceIDNumber', #3
     0xc42a => 'OceImageLogic', #3
     0xc44f => 'Annotations', #7
-    0xc46c => 'PrintQuality', #8 (Kodak APP3)
-    0xc46e => 'ImagePrintStatus', #8 (Kodak APP3)
     0xc4a5 => {
         Name => 'PrintIM',
         # must set Writable here so this tag will be saved with MakerNotes option
@@ -1368,29 +1317,6 @@ sub RebuildMakerNotes($$$);
     # by ProcessExif().
 );
 
-# Kodak Sub-IFD's (ref 8) - (put them here for convenience)
-%Image::ExifTool::Kodak::SpecialEffects = (
-    GROUPS => { 0 => 'EXIF', 1 => 'KodakEffectsIFD', 2 => 'Image'},
-    0 => 'DigitalEffectsVersion',
-    1 => {
-        Name => 'DigitalEffectsName',
-        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-    },
-    2 => 'DigitalEffectsType',
-);
-%Image::ExifTool::Kodak::Borders = (
-    GROUPS => { 0 => 'EXIF', 1 => 'KodakBordersIFD', 2 => 'Image'},
-    0 => 'BordersVersion',
-    1 => {
-        Name => 'BorderName',
-        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-    },
-    2 => 'BorderID',
-    3 => 'BorderLocation',
-    4 => 'BorderType',
-    8 => 'WatermarkType',
-);
-
 # the Composite tags are evaluated last, and are used
 # to calculate values based on the other tags
 # (the main script looks for the special 'Composite' hash)
@@ -1418,8 +1344,7 @@ sub RebuildMakerNotes($$$);
             0 => 'FNumber',
             1 => 'ApertureValue',
         },
-        # convert to a float (could start with 'F' if it was a string value)
-        ValueConv => 'my $a=ToFloat($val[0]); $a || $val[1]',
+        ValueConv => '$val[0] || $val[1]',
         PrintConv => 'sprintf("%.1f", $val)',
     },
     FocalLength35efl => {
@@ -1496,12 +1421,13 @@ sub RebuildMakerNotes($$$);
             return join(' ',@v);
         },
         PrintConv => q{
+            $val =~ tr/,/./;    # in case locale is whacky
             my @v = split ' ', $val;
             $v[1] or return sprintf("inf (%.2f m - inf)", $v[0]);
             return sprintf("%.2f m (%.2f - %.2f)",$v[1]-$v[0],$v[0],$v[1]);
         },
     },
-    DateTimeCreated => { # used by IPTC, XMP and WAV
+    DateTimeCreated => { # used by IPTC, XMP, WAV, etc
         Description => 'Date/Time Created',
         Groups => { 2 => 'Time' },
         Require => {
@@ -1530,8 +1456,7 @@ sub RebuildMakerNotes($$$);
             1 => 'ThumbnailLength',
         },
         # retrieve the thumbnail from our EXIF data
-        ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"ThumbnailImage")',
-        ValueConvInv => '$val',
+        RawConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"ThumbnailImage")',
     },
     PreviewImage => {
         Writable => 1,
@@ -1546,7 +1471,7 @@ sub RebuildMakerNotes($$$);
         WriteAlso => {
             PreviewImageValid => 'defined $val and length $val ? 1 : 0',
         },
-        ValueConv => q{
+        RawConv => q{
             return undef if defined $val[2] and not $val[2];
             return Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],'PreviewImage');
         },
@@ -1559,7 +1484,7 @@ sub RebuildMakerNotes($$$);
             0 => 'JpgFromRawStart',
             1 => 'JpgFromRawLength',
         },
-        ValueConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"JpgFromRaw")',
+        RawConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"JpgFromRaw")',
         ValueConvInv => '$val',
     },
     PreviewImageSize => {
@@ -1568,26 +1493,6 @@ sub RebuildMakerNotes($$$);
             1 => 'PreviewImageHeight',
         },
         ValueConv => '"$val[0]x$val[1]"',
-    },
-    ProcessGeoTiff => {
-        Require => {
-            0 => 'GeoTiffDirectory',
-        },
-        Desire => {
-            1 => 'GeoTiffDoubleParams',
-            2 => 'GeoTiffAsciiParams',
-        },
-        ValueConv => q{
-            my $tagTable = GetTagTable("Image::ExifTool::GeoTiff::Main");
-            Image::ExifTool::GeoTiff::ProcessGeoTiff($self, $tagTable, $val[0], $val[1], $val[2]);
-            unless ($self->Options('Verbose')) {
-                # this is duplicate information so delete it unless verbose
-                $self->DeleteTag('GeoTiffDirectory');
-                $self->DeleteTag('GeoTiffDoubleParams');
-                $self->DeleteTag('GeoTiffAsciiParams');
-            }
-            return undef;       # don't generate a tag value
-        },
     },
     SubSecDateTimeOriginal => {
         Description => 'Shooting Date/Time',
@@ -1706,6 +1611,10 @@ sub ConvertExifText($$)
     return $val if length($val) < 8;
     my $id = substr($val, 0, 8);
     my $str = substr($val, 8);
+    # by the EXIF spec, the string should be "UNICODE\0", but apparently Kodak
+    # sometimes uses "Unicode\0" in the APP3 "Meta" information.  But unfortunately
+    # Ricoh uses "Unicode\0" in the RR30 EXIF UserComment when the text is actually
+    # ASCII, so only recognize uppercase "UNICODE\0" here.
     if ($id eq "UNICODE\0") {
         # convert from unicode
         $str = $exifTool->Unicode2Byte($str);
@@ -1979,7 +1888,7 @@ sub ProcessExif($$$)
                     $valuePtr += $diff;
                     $$dirInfo{Base} = $base = $base + $diff;
                     $$dirInfo{DataPos} = $dataPos = $dataPos - $diff;
-                    $$dirInfo{Relative} = 1 if $base > $base+$dataPos+$dirStart;
+                    $$dirInfo{Relative} = 1 if $dataPos + $dirStart < 0;
                     if ($verbose) {
                         my $rel = $$dirInfo{Relative} ? 'relative' : 'absolute';
                         $exifTool->Warn("Adjusted $$dirInfo{DirName} base by $diff ($rel)");
@@ -2066,15 +1975,15 @@ sub ProcessExif($$$)
             my $fstr = $formatName[$format];
             $origFormStr and $fstr = "$origFormStr read as $fstr";
             $exifTool->VerboseInfo($tagID, $tagInfo,
-                Table  => $tagTablePtr,
-                Index  => $index,
-                Value  => $val,
-                DataPt => $valueDataPt,
-                Size   => $size,
-                Start  => $valuePtr,
-                Addr   => $valuePtr + $valueDataPos,
-                Format => $fstr,
-                Count  => $count,
+                Table   => $tagTablePtr,
+                Index   => $index,
+                Value   => $val,
+                DataPt  => $valueDataPt,
+                DataPos => $valueDataPos,
+                Size    => $size,
+                Start   => $valuePtr,
+                Format  => $fstr,
+                Count   => $count,
             );
             next unless $tagInfo;
         }
@@ -2182,7 +2091,7 @@ sub ProcessExif($$$)
                                 $msg .= " (directory start $subdirStart is before EXIF start)";
                             } else {
                                 my $end = $subdirStart + $size;
-                                $msg .= " (directory end is $subdirStart but EXIF size is only $subdirDataLen)";
+                                $msg .= " (directory end is $end but EXIF size is only $subdirDataLen)";
                             }
                         }
                         $exifTool->Warn($msg);
@@ -2214,6 +2123,7 @@ sub ProcessExif($$$)
                     RAF      => $raf,
                     Parent   => $$dirInfo{DirName},
                     FixBase  => $$subdir{FixBase},
+                    TagInfo  => $tagInfo,
                 );
                 # set directory IFD name from group name of family 1 in tag information if it exists
                 if ($$tagInfo{Groups}) {
@@ -2284,7 +2194,7 @@ sub ProcessExif($$$)
         $tagKey = $exifTool->FoundTag($tagInfo, $val);
         # set the group 1 name for tags in main table
         if (defined $tagKey and $tagTablePtr eq \%Image::ExifTool::Exif::Main) {
-            $exifTool->SetTagExtra($tagKey, $$dirInfo{DirName});
+            $exifTool->SetGroup1($tagKey, $$dirInfo{DirName});
         }
     }
 
@@ -2301,7 +2211,7 @@ sub ProcessExif($$$)
             if ($newDirInfo{DirName} =~ /^IFD(\d+)$/) {
                 $newDirInfo{DirName} = 'IFD' . ($1 + 1);
             }
-            $exifTool->{INDENT} = substr($exifTool->{INDENT},0,-2);
+            $exifTool->{INDENT} =~ s/..$//;
             $newDirInfo{DirStart} = $subdirStart;
             $exifTool->ProcessDirectory(\%newDirInfo, $tagTablePtr) or $success = 0;
         }
@@ -2315,7 +2225,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Exif - Definitions for EXIF meta information
+Image::ExifTool::Exif - Read EXIF meta information
 
 =head1 SYNOPSIS
 

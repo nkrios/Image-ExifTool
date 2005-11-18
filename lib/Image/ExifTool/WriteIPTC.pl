@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WriteIPTC.pl
 #
-# Description:  Routines for writing IPTC meta information
+# Description:  Write IPTC meta information
 #
 # Revisions:    12/15/2004 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -54,7 +54,10 @@ sub CheckIPTC($$$)
             return "Can't write $bytes-byte integer";
         }
         my $val = $$valPtr;
-        return 'Not an integer' unless Image::ExifTool::IsInt($val);
+        unless (Image::ExifTool::IsInt($val)) {
+            return 'Not an integer' unless Image::ExifTool::IsHex($val);
+            $val = $$valPtr = hex($val);
+        }
         my $n;
         for ($n=0; $n<$bytes; ++$n) { $val >>= 8; }
         return "Value too large for $bytes-byte format" if $val;
@@ -438,7 +441,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WriteIPTC.pl - Routines for writing IPTC meta information
+Image::ExifTool::WriteIPTC.pl - Write IPTC meta information
 
 =head1 SYNOPSIS
 

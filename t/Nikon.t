@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..6\n"; }
+BEGIN { $| = 1; print "1..8\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -25,7 +25,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/Nikon.jpg');
+    my $info = $exifTool->ImageInfo('t/images/Nikon.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -45,10 +45,10 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValuesFromFile('t/NikonD70.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/NikonD70.jpg');
     my $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/Writer.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -62,7 +62,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/NikonD2Hs.jpg');
+    my $info = $exifTool->ImageInfo('t/images/NikonD2Hs.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -79,6 +79,28 @@ my $testnum = 1;
         warn sprintf("    Expected 0x%x but got 0x%x\n", $expected, $got);
         print 'not ';
     }
+    print "ok $testnum\n";
+}
+
+# test 7: Test reading NEF image
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->Options(Duplicates => 1);
+    my $info = $exifTool->ImageInfo('t/images/Nikon.nef');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 8: Test writing Nikon Capture information in NEF image
+{
+    ++$testnum;
+    my @writeInfo = (
+        ['PhotoEffects' => 'Off'],
+        ['Caption-abstract' => 'A new caption'],
+        ['VignetteControlIntensity' => '70'],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Nikon.nef', 1);
     print "ok $testnum\n";
 }
 

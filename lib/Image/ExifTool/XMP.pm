@@ -1,12 +1,13 @@
 #------------------------------------------------------------------------------
 # File:         XMP.pm
 #
-# Description:  Definitions for XMP tags
+# Description:  Read XMP meta information
 #
 # Revisions:    11/25/2003 - P. Harvey Created
 #               10/28/2004 - P. Harvey Major overhaul to conform with XMP spec
 #               02/27/2005 - P. Harvey Also read UTF-16 and UTF-32 XMP
 #               08/30/2005 - P. Harvey Split tag tables into separate namespaces
+#               10/24/2005 - P. Harvey Added ability to parse .XMP files
 #
 # References:   1) http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
 #               2) http://www.w3.org/TR/rdf-syntax-grammar/  (20040210)
@@ -31,15 +32,16 @@ package Image::ExifTool::XMP;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace %xlatNamespace);
+use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.41';
+$VERSION = '1.45';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
-sub ProcessXMP($$$);
-sub WriteXMP($$$);
+sub ProcessXMP($$;$);
+sub WriteXMP($$;$);
 sub ParseXMPElement($$$;$$);
 sub DecodeBase64($);
 
@@ -47,30 +49,26 @@ sub DecodeBase64($);
 sub ToDegrees
 {
     require Image::ExifTool::GPS;
-    Image::ExifTool::GPS::ToDegrees($_[1], 1);
+    Image::ExifTool::GPS::ToDegrees($_[0], 1);
 }
 my %latConv = (
     ValueConv    => \&ToDegrees,
+    RawConv => 'require Image::ExifTool::GPS; $val', # to load Composite tags and routines
     ValueConvInv => q{
         require Image::ExifTool::GPS;
         Image::ExifTool::GPS::ToDMS($self, $val, 2, "N");
     },
-    PrintConv    => q{
-        require Image::ExifTool::GPS;
-        Image::ExifTool::GPS::ToDMS($self, $val, 1, "N");
-    },
+    PrintConv    => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")',
     PrintConvInv => \&ToDegrees,
 );
 my %longConv = (
     ValueConv    => \&ToDegrees,
+    RawConv => 'require Image::ExifTool::GPS; $val',
     ValueConvInv => q{
         require Image::ExifTool::GPS;
         Image::ExifTool::GPS::ToDMS($self, $val, 2, "E");
     },
-    PrintConv    => q{
-        require Image::ExifTool::GPS;
-        Image::ExifTool::GPS::ToDMS($self, $val, 1, "E");
-    },
+    PrintConv    => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")',
     PrintConvInv => \&ToDegrees,
 );
 
@@ -186,6 +184,7 @@ my %longConv = (
     date        => {
         Groups => { 2 => 'Time'   },
         Writable => 'date',
+        Shift => 'Time',
         List => 'Seq',
         PrintConv => '$self->ConvertDateTime($val)',
     },
@@ -219,6 +218,7 @@ group names.
     CreateDate  => {
         Groups => { 2 => 'Time'  },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     CreatorTool => { },
@@ -229,11 +229,13 @@ group names.
     MetadataDate => {
         Groups => { 2 => 'Time'  },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ModifyDate => {
         Groups => { 2 => 'Time' },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Nickname    => { },
@@ -303,7 +305,12 @@ group names.
     HistoryInstanceID       => { List => 1 },
     HistoryParameters       => { List => 1 },
     HistorySoftwareAgent    => { List => 1 },
-    HistoryWhen             => { List => 1, Groups => { 2 => 'Time'  }, Writable => 'date' },
+    HistoryWhen             => {
+        List => 1,
+        Groups => { 2 => 'Time'  },
+        Writable => 'date',
+        Shift => 'Time',
+    },
     ManagedFrom     => { SubDirectory => { }, Struct => 'ResourceRef' },
     ManagedFromInstanceID       => { },
     ManagedFromDocumentID       => { },
@@ -332,8 +339,18 @@ group names.
     VersionsEventInstanceID     => { List => 1 },
     VersionsEventParameters     => { List => 1 },
     VersionsEventSoftwareAgent  => { List => 1 },
-    VersionsEventWhen           => { List => 1, Groups => { 2 => 'Time' }, Writable => 'date' },
-    VersionsModifyDate  => { List => 1, Groups => { 2 => 'Time' }, Writable => 'date' },
+    VersionsEventWhen           => {
+        List => 1,
+        Groups => { 2 => 'Time' },
+        Writable => 'date',
+        Shift => 'Time',
+    },
+    VersionsModifyDate  => {
+        List => 1,
+        Groups => { 2 => 'Time' },
+        Writable => 'date',
+        Shift => 'Time',
+    },
     VersionsModifier    => { List => 1 },
     VersionsVersion     => { List => 1 },
     LastURL         => { },
@@ -401,11 +418,13 @@ writable because their names conflict with XMP-dc tags.
     ModDate => { #PH
         Groups => { 2 => 'Time' },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     CreationDate => { #PH
         Groups => { 2 => 'Time' },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Creator     => { Groups => { 2 => 'Author' }, Writable => 0 },
@@ -432,6 +451,7 @@ writable because their names conflict with XMP-dc tags.
     DateCreated => {
         Groups => { 2 => 'Time' },
         Writable => 'date',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
     },
     Headline        => { },
@@ -549,6 +569,7 @@ writable because their names conflict with XMP-dc tags.
         Description => 'Date/Time Of Last Modification',
         Groups => { 2 => 'Time' },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ImageDescription => { Writable => 'lang-alt' },
@@ -615,12 +636,14 @@ writable because their names conflict with XMP-dc tags.
     DateTimeOriginal => {
         Groups => { 2 => 'Time' },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     DateTimeDigitized => {
         Description => 'Date/Time Digitized',
         Groups => { 2 => 'Time' },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ExposureTime => {
@@ -989,6 +1012,7 @@ writable because their names conflict with XMP-dc tags.
     GPSTimeStamp    => {
         Groups => { 2 => 'Time' },
         Writable => 'date',
+        Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     GPSSatellites   => { Groups => { 2 => 'Location' } },
@@ -1289,7 +1313,7 @@ sub GetXMPTagID($)
                 my $info = $Image::ExifTool::XMP::Main{$xlatNS};
                 my $table;
                 if (ref $info eq 'HASH' and $info->{SubDirectory}) {
-                    $table = Image::ExifTool::GetTagTable($info->{SubDirectory}->{TagTable});
+                    $table = GetTagTable($info->{SubDirectory}->{TagTable});
                 }
                 unless ($table and $table->{$nm}) {
                     $nm = lc($nm);
@@ -1336,7 +1360,7 @@ sub FoundXMP($$$$)
         $table = 'Image::ExifTool::XMP::other';
     }
     # change pointer to the table for this namespace
-    $tagTablePtr = Image::ExifTool::GetTagTable($table);
+    $tagTablePtr = GetTagTable($table);
 
     # convert quotient and date values to a more sensible format
     if ($val =~ /^(-?\d+)\/(-?\d+)/) {
@@ -1352,7 +1376,7 @@ sub FoundXMP($$$$)
         Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
     }
     $tag = $exifTool->FoundTag($tagInfo, UnescapeHTML($val));
-    $exifTool->SetTagExtra($tag, "XMP-$namespace") if $namespace;
+    $exifTool->SetGroup1($tag, "XMP-$namespace") if $namespace;
 
     if ($exifTool->Options('Verbose')) {
         my $tagID = join('/',@$props);
@@ -1414,8 +1438,10 @@ sub ParseXMPElement($$$;$$)
             if ($prop eq 'rdf:li') {
                 $$propListPt[$#$propListPt] = sprintf('rdf:li %.3d', $count);
             }
-            # undefine value if we found more properties within this one
-            undef $val if ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt);
+            if (ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt)) {
+                # undefine value since we found more properties within this one
+                undef $val;
+            }
             CaptureXMP($exifTool, $propListPt, $val, \%attrs);
         } else {
             # trim comments and whitespace from rdf:Description properties only
@@ -1465,18 +1491,34 @@ sub ParseXMPElement($$$;$$)
 # Process XMP data
 # Inputs: 0) ExifTool object reference, 1) DirInfo reference, 2) Pointer to tag table
 # Returns: 1 on success
-sub ProcessXMP($$$)
+sub ProcessXMP($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen};
+    my $dataLen = $$dirInfo{DataLen};
     my $rtnVal = 0;
     my $buff;
 
-    return 0 unless $tagTablePtr;
+    # read information from XMP file if necessary
+    unless ($dataPt) {
+        my $raf = $$dirInfo{RAF} or return 0;
+        $raf->Read($buff, 64) or return 0;
+        $buff =~ tr/\0//d;
+        # check to see if this is XMP format
+        return 0 unless $buff =~ /^<\?xpacket begin=/;
+        $raf->Seek(0, 2) or return 0;
+        my $size = $raf->Tell() or return 0;
+        $raf->Seek(0, 0) or return 0;
+        $raf->Read($buff, $size) == $size or return 0;
+        $dataPt = \$buff;
+        $dirStart = 0;
+        $dirLen = $dataLen = $size;
+        $exifTool->SetFileType();
+    }
     # take substring if necessary
-    if ($$dirInfo{DataLen} != $dirStart + $dirLen) {
+    if ($dataLen != $dirStart + $dirLen) {
         $buff = substr($$dataPt, $dirStart, $dirLen);
         $dataPt = \$buff;
         $dirStart = 0;
@@ -1540,8 +1582,10 @@ sub ProcessXMP($$$)
 #
 # extract the information
 #
+    $tagTablePtr or $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
     $rtnVal = 1 if ParseXMPElement($exifTool, $tagTablePtr, $dataPt, $dirStart);
-
+    # return DataPt if successful in case we want it for writing
+    $$dirInfo{DataPt} = $dataPt if $rtnVal and $$dirInfo{RAF};
     return $rtnVal;
 }
 
@@ -1552,7 +1596,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::XMP - Definitions for XMP meta information
+Image::ExifTool::XMP - Read XMP meta information
 
 =head1 SYNOPSIS
 

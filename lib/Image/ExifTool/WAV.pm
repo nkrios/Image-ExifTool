@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WAV.pm
 #
-# Description:  Routines fro reading WAV files
+# Description:  Read WAV meta information
 #
 # Revisions:    09/14/2005 - P. Harvey Created
 #
@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 # WAV info
 %Image::ExifTool::WAV::Main = (
@@ -179,33 +179,16 @@ sub ProcessSubChunks($$$)
         my $tag = substr($$dataPt, $offset, 4);
         my $len = Get32u($dataPt, $offset + 4);
         $offset += 8;
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         if ($offset + $len > $end) {
             $exifTool->Warn("Bad $tag chunk");
             return 0;
         }
-        if ($verbose) {
-            my $val = substr($$dataPt, $offset, $len);
-            $exifTool->VerboseInfo($tag, $tagInfo,
-                Size => $len,
-                Value => $val,
-                DataPt => \$val,
-            );
-        }
-        if ($tagInfo) {
-            if ($$tagInfo{SubDirectory}) {
-                my %subdirInfo = (
-                    DataPt => $dataPt,
-                    DirStart => $offset,
-                    DirLen => $len,
-                    DirName => $tag,
-                );
-                my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-                $exifTool->ProcessDirectory(\%subdirInfo, $tagTablePtr);
-            } else {
-                $exifTool->FoundTag($tagInfo, substr($$dataPt, $offset, $len));
-            }
-        }
+        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+            DataPt => $dataPt,
+            DataPos => $$dirInfo{DataPos},
+            Start => $offset,
+            Size => $len,
+        );
         ++$len if $len & 0x01;  # must account for padding if odd number of bytes
         $offset += $len;
     }
@@ -232,6 +215,7 @@ sub ProcessChunk($$$)
         $tagTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
         my %subInfo = (
             DataPt => $dataPt,
+            DataPos => $$dirInfo{DataPos},
             DirStart => $offset + 4,
             DirLen => $size - 4,
             DirName => $chunkType,
@@ -258,11 +242,13 @@ sub ProcessWAV($$)
     $exifTool->SetFileType();
     SetByteOrder('II');
     my $tagTablePtr = GetTagTable('Image::ExifTool::WAV::Main');
+    my $pos = 12;
 #
 # Read chunks in WAVE image until we get to the 'data' chunk
 #
     for (;;) {
         $raf->Read($buff, 8) == 8 or $err=1, last;
+        $pos += 8;
         my ($tag, $len) = unpack('a4V', $buff);
         last if $tag eq 'data'; # stop when we hit the audio data
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
@@ -271,6 +257,7 @@ sub ProcessWAV($$)
             $raf->Read($buff, $len) == $len or $err=1, last;
             my %dirInfo = (
                 DataPt => \$buff,
+                DataPos => $pos,
                 DirStart => 0,
                 DirLen => $len,
             );
@@ -279,6 +266,7 @@ sub ProcessWAV($$)
         } else {
             $raf->Seek($len, 1) or $err=1, last;
         }
+        $pos += $len;
     }
     $err and $exifTool->Warn('Error reading WAV file -- corrupted?');
     return 1;
@@ -290,7 +278,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WAV - Routines for reading WAV files
+Image::ExifTool::WAV - Read WAV meta information
 
 =head1 SYNOPSIS
 

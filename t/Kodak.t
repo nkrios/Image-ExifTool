@@ -24,7 +24,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/Kodak.jpg');
+    my $info = $exifTool->ImageInfo('t/images/Kodak.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -33,7 +33,8 @@ my $testnum = 1;
 {
     ++$testnum;
     my @writeInfo = (
-        [Date => '2005:03:31', Group => 'Kodak'],
+        [YearCreated => '2005', Group => 'Kodak'],
+        [MonthDayCreated => '03:31', Group => 'Kodak'],
         [DigitalZoom => '2'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);

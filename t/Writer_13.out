@@ -1,24 +1,126 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.70
 [File, File, Image]  - File Name: Writer_13_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:36:16
+[File, File, Image]  - File Size: 5 kB
+[File, File, Time]  - File Modification Date/Time: 2005:04:16 10:37:10
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 16
 [File, File, Image]  - Image Height: 16
+[EXIF, IFD0, Camera] 271 - Make: Canon
+[EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
+[EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 282 - X Resolution: 72
 [EXIF, IFD0, Image] 283 - Y Resolution: 72
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/64
+[EXIF, ExifIFD, Image] 33437 - Aperture: 3.6
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2005:01:19 13:37:22
+[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:11:10 17:39:26
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 24.0mm
+[EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
-[EXIF, ExifIFD, Image] 40961 - Color Space: Uncalibrated
-[GPS, GPS, Location] 0 - GPS Version ID: 2.2.0.0
-[GPS, GPS, Location] 2 - GPS Latitude: 44 deg 14' 12.25"
-[IPTC, IPTC, Image] 22 - File Version: 12
-[IPTC, IPTC, Other] 0 - Envelope Record Version: 4
-[XMP, XMP-dc, Author] contributor - Contributor: Guess who
+[EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
+[EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
+[EXIF, ExifIFD, Camera] 41992 - Contrast: High
+[EXIF, ExifIFD, Camera] 41993 - Saturation: High
+[EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
+[EXIF, ExifIFD, Image] 65000 - Owner Name: Phil Harvey
+[MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
+[MakerNotes, Canon, Camera] 2 - Self-timer: 0
+[MakerNotes, Canon, Camera] 3 - Image Quality: RAW
+[MakerNotes, Canon, Camera] 4 - Canon Flash Mode: On
+[MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
+[MakerNotes, Canon, Camera] 7 - Focus Mode: AI Focus AF
+[MakerNotes, Canon, Camera] 10 - Canon Image Size: Large
+[MakerNotes, Canon, Camera] 11 - Easy Mode: Manual
+[MakerNotes, Canon, Camera] 12 - Digital Zoom: Unknown (-1)
+[MakerNotes, Canon, Camera] 13 - Contrast: +1
+[MakerNotes, Canon, Camera] 14 - Saturation: +1
+[MakerNotes, Canon, Camera] 15 - Sharpness: +1
+[MakerNotes, Canon, Camera] 16 - Camera ISO: Use shot ISO instead
+[MakerNotes, Canon, Camera] 17 - Metering Mode: Evaluative
+[MakerNotes, Canon, Camera] 18 - Focus Type: Auto (2)
+[MakerNotes, Canon, Camera] 19 - AF Point: Manual AF point selection
+[MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Program AE
+[MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
+[MakerNotes, Canon, Camera] 23 - Long Focal: 55
+[MakerNotes, Canon, Camera] 24 - Short Focal: 18
+[MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 26 - Max Aperture: 3.6
+[MakerNotes, Canon, Camera] 28 - Flash Activity: 0
+[MakerNotes, Canon, Camera] 29 - Flash Bits: On, Internal flash
+[MakerNotes, Canon, Camera] 32 - Focus Continuous: Unknown (-1)
+[MakerNotes, Canon, Camera] 36 - Zoomed Resolution: 3072
+[MakerNotes, Canon, Camera] 37 - Zoomed Resolution Base: 3072
+[MakerNotes, Canon, Camera] 42 - Color Tone: Normal
+[MakerNotes, Canon, Image] 1 - Focal Length: 24mm
+[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
+[MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
+[MakerNotes, Canon, Image] 2 - ISO Speed: 100
+[MakerNotes, Canon, Image] 4 - Target Aperture: 3.6
+[MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/60
+[MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
+[MakerNotes, Canon, Image] 7 - White Balance: Auto
+[MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
+[MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
+[MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: +2/3
+[MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
+[MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
+[MakerNotes, Canon, Image] 19 - Focus Distance Upper: 1.42
+[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 1.19
+[MakerNotes, Canon, Image] 21 - Aperture: 3.6
+[MakerNotes, Canon, Image] 22 - Shutter Speed: 1/64
+[MakerNotes, Canon, Image] 24 - Bulb Duration: 0
+[MakerNotes, Canon, Image] 27 - Auto Rotate: None
+[MakerNotes, Canon, Image] 29 - Self-timer 2: 0
+[MakerNotes, Canon, Camera] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
+[MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
+[MakerNotes, Canon, Camera] 8 - File Number: 116-1602
+[MakerNotes, Canon, Camera] 9 - Owner's Name: Phil Harvey
+[MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
+[MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
+[MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
+[MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
+[MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
+[MakerNotes, Canon, Image] 22 - AF Points Used: 1 (4)
+[MakerNotes, Canon, Camera] 0 - Red Balance Auto: 2.09135
+[MakerNotes, Canon, Camera] 1 - Blue Balance Auto: 0.89259
+[MakerNotes, Canon, Camera] 2 - Red Balance Daylight: 2.06971
+[MakerNotes, Canon, Camera] 3 - Blue Balance Daylight: 0.84024
+[MakerNotes, Canon, Camera] 4 - Red Balance Cloudy: 2.44591
+[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99046
+[MakerNotes, Canon, Camera] 6 - Red Balance Tungsten: 2.25721
+[MakerNotes, Canon, Camera] 7 - Blue Balance Tungsten: 0.92027
+[MakerNotes, Canon, Camera] 8 - Red Balance Fluorescent: 1.34502
+[MakerNotes, Canon, Camera] 9 - Blue Balance Fluorescent: 0.54676
+[MakerNotes, Canon, Camera] 10 - Red Balance Flash: 1.78860
+[MakerNotes, Canon, Camera] 11 - Blue Balance Flash: 0.60898
+[MakerNotes, Canon, Camera] 12 - Red Balance Custom: 2.36058
+[MakerNotes, Canon, Camera] 13 - Blue Balance Custom: 0.94755
+[MakerNotes, Canon, Camera] 14 - Red Balance B&W: 2.06971
+[MakerNotes, Canon, Camera] 15 - Blue Balance B&W: 0.84024
+[MakerNotes, Canon, Camera] 16 - Red Balance Shade: 2.06971
+[MakerNotes, Canon, Camera] 17 - Blue Balance Shade: 0.84109
+[MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
+[XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0mm
+[XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
+[XMP, XMP-tiff, Image] ImageLength - Image Height: 2048
+[XMP, XMP-tiff, Image] ImageWidth - Image Width: 3072
+[Composite, Composite, Image]  - Aperture: 3.6
+[Composite, Composite, Camera]  - Flash Exposure Compensation: +2/3
+[Composite, Composite, Camera]  - Drive Mode: Continuous shooting
+[Composite, Composite, Camera]  - Flash: On
+[Composite, Composite, Camera]  - Flash Type: Built-In Flash
 [Composite, Composite, Image]  - Image Size: 16x16
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
+[Composite, Composite, Camera]  - Red Eye Reduction: Off
+[Composite, Composite, Camera]  - Shooting Mode: Program AE
+[Composite, Composite, Camera]  - Shutter Curtain Sync: 1st-curtain sync
+[Composite, Composite, Image]  - Shutter Speed: 1/64
+[Composite, Composite, Camera]  - Focal Length: 24.0mm
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm

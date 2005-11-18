@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         PPM.pm
 #
-# Description:  Routines for processing PPM/PGM/PBM images
+# Description:  Read and write PPM meta information
 #
 # Revisions:    09/03/2005 - P. Harvey Created
 #
@@ -130,7 +130,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PPM - Routines for processing PPM/PGM/PBM images
+Image::ExifTool::PPM - Read and write PPM meta information
 
 =head1 SYNOPSIS
 

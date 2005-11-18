@@ -7,7 +7,7 @@ AutoExposureBracketing: Off
 AutoRotate: None
 BlueBalanceAuto: 0.83939
 BlueBalanceB&W: 0.84024
-BlueBalanceCloudy: 0.99047
+BlueBalanceCloudy: 0.99046
 BlueBalanceCustom: 0.92849
 BlueBalanceDaylight: 0.84024
 BlueBalanceFlash: 0.60898
@@ -44,7 +44,7 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 5.64
+ExifToolVersion: 5.69
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -53,7 +53,7 @@ ExposureTime: 4
 ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
-FileModifyDate: 2005:09:21 19:36:10
+FileModifyDate: 2005:10:19 09:46:02
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FileSize: 3 kB
@@ -69,9 +69,9 @@ FocalLength: 34.0mm
 FocalLength (1): 34mm
 FocalLength35efl: 34.0mm (35mm equivalent: 54.0mm)
 FocalPlaneResolutionUnit: inches
-FocalPlaneXResolution: 3443.95
+FocalPlaneXResolution: 3443.946
 FocalPlaneXSize: 23.22mm
-FocalPlaneYResolution: 3442.02
+FocalPlaneYResolution: 3442.017
 FocalPlaneYSize: 15.49mm
 FocalUnits: 1
 FocusContinuous: Unknown (-1)

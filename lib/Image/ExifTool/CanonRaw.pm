@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         CanonRaw.pm
 #
-# Description:  Definitions for Canon CRW file information
+# Description:  Read Canon RAW (CRW) meta information
 #
 # Revisions:    11/25/2003 - P. Harvey Created
 #               12/02/2003 - P. Harvey Completely reworked and figured out many
@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.27';
+$VERSION = '1.29';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -52,7 +52,11 @@ sub BuildMakerNotes($$$$$$);
     CHECK_PROC => \&CheckCanonRaw,
     WRITABLE => 1,
     0x0000 => 'NullRecord', #3
-    0x0001 => 'FreeBytes', #3
+    0x0001 => { #3
+        Name => 'FreeBytes',
+        Format => 'undef',
+        ValueConv => '\$val',
+    },
     0x0032 => { Name => 'CanonColorInfo1', Writable => 0 },
     0x0805 => [
         # this tag is found in more than one directory...
@@ -265,7 +269,7 @@ sub BuildMakerNotes($$$$$$);
         Name => 'JpgFromRaw',
         Writable => 'resize',  # 'resize' allows this value to change size
         Permanent => 0,
-        ValueConv => '\$val',
+        ValueConv => '$self->ValidateImage(\$val,$tag)',
         ValueConvInv => '$val',
     },
     0x2008 => {
@@ -273,7 +277,7 @@ sub BuildMakerNotes($$$$$$);
         Writable => 'resize',  # 'resize' allows this value to change size
         WriteCheck => '$self->CheckImage(\$val)',
         Permanent => 0,
-        ValueConv => '\$val',
+        ValueConv => '$self->ValidateImage(\$val,$tag)',
         ValueConvInv => '$val',
     },
     # the following entries are subdirectories
@@ -328,15 +332,13 @@ sub BuildMakerNotes($$$$$$);
     0 => {
         Name => 'Make',
         Format => 'string[6]',  # "Canon\0"
-        ValueConv => '$self->{CameraMake} = $val',
-        ValueConvInv => '$val',
+        RawConv => '$self->{CameraMake} = $val',
     },
     6 => {
         Name => 'Model',
         Format => 'string[$size-6]',
         Description => 'Camera Model Name',
-        ValueConv => '$self->{CameraModel} = $val',
-        ValueConvInv => '$val',
+        RawConv => '$self->{CameraModel} = $val',
     },
 );
 
@@ -351,6 +353,7 @@ sub BuildMakerNotes($$$$$$);
     0 => {
         Name => 'DateTimeOriginal',
         Description => 'Shooting Date/Time',
+        Shift => 'Time',
         ValueConv => 'ConvertUnixTime($val)',
         ValueConvInv => 'GetUnixTime($val)',
         PrintConv => '$self->ConvertDateTime($val)',
@@ -533,7 +536,7 @@ sub ProcessCanonRaw($$$)
             $count = $$tagInfo{Count};
         }
         # get value data
-        my $value;
+        my ($value, $delRawConv);
         if ($valueInDir) {  # is the value data in the directory?
             # this type of tag stores the value in the 'size' and 'ptr' fields
             $valueDataPos = $dirOffset + $valuePtr;
@@ -565,7 +568,8 @@ sub ProcessCanonRaw($$$)
                         }
                     }
                     # force this to be a binary (scalar reference)
-                    $$tagInfo{ValueConv} = '\$val';
+                    $$tagInfo{RawConv} = '\$val';
+                    $delRawConv = 1;
                 }
                 $size = length $value;
                 undef $format;
@@ -582,14 +586,14 @@ sub ProcessCanonRaw($$$)
             my $val = $value;
             $format and $val = ReadValue(\$val, 0, $format, $count, $size);
             $exifTool->VerboseInfo($tag, $tagInfo,
-                'Table'  => $rawTagTable,
-                'Index'  => $index,
-                'Value'  => $val,
-                'DataPt' => \$value,
-                'Addr'   => $blockStart + $valueDataPos,
-                'Size'   => $size,
-                'Format' => $format,
-                'Count'  => $count,
+                Table   => $rawTagTable,
+                Index   => $index,
+                Value   => $val,
+                DataPt  => \$value,
+                DataPos => $valueDataPos,
+                Size    => $size,
+                Format  => $format,
+                Count   => $count,
             );
         }
         if ($buildMakerNotes) {
@@ -634,15 +638,9 @@ sub ProcessCanonRaw($$$)
         } else {
             # convert to specified format if necessary
             $format and $value = ReadValue(\$value, 0, $format, $count, $size);
-            my $tagName = $$tagInfo{Name};
-            # check for valid image
-            if (($tagName eq 'JpgFromRaw' or $tagName eq 'ThumbnailImage') and not
-                ($value =~ /^(Binary|\xff\xd8)/ or $exifTool->Options('IgnoreMinorErrors')))
-            {
-                $exifTool->Warn("$tagName is not a valid image", 1);
-            } else {
-                $exifTool->FoundTag($tagInfo, $value);
-            }
+            # save the information
+            $exifTool->FoundTag($tagInfo, $value);
+            delete $$tagInfo{RawConv} if $delRawConv;
         }
     }
     return 1;
@@ -702,7 +700,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::CanonRaw - Definitions for Canon CRW file meta information
+Image::ExifTool::CanonRaw - Read Canon RAW (CRW) meta information
 
 =head1 SYNOPSIS
 

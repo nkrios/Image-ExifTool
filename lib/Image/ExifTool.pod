@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         ExifTool.pod - Documentation for File::ExifTool
 #
-# Description:  Utility to read EXIF information from image files
+# Description:  Read and write meta information in images
 #
 # URL:          http://owl.phy.queensu.ca/~phil/exiftool/
 #
@@ -56,17 +56,18 @@ Image::ExifTool - Read and write meta information in images
 ExifTool provides an extensible set of perl modules to read and write meta
 information in image files.  It reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF,
 ICC Profile, Photoshop IRB and ID3 meta information from JPEG, JP2, TIFF,
-GIF, BMP, PGM, PGM, PBM, PNG, MNG, JNG, MIFF, PICT, EPS, PS, AI, PDF, PSD,
-THM, CRW (Canon RAW), CR2 (Canon RAW 2), MRW (Minolta RAW), NEF (Nikon
-Electronic image Format), PEF (Pentax RAW), ORF (Olympus RAW Format), RAF
-(FujiFilm RAW Format), SRF (Sony Raw Format), MOS (Leaf Mosaic) and DNG
-(Digital Negative) images, MP3 and WAV audio files, and MOV videos. 
-ExifTool also extracts information from the maker notes of many digital
-cameras by various manufacturers including Canon, Casio, FujiFilm, Kodak,
-Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
-Ricoh, Sanyo and Sigma/Foveon.  It writes EXIF, GPS, IPTC, XMP and
-MakerNotes information to JPEG, TIFF, GIF, PPM, PGM, PBM, PNG, MNG, JNG,
-CRW, THM, CR2, MRW, NEF, PEF, MOS and DNG files.
+GIF, BMP, PICT, QTIF, PNG, MNG, JNG, MIFF, PGM, PGM, PBM, XMP, EPS, PS, AI,
+PDF, PSD, DCM, ACR, THM, CRW (Canon RAW), CR2 (Canon RAW 2), MRW (Minolta
+RAW), NEF (Nikon Electronic image Format), PEF (Pentax RAW), ORF (Olympus
+RAW Format), RAF (FujiFilm RAW Format), SRF (Sony Raw Format), MOS (Leaf
+Mosaic), X3F (Sigma Raw) and DNG (Digital Negative) images, MP3 and WAV
+audio files, and MOV videos. ExifTool also extracts information from the
+maker notes of many digital cameras by various manufacturers including
+Canon, Casio, FujiFilm, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
+Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
+It writes EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG, TIFF,
+GIF, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, MRW, NEF, PEF, MOS and DNG
+files.
 
 =head1 METHODS
 
@@ -433,7 +434,7 @@ L</ExtractInfo> takes exactly the same arguments as L</ImageInfo>.  The only
 difference is that a list of tags is not returned if an ARRAY reference is
 given.  The following options are effective in the call to L</ExtractInfo>:
 
-Binary, Composite, DateFormat, PrintConv, Unknown and Verbose.
+Binary, Composite, DateFormat, Unknown and Verbose.
 
 =item Return Value:
 
@@ -464,7 +465,8 @@ L</ImageInfo>.
 Inputs are the same as L</ExtractInfo> and L</ImageInfo> except that an
 image can not be specified.  Options in effect are:
 
-Duplicates, Exclude, Group#, (and Sort if tag list reference is given).
+Duplicates, Exclude, Group#, PrintConv (and Sort if tag list reference is
+given).
 
 =item Return Value:
 
@@ -475,13 +477,20 @@ Reference to information hash, the same as with L</ImageInfo>.
 =head2 WriteInfo
 
 Write meta information to a file.  The specified source file is rewritten to
-the destination file with the new information specified in previous calls to
-L</SetNewValue>.  The necessary segments and/or directories are created in
-the destination file as required to store the specified information.  May be
-called repeatedly to write the same information to additional files without
-the need to call L</SetNewValue> again.
+the same-type destination file with new information as specified by previous
+calls to L</SetNewValue>.  The necessary segments and/or directories are
+created in the destination file as required to store the specified
+information.  May be called repeatedly to write the same information to
+additional files without the need to call L</SetNewValue> again.
 
+    # add information to a source file, writing output to new file
     $exifTool->WriteInfo($srcfile, $dstfile);
+
+    # create XMP data file from scratch
+    $exifTool->WriteInfo(undef, $dstfile, 'XMP');
+
+    # edit file in place (you do have backups, right?)
+    $exifTool->WriteInfo($srcfile);
 
 =over 4
 
@@ -491,12 +500,14 @@ the need to call L</SetNewValue> again.
 
 1) Source file name, file reference, or scalar reference
 
-2) Destination file name, file reference, or scalar reference
+2) [optional] Destination file name, file or scalar reference
+
+3) [optional] Destination file type
 
 =item Return Value:
 
-1 if file was written OK, 2 if file was written but no changes made, 0 on file
-write error.
+1 if file was written OK, 2 if file was written but no changes made, 0 on
+file write error.
 
 If an error code is returned, an Error tag is set and GetValue('Error') can
 be called to obtain the error description.  A Warning tag mag be set even if
@@ -507,7 +518,17 @@ this routine is successful.
 
 =item Notes:
 
-Will not overwrite an existing file.
+The source file name may be undefined to create a file from scratch
+(currently only .XMP files can be created in this way).  If undefined, the
+destination file type is required unless the type can be determined from the
+destination file name.
+
+The destination file name may be undefined to edit a file in place (make
+sure you have backups!).  If a destination file name is given, the specified
+file must not exist because existing destination files will not be
+overwritten.
+
+The destination file type is only used if the source file is undefined.
 
 =back
 
@@ -610,16 +631,18 @@ Note that this list will be empty if tags were not specifically requested
 
 =head2 GetValue
 
-Get the value of specified tag.  By default this routine returns the
-human-readable (PrintConv) value, but optionally returns the
-machine-readable (ValueConv) value.  Note that the PrintConv value will only
-differ from the ValueConv value if the PrintConv option is enabled (which it
-is by default), or if the values form a list.  In the case of a list of
-values (as can happen with the 'Keywords' tag for instance), PrintConv
-returns a comma-separated string of values, while ValueConv returns a
-reference to an array of values or the array itself in list context. The
+Get the value of a specified tag.  The returned value is either the
+human-readable (PrintConv) value, the converted machine-readable (ValueConv)
+value, or the original raw (Raw) value.  If the value type is not specified,
+the PrintConv value is returned if the PrintConv option is set, otherwise
+the ValueConv value is returned.
+
+In the case of a list (as can happen with the 'Keywords' tag for instance),
+PrintConv returns a comma-separated string of values in scalar context,
+while ValueConv returns a reference to an array of values.  In list context,
+L</GetValue> returns the list for both PrintConv and ValueConv.  The
 PrintConv values are the values returned by L</ImageInfo> and L</GetInfo> in
-the tag/value hash.
+the tag/value hash unless the PrintConv option is disabled.
 
     # PrintConv example
     my $val = $exifTool->GetValue($tag);
@@ -649,25 +672,33 @@ the tag/value hash.
 
 1) Tag key
 
-2) [optional] Value type, 'PrintConv' (default) or 'ValueConv'
+2) [optional] Value type, 'PrintConv', 'ValueConv', 'Both' or 'Raw'
+
+The default value type is 'PrintConv' if the PrintConv option is set,
+otherwise the default is 'ValueConv'.  A value type of 'Both' returns both
+ValueConv and PrintConv values as a list.
 
 =item Return Values:
 
-The value of the specified tag.  If the tag represents a list of values then
-a comma-separated string of values is returned for PrintConv if the List
-option is disabled, otherwise a reference to the list of values is returned
-in scalar context, or the list itself is returned in list context.  Values
-may also be scalar references to binary data.
+The value of the specified tag.  If the tag represents a list of values and
+the List option is disabled then PrintConv returns a comma separated string
+of values, otherwise a reference to the list is returned in scalar context.
+The list itself is returned in list context.  Values may also be scalar
+references to binary data.
+
+Note: It is possible for L</GetValue> to return an undefined ValueConv or
+PrintConv value (or an empty list in list context) even if the tag exists,
+since it is possible for these conversions to yield undefined values.
 
 =back
 
 =head2 SetNewValue
 
-Set the new value for a tag.  The new value is the value that will be written
-for this tag in subsequent calls to L</WriteInfo>.
+Set the new value for a tag.  The new value is the value that will be
+written for this tag in subsequent calls to L</WriteInfo>.
 
-For tag lists (like Keywords), call repeatedly with the same tag name for
-each value in the list.
+For list-type tags (like Keywords), call repeatedly with the same tag name
+for each value in the list.
 
     $success = $exifTool->SetNewValue($tag, $value);
 
@@ -687,6 +718,9 @@ each value in the list.
 
     # set a tag in a specific group
     $exifTool->SetNewValue(Headline => $val, Group => 'XMP');
+
+    # shift original date/time back by 1 hour
+    $exifTool->SetNewValue(DateTimeOriginal => '1:00', Shift => -1);
 
 =over 4
 
@@ -711,7 +745,7 @@ separated by a colon (ie. 'GROUP:TAG'), which is equivalent to using a
 =item Type
 
 The type of value being set.  Valid values are PrintConv, ValueConv or Raw.
-Default is PrintConv.
+Default is PrintConv if the L<PrintConv> Option is set, otherwise ValueConv.
 
 =item AddValue
 
@@ -743,6 +777,15 @@ Flag to replace the previous new value for this tag (ie. replace the value
 set in a previous call to L</SetNewValue>).  Valid values are 0 (don't
 repace), 1 (replace with specified new value) or 2 (reset previous new value
 only).
+
+=item Shift
+
+Shift the tag by the specified value.  Currently only date/time tags can be
+shifted.  Undefined for no shift, 1 for a positive shift, or -1 for a
+negative shift.  If 0, the shift is applied only if the tag is shiftable.
+In this case, the direction of the shift is positive if AddValue is set, or
+negative if DelValue is set.  Default is undef.  See
+L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for more information.
 
 =back
 
@@ -794,6 +837,9 @@ A hash of information that was set successfully.  May include Warning or
 Error entries if there were problems reading the input file.
 
 =item Notes:
+
+The PrintConv option applies to this routine, but it should normally be left
+on to provide more reliable transfer of information between groups.
 
 If a preview image exists, it is not copied.  The preview image must be
 transferred separately if desired.
@@ -897,6 +943,8 @@ Set the file modification time from the new value of the FileModifyDate tag.
 
 1) File name
 
+2) [optional] Base time if applying shift (days before $^T)
+
 =item Return Value:
 
 1 if the time was changed, 0 if the FileModifyDate tag wasn't set, or -1 if
@@ -908,8 +956,11 @@ there was an error setting the time.
 
 Set the order of the preferred groups when adding new information.  In
 subsequent calls to L</SetNewValue>, new information will be created in the
-first valid group of this list.  The default order is EXIF, GPS, IPTC, XMP and
-MakerNotes.  Any family 0 group name may be used.  Case is not significant.
+first valid group of this list.  This has an impact only if the group is not
+specified and the tag name exists in more than one group.  The default order
+is EXIF, GPS, IPTC, XMP and MakerNotes.  The default order is EXIF, GPS,
+IPTC, XMP and MakerNotes.  Any family 0 group name may be used.  Case is not
+significant.
 
     $exifTool->SetNewGroups('XMP','EXIF','IPTC');
 
@@ -1187,22 +1238,24 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (General Location):
 
-APP12, BMP, Canon, Composite, EXIF, ExifTool, File, GPS, GeoTiff,
-ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG, MakerNotes, PICT,
-PDF, PNG, Pentax, Photoshop, PostScript, PrintIM, QuickTime, WAV, XMP
+APP12, BMP, Canon, Composite, DICOM, EXIF, ExifTool, File, GPS, GeoTiff,
+ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG, MakerNotes, Meta,
+PDF, PICT, PNG, Pentax, Photoshop, PostScript, PrintIM, QuickTime, SigmaRaw,
+WAV, XMP
 
 =item Family 1 (Specific Location):
 
-APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD,
+APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, DICOM, ExifIFD,
 ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt,
 ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3,
 ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, Jpeg2000, Kodak,
 KodakBordersIFD, KodakEffectsIFD, Leaf, LeafSubIFD, MIFF, MNG, MakerUnknown,
-Minolta, Nikon, NikonPreview, Olympus, PICT, PDF, PNG, Panasonic, Pentax,
-Photoshop, PostScript, PrintIM, QuickTime, Ricoh, SRF#, Sanyo, Sigma, Sony,
-SubIFD, Track#, WAV, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
-XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
-XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+MetaIFD, Minolta, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT,
+PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM, QuickTime, Ricoh,
+SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, WAV, XMP, XMP-PixelLive,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
+XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS,
+XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 
@@ -1221,14 +1274,52 @@ Get type of file given file name.
 
 =item Inputs:
 
-0) File name (or just an extension)
+0) [optional] File name (or just an extension)
 
 =item Return Value:
 
 A string, based on the file extension, which represents the type of file.
 Returns undefined value if file type is not supported by ExifTool.  In array
 context, may return more than one file type if the file may be different
-formats.
+formats.  Returns a list of extensions for all recognized file types if no
+input extension is specified.
+
+=back
+
+=head2 CanWrite [static]
+
+Can the specified file or file type be written?
+
+    my $writable = Image::ExifTool::CanWrite($filename);
+
+=over 4
+
+=item Inputs:
+
+0) File name, file extension, or file type
+
+=item Return Value:
+
+True if the specified file type can be written (edited).
+
+=back
+
+=head2 CanCreate [static]
+
+Can the specified file or file type be created?
+
+    my $creatable = Image::ExifTool::CanCreate($filename);
+
+=over 4
+
+=item Inputs:
+
+0) File name, file extension, or file type
+
+=item Return Value:
+
+True if the specified file type can be created from scratch.  Currently,
+this can only be done with XMP files.
 
 =back
 
@@ -1251,6 +1342,7 @@ people who have contributed to this project.
 L<exiftool(1)|exiftool>,
 L<Image::ExifTool::TagNames(3pm)|Image::ExifTool::TagNames>,
 L<Image::ExifTool::Shortcuts(3pm)|Image::ExifTool::Shortcuts>,
+L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl>,
 L<Image::Info(3pm)|Image::Info>,
 L<Image::MetaData::JPEG(3pm)|Image::MetaData::JPEG>
 

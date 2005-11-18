@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Leaf.pm
 #
-# Description:  Definitions for reading Creo Leaf EXIF information
+# Description:  Read Creo Leaf EXIF meta information
 #
 # Revisions:    09/28/2005  - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -339,7 +339,9 @@ they don't appear in these tables.
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     NOTES => q{
 Leaf also writes a TIFF-format sub-IFD inside IFD0 of a MOS image.  No tags
-in this sub-IFD are currently known.
+in this sub-IFD are currently known, except for tag 0x8606 which really
+shouldn't be here since it duplicates a reference to the same data of tag
+0x8606 in IFD0.
     },
 );
 
@@ -449,12 +451,12 @@ sub ProcessLeaf($$$)
         }
         if ($verbose) {
             $exifTool->VerboseInfo($tag, $tagInfo,
-                Table  => $tagTablePtr,
-                Value  => $val,
-                DataPt => $dataPt,
-                Size   => $size,
-                Start  => $pos,
-                Addr   => $pos + $$dirInfo{DataPos},
+                Table   => $tagTablePtr,
+                Value   => $val,
+                DataPt  => $dataPt,
+                DataPos => $$dirInfo{DataPos},
+                Size    => $size,
+                Start   => $pos,
             );
         }
         if ($tagInfo) {
@@ -485,7 +487,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Leaf - Read Creo Leaf meta information
+Image::ExifTool::Leaf - Read Creo Leaf EXIF meta information
 
 =head1 SYNOPSIS
 

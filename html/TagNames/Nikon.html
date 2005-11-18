@@ -234,11 +234,15 @@
 <td>ColorBalance0100
   <br>ColorBalance0102
   <br>ColorBalance0103
+  <br>ColorBalance0205
+  <br>ColorBalance02
   <br>ColorBalanceUnknown</td>
-<td align='center'>-<br>-<br>-<br>N</td>
-<td>--&gt; <a href='Nikon.html#ColorBalance0100'>Nikon ColorBalance0100 Tags</a>
-  <br>--&gt; <a href='Nikon.html#ColorBalance0102'>Nikon ColorBalance0102 Tags</a>
-  <br>--&gt; <a href='Nikon.html#ColorBalance0103'>Nikon ColorBalance0103 Tags</a></td></tr>
+<td align='center'>-<br>-<br>-<br>-<br>-<br>N</td>
+<td>--&gt; <a href='Nikon.html#ColorBalance1'>Nikon ColorBalance1 Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalance3'>Nikon ColorBalance3 Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0098</td>
 <td>LensData0100
@@ -297,8 +301,8 @@
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0e01</td>
 <td>NikonCaptureData</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
+<td align='center'>-</td>
+<td>--&gt; <a href='NikonCapture.html'>NikonCapture Tags</a></td></tr>
 <tr valign='top'>
 <td>0x0e09</td>
 <td>NikonCaptureVersion</td>
@@ -308,7 +312,7 @@
 <td>0x0e0e</td>
 <td>NikonCaptureOffsets</td>
 <td align='center'>-</td>
-<td>--&gt; <a href='Nikon.html#NikonCaptureOffsets'>Nikon NikonCaptureOffsets Tags</a></td></tr>
+<td>--&gt; <a href='Nikon.html#CaptureOffsets'>Nikon CaptureOffsets Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PreviewImage'>Nikon PreviewImage Tags</a></h2>
@@ -382,7 +386,7 @@
   <br>2 = Co-sited</font></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='ColorBalance0100'>Nikon ColorBalance0100 Tags</a></h2>
+<h2><a name='ColorBalance1'>Nikon ColorBalance1 Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
@@ -399,7 +403,7 @@
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='ColorBalance0102'>Nikon ColorBalance0102 Tags</a></h2>
+<h2><a name='ColorBalance2'>Nikon ColorBalance2 Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
@@ -416,7 +420,7 @@
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='ColorBalance0103'>Nikon ColorBalance0103 Tags</a></h2>
+<h2><a name='ColorBalance3'>Nikon ColorBalance3 Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
@@ -540,6 +544,7 @@ This structure is used by the D100 and newer D1X models.
   <br>129 = AF-S VR Nikkor 200mm f/2G IF-ED
   <br>130 = AF-S VR Nikkor 300mm f/2.8G IF-ED
   <br>137 = AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED
+  <br>139 = AF-S VR Zoom-Nikkor 18-200mm f/3.5-5.6G
   <br>140 = AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED</font></td></tr>
 <tr valign='top'>
 <td align='right'>7</td>
@@ -703,6 +708,7 @@ which make writing more difficult.
   <br>129 = AF-S VR Nikkor 200mm f/2G IF-ED
   <br>130 = AF-S VR Nikkor 300mm f/2.8G IF-ED
   <br>137 = AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED
+  <br>139 = AF-S VR Zoom-Nikkor 18-200mm f/3.5-5.6G
   <br>140 = AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED</font></td></tr>
 <tr valign='top'>
 <td align='right'>12</td>
@@ -741,7 +747,7 @@ which make writing more difficult.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='NikonCaptureOffsets'>Nikon NikonCaptureOffsets Tags</a></h2>
+<h2><a name='CaptureOffsets'>Nikon CaptureOffsets Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
@@ -813,6 +819,6 @@ which make writing more difficult.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 4, 2005</i>
+<br><i>Last revised Nov 14, 2005</i>
 </body>
 </html>

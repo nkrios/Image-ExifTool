@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.66
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.73
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 100
@@ -58,7 +58,7 @@
 [IPTC, IPTC, Other] 20 - Supplemental Categories: amazing, image, utilities
 [IPTC, IPTC, Other] 25 - Keywords: ExifTool, Test, XMP
 [IPTC, IPTC, Other] 40 - Special Instructions: What instructions
-[IPTC, IPTC, Other] 55 - Date Created: 2004:02:26
+[IPTC, IPTC, Time] 55 - Date Created: 2004:02:26
 [IPTC, IPTC, Author] 80 - By-line: Phil Harvey
 [IPTC, IPTC, Author] 85 - By-line Title: My Position
 [IPTC, IPTC, Location] 90 - City: Kingston

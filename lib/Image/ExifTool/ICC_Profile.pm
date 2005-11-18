@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         ICC_Profile.pm
 #
-# Description:  Definitions for ICC_Profile table
+# Description:  Read ICC Profile meta information
 #
 # Revisions:    11/16/04 - P. Harvey Created
 #
@@ -577,9 +577,9 @@ sub ProcessICC_Profile($$$)
         my $fakeInfo = { Name=>'ProfileHeader', SubDirectory => { } };
         $exifTool->VerboseInfo(undef, $fakeInfo);
     }
-    if ($exifTool->{ICC_COUNT}++) {
-        $exifTool->{SET_TAG_EXTRA} = '+' . $exifTool->{ICC_COUNT};
-    }
+    # increment ICC dir count
+    my $dirCount = $exifTool->{DIR_COUNT}->{ICC} = ($exifTool->{DIR_COUNT}->{ICC} || 0) + 1;
+    $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
     # process the header block
     my %subdirInfo = (
         Name     => 'ProfileHeader',
@@ -661,13 +661,12 @@ sub ProcessICC_Profile($$$)
             $value = substr($$dataPt, $valuePtr, $size);
             # treat unsupported formats as binary data
             my $oldValueConv = $$tagInfo{ValueConv};
-            $$tagInfo{ValueConv} = '\$val';
+            $$tagInfo{ValueConv} = '\$val' unless defined $$tagInfo{ValueConv};
             $exifTool->FoundTag($tagInfo, $value);
-            $$tagInfo{ValueConv} = $oldValueConv;
         }
     }
     SetByteOrder($oldOrder);
-    delete $exifTool->{SET_TAG_EXTRA};
+    delete $exifTool->{SET_GROUP1};
     return 1;
 }
 
@@ -679,7 +678,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::ICC_Profile - Definitions for ICC profile tables
+Image::ExifTool::ICC_Profile - Read ICC Profile meta information
 
 =head1 SYNOPSIS
 

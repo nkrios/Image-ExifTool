@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Pentax.pm
 #
-# Description:  Definitions for Pentax/Asahi EXIF Maker Notes
+# Description:  Pentax/Asahi EXIF maker notes tags
 #
 # Revisions:    11/25/2003 - P. Harvey Created
 #               02/10/2004 - P. Harvey Completely re-done
@@ -147,15 +147,19 @@ my %pentaxCities = (
     0x0006 => { #5
         # Note: Year is int16u in MM byte ordering regardless of EXIF byte order
         Name => 'Date',
+        Groups => { 2 => 'Time' },
         Writable => 'undef',
         Count => 4,
+        Shift => 'Time',
         ValueConv => 'length($val)==4 ? sprintf("%.4d:%.2d:%.2d",unpack("nC2",$val)) : "Unknown ($val)"',
         ValueConvInv => 'my @v=split /:/, $val;pack("nC2",$v[0],$v[1],$v[2])',
     },
     0x0007 => { #5
         Name => 'Time',
+        Groups => { 2 => 'Time' },
         Writable => 'undef',
         Count => 3,
+        Shift => 'Time',
         ValueConv => 'length($val)>=3 ? sprintf("%.2d:%.2d:%.2d",unpack("C3",$val)) : "Unknown ($val)"',
         ValueConvInv => 'pack("C3",split(/:/,$val))',
     },
@@ -737,7 +741,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Pentax - Definitions for Pentax/Asahi maker notes
+Image::ExifTool::Pentax - Pentax/Asahi maker notes tags
 
 =head1 SYNOPSIS
 

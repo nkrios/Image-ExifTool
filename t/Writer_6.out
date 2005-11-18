@@ -1,81 +1,160 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.65
-[File, File, Image]  - File Type: TIFF
-[File, File, Image]  - MIME Type: image/tiff
-[EXIF, IFD0, Image] 254 - Subfile Type: Full-resolution Image
-[EXIF, IFD0, Image] 256 - Image Width: 160
-[EXIF, IFD0, Image] 257 - Image Height: 120
-[EXIF, IFD0, Image] 258 - Bits Per Sample: 8 8 8
-[EXIF, IFD0, Image] 259 - Compression: LZW
-[EXIF, IFD0, Image] 262 - Photometric Interpretation: RGB
-[EXIF, IFD0, Image] 270 - Image Description: Modified TIFF
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.77
+[File, File, Image]  - File Name: Writer_6_failed.jpg
+[File, File, Image]  - Directory: t
+[File, File, Image]  - File Size: 7 kB
+[File, File, Time]  - File Modification Date/Time: 2005:11:17 08:44:20
+[File, File, Image]  - File Type: JPEG
+[File, File, Image]  - MIME Type: image/jpeg
+[File, File, Image]  - Image Width: 160
+[File, File, Image]  - Image Height: 120
 [EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
-[EXIF, IFD0, Image] 273 - Strip Offsets: 6748
-[EXIF, IFD0, Image] 277 - Samples Per Pixel: 3
-[EXIF, IFD0, Image] 278 - Rows Per Strip: 120
-[EXIF, IFD0, Image] 279 - Strip Byte Counts: 1048
+[EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 282 - X Resolution: 180
 [EXIF, IFD0, Image] 283 - Y Resolution: 180
-[EXIF, IFD0, Image] 284 - Planar Configuration: Chunky
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
-[EXIF, IFD0, Image] 305 - Software: GraphicConverter
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2004:02:20 08:07:49
-[EXIF, IFD0, Image] 317 - Predictor: None
-[XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: new XMP info
-[IPTC, IPTC, Other] 0 - Application Record Version: 2
-[IPTC, IPTC, Other] 120 - Caption-Abstract: The picture caption
-[IPTC, IPTC, Author] 122 - Writer-Editor: I wrote it
-[IPTC, IPTC, Other] 40 - Special Instructions: no instructions
-[IPTC, IPTC, Author] 80 - By-line: I'm the author
-[IPTC, IPTC, Author] 85 - By-line Title: On top
-[IPTC, IPTC, Author] 110 - Credit: Phil Harvey
-[IPTC, IPTC, Author] 115 - Source: My camera
-[IPTC, IPTC, Other] 5 - Object Name: This is the title
-[IPTC, IPTC, Other] 55 - Date Created: 2004:02:20
-[IPTC, IPTC, Location] 90 - City: Kingston
-[IPTC, IPTC, Location] 95 - Province-State: Ontario
-[IPTC, IPTC, Location] 101 - Country-Primary Location Name: Canada
-[IPTC, IPTC, Other] 103 - Original Transmission Reference: no reference
-[IPTC, IPTC, Other] 25 - Keywords: exiftool, test, picture, another keyword
-[IPTC, IPTC, Author] 116 - Copyright Notice: Copyright notice
-[IPTC, IPTC, Other] 105 - Headline: A different headline
-[ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: Lino
-[ICC_Profile, ICC-header, Image] 8 - Profile Version: 2.1.0
-[ICC_Profile, ICC-header, Image] 12 - Profile Class: Display Device Profile
-[ICC_Profile, ICC-header, Image] 16 - Color Space Data: RGB 
-[ICC_Profile, ICC-header, Image] 20 - Profile Connection Space: XYZ 
-[ICC_Profile, ICC-header, Time] 24 - Profile Date Time: 1998:02:09 06:49:00
-[ICC_Profile, ICC-header, Image] 36 - Profile File Signature: acsp
-[ICC_Profile, ICC-header, Image] 40 - Primary Platform: Microsoft Corporation
-[ICC_Profile, ICC-header, Image] 44 - CMM Flags: Not Embedded, Independent
-[ICC_Profile, ICC-header, Image] 48 - Device Manufacturer: IEC 
-[ICC_Profile, ICC-header, Image] 52 - Device Model: sRGB
-[ICC_Profile, ICC-header, Image] 56 - Device Attributes: Reflective, Glossy, Positive, Color
-[ICC_Profile, ICC-header, Image] 64 - Rendering Intent: Perceptual
-[ICC_Profile, ICC-header, Image] 68 - Profile Connection Space: 0.9642 1 0.82491
-[ICC_Profile, ICC-header, Image] 80 - Profile Creator: HP  
-[ICC_Profile, ICC-header, Image] 84 - Profile ID: 0
-[ICC_Profile, ICC_Profile, Image] cprt - Copyright: Copyright (c) 1998 Hewlett-Packard Company
-[ICC_Profile, ICC_Profile, Image] desc - Profile Description: sRGB IEC61966-2.1
-[ICC_Profile, ICC_Profile, Image] wtpt - Media White Point: 0.95045 1 1.08905
-[ICC_Profile, ICC_Profile, Image] bkpt - Media Black Point: 0 0 0
-[ICC_Profile, ICC_Profile, Image] rXYZ - Red Matrix Column: 0.43607 0.22249 0.01392
-[ICC_Profile, ICC_Profile, Image] gXYZ - Green Matrix Column: 0.38515 0.71687 0.09708
-[ICC_Profile, ICC_Profile, Image] bXYZ - Blue Matrix Column: 0.14307 0.06061 0.7141
-[ICC_Profile, ICC_Profile, Camera] dmnd - Device Mfg Desc: IEC http://www.iec.ch
-[ICC_Profile, ICC_Profile, Camera] dmdd - Device Model Desc: IEC 61966-2.1 Default RGB colour space - sRGB
-[ICC_Profile, ICC_Profile, Image] vued - Viewing Cond Desc: Reference Viewing Condition in IEC61966-2.1
-[ICC_Profile, ICC-view, Image] 8 - Viewing Cond Illuminant: 19.6445 20.3718 16.8089
-[ICC_Profile, ICC-view, Image] 20 - Viewing Cond Surround: 3.92889 4.07439 3.36179
-[ICC_Profile, ICC-view, Image] 32 - Viewing Cond Illuminant Type: D50
-[ICC_Profile, ICC_Profile, Image] lumi - Luminance: 76.03647 80 87.12462
-[ICC_Profile, ICC-meas, Image] 8 - Measurement Observer: CIE 1931
-[ICC_Profile, ICC-meas, Image] 12 - Measurement Backing: 0 0 0
-[ICC_Profile, ICC-meas, Image] 24 - Measurement Geometry: Unknown (0)
-[ICC_Profile, ICC-meas, Image] 28 - Measurement Flare: 0.999 %
-[ICC_Profile, ICC-meas, Image] 32 - Measurement Illuminant: D65
-[ICC_Profile, ICC_Profile, Image] tech - Technology: Cathode Ray Tube Display
-[ICC_Profile, ICC_Profile, Image] rTRC - Red Tone Reproduction Curve: (Binary data 2060 bytes)
-[ICC_Profile, ICC_Profile, Image] gTRC - Green Tone Reproduction Curve: (Binary data 2060 bytes)
-[ICC_Profile, ICC_Profile, Image] bTRC - Blue Tone Reproduction Curve: (Binary data 2060 bytes)
+[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:04 06:46:52
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
+[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 4
+[EXIF, ExifIFD, Image] 33437 - Aperture: 14.0
+[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
+[EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
+[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:12:04 06:46:52
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
+[EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
+[EXIF, ExifIFD, Image] 37378 - Aperture Value: 14.0
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: +999
+[EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 4.5
+[EXIF, ExifIFD, Camera] 37383 - Metering Mode: Average
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Cloudy
+[EXIF, ExifIFD, Camera] 37385 - Flash: Fired
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 34.0mm
+[EXIF, ExifIFD, Image] 37510 - User Comment: 
+[EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
+[EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
+[EXIF, ExifIFD, Image] 40962 - Exif Image Width: 160
+[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 120
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM
+[EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
+[EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
+[EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
+[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.946
+[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.017
+[EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: mm
+[EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
+[EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
+[EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
+[EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Manual
+[EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
+[EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
+[EXIF, IFD0, Time] 36867 - Shooting Date/Time: 2005:01:01 00:00:00
+[MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
+[MakerNotes, Canon, Camera] 2 - Self-timer: 0
+[MakerNotes, Canon, Camera] 3 - Image Quality: RAW
+[MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
+[MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
+[MakerNotes, Canon, Camera] 7 - Focus Mode: Manual Focus
+[MakerNotes, Canon, Camera] 10 - Canon Image Size: Large
+[MakerNotes, Canon, Camera] 11 - Easy Mode: Manual
+[MakerNotes, Canon, Camera] 12 - Digital Zoom: Unknown (-1)
+[MakerNotes, Canon, Camera] 13 - Contrast: +1
+[MakerNotes, Canon, Camera] 14 - Saturation: +1
+[MakerNotes, Canon, Camera] 15 - Sharpness: +1
+[MakerNotes, Canon, Camera] 16 - Camera ISO: Use shot ISO instead
+[MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
+[MakerNotes, Canon, Camera] 18 - Focus Type: Auto (2)
+[MakerNotes, Canon, Camera] 19 - AF Point: Unknown (0)
+[MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Manual
+[MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
+[MakerNotes, Canon, Camera] 23 - Long Focal: 55
+[MakerNotes, Canon, Camera] 24 - Short Focal: 18
+[MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 26 - Max Aperture: 4
+[MakerNotes, Canon, Camera] 28 - Flash Activity: 0
+[MakerNotes, Canon, Camera] 29 - Flash Bits: (none)
+[MakerNotes, Canon, Camera] 32 - Focus Continuous: Unknown (-1)
+[MakerNotes, Canon, Camera] 36 - Zoomed Resolution: 3072
+[MakerNotes, Canon, Camera] 37 - Zoomed Resolution Base: 3072
+[MakerNotes, Canon, Camera] 42 - Color Tone: Normal
+[MakerNotes, Canon, Image] 0 - Canon Focal Length 0x0000: 0
+[MakerNotes, Canon, Image] 1 - Focal Length: 34mm
+[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
+[MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
+[MakerNotes, Canon, Camera] 3 - Canon Flash Info: 100 0 0 0
+[MakerNotes, Canon, Image] 2 - ISO Speed: 100
+[MakerNotes, Canon, Image] 4 - Target Aperture: 14
+[MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
+[MakerNotes, Canon, Image] 7 - White Balance: Auto
+[MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
+[MakerNotes, Canon, Image] 14 - Ixus AF Point: Unknown (0)
+[MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
+[MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
+[MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
+[MakerNotes, Canon, Image] 19 - Focus Distance Upper: -0.01
+[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
+[MakerNotes, Canon, Image] 21 - Aperture: 14
+[MakerNotes, Canon, Image] 22 - Shutter Speed: 128
+[MakerNotes, Canon, Image] 24 - Bulb Duration: 4
+[MakerNotes, Canon, Image] 27 - Auto Rotate: None
+[MakerNotes, Canon, Image] 29 - Self-timer 2: 0
+[MakerNotes, Canon, Image] 1 - Canon File Info 0x0001: 0
+[MakerNotes, Canon, Camera] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
+[MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
+[MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
+[MakerNotes, Canon, Camera] 21 - Canon 0x0015: 2415919104
+[MakerNotes, Canon, Camera] 8 - File Number: 118-1861
+[MakerNotes, Canon, Camera] 9 - Owner's Name: Phil Harvey
+[MakerNotes, Canon, Camera] 16 - Canon 0x0010: 2147484016
+[MakerNotes, Canon, Image] 14 - Canon File Length: 4480822
+[MakerNotes, Canon, Camera] 13 - Canon 0x000d: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0[...]
+[MakerNotes, Canon, Camera] 0 - Canon 0x0000: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[MakerNotes, Canon, Camera] 192 - Canon 0x00c0: 26 331 372 372 177 240 428 429 277 186 510 511 442
+[MakerNotes, Canon, Camera] 193 - Canon 0x00c1: 26 299 375 375 170 202 394 395 240 153 453 454 375
+[MakerNotes, Canon, Camera] 170 - Canon 0x00aa: 10 998 1022 1026 808
+[MakerNotes, Canon, Camera] 168 - Canon 0x00a8: 20 5190 5190 7000 5987 3214 3897 6203 5190 5200
+[MakerNotes, Canon, Camera] 0 - Red Balance Auto: 2.06611
+[MakerNotes, Canon, Camera] 1 - Blue Balance Auto: 0.83939
+[MakerNotes, Canon, Camera] 2 - Red Balance Daylight: 2.06971
+[MakerNotes, Canon, Camera] 3 - Blue Balance Daylight: 0.84024
+[MakerNotes, Canon, Camera] 4 - Red Balance Cloudy: 2.44591
+[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99046
+[MakerNotes, Canon, Camera] 6 - Red Balance Tungsten: 2.25721
+[MakerNotes, Canon, Camera] 7 - Blue Balance Tungsten: 0.92027
+[MakerNotes, Canon, Camera] 8 - Red Balance Fluorescent: 1.34502
+[MakerNotes, Canon, Camera] 9 - Blue Balance Fluorescent: 0.54676
+[MakerNotes, Canon, Camera] 10 - Red Balance Flash: 1.78860
+[MakerNotes, Canon, Camera] 11 - Blue Balance Flash: 0.60898
+[MakerNotes, Canon, Camera] 12 - Red Balance Custom: 2.32332
+[MakerNotes, Canon, Camera] 13 - Blue Balance Custom: 0.92849
+[MakerNotes, Canon, Camera] 14 - Red Balance B&W: 2.06971
+[MakerNotes, Canon, Camera] 15 - Blue Balance B&W: 0.84024
+[MakerNotes, Canon, Camera] 16 - Red Balance Shade: 2.06971
+[MakerNotes, Canon, Camera] 17 - Blue Balance Shade: 0.84109
+[MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
+[MakerNotes, Canon, Camera] 180 - Canon 0x00b4: 1
+[MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
+[MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
+[MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
+[MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
+[MakerNotes, Canon, Image] 22 - AF Points Used: 0 ()
+[MakerNotes, Canon, Camera] 19 - Canon 0x0013: 0 159 7 112
+[MakerNotes, Canon, Camera] 181 - Canon 0x00b5: 10 3 1 2048 1360
+[MakerNotes, Canon, Camera] 0 - Canon 0x0000: 0 0 0 0 0 0 3072000 892 2048000 595 65540 262146
+[IPTC, IPTC, Other] 15 - Category: IPTC test
+[IPTC, IPTC, Other] 0 - Application Record Version: 4
+[XMP, XMP-crs, Image] Contrast - Contrast: +2
+[XMP, XMP-dc, Image] description - Description: New description
+[XMP, XMP-exif, Camera] Contrast - Contrast: High
+[Composite, Composite, Image]  - Aperture: 14.0
+[Composite, Composite, Camera]  - Drive Mode: Continuous shooting
+[Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
+[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 40.4
+[Composite, Composite, Camera]  - Shooting Mode: Manual
+[Composite, Composite, Image]  - Shutter Speed: 4
+[Composite, Composite, Image]  - Circle Of Confusion: 0.001 mm
+[Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 1372.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 110.89 m
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 726.3 - 2219.3mm)

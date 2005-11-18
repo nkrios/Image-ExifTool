@@ -234,11 +234,6 @@ The tags listed in the PDF tables below are those which are used by ExifTool
 to extract meta information, but they are only a small fraction of the total
 number of available PDF tags.
 },
-    APP12 => q{
-The JPEG APP12 segment may contain ASCI-based meta information.  ExifTool
-does not pre-define the names of these tags, but will extract the
-information for any tags found in this segment.
-},
     Extra => q{
 The extra tags represent information found in the image but not associated
 with any other tag group.
@@ -497,6 +492,8 @@ TagID:  foreach $tagID (@keys) {
                 } else {
                     $tagIDstr = sprintf("0x%.4x",$tagID);
                 }
+            } elsif ($short eq 'DICOM') {
+                ($tagIDstr = $tagID) =~ s/_/,/;
             } else {
                 # convert non-printable characters to hex escape sequences
                 if ($tagID =~ s/([\x00-\x1f\x7f-\xff])/'\x'.unpack('H*',$1)/eg) {
@@ -789,7 +786,11 @@ sub CloseHtmlFiles()
         my $tmpFile = $htmlFile . '_tmp';
         open(HTMLFILE,">>$tmpFile") or $success = 0, next;
         # write the trailers
-        print HTMLFILE "<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>\n" unless $htmlFile =~ /index/;
+        if ($htmlFile =~ /index\.html$/) {
+            print HTMLFILE "<p><a href='../index.html'>&lt;-- Back to ExifTool Home Page</a>\n";
+        } else {
+            print HTMLFILE "<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>\n"
+        }
         print HTMLFILE "<hr>\n";
         print HTMLFILE "(This document generated automatically by Image::ExifTool::BuildTagLookup)\n";
         print HTMLFILE "<br><i>Last revised $date</i>\n</body>\n</html>\n" or $success = 0;
@@ -898,6 +899,8 @@ sub WriteTagNames($$)
         }
         if ($podIdLen <= $wID) {
             $podIdLen = $wID;
+        } elsif ($short eq 'DICOM') {
+            $podIdLen = 10;
         } else {
             # align tag names at the secondary column if possible
             my $col = 20;
@@ -1091,7 +1094,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::BuildTagLookup - Utility to build tag lookup tables
+Image::ExifTool::BuildTagLookup - Build ExifTool tag lookup tables
 
 =head1 DESCRIPTION
 

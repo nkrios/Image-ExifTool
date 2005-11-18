@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Minolta.pm
 #
-# Description:  Definitions for Minolta EXIF Maker Notes
+# Description:  Minolta EXIF maker notes tags
 #
 # Revisions:    04/06/2004 - P. Harvey Created
 #               09/09/2005 - P. Harvey Added ability to write MRW files
@@ -354,11 +354,15 @@ $VERSION = '1.19';
     },
     21 => {
         Name => 'MinoltaDate',
+        Groups => { 2 => 'Time' },
+        Shift => 'Time',
         ValueConv => 'sprintf("%4d:%.2d:%.2d",$val>>16,($val&0xff00)>>8,$val&0xff)',
         ValueConvInv => 'my @a=($val=~/(\d+):(\d+):(\d+)/); @a ? ($a[0]<<16)+($a[1]<<8)+$a[2] : undef',
     },
     22 => {
         Name => 'MinoltaTime',
+        Groups => { 2 => 'Time' },
+        Shift => 'Time',
         ValueConv => 'sprintf("%.2d:%.2d:%.2d",$val>>16,($val&0xff00)>>8,$val&0xff)',
         ValueConvInv => 'my @a=($val=~/(\d+):(\d+):(\d+)/); @a ? ($a[0]<<16)+($a[1]<<8)+$a[2] : undef',
     },
@@ -663,7 +667,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Minolta - Definitions for Minolta EXIF maker notes
+Image::ExifTool::Minolta - Minolta EXIF maker notes tags
 
 =head1 SYNOPSIS
 
@@ -673,7 +677,7 @@ This module is loaded automatically by Image::ExifTool when required.
 
 This module contains definitions required by Image::ExifTool to interpret
 Minolta and Konica-Minolta maker notes in EXIF information, and to read
-and write Minolta RAW (MRW) files.
+and write Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 

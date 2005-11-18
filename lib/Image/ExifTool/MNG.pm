@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         MNG.pm
 #
-# Description:  Tag definitions for MNG and JNG images
+# Description:  MNG and JNG meta information tags
 #
 # Revisions:    06/23/2005 - P. Harvey Created
 #
@@ -174,7 +174,7 @@ JNG images.
     8 => 'BitDepth',
     9 => {
         Name => 'ColorType',
-        ValueConv => '$Image::ExifTool::PNG::colorType = $val',
+        RawConv => '$Image::ExifTool::PNG::colorType = $val',
         PrintConv => {
             0 => 'Grayscale',
             2 => 'RGB',
@@ -648,7 +648,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::MNG - Tag definitions for MNG and JNG images
+Image::ExifTool::MNG - MNG and JNG meta information tags
 
 =head1 SYNOPSIS
 

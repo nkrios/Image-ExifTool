@@ -1,11 +1,12 @@
 #------------------------------------------------------------------------------
 # File:         Kodak.pm
 #
-# Description:  Definitions for Kodak EXIF Maker Notes
+# Description:  Kodak EXIF maker notes and APP3 "Meta" tags
 #
 # Revisions:    03/28/2005  - P. Harvey Created
 #
 # References:   1) http://search.cpan.org/dist/Image-MetaData-JPEG/
+#               2) http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
 #
 # Notes:        There really isn't much public information about Kodak formats. 
 #               The only source I could find was Image::MetaData::JPEG, which
@@ -19,8 +20,7 @@ package Image::ExifTool::Kodak;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
-
+$VERSION = '1.04';
 
 %Image::ExifTool::Kodak::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -60,15 +60,23 @@ LS443, LS743 and LS753.
         Format => 'int16u',
     },
     0x10 => {
-        Name => 'Date',
-        Format => 'undef[4]',
-        ValueConv => 'sprintf("%.4d:%.2d:%.2d",Get16u(\$val,0),unpack("x2C2",$val))',
-        ValueConvInv => 'my @v=split /:/, $val;Set16u($v[0]) . pack("C2",$v[1],$v[2])',
+        Name => 'YearCreated',
+        Groups => { 2 => 'Time' },
+        Format => 'int16u',
+    },
+    0x12 => {
+        Name => 'MonthDayCreated',
+        Groups => { 2 => 'Time' },
+        Format => 'int8u[2]',
+        ValueConv => 'sprintf("%.2d:%.2d",split(" ", $val))',
+        ValueConvInv => '$val=~tr/:./ /;$val',
     },
     0x14 => {
-        Name => 'Time',
+        Name => 'TimeCreated',
+        Groups => { 2 => 'Time' },
         Format => 'int8u[4]',
-        ValueConv => 'sprintf("%2d:%.2d:%.2d.%.2d",split(" ", $val))',
+        Shift => 'Time',
+        ValueConv => 'sprintf("%.2d:%.2d:%.2d.%.2d",split(" ", $val))',
         ValueConvInv => '$val=~tr/:./ /;$val',
     },
     0x18 => {
@@ -281,15 +289,23 @@ LS443, LS743 and LS753.
     NOTES => 'These tags are used by the DC280, DC3400 and DC5000.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    0x0c => { #PH
-        Name => 'Date',
-        Format => 'undef[4]',
-        ValueConv => 'sprintf("%.4d:%.2d:%.2d",Get16u(\$val,0),unpack("x2C2",$val))',
-        ValueConvInv => 'my @v=split /:/, $val;Set16u($v[0]) . pack("C2",$v[1],$v[2])',
+    0x0c => {
+        Name => 'YearCreated',
+        Groups => { 2 => 'Time' },
+        Format => 'int16u',
+    },
+    0x0e => {
+        Name => 'MonthDayCreated',
+        Groups => { 2 => 'Time' },
+        Format => 'int8u[2]',
+        ValueConv => 'sprintf("%.2d:%.2d",split(" ", $val))',
+        ValueConvInv => '$val=~tr/:./ /;$val',
     },
     0x10 => { #PH
-        Name => 'Time',
+        Name => 'TimeCreated',
+        Groups => { 2 => 'Time' },
         Format => 'int8u[4]',
+        Shift => 'Time',
         ValueConv => 'sprintf("%2d:%.2d:%.2d.%.2d",split(" ", $val))',
         ValueConvInv => '$val=~tr/:./ /;$val',
     },
@@ -468,6 +484,110 @@ LS443, LS743 and LS753.
     FIRST_ENTRY => 0,
 );
 
+# Kodak composite tags
+%Image::ExifTool::Kodak::Composite = (
+    DateCreated => {
+        Groups => { 2 => 'Time' },
+        Require => {
+            0 => 'Kodak:YearCreated',
+            1 => 'Kodak:MonthDayCreated',
+        },
+        ValueConv => '"$val[0]:$val[1]"',
+    },
+);
+
+# Kodak APP3 "Meta" tags (ref 2)
+%Image::ExifTool::Kodak::Meta = (
+    GROUPS => { 0 => 'Meta', 1 => 'MetaIFD', 2 => 'Image'},
+    NOTES => q{
+These tags are found in the APP3 "Meta" segment of JPEG images from Kodak
+cameras such as the DC280, DC3400, DC5000 and MC3.  The structure of this
+segment is similar to the APP1 "Exif" segment, but a different set of tags
+is used.
+    },
+    0xc350 => 'FilmProductCode',
+    0xc351 => 'ImageSourceEK',
+    0xc352 => 'CaptureConditionsPAR',
+    0xc353 => {
+        Name => 'CameraOwner',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+    },
+    0xc354 => {
+        Name => 'SerialNumber',
+        Groups => { 2 => 'Camera' },
+    },
+    0xc355 => 'UserSelectGroupTitle',
+    0xc356 => 'DealerIDNumber',
+    0xc357 => 'CaptureDeviceFID',
+    0xc358 => 'EnvelopeNumber',
+    0xc359 => 'FrameNumber',
+    0xc35a => 'FilmCategory',
+    0xc35b => 'FilmGencode',
+    0xc35c => 'ModelAndVersion',
+    0xc35d => 'FilmSize',
+    0xc35e => 'SBA_RGBShifts',
+    0xc35f => 'SBAInputImageColorspace',
+    0xc360 => 'SBAInputImageBitDepth',
+    0xc361 => 'SBAExposureRecord',
+    0xc362 => 'UserAdjSBA_RGBShifts',
+    0xc363 => 'ImageRotationStatus',
+    0xc364 => 'RollGuidElements',
+    0xc365 => 'MetadataNumber',
+    0xc366 => 'EditTagArray',
+    0xc367 => 'Magnification',
+    0xc36c => 'NativeXResolution',
+    0xc36d => 'NativeYResolution',
+    0xc36e => {
+        Name => 'KodakEffectsIFD',
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SpecialEffects',
+            Start => '$val',
+        },
+    },
+    0xc36f => {
+        Name => 'KodakBordersIFD',
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Borders',
+            Start => '$val',
+        },
+    },
+    0xc37a => 'NativeResolutionUnit',
+    0xc418 => 'SourceImageDirectory',
+    0xc419 => 'SourceImageFileName',
+    0xc41a => 'SourceImageVolumeName',
+    0xc46c => 'PrintQuality',
+    0xc46e => 'ImagePrintStatus',
+);
+
+# Kodak APP3 "Meta" Special Effects sub-IFD (ref 2)
+%Image::ExifTool::Kodak::SpecialEffects = (
+    GROUPS => { 0 => 'Meta', 1 => 'KodakEffectsIFD', 2 => 'Image'},
+    0 => 'DigitalEffectsVersion',
+    1 => {
+        Name => 'DigitalEffectsName',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+    },
+    2 => 'DigitalEffectsType',
+);
+
+# Kodak APP3 "Meta" Borders sub-IFD (ref 2)
+%Image::ExifTool::Kodak::Borders = (
+    GROUPS => { 0 => 'Meta', 1 => 'KodakBordersIFD', 2 => 'Image'},
+    0 => 'BordersVersion',
+    1 => {
+        Name => 'BorderName',
+        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+    },
+    2 => 'BorderID',
+    3 => 'BorderLocation',
+    4 => 'BorderType',
+    8 => 'WatermarkType',
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Kodak::Composite');
 
 1;  # end
 
@@ -475,7 +595,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Kodak - Definitions for Kodak EXIF maker notes
+Image::ExifTool::Kodak - Kodak EXIF maker notes and APP3 "Meta" tags
 
 =head1 SYNOPSIS
 
@@ -498,6 +618,8 @@ it under the same terms as Perl itself.
 =over 4
 
 =item L<Image::MetaData::JPEG|Image::MetaData::JPEG>
+
+=item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html>
 
 =item (...plus lots of testing with my daughter's CX4200!)
 

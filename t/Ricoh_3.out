@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.70
 [File, File, Image]  - File Name: Ricoh_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:36:00
+[File, File, Time]  - File Modification Date/Time: 2005:10:22 20:55:06
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -65,7 +65,7 @@
 [MakerNotes, Ricoh, Camera] 8 - Ricoh Subdir 0x0008: 32
 [MakerNotes, Ricoh, Camera] 9 - Ricoh Subdir 0x0009: 65535 1024
 [MakerNotes, Ricoh, Camera] 10 - Ricoh Subdir 0x000a: 0.0748538
-[MakerNotes, Ricoh, Camera] 11 - Ricoh Subdir 0x000b: 0.393939
+[MakerNotes, Ricoh, Camera] 11 - Ricoh Subdir 0x000b: 0.3939394
 [MakerNotes, Ricoh, Camera] 12 - Ricoh Subdir 0x000c: 136 12
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000000
@@ -81,7 +81,6 @@
 [PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x05000000
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000000
 [Composite, Composite, Image]  - Aperture: 2.6
-[Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Image]  - Shutter Speed: 1/274
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

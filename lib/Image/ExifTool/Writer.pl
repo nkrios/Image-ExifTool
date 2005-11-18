@@ -93,11 +93,12 @@ my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 #         2) new value, or undef to delete tag
 #         3-N) Options:
 #           Type => PrintConv, ValueConv or Raw - specifies value type
-#           AddValue => 0 or 1 - add to list of existing values instead of overwriting
-#           DelValue => 0 or 1 - delete this existing value value from a list
+#           AddValue => true to add to list of existing values instead of overwriting
+#           DelValue => true to delete this existing value value from a list
 #           Group => family 0 or 1 group name (case insensitive)
 #           Replace => 0, 1 or 2 - overwrite previous new values (2=reset)
 #           Protected => bitmask to write tags with specified protections
+#           Shift => undef, 0, +1 or -1 - shift value if possible
 # Returns: number of tags set (plus error string in list context)
 # Notes: For tag lists (like Keywords), call repeatedly with the same tag name for
 #        each value in the list.  Internally, the new information is stored in
@@ -109,6 +110,8 @@ my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 #                      changed if it already exists
 #           WriteGroup - group name where information is being written
 #           Next - pointer to next newValueHash (if more than one)
+#           Shift - shift value
+#           Self - ExifTool ref defined only if Shift is set
 sub SetNewValue($;$$%)
 {
     local $_;
@@ -118,11 +121,12 @@ sub SetNewValue($;$$%)
     my $protected = $options{Protected} || 0;
     my $numSet = 0;
 
-    # make sure the Perl UTF-8 flag is OFF for the value with perl 5.8 or greater
+    # make sure the Perl UTF-8 flag is OFF for the value if perl 5.6 or greater
     # (otherwise our byte manipulations get corrupted!!)
-    if ($] >= 5.008 and defined $value) {
-        require Encode;
-        Encode::_utf8_off($value);
+    if ($] >= 5.006 and defined $value) {
+        if (eval 'require Encode; Encode::is_utf8($value)' or $@) {
+            $value = pack('C*', unpack('C*', $value));
+        }
     }
     unless (defined $tag) {
         # remove any existing set values
@@ -136,6 +140,9 @@ sub SetNewValue($;$$%)
         $options{Group} = $1 if $1 ne '*' and lc($1) ne 'all';
         $tag = $2;
     }
+#
+# get list of tags we want to set
+#
     my $wantGroup = $options{Group};
     $tag =~ s/ .*//;    # convert from tag key to tag name if necessary
     my @matchingTags = FindTagInfo($tag);
@@ -210,8 +217,10 @@ sub SetNewValue($;$$%)
             $writeProc and &$writeProc();
         }
     }
-    # determine the groups for all tags found, and the tag with
-    # the highest priority group
+#
+# determine the groups for all tags found, and the tag with
+# the highest priority group
+#
     my (@tagInfoList, %writeGroup, %preferred, %tagPriority, $avoid);
     my $highestPriority = -1;
     foreach $tagInfo (@matchingTags) {
@@ -317,6 +326,9 @@ sub SetNewValue($;$$%)
             }
         }
     }
+#
+# generate new value hash for each tag
+#
     my $prioritySet;
     my @requireTags;
     # sort tag info list in reverse order of priority (higest number last)
@@ -334,23 +346,51 @@ sub SetNewValue($;$$%)
             $wgrp1 = $writeGroup;
         }
         $tag = $tagInfo->{Name};    # get proper case for tag name
+        my $shift = $options{Shift};
+        if (defined $shift) {
+            if ($tagInfo->{Shift}) {
+                unless ($shift) {
+                    # set shift according to AddValue/DelValue
+                    $shift = 1 if $options{AddValue};
+                    $shift = -1 if $options{DelValue};
+                }
+            } elsif ($shift) {
+                $err = "$wgrp1:$tag is not shiftable";
+                $verbose > 2 and print "$err\n";
+                next;
+            }
+        }
         # convert the value
         my $val = $value;
         # can't delete permanent tags, so set value to empty string instead
         $val = '' if not defined $val and $permanent;
-        my $type = $options{Type};
-        $type or $type = $self->Options('PrintConv') ? 'PrintConv' : 'ValueConv';
-        while (defined $val) {
+        my $type;
+        if ($shift) {
+            # add '+' or '-' prefix to indicate shift direction
+            $val = ($shift > 0 ? '+' : '-') . $val;
+            # check the shift for validity
+            require 'Image/ExifTool/Shift.pl';
+            my $err2 = CheckShift($tagInfo->{Shift}, $val);
+            if ($err2) {
+                $err = "$err2 for $wgrp1:$tag";
+                $verbose > 2 and print "$err\n";
+                next;
+            }
+        } else {
+            $type = $options{Type};
+            $type or $type = $self->Options('PrintConv') ? 'PrintConv' : 'ValueConv';
+        }
+        while (defined $val and not $shift) {
             my $conv = $tagInfo->{$type};
             my $convInv = $tagInfo->{"${type}Inv"};
             if ($convInv) {
                 # capture eval warnings too
-                local $SIG{__WARN__} = sub { $evalWarning = $_[0]; };
+                local $SIG{'__WARN__'} = sub { $evalWarning = $_[0]; };
                 undef $evalWarning;
                 if (ref($convInv) eq 'CODE') {
                     $val = &$convInv($val, $self);
                 } else {
-                    #### eval PrintConvInv/ValueConvInv ($val)
+                    #### eval PrintConvInv/ValueConvInv ($val, $self)
                     $val = eval $convInv;
                     $@ and $evalWarning = $@;
                 }
@@ -432,15 +472,21 @@ sub SetNewValue($;$$%)
 
         # set value in NEW_VALUE hash
         if (defined $val) {
-            if ($options{AddValue} and not $tagInfo->{List}) {
+            if ($options{AddValue} and not ($shift or $tagInfo->{List})) {
                 $err = "Can't add $wgrp1:$tag (not a List type)";
                 $verbose > 2 and print "$err\n";
                 next;
             }
             # we are editing this tag, so create a NEW_VALUE hash entry
             my $newValueHash = $self->GetNewValueHash($tagInfo, $writeGroup, 'create');
-            if ($options{DelValue} or $options{AddValue}) {
-                if ($options{DelValue}) {
+            if ($options{DelValue} or $options{AddValue} or $shift) {
+                # flag any AddValue or DelValue by creating the DelValue list
+                $newValueHash->{DelValue} or $newValueHash->{DelValue} = [ ];
+                if ($shift) {
+                    # add shift value to list
+                    $newValueHash->{Shift} = $val;
+                    $newValueHash->{Self} = $self;
+                } elsif ($options{DelValue}) {
                     # don't create if we are replacing a specific value
                     $newValueHash->{IsCreating} = 0 unless $val eq '';
                     # add delete value to list
@@ -451,15 +497,13 @@ sub SetNewValue($;$$%)
                         print "$verb $wgrp1:$tag$fromList if value is '$val'\n";
                     }
                 }
-                # flag any AddValue or DelValue by creating the DelValue list
-                $newValueHash->{DelValue} or $newValueHash->{DelValue} = [ ];
             }
             # set priority flag to add only the high priority info
             # (will only create the priority tag if it doesn't exist,
             #  others get changed only if they already exist)
             if ($preferred{$tagInfo} or $tagInfo->{Table}->{PREFERRED}) {
-                if ($permanent) {
-                    # don't create permanent tag but define IsCreating
+                if ($permanent or $shift) {
+                    # don't create permanent or Shift-ed tag but define IsCreating
                     # so we know that it is the preferred tag
                     $newValueHash->{IsCreating} = 0;
                 } elsif (not ($newValueHash->{DelValue} and @{$newValueHash->{DelValue}}) or
@@ -469,7 +513,7 @@ sub SetNewValue($;$$%)
                     $newValueHash->{IsCreating} = 1;
                 }
             }
-            unless ($options{DelValue}) {
+            if ($shift or not $options{DelValue}) {
                 $newValueHash->{Value} or $newValueHash->{Value} = [ ];
                 if ($tagInfo->{List}) {
                     # we can write a list of entries
@@ -480,7 +524,9 @@ sub SetNewValue($;$$%)
                 }
                 if ($verbose > 1) {
                     my $ifExists = $newValueHash->{IsCreating} ? '' : ' if tag already exists';
-                    if ($options{AddValue}) {
+                    if ($shift) {
+                        print "Shifting $wgrp1:$tag$ifExists\n";
+                    } elsif ($options{AddValue}) {
                         print "Adding to $wgrp1:$tag$ifExists\n";
                     } else {
                         print "Writing $wgrp1:$tag$ifExists\n";
@@ -846,12 +892,23 @@ sub RestoreNewValues($)
 #------------------------------------------------------------------------------
 # Set file modification time from FileModifyDate tag
 # Inputs: 0) ExifTool object reference, 1) file name
+#         2) modify time (-M) of original file (needed for time shift)
 # Returns: 1=time changed OK, 0=FileModifyDate not set, -1=error setting time
-sub SetFileModifyDate($$)
+sub SetFileModifyDate($$;$)
 {
-    my ($self, $file) = @_;
-    my $val = $self->GetNewValues('FileModifyDate');
+    my ($self, $file, $originalTime) = @_;
+    my $newValueHash;
+    my $val = $self->GetNewValues('FileModifyDate', \$newValueHash);
     return 0 unless defined $val;
+    my $isOverwriting = IsOverwriting($newValueHash);
+    return 0 unless $isOverwriting;
+    if ($isOverwriting < 0) {  # are we shifting time?
+        # use original time of this file if not specified
+        $originalTime = -M $file unless defined $originalTime;
+        return 0 unless defined $originalTime;
+        return 0 unless IsOverwriting($newValueHash, $^T - $originalTime*(24*3600));
+        $val = $newValueHash->{Value}->[0]; # get shifted value
+    }
     unless (utime($val, $val, $file)) {
         $self->Warn('Error setting FileModifyDate');
         return -1;
@@ -874,43 +931,79 @@ sub GetNewGroups($)
 #------------------------------------------------------------------------------
 # Write information back to file
 # Inputs: 0) ExifTool object reference,
-#         1) input filename, file reference, or scalar reference
-#         2) output filename, file reference, or scalar reference
+#         1) input filename, file ref, or scalar ref (or '' or undef to create from scratch)
+#         2) output filename, file ref, or scalar ref (or undef to edit in place)
+#         3) optional output file type (required only if input file is not specified
+#            and output file is a reference)
 # Returns: 1=file written OK, 2=file written but no changes made, 0=file write error
-sub WriteInfo($$$)
+sub WriteInfo($$;$$)
 {
     local $_;
-    my ($self, $infile, $outfile) = @_;
+    my ($self, $infile, $outfile, $outType) = @_;
     my (@fileTypeList, $fileType, $tiffType);
-    my ($inRef, $outRef, $outPos);
+    my ($inRef, $outRef, $closeIn, $closeOut, $outPos, $outBuff);
     my $oldRaf = $self->{RAF};
     my $rtnVal = 1;
 
     # initialize member variables
     $self->Init();
 
-    # set up input file
+    # first, save original file modify date if necessary
+    # (do this now in case we are modifying file in place and shifting date)
+    my ($newValueHash, $originalTime);
+    my $fileModifyDate =  $self->GetNewValues('FileModifyDate', \$newValueHash);
+    if (defined $fileModifyDate and IsOverwriting($newValueHash) < 0 and
+        defined $infile and ref $infile ne 'SCALAR')
+    {
+        $originalTime = -M $infile;
+    }
+#
+# set up input file
+#
     if (ref $infile) {
         $inRef = $infile;
         # make sure we are at the start of the file
         seek($inRef, 0, 0) if UNIVERSAL::isa($inRef,'GLOB');
-    } else {
-        unless (open(EXIFTOOL_FILE2,$infile)) {
-            $self->Warn("Error opening file $infile");
+    } elsif (defined $infile and $infile ne '') {
+        if (open(EXIFTOOL_FILE2, defined $outfile ? $infile : "+<$infile")) {
+            $fileType = GetFileType($infile);
+            $tiffType = GetFileExtension($infile);
+            $self->{OPTIONS}->{Verbose} and print "Rewriting $infile...\n";
+            $inRef = \*EXIFTOOL_FILE2;
+            $closeIn = 1;   # we must close the file since we opened it
+        } else {
+            my $forUpdate = (defined $outfile ? '' : ' for update');
+            $self->Error("Error opening file $infile$forUpdate");
             return 0;
         }
-        $self->{OPTIONS}->{Verbose} and print "Rewriting $infile...\n";
-        $inRef = \*EXIFTOOL_FILE2;
-        $fileType = GetFileType($infile);
+    } elsif (not defined $outfile) {
+        $self->Error("WriteInfo(): Must specify infile or outfile\n");
+        return 0;
+    } else {
+        # create file from scratch
+        $outType = GetFileType($outfile) unless $outType or ref $outfile;
+        if (CanCreate($outType)) {
+            $fileType = $tiffType = $outType;   # use output file type if no input file
+            $infile = "$fileType file";         # make bogus file name
+            $self->{OPTIONS}->{Verbose} and print "Creating $infile...\n";
+            $inRef = \ '';      # set $inRef to reference to empty data
+        } elsif ($outType) {
+            $self->Error("Can't create $outType files");
+            return 0;
+        } else {
+            $self->Error("Can't create file (unknown type)");
+            return 0;
+        }
     }
     if ($fileType) {
         @fileTypeList = ( $fileType );
-        $tiffType = GetFileExtension($infile);
     } else {
         @fileTypeList = @fileTypes;
         $tiffType = 'TIFF';
     }
-    # set up output file
+#
+# set up output file
+#
     if (ref $outfile) {
         $outRef = $outfile;
         if (UNIVERSAL::isa($outRef,'GLOB')) {
@@ -921,23 +1014,30 @@ sub WriteInfo($$$)
             defined $$outRef or $$outRef = '';
             $outPos = length($$outRef);
         }
+    } elsif (not defined $outfile) {
+        # editing in place, so write to memory first
+        $outBuff = '';
+        $outRef = \$outBuff;
+        $outPos = 0;
+    } elsif (-e $outfile) {
+        $self->Error("File already exists: $outfile");
+        $rtnVal = 0;
+    } elsif (open(EXIFTOOL_OUTFILE, ">$outfile")) {
+        $outRef = \*EXIFTOOL_OUTFILE;
+        $closeOut = 1;  # we must close $outRef
+        binmode($outRef);
+        $outPos = 0;
     } else {
-        if (-e $outfile) {
-            $self->Warn("File already exists: $outfile");
-            $rtnVal = 0;
-        } elsif (open(EXIFTOOL_OUTFILE, ">$outfile")) {
-            $outRef = \*EXIFTOOL_OUTFILE;
-            binmode($outRef);
-            $outPos = 0;
-        } else {
-            $self->Warn("Error creating file: $outfile");
-            $rtnVal = 0;
-        }
+        $self->Error("Error creating file: $outfile");
+        $rtnVal = 0;
     }
+#
+# write the file
+#
     if ($rtnVal) {
         # create random access file object
         # (note: disable buffering for a normal file -- $infile ne '-')
-        my $isRandom = (ref $infile or $infile eq '-') ? 0 : 1;
+        my $isRandom = not (ref $infile or $infile eq '-');
         my $raf = new File::RandomAccess($inRef, $isRandom);
        # $raf->Debug() and warn "  RAF debugging enabled!\n";
         my $inPos = $raf->Tell();
@@ -959,29 +1059,32 @@ sub WriteInfo($$$)
                 $dirInfo{Parent} = $tiffType;
                 $rtnVal = $self->ProcessTIFF(\%dirInfo);
             } elsif ($type eq 'GIF') {
-                $rtnVal = $self->ProcessGIF(\%dirInfo);
+                require Image::ExifTool::GIF;
+                $rtnVal = Image::ExifTool::GIF::ProcessGIF($self,\%dirInfo);
             } elsif ($type eq 'CRW') {
-                # must be sure we have loaded CanonRaw before we can call WriteCRW()
-                GetTagTable('Image::ExifTool::CanonRaw::Main');
+                require Image::ExifTool::CanonRaw;
                 $rtnVal = Image::ExifTool::CanonRaw::WriteCRW($self, \%dirInfo);
             } elsif ($type eq 'MRW') {
-                GetTagTable('Image::ExifTool::Minolta::Main');
+                require Image::ExifTool::Minolta;
                 $rtnVal = Image::ExifTool::Minolta::ProcessMRW($self, \%dirInfo);
             } elsif ($type eq 'PNG') {
-                GetTagTable('Image::ExifTool::PNG::Main');
+                require Image::ExifTool::PNG;
                 $rtnVal = Image::ExifTool::PNG::ProcessPNG($self, \%dirInfo);
+            } elsif ($type eq 'XMP') {
+                require Image::ExifTool::XMP;
+                $rtnVal = Image::ExifTool::XMP::WriteXMP($self, \%dirInfo);
             } elsif ($type eq 'PPM') {
                 require Image::ExifTool::PPM;
                 $rtnVal = Image::ExifTool::PPM::ProcessPPM($self, \%dirInfo);
             } else {
-                $rtnVal = 0;
+                undef $rtnVal;  # flag that we don't write this type of file
             }
             # all done unless we got the wrong type
             last if $rtnVal;
             last unless @fileTypeList;
             # seek back to original position in files for next try
             unless ($raf->Seek($inPos, 0)) {
-                $self->Warn('Error seeking in file');
+                $self->Error('Error seeking in file');
                 last;
             }
             if (UNIVERSAL::isa($outRef,'GLOB')) {
@@ -992,34 +1095,58 @@ sub WriteInfo($$$)
         }
         # print file format errors
         unless ($rtnVal) {
-            if ($fileType and $fileType =~ /^(JPEG|GIF|TIFF|CRW)$/) {
-                unless ($self->{PRINT_CONV}->{Error}) {
-                    $self->Error("Format error in file");
-                }
+            if ($fileType and defined $rtnVal) {
+                $self->{VALUE}->{Error} or $self->Error("Format error in file");
             } elsif ($fileType) {
                 $self->Error("ExifTool does not yet support writing of $fileType files");
             } else {
                 $self->Error('ExifTool does not support writing of this type of file');
             }
+            $rtnVal = 0;
         }
        # $raf->Close(); # only used to force debug output
     }
-    # close input file file if we opened it
-    close($inRef) if $inRef and $inRef ne $infile;
+    # don't return success code if any error occurred
+    $rtnVal = 0 if $rtnVal > 0 and $self->{VALUE}->{Error};
 
-    # did we create the output file?
-    if ($outRef and $outRef ne $outfile) {
+    # rewrite original file in place if required
+    if (defined $outBuff) {
+        if ($rtnVal <= 0 or not $self->{CHANGED}) {
+            # nothing changed, so no need to write $outBuff
+        } elsif (UNIVERSAL::isa($inRef,'GLOB')) {
+                my $len = length($outBuff);
+                my $size;
+                $rtnVal = -1 unless
+                    seek($inRef, 0, 2) and          # seek to the end of file
+                    ($size = tell $inRef) >= 0 and  # get the file size
+                    seek($inRef, 0, 0) and          # seek back to the start
+                    print $inRef $outBuff and       # write the new data
+                    ($len >= $size or               # if necessary:
+                    eval 'truncate($inRef, $len)'); #  shorten output file
+        } else {
+            $$inRef = $outBuff;                 # replace original data
+        }
+        $outBuff = '';  # free memory but leave $outBuff defined
+    }
+    # close input file if we opened it
+    if ($closeIn) {
+        # errors on input file are significant if we edited the file in place
+        $rtnVal and $rtnVal = -1 unless close($inRef) or not defined $outBuff;
+    }
+    # close output file if we created it
+    if ($closeOut) {
         # close file and set $rtnVal to -1 if there was an error
         $rtnVal and $rtnVal = -1 unless close($outRef);
-        if ($rtnVal > 0) {
-            # set FileModifyDate if requested
-            $self->SetFileModifyDate($outfile);
-        } else {
-            # erase the output file since we weren't successful
-            unlink $outfile;
-        }
+        # erase the output file if we weren't successful
+        $rtnVal > 0 or unlink $outfile;
     }
-    # if $rtnVal<0 there was a write error
+    # set FileModifyDate if requested (and if possible!)
+    if (defined $fileModifyDate and $rtnVal > 0 and
+        ($closeOut or ($closeIn and defined $outBuff)))
+    {
+        $self->SetFileModifyDate($closeOut ? $outfile : $infile, $originalTime);
+    }
+    # check for write error and set appropriate error message and return value
     if ($rtnVal < 0) {
         $self->Error('Error writing output file');
         $rtnVal = 0;    # return 0 on failure
@@ -1198,6 +1325,22 @@ sub IsOverwriting($;$)
     return 0 unless $newValueHash;
     # overwrite regardless if no DelValues specified
     return 1 unless $newValueHash->{DelValue};
+    # apply time shift if necessary
+    if (defined $newValueHash->{Shift}) {
+        return -1 unless defined $value;
+        my $type = $newValueHash->{TagInfo}->{Shift};
+        my $shift = $newValueHash->{Shift};
+        require 'Image/ExifTool/Shift.pl';
+        my $err = ApplyShift($type, $shift, $value, $newValueHash);
+        if ($err) {
+            my $tag = $newValueHash->{TagInfo}->{Name};
+            $newValueHash->{Self}->Warn("$err when shifting $tag");
+            return 0;
+        }
+        # don't bother overwriting if value is the same
+        return 0 if $value eq $newValueHash->{Value}->[0];
+        return 1;
+    }
     # never overwrite if DelValue list exists but is empty
     return 0 unless @{$newValueHash->{DelValue}};
     # return "don't know" if we don't have a value to test
@@ -1304,9 +1447,6 @@ sub LoadAllTables()
             GetTagTable($tableName);
         }
         # (then our special tables)
-        GetTagTable('Image::ExifTool::JFIF::Main');
-        GetTagTable('Image::ExifTool::JFIF::Extension');
-        GetTagTable('Image::ExifTool::APP12');
         GetTagTable('Image::ExifTool::Extra');
         GetTagTable('Image::ExifTool::Composite');
         # recursively load all tables referenced by the current tables
@@ -1393,13 +1533,8 @@ sub GetAddDirHash($$;$)
             #  otherwise Group0 name of SubDirectory TagTable or tag Group1 name)
             my $dirName = $tagInfo->{SubDirectory}->{DirName};
             unless ($dirName) {
-                my $subTable = Image::ExifTool::GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-                if ($subTable) {
-                    $dirName = $subTable->{GROUPS}->{0};
-                } else {
-                    $dirName = $tagInfo->{Groups}->{1};
-                }
-                # set directory name for next time
+                # use tag name for directory name and save for next time
+                $dirName = $$tagInfo{Name};
                 $tagInfo->{SubDirectory}->{DirName} = $dirName;
             }
             # save this directory information if we are writing it
@@ -1477,7 +1612,7 @@ sub InitWriteDirs($$)
 # Inputs: 0) ExifTool object reference, 1) source directory information reference
 #         2) tag table reference, 3) optional reference to writing procedure
 # Returns: New directory data or undefined on error
-sub WriteDirectory($$;$$)
+sub WriteDirectory($$$;$)
 {
     my ($self, $dirInfo, $tagTablePtr, $writeProc) = @_;
 
@@ -1525,8 +1660,8 @@ sub WriteDirectory($$;$$)
     if (defined $$dirInfo{DataPt} and defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos}) {
         my $processed = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0);
         if ($self->{PROCESSED}->{$processed}) {
-            $self->Warn("$dirName pointer references previous $self->{PROCESSED}->{$processed} directory");
-            return 0;
+            $self->Error("$dirName pointer references previous $self->{PROCESSED}->{$processed} directory", 1);
+            return undef;
         } else {
             $self->{PROCESSED}->{$processed} = $dirName;
         }
@@ -1583,7 +1718,8 @@ sub Get64u($$)
 # Dump data in hex and ASCII to console
 # Inputs: 0) data reference, 1) length or undef, 2-N) Options:
 # Options: Start => offset to start of data (default=0)
-#          Addr => address to print for data start (default=Start)
+#          Addr => address to print for data start (default=DataPos+Start)
+#          DataPos => address of start of data
 #          Width => width of printout (bytes, default=16)
 #          Prefix => prefix to print at start of line (default='')
 #          MaxLen => maximum length to dump
@@ -1593,7 +1729,7 @@ sub HexDump($;$%)
     my $len    = shift;
     my %opts   = @_;
     my $start  = $opts{Start}  || 0;
-    my $addr   = $opts{Addr}   || $start;
+    my $addr   = $opts{Addr}   || $start + ($opts{DataPos} || 0);
     my $wid    = $opts{Width}  || 16;
     my $prefix = $opts{Prefix} || '';
     my $maxLen = $opts{MaxLen};
@@ -1634,6 +1770,7 @@ sub HexDump($;$%)
 # Parms: Index => Index of tag in menu (starting at 0)
 #        Value => Tag value
 #        DataPt => reference to value data block
+#        DataPos => location of data block in file
 #        Size => length of value data within block
 #        Format => value format string
 #        Count => number of values
@@ -1948,7 +2085,15 @@ sub SetRational16s($;$$) {
     return $val;
 }
 sub SetFloat($;$$) {
-    return SwapBytes(pack('f',$_[0]), 4);
+    my $val = SwapBytes(pack('f',$_[0]), 4);
+    $_[1] and substr(${$_[1]}, $_[2], length($val)) = $val;
+    return $val;
+}
+sub SetDouble($;$$) {
+    # swap 32-bit words (ARM quirk) and bytes if necessary
+    my $val = SwapBytes(SwapWords(pack('d',$_[0])), 8);
+    $_[1] and substr(${$_[1]}, $_[2], length($val)) = $val;
+    return $val;
 }
 #------------------------------------------------------------------------------
 # hash lookups for writing binary data values
@@ -1964,8 +2109,27 @@ my %writeValueProc = (
     rational32s => \&SetRational32s,
     rational32u => \&SetRational32u,
     float => \&SetFloat,
+    double => \&SetDouble,
     ifd => \&Set32u,
 );
+# verify that we can write floats on this platform
+{
+    my %writeTest = (
+        float =>  [ -3.14159, 'c0490fd0' ],
+        double => [ -3.14159, 'c00921f9f01b866e' ],
+    );
+    my $format;
+    my $oldOrder = GetByteOrder();
+    SetByteOrder('MM');
+    foreach $format (keys %writeTest) {
+        my ($val, $hex) = @{$writeTest{$format}};
+        # add floating point entries if we can write them
+        next if unpack('H*', &{$writeValueProc{$format}}($val)) eq $hex;
+        delete $writeValueProc{$format};    # we can't write them
+    }
+    SetByteOrder($oldOrder);
+}
+
 #------------------------------------------------------------------------------
 # write binary data value (with current byte ordering)
 # Inputs: 0) value, 1) format string
@@ -1992,7 +2156,7 @@ sub WriteValue($$;$$$$)
             return undef unless defined $val;
             # validate numerical formats
             if ($format =~ /^int/) {
-                return undef unless IsInt($val);
+                return undef unless IsInt($val) or IsHex($val);
             } else {
                 return undef unless IsFloat($val);
             }
@@ -2022,7 +2186,7 @@ sub WriteValue($$;$$$$)
         $dataPt and substr($$dataPt, $offset, $count) = $val;
         return $val;
     } else {
-        warn "Can't currently write format $format";
+        warn "Sorry, Can't write $format values on this platform";
         return undef;
     }
     $dataPt and substr($$dataPt, $offset, length($packed)) = $packed;
@@ -2433,7 +2597,7 @@ sub WriteJPEG($$)
                     );
                     my $result = $self->ProcessTIFF(\%dirInfo);
                     $segDataPt = \$buff;
-                    unless ($result) { # check for problems writing the EXIF
+                    unless ($result > 0) { # check for problems writing the EXIF
                         last Marker unless $self->Options('IgnoreMinorErrors');
                         $$segDataPt = $exifAPP1hdr . $self->{EXIF_DATA}; # restore original EXIF
                         $self->{CHANGED} = $oldChanged;
@@ -2644,9 +2808,13 @@ sub CheckValue($$;$)
         if ($format =~ /^int/) {
             # make sure the value is integer
             unless (IsInt($val)) {
-                # round single floating point values to the nearest integer
-                return 'Not an integer' unless IsFloat($val) and $count == 1;
-                $val = $$valPtr = int($val + ($val < 0 ? -0.5 : 0.5));
+                if (IsHex($val)) {
+                    $val = $$valPtr = hex($val);
+                } else {
+                    # round single floating point values to the nearest integer
+                    return 'Not an integer' unless IsFloat($val) and $count == 1;
+                    $val = $$valPtr = int($val + ($val < 0 ? -0.5 : 0.5));
+                }
             }
             my ($min, $max) = @{$intRange{$format}};
             return "Value below $format minimum" if $val < $min;
@@ -2739,7 +2907,7 @@ sub WriteBinaryData($$$)
         my $val = ReadValue($dataPt, $entry, $format, $count, $dirLen-$entry);
         next unless defined $val;
         my $newValueHash = $self->GetNewValueHash($tagInfo);
-        next unless IsOverwriting($newValueHash);
+        next unless IsOverwriting($newValueHash, $val);
         my $newVal = GetNewValues($newValueHash);
         next unless defined $newVal;    # can't delete from a binary table
         # set the size
@@ -2786,6 +2954,7 @@ sub WriteBinaryData($$$)
     }
     return $newData;
 }
+
 
 1; # end
 

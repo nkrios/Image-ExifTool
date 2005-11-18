@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         IPTC.pm
 #
-# Description:  Definitions for IPTC information
+# Description:  Read IPTC meta information
 #
 # Revisions:    Jan. 08/03 - P. Harvey Created
 #               Feb. 05/04 - P. Harvey Added support for records other than 2
@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.12';
+$VERSION = '1.15';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -146,6 +146,7 @@ my %fileFormat = (
         Name => 'DateSent',
         Groups => { 2 => 'Time' },
         Format => 'digits[8]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
@@ -153,6 +154,7 @@ my %fileFormat = (
         Name => 'TimeSent',
         Groups => { 2 => 'Time' },
         Format => 'string[11]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -248,6 +250,7 @@ my %fileFormat = (
         Name => 'ReleaseDate',
         Groups => { 2 => 'Time' },
         Format => 'digits[8]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
@@ -255,6 +258,7 @@ my %fileFormat = (
         Name => 'ReleaseTime',
         Groups => { 2 => 'Time' },
         Format => 'string[11]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -262,6 +266,7 @@ my %fileFormat = (
         Name => 'ExpirationDate',
         Groups => { 2 => 'Time' },
         Format => 'digits[8]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
@@ -269,6 +274,7 @@ my %fileFormat = (
         Name => 'ExpirationTime',
         Groups => { 2 => 'Time' },
         Format => 'string[11]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -294,8 +300,10 @@ my %fileFormat = (
     },
     47 => {
         Name => 'ReferenceDate',
+        Groups => { 2 => 'Time' },
         Flags => 'List',
         Format => 'digits[8]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
@@ -306,7 +314,9 @@ my %fileFormat = (
     },
     55 => {
         Name => 'DateCreated',
+        Groups => { 2 => 'Time' },
         Format => 'digits[8]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
@@ -314,6 +324,7 @@ my %fileFormat = (
         Name => 'TimeCreated',
         Groups => { 2 => 'Time' },
         Format => 'string[11]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -321,6 +332,7 @@ my %fileFormat = (
         Name => 'DigitalCreationDate',
         Groups => { 2 => 'Time' },
         Format => 'digits[8]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
     },
@@ -328,6 +340,7 @@ my %fileFormat = (
         Name => 'DigitalCreationTime',
         Groups => { 2 => 'Time' },
         Format => 'string[11]',
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
     },
@@ -815,6 +828,8 @@ sub ProcessIPTC($$$)
     my %listTags;
 
     $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
+    my $dirCount = $exifTool->{DIR_COUNT}->{IPTC} = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
+    $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
     while ($pos + 5 <= $dirEnd) {
         my $buff = substr($$dataPt, $pos, 5);
         my ($id, $rec, $tag, $len) = unpack("CCCn", $buff);
@@ -861,12 +876,13 @@ sub ProcessIPTC($$$)
         my $recordPtr = Image::ExifTool::GetTagTable($tableName);
         my $tagInfo = $exifTool->GetTagInfo($recordPtr, $tag);
         $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
-            'Table'  => $tagTablePtr,
-            'Value'  => $val,
-            'DataPt' => $dataPt,
-            'Size'   => $len,
-            'Start'  => $pos,
-            'Extra'  => ', ' . $tableInfo->{Name} . ' record',
+            Table   => $tagTablePtr,
+            Value   => $val,
+            DataPt  => $dataPt,
+            DataPos => $$dirInfo{DataPos},
+            Size    => $len,
+            Start   => $pos,
+            Extra   => ', ' . $tableInfo->{Name} . ' record',
         );
         if ($tagInfo) {
             my $format = $tagInfo->{Format};
@@ -896,6 +912,7 @@ sub ProcessIPTC($$$)
 
         $pos += $len;   # increment to next field
     }
+    delete $exifTool->{SET_GROUP1};
     return $success;
 }
 
@@ -906,7 +923,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::IPTC - Definitions for IPTC meta information
+Image::ExifTool::IPTC - Read IPTC meta information
 
 =head1 SYNOPSIS
 

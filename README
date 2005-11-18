@@ -5,13 +5,13 @@ ExifTool is a highly customizable Perl script for reading and writing meta
 information in images.
 
 ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop
-IRB and ID3 meta information from JPG, JP2, TIFF, GIF, BMP, PPM, PGM, PBM,
-PNG, MNG, JNG, MIFF, PICT, EPS, PS, AI, PDF, PSD, THM, CRW, CR2, MRW, NEF,
-PEF, ORF, RAF, SRF, MOS and DNG images, MP3 and WAV audio files, and MOV
-videos. ExifTool also extracts information from the maker notes of many
-digital cameras by various manufacturers including Canon, Casio, FujiFilm,
-Kodak, Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica,
-Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
+IRB and ID3 meta information from JPG, JP2, TIFF, GIF, BMP, PICT, QTIF, PNG,
+MNG, JNG, MIFF, PPM, PGM, PBM, XMP, EPS, PS, AI, PDF, PSD, DCM, ACR, THM,
+CRW, CR2, MRW, NEF, PEF, ORF, RAF, SRF, MOS, X3F and DNG images, MP3 and WAV
+audio files, and MOV videos.  ExifTool also extracts information from the
+maker notes of many digital cameras by various manufacturers including
+Canon, Casio, FujiFilm, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
+Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
 
 ExifTool writes EXIF, GPS, IPTC, XMP and MakerNotes meta information to
 JPEG, TIFF, GIF, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, MRW, NEF, PEF,
@@ -33,7 +33,7 @@ The exiftool script can be run right away without the need to install
 Image::ExifTool.  For example, from within the exiftool directory you can
 extract the information from one of the included test files by typing:
 
-   ./exiftool t/ExifTool.jpg
+   ./exiftool t/images/ExifTool.jpg
 
 If you move the exiftool script to a different directory, you must also
 either move the contents of the lib directory or install the Image::ExifTool
@@ -47,20 +47,20 @@ IF YOU ARE STILL CONFUSED
 
 The exiftool script is a command line application.  You run it by typing
 commands in a terminal window.  The first step is to determine the name of
-the directory where you downloaded the ExifTool distribution package.  For
-the sake of argument, I'll assume it was in a folder called "Desktop" in
-your home directory.  To extract and run exiftool from this directory, you
-type the following in a terminal window:
+the directory where you downloaded the ExifTool distribution package.
+Assuming, for example, you downloaded it to a folder called "Desktop" in
+your home directory, then you would type the following commands in a
+terminal window to extract and run ExifTool:
 
    cd ~/Desktop
    tar -xzf Image-ExifTool-#.##.tar.gz
    cd Image-ExifTool-#.##
-   ./exiftool t/ExifTool.jpg
+   ./exiftool t/images/ExifTool.jpg
 
-Note: You must replace "#.##" in the commands above with the actual version
+Note: You must replace "#.##" in the above commands with the actual version
 number of ExifTool that you downloaded.  These commands extract meta
 information from one of the test images.  To use one of your images instead,
-enter the full path name of your file in place of "t/ExifTool.jpg".
+enter the full path name of your file in place of "t/images/ExifTool.jpg".
 
 INSTALLATION
 
@@ -82,8 +82,9 @@ Notes:
 DEPENDENCIES
 
 Requires Perl version 5.004 or later.  No other special libraries are
-required, however Compress::Zlib and Digest::MD5 are used if available to
-read/write compressed and/or encrypted information from PNG and PDF files.
+required, however Compress::Zlib is used if available to read/write
+compressed information in PNG, PDF and DCM images, and Digest::MD5 is used
+if available to read encrypted information in PDF files.
 
 COPYRIGHT AND LICENCE
 

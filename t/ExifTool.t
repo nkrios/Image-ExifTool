@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..18\n"; }
+BEGIN { $| = 1; print "1..17\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -23,74 +23,61 @@ my $testnum = 1;
 # test 2: JPG file using name
 {
     ++$testnum;
-    my $info = ImageInfo('t/ExifTool.jpg');
+    my $info = ImageInfo('t/images/ExifTool.jpg');
     print 'not ' unless check($info, $testname, $testnum);
     print "ok $testnum\n";
 }
 
-# test 3: GIF file using data in memory
-{
-    ++$testnum;
-    open(TESTFILE, 't/ExifTool.gif');
-    binmode(TESTFILE);
-    my $gifImage;
-    read(TESTFILE, $gifImage, 100000);
-    close(TESTFILE);
-    my $info = ImageInfo(\$gifImage);
-    print 'not ' unless check($info, $testname, $testnum);
-    print "ok $testnum\n";
-}
-
-# test 4: TIFF file using file reference and ExifTool object with options
+# test 3: TIFF file using file reference and ExifTool object with options
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Duplicates => 1, Unknown => 1);
-    open(TESTFILE, 't/ExifTool.tif');
+    open(TESTFILE, 't/images/ExifTool.tif');
     my $info = $exifTool->ImageInfo(\*TESTFILE);
     close(TESTFILE);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 
-# test 5: test the Group option to extract EXIF info only
+# test 4: test the Group option to extract EXIF info only
 {
     ++$testnum;
-    my $info = ImageInfo('t/ExifTool.jpg', {Group0 => 'EXIF'});
+    my $info = ImageInfo('t/images/ExifTool.jpg', {Group0 => 'EXIF'});
     print 'not ' unless check($info, $testname, $testnum);
     print "ok $testnum\n";
 }
 
-# test 6: extract specified tags only
+# test 5: extract specified tags only
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
 # don't test DateFormat because strftime output is system dependent
 #    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
     my @tags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate');
-    my $info = $exifTool->ImageInfo('t/ExifTool.jpg', \@tags);
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg', \@tags);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 
-# test 7: test the 4 different ways to exclude tags...
+# test 6: test the 4 different ways to exclude tags...
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Exclude => 'ImageWidth');
     my @tagList = ( '-ImageHeight', '-Make' );
-    my $info = $exifTool->ImageInfo('t/ExifTool.jpg', '-FileSize',
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg', '-FileSize',
                         \@tagList, {Group0 => '-MakerNotes'});
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 
-# tests 8/9: test ExtractInfo(), GetInfo(), CombineInfo()
+# tests 7/8: test ExtractInfo(), GetInfo(), CombineInfo()
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Duplicates => 0);  # don't allow duplicates
-    $exifTool->ExtractInfo('t/ExifTool.jpg');
+    $exifTool->ExtractInfo('t/images/ExifTool.jpg');
     my $info1 = $exifTool->GetInfo({Group0 => 'MakerNotes'});
     my $info2 = $exifTool->GetInfo({Group0 => 'EXIF'});
     my $info = $exifTool->CombineInfo($info1, $info2);
@@ -104,24 +91,24 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 10: test group options across different families
+# test 9: test group options across different families
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/ExifTool.jpg',
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg',
                     { Group1 => 'Canon', Group2 => '-Camera' });
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 
-# test 11/12: test ExtractInfo() and GetInfo()
-# (uses output from test 6 for comparison)
+# test 10/11: test ExtractInfo() and GetInfo()
+# (uses output from test 5 for comparison)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
 # don't test DateFormat because strftime output is system dependent
 #    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
-    $exifTool->ExtractInfo('t/ExifTool.jpg');
+    $exifTool->ExtractInfo('t/images/ExifTool.jpg');
     my @tags = ('createdate', 'datetimeoriginal', 'modifydate');
     my $info = $exifTool->GetInfo(\@tags);
     my $good = 1;
@@ -133,33 +120,33 @@ my $testnum = 1;
     print "ok $testnum\n";
 
     ++$testnum;
-    print 'not ' unless check($exifTool, $info, $testname, $testnum, 6);
+    print 'not ' unless check($exifTool, $info, $testname, $testnum, 5);
     print "ok $testnum\n";
 }
 
-# tests 13/14: check precidence of tags extracted from groups
-# (Note: these tests should produce the same output as 8/9,
-#  so the .out files from tests 8/9 are used)
+# tests 12/13: check precidence of tags extracted from groups
+# (Note: these tests should produce the same output as 7/8,
+#  so the .out files from tests 7/8 are used)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Duplicates => 0);  # don't allow duplicates
-    my $info = $exifTool->ImageInfo('t/ExifTool.jpg',{Group0=>['MakerNotes','EXIF']});
-    print 'not ' unless check($exifTool, $info, $testname, $testnum, 8);
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg',{Group0=>['MakerNotes','EXIF']});
+    print 'not ' unless check($exifTool, $info, $testname, $testnum, 7);
     print "ok $testnum\n";
 
     # combine information in different order
     ++$testnum;
-    $info = $exifTool->ImageInfo('t/ExifTool.jpg',{Group0=>['EXIF','MakerNotes']});
-    print 'not ' unless check($exifTool, $info, $testname, $testnum, 9);
+    $info = $exifTool->ImageInfo('t/images/ExifTool.jpg',{Group0=>['EXIF','MakerNotes']});
+    print 'not ' unless check($exifTool, $info, $testname, $testnum, 8);
     print "ok $testnum\n";
 }
 
-# test 15/16/17: test GetGroups()
+# test 14/15/16: test GetGroups()
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->ExtractInfo('t/ExifTool.jpg');
+    $exifTool->ExtractInfo('t/images/ExifTool.jpg');
     my @groups = $exifTool->GetGroups(2);
     my $not;
     foreach ('Camera','ExifTool','Image','Time') {
@@ -180,7 +167,7 @@ my $testnum = 1;
     open(TESTFILE,">$testfile.failed");
     my $oldSep = $/;   
     $/ = "\x0a";        # set input line separator
-    $exifTool->ExtractInfo('t/ExifTool.jpg');
+    $exifTool->ExtractInfo('t/images/ExifTool.jpg');
     my $family = 1;
     @groups = $exifTool->GetGroups($family);
     my $group;
@@ -198,10 +185,10 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 18: Test verbose output
+# test 17: Test verbose output
 {
     ++$testnum;
-    my ($ok, $skip) = testVerbose($testname, $testnum, 't/ExifTool.jpg', 3);
+    my ($ok, $skip) = testVerbose($testname, $testnum, 't/images/ExifTool.jpg', 3);
     print 'not ' unless $ok;
     print "ok $testnum$skip\n";
 }

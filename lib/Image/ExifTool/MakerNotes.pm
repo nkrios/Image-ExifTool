@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         MakerNotes.pm
 #
-# Description:  Logic to decode EXIF maker notes
+# Description:  Read and write EXIF maker notes
 #
 # Revisions:    11/11/2004 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -515,7 +515,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::MakerNotes - Logic to decode EXIF maker notes
+Image::ExifTool::MakerNotes - Read and write EXIF maker notes
 
 =head1 SYNOPSIS
 

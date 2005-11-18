@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Sony.pm
 #
-# Description:  Definitions for Sony EXIF Maker Notes
+# Description:  Sony EXIF Maker Notes tags
 #
 # Revisions:    04/06/2004  - P. Harvey Created
 #
@@ -46,12 +46,12 @@ encrypted, but thanks to Dave Coffin the decryption algorithm is known.
     0 => {
         Name => 'SRF2_Key',
         Notes => 'key to decrypt maker notes from the start of SRF2',
-        ValueConv => '$self->{SRF2_Key} = $val',
+        RawConv => '$self->{SRF2_Key} = $val',
     },
     1 => {
         Name => 'DataKey',
         Notes => 'key to decrypt the rest of the file from the end of the maker notes',
-        ValueConv => '$self->{SRFDataKey} = $val',
+        RawConv => '$self->{SRFDataKey} = $val',
     },
 );
 
@@ -101,9 +101,9 @@ sub ProcessSRF($$$)
         my $srfTable = $tagTablePtr;
         # SRF6 uses standard EXIF tags
         $srfTable = GetTagTable('Image::ExifTool::Exif::Main') if $ifd == 6;
-        $exifTool->{SET_TAG_EXTRA} = $srf;
+        $exifTool->{SET_GROUP1} = $srf;
         $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $srfTable);
-        delete $exifTool->{SET_TAG_EXTRA};
+        delete $exifTool->{SET_GROUP1};
         last unless $success;
 #
 # get pointer to next IFD
@@ -141,7 +141,7 @@ sub ProcessSRF($$$)
         my %parms = (
             Prefix => "$exifTool->{INDENT}  ",
             Start => $nextIFD,
-            Addr => $nextIFD + $$dirInfo{DataPos},
+            DataPos => $$dirInfo{DataPos},
         );
         $parms{MaxLen} = 96 unless $verbose > 3;
         Image::ExifTool::HexDump($dataPt, $len, %parms);
@@ -154,7 +154,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Sony - Definitions for Sony EXIF maker notes
+Image::ExifTool::Sony - Sony EXIF maker notes tags
 
 =head1 SYNOPSIS
 

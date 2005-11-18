@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Shortcuts.pm
 #
-# Description:  Definitions for tag shortcuts
+# Description:  ExifTool shortcut tags
 #
 # Revisions:    02/07/2004 - P. Harvey Moved out of Exif.pm
 #               09/15/2004 - P. Harvey Added D70Boring from Greg Troxel
@@ -176,7 +176,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Shortcuts - Definitions for Image::ExifTool shortcuts
+Image::ExifTool::Shortcuts - ExifTool shortcut tags
 
 =head1 SYNOPSIS
 

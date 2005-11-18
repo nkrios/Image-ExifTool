@@ -1,0 +1,144 @@
+---- Canon ----
+AEBBracketValue : 0
+AFPoint : Unknown (0)
+AFPointsUsed : 0 ()
+AutoExposureBracketing : Off
+AutoRotate : None
+BlueBalanceAuto : 0.83939
+BlueBalanceB&W : 0.84024
+BlueBalanceCloudy : 0.99046
+BlueBalanceCustom : 0.92849
+BlueBalanceDaylight : 0.84024
+BlueBalanceFlash : 0.60898
+BlueBalanceFluorescent : 0.54676
+BlueBalanceShade : 0.84109
+BlueBalanceTungsten : 0.92027
+BulbDuration : 4
+CameraISO : Use shot ISO instead
+CanonExposureMode : Manual
+CanonFileLength : 4480822
+CanonFirmwareVersion : Firmware Version 1.1.1
+CanonFlashMode : Off
+CanonImageHeight : 2048
+CanonImageHeightAsShot : 2048
+CanonImageSize : Large
+CanonImageType : CRW:EOS DIGITAL REBEL CMOS RAW
+CanonImageWidth : 3072
+CanonImageWidthAsShot : 3072
+ColorTemperature : 5200
+ColorTone : Normal
+ContinuousDrive : Continuous
+Contrast : +1
+DigitalZoom : Unknown (-1)
+EasyMode : Manual
+ExposureCompensation : 0
+ExposureTime (1) : 128
+FNumber (1) : 14
+FileNumber : 118-1861
+FlashActivity : 0
+FlashBits : (none)
+FlashExposureComp : 0
+FocalLength (1) : 34mm
+FocalPlaneXSize : 23.22mm
+FocalPlaneYSize : 15.49mm
+FocalUnits : 1
+FocusContinuous : Unknown (-1)
+FocusDistanceLower : 5.46
+FocusDistanceUpper : -0.01
+FocusMode : Manual Focus
+FocusType : Auto (2)
+ISO : 100
+IxusAFPoint : Unknown (0)
+LensType : Unknown (-1)
+LongFocal : 55
+MacroMode : Unknown (0)
+MaxAperture : 4
+MeteringMode : Center-weighted averaging
+OwnerName : Phil Harvey
+Quality : RAW
+RedBalanceAuto : 2.06611
+RedBalanceB&W : 2.06971
+RedBalanceCloudy : 2.44591
+RedBalanceCustom : 2.32332
+RedBalanceDaylight : 2.06971
+RedBalanceFlash : 1.78860
+RedBalanceFluorescent : 1.34502
+RedBalanceShade : 2.06971
+RedBalanceTungsten : 2.25721
+Saturation : +1
+Self-timer : 0
+Self-timer2 : 0
+SequenceNumber : 0
+SerialNumber : 0560018150
+Sharpness : +1
+ShortFocal : 18
+TargetAperture : 14
+WhiteBalance : Auto
+ZoomedResolution : 3072
+ZoomedResolutionBase : 3072
+---- Composite ----
+Aperture : 14.0
+CircleOfConfusion : 0.019 mm
+DriveMode : Continuous shooting
+FlashOn : Off
+FocalLength35efl : 34.0mm (35mm equivalent: 54.0mm)
+HyperfocalDistance : 4.37 m
+ImageSize : 160x120
+Lens : 18.0 - 55.0mm
+Lens35efl : 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)
+ScaleFactor35efl : 1.6
+ShootingMode : Manual
+ShutterSpeed : 4
+---- ExifIFD ----
+ApertureValue : 14.0
+ColorSpace : sRGB
+ComponentsConfiguration : YCbCr
+CompressedBitsPerPixel : 9
+CreateDate : 2003:12:04 06:46:52
+CustomRendered : Normal
+DateTimeOriginal : 2003:12:04 06:46:52
+ExifImageLength : 120
+ExifImageWidth : 160
+ExifVersion : 0221
+ExposureCompensation (1) : 0
+ExposureMode : Manual
+ExposureTime : 4
+FNumber : 14.0
+FileSource : Digital Camera
+Flash : No Flash
+FlashpixVersion : 0100
+FocalLength : 34.0mm
+FocalPlaneResolutionUnit : inches
+FocalPlaneXResolution : 3443.946
+FocalPlaneYResolution : 3442.017
+ISO (1) : 100
+MaxApertureValue : 4.5
+MeteringMode (1) : Average
+SceneCaptureType : Standard
+SensingMethod : One-chip color area
+ShutterSpeedValue : 0
+UserComment : 
+WhiteBalance (1) : Auto
+---- File ----
+Directory : t/images
+FileModifyDate : 2005:04:16 10:37:10
+FileName : ExifTool.jpg
+FileSize : 3 kB
+FileType : JPEG
+ImageHeight : 120
+ImageWidth : 160
+MIMEType : image/jpeg
+---- IFD0 ----
+Make : Canon
+Model : Canon EOS DIGITAL REBEL
+ModifyDate : 2003:12:04 06:46:52
+Orientation : Horizontal (normal)
+ResolutionUnit : inches
+XResolution : 180
+YCbCrPositioning : Centered
+YResolution : 180
+---- InteropIFD ----
+InteropIndex : THM
+InteropVersion : 0100
+RelatedImageLength : 2048
+RelatedImageWidth : 3072

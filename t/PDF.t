@@ -25,7 +25,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/PDF.pdf');
+    my $info = $exifTool->ImageInfo('t/images/PDF.pdf');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }

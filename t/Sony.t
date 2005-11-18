@@ -25,7 +25,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/Sony.jpg',{'Unknown'=>1});
+    my $info = $exifTool->ImageInfo('t/images/Sony.jpg',{'Unknown'=>1});
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }

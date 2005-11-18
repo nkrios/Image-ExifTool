@@ -50,7 +50,7 @@ meaning of each special key:
   (reference to directory information hash) is optional, and if specified gives
   information about the source directory for tags to be copied to the output.
 
-  CHECK_PROC : Reference to a function which validates raw values for writing.
+  CHECK_PROC : Reference to a function which validates Raw values for writing.
   The function takes three arguments: 0) ExifTool object reference, 1) tagInfo
   reference, 2) value reference, and returns undefined (and possibly modifies
   the input value) if successful, or an error message if there was a format
@@ -209,45 +209,60 @@ conditions.  The following is a description of possible hash entries:
                   'MakerNotes' - set if this tag is maker note data.
 
                   'DataMember' - name of exiftool data member associated with
-                  this tag if it should be stored as a special data member.
+                  this tag if it should be stored as a special data member when
+                  writing information.  Necessary only if the value of the tag
+                  affects other written information.
 
                   'Permanent' - flag indicates that a tag is permanent, and
                   can't be added or deleted from the file.  By default, all
                   MakerNotes tags are permanent unless otherwise specified.
-                  
+
                   'Avoid' - avoid creating this tag if possible.
 
                   'Unknown' - this is an unknown tag (only extracted when the
                   Unknown option is set.
-                  
-  ValueConv     : [optional] Used to convert the raw data value to a useable
-                  form.  May be a hash reference to act as a lookup table, a
-                  scalar which is evaluated as a Perl expression, or a code
-                  reference to a subroutine. If a hash reference is used and the
-                  raw value doesn't appear as one of the keys, then the
-                  converted value is set to "Unknown (X)", where X is the raw
-                  value.  In an expression, $val is the raw value, and $self is
-                  a reference to the current ExifTool object.  The subroutine
-                  takes 2 arguments: a reference to the  and the value to
-                  convert ExifTool object.  When evaluated, the expression or
-                  subroutine may return either a scalar representing the a
-                  printable value, or a scalar reference to the value if it is
-                  not printable (as with a binary data block).  Composite tags
-                  which Require or Desire other tags may access the ValueConv
-                  and PrintConv values of these tags through the elements of the
-                  @val and @valPrint lists. The result of the ValueConv
-                  evaluation may be undefined to indicate the tag should be
-                  ignored.  If ValueConv is not specified, the raw value is not
-                  converted.
+
+  RawConv       : [optional] Used to convert the Raw value at extraction time
+                  (while the image file is still open, unlike ValueConv and
+                  PrintConv below which are done later only if the value is
+                  requested).  The expression may use $self to represent the
+                  current ExifTool object, and $val for the Raw tag value.  For
+                  Composite tags, $val is a reference to a hash of component tag
+                  names, and @val may be used to access the Raw values of these
+                  tags.  The returned value may be a scalar with is used as the
+                  new Raw value, a scalar reference to a binary data value, or
+                  undefined to indicate that the tag should be ignored.  Note:
+                  RawConv should only be used if necessary.  It is preferable to
+                  use ValueConv instead of RawConv because ValueConv is only
+                  executed if the tag value is requested, while RawConv is
+                  executed for all extracted tags.
+
+  ValueConv     : [optional] Used to convert the Raw value to a useable form.
+                  May be a hash reference to act as a lookup table, a scalar
+                  which is evaluated as a Perl expression, or a code reference
+                  to a subroutine.  If a hash reference is used and the Raw
+                  value doesn't appear as one of the keys, then the converted
+                  value is set to "Unknown (X)", where X is the Raw value.  In
+                  an expression, $self is a reference to the current ExifTool
+                  object, $val is the Raw value, and $tag is the tag name.  The
+                  subroutine takes 2 arguments: the Raw value and a reference to
+                  the current ExifTool object.  When evaluated, the expression
+                  or subroutine returns a scalar for the converted value, a
+                  scalar reference to a binary data value, or undefined to
+                  ignore the tag.  Composite tags which Require or Desire other
+                  tags may access the ValueConv and PrintConv values of these
+                  tags through the elements of the @val and @valPrint lists.  If
+                  ValueConv is not specified, the Raw value is not converted.
 
   PrintConv     : [optional] This entry is similar to ValueConv above, except
                   that it is used to further convert the tag value to a human
                   readable form.  It can be either a hash lookup, a scalar Perl
-                  expression or a code reference.  In this expression, $val
-                  represents the result of the ValueConv from above.  Note that
-                  the print conversion is only done if the PrintConv option is
-                  enabled (which it is by default), and if the result of the
-                  ValueConv is not a scalar reference.
+                  expression or a code reference.  In this expression, $self,
+                  $val and $tag may be used as with ValueConv, but the returned
+                  value should always be defined.  Note that the print
+                  conversion is only done if the PrintConv option is enabled
+                  (which it is by default), and if the result of the ValueConv
+                  is not a scalar reference.
 
   ValueConvInv  : [optional] The inverse of ValueConv.  Only necessary if
                   ValueConv is specified and this tag is Writable.  Note that
@@ -262,7 +277,7 @@ conditions.  The following is a description of possible hash entries:
                   Perl expression to decide whether the tag is valid.  If used
                   in a list, the first list entry with a true condition is
                   taken.  If no condition exists, then a 'true' condition is
-                  assumed.  The previous value for this tag is available as
+                  assumed.  The previous Raw value for this tag is available as
                   $oldVal for use in the logic expression.  The first 48 bytes
                   of the raw data value are accessible through the reference
                   $valPt for EXIF and Jpeg2000 tags only.  Note that if the
@@ -288,6 +303,10 @@ conditions.  The following is a description of possible hash entries:
                   may exist together, however be sure to specify unique keys for
                   each tag since they are used as indices into the @val and
                   @valPrint lists.
+
+  Shift         : [optional] For Writable tags only.  Specifies type of shift
+                  to apply if this value may be shifted.  Set to 'Time' for
+                  shifting date/time tags.
 
   Writable      : [optional] Indicates this tag can be written (or not written
                   if value is set to zero), and for EXIF-type tables gives
@@ -391,8 +410,10 @@ conditions.  The following is a description of possible hash entries:
                   procedure specified by PROCESS_PROC in the tag table.
 
      DirName    : [optional] Name of this subdirectory.  If not specified, the
-                  name is taken from the TagTable default GROUP0 name, or from
-                  the tag Group1 name if no TagTable specified.
+                  name is taken from the tag name.  DirName is important because
+                  it is used when writing to compare against names in the
+                  directory map to determine which directories need to be
+                  edited.
 
      FixBase    : [optional] Flag set if base offsets should be fixed.
   }

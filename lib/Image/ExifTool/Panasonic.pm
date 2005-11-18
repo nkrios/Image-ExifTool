@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Panasonic.pm
 #
-# Description:  Definitions for Panasonic/Leica Maker Notes
+# Description:  Panasonic/Leica maker notes tags
 #
 # Revisions:    11/10/2004 - P. Harvey Created
 #
@@ -195,7 +195,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Panasonic - Definitions for Panasonic/Leica maker notes
+Image::ExifTool::Panasonic - Panasonic/Leica maker notes tags
 
 =head1 SYNOPSIS
 

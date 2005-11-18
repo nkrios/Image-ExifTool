@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         GPS.pm
 #
-# Description:  Definitions for EXIF GPS tags
+# Description:  EXIF GPS meta information tags
 #
 # Revisions:    12/09/2003  - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -84,9 +84,10 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x0007 => {
         Name => 'GPSTimeStamp',
+        Groups => { 2 => 'Time' },
         Writable => 'rational32u',
         Count => 3,
-        Groups => { 2 => 'Time' },
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => '$val=~tr/:/ /;$val',
     },
@@ -231,9 +232,10 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x001D => {
         Name => 'GPSDateStamp',
+        Groups => { 2 => 'Time' },
         Writable => 'string',
         Count => 11,
-        Groups => { 2 => 'Time' },
+        Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => '$val',
     },
@@ -278,10 +280,8 @@ GPSAltitude and GPSAltitudeRef.
             return "$val[0] $val[1]";
         },
         PrintConv => q{
-            require Image::ExifTool::XMP;
-            my @vals = split ' ', $val;
-            my $lat  = Image::ExifTool::GPS::ToDMS($self, $val[0], 1, "N");
-            my $long = Image::ExifTool::GPS::ToDMS($self, $val[1], 1, "E");
+            my $lat  = Image::ExifTool::GPS::ToDMS($self, $val[0], 1, 'N');
+            my $long = Image::ExifTool::GPS::ToDMS($self, $val[1], 1, 'E');
             return "$lat, $long";
         },
     },
@@ -357,7 +357,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::GPS - Definitions for GPS meta information
+Image::ExifTool::GPS - EXIF GPS meta information tags
 
 =head1 SYNOPSIS
 

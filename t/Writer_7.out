@@ -1,8 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
-[File, File, Image]  - File Name: Writer_8_failed.jpg
-[File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:36:11
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.69
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -19,15 +15,15 @@
 [EXIF, ExifIFD, Image] 33437 - Aperture: 14.0
 [EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
+[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:12:04 06:46:52
 [EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:12:04 06:46:52
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 14.0
-[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: +999
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 4.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Average
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Cloudy
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 34.0mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
@@ -39,16 +35,15 @@
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.95
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.02
-[EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: mm
+[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.946
+[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.017
+[EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Manual
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
-[EXIF, IFD0, Time] 36867 - Shooting Date/Time: 2005:01:01 00:00:00
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
 [MakerNotes, Canon, Camera] 3 - Image Quality: RAW
@@ -118,7 +113,7 @@
 [MakerNotes, Canon, Camera] 2 - Red Balance Daylight: 2.06971
 [MakerNotes, Canon, Camera] 3 - Blue Balance Daylight: 0.84024
 [MakerNotes, Canon, Camera] 4 - Red Balance Cloudy: 2.44591
-[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99047
+[MakerNotes, Canon, Camera] 5 - Blue Balance Cloudy: 0.99046
 [MakerNotes, Canon, Camera] 6 - Red Balance Tungsten: 2.25721
 [MakerNotes, Canon, Camera] 7 - Blue Balance Tungsten: 0.92027
 [MakerNotes, Canon, Camera] 8 - Red Balance Fluorescent: 1.34502
@@ -141,20 +136,15 @@
 [MakerNotes, Canon, Camera] 19 - Canon 0x0013: 0 159 7 112
 [MakerNotes, Canon, Camera] 181 - Canon 0x00b5: 10 3 1 2048 1360
 [MakerNotes, Canon, Camera] 0 - Canon 0x0000: 0 0 0 0 0 0 3072000 892 2048000 595 65540 262146
-[IPTC, IPTC, Other] 15 - Category: IPTC test
-[IPTC, IPTC, Other] 0 - Application Record Version: 4
-[XMP, XMP-crs, Image] Contrast - Contrast: +2
-[XMP, XMP-dc, Image] description - Description: New description
-[XMP, XMP-exif, Camera] Contrast - Contrast: High
 [Composite, Composite, Image]  - Aperture: 14.0
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 40.4
+[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4
-[Composite, Composite, Image]  - Circle Of Confusion: 0.001 mm
-[Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 1372.0mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 110.89 m
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 726.3 - 2219.4mm)
+[Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
+[Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 54.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 4.37 m
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)

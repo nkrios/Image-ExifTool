@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
 [File, File, Image]  - File Name: Kodak.jpg
-[File, File, Image]  - Directory: t
+[File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2005:04:02 19:17:12
+[File, File, Time]  - File Modification Date/Time: 2005:04:02 19:20:31
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -51,8 +51,9 @@
 [MakerNotes, Kodak, Camera] 10 - Burst Mode: Off
 [MakerNotes, Kodak, Camera] 12 - Kodak Image Width: 2448
 [MakerNotes, Kodak, Camera] 14 - Kodak Image Height: 1632
-[MakerNotes, Kodak, Camera] 16 - Date: 2002:05:01
-[MakerNotes, Kodak, Camera] 20 - Time: 10:22:28.62
+[MakerNotes, Kodak, Time] 16 - Year Created: 2002
+[MakerNotes, Kodak, Time] 18 - Month Day Created: 05:01
+[MakerNotes, Kodak, Time] 20 - Time Created: 10:22:28.62
 [MakerNotes, Kodak, Camera] 27 - Shutter Mode: Auto
 [MakerNotes, Kodak, Camera] 28 - Metering Mode: Multi-pattern
 [MakerNotes, Kodak, Camera] 29 - Sequence Number: 0
@@ -71,6 +72,8 @@
 [MakerNotes, Kodak, Camera] 104 - Digital Zoom: 1
 [MakerNotes, Kodak, Camera] 107 - Sharpness: Normal
 [Composite, Composite, Image]  - Aperture: 6.7
+[Composite, Composite, Time]  - Date Created: 2002:05:01
+[Composite, Composite, Time]  - Date/Time Created: 2002:05:01 10:22:28.62
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Image]  - Shutter Speed: 1/216
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

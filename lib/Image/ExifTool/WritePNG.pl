@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WritePNG.pl
 #
-# Description:  Routines for writing PNG metadata
+# Description:  Write PNG meta information
 #
 # Revisions:    09/16/2005 - P. Harvey Created
 #
@@ -173,7 +173,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WritePNG.pl - Routines for writing PNG metadata
+Image::ExifTool::WritePNG.pl - Write PNG meta information
 
 =head1 SYNOPSIS
 

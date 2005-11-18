@@ -143,13 +143,14 @@ comment.out</code>".
 
 Writing the preview image in JPEG files poses problems of its own.  These
 problems stem from the fact that the JPEG standard is inadequate for storing
-large preview images due to the 64kB limit on segment size as mentioned above. 
-(Note that TIFF images don't have this problem since they have a 4GB limit.) 
+large preview images due to the 64kB limit on segment size as mentioned above.
+(Note that TIFF images don't have this problem since they have a 4GB limit.)
 Most manufacturers get around this by appending the preview after the normal end
 of the JPEG file, but this causes complications because it means that the
 preview image pointers in the EXIF information now point outside the EXIF
 segment.  This is truly unfortunate because it greatly complicates things for
-image writing software.
+image writing software.  Most other software can't deal with a preview image and
+will simply remove the preview when rewriting the file.
 
 <p>However, as of ExifTool version 5, the preview images are handled properly
 when writing EXIF information in JPEG files.  But for reasons of efficiency, the
@@ -161,22 +162,21 @@ preview image (at the end of the file) is likely to change.  ExifTool gets
 around this when reading JPEG images by looking for the preview at the end of
 the file and updating pointers if necessary, but the preview image may not be
 readable by other software (it should be noted though that very few image
-readers even know the preview image exists, and many writing utilities will
-delete the preview image without even realizing).  However, the preview pointers
-in such a file can be fixed if necessary by simply using ExifTool to edit any
-EXIF information.
+readers even know the preview image exists).  However, the preview pointers in
+such a file can be fixed if necessary by simply using ExifTool to edit any EXIF
+information.
 
 <h3>IFD0/ExifIFD Ambiguity</h3>
 
-ExifTool has a preferred location where it writes all EXIF tags.  However, a
-number of tags have been observed in different locations in the EXIF information
-of different images.  Specifically, the following tags have been observed in
-both IFD0 and ExifIFD: Make, Model, Software, Artist, DateTimeOriginal,
+ExifTool has a preferred location (IFD) where it writes all EXIF tags.  However,
+a number of tags have are written to different locations by various digital
+cameras or image editors.  Specifically, the following tags have been observed
+in both IFD0 and ExifIFD: Make, Model, Software, Artist, DateTimeOriginal,
 SensingMethod, CustomRendered, ExposureMode, WhiteBalance, DigitalZoomRatio and
 SceneCaptureType.  To handle this ambiguity, ExifTool will delete the tag if it
 exists in IFD0 when it is written to ExifIFD, and vice versa.
 
 <hr>
-<i>Last revised May 12, 2005</i>
+<i>Last revised Oct. 14, 2005</i>
 </body>
 </html>

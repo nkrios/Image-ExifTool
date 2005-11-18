@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         QuickTime.pm
 #
-# Description:  Routines fro reading QuickTime files
+# Description:  Read QuickTime meta information
 #
 # Revisions:    10/04/2005 - P. Harvey Created
 #
@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub FixWrongFormat($);
 
@@ -33,7 +33,7 @@ my %durationInfo = (
 
 # QuickTime atoms
 %Image::ExifTool::QuickTime::Main = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessQuickTime,
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     NOTES => q{
 Tags with a question mark after their name are not extracted unless the
 Unknown option is set.
@@ -58,7 +58,7 @@ Unknown option is set.
 
 # atoms used in QTIF files
 %Image::ExifTool::QuickTime::ImageFile = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessQuickTime,
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     NOTES => q{
 Tags used in QTIF QuickTime Image Files.
     },
@@ -111,7 +111,7 @@ Tags used in QTIF QuickTime Image Files.
 
 # movie atoms
 %Image::ExifTool::QuickTime::Movie = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessQuickTime,
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     mvhd => {
         Name => 'MovieHeader',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MovieHdr' },
@@ -143,7 +143,7 @@ Tags used in QTIF QuickTime Image Files.
     },
     3 => {
         Name => 'TimeScale',
-        ValueConv => '$self->{TimeScale} = $val',
+        RawConv => '$self->{TimeScale} = $val',
     },
     4 => { Name => 'Duration', %durationInfo },
     5 => {
@@ -167,7 +167,7 @@ Tags used in QTIF QuickTime Image Files.
 
 # track atoms
 %Image::ExifTool::QuickTime::Track = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessQuickTime,
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     tkhd => {
         Name => 'TrackHeader',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TrackHdr' },
@@ -233,7 +233,7 @@ Tags used in QTIF QuickTime Image Files.
 
 # user data atoms
 %Image::ExifTool::QuickTime::UserData = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessQuickTime,
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     NOTES => q{
 Tag ID's beginning with the copyright symbol (hex 0xa9) are multi-language
 text, but ExifTool only extracts the text from the first language in the
@@ -342,7 +342,7 @@ sub FixWrongFormat($)
 # Inputs: 0) ExifTool object reference, 1) directory information reference
 #         2) optional tag table reference
 # Returns: 1 on success
-sub ProcessQuickTime($$;$)
+sub ProcessMOV($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $raf = $$dirInfo{RAF};
@@ -416,11 +416,11 @@ sub ProcessQuickTime($$;$)
                     }
                     if ($$tagInfo{Name} eq 'Track') {
                         $track or $track = 0;
-                        $exifTool->{SET_TAG_EXTRA} = 'Track' . (++$track);
+                        $exifTool->{SET_GROUP1} = 'Track' . (++$track);
                     }
                     my $subTable = GetTagTable($$subdir{TagTable});
                     $exifTool->ProcessDirectory(\%dirInfo, $subTable);
-                    delete $exifTool->{SET_TAG_EXTRA};
+                    delete $exifTool->{SET_GROUP1};
                     SetByteOrder('MM');
                 } else {
                     if ($tag =~ /^\xa9/) {
@@ -445,13 +445,23 @@ sub ProcessQuickTime($$;$)
     return 1;
 }
 
+#------------------------------------------------------------------------------
+# Process a QuickTime Image File
+# Inputs: 0) ExifTool object reference, 1) directory information reference
+# Returns: 1 on success
+sub ProcessQTIF($$)
+{
+    my $table = GetTagTable('Image::ExifTool::QuickTime::ImageFile');
+    return ProcessMOV($_[0], $_[1], $table);
+}
+
 1;  # end
 
 __END__
 
 =head1 NAME
 
-Image::ExifTool::QuickTime - Routines for reading QuickTime files
+Image::ExifTool::QuickTime - Read QuickTime meta information
 
 =head1 SYNOPSIS
 

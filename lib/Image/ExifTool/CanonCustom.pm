@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         CanonCustom.pm
 #
-# Description:  Definitions for Canon Custom functions
+# Description:  Read and write Canon Custom functions
 #
 # Revisions:    11/25/2003  - P. Harvey Created
 #
@@ -14,7 +14,7 @@ package Image::ExifTool::CanonCustom;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessCanonCustom($$$);
 sub WriteCanonCustom($$$);
@@ -663,16 +663,12 @@ sub ProcessCanonCustom($$$)
         my $val = Image::ExifTool::Get16u($dataPt,$offset+$pos);
         my $tag = ($val >> 8);
         $val = ($val & 0xff);
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
-            'Table'  => $tagTablePtr,
-            'Index'  => $pos/2-1,
-            'Value'  => $val,
-            'Format' => 'int8u',
-            'Count'  => 1,
-            'Size'   => 1,
+        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+            Index  => $pos/2-1,
+            Format => 'int8u',
+            Count  => 1,
+            Size   => 1,
         );
-        $tagInfo and $exifTool->FoundTag($tagInfo,$val);
     }
     return 1;
 }
@@ -739,7 +735,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::CanonCustom - Definitions for Canon custom functions
+Image::ExifTool::CanonCustom - Read and Write Canon custom functions
 
 =head1 SYNOPSIS
 

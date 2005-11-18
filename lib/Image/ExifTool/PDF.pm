@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         PDF.pm
 #
-# Description:  Routines for reading PDF files
+# Description:  Read PDF meta information
 #
 # Revisions:    07/11/05 - P. Harvey Created
 #               07/25/05 - P. Harvey Add support for encrypted documents
@@ -693,7 +693,7 @@ sub DecodeStream($$)
             my $inflate = Compress::Zlib::inflateInit();
             my ($buff, $stat);
             $inflate and ($buff, $stat) = $inflate->inflate($$dict{stream});
-            if ($stat == 1) {
+            if ($inflate and $stat == Compress::Zlib::Z_STREAM_END()) {
                 $$dict{stream} = $buff;
                 # move Filter to prevent double decoding
                 $$dict{oldFilter} = $$dict{Filter};
@@ -1248,7 +1248,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PDF - Routines for reading PDF files
+Image::ExifTool::PDF - Read PDF meta information
 
 =head1 SYNOPSIS
 

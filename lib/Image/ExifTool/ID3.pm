@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         ID3.pm
 #
-# Description:  Extract ID3 information from MP3 audio files
+# Description:  Read ID3 meta information from MP3 audio files
 #
 # Revisions:    09/12/2005 - P. Harvey Created
 #
@@ -19,7 +19,7 @@ $VERSION = '1.00';
 
 sub ProcessID3v2($$$);
 
-# This table is just for documenation purposes
+# This table is just for documentation purposes
 %Image::ExifTool::ID3::Main = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData, # (not really)
     NOTES => q{
@@ -644,7 +644,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::ID3 - Read ID3 information from MP3 audio files
+Image::ExifTool::ID3 - Read ID3 meta information from MP3 audio files
 
 =head1 SYNOPSIS
 

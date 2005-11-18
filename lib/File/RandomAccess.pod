@@ -10,7 +10,7 @@
 
 =head1 NAME
 
-File::RandomAccess - Allow random access reading of sequential file or scalar
+File::RandomAccess - Random access reads of sequential file or scalar
 
 =head1 SYNOPSIS
 

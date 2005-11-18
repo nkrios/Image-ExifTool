@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Unknown.pm
 #
-# Description:  Definitions for Unknown EXIF Maker Notes
+# Description:  Unknown EXIF maker notes tags
 #
 # Revisions:    04/07/2004  - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Unknown - Definitions for unknown EXIF Maker Notes
+Image::ExifTool::Unknown - Unknown EXIF maker notes tags
 
 =head1 SYNOPSIS
 

@@ -24,7 +24,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/Casio.jpg');
+    my $info = $exifTool->ImageInfo('t/images/Casio.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -33,7 +33,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/Casio2.jpg');
+    my $info = $exifTool->ImageInfo('t/images/Casio2.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -57,7 +57,7 @@ my $testnum = 1;
         ['YResolution',300],
         ['Timezone','EST5EDT'],
     );
-    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/Casio2.jpg');
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Casio2.jpg');
     print "ok $testnum\n";
 }
 

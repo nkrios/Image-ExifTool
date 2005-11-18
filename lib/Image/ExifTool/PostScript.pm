@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         PostScript.pm
 #
-# Description:  Definitions for reading PostScript (EPS, PS and AI) files
+# Description:  Read PostScript meta information
 #
 # Revisions:    07/08/05 - P. Harvey Created
 #
@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # PostScript tag table
 %Image::ExifTool::PostScript::Main = (
@@ -187,9 +187,7 @@ sub ProcessPS($$)
             if ($val =~ s/^\((.*)\)$/$1/) { # remove brackets if necessary
                 $val =~ s/\) \(/, /g;       # convert contained brackets too
             }
-            my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-            $verbose and $exifTool->VerboseInfo($tag, $tagInfo, Value=>$val);
-            $exifTool->FoundTag($tagInfo, $val);
+            $exifTool->HandleTag($tagTablePtr, $tag, $val);
             next;
         } else {
             next;
@@ -214,6 +212,15 @@ sub ProcessPS($$)
     return 1;
 }
 
+#------------------------------------------------------------------------------
+# Extract information from EPS file
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Returns: 1 if this was a valid PostScript file
+sub ProcessEPS($$)
+{
+    return ProcessPS($_[0],$_[1]);
+}
+
 1; # end
 
 
@@ -221,7 +228,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PostScript - Definitions for reading PostScript files
+Image::ExifTool::PostScript - Read PostScript meta information
 
 =head1 SYNOPSIS
 

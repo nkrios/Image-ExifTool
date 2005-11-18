@@ -24,7 +24,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/GeoTiff.tif');
+    my $info = $exifTool->ImageInfo('t/images/GeoTiff.tif');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -33,7 +33,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my @writeInfo = (['ResolutionUnit','cm']);
-    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/GeoTiff.tif');
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/GeoTiff.tif');
     print "ok $testnum\n";
 }
 

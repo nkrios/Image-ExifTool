@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WritePhotoshop.pl
 #
-# Description:  Routines for writing Photoshop IRB resource
+# Description:  Write Photoshop IRB meta information
 #
 # Revisions:    12/17/2004 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WritePhotoshop.pl - Routines to write Photoshop IRB resource
+Image::ExifTool::WritePhotoshop.pl - Write Photoshop IRB meta information
 
 =head1 SYNOPSIS
 

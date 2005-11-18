@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         BMP.pm
 #
-# Description:  Routines for reading BMP images
+# Description:  Read BMP meta information
 #
 # Revisions:    07/16/2005 - P. Harvey Created
 #
@@ -107,7 +107,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::BMP - Routines for reading BMP images
+Image::ExifTool::BMP - Read BMP meta information
 
 =head1 SYNOPSIS
 

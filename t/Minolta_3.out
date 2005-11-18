@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.73
 [File, File, Image]  - File Name: Minolta_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 14 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:35:37
+[File, File, Time]  - File Modification Date/Time: 2005:11:02 17:19:19
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -78,8 +78,8 @@
 [MakerNotes, Minolta, Camera] 18 - Focal Length: 41.4mm
 [MakerNotes, Minolta, Camera] 19 - Focus Distance: 2 m
 [MakerNotes, Minolta, Camera] 20 - Flash Fired: No
-[MakerNotes, Minolta, Camera] 21 - Minolta Date: 2005:01:16
-[MakerNotes, Minolta, Camera] 22 - Minolta Time: 12:37:27
+[MakerNotes, Minolta, Time] 21 - Minolta Date: 2005:01:16
+[MakerNotes, Minolta, Time] 22 - Minolta Time: 12:37:27
 [MakerNotes, Minolta, Camera] 23 - Max Aperture: 3.4
 [MakerNotes, Minolta, Camera] 26 - File Number Memory: On
 [MakerNotes, Minolta, Camera] 27 - Last File Number: 32
@@ -124,7 +124,6 @@
 [IPTC, IPTC, Other] 120 - Caption-Abstract: A new caption/abstract
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
 [Composite, Composite, Image]  - Aperture: 5.6
-[Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 4.0

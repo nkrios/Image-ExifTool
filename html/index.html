@@ -10,62 +10,85 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool by Phil Harvey</h1>
 
-<table><tr><td bgcolor='#cc0000'>
-<font color='#ffffff' size='+1'>&nbsp;<b>ExifTool Version 5 is Here!&nbsp;</b></font></td><td>
-<font color='#cc0000' size='+1'>-- <b>Read</b> <i>and</i> <b>Write</b> Meta Information!</font></td>
-</tr></table>
-
-<p>ExifTool versions 4.00 through 4.95 were an evolution of the writing
-abilities, but with the release of version 5 all of the major planned
-writing features have now been incorporated!
+<font color='#cc0000' size='+2'><b>Read</b> <i>and</i> <b>Write</b> Meta Information!</font>
 
 <h3>
-<a href="Image-ExifTool-5.67.tar.gz">
-Download        Version 5.67</a> - Oct. 13, 2005
+<a href="Image-ExifTool-5.77.tar.gz">
+Download        Version 5.77</a> - Nov. 18, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
 <a href="exiftool_pod.html">command-line application</a> for reading and writing
-meta information in image files.  It reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF,
-ICC Profile, Photoshop IRB and ID3 meta information from JPG, JP2, TIFF, GIF,
-PNG, MNG, JNG, MIFF, PICT, EPS, PS, AI, PDF, PSD, BMP, PPM, PGM, PBM, THM, CRW,
-CR2, MRW, NEF, PEF, ORF, RAF, SRF, MOS and DNG images, MP3 and WAV audio files,
-and MOV videos. ExifTool also extracts information from the maker notes of many
-digital cameras by various manufacturers including Canon, Casio, FujiFilm,
-Kodak, Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica,
+meta information in image files.  It recognizes EXIF, GPS, IPTC, XMP, JFIF,
+GeoTIFF, ICC Profile, Photoshop IRB and ID3 meta information as well as the
+maker notes of many digital cameras including Canon, Casio, FujiFilm, Kodak,
+Leaf, Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica,
 Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
 
-<p>ExifTool writes EXIF, GPS, IPTC, XMP and MakerNotes meta information to JPEG,
-TIFF, GIF, PPM, PGM, PBM, PNG, MNG, JNG, THM, CRW, CR2, MRW, NEF, PEF, MOS and
-DNG images. When writing, ExifTool preserves the original file by adding
-"_original" to the file name.  You should keep a copy of the original, or
-thoroughly validate the new file before erasing the original.  <a
-href="writing.html">Read here</a> for some ramblings on the subject of writing
-meta information.
+<p>When writing information, ExifTool preserves the original file by adding
+"_original" to the file name.  Be sure to keep a copy of the original, or
+thoroughly validate the new file before erasing the original.
+<a href="writing.html">Read here</a> for some ramblings on the subject of
+writing meta information.
 
-<p>Drop me a note if you find ExifTool useful, or if you have any comments
-or suggestions.  My e-mail address is in the README file.  Thanks.
 
 <h2>Features</h2>
 <ul>
-<li>powerful, fast, and easy to use
-<li>works on a large number of different file formats
-<li>reads EXIF, GPS, IPTC, XMP, MakerNotes, JFIF, GeoTIFF, ICC Profile,
+<li>Powerful, fast, and easy to use
+<li><a href="#supported">Supports a large number of different file formats</a>
+<li>Reads EXIF, GPS, IPTC, XMP, MakerNotes, JFIF, GeoTIFF, ICC Profile,
     Photoshop IRB and ID3 records
-<li>writes EXIF, GPS, IPTC, XMP and MakerNotes information
-<li>reads and writes maker notes of many digital cameras
-<li>deletes meta information individually, in groups, or all together
-<li>copies meta information between files (even if they are different formats)
-<li>allows information to be rewritten to any specified tag or location
-<li>highly customizable, can extract exactly what you want
-<li>scans entire directory trees
-<li>easy to add support for new camera types by editing ExifTool modules
-<li>option to create text output file for each image file
-<li>extracts thumbnail images, preview images, and JPEG images embedded in RAW files
-<li>ability to organize output into groups
-<li>recognizes over <a href="TagNames/index.html">1600 different tags</a>
-<li>sets the file modification date from EXIF information
+<li>Writes EXIF, GPS, IPTC, XMP and MakerNotes information
+<li>Reads and writes maker notes of many digital cameras
+<li>Very flexible -- read or write exactly the information you want
+<li><a href="#shift">Shifts date/time values</a> to fix timestamps in images
+<li>Extracts thumbnail images, preview images, and JPEG images embedded in RAW files
+<li>Copies meta information between files (even if they are different formats)
+<li>Deletes meta information individually, in groups, or all together
+<li>Sets the file modification date from EXIF information
+<li>Scans entire directory trees
+<li>Creates text output file for each image file
+<li>Organizes output into groups
+<li>Ability to add user-defined tags
+<li>Recognizes <a href="TagNames/index.html">thousands of different tags</a>
 </ul>
+
+<h2><a name="Supported">Supported File Types</a></h2>
+<blockquote><table cellpadding=2 cellspacing=0 border=1>
+<tr><th>File Type</th><th>Read/Write</th><th>Description</th></tr>
+<tr><td>ACR</td><td>R</td><td>American College of Radiology ACR-NEMA (DICOM-like)</td></tr>
+<tr><td>AI</td><td>R</td><td>Adobe Illustrator (PS or PDF)</td></tr>
+<tr><td>BMP, DIB</td><td>R</td><td>Windows BitMaP / Device Independent Bitmap</td></tr>
+<tr><td>CR2</td><td>R/W</td><td>Canon RAW 2 format (TIFF-like)</td></tr>
+<tr><td>CRW</td><td>R/W</td><td>Canon RAW format</td></tr>
+<tr><td>DCM, DC3, DIC, DICM</td><td>R</td><td>DICOM - Digital Imaging and Communications in Medicine</td></tr>
+<tr><td>DNG</td><td>R/W</td><td>Digital Negative (TIFF-like)</td></tr>
+<tr><td>GIF</td><td>R/W</td><td>Compuserve Graphics Interchange Format</td></tr>
+<tr><td>JP2, JPX</td><td>R</td><td>JPEG 2000 file</td></tr>
+<tr><td>JPEG, JPG</td><td>R/W</td><td>Joint Photographic Experts Group</td></tr>
+<tr><td>MIFF, MIFF</td><td>R</td><td>Magick Image File Format</td></tr>
+<tr><td>MOS</td><td>R/W</td><td>Creo Leaf Mosaic (TIFF-like)</td></tr>
+<tr><td>MOV</td><td>R</td><td>Apple QuickTime Movie</td></tr>
+<tr><td>MP3</td><td>R</td><td>MPEG Layer 3 audio (uses ID3 information)</td></tr>
+<tr><td>MRW</td><td>R/W</td><td>Minolta RAW format</td></tr>
+<tr><td>NEF</td><td>R/W</td><td>Nikon (RAW) Electronic Format (TIFF-like)</td></tr>
+<tr><td>ORF</td><td>R</td><td>Olympus RAW format</td></tr>
+<tr><td>PDF</td><td>R</td><td>Adobe Portable Document Format</td></tr>
+<tr><td>PEF</td><td>R/W</td><td>Pentax (RAW) Electronic Format (TIFF-like)</td></tr>
+<tr><td>PICT, PCT</td><td>R</td><td>Apple Picture file</td></tr>
+<tr><td>PNG, JNG, MNG</td><td>R/W</td><td>Portable/JPEG/Multiple-image Network Graphics</td></tr>
+<tr><td>PPM, PBM, PGM</td><td>R/W</td><td>Portable Pixel/Bit/Gray Map</td></tr>
+<tr><td>PS, EPS, EPSF</td><td>R</td><td>[Encapsulated] PostScript Format</td></tr>
+<tr><td>PSD</td><td>R</td><td>PhotoShop Drawing</td></tr>
+<tr><td>QTIF, QTI, QIF</td><td>R</td><td>QuickTime Image File</td></tr>
+<tr><td>RAF</td><td>R</td><td>FujiFilm RAW Format</td></tr>
+<tr><td>SRF</td><td>R</td><td>Sony RAW Format (TIFF-like)</td></tr>
+<tr><td>THM</td><td>R/W</td><td>Canon Thumbnail (JPG)</td></tr>
+<tr><td>TIFF, TIF</td><td>R/W</td><td>Tagged Image File Format</td></tr>
+<tr><td>WAV</td><td>R</td><td>WAVeform (Windows digital audio format)</td></tr>
+<tr><td>X3F</td><td>R</td><td>Sigma/Foveon RAW format</td></tr>
+<tr><td>XMP</td><td>R/W</td><td>Extensible Metadata Platform data file</td></tr>
+</table></blockquote>
 
 <h2><font color='#cc0000'>Writer Limitations</font></h2>
 <ul>
@@ -209,21 +232,23 @@ These groups are:
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>APP12, BMP, Canon, Composite, EXIF, ExifTool, File, GPS, GeoTiff,
-ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG, MakerNotes, PICT, PDF,
-PNG, Pentax, Photoshop, PostScript, PrintIM, QuickTime, WAV, XMP
+<td>APP12, BMP, Canon, Composite, DICOM, EXIF, ExifTool, File, GPS, GeoTiff,
+ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG, MakerNotes, Meta,
+PDF, PICT, PNG, Pentax, Photoshop, PostScript, PrintIM, QuickTime, SigmaRaw,
+WAV, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, ExifIFD,
-ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt,
-ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3,
-ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, Jpeg2000, Kodak,
+<td>APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, DICOM,
+ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm,
+ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2,
+ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, Jpeg2000, Kodak,
 KodakBordersIFD, KodakEffectsIFD, Leaf, LeafSubIFD, MIFF, MNG, MakerUnknown,
-Minolta, Nikon, NikonPreview, Olympus, PICT, PDF, PNG, Panasonic, Pentax,
-Photoshop, PostScript, PrintIM, QuickTime, SRF#, Ricoh, Sanyo, Sigma, Sony,
-SubIFD, Track#, WAV, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
-XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
-XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+MetaIFD, Minolta, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT,
+PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM, QuickTime, Ricoh,
+SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, WAV, XMP, XMP-PixelLive,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
+XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS,
+XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,
@@ -299,6 +324,42 @@ valid in the destination file, in which case they aren't written.  No
 translation between similar tags with different names is done, although
 information may be transferred between same-named tags in different groups.
 
+<h2><a name="shift">Date/Time Shift Feature</a></h2>
+
+Have you ever forgotten to set the date/time on your digital camera before
+taking a bunch of pictures?  ExifTool has a time shift feature that makes it
+easy to apply a batch fix to the timestamps of the images.  For example, say
+that your camera clock was reset to 2000:01:01&nbsp;00:00:00 when you put in a
+new battery at 2005:11:03&nbsp;10:48:00.  Then all of the pictures you took
+subsequently have timestamps that are wrong by 5 years, 10 months, 2 days, 10
+hours and 48 minutes.  To fix this, put all of the images in the same directory
+("DIR") and run exiftool:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+exiftool -DateTimeOriginal+='5:10:2 10:48:0' DIR
+</pre></td></tr></table></blockquote>
+
+Or say you just forgot to set your camera clock back 1 hour at the end of
+daylight savings time in the fall:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+exiftool -DateTimeOriginal-=1 DIR
+</pre></td></tr></table></blockquote>
+
+The examples above change only the DateTimeOriginal tag, but any writable date
+or time tag can be shifted.  See Image::ExifTool::Shift.pl for details about the
+syntax of the time shift string.
+
+<h2>Improving Performance</h2>
+
+The processing speed of ExifTool can be dramatically improved when extracting
+information by reducing the amount of work that it must do.  Disabling the
+composite tags (-e option) and the print conversions (-n option) will speed
+things up somewhat if these features aren't required, but the biggest
+performance benefits come from reducing the number of extracted tags.  By
+specifying only the tags you need to extract, you can speed things up
+significantly.
+
 <h2>The Image::ExifTool Perl Library Module</h2>
 
 The 'exiftool' script is essentially just a command-line interface to the
@@ -341,6 +402,9 @@ a stand-alone Mac OS X droplet to extract preview images from RAW files (thanks 
 
 Also, visit the <a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool
 Forum</a> at CPAN.
+
+<p>Feel free to drop me a note if you find ExifTool useful, or if you have any
+comments, suggestions or questions.  My e-mail address is in the README file.
 
 <h2>License</h2>
 
@@ -387,7 +451,7 @@ And thanks to the following people for their help:
 <li>Michael Rommel for his bug fixes and additions to the Canon maker notes
 <li>Joseph Heled for help figuring out some of the Nikon D70 maker notes
 <li>Joachim Loehr for adding the Casio type 2 maker notes
-<li>Greg Troxel for his suggestions and for adding ExifTool to pkgsrc-wip
+<li>Greg Troxel for his suggestions and for adding ExifTool to pkgsrc
 <li>Jay Al-Saadi for his discoveries with the Minolta white balance tag
 <li>Thomas Walter for figuring out some Nikon tags
 <li>Brian Ristuccia for more information about some Nikon tags

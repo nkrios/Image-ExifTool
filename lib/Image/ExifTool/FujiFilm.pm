@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         FujiFilm.pm
 #
-# Description:  Definitions for FujiFilm EXIF Maker Notes
+# Description:  FujiFilm EXIF maker notes tags
 #
 # Revisions:    11/25/2003  - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -192,7 +192,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::FujiFilm - Definitions for FujiFilm EXIF maker notes
+Image::ExifTool::FujiFilm - FujiFilm EXIF maker notes tags
 
 =head1 SYNOPSIS
 
@@ -201,7 +201,8 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to interpret
-FujiFilm maker notes in EXIF information.
+FujiFilm maker notes in EXIF information, and to read FujiFilm RAW (RAF)
+images.
 
 =head1 AUTHOR
 

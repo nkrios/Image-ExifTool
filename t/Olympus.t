@@ -24,7 +24,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/Olympus.jpg');
+    my $info = $exifTool->ImageInfo('t/images/Olympus.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -44,7 +44,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/OlympusE1.jpg');
+    my $info = $exifTool->ImageInfo('t/images/OlympusE1.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -56,7 +56,7 @@ my $testnum = 1;
         [LensSerialNumber => '012345678'],
         [CoringFilter => 0],
     );
-    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/OlympusE1.jpg');
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/OlympusE1.jpg');
     print "ok $testnum\n";
 }
 

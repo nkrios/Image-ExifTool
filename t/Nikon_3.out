@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.70
 [File, File, Image]  - File Name: Nikon_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:35:40
+[File, File, Time]  - File Modification Date/Time: 2005:10:22 20:54:49
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -79,7 +79,6 @@
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000001
 [XMP, XMP-dc, Author] creator - Creator: Phil
 [Composite, Composite, Image]  - Aperture: 9.4
-[Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Image]  - Shutter Speed: 1/213
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

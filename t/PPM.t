@@ -24,7 +24,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/PPM.ppm');
+    my $info = $exifTool->ImageInfo('t/images/PPM.ppm');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -35,7 +35,7 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValue('Comment', 'A new comment');
     my $image;
-    $exifTool->WriteInfo('t/PPM.ppm', \$image);
+    $exifTool->WriteInfo('t/images/PPM.ppm', \$image);
     $exifTool->Options(Unknown => 1, Binary => 0, List => 0);
     my $info = $exifTool->ImageInfo(\$image);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);

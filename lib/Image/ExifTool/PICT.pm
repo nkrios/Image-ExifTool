@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         PICT.pm
 #
-# Description:  Routines for reading PICT (Apple Picture) images
+# Description:  Read PICT meta information
 #
 # Revisions:    10/10/2005 - P. Harvey Created
 #
@@ -20,39 +20,22 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ReadPictValue($$$;$);
 
 my ($vers, $extended);  # PICT version number, and extended flag
 my ($verbose, $indent); # used in verbose mode
 
-# ranges of reserved opcodes.  Opcodes on left must be defined in the table
+# ranges of reserved opcodes.
+# opcodes at the start of each range must be defined in the tag table
 my @reserved = (
-    0x0017 => 0x0019,
-    0x0024 => 0x0027,
-    0x0035 => 0x0037,
-    0x003d => 0x003f,
-    0x0045 => 0x0047,
-    0x004d => 0x004f,
-    0x0055 => 0x0057,
-    0x005d => 0x005f,
-    0x0065 => 0x0067,
-    0x006d => 0x006f,
-    0x0075 => 0x0077,
-    0x007d => 0x007f,
-    0x0085 => 0x0087,
-    0x008d => 0x008f,
-    0x0092 => 0x0097,
-    0x00a2 => 0x00af,
-    0x00b0 => 0x00cf,
-    0x00d0 => 0x00fe,
-    0x0100 => 0x01ff,
-    0x0300 => 0x0bfe,
-    0x0c01 => 0x7eff,
-    0x7f00 => 0x7fff,
-    0x8000 => 0x80ff,
-    0x8100 => 0x81ff,
+    0x0017 => 0x0019, 0x0024 => 0x0027, 0x0035 => 0x0037, 0x003d => 0x003f,
+    0x0045 => 0x0047, 0x004d => 0x004f, 0x0055 => 0x0057, 0x005d => 0x005f,
+    0x0065 => 0x0067, 0x006d => 0x006f, 0x0075 => 0x0077, 0x007d => 0x007f,
+    0x0085 => 0x0087, 0x008d => 0x008f, 0x0092 => 0x0097, 0x00a2 => 0x00af,
+    0x00b0 => 0x00cf, 0x00d0 => 0x00fe, 0x0100 => 0x01ff, 0x0300 => 0x0bfe,
+    0x0c01 => 0x7eff, 0x7f00 => 0x7fff, 0x8000 => 0x80ff, 0x8100 => 0x81ff,
     0x8201 => 0xffff,
 );
 
@@ -188,12 +171,12 @@ my %structs = (
     Int8uText => [
         val => 'int8u',
         count => 'int8u',
-        text => 'int8u[$val{count}]',
+        text => 'string[$val{count}]',
     ],
     Int8u2Text => [
         val => 'int8u[2]',
         count => 'int8u',
-        text => 'int8u[$val{count}]',
+        text => 'string[$val{count}]',
     ],
     Int16Data => [
         size => 'int16u',   # size NOT including size word
@@ -246,7 +229,7 @@ my %structs = (
     PointText => [
         txLoc => 'Point',
         count => 'int8u',
-        text => 'int8u[$val{count}]',
+        text => 'string[$val{count}]',
     ],
     Polygon => [
         polySize => 'int16u',
@@ -295,11 +278,11 @@ my %structs = (
 The PICT format contains no true meta information, except for the possible
 exception of the LongComment opcode.  By default, only ImageWidth,
 ImageHeight and X/YResolution are extracted from a PICT image.  Tags in the
-following table represent image opcodes, and extraction of these opcodes is
-experimental and is only enabled when the Verbose option is set.
+following table represent image opcodes.  Extraction of these tags is
+experimental, and is only enabled when the Verbose option is set.
     },
     0x0000 => {
-        Name => 'NOP',
+        Name => 'Nop',
         Description => 'No Operation',
         Format => 'null',
     },
@@ -840,6 +823,8 @@ experimental and is only enabled when the Verbose option is set.
     0x00a1 => [
         # this list for documentation only [not currently extracted]
         {
+            # (not actually a full Photohop IRB record it appears, but it does start
+            #  with '8BIM', and does contain resolution information at offset 0x0a)
             Name => 'LongComment',  # kind = 498
             Format => 'LongComment',
             SubDirectory => { TagTable => 'Image::ExifTool::Photoshop::Main' },
@@ -1200,7 +1185,8 @@ sub ProcessPICT($$)
         }
         # replace version number for version-dependent formats
         $format =~ s/#$/$vers/;
-        $verbose and printf "Tag 0x%.*x, ", $vers * 2, $op;
+        my $wid = $vers * 2;
+        $verbose and printf "Tag 0x%.${wid}x, ", $op;
         my $val = ReadPictValue($raf, $$tagInfo{Name}, $format);
         unless (defined $val) {
             $exifTool->Warn("Error reading $$tagInfo{Name} information");
@@ -1218,7 +1204,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PICT - Routines for reading PICT images
+Image::ExifTool::PICT - Read PICT meta information
 
 =head1 SYNOPSIS
 

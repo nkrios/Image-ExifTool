@@ -5,14 +5,30 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool FAQ</h1>
 
-<h4>"Is there a forum for discussing ExifTool issues?"</h4>
+<h3>Index</h3>
+<table><tr><td><ol>
+<li><a href="#Forum">Discussing ExifTool issues</a>
+<li><a href="#TagNames">Determining tag names</a>
+<li><a href="#Duplicate">Problems with duplicate tags</a>
+<li><a href="#Apertures">Aperture and shutter speed</a>
+</ol></td><td><ol start=5>
+<li><a href="#DateTime">Date and time formats</a>
+<li><a href="#PrintConv">"Can't convert TAG" errors</a>
+<li><a href="#TIFF">Deleting all EXIF from a TIFF</a>
+<li><a href="#MakeModel">Changing Make or Model tag</a>
+</ol></td></tr></table>
+
+<hr>
+<a name="Forum"></a>
+<p>1. <b>"Is there a forum for discussing ExifTool issues?"</b>
 
 <blockquote>
 ExifTool issues can be discussed on the CPAN forum at
 <a href="http://www.cpanforum.com/dist/Image-ExifTool">http://www.cpanforum.com/dist/Image-ExifTool</a>
 </blockquote>
 
-<h4>"How do I determine the tag name for some information?"</h4>
+<a name="TagNames"></a>
+<p>2. <b>"How do I determine the tag name for some information?"</b>
 
 <blockquote>
 When you run exiftool, by default it prints descriptions, not tag names, for
@@ -22,9 +38,10 @@ the information it extracts.  To print the tag names instead, use the
 of available tag names.
 </blockquote>
 
-<h4>"ExifTool reports the wrong value for a tag",
-<br>"ExifTool doesn't write a tag properly", or
-<br>"Other software can't read information written by ExifTool"</h4>
+<a name="Duplicate"></a>
+<p>3a. <b>"ExifTool reports the wrong value for a tag"</b>,
+<br>3b. <b>"ExifTool doesn't write a tag properly"</b>, or
+<br>3c. <b>"Other software can't read information written by ExifTool"</b>
 
 <blockquote>
 Make sure you are looking at the right information.  Information may be
@@ -43,8 +60,9 @@ prefixing the tag name on the command line with the desired group name.  ie)
 <code><font color='#880000'>'-ExifIFD:DateTimeOriginal'</font></code>
 </blockquote>
 
-<h4>"ExifTool reports more than one shutter speed or aperture value, and
-they are slightly different"</h4>
+<a name="Apertures"></a>
+<p>4. <b>"ExifTool reports more than one shutter speed or aperture value, and
+they are slightly different"</b>
 
 <blockquote>
 There are a number of different ways that aperture and shutter speed information
@@ -57,8 +75,30 @@ they haven't been rounded off at all, but you may see odd values like 1/102
 instead of 1/100, etc.
 </blockquote>
 
-<h4>"I get the following error when writing a tag:
-<code><font color='#880000'>'Can't convert TAG (not in PrintConv)'</font></code>"</h4>
+<a name="DateTime"></a>
+<p>5. <b>"How do I format date and time information for writing?"</b>
+
+<blockquote>All information (including date/time information) is written in the
+same format as it is read out.  ExifTool converts all date and time information
+to standard EXIF format, so this is also the way it is specified when writing.
+The standard EXIF date/time format is
+<font color='#880000'><code>'YYYY:MM:DD hh:mm:ss'</code></font>,
+and a timezone may be specified by adding
+<code><font color='#880000'>'+hh:mm'</font></code>,
+<code><font color='#880000'>'-hh:mm'</font></code> or
+<code><font color='#880000'>'Z'</font></code>.
+If the meta information format requires a timezone and one is not specified,
+<code><font color='#880000'>'+00:00'</font></code>
+(or <code><font color='#880000'>'Z'</font></code>) is assumed.  For example:
+
+<font color='#880000'>
+<pre>    exiftool -dateTimeOriginal='2005:10:23 20:06:34-05:00' a.jpg
+</pre></font>
+</blockquote>
+
+<a name="PrintConv"></a>
+<p>6. <b>"I get the following error when writing a tag:
+<code><font color='#880000'>'Can't convert TAG (not in PrintConv)'</font></code>"</b>
 
 <blockquote>
 ExifTool applies a print conversion (PrintConv) to the printed values of all
@@ -87,10 +127,18 @@ the following command has exactly the same effect as the commands above:
 <font color='#880000'>
 <pre>    exiftool -gpsaltituderef=0 -n image.jpg
 </pre></font>
+Integer values may also be specified in hexadecimal (with a leading '0x').  For
+example, the following commands are all valid and accomplish the same thing:
+<font color='#880000'>
+<pre>    exiftool -flash=1 -n image.jpg
+    exiftool -flash=0x1 -n image.jpg
+    exiftool -flash=fired image.jpg
+</pre></font>
 </blockquote>
 
-<h4>"I can't delete all EXIF information from a TIFF file using
-<code><font color='#880000'>'exiftool -exif:all= img.tif'</font></code>"</h4>
+<a name="TIFF"></a>
+<p>7. <b>"I can't delete all EXIF information from a TIFF file using
+<code><font color='#880000'>'exiftool -exif:all= img.tif'</font></code>"</b>
 
 <blockquote>
 This is because of the way a TIFF file is structured.  With a JPEG image, this
@@ -105,8 +153,27 @@ see where the information is stored.  Any information remaining in other IFD's
 must be deleted separately from a TIFF file if desired.
 </blockquote>
 
+<a name="MakeModel"></a>
+<p>8. <b>"All maker note information is lost if I change the Make or Model tag"</b>
+
+<blockquote>
+The Make and Model tags are used by some image utilties (including ExifTool) to
+determine the format of the maker note information.  Deleting or changing either
+of these tags may prevent these utilities from recognizing or properly
+interpreting the maker notes.  Also beware that the maker notes information may
+be damaged if an image is edited when the maker notes are not properly
+recognized. So it is a good idea not to edit the Make and Model tags in the
+first place.
+
+<p>If you really want to delete the Make and Model information, you might as
+well delete the maker notes too.  You can do this with the following command:
+<font color='#880000'>
+<pre>    exiftool -make= -model= -makernotes:all= image.jpg
+</pre></font>
+</blockquote>
+
 <hr>
-<i>Last revised May 24, 2005</i>
+<i>Last revised Nov. 16, 2005</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

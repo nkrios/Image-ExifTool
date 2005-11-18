@@ -49,7 +49,7 @@ reading and writing meta information in image files.  <code>FILE</code> may be a
 image file name, a directory name, or <code>-</code> for the standard input.
 Information is read from the specified file and output in readable form to
 the console (or written to an output text file with the <code>-w</code> option).</p>
-<p>To write information in an image file, specify new values using either the
+<p>To write information to an image file, specify new values using either the
 <code>-TAG=[VALUE]</code> syntax or the <code>-TagsFromFile</code> option.  This causes exiftool
 to rewrite <code>FILE</code> with the specified information, preserving the original
 file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify that the
@@ -57,19 +57,20 @@ new file is OK before erasing the original.)</p>
 <p>Below is a list of meta information formats and file types currently
 supported by exiftool (r = read support, w = write support):</p>
 <pre>
-     Meta Information                        File Type
-    ------------------          -----------------------------------
-    EXIF           r/w          JPEG  r/w     PNG   r/w     PDF   r
-    GPS            r/w          TIFF  r/w     MNG   r/w     PS    r
-    IPTC           r/w          GIF   r/w     JNG   r/w     EPS   r
-    XMP            r/w          THM   r/w     PPM   r/w     AI    r
-    MakerNotes     r/w          CRW   r/w     PGM   r/w     PSD   r
-    Photoshop IRB  r/w          CR2   r/w     PBM   r/w     MIFF  r
-    JFIF           r            NEF   r/w     JP2   r       PICT  r
-    GeoTIFF        r            PEF   r/w     BMP   r       MP3   r
-    ICC Profile    r            MRW   r/w     ORF   r       WAV   r
-    PrintIM        r            MOS   r/w     RAF   r       MOV   r
-    ID3            r            DNG   r/w     SRF   r</pre>
+     Meta Information                      File Type
+    ------------------        -----------------------------------
+    EXIF           r/w        JPEG  r/w     PNG   r/w     PDF   r
+    GPS            r/w        TIFF  r/w     MNG   r/w     PS    r
+    IPTC           r/w        GIF   r/w     JNG   r/w     EPS   r
+    XMP            r/w        THM   r/w     PPM   r/w     AI    r
+    MakerNotes     r/w        CRW   r/w     PGM   r/w     PSD   r
+    Photoshop IRB  r/w        CR2   r/w     PBM   r/w     MIFF  r
+    JFIF           r          NEF   r/w     JP2   r       PICT  r
+    GeoTIFF        r          PEF   r/w     BMP   r       QTIF  r
+    ICC Profile    r          MRW   r/w     ORF   r       DCM   r
+    PrintIM        r          MOS   r/w     RAF   r       MP3   r
+    ID3            r          DNG   r/w     SRF   r       WAV   r
+                              XMP   r/w     X3F   r       MOV   r</pre>
 <p>
 </p>
 <hr />
@@ -108,11 +109,12 @@ being extracted from the source file.
 <dt><strong><a name="item__2dtag_5b_2b_2d_3c_5d_3d_5bvalue_5d"><strong>-</strong><em>TAG</em>[+-&lt;]<strong>=</strong>[<em>VALUE</em>]</a></strong><br />
 </dt>
 <dd>
-Writes a new value for the specified tag, or deletes the tag if <code>VALUE</code> is
-not specified.  Use <code>+=</code> to add a value to a list without replacing
-existing values, and <code>-=</code> to delete the specifiied value only.  Use
-<code>&lt;=</code> to set the value of a tag from the contents of a file with name
-<code>VALUE</code>. (Note: Quotes are required around the argument in this case to
+Write a new value for the specified tag (with <code>-TAG=VALUE</code>), or delete the
+tag if <code>VALUE</code> is not specified.  <code>+=</code> and <code>-=</code> add or remove <code>VALUE</code>
+from a list, or shift date/time values (see
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl.html">Image::ExifTool::Shift.pl</a> for shift formats). 
+<code>&lt;=</code> sets the value of a tag from the contents of a file with name
+<code>VALUE</code>.  (Note: Quotes are required around the argument in this case to
 prevent shell redirection.)
 </dd>
 <dd>
@@ -155,8 +157,8 @@ the exiftool directory unless an absolute pathname is given.
 <dt><strong><a name="item__2da"><strong>-a</strong></a></strong><br />
 </dt>
 <dd>
-<strong>A</strong>llow duplicate tag names in the output (otherwise duplicates are
-suppressed).
+<strong>A</strong>llow duplicate tag names in the output.  Without this option, duplicates
+are suppressed.
 </dd>
 <p></p>
 <dt><strong><a name="item__2db"><strong>-b</strong></a></strong><br />
@@ -187,8 +189,8 @@ various formats:
 <dt><strong><a name="item__2dd_fmt"><strong>-d</strong> <em>FMT</em></a></strong><br />
 </dt>
 <dd>
-Set <strong>d</strong>ate/time format (consult <code>strftime</code> man page for FMT syntax).  The
-default format is equivalent to ``%Y:%m:%d %H:%M:%S''.
+Set <strong>d</strong>ate/time format.  Consult <code>strftime</code> man page for <code>FMT</code> syntax.
+The default format is equivalent to ``%Y:%m:%d %H:%M:%S''.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dd"><strong>-D</strong></a></strong><br />
@@ -206,8 +208,8 @@ Print <strong>e</strong>xisting tags only -- don't calculate composite tags.
 <dt><strong><a name="item__2de"><strong>-E</strong></a></strong><br />
 </dt>
 <dd>
-<strong>E</strong>scape characters in output values for HTML (implied with the <a href="#item__2dh"><code>-h</code></a>
-option).
+<strong>E</strong>scape characters in output values for HTML.  Implied with the <a href="#item__2dh"><code>-h</code></a>
+option.
 </dd>
 <p></p>
 <dt><strong><a name="item_ext"><strong>-ext</strong> <em>EXT</em> (or <strong>--ext</strong> <em>EXT</em>)</a></strong><br />
@@ -251,16 +253,10 @@ Same as <code>-g</code> but print <strong>G</strong>roup name for each tag.
 Show tag ID number in <strong>H</strong>exadecimal.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dgroup_5b_23_5d"><strong>-group</strong>[#]</a></strong><br />
-</dt>
-<dd>
-List all tag groups for family #.  Family 0 assumed if # not specified.
-</dd>
-<p></p>
 <dt><strong><a name="item__2dh"><strong>-h</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>H</strong>TML formatting for output (implies <a href="#item__2de"><code>-E</code></a> option).
+Use <strong>H</strong>TML formatting for output.  Implies <a href="#item__2de"><code>-E</code></a> option.
 </dd>
 <p></p>
 <dt><strong><a name="item__2di_dir"><strong>-i</strong> <em>DIR</em></a></strong><br />
@@ -272,7 +268,7 @@ Use <strong>H</strong>TML formatting for output (implies <a href="#item__2de"><c
 <dt><strong><a name="item__2dl"><strong>-l</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>l</strong>ong output format (2-line Canon-style output).
+Use <strong>l</strong>ong 2-line Canon-style output format.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dl"><strong>-L</strong></a></strong><br />
@@ -282,23 +278,21 @@ Convert Unicode characters in output to Windows <strong>L</strong>atin1 (cp1252)
 of the default UTF-8.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dlist"><strong>-list</strong></a></strong><br />
+<dt><strong><a name="item__2dlist_2c__2dlistw_2c__2dlistf_2c__2dlistg_5b_23_"><strong>-list</strong>, <strong>-listw</strong>, <strong>-listf</strong>, <strong>-listg</strong>[#]</a></strong><br />
 </dt>
 <dd>
-List all valid tag names.
-</dd>
-<p></p>
-<dt><strong><a name="item__2dlistw"><strong>-listw</strong></a></strong><br />
-</dt>
-<dd>
-List all writable tag names.
+Print a <strong>list</strong> of all valid tag names (<code>-list</code>), all <strong>w</strong>ritable tag names
+(<code>-listw</code>), all recognized <strong>f</strong>ile types (<code>-listf</code>), or all tag <strong>g</strong>roups
+in a specified family (<code>-listg</code>).  With <code>-listg</code>, a number may be given to
+specify the group family, otherwise family 0 is assumed.  For example,
+<code>-listg1</code> lists all groups in family 1.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dm"><strong>-m</strong></a></strong><br />
 </dt>
 <dd>
-Ignore <strong>m</strong>inor errors (allows writing if some minor errors occur, or
-extraction of embedded images that aren't in standard JPG format).
+Ignore <strong>m</strong>inor errors.  Allows writing if some minor errors occur, or
+extraction of embedded images that aren't in standard JPG format.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dn"><strong>-n</strong></a></strong><br />
@@ -324,12 +318,23 @@ more readable, and the inverse print conversion when writing.  For example:
     &gt; exiftool -Orientation=6 -n a.jpg</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2do_outfile"><strong>-o</strong> <em>OUTFILE</em></a></strong><br />
+<dt><strong><a name="item__2do_outfile_or_fmt"><strong>-o</strong> <em>OUTFILE</em> or <em>FMT</em></a></strong><br />
 </dt>
 <dd>
 Set <strong>o</strong>utput file or directory name when writing information (otherwise the
 source file is renamed to <code>FILE_original</code> and the output file is <code>FILE</code> in
-the original directory).
+the original directory).  The output file name may also be specified using a
+<code>FMT</code> string in which %d, %f and %e represent the directory, file name and
+extension of <code>FILE</code>.  Output directories are created if necessary.  See the
+<code>-w</code> option for <code>FMT</code> string examples.
+</dd>
+<dd>
+<p>A special feature of this option allows it to be used to create XMP meta
+information files from a combination of information in <code>FILE</code> and tag
+values assigned on the command line.  This is done by specifying a file
+extension of '.XMP' for <code>OUTFILE</code>.  The XMP file will be created even if no
+<code>FILE</code> is specified, provided some tag values are given on the command
+line.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2doverwrite_original"><strong>-overwrite_original</strong></a></strong><br />
@@ -374,28 +379,29 @@ with <code>#</code> are ignored.  For example, this format file:
 <dd>
 <strong>Q</strong>uiet processing.  One <a href="#item__2dq"><code>-q</code></a> suppresses normal informational messages,
 and a second <a href="#item__2dq"><code>-q</code></a> suppresses warnings as well.  Error messages can not be
-suppressed.
+suppressed, although minor errors may be downgraded to warnings with the
+<a href="#item__2dm"><code>-m</code></a> option.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dr"><strong>-r</strong></a></strong><br />
 </dt>
 <dd>
-<strong>R</strong>ecursively scan subdirectories (only meaningful if <code>FILE</code> is a
-directory name).
+<strong>R</strong>ecursively scan subdirectories.  Only meaningful if <code>FILE</code> is a
+directory name.
 </dd>
 <p></p>
 <dt><strong><a name="item__2ds"><strong>-s</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>s</strong>hort output format (add up to 3 <a href="#item__2ds"><code>-s</code></a> options for even shorter
-formats).
+Use <strong>s</strong>hort output format.  Add up to 3 <a href="#item__2ds"><code>-s</code></a> options for even shorter
+formats.
 </dd>
 <p></p>
 <dt><strong><a name="item__2ds"><strong>-S</strong></a></strong><br />
 </dt>
 <dd>
-Print tag names instead of descriptions (very <strong>s</strong>hort format, same as two
--s options).
+Very <strong>s</strong>hort format -- print tag names instead of descriptions.  This is
+the same as two <a href="#item__2ds"><code>-s</code></a> options.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dt"><strong>-t</strong></a></strong><br />
@@ -436,18 +442,17 @@ used as a tag or group name.  If no destination group is specified, then the
 information is written to the preferred group.</p>
 </dd>
 <dd>
-<p><code>SRCFILE</code> may be the same as the target file to move information around
-within a file.  <code>@</code> may be used to represent the target file name (ie.
-<code>-TagsFromFile @</code>), permitting this feature to be used when batch
-processing multiple files.  Specified tags are then copied from each target
-file in turn as it is rewritten.  As a convenience, <code>-TagsFromFile @</code> is
-assumed for any redirected tags which are specified without a prior
-<code>-TagsFromFile</code> option.</p>
+<p><code>SRCFILE</code> may be the same as <code>FILE</code> to move information around within a
+file.  <code>@</code> may be used to represent <code>FILE</code> (ie. <code>-TagsFromFile @</code>),
+permitting this feature to be used when batch processing multiple files.
+Specified tags are then copied from file in turn as it is rewritten.  As a
+convenience, <code>-TagsFromFile @</code> is assumed for any redirected tags which are
+specified without a prior <code>-TagsFromFile</code> option.</p>
 </dd>
 <dd>
 <p>For advanced batch use, the source file name may also be specified using a
 <code>FMT</code> string in which %d, %f and %e represent the directory, file name and
-extension of the target file (similar to the <code>-w</code> option).</p>
+extension of <code>FILE</code> (similar to the <code>-o</code> and <code>-w</code> options).</p>
 </dd>
 <dd>
 <p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples of how to use this option.</p>
@@ -471,23 +476,23 @@ desired.</p>
 <dt><strong><a name="item__2du"><strong>-u</strong></a></strong><br />
 </dt>
 <dd>
-Extract values of <strong>u</strong>nknown tags (add another <a href="#item__2du"><code>-u</code></a> to also extract unknown
-information from binary data blocks).
+Extract values of <strong>u</strong>nknown tags.  Add another <a href="#item__2du"><code>-u</code></a> to also extract
+unknown information from binary data blocks.
 </dd>
 <p></p>
 <dt><strong><a name="item__2du"><strong>-U</strong></a></strong><br />
 </dt>
 <dd>
 Extract values of <strong>u</strong>nknown tags as well as unknown information from binary
-data blocks (same as two <a href="#item__2du"><code>-u</code></a> options).
+data blocks.  This is the same as two <a href="#item__2du"><code>-u</code></a> options.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dv_5b_23_5d"><strong>-v</strong>[#]</a></strong><br />
 </dt>
 <dd>
-Print <strong>v</strong>erbose messages (# may be 1-5, higher is more verbose).  This
-option suppresses normal console output unless specific tags are being
-extracted.
+Print <strong>v</strong>erbose messages.  A <code>#</code> in the range 1-5 may be specified to
+indicate the level of verbosity -- higher is more verbose.  This option
+suppresses normal console output unless specific tags are being extracted.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dver"><strong>-ver</strong></a></strong><br />
@@ -527,7 +532,8 @@ from the source file.
 <dt><strong><a name="item__2dz"><strong>-z</strong></a></strong><br />
 </dt>
 <dd>
-Extract information from .g<strong>z</strong> and .b<strong>z</strong>2 compressed images.
+Extract information from .g<strong>z</strong> and .b<strong>z</strong>2 compressed images.  Must be only
+one image in the compressed archive.
 </dd>
 <p></p></dl>
 <p>
@@ -576,7 +582,7 @@ Save thumbnail image from <code>image.jpg</code> to a file called <code>thumbnai
 </dt>
 <dd>
 Recursively extract JPG image from all Canon RAW files in the current
-directory, adding '_JFR.JPG' for the name of the output JPG files.
+directory, adding <code>_JFR.JPG</code> for the name of the output JPG files.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2db__2dpreviewimage_118_1834_2ejpg__3e_p">exiftool -b -PreviewImage 118_1834.JPG &gt; preview.jpg</a></strong><br />
@@ -600,8 +606,8 @@ Extract image resolution from IFD1.
 <dt><strong><a name="item_exiftool__2dxmp__2db_a_2ejpg__3e_xmp_2eout">exiftool -xmp -b a.jpg &gt; xmp.out</a></strong><br />
 </dt>
 <dd>
-Extract complete XMP data record intact from a.jpg and write it to xmp.out
-using the special <code>XMP</code> tag (see the Extra tags in
+Extract complete XMP data record intact from <code>a.jpg</code> and write it to
+<code>xmp.out</code> using the special <code>XMP</code> tag (see the Extra tags in
 <a href="TagNames/index.html">Image::ExifTool::TagNames</a>).
 </dd>
 <p></p></dl>
@@ -648,6 +654,14 @@ Delete only the specified category (<code>xxx</code>) from all files in director
 Delete all meta information from an image.
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2ddatetimeoriginal_2d_3d_270_3a0_3a0_1_3">exiftool -DateTimeOriginal-='0:0:0 1:30:0' dir</a></strong><br />
+</dt>
+<dd>
+Adjust original date/time of all images in directory <code>dir</code> by subtracting
+one hour and 30 minutes.  (This is equivalent to <code>-DateTimeOriginal-=1.5</code>.
+See <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl.html">Image::ExifTool::Shift.pl</a> for details.)
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__2dphotoshop_3aall_3d_dst_2ejpg">exiftool -Photoshop:All= dst.jpg</a></strong><br />
 </dt>
 <dd>
@@ -687,6 +701,18 @@ Delete <code>LightSource</code> tag only if it is unknown with a value of 0.
 <dd>
 Set <code>WhiteBalance</code> to <code>Tungsten</code> only if it was previously <code>Auto</code>.
 </dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2do__25d_25f_2exmp_dir">exiftool -o %d%f.xmp dir</a></strong><br />
+</dt>
+<dd>
+Create XMP meta information data files for all images in <code>dir</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2do_test_2exmp__2downer_3dphil__2dtitle_">exiftool -o test.xmp -owner=Phil -title='XMP File'</a></strong><br />
+</dt>
+<dd>
+Create an XMP data file only from tags defined on the command line.
+</dd>
 <p></p></dl>
 <p>
 </p>
@@ -700,6 +726,15 @@ Copy the values of all writable tags from <code>src.crw</code> to <code>dst.jpg<
 the information to the preferred groups.
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg_out_2exmp">exiftool -tagsfromfile a.jpg out.xmp</a></strong><br />
+</dt>
+<dd>
+Copy meta information <code>a.jpg</code> to an XMP data file.  If the XMP data file
+<code>out.xmp</code> already exists, it will be updated with the new information.
+Otherwise the XMP data file will be created.  Only XMP files may be created
+like this (other file types may be edited but not created).
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ecrw__2dall_3aall_ds">exiftool -TagsFromFile src.crw -all:all dst.jpg</a></strong><br />
 </dt>
 <dd>
@@ -710,8 +745,8 @@ preserving the original tag groups.
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2dxmp_3aall_3d__">exiftool -tagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg</a></strong><br />
 </dt>
 <dd>
-Copy all meta information from a.jpg to b.jpg, but do not write the
-thumbnail image or XMP information.
+Copy all meta information from <code>a.jpg</code> to <code>b.jpg</code>, deleting all XMP
+information and the thumbnail image from the destination.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__2dtitle__2daut">exiftool -TagsFromFile src.jpg -title -author=Phil dst.jpg</a></strong><br />
@@ -747,8 +782,8 @@ redirecting information as in this example.)
 <dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__27_2dall_3exmp">exiftool -TagsFromFile src.jpg '-all&gt;xmp:all' dst.jpg</a></strong><br />
 </dt>
 <dd>
-Translate all possible information into XMP format, and update dst.jpg with
-the new information.
+Translate all possible information into XMP format, and update <code>dst.jpg</code>
+with the new information.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2d_40_iptc2xmp_2">exiftool -tagsFromFile a.jpg -@ iptc2xmp.args -iptc:all= a.jpg</a></strong><br />
@@ -805,7 +840,8 @@ it under the same terms as Perl itself.</p>
 <h1><a name="see_also">SEE ALSO</a></h1>
 <p><a href="ExifTool.html">Image::ExifTool(3pm)</a>,
 <a href="TagNames/index.html">Image::ExifTool::TagNames(3pm)</a>,
-<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shortcuts.pm">Image::ExifTool::Shortcuts(3pm)</a></p>
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shortcuts.pm">Image::ExifTool::Shortcuts(3pm)</a>,
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl.html">Image::ExifTool::Shift.pl</a></p>
 <table border="0" width="100%" cellspacing="0" cellpadding="3">
 <tr><td class="block" style="background-color: #cccccc" valign="middle">
 <big><strong><span class="block">&nbsp;exiftool Application Documentation</span></strong></big>

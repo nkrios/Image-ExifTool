@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.70
 [File, File, Image]  - File Name: Sanyo_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:36:02
+[File, File, Time]  - File Modification Date/Time: 2005:10:22 20:55:07
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -91,7 +91,6 @@
 [MakerNotes, Sanyo, Camera] 3840 - Data Dump: (Binary data 260 bytes)
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000001
 [Composite, Composite, Image]  - Aperture: 6.9
-[Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 481.1
 [Composite, Composite, Image]  - Shutter Speed: 1/185

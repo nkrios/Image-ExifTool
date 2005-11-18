@@ -25,7 +25,7 @@ my $testnum = 1;
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(CoordFormat => '%d degrees %.2f minutes');
-    my $info = $exifTool->ImageInfo('t/GPS.jpg');
+    my $info = $exifTool->ImageInfo('t/images/GPS.jpg');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }

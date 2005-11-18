@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WriteXMP.pl
 #
-# Description:  Routines for writing XMP metadata
+# Description:  Write XMP meta information
 #
 # Revisions:    12/19/2004 - P. Harvey Created
 #
@@ -28,6 +28,7 @@
 package Image::ExifTool::XMP;
 
 use strict;
+use Image::ExifTool qw(:Utils);
 
 sub CheckXMP($$$);
 sub SetPropertyPath($$;$$);
@@ -195,13 +196,13 @@ my $pktClose =  "<?xpacket end='w'?>";
 # - generate PropertyPath for structure elements
 # - add necessary inverse conversion routines
 {
-    my $mainTable = Image::ExifTool::GetTagTable('Image::ExifTool::XMP::Main');
-    Image::ExifTool::GenerateTagIDs($mainTable);
+    my $mainTable = GetTagTable('Image::ExifTool::XMP::Main');
+    GenerateTagIDs($mainTable);
     my $mainTag;
     foreach $mainTag (keys %$mainTable) {
         my $mainInfo = $mainTable->{$mainTag};
         next unless ref $mainInfo eq 'HASH' and $mainInfo->{SubDirectory};
-        my $table = Image::ExifTool::GetTagTable($mainInfo->{SubDirectory}->{TagTable});
+        my $table = GetTagTable($mainInfo->{SubDirectory}->{TagTable});
         # add new namespace if NAMESPACE is ns/uri pair
         if (ref $$table{NAMESPACE} eq 'ARRAY') {
             my $ns = $table->{NAMESPACE}->[0];
@@ -209,10 +210,10 @@ my $pktClose =  "<?xpacket end='w'?>";
             $$table{NAMESPACE} = $ns;
         }
         $$table{WRITE_PROC} = \&WriteXMP;   # set WRITE_PROC for all tables
-        Image::ExifTool::GenerateTagIDs($table);
+        GenerateTagIDs($table);
         my $tag;
         $table->{CHECK_PROC} = \&CheckXMP; # add our write check routine
-        foreach $tag (Image::ExifTool::TagTableKeys($table)) {
+        foreach $tag (TagTableKeys($table)) {
             my $tagInfo = $$table{$tag};
             next unless ref $tagInfo eq 'HASH';
             # must set PropertyPath now for all tags that are Struct elements
@@ -240,16 +241,19 @@ sub CheckXMP($$$)
     return undef unless $format and $format ne 'string';
     if ($format eq 'rational' or $format eq 'real') {
         # make sure the value is a valid floating point number
-        unless ($$valPtr =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/) {
-            return 'Not a floating point number';
-        }
+        Image::ExifTool::IsFloat($$valPtr) or return 'Not a floating point number';
         if ($format eq 'rational') {
             $$valPtr = join('/', Image::ExifTool::Rationalize($$valPtr));
         }
     } elsif ($format eq 'integer') {
         # make sure the value is integer
-        return 'Not an integer' unless $$valPtr =~ /^[+-]?\d+$/;
-        $$valPtr = int($$valPtr);
+        if (Image::ExifTool::IsInt($$valPtr)) {
+            $$valPtr = int($$valPtr);
+        } elsif (Image::ExifTool::IsHex($$valPtr)) {
+            $$valPtr = hex($$valPtr);
+        } else {
+            return 'Not an integer';
+        }
     } elsif ($format eq 'date') {
         if ($$valPtr =~ /(\d{4}):(\d{2}):(\d{2}) (\d{2}:\d{2}:\d{2})(.*)/) {
             my ($y, $m, $d, $t, $tz) = ($1, $2, $3, $4, $5);
@@ -366,7 +370,16 @@ sub CaptureShorthand($$$;$)
             unless ($ns eq 'x' or $ns eq 'iX' or defined $$nsUsed{$ns}) {
                 $$nsUsed{$ns} = $$attrs{$attr};
             }
-        } elsif (not $recognizedAttrs{$attr}) {
+        } elsif ($recognizedAttrs{$attr}) {
+            # save UUID to use same ID when writing
+            if ($attr eq 'about') {
+                if (not $exifTool->{XMP_UUID}) {
+                    $exifTool->{XMP_UUID} = $$attrs{about};
+                } elsif ($exifTool->{XMP_UUID} ne $$attrs{about}) {
+                    $exifTool->Error("Multiple XMP UUID's not handled", 1);
+                }
+            }
+        } else {
             # check for RDF shorthand format
             my ($ns,$name);
             if ($attr =~ /(.*):(.*)/) {
@@ -464,19 +477,20 @@ sub ConformPathToNamespace($$)
 #------------------------------------------------------------------------------
 # Write XMP information
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
-#         2) tag table reference
-# Returns: new XMP data (may be empty if no XMP data) or undef on error
+#         2) [optional] tag table reference
+# Returns: with tag table: new XMP data (may be empty if no XMP data) or undef on error
+#          without tag table: 1 on success, 0 if not valid XMP file, -1 on write error
 # Notes: Increments ExifTool CHANGED flag for each tag changed
-sub WriteXMP($$$)
+sub WriteXMP($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
-    $tagTablePtr or return undef;
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart} || 0;
-    my (%capture, %nsUsed, $xmpErr);
+    my (%capture, %nsUsed, $xmpErr, $uuid);
     my $changed = 0;
     my $verbose = $exifTool->Options('Verbose');
+    my $xmpFile = (not $tagTablePtr); # this is an XMP data file if no $tagTablePtr
 #
 # extract existing XMP information into %capture hash
 #
@@ -489,26 +503,36 @@ sub WriteXMP($$$)
     $exifTool->{XMP_CAPTURE} = \%capture;
     $exifTool->{XMP_NS} = \%nsUsed;
 
-    if ($dataPt) {
+    if ($dataPt or $xmpFile) {
         delete $exifTool->{XMP_ERROR};
+        delete $exifTool->{XMP_UUID};
         # extract all existing XMP information (to the XMP_CAPTURE hash)
         my $success = ProcessXMP($exifTool, $dirInfo, $tagTablePtr);
         # don't continue if there is nothing to parse or if we had a parsing error
         unless ($success and not $exifTool->{XMP_ERROR}) {
-            if ($exifTool->{XMP_ERROR}) {
-                $exifTool->Warn($exifTool->{XMP_ERROR}, 1);
+            my $err = $exifTool->{XMP_ERROR} || 'Error parsing XMP';
+            # may ignore this error only if we were successful
+            if ($xmpFile) {
+                my $raf = $$dirInfo{RAF};
+                # allow empty XMP data so we can create something from nothing
+                if ($success or not $raf->Seek(0,2) or $raf->Tell()) {
+                    if ($exifTool->Error($err, $success)) {
+                        delete $exifTool->{XMP_CAPTURE};
+                        return 0;
+                    }
+                }
             } else {
-                $exifTool->Warn('Error parsing XMP', 1);
-            }
-            unless ($success and $exifTool->Options('IgnoreMinorErrors')) {
-                delete $exifTool->{XMP_CAPTURE};
-                return undef;
+                if ($exifTool->Warn($err, $success)) {
+                    delete $exifTool->{XMP_CAPTURE};
+                    return undef;
+                }
             }
         }
+        $uuid = $exifTool->{XMP_UUID} || '';
         delete $exifTool->{XMP_ERROR};
+        delete $exifTool->{XMP_UUID};
     } else {
-        my $emptyData = '';
-        $dataPt = \$emptyData;
+        $uuid = '';
     }
 #
 # add, delete or change information as specified
@@ -530,7 +554,6 @@ sub WriteXMP($$$)
         # find existing property
         my $capList = $capture{$path};
         my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-        my @newValues = Image::ExifTool::GetNewValues($newValueHash);
         my %attrs;
         # delete existing entry if necessary
         if ($capList) {
@@ -586,9 +609,11 @@ sub WriteXMP($$$)
                 }
             }
         }
-        next unless @newValues; # done if no new values specified
+        # get list of new values (done if no new values specified)
+        my @newValues = Image::ExifTool::GetNewValues($newValueHash) or next;
         # don't add new tag if it didn't exist before unless specified
-        next unless $capList or Image::ExifTool::IsCreating($newValueHash);
+        # (or unless this is an XMP data file)
+        next unless $capList or Image::ExifTool::IsCreating($newValueHash) or $xmpFile;
 
         # set default language attribute for lang-alt lists
         # (currently on support changing the default language)
@@ -616,7 +641,17 @@ sub WriteXMP($$$)
     delete $exifTool->{XMP_NS};
 
     # return now if we didn't change anything
-    return undef unless $changed;
+    unless ($changed) {
+        return undef unless $xmpFile;   # just rewrite original XMP
+        # get DataPt again because it may have been set by ProcessXMP
+        $dataPt = $$dirInfo{DataPt};
+        unless (defined $dataPt) {
+            $exifTool->Error("Nothing to write");
+            return 0;
+        }
+        return 1 if Image::ExifTool::Write($$dirInfo{OutFile}, $$dataPt);
+        return -1;
+    }
 #
 # write out the new XMP information
 #
@@ -665,7 +700,7 @@ sub WriteXMP($$$)
             # open the new description
             $prop = $rdfDesc;
             %nsCur = %nsNew;            # save current namespaces
-            $newData .= "\n <$prop about=''";
+            $newData .= "\n <$prop about='$uuid'";
             foreach (sort keys %nsCur) {
                 $newData .= "\n  xmlns:$_='$nsCur{$_}'";
             }
@@ -722,12 +757,18 @@ sub WriteXMP($$$)
     $newData = '' unless %capture;
 
     if ($xmpErr) {
+        if ($xmpFile) {
+            $exifTool->Error($xmpErr);
+            return -1;
+        }
         $exifTool->Warn($xmpErr);
         return undef;
     }
     $exifTool->{CHANGED} += $changed;
     $debug > 1 and $newData and print $newData,"\n";
-    return $newData;
+    return $newData unless $xmpFile;
+    return 1 if Image::ExifTool::Write($$dirInfo{OutFile}, $newData);
+    return -1;
 }
 
 
@@ -737,7 +778,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WriteXMP.pl - Routines for writing XMP metadata
+Image::ExifTool::WriteXMP.pl - Write XMP meta information
 
 =head1 SYNOPSIS
 

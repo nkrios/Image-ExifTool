@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Sanyo.pm
 #
-# Description:  Definitions for Sanyo EXIF Maker Notes
+# Description:  Sanyo EXIF maker notes tags
 #
 # Revisions:    04/06/2004  - P. Harvey Created
 #
@@ -214,7 +214,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Sanyo - Definitions for Sanyo EXIF maker notes
+Image::ExifTool::Sanyo - Sanyo EXIF maker notes tags
 
 =head1 SYNOPSIS
 

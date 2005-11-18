@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Photoshop.pm
 #
-# Description:  Definitions for Photoshop IRB resource
+# Description:  Read Photoshop IRB meta information
 #
 # Revisions:    02/06/04 - P. Harvey Created
 #               02/25/04 - P. Harvey Added hack for problem with old photoshops
@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.18';
+$VERSION = '1.20';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -72,6 +72,7 @@ sub WritePhotoshop($$$);
     0x0404 => {
         Name => 'IPTCData',
         SubDirectory => {
+            DirName => 'IPTC',
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
@@ -102,7 +103,7 @@ sub WritePhotoshop($$$);
     },
     0x040c => {
         Name => 'PhotoshopThumbnail',
-        ValueConv => 'my $img=substr($val,0x1c);$self->ValidateImage(\$img,"PhotoshopThumbnail")',
+        ValueConv => 'my $img=substr($val,0x1c);$self->ValidateImage(\$img,$tag)',
     },
     0x040d => {
         Name => 'GlobalAngle',
@@ -302,42 +303,13 @@ sub ProcessPhotoshop($$$)
             }
         }
         $success = 1;
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
-            'Table'  => $tagTablePtr,
-            'DataPt' => $dataPt,
-            'Size'   => $size,
-            'Start'  => $pos,
+        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+            DataPt  => $dataPt,
+            DataPos => $$dirInfo{DataPos},
+            Size    => $size,
+            Start   => $pos,
+            Parent  => $$dirInfo{DirName},
         );
-        if ($tagInfo) {
-            my $value = substr($$dataPt, $pos, $size);
-            my $subdir = $$tagInfo{SubDirectory};
-            if ($subdir) {
-                my $newTagTable;
-                if ($$subdir{TagTable}) {
-                    $newTagTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
-                    $newTagTable or warn "Unknown tag table $$subdir{TagTable}\n";
-                } else {
-                    $newTagTable = $tagTablePtr;
-                }
-                # build directory information hash
-                my %subdirInfo = (
-                    Name     => $$tagInfo{Name},
-                    DataPt   => \$value,
-                    DataLen  => $size,
-                    DirStart => 0,
-                    DirLen   => $size,
-                    Parent   => $$dirInfo{DirName},
-                );
-                if (defined $$dirInfo{DataPos}) {
-                    $subdirInfo{DataPos} = $$dirInfo{DataPos} + $pos,
-                }
-                # process the directory
-                $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable, $$subdir{ProcessProc});
-            } else {
-                $exifTool->FoundTag($tagInfo, $value);
-            }
-        }
         $size += 1 if $size & 0x01; # size is padded to an even # bytes
         $pos += $size;
     }
@@ -380,7 +352,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Photoshop - Definitions for Photoshop IRB resource
+Image::ExifTool::Photoshop - Read Photoshop IRB meta information
 
 =head1 SYNOPSIS
 

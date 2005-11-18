@@ -16,9 +16,9 @@ Multiple -v options are allowed, so the following two examples give the
 same result:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
-exiftool -v -v -v t/ExifTool.jpg
+exiftool -v -v -v t/images/ExifTool.jpg
 
-exiftool -v3 t/ExifTool.jpg
+exiftool -v3 t/images/ExifTool.jpg
 </pre></td></tr></table></blockquote>
 
 <p>Below are example outputs for different Verbose settings.
@@ -32,7 +32,7 @@ directory structure:
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
   ExifToolVersion = 5.32
   FileName = ExifTool.jpg
-  Directory = t
+  Directory = t/images
   FileSize = 3475
   FileModifyDate = 1117042858
   FileType = JPEG
@@ -46,7 +46,7 @@ JPEG APP1 (2442 bytes):
   | 5)  ResolutionUnit = 2
   | 6)  ModifyDate = 2003:12:04 06:46:52
   | 7)  YCbCrPositioning = 1
-  | 8)  ExifOffset (SubDirectory) -->
+  | 8)  ExifOffset (SubDirectory) --&gt;
   | + [ExifIFD directory with 31 entries]
   | | 0)  ExposureTime = 4
   | | 1)  FNumber = 14
@@ -63,7 +63,7 @@ about the tag number, data size and format:
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
   ExifToolVersion = 5.32
   FileName = ExifTool.jpg
-  Directory = t
+  Directory = t/images
   FileSize = 3475
   FileModifyDate = 1117042858
   FileType = JPEG
@@ -85,7 +85,7 @@ JPEG APP1 (2442 bytes):
   |     - Tag 0x0132 (20 bytes, string[20])
   | 7)  YCbCrPositioning = 1
   |     - Tag 0x0213 (2 bytes, int16u[1])
-  | 8)  ExifOffset (SubDirectory) -->
+  | 8)  ExifOffset (SubDirectory) --&gt;
   |     - Tag 0x8769 (4 bytes, int32u[1])
   | + [ExifIFD directory with 31 entries]
   | | 0)  ExposureTime = 4
@@ -111,7 +111,7 @@ only the first few lines of the dump are printed:
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
   ExifToolVersion = 5.32
   FileName = ExifTool.jpg
-  Directory = t
+  Directory = t/images
   FileSize = 3475
   FileModifyDate = 1117042858
   FileType = JPEG
@@ -151,7 +151,7 @@ JPEG APP1 (2442 bytes):
   | 7)  YCbCrPositioning = 1
   |     - Tag 0x0213 (2 bytes, int16u[1]):
   |         0066: 01 00                                           [..]
-  | 8)  ExifOffset (SubDirectory) -->
+  | 8)  ExifOffset (SubDirectory) --&gt;
   |     - Tag 0x8769 (4 bytes, int32u[1]):
   |         0072: bc 00 00 00                                     [....]
   | + [ExifIFD directory with 31 entries]

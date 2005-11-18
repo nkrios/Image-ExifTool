@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         PNG.pm
 #
-# Description:  Routines for reading and writing PNG, MNG and JNG images
+# Description:  Read and write PNG meta information
 #
 # Revisions:    06/10/2005 - P. Harvey Created
 #               06/23/2005 - P. Harvey Added MNG and JNG support
@@ -156,6 +156,7 @@ $Image::ExifTool::PNG::colorType = -1;
         Name => 'ModifyDate',
         Description => 'Date/Time Of Last Modification',
         Groups => { 2 => 'Time' },
+        Shift => 'Time',
         ValueConv => 'sprintf("%.4d:%.2d:%.2d %.2d:%.2d:%.2d", unpack("nC5", $val))',
         PrintConv => '$self->ConvertDateTime($val)',
     },
@@ -194,7 +195,7 @@ $Image::ExifTool::PNG::colorType = -1;
     8 => 'BitDepth',
     9 => {
         Name => 'ColorType',
-        ValueConv => '$Image::ExifTool::PNG::colorType = $val',
+        RawConv => '$Image::ExifTool::PNG::colorType = $val',
         PrintConv => {
             0 => 'Grayscale',
             2 => 'RGB',
@@ -282,6 +283,7 @@ ImageMagick.
    'Creation Time' => {
         Name => 'CreationTime',
         Groups => { 2 => 'Time' },
+        Shift => 'Time',
     },
     Software    => { },
     Disclaimer  => { },
@@ -298,7 +300,7 @@ ImageMagick.
     Label       => { %unreg },
     Make        => { %unreg, Groups => { 2 => 'Camera' } },
     Model       => { %unreg, Groups => { 2 => 'Camera' } },
-    TimeStamp   => { %unreg, Groups => { 2 => 'Time' } },
+    TimeStamp   => { %unreg, Groups => { 2 => 'Time' }, Shift => 'Time' },
     URL         => { %unreg },
    'Raw profile type APP1' => [
         {
@@ -385,10 +387,10 @@ sub FoundPNG($$$$;$$)
         my $warn;
         if ($compressed == 2) { # Inflate/Deflate compression
             if (eval 'require Compress::Zlib') {
-                my $v2;
+                my ($v2, $stat);
                 my $inflate = Compress::Zlib::inflateInit();
-                $inflate and ($v2) = $inflate->inflate($val);
-                if ($v2) {
+                $inflate and ($v2, $stat) = $inflate->inflate($val);
+                if ($inflate and $stat == Compress::Zlib::Z_STREAM_END()) {
                     $val = $v2;
                     $compressed = 0;
                     $wasCompressed = 1;
@@ -425,7 +427,7 @@ sub FoundPNG($$$$;$$)
                     Image::ExifTool::HexDump(\$val, undef, %parms);
                 }
                 # don't indent next directory (since it is really the same data)
-                $exifTool->{INDENT} = substr($exifTool->{INDENT}, 0, -2);
+                $exifTool->{INDENT} =~ s/..$//;
             }
             my $subdir = $$tagInfo{SubDirectory};
             my $processProc = $$subdir{ProcessProc};
@@ -509,14 +511,14 @@ sub FoundPNG($$$$;$$)
         );
         $$tagInfo{SubDirectory} = $subdir if $subdir;
     }
-    # set the ValueConv dynamically depending on whether this is binary or not
-    my $delValueConv;
+    # set the RawConv dynamically depending on whether this is binary or not
+    my $delRawConv;
     if ($compressed and not defined $$tagInfo{ValueConv}) {
-        $$tagInfo{ValueConv} = '\$val';
-        $delValueConv = 1;
+        $$tagInfo{RawConv} = '\$val';
+        $delRawConv = 1;
     }
     $exifTool->FoundTag($tagInfo, $val);
-    delete $$tagInfo{ValueConv} if $delValueConv;
+    delete $$tagInfo{RawConv} if $delRawConv;
     return 1;
 }
 
@@ -552,7 +554,7 @@ sub ProcessProfile($$$)
             Image::ExifTool::HexDump(\$buff, undef, %parms);
         }
         # don't indent next directory (since it is really the same data)
-        $exifTool->{INDENT} = substr($exifTool->{INDENT}, 0, -2);
+        $exifTool->{INDENT} =~ s/..$//;
     }
     my %dirInfo = (
         Parent   => 'PNG',
@@ -833,7 +835,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PNG - Read and write PNG, MNG and JNG images
+Image::ExifTool::PNG - Read and write PNG meta information
 
 =head1 SYNOPSIS
 

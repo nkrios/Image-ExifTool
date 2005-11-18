@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.69
 [File, File, Image]  - File Name: CanonRaw_6_failed.cr2
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 9 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:28 12:02:24
+[File, File, Time]  - File Modification Date/Time: 2005:10:19 09:45:17
 [File, File, Image]  - File Type: CR2
 [File, File, Image]  - MIME Type: application/unknown
 [EXIF, IFD0, Image] 256 - Image Width: 1536
@@ -39,8 +39,8 @@
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2304
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3954.23
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3958.76
+[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3954.233
+[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3958.763
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto

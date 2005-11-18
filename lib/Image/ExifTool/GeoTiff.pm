@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         GeoTiff.pm
 #
-# Description:  Definitions for GeoTiff tags
+# Description:  Read GeoTiff meta information
 #
 # Revisions:    02/23/04 - P. Harvey Created
 #               02/25/04 - P. Harvey Added new codes from libgeotiff-1.2.1
@@ -2052,12 +2052,12 @@ my $epsg_units = {
 #------------------------------------------------------------------------------
 # Inputs: 0) ExifTool object reference
 #         1) tag table reference
-#         2) reference to GeoTIFF directory data
-#         3) reference to GeoTiff double parameters data
-#         4) reference to GeoTiff ASCII parameters data
-sub ProcessGeoTiff($$$$$)
+sub ProcessGeoTiff($)
 {
-    my ($exifTool, $tagTable, $dirData, $doubleData, $asciiData) = @_;
+    my ($exifTool) = @_;
+    my $dirData = $exifTool->GetValue('GeoTiffDirectory', 'ValueConv') or return;
+    my $doubleData = $exifTool->GetValue('GeoTiffDoubleParams', 'ValueConv');
+    my $asciiData = $exifTool->GetValue('GeoTiffAsciiParams', 'ValueConv');
     my $verbose = $exifTool->Options('Verbose');
     my @double;
 
@@ -2080,6 +2080,7 @@ sub ProcessGeoTiff($$$$$)
         $exifTool->VerboseDir('GeoTiff',$numEntries);
     }
     # generate version number tag (not a real GeoTiff tag)
+    my $tagTable = Image::ExifTool::GetTagTable("Image::ExifTool::GeoTiff::Main");
     my $tagInfo = $exifTool->GetTagInfo($tagTable, 1);
     $tagInfo and $exifTool->FoundTag($tagInfo,"$version.$revision.$minorRev");
 
@@ -2123,7 +2124,12 @@ sub ProcessGeoTiff($$$$$)
         $exifTool->FoundTag($tagInfo, $val);
     }
     if ($verbose) {
-        $exifTool->{INDENT} = substr($exifTool->{INDENT}, 0, -2);
+        $exifTool->{INDENT} =~ s/..$//;
+    } else {
+        # this is duplicate information so delete it unless verbose
+        $exifTool->DeleteTag('GeoTiffDirectory');
+        $exifTool->DeleteTag('GeoTiffDoubleParams');
+        $exifTool->DeleteTag('GeoTiffAsciiParams');
     }
 }
 
@@ -2134,7 +2140,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::GeoTiff - Definitions for GeoTiff meta information
+Image::ExifTool::GeoTiff - Read GeoTiff meta information
 
 =head1 SYNOPSIS
 

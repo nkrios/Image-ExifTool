@@ -1,14 +1,13 @@
-  ExifToolVersion = 5.65
+  ExifToolVersion = 5.76
   FileName = CanonRaw.crw
-  Directory = t
+  Directory = t/images
   FileSize = 6255
-  FileModifyDate = 1113661900
+  FileModifyDate = 1113662230
   FileType = Canon RAW
   MIMEType = application/unknown
   + [Raw directory with 3 entries]
   | 0)  RawData = <Dummy raw image data>
   | 1)  JpgFromRaw = <Dummy JpgFromRaw image data>
-  | Warning = [minor] JpgFromRaw is not a valid image
   | 2)  ImageProps (SubDirectory) -->
   | + [Raw directory with 13 entries]
   | | 0)  ImageFormat (SubDirectory) -->
@@ -141,24 +140,24 @@
   | | | 17) CanonRaw_0x10af = 1024
   | | | 18) WhiteBalanceTable (SubDirectory) -->
   | | | + [BinaryData directory, 80 bytes]
-  | | | | RedBalanceAuto = 2.09135
-  | | | | BlueBalanceAuto = 0.892589
-  | | | | RedBalanceDaylight = 2.06971
-  | | | | BlueBalanceDaylight = 0.840243
-  | | | | RedBalanceCloudy = 2.44591
-  | | | | BlueBalanceCloudy = 0.990465
-  | | | | RedBalanceTungsten = 2.25721
-  | | | | BlueBalanceTungsten = 0.920266
-  | | | | RedBalanceFluorescent = 1.34502
-  | | | | BlueBalanceFluorescent = 0.546763
-  | | | | RedBalanceFlash = 1.7886
+  | | | | RedBalanceAuto = 2.091346
+  | | | | BlueBalanceAuto = 0.8925886
+  | | | | RedBalanceDaylight = 2.069712
+  | | | | BlueBalanceDaylight = 0.8402427
+  | | | | RedBalanceCloudy = 2.445913
+  | | | | BlueBalanceCloudy = 0.9904648
+  | | | | RedBalanceTungsten = 2.257212
+  | | | | BlueBalanceTungsten = 0.9202658
+  | | | | RedBalanceFluorescent = 1.345016
+  | | | | BlueBalanceFluorescent = 0.5467626
+  | | | | RedBalanceFlash = 1.788599
   | | | | BlueBalanceFlash = 0.608979
-  | | | | RedBalanceCustom = 2.36058
-  | | | | BlueBalanceCustom = 0.947548
-  | | | | RedBalanceB&W = 2.06971
-  | | | | BlueBalanceB&W = 0.840243
-  | | | | RedBalanceShade = 2.06971
-  | | | | BlueBalanceShade = 0.841093
+  | | | | RedBalanceCustom = 2.360577
+  | | | | BlueBalanceCustom = 0.9475485
+  | | | | RedBalanceB&W = 2.069712
+  | | | | BlueBalanceB&W = 0.8402427
+  | | | | RedBalanceShade = 2.069712
+  | | | | BlueBalanceShade = 0.8410931
   | | | 19) ColorSpace = 1
   | | | 20) CanonRaw_0x10b5 = 10 3 1 2048 1360
   | | | 21) CanonRaw_0x1039 = 0 159 7 112
