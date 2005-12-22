@@ -36,7 +36,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.45';
+$VERSION = '1.47';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -1451,6 +1451,7 @@ sub ParseXMPElement($$$;$$)
             }
             # handle properties inside element attributes (RDF shorthand format):
             # (attributes take the form a:b='c' or a:b="c")
+            my $shorthand;
             while ($attrs =~ m/(\S+)=(['"])(.*?)\2/sg) {
                 my ($shortName, $shortVal) = ($1, $3);
                 my $ns;
@@ -1470,6 +1471,7 @@ sub ParseXMPElement($$$;$$)
                 # save this shorthand XMP property
                 FoundXMP($exifTool, $tagTablePtr, $propListPt, $shortVal);
                 pop @$propListPt;
+                $shorthand = 1;
             }
             # if element value is empty, take value from 'resource' attribute
             # (preferentially) or 'about' attribute (if no 'resource')
@@ -1478,7 +1480,10 @@ sub ParseXMPElement($$$;$$)
             # look for additional elements contained within this one
             if (!ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt)) {
                 # there are no contained elements, so this must be a simple property value
-                FoundXMP($exifTool, $tagTablePtr, $propListPt, $val);
+                # (unless we already extracted shorthand values from this element)
+                if (length $val or not $shorthand) {
+                    FoundXMP($exifTool, $tagTablePtr, $propListPt, $val);
+                }
             }
         }
         pop @$propListPt;
@@ -1507,7 +1512,8 @@ sub ProcessXMP($$;$)
         $raf->Read($buff, 64) or return 0;
         $buff =~ tr/\0//d;
         # check to see if this is XMP format
-        return 0 unless $buff =~ /^<\?xpacket begin=/;
+        # (CS2 writes .XMP files without the "xpacket begin")
+        return 0 unless $buff =~ /^<\?xpacket begin=/ or $buff =~ /^<x:xmpmeta/;
         $raf->Seek(0, 2) or return 0;
         my $size = $raf->Tell() or return 0;
         $raf->Seek(0, 0) or return 0;
@@ -1534,7 +1540,12 @@ sub ProcessXMP($$;$)
 #
     my $begin = '<?xpacket begin=';
     pos($$dataPt) = $dirStart;
-    unless ($$dataPt =~ /\G\Q$begin\E/) {
+    if ($$dataPt =~ /\G\Q$begin\E/) {
+        delete $$exifTool{XMP_NO_XPACKET};
+    } elsif ($$dataPt =~ /<x:xmpmeta/) {
+        $$exifTool{XMP_NO_XPACKET} = 1;
+    } else {
+        delete $$exifTool{XMP_NO_XPACKET};
         my ($fmt, $len);
         # check for UTF-16 encoding (insert one \0 between characters)
         $begin = join "\0", split //, $begin;
@@ -1579,6 +1590,7 @@ sub ProcessXMP($$;$)
             defined $fmt or $exifTool->Warn('XMP character encoding error');
         }
     }
+    
 #
 # extract the information
 #

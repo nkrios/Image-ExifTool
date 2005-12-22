@@ -61,13 +61,13 @@ PDF, PSD, DCM, ACR, THM, CRW (Canon RAW), CR2 (Canon RAW 2), MRW (Minolta
 RAW), NEF (Nikon Electronic image Format), PEF (Pentax RAW), ORF (Olympus
 RAW Format), RAF (FujiFilm RAW Format), SRF (Sony Raw Format), MOS (Leaf
 Mosaic), X3F (Sigma Raw) and DNG (Digital Negative) images, MP3 and WAV
-audio files, and MOV videos. ExifTool also extracts information from the
-maker notes of many digital cameras by various manufacturers including
-Canon, Casio, FujiFilm, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
-Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
-It writes EXIF, GPS, IPTC, XMP and MakerNotes information to JPEG, TIFF,
-GIF, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, MRW, NEF, PEF, MOS and DNG
-files.
+audio files, and AVI, MOV and MP4 videos. ExifTool also extracts information
+from the maker notes of many digital cameras by various manufacturers
+including Canon, Casio, FujiFilm, JVC/Victor, Kodak, Leaf,
+Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
+Ricoh, Sanyo and Sigma/Foveon. It writes EXIF, GPS, IPTC, XMP and MakerNotes
+information to JPEG, TIFF, GIF, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2,
+MRW, NEF, PEF, MOS and DNG files.
 
 =head1 METHODS
 
@@ -296,9 +296,9 @@ Character set for converting Unicode character strings.  Valid values are:
 
 =item Compact
 
-Write compact output.  Default is 0.  Some data formats (XMP, IPTC) specify
-that the data be padded with blanks to allow in-place editing.  By setting
-this flag, 2kB is saved for files with XMP data, and 100 bytes for IPTC.
+Write compact output.  Default is 0.  The XMP specification suggests that
+the data be padded with blanks to allow in-place editing.  By setting this
+flag, 2kB is saved for files with XMP data.
 
 =item Composite
 
@@ -336,13 +336,15 @@ case of tag names is not significant. This option is ignored for
 specifically requested tags.  Tags may also be excluded by preceeding their
 name with a '-' in the arguments to L</ImageInfo>.
 
-=item IgnoreMinorErrors
+=item FixBase
 
-Causes minor errors to be downgraded to warnings, and minor warnings to be
-ignored.  This option is provided mainly to allow writing of files when
-minor errors occur, but also allows thumbnail and preview images to be
-extracted even if they don't have a recognizable header.  Minor
-errors/warnings are denoted by '[minor]' at the start of the message.
+Fix maker notes base offset.  A common problem with image editing software
+is that offsets in the maker notes are not adjusted properly when the file
+is modified.  This may cause the wrong values to be extracted for some maker
+note entries when reading the edited file.  FixBase specifies an integer
+value to be added to the maker notes base offset.  It may also be set to the
+empty string ('') for ExifTool will take its best guess at the correct base,
+or undef (the default) for no base adjustment.
 
 =item Group#
 
@@ -351,6 +353,20 @@ not given).  The option value may be a single group name or a reference
 to a list of groups.  Case is significant in group names.  Specify a
 group to be excluded by preceeding group name with a '-'.  See
 L</GetAllGroups> for a list of available groups.
+
+=item HtmlDump
+
+Dump information in hex to dynamic HTML web page.  The value may be 0-3 for
+increasingly larger limits on the maximum block size.  Default is 0.  Output
+goes to the file specified by the TextOut option (\*STDOUT by default).
+
+=item IgnoreMinorErrors
+
+Causes minor errors to be downgraded to warnings, and minor warnings to be
+ignored.  This option is provided mainly to allow writing of files when
+minor errors occur, but also allows thumbnail and preview images to be
+extracted even if they don't have a recognizable header.  Minor
+errors/warnings are denoted by '[minor]' at the start of the message.
 
 =item List
 
@@ -378,6 +394,11 @@ Specifies order to sort tags in returned list:
            See GetGroup for a list of groups.
   Input  - Sort in same order as input tag arguments (default)
 
+=item TextOut
+
+Output file reference for Verbose and HtmlDump options.  Default is
+\*STDOUT.
+
 =item Unknown
 
 Flag to get the values of unknown tags.  If set to 1, unknown tags are
@@ -386,13 +407,13 @@ extracted from binary data blocks.  Default is 0.
 
 =item Verbose
 
-Flag to print verbose messages.  May be set to a value from 0 to 5 to be
-increasingly verbose.  Default is 0.  With the verbose option set, messages
-are printed to the console as the file is parsed.  Level 1 prints the tag
-names and raw values.  Level 2 adds more details about the tags.  Level 3
-adds a hex dump of the tag data, but with limits on the number of bytes
-dumped.  Levels 4 and 5 remove the dump limit on tag values and JPEG segment
-data respectively.
+Print verbose messages to file specified by TextOut option.  Value may be
+from 0 to 5 for increasingly verbose messages.  Default is 0.  With the
+verbose option set, messages are printed to the console as the file is
+parsed.  Level 1 prints the tag names and raw values.  Level 2 adds more
+details about the tags.  Level 3 adds a hex dump of the tag data, but with
+limits on the number of bytes dumped.  Levels 4 and 5 remove the dump limit
+on tag values and JPEG segment data respectively.
 
 =back
 
@@ -694,23 +715,27 @@ since it is possible for these conversions to yield undefined values.
 
 =head2 SetNewValue
 
-Set the new value for a tag.  The new value is the value that will be
-written for this tag in subsequent calls to L</WriteInfo>.
+Set the new value for a tag.  The routine may be called multiple times to
+set the values of many tags before using L</WriteInfo> to write the new
+values to an image.
 
 For list-type tags (like Keywords), call repeatedly with the same tag name
 for each value in the list.
 
+    # set a new value for a tag (errors go to STDERR)
     $success = $exifTool->SetNewValue($tag, $value);
 
+    # set a new value and capture any error message
     ($success, $errStr) = $exifTool->SetNewValue($tag, $value);
 
-    # delete a tag (also resets AddValue and DelValue options for this tag)
+    # delete information for specified tag if it exists in image
+    # (also resets AddValue and DelValue options for this tag)
     $exifTool->SetNewValue($tag);
 
     # reset all values from previous calls to SetNewValue()
     $exifTool->SetNewValue();
 
-    # delete a single keyword
+    # delete a specific keyword
     $exifTool->SetNewValue('Keywords', $word, DelValue => 1);
 
     # add a keyword without replacing existing keywords
@@ -791,8 +816,9 @@ L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for more information.
 
 =item Return Values:
 
-The number of tags set and prints any errors in scalar context, or the
-number of tags set and the error string in list context.
+In scalar context, returns the number of tags set and error messages are
+printed to STDERR.  In list context, returns the number of tags set and the
+error string.
 
 =back
 
@@ -1248,7 +1274,7 @@ WAV, XMP
 APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, DICOM, ExifIFD,
 ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt,
 ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3,
-ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, Jpeg2000, Kodak,
+ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC, Jpeg2000, Kodak,
 KodakBordersIFD, KodakEffectsIFD, Leaf, LeafSubIFD, MIFF, MNG, MakerUnknown,
 MetaIFD, Minolta, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT,
 PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM, QuickTime, Ricoh,

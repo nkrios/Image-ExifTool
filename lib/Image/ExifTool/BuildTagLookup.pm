@@ -25,7 +25,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -346,7 +346,10 @@ TagID:  foreach $tagID (@keys) {
             foreach $tagInfo (@infoArray) {
                 if ($$tagInfo{Notes}) {
                     my $note = $$tagInfo{Notes};
-                    $note =~ s/(^\s+|\s+$)//sg;
+                    # remove leading/trailing blank lines
+                    $note =~ s/(^\s+|\s+$)//g;
+                    # remove leading/trailing spaces on each line
+                    $note =~ s/(^[ \t]+|[ \t]+$)//mg;
                     push @values, "($note)";
                 }
                 my $writeGroup;
@@ -893,9 +896,14 @@ sub WriteTagNames($$)
         my $table = GetTagTable($tableName);
         my $notes = $$table{NOTES};
         my $prefix;
-        if ($notes and $notes =~ /leading '(.*?_)' which/) {
-            $prefix = $1;
-            $podIdLen -= length $prefix;
+        if ($notes) {
+            # remove unnecessary whitespace
+            $notes =~ s/(^\s+|\s+$)//g;
+            $notes =~ s/(^[ \t]+|[ \t]+$)//mg;
+            if ($notes =~ /leading '(.*?_)' which/) {
+                $prefix = $1;
+                $podIdLen -= length $prefix;
+            }
         }
         if ($podIdLen <= $wID) {
             $podIdLen = $wID;
@@ -926,10 +934,7 @@ sub WriteTagNames($$)
         my $head = ($short =~ / /) ? 'head3' : 'head2';
         print PODFILE "\n=$head $short Tags\n";
         print PODFILE $docs{$short} if $docs{$short};
-        if ($notes) {
-            $notes =~ s/(^\s+|\s+$)//sg;
-            print PODFILE "\n$notes\n";
-        }
+        print PODFILE "\n$notes\n" if $notes;
         my $line = "\n";
         if ($id) {
             # shift over 'Index' heading by one character for a bit more balance
@@ -1072,11 +1077,11 @@ sub WriteTagNames($$)
             print HTMLFILE join("\n  <br>",@values),"$close</td></tr>\n";
         }
         unless ($infoCount) {
-            printf PODFILE "  [no tags defined]\n";
+            printf PODFILE "  [no tags known]\n";
             my $cols = 3;
             ++$cols if $hid;
             ++$cols if $derived;
-            print HTMLFILE "<tr><td colspan=$cols align='center'>[no tags defined]</td></tr>\n";
+            print HTMLFILE "<tr><td colspan=$cols align='center'>[no tags known]</td></tr>\n";
         }
         print HTMLFILE "</table></td></tr></table></blockquote>\n\n";
     }

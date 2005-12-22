@@ -559,7 +559,7 @@ specified shift, then calculating the equivalent time difference in seconds
 for this shift and applying this difference to subsequent tags in a batch
 conversion.  So if it works as designed, the behaviour should be both
 intuitive and mathematically correct, and the user shouldn't have to worry
-about details such as this (in keeping with the Perl "do the right thing"
+about details such as this (in keeping with Perl's "do the right thing"
 philosophy).
 
 =head1 AUTHOR

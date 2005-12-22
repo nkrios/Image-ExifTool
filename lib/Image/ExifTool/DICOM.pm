@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         DICOM.pm
 #
-# Description:  Read DICOM and NEMA-ACR medical images
+# Description:  Read DICOM and ACR-NEMA medical images
 #
 # Revisions:    11/09/2005 - P. Harvey Created
 #
@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # DICOM VR (Value Representation) format conversions
 my %dicomFormat = (
@@ -2487,7 +2487,7 @@ sub ProcessDICM($$)
             $len = 0;   # don't read value if undefined length
             if ($verbose) {
                 # start list of items in verbose output
-                print "$exifTool->{INDENT}+ [List of items]\n";
+                $exifTool->VPrint(0, "$exifTool->{INDENT}+ [List of items]\n");
                 $exifTool->{INDENT} .= '| ';
             }
         }
@@ -2594,7 +2594,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::DICOM - Read DICOM and NEMA-ACR medical images
+Image::ExifTool::DICOM - Read DICOM and ACR-NEMA medical images
 
 =head1 SYNOPSIS
 

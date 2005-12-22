@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..7\n"; }
+BEGIN { $| = 1; print "1..8\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -122,6 +122,20 @@ my $testnum = 1;
     } else {
         print 'not ';
     }
+    print "ok $testnum\n";
+}
+
+# test 8: Test rewriting CS2 XMP information
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $testfile = "t/${testname}_${testnum}_failed.xmp";
+    unlink $testfile;
+    $exifTool->SetNewValue(Label => 'Blue');
+    $exifTool->SetNewValue(Rating => 3);
+    $exifTool->Options(Compact => 1);
+    $exifTool->WriteInfo('t/images/XMP.xmp',$testfile);
+    print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
     print "ok $testnum\n";
 }
 

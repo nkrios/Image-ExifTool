@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.14';
+$VERSION = '1.17';
 
 # conditional list of maker notes
 # Notes:
@@ -69,6 +69,22 @@ $VERSION = '1.14';
             # the pointers are relative to the subdirectory start
             # (before adding the offsetPt) - PH
             Base => '$start',
+        },
+    },
+    {
+        Name => 'MakerNoteJVC',
+        Condition => '$self->{CameraMake}=~/^JVC/ and $$valPt=~/^JVC /',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::JVC::Main',
+            Start => '$valuePtr + 4',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteJVCText',
+        Condition => '$self->{CameraMake}=~/^(JVC|Victor)/ and $$valPt=~/^VER:/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::JVC::Text',
         },
     },
     {
@@ -204,7 +220,7 @@ $VERSION = '1.14';
         Condition => '$self->{CameraMake}=~/^NIKON/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
-            ByteOrder => 'LittleEndian',
+            ByteOrder => 'Unknown', # most are little-endian, but D1 is big
         },
     },
     {
@@ -276,7 +292,7 @@ $VERSION = '1.14';
     {
         # Samsung PreviewImage
         %Image::ExifTool::previewImageTagInfo,
-        Condition => '$self->{CameraMake}=~/^Samsung/ and $self->{CameraModel}=~/^<Digimax V700/',
+        Condition => '$self->{CameraMake}=~/^Samsung/ and $self->{CameraModel}=~/^<Digimax/',
         Notes => 'Samsung preview image',
     },
     {
@@ -341,6 +357,41 @@ foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
     $$tagInfo{ValueConv} = '\$val';
     $$tagInfo{ValueConvInv} = '$val';
     $$tagInfo{MakerNotes} = 1;
+}
+
+#------------------------------------------------------------------------------
+# Get normal offset (absolute) of value data from end of maker note IFD
+# Inputs: 0) ExifTool object reference
+# Returns: (array) 0) expected offset, 1) relative flag (undef for no change)
+# Notes: Directory size should be validated before calling this routine
+sub GetMakerNoteOffset($)
+{
+    my $exifTool = shift;
+    # figure out where we expect the value data based on camera type
+    my $make = $exifTool->{CameraMake};
+    my $model = $exifTool->{CameraModel};
+    my ($offset, $relative);
+    if ($make =~ /^Canon/ and $model =~ /\b(20D|350D|REBEL XT)\b/) {
+        $offset = 6;
+    } elsif ($make =~ /^KYOCERA/) {
+        $offset = 12;
+    } elsif ($make =~ /^OLYMPUS/ and $model =~ /^E-(1|300)\b/) {
+        $offset = 16;
+    } elsif ($make =~ /^OLYMPUS/ and $model =~ /^C2500L\b/) {
+        $offset = undef;   # these are just weird
+    } elsif ($make =~ /^(Panasonic|SONY|JVC|TOSHIBA)\b/) {
+        $offset = 0;
+    } elsif ($make =~ /^PENTAX/) {
+        $offset = 4;
+        # the Pentax addressing mode is determined automatically, but
+        # sometimes the algorithm gets it wrong, but Pentax always uses
+        # absolute addressing, so force it to be absolute
+        $relative = 0;
+    } else {
+        # normally, value data starts 4 bytes after end of directory
+        $offset = 4;
+    }
+    return ($offset, $relative);
 }
 
 #------------------------------------------------------------------------------
@@ -497,13 +548,15 @@ sub ProcessUnknown($$$)
     my $loc = LocateIFD($exifTool,$dirInfo);
     if (defined $loc) {
         if ($exifTool->Options('Verbose') > 1) {
+            my $out = $exifTool->Options('TextOut');
             my $indent = $exifTool->{INDENT};
             $indent =~ s/\| $/  /;
-            printf "${indent}Found IFD at offset 0x%.4x in Unknown maker notes:\n", $$dirInfo{DirStart};
+            printf $out "${indent}Found IFD at offset 0x%.4x in maker notes:\n",
+                    $$dirInfo{DirStart} + $$dirInfo{DataPos} + $$dirInfo{Base};
         }
         $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
     } else {
-        $exifTool->Warn("Bad $$dirInfo{DirName} SubDirectory");
+        $exifTool->Warn("Unrecognized $$dirInfo{DirName}");
     }
     return $success;
 }

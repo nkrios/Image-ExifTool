@@ -279,6 +279,12 @@ sub CheckXMP($$$)
         } else {
             $$valPtr = 'True';
         }
+    } elsif ($format eq '1') {
+        # this is the entire XMP data block
+        return undef if $$valPtr =~ /^\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/;
+        return 'Invalid XMP data' unless $$valPtr =~ /^<x:xmpmeta/;
+        # add required xpacket header/trailer
+        $$valPtr = $pktOpen . $$valPtr . $pktClose;
     } else {
         return "Unknown XMP format: $format";
     }
@@ -357,11 +363,13 @@ sub SetPropertyPath($$;$$)
 #         2) reference to array of XMP property path (last is current property)
 #         3) reference to hash of property attributes
 #         4) true to set error on unrecognized attributes
+# Returns: number of shorthand properties captured
 sub CaptureShorthand($$$;$)
 {
     my ($exifTool, $propList, $attrs, $setError) = @_;
     my $attr;
     my @attrList = keys %$attrs;
+    my $count = 0;
     foreach $attr (@attrList) {
         if ($attr =~ /^xmlns:(.*)/) {
             # remember all namespaces (except x which we open ourselves)
@@ -390,20 +398,20 @@ sub CaptureShorthand($$$;$)
                 $ns = $1 if $prop =~ /(.*):/;   # take namespace from enclosing property
                 $name = $attr;
             }
-            if ($ns and ($Image::ExifTool::XMP::Main{$ns} or ($xlatNamespace{$ns} and
-                $Image::ExifTool::XMP::Main{$xlatNamespace{$ns}})))
-            {
+            if ($ns and not $ignoreNamespace{$ns}) {
                 # save this shorthand property
                 push @$propList, "$ns:$name";
                 CaptureXMP($exifTool, $propList, $$attrs{$attr});
                 pop @$propList;
                 # remove this attribute from list since we handled it
                 delete $$attrs{$attr};
+                ++$count;
             } elsif ($setError) {
-                $exifTool->{XMP_ERROR} = "Can't yet handle XMP attribute '$attr'";
+                $exifTool->{XMP_ERROR} = "Can't handle XMP attribute '$attr'";
             }
         }
     }
+    return $count;
 }
 
 #------------------------------------------------------------------------------
@@ -423,7 +431,7 @@ sub CaptureXMP($$$;$)
             $$propList[2] eq $rdfDesc)
         {
             # capture any shorthand properties in the attribute list
-            CaptureShorthand($exifTool, $propList, $attrs);
+            my $shorthand = CaptureShorthand($exifTool, $propList, $attrs);
             # no properties to save yet if this is just the description
             return unless @$propList > 3;
             # save information about this property
@@ -431,7 +439,7 @@ sub CaptureXMP($$$;$)
             my $path = join('/', @$propList[3..$#$propList]);
             if (defined $$capture{$path}) {
                 $exifTool->{XMP_ERROR} = "Duplicate XMP property: $path";
-            } else {
+            } elsif (length $val or not $shorthand) {
                 $$capture{$path} = [$val, $attrs];
             }
         } else {
@@ -489,7 +497,6 @@ sub WriteXMP($$;$)
     my $dirStart = $$dirInfo{DirStart} || 0;
     my (%capture, %nsUsed, $xmpErr, $uuid);
     my $changed = 0;
-    my $verbose = $exifTool->Options('Verbose');
     my $xmpFile = (not $tagTablePtr); # this is an XMP data file if no $tagTablePtr
 #
 # extract existing XMP information into %capture hash
@@ -576,7 +583,7 @@ sub WriteXMP($$;$)
                         # only overwrite specific values
                         next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
                     }
-                    $verbose > 1 and print "    - XMP:$$tagInfo{Name} = '$val'\n";
+                    $exifTool->VPrint(1, "    - XMP:$$tagInfo{Name} = '$val'\n");
                     # save attributes and path from this deleted property
                     # so we can replace it exactly
                     %attrs = %$attrs;
@@ -623,7 +630,7 @@ sub WriteXMP($$;$)
         for (;;) {
             my $newValue = EscapeHTML(shift @newValues);
             $capture{$path} = [ $newValue, \%attrs ];
-            $verbose > 1 and print "    + XMP:$$tagInfo{Name} = '$newValue'\n";
+            $exifTool->VPrint(1, "    + XMP:$$tagInfo{Name} = '$newValue'\n");
             ++$changed;
             last unless @newValues;
             $path =~ m/ (\d{3})/g or warn("Internal error: no list index!\n"), next;
@@ -656,7 +663,9 @@ sub WriteXMP($$;$)
 # write out the new XMP information
 #
     # start writing the XMP data
-    my $newData = $pktOpen . $xmpOpen . $rdfOpen;
+    my $newData = '';
+    $newData .= $pktOpen unless $$exifTool{XMP_NO_XPACKET};
+    $newData .= $xmpOpen . $rdfOpen;
 
     # initialize current property path list
     my @curPropList;
@@ -744,8 +753,10 @@ sub WriteXMP($$;$)
     $newData .= $rdfClose . $xmpClose;
     # (the XMP standard recommends writing 2k-4k of white space before the
     # packet trailer, with a newline every 100 characters)
-    $newData .= ((' ' x 100) . "\n") x 24 unless $exifTool->Options('Compact');
-    $newData .= $pktClose;
+    unless ($$exifTool{XMP_NO_XPACKET}) {
+        $newData .= ((' ' x 100) . "\n") x 24 unless $exifTool->Options('Compact');
+        $newData .= $pktClose;
+    }
 #
 # clean up and return our data
 #

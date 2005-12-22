@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessID3v2($$$);
 
@@ -539,7 +539,6 @@ sub ProcessID3($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my $verbose = $exifTool->Options('Verbose');
     my $buff;
     my $rtnVal = 0;
 
@@ -555,7 +554,7 @@ sub ProcessID3($$)
         my ($vers, $flags, $size) = unpack('nCN', $buff);
         $size & 0x80808080 and $exifTool->Warn('Invalid ID3 header'), return 1;
         my $verStr = sprintf("2.%d.%d", $vers >> 8, $vers & 0xff);
-        $verbose and printf "ID3v$verStr:\n";
+        $exifTool->VPrint(0, "ID3v$verStr:\n");
         if ($vers >= 0x0500) {
             $exifTool->Warn("Unsupported ID3 version: $verStr");
             return 1;
@@ -604,7 +603,7 @@ sub ProcessID3($$)
     if ($raf->Seek(-128, 2) and $raf->Read($buff, 128) == 128 and $buff =~ /^TAG/) {
         $rtnVal or $exifTool->SetFileType();
         $rtnVal = 1;
-        $verbose and printf "ID3v1:\n";
+        $exifTool->VPrint(0, "ID3v1:\n");
         SetByteOrder('MM');
         my %dirInfo = (
             DataPt => \$buff,

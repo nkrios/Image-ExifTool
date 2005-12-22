@@ -3,17 +3,16 @@
   <title>ExifTool Verbose Option</title>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
-<h1>ExifTool Verbose Option</h1>
+<h2>ExifTool Verbose Option</h2>
 
-With the Verbose option enabled, ExifTool prints a verbose log to the
-console as it extracts the meta information from a file.
+With the Verbose option enabled, ExifTool prints a verbose log to the console as
+it extracts the meta information from a file.
 
-<p>The -v option of the exiftool application allows control of the
-Verbose setting.  A number between 0 and 5 may be specified with the -v
-option to set a specific Verbose level.  For example, -v2 sets Verbose =
-2.  Without a number, -v increments the current Verbose level by one. 
-Multiple -v options are allowed, so the following two examples give the
-same result:
+<p>The -v option of the exiftool application allows control of the Verbose
+setting.  A number between 0 and 5 may be specified with the -v option to set a
+specific Verbose level.  For example, -v2 sets Verbose = 2.  Without a number,
+-v increments the current Verbose level by one. Multiple -v options are allowed,
+so the following two examples give the same result:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
 exiftool -v -v -v t/images/ExifTool.jpg
@@ -30,12 +29,13 @@ numbers are printed instead of a name.  Also printed are details of the file and
 directory structure:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
-  ExifToolVersion = 5.32
+  ExifToolVersion = 5.83
   FileName = ExifTool.jpg
   Directory = t/images
   FileSize = 3475
-  FileModifyDate = 1117042858
+  FileModifyDate = 1131997641
   FileType = JPEG
+  MIMEType = image/jpeg
 JPEG APP1 (2442 bytes):
   + [IFD0 directory with 9 entries]
   | 0)  Make = Canon
@@ -46,7 +46,7 @@ JPEG APP1 (2442 bytes):
   | 5)  ResolutionUnit = 2
   | 6)  ModifyDate = 2003:12:04 06:46:52
   | 7)  YCbCrPositioning = 1
-  | 8)  ExifOffset (SubDirectory) --&gt;
+  | 8)  ExifOffset (SubDirectory) -->
   | + [ExifIFD directory with 31 entries]
   | | 0)  ExposureTime = 4
   | | 1)  FNumber = 14
@@ -61,12 +61,13 @@ Prints all of the information from Verbose = 1, plus additional information
 about the tag number, data size and format:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
-  ExifToolVersion = 5.32
+  ExifToolVersion = 5.83
   FileName = ExifTool.jpg
   Directory = t/images
   FileSize = 3475
-  FileModifyDate = 1117042858
+  FileModifyDate = 1131997641
   FileType = JPEG
+  MIMEType = image/jpeg
 JPEG APP1 (2442 bytes):
   + [IFD0 directory with 9 entries]
   | 0)  Make = Canon
@@ -85,7 +86,7 @@ JPEG APP1 (2442 bytes):
   |     - Tag 0x0132 (20 bytes, string[20])
   | 7)  YCbCrPositioning = 1
   |     - Tag 0x0213 (2 bytes, int16u[1])
-  | 8)  ExifOffset (SubDirectory) --&gt;
+  | 8)  ExifOffset (SubDirectory) -->
   |     - Tag 0x8769 (4 bytes, int32u[1])
   | + [ExifIFD directory with 31 entries]
   | | 0)  ExposureTime = 4
@@ -102,75 +103,76 @@ JPEG APP1 (2442 bytes):
 </pre></td></tr></table></blockquote>
 
 <h3>Verbose = 3</h3>
-Adds a hex dump of the binary data associated with each tag.  For information in
-EXIF directories, the hex dumps offsets are relative to the start of the TIFF
-header (for a JPEG image, this is 6 bytes into the EXIF APP1 segment), which
-corresponds to the offsets stored in the IFD entries.  If the data is very long,
+Adds a hex dump of the binary data associated with each tag.  As of version
+5.69, the hex offsets are relative to the start of the file (previously they
+were relative to the start of the TIFF header, like the HtmlDump output still
+is, which is the native base for TIFF IFD offsets).  If the data is very long,
 only the first few lines of the dump are printed:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
-  ExifToolVersion = 5.32
+  ExifToolVersion = 5.83
   FileName = ExifTool.jpg
   Directory = t/images
   FileSize = 3475
-  FileModifyDate = 1117042858
+  FileModifyDate = 1131997641
   FileType = JPEG
+  MIMEType = image/jpeg
 JPEG APP1 (2442 bytes):
-    0000: 45 78 69 66 00 00 49 49 2a 00 08 00 00 00 09 00 [Exif..II*.......]
-    0010: 0f 01 02 00 06 00 00 00 7a 00 00 00 10 01 02 00 [........z.......]
-    0020: 18 00 00 00 80 00 00 00 12 01 03 00 01 00 00 00 [................]
-    0030: 01 00 00 00 1a 01 05 00 01 00 00 00 98 00 00 00 [................]
-    0040: 1b 01 05 00 01 00 00 00 a0 00 00 00 28 01 03 00 [............(...]
-    0050: 01 00 00 00 02 00 00 00 32 01 02 00 14 00 00 00 [........2.......]
-    0060: a8 00 00 00 13 02 03 00 01 00 00 00 01 00 00 00 [................]
+    0006: 45 78 69 66 00 00 49 49_2a 00 08 00 00 00 09 00 [Exif..II*.......]
+    0016: 0f 01 02 00 06 00 00 00_7a 00 00 00 10 01 02 00 [........z.......]
+    0026: 18 00 00 00 80 00 00 00_12 01 03 00 01 00 00 00 [................]
+    0036: 01 00 00 00 1a 01 05 00_01 00 00 00 98 00 00 00 [................]
+    0046: 1b 01 05 00 01 00 00 00_a0 00 00 00 28 01 03 00 [............(...]
+    0056: 01 00 00 00 02 00 00 00_32 01 02 00 14 00 00 00 [........2.......]
+    0066: a8 00 00 00 13 02 03 00_01 00 00 00 01 00 00 00 [................]
     [snip 2330 bytes]
   + [IFD0 directory with 9 entries]
   | 0)  Make = Canon
   |     - Tag 0x010f (6 bytes, string[6]):
-  |         007a: 43 61 6e 6f 6e 00                               [Canon.]
+  |         0086: 43 61 6e 6f 6e 00                               [Canon.]
   | 1)  Model = Canon EOS DIGITAL REBEL
   |     - Tag 0x0110 (24 bytes, string[24]):
-  |         0080: 43 61 6e 6f 6e 20 45 4f 53 20 44 49 47 49 54 41 [Canon EOS DIGITA]
-  |         0090: 4c 20 52 45 42 45 4c 00                         [L REBEL.]
+  |         008c: 43 61 6e 6f 6e 20 45 4f_53 20 44 49 47 49 54 41 [Canon EOS DIGITA]
+  |         009c: 4c 20 52 45 42 45 4c 00                         [L REBEL.]
   | 2)  Orientation = 1
   |     - Tag 0x0112 (2 bytes, int16u[1]):
-  |         002a: 01 00                                           [..]
+  |         0036: 01 00                                           [..]
   | 3)  XResolution = 180
   |     - Tag 0x011a (8 bytes, rational32u[1]):
-  |         0098: b4 00 00 00 01 00 00 00                         [........]
+  |         00a4: b4 00 00 00 01 00 00 00                         [........]
   | 4)  YResolution = 180
   |     - Tag 0x011b (8 bytes, rational32u[1]):
-  |         00a0: b4 00 00 00 01 00 00 00                         [........]
+  |         00ac: b4 00 00 00 01 00 00 00                         [........]
   | 5)  ResolutionUnit = 2
   |     - Tag 0x0128 (2 bytes, int16u[1]):
-  |         004e: 02 00                                           [..]
+  |         005a: 02 00                                           [..]
   | 6)  ModifyDate = 2003:12:04 06:46:52
   |     - Tag 0x0132 (20 bytes, string[20]):
-  |         00a8: 32 30 30 33 3a 31 32 3a 30 34 20 30 36 3a 34 36 [2003:12:04 06:46]
-  |         00b8: 3a 35 32 00                                     [:52.]
+  |         00b4: 32 30 30 33 3a 31 32 3a_30 34 20 30 36 3a 34 36 [2003:12:04 06:46]
+  |         00c4: 3a 35 32 00                                     [:52.]
   | 7)  YCbCrPositioning = 1
   |     - Tag 0x0213 (2 bytes, int16u[1]):
-  |         0066: 01 00                                           [..]
-  | 8)  ExifOffset (SubDirectory) --&gt;
+  |         0072: 01 00                                           [..]
+  | 8)  ExifOffset (SubDirectory) -->
   |     - Tag 0x8769 (4 bytes, int32u[1]):
-  |         0072: bc 00 00 00                                     [....]
+  |         007e: bc 00 00 00                                     [....]
   | + [ExifIFD directory with 31 entries]
   | | 0)  ExposureTime = 4
   | |     - Tag 0x829a (8 bytes, rational32u[1]):
-  | |         0236: 04 00 00 00 01 00 00 00                         [........]
+  | |         0242: 04 00 00 00 01 00 00 00                         [........]
   | | 1)  FNumber = 14
   | |     - Tag 0x829d (8 bytes, rational32u[1]):
-  | |         023e: 0e 00 00 00 01 00 00 00                         [........]
+  | |         024a: 0e 00 00 00 01 00 00 00                         [........]
   | | 2)  ISO = 100
   | |     - Tag 0x8827 (2 bytes, int16u[1]):
-  | |         00de: 64 00                                           [d.]
+  | |         00ea: 64 00                                           [d.]
   | | 3)  ExifVersion = 0221
   | |     - Tag 0x9000 (4 bytes, undef[4]):
-  | |         00ea: 30 32 32 31                                     [0221]
+  | |         00f6: 30 32 32 31                                     [0221]
   | | 4)  DateTimeOriginal = 2003:12:04 06:46:52
   | |     - Tag 0x9003 (20 bytes, string[20]):
-  | |         0246: 32 30 30 33 3a 31 32 3a 30 34 20 30 36 3a 34 36 [2003:12:04 06:46]
-  | |         0256: 3a 35 32 00                                     [:52.]
+  | |         0252: 32 30 30 33 3a 31 32 3a_30 34 20 30 36 3a 34 36 [2003:12:04 06:46]
+  | |         0262: 3a 35 32 00                                     [:52.]
   [etc...]
 </pre></td></tr></table></blockquote>
 

@@ -101,7 +101,6 @@ sub AddChunks($$)
     my $addTags = $exifTool->{ADD_PNG};
     delete $exifTool->{ADD_PNG};
     my ($tag, $dir, $err, $tagTablePtr);
-    my $verbose = $exifTool->Options('Verbose');
     foreach $tag (sort keys %$addTags) {
         my $tagInfo = $$addTags{$tag};
         my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
@@ -112,7 +111,7 @@ sub AddChunks($$)
             my $hdr = pack('N', length($data) - 4);
             my $cbuf = pack('N', CalculateCRC(\$data, undef));
             Write($outfile, $hdr, $data, $cbuf) or $err = 1;
-            $verbose > 1 and print "    + $$tagInfo{Name} = '$val'\n";
+            $exifTool->VPrint(1, "    + $$tagInfo{Name} = '$val'\n");
             ++$exifTool->{CHANGED};
         }
     }
@@ -125,7 +124,7 @@ sub AddChunks($$)
             DirName => $dir,
         );
         if ($dir eq 'IFD0') {
-            $verbose and print "Creating EXIF profile:\n";
+            $exifTool->VPrint(0, "Creating EXIF profile:\n");
             $exifTool->{TIFF_TYPE} = 'APP1';
             $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
             # use specified byte ordering or ordering from maker notes if set
@@ -144,7 +143,7 @@ sub AddChunks($$)
                 WriteProfile($outfile, 'APP1', 'generic', \$buff) or $err = 1;
             }
         } elsif ($dir eq 'XMP') {
-            $verbose and print "Creating XMP profile:\n";
+            $exifTool->VPrint(0, "Creating XMP profile:\n");
             # write new XMP data
             $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
@@ -153,7 +152,7 @@ sub AddChunks($$)
                 WriteProfile($outfile, 'APP1', 'generic', \$buff) or $err = 1;
             }
         } elsif ($dir eq 'IPTC') {
-            $verbose and print "Creating IPTC profile:\n";
+            $exifTool->VPrint(0, "Creating IPTC profile:\n");
             # write new XMP data
             $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);

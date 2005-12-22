@@ -11,7 +11,7 @@ package Image::ExifTool::APP12;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessAPP12($$$);
 
@@ -75,7 +75,12 @@ tags found in this segment.
     Zoom        => { },
     ZoomPos     => { },
     LightS      => { },
-    Type        => { Groups => { 2 => 'Camera' } },
+    Type        => {
+        Name => 'CameraType',
+        Groups => { 2 => 'Camera' },
+        DataMember => 'CameraType',
+        RawConv => '$self->{CameraType} = $val',
+    },
     Version     => { Groups => { 2 => 'Camera' } },
     ID          => { Groups => { 2 => 'Camera' } },
 );
@@ -88,27 +93,42 @@ sub ProcessAPP12($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my @lines = split /[\x0d\x0a]+/, $$dataPt;
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $dirStart);
+    if ($dirLen != $dirStart + length($$dataPt)) {
+        my $buff = substr($$dataPt, $dirStart, $dirLen);
+        $dataPt = \$buff;
+    } else {
+        pos($$dataPt) = $$dirInfo{DirStart};
+    }
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
+    my $section = '';
+    pos($$dataPt) = 0;
 
-    foreach (@lines) {
-        unless (/(\w+#?)=(.+)/) {
-            # Agfa begins sections with strings like "[camera info]"
-            if (/^\[(.*)\]/) {
-                $exifTool->VerboseDir($1) if $verbose;
-                $success = 1;
-            }
+    # this regular expression is a bit complex, but basically we are looking for
+    # section headers (ie. "[Camera Info]") and tag/value pairs (ie. "tag=value",
+    # where "value" may contain white space), separated by spaces or CR/LF.
+    # (APP12 uses CR/LF, but Olympus TextualInfo is similar and uses spaces)
+    while ($$dataPt =~ /(\[.*?\]|[\w#-]+=[\x20-\x7e]+?(?=\s*([\n\r\0]|[\w#-]+=|\[|$)))/g) {
+        my $token = $1;
+        # was this a section name?
+        if ($token =~ /^\[(.*)\]/) {
+            $exifTool->VerboseDir($1) if $verbose;
+            $section = ($token =~ /\[(\S+) ?Info\]/i) ? $1 : '';
+            $success = 1;
             next;
         }
-        $exifTool->VerboseDir('APP12') if $verbose and not $success;
+        $exifTool->VerboseDir($$dirInfo{DirName}) if $verbose and not $success;
         $success = 1;
-        my ($tag, $val) = ($1, $2);
+        my ($tag, $val) = ($token =~ /(\S+)=(.+)/);
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         $verbose and $exifTool->VerboseInfo($tag, $tagInfo, Value => $val);
         unless ($tagInfo) {
             # add new tag to table
             $tagInfo = { Name => $tag };
+            # put in Camera group if information in "Camera" section
+            $$tagInfo{Groups} = { 2 => 'Camera' } if $section =~ /camera/i;
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         $exifTool->FoundTag($tagInfo, $val);

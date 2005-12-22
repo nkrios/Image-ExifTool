@@ -118,6 +118,7 @@ sub SetNewValue($;$$%)
     my ($self, $tag, $value, %options) = @_;
     my ($err, $tagInfo);
     my $verbose = $self->Options('Verbose');
+    my $out = $self->Options('TextOut');
     my $protected = $options{Protected} || 0;
     my $numSet = 0;
 
@@ -132,7 +133,7 @@ sub SetNewValue($;$$%)
         # remove any existing set values
         delete $self->{NEW_VALUE};
         delete $self->{DEL_GROUP};
-        $verbose > 1 and print "Cleared new values\n";
+        $verbose > 1 and print $out "Cleared new values\n";
         return 1;
     }
     # set group name in options if specified
@@ -164,10 +165,10 @@ sub SetNewValue($;$$%)
                     foreach $grp (@del) {
                         if ($options{Replace} and $options{Replace} > 1) {
                             delete $self->{DEL_GROUP}->{$grp};
-                            $verbose > 1 and print "Removed group $grp from delete list\n";
+                            $verbose > 1 and print $out "Removed group $grp from delete list\n";
                         } else {
                             $self->{DEL_GROUP}->{$grp} = 1;
-                            $verbose > 1 and print "Deleting all $grp tags\n";
+                            $verbose > 1 and print $out "Deleting all $grp tags\n";
                         }
                     }
                 } else {
@@ -356,7 +357,7 @@ sub SetNewValue($;$$%)
                 }
             } elsif ($shift) {
                 $err = "$wgrp1:$tag is not shiftable";
-                $verbose > 2 and print "$err\n";
+                $verbose > 2 and print $out "$err\n";
                 next;
             }
         }
@@ -373,7 +374,7 @@ sub SetNewValue($;$$%)
             my $err2 = CheckShift($tagInfo->{Shift}, $val);
             if ($err2) {
                 $err = "$err2 for $wgrp1:$tag";
-                $verbose > 2 and print "$err\n";
+                $verbose > 2 and print $out "$err\n";
                 next;
             }
         } else {
@@ -398,12 +399,12 @@ sub SetNewValue($;$$%)
                     chomp $evalWarning;
                     $evalWarning =~ s/ at \(eval .*//s;
                     $err = "$evalWarning in $wgrp1:$tag (${type}Inv)";
-                    $verbose > 2 and print "$err\n";
+                    $verbose > 2 and print $out "$err\n";
                     undef $val;
                     last;
                 } elsif (not defined $val) {
                     $err = "Error converting value for $wgrp1:$tag (${type}Inv)";
-                    $verbose > 2 and print "$err\n";
+                    $verbose > 2 and print $out "$err\n";
                     last;
                 }
             } elsif ($conv) {
@@ -413,12 +414,12 @@ sub SetNewValue($;$$%)
                     unless (defined $val) {
                         $err = "Can't convert $wgrp1:$tag (" .
                                ($multi ? 'matches more than one' : 'not in') . " $type)";
-                        $verbose > 2 and print "$err\n";
+                        $verbose > 2 and print $out "$err\n";
                         last;
                     }
                 } else {
                     $err = "Can't convert value for $wgrp1:$tag (no ${type}Inv)";
-                    $verbose > 2 and print "$err\n";
+                    $verbose > 2 and print $out "$err\n";
                     undef $val;
                     last;
                 }
@@ -430,7 +431,7 @@ sub SetNewValue($;$$%)
                 # validate the value with WriteCheck and CHECK_PROC if they exist
                 my $err2;
                 if ($tagInfo->{WriteCheck}) {
-                    #### eval WriteCheck ($self, $val)
+                    #### eval WriteCheck ($self, $tagInfo, $val)
                     $err2 = eval $tagInfo->{WriteCheck};
                     $@ and warn($@), $err2 = 'Error evaluating WriteCheck';
                 }
@@ -443,7 +444,7 @@ sub SetNewValue($;$$%)
                 }
                 if ($err2) {
                     $err = "$err2 for $wgrp1:$tag";
-                    $verbose > 2 and print "$err\n";
+                    $verbose > 2 and print $out "$err\n";
                     undef $val; # value was invalid
                 }
                 last;
@@ -474,7 +475,7 @@ sub SetNewValue($;$$%)
         if (defined $val) {
             if ($options{AddValue} and not ($shift or $tagInfo->{List})) {
                 $err = "Can't add $wgrp1:$tag (not a List type)";
-                $verbose > 2 and print "$err\n";
+                $verbose > 2 and print $out "$err\n";
                 next;
             }
             # we are editing this tag, so create a NEW_VALUE hash entry
@@ -494,7 +495,7 @@ sub SetNewValue($;$$%)
                     if ($verbose > 1) {
                         my $verb = $permanent ? 'Replacing' : 'Deleting';
                         my $fromList = $tagInfo->{List} ? ' from list' : '';
-                        print "$verb $wgrp1:$tag$fromList if value is '$val'\n";
+                        print $out "$verb $wgrp1:$tag$fromList if value is '$val'\n";
                     }
                 }
             }
@@ -525,26 +526,26 @@ sub SetNewValue($;$$%)
                 if ($verbose > 1) {
                     my $ifExists = $newValueHash->{IsCreating} ? '' : ' if tag already exists';
                     if ($shift) {
-                        print "Shifting $wgrp1:$tag$ifExists\n";
+                        print $out "Shifting $wgrp1:$tag$ifExists\n";
                     } elsif ($options{AddValue}) {
-                        print "Adding to $wgrp1:$tag$ifExists\n";
+                        print $out "Adding to $wgrp1:$tag$ifExists\n";
                     } else {
-                        print "Writing $wgrp1:$tag$ifExists\n";
+                        print $out "Writing $wgrp1:$tag$ifExists\n";
                     }
                 }
             }
         } elsif ($permanent) {
             $err = "Can't delete $tag";
-            $verbose > 1 and print "$err\n";
+            $verbose > 1 and print $out "$err\n";
             next;
         } elsif ($options{AddValue} or $options{DelValue}) {
-            $verbose > 1 and print "Adding/Deleting nothing does nothing\n";
+            $verbose > 1 and print $out "Adding/Deleting nothing does nothing\n";
             next;
         } else {
             # create empty new value hash entry to delete this tag
             $self->GetNewValueHash($tagInfo, $writeGroup, 'delete');
             $self->GetNewValueHash($tagInfo, $writeGroup, 'create');
-            $verbose > 1 and print "Deleting $wgrp1:$tag\n";
+            $verbose > 1 and print $out "Deleting $wgrp1:$tag\n";
         }
         ++$numSet;
         $prioritySet = 1 if $preferred{$tagInfo};
@@ -914,7 +915,7 @@ sub SetFileModifyDate($$;$)
         return -1;
     }
     ++$self->{CHANGED};
-    $self->{OPTIONS}->{Verbose} > 1 and print "    + FileModifyDate = '$val'\n";
+    $self->VPrint(1, "    + FileModifyDate = '$val'\n");
     return 1;
 }
 
@@ -968,12 +969,12 @@ sub WriteInfo($$;$$)
         if (open(EXIFTOOL_FILE2, defined $outfile ? $infile : "+<$infile")) {
             $fileType = GetFileType($infile);
             $tiffType = GetFileExtension($infile);
-            $self->{OPTIONS}->{Verbose} and print "Rewriting $infile...\n";
+            $self->VPrint(0, "Rewriting $infile...\n");
             $inRef = \*EXIFTOOL_FILE2;
             $closeIn = 1;   # we must close the file since we opened it
         } else {
             my $forUpdate = (defined $outfile ? '' : ' for update');
-            $self->Error("Error opening file $infile$forUpdate");
+            $self->Error("Error opening file$forUpdate");
             return 0;
         }
     } elsif (not defined $outfile) {
@@ -985,7 +986,7 @@ sub WriteInfo($$;$$)
         if (CanCreate($outType)) {
             $fileType = $tiffType = $outType;   # use output file type if no input file
             $infile = "$fileType file";         # make bogus file name
-            $self->{OPTIONS}->{Verbose} and print "Creating $infile...\n";
+            $self->VPrint(0, "Creating $infile...\n");
             $inRef = \ '';      # set $inRef to reference to empty data
         } elsif ($outType) {
             $self->Error("Can't create $outType files");
@@ -1554,13 +1555,17 @@ sub GetAddDirHash($$;$)
 #------------------------------------------------------------------------------
 # initialize ADD_DIRS and EDIT_DIRS hashes for all directories that need
 # need to be created or will have tags changed in them
-# Inputs: 0) ExifTool object reference, 1) File type string
+# Inputs: 0) ExifTool object reference, 1) File type string (or map hash ref)
 sub InitWriteDirs($$)
 {
     my ($self, $fileType) = @_;
     my $editDirs = $self->{EDIT_DIRS} = { };
     my $addDirs = $self->{ADD_DIRS} = { };
-    my $fileDirs = $dirMap{$fileType} or return;
+    my $fileDirs = $dirMap{$fileType};
+    unless ($fileDirs) {
+        return unless ref $fileType eq 'HASH';
+        $fileDirs = $fileType;
+    }
     my @tagInfoList = $self->GetNewTagInfoList();
     my $tagInfo;
     for $tagInfo (@tagInfoList) {
@@ -1597,13 +1602,14 @@ sub InitWriteDirs($$)
         }
     }
     if ($self->{OPTIONS}->{Verbose}) {
-        print "  Editing tags in: ";
-        foreach (sort keys %$editDirs) { print "$_ "; }
-        print "\n";
+        my $out = $self->{OPTIONS}->{TextOut};
+        print $out "  Editing tags in: ";
+        foreach (sort keys %$editDirs) { print $out "$_ "; }
+        print $out "\n";
         return unless $self->{OPTIONS}->{Verbose} > 1;
-        print "  Creating tags in: ";
-        foreach (sort keys %$addDirs) { print "$_ "; }
-        print "\n";
+        print $out "  Creating tags in: ";
+        foreach (sort keys %$addDirs) { print $out "$_ "; }
+        print $out "\n";
     }
 }
 
@@ -1617,7 +1623,8 @@ sub WriteDirectory($$$;$)
     my ($self, $dirInfo, $tagTablePtr, $writeProc) = @_;
 
     $tagTablePtr or return undef;
-    my $verbose = $self->{OPTIONS}->{Verbose};
+    my $out;
+    $out = $self->{OPTIONS}->{TextOut} if $self->{OPTIONS}->{Verbose};
     # set directory name from default group0 name if not done already
     my $dirName = $$dirInfo{DirName};
     my $grp0 = $tagTablePtr->{GROUPS}->{0};
@@ -1631,7 +1638,7 @@ sub WriteDirectory($$$;$)
                 # restrict delete logic to prevent entire tiff image from being killed
                 # (don't allow IFD0 to be deleted, and delete only ExifIFD if EXIF specified)
                 if ($grp1 eq 'IFD0') {
-                    $$delGroupPtr{IFD0} and $self->Warn("Can't delete IFD0 from $self->{FILE_TYPE} image");
+                    $$delGroupPtr{IFD0} and $self->Warn("Can't delete IFD0 from $self->{FILE_TYPE} image",1);
                     undef $grp1;
                 } elsif ($grp0 eq 'EXIF' and $$delGroupPtr{$grp0}) {
                     undef $grp1 unless $$delGroupPtr{$grp1} or $grp1 eq 'ExifIFD';
@@ -1639,19 +1646,23 @@ sub WriteDirectory($$$;$)
             }
             if ($grp1) {
                 ++$self->{CHANGED};
-                $verbose and print "  Deleting $grp1\n";
+                $out and print $out "  Deleting $grp1\n";
                 return '';
             }
         }
     }
-    # copy new directory as a block if specified
+    # copy or delete new directory as a block if specified
     my $tagInfo = $Image::ExifTool::Extra{$grp0};
     if ($tagInfo and $self->{NEW_VALUE}->{$tagInfo}) {
         my $newVal = GetNewValues($self->{NEW_VALUE}->{$tagInfo});
         if (defined $newVal and length $newVal) {
-            $verbose and print "  Writing $grp0 as a block\n";
+            $out and print $out "  Writing $grp0 as a block\n";
             ++$self->{CHANGED};
             return $newVal;
+        } else {
+            $out and print $out "  Deleting $grp0 as a block\n";
+            ++$self->{CHANGED};
+            return '';
         }
     }
     # use default proc from tag table if no proc specified
@@ -1660,8 +1671,12 @@ sub WriteDirectory($$$;$)
     if (defined $$dirInfo{DataPt} and defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos}) {
         my $processed = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0);
         if ($self->{PROCESSED}->{$processed}) {
-            $self->Error("$dirName pointer references previous $self->{PROCESSED}->{$processed} directory", 1);
-            return undef;
+            if ($self->Error("$dirName pointer references previous $self->{PROCESSED}->{$processed} directory", 1)) {
+                return undef;
+            } else {
+                $out and print $out "  Deleting $dirName\n";
+                return '';  # delete the duplicate directory
+            }
         } else {
             $self->{PROCESSED}->{$processed} = $dirName;
         }
@@ -1669,49 +1684,37 @@ sub WriteDirectory($$$;$)
     # be sure the tag ID's are generated, because the write proc will need them
     GenerateTagIDs($tagTablePtr);
     my $oldDir = $self->{DIR_NAME};
-    if ($verbose and (not defined $oldDir or $oldDir ne $dirName)) {
+    if ($out and (not defined $oldDir or $oldDir ne $dirName)) {
         my $verb = ($$dirInfo{DataPt} or $$dirInfo{DirLen}) ? 'Rewriting' : 'Creating';
-        print "  $verb $dirName\n";
+        print $out "  $verb $dirName\n";
     }
     my $saveOrder = GetByteOrder();
     $self->{DIR_NAME} = $dirName;
     my $newData = &$writeProc($self, $dirInfo, $tagTablePtr);
     $self->{DIR_NAME} = $oldDir;
     SetByteOrder($saveOrder);
-    print "  Deleting $dirName\n" if $verbose and defined $newData and not length $newData;
+    print $out "  Deleting $dirName\n" if $out and defined $newData and not length $newData;
     return $newData;
 }
 
 #------------------------------------------------------------------------------
-# Uncommon (and bulky) utility routines to for reading binary data values
+# Uncommon utility routines to for reading binary data values
 # Inputs: 0) data reference, 1) offset into data
 sub Get64s($$)
 {
     my ($dataPt, $pos) = @_;
-    my ($a, $b);
-    # must preserve sign bit of high-order word
-    if (GetByteOrder() eq 'II') {
-        $a = Get32s($dataPt, $pos + 4);
-        $b = Get32u($dataPt, $pos);
-    } else {
-        $a = Get32s($dataPt, $pos);
-        $b = Get32u($dataPt, $pos + 4);
-    }
-    return $a * 4294967296.0 + $b;
+    my $pt = GetByteOrder() eq 'MM' ? 0 : 4;    # get position of high word
+    my $hi = Get32s($dataPt, $pos + $pt);       # preserve sign bit of high word
+    my $lo = Get32u($dataPt, $pos + 4 - $pt);
+    return $hi * 4294967296 + $lo;
 }
 sub Get64u($$)
 {
     my ($dataPt, $pos) = @_;
-    my ($a, $b);
-    # high word comes second for Intel byte ordering
-    if (GetByteOrder() eq 'II') {
-        $a = Get32u($dataPt, $pos + 4);
-        $b = Get32u($dataPt, $pos);
-    } else {
-        $a = Get32u($dataPt, $pos);
-        $b = Get32u($dataPt, $pos + 4);
-    }
-    return $a * 4294967296.0 + $b;
+    my $pt = GetByteOrder() eq 'MM' ? 0 : 4;    # get position of high word
+    my $hi = Get32u($dataPt, $pos + $pt);       # (unsigned this time)
+    my $lo = Get32u($dataPt, $pos + 4 - $pt);
+    return $hi * 4294967296 + $lo;
 }
 
 #------------------------------------------------------------------------------
@@ -1723,6 +1726,7 @@ sub Get64u($$)
 #          Width => width of printout (bytes, default=16)
 #          Prefix => prefix to print at start of line (default='')
 #          MaxLen => maximum length to dump
+#          Out => output file reference
 sub HexDump($;$%)
 {
     my $dataPt = shift;
@@ -1732,6 +1736,7 @@ sub HexDump($;$%)
     my $addr   = $opts{Addr}   || $start + ($opts{DataPos} || 0);
     my $wid    = $opts{Width}  || 16;
     my $prefix = $opts{Prefix} || '';
+    my $out    = $opts{Out}    || \*STDOUT;
     my $maxLen = $opts{MaxLen};
     my $datLen = length($$dataPt) - $start;
     my $more;
@@ -1739,8 +1744,8 @@ sub HexDump($;$%)
     if (not defined $len) {
         $len = $datLen;
     } elsif ($len > $datLen) {
-        print "$prefix    Warning: Attempted dump outside data\n";
-        print "$prefix    ($len bytes specified, but only $datLen available)\n";
+        print $out "$prefix    Warning: Attempted dump outside data\n";
+        print $out "$prefix    ($len bytes specified, but only $datLen available)\n";
         $len = $datLen;
     }
     if ($maxLen and $len > $maxLen) {
@@ -1753,13 +1758,15 @@ sub HexDump($;$%)
     my $i;
     for ($i=0; $i<$len; $i+=$wid) {
         $wid > $len-$i and $wid = $len-$i;
-        printf "$prefix%8.4x: ", $addr+$i;
+        printf $out "$prefix%8.4x: ", $addr+$i;
         my $dat = substr($$dataPt, $i+$start, $wid);
-        printf $format, join(' ',unpack('H*',$dat) =~ /../g);
+        my $s = join(' ',(unpack('H*',$dat) =~ /../g));
+        substr($s, 23, 1) = '_' if length($s) > 23;
+        printf $out $format, $s;
         $dat =~ tr /\x00-\x1f\x7f-\xff/./;
-        print "[$dat]\n";
+        print $out "[$dat]\n";
     }
-    $more and printf "$prefix    [snip $more bytes]\n";
+    $more and printf $out "$prefix    [snip $more bytes]\n";
 }
 
 #------------------------------------------------------------------------------
@@ -1781,6 +1788,7 @@ sub VerboseInfo($$$%)
 {
     my ($self, $tagID, $tagInfo, %parms) = @_;
     my $verbose = $self->{OPTIONS}->{Verbose};
+    my $out = $self->{OPTIONS}->{TextOut};
     my ($tag, $tagDesc, $line, $hexID);
 
     # generate hex number if tagID is numerical
@@ -1824,7 +1832,7 @@ sub VerboseInfo($$$%)
         my $start = $parms{Start} || 0;
         $line .= ' = ' . $self->Printable(substr($$dataPt,$start,$size));
     }
-    print "$line\n";
+    print $out "$line\n";
 
     # Level 2: print detailed information about the tag
     if ($verbose > 1 and ($parms{Extra} or $parms{Format} or
@@ -1847,15 +1855,29 @@ sub VerboseInfo($$$%)
             $line .= ')';
         }
         $line .= ':' if $verbose > 2 and $parms{DataPt};
-        print "$line\n";
+        print $out "$line\n";
     }
 
     # Level 3: do hex dump of value
     if ($verbose > 2 and $parms{DataPt}) {
+        $parms{Out} = $out;
         $parms{Prefix} = $indent;
         # limit dump length unless verbose > 3
         $parms{MaxLen} = 96 unless $verbose > 3;
         HexDump($dataPt, $size, %parms);
+    }
+}
+
+#------------------------------------------------------------------------------
+# Print verbose output
+# Inputs: 0) ExifTool ref, 1) verbose level (prints if level > this), 2-N) print args
+sub VPrint($$@)
+{
+    my $self = shift;
+    my $level = shift;
+    if ($self->{OPTIONS}->{Verbose} and $self->{OPTIONS}->{Verbose} > $level) {
+        my $out = $self->{OPTIONS}->{TextOut};
+        print $out @_;
     }
 }
 
@@ -1881,6 +1903,7 @@ sub VerboseDir($$;$$)
 {
     my ($self, $name, $entries, $size) = @_;
     my $indent = substr($self->{INDENT}, 0, -2);
+    my $out = $self->{OPTIONS}->{TextOut};
     my $str;
     if ($entries) {
         $str = " with $entries entries";
@@ -1889,7 +1912,7 @@ sub VerboseDir($$;$$)
     } else {
         $str = '';
     }
-    print "$indent+ [$name directory$str]\n";
+    print $out "$indent+ [$name directory$str]\n";
 }
 
 #------------------------------------------------------------------------------
@@ -2251,9 +2274,10 @@ sub WriteJPEG($$)
     my $raf = $$dirInfo{RAF};
     my ($ch,$s,$length);
     my $verbose = $self->{OPTIONS}->{Verbose};
+    my $out = $self->{OPTIONS}->{TextOut};
     my $rtnVal = 0;
-    my %doneDir;
-    my ($err, %dumpParms);
+    my ($err, %doneDir);
+    my %dumpParms = ( Out => $out );
     my ($writeBuffer, $oldOutfile); # used to buffer writing until PreviewImage position is known
 
     # check to be sure this is a valid JPG file
@@ -2351,7 +2375,7 @@ sub WriteJPEG($$)
             # EXIF information must come immediately after APP0
             if (exists $$addDirs{IFD0} and not $doneDir{IFD0}) {
                 $doneDir{IFD0} = 1;
-                $verbose and print "Creating APP1:\n";
+                $verbose and print $out "Creating APP1:\n";
                 # write new EXIF data
                 $self->{TIFF_TYPE} = 'APP1';
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
@@ -2395,7 +2419,7 @@ sub WriteJPEG($$)
             # Photoshop APP13 segment next
             if (exists $$addDirs{Photoshop} and not $doneDir{Photoshop}) {
                 $doneDir{Photoshop} = 1;
-                $verbose and print "Creating APP13:\n";
+                $verbose and print $out "Creating APP13:\n";
                 # write new Photoshop APP13 record to memory
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
                 my %dirInfo = (
@@ -2411,7 +2435,7 @@ sub WriteJPEG($$)
             # then XMP APP1 segment
             if (exists $$addDirs{XMP} and not $doneDir{XMP}) {
                 $doneDir{XMP} = 1;
-                $verbose and print "Creating APP1:\n";
+                $verbose and print $out "Creating APP1:\n";
                 # write new XMP data
                 my $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
                 my %dirInfo = (
@@ -2441,14 +2465,14 @@ sub WriteJPEG($$)
                     delete $$editDirs{COM}; # we aren't editing COM after all
                     last;
                 }
-                $verbose and print "Creating COM:\n";
+                $verbose and print $out "Creating COM:\n";
                 # write out the comments now:
                 # need room for the comment, plus null terminator, plus size word (2 bytes)
                 # and the total size must be less than 0xffff to fit in one record
                 # so split up longer comments into multiple records
                 my $newComment = GetNewValues($newValueHash);
                 if (defined $newComment and length($newComment)) {
-                    $verbose > 1 and print "    + Comment = '$newComment'\n";
+                    $verbose > 1 and print $out "    + Comment = '$newComment'\n";
                     my $len = length($newComment);
                     my $n;
                     for ($n=0; $n<$len; $n+=$maxSegmentLen) {
@@ -2469,11 +2493,11 @@ sub WriteJPEG($$)
 #
         # handle SOF markers: SOF0-SOF15, except DHT(0xc4), JPGA(0xc8) and DAC(0xcc)
         if (($marker & 0xf0) == 0xc0 and ($marker == 0xc0 or $marker & 0x03)) {
-            $verbose and print "JPEG $markerName:\n";
+            $verbose and print $out "JPEG $markerName:\n";
             Write($outfile, $hdr, $$segDataPt) or $err = 1;
             next;
         } elsif ($marker == 0xda) {             # SOS
-            $verbose and print "JPEG SOS (end of parsing)\n";
+            $verbose and print $out "JPEG SOS (end of parsing)\n";
             # write SOS segment
             $s = pack('n', length($$segDataPt) + 2);
             Write($outfile, $hdr, $s, $$segDataPt) or $err = 1;
@@ -2494,7 +2518,10 @@ sub WriteJPEG($$)
                         $buff = substr($buff, $pos);
                         last;
                     }
-                    $n == 65536 or last Marker; # error if EOI not found
+                    unless ($n == 65536) {
+                        $self->Error('JPEG EOI marker not found');
+                        last Marker;
+                    }
                     Write($outfile, $buff);
                     $endedWithFF = substr($buff, 65535, 1) eq "\xff" ? 1 : 0;
                 }
@@ -2549,7 +2576,7 @@ sub WriteJPEG($$)
             }
             last;   # all done parsing file
         } elsif ($marker==0x00 or $marker==0x01 or ($marker>=0xd0 and $marker<=0xd7)) {
-            $verbose and $marker and print "JPEG $markerName:\n";
+            $verbose and $marker and print $out "JPEG $markerName:\n";
             # handle stand-alone markers 0x00, 0x01 and 0xd0-0xd7 (NULL, TEM, RST0-RST7)
             Write($outfile, $hdr) or $err = 1;
             next;
@@ -2561,7 +2588,7 @@ sub WriteJPEG($$)
         #
         $length = length($$segDataPt);
         if ($verbose) {
-            print "JPEG $markerName ($length bytes):\n";
+            print $out "JPEG $markerName ($length bytes):\n";
             if ($verbose > 2 and $markerName =~ /^APP/) {
                 HexDump($segDataPt, undef, %dumpParms);
             }
@@ -2612,7 +2639,7 @@ sub WriteJPEG($$)
                     }
                     # delete segment if IFD contains no entries
                     unless (length($$segDataPt) > length($exifAPP1hdr)) {
-                        $verbose and print "Deleting APP1\n";
+                        $verbose and print $out "Deleting APP1\n";
                         next Marker;
                     }
                 # check for XMP data
@@ -2640,7 +2667,7 @@ sub WriteJPEG($$)
                         $self->{CHANGED} = $oldChanged;
                     }
                     unless (length $$segDataPt) {
-                        $verbose and print "Deleting APP1\n";
+                        $verbose and print $out "Deleting APP1\n";
                         next Marker;
                     }
                 }
@@ -2648,7 +2675,7 @@ sub WriteJPEG($$)
                 if ($$segDataPt =~ /ICC_PROFILE\0/) {
                     if ($self->{DEL_GROUP} and $self->{DEL_GROUP}->{ICC_Profile}) {
                         ++$self->{CHANGED};
-                        $verbose and not $doneDir{ICC_Profile} and print "  Deleting ICC_Profile\n";
+                        $verbose and not $doneDir{ICC_Profile} and print $out "  Deleting ICC_Profile\n";
                         next Marker;
                     }
                     $doneDir{ICC_Profile} = 1;
@@ -2707,7 +2734,7 @@ sub WriteJPEG($$)
                         $self->{CHANGED} = $oldChanged;
                     }
                     unless (length $$segDataPt) {
-                        $verbose and print "Deleting APP13\n";
+                        $verbose and print $out "Deleting APP13\n";
                         next Marker;
                     }
                     # write as multi-segment
@@ -2724,8 +2751,8 @@ sub WriteJPEG($$)
                 }
             } elsif ($marker == 0xfe) {         # COM (JPEG comment)
                 $verbose > 2 and HexDump($segDataPt, undef, %dumpParms);
-                $verbose > 1 and print "    - Comment = '$$segDataPt'\n";
-                $verbose and print "Deleting COM\n";
+                $verbose > 1 and print $out "    - Comment = '$$segDataPt'\n";
+                $verbose and print $out "Deleting COM\n";
                 ++$self->{CHANGED};         # increment the changed flag
                 undef $segDataPt;   # don't write existing comment
             }
@@ -2919,8 +2946,9 @@ sub WriteBinaryData($$$)
         my $rtnVal = WriteValue($newVal, $format, $count, $dataPt, $entry);
         if (defined $rtnVal) {
             if ($verbose > 1) {
-                print "    - $dirName:$$tagInfo{Name} = '$val'\n";
-                print "    + $dirName:$$tagInfo{Name} = '$newVal'\n";
+                my $out = $self->{OPTIONS}->{TextOut};
+                print $out "    - $dirName:$$tagInfo{Name} = '$val'\n";
+                print $out "    + $dirName:$$tagInfo{Name} = '$newVal'\n";
             }
             ++$self->{CHANGED};
         }

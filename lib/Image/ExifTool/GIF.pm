@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 #------------------------------------------------------------------------------
 # Process meta information in GIF image
@@ -27,6 +27,7 @@ sub ProcessGIF($$)
     my ($type, $a, $s, $ch, $length, $buff);
     my ($err, $newComment, $setComment);
     my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
     my $outfile = $$dirInfo{OutFile};
     my $raf = $$dirInfo{RAF};
     my $rtnVal = 0;
@@ -37,7 +38,7 @@ sub ProcessGIF($$)
         and $type =~ /^GIF8[79]a$/
         and $raf->Read($s, 4) == 4;
 
-    $verbose and print "GIF file version $type\n";
+    $verbose and print $out "GIF file version $type\n";
     if ($outfile) {
         Write($outfile, $type, $s) or $err = 1;
         if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{File}) {
@@ -133,7 +134,7 @@ sub ProcessGIF($$)
                     }
                     while ($length) {
                         last unless $raf->Read($buff, $length) == $length;
-                        $exifTool->{OPTIONS}->{Verbose} > 2 and HexDump(\$buff);
+                        $verbose > 2 and Image::ExifTool::HexDump(\$buff, undef, Out => $out);
                         if (defined $comment) {
                             $comment .= $buff;  # add to comment string
                         } else {

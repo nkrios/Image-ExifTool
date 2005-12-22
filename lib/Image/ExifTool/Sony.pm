@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessSRF($$$);
 
@@ -142,6 +142,7 @@ sub ProcessSRF($$$)
             Prefix => "$exifTool->{INDENT}  ",
             Start => $nextIFD,
             DataPos => $$dirInfo{DataPos},
+            Out => $exifTool->Options('TextOut'),
         );
         $parms{MaxLen} = 96 unless $verbose > 3;
         Image::ExifTool::HexDump($dataPt, $len, %parms);

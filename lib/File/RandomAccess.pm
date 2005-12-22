@@ -184,7 +184,7 @@ sub Read($$$)
         $self->{POS} += $rtnVal;
     } else {
         $_[0] = '' unless defined $_[0];
-        $rtnVal = read($self->{FILE_PT}, $_[0], $len);
+        $rtnVal = read($self->{FILE_PT}, $_[0], $len) || 0;
     }
     if ($self->{DEBUG}) {
         my $pos = $self->Tell() - $rtnVal;

@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
@@ -151,31 +151,31 @@ my %canonLensTypes = ( #4
     },
     0xc => [   # square brackets for a conditional list
         {
+            # D30
             Name => 'SerialNumber',
             Description => 'Camera Body No.',
-            Condition => '$self->{CameraModel} =~ /\b(300D|350D|REBEL|10D|20D)/',
-            Writable => 'int32u',
-            PrintConv => 'sprintf("%.10d",$val)',
-            PrintConvInv => '$val',
-        },
-        {
-            # serial number of 1D/1Ds/1D Mark II/1Ds Mark II is usually
-            # displayed w/o leeding zeros (ref 7)
-            # (use this for any other EOS models too, except D30 and D60)
-            Name => 'SerialNumber',
-            Description => 'Camera Body No.',
-            Condition => '$self->{CameraModel} =~ /\bEOS.(?!(D30|D60))\b/',
-            Writable => 'int32u',
-            PrintConv => 'sprintf("%d",$val)',
-            PrintConvInv => '$val',
-        },
-        {
-            # no condition (all other models)
-            Name => 'SerialNumber',
-            Description => 'Camera Body No.',
+            Condition => '$self->{CameraModel} =~ /\bEOS D30\b/',
             Writable => 'int32u',
             PrintConv => 'sprintf("%x-%.5d",$val>>16,$val&0xffff)',
             PrintConvInv => '$val=~/(.*)-(\d+)/ ? (hex($1)<<16)+$2 : undef',
+        },
+        {
+            # serial number of 1D/1Ds/1D Mark II/1Ds Mark II is usually
+            # displayed w/o leeding zeros (ref 7) (1D uses 6 digits - PH)
+            Name => 'SerialNumber',
+            Description => 'Camera Body No.',
+            Condition => '$self->{CameraModel} =~ /\bEOS-1D/',
+            Writable => 'int32u',
+            PrintConv => 'sprintf("%.6d",$val)',
+            PrintConvInv => '$val',
+        },
+        {
+            # all other models (D60,300D,350D,REBEL,10D,20D,etc)
+            Name => 'SerialNumber',
+            Description => 'Camera Body No.',
+            Writable => 'int32u',
+            PrintConv => 'sprintf("%.10d",$val)',
+            PrintConvInv => '$val',
         },
     ],
     0xd => {
@@ -1120,7 +1120,7 @@ sub Validate($$@)
 sub ValidatePictureInfo($$$)
 {
     my ($dataPt, $offset, $size) = @_;
-    return 0 if $size < 46; # must be at least 46 bytes long
+    return 0 if $size < 24; # must be at least 24 bytes long (PowerShot Pro1)
     my $w1 = Image::ExifTool::Get16u($dataPt, $offset + 4);
     my $h1 = Image::ExifTool::Get16u($dataPt, $offset + 6);
     return 0 unless $h1 and $w1;

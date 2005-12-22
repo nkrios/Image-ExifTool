@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -247,9 +247,7 @@ sub ProcessX3FHeader($$$)
                 Size => 4,
             );
         }
-        if ($verbose and $unused) {
-            print "$exifTool->{INDENT}($unused entries unused)\n";
-        }
+        $exifTool->VPrint(0, "$exifTool->{INDENT}($unused entries unused)\n");
     }
     return 1;
 }
@@ -322,13 +320,16 @@ sub ProcessX3FDirectory($$$)
         my ($offset, $len, $tag) = unpack("x${pos}V2a4", $dir);
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         if ($verbose) {
-            print "$exifTool->{INDENT}$index) $tag Subsection ($len bytes):\n";
+            $exifTool->VPrint(0, "$exifTool->{INDENT}$index) $tag Subsection ($len bytes):\n");
             if ($verbose > 2) {
                 $raf->Seek($offset, 0) or return 'Error seeking';
                 my $n = $verbose > 3 ? $len : 64;
                 $n = $len if $n > $len;
                 $raf->Read($buff, $n) == $n or return 'Truncated image';
-                Image::ExifTool::HexDump(\$buff, undef, Prefix => $exifTool->{INDENT});
+                Image::ExifTool::HexDump(\$buff, undef,
+                    Prefix => $exifTool->{INDENT},
+                    Out => $exifTool->Options('TextOut'),
+                );
             }
         }
         next unless $tagInfo;

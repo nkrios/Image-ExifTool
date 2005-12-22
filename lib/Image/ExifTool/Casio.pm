@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 %Image::ExifTool::Casio::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -106,6 +106,16 @@ $VERSION = '1.12';
             125 => '+1.0',
             250 => '+2.0',
             244 => '+3.0',
+        },
+    },
+    0x0e00 => {
+        Name => 'PrintIM',
+        Description => 'Print Image Matching',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PrintIM::Main',
+            # hack because QV-4000 uses a silly offset base here
+            # (note this still won't get rewritten properly)
+            Start => '$valuePtr + $entry + $dataPos',
         },
     },
 );

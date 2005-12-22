@@ -1,9 +1,10 @@
 #------------------------------------------------------------------------------
 # File:         QuickTime.pm
 #
-# Description:  Read QuickTime meta information
+# Description:  Read QuickTime and MP4 meta information
 #
 # Revisions:    10/04/2005 - P. Harvey Created
+#               12/19/2005 - P. Harvey Added MP4 support
 #
 # References:   1) http://developer.apple.com/documentation/QuickTime/
 #------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub FixWrongFormat($);
 
@@ -35,12 +36,19 @@ my %durationInfo = (
 %Image::ExifTool::QuickTime::Main = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     NOTES => q{
-Tags with a question mark after their name are not extracted unless the
-Unknown option is set.
+These tags are used in QuickTime MOV and MP4 videos, and QTIF images.  Tags
+with a question mark after their name are not extracted unless the Unknown
+option is set.
     },
     free => { Unknown => 1, ValueConv => '\$val' },
     skip => { Unknown => 1, ValueConv => '\$val' },
     wide => { Unknown => 1, ValueConv => '\$val' },
+    ftyp => { #MP4
+        Name => 'FrameType',
+        Unknown => 1,
+        Notes => 'MP4 only',
+        ValueConv => '\$val',
+    },
     pnot => {
         Name => 'Preview',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Preview' },
@@ -175,6 +183,10 @@ Tags used in QTIF QuickTime Image Files.
     udta => {
         Name => 'UserData',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::UserData' },
+    },
+    mdia => { #MP4
+        Name => 'Media',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Media' },
     },
 );
 
@@ -325,6 +337,38 @@ if they don't exist in this table.
     },
 );
 
+# MP4 media
+%Image::ExifTool::QuickTime::Media = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    NOTES => q{
+MP4 only (most tags unknown because ISO charges for the specification).
+    },
+    minf => {
+        Name => 'Minf',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Minf' },
+    },
+);
+
+# MP4 media
+%Image::ExifTool::QuickTime::Minf = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    NOTES => q{
+MP4 only (most tags unknown because ISO charges for the specification).
+    },
+    stbl => {
+        Name => 'Stbl',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Stbl' },
+    },
+);
+
+# MP4 media
+%Image::ExifTool::QuickTime::Stbl = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    NOTES => q{
+MP4 only (most tags unknown because ISO charges for the specification).
+    },
+);
+
 #------------------------------------------------------------------------------
 # Fix incorrect format for ImageWidth/Height as written by Pentax
 sub FixWrongFormat($)
@@ -359,7 +403,11 @@ sub ProcessMOV($$;$)
     } else {
         # check on file type if called with a RAF
         $$tagTablePtr{$tag} or return 0;
-        $exifTool->SetFileType();
+        if ($tag eq 'ftyp') {
+            $exifTool->SetFileType('MP4');
+        } else {
+            $exifTool->SetFileType();
+        }
         SetByteOrder('MM');
     }
     for (;;) {
@@ -461,7 +509,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::QuickTime - Read QuickTime meta information
+Image::ExifTool::QuickTime - Read QuickTime and MP4 meta information
 
 =head1 SYNOPSIS
 
@@ -470,7 +518,12 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains routines required by Image::ExifTool to extract
-information from QuickTime audio files.
+information from QuickTime and MP4 video files.
+
+=head1 BUGS
+
+The MP4 support is rather pathetic since the specification documentation is
+not freely available (yes, ISO sucks).
 
 =head1 AUTHOR
 

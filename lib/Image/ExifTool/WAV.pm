@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         WAV.pm
 #
-# Description:  Read WAV meta information
+# Description:  Read WAV and AVI meta information
 #
 # Revisions:    09/14/2005 - P. Harvey Created
 #
@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 # WAV info
 %Image::ExifTool::WAV::Main = (
@@ -233,13 +233,17 @@ sub ProcessWAV($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my $verbose = $exifTool->Options('Verbose');
     my ($buff, $err);
 
     # verify this is a valid WAV file
     return 0 unless $raf->Read($buff, 12) == 12;
-    return 0 unless $buff =~ /^RIFF....WAVE/s;
-    $exifTool->SetFileType();
+    if ($buff =~ /^RIFF....WAVE/s) {
+        $exifTool->SetFileType('WAV');
+    } elsif ($buff =~ /^RIFF....AVI /s) {
+        $exifTool->SetFileType('AVI');
+    } else {
+        return 0;
+    }
     SetByteOrder('II');
     my $tagTablePtr = GetTagTable('Image::ExifTool::WAV::Main');
     my $pos = 12;
@@ -250,9 +254,10 @@ sub ProcessWAV($$)
         $raf->Read($buff, 8) == 8 or $err=1, last;
         $pos += 8;
         my ($tag, $len) = unpack('a4V', $buff);
-        last if $tag eq 'data'; # stop when we hit the audio data
+        # stop when we hit the audio data or AVI index
+        last if $tag eq 'data' or $tag eq 'idx1';
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-        $verbose and print "WAVE '$tag' chunk:\n";
+        $exifTool->VPrint(0, "RIFF '$tag' chunk:\n");
         if ($tagInfo and $$tagInfo{SubDirectory}) {
             $raf->Read($buff, $len) == $len or $err=1, last;
             my %dirInfo = (
@@ -278,7 +283,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WAV - Read WAV meta information
+Image::ExifTool::WAV - Read WAV and AVI meta information
 
 =head1 SYNOPSIS
 
@@ -287,7 +292,7 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains routines required by Image::ExifTool to extract
-information from WAV audio files.
+information from Windows WAV audio and AVI video files.
 
 =head1 AUTHOR
 

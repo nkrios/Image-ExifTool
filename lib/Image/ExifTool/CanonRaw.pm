@@ -20,7 +20,7 @@ use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);

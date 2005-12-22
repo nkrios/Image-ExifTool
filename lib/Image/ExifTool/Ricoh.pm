@@ -23,6 +23,7 @@ sub ProcessRicohText($$$);
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
+    NOTES => 'These tags are used by Ricoh Caplio camera models.',
     0x0001 => 'MakerNoteType',
     0x0002 => 'MakerNoteVersion',
     0x0e00 => {
@@ -72,6 +73,12 @@ sub ProcessRicohText($$$);
 %Image::ExifTool::Ricoh::Text = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessRicohText,
+    NOTES => q{
+Ricoh RDC models such as the RDC-i700, RDC-5000, RDC-6000, RDC-7 and
+RDC-4300 use a text-based format for their maker notes instead of the IFD
+format used by the Caplio models.  Below is a list of known tags in this
+information.
+    },
     Rev => 'Revision',
     Rv => 'Revision',
     Rg => 'RedGain',

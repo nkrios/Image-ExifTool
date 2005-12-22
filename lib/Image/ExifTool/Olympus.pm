@@ -21,8 +21,9 @@ package Image::ExifTool::Olympus;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
+use Image::ExifTool::APP12;
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -34,7 +35,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 #
 # Tags 0x0000 through 0x0103 are the same as Konica/Minolta cameras (ref 3)
 #
-    0x0000 => 'MakerNoteVersion',
+    0x0000 => {
+        Name => 'MakerNoteVersion',
+        Writable => 'undef',
+    },
     0x0001 => {
         Name => 'MinoltaCameraSettingsOld',
         SubDirectory => {
@@ -55,6 +59,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x0081 => {
         Name => 'PreviewImageData',
+        ValueConv => '\$val',
         Writable => 0,
     },
     0x0088 => {
@@ -120,12 +125,15 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 #
     0x0200 => {
         Name => 'SpecialMode',
-        Notes => q{3 numbers: 1. Shooting mode: 0=Normal, 2=Fast, 3=Panorama;
-                   2. Sequence Number; 3. Panorama Direction: 1=Left-Right,
-                   2=Right-Left, 3=Bottom-Top, 4=Top-Bottom},
+        Notes => q{
+            3 numbers: 1. Shooting mode: 0=Normal, 2=Fast, 3=Panorama;
+            2. Sequence Number; 3. Panorama Direction: 1=Left-Right,
+            2=Right-Left, 3=Bottom-Top, 4=Top-Bottom
+        },
         Writable => 'int32u',
         Count => 3,
-        PrintConv => q{ #3
+        PrintConv => sub { #3
+            my $val = shift;
             my @v = split ' ', $val;
             return $val unless @v >= 3;
             my @v0 = ('Normal','Unknown (1)','Fast','Panorama');
@@ -136,24 +144,41 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             return $val;
         },
     },
-    0x0201 => [
-        {
-            # for some reason, the values for the E-1/E-300 start at 1 instead of 0
-            Condition => '$self->{CameraModel} =~ /^(E-1|E-300)/',
-            Name => 'Quality',
-            Description => 'Image Quality',
-            Writable => 'int16u',
-            PrintConv => { 1 => 'SQ', 2 => 'HQ', 3 => 'SHQ', 4 => 'RAW' },
+    0x0201 => {
+        Name => 'Quality',
+        Description => 'Image Quality',
+        Writable => 'int16u',
+        Notes => q{
+            Quality values are decoded based on the CameraType tag. All types
+            represent SQ, HQ and SHQ as sequential integers, but in general
+            SX-type cameras start with a value of 0 for SQ while others start
+            with 1
         },
-        {
-            # all other models...
-            Name => 'Quality',
-            Description => 'Image Quality',
-            Writable => 'int16u',
-            # 6 = RAW for C5060WZ
-            PrintConv => { 0 => 'SQ', 1 => 'HQ', 2 => 'SHQ', 6 => 'RAW' },
+        # These values are different for different camera types
+        # (can't have Condition based on CameraType because it isn't known
+        #  when this tag is extracted)
+        PrintConv => sub {
+            my ($val, $self) = @_;
+            my %t1 = ( # all SX camera types except SX151
+                0 => 'SQ (Low)',
+                1 => 'HQ (Normal)',
+                2 => 'SHQ (Fine)',
+                6 => 'RAW', #PH - C5050WZ
+            );
+            my %t2 = ( # all other types
+                1 => 'SQ (Low)',
+                2 => 'HQ (Normal)',
+                3 => 'SHQ (Fine)',
+                4 => 'RAW',
+                5 => 'Medium-Fine', #PH
+                6 => 'Small-Fine', #PH
+                33 => 'Uncompressed', #PH - C2100Z
+            );
+            my $conv = $self->{CameraType} =~ /^SX(?!151\b)/ ? \%t1 : \%t2;
+            return $$conv{$val} ? $$conv{$val} : "Unknown ($val)";
         },
-    ],
+        # (no PrintConvInv because we don't know CameraType at write time)
+    },
     0x0202 => {
         Name => 'Macro',
         Writable => 'int16u',
@@ -181,28 +206,38 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s+.*//;$val',
     },
-    0x0207 => {
-        Name => 'FirmwareVersion',
+    0x0207 => { #PH (was incorrectly FirmwareVersion, ref 1,3)
+        Name => 'CameraType',
         Writable => 'string',
+        DataMember => 'CameraType',
+        RawConv => '$self->{CameraType} = $val',
     },
     0x0208 => {
-        Name => 'PictureInfo',
-        Writable => 'string',
+        Name => 'TextInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::TextInfo',
+        },
     },
     0x0209 => {
         Name => 'CameraID',
         Format => 'string', # this really should have been a string
     },
-    0x020b => {
-        Name => 'EpsonImageWidth', #PH
+    0x020b => { #PH
+        Name => 'EpsonImageWidth',
         Writable => 'int16u',
     },
-    0x020c => {
-        Name => 'EpsonImageHeight', #PH
+    0x020c => { #PH
+        Name => 'EpsonImageHeight',
         Writable => 'int16u',
     },
-    0x020d => 'EpsonSoftware', #PH
-    0x0300 => 'PreCaptureFrames', #6
+    0x020d => { #PH
+        Name => 'EpsonSoftware',
+        Writable => 'string',
+    },
+    0x0300 => { #6
+        Name => 'PreCaptureFrames',
+        Writable => 'int16u',
+    },
     0x0302 => { #6
         Name => 'OneTouchWB',
         Writable => 'int16u',
@@ -211,6 +246,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             1 => 'On',
             2 => 'On (Preset)',
         },
+    },
+    0x0404 => { #PH (D595Z, C7070WZ)
+        Name => 'SerialNumber',
+        Writable => 'string',
     },
     0x0e00 => {
         Name => 'PrintIM',
@@ -230,9 +269,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 0,
         ValueConv => '\$val',
     },
-    0x1004 => {
-        Name => 'FlashMode', #3
+    0x1004 => { #3
+        Name => 'FlashMode',
         Writable => 'int16u',
+        PrintConv => {
+            2 => 'On', #PH
+            3 => 'Off', #PH
+        },
     },
     0x1005 => { #6
         Name => 'FlashDevice',
@@ -244,15 +287,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             5 => 'Internal + External',
         },
     },
-    0x1006 => 'Bracket', #3
-    0x100b => 'FocusMode', #3
-    0x100c => 'FocusDistance', #3
-    0x100d => 'Zoom', #3
-    0x100e => 'MacroFocus', #3
-    0x100f => { #3
-        Name => 'SharpnessFactor',
-        Writable => 'int16u',
-    },
+    # commented out tags below from ref 3 look wrong to me - PH
+    #0x1006 => 'Bracket', #3 (rational32s)
+    #0x100b => 'FocusMode', #3 (int16u)
+    #0x100c => 'FocusDistance', #3 (rational32u)
+    #0x100d => 'Zoom', #3 (int16u)
+    #0x100e => 'MacroFocus', #3 (int16u)
+    #0x100f => 'SharpnessFactor', #3 (int16u)
     0x1011 => { #3
         Name => 'ColorMatrix',
         Writable => 'int16u',
@@ -263,7 +304,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16u',
         Count => 4,
     },
-    0x1015 => 'WhiteBalance', #3
+    #0x1015 => 'WhiteBalance', #3 (int16u -- usually count of 2, but sometimes 1)
     0x1017 => { #2
         Name => 'RedBalance',
         Writable => 'int16u',
@@ -278,8 +319,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => '$val=~s/ .*//; $val / 256',
         ValueConvInv => '$val*=256;"$val 64"',
     },
-    0x101a => 'SerialNumber', #3
-    0x1023 => 'FlashBias', #3
+    # 0x101a is same as CameraID ("OLYMPUS DIGITAL CAMERA") for C2500L - PH
+    0x101a => { #3
+        Name => 'SerialNumber',
+        Writable => 'string',
+    },
+    #0x1023 => 'FlashBias', #3 (rational32s)
     0x1029 => { #3
         Name => 'Contrast',
         Writable => 'int16u',
@@ -315,7 +360,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'OlympusImageHeight',
         Writable => 'int32u',
     },
-    0x1034 => 'CompressionRatio', #3
+    0x1034 => { #3
+        Name => 'CompressionRatio',
+        Writable => 'rational32u',
+    },
     0x1035 => { #6
         Name => 'PreviewImageValid',
         Writable => 'int32u',
@@ -378,6 +426,24 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             TagTable => 'Image::ExifTool::Olympus::FocusInfo',
             ByteOrder => 'Unknown',
         },
+    },
+);
+
+# TextInfo tags
+%Image::ExifTool::Olympus::TextInfo = (
+    PROCESS_PROC => \&Image::ExifTool::APP12::ProcessAPP12,
+    NOTES => q{
+This information is in text format (similar to APP12 information, but with
+spaces instead of linefeeds).  Below are tags which have been observed, but
+any information found here will be extracted, even if the tag is not listed.
+    },
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Olympus', 2 => 'Image' },
+    Resolution => { },
+    Type => {
+        Name => 'CameraType',
+        Groups => { 2 => 'Camera' },
+        DataMember => 'CameraType',
+        RawConv => '$self->{CameraType} = $val',
     },
 );
 

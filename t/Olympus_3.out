@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.86
 [File, File, Image]  - File Name: Olympus_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:35:44
+[File, File, Time]  - File Modification Date/Time: 2005:12:16 14:10:46
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 160
@@ -48,19 +48,19 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1296
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Olympus, Camera] 512 - Special Mode: Normal, Sequence: 0, Panorama: (none)
-[MakerNotes, Olympus, Camera] 513 - Image Quality: SHQ
-[MakerNotes, Olympus, Camera] 514 - Macro: Off
+[MakerNotes, Olympus, Camera] 513 - Image Quality: SQ (Low)
+[MakerNotes, Olympus, Camera] 514 - Macro: On
 [MakerNotes, Olympus, Camera] 515 - Black & White Mode: Off
 [MakerNotes, Olympus, Camera] 516 - Digital Zoom: 0.0
 [MakerNotes, Olympus, Camera] 517 - Focal Plane Diagonal: 7.8 mm
 [MakerNotes, Olympus, Camera] 518 - Olympus 0x0206: -215 -388 -418 -185 -310 -314
-[MakerNotes, Olympus, Camera] 519 - Firmware Version: SR951
-[MakerNotes, Olympus, Camera] 520 - Picture Info: [pictureInfo] Resolution=1 [Camera Info] Type=SR951
+[MakerNotes, Olympus, Camera] 519 - Camera Type: SR951
+[MakerNotes, Olympus, Image] Resolution - Resolution: 1
+[MakerNotes, Olympus, Camera] Type - Camera Type: SR951
 [MakerNotes, Olympus, Camera] 521 - Camera ID: OLYMPUS DIGITAL CAMERA
 [MakerNotes, Olympus, Camera] 3840 - Data Dump: (Binary data 186 bytes)
 [XMP, XMP-tiff, Image] Software - Software: ExifTool
 [Composite, Composite, Image]  - Aperture: 2.0
-[Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 5.5
 [Composite, Composite, Image]  - Shutter Speed: 1/30

@@ -33,7 +33,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.35';
+$VERSION = '1.37';
 
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
@@ -618,7 +618,7 @@ my %nikonLensIDs = (
     0 => 'Unknown Nikkor or Tokina',
     1 => 'AF Nikkor 50mm f/1.8',
     2 => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5 or Sigma non-D',
-    3 => 'Unknown Nikkor or Soligor',
+    3 => 'AF Zoom-Nikkor 70-210mm f/4 or Soligor',
     4 => 'AF Nikkor 28mm f/2.8',
     5 => 'AF Nikkor 50mm f/1.4',
     6 => 'AF Micro-Nikkor 55mm f/2.8 or Cosina',
@@ -626,7 +626,7 @@ my %nikonLensIDs = (
     8 => 'AF Zoom-Nikkor 35-105mm f/3.5-4.5',
     9 => 'AF Nikkor 24mm f/2.8',
     10 => 'AF Nikkor 300mm f/2.8 IF-ED',
-    11 => 'AF Nikkor 180mm f/2.8 IF-ED or third party lens',
+    11 => 'AF Nikkor 180mm f/2.8 IF-ED or Tamron',
     13 => 'AF Zoom-Nikkor 35-135mm f/3.5-4.5',
     14 => 'AF Zoom-Nikkor 70-210mm f/4',
     15 => 'AF Nikkor 50mm f/1.8 N',
@@ -638,6 +638,7 @@ my %nikonLensIDs = (
     21 => 'AF Nikkor 85mm f/1.8',
     23 => 'Nikkor 500mm f/4 P',
     24 => 'AF Zoom-Nikkor 35-135mm f/3.5-4.5 N',
+    26 => 'AF Nikkor 35mm f/2',
     27 => 'AF Zoom-Nikkor 75-300mm f/4.5-5.6',
     28 => 'AF Nikkor 20mm f/2.8',
     29 => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5 N',
@@ -660,11 +661,12 @@ my %nikonLensIDs = (
     55 => 'AF Nikkor 20mm f/2.8D',
     56 => 'AF Nikkor 85mm f/1.8D',
     59 => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
+    61 => 'AF Zoom-Nikkor 35-80mm f/4-5.6D',
     62 => 'AF Nikkor 28mm f/2.8D',
     65 => 'AF Nikkor 180mm f/2.8D IF-ED',
     66 => 'AF Nikkor 35mm f/2D',
     67 => 'AF Nikkor 50mm f/1.4D',
-    70 => 'AF Zoom-Nikkor 35-80mm f/4-5.6D',
+    70 => 'AF Zoom-Nikkor 35-80mm f/4-5.6D N',
     72 => 'AF-S Nikkor 300mm f/2.8D IF-ED or Sigma HSM',
     74 => 'AF Nikkor 85mm f/1.4D IF',
     76 => 'AF Zoom-Nikkor 24-120mm f/3.5-5.6D IF',
@@ -707,7 +709,7 @@ my %nikonLensIDs = (
     129 => 'AF-S VR Nikkor 200mm f/2G IF-ED',
     130 => 'AF-S VR Nikkor 300mm f/2.8G IF-ED',
     137 => 'AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED',
-    139 => 'AF-S VR Zoom-Nikkor 18-200mm f/3.5-5.6G', #10
+    139 => 'AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED',#8/10
     140 => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
 );
 
@@ -938,7 +940,7 @@ sub ProcessNikonEncrypted($$$)
     push @{$exifTool->{NikonInfo}->{Encrypted}}, [ $tagTablePtr, $buff, $$dirInfo{TagInfo}];
     if ($exifTool->Options('Verbose')) {
         my $indent = substr($exifTool->{INDENT}, 0, -2);
-        print $indent, "[$dirInfo->{TagInfo}->{Name} directory to be decrypted later]\n";
+        $exifTool->VPrint(0, $indent, "[$dirInfo->{TagInfo}->{Name} directory to be decrypted later]\n");
     }
     return 1;
 }
@@ -1034,7 +1036,10 @@ sub ProcessNikon($$$)
             );
             if ($verbose > 2) {
                 $exifTool->VerboseDir("Decrypted $$tagInfo{Name}");
-                my %parms = ( Prefix => $exifTool->{INDENT} );
+                my %parms = (
+                    Prefix => $exifTool->{INDENT},
+                    Out => $exifTool->Options('TextOut'),
+                );
                 $parms{MaxLen} = 96 unless $verbose > 3;
                 Image::ExifTool::HexDump(\$data, undef, %parms);
             }

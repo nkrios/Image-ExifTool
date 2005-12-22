@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -380,6 +380,7 @@ sub FoundPNG($$$$;$$)
 # First, uncompress data if requested
 #    
     my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag) ||
                   # (some software forgets to capitalize first letter)
                   $exifTool->GetTagInfo($tagTablePtr, ucfirst($tag));
@@ -422,7 +423,7 @@ sub FoundPNG($$$$;$$)
                     my $name = $$tagInfo{Name};
                     $wasCompressed and $name = "Decompressed $name";
                     $exifTool->VerboseDir($name, 0, $len);
-                    my %parms = ( Prefix => $exifTool->{INDENT} );
+                    my %parms = ( Prefix => $exifTool->{INDENT}, Out => $out );
                     $parms{MaxLen} = 96 unless $verbose > 3;
                     Image::ExifTool::HexDump(\$val, undef, %parms);
                 }
@@ -467,8 +468,8 @@ sub FoundPNG($$$$;$$)
                     $$outBuff =  (defined $newVal) ? $newVal : '';
                     ++$exifTool->{CHANGED};
                     if ($verbose > 1) {
-                        print "    - $$tagInfo{Name} = '$val'\n";
-                        print "    + $$tagInfo{Name} = '$newVal'\n" if defined $newVal;
+                        print $out "    - $$tagInfo{Name} = '$val'\n";
+                        print $out "    + $$tagInfo{Name} = '$newVal'\n" if defined $newVal;
                     }
                 }
             }
@@ -549,7 +550,10 @@ sub ProcessProfile($$$)
     if ($verbose) {
         if ($verbose > 2) {
             $exifTool->VerboseDir("Decoded $$tagInfo{Name}", 0, $len);
-            my %parms = ( Prefix => $exifTool->{INDENT} );
+            my %parms = (
+                Prefix => $exifTool->{INDENT},
+                Out => $exifTool->Options('TextOut'),
+            );
             $parms{MaxLen} = 96 unless $verbose > 3;
             Image::ExifTool::HexDump(\$buff, undef, %parms);
         }
@@ -707,7 +711,7 @@ sub ProcessPNG_iTXt($$$)
 #------------------------------------------------------------------------------
 # Extract meta information from a PNG image
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
-# Returns: 1 on success, 0 if this wasn't a valid PNG image
+# Returns: 1 on success, 0 if this wasn't a valid PNG image, or -1 on write error
 sub ProcessPNG($$)
 {
     my ($exifTool, $dirInfo) = @_;
@@ -734,7 +738,8 @@ sub ProcessPNG($$)
     if ($fileType ne 'PNG') {
         $mngTablePtr = GetTagTable('Image::ExifTool::MNG::Main');
     }
-    my $verbose = $exifTool->{OPTIONS}->{Verbose};
+    my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
     my ($hbuf, $dbuf, $cbuf, $foundHdr);
 
     # process the PNG/MNG/JNG chunks
@@ -747,7 +752,7 @@ sub ProcessPNG($$)
             # don't dump image data chunks in verbose mode (only give count instead)
             if ($datCount and $chunk ne $datChunk) {
                 my $s = $datCount > 1 ? 's' : '';
-                print "$fileType $datChunk ($datCount chunk$s, total $datBytes bytes)\n";
+                print $out "$fileType $datChunk ($datCount chunk$s, total $datBytes bytes)\n";
                 $datCount = $datBytes = 0;
                 $datChunk = '';
             }
@@ -769,7 +774,7 @@ sub ProcessPNG($$)
                     Write($outfile, $hbuf) or $err = 1;
                 }
             }
-            $verbose and print "$fileType $chunk (end of image)\n";
+            $verbose and print $out "$fileType $chunk (end of image)\n";
             $ok = 1;
             last;
         }
@@ -797,9 +802,9 @@ sub ProcessPNG($$)
                 Write($outfile, $hbuf, $dbuf, $cbuf) or $err = 1 if $outfile;
                 next;
             }
-            print "$fileType $chunk ($len bytes):\n";
+            print $out "$fileType $chunk ($len bytes):\n";
             if ($verbose > 2) {
-                my %dumpParms;
+                my %dumpParms = ( Out => $out );
                 $dumpParms{MaxLen} = 96 if $verbose <= 4;
                 Image::ExifTool::HexDump(\$dbuf, undef, %dumpParms);
             }

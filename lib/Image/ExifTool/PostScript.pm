@@ -108,7 +108,6 @@ sub ProcessPS($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my $verbose = $exifTool->Options('Verbose');
     my $data;
 #
 # determine postscript file type

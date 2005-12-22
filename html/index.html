@@ -13,24 +13,23 @@
 <font color='#cc0000' size='+2'><b>Read</b> <i>and</i> <b>Write</b> Meta Information!</font>
 
 <h3>
-<a href="Image-ExifTool-5.77.tar.gz">
-Download        Version 5.77</a> - Nov. 18, 2005
+<a href="Image-ExifTool-5.87.tar.gz">
+Download        Version 5.87</a> - Dec. 22, 2005
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
 <a href="exiftool_pod.html">command-line application</a> for reading and writing
 meta information in image files.  It recognizes EXIF, GPS, IPTC, XMP, JFIF,
 GeoTIFF, ICC Profile, Photoshop IRB and ID3 meta information as well as the
-maker notes of many digital cameras including Canon, Casio, FujiFilm, Kodak,
-Leaf, Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica,
-Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
+maker notes of many digital cameras including Canon, Casio, FujiFilm,
+JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon, Olympus/Epson,
+Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
 
 <p>When writing information, ExifTool preserves the original file by adding
 "_original" to the file name.  Be sure to keep a copy of the original, or
 thoroughly validate the new file before erasing the original.
 <a href="writing.html">Read here</a> for some ramblings on the subject of
 writing meta information.
-
 
 <h2>Features</h2>
 <ul>
@@ -50,7 +49,10 @@ writing meta information.
 <li>Creates text output file for each image file
 <li>Organizes output into groups
 <li>Ability to add user-defined tags
+<li>Tested with images from <a href="models.html">hundreds of different camera models</a>
 <li>Recognizes <a href="TagNames/index.html">thousands of different tags</a>
+<li>Advanced <a href="verbose.html">verbose</a> and <a href="htmldump.html">HTML-based
+    hex dump</a> outputs
 </ul>
 
 <h2><a name="Supported">Supported File Types</a></h2>
@@ -58,6 +60,7 @@ writing meta information.
 <tr><th>File Type</th><th>Read/Write</th><th>Description</th></tr>
 <tr><td>ACR</td><td>R</td><td>American College of Radiology ACR-NEMA (DICOM-like)</td></tr>
 <tr><td>AI</td><td>R</td><td>Adobe Illustrator (PS or PDF)</td></tr>
+<tr><td>AVI</td><td>R</td><td>Windows Audio/Video</td></tr>
 <tr><td>BMP, DIB</td><td>R</td><td>Windows BitMaP / Device Independent Bitmap</td></tr>
 <tr><td>CR2</td><td>R/W</td><td>Canon RAW 2 format (TIFF-like)</td></tr>
 <tr><td>CRW</td><td>R/W</td><td>Canon RAW format</td></tr>
@@ -66,10 +69,11 @@ writing meta information.
 <tr><td>GIF</td><td>R/W</td><td>Compuserve Graphics Interchange Format</td></tr>
 <tr><td>JP2, JPX</td><td>R</td><td>JPEG 2000 file</td></tr>
 <tr><td>JPEG, JPG</td><td>R/W</td><td>Joint Photographic Experts Group</td></tr>
-<tr><td>MIFF, MIFF</td><td>R</td><td>Magick Image File Format</td></tr>
+<tr><td>MIFF, MIF</td><td>R</td><td>Magick Image File Format</td></tr>
 <tr><td>MOS</td><td>R/W</td><td>Creo Leaf Mosaic (TIFF-like)</td></tr>
 <tr><td>MOV</td><td>R</td><td>Apple QuickTime Movie</td></tr>
 <tr><td>MP3</td><td>R</td><td>MPEG Layer 3 audio (uses ID3 information)</td></tr>
+<tr><td>MP4</td><td>R</td><td>Motion Picture Experts Group video format 4</td></tr>
 <tr><td>MRW</td><td>R/W</td><td>Minolta RAW format</td></tr>
 <tr><td>NEF</td><td>R/W</td><td>Nikon (RAW) Electronic Format (TIFF-like)</td></tr>
 <tr><td>ORF</td><td>R</td><td>Olympus RAW format</td></tr>
@@ -100,6 +104,16 @@ that it will corrupt some files.  Be sure to keep backups of your files.
 still possible to write illegal values which may cause problems when reading the
 images with other software.  So take care to verify the information you are
 writing.
+</ul>
+
+<h2><font color='#cc6600'>Known Problems</font></h2>
+<ul>
+<li>CR2 (Canon RAW format 2) images edited by ExifTool show up all black when
+displayed using the new Apple OS X 10.4.3 RAW image utilities, although there
+are no such problems with Canon Digital Photo Professional, Photoshop CS2 or
+dcraw. It is thought that this is an Apple bug, and that they may be cutting
+corners in reading the file by assuming a fixed offset for white balance
+information. If this problem effects you, please send a bug report to Apple.
 </ul>
 
 <h2>System Requirements</h2>
@@ -167,10 +181,11 @@ then type "exiftool.pl" to run it.
 </table>
 </blockquote>
 
-<h3>Verbose Output</h3>
+<h3>Verbose and HtmlDump Output</h3>
 
-The <a href="verbose.html">verbose option</a> (-v) prints additional information
-that is useful for debugging or when decoding new tags.
+The <a href="verbose.html">Verbose</a> (-v) and <a
+href="htmldump.html">HtmlDump</a> (-htmlDump) options print additional
+information that can be very useful for debugging or when decoding new tags.
 
 <h2><a href="TagNames/index.html">ExifTool Tag Names</a></h2>
 
@@ -241,7 +256,7 @@ WAV, XMP
 <td>APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, DICOM,
 ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm,
 ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2,
-ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, Jpeg2000, Kodak,
+ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC, Jpeg2000, Kodak,
 KodakBordersIFD, KodakEffectsIFD, Leaf, LeafSubIFD, MIFF, MNG, MakerUnknown,
 MetaIFD, Minolta, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT,
 PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM, QuickTime, Ricoh,
@@ -320,9 +335,12 @@ specifed after this option on the command line are extracted from source file
 and written to the destination file.  If no tags are specified, then all writable
 tags are copied.  This option is very simple, yet very powerful.  Depending on
 the formats of the source and destination files, some of tags read may not be
-valid in the destination file, in which case they aren't written.  No
-translation between similar tags with different names is done, although
-information may be transferred between same-named tags in different groups.
+valid in the destination file, in which case they aren't written.
+
+<p>This option may also be used to transfer information between different tags
+within a single image or between different images.  See the
+<a href="exiftool_pod.html">exiftool application documentation</a> for more
+details.
 
 <h2><a name="shift">Date/Time Shift Feature</a></h2>
 
@@ -347,8 +365,9 @@ exiftool -DateTimeOriginal-=1 DIR
 </pre></td></tr></table></blockquote>
 
 The examples above change only the DateTimeOriginal tag, but any writable date
-or time tag can be shifted.  See Image::ExifTool::Shift.pl for details about the
-syntax of the time shift string.
+or time tag can be shifted.  See
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a>
+for details about the syntax of the time shift string.
 
 <h2>Improving Performance</h2>
 
@@ -439,7 +458,9 @@ to figure out the file formats
 <li><a href="http://www.awaresystems.be/imaging/tiff/tifftags.html">http://www.awaresystems.be/imaging/tiff/tifftags.html</a>
 </ul>
 
-And thanks to the following people for their help:
+Thanks to everyone who has sent in bug reports, comments, or suggestions, and
+special thanks to the following people for their valuable input and/or additions
+to the code:
 
 <ul>
 <li>Malcolm Wotton for his help with the D30 Custom Functions

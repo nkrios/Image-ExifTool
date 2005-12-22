@@ -5,7 +5,101 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.77.tar.gz">Version 5.77</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.87.tar.gz">Version 5.87</a>.<p>
+
+<b>Dec. 22/05 - Version 5.87</b> (production release)
+<ul>
+<li>Added support for JVC maker notes
+<li>Extract a number of new DNG tags plus DNG JPEG preview image
+<li>Changed name of DNGCameraSerialNumber tag to CameraSerialNumber
+</ul>
+
+<b>Dec. 20/05 - Version 5.86</b>
+<ul>
+<li>Added support for AVI and MP4 videos
+<li>Improved decoding of Olympus maker notes
+<li>Improved APP12 decoding
+<li>Improved CanonPictureInfo validation to work with more PowerShot models
+<li>Display Canon 1D serial numbers with 6 digits
+<li>Decode maker notes of Nikon D-1
+<li>Combining -t with -S now gives a single-line tab-delimited list of values
+<li>Extract preview image for Samsung Digimax i5
+</ul>
+
+<b>Dec. 13/05 - Version 5.85</b>
+<ul>
+<li>Added ability to read and write XMP files which don't have an xpacket header
+<li>Fixed problem deleting entire XMP data block using '-xmp=' syntax
+<li>More minor HtmlDump improvements
+</ul>
+
+<b>Dec. 12/05 - Version 5.84</b>
+<ul>
+<li>Minor improvements to HtmlDump output
+</ul>
+
+<b>Dec. 12/05 - Version 5.83</b>
+<ul>
+<li>Added -F option to allow maker notes offsets to be fixed
+<li>Added -htmlDump option to generate a verbose HTML-based hex dump of EXIF
+    and/or TIFF information (cool new diagnostic tool)
+<li>Attempt to validate maker notes offsets and issue warning if they look wrong
+<li>Fixed problem rewriting PreviewImage in some Olympus and Pentax images
+<li>Increased speed for extracting large preview images
+<li>Improved synthetic maker notes when coping tags from CRW file
+<li>Display absolute offsets for EXIF values in very very verbose mode
+<li>Verbose option output is now written to file if -w option used
+<li>Speed up rewriting of some TIFF images when using ActivePerl 5.8.x for
+    Windows (image strips are now copied in a single block if they are
+    contiguous in the file to avoid ActivePerl bug which causes extremely poor
+    performance when concatinating a large number of memory blocks)
+<li>Added a couple of new Nikon and Pentax lens ID's (thanks Robert Rottmerhusen
+    and David Buret)
+<li>Decode PrintIM information in Casio QV-4000
+<li>Fixed Decoding of Canon EOS D60 serial numbers to agree with Canon utilities
+<li>API changes:
+    <ul>
+    <li>Added HtmlDump and TextOut options
+    </ul>
+</ul>
+
+<b>Nov. 26/05 - Version 5.82</b>
+<ul>
+<li>Fixed bug which caused error rewriting Minolta MRW images
+<li>Added MRW write test
+<li>Improved MRW verbose output
+</ul>
+
+<b>Nov. 24/05 - Version 5.81</b>
+<ul>
+<li>Changed writing of TIFF so that existing IPTC will be rewritten as int32u
+    whenever IPTC is edited, regardless of original format type.  This allows
+    files to be 'fixed' even if IPTC was previously another format (now we get
+    to see if there is any software out there that barfs on int32u's...)
+<li>Changed the -s option so tag names are displayed instead of descriptions
+    (now similar to the -S option, but values are aligned in a column)
+<li>Remove padding at the end of IPTC record when writing
+<li>Fixed problem which was generating a warning with ActivePerl 5.6.1
+</ul>
+
+<b>Nov. 22/05 - Version 5.80</b>
+<ul>
+<li>Changed writing of new TIFF IPTC information to make it visible in Nikon
+    Capture (for some reason requires int32u format)
+<li>Installed patch for building of ExifTool RPMS on Mandriva Linux (thanks
+    Niels Kristian)
+</ul>
+
+<b>Nov. 22/05 - Version 5.79</b>
+<ul>
+<li>Fixed problem which could render XMP information unreadable by Photoshop
+    when editing some XMP written by Photoshop CS2
+</ul>
+
+<b>Nov. 21/05 - Version 5.78</b>
+<ul>
+<li>Fixed problem which could generate an error when adding IFD1 to an image
+</ul>
 
 <b>Nov. 18/05 - Version 5.77</b> (production release)
 <ul>

@@ -55,7 +55,7 @@ sub InitMakerNotes($)
     my $exifTool = shift;
     $exifTool->{MAKER_NOTE_INFO} = {
         Entries => { },     # directory entries keyed by tagID
-        ValBuff => ' ',     # value data buffer
+        ValBuff => "\0\0\0\0", # value data buffer (start with zero nextIFD pointer)
         FixupTags => { },   # flags for tags with data in value buffer
     };
 }
@@ -216,8 +216,8 @@ sub WriteCR2($$$)
             Write($outfile, $newData) or return 0;
             $extra += length $newData;
         }
-        if ($extra and $exifTool->{OPTIONS}->{Verbose}) {
-            print "Note: $extra extra bytes copied after normal end of CR2\n";
+        if ($extra) {
+            $exifTool->VPrint(0, "Note: $extra extra bytes copied after normal end of CR2\n");
         }
     }
     undef $exifTool->{TIFF_END};
@@ -246,6 +246,7 @@ sub WriteCanonRaw($$$)
     my $outPos = $$dirInfo{OutPos} or return undef;
     my $outBase = $outPos;
     my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
     my ($buff, $tagInfo);
 
     # 4 bytes at end of block give directory position within block
@@ -296,7 +297,7 @@ sub WriteCanonRaw($$$)
                 # write new value data
                 Write($outfile, $newVal) or return undef;
                 $outPos += length($newVal);     # update current position
-                $verbose > 1 and print "    + CanonRaw:$$tagInfo{Name}\n";
+                $verbose > 1 and print $out "    + CanonRaw:$$tagInfo{Name}\n";
                 ++$exifTool->{CHANGED};
             }
             # set flag to delete this tag if found later
@@ -396,7 +397,7 @@ sub WriteCanonRaw($$$)
                 }
             } elsif ($$newTags{$tagID}) {
                 if ($delTag{$tagID}) {
-                    $verbose > 1 and print "    - CanonRaw:$$tagInfo{Name}\n";
+                    $verbose > 1 and print $out "    - CanonRaw:$$tagInfo{Name}\n";
                     ++$exifTool->{CHANGED};
                     next;   # next since we already added this tag
                 }
@@ -421,8 +422,8 @@ sub WriteCanonRaw($$$)
                         if ($verbose > 1) {
                             my $oldStr = $exifTool->Printable($oldVal);
                             my $newStr = $exifTool->Printable($verboseVal);
-                            print "    - CanonRaw:$$tagInfo{Name} = '$oldStr'\n";
-                            print "    + CanonRaw:$$tagInfo{Name} = '$newStr'\n";
+                            print $out "    - CanonRaw:$$tagInfo{Name} = '$oldStr'\n";
+                            print $out "    + CanonRaw:$$tagInfo{Name} = '$newStr'\n";
                         }
                     }
                 }
@@ -486,7 +487,6 @@ sub WriteCRW($$)
     my ($exifTool, $dirInfo) = @_;
     my $outfile = $$dirInfo{OutFile};
     my $raf = $$dirInfo{RAF};
-    my $verbose = $exifTool->{OPTIONS}->{Verbose};
     my $rtnVal = 0;
     my ($buff, $err, $sig);
 

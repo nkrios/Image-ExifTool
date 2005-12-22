@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # MIFF chunks
 %Image::ExifTool::MIFF::Main = (
@@ -230,8 +230,10 @@ sub ProcessMIFF($$)
         unless ($processed) {
             $exifTool->Warn("Unknown MIFF $type profile data");
             if ($verbose) {
-                 $exifTool->VerboseDir($type, 0, $len);
-                 $verbose > 2 and Image::ExifTool::HexDump(\$buff);
+                $exifTool->VerboseDir($type, 0, $len);
+                Image::ExifTool::HexDump(\$buff, undef, 
+                    Out => $exifTool->Options('TextOut')
+                ) if $verbose > 2;
              }
          }
     }

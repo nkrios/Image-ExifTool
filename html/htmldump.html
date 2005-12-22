@@ -1,0 +1,597 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+"http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd">
+<html>
+<head>
+<title>
+HTML Dump (t/images/Olympus.jpg)</title>
+<style type="text/css">
+<!--
+/* character style ID's */
+#D { color: #000000 } /* default color */
+#V { color: #ff0000 } /* duplicate block 1 */
+#W { color: #004400 } /* normal block 1 */
+#X { color: #ff4488 } /* duplicate block 2 */
+#Y { color: #448844 } /* normal block 2 */
+#U { color: #cc8844 } /* unused data block */
+#H { color: #0000ff } /* highlighted tag name */
+#M { text-decoration: underline } /* maker notes data */
+/* table styles */
+table.dump {
+  border-top-style: solid;
+  border-bottom-style: solid;
+  border-width: 1;
+  border-color: #888888;
+  padding-top: 4;
+  padding-bottom: 4;
+}
+table.dump td {
+  padding-left: 4;
+  padding-right: 4;
+}
+td.c2 {
+  border-left-style: solid;
+  border-right-style: solid;
+  border-width: 1;
+  border-color: #888888;
+  padding-left: 4;
+  padding-right: 4;
+}
+-->
+</style>
+<script language="JavaScript" type="text/JavaScript">
+<!-- Begin
+var t = new Array;
+function GetSpansByClass(classname) {
+  var found = new Array();
+  var list = document.getElementsByTagName('span');
+  var len = list.length;
+  for (var i=0, j=0; i<len; ++i) {
+    if (list[i].className == classname) {
+      found[j++] = list[i];
+    }
+  }
+  delete list;
+  return found;
+}
+function high(e,on) {
+  var targ;
+  if (e.target) targ = e.target;
+  else if (e.srcElement) targ = e.srcElement;
+  if (targ.nodeType == 3) targ = targ.parentNode; // defeat Safari bug
+  if (!targ.name) targ = targ.parentNode; // go up another level if necessary
+  if (targ.name && document.getElementsByName) {
+    var col;
+    var tip;
+    if (on) {
+      col = "#ffcc99";
+      if (targ.name.substring(0,1) == 't') {
+        var index = parseInt(targ.name.substring(1));
+        tip = t[index];
+        if (tip) delete t[index];
+      }
+    } else {
+      col = "transparent";
+    }
+    // highlight anchor elements with the same name and add tool tip
+    var list = document.getElementsByName(targ.name);
+    for (var i=0; i<list.length; ++i) {
+      list[i].style.background = col;
+      if (tip) list[i].title += tip;
+    }
+    // use class name to highlight corresponding span elements
+    list = GetSpansByClass(targ.name);
+    for (var i=0; i<list.length; ++i) {
+      list[i].style.background = col;
+    }
+  }
+}
+t[0] = "SOI Marker"
+t[1] = "APP1 Header\nData size: 1318 bytes"
+t[2] = "APP1 Identifier\nData type: Exif"
+t[3] = "TIFF Header\nByte order: Little endian"
+t[4] = "IFD0 offset: 0x0008"
+t[5] = "IFD0\nNum entries: 11"
+t[6] = "IFD0 ImageDescription\nTag ID: 0x010e\nFormat: string[32]\nSize: 32 bytes\nValue offset: 0x0092\nValue: OLYMPUS DIGITAL CAMERA         "
+t[7] = "IFD0 Make\nTag ID: 0x010f\nFormat: string[24]\nSize: 24 bytes\nValue offset: 0x00b2\nValue: OLYMPUS OPTICAL CO.,LTD"
+t[8] = "IFD0 Model\nTag ID: 0x0110\nFormat: string[7]\nSize: 7 bytes\nValue offset: 0x00ca\nValue: C2000Z"
+t[9] = "IFD0 Orientation\nTag ID: 0x0112\nFormat: int16u[1]\nSize: 2 bytes\nValue: 1"
+t[10] = "IFD0 XResolution\nTag ID: 0x011a\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x00d2\nValue: 72"
+t[11] = "IFD0 YResolution\nTag ID: 0x011b\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x00da\nValue: 72"
+t[12] = "IFD0 ResolutionUnit\nTag ID: 0x0128\nFormat: int16u[1]\nSize: 2 bytes\nValue: 2"
+t[13] = "IFD0 Software\nTag ID: 0x0131\nFormat: string[9]\nSize: 9 bytes\nValue offset: 0x00e2\nValue: v951p-80"
+t[14] = "IFD0 ModifyDate\nTag ID: 0x0132\nFormat: string[20]\nSize: 20 bytes\nValue offset: 0x00ec\nValue: 1999:12:06 16:38:40"
+t[15] = "IFD0 YCbCrPositioning\nTag ID: 0x0213\nFormat: int16u[1]\nSize: 2 bytes\nValue: 2"
+t[16] = "IFD0 ExifOffset\nTag ID: 0x8769\nFormat: int32u[1]\nSize: 4 bytes\nValue: 256"
+t[17] = "IFD1 offset: 0x04a6"
+t[20] = "ExifIFD\nNum entries: 24"
+t[21] = "ExifIFD ExposureTime\nTag ID: 0x829a\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x0226\nValue: 0.03333333"
+t[22] = "ExifIFD FNumber\nTag ID: 0x829d\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x022e\nValue: 2"
+t[23] = "ExifIFD ExposureProgram\nTag ID: 0x8822\nFormat: int16u[1]\nSize: 2 bytes\nValue: 2"
+t[24] = "ExifIFD ISO\nTag ID: 0x8827\nFormat: int16u[1]\nSize: 2 bytes\nValue: 100"
+t[25] = "ExifIFD ExifVersion\nTag ID: 0x9000\nFormat: undef[4]\nSize: 4 bytes\nValue: 0210"
+t[26] = "ExifIFD DateTimeOriginal\nTag ID: 0x9003\nFormat: string[20]\nSize: 20 bytes\nValue offset: 0x0236\nValue: 1999:12:06 16:38:40"
+t[27] = "ExifIFD CreateDate\nTag ID: 0x9004\nFormat: string[20]\nSize: 20 bytes\nValue offset: 0x024a\nValue: 1999:12:06 16:38:40"
+t[28] = "ExifIFD ComponentsConfiguration\nTag ID: 0x9101\nFormat: undef[4]\nSize: 4 bytes\nValue: ...."
+t[29] = "ExifIFD CompressedBitsPerPixel\nTag ID: 0x9102\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x025e\nValue: 1"
+t[30] = "ExifIFD ExposureCompensation\nTag ID: 0x9204\nFormat: rational32s[1]\nSize: 8 bytes\nValue offset: 0x0266\nValue: 0"
+t[31] = "ExifIFD MaxApertureValue\nTag ID: 0x9205\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x026e\nValue: 3"
+t[32] = "ExifIFD MeteringMode\nTag ID: 0x9207\nFormat: int16u[1]\nSize: 2 bytes\nValue: 5"
+t[33] = "ExifIFD LightSource\nTag ID: 0x9208\nFormat: int16u[1]\nSize: 2 bytes\nValue: 0"
+t[34] = "ExifIFD Flash\nTag ID: 0x9209\nFormat: int16u[1]\nSize: 2 bytes\nValue: 0x1"
+t[35] = "ExifIFD FocalLength\nTag ID: 0x920a\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x0276\nValue: 7"
+t[36] = "ExifIFD MakerNotes\nTag ID: 0x927c\nFormat: undef[396]\nSize: 396 bytes\nValue offset: 0x027e\nValue: OLYMP.......................[...]"
+t[37] = "ExifIFD UserComment\nTag ID: 0x9286\nFormat: undef[125]\nSize: 125 bytes\nValue offset: 0x040a\nValue: ............................[...]"
+t[38] = "ExifIFD FlashpixVersion\nTag ID: 0xa000\nFormat: undef[4]\nSize: 4 bytes\nValue: 0100"
+t[39] = "ExifIFD ColorSpace\nTag ID: 0xa001\nFormat: int16u[1]\nSize: 2 bytes\nValue: 1"
+t[40] = "ExifIFD ExifImageWidth\nTag ID: 0xa002\nFormat: int32u[1]\nSize: 4 bytes\nValue: 640"
+t[41] = "ExifIFD ExifImageLength\nTag ID: 0xa003\nFormat: int32u[1]\nSize: 4 bytes\nValue: 480"
+t[42] = "ExifIFD InteropOffset\nTag ID: 0xa005\nFormat: int32u[1]\nSize: 4 bytes\nValue: 1160"
+t[43] = "ExifIFD FileSource\nTag ID: 0xa300\nFormat: undef[1]\nSize: 1 bytes\nValue: 3"
+t[44] = "ExifIFD SceneType\nTag ID: 0xa301\nFormat: undef[1]\nSize: 1 bytes\nValue: 1"
+t[45] = "Next IFD offset: 0x0000"
+t[46] = "MakerNoteOlympus header\nSize: 8 bytes"
+t[47] = "MakerNoteOlympus\nNum entries: 11"
+t[48] = "MakerNotes SpecialMode\nTag ID: 0x0200\nFormat: int32u[3]\nSize: 12 bytes\nValue offset: 0x0310\nValue: 0 0 0"
+t[49] = "MakerNotes Quality\nTag ID: 0x0201\nFormat: int16u[1]\nSize: 2 bytes\nValue: 1"
+t[50] = "MakerNotes Macro\nTag ID: 0x0202\nFormat: int16u[1]\nSize: 2 bytes\nValue: 0"
+t[51] = "MakerNotes BWMode\nTag ID: 0x0203\nFormat: int16u[1]\nSize: 2 bytes\nValue: 0"
+t[52] = "MakerNotes DigitalZoom\nTag ID: 0x0204\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x031c\nValue: 0"
+t[53] = "MakerNotes FocalPlaneDiagonal\nTag ID: 0x0205\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x0324\nValue: 7.8"
+t[54] = "MakerNotes Tag 0x0206\nTag ID: 0x0206\nFormat: int16s[6]\nSize: 12 bytes\nValue offset: 0x032c\nValue: -215 -388 -418 -185 -310 -314"
+t[55] = "MakerNotes CameraType\nTag ID: 0x0207\nFormat: string[5]\nSize: 5 bytes\nValue offset: 0x0338\nValue: SR951"
+t[56] = "MakerNotes TextInfo\nTag ID: 0x0208\nFormat: string[52]\nSize: 52 bytes\nValue offset: 0x033e\nValue: [pictureInfo] Resolution=1 [[...]"
+t[57] = "MakerNotes CameraID\nTag ID: 0x0209\nFormat: string[32]\nSize: 32 bytes\nValue offset: 0x0372\nValue: OLYMPUS DIGITAL CAMERA"
+t[58] = "MakerNotes DataDump\nTag ID: 0x0f00\nFormat: int32u[30]\nSize: 120 bytes\nValue offset: 0x0392\nValue: 0 0 16777216 0 61817 768 618[...]"
+t[59] = "Next IFD offset: 0x0000"
+t[62] = "InteropIFD\nNum entries: 2"
+t[63] = "InteropIFD InteropIndex\nTag ID: 0x0001\nFormat: string[4]\nSize: 4 bytes\nValue: R98"
+t[64] = "InteropIFD InteropVersion\nTag ID: 0x0002\nFormat: undef[4]\nSize: 4 bytes\nValue: 0100"
+t[65] = "Next IFD offset: 0x0000"
+t[66] = "IFD1\nNum entries: 6"
+t[67] = "IFD1 Compression\nTag ID: 0x0103\nFormat: int16u[1]\nSize: 2 bytes\nValue: 6"
+t[68] = "IFD1 XResolution\nTag ID: 0x011a\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x04f4\nValue: 72"
+t[69] = "IFD1 YResolution\nTag ID: 0x011b\nFormat: rational32u[1]\nSize: 8 bytes\nValue offset: 0x04fc\nValue: 72"
+t[70] = "IFD1 ResolutionUnit\nTag ID: 0x0128\nFormat: int16u[1]\nSize: 2 bytes\nValue: 2"
+t[71] = "IFD1 ThumbnailOffset\nTag ID: 0x0201\nFormat: int32u[1]\nSize: 4 bytes\nValue: 0x0504"
+t[72] = "IFD1 ThumbnailLength\nTag ID: 0x0202\nFormat: int32u[1]\nSize: 4 bytes\nValue: 28"
+t[73] = "IFD2 offset: 0x0000"
+t[74] = "ThumbnailImage\nSize: 28 bytes"
+
+// End --->
+</script></head>
+<body bgcolor='#ffffff'>
+<h2>ExifTool HtmlDump Option</h2>
+Below is an example of the ExifTool HtmlDump output (the exiftool '-htmlDump'
+option).  Move your cursor over the data to highlight individual blocks and
+reveal tool tips for extra information. (You must have JavaScript enabled.)
+
+<span onmouseover="high(event,1)" onmouseout="high(event,0)"> <p>Normal data
+blocks are <span name='XA' id='Y'>light</span> or <span name='XA' id='W'>dark
+green</span>, unused blocks are <span name='XB' id='U'>yellow</span>, and
+double-referenced blocks are <span name='XC' id='V'>red</span> or
+<span name='XC' id='X'>pink</span>. A <span name='XD' id='H'>blue</span> tag
+name indicates that the tag references data outside the IFD (ie. the value size
+is greater than 4 bytes), and all data in the maker notes value block is
+<span name='XE' id='M'><span id='W'>underlined</span></span>. Note that in TIFF
+images, image data appears as <span name='XB' id='U'>[unused]</span>, and is
+only dumped if it occurs before the meta information.</span>
+
+<p>Currently, only EXIF and/or TIFF information is dumped.  All offsets are
+relative to the start of the TIFF header.  For a TIFF image this is at the start
+of the file, but for a JPEG image it is 6 bytes into the data of the Exif APP1
+segment.
+
+<hr>
+<noscript><b id='V'>--&gt;
+Enable JavaScript for active highlighting and information tool tips!
+</b></noscript><table class='dump' cellspacing=0 cellpadding=2>
+<tr><td valign='top'><pre>-000c
+ 0000
+ 000a
+ 0016
+ 0022
+ 002e
+ 003a
+ 0046
+ 0052
+ 005e
+ 006a
+ 0076
+ 0082
+ 008e
+ 0090
+ 00a0
+ 00b0
+ 00c0
+ 00d0
+ 00e0
+ 00f0
+ 0100
+ 0102
+ 010e
+ 011a
+ 0126
+ 0132
+ 013e
+ 014a
+ 0156
+ 0162
+ 016e
+ 017a
+ 0186
+ 0192
+ 019e
+ 01aa
+ 01b6
+ 01c2
+ 01ce
+ 01da
+ 01e6
+ 01f2
+ 01fe
+ 020a
+ 0216
+ 0222
+ 0230
+ 0240
+ 0250
+ 0260
+ 0270
+ 0280
+ 0288
+ 0294
+ 02a0
+ 02ac
+ 02b8
+ 02c4
+ 02d0
+ 02dc
+ 02e8
+ 02f4
+ 0300
+ 030c
+ 0310
+ 0320
+ 0330
+ 0340
+ 0350
+ 0360
+ 0370
+ 0380
+ 0390
+ 03a0
+ 03b0
+ 03c0
+ 03d0
+ 03e0
+ 03f0
+ 0400
+ 0410
+ 0420
+ 0430
+ 0440
+ 0450
+ 0460
+ 0470
+ 0480
+ 048a
+ 0496
+ 04a2
+ 04a8
+ 04b4
+ 04c0
+ 04cc
+ 04d8
+ 04e4
+ 04f0
+ 0500
+ 0510
+ 0520
+</pre></td><td valign="top"><pre onmouseover="high(event,1)" onmouseout="high(event,0)">            <a name='t0' id='W'>ff d8</a> <a name='t1' id='Y'>ff e1  05 28</a> <a name='t2' id='W'>45 78 69 66 00 00</a>
+<a name='t3' id='Y'>49 49 2a 00</a> <a name='t4' id='W'>08 00 00 00</a>  <a name='t5' id='Y'>0b 00</a>
+<a name='t6' id='W'>0e 01 02 00 20 00 00 00  92 00 00 00</a>
+<a name='t7' id='Y'>0f 01 02 00 18 00 00 00  b2 00 00 00</a>
+<a name='t8' id='W'>10 01 02 00 07 00 00 00  ca 00 00 00</a>
+<a name='t9' id='Y'>12 01 03 00 01 00 00 00  01 00 00 00</a>
+<a name='t10' id='W'>1a 01 05 00 01 00 00 00  d2 00 00 00</a>
+<a name='t11' id='Y'>1b 01 05 00 01 00 00 00  da 00 00 00</a>
+<a name='t12' id='W'>28 01 03 00 01 00 00 00  02 00 00 00</a>
+<a name='t13' id='Y'>31 01 02 00 09 00 00 00  e2 00 00 00</a>
+<a name='t14' id='W'>32 01 02 00 14 00 00 00  ec 00 00 00</a>
+<a name='t15' id='Y'>13 02 03 00 01 00 00 00  02 00 00 00</a>
+<a name='t16' id='W'>69 87 04 00 01 00 00 00  00 01 00 00</a>
+                                           <a name='t17' id='Y'>a6 04
+00 00</a> <a name='t6' id='W'>4f 4c 59 4d 50 55  53 20 44 49 47 49 54 41
+4c 20 43 41 4d 45 52 41  20 20 20 20 20 20 20 20
+20 00</a> <a name='t7' id='Y'>4f 4c 59 4d 50 55  53 20 4f 50 54 49 43 41
+4c 20 43 4f 2e 2c 4c 54  44 00</a> <a name='t8' id='W'>43 32 30 30 30 5a
+00</a> <a name='t18' id='U'>00</a> <a name='t10' id='Y'>48 00 00 00 01 00  00 00</a> <a name='t11' id='W'>48 00 00 00 01 00
+00 00</a> <a name='t13' id='Y'>76 39 35 31 70 2d  38 30 00</a> <a name='t19' id='U'>00</a> <a name='t14' id='W'>31 39 39 39
+3a 31 32 3a 30 36 20 31  36 3a 33 38 3a 34 30 00</a>
+<a name='t20' id='Y'>18 00</a>
+<a name='t21' id='W'>9a 82 05 00 01 00 00 00  26 02 00 00</a>
+<a name='t22' id='Y'>9d 82 05 00 01 00 00 00  2e 02 00 00</a>
+<a name='t23' id='W'>22 88 03 00 01 00 00 00  02 00 00 00</a>
+<a name='t24' id='Y'>27 88 03 00 01 00 00 00  64 00 00 00</a>
+<a name='t25' id='W'>00 90 07 00 04 00 00 00  30 32 31 30</a>
+<a name='t26' id='Y'>03 90 02 00 14 00 00 00  36 02 00 00</a>
+<a name='t27' id='W'>04 90 02 00 14 00 00 00  4a 02 00 00</a>
+<a name='t28' id='Y'>01 91 07 00 04 00 00 00  01 02 03 00</a>
+<a name='t29' id='W'>02 91 05 00 01 00 00 00  5e 02 00 00</a>
+<a name='t30' id='Y'>04 92 0a 00 01 00 00 00  66 02 00 00</a>
+<a name='t31' id='W'>05 92 05 00 01 00 00 00  6e 02 00 00</a>
+<a name='t32' id='Y'>07 92 03 00 01 00 00 00  05 00 00 00</a>
+<a name='t33' id='W'>08 92 03 00 01 00 00 00  00 00 00 00</a>
+<a name='t34' id='Y'>09 92 03 00 01 00 00 00  01 00 00 00</a>
+<a name='t35' id='W'>0a 92 05 00 01 00 00 00  76 02 00 00</a>
+<a name='t36' id='Y'>7c 92 07 00 8c 01 00 00  7e 02 00 00</a>
+<a name='t37' id='W'>86 92 07 00 7d 00 00 00  0a 04 00 00</a>
+<a name='t38' id='Y'>00 a0 07 00 04 00 00 00  30 31 30 30</a>
+<a name='t39' id='W'>01 a0 03 00 01 00 00 00  01 00 00 00</a>
+<a name='t40' id='Y'>02 a0 04 00 01 00 00 00  80 02 00 00</a>
+<a name='t41' id='W'>03 a0 04 00 01 00 00 00  e0 01 00 00</a>
+<a name='t42' id='Y'>05 a0 04 00 01 00 00 00  88 04 00 00</a>
+<a name='t43' id='W'>00 a3 07 00 01 00 00 00  03 00 00 00</a>
+<a name='t44' id='Y'>01 a3 07 00 01 00 00 00  01 00 00 00</a>
+      <a name='t45' id='W'>00 00 00 00</a> <a name='t21' id='Y'>0a 00  00 00 2c 01 00 00</a> <a name='t22' id='W'>14 00
+00 00 0a 00 00 00</a> <a name='t26' id='Y'>31 39  39 39 3a 31 32 3a 30 36
+20 31 36 3a 33 38 3a 34  30 00</a> <a name='t27' id='W'>31 39 39 39 3a 31
+32 3a 30 36 20 31 36 3a  33 38 3a 34 30 00</a> <a name='t29' id='Y'>01 00
+00 00 01 00 00 00</a> <a name='t30' id='W'>00 00  00 00 0a 00 00 00</a> <a name='t31' id='Y'>1e 00
+00 00 0a 00 00 00</a> <a name='t35' id='W'>46 00  00 00 0a 00 00 00</a> <span id='M' class='t36'><a name='t46' id='Y'>4f 4c
+59 4d 50 00 01 00</a> <a name='t47' id='W'>0b 00</a>
+<a name='t48' id='Y'>00 02 04 00 03 00 00 00  10 03 00 00</a>
+<a name='t49' id='W'>01 02 03 00 01 00 00 00  01 00 00 00</a>
+<a name='t50' id='Y'>02 02 03 00 01 00 00 00  00 00 00 00</a>
+<a name='t51' id='W'>03 02 03 00 01 00 00 00  00 00 00 00</a>
+<a name='t52' id='Y'>04 02 05 00 01 00 00 00  1c 03 00 00</a>
+<a name='t53' id='W'>05 02 05 00 01 00 00 00  24 03 00 00</a>
+<a name='t54' id='Y'>06 02 08 00 06 00 00 00  2c 03 00 00</a>
+<a name='t55' id='W'>07 02 02 00 05 00 00 00  38 03 00 00</a>
+<a name='t56' id='Y'>08 02 02 00 34 00 00 00  3e 03 00 00</a>
+<a name='t57' id='W'>09 02 07 00 20 00 00 00  72 03 00 00</a>
+<a name='t58' id='Y'>00 0f 04 00 1e 00 00 00  92 03 00 00</a>
+</span>                                     <span id='M' class='t36'><a name='t59' id='W'>00 00 00 00</a>
+<a name='t48' id='Y'>00 00 00 00 00 00 00 00  00 00 00 00</a> <a name='t52' id='W'>00 00 00 00
+64 00 00 00</a> <a name='t53' id='Y'>0c 03 00 00  64 00 00 00</a> <a name='t54' id='W'>29 ff 7c fe
+5e fe 47 ff ca fe c6 fe</a>  <a name='t55' id='Y'>53 52 39 35 31</a> <a name='t60' id='U'>00</a> <a name='t56' id='W'>5b 70
+69 63 74 75 72 65 49 6e  66 6f 5d 20 52 65 73 6f
+6c 75 74 69 6f 6e 3d 31  20 5b 43 61 6d 65 72 61
+20 49 6e 66 6f 5d 20 54  79 70 65 3d 53 52 39 35
+31 00</a> <a name='t57' id='Y'>4f 4c 59 4d 50 55  53 20 44 49 47 49 54 41
+4c 20 43 41 4d 45 52 41  00 00 00 00 00 00 00 00
+00 00</a> <a name='t58' id='W'>00 00 00 00 00 00  00 00 00 00 00 01 00 00
+00 00 79 f1 00 00 00 03  00 00 79 f1 00 00 00 72
+00 00 79 f1 3b b2 00 6d  00 00 00 44 00 00 04 5a
+0a a3 00 00 01 f4 01 08  00 00 00 00 00 00 00 00
+00 00 00 75 11 61 00 00  00 00 0a 01 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+0d 91 29 00 0a 5f 64 61  02 d5 12 14 10 d1 15 00
+ff 42 4f 53 32 0c 50 ff  00 00</a></span> <a name='t37' id='Y'>00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00</a> <a name='t61' id='U'>00</a>  <a name='t62' id='W'>02 00</a>
+<a name='t63' id='Y'>01 00 02 00 04 00 00 00  52 39 38 00</a>
+<a name='t64' id='W'>02 00 07 00 04 00 00 00  30 31 30 30</a>
+      <a name='t65' id='Y'>00 00 00 00</a> <a name='t66' id='W'>06 00</a>
+<a name='t67' id='Y'>03 01 03 00 01 00 00 00  06 00 00 00</a>
+<a name='t68' id='W'>1a 01 05 00 01 00 00 00  f4 04 00 00</a>
+<a name='t69' id='Y'>1b 01 05 00 01 00 00 00  fc 04 00 00</a>
+<a name='t70' id='W'>28 01 03 00 01 00 00 00  02 00 00 00</a>
+<a name='t71' id='Y'>01 02 04 00 01 00 00 00  04 05 00 00</a>
+<a name='t72' id='W'>02 02 04 00 01 00 00 00  1c 00 00 00</a>
+<a name='t73' id='Y'>00 00 00 00</a> <a name='t68' id='W'>48 00 00 00  01 00 00 00</a> <a name='t69' id='Y'>48 00 00 00
+01 00 00 00</a> <a name='t74' id='W'>3c 44 75 6d  6d 79 20 74 68 75 6d 62
+6e 61 69 6c 20 69 6d 61  67 65 20 64 61 74 61 3e</a>
+<a name='t75' id='Y'>ff db</a>
+</pre></td><td class="c2" valign="top"><pre onmouseover="high(event,1)" onmouseout="high(event,0)">    <a name='t0' id='W'>..</a><a name='t1' id='Y'>...(</a><a name='t2' id='W'>Exif..</a>
+<a name='t3' id='Y'>II*.</a><a name='t4' id='W'>....</a><a name='t5' id='Y'>..</a>
+<a name='t6' id='W'>.... .......</a>
+<a name='t7' id='Y'>............</a>
+<a name='t8' id='W'>............</a>
+<a name='t9' id='Y'>............</a>
+<a name='t10' id='W'>............</a>
+<a name='t11' id='Y'>............</a>
+<a name='t12' id='W'>(...........</a>
+<a name='t13' id='Y'>1...........</a>
+<a name='t14' id='W'>2...........</a>
+<a name='t15' id='Y'>............</a>
+<a name='t16' id='W'>i...........</a>
+              <a name='t17' id='Y'>..
+..</a><a name='t6' id='W'>OLYMPUS DIGITA
+L CAMERA        
+ .</a><a name='t7' id='Y'>OLYMPUS OPTICA
+L CO.,LTD.</a><a name='t8' id='W'>C2000Z
+.</a><a name='t18' id='U'>.</a><a name='t10' id='Y'>H.......</a><a name='t11' id='W'>H.....
+..</a><a name='t13' id='Y'>v951p-80.</a><a name='t19' id='U'>.</a><a name='t14' id='W'>1999
+:12:06 16:38:40.</a>
+<a name='t20' id='Y'>..</a>
+<a name='t21' id='W'>........&amp;...</a>
+<a name='t22' id='Y'>............</a>
+<a name='t23' id='W'>"...........</a>
+<a name='t24' id='Y'>'.......d...</a>
+<a name='t25' id='W'>........0210</a>
+<a name='t26' id='Y'>........6...</a>
+<a name='t27' id='W'>........J...</a>
+<a name='t28' id='Y'>............</a>
+<a name='t29' id='W'>........^...</a>
+<a name='t30' id='Y'>........f...</a>
+<a name='t31' id='W'>........n...</a>
+<a name='t32' id='Y'>............</a>
+<a name='t33' id='W'>............</a>
+<a name='t34' id='Y'>............</a>
+<a name='t35' id='W'>........v...</a>
+<a name='t36' id='Y'>|.......~...</a>
+<a name='t37' id='W'>....}.......</a>
+<a name='t38' id='Y'>........0100</a>
+<a name='t39' id='W'>............</a>
+<a name='t40' id='Y'>............</a>
+<a name='t41' id='W'>............</a>
+<a name='t42' id='Y'>............</a>
+<a name='t43' id='W'>............</a>
+<a name='t44' id='Y'>............</a>
+  <a name='t45' id='W'>....</a><a name='t21' id='Y'>....,...</a><a name='t22' id='W'>..
+......</a><a name='t26' id='Y'>1999:12:06
+ 16:38:40.</a><a name='t27' id='W'>1999:1
+2:06 16:38:40.</a><a name='t29' id='Y'>..
+......</a><a name='t30' id='W'>........</a><a name='t31' id='Y'>..
+......</a><a name='t35' id='W'>F.......</a><span id='M' class='t36'><a name='t46' id='Y'>OL
+YMP...</a><a name='t47' id='W'>..</a>
+<a name='t48' id='Y'>............</a>
+<a name='t49' id='W'>............</a>
+<a name='t50' id='Y'>............</a>
+<a name='t51' id='W'>............</a>
+<a name='t52' id='Y'>............</a>
+<a name='t53' id='W'>........$...</a>
+<a name='t54' id='Y'>........,...</a>
+<a name='t55' id='W'>........8...</a>
+<a name='t56' id='Y'>....4...&gt;...</a>
+<a name='t57' id='W'>.... ...r...</a>
+<a name='t58' id='Y'>............</a>
+</span>            <span id='M' class='t36'><a name='t59' id='W'>....</a>
+<a name='t48' id='Y'>............</a><a name='t52' id='W'>....
+d...</a><a name='t53' id='Y'>....d...</a><a name='t54' id='W'>).|.
+^.G.....</a><a name='t55' id='Y'>SR951</a><a name='t60' id='U'>.</a><a name='t56' id='W'>[p
+ictureInfo] Reso
+lution=1 [Camera
+ Info] Type=SR95
+1.</a><a name='t57' id='Y'>OLYMPUS DIGITA
+L CAMERA........
+..</a><a name='t58' id='W'>..............
+..y.......y....r
+..y.;..m...D...Z
+................
+...u.a..........
+................
+..).._da........
+.BOS2.P...</a></span><a name='t37' id='Y'>......
+................
+................
+................
+................
+................
+................
+................
+.......</a><a name='t61' id='U'>.</a><a name='t62' id='W'>..</a>
+<a name='t63' id='Y'>........R98.</a>
+<a name='t64' id='W'>........0100</a>
+  <a name='t65' id='Y'>....</a><a name='t66' id='W'>..</a>
+<a name='t67' id='Y'>............</a>
+<a name='t68' id='W'>............</a>
+<a name='t69' id='Y'>............</a>
+<a name='t70' id='W'>(...........</a>
+<a name='t71' id='Y'>............</a>
+<a name='t72' id='W'>............</a>
+<a name='t73' id='Y'>....</a><a name='t68' id='W'>H.......</a><a name='t69' id='Y'>H...
+....</a><a name='t74' id='W'>&lt;Dummy thumb
+nail image data&gt;</a>
+<a name='t75' id='Y'>..</a>
+</pre></td><td valign="top"><pre onmouseover="high(event,1)" onmouseout="high(event,0)"><a name='t0' id='W'>JPEG header</a> <a name='t1' id='Y'>APP1 header</a> <a name='t2' id='W'>APP1 ID</a>
+<a name='t3' id='Y'>TIFF header</a> <a name='t4' id='W'>IFD0 pointer</a> <a name='t5' id='Y'>IFD0 entries</a>
+<a name='t6' id='W'>IFD0_00 <span id='H'>ImageDescription</span></a>
+<a name='t7' id='Y'>IFD0_01 <span id='H'>Make</span></a>
+<a name='t8' id='W'>IFD0_02 <span id='H'>Model</span></a>
+<a name='t9' id='Y'>IFD0_03 Orientation</a>
+<a name='t10' id='W'>IFD0_04 <span id='H'>XResolution</span></a>
+<a name='t11' id='Y'>IFD0_05 <span id='H'>YResolution</span></a>
+<a name='t12' id='W'>IFD0_06 ResolutionUnit</a>
+<a name='t13' id='Y'>IFD0_07 <span id='H'>Software</span></a>
+<a name='t14' id='W'>IFD0_08 <span id='H'>ModifyDate</span></a>
+<a name='t15' id='Y'>IFD0_09 YCbCrPositioning</a>
+<a name='t16' id='W'>IFD0_10 ExifOffset</a>
+<a name='t17' id='Y'>Next IFD</a>
+<a name='t6' id='W'>ImageDescription value</a>
+
+<a name='t7' id='Y'>Make value</a>
+<a name='t8' id='W'>Model value</a>
+<a name='t18' id='U'>[pad byte]</a> <a name='t10' id='Y'>XResolution value</a>
+<a name='t11' id='W'>YResolution value</a> <a name='t13' id='Y'>Software value</a> <a name='t19' id='U'>[pad byte]</a>
+<a name='t14' id='W'>ModifyDate value</a>
+<a name='t20' id='Y'>ExifIFD entries</a>
+<a name='t21' id='W'>ExifIFD_00 <span id='H'>ExposureTime</span></a>
+<a name='t22' id='Y'>ExifIFD_01 <span id='H'>FNumber</span></a>
+<a name='t23' id='W'>ExifIFD_02 ExposureProgram</a>
+<a name='t24' id='Y'>ExifIFD_03 ISO</a>
+<a name='t25' id='W'>ExifIFD_04 ExifVersion</a>
+<a name='t26' id='Y'>ExifIFD_05 <span id='H'>DateTimeOriginal</span></a>
+<a name='t27' id='W'>ExifIFD_06 <span id='H'>CreateDate</span></a>
+<a name='t28' id='Y'>ExifIFD_07 ComponentsConfiguration</a>
+<a name='t29' id='W'>ExifIFD_08 <span id='H'>CompressedBitsPerPixel</span></a>
+<a name='t30' id='Y'>ExifIFD_09 <span id='H'>ExposureCompensation</span></a>
+<a name='t31' id='W'>ExifIFD_10 <span id='H'>MaxApertureValue</span></a>
+<a name='t32' id='Y'>ExifIFD_11 MeteringMode</a>
+<a name='t33' id='W'>ExifIFD_12 LightSource</a>
+<a name='t34' id='Y'>ExifIFD_13 Flash</a>
+<a name='t35' id='W'>ExifIFD_14 <span id='H'>FocalLength</span></a>
+<a name='t36' id='Y'>ExifIFD_15 <span id='H'>MakerNotes</span></a>
+<a name='t37' id='W'>ExifIFD_16 <span id='H'>UserComment</span></a>
+<a name='t38' id='Y'>ExifIFD_17 FlashpixVersion</a>
+<a name='t39' id='W'>ExifIFD_18 ColorSpace</a>
+<a name='t40' id='Y'>ExifIFD_19 ExifImageWidth</a>
+<a name='t41' id='W'>ExifIFD_20 ExifImageLength</a>
+<a name='t42' id='Y'>ExifIFD_21 InteropOffset</a>
+<a name='t43' id='W'>ExifIFD_22 FileSource</a>
+<a name='t44' id='Y'>ExifIFD_23 SceneType</a>
+<a name='t45' id='W'>Next IFD</a> <a name='t21' id='Y'>ExposureTime value</a>
+<a name='t22' id='W'>FNumber value</a>
+<a name='t26' id='Y'>DateTimeOriginal value</a>
+<a name='t27' id='W'>CreateDate value</a>
+<a name='t29' id='Y'>CompressedBitsPerPixel value</a> <a name='t30' id='W'>ExposureCompensation value</a>
+<a name='t31' id='Y'>MaxApertureValue value</a> <a name='t35' id='W'>FocalLength value</a>
+<a name='t46' id='Y'>MakerNotes header</a> <a name='t47' id='W'>MakerNoteOlympus entries</a>
+<a name='t48' id='Y'>MakerNotes_00 <span id='H'>SpecialMode</span></a>
+<a name='t49' id='W'>MakerNotes_01 Quality</a>
+<a name='t50' id='Y'>MakerNotes_02 Macro</a>
+<a name='t51' id='W'>MakerNotes_03 BWMode</a>
+<a name='t52' id='Y'>MakerNotes_04 <span id='H'>DigitalZoom</span></a>
+<a name='t53' id='W'>MakerNotes_05 <span id='H'>FocalPlaneDiagonal</span></a>
+<a name='t54' id='Y'>MakerNotes_06 <span id='H'>Tag 0x0206</span></a>
+<a name='t55' id='W'>MakerNotes_07 <span id='H'>CameraType</span></a>
+<a name='t56' id='Y'>MakerNotes_08 <span id='H'>TextInfo</span></a>
+<a name='t57' id='W'>MakerNotes_09 <span id='H'>CameraID</span></a>
+<a name='t58' id='Y'>MakerNotes_10 <span id='H'>DataDump</span></a>
+<a name='t59' id='W'>Next IFD</a>
+<a name='t48' id='Y'>SpecialMode value</a>
+<a name='t52' id='W'>DigitalZoom value</a> <a name='t53' id='Y'>FocalPlaneDiagonal value</a>
+<a name='t54' id='W'>Tag 0x0206 value</a> <a name='t55' id='Y'>CameraType value</a> <a name='t60' id='U'>[pad byte]</a>
+<a name='t56' id='W'>TextInfo value</a>
+
+
+<a name='t57' id='Y'>CameraID value</a>
+
+<a name='t58' id='W'>DataDump value</a>
+
+
+
+
+
+
+<a name='t37' id='Y'>UserComment value</a>
+
+
+
+
+
+
+
+<a name='t61' id='U'>[pad byte]</a> <a name='t62' id='W'>InteropIFD entries</a>
+<a name='t63' id='Y'>InteropIFD_00 InteropIndex</a>
+<a name='t64' id='W'>InteropIFD_01 InteropVersion</a>
+<a name='t65' id='Y'>Next IFD</a> <a name='t66' id='W'>IFD1 entries</a>
+<a name='t67' id='Y'>IFD1_00 Compression</a>
+<a name='t68' id='W'>IFD1_01 <span id='H'>XResolution</span></a>
+<a name='t69' id='Y'>IFD1_02 <span id='H'>YResolution</span></a>
+<a name='t70' id='W'>IFD1_03 ResolutionUnit</a>
+<a name='t71' id='Y'>IFD1_04 ThumbnailOffset</a>
+<a name='t72' id='W'>IFD1_05 ThumbnailLength</a>
+<a name='t73' id='Y'>Next IFD</a> <a name='t68' id='W'>XResolution value</a>
+<a name='t69' id='Y'>YResolution value</a>
+<a name='t74' id='W'>ThumbnailImage data</a>
+<a name='t75' id='Y'>Next JPEG segment...</a>
+</pre></td></tr></table>
+</body></html>

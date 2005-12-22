@@ -17,7 +17,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub LocateObject($$);
 sub FetchObject($$$$);
@@ -1197,7 +1197,7 @@ sub ReadPDF($$)
     my $dict;
     foreach $dict (@mainDicts) {
         if ($verbose) {
-            printf "PDF dictionary with %d entries:\n", scalar(@{$$dict{tags}});
+            $exifTool->VPrint(0, "PDF dictionary with %d entries:\n", scalar(@{$$dict{tags}}));
         }
         ProcessDict($exifTool, $tagTablePtr, $dict, \%xref);
     }

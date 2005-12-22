@@ -176,7 +176,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>PreviewImageStart</td>
 <td align='center'>N<br>int32u*</td>
 <td align='center'>-<br>IFD0</td>
-<td><font size='-1'><font color="#666666">(PreviewImageStart in IFD0 of CR2 files)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(PreviewImageStart in IFD0 of CR2 images and SubIFD1 of DNG images)</font></font></td></tr>
 <tr valign='top'>
 <td>0x0112</td>
 <td>Orientation</td>
@@ -208,7 +208,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>PreviewImageLength</td>
 <td align='center'>N<br>int32u*</td>
 <td align='center'>-<br>IFD0</td>
-<td><font size='-1'><font color="#666666">(PreviewImageLength in IFD0 of CR2 files)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(PreviewImageLength in IFD0 of CR2 images and SubIFD1 of DNG images)</font></font></td></tr>
 <tr valign='top'>
 <td>0x0118</td>
 <td>MinSampleValue</td>
@@ -798,7 +798,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x83bb</td>
 <td>IPTC-NAA</td>
-<td align='center'>undef</td>
+<td align='center'>int32u</td>
 <td align='center'>IFD0</td>
 <td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
 <tr valign='top'>
@@ -1289,6 +1289,8 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>MakerNoteCasio
   <br>MakerNoteCasio2
   <br>MakerNoteFujiFilm
+  <br>MakerNoteJVC
+  <br>MakerNoteJVCText
   <br>MakerNoteKodak1a
   <br>MakerNoteKodak1b
   <br>MakerNoteKodak2
@@ -1315,12 +1317,14 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>MakerNoteSony
   <br>MakerNoteSonySRF
   <br>MakerNoteUnknown</td>
-<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
   <br>--&gt; <a href='FujiFilm.html'>FujiFilm Tags</a>
+  <br>--&gt; <a href='JVC.html'>JVC Tags</a>
+  <br>--&gt; <a href='JVC.html#Text'>JVC Text Tags</a>
   <br>--&gt; <a href='Kodak.html'>Kodak Tags</a>
   <br>--&gt; <a href='Kodak.html'>Kodak Tags</a>
   <br>--&gt; <a href='Kodak.html#Type2'>Kodak Type2 Tags</a>
@@ -1382,9 +1386,10 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <td>XPTitle</td>
 <td align='center'>undef</td>
 <td align='center'>IFD0</td>
-<td><font size='-1'><font color="#666666">(tags 0x9c9b-0x9c9f are used by Windows Explorer; special characters in these
-values are converted to UTF-8 by default, or Windows Latin1 with the -L option.
-XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(tags 0x9c9b-0x9c9f are used by Windows Explorer; special characters
+in these values are converted to UTF-8 by default, or Windows Latin1
+with the -L option. XPTitle is ignored by Windows Explorer if
+ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9c9c</td>
 <td>XPComment</td>
@@ -1708,12 +1713,12 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <td>DNGVersion</td>
 <td align='center'>int8u[4]</td>
 <td align='center'>IFD0</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(tags 0xc612-0xc692 are used in DNG images)</font></font></td></tr>
 <tr valign='top'>
 <td>0xc613</td>
 <td>DNGBackwardVersion</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int8u[4]</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc614</td>
@@ -1783,19 +1788,19 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <td>0xc61e</td>
 <td>DefaultScale</td>
 <td align='center'>rational32u[2]</td>
-<td align='center'>IFD0</td>
+<td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc61f</td>
 <td>DefaultCropOrigin</td>
 <td align='center'>int32u[2]</td>
-<td align='center'>IFD0</td>
+<td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc620</td>
 <td>DefaultCropSize</td>
 <td align='center'>int32u[2]</td>
-<td align='center'>IFD0</td>
+<td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc621</td>
@@ -1848,8 +1853,8 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <tr valign='top'>
 <td>0xc629</td>
 <td>AsShotWhiteXY</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>rational32u[2]</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc62a</td>
@@ -1873,7 +1878,7 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <td>0xc62d</td>
 <td>BayerGreenSplit</td>
 <td align='center'>int32u</td>
-<td align='center'>IFD0</td>
+<td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc62e</td>
@@ -1883,7 +1888,7 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc62f</td>
-<td>DNGCameraSerialNumber</td>
+<td>CameraSerialNumber</td>
 <td align='center'>string</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
@@ -1897,13 +1902,13 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <td>0xc631</td>
 <td>ChromaBlurRadius</td>
 <td align='center'>rational32u</td>
-<td align='center'>IFD0</td>
+<td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc632</td>
 <td>AntiAliasStrength</td>
 <td align='center'>rational32u</td>
-<td align='center'>IFD0</td>
+<td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc633</td>
@@ -1927,8 +1932,8 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc65a</td>
 <td>CalibrationIlluminant1</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = Daylight
   <br>2 = Fluorescent
   <br>3 = Tungsten
@@ -1952,8 +1957,8 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <tr valign='top'>
 <td>0xc65b</td>
 <td>CalibrationIlluminant2</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int16u</td>
+<td align='center'>IFD0</td>
 <td><font size='-1'>1 = Daylight
   <br>2 = Fluorescent
   <br>3 = Tungsten
@@ -1978,95 +1983,149 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <td>0xc65c</td>
 <td>BestQualityScale</td>
 <td align='center'>rational32u</td>
-<td align='center'>IFD0</td>
+<td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0xc65d</td>
+<td>RawDataUniqueID</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc660</td>
 <td>AliasLayerMetadata</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xc68b</td>
+<td>OriginalRawFileName</td>
+<td align='center'>string</td>
+<td align='center'>IFD0</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0xc68c</td>
+<td>OriginalRawFileData</td>
+<td align='center'>N</td>
+<td align='center'>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xc68d</td>
+<td>ActiveArea</td>
+<td align='center'>int32u[4]</td>
+<td align='center'>SubIFD</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xc68e</td>
+<td>MaskedAreas</td>
+<td align='center'>int32u[4]</td>
+<td align='center'>SubIFD</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xc68f</td>
+<td>AsShotICCProfile</td>
+<td align='center'>-</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xc690</td>
+<td>AsShotPreProfileMatrix</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xc691</td>
+<td>CurrentICCProfile</td>
+<td align='center'>-</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xc692</td>
+<td>CurrentPreProfileMatrix</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0xfde8</td>
 <td>OwnerName</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
-<td><font size='-1'><font color="#666666">(tags 0xfde8-0xfe58 are generated by Photoshop Camera RAW --
-                   some names are the same as other EXIF tags, but ExifTool will
-                   avoid writing these unless they already exist in the file)</font></font></td></tr>
-<tr valign='top'>
+<td><font size='-1'><font color="#666666">(tags 0xfde8-0xfe58 are generated by Photoshop Camera RAW -- some
+names are the same as other EXIF tags, but ExifTool will avoid
+writing these unless they already exist in the file)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfde9</td>
 <td>SerialNumber</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfdea</td>
 <td>Lens</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe4c</td>
 <td>RawFile</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe4d</td>
 <td>Converter</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe4e</td>
 <td>WhiteBalance</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe51</td>
 <td>Exposure</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe52</td>
 <td>Shadows</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe53</td>
 <td>Brightness</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe54</td>
 <td>Contrast</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe55</td>
 <td>Saturation</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe56</td>
 <td>Sharpness</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe57</td>
 <td>Smoothness</td>
 <td align='center'>string</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe58</td>
 <td>MoireFilter</td>
 <td align='center'>string</td>
@@ -2077,6 +2136,6 @@ XPTitle is ignored by Windows Explorer if ImageDescription exists)</font></font>
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 14, 2005</i>
+<br><i>Last revised Dec 22, 2005</i>
 </body>
 </html>

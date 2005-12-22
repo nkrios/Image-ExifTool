@@ -54,32 +54,32 @@ the console (or written to an output text file with the <code>-w</code> option).
 to rewrite <code>FILE</code> with the specified information, preserving the original
 file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify that the
 new file is OK before erasing the original.)</p>
-<p>Below is a list of meta information formats and file types currently
+<p>Below is a list of file types and meta information formats currently
 supported by exiftool (r = read support, w = write support):</p>
 <pre>
-     Meta Information                      File Type
-    ------------------        -----------------------------------
-    EXIF           r/w        JPEG  r/w     PNG   r/w     PDF   r
-    GPS            r/w        TIFF  r/w     MNG   r/w     PS    r
-    IPTC           r/w        GIF   r/w     JNG   r/w     EPS   r
-    XMP            r/w        THM   r/w     PPM   r/w     AI    r
-    MakerNotes     r/w        CRW   r/w     PGM   r/w     PSD   r
-    Photoshop IRB  r/w        CR2   r/w     PBM   r/w     MIFF  r
-    JFIF           r          NEF   r/w     JP2   r       PICT  r
-    GeoTIFF        r          PEF   r/w     BMP   r       QTIF  r
-    ICC Profile    r          MRW   r/w     ORF   r       DCM   r
-    PrintIM        r          MOS   r/w     RAF   r       MP3   r
-    ID3            r          DNG   r/w     SRF   r       WAV   r
-                              XMP   r/w     X3F   r       MOV   r</pre>
+                 File Type                      Meta Information
+    -----------------------------------        ------------------
+    JPEG  r/w     XMP   r/w     PDF   r        EXIF           r/w
+    TIFF  r/w     THM   r/w     PS    r        GPS            r/w
+    GIF   r/w     PPM   r/w     EPS   r        IPTC           r/w
+    CRW   r/w     PPM   r/w     AI    r        XMP            r/w
+    CR2   r/w     PBM   r/w     PSD   r        MakerNotes     r/w
+    NEF   r/w     JP2   r       MIFF  r        Photoshop IRB  r/w
+    PEF   r/w     BMP   r       PICT  r        JFIF           r
+    MRW   r/w     ORF   r       QTIF  r        GeoTIFF        r
+    MOS   r/w     RAF   r       AVI   r        ICC Profile    r
+    DNG   r/w     SRF   r       MOV   r        PrintIM        r
+    PNG   r/w     X3F   r       MP4   r        ID3            r
+    MNG   r/w     DCM   r       MP3   r
+    JNG   r/w     ACR   r       WAV   r</pre>
 <p>
 </p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <p>Note:  Case is not significant for any command-line option (including tag
-and group names), except for single-character options where the
-corresponding upper case option is defined.  Multiple options can NOT be
-combined into a single argument, because that would be interpreted as a tag
-name.</p>
+and group names), except for single-character options if the corresponding
+upper case option is defined.  Multiple options can NOT be combined into a
+single argument, because that would be interpreted as a tag name.</p>
 <dl>
 <dt><strong><a name="item__2dtag"><strong>-</strong><em>TAG</em></a></strong><br />
 </dt>
@@ -112,7 +112,7 @@ being extracted from the source file.
 Write a new value for the specified tag (with <code>-TAG=VALUE</code>), or delete the
 tag if <code>VALUE</code> is not specified.  <code>+=</code> and <code>-=</code> add or remove <code>VALUE</code>
 from a list, or shift date/time values (see
-<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl.html">Image::ExifTool::Shift.pl</a> for shift formats). 
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a> for shift formats).
 <code>&lt;=</code> sets the value of a tag from the contents of a file with name
 <code>VALUE</code>.  (Note: Quotes are required around the argument in this case to
 prevent shell redirection.)
@@ -232,6 +232,17 @@ begin with a leading '.', and case is not significant.  For example:
 <strong>F</strong>orce printing of tags even if their values are not found.
 </dd>
 <p></p>
+<dt><strong><a name="item__2df_5bvalue_5d"><strong>-F</strong>[VALUE]</a></strong><br />
+</dt>
+<dd>
+Fix the base for maker notes offsets.  A common problem with some image
+editors is that offsets in the maker notes are not adjusted properly when
+the file is modified.  This may cause the wrong values to be extracted for
+some maker note entries when reading the edited file.  This option allows an
+integer value to be specified for adjusting the maker notes base offset.  If
+no value is given, ExifTool will take its best guess at the correct base.
+</dd>
+<p></p>
 <dt><strong><a name="item__2dg_5b_23_5d"><strong>-g</strong>[#]</a></strong><br />
 </dt>
 <dd>
@@ -247,16 +258,26 @@ group names for a specified family.
 Same as <code>-g</code> but print <strong>G</strong>roup name for each tag.
 </dd>
 <p></p>
+<dt><strong><a name="item__2dh"><strong>-h</strong></a></strong><br />
+</dt>
+<dd>
+Use <strong>H</strong>TML formatting for output.  Implies <a href="#item__2de"><code>-E</code></a> option.
+</dd>
+<p></p>
 <dt><strong><a name="item__2dh"><strong>-H</strong></a></strong><br />
 </dt>
 <dd>
 Show tag ID number in <strong>H</strong>exadecimal.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dh"><strong>-h</strong></a></strong><br />
+<dt><strong><a name="item__2dhtmldump"><strong>-htmlDump</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>H</strong>TML formatting for output.  Implies <a href="#item__2de"><code>-E</code></a> option.
+Generates a dynamic web page containing a hex dump of the EXIF information.
+This can be a very powerful tool for low-level analysis of EXIF information.
+The <a href="#item__2dhtmldump"><code>-htmlDump</code></a> option is also involked if the <code>-v</code> and <a href="#item__2dh"><code>-h</code></a> options are
+used together.  The verbose level controls the maximum length of the blocks
+dumped.  Currently only works for EXIF and TIFF information.
 </dd>
 <p></p>
 <dt><strong><a name="item__2di_dir"><strong>-i</strong> <em>DIR</em></a></strong><br />
@@ -325,8 +346,9 @@ Set <strong>o</strong>utput file or directory name when writing information (oth
 source file is renamed to <code>FILE_original</code> and the output file is <code>FILE</code> in
 the original directory).  The output file name may also be specified using a
 <code>FMT</code> string in which %d, %f and %e represent the directory, file name and
-extension of <code>FILE</code>.  Output directories are created if necessary.  See the
-<code>-w</code> option for <code>FMT</code> string examples.
+extension of <code>FILE</code>.  Existing files will not be overwritten.  Output
+directories are created if necessary.  See the <code>-w</code> option for <code>FMT</code>
+string examples.
 </dd>
 <dd>
 <p>A special feature of this option allows it to be used to create XMP meta
@@ -393,22 +415,25 @@ directory name.
 <dt><strong><a name="item__2ds"><strong>-s</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>s</strong>hort output format.  Add up to 3 <a href="#item__2ds"><code>-s</code></a> options for even shorter
-formats.
+Print tag names instead of descriptions.  This is the <strong>s</strong>hort output
+format.  Add up to 3 <a href="#item__2ds"><code>-s</code></a> options for even shorter formats.  Also effective
+when combined with <a href="#item__2dt"><code>-t</code></a> or <a href="#item__2dh"><code>-h</code></a> options.
 </dd>
 <p></p>
 <dt><strong><a name="item__2ds"><strong>-S</strong></a></strong><br />
 </dt>
 <dd>
-Very <strong>s</strong>hort format -- print tag names instead of descriptions.  This is
-the same as two <a href="#item__2ds"><code>-s</code></a> options.
+Very <strong>s</strong>hort format.  The same as two <a href="#item__2ds"><code>-s</code></a> options.  Extra spaces used
+to column-align values are not printed.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dt"><strong>-t</strong></a></strong><br />
 </dt>
 <dd>
 Output a <strong>t</strong>ab-delimited list of description/values (useful for database
-import).
+import).  May be combined with <a href="#item__2ds"><code>-s</code></a> to print tag names instead of
+descriptions, or <a href="#item__2ds"><code>-S</code></a> to print tag values only, tab-delimited on a single
+line.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dtagsfromfile_srcfile_or_fmt"><strong>-TagsFromFile</strong> <em>SRCFILE</em> or <em>FMT</em></a></strong><br />
@@ -493,6 +518,7 @@ data blocks.  This is the same as two <a href="#item__2du"><code>-u</code></a> o
 Print <strong>v</strong>erbose messages.  A <code>#</code> in the range 1-5 may be specified to
 indicate the level of verbosity -- higher is more verbose.  This option
 suppresses normal console output unless specific tags are being extracted.
+Verbose output goes to the console, and is not affected by the <code>-w</code> option.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dver"><strong>-ver</strong></a></strong><br />
@@ -518,6 +544,9 @@ automatically if necessary.  For example:
     -w %d%f.txt       # same effect as &quot;-w txt&quot;
     -w dir/%f_%e.out  # writes files to &quot;dir&quot; as &quot;FILE_EXT.out&quot;
     -w dir2/%d%f.txt  # writes to &quot;dir2&quot;, keeping dir structure</pre>
+</dd>
+<dd>
+<p>Existing files will not be overwritten.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dx_tag"><strong>-x</strong> <em>TAG</em></a></strong><br />
@@ -553,7 +582,7 @@ Print all EXIF information sorted by group (for family 0).
 Print common EXIF information for all images in <code>dir</code>.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2ds__2dimagesize__2dexposuretime_b_2ejpg">exiftool -S -ImageSize -ExposureTime b.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2ds__2dimagesize__2dexposuretime_b_2ejpg">exiftool -s -ImageSize -ExposureTime b.jpg</a></strong><br />
 </dt>
 <dd>
 Print ImageSize and ExposureTime tag names and values.
@@ -610,11 +639,25 @@ Extract complete XMP data record intact from <code>a.jpg</code> and write it to
 <code>xmp.out</code> using the special <code>XMP</code> tag (see the Extra tags in
 <a href="TagNames/index.html">Image::ExifTool::TagNames</a>).
 </dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dhtmldump__2dw_tmp_2f_25f__25e_2ehtml_t">exiftool -htmldump -w tmp/%f_%e.html t/images</a></strong><br />
+</dt>
+<dd>
+Generate HTML pages from a hex dump of EXIF information in all images from
+the <code>t/images</code> directory.  The output HTML files are written to the <code>tmp</code>
+directory (which is created if it didn't exist), with names of the form
+'FILENAME_EXT.html'.
+</dd>
 <p></p></dl>
 <p>
 </p>
 <hr />
 <h1><a name="writing_examples">WRITING EXAMPLES</a></h1>
+<p>Note that quotes are necessary around arguments which contain certain
+special characters such as &gt;, &lt; or any white space.  These quoting
+techniques are shell dependent, but the examples below will work for most
+Unix shells.  With the Windows cmd shell however, double quotes should be
+used around the entire argument (ie. ``-Comment=This is a new comment'')</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dcomment_3d_27this_is_a_new_comment_27_">exiftool -Comment='This is a new comment' dst.jpg</a></strong><br />
 </dt>
@@ -659,7 +702,7 @@ Delete all meta information from an image.
 <dd>
 Adjust original date/time of all images in directory <code>dir</code> by subtracting
 one hour and 30 minutes.  (This is equivalent to <code>-DateTimeOriginal-=1.5</code>.
-See <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl.html">Image::ExifTool::Shift.pl</a> for details.)
+See <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a> for details.)
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dphotoshop_3aall_3d_dst_2ejpg">exiftool -Photoshop:All= dst.jpg</a></strong><br />
@@ -841,7 +884,7 @@ it under the same terms as Perl itself.</p>
 <p><a href="ExifTool.html">Image::ExifTool(3pm)</a>,
 <a href="TagNames/index.html">Image::ExifTool::TagNames(3pm)</a>,
 <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shortcuts.pm">Image::ExifTool::Shortcuts(3pm)</a>,
-<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl.html">Image::ExifTool::Shift.pl</a></p>
+<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a></p>
 <table border="0" width="100%" cellspacing="0" cellpadding="3">
 <tr><td class="block" style="background-color: #cccccc" valign="middle">
 <big><strong><span class="block">&nbsp;exiftool Application Documentation</span></strong></big>

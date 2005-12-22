@@ -33,7 +33,7 @@ ExifTool issues can be discussed on the CPAN forum at
 <blockquote>
 When you run exiftool, by default it prints descriptions, not tag names, for
 the information it extracts.  To print the tag names instead, use the
-<code><font color='#880000'>'-S'</font></code> option.  Also, see the
+<code><font color='#880000'>'-s'</font></code> option.  Also, see the
 <a href="TagNames/index.html">tag names documentation</a> for a complete list
 of available tag names.
 </blockquote>
@@ -52,7 +52,7 @@ information and the locations in the file.  In this command,
 displayed, <code><font color='#880000'>'-G1'</font></code> shows the family 1
 group name (ie. the location) of each tag, and
 <code><font color='#880000'>'FILENAME'</font></code> is the name of your image
-file.  Also, you may want to add <code><font color='#880000'>'-S'</font></code>
+file.  Also, you may want to add <code><font color='#880000'>'-s'</font></code>
 to show the actual tag names instead of the descriptions.
 
 <p>You can read or write information in a specific location if necessary by
@@ -148,7 +148,7 @@ the main image itself is stored in IFD0, so deleting this directory would
 destroy the image.  Instead, ExifTool just deletes the ExifIFD subdirectory, so
 any information stored in other directories is preserved.
 
-<p>Use <code><font color='#880000'>'exiftool -a -G1 -S img.tif'</font></code> to
+<p>Use <code><font color='#880000'>'exiftool -a -G1 -s img.tif'</font></code> to
 see where the information is stored.  Any information remaining in other IFD's
 must be deleted separately from a TIFF file if desired.
 </blockquote>

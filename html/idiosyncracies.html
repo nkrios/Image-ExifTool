@@ -30,9 +30,9 @@ for values to be stored, and all value data for the IFD would be stored in a
 block at this location.  If this was done, an entire IFD could be relocated
 easily without causing problems.</blockquote>
 
-Below is a list of idiosyncracies in files written by the digital cameras of
-various manufacturers.  Many of these quirks relate to the offset problem
-mentioned above.
+Below is a list of idiosyncracies in files written by the digital cameras or
+software from various manufacturers.  Many of these quirks relate to the offset
+problem mentioned above.
 
 <hr>
 
@@ -40,17 +40,18 @@ mentioned above.
 wrong and reports it to be 10 bytes too long.  This can cause the reported
 thumbnail image data to run off the end of the APP1 segment.
 
-<p><b>Casio:</b> EX-Z3 files have incorrect offsets in the maker notes.  They
-are all off by +20 bytes. This is not a problem with the EX-P700 which uses the
-same maker notes tags. [Hmmm... This is true for samples that I download from
-dpreview.com, but not imaging-resource.com.  Maybe the dpreview samples were
-modified by 3rd party software?  Or maybe it was a different firmware version?]
-
 <p><b>Casio:</b> The preview image is referenced by two different offsets (the
-PreviewImage tag plus a PreviewImageStart/PreviewImageLength pair).
+PreviewImage tag plus a PreviewImageStart/PreviewImageLength pair).  Also, the
+offset for the PrintIM information for the QV-4000 is relative to the start
+of the IFD entry (other offsets are OK).
 
 <p><b>Kodak:</b> Professional DCS Photo Desk software writes a cyclical EXIF
 directory such that the InteropIFD pointer points back to IFD0.
+
+<p><b>Minolta:</b> An obvious bug in the firmware of the Z2 writes an incorrect
+offset for the 'MinoltaCameraSettings2' information -- it writes the offset of
+the offset itself instead of the offset of the value (hahaha!).  Other
+offsets are correct.
 
 <p><b>Nikon:</b> D2H NEF files have huge blocks with all zero data (3.7 MB in
 my test file!).
@@ -60,17 +61,37 @@ but not only does the data size of these subdirectories exclude the subdirectory
 value data, but also it is 2 bytes too small for the directory information
 itself (doh! -- they forgot to include the entry count).
 
-<p><b>Pentax:</b> The Optio 330 uses a base which is relative to the start of
-the directory entry (egad!).
+<p><b>Pentax:</b> The Optio 330 uses a base offset for the PrintIM information
+which is relative to the start of the individual IFD entry (egad!).  Also,
+preview image offsets in the maker notes are given relative to the EXIF base
+rather than the maker note base (like all other maker notes offsets).
 
-<p><b>Pentax:</b> The Optio 550 uses different offset bases for different
-entries in the IFD.  Tag 0x0027 has a base offset at the end of the IFD, but
-0x0e00 (PrintIM) uses a different base entirely (double EGAD!!).
+<p>The Optio 550, 555, 33WR and 43WR all specify a PrintIM directory at a the
+same offset of 0x29a with length 40 bytes, but the only PrintIM information in
+the file is nowhere near that offset an is 128 bytes long.  Also for these
+models, tag 0x002e has a constant value of 0x6a6 even though its position
+changes.  Finally, all of these models plus the Optio WP waste many kilobytes of
+space in each image by having large unused data blocks in the EXIF information.
+
+<p>The Optio 330RS and 430RS double reference the preview image information.
+
+<p>Note that the worst problems are with the Optio 230, 330, and 430, which
+were built for Pentax by Asahi.
+
+<p><b>Photoshop and Nikon Capture:</b> Both of these packages write TIFF IPTC
+information as 'int32u' (or 'LONG').  This is wrong
+(<a href="http://www.awaresystems.be/imaging/tiff/tifftags/iptc.html">see
+reference</a>).  Nikon Capture goes one step further and simply ignores IPTC
+that is written correctly as 'undef' or 'int8u'.
 
 <p><b>Ricoh:</b> An IFD subdirectory in the Ricoh maker notes of both the
 Caplio RR30 and RR1.  The RR30 uses standard EXIF offsets (relative to the start
 of the EXIF data), but for the RR1 the offsets are relative to the start of the
 subdirectory.
+
+<p><b>Toshiba:</b> The PDR-3310 writes all maker notes offsets relative to the
+start of the individual IFD entry (now where have I seen that before?).  But at
+least they are consistent.
 
 <hr>
 </body>

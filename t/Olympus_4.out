@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.86
 [File, File, Image]  - File Name: OlympusE1.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 8 kB
@@ -55,14 +55,13 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 7088
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Olympus, Camera] 512 - Special Mode: Fast, Sequence: 2, Panorama: (none)
-[MakerNotes, Olympus, Camera] 513 - Image Quality: SHQ
+[MakerNotes, Olympus, Camera] 513 - Image Quality: SHQ (Fine)
 [MakerNotes, Olympus, Camera] 514 - Macro: Off
 [MakerNotes, Olympus, Camera] 515 - Black & White Mode: Off
 [MakerNotes, Olympus, Camera] 516 - Digital Zoom: 0.0
 [MakerNotes, Olympus, Camera] 517 - Focal Plane Diagonal: 21.6 mm
-[MakerNotes, Olympus, Camera] 519 - Firmware Version: D4040
+[MakerNotes, Olympus, Camera] 519 - Camera Type: D4040
 [MakerNotes, Olympus, Camera] 521 - Camera ID: OLYMPUS DIGITAL CAMERA         
-[MakerNotes, Olympus, Camera] 4111 - Sharpness Factor: 1
 [MakerNotes, Olympus, Camera] 4113 - Color Matrix: 356 65502 65470 65514 308 65506 6 65410 376
 [MakerNotes, Olympus, Camera] 4114 - Black Level: 69 69 69 68
 [MakerNotes, Olympus, Camera] 4119 - Red Balance: 1.609375
@@ -149,7 +148,6 @@
 [MakerNotes, Olympus, Camera] 4609 - External Flash: Off
 [MakerNotes, Olympus, Camera] 4616 - Internal Flash: Off
 [Composite, Composite, Image]  - Aperture: 4.5
-[Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 160x120
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 2.0

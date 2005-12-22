@@ -34,7 +34,7 @@ my $testnum = 1;
     ++$testnum;
     my @writeInfo = (
         [Software => 'ExifTool', Group => 'XMP'],
-        [Quality => 'SHQ'],
+        [Macro => 'On'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
     print "ok $testnum\n";

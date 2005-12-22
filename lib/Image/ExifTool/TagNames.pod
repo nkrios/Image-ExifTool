@@ -270,6 +270,8 @@ B<Group> listed below is used unless another group is specified.
            MakerNoteCasio            ExifIFD    Casio
            MakerNoteCasio2           ExifIFD    Casio Type2
            MakerNoteFujiFilm         ExifIFD    FujiFilm
+           MakerNoteJVC              ExifIFD    JVC
+           MakerNoteJVCText          ExifIFD    JVC Text
            MakerNoteKodak1a          ExifIFD    Kodak
            MakerNoteKodak1b          ExifIFD    Kodak
            MakerNoteKodak2           ExifIFD    Kodak Type2
@@ -351,7 +353,7 @@ B<Group> listed below is used unless another group is specified.
   0xc44f   Annotations               -          N
   0xc4a5   PrintIM                   IFD0       PrintIM
   0xc612   DNGVersion                IFD0       int8u[4]
-  0xc613   DNGBackwardVersion        -          N
+  0xc613   DNGBackwardVersion        IFD0       int8u[4]
   0xc614   UniqueCameraModel         IFD0       string
   0xc615   LocalizedCameraModel      IFD0       string
   0xc616   CFAPlaneColor             -          N
@@ -362,9 +364,9 @@ B<Group> listed below is used unless another group is specified.
   0xc61b   BlackLevelDeltaH          -          N
   0xc61c   BlackLevelDeltaV          -          N
   0xc61d   WhiteLevel                -          N
-  0xc61e   DefaultScale              IFD0       rational32u[2]
-  0xc61f   DefaultCropOrigin         IFD0       int32u[2]
-  0xc620   DefaultCropSize           IFD0       int32u[2]
+  0xc61e   DefaultScale              SubIFD     rational32u[2]
+  0xc61f   DefaultCropOrigin         SubIFD     int32u[2]
+  0xc620   DefaultCropSize           SubIFD     int32u[2]
   0xc621   ColorMatrix1              -          N
   0xc622   ColorMatrix2              -          N
   0xc623   CameraCalibration1        -          N
@@ -373,23 +375,32 @@ B<Group> listed below is used unless another group is specified.
   0xc626   ReductionMatrix2          -          N
   0xc627   AnalogBalance             -          N
   0xc628   AsShotNeutral             -          N
-  0xc629   AsShotWhiteXY             -          N
+  0xc629   AsShotWhiteXY             IFD0       rational32u[2]
   0xc62a   BaselineExposure          IFD0       rational32s
   0xc62b   BaselineNoise             IFD0       rational32u
   0xc62c   BaselineSharpness         IFD0       rational32u
-  0xc62d   BayerGreenSplit           IFD0       int32u
+  0xc62d   BayerGreenSplit           SubIFD     int32u
   0xc62e   LinearResponseLimit       IFD0       rational32u
-  0xc62f   DNGCameraSerialNumber     IFD0       string
+  0xc62f   CameraSerialNumber        IFD0       string
   0xc630   DNGLensInfo               IFD0       rational32u[4]
-  0xc631   ChromaBlurRadius          IFD0       rational32u
-  0xc632   AntiAliasStrength         IFD0       rational32u
+  0xc631   ChromaBlurRadius          SubIFD     rational32u
+  0xc632   AntiAliasStrength         SubIFD     rational32u
   0xc633   ShadowScale               IFD0       rational32u
   0xc634   DNGPrivateData            -          N
   0xc635   MakerNoteSafety           IFD0       int16u
-  0xc65a   CalibrationIlluminant1    -          N
-  0xc65b   CalibrationIlluminant2    -          N
-  0xc65c   BestQualityScale          IFD0       rational32u
+  0xc65a   CalibrationIlluminant1    IFD0       int16u
+  0xc65b   CalibrationIlluminant2    IFD0       int16u
+  0xc65c   BestQualityScale          SubIFD     rational32u
+  0xc65d   RawDataUniqueID           -          N
   0xc660   AliasLayerMetadata        -          N
+  0xc68b   OriginalRawFileName       IFD0       string
+  0xc68c   OriginalRawFileData       IFD0       N
+  0xc68d   ActiveArea                SubIFD     int32u[4]
+  0xc68e   MaskedAreas               SubIFD     int32u[4]
+  0xc68f   AsShotICCProfile          -          ICC_Profile
+  0xc690   AsShotPreProfileMatrix    -          N
+  0xc691   CurrentICCProfile         -          ICC_Profile
+  0xc692   CurrentPreProfileMatrix   -          N
   0xfde8   OwnerName                 ExifIFD    string
   0xfde9   SerialNumber              ExifIFD    string
   0xfdea   Lens                      ExifIFD    string
@@ -1043,8 +1054,8 @@ own set of tags.
 
 =head2 Leaf Tags
 
-These tags are found in .MOS images from Leaf digital camera backs written
-by Creo Leaf Capture.  They exist within the Leaf-specific directory
+These tags are found in .MOS images from Leaf digital camera backs as
+written by Creo Leaf Capture.  They exist within the Leaf-specific directory
 structure of EXIF tag 0x8606. The tables below list observed Leaf tags,
 however ExifTool will extract any tags found in the Leaf directories even if
 they don't appear in these tables.
@@ -1300,12 +1311,12 @@ has been removed.
 
 Leaf also writes a TIFF-format sub-IFD inside IFD0 of a MOS image.  No tags
 in this sub-IFD are currently known, except for tag 0x8606 which really
-shouldn't be here since it duplicates a reference to the same data of tag
-0x8606 in IFD0.
+shouldn't be here anyway (so it doesn't appear in the table below) because
+it duplicates a reference to the same data of tag 0x8606 in IFD0.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  [no tags defined]
+  [no tags known]
 
 =head2 ICC_Profile Tags
 
@@ -1848,6 +1859,7 @@ Lens information for the 1D, 1DS and 1D Mark II only.
   0x000c   Contrast                             int16u
   0x000d   Saturation                           int16u
   0x0014   CCDSensitivity                       int16u
+  0x0e00   PrintIM                              PrintIM
 
 =head3 Casio Type2 Tags
 
@@ -1889,7 +1901,7 @@ been decoded.  Use the Unknown (-u) option to extract PrintIM information.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  [no tags defined]
+  [no tags known]
 
 =head2 FujiFilm Tags
 
@@ -1911,6 +1923,24 @@ been decoded.  Use the Unknown (-u) option to extract PrintIM information.
   0x1300   BlurWarning                          int16u
   0x1301   FocusWarning                         int16u
   0x1302   ExposureWarning                      int16u
+
+=head2 JVC Tags
+
+JVC EXIF maker note tags.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0002   CPUVersions                          N
+  0x0003   Quality                              N
+
+=head3 JVC Text Tags
+
+JVC/Victor text-based maker note tags.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'QTY'    Quality                              N
+  'VER'    MakerNoteVersion                     N
 
 =head2 Kodak Tags
 
@@ -2029,7 +2059,7 @@ These tags are used by the DX3215 and DX3700.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-  [no tags defined]
+  [no tags known]
 
 =head3 Kodak Meta Tags
 
@@ -2475,7 +2505,7 @@ and Agfa cameras.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   MakerNoteVersion                     Y
+  0x0000   MakerNoteVersion                     undef
   0x0001   MinoltaCameraSettingsOld             Minolta CameraSettings
   0x0003   MinoltaCameraSettings                Minolta CameraSettings
   0x0040   CompressedImageSize                  int32u
@@ -2487,37 +2517,30 @@ and Agfa cameras.
   0x0102   MinoltaQuality                       int16u
   0x0103   MinoltaQuality                       int16u
   0x0200   SpecialMode                          int32u[3]~
-  0x0201   Quality                              int16u
+  0x0201   Quality                              int16u~
   0x0202   Macro                                int16u
   0x0203   BWMode                               int16u
   0x0204   DigitalZoom                          rational32u
   0x0205   FocalPlaneDiagonal                   rational32u
-  0x0207   FirmwareVersion                      string
-  0x0208   PictureInfo                          string
+  0x0207   CameraType                           string
+  0x0208   TextInfo                             Olympus TextInfo
   0x0209   CameraID                             string
   0x020b   EpsonImageWidth                      int16u
   0x020c   EpsonImageHeight                     int16u
-  0x020d   EpsonSoftware                        Y
-  0x0300   PreCaptureFrames                     Y
+  0x020d   EpsonSoftware                        string
+  0x0300   PreCaptureFrames                     int16u
   0x0302   OneTouchWB                           int16u
+  0x0404   SerialNumber                         string
   0x0e00   PrintIM                              PrintIM
   0x0f00   DataDump                             N
   0x0f01   DataDump2                            N
   0x1004   FlashMode                            int16u
   0x1005   FlashDevice                          int16u
-  0x1006   Bracket                              Y
-  0x100b   FocusMode                            Y
-  0x100c   FocusDistance                        Y
-  0x100d   Zoom                                 Y
-  0x100e   MacroFocus                           Y
-  0x100f   SharpnessFactor                      int16u
   0x1011   ColorMatrix                          int16u[6]
   0x1012   BlackLevel                           int16u[4]
-  0x1015   WhiteBalance                         Y
   0x1017   RedBalance                           int16u[2]
   0x1018   BlueBalance                          int16u[2]
-  0x101a   SerialNumber                         Y
-  0x1023   FlashBias                            Y
+  0x101a   SerialNumber                         string
   0x1029   Contrast                             int16u
   0x102a   SharpnessFactor                      int16u
   0x102b   ColorControl                         int16u[6]
@@ -2525,7 +2548,7 @@ and Agfa cameras.
   0x102d   CoringFilter                         int16u
   0x102e   OlympusImageWidth                    int32u
   0x102f   OlympusImageHeight                   int32u
-  0x1034   CompressionRatio                     Y
+  0x1034   CompressionRatio                     rational32u
   0x1035   PreviewImageValid                    int32u
   0x1036   PreviewImageStart                    int32u*
   0x1037   PreviewImageLength                   int32u*
@@ -2534,6 +2557,17 @@ and Agfa cameras.
   0x2030   RawDevelopment                       Olympus RawDevelopment
   0x2040   ImageProcessing                      Olympus ImageProcessing
   0x2050   FocusInfo                            Olympus FocusInfo
+
+=head3 Olympus TextInfo Tags
+
+This information is in text format (similar to APP12 information, but with
+spaces instead of linefeeds).  Below are tags which have been observed, but
+any information found here will be extracted, even if the tag is not listed.
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Resolution'         Resolution               N
+  'Type'               CameraType               N
 
 =head3 Olympus Equipment Tags
 
@@ -2711,6 +2745,7 @@ The Pentax tags are also used in Asahi cameras.
   0x0e00   PrintIM                              PrintIM
   0x1000   HometownCityCode                     undef[4]
   0x1001   DestinationCityCode                  undef[4]
+  0x2000   PreviewImageData                     N
 
 =head3 Pentax MOV Tags
 
@@ -2726,6 +2761,8 @@ This information is found in Pentax MOV video images.
     175    ISO                                  N
 
 =head2 Ricoh Tags
+
+These tags are used by Ricoh Caplio camera models.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -2743,6 +2780,11 @@ This information is found in Pentax MOV video images.
   0x0005   RicohDateTime2                       N
 
 =head3 Ricoh Text Tags
+
+Ricoh RDC models such as the RDC-i700, RDC-5000, RDC-6000, RDC-7 and
+RDC-4300 use a text-based format for their maker notes instead of the IFD
+format used by the Caplio models.  Below is a list of known tags in this
+information.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -6179,13 +6221,15 @@ content is extracted from the C<fmt > chunk.
 
 =head2 QuickTime Tags
 
-Tags with a question mark after their name are not extracted unless the
-Unknown option is set.
+These tags are used in QuickTime MOV and MP4 videos, and QTIF images.  Tags
+with a question mark after their name are not extracted unless the Unknown
+option is set.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   'PICT'   PreviewPICT                          N
   'free'   Free?                                N
+  'ftyp'   FrameType?                           N
   'mdat'   Mdat?                                N
   'moov'   Movie                                QuickTime Movie
   'pnot'   Preview                              QuickTime Preview
@@ -6223,8 +6267,33 @@ Unknown option is set.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  'mdia'   Media                                QuickTime Media
   'tkhd'   TrackHeader                          QuickTime TrackHdr
   'udta'   UserData                             QuickTime UserData
+
+=head3 QuickTime Media Tags
+
+MP4 only (most tags unknown because ISO charges for the specification).
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'minf'   Minf                                 QuickTime Minf
+
+=head3 QuickTime Minf Tags
+
+MP4 only (most tags unknown because ISO charges for the specification).
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'stbl'   Stbl                                 QuickTime Stbl
+
+=head3 QuickTime Stbl Tags
+
+MP4 only (most tags unknown because ISO charges for the specification).
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
 
 =head3 QuickTime TrackHdr Tags
 
@@ -6348,7 +6417,7 @@ tags found in this segment.
   'Shutter'            ExposureTime             N
   'StrobeTime'         StrobeTime               N
   'TimeDate'           DateTimeOriginal         N
-  'Type'               Type                     N
+  'Type'               CameraType               N
   'Version'            Version                  N
   'Ytarget'            Ytarget                  N
   'Zoom'               Zoom                     N

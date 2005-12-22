@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -435,10 +435,10 @@ my %fileFormat = (
         Name => 'LocalCaption',
         Format => 'string[0,256]',
         Notes => q{
-I haven't found a reference for the format of tags 121, 184-188 and 225-232,
-so I have just make them writable as strings with reasonable length.  Beware
-that if this is wrong, other utilities won't be able to read these tags as
-written by ExifTool.
+            I haven't found a reference for the format of tags 121, 184-188 and
+            225-232, so I have just make them writable as strings with
+            reasonable length.  Beware that if this is wrong, other utilities
+            won't be able to read these tags as written by ExifTool.
         },
     },
     122 => {
@@ -858,7 +858,7 @@ sub ProcessIPTC($$$)
         if ($len & 0x8000) {
             my $n = $len & 0x7fff; # get num bytes in length field
             if ($pos + $n > $dirEnd or $n > 8) {
-                $verbose and print "Invalid extended IPTC entry (tag $tag)\n";
+                $exifTool->VPrint(0, "Invalid extended IPTC entry (tag $tag)\n");
                 $success = 0;
                 last;
             }
@@ -868,7 +868,7 @@ sub ProcessIPTC($$$)
             }
         }
         if ($pos + $len > $dirEnd) {
-            $verbose and print "Invalid IPTC entry (tag $tag, len $len)\n";
+            $exifTool->VPrint(0, "Invalid IPTC entry (tag $tag, len $len)\n");
             $success = 0;
             last;
         }

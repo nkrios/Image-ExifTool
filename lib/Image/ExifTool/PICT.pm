@@ -20,12 +20,12 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ReadPictValue($$$;$);
 
 my ($vers, $extended);  # PICT version number, and extended flag
-my ($verbose, $indent); # used in verbose mode
+my ($verbose, $out, $indent); # used in verbose mode
 
 # ranges of reserved opcodes.
 # opcodes at the start of each range must be defined in the tag table
@@ -1015,28 +1015,28 @@ sub ReadPictValue($$$;$)
             $val = '';
         }
         if ($verbose) {
-            print "${indent}$tag ($format$cntStr)";
+            print $out "${indent}$tag ($format$cntStr)";
             if ($size) {
                 if (not defined $val) {
-                    print " = <undef>\n";
+                    print $out " = <undef>\n";
                 } elsif ($format eq 'binary') {
-                    print " = <binary data>\n";
+                    print $out " = <binary data>\n";
                     if ($verbose > 2) {
-                        my %parms;
+                        my %parms = ( Out => $out );
                         $parms{MaxLen} = 96 if $verbose < 4;
                         Image::ExifTool::HexDump(\$val, undef, %parms);
                     }
                 } else {
-                    print " = $val\n";
+                    print $out " = $val\n";
                 }
             } else {
-                print "\n";
+                print $out "\n";
             }
         }
         return \$val if $format eq 'binary' and defined $val;
         return $val;
     }
-    $verbose and print "${indent}$tag ($format$cntStr):\n";
+    $verbose and print $out "${indent}$tag ($format$cntStr):\n";
     my $struct = $structs{$format} or return undef;
     my ($c, @vals);
     for ($c=0; $c<$count; ++$c) {
@@ -1050,9 +1050,9 @@ sub ReadPictValue($$$;$)
                 $val = eval $$fmt;
                 $@ and warn $@;
                 if ($verbose and defined $val) {
-                    printf "${indent}$tag (binary[%d]) = <binary data>\n",length($$val);
+                    printf $out "${indent}$tag (binary[%d]) = <binary data>\n",length($$val);
                     if ($verbose > 2) {
-                        my %parms;
+                        my %parms = ( Out => $out );
                         $parms{MaxLen} = 96 if $verbose < 4;
                         Image::ExifTool::HexDump($val, undef, %parms);
                     }
@@ -1083,7 +1083,8 @@ sub ProcessPICT($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    $verbose = $exifTool->{OPTIONS}->{Verbose};
+    $verbose = $exifTool->Options('Verbose');
+    $out = $exifTool->Options('TextOut');
     $indent = '';
     my ($buff, $tried, @hdr, $op, $hRes, $vRes);
 
@@ -1146,7 +1147,7 @@ sub ProcessPICT($$)
     # don't extract image opcodes unless verbose
     return 1 unless $verbose;
 
-    printf "PICT version $vers%s\n", $extended ? ' extended' : '';
+    printf $out "PICT version $vers%s\n", $extended ? ' extended' : '';
 
     my $tagTablePtr = GetTagTable('Image::ExifTool::PICT::Main');
 
@@ -1174,7 +1175,7 @@ sub ProcessPICT($$)
             last unless $tagInfo;
         }
         if ($op eq 0xff) {
-            $verbose and print "End of picture\n";
+            $verbose and print $out "End of picture\n";
             $success = 1;
             last;
         }
@@ -1186,7 +1187,7 @@ sub ProcessPICT($$)
         # replace version number for version-dependent formats
         $format =~ s/#$/$vers/;
         my $wid = $vers * 2;
-        $verbose and printf "Tag 0x%.${wid}x, ", $op;
+        $verbose and printf $out "Tag 0x%.${wid}x, ", $op;
         my $val = ReadPictValue($raf, $$tagInfo{Name}, $format);
         unless (defined $val) {
             $exifTool->Warn("Error reading $$tagInfo{Name} information");

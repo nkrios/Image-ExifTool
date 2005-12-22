@@ -66,9 +66,8 @@ my $testnum = 1;
 # test 5: Test verbose output
 {
     ++$testnum;
-    my ($ok, $skip) = testVerbose($testname, $testnum, 't/images/CanonRaw.crw', 1);
-    print 'not ' unless $ok;
-    print "ok $testnum$skip\n";
+    print 'not ' unless testVerbose($testname, $testnum, 't/images/CanonRaw.crw', 1);
+    print "ok $testnum\n";
 }
 
 # test 6: Write to CR2 file

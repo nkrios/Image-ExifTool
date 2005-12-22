@@ -24,7 +24,7 @@ use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables @tableOrd
             $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr @loadAllTables
             %UserDefined);
 
-$VERSION = '5.77';
+$VERSION = '5.87';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -43,6 +43,7 @@ $VERSION = '5.77';
     )],
     Utils => [qw(
         GetTagTable TagTableKeys GetTagInfoList GenerateTagIDs SetFileType
+        HtmlDump
     )],
     Vars => [qw(
         %allTables @tableOrder @fileTypes
@@ -65,6 +66,7 @@ sub SetFileModifyDate($$;$);
 sub GetAllTags();
 sub GetWritableTags();
 sub GetAllGroups($);
+sub GetNewGroups($);
 # non-public routines below
 sub LoadAllTables();
 sub GetNewTagInfoList($;$);
@@ -74,6 +76,7 @@ sub Get64u($$);
 sub HexDump($;$%);
 sub VerboseInfo($$$%);
 sub VerboseDir($$;$$);
+sub VPrint($$@);
 sub Rationalize($;$);
 sub Write($@);
 sub WriteValue($$;$$$$);
@@ -104,6 +107,7 @@ my @createTypes = qw(XMP);
 
 # file type lookup for all recognized file extensions
 my %fileTypeLookup = (
+    AVI  => 'WAV',  # Windows Audio/Video (RIFF-based like WAV)
     ACR  => 'DICM', # American College of Radiology ACR-NEMA
     AI   => ['PDF','PS'], # Adobe Illustrator (PDF-like or PS-like)
     BMP  => 'BMP',  # Windows BitMaP
@@ -129,6 +133,7 @@ my %fileTypeLookup = (
     MOS  => 'TIFF', # Creo Leaf Mosaic (TIFF-like)
     MOV  => 'MOV',  # Apple QuickTime movie
     MP3  => 'MP3',  # MPEG Layer 3 audio (uses ID3 information)
+    MP4  => 'MOV',  # MPEG Layer 4 video (QuickTime-based)
     MRW  => 'MRW',  # Minolta RAW format
     NEF  => 'TIFF', # Nikon (RAW) Electronic Format (TIFF-like)
     ORF  => 'ORF',  # Olympus RAW format
@@ -150,7 +155,7 @@ my %fileTypeLookup = (
     THM  => 'JPEG', # Canon Thumbnail (aka. JPG)
     TIF  => 'TIFF', # Tagged Image File Format (.3)
     TIFF => 'TIFF', # Tagged Image File Format (.4)
-    WAV  => 'WAV',  # WAVeform (Windows digital audio format
+    WAV  => 'WAV',  # WAVeform (Windows digital audio format)
     X3F  => 'X3F',  # Sigma RAW format
     XMP  => 'XMP',  # Extensible Metadata Platform data file
 );
@@ -158,6 +163,7 @@ my %fileTypeLookup = (
 # MIME types for applicable file types above
 # (missing entries set to 'application/unknown')
 my %mimeType = (
+    AVI  => 'video/avi',
     BMP  => 'image/bmp',
     EPS  => 'application/postscript',
     DICM => 'application/dicom',
@@ -169,6 +175,7 @@ my %mimeType = (
     MNG  => 'video/mng',
     MOV  => 'video/quicktime',
     MP3  => 'audio/mpeg',
+    MP4  => 'video/mp4',
     PBM  => 'image/x-portable-bitmap',
     PDF  => 'application/pdf',
     PGM  => 'image/x-portable-graymap',
@@ -287,7 +294,10 @@ sub DummyWriteProc { return 1; }
         Writable => 1,
         ValueConv => '\$val',
         ValueConvInv => '$val',
-        WriteCheck => '$val =~ /^\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/ ? undef : "Invalid XMP data"',
+        WriteCheck => q{
+            require Image::ExifTool::XMP;
+            return Image::ExifTool::XMP::CheckXMP($self, $tagInfo, \$val);
+        },
     },
     ExifToolVersion => {
         Name        => 'ExifToolVersion',
@@ -466,12 +476,15 @@ sub ClearOptions($)
     #   DateFormat  => undef,   # format for date/time
         Duplicates  => 1,       # flag to save duplicate tag values
     #   Exclude     => undef,   # tags to exclude
-    #   IgnoreMinorErrors => undef, # ignore minor errors when reading/writing
+    #   FixBase     => undef,   # fix maker notes base offsets
     #   Group#      => undef,   # return tags for specified groups in family #
+        HtmlDump    => 0,       # HTML dump (0-3, higher # = bigger limit)
+    #   IgnoreMinorErrors => undef, # ignore minor errors when reading/writing
     #   List        => undef,   # extract lists of PrintConv values into arrays
     #   MakerNotes  => undef,   # extract maker notes as a block
         PrintConv   => 1,       # flag to enable print conversion
         Sort        => 'Input', # order to sort found tags (Input, File, Alpha, Group#)
+        TextOut     => \*STDOUT,# file for Verbose/HtmlDump output
         Unknown     => 0,       # flag to get values of unknown tags (0-2)
         Verbose     => 0,       # print verbose messages (0-4, higher # = more verbose)
     };
@@ -604,6 +617,14 @@ sub ExtractInfo($;@)
         }
         # calculate composite tags
         $self->BuildCompositeTags() if $options->{Composite};
+
+        # do our HTML dump if requested
+        if ($self->{HTML_DUMP}) {
+            my $dataPt = defined $self->{EXIF_DATA} ? \$self->{EXIF_DATA} : undef;
+            $self->{HTML_DUMP}->Print($raf, $dataPt, $self->{EXIF_POS},
+                $self->{OPTIONS}->{TextOut}, $self->{OPTIONS}->{HtmlDump},
+                $self->{FILENAME} ? "HTML Dump ($self->{FILENAME})" : 'HTML Dump');
+        }
 
         $raf->Close() if $filename;     # close the file if we opened it
     }
@@ -1196,6 +1217,7 @@ sub Init($)
     delete $self->{EXIF_DATA};      # the EXIF data block
     delete $self->{EXIF_POS};       # EXIF position in file
     delete $self->{EXIF_BYTE_ORDER};# the EXIF byte ordering
+    delete $self->{HTML_DUMP};      # html dump information
     $self->{FILE_ORDER} = { };      # hash of tag order in file
     $self->{VALUE}      = { };      # hash of raw tag values
     $self->{TAG_INFO}   = { };      # hash of tag information
@@ -1210,6 +1232,13 @@ sub Init($)
     $self->{TIFF_TYPE}  = '';       # type of TIFF data (APP1, TIFF, NEF, etc...)
     $self->{CameraMake} = '';       # camera make
     $self->{CameraModel}= '';       # camera model
+    $self->{CameraType} = '';       # Olympus camera type
+    if ($self->Options('HtmlDump')) {
+        require Image::ExifTool::HtmlDump;
+        $self->{HTML_DUMP} = new Image::ExifTool::HtmlDump;
+    }
+    # make sure our TextOut is a file reference
+    $self->{OPTIONS}->{TextOut} = \*STDOUT unless ref $self->{OPTIONS}->{TextOut};
 }
 
 #------------------------------------------------------------------------------
@@ -1960,10 +1989,10 @@ sub ValidateImage($$$)
 {
     my ($self, $imagePt, $tag) = @_;
     return undef if $$imagePt eq 'none';
-    unless ($$imagePt =~ /^(Binary data|\xff\xd8)/ or
+    unless ($$imagePt =~ /^(Binary data|\xff\xd8\xff)/ or
             # the first byte of the preview of some Minolta cameras is wrong,
             # so check for this and set it back to 0xff if necessary
-            $$imagePt =~ s/^.\xd8\xff\xdb/\xff\xd8\xff\xdb/ or
+            $$imagePt =~ s/^.(\xd8\xff\xdb)/\xff$1/ or
             $self->Options('IgnoreMinorErrors'))
     {
         # issue warning only if the tag was specifically requested
@@ -2058,6 +2087,16 @@ sub GetUnixTime($;$)
 }
 
 #------------------------------------------------------------------------------
+# Save information for HTML dump
+# Inputs: 0) ExifTool hash ref, 1) start offset, 2) data size
+#         3) comment string, 4) tool tip, 5) flags
+sub HtmlDump($$$$;$$)
+{
+    my $self = shift;
+    $self->{HTML_DUMP} and $self->{HTML_DUMP}->Add(@_);
+}
+
+#------------------------------------------------------------------------------
 # JPEG constants
 my %jpegMarker = (
     0x01 => 'TEM',
@@ -2107,11 +2146,12 @@ sub ProcessJPEG($$)
     my ($self, $dirInfo) = @_;
     my ($ch,$s,$length);
     my $verbose = $self->{OPTIONS}->{Verbose};
+    my $out = $self->{OPTIONS}->{TextOut};
     my $raf = $$dirInfo{RAF};
     my $icc_profile;
     my $rtnVal = 0;
     my $wantPreview;
-    my %dumpParms;
+    my %dumpParms = ( Out => $out );
 
     # check to be sure this is a valid JPG file
     return 0 unless $raf->Read($s, 2) == 2 and $s eq "\xff\xd8";
@@ -2177,14 +2217,14 @@ sub ProcessJPEG($$)
 #
         # handle SOF markers: SOF0-SOF15, except DHT(0xc4), JPGA(0xc8) and DAC(0xcc)
         if (($marker & 0xf0) == 0xc0 and ($marker == 0xc0 or $marker & 0x03)) {
-            $verbose and print "JPEG $markerName:\n";
+            $verbose and print $out "JPEG $markerName:\n";
             # get the image size;
             my ($h, $w) = unpack('n'x2, substr($$segDataPt, 3));
             $self->FoundTag('ImageWidth', $w);
             $self->FoundTag('ImageHeight', $h);
             next;
         } elsif ($marker == 0xd9) {         # EOI
-            $verbose and print "JPEG EOI\n";
+            $verbose and print $out "JPEG EOI\n";
             $rtnVal = 1;
             my $buff;
             $raf->Read($buff, 2) == 2 or last;
@@ -2194,7 +2234,9 @@ sub ProcessJPEG($$)
                 if ($start) {
                     my $actual = $raf->Tell() - 2;
                     if ($start ne $actual) {
-                        $verbose>1 and print "(Fixed PreviewImage location: $start -> $actual)\n";
+                        if ($verbose > 1) {
+                            print $out "(Fixed PreviewImage location: $start -> $actual)\n";
+                        }
                         $self->{VALUE}->{PreviewImageStart} = $actual;
                     }
                 }
@@ -2202,31 +2244,43 @@ sub ProcessJPEG($$)
             last;   # all done parsing file
         } elsif ($marker == 0xda) {         # SOS
             if ($wantPreview) {
-                $verbose and print "JPEG SOS (continue parsing for PreviewImage)\n";
-                next;
-            } else {
-                $verbose and print "JPEG SOS (end of parsing)\n";
+                # seek ahead and validate preview image
+                my $tell = $raf->Tell();
+                my $buff;
+                unless ($raf->Seek($self->GetValue('PreviewImageStart'), 0) and
+                        $raf->Read($buff, 4) == 4 and
+                        $buff =~ /^.\xd8\xff[\xc4\xdb\xe0-\xef]/)
+                {
+                    # PreviewImageStart was wrong, so scan entire JPEG
+                    # to look for PreviewImage after EOI
+                    $raf->Seek($tell, 0) or last;
+                    $verbose and print $out "JPEG SOS (continue parsing for PreviewImage)\n";
+                    next;
+                }
             }
+            $verbose and print $out "JPEG SOS (end of parsing)\n";
             # nothing interesting to parse after start of scan (SOS)
             $rtnVal = 1;
             last;   # all done parsing file
         } elsif ($marker==0x00 or $marker==0x01 or ($marker>=0xd0 and $marker<=0xd7)) {
             # handle stand-alone markers 0x00, 0x01 and 0xd0-0xd7 (NULL, TEM, RST0-RST7)
-            $verbose and $marker and print "JPEG $markerName:\n";
+            $verbose and $marker and print $out "JPEG $markerName:\n";
             next;
         }
         # handle all other markers
         $length = length($$segDataPt);
         if ($verbose) {
-            print "JPEG $markerName ($length bytes):\n";
+            print $out "JPEG $markerName ($length bytes):\n";
             if ($verbose > 2) {
-                my %extraParms;
+                my %extraParms = ( Addr => $segPos );
                 $extraParms{MaxLen} = 128 if $verbose == 4;
                 HexDump($segDataPt, undef, %dumpParms, %extraParms);
             }
         }
         if ($marker == 0xe0) {              # APP0 (JFIF)
             if ($$segDataPt =~ /^JFIF\0/) {
+                HtmlDump($self, $segPos-4, $length+4, "JFIF segment",
+                         'Size: ' . ($length + 4) . ' bytes', 0);
                 my %dirInfo = (
                     DataPt => $segDataPt,
                     DirStart => 5,
@@ -2252,6 +2306,15 @@ sub ProcessJPEG($$)
                     DirStart => $hdrLen,
                     Base => $segPos + $hdrLen,
                 );
+                if ($self->{HTML_DUMP}) {
+                    HtmlDump($self, 0, 2, 'JPEG header','SOI Marker');
+                    HtmlDump($self, $segPos-4, 4, 'APP1 header',
+                             "APP1 Header\\nData size: $length bytes");
+                    HtmlDump($self, $segPos, $hdrLen, "APP1 ID",
+                             'APP1 Identifier\nData type: Exif');
+                    # add marker at end of APP1
+                    HtmlDump($self, $segPos + length($$segDataPt), 2, 'Next JPEG segment...');
+                }
                 # extract the EXIF information (it is in standard TIFF format)
                 $self->ProcessTIFF(\%dirInfo);
                 # avoid looking for preview unless necessary because it really slows
@@ -2375,7 +2438,7 @@ sub ProcessTIFF($$;$)
 {
     my ($self, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my $fileType = $$dirInfo{Parent};
+    my $fileType = $$dirInfo{Parent} || '';
     my $raf = $$dirInfo{RAF};
     my $base = $$dirInfo{Base} || 0;
     my $outfile = $$dirInfo{OutFile};
@@ -2417,6 +2480,13 @@ sub ProcessTIFF($$;$)
     # get offset to IFD0
     my $offset = Get32u($dataPt, 4);
     $offset >= 8 or return 0;
+
+    if ($self->{HTML_DUMP}) {
+        my $o = (GetByteOrder() eq 'II') ? 'Little' : 'Big';
+        HtmlDump($self, $base, 4, "TIFF header", "TIFF Header\\nByte order: $o endian", 0);
+        HtmlDump($self, $base+4, 4, "IFD0 pointer",
+                 sprintf("IFD0 offset: 0x%.4x",$offset), 0);
+    }
     if ($raf) {
         # possibly a Canon RAW image if offset is 16, so read signature
         if ($offset == 16) {
@@ -2424,7 +2494,9 @@ sub ProcessTIFF($$;$)
             $$dataPt .= $canonSig;
         }
         # we have a valid TIFF (or whatever) file
-        $self->SetFileType($fileType) if $fileType;
+        if ($fileType and not $self->{VALUE}->{FileType}) {
+            $self->SetFileType($fileType);
+        }
     }
     # remember where we found the TIFF data (APP1, APP3, TIFF, NEF, etc...)
     $self->{TIFF_TYPE} = $fileType;
@@ -2461,7 +2533,7 @@ sub ProcessTIFF($$;$)
                 my $offset = 8;
                 my $header = substr($$dataPt, 0, 4) . Set32u($offset);
                 Write($outfile, $header, $newData) or $err = 1;
-                if ($raf) {
+                if ($raf and $fileType ne 'MRW') {
                     $raf->Seek(0, 2) or $err = 1;
                     my $extra = $raf->Tell() - $self->{TIFF_END};
                     # we may expect 4 unreferenced bytes due to next IFD pointer

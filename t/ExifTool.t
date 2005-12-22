@@ -52,7 +52,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-# don't test DateFormat because strftime output is system dependent
+# don't test DateFormat because strftime output varies with locale
 #    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
     my @tags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate');
     my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg', \@tags);
@@ -188,9 +188,8 @@ my $testnum = 1;
 # test 17: Test verbose output
 {
     ++$testnum;
-    my ($ok, $skip) = testVerbose($testname, $testnum, 't/images/ExifTool.jpg', 3);
-    print 'not ' unless $ok;
-    print "ok $testnum$skip\n";
+    print 'not ' unless testVerbose($testname, $testnum, 't/images/ExifTool.jpg', 3);
+    print "ok $testnum\n";
 }
 
 # end

@@ -25,7 +25,7 @@ meaning of each special key:
   assumed.  If PROCESS_PROC is set to 0, the tags are not added to the lookup.
   The process proc returns 1 on success or 0 on failure, and takes 3 arguments:
   0) reference to the ExifTool object, 1) reference to a directory information
-  hash, 2) reference to the tag table hash, with the following members:
+  hash (with the following entries:), 2) reference to the tag table hash.
 
     Name        - Tag name for this SubDirectory entry (for verbose messages)
     Base        - Base offset for pointers from start of file
@@ -197,7 +197,9 @@ conditions.  The following is a description of possible hash entries:
 
                   'IsOffset' - flag set if the tag represents an offset to some
                   data, and causes value will be adjusted to an absolute file
-                  offset.
+                  offset.  If set to '2', the offset base of the parent
+                  directory is used even if the base changes for the current
+                  directory (only some maker notes are this messed up).
 
                   'OffsetPair' - set if the tag represents half of an offset/
                   byte count pair.  Data for these tags must be handled
@@ -328,9 +330,10 @@ conditions.  The following is a description of possible hash entries:
 
   WriteCheck    : [optional] If given, specifies a scalar which is evaluated as
                   a Perl expression for a one-time validatation the value being
-                  written.  The expression has access to two variables: $val
-                  is the value to be written, and $self is the ExifTool object.
-                  It returns an error string or undef if the value is good.
+                  written.  The expression has access to 3 variables: $val is
+                  the value to be written, $self is the ExifTool object, and
+                  $tagInfo is the tag information hash reference. It returns an
+                  error string or undef if the value is good.
 
   WriteCondition: [optional] Only meaningful for writable EXIF tags.  Specifies
                   a condition to be evaluated before the tag can be written to a

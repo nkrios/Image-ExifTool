@@ -330,39 +330,55 @@ to a specific function.
     If EXIF information already exists, the existing order is used instead.  If not
     defined, the order of the maker notes is used (if maker notes are copied), otherwise
     it defaults to 'MM'.</td>
-    <td align='center'>'MM','II' or undef</td><td align=center>-</td></tr>
+    <td align='center'>'MM','II' or undef</td><td align=center>undef</td></tr>
 <tr><td>Charset</td><td>Character set for converting Unicode character strings.</td>
     <td><table>
     <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF-8 characters</td></tr>
     <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
     </table></td><td align=center>'UTF8'</td></tr>
-<tr><td>Compact</td><td>Write compact output.  Some data formats (XMP, IPTC) specify
-    that the data be padded with blanks to allow in-place editing.  By setting this
-    flag, 2kB is saved for files with XMP data, and 100 bytes for IPTC data.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
+<tr><td>Compact</td><td>Write compact output.  The XMP specification suggests that
+the data be padded with blanks to allow in-place editing.  By setting this
+flag, 2kB is saved for files with XMP data.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Composite</td><td>Flag to calculate Composite tags</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>CoordFormat</td><td>Format for GPS coordinates</td><td> Format for
     printing GPS coordinates.  This is a printf format string with specifiers
     for degrees, minutes and seconds in that order, however minutes and seconds
     may be omitted.  The default is equivalent to using a format string of
     q{%d&nbsp;deg&nbsp;%d'&nbsp;%.2f"}.
-    </td><td align=center>-</td></tr>
-<tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td><td align=center>-</td></tr>
+    </td><td align=center>undef</td></tr>
+<tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td>
+    <td align=center>undef</td></tr>
 <tr><td>Duplicates</td><td>Flag to save duplicate tag values</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>Exclude</td>
     <td>Exclude specified tags</td>
     <td>Tag name or reference to a list of tag names to exclude.  Case is not significant.
     Tags may also be excluded by preceeding their name with a '-' in the arguments to ImageInfo.</td>
-    <td align='center'>-</td></tr>
+    <td align='center'>undef</td></tr>
+<tr><td>FixBase</td>
+    <td>Fix maker notes base offset.  Allows values to be extracted from maker notes
+    which have been corrupted by editing with 3rd party software.</td>
+    <td>An integer specifying a value to be added to the maker notes base offset, or the
+    empty string ('') for ExifTool to take its best guess at the correct base.</td>
+    <td align='center'>undef</td></tr>
+<tr><td>Group#</td><td>Extract tags for specified groups</td>
+    <td>Group name or reference to list of group names.
+    Group name may begin with '-' to exclude a group.  Case IS significant.
+    See <a href="#GetAllGroups">GetAllGroups</a> for a list of available groups.</td>
+    <td align='center'>undef</td></tr>
+<tr><td>HtmlDump</td><td>Dump information in hex to a dynamic HTML web page. 
+    Option value sets a limit on the maximum block size.  Output file is
+    specified by the TextOut option.</td>
+    <td><table>
+    <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>No HTML dump</td></tr>
+    <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>1 KB size limit</td></tr>
+    <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>16 KB size limit</td></tr>
+    <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Full dump</td></tr>
+    </table></td><td align=center>0</td></tr>
 <tr><td>IgnoreMinorErrors</td><td>Causes some minor errors to be ignored.
     This option is provided mainly to allow writing of files when minor errors
     occur, but also allows thumbnail and preview images to be extracted even if
     they don't have a recognizable header.</td>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
-<tr><td>Group#</td><td>Extract tags for specified groups</td>
-    <td>Group name or reference to list of group names.
-    Group name may begin with '-' to exclude a group.  Case IS significant.
-    See <a href="#GetAllGroups">GetAllGroups</a> for a list of available groups.</td>
-    <td align='center'>-</td></tr>
 <tr><td>List</td><td>Flag to extract lists of PrintConv values into arrays instead of concatinating
     them into comma-separated strings.</td><td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>MakerNotes</td><td>Flag to cause MakerNotes data and other writable subdirectories
@@ -379,13 +395,16 @@ to a specific function.
         where # is the group family number.  If # is not specified, Group0 is assumed.
         See <a href="#GetAllGroups">GetAllGroups</a> for a group list.</td></tr>
     </table></td><td align=center>'Input'</td></tr>
+<tr><td>TextOut</td><td>Output file for Verbose and HtmlDump options.</td>
+    <td align='center'>File reference</td><td align=center>\*STDOUT</td></tr>
 <tr><td>Unknown</td><td>Flag to get values of unknown tags</td>
     <td><table>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Unknown tags not extracted</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Unknown tags extracted from EXIF directories</td></tr>
     <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Unknown tags also extracted from binary data blocks</td></tr>
     </table></td><td align=center>0</td></tr>
-<tr><td>Verbose</td><td>Flag to print verbose messages to console. <a href="verbose.html">Click here</a> for example outputs</td>
+<tr><td>Verbose</td><td>Print verbose messages to file specified by TextOut option.
+    <a href="verbose.html">Click here</a> for example outputs.</td>
     <td><table>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>No verbose messages</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Print tag names and raw values</td></tr>
@@ -661,8 +680,9 @@ my @keywords = $exifTool-&gt;<b>GetValue</b>('Keywords', 'ValueConv');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewValue">SetNewValue</a></h2>
-Set the new value for a tag.  The new value is the value that will be written
-for this tag in subsequent calls to <a href="#WriteInfo">WriteInfo</a>.
+Set the new value for a tag.  The routine may be called multiple times to set
+the values of many tags before using <a href="#WriteInfo">WriteInfo</a> to write
+the new values to an image.
 <p>For list-type tags (like Keywords), call repeatedly with the same tag name
 for each value in the list.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
@@ -674,10 +694,11 @@ for each value in the list.
  separated by a colon (ie. 'GROUP:TAG'), which is equivalent to using a
  'Group' option argument.
  <br>2) [optional] New value for tag.  Undefined to delete tag from file.
- <br>3-N) [optional] SetNewValue options hash entries (see below)
+ <br>3-N) [optional] SetNewValue options hash entries (see below).
 </td></tr>
-<tr><td><b>Returns</b></td><td>The number of tags set and prints any errors in
-scalar context, or the number of tags set and the error string in list context.
+<tr><td><b>Returns</b></td><td>Scalar context: The number of tags set, and
+errors are printed to STDERR.
+<br>List context: The number of tags set and the error string.
 </td></tr>
 </table></blockquote>
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
@@ -693,7 +714,7 @@ scalar context, or the number of tags set and the error string in list context.
 <tr><td>Group</td><td>Specifies group name where tag should be written.
     If not specified, tag is written to hightest priority group as specified
     by <a href="#SetNewGroups">SetNewGroups</a>.  Case is not significant</td>
-    <td>Any family 0 or 1 group name</td><td align=center>-</td></tr>
+    <td>Any family 0 or 1 group name</td><td align=center>undef</td></tr>
 <tr><td>Protected</td><td>Allow protected tags to be written</td>
     <td>Bitmask of tag protection levels to write:
     <table>
@@ -723,17 +744,20 @@ scalar context, or the number of tags set and the error string in list context.
 </table></blockquote>
 <b>Examples:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+# set a new value for a tag (errors go to STDERR)
 $success = $exifTool-&gt;<b>SetNewValue</b>($tag, $value);
 
+# set a new value and capture any error message
 ($success, $errStr) = $exifTool-&gt;<b>SetNewValue</b>($tag, $value);
 
-# delete a tag (also resets AddValue and DelValue options for this tag)
+# delete information for specified tag if it exists in image
+# (also resets AddValue and DelValue options for this tag)
 $exifTool-&gt;<b>SetNewValue</b>($tag);
 
 # reset all values from previous calls to SetNewValue()
 $exifTool-&gt;<b>SetNewValue</b>();
 
-# delete a single keyword
+# delete a specific keyword
 $exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, DelValue =&gt; 1);
 
 # add a keyword without replacing existing keywords

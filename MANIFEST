@@ -23,6 +23,7 @@ html/TagNames/ICC_Profile.html
 html/TagNames/ID3.html
 html/TagNames/IPTC.html
 html/TagNames/JFIF.html
+html/TagNames/JVC.html
 html/TagNames/Jpeg2000.html
 html/TagNames/Kodak.html
 html/TagNames/Leaf.html
@@ -56,8 +57,10 @@ html/data_members.html
 html/exiftool_pod.html
 html/faq.html
 html/history.html
+html/htmldump.html
 html/idiosyncracies.html
 html/index.html
+html/models.html
 html/verbose.html
 html/writing.html
 iptc2xmp.args
@@ -79,9 +82,11 @@ lib/Image/ExifTool/FujiFilm.pm
 lib/Image/ExifTool/GIF.pm
 lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
+lib/Image/ExifTool/HtmlDump.pm
 lib/Image/ExifTool/ICC_Profile.pm
 lib/Image/ExifTool/ID3.pm
 lib/Image/ExifTool/IPTC.pm
+lib/Image/ExifTool/JVC.pm
 lib/Image/ExifTool/Jpeg2000.pm
 lib/Image/ExifTool/Kodak.pm
 lib/Image/ExifTool/Leaf.pm
@@ -165,6 +170,7 @@ t/IPTC-XMP_2.out
 t/IPTC-XMP_4.out
 t/IPTC-XMP_6.out
 t/IPTC-XMP_7.out
+t/IPTC-XMP_8.out
 t/Jpeg2000.t
 t/Jpeg2000_2.out
 t/Kodak.t
@@ -177,6 +183,7 @@ t/MP3_2.out
 t/Minolta.t
 t/Minolta_2.out
 t/Minolta_3.out
+t/Minolta_4.out
 t/Nikon.t
 t/Nikon_2.out
 t/Nikon_3.out
@@ -264,6 +271,7 @@ t/images/Kodak.jpg
 t/images/MIFF.miff
 t/images/MP3.mp3
 t/images/Minolta.jpg
+t/images/Minolta.mrw
 t/images/Nikon.jpg
 t/images/Nikon.nef
 t/images/NikonD2Hs.jpg
@@ -287,4 +295,5 @@ t/images/Sony.jpg
 t/images/Unknown.jpg
 t/images/WAV.wav
 t/images/Writer.jpg
+t/images/XMP.xmp
 xmp2iptc.args

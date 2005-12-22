@@ -30,6 +30,7 @@ sub WritePhotoshop($$$)
     my $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $start);
     my $dirEnd = $start + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
     my $newData = '';
 
     # make a hash of new tag info, keyed on tagID
@@ -96,11 +97,11 @@ sub WritePhotoshop($$$)
             # check to see if we are overwriting this tag
             $value = substr($$dataPt, $pos, $size);
             if (Image::ExifTool::IsOverwriting($newValueHash, $value)) {
-                $verbose > 1 and print "    - Photoshop:$$tagInfo{Name} = '$value'\n";
+                $verbose > 1 and print $out "    - Photoshop:$$tagInfo{Name} = '$value'\n";
                 $value = Image::ExifTool::GetNewValues($newValueHash);
                 ++$exifTool->{CHANGED};
                 next unless defined $value;     # next if tag is being deleted
-                $verbose > 1 and print "    + Photoshop:$$tagInfo{Name} = '$value'\n";
+                $verbose > 1 and print $out "    + Photoshop:$$tagInfo{Name} = '$value'\n";
             }
         } elsif ($$editDirs{$tagID}) {
             $tagInfo = $$editDirs{$tagID};
@@ -139,7 +140,7 @@ sub WritePhotoshop($$$)
             next unless defined $value;     # next if tag is being deleted
             # don't add this tag unless specified
             next unless Image::ExifTool::IsCreating($newValueHash);
-            $verbose > 1 and print "    + Photoshop:$$tagInfo{Name} = '$value'\n";
+            $verbose > 1 and print $out "    + Photoshop:$$tagInfo{Name} = '$value'\n";
             ++$exifTool->{CHANGED};
         } else {
             $tagInfo = $$addDirs{$tagID};

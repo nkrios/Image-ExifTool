@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..3\n"; }
+BEGIN { $| = 1; print "1..4\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -37,6 +37,17 @@ my $testnum = 1;
         ['MinoltaDate' => '2005:01:16'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 4: Write rewriting MRW image
+{
+    ++$testnum;
+    my @writeInfo = (
+        ['FocusMode' => 'MF'],
+        ['LastFileNumber' => '123'],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Minolta.mrw');
     print "ok $testnum\n";
 }
 

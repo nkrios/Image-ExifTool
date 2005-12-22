@@ -14,7 +14,7 @@ package Image::ExifTool::CanonCustom;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessCanonCustom($$$);
 sub WriteCanonCustom($$$);
@@ -680,7 +680,7 @@ sub ProcessCanonCustom($$$)
 # Returns: error string or undef (and may modify value) on success
 sub CheckCanonCustom($$$)
 {
-    my ($self, $tagInfo, $valPtr) = @_;
+    my ($exifTool, $tagInfo, $valPtr) = @_;
     return Image::ExifTool::CheckValue($valPtr, 'int8u');
 }
 
@@ -720,8 +720,8 @@ sub WriteCanonCustom($$$)
         next unless defined $newVal;    # can't delete from a custom table
         Image::ExifTool::Set16u(($newVal & 0xff) + ($tag << 8), $dataPt, $pos);
         if ($verbose > 1) {
-            print "    - $dirName:$$tagInfo{Name} = '$val'\n";
-            print "    + $dirName:$$tagInfo{Name} = '$newVal'\n";
+            $exifTool->VPrint(0, "    - $dirName:$$tagInfo{Name} = '$val'\n",
+                                 "    + $dirName:$$tagInfo{Name} = '$newVal'\n");
         }
         ++$exifTool->{CHANGED};
     }

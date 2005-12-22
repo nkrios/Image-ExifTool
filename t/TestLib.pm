@@ -20,7 +20,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.05';
+$VERSION = '1.06';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare testVerbose);
 
@@ -91,9 +91,9 @@ sub closeEnough($$)
 {
     my ($line1, $line2) = @_;
 
-    # allow version number differences
-    return 1 if $line1 =~ /ExifTool\s?Version/ and
-                $line2 =~ /ExifTool\s?Version/;
+    # of course, the version number will change...
+    return 1 if $line1 =~ /^(.*ExifTool.*)\b\d{1,2}\.\d{2}\b(.*)/s and
+                $line2 eq "$1$Image::ExifTool::VERSION$2";
 
     # allow different FileModifyDate's
     return 1 if $line1 =~ /File\s?Modif.*Date/ and
@@ -190,7 +190,7 @@ sub check($$$;$$)
 #
 # Compare the output file to the output from the standard test (TESTNAME_#.out)
 #
-    return testCompare($stdfile, $testfile,$testnum);
+    return testCompare($stdfile, $testfile, $testnum);
 }
 
 #------------------------------------------------------------------------------
@@ -229,32 +229,24 @@ sub testVerbose($$$$)
 {
     my ($testname, $testnum, $infile, $verbose) = @_;
     my $testfile = "t/${testname}_$testnum";
-    my $ok = 1;
-    my $skip = '';
     # capture verbose output by redirecting STDOUT
-    if (open(TESTFILE,">&STDOUT") and open(STDOUT,">$testfile.tmp")) {
-        ImageInfo($infile, { Verbose => $verbose });
-        close(STDOUT);
-        open(STDOUT,">&TESTFILE"); # restore original STDOUT
-        # re-write output file to change newlines to be same as standard test file
-        # (if I was a Perl guru, maybe I would know a better way to do this)
-        open(TMPFILE,"$testfile.tmp");
-        open(TESTFILE,">$testfile.failed");
-        my $oldSep = $\;
-        $\ = "\x0a";        # set output line separator
-        while (<TMPFILE>) {
-            chomp;          # remove existing newline
-            print TESTFILE $_;  # re-write line using \x0a for newlines
-        }
-        $\ = $oldSep;       # restore output line separator
-        close(TESTFILE);
-        unlink("$testfile.tmp");
-        $ok = testCompare("$testfile.out","$testfile.failed",$testnum);
-    } else {
-        # skip this test
-        $skip = ' # Skip Can not redirect standard output to test verbose output';
+    return 0 unless open(TMPFILE,">$testfile.tmp");
+    ImageInfo($infile, { Verbose => $verbose, TextOut => \*TMPFILE });
+    close(TMPFILE);
+    # re-write output file to change newlines to be same as standard test file
+    # (if I was a Perl guru, maybe I would know a better way to do this)
+    open(TMPFILE,"$testfile.tmp");
+    open(TESTFILE,">$testfile.failed");
+    my $oldSep = $\;
+    $\ = "\x0a";        # set output line separator
+    while (<TMPFILE>) {
+        chomp;          # remove existing newline
+        print TESTFILE $_;  # re-write line using \x0a for newlines
     }
-    return ($ok, $skip);
+    $\ = $oldSep;       # restore output line separator
+    close(TESTFILE);
+    unlink("$testfile.tmp");
+    return testCompare("$testfile.out","$testfile.failed",$testnum);
 }
 
 

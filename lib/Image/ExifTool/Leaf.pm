@@ -21,8 +21,8 @@ sub ProcessLeaf($$$);
     PROCESS_PROC => \&ProcessLeaf,
     GROUPS => { 0 => 'Leaf', 2 => 'Camera' },
     NOTES => q{
-These tags are found in .MOS images from Leaf digital camera backs written
-by Creo Leaf Capture.  They exist within the Leaf-specific directory
+These tags are found in .MOS images from Leaf digital camera backs as
+written by Creo Leaf Capture.  They exist within the Leaf-specific directory
 structure of EXIF tag 0x8606. The tables below list observed Leaf tags,
 however ExifTool will extract any tags found in the Leaf directories even if
 they don't appear in these tables.
@@ -340,8 +340,8 @@ they don't appear in these tables.
     NOTES => q{
 Leaf also writes a TIFF-format sub-IFD inside IFD0 of a MOS image.  No tags
 in this sub-IFD are currently known, except for tag 0x8606 which really
-shouldn't be here since it duplicates a reference to the same data of tag
-0x8606 in IFD0.
+shouldn't be here anyway (so it doesn't appear in the table below) because
+it duplicates a reference to the same data of tag 0x8606 in IFD0.
     },
 );
 

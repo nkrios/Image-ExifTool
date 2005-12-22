@@ -192,6 +192,7 @@ sub WriteIPTC($$$)
     my $start = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
     my ($tagInfo, %iptcInfo, $tag);
 
     # make sure our dataLen is defined (note: allow zero length directory)
@@ -298,7 +299,7 @@ sub WriteIPTC($$$)
                             }
                             if ($num) {
                                 $newData = substr($newData, 0, $lastRecPos);
-                                $verbose > 1 and print "    - $num mandatory tags\n";
+                                $verbose > 1 and print $out "    - $num mandatory tags\n";
                             }
                         } elsif ($mandatory{$lastRec}) {
                             # add required mandatory tags
@@ -314,7 +315,7 @@ sub WriteIPTC($$$)
                                 }
                                 $tagInfo = $subTablePtr->{$mandTag} or warn("WriteIPTC: Internal error 2\n"), next;
                                 my $value = $mandatory->{$mandTag};
-                                $verbose > 1 and print "    + IPTC:$$tagInfo{Name} = '$value' (mandatory)\n";
+                                $verbose > 1 and print $out "    + IPTC:$$tagInfo{Name} = '$value' (mandatory)\n";
                                 # convert to int if necessary
                                 FormatIPTC($tagInfo, \$value);
                                 $len = length $value;
@@ -356,7 +357,7 @@ sub WriteIPTC($$$)
                     # write tags for each value in list
                     my $value;
                     foreach $value (@values) {
-                        $verbose > 1 and print "    + IPTC:$$tagInfo{Name} = '$value'\n";
+                        $verbose > 1 and print $out "    + IPTC:$$tagInfo{Name} = '$value'\n";
                         # reset allMandatory flag if a non-mandatory tag is written
                         if ($allMandatory) {
                             my $mandatory = $mandatory{$newRec};
@@ -405,7 +406,7 @@ sub WriteIPTC($$$)
                 }
             }
             if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
-                $verbose > 1 and print "    - IPTC:$$tagInfo{Name} = '$val'\n";
+                $verbose > 1 and print $out "    - IPTC:$$tagInfo{Name} = '$val'\n";
                 ++$exifTool->{CHANGED};
                 # set deleted flag to indicate we found and deleted this tag
                 $foundRec{$rec}->{$tag} |= 0x02;
@@ -428,8 +429,6 @@ sub WriteIPTC($$$)
         if ($trailer =~ /[^\0]/) {
             return undef if $exifTool->Warn('Unrecognized data in IPTC trailer', 1);
         }
-        # add back a bit of zero padding ourselves
-        $newData .= "\0" x 100 if length($newData) and not $exifTool->Options('Compact');
     }
     return $newData;
 }

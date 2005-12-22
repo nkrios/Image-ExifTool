@@ -22,7 +22,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 %Image::ExifTool::Minolta::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -613,20 +613,34 @@ sub ProcessMRW($$)
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my $outfile = $$dirInfo{OutFile};
-    my $data;
+    my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
+    my ($data, $err);
 
     $raf->Read($data,8) == 8 or return 0;
     $data =~ /^\0MRM/ or return 0;
+    $exifTool->SetFileType();
     SetByteOrder('MM');
     $outfile and $exifTool->InitWriteDirs('TIFF'); # use same write dirs as TIFF
     my $offset = Get32u(\$data, 4) + 8;
     my $pos = 8;
+    my $rtnVal = 1;
+    $verbose and printf $out "  [Data Offset: 0x%x]\n", $offset;
     # decode MRW structure to locate start of TIFF-format image (ref 5)
     while ($pos < $offset) {
-        $raf->Read($data,8) == 8 or return 0;
+        $raf->Read($data,8) == 8 or $err = 1, last;
         $pos += 8;
         my $tag = substr($data, 0, 4);
         my $len = Get32u(\$data, 4);
+        if ($verbose) {
+            print $out "MRW ",$exifTool->Printable($tag)," segment ($len bytes):\n";
+            if ($verbose > 2) {
+                $raf->Read($data,$len) == $len and $raf->Seek($pos,0) or $err = 1, last;
+                my %parms = (Addr => $pos, Out => $out);
+                $parms{MaxLen} = 96 unless $verbose > 3;
+                Image::ExifTool::HexDump(\$data,undef,%parms);
+            }
+        }
         if ($tag eq "\0TTW") {
             # parse the TIFF structure after the TTW tag
             my %dirInfo = (
@@ -637,9 +651,12 @@ sub ProcessMRW($$)
             # rewrite the EXIF information (plus the file header)
             my $buff = '';
             $dirInfo{OutFile} = \$buff if $outfile;
-            my $rtnVal = $exifTool->ProcessTIFF(\%dirInfo);
-            return $rtnVal unless $outfile;
-            if ($rtnVal == 1) {
+            my $result = $exifTool->ProcessTIFF(\%dirInfo);
+            if ($result < 0) {
+                $rtnVal = -1;
+            } elsif (not $result) {
+                $err = 1;
+            } elsif ($outfile) {
                 # adjust offset for new EXIF length
                 my $newLen = length($buff) - $pos;
                 $offset += $newLen - $len;
@@ -648,17 +665,19 @@ sub ProcessMRW($$)
                 Write($outfile, $buff) or $rtnVal = -1;
                 # rewrite the rest of the file
                 $pos += $len;
-                $raf->Seek($pos, 0) or return 0;
+                $raf->Seek($pos, 0) or $err = 1, last;
                 while ($raf->Read($buff, 65536)) {
                     Write($outfile, $buff) or $rtnVal = -1;
                 }
+                last;   # all done
             }
-            return $rtnVal;
+            last unless $verbose;
         }
         $pos += $len;
-        $raf->Seek($pos, 0) or return 0;
+        $raf->Seek($pos, 0) or $err = 1, last;
     }
-    return 0;
+    $err and $exifTool->Error("MRW format error");
+    return $rtnVal;
 }
 
 1;  # end

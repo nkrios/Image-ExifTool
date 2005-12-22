@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 #------------------------------------------------------------------------------
 # Read or write information in a PPM/PGM/PBM image
@@ -28,6 +28,7 @@ sub ProcessPPM($$)
     my $raf = $$dirInfo{RAF};
     my $outfile = $$dirInfo{OutFile};
     my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
     my ($buff, $num, $type, %info);
 #
 # read as much of the image as necessary to extract the header and comments
@@ -89,8 +90,8 @@ sub ProcessPPM($$)
         if (Image::ExifTool::IsOverwriting($newValueHash, $oldComment)) {
             ++$exifTool->{CHANGED};
             if ($verbose > 1) {
-                print "    - Comment = '$oldComment'\n" if defined $oldComment;
-                print "    + Comment = '$newComment'\n" if defined $newComment;
+                print $out "    - Comment = '$oldComment'\n" if defined $oldComment;
+                print $out "    + Comment = '$newComment'\n" if defined $newComment;
             }
         } else {
             $newComment = $oldComment;  # use existing comment
@@ -114,8 +115,8 @@ sub ProcessPPM($$)
 # save extracted information
 #
     if ($verbose > 2) {
-        print "$type header ($len bytes):\n";
-        Image::ExifTool::HexDump(\$buff, $len);
+        print $out "$type header ($len bytes):\n";
+        Image::ExifTool::HexDump(\$buff, $len, Out => $out);
     }
     my $tag;
     foreach $tag (qw{Comment ImageWidth ImageHeight MaxVal}) {

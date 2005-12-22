@@ -20,6 +20,7 @@
 #               7) Douglas O'Brien private communication (tests with *istD)
 #               8) Denis Bourez private communication
 #               9) Kazumichi Kawabata private communication
+#              10) David Buret private communication (tests with *istD)
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -30,7 +31,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.24';
+$VERSION = '1.27';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -137,7 +138,7 @@ my %pentaxCities = (
     },
     0x0004 => {
         Name => 'PreviewImageStart',
-        Flags => 'IsOffset',
+        IsOffset => 2,  # code to use original base
         Protected => 2,
         OffsetPair => 0x0003, # point to associated byte count
         DataTag => 'PreviewImage',
@@ -289,7 +290,7 @@ my %pentaxCities = (
     0x0010 => { #PH
         Name => 'FocusPosition',
         Writable => 'int16u',
-        Notes => 'Related to focus distance but effected by focal length',
+        Notes => 'related to focus distance but effected by focal length',
     },
     0x0012 => { #PH
         Name => 'ExposureTime',
@@ -578,6 +579,8 @@ my %pentaxCities = (
             '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
             '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
             '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
+            '4 247' => 'smc PENTAX-DA 10-17mm F3.5-4.5 ED [IF] Fisheye zoom', #10
+            '4 248' => 'smc PENTAX-DA 12-24mm F4 ED AL [IF]', #10
             '4 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED', #8
             '4 251' => 'smc PENTAX-DA 40mm F2.8 Limited', #9
             '4 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL', #8
@@ -654,6 +657,10 @@ my %pentaxCities = (
         Name => 'DestinationCityCode', #PH
         Writable => 'undef',
         Count => 4,
+    },
+    0x2000 => {
+        Name => 'PreviewImageData', #PH (Optio 330RS)
+        ValueConv => '\$val',
     },
 );
 
@@ -790,8 +797,8 @@ the information should be stored to deduce the correct offsets.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Wayne Smith, John Francis and Douglas O'Brien for help figuring
-out some Pentax tags, and to Denis Bourez and Kazumichi Kawabata for adding
-to the LensType list.
+out some Pentax tags, and to Denis Bourez, Kazumichi Kawabata and David
+Buret for adding to the LensType list.
 
 =head1 AUTHOR
 
