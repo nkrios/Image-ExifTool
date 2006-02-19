@@ -1,25 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html>
 <head>
   <title>ExifTool FAQ</title>
+<style type="text/css">
+<!--
+#BLK { color: #000000 } /* black color */
+code {
+    color: #880000;
+    font-family: monospace;
+}
+pre {
+    margin-left: 2em;
+    color: #880000;
+    font-family: monospace;
+}
+-->
+</style>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool FAQ</h1>
 
-<h3>Index</h3>
+<font size='+1'><b>Index</b></font>
 <table><tr><td><ol>
-<li><a href="#Forum">Discussing ExifTool issues</a>
-<li><a href="#TagNames">Determining tag names</a>
-<li><a href="#Duplicate">Problems with duplicate tags</a>
-<li><a href="#Apertures">Aperture and shutter speed</a>
-</ol></td><td><ol start=5>
-<li><a href="#DateTime">Date and time formats</a>
-<li><a href="#PrintConv">"Can't convert TAG" errors</a>
-<li><a href="#TIFF">Deleting all EXIF from a TIFF</a>
-<li><a href="#MakeModel">Changing Make or Model tag</a>
+<li><a href="#Q1">Discussing ExifTool issues</a>
+<li><a href="#Q2">Determining tag names</a>
+<li><a href="#Q3">Problems with duplicate tags</a>
+<li><a href="#Q4">Aperture and shutter speed</a>
+<li><a href="#Q5">Date and time formats</a>
+</ol></td><td valign='top'><ol start=6>
+<li><a href="#Q6">"Can't convert TAG" errors</a>
+<li><a href="#Q7">Deleting all EXIF from a TIFF</a>
+<li><a href="#Q8">Changing Make or Model tag</a>
+<li><a href="#Q9">Tag locations when copying</a>
 </ol></td></tr></table>
 
 <hr>
-<a name="Forum"></a>
+<a name="Q1"></a>
 <p>1. <b>"Is there a forum for discussing ExifTool issues?"</b>
 
 <blockquote>
@@ -27,18 +44,17 @@ ExifTool issues can be discussed on the CPAN forum at
 <a href="http://www.cpanforum.com/dist/Image-ExifTool">http://www.cpanforum.com/dist/Image-ExifTool</a>
 </blockquote>
 
-<a name="TagNames"></a>
+<a name="Q2"></a>
 <p>2. <b>"How do I determine the tag name for some information?"</b>
 
 <blockquote>
 When you run exiftool, by default it prints descriptions, not tag names, for
 the information it extracts.  To print the tag names instead, use the
-<code><font color='#880000'>'-s'</font></code> option.  Also, see the
-<a href="TagNames/index.html">tag names documentation</a> for a complete list
-of available tag names.
+<code>'-s'</code> option.  Also, see the <a href="TagNames/index.html">tag names
+documentation</a> for a complete list of available tag names.
 </blockquote>
 
-<a name="Duplicate"></a>
+<a name="Q3"></a>
 <p>3a. <b>"ExifTool reports the wrong value for a tag"</b>,
 <br>3b. <b>"ExifTool doesn't write a tag properly"</b>, or
 <br>3c. <b>"Other software can't read information written by ExifTool"</b>
@@ -46,21 +62,19 @@ of available tag names.
 <blockquote>
 Make sure you are looking at the right information.  Information may be
 duplicated in different locations within an image.  When in doubt, use
-<code><font color='#880000'>'exiftool -a -G1 FILENAME'</font></code> to show all
-information and the locations in the file.  In this command,
-<code><font color='#880000'>'-a'</font></code> allows duplicate tags to be
-displayed, <code><font color='#880000'>'-G1'</font></code> shows the family 1
-group name (ie. the location) of each tag, and
-<code><font color='#880000'>'FILENAME'</font></code> is the name of your image
-file.  Also, you may want to add <code><font color='#880000'>'-s'</font></code>
-to show the actual tag names instead of the descriptions.
+<code>'exiftool -a -G1 FILENAME'</code> to show all information and the
+locations in the file.  In this command, <code>'-a'</code> allows duplicate tags
+to be displayed, <code>'-G1'</code> shows the family 1 group name (ie. the
+location) of each tag, and <code>'FILENAME'</code> is the name of your image
+file.  Also, you may want to add <code>'-s'</code> to show the actual tag names
+instead of the descriptions.
 
 <p>You can read or write information in a specific location if necessary by
 prefixing the tag name on the command line with the desired group name.  ie)
-<code><font color='#880000'>'-ExifIFD:DateTimeOriginal'</font></code>
+<code>'-ExifIFD:DateTimeOriginal'</code>
 </blockquote>
 
-<a name="Apertures"></a>
+<a name="Q4"></a>
 <p>4. <b>"ExifTool reports more than one shutter speed or aperture value, and
 they are slightly different"</b>
 
@@ -75,30 +89,25 @@ they haven't been rounded off at all, but you may see odd values like 1/102
 instead of 1/100, etc.
 </blockquote>
 
-<a name="DateTime"></a>
+<a name="Q5"></a>
 <p>5. <b>"How do I format date and time information for writing?"</b>
 
 <blockquote>All information (including date/time information) is written in the
 same format as it is read out.  ExifTool converts all date and time information
 to standard EXIF format, so this is also the way it is specified when writing.
-The standard EXIF date/time format is
-<font color='#880000'><code>'YYYY:MM:DD hh:mm:ss'</code></font>,
+The standard EXIF date/time format is <code>'YYYY:MM:DD hh:mm:ss'</code>,
 and a timezone may be specified by adding
-<code><font color='#880000'>'+hh:mm'</font></code>,
-<code><font color='#880000'>'-hh:mm'</font></code> or
-<code><font color='#880000'>'Z'</font></code>.
+<code>'+hh:mm'</code>, <code>'-hh:mm'</code> or <code>'Z'</code>.
 If the meta information format requires a timezone and one is not specified,
-<code><font color='#880000'>'+00:00'</font></code>
-(or <code><font color='#880000'>'Z'</font></code>) is assumed.  For example:
+<code>'+00:00'</code> (or <code>'Z'</code>) is assumed.  For example:
 
-<font color='#880000'>
-<pre>    exiftool -dateTimeOriginal='2005:10:23 20:06:34-05:00' a.jpg
-</pre></font>
+<pre>exiftool "-dateTimeOriginal=2005:10:23 20:06:34-05:00" a.jpg
+</pre>
 </blockquote>
 
-<a name="PrintConv"></a>
+<a name="Q6"></a>
 <p>6. <b>"I get the following error when writing a tag:
-<code><font color='#880000'>'Can't convert TAG (not in PrintConv)'</font></code>"</b>
+<code>'Can't convert TAG (not in PrintConv)'</code>"</b>
 
 <blockquote>
 ExifTool applies a print conversion (PrintConv) to the printed values of all
@@ -113,32 +122,28 @@ as 'Below Sea Level'.  Reading and writing with ExifTool is symmetrical, so a
 value that is printed as 'Above Sea Level' must also be written in that form.
 (ie. The inverse print conversion is applied when writing values.) For example,
 to write GPSAltitudeRef you can type:
-<font color='#880000'>
-<pre>    exiftool -gpsaltituderef='Above Sea Level' image.jpg
-</pre></font>
+<pre>exiftool "-gpsaltituderef=Above Sea Level" image.jpg
+</pre>
 or any unambiguous short form may be used and ExifTool will know what you mean, ie)
-<font color='#880000'>
-<pre>    exiftool -gpsaltituderef=above image.jpg
-</pre></font>
-Alternatively, the print conversion can be disabled with the <code>
-<font color='#880000'>'-n'</font></code> option. In this case the printed value of
-GPSAltitudeRef will be '0' or '1', and the value is written in the same way. So
-the following command has exactly the same effect as the commands above:
-<font color='#880000'>
-<pre>    exiftool -gpsaltituderef=0 -n image.jpg
-</pre></font>
+<pre>exiftool -gpsaltituderef=above image.jpg
+</pre>
+Alternatively, the print conversion can be disabled with the <code>'-n'</code>
+option. In this case the printed value of GPSAltitudeRef will be '0' or '1', and
+the value is written in the same way. So the following command has exactly the
+same effect as the commands above:
+<pre>exiftool -gpsaltituderef=0 -n image.jpg
+</pre>
 Integer values may also be specified in hexadecimal (with a leading '0x').  For
 example, the following commands are all valid and accomplish the same thing:
-<font color='#880000'>
-<pre>    exiftool -flash=1 -n image.jpg
-    exiftool -flash=0x1 -n image.jpg
-    exiftool -flash=fired image.jpg
-</pre></font>
+<pre>exiftool -flash=1 -n image.jpg
+exiftool -flash=0x1 -n image.jpg
+exiftool -flash=fired image.jpg
+</pre>
 </blockquote>
 
-<a name="TIFF"></a>
+<a name="Q7"></a>
 <p>7. <b>"I can't delete all EXIF information from a TIFF file using
-<code><font color='#880000'>'exiftool -exif:all= img.tif'</font></code>"</b>
+<code>'exiftool -exif:all= img.tif'</code>"</b>
 
 <blockquote>
 This is because of the way a TIFF file is structured.  With a JPEG image, this
@@ -148,16 +153,16 @@ the main image itself is stored in IFD0, so deleting this directory would
 destroy the image.  Instead, ExifTool just deletes the ExifIFD subdirectory, so
 any information stored in other directories is preserved.
 
-<p>Use <code><font color='#880000'>'exiftool -a -G1 -s img.tif'</font></code> to
+<p>Use <code>'exiftool -a -G1 -s img.tif'</code> to
 see where the information is stored.  Any information remaining in other IFD's
 must be deleted separately from a TIFF file if desired.
 </blockquote>
 
-<a name="MakeModel"></a>
+<a name="Q8"></a>
 <p>8. <b>"All maker note information is lost if I change the Make or Model tag"</b>
 
 <blockquote>
-The Make and Model tags are used by some image utilties (including ExifTool) to
+The Make and Model tags are used by some image utilities (including ExifTool) to
 determine the format of the maker note information.  Deleting or changing either
 of these tags may prevent these utilities from recognizing or properly
 interpreting the maker notes.  Also beware that the maker notes information may
@@ -167,13 +172,95 @@ first place.
 
 <p>If you really want to delete the Make and Model information, you might as
 well delete the maker notes too.  You can do this with the following command:
-<font color='#880000'>
-<pre>    exiftool -make= -model= -makernotes:all= image.jpg
-</pre></font>
+<pre>exiftool -make= -model= -makernotes:all= image.jpg
+</pre>
+</blockquote>
+
+<a name="Q9"></a>
+<p>9a. <b>"The information is different when I copy all tags to a new file"</b>, or
+<br>9b. <b>"The tag locations change when I use <code>'-tagsfromfile'</code>
+to copy information"</b>
+
+<blockquote>
+This feature is explained in the
+<a href="exiftool_pod.html#item__2dtagsfromfile_srcfile_or_fmt">exiftool
+application documentation</a>, but the question is common enough that it is
+discussed in more detail here:
+
+<p>By default, ExifTool will store information in preferred locations when
+either writing new information or copying information between files. This
+freedom allows ExifTool to write or copy information to files of different
+formats without requiring the user to know details about where the information
+is stored.
+
+<p>The preferred locations for information written to JPEG images are 1) EXIF,
+2) GPS, 3) IPTC, 4) XMP and 5) MakerNotes.  As an example, information extracted
+from the maker notes will be preferentially written (on a tag-by-tag basis) in
+EXIF format when copying information between two JPEG images.  But if a specific
+tag doesn't exist in EXIF, then the tag is written to the first valid group in
+the order specified above.  The advantage of "translating" the information to
+EXIF is that it then becomes readable by applications which only support
+standard EXIF. The disadvantage is that you don't get an exact copy of the
+original information structure.
+
+<p>But ExifTool gives you the ability to customize this behaviour to write the
+information to wherever you want.  This is done by specifying a group name for
+the tag(s) to be copied.  This applies even if the group name is
+<code>'all'</code>, in which case the original group is preserved.  So to copy
+all information and preserve the original structure, use this syntax:
+
+<pre>exiftool -tagsfromfile src.jpg -all:all dst.jpg
+</pre>
+
+By specifying a group name with <code>'-all:all'</code>, the location of the
+information is preserved.  (Specifically, since no destination group was
+specified the source group <code>'all'</code> was assumed, thus preserving
+the original group.)
+
+<p>Now, in case this isn't confusing enough for you, here are some examples to
+show you the type of control you have over where the information is written.
+All commands in each example are equivalent:
+
+<pre><span id='BLK'># copy all tags to preferred groups (no destination group)</span>
+exiftool -tagsfromfile src.jpg dst.jpg
+exiftool -tagsfromfile src.jpg -all dst.jpg
+exiftool -tagsfromfile src.jpg "-all&gt;all" dst.jpg
+exiftool -tagsfromfile src.jpg "-all:all&gt;all" dst.jpg
+
+<span id='BLK'># copy all tags, preserving original group (destination group 'all')</span>
+exiftool -tagsfromfile src.jpg -all:all dst.jpg
+exiftool -tagsfromfile src.jpg "-all&gt;all:all" dst.jpg
+exiftool -tagsfromfile src.jpg "-all:all&gt;all:all" dst.jpg
+
+<span id='BLK'># copy all tags to EXIF group only (destination group 'exif')</span>
+exiftool -tagsfromfile src.jpg "-all&gt;exif:all" dst.jpg
+exiftool -tagsfromfile src.jpg "-all:all&gt;exif:all" dst.jpg
+
+<span id='BLK'># copy XMP tags to XMP group (destination group 'xmp' or 'all')</span>
+exiftool -tagsfromfile src.jpg "-xmp:all" dst.jpg
+exiftool -tagsfromfile src.jpg "-xmp:all&gt;xmp:all" dst.jpg
+exiftool -tagsfromfile src.jpg "-xmp:all&gt;all:all" dst.jpg
+
+<span id='BLK'># copy XMP tags to preferred groups (no destination group)</span>
+exiftool -tagsfromfile src.jpg "-xmp:all&gt;all" dst.jpg
+
+<span id='BLK'># copy XMP tags to EXIF only (destination group 'exif')</span>
+exiftool -tagsfromfile src.jpg "-xmp:all&gt;exif:all" dst.jpg
+</pre>
+
+The same rules illustrated above also apply when copying individual tags.
+
+<p>Note: If no destination group is specified, a new tag is created if necessary
+only in the preferred group, but if the same tag already exists in another
+group, then this information is also updated.  (Otherwise inconsistent values
+for the same information would exist in different locations. Of course, you
+can always generate inconsistencies like this by specifically writing
+contradictory information to different groups, but you wouldn't do this now,
+would you?)
 </blockquote>
 
 <hr>
-<i>Last revised Nov. 16, 2005</i>
+<i>Last revised Feb. 7, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

@@ -1,12 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
 [File, File, Time]  - File Modification Date/Time: 2005:01:31 11:57:40
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 16
-[File, File, Image]  - Image Height: 16
+[File, File, Image]  - Image Width: 8
+[File, File, Image]  - Image Height: 8
 [EXIF, IFD0, Camera] 271 - Make: NIKON CORPORATION
 [EXIF, IFD0, Camera] 272 - Camera Model Name: NIKON D70
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -14,18 +14,18 @@
 [EXIF, IFD0, Image] 283 - Y Resolution: 300
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: Ver.1.02 
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2005:01:14 08:57:59
+[EXIF, IFD0, Time] 306 - Modify Date: 2005:01:14 08:57:59
 [EXIF, IFD0, Camera] 318 - White Point: 0.313 0.329
 [EXIF, IFD0, Image] 319 - Primary Chromaticities: 0.64 0.33 0.21 0.71 0.15 0.06
 [EXIF, IFD0, Image] 529 - Y Cb Cr Coefficients: 0.299 0.587 0.114
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/60
-[EXIF, ExifIFD, Image] 33437 - Aperture: 5.0
+[EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/60
+[EXIF, ExifIFD, Image] 33437 - F Number: 5.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Aperture-priority AE
-[EXIF, ExifIFD, Image] 34855 - ISO Speed: 200
+[EXIF, ExifIFD, Image] 34855 - ISO: 200
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2005:01:14 08:57:59
-[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2005:01:14 08:57:59
+[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2005:01:14 08:57:59
+[EXIF, ExifIFD, Time] 36868 - Create Date: 2005:01:14 08:57:59
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 4
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
@@ -61,7 +61,7 @@
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown (0)
 [EXIF, ExifIFD, Image] 42240 - Gamma: 2.2
 [MakerNotes, Nikon, Camera] 1 - Firmware Version: 2.10
-[MakerNotes, Nikon, Image] 2 - ISO Speed: 200
+[MakerNotes, Nikon, Image] 2 - ISO: 200
 [MakerNotes, Nikon, Camera] 4 - Quality: Fine
 [MakerNotes, Nikon, Camera] 5 - White Balance: Auto
 [MakerNotes, Nikon, Camera] 6 - Sharpness: Med.H
@@ -93,14 +93,13 @@
 [MakerNotes, Nikon, Camera] 144 - Light Source: Speedlight
 [MakerNotes, Nikon, Camera] 146 - Hue Adjustment: 0
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
-[MakerNotes, Nikon, Camera] 0 - Red Balance: 2.33203
-[MakerNotes, Nikon, Camera] 1 - Blue Balance: 1.41016
+[MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 597 256 361 256
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 4.6
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 33
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 0.63 m
 [MakerNotes, Nikon, Camera] 10 - Focal Length: 56.6mm
-[MakerNotes, Nikon, Camera] 11 - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
+[MakerNotes, Nikon, Camera] 11 - Lens ID Number: 127
 [MakerNotes, Nikon, Camera] 12 - Lens F Stops: 5.33
 [MakerNotes, Nikon, Camera] 13 - Min Focal Length: 18.3mm
 [MakerNotes, Nikon, Camera] 14 - Max Focal Length: 71.3mm
@@ -122,7 +121,8 @@
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 71
 [Composite, Composite, Image]  - Aperture: 5.0
 [Composite, Composite, Camera]  - Flash: On
-[Composite, Composite, Image]  - Image Size: 16x16
+[Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Camera]  - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
 [Composite, Composite, Camera]  - Lens: 18-70mm f/3.5-4.5 G
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/60
@@ -130,4 +130,4 @@
 [Composite, Composite, Image]  - Depth of Field: 0.02 m (0.62 - 0.64)
 [Composite, Composite, Camera]  - Focal Length: 56.0mm (35mm equivalent: 84.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 31.31 m
-[Composite, Composite, Image]  - Shooting Date/Time: 2005:01:14 08:57:59.20
+[Composite, Composite, Image]  - Date/Time Original: 2005:01:14 08:57:59.20

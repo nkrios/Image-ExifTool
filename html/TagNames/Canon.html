@@ -55,7 +55,7 @@
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x000a</td>
-<td>CanonColorInfoD30</td>
+<td>ColorInfoD30</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#ColorInfoD30'>Canon ColorInfoD30 Tags</a></td></tr>
 <tr valign='top'>
@@ -65,9 +65,9 @@
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x000d</td>
-<td>CanonLensInfo1D</td>
+<td>CanonCameraInfo</td>
 <td align='center'>-</td>
-<td>--&gt; <a href='Canon.html#LensInfo1D'>Canon LensInfo1D Tags</a></td></tr>
+<td>--&gt; <a href='Canon.html#CameraInfo'>Canon CameraInfo Tags</a></td></tr>
 <tr valign='top'>
 <td>0x000e</td>
 <td>CanonFileLength</td>
@@ -75,53 +75,223 @@
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x000f</td>
-<td>CanonCustomFunctions10D
+<td>CanonCustomFunctions1D
+  <br>CanonCustomFunctions5D
+  <br>CanonCustomFunctions10D
   <br>CanonCustomFunctions20D
-  <br>CanonCustomFunctionsD30</td>
-<td align='center'>-<br>-<br>-</td>
-<td>--&gt; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D Tags</a>
+  <br>CanonCustomFunctions350D
+  <br>CanonCustomFunctionsD30
+  <br>CanonCustomFunctionsD60
+  <br>CanonCustomFunctionsUnknown</td>
+<td align='center'>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
+<td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#Functions5D'>CanonCustom Functions5D Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D Tags</a>
-  <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a></td></tr>
+  <br>--&gt; <a href='CanonCustom.html#Functions350D'>CanonCustom Functions350D Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#FuncsUnknown'>CanonCustom FuncsUnknown Tags</a></td></tr>
 <tr valign='top'>
+<td>0x0010</td>
+<td>CanonModelID</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>0x1010000 = PowerShot A30
+  <br>0x1040000 = PowerShot S300 / Digital IXUS 300 / IXY Digital 300
+  <br>0x1060000 = PowerShot A20
+  <br>0x1080000 = PowerShot A10
+  <br>0x1090000 = PowerShot S110 / Digital IXUS v / IXY Digital 200
+  <br>0x1100000 = PowerShot G2
+  <br>0x1110000 = PowerShot S40
+  <br>0x1120000 = PowerShot S30
+  <br>0x1130000 = PowerShot A40
+  <br>0x1140000 = EOS D30
+  <br>0x1150000 = PowerShot A100
+  <br>0x1160000 = PowerShot S200 / Digital IXUS v2 / IXY Digital 200a
+  <br>0x1170000 = PowerShot A200
+  <br>0x1180000 = PowerShot S330 / Digital IXUS 330 / IXY Digital 300a
+  <br>0x1190000 = PowerShot G3
+  <br>0x1210000 = PowerShot S45
+  <br>0x1230000 = PowerShot SD100 / Digital IXUS II / IXY Digital 30
+  <br>0x1240000 = PowerShot S230 / Digital IXUS v3 / IXY Digital 320
+  <br>0x1250000 = PowerShot A70
+  <br>0x1260000 = PowerShot A60
+  <br>0x1270000 = PowerShot S400 / Digital IXUS 400 / IXY Digital 400
+  <br>0x1290000 = PowerShot G5
+  <br>0x1300000 = PowerShot A300
+  <br>0x1310000 = PowerShot S50
+  <br>0x1340000 = PowerShot A80
+  <br>0x1350000 = PowerShot SD10 / Digital IXUS i / IXY Digital L
+  <br>0x1360000 = PowerShot S1 IS
+  <br>0x1370000 = PowerShot Pro1
+  <br>0x1380000 = PowerShot S70
+  <br>0x1390000 = PowerShot S60
+  <br>0x1400000 = PowerShot G6
+  <br>0x1410000 = PowerShot S500 / Digital IXUS 500 / IXY Digital 500
+  <br>0x1420000 = PowerShot A75
+  <br>0x1440000 = PowerShot SD110 / Digital IXUS IIs / IXY Digital 30a
+  <br>0x1450000 = PowerShot A400
+  <br>0x1470000 = PowerShot A310
+  <br>0x1490000 = PowerShot A85
+  <br>0x1520000 = PowerShot S410 / Digital IXUS 430 / IXY Digital 450
+  <br>0x1530000 = PowerShot A95
+  <br>0x1540000 = PowerShot SD300 / Digital IXUS 40 / IXY Digital 50
+  <br>0x1550000 = PowerShot SD200 / Digital IXUS 30 / IXY Digital 40
+  <br>0x1560000 = PowerShot A520
+  <br>0x1570000 = PowerShot A510
+  <br>0x1590000 = PowerShot SD20 / Digital IXUS i5 / IXY Digital L2
+  <br>0x1640000 = PowerShot S2 IS
+  <br>0x1650000 = PowerShot SD430 / IXUS Wireless / IXY Wireless
+  <br>0x1660000 = PowerShot SD500 / Digital IXUS 700 / IXY Digital 600
+  <br>0x1668000 = EOS D60
+  <br>0x1700000 = PowerShot SD30 / Digital IXUS i zoom / IXY Digital L3
+  <br>0x1750000 = PowerShot A410
+  <br>0x1760000 = PowerShot S80
+  <br>0x1780000 = PowerShot A620
+  <br>0x1790000 = PowerShot A610
+  <br>0x1810000 = PowerShot SD450 / Digital IXUS 55 / IXY Digital 60
+  <br>0x1870000 = PowerShot SD400 / Digital IXUS 50 / IXY Digital 55
+  <br>0x1900000 = PowerShot SD550 / Digital IXUS 750 / IXY Digital 700
+  <br>0x3010000 = PowerShot Pro90 IS
+  <br>0x4040000 = PowerShot G1
+  <br>0x6040000 = PowerShot S100 / Digital IXUS / IXY Digital
+  <br>0x80000001 = EOS-1D
+  <br>0x80000167 = EOS-1DS
+  <br>0x80000168 = EOS 10D
+  <br>0x80000170 = EOS Digital Rebel / 300D / Kiss Digital
+  <br>0x80000174 = EOS-1D Mark II
+  <br>0x80000175 = EOS 20D
+  <br>0x80000188 = EOS-1Ds Mark II
+  <br>0x80000189 = EOS Digital Rebel XT / 350D / Kiss Digital N
+  <br>0x80000213 = EOS 5D
+  <br>0x80000232 = EOS-1D Mark II N</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0012</td>
 <td>CanonPictureInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#PictureInfo'>Canon PictureInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x0015</td>
+<td>SerialNumberFormat</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>0x90000000 = Format 1
+  <br>0xa0000000 = Format 2</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0090</td>
 <td>CanonCustomFunctions1D</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a></td></tr>
 <tr valign='top'>
+<td>0x0091</td>
+<td>PersonalFunctions</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='CanonCustom.html#PersonalFuncs'>CanonCustom PersonalFuncs Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0092</td>
+<td>PersonalFunctionValues</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='CanonCustom.html#PersonalFuncValues'>CanonCustom PersonalFuncValues Tags</a></td></tr>
+<tr valign='top'>
 <td>0x0093</td>
 <td>CanonFileInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#FileInfo'>Canon FileInfo Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0094</td>
+<td>AFPointsUsed1D</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(5 rows: A1-7, B1-10, C1-11, D1-10, E1-7, center point is C6)</font></font></td></tr>
+<tr valign='top'>
 <td>0x0095</td>
 <td>LensType</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x00a0</td>
+<td>ProccessingInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#Processing'>Canon Processing Tags</a></td></tr>
+<tr valign='top'>
+<td>0x00a1</td>
+<td>ToneCurveTable</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x00a2</td>
+<td>SharpnessTable</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0x00a0</td>
-<td>CanonColorInfo</td>
-<td align='center'>-</td>
-<td>--&gt; <a href='Canon.html#ColorInfo'>Canon ColorInfo Tags</a></td></tr>
+<td>0x00a3</td>
+<td>SharpnessFreqTable</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td>0x00a9</td>
+<td>0x00a4</td>
 <td>WhiteBalanceTable</td>
-<td align='center'>-</td>
-<td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Tags</a></td></tr>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x00a9</td>
+<td>ColorBalance</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#ColorBalance'>Canon ColorBalance Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00ae</td>
 <td>ColorTemperature</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x00b0</td>
+<td>CanonFlags</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#Flags'>Canon Flags Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x00b1</td>
+<td>ModifiedInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#ModifiedInfo'>Canon ModifiedInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x00b2</td>
+<td>ToneCurveMatching</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x00b3</td>
+<td>WhiteBalanceMatching</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x00b4</td>
+<td>ColorSpace</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = sRGB
+  <br>2 = Adobe RGB</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x00b6</td>
 <td>PreviewImageInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#PreviewImageInfo'>Canon PreviewImageInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x00e0</td>
+<td>SensorInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#SensorInfo'>Canon SensorInfo Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x4001</td>
+<td>ColorBalance1
+  <br>ColorBalance2
+  <br>ColorBalance3
+  <br>ColorBalanceUnknown</td>
+<td align='center'>-<br>-<br>-<br>N</td>
+<td>--&gt; <a href='Canon.html#ColorBalance1'>Canon ColorBalance1 Tags</a>
+  <br>--&gt; <a href='Canon.html#ColorBalance2'>Canon ColorBalance2 Tags</a>
+  <br>--&gt; <a href='Canon.html#ColorBalance3'>Canon ColorBalance3 Tags</a></td></tr>
+<tr valign='top'>
+<td>0x4003</td>
+<td>ColorInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#ColorInfo'>Canon ColorInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Canon CameraSettings Tags</a></h2>
@@ -144,7 +314,8 @@
 <td align='right'>3</td>
 <td>Quality</td>
 <td align='center'>int16s</td>
-<td><font size='-1'>2 = Normal
+<td><font size='-1'>1 = Economy
+  <br>2 = Normal
   <br>3 = Fine
   <br>4 = RAW
   <br>5 = Superfine</font></td></tr>
@@ -165,7 +336,11 @@
 <td>ContinuousDrive</td>
 <td align='center'>int16s</td>
 <td><font size='-1'>0 = Single
-  <br>1 = Continuous</font></td></tr>
+  <br>1 = Continuous
+  <br>2 = Movie
+  <br>3 = Continuous, Speed Priority
+  <br>4 = Continuous, Low
+  <br>5 = Continuous, High</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>7</td>
 <td>FocusMode</td>
@@ -176,14 +351,18 @@
   <br>3 = Manual Focus
   <br>4 = Single
   <br>5 = Continuous
-  <br>6 = Manual Focus</font></td></tr>
+  <br>6 = Manual Focus
+  <br>16 = Pan Focus</font></td></tr>
 <tr valign='top'>
 <td align='right'>10</td>
 <td>CanonImageSize</td>
 <td align='center'>int16s</td>
 <td><font size='-1'>0 = Large
   <br>1 = Medium
-  <br>2 = Small</font></td></tr>
+  <br>2 = Small
+  <br>5 = Medium 1
+  <br>6 = Medium 2
+  <br>7 = Medium 3</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>11</td>
 <td>EasyMode</td>
@@ -194,13 +373,28 @@
   <br>3 = Fast shutter
   <br>4 = Slow shutter
   <br>5 = Night
-  <br>6 = Black &amp; White
+  <br>6 = Gray Scale
   <br>7 = Sepia
   <br>8 = Portrait
   <br>9 = Sports
   <br>10 = Macro
-  <br>11 = Pan focus
-  <br>15 = Flash Off</font></td></tr>
+  <br>11 = Black &amp; White
+  <br>12 = Pan focus
+  <br>13 = Vivid
+  <br>14 = Neutral
+  <br>15 = Flash Off
+  <br>16 = Long Shutter
+  <br>17 = Super Macro
+  <br>18 = Foliage
+  <br>19 = Indoor
+  <br>20 = Fireworks
+  <br>21 = Beach
+  <br>22 = Underwater
+  <br>23 = Snow
+  <br>24 = Kids &amp; Pets
+  <br>25 = Night Snapshot
+  <br>26 = Digital Macro
+  <br>27 = My Colors</font></td></tr>
 <tr valign='top'>
 <td align='right'>12</td>
 <td>DigitalZoom</td>
@@ -228,31 +422,32 @@
 <td align='right'>16</td>
 <td>CameraISO</td>
 <td align='center'>int16s</td>
-<td><font size='-1'>0 = Use shot ISO instead
-  <br>15 = Auto
-  <br>16 = 50
-  <br>17 = 100
-  <br>18 = 200
-  <br>19 = 400</font></td></tr>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>17</td>
 <td>MeteringMode</td>
 <td align='center'>int16s</td>
 <td><font size='-1'>0 = Default
   <br>1 = Spot
+  <br>2 = Average
   <br>3 = Evaluative
   <br>4 = Partial
   <br>5 = Center-weighted averaging</font></td></tr>
 <tr valign='top'>
 <td align='right'>18</td>
-<td>FocusType</td>
+<td>FocusRange</td>
 <td align='center'>int16s</td>
 <td><font size='-1'>0 = Manual
-  <br>1 = Auto (1)
-  <br>2 = Auto (2)
-  <br>3 = Macro Mode
-  <br>7 = Infinity Mode
-  <br>8 = Locked (Pan Mode)</font></td></tr>
+  <br>1 = Auto
+  <br>2 = Not Known
+  <br>3 = Macro
+  <br>4 = Very Close
+  <br>5 = Close
+  <br>6 = Middle Range
+  <br>7 = Far Range
+  <br>8 = Pan Focus
+  <br>9 = Super Macro
+  <br>10 = Infinity</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>19</td>
 <td>AFPoint</td>
@@ -273,7 +468,8 @@
   <br>2 = Shutter Speed Priority AE
   <br>3 = Aperture-Priority AE
   <br>4 = Manual
-  <br>5 = Depth-of-field AE</font></td></tr>
+  <br>5 = Depth-of-field AE
+  <br>6 = M-Dep</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>22</td>
 <td>LensType</td>
@@ -287,9 +483,9 @@
   <br>13 = Canon EF 15mm f/2.8
   <br>21 = Canon EF 80-200mm f/2.8L
   <br>26 = Cosina 100mm f/3.5 Macro AF
-  <br>28 = Tamron AF Aspherical 28-200mm f/3.8-5.6
+  <br>28 = Tamron AF Aspherical 28-200mm f/3.8-5.6 or 28-200mm f/3.8-5.6
   <br>29 = Canon EF 50mm f/1.8 MkII
-  <br>32 = Canon EF 24mm f/2.8
+  <br>32 = Canon EF 24mm f/2.8 or Sigma 15mm f/2.8 EX Fisheye
   <br>39 = Canon EF 75-300mm f/4-5.6
   <br>40 = Canon EF 28-80mm f/3.5-5.6
   <br>43 = Canon EF 28-105mm f/4-5.6
@@ -330,6 +526,8 @@
   <br>198 = Canon EF 50mm f/1.4 USM
   <br>202 = Canon EF 28-80 f/3.5-5.6 USM IV
   <br>213 = Canon EF 90-300mm f/4.5-5.6
+  <br>224 = Canon EF 70-200mm f/2.8L IS USM
+  <br>225 = Canon EF 70-200mm f/2.8L IS USM + x1.4
   <br>229 = Canon EF 16-35mm f/2.8L
   <br>230 = Canon EF 24-70mm f/2.8L
   <br>231 = Canon EF 17-40mm f/4L</font></td></tr>
@@ -354,32 +552,77 @@
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td align='right'>27</td>
+<td>MinAperture</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>28</td>
 <td>FlashActivity</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>29</td>
 <td>FlashBits</td>
-<td align='center'>int16s~</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
+<td align='center'>int16s</td>
+<td><font size='-1'>Bit 0 = Manual
+  <br>Bit 1 = TTL
+  <br>Bit 2 = A-TTL
+  <br>Bit 3 = E-TTL
+  <br>Bit 4 = FP sync enabled
+  <br>Bit 7 = 2nd-curtain sync used
+  <br>Bit 11 = FP sync used
+  <br>Bit 13 = Built-in
+  <br>Bit 14 = External</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>32</td>
 <td>FocusContinuous</td>
 <td align='center'>int16s</td>
 <td><font size='-1'>0 = Single
   <br>1 = Continuous</font></td></tr>
+<tr valign='top'>
+<td align='right'>33</td>
+<td>AESetting</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Normal AE
+  <br>1 = Exposure Compensation
+  <br>2 = AE Lock
+  <br>3 = AE Lock + Exposure Comp.
+  <br>4 = No AE</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>34</td>
+<td>ImageStabilization</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
+<td align='right'>35</td>
+<td>DisplayAperture</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>36</td>
-<td>ZoomedResolution</td>
+<td>ZoomSourceWidth</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>37</td>
-<td>ZoomedResolutionBase</td>
+<td>ZoomTargetWidth</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>40</td>
+<td>PhotoEffect</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Off
+  <br>1 = Vivid
+  <br>2 = Neutral
+  <br>3 = Smooth
+  <br>4 = Sepia
+  <br>5 = B&amp;W
+  <br>6 = Custom
+  <br>100 = My Color Data</font></td></tr>
+<tr valign='top'>
 <td align='right'>42</td>
 <td>ColorTone</td>
 <td align='center'>int16s</td>
@@ -395,8 +638,7 @@
 <td align='right'>0</td>
 <td>FocalType</td>
 <td align='center'>int16u</td>
-<td><font size='-1'><font color="#666666">(1D Mark II only)</font>
-  <br>1 = Fixed
+<td><font size='-1'>1 = Fixed
   <br>2 = Zoom</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
@@ -453,19 +695,38 @@
   <br>6 = Custom
   <br>7 = Black &amp; White
   <br>8 = Shade
-  <br>9 = Manual temperature
+  <br>9 = Manual Temperature (Kelvin)
+  <br>10 = PC Set1
+  <br>11 = PC Set2
+  <br>12 = PC Set3
   <br>14 = Daylight Fluorescent
+  <br>15 = Custom 1
+  <br>16 = Custom 2
   <br>17 = Underwater</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>8</td>
+<td>SlowShutter</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Off
+  <br>1 = Night Scene
+  <br>2 = On
+  <br>3 = None</font></td></tr>
+<tr valign='top'>
 <td align='right'>9</td>
 <td>SequenceNumber</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>13</td>
+<td>FlashGuideNumber</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>14</td>
-<td>IxusAFPoint</td>
+<td>AFPointsUsed2</td>
 <td align='center'>int16s</td>
-<td><font size='-1'>0x3000 = None (MF)
+<td><font size='-1'><font color="#666666">(used by D30, D60 and some PowerShot/Ixus models)</font>
+  <br>0x3000 = None (MF)
   <br>0x3001 = Right
   <br>0x3002 = Center
   <br>0x3003 = Center+Right
@@ -483,7 +744,10 @@
 <td>AutoExposureBracketing</td>
 <td align='center'>int16s</td>
 <td><font size='-1'>-1 = On
-  <br>0 = Off</font></td></tr>
+  <br>0 = Off
+  <br>1 = On (shot 1)
+  <br>2 = On (shot 2)
+  <br>3 = On (shot 3)</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>17</td>
 <td>AEBBracketValue</td>
@@ -568,8 +832,8 @@
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='LensInfo1D'>Canon LensInfo1D Tags</a></h2>
-Lens information for the 1D, 1DS and 1D Mark II only.
+<h2><a name='CameraInfo'>Canon CameraInfo Tags</a></h2>
+Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
@@ -597,9 +861,9 @@ Lens information for the 1D, 1DS and 1D Mark II only.
   <br>13 = Canon EF 15mm f/2.8
   <br>21 = Canon EF 80-200mm f/2.8L
   <br>26 = Cosina 100mm f/3.5 Macro AF
-  <br>28 = Tamron AF Aspherical 28-200mm f/3.8-5.6
+  <br>28 = Tamron AF Aspherical 28-200mm f/3.8-5.6 or 28-200mm f/3.8-5.6
   <br>29 = Canon EF 50mm f/1.8 MkII
-  <br>32 = Canon EF 24mm f/2.8
+  <br>32 = Canon EF 24mm f/2.8 or Sigma 15mm f/2.8 EX Fisheye
   <br>39 = Canon EF 75-300mm f/4-5.6
   <br>40 = Canon EF 28-80mm f/3.5-5.6
   <br>43 = Canon EF 28-105mm f/4-5.6
@@ -640,6 +904,8 @@ Lens information for the 1D, 1DS and 1D Mark II only.
   <br>198 = Canon EF 50mm f/1.4 USM
   <br>202 = Canon EF 28-80 f/3.5-5.6 USM IV
   <br>213 = Canon EF 90-300mm f/4.5-5.6
+  <br>224 = Canon EF 70-200mm f/2.8L IS USM
+  <br>225 = Canon EF 70-200mm f/2.8L IS USM + x1.4
   <br>229 = Canon EF 16-35mm f/2.8L
   <br>230 = Canon EF 24-70mm f/2.8L
   <br>231 = Canon EF 17-40mm f/4L</font></td></tr>
@@ -647,19 +913,303 @@ Lens information for the 1D, 1DS and 1D Mark II only.
 <td align='right'>18</td>
 <td>ShortFocal</td>
 <td align='center'>int8u</td>
-<td><font size='-1'><font color="#666666">(1D Mark II only)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(1D and 5D only)</font></font></td></tr>
 <tr valign='top'>
 <td align='right'>20</td>
 <td>LongFocal</td>
 <td align='center'>int8u</td>
-<td><font size='-1'><font color="#666666">(1D Mark II only)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(1D and 5D only)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>45</td>
 <td>FocalType</td>
 <td align='center'>int8u</td>
-<td><font size='-1'><font color="#666666">(1D Mark II only)</font>
+<td><font size='-1'><font color="#666666">(1DmkII and 1DSmkII only)</font>
   <br>0 = Fixed
   <br>2 = Zoom</font></td></tr>
+<tr valign='top'>
+<td align='right'>56</td>
+<td>AFPointsUsed5D</td>
+<td align='center'>undef[2]</td>
+<td><font size='-1'><font color="#666666">(bit definitions are for big-endian int16u)</font>
+  <br>Bit 0 = Center
+  <br>Bit 1 = Top
+  <br>Bit 2 = Bottom
+  <br>Bit 3 = Upper-left
+  <br>Bit 4 = Upper-right
+  <br>Bit 5 = Lower-left
+  <br>Bit 6 = Lower-right
+  <br>Bit 7 = Left
+  <br>Bit 8 = Right
+  <br>Bit 9 = AI Servo1
+  <br>Bit 10 = AI Servo2
+  <br>Bit 11 = AI Servo3
+  <br>Bit 12 = AI Servo4
+  <br>Bit 13 = AI Servo5
+  <br>Bit 14 = AI Servo6</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>108</td>
+<td>PictureStyle</td>
+<td align='center'>int16u</td>
+<td><font size='-1'><font color="#666666">(5D only; 1DmkII values are currently unknown)</font>
+  <br>0x21 = User Def. 1
+  <br>0x22 = User Def. 2
+  <br>0x23 = User Def. 3
+  <br>0x41 = Nostalgia
+  <br>0x42 = Clear
+  <br>0x43 = Twilight
+  <br>0x81 = Standard
+  <br>0x82 = Portrait
+  <br>0x83 = Landscape
+  <br>0x84 = Neutral
+  <br>0x85 = Faithful
+  <br>0x86 = Monochrome</font></td></tr>
+<tr valign='top'>
+<td align='right'>164</td>
+<td>FirmwareRevision</td>
+<td align='center'>string[8]</td>
+<td><font size='-1'><font color="#666666">(5D only)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>172</td>
+<td>ShortOwnerName</td>
+<td align='center'>string[16]</td>
+<td><font size='-1'><font color="#666666">(5D only)</font></font></td></tr>
+<tr valign='top'>
+<td align='right'>208</td>
+<td>PictureNumber</td>
+<td align='center'>int16u</td>
+<td><font size='-1'><font color="#666666">(5D only)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>232</td>
+<td>ContrastStandard</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>233</td>
+<td>ContrastPortrait</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>234</td>
+<td>ContrastLandscape</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>235</td>
+<td>ContrastNeutral</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>236</td>
+<td>ContrastFaithful</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>237</td>
+<td>ContrastMonochrome</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>238</td>
+<td>ContrastUserDef1</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>239</td>
+<td>ContrastUserDef2</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>240</td>
+<td>ContrastUserDef3</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>241</td>
+<td>SharpnessStandard</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>242</td>
+<td>SharpnessPortrait</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>243</td>
+<td>SharpnessLandscape</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>244</td>
+<td>SharpnessNeutral</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>245</td>
+<td>SharpnessFaithful</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>246</td>
+<td>SharpnessMonochrome</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>247</td>
+<td>SharpnessUserDef1</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>248</td>
+<td>SharpnessUserDef2</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>249</td>
+<td>SharpnessUserDef3</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>250</td>
+<td>SaturationStandard</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>251</td>
+<td>SaturationPortrait</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>252</td>
+<td>SaturationLandscape</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>253</td>
+<td>SaturationNeutral</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>254</td>
+<td>SaturationFaithful</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>255</td>
+<td>FilterEffectMonochrome</td>
+<td align='center'>int8s</td>
+<td><font size='-1'>0 = None
+  <br>1 = Yellow
+  <br>2 = Orange
+  <br>3 = Red
+  <br>4 = Green</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>256</td>
+<td>SaturationUserDef1</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>257</td>
+<td>SaturationUserDef2</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>258</td>
+<td>SaturationUserDef3</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>259</td>
+<td>ColorToneStandard</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>260</td>
+<td>ColorTonePortrait</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>261</td>
+<td>ColorToneLandscape</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>262</td>
+<td>ColorToneNeutral</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>263</td>
+<td>ColorToneFaithful</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>264</td>
+<td>ToningEffectMonochrome</td>
+<td align='center'>int8s</td>
+<td><font size='-1'>0 = None
+  <br>1 = Sepia
+  <br>2 = Blue
+  <br>3 = Purple
+  <br>4 = Green</font></td></tr>
+<tr valign='top'>
+<td align='right'>265</td>
+<td>ColorToneUserDef1</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>266</td>
+<td>ColorToneUserDef2</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>267</td>
+<td>ColorToneUserDef3</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>268</td>
+<td>UserDef1PictureStyle</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0x41 = Nostalgia
+  <br>0x42 = Clear
+  <br>0x43 = Twilight
+  <br>0x81 = Standard
+  <br>0x82 = Portrait
+  <br>0x83 = Landscape
+  <br>0x84 = Neutral
+  <br>0x85 = Faithful
+  <br>0x86 = Monochrome</font></td></tr>
+<tr valign='top'>
+<td align='right'>270</td>
+<td>UserDef2PictureStyle</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0x41 = Nostalgia
+  <br>0x42 = Clear
+  <br>0x43 = Twilight
+  <br>0x81 = Standard
+  <br>0x82 = Portrait
+  <br>0x83 = Landscape
+  <br>0x84 = Neutral
+  <br>0x85 = Faithful
+  <br>0x86 = Monochrome</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>272</td>
+<td>UserDef3PictureStyle</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0x41 = Nostalgia
+  <br>0x42 = Clear
+  <br>0x43 = Twilight
+  <br>0x81 = Standard
+  <br>0x82 = Portrait
+  <br>0x83 = Landscape
+  <br>0x84 = Neutral
+  <br>0x85 = Faithful
+  <br>0x86 = Monochrome</font></td></tr>
+<tr valign='top'>
+<td align='right'>284</td>
+<td>TimeStamp</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PictureInfo'>Canon PictureInfo Tags</a></h2>
@@ -690,8 +1240,28 @@ Lens information for the 1D, 1DS and 1D Mark II only.
 <tr valign='top'>
 <td align='right'>22</td>
 <td>AFPointsUsed</td>
-<td align='center'>int16u~</td>
-<td><font size='-1'><font color="#666666">(bits 6-0 correspond to focus points 1-7 respectively)</font></font></td></tr>
+<td align='center'>int16u</td>
+<td><font size='-1'><font color="#666666">(10D, 300D and 350D)</font>
+  <br>Bit 0 = Right
+  <br>Bit 1 = Mid-right
+  <br>Bit 2 = Bottom
+  <br>Bit 3 = Center
+  <br>Bit 4 = Top
+  <br>Bit 5 = Mid-left
+  <br>Bit 6 = Left</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>26</td>
+<td>AFPointsUsed20D</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>Bit 0 = Top
+  <br>Bit 1 = Upper-left
+  <br>Bit 2 = Upper-right
+  <br>Bit 3 = Left
+  <br>Bit 4 = Center
+  <br>Bit 5 = Right
+  <br>Bit 6 = Lower-left
+  <br>Bit 7 = Lower-right
+  <br>Bit 8 = Bottom</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FileInfo'>Canon FileInfo Tags</a></h2>
@@ -705,114 +1275,352 @@ Lens information for the 1D, 1DS and 1D Mark II only.
   <br>ShutterCount</td>
 <td align='center'>int32u<br>int32u</td>
 <td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>3</td>
+<td>BracketMode</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Off
+  <br>1 = AEB
+  <br>2 = FEB
+  <br>3 = ISO
+  <br>4 = WB</font></td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>BracketValue</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>5</td>
+<td>BracketShotNumber</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>RawJpgQuality</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>1 = Economy
+  <br>2 = Normal
+  <br>3 = Fine
+  <br>4 = RAW
+  <br>5 = Superfine</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>7</td>
+<td>RawJpgSize</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Large
+  <br>1 = Medium
+  <br>2 = Small
+  <br>5 = Medium 1
+  <br>6 = Medium 2
+  <br>7 = Medium 3</font></td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>NoiseReduction</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On (mode 1)
+  <br>2 = On (mode 2)</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>9</td>
+<td>WBBracketMode</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On (shift AB)
+  <br>2 = On (shift GB)</font></td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>WBBracketValueAB</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>13</td>
+<td>WBBracketValueGM</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>FilterEffect</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = None
+  <br>1 = Yellow
+  <br>2 = Orange
+  <br>3 = Red
+  <br>4 = Green</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>15</td>
+<td>ToningEffect</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = None
+  <br>1 = Sepia
+  <br>2 = Blue
+  <br>3 = Purple
+  <br>4 = Green</font></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='ColorInfo'>Canon ColorInfo Tags</a></h2>
+<h2><a name='Processing'>Canon Processing Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td align='right'>1</td>
+<td>ToneCurve</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Standard
+  <br>1 = Manual
+  <br>2 = Custom</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>Sharpness</td>
+<td align='center'>int16s</td>
+<td><font size='-1'><font color="#666666">(1D and 5D only)</font></font></td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>SharpnessFrequency</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = n/a
+  <br>1 = Lowest
+  <br>2 = Low
+  <br>3 = Standard
+  <br>4 = High
+  <br>5 = Highest</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>SensorRedLevel</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>SensorBlueLevel</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>6</td>
+<td>WhiteBalanceRed</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>WhiteBalanceBlue</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>8</td>
+<td>WhiteBalance</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Cloudy
+  <br>3 = Tungsten
+  <br>4 = Fluorescent
+  <br>5 = Flash
+  <br>6 = Custom
+  <br>7 = Black &amp; White
+  <br>8 = Shade
+  <br>9 = Manual Temperature (Kelvin)
+  <br>10 = PC Set1
+  <br>11 = PC Set2
+  <br>12 = PC Set3
+  <br>14 = Daylight Fluorescent
+  <br>15 = Custom 1
+  <br>16 = Custom 2
+  <br>17 = Underwater</font></td></tr>
+<tr valign='top'>
 <td align='right'>9</td>
 <td>ColorTemperature</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>10</td>
+<td>PictureStyle</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0x21 = User Def. 1
+  <br>0x22 = User Def. 2
+  <br>0x23 = User Def. 3
+  <br>0x41 = Nostalgia
+  <br>0x42 = Clear
+  <br>0x43 = Twilight
+  <br>0x81 = Standard
+  <br>0x82 = Portrait
+  <br>0x83 = Landscape
+  <br>0x84 = Neutral
+  <br>0x85 = Faithful
+  <br>0x86 = Monochrome</font></td></tr>
+<tr valign='top'>
+<td align='right'>11</td>
+<td>DigitalGain</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>12</td>
+<td>WBShiftAB</td>
+<td align='center'>int16s</td>
+<td><font size='-1'><font color="#666666">(positive is a shift toward red)</font></font></td></tr>
+<tr valign='top'>
+<td align='right'>13</td>
+<td>WBShiftGM</td>
+<td align='center'>int16s</td>
+<td><font size='-1'><font color="#666666">(positive is a shift toward yellow/green)</font></font></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='WhiteBalance'>Canon WhiteBalance Tags</a></h2>
+<h2><a name='ColorBalance'>Canon ColorBalance Tags</a></h2>
+This table is used by the 10D and 300D.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>0</td>
-<td>RedBalanceAuto</td>
-<td align='center'>N</td>
+<td>WB_RGGBLevelsAuto</td>
+<td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>1</td>
-<td>BlueBalanceAuto</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>2</td>
-<td>RedBalanceDaylight</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>3</td>
-<td>BlueBalanceDaylight</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
 <td align='right'>4</td>
-<td>RedBalanceCloudy</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>5</td>
-<td>BlueBalanceCloudy</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>6</td>
-<td>RedBalanceTungsten</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>7</td>
-<td>BlueBalanceTungsten</td>
-<td align='center'>N</td>
+<td>WB_RGGBLevelsDaylight</td>
+<td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>8</td>
-<td>RedBalanceFluorescent</td>
-<td align='center'>N</td>
+<td>WB_RGGBLevelsShade</td>
+<td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>9</td>
-<td>BlueBalanceFluorescent</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>10</td>
-<td>RedBalanceFlash</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>11</td>
-<td>BlueBalanceFlash</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
 <td align='right'>12</td>
-<td>RedBalanceCustom</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>13</td>
-<td>BlueBalanceCustom</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>14</td>
-<td>RedBalanceB&amp;W</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>15</td>
-<td>BlueBalanceB&amp;W</td>
-<td align='center'>N</td>
+<td>WB_RGGBLevelsCloudy</td>
+<td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>16</td>
-<td>RedBalanceShade</td>
-<td align='center'>N</td>
+<td>WB_RGGBLevelsTungsten</td>
+<td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>17</td>
-<td>BlueBalanceShade</td>
-<td align='center'>N</td>
+<td align='right'>20</td>
+<td>WB_RGGBLevelsFluorescent</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>24</td>
+<td>WB_RGGBLevelsFlash</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>28</td>
+<td>WB_RGGBLevelsCustom</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>32</td>
+<td>WB_RGGBLevelsKelvin</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Flags'>Canon Flags Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>1</td>
+<td>ModifiedParamFlag</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ModifiedInfo'>Canon ModifiedInfo Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>1</td>
+<td>ModifiedToneCurve</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Standard
+  <br>1 = Manual
+  <br>2 = Custom</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>ModifiedSharpness</td>
+<td align='center'>int16s</td>
+<td><font size='-1'><font color="#666666">(1D and 5D only)</font></font></td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>ModifiedSharpnessFreq</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = n/a
+  <br>1 = Smoothest
+  <br>2 = Smooth
+  <br>3 = Standard
+  <br>4 = Sharp
+  <br>5 = Sharpest</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>ModifiedSensorRedLevel</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>ModifiedSensorBlueLevel</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>6</td>
+<td>ModifiedWhiteBalanceRed</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>ModifiedWhiteBalanceBlue</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>8</td>
+<td>ModifiedWhiteBalance</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Cloudy
+  <br>3 = Tungsten
+  <br>4 = Fluorescent
+  <br>5 = Flash
+  <br>6 = Custom
+  <br>7 = Black &amp; White
+  <br>8 = Shade
+  <br>9 = Manual Temperature (Kelvin)
+  <br>10 = PC Set1
+  <br>11 = PC Set2
+  <br>12 = PC Set3
+  <br>14 = Daylight Fluorescent
+  <br>15 = Custom 1
+  <br>16 = Custom 2
+  <br>17 = Underwater</font></td></tr>
+<tr valign='top'>
+<td align='right'>9</td>
+<td>ModifiedColorTemp</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>10</td>
+<td>ModifiedPictureStyle</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0x21 = User Def. 1
+  <br>0x22 = User Def. 2
+  <br>0x23 = User Def. 3
+  <br>0x41 = Nostalgia
+  <br>0x42 = Clear
+  <br>0x43 = Twilight
+  <br>0x81 = Standard
+  <br>0x82 = Portrait
+  <br>0x83 = Landscape
+  <br>0x84 = Neutral
+  <br>0x85 = Faithful
+  <br>0x86 = Monochrome</font></td></tr>
+<tr valign='top'>
+<td align='right'>11</td>
+<td>ModifiedDigitalGain</td>
+<td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -822,40 +1630,653 @@ Lens information for the 1D, 1DS and 1D Mark II only.
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td align='right'>1</td>
+<td>PreviewQuality</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>1 = Economy
+  <br>2 = Normal
+  <br>3 = Fine
+  <br>4 = RAW
+  <br>5 = Superfine</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>2</td>
 <td>PreviewImageLength</td>
 <td align='center'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>3</td>
 <td>PreviewImageWidth</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>4</td>
 <td>PreviewImageHeight</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>5</td>
 <td>PreviewImageStart</td>
 <td align='center'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>6</td>
 <td>PreviewFocalPlaneXResolution</td>
-<td align='center'>rational32s</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>PreviewFocalPlaneYResolution</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SensorInfo'>Canon SensorInfo Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>1</td>
+<td>SensorWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>SensorHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>5</td>
+<td>SensorLeftBorder</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>6</td>
+<td>SensorTopBorder</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>SensorRightBorder</td>
+<td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>8</td>
-<td>PreviewFocalPlaneYResolution</td>
-<td align='center'>rational32s</td>
+<td>SensorBottomBorder</td>
+<td align='center'>N</td>
 <td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ColorBalance1'>Canon ColorBalance1 Tags</a></h2>
+This table is used by the 20D and 350D.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>25</td>
+<td>WB_RGGBLevelsAsShot</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>29</td>
+<td>ColorTempAsShot</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>30</td>
+<td>WB_RGGBLevelsAuto</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>34</td>
+<td>ColorTempAuto2</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>35</td>
+<td>WB_RGGBLevelsDaylight</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>39</td>
+<td>ColorTempDaylight</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>40</td>
+<td>WB_RGGBLevelsShade</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>44</td>
+<td>ColorTempShade</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>45</td>
+<td>WB_RGGBLevelsCloudy</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>49</td>
+<td>ColorTempCloudy</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>50</td>
+<td>WB_RGGBLevelsTungsten</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>54</td>
+<td>ColorTempTungsten</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>55</td>
+<td>WB_RGGBLevelsFluorescent</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>59</td>
+<td>ColorTempFluorescent</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>60</td>
+<td>WB_RGGBLevelsFlash</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>64</td>
+<td>ColorTempFlash</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>65</td>
+<td>WB_RGGBLevelsCustom1</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>69</td>
+<td>ColorTempCustom1</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>70</td>
+<td>WB_RGGBLevelsCustom2</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>74</td>
+<td>ColorTempCustom2</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ColorBalance2'>Canon ColorBalance2 Tags</a></h2>
+This table is used by the 1DmkII and 1DSmkII.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>24</td>
+<td>WB_RGGBLevelsAsShot</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>28</td>
+<td>ColorTempAsShot</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>29</td>
+<td>WB_RGGBLevelsUnknown?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>33</td>
+<td>ColorTempUnknown?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>34</td>
+<td>WB_RGGBLevelsAuto</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>38</td>
+<td>ColorTempAuto</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>39</td>
+<td>WB_RGGBLevelsDaylight</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>43</td>
+<td>ColorTempDaylight</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>44</td>
+<td>WB_RGGBLevelsShade</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>48</td>
+<td>ColorTempShade</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>49</td>
+<td>WB_RGGBLevelsCloudy</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>53</td>
+<td>ColorTempCloudy</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>54</td>
+<td>WB_RGGBLevelsTungsten</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>58</td>
+<td>ColorTempTungsten</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>59</td>
+<td>WB_RGGBLevelsFluorescent</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>63</td>
+<td>ColorTempFluorescent</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>64</td>
+<td>WB_RGGBLevelsKelvin</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>68</td>
+<td>ColorTempKelvin</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>69</td>
+<td>WB_RGGBLevelsFlash</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>73</td>
+<td>ColorTempFlash</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>74</td>
+<td>WB_RGGBLevelsUnknown2?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>78</td>
+<td>ColorTempUnknown2?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>79</td>
+<td>WB_RGGBLevelsUnknown3?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>83</td>
+<td>ColorTempUnknown3?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>84</td>
+<td>WB_RGGBLevelsUnknown4?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>88</td>
+<td>ColorTempUnknown4?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>89</td>
+<td>WB_RGGBLevelsUnknown5?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>93</td>
+<td>ColorTempUnknown5?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>94</td>
+<td>WB_RGGBLevelsUnknown6?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>98</td>
+<td>ColorTempUnknown6?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>99</td>
+<td>WB_RGGBLevelsUnknown7?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>103</td>
+<td>ColorTempUnknown7?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>104</td>
+<td>WB_RGGBLevelsUnknown8?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>108</td>
+<td>ColorTempUnknown8?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>109</td>
+<td>WB_RGGBLevelsUnknown9?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>113</td>
+<td>ColorTempUnknown9?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>114</td>
+<td>WB_RGGBLevelsUnknown10?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>118</td>
+<td>ColorTempUnknown10?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>119</td>
+<td>WB_RGGBLevelsUnknown11?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>123</td>
+<td>ColorTempUnknown11?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>124</td>
+<td>WB_RGGBLevelsUnknown12?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>128</td>
+<td>ColorTempUnknown12?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>129</td>
+<td>WB_RGGBLevelsUnknown13?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>133</td>
+<td>ColorTempUnknown13?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>134</td>
+<td>WB_RGGBLevelsUnknown14?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>138</td>
+<td>ColorTempUnknown14?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>139</td>
+<td>WB_RGGBLevelsUnknown15?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>143</td>
+<td>ColorTempUnknown15?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>144</td>
+<td>WB_RGGBLevelsPC1</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>148</td>
+<td>ColorTempPC1</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>149</td>
+<td>WB_RGGBLevelsPC2</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>153</td>
+<td>ColorTempPC2</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>154</td>
+<td>WB_RGGBLevelsPC3</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>158</td>
+<td>ColorTempPC3</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>159</td>
+<td>WB_RGGBLevelsUnknown16?</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>163</td>
+<td>ColorTempUnknown16?</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ColorBalance3'>Canon ColorBalance3 Tags</a></h2>
+This table is used by the 5D and 1DmkIIN.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>63</td>
+<td>WB_RGGBLevelsAsShot</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>67</td>
+<td>ColorTempAsShot</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>68</td>
+<td>WB_RGGBLevelsAuto</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>72</td>
+<td>ColorTempAuto</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>73</td>
+<td>WB_RGGBLevelsMeasured</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>77</td>
+<td>ColorTempMeasured</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>78</td>
+<td>WB_RGGBLevelsDaylight</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>82</td>
+<td>ColorTempDaylight</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>83</td>
+<td>WB_RGGBLevelsShade</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>87</td>
+<td>ColorTempShade</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>88</td>
+<td>WB_RGGBLevelsCloudy</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>92</td>
+<td>ColorTempCloudy</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>93</td>
+<td>WB_RGGBLevelsTungsten</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>97</td>
+<td>ColorTempTungsten</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>98</td>
+<td>WB_RGGBLevelsFluorescent</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>102</td>
+<td>ColorTempFluorescent</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>103</td>
+<td>WB_RGGBLevelsKelvin</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>107</td>
+<td>ColorTempKelvin</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>108</td>
+<td>WB_RGGBLevelsFlash</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>112</td>
+<td>ColorTempFlash</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>113</td>
+<td>WB_RGGBLevelsPC1</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>117</td>
+<td>ColorTempPC1</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>118</td>
+<td>WB_RGGBLevelsPC2</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>122</td>
+<td>ColorTempPC2</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>123</td>
+<td>WB_RGGBLevelsPC3</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>127</td>
+<td>ColorTempPC3</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>128</td>
+<td>WB_RGGBLevelsCustom</td>
+<td align='center'>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>132</td>
+<td>ColorTempCustom</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ColorInfo'>Canon ColorInfo Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>1</td>
+<td>Saturation</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>ColorHue</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>ColorSpace</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>1 = sRGB
+  <br>2 = Adobe RGB</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 14, 2005</i>
+<br><i>Last revised Feb 16, 2006</i>
 </body>
 </html>

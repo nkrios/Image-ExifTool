@@ -10,7 +10,6 @@ package Image::ExifTool::Photoshop;
 
 use strict;
 
-
 #------------------------------------------------------------------------------
 # Write Photoshop IRB resource
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
@@ -103,24 +102,37 @@ sub WritePhotoshop($$$)
                 next unless defined $value;     # next if tag is being deleted
                 $verbose > 1 and print $out "    + Photoshop:$$tagInfo{Name} = '$value'\n";
             }
-        } elsif ($$editDirs{$tagID}) {
-            $tagInfo = $$editDirs{$tagID};
-            $$addDirs{$tagID} and delete $$addDirs{$tagID};
-            my %subdirInfo = (
-                DataPt => $dataPt,
-                DirStart => $pos,
-                DataLen => $dirLen,
-                DirLen => $size,
-                Parent => $$dirInfo{DirName},
-            );
-            my $subTable = Image::ExifTool::GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-            my $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
-            if (defined $newValue) {
-                next unless length $newValue;   # remove subdirectory entry
-                $value = $newValue;
-            }
         } else {
-            $value = substr($$dataPt, $pos, $size);
+            $tagInfo = $$editDirs{$tagID};
+            unless ($tagInfo) {
+                $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
+                if ($tagInfo) {
+                    # rewrite all Photoshop subdirectories
+                    undef $tagInfo unless $$tagInfo{SubDirectory} and
+                        $tagInfo->{SubDirectory}->{TagTable} =~ /^Image::ExifTool::Photoshop/;
+                }
+            }
+            if ($tagInfo) {
+                $$addDirs{$tagID} and delete $$addDirs{$tagID};
+                my %subdirInfo = (
+                    DataPt => $dataPt,
+                    DirStart => $pos,
+                    DataLen => $dirLen,
+                    DirLen => $size,
+                    Parent => $$dirInfo{DirName},
+                );
+                my $subTable = Image::ExifTool::GetTagTable($tagInfo->{SubDirectory}->{TagTable});
+                my $writeProc = $tagInfo->{SubDirectory}->{WriteProc};
+                my $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable, $writeProc);
+                if (defined $newValue) {
+                    next unless length $newValue;   # remove subdirectory entry
+                    $value = $newValue;
+                } else {
+                    $value = substr($$dataPt, $pos, $size); # rewrite old directory
+                }
+            } else {
+                $value = substr($$dataPt, $pos, $size);
+            }
         }
         my $newSize = length $value;
         # write this directory entry
@@ -149,7 +161,8 @@ sub WritePhotoshop($$$)
                 Parent => $$dirInfo{DirName},
             );
             my $subTable = Image::ExifTool::GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-            $value = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
+            my $writeProc = $tagInfo->{SubDirectory}->{WriteProc};
+            $value = $exifTool->WriteDirectory(\%subdirInfo, $subTable, $writeProc);
             next unless $value;
         }
         $size = length($value);
@@ -180,7 +193,7 @@ This file contains routines to write Photoshop metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

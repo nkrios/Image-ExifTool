@@ -700,7 +700,7 @@ and write Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

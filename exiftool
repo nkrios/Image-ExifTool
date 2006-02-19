@@ -2,7 +2,7 @@
 #------------------------------------------------------------------------------
 # File:         exiftool
 #
-# Description:  Extract EXIF information from image files
+# Description:  Read/write meta information
 #
 # Revisions:    Nov. 12/03 - P. Harvey Created
 #               (See html/history.html for revision history)
@@ -27,7 +27,7 @@ sub GetImageInfo($$);
 sub PrintTagList(@);
 sub LoadPrintFormat($);
 sub FilterGroups($$$);
-sub FilenameSPrintf($$);
+sub FilenameSPrintf($;$);
 sub AddExclude($);
 sub IsExcluded($$);
 sub Cleanup();
@@ -83,7 +83,7 @@ my %excludeGrp;     # hash of tags excluded by group
 my $allInGroup;     # flag to show all tags in a group
 my $disableOutput;  # flag to disable normal output
 my $quiet = 0;      # flag to disable printing of informational messages / warnings
-my $overwriteOriginal; # flag to overwrite original file
+my $overwriteOrig;  # flag to overwrite original file
 my $filterFlag = 0; # file filter flag (0x01=allow extensions, 0x02=deny extensions)
 my %filterExt;      # lookup for filtered extensions
 my $verbose = 0;    # verbose setting
@@ -115,36 +115,39 @@ $mainTool->Options(Duplicates => 0);    # don't save duplicates by default
 # parse command-line options
 while ($_ = shift) {
     if (s/^-//) {
-        if (/^list$/i) {
-            print "Available tags:\n";
-            PrintTagList(GetAllTags());
-            # also print shortcuts
-            my @tagList = GetShortcuts();
-            if (@tagList) {
-                print "Command-line shortcuts:\n";
-                PrintTagList(@tagList);
-            }
+        if (/^listw?$/i) {
             $helped = 1;
+            my $wr = ($_ eq 'listw');
+            my $group;
+            if ($ARGV[0] and $ARGV[0] =~ /^-(.+):(all|\*)$/i) {
+                $group = $1;
+                shift;
+                $group =~ /IFD/i and warn("Can't list tags for specific IFD\n"), next;
+            }
+            print $wr ? 'Writable' : 'Available', $group ? " $group" : '', " tags:\n";
+            PrintTagList($wr ? GetWritableTags($group) : GetAllTags($group));
+            # also print shortcuts if listing all tags
+            unless ($group or $wr) {
+                my @tagList = GetShortcuts();
+                if (@tagList) {
+                    print "Command-line shortcuts:\n";
+                    PrintTagList(@tagList);
+                }
+            }
             next;
         }
         if (/^listf$/i) {
+            $helped = 1;
             print "Recognized file types:\n";
             PrintTagList(GetFileType());
-            $helped = 1;
             next;
         }
         if (/^(listg|group)(\d*)$/i) {
+            $helped = 1;
             # list all groups in specified family
             my $family = $2 || 0;
             print "Groups in family $family:\n";
             PrintTagList(GetAllGroups($family));
-            $helped = 1;
-            next;
-        }
-        if (/^listw$/i) {
-            print "Writable tags:\n";
-            PrintTagList(GetWritableTags());
-            $helped = 1;
             next;
         }
         /^ver$/i and print("ExifTool version $Image::ExifTool::VERSION\n"), exit 0;
@@ -200,7 +203,7 @@ while ($_ = shift) {
         /^m$/i and $mainTool->Options(IgnoreMinorErrors => 1), next;
         /^n$/i and $mainTool->Options(PrintConv => 0), next;
         /^o$/i and $outOpt = shift || Die("Expected output file or directory name for -o option\n"), next;
-        /^overwrite_original$/i and $overwriteOriginal = 1, next;
+        /^overwrite_original$/i and $overwriteOrig = 1, next;
         /^p$/  and LoadPrintFormat(shift || Die "Expecting file name for -p option\n"), next;
         /^P$/  and $preserveTime = 1, next;
         /^q$/i and ++$quiet, next;
@@ -290,7 +293,7 @@ if (@newValues) {
         if ($tag =~ /^(All)?TagsFromFile$/i) {
             Die "Need file name for -TagsFromFile\n" unless defined $newVal;
             ++$isWriting;
-            if ($newVal =~ /(@|%(d|f|e))/) {
+            if ($newVal eq '@' or not defined FilenameSPrintf($newVal)) {
                 push @dynamicFiles, $newVal;
                 next;   # set tags from dynamic file later
             }
@@ -598,7 +601,7 @@ sub SetImageInfo($$)
                 unless (defined $outOpt) {
                     # move original out of the way
                     my $original = "${file}_original";
-                    if (not $overwriteOriginal and not -e $original) {
+                    if (not $overwriteOrig and not -e $original) {
                         # rename the file and check again to be sure the file doesn't exist
                         # (in case, say, the filesystem truncated the file extension)
                         if (not rename($file, $original) or -e $file) {
@@ -634,23 +637,36 @@ sub SetImageInfo($$)
 
 #------------------------------------------------------------------------------
 # A sort of sprintf for filenames
-# Inputs: 0) format string (%d=dir, %f=file name, %e=ext), 1) source filename
-# Returns: new filename or undef on error
-sub FilenameSPrintf($$)
+# Inputs: 0) format string (%d=dir, %f=file name, %e=ext),
+#         1) source filename or undef to test format string
+# Returns: new filename or undef on error (or if no file and fmt contains token)
+sub FilenameSPrintf($;$)
 {
     my ($fmt, $file) = @_;
+    # return format string straight away if no tokens
+    return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*(d|f|e)/;
+    return undef unless defined $file;
     $file =~ s/\\/\//g; # make sure we are using forward slashes
     # split filename into directory, file, extension
     my @parts = ($file =~ /^(.*?)([^\/]*?)[.]?([^.\/]*)$/);
-    unless (@parts) {
-        Warn "Error: Bad pattern match for file $file\n";
-        return undef;
-    }
+    @parts or Warn("Error: Bad pattern match for file $file\n"), return undef;
+    my %part;
     foreach ('d','f','e') {
-        my $part = shift @parts;
-        $fmt =~ s/%$_/$part/g;
+        $part{$_} = shift @parts;
     }
-    return $fmt;
+    my ($filename, $pos) = ('', 0);
+    while ($fmt =~ /(%([-+]?)(\d*)\.?(\d*)(d|f|e))/g) {
+        $filename .= substr($fmt, $pos, pos($fmt) - $pos - length($1));
+        $pos = pos($fmt);
+        my ($wid, $skip, $code) = ($3, $4 || 0, $5);
+        my $len = length $part{$code};
+        next unless $skip < $len;
+        $wid = $len - $skip if $wid eq '' or $wid + $skip > $len;
+        $skip = $len - $wid - $skip if $2 eq '-';
+        $filename .= substr($part{$code}, $skip, $wid);
+    }
+    $filename .= substr($fmt, $pos); # add rest of file name
+    return $filename;
 }
 
 #------------------------------------------------------------------------------
@@ -663,7 +679,7 @@ sub OpenOutputFile($)
     my ($fp, $outfile);
     if ($outputExt) {
         ($outfile = $file) =~ tr/\\/\//;
-        if ($outputExt =~ /%(d|f|e)/) {
+        if (not defined FilenameSPrintf($outputExt)) {
             # make filename from printf-like $outputExt
             $outfile = FilenameSPrintf($outputExt, $file);
             return () unless defined $outfile;
@@ -883,7 +899,7 @@ sub GetImageInfo($$)
             if (not defined $val) {
                 # ignore tags that weren't found unless necessary
                 next if $binaryOutput;
-                next unless $forcePrint or $outFormat+$htmlOutput>=3;
+                next unless $forcePrint;
                 $val = '-';     # forced to print all tag values
             }
             if (defined $showGroup) {
@@ -980,7 +996,7 @@ sub GetImageInfo($$)
                     }
                     printf $fp "%-32s: %s\n",$description,$val;
                 } elsif ($outFormat == 1) {
-                    printf $fp "%-12s ", $group if defined $group;
+                    printf $fp "%-15s ", "[$group]" if defined $group;
                      if ($showTagID) {
                         my $wid = ($showTagID eq 'D') ? 5 : 6;
                         printf $fp "%${wid}s ", $id;
@@ -1217,28 +1233,30 @@ sub PrintTagList(@)
         print " $tag";
         $len += $taglen + 1;
     }
-    $len and print "\n";
+    @_ or print ' [empty list]';
+    print "\n";
 }
 
 __END__
 
 =head1 NAME
 
-exiftool - Read/write meta information in images
+exiftool - Read/write meta information
 
 =head1 SYNOPSIS
 
-exiftool [OPTIONS] [-TAG[[+-E<lt>]=[VALUE]] or --TAG...] FILE ...
+exiftool [OPTIONS] [-TAG[[+-E<lt>]=[VALUE]] or --TAG ...] FILE ...
 
 =head1 DESCRIPTION
 
 A command-line interface to L<Image::ExifTool|Image::ExifTool> used for
-reading and writing meta information in image files.  C<FILE> may be an
-image file name, a directory name, or C<-> for the standard input.
-Information is read from the specified file and output in readable form to
-the console (or written to an output text file with the C<-w> option).
+reading and writing meta information in image, audio and video files.
+C<FILE> may be an image file name, a directory name, or C<-> for the
+standard input. Information is read from the specified file and output in
+readable form to the console (or written to an output text file with the
+C<-w> option).
 
-To write information to an image file, specify new values using either the
+To write information to a file, specify new values using either the
 C<-TAG=[VALUE]> syntax or the C<-TagsFromFile> option.  This causes exiftool
 to rewrite C<FILE> with the specified information, preserving the original
 file by renaming it to C<FILE_original>.  (Note: Be sure to verify that the
@@ -1249,19 +1267,22 @@ supported by exiftool (r = read support, w = write support):
 
                  File Type                      Meta Information
     -----------------------------------        ------------------
-    JPEG  r/w     XMP   r/w     PDF   r        EXIF           r/w
-    TIFF  r/w     THM   r/w     PS    r        GPS            r/w
-    GIF   r/w     PPM   r/w     EPS   r        IPTC           r/w
-    CRW   r/w     PPM   r/w     AI    r        XMP            r/w
-    CR2   r/w     PBM   r/w     PSD   r        MakerNotes     r/w
-    NEF   r/w     JP2   r       MIFF  r        Photoshop IRB  r/w
-    PEF   r/w     BMP   r       PICT  r        JFIF           r
-    MRW   r/w     ORF   r       QTIF  r        GeoTIFF        r
-    MOS   r/w     RAF   r       AVI   r        ICC Profile    r
-    DNG   r/w     SRF   r       MOV   r        PrintIM        r
-    PNG   r/w     X3F   r       MP4   r        ID3            r
-    MNG   r/w     DCM   r       MP3   r
-    JNG   r/w     ACR   r       WAV   r
+    JPEG  r/w     PPM   r/w     PDF   r        EXIF           r/w
+    TIFF  r/w     PGM   r/w     MIFF  r        GPS            r/w
+    GIF   r/w     PBM   r/w     PICT  r        IPTC           r/w
+    CRW   r/w     JP2   r       QTIF  r        XMP            r/w
+    CR2   r/w     BMP   r       RIFF  r        MakerNotes     r/w
+    NEF   r/w     ORF   r       AIFF  r        Photoshop IRB  r/w
+    PEF   r/w     RAF   r       AVI   r        AFCP           r/w
+    MRW   r/w     RAW   r       WAV   r        JFIF           r/w
+    MOS   r/w     SRF   r       MP3   r        GeoTIFF        r
+    DNG   r/w     SR2   r       MP4   r        ICC Profile    r
+    PNG   r/w     X3F   r       MOV   r        PrintIM        r
+    MNG   r/w     DCM   r       ASF   r        ID3            r
+    JNG   r/w     ACR   r       WMA   r
+    XMP   r/w     AI    r       WMV   r
+    THM   r/w     PS    r
+    PSD   r/w     EPS   r
 
 =head1 OPTIONS
 
@@ -1278,8 +1299,9 @@ Extract information for specified tag.  See
 L<Image::ExifTool::TagNames|Image::ExifTool::TagNames> for documentation on
 available tag names.  The tag name may begin with an optional group name
 followed by a colon.  (ie. C<-TAG:GROUP>, where C<GROUP> is any valid family
-0 or 1 group name.  Use the C<-group> option to list valid group names.)  If
-no tags are specified, all available information is extracted.
+0 or 1 group name optionally prefixed by a family number.  Use the C<-listg>
+option to list valid group names.)  If no tags are specified, all available
+information is extracted.
 
 A special tag name of C<All> may be used to indicate all meta information.
 This is particularly useful when a group name is specified to extract all
@@ -1399,7 +1421,7 @@ no value is given, ExifTool will take its best guess at the correct base.
 
 Organize output by tag B<g>roup.  C<#> specifies the group family number,
 and may be 0 (general location), 1 (specific location) or 2 (category).  If
-not specified, C<-g0> is assumed.  Use the C<-group> option to list all
+not specified, C<-g0> is assumed.  Use the C<-listg> option to list all
 group names for a specified family.
 
 =item B<-G>[#]
@@ -1432,16 +1454,23 @@ Use B<l>ong 2-line Canon-style output format.
 
 =item B<-L>
 
-Convert Unicode characters in output to Windows B<L>atin1 (cp1252) instead
-of the default UTF-8.
+Convert 16-bit Unicode characters in output to Windows B<L>atin1 (cp1252)
+instead of the default UTF-8.
 
 =item B<-list>, B<-listw>, B<-listf>, B<-listg>[#]
 
 Print a B<list> of all valid tag names (C<-list>), all B<w>ritable tag names
 (C<-listw>), all recognized B<f>ile types (C<-listf>), or all tag B<g>roups
-in a specified family (C<-listg>).  With C<-listg>, a number may be given to
-specify the group family, otherwise family 0 is assumed.  For example,
-C<-listg1> lists all groups in family 1.
+in a specified family (C<-listg>).  The C<-list> and C<-listw> options may
+be followed by an additional argument of the form C<-GROUP:All> to list all
+tags in a specific group.  With C<-listg>, a number may be given to specify
+the group family, otherwise family 0 is assumed.  For example:
+
+    -list               # list all tag names
+    -list -EXIF:All     # list all EXIF tags
+    -listw -XMP-dc:All  # list all writable XMP-dc tags
+    -listf              # list all recognized file types
+    -listg1             # list all groups in family 1
 
 =item B<-m>
 
@@ -1571,18 +1600,18 @@ Specified tags are then copied from file in turn as it is rewritten.  As a
 convenience, C<-TagsFromFile @> is assumed for any redirected tags which are
 specified without a prior C<-TagsFromFile> option.
 
+See L</COPYING EXAMPLES> for examples using C<-TagsFromFile>.
+
 For advanced batch use, the source file name may also be specified using a
 C<FMT> string in which %d, %f and %e represent the directory, file name and
-extension of C<FILE> (similar to the C<-o> and C<-w> options).
-
-See L</COPYING EXAMPLES> for examples of how to use this option.
+extension of C<FILE>.  See C<-w> option for C<FMT> string examples.
 
 Be aware of the difference between excluding a tag from being copied
 (C<--TAG>), and deleting a tag (C<-TAG=>).  Excluding a tag will prevent it
 from being copied to the destination image, but deleting a tag will remove
 it if it already exists.
 
-Note that the maker note information is set as a block, so it isn't effected
+Note that the maker note information is set as a block, so it isn't affected
 like other information by subsequent tag assignments on the command line.
 For example, to copy all information but the thumbnail image, use
 C<-ThumbnailImage=> after C<-TagsFromFile> on the command line.  Since the
@@ -1619,14 +1648,30 @@ extension (including the C<.>) with the specified extension.  Alternatively,
 a format statement may be used to give more control over the output file
 name and directory.  In this case, C<FMT> is a string specifying the output
 file name.  In this string, %d, %f and %e represent the directory, filename
-and extension of the source file.  Output directories are created
-automatically if necessary.  For example:
+and extension of the source file.  For example:
 
     -w %d%f.txt       # same effect as "-w txt"
     -w dir/%f_%e.out  # writes files to "dir" as "FILE_EXT.out"
     -w dir2/%d%f.txt  # writes to "dir2", keeping dir structure
 
-Existing files will not be overwritten.
+Existing files will not be overwritten.  Output directories are created
+automatically if necessary.
+
+Advanced feature:  A substring of the original file name, directory or
+extension may be taken by specifying a string length immediately following
+the % character.  If the length is negative, the substring is taken from the
+end.  The substring position (characters to ignore at the start or end of
+the string) may be given by a second optional value after a decimal point.
+For example:
+
+    Input File Name     Format Specifier    Output File Name
+    ----------------    ----------------    ----------------
+    Picture-123.jpg     %7f.txt             Picture.txt
+    Picture-123.jpg     %-.4f.out           Picture.out
+    Picture-123.jpg     %7f.%-3f            Picture.123
+    Picture-123a.jpg    Meta%-3.1f.txt      Meta123.txt
+
+This same C<FMT> syntax is used with the C<-o> and C<-TagsFromFile> options.
 
 =item B<-x> I<TAG>
 
@@ -1745,6 +1790,10 @@ Adjust original date/time of all images in directory C<dir> by subtracting
 one hour and 30 minutes.  (This is equivalent to C<-DateTimeOriginal-=1.5>.
 See L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for details.)
 
+=item exiftool -createdate+=3 -modifydate+=3 a.jpg b.jpg
+
+Add 3 hours to the CreateDate and ModifyDate timestamps of two images.
+
 =item exiftool -Photoshop:All= dst.jpg
 
 Delete Photoshop meta information from an image (note that the Photoshop
@@ -1792,17 +1841,17 @@ Create an XMP data file only from tags defined on the command line.
 Copy the values of all writable tags from C<src.crw> to C<dst.jpg>, writing
 the information to the preferred groups.
 
+=item exiftool -TagsFromFile src.jpg -all:all dst.jpg
+
+Copy the values of all writable tags from C<src.jpg> to C<dst.jpg>,
+preserving the original tag groups.
+
 =item exiftool -tagsfromfile a.jpg out.xmp
 
 Copy meta information C<a.jpg> to an XMP data file.  If the XMP data file
 C<out.xmp> already exists, it will be updated with the new information.
 Otherwise the XMP data file will be created.  Only XMP files may be created
 like this (other file types may be edited but not created).
-
-=item exiftool -TagsFromFile src.crw -all:all dst.jpg
-
-Copy the values of all writable tags from C<src.crw> to C<dst.jpg>,
-preserving the original tag groups.
 
 =item exiftool -tagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg
 
@@ -1872,10 +1921,10 @@ Add an IPTC keyword in a pipeline, saving output to a new file.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey
+Copyright 2003-2006, Phil Harvey
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
 
 =head1 SEE ALSO
 

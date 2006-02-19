@@ -11,7 +11,7 @@ package Image::ExifTool::HtmlDump;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 sub DumpTable($$$;$$$$);
 sub Open($$$;@);
@@ -27,7 +27,7 @@ my $htmlHeader1 = <<_END_PART_1_;
 <title>
 _END_PART_1_
 
-# Note: Don't change font-weight style because it can effect line height
+# Note: Don't change font-weight style because it can affect line height
 my $htmlHeader2 = <<_END_PART_2_;
 </title>
 <style type="text/css">
@@ -267,7 +267,7 @@ sub Print($$;$$$$$)
         Write($outfile, $htmlHeader2);
         my $tips = \@{$$self{TipList}};
         for ($i=0; $i<@$tips; ++$i) {
-            Write($outfile, qq(t[$i] = "$$tips[$i]"\n)) if defined $$tips[$i];
+            Write($outfile, qq(t[$i] = "$$tips[$i]";\n)) if defined $$tips[$i];
         }
         delete $$self{TipList};
         Write($outfile, $htmlHeader3, $self->{Cols}->[0]);
@@ -294,8 +294,8 @@ sub Print($$;$$$$$)
 # Open or close a specified html element
 # Inputs: 0) HtmlDump object ref, 1) element id, 2) element string,
 #         3-N) list of column numbers (empty for all columns)
-# - element id may be '' to close all elements or 0 to close without reopening
-# - element string may be '' to close element with specified ID
+# - element id may be '' to close all elements
+# - element string may be '' to close element by ID (or 0 to close without reopening)
 # - element id and string may both be 1 to reopen temporarily closed elements
 sub Open($$$;@)
 {
@@ -311,7 +311,7 @@ sub Open($$$;@)
         if ($element) {
             # next if already open
             next if $$opElem{$id} and $$opElem{$id} eq $element;
-        } elsif (not $$opElem{$id}) {
+        } elsif ($id and not $$opElem{$id}) {
             # next if already closed and nothing to reopen
             next unless $element eq '' and @{$self->{Closed}->[$col]->{ID}};
         }
@@ -560,7 +560,7 @@ display linefeeds in the tool tips.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -195,8 +195,7 @@ sub WriteCR2($$$)
     my $outfile = $$dirInfo{OutFile} or return 0;
 
     # check CR2 signature
-    my $sig = substr($$dataPt, 8, 4);
-    return 0 if $sig ne "CR\x02\0" and
+    return 0 if $$dataPt !~ /^.{8}CR\x02\0/s and
         $exifTool->Warn("Unsupported Canon RAW file. May cause problems if rewritten", 1);
     # CR2 has a 16-byte header
     $$dirInfo{NewDataPos} = 16;
@@ -209,18 +208,26 @@ sub WriteCR2($$$)
         # last 4 bytes is pointer to last IFD
         Set32u($$dirInfo{LastIFD}, \$header, 12);
         Write($outfile, $header, $newData) or return 0;
-        # write anything after the end of a Canon RAW image
-        $raf->Seek($exifTool->{TIFF_END}, 0) or return 0;
-        my $extra = 0;
-        while ($raf->Read($newData, 65536)) {
-            Write($outfile, $newData) or return 0;
-            $extra += length $newData;
+        undef $newData;     # free memory
+        
+        # copy over image data now if necessary
+        if (ref $$dirInfo{ImageData}) {
+            $exifTool->CopyImageData($$dirInfo{ImageData}, $outfile) or return 0;
+            delete $$dirInfo{ImageData};
         }
-        if ($extra) {
-            $exifTool->VPrint(0, "Note: $extra extra bytes copied after normal end of CR2\n");
+        # write anything after the end of a Canon RAW image
+        if ($exifTool->{TIFF_END}) {
+            $raf->Seek($exifTool->{TIFF_END}, 0) or return 0;
+            my $extra = 0;
+            while ($raf->Read($newData, 65536)) {
+                Write($outfile, $newData) or return 0;
+                $extra += length $newData;
+            }
+            if ($extra) {
+                $exifTool->VPrint(0, "Note: $extra extra bytes copied after normal end of CR2\n");
+            }
         }
     }
-    undef $exifTool->{TIFF_END};
     return 1;
 }
 
@@ -564,7 +571,7 @@ files, and would lead to far fewer problems with corrupted metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

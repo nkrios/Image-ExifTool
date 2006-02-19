@@ -20,7 +20,7 @@
 #               properties (with no associated namespace).
 #
 #             - Currently, there is no special treatment of the following
-#               properties which could potentially effect the extracted
+#               properties which could potentially affect the extracted
 #               information: xml:base, xml:lang, rdf:parseType (note that
 #               parseType Literal isn't allowed by the XMP spec).
 #
@@ -36,7 +36,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.47';
+$VERSION = '1.48';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -566,7 +566,7 @@ writable because their names conflict with XMP-dc tags.
     YCbCrCoefficients     => { Writable => 'rational', List => 'Seq' },
     ReferenceBlackWhite   => { Writable => 'rational', List => 'Seq' },
     DateTime => {
-        Description => 'Date/Time Of Last Modification',
+        Description => 'Date/Time Modified',
         Groups => { 2 => 'Time' },
         Writable => 'date',
         Shift => 'Time',
@@ -634,6 +634,7 @@ writable because their names conflict with XMP-dc tags.
     },
     RelatedSoundFile => { },
     DateTimeOriginal => {
+        Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         Writable => 'date',
         Shift => 'Time',
@@ -647,13 +648,11 @@ writable because their names conflict with XMP-dc tags.
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ExposureTime => {
-        Description => 'Shutter Speed',
         Writable => 'rational',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
     FNumber => {
-        Description => 'Aperture',
         Writable => 'rational',
         PrintConv => 'sprintf("%.1f",$val)',
         PrintConvInv => '$val',
@@ -679,7 +678,6 @@ writable because their names conflict with XMP-dc tags.
         Name => 'ISO',
         Writable => 'integer',
         List => 'Seq',
-        Description => 'ISO Speed',
     },
     OECF => {
         Name => 'Opto-ElectricConvFactor',
@@ -1148,7 +1146,7 @@ uncommon and there are name conflicts with other more common tags.
     },
     AUTHOR    => { Name => 'Author', Groups => { 2 => 'Author'} },
     COMMENTS  => { Name => 'Comments' },
-    COPYRIGHT => { Name => 'Copyright' },
+    COPYRIGHT => { Name => 'Copyright', Groups => { 2 => 'Author'} },
     DATE      => { Name => 'Date', Groups => { 2 => 'Time'} },
     GENRE     => { Name => 'Genre' },
     TITLE     => { Name => 'Title' },
@@ -1622,7 +1620,7 @@ contains the definitions required by Image::ExifTool to read XMP information.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

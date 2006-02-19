@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -110,8 +110,8 @@ my %pentaxCities = (
 %Image::ExifTool::Pentax::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITABLE => 1,
     0x0001 => {
         Name => 'PentaxMode',
         Writable => 'int16u',
@@ -290,11 +290,10 @@ my %pentaxCities = (
     0x0010 => { #PH
         Name => 'FocusPosition',
         Writable => 'int16u',
-        Notes => 'related to focus distance but effected by focal length',
+        Notes => 'related to focus distance but affected by focal length',
     },
     0x0012 => { #PH
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         Writable => 'int32u',
         Priority => 0,
         ValueConv => '$val * 1e-5',
@@ -304,7 +303,6 @@ my %pentaxCities = (
     },
     0x0013 => { #PH
         Name => 'FNumber',
-        Description => 'Aperture',
         Writable => 'int16u',
         Priority => 0,
         ValueConv => '$val * 0.1',
@@ -315,7 +313,6 @@ my %pentaxCities = (
     # ISO Tag - Entries confirmed by W. Smith 12 FEB 04
     0x0014 => {
         Name => 'ISO',
-        Description => 'ISO Speed',
         Writable => 'int16u',
         Priority => 0,
         PrintConv => {
@@ -694,18 +691,16 @@ my %pentaxCities = (
 # tags in Pentax MOV videos (PH - tests with Optio WP)
 %Image::ExifTool::Pentax::MOV = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'This information is found in Pentax MOV video images.',
     0x26 => {
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         Format => 'int32u',
         ValueConv => '$val ? 10 / $val : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     0x2a => {
         Name => 'FNumber',
-        Description => 'Aperture',
         Format => 'int32u',
         ValueConv => '$val * 0.1',
         PrintConv => 'sprintf("%.1f",$val)',
@@ -736,7 +731,6 @@ my %pentaxCities = (
     },
     0xaf => {
         Name => 'ISO',
-        Description => 'ISO Speed',
         Format => 'int16u',
     },
 );
@@ -774,7 +768,7 @@ offset in the middle of nowhere, and the Optio 550 uses different (and
 totally illogical) bases for different menu entries.  Very weird.  (It
 wouldn't surprise me if Pentax can't read their own maker notes!)  Luckily,
 there are only a few entries in the maker notes which are large enough to
-require offsets, so this doesn't effect much useful information.  ExifTool
+require offsets, so this doesn't affect much useful information.  ExifTool
 attempts to make sense of this fiasco by making an assumption about where
 the information should be stored to deduce the correct offsets.
 
@@ -802,7 +796,7 @@ Buret for adding to the LensType list.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

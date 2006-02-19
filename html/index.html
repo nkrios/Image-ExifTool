@@ -13,17 +13,17 @@
 <font color='#cc0000' size='+2'><b>Read</b> <i>and</i> <b>Write</b> Meta Information!</font>
 
 <h3>
-<a href="Image-ExifTool-5.87.tar.gz">
-Download        Version 5.87</a> - Dec. 22, 2005
+<a href="Image-ExifTool-6.00.tar.gz">
+Download        Version 6.00</a> (856 KB) - Feb. 19, 2006
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
 <a href="exiftool_pod.html">command-line application</a> for reading and writing
-meta information in image files.  It recognizes EXIF, GPS, IPTC, XMP, JFIF,
-GeoTIFF, ICC Profile, Photoshop IRB and ID3 meta information as well as the
-maker notes of many digital cameras including Canon, Casio, FujiFilm,
-JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon, Olympus/Epson,
-Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
+meta information in image, audio and video files.  It recognizes EXIF, GPS,
+IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop IRB, AFCP and ID3 meta
+information as well as the maker notes of many digital cameras including Canon,
+Casio, FujiFilm, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
+Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
 
 <p>When writing information, ExifTool preserves the original file by adding
 "_original" to the file name.  Be sure to keep a copy of the original, or
@@ -35,9 +35,9 @@ writing meta information.
 <ul>
 <li>Powerful, fast, and easy to use
 <li><a href="#supported">Supports a large number of different file formats</a>
-<li>Reads EXIF, GPS, IPTC, XMP, MakerNotes, JFIF, GeoTIFF, ICC Profile,
-    Photoshop IRB and ID3 records
-<li>Writes EXIF, GPS, IPTC, XMP and MakerNotes information
+<li>Reads EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, GeoTIFF, ICC Profile,
+    Photoshop IRB, AFCP and ID3 records
+<li>Writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, Photoshop IRB and AFCP information
 <li>Reads and writes maker notes of many digital cameras
 <li>Very flexible -- read or write exactly the information you want
 <li><a href="#shift">Shifts date/time values</a> to fix timestamps in images
@@ -49,47 +49,53 @@ writing meta information.
 <li>Creates text output file for each image file
 <li>Organizes output into groups
 <li>Ability to add user-defined tags
-<li>Tested with images from <a href="models.html">hundreds of different camera models</a>
 <li>Recognizes <a href="TagNames/index.html">thousands of different tags</a>
+<li>Tested with images from <a href="models.html">hundreds of different camera models</a>
 <li>Advanced <a href="verbose.html">verbose</a> and <a href="htmldump.html">HTML-based
     hex dump</a> outputs
 </ul>
 
 <h2><a name="Supported">Supported File Types</a></h2>
 <blockquote><table cellpadding=2 cellspacing=0 border=1>
-<tr><th>File Type</th><th>Read/Write</th><th>Description</th></tr>
+<tr bgcolor='#dddddd'><th>File Type</th><th>Read/Write</th><th>Description</th></tr>
 <tr><td>ACR</td><td>R</td><td>American College of Radiology ACR-NEMA (DICOM-like)</td></tr>
 <tr><td>AI</td><td>R</td><td>Adobe Illustrator (PS or PDF)</td></tr>
-<tr><td>AVI</td><td>R</td><td>Windows Audio/Video</td></tr>
+<tr><td>AIFF, AIF, AIFC</td><td>R</td><td>Audio Interchange File Format</td></tr>
+<tr><td>ASF</td><td>R</td><td>Microsoft Advanced Systems Format</td></tr>
+<tr><td>AVI</td><td>R</td><td>Audio Video Interleaved (RIFF-based)</td></tr>
 <tr><td>BMP, DIB</td><td>R</td><td>Windows BitMaP / Device Independent Bitmap</td></tr>
-<tr><td>CR2</td><td>R/W</td><td>Canon RAW 2 format (TIFF-like)</td></tr>
+<tr><td>CR2</td><td>R/W</td><td>Canon RAW 2 format (TIFF-based)</td></tr>
 <tr><td>CRW</td><td>R/W</td><td>Canon RAW format</td></tr>
 <tr><td>DCM, DC3, DIC, DICM</td><td>R</td><td>DICOM - Digital Imaging and Communications in Medicine</td></tr>
-<tr><td>DNG</td><td>R/W</td><td>Digital Negative (TIFF-like)</td></tr>
+<tr><td>DNG</td><td>R/W</td><td>Digital Negative (TIFF-based)</td></tr>
 <tr><td>GIF</td><td>R/W</td><td>Compuserve Graphics Interchange Format</td></tr>
-<tr><td>JP2, JPX</td><td>R</td><td>JPEG 2000 file</td></tr>
-<tr><td>JPEG, JPG</td><td>R/W</td><td>Joint Photographic Experts Group</td></tr>
+<tr><td>JP2, JPX</td><td>R</td><td>JPEG 2000 image</td></tr>
+<tr><td>JPEG, JPG</td><td>R/W</td><td>Joint Photographic Experts Group image</td></tr>
 <tr><td>MIFF, MIF</td><td>R</td><td>Magick Image File Format</td></tr>
-<tr><td>MOS</td><td>R/W</td><td>Creo Leaf Mosaic (TIFF-like)</td></tr>
-<tr><td>MOV</td><td>R</td><td>Apple QuickTime Movie</td></tr>
+<tr><td>MOS</td><td>R/W</td><td>Creo Leaf Mosaic (TIFF-based)</td></tr>
+<tr><td>MOV, QT</td><td>R</td><td>Apple QuickTime Movie</td></tr>
 <tr><td>MP3</td><td>R</td><td>MPEG Layer 3 audio (uses ID3 information)</td></tr>
 <tr><td>MP4</td><td>R</td><td>Motion Picture Experts Group video format 4</td></tr>
 <tr><td>MRW</td><td>R/W</td><td>Minolta RAW format</td></tr>
-<tr><td>NEF</td><td>R/W</td><td>Nikon (RAW) Electronic Format (TIFF-like)</td></tr>
+<tr><td>NEF</td><td>R/W</td><td>Nikon (RAW) Electronic Format (TIFF-based)</td></tr>
 <tr><td>ORF</td><td>R</td><td>Olympus RAW format</td></tr>
 <tr><td>PDF</td><td>R</td><td>Adobe Portable Document Format</td></tr>
-<tr><td>PEF</td><td>R/W</td><td>Pentax (RAW) Electronic Format (TIFF-like)</td></tr>
+<tr><td>PEF</td><td>R/W</td><td>Pentax (RAW) Electronic Format (TIFF-based)</td></tr>
 <tr><td>PICT, PCT</td><td>R</td><td>Apple Picture file</td></tr>
 <tr><td>PNG, JNG, MNG</td><td>R/W</td><td>Portable/JPEG/Multiple-image Network Graphics</td></tr>
 <tr><td>PPM, PBM, PGM</td><td>R/W</td><td>Portable Pixel/Bit/Gray Map</td></tr>
 <tr><td>PS, EPS, EPSF</td><td>R</td><td>[Encapsulated] PostScript Format</td></tr>
-<tr><td>PSD</td><td>R</td><td>PhotoShop Drawing</td></tr>
+<tr><td>PSD</td><td>R/W</td><td>PhotoShop Drawing</td></tr>
 <tr><td>QTIF, QTI, QIF</td><td>R</td><td>QuickTime Image File</td></tr>
 <tr><td>RAF</td><td>R</td><td>FujiFilm RAW Format</td></tr>
-<tr><td>SRF</td><td>R</td><td>Sony RAW Format (TIFF-like)</td></tr>
+<tr><td>RAW</td><td>R</td><td>Kyocera Contax N Digital RAW Format</td></tr>
+<tr><td>RIFF, RIF</td><td>R</td><td>Resource Interchange File Format</td></tr>
+<tr><td>SR2</td><td>R</td><td>Sony RAW Format 2 (TIFF-based)</td></tr>
+<tr><td>SRF</td><td>R</td><td>Sony RAW Format (TIFF-based)</td></tr>
 <tr><td>THM</td><td>R/W</td><td>Canon Thumbnail (JPG)</td></tr>
 <tr><td>TIFF, TIF</td><td>R/W</td><td>Tagged Image File Format</td></tr>
-<tr><td>WAV</td><td>R</td><td>WAVeform (Windows digital audio format)</td></tr>
+<tr><td>WAV</td><td>R</td><td>Windows digital audio WAVeform (RIFF-based)</td></tr>
+<tr><td>WMA, WMV</td><td>R</td><td>Windows Media Audio/Video (ASF-based)</td></tr>
 <tr><td>X3F</td><td>R</td><td>Sigma/Foveon RAW format</td></tr>
 <tr><td>XMP</td><td>R/W</td><td>Extensible Metadata Platform data file</td></tr>
 </table></blockquote>
@@ -109,11 +115,12 @@ writing.
 <h2><font color='#cc6600'>Known Problems</font></h2>
 <ul>
 <li>CR2 (Canon RAW format 2) images edited by ExifTool show up all black when
-displayed using the new Apple OS X 10.4.3 RAW image utilities, although there
-are no such problems with Canon Digital Photo Professional, Photoshop CS2 or
-dcraw. It is thought that this is an Apple bug, and that they may be cutting
-corners in reading the file by assuming a fixed offset for white balance
-information. If this problem effects you, please send a bug report to Apple.
+displayed using the new Apple OS X 10.4.4 RAW image utilities, although there
+are no such problems with Canon Digital Photo Professional, Photoshop CS2,
+Lightroom or dcraw. It is thought that this is an Apple bug, and that they may
+be cutting corners in reading the file by assuming a fixed offset for white
+balance information. If this problem affects you, please send a bug report to
+Apple.
 </ul>
 
 <h2>System Requirements</h2>
@@ -138,9 +145,12 @@ formatting and to allow reading or writing of specific information.  Run
 exiftool with no arguments for a <a href="exiftool_pod.html">description of
 exiftool, complete list of available options, and examples</a>.
 
-<p><b>Note:</b> Windows users should type "perl exiftool" instead of just
-"exiftool" to run exiftool.  Alternately, you can rename exiftool to exiftool.pl
-then type "exiftool.pl" to run it.
+<p><b>Notes for Windows users:</b> You should type "perl exiftool" instead of
+just "exiftool" to run exiftool.  Alternately, you may be able to rename
+exiftool to exiftool.pl then type "exiftool.pl" to run it.  Also, if you are
+using the "cmd" shell, you should use double quotes around the entire
+command-line argument instead of single quotes or partial quoting as shown in
+some examples.
 
 <h2>Example Output</h2>
 
@@ -200,14 +210,14 @@ or all tags in a specified group.
 <p>A complete list of <a href="TagNames/index.html">ExifTool Tag Names</a>
 accompanies this documentation.  As well, current lists of available tag names
 and writable tag names may be obtained using the exiftool -list and -listw
-options.  But perhaps the easiest way to determine a tag name is to use the -S
+options.  But perhaps the easiest way to determine a tag name is to use the -s
 option to print the tag names instead of descriptions for all information in a
 file.  It may also be helpful to use the -G option to display the group names,
 and the -H or -D option to print the numerical tag ID's for reference.
 
 <p><b>Notes:</b>
 
-<ol><li>Tag names sometimes differ from their descriptions.  Use the '-S'
+<ol><li>Tag names sometimes differ from their descriptions.  Use the '-s'
 command-line option to see the actual tag names instead of the descriptions
 when extracting information.
 <li>Values are only displayed for tags that exist in the specified file when
@@ -245,29 +255,30 @@ ExifTool classifies tags into groups in three different families.
 These groups are:
 
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
-<tr><th>Family</th><th>Group Names</th></tr>
+<tr bgcolor='#dddddd'><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>APP12, BMP, Canon, Composite, DICOM, EXIF, ExifTool, File, GPS, GeoTiff,
-ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG, MakerNotes, Meta,
-PDF, PICT, PNG, Pentax, Photoshop, PostScript, PrintIM, QuickTime, SigmaRaw,
-WAV, XMP
+<td>AFCP, AIFF, APP12, ASF, BMP, Composite, DICOM, DNG, EXIF, ExifTool, File,
+GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG,
+MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript, PrintIM, QuickTime,
+RIFF, SigmaRaw, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, DICOM,
-ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm,
-ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2,
-ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC, Jpeg2000, Kodak,
-KodakBordersIFD, KodakEffectsIFD, Leaf, LeafSubIFD, MIFF, MNG, MakerUnknown,
-MetaIFD, Minolta, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT,
-PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM, QuickTime, Ricoh,
-SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, WAV, XMP, XMP-PixelLive,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS,
-XMP-xmpRights, XMP-xmpTPg
+<td>AFCP, AIFF, APP12, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite,
+DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD,
+ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1,
+ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC,
+Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw, Leaf,
+LeafSubIFD, MIFF, MNG, MakerUnknown, MetaIFD, Minolta, Nikon, NikonCapture,
+NikonPreview, Olympus, PDF, PICT, PNG, Panasonic, Pentax, Photoshop,
+PostScript, PrintIM, QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma,
+SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc,
+XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop,
+XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights,
+XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,
-Unknown
+Unknown, Video
 </td></tr>
 </table></blockquote>
 
@@ -313,7 +324,7 @@ symbol.  The '=' may be prefixed by '+', '-' or '&lt;' to add a value, remove a 
 or set a value from file.  The following table outlines the different write syntaxes:
 
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
-<tr><th>Syntax</th><th>Result</th></tr>
+<tr bgcolor='#dddddd'><th>Syntax</th><th>Result</th></tr>
 <tr><td>-TAG=</td><td>Deletes all occurrances of TAG</td></tr>
 <tr><td>-all=</td><td>Deletes all meta information!</td></tr>
 <tr><td>-GROUP:TAG=</td><td>Deletes TAG only in specified group</td></tr>
@@ -384,7 +395,7 @@ significantly.
 The 'exiftool' script is essentially just a command-line interface to the
 Image::ExifTool Perl library module which is part of the ExifTool distribution.
 The Image::ExifTool module can be used in any Perl script to provide easy access
-to meta information in images.  Here is an example a very simple script that uses
+to meta information.  Here is an example a very simple script that uses
 Image::ExifTool to print out all recognized meta information in a file:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
@@ -417,6 +428,7 @@ a stand-alone Mac OS X droplet to extract preview images from RAW files (thanks 
 <li><a href="ExifTool.html">Image::ExifTool Module Documentation</a>
 <li><a href="writing.html">Comments on the Subject of Writing Meta Information</a>
 <li><a href="canon_raw.html">Canon RAW (CRW) File Format Specification</a>
+<li><a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Image-ExifTool">Bug Reports</a>
 </ul>
 
 Also, visit the <a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool
@@ -427,7 +439,8 @@ comments, suggestions or questions.  My e-mail address is in the README file.
 
 <h2>License</h2>
 
-It's free, and you're free to use it however you want.
+This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
 
 <h2>Boldly Go where No Man has Gone Before...</h2>
 
@@ -486,6 +499,7 @@ to the code:
 <li>Robert Rottmerhusen for decoding many tricky Nikon lens data tags
 <li>Michael Tiemann for decoding a number of new Canon tags
 <li>Albert Bogner for his image samples, testing and useful suggestions
+<li>Rainer H&ouml;nle for decoding a number of new Canon 5D tags
 </ul>
 
 <hr>

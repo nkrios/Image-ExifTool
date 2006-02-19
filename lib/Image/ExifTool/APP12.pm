@@ -11,7 +11,7 @@ package Image::ExifTool::APP12;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessAPP12($$$);
 
@@ -26,7 +26,6 @@ Agfa and Polaroid images, however ExifTool will extract information from any
 tags found in this segment.
     },
     FNumber => {
-        Description => 'Aperture',
         ValueConv => '$val=~s/^[A-Za-z ]*//;$val',  # Agfa leads with an 'F'
         PrintConv => 'sprintf("%.1f",$val)',
     },
@@ -35,20 +34,18 @@ tags found in this segment.
     },
     TimeDate => {
         Name => 'DateTimeOriginal',
-        Description => 'Shooting Date/Time',
+        Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         ValueConv => '$val=~/^\d+$/ ? ConvertUnixTime($val) : $val',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Shutter => {
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         ValueConv => '$val * 1e-6',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     shtr => {
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         ValueConv => '$val * 1e-6',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
@@ -156,7 +153,7 @@ APP12 meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

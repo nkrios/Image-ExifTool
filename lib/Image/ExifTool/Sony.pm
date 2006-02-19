@@ -5,7 +5,7 @@
 #
 # Revisions:    04/06/2004  - P. Harvey Created
 #
-# References:   1) http://www.cybercom.net/~dcoffin/dcraw/sony_clear.c
+# References:   1) http://www.cybercom.net/~dcoffin/dcraw/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Sony;
@@ -15,15 +15,15 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessSRF($$$);
+sub ProcessSR2($$$);
 
 %Image::ExifTool::Sony::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -31,6 +31,7 @@ sub ProcessSRF($$$);
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
+    0xb020 => 'ColorModeSetting', #PH
 );
 
 # tag table for Sony RAW Format
@@ -38,10 +39,10 @@ sub ProcessSRF($$$);
     PROCESS_PROC => \&ProcessSRF,
     GROUPS => { 0 => 'MakerNotes', 1 => 'SRF#', 2 => 'Camera' },
     NOTES => q{
-The maker notes in SRF (Sony Raw Format) images contain 7 IFD's (with family
-1 group names SRF0 through SRF6).  SRF0 through SRF5 use these Sony tags,
-while SRF6 uses standard EXIF tags.  All information other than SRF0 is
-encrypted, but thanks to Dave Coffin the decryption algorithm is known.
+        The maker notes in SRF (Sony Raw Format) images contain 7 IFD's (with family
+        1 group names SRF0 through SRF6).  SRF0 through SRF5 use these Sony tags,
+        while SRF6 uses standard EXIF tags.  All information other than SRF0 is
+        encrypted, but thanks to Dave Coffin the decryption algorithm is known.
     },
     0 => {
         Name => 'SRF2_Key',
@@ -55,10 +56,59 @@ encrypted, but thanks to Dave Coffin the decryption algorithm is known.
     },
 );
 
+# tag table for Sony RAW 2 Format Private IFD (ref 1)
+%Image::ExifTool::Sony::SR2Private = (
+    PROCESS_PROC => \&ProcessSR2,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'SR2', 2 => 'Camera' },
+    NOTES => q{
+        The SR2 format uses the DNGPrivateData tag to reference a private IFD
+        containing these tags.
+    },
+    0x7200 => {
+        Name => 'SR2SubIFDOffset',
+        Flags => 'IsOffset',
+        OffsetPair => 0x7201,
+        RawConv => '$self->{SR2SubIFDOffset} = $val',
+    },
+    0x7201 => {
+        Name => 'SR2SubIFDLength',
+        OffsetPair => 0x7200,
+        RawConv => '$self->{SR2SubIFDLength} = $val',
+    },
+    0x7221 => {
+        Name => 'SR2SubIFDKey',
+        Format => 'int32u',
+        Notes => 'key to decrypt SR2SubIFD',
+        RawConv => '$self->{SR2SubIFDKey} = $val',
+    },
+);
+
+%Image::ExifTool::Sony::SR2SubIFD = (
+    GROUPS => { 0 => 'MakerNotes', 1 => 'SR2', 2 => 'Camera' },
+    NOTES => 'Tags in the encrypted SR2SubIFD',
+    0x7303 => 'WB_GRBGLevels', #1
+    0x74c0 => { #PH
+        Name => 'SR2DataIFD',
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sony::SR2DataIFD',
+            Start => '$val',
+            MaxSubdirs => 6,
+        },
+    },
+    0x74a0 => 'MaxApertureAtMaxFocal', #PH
+    0x74a1 => 'MaxApertureAtMinFocal', #PH
+);
+
+%Image::ExifTool::Sony::SR2DataIFD = (
+    GROUPS => { 0 => 'MakerNotes', 1 => 'SR2', 2 => 'Camera' },
+    0x7770 => 'ColorMode', #PH
+);
+
 #------------------------------------------------------------------------------
 # decrypt Sony data (ref 1)
 # Inputs: 0) data reference, 1) start offset, 2) data length, 3) decryption key
-#
+# Returns: nothing (original data buffer is updated with decrypted data)
 sub Decrypt($$$$)
 {
     my ($dataPt, $start, $len, $key) = @_;
@@ -149,6 +199,59 @@ sub ProcessSRF($$$)
     }
 }
 
+#------------------------------------------------------------------------------
+# Process SR2 data
+# Inputs: 0) ExifTool object reference, 1) reference to directory information
+#         2) pointer to tag table
+# Returns: 1 on success
+sub ProcessSR2($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirLen = $$dirInfo{DirLen};
+    my $verbose = $exifTool->Options('Verbose');
+    my $result = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+    return $result unless $result;
+    my $offset = $exifTool->{SR2SubIFDOffset};
+    my $length = $exifTool->{SR2SubIFDLength};
+    my $key = $exifTool->{SR2SubIFDKey};
+    my $raf = $$dirInfo{RAF};
+    my $base = $$dirInfo{Base} || 0;
+    if ($offset and $length and defined $key and $raf) {
+        my $buff;
+        if ($raf->Seek($offset+$base, 0) and $raf->Read($buff, $length)) {
+            Decrypt(\$buff, 0, $length, $key);
+            # display decrypted data in verbose mode
+            if ($verbose > 2) {
+                $exifTool->VerboseDir("Decrypted SR2SubIFD", 0, $length);
+                my %parms = (
+                    Out => $exifTool->{OPTIONS}->{TextOut},
+                    Prefix => $exifTool->{INDENT},
+                    Addr => $offset + $base,
+                );
+                $parms{MaxLen} = 96 unless $verbose > 3;
+                Image::ExifTool::HexDump(\$buff, $length, %parms);
+            }
+            my %dirInfo = (
+                DataPt => \$buff,
+                DataLen => length $buff,
+                DirStart => 0,
+                DirName => 'SR2SubIFD',
+                DataPos => $offset,
+            );
+            my $subTable = Image::ExifTool::GetTagTable('Image::ExifTool::Sony::SR2SubIFD');
+            $result = $exifTool->ProcessDirectory(\%dirInfo, $subTable);
+            
+        } else {
+            $exifTool->Warn('Error reading SR2 data');
+        }
+    }
+    delete $exifTool->{SR2SubIFDOffset};
+    delete $exifTool->{SR2SubIFDLength};
+    delete $exifTool->{SR2SubIFDKey};
+    return $result;
+}
+
 1; # end
 
 __END__
@@ -174,7 +277,7 @@ documentation.  You can use "exiftool -v3" to dump these blocks in hex.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -183,7 +286,7 @@ it under the same terms as Perl itself.
 
 =over 4
 
-=item L<http://www.cybercom.net/~dcoffin/dcraw/sony_clear.c>
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
 =back
 

@@ -49,7 +49,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x0002 => {
         Name => 'GPSLatitude',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         Count => 3,
         %coordConv,
     },
@@ -64,7 +64,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x0004 => {
         Name => 'GPSLongitude',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         Count => 3,
         %coordConv,
     },
@@ -78,14 +78,14 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x0006 => {
         Name => 'GPSAltitude',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         PrintConv => '"$val metres"',
         PrintConvInv => '$val=~s/\s*m.*//;$val',
     },
     0x0007 => {
         Name => 'GPSTimeStamp',
         Groups => { 2 => 'Time' },
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         Count => 3,
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
@@ -115,7 +115,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x000B => {
         Name => 'GPSDOP',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
     },
     0x000C => {
         Name => 'GPSSpeedRef',
@@ -129,7 +129,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x000D => {
         Name => 'GPSSpeed',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
     },
     0x000E => {
         Name => 'GPSTrackRef',
@@ -142,7 +142,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x000F => {
         Name => 'GPSTrack',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
     },
     0x0010 => {
         Name => 'GPSImgDirectionRef',
@@ -155,7 +155,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x0011 => {
         Name => 'GPSImgDirection',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
     },
     0x0012 => {
         Name => 'GPSMapDatum',
@@ -172,7 +172,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x0014 => {
         Name => 'GPSDestLatitude',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         Count => 3,
         %coordConv,
     },
@@ -187,7 +187,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x0016 => {
         Name => 'GPSDestLongitude',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         Count => 3,
         %coordConv,
     },
@@ -202,7 +202,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x0018 => {
         Name => 'GPSDestBearing',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
     },
     0x0019 => {
         Name => 'GPSDestDistanceRef',
@@ -216,7 +216,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x001A => {
         Name => 'GPSDestDistance',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
     },
     0x001B => {
         Name => 'GPSProcessingMethod',
@@ -370,7 +370,7 @@ GPS (Global Positioning System) meta information in EXIF data.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

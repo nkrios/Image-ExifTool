@@ -34,22 +34,23 @@
 <p>
 </p>
 <h1><a name="name">NAME</a></h1>
-<p>exiftool - Read/write meta information in images</p>
+<p>exiftool - Read/write meta information</p>
 <p>
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>exiftool [OPTIONS] [-TAG[[+-&lt;]=[VALUE]] or --TAG...] FILE ...</p>
+<p>exiftool [OPTIONS] [-TAG[[+-&lt;]=[VALUE]] or --TAG ...] FILE ...</p>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
 <p>A command-line interface to <a href="ExifTool.html">Image::ExifTool</a> used for
-reading and writing meta information in image files.  <code>FILE</code> may be an
-image file name, a directory name, or <code>-</code> for the standard input.
-Information is read from the specified file and output in readable form to
-the console (or written to an output text file with the <code>-w</code> option).</p>
-<p>To write information to an image file, specify new values using either the
+reading and writing meta information in image, audio and video files.
+<code>FILE</code> may be an image file name, a directory name, or <code>-</code> for the
+standard input. Information is read from the specified file and output in
+readable form to the console (or written to an output text file with the
+<code>-w</code> option).</p>
+<p>To write information to a file, specify new values using either the
 <code>-TAG=[VALUE]</code> syntax or the <code>-TagsFromFile</code> option.  This causes exiftool
 to rewrite <code>FILE</code> with the specified information, preserving the original
 file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify that the
@@ -59,19 +60,22 @@ supported by exiftool (r = read support, w = write support):</p>
 <pre>
                  File Type                      Meta Information
     -----------------------------------        ------------------
-    JPEG  r/w     XMP   r/w     PDF   r        EXIF           r/w
-    TIFF  r/w     THM   r/w     PS    r        GPS            r/w
-    GIF   r/w     PPM   r/w     EPS   r        IPTC           r/w
-    CRW   r/w     PPM   r/w     AI    r        XMP            r/w
-    CR2   r/w     PBM   r/w     PSD   r        MakerNotes     r/w
-    NEF   r/w     JP2   r       MIFF  r        Photoshop IRB  r/w
-    PEF   r/w     BMP   r       PICT  r        JFIF           r
-    MRW   r/w     ORF   r       QTIF  r        GeoTIFF        r
-    MOS   r/w     RAF   r       AVI   r        ICC Profile    r
-    DNG   r/w     SRF   r       MOV   r        PrintIM        r
-    PNG   r/w     X3F   r       MP4   r        ID3            r
-    MNG   r/w     DCM   r       MP3   r
-    JNG   r/w     ACR   r       WAV   r</pre>
+    JPEG  r/w     PPM   r/w     PDF   r        EXIF           r/w
+    TIFF  r/w     PGM   r/w     MIFF  r        GPS            r/w
+    GIF   r/w     PBM   r/w     PICT  r        IPTC           r/w
+    CRW   r/w     JP2   r       QTIF  r        XMP            r/w
+    CR2   r/w     BMP   r       RIFF  r        MakerNotes     r/w
+    NEF   r/w     ORF   r       AIFF  r        Photoshop IRB  r/w
+    PEF   r/w     RAF   r       AVI   r        AFCP           r/w
+    MRW   r/w     RAW   r       WAV   r        JFIF           r/w
+    MOS   r/w     SRF   r       MP3   r        GeoTIFF        r
+    DNG   r/w     SR2   r       MP4   r        ICC Profile    r
+    PNG   r/w     X3F   r       MOV   r        PrintIM        r
+    MNG   r/w     DCM   r       ASF   r        ID3            r
+    JNG   r/w     ACR   r       WMA   r
+    XMP   r/w     AI    r       WMV   r
+    THM   r/w     PS    r
+    PSD   r/w     EPS   r</pre>
 <p>
 </p>
 <hr />
@@ -88,8 +92,9 @@ Extract information for specified tag.  See
 <a href="TagNames/index.html">Image::ExifTool::TagNames</a> for documentation on
 available tag names.  The tag name may begin with an optional group name
 followed by a colon.  (ie. <code>-TAG:GROUP</code>, where <code>GROUP</code> is any valid family
-0 or 1 group name.  Use the <code>-group</code> option to list valid group names.)  If
-no tags are specified, all available information is extracted.
+0 or 1 group name optionally prefixed by a family number.  Use the <code>-listg</code>
+option to list valid group names.)  If no tags are specified, all available
+information is extracted.
 </dd>
 <dd>
 <p>A special tag name of <code>All</code> may be used to indicate all meta information.
@@ -248,7 +253,7 @@ no value is given, ExifTool will take its best guess at the correct base.
 <dd>
 Organize output by tag <strong>g</strong>roup.  <code>#</code> specifies the group family number,
 and may be 0 (general location), 1 (specific location) or 2 (category).  If
-not specified, <code>-g0</code> is assumed.  Use the <code>-group</code> option to list all
+not specified, <code>-g0</code> is assumed.  Use the <code>-listg</code> option to list all
 group names for a specified family.
 </dd>
 <p></p>
@@ -295,8 +300,8 @@ Use <strong>l</strong>ong 2-line Canon-style output format.
 <dt><strong><a name="item__2dl"><strong>-L</strong></a></strong><br />
 </dt>
 <dd>
-Convert Unicode characters in output to Windows <strong>L</strong>atin1 (cp1252) instead
-of the default UTF-8.
+Convert 16-bit Unicode characters in output to Windows <strong>L</strong>atin1 (cp1252)
+instead of the default UTF-8.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dlist_2c__2dlistw_2c__2dlistf_2c__2dlistg_5b_23_"><strong>-list</strong>, <strong>-listw</strong>, <strong>-listf</strong>, <strong>-listg</strong>[#]</a></strong><br />
@@ -304,9 +309,18 @@ of the default UTF-8.
 <dd>
 Print a <strong>list</strong> of all valid tag names (<code>-list</code>), all <strong>w</strong>ritable tag names
 (<code>-listw</code>), all recognized <strong>f</strong>ile types (<code>-listf</code>), or all tag <strong>g</strong>roups
-in a specified family (<code>-listg</code>).  With <code>-listg</code>, a number may be given to
-specify the group family, otherwise family 0 is assumed.  For example,
-<code>-listg1</code> lists all groups in family 1.
+in a specified family (<code>-listg</code>).  The <code>-list</code> and <code>-listw</code> options may
+be followed by an additional argument of the form <code>-GROUP:All</code> to list all
+tags in a specific group.  With <code>-listg</code>, a number may be given to specify
+the group family, otherwise family 0 is assumed.  For example:
+</dd>
+<dd>
+<pre>
+    -list               # list all tag names
+    -list -EXIF:All     # list all EXIF tags
+    -listw -XMP-dc:All  # list all writable XMP-dc tags
+    -listf              # list all recognized file types
+    -listg1             # list all groups in family 1</pre>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dm"><strong>-m</strong></a></strong><br />
@@ -475,12 +489,12 @@ convenience, <code>-TagsFromFile @</code> is assumed for any redirected tags whi
 specified without a prior <code>-TagsFromFile</code> option.</p>
 </dd>
 <dd>
-<p>For advanced batch use, the source file name may also be specified using a
-<code>FMT</code> string in which %d, %f and %e represent the directory, file name and
-extension of <code>FILE</code> (similar to the <code>-o</code> and <code>-w</code> options).</p>
+<p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples using <code>-TagsFromFile</code>.</p>
 </dd>
 <dd>
-<p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples of how to use this option.</p>
+<p>For advanced batch use, the source file name may also be specified using a
+<code>FMT</code> string in which %d, %f and %e represent the directory, file name and
+extension of <code>FILE</code>.  See <code>-w</code> option for <code>FMT</code> string examples.</p>
 </dd>
 <dd>
 <p>Be aware of the difference between excluding a tag from being copied
@@ -489,7 +503,7 @@ from being copied to the destination image, but deleting a tag will remove
 it if it already exists.</p>
 </dd>
 <dd>
-<p>Note that the maker note information is set as a block, so it isn't effected
+<p>Note that the maker note information is set as a block, so it isn't affected
 like other information by subsequent tag assignments on the command line.
 For example, to copy all information but the thumbnail image, use
 <code>-ThumbnailImage=</code> after <code>-TagsFromFile</code> on the command line.  Since the
@@ -536,8 +550,7 @@ extension (including the <code>.</code>) with the specified extension.  Alternat
 a format statement may be used to give more control over the output file
 name and directory.  In this case, <code>FMT</code> is a string specifying the output
 file name.  In this string, %d, %f and %e represent the directory, filename
-and extension of the source file.  Output directories are created
-automatically if necessary.  For example:
+and extension of the source file.  For example:
 </dd>
 <dd>
 <pre>
@@ -546,7 +559,28 @@ automatically if necessary.  For example:
     -w dir2/%d%f.txt  # writes to &quot;dir2&quot;, keeping dir structure</pre>
 </dd>
 <dd>
-<p>Existing files will not be overwritten.</p>
+<p>Existing files will not be overwritten.  Output directories are created
+automatically if necessary.</p>
+</dd>
+<dd>
+<p>Advanced feature:  A substring of the original file name, directory or
+extension may be taken by specifying a string length immediately following
+the % character.  If the length is negative, the substring is taken from the
+end.  The substring position (characters to ignore at the start or end of
+the string) may be given by a second optional value after a decimal point.
+For example:</p>
+</dd>
+<dd>
+<pre>
+    Input File Name     Format Specifier    Output File Name
+    ----------------    ----------------    ----------------
+    Picture-123.jpg     %7f.txt             Picture.txt
+    Picture-123.jpg     %-.4f.out           Picture.out
+    Picture-123.jpg     %7f.%-3f            Picture.123
+    Picture-123a.jpg    Meta%-3.1f.txt      Meta123.txt</pre>
+</dd>
+<dd>
+<p>This same <code>FMT</code> syntax is used with the <code>-o</code> and <code>-TagsFromFile</code> options.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dx_tag"><strong>-x</strong> <em>TAG</em></a></strong><br />
@@ -705,6 +739,12 @@ one hour and 30 minutes.  (This is equivalent to <code>-DateTimeOriginal-=1.5</c
 See <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a> for details.)
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2dcreatedate_2b_3d3__2dmodifydate_2b_3d3">exiftool -createdate+=3 -modifydate+=3 a.jpg b.jpg</a></strong><br />
+</dt>
+<dd>
+Add 3 hours to the CreateDate and ModifyDate timestamps of two images.
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__2dphotoshop_3aall_3d_dst_2ejpg">exiftool -Photoshop:All= dst.jpg</a></strong><br />
 </dt>
 <dd>
@@ -769,6 +809,13 @@ Copy the values of all writable tags from <code>src.crw</code> to <code>dst.jpg<
 the information to the preferred groups.
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__2dall_3aall_ds">exiftool -TagsFromFile src.jpg -all:all dst.jpg</a></strong><br />
+</dt>
+<dd>
+Copy the values of all writable tags from <code>src.jpg</code> to <code>dst.jpg</code>,
+preserving the original tag groups.
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg_out_2exmp">exiftool -tagsfromfile a.jpg out.xmp</a></strong><br />
 </dt>
 <dd>
@@ -776,13 +823,6 @@ Copy meta information <code>a.jpg</code> to an XMP data file.  If the XMP data f
 <code>out.xmp</code> already exists, it will be updated with the new information.
 Otherwise the XMP data file will be created.  Only XMP files may be created
 like this (other file types may be edited but not created).
-</dd>
-<p></p>
-<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ecrw__2dall_3aall_ds">exiftool -TagsFromFile src.crw -all:all dst.jpg</a></strong><br />
-</dt>
-<dd>
-Copy the values of all writable tags from <code>src.crw</code> to <code>dst.jpg</code>,
-preserving the original tag groups.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2dxmp_3aall_3d__">exiftool -tagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg</a></strong><br />
@@ -874,9 +914,9 @@ Add an IPTC keyword in a pipeline, saving output to a new file.
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Copyright 2003-2005, Phil Harvey</p>
-<p>This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.</p>
+<p>Copyright 2003-2006, Phil Harvey</p>
+<p>This is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.</p>
 <p>
 </p>
 <hr />

@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -94,7 +94,6 @@ sub ProcessX3FProperties($$$);
     AP_DESC     => 'ApertureDisplayed',
     APERTURE => {
         Name => 'FNumber',
-        Description => 'Aperture',
         Groups => { 2 => 'Image' },
         PrintConv => 'sprintf("%.1f",$val)',
     },
@@ -177,14 +176,13 @@ sub ProcessX3FProperties($$$);
     SH_DESC     => 'ShutterSpeedDisplayed',
     SHUTTER => {
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         Groups => { 2 => 'Image' },
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     TIME => {
         Name => 'DateTimeOriginal',
         Groups => { 2 => 'Time' },
-        Description => 'Shooting Date/Time',
+        Description => 'Date/Time Original',
         ValueConv => 'ConvertUnixTime($val)',
         PrintConv => '$self->ConvertDateTime($val)',
     },
@@ -432,7 +430,7 @@ Sigma and Foveon X3F images.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

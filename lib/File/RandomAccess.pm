@@ -7,6 +7,8 @@
 #               02/20/04 - P. Harvey Added flag to disable SeekTest in new()
 #               11/18/04 - P. Harvey Fixed bug with seek relative to end of file
 #               01/02/05 - P. Harvey Added DEBUG code
+#               01/09/06 - P. Harvey Fixed bug in ReadLine() when using
+#                                    multi-character EOL sequences
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.
@@ -15,7 +17,7 @@
 #
 #               May also be used for string i/o (just pass a scalar reference)
 #
-# Legal:        Copyright (c) 2004-2005 Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2004-2006 Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -27,7 +29,7 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.02';
+$VERSION = '1.03';
 @ISA = qw(Exporter);
 
 # constants
@@ -218,7 +220,7 @@ sub ReadLine($$)
             }
             # scan and read until we find the EOL (or hit EOF)
             for (;;) {
-                $pos = index(${$self->{BUFF_PT}}, $/, $pos) + 1;
+                $pos = index(${$self->{BUFF_PT}}, $/, $pos) + length($/);
                 last if $pos > 0;
                 $pos = $self->{LEN};    # have scanned to end of buffer
                 $num = read($fp, $buff, $CHUNK_SIZE) or last;
@@ -227,7 +229,7 @@ sub ReadLine($$)
             }
         } else {
             # string i/o
-            $pos = index(${$self->{BUFF_PT}}, $/, $pos) + 1;
+            $pos = index(${$self->{BUFF_PT}}, $/, $pos) + length($/);
             $pos <= 0 and $pos = $self->{LEN};
         }
         # read the line from our buffer

@@ -43,6 +43,7 @@ meaning of each special key:
     Fixup       - Reference to hash of offset fixups (used in EXIF writing only)
     FixBase     - Flag set to attempt to fix base offsets
     LastIFD     - Used by WriteExif() to return offset of last IFD written
+    ImageData   - Used by WriteExif() to avoid buffering large image data blocks
 
   WRITE_PROC : Reference to a function to write all new tags for this directory.
   The write proc returns the new directory data or undefined on error.  It takes
@@ -72,16 +73,17 @@ meaning of each special key:
     int32u      - Unsigned 32-bit integer                 (EXIF 'LONG')
     int64s      - Signed 64-bit integer
     int64u      - Unsigned 64-bit integer
-    rational16s - Rational consisting of 2 int16s values
-    rational16u - Rational consisting of 2 int16u values
-    rational32s - Rational consisting of 2 int32s values  (EXIF 'SRATIONAL')
-    rational32u - Rational consisting of 2 int32u values  (EXIF 'RATIONAL')
+    rational32s - Rational consisting of 2 int16s values
+    rational32u - Rational consisting of 2 int16u values
+    rational64s - Rational consisting of 2 int32s values  (EXIF 'SRATIONAL')
+    rational64u - Rational consisting of 2 int32u values  (EXIF 'RATIONAL')
     fixed16s    - Signed 16-bit fixed point value
     fixed16u    - Unsigned 16-bit fixed point value
     fixed32s    - Signed 32-bit fixed point value
     fixed32u    - Unsigned 32-bit fixed point value
     float       - 32-bit IEEE floating point value        (EXIF 'FLOAT')
     double      - 64-bit IEEE floating point value        (EXIF 'DOUBLE')
+    extended    - 80-bit extended floating float
     ifd         - Unsigned 32-bit integer sub-IFD pointer (EXIF 'IFD')
     string      - Series of 8-bit ASCII characters        (EXIF 'ASCII')
     undef       - Undefined-format binary data            (EXIF 'UNDEFINED')
@@ -223,6 +225,10 @@ conditions.  The following is a description of possible hash entries:
 
                   'Unknown' - this is an unknown tag (only extracted when the
                   Unknown option is set.
+                  
+                  'SeparateTable' - set to list PrintConv values in a separate
+                  table in the HTML documentation.  Value is 1 or the name of
+                  the module where the table should be located.
 
   RawConv       : [optional] Used to convert the Raw value at extraction time
                   (while the image file is still open, unlike ValueConv and
@@ -244,17 +250,23 @@ conditions.  The following is a description of possible hash entries:
                   which is evaluated as a Perl expression, or a code reference
                   to a subroutine.  If a hash reference is used and the Raw
                   value doesn't appear as one of the keys, then the converted
-                  value is set to "Unknown (X)", where X is the Raw value.  In
-                  an expression, $self is a reference to the current ExifTool
-                  object, $val is the Raw value, and $tag is the tag name.  The
-                  subroutine takes 2 arguments: the Raw value and a reference to
-                  the current ExifTool object.  When evaluated, the expression
-                  or subroutine returns a scalar for the converted value, a
-                  scalar reference to a binary data value, or undefined to
-                  ignore the tag.  Composite tags which Require or Desire other
-                  tags may access the ValueConv and PrintConv values of these
-                  tags through the elements of the @val and @valPrint lists.  If
-                  ValueConv is not specified, the Raw value is not converted.
+                  value is set to "Unknown (X)", where X is the Raw value
+                  (unless a special 'BITMASK' key exists, in which case the hash
+                  referenced by 'BITMASK' is used to decode individual value
+                  bits).  In an expression, $self is a reference to the current
+                  ExifTool object, $val is the Raw value, and $tag is the tag
+                  name.  The subroutine takes 2 arguments: the Raw value and a
+                  reference to the current ExifTool object.  When evaluated, the
+                  expression or subroutine returns a scalar for the converted
+                  value, a scalar reference to a binary data value, but the
+                  value MUST be defined.  (Use RawConv instead to return undef
+                  if it is necessary to test the value for validity, otherwise
+                  an undef tag may hide a previously defined value when the
+                  Duplicates option is not enabled.)  Composite tags which
+                  Require or Desire other tags may access the ValueConv,
+                  PrintConv and Raw values of these tags through the elements of
+                  the @val, @prt and @raw lists respectively.  If ValueConv is
+                  not specified, the Raw value is not converted.
 
   PrintConv     : [optional] This entry is similar to ValueConv above, except
                   that it is used to further convert the tag value to a human
@@ -300,11 +312,11 @@ conditions.  The following is a description of possible hash entries:
 
   Desire        : [Composite tables only] This is the same as Require except
                   that the value is still calculated even if the specified tags
-                  don't exist.  Beware that the elements of @val and @valPrint
+                  don't exist.  Beware that the elements of @val, @prt and @raw
                   may be undefined for Desire'd tags.  Both Require and Desire
                   may exist together, however be sure to specify unique keys for
-                  each tag since they are used as indices into the @val and
-                  @valPrint lists.
+                  each tag since they are used as indices into the @val, @prt
+                  and @raw lists.
 
   Shift         : [optional] For Writable tags only.  Specifies type of shift
                   to apply if this value may be shifted.  Set to 'Time' for

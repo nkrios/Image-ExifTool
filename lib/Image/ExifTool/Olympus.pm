@@ -196,13 +196,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x0204 => {
         Name => 'DigitalZoom',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         PrintConv => '$val=~/\./ or $val.=".0"; $val',
         PrintConvInv => '$val',
     },
     0x0205 => { #6
         Name => 'FocalPlaneDiagonal',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s+.*//;$val',
     },
@@ -288,9 +288,9 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         },
     },
     # commented out tags below from ref 3 look wrong to me - PH
-    #0x1006 => 'Bracket', #3 (rational32s)
+    #0x1006 => 'Bracket', #3 (rational64s)
     #0x100b => 'FocusMode', #3 (int16u)
-    #0x100c => 'FocusDistance', #3 (rational32u)
+    #0x100c => 'FocusDistance', #3 (rational64u)
     #0x100d => 'Zoom', #3 (int16u)
     #0x100e => 'MacroFocus', #3 (int16u)
     #0x100f => 'SharpnessFactor', #3 (int16u)
@@ -324,7 +324,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'SerialNumber',
         Writable => 'string',
     },
-    #0x1023 => 'FlashBias', #3 (rational32s)
+    #0x1023 => 'FlashBias', #3 (rational64s)
     0x1029 => { #3
         Name => 'Contrast',
         Writable => 'int16u',
@@ -362,7 +362,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x1034 => { #3
         Name => 'CompressionRatio',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
     },
     0x1035 => { #6
         Name => 'PreviewImageValid',
@@ -472,7 +472,7 @@ any information found here will be extracted, even if the tag is not listed.
     },
     0x103 => { #6
         Name => 'FocalPlaneDiagonal',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s+.*//;$val',
     },
@@ -671,7 +671,7 @@ any information found here will be extracted, even if the tag is not listed.
     },
     0x401 => { #6
         Name => 'FlashExposureCompensation',
-        Writable => 'rational32s',
+        Writable => 'rational64s',
     },
     0x501 => { #PH/4
         Name => 'WhiteBalanceTemperature',
@@ -769,7 +769,7 @@ any information found here will be extracted, even if the tag is not listed.
     },
     0x50d => { #PH/4
         Name => 'CompressionFactor',
-        Writable => 'rational32u',
+        Writable => 'rational64u',
     },
     0x50f => { #6
         Name => 'Gradation',
@@ -821,7 +821,7 @@ any information found here will be extracted, even if the tag is not listed.
     },
     0x100 => { #6
         Name => 'RawDevExposureBiasValue',
-        Writable => 'rational32s',
+        Writable => 'rational64s',
     },
     0x101 => { #6
         Name => 'RawDevWhiteBalanceValue',
@@ -1112,7 +1112,7 @@ Olympus or Epson maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 sub ProcessID3v2($$$);
 
@@ -241,7 +241,7 @@ ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
         PrintConv => 'Image::ExifTool::ID3::PrintGenre($val)',
     },
     TCP => 'Compilation', # not part of spec, but used by iTunes
-    TCR => 'Copyright',
+    TCR => { Name => 'Copyright', Groups => { 2 => 'Author' } },
     TDA => { Name => 'Date', Groups => { 2 => 'Time' } },
     TDY => 'PlaylistDelay',
     TEN => 'EncodedBy',
@@ -278,7 +278,7 @@ ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
     WAR => { Name => 'ArtistURL', Groups => { 2 => 'Author' } },
     WAS => 'SourceURL',
     WCM => 'CommercialURL',
-    WCP => 'CopyrightURL',
+    WCP => { Name => 'CopyrightURL', Groups => { 2 => 'Author' } },
     WPB => 'PublisherURL',
     WXX => 'UserDefinedURL',
 );
@@ -301,7 +301,7 @@ my %id3v2_common = (
         Notes => 'uses same lookup table as ID3v1 Genre',
         PrintConv => 'Image::ExifTool::ID3::PrintGenre($val)',
     },
-    TCOP => 'Copyright',
+    TCOP => { Name => 'Copyright', Groups => { 2 => 'Author' } },
     TDLY => 'PlaylistDelay',
     TENC => 'EncodedBy',
     TEXT => 'Lyricist',
@@ -538,7 +538,8 @@ sub ProcessID3v2($$$)
 sub ProcessID3($$)
 {
     my ($exifTool, $dirInfo) = @_;
-    my $raf = $$dirInfo{RAF};
+    # allow this to be called with either RAF or DataPt
+    my $raf = $$dirInfo{RAF} || new File::RandomAccess($$dirInfo{DataPt});
     my $buff;
     my $rtnVal = 0;
 
@@ -548,7 +549,8 @@ sub ProcessID3($$)
 # look for ID3v2 header
 #
     if ($buff =~ /^ID3/) {
-        $exifTool->SetFileType();
+        # set file type if not done already
+        $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
         $rtnVal = 1;
         $raf->Read($buff, 7) == 7 or $exifTool->Warn('Short ID3 header'), return 1;
         my ($vers, $flags, $size) = unpack('nCN', $buff);
@@ -657,7 +659,7 @@ other types of audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

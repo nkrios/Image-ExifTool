@@ -1,26 +1,26 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: Unknown.jpg
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2004:11:11 11:03:55
+[File, File, Image]  - File Size: 3 kB
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 160
-[File, File, Image]  - Image Height: 120
+[File, File, Image]  - Image Width: 8
+[File, File, Image]  - Image Height: 8
 [EXIF, IFD0, Camera] 271 - Make: Xxxxx
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS 10D
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 282 - X Resolution: 180
 [EXIF, IFD0, Image] 283 - Y Resolution: 180
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:11:30 18:05:18
+[EXIF, IFD0, Time] 306 - Modify Date: 2003:11:30 18:05:18
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 3.2
-[EXIF, ExifIFD, Image] 33437 - Aperture: 5.0
-[EXIF, ExifIFD, Image] 34855 - ISO Speed: 200
+[EXIF, ExifIFD, Image] 33434 - Exposure Time: 3.2
+[EXIF, ExifIFD, Image] 33437 - F Number: 5.0
+[EXIF, ExifIFD, Image] 34855 - ISO: 200
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:11:30 18:05:18
-[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:11:30 18:05:18
+[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:11:30 18:05:18
+[EXIF, ExifIFD, Time] 36868 - Create Date: 2003:11:30 18:05:18
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 3.2
@@ -74,7 +74,7 @@
 [MakerNotes, MakerUnknown, Camera] 19 - Unknown 0x0013: 0 159 7 112
 [MakerNotes, MakerUnknown, Camera] 181 - Unknown 0x00b5: 10 2 2 1536 1024
 [Composite, Composite, Image]  - Aperture: 5.0
-[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 29.3
 [Composite, Composite, Image]  - Shutter Speed: 3.2
 [Composite, Composite, Image]  - Circle Of Confusion: 0.001 mm

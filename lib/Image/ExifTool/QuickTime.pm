@@ -16,11 +16,11 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.06';
 
 sub FixWrongFormat($);
 
-# information for time/date-based tags
+# information for time/date-based tags (time zero is Jan 1, 1904)
 my %timeInfo = (
     Groups => { 2 => 'Time' },
     ValueConv => 'ConvertUnixTime($val - ((66 * 365 + 17) * 24 * 3600))',
@@ -141,12 +141,10 @@ Tags used in QTIF QuickTime Image Files.
     0 => { Name => 'Version', Format => 'int8u' },
     1 => {
         Name => 'CreateDate',
-        Description => 'Date/Time Of Digitization',
         %timeInfo,
     },
     2 => {
         Name => 'ModifyDate',
-        Description => 'Date/Time Of Last Modification',
         %timeInfo,
     },
     3 => {
@@ -234,12 +232,12 @@ Tags used in QTIF QuickTime Image Files.
     19 => {
         Name => 'ImageWidth',
         Priority => 0,
-        ValueConv => \&FixWrongFormat,
+        RawConv => \&FixWrongFormat,
     },
     20 => {
         Name => 'ImageHeight',
         Priority => 0,
-        ValueConv => \&FixWrongFormat,
+        RawConv => \&FixWrongFormat,
     },
 );
 
@@ -527,7 +525,7 @@ not freely available (yes, ISO sucks).
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

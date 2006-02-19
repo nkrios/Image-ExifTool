@@ -224,13 +224,13 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr valign='top'>
 <td>0x011a</td>
 <td>XResolution</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x011b</td>
 <td>YResolution</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -249,13 +249,13 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr valign='top'>
 <td>0x011e</td>
 <td>XPosition</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x011f</td>
 <td>YPosition</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -291,13 +291,15 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <td>T4Options</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'>Bit 0 = 2-Dimensional encoding
+  <br>Bit 1 = Uncompressed
+  <br>Bit 2 = Fill bits added</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0125</td>
 <td>T6Options</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'>Bit 1 = Uncompressed</font></td></tr>
 <tr valign='top'>
 <td>0x0128</td>
 <td>ResolutionUnit</td>
@@ -358,13 +360,13 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x013e</td>
 <td>WhitePoint</td>
-<td align='center'>rational32u[2]</td>
+<td align='center'>rational64u[2]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x013f</td>
 <td>PrimaryChromaticities</td>
-<td align='center'>rational32u[6]</td>
+<td align='center'>rational64u[6]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -563,7 +565,13 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <td>CodingMethods</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'>Bit 0 = Unspecified compression
+  <br>Bit 1 = Modified Huffman
+  <br>Bit 2 = Modified Read
+  <br>Bit 3 = Modified MR
+  <br>Bit 4 = JBIG
+  <br>Bit 5 = Baseline JPEG
+  <br>Bit 6 = JBIG color</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0194</td>
 <td>VersionYear</td>
@@ -654,7 +662,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr valign='top'>
 <td>0x0211</td>
 <td>YCbCrCoefficients</td>
-<td align='center'>rational32u[3]</td>
+<td align='center'>rational64u[3]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -678,7 +686,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0214</td>
 <td>ReferenceBlackWhite</td>
-<td align='center'>rational32u[6]</td>
+<td align='center'>rational64u[6]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -780,14 +788,62 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr valign='top'>
 <td>0x829a</td>
 <td>ExposureTime</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x829d</td>
 <td>FNumber</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x82a5</td>
+<td>MDFileTag</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td><font size='-1'><font color="#666666">(tags 0x82a5-0x82ac are used in Molecular Dynamics GEL files)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x82a6</td>
+<td>MDScalePixel</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x82a7</td>
+<td>MDColorTable</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x82a8</td>
+<td>MDLabName</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x82a9</td>
+<td>MDSampleInfo</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x82aa</td>
+<td>MDPrepDate</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x82ab</td>
+<td>MDPrepTime</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x82ac</td>
+<td>MDFileUnits</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x830e</td>
@@ -798,11 +854,11 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x83bb</td>
 <td>IPTC-NAA</td>
-<td align='center'>int32u</td>
+<td align='center'>undef</td>
 <td align='center'>IFD0</td>
 <td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
 <tr valign='top'>
-<td>0x8474</td>
+<td>0x847e</td>
 <td>IntergraphPacketData</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
@@ -917,7 +973,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x8568</td>
-<td>IPTC-NAA2</td>
+<td>AFCP_IPTC</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
@@ -1081,43 +1137,43 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9102</td>
 <td>CompressedBitsPerPixel</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9201</td>
 <td>ShutterSpeedValue</td>
-<td align='center'>rational32s</td>
+<td align='center'>rational64s</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9202</td>
 <td>ApertureValue</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9203</td>
 <td>BrightnessValue</td>
-<td align='center'>rational32s</td>
+<td align='center'>rational64s</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9204</td>
 <td>ExposureCompensation</td>
-<td align='center'>rational32s</td>
+<td align='center'>rational64s</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9205</td>
 <td>MaxApertureValue</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9206</td>
 <td>SubjectDistance</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1187,7 +1243,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x920a</td>
 <td>FocalLength</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1308,6 +1364,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>MakerNoteOlympus
   <br>MakerNoteLeica
   <br>MakerNotePanasonic
+  <br>MakerNotePanasonic2
   <br>MakerNotePentax
   <br>MakerNoteRicoh
   <br>MakerNoteRicohText
@@ -1316,9 +1373,10 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>MakerNoteSigma
   <br>MakerNoteSony
   <br>MakerNoteSonySRF
+  <br>MakerNoteSonySR2
   <br>MakerNoteUnknown</td>
-<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -1342,6 +1400,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>--&gt; <a href='Olympus.html'>Olympus Tags</a>
   <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
   <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
+  <br>--&gt; <a href='Panasonic.html#Type2'>Panasonic Type2 Tags</a>
   <br>--&gt; <a href='Pentax.html'>Pentax Tags</a>
   <br>--&gt; <a href='Ricoh.html'>Ricoh Tags</a>
   <br>--&gt; <a href='Ricoh.html#Text'>Ricoh Text Tags</a>
@@ -1350,6 +1409,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>--&gt; <a href='Sigma.html'>Sigma Tags</a>
   <br>--&gt; <a href='Sony.html'>Sony Tags</a>
   <br>--&gt; <a href='Sony.html#SRF'>Sony SRF Tags</a>
+  <br>--&gt; <a href='Sony.html'>Sony Tags</a>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9286</td>
@@ -1455,7 +1515,7 @@ ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa20b</td>
 <td>FlashEnergy</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1473,13 +1533,13 @@ ImageDescription exists)</font></font></td></tr>
 <tr valign='top'>
 <td>0xa20e</td>
 <td>FocalPlaneXResolution</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa20f</td>
 <td>FocalPlaneYResolution</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1518,7 +1578,7 @@ ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa215</td>
 <td>ExposureIndex</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1582,7 +1642,7 @@ ImageDescription exists)</font></font></td></tr>
 <tr valign='top'>
 <td>0xa404</td>
 <td>DigitalZoomRatio</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -1669,7 +1729,7 @@ ImageDescription exists)</font></font></td></tr>
 <tr valign='top'>
 <td>0xa500</td>
 <td>Gamma</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -1713,7 +1773,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>DNGVersion</td>
 <td align='center'>int8u[4]</td>
 <td align='center'>IFD0</td>
-<td><font size='-1'><font color="#666666">(tags 0xc612-0xc692 are used in DNG images)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(tags 0xc612-0xc65d are used in DNG images)</font></font></td></tr>
 <tr valign='top'>
 <td>0xc613</td>
 <td>DNGBackwardVersion</td>
@@ -1787,7 +1847,7 @@ ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc61e</td>
 <td>DefaultScale</td>
-<td align='center'>rational32u[2]</td>
+<td align='center'>rational64u[2]</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1853,25 +1913,25 @@ ImageDescription exists)</font></font></td></tr>
 <tr valign='top'>
 <td>0xc629</td>
 <td>AsShotWhiteXY</td>
-<td align='center'>rational32u[2]</td>
+<td align='center'>rational64u[2]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc62a</td>
 <td>BaselineExposure</td>
-<td align='center'>rational32s</td>
+<td align='center'>rational64s</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc62b</td>
 <td>BaselineNoise</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc62c</td>
 <td>BaselineSharpness</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1883,7 +1943,7 @@ ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc62e</td>
 <td>LinearResponseLimit</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -1895,33 +1955,34 @@ ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc630</td>
 <td>DNGLensInfo</td>
-<td align='center'>rational32u[4]</td>
+<td align='center'>rational64u[4]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc631</td>
 <td>ChromaBlurRadius</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc632</td>
 <td>AntiAliasStrength</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc633</td>
 <td>ShadowScale</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc634</td>
-<td>DNGPrivateData</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td>DNGPrivateData
+  <br>SR2Private</td>
+<td align='center'>N<br>-</td>
+<td align='center'>-<br>-</td>
+<td><font size='-1'>Sony SR2Private</font></td></tr>
 <tr valign='top'>
 <td>0xc635</td>
 <td>MakerNoteSafety</td>
@@ -1982,21 +2043,21 @@ ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc65c</td>
 <td>BestQualityScale</td>
-<td align='center'>rational32u</td>
+<td align='center'>rational64u</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xc65d</td>
 <td>RawDataUniqueID</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>undef[16]</td>
+<td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc660</td>
 <td>AliasLayerMetadata</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(used by Alias Sketchbook Pro, not a DNG tag)</font></font></td></tr>
 <tr valign='top'>
 <td>0xc68b</td>
 <td>OriginalRawFileName</td>
@@ -2006,9 +2067,9 @@ ImageDescription exists)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xc68c</td>
 <td>OriginalRawFileData</td>
-<td align='center'>N</td>
+<td align='center'>undef</td>
 <td align='center'>IFD0</td>
-<td>&nbsp;</td></tr>
+<td>--&gt; <a href='DNG.html#OriginalRaw'>DNG OriginalRaw Tags</a></td></tr>
 <tr valign='top'>
 <td>0xc68d</td>
 <td>ActiveArea</td>
@@ -2136,6 +2197,6 @@ writing these unless they already exist in the file)</font></font></td></tr>
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 22, 2005</i>
+<br><i>Last revised Feb 16, 2006</i>
 </body>
 </html>

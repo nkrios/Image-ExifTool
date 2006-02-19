@@ -30,7 +30,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.79';
+$VERSION = '1.86';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -42,8 +42,8 @@ sub RebuildMakerNotes($$$);
 
 @formatName = (
     'err','int8u','string','int16u',
-    'int32u','rational32u','int8s','undef',
-    'int16s','int32s','rational32s','float',
+    'int32u','rational64u','int8s','undef',
+    'int16s','int32s','rational64s','float',
     'double', 'ifd'
 );
 
@@ -52,15 +52,15 @@ sub RebuildMakerNotes($$$);
 %formatNumber = (
     'int8u'         => 1,   # BYTE
     'string'        => 2,   # ASCII
-    'binary'        => 2,   # (binary is the same as string in Perl, but watch out for UTF8)
     'int16u'        => 3,   # SHORT
     'int32u'        => 4,   # LONG
-    'rational32u'   => 5,   # RATIONAL
+    'rational64u'   => 5,   # RATIONAL
     'int8s'         => 6,   # SBYTE
     'undef'         => 7,   # UNDEFINED
+    'binary'        => 7,   # (treat binary data as undef)
     'int16s'        => 8,   # SSHORT
     'int32s'        => 9,   # SLONG
-    'rational32s'   => 10,  # SRATIONAL
+    'rational64s'   => 10,  # SRATIONAL
     'float'         => 11,  # FLOAT
     'double'        => 12,  # DOUBLE
     'ifd'           => 13,  # IFD (with int32u format)
@@ -148,6 +148,11 @@ sub RebuildMakerNotes($$$);
     8 => 'Rotate 270 CW',
 );
 
+# ValueConv that makes long values binary type
+my %longBin = (
+    ValueConv => 'length($val) > 64 ? \$val : $val',
+    ValueConvInv => '$val',
+);
 
 # main EXIF tag table
 %Image::ExifTool::Exif::Main = (
@@ -353,17 +358,17 @@ sub RebuildMakerNotes($$$);
     },
     0x124 => {
         Name => 'T4Options',
-        PrintConv => q[Image::ExifTool::Exif::DecodeBits($val, {
+        PrintConv => { BITMASK => {
             0 => '2-Dimensional encoding',
             1 => 'Uncompressed',
             2 => 'Fill bits added',
-        } )], #3
+        } }, #3
     },
     0x125 => {
         Name => 'T6Options',
-        PrintConv => q[Image::ExifTool::Exif::DecodeBits($val, {
+        PrintConv => { BITMASK => {
             1 => 'Uncompressed',
-        } )], #3
+        } }, #3
     },
     0x128 => {
         Name => 'ResolutionUnit',
@@ -385,7 +390,6 @@ sub RebuildMakerNotes($$$);
     },
     0x132 => {
         Name => 'ModifyDate',
-        Description => 'Date/Time Of Last Modification',
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
@@ -518,7 +522,7 @@ sub RebuildMakerNotes($$$);
     },
     0x193 => { #3
         Name => 'CodingMethods',
-        PrintConv => q[Image::ExifTool::Exif::DecodeBits($val, {
+        PrintConv => { BITMASK => {
             0 => 'Unspecified compression',
             1 => 'Modified Huffman',
             2 => 'Modified Read',
@@ -526,7 +530,7 @@ sub RebuildMakerNotes($$$);
             4 => 'JBIG',
             5 => 'Baseline JPEG',
             6 => 'JBIG color',
-        } )],
+        } },
     },
     0x194 => 'VersionYear', #3
     0x195 => 'ModeNumber', #3
@@ -698,14 +702,23 @@ sub RebuildMakerNotes($$$);
     },
     0x829a => {
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     0x829d => {
         Name => 'FNumber',
-        Description => 'Aperture',
         PrintConv => 'sprintf("%.1f",$val)',
     },
+    0x82a5 => { #3
+        Name => 'MDFileTag',
+        Notes => 'tags 0x82a5-0x82ac are used in Molecular Dynamics GEL files',
+    },
+    0x82a6 => 'MDScalePixel', #3
+    0x82a7 => 'MDColorTable', #3
+    0x82a8 => 'MDLabName', #3
+    0x82a9 => 'MDSampleInfo', #3
+    0x82aa => 'MDPrepDate', #3
+    0x82ab => 'MDPrepTime', #3
+    0x82ac => 'MDFileUnits', #3
     0x830e => 'PixelScale',
     0x83bb => {
         Name => 'IPTC-NAA',
@@ -714,7 +727,7 @@ sub RebuildMakerNotes($$$);
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
-    0x8474 => 'IntergraphPacketData', #3
+    0x847e => 'IntergraphPacketData', #3
     0x847f => 'IntergraphFlagRegisters', #3
     0x8480 => 'IntergraphMatrix',
     0x8482 => {
@@ -737,9 +750,9 @@ sub RebuildMakerNotes($$$);
     0x84ed => 'ColorCharacterization', #9
     0x84ee => 'HCUsage', #9
     0x8568 => {
-        Name => 'IPTC-NAA2',
+        Name => 'AFCP_IPTC',
         SubDirectory => {
-            DirName => 'IPTC2',     # change name because this isn't the IPTC we want to write
+            DirName => 'IPTC2', # change name because this isn't the IPTC we want to write
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
@@ -821,13 +834,8 @@ sub RebuildMakerNotes($$$);
             Start => '$val',
         },
     },
-    0x8827 => {
-        Name => 'ISO',
-        Description => 'ISO Speed',
-    },
-    0x8828 => {
-        Name => 'Opto-ElectricConvFactor',
-    },
+    0x8827 => 'ISO',
+    0x8828 => 'Opto-ElectricConvFactor',
     0x8829 => 'Interlace',
     0x882a => 'TimeZoneOffset',
     0x882b => 'SelfTimerMode',
@@ -847,13 +855,12 @@ sub RebuildMakerNotes($$$);
     0x9000 => 'ExifVersion',
     0x9003 => {
         Name => 'DateTimeOriginal',
-        Description => 'Shooting Date/Time',
+        Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
     0x9004 => {
         Name => 'CreateDate',
-        Description => 'Date/Time Of Digitization',
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
@@ -1243,7 +1250,7 @@ sub RebuildMakerNotes($$$);
     # DNG tags 0xc6XX (ref 2 unless otherwise stated)
     0xc612 => {
         Name => 'DNGVersion',
-        Notes => 'tags 0xc612-0xc692 are used in DNG images',
+        Notes => 'tags 0xc612-0xc65d are used in DNG images',
     },
     0xc613 => 'DNGBackwardVersion',
     0xc614 => 'UniqueCameraModel',
@@ -1269,8 +1276,8 @@ sub RebuildMakerNotes($$$);
     },
     0xc619 => 'BlackLevelRepeatDim',
     0xc61a => 'BlackLevel',
-    0xc61b => 'BlackLevelDeltaH',
-    0xc61c => 'BlackLevelDeltaV',
+    0xc61b => { Name => 'BlackLevelDeltaH', %longBin },
+    0xc61c => { Name => 'BlackLevelDeltaV', %longBin },
     0xc61d => 'WhiteLevel',
     0xc61e => 'DefaultScale',
     0xc61f => 'DefaultCropOrigin',
@@ -1301,10 +1308,24 @@ sub RebuildMakerNotes($$$);
     0xc631 => 'ChromaBlurRadius',
     0xc632 => 'AntiAliasStrength',
     0xc633 => 'ShadowScale', #DNG forum at http://www.adobe.com/support/forums/main.html
-    0xc634 => {
-        Name => 'DNGPrivateData',
-        ValueConv => '\$val',
-    },
+    0xc634 => [
+        {
+            Name => 'DNGPrivateData',
+            Condition => '$self->{TIFF_TYPE} ne "SR2"',
+            ValueConv => '\$val',
+        },
+        {
+            Name => 'SR2Private',
+            Groups => { 1 => 'SR2' },
+            Flags => 'SubIFD',
+            Format => 'int32u',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Sony::SR2Private',
+                DirName => 'SR2Private',
+                Start => '$val',
+            },
+        },
+    ],
     0xc635 => {
         Name => 'MakerNoteSafety',
         PrintConv => {
@@ -1321,12 +1342,24 @@ sub RebuildMakerNotes($$$);
         PrintConv => \%lightSource,
     },
     0xc65c => 'BestQualityScale', #3 (incorrect in ref 2)
-    0xc65d => 'RawDataUniqueID',
-    0xc660 => 'AliasLayerMetadata', #3
-    0xc68b => 'OriginalRawFileName',
+    0xc65d => {
+        Name => 'RawDataUniqueID',
+        Format => 'undef',
+        ValueConv => 'uc(unpack("H*",$val))',
+    },
+    0xc660 => { #3
+        Name => 'AliasLayerMetadata',
+        Notes => 'used by Alias Sketchbook Pro, not a DNG tag',
+    },
+    0xc68b => {
+        Name => 'OriginalRawFileName',
+        Format => 'string', # sometimes written as int8u
+    },
     0xc68c => {
         Name => 'OriginalRawFileData',
-        ValueConv => '\$val',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::DNG::OriginalRaw',
+        },
     },
     0xc68d => 'ActiveArea',
     0xc68e => 'MaskedAreas',
@@ -1379,6 +1412,7 @@ sub RebuildMakerNotes($$$);
             0 => 'FNumber',
             1 => 'ApertureValue',
         },
+        RawConv => '($val[0] || $val[1]) ? $val : undef',
         ValueConv => '$val[0] || $val[1]',
         PrintConv => 'sprintf("%.1f", $val)',
     },
@@ -1403,15 +1437,17 @@ sub RebuildMakerNotes($$$);
             0 => 'FocalLength',
             1 => 'FocalLengthIn35mmFormat',
             2 => 'FocalPlaneDiagonal',
-            3 => 'FocalPlaneResolutionUnit',
-            4 => 'FocalPlaneXResolution',
-            5 => 'FocalPlaneYResolution',
-            6 => 'CanonImageWidthAsShot',
-            7 => 'CanonImageHeightAsShot',
-            8 => 'ExifImageWidth',
-            9 => 'ExifImageLength',
-           10 => 'ImageWidth',
-           11 => 'ImageHeight',
+            3 => 'FocalPlaneXSize',
+            4 => 'FocalPlaneYSize',
+            5 => 'FocalPlaneResolutionUnit',
+            6 => 'FocalPlaneXResolution',
+            7 => 'FocalPlaneYResolution',
+            8 => 'CanonImageWidth',
+            9 => 'CanonImageHeight',
+           10 => 'ExifImageWidth',
+           11 => 'ExifImageLength',
+           12 => 'ImageWidth',
+           13 => 'ImageHeight',
         },
         ValueConv => 'Image::ExifTool::Exif::CalcScaleFactor35efl(@val)',
         PrintConv => 'sprintf("%.1f", $val)',
@@ -1475,13 +1511,13 @@ sub RebuildMakerNotes($$$);
     # set the original date/time from DateTimeCreated if not set already
     DateTimeOriginal => {
         Condition => 'not defined($oldVal)',
-        Description => 'Shooting Date/Time',
+        Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         Require => {
             0 => 'DateTimeCreated',
         },
         ValueConv => '$val[0]',
-        PrintConv => '$valPrint[0]',
+        PrintConv => '$prt[0]',
     },
     ThumbnailImage => {
         Writable => 1,
@@ -1530,7 +1566,7 @@ sub RebuildMakerNotes($$$);
         ValueConv => '"$val[0]x$val[1]"',
     },
     SubSecDateTimeOriginal => {
-        Description => 'Shooting Date/Time',
+        Description => 'Date/Time Original',
         Require => {
             0 => 'DateTimeOriginal',
             1 => 'SubSecTimeOriginal',
@@ -1578,9 +1614,10 @@ sub AUTOLOAD
 # Inputs: 0) Focal length
 #         1) Focal length in 35mm format
 #         2) Focal plane diagonal size (in mm)
-#         3) focal plane resolution units (in mm)
-#         4/5) Focal plane X/Y resolution
-#         6/7,8/9...) Image width/height in order of precedence (first valid pair is used)
+#         3/4) Focal plane X/Y size (in mm)
+#         5) focal plane resolution units (in mm)
+#         6/7) Focal plane X/Y resolution
+#         8/9,10/11...) Image width/height in order of precedence (first valid pair is used)
 # Returns: 35mm conversion factor (or undefined if it can't be calculated)
 sub CalcScaleFactor35efl
 {
@@ -1591,24 +1628,30 @@ sub CalcScaleFactor35efl
 
     my $diag = shift;
     unless ($diag and Image::ExifTool::IsFloat($diag)) {
-        my $units = shift || return undef;
-        my $x_res = shift || return undef;
-        my $y_res = shift || return undef;
-        my ($w, $h);
-        for (;;) {
-            @_ < 2 and return undef;
-            $w = shift;
-            $h = shift;
-            next unless $w and $h;
-            my $a = $w / $h;
-            last if $a > 0.5 and $a < 2; # stop if we get a reasonable value
+        my $xsize = shift;
+        my $ysize = shift;
+        if ($xsize and $ysize) {
+            $diag = sqrt($xsize * $xsize + $ysize * $ysize);
+        } else {
+            my $units = shift || return undef;
+            my $x_res = shift || return undef;
+            my $y_res = shift || return undef;
+            my ($w, $h);
+            for (;;) {
+                @_ < 2 and return undef;
+                $w = shift;
+                $h = shift;
+                next unless $w and $h;
+                my $a = $w / $h;
+                last if $a > 0.5 and $a < 2; # stop if we get a reasonable value
+            }
+            # calculate focal plane size in mm
+            $w *= $units / $x_res;
+            $h *= $units / $y_res;
+            $diag = sqrt($w*$w+$h*$h);
+            # make sure size is reasonable
+            return undef unless $diag > 1 and $diag < 100;
         }
-        # calculate focal plane size in mm
-        $w *= $units / $x_res;
-        $h *= $units / $y_res;
-        $diag = sqrt($w*$w+$h*$h);
-        # make sure size is reasonable
-        return undef unless $diag > 1 and $diag < 100;
     }
     return sqrt(36*36+24*24) / $diag;
 }
@@ -1768,28 +1811,6 @@ sub ExifTime($)
 }
 
 #------------------------------------------------------------------------------
-# Decode bit mask
-# Inputs: 0) value to decode,
-#         1) Reference to hash for decoding
-sub DecodeBits($$)
-{
-    my $bits = shift;
-    my $lookup = shift;
-    my $outStr = '';
-    my $i;
-    for ($i=0; $i<32; ++$i) {
-        next unless $bits & (1 << $i);
-        $outStr .= ', ' if $outStr;
-        if ($$lookup{$i}) {
-            $outStr .= $$lookup{$i};
-        } else {
-            $outStr .= "[$i]";
-        }
-    }
-    return $outStr || '(none)';
-}
-
-#------------------------------------------------------------------------------
 # extract image from file
 # Inputs: 0) ExifTool object reference, 1) data offset (in file), 2) data length
 #         3) [optional] tag name
@@ -1926,7 +1947,7 @@ sub ProcessExif($$$)
         $dirSize = 2 + 12 * $numEntries;
         $dirEnd = $dirStart + $dirSize;
         if ($dirSize > $dirLen) {
-            if ($dirLen > 4 and $verbose > 0) {
+            if ($verbose > 0 and not $$dirInfo{SubIFD}) {
                 my $short = $dirSize - $dirLen;
                 $exifTool->Warn("Short directory size (missing $short bytes)");
             }
@@ -2131,6 +2152,7 @@ sub ProcessExif($$$)
                 } elsif ($formatStr =~ /^(string|undef|binary)/) {
                     # translate all characters that could mess up JavaScript
                     $tval =~ tr/\\\x00-\x1f\x7f-\xff/./;
+                    $tval =~ tr/"/'/;
                     $tval = "$tval";
                 } elsif ($tagInfo and Image::ExifTool::IsInt($tval)) {
                     if ($$tagInfo{IsOffset}) {
@@ -2178,8 +2200,17 @@ sub ProcessExif($$$)
                 pop @values while @values > $$subdir{MaxSubdirs};
                 $val = shift @values;
             }
-            # loop through all sub-directories specified by this tag
             my ($newTagTable, $dirNum);
+            if ($$subdir{TagTable}) {
+                $newTagTable = GetTagTable($$subdir{TagTable});
+                unless ($newTagTable) {
+                    warn "Unknown tag table $$subdir{TagTable}\n";
+                    next;
+                }
+            } else {
+                $newTagTable = $tagTablePtr;    # use existing table
+            }
+            # loop through all sub-directories specified by this tag
             for ($dirNum=0; ; ++$dirNum) {
                 my $subdirBase = $base;
                 my $subdirDataPt = $valueDataPt;
@@ -2276,15 +2307,6 @@ sub ProcessExif($$$)
                         last;
                     }
                 }
-                if ($$subdir{TagTable}) {
-                    $newTagTable = GetTagTable($$subdir{TagTable});
-                    unless ($newTagTable) {
-                        warn "Unknown tag table $$subdir{TagTable}\n";
-                        last;
-                    }
-                } else {
-                    $newTagTable = $tagTablePtr;    # use existing table
-                }
 
                 # must update subdirDataPos if $base changes for this subdirectory
                 $subdirDataPos += $base - $subdirBase;
@@ -2302,6 +2324,7 @@ sub ProcessExif($$$)
                     Parent   => $dirName,
                     FixBase  => $$subdir{FixBase},
                     TagInfo  => $tagInfo,
+                    SubIFD   => $$tagInfo{SubIFD},
                 );
                 # some Pentax cameras (Optio 330) write maker notes in IFD0
                 if ($$tagInfo{MakerNotes}) {
@@ -2422,7 +2445,7 @@ interpret EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

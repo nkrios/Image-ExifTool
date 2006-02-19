@@ -16,13 +16,15 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.05';
+$VERSION = '1.07';
+
+sub ProcessPanasonicType2($$$);
 
 %Image::ExifTool::Panasonic::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITABLE => 1,
     0x01 => {
         Name => 'ImageQuality',
         Writable => 'int16u',
@@ -188,6 +190,24 @@ $VERSION = '1.05';
     },
 );
 
+# Type 2 tags (ref PH)
+%Image::ExifTool::Panasonic::Type2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    FIRST_ENTRY => 0,
+    FORMAT => 'int16u',
+    NOTES => q{
+        This type of maker notes is used by models such as the NV-DS65, PV-D2002,
+        PV-DC3000, PV-L2001 and PV-SD4090.
+    },
+    0 => {
+        Name => 'MakerNoteVersion',
+        Format => 'string[4]',
+    },
+    # seems to vary inversely with amount of light, so I'll call it 'Gain' - PH
+    # (minimum is 16, maximum is 136.  Value is 0 for pictures captured from video)
+    3 => 'Gain',
+);
 
 1;  # end
 
@@ -208,7 +228,7 @@ Panasonic and Leica maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

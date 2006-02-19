@@ -105,31 +105,36 @@ change size.
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x1028</td>
+<td>CanonFlashInfo?</td>
+<td align='center'>Y[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0x1029</td>
 <td>CanonFocalLength</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#FocalLength'>Canon FocalLength Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x102a</td>
 <td>CanonShotInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#ShotInfo'>Canon ShotInfo Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x102c</td>
 <td>CanonColorInfo2</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x102d</td>
 <td>CanonCameraSettings</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#CameraSettings'>Canon CameraSettings Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1031</td>
 <td>SensorInfo</td>
 <td align='center'>-</td>
-<td>--&gt; <a href='CanonRaw.html#SensorInfo'>CanonRaw SensorInfo Tags</a></td></tr>
-<tr valign='top'>
+<td>--&gt; <a href='Canon.html#SensorInfo'>Canon SensorInfo Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1033</td>
 <td>CanonCustomFunctions10D
   <br>CanonCustomFunctions20D
@@ -138,16 +143,21 @@ change size.
 <td>--&gt; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1038</td>
 <td>CanonPictureInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#PictureInfo'>Canon PictureInfo Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1093</td>
+<td>CanonFileInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Canon.html#FileInfo'>Canon FileInfo Tags</a></td></tr>
 <tr valign='top'>
 <td>0x10a9</td>
-<td>WhiteBalanceTable</td>
+<td>ColorBalance</td>
 <td align='center'>-</td>
-<td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Tags</a></td></tr>
+<td>--&gt; <a href='Canon.html#ColorBalance'>Canon ColorBalance Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x10ae</td>
 <td>ColorTemperature</td>
@@ -161,111 +171,197 @@ change size.
   <br>2 = Adobe RGB
   <br>65535 = Uncalibrated</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x10b5</td>
+<td>RawJpgInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='CanonRaw.html#RawJpgInfo'>CanonRaw RawJpgInfo Tags</a></td></tr>
+<tr valign='top'>
 <td>0x1803</td>
 <td>ImageFormat</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html#ImageFormat'>CanonRaw ImageFormat Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1804</td>
 <td>RecordID</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1806</td>
 <td>SelfTimerTime</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1807</td>
 <td>TargetDistanceSetting</td>
 <td align='center'>float</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x180b</td>
 <td>SerialNumber</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x180e</td>
 <td>TimeStamp</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html#TimeStamp'>CanonRaw TimeStamp Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1810</td>
 <td>ImageInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html#ImageInfo'>CanonRaw ImageInfo Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1813</td>
 <td>FlashInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html#FlashInfo'>CanonRaw FlashInfo Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1814</td>
 <td>MeasuredEV</td>
 <td align='center'>float</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1817</td>
 <td>FileNumber</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1818</td>
 <td>ExposureInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html#ExposureInfo'>CanonRaw ExposureInfo Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1834</td>
+<td>CanonModelID</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(this is the complete list of model ID numbers, but note that many of these
+models do not produce CRW images)</font>
+  <br>0x1010000 = PowerShot A30
+  <br>0x1040000 = PowerShot S300 / Digital IXUS 300 / IXY Digital 300
+  <br>0x1060000 = PowerShot A20
+  <br>0x1080000 = PowerShot A10
+  <br>0x1090000 = PowerShot S110 / Digital IXUS v / IXY Digital 200
+  <br>0x1100000 = PowerShot G2
+  <br>0x1110000 = PowerShot S40
+  <br>0x1120000 = PowerShot S30
+  <br>0x1130000 = PowerShot A40
+  <br>0x1140000 = EOS D30
+  <br>0x1150000 = PowerShot A100
+  <br>0x1160000 = PowerShot S200 / Digital IXUS v2 / IXY Digital 200a
+  <br>0x1170000 = PowerShot A200
+  <br>0x1180000 = PowerShot S330 / Digital IXUS 330 / IXY Digital 300a
+  <br>0x1190000 = PowerShot G3
+  <br>0x1210000 = PowerShot S45
+  <br>0x1230000 = PowerShot SD100 / Digital IXUS II / IXY Digital 30
+  <br>0x1240000 = PowerShot S230 / Digital IXUS v3 / IXY Digital 320
+  <br>0x1250000 = PowerShot A70
+  <br>0x1260000 = PowerShot A60
+  <br>0x1270000 = PowerShot S400 / Digital IXUS 400 / IXY Digital 400
+  <br>0x1290000 = PowerShot G5
+  <br>0x1300000 = PowerShot A300
+  <br>0x1310000 = PowerShot S50
+  <br>0x1340000 = PowerShot A80
+  <br>0x1350000 = PowerShot SD10 / Digital IXUS i / IXY Digital L
+  <br>0x1360000 = PowerShot S1 IS
+  <br>0x1370000 = PowerShot Pro1
+  <br>0x1380000 = PowerShot S70
+  <br>0x1390000 = PowerShot S60
+  <br>0x1400000 = PowerShot G6
+  <br>0x1410000 = PowerShot S500 / Digital IXUS 500 / IXY Digital 500
+  <br>0x1420000 = PowerShot A75
+  <br>0x1440000 = PowerShot SD110 / Digital IXUS IIs / IXY Digital 30a
+  <br>0x1450000 = PowerShot A400
+  <br>0x1470000 = PowerShot A310
+  <br>0x1490000 = PowerShot A85
+  <br>0x1520000 = PowerShot S410 / Digital IXUS 430 / IXY Digital 450
+  <br>0x1530000 = PowerShot A95
+  <br>0x1540000 = PowerShot SD300 / Digital IXUS 40 / IXY Digital 50
+  <br>0x1550000 = PowerShot SD200 / Digital IXUS 30 / IXY Digital 40
+  <br>0x1560000 = PowerShot A520
+  <br>0x1570000 = PowerShot A510
+  <br>0x1590000 = PowerShot SD20 / Digital IXUS i5 / IXY Digital L2
+  <br>0x1640000 = PowerShot S2 IS
+  <br>0x1650000 = PowerShot SD430 / IXUS Wireless / IXY Wireless
+  <br>0x1660000 = PowerShot SD500 / Digital IXUS 700 / IXY Digital 600
+  <br>0x1668000 = EOS D60
+  <br>0x1700000 = PowerShot SD30 / Digital IXUS i zoom / IXY Digital L3
+  <br>0x1750000 = PowerShot A410
+  <br>0x1760000 = PowerShot S80
+  <br>0x1780000 = PowerShot A620
+  <br>0x1790000 = PowerShot A610
+  <br>0x1810000 = PowerShot SD450 / Digital IXUS 55 / IXY Digital 60
+  <br>0x1870000 = PowerShot SD400 / Digital IXUS 50 / IXY Digital 55
+  <br>0x1900000 = PowerShot SD550 / Digital IXUS 750 / IXY Digital 700
+  <br>0x3010000 = PowerShot Pro90 IS
+  <br>0x4040000 = PowerShot G1
+  <br>0x6040000 = PowerShot S100 / Digital IXUS / IXY Digital
+  <br>0x80000001 = EOS-1D
+  <br>0x80000167 = EOS-1DS
+  <br>0x80000168 = EOS 10D
+  <br>0x80000170 = EOS Digital Rebel / 300D / Kiss Digital
+  <br>0x80000174 = EOS-1D Mark II
+  <br>0x80000175 = EOS 20D
+  <br>0x80000188 = EOS-1Ds Mark II
+  <br>0x80000189 = EOS Digital Rebel XT / 350D / Kiss Digital N
+  <br>0x80000213 = EOS 5D
+  <br>0x80000232 = EOS-1D Mark II N</font></td></tr>
 <tr valign='top'>
 <td>0x1835</td>
 <td>DecoderTable</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x183b</td>
+<td>SerialNumberFormat</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>0x90000000 = Format 1
+  <br>0xa0000000 = Format 2</font></td></tr>
+<tr valign='top'>
 <td>0x2005</td>
 <td>RawData</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x2007</td>
 <td>JpgFromRaw</td>
 <td align='center'>resize</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x2008</td>
 <td>ThumbnailImage</td>
 <td align='center'>resize</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x2804</td>
 <td>ImageDescription</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x2807</td>
 <td>CameraObject</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3002</td>
 <td>ShootingRecord</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x3003</td>
 <td>MeasuredInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3004</td>
 <td>CameraSpecification</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x300a</td>
 <td>ImageProps</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x300b</td>
 <td>ExifInformation</td>
 <td align='center'>-</td>
@@ -289,40 +385,35 @@ change size.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='SensorInfo'>CanonRaw SensorInfo Tags</a></h2>
+<h2><a name='RawJpgInfo'>CanonRaw RawJpgInfo Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td align='right'>1</td>
-<td>SensorWidth</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
+<td>RawJpgQuality</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Economy
+  <br>2 = Normal
+  <br>3 = Fine
+  <br>5 = Superfine</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>2</td>
-<td>SensorHeight</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
+<td>RawJpgSize</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Large
+  <br>1 = Medium
+  <br>2 = Small</font></td></tr>
 <tr valign='top'>
-<td align='right'>5</td>
-<td>SensorLeftBorder</td>
-<td align='center'>N</td>
+<td align='right'>3</td>
+<td>RawJpgWidth</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>6</td>
-<td>SensorTopBorder</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>7</td>
-<td>SensorRightBorder</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>8</td>
-<td>SensorBottomBorder</td>
-<td align='center'>N</td>
+<td align='right'>4</td>
+<td>RawJpgHeight</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -452,6 +543,6 @@ change size.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 14, 2005</i>
+<br><i>Last revised Feb 16, 2006</i>
 </body>
 </html>

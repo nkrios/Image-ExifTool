@@ -5,40 +5,171 @@
 <body><!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-5.87.tar.gz">Version 5.87</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.00.tar.gz">Version 6.00</a>.<p>
 
-<b>Dec. 22/05 - Version 5.87</b> (production release)
+<b>Feb. 19, 2006 - Version 6.00</b> (production release)
+<ul>
+<li>Added read support for Sony SR2 raw images (but most tags still unknown)
+<li>Added read support for Kyocera Contax N Digital RAW images
+<li>Added ability to write or delete shortcuts which reference multiple tags
+    (previously only shortcuts referencing a single tag were writable)
+<li>Changed descriptions of FNumber, ExposureTime, ISO, DateTimeOriginal,
+    CreateDate and ModifyDate to more closely match their tag names
+<li>Separated Canon and Nikon Red/BlueBalance information into individual
+    components with tag names like WB_RGGBLevels
+<li>Decoded a number of new Canon tags for EOS models, including ColorBalance
+    tables, 20D AF points and SensorInfo (thanks Rainer Honle)
+<li>Fixed incorrect decoding of EOS 10D/300D color balance modes
+<li>More additions and minor fixes to Canon decoding
+<li>Made EOS-1D personal functions writable
+<li>Added ability to write bitmasks at the PrintConv level
+<li>Set MIME type for all RAW image formats to "image/x-raw"
+<li>The -f option is no longer implied when -S and -s are combined
+<li>Fixed bug introduced in 5.99 which broke the "-tagsFromFile @" feature
+<li>Fixed problem with offsets in verbose dump of CRW images
+<li>Fixed problem with some tags in Canon images not printing without -a option
+<li>Fixed problem with validation of Canon PictureInfo for images rotated by
+    Canon ZoomBrowser EX (thanks Joshua Bixby)
+</ul>
+
+<b>Feb. 1, 2006 - Version 5.99</b>
+<ul>
+<li>Major additions to Canon maker note decoding, including EOS-1D personal
+    functions (thanks Rainer Honle for decoding many 5D tags)
+<li>Added Canon maker note trailer when rewriting Canon maker notes
+<li>Attempt to fix problem where ScaleFactor35efl was calculated incorrectly for
+    some Canon images
+<li>Reduce memory useage and speed up writing of large TIFF images
+<li>Fixed problem with binary data offsets in verbose dump
+<li>Fixed problem writing Comment if 'File' group specified
+<li>Fixed bug which could cause formatting error in htmlDump output
+</ul>
+
+<b>Jan. 22, 2006 - Version 5.98</b>
+<ul>
+<li>Enhanced FMT syntax for -o, -w and -tagsFromFile options
+<li>Decode maker notes of Samsung DX-1S
+<li>Added ability to list tags in a specific group
+<li>Recognize maker notes of a few more Kodak models
+<li>Added a few more Canon LensType's
+<li>Added missing semicolons in HtmlDump JavaScript output
+</ul>
+
+<b>Jan. 16, 2006 - Version 5.97</b>
+<ul>
+<li>Added support for Canon 5D custom functions (thanks Rainer Honle)
+<li>Added support for Canon 1DmkII and 350D custom functions
+<li>General fixes and improvements to Canon custom functions
+<li>Changed name of ICC_Profile Copyright to ProfileCopyright
+<li>Report all extraction errors when copying only specified tags from file
+<li>Avoid issuing "Error rebuilding maker notes" warning when copying maker
+    notes that don't require rebuilding
+</ul>
+
+<b>Jan. 14, 2006 - Version 5.96</b>
+<ul>
+<li>Fixed problem where XMP information could be lost when writing PSD images
+</ul>
+
+<b>Jan. 12, 2006 - Version 5.95</b>
+<ul>
+<li>Decode AIFF SampleRate
+<li>Fixed problem where FileType was being set twice for AIFF files
+<li>Patched problem reading some file types through Windows cmd shell pipeline
+<li>Properly identify CR2 images read via pipes (previously identified as TIFF)
+<li>Improved formatting of printed values for some DNG tags
+<li>Fixed problem with EXIF format of some tags when writing
+<li>Changed 'rational' format names to match full bit size of value
+</ul>
+
+<b>Jan. 10, 2006 - Version 5.94</b>
+<ul>
+<li>Fixed problem extracting OriginalRawImage from little-endian DNG images
+<li>Fixed problem where "unreferenced bytes" error could be incorrectly issued
+    when deleting all EXIF from a TIFF image
+</ul>
+
+<b>Jan. 9, 2006 - Version 5.93</b>
+<ul>
+<li>Added ability to write JFIF information
+</ul>
+
+<b>Jan. 9, 2006 - Version 5.92</b>
+<ul>
+<li>Added ability to extract and decompress original raw image from DNG
+<li>Fixed problem extracting information from some image types in pipelines
+<li>Decode more information in PSD images
+</ul>
+
+<b>Jan. 7, 2006 - Version 5.91</b>
+<ul>
+<li>Added write support for PSD images
+<li>Made a couple more Photoshop tags writable
+</ul>
+
+<b>Jan. 6, 2006 - Version 5.90</b>
+<ul>
+<li>Added read support for AIFF audio files
+<li>Made Photoshop:XResolution and Photoshop:YResolution writable
+<li>Fixed problem with processing some RIFF files
+<li>Added a new Canon LensType
+<li>API changes:
+    <ul>
+    <li>SetNewValue() now accepts an ARRAY reference for setting list-type tags
+        such as Keywords, or a SCALAR reference for binary data, so it may now
+        be called directly with any value returned by GetValue().
+    </ul>
+</ul>
+
+<b>Jan. 3, 2006 - Version 5.89</b>
+<ul>
+<li>Recognize Panasonic Type 2 maker notes
+<li>Changed Nikon LensID to a composite tag to allow better decoding of
+    non-Nikon lenses, and added a bunch of new lenses to the list
+</ul>
+
+<b>Jan. 1, 2006 - Version 5.88</b>
+<ul>
+<li>Added ability to read and write AFCP information in JPEG images
+<li>Added read support for WMV video and WMA audio files (ASF format files)
+<li>Added EXIF tags 0x82a5-0x82ac
+<li>Fixed TagID of IntergraphPacketData tag
+<li>Fixed problem in rewriting some types of JVC maker notes
+<li>Renamed WAV module to RIFF
+</ul>
+
+<b>Dec. 22, 2005 - Version 5.87</b> (production release)
 <ul>
 <li>Added support for JVC maker notes
 <li>Extract a number of new DNG tags plus DNG JPEG preview image
 <li>Changed name of DNGCameraSerialNumber tag to CameraSerialNumber
 </ul>
 
-<b>Dec. 20/05 - Version 5.86</b>
+<b>Dec. 20, 2005 - Version 5.86</b>
 <ul>
 <li>Added support for AVI and MP4 videos
 <li>Improved decoding of Olympus maker notes
 <li>Improved APP12 decoding
 <li>Improved CanonPictureInfo validation to work with more PowerShot models
 <li>Display Canon 1D serial numbers with 6 digits
-<li>Decode maker notes of Nikon D-1
+<li>Decode maker notes of Nikon D1
 <li>Combining -t with -S now gives a single-line tab-delimited list of values
 <li>Extract preview image for Samsung Digimax i5
 </ul>
 
-<b>Dec. 13/05 - Version 5.85</b>
+<b>Dec. 13, 2005 - Version 5.85</b>
 <ul>
 <li>Added ability to read and write XMP files which don't have an xpacket header
 <li>Fixed problem deleting entire XMP data block using '-xmp=' syntax
 <li>More minor HtmlDump improvements
 </ul>
 
-<b>Dec. 12/05 - Version 5.84</b>
+<b>Dec. 12, 2005 - Version 5.84</b>
 <ul>
 <li>Minor improvements to HtmlDump output
 </ul>
 
-<b>Dec. 12/05 - Version 5.83</b>
+<b>Dec. 12, 2005 - Version 5.83</b>
 <ul>
 <li>Added -F option to allow maker notes offsets to be fixed
 <li>Added -htmlDump option to generate a verbose HTML-based hex dump of EXIF
@@ -52,7 +183,7 @@
 <li>Speed up rewriting of some TIFF images when using ActivePerl 5.8.x for
     Windows (image strips are now copied in a single block if they are
     contiguous in the file to avoid ActivePerl bug which causes extremely poor
-    performance when concatinating a large number of memory blocks)
+    performance when concatenating a large number of memory blocks)
 <li>Added a couple of new Nikon and Pentax lens ID's (thanks Robert Rottmerhusen
     and David Buret)
 <li>Decode PrintIM information in Casio QV-4000
@@ -63,14 +194,14 @@
     </ul>
 </ul>
 
-<b>Nov. 26/05 - Version 5.82</b>
+<b>Nov. 26, 2005 - Version 5.82</b>
 <ul>
 <li>Fixed bug which caused error rewriting Minolta MRW images
 <li>Added MRW write test
 <li>Improved MRW verbose output
 </ul>
 
-<b>Nov. 24/05 - Version 5.81</b>
+<b>Nov. 24, 2005 - Version 5.81</b>
 <ul>
 <li>Changed writing of TIFF so that existing IPTC will be rewritten as int32u
     whenever IPTC is edited, regardless of original format type.  This allows
@@ -82,7 +213,7 @@
 <li>Fixed problem which was generating a warning with ActivePerl 5.6.1
 </ul>
 
-<b>Nov. 22/05 - Version 5.80</b>
+<b>Nov. 22, 2005 - Version 5.80</b>
 <ul>
 <li>Changed writing of new TIFF IPTC information to make it visible in Nikon
     Capture (for some reason requires int32u format)
@@ -90,25 +221,25 @@
     Niels Kristian)
 </ul>
 
-<b>Nov. 22/05 - Version 5.79</b>
+<b>Nov. 22, 2005 - Version 5.79</b>
 <ul>
 <li>Fixed problem which could render XMP information unreadable by Photoshop
     when editing some XMP written by Photoshop CS2
 </ul>
 
-<b>Nov. 21/05 - Version 5.78</b>
+<b>Nov. 21, 2005 - Version 5.78</b>
 <ul>
 <li>Fixed problem which could generate an error when adding IFD1 to an image
 </ul>
 
-<b>Nov. 18/05 - Version 5.77</b> (production release)
+<b>Nov. 18, 2005 - Version 5.77</b> (production release)
 <ul>
 <li>Allow integer tag values to be specified in hex (with leading '0x')
 <li>Fixed problem which generated warnings about symbol "@indent" in Nikon.pm
     when using older versions of Perl (observed with 5.6.1)
 </ul>
 
-<b>Nov. 16/05 - Version 5.76</b>
+<b>Nov. 16, 2005 - Version 5.76</b>
 <ul>
 <li>Tolerate extra null padding at end of TIFF images (as written by Photoshop
     CS) when rewriting TIFF images
@@ -116,12 +247,12 @@
 <li>Updated FAQ
 </ul>
 
-<b>Nov. 14/05 - Version 5.75</b>
+<b>Nov. 14, 2005 - Version 5.75</b>
 <ul>
 <li>Fixed problem decompressing deflated DICOM images
 </ul>
 
-<b>Nov. 14/05 - Version 5.74</b>
+<b>Nov. 14, 2005 - Version 5.74</b>
 <ul>
 <li>Added read support for DICOM (DCM, DC3, DIC, DICM) and ACR-NEMA (ACR)
     medical image files
@@ -132,7 +263,7 @@
 <li>Recognize file types even if they have the wrong extension
 </ul>
 
-<b>Nov. 7/05 - Version 5.73</b>
+<b>Nov. 7, 2005 - Version 5.73</b>
 <ul>
 <li>Added ability to shift date/time tag values
 <li>Extract Red/BlueBalance tags for Nikon D2Hs, D50 and D2X
@@ -140,7 +271,7 @@
 <li>Added a new Olympus LensType (thanks Michael Meissner)
 </ul>
 
-<b>Oct. 28/05 - Version 5.72</b>
+<b>Oct. 28, 2005 - Version 5.72</b>
 <ul>
 <li>Added ability to create XMP data files.  This is more significant than it
     sounds:  The -o option may now be used to generate XMP files from
@@ -159,7 +290,7 @@
     </ul>
 </ul>
 
-<b>Oct. 24/05 - Version 5.71</b>
+<b>Oct. 24, 2005 - Version 5.71</b>
 <ul>
 <li>Added ability to read/write .XMP data files
 <li>Added -listf option to print list of recognized file types
@@ -167,7 +298,7 @@
 <li>Moved Kodak APP3 "Meta" tags from EXIF to a new Kodak "Meta" group
 </ul>
 
-<b>Oct. 23/05 - Version 5.70</b>
+<b>Oct. 23, 2005 - Version 5.70</b>
 <ul>
 <li>Significant internal changes to improve speed and reduce memory useage
 <li>Fixed a bug introduced in version 5.63 which caused incorrect XMP GPS
@@ -182,7 +313,7 @@
     </ul>
 </ul>
 
-<b>Oct. 19/05 - Version 5.69</b>
+<b>Oct. 19, 2005 - Version 5.69</b>
 <ul>
 <li>Changed UTF-8 bug fix introduced in 5.67 to improve portability and allow it
     to work with Perl versions back to 5.6
@@ -196,12 +327,12 @@
     </ul>
 </ul>
 
-<b>Oct. 17/05 - Version 5.68</b>
+<b>Oct. 17, 2005 - Version 5.68</b>
 <ul>
 <li>Added support for reading Sigma RAW (X3F) images
 </ul>
 
-<b>Oct. 13/05 - Version 5.67</b> (production release)
+<b>Oct. 13, 2005 - Version 5.67</b> (production release)
 <ul>
 <li>Added support for reading PICT images
 <li>Fixed a problem when writing information via the ExifTool API if using Perl
@@ -211,7 +342,7 @@
     a failed test
 </ul>
 
-<b>Oct. 10/05 - Version 5.66</b>
+<b>Oct. 10, 2005 - Version 5.66</b>
 <ul>
 <li>Enhanced -tagsFromFile option to allow %d, %f and %e in filenames
 <li>Extract a few more tags from Canon EOS 5D images
@@ -223,7 +354,7 @@
 <li>Added tests of Nikon, Sony and PDF decryption algorithms
 </ul>
 
-<b>Oct. 7/05 - Version 5.65</b>
+<b>Oct. 7, 2005 - Version 5.65</b>
 <ul>
 <li>Added read support for QuickTime MOV videos (and QTIF images if anyone
     cares)
@@ -240,7 +371,7 @@
 <li>Removed hack to write Leaf maker note information at start of image
 </ul>
 
-<b>Sept. 30/05 - Version 5.64</b>
+<b>Sept. 30, 2005 - Version 5.64</b>
 <ul>
 <li>Improved writing of Canon CR2 images to preserve CR2 header and editing
     information written by Canon Digital Photo Professional software
@@ -255,7 +386,7 @@
 <li>Decode Photoshop resolution information
 </ul>
 
-<b>Sept. 21/05 - Version 5.63</b>
+<b>Sept. 21, 2005 - Version 5.63</b>
 <ul>
 <li>Added read support for MP3 and WAV audio files (Oops... ExifTool has
     expanded beyond its "Image" roots!)
@@ -275,20 +406,20 @@
 <li>Added a new lens to the Olympus list (thanks Shingo Noguchi)
 </ul>
 
-<b>Sept. 7/05 - Version 5.62</b>
+<b>Sept. 7, 2005 - Version 5.62</b>
 <ul>
 <li>Fixed problem reading FujiFilm maker notes from RAF images
 <li>Extract comments from PPM/PGM/PBM images and add write support
 <li>Extract maker notes from Nikon Coolscan scanner images
 </ul>
 
-<b>Sept. 3/05 - Version 5.61</b>
+<b>Sept. 3, 2005 - Version 5.61</b>
 <ul>
 <li>Added read support for PBM, PGM and PPM file formats
 <li>Added read support for RAF (FujiFilm RAW) file format
 </ul>
 
-<b>Sept. 2/05 - Version 5.60</b>
+<b>Sept. 2, 2005 - Version 5.60</b>
 <ul>
 <li>Fixed bug where tag was deleted if TAG+=VALUE used for a non-list type tag
 <li>Fixed problem where reading some CRW files could generate a "Use of
@@ -302,14 +433,14 @@
 <li>Added NikonCaptureData and NikonCaptureVersion tags
 </ul>
 
-<b>Aug. 24/05 - Version 5.55</b> (production release)
+<b>Aug. 24, 2005 - Version 5.55</b> (production release)
 <ul>
 <li>Added patch to fix word ordering when unpacking doubles on ARM systems with
     little-endian byte order but big-endian word order (thanks Riku Voipio)
 <li>Added another lens to the Pentax LensType list
 </ul>
 
-<b>Aug. 22/05 - Version 5.54</b>
+<b>Aug. 22, 2005 - Version 5.54</b>
 <ul>
 <li>Fixed problem introduced in version 5.50 which broke ability to delete
     groups of information
@@ -317,7 +448,7 @@
 <li>Changed name of Olympus 'Lens' tag to 'LensType'
 </ul>
 
-<b>July 29/05 - Version 5.53</b>
+<b>July 29, 2005 - Version 5.53</b>
 <ul>
 <li>Added -ext option to allow files to be processed or excluded from processing
     based on their extension
@@ -326,19 +457,19 @@
     option used)
 </ul>
 
-<b>July 28/05 - Version 5.52</b>
+<b>July 28, 2005 - Version 5.52</b>
 <ul>
 <li>Removed warning message when writing CR2 files that was intended only for
     Canon 1D TIFF files
 </ul>
 
-<b>July 27/05 - Version 5.51</b>
+<b>July 27, 2005 - Version 5.51</b>
 <ul>
 <li>Assume '-TagsFromFile @' for any redirected tags (ie. '-SRCTAG&gt;DSTTAG' or
     '-DSTTAG&lt;SRCTAG') which are specified without a prior '-TagsFromFile'
 </ul>
 
-<b>July 27/05 - Version 5.50</b>
+<b>July 27, 2005 - Version 5.50</b>
 <ul>
 <li>Don't rewrite entire file if only FileModifyDate is being changed
 <li>API Changes:
@@ -347,7 +478,7 @@
     </ul>
 </ul>
 
-<b>July 26/05 - Version 5.49</b>
+<b>July 26, 2005 - Version 5.49</b>
 <ul>
 <li>Decode encrypted PDF documents
 <li>Extract metadata from individual PDF pages
@@ -357,12 +488,12 @@
 <li>Minor changes to Canon LensType strings (thanks Michael Tiemann)
 </ul>
 
-<b>July 21/05 - Version 5.48</b>
+<b>July 21, 2005 - Version 5.48</b>
 <ul>
 <li>Fixed parsing of XMP-pdf CreationDate and ModDate tags
 </ul>
 
-<b>July 21/05 - Version 5.47</b>
+<b>July 21, 2005 - Version 5.47</b>
 <ul>
 <li>Fixed problem where existing item in list was getting overwritten when
     adding to XMP lists with '-TAG+=VALUE' syntax
@@ -372,7 +503,7 @@
 <li>Added support for PDF-like Adobe Illustrator (.AI) files
 </ul>
 
-<b>July 19/05 - Version 5.46</b> (production release)
+<b>July 19, 2005 - Version 5.46</b> (production release)
 <ul>
 <li>Fixed bug which could cause CRW file to be corrupted under some conditions
     when writing and rewriting the same file
@@ -382,7 +513,7 @@
     recursion in long linked lists
 </ul>
 
-<b>July 19/05 - Version 5.45</b>
+<b>July 19, 2005 - Version 5.45</b>
 <ul>
 <li>Set FileType tags properly for newly added formats
 <li>Added Canon TargetAperture and TargetExposureTime and decode Canon 1D Mark
@@ -397,28 +528,28 @@
 <li>Added BMP, PDF, Photoshop and PostScript tests
 </ul>
 
-<b>July 16/05 - Version 5.44</b>
+<b>July 16, 2005 - Version 5.44</b>
 <ul>
 <li>Added read support for BMP (and DIB) images
 </ul>
 
-<b>July 16/05 - Version 5.43</b>
+<b>July 16, 2005 - Version 5.43</b>
 <ul>
 <li>Allow shortcut tags to be used with -tagsFromFile
 </ul>
 
-<b>July 15/05 - Version 5.42</b>
+<b>July 15, 2005 - Version 5.42</b>
 <ul>
 <li>Added ability to read PostScript (EPS and PS) and PDF images
 <li>Decode PhotoshopSettings in TIFF images
 </ul>
 
-<b>July 8/05 - Version 5.41</b>
+<b>July 8, 2005 - Version 5.41</b>
 <ul>
 <li>Added ability to read Photoshop PSD images
 </ul>
 
-<b>July 8/05 - Version 5.40</b>
+<b>July 8, 2005 - Version 5.40</b>
 <ul>
 <li>Improved decoding of Minolta MRW files to support new cameras
 <li>Changed Minolta ImageQuality values to conform with Minolta terminology
@@ -429,7 +560,7 @@
     suppresses errors
 </ul>
 
-<b>July 6/05 - Version 5.39</b>
+<b>July 6, 2005 - Version 5.39</b>
 <ul>
 <li>Using -b option now disables -h, -H and -g options
 <li>Decode Canon Panorama information
@@ -441,7 +572,7 @@
 <li>Improved validation of PreviewImage
 </ul>
 
-<b>July 4/05 - Version 5.38</b>
+<b>July 4, 2005 - Version 5.38</b>
 <ul>
 <li>Translate older 'xap' XMP namespace prefixes (xap, xapRights, xapMM and
     xapBJ) to their newer 'xmp' counterparts (xmp, xmpRights, xmpMM and xmpBJ)
@@ -452,13 +583,13 @@
 <li>Updated Nikon LensID's (thanks Robert Rottmerhusen)
 </ul>
 
-<b>June 29/05 - Version 5.37</b>
+<b>June 29, 2005 - Version 5.37</b>
 <ul>
 <li>Removed unknown status from Photoshop CopyrightFlag and made it writable
 <li>Decode a new Canon EasyMode value
 </ul>
 
-<b>June 28/05 - Version 5.36</b>
+<b>June 28, 2005 - Version 5.36</b>
 <ul>
 <li>Added new composite tags: DOF, CircleOfConfusion and HyperfocalDistance
 <li>Minor changes to simplify and improve generated XMP when writing
@@ -468,33 +599,33 @@
 <li>Ignore white space around '=' sign of arguments in '-@' file
 </ul>
 
-<b>June 24/05 - Version 5.35</b>
+<b>June 24, 2005 - Version 5.35</b>
 <ul>
 <li>Added support for MNG and JNG images
 <li>Added a few new PNG tags
 </ul>
 
-<b>June 21/05 - Version 5.34</b>
+<b>June 21, 2005 - Version 5.34</b>
 <ul>
 <li>Decode ASCII-based APP12 information (tested with Agfa and Polaroid images)
 <li>Decode remaining PNG chunks in original spec except for IDAT (image data)
 <li>Only generate FileSize and FileModifyDate tags for plain files
 </ul>
 
-<b>June 16/05 - Version 5.33</b>
+<b>June 16, 2005 - Version 5.33</b>
 <ul>
 <li>Changed print conversions for Contrast, Saturation and Sharpness throughout
     to be more consistent and to better conform with the EXIF specification
 <li>Decode Minolta Dimage Z2 MinoltaImageSize
 </ul>
 
-<b>June 15/05 - Version 5.32</b> (production release)
+<b>June 15, 2005 - Version 5.32</b> (production release)
 <ul>
 <li>Changes to a few PNG and MIFF tag names
 <li>Improved PNG/MIFF documentation
 </ul>
 
-<b>June 14/05 - Version 5.31</b>
+<b>June 14, 2005 - Version 5.31</b>
 <ul>
 <li>Decode compressed information in PNG images if Compress::Zlib is available
 <li>Decode profile information (including EXIF, XMP, IPTC and ICC_Profile
@@ -503,18 +634,18 @@
     Rottmerhusen)
 </ul>
 
-<b>June 10/05 - Version 5.30</b>
+<b>June 10, 2005 - Version 5.30</b>
 <ul>
 <li>Added PNG and MIFF read support
 <li>Decode Nikon SensorPixelSize
 </ul>
 
-<b>June 9/05 - Version 5.27</b>
+<b>June 9, 2005 - Version 5.27</b>
 <ul>
 <li>Added -q option
 </ul>
 
-<b>June 8/05 - Version 5.26</b>
+<b>June 8, 2005 - Version 5.26</b>
 <ul>
 <li>Automatically fix out-of-sequence entries in IFD when writing to comply with
     the TIFF specification (but not in maker notes)
@@ -535,7 +666,7 @@
     </ul>
 </ul>
 
-<b>June 3/05 - Version 5.25</b> (production release)
+<b>June 3, 2005 - Version 5.25</b> (production release)
 <ul>
 <li>Fixed problem with writing IPTC Time tags
 <li>Changed Composite ShutterSpeed to ignore bulb duration if it is negative
@@ -545,7 +676,7 @@
     </ul>
 </ul>
 
-<b>June 1/05 - Version 5.24</b>
+<b>June 1, 2005 - Version 5.24</b>
 <ul>
 <li>Added new "XMP" tag to allow read/write of XMP data as a block
 <li>Changed name of ExifData tag to EXIF (but didn't make it writable as a block
@@ -563,7 +694,7 @@
 <li>Removed trailing white space in values printed by exiftool
 </ul>
 
-<b>May 27/05 - Version 5.23</b>
+<b>May 27, 2005 - Version 5.23</b>
 <ul>
 <li>Changed behaviour of -tagsfromfile slightly so that '-GROUP:TAG&gt;DSTTAG' now
     commutes information between different groups unless a destination group is
@@ -571,14 +702,14 @@
 <li>Improved reliability of calculating offsets in Pentax maker notes
 </ul>
 
-<b>May 26/05 - Version 5.22</b>
+<b>May 26, 2005 - Version 5.22</b>
 <ul>
 <li>Fixed problem with new '-tagsFromFile @' feature which occurred when
     simultaneously copying tags and writing new values to multiple target files
     (the new values were only getting written to the first file)
 </ul>
 
-<b>May 25/05 - Version 5.21</b>
+<b>May 25, 2005 - Version 5.21</b>
 <ul>
 <li>Allow target file to be specified by '@' with -TagsFromFile option
 <li>Fixed bug which caused internal error when using -TagsFromFile option to
@@ -595,7 +726,7 @@
     </ul>
 </ul>
 
-<b>May 20/05 - Version 5.20</b>
+<b>May 20, 2005 - Version 5.20</b>
 <ul>
 <li>Give names to many Photoshop tags, but leave them marked as 'Unknown' so
     they aren't extracted under normal circumstances (must use the -u option)
@@ -605,12 +736,12 @@
     differences in floating point numbers
 </ul>
 
-<b>May 17/05 - Version 5.19</b>
+<b>May 17, 2005 - Version 5.19</b>
 <ul>
 <li>Added -overwrite_original option
 </ul>
 
-<b>May 16/05 - Version 5.18</b> (production release)
+<b>May 16, 2005 - Version 5.18</b> (production release)
 <ul>
 <li>Added -@ option and two utility files (iptc2xmp.args and xmp2iptc.args) to
     use with this option for translating between IPTC and XMP tag names
@@ -619,7 +750,7 @@
 <li>More tweaking of -TagsFromFile order of operations
 </ul>
 
-<b>May 14/05 - Version 5.17</b>
+<b>May 14, 2005 - Version 5.17</b>
 <ul>
 <li>Allow 'All' to be used as a group name with '-TagsFromFile' option to
     preserve original tag groups (ie. '-all:all')
@@ -636,14 +767,14 @@
     especially when associated with the -TagsFromFile option
 </ul>
 
-<b>May 10/05 - Version 5.16</b>
+<b>May 10, 2005 - Version 5.16</b>
 <ul>
 <li>Decode a number of new Nikon lens-related tags (thanks again Robert
     Rottmerhusen)
 <li>Various other improvements
 </ul>
 
-<b>May 7/05 - Version 5.15</b>
+<b>May 7, 2005 - Version 5.15</b>
 <ul>
 <li>Added powerful new information redirection feature to -TagsFromFile option
 <li>Added writable File:FileModifyDate tag which represents the filesystem
@@ -653,13 +784,13 @@
     more convenient since '*' must be quoted to prevent shell globbing
 </ul>
 
-<b>May 5/05 - Version 5.11</b>
+<b>May 5, 2005 - Version 5.11</b>
 <ul>
 <li>Fixed problem where the proper tags weren't excluded from being extracted if
     -GROUP:All and --TAG options are used together on the command line
 </ul>
 
-<b>May 5/05 - Version 5.10</b>
+<b>May 5, 2005 - Version 5.10</b>
 <ul>
 <li>Changed -AllTagsFromFile option to -TagsFromFile and allow copied tags to be
     specified on the command line.  (-AllTagsFromFile is preserved as an alias
@@ -673,30 +804,30 @@
 <li>Added FAQ
 </ul>
 
-<b>May 2/05 - Version 5.06</b>
+<b>May 2, 2005 - Version 5.06</b>
 <ul>
 <li>Made a few more EXIF tags writable
 <li>No longer add null-terminator to JPEG comment (was confusing xv)
 </ul>
 
-<b>Apr. 20/05 - Version 5.05</b> (production release)
+<b>Apr. 20, 2005 - Version 5.05</b> (production release)
 <ul>
 <li>Added Nikon LensFStops tag (thanks to Robert Rottmerhusen)
 <li>Reliability improvements for writing maker notes information
 <li>exiftool now returns error status if there were errors reading/writing files
 </ul>
 
-<b>Apr. 18/05 - Version 5.04</b>
+<b>Apr. 18, 2005 - Version 5.04</b>
 <ul>
 <li>Fixed problem where maker notes of Olympus C2500L could get corrupted when
     writing
 </ul>
 
-<b>Apr. 18/05 - Version 5.03</b>
+<b>Apr. 18, 2005 - Version 5.03</b>
 <ul>
 <li>ExifTool now requires Perl version 5.004 or higher (previously 5.002 was OK)
 <li>Restrict the size of preview images where data is referenced directly as
-    the value data of an IFD entry (only effects Casio images)
+    the value data of an IFD entry (only affects Casio images)
 <li>Fixed problems rewriting some Casio maker notes
 <li>Change priority of orientation (and a number of other tags which may appear
     in IFD1) so value in IFD0 takes precedence of value in IFD1 if it exists
@@ -707,12 +838,12 @@
     </ul>
 </ul>
 
-<b>Apr. 16/05 - Version 5.02</b>
+<b>Apr. 16, 2005 - Version 5.02</b>
 <ul>
 <li>Fixed problem rewriting Pentax *istD preview image
 </ul>
 
-<b>Apr. 15/05 - Version 5.01</b>
+<b>Apr. 15, 2005 - Version 5.01</b>
 <ul>
 <li>Major speed improvements for writing large JPEG files with preview images
 <li>Fixed problem rewriting preview in Olympus E-1 and E-300 images
@@ -725,7 +856,7 @@
 <li>Separate lookups by manufacturer for Olympus lens information
 </ul>
 
-<b>Apr. 14/05 - Version 5.00</b>
+<b>Apr. 14, 2005 - Version 5.00</b>
 <ul>
 <li>ALL MAJOR PLANNED WRITING FEATURES NOW IMPLEMENTED!
 <li>Finally solved problem of writing large preview images in JPEG files
@@ -740,7 +871,7 @@
 <li>Changes to Olympus Lens decoding
 </ul>
 
-<b>Apr. 11/05 - Version 4.95</b>
+<b>Apr. 11, 2005 - Version 4.95</b>
 <ul>
 <li>Added ability to delete all meta information, or all information in a group
 <li>Create some mandatory IPTC tags automatically when writing IPTC information
@@ -755,7 +886,7 @@
     when that happens)
 </ul>
 
-<b>Apr. 6/05 - Version 4.94</b>
+<b>Apr. 6, 2005 - Version 4.94</b>
 <ul>
 <li>Added support for Kodak DX3215 and DX3700
 <li>Improved Kodak decoding and changed some Kodak tag names
@@ -765,7 +896,7 @@
     firmware (version 1.0.1) that writes an incorrect ThumbnailLength in IFD1
 </ul>
 
-<b>Apr. 2/05 - Version 4.93</b> (production release)
+<b>Apr. 2, 2005 - Version 4.93</b> (production release)
 <ul>
 <li>Added IPTC XMP Core support
 <li>Added support for Kodak CX4200 plus other minor Kodak changes
@@ -774,7 +905,7 @@
 <li>Split HTML TagNames documentation into separate files
 </ul>
 
-<b>Mar. 31/05 - Version 4.92</b>
+<b>Mar. 31, 2005 - Version 4.92</b>
 <ul>
 <li>Added support for Kodak and Ricoh cameras
 <li>Decode still more Olympus E-1/E-300 tags
@@ -784,7 +915,7 @@
 <li>Fixed problem rewriting makernotes with sub directories (ie. Olympus)
 </ul>
 
-<b>Mar. 28/05 - Version 4.91</b>
+<b>Mar. 28, 2005 - Version 4.91</b>
 <ul>
 <li>Decode yet more Olympus E-1/E-300 tags
 <li>Changed decoding of Olympus E-300 Quality tag
@@ -804,29 +935,29 @@
 <li>Recognize TIFF field type 13
 </ul>
 
-<b>Mar. 24/05 - Version 4.90</b>
+<b>Mar. 24, 2005 - Version 4.90</b>
 <ul>
 <li>Extract Olympus PreviewImage, and decode a bunch more Olympus tags
 <li>Improvements to documentation
 </ul>
 
-<b>Mar. 23/05 - Version 4.89</b>
+<b>Mar. 23, 2005 - Version 4.89</b>
 <ul>
 <li>Decode subdirectories in Olympus maker notes (now much more information is
     extracted for E-1 and E-300 cameras, although most is still unknown)
 </ul>
 
-<b>Mar. 22/05 - Version 4.88</b>
+<b>Mar. 22, 2005 - Version 4.88</b>
 <ul>
 <li>Convert exiftool help to POD format
 </ul>
 
-<b>Mar. 15/05 - Version 4.87</b> (production release)
+<b>Mar. 15, 2005 - Version 4.87</b> (production release)
 <ul>
 <li>Added notes to TagNames documentation
 </ul>
 
-<b>Mar. 11/05 - Version 4.86</b>
+<b>Mar. 11, 2005 - Version 4.86</b>
 <ul>
 <li>Extract PreviewImage from CR2 files
 <li>Create mandatory GPS tags when adding new GPS directory
@@ -834,7 +965,7 @@
 <li>Fixed problem when setting 8-bit integer IPTC values
 </ul>
 
-<b>Mar. 10/05 - Version 4.85</b>
+<b>Mar. 10, 2005 - Version 4.85</b>
 <ul>
 <li>Create most mandatory EXIF entries automatically when a new EXIF directory
     is created
@@ -845,7 +976,7 @@
     maker notes)
 </ul>
 
-<b>Mar. 9/05 - Version 4.84</b>
+<b>Mar. 9, 2005 - Version 4.84</b>
 <ul>
 <li>Interpret Olympus ImageQuality of 6 as RAW
 <li>Remove validation of TIFF identifier to allow forward compatibility with
@@ -853,13 +984,13 @@
     identifier)
 </ul>
 
-<b>Mar. 8/05 - Version 4.83</b>
+<b>Mar. 8, 2005 - Version 4.83</b>
 <ul>
 <li>Extract ThumbnailImage from Canon CRW files written by some cameras
 <li>Recognize ORF files from Olympus C5060WZ (and hopefully some others too!)
 </ul>
 
-<b>Mar. 7/05 - Version 4.82</b>
+<b>Mar. 7, 2005 - Version 4.82</b>
 <ul>
 <li>Made a number of new EXIF tags writable, but classify them as 'unsafe' so
     they aren't copied over with the -AllTagsFromFile option
@@ -868,14 +999,14 @@
 <li>Interpret Photoshop XMP:ColorSpace value of 4294967295 as 'Uncalibrated'
 </ul>
 
-<b>Mar. 4/05 - Version 4.81</b>
+<b>Mar. 4, 2005 - Version 4.81</b>
 <ul>
 <li>Added user-definable shortcuts
 <li>Fixed problem with XMP:Identifier (should have existed in both XMP-dc and
     XMP-xmp)
 </ul>
 
-<b>Mar. 2/05 - Version 4.80</b>
+<b>Mar. 2, 2005 - Version 4.80</b>
 <ul>
 <li>The -n option now prints binary data values as "Binary data #### bytes"
 <li>API Changes: (NOTE: Change in API behaviour for binary data values)
@@ -885,12 +1016,12 @@
     </ul>
 </ul>
 
-<b>Mar. 1/05 - Version 4.73</b> (production release)
+<b>Mar. 1, 2005 - Version 4.73</b> (production release)
 <ul>
 <li>Minor changes to XMP parsing to increase speed and improve validation
 </ul>
 
-<b>Feb. 28/05 - Version 4.72</b>
+<b>Feb. 28, 2005 - Version 4.72</b>
 <ul>
 <li>Extract info from UTF-16 and UTF-32 encoded XMP
 <li>Convert EXIF text fields if encoded in Unicode
@@ -898,19 +1029,19 @@
 <li>Fixed name of Nikon ColorBalanceD2H tag
 </ul>
 
-<b>Feb. 25/05 - Version 4.71</b>
+<b>Feb. 25, 2005 - Version 4.71</b>
 <ul>
 <li>Fixed bug introduced in 4.70 which caused error when transferring
     information using -AllTagsFromFile from a RAW file to a JPEG file
 </ul>
 
-<b>Feb. 24/05 - Version 4.70</b>
+<b>Feb. 24, 2005 - Version 4.70</b>
 <ul>
 <li>Allow family 1 group name to be specified for any tag while writing
 <li>Fixed problem with writing Nikon PreviewImage to NEF files
 </ul>
 
-<b>Feb. 23/05 - Version 4.67</b>
+<b>Feb. 23, 2005 - Version 4.67</b>
 <ul>
 <li>Added -L option to allow XP characters to be converted to Latin character
     set instead of UTF-8.  (Now XP characters can be displayed properly in
@@ -918,7 +1049,7 @@
 <li>Make JpgFromRaw image writable in Nikon NEF files
 </ul>
 
-<b>Feb. 21/05 - Version 4.66</b>
+<b>Feb. 21, 2005 - Version 4.66</b>
 <ul>
 <li>Recognize JPEG 2000 XMP UUID information
 <li>Extract Meta information from JPEG APP3
@@ -931,25 +1062,25 @@
     make them more consistent across different types of meta information)
 </ul>
 
-<b>Feb. 18/05 - Version 4.65</b>
+<b>Feb. 18, 2005 - Version 4.65</b>
 <ul>
 <li>Fixed problem in translating XP characters
 </ul>
 
-<b>Feb. 17/05 - Version 4.64</b> (production release)
+<b>Feb. 17, 2005 - Version 4.64</b> (production release)
 <ul>
 <li>Added new tag name documentation (replaces old tag lists)
 <li>Made a few more DNG tags writable
 </ul>
 
-<b>Feb. 15/05 - Version 4.63</b>
+<b>Feb. 15, 2005 - Version 4.63</b>
 <ul>
 <li>Remove null terminators in ICC_Profile 'desc' strings
 <li>Treat Olympus CameraID as a string (why wasn't it written this way?)
 <li>Added print conversion for EXIF:CFAPattern
 </ul>
 
-<b>Feb. 14/05 - Version 4.62</b>
+<b>Feb. 14, 2005 - Version 4.62</b>
 <ul>
 <li>Convert XPTitle, XPComment, XPKeywords etc from XP character codes and add
     write support for these tags
@@ -960,20 +1091,20 @@
     codestream, and doesn't contain any metadata that ExifTool can extract)
 </ul>
 
-<b>Feb. 14/05 - Version 4.61</b>
+<b>Feb. 14, 2005 - Version 4.61</b>
 <ul>
 <li>Don't print filename line when -p option used
 <li>JPEG 2000 improvements
 <li>Also recognize .JPX and .J2K extensions
 </ul>
 
-<b>Feb. 11/05 - Version 4.60</b>
+<b>Feb. 11, 2005 - Version 4.60</b>
 <ul>
 <li>Added support for reading the JPEG 2000 (.JP2) files
 <li>Improved warnings on errors while setting tag values
 </ul>
 
-<b>Feb. 10/05 - Version 4.54</b>
+<b>Feb. 10, 2005 - Version 4.54</b>
 <ul>
 <li>Added ColorTemperature tag for many Canon models
 <li>Added AutoRotate for Canon 10D and 300D
@@ -983,19 +1114,19 @@
 <li>Made Photoshop EXIF Camera RAW tags writable
 </ul>
 
-<b>Feb. 7/05 - Version 4.53</b> (production release)
+<b>Feb. 7, 2005 - Version 4.53</b> (production release)
 <ul>
 <li>Added FileNumber for Canon 20D (decoded by Juha Eskelinen)
 <li>Removed CanonA0Tag
 </ul>
 
-<b>Feb. 4/05 - Version 4.52</b>
+<b>Feb. 4, 2005 - Version 4.52</b>
 <ul>
 <li>Added another CanonRaw test
 <li>Changes to Canon CRW documentation
 </ul>
 
-<b>Feb. 4/05 - Version 4.51</b>
+<b>Feb. 4, 2005 - Version 4.51</b>
 <ul>
 <li>Finally found documentation for Canon CRW files (CIFF format)!!
 <li>Changed CanonRaw to bring code up to CIFF specification
@@ -1003,7 +1134,7 @@
 <li>Updated Canon CRW documentation
 </ul>
 
-<b>Feb. 2/05 - Version 4.50</b>
+<b>Feb. 2, 2005 - Version 4.50</b>
 <ul>
 <li>Allow writing to specific IFD
 <li>Allow permanent tags (ie. MakerNotes tags) 'deleted' by setting them to an
@@ -1017,19 +1148,19 @@
 <li>Remove garbage after null terminator in CanonRaw string-type tags
 </ul>
 
-<b>Jan. 30/05 - Version 4.45</b>
+<b>Jan. 30, 2005 - Version 4.45</b>
 <ul>
 <li>Added a few more Canon tags
 <li>Fixed bug with divide by zero error (in Perl, '0.0' is a true value -- doh!)
 </ul>
 
-<b>Jan. 30/05 - Version 4.44</b>
+<b>Jan. 30, 2005 - Version 4.44</b>
 <ul>
 <li>Sort entries in synthesized Canon MakerNotes directory
 <li>Interpret Canon custom functions for models other than 10D in CRW files
 </ul>
 
-<b>Jan. 29/05 - Version 4.43</b>
+<b>Jan. 29, 2005 - Version 4.43</b>
 <ul>
 <li>Synthesize Canon MakerNotes information when using -allTagsFromFile for a
     CRW file
@@ -1037,7 +1168,7 @@
 <li>Rename CanonRaw CanonFileType tag to CanonImageType
 </ul>
 
-<b>Jan. 28/05 - Version 4.42</b>
+<b>Jan. 28, 2005 - Version 4.42</b>
 <ul>
 <li>Fixed problem where multiple IPTC tags could be created if replacing
     specific IPTC tag values with 'TAG-=VALUE'
@@ -1046,13 +1177,13 @@
 <li>Added documention of Canon RAW (CRW) file format
 </ul>
 
-<b>Jan. 27/05 - Version 4.41</b>
+<b>Jan. 27, 2005 - Version 4.41</b>
 <ul>
 <li>Added write support for Canon exposure parameters
 <li>Change validation of CanonPictureInfo to get it working for Canon 20D
 </ul>
 
-<b>Jan. 26/05 - Version 4.40</b>
+<b>Jan. 26, 2005 - Version 4.40</b>
 <ul>
 <li>Added ability to write Canon RAW (CRW) files.  With this format you aren't
     allowed to add or delete any new tags (just as with the MakerNotes), except
@@ -1073,12 +1204,12 @@
     </ul>
 </ul>
 
-<b>Jan. 24/05 - Version 4.36</b> (production release)
+<b>Jan. 24, 2005 - Version 4.36</b> (production release)
 <ul>
 <li>Added support for reading Olympus Raw Format (ORF)
 </ul>
 
-<b>Jan. 23/05 - Version 4.35</b>
+<b>Jan. 23, 2005 - Version 4.35</b>
 <ul>
 <li>Moved a couple of the informational warnings to verbose mode
 <li>Suppress warnings an non-critical errors with -m option
@@ -1088,7 +1219,7 @@
 <li>Added range check for integer values
 </ul>
 
-<b>Jan. 21/05 - Version 4.34</b>
+<b>Jan. 21, 2005 - Version 4.34</b>
 <ul>
 <li>Fixed problem when writing Canon maker notes with -allTagsFromFile
 <li>Added -o option to write to different file or directory
@@ -1098,7 +1229,7 @@
 <li>Other minor improvements to writer code
 </ul>
 
-<b>Jan. 19/05 - Version 4.33</b>
+<b>Jan. 19, 2005 - Version 4.33</b>
 <ul>
 <li>Added check at higher level and return warning if trying to delete
     information from maker notes
@@ -1107,7 +1238,7 @@
 <li>Updates to documentation
 </ul>
 
-<b>Jan. 19/05 - Version 4.32</b>
+<b>Jan. 19, 2005 - Version 4.32</b>
 <ul>
 <li>Now rewrites Casio EX-Z3 maker notes properly (well, not actually
     'properly', but the way they were written in the first place, which is
@@ -1124,12 +1255,12 @@
 <li>Added some more writer tests
 </ul>
 
-<b>Jan. 18/05 - Version 4.31</b>
+<b>Jan. 18, 2005 - Version 4.31</b>
 <ul>
 <li>Now also copies over preview image in Nikon NEF files
 </ul>
 
-<b>Jan. 18/05 - Version 4.30</b>
+<b>Jan. 18, 2005 - Version 4.30</b>
 <ul>
 <li>Now copies over preview images in EXIF data (large, external previews still
     not copied)
@@ -1138,12 +1269,12 @@
 <li>Fixed bug introduced in 4.20 that broke extraction of Canon PreviewImage
 </ul>
 
-<b>Jan. 17/05 - Version 4.23</b>
+<b>Jan. 17, 2005 - Version 4.23</b>
 <ul>
 <li>Improve handling of unrecognized maker notes when writing
 </ul>
 
-<b>Jan. 17/05 - Version 4.22</b>
+<b>Jan. 17, 2005 - Version 4.22</b>
 <ul>
 <li>Added check in -AllTagsFromFile to test for pointers in the maker notes
     directory running outside the maker notes data. If they do, a warning is
@@ -1151,12 +1282,12 @@
 <li>Fixed problem which could corrupt some values when editing maker notes
 </ul>
 
-<b>Jan. 17/05 - Version 4.21</b>
+<b>Jan. 17, 2005 - Version 4.21</b>
 <ul>
 <li>Added Olympus Red/BlueBalance
 </ul>
 
-<b>Jan. 17/05 - Version 4.20</b>
+<b>Jan. 17, 2005 - Version 4.20</b>
 <ul>
 <li>Added ability to edit MakerNotes!
 <li>Added more validation when writing IPTC information
@@ -1187,7 +1318,7 @@
 <li>Fixed Quality for Olympus E-1
 </ul>
 
-<b>Jan. 12/05 - Version 4.15</b>
+<b>Jan. 12, 2005 - Version 4.15</b>
 <ul>
 <li>Added Pentax LensType and RawImageSize tags
 <li>Change printing of some unknown values to hexadecimal
@@ -1200,31 +1331,31 @@
 <li>Improved logic in determining byte ordering of maker notes
 </ul>
 
-<b>Jan. 10/05 - Version 4.14</b>
+<b>Jan. 10, 2005 - Version 4.14</b>
 <ul>
 <li>Fixed problem introduced in 4.13 that messed up new 4.12 features.  doh.
     (and added test to keep this from happening again!).
 <li>No longer store bad directory data as a tag (dump in verbose output instead)
 </ul>
 
-<b>Jan. 9/05 - Version 4.13</b>
+<b>Jan. 9, 2005 - Version 4.13</b>
 <ul>
 <li>Added check on size of new ThumbnailImage so ExifTool doesn't try to write
     an image that is too large (&gt;60k) into the JPEG EXIF APP1 segment
 </ul>
 
-<b>Jan. 9/05 - Version 4.12</b>
+<b>Jan. 9, 2005 - Version 4.12</b>
 <ul>
 <li>-AllTagsFromFile option now copies over the maker notes
 <li>Changed some misleading warning messages
 </ul>
 
-<b>Jan. 8/05 - Version 4.11</b>
+<b>Jan. 8, 2005 - Version 4.11</b>
 <ul>
 <li>Improved validation of tag values with -AllTagsFromFile option
 </ul>
 
-<b>Jan. 7/05 - Version 4.10</b>
+<b>Jan. 7, 2005 - Version 4.10</b>
 <ul>
 <li>Added ability to write EXIF, IPTC and XMP tags in JPEG and TIFF files!
 <li>Allow Photoshop APP13 data to span multiple segments (read and write)
@@ -1258,7 +1389,7 @@
     </ul>
 </ul>
 
-<b>Dec. 15/04 - Version 4.05</b>
+<b>Dec. 15, 2004 - Version 4.05</b>
 <ul>
 <li>Added a couple of Nikon tags
 <li>Now preserves original file by renaming to "NAME_original" when writing
@@ -1268,14 +1399,14 @@
 <li>Changes to spec file
 </ul>
 
-<b>Dec. 11/04 - Version 4.04</b>
+<b>Dec. 11, 2004 - Version 4.04</b>
 <ul>
 <li>Fixed problem which could corrupt JPEG images when adding comments (Note: if
     done, the damage can reversed by removing the comments with the same version
     of ExifTool that added them.)
 </ul>
 
-<b>Dec. 6/04 - Version 4.03</b>
+<b>Dec. 6, 2004 - Version 4.03</b>
 <ul>
 <li>Major overhaul of verbose message output
 <li>Change -v option to allow verbose level to be specified (ie. -v3 = very very
@@ -1284,7 +1415,7 @@
 <li>Count images which were unchanged when writing tags
 <li>Changed FileType 'JPG' to 'JPEG'</ul>
 
-<b>Dec. 2/04 - Version 4.02</b>
+<b>Dec. 2, 2004 - Version 4.02</b>
 <ul>
 <li>Fixed problem with rewriting some JPEG images
 <li>Preserve original file modification time when updating tags in a file
@@ -1296,14 +1427,14 @@
     </ul>
 </ul>
 
-<b>Dec. 1/04 - Version 4.01</b>
+<b>Dec. 1, 2004 - Version 4.01</b>
 <ul>
 <li>Changed -o option to -w to avoid confusion since we now write image files
     too
 <li>Added warning if specified image file doesn't exist
 </ul>
 
-<b>Dec. 1/04 - Version 4.00</b>
+<b>Dec. 1, 2004 - Version 4.00</b>
 <ul>
 <li>Started down the road of adding write support:
     <ul>
@@ -1314,19 +1445,19 @@
     spaces)
 </ul>
 
-<b>Nov. 30/04 - Version 3.96</b>
+<b>Nov. 30, 2004 - Version 3.96</b>
 <ul>
 <li>Changed JPEG read routine to speed things up a bit
 <li>Added a few more ICC_Profile tags
 </ul>
 
-<b>Nov. 25/04 - Version 3.95</b>
+<b>Nov. 25, 2004 - Version 3.95</b>
 <ul>
 <li>Improved compatibility with old Perl versions (now runs, albeit with
     warnings, on 5.003)
 </ul>
 
-<b>Nov. 25/04 - Version 3.94</b> (production release)
+<b>Nov. 25, 2004 - Version 3.94</b> (production release)
 <ul>
 <li>Patched problem with reading XMP data using Perl 5.6.x (Perl bug)
 <li>Put lib directory first in exiftool include list to take precedence over
@@ -1334,7 +1465,7 @@
 <li>Continue trying to parse JPEG image after an unrecognized APP1 segment
 </ul>
 
-<b>Nov. 24/04 - Version 3.93</b> (production release)
+<b>Nov. 24, 2004 - Version 3.93</b> (production release)
 <ul>
 <li>Final round of ICC_Profile updates
 <li>Increase precision of extracted rational values
@@ -1346,7 +1477,7 @@
     </ul>
 </ul>
 
-<b>Nov. 22/04 - Version 3.92</b>
+<b>Nov. 22, 2004 - Version 3.92</b>
 <ul>
 <li>Fixed problem with -p option when multiple files are specified
 <li>Enhancements to ICC_Profile information, including extracting information
@@ -1355,7 +1486,7 @@
 <li>Added Minolta ImageStabilization tag
 </ul>
 
-<b>Nov. 20/04 - Version 3.91</b>
+<b>Nov. 20, 2004 - Version 3.91</b>
 <ul>
 <li>Fixed problem where some tags were not extracted properly from Canon CR2
     files
@@ -1365,7 +1496,7 @@
     </ul>
 </ul>
 
-<b>Nov. 20/04 - Version 3.90</b>
+<b>Nov. 20, 2004 - Version 3.90</b>
 <ul>
 <li>Extract information from ICC Profiles
 <li>Extract undocumented IFD0 Photoshop tags
@@ -1382,7 +1513,7 @@
     </ul>
 </ul>
 
-<b>Nov. 15/04 - Version 3.85</b>
+<b>Nov. 15, 2004 - Version 3.85</b>
 <ul>
 <li>Extract a couple more Photoshop tags (including PhotoshopQuality)
 <li>All XMP lists now comma separated (previously, 'alt' lists were separated by
@@ -1394,13 +1525,13 @@
     </ul>
 </ul>
 
-<b>Nov. 12/04 - Version 3.84</b>
+<b>Nov. 12, 2004 - Version 3.84</b>
 <ul>
 <li>Added test of GetTagID()
 <li>Fixed bug in GetTagID() which was causing special tags to get overwritten
 </ul>
 
-<b>Nov. 12/04 - Version 3.83</b>
+<b>Nov. 12, 2004 - Version 3.83</b>
 <ul>
 <li>Added -D and -H command line options
 <li>API Changes:
@@ -1409,49 +1540,49 @@
     </ul>
 </ul>
 
-<b>Nov. 11/04 - Version 3.82</b> (production release)
+<b>Nov. 11, 2004 - Version 3.82</b> (production release)
 <ul>
 <li>Improved diagnostic output for failed tests in installation
 </ul>
 
-<b>Nov. 11/04 - Version 3.81</b>
+<b>Nov. 11, 2004 - Version 3.81</b>
 <ul>
 <li>Updated Olympus module to also support Epson cameras
 <li>Moved MakerNotes code into separate module
 <li>Added tests for Sony and Unknown maker notes
 </ul>
 
-<b>Nov. 10/04 - Version 3.80</b>
+<b>Nov. 10, 2004 - Version 3.80</b>
 <ul>
 <li>Added support for Panasonic/Leica cameras
 <li>Updated Pentax module to also support Asahi cameras
 <li>Decode a couple more Minolta camera model types
 </ul>
 
-<b>Nov. 4/04 - Version 3.74</b> (production release)
+<b>Nov. 4, 2004 - Version 3.74</b> (production release)
 <ul>
 <li>Properly localize $_ in public Image::ExifTool subroutines
 </ul>
 
-<b>Nov. 3/04 - Version 3.73</b>
+<b>Nov. 3, 2004 - Version 3.73</b>
 <ul>
 <li>Changes to tests to avoid false failures on MSWin32-x86-multi-thread 4.0
 </ul>
 
-<b>Nov. 1/04 - Version 3.72</b> (production release)
+<b>Nov. 1, 2004 - Version 3.72</b> (production release)
 <ul>
 <li>Fixed minor bug in generation of family 1 XMP group names
 <li>Changes to Photoshop family 2 groups
 </ul>
 
-<b>Oct. 30/04 - Version 3.71</b>
+<b>Oct. 30, 2004 - Version 3.71</b>
 <ul>
 <li>Switched group families 0 and 1 so the general location is now the default
 <li>Fixed bug when sorting by order of group for any family other than 0
 <li>Added test 17 to ExifTool.t
 </ul>
 
-<b>Oct. 29/04 - Version 3.70</b>
+<b>Oct. 29, 2004 - Version 3.70</b>
 <ul>
 <li>Major improvements to XMP parsing
 <li>Divided XMP group in family 0 based on the XMP namespace prefix
@@ -1462,7 +1593,7 @@
 <li>Added information about tag format to verbose hex dump
 </ul>
 
-<b>Oct. 22/04 - Version 3.61</b>
+<b>Oct. 22, 2004 - Version 3.61</b>
 <ul>
 <li>Added support for DNG file format
 <li>Added and updated a number of EXIF tags for FAX and other uncommon images
@@ -1476,7 +1607,7 @@
 <li>Started referencing sources for tag definitions in the source code
 </ul>
 
-<b>Oct. 1/04 - Version 3.60</b> (production release)
+<b>Oct. 1, 2004 - Version 3.60</b> (production release)
 <ul>
 <li>Changed group family 0 to divide EXIF group into individual IFD groups
 <li>Fixed typos in some Casio tag names
@@ -1487,92 +1618,92 @@
     </ul>
 </ul>
 
-<b>Sept. 21/04 - Version 3.51</b>
+<b>Sept. 21, 2004 - Version 3.51</b>
 <ul>
 <li>Improvements to interpretation of Nikon D70 ISO settings
 </ul>
 
-<b>Sept. 16/04 - Version 3.50</b>
+<b>Sept. 16, 2004 - Version 3.50</b>
 <ul>
 <li>Fixed problem with duplicate tags showing up without the -a option
 <li>Changed Nikon DataDump to a binary type
 <li>Added D70Boring shortcut
 </ul>
 
-<b>Sept. 14/04 - Version 3.49</b>
+<b>Sept. 14, 2004 - Version 3.49</b>
 <ul>
 <li>Changed installation to also install the 'exiftool' script
 </ul>
 
-<b>Sept. 13/04 - Version 3.48</b>
+<b>Sept. 13, 2004 - Version 3.48</b>
 <ul>
 <li>Changed UserComment to skip first 8 bytes since the comments come after an 8
     byte character code
 </ul>
 
-<b>Sept. 10/04 - Version 3.47</b>
+<b>Sept. 10, 2004 - Version 3.47</b>
 <ul>
 <li>Added support for second type of Casio maker notes (MakerNoteCasio2)
 </ul>
 
-<b>Sept. 1/04 - Version 3.46</b>
+<b>Sept. 1, 2004 - Version 3.46</b>
 <ul>
 <li>Fixed minor bug in PrintConv of FileNumber for CanonRaw files
 </ul>
 
-<b>June 3/04 - Version 3.45</b>
+<b>June 3, 2004 - Version 3.45</b>
 <ul>
 <li>Recognize Canon 1D Mk II raw files (.CR2)
     <br>(Note: Not properly decoding maker notes from these files yet)
 </ul>
 
-<b>May 28/04 - Version 3.44</b>
+<b>May 28, 2004 - Version 3.44</b>
 <ul>
 <li>Improved validity check of Sony maker notes
 </ul>
 
-<b>May 18/04 - Version 3.43</b>
+<b>May 18, 2004 - Version 3.43</b>
 <ul>
 <li>A couple more changes to the Nikon maker notes
 </ul>
 
-<b>May 17/04 - Version 3.42</b>
+<b>May 17, 2004 - Version 3.42</b>
 <ul>
 <li>Additions to Nikon maker notes for values derived from D70
 </ul>
 
-<b>Apr. 28/04 - Version 3.41</b>
+<b>Apr. 28, 2004 - Version 3.41</b>
 <ul>
 <li>Fixed some errors when running on older Perl versions
 </ul>
 
-<b>Apr. 7/04 - Version 3.40</b>
+<b>Apr. 7, 2004 - Version 3.40</b>
 <ul>
 <li>Try to extract data from unrecognized maker notes (assuming standard EXIF
     format)
 <li>Added tests for different maker notes
 </ul>
 
-<b>Apr. 6/04 - Version 3.37</b>
+<b>Apr. 6, 2004 - Version 3.37</b>
 <ul>
 <li>Added support for Sigma maker notes
 <li>Remember to add new files to MANIFEST so they get included in release.  Doh
 </ul>
 
-<b>Apr. 6/04 - Version 3.36</b>
+<b>Apr. 6, 2004 - Version 3.36</b>
 <ul>
 <li>Added support for Sanyo and Minolta maker notes
 <li>Added skeleton for interpeting Sony maker notes
 <li>Interpret Pentax PrintIM
 </ul>
 
-<b>Apr. 6/04 - Version 3.35</b>
+<b>Apr. 6, 2004 - Version 3.35</b>
 <ul>
 <li>Added support for Nikon PrintIM
 <li>Changed names of duplicate EXIF tags
 </ul>
 
-<b>Apr. 5/04 - Version 3.34</b>
+<b>Apr. 5, 2004 - Version 3.34</b>
 <ul>
 <li>Added all missing tag definitions from TIFF 6 standard
 <li>Added a few more EXIF tag definitions
@@ -1581,25 +1712,25 @@
 <li>Fixed potential endless loop bug introduced in version 3.33
 </ul>
 
-<b>Apr. 5/04 - Version 3.33</b>
+<b>Apr. 5, 2004 - Version 3.33</b>
 <ul>
 <li>Parse SubIFD of Nikon NEF file (now extracts raw image size and thumbnail
     image)
 </ul>
 
-<b>Apr. 2/04 - Version 3.32</b>
+<b>Apr. 2, 2004 - Version 3.32</b>
 <ul>
 <li>Changes to some Nikon tag names
 <li>Added Nikon Saturation
 <li>Documentation improvements
 </ul>
 
-<b>Mar. 31/04 - Version 3.31</b>
+<b>Mar. 31, 2004 - Version 3.31</b>
 <ul>
 <li>Now recognizes NEF (Nikon Electronic image Format) files
 </ul>
 
-<b>Mar. 29/04 - Version 3.30</b>
+<b>Mar. 29, 2004 - Version 3.30</b>
 <ul>
 <li>Removed -w option
 <li>Fixed problem with some XMP tags being put in the EXIF group
@@ -1611,7 +1742,7 @@
     </ul>
 </ul>
 
-<b>Mar. 26/04 - Version 3.27</b>
+<b>Mar. 26, 2004 - Version 3.27</b>
 <ul>
 <li>Optimized a few routines to speed things up a bit
 <li>API Changes:
@@ -1622,22 +1753,22 @@
     </ul>
 </ul>
 
-<b>Mar. 25/04 - Version 3.26</b>
+<b>Mar. 25, 2004 - Version 3.26</b>
 <ul>
 <li>Don't generate warning if end of IPTC block is padded with nulls
 </ul>
 
-<b>Mar. 19/04 - Version 3.25</b>
+<b>Mar. 19, 2004 - Version 3.25</b>
 <ul>
 <li>Fixed problem with 'Input' sort order
 </ul>
 
-<b>Mar. 19/04 - Version 3.24</b>
+<b>Mar. 19, 2004 - Version 3.24</b>
 <ul>
 <li>Only return PreviewImage if it is a valid JPG (otherwise set 'Warning')
 </ul>
 
-<b>Mar. 16/04 - Version 3.23</b>
+<b>Mar. 16, 2004 - Version 3.23</b>
 <ul>
 <li>API Changes:
     <ul>
@@ -1647,7 +1778,7 @@
     </ul>
 </ul>
 
-<b>Mar. 12/04 - Version 3.22</b>
+<b>Mar. 12, 2004 - Version 3.22</b>
 <ul>
 <li>API Changes:
     <ul>
@@ -1657,7 +1788,7 @@
     </ul>
 </ul>
 
-<b>Mar. 11/04 - Version 3.21</b>
+<b>Mar. 11, 2004 - Version 3.21</b>
 <ul>
 <li>Fixed problem with Composite group in family 1
 <li>Changed case of Exif to EXIF in family 1
@@ -1668,7 +1799,7 @@
     </ul>
 </ul>
 
-<b>Mar. 10/04 - Version 3.20</b>
+<b>Mar. 10, 2004 - Version 3.20</b>
 <ul>
 <li>Added -group option
 <li>Added group families 1 and 2
@@ -1685,7 +1816,7 @@
     </ul>
 </ul>
 
-<b>Mar. 1/04 - Version 3.15</b>
+<b>Mar. 1, 2004 - Version 3.15</b>
 <ul>
 <li>Changed format of all date and time tags to EXIF standard
 <li>Added some composite date/time tags
@@ -1708,13 +1839,13 @@
     </ul>
 </ul>
 
-<b>Feb. 27/04 - Version 3.14</b>
+<b>Feb. 27, 2004 - Version 3.14</b>
 <ul>
 <li>Added GPS tag conversions and GPS test
 <li>Values that can't be converted now show up simply as "Unknown (X)"
 </ul>
 
-<b>Feb. 26/04 - Version 3.13</b>
+<b>Feb. 26, 2004 - Version 3.13</b>
 <ul>
 <li>Print out errors from exiftool script (since Image::ExifTool no longer
     prints them)
@@ -1722,12 +1853,12 @@
 <li>Failed tests now leave ".failed" file in "t" directory for post mortem
 </ul>
 
-<b>Feb. 25/04 - Version 3.12</b>
+<b>Feb. 25, 2004 - Version 3.12</b>
 <ul>
 <li>Moved all image-related warnings to new Warning tag
 </ul>
 
-<b>Feb. 25/04 - Version 3.11</b>
+<b>Feb. 25, 2004 - Version 3.11</b>
 <ul>
 <li>Added GeoTiff support
 <li>Added -x option
@@ -1742,7 +1873,7 @@
     </ul>
 </ul>
 
-<b>Feb. 20/04 - Version 3.10</b>
+<b>Feb. 20, 2004 - Version 3.10</b>
 <ul>
 <li>Restructuring only -- the behaviour of the exiftool
 script was not changed
@@ -1762,12 +1893,12 @@ script was not changed
     </ul>
 </ul>
 
-<b>Feb. 20/04 - Version 3.05</b>
+<b>Feb. 20, 2004 - Version 3.05</b>
 <ul>
 <li>Fixed problem where output files (-o) weren't written if -p option used
 </ul>
 
-<b>Feb. 19/04 - Version 3.04</b>
+<b>Feb. 19, 2004 - Version 3.04</b>
 <ul>
 <li>Added -U option to allow display of unknown values in Canon binary data
     blocks
@@ -1775,7 +1906,7 @@ script was not changed
 <li>Added RawData and DecoderTable tags (for Canon RAW file)
 </ul>
 
-<b>Feb. 17/04 - Version 3.03</b>
+<b>Feb. 17, 2004 - Version 3.03</b>
 <ul>
 <li>Fixed RandomAccessFile package name (should have been
     File::RandomAccessFile)
@@ -1788,12 +1919,12 @@ script was not changed
     </ul>
 </ul>
 
-<b>Feb. 16/04 - Version 3.02</b>
+<b>Feb. 16, 2004 - Version 3.02</b>
 <ul>
 <li>Improved handling of Pentax maker notes
 </ul>
 
-<b>Feb. 15/04 - Version 3.01</b>
+<b>Feb. 15, 2004 - Version 3.01</b>
 <ul>
 <li>API changes:
     <ul>
@@ -1802,7 +1933,7 @@ script was not changed
     </ul>
 </ul>
 
-<b>Feb. 13/04 - Version 3.00</b>
+<b>Feb. 13, 2004 - Version 3.00</b>
 <ul>
 <li>Removed -all option (it is now the default -- specify -common for previous
     default behaviour)
@@ -1820,7 +1951,7 @@ script was not changed
     </ul>
 </ul>
 
-<b>Feb. 12/04 - Version 2.71</b>
+<b>Feb. 12, 2004 - Version 2.71</b>
 <ul>
 <li>Still more playing with Pentax maker notes
 <li>More API changes:
@@ -1832,7 +1963,7 @@ script was not changed
     </ul>
 </ul>
 
-<b>Feb. 11/04 - Version 2.70</b>
+<b>Feb. 11, 2004 - Version 2.70</b>
 <ul>
 <li>More tweaking of Pentax maker notes
 <li>Changed API to be more object oriented:
@@ -1849,20 +1980,20 @@ script was not changed
     </ul>
 </ul>
 
-<b>Feb. 10/04 - Version 2.62</b>
+<b>Feb. 10, 2004 - Version 2.62</b>
 <ul>
 <li>Added -u option to allow display of unknown tags
 <li>Major changes to Pentax maker notes (still needs work)
 </ul>
 
-<b>Feb. 09/04 - Version 2.61</b>
+<b>Feb. 09, 2004 - Version 2.61</b>
 <ul>
 <li>Allow file reference to be passed to ImageInfo()
 <li>Allow file to be read from standard input by specifying "-" as file name
 <li>Added FileType tag
 </ul>
 
-<b>Feb. 07/04 - Version 2.60</b>
+<b>Feb. 07, 2004 - Version 2.60</b>
 <ul>
 <li>Improve IPTC parsing and add support for more IPTC data types
 <li>Read Photoshop APP13 records properly
@@ -1878,117 +2009,117 @@ script was not changed
     </ul>
 </ul>
 
-<b>Jan. 30/04 - Version 2.51</b>
+<b>Jan. 30, 2004 - Version 2.51</b>
 <ul>
 <li>Speed up JPG reading code
 <li>API no longer returns references to image-specific static data
 <li>Added ExifToolVersion tag
 </ul>
 
-<b>Jan. 29/04 - Version 2.50</b>
+<b>Jan. 29, 2004 - Version 2.50</b>
 <ul>
 <li>Changed API to return binary data as SCALAR reference and
     list of values as ARRAY reference
 <li>Attempt to make case of tag descriptions more consistent
 </ul>
 
-<b>Jan. 28/04 - Version 2.41</b>
+<b>Jan. 28, 2004 - Version 2.41</b>
 <ul>
 <li>Scan photoshop JPG 0xe1 garbage for possible XMP information
 </ul>
 
-<b>Jan. 27/04 - Version 2.40</b>
+<b>Jan. 27, 2004 - Version 2.40</b>
 <ul>
 <li>Improved handling of XMP data
 <li>Changed output format and added -l option
 </ul>
 
-<b>Jan. 21/04 - Version 2.36</b>
+<b>Jan. 21, 2004 - Version 2.36</b>
 <ul>
 <li>Don't output trailing linefeed when -b option used
 </ul>
 
-<b>Jan. 19/04 - Version 2.35</b>
+<b>Jan. 19, 2004 - Version 2.35</b>
 <ul>
 <li>Changes to verbose output
 <li>Added TagTables::CanonRaw::CleanRaw() as an API utility function
 </ul>
 
-<b>Jan. 16/04 - Version 2.34</b>
+<b>Jan. 16, 2004 - Version 2.34</b>
 <ul>
 <li>Added 'Validate' check for Canon data fields
 <li>Changed ScaleFactor35efl to use FocalLengthIn35mmFormat if available
 </ul>
 
-<b>Jan. 15/04 - Version 2.33</b>
+<b>Jan. 15, 2004 - Version 2.33</b>
 <ul>
 <li>Added ScaleFactor35efl, FocalLength35efl, Lens35efl
 <li>Allow Composite tags to Require/Desire each other
 <li>Changed FlashType to use FlashBits instead of CanonFlashMode
 </ul>
 
-<b>Jan. 13/04 - Version 2.32</b>
+<b>Jan. 13, 2004 - Version 2.32</b>
 <ul>
 <li>Added -d (date format) option
 <li>Added -p (print format file) option
 </ul>
 
-<b>Jan. 9/04 - Version 2.31</b>
+<b>Jan. 9, 2004 - Version 2.31</b>
 <ul>
 <li>Exif WhiteBalance no longer overrides maker-specific WhiteBalance
 </ul>
 
-<b>Jan. 8/04 - Version 2.30</b>
+<b>Jan. 8, 2004 - Version 2.30</b>
 <ul>
 <li>Added support for IPTC format information
 </ul>
 
-<b>Jan. 6/04 - Version 2.25</b>
+<b>Jan. 6, 2004 - Version 2.25</b>
 <ul>
 <li>Fixed problem with ImageInfo() function prototype
-<li>Fixed printout of JpgFromRaw message (doesn't effect JPG extraction)
+<li>Fixed printout of JpgFromRaw message (doesn't affect JPG extraction)
 <li>Set output files to binmode (including STDOUT) if -b option used
 </ul>
 
-<b>Jan. 1/04 - Version 2.24</b>
+<b>Jan. 1, 2004 - Version 2.24</b>
 <ul>
 <li>Fixed -list option to show all available tag names
 </ul>
 
-<b>Dec. 18/03 - Version 2.23</b>
+<b>Dec. 18, 2003 - Version 2.23</b>
 <ul>
 <li>Changed "Disable" routines to "Enable"
 </ul>
 
-<b>Dec. 17/03 - Version 2.22</b>
+<b>Dec. 17, 2003 - Version 2.22</b>
 <ul>
 <li>Fixed make/model tags which I broke with a recent change
 <li>Removed null terminator from returned strings
 </ul>
 
-<b>Dec. 16/03 - Version 2.21</b>
+<b>Dec. 16, 2003 - Version 2.21</b>
 <ul>
 <li>Fixed problem with decoding some Nikon maker notes
 <li>General improvements and tweaks to the code
 </ul>
 
-<b>Dec. 14/03 - Version 2.20</b>
+<b>Dec. 14, 2003 - Version 2.20</b>
 <ul>
 <li>Now extracts preview image from 300D JPG files (PreviewImage)
 <li>Changed ThumbnailData tag name to ThumbnailImage
 </ul>
 
-<b>Dec. 12/03 - Version 2.10</b>
+<b>Dec. 12, 2003 - Version 2.10</b>
 <ul>
 <li>ExifTool::ImageInfo now returns reference to hash instead of hash
 </ul>
 
-<b>Dec. 10/03 - Version 2.01</b>
+<b>Dec. 10, 2003 - Version 2.01</b>
 <ul>
 <li>Minor fixes for reading of RAW files
 </ul>
 
-<b>Dec. 09/03 - Version 2.00</b>
+<b>Dec. 09, 2003 - Version 2.00</b>
 <ul>
 <li>Added support Olympus, Casio and Nikon cameras
 <li>Now recognized GPS information
@@ -1996,78 +2127,78 @@ script was not changed
 <li>Restructured API
 </ul>
 
-<b>Dec. 05/03 - Version 1.72</b>
+<b>Dec. 05, 2003 - Version 1.72</b>
 <ul>
 <li>Changes to composite Aperture and ShutterSpeed decisions
 </ul>
 
-<b>Dec. 05/03 - Version 1.71</b>
+<b>Dec. 05, 2003 - Version 1.71</b>
 <ul>
 <li>Read 10D Custom functions from CRW file too (thanks dpophyte)
 </ul>
 
-<b>Dec. 05/03 - Version 1.70</b>
+<b>Dec. 05, 2003 - Version 1.70</b>
 <ul>
 <li>Added custom functions for 10D and 1D
 </ul>
 
-<b>Dec. 04/03 - Version 1.62</b>
+<b>Dec. 04, 2003 - Version 1.62</b>
 <ul>
 <li>Decode known flash bits
 </ul>
 
-<b>Dec. 04/03 - Version 1.61</b>
+<b>Dec. 04, 2003 - Version 1.61</b>
 <ul>
 <li>Override ShutterSpeed with BulbDuration if available
 <li>Change -s option to add tab-separated list
 </ul>
 
-<b>Dec. 03/03 - Version 1.60</b>
+<b>Dec. 03, 2003 - Version 1.60</b>
 <ul>
 <li>Big improvements in reading Canon RAW files
 </ul>
 
-<b>Nov. 29/03 - Version 1.50</b>
+<b>Nov. 29, 2003 - Version 1.50</b>
 <ul>
 <li>Added ability to extract JPG from RAW
 <li>Added ExifData tag to allow entire EXIF block to be dumped
 </ul>
 
-<b>Nov. 26/03 - Version 1.40</b>
+<b>Nov. 26, 2003 - Version 1.40</b>
 <ul>
 <li>Split up config files to speed things up
 <li>Added ability to extract binary data
 <li>Added ThumbnailData tag (to allow extracting JPG thumbnails)
 </ul>
 
-<b>Nov. 25/03 - Version 1.30</b>
+<b>Nov. 25, 2003 - Version 1.30</b>
 <ul>
 <li>Added experimental Canon RAW file support
 </ul>
 
-<b>Nov. 22/03 - Version 1.20</b>
+<b>Nov. 22, 2003 - Version 1.20</b>
 <ul>
 <li>Now reads TIFF files too
 </ul>
 
-<b>Nov. 20/03 - Version 1.12</b>
+<b>Nov. 20, 2003 - Version 1.12</b>
 <ul>
 <li>Don't translate PhotoShop Brightness, etc
 </ul>
 
-<b>Nov. 20/03 - Version 1.11</b>
+<b>Nov. 20, 2003 - Version 1.11</b>
 <ul>
 <li>Attempt to fix problem on hp
 <li>clean up code a bit
 <li>added '-ver' command-line option
 </ul>
 
-<b>Nov. 20/03 - Version 1.10</b>
+<b>Nov. 20, 2003 - Version 1.10</b>
 <ul>
 <li>Added support for XMP format
 </ul>
 
-<b>Nov. 19/03 - Version 1.00</b>
+<b>Nov. 19, 2003 - Version 1.00</b>
 <ul>
 <li>Initial release
 </ul>

@@ -231,11 +231,11 @@ my %jp2ResolutionUnit = (
     FORMAT => 'int8s',
     0 => {
         Name => 'CaptureYResolution',
-        Format => 'rational16u',
+        Format => 'rational32u',
     },
     4 => {
         Name => 'CaptureXResolution',
-        Format => 'rational16u',
+        Format => 'rational32u',
     },
     8 => {
         Name => 'CaptureYResolutionUnit',
@@ -253,11 +253,11 @@ my %jp2ResolutionUnit = (
     FORMAT => 'int8s',
     0 => {
         Name => 'DisplayYResolution',
-        Format => 'rational16u',
+        Format => 'rational32u',
     },
     4 => {
         Name => 'DisplayXResolution',
-        Format => 'rational16u',
+        Format => 'rational32u',
     },
     8 => {
         Name => 'DisplayYResolutionUnit',
@@ -420,7 +420,7 @@ aren't decoded properly, please send them to me so I can improve the JPEG
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

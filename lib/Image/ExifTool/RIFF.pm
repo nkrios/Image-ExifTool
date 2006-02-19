@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
-# File:         WAV.pm
+# File:         RIFF.pm
 #
-# Description:  Read WAV and AVI meta information
+# Description:  Read RIFF/WAV/AVI meta information
 #
 # Revisions:    09/14/2005 - P. Harvey Created
 #
@@ -11,49 +11,47 @@
 #               4) http://www.codeproject.com/audio/wavefiles.asp
 #------------------------------------------------------------------------------
 
-package Image::ExifTool::WAV;
+package Image::ExifTool::RIFF;
 
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
-use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
-# WAV info
-%Image::ExifTool::WAV::Main = (
-    PROCESS_PROC => \&Image::ExifTool::WAV::ProcessSubChunks,
+# RIFF info
+%Image::ExifTool::RIFF::Main = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessSubChunks,
     NOTES => q{
-WAV is the native digital audio format for Windows.  This is a RIFF-based
-format which supports meta information embedded in two types of RIFF C<LIST>
-chunks: C<INFO> and C<exif>.  As well, some information about the audio
-content is extracted from the C<fmt > chunk.
+Windows WAV and AVI files are RIFF format files.  Meta information embedded
+in two types of RIFF C<LIST> chunks: C<INFO> and C<exif>.  As well, some
+information about the audio content is extracted from the C<fmt > chunk.
     },
     'fmt ' => {
         Name => 'Format',
-        SubDirectory => { TagTable => 'Image::ExifTool::WAV::Format' },
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Format' },
     },
     'LIST' => {
         Name => 'List',
-        SubDirectory => { TagTable => 'Image::ExifTool::WAV::List' },
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::List' },
     },
 );
 
 # Sub chunks of LIST chunk
-%Image::ExifTool::WAV::List = (
-    PROCESS_PROC => \&Image::ExifTool::WAV::ProcessChunk,
+%Image::ExifTool::RIFF::List = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunk,
     'INFO' => {
         Name => 'Info',
-        SubDirectory => { TagTable => 'Image::ExifTool::WAV::Info' },
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Info' },
     },
     'exif' => {
         Name => 'Exif',
-        SubDirectory => { TagTable => 'Image::ExifTool::WAV::Exif' },
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Exif' },
     },
 );
 
 # Format chunk data
-%Image::ExifTool::WAV::Format = (
+%Image::ExifTool::RIFF::Format = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Audio' },
     FORMAT => 'int16u',
@@ -110,8 +108,8 @@ content is extracted from the C<fmt > chunk.
 );
 
 # Sub chunks of INFO LIST chunk
-%Image::ExifTool::WAV::Info = (
-    PROCESS_PROC => \&Image::ExifTool::WAV::ProcessSubChunks,
+%Image::ExifTool::RIFF::Info = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessSubChunks,
     GROUPS => { 2 => 'Audio' },
     IARL => 'ArchivalLocation',
     IART => { Name => 'Artist',    Groups => { 2 => 'Author' } },
@@ -143,8 +141,8 @@ content is extracted from the C<fmt > chunk.
 );
 
 # Sub chunks of EXIF LIST chunk
-%Image::ExifTool::WAV::Exif = (
-    PROCESS_PROC => \&Image::ExifTool::WAV::ProcessSubChunks,
+%Image::ExifTool::RIFF::Exif = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessSubChunks,
     GROUPS => { 2 => 'Audio' },
     ever => 'ExifVersion',
     erel => 'RelatedImageFile',
@@ -226,29 +224,25 @@ sub ProcessChunk($$$)
 }
 
 #------------------------------------------------------------------------------
-# Extract information from a WAV audio file
+# Extract information from a RIFF file
 # Inputs: 0) ExifTool object reference, 1) DirInfo reference
-# Returns: 1 on success, 0 if this wasn't a valid WAV file
-sub ProcessWAV($$)
+# Returns: 1 on success, 0 if this wasn't a valid RIFF file
+sub ProcessRIFF($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my ($buff, $err);
+    my %types = ( 'WAVE' => 'WAV', 'AVI ' => 'AVI' );
 
-    # verify this is a valid WAV file
+    # verify this is a valid RIFF file
     return 0 unless $raf->Read($buff, 12) == 12;
-    if ($buff =~ /^RIFF....WAVE/s) {
-        $exifTool->SetFileType('WAV');
-    } elsif ($buff =~ /^RIFF....AVI /s) {
-        $exifTool->SetFileType('AVI');
-    } else {
-        return 0;
-    }
+    return 0 unless $buff =~ /^RIFF....(.{4})/s;
+    $exifTool->SetFileType($types{$1}); # set type to 'WAV', 'AVI' or 'RIFF'
     SetByteOrder('II');
-    my $tagTablePtr = GetTagTable('Image::ExifTool::WAV::Main');
+    my $tagTablePtr = GetTagTable('Image::ExifTool::RIFF::Main');
     my $pos = 12;
 #
-# Read chunks in WAVE image until we get to the 'data' chunk
+# Read chunks in RIFF image until we get to the 'data' chunk
 #
     for (;;) {
         $raf->Read($buff, 8) == 8 or $err=1, last;
@@ -257,9 +251,11 @@ sub ProcessWAV($$)
         # stop when we hit the audio data or AVI index
         last if $tag eq 'data' or $tag eq 'idx1';
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-        $exifTool->VPrint(0, "RIFF '$tag' chunk:\n");
+        $exifTool->VPrint(0, "RIFF '$tag' chunk ($len bytes of data):\n");
+        # RIFF chunks are padded to an even number of bytes
+        my $len2 = $len + ($len & 0x01);
         if ($tagInfo and $$tagInfo{SubDirectory}) {
-            $raf->Read($buff, $len) == $len or $err=1, last;
+            $raf->Read($buff, $len2) == $len2 or $err=1, last;
             my %dirInfo = (
                 DataPt => \$buff,
                 DataPos => $pos,
@@ -269,11 +265,11 @@ sub ProcessWAV($$)
             my $tagTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
             $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
         } else {
-            $raf->Seek($len, 1) or $err=1, last;
+            $raf->Seek($len2, 1) or $err=1, last;
         }
-        $pos += $len;
+        $pos += $len2;
     }
-    $err and $exifTool->Warn('Error reading WAV file -- corrupted?');
+    $err and $exifTool->Warn('Error reading RIFF file -- corrupted?');
     return 1;
 }
 
@@ -283,7 +279,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::WAV - Read WAV and AVI meta information
+Image::ExifTool::RIFF - Read RIFF/WAV/AVI meta information
 
 =head1 SYNOPSIS
 
@@ -292,11 +288,12 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains routines required by Image::ExifTool to extract
-information from Windows WAV audio and AVI video files.
+information from RIFF-based (Resource Interchange File Format) files,
+including Windows WAV audio and AVI video files.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -317,7 +314,7 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool::TagNames/WAV Tags>,
+L<Image::ExifTool::TagNames/RIFF Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

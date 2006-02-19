@@ -20,7 +20,7 @@ package Image::ExifTool::Kodak;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.06';
 
 %Image::ExifTool::Kodak::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -30,9 +30,10 @@ $VERSION = '1.04';
     NOTES => q{
 The table below contains the most common set of Kodak tags.  The following
 Kodak camera models have been tested and found to use these tags:  CX6330,
-CX7330, CX7430, CX7530, DC4800, DC4900, DX3500, DX3600, DX3900, DX4330,
-DX4530, DX4900, DX6340, DX6440, DX6490, DX7440, DX7590, DX7630, LS420,
-LS443, LS743 and LS753.
+CX7330, CX7430, CX7525, CX7530, DC4800, DC4900, DX3500, DX3600, DX3900,
+DX4330, DX4530, DX4900, DX6340, DX6440, DX6490, DX7440, DX7590, DX7630,
+EasyShare-One, LS420, LS443, LS633, LS743, LS753, Z700, Z730, Z740, Z760 and
+Z7560.
     },
     WRITABLE => 1,
     FIRST_ENTRY => 8,
@@ -103,14 +104,12 @@ LS443, LS743 and LS753.
     0x1d => 'SequenceNumber',
     0x1e => {
         Name => 'FNumber',
-        Description => 'Aperture',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => 'int($val * 100 + 0.5)',
     },
     0x20 => {
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         Format => 'int32u',
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
@@ -208,7 +207,6 @@ LS443, LS743 and LS753.
     },
     0x60 => {
         Name => 'ISO',
-        Description => 'ISO Speed',
         Format => 'int16u',
     },
     0x62 => {
@@ -286,7 +284,7 @@ LS443, LS743 and LS753.
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    NOTES => 'These tags are used by the DC280, DC3400 and DC5000.',
+    NOTES => 'These tags are used by the DC240, DC280, DC3400 and DC5000.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     0x0c => {
@@ -323,7 +321,6 @@ LS443, LS743 and LS753.
     },
     0x38 => { #PH
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         Format => 'int32u',
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
@@ -332,14 +329,12 @@ LS443, LS743 and LS753.
     },
     0x3c => { #PH
         Name => 'FNumber',
-        Description => 'Aperture',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => 'int($val * 100 + 0.5)',
     },
     0x4e => { #PH
         Name => 'ISO',
-        Description => 'ISO Speed',
         Format => 'int16u',
     },
 );
@@ -361,12 +356,14 @@ LS443, LS743 and LS753.
 %Image::ExifTool::Kodak::Type5 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    NOTES => 'These tags are used by the CX4200, CX4230 and CX6200.',
+    NOTES => q{
+        These tags are used by the CX4200, CX4210, CX4230, CX4300, CX6200 and
+        CX6230.
+    },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     0x14 => { #PH
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         Format => 'int32u',
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
@@ -383,14 +380,12 @@ LS443, LS743 and LS753.
     },
     0x1c => { #PH
         Name => 'FNumber',
-        Description => 'Aperture',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => 'int($val * 100 + 0.5)',
     },
     0x1e => { #PH
         Name => 'ISO',
-        Description => 'ISO Speed',
         Format => 'int16u',
     },
     0x20 => { #PH
@@ -432,7 +427,6 @@ LS443, LS743 and LS753.
     FIRST_ENTRY => 0,
     0x10 => { #PH
         Name => 'ExposureTime',
-        Description => 'Shutter Speed',
         Format => 'int32u',
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
@@ -446,14 +440,12 @@ LS443, LS743 and LS753.
     },
     0x18 => { #PH
         Name => 'FNumber',
-        Description => 'Aperture',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => 'int($val * 100 + 0.5)',
     },
     0x1a => { #PH
         Name => 'ISO',
-        Description => 'ISO Speed',
         Format => 'int16u',
     },
     0x1c => { #PH
@@ -608,7 +600,7 @@ interpret Kodak maker notes EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

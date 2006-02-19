@@ -180,13 +180,13 @@ Unknown (-u) option is used.
 <tr valign='top'>
 <td>0x040a</td>
 <td>CopyrightFlag</td>
-<td align='center'>Y</td>
+<td align='center'>int8u</td>
 <td><font size='-1'>0 = False
   <br>1 = True</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x040b</td>
 <td>URL</td>
-<td align='center'>Y</td>
+<td align='center'>string</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x040c</td>
@@ -196,7 +196,7 @@ Unknown (-u) option is used.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x040d</td>
 <td>GlobalAngle</td>
-<td align='center'>N</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x040e</td>
@@ -251,7 +251,7 @@ Unknown (-u) option is used.
 <tr valign='top'>
 <td>0x0419</td>
 <td>GlobalAltitude</td>
-<td align='center'>N</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x041a</td>
@@ -313,23 +313,23 @@ Unknown (-u) option is used.
 <tr valign='top'>
 <td align='right'>0</td>
 <td>XResolution</td>
-<td align='center'>N</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>2</td>
 <td>DisplayedUnitsX</td>
-<td align='center'>N</td>
+<td align='center'>int16u</td>
 <td><font size='-1'>1 = inches
   <br>2 = cm</font></td></tr>
 <tr valign='top'>
 <td align='right'>4</td>
 <td>YResolution</td>
-<td align='center'>N</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>6</td>
 <td>DisplayedUnitsY</td>
-<td align='center'>N</td>
+<td align='center'>int16u</td>
 <td><font size='-1'>1 = inches
   <br>2 = cm</font></td></tr>
 </table></td></tr></table></blockquote>
@@ -342,7 +342,7 @@ Unknown (-u) option is used.
 <tr valign='top'>
 <td align='right'>0</td>
 <td>PhotoshopQuality</td>
-<td align='center'>N</td>
+<td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
@@ -360,9 +360,49 @@ Unknown (-u) option is used.
   <br>3 = 5 Scans</font></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Header'>Photoshop Header Tags</a></h2>
+This information is found in the PSD file header.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>NumChannels</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>7</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>9</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>11</td>
+<td>BitDepth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>12</td>
+<td>ColorMode</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Bitmap
+  <br>1 = Grayscale
+  <br>2 = Indexed
+  <br>3 = RGB
+  <br>4 = CMYK
+  <br>7 = Multichannel
+  <br>8 = Duotone
+  <br>9 = Lab</font></td></tr>
+</table></td></tr></table></blockquote>
+
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 14, 2005</i>
+<br><i>Last revised Jan 9, 2006</i>
 </body>
 </html>

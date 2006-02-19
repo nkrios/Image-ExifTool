@@ -1,12 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: Sigma_3_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2005:09:21 19:36:04
+[File, File, Image]  - File Size: 1575 bytes
+[File, File, Time]  - File Modification Date/Time: 2006:02:06 11:57:12
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 160
-[File, File, Image]  - Image Height: 120
+[File, File, Image]  - Image Width: 8
+[File, File, Image]  - Image Height: 8
 [EXIF, IFD0, Camera] 271 - Make: SIGMA
 [EXIF, IFD0, Camera] 272 - Camera Model Name: SIGMA SD10
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -14,15 +14,15 @@
 [EXIF, IFD0, Image] 283 - Y Resolution: 180
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: SIGMA PhotoPro 2.0.0.1586
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2004:03:19 17:48:51
+[EXIF, IFD0, Time] 306 - Modify Date: 2004:03:19 17:48:51
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/320
-[EXIF, ExifIFD, Image] 33437 - Aperture: 8.0
+[EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/320
+[EXIF, ExifIFD, Image] 33437 - F Number: 8.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
-[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
+[EXIF, ExifIFD, Image] 34855 - ISO: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:11:27 10:31:34
-[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2004:03:19 17:48:51
+[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:11:27 10:31:34
+[EXIF, ExifIFD, Time] 36868 - Create Date: 2004:03:19 17:48:51
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.5
@@ -75,7 +75,7 @@
 [IPTC, IPTC, Image] 0 - News Photo Version: 4
 [Composite, Composite, Image]  - Aperture: 8.0
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.7
 [Composite, Composite, Image]  - Shutter Speed: 1/320
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

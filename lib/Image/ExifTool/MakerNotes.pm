@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.17';
+$VERSION = '1.19';
 
 # conditional list of maker notes
 # Notes:
@@ -135,9 +135,9 @@ $VERSION = '1.17';
         Name => 'MakerNoteKodak5',
         Condition => q{
             $self->{CameraMake}=~/^EASTMAN KODAK/ and
-            ($self->{CameraModel}=~/(CX4200|CX4230|CX6200)/ or
+            ($self->{CameraModel}=~/CX(4200|4230|4300|4310|6200|6230)/ or
             # try to pick up similar models we haven't tested yet
-            $$valPt=~/^\0(\x1a\x18|\x3a\x08|\x59\xf8)\0/)
+            $$valPt=~/^\0(\x1a\x18|\x3a\x08|\x59\xf8|\x14\x80)\0/)
         },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type5',
@@ -249,7 +249,7 @@ $VERSION = '1.17';
     {
         Name => 'MakerNotePanasonic',
         # (starts with "Panasonic\0")
-        Condition => '$self->{CameraMake} =~ /^Panasonic/',
+        Condition => '$self->{CameraMake} =~ /^Panasonic/ and $$valPt!~/^MKE/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Main',
             Start => '$valuePtr+12',
@@ -257,10 +257,19 @@ $VERSION = '1.17';
         },
     },
     {
+        Name => 'MakerNotePanasonic2',
+        # (starts with "Panasonic\0")
+        Condition => '$self->{CameraMake} =~ /^Panasonic/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Type2',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    {
         Name => 'MakerNotePentax',
-        # (if Make is 'PENTAX Corporation', starts with "AOC\0")
+        # (if Make is 'PENTAX Corporation', starts with "AOC\0" (also Samsung DX-1S))
         # (if Make is 'Asahi Optical Co.,Ltd', starts with an IFD)
-        Condition => '$self->{CameraMake} =~ /^(PENTAX|AOC|Asahi)/',
+        Condition => '$self->{CameraMake}=~/^(PENTAX|AOC|Asahi)/ or $$valPt=~/^AOC\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::Main',
             # process as Unknown maker notes because the start offset and
@@ -320,7 +329,7 @@ $VERSION = '1.17';
     {
         Name => 'MakerNoteSony',
         # (starts with "SONY DSC \0")
-        Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE} ne "SRF"',
+        Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE}!~/^(SRF|SR2)$/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
             # validate the maker note because this is sometimes garbage
@@ -331,10 +340,20 @@ $VERSION = '1.17';
     },
     {
         Name => 'MakerNoteSonySRF',
-        Condition => '$self->{CameraMake}=~/^SONY/',
+        Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE} eq "SRF"',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::SRF',
             Start => '$valuePtr',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteSonySR2',
+        Condition => '$self->{CameraMake}=~/^SONY/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sony::Main',
+            Start => '$valuePtr',
+            ByteOrder => 'Unknown',
         },
     },
     {
@@ -581,7 +600,7 @@ maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

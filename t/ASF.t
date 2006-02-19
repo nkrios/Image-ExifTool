@@ -1,5 +1,5 @@
 # Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/WAV.t'
+# `make test'. After `make install' it should work as `perl t/ASF.t'
 
 ######################### We start with some black magic to print on failure.
 
@@ -17,14 +17,14 @@ print "ok 1\n";
 
 use t::TestLib;
 
-my $testname = 'WAV';
+my $testname = 'ASF';
 my $testnum = 1;
 
-# test 2: Extract information from WAV.wav
+# test 2: Extract information from ASF.wmv
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/images/WAV.wav');
+    my $info = $exifTool->ImageInfo('t/images/ASF.wmv');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }

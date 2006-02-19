@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: QuickTime.mov
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1938 bytes
@@ -6,8 +6,8 @@
 [File, File, Image]  - File Type: MOV
 [File, File, Image]  - MIME Type: video/quicktime
 [QuickTime, QuickTime, Other] 0 - Version: 0
-[QuickTime, QuickTime, Time] 1 - Date/Time Of Digitization: 2005:08:11 14:03:54
-[QuickTime, QuickTime, Time] 2 - Date/Time Of Last Modification: 2005:08:11 14:03:54
+[QuickTime, QuickTime, Time] 1 - Create Date: 2005:08:11 14:03:54
+[QuickTime, QuickTime, Time] 2 - Modify Date: 2005:08:11 14:03:54
 [QuickTime, QuickTime, Other] 3 - Time Scale: 600
 [QuickTime, QuickTime, Other] 4 - Duration: 4.97s
 [QuickTime, QuickTime, Other] 5 - Preferred Rate: 1
@@ -37,12 +37,12 @@
 [QuickTime, Track2, Other] 9 - Track Volume: 100.00%
 [QuickTime, QuickTime, Other] ©fmt - Format: Digital Camera
 [QuickTime, QuickTime, Other] ©inf - Information: PENTAX DIGITAL CAMERA                            
-[Pentax, Pentax, Camera] 38 - Shutter Speed: 1/38
-[Pentax, Pentax, Camera] 42 - Aperture: 4.0
-[Pentax, Pentax, Camera] 50 - Exposure Compensation: 0
-[Pentax, Pentax, Camera] 68 - White Balance: Auto
-[Pentax, Pentax, Camera] 72 - Focal Length: 18.9mm
-[Pentax, Pentax, Camera] 175 - ISO Speed: 50
+[MakerNotes, Pentax, Camera] 38 - Exposure Time: 1/38
+[MakerNotes, Pentax, Camera] 42 - F Number: 4.0
+[MakerNotes, Pentax, Camera] 50 - Exposure Compensation: 0
+[MakerNotes, Pentax, Camera] 68 - White Balance: Auto
+[MakerNotes, Pentax, Camera] 72 - Focal Length: 18.9mm
+[MakerNotes, Pentax, Camera] 175 - ISO: 50
 [Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Image]  - Image Size: 320x240
 [Composite, Composite, Image]  - Shutter Speed: 1/38

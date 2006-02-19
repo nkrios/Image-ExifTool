@@ -19,6 +19,11 @@ tags.
 <td>PrintIM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xb020</td>
+<td>ColorModeSetting</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SRF'>Sony SRF Tags</a></h2>
@@ -42,9 +47,73 @@ encrypted, but thanks to Dave Coffin the decryption algorithm is known.
 <td><font size='-1'><font color="#666666">(key to decrypt the rest of the file from the end of the maker notes)</font></font></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='SR2Private'>Sony SR2Private Tags</a></h2>
+The SR2 format uses the DNGPrivateData tag to reference a private IFD
+containing these tags.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x7200</td>
+<td>SR2SubIFDOffset</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x7201</td>
+<td>SR2SubIFDLength</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x7221</td>
+<td>SR2SubIFDKey</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(key to decrypt SR2SubIFD)</font></font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SR2SubIFD'>Sony SR2SubIFD Tags</a></h2>
+Tags in the encrypted SR2SubIFD
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x7303</td>
+<td>WB_GRBGLevels</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x74a0</td>
+<td>MaxApertureAtMaxFocal</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x74a1</td>
+<td>MaxApertureAtMinFocal</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x74c0</td>
+<td>SR2DataIFD</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Sony.html#SR2DataIFD'>Sony SR2DataIFD Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SR2DataIFD'>Sony SR2DataIFD Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x7770</td>
+<td>ColorMode</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 14, 2005</i>
+<br><i>Last revised Feb 19, 2006</i>
 </body>
 </html>

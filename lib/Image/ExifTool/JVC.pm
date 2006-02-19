@@ -17,6 +17,8 @@ sub ProcessJVCText($$$);
 
 # JVC EXIF-based maker notes
 %Image::ExifTool::JVC::Main = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'JVC EXIF maker note tags.',
     #0x0001 - almost always '2', but '3' for GR-DV700 samples
@@ -110,7 +112,7 @@ notes.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

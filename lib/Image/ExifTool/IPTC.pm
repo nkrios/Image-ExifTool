@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -161,6 +161,9 @@ my %fileFormat = (
     90 => {
         Name => 'CodedCharacterSet',
         Format => 'string[0,32]',
+        # convert ISO 2022 escape sequences to a more readable format
+        PrintConv => '$_=$val; s/(.)/ $1/g; s/ \x1b/, ESC/g; s/^,? //; $_',
+        PrintConvInv => '$_=$val; s/ESC /\x1b/g; tr/, //d; $_',
     },
     100 => {
         Name => 'UniqueObjectName',
@@ -937,7 +940,7 @@ image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

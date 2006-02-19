@@ -1,12 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: Writer_10_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2005:10:20 21:55:07
+[File, File, Image]  - File Size: 5 kB
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 160
-[File, File, Image]  - Image Height: 120
+[File, File, Image]  - Image Width: 8
+[File, File, Image]  - Image Height: 8
 [EXIF, IFD0, Camera] 271 - Make: PENTAX Corporation 
 [EXIF, IFD0, Camera] 272 - Camera Model Name: PENTAX Optio S 
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -14,15 +14,15 @@
 [EXIF, IFD0, Image] 283 - Y Resolution: 72
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: Optio S V1.00    
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:03:06 13:09:25
+[EXIF, IFD0, Time] 306 - Modify Date: 2003:03:06 13:09:25
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/500
-[EXIF, ExifIFD, Image] 33437 - Aperture: 5.6
+[EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/500
+[EXIF, ExifIFD, Image] 33437 - F Number: 5.6
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
-[EXIF, ExifIFD, Image] 34855 - ISO Speed: 50
+[EXIF, ExifIFD, Image] 34855 - ISO: 50
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:03:06 13:09:25
-[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:03:06 13:09:25
+[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:03:06 13:09:25
+[EXIF, ExifIFD, Time] 36868 - Create Date: 2003:03:06 13:09:25
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.3580729
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
@@ -76,9 +76,9 @@
 [MakerNotes, Pentax, Camera] 13 - Focus Mode: Normal
 [MakerNotes, Pentax, Camera] 15 - Auto AF Point: Center
 [MakerNotes, Pentax, Camera] 16 - Focus Position: 2
-[MakerNotes, Pentax, Camera] 18 - Shutter Speed: 1/463
-[MakerNotes, Pentax, Camera] 19 - Aperture: 5.6
-[MakerNotes, Pentax, Camera] 20 - ISO Speed: 50
+[MakerNotes, Pentax, Camera] 18 - Exposure Time: 1/463
+[MakerNotes, Pentax, Camera] 19 - F Number: 5.6
+[MakerNotes, Pentax, Camera] 20 - ISO: 50
 [MakerNotes, Pentax, Camera] 22 - Exposure Compensation: 0
 [MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
 [MakerNotes, Pentax, Camera] 25 - White Balance: Auto
@@ -98,11 +98,11 @@
 [XMP, XMP-dc, Time] date - Date: 2003-03-06
 [XMP, XMP-exif, Camera] FlashMode - Flash Mode: Off
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
-[XMP, XMP-tiff, Image] ImageLength - Image Height: 120
-[XMP, XMP-tiff, Image] ImageWidth - Image Width: 160
+[XMP, XMP-tiff, Image] ImageLength - Image Height: 8
+[XMP, XMP-tiff, Image] ImageWidth - Image Width: 8
 [Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
 [Composite, Composite, Image]  - Shutter Speed: 1/500
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

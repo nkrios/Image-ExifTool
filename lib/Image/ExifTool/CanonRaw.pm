@@ -19,8 +19,9 @@ use strict;
 use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
+use Image::ExifTool::Canon;
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -108,6 +109,11 @@ sub BuildMakerNotes($$$$$$);
     },
     0x1016 => 'ReleaseSetting', #3
     0x101c => 'BaseISO', #3
+    0x1028=> { #PH
+        Name => 'CanonFlashInfo',
+        Count => 4,
+        Unknown => 1,
+    },
     0x1029 => {
         Name => 'CanonFocalLength',
         Writable => 0,
@@ -134,7 +140,7 @@ sub BuildMakerNotes($$$$$$);
         Name => 'SensorInfo',
         Writable => 0,
         SubDirectory => {
-            TagTable => 'Image::ExifTool::CanonRaw::SensorInfo',
+            TagTable => 'Image::ExifTool::Canon::SensorInfo',
         },
     },
     # this tag has only be verified for the 10D in CRW files, but this
@@ -172,14 +178,28 @@ sub BuildMakerNotes($$$$$$);
             TagTable => 'Image::ExifTool::Canon::PictureInfo',
         },
     },
+    0x1093 => {
+        Name => 'CanonFileInfo',
+        SubDirectory => {
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+            TagTable => 'Image::ExifTool::Canon::FileInfo',
+        },
+    },
     0x10a9 => {
-        Name => 'WhiteBalanceTable',
+        Name => 'ColorBalance',
         Writable => 0,
         SubDirectory => {
             # this offset is necessary because the table contains short rationals
             # (4 bytes long) but the first entry is 2 bytes into the table.
             Start => '2',
-            TagTable => 'Image::ExifTool::Canon::WhiteBalance',
+            TagTable => 'Image::ExifTool::Canon::ColorBalance',
+        },
+    },
+    0x10b5 => { #PH
+        Name => 'RawJpgInfo',
+        SubDirectory => {
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+            TagTable => 'Image::ExifTool::CanonRaw::RawJpgInfo',
         },
     },
     0x10ae => 'ColorTemperature',
@@ -256,9 +276,29 @@ sub BuildMakerNotes($$$$$$);
             TagTable => 'Image::ExifTool::CanonRaw::ExposureInfo',
         },
     },
+    0x1834 => { #PH
+        Name => 'CanonModelID',
+        Writable => 0,
+        PrintHex => 1,
+        Notes => q{
+            this is the complete list of model ID numbers, but note that many of these
+            models do not produce CRW images
+        },
+        PrintConv => \%Image::ExifTool::Canon::canonModelID,
+    },
     0x1835 => {
         Name => 'DecoderTable',
         Writable => 0,
+    },
+    0x183b => { #PH
+        # display format for serial number
+        Name => 'SerialNumberFormat',
+        Writable => 'int32u',
+        PrintHex => 1,
+        PrintConv => {
+            0x90000000 => 'Format 1',
+            0xa0000000 => 'Format 2',
+        },
     },
     0x2005 => {
         Name => 'RawData',
@@ -352,7 +392,7 @@ sub BuildMakerNotes($$$$$$);
     GROUPS => { 0 => 'MakerNotes', 2 => 'Time' },
     0 => {
         Name => 'DateTimeOriginal',
-        Description => 'Shooting Date/Time',
+        Description => 'Date/Time Original',
         Shift => 'Time',
         ValueConv => 'ConvertUnixTime($val)',
         ValueConvInv => 'GetUnixTime($val)',
@@ -392,6 +432,36 @@ sub BuildMakerNotes($$$$$$);
     },
 );
 
+%Image::ExifTool::CanonRaw::RawJpgInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+#    0 => 'RawJpgInfoSize',
+    1 => { #PH
+        Name => 'RawJpgQuality',
+        PrintConv => {
+            1 => 'Economy',
+            2 => 'Normal',
+            3 => 'Fine',
+            5 => 'Superfine',
+        },
+    },
+    2 => { #PH
+        Name => 'RawJpgSize',
+        PrintConv => {
+            0 => 'Large',
+            1 => 'Medium',
+            2 => 'Small',
+        },
+    },
+    3 => 'RawJpgWidth', #PH
+    4 => 'RawJpgHeight', #PH
+);
+
 %Image::ExifTool::CanonRaw::FlashInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -415,21 +485,6 @@ sub BuildMakerNotes($$$$$$);
     0 => 'ExposureCompensation',
     1 => 'TvValue',
     2 => 'AvValue',
-);
-
-%Image::ExifTool::CanonRaw::SensorInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    FORMAT => 'int16s',
-    FIRST_ENTRY => 1,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    # Note: Don't make these writable because it confuses Canon decoding software
-    # if these are changed
-    1 => 'SensorWidth',
-    2 => 'SensorHeight',
-    5 => 'SensorLeftBorder', #2
-    6 => 'SensorTopBorder', #2
-    7 => 'SensorRightBorder', #2
-    8 => 'SensorBottomBorder', #2
 );
 
 %Image::ExifTool::CanonRaw::ImageInfo = (
@@ -519,7 +574,7 @@ sub ProcessCanonRaw($$$)
             );
             if ($verbose) {
                 my $fakeInfo = { Name => $name, SubDirectory => { } };
-                $exifTool->VerboseInfo($tag, $fakeInfo,
+                $exifTool->VerboseInfo($tagID, $fakeInfo,
                     'Index'  => $index,
                     'Size'   => $size,
                     'Start'  => $ptr,
@@ -539,7 +594,7 @@ sub ProcessCanonRaw($$$)
         my ($value, $delRawConv);
         if ($valueInDir) {  # is the value data in the directory?
             # this type of tag stores the value in the 'size' and 'ptr' fields
-            $valueDataPos = $dirOffset + $valuePtr;
+            $valueDataPos = $dirOffset + $pt + 4;
             $size = 8;
             $value = substr($buff, $pt+2, $size);
             # set count to 1 by default for normal values in directory
@@ -585,7 +640,7 @@ sub ProcessCanonRaw($$$)
         if ($verbose) {
             my $val = $value;
             $format and $val = ReadValue(\$val, 0, $format, $count, $size);
-            $exifTool->VerboseInfo($tag, $tagInfo,
+            $exifTool->VerboseInfo($tagID, $tagInfo,
                 Table   => $rawTagTable,
                 Index   => $index,
                 Value   => $val,
@@ -623,6 +678,7 @@ sub ProcessCanonRaw($$$)
                 Name     => $name,
                 DataPt   => $dirData,
                 DataLen  => $size,
+                DataPos  => $valueDataPos,
                 DirStart => $subdirStart,
                 DirLen   => $size - $subdirStart,
                 Nesting  => $$dirInfo{Nesting} + 1,
@@ -721,7 +777,7 @@ tags.)
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

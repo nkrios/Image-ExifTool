@@ -172,19 +172,8 @@ sub binaryCompare($$)
     my $tag;
     foreach $tag (keys %$info) {
         my $group = $exifTool->GetGroup($tag);
-        my $val = $info->{$tag};
-        my @values;
-        if (ref $val eq 'ARRAY') {
-            @values = @$val;
-        } elsif (ref $val eq 'SCALAR') {
-            @values = ( $$val );
-        } else {
-            @values = ( $val );
-        }
-        foreach $val (@values) {
-            # eat return values so warning don't get printed
-            my @rtns = $exifTool->SetNewValue($tag,$val,Group=>$group);
-        }
+        # eat return values so warning don't get printed
+        my @rtns = $exifTool->SetNewValue($tag,$info->{$tag},Group=>$group);
     }
     undef $info;
     my $image;

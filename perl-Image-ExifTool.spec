@@ -1,6 +1,6 @@
 Summary: perl module for image data extraction 
 Name: perl-Image-ExifTool
-Version: 5.87
+Version: 6.00
 Release: 1
 License: Free
 Group: Development/Libraries/Perl
@@ -9,22 +9,22 @@ Source0: Image-ExifTool-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 %description
-ExifTool is a highly customizable set of Perl libraries plus an application
-script for reading and writing meta information in images.
+ExifTool is a customizable set of Perl libraries plus an application script
+for reading and writing meta information in image, audio and video files.
 
 ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop
-IRB and ID3 meta information from JPG, JP2, TIFF, GIF, BMP, PICT, QTIF, PNG,
-MNG, JNG, MIFF, PPM, PGM, PBM, XMP, EPS, PS, AI, PDF, PSD, DCM, ACR, THM,
-CRW, CR2, MRW, NEF, PEF, ORF, RAF, SRF, MOS, X3F and DNG images, MP3 and WAV
-audio files, and AVI, MOV and MP4 videos.  ExifTool also extracts
-information from the maker notes of many digital cameras by various
-manufacturers including Canon, Casio, FujiFilm, JVC/Victor, Kodak, Leaf,
-Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
-Ricoh, Sanyo and Sigma/Foveon.
+IRB, AFCP and ID3 meta information from JPG, JP2, TIFF, GIF, BMP, PICT,
+QTIF, PNG, MNG, JNG, MIFF, PPM, PGM, PBM, XMP, EPS, PS, AI, PDF, PSD, DCM,
+ACR, THM, CRW, CR2, MRW, NEF, PEF, ORF, RAF, RAW, SRF, SR2, MOS, X3F and DNG
+images, MP3, WAV, WMA and AIFF audio files, and AVI, MOV, MP4 and WMV
+videos. ExifTool also extracts information from the maker notes of many
+digital cameras by various manufacturers including Canon, Casio, FujiFilm,
+JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon, Olympus/Epson,
+Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
 
-ExifTool writes EXIF, GPS, IPTC, XMP and MakerNotes meta information to
-JPEG, TIFF, GIF, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, MRW, NEF, PEF,
-MOS and DNG images.
+ExifTool writes EXIF, GPS, IPTC, XMP, MakerNotes, Photoshop IRB and AFCP
+meta information to JPEG, TIFF, GIF, PSD, XMP, PPM, PGM, PBM, PNG, MNG, JNG,
+CRW, THM, CR2, MRW, NEF, PEF, MOS and DNG images.
 
 See html/index.html for more details about ExifTool features.
 

@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: Sigma.x3f
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1464 bytes
-[File, File, Time]  - File Modification Date/Time: 2005:10:17 09:33:06
+[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:22
 [File, File, Image]  - File Type: X3F
-[File, File, Image]  - MIME Type: application/unknown
+[File, File, Image]  - MIME Type: image/x-raw
 [SigmaRaw, SigmaRaw, Other] 1 - File Version: 2.2
 [SigmaRaw, SigmaRaw, Other] 7 - Image Width: 2268
 [SigmaRaw, SigmaRaw, Other] 8 - Image Height: 1512
@@ -27,11 +27,11 @@
 [SigmaRaw, SigmaRaw, Camera] CAMMODEL - Model: SIGMA SD10
 [SigmaRaw, SigmaRaw, Camera] CAMSERIAL - Serial Number: 02001234
 [SigmaRaw, SigmaRaw, Camera] FIRMVERS - Firmware Version: 2.0.4.1586 Release
-[SigmaRaw, SigmaRaw, Time] TIME - Shooting Date/Time: 2001:01:01 00:36:35
+[SigmaRaw, SigmaRaw, Time] TIME - Date/Time Original: 2001:01:01 00:36:35
 [SigmaRaw, SigmaRaw, Image] EXPTIME - Integration Time: 1/41
 [SigmaRaw, SigmaRaw, Camera] FOCUS - Focus: Auto-focus Locked
 [SigmaRaw, SigmaRaw, Camera] AFMODE - Focus Mode: AF-S
-[SigmaRaw, SigmaRaw, Image] SHUTTER - Shutter Speed: 1/108
+[SigmaRaw, SigmaRaw, Image] SHUTTER - Exposure Time: 1/108
 [SigmaRaw, SigmaRaw, Camera] SH_DESC - Shutter Speed Displayed: 1/100
 [SigmaRaw, SigmaRaw, Camera] FLASH - Flash Mode: Off
 [SigmaRaw, SigmaRaw, Camera] PMODE - Exposure Program: Program
@@ -40,7 +40,7 @@
 [SigmaRaw, SigmaRaw, Camera] AEMODE - Metering Mode: 8-segment
 [SigmaRaw, SigmaRaw, Camera] DRIVE - Drive Mode: Single Shot
 [SigmaRaw, SigmaRaw, Camera] LENSMODEL - Lens ID: 145
-[SigmaRaw, SigmaRaw, Image] APERTURE - Aperture: 8.4
+[SigmaRaw, SigmaRaw, Image] APERTURE - F Number: 8.4
 [SigmaRaw, SigmaRaw, Camera] AP_DESC - Aperture Displayed: 8
 [SigmaRaw, SigmaRaw, Camera] LENSARANGE - Lens Aperture Range: 29 to 4.5
 [SigmaRaw, SigmaRaw, Camera] LENSFRANGE - Lens Focal Range: 15 to 30

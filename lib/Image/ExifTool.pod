@@ -1,18 +1,18 @@
 #------------------------------------------------------------------------------
 # File:         ExifTool.pod - Documentation for File::ExifTool
 #
-# Description:  Read and write meta information in images
+# Description:  Read and write meta information
 #
 # URL:          http://owl.phy.queensu.ca/~phil/exiftool/
 #
-# Legal:        Copyright (c) 2003-2005 Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2006 Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
 
 =head1 NAME
 
-Image::ExifTool - Read and write meta information in images
+Image::ExifTool - Read and write meta information
 
 =head1 SYNOPSIS
 
@@ -54,20 +54,21 @@ Image::ExifTool - Read and write meta information in images
 =head1 DESCRIPTION
 
 ExifTool provides an extensible set of perl modules to read and write meta
-information in image files.  It reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF,
-ICC Profile, Photoshop IRB and ID3 meta information from JPEG, JP2, TIFF,
-GIF, BMP, PICT, QTIF, PNG, MNG, JNG, MIFF, PGM, PGM, PBM, XMP, EPS, PS, AI,
-PDF, PSD, DCM, ACR, THM, CRW (Canon RAW), CR2 (Canon RAW 2), MRW (Minolta
-RAW), NEF (Nikon Electronic image Format), PEF (Pentax RAW), ORF (Olympus
-RAW Format), RAF (FujiFilm RAW Format), SRF (Sony Raw Format), MOS (Leaf
-Mosaic), X3F (Sigma Raw) and DNG (Digital Negative) images, MP3 and WAV
-audio files, and AVI, MOV and MP4 videos. ExifTool also extracts information
-from the maker notes of many digital cameras by various manufacturers
-including Canon, Casio, FujiFilm, JVC/Victor, Kodak, Leaf,
-Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
-Ricoh, Sanyo and Sigma/Foveon. It writes EXIF, GPS, IPTC, XMP and MakerNotes
-information to JPEG, TIFF, GIF, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2,
-MRW, NEF, PEF, MOS and DNG files.
+information in image, audio and video files.
+
+ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop
+IRB, AFCP and ID3 meta information from JPG, JP2, TIFF, GIF, BMP, PICT,
+QTIF, PNG, MNG, JNG, MIFF, PPM, PGM, PBM, XMP, EPS, PS, AI, PDF, PSD, DCM,
+ACR, THM, CRW, CR2, MRW, NEF, PEF, ORF, RAF, RAW, SRF, SR2, MOS, X3F and DNG
+images, MP3, WAV, WMA and AIFF audio files, and AVI, MOV, MP4 and WMV
+videos. ExifTool also extracts information from the maker notes of many
+digital cameras by various manufacturers including Canon, Casio, FujiFilm,
+JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon, Olympus/Epson,
+Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
+
+ExifTool writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, Photoshop IRB and
+AFCP meta information to JPEG, TIFF, GIF, PSD, XMP, PPM, PGM, PBM, PNG, MNG,
+JNG, CRW, THM, CR2, MRW, NEF, PEF, MOS and DNG images.
 
 =head1 METHODS
 
@@ -116,7 +117,7 @@ The one required argument is either a SCALAR (the image file name), a file
 reference (a reference to the image file) or a SCALAR reference (a
 reference to the image in memory).  Other arguments are optional.  The
 order of the arguments is not significant, except that the first SCALAR is
-taken to be the file name unless a file reference or scalar reference came
+taken to be the file name unless a file reference or scalar reference comes
 earlier in the argument list.
 
 Below is an explanation of how the L</ImageInfo> function arguments are
@@ -129,7 +130,7 @@ interpreted:
 L</ImageInfo> may be called with an ExifTool object if desired.  The
 advantage of using the object-oriented form is that the options may be set
 before calling L</ImageInfo>, and the object may be used afterward to access
-member functions.
+member functions.  Must be the first argument if used.
 
 =item SCALAR
 
@@ -289,7 +290,8 @@ is undef.
 
 =item Charset
 
-Character set for converting Unicode character strings.  Valid values are:
+Character set for converting 16-bit Unicode character strings.  Valid values
+are:
 
   UTF8  - UTF-8 characters (the default)
   Latin - Windows Latin1 (cp1252)
@@ -311,7 +313,7 @@ specifiers for degrees, minutes and seconds in that order, however minutes
 and seconds may be omitted.  For example, the following table gives the
 output for the same coordinate using various formats:
 
-        CoordFormat              Output
+        CoordFormat          Example Output
     -------------------    ------------------
     q{%d deg %d' %.2f"}    54 deg 59' 22.80"   (the default)
     q{%d deg %.4f min}     54 deg 59.3800 min
@@ -371,7 +373,7 @@ errors/warnings are denoted by '[minor]' at the start of the message.
 =item List
 
 Flag to extract lists of PrintConv values into arrays instead of
-concatinating them into comma-separated strings.  Default is 0.
+concatenating them into comma-separated strings.  Default is 0.
 
 =item MakerNotes
 
@@ -719,8 +721,8 @@ Set the new value for a tag.  The routine may be called multiple times to
 set the values of many tags before using L</WriteInfo> to write the new
 values to an image.
 
-For list-type tags (like Keywords), call repeatedly with the same tag name
-for each value in the list.
+For list-type tags (like Keywords), either call repeatedly with the same tag
+name for each value, or call with a reference to the list of values.
 
     # set a new value for a tag (errors go to STDERR)
     $success = $exifTool->SetNewValue($tag, $value);
@@ -737,6 +739,9 @@ for each value in the list.
 
     # delete a specific keyword
     $exifTool->SetNewValue('Keywords', $word, DelValue => 1);
+
+    # write a list of keywords
+    $exifTool->SetNewValue('Keywords', ['word1','word2']);
 
     # add a keyword without replacing existing keywords
     $exifTool->SetNewValue(Keywords => $word, AddValue => 1);
@@ -759,7 +764,8 @@ tags in a specified group.  The tag name may be prefixed by group name,
 separated by a colon (ie. 'GROUP:TAG'), which is equivalent to using a
 'Group' option argument.
 
-2) [optional] New value for tag.  Undefined to delete tag from file.
+2) [optional] New value for tag.  Undefined to delete tag from file.  May be
+a scalar, scalar reference, or list reference to set a list of values.
 
 3-N) [optional] SetNewValue options hash entries (see below)
 
@@ -787,6 +793,11 @@ Delete the exisiting tag if it has the specified value.  Valid values are
 Specifies group name where tag should be written.  If not specified, tag is
 written to hightest priority group as specified by L</SetNewGroups>.  Any
 family 0 or 1 group name may be used.  Case is not significant.
+
+=item NoShortcut
+
+Disables default behaviour of looking up tag in shortcuts if not found
+otherwise.
 
 =item Protected
 
@@ -827,7 +838,19 @@ error string.
 A very powerful routine that sets new values for tags from information found
 in a specified file.
 
-    $info = $exifTool->SetNewValuesFromFile($srcFile, @tags);
+    # set new values from all information in a file...
+    my $info = $exifTool->SetNewValuesFromFile($srcFile);
+    # ...then write these values to another image
+    my $result = $exifTool->WriteInfo($file2, $outFile);
+
+    # set all new values, preserving original groups
+    $exifTool->SetNewValuesFromFile($srcFile, '*:*');
+
+    # set specific information
+    $exifTool->SetNewValuesFromFile($srcFile, @tags);
+
+    # set new value from a different tag in specific group
+    $exifTool->SetNewValuesFromFile($fp, 'IPTC:Keywords>XMP-dc:Subject');
 
 =over 4
 
@@ -869,6 +892,10 @@ on to provide more reliable transfer of information between groups.
 
 If a preview image exists, it is not copied.  The preview image must be
 transferred separately if desired.
+
+When simply copying all information between files of the same type, it is
+usually desireable to preserve the original groups by specifying '*:*' for
+the tags to set.
 
 =back
 
@@ -1189,17 +1216,19 @@ List of shortcut tags (as defined in Image::ExifTool::Shortcuts).
 
 Get list of all available tag names.
 
-    @tagList = Image::ExifTool::GetAllTags();
+    @tagList = Image::ExifTool::GetAllTags($group);
 
 =over 4
 
 =item Inputs:
 
-(none)
+0) [optional] Group name
 
 =item Return Values:
 
-A list of all available tags in alphabetical order.
+A list of all available tags in alphabetical order, or all tags in specified
+group.  The group name is case insensitive, and any group in any family may
+be used except for EXIF family 1 groups (ie. the specific IFD).
 
 =back
 
@@ -1207,18 +1236,21 @@ A list of all available tags in alphabetical order.
 
 Get list of all writable tag names.
 
-    @tagList = Image::ExifTool::GetWritableTags();
+    @tagList = Image::ExifTool::GetWritableTags($group);
 
 =over 4
 
 =item Inputs:
 
-(none)
+0) [optional] Group name
 
 =item Return Values:
 
-A list of all writable tags in alphabetical order.  These are the
-tags for which the values may be set through L</SetNewValue>.
+A list of all writable tags in alphabetical order.  These are the tags for
+which values may be set through L</SetNewValue>.  If a group name is given,
+returns only writable tags in specified group.  The group name is case
+insensitive, and any group in any family may be used except for EXIF family
+1 groups (ie. the specific IFD).
 
 =back
 
@@ -1255,7 +1287,7 @@ some XMP data.  Also note that the 'XMP-xmp...' group names may appear in
 the older form 'XMP-xap...' since these names evolved as the XMP standard
 was developed.  The ICC_Profile group is broken down to give information
 about the specific ICC_Profile tag from which multiple values were
-extracted. As well, information extracted from the ICC_Profile header is
+extracted.  As well, information extracted from the ICC_Profile header is
 separated into the ICC-header group.
 
 Here is a complete list of groups for each family:
@@ -1264,29 +1296,30 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (General Location):
 
-APP12, BMP, Canon, Composite, DICOM, EXIF, ExifTool, File, GPS, GeoTiff,
-ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG, MakerNotes, Meta,
-PDF, PICT, PNG, Pentax, Photoshop, PostScript, PrintIM, QuickTime, SigmaRaw,
-WAV, XMP
+AFCP, AIFF, APP12, ASF, BMP, Composite, DICOM, DNG, EXIF, ExifTool, File,
+GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG,
+MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript, PrintIM, QuickTime,
+RIFF, SigmaRaw, XMP
 
 =item Family 1 (Specific Location):
 
-APP12, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite, DICOM, ExifIFD,
-ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt,
-ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3,
-ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC, Jpeg2000, Kodak,
-KodakBordersIFD, KodakEffectsIFD, Leaf, LeafSubIFD, MIFF, MNG, MakerUnknown,
-MetaIFD, Minolta, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT,
-PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM, QuickTime, Ricoh,
-SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, WAV, XMP, XMP-PixelLive,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS,
-XMP-xmpRights, XMP-xmpTPg
+AFCP, AIFF, APP12, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite,
+DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD,
+ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1,
+ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC,
+Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw, Leaf,
+LeafSubIFD, MIFF, MNG, MakerUnknown, MetaIFD, Minolta, Nikon, NikonCapture,
+NikonPreview, Olympus, PDF, PICT, PNG, Panasonic, Pentax, Photoshop,
+PostScript, PrintIM, QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma,
+SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc,
+XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop,
+XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights,
+XMP-xmpTPg
 
 =item Family 2 (Category):
 
 Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,
-Unknown
+Unknown, Video
 
 =back
 
@@ -1351,7 +1384,7 @@ this can only be done with XMP files.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey
+Copyright 2003-2006, Phil Harvey
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -162,11 +162,11 @@ my %writeTable = (
         WriteGroup => 'IFD0',
     },
     0x011a => {             # XResolution
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
     },
     0x011b => {             # YResolution
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
     },
     0x011c => {             # PlanarConfiguration
@@ -179,11 +179,11 @@ my %writeTable = (
         WriteGroup => 'IFD0',
     },
     0x011e => {             # XPosition
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
     },
     0x011f => {             # YPosition
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
     },
     0x0122 => {             # GrayResponseUnit
@@ -223,12 +223,12 @@ my %writeTable = (
         WriteGroup => 'IFD0',
     },
     0x013e => {             # WhitePoint
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
         Count => 2,
     },
     0x013f => {             # PrimaryChromaticities
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
         Count => 6,
     },
@@ -260,7 +260,7 @@ my %writeTable = (
         WriteGroup => 'IFD0',
     },
     0x0211 => {             # YCbCrCoefficients
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
         Count => 3,
     },
@@ -275,7 +275,7 @@ my %writeTable = (
         WriteGroup => 'IFD0',
     },
     0x0214 => {             # ReferenceBlackWhite
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
         Count => 6,
     },
@@ -295,11 +295,11 @@ my %writeTable = (
 # Most of the tags below this belong in the ExifIFD...
 #
     0x829a => {             # ExposureTime
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         PrintConvInv => 'eval $val',
     },
     0x829d => {             # FNumber
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         PrintConvInv => '$val',
     },
     0x83bb => {             # IPTC-NAA
@@ -337,38 +337,38 @@ my %writeTable = (
             return $_ . "\0";
         },
     },
-    0x9102 => 'rational32u',# CompressedBitsPerPixel
+    0x9102 => 'rational64u',# CompressedBitsPerPixel
     0x9201 => {             # ShutterSpeedValue
-        Writable => 'rational32s',
+        Writable => 'rational64s',
         ValueConvInv => '$val>0 ? -log($val)/log(2) : -100',
         # do eval to convert things like '1/100'
         PrintConvInv => 'eval $val',
     },
     0x9202 => {             # ApertureValue
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         ValueConvInv => '$val>0 ? 2*log($val)/log(2) : 0',
         PrintConvInv => '$val',
     },
-    0x9203 => 'rational32s',# BrightnessValue
+    0x9203 => 'rational64s',# BrightnessValue
     0x9204 => {             # ExposureCompensation
-        Writable => 'rational32s',
+        Writable => 'rational64s',
         # do eval to convert things like '+2/3'
         PrintConvInv => 'eval $val',
     },
     0x9205 => {             # MaxApertureValue
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         ValueConvInv => '$val>0 ? 2*log($val)/log(2) : 0',
         PrintConvInv => '$val',
     },
     0x9206 => {             # SubjectDistance
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         PrintConvInv => '$val=~s/ m$//;$val',
     },
     0x9207 => 'int16u',     # MeteringMode
     0x9208 => 'int16u',     # LightSource
     0x9209 => 'int16u',     # Flash
     0x920a => {             # FocalLength
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     0x9214 => {             # SubjectLocation
@@ -421,16 +421,16 @@ my %writeTable = (
     0xa002 => 'int16u',     # ExifImageWidth (could also be int32u)
     0xa003 => 'int16u',     # ExifImageLength (could also be int32u)
     0xa004 => 'string',     # RelatedSoundFile
-    0xa20b => 'rational32u',# FlashEnergy
+    0xa20b => 'rational64u',# FlashEnergy
 #    0xa20c => 'undef',      # SpatialFrequencyResponse
-    0xa20e => 'rational32u',# FocalPlaneXResolution
-    0xa20f => 'rational32u',# FocalPlaneYResolution
+    0xa20e => 'rational64u',# FocalPlaneXResolution
+    0xa20f => 'rational64u',# FocalPlaneYResolution
     0xa210 => 'int16u',     # FocalPlaneResolutionUnit
     0xa214 => {             # SubjectLocation
         Writable => 'int16u',
         Count => 2,
     },
-    0xa215 => 'rational32u',# ExposureIndex
+    0xa215 => 'rational64u',# ExposureIndex
     0xa217 => 'int16u',     # SensingMethod
     0xa300 => {             # FileSource
         Writable => 'undef',
@@ -448,7 +448,7 @@ my %writeTable = (
     0xa401 => 'int16u',     # CustomRendered
     0xa402 => 'int16u',     # ExposureMode
     0xa403 => 'int16u',     # WhiteBalance
-    0xa404 => 'rational32u',# DigitalZoomRatio
+    0xa404 => 'rational64u',# DigitalZoomRatio
     0xa405 => 'int16u',     # FocalLengthIn35mmFormat
     0xa406 => 'int16u',     # SceneCaptureType
     0xa407 => 'int16u',     # GainControl
@@ -467,7 +467,7 @@ my %writeTable = (
 #    0xa40b => 'undef',      # DeviceSettingDescription
     0xa40c => 'int16u',     # SubjectDistanceRange
     0xa420 => 'string',     # ImageUniqueID
-    0xa500 => 'rational32u',# Gamma
+    0xa500 => 'rational64u',# Gamma
     0xc4a5 => {             # PrintIM
         Writable => 'undef',
         WriteGroup => 'IFD0',
@@ -495,7 +495,7 @@ my %writeTable = (
         PrintConvInv => '$val',
     },
     0xc61e => {             # DefaultScale
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'SubIFD',
         Count => 2,
     },
@@ -510,20 +510,20 @@ my %writeTable = (
         Count => 2,
     },
     0xc629 => {             # AsShotWhiteXY
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
         Count => 2,
     },
     0xc62a => {             # BaselineExposure
-        Writable => 'rational32s',
+        Writable => 'rational64s',
         WriteGroup => 'IFD0',
     },
     0xc62b => {             # BaselineNoise
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
     },
     0xc62c => {             # BaselineSharpness
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
     },
     0xc62d => {             # BayerGreenSplit
@@ -531,7 +531,7 @@ my %writeTable = (
         WriteGroup => 'SubIFD',
     },
     0xc62e => {             # LinearResponseLimit
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
     },
     0xc62f => {             # CameraSerialNumber
@@ -539,21 +539,21 @@ my %writeTable = (
         WriteGroup => 'IFD0',
     },
     0xc630 => {             # DNGLensInfo
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
         Count => 4,
         PrintConvInv => '$_=$val;s/(-|mm f)/ /g;$_',
     },
     0xc631 => {             # ChromaBlurRadius
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'SubIFD',
     },
     0xc632 => {             # AntiAliasStrength
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'SubIFD',
     },
     0xc633 => {             # ShadowScale
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'IFD0',
     },
     0xc635 => {             # MakerNoteSafety
@@ -569,14 +569,20 @@ my %writeTable = (
         WriteGroup => 'IFD0',
     },
     0xc65c => {             # BestQualityScale
-        Writable => 'rational32u',
+        Writable => 'rational64u',
         WriteGroup => 'SubIFD',
+    },
+    0xc65d => {             # RawDataUniqueID
+        Writable => 'int8u',
+        WriteGroup => 'IFD0',
+        Count => 16,
+        ValueConvInv => 'pack("H*",$val)',
     },
     0xc68b => {             # OriginalRawFileName
         Writable => 'string',
         WriteGroup => 'IFD0',
     },
-    0xc68c => {             # OriginalRawFileData
+    0xc68c => {             # OriginalRawFileData (a writable directory)
         Writable => 'undef',
         WriteGroup => 'IFD0',
     },
@@ -800,6 +806,15 @@ sub RebuildMakerNotes($$$)
 
     delete $exifTool->{MAKER_NOTE_FIXUP};
 
+    # don't need to rebuild text or binary-data maker notes
+    my $tagInfo = $$dirInfo{TagInfo};
+    my $subdir = $$tagInfo{SubDirectory};
+    my $proc = $$subdir{ProcessProc} || $$tagTablePtr{PROCESS_PROC} || \&ProcessExif;
+    if (($proc ne \&ProcessExif and $$tagInfo{Name} =~ /Text/) or
+         $proc eq \&Image::ExifTool::ProcessBinaryData)
+    {
+        return substr($$dataPt, $dirStart, $dirLen);
+    }
     my $saveOrder = GetByteOrder();
     my $loc = Image::ExifTool::MakerNotes::LocateIFD($exifTool,\%subdirInfo);
     if (defined $loc) {
@@ -1041,7 +1056,7 @@ sub WriteExif($$$)
         }
 
         # fix base offsets
-        if ($dirName eq 'MakerNotes' and $$dirInfo{Parent} eq 'ExifIFD' and 
+        if ($dirName eq 'MakerNotes' and $$dirInfo{Parent} eq 'ExifIFD' and
             FixBase($exifTool, $dirInfo))
         {
             $base = $$dirInfo{Base};
@@ -1084,6 +1099,7 @@ sub WriteExif($$$)
         my $index = 0;
         my $lastTagID = -1;
         my ($oldInfo, $oldFormat, $oldFormName, $oldCount, $oldSize, $oldValue);
+        my ($readFormName, $readCount); # format for reading old value(s)
         my ($entry, $valueDataPt, $valueDataPos, $valueDataLen, $valuePtr);
         my $oldID = -1;
         my $newID = -1;
@@ -1100,7 +1116,7 @@ sub WriteExif($$$)
                     $entry = $dirStart + 2 + 12 * $index;
                     $oldID = Get16u($dataPt, $entry);
                     $oldFormat = Get16u($dataPt, $entry+2);
-                    $oldCount = Get32u($dataPt, $entry+4);
+                    $readCount = $oldCount = Get32u($dataPt, $entry+4);
                     if ($oldFormat < 1 or $oldFormat > 13) {
                         # don't write out null directory entry
                         unless ($oldFormat or $oldCount or not $index) {
@@ -1113,7 +1129,7 @@ sub WriteExif($$$)
                         $exifTool->Error("Bad format ($oldFormat) for $dirName entry $index");
                         return undef;
                     }
-                    $oldFormName = $formatName[$oldFormat];
+                    $readFormName = $oldFormName = $formatName[$oldFormat];
                     $valueDataPt = $dataPt;
                     $valueDataPos = $dataPos;
                     $valueDataLen = $dataLen;
@@ -1154,14 +1170,14 @@ sub WriteExif($$$)
                     }
                     # override format we use to read the value if specified
                     if ($oldInfo and $$oldInfo{Format}) {
-                        $oldFormName = $$oldInfo{Format};
-                        # must adjust number of items for new format size
-                        $oldFormat = $formatNumber{$oldFormName};
-                        unless ($oldFormat) {
-                            $exifTool->Error("Bad format name $oldFormName");
+                        $readFormName = $$oldInfo{Format};
+                        my $readFormat = $formatNumber{$readFormName};
+                        unless ($readFormat) {
+                            $exifTool->Error("Bad format name $readFormName");
                             return undef;
                         }
-                        $oldCount = $oldSize / $formatSize[$oldFormat];
+                        # adjust number of items to read if format size changed
+                        $readCount = $oldSize / $formatSize[$readFormat];
                     }
                     if ($oldID <= $lastTagID and not $inMakerNotes) {
                         my $str = $oldInfo ? "$$oldInfo{Name} tag" : sprintf('tag 0x%x',$oldID);
@@ -1199,8 +1215,8 @@ sub WriteExif($$$)
             my $newInfo = $oldInfo;
             my $newFormat = $oldFormat;
             my $newFormName = $oldFormName;
-            my $ifdFormName;
             my $newCount = $oldCount;
+            my $ifdFormName;
             my $newValue;
             my $newValuePt = $isNew >= 0 ? \$newValue : \$oldValue;
             my $isOverwriting;
@@ -1243,8 +1259,8 @@ sub WriteExif($$$)
                         unless ($newValueHash) {
                             $newValueHash = $exifTool->GetNewValueHash($newInfo, $wrongDir);
                         }
-                        # write in existing format
-                        $val = ReadValue(\$oldValue, 0, $oldFormName, $oldCount, $oldSize);
+                        # read value
+                        $val = ReadValue(\$oldValue, 0, $readFormName, $readCount, $oldSize);
                         if ($$newInfo{Format}) {
                             $newFormName = $$newInfo{Format};
                             # override existing format if necessary
@@ -1862,18 +1878,41 @@ sub WriteExif($$$)
 #
 # copy over image data for IFD's, starting with the last IFD first
 #
+    my @imageData; # image data blocks if requested
     if (@offsetInfo) {
-        for ($ifd=$#offsetInfo; $ifd>=0; --$ifd) {
-            my $offsetInfo = $offsetInfo[$ifd];
-            next unless $offsetInfo;
-            my $tagID;
-            # loop through all tags in reverse order so we save thumbnail
-            # data before main image data if both exist in the same IFD
-            foreach $tagID (reverse sort keys %$offsetInfo) {
-                my ($tagInfo, $offsets, $count, $oldOffset) = @{$offsetInfo->{$tagID}};
-                next unless $$tagInfo{IsOffset}; # handle byte counts with offsets
-                my $sizeInfo = $offsetInfo->{$$tagInfo{OffsetPair}};
-                my ($cntInfo, $byteCounts, $count2, $oldSize, $format) = @$sizeInfo;
+        my @writeLater;  # write image data last
+        for ($ifd=$#offsetInfo; $ifd>=-1; --$ifd) {
+            # build list of offsets to process
+            my @offsetList;
+            if ($ifd >= 0) {
+                my $offsetInfo = $offsetInfo[$ifd] or next;
+                my $tagID;
+                # loop through all tags in reverse order so we save thumbnail
+                # data before main image data if both exist in the same IFD
+                foreach $tagID (reverse sort keys %$offsetInfo) {
+                    my $tagInfo = $offsetInfo->{$tagID}->[0];
+                    next unless $$tagInfo{IsOffset}; # handle byte counts with offsets
+                    my $sizeInfo = $offsetInfo->{$$tagInfo{OffsetPair}};
+                    my $dataTag = $$tagInfo{DataTag};
+                    # write TIFF image data (strips or tiles) later if requested
+                    if ($raf and defined $_[1]->{ImageData} and
+                        ($tagID == 0x111 or $tagID == 0x144) and
+                        (not defined $dataTag or not defined $offsetData{$dataTag}))
+                    {
+                        push @writeLater, [ $offsetInfo->{$tagID}, $sizeInfo ];
+                    } else {
+                        push @offsetList, [ $offsetInfo->{$tagID}, $sizeInfo ];
+                    }
+                }
+            } else {
+                last unless @writeLater;
+                @offsetList = @writeLater;
+            }
+            my $blockSize = 0;  # total size of blocks to copy later
+            my $offsetPair;
+            foreach $offsetPair (@offsetList) {
+                my ($tagInfo, $offsets, $count, $oldOffset) = @{$$offsetPair[0]};
+                my ($cntInfo, $byteCounts, $count2, $oldSize, $format) = @{$$offsetPair[1]};
                 # must be the same number of offset and byte count values
                 unless ($count == $count2) {
                     $exifTool->Error("Offset/byteCounts disagree on count for $$tagInfo{Name}");
@@ -1898,28 +1937,20 @@ sub WriteExif($$$)
                     $dpos = $dataPos;
                 }
                 # transfer the data referenced by all offsets of this tag
-                my $d;
-                my $block = 0;
                 for ($n=0; $n<$count; ++$n) {
-                    my $offsetPos = $offsets + $n * 4;
+                    my $oldEnd;
                     if (@$oldOffset and @$oldSize) {
-                        my $oldEnd = $$oldOffset[$n] + $$oldSize[$n];
-                        # wait to read this data later as a block if possible (for speed)
-                        if ($n+1 < $count and (($d=$$oldOffset[$n+1]-$oldEnd) == 0 or $d == 1)) {
-                            Set32u(length($newData)+$block, \$newData, $offsetPos);
-                            $fixup->AddFixup($offsetPos, $$tagInfo{DataTag});
-                            $block += $$oldSize[$n] + $d;
-                            next;
-                        }
                         # update TIFF_END as if we had read this data from file
+                        $oldEnd = $$oldOffset[$n] + $$oldSize[$n];
                         UpdateTiffEnd($exifTool, $oldEnd + $dbase);
                     }
+                    my $offsetPos = $offsets + $n * 4;
                     my $byteCountPos = $byteCounts + $n * $formatSize[$format];
-                    my $size = ReadValue(\$newData, $byteCountPos, $formatStr, 1, 4) + $block;
-                    my $offset = Get32u(\$newData, $offsetPos) - $dpos - $block;
+                    my $size = ReadValue(\$newData, $byteCountPos, $formatStr, 1, 4);
+                    my $offset = Get32u(\$newData, $offsetPos) - $dpos;
                     my $buff;
                     # look for 'feed' code to use our new data
-                    if ($size-$block == 0xfeedfeed) {
+                    if ($size == 0xfeedfeed) {
                         my $dataTag = $$tagInfo{DataTag};
                         unless (defined $dataTag) {
                             $exifTool->Error("No DataTag defined for $$tagInfo{Name}");
@@ -1941,6 +1972,16 @@ sub WriteExif($$$)
                         # set the data size
                         $size = length($buff);
                         Set32u($size, \$newData, $byteCountPos);
+                    } elsif ($ifd < 0) {
+                        # pad if necessary (but don't pad contiguous image blocks)
+                        my $pad = 0;
+                        ++$pad if $size & 0x01 and ($n+1 >= $count or not $oldEnd or
+                                  $oldEnd != $$oldOffset[$n+1]);
+                        # copy data later
+                        push @imageData, [$offset+$dbase+$dpos, $size, $pad];
+                        $size += $pad; # account for pad byte if necessary
+                        # return ImageData list
+                        $_[1]->{ImageData} = \@imageData;
                     } elsif ($offset >= 0 and $offset+$size <= $dataLen) {
                         # take data from old dir data buffer
                         $buff = substr($$dataPt, $offset, $size);
@@ -1954,16 +1995,16 @@ sub WriteExif($$$)
                         $exifTool->Warn("ThumbnailImage runs outside EXIF data by $diff bytes -- Truncated");
                         # set the size to the available data
                         $size -= $diff;
-                        WriteValue($size-$block, $formatStr, 1, \$newData, $byteCountPos);
+                        WriteValue($size, $formatStr, 1, \$newData, $byteCountPos);
                         # get the truncated image
                         $buff = substr($$dataPt, $offset, $size);
                     } elsif ($$tagInfo{Name} eq 'PreviewImageStart' and $exifTool->{FILE_TYPE} eq 'JPEG') {
-                        # try to load the preview image using the specified offset 
+                        # try to load the preview image using the specified offset
                         undef $buff;
                         my $r = $exifTool->{RAF};
                         if ($r and not $raf) {
                             my $tell = $r->Tell();
-                            # read and validate 
+                            # read and validate
                             undef $buff unless $r->Seek($offset+$base+$dataPos,0) and
                                                $r->Read($buff,$size) == $size and
                                                $buff =~ /^.\xd8\xff[\xc4\xdb\xe0-\xef]/;
@@ -1985,13 +2026,15 @@ sub WriteExif($$$)
                         $buff = '';
                     }
                     # update offset accordingly and add to end of new data
-                    Set32u(length($newData)+$block, \$newData, $offsetPos);
+                    Set32u(length($newData)+$blockSize, \$newData, $offsetPos);
                     # add a pointer to fix up this offset value (marked with DataTag name)
                     $fixup->AddFixup($offsetPos, $$tagInfo{DataTag});
-                    $buff .= "\0" if $size & 0x01;  # must be even size
-                    # add this strip to the data
-                    $newData .= $buff;
-                    $block = 0;
+                    if ($ifd >= 0) {
+                        $buff .= "\0" if $size & 0x01;  # must be even size
+                        $newData .= $buff;      # add this strip to the data
+                    } else {
+                        $blockSize += $size;    # keep track of total size
+                    }
                 }
             }
         }
@@ -2067,7 +2110,7 @@ This file contains routines to write EXIF metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

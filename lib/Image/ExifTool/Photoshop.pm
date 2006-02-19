@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Photoshop.pm
 #
-# Description:  Read Photoshop IRB meta information
+# Description:  Read/Write Photoshop IRB meta information
 #
 # Revisions:    02/06/04 - P. Harvey Created
 #               02/25/04 - P. Harvey Added hack for problem with old photoshops
@@ -9,7 +9,8 @@
 #                          but left most of them commented out until I have enough
 #                          information to write PrintConv routines for them to
 #                          display something useful
-#               07/08/05 - P. Harvey Add support for reading PSD files
+#               07/08/05 - P. Harvey Added support for reading PSD files
+#               01/07/06 - P. Harvey Added PSD write support
 #
 # References:   1) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 #               2) http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html
@@ -23,10 +24,27 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.20';
+$VERSION = '1.25';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
+
+# map of where information is stored in PSD image
+my %psdMap = (
+    IPTC         => 'Photoshop',
+    XMP          => 'Photoshop',
+    EXIFInfo     => 'Photoshop',
+    IFD0         => 'EXIFInfo',
+    IFD1         => 'IFD0',
+    ICC_Profile  => 'Photoshop',
+    ExifIFD      => 'IFD0',
+    GPS          => 'IFD0',
+    SubIFD       => 'IFD0',
+    GlobParamIFD => 'IFD0',
+    PrintIM      => 'IFD0',
+    InteropIFD   => 'ExifIFD',
+    MakerNotes   => 'ExifIFD',
+);
 
 # Photoshop APP13 tag table
 # (set Unknown flag for information we don't want to display normally)
@@ -87,7 +105,7 @@ sub WritePhotoshop($$$);
     0x0409 => { Unknown => 1, Name => 'ThumbnailResource' },
     0x040a => {
         Name => 'CopyrightFlag',
-        Writable => 1,
+        Writable => 'int8u',
         Groups => { 2 => 'Author' },
         ValueConv => 'join(" ",unpack("C*", $val))',
         ValueConvInv => 'pack("C*",split(" ",$val))',
@@ -98,7 +116,7 @@ sub WritePhotoshop($$$);
     },
     0x040b => {
         Name => 'URL',
-        Writable => 1,
+        Writable => 'string',
         Groups => { 2 => 'Author' },
     },
     0x040c => {
@@ -107,7 +125,9 @@ sub WritePhotoshop($$$);
     },
     0x040d => {
         Name => 'GlobalAngle',
+        Writable => 'int32u',
         ValueConv => 'unpack("N",$val)',
+        ValueConvInv => 'pack("N",$val)',
     },
     0x040e => { Unknown => 1, Name => 'ColorSamplersResource' },
     0x040f => {
@@ -126,7 +146,9 @@ sub WritePhotoshop($$$);
     0x0417 => { Unknown => 1, Name => 'TransparentIndex' },
     0x0419 => {
         Name => 'GlobalAltitude',
+        Writable => 'int32u',
         ValueConv => 'unpack("N",$val)',
+        ValueConvInv => 'pack("N",$val)',
     },
     0x041a => { Unknown => 1, Name => 'Slices' },
     0x041b => { Unknown => 1, Name => 'WorkflowURL' },
@@ -139,6 +161,7 @@ sub WritePhotoshop($$$);
         SubDirectory => {
             TagTable=> 'Image::ExifTool::Exif::Main',
             ProcessProc => \&Image::ExifTool::ProcessTIFF,
+            WriteProc => \&Image::ExifTool::WriteTIFF,
         },
     },
     0x0424 => {
@@ -154,11 +177,15 @@ sub WritePhotoshop($$$);
 # Photoshop JPEG quality record (ref 2)
 %Image::ExifTool::Photoshop::JPEG_Quality = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     FORMAT => 'int16s',
     GROUPS => { 2 => 'Image' },
     0 => {
         Name => 'PhotoshopQuality',
+        Writable => 1,
         PrintConv => '$val + 4',
+        PrintConvInv => '$val - 4',
     },
     1 => {
         Name => 'PhotoshopFormat',
@@ -181,15 +208,20 @@ sub WritePhotoshop($$$);
 # Photoshop resolution information #PH
 %Image::ExifTool::Photoshop::Resolution = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     FORMAT => 'int16u',
     FIRST_ENTRY => 0,
+    WRITABLE => 1,
     GROUPS => { 2 => 'Image' },
     0 => {
         Name => 'XResolution',
         Format => 'int32u',
         Priority => 0,
         ValueConv => '$val / 0x10000',
+        ValueConvInv => 'int($val * 0x10000 + 0.5)',
         PrintConv => 'int($val * 100 + 0.5) / 100',
+        PrintConvInv => '$val',
     },
     2 => {
         Name => 'DisplayedUnitsX',
@@ -203,7 +235,9 @@ sub WritePhotoshop($$$);
         Format => 'int32u',
         Priority => 0,
         ValueConv => '$val / 0x10000',
+        ValueConvInv => 'int($val * 0x10000 + 0.5)',
         PrintConv => 'int($val * 100 + 0.5) / 100',
+        PrintConvInv => '$val',
     },
     6 => {
         Name => 'DisplayedUnitsY',
@@ -214,6 +248,30 @@ sub WritePhotoshop($$$);
     },
 );
 
+# Photoshop PSD file header
+%Image::ExifTool::Photoshop::Header = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    GROUPS => { 2 => 'Image' },
+    NOTES => 'This information is found in the PSD file header.',
+    6 => 'NumChannels',
+    7 => { Name => 'ImageHeight', Format => 'int32u' },
+    9 => { Name => 'ImageWidth', Format => 'int32u' },
+    11 => 'BitDepth',
+    12 => {
+        Name => 'ColorMode',
+        PrintConv => {
+            0 => 'Bitmap',
+            1 => 'Grayscale',
+            2 => 'Indexed',
+            3 => 'RGB',
+            4 => 'CMYK',
+            7 => 'Multichannel',
+            8 => 'Duotone',
+            9 => 'Lab',
+        },
+    },
+);
 
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary
@@ -226,7 +284,7 @@ sub AUTOLOAD
 #------------------------------------------------------------------------------
 # Convert pascal string(s) to something we can use
 # Inputs: 1) Pascal string data
-# Returns: Strings, concatinated with ', '
+# Returns: Strings, concatenated with ', '
 sub ConvertPascalString($)
 {
     my $inStr = shift;
@@ -319,30 +377,63 @@ sub ProcessPhotoshop($$$)
 #------------------------------------------------------------------------------
 # extract information from Photoshop PSD file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
-# Returns: 1 if this was a valid PSD file
+# Returns: 1 if this was a valid PSD file, -1 on write error
 sub ProcessPSD($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my $data;
+    my $outfile = $$dirInfo{OutFile};
+    my ($data, $err, $tagTablePtr);
 
     $raf->Read($data, 30) == 30 or return 0;
-    $data =~ /^8BPS/ or return 0;
+    $data =~ /^8BPS\0\x01/ or return 0;
     SetByteOrder('MM');
-    my $len = Get32u(\$data, 26);
-    $raf->Seek($len, 1) or return 0;
-    $raf->Read($data, 4) == 4 or return 0;
-    $len = Get32u(\$data, 0);
-    $raf->Read($data, $len) == $len or return 0;
     $exifTool->SetFileType('Photoshop');    # set the FileType tag
-    my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Main');
     my %dirInfo = (
         DataPt => \$data,
         DirStart => 0,
-        DirLen => $len,
         DirName => 'PSD',
     );
-    return ProcessPhotoshop($exifTool, \%dirInfo, $tagTablePtr);
+    my $len = Get32u(\$data, 26);
+    if ($outfile) {
+        Write($outfile, $data) or $err = 1;
+        $raf->Read($data, $len) == $len or return -1;
+        Write($outfile, $data) or $err = 1; # write color mode data
+        # initialize map of where things are written
+        Image::ExifTool::InitWriteDirs($exifTool, \%psdMap);
+    } else {
+        # process the header
+        $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Header');
+        $dirInfo{DirLen} = 30;
+        $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
+        $raf->Seek($len, 1) or $err = 1;    # skip over color mode data
+    }
+    $raf->Read($data, 4) == 4 or $err = 1;
+    $len = Get32u(\$data, 0);
+    $raf->Read($data, $len) == $len or $err = 1;
+    $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Main');
+    $dirInfo{DirLen} = $len;
+    my $rtnVal = 1;
+    if ($outfile) {
+        # rewrite IRB resources
+        $data = WritePhotoshop($exifTool, \%dirInfo, $tagTablePtr);
+        if ($data) {
+            $len = Set32u(length $data);
+            Write($outfile, $len, $data) or $err = 1;
+            # copy over the rest of the file
+            while ($raf->Read($data, 65536)) {
+                Write($outfile, $data) or $err = 1;
+            }
+        } else {
+            $err = 1;
+        }
+        $rtnVal = -1 if $err;
+    } elsif ($err) {
+        $exifTool->Warn('File format error');
+    } else {
+        ProcessPhotoshop($exifTool, \%dirInfo, $tagTablePtr);
+    }
+    return $rtnVal;
 }
 
 1; # end
@@ -352,7 +443,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Photoshop - Read Photoshop IRB meta information
+Image::ExifTool::Photoshop - Read/Write Photoshop IRB meta information
 
 =head1 SYNOPSIS
 
@@ -366,7 +457,7 @@ contains the definitions to read this information.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

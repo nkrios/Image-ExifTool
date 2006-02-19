@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: ExifTool.jpg
 [File, File, Image]  - Directory: t/images
-[File, File, Time]  - File Modification Date/Time: 2005:04:16 10:37:10
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
@@ -9,14 +9,14 @@
 [EXIF, IFD0, Image] 282 - X Resolution: 180
 [EXIF, IFD0, Image] 283 - Y Resolution: 180
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2003:12:04 06:46:52
+[EXIF, IFD0, Time] 306 - Modify Date: 2003:12:04 06:46:52
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 4
-[EXIF, ExifIFD, Image] 33437 - Aperture: 14.0
-[EXIF, ExifIFD, Image] 34855 - ISO Speed: 100
+[EXIF, ExifIFD, Image] 33434 - Exposure Time: 4
+[EXIF, ExifIFD, Image] 33437 - F Number: 14.0
+[EXIF, ExifIFD, Image] 34855 - ISO: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2003:12:04 06:46:52
-[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2003:12:04 06:46:52
+[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:12:04 06:46:52
+[EXIF, ExifIFD, Time] 36868 - Create Date: 2003:12:04 06:46:52
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
@@ -47,12 +47,12 @@
 [Composite, Composite, Image]  - Aperture: 14.0
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
-[Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 54.0mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 4.37 m
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 28.6 - 87.4mm)
+[Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 52.7mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 4.26 m
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)

@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
 [File, File, Time]  - File Modification Date/Time: 2005:11:09 11:22:45
 [File, File, Image]  - File Type: NEF
-[File, File, Image]  - MIME Type: application/unknown
+[File, File, Image]  - MIME Type: image/x-raw
 [EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
 [EXIF, IFD0, Image] 256 - Image Width: 160
 [EXIF, IFD0, Image] 257 - Image Height: 106
@@ -23,7 +23,7 @@
 [EXIF, IFD0, Image] 284 - Planar Configuration: Chunky
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: Nikon Capture Editor 4.3.1 W
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2005:08:25 13:09:05
+[EXIF, IFD0, Time] 306 - Modify Date: 2005:08:25 13:09:05
 [EXIF, SubIFD, Image] 254 - Subfile Type: Reduced-resolution image
 [EXIF, SubIFD, Image] 259 - Compression: JPEG (old-style)
 [EXIF, SubIFD, Image] 274 - Orientation: Horizontal (normal)
@@ -49,12 +49,12 @@
 [EXIF, SubIFD1, Image] 296 - Resolution Unit: inches
 [EXIF, SubIFD1, Image] 33421 - CFA Repeat Pattern Dim: 2 2
 [EXIF, SubIFD1, Image] 33422 - CFA Pattern 2: 2 1 1 0
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/20
-[EXIF, ExifIFD, Image] 33437 - Aperture: 3.5
+[EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/20
+[EXIF, ExifIFD, Image] 33437 - F Number: 3.5
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Aperture-priority AE
-[EXIF, ExifIFD, Image] 34855 - ISO Speed: 200
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2004:06:09 16:02:35
-[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2004:06:09 16:02:35
+[EXIF, ExifIFD, Image] 34855 - ISO: 200
+[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2004:06:09 16:02:35
+[EXIF, ExifIFD, Time] 36868 - Create Date: 2004:06:09 16:02:35
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
@@ -70,7 +70,7 @@
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41729 - Scene Type: Directly photographed
 [EXIF, ExifIFD, Image] 41730 - CFA Pattern: [Blue,Green][Green,Red]
-[EXIF, IFD0, Time] 36867 - Shooting Date/Time: 2004:06:09 16:02:35
+[EXIF, IFD0, Time] 36867 - Date/Time Original: 2004:06:09 16:02:35
 [EXIF, IFD0, Image] 37398 - TIFF-EP Standard ID: 1 0 0 0
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
 [IPTC, IPTC, Other] 120 - Caption-Abstract: A caption
@@ -85,7 +85,7 @@
 [IPTC, IPTC2, Location] 95 - Province-State: Ontario
 [IPTC, IPTC2, Location] 101 - Country-Primary Location Name: Canada
 [MakerNotes, Nikon, Camera] 1 - Firmware Version: 2.10
-[MakerNotes, Nikon, Image] 2 - ISO Speed: 200
+[MakerNotes, Nikon, Image] 2 - ISO: 200
 [MakerNotes, Nikon, Camera] 4 - Quality: Raw
 [MakerNotes, Nikon, Camera] 5 - White Balance: Auto
 [MakerNotes, Nikon, Camera] 6 - Sharpness: None
@@ -113,14 +113,13 @@
 [MakerNotes, Nikon, Camera] 146 - Hue Adjustment: 0
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
 [MakerNotes, Nikon, Camera] 150 - NEF Curve 2: (Binary data 17 bytes)
-[MakerNotes, Nikon, Camera] 0 - Red Balance: 1.80377
-[MakerNotes, Nikon, Camera] 1 - Blue Balance: 1.86038
+[MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 478 265 493 265
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 3.6
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 241
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 2.37 m
 [MakerNotes, Nikon, Camera] 10 - Focal Length: 18.3mm
-[MakerNotes, Nikon, Camera] 11 - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
+[MakerNotes, Nikon, Camera] 11 - Lens ID Number: 127
 [MakerNotes, Nikon, Camera] 12 - Lens F Stops: 5.33
 [MakerNotes, Nikon, Camera] 13 - Min Focal Length: 18.3mm
 [MakerNotes, Nikon, Camera] 14 - Max Focal Length: 71.3mm
@@ -215,14 +214,15 @@
 [ICC_Profile, ICC_Profile, Image] gTRC - Green Tone Reproduction Curve: (Binary data 14 bytes)
 [ICC_Profile, ICC_Profile, Image] bTRC - Blue Tone Reproduction Curve: (Binary data 14 bytes)
 [ICC_Profile, ICC_Profile, Image] wtpt - Media White Point: 0.9505 1 1.0891
-[ICC_Profile, ICC_Profile, Image] cprt - Copyright: Nikon Inc. & Nikon Corporation 2001
+[ICC_Profile, ICC_Profile, Image] cprt - Profile Copyright: Nikon Inc. & Nikon Corporation 2001
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - CFA Pattern: [Blue,Green][Green,Red]
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 3040x2014
 [Composite, Composite, Image]  - Jpg From Raw: (Binary data 29 bytes)
+[Composite, Composite, Camera]  - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
 [Composite, Composite, Camera]  - Lens: 18-70mm f/3.5-4.5 G
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Image]  - Shutter Speed: 1/20
 [Composite, Composite, Camera]  - Focal Length: 18.0mm
-[Composite, Composite, Image]  - Shooting Date/Time: 2004:06:09 16:02:35.00
+[Composite, Composite, Image]  - Date/Time Original: 2004:06:09 16:02:35.00

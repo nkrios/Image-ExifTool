@@ -29,7 +29,7 @@ verified, or not very useful -- these tags are not extracted by ExifTool
 unless the Unknown (-u) option is enabled.  Be aware that some tag names are
 different than the descriptions printed out by default when extracting
 information with "exiftool".  To see the tag names instead of the
-descriptions, use "exiftool -S".
+descriptions, use "exiftool -s".
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an "N" in this column means the tag is writable.  A "Y"
@@ -57,7 +57,7 @@ B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
 reason for this is to make the tag names more consistent across different
 types of meta information.  To determine a tag name, either consult this
-documentation or run "exiftool -S" on a file containing the information in
+documentation or run "exiftool -s" on a file containing the information in
 question.
 
 =head2 EXIF Tags
@@ -98,12 +98,12 @@ B<Group> listed below is used unless another group is specified.
            PreviewImageLength        IFD0       int32u*
   0x0118   MinSampleValue            IFD0       int16u
   0x0119   MaxSampleValue            IFD0       int16u
-  0x011a   XResolution               IFD0       rational32u
-  0x011b   YResolution               IFD0       rational32u
+  0x011a   XResolution               IFD0       rational64u
+  0x011b   YResolution               IFD0       rational64u
   0x011c   PlanarConfiguration       IFD0       int16u!
   0x011d   PageName                  IFD0       string
-  0x011e   XPosition                 IFD0       rational32u
-  0x011f   YPosition                 IFD0       rational32u
+  0x011e   XPosition                 IFD0       rational64u
+  0x011f   YPosition                 IFD0       rational64u
   0x0120   FreeOffsets               -          N
   0x0121   FreeByteCounts            -          N
   0x0122   GrayResponseUnit          IFD0       int16u
@@ -119,8 +119,8 @@ B<Group> listed below is used unless another group is specified.
   0x013b   Artist                    IFD0       string
   0x013c   HostComputer              IFD0       string
   0x013d   Predictor                 IFD0       int16u!
-  0x013e   WhitePoint                IFD0       rational32u[2]
-  0x013f   PrimaryChromaticities     IFD0       rational32u[6]
+  0x013e   WhitePoint                IFD0       rational64u[2]
+  0x013f   PrimaryChromaticities     IFD0       rational64u[6]
   0x0140   ColorMap                  -          N
   0x0141   HalftoneHints             IFD0       int16u[2]
   0x0142   TileWidth                 IFD0       int32u!
@@ -172,10 +172,10 @@ B<Group> listed below is used unless another group is specified.
   0x0207   JPEGQTables               -          N
   0x0208   JPEGDCTables              -          N
   0x0209   JPEGACTables              -          N
-  0x0211   YCbCrCoefficients         IFD0       rational32u[3]
+  0x0211   YCbCrCoefficients         IFD0       rational64u[3]
   0x0212   YCbCrSubSampling          IFD0       int16u[2]!
   0x0213   YCbCrPositioning          IFD0       int16u
-  0x0214   ReferenceBlackWhite       IFD0       rational32u[6]
+  0x0214   ReferenceBlackWhite       IFD0       rational64u[6]
   0x022f   StripRowCounts            -          N
   0x02bc   ApplicationNotes          -          XMP
   0x1000   RelatedImageFileFormat    -          N
@@ -192,11 +192,19 @@ B<Group> listed below is used unless another group is specified.
   0x828e   CFAPattern2               -          N
   0x828f   BatteryLevel              -          N
   0x8298   Copyright                 IFD0       string
-  0x829a   ExposureTime              ExifIFD    rational32u
-  0x829d   FNumber                   ExifIFD    rational32u
+  0x829a   ExposureTime              ExifIFD    rational64u
+  0x829d   FNumber                   ExifIFD    rational64u
+  0x82a5   MDFileTag                 -          N
+  0x82a6   MDScalePixel              -          N
+  0x82a7   MDColorTable              -          N
+  0x82a8   MDLabName                 -          N
+  0x82a9   MDSampleInfo              -          N
+  0x82aa   MDPrepDate                -          N
+  0x82ab   MDPrepTime                -          N
+  0x82ac   MDFileUnits               -          N
   0x830e   PixelScale                -          N
   0x83bb   IPTC-NAA                  IFD0       IPTC
-  0x8474   IntergraphPacketData      -          N
+  0x847e   IntergraphPacketData      -          N
   0x847f   IntergraphFlagRegisters   -          N
   0x8480   IntergraphMatrix          -          N
   0x8482   ModelTiePoint             -          N
@@ -215,7 +223,7 @@ B<Group> listed below is used unless another group is specified.
   0x84ec   TransparencyIndicator     -          N
   0x84ed   ColorCharacterization     -          N
   0x84ee   HCUsage                   -          N
-  0x8568   IPTC-NAA2                 -          IPTC
+  0x8568   AFCP_IPTC                 -          IPTC
   0x85d8   ModelTransform            -          N
   0x8606   LeafData                  -          Leaf
   0x8649   PhotoshopSettings         -          Photoshop
@@ -241,17 +249,17 @@ B<Group> listed below is used unless another group is specified.
   0x9003   DateTimeOriginal          ExifIFD    string
   0x9004   CreateDate                ExifIFD    string
   0x9101   ComponentsConfiguration   ExifIFD    undef
-  0x9102   CompressedBitsPerPixel    ExifIFD    rational32u
-  0x9201   ShutterSpeedValue         ExifIFD    rational32s
-  0x9202   ApertureValue             ExifIFD    rational32u
-  0x9203   BrightnessValue           ExifIFD    rational32s
-  0x9204   ExposureCompensation      ExifIFD    rational32s
-  0x9205   MaxApertureValue          ExifIFD    rational32u
-  0x9206   SubjectDistance           ExifIFD    rational32u
+  0x9102   CompressedBitsPerPixel    ExifIFD    rational64u
+  0x9201   ShutterSpeedValue         ExifIFD    rational64s
+  0x9202   ApertureValue             ExifIFD    rational64u
+  0x9203   BrightnessValue           ExifIFD    rational64s
+  0x9204   ExposureCompensation      ExifIFD    rational64s
+  0x9205   MaxApertureValue          ExifIFD    rational64u
+  0x9206   SubjectDistance           ExifIFD    rational64u
   0x9207   MeteringMode              ExifIFD    int16u
   0x9208   LightSource               ExifIFD    int16u
   0x9209   Flash                     ExifIFD    int16u
-  0x920a   FocalLength               ExifIFD    rational32u
+  0x920a   FocalLength               ExifIFD    rational64u
   0x920b   FlashEnergy               -          N
   0x920c   SpatialFrequencyResponse  -          N
   0x920d   Noise                     -          N
@@ -289,6 +297,7 @@ B<Group> listed below is used unless another group is specified.
            MakerNoteOlympus          ExifIFD    Olympus
            MakerNoteLeica            ExifIFD    Panasonic
            MakerNotePanasonic        ExifIFD    Panasonic
+           MakerNotePanasonic2       ExifIFD    Panasonic Type2
            MakerNotePentax           ExifIFD    Pentax
            MakerNoteRicoh            ExifIFD    Ricoh
            MakerNoteRicohText        ExifIFD    Ricoh Text
@@ -297,6 +306,7 @@ B<Group> listed below is used unless another group is specified.
            MakerNoteSigma            ExifIFD    Sigma
            MakerNoteSony             ExifIFD    Sony
            MakerNoteSonySRF          ExifIFD    Sony SRF
+           MakerNoteSonySR2          ExifIFD    Sony
            MakerNoteUnknown          ExifIFD    Unknown
   0x9286   UserComment               ExifIFD    undef
   0x9290   SubSecTime                ExifIFD    string
@@ -314,17 +324,17 @@ B<Group> listed below is used unless another group is specified.
   0xa003   ExifImageLength           ExifIFD    int16u
   0xa004   RelatedSoundFile          ExifIFD    string
   0xa005   InteropOffset             -          EXIF
-  0xa20b   FlashEnergy               ExifIFD    rational32u
+  0xa20b   FlashEnergy               ExifIFD    rational64u
   0xa20c   SpatialFrequencyResponse  -          N
   0xa20d   Noise                     -          N
-  0xa20e   FocalPlaneXResolution     ExifIFD    rational32u
-  0xa20f   FocalPlaneYResolution     ExifIFD    rational32u
+  0xa20e   FocalPlaneXResolution     ExifIFD    rational64u
+  0xa20f   FocalPlaneYResolution     ExifIFD    rational64u
   0xa210   FocalPlaneResolutionUnit  ExifIFD    int16u
   0xa211   ImageNumber               -          N
   0xa212   SecurityClassification    -          N
   0xa213   ImageHistory              -          N
   0xa214   SubjectLocation           ExifIFD    int16u[2]
-  0xa215   ExposureIndex             ExifIFD    rational32u
+  0xa215   ExposureIndex             ExifIFD    rational64u
   0xa216   TIFF-EPStandardID         -          N
   0xa217   SensingMethod             ExifIFD    int16u
   0xa300   FileSource                ExifIFD    undef
@@ -333,7 +343,7 @@ B<Group> listed below is used unless another group is specified.
   0xa401   CustomRendered            ExifIFD    int16u
   0xa402   ExposureMode              ExifIFD    int16u
   0xa403   WhiteBalance              ExifIFD    int16u
-  0xa404   DigitalZoomRatio          ExifIFD    rational32u
+  0xa404   DigitalZoomRatio          ExifIFD    rational64u
   0xa405   FocalLengthIn35mmFormat   ExifIFD    int16u
   0xa406   SceneCaptureType          ExifIFD    int16u
   0xa407   GainControl               ExifIFD    int16u
@@ -345,7 +355,7 @@ B<Group> listed below is used unless another group is specified.
   0xa420   ImageUniqueID             ExifIFD    string
   0xa480   GDALMetadata              -          N
   0xa481   GDALNoData                -          N
-  0xa500   Gamma                     ExifIFD    rational32u
+  0xa500   Gamma                     ExifIFD    rational64u
   0xc427   OceScanjobDesc            -          N
   0xc428   OceApplicationSelector    -          N
   0xc429   OceIDNumber               -          N
@@ -364,7 +374,7 @@ B<Group> listed below is used unless another group is specified.
   0xc61b   BlackLevelDeltaH          -          N
   0xc61c   BlackLevelDeltaV          -          N
   0xc61d   WhiteLevel                -          N
-  0xc61e   DefaultScale              SubIFD     rational32u[2]
+  0xc61e   DefaultScale              SubIFD     rational64u[2]
   0xc61f   DefaultCropOrigin         SubIFD     int32u[2]
   0xc620   DefaultCropSize           SubIFD     int32u[2]
   0xc621   ColorMatrix1              -          N
@@ -375,26 +385,27 @@ B<Group> listed below is used unless another group is specified.
   0xc626   ReductionMatrix2          -          N
   0xc627   AnalogBalance             -          N
   0xc628   AsShotNeutral             -          N
-  0xc629   AsShotWhiteXY             IFD0       rational32u[2]
-  0xc62a   BaselineExposure          IFD0       rational32s
-  0xc62b   BaselineNoise             IFD0       rational32u
-  0xc62c   BaselineSharpness         IFD0       rational32u
+  0xc629   AsShotWhiteXY             IFD0       rational64u[2]
+  0xc62a   BaselineExposure          IFD0       rational64s
+  0xc62b   BaselineNoise             IFD0       rational64u
+  0xc62c   BaselineSharpness         IFD0       rational64u
   0xc62d   BayerGreenSplit           SubIFD     int32u
-  0xc62e   LinearResponseLimit       IFD0       rational32u
+  0xc62e   LinearResponseLimit       IFD0       rational64u
   0xc62f   CameraSerialNumber        IFD0       string
-  0xc630   DNGLensInfo               IFD0       rational32u[4]
-  0xc631   ChromaBlurRadius          SubIFD     rational32u
-  0xc632   AntiAliasStrength         SubIFD     rational32u
-  0xc633   ShadowScale               IFD0       rational32u
+  0xc630   DNGLensInfo               IFD0       rational64u[4]
+  0xc631   ChromaBlurRadius          SubIFD     rational64u
+  0xc632   AntiAliasStrength         SubIFD     rational64u
+  0xc633   ShadowScale               IFD0       rational64u
   0xc634   DNGPrivateData            -          N
+           SR2Private                -          -
   0xc635   MakerNoteSafety           IFD0       int16u
   0xc65a   CalibrationIlluminant1    IFD0       int16u
   0xc65b   CalibrationIlluminant2    IFD0       int16u
-  0xc65c   BestQualityScale          SubIFD     rational32u
-  0xc65d   RawDataUniqueID           -          N
+  0xc65c   BestQualityScale          SubIFD     rational64u
+  0xc65d   RawDataUniqueID           IFD0       undef[16]
   0xc660   AliasLayerMetadata        -          N
   0xc68b   OriginalRawFileName       IFD0       string
-  0xc68c   OriginalRawFileData       IFD0       N
+  0xc68c   OriginalRawFileData       IFD0       DNG OriginalRaw
   0xc68d   ActiveArea                SubIFD     int32u[4]
   0xc68e   MaskedAreas               SubIFD     int32u[4]
   0xc68f   AsShotICCProfile          -          ICC_Profile
@@ -887,7 +898,7 @@ XMP Paged-Text schema tags.
 
 IPTC stands for 'International Press Telecommunications Council'.  This is
 an older meta information format that is slowly being phased out in favor of
-XMP. IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS, PDF, PSD
+XMP.  IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS, PDF, PSD
 and DNG images.
 
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
@@ -1338,7 +1349,7 @@ it duplicates a reference to the same data of tag 0x8606 in IFD0.
   'chrm'   Chromaticity                         ICC_Profile Chromaticity
   'clro'   ColorantOrder                        N
   'clrt'   ColorantTable                        ICC_Profile ColorantTable
-  'cprt'   Copyright                            N
+  'cprt'   ProfileCopyright                     N
   'crdi'   CRDInfo                              N
   'desc'   ProfileDescription                   N
   'devs'   DeviceSettings                       N
@@ -1483,10 +1494,10 @@ Unknown (-u) option is used.
   0x0406   JPEG_Quality                         Photoshop JPEG_Quality
   0x0408   GridGuidesInfo?                      N
   0x0409   ThumbnailResource?                   N
-  0x040a   CopyrightFlag                        Y
-  0x040b   URL                                  Y
+  0x040a   CopyrightFlag                        int8u
+  0x040b   URL                                  string
   0x040c   PhotoshopThumbnail                   N
-  0x040d   GlobalAngle                          N
+  0x040d   GlobalAngle                          int32u
   0x040e   ColorSamplersResource?               N
   0x040f   ICC_Profile                          ICC_Profile
   0x0410   Watermark?                           N
@@ -1497,7 +1508,7 @@ Unknown (-u) option is used.
   0x0415   UnicodeAlphaNames?                   N
   0x0416   IndexedColourTableCount?             N
   0x0417   TransparentIndex?                    N
-  0x0419   GlobalAltitude                       N
+  0x0419   GlobalAltitude                       int32u
   0x041a   Slices?                              N
   0x041b   WorkflowURL?                         N
   0x041c   JumpToXPEP?                          N
@@ -1513,18 +1524,30 @@ Unknown (-u) option is used.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    XResolution                          N
-      2    DisplayedUnitsX                      N
-      4    YResolution                          N
-      6    DisplayedUnitsY                      N
+      0    XResolution                          int32u
+      2    DisplayedUnitsX                      int16u
+      4    YResolution                          int32u
+      6    DisplayedUnitsY                      int16u
 
 =head3 Photoshop JPEG_Quality Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    PhotoshopQuality                     N
+      0    PhotoshopQuality                     int16s
       1    PhotoshopFormat                      N
       2    ProgressiveScans                     N
+
+=head3 Photoshop Header Tags
+
+This information is found in the PSD file header.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      6    NumChannels                          N
+      7    ImageHeight                          N
+      9    ImageWidth                           N
+     11    BitDepth                             N
+     12    ColorMode                            N
 
 =head2 GPS Tags
 
@@ -1545,31 +1568,31 @@ GPSAltitude and GPSAltitudeRef.
   ------   --------                             --------
   0x0000   GPSVersionID                         int8u[4]
   0x0001   GPSLatitudeRef                       string[2]
-  0x0002   GPSLatitude                          rational32u[3]
+  0x0002   GPSLatitude                          rational64u[3]
   0x0003   GPSLongitudeRef                      string[2]
-  0x0004   GPSLongitude                         rational32u[3]
+  0x0004   GPSLongitude                         rational64u[3]
   0x0005   GPSAltitudeRef                       int8u
-  0x0006   GPSAltitude                          rational32u
-  0x0007   GPSTimeStamp                         rational32u[3]
+  0x0006   GPSAltitude                          rational64u
+  0x0007   GPSTimeStamp                         rational64u[3]
   0x0008   GPSSatellites                        string
   0x0009   GPSStatus                            string[2]
   0x000a   GPSMeasureMode                       string[2]
-  0x000b   GPSDOP                               rational32u
+  0x000b   GPSDOP                               rational64u
   0x000c   GPSSpeedRef                          string[2]
-  0x000d   GPSSpeed                             rational32u
+  0x000d   GPSSpeed                             rational64u
   0x000e   GPSTrackRef                          string[2]
-  0x000f   GPSTrack                             rational32u
+  0x000f   GPSTrack                             rational64u
   0x0010   GPSImgDirectionRef                   string[2]
-  0x0011   GPSImgDirection                      rational32u
+  0x0011   GPSImgDirection                      rational64u
   0x0012   GPSMapDatum                          string
   0x0013   GPSDestLatitudeRef                   string[2]
-  0x0014   GPSDestLatitude                      rational32u[3]
+  0x0014   GPSDestLatitude                      rational64u[3]
   0x0015   GPSDestLongitudeRef                  string[2]
-  0x0016   GPSDestLongitude                     rational32u[3]
+  0x0016   GPSDestLongitude                     rational64u[3]
   0x0017   GPSDestBearingRef                    string[2]
-  0x0018   GPSDestBearing                       rational32u
+  0x0018   GPSDestBearing                       rational64u
   0x0019   GPSDestDistanceRef                   string[2]
-  0x001a   GPSDestDistance                      rational32u
+  0x001a   GPSDestDistance                      rational64u
   0x001b   GPSProcessingMethod                  undef
   0x001c   GPSAreaInformation                   undef
   0x001d   GPSDateStamp                         string[11]
@@ -1588,21 +1611,46 @@ GPSAltitude and GPSAltitudeRef.
   0x0007   CanonFirmwareVersion                 string
   0x0008   FileNumber                           int32u
   0x0009   OwnerName                            string
-  0x000a   CanonColorInfoD30                    Canon ColorInfoD30
+  0x000a   ColorInfoD30                         Canon ColorInfoD30
   0x000c   SerialNumber                         int32u
-  0x000d   CanonLensInfo1D                      Canon LensInfo1D
+  0x000d   CanonCameraInfo                      Canon CameraInfo
   0x000e   CanonFileLength                      int32u
-  0x000f   CanonCustomFunctions10D              CanonCustom Functions10D
+  0x000f   CanonCustomFunctions1D               CanonCustom Functions1D
+           CanonCustomFunctions5D               CanonCustom Functions5D
+           CanonCustomFunctions10D              CanonCustom Functions10D
            CanonCustomFunctions20D              CanonCustom Functions20D
+           CanonCustomFunctions350D             CanonCustom Functions350D
            CanonCustomFunctionsD30              CanonCustom FunctionsD30
+           CanonCustomFunctionsD60              CanonCustom FunctionsD30
+           CanonCustomFunctionsUnknown          CanonCustom FuncsUnknown
+  0x0010   CanonModelID                         int32u
   0x0012   CanonPictureInfo                     Canon PictureInfo
+  0x0015   SerialNumberFormat                   int32u
   0x0090   CanonCustomFunctions1D               CanonCustom Functions1D
+  0x0091   PersonalFunctions                    CanonCustom PersonalFuncs
+  0x0092   PersonalFunctionValues               CanonCustom PersonalFuncValues
   0x0093   CanonFileInfo                        Canon FileInfo
-  0x0095   LensType                             N
-  0x00a0   CanonColorInfo                       Canon ColorInfo
-  0x00a9   WhiteBalanceTable                    Canon WhiteBalance
+  0x0094   AFPointsUsed1D                       N
+  0x0095   LensType                             string
+  0x00a0   ProccessingInfo                      Canon Processing
+  0x00a1   ToneCurveTable                       N
+  0x00a2   SharpnessTable                       N
+  0x00a3   SharpnessFreqTable                   N
+  0x00a4   WhiteBalanceTable                    N
+  0x00a9   ColorBalance                         Canon ColorBalance
   0x00ae   ColorTemperature                     int16u
+  0x00b0   CanonFlags                           Canon Flags
+  0x00b1   ModifiedInfo                         Canon ModifiedInfo
+  0x00b2   ToneCurveMatching                    N
+  0x00b3   WhiteBalanceMatching                 N
+  0x00b4   ColorSpace                           int16u
   0x00b6   PreviewImageInfo                     Canon PreviewImageInfo
+  0x00e0   SensorInfo                           Canon SensorInfo
+  0x4001   ColorBalance1                        Canon ColorBalance1
+           ColorBalance2                        Canon ColorBalance2
+           ColorBalance3                        Canon ColorBalance3
+           ColorBalanceUnknown
+  0x4003   ColorInfo                            Canon ColorInfo
 
 =head3 Canon CameraSettings Tags
 
@@ -1622,7 +1670,7 @@ GPSAltitude and GPSAltitudeRef.
      15    Sharpness                            int16s
      16    CameraISO                            int16s
      17    MeteringMode                         int16s
-     18    FocusType                            int16s
+     18    FocusRange                           int16s
      19    AFPoint                              int16s
      20    CanonExposureMode                    int16s
      22    LensType                             int16s
@@ -1630,11 +1678,16 @@ GPSAltitude and GPSAltitudeRef.
      24    ShortFocal                           int16s
      25    FocalUnits                           int16s
      26    MaxAperture                          int16s
+     27    MinAperture                          int16s
      28    FlashActivity                        int16s
-     29    FlashBits                            int16s~
+     29    FlashBits                            int16s
      32    FocusContinuous                      int16s
-     36    ZoomedResolution                     int16s
-     37    ZoomedResolutionBase                 int16s
+     33    AESetting                            int16s
+     34    ImageStabilization                   int16s
+     35    DisplayAperture                      int16s
+     36    ZoomSourceWidth                      int16s
+     37    ZoomTargetWidth                      int16s
+     40    PhotoEffect                          int16s
      42    ColorTone                            int16s
 
 =head3 Canon FocalLength Tags
@@ -1655,8 +1708,10 @@ GPSAltitude and GPSAltitudeRef.
       5    TargetExposureTime                   int16s
       6    ExposureCompensation                 int16s
       7    WhiteBalance                         int16s
+      8    SlowShutter                          int16s
       9    SequenceNumber                       int16s
-     14    IxusAFPoint                          int16s
+     13    FlashGuideNumber                     int16s
+     14    AFPointsUsed2                        int16s
      15    FlashExposureComp                    int16s
      16    AutoExposureBracketing               int16s
      17    AEBBracketValue                      int16s
@@ -1682,9 +1737,9 @@ GPSAltitude and GPSAltitudeRef.
       9    ColorTemperature                     int16s
      10    ColorMatrix                          int16s
 
-=head3 Canon LensInfo1D Tags
+=head3 Canon CameraInfo Tags
 
-Lens information for the 1D, 1DS and 1D Mark II only.
+Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -1694,6 +1749,51 @@ Lens information for the 1D, 1DS and 1D Mark II only.
      18    ShortFocal                           int8u
      20    LongFocal                            int8u
      45    FocalType                            int8u
+     56    AFPointsUsed5D                       undef[2]
+    108    PictureStyle                         int16u
+    164    FirmwareRevision                     string[8]
+    172    ShortOwnerName                       string[16]
+    208    PictureNumber                        int16u
+    232    ContrastStandard                     int8s
+    233    ContrastPortrait                     int8s
+    234    ContrastLandscape                    int8s
+    235    ContrastNeutral                      int8s
+    236    ContrastFaithful                     int8s
+    237    ContrastMonochrome                   int8s
+    238    ContrastUserDef1                     int8s
+    239    ContrastUserDef2                     int8s
+    240    ContrastUserDef3                     int8s
+    241    SharpnessStandard                    int8s
+    242    SharpnessPortrait                    int8s
+    243    SharpnessLandscape                   int8s
+    244    SharpnessNeutral                     int8s
+    245    SharpnessFaithful                    int8s
+    246    SharpnessMonochrome                  int8s
+    247    SharpnessUserDef1                    int8s
+    248    SharpnessUserDef2                    int8s
+    249    SharpnessUserDef3                    int8s
+    250    SaturationStandard                   int8s
+    251    SaturationPortrait                   int8s
+    252    SaturationLandscape                  int8s
+    253    SaturationNeutral                    int8s
+    254    SaturationFaithful                   int8s
+    255    FilterEffectMonochrome               int8s
+    256    SaturationUserDef1                   int8s
+    257    SaturationUserDef2                   int8s
+    258    SaturationUserDef3                   int8s
+    259    ColorToneStandard                    int8s
+    260    ColorTonePortrait                    int8s
+    261    ColorToneLandscape                   int8s
+    262    ColorToneNeutral                     int8s
+    263    ColorToneFaithful                    int8s
+    264    ToningEffectMonochrome               int8s
+    265    ColorToneUserDef1                    int8s
+    266    ColorToneUserDef2                    int8s
+    267    ColorToneUserDef3                    int8s
+    268    UserDef1PictureStyle                 int16u
+    270    UserDef2PictureStyle                 int16u
+    272    UserDef3PictureStyle                 int16u
+    284    TimeStamp                            int32u
 
 =head3 Canon PictureInfo Tags
 
@@ -1703,7 +1803,8 @@ Lens information for the 1D, 1DS and 1D Mark II only.
       3    CanonImageHeight                     int16u
       4    CanonImageWidthAsShot                int16u
       5    CanonImageHeightAsShot               int16u
-     22    AFPointsUsed                         int16u~
+     22    AFPointsUsed                         int16u
+     26    AFPointsUsed20D                      int16u
 
 =head3 Canon FileInfo Tags
 
@@ -1711,137 +1812,433 @@ Lens information for the 1D, 1DS and 1D Mark II only.
    -----   --------                             --------
       1    FileNumber                           int32u
            ShutterCount                         int32u
+      3    BracketMode                          int16s
+      4    BracketValue                         int16s
+      5    BracketShotNumber                    int16s
+      6    RawJpgQuality                        int16s
+      7    RawJpgSize                           int16s
+      8    NoiseReduction                       int16s
+      9    WBBracketMode                        int16s
+     12    WBBracketValueAB                     int16s
+     13    WBBracketValueGM                     int16s
+     14    FilterEffect                         int16s
+     15    ToningEffect                         int16s
 
-=head3 Canon ColorInfo Tags
+=head3 Canon Processing Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+      1    ToneCurve                            int16s
+      2    Sharpness                            int16s
+      3    SharpnessFrequency                   int16s
+      4    SensorRedLevel                       int16s
+      5    SensorBlueLevel                      int16s
+      6    WhiteBalanceRed                      int16s
+      7    WhiteBalanceBlue                     int16s
+      8    WhiteBalance                         int16s
       9    ColorTemperature                     int16s
+     10    PictureStyle                         int16s
+     11    DigitalGain                          int16s
+     12    WBShiftAB                            int16s
+     13    WBShiftGM                            int16s
 
-=head3 Canon WhiteBalance Tags
+=head3 Canon ColorBalance Tags
+
+This table is used by the 10D and 300D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    RedBalanceAuto                       N
-      1    BlueBalanceAuto                      N
-      2    RedBalanceDaylight                   N
-      3    BlueBalanceDaylight                  N
-      4    RedBalanceCloudy                     N
-      5    BlueBalanceCloudy                    N
-      6    RedBalanceTungsten                   N
-      7    BlueBalanceTungsten                  N
-      8    RedBalanceFluorescent                N
-      9    BlueBalanceFluorescent               N
-     10    RedBalanceFlash                      N
-     11    BlueBalanceFlash                     N
-     12    RedBalanceCustom                     N
-     13    BlueBalanceCustom                    N
-     14    RedBalanceB&W                        N
-     15    BlueBalanceB&W                       N
-     16    RedBalanceShade                      N
-     17    BlueBalanceShade                     N
+      0    WB_RGGBLevelsAuto                    int16u[4]
+      4    WB_RGGBLevelsDaylight                int16u[4]
+      8    WB_RGGBLevelsShade                   int16u[4]
+     12    WB_RGGBLevelsCloudy                  int16u[4]
+     16    WB_RGGBLevelsTungsten                int16u[4]
+     20    WB_RGGBLevelsFluorescent             int16u[4]
+     24    WB_RGGBLevelsFlash                   int16u[4]
+     28    WB_RGGBLevelsCustom                  int16u[4]
+     32    WB_RGGBLevelsKelvin                  int16u[4]
+
+=head3 Canon Flags Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    ModifiedParamFlag                    int16s
+
+=head3 Canon ModifiedInfo Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    ModifiedToneCurve                    int16s
+      2    ModifiedSharpness                    int16s
+      3    ModifiedSharpnessFreq                int16s
+      4    ModifiedSensorRedLevel               int16s
+      5    ModifiedSensorBlueLevel              int16s
+      6    ModifiedWhiteBalanceRed              int16s
+      7    ModifiedWhiteBalanceBlue             int16s
+      8    ModifiedWhiteBalance                 int16s
+      9    ModifiedColorTemp                    int16s
+     10    ModifiedPictureStyle                 int16s
+     11    ModifiedDigitalGain                  int16s
 
 =head3 Canon PreviewImageInfo Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+      1    PreviewQuality                       int32u
       2    PreviewImageLength                   int32u*
       3    PreviewImageWidth                    int32u
       4    PreviewImageHeight                   int32u
       5    PreviewImageStart                    int32u*
-      6    PreviewFocalPlaneXResolution         rational32s
-      8    PreviewFocalPlaneYResolution         rational32s
+      6    PreviewFocalPlaneXResolution         rational64s
+      8    PreviewFocalPlaneYResolution         rational64s
 
-=head3 CanonCustom Functions10D Tags
+=head3 Canon SensorInfo Tags
 
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0001   SetButtonFunction                    int8u
-  0x0002   ShutterReleaseNoCFCard               int8u
-  0x0003   FlashSyncSpeedAv                     int8u
-  0x0004   Shutter-AELock                       int8u
-  0x0005   AFAssist                             int8u
-  0x0006   ExposureLevelIncrements              int8u
-  0x0007   AFPointRegistration                  int8u
-  0x0008   RawAndJpgRecording                   int8u
-  0x0009   AEBSequence                          int8u
-  0x000a   SuperimposedDisplay                  int8u
-  0x000b   MenuButtonDisplayPosition            int8u
-  0x000c   MirrorLockup                         int8u
-  0x000d   AssistButtonFunction                 int8u
-  0x000e   FillFlashAutoReduction               int8u
-  0x000f   ShutterCurtainSync                   int8u
-  0x0010   SafetyShiftInAvOrTv                  int8u
-  0x0011   LensAFStopButton                     int8u
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    SensorWidth                          N
+      2    SensorHeight                         N
+      5    SensorLeftBorder                     N
+      6    SensorTopBorder                      N
+      7    SensorRightBorder                    N
+      8    SensorBottomBorder                   N
 
-=head3 CanonCustom Functions20D Tags
+=head3 Canon ColorBalance1 Tags
 
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0000   SetFunctionWhenShooting              int8u
-  0x0001   LongExposureNoiseReduction           int8u
-  0x0002   FlashSyncSpeedAv                     int8u
-  0x0003   Shutter-AELock                       int8u
-  0x0004   AFAssistBeam                         int8u
-  0x0005   ExposureLevelIncrements              int8u
-  0x0006   FlashFiring                          int8u
-  0x0007   ISOExpansion                         int8u
-  0x0008   AEBSequence                          int8u
-  0x0009   SuperimposedDisplay                  int8u
-  0x000a   MenuButtonDisplayPosition            int8u
-  0x000b   MirrorLockup                         int8u
-  0x000c   AFPointSelectionMethod               int8u
-  0x000d   ETTLII                               int8u
-  0x000e   ShutterCurtainSync                   int8u
-  0x000f   SafetyShiftInAVorTV                  int8u
-  0x0010   LensAFStopButton                     int8u
-  0x0011   AddOriginalDecisionData              int8u
+This table is used by the 20D and 350D.
 
-=head3 CanonCustom FunctionsD30 Tags
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     25    WB_RGGBLevelsAsShot                  int16u[4]
+     29    ColorTempAsShot                      int16u
+     30    WB_RGGBLevelsAuto                    int16u[4]
+     34    ColorTempAuto2                       int16u
+     35    WB_RGGBLevelsDaylight                int16u[4]
+     39    ColorTempDaylight                    int16u
+     40    WB_RGGBLevelsShade                   int16u[4]
+     44    ColorTempShade                       int16u
+     45    WB_RGGBLevelsCloudy                  int16u[4]
+     49    ColorTempCloudy                      int16u
+     50    WB_RGGBLevelsTungsten                int16u[4]
+     54    ColorTempTungsten                    int16u
+     55    WB_RGGBLevelsFluorescent             int16u[4]
+     59    ColorTempFluorescent                 int16u
+     60    WB_RGGBLevelsFlash                   int16u[4]
+     64    ColorTempFlash                       int16u
+     65    WB_RGGBLevelsCustom1                 int16u[4]
+     69    ColorTempCustom1                     int16u
+     70    WB_RGGBLevelsCustom2                 int16u[4]
+     74    ColorTempCustom2                     int16u
 
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0001   LongExposureNoiseReduction           int8u
-  0x0002   Shutter-AELock                       int8u
-  0x0003   MirrorLockup                         int8u
-  0x0004   ExposureLevelIncrements              int8u
-  0x0005   AFAssist                             int8u
-  0x0006   FlashSyncSpeedAv                     int8u
-  0x0007   AEBSequence                          int8u
-  0x0008   ShutterCurtainSync                   int8u
-  0x0009   LensAFStopButton                     int8u
-  0x000a   FillFlashAutoReduction               int8u
-  0x000b   MenuButtonReturn                     int8u
-  0x000c   SetButtonFunction                    int8u
-  0x000d   SensorCleaning                       int8u
-  0x000e   SuperimposedDisplay                  int8u
-  0x000f   ShutterReleaseNoCFCard               int8u
+=head3 Canon ColorBalance2 Tags
+
+This table is used by the 1DmkII and 1DSmkII.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     24    WB_RGGBLevelsAsShot                  int16u[4]
+     28    ColorTempAsShot                      int16u
+     29    WB_RGGBLevelsUnknown?                int16u[4]
+     33    ColorTempUnknown?                    int16u
+     34    WB_RGGBLevelsAuto                    int16u[4]
+     38    ColorTempAuto                        int16u
+     39    WB_RGGBLevelsDaylight                int16u[4]
+     43    ColorTempDaylight                    int16u
+     44    WB_RGGBLevelsShade                   int16u[4]
+     48    ColorTempShade                       int16u
+     49    WB_RGGBLevelsCloudy                  int16u[4]
+     53    ColorTempCloudy                      int16u
+     54    WB_RGGBLevelsTungsten                int16u[4]
+     58    ColorTempTungsten                    int16u
+     59    WB_RGGBLevelsFluorescent             int16u[4]
+     63    ColorTempFluorescent                 int16u
+     64    WB_RGGBLevelsKelvin                  int16u[4]
+     68    ColorTempKelvin                      int16u
+     69    WB_RGGBLevelsFlash                   int16u[4]
+     73    ColorTempFlash                       int16u
+     74    WB_RGGBLevelsUnknown2?               int16u[4]
+     78    ColorTempUnknown2?                   int16u
+     79    WB_RGGBLevelsUnknown3?               int16u[4]
+     83    ColorTempUnknown3?                   int16u
+     84    WB_RGGBLevelsUnknown4?               int16u[4]
+     88    ColorTempUnknown4?                   int16u
+     89    WB_RGGBLevelsUnknown5?               int16u[4]
+     93    ColorTempUnknown5?                   int16u
+     94    WB_RGGBLevelsUnknown6?               int16u[4]
+     98    ColorTempUnknown6?                   int16u
+     99    WB_RGGBLevelsUnknown7?               int16u[4]
+    103    ColorTempUnknown7?                   int16u
+    104    WB_RGGBLevelsUnknown8?               int16u[4]
+    108    ColorTempUnknown8?                   int16u
+    109    WB_RGGBLevelsUnknown9?               int16u[4]
+    113    ColorTempUnknown9?                   int16u
+    114    WB_RGGBLevelsUnknown10?              int16u[4]
+    118    ColorTempUnknown10?                  int16u
+    119    WB_RGGBLevelsUnknown11?              int16u[4]
+    123    ColorTempUnknown11?                  int16u
+    124    WB_RGGBLevelsUnknown12?              int16u[4]
+    128    ColorTempUnknown12?                  int16u
+    129    WB_RGGBLevelsUnknown13?              int16u[4]
+    133    ColorTempUnknown13?                  int16u
+    134    WB_RGGBLevelsUnknown14?              int16u[4]
+    138    ColorTempUnknown14?                  int16u
+    139    WB_RGGBLevelsUnknown15?              int16u[4]
+    143    ColorTempUnknown15?                  int16u
+    144    WB_RGGBLevelsPC1                     int16u[4]
+    148    ColorTempPC1                         int16u
+    149    WB_RGGBLevelsPC2                     int16u[4]
+    153    ColorTempPC2                         int16u
+    154    WB_RGGBLevelsPC3                     int16u[4]
+    158    ColorTempPC3                         int16u
+    159    WB_RGGBLevelsUnknown16?              int16u[4]
+    163    ColorTempUnknown16?                  int16u
+
+=head3 Canon ColorBalance3 Tags
+
+This table is used by the 5D and 1DmkIIN.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     63    WB_RGGBLevelsAsShot                  int16u[4]
+     67    ColorTempAsShot                      int16u
+     68    WB_RGGBLevelsAuto                    int16u[4]
+     72    ColorTempAuto                        int16u
+     73    WB_RGGBLevelsMeasured                int16u[4]
+     77    ColorTempMeasured                    int16u
+     78    WB_RGGBLevelsDaylight                int16u[4]
+     82    ColorTempDaylight                    int16u
+     83    WB_RGGBLevelsShade                   int16u[4]
+     87    ColorTempShade                       int16u
+     88    WB_RGGBLevelsCloudy                  int16u[4]
+     92    ColorTempCloudy                      int16u
+     93    WB_RGGBLevelsTungsten                int16u[4]
+     97    ColorTempTungsten                    int16u
+     98    WB_RGGBLevelsFluorescent             int16u[4]
+    102    ColorTempFluorescent                 int16u
+    103    WB_RGGBLevelsKelvin                  int16u[4]
+    107    ColorTempKelvin                      int16u
+    108    WB_RGGBLevelsFlash                   int16u[4]
+    112    ColorTempFlash                       int16u
+    113    WB_RGGBLevelsPC1                     int16u[4]
+    117    ColorTempPC1                         int16u
+    118    WB_RGGBLevelsPC2                     int16u[4]
+    122    ColorTempPC2                         int16u
+    123    WB_RGGBLevelsPC3                     int16u[4]
+    127    ColorTempPC3                         int16u
+    128    WB_RGGBLevelsCustom                  int16u[4]
+    132    ColorTempCustom                      int16u
+
+=head3 Canon ColorInfo Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    Saturation                           int16s
+      2    ColorHue                             int16s
+      3    ColorSpace                           int16s
 
 =head3 CanonCustom Functions1D Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   FocusingScreen                       int8u
-  0x0001   FinderDisplayDuringExposure          int8u
-  0x0002   ShutterReleaseNoCFCard               int8u
-  0x0003   ISOSpeedExpansion                    int8u
-  0x0004   ShutterAELButton                     int8u
-  0x0005   ManualTv                             int8u
-  0x0006   ExposureLevelIncrements              int8u
-  0x0007   USMLensElectronicMF                  int8u
-  0x0008   LCDPanels                            int8u
-  0x0009   AEBSequence                          int8u
-  0x000a   AFPointIllumination                  int8u
-  0x000b   AFPointSelection                     int8u
-  0x000c   MirrorLockup                         int8u
-  0x000d   AFPointSpotMetering                  int8u
-  0x000e   FillFlashAutoReduction               int8u
-  0x000f   ShutterCurtainSync                   int8u
-  0x0010   SafetyShiftInAvOrTv                  int8u
-  0x0011   AFPointActivationArea                int8u
-  0x0012   SwitchToRegisteredAFPoint            int8u
-  0x0013   LensAFStopButton                     int8u
-  0x0014   AIServoTrackingSensitivity           int8u
+      0    FocusingScreen                       int8u
+      1    FinderDisplayDuringExposure          int8u
+      2    ShutterReleaseNoCFCard               int8u
+      3    ISOSpeedExpansion                    int8u
+      4    ShutterAELButton                     int8u
+      5    ManualTv                             int8u
+      6    ExposureLevelIncrements              int8u
+      7    USMLensElectronicMF                  int8u
+      8    LCDPanels                            int8u
+      9    AEBSequence                          int8u
+     10    AFPointIllumination                  int8u
+     11    AFPointSelection                     int8u
+     12    MirrorLockup                         int8u
+     13    AFPointSpotMetering                  int8u
+     14    FillFlashAutoReduction               int8u
+     15    ShutterCurtainSync                   int8u
+     16    SafetyShiftInAvOrTv                  int8u
+     17    AFPointActivationArea                int8u
+     18    SwitchToRegisteredAFPoint            int8u
+     19    LensAFStopButton                     int8u
+     20    AIServoTrackingSensitivity           int8u
+
+=head3 CanonCustom Functions5D Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+      0    FocusingScreen                       int8u
+      1    SetFunctionWhenShooting              int8u
+      2    LongExposureNoiseReduction           int8u
+      3    FlashSyncSpeedAv                     int8u
+      4    Shutter-AELock                       int8u
+      5    AFAssistBeam                         int8u
+      6    ExposureLevelIncrements              int8u
+      7    FlashFiring                          int8u
+      8    ISOExpansion                         int8u
+      9    AEBSequence                          int8u
+     10    SuperimposedDisplay                  int8u
+     11    MenuButtonDisplayPosition            int8u
+     12    MirrorLockup                         int8u
+     13    AFPointSelectionMethod               int8u
+     14    ETTLII                               int8u
+     15    ShutterCurtainSync                   int8u
+     16    SafetyShiftInAvOrTv                  int8u
+     17    AFPointActivationArea                int8u
+     18    LCDDisplayReturnToShoot              int8u
+     19    LensAFStopButton                     int8u
+     20    AddOriginalDecisionData              int8u
+
+=head3 CanonCustom Functions10D Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+      1    SetButtonFunction                    int8u
+      2    ShutterReleaseNoCFCard               int8u
+      3    FlashSyncSpeedAv                     int8u
+      4    Shutter-AELock                       int8u
+      5    AFAssist                             int8u
+      6    ExposureLevelIncrements              int8u
+      7    AFPointRegistration                  int8u
+      8    RawAndJpgRecording                   int8u
+      9    AEBSequence                          int8u
+     10    SuperimposedDisplay                  int8u
+     11    MenuButtonDisplayPosition            int8u
+     12    MirrorLockup                         int8u
+     13    AssistButtonFunction                 int8u
+     14    FillFlashAutoReduction               int8u
+     15    ShutterCurtainSync                   int8u
+     16    SafetyShiftInAvOrTv                  int8u
+     17    LensAFStopButton                     int8u
+
+=head3 CanonCustom Functions20D Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+      0    SetFunctionWhenShooting              int8u
+      1    LongExposureNoiseReduction           int8u
+      2    FlashSyncSpeedAv                     int8u
+      3    Shutter-AELock                       int8u
+      4    AFAssistBeam                         int8u
+      5    ExposureLevelIncrements              int8u
+      6    FlashFiring                          int8u
+      7    ISOExpansion                         int8u
+      8    AEBSequence                          int8u
+      9    SuperimposedDisplay                  int8u
+     10    MenuButtonDisplayPosition            int8u
+     11    MirrorLockup                         int8u
+     12    AFPointSelectionMethod               int8u
+     13    ETTLII                               int8u
+     14    ShutterCurtainSync                   int8u
+     15    SafetyShiftInAvOrTv                  int8u
+     16    LensAFStopButton                     int8u
+     17    AddOriginalDecisionData              int8u
+
+=head3 CanonCustom Functions350D Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+      0    SetButtonCrossKeysFunc               int8u
+      1    LongExposureNoiseReduction           int8u
+      2    FlashSyncSpeedAv                     int8u
+      3    Shutter-AELock                       int8u
+      4    AFAssistBeam                         int8u
+      5    ExposureLevelIncrements              int8u
+      6    MirrorLockup                         int8u
+      7    ETTLII                               int8u
+      8    ShutterCurtainSync                   int8u
+
+=head3 CanonCustom FunctionsD30 Tags
+
+Custom functions for the EOS-D30 and D60.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+      1    LongExposureNoiseReduction           int8u
+      2    Shutter-AELock                       int8u
+      3    MirrorLockup                         int8u
+      4    ExposureLevelIncrements              int8u
+      5    AFAssist                             int8u
+      6    FlashSyncSpeedAv                     int8u
+      7    AEBSequence                          int8u
+      8    ShutterCurtainSync                   int8u
+      9    LensAFStopButton                     int8u
+     10    FillFlashAutoReduction               int8u
+     11    MenuButtonReturn                     int8u
+     12    SetButtonFunction                    int8u
+     13    SensorCleaning                       int8u
+     14    SuperimposedDisplay                  int8u
+     15    ShutterReleaseNoCFCard               int8u
+
+=head3 CanonCustom FuncsUnknown Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
+
+=head3 CanonCustom PersonalFuncs Tags
+
+Personal function settings for the EOS-1D.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    PF0CustomFuncRegistration            int16u
+      2    PF1DisableShootingModes              int16u
+      3    PF2DisableMeteringModes              int16u
+      4    PF3ManualExposureMetering            int16u
+      5    PF4ExposureTimeLimits                int16u
+      6    PF5ApertureLimits                    int16u
+      7    PF6PresetShootingModes               int16u
+      8    PF7BracketContinuousShoot            int16u
+      9    PF8SetBracketShots                   int16u
+     10    PF9ChangeBracketSequence             int16u
+     11    PF10RetainProgramShift               int16u
+     14    PF13DrivePriority                    int16u
+     15    PF14DisableFocusSearch               int16u
+     16    PF15DisableAFAssistBeam              int16u
+     17    PF16AutoFocusPointShoot              int16u
+     18    PF17DisableAFPointSel                int16u
+     19    PF18EnableAutoAFPointSel             int16u
+     20    PF19ContinuousShootSpeed             int16u
+     21    PF20LimitContinousShots              int16u
+     22    PF21EnableQuietOperation             int16u
+     24    PF23SetTimerLengths                  int16u
+     25    PF24LightLCDDuringBulb               int16u
+     26    PF25DefaultClearSettings             int16u
+     27    PF26ShortenReleaseLag                int16u
+     28    PF27ReverseDialRotation              int16u
+     29    PF28NoQuickDialExpComp               int16u
+     30    PF29QuickDialSwitchOff               int16u
+     31    PF30EnlargementMode                  int16u
+     32    PF31OriginalDecisionData             int16u
+
+=head3 CanonCustom PersonalFuncValues Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    PF1Value                             int16u
+      2    PF2Value                             int16u
+      3    PF3Value                             int16u
+      4    PF4ExposureTimeMin                   int16u
+      5    PF4ExposureTimeMax                   int16u
+      6    PF5ApertureMin                       int16u
+      7    PF5ApertureMax                       int16u
+      8    PF8BracketShots                      int16u
+      9    PF19ShootingSpeedLow                 int16u
+     10    PF19ShootingSpeedHigh                int16u
+     11    PF20MaxContinousShots                int16u
+     12    PF23ShutterButtonTime                int16u
+     13    PF23FELockTime                       int16u
+     14    PF23PostReleaseTime                  int16u
+     15    PF25AEMode                           int16u
+     16    PF25MeteringMode                     int16u
+     17    PF25DriveMode                        int16u
+     18    PF25AFMode                           int16u
+     19    PF25AFPointSel                       int16u
+     20    PF25ImageSize                        int16u
+     21    PF25WBMode                           int16u
+     22    PF25Parameters                       int16u
+     23    PF25ColorMatrix                      int16u
+     24    PF27Value                            int16u
 
 =head2 Casio Tags
 
@@ -1873,7 +2270,7 @@ Lens information for the 1D, 1DS and 1D Mark II only.
   0x000d   FocusMode                            int16u
   0x0014   ISO                                  int16u
   0x0019   WhiteBalance                         int16u
-  0x001d   FocalLength                          rational32u
+  0x001d   FocalLength                          rational64u
   0x001f   Saturation                           int16u
   0x0020   Contrast                             int16u
   0x0021   Sharpness                            int16u
@@ -1914,7 +2311,7 @@ been decoded.  Use the Unknown (-u) option to extract PrintIM information.
   0x1003   Saturation                           int16u
   0x1004   Contrast                             int16u
   0x1010   FujiFlashMode                        int16u
-  0x1011   FlashStrength                        rational32s
+  0x1011   FlashStrength                        rational64s
   0x1020   Macro                                int16u
   0x1021   FocusMode                            int16u
   0x1030   SlowSync                             int16u
@@ -1950,9 +2347,10 @@ much of the Kodak information remains unknown.
 
 The table below contains the most common set of Kodak tags.  The following
 Kodak camera models have been tested and found to use these tags:  CX6330,
-CX7330, CX7430, CX7530, DC4800, DC4900, DX3500, DX3600, DX3900, DX4330,
-DX4530, DX4900, DX6340, DX6440, DX6490, DX7440, DX7590, DX7630, LS420,
-LS443, LS743 and LS753.
+CX7330, CX7430, CX7525, CX7530, DC4800, DC4900, DX3500, DX3600, DX3900,
+DX4330, DX4530, DX4900, DX6340, DX6440, DX6490, DX7440, DX7590, DX7630,
+EasyShare-One, LS420, LS443, LS633, LS743, LS753, Z700, Z730, Z740, Z760 and
+Z7560.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2004,7 +2402,7 @@ These tags are used by the DC265 and DC290.
 
 =head3 Kodak Type3 Tags
 
-These tags are used by the DC280, DC3400 and DC5000.
+These tags are used by the DC240, DC280, DC3400 and DC5000.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2027,7 +2425,8 @@ These tags are used by the DC200 and DC215.
 
 =head3 Kodak Type5 Tags
 
-These tags are used by the CX4200, CX4230 and CX6200.
+These tags are used by the CX4200, CX4210, CX4230, CX4300, CX6200 and
+CX6230.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2107,8 +2506,8 @@ is used.
 
 =head3 Kodak SpecialEffects Tags
 
-The Kodak SpecialEffects and Borders tags are found in sub-IFD's within
-the Kodak "Meta" JPEG APP3 segment.
+The Kodak SpecialEffects and Borders tags are found in sub-IFD's within the
+Kodak "Meta" JPEG APP3 segment.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -2230,7 +2629,7 @@ different places.)
   0x0008   FlashSetting                         string
   0x0009   FlashType                            string[13]
   0x000b   WhiteBalanceFineTune                 int16u
-  0x000c   ColorBalance1                        rational32u[4]
+  0x000c   ColorBalance1                        rational64u[4]
   0x000e   ExposureDifference                   undef[4]
   0x000f   ISOSelection                         string
   0x0010   DataDump                             N
@@ -2239,15 +2638,15 @@ different places.)
   0x0013   ISOSetting                           int16u[2]
   0x0016   ImageBoundary                        int16u[4]
   0x0018   FlashExposureBracketValue            int32s~
-  0x0019   ExposureBracketValue                 rational32s~
+  0x0019   ExposureBracketValue                 rational64s~
   0x001d   SerialNumber                         N
   0x0080   ImageAdjustment                      string
   0x0081   ToneComp                             string
   0x0082   AuxiliaryLens                        string
   0x0083   LensType                             int8u
-  0x0084   Lens                                 rational32u[4]
-  0x0085   ManualFocusDistance                  rational32u
-  0x0086   DigitalZoom                          rational32u
+  0x0084   Lens                                 rational64u[4]
+  0x0085   ManualFocusDistance                  rational64u
+  0x0086   DigitalZoom                          rational64u
   0x0087   FlashMode                            int8u
   0x0088   AFPoint                              int32u
   0x0089   ShootingMode                         int16u~
@@ -2271,7 +2670,7 @@ different places.)
            LensData0201                         Nikon LensData01
            LensDataUnknown
   0x0099   NEFThumbnailSize                     int16u[2]
-  0x009a   SensorPixelSize                      rational32u[2]
+  0x009a   SensorPixelSize                      rational64u[2]
   0x00a0   SerialNumber                         string
   0x00a2   ImageDataSize                        Y
   0x00a7   ShutterCount                         N
@@ -2299,22 +2698,19 @@ different places.)
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    RedBalance                           int16u
-      1    BlueBalance                          int16u
+      0    WB_RBGGLevels                        int16u[4]!
 
 =head3 Nikon ColorBalance2 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    RedBalance                           rational16s
-      1    BlueBalance                          rational16s
+      0    WB_RGGBLevels                        int16u[4]!
 
 =head3 Nikon ColorBalance3 Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    RedBalance                           rational16s
-      1    BlueBalance                          rational16s
+      0    WB_RGBGLevels                        int16u[4]!
 
 =head3 Nikon LensData00 Tags
 
@@ -2323,7 +2719,7 @@ This structure is used by the D100 and newer D1X models.
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    LensDataVersion                      undef[4]
-      6    LensID                               int8u
+      6    LensIDNumber                         int8u
       7    LensFStops                           int8u
       8    MinFocalLength                       int8u
       9    MaxFocalLength                       int8u
@@ -2345,7 +2741,7 @@ which make writing more difficult.
       8    FocusPosition                        N
       9    FocusDistance                        N
      10    FocalLength                          N
-     11    LensID                               N
+     11    LensIDNumber                         N
      12    LensFStops                           N
      13    MinFocalLength                       N
      14    MaxFocalLength                       N
@@ -2520,8 +2916,8 @@ and Agfa cameras.
   0x0201   Quality                              int16u~
   0x0202   Macro                                int16u
   0x0203   BWMode                               int16u
-  0x0204   DigitalZoom                          rational32u
-  0x0205   FocalPlaneDiagonal                   rational32u
+  0x0204   DigitalZoom                          rational64u
+  0x0205   FocalPlaneDiagonal                   rational64u
   0x0207   CameraType                           string
   0x0208   TextInfo                             Olympus TextInfo
   0x0209   CameraID                             string
@@ -2548,7 +2944,7 @@ and Agfa cameras.
   0x102d   CoringFilter                         int16u
   0x102e   OlympusImageWidth                    int32u
   0x102f   OlympusImageHeight                   int32u
-  0x1034   CompressionRatio                     rational32u
+  0x1034   CompressionRatio                     rational64u
   0x1035   PreviewImageValid                    int32u
   0x1036   PreviewImageStart                    int32u*
   0x1037   PreviewImageLength                   int32u*
@@ -2576,7 +2972,7 @@ any information found here will be extracted, even if the tag is not listed.
   0x0000   EquipmentVersion                     undef[4]
   0x0100   FirmwareVersion2                     string[6]
   0x0101   SerialNumber                         string[32]
-  0x0103   FocalPlaneDiagonal                   rational32u
+  0x0103   FocalPlaneDiagonal                   rational64u
   0x0104   BodyFirmwareVersion                  int32u
   0x0201   LensType                             int8u[6]~
   0x0202   LensSerialNumber                     string[32]
@@ -2608,7 +3004,7 @@ any information found here will be extracted, even if the tag is not listed.
   0x0303   AFSearch                             int16u
   0x0304   AFAreas                              int32u[64]~
   0x0400   FlashMode                            int16u
-  0x0401   FlashExposureCompensation            rational32s
+  0x0401   FlashExposureCompensation            rational64s
   0x0501   WhiteBalanceTemperature              int16u
   0x0502   WhiteBalanceBracket                  int16s
   0x0503   CustomSaturation                     int16s[3]~
@@ -2620,7 +3016,7 @@ any information found here will be extracted, even if the tag is not listed.
   0x050a   NoiseReduction                       int16u
   0x050b   DistortionCorrection                 int16u
   0x050c   ShadingCompensation                  int16u
-  0x050d   CompressionFactor                    rational32u
+  0x050d   CompressionFactor                    rational64u
   0x050f   Gradation                            int16s
   0x0600   Sequence                             int16u[2]~
   0x0603   ImageQuality2                        int16u
@@ -2630,7 +3026,7 @@ any information found here will be extracted, even if the tag is not listed.
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0000   RawDevVersion                        undef[4]
-  0x0100   RawDevExposureBiasValue              rational32s
+  0x0100   RawDevExposureBiasValue              rational64s
   0x0101   RawDevWhiteBalanceValue              int16u
   0x0102   RawDevWBFineAdjustment               int16s
   0x0103   RawDevGrayPoint                      int16u[3]
@@ -2695,6 +3091,16 @@ Panasonic tags are also used for Leica cameras.
   0x002c   Contrast                             int16u
   0x002d   NoiseReduction                       int16u
   0x0e00   PrintIM                              PrintIM
+
+=head3 Panasonic Type2 Tags
+
+This type of maker notes is used by models such as the NV-DS65, PV-D2002,
+PV-DC3000, PV-L2001 and PV-SD4090.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    MakerNoteVersion                     N
+      3    Gain                                 N
 
 =head2 Pentax Tags
 
@@ -2803,7 +3209,7 @@ information.
   0x0200   SpecialMode                          int32u[3]
   0x0201   SanyoQuality                         int16u
   0x0202   Macro                                int16u
-  0x0204   DigitalZoom                          rational32u
+  0x0204   DigitalZoom                          rational64u
   0x0207   SoftwareVersion                      Y
   0x0208   PictInfo                             Y
   0x0209   CameraID                             Y
@@ -2820,7 +3226,7 @@ information.
   0x021d   LightSourceSpecial                   int16u
   0x021e   Resaved                              int16u
   0x021f   SceneSelect                          int16u
-  0x0223   ManualFocusDistance                  rational32u
+  0x0223   ManualFocusDistance                  rational64u
   0x0224   SequenceShotInterval                 int16u
   0x0225   FlashMode                            int16u
   0x0e00   PrintIM                              PrintIM
@@ -2866,6 +3272,7 @@ tags.
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0e00   PrintIM                              PrintIM
+  0xb020   ColorModeSetting                     N
 
 =head3 Sony SRF Tags
 
@@ -2878,6 +3285,50 @@ encrypted, but thanks to Dave Coffin the decryption algorithm is known.
   ------   --------                             --------
   0x0000   SRF2_Key                             N
   0x0001   DataKey                              N
+
+=head3 Sony SR2Private Tags
+
+The SR2 format uses the DNGPrivateData tag to reference a private IFD
+containing these tags.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x7200   SR2SubIFDOffset                      N
+  0x7201   SR2SubIFDLength                      N
+  0x7221   SR2SubIFDKey                         N
+
+=head3 Sony SR2SubIFD Tags
+
+Tags in the encrypted SR2SubIFD
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x7303   WB_GRBGLevels                        N
+  0x74a0   MaxApertureAtMaxFocal                N
+  0x74a1   MaxApertureAtMinFocal                N
+  0x74c0   SR2DataIFD                           Sony SR2DataIFD
+
+=head3 Sony SR2DataIFD Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x7770   ColorMode                            N
+
+=head2 DNG OriginalRaw Tags
+
+This table defines tags extracted from the DNG OriginalRawFileData
+information.  All other DNG tags are defined in the EXIF table.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   OriginalRawImage                     N
+  0x0001   OriginalRawResource                  N
+  0x0002   OriginalRawFileType                  N
+  0x0003   OriginalRawCreator                   N
+  0x0004   OriginalTHMImage                     N
+  0x0005   OriginalTHMResource                  N
+  0x0006   OriginalTHMFileType                  N
+  0x0007   OriginalTHMCreator                   N
 
 =head2 CanonRaw Tags
 
@@ -2907,18 +3358,21 @@ change size.
   0x1011   ShutterReleaseTiming                 Y
   0x1016   ReleaseSetting                       Y
   0x101c   BaseISO                              Y
+  0x1028   CanonFlashInfo?                      Y[4]
   0x1029   CanonFocalLength                     Canon FocalLength
   0x102a   CanonShotInfo                        Canon ShotInfo
   0x102c   CanonColorInfo2                      N
   0x102d   CanonCameraSettings                  Canon CameraSettings
-  0x1031   SensorInfo                           CanonRaw SensorInfo
+  0x1031   SensorInfo                           Canon SensorInfo
   0x1033   CanonCustomFunctions10D              CanonCustom Functions10D
            CanonCustomFunctions20D              CanonCustom Functions20D
            CanonCustomFunctionsD30              CanonCustom FunctionsD30
   0x1038   CanonPictureInfo                     Canon PictureInfo
-  0x10a9   WhiteBalanceTable                    Canon WhiteBalance
+  0x1093   CanonFileInfo                        Canon FileInfo
+  0x10a9   ColorBalance                         Canon ColorBalance
   0x10ae   ColorTemperature                     Y
   0x10b4   ColorSpace                           Y
+  0x10b5   RawJpgInfo                           CanonRaw RawJpgInfo
   0x1803   ImageFormat                          CanonRaw ImageFormat
   0x1804   RecordID                             Y
   0x1806   SelfTimerTime                        Y
@@ -2930,7 +3384,9 @@ change size.
   0x1814   MeasuredEV                           float
   0x1817   FileNumber                           Y
   0x1818   ExposureInfo                         CanonRaw ExposureInfo
+  0x1834   CanonModelID                         N
   0x1835   DecoderTable                         N
+  0x183b   SerialNumberFormat                   int32u
   0x2005   RawData                              N
   0x2007   JpgFromRaw                           resize
   0x2008   ThumbnailImage                       resize
@@ -2949,16 +3405,14 @@ change size.
       0    Make                                 string[6]
       6    Model                                string[$size-6]
 
-=head3 CanonRaw SensorInfo Tags
+=head3 CanonRaw RawJpgInfo Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      1    SensorWidth                          N
-      2    SensorHeight                         N
-      5    SensorLeftBorder                     N
-      6    SensorTopBorder                      N
-      7    SensorRightBorder                    N
-      8    SensorBottomBorder                   N
+      1    RawJpgQuality                        int16u
+      2    RawJpgSize                           int16u
+      3    RawJpgWidth                          int16u
+      4    RawJpgHeight                         int16u
 
 =head3 CanonRaw ImageFormat Tags
 
@@ -3001,6 +3455,24 @@ change size.
       0    ExposureCompensation                 float
       1    TvValue                              float
       2    AvValue                              float
+
+=head2 KyoceraRaw Tags
+
+Tags for Kyocera Contax N Digital RAW images.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    FirmwareVersion                      N
+     12    Model                                N
+     25    Make                                 N
+     33    DateTimeOriginal                     N
+     52    ISO                                  N
+     56    ExposureTime                         N
+     60    WB_RGGBLevels                        N
+     88    FNumber                              N
+    104    MaxAperture                          N
+    112    FocalLength                          N
+    124    Lens                                 N
 
 =head2 SigmaRaw Tags
 
@@ -3136,9 +3608,9 @@ Extended header data found in version 2.1 and 2.2 files
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    JFIFVersion                          N
-      2    ResolutionUnit                       N
-      3    XResolution                          N
-      5    YResolution                          N
+      2    ResolutionUnit                       int8u
+      3    XResolution                          int16u
+      5    YResolution                          int16u
 
 =head3 JFIF Extension Tags
 
@@ -6150,26 +6622,25 @@ ID3 version 2.4 tags
   'WPUB'   PublisherURL                         N
   'WXXX'   UserDefinedURL                       N
 
-=head2 WAV Tags
+=head2 RIFF Tags
 
-WAV is the native digital audio format for Windows.  This is a RIFF-based
-format which supports meta information embedded in two types of RIFF C<LIST>
-chunks: C<INFO> and C<exif>.  As well, some information about the audio
-content is extracted from the C<fmt > chunk.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  'LIST'   List                                 WAV List
-  'fmt '   Format                               WAV Format
-
-=head3 WAV List Tags
+Windows WAV and AVI files are RIFF format files.  Meta information embedded
+in two types of RIFF C<LIST> chunks: C<INFO> and C<exif>.  As well, some
+information about the audio content is extracted from the C<fmt > chunk.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  'INFO'   Info                                 WAV Info
-  'exif'   Exif                                 WAV Exif
+  'LIST'   List                                 RIFF List
+  'fmt '   Format                               RIFF Format
 
-=head3 WAV Info Tags
+=head3 RIFF List Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'INFO'   Info                                 RIFF Info
+  'exif'   Exif                                 RIFF Exif
+
+=head3 RIFF Info Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -6197,7 +6668,7 @@ content is extracted from the C<fmt > chunk.
   'ISRF'   SourceForm                           N
   'ITCH'   Technician                           N
 
-=head3 WAV Exif Tags
+=head3 RIFF Exif Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -6209,7 +6680,7 @@ content is extracted from the C<fmt > chunk.
   'eucm'   UserComment                          N
   'ever'   ExifVersion                          N
 
-=head3 WAV Format Tags
+=head3 RIFF Format Tags
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -6218,6 +6689,330 @@ content is extracted from the C<fmt > chunk.
       2    SampleRate                           N
       4    AvgBytesPerSec                       N
       7    BitsPerSample                        N
+
+=head2 AIFF Tags
+
+Only the tags decoded by ExifTool are listed in this table.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  '(c) '   Copyright                            N
+  'ANNO'   Annotation                           N
+  'AUTH'   Author                               N
+  'COMM'   Common                               AIFF Common
+  'COMT'   Comment                              AIFF Comment
+  'FVER'   FormatVersion                        AIFF FormatVers
+  'ID3 '   ID3                                  ID3
+  'NAME'   Name                                 N
+
+=head3 AIFF Common Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    NumChannels                          N
+      1    NumSampleFrames                      N
+      3    SampleSize                           N
+      4    SampleRate                           N
+      9    CompressionType                      N
+
+=head3 AIFF Comment Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0000   CommentTime                          N
+  0x0001   MarkerID                             N
+  0x0002   Comment                              N
+
+=head3 AIFF FormatVers Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    FormatVersionTime                    N
+
+=head2 ASF Tags
+
+ASF format is used by Windows WMA and WMV files.  Tag ID's aren't listed
+because they are huge 128-bit GUID's that would ruin the formatting of this
+table.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  SimpleIndex                                   N
+  TimecodeIndex                                 N
+  Header                                        ASF Header
+  Data                                          N
+  Index                                         N
+  MediaIndex                                    N
+
+=head3 ASF Header Tags
+
+  Tag Name                                      Writable
+  --------                                      --------
+  Padding                                       N
+  ScriptCommand                                 N
+  ContentBranding                               ASF ContentBranding
+  ContentEncryption                             N
+  DigitalSignature                              N
+  ExtendedContentEncryption                     N
+  HeaderExtension                               ASF HeaderExtension
+  ContentDescription                            ASF ContentDescr
+  ErrorCorrection                               N
+  StreamBitrateProps                            N
+  CodecList                                     ASF CodecList
+  FileProperties                                ASF FileProperties
+  StreamProperties                              ASF StreamProperties
+  ExtendedContentDescr                          ASF ExtendedDescr
+  BitrateMutualExclusion                        N
+  Marker                                        N
+
+=head3 ASF ContentBranding Tags
+
+  Tag Name                                      Writable
+  --------                                      --------
+  BannerImageType                               N
+  BannerImage                                   N
+  BannerImageURL                                N
+  CopyrightURL                                  N
+
+=head3 ASF HeaderExtension Tags
+
+  Tag Name                                      Writable
+  --------                                      --------
+  ExtendedStreamProps                           N
+  AdvancedContentEncryption                     N
+  MetadataLibrary                               ASF Metadata
+  TimecodeIndexParms                            N
+  Compatibility                                 N
+  LanguageList                                  N
+  AdvancedMutualExcl                            N
+  BandwidthSharing                              N
+  Reserved1                                     N
+  Metadata                                      ASF Metadata
+  GroupMutualExclusion                          N
+  StreamPrioritization                          N
+  IndexParameters                               N
+
+=head3 ASF Metadata Tags
+
+  Tag Name                                      Writable
+  --------                                      --------
+  [no tags known]
+
+=head3 ASF ContentDescr Tags
+
+  Tag Name                                      Writable
+  --------                                      --------
+  Title                                         N
+  Author                                        N
+  Copyright                                     N
+  Description                                   N
+  Rating                                        N
+
+=head3 ASF CodecList Tags
+
+  Tag Name                                      Writable
+  --------                                      --------
+  AudioCodecDescription                         N
+  AudioCodecName                                N
+  OtherCodecDescription                         N
+  OtherCodecName                                N
+  VideoCodecDescription                         N
+  VideoCodecName                                N
+
+=head3 ASF FileProperties Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    FileID                               N
+     16    FileSize                             N
+     24    CreationDate                         N
+     32    DataPackets                          N
+     40    PlayDuration                         N
+     48    SendDuration                         N
+     56    Preroll                              N
+     64    Flags                                N
+     68    MinPacketSize                        N
+     72    MaxPacketSize                        N
+     76    MaxBitrate                           N
+
+=head3 ASF StreamProperties Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    StreamType                           N
+     16    ErrorCorrectionType                  N
+     32    TimeOffset                           N
+     48    StreamNumber                         N
+
+=head3 ASF ExtendedDescr Tags
+
+  Tag Name                                      Writable
+  --------                                      --------
+  ASFLeakyBucketPairs                           N
+  ASFPacketCount                                N
+  ASFSecurityObjectsSize                        N
+  AlbumArtist                                   N
+  AlbumCoverURL                                 N
+  AlbumTitle                                    N
+  AspectRatioX                                  N
+  AspectRatioY                                  N
+  AudioFileURL                                  N
+  AudioSourceURL                                N
+  Author                                        N
+  AuthorURL                                     N
+  AverageLevel                                  N
+  BannerImageData                               N
+  BannerImageType                               N
+  BannerImageURL                                N
+  BeatsPerMinute                                N
+  Bitrate                                       N
+  Broadcast                                     N
+  BufferAverage                                 N
+  Can_Skip_Backward                             N
+  Can_Skip_Forward                              N
+  Category                                      N
+  Codec                                         N
+  Composer                                      N
+  Conductor                                     N
+  ContainerFormat                               N
+  ContentDistributor                            N
+  ContentGroupDescription                       N
+  Copyright                                     N
+  CopyrightURL                                  N
+  CurrentBitrate                                N
+  DRM                                           N
+  DRM_ContentID                                 N
+  DRM_DRMHeader                                 N
+  DRM_DRMHeader_ContentDistributor              N
+  DRM_DRMHeader_ContentID                       N
+  DRM_DRMHeader_IndividualizedVersion           N
+  DRM_DRMHeader_KeyID                           N
+  DRM_DRMHeader_LicenseAcqURL                   N
+  DRM_DRMHeader_SubscriptionContentID           N
+  DRM_IndividualizedVersion                     N
+  DRM_KeyID                                     N
+  DRM_LASignatureCert                           N
+  DRM_LASignatureLicSrvCert                     N
+  DRM_LASignaturePrivKey                        N
+  DRM_LASignatureRootCert                       N
+  DRM_LicenseAcqURL                             N
+  DRM_V1LicenseAcqURL                           N
+  DVDID                                         N
+  Description                                   N
+  Director                                      N
+  Duration                                      N
+  EncodedBy                                     N
+  EncodingSettings                              N
+  EncodingTime                                  N
+  FileSize                                      N
+  Genre                                         N
+  GenreID                                       N
+  HasArbitraryDataStream                        N
+  HasAttachedImages                             N
+  HasAudio                                      N
+  HasFileTransferStream                         N
+  HasImage                                      N
+  HasScript                                     N
+  HasVideo                                      N
+  ISRC                                          N
+  InitialKey                                    N
+  IsVBR                                         N
+  Is_Protected                                  N
+  Is_Trusted                                    N
+  Language                                      N
+  Lyrics                                        N
+  Lyrics_Synchronised                           N
+  MCDI                                          N
+  MediaClassPrimaryID                           N
+  MediaClassSecondaryID                         N
+  MediaCredits                                  N
+  MediaIsDelay                                  N
+  MediaIsFinale                                 N
+  MediaIsLive                                   N
+  MediaIsPremiere                               N
+  MediaIsRepeat                                 N
+  MediaIsSAP                                    N
+  MediaIsStereo                                 N
+  MediaIsSubtitled                              N
+  MediaIsTape                                   N
+  MediaNetworkAffiliation                       N
+  MediaOriginalBroadcastDateTime                N
+  MediaOriginalChannel                          N
+  MediaStationCallSign                          N
+  MediaStationName                              N
+  ModifiedBy                                    N
+  Mood                                          N
+  NSC_Address                                   N
+  NSC_Description                               N
+  NSC_Email                                     N
+  NSC_Name                                      N
+  NSC_Phone                                     N
+  NumberOfFrames                                N
+  OptimalBitrate                                N
+  OriginalAlbumTitle                            N
+  OriginalArtist                                N
+  OriginalFilename                              N
+  OriginalLyricist                              N
+  OriginalReleaseTime                           N
+  OriginalReleaseYear                           N
+  ParentalRating                                N
+  ParentalRatingReason                          N
+  PartOfSet                                     N
+  PeakBitrate                                   N
+  PeakValue                                     N
+  Period                                        N
+  Picture                                       ASF Preview
+  PlaylistDelay                                 N
+  Producer                                      N
+  PromotionURL                                  N
+  ProtectionType                                N
+  Provider                                      N
+  ProviderCopyright                             N
+  ProviderRating                                N
+  ProviderStyle                                 N
+  Publisher                                     N
+  RadioStationName                              N
+  RadioStationOwner                             N
+  Rating                                        N
+  Seekable                                      N
+  SharedUserRating                              N
+  Signature_Name                                N
+  StreamTypeInfo                                N
+  Stridable                                     N
+  SubTitle                                      N
+  SubTitleDescription                           N
+  SubscriptionContentID                         N
+  Text                                          N
+  Title                                         N
+  ToolName                                      N
+  ToolVersion                                   N
+  Track                                         N
+  TrackNumber                                   N
+  UniqueFileIdentifier                          N
+  UserWebURL                                    N
+  VBRPeak                                       N
+  VideoClosedCaptioning                         N
+  VideoFrameRate                                N
+  VideoHeight                                   N
+  VideoWidth                                    N
+  WMADRCAverageReference                        N
+  WMADRCAverageTarget                           N
+  WMADRCPeakReference                           N
+  WMADRCPeakTarget                              N
+  WMCollectionGroupID                           N
+  WMCollectionID                                N
+  WMContentID                                   N
+  Writer                                        N
+  Year                                          N
+
+=head3 ASF Preview Tags
+
+  Tag Name                                      Writable
+  --------                                      --------
+  PreviewType                                   N
+  PreviewMimeType                               N
+  PreviewDescription                            N
+  PreviewImage                                  N
 
 =head2 QuickTime Tags
 
@@ -6425,6 +7220,23 @@ tags found in this segment.
   'shtr'               ExposureTime             N
   'ylevel'             Ylevel                   N
 
+=head2 AFCP Tags
+
+AFCP stands for AXS File Concatenation Protocol, and is a poorly designed
+protocol for appending information to the end of files.  This can be used as
+an auxiliary technique to store IPTC information in images, but is
+incompatible with some file formats.
+
+ExifTool will read and write (but not create) AFCP IPTC information in JPEG
+images, but not other image formats.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'IPTC'   IPTC                                 IPTC
+  'Nail'   ThumbnailImage                       N
+  'PrVw'   PreviewImage                         N
+  'TEXT'   Text                                 N
+
 =head2 Extra Tags
 
 The extra tags represent information found in the image but not associated
@@ -6503,6 +7315,14 @@ is extracted.
                        FocalUnits
                        Lens
                        ScaleFactor35efl
+  LensID               Nikon:LensIDNumber       N
+                       LensFStops
+                       MinFocalLength
+                       MaxFocalLength
+                       MaxApertureAtMinFocal
+                       MaxApertureAtMaxFocal
+                       MCUVersion
+                       Nikon:LensType
   LensSpec             Nikon:Lens               N
                        Nikon:LensType
   PreviewImage         PreviewImageStart        Y
@@ -6515,11 +7335,13 @@ is extracted.
   ScaleFactor35efl     FocalLength              N
                        FocalLengthIn35mmFormat
                        FocalPlaneDiagonal
+                       FocalPlaneXSize
+                       FocalPlaneYSize
                        FocalPlaneResolutionUnit
                        FocalPlaneXResolution
                        FocalPlaneYResolution
-                       CanonImageWidthAsShot
-                       CanonImageHeightAsShot
+                       CanonImageWidth
+                       CanonImageHeight
                        ExifImageWidth
                        ExifImageLength
                        ImageWidth
@@ -6543,7 +7365,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

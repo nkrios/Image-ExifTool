@@ -24,8 +24,9 @@ BEGIN {
 use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
+use Image::ExifTool::Nikon;
 
-$VERSION = '1.22';
+$VERSION = '1.27';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -74,7 +75,7 @@ verified, or not very useful -- these tags are not extracted by ExifTool
 unless the Unknown (-u) option is enabled.  Be aware that some tag names are
 different than the descriptions printed out by default when extracting
 information with "exiftool".  To see the tag names instead of the
-descriptions, use "exiftool -S".
+descriptions, use "exiftool -s".
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an "N" in this column means the tag is writable.  A "Y"
@@ -102,7 +103,7 @@ B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
 reason for this is to make the tag names more consistent across different
 types of meta information.  To determine a tag name, either consult this
-documentation or run "exiftool -S" on a file containing the information in
+documentation or run "exiftool -s" on a file containing the information in
 question.
 },
     EXIF => q{
@@ -157,7 +158,7 @@ but this information is extracted by ExifTool anyway.
     IPTC => q{
 IPTC stands for 'International Press Telecommunications Council'.  This is
 an older meta information format that is slowly being phased out in favor of
-XMP. IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS, PDF, PSD
+XMP.  IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS, PDF, PSD
 and DNG images.
 
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
@@ -188,8 +189,8 @@ frequently with different models.  Some information has been decoded, but
 much of the Kodak information remains unknown.
 },
     'Kodak SpecialEffects' => q{
-The Kodak SpecialEffects and Borders tags are found in sub-IFD's within
-the Kodak "Meta" JPEG APP3 segment.
+The Kodak SpecialEffects and Borders tags are found in sub-IFD's within the
+Kodak "Meta" JPEG APP3 segment.
 },
     Minolta => q{
 These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn't
@@ -251,7 +252,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 ~head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -283,7 +284,7 @@ sub new
 # loop through all tables, accumulating TagLookup and TagName information
 #
     my (%tagNameInfo, %id, %longID, %shortName, %tableNum,
-        %tagLookup, %tagExists, %tableWritable);
+        %tagLookup, %tagExists, %tableWritable, %sepTable);
     $self->{TAG_NAME_INFO} = \%tagNameInfo;
     $self->{TAG_ID} = \%id;
     $self->{LONG_ID} = \%longID;
@@ -292,6 +293,7 @@ sub new
     $self->{TAG_LOOKUP} = \%tagLookup;
     $self->{TAG_EXISTS} = \%tagExists;
     $self->{TABLE_WRITABLE} = \%tableWritable;
+    $self->{SEPARATE_TABLE} = \%sepTable;
 
     Image::ExifTool::LoadAllTables();
     my @tableNames = sort keys %allTables;
@@ -319,7 +321,8 @@ sub new
         my $writeProc = $table->{WRITE_PROC};
         $writeProc and &$writeProc();
         # save all tag names
-        my ($tagID, $binaryTable);
+        my ($tagID, $binaryTable, $noID);
+        $noID = 1 if $short =~ /^(Composite|XMP|Extra|ASF.*)$/;
         if ($table->{PROCESS_PROC} and
             $table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData)
         {
@@ -327,7 +330,7 @@ sub new
             $id{$tableName} = 'Index';
         } elsif ($short eq 'IPTC') {
             $id{$tableName} = 'Record';
-        } elsif ($short !~ /^(Composite|XMP|Extra)$/) {
+        } elsif (not $noID) {
             $id{$tableName} = 'Tag ID';
         }
         $caseInsensitive = ($tableName =~ /::XMP::/);
@@ -375,35 +378,62 @@ TagID:  foreach $tagID (@keys) {
                 }
                 my $printConv = $$tagInfo{PrintConv};
                 if (ref $printConv eq 'HASH') {
-                    $caseInsensitive = 0;
-                    my @pk = sort NumbersFirst keys %$printConv;
-                    foreach (@pk) {
-                        next if $_ eq '';
-                        my $index;
-                        if ($$tagInfo{PrintHex}) {
-                            $index = sprintf('0x%x',$_);
-                        } elsif (/^[-+]?\d+$/) {
-                            $index = $_;
-                        } else {
-                            # ignore unprintable values
-                            next if /[\x00-\x1f\x80-\xff]/;
-                            $index = "'$_'";
+                    if ($$tagInfo{SeparateTable}) {
+                        $subdir = 1;
+                        my $s = $$tagInfo{SeparateTable};
+                        ($s = $short) =~ s/ .*// if $s eq '1';
+                        $s .= " $$tagInfo{Name}";
+                        push @values, $s;
+                        $sepTable{$s} = $printConv;
+                    } else {
+                        $caseInsensitive = 0;
+                        my @pk = sort NumbersFirst keys %$printConv;
+                        my $bits;
+                        foreach (@pk) {
+                            next if $_ eq '';
+                            $_ eq 'BITMASK' and $bits = $$printConv{$_}, next;
+                            my $index;
+                            if ($$tagInfo{PrintHex}) {
+                                $index = sprintf('0x%x',$_);
+                            } elsif (/^[-+]?\d+$/) {
+                                $index = $_;
+                            } else {
+                                # ignore unprintable values
+                                next if /[\x00-\x1f\x80-\xff]/;
+                                $index = "'$_'";
+                            }
+                            push @values, "$index = " . $$printConv{$_};
                         }
-                        push @values, "$index = " . $$printConv{$_};
+                        if ($bits) {
+                            my @pk = sort NumbersFirst keys %$bits;
+                            foreach (@pk) {
+                                push @values, "Bit $_ = " . $$bits{$_};
+                            }
+                        }
+                    }
+                } elsif ($printConv and $printConv =~ /DecodeBits\(\$val,\s*(\{.*\})\s*\)/s) {
+                    my $bits = eval $1;
+                    if ($@) {
+                        warn $@;
+                    } else {
+                        my @pk = sort NumbersFirst keys %$bits;
+                        foreach (@pk) {
+                            push @values, "Bit $_ = " . $$bits{$_};
+                        }
                     }
                 }
                 my $writable;
+                if (defined $$tagInfo{Writable}) {
+                    $writable = $$tagInfo{Writable};
+                } else {
+                    $writable = $$table{WRITABLE};
+                }
+                $writable = $$tagInfo{Format} if $writable and $$tagInfo{Format};
                 if ($subdir) {
                     # flag a subdirectory by setting writable to '-'
                     # (if this is a writable subdirectory, prefix writable by '-')
-                    $writable = '-' . ($$tagInfo{Writable} || '');
+                    $writable = '-' . ($$tagInfo{Writable} ? $writable : '');
                 } else {
-                    if (defined $$tagInfo{Writable}) {
-                        $writable = $$tagInfo{Writable};
-                    } else {
-                        $writable = $$table{WRITABLE};
-                    }
-                    $writable = $$tagInfo{Format} if $writable and $$tagInfo{Format};
                     # not writable if we can't do the inverse conversions
                     my $noPrintConvInv;
                     if ($writable) {
@@ -490,7 +520,7 @@ TagID:  foreach $tagID (@keys) {
 #
             my $tagIDstr;
             if ($tagID =~ /^\d+$/) {
-                if ($binaryTable or $short =~ /^IPTC\b/) {
+                if ($binaryTable or $short =~ /^IPTC\b/ or $short =~ /^CanonCustom/) {
                     $tagIDstr = $tagID;
                 } else {
                     $tagIDstr = sprintf("0x%.4x",$tagID);
@@ -743,21 +773,22 @@ sub GetTableOrder()
 # Inputs: 0) Filename, 1) optional category
 # Returns: True on success
 my %createdFiles;
-sub OpenHtmlFile($;$)
+sub OpenHtmlFile($;$$)
 {
-    my ($htmldir, $category) = @_;
-    my ($htmlFile, $title, $url);
+    my ($htmldir, $category, $sepTable) = @_;
+    my ($htmlFile, $head, $title, $url);
 
     if ($category) {
         my @names = split ' ', $category;
         my $class = shift @names;
         $htmlFile = "$htmldir/TagNames/$class.html";
-        $title = "$category Tags";
+        $head = $category . ($sepTable ? ' Values' : ' Tags');
+        ($title = $head) =~ s/ .* / /;
         @names and $url = join '_', @names;
     } else {
         $htmlFile = "$htmldir/TagNames/index.html";
         $category = 'ExifTool';
-        $title = 'ExifTool Tag Names';
+        $head = $title = 'ExifTool Tag Names';
     }
     if ($createdFiles{$htmlFile}) {
         open(HTMLFILE,">>${htmlFile}_tmp") or return 0;
@@ -766,8 +797,8 @@ sub OpenHtmlFile($;$)
         print HTMLFILE "<html>\n<head>\n<title>$title</title>\n</head>\n";
         print HTMLFILE "<body text='#000000' $bgBody>\n";
     }
-    $title = "<a name='$url'>$title</a>" if $url;
-    print HTMLFILE "<h2>$title</h2>\n" or return 0;
+    $head = "<a name='$url'>$head</a>" if $url;
+    print HTMLFILE "<h2>$head</h2>\n" or return 0;
     print HTMLFILE Doc2Html($docs{$category}),"\n" if $docs{$category};
     $createdFiles{$htmlFile} = 1;
     return 1;
@@ -840,10 +871,11 @@ sub CloseHtmlFiles()
 sub WriteTagNames($$)
 {
     my ($self, $podFile, $htmldir) = @_;
-    my ($tableName, $short, $url);
+    my ($tableName, $short, $url, @sepTables);
     my $tagNameInfo = $self->{TAG_NAME_INFO} or return 0;
     my $idTitle = $self->{TAG_ID};
     my $shortName = $self->{SHORT_NAME};
+    my $sepTable = $self->{SEPARATE_TABLE};
     my $success = 1;
     my %htmlFiles;
 
@@ -876,14 +908,44 @@ sub WriteTagNames($$)
         my $indent = '';
         if (@names) {
             $url .= '#' . join '_', @names;
-            $indent = '&nbsp; &nbsp; ';
+            $indent = '&nbsp; &nbsp; ' unless $url =~ /^DNG/;
         }
         print HTMLFILE "$indent<a href='$url'>$short</a>\n";
         ++$count;
     }
     print HTMLFILE "</td></tr></table></td></tr></table></blockquote>\n\n";
     # write all the tag tables
-    foreach $tableName (@tableNames) {
+    while (@tableNames or @sepTables) {
+        while (@sepTables) {
+            $tableName = shift @sepTables;
+            my $printConv = $$sepTable{$tableName};
+            next unless ref $printConv eq 'HASH';
+            $$sepTable{$tableName} = 1;
+            my $notes = $$printConv{Notes};
+            if ($notes) {
+                # remove unnecessary whitespace
+                $notes =~ s/(^\s+|\s+$)//g;
+                $notes =~ s/(^[ \t]+|[ \t]+$)//mg;
+            }
+            my $head = $tableName;
+            $head =~ s/.* //;
+            close HTMLFILE;
+            if (OpenHtmlFile($htmldir, $tableName, 1)) {
+                print HTMLFILE Doc2Html($notes), "\n" if $notes;
+                print HTMLFILE "<blockquote>\n";
+                print HTMLFILE "<table $bgHeading cellspacing=2 cellpadding=0><tr $bgBody><td>\n";
+                print HTMLFILE "<table cellspacing=1 cellpadding=0><tr $bgHeading><th>$head</th><th>Value</th></tr>\n";
+                foreach (sort NumbersFirst keys %$printConv) {
+                    next if $_ eq 'Notes';
+                    my $val = EscapeHTML($_);
+                    $val =~ /\s/ and $val =  "'$val'";
+                    print HTMLFILE "<tr><td>$val</td><td>= $$printConv{$_}</td></tr>\n";
+                }
+                print HTMLFILE "</table></td></tr></table></blockquote>\n\n";
+            }
+        }
+        last unless @tableNames;
+        $tableName = shift @tableNames;
         $short = $$shortName{$tableName};
         my $info = $$tagNameInfo{$tableName};
         my $id = $$idTitle{$tableName};
@@ -919,7 +981,7 @@ sub WriteTagNames($$)
             $hid = "<th>$id</th>";
             $wTag -= $podIdLen - $wID;
             $wID = $podIdLen;
-        } elsif ($short eq 'Extra' or $short =~ /^XMP/) {
+        } elsif ($short =~ /^(Extra|XMP|ASF)/) {
             $wTag += 9;
             $hid = '';
         } else {
@@ -931,7 +993,7 @@ sub WriteTagNames($$)
             $showGrp = 1;
             $wTag -= $wGrp + 1;
         }
-        my $head = ($short =~ / /) ? 'head3' : 'head2';
+        my $head = ($short =~ / / and not $short =~ /^DNG/) ? 'head3' : 'head2';
         print PODFILE "\n=$head $short Tags\n";
         print PODFILE $docs{$short} if $docs{$short};
         print PODFILE "\n$notes\n" if $notes;
@@ -991,7 +1053,13 @@ sub WriteTagNames($$)
             if ($wrStr =~ /^-/) {
                 $subdir = 1;
                 @vals = @$values;
-                $wrStr = shift @vals;
+                if ($$sepTable{$vals[0]}) {
+                    $wrStr =~ s/^-//;
+                    $wrStr = 'N' unless $wrStr;
+                } else {
+                    $wrStr = $vals[0];
+                }
+                shift @vals;
             }
             my $tag = shift @tags;
             printf PODFILE "%s%-${wTag}s", $idStr, $tag;
@@ -1060,7 +1128,12 @@ sub WriteTagNames($$)
                         my @names = split;
                         $url = (shift @names) . '.html';
                         @names and $url .= '#' . join '_', @names;
-                        push @values, "--&gt; <a href='$url'>$_ Tags</a>";
+                        my $suffix = ' Tags';
+                        if ($$sepTable{$_}) {
+                            push @sepTables, $_;
+                            $suffix = '';
+                        }
+                        push @values, "--&gt; <a href='$url'>$_$suffix</a>";
                     }
                 } else {
                     foreach (@$values) {
@@ -1121,7 +1194,7 @@ documentation.
 
 =head1 AUTHOR
 
-Copyright 2003-2005, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

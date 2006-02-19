@@ -1,12 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.69
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Name: Casio_4_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 1981 bytes
-[File, File, Time]  - File Modification Date/Time: 2005:10:19 09:45:19
+[File, File, Image]  - File Size: 1203 bytes
+[File, File, Time]  - File Modification Date/Time: 2006:02:06 11:56:30
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 160
-[File, File, Image]  - Image Height: 120
+[File, File, Image]  - Image Width: 8
+[File, File, Image]  - Image Height: 8
 [EXIF, IFD0, Camera] 271 - Make: CASIO
 [EXIF, IFD0, Camera] 272 - Camera Model Name: QV-3000EX
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -14,14 +14,14 @@
 [EXIF, IFD0, Image] 283 - Y Resolution: 72
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: Ver1.000
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2000:03:31 10:44:15
+[EXIF, IFD0, Time] 306 - Modify Date: 2000:03:31 10:44:15
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
-[EXIF, ExifIFD, Image] 33434 - Shutter Speed: 1/114
-[EXIF, ExifIFD, Image] 33437 - Aperture: 2.0
+[EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/114
+[EXIF, ExifIFD, Image] 33437 - F Number: 2.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0210
-[EXIF, ExifIFD, Time] 36867 - Shooting Date/Time: 2000:03:31 10:44:15
-[EXIF, ExifIFD, Time] 36868 - Date/Time Of Digitization: 2000:03:31 10:44:15
+[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2000:03:31 10:44:15
+[EXIF, ExifIFD, Time] 36868 - Create Date: 2000:03:31 10:44:15
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 3.645833
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
@@ -64,7 +64,7 @@
 [MakerNotes, Casio, Camera] 20 - CCD Sensitivity: Normal
 [Composite, Composite, Image]  - Aperture: 2.0
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 160x120
+[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Shutter Speed: 1/114
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 13.3mm

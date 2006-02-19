@@ -44,7 +44,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 4: Test rewriting everything
+# test 4: Test rewriting everything with slightly different values
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -53,21 +53,21 @@ my $testnum = 1;
     my $tag;
     foreach $tag (keys %$info) {
         my $group = $exifTool->GetGroup($tag);
-        my $val = $info->{$tag};
-        my @values;
+        my $val = $$info{$tag};
         if (ref $val eq 'ARRAY') {
-            @values = @$val;
+            push @$val, 'v2';
         } elsif (ref $val eq 'SCALAR') {
-            @values = ( $$val );
+            $val = 'v2';
+        } elsif ($val =~ /^\d+(\.\d*)?$/) {
+            $val += ($val / 10) + 1;
+            $1 or $val = int($val);
         } else {
-            @values = ( $val );
+            $val .= '-v2';
         }
-        foreach $val (@values) {
-            # eat return values so warning don't get printed
-            my @rtns = $exifTool->SetNewValue($tag,$val,Group=>$group);
-        }
+        # eat return values so warning don't get printed
+        my @x = $exifTool->SetNewValue($tag, $val, Group=>$group, Replace=>1);
     }
-    # also test out an IPTC Core tag
+    # also try adding an IPTC Core tag
     $exifTool->SetNewValue(CreatorContactInfoCiAdrCtry => 'Canada');
     undef $info;
     my $image;

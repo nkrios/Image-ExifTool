@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.86
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
 [File, File, Image]  - File Type: TIFF
 [File, File, Image]  - MIME Type: image/tiff
 [EXIF, IFD0, Image] 254 - Subfile Type: Full-resolution Image
@@ -19,7 +19,7 @@
 [EXIF, IFD0, Image] 284 - Planar Configuration: Chunky
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: GraphicConverter
-[EXIF, IFD0, Time] 306 - Date/Time Of Last Modification: 2004:02:20 08:07:49
+[EXIF, IFD0, Time] 306 - Modify Date: 2004:02:20 08:07:49
 [EXIF, IFD0, Image] 317 - Predictor: None
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: new XMP info
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
@@ -55,7 +55,7 @@
 [ICC_Profile, ICC-header, Image] 68 - Profile Connection Space: 0.9642 1 0.82491
 [ICC_Profile, ICC-header, Image] 80 - Profile Creator: HP  
 [ICC_Profile, ICC-header, Image] 84 - Profile ID: 0
-[ICC_Profile, ICC_Profile, Image] cprt - Copyright: Copyright (c) 1998 Hewlett-Packard Company
+[ICC_Profile, ICC_Profile, Image] cprt - Profile Copyright: Copyright (c) 1998 Hewlett-Packard Company
 [ICC_Profile, ICC_Profile, Image] desc - Profile Description: sRGB IEC61966-2.1
 [ICC_Profile, ICC_Profile, Image] wtpt - Media White Point: 0.95045 1 1.08905
 [ICC_Profile, ICC_Profile, Image] bkpt - Media Black Point: 0 0 0
