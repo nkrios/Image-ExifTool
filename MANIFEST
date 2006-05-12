@@ -9,6 +9,7 @@ html/ExifTool.html
 html/TagNames/AFCP.html
 html/TagNames/AIFF.html
 html/TagNames/APP12.html
+html/TagNames/APP14.html
 html/TagNames/ASF.html
 html/TagNames/BMP.html
 html/TagNames/Canon.html
@@ -32,9 +33,11 @@ html/TagNames/Jpeg2000.html
 html/TagNames/Kodak.html
 html/TagNames/KyoceraRaw.html
 html/TagNames/Leaf.html
+html/TagNames/MIE.html
 html/TagNames/MIFF.html
 html/TagNames/MNG.html
 html/TagNames/Minolta.html
+html/TagNames/MinoltaRaw.html
 html/TagNames/Nikon.html
 html/TagNames/NikonCapture.html
 html/TagNames/Olympus.html
@@ -61,6 +64,7 @@ html/config.html
 html/data_members.html
 html/exiftool_pod.html
 html/faq.html
+html/filename.html
 html/history.html
 html/htmldump.html
 html/idiosyncracies.html
@@ -100,10 +104,12 @@ lib/Image/ExifTool/Jpeg2000.pm
 lib/Image/ExifTool/Kodak.pm
 lib/Image/ExifTool/KyoceraRaw.pm
 lib/Image/ExifTool/Leaf.pm
+lib/Image/ExifTool/MIE.pm
 lib/Image/ExifTool/MIFF.pm
 lib/Image/ExifTool/MNG.pm
 lib/Image/ExifTool/MakerNotes.pm
 lib/Image/ExifTool/Minolta.pm
+lib/Image/ExifTool/MinoltaRaw.pm
 lib/Image/ExifTool/Nikon.pm
 lib/Image/ExifTool/NikonCapture.pm
 lib/Image/ExifTool/Olympus.pm
@@ -134,6 +140,7 @@ lib/Image/ExifTool/WriteExif.pl
 lib/Image/ExifTool/WriteIPTC.pl
 lib/Image/ExifTool/WritePNG.pl
 lib/Image/ExifTool/WritePhotoshop.pl
+lib/Image/ExifTool/WritePostScript.pl
 lib/Image/ExifTool/WriteXMP.pl
 lib/Image/ExifTool/Writer.pl
 lib/Image/ExifTool/XMP.pm
@@ -159,10 +166,14 @@ t/Casio_4.out
 t/Casio_5.out
 t/DICOM.t
 t/DICOM_2.out
+t/DNG.t
+t/DNG_2.out
 t/ExifTool.t
 t/ExifTool_16.out
 t/ExifTool_17.out
 t/ExifTool_2.out
+t/ExifTool_20.out
+t/ExifTool_21.out
 t/ExifTool_3.out
 t/ExifTool_4.out
 t/ExifTool_5.out
@@ -198,6 +209,9 @@ t/Kodak_2.out
 t/Kodak_3.out
 t/KyoceraRaw.t
 t/KyoceraRaw_2.out
+t/MIE.t
+t/MIE_2.out
+t/MIE_3.out
 t/MIFF.t
 t/MIFF_2.out
 t/MP3.t
@@ -239,6 +253,7 @@ t/Photoshop_2.out
 t/Photoshop_3.out
 t/PostScript.t
 t/PostScript_2.out
+t/PostScript_3.out
 t/QuickTime.t
 t/QuickTime_2.out
 t/RIFF.t
@@ -285,6 +300,7 @@ t/images/CanonRaw.crw
 t/images/Casio.jpg
 t/images/Casio2.jpg
 t/images/DICOM.dcm
+t/images/DNG.dng
 t/images/ExifTool.jpg
 t/images/ExifTool.tif
 t/images/FujiFilm.jpg
@@ -297,6 +313,7 @@ t/images/JVC2.jpg
 t/images/Jpeg2000.jp2
 t/images/Kodak.jpg
 t/images/KyoceraRaw.raw
+t/images/MIE.mie
 t/images/MIFF.miff
 t/images/MP3.mp3
 t/images/Minolta.jpg

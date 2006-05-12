@@ -9,6 +9,7 @@
 #               2) http://www.vlsi.fi/datasheets/vs1011.pdf
 #               3) http://www.music-center.com.br/spec_rif.htm
 #               4) http://www.codeproject.com/audio/wavefiles.asp
+#               5) http://msdn.microsoft.com/archive/en-us/directx9_c/directx/htm/avirifffilereference.asp
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::RIFF;
@@ -17,36 +18,31 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # RIFF info
 %Image::ExifTool::RIFF::Main = (
-    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessSubChunks,
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
     NOTES => q{
 Windows WAV and AVI files are RIFF format files.  Meta information embedded
 in two types of RIFF C<LIST> chunks: C<INFO> and C<exif>.  As well, some
 information about the audio content is extracted from the C<fmt > chunk.
     },
-    'fmt ' => {
+   'fmt ' => {
         Name => 'Format',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Format' },
     },
-    'LIST' => {
-        Name => 'List',
-        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::List' },
-    },
-);
-
-# Sub chunks of LIST chunk
-%Image::ExifTool::RIFF::List = (
-    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunk,
-    'INFO' => {
+    LIST_INFO => {
         Name => 'Info',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Info' },
     },
-    'exif' => {
+    LIST_exif => {
         Name => 'Exif',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Exif' },
+    },
+    LIST_hdrl => { # AVI header LIST chunk
+        Name => 'Hdrl',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Hdrl' },
     },
 );
 
@@ -109,7 +105,7 @@ information about the audio content is extracted from the C<fmt > chunk.
 
 # Sub chunks of INFO LIST chunk
 %Image::ExifTool::RIFF::Info = (
-    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessSubChunks,
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
     GROUPS => { 2 => 'Audio' },
     IARL => 'ArchivalLocation',
     IART => { Name => 'Artist',    Groups => { 2 => 'Author' } },
@@ -142,7 +138,7 @@ information about the audio content is extracted from the C<fmt > chunk.
 
 # Sub chunks of EXIF LIST chunk
 %Image::ExifTool::RIFF::Exif = (
-    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessSubChunks,
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
     GROUPS => { 2 => 'Audio' },
     ever => 'ExifVersion',
     erel => 'RelatedImageFile',
@@ -156,23 +152,147 @@ information about the audio content is extracted from the C<fmt > chunk.
     },
 );
 
+# Sub chunks of hdrl LIST chunk
+%Image::ExifTool::RIFF::Hdrl = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
+    GROUPS => { 2 => 'Image' },
+    avih => {
+        Name => 'AVIHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::AVIHeader' },
+    },
+    IDIT => {
+        Name => 'DateTimeOriginal',
+        Description => 'Date/Time Original',
+        Groups => { 2 => 'Time' },
+        ValueConv => 'Image::ExifTool::RIFF::ConvertRIFFDate($val)',
+    },
+    ISMP => 'TimeCode',
+    LIST_strl => {
+        Name => 'Stream',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Stream' },
+    },
+);
+
+%Image::ExifTool::RIFF::AVIHeader = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    FORMAT => 'int32u',
+    FIRST_ENTRY => 0,
+    0 => {
+        Name => 'FrameRate',
+        ValueConv => '$val ? 1e6 / $val : undef',
+        PrintConv => 'int($val * 1000 + 0.5) / 1000',
+    },
+    1 => {
+        Name => 'MaxDataRate',
+        PrintConv => 'sprintf("%.4g kB/s",$val / 1024)',
+    },
+  # 2 => 'PaddingGranularity',
+  # 3 => 'Flags',
+    4 => 'FrameCount',
+  # 5 => 'InitialFrames',
+    6 => 'StreamCount',
+  # 7 => 'SuggestedBufferSize',
+    8 => 'ImageWidth',
+    9 => 'ImageHeight',
+);
+
+%Image::ExifTool::RIFF::Stream = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
+    GROUPS => { 2 => 'Image' },
+    strh => {
+        Name => 'StreamHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::StreamHeader' },
+    },
+    strn => 'StreamName',
+);
+
+%Image::ExifTool::RIFF::StreamHeader = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    FORMAT => 'int32u',
+    FIRST_ENTRY => 0,
+    0 => {
+        Name => 'StreamType',
+        Format => 'string[4]',
+        PrintConv => {
+            auds => 'Audio',
+            mids => 'MIDI',
+            txts => 'Text',
+            vids => 'Video',
+        },
+    },
+    1 => {
+        Name => 'Codec',
+        Format => 'string[4]',
+    },
+  # 2 => 'StreamFlags',
+  # 3 => 'StreamPriority',
+  # 3.5 => 'Language',
+  # 4 => 'InitialFrames',
+  # 5 => 'Scale',
+  # 6 => 'Rate',
+  # 7 => 'Start',
+  # 8 => 'Length',
+  # 9 => 'SuggestedBufferSize',
+  # 10 => 'Quality',
+  # 11 => 'SampleSize',
+  # 12 => { Name => 'Frame', Format => 'int16u[4]' },
+);
+
+# RIFF composite tags
+%Image::ExifTool::RIFF::Composite = (
+    Duration => {
+        Require => {
+            0 => 'FrameRate',
+            1 => 'FrameCount',
+        },
+        ValueConv => '$val[0] ? $val[1] / $val[0] : undef',
+        PrintConv => 'sprintf("%.2fs",$val)',
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::RIFF::Composite');
+
 
 #------------------------------------------------------------------------------
-# Process RIFF sub-chunk
+# Convert RIFF date to EXIF format
+my %monthNum = (
+    Jan=>1, Feb=>2, Mar=>3, Apr=>4, May=>5, Jun=>6,
+    Jul=>7, Aug=>8, Sep=>9, Oct=>10,Nov=>11,Dec=>12
+);
+sub ConvertRIFFDate($)
+{
+    my $val = shift;
+    my @part = split ' ', $val;
+    if (@part >= 5 and $monthNum{$part[1]}) {
+        # the standard AVI date format
+        $val = sprintf("%.4d:%.2d:%.2d %s", $part[4],
+                       $monthNum{$part[1]}, $part[2], $part[3]);
+    } elsif ($val =~ /(\d{4})\/\s*(\d+)\/\s*(\d+)\s*(\d+):\s*(\d+)\s*(P?)/) {
+        # but the Casio QV-3EX writes dates like this
+        $val = sprintf("%.4d:%.2d:%.2d %.2d:%.2d:00",$1,$2,$3,$4+($6?12:0),$5);
+    }
+    return $val;
+}
+
+#------------------------------------------------------------------------------
+# Process RIFF chunks
 # Inputs: 0) ExifTool object reference, 1) directory information reference
 #         2) tag table reference
 # Returns: 1 on success
-sub ProcessSubChunks($$$)
+sub ProcessChunks($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $offset = $$dirInfo{DirStart};
     my $size = $$dirInfo{DirLen};
-    my $verbose = $exifTool->Options('Verbose');
     my $end = $offset + $size;
 
-    $verbose and $exifTool->VerboseDir($$dirInfo{DirName}, 0, $size);
-
+    if ($exifTool->Options('Verbose')) {
+        $exifTool->VerboseDir($$dirInfo{DirName}, 0, $size);
+    }
     while ($offset + 8 < $end) {
         my $tag = substr($$dataPt, $offset, 4);
         my $len = Get32u($dataPt, $offset + 4);
@@ -180,6 +300,11 @@ sub ProcessSubChunks($$$)
         if ($offset + $len > $end) {
             $exifTool->Warn("Bad $tag chunk");
             return 0;
+        }
+        if ($tag eq 'LIST' and $len >= 4) {
+            $tag .= '_' . substr($$dataPt, $offset, 4);
+            $len -= 4;
+            $offset += 4;
         }
         $exifTool->HandleTag($tagTablePtr, $tag, undef,
             DataPt => $dataPt,
@@ -189,36 +314,6 @@ sub ProcessSubChunks($$$)
         );
         ++$len if $len & 0x01;  # must account for padding if odd number of bytes
         $offset += $len;
-    }
-    return 1;
-}
-
-#------------------------------------------------------------------------------
-# Process RIFF chunk
-# Inputs: 0) ExifTool object reference, 1) directory information reference
-#         2) tag table reference
-# Returns: 1 on success
-sub ProcessChunk($$$)
-{
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $dataPt = $$dirInfo{DataPt};
-    my $offset = $$dirInfo{DirStart};
-    my $size = $$dirInfo{DirLen};
-    
-    $size >= 4 or $exifTool->Warn('Chunk too small'), return 0;
-    # get chunk type (the only difference between a chunk and a sub-chunk)
-    my $chunkType = substr($$dataPt, $offset, 4);
-    my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $chunkType);
-    if ($tagInfo and $$tagInfo{SubDirectory}) {
-        $tagTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-        my %subInfo = (
-            DataPt => $dataPt,
-            DataPos => $$dirInfo{DataPos},
-            DirStart => $offset + 4,
-            DirLen => $size - 4,
-            DirName => $chunkType,
-        );
-        ProcessSubChunks($exifTool, \%subInfo, $tagTablePtr) or return 0;
     }
     return 1;
 }
@@ -248,10 +343,19 @@ sub ProcessRIFF($$)
         $raf->Read($buff, 8) == 8 or $err=1, last;
         $pos += 8;
         my ($tag, $len) = unpack('a4V', $buff);
-        # stop when we hit the audio data or AVI index
-        last if $tag eq 'data' or $tag eq 'idx1';
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        # special case: construct new tag name from specific LIST type
+        if ($tag eq 'LIST') {
+            $raf->Read($buff, 4) == 4 or $err=1, last;
+            $tag .= "_$buff";
+            $len -= 4;  # already read 4 bytes (the LIST type)
+        }
         $exifTool->VPrint(0, "RIFF '$tag' chunk ($len bytes of data):\n");
+        # stop when we hit the audio data or AVI index or AVI movie data
+        if ($tag eq 'data' or $tag eq 'idx1' or $tag eq 'LIST_movi') {
+            $exifTool->VPrint(0, "(end of parsing)\n");
+            last;
+        }
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         # RIFF chunks are padded to an even number of bytes
         my $len2 = $len + ($len & 0x01);
         if ($tagInfo and $$tagInfo{SubDirectory}) {
@@ -295,8 +399,8 @@ including Windows WAV audio and AVI video files.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 
@@ -309,6 +413,8 @@ it under the same terms as Perl itself.
 =item L<http://www.music-center.com.br/spec_rif.htm>
 
 =item L<http://www.codeproject.com/audio/wavefiles.asp>
+
+=item L<http://msdn.microsoft.com/archive/en-us/directx9_c/directx/htm/avirifffilereference.asp>
 
 =back
 

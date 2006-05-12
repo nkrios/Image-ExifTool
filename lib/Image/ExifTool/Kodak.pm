@@ -476,18 +476,6 @@ Z7560.
     FIRST_ENTRY => 0,
 );
 
-# Kodak composite tags
-%Image::ExifTool::Kodak::Composite = (
-    DateCreated => {
-        Groups => { 2 => 'Time' },
-        Require => {
-            0 => 'Kodak:YearCreated',
-            1 => 'Kodak:MonthDayCreated',
-        },
-        ValueConv => '"$val[0]:$val[1]"',
-    },
-);
-
 # Kodak APP3 "Meta" tags (ref 2)
 %Image::ExifTool::Kodak::Meta = (
     GROUPS => { 0 => 'Meta', 1 => 'MetaIFD', 2 => 'Image'},
@@ -578,6 +566,18 @@ is used.
     8 => 'WatermarkType',
 );
 
+# Kodak composite tags
+%Image::ExifTool::Kodak::Composite = (
+    DateCreated => {
+        Groups => { 2 => 'Time' },
+        Require => {
+            0 => 'Kodak:YearCreated',
+            1 => 'Kodak:MonthDayCreated',
+        },
+        ValueConv => '"$val[0]:$val[1]"',
+    },
+);
+
 # add our composite tags
 Image::ExifTool::AddCompositeTags('Image::ExifTool::Kodak::Composite');
 
@@ -602,8 +602,8 @@ interpret Kodak maker notes EXIF meta information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

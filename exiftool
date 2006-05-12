@@ -26,9 +26,7 @@ sub ScanDir($$);
 sub GetImageInfo($$);
 sub PrintTagList(@);
 sub LoadPrintFormat($);
-sub FilterGroups($$$);
 sub FilenameSPrintf($;$);
-sub AddExclude($);
 sub IsExcluded($$);
 sub Cleanup();
 sub SigInt();
@@ -63,6 +61,7 @@ my $helped;         # flag to avoid printing help if no tags specified
 my $htmlOutput = 0; # flag for html-formatted output
 my $escapeHTML;     # flag to escape printed values for html
 my $binaryOutput;   # flag for binary output
+my $doSetFileName;  # flag set if FileName may be written
 my $showGroup;      # number of group to show (may be zero or '')
 my $allGroup;       # show group name for all tags
 my $preserveTime;   # flag to preserve times of updated files
@@ -83,7 +82,7 @@ my %excludeGrp;     # hash of tags excluded by group
 my $allInGroup;     # flag to show all tags in a group
 my $disableOutput;  # flag to disable normal output
 my $quiet = 0;      # flag to disable printing of informational messages / warnings
-my $overwriteOrig;  # flag to overwrite original file
+my $overwriteOrig=0;# flag to overwrite original file
 my $filterFlag = 0; # file filter flag (0x01=allow extensions, 0x02=deny extensions)
 my %filterExt;      # lookup for filtered extensions
 my $verbose = 0;    # verbose setting
@@ -202,9 +201,14 @@ while ($_ = shift) {
         /^L$/  and $mainTool->Options(Charset => 'Latin'), next;
         /^m$/i and $mainTool->Options(IgnoreMinorErrors => 1), next;
         /^n$/i and $mainTool->Options(PrintConv => 0), next;
-        /^o$/i and $outOpt = shift || Die("Expected output file or directory name for -o option\n"), next;
+        if (/^o$/i) {
+            $outOpt = shift || Die("Expected output file or directory name for -o option\n");
+            $outOpt =~ tr/\\/\//;
+            next;
+        }
         /^overwrite_original$/i and $overwriteOrig = 1, next;
-        /^p$/  and LoadPrintFormat(shift || Die "Expecting file name for -p option\n"), next;
+        /^overwrite_original_in_place$/i and $overwriteOrig = 2, next;
+        /^p$/  and LoadPrintFormat(shift), next;
         /^P$/  and $preserveTime = 1, next;
         /^q$/i and ++$quiet, next;
         /^r$/i and $recurse = 1, next;
@@ -225,15 +229,16 @@ while ($_ = shift) {
             if ($setTagsFile) {
                 push @{$setTags{$setTagsFile}}, "-$tag";
             } else {
-                AddExclude($tag);
+                push @exclude, $tag;
             }
             next;
         }
-        /^z$/i and $doUnzip = 1, next;
+        /^z$/i and $doUnzip = 1, $mainTool->Options(Compress => 1), next;
         $_ eq '' and push(@files, '-'), next;   # read STDIN
         length $_ eq 1 and Die "Unknown option -$_\n";
         if (/=/) {
             push @newValues, $_;
+            $doSetFileName = 1 if /^(filename|directory)\b/i;
         } else {
             s/\ball\b/\*/ig;    # replace 'all' with '*' in tag names
             if (not $setTagsFile and /(<|>)/) {
@@ -245,8 +250,9 @@ while ($_ = shift) {
             }
             if ($setTagsFile) {
                 push @{$setTags{$setTagsFile}}, $_;
+                $doSetFileName = 1 if /(^|>)(filename|directory)\b/i;
             } elsif (/^-(.*)/) {
-                AddExclude($1);
+                push @exclude, $1;
             } else {
                 push @tags, $_;
             }
@@ -259,10 +265,14 @@ while ($_ = shift) {
 # print help
 unless ((@tags and not $outOpt) or @files or @newValues) {
     Die "Nothing to write\n" if $outOpt;
-    unless ($helped or not system "perldoc '$0'") {
+    unless ($helped or not system qq{perldoc "$0"}) {
         print "Run 'perldoc exiftool' for help on exiftool.\n";
     }
     exit 0;
+}
+
+if ($overwriteOrig > 1 and $outOpt) {
+    Die "Can't overwrite in place when -o option is used\n";
 }
 
 # can't do anything if no file specified
@@ -350,15 +360,12 @@ if (@newValues) {
             exit 1;
         }
     }
-} elsif (grep /^\*$/, @exclude) {
+} elsif (grep /^(\*:)?\*$/, @exclude) {
     Die "All tags excluded -- nothing to do.\n";
 }
 # save current state of new values if setting values from target file
 # or if we may be translating to a different format
 $mainTool->SaveNewValues() if $setTags{'@'} or $outOpt;
-
-# delete tag list to extract all tags if '*' specified
-undef @tags if grep /^(\*:)?\*$/i, @tags;
 
 $multiFile = 1 if @files > 1;
 $showGroup = 0 if defined $showGroup and not $showGroup;
@@ -417,7 +424,7 @@ if (($countDir or $totWr or $tot > 1 or $outputExt) and not ($binaryStdout or $q
     printf("%5d directories scanned\n", $countDir) if $countDir;
     printf("%5d directories created\n", $countNewDir) if $countNewDir;
     printf("%5d image files created\n", $countGoodCr) if $countGoodCr;
-    printf("%5d image files updated\n", $countGoodWr) if $totWr - $countGoodCr;
+    printf("%5d image files updated\n", $countGoodWr) if $totWr - $countGoodCr - $countBadCr;
     printf("%5d image files unchanged\n", $countSameWr) if $countSameWr;
     printf("%5d files weren't updated due to errors\n", $countBadWr) if $countBadWr;
     printf("%5d files weren't created due to errors\n", $countBadCr) if $countBadCr;
@@ -462,7 +469,7 @@ sub CreateDirectory($)
         $dir = '';
         foreach (@parts) {
             $dir .= $_;
-            if ($dir and not -d $dir) {
+            if (length $dir and not -d $dir) {
                 # create directory since it doesn't exist
                 mkdir($dir, 0777) or Die "Error creating directory $dir\n";
                 $verbose and print "Created directory $dir\n";
@@ -477,57 +484,73 @@ sub CreateDirectory($)
 
 #------------------------------------------------------------------------------
 # Set information in file
-# Inputs: 0) ExifTool object reference, 1) source file name
+# Inputs: 0) ExifTool object reference
+#         1) source file name ('' to create from scratch)
 # Returns: true on success
 sub SetImageInfo($$)
 {
     my ($exifTool, $file) = @_;
-    my ($outfile, $restored);
-    my $argFile = $file;    # save original file argument
+    my ($outfile, $restored, $isTemporary, $isStdout);
+    my $infile = $file;    # save original file argument
 
-    # first, figure out our output file name so we can
-    # return quickly if it already exists
-    if (defined $outOpt and $outOpt ne '-') {
-        if (-d $outOpt) {
-            ($outfile = $outOpt) =~ tr/\\/\//;
-            $outfile .= '/' unless $outfile =~ /\/$/;
-            my $name = $file;
-            $name =~ tr/\\/\//;
-            $name =~ s/.*\///;  # remove directory name
-            $outfile .= $name;
+    undef $tmpFile; # make sure this isn't defined
+
+    # first, try to determine our output file name so we can return quickly
+    # if it already exists (note: this test must be delayed until after we
+    # set tags from dynamic files if writing FileName or Directory)
+    if (defined $outOpt) {
+        if ($outOpt eq '-') {
+            $isStdout = 1;
+            last;
         } else {
             $outfile = FilenameSPrintf($outOpt, $file);
-            my $srcType = GetFileType($file) || '';
-            my $outType = GetFileType($outfile);
-            if ($outType and $srcType ne $outType) {
-                if (CanCreate($outfile)) {
-                    if ($file ne '') {
-                        # restore previous new values unless done already
-                        $exifTool->RestoreNewValues();
-                        $restored = 1;
-                        # translate to this type by setting specified tags from file
-                        my @setTags = @tags;
-                        foreach (@exclude) {
-                            push @setTags, "-$_";
+            if ($outfile eq '') {
+                Warn "Can't create file with zero-length name from $file\n";
+                ++$countBadCr;
+                return 0;
+            }
+            if (-d $outfile or $outfile =~ /\/$/) {
+                $outfile .= '/' unless $outfile =~ /\/$/;
+                my $name = $file;
+                $name =~ tr/\\/\//;
+                $name =~ s/.*\///;  # remove directory name
+                $outfile .= $name;
+            } else {
+                my $srcType = GetFileType($file) || '';
+                my $outType = GetFileType($outfile);
+                if ($outType and ($srcType ne $outType or $outType eq 'ICC')) {
+                    if (CanCreate($outfile)) {
+                        if ($file ne '') {
+                            # restore previous new values unless done already
+                            $exifTool->RestoreNewValues();
+                            $restored = 1;
+                            # translate to this type by setting specified tags from file
+                            my @setTags = @tags;
+                            foreach (@exclude) {
+                                push @setTags, "-$_";
+                            }
+                            # force ICC_Profile to be set if this is an ICC output file
+                            push @setTags, 'ICC_Profile' if $outType eq 'ICC';
+                            return 0 unless DoSetFromFile($exifTool, $file, \@setTags);
+                            # all done with source file -- create from meta information alone
+                            $file = '';
                         }
-                        return 0 unless DoSetFromFile($exifTool, $file, \@setTags);
-                        # all done with source file -- create from meta information alone
-                        $file = '';
+                    } else {
+                        my $what = $srcType ? 'other types' : 'scratch';
+                        WarnOnce "Error: Can't create $outType files from $what\n";
+                        ++$countBadCr;
+                        return 0;
                     }
-                } else {
-                    my $what = $srcType ? 'other types' : 'scratch';
-                    WarnOnce "Error: Can't create $outType files from $what\n";
-                    ++$countBadCr;
-                    return 0;
                 }
             }
+            if (-e $outfile and not $doSetFileName) {
+                Warn "Error: '$outfile' already exists - $infile\n";
+                ++$countBadWr;
+                return 0;
+            }
         }
-        if (-e $outfile) {
-            Warn "Error: File already exists: $outfile\n";
-            ++$countBadWr;
-            return 0;
-        }
-        $tmpFile = $outfile;
+    } elsif ($file eq '-') {
+        $isStdout = 1;
     }
     # set tags from destination file if required
     if (@dynamicFiles) {
@@ -537,51 +560,89 @@ sub SetImageInfo($$)
         foreach $dyFile (@dynamicFiles) {
             my $fromFile;
             if ($dyFile eq '@') {
-                $fromFile = $argFile;
+                $fromFile = $infile;
             } else {
-                $fromFile = FilenameSPrintf($dyFile, $argFile);
+                $fromFile = FilenameSPrintf($dyFile, $infile);
                 ++$countBadWr, return 0 unless defined $fromFile;
             }
             # set new values values from file
             return 0 unless DoSetFromFile($exifTool, $fromFile, $setTags{$dyFile});
         }
     }
-    if ($outfile) {
-        # create output directory if necessary since it may not exist
-        CreateDirectory($outfile);
-    } elsif ($file eq '-' or $outOpt) {
+    if ($isStdout) {
         # write to STDOUT
         $outfile = \*STDOUT;
         binmode(STDOUT);
         $binaryStdout = 1;
-        undef $tmpFile;
     } else {
-        # only need to rewrite file if we set a valid tag
-        my $numSet = $exifTool->CountNewValues();
-        unless ($numSet) {
-            if (-e $file) {
-                ++$countSameWr;
-                return 1;
-            } else {
-                Warn("Warning: File not found - $file\n");
-                ++$countBadWr;
-                return 0;
+        # determine what our output file name should be
+        my $newFileName = $exifTool->GetNewValues('FileName');
+        my $newDir = $exifTool->GetNewValues('Directory');
+        if ($newFileName or $newDir or ($doSetFileName and defined $outfile)) {
+            if ($newFileName) {
+                $newFileName = FilenameSPrintf($newFileName, $infile);
+                if (defined $outfile) {
+                    $outfile = Image::ExifTool::GetNewFileName($infile, $outfile) if $infile ne '';
+                    $outfile = Image::ExifTool::GetNewFileName($outfile, $newFileName);
+                } elsif ($infile ne '') {
+                    $outfile = Image::ExifTool::GetNewFileName($infile, $newFileName);
+                }
+            }
+            if ($newDir) {
+                $newDir = FilenameSPrintf($newDir, $infile);
+                $outfile = Image::ExifTool::GetNewFileName(defined $outfile ? $outfile : $infile, $newDir);
+            }
+            if (-e $outfile) {
+                if ($infile ne $outfile) {
+                    Warn "Error: '$outfile' already exists - $infile\n";
+                    ++$countBadWr;
+                    return 0;
+                }
+                undef $outfile; # not changing the file name after all
             }
         }
-        if ($numSet == 1) {
-            # just set file timestamp if this is the only tag we are writing
-            my $result = $exifTool->SetFileModifyDate($file);
-            if ($result > 0) {
-                ++$countGoodWr;
-                return 1;
-            } elsif ($result < 0) {
-                Warn "Error setting file time - $file\n";
-                ++$countBadWr;
-                return 0;
-            }
+        if (defined $outfile) {
+            $verbose and print "'$infile' --> '$outfile'\n";
+            # create output directory if necessary
+            CreateDirectory($outfile);
+            # set temporary file (automatically erased on abnormal exit)
+            $tmpFile = $outfile if defined $outOpt;
         }
-        $outfile = "${file}_exiftool_tmp";  # write to temporary file
-        $tmpFile = $outfile;
+        unless (defined $tmpFile) {
+            # only need to rewrite file if we set a valid tag
+            my ($numSet, $numQuick) = $exifTool->CountNewValues();
+            unless ($numSet) {
+                if (-e $file) {
+                    ++$countSameWr;
+                    return 1;
+                } else {
+                    Warn("Warning: File not found - $file\n");
+                    ++$countBadWr;
+                    return 0;
+                }
+            }
+            # quickly rename file and/or set file date if this is all we are doing
+            if ($numSet == $numQuick) {
+                my $r1 = $exifTool->SetFileModifyDate($file);
+                my $r2 = 0;
+                $r2 = $exifTool->SetFileName($file, $outfile) if defined $outfile;
+                if ($r1 > 0 or $r2 > 0) {
+                    ++$countGoodWr;
+                } elsif ($r1 < 0 or $r2 < 0) {
+                    ++$countBadWr;
+                    return 0;
+                } else {
+                    ++$countSameWr;
+                }
+                return 1;
+            }
+            unless (defined $outfile) {
+                # write to a truly temporary file
+                $outfile = "${file}_exiftool_tmp";
+                $isTemporary = 1;
+            }
+            $tmpFile = $outfile;
+        }
     }
     # rewrite the file
     my $success = $exifTool->WriteInfo($file, $outfile);
@@ -591,14 +652,15 @@ sub SetImageInfo($$)
         # preserve the original file times
         if (defined $tmpFile) {
             if (-e $file) {
+                my ($modTime, $accTime);
                 if ($preserveTime) {
-                    my $modTime = $^T - (-M $file) * (24 * 3600);
-                    my $accTime = $^T - (-A $file) * (24 * 3600);
+                    $modTime = $^T - (-M $file) * (24 * 3600);
+                    $accTime = $^T - (-A $file) * (24 * 3600);
                     unless (utime($accTime, $modTime, $tmpFile)) {
                         Warn "Error setting file time - $file\n";
                     }
                 }
-                unless (defined $outOpt) {
+                if ($isTemporary) {
                     # move original out of the way
                     my $original = "${file}_original";
                     if (not $overwriteOrig and not -e $original) {
@@ -608,10 +670,42 @@ sub SetImageInfo($$)
                             Die "Error renaming $file\n";
                         }
                     }
-                    unless (rename($tmpFile, $file)) {
-                        Warn "Error renaming temporary file to $file\n";
-                        unlink $tmpFile;
+                    if ($overwriteOrig > 1) {
+                        # copy temporary file over top of original to preserve attributes
+                        my ($err, $buff);
+                        open(TMP_FILE, $tmpFile) or die "Error opening $tmpFile\n";
+                        binmode(TMP_FILE);
+                        if (open(ORIG_FILE, ">$file")) {
+                            binmode(ORIG_FILE);
+                            while (read(TMP_FILE, $buff, 65536)) {
+                                print ORIG_FILE $buff or $err = 1;
+                            }
+                            close(TMP_FILE);
+                            close(ORIG_FILE) or $err = 1;
+                            if ($err) {
+                                warn "Error preserving creator for $file\n";
+                                rename($tmpFile, $file) or die "Error renaming $tmpFile to $file\n";
+                            } else {
+                                unlink $tmpFile;
+                                if ($preserveTime and not utime($accTime, $modTime, $file)) {
+                                    Warn "Error setting file time - $file\n";
+                                }
+                            }
+                        } else {
+                            close(TMP_FILE);
+                            warn "Error opening $file for writing\n";
+                            unlink $tmpFile;
+                        }
+                    } else {
+                        # simply rename temporary file to replace original
+                        unless (rename($tmpFile, $file)) {
+                            Warn "Error renaming temporary file to $file\n";
+                            unlink $tmpFile;
+                        }
                     }
+                } elsif ($overwriteOrig) {
+                    # erase original file
+                    unlink $file or Warn "Error erasing original $file\n"; 
                 }
             } else {
                 # this file was created from scratch, not edited
@@ -620,12 +714,15 @@ sub SetImageInfo($$)
             }
         }
     } elsif ($success) {
-        if (defined $outOpt) {
-            ++$countGoodWr;
-        } else {
-            ++$countSameWr;
+        if ($isTemporary) {
             # just erase the temporary file since no changes were made
-            unlink $tmpFile if defined $tmpFile;
+            ++$countSameWr;
+            unlink $tmpFile;
+        } else {
+            if ($overwriteOrig) {
+                unlink $file or Warn "Error erasing original $file\n"; 
+            }
+            ++$countGoodWr;
         }
     } else {
         ++$countBadWr;
@@ -666,6 +763,7 @@ sub FilenameSPrintf($;$)
         $filename .= substr($part{$code}, $skip, $wid);
     }
     $filename .= substr($fmt, $pos); # add rest of file name
+    $filename =~ s{//}{/}g; # remove double slashes
     return $filename;
 }
 
@@ -736,7 +834,13 @@ sub GetImageInfo($$)
     if ($isWriting) {
         my $success = SetImageInfo($exifTool, $file);
         $info = $exifTool->GetInfo('Warning', 'Error');
-        $info->{Warning} and Warn "Warning: $info->{Warning} - $file\n";
+        if ($info->{Warning}) {
+            my @warns = qw(Warning);
+            push @warns, sort(grep /Warning /, keys %$info) if $exifTool->Options('Duplicates');
+            foreach (@warns) {
+                Warn "Warning: $info->{$_} - $file\n";
+            }
+        }
         $info->{Error} and Warn "Error: $info->{Error} - $file\n";
         # close output text file if necessary
         if ($outfile) {
@@ -751,28 +855,9 @@ sub GetImageInfo($$)
         }
         return;
     } else {
-        my ($tag, $doGroup, %options);
-        # don't request specific tags if using print format option
-        unless (@printFmt) {
-            # copy over tags and strip off group names
-            foreach $tag (@tags) {
-                if ($tag =~ /(.+?):(.+)/) {
-                    $doGroup = 1;
-                    if ($2 ne '*') {
-                        push @foundTags, $2;
-                        next;
-                    }
-                    # (put tag into @foundTags as a placeholder only)
-                }
-                push @foundTags, $tag;
-            }
-        }
-        # temporarily change options to make it possible to
-        # weed out specific groups later
-        $doGroup = 1 if %excludeGrp;
-        $options{Duplicates} = 1 if $doGroup or @printFmt;
-        $options{Sort} = 'Input' if $doGroup;
-
+        my $tag;
+        # request specified tags unless using print format option
+        @foundTags = @tags unless @printFmt;
         # extract EXIF information from this file
         unless ($file eq '-' or -e $file) {
             Warn "File not found: $file\n";
@@ -788,7 +873,7 @@ sub GetImageInfo($$)
         }
 
         # extract the information!
-        $info = $exifTool->ImageInfo($pipe, \@foundTags, \%options);
+        $info = $exifTool->ImageInfo($pipe, \@foundTags);
 
         # all done now if we already wrote output file
         if ($fp) {
@@ -807,17 +892,6 @@ sub GetImageInfo($$)
                 ++$countBad;
             }
             return;
-        }
-
-        # get tags for the specified groups if required
-        if ($doGroup) {
-            FilterGroups($exifTool, \@foundTags, $info);
-            # re-sort tags if necessary
-            if (not defined $exifTool->Options('Sort') or
-                $options{Sort} ne $exifTool->Options('Sort'))
-            {
-                @foundTags = $exifTool->GetTagList(\@foundTags);
-            }
         }
     }
     # check for file error
@@ -861,8 +935,8 @@ sub GetImageInfo($$)
                 # check to see if this is a group name
                 if ($line =~ /^:([-a-zA-Z_0-9]+)(.*)/s) {
                     $group = lc($tag);
-                    $family = $1 if $group =~ s/^(\d+)//;
                     ($tag, $line) = ($1, $2);
+                    $family = $1 if $group =~ s/^(\d+)//;
                 }
                 my $val;
                 if ($group) {
@@ -1031,118 +1105,6 @@ sub GetImageInfo($$)
 }
 
 #------------------------------------------------------------------------------
-# filter out specific groups from tag list
-# Inputs: 0) reference to tag list, 1) information hash reference
-# Note: this logic relies on the order of the found tags
-sub FilterGroups($$$)
-{
-    my ($exifTool, $foundTags, $info) = @_;
-    my ($groupTag, @newFoundTags);
-    my (@allTags, $allInfo);
-    my $dups = $exifTool->Options('Duplicates');
-    my $inputTags = \@tags;
-    unless (@tags) {
-        my @allInput = grep !/ /, @$foundTags;
-        $inputTags = \@allInput;
-    }
-    my $tag = shift @$foundTags;
-    foreach $groupTag (@$inputTags) {
-        my $foundTag = $tag;
-        my $numFound = scalar @newFoundTags;
-        if ($groupTag =~ /(.+?):(.+)/) {
-            my $group = lc($1);
-            my $t = $2;
-            my $family;
-            $family = $1 if $group =~ s/^(\d+)//;
-            if ($t eq '*') {
-                # add all tags from specified group
-                unless ($allInfo) {
-                    # get all information
-                    $allInfo = $exifTool->GetInfo({Duplicates=>1});
-                    @allTags = $exifTool->GetFoundTags('File');
-                }
-                # add all information from specified group
-                my $tag2;
-                my %addedTag;
-                foreach $tag2 (@allTags) {
-                    my @groups = $exifTool->GetGroup($tag2, $family);
-                    next unless grep /^$group$/i, @groups;
-                    next if IsExcluded($exifTool, $tag2);
-                    # don't allow duplicates within a group unless specified
-                    unless ($dups) {
-                        my $tagName = GetTagName($tag2);
-                        next if $addedTag{$tagName};
-                        $addedTag{$tagName} = 1;
-                    }
-                    push @newFoundTags, $tag2;
-                    $$info{$tag2} = $$allInfo{$tag2};   # add value to main info hash
-                }
-                $tag = shift @$foundTags;   # continue with next tag
-            } else {
-                # only allow the specific GROUP:TAG requested
-                my (@matches, $addDummy);
-                for (;;) {
-                    unless (IsExcluded($exifTool, $tag)) {
-                        $addDummy = 1;
-                        if ($group eq '*') {
-                            # allow duplicates for individual tag if group is '*'
-                            push @newFoundTags, $tag;
-                        } else {
-                            my @groups = $exifTool->GetGroup($tag, $family);
-                            if (grep /^$group$/i, @groups) {
-                                push @matches, $tag;
-                            }
-                        }
-                    }
-                    $tag = shift @$foundTags;
-                    last unless $tag and $tag =~ / /;
-                }
-                @matches and push @newFoundTags, $dups ? @matches : $matches[0];
-                # push invalid tag as placeholder in list if necessary
-                # so it shows up with the -f option (only if tag not excluded)
-                if ($numFound == scalar @newFoundTags and $addDummy) {
-                    my $bogusTag = "$foundTag (x)";
-                    push @newFoundTags, $bogusTag;
-                }
-            }
-        } else {
-            # exclude specified GROUP:TAG and duplicates unless requested
-            push @newFoundTags, $tag unless IsExcluded($exifTool, $tag);
-            for (;;) {
-                $tag = shift @$foundTags;
-                last unless $tag and $tag =~ / /;
-                next unless $dups or $numFound == scalar @newFoundTags;
-                push @newFoundTags, $tag unless IsExcluded($exifTool, $tag);
-            }
-        }
-    }
-    # return new tag list in original array
-    @$foundTags = @newFoundTags;
-}
-
-#------------------------------------------------------------------------------
-# Add tag to exclude list
-# Inputs: 0) tag name
-sub AddExclude($)
-{
-    my $tag = shift or Die "Expecting tag name\n";
-    if ($tag =~ /(.+?):(.+)/) {
-        # convert group and tag to lower case for case-insensitive lookups
-        my $group = lc($1);
-        if ($group eq '*') {
-            $tag = $2;
-        } else {
-            $tag = lc($2);
-            $excludeGrp{$tag} or $excludeGrp{$tag} = [ ];
-            # save in list of excluded groups for this tag
-            push @{$excludeGrp{$tag}}, $group;
-            return;
-        }
-    }
-    push @exclude, $tag;
-}
-
-#------------------------------------------------------------------------------
 # Is specified tag excluded by group?
 # Inputs: 1) tag key
 # Returns: true if tag is excluded by group
@@ -1173,7 +1135,7 @@ sub LoadPrintFormat($)
     foreach (<FMT_FILE>) {
         /^#/ and next;  # ignore comments
         push @printFmt, $_;
-        push @tags, /\$([-a-zA-Z_0-9]+)/g;
+        push @tags, /\$((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)/g;
     }
     close(FMT_FILE);
     @tags or Die "Print format file doesn't contain any tag names!\n";
@@ -1245,7 +1207,7 @@ exiftool - Read/write meta information
 
 =head1 SYNOPSIS
 
-exiftool [OPTIONS] [-TAG[[+-E<lt>]=[VALUE]] or --TAG ...] FILE ...
+B<exiftool> [I<OPTIONS>] [-I<TAG>[[+-E<lt>]=[I<VALUE>]] or --I<TAG> ...] I<FILE> ...
 
 =head1 DESCRIPTION
 
@@ -1267,22 +1229,23 @@ supported by exiftool (r = read support, w = write support):
 
                  File Type                      Meta Information
     -----------------------------------        ------------------
-    JPEG  r/w     PPM   r/w     PDF   r        EXIF           r/w
-    TIFF  r/w     PGM   r/w     MIFF  r        GPS            r/w
-    GIF   r/w     PBM   r/w     PICT  r        IPTC           r/w
-    CRW   r/w     JP2   r       QTIF  r        XMP            r/w
-    CR2   r/w     BMP   r       RIFF  r        MakerNotes     r/w
-    NEF   r/w     ORF   r       AIFF  r        Photoshop IRB  r/w
-    PEF   r/w     RAF   r       AVI   r        AFCP           r/w
-    MRW   r/w     RAW   r       WAV   r        JFIF           r/w
-    MOS   r/w     SRF   r       MP3   r        GeoTIFF        r
-    DNG   r/w     SR2   r       MP4   r        ICC Profile    r
-    PNG   r/w     X3F   r       MOV   r        PrintIM        r
-    MNG   r/w     DCM   r       ASF   r        ID3            r
-    JNG   r/w     ACR   r       WMA   r
-    XMP   r/w     AI    r       WMV   r
-    THM   r/w     PS    r
-    PSD   r/w     EPS   r
+    JPEG  r/w     PSD   r/w     ACR   r        EXIF           r/w
+    TIFF  r/w     EPS   r/w     AI    r        GPS            r/w
+    GIF   r/w     PS    r/w     PDF   r        IPTC           r/w
+    CRW   r/w     ICC   r/w     PICT  r        XMP            r/w
+    CR2   r/w     PPM   r/w     QTIF  r        MakerNotes     r/w
+    ERF   r/w     PGM   r/w     RIFF  r        Photoshop IRB  r/w
+    NEF   r/w     PBM   r       AIFF  r        AFCP           r/w
+    PEF   r/w     JP2   r       AVI   r        JFIF           r/w
+    MRW   r/w     BMP   r       WAV   r        ICC Profile    r/w
+    MOS   r/w     ORF   r       MP3   r        MIE            r/w
+    DNG   r/w     RAF   r       MP4   r        GeoTIFF        r
+    PNG   r/w     RAW   r       MOV   r        PrintIM        r
+    MNG   r/w     SRF   r       ASF   r        ID3            r
+    JNG   r/w     SR2   r       WMA   r
+    XMP   r/w     X3F   r       WMV   r
+    THM   r/w     DCM   r
+    MIE   r/w     MIFF  r
 
 =head1 OPTIONS
 
@@ -1499,22 +1462,33 @@ Set B<o>utput file or directory name when writing information (otherwise the
 source file is renamed to C<FILE_original> and the output file is C<FILE> in
 the original directory).  The output file name may also be specified using a
 C<FMT> string in which %d, %f and %e represent the directory, file name and
-extension of C<FILE>.  Existing files will not be overwritten.  Output
-directories are created if necessary.  See the C<-w> option for C<FMT>
-string examples.
+extension of C<FILE>.  See the C<-w> option for C<FMT> string examples.
 
-A special feature of this option allows it to be used to create XMP meta
-information files from a combination of information in C<FILE> and tag
-values assigned on the command line.  This is done by specifying a file
-extension of '.XMP' for C<OUTFILE>.  The XMP file will be created even if no
-C<FILE> is specified, provided some tag values are given on the command
-line.
+The output file is taken to be a directory name if it already exists as a
+directory or if the name ends with '/'.  Output directories are created if
+necessary.  Existing files will not be overwritten.  Combining the
+C<-overwrite_original> option with C<-o> causes the original source file to
+be erased after the output file is successfully written.
+
+A special feature of this option allows it to be used to create certain types
+of files from scratch.  Currently, this can only be done with XMP and
+ICC/ICM files.  The file is created from a combination of information in
+C<FILE> and tag values assigned on the command line.  This is done by
+specifying a file extension of '.XMP', '.ICC' or '.ICM' for C<OUTFILE>.  The
+output file may be created even if no C<FILE> is specified, provided some
+appropriate tag values are specified on the command line.
 
 =item B<-overwrite_original>
 
 Overwrite the original file instead of renaming it to C<FILE_original> when
 writing information to an image.  Caution:  This option should only be used
 if you already have separate backup copies of your image files.
+
+=item B<-overwrite_original_in_place>
+
+Similar to the C<-overwrite_original> option except that an extra step is
+added to allow the original file attributes to be preserved.  On a Macintosh
+for example, this preserves the original file type, creator and icon.
 
 =item B<-p> I<FMTFILE>
 
@@ -1648,7 +1622,8 @@ extension (including the C<.>) with the specified extension.  Alternatively,
 a format statement may be used to give more control over the output file
 name and directory.  In this case, C<FMT> is a string specifying the output
 file name.  In this string, %d, %f and %e represent the directory, filename
-and extension of the source file.  For example:
+and extension of the source file.  (%d includes the trailing '/' if
+necessary, but %e does not include the leading '.')  For example:
 
     -w %d%f.txt       # same effect as "-w txt"
     -w dir/%f_%e.out  # writes files to "dir" as "FILE_EXT.out"
@@ -1682,8 +1657,10 @@ from the source file.
 
 =item B<-z>
 
-Extract information from .gB<z> and .bB<z>2 compressed images.  Must be only
-one image in the compressed archive.
+When reading, causes information to be extracted from .gB<z> and .bB<z>2
+compressed images.  Must be only one image in the compressed archive.  When
+writing, causes compressed information to be written if supported in the
+particular information format.
 
 =back
 
@@ -1760,12 +1737,12 @@ used around the entire argument (ie. "-Comment=This is a new comment")
 
 =item exiftool -Comment='This is a new comment' dst.jpg
 
-Set comment in file (replaces any existing comment).
+Write new comment to a JPG image (replaces any existing comment).
 
 =item exiftool -comment= -o newdir *.jpg
 
-Remove comment from all JPG files in the current directory, writing the
-modified files to a new directory.
+Remove comment from all JPG images in the current directory, writing the
+modified images to a new directory.
 
 =item exiftool -keywords=EXIF -keywords=editor dst.jpg
 
@@ -1784,16 +1761,6 @@ Delete only the specified category (C<xxx>) from all files in directory.
 
 Delete all meta information from an image.
 
-=item exiftool -DateTimeOriginal-='0:0:0 1:30:0' dir
-
-Adjust original date/time of all images in directory C<dir> by subtracting
-one hour and 30 minutes.  (This is equivalent to C<-DateTimeOriginal-=1.5>.
-See L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for details.)
-
-=item exiftool -createdate+=3 -modifydate+=3 a.jpg b.jpg
-
-Add 3 hours to the CreateDate and ModifyDate timestamps of two images.
-
 =item exiftool -Photoshop:All= dst.jpg
 
 Delete Photoshop meta information from an image (note that the Photoshop
@@ -1803,6 +1770,16 @@ information also includes IPTC).
 
 Set the thumbnail image from specified file (Note: The quotes are neccessary
 to prevent shell redirection).
+
+=item exiftool -DateTimeOriginal-='0:0:0 1:30:0' dir
+
+Adjust original date/time of all images in directory C<dir> by subtracting
+one hour and 30 minutes.  (This is equivalent to C<-DateTimeOriginal-=1.5>.
+See L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for details.)
+
+=item exiftool -createdate+=3 -modifydate+=3 a.jpg b.jpg
+
+Add 3 hours to the CreateDate and ModifyDate timestamps of two images.
 
 =item exiftool -xmp:city=Kingston dst.jpg
 
@@ -1834,6 +1811,8 @@ Create an XMP data file only from tags defined on the command line.
 
 =head1 COPYING EXAMPLES
 
+These examples demonstrate the ability to copy tag values between files.
+
 =over 5
 
 =item exiftool -TagsFromFile src.crw dst.jpg
@@ -1850,8 +1829,8 @@ preserving the original tag groups.
 
 Copy meta information C<a.jpg> to an XMP data file.  If the XMP data file
 C<out.xmp> already exists, it will be updated with the new information.
-Otherwise the XMP data file will be created.  Only XMP files may be created
-like this (other file types may be edited but not created).
+Otherwise the XMP data file will be created.  Only XMP and ICC files may be
+created like this (other file types may be edited but not created).
 
 =item exiftool -tagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg
 
@@ -1882,8 +1861,8 @@ redirecting information as in this example.)
 
 =item exiftool -TagsFromFile src.jpg '-all>xmp:all' dst.jpg
 
-Translate all possible information into XMP format, and update C<dst.jpg>
-with the new information.
+Copy all possible information from C<src.jpg> and write in XMP format to
+C<dst.jpg>.
 
 =item exiftool -tagsFromFile a.jpg -@ iptc2xmp.args -iptc:all= a.jpg
 
@@ -1898,6 +1877,51 @@ inverse conversion.
 
 Recursively rewrite all C<JPG> images in C<dir> with information copied from
 the corresponding C<CRW> images in the same directories.
+
+=back
+
+=head1 RENAMING EXAMPLES
+
+By writing the C<FileName> and C<Directory> tags, files are renamed and/or
+moved to new directories.  This can be particularly useful and powerful for
+organizing files by date when combined with the C<-d> option.  New
+directories are created as necessary, but existing files will not be
+overwritten.  The file name format codes %d, %f and %e (see the C<-w> option
+for details) may be used to represent the directory, name and extension of
+the original file, but note that if used within a date format string, an
+extra '%' must be added to pass these codes through the date/time parser.
+
+=over 5
+
+=item exiftool -filename=new.jpg dir/old.jpg
+
+Rename C<old.jpg> to C<new.jpg> in directory C<dir>.
+
+=item exiftool -directory=%e dir
+
+Move all files from directory C<dir> into directories named by the original
+file extensions.
+
+=item exiftool '-Directory<DateTimeOriginal' -d %Y/%m/%d dir
+
+Move all files in C<dir> into a directory hierarchy based on year, month and
+day of C<DateTimeOriginal>.  ie) This command would move the file
+C<dir/image.jpg> with a C<DateTimeOriginal> of C<2005:10:12 16:05:56> to
+C<2005/10/12/image.jpg>.
+
+=item exiftool '-FileName<CreateDate' -d %Y%m%d_%H%M%S.%%e dir
+
+Rename all images in C<dir> according to the C<CreateDate> date and time,
+preserving the original file extensions.  Note the extra '%' added to the
+file extension code (C<%%e>) since it is used in a date format string.
+
+=item exiftool -r '-FileName<CreateDate' -d %Y-%m-%d/%H%M_%%f.%%e dir
+
+Both the directory and the filename may be changed together via the
+C<FileName> tag if the new C<FileName> contains a '/'.  The example above
+recursively renames all images in a directory by adding a C<CreateDate>
+timestamp to the start of the filename, then moves them into new directories
+named by date.
 
 =back
 
@@ -1916,6 +1940,13 @@ Extract information from an embedded thumbnail image.
 =item cat a.jpg | exiftool -iptc:keywords+=fantastic - > b.jpg
 
 Add an IPTC keyword in a pipeline, saving output to a new file.
+
+=item exiftool a.jpg -thumbnailimage -b | exiftool -comment=wow - |
+      exiftool a.jpg -thumbnailimage'<=-'
+
+Add a comment to an embedded thumbnail image.  (Why anyone would want to do
+this I don't know, but I've included this example may give you an idea of
+ExifTool's flexibility.)
 
 =back
 

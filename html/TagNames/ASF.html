@@ -322,6 +322,7 @@ table.
 </table></td></tr></table></blockquote>
 
 <h2><a name='StreamProperties'>ASF StreamProperties Tags</a></h2>
+Tags with index 54 and greater are conditional based on the StreamType.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
@@ -352,6 +353,133 @@ table.
 <td align='right'>48</td>
 <td>StreamNumber</td>
 <td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>54</td>
+<td>AudioCodecID
+  <br>ImageWidth</td>
+<td align='center'>N<br>N</td>
+<td><font size='-1'>0x1 = Microsoft PCM
+  <br>0x2 = Microsoft ADPCM
+  <br>0x3 = IEEE Float
+  <br>0x4 = Cmpaq VSELP
+  <br>0x5 = IBM CVSD
+  <br>0x6 = Microsoft A-Law
+  <br>0x7 = Microsoft Mu-Law
+  <br>0x8 = DTS Coherent Acoustics 1
+  <br>0x10 = OKI ADPCM
+  <br>0x11 = Intel DVI ADPCM
+  <br>0x12 = Videologic MediaSpace ADPCM
+  <br>0x13 = Sierra ADPCM
+  <br>0x14 = G.723 ADPCM
+  <br>0x15 = DSP Solution DIGISTD
+  <br>0x16 = DSP Solution DIGIFIX
+  <br>0x17 = Dialogic OKI ADPCM
+  <br>0x18 = MediaVision ADPCM
+  <br>0x19 = HP CU
+  <br>0x20 = Yamaha ADPCM
+  <br>0x21 = Speech Compression Sonarc
+  <br>0x22 = DSP Group True Speech
+  <br>0x23 = Echo Speech EchoSC1
+  <br>0x24 = Audiofile AF36
+  <br>0x25 = APTX
+  <br>0x26 = AudioFile AF10
+  <br>0x27 = Prosody 1612
+  <br>0x28 = LRC
+  <br>0x30 = Dolby AC2
+  <br>0x31 = GSM610
+  <br>0x32 = MSNAudio
+  <br>0x33 = Antex ADPCME
+  <br>0x34 = Control Res VQLPC
+  <br>0x35 = Digireal
+  <br>0x36 = DigiADPCM
+  <br>0x37 = Control Res CR10
+  <br>0x38 = NMS VBXADPCM
+  <br>0x39 = Roland RDAC
+  <br>0x3a = EchoSC3
+  <br>0x3b = Rockwell ADPCM
+  <br>0x3c = Rockwell Digit LK
+  <br>0x3d = Xebec
+  <br>0x40 = Antex Electronics G.721
+  <br>0x41 = G.728 CELP
+  <br>0x42 = MSG723
+  <br>0x45 = G.726 ADPCM
+  <br>0x50 = MPEG
+  <br>0x52 = RT24
+  <br>0x53 = PAC
+  <br>0x55 = MPEG Layer 3
+  <br>0x59 = Lucent G.723
+  <br>0x60 = Cirrus
+  <br>0x61 = ESPCM
+  <br>0x62 = Voxware
+  <br>0x63 = Canopus Atrac
+  <br>0x64 = G.726 ADPCM
+  <br>0x66 = DSAT
+  <br>0x67 = DSAT Display
+  <br>0x69 = Voxware Byte Aligned
+  <br>0x70 = Voxware AC8
+  <br>0x71 = Voxware AC10
+  <br>0x72 = Voxware AC16
+  <br>0x73 = Voxware AC20
+  <br>0x74 = Voxware MetaVoice
+  <br>0x75 = Voxware MetaSound
+  <br>0x76 = Voxware RT29HW
+  <br>0x77 = Voxware VR12
+  <br>0x78 = Voxware VR18
+  <br>0x79 = Voxware TQ40
+  <br>0x80 = Softsound
+  <br>0x81 = Voxware TQ60
+  <br>0x82 = MSRT24
+  <br>0x83 = G.729A
+  <br>0x84 = MVI MV12
+  <br>0x85 = DF G.726
+  <br>0x86 = DF GSM610
+  <br>0x88 = ISIAudio
+  <br>0x89 = Onlive
+  <br>0x91 = SBC24
+  <br>0x92 = Dolby AC3 SPDIF
+  <br>0x97 = ZyXEL ADPCM
+  <br>0x98 = Philips LPCBB
+  <br>0x99 = Packed
+  <br>0xff = MPEG-4
+  <br>0x100 = Rhetorex ADPCM
+  <br>0x101 = BeCubed Software IRAT
+  <br>0x111 = Vivo G.723
+  <br>0x112 = Vivo Siren
+  <br>0x123 = Digital G.723
+  <br>0x160 = Windows Media v1
+  <br>0x161 = Windows Media v2
+  <br>0x162 = Windows Media 9 Professional
+  <br>0x163 = Windows Media 9 Lossless
+  <br>0x200 = Creative ADPCM
+  <br>0x202 = Creative FastSpeech8
+  <br>0x203 = Creative FastSpeech10
+  <br>0x220 = Quarterdeck
+  <br>0x300 = FM Towns Snd
+  <br>0x400 = BTV Digital
+  <br>0x680 = VME VMPCM
+  <br>0x1000 = OLIGSM
+  <br>0x1001 = OLIADPCM
+  <br>0x1002 = OLICELP
+  <br>0x1003 = OLISBC
+  <br>0x1004 = OLIOPR
+  <br>0x1100 = LH Codec
+  <br>0x1400 = Norris
+  <br>0x1401 = ISIAudio
+  <br>0x1500 = Soundspace Music Compression
+  <br>0x2000 = DVM
+  <br>0x2001 = DTS Coherent Acoustics 2
+  <br>0x4143 = MPEG-4 (Divio)</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>56</td>
+<td>AudioChannels</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>58</td>
+<td>AudioSampleRate
+  <br>ImageHeight</td>
+<td align='center'>N<br>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1032,6 +1160,6 @@ table.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 4, 2006</i>
+<br><i>Last revised Mar 6, 2006</i>
 </body>
 </html>

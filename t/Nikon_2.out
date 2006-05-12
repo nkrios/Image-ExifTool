@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
 [File, File, Image]  - File Name: Nikon.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1703 bytes
@@ -60,7 +60,9 @@
 [MakerNotes, Nikon, Camera] 130 - Auxiliary Lens: Off
 [MakerNotes, Nikon, Camera] 133 - Manual Focus Distance: inf
 [MakerNotes, Nikon, Camera] 134 - Digital Zoom: 1
-[MakerNotes, Nikon, Camera] 136 - AF Point: Center
+[MakerNotes, Nikon, Camera] 0 - AF Mode: Single Area
+[MakerNotes, Nikon, Camera] 1 - AF Point: Center
+[MakerNotes, Nikon, Camera] 2 - AF Points Used: (none)
 [MakerNotes, Nikon, Camera] 143 - Scene Mode: 
 [MakerNotes, Nikon, Camera] 16 - Data Dump: (Binary data 122 bytes)
 [Composite, Composite, Image]  - Aperture: 9.4

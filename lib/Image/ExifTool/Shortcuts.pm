@@ -196,19 +196,20 @@ of tag names.
 An example shortcut definition in .ExifTool_config:
 
     %Image::ExifTool::Shortcuts::UserDefined = (
-        MyShortcut => ['createdate','exposuretime','aperture'],
+        MyShortcut => ['createdate','exif:exposuretime','aperture'],
         MyAlias => 'FocalLengthIn35mmFormat',
     );
 
-In this example, MyShortcut is a shortcut for the CreateDate, ExposureTime
-and Aperture tags, and MyAlias is a shortcut for FocalLengthIn35mmFormat.
+In this example, MyShortcut is a shortcut for the CreateDate,
+EXIF:ExposureTime and Aperture tags, and MyAlias is a shortcut for
+FocalLengthIn35mmFormat.
 
 =head1 AUTHOR
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

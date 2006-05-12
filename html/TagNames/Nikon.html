@@ -160,28 +160,9 @@
   <br>9 = Fired, TTL Mode</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0088</td>
-<td>AFPoint</td>
-<td align='center'>int32u</td>
-<td><font size='-1'>0x0 = Center
-  <br>0x1 = Single Area, Center
-  <br>0x100 = Top
-  <br>0x200 = Bottom
-  <br>0x300 = Left
-  <br>0x400 = Right
-  <br>0x10002 = Single Area, Top
-  <br>0x20004 = Single Area, Bottom
-  <br>0x30008 = Single Area, Left
-  <br>0x40010 = Single Area, Right
-  <br>0x1000001 = Dynamic Area, Center
-  <br>0x1010002 = Dynamic Area, Top
-  <br>0x1020004 = Dynamic Area, Bottom
-  <br>0x1030008 = Dynamic Area, Left
-  <br>0x1040010 = Dynamic Area, Right
-  <br>0x2000001 = Closest Subject, Center
-  <br>0x2010002 = Closest Subject, Top
-  <br>0x2020004 = Closest Subject, Bottom
-  <br>0x2030008 = Closest Subject, Left
-  <br>0x2040010 = Closest Subject, Right</font></td></tr>
+<td>AFInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Nikon.html#AFInfo'>Nikon AFInfo Tags</a></td></tr>
 <tr valign='top'>
 <td>0x0089</td>
 <td>ShootingMode</td>
@@ -393,6 +374,54 @@
 <td align='center'>N</td>
 <td><font size='-1'>1 = Centered
   <br>2 = Co-sited</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AFInfo'>Nikon AFInfo Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>AFMode</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Single Area
+  <br>1 = Dynamic Area
+  <br>2 = Dynamic Area, Closest Subject
+  <br>3 = Group Dynamic
+  <br>4 = Single Area (wide)
+  <br>5 = Dynamic Area (wide)</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>AFPoint</td>
+<td align='center'>int8u</td>
+<td><font size='-1'><font color="#666666">(in some focus modes this value is not meaningful)</font>
+  <br>0 = Center
+  <br>1 = Top
+  <br>2 = Bottom
+  <br>3 = Left
+  <br>4 = Right
+  <br>5 = Upper-left
+  <br>6 = Upper-right
+  <br>7 = Lower-left
+  <br>8 = Lower-right
+  <br>9 = Far Left
+  <br>10 = Far Right</font></td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>AFPointsUsed</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>Bit 0 = Center
+  <br>Bit 1 = Top
+  <br>Bit 2 = Bottom
+  <br>Bit 3 = Left
+  <br>Bit 4 = Right
+  <br>Bit 5 = Upper-left
+  <br>Bit 6 = Upper-right
+  <br>Bit 7 = Lower-left
+  <br>Bit 8 = Lower-right
+  <br>Bit 9 = Far Left
+  <br>Bit 10 = Far Right</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ColorBalance1'>Nikon ColorBalance1 Tags</a></h2>
@@ -624,6 +653,65 @@ which make writing more difficult.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='MOV'>Nikon MOV Tags</a></h2>
+This information is found in Nikon QT video images, and is very similar to
+information found in Pentax MOV videos.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>Make</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>24</td>
+<td>Model</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>38</td>
+<td>ExposureTime</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>42</td>
+<td>FNumber</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>50</td>
+<td>ExposureCompensation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>68</td>
+<td>WhiteBalance</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Shade
+  <br>3 = Fluorescent
+  <br>4 = Tungsten
+  <br>5 = Manual</font></td></tr>
+<tr valign='top'>
+<td align='right'>72</td>
+<td>FocalLength</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>175</td>
+<td>Software</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>223</td>
+<td>ISO</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='LensID'>Nikon LensID Values</a></h2>
 The Nikon LensID is constructed as a Composite tag from the raw hex values
 of 8 other tags: LensIDNumber, LensFStops, MinFocalLength, MaxFocalLength,
@@ -817,6 +905,7 @@ that order.
 <tr><td>'81 54 80 80 18 18 86 0E'</td><td>= AF-S VR Nikkor 200mm f/2G IF-ED</td></tr>
 <tr><td>'82 48 8E 8E 24 24 87 0E'</td><td>= AF-S VR Nikkor 300mm f/2.8G IF-ED</td></tr>
 <tr><td>'89 3C 53 80 30 3C 8B 06'</td><td>= AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED</td></tr>
+<tr><td>'8A 54 6A 6A 24 24 8C 0E'</td><td>= AF-S VR Micro-Nikkor 105mm f/2.8G IF-ED</td></tr>
 <tr><td>'8B 40 2D 80 2C 3C 8D 0E'</td><td>= AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED</td></tr>
 <tr><td>'8C 40 2D 53 2C 3C 8E 06'</td><td>= AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED</td></tr>
 </table></td></tr></table></blockquote>
@@ -824,6 +913,6 @@ that order.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 19, 2006</i>
+<br><i>Last revised May 5, 2006</i>
 </body>
 </html>

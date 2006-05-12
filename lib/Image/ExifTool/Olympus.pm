@@ -14,6 +14,7 @@
 #               6) Frank Ledwon private communication (tests with E/C-series cameras)
 #               7) Michael Meissner private communication
 #               8) Shingo Noguchi, PhotoXP (http://www.daifukuya.com/photoxp/)
+#               9) Mark Dapoz private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -23,7 +24,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.22';
+$VERSION = '1.26';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -206,6 +207,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s+.*//;$val',
     },
+    0x0206 => { #6
+        Name => 'LensDistortionParams',
+        Writable => 'int16s',
+        Count => 6,
+    },
     0x0207 => { #PH (was incorrectly FirmwareVersion, ref 1,3)
         Name => 'CameraType',
         Writable => 'string',
@@ -233,6 +239,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x020d => { #PH
         Name => 'EpsonSoftware',
         Writable => 'string',
+    },
+    0x0280 => { #PH
+        Name => 'PreviewImage',
+        Notes => 'Epson ERF preview image',
+        Format => 'undef',
+        Writable => 'int8u',
+        ValueConv => '$self->ValidateImage(\$val,"PreviewImage")',
+        ValueConvInv => '$val',
     },
     0x0300 => { #6
         Name => 'PreCaptureFrames',
@@ -269,6 +283,38 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 0,
         ValueConv => '\$val',
     },
+    0x1000 => { #6
+        Name => 'ShutterSpeedValue',
+        Writable => 'rational64s',
+        Priority => 0,
+        ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
+        ValueConvInv => '$val>0 ? -log($val)/log(2) : -100',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x1001 => { #6
+        Name => 'ISOValue',
+        Writable => 'rational64s',
+        Priority => 0,
+        ValueConv => '100 * 2 ** ($val - 5)',
+        ValueConvInv => '$val>0 ? log($val/100)/log(2)+5 : 0',
+        PrintConv => 'int($val * 100 + 0.5) / 100',
+        PrintConvInv => '$val',
+    },
+    0x1002 => { #6
+        Name => 'ApertureValue',
+        Writable => 'rational64s',
+        Priority => 0,
+        ValueConv => '2 ** ($val / 2)',
+        ValueConvInv => '$val>0 ? 2*log($val)/log(2) : 0',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x1003 => { #6
+        Name => 'BrightnessValue',
+        Writable => 'rational64s',
+        Priority => 0,
+    },
     0x1004 => { #3
         Name => 'FlashMode',
         Writable => 'int16u',
@@ -287,24 +333,82 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             5 => 'Internal + External',
         },
     },
-    # commented out tags below from ref 3 look wrong to me - PH
-    #0x1006 => 'Bracket', #3 (rational64s)
-    #0x100b => 'FocusMode', #3 (int16u)
-    #0x100c => 'FocusDistance', #3 (rational64u)
-    #0x100d => 'Zoom', #3 (int16u)
-    #0x100e => 'MacroFocus', #3 (int16u)
-    #0x100f => 'SharpnessFactor', #3 (int16u)
+    0x1006 => { #6
+        Name =>'ExposureCompensation',
+        Writable => 'rational64s',
+    },
+    0x1007 => { #6
+        Name => 'SensorTemperature',
+        Writable => 'int16s',
+    },
+    0x1008 => { #6
+        Name => 'LensTemperature',
+        Writable => 'int16s',
+    },
+    0x100b => { #6
+        Name => 'FocusMode',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Manual',
+        },
+    },
+    0x100c => { #6
+        Name => 'ManualFocusDistance',
+        Writable => 'rational64u',
+    },
+    0x100d => { #6
+        Name => 'ZoomStepCount',
+        Writable => 'int16u',
+    },
+    0x100e => { #6
+        Name => 'FocusStepCount',
+        Writable => 'int16u',
+    },
+    0x100f => { #6
+        Name => 'Sharpness',
+        Writable => 'int16u',
+        Priority => 0,
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Hard',
+            2 => 'Soft',
+        },
+    },
+    0x1010 => { #6
+        Name => 'FlashChargeLevel',
+        Writable => 'int16u',
+    },
     0x1011 => { #3
         Name => 'ColorMatrix',
         Writable => 'int16u',
-        Count => 6,
+        Format => 'int16s',
+        Count => 9,
     },
     0x1012 => { #3
         Name => 'BlackLevel',
         Writable => 'int16u',
         Count => 4,
     },
-    #0x1015 => 'WhiteBalance', #3 (int16u -- usually count of 2, but sometimes 1)
+    0x1015 => { #6
+        Name => 'WBMode',
+        Writable => 'int16u',
+        Count => 2,
+        PrintConv => {
+            '1'   => 'Auto',
+            '1 0' => 'Auto',
+            '1 2' => 'Auto (2)',
+            '1 4' => 'Auto (4)',
+            '2 2' => '3000 Kelvin',
+            '2 3' => '3700 Kelvin',
+            '2 4' => '4000 Kelvin',
+            '2 5' => '4500 Kelvin',
+            '2 6' => '5500 Kelvin',
+            '2 7' => '6500 Kelvin',
+            '2 8' => '7500 Kelvin',
+            '3 0' => 'One-touch',
+        },
+    },
     0x1017 => { #2
         Name => 'RedBalance',
         Writable => 'int16u',
@@ -324,7 +428,26 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'SerialNumber',
         Writable => 'string',
     },
-    #0x1023 => 'FlashBias', #3 (rational64s)
+    0x1023 => { #6
+        Name => 'FlashExposureComp',
+        Writable => 'rational64s',
+    },
+    0x1026 => { #6
+        Name => 'ExternalFlashBounce',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'No',
+            1 => 'Yes',
+        },
+    },
+    0x1027 => { #6
+        Name => 'ExternalFlashZoom',
+        Writable => 'int16u',
+    },
+    0x1028 => { #6
+        Name => 'ExternalFlashMode',
+        Writable => 'int16u',
+    },
     0x1029 => { #3
         Name => 'Contrast',
         Writable => 'int16u',
@@ -384,6 +507,30 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int32u',
         Protected => 2,
     },
+    0x1039 => { #6
+        Name => 'CCDScanMode',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Interlaced',
+            1 => 'Progressive',
+        },
+    },
+    0x103a => { #6
+        Name => 'NoiseReduction',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+        },
+    },
+    0x103b => { #6
+        Name => 'InfinityLensStep',
+        Writable => 'int16u',
+    },
+    0x103c => { #6
+        Name => 'NearLensStep',
+        Writable => 'int16u',
+    },
 # 
 # Olympus really screwed up the format of the following subdirectories (for the
 # E-1 and E-300 anyway). Not only is the subdirectory value data not included in
@@ -427,6 +574,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             ByteOrder => 'Unknown',
         },
     },
+    0x3000 => { #6
+        Name => 'RawInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::RawInfo',
+            ByteOrder => 'Unknown',
+        },
+    },
 );
 
 # TextInfo tags
@@ -458,8 +612,8 @@ any information found here will be extracted, even if the tag is not listed.
         Writable => 'undef',
         Count => 4,
     },
-    0x100 => { #PH
-        Name => 'FirmwareVersion2',
+    0x100 => { #6
+        Name => 'CameraType2',
         Writable => 'string',
         Count => 6,
     },
@@ -469,6 +623,12 @@ any information found here will be extracted, even if the tag is not listed.
         Count => 32,
         PrintConv => '$val=~s/\s+$//;$val',
         PrintConvInv => 'pack("A31",$val)', # pad with spaces to 31 chars
+    },
+    0x102 => { #6
+        Name => 'InternalSerialNumber',
+        Notes => '16 digits: 0-3=model, 4=year, 5-6=month, 8-12=unit number',
+        Writable => 'string',
+        Count => 32,
     },
     0x103 => { #6
         Name => 'FocalPlaneDiagonal',
@@ -525,17 +685,29 @@ any information found here will be extracted, even if the tag is not listed.
         Name => 'MaxFocalLength',
         Writable => 'int16u',
     },
+    0x20a => { #9
+        Name => 'MaxApertureAtCurrentFocal',
+        Writable => 'int16u',
+        ValueConv => '$val ? sqrt(2)**($val/256) : 0',
+        ValueConvInv => '$val>0 ? int(512*log($val)/log(2)+0.5) : 0',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
     0x301 => { #6
         Name => 'Extender',
         Writable => 'int8u',
         Count => 6,
-        Notes => '6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown',
+        Notes => '6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown.',
         PrintConv => 'Image::ExifTool::Olympus::PrintLensInfo($val,"Extender")',
     },
     0x302 => { #4
         Name => 'ExtenderSerialNumber',
         Writable => 'string',
         Count => 32,
+    },
+    0x303 => { #9
+        Name => 'ExtenderModel',
+        Writable => 'string',
     },
     0x304 => { #6
         Name => 'ExtenderFirmwareVersion',
@@ -564,16 +736,16 @@ any information found here will be extracted, even if the tag is not listed.
             5 => 'FL-36',
         },
     },
-    0x1003 => { #4
-        Name => 'FlashSerialNumber',
-        Writable => 'string',
-        Count => 32,
-    },
-    0x1004 => { #6
+    0x1002 => { #6
         Name => 'FlashFirmwareVersion',
         Writable => 'int32u',
         PrintConv => '$val=sprintf("%x",$val);$val=~s/(.{3})$/\.$1/;$val',
         PrintConvInv => '$val=~s/\.//;hex($val)',
+    },
+    0x1003 => { #4
+        Name => 'FlashSerialNumber',
+        Writable => 'string',
+        Count => 32,
     },
 );
 
@@ -613,10 +785,19 @@ any information found here will be extracted, even if the tag is not listed.
         Writable => 'int16u',
         PrintConv => {
             1 => 'Manual',
+            2 => 'Program', #6
             3 => 'Aperture-priority AE',
             4 => 'Shutter speed priority AE',
-            5 => 'Program AE',
+            5 => 'Program-shift', #6
         }
+    },
+    0x201 => { #6
+        Name => 'AELock',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+        },
     },
     0x202 => { #PH/4
         Name => 'MeteringMode',
@@ -625,6 +806,9 @@ any information found here will be extracted, even if the tag is not listed.
             2 => 'Center Weighted',
             3 => 'Spot',
             5 => 'ESP',
+            261 => 'Pattern+AF', #6
+            515 => 'Spot+Highlight control', #6
+            1027 => 'Spot+Shadow control', #6
         },
     },
     0x300 => { #6
@@ -668,10 +852,44 @@ any information found here will be extracted, even if the tag is not listed.
     0x400 => { #6
         Name => 'FlashMode',
         Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            BITMASK => {
+                0 => 'On',
+                1 => 'Fill-in',
+                2 => 'Red-eye',
+                3 => 'Slow-sync',
+                4 => 'Forced On',
+                5 => '2nd Curtain',
+            },
+        },
     },
     0x401 => { #6
         Name => 'FlashExposureCompensation',
         Writable => 'rational64s',
+    },
+    0x500 => { #6
+        Name => 'WhiteBalance2',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            16 => '7500K (Fine Weather with Shade)',
+            17 => '6000K (Cloudy)',
+            18 => '5300K (Fine Weather)',
+            20 => '3000K (Tungsten light)',
+            21 => '3600K (Tungsten light-like)',
+            33 => '6600K (Daylight fluorescent)',
+            34 => '4500K (Neutral white fluorescent)',
+            35 => '4000K (Cool white fluorescent)',
+            48 => '3600K (Tungsten light-like)',
+            256 => 'Custom WB 1',
+            257 => 'Custom WB 2',
+            258 => 'Custom WB 3',
+            259 => 'Custom WB 4',
+            512 => 'Custom WB 5400K',
+            513 => 'Custom WB 2900K',
+            514 => 'Custom WB 8000K',
+        },
     },
     0x501 => { #PH/4
         Name => 'WhiteBalanceTemperature',
@@ -683,12 +901,20 @@ any information found here will be extracted, even if the tag is not listed.
         Name => 'WhiteBalanceBracket',
         Writable => 'int16s',
     },
-    0x503 => { #PH/4
+    0x503 => { #PH/4/6
         Name => 'CustomSaturation',
         Writable => 'int16s',
         Count => 3,
         Notes => '3 numbers: 1. CS Value, 2. Min, 3. Max',
-        PrintConv => 'my ($a,$b,$c)=split " ",$val; $a-=$b; $c-=$b; "CS$a (min CS0, max CS$c)"',
+        PrintConv => q{
+            my ($a,$b,$c)=split ' ',$val;
+            if ($self->{CameraModel} =~ /^E-1\b/) {
+                $a-=$b; $c-=$b;
+                return "CS$a (min CS0, max CS$c)";
+            } else {
+                return "$a (min $b, max $c)";
+            }
+        },
     },
     0x504 => { #PH/4
         Name => 'ModifiedSaturation',
@@ -731,11 +957,14 @@ any information found here will be extracted, even if the tag is not listed.
         Writable => 'int16u',
         PrintConv => {
             0 => 'Standard',
+            6 => 'Auto', #6
             7 => 'Sport',
             8 => 'Portrait',
             9 => 'Landscape+Portrait',
             10 => 'Landscape',
             11 => 'Night scene',
+            13 => 'Panorama', #6
+            16 => 'Landscape+Portrait', #6
             17 => 'Night+Portrait',
             19 => 'Fireworks',
             20 => 'Sunset',
@@ -744,7 +973,14 @@ any information found here will be extracted, even if the tag is not listed.
             26 => 'Museum',
             28 => 'Beach&Snow',
             30 => 'Candle',
+            35 => 'Underwater Wide1', #6
+            36 => 'Underwater Macro', #6
             39 => 'High Key',
+            40 => 'Digital Image Stabilization', #6
+            44 => 'Underwater Wide2', #6
+            45 => 'Low Key', #6
+            46 => 'Children', #6
+            48 => 'Nature Macro', #6
         },
     },
     0x50a => { #PH/4/6
@@ -752,9 +988,11 @@ any information found here will be extracted, even if the tag is not listed.
         Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
-            1 => 'Noise Reduction On',
-            2 => 'Noise Filter On',
-            3 => 'Noise Reduction + Noise Filter On',
+            1 => 'Noise Reduction',
+            2 => 'Noise Filter',
+            3 => 'Noise Reduction + Noise Filter',
+            4 => 'Noise Filter (ISO Boost)', #6
+            5 => 'Noise Reduction + Noise Filter (ISO Boost)', #6
         },
     },
     0x50b => { #6
@@ -774,24 +1012,108 @@ any information found here will be extracted, even if the tag is not listed.
     0x50f => { #6
         Name => 'Gradation',
         Writable => 'int16s',
+        Count => 3,
         PrintConv => {
-           -1 => 'Low Key',
-            0 => 'Normal',
-            1 => 'High Key',
+           '-1 -1 1' => 'Low Key',
+            '0 -1 1' => 'Normal',
+            '1 -1 1' => 'High Key',
+        },
+    },
+    0x520 => { #6
+        Name => 'PictureMode',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Vivid',
+            2 => 'Natural',
+            3 => 'Muted',
+            256 => 'Monotone',
+            512 => 'Sepia',
+        },
+    },
+    0x521 => { #6
+        Name => 'PictureModeSaturation',
+        Writable => 'int16s',
+        Count => 3, # value, min, max
+    },
+    0x522 => { #6
+        Name => 'PictureModeHue',
+        Writable => 'int16s',
+        Unknown => 1, # not confirmed
+    },
+    0x523 => { #6
+        Name => 'PictureModeContrast',
+        Writable => 'int16s',
+        Count => 3, # value, min, max
+    },
+    0x524 => { #6
+        Name => 'PictureModeSharpness',
+        Writable => 'int16s',
+        Count => 3, # value, min, max
+    },
+    0x525 => { #6
+        Name => 'PictureModeBWFilter',
+        Writable => 'int16s',
+        PrintConv => {
+            0 => 'n/a',
+            1 => 'Neutral',
+            2 => 'Yellow',
+            3 => 'Orange',
+            4 => 'Red',
+            5 => 'Green',
+        },
+    },
+    0x526 => { #6
+        Name => 'PictureModeTone',
+        Writable => 'int16s',
+        PrintConv => {
+            0 => 'n/a',
+            1 => 'Neutral',
+            2 => 'Sepia',
+            3 => 'Blue',
+            4 => 'Purple',
+            5 => 'Green',
         },
     },
     0x600 => { #PH/4
         Name => 'Sequence',
         Writable => 'int16u',
-        Count => 2,
-        Notes => '2 numbers: 1. Mode, 2. Sequence Number',
+        Count => -1,
+        Notes => '2 or 3 numbers: 1. Mode, 2. Shot number, 3. Mode bits',
+        PrintConv => q{
+            my ($a,$b,$c) = split ' ',$val;
+            return 'Single Shot' unless $a;
+            if ($a == 5 and defined $c) {
+                $a = DecodeBits($c, { #6
+                    0 => 'AE',
+                    1 => 'WB',
+                    2 => 'FL',
+                    3 => 'MF',
+                }) . ' Bracketing';
+                $a =~ s/, /+/g;
+            } else {
+                my %a = (
+                    1 => 'Continuous Shooting',
+                    2 => 'Exposure Bracketing',
+                    3 => 'White Balance Bracketing',
+                    4 => 'Exposure+WB Bracketing', #6
+                );
+                $a = $a{$a} || "Unknown ($a)";
+            }
+            return "$a, Shot $b";
+        },
+    },
+    0x601 => { #6
+        Name => 'PanoramaMode',
+        Writable => 'int16u',
+        Notes => '2 numbers: 1. Mode, 2. Shot number',
         PrintConv => q{
             my ($a,$b) = split ' ',$val;
-            return 'Single Shot' unless $a;
+            return 'Off' unless $a;
             my %a = (
-                1 => 'Continuous Shooting',
-                2 => 'Exposure Bracketing',
-                3 => 'White Balance Bracketing',
+                1 => 'Left to right',
+                2 => 'Right to left',
+                3 => 'Bottom to top',
+                4 => 'Top to bottom',
             );
             return ($a{$a} || "Unknown ($a)") . ', Shot ' . $b;
         },
@@ -808,7 +1130,7 @@ any information found here will be extracted, even if the tag is not listed.
     },
 );
 
-# Subdir 3
+# Subdir 3 (ref 6)
 %Image::ExifTool::Olympus::RawDevelopment = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -819,59 +1141,59 @@ any information found here will be extracted, even if the tag is not listed.
         Writable => 'undef',
         Count => 4,
     },
-    0x100 => { #6
+    0x100 => {
         Name => 'RawDevExposureBiasValue',
         Writable => 'rational64s',
     },
-    0x101 => { #6
+    0x101 => {
         Name => 'RawDevWhiteBalanceValue',
         Writable => 'int16u',
     },
-    0x102 => { #6
+    0x102 => {
         Name => 'RawDevWBFineAdjustment',
         Writable => 'int16s',
     },
-    0x103 => { #6
+    0x103 => {
         Name => 'RawDevGrayPoint',
         Writable => 'int16u',
         Count => 3,
     },
-    0x104 => { #6
+    0x104 => {
         Name => 'RawDevSaturationEmphasis',
         Writable => 'int16s',
         Count => 3,
     },
-    0x105 => { #6
+    0x105 => {
         Name => 'RawDevMemoryColorEmphasis',
         Writable => 'int16u',
     },
-    0x106 => { #6
+    0x106 => {
         Name => 'RawDevContrastValue',
         Writable => 'int16s',
         Count => 3,
     },
-    0x107 => { #6
+    0x107 => {
         Name => 'RawDevSharpnessValue',
         Writable => 'int16s',
         Count => 3,
     },
-    0x108 => { #6
+    0x108 => {
         Name => 'RawDevColorSpace',
         Writable => 'int16u',
     },
-    0x109 => { #6
+    0x109 => {
         Name => 'RawDevEngine',
         Writable => 'int16u',
     },
-    0x10A => { #6
+    0x10A => {
         Name => 'RawDevNoiseReduction',
         Writable => 'int16u',
     },
-    0x10B => { #6
+    0x10B => {
         Name => 'RawDevEditStatus',
         Writable => 'int16u',
     },
-    0x10C => { #6
+    0x10C => {
         Name => 'RawDevSettings',
         Writable => 'int16u',
     },
@@ -889,13 +1211,14 @@ any information found here will be extracted, even if the tag is not listed.
         Count => 4,
     },
     0x100 => { #6
-        Name => 'RedBlueBias',
+        Name => 'WB_RBLevels',
         Writable => 'int16u',
         Count => 2,
     },
     0x200 => { #6
         Name => 'ColorMatrix',
         Writable => 'int16u',
+        Format => 'int16s',
         Count => 9,
     },
     0x300 => { #PH/4
@@ -928,13 +1251,26 @@ any information found here will be extracted, even if the tag is not listed.
         Name => 'OlympusImageHeight2',
         Writable => 'int32u',
     },
+    # 0x1010-0x1012 are the processing options used in camera or in
+    # Olympus software, which 0x050a-0x050c are in-camera only (ref 6)
     0x1010 => { #PH/4
-        Name => 'NoiseFilter2',
+        Name => 'NoiseReduction2',
         Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'Noise Filter',
             2 => 'Noise Reduction',
+            3 => 'Noise Reduction + Noise Filter', #6
+            4 => 'Noise Filter (ISO Boost)', #6
+            5 => 'Noise Reduction + Noise Filter (ISO Boost)', #6
+        },
+    },
+    0x1011 => { #6
+        Name => 'DistortionCorrection2',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
         },
     },
     0x1012 => { #PH/4
@@ -962,7 +1298,7 @@ any information found here will be extracted, even if the tag is not listed.
         Unknown => 1, #6
     },
     0x300 => { #6
-        Name => 'ZoomPosition',
+        Name => 'ZoomStepCount',
         Writable => 'int16u',
     },
     # 0x301 Related to inverse of focus distance
@@ -1000,10 +1336,154 @@ any information found here will be extracted, even if the tag is not listed.
     0x1208 => { #6
         Name => 'InternalFlash',
         Writable => 'int16u',
-        PrintConv => \%offOn,
+        Count => -1,
+        PrintConv => {
+            '0'   => 'Off',
+            '1'   => 'On',
+            '0 0' => 'Off',
+            '1 0' => 'On',
+        },
+    },
+    0x1209 => { #6
+        Name => 'ManualFlash',
+        Writable => 'int16u',
+        Count => 2,
+        Notes => '2 numbers: 1. 0=Off, 1=On, 2. Flash strength',
+        PrintConv => q{
+            my ($a,$b) = split ' ',$val;
+            return 'Off' unless $a;
+            $b = ($b == 1) ? 'Full' : "1/$b";
+            return "On ($b strength)";
+        },
+    },
+    0x1500 => { #6
+        Name => 'SensorTemperature',
+        Writable => 'int16s',
     },
     # 0x102a same as Subdir4-0x300
 );
+
+# Olympus raw information tags (ref 6)
+%Image::ExifTool::Olympus::RawInfo = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    NOTES => 'These tags are found only in ORF images of some models (ie. C8080WZ).',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x100 => 'WB_RBLevelsUsed',
+    0x110 => 'WB_RBLevelsAuto',
+    0x120 => 'WB_RBLevelsShade',
+    0x121 => 'WB_RBLevelsCloudy',
+    0x122 => 'WB_RBLevelsFineWeather',
+    0x123 => 'WB_RBLevelsTungsten',
+    0x124 => 'WB_RBLevelsEveningSunlight',
+    0x130 => 'WB_RBLevelsDaylightFluor',
+    0x131 => 'WB_RBLevelsDayWhiteFluor',
+    0x132 => 'WB_RBLevelsCoolWhiteFluor',
+    0x133 => 'WB_RBLevelsWhiteFluorescent',
+    0x200 => {
+        Name => 'ColorMatrix2',
+        Format => 'int16s',
+    },
+    # 0x240 => 'ColorMatrixDefault', ?
+    # 0x250 => 'ColorMatrixSaturation', ?
+    # 0x251 => 'ColorMatrixHue', ?
+    # 0x252 => 'ColorMatrixContrast', ?
+    # 0x300 => sharpness-related
+    # 0x301 => list of sharpness-related values
+    0x310 => 'CoringFilter',
+    0x311 => 'CoringValues',
+    0x600 => 'BlackLevel2',
+    0x601 => {
+        Name => 'YCbCrCoefficients',
+        Format => 'rational32u',
+    },
+    0x611 => 'ValidPixelDepth',
+    0x614 => 'FinalImageWidth',
+    0x615 => 'FinalImageHeight',
+    0x1000 => {
+        Name => 'LightSource',
+        PrintConv => {
+            0 => 'Unknown',
+            16 => 'Shade',
+            17 => 'Cloudy',
+            18 => 'Fine Weather',
+            20 => 'Tungsten (incandescent)',
+            22 => 'Evening Sunlight',
+            33 => 'Daylight Fluorescent (D 5700 Ð 7100K)',
+            34 => 'Day White Fluorescent (N 4600 Ð 5400K)',
+            35 => 'Cool White Fluorescent (W 3900 Ð 4500K)',
+            36 => 'White Fluorescent (WW 3200 Ð 3700K)',
+            256 => 'One Touch White Balance',
+            512 => 'Custom 1-4',
+        },
+    },
+    # the following 5 tags all have 3 values: val, min, max
+    0x1000 => 'WhiteBalanceComp',
+    0x1010 => 'SaturationSetting',
+    0x1011 => 'HueSetting',
+    0x1012 => 'ContrastSetting',
+    0x1013 => 'SharpnessSetting',
+    # settings written by Camedia Master 4.x
+    0x2000 => 'CMExposureCompensation',
+    0x2001 => 'CMWhiteBalance',
+    0x2002 => 'CMWhiteBalanceComp',
+    0x2010 => 'CMWhiteBalanceGrayPoint',
+    0x2020 => 'CMSaturation',
+    0x2021 => 'CMHue',
+    0x2022 => 'CMContrast',
+    0x2023 => 'CMSharpness',
+);
+
+# Olympus composite tags
+%Image::ExifTool::Olympus::Composite = (
+    GROUPS => { 2 => 'Camera' },
+    ExtenderStatus => {
+        Notes => q{
+            Olympus cameras have the quirk that they may retain the extender settings
+            after the extender is removed until the camera is powered off.  This tag is
+            an attempt to represent the actual status of the extender.
+        },
+        Require => {
+            0 => 'Olympus:Extender',
+            1 => 'Olympus:LensType',
+            2 => 'MaxApertureValue',
+        },
+        ValueConv => 'Image::ExifTool::Olympus::ExtenderStatus($val[0],$prt[1],$val[2])',
+        PrintConv => {
+            0 => 'Not attached',
+            1 => 'Attached',
+            2 => 'Removed',
+        },
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Olympus::Composite');
+
+
+#------------------------------------------------------------------------------
+# Determine if the extender (EX-25/EC-14) was really attached (ref 9)
+# Inputs: 0) Extender, 1) LensType string, 2) MaxApertureAtMaxFocal
+# Returns: 0=not attached, 1=attached, 2=could have been removed
+# Notes: Olympus has a bug in the in-camera firmware which results in the
+# extender information being cached and written into the EXIF data even after
+# the extender has been removed.  You must power cycle the camera to prevent it
+# from writing the cached extender information into the EXIF data.
+sub ExtenderStatus($$$)
+{
+    my ($extender, $lensType, $maxAperture) = @_;
+    my @info = split ' ', $extender;
+    # validate that extender identifier is reasonable 
+    return 0 unless @info >= 4 and $info[2];
+    # if it's not an EC-14 (id 0 4) then assume it was really attached
+    # (other extenders don't seem to affect the reported max aperture)
+    return 1 if "$info[0] $info[2]" ne "0 4";
+    # get the maximum aperture for this lens (in $1)
+    $lensType =~ / F(\d+(.\d+)?)/ or return 1;
+    # If the maximum aperture at the maximum focal length is greater than the
+    # known max/max aperture of the lens, then the extender must be attached
+    return ($maxAperture - $1 > 0.2) ? 1 : 2;
+}
 
 #------------------------------------------------------------------------------
 # Print lens information (ref 6)
@@ -1026,12 +1506,17 @@ sub PrintLensInfo($$)
             '0 1 1' => 'Zuiko Digital 40-150mm F3.5-4.5', #8
             '0 2'   => 'Zuiko Digital ED 150mm F2.0',
             '0 3'   => 'Zuiko Digital ED 300mm F2.8',
-            '0 5'   => 'Zuiko Digital 14-54mm F2.8-3.5',
-            '0 6'   => 'Zuiko Digital ED 50-200mm F2.8-3.5',
-            '0 7'   => 'Zuiko Digital 11-22mm F2.8-3.5',
+            '0 5 0' => 'Zuiko Digital 14-54mm F2.8-3.5',
+            '0 5 1' => 'Zuiko Digital Pro ED 90-250mm F2.8', #9
+            '0 6 0' => 'Zuiko Digital ED 50-200mm F2.8-3.5',
+            '0 6 1' => 'Zuiko Digital ED 8mm F3.5 Fisheye', #9
+            '0 7 0' => 'Zuiko Digital 11-22mm F2.8-3.5',
+            '0 7 1' => 'Zuiko Digital 18-180mm F3.5-6.3', #6
             '0 21'  => 'Zuiko Digital ED 7-14mm F4.0',
             '0 23'  => 'Zuiko Digital Pro ED 35-100mm F2.0', #7
             '0 24'  => 'Zuiko Digital 14-45mm F3.5-5.6',
+            '0 32'  => 'Zuiko Digital 35mm F3.5 Macro', #9
+            '0 34'  => 'Zuiko Digital 17.5-45mm F3.5-5.6', #9
             # Sigma lenses
             '1 1'   => '18-50mm F3.5-5.6', #8
             '1 2'   => '55-200mm F4.0-5.6 DC',
@@ -1045,14 +1530,15 @@ sub PrintLensInfo($$)
         },
     );
     my %release = (
-        0 => '(production)',
-        1 => '(pre-release)',
+        0 => '', # production
+        1 => ' (pre-release)',
     );
     my $make = $make{$info[0]} || "Unknown Make ($info[0])";
     my $str = "$info[0] $info[2]";
     my $model = $model{$type}->{"$str $info[3]"} || $model{$type}->{$str} || "Unknown Model ($str)";
-    my $rel = $release{$info[3]} || "Unknown Release ($info[3])";
-    return "$make $model $rel";
+    my $rel = $release{$info[3]};
+    $rel = " Unknown Release ($info[3])" unless defined $rel;
+    return "$make $model$rel";
 }
 
 #------------------------------------------------------------------------------
@@ -1114,8 +1600,8 @@ Olympus or Epson maker notes in EXIF information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 
@@ -1131,8 +1617,8 @@ it under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Markku Hanninen, Remi Guyomarch, Frank Ledwon and Michael Meissner
-for their help figuring out some Olympus tags.
+Thanks to Markku Hanninen, Remi Guyomarch, Frank Ledwon, Michael Meissner
+and Mark Dapoz for their help figuring out some Olympus tags.
 
 =head1 SEE ALSO
 

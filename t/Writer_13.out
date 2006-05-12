@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
 [File, File, Image]  - File Name: Writer_13_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2005:04:16 10:37:10
+[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -29,7 +29,6 @@
 [EXIF, ExifIFD, Camera] 41992 - Contrast: High
 [EXIF, ExifIFD, Camera] 41993 - Saturation: High
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
-[EXIF, ExifIFD, Image] 65000 - Owner Name: Phil Harvey
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
 [MakerNotes, Canon, Camera] 3 - Image Quality: RAW
@@ -105,6 +104,7 @@
 [MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0mm
+[XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 2048
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 3072
@@ -113,14 +113,17 @@
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Camera]  - Flash Type: Built-In Flash
-[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Red Eye Reduction: Off
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Program AE
 [Composite, Composite, Camera]  - Shutter Curtain Sync: 1st-curtain sync
 [Composite, Composite, Image]  - Shutter Speed: 1/64
+[Composite, Composite, Camera]  - WB RGGB Levels: 1740 832 831 931
+[Composite, Composite, Camera]  - Blue Balance: 1.11966
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 24.0mm (35mm equivalent: 37.2mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 8.25 m
+[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+[Composite, Composite, Camera]  - Red Balance: 2.09260

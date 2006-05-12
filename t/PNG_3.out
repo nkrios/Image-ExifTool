@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.08
 [File, File, Image]  - File Type: PNG
 [File, File, Image]  - MIME Type: image/png
 [PNG, PNG, Image] 0 - Image Width: 16
@@ -29,7 +29,7 @@
 [EXIF, IFD0, Image] 305 - Software: Adobe Photoshop 7.0
 [EXIF, IFD0, Time] 306 - Modify Date: 2004:02:26 09:36:46
 [EXIF, IFD0, Author] 315 - Artist: Phil Harvey
-[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
 [EXIF, IFD0, Author] 33432 - Copyright: Copyright 2004 Phil Harvey
 [EXIF, ExifIFD, Image] 33437 - F Number: 3.5
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
@@ -95,12 +95,13 @@
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 80
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 100
+[XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Co-sited
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
 [XMP, XMP-xmpRights, Author] Marked - Marked: False
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Camera]  - Flash: On
-[Composite, Composite, Image]  - Image Size: 100x80
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Camera]  - Focal Length: 6.0mm
+[Composite, Composite, Image]  - Image Size: 100x80

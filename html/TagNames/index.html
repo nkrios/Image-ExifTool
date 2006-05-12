@@ -34,15 +34,18 @@ name may be followed by a number in square brackets to indicate the number
 of values written, or the number of characters in a fixed-length string
 (including a null terminator which is added if required).
 
-<p>An asterisk (<code>*</code>) in the <b>Writable</b> column indicates a &apos;protected&apos; tag
-which is not writable directly, but is set via a Composite tag.  A tilde
-(<code>~</code>) indicates a tag this is only writable when print conversion is
-disabled (by setting PrintConv to 0, or using the -n option).  An
-exclamation point (<code>!</code>) indicates a tag that is considered unsafe to write
-under normal circumstances.  These &apos;unsafe&apos; tags are not set when calling
-SetNewValuesFromFile() or when using the exiftool -TagsFromFile option, and
-care should be taken when editing them manually since they may affect the
-way an image is rendered.
+<p>An asterisk (<code>*</code>) after an entry in the <b>Writable</b> column indicates a
+&apos;protected&apos; tag which is not writable directly, but is set via a Composite
+tag.  A tilde (<code>~</code>) indicates a tag this is only writable when print
+conversion is disabled (by setting PrintConv to 0, or using the -n option). 
+A slash (<code>/</code>) indicates an &apos;avoided&apos; tag that is not created unless the
+group is specified (due to name conflicts with other tags).  An exclamation
+point (<code>!</code>) indicates a tag that is considered unsafe to write under normal
+circumstances.  These &apos;unsafe&apos; tags are not set when calling
+SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
+unless specified explicitly, and care should be taken when editing them
+manually since they may affect the way an image is rendered.  A plus sign
+(<code>+</code>) indicates a &apos;list&apos; tag which supports multiple instances.
 
 <p>The HTML version of this document also lists possible <b>Values</b> for all tags
 which have a discrete set of values, and gives <b>Notes</b> for some tags.
@@ -74,6 +77,7 @@ question.
 <br>&nbsp; &nbsp; <a href='XMP.html#tiff'>XMP tiff</a>
 <br>&nbsp; &nbsp; <a href='XMP.html#xmp'>XMP xmp</a>
 <br>&nbsp; &nbsp; <a href='XMP.html#xmpBJ'>XMP xmpBJ</a>
+<br>&nbsp; &nbsp; <a href='XMP.html#xmpDM'>XMP xmpDM</a>
 <br>&nbsp; &nbsp; <a href='XMP.html#xmpMM'>XMP xmpMM</a>
 <br>&nbsp; &nbsp; <a href='XMP.html#xmpPLUS'>XMP xmpPLUS</a>
 <br>&nbsp; &nbsp; <a href='XMP.html#xmpRights'>XMP xmpRights</a>
@@ -134,14 +138,14 @@ question.
 <br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions5D'>CanonCustom Functions5D</a>
 <br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D</a>
 <br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D</a>
+<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions30D'>CanonCustom Functions30D</a>
 <br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions350D'>CanonCustom Functions350D</a>
 <br>&nbsp; &nbsp; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30</a>
 <br>&nbsp; &nbsp; <a href='CanonCustom.html#FuncsUnknown'>CanonCustom FuncsUnknown</a>
 <br>&nbsp; &nbsp; <a href='CanonCustom.html#PersonalFuncs'>CanonCustom PersonalFuncs</a>
 <br>&nbsp; &nbsp; <a href='CanonCustom.html#PersonalFuncValues'>CanonCustom PersonalFuncValues</a>
 <br><a href='Casio.html'>Casio</a>
-</td><td>
-&nbsp; &nbsp; <a href='Casio.html#Type2'>Casio Type2</a>
+<br>&nbsp; &nbsp; <a href='Casio.html#Type2'>Casio Type2</a>
 <br><a href='PrintIM.html'>PrintIM</a>
 <br><a href='FujiFilm.html'>FujiFilm</a>
 <br><a href='JVC.html'>JVC</a>
@@ -150,7 +154,8 @@ question.
 <br>&nbsp; &nbsp; <a href='Kodak.html#Type2'>Kodak Type2</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Type3'>Kodak Type3</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Type4'>Kodak Type4</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Type5'>Kodak Type5</a>
+</td><td>
+&nbsp; &nbsp; <a href='Kodak.html#Type5'>Kodak Type5</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Type6'>Kodak Type6</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Unknown'>Kodak Unknown</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Meta'>Kodak Meta</a>
@@ -159,8 +164,11 @@ question.
 <br><a href='Unknown.html'>Unknown</a>
 <br><a href='Minolta.html'>Minolta</a>
 <br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings</a>
+<br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings7D'>Minolta CameraSettings7D</a>
+<br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D</a>
 <br><a href='Nikon.html'>Nikon</a>
 <br>&nbsp; &nbsp; <a href='Nikon.html#PreviewImage'>Nikon PreviewImage</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#AFInfo'>Nikon AFInfo</a>
 <br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance1'>Nikon ColorBalance1</a>
 <br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2</a>
 <br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance3'>Nikon ColorBalance3</a>
@@ -168,6 +176,7 @@ question.
 <br>&nbsp; &nbsp; <a href='Nikon.html#LensData01'>Nikon LensData01</a>
 <br>&nbsp; &nbsp; <a href='Nikon.html#CaptureOffsets'>Nikon CaptureOffsets</a>
 <br>&nbsp; &nbsp; <a href='Nikon.html#Type2'>Nikon Type2</a>
+<br>&nbsp; &nbsp; <a href='Nikon.html#MOV'>Nikon MOV</a>
 <br><a href='NikonCapture.html'>NikonCapture</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#CropData'>NikonCapture CropData</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#Brightness'>NikonCapture Brightness</a>
@@ -184,10 +193,12 @@ question.
 <br>&nbsp; &nbsp; <a href='Olympus.html#RawDevelopment'>Olympus RawDevelopment</a>
 <br>&nbsp; &nbsp; <a href='Olympus.html#ImageProcessing'>Olympus ImageProcessing</a>
 <br>&nbsp; &nbsp; <a href='Olympus.html#FocusInfo'>Olympus FocusInfo</a>
-<br><a href='Panasonic.html'>Panasonic</a>
-<br>&nbsp; &nbsp; <a href='Panasonic.html#Type2'>Panasonic Type2</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#RawInfo'>Olympus RawInfo</a>
 <br><a href='Pentax.html'>Pentax</a>
 <br>&nbsp; &nbsp; <a href='Pentax.html#MOV'>Pentax MOV</a>
+<br><a href='Panasonic.html'>Panasonic</a>
+<br>&nbsp; &nbsp; <a href='Panasonic.html#Type2'>Panasonic Type2</a>
+<br>&nbsp; &nbsp; <a href='Panasonic.html#Raw'>Panasonic Raw</a>
 <br><a href='Ricoh.html'>Ricoh</a>
 <br>&nbsp; &nbsp; <a href='Ricoh.html#Subdir'>Ricoh Subdir</a>
 <br>&nbsp; &nbsp; <a href='Ricoh.html#Text'>Ricoh Text</a>
@@ -198,6 +209,7 @@ question.
 <br>&nbsp; &nbsp; <a href='Sony.html#SR2Private'>Sony SR2Private</a>
 <br>&nbsp; &nbsp; <a href='Sony.html#SR2SubIFD'>Sony SR2SubIFD</a>
 <br>&nbsp; &nbsp; <a href='Sony.html#SR2DataIFD'>Sony SR2DataIFD</a>
+<br><a href='DNG.html#MakerNotes'>DNG MakerNotes</a>
 <br><a href='DNG.html#OriginalRaw'>DNG OriginalRaw</a>
 <br><a href='CanonRaw.html'>CanonRaw</a>
 <br>&nbsp; &nbsp; <a href='CanonRaw.html#MakeModel'>CanonRaw MakeModel</a>
@@ -208,6 +220,10 @@ question.
 <br>&nbsp; &nbsp; <a href='CanonRaw.html#FlashInfo'>CanonRaw FlashInfo</a>
 <br>&nbsp; &nbsp; <a href='CanonRaw.html#ExposureInfo'>CanonRaw ExposureInfo</a>
 <br><a href='KyoceraRaw.html'>KyoceraRaw</a>
+<br><a href='MinoltaRaw.html'>MinoltaRaw</a>
+<br>&nbsp; &nbsp; <a href='MinoltaRaw.html#PRD'>MinoltaRaw PRD</a>
+<br>&nbsp; &nbsp; <a href='MinoltaRaw.html#RIF'>MinoltaRaw RIF</a>
+<br>&nbsp; &nbsp; <a href='MinoltaRaw.html#WBG'>MinoltaRaw WBG</a>
 <br><a href='SigmaRaw.html'>SigmaRaw</a>
 <br>&nbsp; &nbsp; <a href='SigmaRaw.html#Header'>SigmaRaw Header</a>
 <br>&nbsp; &nbsp; <a href='SigmaRaw.html#HeaderExt'>SigmaRaw HeaderExt</a>
@@ -222,8 +238,7 @@ question.
 <br><a href='BMP.html'>BMP</a>
 <br><a href='PICT.html'>PICT</a>
 <br><a href='PNG.html'>PNG</a>
-</td><td>
-&nbsp; &nbsp; <a href='PNG.html#ImageHeader'>PNG ImageHeader</a>
+<br>&nbsp; &nbsp; <a href='PNG.html#ImageHeader'>PNG ImageHeader</a>
 <br>&nbsp; &nbsp; <a href='PNG.html#PrimaryChromaticities'>PNG PrimaryChromaticities</a>
 <br>&nbsp; &nbsp; <a href='PNG.html#TextualData'>PNG TextualData</a>
 <br>&nbsp; &nbsp; <a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel</a>
@@ -232,7 +247,8 @@ question.
 <br>&nbsp; &nbsp; <a href='MNG.html#BasisObject'>MNG BasisObject</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#ClipObjects'>MNG ClipObjects</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#CloneObject'>MNG CloneObject</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#DefineObject'>MNG DefineObject</a>
+</td><td>
+&nbsp; &nbsp; <a href='MNG.html#DefineObject'>MNG DefineObject</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#DeltaPNGHeader'>MNG DeltaPNGHeader</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#JNGHeader'>MNG JNGHeader</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#Loop'>MNG Loop</a>
@@ -268,9 +284,12 @@ question.
 <br>&nbsp; &nbsp; <a href='ID3.html#v2_3'>ID3 v2_3</a>
 <br>&nbsp; &nbsp; <a href='ID3.html#v2_4'>ID3 v2_4</a>
 <br><a href='RIFF.html'>RIFF</a>
-<br>&nbsp; &nbsp; <a href='RIFF.html#List'>RIFF List</a>
 <br>&nbsp; &nbsp; <a href='RIFF.html#Info'>RIFF Info</a>
 <br>&nbsp; &nbsp; <a href='RIFF.html#Exif'>RIFF Exif</a>
+<br>&nbsp; &nbsp; <a href='RIFF.html#Hdrl'>RIFF Hdrl</a>
+<br>&nbsp; &nbsp; <a href='RIFF.html#Stream'>RIFF Stream</a>
+<br>&nbsp; &nbsp; <a href='RIFF.html#StreamHeader'>RIFF StreamHeader</a>
+<br>&nbsp; &nbsp; <a href='RIFF.html#AVIHeader'>RIFF AVIHeader</a>
 <br>&nbsp; &nbsp; <a href='RIFF.html#Format'>RIFF Format</a>
 <br><a href='AIFF.html'>AIFF</a>
 <br>&nbsp; &nbsp; <a href='AIFF.html#Common'>AIFF Common</a>
@@ -301,7 +320,23 @@ question.
 <br>&nbsp; &nbsp; <a href='QuickTime.html#ImageFile'>QuickTime ImageFile</a>
 <br>&nbsp; &nbsp; <a href='QuickTime.html#ImageDesc'>QuickTime ImageDesc</a>
 <br><a href='APP12.html'>APP12</a>
+<br><a href='APP14.html'>APP14</a>
 <br><a href='AFCP.html'>AFCP</a>
+<br><a href='MIE.html'>MIE</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Meta'>MIE Meta</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Audio'>MIE Audio</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Camera'>MIE Camera</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Extender'>MIE Extender</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Flash'>MIE Flash</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Lens'>MIE Lens</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Doc'>MIE Doc</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Geo'>MIE Geo</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Image'>MIE Image</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#MakerNotes'>MIE MakerNotes</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Unknown'>MIE Unknown</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Preview'>MIE Preview</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Thumbnail'>MIE Thumbnail</a>
+<br>&nbsp; &nbsp; <a href='MIE.html#Video'>MIE Video</a>
 <br><a href='Extra.html'>Extra</a>
 <br><a href='Composite.html'>Composite</a>
 </td></tr></table></td></tr></table></blockquote>
@@ -309,6 +344,6 @@ question.
 <p><a href='../index.html'>&lt;-- Back to ExifTool Home Page</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 19, 2006</i>
+<br><i>Last revised May 12, 2006</i>
 </body>
 </html>

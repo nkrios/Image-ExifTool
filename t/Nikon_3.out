@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
 [File, File, Image]  - File Name: Nikon_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2006:02:06 11:56:50
+[File, File, Time]  - File Modification Date/Time: 2006:05:02 10:53:54
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -61,7 +61,9 @@
 [MakerNotes, Nikon, Camera] 130 - Auxiliary Lens: Off
 [MakerNotes, Nikon, Camera] 133 - Manual Focus Distance: inf
 [MakerNotes, Nikon, Camera] 134 - Digital Zoom: 1
-[MakerNotes, Nikon, Camera] 136 - AF Point: Center
+[MakerNotes, Nikon, Camera] 0 - AF Mode: Single Area
+[MakerNotes, Nikon, Camera] 1 - AF Point: Center
+[MakerNotes, Nikon, Camera] 2 - AF Points Used: (none)
 [MakerNotes, Nikon, Camera] 143 - Scene Mode: 
 [MakerNotes, Nikon, Camera] 16 - Data Dump: (Binary data 122 bytes)
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
@@ -79,7 +81,7 @@
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000001
 [XMP, XMP-dc, Author] creator - Creator: Phil
 [Composite, Composite, Image]  - Aperture: 9.4
-[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Shutter Speed: 1/213
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Focal Length: 8.6mm
+[Composite, Composite, Image]  - Image Size: 8x8

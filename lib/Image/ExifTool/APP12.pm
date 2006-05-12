@@ -11,7 +11,7 @@ package Image::ExifTool::APP12;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessAPP12($$$);
 
@@ -21,7 +21,7 @@ sub ProcessAPP12($$$);
     GROUPS => { 0 => 'APP12', 1 => 'APP12', 2 => 'Image' },
     NOTES => q{
 The JPEG APP12 segment was used by some older cameras, and may contain
-ASCI-based meta information.  Below are some tags which have been observed
+ASCII-based meta information.  Below are some tags which have been observed
 Agfa and Polaroid images, however ExifTool will extract information from any
 tags found in this segment.
     },
@@ -56,8 +56,8 @@ tags found in this segment.
     Flash       => { PrintConv => { 0 => 'Off', 1 => 'On' } },
     Macro       => { PrintConv => { 0 => 'Off', 1 => 'On' } },
     StrobeTime  => { },
-    Ytarget     => { },
-    ylevel      => { },
+    Ytarget     => { Name => 'YTarget' },
+    ylevel      => { Name => 'YLevel' },
     FocusPos    => { },
     FocusMode   => { },
     Quality     => { },
@@ -155,8 +155,8 @@ APP12 meta information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

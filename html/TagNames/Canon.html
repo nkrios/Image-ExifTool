@@ -75,19 +75,21 @@
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x000f</td>
-<td>CanonCustomFunctions1D
-  <br>CanonCustomFunctions5D
-  <br>CanonCustomFunctions10D
-  <br>CanonCustomFunctions20D
-  <br>CanonCustomFunctions350D
-  <br>CanonCustomFunctionsD30
-  <br>CanonCustomFunctionsD60
-  <br>CanonCustomFunctionsUnknown</td>
-<td align='center'>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
+<td>CustomFunctions1D
+  <br>CustomFunctions5D
+  <br>CustomFunctions10D
+  <br>CustomFunctions20D
+  <br>CustomFunctions30D
+  <br>CustomFunctions350D
+  <br>CustomFunctionsD30
+  <br>CustomFunctionsD60
+  <br>CustomFunctionsUnknown</td>
+<td align='center'>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions5D'>CanonCustom Functions5D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#Functions30D'>CanonCustom Functions30D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions350D'>CanonCustom Functions350D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a>
@@ -145,13 +147,22 @@
   <br>0x1660000 = PowerShot SD500 / Digital IXUS 700 / IXY Digital 600
   <br>0x1668000 = EOS D60
   <br>0x1700000 = PowerShot SD30 / Digital IXUS i zoom / IXY Digital L3
+  <br>0x1740000 = PowerShot A430
   <br>0x1750000 = PowerShot A410
   <br>0x1760000 = PowerShot S80
   <br>0x1780000 = PowerShot A620
   <br>0x1790000 = PowerShot A610
+  <br>0x1800000 = PowerShot SD630 / Digital IXUS 65 / IXY Digital 80
   <br>0x1810000 = PowerShot SD450 / Digital IXUS 55 / IXY Digital 60
   <br>0x1870000 = PowerShot SD400 / Digital IXUS 50 / IXY Digital 55
+  <br>0x1880000 = PowerShot A420
   <br>0x1900000 = PowerShot SD550 / Digital IXUS 750 / IXY Digital 700
+  <br>0x1920000 = PowerShot A700
+  <br>0x1940000 = PowerShot SD700 IS / Digital IXUS 800 IS
+  <br>0x1950000 = PowerShot S3 IS
+  <br>0x1960000 = PowerShot A540
+  <br>0x1970000 = PowerShot SD600 / Digital IXUS 60 / IXY Digital 70
+  <br>0x1990000 = PowerShot A530
   <br>0x3010000 = PowerShot Pro90 IS
   <br>0x4040000 = PowerShot G1
   <br>0x6040000 = PowerShot S100 / Digital IXUS / IXY Digital
@@ -164,7 +175,8 @@
   <br>0x80000188 = EOS-1Ds Mark II
   <br>0x80000189 = EOS Digital Rebel XT / 350D / Kiss Digital N
   <br>0x80000213 = EOS 5D
-  <br>0x80000232 = EOS-1D Mark II N</font></td></tr>
+  <br>0x80000232 = EOS-1D Mark II N
+  <br>0x80000234 = EOS 30D</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0012</td>
 <td>CanonPictureInfo</td>
@@ -178,7 +190,7 @@
   <br>0xa0000000 = Format 2</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0090</td>
-<td>CanonCustomFunctions1D</td>
+<td>CustomFunctions1D</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a></td></tr>
 <tr valign='top'>
@@ -288,10 +300,20 @@
   <br>--&gt; <a href='Canon.html#ColorBalance2'>Canon ColorBalance2 Tags</a>
   <br>--&gt; <a href='Canon.html#ColorBalance3'>Canon ColorBalance3 Tags</a></td></tr>
 <tr valign='top'>
+<td>0x4002</td>
+<td>UnknownBlock1?</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x4003</td>
 <td>ColorInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Canon.html#ColorInfo'>Canon ColorInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x4005</td>
+<td>UnknownBlock2?</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(unknown 49kB block, not copied to JPEG images)</font></font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Canon CameraSettings Tags</a></h2>
@@ -534,12 +556,12 @@
 <tr valign='top'>
 <td align='right'>23</td>
 <td>LongFocal</td>
-<td align='center'>int16s</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>24</td>
 <td>ShortFocal</td>
-<td align='center'>int16s</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>25</td>
@@ -975,7 +997,7 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
 <td><font size='-1'><font color="#666666">(5D only)</font></font></td></tr>
 <tr valign='top'>
 <td align='right'>208</td>
-<td>PictureNumber</td>
+<td>ImageNumber</td>
 <td align='center'>int16u</td>
 <td><font size='-1'><font color="#666666">(5D only)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -1326,7 +1348,7 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
 <td align='center'>int16s</td>
 <td><font size='-1'>0 = Off
   <br>1 = On (shift AB)
-  <br>2 = On (shift GB)</font></td></tr>
+  <br>2 = On (shift GM)</font></td></tr>
 <tr valign='top'>
 <td align='right'>12</td>
 <td>WBBracketValueAB</td>
@@ -1730,7 +1752,7 @@ This table is used by the 20D and 350D.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>34</td>
-<td>ColorTempAuto2</td>
+<td>ColorTempAuto</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -2277,6 +2299,6 @@ This table is used by the 5D and 1DmkIIN.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 16, 2006</i>
+<br><i>Last revised Apr 3, 2006</i>
 </body>
 </html>

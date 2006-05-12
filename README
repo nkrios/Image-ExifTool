@@ -2,21 +2,23 @@ ExifTool by Phil Harvey (phil at owl.phy.queensu.ca)
 ----------------------------------------------------------------------------
 
 ExifTool is a customizable set of Perl libraries plus an application script
-for reading and writing meta information in image, audio and video files.
+for reading and writing meta information in image, audio and video files,
+including the maker note information of many digital cameras by various
+manufacturers such as Canon, Casio, FujiFilm, JVC/Victor, Kodak, Leaf,
+Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
+Ricoh, Sanyo and Sigma/Foveon.
 
-ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop
-IRB, AFCP and ID3 meta information from JPG, JP2, TIFF, GIF, BMP, PICT,
-QTIF, PNG, MNG, JNG, MIFF, PPM, PGM, PBM, XMP, EPS, PS, AI, PDF, PSD, DCM,
-ACR, THM, CRW, CR2, MRW, NEF, PEF, ORF, RAF, RAW, SRF, SR2, MOS, X3F and DNG
-images, MP3, WAV, WMA and AIFF audio files, and AVI, MOV, MP4 and WMV
-videos. ExifTool also extracts information from the maker notes of many
-digital cameras by various manufacturers including Canon, Casio, FujiFilm,
-JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon, Olympus/Epson,
-Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
+ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, GeoTIFF, ICC Profile,
+Photoshop IRB, AFCP and ID3 meta information from JPG, JP2, TIFF, GIF, BMP,
+PICT, QTIF, PNG, MNG, JNG, MIFF, PPM, PGM, PBM, EPS, PS, AI, PDF, PSD, DCM,
+ACR, THM, CRW, CR2, ERF, MRW, NEF, PEF, ORF, RAF, RAW, SRF, SR2, MOS, X3F
+and DNG images, MP3, WAV, WMA and AIFF audio files, AVI, MOV, MP4 and WMV
+videos, and XMP, ICC and MIE data files.
 
-ExifTool writes EXIF, GPS, IPTC, XMP, MakerNotes, Photoshop IRB and AFCP
-meta information to JPEG, TIFF, GIF, PSD, XMP, PPM, PGM, PBM, PNG, MNG, JNG,
-CRW, THM, CR2, MRW, NEF, PEF, MOS and DNG images.
+ExifTool writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, ICC Profile,
+Photoshop IRB and AFCP meta information to JPEG, TIFF, GIF, EPS, PS, PSD,
+XMP, ICC, MIE, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, ERF, MRW, NEF,
+PEF, MOS and DNG images.
 
 See html/index.html for more details about ExifTool features.
 
@@ -84,8 +86,8 @@ DEPENDENCIES
 
 Requires Perl version 5.004 or later.  No other special libraries are
 required, however Compress::Zlib is used if available to read/write
-compressed information in PNG, PDF, DCM and DNG images, and Digest::MD5 is
-used if available to read encrypted information in PDF files.
+compressed information in PNG, PDF, DCM, DNG and MIE images, and Digest::MD5
+is used if available to read encrypted information in PDF files.
 
 COPYRIGHT AND LICENCE
 

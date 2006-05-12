@@ -173,10 +173,13 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0111</td>
 <td>StripOffsets
-  <br>PreviewImageStart</td>
-<td align='center'>N<br>int32u*</td>
-<td align='center'>-<br>IFD0</td>
-<td><font size='-1'><font color="#666666">(PreviewImageStart in IFD0 of CR2 images and SubIFD1 of DNG images)</font></font></td></tr>
+  <br>PreviewImageStart
+  <br>PreviewImageStart
+  <br>JpgFromRawStart</td>
+<td align='center'>N<br>int32u*<br>int32u*<br>int32u*</td>
+<td align='center'>-<br>IFD0<br>SubIFD1<br>SubIFD2</td>
+<td><font size='-1'><font color="#666666">(PreviewImageStart in IFD0 of CR2 images and SubIFD1 of DNG images, and
+JpgFromRawStart in SubIFD2 of DNG images)</font></font></td></tr>
 <tr valign='top'>
 <td>0x0112</td>
 <td>Orientation</td>
@@ -205,10 +208,13 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0117</td>
 <td>StripByteCounts
-  <br>PreviewImageLength</td>
-<td align='center'>N<br>int32u*</td>
-<td align='center'>-<br>IFD0</td>
-<td><font size='-1'><font color="#666666">(PreviewImageLength in IFD0 of CR2 images and SubIFD1 of DNG images)</font></font></td></tr>
+  <br>PreviewImageLength
+  <br>PreviewImageLength
+  <br>JpgFromRawLength</td>
+<td align='center'>N<br>int32u*<br>int32u*<br>int32u*</td>
+<td align='center'>-<br>IFD0<br>SubIFD1<br>SubIFD2</td>
+<td><font size='-1'><font color="#666666">(PreviewImageLength in IFD0 of CR2 images and SubIFD1 of DNG images, and
+JpgFromRawLength in SubIFD2 of DNG images)</font></font></td></tr>
 <tr valign='top'>
 <td>0x0118</td>
 <td>MinSampleValue</td>
@@ -662,7 +668,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr valign='top'>
 <td>0x0211</td>
 <td>YCbCrCoefficients</td>
-<td align='center'>rational64u[3]</td>
+<td align='center'>rational64u[3]!</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -679,7 +685,7 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <tr valign='top'>
 <td>0x0213</td>
 <td>YCbCrPositioning</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u!</td>
 <td align='center'>IFD0</td>
 <td><font size='-1'>1 = Centered
   <br>2 = Co-sited</font></td></tr>
@@ -789,13 +795,13 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <td>0x829a</td>
 <td>ExposureTime</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x829d</td>
 <td>FNumber</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x82a5</td>
@@ -972,70 +978,76 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x8546</td>
+<td>SEMInfo</td>
+<td align='center'>string</td>
+<td align='center'>IFD0</td>
+<td><font size='-1'><font color="#666666">(found in some scanning electron microscope images)</font></font></td></tr>
+<tr valign='top'>
 <td>0x8568</td>
 <td>AFCP_IPTC</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x85d8</td>
 <td>ModelTransform</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8606</td>
 <td>LeafData</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Leaf.html'>Leaf Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8649</td>
 <td>PhotoshopSettings</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8769</td>
 <td>ExifOffset</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8773</td>
 <td>ICC_Profile</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x87ac</td>
 <td>ImageLayer</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x87af</td>
 <td>GeoTiffDirectory</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x87b0</td>
 <td>GeoTiffDoubleParams</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x87b1</td>
 <td>GeoTiffAsciiParams</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8822</td>
 <td>ExposureProgram</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>1 = Manual
   <br>2 = Program AE
   <br>3 = Aperture-priority AE
@@ -1044,143 +1056,144 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>6 = Action (High speed)
   <br>7 = Portrait
   <br>8 = Landscape</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8824</td>
 <td>SpectralSensitivity</td>
 <td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8825</td>
 <td>GPSInfo</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='GPS.html'>GPS Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8827</td>
 <td>ISO</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8828</td>
 <td>Opto-ElectricConvFactor</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8829</td>
 <td>Interlace</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x882a</td>
 <td>TimeZoneOffset</td>
-<td align='center'>int16s</td>
-<td align='center'>ExifIFD</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
+<td align='center'>int16s[n]</td>
+<td align='center'>-</td>
+<td><font size='-1'><font color="#666666">(1 or 2 values: 1. The time zone offset of DateTimeOriginal from GMT in
+hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x882b</td>
 <td>SelfTimerMode</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x885c</td>
 <td>FaxRecvParams</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x885d</td>
 <td>FaxSubAddress</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x885e</td>
 <td>FaxRecvTime</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x888a</td>
 <td>LeafSubIFD</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Leaf.html#SubIFD'>Leaf SubIFD Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9000</td>
 <td>ExifVersion</td>
 <td align='center'>undef</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9003</td>
 <td>DateTimeOriginal</td>
 <td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9004</td>
 <td>CreateDate</td>
 <td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9101</td>
 <td>ComponentsConfiguration</td>
 <td align='center'>undef</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9102</td>
 <td>CompressedBitsPerPixel</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9201</td>
 <td>ShutterSpeedValue</td>
 <td align='center'>rational64s</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9202</td>
 <td>ApertureValue</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9203</td>
 <td>BrightnessValue</td>
 <td align='center'>rational64s</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9204</td>
 <td>ExposureCompensation</td>
 <td align='center'>rational64s</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9205</td>
 <td>MaxApertureValue</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9206</td>
 <td>SubjectDistance</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9207</td>
 <td>MeteringMode</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>1 = Average
   <br>2 = Center-weighted average
   <br>3 = Spot
@@ -1188,11 +1201,11 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>5 = Multi-segment
   <br>6 = Partial
   <br>255 = Other</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9208</td>
 <td>LightSource</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>1 = Daylight
   <br>2 = Fluorescent
   <br>3 = Tungsten
@@ -1213,11 +1226,11 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>23 = D50
   <br>24 = ISO Studio Tungsten
   <br>255 = Other</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9209</td>
 <td>Flash</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>0x0 = No Flash
   <br>0x1 = Fired
   <br>0x5 = Fired, Return not detected
@@ -1240,43 +1253,43 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>0x59 = Auto, Fired, Red-eye reduction
   <br>0x5d = Auto, Fired, Red-eye reduction, Return not detected
   <br>0x5f = Auto, Fired, Red-eye reduction, Return detected</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x920a</td>
 <td>FocalLength</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x920b</td>
 <td>FlashEnergy</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x920c</td>
 <td>SpatialFrequencyResponse</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x920d</td>
 <td>Noise</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x920e</td>
 <td>FocalPlaneXResolution</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x920f</td>
 <td>FocalPlaneYResolution</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9210</td>
 <td>FocalPlaneResolutionUnit</td>
 <td align='center'>N</td>
@@ -1285,61 +1298,66 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>10 = cm
   <br>&apos;0.001&apos; = um
   <br>&apos;25.4&apos; = inches</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9211</td>
 <td>ImageNumber</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9212</td>
 <td>SecurityClassification</td>
-<td align='center'>N</td>
+<td align='center'>string</td>
 <td align='center'>-</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
+<td><font size='-1'>&apos;C&apos; = Confidential
+  <br>&apos;R&apos; = Restricted
+  <br>&apos;S&apos; = Secret
+  <br>&apos;T&apos; = Top Secret
+  <br>&apos;U&apos; = Unclassified</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9213</td>
 <td>ImageHistory</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9214</td>
 <td>SubjectLocation</td>
 <td align='center'>int16u[4]</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9215</td>
 <td>ExposureIndex</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9216</td>
 <td>TIFF-EPStandardID</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9217</td>
 <td>SensingMethod</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
-<td><font size='-1'>1 = Not defined
+<td><font size='-1'>1 = Monochrome area
   <br>2 = One-chip color area
   <br>3 = Two-chip color area
   <br>4 = Three-chip color area
   <br>5 = Color sequential area
+  <br>6 = Monochrome linear
   <br>7 = Trilinear
   <br>8 = Color sequential linear</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x923f</td>
 <td>StoNits</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x927c</td>
 <td>MakerNoteCanon
   <br>MakerNoteCasio
@@ -1411,37 +1429,37 @@ ExifTool family 1 group names.  When writing EXIF information, the default
   <br>--&gt; <a href='Sony.html#SRF'>Sony SRF Tags</a>
   <br>--&gt; <a href='Sony.html'>Sony Tags</a>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9286</td>
 <td>UserComment</td>
 <td align='center'>undef</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9290</td>
 <td>SubSecTime</td>
 <td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9291</td>
 <td>SubSecTimeOriginal</td>
 <td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9292</td>
 <td>SubSecTimeDigitized</td>
 <td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x935c</td>
 <td>ImageSourceData</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9c9b</td>
 <td>XPTitle</td>
 <td align='center'>undef</td>
@@ -1450,148 +1468,148 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 in these values are converted to UTF-8 by default, or Windows Latin1
 with the -L option. XPTitle is ignored by Windows Explorer if
 ImageDescription exists)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9c9c</td>
 <td>XPComment</td>
 <td align='center'>undef</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9c9d</td>
 <td>XPAuthor</td>
 <td align='center'>undef</td>
 <td align='center'>IFD0</td>
 <td><font size='-1'><font color="#666666">(ignored by Windows Explorer if Artist exists)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x9c9e</td>
 <td>XPKeywords</td>
 <td align='center'>undef</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x9c9f</td>
 <td>XPSubject</td>
 <td align='center'>undef</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa000</td>
 <td>FlashpixVersion</td>
 <td align='center'>undef</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa001</td>
 <td>ColorSpace</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>1 = sRGB
   <br>2 = Adobe RGB
   <br>65535 = Uncalibrated</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa002</td>
 <td>ExifImageWidth</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa003</td>
 <td>ExifImageLength</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa004</td>
 <td>RelatedSoundFile</td>
 <td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa005</td>
 <td>InteropOffset</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa20b</td>
 <td>FlashEnergy</td>
-<td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>rational64u[n]</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa20c</td>
 <td>SpatialFrequencyResponse</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa20d</td>
 <td>Noise</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa20e</td>
 <td>FocalPlaneXResolution</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa20f</td>
 <td>FocalPlaneYResolution</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa210</td>
 <td>FocalPlaneResolutionUnit</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>1 = mm
   <br>10 = cm
   <br>&apos;0.001&apos; = um
   <br>&apos;25.4&apos; = inches</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa211</td>
 <td>ImageNumber</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa212</td>
 <td>SecurityClassification</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa213</td>
 <td>ImageHistory</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa214</td>
 <td>SubjectLocation</td>
 <td align='center'>int16u[2]</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa215</td>
 <td>ExposureIndex</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa216</td>
 <td>TIFF-EPStandardID</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa217</td>
 <td>SensingMethod</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>1 = Not defined
   <br>2 = One-chip color area
   <br>3 = Two-chip color area
@@ -1599,206 +1617,206 @@ ImageDescription exists)</font></font></td></tr>
   <br>5 = Color sequential area
   <br>7 = Trilinear
   <br>8 = Color sequential linear</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa300</td>
 <td>FileSource</td>
 <td align='center'>undef</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>3 = Digital Camera</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa301</td>
 <td>SceneType</td>
 <td align='center'>undef</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>1 = Directly photographed</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa302</td>
 <td>CFAPattern</td>
 <td align='center'>undef</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa401</td>
 <td>CustomRendered</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Custom</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa402</td>
 <td>ExposureMode</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>0 = Auto
   <br>1 = Manual
   <br>2 = Auto bracket</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa403</td>
 <td>WhiteBalance</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>0 = Auto
   <br>1 = Manual</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa404</td>
 <td>DigitalZoomRatio</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa405</td>
 <td>FocalLengthIn35mmFormat</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa406</td>
 <td>SceneCaptureType</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>0 = Standard
   <br>1 = Landscape
   <br>2 = Portrait
   <br>3 = Night</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa407</td>
 <td>GainControl</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>0 = None
   <br>1 = Low gain up
   <br>2 = High gain up
   <br>3 = Low gain down
   <br>4 = High gain down</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa408</td>
 <td>Contrast</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
-<td><font size='-1'>0 = Normal
-  <br>1 = Low
-  <br>2 = High</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td>0xa409</td>
-<td>Saturation</td>
-<td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Low
   <br>2 = High</font></td></tr>
 <tr valign='top'>
+<td>0xa409</td>
+<td>Saturation</td>
+<td align='center'>int16u</td>
+<td align='center'>-</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Low
+  <br>2 = High</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa40a</td>
 <td>Sharpness</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Soft
   <br>2 = Hard</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa40b</td>
 <td>DeviceSettingDescription</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa40c</td>
 <td>SubjectDistanceRange</td>
 <td align='center'>int16u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td><font size='-1'>1 = Macro
   <br>2 = Close
   <br>3 = Distant</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa420</td>
 <td>ImageUniqueID</td>
 <td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa480</td>
 <td>GDALMetadata</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xa481</td>
 <td>GDALNoData</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xa500</td>
 <td>Gamma</td>
 <td align='center'>rational64u</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc427</td>
 <td>OceScanjobDesc</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc428</td>
 <td>OceApplicationSelector</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc429</td>
 <td>OceIDNumber</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc42a</td>
 <td>OceImageLogic</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc44f</td>
 <td>Annotations</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc4a5</td>
 <td>PrintIM</td>
 <td align='center'>undef</td>
 <td align='center'>IFD0</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc612</td>
 <td>DNGVersion</td>
 <td align='center'>int8u[4]</td>
 <td align='center'>IFD0</td>
 <td><font size='-1'><font color="#666666">(tags 0xc612-0xc65d are used in DNG images)</font></font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc613</td>
 <td>DNGBackwardVersion</td>
 <td align='center'>int8u[4]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc614</td>
 <td>UniqueCameraModel</td>
 <td align='center'>string</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc615</td>
 <td>LocalizedCameraModel</td>
 <td align='center'>string</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc616</td>
 <td>CFAPlaneColor</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc617</td>
 <td>CFALayout</td>
 <td align='center'>N</td>
@@ -1808,189 +1826,191 @@ ImageDescription exists)</font></font></td></tr>
   <br>3 = Even columns offset up 1/2 row
   <br>4 = Even rows offset right 1/2 column
   <br>5 = Even rows offset left 1/2 column</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc618</td>
 <td>LinearizationTable</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc619</td>
 <td>BlackLevelRepeatDim</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc61a</td>
 <td>BlackLevel</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc61b</td>
 <td>BlackLevelDeltaH</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc61c</td>
 <td>BlackLevelDeltaV</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc61d</td>
 <td>WhiteLevel</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc61e</td>
 <td>DefaultScale</td>
 <td align='center'>rational64u[2]</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc61f</td>
 <td>DefaultCropOrigin</td>
 <td align='center'>int32u[2]</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc620</td>
 <td>DefaultCropSize</td>
 <td align='center'>int32u[2]</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc621</td>
 <td>ColorMatrix1</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc622</td>
 <td>ColorMatrix2</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc623</td>
 <td>CameraCalibration1</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc624</td>
 <td>CameraCalibration2</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc625</td>
 <td>ReductionMatrix1</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc626</td>
 <td>ReductionMatrix2</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc627</td>
 <td>AnalogBalance</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc628</td>
 <td>AsShotNeutral</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc629</td>
 <td>AsShotWhiteXY</td>
 <td align='center'>rational64u[2]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc62a</td>
 <td>BaselineExposure</td>
 <td align='center'>rational64s</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc62b</td>
 <td>BaselineNoise</td>
 <td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc62c</td>
 <td>BaselineSharpness</td>
 <td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc62d</td>
 <td>BayerGreenSplit</td>
 <td align='center'>int32u</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc62e</td>
 <td>LinearResponseLimit</td>
 <td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc62f</td>
 <td>CameraSerialNumber</td>
 <td align='center'>string</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc630</td>
 <td>DNGLensInfo</td>
 <td align='center'>rational64u[4]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc631</td>
 <td>ChromaBlurRadius</td>
 <td align='center'>rational64u</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc632</td>
 <td>AntiAliasStrength</td>
 <td align='center'>rational64u</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc633</td>
 <td>ShadowScale</td>
 <td align='center'>rational64u</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td>0xc634</td>
-<td>DNGPrivateData
-  <br>SR2Private</td>
-<td align='center'>N<br>-</td>
-<td align='center'>-<br>-</td>
-<td><font size='-1'>Sony SR2Private</font></td></tr>
 <tr valign='top'>
+<td>0xc634</td>
+<td>SR2Private
+  <br>DNGMakerNotes
+  <br>DNGPrivateData</td>
+<td align='center'>-<br>-<br>N</td>
+<td align='center'>-<br>-<br>-</td>
+<td>--&gt; <a href='Sony.html#SR2Private'>Sony SR2Private Tags</a>
+  <br>--&gt; <a href='DNG.html#MakerNotes'>DNG MakerNotes Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc635</td>
 <td>MakerNoteSafety</td>
 <td align='center'>int16u</td>
 <td align='center'>IFD0</td>
 <td><font size='-1'>0 = Unsafe
   <br>1 = Safe</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc65a</td>
 <td>CalibrationIlluminant1</td>
 <td align='center'>int16u</td>
@@ -2015,7 +2035,7 @@ ImageDescription exists)</font></font></td></tr>
   <br>23 = D50
   <br>24 = ISO Studio Tungsten
   <br>255 = Other</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc65b</td>
 <td>CalibrationIlluminant2</td>
 <td align='center'>int16u</td>
@@ -2040,163 +2060,163 @@ ImageDescription exists)</font></font></td></tr>
   <br>23 = D50
   <br>24 = ISO Studio Tungsten
   <br>255 = Other</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc65c</td>
 <td>BestQualityScale</td>
 <td align='center'>rational64u</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc65d</td>
 <td>RawDataUniqueID</td>
 <td align='center'>undef[16]</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc660</td>
 <td>AliasLayerMetadata</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td><font size='-1'><font color="#666666">(used by Alias Sketchbook Pro, not a DNG tag)</font></font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc68b</td>
 <td>OriginalRawFileName</td>
 <td align='center'>string</td>
 <td align='center'>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc68c</td>
 <td>OriginalRawFileData</td>
 <td align='center'>undef</td>
 <td align='center'>IFD0</td>
 <td>--&gt; <a href='DNG.html#OriginalRaw'>DNG OriginalRaw Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc68d</td>
 <td>ActiveArea</td>
 <td align='center'>int32u[4]</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc68e</td>
 <td>MaskedAreas</td>
 <td align='center'>int32u[4]</td>
 <td align='center'>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc68f</td>
 <td>AsShotICCProfile</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc690</td>
 <td>AsShotPreProfileMatrix</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xc691</td>
 <td>CurrentICCProfile</td>
 <td align='center'>-</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xc692</td>
 <td>CurrentPreProfileMatrix</td>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfde8</td>
 <td>OwnerName</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td><font size='-1'><font color="#666666">(tags 0xfde8-0xfe58 are generated by Photoshop Camera RAW -- some
 names are the same as other EXIF tags, but ExifTool will avoid
 writing these unless they already exist in the file)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfde9</td>
 <td>SerialNumber</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfdea</td>
 <td>Lens</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe4c</td>
 <td>RawFile</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe4d</td>
 <td>Converter</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe4e</td>
 <td>WhiteBalance</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe51</td>
 <td>Exposure</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe52</td>
 <td>Shadows</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe53</td>
 <td>Brightness</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xfe54</td>
 <td>Contrast</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe55</td>
 <td>Saturation</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td>0xfe56</td>
-<td>Sharpness</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>0xfe57</td>
-<td>Smoothness</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td>0xfe56</td>
+<td>Sharpness</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0xfe57</td>
+<td>Smoothness</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0xfe58</td>
 <td>MoireFilter</td>
-<td align='center'>string</td>
-<td align='center'>ExifIFD</td>
+<td align='center'>string/</td>
+<td align='center'>-</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 16, 2006</i>
+<br><i>Last revised Apr 9, 2006</i>
 </body>
 </html>

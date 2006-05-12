@@ -121,35 +121,45 @@ with 1)</font></font></td></tr>
 <td align='center'>rational64u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0206</td>
+<td>LensDistortionParams</td>
+<td align='center'>int16s[6]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0x0207</td>
 <td>CameraType</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0208</td>
 <td>TextInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Olympus.html#TextInfo'>Olympus TextInfo Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0209</td>
 <td>CameraID</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x020b</td>
 <td>EpsonImageWidth</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x020c</td>
 <td>EpsonImageHeight</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x020d</td>
 <td>EpsonSoftware</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0280</td>
+<td>PreviewImage</td>
+<td align='center'>undef</td>
+<td><font size='-1'><font color="#666666">(Epson ERF preview image)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0300</td>
 <td>PreCaptureFrames</td>
@@ -183,6 +193,26 @@ with 1)</font></font></td></tr>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x1000</td>
+<td>ShutterSpeedValue</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1001</td>
+<td>ISOValue</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1002</td>
+<td>ApertureValue</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1003</td>
+<td>BrightnessValue</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1004</td>
 <td>FlashMode</td>
 <td align='center'>int16u</td>
@@ -197,15 +227,79 @@ with 1)</font></font></td></tr>
   <br>4 = External
   <br>5 = Internal + External</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td>0x1011</td>
-<td>ColorMatrix</td>
-<td align='center'>int16u[6]</td>
+<td>0x1006</td>
+<td>ExposureCompensation</td>
+<td align='center'>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x1007</td>
+<td>SensorTemperature</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1008</td>
+<td>LensTemperature</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x100b</td>
+<td>FocusMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Manual</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x100c</td>
+<td>ManualFocusDistance</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x100d</td>
+<td>ZoomStepCount</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x100e</td>
+<td>FocusStepCount</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x100f</td>
+<td>Sharpness</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Hard
+  <br>2 = Soft</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1010</td>
+<td>FlashChargeLevel</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1011</td>
+<td>ColorMatrix</td>
+<td align='center'>int16s[9]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1012</td>
 <td>BlackLevel</td>
 <td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1015</td>
+<td>WBMode</td>
+<td align='center'>int16u[2]</td>
+<td><font size='-1'>1 = Auto
+  <br>&apos;1 0&apos; = Auto
+  <br>&apos;1 2&apos; = Auto (2)
+  <br>&apos;1 4&apos; = Auto (4)
+  <br>&apos;2 2&apos; = 3000 Kelvin
+  <br>&apos;2 3&apos; = 3700 Kelvin
+  <br>&apos;2 4&apos; = 4000 Kelvin
+  <br>&apos;2 5&apos; = 4500 Kelvin
+  <br>&apos;2 6&apos; = 5500 Kelvin
+  <br>&apos;2 7&apos; = 6500 Kelvin
+  <br>&apos;2 8&apos; = 7500 Kelvin
+  <br>&apos;3 0&apos; = One-touch</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x1017</td>
 <td>RedBalance</td>
@@ -220,6 +314,27 @@ with 1)</font></font></td></tr>
 <td>0x101a</td>
 <td>SerialNumber</td>
 <td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1023</td>
+<td>FlashExposureComp</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1026</td>
+<td>ExternalFlashBounce</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+<tr valign='top'>
+<td>0x1027</td>
+<td>ExternalFlashZoom</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1028</td>
+<td>ExternalFlashMode</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x1029</td>
@@ -280,6 +395,28 @@ with 1)</font></font></td></tr>
 <td align='center'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x1039</td>
+<td>CCDScanMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Interlaced
+  <br>1 = Progressive</font></td></tr>
+<tr valign='top'>
+<td>0x103a</td>
+<td>NoiseReduction</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x103b</td>
+<td>InfinityLensStep</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x103c</td>
+<td>NearLensStep</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x2010</td>
 <td>Equipment</td>
 <td align='center'>-</td>
@@ -304,6 +441,11 @@ with 1)</font></font></td></tr>
 <td>FocusInfo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Olympus.html#FocusInfo'>Olympus FocusInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x3000</td>
+<td>RawInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Olympus.html#RawInfo'>Olympus RawInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='TextInfo'>Olympus TextInfo Tags</a></h2>
@@ -338,7 +480,7 @@ any information found here will be extracted, even if the tag is not listed.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0100</td>
-<td>FirmwareVersion2</td>
+<td>CameraType2</td>
 <td align='center'>string[6]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -347,68 +489,83 @@ any information found here will be extracted, even if the tag is not listed.
 <td align='center'>string[32]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0102</td>
+<td>InternalSerialNumber</td>
+<td align='center'>string[32]</td>
+<td><font size='-1'><font color="#666666">(16 digits: 0-3=model, 4=year, 5-6=month, 8-12=unit number)</font></font></td></tr>
+<tr valign='top'>
 <td>0x0103</td>
 <td>FocalPlaneDiagonal</td>
 <td align='center'>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0104</td>
 <td>BodyFirmwareVersion</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0201</td>
 <td>LensType</td>
 <td align='center'>int8u[6]~</td>
 <td><font size='-1'><font color="#666666">(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown)</font></font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0202</td>
 <td>LensSerialNumber</td>
 <td align='center'>string[32]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0204</td>
 <td>LensFirmwareVersion</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0206</td>
 <td>MaxApertureAtMaxFocal</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0207</td>
 <td>MinFocalLength</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0208</td>
 <td>MaxFocalLength</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x020a</td>
+<td>MaxApertureAtCurrentFocal</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0301</td>
 <td>Extender</td>
 <td align='center'>int8u[6]~</td>
-<td><font size='-1'><font color="#666666">(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown.)</font></font></td></tr>
 <tr valign='top'>
 <td>0x0302</td>
 <td>ExtenderSerialNumber</td>
 <td align='center'>string[32]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0303</td>
+<td>ExtenderModel</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0x0304</td>
 <td>ExtenderFirmwareVersion</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1000</td>
 <td>FlashType</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = None
   <br>2 = Simple E-System
   <br>3 = E-System</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1001</td>
 <td>FlashModel</td>
 <td align='center'>int16u</td>
@@ -418,15 +575,15 @@ any information found here will be extracted, even if the tag is not listed.
   <br>3 = RF-11
   <br>4 = TF-22
   <br>5 = FL-36</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1002</td>
+<td>FlashFirmwareVersion</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x1003</td>
 <td>FlashSerialNumber</td>
 <td align='center'>string[32]</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td>0x1004</td>
-<td>FlashFirmwareVersion</td>
-<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -461,23 +618,33 @@ any information found here will be extracted, even if the tag is not listed.
 <td>ExposureMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>1 = Manual
+  <br>2 = Program
   <br>3 = Aperture-priority AE
   <br>4 = Shutter speed priority AE
-  <br>5 = Program AE</font></td></tr>
+  <br>5 = Program-shift</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0201</td>
+<td>AELock</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
 <td>0x0202</td>
 <td>MeteringMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>2 = Center Weighted
   <br>3 = Spot
-  <br>5 = ESP</font></td></tr>
-<tr valign='top'>
+  <br>5 = ESP
+  <br>261 = Pattern+AF
+  <br>515 = Spot+Highlight control
+  <br>1027 = Spot+Shadow control</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0300</td>
 <td>MacroMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0301</td>
 <td>FocusMode</td>
 <td align='center'>int16u</td>
@@ -486,33 +653,60 @@ any information found here will be extracted, even if the tag is not listed.
   <br>2 = Continuous AF
   <br>3 = Multi AF
   <br>10 = MF</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0302</td>
 <td>FocusProcess</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = AF Not Used
   <br>1 = AF Used</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0303</td>
 <td>AFSearch</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Not Ready
   <br>1 = Ready</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0304</td>
 <td>AFAreas</td>
 <td align='center'>int32u[64]~</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0400</td>
 <td>FlashMode</td>
 <td align='center'>int16u</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
+<td><font size='-1'>0 = Off
+  <br>Bit 0 = On
+  <br>Bit 1 = Fill-in
+  <br>Bit 2 = Red-eye
+  <br>Bit 3 = Slow-sync
+  <br>Bit 4 = Forced On
+  <br>Bit 5 = 2nd Curtain</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0401</td>
 <td>FlashExposureCompensation</td>
 <td align='center'>rational64s</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0500</td>
+<td>WhiteBalance2</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Auto
+  <br>16 = 7500K (Fine Weather with Shade)
+  <br>17 = 6000K (Cloudy)
+  <br>18 = 5300K (Fine Weather)
+  <br>20 = 3000K (Tungsten light)
+  <br>21 = 3600K (Tungsten light-like)
+  <br>33 = 6600K (Daylight fluorescent)
+  <br>34 = 4500K (Neutral white fluorescent)
+  <br>35 = 4000K (Cool white fluorescent)
+  <br>48 = 3600K (Tungsten light-like)
+  <br>256 = Custom WB 1
+  <br>257 = Custom WB 2
+  <br>258 = Custom WB 3
+  <br>259 = Custom WB 4
+  <br>512 = Custom WB 5400K
+  <br>513 = Custom WB 2900K
+  <br>514 = Custom WB 8000K</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0501</td>
 <td>WhiteBalanceTemperature</td>
@@ -559,11 +753,14 @@ any information found here will be extracted, even if the tag is not listed.
 <td>SceneMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Standard
+  <br>6 = Auto
   <br>7 = Sport
   <br>8 = Portrait
   <br>9 = Landscape+Portrait
   <br>10 = Landscape
   <br>11 = Night scene
+  <br>13 = Panorama
+  <br>16 = Landscape+Portrait
   <br>17 = Night+Portrait
   <br>19 = Fireworks
   <br>20 = Sunset
@@ -572,15 +769,24 @@ any information found here will be extracted, even if the tag is not listed.
   <br>26 = Museum
   <br>28 = Beach&amp;Snow
   <br>30 = Candle
-  <br>39 = High Key</font></td></tr>
+  <br>35 = Underwater Wide1
+  <br>36 = Underwater Macro
+  <br>39 = High Key
+  <br>40 = Digital Image Stabilization
+  <br>44 = Underwater Wide2
+  <br>45 = Low Key
+  <br>46 = Children
+  <br>48 = Nature Macro</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x050a</td>
 <td>NoiseReduction</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
-  <br>1 = Noise Reduction On
-  <br>2 = Noise Filter On
-  <br>3 = Noise Reduction + Noise Filter On</font></td></tr>
+  <br>1 = Noise Reduction
+  <br>2 = Noise Filter
+  <br>3 = Noise Reduction + Noise Filter
+  <br>4 = Noise Filter (ISO Boost)
+  <br>5 = Noise Reduction + Noise Filter (ISO Boost)</font></td></tr>
 <tr valign='top'>
 <td>0x050b</td>
 <td>DistortionCorrection</td>
@@ -601,15 +807,69 @@ any information found here will be extracted, even if the tag is not listed.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x050f</td>
 <td>Gradation</td>
-<td align='center'>int16s</td>
-<td><font size='-1'>-1 = Low Key
-  <br>0 = Normal
-  <br>1 = High Key</font></td></tr>
+<td align='center'>int16s[3]</td>
+<td><font size='-1'>&apos;-1 -1 1&apos; = Low Key
+  <br>&apos;0 -1 1&apos; = Normal
+  <br>&apos;1 -1 1&apos; = High Key</font></td></tr>
 <tr valign='top'>
+<td>0x0520</td>
+<td>PictureMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Vivid
+  <br>2 = Natural
+  <br>3 = Muted
+  <br>256 = Monotone
+  <br>512 = Sepia</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0521</td>
+<td>PictureModeSaturation</td>
+<td align='center'>int16s[3]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0522</td>
+<td>PictureModeHue?</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0523</td>
+<td>PictureModeContrast</td>
+<td align='center'>int16s[3]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0524</td>
+<td>PictureModeSharpness</td>
+<td align='center'>int16s[3]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0525</td>
+<td>PictureModeBWFilter</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = n/a
+  <br>1 = Neutral
+  <br>2 = Yellow
+  <br>3 = Orange
+  <br>4 = Red
+  <br>5 = Green</font></td></tr>
+<tr valign='top'>
+<td>0x0526</td>
+<td>PictureModeTone</td>
+<td align='center'>int16s</td>
+<td><font size='-1'>0 = n/a
+  <br>1 = Neutral
+  <br>2 = Sepia
+  <br>3 = Blue
+  <br>4 = Purple
+  <br>5 = Green</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0600</td>
 <td>Sequence</td>
-<td align='center'>int16u[2]~</td>
-<td><font size='-1'><font color="#666666">(2 numbers: 1. Mode, 2. Sequence Number)</font></font></td></tr>
+<td align='center'>int16u[n]~</td>
+<td><font size='-1'><font color="#666666">(2 or 3 numbers: 1. Mode, 2. Shot number, 3. Mode bits)</font></font></td></tr>
+<tr valign='top'>
+<td>0x0601</td>
+<td>PanoramaMode</td>
+<td align='center'>int16u~</td>
+<td><font size='-1'><font color="#666666">(2 numbers: 1. Mode, 2. Shot number)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0603</td>
 <td>ImageQuality2</td>
@@ -709,13 +969,13 @@ any information found here will be extracted, even if the tag is not listed.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0100</td>
-<td>RedBlueBias</td>
+<td>WB_RBLevels</td>
 <td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0200</td>
 <td>ColorMatrix</td>
-<td align='center'>int16u[9]</td>
+<td align='center'>int16s[9]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0300</td>
@@ -754,12 +1014,21 @@ any information found here will be extracted, even if the tag is not listed.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x1010</td>
-<td>NoiseFilter2</td>
+<td>NoiseReduction2</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
   <br>1 = Noise Filter
-  <br>2 = Noise Reduction</font></td></tr>
+  <br>2 = Noise Reduction
+  <br>3 = Noise Reduction + Noise Filter
+  <br>4 = Noise Filter (ISO Boost)
+  <br>5 = Noise Reduction + Noise Filter (ISO Boost)</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x1011</td>
+<td>DistortionCorrection2</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr valign='top'>
 <td>0x1012</td>
 <td>ShadingCompensation2</td>
 <td align='center'>int16u</td>
@@ -785,7 +1054,7 @@ any information found here will be extracted, even if the tag is not listed.
   <br>1 = On</font></td></tr>
 <tr valign='top'>
 <td>0x0300</td>
-<td>ZoomPosition</td>
+<td>ZoomStepCount</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -802,14 +1071,194 @@ any information found here will be extracted, even if the tag is not listed.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x1208</td>
 <td>InternalFlash</td>
-<td align='center'>int16u</td>
+<td align='center'>int16u[n]</td>
 <td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
+  <br>1 = On
+  <br>&apos;0 0&apos; = Off
+  <br>&apos;1 0&apos; = On</font></td></tr>
+<tr valign='top'>
+<td>0x1209</td>
+<td>ManualFlash</td>
+<td align='center'>int16u[2]~</td>
+<td><font size='-1'><font color="#666666">(2 numbers: 1. 0=Off, 1=On, 2. Flash strength)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1500</td>
+<td>SensorTemperature</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='RawInfo'>Olympus RawInfo Tags</a></h2>
+These tags are found only in ORF images of some models (ie. C8080WZ).
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0100</td>
+<td>WB_RBLevelsUsed</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0110</td>
+<td>WB_RBLevelsAuto</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0120</td>
+<td>WB_RBLevelsShade</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0121</td>
+<td>WB_RBLevelsCloudy</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0122</td>
+<td>WB_RBLevelsFineWeather</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0123</td>
+<td>WB_RBLevelsTungsten</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0124</td>
+<td>WB_RBLevelsEveningSunlight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0130</td>
+<td>WB_RBLevelsDaylightFluor</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0131</td>
+<td>WB_RBLevelsDayWhiteFluor</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0132</td>
+<td>WB_RBLevelsCoolWhiteFluor</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0133</td>
+<td>WB_RBLevelsWhiteFluorescent</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0200</td>
+<td>ColorMatrix2</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0310</td>
+<td>CoringFilter</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0311</td>
+<td>CoringValues</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0600</td>
+<td>BlackLevel2</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0601</td>
+<td>YCbCrCoefficients</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0611</td>
+<td>ValidPixelDepth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0614</td>
+<td>FinalImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0615</td>
+<td>FinalImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1000</td>
+<td>WhiteBalanceComp</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1010</td>
+<td>SaturationSetting</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1011</td>
+<td>HueSetting</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x1012</td>
+<td>ContrastSetting</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x1013</td>
+<td>SharpnessSetting</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2000</td>
+<td>CMExposureCompensation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x2001</td>
+<td>CMWhiteBalance</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2002</td>
+<td>CMWhiteBalanceComp</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x2010</td>
+<td>CMWhiteBalanceGrayPoint</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2020</td>
+<td>CMSaturation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x2021</td>
+<td>CMHue</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x2022</td>
+<td>CMContrast</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x2023</td>
+<td>CMSharpness</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 12, 2006</i>
+<br><i>Last revised Mar 22, 2006</i>
 </body>
 </html>

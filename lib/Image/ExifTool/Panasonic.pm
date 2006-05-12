@@ -8,6 +8,9 @@
 # References:   1) http://www.compton.nu/panasonic.html (based on FZ10)
 #               2) Derived from DMC-FZ3 samples from dpreview.com
 #               3) http://johnst.org/sw/exiftags/
+#               4) Tels (http://bloodgate.com/) private communication (tests with FZ5)
+#               5) CPAN forum post by 'hardloaf' (http://www.cpanforum.com/threads/2183)
+#               6) http://www.cybercom.net/~dcoffin/dcraw/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Panasonic;
@@ -16,7 +19,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.07';
+$VERSION = '1.12';
 
 sub ProcessPanasonicType2($$$);
 
@@ -62,6 +65,8 @@ sub ProcessPanasonicType2($$$);
         PrintConv => {
             1 => 'Auto',
             2 => 'Manual',
+            4 => 'Auto, Focus button', #4
+            5 => 'Auto, Continuous', #4
         },
     },
     0x0f => {
@@ -132,7 +137,21 @@ sub ProcessPanasonicType2($$$);
         Format => 'int16s',
         Writable => 'int16s',
     },
-    0x25 => 'SerialNumber', #2
+    0x25 => { #PH
+        Name => 'InternalSerialNumber',
+        Writable => 'undef',
+        Count => 16,
+        Notes => q{
+            this number is unique, and contains the date of manufacture, but is not the
+            same as the number printed on the camera body
+        },
+        PrintConv => q{
+            return $val unless $val=~/^([A-Z]\d{2})(\d{2})(\d{2})(\d{2})(\d{4})/;
+            my $yr = $2 + ($2 < 70 ? 2000 : 1900);
+            return "($1) $yr:$3:$4 no. $5";
+        },
+        PrintConvInv => '$_=$val; tr/A-Z0-9//dc; s/(.{3})(19|20)/$1/; $_',
+    },
     0x28 => {
         Name => 'ColorEffect',
         Writable => 'int16u',
@@ -145,6 +164,28 @@ sub ProcessPanasonicType2($$$);
         },
     },
     # 0x29 => 'SubjectDistance?',
+    0x2a => { #4
+        Name => 'BurstMode',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Low/High Quality',
+            2 => 'Infinite',
+        },
+    },
+    0x2b => { #4
+        Name => 'SequenceNumber',
+        Writable => 'int32u',
+    },
+    0x2e => { #4
+        Name => 'SelfTimer',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Off',
+            2 => '10s',
+            3 => '2s',
+        },
+    },
     0x2c => [
         {
             Name => 'Contrast',
@@ -209,6 +250,66 @@ sub ProcessPanasonicType2($$$);
     3 => 'Gain',
 );
 
+# Tags found in Panasonic RAW images
+%Image::ExifTool::Panasonic::Raw = (
+    GROUPS => { 0 => 'EXIF', 1 => 'IFD0', 2 => 'Image'},
+    NOTES => 'These tags are found in IFD0 of Panasonic RAW images.',
+    0x01 => 'PanasonicRawVersion',
+    0x02 => 'SensorWidth', #5/PH
+    0x03 => 'SensorHeight', #5/PH
+    0x06 => 'ImageHeight', #5/PH
+    0x07 => 'ImageWidth', #5/PH
+    0x17 => 'ISO', #5
+    0x24 => 'WB_RedLevel', #6
+    0x25 => 'WB_GreenLevel', #6
+    0x26 => 'WB_BlueLevel', #6
+    0x10f => {
+        Name => 'Make',
+        Groups => { 2 => 'Camera' },
+        DataMember => 'CameraMake',
+        # save this value as an ExifTool member variable
+        RawConv => '$self->{CameraMake} = $val',
+    },
+    0x110 => {
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Groups => { 2 => 'Camera' },
+        DataMember => 'CameraModel',
+        # save this value as an ExifTool member variable
+        RawConv => '$self->{CameraModel} = $val',
+    },
+    0x111 => {
+        Name => 'StripOffsets',
+        Flags => 'IsOffset',
+        OffsetPair => 0x117,  # point to associated byte counts
+        ValueConv => 'length($val) > 32 ? \$val : $val',
+    },
+    0x112 => {
+        Name => 'Orientation',
+        PrintConv => \%Image::ExifTool::Exif::orientation,
+        Priority => 0,  # so IFD1 doesn't take precedence
+    },
+    0x116 => {
+        Name => 'RowsPerStrip',
+        Priority => 0,
+    },
+    0x117 => {
+        Name => 'StripByteCounts',
+        OffsetPair => 0x111,   # point to associated offset
+        ValueConv => 'length($val) > 32 ? \$val : $val',
+    },
+    0x8769 => {
+        Name => 'ExifOffset',
+        Groups => { 1 => 'ExifIFD' },
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+            DirName => 'ExifIFD',
+            Start => '$val',
+        },
+    },
+);
+
 1;  # end
 
 __END__
@@ -230,8 +331,8 @@ Panasonic and Leica maker notes in EXIF information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 
@@ -242,6 +343,10 @@ it under the same terms as Perl itself.
 =item L<http://johnst.org/sw/exiftags/>
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Tels for the information he provided on decoding some tags.
 
 =head1 SEE ALSO
 

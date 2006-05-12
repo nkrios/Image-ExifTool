@@ -34,7 +34,7 @@ my $testnum = 1;
     ++$testnum;
     my @writeInfo = (
         ['CreateDate','2005:01:06 11:51:09'],
-        ['WhiteBalance', 'daywhite', 'Group', 'MakerNotes'],
+        ['WhiteBalance', 'day white', 'Group', 'MakerNotes'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
     print "ok $testnum\n";

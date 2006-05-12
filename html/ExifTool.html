@@ -39,14 +39,15 @@ and explain the following individual functions in more detail:
 <li><a href="#SaveNewValues">SaveNewValues</a>
 <li><a href="#RestoreNewValues">RestoreNewValues</a>
 <li><a href="#SetFileModifyDate">SetFileModifyDate</a>
+<li><a href="#SetFileName">SetFileName</a>
 <li><a href="#SetNewGroups">SetNewGroups</a>
 <li><a href="#GetNewGroups">GetNewGroups</a>
 <li><a href="#GetTagID">GetTagID</a>
 <li><a href="#GetDescription">GetDescription</a>
-<li><a href="#GetGroup">GetGroup</a>
 </ul>
 </td><td valign=top>
 <ul>
+<li><a href="#GetGroup">GetGroup</a>
 <li><a href="#GetGroups">GetGroups</a>
 <li><a href="#BuildCompositeTags">BuildCompositeTags</a>
 <li><a href="#GetTagName">GetTagName</a>
@@ -154,7 +155,7 @@ my $thumbInfo = <b>ImageInfo</b>($$info{ThumbnailImage});
 <a href="#ImageInfo">ImageInfo</a>:
 <table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 my $filename = shift || die "Please specify filename\n";
-my @ioTagList = ('DateTimeOriginal', 'ImageSize', 'FocalLength');
+my @ioTagList = qw(filename imagesize xmp:creator exif:* -ifd1:*);
 
 $exifTool-&gt;Options(Unknown =&gt; 1, DateFormat =&gt; '%H:%M:%S %a. %b. %e, %Y');
 $info = $exifTool-&gt;<b>ImageInfo</b>($filename, \@ioTagList);
@@ -174,53 +175,67 @@ earlier in the argument list.
 <p>Below is a more detailed explanation of how the <a href="#ImageInfo">ImageInfo</a>
 function arguments are interpreted.
 
-<blockquote>
-<b>ExifTool ref</b> --
+<blockquote><table border=1 cellspacing=0 cellpadding=3>
+<tr><td valign='top'><b>ExifTool&nbsp;ref</b></td><td>
 <a href="#ImageInfo">ImageInfo</a> may be called with an ExifTool object if
 desired.  The advantage of using the object-oriented form of this function is
 that after <a href="#ImageInfo">ImageInfo</a> returns, you may use the
 object-oriented functions below to obtain additional information if required.
 Must be the first argument if used.
 
-<p><b>SCALAR</b> --
+</td></tr><tr><td valign='top'><b>SCALAR</b></td><td>
 The first scalar argument is taken to be the file name unless an earlier
 argument specified the image data via a file reference (file ref) or data
-reference (SCALAR ref). The remaining scalar arguments are names of tags for
-requested information.  If no tags are specified, all possible information
-is extracted.  Tag names may begin with '-' indicating tags to exclude.  The
-tag names are case-insensitive, so note that the returned tags may not be
-exactly the same as the requested tags. For this reason it is best to use
-either the keys of the returned hash or the elements of the tag array when
-accessing the return values
+reference (SCALAR ref).  The remaining scalar arguments are names of tags
+for requested information.  If no tags are specified, all possible
+information is extracted.
 
-<p><b>File ref</b> --
+<p>Tag names are case-insensitive and may be prefixed by an optional group
+name followed by a colon.  The group name may begin with a family number
+(ie. '1IPTC:Keywords'), to restrict matches to a specific family.  A tag
+name of '*' may be used, thus allowing 'GROUP:*' to represent all tags in a
+specific group, or a group name of '*' may be used, in which case all
+available instances of the specified tag are returned regardless of the
+<a href="#Duplicates">Duplicates</a> setting (ie. '*:WhiteBalance').  And
+finally, a leading '-' indicates tags to be excluded (ie. '-IFD1:*').
+
+<p>Note that keys in the returned information hash and elements of the
+returned tag list are not necessarily the same as these tag names -- group
+names are removed, the case may be changed, and an instance number may be
+added.  For this reason it is best to use either the keys of the returned
+hash or the elements of the tag array when accessing the tag values.
+
+<p>See the <a href="TagNames/index.html">TagNames</a> documentation for a
+complete list of ExifTool tag names.
+
+</td></tr><tr><td valign='top'><b>File&nbsp;ref</b></td><td>
 A reference to an open image file.  If you use this method (or a SCALAR
 reference) to access information in an image, the FileName and Directory tags
 will not be returned.  (Also, the FileSize and FileModifyDate tags will not be
 returned unless it is a plain file.)
 
-<p><b>SCALAR ref</b> --
+</td></tr><tr><td valign='top'><b>SCALAR&nbsp;ref</b></td><td>
 A reference to image data in memory.
 
-<p><b>ARRAY ref</b> --
+</td></tr><tr><td valign='top'><b>ARRAY&nbsp;ref</b></td><td>
 Reference to a list of tag names.  On entry, any elements in the
 list are added to the list of requested tags.  On return, this list
 is updated to contain a sorted list of tag names in the proper case.
 
-<p><b>HASH ref</b> --
+</td></tr><tr><td valign='top'><b>HASH&nbsp;ref</b></td><td>
 Reference to a hash containing the options settings.  See
 <a href="#Options">Options</a> documentation below for a list of available
 options. Options specified as arguments to <a href="#ImageInfo">ImageInfo</a>
 take precedence over <a href="#Options">Options</a> settings.
-</blockquote>
+</td></tr></table></blockquote>
 
 <b>Return Value:</b>
 
 <p>ImageInfo returns a reference to a hash of tag/value pairs. The keys of the
-hash are the tag identifiers, which are similar to the tag names but my have an
-embedded copy number if more than one tag with that name was found in the image.
- Use <a href="#GetTagName">GetTagName</a> to remove the copy number from the
-tag. Note that the case of the tags may not be the same as requested.
+hash are the tag identifiers, which are similar to the tag names but may have an
+embedded instance number if more than one tag with that name was found in the image.
+Use <a href="#GetTagName">GetTagName</a> to remove the instance number from the
+tag.  Note that the case of the tags may not be the same as requested.
 
 <p>Values of the returned hash are usually simple scalars, but a scalar
 reference is used to indicate binary data and an array reference may be used
@@ -337,9 +352,13 @@ to a specific function.
     <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
     </table></td><td align=center>'UTF8'</td></tr>
 <tr><td>Compact</td><td>Write compact output.  The XMP specification suggests that
-the data be padded with blanks to allow in-place editing.  By setting this
-flag, 2kB is saved for files with XMP data.</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
+    the data be padded with blanks to allow in-place editing.  By setting this
+    flag, 2kB is saved for files with XMP data.</td>
+    <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Composite</td><td>Flag to calculate Composite tags</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td>Compress</td><td>Write new values in compressed format if possible.  Has
+    no effect unless Compress::Zlib is installed.</td>
+    <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>CoordFormat</td><td>Format for GPS coordinates</td><td> Format for
     printing GPS coordinates.  This is a printf format string with specifiers
     for degrees, minutes and seconds in that order, however minutes and seconds
@@ -348,7 +367,7 @@ flag, 2kB is saved for files with XMP data.</td><td align='center'>0 or 1</td><t
     </td><td align=center>undef</td></tr>
 <tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td>
     <td align=center>undef</td></tr>
-<tr><td>Duplicates</td><td>Flag to save duplicate tag values</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td><a name="Duplicates">Duplicates</a></td><td>Flag to save duplicate tag values</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>Exclude</td>
     <td>Exclude specified tags</td>
     <td>Tag name or reference to a list of tag names to exclude.  Case is not significant.
@@ -395,6 +414,9 @@ flag, 2kB is saved for files with XMP data.</td><td align='center'>0 or 1</td><t
         where # is the group family number.  If # is not specified, Group0 is assumed.
         See <a href="#GetAllGroups">GetAllGroups</a> for a group list.</td></tr>
     </table></td><td align=center>'Input'</td></tr>
+<tr><td>StrictDate</td><td>Flag to return undefined value for any date which can't be
+    converted when the DateFormat option is used.</td>
+    <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>TextOut</td><td>Output file for Verbose and HtmlDump options.</td>
     <td align='center'>File reference</td><td align=center>\*STDOUT</td></tr>
 <tr><td>Unknown</td><td>Flag to get values of unknown tags</td>
@@ -412,7 +434,7 @@ flag, 2kB is saved for files with XMP data.</td><td align='center'>0 or 1</td><t
     <tr><td valign='top' align=center><b>3</b>&nbsp;=</td><td>Add hex dump of tag data (with length limits)</td></tr>
     <tr><td valign='top' align=center><b>4</b>&nbsp;=</td><td>Remove length limit on dump of tag values</td></tr>
     <tr><td valign='top' align=center><b>5</b>&nbsp;=</td><td>Remove length limit on dump of JPEG segments</td></tr>
-    </table><td align=center>0</td></tr>
+    </table></td><td align=center>0</td></tr>
 </table></blockquote>
 
 <b>Examples:</b>
@@ -626,15 +648,16 @@ my @requestedTags = $exifTool-&gt;<b>GetRequestedTags</b>();
 Get the value of a specified tag.  The returned value is either the
 human-readable (PrintConv) value, the converted machine-readable (ValueConv)
 value, or the original raw (Raw) value.  If the value type is not specified,
-the PrintConv value is returned if the PrintConv option is set, otherwise
-the ValueConv value is returned.
-<p>In the case of a list (as can happen with the 'Keywords' tag for
-instance), PrintConv returns a comma-separated string of values in scalar
-context, while ValueConv returns a reference to an array of values.
-<a href="#GetValue">GetValue</a> always returns the list itself in list
-context.  The PrintConv values are the values returned by
-<a href="#ImageInfo">ImageInfo</a> and <a href="#GetInfo">GetInfo</a> in the
-tag/value hash unless the PrintConv option is disabled.
+the PrintConv value is returned if the PrintConv option is set, otherwise the
+ValueConv value is returned.  The PrintConv values are the same as the values
+returned by <a href="#ImageInfo">ImageInfo</a> and <a href="#GetInfo">GetInfo</a>
+in the tag/value hash unless the PrintConv option is disabled.
+<p>Tags which represent lists of multiple values (as may happen with
+'Keywords' for example) are handled specially.  In scalar context, the
+returned PrintConv value for these tags is either a comma-separated string
+of values or a list reference (depending on the List option setting), and
+the ValueConv value is always a list reference.  But in list context,
+<a href="#GetValue">GetValue</a> always returns the list itself.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>GetValue($$;$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
@@ -772,6 +795,7 @@ $exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; $word, AddValue =&gt; 1);
 
 # set a tag in a specific group
 $exifTool-&gt;<b>SetNewValue</b>(Headline =&gt; $val, Group =&gt; 'XMP');
+$exifTool-&gt;<b>SetNewValue</b>('XMP:Headline' =&gt; $val);  # equivalent
 
 # shift original date/time back by 1 hour
 $exifTool-&gt;<b>SetNewValue</b>(DateTimeOriginal =&gt; '1:00', Shift =&gt; -1);
@@ -813,7 +837,7 @@ information while preserving the original groups.)
 # set new values from all information in a file...
 my $info = $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile);
 # ...then write these values to another image
-my $result = $exifTool->WriteInfo($file2, $outFile);
+my $result = $exifTool-&gt;WriteInfo($file2, $outFile);
 
 # set all new values, preserving original groups
 $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile, '*:*');
@@ -822,7 +846,7 @@ $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile, '*:*');
 $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile, $tag1, $tag2...);
 
 # set new value from a different tag in specific group
-$exifTool-&gt;<b>SetNewValuesFromFile</b>($src, 'IPTC:Keywords>XMP-dc:Subject');
+$exifTool-&gt;<b>SetNewValuesFromFile</b>($src, 'IPTC:Keywords&gt;XMP-dc:Subject');
 </pre></td></tr></table></blockquote>
 <b>Notes:</b>
 <p>The PrintConv option applies to this routine, but it should normally be left
@@ -832,7 +856,6 @@ transferred separately if desired.
 <p>When simply copying all information between files of the same type, it is
 usually desireable to preserve the original groups by specifying '*:*' for
 the tags to set.
-
 
 <hr><h2><a name="GetNewValues">GetNewValues</a></h2>
 Get list of new Raw values for the specified tag.  These are the values
@@ -861,12 +884,16 @@ Return the total number of new values set.
 <tr><td><b>Prototype</b></td><td>CountNewValues($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
 </td></tr>
-<tr><td><b>Returns</b></td><td>The total number of tags with new values set.
-</td></tr>
+<tr><td><b>Returns</b></td><td>In scalar context, returns the total number
+of tags with new values set.  In list context, also returns the number of
+"quick" tag values which have been set.  "Quick" tags are tags like FileName
+and FileModifyDate which can be changed without the need to rewrite the
+file.</td></tr>
 </table></blockquote>
 <b>Examples:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 my $numSet = $exifTool-&gt;<b>CountNewValues</b>();
+my ($numSet, $numQuick) = $exifTool-&gt;<b>CountNewValues</b>();
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SaveNewValues">SaveNewValues</a></h2>
@@ -904,14 +931,40 @@ Set the file modification time from the new value of the FileModifyDate tag.
  <br>1) File name
  <br>2) [optional] Base time if applying shift (in days before $^T)
 </td></tr>
-<tr><td><b>Returns</b></td><td>1 if the time was changed, 0 if the FileModifyDate
-tag wasn't set, or -1 if there was an error setting the time.
+<tr><td><b>Returns</b></td><td>1 if the time was changed, 0 if nothing was
+done, or -1 if there was an error setting the time.
 </td></tr>
 </table></blockquote>
 <b>Example:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 my $result = $exifTool-&gt;<b>SetFileModifyDate</b>($file);
 </pre></td></tr></table></blockquote>
+
+<hr><h2><a name="SetFileName">SetFileName</a></h2>
+Set the file name and directory.  If not specified, the new file name is
+derived from the new values of the FileName and Directory tags.  If the
+FileName tag contains a '/', then the file is renamed into a new directory. 
+If FileName ends with '/', then it is taken as a directory name and the file
+is moved into the new directory.  The new value for the Directory tag takes
+precedence over any directory specified in FileName.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>SetFileName($$;$)</td></tr>
+<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+ <br>1) Current file name
+ <br>2) [optional] New file name
+</td></tr>
+<tr><td><b>Returns</b></td><td>1 if the file name or directory was changed,
+0 if nothing was done, or -1 if there was an error renaming the file.
+</td></tr>
+</table></blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my $result = $exifTool-&gt;<b>SetFileName</b>($file);
+my $result = $exifTool-&gt;<b>SetFileName</b>($file, $newName);
+</pre></td></tr></table></blockquote>
+<b>Notes:</b>
+<p>Will not overwrite existing files. New directories are created as
+necessary.
 
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
 Set the order of the preferred groups when adding new information.  In
@@ -1062,7 +1115,7 @@ ExifTool object
 
 <hr><h2><a name="GetTagName">GetTagName</a></h2>
 Get name of tag from tag identifier.  This is a convenience function that
-strips the embedded copy number, if it exists, from the tag key.
+strips the embedded instance number, if it exists, from the tag key.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>GetTagName($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) Tag key
@@ -1142,24 +1195,27 @@ separated into the ICC-header group.
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>AFCP, AIFF, APP12, ASF, BMP, Composite, DICOM, DNG, EXIF, ExifTool, File,
-GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG,
-MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript, PrintIM, QuickTime,
-RIFF, SigmaRaw, XMP
+<td>AFCP, AIFF, APP12, APP14, ASF, BMP, Composite, DICOM, DNG, EXIF,
+ExifTool, File, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf,
+MIE, MIFF, MNG, MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript,
+PrintIM, QuickTime, RIFF, SigmaRaw, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AFCP, AIFF, APP12, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite,
-DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD,
-ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1,
-ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC,
-Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw, Leaf,
-LeafSubIFD, MIFF, MNG, MakerUnknown, MetaIFD, Minolta, Nikon, NikonCapture,
-NikonPreview, Olympus, PDF, PICT, PNG, Panasonic, Pentax, Photoshop,
-PostScript, PrintIM, QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma,
-SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc,
-XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop,
-XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights,
-XMP-xmpTPg
+<td>AFCP, AIFF, APP12, APP14, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio,
+Composite, DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff,
+GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
+ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC,
+InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
+KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-Video, MIFF, MNG, MakerUnknown,
+MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, Olympus,
+PDF, PICT, PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM,
+QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD,
+Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
+XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
+XMP-xxx
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,

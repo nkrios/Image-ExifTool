@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Canon;
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 sub ProcessCanonCustom($$$);
 sub WriteCanonCustom($$$);
@@ -634,6 +634,149 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
 );
 
+# Custom functions for the 30D (PH)
+%Image::ExifTool::CanonCustom::Functions30D = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&ProcessCanonCustom,
+    WRITE_PROC => \&WriteCanonCustom,
+    CHECK_PROC => \&CheckCanonCustom,
+    WRITABLE => 'int8u',
+    1 => {
+        Name => 'SetFunctionWhenShooting',
+        PrintConv => {
+            0 => 'Default (no function)',
+            1 => 'Change quality',
+            2 => 'Change Picture Style',
+            3 => 'Menu display',
+            4 => 'Image replay',
+        },
+    },
+    2 => {
+        Name => 'LongExposureNoiseReduction',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Auto',
+            2 => 'On',
+        },
+    },
+    3 => {
+        Name => 'FlashSyncSpeedAv',
+        PrintConv => {
+            0 => 'Auto',
+            1 => '1/250 Fixed',
+        },
+    },
+    4 => {
+        Name => 'Shutter-AELock',
+        PrintConv => {
+            0 => 'AF/AE lock',
+            1 => 'AE lock/AF',
+            2 => 'AF/AF lock, No AE lock',
+            3 => 'AE/AF, No AE lock',
+        },
+    },
+    5 => {
+        Name => 'AFAssistBeam',
+        PrintConv => {
+            0 => 'Emits',
+            1 => 'Does not emit',
+            2 => 'Only ext. flash emits',
+        },
+    },
+    6 => {
+        Name => 'ExposureLevelIncrements',
+        PrintConv => {
+            0 => '1/3 Stop',
+            1 => '1/2 Stop',
+        },
+    },
+    7 => {
+        Name => 'FlashFiring',
+        PrintConv => {
+            0 => 'Fires',
+            1 => 'Does not fire',
+        },
+    },
+    8 => {
+        Name => 'ISOExpansion',
+        PrintConv => \%offOn,
+    },
+    9 => {
+        Name => 'AEBSequence',
+        PrintConv => {
+            0 => '0,-,+/Enabled',
+            1 => '0,-,+/Disabled',
+            2 => '-,0,+/Enabled',
+            3 => '-,0,+/Disabled',
+        },
+    },
+    10 => {
+        Name => 'SuperimposedDisplay',
+        PrintConv => \%onOff,
+    },
+    11 => {
+        Name => 'MenuButtonDisplayPosition',
+        PrintConv => {
+            0 => 'Previous (top if power off)',
+            1 => 'Previous',
+            2 => 'Top',
+        },
+    },
+    12 => {
+        Name => 'MirrorLockup',
+        PrintConv => \%disableEnable,
+    },
+    13 => {
+        Name => 'AFPointSelectionMethod',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Multi-controller direct',
+            2 => 'Quick Control Dial direct',
+        },
+    },
+    14 => {
+        Name => 'ETTLII',
+        Description => 'E-TTL II',
+        PrintConv => {
+            0 => 'Evaluative',
+            1 => 'Average',
+        },
+    },
+    15 => {
+        Name => 'ShutterCurtainSync',
+        PrintConv => {
+            0 => '1st-curtain sync',
+            1 => '2nd-curtain sync',
+        },
+    },
+    16 => {
+        Name => 'SafetyShiftInAvOrTv',
+        PrintConv => \%disableEnable,
+    },
+    17 => {
+        Name => 'MagnifiedView',
+        PrintConv => {
+            0 => 'Image playback only',
+            1 => 'Image review and playback',
+        },
+    },
+    18 => {
+        Name => 'LensAFStopButton',
+        PrintConv => {
+            0 => 'AF stop',
+            1 => 'AF start',
+            2 => 'AE lock while metering',
+            3 => 'AF point: M -> Auto / Auto -> Ctr.',
+            4 => 'ONE SHOT <-> AI SERVO',
+            5 => 'IS start',
+        },
+    },
+    19 => {
+        Name => 'AddOriginalDecisionData',
+        PrintConv => \%offOn,
+    },
+);
+
 # Custom functions for the 350D (PH - unconfirmed)
 %Image::ExifTool::CanonCustom::Functions350D = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -1062,8 +1205,8 @@ Image::ExifTool to read this information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

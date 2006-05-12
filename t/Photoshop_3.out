@@ -1,9 +1,9 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.13
 [File, File, Image]  - File Name: Photoshop_3_failed.psd
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 14 kB
-[File, File, Time]  - File Modification Date/Time: 2006:02:06 11:57:01
-[File, File, Image]  - File Type: Photoshop
+[File, File, Time]  - File Modification Date/Time: 2006:04:07 20:36:28
+[File, File, Image]  - File Type: PSD
 [File, File, Image]  - MIME Type: application/photoshop
 [Photoshop, Photoshop, Image] 6 - Num Channels: 3
 [Photoshop, Photoshop, Image] 7 - Image Height: 8
@@ -60,7 +60,7 @@
 [ICC_Profile, ICC-header, Image] 52 - Device Model: 
 [ICC_Profile, ICC-header, Image] 56 - Device Attributes: Reflective, Glossy, Positive, Color
 [ICC_Profile, ICC-header, Image] 64 - Rendering Intent: Media-Relative Colorimetric
-[ICC_Profile, ICC-header, Image] 68 - Profile Connection Space: 0.9642 1 0.82491
+[ICC_Profile, ICC-header, Image] 68 - Connection Space Illuminant: 0.9642 1 0.82491
 [ICC_Profile, ICC-header, Image] 80 - Profile Creator: ADBE
 [ICC_Profile, ICC-header, Image] 84 - Profile ID: 0
 [ICC_Profile, ICC_Profile, Image] cprt - Profile Copyright: Copyright 1999 Adobe Systems Incorporated

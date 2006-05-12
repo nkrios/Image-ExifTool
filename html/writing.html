@@ -2,20 +2,20 @@
 <head>
   <title>Writing Meta Information</title>
 </head>
-<body>
+<body text='#000000' bgcolor='#ffffff'>
 <h1>Writing Meta Information</h1>
 <h3>Abstract</h3>
 Writing meta information is more complicated than it may appear at first glance,
 this may be one reason why there are very few utilities around that do it.
 ExifTool uses tag names to identify the different pieces of meta information
-that can be extracted from a file.  At last count there were more than 1000
-different tags that ExifTool recognizes, and many of these tag names are common
-between different metadata formats (the WhiteBalance tag is the worst offender,
-and can be found in 12 different places), and sometimes the information can even
-be stored in different places within a single format.  Couple this with the fact
-that many manufacturers store meta information in undocumented formats which
-must be reverse engineered (and each of which have their particular quirks), and
-you have a very complex situation.
+that can be extracted from a file.  There are thousands of different tags that
+ExifTool recognizes, and many of these tag names are common between different
+metadata formats (the WhiteBalance tag is the worst offender, and can be found
+in 19 different places), and sometimes the information can even be stored in
+different places within a single format.  Couple this with the fact that many
+manufacturers store meta information in undocumented formats which must be
+reverse engineered (and each of which have their particular quirks), and you
+have a very complex situation.
 
 <p>ExifTool attempts to simplify this situation as much as possible by making
 reasonable decisions about where to write the information you specify, yet it
@@ -177,7 +177,7 @@ SceneCaptureType.  To handle this ambiguity, ExifTool will delete the tag if it
 exists in IFD0 when it is written to ExifIFD, and vice versa.
 
 <hr>
-<i>Last revised Oct. 14, 2005</i>
+<i>Last revised Feb. 27, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

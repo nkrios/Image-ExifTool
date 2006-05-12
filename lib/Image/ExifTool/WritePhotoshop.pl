@@ -44,7 +44,7 @@ sub WritePhotoshop($$$)
 #
     # Format: 0) Type, 4 bytes - "8BIM"
     #         1) TagID,2 bytes
-    #         2) Name, null terminated string padded to even no. bytes
+    #         2) Name, pascal string padded to even no. bytes
     #         3) Size, 4 bytes - N
     #         4) Data, N bytes
     my ($pos, $value, $size, $tagInfo, $tagID);
@@ -53,41 +53,26 @@ sub WritePhotoshop($$$)
         ++$pos if ($pos ^ $start) & 0x01;
         my $type = substr($$dataPt, $pos, 4);
         if ($type ne '8BIM') {
-            $exifTool->Error("Bad IRB resource: $type");
+            $exifTool->Error("Bad Photoshop IRB resource");
             undef $newData;
             last;
         }
         $tagID = Get16u($dataPt, $pos + 4);
-        $pos += 6;
-        # get resource block name (null-terminated, padded to an even # of bytes)
-        my $name = '';
-        my $bytes;
-        while ($pos + 2 < $dirEnd) {
-            $bytes = substr($$dataPt, $pos, 2);
-            $pos += 2;
-            $name .= $bytes;
-            last if $bytes =~ /\0/;
-        }
-        if ($pos + 4 > $dirEnd) {
+        # get resource block name (pascal string padded to an even # of bytes)
+        my $namelen = 1 + Get8u($dataPt, $pos + 6);
+        ++$namelen if $namelen & 0x01;
+        if ($pos + $namelen + 10 > $dirEnd) {
             $exifTool->Error("Bad APP13 resource block");
             undef $newData;
             last;
         }
-        $size = Get32u($dataPt, $pos);
-        $pos += 4;
+        my $name = substr($$dataPt, $pos + 6, $namelen);
+        $size = Get32u($dataPt, $pos + 6 + $namelen);
+        $pos += $namelen + 10;
         if ($size + $pos > $dirEnd) {
-            # hack necessary because earlier versions of photoshop
-            # sometimes don't put null terminator on string if it
-            # ends at an even word boundary - PH 02/25/04
-            if (defined($bytes) and $bytes eq "\0\0") {
-                $pos -= 2;
-                $size = Get32u($dataPt, $pos-4);
-            }
-            if ($size + $pos > $dirEnd) {
-                $exifTool->Error("Bad APP13 resource data size $size");
-                undef $newData;
-                last;
-            }
+            $exifTool->Error("Bad APP13 resource data size $size");
+            undef $newData;
+            last;
         }
         if ($$newTags{$tagID}) {
             $tagInfo = $$newTags{$tagID};
@@ -195,8 +180,8 @@ This file contains routines to write Photoshop metadata.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

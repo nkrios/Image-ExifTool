@@ -20,6 +20,8 @@
 #               8) http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
 #               9) http://hul.harvard.edu/jhove/tiff-tags.html
 #              10) http://partners.adobe.com/public/developer/en/tiff/TIFFPM6.pdf
+#              11) Robert Mucke private communication
+#              12) http://www.broomscloset.com/closet/photo/exif/TAG2000-22_DIS12234-2.PDF
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -30,7 +32,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.86';
+$VERSION = '1.97';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -158,6 +160,7 @@ my %longBin = (
 %Image::ExifTool::Exif::Main = (
     GROUPS => { 0 => 'EXIF', 1 => 'IFD0', 2 => 'Image'},
     WRITE_PROC => \&WriteExif,
+    WRITE_GROUP => 'ExifIFD',   # default write group
     0x1 => {
         Name => 'InteropIndex',
         Description => 'Interoperability Index',
@@ -259,7 +262,7 @@ my %longBin = (
         {
             Condition => q[
                 ($self->{TIFF_TYPE} ne "CR2" or $self->{DIR_NAME} ne "IFD0") and
-                ($self->{TIFF_TYPE} ne "DNG" or $self->{DIR_NAME} ne "SubIFD1")
+                ($self->{TIFF_TYPE} ne "DNG" or $self->{DIR_NAME} !~ /^SubIFD[12]$/)
             ],
             Name => 'StripOffsets',
             Flags => 'IsOffset',
@@ -267,13 +270,39 @@ my %longBin = (
             ValueConv => 'length($val) > 32 ? \$val : $val',
         },
         {
+            Condition => '$self->{DIR_NAME} eq "IFD0"',
             Name => 'PreviewImageStart',
             Flags => 'IsOffset',
             OffsetPair => 0x117,
-            Notes => 'PreviewImageStart in IFD0 of CR2 images and SubIFD1 of DNG images',
+            Notes => q{
+                PreviewImageStart in IFD0 of CR2 images and SubIFD1 of DNG images, and
+                JpgFromRawStart in SubIFD2 of DNG images
+            },
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'IFD0',
+            WriteCondition => '$self->{TIFF_TYPE} eq "CR2"',
+            Protected => 2,
+        },
+        {
+            Condition => '$self->{DIR_NAME} eq "SubIFD1"',
+            Name => 'PreviewImageStart',
+            Flags => 'IsOffset',
+            OffsetPair => 0x117,
+            DataTag => 'PreviewImage',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD1',
+            WriteCondition => '$self->{TIFF_TYPE} eq "DNG"',
+            Protected => 2,
+        },
+        {
+            Name => 'JpgFromRawStart',
+            Flags => 'IsOffset',
+            OffsetPair => 0x117,
+            DataTag => 'JpgFromRaw',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD2',
+            WriteCondition => '$self->{TIFF_TYPE} eq "DNG"',
             Protected => 2,
         },
     ],
@@ -294,19 +323,43 @@ my %longBin = (
         {
             Condition => q[
                 ($self->{TIFF_TYPE} ne "CR2" or $self->{DIR_NAME} ne "IFD0") and
-                ($self->{TIFF_TYPE} ne "DNG" or $self->{DIR_NAME} ne "SubIFD1")
+                ($self->{TIFF_TYPE} ne "DNG" or $self->{DIR_NAME} !~ /^SubIFD[12]$/)
             ],
             Name => 'StripByteCounts',
             OffsetPair => 0x111,   # point to associated offset
             ValueConv => 'length($val) > 32 ? \$val : $val',
         },
         {
+            Condition => '$self->{DIR_NAME} eq "IFD0"',
             Name => 'PreviewImageLength',
             OffsetPair => 0x111,
-            Notes => 'PreviewImageLength in IFD0 of CR2 images and SubIFD1 of DNG images',
+            Notes => q{
+                PreviewImageLength in IFD0 of CR2 images and SubIFD1 of DNG images, and
+                JpgFromRawLength in SubIFD2 of DNG images
+            },
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'IFD0',
+            WriteCondition => '$self->{TIFF_TYPE} eq "CR2"',
+            Protected => 2,
+        },
+        {
+            Condition => '$self->{DIR_NAME} eq "SubIFD1"',
+            Name => 'PreviewImageLength',
+            OffsetPair => 0x111,
+            DataTag => 'PreviewImage',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD1',
+            WriteCondition => '$self->{TIFF_TYPE} eq "DNG"',
+            Protected => 2,
+        },
+        {
+            Name => 'JpgFromRawLength',
+            OffsetPair => 0x111,
+            DataTag => 'JpgFromRaw',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD2',
+            WriteCondition => '$self->{TIFF_TYPE} eq "DNG"',
             Protected => 2,
         },
     ],
@@ -448,7 +501,7 @@ my %longBin = (
         Flags => 'SubIFD',
         SubDirectory => {
             Start => '$val',
-            MaxSubdirs => 2,
+            MaxSubdirs => 3,
         },
     },
     0x14c => {
@@ -749,6 +802,10 @@ my %longBin = (
     0x84ec => 'TransparencyIndicator', #9
     0x84ed => 'ColorCharacterization', #9
     0x84ee => 'HCUsage', #9
+    0x8546 => { #11
+        Name => 'SEMInfo',
+        Notes => 'found in some scanning electron microscope images',
+    },
     0x8568 => {
         Name => 'AFCP_IPTC',
         SubDirectory => {
@@ -835,7 +892,11 @@ my %longBin = (
         },
     },
     0x8827 => 'ISO',
-    0x8828 => 'Opto-ElectricConvFactor',
+    0x8828 => {
+        Name => 'Opto-ElectricConvFactor',
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
+    },
     0x8829 => 'Interlace',
     0x882a => 'TimeZoneOffset',
     0x882b => 'SelfTimerMode',
@@ -955,7 +1016,7 @@ my %longBin = (
         Name => 'FlashEnergy',
         Groups => { 2 => 'Camera' },
     },
-    0x920c => 'SpatialFrequencyResponse',
+    0x920c => 'SpatialFrequencyResponse',   # ?? (not in Fuji images - PH)
     0x920d => 'Noise',
     0x920e => 'FocalPlaneXResolution',
     0x920f => 'FocalPlaneYResolution',
@@ -977,7 +1038,16 @@ my %longBin = (
         },
     },
     0x9211 => 'ImageNumber',
-    0x9212 => 'SecurityClassification',
+    0x9212 => { #12
+        Name => 'SecurityClassification',
+        PrintConv => {
+            T => 'Top Secret',
+            S => 'Secret',
+            C => 'Confidential',
+            R => 'Restricted',
+            U => 'Unclassified',
+        },
+    },
     0x9213 => 'ImageHistory',
     0x9214 => {
         Name => 'SubjectLocation',
@@ -989,11 +1059,12 @@ my %longBin = (
         Name => 'SensingMethod',
         Groups => { 2 => 'Camera' },
         PrintConv => {
-            1 => 'Not defined',
+            1 => 'Monochrome area', #12
             2 => 'One-chip color area',
             3 => 'Two-chip color area',
             4 => 'Three-chip color area',
             5 => 'Color sequential area',
+            6 => 'Monochrome linear', #12
             7 => 'Trilinear',
             8 => 'Color sequential linear',
         },
@@ -1071,7 +1142,10 @@ my %longBin = (
         Name => 'FlashEnergy',
         Groups => { 2 => 'Camera' },
     },
-    0xa20c => 'SpatialFrequencyResponse',
+    0xa20c => {
+        Name => 'SpatialFrequencyResponse',
+        PrintConv => 'Image::ExifTool::Exif::PrintSFR($val)',
+    },
     0xa20d => 'Noise',
     0xa20e => 'FocalPlaneXResolution',
     0xa20f => 'FocalPlaneYResolution',
@@ -1259,7 +1333,14 @@ my %longBin = (
         Format => 'string',
         PrintConv => '$self->Printable($val)',
     },
-    0xc616 => 'CFAPlaneColor',
+    0xc616 => {
+        Name => 'CFAPlaneColor',
+        PrintConv => q{
+            my @cols = qw(Red Green Blue Cyan Magenta Yellow White);
+            my @vals = map { $cols[$_] || "Unknown($_)" } split(' ', $val);
+            return join(',', @vals);
+        },
+    },
     0xc617 => {
         Name => 'CFALayout',
         PrintConv => {
@@ -1307,14 +1388,10 @@ my %longBin = (
     },
     0xc631 => 'ChromaBlurRadius',
     0xc632 => 'AntiAliasStrength',
-    0xc633 => 'ShadowScale', #DNG forum at http://www.adobe.com/support/forums/main.html
+    0xc633 => 'ShadowScale',
     0xc634 => [
         {
-            Name => 'DNGPrivateData',
-            Condition => '$self->{TIFF_TYPE} ne "SR2"',
-            ValueConv => '\$val',
-        },
-        {
+            Condition => '$self->{TIFF_TYPE} eq "SR2"',
             Name => 'SR2Private',
             Groups => { 1 => 'SR2' },
             Flags => 'SubIFD',
@@ -1324,6 +1401,17 @@ my %longBin = (
                 DirName => 'SR2Private',
                 Start => '$val',
             },
+        },
+        {
+            Condition => '$$valPt =~ /^Adobe\0MakN/',
+            Name => 'DNGMakerNotes',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::DNG::MakerNotes',
+            },
+        },
+        {
+            Name => 'DNGPrivateData',
+            ValueConv => '\$val',
         },
     ],
     0xc635 => {
@@ -1341,7 +1429,7 @@ my %longBin = (
         Name => 'CalibrationIlluminant2',
         PrintConv => \%lightSource,
     },
-    0xc65c => 'BestQualityScale', #3 (incorrect in ref 2)
+    0xc65c => 'BestQualityScale',
     0xc65d => {
         Name => 'RawDataUniqueID',
         Format => 'undef',
@@ -1589,6 +1677,34 @@ my %longBin = (
         },
         PrintConv => 'Image::ExifTool::Exif::PrintCFAPattern($val)',
     },
+    RedBalance => {
+        Groups => { 2 => 'Camera' },
+        Desire => {
+            0 => 'WB_RGGBLevels',
+            1 => 'WB_RGBGLevels',
+            2 => 'WB_RBGGLevels',
+            3 => 'WB_GRBGLevels',
+            4 => 'WB_RBLevels',
+            5 => 'WB_RedLevel',
+            6 => 'WB_GreenLevel',
+        },
+        ValueConv => 'Image::ExifTool::Exif::RedBlueBalance(0,@val)',
+        PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
+    },
+    BlueBalance => {
+        Groups => { 2 => 'Camera' },
+        Desire => {
+            0 => 'WB_RGGBLevels',
+            1 => 'WB_RGBGLevels',
+            2 => 'WB_RBGGLevels',
+            3 => 'WB_GRBGLevels',
+            4 => 'WB_RBLevels',
+            5 => 'WB_BlueLevel',
+            6 => 'WB_GreenLevel',
+        },
+        ValueConv => 'Image::ExifTool::Exif::RedBlueBalance(1,@val)',
+        PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
+    },
 );
 
 # table for unknown IFD entries
@@ -1704,6 +1820,28 @@ sub ConvertExifText($$)
 }
 
 #------------------------------------------------------------------------------
+# Print conversion for SpatialFrequencyResponse
+sub PrintSFR($)
+{
+    my $val = shift;
+    return $val unless length $val > 4;
+    my ($n, $m) = (Get16u(\$val, 0), Get16u(\$val, 2));
+    my @cols = split /\0/, substr($val, 4), $n+1;
+    my $pos = length($val) - 8 * $n * $m;
+    return $val unless @cols == $n+1 and $pos >= 4;
+    pop @cols;
+    my ($i, $j);
+    for ($i=0; $i<$n; ++$i) {
+        my @rows;
+        for ($j=0; $j<$m; ++$j) {
+            push @rows, Image::ExifTool::GetRational64u(\$val, $pos + 8*($i+$j*$n));
+        }
+        $cols[$i] .= '=' . join(',',@rows) . '';
+    }
+    return join '; ', @cols;
+}
+
+#------------------------------------------------------------------------------
 # Print numerical parameter value (with sign, or 'Normal' for zero)
 sub PrintParameter($)
 {
@@ -1738,6 +1876,38 @@ sub ConvertParameter($)
 }
 
 #------------------------------------------------------------------------------
+# Calculate Red/BlueBalance
+# Inputs: 0) 0=red, 1=blue, 1-5) WB_RGGB/RGBG/RBGG/GRBG/RBLevels, 
+#         6) red or blue level, 7) green level
+my @rggbLookup = (
+    [ 0, 1, 2, 3 ], # RGGB
+    [ 0, 1, 3, 2 ], # RGBG
+    [ 0, 2, 3, 1 ], # RBGG
+    [ 1, 0, 3, 2 ], # GRBG
+    [ 0, 256, 256, 1 ], # RB (green level is 256)
+);
+sub RedBlueBalance($@)
+{
+    my $blue = shift;
+    my ($i, $val, $levels);
+    for ($i=0; $i<@rggbLookup; ++$i) {
+        $levels = shift or next;
+        my @levels = split ' ', $levels;
+        next if @levels < 2;
+        my $lookup = $rggbLookup[$i];
+        my $g = $$lookup[1];    # get green level or index
+        if ($g < 4) {
+            next if @levels < 4;
+            $g = ($levels[$g] + $levels[$$lookup[2]]) / 2 or next;
+        }
+        $val = $levels[$$lookup[$blue * 3]] / $g;
+        last;
+    }
+    $val = $_[0] / $_[1] if not defined $val and ($_[0] and $_[1]);
+    return $val;
+}
+
+#------------------------------------------------------------------------------
 # Print exposure time as a fraction
 sub PrintExposureTime($)
 {
@@ -1756,6 +1926,8 @@ sub PrintCFAPattern($)
 {
     my $val = shift;
     return '<truncated data>' unless length $val > 4;
+    # some panasonic cameras (SV-AS3, SV-AS30) write this in ascii (very odd)
+    $val =~ /^[0-6]+$/ and $val =~ tr/0-6/\x00-\x06/;
     my ($nx, $ny) = (Get16u(\$val, 0), Get16u(\$val, 2));
     return '<zero pattern size>' unless $nx and $ny;
     my $end = 4 + $nx * $ny;
@@ -1765,7 +1937,7 @@ sub PrintCFAPattern($)
         $end = 4 + $nx * $ny;
         return '<invalid pattern size>' if $end > length $val;
     }
-    my @cfaColor = ('Red','Green','Blue','Cyan','Magenta','Yellow','White');
+    my @cfaColor = qw(Red Green Blue Cyan Magenta Yellow White);
     my ($pos, $rtnVal) = (4, '[');
     for (;;) {
         $rtnVal .= $cfaColor[Get8u(\$val,$pos)] || 'Unknown';
@@ -2044,6 +2216,10 @@ sub ProcessExif($$$)
         my $valueDataLen = $dataLen;
         my $valuePtr = $entry + 8;      # pointer to value within $$dataPt
         if ($size > 4) {
+            if ($size > 0x7fffffff) {
+                $exifTool->Warn(sprintf("Invalid size ($size) for $dirName tag 0x%x",$tagID));
+                next;
+            }
             $valuePtr = Get32u($dataPt, $valuePtr) - $dataPos;
             if ($valuePtr < 0 or $valuePtr+$size > $dataLen) {
                 # get value by seeking in file if we are allowed
@@ -2197,7 +2373,11 @@ sub ProcessExif($$$)
             if ($$subdir{MaxSubdirs}) {
                 @values = split ' ', $val;
                 # limit the number of subdirectories we parse
-                pop @values while @values > $$subdir{MaxSubdirs};
+                my $over = @values - $$subdir{MaxSubdirs};
+                if ($over > 0) {
+                    $exifTool->Warn("Ignoring $over $tagStr directories");
+                    pop @values while $over--;
+                }
                 $val = shift @values;
             }
             my ($newTagTable, $dirNum);
@@ -2241,7 +2421,7 @@ sub ProcessExif($$$)
                         # attempt to determine the byte ordering by checking
                         # at the number of directory entries.  This is an int16u
                         # that should be a reasonable value.
-                        my $num = Image::ExifTool::Get16u($subdirDataPt, $subdirStart);
+                        my $num = Get16u($subdirDataPt, $subdirStart);
                         if ($num & 0xff00 and ($num>>8) > ($num&0xff)) {
                             # This looks wrong, we shouldn't have this many entries
                             my %otherOrder = ( II=>'MM', MM=>'II' );
@@ -2447,8 +2627,8 @@ interpret EXIF meta information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

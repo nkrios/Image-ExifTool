@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..17\n"; }
+BEGIN { $| = 1; print "1..21\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -101,7 +101,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 10/11: test ExtractInfo() and GetInfo()
+# tests 10/11: test ExtractInfo() and GetInfo()
 # (uses output from test 5 for comparison)
 {
     ++$testnum;
@@ -142,7 +142,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 14/15/16: test GetGroups()
+# tests 14/15/16: test GetGroups()
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -189,6 +189,42 @@ my $testnum = 1;
 {
     ++$testnum;
     print 'not ' unless testVerbose($testname, $testnum, 't/images/ExifTool.jpg', 3);
+    print "ok $testnum\n";
+}
+
+# tests 18/19: Test Group# option with multiple groups and no duplicates
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->Options(Duplicates => 0);  # don't allow duplicates
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg',
+                    { Group0 => ['MakerNotes','EXIF'] });
+    print 'not ' unless check($exifTool, $info, $testname, $testnum, 7);
+    print "ok $testnum\n";
+
+    ++$testnum;
+    $info = $exifTool->ImageInfo('t/images/ExifTool.jpg',
+                    { Group0 => ['EXIF','MakerNotes'] });
+    print 'not ' unless check($exifTool, $info, $testname, $testnum, 8);
+    print "ok $testnum\n";
+}
+
+# test 20: Test extracting a single, non-priority tag with duplicates set to 0
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->Options(Duplicates => 0);
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg', 'EXIF:WhiteBalance');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 21: Test extracting ICC_Profile as a block
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.tif', 'ICC_Profile');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 

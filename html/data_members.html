@@ -2,7 +2,7 @@
 <head>
 <title>ExifTool Object Data Members</title>
 </head>
-<body>
+<body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool Object Data Members</h1>
 
 The following table lists the data members of the ExifTool object.
@@ -30,6 +30,8 @@ header file.  (but this is Perl, so I couldn't do that...)
 <tr><td>DIR_COUNT</td><td>Hash reference for counters of various types of directorys (ICC, IPTC,...)</td></tr>
 
 <tr><td>DIR_NAME</td><td>Name of directory currently being processed</td></tr>
+
+<tr><td>DROP_TAGS</td><td>Flag to exclude "Drop" tags when writing</td></tr>
 
 <tr><td>EDIT_DIRS</td><td>Hash of parent directories for each directory edited during
 	writing (Note: entry may exist but be undefined for top-level

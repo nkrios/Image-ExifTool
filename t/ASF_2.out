@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.88
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
 [File, File, Image]  - File Name: ASF.wmv
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 12 kB
@@ -33,7 +33,13 @@
 [ASF, ASF, Video] 16 - Error Correction Type: Audio Spread
 [ASF, ASF, Video] 32 - Time Offset: 0 sec
 [ASF, ASF, Video] 48 - Stream Number: 1
+[ASF, ASF, Video] 54 - Audio Codec ID: Windows Media v2
+[ASF, ASF, Video] 56 - Audio Channels: 2
+[ASF, ASF, Video] 58 - Audio Sample Rate: 22050
 [ASF, ASF, Video] 0 - Stream Type: Video
 [ASF, ASF, Video] 16 - Error Correction Type: No Error Correction
 [ASF, ASF, Video] 32 - Time Offset: 0 sec
 [ASF, ASF, Video] 48 - Stream Number: 2
+[ASF, ASF, Video] 54 - Image Width: 160
+[ASF, ASF, Video] 58 - Image Height: 120
+[Composite, Composite, Image]  - Image Size: 160x120

@@ -2,10 +2,211 @@
 <head>
   <title>ExifTool Version History</title>
 </head>
-<body><!-- Use line width of 80 -->
+<body text='#000000' bgcolor='#ffffff'>
+<!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.00.tar.gz">Version 6.00</a>.<p>
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.17.tar.gz">Version 6.17</a> (other versions are
+considered development releases).<p>
+
+<b>May 12, 2006 - Version 6.17</b> (production release)
+<ul>
+<li>Fixed problem with rpmbuild on Mandriva 2006.0 (thanks Niels Kristian)
+<li>Fixed typo in iptc2xmp.args and xmp2iptc.args which prevented the XMP
+    Instructions from being copied properly (thanks Mark Tate)
+<li>Handle byte order mark in unicode EXIF strings
+</ul>
+
+<b>May 8, 2006 - Version 6.16</b>
+<ul>
+<li>Write %ADO_ContainsXMP comment when adding XMP to EPS images
+<li>Don't issue DSC warning when writing Adobe version 3.1 EPS images
+<li>Added separate table for decoding tags in IFD0 of Panasonic RAW images
+<li>Improvements to Nikon AF point decoding (thanks Roger Larsson)
+<li>Allow .ExifTool_config directory to be specified by setting the
+    EXIFTOOL_HOME environment variable
+<li>Made all maker note write errors minor so they can be ignored if necessary,
+    allowing information to be written to images with corrupted maker notes
+<li>Minor change to perl-Image-ExifTool.spec to fix problem with rpmbuild
+    (thanks Volker Kuhlmann)
+<li>Fixed bug which could cause incorrect date to be calculated when shifting
+    date/time values
+</ul>
+
+<b>Apr. 20, 2006 - Version 6.15</b>
+<ul>
+<li>Changes to MIE specification involving string lists and alternate languages
+</ul>
+
+<b>Apr. 18, 2006 - Version 6.14</b>
+<ul>
+<li>Fixed some problems with EPS writer and removed beta testing status (thanks
+    to Tim Kordick for help with testing)
+<li>Created new MIE meta information format [Note: The MIE module is fully
+    functional but the MIE format specification is still in development]
+<li>Added print conversion for SpatialFrequencyResponse
+<li>Extended meaning of -z option when writing to allow compressed information
+    to be written to MIE files
+<li>Added Minolta FlashMetering tag
+<li>API Changes:
+    <ul>
+    <li>Added 'Compress' option
+    </ul>
+</ul>
+
+<b>Apr. 9, 2006 - Version 6.13</b>
+<ul>
+<li>Fixed problem with writing FileName that caused format codes not to be
+    properly expanded if the specified filename already existed
+<li>Standardized reported FileType for ACR, AIFC, CRW, JP2, PS and PSD files
+<li>Allow 2 values to be written for EXIF TimeZoneOffset and make EXIF
+    SecurityClassification writable
+</ul>
+
+<b>Apr. 5, 2006 - Version 6.12</b>
+<ul>
+<li>Avoid printing garbage for DNG maker note information that was not copied
+    properly by the Adobe DNG converter (affects converted ORF images)
+<li>Disabled "Possibly incorrect maker notes offsets" warning for a number of
+    Olympus models
+<li>Fixed bug introduced in 6.04 which could cause endless loop (eeek!) when
+    writing tags with PostScript equivalents
+<li>Fixed error reading some DICOM images
+</ul>
+
+<b>Apr. 3, 2006 - Version 6.11</b>
+<ul>
+<li>Added a few new Pentax LensType's
+<li>Fixed bug rewriting MOS images (this bug introduced in version 5.95 caused
+    an error message and prevented the file from being rewritten)
+</ul>
+
+<b>Mar. 31, 2006 - Version 6.10</b>
+<ul>
+<li>Added ability to use filename format codes %d, %f and %e in values written
+    to FileName and Directory tags
+<li>Fixed problem of odd filenames being generated when setting FileName from an
+    invalid date/time tag
+<li>Removed debugging print statement forgotten in Olympus code of 6.07 (oops)
+<li>API Changes:
+    <ul>
+    <li>Added StrictDate option
+    </ul>
+</ul>
+
+<b>Mar. 30, 2006 - Version 6.09</b>
+<ul>
+<li>Made FileName and Directory writable (enabling a whole new functionality!)
+<li>Added ability to write DOS-style EPS images [Note: still in beta testing]
+<li>Increased precision of Composite Red/BlueBalance print conversion
+<li>When combining the -o and -overwrite_original options, the original file is
+    now erased if the new file is written successfully
+<li>Added a new Nikon lens (thanks Werner Kober)
+<li>API Changes:
+    <ul>
+    <li>Added SetFileName() routine
+    <li>In list context, CountNewValues() now also returns "quick" value count
+    </ul>
+</ul>
+
+<b>Mar. 25, 2006 - Version 6.08</b>
+<ul>
+<li>Made YCbCrCoefficients and YCbCrPositioning protected when writing
+<li>Decode some new Nikon-specific tags in QuickTime videos from Nikon cameras
+<li>Calculate Red/BlueBalance for Olympus images
+<li>Fixed "APP1 segment too large" problem when copying all tags from Canon
+    EOS-5D or EOS-30D CR2 image to JPEG image
+<li>Fixed problem running "exiftool" with no arguments in Windows cmd shell
+</ul>
+
+<b>Mar. 22, 2006 - Version 6.07</b>
+<ul>
+<li>Added a number of new Olympus tags (thanks Frank Ledwon)
+<li>Decode Adobe JPEG APP14 segment (thanks Didier Giet)
+<li>Made Rotation writable in CRW images
+<li>Changed some FujiFilm WhiteBalance strings
+<li>No longer return multiple tags when a group is specified unless the
+    duplicates option is enabled or the group name is 'all' or '*'
+</ul>
+
+<b>Mar. 20, 2006 - Version 6.06</b>
+<ul>
+<li>Added validity check for Canon FocalPlaneX/YSize which resulted in incorrect
+    values of FocalLength35efl being calculated for some PowerShot models
+<li>Made Opto-ElectricConvFactor value binary
+</ul>
+
+<b>Mar. 18, 2006 - Version 6.05</b>
+<ul>
+<li>Improved JPEG writer to tolerate any segment ordering
+<li>Fixed Olympus ExtenderStatus to work with E-330 (thanks Mark Dapoz)
+</ul>
+
+<b>Mar. 15, 2006 - Version 6.04</b>
+<ul>
+<li>Added write support for EPS and PS images [Note: still in beta testing --
+    must currently use the -m option to enable writing to EPS images]
+<li>Added ability to write ICC_Profile data as a block
+<li>Added read/write support for ICC and ICM color profile files
+<li>Added read/write support for ERF (Epson Raw Format) images
+<li>Added a couple of new Olympus tags and LensType's (thanks Mark Dapoz)
+<li>Added ability to scan past unknown header to find JPEG or TIFF image
+<li>Added Canon EOS 30D custom functions
+<li>Changed name of Panasonic SerialNumber tag to InternalSerialNumber
+<li>Changed name of Canon 5D PictureNumber tag to ImageNumber
+<li>Improved MRW reading and writing
+<li>Decode a number of new Minolta tags and changed names of some existing tags
+<li>Decode some type-specific data in ASF StreamProperties, including video
+    ImageWidth and ImageHeight
+<li>Extract a few more PostScript tags and derive ImageWidth and ImageHeight for
+    PostScript documents
+<li>Some improvements to Panasonic decoding (thanks Tels)
+<li>API Changes:
+    <ul>
+    <li>'Unsafe' tags are now copied by SetNewValuesFromFile() if specified
+        explicitly
+    </ul>
+<li>Internal Changes:
+    <ul>
+    <li>SubDirectory tags are no longer Writable by default in WRITABLE tables
+    </ul>
+</ul>
+
+<b>Mar. 2, 2006 - Version 6.03</b>
+<ul>
+<li>Added print conversion for CFAPlaneColor
+<li>Decode CFAPattern as written incorrectly in ASCII by some Panasonic cameras
+<li>Added recently announced Canon cameras to CanonModelID list
+<li>API Changes:
+    <ul>
+    <li>Added ability to prefix tag name with group in arguments to ImageInfo()
+        (read/write symmetry is now improved since this feature already existed
+        in the write routines, and now group names can be used in shortcuts)
+    <li>Changed order of filtering for Group# option and tag exclusions to be
+        applied after extracting tags specified in calls to ImageInfo()
+    </ul>
+</ul>
+
+<b>Feb. 26, 2006 - Version 6.02</b>
+<ul>
+<li>Fixed problem rewriting Photoshop IRB resources as written by some
+    applications (ie. PixVue)
+<li>Improved decoding of AVI files to increase speed and extract more tags
+<li>Added -overwrite_original_in_place option
+<li>Added a number of new XMP tags and bring XMP support up to new
+    specification, plus a few undocumented XMP-aux tags (thanks Lou Salkind)
+<li>Added support for large DNG preview image (with JpgFromRaw tag)
+<li>Added ability to decode DNGMakerNotes
+<li>Added SEMInfo tag (thanks Robert Mucke)
+<li>Decode (but don't rewrite) old PS APP13 "Adobe_Photoshop2.5:" segment
+</ul>
+
+<b>Feb. 20, 2006 - Version 6.01</b>
+<ul>
+<li>Added back RedBalance and BlueBalance as composite tags
+<li>Fixed potential problem in File::RandomAccess which could cause a "substr
+    outside of string" warning
+</ul>
 
 <b>Feb. 19, 2006 - Version 6.00</b> (production release)
 <ul>
@@ -1875,8 +2076,7 @@
 
 <b>Feb. 20, 2004 - Version 3.10</b>
 <ul>
-<li>Restructuring only -- the behaviour of the exiftool
-script was not changed
+<li>Restructuring only -- the behaviour of the exiftool script was not changed
 <li>Moved html documentation to new html directory
 <li>API changes:
     <ul>

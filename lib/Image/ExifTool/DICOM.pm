@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 # DICOM VR (Value Representation) format conversions
 my %dicomFormat = (
@@ -2393,7 +2393,7 @@ sub ProcessDICM($$)
             last;   # success!
         }
         $raf->Seek(0, 0) or return 0;   # rewind to start of file
-        $exifTool->SetFileType('ACR-NEMA');
+        $exifTool->SetFileType('ACR');
     }
 #
 # process the meta information
@@ -2538,7 +2538,7 @@ sub ProcessDICM($$)
             # format time values
             $buff =~ s/^(\d{2})(\d{2})(\d{2})/$1:$2:$3/;
         } elsif ($vr eq 'AT' and $len == 4) {
-            my ($g, $e) = (Get16u($buff,0), Get16u($buff,2));
+            my ($g, $e) = (Get16u(\$buff,0), Get16u(\$buff,2));
             $buff = sprintf('%.4X,%.4X', $g, $e);
         }
         my $val;
@@ -2623,8 +2623,8 @@ No translation of special characters sets is done.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

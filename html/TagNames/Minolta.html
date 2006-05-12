@@ -8,7 +8,7 @@
 These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn&apos;t
 make things easy for decoders because the meaning of some tags and the
 location where some information is stored is different for different camera
-models.  (Take MinoltaQuality for example, which may be located in 3
+models.  (Take MinoltaQuality for example, which may be located in 5
 different places.)
 
 <blockquote>
@@ -31,40 +31,48 @@ different places.)
 <td align='center'>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0004</td>
+<td>MinoltaCameraSettings7D</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Minolta.html#CameraSettings7D'>Minolta CameraSettings7D Tags</a></td></tr>
+<tr valign='top'>
 <td>0x0018</td>
 <td>ImageStabilization</td>
 <td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
+<td><font size='-1'><font color="#666666">(a block of binary data which exists in DiMAGE A2 (and A1/X1?) images only if
+image stabilization is enabled)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0040</td>
 <td>CompressedImageSize</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0081</td>
 <td>PreviewImage</td>
 <td align='center'>undef</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0088</td>
 <td>PreviewImageStart</td>
 <td align='center'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0089</td>
 <td>PreviewImageLength</td>
 <td align='center'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0101</td>
 <td>ColorMode</td>
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = Natural color
-  <br>1 = Black&amp;white
+  <br>1 = Black &amp; White
   <br>2 = Vivid color
   <br>3 = Solarization
-  <br>4 = Adobe RGB</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>4 = Adobe RGB
+  <br>13 = Natural sRGB
+  <br>14 = Natural+ sRGB</font></td></tr>
+<tr valign='top'>
 <td>0x0102</td>
 <td>MinoltaQuality</td>
 <td align='center'>int32u</td>
@@ -74,7 +82,7 @@ different places.)
   <br>3 = Standard
   <br>4 = Economy
   <br>5 = Extra fine</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0103</td>
 <td>MinoltaQuality
   <br>MinoltaImageSize</td>
@@ -93,6 +101,24 @@ different places.)
   <br>5 = 2560x1920
   <br>6 = 2272x1704
   <br>7 = 2048x1536</font></td></tr>
+<tr valign='top'>
+<td>0x0107</td>
+<td>ImageStabilization</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>1 = Off
+  <br>5 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x010a</td>
+<td>ZoneMatching</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>0 = ISO Setting Used
+  <br>1 = High Key
+  <br>2 = Low Key</font></td></tr>
+<tr valign='top'>
+<td>0x010b</td>
+<td>ColorTemperature</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x010c</td>
 <td>LensID</td>
@@ -149,11 +175,16 @@ different places.)
   <br>26241 = AF35-80mm F4-5.6
   <br>45741 = AF200mm F2.8G x2 or TOKINA 300mm F2.8 x2</font></td></tr>
 <tr valign='top'>
+<td>0x0114</td>
+<td>MinoltaCameraSettings5D</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0f00</td>
 <td>MinoltaCameraSettings2</td>
 <td align='center'>N</td>
@@ -161,6 +192,12 @@ different places.)
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Minolta CameraSettings Tags</a></h2>
+There is some variability in CameraSettings information between different
+models (and sometimes even between different firmware versions), so this
+information may not be as reliable as it should be.  Because of this, tags
+in the following tables are set to lower priority to prevent them from
+superceeding the values of same-named tags in other locations when duplicate
+tags are disabled.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
@@ -227,18 +264,18 @@ different places.)
   <br>2 = Spot</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>8</td>
-<td>MinoltaISO</td>
-<td align='center'>int32u~</td>
+<td>ISO</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>9</td>
-<td>MinoltaShutterSpeed</td>
-<td align='center'>int32u~</td>
+<td>ExposureTime</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>10</td>
-<td>MinoltaAperture</td>
-<td align='center'>int32u~</td>
+<td>FNumber</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>11</td>
@@ -304,7 +341,7 @@ different places.)
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>23</td>
 <td>MaxAperture</td>
-<td align='center'>int32u~</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>26</td>
@@ -372,7 +409,7 @@ different places.)
   <br>1 = 200
   <br>2 = 400
   <br>3 = 800
-  <br>4 = auto
+  <br>4 = Auto
   <br>5 = 64</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>37</td>
@@ -403,7 +440,7 @@ different places.)
 <td>ColorMode</td>
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = Natural color
-  <br>1 = Black&amp;white
+  <br>1 = Black &amp; White
   <br>2 = Vivid color
   <br>3 = Solarization
   <br>4 = Adobe RGB</font></td></tr>
@@ -484,11 +521,330 @@ different places.)
   <br>2 = MM/DD/HH:MM
   <br>3 = Text
   <br>4 = Text + ID#</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>63</td>
+<td>FlashMetering</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>0 = ADI (Advanced Distance Integration)
+  <br>1 = Pre-flash TTl
+  <br>2 = Manual flash control</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraSettings7D'>Minolta CameraSettings7D Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>ExposureMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Program
+  <br>1 = Aperture Priority
+  <br>2 = Shutter Priority
+  <br>3 = Manual
+  <br>4 = Auto?
+  <br>5 = Program-shift A
+  <br>6 = Program-shift S</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>MinoltaImageSize</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Large
+  <br>1 = Medium
+  <br>2 = Small</font></td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>MinoltaQuality</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = RAW
+  <br>16 = Fine
+  <br>32 = Normal
+  <br>34 = RAW+JPEG
+  <br>48 = Economy</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>WhiteBalance</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Shade
+  <br>3 = Cloudy
+  <br>4 = Tungsten
+  <br>5 = Fluorescent
+  <br>256 = Kelvin
+  <br>512 = Manual</font></td></tr>
+<tr valign='top'>
+<td align='right'>14</td>
+<td>FocusMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Single-shot AF
+  <br>1 = Continuous AF
+  <br>3 = Automatic AF
+  <br>4 = Manual</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>16</td>
+<td>AFPoints</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>Bit 0 = Center
+  <br>Bit 1 = Top
+  <br>Bit 2 = Top-Right
+  <br>Bit 3 = Right
+  <br>Bit 4 = Bottom-Right
+  <br>Bit 5 = Bottom
+  <br>Bit 6 = Bottom-Left
+  <br>Bit 7 = Left
+  <br>Bit 8 = Top-Left</font></td></tr>
+<tr valign='top'>
+<td align='right'>21</td>
+<td>Flash</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>28</td>
+<td>ISOSetting</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = 100
+  <br>3 = 200
+  <br>4 = 400
+  <br>5 = 800
+  <br>6 = 1600
+  <br>7 = 3200</font></td></tr>
+<tr valign='top'>
+<td align='right'>30</td>
+<td>ExposureCompensation</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>37</td>
+<td>ColorSpace</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = sRGB (Natural)
+  <br>1 = sRGB (Natural+)
+  <br>4 = Adobe RGB</font></td></tr>
+<tr valign='top'>
+<td align='right'>38</td>
+<td>Sharpness</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>39</td>
+<td>Contrast</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>40</td>
+<td>Saturation</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>45</td>
+<td>FreeMemoryCardImages</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>63</td>
+<td>ColorTemperature</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>70</td>
+<td>Rotation</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>72 = Horizontal (normal)
+  <br>76 = Rotate 90 CW
+  <br>82 = Rotate 270 CW</font></td></tr>
+<tr valign='top'>
+<td align='right'>71</td>
+<td>FNumber</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>72</td>
+<td>ExposureTime</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>74</td>
+<td>FreeMemoryCardImages</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>94</td>
+<td>ImageNumber</td>
+<td align='center'>int16u</td>
+<td><font size='-1'><font color="#666666">(this information may appear at index 98 (0x62), depending on firmware
+version)</font></font></td></tr>
+<tr valign='top'>
+<td align='right'>96</td>
+<td>NoiseReduction</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>98</td>
+<td>ImageNumber2</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>113</td>
+<td>ImageStabilization</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>117</td>
+<td>ZoneMatchingOn</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraSettings5D'>Minolta CameraSettings5D Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>ExposureMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Program
+  <br>1 = Aperture Priority
+  <br>2 = Shutter Priority
+  <br>3 = Manual
+  <br>4 = Auto?
+  <br>4131 = Connected Copying?</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>12</td>
+<td>MinoltaImageSize</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Large
+  <br>1 = Medium
+  <br>2 = Small</font></td></tr>
+<tr valign='top'>
+<td align='right'>13</td>
+<td>MinoltaQuality</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = RAW
+  <br>16 = Fine
+  <br>32 = Normal
+  <br>34 = RAW+JPEG
+  <br>48 = Economy</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>14</td>
+<td>WhiteBalance</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Cloudy?
+  <br>3 = Shade?
+  <br>4 = Tungsten
+  <br>5 = Fluorescent
+  <br>6 = Flash
+  <br>256 = Kelvin
+  <br>512 = Manual</font></td></tr>
+<tr valign='top'>
+<td align='right'>31</td>
+<td>Flash</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Did not fire
+  <br>1 = Fired</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>37</td>
+<td>MeteringMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Multi-segment
+  <br>1 = Center weighted
+  <br>2 = Spot</font></td></tr>
+<tr valign='top'>
+<td align='right'>38</td>
+<td>ISOSetting</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = 100
+  <br>3 = 200
+  <br>4 = 400
+  <br>5 = 800
+  <br>6 = 1600
+  <br>7 = 3200
+  <br>8 = 200 (Zone Matching High)
+  <br>10 = 80 (Zone Matching Low)</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>48</td>
+<td>Sharpness</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>49</td>
+<td>Contrast</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>50</td>
+<td>Saturation</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>53</td>
+<td>ExposureTime</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>54</td>
+<td>FNumber</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>55</td>
+<td>FreeMemoryCardImages</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>73</td>
+<td>ColorTemperature</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>80</td>
+<td>Rotation</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>72 = Horizontal (normal)
+  <br>76 = Rotate 90 CW
+  <br>82 = Rotate 270 CW</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>83</td>
+<td>ExposureCompensation</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>84</td>
+<td>FreeMemoryCardImages</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>174</td>
+<td>ImageNumber</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>176</td>
+<td>NoiseReduction</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>189</td>
+<td>ImageStabilization</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 14, 2005</i>
+<br><i>Last revised Apr 17, 2006</i>
 </body>
 </html>

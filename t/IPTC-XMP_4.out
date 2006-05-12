@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.07
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 100
@@ -120,7 +120,7 @@
 [ICC_Profile, ICC-header, Image] 52 - Device Model: sRGB
 [ICC_Profile, ICC-header, Image] 56 - Device Attributes: Reflective, Glossy, Positive, Color
 [ICC_Profile, ICC-header, Image] 64 - Rendering Intent: Perceptual
-[ICC_Profile, ICC-header, Image] 68 - Profile Connection Space: 0.9642 1 0.82491
+[ICC_Profile, ICC-header, Image] 68 - Connection Space Illuminant: 0.9642 1 0.82491
 [ICC_Profile, ICC-header, Image] 80 - Profile Creator: HP  
 [ICC_Profile, ICC-header, Image] 84 - Profile ID: 0
 [ICC_Profile, ICC_Profile, Image] cprt - Profile Copyright: Copyright (c) 1998 Hewlett-Packard Company
@@ -146,8 +146,12 @@
 [ICC_Profile, ICC_Profile, Image] rTRC - Red Tone Reproduction Curve: (Binary data 2060 bytes)
 [ICC_Profile, ICC_Profile, Image] gTRC - Green Tone Reproduction Curve: (Binary data 2060 bytes)
 [ICC_Profile, ICC_Profile, Image] bTRC - Blue Tone Reproduction Curve: (Binary data 2060 bytes)
+[APP14, APP14, Image] 0 - DCT Encode Version: 100
+[APP14, APP14, Image] 1 - APP14 Flags 0: (none)
+[APP14, APP14, Image] 2 - APP14 Flags 1: (none)
+[APP14, APP14, Image] 3 - Color Transform: YCbCr
 [Composite, Composite, Image]  - Aperture: 4.8
 [Composite, Composite, Camera]  - Flash: On
-[Composite, Composite, Image]  - Image Size: 100x80
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Camera]  - Focal Length: 6.0mm
+[Composite, Composite, Image]  - Image Size: 100x80

@@ -75,6 +75,7 @@ ZoomSourceWidth : 3072
 ZoomTargetWidth : 3072
 ---- Composite ----
 Aperture : 14.0
+BlueBalance : 1.19062
 CircleOfConfusion : 0.019 mm
 DriveMode : Continuous shooting
 FlashOn : Off
@@ -83,9 +84,11 @@ HyperfocalDistance : 4.26 m
 ImageSize : 8x8
 Lens : 18.0 - 55.0mm
 Lens35efl : 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+RedBalance : 2.06735
 ScaleFactor35efl : 1.6
 ShootingMode : Manual
 ShutterSpeed : 4
+WB_RGGBLevels : 1719 832 831 990
 ---- ExifIFD ----
 ApertureValue : 14.0
 ColorSpace : sRGB
@@ -118,7 +121,7 @@ UserComment :
 WhiteBalance (1) : Auto
 ---- File ----
 Directory : t/images
-FileModifyDate : 2006:01:04 13:39:21
+FileModifyDate : 2006:01:07 13:38:51
 FileName : ExifTool.jpg
 FileSize : 3 kB
 FileType : JPEG

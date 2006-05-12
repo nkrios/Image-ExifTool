@@ -19,7 +19,7 @@
 -XMP:* > IPTC:*
 -XMP-dc:Title > IPTC:ObjectName
 -XMP-dc:Subject > IPTC:Keywords
--XMP-photosop:Instructions > IPTC:SpecialInstructions
+-XMP-photoshop:Instructions > IPTC:SpecialInstructions
 -XMP-dc:Creator > IPTC:By-line
 -XMP-photoshop:AuthorsPosition > IPTC:By-lineTitle
 -XMP-photoshop:State > IPTC:Province-State

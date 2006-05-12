@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessJpeg2000Box($$$);
 
@@ -384,7 +384,7 @@ sub ProcessJP2($$)
     return 0 unless $raf->Read($hdr,12) == 12;
     return 0 unless $hdr eq "\x00\x00\x00\x0cjP  \x0d\x0a\x87\x0a" or     # (ref 1)
                     $hdr eq "\x00\x00\x00\x0cjP\x1a\x1a\x0d\x0a\x87\x0a"; # (ref 2)
-    $exifTool->SetFileType('JPEG 2000');
+    $exifTool->SetFileType();
     SetByteOrder('MM'); # JPEG 2000 files are big-endian
     my %dirInfo = (
         RAF => $raf,
@@ -422,8 +422,8 @@ aren't decoded properly, please send them to me so I can improve the JPEG
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

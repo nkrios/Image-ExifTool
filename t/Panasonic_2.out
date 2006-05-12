@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
 [File, File, Image]  - File Name: Panasonic.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 7 kB
@@ -69,10 +69,13 @@
 [MakerNotes, Panasonic, Camera] 33 - Data Dump: (Binary data 5428 bytes)
 [MakerNotes, Panasonic, Camera] 35 - White Balance Bias: 0
 [MakerNotes, Panasonic, Camera] 36 - Flash Bias: 0
-[MakerNotes, Panasonic, Camera] 37 - Serial Number: S000407190102
+[MakerNotes, Panasonic, Camera] 37 - Internal Serial Number: (S00) 2004:07:19 no. 0102
 [MakerNotes, Panasonic, Camera] 40 - Color Effect: Off
+[MakerNotes, Panasonic, Camera] 42 - Burst Mode: Off
+[MakerNotes, Panasonic, Camera] 43 - Sequence Number: 0
 [MakerNotes, Panasonic, Camera] 44 - Contrast: Normal
 [MakerNotes, Panasonic, Camera] 45 - Noise Reduction: Standard
+[MakerNotes, Panasonic, Camera] 46 - Self Timer: Off
 [Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 7.6

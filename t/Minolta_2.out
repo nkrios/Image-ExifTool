@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
 [File, File, Image]  - File Name: Minolta.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 13 kB
@@ -66,9 +66,9 @@
 [MakerNotes, Minolta, Camera] 5 - Minolta Quality: Fine
 [MakerNotes, Minolta, Camera] 6 - Drive Mode: Single
 [MakerNotes, Minolta, Camera] 7 - Metering Mode: Multi-segment
-[MakerNotes, Minolta, Camera] 8 - Minolta ISO: 100
-[MakerNotes, Minolta, Camera] 9 - Minolta Shutter Speed: 1/181
-[MakerNotes, Minolta, Camera] 10 - Minolta Aperture: 5.7
+[MakerNotes, Minolta, Camera] 8 - ISO: 100
+[MakerNotes, Minolta, Camera] 9 - Exposure Time: 1/181
+[MakerNotes, Minolta, Camera] 10 - F Number: 5.7
 [MakerNotes, Minolta, Camera] 11 - Macro Mode: Off
 [MakerNotes, Minolta, Camera] 12 - Digital Zoom: Off
 [MakerNotes, Minolta, Camera] 13 - Exposure Compensation: 0
@@ -112,10 +112,10 @@
 [Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 4.0
+[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 3.9
 [Composite, Composite, Image]  - Shutter Speed: 1/180
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Image]  - Circle Of Confusion: 0.007 mm
+[Composite, Composite, Image]  - Circle Of Confusion: 0.008 mm
 [Composite, Composite, Image]  - Depth of Field: 0.19 m (1.91 - 2.10)
-[Composite, Composite, Camera]  - Focal Length: 41.4mm (35mm equivalent: 167.0mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 41.06 m
+[Composite, Composite, Camera]  - Focal Length: 42.3mm (35mm equivalent: 167.0mm)
+[Composite, Composite, Image]  - Hyperfocal Distance: 42.01 m

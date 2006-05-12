@@ -4,6 +4,11 @@
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h2>ICC_Profile Tags</h2>
+ICC profile information is used in many different file types including JPEG,
+TIFF, PDF, PostScript, Photoshop, PNG, MIFF, PICT, QuickTime and some RAW
+formats.  While the tags listed below are not individually writable, the
+entire profile itself can be accessed via the extra &apos;ICC_Profile&apos; tag, but
+this tag is neither extracted nor written unless specified explicitly.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
@@ -386,7 +391,7 @@
   <br>3 = ICC-Absolute Colorimetric</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>68</td>
-<td>ProfileConnectionSpace</td>
+<td>ConnectionSpaceIlluminant</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
@@ -556,6 +561,6 @@
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 16, 2006</i>
+<br><i>Last revised Mar 9, 2006</i>
 </body>
 </html>

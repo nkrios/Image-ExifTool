@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
 [File, File, Image]  - File Size: 5 kB
 [File, File, Time]  - File Modification Date/Time: 2005:11:23 15:22:53
 [File, File, Image]  - File Type: TIFF
@@ -53,7 +53,7 @@
 [ICC_Profile, ICC-header, Image] 52 - Device Model: sRGB
 [ICC_Profile, ICC-header, Image] 56 - Device Attributes: Reflective, Glossy, Positive, Color
 [ICC_Profile, ICC-header, Image] 64 - Rendering Intent: Perceptual
-[ICC_Profile, ICC-header, Image] 68 - Profile Connection Space: 0.9642 1 0.82491
+[ICC_Profile, ICC-header, Image] 68 - Connection Space Illuminant: 0.9642 1 0.82491
 [ICC_Profile, ICC-header, Image] 80 - Profile Creator: HP  
 [ICC_Profile, ICC-header, Image] 84 - Profile ID: 0
 [ICC_Profile, ICC_Profile, Image] cprt - Profile Copyright: Copyright (c) 1998 Hewlett-Packard Company

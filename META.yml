@@ -1,6 +1,6 @@
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Image-ExifTool
-version:      6.00
+version:      6.17
 version_from: lib/Image/ExifTool.pm
 installdirs:  site
 requires:

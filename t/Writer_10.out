@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.08
 [File, File, Image]  - File Name: Writer_10_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
@@ -100,12 +100,13 @@
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 8
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 8
+[XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Centered
 [Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
 [Composite, Composite, Image]  - Shutter Speed: 1/500
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
 [Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 3.76 m
+[Composite, Composite, Image]  - Image Size: 8x8

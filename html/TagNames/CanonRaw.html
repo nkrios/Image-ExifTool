@@ -107,7 +107,7 @@ change size.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x1028</td>
 <td>CanonFlashInfo?</td>
-<td align='center'>Y[4]</td>
+<td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x1029</td>
@@ -285,13 +285,22 @@ models do not produce CRW images)</font>
   <br>0x1660000 = PowerShot SD500 / Digital IXUS 700 / IXY Digital 600
   <br>0x1668000 = EOS D60
   <br>0x1700000 = PowerShot SD30 / Digital IXUS i zoom / IXY Digital L3
+  <br>0x1740000 = PowerShot A430
   <br>0x1750000 = PowerShot A410
   <br>0x1760000 = PowerShot S80
   <br>0x1780000 = PowerShot A620
   <br>0x1790000 = PowerShot A610
+  <br>0x1800000 = PowerShot SD630 / Digital IXUS 65 / IXY Digital 80
   <br>0x1810000 = PowerShot SD450 / Digital IXUS 55 / IXY Digital 60
   <br>0x1870000 = PowerShot SD400 / Digital IXUS 50 / IXY Digital 55
+  <br>0x1880000 = PowerShot A420
   <br>0x1900000 = PowerShot SD550 / Digital IXUS 750 / IXY Digital 700
+  <br>0x1920000 = PowerShot A700
+  <br>0x1940000 = PowerShot SD700 IS / Digital IXUS 800 IS
+  <br>0x1950000 = PowerShot S3 IS
+  <br>0x1960000 = PowerShot A540
+  <br>0x1970000 = PowerShot SD600 / Digital IXUS 60 / IXY Digital 70
+  <br>0x1990000 = PowerShot A530
   <br>0x3010000 = PowerShot Pro90 IS
   <br>0x4040000 = PowerShot G1
   <br>0x6040000 = PowerShot S100 / Digital IXUS / IXY Digital
@@ -304,7 +313,8 @@ models do not produce CRW images)</font>
   <br>0x80000188 = EOS-1Ds Mark II
   <br>0x80000189 = EOS Digital Rebel XT / 350D / Kiss Digital N
   <br>0x80000213 = EOS 5D
-  <br>0x80000232 = EOS-1D Mark II N</font></td></tr>
+  <br>0x80000232 = EOS-1D Mark II N
+  <br>0x80000234 = EOS 30D</font></td></tr>
 <tr valign='top'>
 <td>0x1835</td>
 <td>DecoderTable</td>
@@ -456,7 +466,7 @@ models do not produce CRW images)</font>
 <td align='right'>2</td>
 <td>TimeZoneInfo</td>
 <td align='center'>int32u</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(set to 0x80000000 if TimeZoneCode is valid)</font></font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ImageInfo'>CanonRaw ImageInfo Tags</a></h2>
@@ -482,7 +492,7 @@ models do not produce CRW images)</font>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>3</td>
 <td>Rotation</td>
-<td align='center'>N</td>
+<td align='center'>int32s</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>4</td>
@@ -543,6 +553,6 @@ models do not produce CRW images)</font>
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 16, 2006</i>
+<br><i>Last revised Mar 21, 2006</i>
 </body>
 </html>

@@ -21,10 +21,10 @@ require Exporter;
 use File::RandomAccess;
 
 use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables @tableOrder
-            $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $myAPP5hdr @loadAllTables
-            %UserDefined);
+            $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old $myAPP5hdr
+            @loadAllTables %UserDefined);
 
-$VERSION = '6.00';
+$VERSION = '6.17';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [ qw(
@@ -63,11 +63,13 @@ sub SaveNewValues($);
 sub RestoreNewValues($);
 sub WriteInfo($$;$$);
 sub SetFileModifyDate($$;$);
+sub SetFileName($$;$);
 sub GetAllTags(;$);
 sub GetWritableTags(;$);
 sub GetAllGroups($);
 sub GetNewGroups($);
 # non-public routines below
+sub GetNewFileName($$);
 sub LoadAllTables();
 sub GetNewTagInfoList($;$);
 sub GetNewTagInfoHash($$);
@@ -93,23 +95,23 @@ sub WriteTIFF($$$);
 # automatically).  Note: They will appear in this order in the documentation,
 # so put the Exif Table first.
 @loadAllTables = qw(
-    Exif CanonRaw KyoceraRaw SigmaRaw GeoTiff JFIF JFIF::Extension Jpeg2000
-    BMP BMP PICT PNG MNG MIFF PDF PostScript DICOM ID3 RIFF AIFF ASF
-    QuickTime Sony::SR2SubIFD QuickTime::ImageFile Kodak::Meta APP12 AFCP
-    Photoshop::Header
+    Exif CanonRaw KyoceraRaw MinoltaRaw SigmaRaw GeoTiff JFIF JFIF::Extension
+    Jpeg2000 BMP BMP PICT PNG MNG MIFF PDF PostScript DICOM ID3 RIFF AIFF
+    ASF QuickTime Sony::SR2SubIFD QuickTime::ImageFile Kodak::Meta APP12 APP14
+    AFCP Panasonic::Raw Photoshop::Header MIE
 );
 
 # recognized file types, in the order we test unknown files
 # Notes: 1) There is no need to test for like types separately here
 # 2) Put types with no file signature at end of list to avoid false matches
-@fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIFF PS PDF PSD
-                XMP BMP PPM RIFF AIFF ASF MP3 MOV QTIF PICT DICM RAW);
+@fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIE MIFF PS PDF PSD XMP
+                BMP PPM RIFF AIFF ASF MP3 MOV ICC QTIF PICT DICM RAW);
 
 # file types that we can write (edit)
-my @writeTypes = qw(JPEG TIFF GIF CRW MRW PNG PSD XMP PPM);
+my @writeTypes = qw(JPEG TIFF GIF CRW MRW PNG MIE PSD XMP PPM EPS PS ICC);
 
 # file types that we can create from scratch
-my @createTypes = qw(XMP);
+my @createTypes = qw(XMP ICC MIE);
 
 # file type lookup for all recognized file extensions
 my %fileTypeLookup = (
@@ -131,12 +133,16 @@ my %fileTypeLookup = (
     DNG  => 'TIFF', # Digital Negative (TIFF-like)
     EPS  => 'EPS',  # Encapsulated PostScript Format (.3)
     EPSF => 'EPS',  # Encapsulated PostScript Format (.4)
+    ERF  => 'TIFF', # Epson Raw Format (TIFF-like)
     GIF  => 'GIF',  # Compuserve Graphics Interchange Format
+    ICC  => 'ICC',  # International Color Consortium
+    ICM  => 'ICC',  # International Color Consortium
     JNG  => 'PNG',  # JPG Network Graphics (PNG-like)
     JP2  => 'JP2',  # JPEG 2000 file
     JPEG => 'JPEG', # Joint Photographic Experts Group (.4)
     JPG  => 'JPEG', # Joint Photographic Experts Group (.3)
     JPX  => 'JP2',  # JPEG 2000 file
+    MIE  => 'MIE',  # Meta Information Encapsulation format
     MIF  => 'MIFF', # Magick Image File Format (.3)
     MIFF => 'MIFF', # Magick Image File Format (.4)
     MNG  => 'PNG',  # Multiple-image Network Graphics (PNG-like)
@@ -162,7 +168,7 @@ my %fileTypeLookup = (
     QTI  => 'QTIF', # QuickTime Image File (.3)
     QTIF => 'QTIF', # QuickTime Image File (.4)
     RAF  => 'RAF',  # FujiFilm RAW Format
-    RAW  => 'RAW',  # Kyocera Contax N Digital RAW format
+    RAW  => 'RAW',  # Kyocera Contax N Digital RAW or Panasonic RAW
     RIF  => 'RIFF', # Resource Interchange File Format (.3)
     RIFF => 'RIFF', # Resource Interchange File Format (.4)
     SR2  => 'TIFF', # Sony RAW Format 2 (TIFF-like)
@@ -178,7 +184,7 @@ my %fileTypeLookup = (
 );
 
 # MIME types for applicable file types above
-# (missing entries set to 'application/unknown')
+# (missing entries default to 'application/unknown')
 my %mimeType = (
     AIFF => 'audio/aiff',
     ASF  => 'video/x-ms-asf',
@@ -187,12 +193,14 @@ my %mimeType = (
     CR2  => 'image/x-raw',
     CRW  => 'image/x-raw',
     EPS  => 'application/postscript',
+    ERF  => 'image/x-raw',
     DICM => 'application/dicom',
     DNG  => 'image/x-raw',
     GIF  => 'image/gif',
     JNG  => 'image/jng',
     JP2  => 'image/jpeg2000',
     JPEG => 'image/jpeg',
+    MIE  => 'application/x-mie',
     MIFF => 'application/x-magick-image',
     MNG  => 'video/mng',
     MOS  => 'image/x-raw',
@@ -230,11 +238,12 @@ my %moduleName = (
     CRW  => 'CanonRaw',
     DICM => 'DICOM',
     EPS  => 'PostScript',
+    ICC  => 'ICC_Profile',
     JP2  => 'Jpeg2000',
     JPEG => '',     # (in the current module)
     MOV  => 'QuickTime',
     MP3  => 'ID3',
-    MRW  => 'Minolta',
+    MRW  => 'MinoltaRaw',
     ORF  => 'Olympus',
     PS   => 'PostScript',
     PSD  => 'Photoshop',
@@ -246,7 +255,7 @@ my %moduleName = (
 );
 
 # default group priority for writing
-my @defaultWriteGroups = qw(EXIF GPS IPTC XMP MakerNotes Photoshop);
+my @defaultWriteGroups = qw(EXIF GPS IPTC XMP MakerNotes Photoshop ICC_Profile);
 
 # group hash for ExifTool-generated tags
 my %allGroupsExifTool = ( 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'ExifTool' );
@@ -255,6 +264,7 @@ my %allGroupsExifTool = ( 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'ExifTool' );
 $exifAPP1hdr = "Exif\0\0";
 $xmpAPP1hdr = "http://ns.adobe.com/xap/1.0/\0";
 $psAPP13hdr = "Photoshop 3.0\0";
+$psAPP13old = 'Adobe_Photoshop2.5:';
 
 sub DummyWriteProc { return 1; }
 
@@ -286,9 +296,20 @@ sub DummyWriteProc { return 1; }
         WriteGroup => 'Comment',
         Priority => 0,  # to preserve order of JPEG COM segments
     },
-    Directory   => { Name => 'Directory' },
-    FileName    => { Name => 'FileName' },
-    FileSize    => {
+    Directory => {
+        Name => 'Directory',
+        Writable => 1,
+        Protected => 1,
+        # translate backslashes in directory names and add trailing '/'
+        ValueConvInv => '$_=$val; tr/\\\\/\//; m{[^/]$} and $_ .= "/"; $_',
+    },
+    FileName => {
+        Name => 'FileName',
+        Writable => 1,
+        Protected => 1,
+        ValueConvInv => '$val=~tr/\\\\/\//; $val',
+    },
+    FileSize => {
         Name => 'FileSize',
         PrintConv => sub {
             my $val = shift;
@@ -321,6 +342,19 @@ sub DummyWriteProc { return 1; }
         Notes => 'the full EXIF data block',
         Groups => { 0 => 'EXIF' },
         ValueConv => '\$val',
+    },
+    ICC_Profile => {
+        Name => 'ICC_Profile',
+        Notes => 'the full ICC_Profile data block',
+        Groups => { 0 => 'ICC_Profile' },
+        Writable => 1,
+        Protected => 1,
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
+        WriteCheck => q{
+            require Image::ExifTool::ICC_Profile;
+            return Image::ExifTool::ICC_Profile::ValidateICC(\$val);
+        },
     },
     XMP => {
         Name => 'XMP',
@@ -401,12 +435,42 @@ my $evalWarning;    # eval warning message
     },
 );
 
+# APP14 refs:
+# http://partners.adobe.com/public/developer/en/ps/sdk/5116.DCT_Filter.pdf
+# http://java.sun.com/j2se/1.5.0/docs/api/javax/imageio/metadata/doc-files/jpeg_metadata.html#color
+%Image::ExifTool::APP14::Main = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'APP14', 1 => 'APP14', 2 => 'Image' },
+    NOTES => 'The "Adobe" APP14 segment stores image encoding information.',
+    FORMAT => 'int16u',
+    0 => 'DCTEncodeVersion',
+    1 => {
+        Name => 'APP14Flags0',
+        PrintConv => { BITMASK => {
+            15 => 'Encoded with Blend=1 downsampling'
+        } },
+    },
+    2 => {
+        Name => 'APP14Flags1',
+        PrintConv => { BITMASK => { } },
+    },
+    3 => {
+        Name => 'ColorTransform',
+        Format => 'int8u',
+        PrintConv => {
+            0 => 'Unknown (RGB or CMYK)',
+            1 => 'YCbCr',
+            2 => 'YCCK',
+        },
+    },
+);
+
 # special tag names (not used for tag info)
 my %specialTags = (
     PROCESS_PROC=>1, WRITE_PROC=>1, CHECK_PROC=>1, GROUPS=>1, FORMAT=>1,
     FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1, DID_TAG_ID=>1, WRITABLE=>1,
     NOTES=>1, IS_OFFSET=>1, EXTRACT_UNKNOWN=>1, NAMESPACE=>1, PREFERRED=>1,
-    PARENT=>1
+    PARENT=>1, PRIORITY=>1, WRITE_GROUP=>1, LANG_INFO=>1,
 );
 
 #------------------------------------------------------------------------------
@@ -524,6 +588,7 @@ sub ClearOptions($)
     #   MakerNotes  => undef,   # extract maker notes as a block
         PrintConv   => 1,       # flag to enable print conversion
         Sort        => 'Input', # order to sort found tags (Input, File, Alpha, Group#)
+    #   StrictDate  => undef,   # flag to return undef for invalid date conversions
         TextOut     => \*STDOUT,# file for Verbose/HtmlDump output
         Unknown     => 0,       # flag to get values of unknown tags (0-2)
         Verbose     => 0,       # print verbose messages (0-4, higher # = more verbose)
@@ -584,7 +649,7 @@ sub ExtractInfo($;@)
                 # create random access file object
                 $raf = new File::RandomAccess($filePt);
                 # patch to force pipe to be buffered because seek returns success
-                # in Windows cmd shell pipe even though it really failed 
+                # in Windows cmd shell pipe even though it really failed
                 $raf->{TESTED} = -1 if $filename eq '-' or $filename =~ /\|$/;
                 $self->{RAF} = $raf;
             } else {
@@ -618,6 +683,7 @@ sub ExtractInfo($;@)
             @fileTypeList = @fileTypes;
             $tiffType = 'TIFF';
         }
+        push @fileTypeList, ''; # end of list marker
         # initialize the input file for seeking in binary data
         $raf->BinMode();    # set binary mode before we start reading
         my $pos = $raf->Tell(); # get file position so we can rewind
@@ -625,12 +691,32 @@ sub ExtractInfo($;@)
         # loop through list of file types to test
         for (;;) {
             my $type = shift @fileTypeList;
+            unless ($type) {
+                unless (defined $type) {
+                    # if we were given a single image with a known type there
+                    # must be a format error since we couldn't read it, otherwise
+                    # it is likely we don't support images of this type
+                    $self->Error(GetFileType($filename) ?
+                        'Image format error' : 'Unknown image type');
+                    last;   # all done
+                }
+                # last ditch effort to scan past unknown header for JPEG/TIFF
+                my $buff;
+                $raf->Read($buff, 1024);
+                next unless $buff =~ /(\xff\xd8\xff|MM\0\x2a|II\x2a\0)/g;
+                $type = ($1 eq "\xff\xd8\xff") ? 'JPEG' : 'TIFF';
+                my $skip = pos($buff) - length($1);
+                $dirInfo{Base} = $skip;
+                $raf->Seek($pos + $skip, 0);
+                $self->Warn("Skipped unknown $skip byte header");
+            }
             # save file type in member variable
             $self->{FILE_TYPE} = $type;
             $dirInfo{Parent} = ($type eq 'TIFF') ? $tiffType : $type;
             my $module = $moduleName{$type};
             $module = $type unless defined $module;
             my $func = "Process$type";
+
             # load module if necessary
             if ($module) {
                 require "Image/ExifTool/$module.pm";
@@ -641,17 +727,11 @@ sub ExtractInfo($;@)
             &$func($self, \%dirInfo) and last;
             use strict 'refs';
 
-            if (@fileTypeList) {
-                # seek back to try again from the same position in the file
-                $raf->Seek($pos, 0) and next;
+            # seek back to try again from the same position in the file
+            unless ($raf->Seek($pos, 0)) {
                 $self->Error('Error seeking in file');
                 last;
             }
-            # if we were given a single image with a known type there
-            # must be a format error since we couldn't read it, otherwise
-            # it is likely we don't support images of this type
-            $self->Error(GetFileType($filename) ? 'Image format error' : 'Unknown image type');
-            last;     # all done since no more types
         }
         # extract binary EXIF data block only if requested
         if (defined $self->{EXIF_DATA} and $self->{REQ_TAG_LOOKUP}->{exif}) {
@@ -718,7 +798,7 @@ sub GetInfo($;@)
             push @goodTags, $_ unless $ignored{$_};
         }
         $rtnTags = $self->{FOUND_TAGS} = \@goodTags;
-    }    
+    }
 
     # return sorted tag list if provided with a list reference
     if ($self->{IO_TAG_LIST}) {
@@ -815,7 +895,7 @@ sub GetTagList($;$$)
         my $numGroups = 0;
         my $tag;
         foreach $tag (sort { $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags) {
-            my $group = $self->GetGroup($tag,$family);
+            my $group = $self->GetGroup($tag, $family);
             my $num = $groupCount{$group};
             $num or $num = $groupCount{$group} = ++$numGroups;
             $groupOrder{$tag} = $num;
@@ -1011,7 +1091,7 @@ sub GetDescription($$)
 # Get group name for specified tag
 # Inputs: 0) ExifTool object reference
 #         1) tag key (or reference to tagInfo hash, not part of the public API)
-#         2) [optional] group family number
+#         2) [optional] group family number (-1 to get extended group list)
 # Returns: Scalar context: Group name (for family 0 if not otherwise specified)
 #          Array context: Group name if family specified, otherwise list of
 #          group names for each family.
@@ -1041,7 +1121,7 @@ sub GetGroup($$;$)
         # set flag indicating group list was built
         $$tagInfo{GotGroups} = 1;
     }
-    if (defined $family) {
+    if (defined $family and $family >= 0) {
         return $$groups{$family} || 'Other' unless $family == 1;
         $groups[$family] = $$groups{$family};
     } else {
@@ -1056,7 +1136,19 @@ sub GetGroup($$;$)
             $groups[1] = $extra;
         }
     }
-    return $family ? $groups[1] : @groups;
+    if ($family) {
+        return $groups[1] if $family == 1;
+        # add additional matching group names to list
+        # ie) for MIE-Doc, also add MIE1, MIE1-Doc, MIE-Doc1 and MIE1-Doc1
+        # and for MIE2-Doc3, also add MIE2, MIE-Doc3, MIE2-Doc and MIE-Doc
+        if ($groups[1] =~ /^MIE(\d*)-(.+?)(\d*)$/) {
+            push @groups, 'MIE' . ($1 || '1');
+            push @groups, 'MIE' . ($1 ? '' : '1') . "-$2$3";
+            push @groups, "MIE$1-$2" . ($3 ? '' : '1');
+            push @groups, 'MIE' . ($1 ? '' : '1') . "-$2" . ($3 ? '' : '1');
+        }
+    }
+    return @groups;
 }
 
 #------------------------------------------------------------------------------
@@ -1356,25 +1448,20 @@ sub ParseArguments($;@)
         ExpandShortcuts($self->{REQUESTED_TAGS});
         # initialize lookup for requested tags
         foreach (@{$self->{REQUESTED_TAGS}}) {
-            $self->{REQ_TAG_LOOKUP}->{lc($_)} = 1;
+            $self->{REQ_TAG_LOOKUP}->{lc(/.+?:(.+)/ ? $1 : $_)} = 1;
         }
     }
 
     if (@exclude or $wasExcludeOpt) {
-        # must make a copy of exclude list so we can modify it
+        # must add existing excluded tags
         if ($options->{Exclude}) {
             if (ref $options->{Exclude} eq 'ARRAY') {
-                # make copy of list so we can modify it below
-                $options->{Exclude} = [ @{$options->{Exclude}} ];
+                push @exclude, @{$options->{Exclude}};
             } else {
-                # turn single exclude into list reference
-                $options->{Exclude} = [ $options->{Exclude} ];
+                push @exclude, $options->{Exclude};
             }
-            # add our new exclusions
-            push @{$options->{Exclude}}, @exclude;
-        } else {
-            $options->{Exclude} = \@exclude;
         }
+        $options->{Exclude} = \@exclude;
         # expand shortcuts in new exclude list
         ExpandShortcuts($options->{Exclude});
     }
@@ -1383,26 +1470,129 @@ sub ParseArguments($;@)
 #------------------------------------------------------------------------------
 # Set list of found tags
 # Inputs: 0) ExifTool object reference
-# Returns: Reference to found tags list
+# Returns: Reference to found tags list (in order of requested tags)
 sub SetFoundTags($)
 {
     my $self = shift;
     my $options = $self->{OPTIONS};
     my $reqTags = $self->{REQUESTED_TAGS} || [ ];
     my $duplicates = $options->{Duplicates};
-    my ($tag, $rtnTags, @allTags);
-
-    # get information for requested groups
+    my $exclude = $options->{Exclude};
+    my $fileOrder = $self->{FILE_ORDER};
     my @groupOptions = sort grep /^Group/, keys %$options;
-    if (@groupOptions) {
-        # get list of all existing tags
-        @allTags = keys %{$self->{VALUE}};
-        my %wantGroup;
-        my $family;
+    my $doDups = $duplicates || $exclude || @groupOptions;
+    my ($tag, $rtnTags);
+
+    # only return requested tags if specified
+    if (@$reqTags) {
+        $rtnTags or $rtnTags = [ ];
+        # scan through the requested tags and generate a list of tags we found
+        my $tagHash = $self->{VALUE};
+        my $reqTag;
+        foreach $reqTag (@$reqTags) {
+            my (@matches, $group, $family, $allGrp, $allTag);
+            if ($reqTag =~ /^(\d+)?(.+?):(.+)/) {
+                ($family, $group, $tag) = ($1, $2, $3);
+                $allGrp = 1 if $group =~ /^(\*|all)$/i;
+                $family = -1 unless defined $family
+            } else {
+                $tag = $reqTag;
+                $family = -1;
+            }
+            if (defined $tagHash->{$reqTag} and not $doDups) {
+                $matches[0] = $tag;
+            } elsif ($tag =~ /^(\*|all)$/i) {
+                # tag name of '*' or 'all' matches all tags
+                if ($doDups or $allGrp) {
+                    @matches = keys %$tagHash;
+                } else {
+                    @matches = grep(!/ /, keys %$tagHash);
+                }
+                next unless @matches;   # don't want entry in list for '*' tag
+                $allTag = 1;
+            } elsif ($doDups or defined $group) {
+                # must also look for tags like "Tag (1)"
+                @matches = grep(/^$tag(\s|$)/i, keys %$tagHash);
+            } else {
+                # find first matching value
+                # (use in list context to return value instead of count)
+                ($matches[0]) = grep /^$tag$/i, keys %$tagHash;
+                defined $matches[0] or undef @matches;
+            }
+            if (defined $group and not $allGrp) {
+                # keep only specified group
+                my @grpMatches;
+                foreach (@matches) {
+                    my @groups = $self->GetGroup($_, $family);
+                    next unless grep /^$group$/i, @groups;
+                    push @grpMatches, $_;
+                }
+                @matches = @grpMatches;
+                next unless @matches or not $allTag;
+            }
+            if (@matches > 1) {
+                # maintain original file order for multiple tags
+                @matches = sort { $$fileOrder{$a} <=> $$fileOrder{$b} } @matches;
+                # return only the highest priority tag unless duplicates wanted
+                unless ($doDups or $allTag or $allGrp) {
+                    $tag = shift @matches;
+                    my $oldPriority = $self->{PRIORITY}->{$tag} || 1;
+                    foreach (@matches) {
+                        my $priority = $self->{PRIORITY}->{$_};
+                        $priority = 1 unless defined $priority;
+                        next unless $priority >= $oldPriority;
+                        $tag = $_;
+                        $oldPriority = $priority || 1;
+                    }
+                    @matches = ( $tag );
+                }
+            } elsif (not @matches) {
+                # put entry in return list even without value (value is undef)
+                $matches[0] = "$tag (0)";
+                # bogus file order entry to avoid warning if sorting in file order
+                $self->{FILE_ORDER}->{$matches[0]} = 999;
+            }
+            push @$rtnTags, @matches;
+        }
+    } else {
+        # no requested tags, so we want all tags
+        my @allTags;
+        if ($doDups) {
+            @allTags = keys %{$self->{VALUE}};
+        } else {
+            foreach (keys %{$self->{VALUE}}) {
+                # only include tag if it doesn't end in a copy number
+                push @allTags, $_ unless / /;
+            }
+        }
+        $rtnTags = \@allTags;
+    }
+
+    # filter excluded tags and group options
+    while (($exclude or @groupOptions) and @$rtnTags) {
+        if ($exclude) {
+            my @filteredTags;
+EX_TAG:     foreach $tag (@$rtnTags) {
+                my $tagName = GetTagName($tag);
+                my @matches = grep /(^|:)($tagName|\*|all)$/i, @$exclude;
+                foreach (@matches) {
+                    next EX_TAG unless /^(\d+)?(.+?):/;
+                    my ($family, $group) = ($1, $2);
+                    next EX_TAG if $group =~ /^(\*|all)$/i;
+                    $family = -1 unless defined $family;
+                    my @groups = $self->GetGroup($tag, $family);
+                    next EX_TAG if grep /^$group$/i, @groups;
+                }
+                push @filteredTags, $tag;
+            }
+            $rtnTags = \@filteredTags;      # use new filtered tag list
+            last if $duplicates and not @groupOptions;
+        }
+        # filter groups if requested, or to remove duplicates
+        my (%keepTags, %wantGroup, $family, $groupOpt);
         my $allGroups = 1;
         # build hash of requested/excluded group names for each group family
         my $wantOrder = 0;
-        my $groupOpt;
         foreach $groupOpt (@groupOptions) {
             $groupOpt =~ /^Group(\d*)/ or next;
             $family = $1 || 0;
@@ -1430,27 +1620,27 @@ sub SetFoundTags($)
             }
         }
         # loop through all tags and decide which ones we want
-        my (%groupTags, %bestTag);
-G_TAG:  foreach $tag (@allTags) {
+        my (@tags, %bestTag);
+GR_TAG: foreach $tag (@$rtnTags) {
             my $wantTag = $allGroups;   # want tag by default if want all groups
             foreach $family (keys %wantGroup) {
                 my $group = $self->GetGroup($tag, $family);
                 my $wanted = $wantGroup{$family}->{$group};
                 next unless defined $wanted;
-                next G_TAG unless $wanted;      # skip tag if group excluded
+                next GR_TAG unless $wanted;     # skip tag if group excluded
                 # take lowest non-zero want flag
                 next if $wantTag and $wantTag < $wanted;
                 $wantTag = $wanted;
             }
             next unless $wantTag;
             if ($duplicates) {
-                $groupTags{$tag} = $wantTag;
+                push @tags, $tag;
             } else {
                 my $tagName = GetTagName($tag);
                 my $bestTag = $bestTag{$tagName};
                 if (defined $bestTag) {
-                    next if $wantTag > $groupTags{$bestTag};
-                    if ($wantTag == $groupTags{$bestTag}) {
+                    next if $wantTag > $keepTags{$bestTag};
+                    if ($wantTag == $keepTags{$bestTag}) {
                         # want two tags with the same name -- keep the latest one
                         if ($tag =~ / \((\d+)\)$/) {
                             my $tagNum = $1;
@@ -1458,69 +1648,22 @@ G_TAG:  foreach $tag (@allTags) {
                         }
                     }
                     # this tag is better, so delete old best tag
-                    delete $groupTags{$bestTag};
+                    delete $keepTags{$bestTag};
                 }
-                $groupTags{$tag} = $wantTag;    # keep this tag (for now...)
+                $keepTags{$tag} = $wantTag;    # keep this tag (for now...)
                 $bestTag{$tagName} = $tag;      # this is our current best tag
             }
         }
-        my @tags = keys %groupTags;
+        unless ($duplicates) {
+            # construct new tag list with no duplicates, preserving order
+            foreach $tag (@$rtnTags) {
+                push @tags, $tag if $keepTags{$tag};
+            }
+        }
         $rtnTags = \@tags;
-    } elsif (not @$reqTags) {
-        # no requested tags, so we want all tags
-        if ($duplicates) {
-            @allTags = keys %{$self->{VALUE}};
-        } else {
-            foreach (keys %{$self->{VALUE}}) {
-                # only include tag if it doesn't end in a copy number
-                / \(\d+\)$/ or push @allTags, $_;
-            }
-        }
-        $rtnTags = \@allTags;
+        last;
     }
 
-    # exclude specified tags if requested
-    if ($rtnTags and $options->{Exclude}) {
-        my $exclude = $options->{Exclude};
-        my @filteredTags;
-        foreach $tag (@$rtnTags) {
-            my $tagName = GetTagName($tag);
-            next if grep /^$tagName$/i, @$exclude;
-            push @filteredTags, $tag;
-        }
-        $rtnTags = \@filteredTags;      # use new filtered tag list
-    }
-
-    # only return requested tags if specified
-    if (@$reqTags) {
-        $rtnTags or $rtnTags = [ ];
-        # scan through the requested tags and generate a list of tags we found
-        my $tagHash = $self->{VALUE};
-        foreach $tag (@$reqTags) {
-            my @matches;
-            if (defined $tagHash->{$tag} and not $duplicates) {
-                $matches[0] = $tag;
-            } else {
-                # do case-insensitive check
-                if ($duplicates) {
-                    # must also look for tags like "Tag (1)"
-                    @matches = sort grep(/^$tag(\s|$)/i, keys %$tagHash);
-                } else {
-                    # find first matching value
-                    # (use in list context to return value instead of count)
-                    ($matches[0]) = grep /^$tag$/i, keys %$tagHash;
-                    defined $matches[0] or undef @matches;
-                }
-                unless (@matches) {
-                    # put entry in return list even without value (value is undef)
-                    $matches[0] = $tag;
-                    # bogus file order entry to avoid warning if sorting in file order
-                    $self->{FILE_ORDER}->{$tag} = 999;
-                }
-            }
-            push @$rtnTags, @matches;
-        }
-    }
     # save found tags and return reference
     return $self->{FOUND_TAGS} = $rtnTags;
 }
@@ -1651,13 +1794,16 @@ sub AddCompositeTags($)
         $defaultGroups = $$add{GROUPS} = { 0 => 'Composite', 1 => 'Composite', 2 => 'Other' };
     }
     SetupTagTable($add);
-    my $tag;
+    my ($tag, $t, $n);
     foreach $tag (keys %$add) {
         next if $specialTags{$tag}; # must skip special tags
-        # ignore duplicate composite tags
-        next if $Image::ExifTool::Composite{$tag};
-        # add this composite tag to our main composite table
         my $tagInfo = $$add{$tag};
+        # allow composite tags with the same name
+        while ($Image::ExifTool::Composite{$tag}) {
+            $n or $n = 2, $t = $tag;
+            $tag = "${t}_$n";
+        }
+        # add this composite tag to our main composite table
         $Image::ExifTool::Composite{$tag} = $tagInfo;
         # set all default groups in tag
         my $groups = $$tagInfo{Groups};
@@ -2068,7 +2214,7 @@ sub ValidateImage($$$)
     {
         # issue warning only if the tag was specifically requested
         if ($self->{REQ_TAG_LOOKUP}->{lc($tag)}) {
-            $self->Warn("$tag is not a valid image",1);
+            $self->Warn("$tag is not a valid JPEG image",1);
             return undef;
         }
     }
@@ -2121,9 +2267,11 @@ sub ConvertDateTime($$)
     my ($self, $date) = @_;
     my $dateFormat = $self->{OPTIONS}->{DateFormat};
     # only convert date if a format was specified and the date is recognizable
-    if ($dateFormat and $date =~ /^(\d+):(\d+):(\d+)\s+(\d+):(\d+):(\d+)/) {
-        if (eval 'require POSIX') {
+    if ($dateFormat) {
+        if ($date =~ /^(\d+):(\d+):(\d+)\s+(\d+):(\d+):(\d+)/ and eval 'require POSIX') {
             $date = POSIX::strftime($dateFormat, $6, $5, $4, $3, $2-1, $1-1900);
+        } elsif ($self->{OPTIONS}->{StrictDate}) {
+            undef $date;
         }
     }
     return $date;
@@ -2314,21 +2462,19 @@ sub ProcessJPEG($$)
             $verbose and print $out "JPEG EOI\n";
             $rtnVal = 1;
             # we are here because we are looking for either AFCP or a PreviewImage
-            if ($wantPreview) {
+            if ($wantPreview and $self->{VALUE}->{PreviewImageStart}) {
                 my $buff;
                 my $pos = $raf->Tell();
-                if ($raf->Read($buff, 32) and $buff =~ /\xff\xd8\xff/g) {
+                # most previews start right after the JPEG EOI, but the
+                # Olympus E-20 preview is 508 bytes into the trailer...
+                if ($raf->Read($buff, 1024) and $buff =~ /\xff\xd8\xff/g) {
                     # adjust PreviewImageStart to this location
                     my $start = $self->{VALUE}->{PreviewImageStart};
-                    if ($start) {
-                        my $actual = $pos + pos($buff) - 3;
-                        if ($start ne $actual) {
-                            if ($verbose > 1) {
-                                print $out "(Fixed PreviewImage location: $start -> $actual)\n";
-                            }
-                            $self->{VALUE}->{PreviewImageStart} = $actual;
-                        }
+                    my $actual = $pos + pos($buff) - 3;
+                    if ($start ne $actual and $verbose > 1) {
+                        print $out "(Fixed PreviewImage location: $start -> $actual)\n";
                     }
+                    $self->{VALUE}->{PreviewImageStart} = $actual;
                 }
                 $raf->Seek($pos, 0);
             }
@@ -2340,7 +2486,7 @@ sub ProcessJPEG($$)
         } elsif ($marker == 0xda) {         # SOS
             if (IsAFCP($raf)) {
                 require Image::ExifTool::AFCP;
-                $wantAFCP = 1 if Image::ExifTool::AFCP::ProcessAFCP($self, { RAF => $raf }) < 0;
+                $wantAFCP = 1 if Image::ExifTool::AFCP::ProcessAFCP($self, {RAF => $raf}) < 0;
             }
             if ($wantPreview) {
                 # seek ahead and validate preview image
@@ -2386,8 +2532,9 @@ sub ProcessJPEG($$)
                          'Size: ' . ($length + 4) . ' bytes', 0);
                 my %dirInfo = (
                     DataPt => $segDataPt,
+                    DataPos  => $segPos,
                     DirStart => 5,
-                    DirLen => length($$segDataPt) - 5,
+                    DirLen => $length - 5,
                 );
                 SetByteOrder('MM');
                 my $tagTablePtr = GetTagTable('Image::ExifTool::JFIF::Main');
@@ -2416,7 +2563,7 @@ sub ProcessJPEG($$)
                     HtmlDump($self, $segPos, $hdrLen, "APP1 ID",
                              'APP1 Identifier\nData type: Exif');
                     # add marker at end of APP1
-                    HtmlDump($self, $segPos + length($$segDataPt), 2, 'Next JPEG segment...');
+                    HtmlDump($self, $segPos + $length, 2, 'Next JPEG segment...');
                 }
                 # extract the EXIF information (it is in standard TIFF format)
                 $self->ProcessTIFF(\%dirInfo);
@@ -2492,7 +2639,8 @@ sub ProcessJPEG($$)
             my %dirInfo = ( DataPt => $segDataPt );
             $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
         } elsif ($marker == 0xed) {         # APP13 (Photoshop)
-            if ($$segDataPt =~ /^$psAPP13hdr/) {
+            my $isOld;
+            if ($$segDataPt =~ /^$psAPP13hdr/ or ($$segDataPt =~ /$psAPP13old/ and $isOld=1)) {
                 # add this data to the combined data if it exists
                 if (defined $combinedSegData) {
                     $combinedSegData .= substr($$segDataPt,length($psAPP13hdr));
@@ -2505,14 +2653,15 @@ sub ProcessJPEG($$)
                     $combinedSegData = $$segDataPt unless defined $combinedSegData;
                     next;   # will handle the combined data the next time around
                 }
+                my $hdrlen = $isOld ? 27 : 14;
                 # process Photoshop APP13 record
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
                 my %dirInfo = (
                     DataPt   => $segDataPt,
                     DataPos  => $segPos,
                     DataLen  => $length,
-                    DirStart => 14,     # directory starts after identifier
-                    DirLen   => $length-14,
+                    DirStart => $hdrlen,    # directory starts after identifier
+                    DirLen   => $length - $hdrlen,
                     Parent   => $markerName,
                 );
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
@@ -2522,6 +2671,18 @@ sub ProcessJPEG($$)
                 # all messed up, so we ignore it
             } else {
                 $self->Warn('Unknown APP13 data');
+            }
+        } elsif ($marker == 0xee) {         # APP14 (Adobe)
+            if ($$segDataPt =~ /^Adobe/) {
+                SetByteOrder('MM');
+                my $tagTablePtr = GetTagTable('Image::ExifTool::APP14::Main');
+                my %dirInfo = (
+                    DataPt   => $segDataPt,
+                    DataPos  => $segPos,
+                    DirStart => 5,
+                    DirLen   => $length - 5,
+                );
+                $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
             }
         } elsif ($marker == 0xfe) {         # COM (JPEG comment)
             $self->FoundTag('Comment', $$segDataPt);
@@ -2563,6 +2724,9 @@ sub ProcessTIFF($$;$)
         # save a copy of the EXIF data
         my $dirStart = $$dirInfo{DirStart} || 0;
         $self->{EXIF_DATA} = substr(${$$dirInfo{DataPt}}, $dirStart);
+    } elsif ($outfile) {
+        # create TIFF information from scratch
+        $self->{EXIF_DATA} = "MM\0\x2a\0\0\0\x08";
     } else {
         $self->{EXIF_DATA} = '';
     }
@@ -2575,9 +2739,9 @@ sub ProcessTIFF($$;$)
     $self->{EXIF_BYTE_ORDER} = GetByteOrder();
 
     # verify the byte ordering
+    my $identifier = Get16u($dataPt, 2);
+    # identifier is 0x2a for TIFF (but 0x4f52, 0x5352 or ?? for ORF)
   # no longer do this because ORF files use different values
-  #  my $identifier = Get16u($dataPt, 2);
-    # identifier is 0x2a for TIFF and 0x4f52 or 0x5352 or ?? for ORF
   #  return 0 unless $identifier == 0x2a;
 
     # get offset to IFD0
@@ -2596,6 +2760,9 @@ sub ProcessTIFF($$;$)
             $raf->Read($canonSig, 8) == 8 or return 0;
             $$dataPt .= $canonSig;
             $fileType = 'CR2' if $canonSig =~ /^CR\x02\0/;
+        } elsif ($identifier == 0x55 and $fileType =~ /^(RAW|TIFF)$/) {
+            $fileType = 'RAW';  # Panasonic RAW file
+            $tagTablePtr = GetTagTable('Image::ExifTool::Panasonic::Raw');
         }
         # we have a valid TIFF (or whatever) file
         if ($fileType and not $self->{VALUE}->{FileType}) {
@@ -2623,8 +2790,12 @@ sub ProcessTIFF($$;$)
         ImageData=> 1, # set flag to get information to copy image data later
     );
     if ($outfile) {
-        # initialize TIFF_END so it will be updated by WriteExif()
-        $self->{TIFF_END} = 0;
+        if ($$dirInfo{NoTiffEnd}) {
+            delete $self->{TIFF_END};
+        } else {
+            # initialize TIFF_END so it will be updated by WriteExif()
+            $self->{TIFF_END} = 0;
+        }
         if ($canonSig) {
             $dirInfo{OutFile} = $outfile;
             require Image::ExifTool::CanonRaw;
@@ -2640,19 +2811,19 @@ sub ProcessTIFF($$;$)
                 my $header = substr($$dataPt, 0, 4) . Set32u($offset);
                 Write($outfile, $header, $newData) or $err = 1;
                 undef $newData; # free memory
-                if ($raf and $fileType ne 'MRW' and $self->{TIFF_END}) {
+                if ($raf and $self->{TIFF_END}) {
                     $raf->Seek(0, 2) or $err = 1;
                     my $extra = $raf->Tell() - $self->{TIFF_END};
                     # we may expect 4 unreferenced bytes due to next IFD pointer
                     # which we don't always read, but allow up to 6 because PS CS adds
                     # an extra 2 for some reason.  These bytes should be all zero
-                    if ($extra <= 6) {
+                    if ($extra > 0 and $extra <= 6) {
                         my $buf;
                         $raf->Seek(-$extra, 2) or $err = 1;
                         $raf->Read($buf, $extra) == $extra or $err = 1;
                         $extra = 0 if not $err and $buf eq "\0" x $extra;
                     }
-                    if ($extra) {
+                    if ($extra > 0) {
                         $self->Error("$extra unreferenced bytes at end of file not copied", 1);
                     }
                 }
@@ -2750,7 +2921,7 @@ sub GetTagTable($)
             }
             $$table{TAG_PREFIX} = $tagPrefix;
         }
-        # save all descriptions in the new table
+        # set up the new table
         SetupTagTable($table);
         # add any user-defined tags
         if (defined %UserDefined and $UserDefined{$tableName}) {
@@ -2762,7 +2933,9 @@ sub GetTagTable($)
                 } else {
                     $tagInfo = { Name => $tagInfo };
                 }
-                if ($$table{WRITABLE} and not defined $$tagInfo{Writable}) {
+                if ($$table{WRITABLE} and not defined $$tagInfo{Writable} and
+                    not $$tagInfo{SubDirectory})
+                {
                     $$tagInfo{Writable} = $$table{WRITABLE};
                 }
                 delete $$table{$tagID}; # replace any existing entry
@@ -2795,13 +2968,12 @@ sub ProcessDirectory($$$;$)
     $$dirInfo{DirName} or $$dirInfo{DirName} = $tagTablePtr->{GROUPS}->{0};
     # guard against cyclical recursion into the same directory
     if (defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos}) {
-        my $processed = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0);
-        if ($self->{PROCESSED}->{$processed}) {
-            $self->Warn("$$dirInfo{DirName} pointer references previous $self->{PROCESSED}->{$processed} directory");
+        my $addr = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0);
+        if ($self->{PROCESSED}->{$addr}) {
+            $self->Warn("$$dirInfo{DirName} pointer references previous $self->{PROCESSED}->{$addr} directory");
             return 0;
-        } else {
-            $self->{PROCESSED}->{$processed} = $$dirInfo{DirName};
         }
+        $self->{PROCESSED}->{$addr} = $$dirInfo{DirName};
     }
     # otherwise process as an EXIF directory
     $processProc or $processProc = \&Image::ExifTool::Exif::ProcessExif;
@@ -3053,6 +3225,9 @@ sub FoundTag($$$)
         }
         return undef unless defined $value;
     }
+    # get tag priority
+    my $priority = $$tagInfo{Priority};
+    defined $priority or $priority = $tagInfo->{Table}->{PRIORITY};
     # handle duplicate tag names
     if (defined $rawValueHash->{$tag}) {
         if ($$tagInfo{List} and $tagInfo eq $self->{TAG_INFO}->{$tag} and
@@ -3064,45 +3239,40 @@ sub FoundTag($$$)
             }
             push @{$rawValueHash->{$tag}}, $value;
             return $tag;    # return without creating a new entry
-        } else {
-            # rename existing tag to make room for duplicate values
-            my $nextTag;  # next available copy number for this tag
-            my $i;
-            for ($i=1; ; ++$i) {
-                $nextTag = "$tag ($i)";
-                last unless exists $rawValueHash->{$nextTag};
-            }
-            # take tag with highest priority
-            my $priority = $$tagInfo{Priority};
-            if (defined $priority) {
-                # increase priority for zero priority tags if this is the priority dir
-                $priority = 1 if $priority == 0 and $self->{DIR_NAME} and
-                    $self->{PRIORITY_DIR} and $self->{DIR_NAME} eq $self->{PRIORITY_DIR};
-                my $oldPriority = $self->{PRIORITY}->{$tag} || 1;
-                if ($priority >= $oldPriority) {
-                    $self->{PRIORITY}->{$tag} = $priority;
-                } else {
-                    undef $priority;    # existing tag takes priority
-                }
-            } elsif (not $self->{PRIORITY}->{$tag}) {
-                $priority = 1;          # this tag takes priority
-            }
-            if (defined $priority) {
-                # change the name of existing tags in all hashes
-                $rawValueHash->{$nextTag} = $rawValueHash->{$tag};
-                $self->{FILE_ORDER}->{$nextTag} = $self->{FILE_ORDER}->{$tag};
-                $self->{TAG_INFO}->{$nextTag} = $self->{TAG_INFO}->{$tag};
-                if ($self->{GROUP1}->{$tag}) {
-                    $self->{GROUP1}->{$nextTag} = $self->{GROUP1}->{$tag};
-                    delete $self->{GROUP1}->{$tag};
-                }
-            } else {
-                $tag = $nextTag;        # don't override the previous tag
-            }
         }
-    } elsif ($$tagInfo{Priority}) {
-        # set tag priority
-        $self->{PRIORITY}->{$tag} = $$tagInfo{Priority};
+        # rename existing tag to make room for duplicate values
+        my $nextTag;  # next available copy number for this tag
+        my $i;
+        for ($i=1; ; ++$i) {
+            $nextTag = "$tag ($i)";
+            last unless exists $rawValueHash->{$nextTag};
+        }
+#
+# take tag with highest priority
+#
+        # promote existing 0-priority tag so it takes precedence over a new 0-tag
+        my $oldPriority = $self->{PRIORITY}->{$tag} || 1;
+        # set priority for this tag (default is 1)
+        $priority = 1 if not defined $priority or
+            # increase 0-priority tags if this is the priority directory
+            ($priority == 0 and $self->{DIR_NAME} and $self->{PRIORITY_DIR} and
+            $self->{DIR_NAME} eq $self->{PRIORITY_DIR});
+        if ($priority >= $oldPriority) {
+            $self->{PRIORITY}->{$nextTag} = $self->{PRIORITY}->{$tag};
+            $rawValueHash->{$nextTag} = $rawValueHash->{$tag};
+            $self->{FILE_ORDER}->{$nextTag} = $self->{FILE_ORDER}->{$tag};
+            $self->{TAG_INFO}->{$nextTag} = $self->{TAG_INFO}->{$tag};
+            if ($self->{GROUP1}->{$tag}) {
+                $self->{GROUP1}->{$nextTag} = $self->{GROUP1}->{$tag};
+                delete $self->{GROUP1}->{$tag};
+            }
+        } else {
+            $tag = $nextTag;        # don't override the existing tag
+        }
+        $self->{PRIORITY}->{$tag} = $priority;
+    } elsif ($priority) {
+        # set tag priority (only if exists and non-zero)
+        $self->{PRIORITY}->{$tag} = $priority;
     }
 
     # save the converted values, file order, and tag groups
@@ -3197,6 +3367,39 @@ sub SetFileType($;$)
     $mimeType = $mimeType{$baseType} unless $mimeType or $baseType eq 'TIFF';
     $self->FoundTag('FileType', $fileType);
     $self->FoundTag('MIMEType', $mimeType || 'application/unknown');
+}
+
+#------------------------------------------------------------------------------
+# Modify the value of the MIMEType tag
+# Inputs: 0) ExifTool object reference, 1) file or MIME type
+# Notes: combines existing type with new type: ie) a/b + c/d => c/b-d
+sub ModifyMimeType($;$)
+{
+    my ($self, $mime) = @_;
+    $mime =~ m{/} or $mime = $mimeType{$mime} or return;
+    my $old = $self->{VALUE}->{MIMEType};
+    if (defined $old) {
+        my ($a, $b) = split '/', $old;
+        my ($c, $d) = split '/', $mime;
+        $d =~ s/^x-//;
+        $self->{VALUE}->{MIMEType} = "$c/$b-$d";
+        $self->VPrint(0, "  Modified MIMEType = $c/$b-$d\n");
+    } else {
+        $self->FoundTag('MIMEType', $mime);
+    }
+}
+
+#------------------------------------------------------------------------------
+# Print verbose output
+# Inputs: 0) ExifTool ref, 1) verbose level (prints if level > this), 2-N) print args
+sub VPrint($$@)
+{
+    my $self = shift;
+    my $level = shift;
+    if ($self->{OPTIONS}->{Verbose} and $self->{OPTIONS}->{Verbose} > $level) {
+        my $out = $self->{OPTIONS}->{TextOut};
+        print $out @_;
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -3326,7 +3529,7 @@ sub ProcessBinaryData($$$)
 # Load .ExifTool_config file from user's home directory (unless 'noConfig' set)
 unless ($Image::ExifTool::noConfig) {
     # load config file if it exists
-    my $configFile = ($ENV{HOME} || '.') . '/.ExifTool_config';
+    my $configFile = ($ENV{EXIFTOOL_HOME} || $ENV{HOME} || '.') . '/.ExifTool_config';
     -r $configFile and eval("require '$configFile'");
 }
 

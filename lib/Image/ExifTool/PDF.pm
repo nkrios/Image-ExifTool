@@ -17,7 +17,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub LocateObject($$);
 sub FetchObject($$$$);
@@ -1197,7 +1197,8 @@ sub ReadPDF($$)
     my $dict;
     foreach $dict (@mainDicts) {
         if ($verbose) {
-            $exifTool->VPrint(0, "PDF dictionary with %d entries:\n", scalar(@{$$dict{tags}}));
+            my $n = scalar(@{$$dict{tags}});
+            $exifTool->VPrint(0, "PDF dictionary with $n entries:\n");
         }
         ProcessDict($exifTool, $tagTablePtr, $dict, \%xref);
     }
@@ -1265,8 +1266,8 @@ information but only with a limited number of algorithms.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

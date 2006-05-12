@@ -13,8 +13,8 @@
 <font color='#cc0000' size='+2'><b>Read</b> <i>and</i> <b>Write</b> Meta Information!</font>
 
 <h3>
-<a href="Image-ExifTool-6.00.tar.gz">
-Download        Version 6.00</a> (856 KB) - Feb. 19, 2006
+<a href="Image-ExifTool-6.17.tar.gz">
+Download        Version 6.17</a> (951 KB) - May 12, 2006
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
@@ -36,11 +36,14 @@ writing meta information.
 <li>Powerful, fast, and easy to use
 <li><a href="#supported">Supports a large number of different file formats</a>
 <li>Reads EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, GeoTIFF, ICC Profile,
-    Photoshop IRB, AFCP and ID3 records
-<li>Writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, Photoshop IRB and AFCP information
+    Photoshop IRB, AFCP and ID3 records (and more!)
+<li>Writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, ICC Profile, Photoshop IRB
+    and AFCP information
 <li>Reads and writes maker notes of many digital cameras
 <li>Very flexible -- read or write exactly the information you want
 <li><a href="#shift">Shifts date/time values</a> to fix timestamps in images
+<li><a href="#filename">Renames files and organizes in directories</a> (by date
+    or by any other meta information)
 <li>Extracts thumbnail images, preview images, and JPEG images embedded in RAW files
 <li>Copies meta information between files (even if they are different formats)
 <li>Deletes meta information individually, in groups, or all together
@@ -55,6 +58,22 @@ writing meta information.
     hex dump</a> outputs
 </ul>
 
+<h2>Comments by ExifTool Users</h2>
+<blockquote>
+"<i>While there are a lot of image tools available, nothing comes close for accessing/updating
+the metadata like ExifTool</i>" - <a href="http://www.merg.be/blog/?p=242">merg's blog</a>
+<p>"<i>In my experience, nothing but nothing is as complete, powerful, and flexible as
+Phil Harvey's exiftool ... I've never seen anything that's in the same ballpark for power.</i>"
+- <a href="http://forums.dpreview.com/forums/read.asp?forum=1034&amp;message=16582684">dpreview forum</a>
+<p>"<i>exiftool is  an amazingly powerful Perl module and script</i>"
+- <a href="http://homepage.mac.com/brettgross/AppleScripts/AppleScripts.html">Brett's Place on the Web</a>
+<p>"<i>Fast, reliable and amazingly comprehensive ...</i>"
+- <a href="http://cpanratings.perl.org/dist/Image-ExifTool">CPAN ratings</a>
+<p>"<i>... the one piece of free software that gets the most
+detailed exif data of /any/ tool I've found.</i>"
+- <a href="http://mail.gnome.org/archives/eog-list/2005-August/msg00002.html">gnome mail archives</a>
+</blockquote>
+
 <h2><a name="Supported">Supported File Types</a></h2>
 <blockquote><table cellpadding=2 cellspacing=0 border=1>
 <tr bgcolor='#dddddd'><th>File Type</th><th>Read/Write</th><th>Description</th></tr>
@@ -68,9 +87,12 @@ writing meta information.
 <tr><td>CRW</td><td>R/W</td><td>Canon RAW format</td></tr>
 <tr><td>DCM, DC3, DIC, DICM</td><td>R</td><td>DICOM - Digital Imaging and Communications in Medicine</td></tr>
 <tr><td>DNG</td><td>R/W</td><td>Digital Negative (TIFF-based)</td></tr>
+<tr><td>ERF</td><td>R/W</td><td>Epson RAW Format (TIFF-based)</td></tr>
 <tr><td>GIF</td><td>R/W</td><td>Compuserve Graphics Interchange Format</td></tr>
+<tr><td>ICC, ICM</td><td>R/W</td><td>International Color Consortium color profile</td></tr>
 <tr><td>JP2, JPX</td><td>R</td><td>JPEG 2000 image</td></tr>
 <tr><td>JPEG, JPG</td><td>R/W</td><td>Joint Photographic Experts Group image</td></tr>
+<tr><td>MIE</td><td>R/W</td><td>Meta Infomation Encapsulation format</td></tr>
 <tr><td>MIFF, MIF</td><td>R</td><td>Magick Image File Format</td></tr>
 <tr><td>MOS</td><td>R/W</td><td>Creo Leaf Mosaic (TIFF-based)</td></tr>
 <tr><td>MOV, QT</td><td>R</td><td>Apple QuickTime Movie</td></tr>
@@ -84,11 +106,12 @@ writing meta information.
 <tr><td>PICT, PCT</td><td>R</td><td>Apple Picture file</td></tr>
 <tr><td>PNG, JNG, MNG</td><td>R/W</td><td>Portable/JPEG/Multiple-image Network Graphics</td></tr>
 <tr><td>PPM, PBM, PGM</td><td>R/W</td><td>Portable Pixel/Bit/Gray Map</td></tr>
-<tr><td>PS, EPS, EPSF</td><td>R</td><td>[Encapsulated] PostScript Format</td></tr>
+<tr><td>PS, EPS, EPSF</td><td>R/W</td><td>[Encapsulated] PostScript Format</td></tr>
 <tr><td>PSD</td><td>R/W</td><td>PhotoShop Drawing</td></tr>
 <tr><td>QTIF, QTI, QIF</td><td>R</td><td>QuickTime Image File</td></tr>
 <tr><td>RAF</td><td>R</td><td>FujiFilm RAW Format</td></tr>
 <tr><td>RAW</td><td>R</td><td>Kyocera Contax N Digital RAW Format</td></tr>
+<tr><td>RAW</td><td>R</td><td>Panasonic RAW format (TIFF-based)</td></tr>
 <tr><td>RIFF, RIF</td><td>R</td><td>Resource Interchange File Format</td></tr>
 <tr><td>SR2</td><td>R</td><td>Sony RAW Format 2 (TIFF-based)</td></tr>
 <tr><td>SRF</td><td>R</td><td>Sony RAW Format (TIFF-based)</td></tr>
@@ -121,6 +144,10 @@ Lightroom or dcraw. It is thought that this is an Apple bug, and that they may
 be cutting corners in reading the file by assuming a fixed offset for white
 balance information. If this problem affects you, please send a bug report to
 Apple.
+<li>Some applications on Macintosh systems still store information in the
+resource fork of a file.  ExifTool does not process the resource fork, so this
+information is lost if the file is rewritten.  (In the same way that the Unix
+"cp" command will drop the resource fork in OS X versions earlier than 10.4)
 </ul>
 
 <h2>System Requirements</h2>
@@ -230,7 +257,8 @@ tag when extracting information.
 
 <p>ExifTool defines a few shortcut tags in the Image::ExifTool::Shortcuts
 module, and allows users to define their own shortcuts by adding a
-definition to the .ExifTool_config file in their home directory.  Here is a
+definition to the .ExifTool_config file in their home directory (or in a
+directory specified by the EXIFTOOL_HOME environment variable).  Here is a
 simple example that defines two shortcuts:
 
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
@@ -257,24 +285,27 @@ These groups are:
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr bgcolor='#dddddd'><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>AFCP, AIFF, APP12, ASF, BMP, Composite, DICOM, DNG, EXIF, ExifTool, File,
-GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG,
-MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript, PrintIM, QuickTime,
-RIFF, SigmaRaw, XMP
+<td>AFCP, AIFF, APP12, APP14, ASF, BMP, Composite, DICOM, DNG, EXIF,
+ExifTool, File, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf,
+MIE, MIFF, MNG, MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript,
+PrintIM, QuickTime, RIFF, SigmaRaw, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AFCP, AIFF, APP12, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite,
-DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD,
-ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1,
-ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC,
-Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw, Leaf,
-LeafSubIFD, MIFF, MNG, MakerUnknown, MetaIFD, Minolta, Nikon, NikonCapture,
-NikonPreview, Olympus, PDF, PICT, PNG, Panasonic, Pentax, Photoshop,
-PostScript, PrintIM, QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma,
-SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc,
-XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop,
-XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights,
-XMP-xmpTPg
+<td>AFCP, AIFF, APP12, APP14, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio,
+Composite, DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff,
+GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
+ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC,
+InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
+KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-Video, MIFF, MNG, MakerUnknown,
+MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, Olympus,
+PDF, PICT, PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM,
+QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD,
+Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
+XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
+XMP-xxx
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,
@@ -380,6 +411,30 @@ or time tag can be shifted.  See
 <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a>
 for details about the syntax of the time shift string.
 
+<h2><a name="filename">Renaming and/or Moving Files</a></h2>
+
+By writing a new value to the <b>FileName</b> and/or <b>Directory</b> tags,
+files can be renamed and/or moved to different directories.  This can be a very
+powerful tool in combination with the <b>-d</b> (date format) option for
+organizing images by date/time. For example, the following command renames all
+images in directory "DIR" according to the individual file's creation date in
+the form "yyyymmdd_HHMMSS.ext".
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+exiftool "-FileName&lt;CreateDate" -d "%Y%m%d_%H%M%S.%%e" DIR
+</pre></td></tr></table></blockquote>
+
+Or a new directory can be specified by setting the value of the <b>Directory</b>
+tag.  For example, the following command moves all images originally in
+directory "DIR" into a directory hierarchy organized by year/month/day:
+
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+exiftool "-Directory&lt;DateTimeOriginal" -d "%Y/%m/%d" DIR
+</pre></td></tr></table></blockquote>
+
+<a href="filename.html">Read here</a> for more details about this powerful
+feature.
+
 <h2>Improving Performance</h2>
 
 The processing speed of ExifTool can be dramatically improved when extracting
@@ -417,6 +472,7 @@ binary data.  The simple script above does not handle this case.
 
 <ul><li><a href="http://owl.phy.queensu.ca/~phil/exiftool/Extract%20Preview.sit">Download</a>
 a stand-alone Mac OS X droplet to extract preview images from RAW files (thanks to Brett Gross)
+<li><a href="ftp://ftp.dn.farlep.net/pub/misc/renrot/README">renrot</a>: Utility to rename and rotate image files
 </ul>
 
 <h2>Additional Documentation/Help</h2>

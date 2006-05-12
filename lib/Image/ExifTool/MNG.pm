@@ -20,11 +20,11 @@ $VERSION = '1.00';
 %Image::ExifTool::MNG::Main = (
     GROUPS => { 2 => 'Image' },
     NOTES => q{
-This table contains definitions for tags found in MNG and JNG images.  MNG
-is a superset of PNG and JNG, so a MNG image may contain any of these tags
-as well as any PNG tags.  Conversely, only some of these tags are valid for
-JNG images.
-},
+        This table contains definitions for tags found in MNG and JNG images.  MNG
+        is a superset of PNG and JNG, so a MNG image may contain any of these tags
+        as well as any PNG tags.  Conversely, only some of these tags are valid for
+        JNG images.
+    },
     BACK => {
         Name => 'Background',
         SubDirectory => { TagTable => 'Image::ExifTool::MNG::Background' },
@@ -663,8 +663,8 @@ This module contains definitions required by Image::ExifTool to read MNG
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

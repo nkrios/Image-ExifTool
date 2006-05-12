@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
@@ -104,7 +104,9 @@
 [MakerNotes, Nikon, Camera] 131 - Lens Type: G
 [MakerNotes, Nikon, Camera] 132 - Lens: 18-70mm f/3.5-4.5
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Did Not Fire
-[MakerNotes, Nikon, Camera] 136 - AF Point: Unknown (0x1000000)
+[MakerNotes, Nikon, Camera] 0 - AF Mode: Single Area
+[MakerNotes, Nikon, Camera] 1 - AF Point: Center
+[MakerNotes, Nikon, Camera] 2 - AF Points Used: Lower-right
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Single-Frame
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 5.33
 [MakerNotes, Nikon, Camera] 140 - NEF Curve 1: (Binary data 17 bytes)
@@ -203,7 +205,7 @@
 [ICC_Profile, ICC-header, Image] 52 - Device Model: 
 [ICC_Profile, ICC-header, Image] 56 - Device Attributes: Reflective, Glossy, Positive, Color
 [ICC_Profile, ICC-header, Image] 64 - Rendering Intent: Perceptual
-[ICC_Profile, ICC-header, Image] 68 - Profile Connection Space: 0.9642 1 0.82491
+[ICC_Profile, ICC-header, Image] 68 - Connection Space Illuminant: 0.9642 1 0.82491
 [ICC_Profile, ICC-header, Image] 80 - Profile Creator: 
 [ICC_Profile, ICC-header, Image] 84 - Profile ID: 0
 [ICC_Profile, ICC_Profile, Image] desc - Profile Description: Nikon Adobe RGB 4.0.0.3000
@@ -218,11 +220,13 @@
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - CFA Pattern: [Blue,Green][Green,Red]
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 3040x2014
 [Composite, Composite, Image]  - Jpg From Raw: (Binary data 29 bytes)
 [Composite, Composite, Camera]  - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
 [Composite, Composite, Camera]  - Lens: 18-70mm f/3.5-4.5 G
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Image]  - Shutter Speed: 1/20
+[Composite, Composite, Camera]  - Blue Balance: 1.860377
 [Composite, Composite, Camera]  - Focal Length: 18.0mm
+[Composite, Composite, Image]  - Image Size: 3040x2014
+[Composite, Composite, Camera]  - Red Balance: 1.803774
 [Composite, Composite, Image]  - Date/Time Original: 2004:06:09 16:02:35.00

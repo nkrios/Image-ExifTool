@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
 [File, File, Image]  - File Name: Panasonic_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2006:02:06 11:56:56
+[File, File, Time]  - File Modification Date/Time: 2006:03:13 08:14:24
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -70,16 +70,16 @@
 [MakerNotes, Panasonic, Camera] 34 - Panasonic 0x0022: 0
 [MakerNotes, Panasonic, Camera] 35 - White Balance Bias: 0
 [MakerNotes, Panasonic, Camera] 36 - Flash Bias: 0
-[MakerNotes, Panasonic, Camera] 37 - Serial Number: S000407190102
+[MakerNotes, Panasonic, Camera] 37 - Internal Serial Number: (S00) 2004:07:19 no. 0102
 [MakerNotes, Panasonic, Camera] 38 - Panasonic 0x0026: 0100
 [MakerNotes, Panasonic, Camera] 39 - Panasonic 0x0027: 0
 [MakerNotes, Panasonic, Camera] 40 - Color Effect: Off
 [MakerNotes, Panasonic, Camera] 41 - Panasonic 0x0029: 696
-[MakerNotes, Panasonic, Camera] 42 - Panasonic 0x002a: 0
-[MakerNotes, Panasonic, Camera] 43 - Panasonic 0x002b: 0
+[MakerNotes, Panasonic, Camera] 42 - Burst Mode: Off
+[MakerNotes, Panasonic, Camera] 43 - Sequence Number: 0
 [MakerNotes, Panasonic, Camera] 44 - Contrast: Normal
 [MakerNotes, Panasonic, Camera] 45 - Noise Reduction: Standard
-[MakerNotes, Panasonic, Camera] 46 - Panasonic 0x002e: 1
+[MakerNotes, Panasonic, Camera] 46 - Self Timer: Off
 [MakerNotes, Panasonic, Camera] 47 - Panasonic 0x002f: 4
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000000
@@ -98,10 +98,10 @@
 [IPTC, IPTC, Other] 25 - Keywords: cool
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
 [Composite, Composite, Image]  - Aperture: 4.0
-[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 7.6
 [Composite, Composite, Image]  - Shutter Speed: 1/400
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.004 mm
 [Composite, Composite, Camera]  - Focal Length: 4.6mm (35mm equivalent: 35.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 1.34 m
+[Composite, Composite, Image]  - Image Size: 8x8

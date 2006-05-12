@@ -12,32 +12,25 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>'LIST'</td>
-<td>List</td>
+<td>'LIST_INFO'</td>
+<td>Info</td>
 <td align='center'>-</td>
-<td>--&gt; <a href='RIFF.html#List'>RIFF List Tags</a></td></tr>
+<td>--&gt; <a href='RIFF.html#Info'>RIFF Info Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'LIST_exif'</td>
+<td>Exif</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='RIFF.html#Exif'>RIFF Exif Tags</a></td></tr>
+<tr valign='top'>
+<td>'LIST_hdrl'</td>
+<td>Hdrl</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='RIFF.html#Hdrl'>RIFF Hdrl Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>'fmt '</td>
 <td>Format</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='RIFF.html#Format'>RIFF Format Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='List'>RIFF List Tags</a></h2>
-<blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td>'INFO'</td>
-<td>Info</td>
-<td align='center'>-</td>
-<td>--&gt; <a href='RIFF.html#Info'>RIFF Info Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td>'exif'</td>
-<td>Exif</td>
-<td align='center'>-</td>
-<td>--&gt; <a href='RIFF.html#Exif'>RIFF Exif Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Info'>RIFF Info Tags</a></h2>
@@ -204,6 +197,107 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Hdrl'>RIFF Hdrl Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'IDIT'</td>
+<td>DateTimeOriginal</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ISMP'</td>
+<td>TimeCode</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'LIST_strl'</td>
+<td>Stream</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='RIFF.html#Stream'>RIFF Stream Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'avih'</td>
+<td>AVIHeader</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='RIFF.html#AVIHeader'>RIFF AVIHeader Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Stream'>RIFF Stream Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'strh'</td>
+<td>StreamHeader</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='RIFF.html#StreamHeader'>RIFF StreamHeader Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'strn'</td>
+<td>StreamName</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='StreamHeader'>RIFF StreamHeader Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>StreamType</td>
+<td align='center'>N</td>
+<td><font size='-1'>&apos;auds&apos; = Audio
+  <br>&apos;mids&apos; = MIDI
+  <br>&apos;txts&apos; = Text
+  <br>&apos;vids&apos; = Video</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>Codec</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AVIHeader'>RIFF AVIHeader Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>FrameRate</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>MaxDataRate</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>4</td>
+<td>FrameCount</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>6</td>
+<td>StreamCount</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>8</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>9</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Format'>RIFF Format Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -270,6 +364,6 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 1, 2006</i>
+<br><i>Last revised Feb 20, 2006</i>
 </body>
 </html>

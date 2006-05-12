@@ -142,6 +142,7 @@ sub ProcessSRF($$$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
+    my $start = $$dirInfo{DirStart};
     my $verbose = $exifTool->Options('Verbose');
 
     # process IFD chain
@@ -172,7 +173,7 @@ sub ProcessSRF($$$)
         my ($key, $len);
         if ($ifd == 1) {
             # get the key to decrypt IFD1
-            my $cp = 0x8ddc;    # why?
+            my $cp = $start + 0x8ddc;    # why?
             my $ip = $cp + 4 * unpack("x$cp C", $$dataPt);
             $key = unpack("x$ip N", $$dataPt);
             $len = $cp + $nextIFD;  # decrypt up to $cp
@@ -279,8 +280,8 @@ documentation.  You can use "exiftool -v3" to dump these blocks in hex.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

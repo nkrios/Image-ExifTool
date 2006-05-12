@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..22\n"; }
+BEGIN { $| = 1; print "1..23\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -195,10 +195,12 @@ sub binaryCompare($$)
 }
 
 # test 9: Test copying over information with SetNewValuesFromFile()
+#         (including a transfer of the ICC_Profile record)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValuesFromFile('t/images/ExifTool.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/ExifTool.tif', 'ICC_Profile');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/Nikon.jpg', $testfile);
@@ -348,6 +350,7 @@ my $testOK;
     $exifTool->SetNewValue(Sharpness => '+1');
     $exifTool->SetNewValue(Artist => 'Phil', Group => 'IFD0');
     $exifTool->SetNewValue(Artist => 'Harvey', Group => 'ExifIFD');
+    $exifTool->SetNewValue(DateTimeOriginal => '2006:03:27 16:25:00');
     $exifTool->SaveNewValues();
     $exifTool->SetNewValue(Artist => 'nobody');
     $exifTool->SetNewValuesFromFile('t/images/FujiFilm.jpg');
@@ -412,8 +415,6 @@ my $testOK;
         $skip = ' # skip Relies on previous test';
     }
     print "ok $testnum$skip\n";
-
-    $testOK and unlink $testfile;   # erase test file if all tests passed
 }
 
 # test 22: Test time shift feature
@@ -427,6 +428,31 @@ my $testOK;
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/IPTC-XMP.jpg', 1);
     print "ok $testnum\n";
+}
+
+# test 23: Test renaming a file from the value of DateTimeOriginal
+{
+    ++$testnum;
+    my $skip = '';
+    if ($testOK) {
+        my $newfile = "t/${testname}_${testnum}_20060327_failed.jpg";
+        unlink $newfile;
+        my $exifTool = new Image::ExifTool;
+        $exifTool->Options(DateFormat => "${testname}_${testnum}_%Y%m%d_failed.jpg");
+        $exifTool->SetNewValuesFromFile($testfile, 'FileName<DateTimeOriginal');
+        $exifTool->WriteInfo($testfile);
+        if (-e $newfile and not -e $testfile) {
+            $testfile = $newfile;
+        } else {
+            $testOK = 0;
+            print 'not ';
+        }
+    } else {
+        $skip = ' # skip Relies on test 21';
+    }
+    print "ok $testnum$skip\n";
+
+    $testOK and unlink $testfile;   # erase test file if all tests passed
 }
 
 # end

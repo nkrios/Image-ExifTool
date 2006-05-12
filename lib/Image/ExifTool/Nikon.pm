@@ -24,6 +24,7 @@
 #              10) Werner Kober private communication (D2H, D2X, D100, D70, D200)
 #              11) http://www.rottmerhusen.com/objektives/lensid/nikkor.html
 #              12) http://libexif.sourceforge.net/internals/mnote-olympus-tag_8h-source.html
+#              13) Roger Larsson private communication (tests with D200)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -33,7 +34,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.39';
+$VERSION = '1.42';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -142,6 +143,7 @@ my %nikonLensIDs = (
     '81 54 80 80 18 18 86 0E' => 'AF-S VR Nikkor 200mm f/2G IF-ED',
     '82 48 8E 8E 24 24 87 0E' => 'AF-S VR Nikkor 300mm f/2.8G IF-ED',
     '89 3C 53 80 30 3C 8B 06' => 'AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED',
+    '8A 54 6A 6A 24 24 8C 0E' => 'AF-S VR Micro-Nikkor 105mm f/2.8G IF-ED', #10
     '8B 40 2D 80 2C 3C 8D 0E' => 'AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED',
     '8C 40 2D 53 2C 3C 8E 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
 #
@@ -410,35 +412,9 @@ my %nikonLensIDs = (
         },
     },
     0x0088 => {
-        Name => 'AFPoint',
-        Format => 'int32u',  # override format since int32u is more sensible
-        Writable => 'int32u',
-        Flags => 'PrintHex',
-        PrintConv => {
-            0x0000 => 'Center',
-            0x0100 => 'Top',
-            0x0200 => 'Bottom',
-            0x0300 => 'Left',
-            0x0400 => 'Right',
-
-            # D70 (ref 2)
-            0x0000001 => 'Single Area, Center',
-            0x0010002 => 'Single Area, Top',
-            0x0020004 => 'Single Area, Bottom',
-            0x0030008 => 'Single Area, Left',
-            0x0040010 => 'Single Area, Right',
-
-            0x1000001 => 'Dynamic Area, Center',
-            0x1010002 => 'Dynamic Area, Top',
-            0x1020004 => 'Dynamic Area, Bottom',
-            0x1030008 => 'Dynamic Area, Left',
-            0x1040010 => 'Dynamic Area, Right',
-
-            0x2000001 => 'Closest Subject, Center',
-            0x2010002 => 'Closest Subject, Top',
-            0x2020004 => 'Closest Subject, Bottom',
-            0x2030008 => 'Closest Subject, Left',
-            0x2040010 => 'Closest Subject, Right',
+        Name => 'AFInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::AFInfo',
         },
     },
     0x0089 => { #5
@@ -647,6 +623,63 @@ my %nikonLensIDs = (
             TagTable => 'Image::ExifTool::Nikon::CaptureOffsets',
             Validate => '$val =~ /^0100/',
             Start => '$valuePtr + 4',
+        },
+    },
+);
+
+# Nikon AF information (ref 13)
+%Image::ExifTool::Nikon::AFInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'AFMode',
+        PrintConv => {
+            0 => 'Single Area',
+            1 => 'Dynamic Area',
+            2 => 'Dynamic Area, Closest Subject',
+            3 => 'Group Dynamic',
+            4 => 'Single Area (wide)',
+            5 => 'Dynamic Area (wide)',
+        },
+    },
+    1 => {
+        Name => 'AFPoint',
+        Notes => 'in some focus modes this value is not meaningful',
+        PrintConv => {
+            0 => 'Center',
+            1 => 'Top',
+            2 => 'Bottom',
+            3 => 'Left',
+            4 => 'Right',
+            5 => 'Upper-left',
+            6 => 'Upper-right',
+            7 => 'Lower-left',
+            8 => 'Lower-right',
+            9 => 'Far Left',
+            10 => 'Far Right',
+        },
+    },
+    2 => {
+        Name => 'AFPointsUsed',
+        Format => 'int16u',
+        PrintConv => {
+            BITMASK => {
+                0 => 'Center',
+                1 => 'Top',
+                2 => 'Bottom',
+                3 => 'Left',
+                4 => 'Right',
+                5 => 'Upper-left',
+                6 => 'Upper-right',
+                7 => 'Lower-left',
+                8 => 'Lower-right',
+                9 => 'Far Left',
+                10 => 'Far Right',
+            },
         },
     },
 );
@@ -905,6 +938,71 @@ which make writing more difficult.
         %nikonApertureConversions,
     },
 );
+
+# tags in Nikon QuickTime videos (PH - observations with Coolpix S3)
+# (note: very similar to information in Pentax videos)
+%Image::ExifTool::Nikon::MOV = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        This information is found in Nikon QT video images, and is very similar to
+        information found in Pentax MOV videos.
+    },
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[5]',
+        PrintConv => 'ucfirst(lc($val))',
+    },
+    0x18 => {
+        Name => 'Model',
+        Format => 'string[8]',
+    },
+    0x26 => {
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x2a => {
+        Name => 'FNumber',
+        Format => 'int32u',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x32 => {
+        Name => 'ExposureCompensation',
+        Format => 'int32s',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    0x44 => {
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Daylight',
+            2 => 'Shade',
+            3 => 'Fluorescent', #2
+            4 => 'Tungsten',
+            5 => 'Manual',
+        },
+    },
+    0x48 => {
+        Name => 'FocalLength',
+        Writable => 'int32u',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'sprintf("%.1fmm",$val)',
+    },
+    0xaf => {
+        Name => 'Software',
+        Format => 'string[16]',
+    },
+    0xdf => { # (this is a guess ... could also be offset 0xdb)
+        Name => 'ISO',
+        Format => 'int16u',
+    },
+);
+
 
 # Nikon composite tags
 %Image::ExifTool::Nikon::Composite = (
@@ -1172,8 +1270,8 @@ Nikon maker notes in EXIF information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 
@@ -1192,8 +1290,8 @@ it under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Joseph Heled, Thomas Walter, Brian Ristuccia, Danek Duvall, Tom
-Christiansen, Robert Rottmerhusen and Werner Kober for their help figuring
-out some Nikon tags.
+Christiansen, Robert Rottmerhusen, Werner Kober and Roger Larsson for their
+help figuring out some Nikon tags.
 
 =head1 SEE ALSO
 

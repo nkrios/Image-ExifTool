@@ -8,7 +8,9 @@
 #               11/18/04 - P. Harvey Fixed bug with seek relative to end of file
 #               01/02/05 - P. Harvey Added DEBUG code
 #               01/09/06 - P. Harvey Fixed bug in ReadLine() when using
-#                                    multi-character EOL sequences
+#                          multi-character EOL sequences
+#               02/20/06 - P. Harvey Fixed bug where seek past end of file could
+#                          generate "substr outside string" warning
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.
@@ -29,7 +31,7 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.03';
+$VERSION = '1.04';
 @ISA = qw(Exporter);
 
 # constants
@@ -176,10 +178,13 @@ sub Read($$$)
         }
         # number of bytes left in data buffer
         $num = $self->{LEN} - $self->{POS};
-        if ($len > $num) {
-            $rtnVal = $num;
-        } else {
+        if ($len <= $num) {
             $rtnVal = $len;
+        } elsif ($num <= 0) {
+            $_[0] = '';
+            return 0;
+        } else {
+            $rtnVal = $num;
         }
         # return data from our buffer
         $_[0] = substr(${$self->{BUFF_PT}}, $self->{POS}, $rtnVal);

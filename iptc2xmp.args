@@ -28,7 +28,7 @@
 -IPTC:Source > XMP-photoshop:Source
 -IPTC:Keywords > XMP-dc:Subject
 -IPTC:ObjectName > XMP-dc:Title
--IPTC:SpecialInstructions > XMP-photosop:Instructions
+-IPTC:SpecialInstructions > XMP-photoshop:Instructions
 -IPTC:By-line > XMP-dc:Creator
 -IPTC:By-lineTitle > XMP-photoshop:AuthorsPosition
 -IPTC:Province-State > XMP-photoshop:State

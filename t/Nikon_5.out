@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -89,7 +89,9 @@
 [MakerNotes, Nikon, Camera] 131 - Lens Type: D
 [MakerNotes, Nikon, Camera] 132 - Lens: 50mm f/1.8
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Did Not Fire
-[MakerNotes, Nikon, Camera] 136 - AF Point: Single Area, Center
+[MakerNotes, Nikon, Camera] 0 - AF Mode: Single Area
+[MakerNotes, Nikon, Camera] 1 - AF Point: Center
+[MakerNotes, Nikon, Camera] 2 - AF Points Used: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Delay
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 7.33
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode3
@@ -117,15 +119,17 @@
 [GPS, GPS, Location] 0 - GPS Version ID: 2.2.0.0
 [Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens ID: AF Nikkor 50mm f/1.8D
 [Composite, Composite, Camera]  - Lens: 50mm f/1.8 D
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/125
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Camera]  - Blue Balance: 2.097656
 [Composite, Composite, Image]  - Circle Of Confusion: 0.020 mm
 [Composite, Composite, Image]  - Depth of Field: 0.03 m (0.69 - 0.72)
 [Composite, Composite, Camera]  - Focal Length: 50.0mm (35mm equivalent: 75.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 31.20 m
+[Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Camera]  - Red Balance: 2.195313
 [Composite, Composite, Image]  - Date/Time Original: 2005:03:18 02:55:18.16

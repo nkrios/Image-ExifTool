@@ -13,16 +13,18 @@
 #               5) http://www.cybercom.net/~dcoffin/dcraw/
 #               6) Pedro Corte-Real private communication
 #               7) ExifTool forum post by bronek (http://www.cpanforum.com/posts/1118)
+#               8) http://www.chauveau-central.net/mrw-format/
+#               9) CPAN Forum post by 'geve'
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 %Image::ExifTool::Minolta::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -50,11 +52,22 @@ $VERSION = '1.21';
             ByteOrder => 'BigEndian',
         },
     },
+    0x0004 => { #8
+        Name => 'MinoltaCameraSettings7D',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Minolta::CameraSettings7D',
+            ByteOrder => 'BigEndian',
+        },
+    },
     # it appears that image stabilization is on if this tag exists (ref 2),
     # but it is an 8kB binary data block!
     0x0018 => {
         Name => 'ImageStabilization',
-        Writable => 0,
+        Condition => '$self->{CameraModel} =~ /^DiMAGE (A1|A2|X1)$/',
+        Notes => q{
+            a block of binary data which exists in DiMAGE A2 (and A1/X1?) images only if
+            image stabilization is enabled
+        },
         ValueConv => '"On"',
     },
     0x0040 => {
@@ -87,10 +100,12 @@ $VERSION = '1.21';
         Writable => 'int32u',
         PrintConv => {
             0 => 'Natural color',
-            1 => 'Black&white',
+            1 => 'Black & White',
             2 => 'Vivid color',
             3 => 'Solarization',
             4 => 'Adobe RGB',
+            13 => 'Natural sRGB',
+            14 => 'Natural+ sRGB',
         },
     },
     0x0102 => {
@@ -140,6 +155,27 @@ $VERSION = '1.21';
             },
         },
     ],
+    0x0107 => { #8
+        Name => 'ImageStabilization',
+        Writable => 'int32u',
+        PrintConv => {
+            1 => 'Off',
+            5 => 'On',
+        },
+    },
+    0x010a => {
+        Name => 'ZoneMatching',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'ISO Setting Used',
+            1 => 'High Key',
+            2 => 'Low Key',
+        },
+    },
+    0x010b => {
+        Name => 'ColorTemperature',
+        Writable => 'int32u',
+    },
     0x010c => { #3 (Alpha 7)
         Name => 'LensID',
         Writable => 'int32u',
@@ -197,6 +233,13 @@ $VERSION = '1.21';
             45741 => 'AF200mm F2.8G x2 or TOKINA 300mm F2.8 x2',
         },
     },
+    0x0114 => { #8
+        Name => 'MinoltaCameraSettings5D',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Minolta::CameraSettings5D',
+            ByteOrder => 'BigEndian',
+        },
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -216,9 +259,18 @@ $VERSION = '1.21';
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     WRITABLE => 1,
+    PRIORITY => 0, # not as reliable as other tags
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     FORMAT => 'int32u',
     FIRST_ENTRY => 0,
+    NOTES => q{
+        There is some variability in CameraSettings information between different
+        models (and sometimes even between different firmware versions), so this
+        information may not be as reliable as it should be.  Because of this, tags
+        in the following tables are set to lower priority to prevent them from
+        superceeding the values of same-named tags in other locations when duplicate
+        tags are disabled.
+    },
     1 => {
         Name => 'ExposureMode',
         PrintConv => {
@@ -285,19 +337,25 @@ $VERSION = '1.21';
         },
     },
     8 => {
-        Name => 'MinoltaISO',
-        ValueConv => '2 ** (($val/8-1))*3.125',
-        PrintConv => 'int($val)',
+        Name => 'ISO',
+        ValueConv => '2 ** (($val-48)/8) * 100',
+        ValueConvInv => '48 + 8*log($val/100)/log(2)',
+        PrintConv => 'int($val + 0.5)',
+        PrintConvInv => '$val',
     },
     9 => {
-        Name => 'MinoltaShutterSpeed',
+        Name => 'ExposureTime',
         ValueConv => '2 ** ((48-$val)/8)',
+        ValueConvInv => '48 - 8*log($val)/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
     },
     10 => {
-        Name => 'MinoltaAperture',
-        ValueConv => '2 ** ($val/16 - 0.5)',
+        Name => 'FNumber',
+        ValueConv => '2 ** (($val-8)/16)',
+        ValueConvInv => '8 + 16*log($val)/log(2)',
         PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
     },
     11 => {
         Name => 'MacroMode',
@@ -317,8 +375,8 @@ $VERSION = '1.21';
     13 => {
         Name => 'ExposureCompensation',
         ValueConv => '$val/3 - 2',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         ValueConvInv => '($val + 2) * 3',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         PrintConvInv => 'eval $val',
     },
     14 => {
@@ -368,8 +426,10 @@ $VERSION = '1.21';
     },
     23 => {
         Name => 'MaxAperture',
-        ValueConv => '2 ** ($val/16 - 0.5)',
+        ValueConv => '2 ** (($val-8)/16)',
+        ValueConvInv => '8 + 16*log($val)/log(2)',
         PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
     },
     26 => {
         Name => 'FileNumberMemory',
@@ -438,12 +498,12 @@ $VERSION = '1.21';
     36 => {
         Name => 'ISOSetting',
         PrintConv => {
-            0 => '100',
-            1 => '200',
-            2 => '400',
-            3 => '800',
-            4 => 'auto',
-            5 => '64',
+            0 => 100,
+            1 => 200,
+            2 => 400,
+            3 => 800,
+            4 => 'Auto',
+            5 => 64,
         },
     },
     37 => {
@@ -477,7 +537,7 @@ $VERSION = '1.21';
         Name => 'ColorMode',
         PrintConv => {
             0 => 'Natural color',
-            1 => 'Black&white',
+            1 => 'Black & White',
             2 => 'Vivid color',
             3 => 'Solarization',
             4 => 'Adobe RGB',
@@ -559,6 +619,349 @@ $VERSION = '1.21';
             4 => 'Text + ID#',
         },
     },
+    63 => { #9
+        Name => 'FlashMetering',
+        PrintConv => {
+            0 => 'ADI (Advanced Distance Integration)',
+            1 => 'Pre-flash TTl', 
+            2 => 'Manual flash control',
+        },
+    },
+);
+
+# Camera settings used by the 7D (ref 8)
+%Image::ExifTool::Minolta::CameraSettings7D = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    PRIORITY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    0x00 => {
+        Name => 'ExposureMode',
+        PrintConv => {
+            0 => 'Program',
+            1 => 'Aperture Priority',
+            2 => 'Shutter Priority',
+            3 => 'Manual',
+            4 => 'Auto?',
+            5 => 'Program-shift A',
+            6 => 'Program-shift S',
+        },
+    },
+    0x02 => { #PH
+        Name => 'MinoltaImageSize',
+        PrintConv => {
+            0 => 'Large',
+            1 => 'Medium',
+            2 => 'Small',
+        },
+    },
+    0x03 => {
+        Name => 'MinoltaQuality',
+        PrintConv => {
+            0 => 'RAW',
+            16 => 'Fine', #PH
+            32 => 'Normal', #PH
+            34 => 'RAW+JPEG',
+            48 => 'Economy', #PH
+        },
+    },
+    0x04 => {
+        Name => 'WhiteBalance',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Daylight',
+            2 => 'Shade',
+            3 => 'Cloudy',
+            4 => 'Tungsten',
+            5 => 'Fluorescent',
+            0x100 => 'Kelvin',
+            0x200 => 'Manual',
+        },
+    },
+    0x0e => {
+        Name => 'FocusMode',
+        PrintConv => {
+            0 => 'Single-shot AF',
+            1 => 'Continuous AF',
+            3 => 'Automatic AF',
+            4 => 'Manual',
+        },
+    },
+    0x10 => {
+        Name => 'AFPoints',
+        PrintConv => { BITMASK => {
+            0 => 'Center',
+            1 => 'Top',
+            2 => 'Top-Right',
+            3 => 'Right',
+            4 => 'Bottom-Right',
+            5 => 'Bottom',
+            6 => 'Bottom-Left',
+            7 => 'Left',
+            8 => 'Top-Left',
+        } },
+    },
+    0x15 => {
+        Name => 'Flash',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x1c => {
+        Name => 'ISOSetting',
+        PrintConv => {
+            1 => 100,
+            3 => 200,
+            4 => 400,
+            5 => 800,
+            6 => 1600,
+            7 => 3200,
+        },
+    },
+    0x1e => {
+        Name => 'ExposureCompensation',
+        Format => 'int16s',
+        ValueConv => '$val / 24',
+        ValueConvInv => '$val * 24',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x25 => {
+        Name => 'ColorSpace',
+        PrintConv => {
+            0 => 'sRGB (Natural)',
+            1 => 'sRGB (Natural+)',
+            4 => 'Adobe RGB',
+        },
+    },
+    0x26 => {
+        Name => 'Sharpness',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+    },
+    0x27 => {
+        Name => 'Contrast',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+    },
+    0x28 => {
+        Name => 'Saturation',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+    },
+    0x2d => 'FreeMemoryCardImages',
+    0x3f => {
+        Format => 'int16s',
+        Name => 'ColorTemperature',
+        ValueConv => '$val * 100',
+        ValueConvInv => '$val / 100',
+    },
+    0x46 => {
+        Name => 'Rotation',
+        PrintConv => {
+            72 => 'Horizontal (normal)',
+            76 => 'Rotate 90 CW',
+            82 => 'Rotate 270 CW',
+        },
+    },
+    0x47 => {
+        Name => 'FNumber',
+        ValueConv => '2 ** (($val-8)/16)',
+        ValueConvInv => '8 + 16*log($val)/log(2)',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x48 => {
+        Name => 'ExposureTime',
+        ValueConv => '2 ** ((48-$val)/8)',
+        ValueConvInv => '48 - 8*log($val)/log(2)',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x4a => 'FreeMemoryCardImages',
+    0x5e => {
+        Name => 'ImageNumber',
+        Notes => q{
+            this information may appear at index 98 (0x62), depending on firmware
+            version
+        },
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0x60 => {
+        Name => 'NoiseReduction',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x62 => {
+        Name => 'ImageNumber2',
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0x71 => {
+        Name => 'ImageStabilization',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x75 => {
+        Name => 'ZoneMatchingOn',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+);
+
+# Camera settings used by the 5D (ref 8)
+%Image::ExifTool::Minolta::CameraSettings5D = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    PRIORITY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    0x0a => {
+        Name => 'ExposureMode',
+        PrintConv => {
+            0 => 'Program',
+            1 => 'Aperture Priority',
+            2 => 'Shutter Priority',
+            3 => 'Manual',
+            4 => 'Auto?',
+            4131 => 'Connected Copying?',
+        },
+    },
+    0x0c => { #PH
+        Name => 'MinoltaImageSize',
+        PrintConv => {
+            0 => 'Large',
+            1 => 'Medium',
+            2 => 'Small',
+        },
+    },
+    0x0d => {
+        Name => 'MinoltaQuality',
+        PrintConv => {
+            0 => 'RAW',
+            16 => 'Fine', #PH
+            32 => 'Normal', #PH
+            34 => 'RAW+JPEG',
+            48 => 'Economy', #PH
+        },
+    },
+    0x0e => {
+        Name => 'WhiteBalance',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Daylight',
+            2 => 'Cloudy?',
+            3 => 'Shade?',
+            4 => 'Tungsten',
+            5 => 'Fluorescent',
+            6 => 'Flash',
+            0x100 => 'Kelvin',
+            0x200 => 'Manual',
+        },
+    },
+    # 0x0f=0x11 something to do with WB RGB levels as shot? (PH)
+    # 0x12-0x17 RGB levels for other WB modes (with G missing)? (PH)
+    0x1f => { #PH
+        Name => 'Flash',
+        PrintConv => {
+            0 => 'Did not fire',
+            1 => 'Fired',
+        },
+    },
+    0x25 => {
+        Name => 'MeteringMode',
+        PrintConv => {
+            0 => 'Multi-segment',
+            1 => 'Center weighted',
+            2 => 'Spot',
+        },
+    },
+    0x26 => {
+        Name => 'ISOSetting',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 100,
+            3 => 200,
+            4 => 400,
+            5 => 800,
+            6 => 1600,
+            7 => 3200,
+            8 => '200 (Zone Matching High)',
+            10 => '80 (Zone Matching Low)',
+        },
+    },
+    0x30 => {
+        Name => 'Sharpness',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+    },
+    0x31 => {
+        Name => 'Contrast',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+    },
+    0x32 => {
+        Name => 'Saturation',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+    },
+    0x35 => { #PH
+        Name => 'ExposureTime',
+        ValueConv => '2 ** ((48-$val)/8)',
+        ValueConvInv => '48 - 8*log($val)/log(2)',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x36 => { #PH
+        Name => 'FNumber',
+        ValueConv => '2 ** (($val-8)/16)',
+        ValueConvInv => '8 + 16*log($val)/log(2)',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x37 => 'FreeMemoryCardImages',
+    # 0x38 definitely not related to exposure comp as in ref 8 (PH)
+    0x49 => { #PH
+        Name => 'ColorTemperature',
+        Format => 'int16s',
+        ValueConv => '$val * 100',
+        ValueConvInv => '$val / 100',
+    },
+    0x50 => {
+        Name => 'Rotation',
+        PrintConv => {
+            72 => 'Horizontal (normal)',
+            76 => 'Rotate 90 CW',
+            82 => 'Rotate 270 CW',
+        },
+    },
+    0x53 => {
+        Name => 'ExposureCompensation',
+        ValueConv => '$val / 100 - 3',
+        ValueConvInv => '($val + 3) * 100',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x54 => 'FreeMemoryCardImages',
+    # 0x66 maybe program mode or some setting like this? (PH)
+    # 0x95 FlashStrength? (PH)
+    # 0xa4 similar information to 0x27, except with different values
+    0xae => {
+        Name => 'ImageNumber',
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0xb0 => {
+        Name => 'NoiseReduction',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0xbd => {
+        Name => 'ImageStabilization',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
 );
 
 # basic Minolta white balance lookup
@@ -604,82 +1007,6 @@ sub ConvertWhiteBalance($)
     return $printConv;
 }
 
-#------------------------------------------------------------------------------
-# Read or write Minolta MRW file
-# Inputs: 0) ExifTool object reference, 1) dirInfo reference
-# Returns: 1 on success, 0 if this wasn't a valid MRW file, or -1 on write error
-sub ProcessMRW($$)
-{
-    my ($exifTool, $dirInfo) = @_;
-    my $raf = $$dirInfo{RAF};
-    my $outfile = $$dirInfo{OutFile};
-    my $verbose = $exifTool->Options('Verbose');
-    my $out = $exifTool->Options('TextOut');
-    my ($data, $err);
-
-    $raf->Read($data,8) == 8 or return 0;
-    $data =~ /^\0MRM/ or return 0;
-    $exifTool->SetFileType();
-    SetByteOrder('MM');
-    $outfile and $exifTool->InitWriteDirs('TIFF'); # use same write dirs as TIFF
-    my $offset = Get32u(\$data, 4) + 8;
-    my $pos = 8;
-    my $rtnVal = 1;
-    $verbose and printf $out "  [Data Offset: 0x%x]\n", $offset;
-    # decode MRW structure to locate start of TIFF-format image (ref 5)
-    while ($pos < $offset) {
-        $raf->Read($data,8) == 8 or $err = 1, last;
-        $pos += 8;
-        my $tag = substr($data, 0, 4);
-        my $len = Get32u(\$data, 4);
-        if ($verbose) {
-            print $out "MRW ",$exifTool->Printable($tag)," segment ($len bytes):\n";
-            if ($verbose > 2) {
-                $raf->Read($data,$len) == $len and $raf->Seek($pos,0) or $err = 1, last;
-                my %parms = (Addr => $pos, Out => $out);
-                $parms{MaxLen} = 96 unless $verbose > 3;
-                Image::ExifTool::HexDump(\$data,undef,%parms);
-            }
-        }
-        if ($tag eq "\0TTW") {
-            # parse the TIFF structure after the TTW tag
-            my %dirInfo = (
-                Parent => 'MRW',
-                RAF    => $raf,
-                Base   => $pos,
-            );
-            # rewrite the EXIF information (plus the file header)
-            my $buff = '';
-            $dirInfo{OutFile} = \$buff if $outfile;
-            my $result = $exifTool->ProcessTIFF(\%dirInfo);
-            if ($result < 0) {
-                $rtnVal = -1;
-            } elsif (not $result) {
-                $err = 1;
-            } elsif ($outfile) {
-                # adjust offset for new EXIF length
-                my $newLen = length($buff) - $pos;
-                $offset += $newLen - $len;
-                Set32u($offset - 8, \$buff, 4);
-                Set32u($newLen, \$buff, $pos - 4);
-                Write($outfile, $buff) or $rtnVal = -1;
-                # rewrite the rest of the file
-                $pos += $len;
-                $raf->Seek($pos, 0) or $err = 1, last;
-                while ($raf->Read($buff, 65536)) {
-                    Write($outfile, $buff) or $rtnVal = -1;
-                }
-                last;   # all done
-            }
-            last unless $verbose;
-        }
-        $pos += $len;
-        $raf->Seek($pos, 0) or $err = 1, last;
-    }
-    $err and $exifTool->Error("MRW format error");
-    return $rtnVal;
-}
-
 1;  # end
 
 __END__
@@ -702,8 +1029,8 @@ and write Minolta RAW (MRW) images.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

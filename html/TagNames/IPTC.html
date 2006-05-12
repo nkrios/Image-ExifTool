@@ -68,7 +68,7 @@ own set of tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>5</td>
 <td>Destination</td>
-<td align='center'>string[0,1024]</td>
+<td align='center'>string[0,1024]+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>20</td>
@@ -122,7 +122,7 @@ own set of tags.
 <tr valign='top'>
 <td align='right'>50</td>
 <td>ProductID</td>
-<td align='center'>string[0,32]</td>
+<td align='center'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>60</td>
@@ -143,7 +143,8 @@ own set of tags.
 <td align='right'>90</td>
 <td>CodedCharacterSet</td>
 <td align='center'>string[0,32]</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(this must be set to &quot;ESC % G&quot; if UTF-8 characters are used in
+ApplicationRecord or NewsPhoto string values)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>100</td>
 <td>UniqueObjectName</td>
@@ -179,7 +180,7 @@ own set of tags.
 <tr valign='top'>
 <td align='right'>4</td>
 <td>ObjectAttributeReference</td>
-<td align='center'>string[4,68]</td>
+<td align='center'>string[4,68]+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>5</td>
@@ -204,7 +205,7 @@ own set of tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>12</td>
 <td>SubjectReference</td>
-<td align='center'>string[13,236]</td>
+<td align='center'>string[13,236]+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>15</td>
@@ -214,7 +215,7 @@ own set of tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>20</td>
 <td>SupplementalCategories</td>
-<td align='center'>string[0,32]</td>
+<td align='center'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>22</td>
@@ -224,17 +225,17 @@ own set of tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>25</td>
 <td>Keywords</td>
-<td align='center'>string[0,64]</td>
+<td align='center'>string[0,64]+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>26</td>
 <td>ContentLocationCode</td>
-<td align='center'>string[3]</td>
+<td align='center'>string[3]+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>27</td>
 <td>ContentLocationName</td>
-<td align='center'>string[0,64]</td>
+<td align='center'>string[0,64]+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>30</td>
@@ -272,17 +273,17 @@ own set of tags.
 <tr valign='top'>
 <td align='right'>45</td>
 <td>ReferenceService</td>
-<td align='center'>string[0,10]</td>
+<td align='center'>string[0,10]+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>47</td>
 <td>ReferenceDate</td>
-<td align='center'>digits[8]</td>
+<td align='center'>digits[8]+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>50</td>
 <td>ReferenceNumber</td>
-<td align='center'>digits[8]</td>
+<td align='center'>digits[8]+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>55</td>
@@ -324,12 +325,12 @@ own set of tags.
 <tr valign='top'>
 <td align='right'>80</td>
 <td>By-line</td>
-<td align='center'>string[0,32]</td>
+<td align='center'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>85</td>
 <td>By-lineTitle</td>
-<td align='center'>string[0,32]</td>
+<td align='center'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>90</td>
@@ -384,7 +385,7 @@ own set of tags.
 <tr valign='top'>
 <td align='right'>118</td>
 <td>Contact</td>
-<td align='center'>string[0,128]</td>
+<td align='center'>string[0,128]+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>120</td>
@@ -402,7 +403,7 @@ won&apos;t be able to read these tags as written by ExifTool.)</font></font></td
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>122</td>
 <td>Writer-Editor</td>
-<td align='center'>string[0,32]</td>
+<td align='center'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>125</td>
@@ -779,7 +780,7 @@ won&apos;t be able to read these tags as written by ExifTool.)</font></font></td
 <tr valign='top'>
 <td align='right'>10</td>
 <td>SubFile</td>
-<td align='center'>N</td>
+<td align='center'>N+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -798,6 +799,6 @@ won&apos;t be able to read these tags as written by ExifTool.)</font></font></td
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 1, 2006</i>
+<br><i>Last revised Apr 17, 2006</i>
 </body>
 </html>

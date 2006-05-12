@@ -1,9 +1,9 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.13
 [File, File, Image]  - File Name: CanonRaw.crw
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2005:04:16 10:37:10
-[File, File, Image]  - File Type: Canon RAW
+[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
+[File, File, Image]  - File Type: CRW
 [File, File, Image]  - MIME Type: image/x-raw
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
 [MakerNotes, CanonRaw, Camera] 8199 - Jpg From Raw: (Binary data 29 bytes)
@@ -127,7 +127,10 @@
 [Composite, Composite, Camera]  - Shooting Mode: Program AE
 [Composite, Composite, Camera]  - Shutter Curtain Sync: 1st-curtain sync
 [Composite, Composite, Image]  - Shutter Speed: 1/64
+[Composite, Composite, Camera]  - WB RGGB Levels: 1740 832 831 931
+[Composite, Composite, Camera]  - Blue Balance: 1.119663
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 24.0mm (35mm equivalent: 37.2mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 8.34 m
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+[Composite, Composite, Camera]  - Red Balance: 2.092604

@@ -91,18 +91,22 @@ but this information is extracted by ExifTool anyway.
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpBJ'>XMP xmpBJ Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>xmpDM</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='XMP.html#xmpDM'>XMP xmpDM Tags</a></td></tr>
+<tr valign='top'>
 <td>xmpMM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpMM'>XMP xmpMM Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>xmpPLUS</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpPLUS'>XMP xmpPLUS Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>xmpRights</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpRights'>XMP xmpRights Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>xmpTPg</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpTPg'>XMP xmpTPg Tags</a></td></tr>
@@ -115,10 +119,30 @@ Photoshop Auxiliary schema tags.
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td>Lens</td>
+<td>Firmware</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>FlashCompensation</td>
+<td align='center'>rational</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ImageNumber</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>Lens</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>LensInfo</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>OwnerName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>SerialNumber</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
@@ -143,93 +167,182 @@ Photoshop Camera Raw Schema tags.
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td>AutoBrightness</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>AutoContrast</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>AutoExposure</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>AutoShadows</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>BlueHue</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>BlueSaturation</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Brightness</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>CameraProfile</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>ChromaticAberrationB</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>ChromaticAberrationR</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>ColorNoiseReduction</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>Contrast</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CropAngle</td>
+<td align='center'>real</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>CropBottom</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CropHeight</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>CropLeft</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CropRight</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>CropTop</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>CropUnits</td>
+<td align='center'>integer</td>
+<td><font size='-1'>0 = pixels
+  <br>1 = inches
+  <br>2 = cm</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>CropWidth</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>Exposure</td>
-<td align='center'>string</td>
+<td align='center'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>GreenHue</td>
-<td align='center'>string</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td>GreenSaturation</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>LuminanceSmoothing</td>
-<td align='center'>string</td>
+<td>GreenSaturation</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>HasCrop</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>HasSettings</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>LuminanceSmoothing</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>RawFileName</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>RedHue</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>RedSaturation</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>Saturation</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>Shadows</td>
-<td align='center'>string</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td>ShadowTint</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td>Sharpness</td>
-<td align='center'>string</td>
+<td>ShadowTint</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>Sharpness</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>Temperature</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Tint</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ToneCurve</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ToneCurveName</td>
+<td align='center'>string</td>
+<td><font size='-1'>&apos;Custom&apos; = Custom
+  <br>&apos;Linear&apos; = Linear
+  <br>&apos;Medium Contrast&apos; = Medium Contrast
+  <br>&apos;Strong Contrast&apos; = Strong Contrast</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>Version</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>VignetteAmount</td>
-<td align='center'>string</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VignetteMidpoint</td>
+<td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>VignetteMidpoint</td>
-<td align='center'>string</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
 <td>WhiteBalance</td>
 <td align='center'>string</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'>&apos;As Shot&apos; = As Shot
+  <br>&apos;Auto&apos; = Auto
+  <br>&apos;Cloudy&apos; = Cloudy
+  <br>&apos;Custom&apos; = Custom
+  <br>&apos;Daylight&apos; = Daylight
+  <br>&apos;Flash&apos; = Flash
+  <br>&apos;Fluorescent&apos; = Fluorescent
+  <br>&apos;Shade&apos; = Shade
+  <br>&apos;Tungsten&apos; = Tungsten</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='dc'>XMP dc Tags</a></h2>
@@ -240,7 +353,7 @@ Dublin Core schema tags.
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>Contributor</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Coverage</td>
@@ -248,11 +361,11 @@ Dublin Core schema tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Creator</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Date</td>
-<td align='center'>date</td>
+<td align='center'>date+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Description</td>
@@ -268,15 +381,15 @@ Dublin Core schema tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Language</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Publisher</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Relation</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Rights</td>
@@ -288,7 +401,7 @@ Dublin Core schema tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Subject</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Title</td>
@@ -296,13 +409,14 @@ Dublin Core schema tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Type</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='dex'>XMP dex Tags</a></h2>
-Description Explorer schema tags.  These tags are not very common, and some
-are not made writable due to name conflicts with other XMP tags.
+Description Explorer schema tags.  These tags are not very common.  The
+Source and Rating tags are avoided when writing due to name conflicts with
+other XMP tags.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
@@ -332,7 +446,7 @@ are not made writable due to name conflicts with other XMP tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Rating</td>
-<td align='center'>N</td>
+<td align='center'>string/</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Revision</td>
@@ -344,7 +458,7 @@ are not made writable due to name conflicts with other XMP tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Source</td>
-<td align='center'>N</td>
+<td align='center'>string/</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -372,7 +486,7 @@ EXIF schema for EXIF tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>CFAPatternValues</td>
-<td align='center'>integer</td>
+<td align='center'>integer+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>ColorSpace</td>
@@ -383,7 +497,7 @@ EXIF schema for EXIF tags.
   <br>4294967295 = Uncalibrated</font></td></tr>
 <tr valign='top'>
 <td>ComponentsConfiguration</td>
-<td align='center'>integer</td>
+<td align='center'>integer+</td>
 <td><font size='-1'>0 = .
   <br>1 = Y
   <br>2 = Cb
@@ -424,7 +538,7 @@ EXIF schema for EXIF tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>DeviceSettingDescriptionSettings</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>DigitalZoomRatio</td>
@@ -656,7 +770,7 @@ EXIF schema for EXIF tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>ISO</td>
-<td align='center'>integer</td>
+<td align='center'>integer+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>LightSource</td>
@@ -705,7 +819,7 @@ EXIF schema for EXIF tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>OECFNames</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>OECFRows</td>
@@ -713,7 +827,7 @@ EXIF schema for EXIF tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>OECFValues</td>
-<td align='center'>rational</td>
+<td align='center'>rational+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>ExifImageWidth</td>
@@ -770,7 +884,7 @@ EXIF schema for EXIF tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>SpatialFrequencyResponseNames</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>SpatialFrequencyResponseRows</td>
@@ -778,7 +892,7 @@ EXIF schema for EXIF tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>SpatialFrequencyResponseValues</td>
-<td align='center'>rational</td>
+<td align='center'>rational+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>SpectralSensitivity</td>
@@ -786,7 +900,7 @@ EXIF schema for EXIF tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>SubjectArea</td>
-<td align='center'>integer</td>
+<td align='center'>integer+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>SubjectDistance</td>
@@ -801,7 +915,7 @@ EXIF schema for EXIF tags.
   <br>3 = Distant</font></td></tr>
 <tr valign='top'>
 <td>SubjectLocation</td>
-<td align='center'>integer</td>
+<td align='center'>integer+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>UserComment</td>
@@ -869,19 +983,19 @@ XMP-Iptc4xmpCore is a bit lengthy.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Scene</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>SubjectCode</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='pdf'>XMP pdf Tags</a></h2>
 Adobe PDF schema tags.  The official XMP specification only defines
 Keywords, PDFVersion and Producer.  The other tags are included because they
-have been observed in PDF files, but Creator, Subject and Title aren&apos;t made
-writable because their names conflict with XMP-dc tags.
+have been observed in PDF files, but Creator, Subject and Title are avoided
+when writing due to name conflicts with XMP-dc tags.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
@@ -896,7 +1010,7 @@ writable because their names conflict with XMP-dc tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Creator</td>
-<td align='center'>N</td>
+<td align='center'>string/</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Keywords</td>
@@ -916,11 +1030,11 @@ writable because their names conflict with XMP-dc tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Subject</td>
-<td align='center'>N</td>
+<td align='center'>string/</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Title</td>
-<td align='center'>N</td>
+<td align='center'>string/</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -976,7 +1090,7 @@ Adobe Photoshop schema tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>SupplementalCategories</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>TransmissionReference</td>
@@ -1033,7 +1147,7 @@ EXIF schema for TIFF tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>BitsPerSample</td>
-<td align='center'>integer</td>
+<td align='center'>integer+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Compression</td>
@@ -1128,11 +1242,11 @@ EXIF schema for TIFF tags.
   <br>2 = Planar</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>PrimaryChromaticities</td>
-<td align='center'>rational</td>
+<td align='center'>rational+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>ReferenceBlackWhite</td>
-<td align='center'>rational</td>
+<td align='center'>rational+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>ResolutionUnit</td>
@@ -1150,11 +1264,11 @@ EXIF schema for TIFF tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>TransferFunction</td>
-<td align='center'>integer</td>
+<td align='center'>integer+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>WhitePoint</td>
-<td align='center'>rational</td>
+<td align='center'>rational+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>XResolution</td>
@@ -1162,9 +1276,14 @@ EXIF schema for TIFF tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>YCbCrCoefficients</td>
-<td align='center'>rational</td>
+<td align='center'>rational+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>YCbCrPositioning</td>
+<td align='center'>integer</td>
+<td><font size='-1'>1 = Centered
+  <br>2 = Co-sited</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>YCbCrSubSampling</td>
 <td align='center'>string</td>
 <td><font size='-1'>&apos;1 1&apos; = YCbCr4:4:4
@@ -1173,7 +1292,7 @@ EXIF schema for TIFF tags.
   <br>&apos;2 2&apos; = YCbCr4:2:0
   <br>&apos;4 1&apos; = YCbCr4:1:1
   <br>&apos;4 2&apos; = YCbCr4:1:0</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>YResolution</td>
 <td align='center'>rational</td>
 <td>&nbsp;</td></tr>
@@ -1190,7 +1309,7 @@ group names.
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>Advisory</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>BaseURL</td>
@@ -1206,12 +1325,12 @@ group names.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Identifier</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Label</td>
 <td align='center'>string</td>
-<td><font size='-1'><font color="#666666">(not in original spec)</font></font></td></tr>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>MetadataDate</td>
 <td align='center'>date</td>
@@ -1227,22 +1346,22 @@ group names.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Rating</td>
 <td align='center'>integer</td>
-<td><font size='-1'><font color="#666666">(not in original spec)</font></font></td></tr>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>ThumbnailsFormat</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>ThumbnailsHeight</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>ThumbnailsImage</td>
-<td align='center'>N</td>
+<td align='center'>N+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>ThumbnailsWidth</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1254,14 +1373,378 @@ XMP Basic Job Ticket schema tags.
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>JobRefId</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>JobRefName</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>JobRefUrl</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='xmpDM'>XMP xmpDM Tags</a></h2>
+XMP Dynamic Media schema tags.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>AbsPeakAudioFilePath</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>Album</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>AltTapeName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>AltTimecodeTimeFormat</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>AltTimecodeTimeValue</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>Artist</td>
+<td align='center'>string/</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>AudioChannelType</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>AudioCompressor</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>AudioModDate</td>
+<td align='center'>date</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>AudioSampleRate</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>AudioSampleType</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>BeatSpliceParamsRiseInDecibel</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>BeatSpliceParamsRiseInTimeDuration</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>BeatSpliceParamsUseFileBeatsMarker</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Composer</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ContributedMediaDuration</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ContributedMediaManaged</td>
+<td align='center'>boolean+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ContributedMediaPath</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ContributedMediaStartTime</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ContributedMediaTrack</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ContributedMediaWebStatement</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>Copyright</td>
+<td align='center'>string/</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Duration</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>Engineer</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FileDataRate</td>
+<td align='center'>rational</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>Genre</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Instrument</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>IntroTime</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Key</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>LogComment</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Loop</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>MarkersComment</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>MarkersDuration</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>MarkersLocation</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>MarkersName</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>MarkersStartTime</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>MarkersTarget</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>MarkersType</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>MetadataModDate</td>
+<td align='center'>date</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>NumberOfBeats</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>OutCue</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ProjectRefPath</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ProjectRefType</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>PullDown</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>RelativePeakAudioFilePath</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>RelativeTimestamp</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ReleaseDate</td>
+<td align='center'>date</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ResampleParamsQuality</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ScaleType</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>Scene</td>
+<td align='center'>string/</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ShotDate</td>
+<td align='center'>date</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ShotLocation</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ShotName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>SpeakerPlacement</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>StartTimecodeTimeFormat</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>StartTimecodeTimeValue</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>StretchMode</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>TapeName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>Tempo</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>TimeScaleParamsFrameOverlappingPercentage</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>TimeScaleParamsFrameSize</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>TimeScaleParamsQuality</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>TimeSignature</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>TrackNumber</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoAlphaMode</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoAlphaPremultipleColorA</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoAlphaPremultipleColorB</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoAlphaPremultipleColorBlack</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoAlphaPremultipleColorBlue</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoAlphaPremultipleColorCyan</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoAlphaPremultipleColorGreen</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoAlphaPremultipleColorL</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoAlphaPremultipleColorMagenta</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoAlphaPremultipleColorMode</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoAlphaPremultipleColorRed</td>
+<td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoAlphaPremultipleColorSwatchName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoAlphaPremultipleColorType</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoAlphaPremultipleColorYellow</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoAlphaUnityIsTransparent</td>
+<td align='center'>boolean</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoColorSpace</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoCompressor</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoFieldOrder</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoFrameRate</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoFrameSizeH</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoFrameSizeUnit</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoFrameSizeW</td>
+<td align='center'>real</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoModDate</td>
+<td align='center'>date</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>VideoPixelAspectRatio</td>
+<td align='center'>rational</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>VideoPixelDepth</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -1314,23 +1797,23 @@ XMP Media Management schema tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>HistoryAction</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>HistoryInstanceID</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>HistoryParameters</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>HistorySoftwareAgent</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>HistoryWhen</td>
-<td align='center'>date</td>
+<td align='center'>date+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>LastURL</td>
@@ -1442,39 +1925,39 @@ XMP Media Management schema tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>VersionsComments</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsEventAction</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>VersionsEventInstanceID</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsEventParameters</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>VersionsEventSoftwareAgent</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsEventWhen</td>
-<td align='center'>date</td>
+<td align='center'>date+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>VersionsModifier</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsModifyDate</td>
-<td align='center'>date</td>
+<td align='center'>date+</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>VersionsVersion</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1510,7 +1993,7 @@ XMP Rights Management schema tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Owner</td>
-<td align='center'>string</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>UsageTerms</td>
@@ -1529,26 +2012,114 @@ XMP Paged-Text schema tags.
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td>ColorantsA</td>
+<td align='center'>integer+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ColorantsB</td>
+<td align='center'>integer+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ColorantsBlack</td>
+<td align='center'>real+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ColorantsBlue</td>
+<td align='center'>integer+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ColorantsCyan</td>
+<td align='center'>real+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ColorantsGreen</td>
+<td align='center'>integer+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ColorantsL</td>
+<td align='center'>real+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ColorantsMagenta</td>
+<td align='center'>real+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ColorantsMode</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ColorantsRed</td>
+<td align='center'>integer+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ColorantsSwatchName</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>ColorantsType</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>ColorantsYellow</td>
+<td align='center'>real+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>FontsChildFontFiles</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FontsComposite</td>
+<td align='center'>boolean+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>FontsFontFace</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FontsFontFamily</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>FontsFontFileName</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FontsFontName</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>FontsFontType</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>FontsVersionString</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>MaxPageSizeH</td>
 <td align='center'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>MaxPageSizeUnit</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>MaxPageSizeW</td>
 <td align='center'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>NPages</td>
 <td align='center'>integer</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>PlateNames</td>
+<td align='center'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 6, 2006</i>
+<br><i>Last revised Apr 17, 2006</i>
 </body>
 </html>

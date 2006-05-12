@@ -2,7 +2,7 @@
 [File, File, Image]  - File Name: KyoceraRaw.raw
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 166 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:02:17 11:36:59
+[File, File, Time]  - File Modification Date/Time: 2006:02:17 11:59:53
 [File, File, Image]  - File Type: RAW
 [File, File, Image]  - MIME Type: image/x-raw
 [MakerNotes, KyoceraRaw, Camera] 1 - Firmware Version: Ver. 1.07
@@ -17,5 +17,7 @@
 [MakerNotes, KyoceraRaw, Camera] 112 - Focal Length: 55mm
 [MakerNotes, KyoceraRaw, Camera] 124 - Lens: VS28-80/3.5
 [Composite, Composite, Image]  - Aperture: 11.3
+[Composite, Composite, Camera]  - Blue Balance: 1.34375
+[Composite, Composite, Camera]  - Red Balance: 1.31250
 [Composite, Composite, Image]  - Shutter Speed: 1/125
 [Composite, Composite, Camera]  - Focal Length: 55.0mm

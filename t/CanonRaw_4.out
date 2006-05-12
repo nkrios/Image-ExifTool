@@ -1,9 +1,9 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.13
 [File, File, Image]  - File Name: CanonRaw_4_failed.crw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
-[File, File, Image]  - File Type: Canon RAW
+[File, File, Time]  - File Modification Date/Time: 2006:01:07 13:38:51
+[File, File, Image]  - File Type: CRW
 [File, File, Image]  - MIME Type: image/x-raw
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
 [MakerNotes, CanonRaw, Camera] 8199 - Jpg From Raw: (Binary data 16 bytes)
@@ -119,12 +119,15 @@
 [Composite, Composite, Image]  - Aperture: 14.3
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 3072x2048
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.1
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4
+[Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
+[Composite, Composite, Camera]  - Blue Balance: 1.190619
 [Composite, Composite, Image]  - Circle Of Confusion: 0.027 mm
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 38.4mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 3.05 m
+[Composite, Composite, Image]  - Image Size: 3072x2048
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 20.3 - 62.2mm)
+[Composite, Composite, Camera]  - Red Balance: 2.067348

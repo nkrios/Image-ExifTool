@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
@@ -17,8 +17,7 @@
 [EXIF, IFD0, Time] 306 - Modify Date: 2005:01:14 08:57:59
 [EXIF, IFD0, Camera] 318 - White Point: 0.313 0.329
 [EXIF, IFD0, Image] 319 - Primary Chromaticities: 0.64 0.33 0.21 0.71 0.15 0.06
-[EXIF, IFD0, Image] 529 - Y Cb Cr Coefficients: 0.299 0.587 0.114
-[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/60
 [EXIF, ExifIFD, Image] 33437 - F Number: 5.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Aperture-priority AE
@@ -74,7 +73,7 @@
 [MakerNotes, NikonPreview, Image] 282 - X Resolution: 300
 [MakerNotes, NikonPreview, Image] 283 - Y Resolution: 300
 [MakerNotes, NikonPreview, Image] 296 - Resolution Unit: inches
-[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2460
+[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2424
 [MakerNotes, NikonPreview, Image] 514 - Preview Image Length: 0
 [MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -1.7
@@ -86,7 +85,9 @@
 [MakerNotes, Nikon, Camera] 131 - Lens Type: G
 [MakerNotes, Nikon, Camera] 132 - Lens: 18-70mm f/3.5-4.5
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Fired, TTL Mode
-[MakerNotes, Nikon, Camera] 136 - AF Point: Single Area, Center
+[MakerNotes, Nikon, Camera] 0 - AF Mode: Single Area
+[MakerNotes, Nikon, Camera] 1 - AF Point: Center
+[MakerNotes, Nikon, Camera] 2 - AF Points Used: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Continuous
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 5.33
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode2
@@ -119,15 +120,18 @@
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 47
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 71
+[XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Co-sited
 [Composite, Composite, Image]  - Aperture: 5.0
 [Composite, Composite, Camera]  - Flash: On
-[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
 [Composite, Composite, Camera]  - Lens: 18-70mm f/3.5-4.5 G
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/60
+[Composite, Composite, Camera]  - Blue Balance: 1.410156
 [Composite, Composite, Image]  - Circle Of Confusion: 0.020 mm
 [Composite, Composite, Image]  - Depth of Field: 0.02 m (0.62 - 0.64)
 [Composite, Composite, Camera]  - Focal Length: 56.0mm (35mm equivalent: 84.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 31.31 m
+[Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Camera]  - Red Balance: 2.332031
 [Composite, Composite, Image]  - Date/Time Original: 2005:01:14 08:57:59.20

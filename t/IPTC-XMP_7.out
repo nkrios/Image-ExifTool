@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
 [File, File, Image]  - File Name: IPTC-XMP_7_failed.xmp
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 7 kB
+[File, File, Image]  - File Size: 8 kB
 [File, File, Time]  - File Modification Date/Time: 2006:01:03 14:32:38
 [File, File, Image]  - File Type: XMP
 [File, File, Image]  - MIME Type: application/xmp
@@ -60,6 +60,7 @@
 [XMP, XMP-tiff, Image] ResolutionUnit - Resolution Unit: inches
 [XMP, XMP-tiff, Image] Software - Software: Adobe Photoshop 7.0
 [XMP, XMP-tiff, Image] XResolution - X Resolution: 72
+[XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Co-sited
 [XMP, XMP-tiff, Image] YResolution - Y Resolution: 72
 [XMP, XMP-xmp, Time] CreateDate - Create Date: 2001:05:19 18:36:41Z
 [XMP, XMP-xmp, Time] ModifyDate - Modify Date: 2004:02:26 09:36:46Z
@@ -68,6 +69,6 @@
 [XMP, XMP-xmpRights, Author] Marked - Marked: False
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
 [Composite, Composite, Image]  - Aperture: 3.5
-[Composite, Composite, Image]  - Image Size: 100x80
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Camera]  - Focal Length: 6.0mm
+[Composite, Composite, Image]  - Image Size: 100x80

@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -160,6 +160,10 @@ my %fileFormat = (
     },
     90 => {
         Name => 'CodedCharacterSet',
+        Notes => q{
+            this must be set to "ESC % G" if UTF-8 characters are used in
+            ApplicationRecord or NewsPhoto string values
+        },
         Format => 'string[0,32]',
         # convert ISO 2022 escape sequences to a more readable format
         PrintConv => '$_=$val; s/(.)/ $1/g; s/ \x1b/, ESC/g; s/^,? //; $_',
@@ -942,8 +946,8 @@ image files.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

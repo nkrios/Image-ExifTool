@@ -66,11 +66,16 @@ duplicated in different locations within an image.  When in doubt, use
 locations in the file.  In this command, <code>'-a'</code> allows duplicate tags
 to be displayed, <code>'-G1'</code> shows the family 1 group name (ie. the
 location) of each tag, and <code>'FILENAME'</code> is the name of your image
-file.  Also, you may want to add <code>'-s'</code> to show the actual tag names
-instead of the descriptions.
+file.  Also, it may be helpful to add <code>'-s'</code> to show the actual tag
+names instead of the descriptions.
 
-<p>You can read or write information in a specific location if necessary by
-prefixing the tag name on the command line with the desired group name.  ie)
+<p>If you are having problems with other software reading information written by
+ExifTool, if possible try first writing the information from the other software,
+then use ExifTool to determine where the information was written. Once you know
+where it should go, you can use ExifTool to write to this location.
+
+<p>You can read or write information in a specific location by prefixing the tag
+name on the command line with the desired group name.  ie)
 <code>'-ExifIFD:DateTimeOriginal'</code>
 </blockquote>
 
@@ -185,7 +190,7 @@ to copy information"</b>
 This feature is explained in the
 <a href="exiftool_pod.html#item__2dtagsfromfile_srcfile_or_fmt">exiftool
 application documentation</a>, but the question is common enough that it is
-discussed in more detail here:
+discussed here in more detail.
 
 <p>By default, ExifTool will store information in preferred locations when
 either writing new information or copying information between files. This
@@ -217,9 +222,8 @@ information is preserved.  (Specifically, since no destination group was
 specified the source group <code>'all'</code> was assumed, thus preserving
 the original group.)
 
-<p>Now, in case this isn't confusing enough for you, here are some examples to
-show you the type of control you have over where the information is written.
-All commands in each example are equivalent:
+<p>Here are some examples to show you the type of control you have over where
+the information is written. All commands in each example are equivalent:
 
 <pre><span id='BLK'># copy all tags to preferred groups (no destination group)</span>
 exiftool -tagsfromfile src.jpg dst.jpg
@@ -260,7 +264,7 @@ would you?)
 </blockquote>
 
 <hr>
-<i>Last revised Feb. 7, 2006</i>
+<i>Last revised Mar. 29, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

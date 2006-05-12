@@ -61,33 +61,68 @@ sub HexEncode($)
 
 #------------------------------------------------------------------------------
 # Write profile to tEXt or zTXt chunk (zTXt if Zlib is available)
-# Inputs: 0) outfile, 1) Raw profile type, 2) profile header type, 3) data ref
+# Inputs: 0) outfile, 1) Raw profile type, 2) data ref
+#         3) profile header type (undef if not a text profile)
 # Returns: 1 on success
-sub WriteProfile($$$$)
+sub WriteProfile($$$;$)
 {
-    my ($outfile, $rawType, $profile, $dataPt) = @_;
-    my $txtHdr = sprintf("\ngeneric profile\n%8d\n", length($$dataPt));
-    my $buff = $txtHdr . HexEncode($dataPt);
-    my $prefix = "Raw profile type $rawType\0";
-    $dataPt = \$buff;
-    my $chnk = 'tEXt';
-    # write profile as zTXt chunk if Zlib is available
+    my ($outfile, $rawType, $dataPt, $profile) = @_;
+    my ($buff, $prefix, $chunk, $deflate);
     if (eval 'require Compress::Zlib') {
-        my $deflate = Compress::Zlib::deflateInit();
+        $deflate = Compress::Zlib::deflateInit();
+    }
+    if (not defined $profile) {
+        # write ICC profile as compressed iCCP chunk if possible
+        return 0 unless $deflate;
+        $buff = $deflate->deflate($$dataPt);
+        return 0 unless defined $buff;
+        $buff .= $deflate->flush();
+        my %rawTypeChunk = ( icm => 'iCCP' );
+        $chunk = $rawTypeChunk{$rawType} or return 0;
+        $prefix = "$rawType\0\0";
+        $dataPt = \$buff;
+    } else {
+        # write as ASCII-hex encoded profile in tEXt or zTXt chunk
+        my $txtHdr = sprintf("\n$profile profile\n%8d\n", length($$dataPt));
+        $buff = $txtHdr . HexEncode($dataPt);
+        $chunk = 'tEXt';         # write as tEXt if deflate not available
+        $prefix = "Raw profile type $rawType\0";
+        $dataPt = \$buff;
+        # write profile as zTXt chunk if possible
         if ($deflate) {
             my $buf2 = $deflate->deflate($buff);
             if (defined $buf2) {
-                $buf2 .= $deflate->flush();
                 $dataPt = \$buf2;
-                $chnk = 'zTXt';
+                $buf2 .= $deflate->flush();
+                $chunk = 'zTXt';
                 $prefix .= "\0";    # compression type byte (0=deflate)
             }
         }
     }
-    my $hdr = pack('Na4', length($prefix) + length($$dataPt), $chnk) . $prefix;
+    my $hdr = pack('Na4', length($prefix) + length($$dataPt), $chunk) . $prefix;
     my $crc = CalculateCRC(\$hdr, undef, 4);
     $crc = CalculateCRC($dataPt, $crc);
     return Write($outfile, $hdr, $$dataPt, pack('N',$crc));
+}
+
+#------------------------------------------------------------------------------
+# Add iCCP to the PNG image if necessary (must come before PLTE and IDAT)
+# Inputs: 0) ExifTool object ref, 1) output file or scalar ref
+# Returns: true on success
+sub Add_iCCP($$)
+{
+    my ($exifTool, $outfile) = @_;
+    if ($exifTool->{ADD_DIRS}->{ICC_Profile}) {
+        # write new ICC data
+        my $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
+        my %dirInfo = ( Parent => 'PNG', DirName => 'ICC_Profile' );
+        my $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
+        if (defined $buff and length $buff and WriteProfile($outfile, 'icm', \$buff)) {
+            $exifTool->VPrint(0, "Created ICC profile\n");
+            delete $exifTool->{ADD_DIRS}->{ICC_Profile}; # don't add it again
+        }
+    }
+    return 1;
 }
 
 #------------------------------------------------------------------------------
@@ -140,7 +175,7 @@ sub AddChunks($$)
             if (defined $buff and length $buff) {
                 my $tiffHdr = $byteOrder . Set16u(42) . Set32u(8);
                 $buff = $Image::ExifTool::exifAPP1hdr . $tiffHdr . $buff;
-                WriteProfile($outfile, 'APP1', 'generic', \$buff) or $err = 1;
+                WriteProfile($outfile, 'APP1', \$buff, 'generic') or $err = 1;
             }
         } elsif ($dir eq 'XMP') {
             $exifTool->VPrint(0, "Creating XMP profile:\n");
@@ -149,15 +184,24 @@ sub AddChunks($$)
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
             if (defined $buff and length $buff) {
                 $buff = $Image::ExifTool::xmpAPP1hdr . $buff;
-                WriteProfile($outfile, 'APP1', 'generic', \$buff) or $err = 1;
+                WriteProfile($outfile, 'APP1', \$buff, 'generic') or $err = 1;
             }
         } elsif ($dir eq 'IPTC') {
             $exifTool->VPrint(0, "Creating IPTC profile:\n");
-            # write new XMP data
+            # write new IPTC data
             $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
             if (defined $buff and length $buff) {
-                WriteProfile($outfile, 'iptc', 'IPTC', \$buff) or $err = 1;
+                WriteProfile($outfile, 'iptc', \$buff, 'IPTC') or $err = 1;
+            }
+        } elsif ($dir eq 'ICC_Profile') {
+            $exifTool->VPrint(0, "Creating ICC profile:\n");
+            # write new ICC data (only done if we couldn't create iCCP chunk)
+            $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
+            $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
+            if (defined $buff and length $buff) {
+                WriteProfile($outfile, 'icm', \$buff, 'ICC') or $err = 1;
+                $exifTool->Warn('Wrote ICC as generic profile (no Compress::Zlib)');
             }
         }
     }
@@ -186,8 +230,8 @@ This file contains routines to write PNG metadata.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

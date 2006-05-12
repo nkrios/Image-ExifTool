@@ -28,7 +28,7 @@
 package Image::ExifTool::XMP;
 
 use strict;
-use Image::ExifTool qw(:Utils);
+use Image::ExifTool qw(:DataAccess :Utils);
 
 sub CheckXMP($$$);
 sub SetPropertyPath($$;$$);
@@ -90,6 +90,33 @@ my %xmpStruct = (
         h           => { },
         unit        => { },
     },
+    Colorant => {
+        NAMESPACE => 'xapG',
+        swatchName  => { },
+        mode        => { },
+        type        => { },
+        cyan        => { },
+        magenta     => { },
+        yellow      => { },
+        black       => { },
+        red         => { },
+        green       => { },
+        blue        => { },
+        L           => { },
+        A           => { },
+        B           => { },
+    },
+    Font => {
+        NAMESPACE => 'stFnt',
+        fontName    => { },
+        fontFamily  => { },
+        fontFace    => { },
+        fontType    => { },
+        versionString => { },
+        composite   => { },
+        fontFileName=> { },
+        childFontFiles=> { List => 'Seq' },
+    },
     # the following stuctures are different:  They don't have
     # their own namespaces -- instead they use the parent namespace
     Flash => {
@@ -131,6 +158,57 @@ my %xmpStruct = (
         CiTelWork   => { },
         CiUrlWork   => { },
     },
+    # Dynamic Media structures
+    BeatSpliceStretch => {
+        NAMESPACE => 'xmpDM',
+        useFileBeatsMarker  => { },
+        riseInDecibel       => { },
+        riseInTimeDuration  => { },
+    },
+    Marker => {
+        NAMESPACE => 'xmpDM',
+        startTime   => { },
+        duration    => { },
+        comment     => { },
+        name        => { },
+        location    => { },
+        target      => { },
+        type        => { },
+    },
+    Media => {
+        NAMESPACE => 'xmpDM',
+        path        => { },
+        track       => { },
+        startTime   => { },
+        duration    => { },
+        managed     => { },
+        webStatement=> { },
+    },
+    ProjectLink => {
+        NAMESPACE => 'xmpDM',
+        type        => { },
+        path        => { },
+    },
+    ResampleStretch => {
+        NAMESPACE => 'xmpDM',
+        quality     => { },
+    },
+    Time => {
+        NAMESPACE => 'xmpDM',
+        value       => { },
+        scale       => { },
+    },
+    Timecode => {
+        NAMESPACE => 'xmpDM',
+        timeValue   => { },
+        timeFormat  => { },
+    },
+    TimeScaleStretch => {
+        NAMESPACE => 'xmpDM',
+        quality     => { },
+        frameSize   => { },
+        frameOverlappingPercentage => { },
+    },
 );
 
 # Lookup to translate our namespace prefixes into URI's.  This list need
@@ -149,14 +227,17 @@ my %nsURI = (
     rdf       => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
     stDim     => 'http://ns.adobe.com/xap/1.0/sType/Dimensions#',
     stEvt     => 'http://ns.adobe.com/xap/1.0/sType/ResourceEvent#',
+    stFnt     => 'http:ns.adobe.com/xap/1.0/sType/Font#',
     stJob     => 'http://ns.adobe.com/xap/1.0/sType/Job#',
     stRef     => 'http://ns.adobe.com/xap/1.0/sType/ResourceRef#',
     stVer     => 'http://ns.adobe.com/xap/1.0/sType/Version#',
     tiff      => 'http://ns.adobe.com/tiff/1.0/',
    'x'        => 'adobe:ns:meta/',
+    xapG      => 'http://ns/adobe.com/xap/1.0/g/',
     xapGImg   => 'http://ns/adobe.com/xap/1.0/g/img/',
     xmp       => 'http://ns.adobe.com/xap/1.0/',
     xmpBJ     => 'http://ns.adobe.com/xap/1.0/bj/',
+    xmpDM     => 'http://ns.adobe.com/xmp/1.0/DynamicMedia/',
     xmpMM     => 'http://ns.adobe.com/xap/1.0/mm/',
     xmpRights => 'http://ns.adobe.com/xap/1.0/rights/',
     xmpTPg    => 'http://ns.adobe.com/xap/1.0/t/pg/',
@@ -248,7 +329,7 @@ sub CheckXMP($$$)
     } elsif ($format eq 'integer') {
         # make sure the value is integer
         if (Image::ExifTool::IsInt($$valPtr)) {
-            $$valPtr = int($$valPtr);
+            # no conversion required (converting to 'int' would remove leading '+')
         } elsif (Image::ExifTool::IsHex($$valPtr)) {
             $$valPtr = hex($$valPtr);
         } else {
@@ -488,7 +569,7 @@ sub ConformPathToNamespace($$)
 #         2) [optional] tag table reference
 # Returns: with tag table: new XMP data (may be empty if no XMP data) or undef on error
 #          without tag table: 1 on success, 0 if not valid XMP file, -1 on write error
-# Notes: Increments ExifTool CHANGED flag for each tag changed
+# Notes: May set dirInfo InPlace flag to rewrite with specified DirLen
 sub WriteXMP($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -497,7 +578,8 @@ sub WriteXMP($$;$)
     my $dirStart = $$dirInfo{DirStart} || 0;
     my (%capture, %nsUsed, $xmpErr, $uuid);
     my $changed = 0;
-    my $xmpFile = (not $tagTablePtr); # this is an XMP data file if no $tagTablePtr
+    my $xmpFile = (not $tagTablePtr);   # this is an XMP data file if no $tagTablePtr
+    my $preferred = $xmpFile;   # write XMP as preferred if this is an XMP file
 #
 # extract existing XMP information into %capture hash
 #
@@ -619,8 +701,9 @@ sub WriteXMP($$;$)
         # get list of new values (done if no new values specified)
         my @newValues = Image::ExifTool::GetNewValues($newValueHash) or next;
         # don't add new tag if it didn't exist before unless specified
-        # (or unless this is an XMP data file)
-        next unless $capList or Image::ExifTool::IsCreating($newValueHash) or $xmpFile;
+        # (or unless this is an XMP data file and we aren't avoiding this tag)
+        next unless $capList or Image::ExifTool::IsCreating($newValueHash) or
+            ($preferred and not $$tagInfo{Avoid});
 
         # set default language attribute for lang-alt lists
         # (currently on support changing the default language)
@@ -654,9 +737,9 @@ sub WriteXMP($$;$)
         $dataPt = $$dirInfo{DataPt};
         unless (defined $dataPt) {
             $exifTool->Error("Nothing to write");
-            return 0;
+            return 1;
         }
-        return 1 if Image::ExifTool::Write($$dirInfo{OutFile}, $$dataPt);
+        return 1 if Write($$dirInfo{OutFile}, $$dataPt);
         return -1;
     }
 #
@@ -750,22 +833,40 @@ sub WriteXMP($$;$)
         $prop =~ s/ .*//;   # remove list index if it exists
         $newData .= (' ' x scalar(@curPropList)) . " </$prop>\n";
     }
-    $newData .= $rdfClose . $xmpClose;
-    # (the XMP standard recommends writing 2k-4k of white space before the
-    # packet trailer, with a newline every 100 characters)
-    unless ($$exifTool{XMP_NO_XPACKET}) {
-        $newData .= ((' ' x 100) . "\n") x 24 unless $exifTool->Options('Compact');
-        $newData .= $pktClose;
-    }
 #
-# clean up and return our data
+# clean up, close out the XMP, and return our data
 #
     # remove the ExifTool members we created
     delete $exifTool->{XMP_CAPTURE};
     delete $exifTool->{XMP_NS};
 
+    $newData .= $rdfClose . $xmpClose;
+
+    # (the XMP standard recommends writing 2k-4k of white space before the
+    # packet trailer, with a newline every 100 characters)
+    unless ($$exifTool{XMP_NO_XPACKET}) {
+        my $pad = (' ' x 100) . "\n";
+        if ($$dirInfo{InPlace}) {
+            # pad to specified DirLen
+            my $dirLen = $$dirInfo{DirLen} || length $$dataPt;
+            my $len = length($newData) + length($pktClose);
+            if ($len > $dirLen) {
+                $exifTool->Warn('Not enough room to edit XMP in place');
+                return undef;
+            }
+            my $num = int(($dirLen - $len) / length($pad));
+            if ($num) {
+                $newData .= $pad x $num;
+                $len += length($pad) * $num;
+            }
+            $len < $dirLen and $newData .= (' ' x ($dirLen - $len - 1)) . "\n";
+        } elsif (not $exifTool->Options('Compact')) {
+            $newData .= $pad x 24;
+        }
+        $newData .= $pktClose;
+    }
     # return empty data if no properties exist
-    $newData = '' unless %capture;
+    $newData = '' unless %capture or $$dirInfo{InPlace};
 
     if ($xmpErr) {
         if ($xmpFile) {
@@ -778,7 +879,7 @@ sub WriteXMP($$;$)
     $exifTool->{CHANGED} += $changed;
     $debug > 1 and $newData and print $newData,"\n";
     return $newData unless $xmpFile;
-    return 1 if Image::ExifTool::Write($$dirInfo{OutFile}, $newData);
+    return 1 if Write($$dirInfo{OutFile}, $newData);
     return -1;
 }
 
@@ -803,8 +904,8 @@ This file contains routines to write XMP metadata.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

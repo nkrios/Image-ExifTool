@@ -21,6 +21,8 @@
 #               8) Denis Bourez private communication
 #               9) Kazumichi Kawabata private communication
 #              10) David Buret private communication (tests with *istD)
+#              11) http://forums.dpreview.com/forums/read.asp?forum=1036&message=17465929
+#              12) Derby Chang private communication
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -31,7 +33,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.28';
+$VERSION = '1.31';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -529,13 +531,16 @@ my %pentaxCities = (
             '3 22' => 'smc PENTAX-F FISH-EYE 17-28mm F3.5-4.5',
             '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6',
             '3 24' => 'smc PENTAX-F 35-135mm F3.5-4.5',
-            '3 25' => 'smc PENTAX-F 35-105mm F4-5.6',
+            '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or SIGMA AF 28-300 F3.5-5.6 DL IF', #11 (sigma)
+            # or '3 25' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
             '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
             '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5',
             '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5',
-            '3 29' => 'PENTAX-F 28-80mm F3.5-4.5',
+            # or '3 28' => 'Tokina 19-35mm F3.5-4.5 AF', #12
+            '3 29' => 'PENTAX-F 28-80mm F3.5-4.5 or SIGMA AF 18-125mm F3.5-5.6 DC', #11 (sigma)
             '3 30' => 'PENTAX-F 70-200mm F4-5.6',
             '3 31' => 'smc PENTAX-F 70-210mm F4-5.6',
+            # or '3 31' => 'Tokina AF 730 75-300mm F4.5-5.6',
             '3 32' => 'smc PENTAX-F 50mm F1.4',
             '3 33' => 'smc PENTAX-F 50mm F1.7',
             '3 34' => 'smc PENTAX-F 135mm F2.8 [IF]',
@@ -545,15 +550,24 @@ my %pentaxCities = (
             '3 39' => 'smc PENTAX-F* 600mm F4 ED[IF]',
             '3 40' => 'smc PENTAX-F MACRO 100mm F2.8',
             '3 41' => 'smc PENTAX-F MACRO 50mm F2.8',
-            '3 44' => 'SIGMA 18-50mm F3.5-5.6 DC',
+            '3 44' => 'SIGMA 18-50mm F3.5-5.6 DC, 12-24mm F4.5 EX DG or Tamron 35-90mm F4 AF', #4,12,12
             '3 46' => 'SIGMA APO 70-200mm F2.8 EX',
             '3 50' => 'smc PENTAX-FA 28-70mm F4 AL',
             '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
             '3 52' => 'smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF]',
             '3 53' => 'smc PENTAX-FA 28-80mm F3.5-5.6 AL',
+            '3 247' => 'smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]',
+            '3 248' => 'smc PENTAX-DA 12-24mm F4 ED AL[IF]',
+            '3 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED',
+            '3 251' => 'smc PENTAX-DA 40mm F2.8 Limited',
+            '3 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL',
             '3 253' => 'smc PENTAX-DA 14mm F2.8 ED[IF]',
             '3 254' => 'smc PENTAX-DA 16-45mm F4 ED AL',
-            '3 255' => 'SIGMA 18-200mm F3.5-6.3 DC', #8
+            '3 255' => 'SIGMA',
+            # '3 255' => 'SIGMA 18-200mm F3.5-6.3 DC', #8
+            # '3 255' => 'SIGMA DL-II 35-80mm F4-5.6', #12
+            # '3 255' => 'SIGMA DL Zoom 75-300mm F4-5.6', #12
+            # '3 255' => 'SIGMA DF EX Aspherical 28-70mm F2.8', #12
             '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
             '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
             '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
@@ -564,9 +578,11 @@ my %pentaxCities = (
             '4 23' => 'smc PENTAX-FA 20-35mm F4 AL',
             '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
             '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
+            '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF]Macro (285D)',
             '4 28' => 'smc PENTAX-FA 35mm F2 AL',
             '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
             '4 35' => 'smc PENTAX-FA 100-300mm F4.7-5.8',
+            '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO (572D)',
             '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
             '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
             '4 41' => 'TAMRON AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] MACRO (A03)',
@@ -576,8 +592,11 @@ my %pentaxCities = (
             '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
             '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
             '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
+            '4 51' => 'smc PENTAX-D FA 50mmF2.8 MACRO',
+            '4 52' => 'smc PENTAX-D FA 100mmF2.8 MACRO',
             '4 247' => 'smc PENTAX-DA 10-17mm F3.5-4.5 ED [IF] Fisheye zoom', #10
             '4 248' => 'smc PENTAX-DA 12-24mm F4 ED AL [IF]', #10
+            '4 249' => 'TAMRON XR DiII 18-200mm F3.5-6.3 (A14)',
             '4 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED', #8
             '4 251' => 'smc PENTAX-DA 40mm F2.8 Limited', #9
             '4 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL', #8
@@ -688,11 +707,17 @@ my %pentaxCities = (
 #        },
 #    },
 
-# tags in Pentax MOV videos (PH - tests with Optio WP)
+# tags in Pentax QuickTime videos (PH - tests with Optio WP)
+# (note: very similar to information in Nikon videos)
 %Image::ExifTool::Pentax::MOV = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'This information is found in Pentax MOV video images.',
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[6]',
+        PrintConv => 'ucfirst(lc($val))',
+    },
     0x26 => {
         Name => 'ExposureTime',
         Format => 'int32u',
@@ -798,8 +823,8 @@ Buret for adding to the LensType list.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

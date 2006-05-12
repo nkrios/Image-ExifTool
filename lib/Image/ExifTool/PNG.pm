@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -36,6 +36,7 @@ sub ProcessPNG_Compressed($$$);
 sub CalculateCRC($;$$$);
 sub HexEncode($);
 sub AddChunks($$);
+sub Add_iCCP($$);
 
 my $noCompressLib;
 
@@ -59,7 +60,6 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     cHRM => {
         Name => 'PrimaryChromaticities',
-        Writable => 0,  # set to 0 as indication that we can't edit this information
         SubDirectory => { TagTable => 'Image::ExifTool::PNG::PrimaryChromaticities' },
     },
     fRAc => {
@@ -88,7 +88,6 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     iCCP => {
         Name => 'ICC_Profile',
-        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
             ProcessProc => \&ProcessPNG_Compressed,
@@ -98,7 +97,6 @@ $Image::ExifTool::PNG::colorType = -1;
 #   IEND
     IHDR => {
         Name => 'ImageHeader',
-        Writable => 0,
         SubDirectory => { TagTable => 'Image::ExifTool::PNG::ImageHeader' },
     },
     iTXt => {
@@ -122,7 +120,6 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     pHYs => {
         Name => 'PhysicalPixel',
-        Writable => 0,
         SubDirectory => { TagTable => 'Image::ExifTool::PNG::PhysicalPixel' },
     },
     PLTE => {
@@ -246,7 +243,7 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     8 => {
         Name => 'PixelUnits',
-        PrintConv => { 0 => 'Unknown', 1 => 'Meter' },
+        PrintConv => { 0 => 'Unknown', 1 => 'Meters' },
     },
 );
 
@@ -399,7 +396,8 @@ sub FoundPNG($$$$;$$)
                 }
             } elsif (not $noCompressLib) {
                 $noCompressLib = 1;
-                $warn = 'Install Compress::Zlib to decode compressed binary data';
+                my $verb = $outBuff ? 'write' : 'decode';
+                $warn = "Install Compress::Zlib to $verb compressed binary data";
             }
         } else {
             $compressed -= 2;
@@ -431,9 +429,9 @@ sub FoundPNG($$$$;$$)
             }
             my $subdir = $$tagInfo{SubDirectory};
             my $processProc = $$subdir{ProcessProc};
-            # don't extract info if Writable flag is defined
-            # (it is set to 0 for a subdir that we can't edit)
-            return 1 if $outBuff and defined $$tagInfo{Writable};
+            # nothing more to do if writing and subdirectory is not writable
+            my $subTable = GetTagTable($$subdir{TagTable});
+            return 1 if $outBuff and not $$subTable{WRITE_PROC};
             my %subdirInfo = (
                 DataPt => \$val,
                 DirStart => 0,
@@ -443,10 +441,16 @@ sub FoundPNG($$$$;$$)
                 TagInfo => $tagInfo,
                 OutBuff => $outBuff,
             );
-            my $subTable = GetTagTable($$subdir{TagTable});
             # no need to re-decompress if already done
             undef $processProc if $wasCompressed and $processProc eq \&ProcessPNG_Compressed;
-            $processed = $exifTool->ProcessDirectory(\%subdirInfo, $subTable, $processProc);
+            if ($outBuff and not $processProc) {
+                # rewrite this directory if necessary
+                return 1 unless $exifTool->{EDIT_DIRS}->{$$tagInfo{Name}};
+                delete $exifTool->{ADD_DIRS}->{$$tagInfo{Name}};
+                $$outBuff = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
+            } else {
+                $processed = $exifTool->ProcessDirectory(\%subdirInfo, $subTable, $processProc);
+            }
             $compressed = 1;    # pretend this is compressed since it is binary data
         }
         if ($outBuff) {
@@ -761,9 +765,15 @@ sub ProcessPNG($$)
                 $datBytes += $len;
             }
         }
-        # add any new chunks immediately before the IEND chunk
-        if ($outfile and $chunk eq 'IEND') {
-            AddChunks($exifTool, $outfile) or $err = 1;
+        if ($outfile) {
+            if ($chunk eq 'IEND') {
+                # add any new chunks immediately before the IEND chunk
+                AddChunks($exifTool, $outfile) or $err = 1;
+            } elsif ($chunk eq 'PLTE' or $chunk eq 'IDAT') {
+                # iCCP chunk must come before PLTE and IDAT
+                # (ignore errors -- will add later as text profile if this fails)
+                Add_iCCP($exifTool, $outfile);
+            }
         }
         if ($chunk eq $endChunk) {
             if ($outfile) {
@@ -855,8 +865,8 @@ and JNG (JPEG Network Graphics) images.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

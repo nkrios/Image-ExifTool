@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.31';
+$VERSION = '1.34';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -111,6 +111,7 @@ sub BuildMakerNotes($$$$$$);
     0x101c => 'BaseISO', #3
     0x1028=> { #PH
         Name => 'CanonFlashInfo',
+        Writable => 'int16u',
         Count => 4,
         Unknown => 1,
     },
@@ -405,7 +406,10 @@ sub BuildMakerNotes($$$$$$);
         ValueConv => '$val / 3600',
         ValueConvInv => '$val * 3600',
     },
-    2 => 'TimeZoneInfo', #3
+    2 => { #3
+        Name => 'TimeZoneInfo',
+        Notes => 'set to 0x80000000 if TimeZoneCode is valid',
+    },
 );
 
 %Image::ExifTool::CanonRaw::ImageFormat = (
@@ -489,11 +493,13 @@ sub BuildMakerNotes($$$$$$);
 
 %Image::ExifTool::CanonRaw::ImageInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     FORMAT => 'int32u',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    # Note: Don't make these writable because it confuses Canon decoding software
-    # if these are changed
+    # Note: Don't make these writable (except rotation) because it confuses
+    # Canon decoding software if the are changed
     0 => 'ImageWidth', #3
     1 => 'ImageHeight', #3
     2 => { #3
@@ -503,6 +509,7 @@ sub BuildMakerNotes($$$$$$);
     3 => {
         Name => 'Rotation',
         Format => 'int32s',
+        Writable => 'int32s',
     },
     4 => 'ComponentBitDepth', #3
     5 => 'ColorBitDepth', #3
@@ -726,7 +733,7 @@ sub ProcessCRW($$)
     # initialize maker note data if building maker notes
     $buildMakerNotes and InitMakerNotes($exifTool);
 
-    $exifTool->SetFileType('Canon RAW');    # set the FileType tag
+    $exifTool->SetFileType();   # set the FileType tag
 
     # build directory information for main raw directory
     my %dirInfo = (
@@ -779,8 +786,8 @@ tags.)
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 
@@ -799,6 +806,7 @@ it under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/CanonRaw Tags>,
+L<Image::ExifTool::Canon(3pm)|Image::ExifTool::Canon>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

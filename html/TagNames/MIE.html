@@ -1,0 +1,817 @@
+<html>
+<head>
+<title>MIE Tags</title>
+</head>
+<body text='#000000' bgcolor='#ffffff'>
+<h2>MIE Tags</h2>
+MIE is flexible format which may be used as either a standalone meta
+information format, or for encapsulation of any other file type.  The tables
+below represent currently defined MIE tags, however ExifTool will also
+extract any other information present in a MIE file.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'0Type'</td>
+<td>SubfileType</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(Currently defined types are ACR, AIFC, AIFF, ASF, AVI, BMP, CR2, CRW, DICOM,
+DNG, EPS, ERF, GIF, ICC, JNG, JP2, JPEG, MIE, MIFF, MNG, MOS, MOV, MP3,
+MPEG, MP4, MRW, NEF, ORF, PBM, PDF, PGM, PICT, PNG, PPM, PS, PSD, QTIF, RAF,
+RAW, RIFF, SR2, SRF, TIFF, WAV, WMA, WMV, X3F and XMP.  Other types should
+simply use the common file extension.)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'1Directory'</td>
+<td>SubfileDirectory</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'1Name'</td>
+<td>SubfileName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'2MIME'</td>
+<td>SubfileMIMEType</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Meta'</td>
+<td>Meta</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Meta'>MIE Meta Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'data'</td>
+<td>Subfile</td>
+<td align='center'>undef</td>
+<td><font size='-1'><font color="#666666">(the subfile data)</font></font></td></tr>
+<tr valign='top'>
+<td>'resource'</td>
+<td>SubfileResource</td>
+<td align='center'>undef</td>
+<td><font size='-1'><font color="#666666">(subfile resource fork if it exists)</font></font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Meta'>MIE Meta Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Audio'</td>
+<td>Audio</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Audio'>MIE Audio Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Camera'</td>
+<td>Camera</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Camera'>MIE Camera Tags</a></td></tr>
+<tr valign='top'>
+<td>'Document'</td>
+<td>Document</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Doc'>MIE Doc Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'EXIF'</td>
+<td>EXIF</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
+<tr valign='top'>
+<td>'Geo'</td>
+<td>Geo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Geo'>MIE Geo Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ICCProfile'</td>
+<td>ICC_Profile</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<tr valign='top'>
+<td>'ID3'</td>
+<td>ID3</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='ID3.html'>ID3 Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'IPTC'</td>
+<td>IPTC</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
+<tr valign='top'>
+<td>'Image'</td>
+<td>Image</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Image'>MIE Image Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'MakerNotes'</td>
+<td>MakerNotes</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#MakerNotes'>MIE MakerNotes Tags</a></td></tr>
+<tr valign='top'>
+<td>'Preview'</td>
+<td>Preview</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Preview'>MIE Preview Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Thumbnail'</td>
+<td>Thumbnail</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Thumbnail'>MIE Thumbnail Tags</a></td></tr>
+<tr valign='top'>
+<td>'Video'</td>
+<td>Video</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Video'>MIE Video Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'XMP'</td>
+<td>XMP</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Audio'>MIE Audio Tags</a></h2>
+For the Audio group (and any other group containing a &apos;data&apos; element), tags
+refer to the contained data if present, otherwise they refer to the main
+Subfile data.  The &apos;0Type&apos; and &apos;1Name&apos; elements should exist only if &apos;data&apos;
+is present.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'0Type'</td>
+<td>RelatedAudioFileType</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(MP3 if not specified)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'1Name'</td>
+<td>RelatedAudioFileName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Channels'</td>
+<td>Channels</td>
+<td align='center'>int8u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Compression'</td>
+<td>AudioCompression</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Duration'</td>
+<td>Duration</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'SampleBits'</td>
+<td>SampleBits</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'SampleRate'</td>
+<td>SampleRate</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'data'</td>
+<td>RelatedAudioFile</td>
+<td align='center'>undef</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Camera'>MIE Camera Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'AnalogZoom'</td>
+<td>AnalogZoom</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'BlueBalance'</td>
+<td>BlueBalance</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Brightness'</td>
+<td>Brightness</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ColorTemperature'</td>
+<td>ColorTemperature</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Contrast'</td>
+<td>Contrast</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'DigitalZoom'</td>
+<td>DigitalZoom</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ExposureComp'</td>
+<td>ExposureCompensation</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ExposureMode'</td>
+<td>ExposureMode</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ExposureTime'</td>
+<td>ExposureTime</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Extender'</td>
+<td>Extender</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Extender'>MIE Extender Tags</a></td></tr>
+<tr valign='top'>
+<td>'FNumber'</td>
+<td>FNumber</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'FirmwareVersion'</td>
+<td>FirmwareVersion</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Flash'</td>
+<td>Flash</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Flash'>MIE Flash Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'FocalLength'</td>
+<td>FocalLength</td>
+<td align='center'>rational64u</td>
+<td><font size='-1'><font color="#666666">(includes affect of extender, if any)</font></font></td></tr>
+<tr valign='top'>
+<td>'FocusDistance'</td>
+<td>FocusDistance</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'FocusMode'</td>
+<td>FocusMode</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ISO'</td>
+<td>ISO</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ISOSetting'</td>
+<td>ISOSetting</td>
+<td align='center'>int16u</td>
+<td><font size='-1'><font color="#666666">(0 = Auto, otherwise manual ISO speed setting)</font></font></td></tr>
+<tr valign='top'>
+<td>'ImageNumber'</td>
+<td>ImageNumber</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ImageQuality'</td>
+<td>ImageQuality</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(Economy, Normal, Fine, Super Fine or Raw)</font></font></td></tr>
+<tr valign='top'>
+<td>'ImageStabilization'</td>
+<td>ImageStabilization</td>
+<td align='center'>int8u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Lens'</td>
+<td>Lens</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Lens'>MIE Lens Tags</a></td></tr>
+<tr valign='top'>
+<td>'Make'</td>
+<td>Make</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'MaxAperture'</td>
+<td>MaxAperture</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'MaxApertureAtMaxFocal'</td>
+<td>MaxApertureAtMaxFocal</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'MaxFocalLength'</td>
+<td>MaxFocalLength</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'MeasuredEV'</td>
+<td>MeasuredEV</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'MinAperture'</td>
+<td>MinAperture</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'MinFocalLength'</td>
+<td>MinFocalLength</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Model'</td>
+<td>Model</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Orientation'</td>
+<td>Orientation</td>
+<td align='center'>int16u</td>
+<td><font size='-1'><font color="#666666">(CW rotation angle of camera)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'OwnerName'</td>
+<td>OwnerName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'RedBalance'</td>
+<td>RedBalance</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Saturation'</td>
+<td>Saturation</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'SensorSize'</td>
+<td>SensorSize</td>
+<td align='center'>rational64u[2]</td>
+<td><font size='-1'><font color="#666666">(width and height of active sensor area in mm)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'SerialNumber'</td>
+<td>SerialNumber</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Sharpness'</td>
+<td>Sharpness</td>
+<td align='center'>int8s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ShootingMode'</td>
+<td>ShootingMode</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Extender'>MIE Extender Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Magnification'</td>
+<td>Magnification</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Make'</td>
+<td>ExtenderMake</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Model'</td>
+<td>ExtenderModel</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'SerialNumber'</td>
+<td>ExtenderSerialNumber</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Flash'>MIE Flash Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'ExposureComp'</td>
+<td>FlashExposureComp</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Fired'</td>
+<td>FlashFired</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+<tr valign='top'>
+<td>'GuideNumber'</td>
+<td>FlashGuideNumber</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Make'</td>
+<td>FlashMake</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Mode'</td>
+<td>FlashMode</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Model'</td>
+<td>FlashModel</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'SerialNumber'</td>
+<td>FlashSerialNumber</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Type'</td>
+<td>FlashType</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(&quot;Internal&quot; or &quot;External&quot;)</font></font></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Lens'>MIE Lens Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Make'</td>
+<td>LensMake</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Model'</td>
+<td>LensModel</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'SerialNumber'</td>
+<td>LensSerialNumber</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Doc'>MIE Doc Tags</a></h2>
+Information describing the main document, image or file.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Author'</td>
+<td>Author</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Comment'</td>
+<td>Comment</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Contributors'</td>
+<td>Contributors</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Copyright'</td>
+<td>Copyright</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'CreateDate'</td>
+<td>CreateDate</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Keywords'</td>
+<td>Keywords</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ModifyDate'</td>
+<td>ModifyDate</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'OriginalDate'</td>
+<td>DateTimeOriginal</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'References'</td>
+<td>References</td>
+<td align='center'>string+</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Software'</td>
+<td>Software</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Title'</td>
+<td>Title</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'URL'</td>
+<td>URL</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Geo'>MIE Geo Tags</a></h2>
+Information describing geographic location.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Address'</td>
+<td>Address</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'City'</td>
+<td>City</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Country'</td>
+<td>Country</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Elevation'</td>
+<td>Elevation</td>
+<td align='center'>rational64s</td>
+<td><font size='-1'><font color="#666666">(m above sea level)</font></font></td></tr>
+<tr valign='top'>
+<td>'Latitude'</td>
+<td>Latitude</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(degrees, negative for south latitudes)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Longitude'</td>
+<td>Longitude</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(degrees, negative for west longitudes)</font></font></td></tr>
+<tr valign='top'>
+<td>'State'</td>
+<td>State</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Image'>MIE Image Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'0Type'</td>
+<td>FullSizeImageType</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(JPEG if not specified)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'1Name'</td>
+<td>FullSizeImageName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'BitDepth'</td>
+<td>BitDepth</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'ColorSpace'</td>
+<td>ColorSpace</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(standard ColorSpace values are &quot;sRGB&quot; and &quot;Adobe RGB&quot;)</font></font></td></tr>
+<tr valign='top'>
+<td>'Components'</td>
+<td>ComponentsConfiguration</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(string composed of R, G, B, Y, Cb and Cr)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Compression'</td>
+<td>CompressionRatio</td>
+<td align='center'>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ImageSize'</td>
+<td>ImageSize</td>
+<td align='center'>int16u[n]</td>
+<td><font size='-1'><font color="#666666">(2 or 3 values, for number of XY or XYZ pixels)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Resolution'</td>
+<td>Resolution</td>
+<td align='center'>rational64u[n]</td>
+<td><font size='-1'><font color="#666666">(2 or 3 values for XY or XYZ resolution)</font></font></td></tr>
+<tr valign='top'>
+<td>'ResolutionUnits'</td>
+<td>ResolutionUnits</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = none
+  <br>1 = inches
+  <br>2 = cm</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'data'</td>
+<td>FullSizeImage</td>
+<td align='center'>undef</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MakerNotes'>MIE MakerNotes Tags</a></h2>
+MIE maker notes are contained within separate groups for each manufacturer
+to avoid name conflicts.  Currently no specific manufacturer information has
+been defined.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Canon'</td>
+<td>Canon</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Casio'</td>
+<td>Casio</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr valign='top'>
+<td>'FujiFilm'</td>
+<td>FujiFilm</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Kodak'</td>
+<td>Kodak</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr valign='top'>
+<td>'KonicaMinolta'</td>
+<td>KonicaMinolta</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Nikon'</td>
+<td>Nikon</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr valign='top'>
+<td>'Olympus'</td>
+<td>Olympus</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Panasonic'</td>
+<td>Panasonic</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr valign='top'>
+<td>'Pentax'</td>
+<td>Pentax</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Ricoh'</td>
+<td>Ricoh</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr valign='top'>
+<td>'Sigma'</td>
+<td>Sigma</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Sony'</td>
+<td>Sony</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='MIE.html#Unknown'>MIE Unknown Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Unknown'>MIE Unknown Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr><td colspan=4 align='center'>[no tags known]</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Preview'>MIE Preview Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'0Type'</td>
+<td>PreviewImageType</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(JPEG if not specified)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'1Name'</td>
+<td>PreviewImageName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ImageSize'</td>
+<td>PreviewImageSize</td>
+<td align='center'>int16u[n]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'data'</td>
+<td>PreviewImage</td>
+<td align='center'>undef</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Thumbnail'>MIE Thumbnail Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'0Type'</td>
+<td>ThumbnailImageType</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(JPEG if not specified)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'1Name'</td>
+<td>ThumbnailImageName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'ImageSize'</td>
+<td>ThumbnailImageSize</td>
+<td align='center'>int16u[n]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'data'</td>
+<td>ThumbnailImage</td>
+<td align='center'>undef</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Video'>MIE Video Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'0Type'</td>
+<td>RelatedVideoFileType</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(MOV if not specified)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'1Name'</td>
+<td>RelatedVideoFileName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'Codec'</td>
+<td>Codec</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Duration'</td>
+<td>Duration</td>
+<td align='center'>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'data'</td>
+<td>RelatedVideoFile</td>
+<td align='center'>undef</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised May 11, 2006</i>
+</body>
+</html>

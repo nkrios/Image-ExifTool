@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 sub FixWrongFormat($);
 
@@ -36,9 +36,9 @@ my %durationInfo = (
 %Image::ExifTool::QuickTime::Main = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     NOTES => q{
-These tags are used in QuickTime MOV and MP4 videos, and QTIF images.  Tags
-with a question mark after their name are not extracted unless the Unknown
-option is set.
+        These tags are used in QuickTime MOV and MP4 videos, and QTIF images.  Tags
+        with a question mark after their name are not extracted unless the Unknown
+        option is set.
     },
     free => { Unknown => 1, ValueConv => '\$val' },
     skip => { Unknown => 1, ValueConv => '\$val' },
@@ -67,9 +67,7 @@ option is set.
 # atoms used in QTIF files
 %Image::ExifTool::QuickTime::ImageFile = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
-    NOTES => q{
-Tags used in QTIF QuickTime Image Files.
-    },
+    NOTES => 'Tags used in QTIF QuickTime Image Files.',
     idsc => {
         Name => 'ImageDescription',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::ImageDesc' },
@@ -245,10 +243,10 @@ Tags used in QTIF QuickTime Image Files.
 %Image::ExifTool::QuickTime::UserData = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     NOTES => q{
-Tag ID's beginning with the copyright symbol (hex 0xa9) are multi-language
-text, but ExifTool only extracts the text from the first language in the
-record.  ExifTool will extract any multi-language user data tags found, even
-if they don't exist in this table.
+        Tag ID's beginning with the copyright symbol (hex 0xa9) are multi-language
+        text, but ExifTool only extracts the text from the first language in the
+        record.  ExifTool will extract any multi-language user data tags found, even
+        if they don't exist in this table.
     },
     "\xa9cpy" => 'Copyright',
     "\xa9day" => 'CreateDate',
@@ -298,10 +296,20 @@ if they don't exist in this table.
     # hinf => 'HintTrackInfo',
     TAGS => [
         {
+            # these tags were initially discovered in a Pentax movie, but
+            # seem very similar to those used by Nikon
             Name => 'PentaxTags',
             Condition => '$$valPt =~ /^PENTAX DIGITAL CAMERA\0/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Pentax::MOV',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
+            Name => 'NikonTags',
+            Condition => '$$valPt =~ /^NIKON DIGITAL CAMERA\0/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::MOV',
                 ByteOrder => 'LittleEndian',
             },
         },
@@ -338,9 +346,7 @@ if they don't exist in this table.
 # MP4 media
 %Image::ExifTool::QuickTime::Media = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
-    NOTES => q{
-MP4 only (most tags unknown because ISO charges for the specification).
-    },
+    NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
     minf => {
         Name => 'Minf',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Minf' },
@@ -350,9 +356,7 @@ MP4 only (most tags unknown because ISO charges for the specification).
 # MP4 media
 %Image::ExifTool::QuickTime::Minf = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
-    NOTES => q{
-MP4 only (most tags unknown because ISO charges for the specification).
-    },
+    NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
     stbl => {
         Name => 'Stbl',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Stbl' },
@@ -362,9 +366,7 @@ MP4 only (most tags unknown because ISO charges for the specification).
 # MP4 media
 %Image::ExifTool::QuickTime::Stbl = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
-    NOTES => q{
-MP4 only (most tags unknown because ISO charges for the specification).
-    },
+    NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
 );
 
 #------------------------------------------------------------------------------
@@ -527,8 +529,8 @@ not freely available (yes, ISO sucks).
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

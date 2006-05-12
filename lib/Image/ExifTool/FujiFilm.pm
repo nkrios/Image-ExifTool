@@ -13,7 +13,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -48,9 +48,9 @@ $VERSION = '1.05';
             0x0   => 'Auto',
             0x100 => 'Daylight',
             0x200 => 'Cloudy',
-            0x300 => 'DaylightColor-fluorescent',
-            0x301 => 'DaywhiteColor-fluorescent',
-            0x302 => 'White-fluorescent',
+            0x300 => 'Daylight Fluorescent',
+            0x301 => 'Day White Fluorescent',
+            0x302 => 'White Fluorescent',
             0x400 => 'Incandescent',
             0xF00 => 'Custom',
         },
@@ -208,8 +208,8 @@ images.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

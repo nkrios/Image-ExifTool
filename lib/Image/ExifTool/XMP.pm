@@ -15,6 +15,8 @@
 #               4) http://www.iptc.org/IPTC4XMP/
 #               5) http://creativecommons.org/technology/xmp
 #               6) http://www.optimasc.com/products/fileid/xmp-extensions.pdf
+#               7) Lou Salkind private communication
+#               8) http://partners.adobe.com/public/developer/en/xmp/sdk/xmpspecification.pdf
 #
 # Notes:      - I am handling property qualifiers as if they were separate
 #               properties (with no associated namespace).
@@ -36,7 +38,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.48';
+$VERSION = '1.49';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -98,6 +100,10 @@ my %longConv = (
     xmp => {
         Name => 'xmp',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::xmp' },
+    },
+    xmpDM => {
+        Name => 'xmpDM',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::xmpDM' },
     },
     xmpRights => {
         Name => 'xmpRights',
@@ -223,9 +229,7 @@ group names.
     },
     CreatorTool => { },
     Identifier  => { List => 'Bag' },
-    Label       => {
-        Notes => 'not in original spec',
-    },
+    Label       => { },
     MetadataDate => {
         Groups => { 2 => 'Time'  },
         Writable => 'date',
@@ -239,10 +243,7 @@ group names.
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Nickname    => { },
-    Rating      => {
-        Writable => 'integer',
-        Notes => 'not in original spec',
-    },
+    Rating      => { Writable => 'integer' },
     Thumbnails => {
         SubDirectory => { },
         Struct => 'Thumbnail',
@@ -400,6 +401,203 @@ group names.
     MaxPageSizeH    => { Writable => 'real' },
     MaxPageSizeUnit => { },
     NPages      => { Writable => 'integer' },
+    Fonts       => {
+        SubDirectory => { },
+        Struct => 'Font',
+        List => 'Bag',
+    },
+    FontsFontName       => { List => 1 },
+    FontsFontFamily     => { List => 1 },
+    FontsFontFace       => { List => 1 },
+    FontsFontType       => { List => 1 },
+    FontsVersionString  => { List => 1 },
+    FontsComposite      => { List => 1, Writable => 'boolean' },
+    FontsFontFileName   => { List => 1 },
+    FontsChildFontFiles => { List => 1 },
+    Colorants   => {
+        SubDirectory => { },
+        Struct => 'Colorant',
+        List => 'Seq',
+    },
+    ColorantsSwatchName => { List => 1 },
+    ColorantsMode       => { List => 1 },
+    ColorantsType       => { List => 1 },
+    ColorantsCyan       => { List => 1, Writable => 'real' },
+    ColorantsMagenta    => { List => 1, Writable => 'real' },
+    ColorantsYellow     => { List => 1, Writable => 'real' },
+    ColorantsBlack      => { List => 1, Writable => 'real' },
+    ColorantsRed        => { List => 1, Writable => 'integer' },
+    ColorantsGreen      => { List => 1, Writable => 'integer' },
+    ColorantsBlue       => { List => 1, Writable => 'integer' },
+    ColorantsL          => { List => 1, Writable => 'real' },
+    ColorantsA          => { List => 1, Writable => 'integer' },
+    ColorantsB          => { List => 1, Writable => 'integer' },
+    PlateNames  => { List => 'Seq' },
+);
+
+# XMP Dynamic Media schema properties (xmpDM)
+%Image::ExifTool::XMP::xmpDM = (
+    GROUPS => { 1 => 'XMP-xmpDM', 2 => 'Image' },
+    NAMESPACE => 'xmpDM',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'XMP Dynamic Media schema tags.',
+    projectRef => {
+        SubDirectory => { },
+        Struct => 'ProjectLink',
+    },
+    projectRefType      => { },
+    projectRefPath      => { },
+    videoFrameRate      => { },
+    videoFrameSize => {
+        SubDirectory => { },
+        Struct => 'Dimensions',
+    },
+    videoFrameSizeW     => { Writable => 'real' },
+    videoFrameSizeH     => { Writable => 'real' },
+    videoFrameSizeUnit  => { },
+    videoPixelAspectRatio => { Writable => 'rational' },
+    videoPixelDepth     => { },
+    videoColorSpace     => { },
+    videoAlphaMode      => { },
+    videoAlphaPremultipleColor => {
+        SubDirectory => { },
+        Struct => 'Colorant',
+    },
+    videoAlphaPremultipleColorSwatchName => { },
+    videoAlphaPremultipleColorMode       => { },
+    videoAlphaPremultipleColorType       => { },
+    videoAlphaPremultipleColorCyan       => { Writable => 'real' },
+    videoAlphaPremultipleColorMagenta    => { Writable => 'real' },
+    videoAlphaPremultipleColorYellow     => { Writable => 'real' },
+    videoAlphaPremultipleColorBlack      => { Writable => 'real' },
+    videoAlphaPremultipleColorRed        => { Writable => 'integer' },
+    videoAlphaPremultipleColorGreen      => { Writable => 'integer' },
+    videoAlphaPremultipleColorBlue       => { Writable => 'integer' },
+    videoAlphaPremultipleColorL          => { Writable => 'real' },
+    videoAlphaPremultipleColorA          => { Writable => 'integer' },
+    videoAlphaPremultipleColorB          => { Writable => 'integer' },
+    videoAlphaUnityIsTransparent => { Writable => 'boolean' },
+    videoCompressor     => { },
+    videoFieldOrder     => { },
+    pullDown            => { },
+    audioSampleRate     => { Writable => 'integer' },
+    audioSampleType     => { },
+    audioChannelType    => { },
+    audioCompressor     => { },
+    speakerPlacement    => { },
+    fileDataRate        => { Writable => 'rational' },
+    tapeName            => { },
+    altTapeName         => { },
+    startTimecode => {
+        SubDirectory => { },
+        Struct => 'Timecode',
+    },
+    startTimecodeTimeValue  => { },
+    startTimecodeTimeFormat => { },
+    altTimecode => {
+        SubDirectory => { },
+        Struct => 'Timecode',
+    },
+    altTimecodeTimeValue    => { },
+    altTimecodeTimeFormat   => { },
+    duration            => { },
+    scene               => { Avoid => 1 },
+    shotName            => { },
+    shotDate => {
+        Groups => { 2 => 'Time'  },
+        Writable => 'date',
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    shotLocation        => { },
+    logComment          => { },
+    markers => {
+        SubDirectory => { },
+        Struct => 'Marker',
+        List => 'Seq',
+    },
+    markersStartTime    => { List => 1 },
+    markersDuration     => { List => 1 },
+    markersComment      => { List => 1 },
+    markersName         => { List => 1 },
+    markersLocation     => { List => 1 },
+    markersTarget       => { List => 1 },
+    markersType         => { List => 1 },
+    contributedMedia => {
+        SubDirectory => { },
+        Struct => 'Media',
+        List => 'Bag',
+    },
+    contributedMediaPath         => { List => 1 },
+    contributedMediaTrack        => { List => 1 },
+    contributedMediaStartTime    => { List => 1 },
+    contributedMediaDuration     => { List => 1 },
+    contributedMediaManaged      => { List => 1, Writable => 'boolean' },
+    contributedMediaWebStatement => { List => 1 },
+    absPeakAudioFilePath => { },
+    relativePeakAudioFilePath => { },
+    videoModDate => {
+        Groups => { 2 => 'Time'  },
+        Writable => 'date',
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    audioModDate => {
+        Groups => { 2 => 'Time'  },
+        Writable => 'date',
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    metadataModDate => {
+        Groups => { 2 => 'Time'  },
+        Writable => 'date',
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    artist          => { Avoid => 1, Groups => { 2 => 'Author' } },
+    album           => { },
+    trackNumber     => { Writable => 'integer' },
+    genre           => { },
+    copyright       => { Avoid => 1, Groups => { 2 => 'Author' } },
+    releaseDate => {
+        Groups => { 2 => 'Time'  },
+        Writable => 'date',
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    composer        => { Groups => { 2 => 'Author' } },
+    engineer        => { },
+    tempo           => { Writable => 'real' },
+    instrument      => { },
+    introTime       => { },
+    outCue          => { },
+    relativeTimestamp => { },
+    loop            => { Writable => 'boolean' },
+    numberOfBeats   => { Writable => 'real' },
+    key             => { },
+    stretchMode     => { },
+    timeScaleParams => {
+        SubDirectory => { },
+        Struct => 'TimeScaleStretch',
+    },
+    timeScaleParamsQuality  => { },
+    timeScaleParamsFrameSize=> { Writable => 'real' },
+    timeScaleParamsFrameOverlappingPercentage => { Writable => 'real' },
+    resampleParams => {
+        SubDirectory => { },
+        Struct => 'ResampleStretch',
+    },
+    resampleParamsQuality   => { },
+    beatSpliceParams => {
+        SubDirectory => { },
+        Struct => 'BeatSpliceStretch',
+    },
+    beatSpliceParamsUseFileBeatsMarker => { Writable => 'boolean' },
+    beatSpliceParamsRiseInDecibel      => { Writable => 'real' },
+    beatSpliceParamsRiseInTimeDuration => { },
+    timeSignature   => { },
+    scaleType       => { },
 );
 
 # PDF schema properties (pdf)
@@ -409,12 +607,12 @@ group names.
     WRITE_PROC => \&WriteXMP,
     WRITABLE => 'string',
     NOTES => q{
-Adobe PDF schema tags.  The official XMP specification only defines
-Keywords, PDFVersion and Producer.  The other tags are included because they
-have been observed in PDF files, but Creator, Subject and Title aren't made
-writable because their names conflict with XMP-dc tags.
+        Adobe PDF schema tags.  The official XMP specification only defines
+        Keywords, PDFVersion and Producer.  The other tags are included because they
+        have been observed in PDF files, but Creator, Subject and Title are avoided
+        when writing due to name conflicts with XMP-dc tags.
     },
-    Author          => { Groups => { 2 => 'Author' } }, #PH
+    Author      => { Groups => { 2 => 'Author' } }, #PH
     ModDate => { #PH
         Groups => { 2 => 'Time' },
         Writable => 'date',
@@ -427,9 +625,9 @@ writable because their names conflict with XMP-dc tags.
         Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    Creator     => { Groups => { 2 => 'Author' }, Writable => 0 },
-    Subject     => { Writable => 0 },
-    Title       => { Writable => 0 },
+    Creator     => { Groups => { 2 => 'Author' }, Avoid => 1 },
+    Subject     => { Avoid => 1 },
+    Title       => { Avoid => 1 },
     Keywords    => { },
     PDFVersion  => { },
     Producer    => { Groups => { 2 => 'Author' } },
@@ -465,46 +663,80 @@ writable because their names conflict with XMP-dc tags.
     Urgency         => { Writable => 'integer' },
 );
 
-# Photoshop Camera Raw Schema properties (crs) - not documented
+# Photoshop Camera Raw Schema properties (crs) - (ref 8)
 %Image::ExifTool::XMP::crs = (
     GROUPS => { 1 => 'XMP-crs', 2 => 'Image' },
     NAMESPACE => 'crs',
     WRITE_PROC => \&WriteXMP,
     WRITABLE => 'string',
     NOTES => 'Photoshop Camera Raw Schema tags.',
-    Version         => { },
+    AutoBrightness  => { Writable => 'boolean' },
+    AutoContrast    => { Writable => 'boolean' },
+    AutoExposure    => { Writable => 'boolean' },
+    AutoShadows     => { Writable => 'boolean' },
+    BlueHue         => { Writable => 'integer' },
+    BlueSaturation  => { Writable => 'integer' },
+    Brightness      => { Writable => 'integer' },
+    CameraProfile   => { },
+    ChromaticAberrationB=> { Writable => 'integer' },
+    ChromaticAberrationR=> { Writable => 'integer' },
+    ColorNoiseReduction => { Writable => 'integer' },
+    Contrast        => { Writable => 'integer' },
+    CropTop         => { Writable => 'real' },
+    CropLeft        => { Writable => 'real' },
+    CropBottom      => { Writable => 'real' },
+    CropRight       => { Writable => 'real' },
+    CropAngle       => { Writable => 'real' },
+    CropWidth       => { Writable => 'real' },
+    CropHeight      => { Writable => 'real' },
+    CropUnits => {
+        Writable => 'integer',
+        PrintConv => {
+            0 => 'pixels',
+            1 => 'inches',
+            2 => 'cm',
+        },
+    },
+    Exposure        => { Writable => 'real' },
+    GreenHue        => { Writable => 'integer' },
+    GreenSaturation => { Writable => 'integer' },
+    HasCrop         => { Writable => 'boolean' },
+    HasSettings     => { Writable => 'boolean' },
+    LuminanceSmoothing  => { Writable => 'integer' },
     RawFileName     => { },
-    WhiteBalance    => { },
-    Exposure        => { },
-    Shadows         => { },
-    Brightness      => { },
-    Contrast        => { },
-    Saturation      => { },
-    Sharpness       => { },
-    LuminanceSmoothing  => { },
-    ColorNoiseReduction => { },
-    ChromaticAberrationR=> { },
-    ChromaticAberrationB=> { },
-    VignetteAmount  => { },
-    VignetteMidpoint=> { },
-    ShadowTint      => { },
-    RedHue          => { },
-    RedSaturation   => { },
-    GreenHue        => { },
-    GreenSaturation => { },
-    BlueHue         => { },
-    BlueSaturation  => { },
-);
-
-# Auxiliary schema properties (aux) - not documented
-%Image::ExifTool::XMP::aux = (
-    GROUPS => { 1 => 'XMP-aux', 2 => 'Camera' },
-    NAMESPACE => 'aux',
-    WRITE_PROC => \&WriteXMP,
-    WRITABLE => 'string',
-    NOTES => 'Photoshop Auxiliary schema tags.',
-    Lens            => { },
-    SerialNumber    => { },
+    RedHue          => { Writable => 'integer' },
+    RedSaturation   => { Writable => 'integer' },
+    Saturation      => { Writable => 'integer' },
+    Shadows         => { Writable => 'integer' },
+    ShadowTint      => { Writable => 'integer' },
+    Sharpness       => { Writable => 'integer' },
+    Temperature     => { Writable => 'integer' },
+    Tint            => { Writable => 'integer' },
+    ToneCurve       => { List => 'Seq' },
+    ToneCurveName => {
+        PrintConv => {
+            Linear           => 'Linear',
+           'Medium Contrast' => 'Medium Contrast',
+           'Strong Contrast' => 'Strong Contrast',
+            Custom           => 'Custom',
+        },
+    },
+    Version         => { },
+    VignetteAmount  => { Writable => 'integer' },
+    VignetteMidpoint=> { Writable => 'integer' },
+    WhiteBalance    => {
+        PrintConv => {
+           'As Shot'    => 'As Shot',
+            Auto        => 'Auto',
+            Daylight    => 'Daylight',
+            Cloudy      => 'Cloudy',
+            Shade       => 'Shade',
+            Tungsten    => 'Tungsten',
+            Fluorescent => 'Fluorescent',
+            Flash       => 'Flash',
+            Custom      => 'Custom',
+        },
+    },
 );
 
 # Tiff schema properties (tiff)
@@ -548,6 +780,13 @@ writable because their names conflict with XMP-dc tags.
             '4 1' => 'YCbCr4:1:1',
             '4 2' => 'YCbCr4:1:0',
             '1 2' => 'YCbCr4:4:0',
+        },
+    },
+    YCbCrPositioning => {
+        Writable => 'integer',
+        PrintConv => {
+            1 => 'Centered',
+            2 => 'Co-sited',
         },
     },
     XResolution => { Writable => 'rational' },
@@ -1104,6 +1343,22 @@ writable because their names conflict with XMP-dc tags.
     },
 );
 
+# Auxiliary schema properties (aux) - not fully documented
+%Image::ExifTool::XMP::aux = (
+    GROUPS => { 1 => 'XMP-aux', 2 => 'Camera' },
+    NAMESPACE => 'aux',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'Photoshop Auxiliary schema tags.',
+    Firmware        => { }, #7
+    FlashCompensation => { Writable => 'rational' }, #7
+    ImageNumber     => { }, #7
+    LensInfo        => { }, #7
+    Lens            => { },
+    OwnerName       => { }, #7
+    SerialNumber    => { },
+);
+
 # IPTC Core schema properties (Iptc4xmpCore)
 %Image::ExifTool::XMP::iptcCore = (
     GROUPS => { 1 => 'XMP-iptcCore', 2 => 'Author' },
@@ -1111,10 +1366,10 @@ writable because their names conflict with XMP-dc tags.
     WRITE_PROC => \&WriteXMP,
     WRITABLE => 'string',
     NOTES => q{
-IPTC Core schema tags.  The actual IPTC Core namespace schema prefix is
-C<Iptc4xmpCore>, which is the name used in the file, but ExifTool uses
-C<iptcCore> to generate the family 1 group name of XMP-iptcCore because
-XMP-Iptc4xmpCore is a bit lengthy.
+        IPTC Core schema tags.  The actual IPTC Core namespace schema prefix is
+        C<Iptc4xmpCore>, which is the name used in the file, but ExifTool uses
+        C<iptcCore> to generate the family 1 group name of XMP-iptcCore because
+        XMP-Iptc4xmpCore is a bit lengthy.
     },
     CountryCode         => { Groups => { 2 => 'Location' } },
     CreatorContactInfo => {
@@ -1141,8 +1396,8 @@ XMP-Iptc4xmpCore is a bit lengthy.
     NAMESPACE => 'PixelLive',
     WRITE_PROC => \&WriteXMP,
     NOTES => q{
-PixelLive schema tags.  These tags are not writable because they are
-uncommon and there are name conflicts with other more common tags.
+        PixelLive schema tags.  These tags are not writable because they are
+        uncommon and there are name conflicts with other more common tags.
     },
     AUTHOR    => { Name => 'Author', Groups => { 2 => 'Author'} },
     COMMENTS  => { Name => 'Comments' },
@@ -1180,11 +1435,12 @@ uncommon and there are name conflicts with other more common tags.
     WRITE_PROC => \&WriteXMP,
     WRITABLE => 'string',
     NOTES => q{
-Description Explorer schema tags.  These tags are not very common, and some
-are not made writable due to name conflicts with other XMP tags.
+        Description Explorer schema tags.  These tags are not very common.  The
+        Source and Rating tags are avoided when writing due to name conflicts with
+        other XMP tags.
     },
     crc32       => { Name => 'CRC32', Writable => 'integer' },
-    source      => { Writable => 0 },
+    source      => { Avoid => 1 },
     shortdescription => {
         Name => 'ShortDescription',
         Writable => 'lang-alt',
@@ -1203,7 +1459,7 @@ are not made writable due to name conflicts with other XMP tags.
         },
     },
     revision    => { },
-    rating      => { Writable => 0 },
+    rating      => { Avoid => 1 },
     os          => { Name => 'OS', Writable => 'integer' },
     ffid        => { Name => 'FFID' },
 );
@@ -1614,16 +1870,17 @@ This module is loaded automatically by Image::ExifTool when required.
 
 =head1 DESCRIPTION
 
-XMP stands for Extensible Metadata Platform.  It is a format based on XML that
-Adobe developed for embedding metadata information in image files.  This module
-contains the definitions required by Image::ExifTool to read XMP information.
+XMP stands for Extensible Metadata Platform.  It is a format based on XML
+that Adobe developed for embedding metadata information in image files. 
+This module contains the definitions required by Image::ExifTool to read XMP
+information.
 
 =head1 AUTHOR
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

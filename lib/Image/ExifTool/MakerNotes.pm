@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 # conditional list of maker notes
 # Notes:
@@ -329,7 +329,7 @@ $VERSION = '1.19';
     {
         Name => 'MakerNoteSony',
         # (starts with "SONY DSC \0")
-        Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE}!~/^(SRF|SR2)$/',
+        Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE}!~/^(SRF|SR2|DNG)$/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
             # validate the maker note because this is sometimes garbage
@@ -340,7 +340,7 @@ $VERSION = '1.19';
     },
     {
         Name => 'MakerNoteSonySRF',
-        Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE} eq "SRF"',
+        Condition => '$self->{CameraMake}=~/^SONY/ and $$valPt =~ /^\x01\x00/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::SRF',
             Start => '$valuePtr',
@@ -381,7 +381,8 @@ foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
 #------------------------------------------------------------------------------
 # Get normal offset (absolute) of value data from end of maker note IFD
 # Inputs: 0) ExifTool object reference
-# Returns: (array) 0) expected offset, 1) relative flag (undef for no change)
+# Returns: Array: 0) expected offset (undef if unkown),
+#          1) relative flag (undef for no change)
 # Notes: Directory size should be validated before calling this routine
 sub GetMakerNoteOffset($)
 {
@@ -394,10 +395,13 @@ sub GetMakerNoteOffset($)
         $offset = 6;
     } elsif ($make =~ /^KYOCERA/) {
         $offset = 12;
-    } elsif ($make =~ /^OLYMPUS/ and $model =~ /^E-(1|300)\b/) {
+    } elsif ($make =~ /^OLYMPUS/ and $model =~ /^E-(1|300|330)\b/) {
         $offset = 16;
-    } elsif ($make =~ /^OLYMPUS/ and $model =~ /^C2500L\b/) {
-        $offset = undef;   # these are just weird
+    } elsif ($make =~ /^OLYMPUS/ and
+        # these Olympus models are just weird
+        $model =~ /^(C2500L|C-1Z?|C-5000Z|X-2|C720UZ|C725UZ|C150|C2Z|E-10|E-20|FerrariMODEL2003|u20D|u10D)\b/)
+    {
+        $offset = undef;
     } elsif ($make =~ /^(Panasonic|SONY|JVC|TOSHIBA)\b/) {
         $offset = 0;
     } elsif ($make =~ /^PENTAX/) {
@@ -544,7 +548,7 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
                 # verify format
                 next IFD_TRY if $format < 1 or $format > 13;
                 # count must be reasonable
-                next IFD_TRY if $count == 0 or $count > 0x10000;
+                next IFD_TRY if $count == 0 or $count & 0xff000000;
             }
             $$dirInfo{DirStart} += $offset;    # update directory start
             $$dirInfo{DirLen} -= $offset;
@@ -564,7 +568,7 @@ sub ProcessUnknown($$$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $success = 0;
 
-    my $loc = LocateIFD($exifTool,$dirInfo);
+    my $loc = LocateIFD($exifTool, $dirInfo);
     if (defined $loc) {
         if ($exifTool->Options('Verbose') > 1) {
             my $out = $exifTool->Options('TextOut');
@@ -602,8 +606,8 @@ maker notes in EXIF information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

@@ -12,7 +12,7 @@ use strict;
 
 use Image::ExifTool::Fixup;
 
-sub InsertWritableProperties($$;$$);
+sub InsertWritableProperties($$;$);
 
 # some information may be stored in different IFD's with the same meaning.
 # Use this lookup to decide when we should delete information that is stored
@@ -260,6 +260,7 @@ my %writeTable = (
         WriteGroup => 'IFD0',
     },
     0x0211 => {             # YCbCrCoefficients
+        Protected => 1,
         Writable => 'rational64u',
         WriteGroup => 'IFD0',
         Count => 3,
@@ -271,6 +272,7 @@ my %writeTable = (
         Count => 2,
     },
     0x0213 => {             # YCbCrPositioning
+        Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'IFD0',
     },
@@ -311,10 +313,21 @@ my %writeTable = (
         Writable => 'int32u',   # but write int32u format code in IFD
         WriteGroup => 'IFD0',
     },
+    0x8546 => {             # SEMInfo
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+    },
     0x8822 => 'int16u',     # ExposureProgram
     0x8824 => 'string',     # SpectralSensitivity
     0x8827 => 'int16u',     # ISO
-    0x882a => 'int16s',     # TimeZoneOffset
+    0x882a => {             # TimeZoneOffset
+        Writable => 'int16s',
+        Count => -1, # can be 1 or 2
+        Notes => q{
+            1 or 2 values: 1. The time zone offset of DateTimeOriginal from GMT in
+            hours, 2. If present, the time zone offset of ModifyDate
+        },
+    },
     0x882b => 'int16u',     # SelfTimerMode
     0x9000 => 'undef',      # ExifVersion
     0x9003 => {             # DateTimeOriginal
@@ -371,6 +384,7 @@ my %writeTable = (
         Writable => 'rational64u',
         PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
+    0x9212 => 'string',     # SecurityClassification
     0x9214 => {             # SubjectLocation
         Writable => 'int16u',
         Count => 4,  # write this SubjectLocation with 4 and the other with 2 values
@@ -421,7 +435,10 @@ my %writeTable = (
     0xa002 => 'int16u',     # ExifImageWidth (could also be int32u)
     0xa003 => 'int16u',     # ExifImageLength (could also be int32u)
     0xa004 => 'string',     # RelatedSoundFile
-    0xa20b => 'rational64u',# FlashEnergy
+    0xa20b => {             # FlashEnergy
+        Writable => 'rational64u',
+        Count => -1, # 1 or 2 (ref 12)
+    },
 #    0xa20c => 'undef',      # SpatialFrequencyResponse
     0xa20e => 'rational64u',# FocalPlaneXResolution
     0xa20f => 'rational64u',# FocalPlaneYResolution
@@ -704,7 +721,7 @@ my %writeTable = (
 );
 
 # insert our writable properties into main EXIF tag table
-InsertWritableProperties('Image::ExifTool::Exif::Main', \%writeTable, 'ExifIFD', \&CheckExif);
+InsertWritableProperties('Image::ExifTool::Exif::Main', \%writeTable, \&CheckExif);
 
 #------------------------------------------------------------------------------
 # Get binary CFA Pattern from a text string
@@ -742,7 +759,7 @@ sub GetCFAPattern($)
 sub CheckExif($$$)
 {
     my ($exifTool, $tagInfo, $valPtr) = @_;
-    my $format = $$tagInfo{Format} || $$tagInfo{Writable};
+    my $format = $$tagInfo{Format} || $$tagInfo{Writable} || $tagInfo->{Table}->{WRITABLE};
     if (not $format or $format eq '1') {
         if ($tagInfo->{Groups}->{0} eq 'MakerNotes') {
             return undef;   # OK to have no format for makernotes
@@ -756,10 +773,10 @@ sub CheckExif($$$)
 #------------------------------------------------------------------------------
 # insert writable properties into main tag table
 # Inputs: 0) tag table name, 1) reference to writable properties
-#         2) [optional] default WriteGroup, 3) Optional CHECK_PROC reference
-sub InsertWritableProperties($$;$$)
+#         2) [optional] CHECK_PROC reference
+sub InsertWritableProperties($$;$)
 {
-    my ($tableName, $writeTablePtr, $writeGroup, $checkProc) = @_;
+    my ($tableName, $writeTablePtr, $checkProc) = @_;
     my $tag;
     my $tagTablePtr = GetTagTable($tableName);
     $checkProc and $tagTablePtr->{CHECK_PROC} = $checkProc;
@@ -769,7 +786,6 @@ sub InsertWritableProperties($$;$$)
         if (@infoList) {
             my $tagInfo;
             foreach $tagInfo (@infoList) {
-                $writeGroup and $$tagInfo{WriteGroup} = $writeGroup;
                 if (ref $writeInfo) {
                     my $key;
                     foreach $key (%$writeInfo) {
@@ -780,9 +796,6 @@ sub InsertWritableProperties($$;$$)
                 }
             }
         } else {
-            if ($writeGroup and not $$writeInfo{WriteGroup}) {
-                $$writeInfo{WriteGroup} = $writeGroup;
-            }
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $writeInfo);
         }
     }
@@ -828,6 +841,8 @@ sub RebuildMakerNotes($$$)
         $newTool->{CameraModel} = $exifTool->{CameraModel};
         # set FILE_TYPE to JPEG so PREVIEW_INFO will be generated
         $newTool->{FILE_TYPE} = 'JPEG';
+        # drop any large tags
+        $newTool->{DROP_TAGS} = 1;
         # rewrite maker notes
         $rtnValue = $newTool->WriteDirectory(\%subdirInfo, $tagTablePtr);
         if (defined $rtnValue and length $rtnValue) {
@@ -903,6 +918,17 @@ sub UpdateTiffEnd($$)
 }
 
 #------------------------------------------------------------------------------
+# Handle error while writing EXIF
+# Inputs: 0) ExifTool ref, 1) error string, 2) flag set for minor error
+# Returns: undef on fatal error, or '' if minor error is ignored
+sub ExifErr($$$)
+{
+    my ($exifTool, $errStr, $minor) = @_;
+    return undef if $exifTool->Error($errStr, $minor);
+    return '';
+}
+
+#------------------------------------------------------------------------------
 # Write EXIF directory
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
 #         2) tag table reference
@@ -940,7 +966,7 @@ sub WriteExif($$$)
     my ($nextIfdPos, %offsetData, $inMakerNotes);
     my $deleteAll = 0;
 
-    $inMakerNotes = 1 if $dirName eq 'MakerNotes';
+    $inMakerNotes = 1 if $tagTablePtr->{GROUPS}->{0} eq 'MakerNotes';
     my $ifd;
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # loop through each IFD
@@ -1006,15 +1032,13 @@ sub WriteExif($$$)
             my $offset = $dirStart + $dataPos;
             my ($buff, $buf2);
             unless ($raf->Seek($offset + $base, 0) and $raf->Read($buff,2) == 2) {
-                $exifTool->Error("Bad IFD or truncated file in $dirName");
-                return undef;
+                return ExifErr($exifTool, "Bad IFD or truncated file in $dirName", $inMakerNotes);
             }
             my $len = 12 * Get16u(\$buff,0);
             # also read next IFD pointer if reading multiple IFD's
             $len += 4 if $$dirInfo{Multi};
             unless ($raf->Read($buf2, $len) == $len) {
-                $exifTool->Error("Error reading $dirName");
-                return undef;
+                return ExifErr($exifTool, "Error reading $dirName", $inMakerNotes);
             }
             UpdateTiffEnd($exifTool, $offset+$base+2+$len);
             $buff .= $buf2;
@@ -1033,8 +1057,7 @@ sub WriteExif($$$)
             $numEntries = Get16u($dataPt, $dirStart);
             $len = 2 + 12 * $numEntries;
             if ($dirStart + $len > $dataLen) {
-                $exifTool->Error("Truncated $dirName directory");
-                return undef;
+                return ExifErr($exifTool, "Truncated $dirName directory", $inMakerNotes);
             }
             # sort entries if necessary (but not in maker notes IFDs)
             unless ($inMakerNotes) {
@@ -1099,7 +1122,7 @@ sub WriteExif($$$)
         my $index = 0;
         my $lastTagID = -1;
         my ($oldInfo, $oldFormat, $oldFormName, $oldCount, $oldSize, $oldValue);
-        my ($readFormName, $readCount); # format for reading old value(s)
+        my ($readFormat, $readFormName, $readCount); # format for reading old value(s)
         my ($entry, $valueDataPt, $valueDataPos, $valueDataLen, $valuePtr);
         my $oldID = -1;
         my $newID = -1;
@@ -1115,7 +1138,7 @@ sub WriteExif($$$)
                 if ($index < $numEntries) {
                     $entry = $dirStart + 2 + 12 * $index;
                     $oldID = Get16u($dataPt, $entry);
-                    $oldFormat = Get16u($dataPt, $entry+2);
+                    $readFormat = $oldFormat = Get16u($dataPt, $entry+2);
                     $readCount = $oldCount = Get32u($dataPt, $entry+4);
                     if ($oldFormat < 1 or $oldFormat > 13) {
                         # don't write out null directory entry
@@ -1126,8 +1149,7 @@ sub WriteExif($$$)
                             $dirBuff .= ("\0" x 12) if $$dirInfo{FixBase};
                             next;
                         }
-                        $exifTool->Error("Bad format ($oldFormat) for $dirName entry $index");
-                        return undef;
+                        return ExifErr($exifTool, "Bad format ($oldFormat) for $dirName entry $index", $inMakerNotes);
                     }
                     $readFormName = $oldFormName = $formatName[$oldFormat];
                     $valueDataPt = $dataPt;
@@ -1151,12 +1173,10 @@ sub WriteExif($$$)
                                     $valuePtr = 0;
                                     $readFromFile = 1;
                                 } else {
-                                    $exifTool->Error("Error reading value for $dirName entry $index");
-                                    return undef;
+                                    return ExifErr($exifTool, "Error reading value for $dirName entry $index", $inMakerNotes);
                                 }
                             } else {
-                                $exifTool->Error("Bad EXIF directory pointer for $dirName entry $index");
-                                return undef;
+                                return ExifErr($exifTool, "Bad EXIF directory pointer for $dirName entry $index", $inMakerNotes);
                             }
                         }
                     }
@@ -1169,15 +1189,22 @@ sub WriteExif($$$)
                         $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \$oldValue);
                     }
                     # override format we use to read the value if specified
-                    if ($oldInfo and $$oldInfo{Format}) {
-                        $readFormName = $$oldInfo{Format};
-                        my $readFormat = $formatNumber{$readFormName};
-                        unless ($readFormat) {
-                            $exifTool->Error("Bad format name $readFormName");
-                            return undef;
+                    if ($oldInfo) {
+                        if ($$oldInfo{Drop} and $$exifTool{DROP_TAGS}) {
+                            # don't rewrite this tag
+                            ++$index;
+                            $oldID = $newID;
+                            next;
                         }
-                        # adjust number of items to read if format size changed
-                        $readCount = $oldSize / $formatSize[$readFormat];
+                        if ($$oldInfo{Format}) {
+                            $readFormName = $$oldInfo{Format};
+                            $readFormat = $formatNumber{$readFormName};
+                            unless ($readFormat) {
+                                return ExifErr($exifTool, "Bad format name $readFormName", $inMakerNotes);
+                            }
+                            # adjust number of items to read if format size changed
+                            $readCount = $oldSize / $formatSize[$readFormat];
+                        }
                     }
                     if ($oldID <= $lastTagID and not $inMakerNotes) {
                         my $str = $oldInfo ? "$$oldInfo{Name} tag" : sprintf('tag 0x%x',$oldID);
@@ -1268,9 +1295,7 @@ sub WriteExif($$$)
                             $ifdFormName = $oldFormName unless $ifdFormName and $ifdFormName ne '1';
                             $newFormat = $formatNumber{$newFormName};
                         }
-                        if ($inMakerNotes and $oldFormName ne 'string' and
-                            $oldFormName ne 'undef')
-                        {
+                        if ($inMakerNotes and $readFormName ne 'string' and $readFormName ne 'undef') {
                             # keep same size in maker notes unless string or binary
                             $newCount = $oldCount * $formatSize[$oldFormat] / $formatSize[$newFormat];
                         }
@@ -1541,16 +1566,15 @@ sub WriteExif($$$)
                         my $subdirName = $newInfo->{Groups}->{1};
                         # must handle sub-IFD's specially since the values
                         # are actually offsets to subdirectories
-                        unless ($oldCount) {   # can't have zero count
-                            $exifTool->Error("$dirName entry $index has zero count");
-                            return undef;
+                        unless ($readCount) {   # can't have zero count
+                            return ExifErr($exifTool, "$dirName entry $index has zero count", $inMakerNotes);
                         }
                         my $i;
                         $newValue = '';    # reset value because we regenerate it below
-                        for ($i=0; $i<$oldCount; ++$i) {
-                            my $off = $i * $formatSize[$oldFormat];
+                        for ($i=0; $i<$readCount; ++$i) {
+                            my $off = $i * $formatSize[$readFormat];
                             my $pt = Image::ExifTool::ReadValue($valueDataPt, $valuePtr + $off,
-                                            $oldFormName, 1, $oldSize - $off);
+                                            $readFormName, 1, $oldSize - $off);
                             my $subdirStart = $pt - $dataPos;
                             my %subdirInfo = (
                                 Base => $base,
@@ -1571,8 +1595,7 @@ sub WriteExif($$$)
                                         $subSize = 12 * Get16u(\$buff, 0) and
                                         $raf->Read($buf2,$subSize) == $subSize)
                                 {
-                                    $exifTool->Error("Can't read $subdirName data");
-                                    return undef;
+                                    return ExifErr($exifTool, "Can't read $subdirName data", $inMakerNotes);
                                 }
                                 UpdateTiffEnd($exifTool, $pt+$base+2+$subSize);
                                 $buff .= $buf2;
@@ -1593,7 +1616,7 @@ sub WriteExif($$$)
                             # (will set to actual offset later when we know what it is)
                             $newValue .= Set32u(0xfeedf00d);
                             my ($offset, $where);
-                            if ($oldCount > 1) {
+                            if ($readCount > 1) {
                                 $offset = length($valBuff) + $i * 4;
                                 $where = 'valBuff';
                             } else {
@@ -1680,12 +1703,12 @@ sub WriteExif($$$)
                     # save original values (for updating TIFF_END later)
                     my @vals;
                     if ($isNew <= 0) {
-                        @vals = ReadValue(\$oldValue, 0, $oldFormName, $oldCount, $oldSize);
+                        @vals = ReadValue(\$oldValue, 0, $readFormName, $readCount, $oldSize);
                     }
                     # only support int32 pointers (for now)
                     if ($formatSize[$newFormat] != 4 and $$newInfo{IsOffset}) {
                         die "Internal error (Offset not int32)" if $isNew > 0;
-                        die "Wrong count!" if $newCount != $oldCount;
+                        die "Wrong count!" if $newCount != $readCount;
                         # change to int32
                         $newFormName = 'int32u';
                         $newFormat = $formatNumber{$newFormName};
@@ -2112,8 +2135,8 @@ This file contains routines to write EXIF metadata.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

@@ -240,14 +240,15 @@ sub ShiftComponents($$$$$)
             }
         } elsif ($v >= $max + $min) {
             if ($i == 2) {
-                do {
+                for (;;) {
                     # test against number of days in current month
                     my $mon = $$toTime[$i-1] + $c;
                     my $days = DaysInMonth($mon, $$toTime[$i-2]);
                     last if $v <= $days;
                     $v -= $days;
                     ++$c;
-                } while ($v > 28);
+                    last if $v <= 28;
+                }
             } else {
                 my $fc = ($v - $max - $min) / $max;
                 # carry ($c) must be smallest integer greater than $fc
@@ -566,8 +567,8 @@ philosophy).
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

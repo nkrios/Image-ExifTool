@@ -54,21 +54,22 @@ Image::ExifTool - Read and write meta information
 =head1 DESCRIPTION
 
 ExifTool provides an extensible set of perl modules to read and write meta
-information in image, audio and video files.
+information in image, audio and video files, including the maker note
+information of many digital cameras by various manufacturers such as Canon,
+Casio, FujiFilm, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
+Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
 
-ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, GeoTIFF, ICC Profile, Photoshop
-IRB, AFCP and ID3 meta information from JPG, JP2, TIFF, GIF, BMP, PICT,
-QTIF, PNG, MNG, JNG, MIFF, PPM, PGM, PBM, XMP, EPS, PS, AI, PDF, PSD, DCM,
-ACR, THM, CRW, CR2, MRW, NEF, PEF, ORF, RAF, RAW, SRF, SR2, MOS, X3F and DNG
-images, MP3, WAV, WMA and AIFF audio files, and AVI, MOV, MP4 and WMV
-videos. ExifTool also extracts information from the maker notes of many
-digital cameras by various manufacturers including Canon, Casio, FujiFilm,
-JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon, Olympus/Epson,
-Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
+ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, GeoTIFF, ICC Profile,
+Photoshop IRB, AFCP and ID3 meta information from JPG, JP2, TIFF, GIF, BMP,
+PICT, QTIF, PNG, MNG, JNG, MIFF, PPM, PGM, PBM, EPS, PS, AI, PDF, PSD, DCM,
+ACR, THM, CRW, CR2, ERF, MRW, NEF, PEF, ORF, RAF, RAW, SRF, SR2, MOS, X3F
+and DNG images, MP3, WAV, WMA and AIFF audio files, AVI, MOV, MP4 and WMV
+videos, and XMP, ICC and MIE data files.
 
-ExifTool writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, Photoshop IRB and
-AFCP meta information to JPEG, TIFF, GIF, PSD, XMP, PPM, PGM, PBM, PNG, MNG,
-JNG, CRW, THM, CR2, MRW, NEF, PEF, MOS and DNG images.
+ExifTool writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, ICC Profile,
+Photoshop IRB and AFCP meta information to JPEG, TIFF, GIF, EPS, PS, PSD,
+XMP, ICC, MIE, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, ERF, MRW, NEF,
+PEF, MOS and DNG images.
 
 =head1 METHODS
 
@@ -95,13 +96,15 @@ L</ExtractInfo> to extract the information, L</GetInfo> to generate the
 information hash, and L</GetTagList> for the returned tag list.
 
     # Return meta information for 2 tags only (procedural)
-    $info = ImageInfo($filename, $tag1, $tag2)
+    $info = ImageInfo($filename, $tag1, $tag2);
 
     # Return information about an open image file (object-oriented)
-    $info = $exifTool->ImageInfo(\*FILE)
+    $info = $exifTool->ImageInfo(\*FILE);
 
     # Return information from image data in memory for specified tags
-    $info = ImageInfo(\$imageData, \@tagList, \%options)
+    %options = (PrintConv => 0);
+    @tagList = qw(filename imagesize xmp:creator exif:* -ifd1:*);
+    $info = ImageInfo(\$imageData, \@tagList, \%options);
 
     # Extract information from an embedded thumbnail image
     $info = ImageInfo('image.jpg', 'thumbnailimage');
@@ -136,15 +139,27 @@ member functions.  Must be the first argument if used.
 
 The first scalar argument is taken to be the file name unless an earlier
 argument specified the image data via a file reference (file ref) or data
-reference (SCALAR ref). The remaining scalar arguments are names of tags for
-requested information.  If no tags are specified, all possible information
-is extracted.  Tag names may begin with '-' indicating tags to exclude.  The
-tag names are case-insensitive, so note that the returned tags may not be
-exactly the same as the requested tags. For this reason it is best to use
-either the keys of the returned hash or the elements of the tag array when
-accessing the return values.  See
-L<Image::ExifTool::TagNames|Image::ExifTool::TagNames> for a complete list
-of ExifTool tag names.
+reference (SCALAR ref).  The remaining scalar arguments are names of tags
+for requested information.  If no tags are specified, all possible
+information is extracted.
+
+Tag names are case-insensitive and may be prefixed by an optional group name
+followed by a colon.  The group name may begin with a family number
+(ie. '1IPTC:Keywords'), to restrict matches to a specific family.  A tag
+name of '*' may be used, thus allowing 'GROUP:*' to represent all tags in a
+specific group, or a group name of '*' may be used, in which case all
+available instances of the specified tag are returned regardless of the
+L<Duplicates> setting (ie. '*:WhiteBalance').  And finally, a leading '-'
+indicates tags to be excluded (ie. '-IFD1:*').
+
+Note that keys in the returned information hash and elements of the returned
+tag list are not necessarily the same as these tag names -- group names are
+removed, the case may be changed, and an instance number may be added.  For
+this reason it is best to use either the keys of the returned hash or the
+elements of the tag array when accessing the tag values.
+
+See L<Image::ExifTool::TagNames|Image::ExifTool::TagNames> for a complete
+list of ExifTool tag names.
 
 =item File ref
 
@@ -175,11 +190,12 @@ as arguments to L</ImageInfo> take precedence over L</Options> settings.
 =item Return Values:
 
 L</ImageInfo> returns a reference to a hash of tag/value pairs. The keys of
-the hash are the tag identifiers, which are similar to the tag names but my
-have an embedded copy number if more than one tag with that name was found
-in the image.  Use L</GetTagName> to remove the copy number from the tag.
-Note that the case of the tags may not be the same as requested. Here is a
-simple example to print out the information returned by L</ImageInfo>:
+the hash are the tag identifiers, which are similar to the tag names but may
+have an embedded instance number if more than one tag with that name was
+found in the image.  Use L</GetTagName> to remove the instance number from
+the tag.  Note that the case of the tags may not be the same as requested.
+Here is a simple example to print out the information returned by
+L</ImageInfo>:
 
     foreach (sort keys %$info) {
         print "$_ => $$info{$_}\n";
@@ -306,6 +322,11 @@ flag, 2kB is saved for files with XMP data.
 
 Flag to calculate Composite tags automatically.  Default is 1.
 
+=item Compress
+
+Write new values in compressed format if possible.  Has no effect unless
+Compress::Zlib is installed.  Default is 0.
+
 =item CoordFormat
 
 Format for printing GPS coordinates.  This is a printf format string with
@@ -323,7 +344,8 @@ output for the same coordinate using various formats:
 
 Format for printing EXIF date/time.  See C<strftime> in the L<POSIX> package
 for details about the format string.  The default format is equivalent to
-"%Y:%m:%d %H:%M:%S".
+"%Y:%m:%d %H:%M:%S".  If date can not be converted, value is left unchanged
+unless the StrictDate option is set.
 
 =item Duplicates
 
@@ -395,6 +417,11 @@ Specifies order to sort tags in returned list:
            number.  If # is not specified, Group0 is assumed.
            See GetGroup for a list of groups.
   Input  - Sort in same order as input tag arguments (default)
+
+=item StrictDate
+
+Flag to return undefined value for any date which can't be converted when
+the DateFormat option is used.  Default is 0.
 
 =item TextOut
 
@@ -658,14 +685,16 @@ Get the value of a specified tag.  The returned value is either the
 human-readable (PrintConv) value, the converted machine-readable (ValueConv)
 value, or the original raw (Raw) value.  If the value type is not specified,
 the PrintConv value is returned if the PrintConv option is set, otherwise
-the ValueConv value is returned.
+the ValueConv value is returned.  The PrintConv values are same as the
+values returned by L</ImageInfo> and L</GetInfo> in the tag/value hash
+unless the PrintConv option is disabled.
 
-In the case of a list (as can happen with the 'Keywords' tag for instance),
-PrintConv returns a comma-separated string of values in scalar context,
-while ValueConv returns a reference to an array of values.  In list context,
-L</GetValue> returns the list for both PrintConv and ValueConv.  The
-PrintConv values are the values returned by L</ImageInfo> and L</GetInfo> in
-the tag/value hash unless the PrintConv option is disabled.
+Tags which represent lists of multiple values (as may happen with 'Keywords'
+for example) are handled specially.  In scalar context, the returned
+PrintConv value for these tags is either a comma-separated string of values
+or a list reference (depending on the List option setting), and the
+ValueConv value is always a list reference.  But in list context,
+L</GetValue> always returns the list itself.
 
     # PrintConv example
     my $val = $exifTool->GetValue($tag);
@@ -748,6 +777,7 @@ name for each value, or call with a reference to the list of values.
 
     # set a tag in a specific group
     $exifTool->SetNewValue(Headline => $val, Group => 'XMP');
+    $exifTool->SetNewValue('XMP:Headline' => $val);  # equivalent
 
     # shift original date/time back by 1 hour
     $exifTool->SetNewValue(DateTimeOriginal => '1:00', Shift => -1);
@@ -929,6 +959,7 @@ deleted (ie. if SetNewValue was called without a value).
 Return the total number of new values set.
 
     $numSet = $exifTool->CountNewValues();
+    ($numSet, $numQuick) = $exifTool->CountNewValues();
 
 =over 4
 
@@ -938,7 +969,10 @@ Return the total number of new values set.
 
 =item Return Values:
 
-The total number of tags with new values set.
+In scalar context, returns the total number of tags with new values set.  In
+list context, also returns the number of "quick" tag values which have been
+set.  "Quick" tags are tags like FileName and FileModifyDate which can be
+changed without the need to rewrite the file.
 
 =back
 
@@ -1000,8 +1034,39 @@ Set the file modification time from the new value of the FileModifyDate tag.
 
 =item Return Value:
 
-1 if the time was changed, 0 if the FileModifyDate tag wasn't set, or -1 if
-there was an error setting the time.
+1 if the time was changed, 0 if nothing was done, or -1 if there was an
+error setting the time.
+
+=head2 SetFileName
+
+Set the file name and directory.  If not specified, the new file name is
+derived from the new values of the FileName and Directory tags.  If the
+FileName tag contains a '/', then the file is renamed into a new directory. 
+If FileName ends with '/', then it is taken as a directory name and the file
+is moved into the new directory.  The new value for the Directory tag takes
+precedence over any directory specified in FileName.
+
+    $result = $exifTool->SetFileName($file);
+    $result = $exifTool->SetFileName($file, $newName);
+
+=over 4
+
+=item Inputs:
+
+0) ExifTool object reference
+
+1) Current file name
+
+2) [optional] New file name
+
+=item Return Value:
+
+1 if the file name or directory was changed, 0 if nothing was done, or -1 if
+there was an error renaming the file.
+
+=item Notes:
+
+Will not overwrite existing files. New directories are created as necessary.
 
 =back
 
@@ -1176,7 +1241,7 @@ is closed.
 =head2 GetTagName [static]
 
 Get name of tag from tag key.  This is a convenience function that
-strips the embedded copy number, if it exists, from the tag key.
+strips the embedded instance number, if it exists, from the tag key.
 
 Note: "static" in the heading above indicates that the function does not
 require an ExifTool object reference as the first argument.  All functions
@@ -1192,7 +1257,8 @@ documented below are also static.
 
 =item Return Value:
 
-Tag name.  This is the same as the tag key but has the copy number removed.
+Tag name.  This is the same as the tag key but has the instance number
+removed.
 
 =back
 
@@ -1296,25 +1362,28 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (General Location):
 
-AFCP, AIFF, APP12, ASF, BMP, Composite, DICOM, DNG, EXIF, ExifTool, File,
-GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIFF, MNG,
-MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript, PrintIM, QuickTime,
-RIFF, SigmaRaw, XMP
+AFCP, AIFF, APP12, APP14, ASF, BMP, Composite, DICOM, DNG, EXIF, ExifTool,
+File, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIE, MIFF,
+MNG, MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript, PrintIM,
+QuickTime, RIFF, SigmaRaw, XMP
 
 =item Family 1 (Specific Location):
 
-AFCP, AIFF, APP12, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio, Composite,
-DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff, GlobParamIFD,
-ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1,
-ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JVC,
-Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw, Leaf,
-LeafSubIFD, MIFF, MNG, MakerUnknown, MetaIFD, Minolta, Nikon, NikonCapture,
-NikonPreview, Olympus, PDF, PICT, PNG, Panasonic, Pentax, Photoshop,
-PostScript, PrintIM, QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma,
-SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc,
-XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop,
-XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights,
-XMP-xmpTPg
+AFCP, AIFF, APP12, APP14, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio,
+Composite, DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff,
+GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
+ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC,
+InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
+KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-Video, MIFF, MNG, MakerUnknown,
+MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, Olympus,
+PDF, PICT, PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM,
+QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD,
+Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
+XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
+XMP-xxx
 
 =item Family 2 (Category):
 
@@ -1386,8 +1455,8 @@ this can only be done with XMP files.
 
 Copyright 2003-2006, Phil Harvey
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 CREDITS
 

@@ -35,7 +35,7 @@ use Image::ExifTool::Exif;
 
 sub WriteCanon($$$);
 
-$VERSION = '1.27';
+$VERSION = '1.34';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
@@ -99,65 +99,74 @@ my %canonLensTypes = ( #4
 
 # Canon model ID numbers
 %canonModelID = (
-    0x01010000 => 'PowerShot A30',
-    0x01040000 => 'PowerShot S300 / Digital IXUS 300 / IXY Digital 300',
-    0x01060000 => 'PowerShot A20',
-    0x01080000 => 'PowerShot A10',
-    0x01090000 => 'PowerShot S110 / Digital IXUS v / IXY Digital 200',
-    0x01100000 => 'PowerShot G2',
-    0x01110000 => 'PowerShot S40',
-    0x01120000 => 'PowerShot S30',
-    0x01130000 => 'PowerShot A40',
-    0x01140000 => 'EOS D30',
-    0x01150000 => 'PowerShot A100',
-    0x01160000 => 'PowerShot S200 / Digital IXUS v2 / IXY Digital 200a', 
-    0x01170000 => 'PowerShot A200',
-    0x01180000 => 'PowerShot S330 / Digital IXUS 330 / IXY Digital 300a',
-    0x01190000 => 'PowerShot G3',
-    0x01210000 => 'PowerShot S45',
-    0x01230000 => 'PowerShot SD100 / Digital IXUS II / IXY Digital 30',
-    0x01240000 => 'PowerShot S230 / Digital IXUS v3 / IXY Digital 320',
-    0x01250000 => 'PowerShot A70',
-    0x01260000 => 'PowerShot A60',
-    0x01270000 => 'PowerShot S400 / Digital IXUS 400 / IXY Digital 400',
-    0x01290000 => 'PowerShot G5',
-    0x01300000 => 'PowerShot A300',
-    0x01310000 => 'PowerShot S50',
-    0x01340000 => 'PowerShot A80',
-    0x01350000 => 'PowerShot SD10 / Digital IXUS i / IXY Digital L',
-    0x01360000 => 'PowerShot S1 IS',
-    0x01370000 => 'PowerShot Pro1',
-    0x01380000 => 'PowerShot S70',
-    0x01390000 => 'PowerShot S60',
-    0x01400000 => 'PowerShot G6',
-    0x01410000 => 'PowerShot S500 / Digital IXUS 500 / IXY Digital 500',
-    0x01420000 => 'PowerShot A75',
-    0x01440000 => 'PowerShot SD110 / Digital IXUS IIs / IXY Digital 30a',
-    0x01450000 => 'PowerShot A400',
-    0x01470000 => 'PowerShot A310',
-    0x01490000 => 'PowerShot A85',
-    0x01520000 => 'PowerShot S410 / Digital IXUS 430 / IXY Digital 450',
-    0x01530000 => 'PowerShot A95',
-    0x01540000 => 'PowerShot SD300 / Digital IXUS 40 / IXY Digital 50',
-    0x01550000 => 'PowerShot SD200 / Digital IXUS 30 / IXY Digital 40',
-    0x01560000 => 'PowerShot A520',
-    0x01570000 => 'PowerShot A510',
-    0x01590000 => 'PowerShot SD20 / Digital IXUS i5 / IXY Digital L2',
-    0x01640000 => 'PowerShot S2 IS',
-    0x01650000 => 'PowerShot SD430 / IXUS Wireless / IXY Wireless',
-    0x01660000 => 'PowerShot SD500 / Digital IXUS 700 / IXY Digital 600',
-    0x01668000 => 'EOS D60',
-    0x01700000 => 'PowerShot SD30 / Digital IXUS i zoom / IXY Digital L3',
-    0x01750000 => 'PowerShot A410',
-    0x01760000 => 'PowerShot S80',
-    0x01780000 => 'PowerShot A620',
-    0x01790000 => 'PowerShot A610',
-    0x01810000 => 'PowerShot SD450 / Digital IXUS 55 / IXY Digital 60',
-    0x01870000 => 'PowerShot SD400 / Digital IXUS 50 / IXY Digital 55',
-    0x01900000 => 'PowerShot SD550 / Digital IXUS 750 / IXY Digital 700',
-    0x03010000 => 'PowerShot Pro90 IS',
-    0x04040000 => 'PowerShot G1',
-    0x06040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
+    0x1010000 => 'PowerShot A30',
+    0x1040000 => 'PowerShot S300 / Digital IXUS 300 / IXY Digital 300',
+    0x1060000 => 'PowerShot A20',
+    0x1080000 => 'PowerShot A10',
+    0x1090000 => 'PowerShot S110 / Digital IXUS v / IXY Digital 200',
+    0x1100000 => 'PowerShot G2',
+    0x1110000 => 'PowerShot S40',
+    0x1120000 => 'PowerShot S30',
+    0x1130000 => 'PowerShot A40',
+    0x1140000 => 'EOS D30',
+    0x1150000 => 'PowerShot A100',
+    0x1160000 => 'PowerShot S200 / Digital IXUS v2 / IXY Digital 200a', 
+    0x1170000 => 'PowerShot A200',
+    0x1180000 => 'PowerShot S330 / Digital IXUS 330 / IXY Digital 300a',
+    0x1190000 => 'PowerShot G3',
+    0x1210000 => 'PowerShot S45',
+    0x1230000 => 'PowerShot SD100 / Digital IXUS II / IXY Digital 30',
+    0x1240000 => 'PowerShot S230 / Digital IXUS v3 / IXY Digital 320',
+    0x1250000 => 'PowerShot A70',
+    0x1260000 => 'PowerShot A60',
+    0x1270000 => 'PowerShot S400 / Digital IXUS 400 / IXY Digital 400',
+    0x1290000 => 'PowerShot G5',
+    0x1300000 => 'PowerShot A300',
+    0x1310000 => 'PowerShot S50',
+    0x1340000 => 'PowerShot A80',
+    0x1350000 => 'PowerShot SD10 / Digital IXUS i / IXY Digital L',
+    0x1360000 => 'PowerShot S1 IS',
+    0x1370000 => 'PowerShot Pro1',
+    0x1380000 => 'PowerShot S70',
+    0x1390000 => 'PowerShot S60',
+    0x1400000 => 'PowerShot G6',
+    0x1410000 => 'PowerShot S500 / Digital IXUS 500 / IXY Digital 500',
+    0x1420000 => 'PowerShot A75',
+    0x1440000 => 'PowerShot SD110 / Digital IXUS IIs / IXY Digital 30a',
+    0x1450000 => 'PowerShot A400',
+    0x1470000 => 'PowerShot A310',
+    0x1490000 => 'PowerShot A85',
+    0x1520000 => 'PowerShot S410 / Digital IXUS 430 / IXY Digital 450',
+    0x1530000 => 'PowerShot A95',
+    0x1540000 => 'PowerShot SD300 / Digital IXUS 40 / IXY Digital 50',
+    0x1550000 => 'PowerShot SD200 / Digital IXUS 30 / IXY Digital 40',
+    0x1560000 => 'PowerShot A520',
+    0x1570000 => 'PowerShot A510',
+    0x1590000 => 'PowerShot SD20 / Digital IXUS i5 / IXY Digital L2',
+    0x1640000 => 'PowerShot S2 IS',
+    0x1650000 => 'PowerShot SD430 / IXUS Wireless / IXY Wireless',
+    0x1660000 => 'PowerShot SD500 / Digital IXUS 700 / IXY Digital 600',
+    0x1668000 => 'EOS D60',
+    0x1700000 => 'PowerShot SD30 / Digital IXUS i zoom / IXY Digital L3',
+    0x1740000 => 'PowerShot A430',
+    0x1750000 => 'PowerShot A410',
+    0x1760000 => 'PowerShot S80',
+    0x1780000 => 'PowerShot A620',
+    0x1790000 => 'PowerShot A610',
+    0x1800000 => 'PowerShot SD630 / Digital IXUS 65 / IXY Digital 80',
+    0x1810000 => 'PowerShot SD450 / Digital IXUS 55 / IXY Digital 60',
+    0x1870000 => 'PowerShot SD400 / Digital IXUS 50 / IXY Digital 55',
+    0x1880000 => 'PowerShot A420',
+    0x1900000 => 'PowerShot SD550 / Digital IXUS 750 / IXY Digital 700',
+    0x1920000 => 'PowerShot A700',
+    0x1940000 => 'PowerShot SD700 IS / Digital IXUS 800 IS',
+    0x1950000 => 'PowerShot S3 IS',
+    0x1960000 => 'PowerShot A540',
+    0x1970000 => 'PowerShot SD600 / Digital IXUS 60 / IXY Digital 70',
+    0x1990000 => 'PowerShot A530',
+    0x3010000 => 'PowerShot Pro90 IS',
+    0x4040000 => 'PowerShot G1',
+    0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
     0x80000001 => 'EOS-1D',
     0x80000167 => 'EOS-1DS',
     0x80000168 => 'EOS 10D',
@@ -168,6 +177,7 @@ my %canonLensTypes = ( #4
     0x80000189 => 'EOS Digital Rebel XT / 350D / Kiss Digital N',
     0x80000213 => 'EOS 5D',
     0x80000232 => 'EOS-1D Mark II N',
+    0x80000234 => 'EOS 30D',
 );
 
 my %canonQuality = (
@@ -346,7 +356,7 @@ my %longBin = (
     },
     0xf => [
         {   # used by 1DmkII, 1DsMkII and 1DmkIIN
-            Name => 'CanonCustomFunctions1D',
+            Name => 'CustomFunctions1D',
             Condition => '$self->{CameraModel} =~ /\b1D/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
@@ -354,7 +364,7 @@ my %longBin = (
             },
         },
         {
-            Name => 'CanonCustomFunctions5D',
+            Name => 'CustomFunctions5D',
             Condition => '$self->{CameraModel} =~ /\b5D/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
@@ -362,7 +372,7 @@ my %longBin = (
             },
         },
         {
-            Name => 'CanonCustomFunctions10D',
+            Name => 'CustomFunctions10D',
             Condition => '$self->{CameraModel} =~ /\b10D/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
@@ -370,7 +380,7 @@ my %longBin = (
             },
         },
         {
-            Name => 'CanonCustomFunctions20D',
+            Name => 'CustomFunctions20D',
             Condition => '$self->{CameraModel} =~ /\b20D/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
@@ -378,7 +388,15 @@ my %longBin = (
             },
         },
         {
-            Name => 'CanonCustomFunctions350D',
+            Name => 'CustomFunctions30D',
+            Condition => '$self->{CameraModel} =~ /\b30D/',
+            SubDirectory => {
+                Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+                TagTable => 'Image::ExifTool::CanonCustom::Functions30D',
+            },
+        },
+        {
+            Name => 'CustomFunctions350D',
             Condition => '$self->{CameraModel} =~ /\b(350D|REBEL XT|Kiss Digital N)/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
@@ -386,7 +404,7 @@ my %longBin = (
             },
         },
         {
-            Name => 'CanonCustomFunctionsD30',
+            Name => 'CustomFunctionsD30',
             Condition => '$self->{CameraModel} =~ /\bD30\b/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
@@ -394,7 +412,7 @@ my %longBin = (
             },
         },
         {
-            Name => 'CanonCustomFunctionsD60',
+            Name => 'CustomFunctionsD60',
             Condition => '$self->{CameraModel} =~ /\bD60\b/',
             SubDirectory => {
                 # the stored size in the D60 apparently doesn't include the size word:
@@ -404,7 +422,7 @@ my %longBin = (
             },
         },
         {
-            Name => 'CanonCustomFunctionsUnknown',
+            Name => 'CustomFunctionsUnknown',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::FuncsUnknown',
@@ -439,7 +457,7 @@ my %longBin = (
     },
     # 0x19 => 'InteropFooter', # what is this for?
     0x90 => {   # used by 1D and 1Ds
-        Name => 'CanonCustomFunctions1D',
+        Name => 'CustomFunctions1D',
         SubDirectory => {
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::CanonCustom::Functions1D',
@@ -556,7 +574,7 @@ my %longBin = (
             },
         },
         {   # (int16u[796])
-            Condition => '$self->{CameraModel} =~ /\b(1D Mark II N|5D)$/',
+            Condition => '$self->{CameraModel} =~ /\b(1D Mark II N|5D|30D)$/',
             Name => 'ColorBalance3',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::ColorBalance3',
@@ -567,11 +585,26 @@ my %longBin = (
             %longBin,
         },
     ],
+    0x4002 => { #PH
+        # unknown data block in some JPEG and CR2 images
+        # (5kB for most models, but 22kb for 5D and 30D)
+        Name => 'UnknownBlock1',
+        Format => 'undef',
+        Unknown => 1,
+        ValueConv => '\$val',
+    },
     0x4003 => { #PH
         Name => 'ColorInfo',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::ColorInfo',
         },
+    },
+    0x4005 => { #PH
+        Name => 'UnknownBlock2',
+        Notes => 'unknown 49kB block, not copied to JPEG images',
+        Unknown => 1,
+        Drop => 1, # not found in JPEG images (too large for APP1 anyway)
+        ValueConv => '\$val',
     },
 );
 
@@ -769,8 +802,14 @@ my %longBin = (
         RawConv => '$val ? $val : undef', # don't use if value is zero
         PrintConv => \%canonLensTypes,
     },
-    23 => 'LongFocal',
-    24 => 'ShortFocal',
+    23 => {
+        Name => 'LongFocal',
+        Format => 'int16u',
+    },
+    24 => {
+        Name => 'ShortFocal',
+        Format => 'int16u',
+    },
     25 => 'FocalUnits',
     26 => { #9
         Name => 'MaxAperture',
@@ -890,6 +929,7 @@ my %longBin = (
     2 => { #4
         Name => 'FocalPlaneXSize',
         # focal plane image dimensions in 1/1000 inch -- convert to mm
+        RawConv => '$val < 40 ? undef : $val',  # must be reasonable
         ValueConv => '$val * 25.4 / 1000',
         ValueConvInv => 'int($val * 1000 / 25.4 + 0.5)',
         PrintConv => 'sprintf("%.2fmm",$val)',
@@ -897,6 +937,7 @@ my %longBin = (
     },
     3 => {
         Name => 'FocalPlaneYSize',
+        RawConv => '$val < 40 ? undef : $val',  # must be reasonable
         ValueConv => '$val * 25.4 / 1000',
         ValueConvInv => 'int($val * 1000 / 25.4 + 0.5)',
         PrintConv => 'sprintf("%.2fmm",$val)',
@@ -1206,7 +1247,7 @@ my %longBin = (
         Notes => '5D only',
     },
     0xd0 => {
-        Name => 'PictureNumber',
+        Name => 'ImageNumber',
         Format => 'int16u',
         Condition => '$self->{CameraModel} =~ /\b5D/',
         Notes => '5D only',
@@ -1561,7 +1602,7 @@ my %longBin = (
         PrintConv => {
             0 => 'Off',
             1 => 'On (shift AB)',
-            2 => 'On (shift GB)',
+            2 => 'On (shift GM)',
         },
     },
     12 => 'WBBracketValueAB', #PH
@@ -1701,7 +1742,7 @@ my %longBin = (
     25 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16u[4]' },
     29 => 'ColorTempAsShot',
     30 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16u[4]' },
-    34 => 'ColorTempAuto2',
+    34 => 'ColorTempAuto',
     35 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16u[4]' },
     39 => 'ColorTempDaylight',
     40 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16u[4]' },
@@ -2029,6 +2070,25 @@ my %longBin = (
             1 => '2nd-curtain sync',
         },
     },
+    WB_RGGBLevels => {
+        Require => {
+            0 => 'Canon:WhiteBalance',
+        },
+        Desire => {
+            1 => 'WB_RGGBLevelsAsShot',
+            # indices of the following entries correspond to Canon:WhiteBalance + 2
+            2 => 'WB_RGGBLevelsAuto',
+            3 => 'WB_RGGBLevelsDaylight',
+            4 => 'WB_RGGBLevelsCloudy',
+            5 => 'WB_RGGBLevelsTungsten',
+            6 => 'WB_RGGBLevelsFluorescent',
+            7 => 'WB_RGGBLevelsFlash',
+            8 => 'WB_RGGBLevelsCustom',
+           10 => 'WB_RGGBLevelsShade',
+           11 => 'WB_RGGBLevelsKelvin',
+        },
+        ValueConv => '$val[1] ? $val[1] : $val[($val[0] || 0) + 2]',
+    },
 );
 
 # add our composite tags
@@ -2275,8 +2335,8 @@ Canon maker notes in EXIF information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

@@ -24,7 +24,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.25';
+$VERSION = '1.27';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -157,7 +157,7 @@ my %psdMap = (
     0x041e => { Unknown => 1, Name => 'URL_List' },
     0x0421 => { Unknown => 1, Name => 'VersionInfo' },
     0x0422 => {
-        Name => 'EXIFInfo', #PH (Found in DOS-style EPS file and PSD files)
+        Name => 'EXIFInfo', #PH (Found in EPS and PSD files)
         SubDirectory => {
             TagTable=> 'Image::ExifTool::Exif::Main',
             ProcessProc => \&Image::ExifTool::ProcessTIFF,
@@ -321,26 +321,20 @@ sub ProcessPhotoshop($$$)
     # scan through resource blocks:
     # Format: 0) Type, 4 bytes - "8BIM"
     #         1) TagID,2 bytes
-    #         2) Name, null terminated string padded to even no. bytes
+    #         2) Name, pascal string padded to even no. bytes
     #         3) Size, 4 bytes - N
     #         4) Data, N bytes
     while ($pos + 8 < $dirEnd) {
         my $type = substr($$dataPt, $pos, 4);
         if ($type ne '8BIM') {
-            $exifTool->Warn("Bad Photoshop data $type");
+            $exifTool->Warn("Bad Photoshop IRB resource");
             last;
         }
         my $tag = Get16u($dataPt, $pos + 4);
-        $pos += 6;
-        # get resource block name (null-terminated, padded to an even # of bytes)
-        my $name = '';
-        my $bytes;
-        while ($pos + 2 < $dirEnd) {
-            $bytes = substr($$dataPt, $pos, 2);
-            $pos += 2;
-            $name .= $bytes;
-            last if $bytes =~ /\0/;
-        }
+        my $namelen = 1 + Get8u($dataPt, $pos + 6);
+        ++$namelen if $namelen & 0x01;
+        # skip resource block name (pascal string, padded to an even # of bytes)
+        $pos += 6 + $namelen;
         if ($pos + 4 > $dirEnd) {
             $exifTool->Warn("Bad Photoshop resource block");
             last;
@@ -348,17 +342,8 @@ sub ProcessPhotoshop($$$)
         my $size = Get32u($dataPt, $pos);
         $pos += 4;
         if ($size + $pos > $dirEnd) {
-            # hack necessary because earlier versions of photoshop
-            # sometimes don't put null terminator on string if it
-            # ends at an even word boundary - PH 02/25/04
-            if (defined($bytes) and $bytes eq "\0\0") {
-                $pos -= 2;
-                $size = Get32u($dataPt, $pos-4);
-            }
-            if ($size + $pos > $dirEnd) {
-                $exifTool->Warn("Bad Photoshop resource data size $size");
-                last;
-            }
+            $exifTool->Warn("Bad Photoshop resource data size $size");
+            last;
         }
         $success = 1;
         $exifTool->HandleTag($tagTablePtr, $tag, undef,
@@ -388,7 +373,7 @@ sub ProcessPSD($$)
     $raf->Read($data, 30) == 30 or return 0;
     $data =~ /^8BPS\0\x01/ or return 0;
     SetByteOrder('MM');
-    $exifTool->SetFileType('Photoshop');    # set the FileType tag
+    $exifTool->SetFileType();    # set the FileType tag
     my %dirInfo = (
         DataPt => \$data,
         DirStart => 0,
@@ -400,7 +385,7 @@ sub ProcessPSD($$)
         $raf->Read($data, $len) == $len or return -1;
         Write($outfile, $data) or $err = 1; # write color mode data
         # initialize map of where things are written
-        Image::ExifTool::InitWriteDirs($exifTool, \%psdMap);
+        $exifTool->InitWriteDirs(\%psdMap);
     } else {
         # process the header
         $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Header');
@@ -459,8 +444,8 @@ contains the definitions to read this information.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

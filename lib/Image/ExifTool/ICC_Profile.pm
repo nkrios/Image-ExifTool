@@ -19,11 +19,13 @@ package Image::ExifTool::ICC_Profile;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
+sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
+sub WriteICC_Profile($$;$);
 
 # illuminant type definitions
 my %illuminantType = (
@@ -36,11 +38,28 @@ my %illuminantType = (
     7 => 'Equi-Power (E)',
     8 => 'F8',
 );
+my %profileClass = (
+    scnr => 'Input Device Profile',
+    mntr => 'Display Device Profile',
+    prtr => 'Output Device Profile',
+   'link'=> 'DeviceLink Profile',
+    spac => 'ColorSpace Conversion Profile',
+    abst => 'Abstract Profile',
+    nmcl => 'NamedColor Profile',
+);
 
 # ICC_Profile tag table
 %Image::ExifTool::ICC_Profile::Main = (
     GROUPS => { 2 => 'Image' },
     PROCESS_PROC => \&ProcessICC_Profile,
+    WRITE_PROC => \&WriteICC_Profile,
+    NOTES => q{
+        ICC profile information is used in many different file types including JPEG,
+        TIFF, PDF, PostScript, Photoshop, PNG, MIFF, PICT, QuickTime and some RAW
+        formats.  While the tags listed below are not individually writable, the
+        entire profile itself can be accessed via the extra 'ICC_Profile' tag, but
+        this tag is neither extracted nor written unless specified explicitly.
+    },
     A2B0 => 'AToB0',
     A2B1 => 'AToB1',
     A2B2 => 'AToB2',
@@ -201,15 +220,7 @@ my %illuminantType = (
     12 => {
         Name => 'ProfileClass',
         Format => 'string[4]',
-        PrintConv => {
-            scnr => 'Input Device Profile',
-            mntr => 'Display Device Profile',
-            prtr => 'Output Device Profile',
-           'link'=> 'DeviceLink Profile',
-            spac => 'ColorSpace Conversion Profile',
-            abst => 'Abstract Profile',
-            nmcl => 'NamedColor Profile',
-        },
+        PrintConv => \%profileClass,
     },
     16 => {
         Name => 'ColorSpaceData',
@@ -278,7 +289,7 @@ my %illuminantType = (
         },
     },
     68 => {
-        Name => 'ProfileConnectionSpace',
+        Name => 'ConnectionSpaceIlluminant',
         Format => 'fixed32s[3]',  # xyz
     },
     80 => {
@@ -541,9 +552,96 @@ sub FormatICCTag($$$)
 }
 
 #------------------------------------------------------------------------------
+# Write ICC profile file
+# Inputs: 0) ExifTool object reference, 1) Reference to directory information
+# Returns: 1 on success, 0 if this wasn't a valid ICC file,
+#          or -1 if a write error occurred
+sub WriteICC($$)
+{
+    my ($exifTool, $dirInfo) = @_;
+    my $buff = WriteICC_Profile($exifTool, $dirInfo);
+    if (defined $buff and length $buff) {
+        Write($$dirInfo{OutFile}, $buff) or return -1;
+    } else {
+        $exifTool->Error('No ICC information to write');
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Write ICC data record
+# Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
+#         2) tag table reference
+# Returns: ICC data block (may be empty if no ICC data)
+# Notes: Increments ExifTool CHANGED flag if changed
+sub WriteICC_Profile($$;$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    $exifTool or return 1;    # allow dummy access
+    my $newValueHash = $exifTool->GetNewValueHash($Image::ExifTool::Extra{ICC_Profile});
+    return undef unless Image::ExifTool::IsOverwriting($newValueHash);
+    my $val = Image::ExifTool::GetNewValues($newValueHash);
+    $val = '' unless defined $val;
+    ++$exifTool->{CHANGED};
+    return $val;
+}
+
+#------------------------------------------------------------------------------
+# Validate ICC data
+# Inputs: 0) ICC data reference
+# Returns: error string or undef on success
+sub ValidateICC($)
+{
+    my $valPtr = shift;
+    my $err;
+    length($$valPtr) < 24 and return 'Invalid ICC profile';
+    $profileClass{substr($$valPtr, 12, 4)} or $err = 'profile class';
+    my $col = substr($$valPtr, 16, 4); # ColorSpaceData
+    my $con = substr($$valPtr, 20, 4); # ConnectionSpace
+    my $match = '(XYZ |Lab |Luv |YCbr|Yxy |RGB |GRAY|HSV |HLS |CMYK|CMY |[2-9A-F]CLR)';
+    $col =~ /$match/ or $err = 'color space';
+    $con =~ /$match/ or $err = 'connection space';
+    return $err ? "Invalid ICC profile (bad $err)" : undef;
+}
+
+#------------------------------------------------------------------------------
+# Process ICC profile file
+# Inputs: 0) ExifTool object reference, 1) Reference to directory information
+# Returns: 1 if this was an ICC file
+sub ProcessICC($$)
+{
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
+    my $buff;
+    $raf->Read($buff, 24) == 24 or return 0;
+    # check to see if this is a valid ICC profile file
+    return 0 if ValidateICC(\$buff);
+    $exifTool->SetFileType();
+    # read the profile
+    my $size = unpack('N', $buff);
+    if ($size < 128 or $size & 0x80000000) {
+        $exifTool->Error("Bad ICC Profile length ($size)");
+        return 1;
+    }
+    $raf->Seek(0, 0);
+    unless ($raf->Read($buff, $size)) {
+        $exifTool->Error('Truncated ICC profile');
+        return 1;
+    }
+    my %dirInfo = (
+        DataPt => \$buff,
+        DataLen => $size,
+        DirStart => 0,
+        DirLen => $size,
+    );
+    my $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
+    return ProcessICC_Profile($exifTool, \%dirInfo, $tagTablePtr);
+}
+
+#------------------------------------------------------------------------------
 # Process ICC_Profile APP13 record
 # Inputs: 0) ExifTool object reference, 1) Reference to directory information
-#         2) Tag table reference
+#         2) Tag table reference (undefined to read ICC file)
 # Returns: 1 on success
 sub ProcessICC_Profile($$$)
 {
@@ -552,16 +650,15 @@ sub ProcessICC_Profile($$$)
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
+    my $raf;
 
-    my $oldOrder = GetByteOrder();
     SetByteOrder('MM');     # ICC_Profile is always big-endian
 
     # check length of table
     my $len = Get32u($dataPt, $dirStart);
     if ($len != $dirLen or $len < 128) {
         $exifTool->Warn("Bad length ICC_Profile (length $len)");
-        SetByteOrder($oldOrder);
-        return 0;
+        return 0 if $len < 128 or $dirLen < $len;
     }
     my $pos = $dirStart + 128;  # position at start of table
     my $numEntries = Get32u($dataPt, $pos);
@@ -569,9 +666,13 @@ sub ProcessICC_Profile($$$)
         or $numEntries * 12 + 132 > $dirLen)
     {
         $exifTool->Warn("Bad ICC_Profile table ($numEntries entries)");
-        SetByteOrder($oldOrder);
         return 0;
     }
+    # extract binary ICC_Profile data block if binary mode or requested
+    if ($exifTool->{OPTIONS}->{Binary} or $exifTool->{REQ_TAG_LOOKUP}->{icc_profile}) {
+        $exifTool->FoundTag('ICC_Profile', substr($$dataPt, $dirStart, $dirLen));
+    }
+    
     if ($verbose) {
         $exifTool->VerboseDir('ICC_Profile', $numEntries, $dirLen);
         my $fakeInfo = { Name=>'ProfileHeader', SubDirectory => { } };
@@ -589,7 +690,7 @@ sub ProcessICC_Profile($$$)
         DirLen   => 128,
         Parent   => $$dirInfo{DirName},
     );
-    my $newTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::ICC_Profile::Header');
+    my $newTagTable = GetTagTable('Image::ExifTool::ICC_Profile::Header');
     $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable);
 
     $pos += 4;    # skip item count
@@ -630,7 +731,7 @@ sub ProcessICC_Profile($$$)
             my $name = $$tagInfo{Name};
             undef $newTagTable;
             if ($$subdir{TagTable}) {
-                $newTagTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
+                $newTagTable = GetTagTable($$subdir{TagTable});
                 unless ($newTagTable) {
                     warn "Unknown tag table $$subdir{TagTable}\n";
                     next;
@@ -665,7 +766,6 @@ sub ProcessICC_Profile($$$)
             $exifTool->FoundTag($tagInfo, $value);
         }
     }
-    SetByteOrder($oldOrder);
     delete $exifTool->{SET_GROUP1};
     return 1;
 }
@@ -694,8 +794,8 @@ data created on one device into another device's native color space.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

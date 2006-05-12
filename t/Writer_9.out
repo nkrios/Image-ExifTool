@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.08
 [File, File, Image]  - File Name: Writer_9_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 6 kB
+[File, File, Image]  - File Size: 9 kB
 [File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
@@ -16,7 +16,7 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: E775v1.3u
 [EXIF, IFD0, Time] 306 - Modify Date: 2003:12:04 06:46:52
-[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 4
 [EXIF, ExifIFD, Image] 33437 - F Number: 14.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
@@ -56,12 +56,11 @@
 [EXIF, ExifIFD, Camera] 41992 - Contrast: High
 [EXIF, ExifIFD, Camera] 41993 - Saturation: High
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
-[EXIF, ExifIFD, Image] 65000 - Owner Name: Phil Harvey
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 300
 [EXIF, IFD1, Image] 283 - Y Resolution: 300
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2450
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2412
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
@@ -138,19 +137,63 @@
 [MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
 [MakerNotes, Canon, Image] 22 - AF Points Used: (none)
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0mm
+[XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 8
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 8
+[XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Centered
+[ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: Lino
+[ICC_Profile, ICC-header, Image] 8 - Profile Version: 2.1.0
+[ICC_Profile, ICC-header, Image] 12 - Profile Class: Display Device Profile
+[ICC_Profile, ICC-header, Image] 16 - Color Space Data: RGB 
+[ICC_Profile, ICC-header, Image] 20 - Profile Connection Space: XYZ 
+[ICC_Profile, ICC-header, Time] 24 - Profile Date Time: 1998:02:09 06:49:00
+[ICC_Profile, ICC-header, Image] 36 - Profile File Signature: acsp
+[ICC_Profile, ICC-header, Image] 40 - Primary Platform: Microsoft Corporation
+[ICC_Profile, ICC-header, Image] 44 - CMM Flags: Not Embedded, Independent
+[ICC_Profile, ICC-header, Image] 48 - Device Manufacturer: IEC 
+[ICC_Profile, ICC-header, Image] 52 - Device Model: sRGB
+[ICC_Profile, ICC-header, Image] 56 - Device Attributes: Reflective, Glossy, Positive, Color
+[ICC_Profile, ICC-header, Image] 64 - Rendering Intent: Perceptual
+[ICC_Profile, ICC-header, Image] 68 - Connection Space Illuminant: 0.9642 1 0.82491
+[ICC_Profile, ICC-header, Image] 80 - Profile Creator: HP  
+[ICC_Profile, ICC-header, Image] 84 - Profile ID: 0
+[ICC_Profile, ICC_Profile, Image] cprt - Profile Copyright: Copyright (c) 1998 Hewlett-Packard Company
+[ICC_Profile, ICC_Profile, Image] desc - Profile Description: sRGB IEC61966-2.1
+[ICC_Profile, ICC_Profile, Image] wtpt - Media White Point: 0.95045 1 1.08905
+[ICC_Profile, ICC_Profile, Image] bkpt - Media Black Point: 0 0 0
+[ICC_Profile, ICC_Profile, Image] rXYZ - Red Matrix Column: 0.43607 0.22249 0.01392
+[ICC_Profile, ICC_Profile, Image] gXYZ - Green Matrix Column: 0.38515 0.71687 0.09708
+[ICC_Profile, ICC_Profile, Image] bXYZ - Blue Matrix Column: 0.14307 0.06061 0.7141
+[ICC_Profile, ICC_Profile, Camera] dmnd - Device Mfg Desc: IEC http://www.iec.ch
+[ICC_Profile, ICC_Profile, Camera] dmdd - Device Model Desc: IEC 61966-2.1 Default RGB colour space - sRGB
+[ICC_Profile, ICC_Profile, Image] vued - Viewing Cond Desc: Reference Viewing Condition in IEC61966-2.1
+[ICC_Profile, ICC-view, Image] 8 - Viewing Cond Illuminant: 19.6445 20.3718 16.8089
+[ICC_Profile, ICC-view, Image] 20 - Viewing Cond Surround: 3.92889 4.07439 3.36179
+[ICC_Profile, ICC-view, Image] 32 - Viewing Cond Illuminant Type: D50
+[ICC_Profile, ICC_Profile, Image] lumi - Luminance: 76.03647 80 87.12462
+[ICC_Profile, ICC-meas, Image] 8 - Measurement Observer: CIE 1931
+[ICC_Profile, ICC-meas, Image] 12 - Measurement Backing: 0 0 0
+[ICC_Profile, ICC-meas, Image] 24 - Measurement Geometry: Unknown (0)
+[ICC_Profile, ICC-meas, Image] 28 - Measurement Flare: 0.999 %
+[ICC_Profile, ICC-meas, Image] 32 - Measurement Illuminant: D65
+[ICC_Profile, ICC_Profile, Image] tech - Technology: Cathode Ray Tube Display
+[ICC_Profile, ICC_Profile, Image] rTRC - Red Tone Reproduction Curve: (Binary data 2060 bytes)
+[ICC_Profile, ICC_Profile, Image] gTRC - Green Tone Reproduction Curve: (Binary data 2060 bytes)
+[ICC_Profile, ICC_Profile, Image] bTRC - Blue Tone Reproduction Curve: (Binary data 2060 bytes)
 [Composite, Composite, Image]  - Aperture: 14.0
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
+[Composite, Composite, Camera]  - Blue Balance: 1.19062
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 52.7mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 4.26 m
+[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+[Composite, Composite, Camera]  - Red Balance: 2.06735

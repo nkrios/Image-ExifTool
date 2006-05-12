@@ -40,7 +40,9 @@ Panasonic tags are also used for Leica cameras.
 <td>FocusMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>1 = Auto
-  <br>2 = Manual</font></td></tr>
+  <br>2 = Manual
+  <br>4 = Auto, Focus button
+  <br>5 = Auto, Continuous</font></td></tr>
 <tr valign='top'>
 <td>0x000f</td>
 <td>SpotMode</td>
@@ -102,9 +104,10 @@ Panasonic tags are also used for Leica cameras.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0025</td>
-<td>SerialNumber</td>
-<td align='center'>Y</td>
-<td>&nbsp;</td></tr>
+<td>InternalSerialNumber</td>
+<td align='center'>undef[16]</td>
+<td><font size='-1'><font color="#666666">(this number is unique, and contains the date of manufacture, but is not the
+same as the number printed on the camera body)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0028</td>
 <td>ColorEffect</td>
@@ -114,6 +117,18 @@ Panasonic tags are also used for Leica cameras.
   <br>3 = Cool
   <br>4 = Black &amp; White
   <br>5 = Sepia</font></td></tr>
+<tr valign='top'>
+<td>0x002a</td>
+<td>BurstMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = Low/High Quality
+  <br>2 = Infinite</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x002b</td>
+<td>SequenceNumber</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x002c</td>
 <td>Contrast</td>
@@ -134,6 +149,13 @@ Panasonic tags are also used for Leica cameras.
   <br>1 = Low
   <br>2 = High</font></td></tr>
 <tr valign='top'>
+<td>0x002e</td>
+<td>SelfTimer</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Off
+  <br>2 = 10s
+  <br>3 = 2s</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td align='center'>-</td>
@@ -159,9 +181,104 @@ PV-DC3000, PV-L2001 and PV-SD4090.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Raw'>Panasonic Raw Tags</a></h2>
+These tags are found in IFD0 of Panasonic RAW images.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>0x0001</td>
+<td>PanasonicRawVersion</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0002</td>
+<td>SensorWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0003</td>
+<td>SensorHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0006</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0007</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0017</td>
+<td>ISO</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0024</td>
+<td>WB_RedLevel</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0025</td>
+<td>WB_GreenLevel</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0026</td>
+<td>WB_BlueLevel</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x010f</td>
+<td>Make</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0110</td>
+<td>Model</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0111</td>
+<td>StripOffsets</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0112</td>
+<td>Orientation</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = Horizontal (normal)
+  <br>2 = Mirror horizontal
+  <br>3 = Rotate 180
+  <br>4 = Mirror vertical
+  <br>5 = Mirror horizontal and rotate 270 CW
+  <br>6 = Rotate 90 CW
+  <br>7 = Mirror horizontal and rotate 90 CW
+  <br>8 = Rotate 270 CW</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0116</td>
+<td>RowsPerStrip</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x0117</td>
+<td>StripByteCounts</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x8769</td>
+<td>ExifOffset</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 6, 2006</i>
+<br><i>Last revised May 2, 2006</i>
 </body>
 </html>

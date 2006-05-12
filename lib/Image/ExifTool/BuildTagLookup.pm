@@ -26,7 +26,7 @@ use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP qw(EscapeHTML);
 use Image::ExifTool::Nikon;
 
-$VERSION = '1.27';
+$VERSION = '1.33';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -86,15 +86,18 @@ name may be followed by a number in square brackets to indicate the number
 of values written, or the number of characters in a fixed-length string
 (including a null terminator which is added if required).
 
-An asterisk (C<*>) in the B<Writable> column indicates a 'protected' tag
-which is not writable directly, but is set via a Composite tag.  A tilde
-(C<~>) indicates a tag this is only writable when print conversion is
-disabled (by setting PrintConv to 0, or using the -n option).  An
-exclamation point (C<!>) indicates a tag that is considered unsafe to write
-under normal circumstances.  These 'unsafe' tags are not set when calling
-SetNewValuesFromFile() or when using the exiftool -TagsFromFile option, and
-care should be taken when editing them manually since they may affect the
-way an image is rendered.
+An asterisk (C<*>) after an entry in the B<Writable> column indicates a
+'protected' tag which is not writable directly, but is set via a Composite
+tag.  A tilde (C<~>) indicates a tag this is only writable when print
+conversion is disabled (by setting PrintConv to 0, or using the -n option). 
+A slash (C</>) indicates an 'avoided' tag that is not created unless the
+group is specified (due to name conflicts with other tags).  An exclamation
+point (C<!>) indicates a tag that is considered unsafe to write under normal
+circumstances.  These 'unsafe' tags are not set when calling
+SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
+unless specified explicitly, and care should be taken when editing them
+manually since they may affect the way an image is rendered.  A plus sign
+(C<+>) indicates a 'list' tag which supports multiple instances.
 
 The HTML version of this document also lists possible B<Values> for all tags
 which have a discrete set of values, and gives B<Notes> for some tags.
@@ -176,7 +179,9 @@ information in many other file types (JPEG, TIFF, PDF, PNG to name a few).
 
 Many Photoshop tags are marked as Unknown (indicated by a question mark
 after the tag name) because the information they provide is not very useful
-under normal circumstances.  Unknown tags are not extracted unless the
+under normal circumstances (and because Adobe denied my application for
+their file format documentation -- apparently open source software is too
+big a concept for them).  These unknown tags are not extracted unless the
 Unknown (-u) option is used.
 },
     PrintIM => q{
@@ -196,7 +201,7 @@ Kodak "Meta" JPEG APP3 segment.
 These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn't
 make things easy for decoders because the meaning of some tags and the
 location where some information is stored is different for different camera
-models.  (Take MinoltaQuality for example, which may be located in 3
+models.  (Take MinoltaQuality for example, which may be located in 5
 different places.)
 },
     Olympus => q{
@@ -254,8 +259,8 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 ~head1 SEE ALSO
 
@@ -425,7 +430,7 @@ TagID:  foreach $tagID (@keys) {
                 my $writable;
                 if (defined $$tagInfo{Writable}) {
                     $writable = $$tagInfo{Writable};
-                } else {
+                } elsif (not $$tagInfo{SubDirectory}) {
                     $writable = $$table{WRITABLE};
                 }
                 $writable = $$tagInfo{Format} if $writable and $$tagInfo{Format};
@@ -433,6 +438,7 @@ TagID:  foreach $tagID (@keys) {
                     # flag a subdirectory by setting writable to '-'
                     # (if this is a writable subdirectory, prefix writable by '-')
                     $writable = '-' . ($$tagInfo{Writable} ? $writable : '');
+                    $writable = '-N' if $$tagInfo{SeparateTable} and $writable eq '-';
                 } else {
                     # not writable if we can't do the inverse conversions
                     my $noPrintConvInv;
@@ -446,7 +452,6 @@ TagID:  foreach $tagID (@keys) {
                             } else {
                                 $noPrintConvInv = 1;
                             }
-                            last;
                         }
                     }
                     if (not $writable) {
@@ -465,6 +470,8 @@ TagID:  foreach $tagID (@keys) {
                         $writable .= '*' if $$tagInfo{Protected} & 0x02;
                         $writable .= '!' if $$tagInfo{Protected} & 0x01;
                     }
+                    $writable .= '/' if $$tagInfo{Avoid};
+                    $writable .= '+' if $$tagInfo{List};
                 }
                 # don't duplicate a tag name unless an entry is different
                 my $name = $$tagInfo{Name};
@@ -495,7 +502,8 @@ TagID:  foreach $tagID (@keys) {
                 ++$tagExists{$lcName};
                 # only add writable tags to lookup table (for speed)
                 my $wflag = $$tagInfo{Writable};
-                next unless $writeProc and ($wflag or ($$table{WRITABLE} and not defined $wflag));
+                next unless $writeProc and ($wflag or ($$table{WRITABLE} and
+                    not defined $wflag and not $$tagInfo{SubDirectory}));
                 $tagLookup{$lcName} or $tagLookup{$lcName} = { };
                 # remember number for this table
                 my $tagIDs = $tagLookup{$lcName}->{$tableNum};
@@ -530,6 +538,7 @@ TagID:  foreach $tagID (@keys) {
             } else {
                 # convert non-printable characters to hex escape sequences
                 if ($tagID =~ s/([\x00-\x1f\x7f-\xff])/'\x'.unpack('H*',$1)/eg) {
+                    $tagID =~ s/\\x00/\\0/g;
                     next if $tagID eq 'jP\x1a\x1a'; # ignore abnormal JP2 signature tag
                     $tagIDstr = qq{"$tagID"};
                 } else {
@@ -596,6 +605,12 @@ sub WriteTagLookup($$)
 # write the tag lookup table
 #
     my $tag;
+    # verify that certain critical tag names aren't duplicated
+    foreach $tag (qw{filename directory}) {
+        next unless $$tagLookup{$tag};
+        my $n = scalar keys %{$$tagLookup{$tag}};
+        warn "Warning: $n writable '$tag' tags!\n" if $n > 1;
+    }
     print OUTFILE ");\n\n# lookup for all writable tags\nmy \%tagLookup = (\n";
     foreach $tag (sort keys %$tagLookup) {
         print OUTFILE "\t'$tag' => { ";
@@ -751,19 +766,26 @@ sub GetTableOrder()
         next unless $mainTables{$1};
         $fixOrder{$1} = [];     # fix the order of these tables
     }
-    my (@sortedTables, %fixPos);
+    my (@sortedTables, %fixPos, $pos);
     foreach (@orderedTables) {
         if (/^Image::ExifTool::(\w+)/ and $fixOrder{$1}) {
             my $fix = $fixOrder{$1};
-            @$fix or $fixPos{scalar(@sortedTables)} = $1;
+            unless (@$fix) {
+                $pos = @sortedTables;
+                $fixPos{$pos} or $fixPos{$pos} = [];
+                push @{$fixPos{$pos}}, $1;
+            }
             push @{$fix}, $_;
         } else {
             push @sortedTables, $_;
         }
     }
     # insert back in better order
-    foreach (reverse sort { $a <=> $b } keys %fixPos) {
-        splice(@sortedTables, $_, 0, @{$fixOrder{$fixPos{$_}}});
+    foreach $pos (reverse sort { $a <=> $b } keys %fixPos) {
+        my $fix = $fixPos{$pos};
+        foreach (@$fix) {
+            splice(@sortedTables, $pos, 0, @{$fixOrder{$_}});
+        }
     }
     return @sortedTables
 }
@@ -812,7 +834,7 @@ sub CloseHtmlFiles()
     my $success = 1;
     # get the date
     my ($sec,$min,$hr,$day,$mon,$yr) = localtime;
-    my @month = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+    my @month = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
     $yr += 1900;
     my $date = "$month[$mon] $day, $yr";
     my $htmlFile;
@@ -1196,8 +1218,8 @@ documentation.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 SEE ALSO
 

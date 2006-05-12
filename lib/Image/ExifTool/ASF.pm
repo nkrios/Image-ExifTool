@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -391,9 +391,15 @@ my %advancedContentEncryption = (
 %Image::ExifTool::ASF::StreamProperties = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Video' },
+    NOTES => 'Tags with index 54 and greater are conditional based on the StreamType.',
     0  => {
         Name => 'StreamType',
         Format => 'binary[16]',
+        RawConv => sub { # set ASF_STREAM_TYPE for use in conditional tags
+            my ($val, $exifTool) = @_;
+            $exifTool->{ASF_STREAM_TYPE} = $streamType{GetGUID($val)} || '';
+            return $val;
+        },
         ValueConv => 'Image::ExifTool::ASF::GetGUID($val)',
         PrintConv => \%streamType,
     },
@@ -409,11 +415,157 @@ my %advancedContentEncryption = (
         ValueConv => '$val / 1e7',
         PrintConv => '"$val sec"',
     },
+    
     48 => {
         Name => 'StreamNumber',
         Format => 'int16u',
         PrintConv => '($val & 0x7f) . ($val & 0x8000 ? " (encrypted)" : "")',
     },
+    54 => [
+        {
+            Condition => '$self->{ASF_STREAM_TYPE} eq "Audio"',
+            Name => 'AudioCodecID',
+            Format => 'int16u',
+            PrintHex => 1,
+            # from http://www.iana.org/assignments/wave-avi-codec-registry
+            # and http://developers.videolan.org/vlc/vlc/doc/doxygen/html/codecs_8h-source.html
+            PrintConv => {
+                0x0001 => 'Microsoft PCM',
+                0x0002 => 'Microsoft ADPCM',
+                0x0003 => 'IEEE Float',
+                0x0004 => 'Cmpaq VSELP',
+                0x0005 => 'IBM CVSD',
+                0x0006 => 'Microsoft A-Law',
+                0x0007 => 'Microsoft Mu-Law',
+                0x0008 => 'DTS Coherent Acoustics 1',
+                0x0010 => 'OKI ADPCM',
+                0x0011 => 'Intel DVI ADPCM',
+                0x0012 => 'Videologic MediaSpace ADPCM',
+                0x0013 => 'Sierra ADPCM',
+                0x0014 => 'G.723 ADPCM',
+                0x0015 => 'DSP Solution DIGISTD',
+                0x0016 => 'DSP Solution DIGIFIX',
+                0x0017 => 'Dialogic OKI ADPCM',
+                0x0018 => 'MediaVision ADPCM',
+                0x0019 => 'HP CU',
+                0x0020 => 'Yamaha ADPCM',
+                0x0021 => 'Speech Compression Sonarc',
+                0x0022 => 'DSP Group True Speech',
+                0x0023 => 'Echo Speech EchoSC1',
+                0x0024 => 'Audiofile AF36',
+                0x0025 => 'APTX',
+                0x0026 => 'AudioFile AF10',
+                0x0027 => 'Prosody 1612',
+                0x0028 => 'LRC',
+                0x0030 => 'Dolby AC2',
+                0x0031 => 'GSM610',
+                0x0032 => 'MSNAudio',
+                0x0033 => 'Antex ADPCME',
+                0x0034 => 'Control Res VQLPC',
+                0x0035 => 'Digireal',
+                0x0036 => 'DigiADPCM',
+                0x0037 => 'Control Res CR10',
+                0x0038 => 'NMS VBXADPCM',
+                0x0039 => 'Roland RDAC',
+                0x003a => 'EchoSC3',
+                0x003b => 'Rockwell ADPCM',
+                0x003c => 'Rockwell Digit LK',
+                0x003d => 'Xebec',
+                0x0040 => 'Antex Electronics G.721',
+                0x0041 => 'G.728 CELP',
+                0x0042 => 'MSG723',
+                0x0045 => 'G.726 ADPCM',
+                0x0050 => 'MPEG',
+                0x0052 => 'RT24',
+                0x0053 => 'PAC',
+                0x0055 => 'MPEG Layer 3',
+                0x0059 => 'Lucent G.723',
+                0x0060 => 'Cirrus',
+                0x0061 => 'ESPCM',
+                0x0062 => 'Voxware',
+                0x0063 => 'Canopus Atrac',
+                0x0064 => 'G.726 ADPCM',
+                0x0066 => 'DSAT',
+                0x0067 => 'DSAT Display',
+                0x0069 => 'Voxware Byte Aligned',
+                0x0070 => 'Voxware AC8',
+                0x0071 => 'Voxware AC10',
+                0x0072 => 'Voxware AC16',
+                0x0073 => 'Voxware AC20',
+                0x0074 => 'Voxware MetaVoice',
+                0x0075 => 'Voxware MetaSound',
+                0x0076 => 'Voxware RT29HW',
+                0x0077 => 'Voxware VR12',
+                0x0078 => 'Voxware VR18',
+                0x0079 => 'Voxware TQ40',
+                0x0080 => 'Softsound',
+                0x0081 => 'Voxware TQ60',
+                0x0082 => 'MSRT24',
+                0x0083 => 'G.729A',
+                0x0084 => 'MVI MV12',
+                0x0085 => 'DF G.726',
+                0x0086 => 'DF GSM610',
+                0x0088 => 'ISIAudio',
+                0x0089 => 'Onlive',
+                0x0091 => 'SBC24',
+                0x0092 => 'Dolby AC3 SPDIF',
+                0x0097 => 'ZyXEL ADPCM',
+                0x0098 => 'Philips LPCBB',
+                0x0099 => 'Packed',
+                0x00FF => 'MPEG-4',
+                0x0100 => 'Rhetorex ADPCM',
+                0x0101 => 'BeCubed Software IRAT',
+                0x0111 => 'Vivo G.723',
+                0x0112 => 'Vivo Siren',
+                0x0123 => 'Digital G.723',
+                0x0160 => 'Windows Media v1',
+                0x0161 => 'Windows Media v2',
+                0x0162 => 'Windows Media 9 Professional',
+                0x0163 => 'Windows Media 9 Lossless',
+                0x0200 => 'Creative ADPCM',
+                0x0202 => 'Creative FastSpeech8',
+                0x0203 => 'Creative FastSpeech10',
+                0x0220 => 'Quarterdeck',
+                0x0300 => 'FM Towns Snd',
+                0x0400 => 'BTV Digital',
+                0x0680 => 'VME VMPCM',
+                0x1000 => 'OLIGSM',
+                0x1001 => 'OLIADPCM',
+                0x1002 => 'OLICELP',
+                0x1003 => 'OLISBC',
+                0x1004 => 'OLIOPR',
+                0x1100 => 'LH Codec',
+                0x1400 => 'Norris',
+                0x1401 => 'ISIAudio',
+                0x1500 => 'Soundspace Music Compression',
+                0x2000 => 'DVM',
+                0x2001 => 'DTS Coherent Acoustics 2',
+                0x4143 => 'MPEG-4 (Divio)',
+            },
+        },
+        {
+            Condition => '$self->{ASF_STREAM_TYPE} =~ /^(Video|JFIF|Degradable JPEG)$/',
+            Name => 'ImageWidth',
+            Format => 'int32u',
+        },
+    ],
+    56 => {
+        Condition => '$self->{ASF_STREAM_TYPE} eq "Audio"',
+        Name => 'AudioChannels',
+        Format => 'int16u',
+    },
+    58 => [
+        {
+            Condition => '$self->{ASF_STREAM_TYPE} eq "Audio"',
+            Name => 'AudioSampleRate',
+            Format => 'int32u',
+        },
+        {
+            Condition => '$self->{ASF_STREAM_TYPE} =~ /^(Video|JFIF|Degradable JPEG)$/',
+            Name => 'ImageHeight',
+            Format => 'int32u',
+        },
+    ],
 );
 
 %Image::ExifTool::ASF::HeaderExtension = (
@@ -806,8 +958,8 @@ Windows Media Audio (WMA) and Windows Media Video (WMV) files.
 
 Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =head1 REFERENCES
 

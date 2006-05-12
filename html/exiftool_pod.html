@@ -24,6 +24,7 @@
 	<li><a href="#reading_examples">READING EXAMPLES</a></li>
 	<li><a href="#writing_examples">WRITING EXAMPLES</a></li>
 	<li><a href="#copying_examples">COPYING EXAMPLES</a></li>
+	<li><a href="#renaming_examples">RENAMING EXAMPLES</a></li>
 	<li><a href="#piping_examples">PIPING EXAMPLES</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
@@ -39,7 +40,7 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p>exiftool [OPTIONS] [-TAG[[+-&lt;]=[VALUE]] or --TAG ...] FILE ...</p>
+<p><strong>exiftool</strong> [<em>OPTIONS</em>] [-<em>TAG</em>[[+-&lt;]=[<em>VALUE</em>]] or --<em>TAG</em> ...] <em>FILE</em> ...</p>
 <p>
 </p>
 <hr />
@@ -60,22 +61,23 @@ supported by exiftool (r = read support, w = write support):</p>
 <pre>
                  File Type                      Meta Information
     -----------------------------------        ------------------
-    JPEG  r/w     PPM   r/w     PDF   r        EXIF           r/w
-    TIFF  r/w     PGM   r/w     MIFF  r        GPS            r/w
-    GIF   r/w     PBM   r/w     PICT  r        IPTC           r/w
-    CRW   r/w     JP2   r       QTIF  r        XMP            r/w
-    CR2   r/w     BMP   r       RIFF  r        MakerNotes     r/w
-    NEF   r/w     ORF   r       AIFF  r        Photoshop IRB  r/w
-    PEF   r/w     RAF   r       AVI   r        AFCP           r/w
-    MRW   r/w     RAW   r       WAV   r        JFIF           r/w
-    MOS   r/w     SRF   r       MP3   r        GeoTIFF        r
-    DNG   r/w     SR2   r       MP4   r        ICC Profile    r
-    PNG   r/w     X3F   r       MOV   r        PrintIM        r
-    MNG   r/w     DCM   r       ASF   r        ID3            r
-    JNG   r/w     ACR   r       WMA   r
-    XMP   r/w     AI    r       WMV   r
-    THM   r/w     PS    r
-    PSD   r/w     EPS   r</pre>
+    JPEG  r/w     PSD   r/w     ACR   r        EXIF           r/w
+    TIFF  r/w     EPS   r/w     AI    r        GPS            r/w
+    GIF   r/w     PS    r/w     PDF   r        IPTC           r/w
+    CRW   r/w     ICC   r/w     PICT  r        XMP            r/w
+    CR2   r/w     PPM   r/w     QTIF  r        MakerNotes     r/w
+    ERF   r/w     PGM   r/w     RIFF  r        Photoshop IRB  r/w
+    NEF   r/w     PBM   r       AIFF  r        AFCP           r/w
+    PEF   r/w     JP2   r       AVI   r        JFIF           r/w
+    MRW   r/w     BMP   r       WAV   r        ICC Profile    r/w
+    MOS   r/w     ORF   r       MP3   r        MIE            r/w
+    DNG   r/w     RAF   r       MP4   r        GeoTIFF        r
+    PNG   r/w     RAW   r       MOV   r        PrintIM        r
+    MNG   r/w     SRF   r       ASF   r        ID3            r
+    JNG   r/w     SR2   r       WMA   r
+    XMP   r/w     X3F   r       WMV   r
+    THM   r/w     DCM   r
+    MIE   r/w     MIFF  r</pre>
 <p>
 </p>
 <hr />
@@ -360,17 +362,23 @@ Set <strong>o</strong>utput file or directory name when writing information (oth
 source file is renamed to <code>FILE_original</code> and the output file is <code>FILE</code> in
 the original directory).  The output file name may also be specified using a
 <code>FMT</code> string in which %d, %f and %e represent the directory, file name and
-extension of <code>FILE</code>.  Existing files will not be overwritten.  Output
-directories are created if necessary.  See the <code>-w</code> option for <code>FMT</code>
-string examples.
+extension of <code>FILE</code>.  See the <code>-w</code> option for <code>FMT</code> string examples.
 </dd>
 <dd>
-<p>A special feature of this option allows it to be used to create XMP meta
-information files from a combination of information in <code>FILE</code> and tag
-values assigned on the command line.  This is done by specifying a file
-extension of '.XMP' for <code>OUTFILE</code>.  The XMP file will be created even if no
-<code>FILE</code> is specified, provided some tag values are given on the command
-line.</p>
+<p>The output file is taken to be a directory name if it already exists as a
+directory or if the name ends with '/'.  Output directories are created if
+necessary.  Existing files will not be overwritten.  Combining the
+<a href="#item__2doverwrite_original"><code>-overwrite_original</code></a> option with <code>-o</code> causes the original source file to
+be erased after the output file is successfully written.</p>
+</dd>
+<dd>
+<p>A special feature of this option allows it to be used to create certain types
+of files from scratch.  Currently, this can only be done with XMP and
+ICC/ICM files.  The file is created from a combination of information in
+<code>FILE</code> and tag values assigned on the command line.  This is done by
+specifying a file extension of '.XMP', '.ICC' or '.ICM' for <code>OUTFILE</code>.  The
+output file may be created even if no <code>FILE</code> is specified, provided some
+appropriate tag values are specified on the command line.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2doverwrite_original"><strong>-overwrite_original</strong></a></strong><br />
@@ -379,6 +387,14 @@ line.</p>
 Overwrite the original file instead of renaming it to <code>FILE_original</code> when
 writing information to an image.  Caution:  This option should only be used
 if you already have separate backup copies of your image files.
+</dd>
+<p></p>
+<dt><strong><a name="item__2doverwrite_original_in_place"><strong>-overwrite_original_in_place</strong></a></strong><br />
+</dt>
+<dd>
+Similar to the <a href="#item__2doverwrite_original"><code>-overwrite_original</code></a> option except that an extra step is
+added to allow the original file attributes to be preserved.  On a Macintosh
+for example, this preserves the original file type, creator and icon.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dp_fmtfile"><strong>-p</strong> <em>FMTFILE</em></a></strong><br />
@@ -550,7 +566,8 @@ extension (including the <code>.</code>) with the specified extension.  Alternat
 a format statement may be used to give more control over the output file
 name and directory.  In this case, <code>FMT</code> is a string specifying the output
 file name.  In this string, %d, %f and %e represent the directory, filename
-and extension of the source file.  For example:
+and extension of the source file.  (%d includes the trailing '/' if
+necessary, but %e does not include the leading '.')  For example:
 </dd>
 <dd>
 <pre>
@@ -595,8 +612,10 @@ from the source file.
 <dt><strong><a name="item__2dz"><strong>-z</strong></a></strong><br />
 </dt>
 <dd>
-Extract information from .g<strong>z</strong> and .b<strong>z</strong>2 compressed images.  Must be only
-one image in the compressed archive.
+When reading, causes information to be extracted from .g<strong>z</strong> and .b<strong>z</strong>2
+compressed images.  Must be only one image in the compressed archive.  When
+writing, causes compressed information to be written if supported in the
+particular information format.
 </dd>
 <p></p></dl>
 <p>
@@ -696,14 +715,14 @@ used around the entire argument (ie. ``-Comment=This is a new comment'')</p>
 <dt><strong><a name="item_exiftool__2dcomment_3d_27this_is_a_new_comment_27_">exiftool -Comment='This is a new comment' dst.jpg</a></strong><br />
 </dt>
 <dd>
-Set comment in file (replaces any existing comment).
+Write new comment to a JPG image (replaces any existing comment).
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dcomment_3d__2do_newdir__2a_2ejpg">exiftool -comment= -o newdir *.jpg</a></strong><br />
 </dt>
 <dd>
-Remove comment from all JPG files in the current directory, writing the
-modified files to a new directory.
+Remove comment from all JPG images in the current directory, writing the
+modified images to a new directory.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dkeywords_3dexif__2dkeywords_3deditor_d">exiftool -keywords=EXIF -keywords=editor dst.jpg</a></strong><br />
@@ -731,20 +750,6 @@ Delete only the specified category (<code>xxx</code>) from all files in director
 Delete all meta information from an image.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2ddatetimeoriginal_2d_3d_270_3a0_3a0_1_3">exiftool -DateTimeOriginal-='0:0:0 1:30:0' dir</a></strong><br />
-</dt>
-<dd>
-Adjust original date/time of all images in directory <code>dir</code> by subtracting
-one hour and 30 minutes.  (This is equivalent to <code>-DateTimeOriginal-=1.5</code>.
-See <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a> for details.)
-</dd>
-<p></p>
-<dt><strong><a name="item_exiftool__2dcreatedate_2b_3d3__2dmodifydate_2b_3d3">exiftool -createdate+=3 -modifydate+=3 a.jpg b.jpg</a></strong><br />
-</dt>
-<dd>
-Add 3 hours to the CreateDate and ModifyDate timestamps of two images.
-</dd>
-<p></p>
 <dt><strong><a name="item_exiftool__2dphotoshop_3aall_3d_dst_2ejpg">exiftool -Photoshop:All= dst.jpg</a></strong><br />
 </dt>
 <dd>
@@ -757,6 +762,20 @@ information also includes IPTC).
 <dd>
 Set the thumbnail image from specified file (Note: The quotes are neccessary
 to prevent shell redirection).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2ddatetimeoriginal_2d_3d_270_3a0_3a0_1_3">exiftool -DateTimeOriginal-='0:0:0 1:30:0' dir</a></strong><br />
+</dt>
+<dd>
+Adjust original date/time of all images in directory <code>dir</code> by subtracting
+one hour and 30 minutes.  (This is equivalent to <code>-DateTimeOriginal-=1.5</code>.
+See <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a> for details.)
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dcreatedate_2b_3d3__2dmodifydate_2b_3d3">exiftool -createdate+=3 -modifydate+=3 a.jpg b.jpg</a></strong><br />
+</dt>
+<dd>
+Add 3 hours to the CreateDate and ModifyDate timestamps of two images.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dxmp_3acity_3dkingston_dst_2ejpg">exiftool -xmp:city=Kingston dst.jpg</a></strong><br />
@@ -801,6 +820,7 @@ Create an XMP data file only from tags defined on the command line.
 </p>
 <hr />
 <h1><a name="copying_examples">COPYING EXAMPLES</a></h1>
+<p>These examples demonstrate the ability to copy tag values between files.</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ecrw_dst_2ejpg">exiftool -TagsFromFile src.crw dst.jpg</a></strong><br />
 </dt>
@@ -821,8 +841,8 @@ preserving the original tag groups.
 <dd>
 Copy meta information <code>a.jpg</code> to an XMP data file.  If the XMP data file
 <code>out.xmp</code> already exists, it will be updated with the new information.
-Otherwise the XMP data file will be created.  Only XMP files may be created
-like this (other file types may be edited but not created).
+Otherwise the XMP data file will be created.  Only XMP and ICC files may be
+created like this (other file types may be edited but not created).
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2dxmp_3aall_3d__">exiftool -tagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg</a></strong><br />
@@ -865,8 +885,8 @@ redirecting information as in this example.)
 <dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__27_2dall_3exmp">exiftool -TagsFromFile src.jpg '-all&gt;xmp:all' dst.jpg</a></strong><br />
 </dt>
 <dd>
-Translate all possible information into XMP format, and update <code>dst.jpg</code>
-with the new information.
+Copy all possible information from <code>src.jpg</code> and write in XMP format to
+<code>dst.jpg</code>.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2d_40_iptc2xmp_2">exiftool -tagsFromFile a.jpg -@ iptc2xmp.args -iptc:all= a.jpg</a></strong><br />
@@ -890,6 +910,59 @@ the corresponding <code>CRW</code> images in the same directories.
 <p>
 </p>
 <hr />
+<h1><a name="renaming_examples">RENAMING EXAMPLES</a></h1>
+<p>By writing the <code>FileName</code> and <code>Directory</code> tags, files are renamed and/or
+moved to new directories.  This can be particularly useful and powerful for
+organizing files by date when combined with the <code>-d</code> option.  New
+directories are created as necessary, but existing files will not be
+overwritten.  The file name format codes %d, %f and %e (see the <code>-w</code> option
+for details) may be used to represent the directory, name and extension of
+the original file, but note that if used within a date format string, an
+extra '%' must be added to pass these codes through the date/time parser.</p>
+<dl>
+<dt><strong><a name="item_exiftool__2dfilename_3dnew_2ejpg_dir_2fold_2ejpg">exiftool -filename=new.jpg dir/old.jpg</a></strong><br />
+</dt>
+<dd>
+Rename <code>old.jpg</code> to <code>new.jpg</code> in directory <code>dir</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2ddirectory_3d_25e_dir">exiftool -directory=%e dir</a></strong><br />
+</dt>
+<dd>
+Move all files from directory <code>dir</code> into directories named by the original
+file extensions.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__27_2ddirectory_3cdatetimeoriginal_27__2d">exiftool '-Directory&lt;DateTimeOriginal' -d %Y/%m/%d dir</a></strong><br />
+</dt>
+<dd>
+Move all files in <code>dir</code> into a directory hierarchy based on year, month and
+day of <code>DateTimeOriginal</code>.  ie) This command would move the file
+<code>dir/image.jpg</code> with a <code>DateTimeOriginal</code> of <code>2005:10:12 16:05:56</code> to
+<code>2005/10/12/image.jpg</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__27_2dfilename_3ccreatedate_27__2dd__25y_">exiftool '-FileName&lt;CreateDate' -d %Y%m%d_%H%M%S.%%e dir</a></strong><br />
+</dt>
+<dd>
+Rename all images in <code>dir</code> according to the <code>CreateDate</code> date and time,
+preserving the original file extensions.  Note the extra '%' added to the
+file extension code (<code>%%e</code>) since it is used in a date format string.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dr__27_2dfilename_3ccreatedate_27__2dd_">exiftool -r '-FileName&lt;CreateDate' -d %Y-%m-%d/%H%M_%%f.%%e dir</a></strong><br />
+</dt>
+<dd>
+Both the directory and the filename may be changed together via the
+<code>FileName</code> tag if the new <code>FileName</code> contains a '/'.  The example above
+recursively renames all images in a directory by adding a <code>CreateDate</code>
+timestamp to the start of the filename, then moves them into new directories
+named by date.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
 <h1><a name="piping_examples">PIPING EXAMPLES</a></h1>
 <dl>
 <dt><strong><a name="item_cat_a_2ejpg__7c_exiftool__2d">cat a.jpg | exiftool -</a></strong><br />
@@ -908,6 +981,15 @@ Extract information from an embedded thumbnail image.
 </dt>
 <dd>
 Add an IPTC keyword in a pipeline, saving output to a new file.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool_a_2ejpg__2dthumbnailimage__2db__7c_exifto">exiftool a.jpg -thumbnailimage -b | exiftool -comment=wow - |
+      exiftool a.jpg -thumbnailimage'&lt;=-'</a></strong><br />
+</dt>
+<dd>
+Add a comment to an embedded thumbnail image.  (Why anyone would want to do
+this I don't know, but I've included this example may give you an idea of
+ExifTool's flexibility.)
 </dd>
 <p></p></dl>
 <p>

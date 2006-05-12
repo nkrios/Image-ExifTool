@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..2\n"; }
+BEGIN { $| = 1; print "1..3\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -26,6 +26,26 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     my $info = $exifTool->ImageInfo('t/images/PostScript.eps');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 3: Write EPS information
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg','*:*');
+    $exifTool->SetNewValue(Title => 'new title');
+    $exifTool->SetNewValue(Copyright => 'my copyright');
+    $exifTool->SetNewValue(Creator => 'phil made it', Replace => 1);
+    $testfile = "t/${testname}_${testnum}_failed.eps";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/images/PostScript.eps', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
     print "ok $testnum\n";
 }
 
