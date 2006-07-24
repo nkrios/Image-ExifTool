@@ -5,7 +5,7 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h2>Minolta Tags</h2>
 
-These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn&apos;t
+These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn&#39;t
 make things easy for decoders because the meaning of some tags and the
 location where some information is stored is different for different camera
 models.  (Take MinoltaQuality for example, which may be located in 5
@@ -70,8 +70,15 @@ image stabilization is enabled)</font></font></td></tr>
   <br>2 = Vivid color
   <br>3 = Solarization
   <br>4 = Adobe RGB
+  <br>5 = Sepia
+  <br>9 = Natural
+  <br>12 = Portrait
   <br>13 = Natural sRGB
-  <br>14 = Natural+ sRGB</font></td></tr>
+  <br>14 = Natural+ sRGB
+  <br>15 = Landscape
+  <br>16 = Evening
+  <br>17 = Night Scene
+  <br>18 = Night Portrait</font></td></tr>
 <tr valign='top'>
 <td>0x0102</td>
 <td>MinoltaQuality</td>
@@ -413,9 +420,9 @@ tags are disabled.
   <br>5 = 64</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>37</td>
-<td>MinoltaModel</td>
+<td>MinoltaModelID</td>
 <td align='center'>int32u</td>
-<td><font size='-1'>0 = DiMAGE 7 or X31
+<td><font size='-1'>0 = DiMAGE 7, X1, X21 or X31
   <br>1 = DiMAGE 5
   <br>2 = DiMAGE S304
   <br>3 = DiMAGE S404
@@ -605,7 +612,8 @@ tags are disabled.
 <td align='right'>28</td>
 <td>ISOSetting</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>1 = 100
+<td><font size='-1'>0 = Auto
+  <br>1 = 100
   <br>3 = 200
   <br>4 = 400
   <br>5 = 800
@@ -620,8 +628,8 @@ tags are disabled.
 <td align='right'>37</td>
 <td>ColorSpace</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>0 = sRGB (Natural)
-  <br>1 = sRGB (Natural+)
+<td><font size='-1'>0 = Natural sRGB
+  <br>1 = Natural+ sRGB
   <br>4 = Adobe RGB</font></td></tr>
 <tr valign='top'>
 <td align='right'>38</td>
@@ -738,8 +746,8 @@ version)</font></font></td></tr>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Auto
   <br>1 = Daylight
-  <br>2 = Cloudy?
-  <br>3 = Shade?
+  <br>2 = Cloudy
+  <br>3 = Shade
   <br>4 = Tungsten
   <br>5 = Fluorescent
   <br>6 = Flash
@@ -824,17 +832,22 @@ version)</font></font></td></tr>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>110</td>
+<td>ColorTemperature</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td align='right'>174</td>
 <td>ImageNumber</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>176</td>
 <td>NoiseReduction</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>189</td>
 <td>ImageStabilization</td>
 <td align='center'>int16u</td>
@@ -845,6 +858,6 @@ version)</font></font></td></tr>
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 17, 2006</i>
+<br><i>Last revised Jul 6, 2006</i>
 </body>
 </html>

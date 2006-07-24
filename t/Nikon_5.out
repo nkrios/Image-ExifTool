@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -72,7 +72,8 @@
 [MakerNotes, Nikon, Camera] 8 - Flash Setting: Normal
 [MakerNotes, Nikon, Camera] 9 - Flash Type: 
 [MakerNotes, Nikon, Camera] 11 - White Balance Fine Tune: 0
-[MakerNotes, Nikon, Camera] 14 - Exposure Difference: 0.0
+[MakerNotes, Nikon, Camera] 13 - Program Shift: 0
+[MakerNotes, Nikon, Camera] 14 - Exposure Difference: 0
 [MakerNotes, NikonPreview, Image] 259 - Compression: JPEG (old-style)
 [MakerNotes, NikonPreview, Image] 282 - X Resolution: 300
 [MakerNotes, NikonPreview, Image] 283 - Y Resolution: 300
@@ -85,6 +86,7 @@
 [MakerNotes, Nikon, Camera] 24 - Flash Exposure Bracket Value: 0.0
 [MakerNotes, Nikon, Camera] 25 - Exposure Bracket Value: 0
 [MakerNotes, Nikon, Camera] 29 - Serial Number: 3001006
+[MakerNotes, Nikon, Camera] 30 - Color Space: sRGB
 [MakerNotes, Nikon, Camera] 129 - Tone Comp: Auto
 [MakerNotes, Nikon, Camera] 131 - Lens Type: D
 [MakerNotes, Nikon, Camera] 132 - Lens: 50mm f/1.8
@@ -93,6 +95,7 @@
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
 [MakerNotes, Nikon, Camera] 2 - AF Points Used: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Delay
+[MakerNotes, Nikon, Camera] 138 - Auto Bracket Release: Manual Release
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 7.33
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode3
 [MakerNotes, Nikon, Camera] 144 - Light Source: Colored
@@ -100,12 +103,15 @@
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
 [MakerNotes, Nikon, Camera] 154 - Sensor Pixel Size: 9.4 x 9.4 um
 [MakerNotes, Nikon, Camera] 162 - Image Data Size: 1369271
+[MakerNotes, Nikon, Camera] 165 - Image Count: 2
+[MakerNotes, Nikon, Camera] 166 - Deleted Image Count: 0
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 2
 [MakerNotes, Nikon, Camera] 170 - Saturation: Normal
+[MakerNotes, Nikon, Camera] 177 - High ISO Noise Reduction: Normal
 [MakerNotes, Nikon, Camera] 0 - WB RGGB Levels: 562 256 256 537
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0201
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 1.9
-[MakerNotes, Nikon, Camera] 8 - Focus Position: 17
+[MakerNotes, Nikon, Camera] 8 - Focus Position: 0x11
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 0.71 m
 [MakerNotes, Nikon, Camera] 10 - Focal Length: 50.4mm
 [MakerNotes, Nikon, Camera] 11 - Lens ID Number: 118

@@ -63,7 +63,7 @@ sub ProcessJVCText($$$)
     my $dataLen = $$dirInfo{DataLen};
     my $dirLen = $$dirInfo{DirLen} || $dataLen - $dirStart;
     my $verbose = $exifTool->Options('Verbose');
-    
+
     my $data = substr($$dataPt, $dirStart, $dirLen);
     # validate text maker notes
     unless ($data =~ /^VER:/) {

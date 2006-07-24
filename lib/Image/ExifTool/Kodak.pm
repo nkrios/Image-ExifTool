@@ -8,7 +8,7 @@
 # References:   1) http://search.cpan.org/dist/Image-MetaData-JPEG/
 #               2) http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
 #
-# Notes:        There really isn't much public information about Kodak formats. 
+# Notes:        There really isn't much public information about Kodak formats.
 #               The only source I could find was Image::MetaData::JPEG, which
 #               didn't provide information about decoding the tag values.  So
 #               this module represents a lot of work downloading sample images
@@ -398,7 +398,7 @@ Z7560.
         Name => 'DigitalZoom',
         Format => 'int16u',
         ValueConv => '$val / 100',
-        ValueConvInv => '$val * 100',    
+        ValueConvInv => '$val * 100',
     },
     0x27 => { #PH
         Name => 'FlashMode',

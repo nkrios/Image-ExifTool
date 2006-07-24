@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..8\n"; }
+BEGIN { $| = 1; print "1..9\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -101,6 +101,19 @@ my $testnum = 1;
         ['VignetteControlIntensity' => '70'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Nikon.nef', 1);
+    print "ok $testnum\n";
+}
+
+# test 9: Validate Nikon LensID values (internal check)
+{
+    ++$testnum;
+    my $lensIDs = $Image::ExifTool::Nikon::Composite{LensID}->{PrintConv};
+    foreach (sort keys %$lensIDs) {
+        next if /^([0-9A-F]{2} ){7}[0-9A-F]{2}$/ or $_ eq 'Notes';
+        warn "\n  Bad LensID '$_' in test $testnum\n";
+        print 'not ';
+        last;
+    }
     print "ok $testnum\n";
 }
 

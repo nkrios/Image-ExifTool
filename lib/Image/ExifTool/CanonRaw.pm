@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.34';
+$VERSION = '1.35';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);

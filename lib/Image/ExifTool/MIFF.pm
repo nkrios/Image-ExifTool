@@ -175,7 +175,7 @@ sub ProcessMIFF($$)
         }
     }
     $/ = $oldsep;   # restore separator to original value
-    
+
     # process profile information
     foreach (@profiles) {
         my ($type, $len) = @{$_};
@@ -231,7 +231,7 @@ sub ProcessMIFF($$)
             $exifTool->Warn("Unknown MIFF $type profile data");
             if ($verbose) {
                 $exifTool->VerboseDir($type, 0, $len);
-                Image::ExifTool::HexDump(\$buff, undef, 
+                Image::ExifTool::HexDump(\$buff, undef,
                     Out => $exifTool->Options('TextOut')
                 ) if $verbose > 2;
              }

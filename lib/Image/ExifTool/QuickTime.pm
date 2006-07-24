@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub FixWrongFormat($);
 
@@ -35,6 +35,7 @@ my %durationInfo = (
 # QuickTime atoms
 %Image::ExifTool::QuickTime::Main = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
     NOTES => q{
         These tags are used in QuickTime MOV and MP4 videos, and QTIF images.  Tags
         with a question mark after their name are not extracted unless the Unknown
@@ -67,6 +68,7 @@ my %durationInfo = (
 # atoms used in QTIF files
 %Image::ExifTool::QuickTime::ImageFile = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Image' },
     NOTES => 'Tags used in QTIF QuickTime Image Files.',
     idsc => {
         Name => 'ImageDescription',
@@ -85,6 +87,7 @@ my %durationInfo = (
 # image description data block
 %Image::ExifTool::QuickTime::ImageDesc = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
     4 => { Name => 'CompressorID',  Format => 'string[4]' },
     20 => { Name => 'VendorID',     Format => 'string[4]' },
     28 => { Name => 'Quality',      Format => 'int32u' },
@@ -101,6 +104,7 @@ my %durationInfo = (
 # preview data block
 %Image::ExifTool::QuickTime::Preview = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
     FORMAT => 'int16u',
     0 => {
         Name => 'PreviewDate',
@@ -118,6 +122,7 @@ my %durationInfo = (
 # movie atoms
 %Image::ExifTool::QuickTime::Movie = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
     mvhd => {
         Name => 'MovieHeader',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MovieHdr' },
@@ -135,6 +140,7 @@ my %durationInfo = (
 # movie header data block
 %Image::ExifTool::QuickTime::MovieHdr = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
     FORMAT => 'int32u',
     0 => { Name => 'Version', Format => 'int8u' },
     1 => {
@@ -172,6 +178,7 @@ my %durationInfo = (
 # track atoms
 %Image::ExifTool::QuickTime::Track = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
     tkhd => {
         Name => 'TrackHeader',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TrackHdr' },
@@ -189,7 +196,7 @@ my %durationInfo = (
 # track header data block
 %Image::ExifTool::QuickTime::TrackHdr = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 1 => 'Track#' },
+    GROUPS => { 1 => 'Track#', 2 => 'Video' },
     FORMAT => 'int32u',
     0 => {
         Name => 'TrackVersion',
@@ -242,6 +249,7 @@ my %durationInfo = (
 # user data atoms
 %Image::ExifTool::QuickTime::UserData = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
     NOTES => q{
         Tag ID's beginning with the copyright symbol (hex 0xa9) are multi-language
         text, but ExifTool only extracts the text from the first language in the
@@ -324,6 +332,7 @@ my %durationInfo = (
 # print to video data block
 %Image::ExifTool::QuickTime::Video = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
     0 => {
         Name => 'DisplaySize',
         PrintConv => {
@@ -346,6 +355,7 @@ my %durationInfo = (
 # MP4 media
 %Image::ExifTool::QuickTime::Media = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
     minf => {
         Name => 'Minf',
@@ -356,6 +366,7 @@ my %durationInfo = (
 # MP4 media
 %Image::ExifTool::QuickTime::Minf = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
     stbl => {
         Name => 'Stbl',
@@ -366,6 +377,7 @@ my %durationInfo = (
 # MP4 media
 %Image::ExifTool::QuickTime::Stbl = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
 );
 

@@ -13,10 +13,10 @@ the case of a BinaryData table, the IDs are numerical and specify offsets into
 the binary data block.  The corresponding hash value provides information about
 the tag (explained later).
 
-Nineteen special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
+Twenty special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
 FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE, NOTES, IS_OFFSET,
-EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, PARENT, PRIORITY, WRITE_GROUP and
-LANG_INFO) are used to provide additional information about a table.  The
+EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, PARENT, PRIORITY, WRITE_GROUP, LANG_INFO
+and VARS) are used to provide additional information about a table.  The
 special keys have names that are all capitalized to avoid possible conflicts
 with tag keys. Below is an explanation of the meaning of each special key:
 
@@ -130,7 +130,8 @@ with tag keys. Below is an explanation of the meaning of each special key:
   language-specific tag information hash.  The routine takes two arguments: a
   reference to the non-specific tagInfo hash, and the language code. Used only
   in tables which support tag name language extensions.
-  
+
+  VARS : Used to store additional module-specific variables for the table.
 
 The remaining entries in a tag table are the EXIF tags with their associated
 information.  The information may exist in one of three forms:  1) A simple
@@ -146,7 +147,9 @@ numerical.
                   unless the Duplicates option is set or the new tag has lower
                   Priority.  With Duplicates set, the name of the previous tag
                   is changed to the form "TagName (N)" where N starts at 1 and
-                  increments for subsequent duplicate tags.
+                  increments for subsequent duplicate tags.  A tag should start
+                  with an uppercase letter, and contain only the charcters in
+                  the set [A-Za-z0-9_-].
 
   Description   : A more readable description of tag name.  If a tag doesn't
                   specify a Description, then the tag Name is used instead, with
@@ -244,6 +247,11 @@ numerical.
 
                   'Drop' - set to 1 for tags that should be excluded when
                   rebuilding maker notes when copying all tags.
+                  
+                  'EntryBased' - set to 1 if the offset for this value is based
+                  on the IFD entry position.  This allows individual values to
+                  be entry-based even though some others aren't (as with the
+                  Casio PrintIM information).
 
   RawConv       : Used to convert the Raw value at extraction time (while the
                   image file is still open, unlike ValueConv and PrintConv below
@@ -425,6 +433,10 @@ numerical.
                   May use $start to represent the subdirectory start location
                   relative to the current base.
 
+     EntryBased : Flag indicating that the offsets are based on the indidual
+                  directory entry position, so offsets are incremented by 12
+                  times the corresponding entry index.
+
      MaxSubdirs : Maximum number of subdirectories specified by the current tag
                   (if the tag specifies multiple values).  If not specified, the
                   tag value ($val) is used as-is.  If MaxSubdirs is specified,
@@ -452,7 +464,9 @@ numerical.
                   used when writing to compare against names in the directory
                   map to determine which directories need to be edited.
 
-     FixBase    : Flag set if base offsets should be fixed.
+     FixBase    : Flag set if base offsets should be fixed.  Used to add a
+                  constant to maker notes offsets to fix damage done by some
+                  image editing utilities.
   }
 
 --------------------------------------------------------------------------------

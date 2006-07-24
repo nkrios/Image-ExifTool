@@ -11,6 +11,7 @@
 #                          multi-character EOL sequences
 #               02/20/06 - P. Harvey Fixed bug where seek past end of file could
 #                          generate "substr outside string" warning
+#               06/10/06 - P. Harvey Decreased $CHUNK_SIZE from 64k to 8k
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.
@@ -31,11 +32,12 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.04';
+$VERSION = '1.05';
 @ISA = qw(Exporter);
 
 # constants
-my $CHUNK_SIZE = 65536; # size of chunks to read from file (must be power of 2)
+my $CHUNK_SIZE = 8192;  # size of chunks to read from file (must be power of 2)
+my $SLURP_CHUNKS = 16;  # read this many chunks at a time when slurping
 
 #------------------------------------------------------------------------------
 # Create new RandomAccess object
@@ -267,7 +269,7 @@ sub Slurp($)
     my $fp = $self->{FILE_PT} || return;
     # read whole file into buffer (in large chunks)
     my ($buff, $num);
-    while (($num = read($fp, $buff, 16 * $CHUNK_SIZE)) != 0) {
+    while (($num = read($fp, $buff, $CHUNK_SIZE * $SLURP_CHUNKS)) != 0) {
         ${$self->{BUFF_PT}} .= $buff;
         $self->{LEN} += $num;
     }
@@ -297,7 +299,7 @@ sub Close($)
             my $last;
             my $tot = 0;
             my $bad = 0;
-            foreach (sort { $a <=> $b} keys %{$self->{DEBUG}}) {
+            foreach (sort { $a <=> $b } keys %{$self->{DEBUG}}) {
                 my $pos = $_;
                 my $len = $self->{DEBUG}->{$_};
                 if (defined $last and $last < $pos) {

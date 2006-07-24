@@ -266,6 +266,7 @@ my $rdfDesc = 'rdf:Description';
 # packet/xmp/rdf headers and trailers
 #
 my $pktOpen = "<?xpacket begin='\xef\xbb\xbf' id='W5M0MpCehiHzreSzNTczkc9d'?>\n";
+my $xmlOpen = "\xef\xbb\xbf<?xml version='1.0' encoding='UTF-8'?>\n";
 my $xmpOpen = "<x:xmpmeta xmlns:x='$nsURI{x}' $x_toolkit>\n";
 my $rdfOpen = "<rdf:RDF xmlns:rdf='$nsURI{rdf}'>\n";
 my $rdfClose = "</rdf:RDF>\n";
@@ -748,6 +749,7 @@ sub WriteXMP($$;$)
     # start writing the XMP data
     my $newData = '';
     $newData .= $pktOpen unless $$exifTool{XMP_NO_XPACKET};
+    $newData .= $xmlOpen if $$exifTool{XMP_IS_XML};
     $newData .= $xmpOpen . $rdfOpen;
 
     # initialize current property path list

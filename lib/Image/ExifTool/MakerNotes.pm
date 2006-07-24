@@ -15,7 +15,9 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.20';
+$VERSION = '1.23';
+
+my $debug;          # set to 1 to enabled debugging code
 
 # conditional list of maker notes
 # Notes:
@@ -181,17 +183,60 @@ $VERSION = '1.20';
         SubDirectory => {
             TagTable => 'Image::ExifTool::Unknown::Main',
             Start => '$valuePtr + 22',
-            Base => '$start + 14',
+            Base => '$start + 2',
+            EntryBased => 1,
             ByteOrder => 'Unknown',
         },
     },
     {
         Name => 'MakerNoteMinolta',
-        Condition => '$self->{CameraMake}=~/^(Konica Minolta|Minolta)/i',
+        Condition => q{
+            $self->{CameraMake}=~/^(Konica Minolta|Minolta)/i and
+            $$valPt !~ /^(MINOL|CAMER|FUJIFILM|MLY0|KC|\+M\+M|\xd7)/
+        },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::Main',
             ByteOrder => 'Unknown',
         },
+    },
+    {
+        # the DiMAGE E323 (MINOL) and E500 (CAMER)
+        Name => 'MakerNoteMinolta2',
+        Condition => q{
+            $self->{CameraMake} =~ /^(Konica Minolta|Minolta)/i and
+            $$valPt =~ /^(MINOL|CAMER)/
+        },
+        SubDirectory => {
+            # these models use Olympus tags in the range 0x200-0x221 plus 0xf00
+            TagTable => 'Image::ExifTool::Olympus::Main',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        # the DiMAGE F200
+        Name => 'MakerNoteMinolta3',
+        Condition => q{
+            $self->{CameraMake} =~ /^(Konica Minolta|Minolta)/i and
+            $$valPt =~ /^FUJIFILM/
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::FujiFilm::Main',
+            OffsetPt => '$valuePtr+8',
+            ByteOrder => 'LittleEndian',
+            Base => '$start',
+        },
+    },
+    {
+        # /^MLY0/ - DiMAGE G400, G500, G530, G600
+        # /^KC/   - Revio KD-420Z, DiMAGE E203
+        # /^+M+M/ - DiMAGE E201
+        # /^\xd7/ - DiMAGE RD3000
+        Name => 'MakerNoteMinolta4',
+        Condition => '$self->{CameraMake} =~ /^(Konica Minolta|Minolta)/i',
+        Notes => 'not EXIF-based',
+        ValueConv => '\$val',
+        ValueConvInv => '$val',
     },
     {
         # this maker notes starts with a standard TIFF header at offset 0x0a
@@ -371,6 +416,7 @@ my $tagInfo;
 foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
     $$tagInfo{Writable} = 'undef';
     $$tagInfo{WriteGroup} = 'ExifIFD';
+    $$tagInfo{Groups} = { 1 => 'MakerNotes' };
     next unless $$tagInfo{SubDirectory};
     # set up this tag so we can write it
     $$tagInfo{ValueConv} = '\$val';
@@ -379,10 +425,11 @@ foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
 }
 
 #------------------------------------------------------------------------------
-# Get normal offset (absolute) of value data from end of maker note IFD
+# Get normal offset of value data from end of maker note IFD
 # Inputs: 0) ExifTool object reference
-# Returns: Array: 0) expected offset (undef if unkown),
-#          1) relative flag (undef for no change)
+# Returns: Array: 0) relative flag (undef for no change)
+#                 1) normal offset from end of IFD to first value (empty if unknown)
+#                 2-N) other possible offsets used by some models
 # Notes: Directory size should be validated before calling this routine
 sub GetMakerNoteOffset($)
 {
@@ -390,31 +437,242 @@ sub GetMakerNoteOffset($)
     # figure out where we expect the value data based on camera type
     my $make = $exifTool->{CameraMake};
     my $model = $exifTool->{CameraModel};
-    my ($offset, $relative);
-    if ($make =~ /^Canon/ and $model =~ /\b(20D|350D|REBEL XT)\b/) {
-        $offset = 6;
+    my ($relative, @offsets);
+
+    # normally value data starts 4 bytes after end of directory, so this is the default
+    if ($make =~ /^Canon/) {
+        push @offsets, ($model =~ /\b(20D|350D|REBEL XT|Kiss Digital N)\b/) ? 6 : 4;
+        # some Canon models (FV-M30, Optura50, Optura60) leave 24 unused bytes
+        # at the end of the IFD (2 spare IFD entries?)
+        push @offsets, 28 if $model =~ /\b(FV\b|OPTURA)/;
     } elsif ($make =~ /^KYOCERA/) {
-        $offset = 12;
+        push @offsets, 12;
     } elsif ($make =~ /^OLYMPUS/ and $model =~ /^E-(1|300|330)\b/) {
-        $offset = 16;
+        push @offsets, 16;
     } elsif ($make =~ /^OLYMPUS/ and
         # these Olympus models are just weird
         $model =~ /^(C2500L|C-1Z?|C-5000Z|X-2|C720UZ|C725UZ|C150|C2Z|E-10|E-20|FerrariMODEL2003|u20D|u10D)\b/)
     {
-        $offset = undef;
-    } elsif ($make =~ /^(Panasonic|SONY|JVC|TOSHIBA)\b/) {
-        $offset = 0;
+        # no expected offset --> determine offset empirically via FixBase()
+    } elsif ($make =~ /^(Panasonic|SONY|JVC)\b/) {
+        push @offsets, 0;
+    } elsif ($make eq 'FUJIFILM') {
+        # some models have offset of 6, so allow that too (A345,A350,A360,A370)
+        push @offsets, 4, 6;
+    } elsif ($make =~ /^TOSHIBA/) {
+        # similar to Canon, can also have 24 bytes of padding
+        push @offsets, 0, 24;
     } elsif ($make =~ /^PENTAX/) {
-        $offset = 4;
+        push @offsets, 4;
         # the Pentax addressing mode is determined automatically, but
         # sometimes the algorithm gets it wrong, but Pentax always uses
         # absolute addressing, so force it to be absolute
         $relative = 0;
+    } elsif ($make =~ /^Konica Minolta/i) {
+        # patch for DiMAGE X50, Xg, Z2 and Z10
+        push @offsets, 4, -16;
+    } elsif ($make =~ /^Minolta/) {
+        # patch for DiMAGE 7, X20 and Z1
+        push @offsets, 4, -8, -12;
     } else {
-        # normally, value data starts 4 bytes after end of directory
-        $offset = 4;
+        push @offsets, 4;   # the normal offset
     }
-    return ($offset, $relative);
+    return ($relative, @offsets);
+}
+
+#------------------------------------------------------------------------------
+# Get hash of value offsets / block sizes
+# Inputs: 0) Data pointer, 1) offset to start of directory
+# Returns: 0) hash reference: keys are offsets, values are block sizes
+#          1) same thing, but with keys adjusted for value-based offsets
+# Notes: Directory size should be validated before calling this routine
+# - calculates MIN and MAX offsets in entry-based hash
+sub GetValueBlocks($$)
+{
+    my ($dataPt, $dirStart) = @_;
+    my $numEntries = Get16u($dataPt, $dirStart);
+    my ($index, $valPtr, %valBlock, %valBlkAdj, $end);
+    for ($index=0; $index<$numEntries; ++$index) {
+        my $entry = $dirStart + 2 + 12 * $index;
+        my $format = Get16u($dataPt, $entry+2);
+        last if $format < 1 or $format > 13;
+        my $count = Get32u($dataPt, $entry+4);
+        my $size = $count * $Image::ExifTool::Exif::formatSize[$format];
+        next if $size <= 4;
+        $valPtr = Get32u($dataPt, $entry+8);
+        # save location and size of longest block at this offset
+        unless (defined $valBlock{$valPtr} and $valBlock{$valPtr} > $size) {
+            $valBlock{$valPtr} = $size;
+        }
+        # adjust for case of value-based offsets
+        $valPtr += 12 * $index;
+        unless (defined $valBlkAdj{$valPtr} and $valBlkAdj{$valPtr} > $size) {
+            $valBlkAdj{$valPtr} = $size;
+            my $end = $valPtr + $size;
+            if (defined $valBlkAdj{MIN}) {
+                # save minimum only if it has a value of 12 or greater
+                $valBlkAdj{MIN} = $valPtr if $valBlkAdj{MIN} < 12 or $valBlkAdj{MIN} > $valPtr;
+                $valBlkAdj{MAX} = $end if $valBlkAdj{MAX} > $end;
+            } else {
+                $valBlkAdj{MIN} = $valPtr;
+                $valBlkAdj{MAX} = $end;
+            }
+        }
+    }
+    return(\%valBlock, \%valBlkAdj);
+}
+
+#------------------------------------------------------------------------------
+# Fix base for value offsets in maker notes IFD (if necessary)
+# Inputs: 0) ExifTool object ref, 1) DirInfo hash ref
+# Return: amount of base shift (and $dirInfo Base and DataPos are updated,
+#         and Relative or EntryBased may be set)
+sub FixBase($$)
+{
+    local $_;
+    my ($exifTool, $dirInfo) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $entryBased = $$dirInfo{EntryBased};
+
+    # get hash of value block positions
+    my ($valBlock, $valBlkAdj) = GetValueBlocks($dataPt, $dirStart);
+    return 0 unless %$valBlock;
+#
+# analyze value offsets to see if they need fixing.  The first task is to
+# determine the minimum valid offset used (this is tricky, because we have
+# to weed out bad offsets written by some cameras)
+#
+    my $dataPos = $$dirInfo{DataPos};
+    my $ifdLen = 2 + 12 * Get16u($$dirInfo{DataPt}, $dirStart);
+    my $ifdEnd = $dirStart + $ifdLen;
+    my ($relative, @offsets) = GetMakerNoteOffset($exifTool);
+    my $makeDiff = $offsets[0];
+    my $fixBase = $exifTool->Options('FixBase');
+    my $setBase = (defined $fixBase and $fixBase ne '') ? 1 : 0;
+    my $verbose = $exifTool->Options('Verbose');
+    my $dirName = $$dirInfo{DirName};
+    my ($diff, $shift);
+
+    # calculate expected minimum value offset
+    my $expected = $dataPos + $ifdEnd + (defined $makeDiff ? $makeDiff : 4);
+    $debug and print "$expected expected\n";
+
+    # get sorted list of value offsets
+    my @valPtrs = sort { $a <=> $b } keys %$valBlock;
+    my $minPt = $valPtrs[0];    # if life were simple, this would be it
+
+    # zero our counters
+    my ($countNeg12, $countZero, $countOverlap) = (0, 0, 0);
+    my ($valPtr, $last);
+    foreach $valPtr (@valPtrs) {
+        printf("%d - %d (%d)\n", $valPtr, $valPtr + $$valBlock{$valPtr},
+               $valPtr - ($last || 0)) if $debug;
+        if (defined $last) {
+            my $diff = $valPtr - $last;
+            if ($diff == 0 or $diff == 1) {
+                ++$countZero;
+            } elsif ($diff == -12 and not $entryBased) {
+                # you get this when value offsets are relative to the IFD entry
+                ++$countNeg12;
+            } elsif ($diff < 0) {
+                # any other negative difference indicates overlapping values
+                ++$countOverlap if $valPtr; # (but ignore zero value pointers)
+            } elsif ($diff >= $ifdLen) {
+                # ignore previous minimum if we took a jump to near the expected value
+                # (some values can be stored before the IFD)
+                $minPt = $valPtr if abs($valPtr - $expected) <= 4;
+            }
+            # an offset less than 12 is surely garbage, so ignore it
+            $minPt = $valPtr if $minPt < 12;
+        }
+        $last = $valPtr + $$valBlock{$valPtr};
+    }
+    # could this IFD be using entry-based offsets?
+    if ((($countNeg12 > $countZero and $$valBlkAdj{MIN} >= $ifdLen - 2) or
+         ($$valBlkAdj{MIN} == $ifdLen - 2 or $$valBlkAdj{MIN} == $ifdLen + 2)
+        ) and $$valBlkAdj{MAX} <= $$dirInfo{DirLen}-2)
+    {
+        # looks like these offsets are entry-based, so use the offsets
+        # which have been correcting for individual entry position
+        $entryBased = 1;
+        $verbose and $exifTool->Warn("$dirName offsets are entry-based");
+    } else {
+        # calculate difference from normal
+        $diff = ($minPt - $dataPos) - $ifdEnd;
+        $shift = 0;
+        $countOverlap and $exifTool->Warn("Overlapping $dirName values");
+        if ($entryBased) {
+            $exifTool->Warn("$dirName offsets do NOT look entry-based");
+            undef $entryBased;
+            undef $relative;
+        }
+    }
+#
+# handle entry-based offsets
+#
+    if ($entryBased) {
+        $debug and print "--> entry-based!\n";
+        # most of my entry-based samples have first value immediately
+        # after last IFD entry (ie. no padding or next IFD pointer)
+        $makeDiff = 0;
+        push @offsets, 4;   # but some do have a next IFD pointer
+        # corrected entry-based offsets are relative to start of first entry
+        my $expected = 12 * Get16u($$dirInfo{DataPt}, $dirStart);
+        $diff = $$valBlkAdj{MIN} - $expected;
+        # set up directory to read values with entry-based offsets
+        # (ignore everything and set base to start of first entry)
+        $shift = $dataPos + $dirStart + 2;
+        $$dirInfo{Base} += $shift;
+        $$dirInfo{DataPos} -= $shift;
+        $$dirInfo{EntryBased} = 1;
+        $$dirInfo{Relative} = 1;    # entry-based offsets are relative
+        delete $$dirInfo{FixBase};  # no automatic base fix
+        undef $fixBase unless $setBase;
+    }
+#
+# return without doing shift if offsets look OK
+#
+    unless ($setBase) {
+        # don't try to fix offsets for whacky cameras
+        return $shift unless defined $makeDiff;
+        # normal value data starts 4 bytes after IFD, but allow 0 or 4...
+        return $shift if $diff == 0 or $diff == 4;
+        # also check for allowed make-specific differences
+        foreach (@offsets) {
+            return $shift if $diff == $_;
+        }
+    }
+#
+# apply the fix, or issue a warning
+#
+    # use default padding of 4 bytes unless already specified
+    $makeDiff = 4 unless defined $makeDiff;
+    my $fix = $makeDiff - $diff;    # assume standard diff for this make
+
+    if ($$dirInfo{FixBase}) {
+        # set flag if offsets are relative (base is at or above directory start)
+        if ($dataPos - $fix + $dirStart <= 0) {
+            $$dirInfo{Relative} = (defined $relative) ? $relative : 1;
+        }
+        if ($setBase) {
+            $fix += $fixBase;
+            $exifTool->Warn("Adjusted $dirName base by $fixBase",1);
+        }
+    } elsif (defined $fixBase) {
+        $fix = $fixBase if $fixBase ne '';
+        $exifTool->Warn("Adjusted $dirName base by $fix",1);
+    } else {
+        # print warning unless difference looks reasonable
+        if ($diff < 0 or $diff > 16 or ($diff & 0x01)) {
+            $exifTool->Warn("Possibly incorrect maker notes offsets (fix by $fix?)",1);
+        }
+        # don't do the fix (but we already adjusted base if entry-based)
+        return $shift;
+    }
+    $$dirInfo{Base} += $fix;
+    $$dirInfo{DataPos} -= $fix;
+    return $fix + $shift;
 }
 
 #------------------------------------------------------------------------------

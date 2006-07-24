@@ -212,7 +212,7 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                     my $langInfoProc = $tagInfo->{Table}->{LANG_INFO} or next;
                     my $langInfo = &$langInfoProc($tagInfo, $langCode);
                     push @matchingTags, $langInfo if $langInfo;
-                } 
+                }
                 last if @matchingTags;
             } else {
                 # look for a shortcut or alias
@@ -677,12 +677,13 @@ sub SetNewValuesFromFile($$;@)
     @setTags and ExpandShortcuts(\@setTags);
     # get all tags from source file (including MakerNotes block)
     my $srcExifTool = new Image::ExifTool;
-    my $opts = {MakerNotes=>1, Binary=>1, Duplicates=>1, List=>1};
-    $opts->{IgnoreMinorErrors} = $self->Options('IgnoreMinorErrors');
-    $opts->{PrintConv} = $self->Options('PrintConv');
-    $opts->{DateFormat} = $self->Options('DateFormat');
-    $opts->{StrictDate} = 1;
-    my $info = $srcExifTool->ImageInfo($srcFile, $opts);
+    my %opts = ( MakerNotes=>1, Binary=>1, Duplicates=>1, List=>1 );
+    $opts{IgnoreMinorErrors} = $self->Options('IgnoreMinorErrors');
+    $opts{PrintConv} = $self->Options('PrintConv');
+    $opts{DateFormat} = $self->Options('DateFormat');
+    $opts{StrictDate} = 1;
+    $srcExifTool->Options(%opts);
+    my $info = $srcExifTool->ImageInfo($srcFile);
     return $info if $info->{Error} and $info->{Error} eq 'Error opening file';
 
     # sort tags in reverse order so we get priority tag last
@@ -717,11 +718,22 @@ sub SetNewValuesFromFile($$;@)
         # handle redirection to another tag
         if ($tag =~ /(.+?)\s*(>|<)\s*(.+)/) {
             $dstGrp = '';
-            ($tag, $dstTag) = ($2 eq '>') ? ($1, $3) : ($3, $1);
+            if ($2 eq '>') {
+                ($tag, $dstTag) = ($1, $3);
+            } else {
+                ($tag, $dstTag) = ($3, $1);
+                # handle expressions
+                if ($tag =~ /\$/) {
+                    $tag = $_;  # restore original case
+                    # recover leading whitespace (except for initial single space)
+                    # and flag expression by starting with '@'
+                    $tag =~ s/(.+?)\s*(>|<) ?/\@/;
+                }
+            }
             ($dstGrp, $dstTag) = ($1, $2) if $dstTag =~ /(.+?):(.+)/;
         }
-        my $isExclude = ($tag =~ s/^-//) ? 1 : 0;
-        if ($tag =~ /(.+?):(.+)/) {
+        my $isExclude = ($tag =~ s/^-//);
+        if ($tag =~ /^([\w-]+?|\*):(.+)/) {
             ($grp, $tag) = ($1, $2);
         } else {
             $grp = '';  # flag for don't care about group
@@ -784,6 +796,18 @@ sub SetNewValuesFromFile($$;@)
     }
     # 4) loop through each condition in original order, setting new tag values
     foreach $set (reverse @setList) {
+        # handle expressions
+        if ($$set[1] =~ s/^\@//) {
+            my $val = $srcExifTool->InsertTagValues(\@tags, $$set[1]);
+            my ($dstGrp, $dstTag) = @{$$set[2]};
+            my %opts = ( Protected => 1, Replace => 1 );
+            $opts{Group} = $dstGrp if $dstGrp;
+            my @rtnVals = $self->SetNewValue($dstTag, $val, %opts);
+            if ($rtnVals[0]) {
+                $rtnInfo{$dstTag} = $val;   # tag was set successfully
+            }
+            next;
+        }
         foreach $tag (@{$setMatches{$set}}) {
             my (@values, %opts, $val);
             # get all values for this tag
@@ -806,7 +830,7 @@ sub SetNewValuesFromFile($$;@)
             }
             $dstTag = $tag if $dstTag eq '*';
             # allow protected tags to be copied if specified explicitly
-            $opts{Protected} = 1 unless $$set[1] eq '*';    
+            $opts{Protected} = 1 unless $$set[1] eq '*';
             $opts{Replace} = 1;     # replace the first value found
             # set all values for this tag
             foreach $val (@values) {
@@ -1473,6 +1497,60 @@ sub GetAllGroups($)
 
 #==============================================================================
 # Functions below this are not part of the public API
+
+#------------------------------------------------------------------------------
+# convert tag names to values in a string (ie. "${EXIF:ISO}x $$" --> "100x $")
+# Inputs: 0) ExifTool object ref, 1) reference to list of found tags
+#         2) string with embedded tag names
+# Returns: string with embedded tag values
+# Notes: tag names are not case sensitive
+sub InsertTagValues($$$)
+{
+    my ($self, $foundTags, $line) = @_;
+    my $rtnStr = '';
+    while ($line =~ /(.*?)\$(\{?[\w-]+|\$)(.*)/s) {
+        my ($pre, $tag, $group, $family, $val);
+        ($pre, $tag, $line) = ($1, $2, $3);
+        # "$$" represents a "$" symbol
+        if ($tag eq '$') {
+            $rtnStr .= "$pre$tag";
+            next;
+        }
+        # check to see if this is a group name
+        if ($line =~ /^:([\w-]+)(.*)/s) {
+            $group = $tag;
+            ($tag, $line) = ($1, $2);
+            $family = $1 if $group =~ s/^(\d+)//;
+            $line =~ s/^\}// if $group =~ s/^\{//;
+            # find the specified tag
+            my @matches = grep /^$tag(\s|$)/i, @$foundTags;
+            foreach $tag (@matches) {
+                my @groups = $self->GetGroup($tag, $family);
+                next unless grep /^$group$/i, @groups;
+                $val = $self->GetValue($tag);
+                last;
+            }
+        } else {
+            # remove trailing bracket if we had a leading one
+            $line =~ s/^\}// if $tag =~ s/^\{//;
+            $val = $self->GetValue($tag);
+            unless (defined $val) {
+                # check for tag name with different case
+                ($tag) = grep /^$tag$/i, @$foundTags;
+                $val = $self->GetValue($tag) if defined $tag;
+            }
+        }
+        if (ref $val eq 'ARRAY') {
+            $val = join(', ', @$val);
+        } elsif (ref $val eq 'SCALAR') {
+            $val = $$val;
+        } else {
+            $val = '-' unless defined $val;
+        }
+        $rtnStr .= "$pre$val";
+    }
+    return $rtnStr . $line;
+}
 
 #------------------------------------------------------------------------------
 # Create directory for specified file
@@ -2659,7 +2737,7 @@ sub WriteJPEG($$)
     $raf->Seek($pos, 0) or $self->Error('Seek error'), return 1;
 #
 # re-write the image
-#    
+#
     my ($combinedSegData, $segPos);
     # read through each segment in the JPEG file
     Marker: for (;;) {
@@ -3264,7 +3342,8 @@ sub CheckValue($$;$)
             }
             my $rng = $intRange{$format} or return "Bad int format: $format";
             return "Value below $format minimum" if $val < $$rng[0];
-            return "Value above $format maximum" if $val > $$rng[1];
+            # (allow 0xfeedfeed code as value for 16-bit pointers)
+            return "Value above $format maximum" if $val > $$rng[1] and $val != 0xfeedfeed;
         } elsif ($format =~ /^rational/ or $format eq 'float' or $format eq 'double') {
             # make sure the value is a valid floating point number
             return 'Not a floating point number' unless IsFloat($val);
@@ -3413,13 +3492,15 @@ sub WriteBinaryData($$$)
             $tagInfo = $self->GetTagInfo($tagTablePtr, $tagID) or next;
             my $entry = $tagID * $increment;    # (no offset to dirStart for new dir data)
             next unless $entry <= $dirLen - 4;
-            $fixup->AddFixup($entry, $$tagInfo{DataTag});
+            # (Ricoh has 16-bit preview image offsets, so can't just assume int32u)
+            my $format = $$tagInfo{Format} || $$tagTablePtr{FORMAT} || 'int32u';
+            $fixup->AddFixup($entry, $$tagInfo{DataTag}, $format);
             # handle the preview image now if this is a JPEG file
             next unless $self->{FILE_TYPE} eq 'JPEG' and $$tagInfo{DataTag} and
                 $$tagInfo{DataTag} eq 'PreviewImage' and defined $$tagInfo{OffsetPair};
-            my $offset = ReadValue($dataPt, $entry, 'int32u', 1, $dirLen-$entry);
+            my $offset = ReadValue($dataPt, $entry, $format, 1, $dirLen-$entry);
             $entry = $$tagInfo{OffsetPair} * $increment;
-            my $size = ReadValue($dataPt, $entry, 'int32u', 1, $dirLen-$entry);
+            my $size = ReadValue($dataPt, $entry, $format, 1, $dirLen-$entry);
             my $previewInfo = $self->{PREVIEW_INFO};
             $previewInfo or $previewInfo = $self->{PREVIEW_INFO} = { };
             $previewInfo->{Data} = $self->GetNewValues('PreviewImage');

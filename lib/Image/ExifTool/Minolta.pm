@@ -14,7 +14,8 @@
 #               6) Pedro Corte-Real private communication
 #               7) ExifTool forum post by bronek (http://www.cpanforum.com/posts/1118)
 #               8) http://www.chauveau-central.net/mrw-format/
-#               9) CPAN Forum post by 'geve'
+#               9) CPAN Forum post by 'geve' (http://www.cpanforum.com/threads/2168)
+#              10) http://homepage3.nifty.com/kamisaka/makernote/makernote_km.htm
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
@@ -24,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 %Image::ExifTool::Minolta::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -94,6 +95,20 @@ $VERSION = '1.23';
         Writable => 'int32u',
         Protected => 2,
     },
+# needs verification:
+#    0x0100 => { #10
+#        Name => 'SceneMode',
+#        PrintConv => {
+#            0 => 'Standard',
+#            1 => 'Portrait',
+#            2 => 'Text',
+#            3 => 'Night Scene',
+#            4 => 'Evening Scene',
+#            5 => 'Sports',
+#            6 => 'Landscape',
+#            9 => 'Super Macro',
+#        },
+#    },
     0x0101 => {
         Name => 'ColorMode',
         Priority => 0, # Other ColorMode is more reliable for A2
@@ -104,8 +119,15 @@ $VERSION = '1.23';
             2 => 'Vivid color',
             3 => 'Solarization',
             4 => 'Adobe RGB',
+            5 => 'Sepia', #10
+            9 => 'Natural', #10
+            12 => 'Portrait', #10
             13 => 'Natural sRGB',
             14 => 'Natural+ sRGB',
+            15 => 'Landscape', #10
+            16 => 'Evening', #10
+            17 => 'Night Scene', #10
+            18 => 'Night Portrait', #10
         },
     },
     0x0102 => {
@@ -155,6 +177,22 @@ $VERSION = '1.23';
             },
         },
     ],
+# looks wrong:
+#    0x0104 => { #10
+#        Name => 'ExposureCompensation',
+#        Writable => 'rational64s',
+#    },
+# needs verification:
+#    0x0105 => { #10
+#        Name => 'Teleconverter',
+#        PrintConv => {
+#            0 => 'None',
+#            72 => 'Minolta AF 2x APO (D)',
+#            80 => 'Minolta AF 2x APO II',
+#            136 => 'Minolta AF 1.4x APO (D)',
+#            144 => 'Minolta AF 1.4x APO II',
+#        },
+#    },
     0x0107 => { #8
         Name => 'ImageStabilization',
         Writable => 'int32u',
@@ -233,8 +271,10 @@ $VERSION = '1.23';
             45741 => 'AF200mm F2.8G x2 or TOKINA 300mm F2.8 x2',
         },
     },
+    # 0x010e - WhiteBalance according to ref #10
     0x0114 => { #8
         Name => 'MinoltaCameraSettings5D',
+        Condition => '$self->{CameraModel} =~ /^(DYNAX 5D|MAXXUM 5D|ALPHA SWEET)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::CameraSettings5D',
             ByteOrder => 'BigEndian',
@@ -507,9 +547,9 @@ $VERSION = '1.23';
         },
     },
     37 => {
-        Name => 'MinoltaModel',
+        Name => 'MinoltaModelID',
         PrintConv => {
-            0 => 'DiMAGE 7 or X31',
+            0 => 'DiMAGE 7, X1, X21 or X31',
             1 => 'DiMAGE 5',
             2 => 'DiMAGE S304',
             3 => 'DiMAGE S404',
@@ -623,7 +663,7 @@ $VERSION = '1.23';
         Name => 'FlashMetering',
         PrintConv => {
             0 => 'ADI (Advanced Distance Integration)',
-            1 => 'Pre-flash TTl', 
+            1 => 'Pre-flash TTl',
             2 => 'Manual flash control',
         },
     },
@@ -709,9 +749,19 @@ $VERSION = '1.23';
         Name => 'Flash',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
+# needs verification:
+#    0x16 => { #10
+#        Name => 'FlashMode',
+#        PrintConv => {
+#            0 => 'Normal',
+#            1 => 'Red-eye reduction',
+#            2 => 'Rear flash sync',
+#        },
+#    },
     0x1c => {
         Name => 'ISOSetting',
         PrintConv => {
+            0 => 'Auto', #10
             1 => 100,
             3 => 200,
             4 => 400,
@@ -731,8 +781,8 @@ $VERSION = '1.23';
     0x25 => {
         Name => 'ColorSpace',
         PrintConv => {
-            0 => 'sRGB (Natural)',
-            1 => 'sRGB (Natural+)',
+            0 => 'Natural sRGB',
+            1 => 'Natural+ sRGB',
             4 => 'Adobe RGB',
         },
     },
@@ -758,6 +808,13 @@ $VERSION = '1.23';
         ValueConv => '$val * 100',
         ValueConvInv => '$val / 100',
     },
+# needs verification:
+#    0x40 => { #10
+#        Name => 'HueAdjustment',
+#        Unknown => 1,
+#        ValueConv => '$val - 10',
+#        ValueConvInv => '$val + 10',
+#    },
     0x46 => {
         Name => 'Rotation',
         PrintConv => {
@@ -853,8 +910,8 @@ $VERSION = '1.23';
         PrintConv => {
             0 => 'Auto',
             1 => 'Daylight',
-            2 => 'Cloudy?',
-            3 => 'Shade?',
+            2 => 'Cloudy',
+            3 => 'Shade',
             4 => 'Tungsten',
             5 => 'Fluorescent',
             6 => 'Flash',
@@ -871,6 +928,15 @@ $VERSION = '1.23';
             1 => 'Fired',
         },
     },
+# needs verification:
+#    0x20 => { #10
+#        Name => 'FlashMode',
+#        PrintConv => {
+#            0 => 'Normal',
+#            1 => 'Red-eye reduction',
+#            2 => 'Rear flash sync',
+#        },
+#    },
     0x25 => {
         Name => 'MeteringMode',
         PrintConv => {
@@ -893,6 +959,23 @@ $VERSION = '1.23';
             10 => '80 (Zone Matching Low)',
         },
     },
+# looks wrong:
+#    0x28 => { #10
+#        Name => 'ExposureCompensation',
+#        ValueConv => '$val / 24',
+#        ValueConvInv => '$val * 24',
+#    },
+# needs verification:
+#    0x2f => { #10
+#        Name => 'ColorSpace',
+#        PrintConv => {
+#            0 => 'Natural sRGB',
+#            1 => 'Natural+ sRGB',
+#            2 => 'Monochrome',
+#            4 => 'Adobe RGB (ICC)',
+#            5 => 'Adobe RGB',
+#        },
+#    },
     0x30 => {
         Name => 'Sharpness',
         ValueConv => '$val - 10',
@@ -930,6 +1013,12 @@ $VERSION = '1.23';
         ValueConv => '$val * 100',
         ValueConvInv => '$val / 100',
     },
+# needs verification:
+#    0x4a => { #10
+#        Name => 'HueAdjustment',
+#        ValueConv => '$val - 10',
+#        ValueConvInv => '$val + 10',
+#    },
     0x50 => {
         Name => 'Rotation',
         PrintConv => {
@@ -946,7 +1035,38 @@ $VERSION = '1.23';
         PrintConvInv => 'eval $val',
     },
     0x54 => 'FreeMemoryCardImages',
+# needs verification:
+#    0x65 => { #10
+#        Name => 'Rotation',
+#        PrintConv => {
+#            0 => 'Horizontal (normal)',
+#            1=> 'Rotate 90 CW',
+#            2 => 'Rotate 270 CW',
+#        },
+#    },
     # 0x66 maybe program mode or some setting like this? (PH)
+    0x6e => { #10
+        Name => 'ColorTemperature',
+        Format => 'int16s',
+        ValueConv => '$val * 100',
+        ValueConvInv => '$val / 100',
+    },
+# needs verification:
+#    0x71 => { #10
+#        Name => 'PictureFinish',
+#        PrintConv => {
+#            0 => 'Natural',
+#            1 => 'Natural+',
+#            2 => 'Portrait',
+#            3 => 'Wind Scene',
+#            4 => 'Evening Scene',
+#            5 => 'Night Scene',
+#            6 => 'Night Portrait',
+#            7 => 'Monochrome',
+#            8 => 'Adobe RGB',
+#            9 => 'Adobe RGB (ICC)',
+#        },
+#    },
     # 0x95 FlashStrength? (PH)
     # 0xa4 similar information to 0x27, except with different values
     0xae => {

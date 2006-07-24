@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
 [File, File, Image]  - File Name: PDF.pdf
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 9 kB
@@ -64,8 +64,8 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 8
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 8
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3053
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3053
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3053
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3053
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: cm
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera

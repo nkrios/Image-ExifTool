@@ -415,7 +415,6 @@ my %advancedContentEncryption = (
         ValueConv => '$val / 1e7',
         PrintConv => '"$val sec"',
     },
-    
     48 => {
         Name => 'StreamNumber',
         Format => 'int16u',

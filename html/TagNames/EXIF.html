@@ -5,13 +5,17 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h2>EXIF Tags</h2>
 
-EXIF stands for &apos;Exchangeable Image File Format&apos;.  This type of information
+EXIF stands for &#39;Exchangeable Image File Format&#39;.  This type of information
 may be found in JPG, TIFF, PNG, MIFF and DNG images.
 
 <p>The EXIF meta information is organized into different Image File Directories
-(IFD&apos;s) within an image.  The names of these IFD&apos;s correspond to the
+(IFD&#39;s) within an image.  The names of these IFD&#39;s correspond to the
 ExifTool family 1 group names.  When writing EXIF information, the default
 <b>Group</b> listed below is used unless another group is specified.
+
+<p>Also listed in the table below are TIFF, DNG, WDP and other tags which are
+not part of the EXIF specification, but may co-exist with EXIF tags in some
+images.
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -480,7 +484,7 @@ JpgFromRawLength in SubIFD2 of DNG images)</font></font></td></tr>
 <td align='center'>N</td>
 <td align='center'>-</td>
 <td><font size='-1'>1 = Unsigned integer
-  <br>2 = Two&apos;s complement signed integer
+  <br>2 = Two&#39;s complement signed integer
   <br>3 = IEEE floating point
   <br>4 = Undefined
   <br>5 = Complex integer
@@ -676,12 +680,12 @@ JpgFromRawLength in SubIFD2 of DNG images)</font></font></td></tr>
 <td>YCbCrSubSampling</td>
 <td align='center'>int16u[2]!</td>
 <td align='center'>IFD0</td>
-<td><font size='-1'>&apos;1 1&apos; = YCbCr4:4:4
-  <br>&apos;1 2&apos; = YCbCr4:4:0
-  <br>&apos;2 1&apos; = YCbCr4:2:2
-  <br>&apos;2 2&apos; = YCbCr4:2:0
-  <br>&apos;4 1&apos; = YCbCr4:1:1
-  <br>&apos;4 2&apos; = YCbCr4:1:0</font></td></tr>
+<td><font size='-1'>&#39;1 1&#39; = YCbCr4:4:4
+  <br>&#39;1 2&#39; = YCbCr4:4:0
+  <br>&#39;2 1&#39; = YCbCr4:2:2
+  <br>&#39;2 2&#39; = YCbCr4:2:0
+  <br>&#39;4 1&#39; = YCbCr4:1:1
+  <br>&#39;4 2&#39; = YCbCr4:1:0</font></td></tr>
 <tr valign='top'>
 <td>0x0213</td>
 <td>YCbCrPositioning</td>
@@ -1296,8 +1300,8 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <td align='center'>-</td>
 <td><font size='-1'>1 = mm
   <br>10 = cm
-  <br>&apos;0.001&apos; = um
-  <br>&apos;25.4&apos; = inches</font></td></tr>
+  <br>&#39;0.001&#39; = um
+  <br>&#39;25.4&#39; = inches</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9211</td>
 <td>ImageNumber</td>
@@ -1309,11 +1313,11 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <td>SecurityClassification</td>
 <td align='center'>string</td>
 <td align='center'>-</td>
-<td><font size='-1'>&apos;C&apos; = Confidential
-  <br>&apos;R&apos; = Restricted
-  <br>&apos;S&apos; = Secret
-  <br>&apos;T&apos; = Top Secret
-  <br>&apos;U&apos; = Unclassified</font></td></tr>
+<td><font size='-1'>&#39;C&#39; = Confidential
+  <br>&#39;R&#39; = Restricted
+  <br>&#39;S&#39; = Secret
+  <br>&#39;T&#39; = Top Secret
+  <br>&#39;U&#39; = Unclassified</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9213</td>
 <td>ImageHistory</td>
@@ -1376,6 +1380,9 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
   <br>MakerNoteKodakUnknown
   <br>MakerNoteKyocera
   <br>MakerNoteMinolta
+  <br>MakerNoteMinolta2
+  <br>MakerNoteMinolta3
+  <br>MakerNoteMinolta4
   <br>MakerNoteNikon
   <br>MakerNoteNikon2
   <br>MakerNoteNikon3
@@ -1393,8 +1400,8 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
   <br>MakerNoteSonySRF
   <br>MakerNoteSonySR2
   <br>MakerNoteUnknown</td>
-<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td align='center'>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td align='center'>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -1412,6 +1419,9 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
   <br>--&gt; <a href='Kodak.html#Unknown'>Kodak Unknown Tags</a>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a>
   <br>--&gt; <a href='Minolta.html'>Minolta Tags</a>
+  <br>--&gt; <a href='Olympus.html'>Olympus Tags</a>
+  <br>--&gt; <a href='FujiFilm.html'>FujiFilm Tags</a>
+  <br><font color="#666666">(not EXIF-based)</font>
   <br>--&gt; <a href='Nikon.html'>Nikon Tags</a>
   <br>--&gt; <a href='Nikon.html#Type2'>Nikon Type2 Tags</a>
   <br>--&gt; <a href='Nikon.html'>Nikon Tags</a>
@@ -1567,8 +1577,8 @@ ImageDescription exists)</font></font></td></tr>
 <td align='center'>-</td>
 <td><font size='-1'>1 = mm
   <br>10 = cm
-  <br>&apos;0.001&apos; = um
-  <br>&apos;25.4&apos; = inches</font></td></tr>
+  <br>&#39;0.001&#39; = um
+  <br>&#39;25.4&#39; = inches</font></td></tr>
 <tr valign='top'>
 <td>0xa211</td>
 <td>ImageNumber</td>
@@ -1622,7 +1632,9 @@ ImageDescription exists)</font></font></td></tr>
 <td>FileSource</td>
 <td align='center'>undef</td>
 <td align='center'>-</td>
-<td><font size='-1'>3 = Digital Camera</font></td></tr>
+<td><font size='-1'>1 = Film Scanner
+  <br>2 = Reflection Print Scanner
+  <br>3 = Digital Camera</font></td></tr>
 <tr valign='top'>
 <td>0xa301</td>
 <td>SceneType</td>
@@ -1750,6 +1762,163 @@ ImageDescription exists)</font></font></td></tr>
 <td align='center'>rational64u</td>
 <td align='center'>-</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xbc01</td>
+<td>PixelFormat</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td><font size='-1'><font color="#666666">(tags 0xbc** are used in Windows Media Photo WDP images. The actual
+PixelFormat values are 16-byte GUID&#39;s but the leading 15 bytes,
+&#39;6fddc324-4e03-4bfe-b1853d77768dc9&#39;, have been removed below to avoid
+unnecessary clutter)</font>
+  <br>&#39;0x05&#39; = Black &amp; White
+  <br>&#39;0x08&#39; = 8-bit Gray
+  <br>&#39;0x09&#39; = 16-bit BGR555
+  <br>&#39;0x0a&#39; = 16-bit BGR565
+  <br>&#39;0x0b&#39; = 16-bit Gray
+  <br>&#39;0x0c&#39; = 24-bit BGR
+  <br>&#39;0x0d&#39; = 24-bit RGB
+  <br>&#39;0x0e&#39; = 32-bit BGR
+  <br>&#39;0x0f&#39; = 32-bit BGRA
+  <br>&#39;0x10&#39; = 32-bit PBGRA
+  <br>&#39;0x11&#39; = 32-bit Gray Float
+  <br>&#39;0x12&#39; = 48-bit RGB Fixed Point
+  <br>&#39;0x13&#39; = 32-bit BGR101010
+  <br>&#39;0x15&#39; = 48-bit RGB
+  <br>&#39;0x16&#39; = 64-bit RGBA
+  <br>&#39;0x17&#39; = 64-bit PRGBA
+  <br>&#39;0x18&#39; = 96-bit RGB Fixed Point
+  <br>&#39;0x19&#39; = 128-bit RGBA Float
+  <br>&#39;0x1a&#39; = 128-bit PRGBA Float
+  <br>&#39;0x1b&#39; = 128-bit RGB Float
+  <br>&#39;0x1c&#39; = 32-bit CMYK
+  <br>&#39;0x1d&#39; = 64-bit RGBA Fixed Point
+  <br>&#39;0x1e&#39; = 128-bit RGBA Fixed Point
+  <br>&#39;0x1f&#39; = 64-bit CMYK
+  <br>&#39;0x20&#39; = 24-bit 3 Channels
+  <br>&#39;0x21&#39; = 32-bit 4 Channels
+  <br>&#39;0x22&#39; = 40-bit 5 Channels
+  <br>&#39;0x23&#39; = 48-bit 6 Channels
+  <br>&#39;0x24&#39; = 56-bit 7 Channels
+  <br>&#39;0x25&#39; = 64-bit 8 Channels
+  <br>&#39;0x26&#39; = 48-bit 3 Channels
+  <br>&#39;0x27&#39; = 64-bit 4 Channels
+  <br>&#39;0x28&#39; = 80-bit 5 Channels
+  <br>&#39;0x29&#39; = 96-bit 6 Channels
+  <br>&#39;0x2a&#39; = 112-bit 7 Channels
+  <br>&#39;0x2b&#39; = 128-bit 8 Channels
+  <br>&#39;0x2c&#39; = 40-bit CMYK Alpha
+  <br>&#39;0x2d&#39; = 80-bit CMYK Alpha
+  <br>&#39;0x2e&#39; = 32-bit 3 Channels Alpha
+  <br>&#39;0x2f&#39; = 40-bit 4 Channels Alpha
+  <br>&#39;0x30&#39; = 48-bit 5 Channels Alpha
+  <br>&#39;0x31&#39; = 56-bit 6 Channels Alpha
+  <br>&#39;0x32&#39; = 64-bit 7 Channels Alpha
+  <br>&#39;0x33&#39; = 72-bit 8 Channels Alpha
+  <br>&#39;0x34&#39; = 64-bit 3 Channels Alpha
+  <br>&#39;0x35&#39; = 80-bit 4 Channels Alpha
+  <br>&#39;0x36&#39; = 96-bit 5 Channels Alpha
+  <br>&#39;0x37&#39; = 112-bit 6 Channels Alpha
+  <br>&#39;0x38&#39; = 128-bit 7 Channels Alpha
+  <br>&#39;0x39&#39; = 144-bit 8 Channels Alpha
+  <br>&#39;0x3a&#39; = 64-bit RGBA Half
+  <br>&#39;0x3b&#39; = 48-bit RGB Half
+  <br>&#39;0x3d&#39; = 32-bit RGBE
+  <br>&#39;0x3e&#39; = 16-bit Gray Half
+  <br>&#39;0x3f&#39; = 32-bit Gray Fixed Point</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xbc02</td>
+<td>Transfomation</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td><font size='-1'>0 = Horizontal (normal)
+  <br>1 = Mirror vertical
+  <br>2 = Mirror horizontal
+  <br>3 = Rotate 180
+  <br>4 = Rotate 90 CW
+  <br>5 = Mirror horizontal and rotate 90 CW
+  <br>6 = Mirror horizontal and rotate 270 CW
+  <br>7 = Rotate 270 CW</font></td></tr>
+<tr valign='top'>
+<td>0xbc03</td>
+<td>Uncompressed</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xbc04</td>
+<td>ImageType</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td><font size='-1'>Bit 0 = Preview
+  <br>Bit 1 = Page</font></td></tr>
+<tr valign='top'>
+<td>0xbc80</td>
+<td>ImageWidth</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xbc81</td>
+<td>ImageHeight</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xbc82</td>
+<td>WidthResolution</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xbc83</td>
+<td>HeightResolution</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xbcc0</td>
+<td>ImageOffset</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xbcc1</td>
+<td>ImageByteCount</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xbcc2</td>
+<td>AlphaOffset</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xbcc3</td>
+<td>AlphaByteCount</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xbcc4</td>
+<td>ImageDataDiscard</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td><font size='-1'>0 = Full Resolution
+  <br>1 = Flexbits Discarded
+  <br>2 = HighPass Frequency Data Discarded
+  <br>3 = Highpass and LowPass Frequency Data Discarded</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xbcc5</td>
+<td>AlphaDataDiscard</td>
+<td align='center'>N</td>
+<td align='center'>-</td>
+<td><font size='-1'>0 = Full Resolution
+  <br>1 = Flexbits Discarded
+  <br>2 = HighPass Frequency Data Discarded
+  <br>3 = Highpass and LowPass Frequency Data Discarded</font></td></tr>
 <tr valign='top'>
 <td>0xc427</td>
 <td>OceScanjobDesc</td>
@@ -2217,6 +2386,6 @@ writing these unless they already exist in the file)</font></font></td></tr>
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 9, 2006</i>
+<br><i>Last revised Jul 7, 2006</i>
 </body>
 </html>

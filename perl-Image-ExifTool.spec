@@ -1,6 +1,6 @@
 Summary: perl module for image data extraction 
 Name: perl-Image-ExifTool
-Version: 6.17
+Version: 6.29
 Release: 1
 License: Free
 Group: Development/Libraries/Perl
@@ -16,17 +16,30 @@ manufacturers such as Canon, Casio, FujiFilm, JVC/Victor, Kodak, Leaf,
 Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
 Ricoh, Sanyo and Sigma/Foveon.
 
-ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, GeoTIFF, ICC Profile,
-Photoshop IRB, AFCP and ID3 meta information from JPG, JP2, TIFF, GIF, BMP,
-PICT, QTIF, PNG, MNG, JNG, MIFF, PPM, PGM, PBM, EPS, PS, AI, PDF, PSD, DCM,
-ACR, THM, CRW, CR2, ERF, MRW, NEF, PEF, ORF, RAF, RAW, SRF, SR2, MOS, X3F
-and DNG images, MP3, WAV, WMA and AIFF audio files, AVI, MOV, MP4 and WMV
-videos, and XMP, ICC and MIE data files.
+Below is a list of file types and meta information formats currently
+supported by ExifTool (r = read support, w = write support):
 
-ExifTool writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, ICC Profile,
-Photoshop IRB and AFCP meta information to JPEG, TIFF, GIF, EPS, PS, PSD,
-XMP, ICC, MIE, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, ERF, MRW, NEF,
-PEF, MOS and DNG images.
+                 File Type                      Meta Information
+    -----------------------------------        ------------------
+    JPEG  r/w     ICC   r/w     MIFF  r        EXIF           r/w
+    TIFF  r/w     MIE   r/w     PICT  r        GPS            r/w
+    GIF   r/w     PPM   r/w     QTIF  r        IPTC           r/w
+    CRW   r/w     PGM   r/w     RIFF  r        XMP            r/w
+    CR2   r/w     PBM   r/w     AIFF  r        MakerNotes     r/w
+    ERF   r/w     WDP   r/w     AVI   r        Photoshop IRB  r/w
+    NEF   r/w     JP2   r       WAV   r        AFCP           r/w
+    PEF   r/w     BMP   r       MPG   r        JFIF           r/w
+    MRW   r/w     FPX   r       MP3   r        ICC Profile    r/w
+    MOS   r/w     ORF   r       MP4   r        MIE            r/w
+    DNG   r/w     RAF   r       MOV   r        FlashPix       r
+    PNG   r/w     RAW   r       ASF   r        GeoTIFF        r
+    MNG   r/w     SRF   r       WMA   r        PrintIM        r
+    JNG   r/w     SR2   r       WMV   r        ID3            r
+    XMP   r/w     X3F   r       RA    r
+    THM   r/w     DCM   r       RM    r
+    PSD   r/w     ACR   r       RAM   r
+    EPS   r/w     AI    r       SWF   r
+    PS    r/w     PDF   r
 
 See html/index.html for more details about ExifTool features.
 

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.19
 [File, File, Image]  - File Name: MP3.mp3
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 391 bytes
-[File, File, Time]  - File Modification Date/Time: 2005:09:14 17:39:02
+[File, File, Image]  - File Size: 395 bytes
+[File, File, Time]  - File Modification Date/Time: 2006:05:15 07:23:50
 [File, File, Image]  - File Type: MP3
 [File, File, Image]  - MIME Type: audio/mpeg
 [ID3, ID3v2_2, Audio] TRK - Track: 1/5
@@ -23,3 +23,13 @@
 [ID3, ID3v1, Time] 93 - Year: 2003
 [ID3, ID3v1, Audio] 97 - Comment: Comment
 [ID3, ID3v1, Audio] 127 - Genre: Hip-Hop
+[MPEG, MPEG, Audio] Bit11-12 - MPEG Audio Version: 1
+[MPEG, MPEG, Audio] Bit13-14 - Audio Layer: 3
+[MPEG, MPEG, Audio] Bit16-19 - Audio Bitrate: 128000
+[MPEG, MPEG, Audio] Bit20-21 - Sample Rate: 44100
+[MPEG, MPEG, Audio] Bit24-25 - Channel Mode: Joint Stereo
+[MPEG, MPEG, Audio] Bit26 - MS Stereo: On
+[MPEG, MPEG, Audio] Bit27 - Intensity Stereo: Off
+[MPEG, MPEG, Audio] Bit28 - Copyright Flag: True
+[MPEG, MPEG, Audio] Bit29 - Original Media: True
+[MPEG, MPEG, Audio] Bit30-31 - Emphasis: None

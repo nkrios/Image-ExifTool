@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
 [File, File, Image]  - File Name: CanonRaw_6_failed.cr2
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 11 kB
-[File, File, Time]  - File Modification Date/Time: 2006:03:05 14:22:23
+[File, File, Time]  - File Modification Date/Time: 2006:07:04 10:58:27
 [File, File, Image]  - File Type: CR2
 [File, File, Image]  - MIME Type: image/x-raw
 [EXIF, IFD0, Image] 256 - Image Width: 1536
@@ -39,8 +39,8 @@
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2304
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3954.233
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3958.763
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3954.233
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3958.763
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
@@ -112,7 +112,9 @@
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
+[MakerNotes, Canon, Image] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
+[MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS 350D DIGITAL
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware 1.0.2
@@ -192,10 +194,10 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/15
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - WB RGGB Levels: 2002 1185 1187 2364
-[Composite, Composite, Camera]  - Blue Balance: 1.99325
+[Composite, Composite, Camera]  - Blue Balance: 1.993255
 [Composite, Composite, Image]  - Circle Of Confusion: 0.027 mm
 [Composite, Composite, Camera]  - Focal Length: 55.0mm (35mm equivalent: 62.3mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 14.24 m
 [Composite, Composite, Image]  - Image Size: 1536x1024
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 20.4 - 62.3mm)
-[Composite, Composite, Camera]  - Red Balance: 1.68803
+[Composite, Composite, Camera]  - Red Balance: 1.688027

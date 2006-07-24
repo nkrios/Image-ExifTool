@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.08
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
 [File, File, Image]  - File Name: Olympus_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2006:03:25 11:17:43
+[File, File, Time]  - File Modification Date/Time: 2006:06:05 09:10:10
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -237,11 +237,11 @@
 [PrintIM, PrintIM, Printing] 263 - Print IM 0x0107: 0x00808080
 [PrintIM, PrintIM, Printing] 272 - Print IM 0x0110: 0x00000082
 [Composite, Composite, Image]  - Aperture: 4.5
-[Composite, Composite, Camera]  - Blue Balance: 1.13281
+[Composite, Composite, Camera]  - Blue Balance: 1.132813
 [Composite, Composite, Camera]  - Extender Status: Not attached
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
-[Composite, Composite, Camera]  - Red Balance: 1.60938
+[Composite, Composite, Camera]  - Red Balance: 1.609375
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 2.0
 [Composite, Composite, Image]  - Shutter Speed: 1/100
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

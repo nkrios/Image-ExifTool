@@ -210,9 +210,10 @@ complete list of ExifTool tag names.
 
 </td></tr><tr><td valign='top'><b>File&nbsp;ref</b></td><td>
 A reference to an open image file.  If you use this method (or a SCALAR
-reference) to access information in an image, the FileName and Directory tags
-will not be returned.  (Also, the FileSize and FileModifyDate tags will not be
-returned unless it is a plain file.)
+reference) to access information in an image, the FileName and Directory
+tags will not be returned.  (Also, the FileSize and FileModifyDate tags will
+not be returned unless it is a plain file.)  Image processing begins at the
+current file position, and on return the new file position is not specified.
 
 </td></tr><tr><td valign='top'><b>SCALAR&nbsp;ref</b></td><td>
 A reference to image data in memory.
@@ -324,7 +325,7 @@ to a specific function.
 <tr><td><b>Prototype</b></td><td>Options($$;@)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
     <br>1) Parameter name (see table below)
-    <br>2) [optional] Option value if specified
+    <br>2) [optional] Option value if specified (may be undef to clear option)
     <br>3-N) [optional] Additional parameter/value pairs
 </td></tr>
 <tr><td><b>Returns</b></td><td>Previous value of last specified parameter</td></tr>
@@ -373,6 +374,12 @@ to a specific function.
     <td>Tag name or reference to a list of tag names to exclude.  Case is not significant.
     Tags may also be excluded by preceeding their name with a '-' in the arguments to ImageInfo.</td>
     <td align='center'>undef</td></tr>
+<tr><td>FastScan</td>
+    <td>Flag to increase speed of extracting information from JPEG images.  With this
+    option set, ExifTool will not scan to the end of a JPEG image to check for an AFCP
+    or PreviewImage trailer.</td>
+    <td>1 or 0</td>
+    <td align='center'>0</td></tr>
 <tr><td>FixBase</td>
     <td>Fix maker notes base offset.  Allows values to be extracted from maker notes
     which have been corrupted by editing with 3rd party software.</td>
@@ -819,6 +826,11 @@ in a specified file.
  and 'DSTTAG' may use '*' and/or be prefixed by a group name (ie.
  'modifyDate&gt;fileModifyDate' or '*&gt;xmp:*').  Tags are evaluated in order,
  so exclusions apply only to tags included earlier in the list.
+ An extension of this feature allows the tag value to be set from an
+ expression containing tag names with leading '$' symbols (ie.
+ 'Comment&lt;Filename: $filename').  Braces '{}' may be used around the tag
+ name to separate it from subsequent text, and a '$$' is used to to represent
+ a '$' symbol.
 </td></tr>
 <tr><td><b>Returns</b></td><td>A hash of information that was set
 successfully.  May include Warning or Error entries if there were problems
@@ -847,6 +859,10 @@ $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile, $tag1, $tag2...);
 
 # set new value from a different tag in specific group
 $exifTool-&gt;<b>SetNewValuesFromFile</b>($src, 'IPTC:Keywords&gt;XMP-dc:Subject');
+
+# set new value from an expression involving other tags
+$exifTool-><b>SetNewValuesFromFile</b>($file,
+    'Comment&lt;ISO=$ISO Aperture=$aperture Exposure=$shutterSpeed');
 </pre></td></tr></table></blockquote>
 <b>Notes:</b>
 <p>The PrintConv option applies to this routine, but it should normally be left
@@ -1196,26 +1212,27 @@ separated into the ICC-header group.
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
 <td>AFCP, AIFF, APP12, APP14, ASF, BMP, Composite, DICOM, DNG, EXIF,
-ExifTool, File, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf,
-MIE, MIFF, MNG, MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript,
-PrintIM, QuickTime, RIFF, SigmaRaw, XMP
+ExifTool, File, Flash, FlashPix, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF,
+Jpeg2000, Leaf, MIE, MIFF, MNG, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
+Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real, SigmaRaw, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AFCP, AIFF, APP12, APP14, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio,
-Composite, DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff,
-GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
-ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC,
-InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
-KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
-MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-Video, MIFF, MNG, MakerUnknown,
-MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, Olympus,
-PDF, PICT, PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM,
-QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD,
-Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
-XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
-XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
-XMP-xxx
+Composite, DICOM, DNG, ExifIFD, ExifTool, File, Flash, FlashPix, FujiFilm,
+GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
+ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
+IPTC, InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+KodakEffectsIFD, KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera,
+MIE-Doc, MIE-Extender, MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
+MIE-MakerNotes, MIE-Meta, MIE-Preview, MIE-Thumbnail, MIE-Unknown,
+MIE-Video, MIFF, MNG, MPEG, MakerUnknown, MetaIFD, Minolta, MinoltaRaw,
+Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT, PNG, Panasonic,
+Pentax, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real, Real-CONT,
+Real-MDPR, Real-PROP, Real-RA3, Real-RA4 Real-RA5, Real-RJMD, Ricoh, SR2,
+SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
+XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
+XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,

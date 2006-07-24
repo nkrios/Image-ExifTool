@@ -6,6 +6,8 @@
 # Revisions:    01/19/2005 - P. Harvey Created
 #               04/11/2005 - P. Harvey Allow fixups to be tagged with a marker,
 #                            and add new marker-related routines
+#               06/21/2006 - P. Harvey Patch to work with negative offsets
+#               07/07/2006 - P. Harvey Added support for 16-bit pointers
 #
 # Data Members:
 #
@@ -13,18 +15,20 @@
 #   Shift     - Amount to shift offsets (relative to Start).
 #   Fixups    - List of Fixup object references to to shift relative to this Fixup.
 #   Pointers  - Hash of references to fixup pointer arrays, keyed by ByteOrder
-#               string (with "_$marker" added if tagged with a marker name).
+#               string (with "2" added if pointer is 16-bit [default is 32-bit],
+#               plus "_$marker" suffix if tagged with a marker name).
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Fixup;
 
 use strict;
-use Image::ExifTool qw(GetByteOrder SetByteOrder Get32u Set32u);
+use Image::ExifTool qw(GetByteOrder SetByteOrder Get32u Get32s Set32u
+                       Get16u Get16s Set16u);
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
-sub AddFixup($$;$);
+sub AddFixup($$;$$);
 sub ApplyFixup($$);
 sub Dump($;$);
 
@@ -79,16 +83,24 @@ sub Clone($)
 # Inputs: 0) Fixup object reference
 #         1) Scalar for pointer offset, or reference to Fixup object
 #         2) Optional marker name for the pointer
+#         3) Optional pointer format ('int16u' or 'int32u', defaults to 'int32u')
 # Notes: Byte ordering must be set properly for the pointer being added (must keep
 # track of the byte order of each offset since MakerNotes may have different byte order!)
-sub AddFixup($$;$)
+sub AddFixup($$;$$)
 {
-    my ($self, $pointer, $marker) = @_;
+    my ($self, $pointer, $marker, $format) = @_;
     if (ref $pointer) {
         $self->{Fixups} or $self->{Fixups} = [ ];
         push @{$self->{Fixups}}, $pointer;
     } else {
         my $byteOrder = GetByteOrder();
+        if (defined $format) {
+            if ($format eq 'int16u') {
+                $byteOrder .= '2';
+            } elsif ($format ne 'int32u') {
+                warn "Bad Fixup pointer format $format\n";
+            }
+        }
         $byteOrder .= "_$marker" if defined $marker;
         my $phash = $self->{Pointers};
         $phash or $phash = $self->{Pointers} = { };
@@ -115,11 +127,14 @@ sub ApplyFixup($$)
         my ($byteOrder, $ptr);
         foreach $byteOrder (keys %$phash) {
             SetByteOrder(substr($byteOrder,0,2));
+            # apply the fixup offset shift (must get as signed integer
+            # to avoid overflow in case it was negative before)
+            my ($get, $set) = ($byteOrder =~ /^(II2|MM2)/) ?
+                              (\&Get16s, \&Set16u) : (\&Get32s, \&Set32u);
             foreach $ptr (@{$phash->{$byteOrder}}) {
                 $ptr += $start;         # update pointer to new start location
                 next unless $shift;
-                # apply the fixup offset shift
-                Set32u(Get32u($dataPt, $ptr) + $shift, $dataPt, $ptr);
+                &$set(&$get($dataPt, $ptr) + $shift, $dataPt, $ptr);
             }
         }
         SetByteOrder($saveOrder);       # restore original byte ordering
@@ -161,7 +176,7 @@ sub HasMarker($$)
     my ($self, $marker) = @_;
     my $phash = $self->{Pointers};
     return 0 unless $phash;
-    return 1 if $phash->{"MM_$marker"} or $phash->{"II_$marker"};
+    return 1 if grep /^_$marker$/, keys %$phash;
     return 0 unless $self->{Fixups};
     my $subFixup;
     foreach $subFixup (@{$self->{Fixups}}) {
@@ -184,10 +199,11 @@ sub SetMarkerPointers($$$$;$)
         my $saveOrder = GetByteOrder(); # save original byte ordering
         my ($byteOrder, $ptr);
         foreach $byteOrder (keys %$phash) {
-            next unless $byteOrder =~ /^(II|MM)_$marker$/;
+            next unless $byteOrder =~ /^(II|MM)(2?)_$marker$/;
             SetByteOrder($1);
+            my $set = $2 ? \&Set16u : \&Set32u;
             foreach $ptr (@{$phash->{$byteOrder}}) {
-                Set32u($value, $dataPt, $ptr + $start);
+                &$set($value, $dataPt, $ptr + $start);
             }
         }
         SetByteOrder($saveOrder);       # restore original byte ordering
@@ -203,7 +219,7 @@ sub SetMarkerPointers($$$$;$)
 #------------------------------------------------------------------------------
 # Get pointer values for specified marker
 # Inputs: 0) Fixup object reference, 1) data reference,
-#          2) marker name, 3) offset to start of data
+#         2) marker name, 3) offset to start of data
 # Returns: List of marker pointers in list context, or first marker pointer otherwise
 sub GetMarkerPointers($$$;$)
 {
@@ -217,8 +233,9 @@ sub GetMarkerPointers($$$;$)
         my ($byteOrder, $ptr);
         foreach $byteOrder (grep /_$marker$/, keys %$phash) {
             SetByteOrder(substr($byteOrder,0,2));
+            my $get = ($byteOrder =~ /^(II2|MM2)/) ? \&Get16u : \&Get32u;
             foreach $ptr (@{$phash->{$byteOrder}}) {
-                push @pointers, Get32u($dataPt, $ptr + $start);
+                push @pointers, &$get($dataPt, $ptr + $start);
             }
         }
         SetByteOrder($saveOrder);       # restore original byte ordering

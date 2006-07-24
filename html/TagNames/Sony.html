@@ -24,10 +24,36 @@ tags.
 <td>ColorModeSetting</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xb027</td>
+<td>LensID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xb028</td>
+<td>MinoltaMakerNote</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Minolta.html'>Minolta Tags</a></td></tr>
+<tr valign='top'>
+<td>0xb040</td>
+<td>Macro</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xb041</td>
+<td>ExposureMode</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Auto
+  <br>6 = Program
+  <br>7 = Aperture Priority
+  <br>8 = Shutter Priority
+  <br>9 = Night Scene
+  <br>15 = Manual</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SRF'>Sony SRF Tags</a></h2>
-The maker notes in SRF (Sony Raw Format) images contain 7 IFD&apos;s (with family
+The maker notes in SRF (Sony Raw Format) images contain 7 IFD&#39;s (with family
 1 group names SRF0 through SRF6).  SRF0 through SRF5 use these Sony tags,
 while SRF6 uses standard EXIF tags.  All information other than SRF0 is
 encrypted, but thanks to Dave Coffin the decryption algorithm is known.
@@ -114,6 +140,6 @@ Tags in the encrypted SR2SubIFD
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 19, 2006</i>
+<br><i>Last revised Jul 4, 2006</i>
 </body>
 </html>

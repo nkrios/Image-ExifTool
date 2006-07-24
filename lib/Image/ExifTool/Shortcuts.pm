@@ -15,10 +15,16 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
+    # this shortcut allows the three common date/time tags to be shifted at once
+    AllDates => [
+        'DateTimeOriginal',
+        'CreateDate',
+        'ModifyDate',
+    ],
     # This is a shortcut to some common information which is useful in most images
     Common => [
         'FileName',
@@ -188,10 +194,11 @@ This module contains definitions for tag name shortcuts used by
 Image::ExifTool.  You can customize this file to add your own shortcuts.
 
 Individual users may also add their own shortcuts to the .ExifTool_config
-file in their home directory.  The shortcuts are defined in a hash called
-%Image::ExifTool::Shortcuts::UserDefined.  The keys of the hash are the
-shortcut names, and the elements are either tag names or references to lists
-of tag names.
+file in their home directory (or the directory specified by the
+EXIFTOOL_HOME environment variable).  The shortcuts are defined in a hash
+called %Image::ExifTool::Shortcuts::UserDefined.  The keys of the hash are
+the shortcut names, and the elements are either tag names or references to
+lists of tag names.
 
 An example shortcut definition in .ExifTool_config:
 

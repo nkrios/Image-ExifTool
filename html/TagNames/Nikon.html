@@ -64,55 +64,76 @@
 <td align='center'>rational64u[4]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x000d</td>
+<td>ProgramShift</td>
+<td align='center'>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>0x000e</td>
 <td>ExposureDifference</td>
 <td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x000f</td>
 <td>ISOSelection</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0010</td>
 <td>DataDump</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0011</td>
 <td>NikonPreview</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Nikon.html#PreviewImage'>Nikon PreviewImage Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0012</td>
 <td>FlashExposureComp</td>
-<td align='center'>int32s~</td>
+<td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0013</td>
 <td>ISOSetting</td>
 <td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0016</td>
 <td>ImageBoundary</td>
 <td align='center'>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0018</td>
 <td>FlashExposureBracketValue</td>
-<td align='center'>int32s~</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td>0x0019</td>
-<td>ExposureBracketValue</td>
-<td align='center'>rational64s~</td>
+<td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x0019</td>
+<td>ExposureBracketValue</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x001a</td>
+<td>ImageProcessing</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x001b</td>
+<td>CropHiSpeed</td>
+<td align='center'>Y~</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x001d</td>
 <td>SerialNumber</td>
 <td align='center'>N</td>
 <td><font size='-1'><font color="#666666">(Not writable because this value is used as a key to decrypt other information)</font></font></td></tr>
+<tr valign='top'>
+<td>0x001e</td>
+<td>ColorSpace</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = sRGB
+  <br>2 = AdobeRGB</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0080</td>
 <td>ImageAdjustment</td>
@@ -156,6 +177,8 @@
 <td>FlashMode</td>
 <td align='center'>int8u</td>
 <td><font size='-1'>0 = Did Not Fire
+  <br>1 = Fired, Manual
+  <br>7 = Fired, External
   <br>8 = Fired, Commander Mode
   <br>9 = Fired, TTL Mode</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -175,51 +198,58 @@
   <br>Bit 6 = White-Balance Bracketing
   <br>Bit 7 = IR Control</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x008a</td>
+<td>AutoBracketRelease</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = None
+  <br>1 = Auto Release
+  <br>2 = Manual Release</font></td></tr>
+<tr valign='top'>
 <td>0x008b</td>
 <td>LensFStops</td>
 <td align='center'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x008c</td>
 <td>NEFCurve1</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x008d</td>
 <td>ColorHue</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x008f</td>
 <td>SceneMode</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0090</td>
 <td>LightSource</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0092</td>
 <td>HueAdjustment</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0094</td>
 <td>Saturation</td>
 <td align='center'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0095</td>
 <td>NoiseReduction</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0096</td>
 <td>NEFCurve2</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0097</td>
 <td>ColorBalance0100
   <br>ColorBalance0102
@@ -233,7 +263,7 @@
   <br>--&gt; <a href='Nikon.html#ColorBalance3'>Nikon ColorBalance3 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0098</td>
 <td>LensData0100
   <br>LensData0101
@@ -243,46 +273,75 @@
 <td>--&gt; <a href='Nikon.html#LensData00'>Nikon LensData00 Tags</a>
   <br>--&gt; <a href='Nikon.html#LensData01'>Nikon LensData01 Tags</a>
   <br>--&gt; <a href='Nikon.html#LensData01'>Nikon LensData01 Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0099</td>
-<td>NEFThumbnailSize</td>
+<td>RawImageCenter</td>
 <td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x009a</td>
 <td>SensorPixelSize</td>
 <td align='center'>rational64u[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00a0</td>
 <td>SerialNumber</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x00a2</td>
 <td>ImageDataSize</td>
 <td align='center'>Y</td>
 <td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x00a5</td>
+<td>ImageCount</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x00a6</td>
+<td>DeletedImageCount</td>
+<td align='center'>int32u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00a7</td>
 <td>ShutterCount</td>
 <td align='center'>N</td>
 <td><font size='-1'><font color="#666666">(Not writable because this value is used as a key to decrypt other information)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x00a9</td>
 <td>ImageOptimization</td>
 <td align='center'>string[16]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x00aa</td>
 <td>Saturation</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x00ab</td>
 <td>VariProgram</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x00ac</td>
+<td>ImageStabilization</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x00ad</td>
+<td>AFResponse</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x00b1</td>
+<td>HighISONoiseReduction</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On for ISO 1600/3200
+  <br>2 = Weak
+  <br>4 = Normal
+  <br>6 = Strong</font></td></tr>
 <tr valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
@@ -511,7 +570,7 @@ This structure is used by the D100 and newer D1X models.
 <h2><a name='LensData01'>Nikon LensData01 Tags</a></h2>
 Nikon encrypts the LensData information below if LensDataVersion is 0201,
 but  the decryption algorithm is known so the information can be extracted.
-It isn&apos;t yet writable, however, because the encryption adds complications
+It isn&#39;t yet writable, however, because the encryption adds complications
 which make writing more difficult.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -787,8 +846,8 @@ that order.
 <tr><td>'24 44 60 98 34 3C 1A 02'</td><td>= Tokina AT-X840AF II 80-400mm F4.5-5.6</td></tr>
 <tr><td>'24 48 60 80 24 24 1A 02'</td><td>= AF Zoom-Nikkor ED 80-200mm f/2.8D</td></tr>
 <tr><td>'25 48 3C 5C 24 24 1B 02'</td><td>= Tokina AT-X287AF PRO SV 28-70mm F2.8</td></tr>
-<tr><td>'25 48 44 5c 24 24 1B 02'</td><td>= AF Zoom-Nikkor 35-70mm f/2.8D</td></tr>
-<tr><td>'25 48 44 5c 24 24 52 02'</td><td>= AF Zoom-Nikkor 35-70mm f/2.8D N</td></tr>
+<tr><td>'25 48 44 5C 24 24 1B 02'</td><td>= AF Zoom-Nikkor 35-70mm f/2.8D</td></tr>
+<tr><td>'25 48 44 5C 24 24 52 02'</td><td>= AF Zoom-Nikkor 35-70mm f/2.8D N</td></tr>
 <tr><td>'26 3C 54 80 30 3C 1C 06'</td><td>= Sigma 55-200mm F4-5.6 DC</td></tr>
 <tr><td>'26 3C 5C 8E 30 3C 1C 02'</td><td>= Sigma 70-300mm F4-5.6 DG MACRO</td></tr>
 <tr><td>'26 3E 3C 6A 2E 3C 1C 02'</td><td>= Sigma 28-105mm F3.8-5.6 UC-III ASPHERICAL IF</td></tr>
@@ -839,7 +898,7 @@ that order.
 <tr><td>'3B 48 44 5C 24 24 3A 02'</td><td>= AF Zoom-Nikkor 35-70mm f/2.8D N</td></tr>
 <tr><td>'3D 3C 44 60 30 3C 3E 02'</td><td>= AF Zoom-Nikkor 35-80mm f/4-5.6D</td></tr>
 <tr><td>'3E 48 3C 3C 24 24 3D 02'</td><td>= AF Nikkor 28mm f/2.8D</td></tr>
-<tr><td>'41 48 7c 7c 24 24 43 02'</td><td>= AF Nikkor 180mm f/2.8D IF-ED</td></tr>
+<tr><td>'41 48 7C 7C 24 24 43 02'</td><td>= AF Nikkor 180mm f/2.8D IF-ED</td></tr>
 <tr><td>'42 54 44 44 18 18 44 02'</td><td>= AF Nikkor 35mm f/2D</td></tr>
 <tr><td>'43 54 50 50 0C 0C 46 02'</td><td>= AF Nikkor 50mm f/1.4D</td></tr>
 <tr><td>'45 3D 3C 60 2C 3C 48 02'</td><td>= Tamron AF 28-80mm F3.5-5.6 ASPHERICAL</td></tr>
@@ -913,6 +972,6 @@ that order.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 5, 2006</i>
+<br><i>Last revised Jul 6, 2006</i>
 </body>
 </html>

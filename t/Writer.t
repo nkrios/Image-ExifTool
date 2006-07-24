@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..23\n"; }
+BEGIN { $| = 1; print "1..24\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -453,6 +453,25 @@ my $testOK;
     print "ok $testnum$skip\n";
 
     $testOK and unlink $testfile;   # erase test file if all tests passed
+}
+
+# test 24: Test redirection with expressions
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/images/FujiFilm.jpg',
+        'Comment<ISO=$ISO Aperture=${EXIF:fnumber} Exposure=${shutterspeed}'
+    );
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile, 'Comment');
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
 }
 
 # end

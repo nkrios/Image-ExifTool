@@ -59,17 +59,30 @@ information of many digital cameras by various manufacturers such as Canon,
 Casio, FujiFilm, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
 Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
 
-ExifTool reads EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, GeoTIFF, ICC Profile,
-Photoshop IRB, AFCP and ID3 meta information from JPG, JP2, TIFF, GIF, BMP,
-PICT, QTIF, PNG, MNG, JNG, MIFF, PPM, PGM, PBM, EPS, PS, AI, PDF, PSD, DCM,
-ACR, THM, CRW, CR2, ERF, MRW, NEF, PEF, ORF, RAF, RAW, SRF, SR2, MOS, X3F
-and DNG images, MP3, WAV, WMA and AIFF audio files, AVI, MOV, MP4 and WMV
-videos, and XMP, ICC and MIE data files.
+Below is a list of file types and meta information formats currently
+supported by ExifTool (r = read support, w = write support):
 
-ExifTool writes EXIF, GPS, IPTC, XMP, JFIF, MakerNotes, ICC Profile,
-Photoshop IRB and AFCP meta information to JPEG, TIFF, GIF, EPS, PS, PSD,
-XMP, ICC, MIE, PPM, PGM, PBM, PNG, MNG, JNG, CRW, THM, CR2, ERF, MRW, NEF,
-PEF, MOS and DNG images.
+                 File Type                      Meta Information
+    -----------------------------------        ------------------
+    JPEG  r/w     ICC   r/w     MIFF  r        EXIF           r/w
+    TIFF  r/w     MIE   r/w     PICT  r        GPS            r/w
+    GIF   r/w     PPM   r/w     QTIF  r        IPTC           r/w
+    CRW   r/w     PGM   r/w     RIFF  r        XMP            r/w
+    CR2   r/w     PBM   r/w     AIFF  r        MakerNotes     r/w
+    ERF   r/w     WDP   r/w     AVI   r        Photoshop IRB  r/w
+    NEF   r/w     JP2   r       WAV   r        AFCP           r/w
+    PEF   r/w     BMP   r       MPG   r        JFIF           r/w
+    MRW   r/w     FPX   r       MP3   r        ICC Profile    r/w
+    MOS   r/w     ORF   r       MP4   r        MIE            r/w
+    DNG   r/w     RAF   r       MOV   r        FlashPix       r
+    PNG   r/w     RAW   r       ASF   r        GeoTIFF        r
+    MNG   r/w     SRF   r       WMA   r        PrintIM        r
+    JNG   r/w     SR2   r       WMV   r        ID3            r
+    XMP   r/w     X3F   r       RA    r
+    THM   r/w     DCM   r       RM    r
+    PSD   r/w     ACR   r       RAM   r
+    EPS   r/w     AI    r       SWF   r
+    PS    r/w     PDF   r
 
 =head1 METHODS
 
@@ -166,7 +179,8 @@ list of ExifTool tag names.
 A reference to an open image file.  If you use this method (or a SCALAR
 reference) to access information in an image, the FileName and Directory
 tags will not be returned.  (Also, the FileSize and FileModifyDate tags will
-not be returned unless it is a plain file.)
+not be returned unless it is a plain file.)  Image processing begins at the
+current file position, and on return the new file position is not specified.
 
 =item SCALAR ref
 
@@ -281,7 +295,7 @@ to a specific function.
 
 1) Option parameter name.
 
-2) [optional] Option parameter value.
+2) [optional] Option parameter value (may be undef to clear option).
 
 3-N) [optional] Additional parameter/value pairs.
 
@@ -359,6 +373,12 @@ is either a tag name or reference to a list of tag names to exclude.  The
 case of tag names is not significant. This option is ignored for
 specifically requested tags.  Tags may also be excluded by preceeding their
 name with a '-' in the arguments to L</ImageInfo>.
+
+=item FastScan
+
+Flag to increase speed of extracting information from JPEG images.  With
+this option set, ExifTool will not scan to the end of a JPEG image to check
+for an AFCP or PreviewImage trailer.  Default is 0.
 
 =item FixBase
 
@@ -882,6 +902,10 @@ in a specified file.
     # set new value from a different tag in specific group
     $exifTool->SetNewValuesFromFile($fp, 'IPTC:Keywords>XMP-dc:Subject');
 
+    # set new value from an expression involving other tags
+    $exifTool->SetNewValuesFromFile($file,
+        'Comment<ISO=$ISO Aperture=$aperture Exposure=$shutterSpeed');
+
 =over 4
 
 =item Inputs:
@@ -900,7 +924,11 @@ names of the form 'SRCTAG>DSTTAG' (or 'DSTTAGE<lt>SRCTAG') to be specified
 to copy information to a tag with a different name or a specified group.
 Both 'SRCTAG' and 'DSTTAG' may use '*' and/or be prefixed by a group name
 (ie. 'modifyDate>fileModifyDate' or '*>xmp:*').  Tags are evaluated in
-order, so exclusions apply only to tags included earlier in the list.
+order, so exclusions apply only to tags included earlier in the list.  An
+extension of this feature allows the tag value to be set from an expression
+containing tag names with leading '$' symbols (ie. 'CommentE<lt>Filename:
+$filename').  Braces '{}' may be used around the tag name to separate it
+from subsequent text, and a '$$' is used to to represent a '$' symbol.
 
 By default, this routine will commute information between same-named tags in
 different groups, allowing information to be translated between images with
@@ -1041,7 +1069,7 @@ error setting the time.
 
 Set the file name and directory.  If not specified, the new file name is
 derived from the new values of the FileName and Directory tags.  If the
-FileName tag contains a '/', then the file is renamed into a new directory. 
+FileName tag contains a '/', then the file is renamed into a new directory.
 If FileName ends with '/', then it is taken as a directory name and the file
 is moved into the new directory.  The new value for the Directory tag takes
 precedence over any directory specified in FileName.
@@ -1363,27 +1391,28 @@ Here is a complete list of groups for each family:
 =item Family 0 (General Location):
 
 AFCP, AIFF, APP12, APP14, ASF, BMP, Composite, DICOM, DNG, EXIF, ExifTool,
-File, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000, Leaf, MIE, MIFF,
-MNG, MakerNotes, Meta, PDF, PICT, PNG, Photoshop, PostScript, PrintIM,
-QuickTime, RIFF, SigmaRaw, XMP
+File, Flash, FlashPix, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000,
+Leaf, MIE, MIFF, MNG, MPEG, MakerNotes, Meta, PDF, PICT, PNG, Photoshop,
+PostScript, PrintIM, QuickTime, RIFF, Real, SigmaRaw, XMP
 
 =item Family 1 (Specific Location):
 
 AFCP, AIFF, APP12, APP14, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio,
-Composite, DICOM, DNG, ExifIFD, ExifTool, File, FujiFilm, GPS, GeoTiff,
-GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
-ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC,
-InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
-KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
-MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-Video, MIFF, MNG, MakerUnknown,
-MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, Olympus,
-PDF, PICT, PNG, Panasonic, Pentax, Photoshop, PostScript, PrintIM,
-QuickTime, RIFF, Ricoh, SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD,
-Track#, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
-XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photoshop, XMP-tiff, XMP-xmp,
-XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
-XMP-xxx
+Composite, DICOM, DNG, ExifIFD, ExifTool, File, Flash, FlashPix, FujiFilm,
+GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
+ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
+IPTC, InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+KodakEffectsIFD, KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera,
+MIE-Doc, MIE-Extender, MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
+MIE-MakerNotes, MIE-Meta, MIE-Preview, MIE-Thumbnail, MIE-Unknown,
+MIE-Video, MIFF, MNG, MPEG, MakerUnknown, MetaIFD, Minolta, MinoltaRaw,
+Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT, PNG, Panasonic,
+Pentax, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real, Real-CONT,
+Real-MDPR, Real-PROP, Real-RA3, Real-RA4 Real-RA5, Real-RJMD, Ricoh, SR2,
+SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
+XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
+XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 

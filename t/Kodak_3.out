@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
 [File, File, Image]  - File Name: Kodak_3_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 1941 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:02:06 11:56:45
+[File, File, Image]  - File Size: 3 kB
+[File, File, Time]  - File Modification Date/Time: 2006:06:05 13:08:42
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -80,6 +80,28 @@
 [MakerNotes, Kodak, Camera] 102 - Color Mode: Saturated Color
 [MakerNotes, Kodak, Camera] 104 - Digital Zoom: 2
 [MakerNotes, Kodak, Camera] 107 - Sharpness: Normal
+[FlashPix, FlashPix, Other] 1 - Code Page: 1200
+[FlashPix, FlashPix, Other] 268435456 - Used Extension Numbers: 1 2
+[FlashPix, FlashPix, Other] 1 - Extension Name: Screen nail
+[FlashPix, FlashPix, Other] 2 - Extension Class ID: 10000230-6FC0-11D0-BD01-00609719A180
+[FlashPix, FlashPix, Other] 3 - Extension Persistence: Invalidated By Modification
+[FlashPix, FlashPix, Time] 4 - Extension Create Date: 1998:01:08 08:28:54
+[FlashPix, FlashPix, Time] 5 - Extension Modify Date: 1998:01:08 08:28:54
+[FlashPix, FlashPix, Other] 6 - Creating Application: Digita
+[FlashPix, FlashPix, Other] 7 - Extension Description: Presized image for LCD display
+[FlashPix, FlashPix, Other] 4096 - Storage-Stream Pathname: /.Screen Nail_bd0100609719a180
+[FlashPix, FlashPix, Other] 1 - Extension Name: Audio
+[FlashPix, FlashPix, Other] 2 - Extension Class ID: 10000100-6FC0-11D0-BD01-00609719A180
+[FlashPix, FlashPix, Other] 3 - Extension Persistence: Always Valid
+[FlashPix, FlashPix, Time] 4 - Extension Create Date: 1998:12:17 22:04:36
+[FlashPix, FlashPix, Time] 5 - Extension Modify Date: 1998:12:17 22:04:36
+[FlashPix, FlashPix, Other] 6 - Creating Application: KIES_Toolkit
+[FlashPix, FlashPix, Other] 7 - Extension Description: Audio storage
+[FlashPix, FlashPix, Other] 4096 - Storage-Stream Pathname: /Audio_bd0100609719a180
+[FlashPix, FlashPix, Audio] Audio Stream - Audio Stream: (Binary data 18 bytes)
+[FlashPix, FlashPix, Other] 1 - Code Page: 1200
+[FlashPix, FlashPix, Audio] 2 - Flash Pix Audio Info 0x0002: 0
+[FlashPix, FlashPix, Other] Screen Nail - Screen Nail: (Binary data 166 bytes)
 [Composite, Composite, Image]  - Aperture: 6.7
 [Composite, Composite, Time]  - Date Created: 2005:03:31
 [Composite, Composite, Time]  - Date/Time Created: 2005:03:31 10:22:28.62

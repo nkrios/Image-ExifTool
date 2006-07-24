@@ -25,12 +25,104 @@ These tags are used by Ricoh Caplio camera models.
 <td align='center'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x1001</td>
+<td>ImageInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='Ricoh.html#ImageInfo'>Ricoh ImageInfo Tags</a></td></tr>
+<tr valign='top'>
+<td>0x1003</td>
+<td>Sharpness</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>0 = Sharp
+  <br>1 = Normal
+  <br>2 = Soft</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x2001</td>
 <td>RicohSubdir
   <br>RicohRR1Subdir</td>
 <td align='center'>-<br>-</td>
 <td>--&gt; <a href='Ricoh.html#Subdir'>Ricoh Subdir Tags</a>
   <br>--&gt; <a href='Ricoh.html#Subdir'>Ricoh Subdir Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ImageInfo'>Ricoh ImageInfo Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>RicohImageWidth</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>RicohImageHeight</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>6</td>
+<td>RicohDate</td>
+<td align='center'>int8u[7]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>28</td>
+<td>PreviewImageStart</td>
+<td align='center'>int16u*</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>30</td>
+<td>PreviewImageLength</td>
+<td align='center'>int16u*</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>32</td>
+<td>FlashMode</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = Auto
+  <br>2 = On</font></td></tr>
+<tr valign='top'>
+<td align='right'>33</td>
+<td>Macro</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>34</td>
+<td>Sharpness</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Sharp
+  <br>1 = Normal
+  <br>2 = Soft</font></td></tr>
+<tr valign='top'>
+<td align='right'>38</td>
+<td>WhiteBalance</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Cloudy
+  <br>3 = Tungsten
+  <br>4 = Fluorescent</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>39</td>
+<td>ISOSetting</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = 64
+  <br>2 = 100
+  <br>4 = 200
+  <br>6 = 400
+  <br>7 = 800
+  <br>8 = 1600</font></td></tr>
+<tr valign='top'>
+<td align='right'>40</td>
+<td>Saturation</td>
+<td align='center'>int8u</td>
+<td><font size='-1'>0 = High
+  <br>1 = Normal
+  <br>2 = Low
+  <br>3 = None (B&amp;W)</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Subdir'>Ricoh Subdir Tags</a></h2>
@@ -89,6 +181,6 @@ information.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 19, 2005</i>
+<br><i>Last revised Jul 5, 2006</i>
 </body>
 </html>

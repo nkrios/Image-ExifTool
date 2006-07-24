@@ -24,6 +24,9 @@
 #              11) "cip" private communication
 #              12) Rainer Honle private communication (tests with 5D)
 #              13) http://www.cybercom.net/~dcoffin/dcraw/
+#              14) (bozi) http://www.cpanforum.com/threads/2476 and /2563
+#              15) http://homepage3.nifty.com/kamisaka/makernote/makernote_canon.htm and
+#                  http://homepage3.nifty.com/kamisaka/makernote/CanonLens.htm (2006/07/04)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -35,66 +38,95 @@ use Image::ExifTool::Exif;
 
 sub WriteCanon($$$);
 
-$VERSION = '1.34';
+$VERSION = '1.39';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
     2 => 'Canon EF 28mm f/2.8',
+    3 => 'Canon EF 135mm f/2.8 Soft', #15
     4 => 'Sigma UC Zoom 35-135mm f/4-5.6',
     6 => 'Tokina AF193-2 19-35mm f/3.5-4.5',
-    10 => 'Canon EF 50mm f/2.5 Macro or Sigma 50mm f/2.8 EX or 28mm f/1.8', #10/4
+    # 10 can be 3 different Sigma lenses:
+    # Sigma 50mm f/2.8 EX or Sigma 28mm f/1.8
+    # or Sigma 105mm f/2.8 Macro EX (ref 15)
+    10 => 'Canon EF 50mm f/2.5 Macro or Sigma', #10/4/15
     11 => 'Canon EF 35mm f/2', #9
     13 => 'Canon EF 15mm f/2.8', #9
     21 => 'Canon EF 80-200mm f/2.8L',
-    26 => 'Cosina 100mm f/3.5 Macro AF',
-    28 => 'Tamron AF Aspherical 28-200mm f/3.8-5.6 or 28-200mm f/3.8-5.6',#4/11
+    # 26 can also be 2 Tamron lenses: (ref 15)
+    # Tamron SP AF 90mm f/2.8 Di Macro or Tamron SP AF 180mm F3.5 Di Macro
+    26 => 'Canon EF 100mm f/2.8 Macro or Cosina 100mm f/3.5 Macro AF or Tamron',
+    # 28 can be: (ref 15)
+    # - Tamron SP AF 28-105mm f/2.8 LD Aspherical IF
+    # - Tamron SP AF 28-75mm F/2.8 XR Di LD Aspherical [ IF ] Macro
+    28 => 'Tamron AF Aspherical 28-200mm f/3.8-5.6 or 28-75mm f/2.8 or 28-105mm f/2.8',#4/11/14/15
     29 => 'Canon EF 50mm f/1.8 MkII',
+    31 => 'Tamron SP AF 300mm f/2.8 LD IF', #15
     32 => 'Canon EF 24mm f/2.8 or Sigma 15mm f/2.8 EX Fisheye', #10/11
     39 => 'Canon EF 75-300mm f/4-5.6',
     40 => 'Canon EF 28-80mm f/3.5-5.6',
     43 => 'Canon EF 28-105mm f/4-5.6', #10
     124 => 'Canon MP-E 65mm f/2.8 1-5x Macro Photo', #9
     125 => 'Canon TS-E 24mm f/3.5L',
-    130 => 'Canon EF 50mm 5/1.0 USM', #10
+    126 => 'Canon TS-E 45mm f/2.8', #15
+    127 => 'Canon TS-E 90mm f/2.8', #15
+    130 => 'Canon EF 50mm f/1.0L', #10/15
     131 => 'Sigma 17-35mm f2.8-4 EX Aspherical HSM',
+    134 => 'Canon EF 600mm f/4L IS', #15
     135 => 'Canon EF 200mm f/1.8L',
     136 => 'Canon EF 300mm f/2.8L',
     137 => 'Canon EF 85mm f/1.2L', #10
     139 => 'Canon EF 400mm f/2.8L',
     141 => 'Canon EF 500mm f/4.5L',
+    142 => 'Canon EF 300mm f/2.8L IS', #15
+    143 => 'Canon EF 500mm f/4L IS', #15
     149 => 'Canon EF 100mm f/2', #9
+    # 150 can be: (ref 15)
+    # Sigma 20mm EX F1.8/Sigma 30mm F1.4 DC HSM/Sigma 24mm F1.8 DG Macro EX
     150 => 'Canon EF 14mm f/2.8L or Sigma 20mm EX f/1.8', #10/4
     151 => 'Canon EF 200mm f/2.8L',
-    153 => 'Canon EF 35-350mm f/3.5-5.6L', #PH
+    # 152 can be: (ref 15)
+    # Sigma 12-24mm F4.5-5.6 EX DG ASPHERICAL HSM or Sigma 14mm F2.8 EX Aspherical HSM
+    152 => 'Sigma 10-20mm F4-5.6 or 12-24mm f/4.5-5.6 or 14mm f/2.8', #14/15
+    153 => 'Canon EF 35-350mm f/3.5-5.6L or Tamron AF 28-300mm or Sigma Bigma', #PH/15
     155 => 'Canon EF 85mm f/1.8 USM',
     156 => 'Canon EF 28-105mm f/3.5-4.5 USM',
     160 => 'Canon EF 20-35mm f/3.5-4.5 USM',
-    161 => 'Canon EF 28-70mm f/2.8L or Sigma 24-70mm EX f/2.8',
+    161 => 'Canon EF 28-70mm f/2.8L or Sigma 24-70mm EX f/2.8 or Tamron 90mm f/2.8',
     165 => 'Canon EF 70-200mm f/2.8 L',
     166 => 'Canon EF 70-200mm f/2.8 L + x1.4',
     167 => 'Canon EF 70-200mm f/2.8 L + x2',
-    169 => 'Sigma 15-30mm f/3.5-4.5 EX DG Aspherical',
+    169 => 'Canon EF17-35mm f/2.8L or Sigma 15-30mm f/3.5-4.5 EX DG Aspherical', #15/4
     170 => 'Canon EF 200mm f/2.8L II', #9
-    173 => 'Canon EF 180mm Macro f/3.5L or Sigma 180mm EX HSM Macro f/3.5', #9
+    # the following value is used by 2 different Sigma lenses (ref 14):
+    # Sigma 180mm EX HSM Macro f/3.5 or Sigma APO Macro 150mm F3.5 EX DG IF HSM
+    # 173 => 'Canon EF 180mm Macro f/3.5L or Sigma 180mm EX HSM Macro f/3.5', #9
+    173 => 'Canon EF 180mm Macro f/3.5L or Sigma 180mm F3.5 or 150mm f/2.8 Macro',
     174 => 'Canon EF 135mm f/2L', #9
     176 => 'Canon EF 24-85mm f/3.5-4.5 USM',
     177 => 'Canon EF 300mm f/4L IS', #9
     178 => 'Canon EF 28-135mm f/3.5-5.6 IS',
     180 => 'Canon EF 35mm f/1.4L', #9
+    181 => 'Canon EF 100-400mm f/4.5-5.6L IS + x1.4', #15
     182 => 'Canon EF 100-400mm f/4.5-5.6L IS + x2',
     183 => 'Canon EF 100-400mm f/4.5-5.6L IS',
+    184 => 'Canon EF 400mm f/2.8L + x2', #15
     186 => 'Canon EF 70-200mm f/4L', #9
     190 => 'Canon EF 100mm f/2.8 Macro',
     191 => 'Canon EF 400mm f/4 DO IS', #9
     197 => 'Canon EF 75-300mm f/4-5.6 IS',
     198 => 'Canon EF 50mm f/1.4 USM', #9
     202 => 'Canon EF 28-80 f/3.5-5.6 USM IV',
+    211 => 'Canon EF 28-200mm f/3.5-5.6', #15
     213 => 'Canon EF 90-300mm f/4.5-5.6',
     224 => 'Canon EF 70-200mm f/2.8L IS USM', #11
     225 => 'Canon EF 70-200mm f/2.8L IS USM + x1.4', #11
+    226 => 'Canon EF 70-200mm f/2.8L IS USM + x2', #14
     229 => 'Canon EF 16-35mm f/2.8L', #PH
     230 => 'Canon EF 24-70mm f/2.8L', #9
     231 => 'Canon EF 17-40mm f/4L',
+    232 => 'Canon EF 70-300mm f/4.5-5.6 DO IS USM', #15
+    237 => 'Canon EF 24-105mm f/4L IS', #15
 );
 
 # Canon model ID numbers
@@ -110,7 +142,7 @@ my %canonLensTypes = ( #4
     0x1130000 => 'PowerShot A40',
     0x1140000 => 'EOS D30',
     0x1150000 => 'PowerShot A100',
-    0x1160000 => 'PowerShot S200 / Digital IXUS v2 / IXY Digital 200a', 
+    0x1160000 => 'PowerShot S200 / Digital IXUS v2 / IXY Digital 200a',
     0x1170000 => 'PowerShot A200',
     0x1180000 => 'PowerShot S330 / Digital IXUS 330 / IXY Digital 300a',
     0x1190000 => 'PowerShot G3',
@@ -221,9 +253,12 @@ my %pictureStyles = ( #12
     0x21 => 'User Def. 1',
     0x22 => 'User Def. 2',
     0x23 => 'User Def. 3',
-    0x41 => 'Nostalgia',
-    0x42 => 'Clear',
-    0x43 => 'Twilight',
+    # "External" styles currently available from Canon are Nostalgia, Clear,
+    # Twilight and Emerald.  The "User Def" styles change to these "External"
+    # codes when these styles are installed in the camera
+    0x41 => 'External 1',
+    0x42 => 'External 2',
+    0x43 => 'External 3',
     0x81 => 'Standard',
     0x82 => 'Portrait',
     0x83 => 'Landscape',
@@ -456,6 +491,7 @@ my %longBin = (
         },
     },
     # 0x19 => 'InteropFooter', # what is this for?
+    # 0x1d => 'MicaRa', ???? #15
     0x90 => {   # used by 1D and 1Ds
         Name => 'CustomFunctions1D',
         SubDirectory => {
@@ -511,7 +547,7 @@ my %longBin = (
             # this offset is necessary because the table is interpreted as short rationals
             # (4 bytes long) but the first entry is 2 bytes into the table.
             Start => '$valuePtr + 2',
-            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart-2,$size)',
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart-2,$size+2)',
             TagTable => 'Image::ExifTool::Canon::ColorBalance',
         },
     },
@@ -708,6 +744,7 @@ my %longBin = (
             25 => 'Night Snapshot', #PH
             26 => 'Digital Macro', #PH
             27 => 'My Colors', #PH
+            28 => 'Still Image', #15 (animation frame?)
         },
     },
     12 => {
@@ -870,6 +907,7 @@ my %longBin = (
         PrintConv => {
             0 => 'Off',
             1 => 'On',
+            2 => 'On, Shot Only', #15
         },
     },
     35 => { #PH
@@ -1115,6 +1153,14 @@ my %longBin = (
         ValueConv => '$val / 10',
         ValueConvInv => '$val * 10',
     },
+    26 => { #15
+        Name => 'CameraType',
+        PrintConv => {
+            248 => 'EOS High-end',
+            250 => 'Compact',
+            252 => 'EOS Mid-range',
+        },
+    },
     27 => {
         Name => 'AutoRotate',
         PrintConv => {
@@ -1124,6 +1170,10 @@ my %longBin = (
             2 => 'Rotate 180',
             3 => 'Rotate 270 CW',
         },
+    },
+    28 => { #15
+        Name => 'NDFilter',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
     },
     29 => {
         Name => 'Self-timer2',
@@ -2200,7 +2250,7 @@ sub PrintAFPoints1D($)
     return 'Unknown' unless length $val == 8;
     # these are the x/y positions of each bit in the AF point mask
     # (x is upper 3 bits / y is lower 5 bits)
-    my @focusPts = (0,0, 
+    my @focusPts = (0,0,
               0x04,0x06,0x08,0x0a,0x0c,0x0e,0x10,         0,0,
       0x21,0x23,0x25,0x27,0x29,0x2b,0x2d,0x2f,0x31,0x33,
     0x40,0x42,0x44,0x46,0x48,0x4a,0x4c,0x4d,0x50,0x52,0x54,

@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # DICOM VR (Value Representation) format conversions
 my %dicomFormat = (
@@ -47,10 +47,10 @@ my %implicitVR = (
     GROUPS => { 2 => 'Image' },
     PROCESS_PROC => 0,  # set this to zero to omit tags from lookup (way too many!)
     NOTES => q{
-The DICOM format is based on the ACR-NEMA specification, but adds a file
-header and a number of new tags.  ExifTool will extract information from
-either type of file.  The Tag ID's in the following table are the tag group
-and element numbers in hexadecimal, as given in the DICOM specification.
+        The DICOM format is based on the ACR-NEMA specification, but adds a file
+        header and a number of new tags.  ExifTool will extract information from
+        either type of file.  The Tag ID's in the following table are the tag group
+        and element numbers in hexadecimal, as given in the DICOM specification.
     },
     # file meta information group (names end with VR)
     '0002,0000' => { VR => 'UL', Name => 'FileMetaInfoGroupLength' },
@@ -2531,15 +2531,6 @@ sub ProcessDICM($$)
 
         if ($element == 0) {
             $vr = 'UL'; # group length element is always unsigned long
-        } elsif ($vr eq 'DA') {
-            # format date values
-            $buff =~ s/^(\d{4})(\d{2})(\d{2})/$1:$2:$3/;
-        } elsif ($vr eq 'TM') {
-            # format time values
-            $buff =~ s/^(\d{2})(\d{2})(\d{2})/$1:$2:$3/;
-        } elsif ($vr eq 'AT' and $len == 4) {
-            my ($g, $e) = (Get16u(\$buff,0), Get16u(\$buff,2));
-            $buff = sprintf('%.4X,%.4X', $g, $e);
         }
         my $val;
         my $format = $dicomFormat{$vr};
@@ -2559,9 +2550,22 @@ sub ProcessDICM($$)
         } else {
             $val = $buff;
             $format = 'string';
-            if ($val =~ /^1\.2\.840\./) {
-                $val =~ s/\0.*//; # truncate at null
+            if ($vr eq 'DA') {
+                # format date values
+                $val =~ s/^(\d{4})(\d{2})(\d{2})/$1:$2:$3/;
+            } elsif ($vr eq 'TM') {
+                # format time values
+                $val =~ s/^(\d{2})(\d{2})(\d{2}.*)/$1:$2:$3/;
+            } elsif ($vr eq 'DT') {
+                # format date/time values
+                $val =~ s/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2}.*)/$1:$2:$3 $4:$5:$6/;
+            } elsif ($vr eq 'AT' and $len == 4) {
+                # convert attribute tag ID to hex format
+                my ($g, $e) = (Get16u(\$buff,0), Get16u(\$buff,2));
+                $val = sprintf('%.4X,%.4X', $g, $e);
+            } elsif ($vr eq 'UI') {
                 # add PrintConv to translate registered UID's
+                $val =~ s/\0.*//; # truncate at null
                 $$tagInfo{PrintConv} = \%uid if $uid{$val} and $tagInfo;
             }
         }
@@ -2580,7 +2584,7 @@ sub ProcessDICM($$)
             Size => $len,
             Extra => " ($vr)",
         );
-        
+
         # stop indenting for list if we reached EndOfItems tag
         $exifTool->{INDENT} =~ s/..$// if $verbose and $tag eq 'FFFE,E00D';
     }

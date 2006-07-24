@@ -10,6 +10,7 @@ END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
 use Image::ExifTool 'ImageInfo';
+use Image::ExifTool::PNG;
 $loaded = 1;
 print "ok 1\n";
 
@@ -34,6 +35,7 @@ my $testnum = 1;
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg');
+    $exifTool->SetNewValue('PNG:Comment');  # and delete a tag
     # must write image to memory because size is variable (depends on Zlib
     # availability), and images in memory don't generate a 'FileSize' tag.
     my $image;  

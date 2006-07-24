@@ -47,8 +47,8 @@ Panasonic tags are also used for Leica cameras.
 <td>0x000f</td>
 <td>SpotMode</td>
 <td align='center'>int8u[2]</td>
-<td><font size='-1'>&apos;0 1&apos; = Spot Mode On
-  <br>&apos;0 16&apos; = Spot Mode Off</font></td></tr>
+<td><font size='-1'>&#39;0 1&#39; = Spot Mode On
+  <br>&#39;0 16&#39; = Spot Mode Off</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x001a</td>
 <td>ImageStabilizer</td>
@@ -61,7 +61,8 @@ Panasonic tags are also used for Leica cameras.
 <td>MacroMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>1 = On
-  <br>2 = Off</font></td></tr>
+  <br>2 = Off
+  <br>257 = Tele-Macro</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x001f</td>
 <td>ShootingMode</td>
@@ -80,7 +81,8 @@ Panasonic tags are also used for Leica cameras.
   <br>18 = Fireworks
   <br>19 = Party
   <br>20 = Snow
-  <br>21 = Night Scenery</font></td></tr>
+  <br>21 = Night Scenery
+  <br>22 = Food</font></td></tr>
 <tr valign='top'>
 <td>0x0020</td>
 <td>Audio</td>
@@ -155,6 +157,19 @@ same as the number printed on the camera body)</font></font></td></tr>
 <td><font size='-1'>1 = Off
   <br>2 = 10s
   <br>3 = 2s</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0030</td>
+<td>Rotation</td>
+<td align='center'>Y</td>
+<td><font size='-1'>1 = Horizontal (normal)
+  <br>6 = Rotate 90 CW
+  <br>8 = Rotate 270 CW</font></td></tr>
+<tr valign='top'>
+<td>0x0032</td>
+<td>ColorMode</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Natural</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
@@ -279,6 +294,6 @@ These tags are found in IFD0 of Panasonic RAW images.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 2, 2006</i>
+<br><i>Last revised Jul 5, 2006</i>
 </body>
 </html>

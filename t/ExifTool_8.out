@@ -30,8 +30,8 @@
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.946
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.017
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3443.946
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3442.017
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -77,7 +77,9 @@
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: -0.01
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
+[MakerNotes, Canon, Image] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
+[MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0

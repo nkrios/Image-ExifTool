@@ -10,6 +10,8 @@ END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
 use Image::ExifTool 'ImageInfo';
+use Image::ExifTool::IPTC;
+use Image::ExifTool::XMP;
 $loaded = 1;
 print "ok 1\n";
 

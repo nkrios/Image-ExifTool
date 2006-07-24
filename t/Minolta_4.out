@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
 [File, File, Image]  - File Name: Minolta_4_failed.mrw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:04:18 14:14:25
+[File, File, Time]  - File Modification Date/Time: 2006:07:06 09:48:38
 [File, File, Image]  - File Type: MRW
 [File, File, Image]  - MIME Type: image/x-raw
 [MakerNotes, MinoltaRaw, Camera] 0 - Firmware ID: 27200001
@@ -48,7 +48,7 @@
 [MakerNotes, Minolta, Camera] 34 - Subject Program: None
 [MakerNotes, Minolta, Camera] 35 - Flash Exposure Compensation: 0
 [MakerNotes, Minolta, Camera] 36 - ISO Setting: 64
-[MakerNotes, Minolta, Camera] 37 - Minolta Model: DiMAGE A2 or S414
+[MakerNotes, Minolta, Camera] 37 - Minolta Model ID: DiMAGE A2 or S414
 [MakerNotes, Minolta, Camera] 38 - Interval Mode: Still Image
 [MakerNotes, Minolta, Camera] 39 - Folder Name: Standard Form
 [MakerNotes, Minolta, Camera] 40 - Color Mode: Natural color
@@ -72,7 +72,7 @@
 [MakerNotes, Minolta, Camera] 136 - Preview Image Start: 2082
 [MakerNotes, Minolta, Camera] 137 - Preview Image Length: 26
 [MakerNotes, Minolta, Camera] 256 - Minolta 0x0100: 0
-[MakerNotes, Minolta, Camera] 257 - Color Mode: Unknown (9)
+[MakerNotes, Minolta, Camera] 257 - Color Mode: Natural
 [MakerNotes, Minolta, Camera] 258 - Minolta Quality: Raw
 [MakerNotes, Minolta, Camera] 260 - Minolta 0x0104: 0
 [MakerNotes, MinoltaRaw, Camera] 0 - WB Scale: 2 2 2 2

@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # RIFF info
 %Image::ExifTool::RIFF::Main = (
@@ -270,8 +270,9 @@ sub ConvertRIFFDate($)
         # the standard AVI date format
         $val = sprintf("%.4d:%.2d:%.2d %s", $part[4],
                        $monthNum{$part[1]}, $part[2], $part[3]);
-    } elsif ($val =~ /(\d{4})\/\s*(\d+)\/\s*(\d+)\s*(\d+):\s*(\d+)\s*(P?)/) {
-        # but the Casio QV-3EX writes dates like this
+    } elsif ($val =~ m{(\d{4})/\s*(\d+)/\s*(\d+)/?\s+(\d+):\s*(\d+)\s*(P?)}) {
+        # but the Casio QV-3EX writes dates like "2001/ 1/27  1:42PM",
+        # and the Casio EX-Z30 writes "2005/11/28/ 09:19"... doh!
         $val = sprintf("%.4d:%.2d:%.2d %.2d:%.2d:00",$1,$2,$3,$4+($6?12:0),$5);
     }
     return $val;

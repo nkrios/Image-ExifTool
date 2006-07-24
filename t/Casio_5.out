@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
 [File, File, Image]  - File Name: Casio_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1683 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:02:06 11:56:30
+[File, File, Time]  - File Modification Date/Time: 2006:07:06 12:31:58
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -64,22 +64,22 @@
 [MakerNotes, Casio, Camera] 8210 - White Balance: Unknown (13)
 [MakerNotes, Casio, Camera] 8211 - Casio Type 2 0x2013: 2
 [MakerNotes, Casio, Camera] 8225 - Casio Type 2 0x2021: 176 352 120 240
-[MakerNotes, Casio, Camera] 8226 - Object Distance: 1.000 m
+[MakerNotes, Casio, Camera] 8226 - Object Distance: 1 m
 [MakerNotes, Casio, Camera] 8227 - Casio Type 2 0x2023: 1
 [MakerNotes, Casio, Camera] 8241 - Casio Type 2 0x2031: 
 [MakerNotes, Casio, Camera] 8242 - Casio Type 2 0x2032: d
 [MakerNotes, Casio, Camera] 8243 - Casio Type 2 0x2033: 1
 [MakerNotes, Casio, Camera] 8244 - Flash Distance: 0
-[MakerNotes, Casio, Camera] 12288 - Record Mode: Normal
+[MakerNotes, Casio, Camera] 12288 - Record Mode: Program AE
 [MakerNotes, Casio, Camera] 12289 - Self Timer: Off
 [MakerNotes, Casio, Camera] 12290 - Quality: Fine
 [MakerNotes, Casio, Camera] 12291 - Focus Mode: Single-Area Auto Focus
 [MakerNotes, Casio, Camera] 12293 - Casio Type 2 0x3005: 0 1
 [MakerNotes, Casio, Camera] 12294 - Time Zone: EST5EDT
-[MakerNotes, Casio, Camera] 12295 - Bestshot Mode: Off
-[MakerNotes, Casio, Camera] 12305 - Casio Type 2 0x3011: 
-[MakerNotes, Casio, Camera] 12306 - Casio Type 2 0x3012: 
-[MakerNotes, Casio, Camera] 12307 - Casio Type 2 0x3013: 
+[MakerNotes, Casio, Camera] 12295 - Best Shot Mode: Off
+[MakerNotes, Casio, Camera] 12305 - Sharpness: 0
+[MakerNotes, Casio, Camera] 12306 - Contrast: 0
+[MakerNotes, Casio, Camera] 12307 - Saturation: 0
 [MakerNotes, Casio, Camera] 12308 - CCD ISO Sensitivity: 50
 [MakerNotes, Casio, Camera] 12309 - Color Mode: Off
 [MakerNotes, Casio, Camera] 12310 - Enhancement: Off

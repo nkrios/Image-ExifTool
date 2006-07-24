@@ -1,8 +1,8 @@
-  ExifToolVersion = 6.13
+  ExifToolVersion = 6.27
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
-  FileModifyDate = 1131997641
+  FileModifyDate = 1113662230
   FileType = CRW
   MIMEType = image/x-raw
   + [Raw directory with 3 entries]
@@ -82,7 +82,9 @@
   | | | | FNumber = 116
   | | | | ExposureTime = 192
   | | | | BulbDuration = 0
+  | | | | CameraType = 252
   | | | | AutoRotate = 0
+  | | | | NDFilter = -1
   | | | | Self-timer2 = 0
   | | | 3)  CanonFileInfo (SubDirectory) -->
   | | | + [BinaryData directory, 18 bytes]

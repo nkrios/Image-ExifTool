@@ -364,7 +364,7 @@ sub ProcessX3F($$)
 
     return 0 unless $raf->Read($buff, 40) == 40;
     return 0 unless $buff =~ /^FOVb/;
-    
+
     SetByteOrder('II');
     $exifTool->SetFileType();
 

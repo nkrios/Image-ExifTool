@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
 [File, File, Image]  - File Name: GPS.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 2 kB
@@ -38,8 +38,8 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2400
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1600
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 12.05078
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 12.05078
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 12.05078
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 12.05078
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Unknown (0)

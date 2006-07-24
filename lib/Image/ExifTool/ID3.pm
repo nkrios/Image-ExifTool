@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 sub ProcessID3v2($$$);
 
@@ -23,8 +23,8 @@ sub ProcessID3v2($$$);
 %Image::ExifTool::ID3::Main = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData, # (not really)
     NOTES => q{
-ID3 information is found in different types of audio files, most notably MP3
-files.
+        ID3 information is found in different types of audio files, most notably MP3
+        files.
     },
     ID3v1 => {
         Name => 'ID3v1',
@@ -291,7 +291,7 @@ my %id3v2_common = (
     },
     COMM => 'Comment',
   # OWNE => 'Ownership', # enc(1), _price, 00, _date(8), Seller
-    PCNT => 'Play counter',
+    PCNT => 'PlayCounter',
   # POPM => 'Popularimeter', # _email, 00, rating(1), counter(4-N)
     TALB => 'Album',
     TBPM => 'BeatsPerMinute',
@@ -330,7 +330,7 @@ my %id3v2_common = (
     TPUB => 'Publisher',
     TRCK => 'Track',
     TRSN => 'InternetRadioStationName',
-    TRSO => 'InternetRadioStationOwner ',
+    TRSO => 'InternetRadioStationOwner',
     TSRC => 'ISRC', # (international standard recording code)
     TSSE => 'EncoderSettings',
     TXXX => 'UserDefinedText',
@@ -598,7 +598,16 @@ sub ProcessID3($$)
             $tagTablePtr = GetTagTable('Image::ExifTool::ID3::v2_2');
         }
         $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
+    } else {
+        $raf->Seek(0, 0);
     }
+#
+# extract information from first audio frame header
+# (if it exists in the first 256 bytes)
+#
+    require Image::ExifTool::MPEG;
+    $rtnVal = 1 if $raf->Read($buff, 256) and
+        Image::ExifTool::MPEG::ProcessMPEGAudio($exifTool, \$buff) > 0;
 #
 # look for ID3v1 trailer
 #

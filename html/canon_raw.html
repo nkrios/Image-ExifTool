@@ -58,17 +58,23 @@ A Canon CRW file starts with the following byte sequence:
 seen since Canon is using x86 processors in its current cameras, but
 presumably this could be "MM" for future models.
 </td></tr>
-<tr align='center'><td>2</td><td>4</td><td>0x0000001a</td><td>BlockStart</td>
-<td align='left'>32-bit integer giving the offset from the start of the file to the start of
-the root directory block.  This value may change for future camera models.</td></tr>
+<tr align='center'><td>2</td><td>4</td><td>0x0000001a</td><td>HeaderLength</td>
+<td align='left'>32-bit integer giving the length of the CRW file header.  For
+current camera models the header is 26 bytes long.</td></tr>
 <tr align='center'><td>6</td><td>8</td><td>"HEAPCCDR"</td><td>Signature</td>
-<td align='left'>This series of characters identifies the file as a Canon CRW
+<td align='left'>A series of characters identifying the file as a Canon CRW
 file.</td></tr>
+<tr align='center'><td>14</td><td>4</td><td>0x00010002</td><td>CRWVersion</td>
+<td align='left'>32-bit integer giving the major (high 16 bits) and minor
+(low 16 bits) CRW file version numbers.  The version is 1.2 for current cameras.</td></tr>
+<tr align='center'><td>18</td><td>8</td><td>0</td><td>Reserved</td>
+<td align='left'>Two 32-bit integers, currently set to zero.</td></tr>
 </table></blockquote>
 
 <h3>Directory Block Structure</h3>
-The root directory block begins at the offset specified in the file header,
-and ends at the end of the file.  The structure of the block is as follows:
+The root directory block begins immediately after the file header (at the position
+specified by <b>HeaderLength</b>), and ends at the end of the file.  The structure
+of this block is as follows:
 <blockquote><table border=1 cellspacing=0 cellpadding=2>
 <tr bgcolor='#dddddd'><th>Offset<br>within block</th><th>Number<br>of bytes</th><th>Value</th>
 <th>Name</th><th>Description</th></tr>
@@ -304,7 +310,7 @@ remain constant for all camera models.
 
 <p><hr>
 Please e-mail me if you find any errors or omissions in this document.  My address is phil at owl.phy.queensu.ca - Thanks!
-<p><i>P. Harvey - Last revised Feb. 14, 2006</i>
+<p><i>P. Harvey - Last revised Jun. 27, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

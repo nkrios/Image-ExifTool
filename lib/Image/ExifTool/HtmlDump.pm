@@ -350,7 +350,7 @@ sub Open($$$;@)
             @$clID = grep !/^$id$/, @$clID;
         }
         next if $element eq '0'; # 0 = don't reopen temporarily closed elements
-        
+
         # re-open temporarily closed elements
         while (@$clID) {
             my $tid = pop @$clID;
@@ -444,7 +444,7 @@ sub DumpTable($$$;$$$$)
         # close necessary elements
         if ($p >= $bkgEnd) {
             # close without reopening if closing anchor later
-            my $arg = ($p - $pos >= $len) ? 0 : '';    
+            my $arg = ($p - $pos >= $len) ? 0 : '';
             $self->Open('bkg', $arg, 1, 2);
         }
         if ($dblRef and $p >= $endPos) {

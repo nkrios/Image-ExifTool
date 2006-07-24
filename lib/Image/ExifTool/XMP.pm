@@ -38,7 +38,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.49';
+$VERSION = '1.51';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -175,7 +175,7 @@ my %longConv = (
 #
 # (Note that family 1 group names are generated from the property namespace, not
 #  the group1 names below which exist so the groups will appear in the list.)
-# 
+#
 
 # Dublin Core schema properties (dc)
 %Image::ExifTool::XMP::dc = (
@@ -326,6 +326,7 @@ group names.
     ManageTo        => { Groups => { 2 => 'Author' } },
     ManageUI        => { },
     ManagerVariant  => { },
+    PreservedFileName => { },   # undocumented
     RenditionClass  => { },
     RenditionParams => { },
     VersionID       => { },
@@ -1488,7 +1489,7 @@ sub EscapeHTML($)
     s/&/&amp;/sg;
     s/>/&gt;/sg;
     s/</&lt;/sg;
-    s/'/&apos;/sg;
+    s/'/&#39;/sg;
     s/"/&quot;/sg;
     return $_;
 }
@@ -1503,6 +1504,7 @@ sub UnescapeHTML($)
     s/&gt;/>/sg;
     s/&lt;/</sg;
     s/&apos;/'/sg;
+    s/&#39;/'/sg;
     s/&quot;/"/sg;
     s/&amp;/&/sg;   # do this last or things like '&amp;lt;' will get double-unescaped
     return $_;
@@ -1758,16 +1760,40 @@ sub ProcessXMP($$;$)
     my $dirLen = $$dirInfo{DirLen};
     my $dataLen = $$dirInfo{DataLen};
     my $rtnVal = 0;
-    my $buff;
+    my ($buff, $fmt, $isXML);
 
     # read information from XMP file if necessary
     unless ($dataPt) {
         my $raf = $$dirInfo{RAF} or return 0;
         $raf->Read($buff, 64) or return 0;
-        $buff =~ tr/\0//d;
+        my $buf2;
+        ($buf2 = $buff) =~ tr/\0//d;    # cheap conversion to UTF-8
         # check to see if this is XMP format
-        # (CS2 writes .XMP files without the "xpacket begin")
-        return 0 unless $buff =~ /^<\?xpacket begin=/ or $buff =~ /^<x:xmpmeta/;
+        # - CS2 writes .XMP files without the "xpacket begin"
+        unless ($buf2 =~ /^(<\?xpacket begin=|<x:xmpmeta)/) {
+            # also recognize XML files
+            if ($buf2 =~ /^\xfe\xff<\?xml/g) {
+                $fmt = 'n';     # UTF-16 or 32 MM with BOM
+            } elsif ($buf2 =~ /^\xff\xfe<\?xml/g) {
+                $fmt = 'v';     # UTF-16 or 32 II with BOM
+            } elsif ($buf2 =~ /^(\xef\xbb\xbf)?<\?xml/g) {
+                $fmt = 0;       # UTF-8 with BOM or unknown encoding without BOM
+            } else {
+                return 0;       # not XMP or XML
+            }
+            if ($buff =~ /^\0\0/) {
+                $fmt = 'N';     # UTF-32 MM with or without BOM
+            } elsif ($buff =~ /^..\0\0/) {
+                $fmt = 'V';     # UTF-32 II with or without BOM
+            } elsif (not $fmt) {
+                if ($buff =~ /^\0/) {
+                    $fmt = 'n'; # UTF-16 MM without BOM
+                } elsif ($buff =~ /^.\0/) {
+                    $fmt = 'v'; # UTF-16 II without BOM
+                }
+            }
+            $isXML = 1;
+        }
         $raf->Seek(0, 2) or return 0;
         my $size = $raf->Tell() or return 0;
         $raf->Seek(0, 0) or return 0;
@@ -1777,6 +1803,7 @@ sub ProcessXMP($$;$)
         $dirLen = $dataLen = $size;
         $exifTool->SetFileType();
     }
+    
     # take substring if necessary
     if ($dataLen != $dirStart + $dirLen) {
         $buff = substr($$dataPt, $dirStart, $dirLen);
@@ -1794,13 +1821,16 @@ sub ProcessXMP($$;$)
 #
     my $begin = '<?xpacket begin=';
     pos($$dataPt) = $dirStart;
-    if ($$dataPt =~ /\G\Q$begin\E/) {
+    delete $$exifTool{XMP_IS_XML};
+    if ($isXML) {
+        $$exifTool{XMP_IS_XML} = 1;
+        $$exifTool{XMP_NO_XPACKET} = 1;
+    } elsif ($$dataPt =~ /\G\Q$begin\E/) {
         delete $$exifTool{XMP_NO_XPACKET};
     } elsif ($$dataPt =~ /<x:xmpmeta/) {
         $$exifTool{XMP_NO_XPACKET} = 1;
     } else {
         delete $$exifTool{XMP_NO_XPACKET};
-        my ($fmt, $len);
         # check for UTF-16 encoding (insert one \0 between characters)
         $begin = join "\0", split //, $begin;
         if ($$dataPt =~ /\G(\0)?\Q$begin\E\0./g) {
@@ -1825,26 +1855,24 @@ sub ProcessXMP($$;$)
                 $fmt = 'V' if $$dataPt =~ /\G\0\0\0\xff\xfe\0\0/;
             }
         }
-        if ($fmt) {
-            # translate into UTF-8
-            if ($] >= 5.006001) {
-                $buff = pack('C0U*',unpack("x$dirStart$fmt*",$$dataPt));
-            } else {
-                # hack for pre 5.6.1 (because the code to do the
-                # translation properly is unnecesarily bulky)
-                my @unpk = unpack("x$dirStart$fmt*",$$dataPt);
-                foreach (@unpk) {
-                    $_ > 0xff and $_ = ord('?');
-                }
-                $buff = pack('C*', @unpk);
-            }
-            $dataPt = \$buff;
-            $dirStart = 0;
-        } else {
-            defined $fmt or $exifTool->Warn('XMP character encoding error');
-        }
+        defined $fmt or $exifTool->Warn('XMP character encoding error');
     }
-    
+    if ($fmt) {
+        # translate into UTF-8
+        if ($] >= 5.006001) {
+            $buff = pack('C0U*',unpack("x$dirStart$fmt*",$$dataPt));
+        } else {
+            # hack for pre 5.6.1 (because the code to do the
+            # translation properly is unnecesarily bulky)
+            my @unpk = unpack("x$dirStart$fmt*",$$dataPt);
+            foreach (@unpk) {
+                $_ > 0xff and $_ = ord('?');
+            }
+            $buff = pack('C*', @unpk);
+        }
+        $dataPt = \$buff;
+        $dirStart = 0;
+    }
 #
 # extract the information
 #
@@ -1871,7 +1899,7 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 XMP stands for Extensible Metadata Platform.  It is a format based on XML
-that Adobe developed for embedding metadata information in image files. 
+that Adobe developed for embedding metadata information in image files.
 This module contains the definitions required by Image::ExifTool to read XMP
 information.
 

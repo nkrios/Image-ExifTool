@@ -142,10 +142,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'SubfileType',
         Notes => q{
             Currently defined types are ACR, AIFC, AIFF, ASF, AVI, BMP, CR2, CRW, DICOM,
-            DNG, EPS, ERF, GIF, ICC, JNG, JP2, JPEG, MIE, MIFF, MNG, MOS, MOV, MP3,
-            MPEG, MP4, MRW, NEF, ORF, PBM, PDF, PGM, PICT, PNG, PPM, PS, PSD, QTIF, RAF,
-            RAW, RIFF, SR2, SRF, TIFF, WAV, WMA, WMV, X3F and XMP.  Other types should
-            simply use the common file extension.
+            DNG, EPS, ERF, GIF, ICC, JNG, JP2, JPEG, MIE, MIFF, MNG, MOS, MOV, MP3, MP4,
+            MPEG, MRW, NEF, ORF, PBM, PDF, PGM, PICT, PNG, PPM, PS, PSD, QTIF, RAF, RAW,
+            RIFF, SR2, SRF, TIFF, WAV, WMA, WMV, X3F and XMP.  Other types should simply
+            use the common file extension.
         },
     },
    '1Directory' => { Name => 'SubfileDirectory' },
@@ -1542,7 +1542,7 @@ list these byte sequences for big-endian and little-endian MIE-format files:
     Decimal:        126   16    4    ?   48   77   73   69
         or          126   24    4    ?   48   77   73   69
 
-Note that byte 2 may have one of the two possible values (0x10 or 0x18), and
+Note that byte 1 may have one of the two possible values (0x10 or 0x18), and
 byte 3 may have any value (0x00 to 0xff).
 
 =head2 Element Structure

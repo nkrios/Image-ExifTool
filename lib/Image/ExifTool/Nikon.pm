@@ -25,6 +25,8 @@
 #              11) http://www.rottmerhusen.com/objektives/lensid/nikkor.html
 #              12) http://libexif.sourceforge.net/internals/mnote-olympus-tag_8h-source.html
 #              13) Roger Larsson private communication (tests with D200)
+#              14) http://homepage3.nifty.com/kamisaka/makernote/makernote_nikon.htm
+#              15) http://tomtia.plala.jp/DigitalCamera/MakerNote/index.asp
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -34,7 +36,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.42';
+$VERSION = '1.45';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -44,6 +46,7 @@ my %nikonLensIDs = (
         MaxApertureAtMinFocal, MaxApertureAtMaxFocal, MCUVersion and LensType, in
         that order.
     },
+    # (hex digits must be uppercase in keys below)
     '01 58 50 50 14 14 02 00' => 'AF Nikkor 50mm f/1.8',
     '02 42 44 5C 2A 34 02 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
     '02 42 44 5C 2A 34 08 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
@@ -75,8 +78,8 @@ my %nikonLensIDs = (
     '20 48 60 80 24 24 15 00' => 'AF Zoom-Nikkor ED 80-200mm f/2.8',
     '22 48 72 72 18 18 16 00' => 'AF DC-Nikkor 135mm f/2',
     '24 48 60 80 24 24 1A 02' => 'AF Zoom-Nikkor ED 80-200mm f/2.8D',
-    '25 48 44 5c 24 24 1B 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D',
-    '25 48 44 5c 24 24 52 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
+    '25 48 44 5C 24 24 1B 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D',
+    '25 48 44 5C 24 24 52 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
     '27 48 8E 8E 24 24 F2 02' => 'AF-I Nikkor 300mm f/2.8D IF-ED',
     '27 48 8E 8E 24 24 1D 02' => 'AF-I Nikkor 300mm f/2.8D IF-ED',
     '28 3C A6 A6 30 30 1D 02' => 'AF-I Nikkor 600mm f/4D IF-ED',
@@ -95,7 +98,7 @@ my %nikonLensIDs = (
     '3B 48 44 5C 24 24 3A 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
     '3D 3C 44 60 30 3C 3E 02' => 'AF Zoom-Nikkor 35-80mm f/4-5.6D',
     '3E 48 3C 3C 24 24 3D 02' => 'AF Nikkor 28mm f/2.8D',
-    '41 48 7c 7c 24 24 43 02' => 'AF Nikkor 180mm f/2.8D IF-ED',
+    '41 48 7C 7C 24 24 43 02' => 'AF Nikkor 180mm f/2.8D IF-ED',
     '42 54 44 44 18 18 44 02' => 'AF Nikkor 35mm f/2D',
     '43 54 50 50 0C 0C 46 02' => 'AF Nikkor 50mm f/1.4D',
     '46 3C 44 60 30 3C 49 02' => 'AF Zoom-Nikkor 35-80mm f/4-5.6D N',
@@ -217,11 +220,11 @@ my %nikonLensIDs = (
     '00 3F 2D 80 2B 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)',
     '00 3F 2D 80 2C 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) MACRO',
     '07 40 30 45 2D 35 03 02' => 'Tamron AF19-35mm F3.5-4.5',
-    '00 49 30 48 22 2B 00 02' => 'Tamron SP AF20-40mm f/2.7-3.5', 
+    '00 49 30 48 22 2B 00 02' => 'Tamron SP AF20-40mm f/2.7-3.5',
     '45 41 37 72 2C 3C 48 02' => 'Tamron SP AF24-135mm F3.5-5.6 AD ASPHERICAL(IF)MACRO',
     '33 54 3C 5E 24 24 62 02' => 'Tamron SP AF28-75mm F2.8 XR Di LD ASPHERICAL(IF)MACRO',
     '10 3D 3C 60 2C 3C D2 02' => 'Tamron AF28-80mm f/3.5-5.6 Aspherical',
-    '45 3D 3C 60 2C 3C 48 02' => 'Tamron AF 28-80mm F3.5-5.6 ASPHERICAL', 
+    '45 3D 3C 60 2C 3C 48 02' => 'Tamron AF 28-80mm F3.5-5.6 ASPHERICAL',
     '00 48 3C 6A 24 24 00 02' => 'Tamron SP AF28-105mm f/2.8',
     '0B 3E 3D 7F 2F 3D 0E 02' => 'Tamron AF28-200mm f/3.8-5.6D',
     '0B 3E 3D 7F 2F 3D 0E 00' => 'Tamron AF28-200mm f/3.8-5.6',
@@ -290,6 +293,18 @@ my %nikonLensIDs = (
         Writable => 'rational64u',
         Count => 4,
     },
+    0x000d => { #15
+        Name => 'ProgramShift',
+        Writable => 'undef',
+        Count => 4,
+        ValueConv => 'my ($a,$b,$c)=unpack("c3",$val); $c ? $a*($b/$c) : 0',
+        ValueConvInv => q{
+            my $a = int($val*6 + ($val>0 ? 0.5 : -0.5));
+            $a<-128 or $a>127 ? undef : pack("c4",$a,1,6,0);
+        },
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
+    },
     0x000e => {
         Name => 'ExposureDifference',
         Writable => 'undef',
@@ -297,10 +312,9 @@ my %nikonLensIDs = (
         ValueConv => 'my ($a,$b,$c)=unpack("c3",$val); $c ? $a*($b/$c) : 0',
         ValueConvInv => q{
             my $a = int($val*12 + ($val>0 ? 0.5 : -0.5));
-            return undef if $a<-128 or $a>127;
-            return pack("c4",$a,1,12,0);
+            $a<-128 or $a>127 ? undef : pack("c4",$a,1,12,0);
         },
-        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConv => '$val ? sprintf("%+.1f",$val) : 0',
         PrintConvInv => '$val',
     },
     0x000f => { Name => 'ISOSelection', Writable => 'string' }, #2
@@ -321,9 +335,15 @@ my %nikonLensIDs = (
     0x0012 => { #2
         Name => 'FlashExposureComp',
         Description => 'Flash Exposure Compensation',
-        Format => 'int32s',
-        # just the top byte, signed
-        PrintConv => 'use integer;$val>>=24;no integer;sprintf("%.1f",$val/6)',
+        Writable => 'undef',
+        Count => 4,
+        ValueConv => 'my ($a,$b,$c)=unpack("c3",$val); $c ? $a*($b/$c) : 0',
+        ValueConvInv => q{
+            my $a = int($val*6 + ($val>0 ? 0.5 : -0.5));
+            $a<-128 or $a>127 ? undef : pack("c4",$a,1,6,0);
+        },
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
     },
     # D70 - another ISO tag
     0x0013 => { #2
@@ -341,20 +361,48 @@ my %nikonLensIDs = (
     },
     0x0018 => { #5
         Name => 'FlashExposureBracketValue',
-        Format => 'int32s',
-        # just the top byte, signed
-        PrintConv => 'sprintf("%.1f",($val >> 24)/6)',
+        Writable => 'undef',
+        Count => 4,
+        ValueConv => 'my ($a,$b,$c)=unpack("c3",$val); $c ? $a*($b/$c) : 0',
+        ValueConvInv => q{
+            my $a = int($val*6 + ($val>0 ? 0.5 : -0.5));
+            $a<-128 or $a>127 ? undef : pack("c4",$a,1,6,0);
+        },
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
     },
     0x0019 => { #5
         Name => 'ExposureBracketValue',
         Format => 'rational64s',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x001a => { #PH
+        Name => 'ImageProcessing',
+        Format => 'string',
+    },
+    0x001b => { #15
+        Name => 'CropHiSpeed',
+        PrintConv => q{
+            my @a = split ' ', $val;
+            return "Unknown ($val)" unless @a == 7;
+            $a[0] = $a[0] ? "On" : "Off";
+            return "$a[0] ($a[1]x$a[2] cropped to $a[3]x$a[4] at pixel $a[5],$a[6])";
+        }
     },
     0x001d => { #4
         Name => 'SerialNumber',
         Writable => 0,
         Notes => 'Not writable because this value is used as a key to decrypt other information',
         RawConv => '$self->{NikonInfo}->{SerialNumber} = $val',
+    },
+    0x001e => { #14
+        Name => 'ColorSpace',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'sRGB',
+            2 => 'AdobeRGB',
+        },
     },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
     0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
@@ -407,6 +455,8 @@ my %nikonLensIDs = (
         Writable => 'int8u',
         PrintConv => {
             0 => 'Did Not Fire',
+            1 => 'Fired, Manual', #14
+            7 => 'Fired, External', #14
             8 => 'Fired, Commander Mode',
             9 => 'Fired, TTL Mode',
         },
@@ -444,6 +494,14 @@ my %nikonLensIDs = (
             });
         ],
     },
+    0x008a => { #15
+        Name => 'AutoBracketRelease',
+        PrintConv => {
+            0 => 'None',
+            1 => 'Auto Release',
+            2 => 'Manual Release',
+        },
+    },
     0x008b => { #8
         Name => 'LensFStops',
         ValueConv => 'my ($a,$b,$c)=unpack("C3",$val); $c ? $a*($b/$c) : 0',
@@ -470,6 +528,11 @@ my %nikonLensIDs = (
         Name => 'HueAdjustment',
         Writable => 'int16s',
     },
+# this doesn't look right:
+#    0x0093 => { #15
+#        Name => 'SaturationAdjustment',
+#        Writable => 'int16s',
+#    },
     0x0094 => { Name => 'Saturation',       Writable => 'int16s' },
     0x0095 => { Name => 'NoiseReduction',   Writable => 'string' },
     0x0096 => {
@@ -566,9 +629,8 @@ my %nikonLensIDs = (
             Writable => 0,
         },
     ],
-    # D70 guessing here
-    0x0099 => { #2
-        Name => 'NEFThumbnailSize',
+    0x0099 => { #2/15
+        Name => 'RawImageCenter',
         Writable => 'int16u',
         Count => 2,
     },
@@ -581,6 +643,14 @@ my %nikonLensIDs = (
     },
     0x00a0 => { Name => 'SerialNumber',     Writable => 'string' }, #2
     0x00a2 => { Name => 'ImageDataSize' }, # size of compressed image data plus EOI segment (ref 10)
+    0x00a5 => { #15
+        Name => 'ImageCount',
+        Writable => 'int32u',
+    },
+    0x00a6 => { #15
+        Name => 'DeletedImageCount',
+        Writable => 'int32u',
+    },
     # the sum of 0xa5 and 0xa6 is equal to 0xa7 ShutterCount (D2X,D2Hs,D2H,D200, ref 10)
     0x00a7 => { # Number of shots taken by camera so far (ref 2)
         Name => 'ShutterCount',
@@ -595,6 +665,18 @@ my %nikonLensIDs = (
     },
     0x00aa => { Name => 'Saturation',       Writable => 'string' }, #2
     0x00ab => { Name => 'VariProgram',      Writable => 'string' }, #2
+    0x00ac => { Name => 'ImageStabilization',Writable=> 'string' }, #14
+    0x00ad => { Name => 'AFResponse',       Writable => 'string' }, #14
+    0x00b1 => { #14
+        Name => 'HighISONoiseReduction',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On for ISO 1600/3200',
+            2 => 'Weak',
+            4 => 'Normal',
+            6 => 'Strong',
+        },
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -625,6 +707,8 @@ my %nikonLensIDs = (
             Start => '$valuePtr + 4',
         },
     },
+    # 0x0e10 - unknown (written by Nikon Capture)
+    # 0x0e13 - some sort of edit history written by Nikon Capture
 );
 
 # Nikon AF information (ref 13)
@@ -878,10 +962,10 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 0,
     NOTES => q{
-Nikon encrypts the LensData information below if LensDataVersion is 0201,
-but  the decryption algorithm is known so the information can be extracted.
-It isn't yet writable, however, because the encryption adds complications
-which make writing more difficult.
+        Nikon encrypts the LensData information below if LensDataVersion is 0201,
+        but  the decryption algorithm is known so the information can be extracted.
+        It isn't yet writable, however, because the encryption adds complications
+        which make writing more difficult.
     },
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x00 => {
@@ -892,8 +976,15 @@ which make writing more difficult.
         Name => 'AFAperture',
         %nikonApertureConversions,
     },
-    0x08 => 'FocusPosition', #8
+    0x08 => { #8
+        Name => 'FocusPosition',
+        PrintConv => 'sprintf("0x%02x", $val)',
+        PrintConvInv => '$val',
+    },
     0x09 => { #8/9
+        # With older AF lenses this does not work... (ref 13)
+        # ie) AF Nikkor 50mm f/1.4 => 48 (0x30)
+        # AF Zoom-Nikkor 35-105mm f/3.5-4.5 => @35mm => 15 (0x0f), @105mm => 141 (0x8d)
         Name => 'FocusDistance',
         ValueConv => '0.01 * 10**($val/40)', # in m
         ValueConvInv => '$val>0 ? 40*log($val*100)/log(10) : 0',
@@ -1159,6 +1250,9 @@ sub ProcessNikonCaptureOffsets($$$)
     return 0 unless $dirLen > 2;
     my $count = Get16u($dataPt, $dirStart);
     return 0 unless $count and $count * 12 + 2 <= $dirLen;
+    if ($exifTool->Options('Verbose')) {
+        $exifTool->VerboseDir('NikonCaptureOffsets', $count);
+    }
     my $index;
     for ($index=0; $index<$count; ++$index) {
         my $pos = $dirStart + 12 * $index + 2;

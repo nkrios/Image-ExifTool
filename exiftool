@@ -190,7 +190,8 @@ while ($_ = shift) {
         }
         /^E$/  and $escapeHTML = 1, next;
         /^f$/  and $forcePrint = 1, next;
-        /^F([-+]?\d*)$/ and $mainTool->Options('FixBase',$1), next;
+        /^F([-+]?\d*)$/ and $mainTool->Options(FixBase => $1), next;
+        /^fast$/i and $mainTool->Options(FastScan => 1), next;
         /^g(\d*)$/ and $showGroup = $1, next;
         /^G(\d*)$/ and $showGroup = $1, $allGroup=1, next;
         /^h$/  and $htmlOutput = 1, $escapeHTML = 1, next;
@@ -236,7 +237,7 @@ while ($_ = shift) {
         /^z$/i and $doUnzip = 1, $mainTool->Options(Compress => 1), next;
         $_ eq '' and push(@files, '-'), next;   # read STDIN
         length $_ eq 1 and Die "Unknown option -$_\n";
-        if (/=/) {
+        if (/^[^<]+<?=/) {
             push @newValues, $_;
             $doSetFileName = 1 if /^(filename|directory)\b/i;
         } else {
@@ -705,7 +706,7 @@ sub SetImageInfo($$)
                     }
                 } elsif ($overwriteOrig) {
                     # erase original file
-                    unlink $file or Warn "Error erasing original $file\n"; 
+                    unlink $file or Warn "Error erasing original $file\n";
                 }
             } else {
                 # this file was created from scratch, not edited
@@ -720,7 +721,7 @@ sub SetImageInfo($$)
             unlink $tmpFile;
         } else {
             if ($overwriteOrig) {
-                unlink $file or Warn "Error erasing original $file\n"; 
+                unlink $file or Warn "Error erasing original $file\n";
             }
             ++$countGoodWr;
         }
@@ -928,38 +929,8 @@ sub GetImageInfo($$)
     if (@printFmt) {
         # output using print format file (-p) option
         foreach (@printFmt) {
-            my $line = $_;  # copy the print format line
-            while ($line =~ /(.*?)\$([-a-zA-Z_0-9]+)(.*)/s) {
-                my ($pre, $tag, $group, $family);
-                ($pre, $tag, $line) = ($1, $2, $3);
-                # check to see if this is a group name
-                if ($line =~ /^:([-a-zA-Z_0-9]+)(.*)/s) {
-                    $group = lc($tag);
-                    ($tag, $line) = ($1, $2);
-                    $family = $1 if $group =~ s/^(\d+)//;
-                }
-                my $val;
-                if ($group) {
-                    # find the specified tag
-                    my @matches = grep /^$tag(\s|$)/i, @foundTags;
-                    foreach $tag (@matches) {
-                        my @groups = $exifTool->GetGroup($tag, $family);
-                        next unless grep /^$group$/i, @groups;
-                        $val = $info->{$tag};
-                    }
-                } else {
-                    $val = $info->{$tag};
-                    unless (defined $val) {
-                        # check for tag name with different case
-                        ($tag) = grep /^$tag$/i, @foundTags;
-                        $val = $info->{$tag} if defined $tag;
-                    }
-                }
-                $val = '-' unless defined $val;
-                print $fp $pre, $val;
-            }
+            print $fp $exifTool->InsertTagValues(\@foundTags, $_);
             ++$lineCount;
-            print $fp $line;
         }
     } elsif (not $disableOutput) {
         print $fp "<table>\n" if $htmlOutput;
@@ -1229,29 +1200,31 @@ supported by exiftool (r = read support, w = write support):
 
                  File Type                      Meta Information
     -----------------------------------        ------------------
-    JPEG  r/w     PSD   r/w     ACR   r        EXIF           r/w
-    TIFF  r/w     EPS   r/w     AI    r        GPS            r/w
-    GIF   r/w     PS    r/w     PDF   r        IPTC           r/w
-    CRW   r/w     ICC   r/w     PICT  r        XMP            r/w
-    CR2   r/w     PPM   r/w     QTIF  r        MakerNotes     r/w
-    ERF   r/w     PGM   r/w     RIFF  r        Photoshop IRB  r/w
-    NEF   r/w     PBM   r       AIFF  r        AFCP           r/w
-    PEF   r/w     JP2   r       AVI   r        JFIF           r/w
-    MRW   r/w     BMP   r       WAV   r        ICC Profile    r/w
-    MOS   r/w     ORF   r       MP3   r        MIE            r/w
-    DNG   r/w     RAF   r       MP4   r        GeoTIFF        r
-    PNG   r/w     RAW   r       MOV   r        PrintIM        r
-    MNG   r/w     SRF   r       ASF   r        ID3            r
-    JNG   r/w     SR2   r       WMA   r
-    XMP   r/w     X3F   r       WMV   r
-    THM   r/w     DCM   r
-    MIE   r/w     MIFF  r
+    JPEG  r/w     ICC   r/w     MIFF  r        EXIF           r/w
+    TIFF  r/w     MIE   r/w     PICT  r        GPS            r/w
+    GIF   r/w     PPM   r/w     QTIF  r        IPTC           r/w
+    CRW   r/w     PGM   r/w     RIFF  r        XMP            r/w
+    CR2   r/w     PBM   r/w     AIFF  r        MakerNotes     r/w
+    ERF   r/w     WDP   r/w     AVI   r        Photoshop IRB  r/w
+    NEF   r/w     JP2   r       WAV   r        AFCP           r/w
+    PEF   r/w     BMP   r       MPG   r        JFIF           r/w
+    MRW   r/w     FPX   r       MP3   r        ICC Profile    r/w
+    MOS   r/w     ORF   r       MP4   r        MIE            r/w
+    DNG   r/w     RAF   r       MOV   r        FlashPix       r
+    PNG   r/w     RAW   r       ASF   r        GeoTIFF        r
+    MNG   r/w     SRF   r       WMA   r        PrintIM        r
+    JNG   r/w     SR2   r       WMV   r        ID3            r
+    XMP   r/w     X3F   r       RA    r
+    THM   r/w     DCM   r       RM    r
+    PSD   r/w     ACR   r       RAM   r
+    EPS   r/w     AI    r       SWF   r
+    PS    r/w     PDF   r
 
 =head1 OPTIONS
 
 Note:  Case is not significant for any command-line option (including tag
 and group names), except for single-character options if the corresponding
-upper case option is defined.  Multiple options can NOT be combined into a
+upper case option is defined.  Multiple options may NOT be combined into a
 single argument, because that would be interpreted as a tag name.
 
 =over 5
@@ -1341,8 +1314,9 @@ various formats:
 
 =item B<-d> I<FMT>
 
-Set B<d>ate/time format.  Consult C<strftime> man page for C<FMT> syntax.
-The default format is equivalent to "%Y:%m:%d %H:%M:%S".
+Set the format for B<d>ate/time tag values.  Consult C<strftime> man page
+for C<FMT> syntax. The default format is equivalent to "%Y:%m:%d %H:%M:%S".
+This option has no effect on date-only or time-only tags.
 
 =item B<-D>
 
@@ -1379,6 +1353,14 @@ the file is modified.  This may cause the wrong values to be extracted for
 some maker note entries when reading the edited file.  This option allows an
 integer value to be specified for adjusting the maker notes base offset.  If
 no value is given, ExifTool will take its best guess at the correct base.
+
+=item B<-fast>
+
+Increases speed of extracting information from JPEG images.  With this
+option, ExifTool will not scan to the end of a JPEG image to check for an
+AFCP or PreviewImage trailer.  The speed benefits are small when reading
+images directly from disk, but can be substantial if piping images through a
+network connection.
 
 =item B<-g>[#]
 
@@ -1494,17 +1476,21 @@ for example, this preserves the original file type, creator and icon.
 
 B<P>rint output in the format specified by the given file (and ignore other
 format options).  Tag names in the format file begin with a C<$> symbol and
-may contain an optional group name.  Case is not significant.  Lines beginning
-with C<#> are ignored.  For example, this format file:
+may contain an optional group name.  Case is not significant.  Braces C<{}>
+may be used around the tag name to separate it from subsequent text.  Use
+C<$$> to represent a C<$> symbol.  Lines beginning with C<#> are ignored.
+For example, this format file:
 
     # this is a comment line
     File $FileName was created on $DateTimeOriginal
-    (f/$Aperture, $ShutterSpeed sec, ISO $EXIF:ISO)
+    (f/$Aperture, ${ShutterSpeed}s, ISO $EXIF:ISO)
 
 produces output like this:
 
     File test.jpg was created on 2003:10:31 15:44:19
-    (f/5.6, 1/60 sec, ISO 100)
+    (f/5.6, 1/60s, ISO 100)
+
+If a tag does not exist, the value is set to '-' in the output.
 
 =item B<-P>
 
@@ -1556,6 +1542,13 @@ name for extracted tags (even if C<All> is used as a group name), in which
 case the information is written to the original group, unless redirected to
 a different group.
 
+C<SRCFILE> may be the same as C<FILE> to move information around within a
+file.  C<@> may be used to represent C<FILE> (ie. C<-TagsFromFile @>),
+permitting this feature to be used when batch processing multiple files.
+Specified tags are then copied from file in turn as it is rewritten.  As a
+convenience, C<-TagsFromFile @> is assumed for any redirected tags which are
+specified without a prior C<-TagsFromFile> option.
+
 A powerful information redirection feature allows a destination tag to be
 specified for each extracted tag.  With this feature, information may be
 written to a tag with a different name or group.  This is done using
@@ -1567,12 +1560,15 @@ destination tags may be prefixed by a group name, and C<All> or C<*> may be
 used as a tag or group name.  If no destination group is specified, then the
 information is written to the preferred group.
 
-C<SRCFILE> may be the same as C<FILE> to move information around within a
-file.  C<@> may be used to represent C<FILE> (ie. C<-TagsFromFile @>),
-permitting this feature to be used when batch processing multiple files.
-Specified tags are then copied from file in turn as it is rewritten.  As a
-convenience, C<-TagsFromFile @> is assumed for any redirected tags which are
-specified without a prior C<-TagsFromFile> option.
+An extension of this redirection feature allows expressions involving tag
+names to be used on the right hand side of the C<E<lt>> symbol with the
+syntax E<quot>C<'-DSTTAGE<lt>EXP'>E<quot>, where C<EXP> is an expression
+containing tag names with leading C<$> symbols.  See the C<-p> option for
+more details about this syntax.  Expressions starting with a C<=> sign must
+insert a single space after the C<E<lt>> to avoid confusion with the
+C<E<lt>=> syntax which would otherwise attempt to set the tag value from the
+contents of a file.  A single space at the start of an expression is removed
+if it exists, but all other whitespace is preserved.
 
 See L</COPYING EXAMPLES> for examples using C<-TagsFromFile>.
 
@@ -1781,6 +1777,14 @@ See L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for details.)
 
 Add 3 hours to the CreateDate and ModifyDate timestamps of two images.
 
+=item exiftool -AllDates+=1:30 image.jpg
+
+When shifting date/time values in JPEG images, typically three date/time
+tags must be updated:  DateTimeOriginal, CreateDate and ModifyDate.  The
+AllDates tag is provided as a shortcut for these tags, allowing all three
+values to be shifted at once.  The command above shifts these values forward
+by 1 hour and 30 minutes.
+
 =item exiftool -xmp:city=Kingston dst.jpg
 
 Write a tag to the XMP group (otherwise in this case the tag would get
@@ -1878,6 +1882,12 @@ inverse conversion.
 Recursively rewrite all C<JPG> images in C<dir> with information copied from
 the corresponding C<CRW> images in the same directories.
 
+=item exiftool '-comment<ISO=$exif:iso Exposure=${shutterspeed}' dir
+
+Set the Comment tag of all images in C<dir> from the values of the EXIF:ISO
+and ShutterSpeed tags.  The resulting comment will be in the form "ISO=100
+Exposure=1/60".
+
 =back
 
 =head1 RENAMING EXAMPLES
@@ -1923,6 +1933,11 @@ recursively renames all images in a directory by adding a C<CreateDate>
 timestamp to the start of the filename, then moves them into new directories
 named by date.
 
+=item exiftool '-FileName<${CreateDate}_$filenumber.jpg' -d %Y%m%d dir/*.jpg
+
+Set the filename of all JPG images in the current directory from the
+CreateDate and FileNumber tags, in the form "20060507_118-1861.jpg".
+
 =back
 
 =head1 PIPING EXAMPLES
@@ -1945,8 +1960,8 @@ Add an IPTC keyword in a pipeline, saving output to a new file.
       exiftool a.jpg -thumbnailimage'<=-'
 
 Add a comment to an embedded thumbnail image.  (Why anyone would want to do
-this I don't know, but I've included this example may give you an idea of
-ExifTool's flexibility.)
+this I don't know, but I've included this as an example to illustrate the
+flexibility of ExifTool.)
 
 =back
 

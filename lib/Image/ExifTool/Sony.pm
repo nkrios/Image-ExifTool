@@ -6,6 +6,7 @@
 # Revisions:    04/06/2004  - P. Harvey Created
 #
 # References:   1) http://www.cybercom.net/~dcoffin/dcraw/
+#               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Sony;
@@ -15,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -32,6 +33,31 @@ sub ProcessSR2($$$);
         },
     },
     0xb020 => 'ColorModeSetting', #PH
+    0xb027 => 'LensID', #2
+    0xb028 => { #2
+        # (used by the DSLR-A100)
+        Name => 'MinoltaMakerNote',
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Minolta::Main',
+            Start => '$val',
+        },
+    },
+    0xb040 => { #2
+        Name => 'Macro',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0xb041 => { #2
+        Name => 'ExposureMode',
+        PrintConv => {
+            0 => 'Auto',
+            6 => 'Program',
+            7 => 'Aperture Priority',
+            8 => 'Shutter Priority',
+            9 => 'Night Scene',
+            15 => 'Manual',
+        },
+    },
 );
 
 # tag table for Sony RAW Format
@@ -242,7 +268,7 @@ sub ProcessSR2($$$)
             );
             my $subTable = Image::ExifTool::GetTagTable('Image::ExifTool::Sony::SR2SubIFD');
             $result = $exifTool->ProcessDirectory(\%dirInfo, $subTable);
-            
+
         } else {
             $exifTool->Warn('Error reading SR2 data');
         }

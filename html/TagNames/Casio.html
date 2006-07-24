@@ -16,7 +16,11 @@
   <br>2 = Panorama
   <br>3 = Night Scene
   <br>4 = Portrait
-  <br>5 = Landscape</font></td></tr>
+  <br>5 = Landscape
+  <br>7 = Panorama
+  <br>10 = Night Scene
+  <br>15 = Portrait
+  <br>16 = Landscape</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0002</td>
 <td>Quality</td>
@@ -31,12 +35,18 @@
 <td><font size='-1'>2 = Macro
   <br>3 = Auto
   <br>4 = Manual
-  <br>5 = Infinity</font></td></tr>
+  <br>5 = Infinity
+  <br>7 = Spot AF</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0004</td>
 <td>FlashMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>1 = Auto
+  <br>2 = On
+  <br>3 = Off
+  <br>4 = Off
+  <br>5 = Red-eye Reduction
+  <br>1 = Auto
   <br>2 = On
   <br>3 = Off
   <br>4 = Red-eye Reduction</font></td></tr>
@@ -45,7 +55,9 @@
 <td>FlashIntensity</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>11 = Weak
+  <br>12 = Low
   <br>13 = Normal
+  <br>14 = High
   <br>15 = Strong</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0006</td>
@@ -66,39 +78,105 @@
 <td>0x000a</td>
 <td>DigitalZoom</td>
 <td align='center'>int32u</td>
-<td><font size='-1'>65536 = Off
-  <br>65537 = 2X</font></td></tr>
+<td><font size='-1'>0x10000 = Off
+  <br>0x10001 = 2x
+  <br>0x19999 = 1.6x
+  <br>0x20000 = 2x
+  <br>0x33333 = 3.2x
+  <br>0x40000 = 4x</font></td></tr>
 <tr valign='top'>
 <td>0x000b</td>
 <td>Sharpness</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Soft
-  <br>2 = Hard</font></td></tr>
+  <br>2 = Hard
+  <br>16 = Normal
+  <br>17 = +1
+  <br>18 = -1</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x000c</td>
 <td>Contrast</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Low
-  <br>2 = High</font></td></tr>
+  <br>2 = High
+  <br>16 = Normal
+  <br>17 = +1
+  <br>18 = -1</font></td></tr>
 <tr valign='top'>
 <td>0x000d</td>
 <td>Saturation</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Low
-  <br>2 = High</font></td></tr>
+  <br>2 = High
+  <br>16 = Normal
+  <br>17 = +1
+  <br>18 = -1</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0014</td>
 <td>CCDSensitivity</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>64 = Normal
   <br>80 = Normal
-  <br>100 = High
+  <br>100 = High (or ISO 100)
   <br>125 = +1.0
+  <br>180 = ISO 180
   <br>244 = +3.0
-  <br>250 = +2.0</font></td></tr>
+  <br>250 = +2.0
+  <br>300 = ISO 300
+  <br>500 = ISO 500</font></td></tr>
+<tr valign='top'>
+<td>0x0016</td>
+<td>Enhancement</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Off
+  <br>2 = Red
+  <br>3 = Green
+  <br>4 = Blue
+  <br>5 = Flesh Tones</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0017</td>
+<td>Filter</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Off
+  <br>2 = Black &amp; White
+  <br>3 = Sepia
+  <br>4 = Red
+  <br>5 = Green
+  <br>6 = Blue
+  <br>7 = Yellow
+  <br>8 = Pink
+  <br>9 = Purple</font></td></tr>
+<tr valign='top'>
+<td>0x0018</td>
+<td>AFPoint</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = Center
+  <br>2 = Upper Left
+  <br>3 = Upper Right
+  <br>4 = Near Left/Right of Center
+  <br>5 = Far Left/Right of Center
+  <br>6 = Far Left/Right of Center/Bottom
+  <br>7 = Top Near-Left
+  <br>8 = Near Upper/Left
+  <br>9 = Top Near-Right
+  <br>10 = Top Left
+  <br>11 = Top Center
+  <br>12 = Top Right
+  <br>13 = Center Left
+  <br>14 = Center Right
+  <br>15 = Bottom Left
+  <br>16 = Bottom Center
+  <br>17 = Bottom Right</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0019</td>
+<td>FlashIntensity</td>
+<td align='center'>Y</td>
+<td><font size='-1'>1 = Normal
+  <br>2 = Weak
+  <br>3 = Strong</font></td></tr>
 <tr valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
@@ -214,13 +292,16 @@
 <td>WhiteBalance</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Manual
-  <br>1 = Auto?
+  <br>1 = Daylight
+  <br>3 = Shade
   <br>4 = Flash?
+  <br>6 = Fluorescent
+  <br>10 = Tungsten
   <br>12 = Flash</font></td></tr>
 <tr valign='top'>
 <td>0x2022</td>
 <td>ObjectDistance</td>
-<td align='center'>int32u~</td>
+<td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x2034</td>
@@ -231,7 +312,11 @@
 <td>0x3000</td>
 <td>RecordMode</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>2 = Normal</font></td></tr>
+<td><font size='-1'>2 = Program AE
+  <br>3 = Shutter Priority
+  <br>4 = Aperture Priority
+  <br>5 = Manual
+  <br>6 = Best Shot</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x3001</td>
 <td>SelfTimer</td>
@@ -241,7 +326,7 @@
 <td>0x3002</td>
 <td>Quality</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>1 = Economic
+<td><font size='-1'>1 = Economy
   <br>2 = Normal
   <br>3 = Fine</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -250,6 +335,7 @@
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Manual?
   <br>1 = Fixation?
+  <br>2 = Macro
   <br>3 = Single-Area Auto Focus
   <br>6 = Multi-Area Auto Focus</font></td></tr>
 <tr valign='top'>
@@ -259,10 +345,31 @@
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x3007</td>
-<td>BestshotMode</td>
+<td>BestShotMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On?</font></td></tr>
+<tr valign='top'>
+<td>0x3008</td>
+<td>AutoISO</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>1 = On
+  <br>2 = Off</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x3011</td>
+<td>Sharpness</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x3012</td>
+<td>Contrast</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x3013</td>
+<td>Saturation</td>
+<td align='center'>int16s</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x3014</td>
 <td>CCDISOSensitivity</td>
@@ -283,11 +390,28 @@
 <td>Filter</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off</font></td></tr>
+<tr valign='top'>
+<td>0x301c</td>
+<td>SequenceNumber</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x301d</td>
+<td>BracketSequence</td>
+<td align='center'>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0x3020</td>
+<td>ImageStabilization</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On
+  <br>2 = Best Shot</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 12, 2006</i>
+<br><i>Last revised Jul 6, 2006</i>
 </body>
 </html>

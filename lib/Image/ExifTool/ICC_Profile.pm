@@ -672,7 +672,7 @@ sub ProcessICC_Profile($$$)
     if ($exifTool->{OPTIONS}->{Binary} or $exifTool->{REQ_TAG_LOOKUP}->{icc_profile}) {
         $exifTool->FoundTag('ICC_Profile', substr($$dataPt, $dirStart, $dirLen));
     }
-    
+
     if ($verbose) {
         $exifTool->VerboseDir('ICC_Profile', $numEntries, $dirLen);
         my $fakeInfo = { Name=>'ProfileHeader', SubDirectory => { } };

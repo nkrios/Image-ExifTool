@@ -42,16 +42,25 @@ thumbnail image data to run off the end of the APP1 segment.
 
 <p><b>Casio:</b> The preview image is referenced by two different offsets (the
 PreviewImage tag plus a PreviewImageStart/PreviewImageLength pair).  Also, the
-offset for the PrintIM information for the QV-4000 is relative to the start
-of the IFD entry (other offsets are OK).
+offset for the PrintIM information is relative to the start of the IFD entry
+even though other offsets aren't.
+
+<p><b>Concord:</b> Some models write PrintIM information with an entry-based
+offset like Casio.
 
 <p><b>Kodak:</b> Professional DCS Photo Desk software writes a cyclical EXIF
 directory such that the InteropIFD pointer points back to IFD0.
+
+<p><b>Konica:</b> The KD-300Z writes all maker notes offsets relative to the
+start of the individual IFD entry.
 
 <p><b>Minolta:</b> An obvious bug in the firmware of the Z2 writes an incorrect
 offset for the 'MinoltaCameraSettings2' information -- it writes the offset of
 the offset itself instead of the offset of the value (hahaha!).  Other
 offsets are correct.
+
+<p><b>Kyocera:</b> A number of models write all maker notes offsets relative
+to the start of the individual IFD entry.
 
 <p><b>Nikon:</b> D2H NEF files have huge blocks with all zero data (3.7 MB in
 my test file!).
@@ -61,17 +70,17 @@ but not only does the data size of these subdirectories exclude the subdirectory
 value data, but also it is 2 bytes too small for the directory information
 itself (doh! -- they forgot to include the entry count).
 
-<p><b>Pentax:</b> The Optio 330 uses a base offset for the PrintIM information
-which is relative to the start of the individual IFD entry (egad!).  Also,
-preview image offsets in the maker notes are given relative to the EXIF base
-rather than the maker note base (like all other maker notes offsets).
+<p><b>Pentax:</b> The Optio 330 uses an offset for the PrintIM information which
+is relative to the start of the IFD entry (hmmm, like some Casio models...). 
+Also, preview image offsets in the maker notes are given relative to the EXIF
+base rather than the maker note base (like all other maker notes offsets).
 
 <p>The Optio 550, 555, 33WR and 43WR all specify a PrintIM directory at a the
 same offset of 0x29a with length 40 bytes, but the only PrintIM information in
-the file is nowhere near that offset an is 128 bytes long.  Also for these
+the file is nowhere near that offset and is 128 bytes long.  Also for these
 models, tag 0x002e has a constant value of 0x6a6 even though its position
 changes.  Finally, all of these models plus the Optio WP waste many kilobytes of
-space in each image by having large unused data blocks in the EXIF information.
+space in each image with large unused data blocks in the EXIF information.
 
 <p>The Optio 330RS and 430RS double reference the preview image information.
 
@@ -82,18 +91,22 @@ were built for Pentax by Asahi.
 information as 'int32u' (or 'LONG').  This is wrong
 (<a href="http://www.awaresystems.be/imaging/tiff/tifftags/iptc.html">see
 reference</a>).  Nikon Capture goes one step further and simply ignores IPTC
-that is written correctly as 'undef' or 'int8u'.
+that is written correctly as 'undef' or 'int8u'.  (So for compatibility,
+ExifTool also writes this incorrectly as 'int32u'.)
 
 <p><b>Ricoh:</b> An IFD subdirectory in the Ricoh maker notes of both the
 Caplio RR30 and RR1.  The RR30 uses standard EXIF offsets (relative to the start
 of the EXIF data), but for the RR1 the offsets are relative to the start of the
 subdirectory.
 
+<p><b>Rollei:</b> The DK4010 writes all maker notes offsets relative to the
+start of the individual IFD entry.
+
 <p><b>Toshiba:</b> The PDR-3310 writes all maker notes offsets relative to the
-start of the individual IFD entry (now where have I seen that before?).  But at
-least they are consistent.
+start of the individual IFD entry.  (very similar to Konica KD-300Z)
 
 <hr>
+<i>Last revised Jun. 21, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

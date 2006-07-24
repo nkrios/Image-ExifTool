@@ -275,7 +275,7 @@ sub WriteNewTags($$$)
     # get XMP hint and remove from tags hash
     my $xmpHint = $$newTags{XMP_HINT};
     delete $$newTags{XMP_HINT};
-    
+
     foreach $tag (sort keys %$newTags) {
         my $tagInfo = $$newTags{$tag};
         my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
@@ -315,6 +315,41 @@ sub CheckPSEnd($$$)
 }
 
 #------------------------------------------------------------------------------
+# Split into lines ending in any CR, LF or CR+LF combination
+# (this is annoying, and could be avoided if EPS files didn't mix linefeeds!)
+# Inputs: 0) data pointer, 1) reference to lines array
+# Notes: Updates data to contain next line and fills list with remaining lines
+sub SplitLine($$)
+{
+    my ($dataPt, $lines) = @_;
+    for (;;) {
+        my $endl;
+        # find the position of the first LF (\x0a)
+        $endl = pos($$dataPt), pos($$dataPt) = 0 if $$dataPt =~ /\x0a/g;
+        if ($$dataPt =~ /\x0d/g) { # find the first CR (\x0d)
+            if (defined $endl) {
+                # (remember, CR+LF is a DOS newline...)
+                $endl = pos($$dataPt) if pos($$dataPt) < $endl - 1;
+            } else {
+                $endl = pos($$dataPt);
+            }
+        } elsif (not defined $endl) {
+            push @$lines, $$dataPt;
+            last;
+        }
+        # split into separate lines
+        if (length $$dataPt == $endl) {
+            push @$lines, $$dataPt;
+            last;
+        } else {
+            push @$lines, substr($$dataPt, 0, $endl);
+            $$dataPt = substr($$dataPt, $endl);
+        }
+    }
+    $$dataPt = shift @$lines;   # set $$dataPt to first line
+}
+
+#------------------------------------------------------------------------------
 # Write PS file
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid PS file,
@@ -332,11 +367,17 @@ sub WritePS($$)
     my ($dos, $psStart, $psEnd, $psNewStart, $xmpHint);
 
     $raf->Read($data, 4) == 4 or return 0;
-    return 0 unless $data =~ /^(%!PS|\xc5\xd0\xd3\xc6)/;
+    return 0 unless $data =~ /^(%!PS|%!Ad|\xc5\xd0\xd3\xc6)/;
+
+    if ($data =~ /^%!Ad/) {
+        # I've seen PS files start with "%!Adobe-PS"...
+        return 0 unless $raf->Read($buff, 6) == 6 and $buff eq "obe-PS";
+        $data .= $buff;
+
+    } elsif ($data =~ /^\xc5\xd0\xd3\xc6/) {
 #
 # process DOS binary PS files
 #
-    if ($data =~ /^\xc5\xd0\xd3\xc6/) {
         # save DOS header then seek ahead and check PS header
         $raf->Read($dos, 26) == 26 or return 0;
         $dos = $data . $dos;
@@ -422,11 +463,21 @@ sub WritePS($$)
     $xmpHint = 0 if $exifTool->{DEL_GROUP}->{XMP};
     $$newTags{XMP_HINT} = $xmpHint if $xmpHint;  # add special tag to newTags list
 
-    while ($raf->ReadLine($data)) {
-        $dos and CheckPSEnd($raf, $psEnd, $data);
+    my @lines;
+    my $altnl = ($/ eq "\x0d") ? "\x0a" : "\x0d";
+
+    for (;;) {
+        if (@lines) {
+            $data = shift @lines;
+        } else {
+            $raf->ReadLine($data) or last;
+            $dos and CheckPSEnd($raf, $psEnd, $data);
+            # split line if it contains other newline sequences
+            SplitLine(\$data, \@lines) if $data =~ /$altnl/;
+        }
         if ($endToken) {
             # look for end token
-            if ($data =~ m{^$endToken\s*$/}i) {
+            if ($data =~ m/^$endToken\s*$/is) {
                 undef $endToken;
                 # found end: process this information
                 if ($mode) {
@@ -460,7 +511,7 @@ sub WritePS($$)
                 }
             }
             next;
-        } elsif ($data =~ m{^(%{1,2})(Begin)(?!Object:)(.*?)(:|$/)}i) {
+        } elsif ($data =~ m{^(%{1,2})(Begin)(?!Object:)(.*?)[:\x0d\x0a]}i) {
             # comments section is over... write any new tags now
             WriteNewTags($exifTool, $outfile, $newTags) or $err = 1 if %$newTags;
             undef $xmpHint;
@@ -489,7 +540,7 @@ sub WritePS($$)
                 my $tagInfo = $$newTags{$tag};
                 next unless ref $tagInfo;
                 delete $$newTags{$tag}; # write it then forget it
-                chomp $val;
+                $val =~ s/\x0d*\x0a*$//;        # remove trailing CR, LF or CR/LF
                 if ($val =~ s/^\((.*)\)$/$1/) { # remove brackets if necessary
                     $val =~ s/\) \(/, /g;       # convert contained brackets too
                 }
@@ -512,7 +563,7 @@ sub WritePS($$)
                 }
             }
         # (note: Adobe InDesign doesn't put colon after %ADO_ContainsXMP -- doh!)
-        } elsif (defined $xmpHint and $data =~ m{^%ADO_ContainsXMP:? ?(.+)$/$}s) {
+        } elsif (defined $xmpHint and $data =~ m{^%ADO_ContainsXMP:? ?(.+?)[\x0d\x0a]*$}s) {
             # change the XMP hint if necessary
             if ($xmpHint) {
                 $data = "%ADO_ContainsXMP: MainFirst$/" if $1 eq 'NoMain';
@@ -534,7 +585,7 @@ sub WritePS($$)
             # look for start of drawing commands (AI uses "%AI5_BeginLayer",
             # and Helios uses "%%BeginObject:")
             if ($data =~ /^%(%Page:|%PlateFile:|%BeginObject:|.*BeginLayer)/ or
-                $data !~ m{^(%|\s*$/)})
+                $data !~ m{^(%.*|\s*)$}s)
             {
                 # we have reached the first page or drawing command, so create necessary
                 # directories and copy the rest of the file, then all done
@@ -558,22 +609,25 @@ sub WritePS($$)
                     # write trailer before %%EOF
                     for (;;) {
                         Write($outfile, $data) or $err = 1;
-                        $raf->ReadLine($data) or undef($data), last;
-                        $dos and CheckPSEnd($raf, $psEnd, $data);
+                        if (@lines) {
+                            $data = shift @lines;
+                        } else {
+                            $raf->ReadLine($data) or undef($data), last;
+                            $dos and CheckPSEnd($raf, $psEnd, $data);
+                            # split line if it contains other newline sequences
+                            SplitLine(\$data, \@lines) if $data =~ /$altnl/;
+                        }
                         last if $data =~ /^%%EOF\b/;
                     }
                     Write($outfile, $flags{TRAILER}) or $err = 1;
-                    while (defined $data) {
-                        Write($outfile, $data) or $err = 1;
-                        $raf->ReadLine($data) or last;
+                }
+                # simply copy the rest of the file if any data is left
+                if (defined $data) {
+                    Write($outfile, $data) or $err = 1;
+                    Write($outfile, @lines) or $err = 1 if @lines;
+                    while ($raf->Read($data, 65536)) {
                         $dos and CheckPSEnd($raf, $psEnd, $data);
-                    }
-                } else {
-                    # simply copy the rest of the file
-                    for (;;) {
                         Write($outfile, $data) or $err = 1;
-                        last unless $raf->Read($data, 65536);
-                        $dos and CheckPSEnd($raf, $psEnd, $data);
                     }
                 }
                 last;   # all done!

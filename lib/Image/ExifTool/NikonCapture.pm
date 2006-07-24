@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 # common print conversions
 my %offOn = ( 0 => 'Off', 1 => 'On' );
@@ -37,11 +37,16 @@ my %unsharpColor = (
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => q{
-This information is written by the Nikon Capture software in tag 0x0e01 of
-the maker notes of NEF images.
+        This information is written by the Nikon Capture software in tag 0x0e01 of
+        the maker notes of NEF images.
     },
     0x008ae85e => {
         Name => 'LCHEditor',
+        Writable => 'int8u',
+        PrintConv => \%offOn,
+    },
+    0x0c89224b => {
+        Name => 'ColorAberrationControl',
         Writable => 'int8u',
         PrintConv => \%offOn,
     },
@@ -50,10 +55,20 @@ the maker notes of NEF images.
         Writable => 'int8u',
         PrintConv => \%offOn,
     },
+    0x2fc08431 => {
+        Name => 'StraightenAngle',
+        Writable => 'double',
+    },
     0x374233e0 => {
         Name => 'CropData',
         SubDirectory => {
             TagTable => 'Image::ExifTool::NikonCapture::CropData',
+        },
+    },
+    0x3cfc73c6 => {
+        Name => 'RedEyeData',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::NikonCapture::RedEyeData',
         },
     },
     0x5f0e7d23 => {
@@ -141,7 +156,6 @@ the maker notes of NEF images.
     },
     0xac6bd5c0 => {
         Name => 'VignetteControlIntensity',
-        Format => 'int16s',
         Writable => 'int16s',
     },
     0xb0384e1e => {
@@ -154,6 +168,12 @@ the maker notes of NEF images.
         Name => 'ColorBoostData',
         SubDirectory => {
             TagTable => 'Image::ExifTool::NikonCapture::ColorBoost',
+        },
+    },
+    0xbf3c6c20 => {
+        Name => 'WBAdjData',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::NikonCapture::WBAdjData',
         },
     },
     0xce5554aa => {
@@ -251,6 +271,48 @@ the maker notes of NEF images.
     1 => {
         Name => 'ColorBoostLevel',
         Format => 'int32u',
+    },
+);
+
+%Image::ExifTool::NikonCapture::WBAdjData = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0x00 => {
+        Name => 'WBAdjRedBalance',
+        Format => 'double',
+    },
+    0x08 => {
+        Name => 'WBAdjBlueBalance',
+        Format => 'double',
+    },
+    0x10 => {
+        Name => 'WBAdjMode',
+        PrintConv => {
+            1 => 'Use Gray Point',
+            2 => 'Recorded Value',
+            3 => 'Use Temperature',
+            4 => 'Calculate Automatically'
+        },
+    },
+    0x15 => {
+        Name => 'WBAdjLighting',
+        PrintConv => {
+            0 => 'None',
+            1 => 'Incandescent',
+            2 => 'Daylight',
+            3 => 'Standard Fluorescent',
+            4 => 'High Color Rendering Fluorescent',
+            5 => 'Flash',
+        },
+    },
+    0x18 => {
+        Name => 'WBAdjTemperature',
+        Format => 'int16u',
     },
 );
 
@@ -416,6 +478,24 @@ the maker notes of NEF images.
     },
 );
 
+%Image::ExifTool::NikonCapture::RedEyeData = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0 => {
+        Name => 'RedEyeCorrection',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Automatic',
+            2 => 'Click on Eyes',
+        },
+    },
+);
+
 #------------------------------------------------------------------------------
 # write Nikon Capture data (ref 1)
 # Inputs: 0) ExifTool object reference, 1) reference to directory information
@@ -472,7 +552,7 @@ sub WriteNikonCapture($$$)
                 # rewrite the directory
                 $newVal = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                 # restore our original options
-                $exifTool->Options(IgnoreMinorErrors => $oldSetting)
+                $exifTool->Options(IgnoreMinorErrors => $oldSetting);
             } elsif ($$newTags{$tagID}) {
                 # get new value for this tag if we are writing it
                 my $format = $$tagInfo{Format} || $$tagInfo{Writable};
@@ -526,6 +606,7 @@ sub ProcessNikonCapture($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
     SetByteOrder('II');
+    $verbose and $exifTool->VerboseDir('NikonCapture', 0, $dirLen);
     my $pos;
     for ($pos=$dirStart+22; $pos+22<$dirEnd; ) {
         my $tagID = Get32u($dataPt, $pos);
@@ -535,9 +616,10 @@ sub ProcessNikonCapture($$$)
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
         if ($tagInfo or $verbose) {
             my ($format, $value);
-            $tagInfo and $format = $$tagInfo{Format};
-            if (not defined $format and ($size == 1 or $size == 2 or $size == 4)) {
-                # generate a reasonable default format type for short values
+            # (note that Writable will be 0 for Unknown tags)
+            $tagInfo and $format = ($$tagInfo{Format} || $$tagInfo{Writable});
+            # generate a reasonable default format type for short values
+            if (not $format and ($size == 1 or $size == 2 or $size == 4)) {
                 $format = 'int' . ($size * 8) . 'u';
             }
             if ($format) {

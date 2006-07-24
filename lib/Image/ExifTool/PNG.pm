@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -367,6 +367,7 @@ sub AUTOLOAD
 #         2) Tag ID, 3) Tag value, 4) [optional] compressed data flag:
 #            0=not compressed, 1=unknown compression, 2-N=compression with type N-2
 #         5) optional output buffer reference
+# Returns: 1 on success
 sub FoundPNG($$$$;$$)
 {
     my ($exifTool, $tagTablePtr, $tag, $val, $compressed, $outBuff) = @_;
@@ -374,7 +375,7 @@ sub FoundPNG($$$$;$$)
     return 0 unless defined $val;
 #
 # First, uncompress data if requested
-#    
+#
     my $verbose = $exifTool->Options('Verbose');
     my $out = $exifTool->Options('TextOut');
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag) ||
@@ -443,8 +444,8 @@ sub FoundPNG($$$$;$$)
             );
             # no need to re-decompress if already done
             undef $processProc if $wasCompressed and $processProc eq \&ProcessPNG_Compressed;
-            if ($outBuff and not $processProc) {
-                # rewrite this directory if necessary
+            # rewrite this directory if necessary (but always process TextualData normally)
+            if ($outBuff and not $processProc and $subTable ne \%Image::ExifTool::PNG::TextualData) {
                 return 1 unless $exifTool->{EDIT_DIRS}->{$$tagInfo{Name}};
                 delete $exifTool->{ADD_DIRS}->{$$tagInfo{Name}};
                 $$outBuff = $exifTool->WriteDirectory(\%subdirInfo, $subTable);

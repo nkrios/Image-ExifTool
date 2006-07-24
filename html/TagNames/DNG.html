@@ -3,15 +3,20 @@
 <title>DNG Tags</title>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
+<h2>DNG Tags</h2>
+
+The main DNG tags are found in the EXIF table.  The tables below define tags
+found within structures of these main tag values.
+
 <h2><a name='MakerNotes'>DNG MakerNotes Tags</a></h2>
 This information is always big-endian, and is found in the DNGPrivateData
 with a prefix of &quot;Adobe\0MakN&quot;.  Following OriginalMakerNoteOffset is a copy
 of the maker notes from the original raw file.  These notes are processed by
 ExifTool, but some information may have been lost by the Adobe DNG Converter
-during conversion.  The reason is that DNG Converter (version 3.3) doesn&apos;t
+during conversion.  The reason is that DNG Converter (version 3.3) doesn&#39;t
 realize that the maker notes may reference information outside the maker
 note block, and this information is lost when only the maker note block is
-copied to the DNG image.   While this isn&apos;t a big problem for most Canon,
+copied to the DNG image.   While this isn&#39;t a big problem for most Canon,
 Nikon or Pentax camera models, it is serious for some Olympus models.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
@@ -86,6 +91,6 @@ information.  All other DNG tags are defined in the EXIF table.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 4, 2006</i>
+<br><i>Last revised May 24, 2006</i>
 </body>
 </html>

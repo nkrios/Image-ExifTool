@@ -11,6 +11,7 @@
 #               4) Tels (http://bloodgate.com/) private communication (tests with FZ5)
 #               5) CPAN forum post by 'hardloaf' (http://www.cpanforum.com/threads/2183)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
+#               7) http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Panasonic;
@@ -19,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 sub ProcessPanasonicType2($$$);
 
@@ -90,7 +91,11 @@ sub ProcessPanasonicType2($$$);
     0x1c => {
         Name => 'MacroMode',
         Writable => 'int16u',
-        PrintConv => { 1 => 'On', 2 => 'Off' },
+        PrintConv => {
+            1 => 'On',
+            2 => 'Off',
+            0x101 => 'Tele-Macro', #7
+        },
     },
     0x1f => {
         Name => 'ShootingMode',
@@ -111,6 +116,7 @@ sub ProcessPanasonicType2($$$);
             19 => 'Party',
             20 => 'Snow',
             21 => 'Night Scenery',
+            22 => 'Food', #7
         },
     },
     0x20 => {
@@ -221,6 +227,22 @@ sub ProcessPanasonicType2($$$);
             2 => 'High',
         },
     },
+    0x30 => { #7
+        Name => 'Rotation',
+        PrintConv => {
+            1 => 'Horizontal (normal)',
+            6 => 'Rotate 90 CW', #PH (ref 7 gives 270 CW)
+            8 => 'Rotate 270 CW', #PH (ref 7 gives 90 CW)
+        },
+    },
+    0x32 => { #7
+        Name => 'ColorMode',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Natural',
+        },
+    },
+    # 0x33 - RedModeBirthday? (ref 7)
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',

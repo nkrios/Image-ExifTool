@@ -6,8 +6,118 @@
 <!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.17.tar.gz">Version 6.17</a> (other versions are
-considered development releases).<p>
+(I'll be away from about July 28 to Aug. 21/06, so don't expect any updates or
+email responses during this period. - PH)<p>
+
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.29.tar.gz">Version 6.29</a>. (Other versions are
+considered development releases, and are not uploaded to CPAN.)<p>
+
+<b>July 24, 2006 - Version 6.29</b> (production release)
+<ul>
+<li>Added XMP-xmpMM:PreservedFileName tag (used by Photoshop CS)
+<li>Fixed problem reading TIFF images which don't start at the beginning of the
+    file
+</ul>
+
+<b>July 12, 2006 - Version 6.28</b>
+<ul>
+<li>Fixed bug introduced in 6.04 which prevented PNG tags from being deleted
+<li>Improved decoding of Canon PictureStyle information
+</ul>
+
+<b>July 7, 2006 - Version 6.27</b>
+<ul>
+<li>Decode a number of new tags in Canon, Casio, FujiFilm, Minolta, Nikon,
+    Panasonic, Pentax, Ricoh and Sony and maker notes
+<li>Improved recognition of various Minolta maker note formats
+<li>Added a number of new Nikon Capture tags
+<li>Added support for XML-formatted XMP files
+<li>Properly handle mixed linefeed characters in PostScript images
+<li>Improved formatting of DICOM date/time values
+<li>Added "Actual Offset" entry to HtmlDump tooltip information
+</ul>
+
+<b>June 27, 2006 - Version 6.26</b>
+<ul>
+<li>Avoid creating new SubIFD when copying all tags with "-all:all" from a RAW
+    or TIFF image (this gave problems if image was subsequently edited by PSCS2)
+<li>Fixed decoding of a few Nikon LensID strings
+<li>Minor fixes and changes to htmlDump and verbose output
+<li>Added a new Pentax LensType (thanks Kazumichi Kawabata)
+</ul>
+
+<b>June 19, 2006 - Version 6.25</b>
+<ul>
+<li>Added read/write support for WDP (Windows Media Photo) images
+<li>Improved algorithm to recognize maker notes offsets which need fixing
+<li>Properly handle maker notes which have value offsets relative to the
+    individial IFD entries (Kyocera, Rollei and some Konica and Toshiba models)
+<li>Decode a couple of new Sigma lens values in Canon LensType
+<li>Decreased block size for buffered files to improve performance over slow
+    pipes
+</ul>
+
+<b>June 9, 2006 - Version 6.24</b>
+<ul>
+<li>Added -fast option to avoid scanning to the end of JPEG images to check for
+    an AFCP or PreviewImage trailer
+<li>Recognize PS files which start with %!Adobe-PS instead of %!PS
+<li>Improved FlashPix verbose output
+<li>API Changes:
+    <ul>
+    <li>Added FastScan option
+    </ul>
+</ul>
+
+<b>June 7, 2006 - Version 6.23</b>
+<ul>
+<li>Added new feature allowing tag-name expressions to be used with the
+    -TagsFromFile option
+</ul>
+
+<b>June 5, 2006 - Version 6.22</b>
+<ul>
+<li>Added read support for FPX (FlashPix) images and FPXR (FlashPix Ready)
+    JPEG APP2 meta information
+<li>Added AllDates shortcut tag to allow DateTimeOriginal, CreateDate and
+    ModifyDate to all be written via a single tag
+<li>Added shortcuts to tag name documentation
+<li>Return "0000:00:00 00:00:00" instead of "1970:01:01 00:00:00" as the string
+    representation of numerical times with a value of zero
+</ul>
+
+<b>May 26, 2006 - Version 6.21</b>
+<ul>
+<li>Changed CR2 identification logic to properly identify CR2 images which have
+    been edited by PhotoMechanic
+</ul>
+
+<b>May 24, 2006 - Version 6.20</b>
+<ul>
+<li>Added read support for Real audio/video (RA, RM, RV, RMVB, RAM, RPM) files
+<li>Downgraded "Error reading value..." message from an error to a warning
+<li>Fixed bug where IgnoreMinorErrors option could get set when writing images
+    with NikonCapture information
+<li>Fixed two ID3 tag names which contained spaces
+<li>Fixed problem parsing DateTimeOriginal in Casio EX-Z30 AVI files
+<li>Fixed problem with apostrophes in HTML documentation for some browsers
+<li>API Changes:
+    <ul>
+    <li>Can now call Options() with undefined value to set option value to undef
+    </ul>
+</ul>
+
+<b>May 16, 2006 - Version 6.19</b>
+<ul>
+<li>Added read support for SWF (Shockwave Flash) files
+</ul>
+
+<b>May 15, 2006 - Version 6.18</b>
+<ul>
+<li>Added read support for MPEG audio/video files
+<li>Decode audio information in MP3 files
+<li>Print Nikon:LensPosition in hex
+</ul>
 
 <b>May 12, 2006 - Version 6.17</b> (production release)
 <ul>
@@ -2383,7 +2493,7 @@ considered development releases).<p>
 
 <b>Nov. 20, 2003 - Version 1.12</b>
 <ul>
-<li>Don't translate PhotoShop Brightness, etc
+<li>Don't translate Photoshop Brightness, etc
 </ul>
 
 <b>Nov. 20, 2003 - Version 1.11</b>

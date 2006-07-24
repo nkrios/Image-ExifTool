@@ -6,7 +6,7 @@
 <h2>ExifTool Tag Names</h2>
 
 The tables listed below give the names of all tags recognized by ExifTool,
-excluding shortcut and unknown tags.
+excluding unknown tags.
 
 <p>A <b>Tag ID</b> or <b>Index</b> is given in the first column of each table.  A
 <b>Tag ID</b> is the computer-readable equivalent of a tag name, and is the
@@ -35,17 +35,17 @@ of values written, or the number of characters in a fixed-length string
 (including a null terminator which is added if required).
 
 <p>An asterisk (<code>*</code>) after an entry in the <b>Writable</b> column indicates a
-&apos;protected&apos; tag which is not writable directly, but is set via a Composite
+&#39;protected&#39; tag which is not writable directly, but is set via a Composite
 tag.  A tilde (<code>~</code>) indicates a tag this is only writable when print
-conversion is disabled (by setting PrintConv to 0, or using the -n option). 
-A slash (<code>/</code>) indicates an &apos;avoided&apos; tag that is not created unless the
+conversion is disabled (by setting PrintConv to 0, or using the -n option).
+A slash (<code>/</code>) indicates an &#39;avoided&#39; tag that is not created unless the
 group is specified (due to name conflicts with other tags).  An exclamation
 point (<code>!</code>) indicates a tag that is considered unsafe to write under normal
-circumstances.  These &apos;unsafe&apos; tags are not set when calling
+circumstances.  These &#39;unsafe&#39; tags are not set when calling
 SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  A plus sign
-(<code>+</code>) indicates a &apos;list&apos; tag which supports multiple instances.
+(<code>+</code>) indicates a &#39;list&#39; tag which supports multiple instances.
 
 <p>The HTML version of this document also lists possible <b>Values</b> for all tags
 which have a discrete set of values, and gives <b>Notes</b> for some tags.
@@ -154,8 +154,7 @@ question.
 <br>&nbsp; &nbsp; <a href='Kodak.html#Type2'>Kodak Type2</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Type3'>Kodak Type3</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Type4'>Kodak Type4</a>
-</td><td>
-&nbsp; &nbsp; <a href='Kodak.html#Type5'>Kodak Type5</a>
+<br>&nbsp; &nbsp; <a href='Kodak.html#Type5'>Kodak Type5</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Type6'>Kodak Type6</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Unknown'>Kodak Unknown</a>
 <br>&nbsp; &nbsp; <a href='Kodak.html#Meta'>Kodak Meta</a>
@@ -166,6 +165,15 @@ question.
 <br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings</a>
 <br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings7D'>Minolta CameraSettings7D</a>
 <br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D</a>
+</td><td>
+<a href='Olympus.html'>Olympus</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#TextInfo'>Olympus TextInfo</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#Equipment'>Olympus Equipment</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#CameraSettings'>Olympus CameraSettings</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#RawDevelopment'>Olympus RawDevelopment</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#ImageProcessing'>Olympus ImageProcessing</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#FocusInfo'>Olympus FocusInfo</a>
+<br>&nbsp; &nbsp; <a href='Olympus.html#RawInfo'>Olympus RawInfo</a>
 <br><a href='Nikon.html'>Nikon</a>
 <br>&nbsp; &nbsp; <a href='Nikon.html#PreviewImage'>Nikon PreviewImage</a>
 <br>&nbsp; &nbsp; <a href='Nikon.html#AFInfo'>Nikon AFInfo</a>
@@ -179,27 +187,22 @@ question.
 <br>&nbsp; &nbsp; <a href='Nikon.html#MOV'>Nikon MOV</a>
 <br><a href='NikonCapture.html'>NikonCapture</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#CropData'>NikonCapture CropData</a>
+<br>&nbsp; &nbsp; <a href='NikonCapture.html#RedEyeData'>NikonCapture RedEyeData</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#Brightness'>NikonCapture Brightness</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#DLightingHQ'>NikonCapture DLightingHQ</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#NoiseReduction'>NikonCapture NoiseReduction</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#PhotoEffects'>NikonCapture PhotoEffects</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#ColorBoost'>NikonCapture ColorBoost</a>
+<br>&nbsp; &nbsp; <a href='NikonCapture.html#WBAdjData'>NikonCapture WBAdjData</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#DLightingHS'>NikonCapture DLightingHS</a>
 <br>&nbsp; &nbsp; <a href='NikonCapture.html#UnsharpData'>NikonCapture UnsharpData</a>
-<br><a href='Olympus.html'>Olympus</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#TextInfo'>Olympus TextInfo</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#Equipment'>Olympus Equipment</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#CameraSettings'>Olympus CameraSettings</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#RawDevelopment'>Olympus RawDevelopment</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#ImageProcessing'>Olympus ImageProcessing</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#FocusInfo'>Olympus FocusInfo</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#RawInfo'>Olympus RawInfo</a>
 <br><a href='Pentax.html'>Pentax</a>
 <br>&nbsp; &nbsp; <a href='Pentax.html#MOV'>Pentax MOV</a>
 <br><a href='Panasonic.html'>Panasonic</a>
 <br>&nbsp; &nbsp; <a href='Panasonic.html#Type2'>Panasonic Type2</a>
 <br>&nbsp; &nbsp; <a href='Panasonic.html#Raw'>Panasonic Raw</a>
 <br><a href='Ricoh.html'>Ricoh</a>
+<br>&nbsp; &nbsp; <a href='Ricoh.html#ImageInfo'>Ricoh ImageInfo</a>
 <br>&nbsp; &nbsp; <a href='Ricoh.html#Subdir'>Ricoh Subdir</a>
 <br>&nbsp; &nbsp; <a href='Ricoh.html#Text'>Ricoh Text</a>
 <br><a href='Sanyo.html'>Sanyo</a>
@@ -209,8 +212,9 @@ question.
 <br>&nbsp; &nbsp; <a href='Sony.html#SR2Private'>Sony SR2Private</a>
 <br>&nbsp; &nbsp; <a href='Sony.html#SR2SubIFD'>Sony SR2SubIFD</a>
 <br>&nbsp; &nbsp; <a href='Sony.html#SR2DataIFD'>Sony SR2DataIFD</a>
-<br><a href='DNG.html#MakerNotes'>DNG MakerNotes</a>
-<br><a href='DNG.html#OriginalRaw'>DNG OriginalRaw</a>
+<br><a href='DNG.html'>DNG</a>
+<br>&nbsp; &nbsp; <a href='DNG.html#MakerNotes'>DNG MakerNotes</a>
+<br>&nbsp; &nbsp; <a href='DNG.html#OriginalRaw'>DNG OriginalRaw</a>
 <br><a href='CanonRaw.html'>CanonRaw</a>
 <br>&nbsp; &nbsp; <a href='CanonRaw.html#MakeModel'>CanonRaw MakeModel</a>
 <br>&nbsp; &nbsp; <a href='CanonRaw.html#RawJpgInfo'>CanonRaw RawJpgInfo</a>
@@ -247,8 +251,7 @@ question.
 <br>&nbsp; &nbsp; <a href='MNG.html#BasisObject'>MNG BasisObject</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#ClipObjects'>MNG ClipObjects</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#CloneObject'>MNG CloneObject</a>
-</td><td>
-&nbsp; &nbsp; <a href='MNG.html#DefineObject'>MNG DefineObject</a>
+<br>&nbsp; &nbsp; <a href='MNG.html#DefineObject'>MNG DefineObject</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#DeltaPNGHeader'>MNG DeltaPNGHeader</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#JNGHeader'>MNG JNGHeader</a>
 <br>&nbsp; &nbsp; <a href='MNG.html#Loop'>MNG Loop</a>
@@ -266,7 +269,8 @@ question.
 <br>&nbsp; &nbsp; <a href='PDF.html#Info'>PDF Info</a>
 <br>&nbsp; &nbsp; <a href='PDF.html#Root'>PDF Root</a>
 <br>&nbsp; &nbsp; <a href='PDF.html#Metadata'>PDF Metadata</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#Pages'>PDF Pages</a>
+</td><td>
+&nbsp; &nbsp; <a href='PDF.html#Pages'>PDF Pages</a>
 <br>&nbsp; &nbsp; <a href='PDF.html#Kids'>PDF Kids</a>
 <br>&nbsp; &nbsp; <a href='PDF.html#PieceInfo'>PDF PieceInfo</a>
 <br>&nbsp; &nbsp; <a href='PDF.html#AdobePhotoshop'>PDF AdobePhotoshop</a>
@@ -283,6 +287,22 @@ question.
 <br>&nbsp; &nbsp; <a href='ID3.html#v2_2'>ID3 v2_2</a>
 <br>&nbsp; &nbsp; <a href='ID3.html#v2_3'>ID3 v2_3</a>
 <br>&nbsp; &nbsp; <a href='ID3.html#v2_4'>ID3 v2_4</a>
+<br><a href='MPEG.html'>MPEG</a>
+<br>&nbsp; &nbsp; <a href='MPEG.html#Audio'>MPEG Audio</a>
+<br>&nbsp; &nbsp; <a href='MPEG.html#Video'>MPEG Video</a>
+<br><a href='Flash.html'>Flash</a>
+<br><a href='Real.html'>Real</a>
+<br>&nbsp; &nbsp; <a href='Real.html#Media'>Real Media</a>
+<br>&nbsp; &nbsp; <a href='Real.html#ContentDescr'>Real ContentDescr</a>
+<br>&nbsp; &nbsp; <a href='Real.html#MediaProps'>Real MediaProps</a>
+<br>&nbsp; &nbsp; <a href='Real.html#FileInfo'>Real FileInfo</a>
+<br>&nbsp; &nbsp; <a href='Real.html#Properties'>Real Properties</a>
+<br>&nbsp; &nbsp; <a href='Real.html#Metadata'>Real Metadata</a>
+<br>&nbsp; &nbsp; <a href='Real.html#Audio'>Real Audio</a>
+<br>&nbsp; &nbsp; <a href='Real.html#AudioV3'>Real AudioV3</a>
+<br>&nbsp; &nbsp; <a href='Real.html#AudioV4'>Real AudioV4</a>
+<br>&nbsp; &nbsp; <a href='Real.html#AudioV5'>Real AudioV5</a>
+<br>&nbsp; &nbsp; <a href='Real.html#Metafile'>Real Metafile</a>
 <br><a href='RIFF.html'>RIFF</a>
 <br>&nbsp; &nbsp; <a href='RIFF.html#Info'>RIFF Info</a>
 <br>&nbsp; &nbsp; <a href='RIFF.html#Exif'>RIFF Exif</a>
@@ -319,6 +339,18 @@ question.
 <br>&nbsp; &nbsp; <a href='QuickTime.html#Preview'>QuickTime Preview</a>
 <br>&nbsp; &nbsp; <a href='QuickTime.html#ImageFile'>QuickTime ImageFile</a>
 <br>&nbsp; &nbsp; <a href='QuickTime.html#ImageDesc'>QuickTime ImageDesc</a>
+<br><a href='FlashPix.html'>FlashPix</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#CompObj'>FlashPix CompObj</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#AudioInfo'>FlashPix AudioInfo</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#DataObject'>FlashPix DataObject</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#Extensions'>FlashPix Extensions</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#GlobalInfo'>FlashPix GlobalInfo</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#Image'>FlashPix Image</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#ImageInfo'>FlashPix ImageInfo</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#Operation'>FlashPix Operation</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#SummaryInfo'>FlashPix SummaryInfo</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#Transform'>FlashPix Transform</a>
+<br>&nbsp; &nbsp; <a href='FlashPix.html#SubimageHeader'>FlashPix SubimageHeader</a>
 <br><a href='APP12.html'>APP12</a>
 <br><a href='APP14.html'>APP14</a>
 <br><a href='AFCP.html'>AFCP</a>
@@ -339,11 +371,12 @@ question.
 <br>&nbsp; &nbsp; <a href='MIE.html#Video'>MIE Video</a>
 <br><a href='Extra.html'>Extra</a>
 <br><a href='Composite.html'>Composite</a>
+<br><a href='Shortcuts.html'>Shortcuts</a>
 </td></tr></table></td></tr></table></blockquote>
 
 <p><a href='../index.html'>&lt;-- Back to ExifTool Home Page</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 12, 2006</i>
+<br><i>Last revised Jul 7, 2006</i>
 </body>
 </html>

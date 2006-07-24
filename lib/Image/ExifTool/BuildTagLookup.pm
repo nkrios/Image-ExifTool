@@ -23,10 +23,12 @@ BEGIN {
 
 use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
+use Image::ExifTool::Shortcuts;
 use Image::ExifTool::XMP qw(EscapeHTML);
 use Image::ExifTool::Nikon;
+use Image::ExifTool::Real;
 
-$VERSION = '1.33';
+$VERSION = '1.37';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -58,7 +60,7 @@ specific meta information that is extracted or written in an image.
 },
     ExifTool => q{
 The tables listed below give the names of all tags recognized by ExifTool,
-excluding shortcut and unknown tags.
+excluding unknown tags.
 
 A B<Tag ID> or B<Index> is given in the first column of each table.  A
 B<Tag ID> is the computer-readable equivalent of a tag name, and is the
@@ -89,7 +91,7 @@ of values written, or the number of characters in a fixed-length string
 An asterisk (C<*>) after an entry in the B<Writable> column indicates a
 'protected' tag which is not writable directly, but is set via a Composite
 tag.  A tilde (C<~>) indicates a tag this is only writable when print
-conversion is disabled (by setting PrintConv to 0, or using the -n option). 
+conversion is disabled (by setting PrintConv to 0, or using the -n option).
 A slash (C</>) indicates an 'avoided' tag that is not created unless the
 group is specified (due to name conflicts with other tags).  An exclamation
 point (C<!>) indicates a tag that is considered unsafe to write under normal
@@ -117,6 +119,10 @@ The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
 ExifTool family 1 group names.  When writing EXIF information, the default
 B<Group> listed below is used unless another group is specified.
+
+Also listed in the table below are TIFF, DNG, WDP and other tags which are
+not part of the EXIF specification, but may co-exist with EXIF tags in some
+images.
 },
     GPS => q{
 These GPS tags are part of the EXIF standard, and are stored in a separate
@@ -240,6 +246,20 @@ The tags listed in the PDF tables below are those which are used by ExifTool
 to extract meta information, but they are only a small fraction of the total
 number of available PDF tags.
 },
+    DNG => q{
+The main DNG tags are found in the EXIF table.  The tables below define tags
+found within structures of these main tag values.
+},
+    MPEG => q{
+The MPEG format doesn't specify any file-level meta information.  In lieu of
+this, information is extracted from the first audio and video frame headers
+in the file.
+},
+    Real => q{
+ExifTool recognizes three basic types of Real audio/video files: 1)
+RealMedia (RM, RV and RMVB), 2) RealAudio (RA), and 3) Real Metafile (RAM
+and RPM).
+},
     Extra => q{
 The extra tags represent information found in the image but not associated
 with any other tag group.
@@ -248,6 +268,16 @@ with any other tag group.
 The values of the composite tags are derived from the values of other tags.
 These are convenience tags which are calculated after all other information
 is extracted.
+},
+    Shortcuts => q{
+Shortcut tags are convenience tags that represent one or more other tag
+names.  They are used like regular tags to read and write the information
+for a specified set of tags.
+
+The shortcut tags below have been pre-defined, but user-defined shortcuts
+may be added via the %Image::ExifTool::Shortcuts::UserDefined lookup in the
+~/.ExifTool_config file.  See the Image::ExifTool::Shortcuts documentation
+for more details.
 },
     PodTrailer => q{
 ~head1 NOTES
@@ -288,11 +318,12 @@ sub new
 #
 # loop through all tables, accumulating TagLookup and TagName information
 #
-    my (%tagNameInfo, %id, %longID, %shortName, %tableNum,
+    my (%tagNameInfo, %id, %longID, %longName, %shortName, %tableNum,
         %tagLookup, %tagExists, %tableWritable, %sepTable);
     $self->{TAG_NAME_INFO} = \%tagNameInfo;
     $self->{TAG_ID} = \%id;
     $self->{LONG_ID} = \%longID;
+    $self->{LONG_NAME} = \%longName;
     $self->{SHORT_NAME} = \%shortName;
     $self->{TABLE_NUM} = \%tableNum;
     $self->{TAG_LOOKUP} = \%tagLookup;
@@ -302,6 +333,7 @@ sub new
 
     Image::ExifTool::LoadAllTables();
     my @tableNames = sort keys %allTables;
+    push @tableNames, 'Image::ExifTool::Shortcuts::Main'; # add Shortcuts last
     my $tableNum = 0;
     my $tableName;
     # create lookup for short table names
@@ -319,17 +351,26 @@ sub new
         # create short table name
         my $short = $shortName{$tableName};
         my $info = $tagNameInfo{$tableName} = [ ];
-        my $table = GetTagTable($tableName);
+        my ($table, $shortcut);
+        if ($short eq 'Shortcuts') {
+            # can't use GetTagTable() for Shortcuts (not a normal table)
+            $table = \%Image::ExifTool::Shortcuts::Main;
+            $shortcut = 1;
+        } else {
+            $table = GetTagTable($tableName);
+        }
         my $tableNum = $tableNum{$tableName};
         $longID{$tableName} = 0;
+        $longName{$tableName} = 0;
         # call write proc if it exists in case it adds tags to the table
         my $writeProc = $table->{WRITE_PROC};
         $writeProc and &$writeProc();
         # save all tag names
         my ($tagID, $binaryTable, $noID);
-        $noID = 1 if $short =~ /^(Composite|XMP|Extra|ASF.*)$/;
+        $noID = 1 if $short =~ /^(Composite|XMP|Extra|Shortcuts|ASF.*)$/;
         if ($table->{PROCESS_PROC} and
-            $table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData)
+           ($table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData or
+            $table->{PROCESS_PROC} eq \&Image::ExifTool::Real::ProcessSerialData))
         {
             $binaryTable = 1;
             $id{$tableName} = 'Index';
@@ -347,9 +388,19 @@ sub new
             $defFormat = 'int8u';   # use default format for binary data tables
         }
 TagID:  foreach $tagID (@keys) {
-            my @infoArray = GetTagInfoList($table,$tagID);
             my ($tagInfo, @tagNames, $subdir, $format, @values);
-            my (@require, @writeGroup, @writable);
+            my (@infoArray, @require, @writeGroup, @writable);
+            if ($shortcut) {
+                # must build a dummy tagInfo list since Shortcuts is not a normal table
+                $tagInfo = { Name => $tagID, Writable => 1, Require => { } };
+                my $i;
+                for ($i=0; $i<@{$$table{$tagID}}; ++$i) {
+                    $tagInfo->{Require}->{$i} = $table->{$tagID}->[$i];
+                }
+                @infoArray = ( $tagInfo );
+            } else {
+                @infoArray = GetTagInfoList($table,$tagID);
+            }
             $format = $defFormat;
             foreach $tagInfo (@infoArray) {
                 if ($$tagInfo{Notes}) {
@@ -485,9 +536,9 @@ TagID:  foreach $tagID (@keys) {
                     push @writable, $writable;
                 }
 #
-# add this tag to the tag lookup unless PROCESS_PROC is 0
+# add this tag to the tag lookup unless PROCESS_PROC is 0 or shortcut tag
 #
-                next if defined $$table{PROCESS_PROC} and not $$table{PROCESS_PROC};
+                next if $shortcut or (defined $$table{PROCESS_PROC} and not $$table{PROCESS_PROC});
                 # count our tags
                 if ($$tagInfo{SubDirectory}) {
                     $subdirs{$lcName} or $subdirs{$lcName} = 0;
@@ -547,6 +598,10 @@ TagID:  foreach $tagID (@keys) {
             }
             my $len = length $tagIDstr;
             $longID{$tableName} = $len if $longID{$tableName} < $len;
+            foreach (@tagNames) {
+                $len = length $_;
+                $longName{$tableName} = $len if $longName{$tableName} < $len;
+            }
             push @$info, [ $tagIDstr, \@tagNames, \@writable, \@values, \@require, \@writeGroup ];
         }
     }
@@ -798,18 +853,18 @@ my %createdFiles;
 sub OpenHtmlFile($;$$)
 {
     my ($htmldir, $category, $sepTable) = @_;
-    my ($htmlFile, $head, $title, $url);
+    my ($htmlFile, $head, $title, $url, $class);
 
     if ($category) {
         my @names = split ' ', $category;
-        my $class = shift @names;
+        $class = shift @names;
         $htmlFile = "$htmldir/TagNames/$class.html";
         $head = $category . ($sepTable ? ' Values' : ' Tags');
         ($title = $head) =~ s/ .* / /;
         @names and $url = join '_', @names;
     } else {
         $htmlFile = "$htmldir/TagNames/index.html";
-        $category = 'ExifTool';
+        $category = $class = 'ExifTool';
         $head = $title = 'ExifTool Tag Names';
     }
     if ($createdFiles{$htmlFile}) {
@@ -818,6 +873,10 @@ sub OpenHtmlFile($;$$)
         open(HTMLFILE,">${htmlFile}_tmp") or return 0;
         print HTMLFILE "<html>\n<head>\n<title>$title</title>\n</head>\n";
         print HTMLFILE "<body text='#000000' $bgBody>\n";
+        if ($category ne $class and $docs{$class}) {
+            print HTMLFILE "<h2>$class Tags</h2>\n" or return 0;
+            print HTMLFILE Doc2Html($docs{$class}),"\n" or return 0;
+        }
     }
     $head = "<a name='$url'>$head</a>" if $url;
     print HTMLFILE "<h2>$head</h2>\n" or return 0;
@@ -913,6 +972,27 @@ sub WriteTagNames($$)
     print HTMLFILE "<tr $bgRow valign='top'><td>\n";
     # write the index
     my @tableNames = GetTableOrder();
+    push @tableNames, 'Image::ExifTool::Shortcuts::Main';   # do Shortcuts last
+    # add headings for any missing Main tables
+    my $heading = 'xxx';
+    my @tableIndexNames;
+    foreach $tableName (@tableNames) {
+        $short = $$shortName{$tableName};
+        my @names = split ' ', $short;
+        my $class = shift @names;
+        if (@names) {
+            # add heading for tables without a Main
+            unless($class =~ /^$heading/) {
+                $heading = $class;
+                push @tableIndexNames, $heading;
+            }
+        } else {
+            $heading = $short;
+        }
+        push @tableIndexNames, $tableName;
+    }
+    @tableNames = @tableIndexNames;
+    # print index table
     my $count = 0;
     my $lines = int((scalar(@tableNames) + 2) / 3);
     foreach $tableName (@tableNames) {
@@ -924,13 +1004,18 @@ sub WriteTagNames($$)
             }
         }
         $short = $$shortName{$tableName};
-        my @names = split ' ', $short;
-        my $class = shift @names;
-        $url = "$class.html";
         my $indent = '';
-        if (@names) {
-            $url .= '#' . join '_', @names;
-            $indent = '&nbsp; &nbsp; ' unless $url =~ /^DNG/;
+        if ($short) {
+            my @names = split ' ', $short;
+            my $class = shift @names;
+            $url = "$class.html";
+            if (@names) {
+                $url .= '#' . join '_', @names;
+                $indent = '&nbsp; &nbsp; ';
+            }
+        } else {
+            $short = $tableName;
+            $url = "$short.html";
         }
         print HTMLFILE "$indent<a href='$url'>$short</a>\n";
         ++$count;
@@ -969,16 +1054,29 @@ sub WriteTagNames($$)
         last unless @tableNames;
         $tableName = shift @tableNames;
         $short = $$shortName{$tableName};
+        unless ($short) {
+            # this is just an index heading
+            print PODFILE "\n=head2 $tableName Tags\n";
+            print PODFILE $docs{$tableName} if $docs{$tableName};
+            next;
+        }
         my $info = $$tagNameInfo{$tableName};
         my $id = $$idTitle{$tableName};
         my ($hid, $showGrp);
         # widths of the different columns in the POD documentation
         my ($wID,$wTag,$wReq,$wGrp) = (8,36,24,10);
-        my $composite = $short eq 'Composite';
+        my $composite = $short eq 'Composite' ? 1 : 0;
         my $derived = $composite ? '<th>Derived From</th>' : '';
+        if ($short eq 'Shortcuts') {
+            $derived = '<th>Refers To</th>';
+            $composite = 2;
+        }
         my $podIdLen = $self->{LONG_ID}->{$tableName};
-        my $table = GetTagTable($tableName);
-        my $notes = $$table{NOTES};
+        my $notes;
+        unless ($composite == 2) {
+            my $table = GetTagTable($tableName);
+            $notes = $$table{NOTES};
+        }
         my $prefix;
         if ($notes) {
             # remove unnecessary whitespace
@@ -994,8 +1092,8 @@ sub WriteTagNames($$)
         } elsif ($short eq 'DICOM') {
             $podIdLen = 10;
         } else {
-            # align tag names at the secondary column if possible
-            my $col = 20;
+            # align tag names in secondary columns if possible
+            my $col = ($podIdLen <= 10) ? 12 : 20;
             $podIdLen = $col if $podIdLen < $col;
         }
         $id = '' if $short =~ /^XMP/;
@@ -1003,6 +1101,12 @@ sub WriteTagNames($$)
             $hid = "<th>$id</th>";
             $wTag -= $podIdLen - $wID;
             $wID = $podIdLen;
+            my $longTag = $self->{LONG_NAME}->{$tableName};
+            if ($wTag < $longTag) {
+                $wID -= $longTag - $wTag;
+                $wTag = $longTag;
+                warn "Notice: Long tags in $tableName table\n";
+            }
         } elsif ($short =~ /^(Extra|XMP|ASF)/) {
             $wTag += 9;
             $hid = '';
@@ -1015,7 +1119,7 @@ sub WriteTagNames($$)
             $showGrp = 1;
             $wTag -= $wGrp + 1;
         }
-        my $head = ($short =~ / / and not $short =~ /^DNG/) ? 'head3' : 'head2';
+        my $head = ($short =~ / /) ? 'head3' : 'head2';
         print PODFILE "\n=$head $short Tags\n";
         print PODFILE $docs{$short} if $docs{$short};
         print PODFILE "\n$notes\n" if $notes;
@@ -1029,7 +1133,7 @@ sub WriteTagNames($$)
         }
         my $tagNameHeading = ($short eq 'XMP') ? 'Namespace' : 'Tag Name';
         $line .= sprintf " %-${wTag}s", $tagNameHeading;
-        $line .= sprintf " %-${wReq}s", 'Derived From' if $composite;
+        $line .= sprintf " %-${wReq}s", $composite == 2 ? 'Refers To' : 'Derived From' if $composite;
         $line .= sprintf " %-${wGrp}s", 'Group' if $showGrp;
         $line .= ' Writable';
         print PODFILE $line;
@@ -1062,7 +1166,13 @@ sub WriteTagNames($$)
             } else {
                 $tagIDstr =~ s/^'$prefix/'/ if $prefix;
                 $w = $wID;
-                $idStr = sprintf "  %-${w}s ", $tagIDstr;
+                if (length $tagIDstr > $w) {
+                    # put tag name on next line if ID is too long
+                    $idStr = "  $tagIDstr\n   " . (' ' x $w);
+                    warn "Notice: Split $$tagNames[0] line\n";
+                } else {
+                    $idStr = sprintf "  %-${w}s ", $tagIDstr;
+                }
                 $align = '';
             }
             my @reqs;
@@ -1089,7 +1199,7 @@ sub WriteTagNames($$)
             printf PODFILE " %-${wGrp}s", shift(@wGrp) || '-' if $showGrp;
             if ($composite) {
                 @reqs = @$require;
-                $w = $wReq; # Keep writable columun in line
+                $w = $wReq; # Keep writable column in line
                 length($tag) > $wTag and $w -= length($tag) - $wTag;
                 printf PODFILE " %-${w}s", shift(@reqs) || '';
             }

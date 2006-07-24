@@ -196,7 +196,7 @@ sub WriteCR2($$$)
 
     # check CR2 signature
     return 0 if $$dataPt !~ /^.{8}CR\x02\0/s and
-        $exifTool->Warn("Unsupported Canon RAW file. May cause problems if rewritten", 1);
+        $exifTool->Error("Unsupported Canon RAW file. May cause problems if rewritten", 1);
     # CR2 has a 16-byte header
     $$dirInfo{NewDataPos} = 16;
     my $newData = $exifTool->WriteDirectory($dirInfo, $tagTablePtr);
@@ -205,11 +205,13 @@ sub WriteCR2($$$)
     if (length($newData)) {
         # build 16 byte header for Canon RAW file
         my $header = substr($$dataPt, 0, 16);
-        # last 4 bytes is pointer to last IFD
+        # set IFD0 pointer (may not be 16 if edited by PhotoMechanic)
+        Set32u(16, \$header, 4);
+        # last 4 bytes of header is pointer to last IFD
         Set32u($$dirInfo{LastIFD}, \$header, 12);
         Write($outfile, $header, $newData) or return 0;
         undef $newData;     # free memory
-        
+
         # copy over image data now if necessary
         if (ref $$dirInfo{ImageData}) {
             $exifTool->CopyImageData($$dirInfo{ImageData}, $outfile) or return 0;

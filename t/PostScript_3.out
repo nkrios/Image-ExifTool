@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.08
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
 [File, File, Image]  - File Name: PostScript_3_failed.eps
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 13 kB
@@ -67,8 +67,8 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 100
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 80
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3053
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3053
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3053
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3053
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: cm
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera

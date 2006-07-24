@@ -13,7 +13,6 @@ package Image::ExifTool::DNG;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
-use Image::ExifTool::MakerNotes;
 
 $VERSION = '1.04';
 
@@ -182,16 +181,17 @@ sub ProcessDNGMakerNotes($$$)
         }
         # initialize subdirectory information
         my %subdirInfo = (
-            DirName  => $$tagInfo{Name},
-            Base     => $$dirInfo{Base},
-            DataPt   => $dataPt,
-            DataPos  => $dataPos,
-            DataLen  => $$dirInfo{DataLen},
-            DirStart => $dirStart,
-            DirLen   => $len - $dirStart,
-            TagInfo  => $tagInfo,
-            FixBase  => $$subdir{FixBase},
-            Parent   => $$dirInfo{DirName},
+            DirName   => $$tagInfo{Name},
+            Base      => $$dirInfo{Base},
+            DataPt    => $dataPt,
+            DataPos   => $dataPos,
+            DataLen   => $$dirInfo{DataLen},
+            DirStart  => $dirStart,
+            DirLen    => $len - $dirStart,
+            TagInfo   => $tagInfo,
+            FixBase   => $$subdir{FixBase},
+            EntryBased=> $$subdir{EntryBased},
+            Parent    => $$dirInfo{DirName},
         );
         # set base offset if necessary
         if ($$subdir{Base}) {
@@ -245,8 +245,18 @@ Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
+=head1 REFERENCES
+
+=over 4
+
+=item L<http://www.adobe.com/products/dng/pdfs/dng_spec.pdf>
+
+=back
+
 =head1 SEE ALSO
 
-L<http://www.adobe.com/products/dng/pdfs/dng_spec.pdf>
+L<Image::ExifTool::TagNames/DNG Tags>,
+L<Image::ExifTool::TagNames/EXIF Tags>,
+L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

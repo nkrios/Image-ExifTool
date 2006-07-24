@@ -4,6 +4,9 @@
 # Description:  FujiFilm EXIF maker notes tags
 #
 # Revisions:    11/25/2003  - P. Harvey Created
+#
+# References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+#               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_fuji.htm
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::FujiFilm;
@@ -13,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -52,7 +55,7 @@ $VERSION = '1.06';
             0x301 => 'Day White Fluorescent',
             0x302 => 'White Fluorescent',
             0x400 => 'Incandescent',
-            0xF00 => 'Custom',
+            0xf00 => 'Custom',
         },
     },
     0x1003 => {
@@ -63,6 +66,7 @@ $VERSION = '1.06';
             0x0   => 'Normal',
             0x100 => 'High',
             0x200 => 'Low',
+            0x300 => 'None (B&W)', #2
         },
     },
     0x1004 => {
@@ -105,6 +109,11 @@ $VERSION = '1.06';
             1 => 'Manual',
         },
     },
+    0x1023 => { #2
+        Name => 'FocusPixel',
+        Writable => 'int16u',
+        Count => 2,
+    },
     0x1030 => {
         Name => 'SlowSync',
         Writable => 'int16u',
@@ -122,19 +131,37 @@ $VERSION = '1.06';
             0x1 => 'Portrait',
             0x2 => 'Landscape',
             0x4 => 'Sports',
-            0x5 => 'Night',
+            0x5 => 'Night Scene',
             0x6 => 'Program AE',
             0x100 => 'Aperture-priority AE',
             0x200 => 'Shutter speed priority AE',
             0x300 => 'Manual',
         },
     },
+# this usually has a value of 1
+#    0x1032 => { #2
+#        Name => 'ShutterCount',
+#        Writable => 'int16u',
+#    },
     0x1100 => {
         Name => 'AutoBracketing',
         Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'On',
+        },
+    },
+    0x1101 => {
+        Name => 'SequenceNumber',
+        Writable => 'int16u',
+    },
+    0x1210 => { #2
+        Name => 'ColorMode',
+        PrintHex => 1,
+        PrintConv => {
+            0x00 => 'Standard',
+            0x10 => 'Chrome',
+            0x30 => 'B & W',
         },
     },
     0x1300 => {
@@ -160,6 +187,68 @@ $VERSION = '1.06';
             0 => 'Good',
             1 => 'Bad exposure',
         },
+    },
+    0x1400 => { #2
+        Name => 'DynamicRange',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Standard',
+            3 => 'Wide',
+        },
+    },
+    0x1401 => { #2
+        Name => 'FilmMode',
+        Writable => 'int16u',
+        PrintHex => 1,
+        PrintConv => {
+            0x000 => 'F0/Standard',
+            0x100 => 'F1/Studio Portrait',
+            0x200 => 'F2/Fujichrome',
+            0x300 => 'F3/Studio Portrait Ex',
+            0x400 => 'F4/Velvia',
+        },
+    },
+    0x1402 => { #2
+        Name => 'DynamicRangeSetting',
+        Writable => 'int16u',
+        PrintHex => 1,
+        PrintConv => {
+            0x000 => 'Auto (100-400%)',
+            0x001 => 'RAW',
+            0x100 => 'Standard (100%)',
+            0x200 => 'Wide1 (230%)',
+            0x201 => 'Wide2 (400%)',
+            0x8000 => 'Film Simulation Mode',
+        },
+    },
+    0x1403 => 'DevelopmentDynamicRange', #2
+    0x1404 => { #2
+        Name => 'MinFocalLength',
+        Format => 'rational64s',
+    },
+    0x1405 => { #2
+        Name => 'MaxFocalLength',
+        Format => 'rational64s',
+    },
+    0x1406 => { #2
+        Name => 'MaxApertureAtMinFocal',
+        Format => 'rational64s',
+    },
+    0x1407 => { #2
+        Name => 'MaxApertureAtMaxFocal',
+        Format => 'rational64s',
+    },
+    0x8000 => { #2
+        Name => 'FileSource',
+        Format => 'string',
+    },
+    0x8002 => { #2
+        Name => 'OrderNumber',
+        Format => 'int32u',
+    },
+    0x8003 => { #2
+        Name => 'FrameNumber',
+        Format => 'int16u',
     },
 );
 

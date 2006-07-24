@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
@@ -68,6 +68,7 @@
 [MakerNotes, Nikon, Camera] 8 - Flash Setting: Normal
 [MakerNotes, Nikon, Camera] 9 - Flash Type: Built-in,TTL
 [MakerNotes, Nikon, Camera] 11 - White Balance Fine Tune: 0
+[MakerNotes, Nikon, Camera] 13 - Program Shift: 0
 [MakerNotes, Nikon, Camera] 14 - Exposure Difference: -4.9
 [MakerNotes, NikonPreview, Image] 259 - Compression: JPEG (old-style)
 [MakerNotes, NikonPreview, Image] 282 - X Resolution: 300
@@ -76,7 +77,7 @@
 [MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2424
 [MakerNotes, NikonPreview, Image] 514 - Preview Image Length: 0
 [MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
-[MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -1.7
+[MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -5/3
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 200
 [MakerNotes, Nikon, Camera] 22 - Image Boundary: 0 0 3008 2000
 [MakerNotes, Nikon, Camera] 24 - Flash Exposure Bracket Value: 0.0
@@ -89,6 +90,7 @@
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
 [MakerNotes, Nikon, Camera] 2 - AF Points Used: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Continuous
+[MakerNotes, Nikon, Camera] 138 - Auto Bracket Release: None
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 5.33
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode2
 [MakerNotes, Nikon, Camera] 144 - Light Source: Speedlight
@@ -97,7 +99,7 @@
 [MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 597 256 361 256
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 4.6
-[MakerNotes, Nikon, Camera] 8 - Focus Position: 33
+[MakerNotes, Nikon, Camera] 8 - Focus Position: 0x21
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 0.63 m
 [MakerNotes, Nikon, Camera] 10 - Focal Length: 56.6mm
 [MakerNotes, Nikon, Camera] 11 - Lens ID Number: 127

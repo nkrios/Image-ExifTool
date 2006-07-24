@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
@@ -91,7 +91,8 @@
 [MakerNotes, Nikon, Camera] 6 - Sharpness: None
 [MakerNotes, Nikon, Camera] 7 - Focus Mode: AF-S
 [MakerNotes, Nikon, Camera] 11 - White Balance Fine Tune: 0
-[MakerNotes, Nikon, Camera] 14 - Exposure Difference: 0.0
+[MakerNotes, Nikon, Camera] 13 - Program Shift: 0
+[MakerNotes, Nikon, Camera] 14 - Exposure Difference: 0
 [MakerNotes, NikonPreview, Image] 259 - Compression: JPEG (old-style)
 [MakerNotes, NikonPreview, Image] 282 - X Resolution: 72
 [MakerNotes, NikonPreview, Image] 283 - Y Resolution: 72
@@ -118,7 +119,7 @@
 [MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 478 265 493 265
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 3.6
-[MakerNotes, Nikon, Camera] 8 - Focus Position: 241
+[MakerNotes, Nikon, Camera] 8 - Focus Position: 0xf1
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 2.37 m
 [MakerNotes, Nikon, Camera] 10 - Focal Length: 18.3mm
 [MakerNotes, Nikon, Camera] 11 - Lens ID Number: 127
@@ -129,7 +130,7 @@
 [MakerNotes, Nikon, Camera] 16 - Max Aperture At Max Focal: 4.5
 [MakerNotes, Nikon, Camera] 17 - MCU Version: 132
 [MakerNotes, Nikon, Camera] 18 - Effective Max Aperture: 3.6
-[MakerNotes, Nikon, Camera] 153 - NEF Thumbnail Size: 1520 1008
+[MakerNotes, Nikon, Camera] 153 - Raw Image Center: 1520 1008
 [MakerNotes, Nikon, Camera] 154 - Sensor Pixel Size: 7.8 x 7.8 um
 [MakerNotes, Nikon, Camera] 160 - Serial Number: 12345678
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 3619
@@ -163,6 +164,11 @@
 [MakerNotes, NikonCapture, Image] 214 - Output Pixels: 6016000
 [MakerNotes, NikonCapture, Image] 1990472195 - Advanced Raw: On
 [MakerNotes, NikonCapture, Image] 1990472196 - White Balance Adj: On
+[MakerNotes, NikonCapture, Image] 0 - WB Adj Red Balance: 2.015162472363
+[MakerNotes, NikonCapture, Image] 8 - WB Adj Blue Balance: 1.6951313394899
+[MakerNotes, NikonCapture, Image] 16 - WB Adj Mode: Use Temperature
+[MakerNotes, NikonCapture, Image] 21 - WB Adj Lighting: High Color Rendering Fluorescent
+[MakerNotes, NikonCapture, Image] 24 - WB Adj Temperature: 5000
 [MakerNotes, NikonCapture, Image] 1966984128 - Noise Reduction: On
 [MakerNotes, NikonCapture, Image] 4 - Edge Noise Reduction: Off
 [MakerNotes, NikonCapture, Image] 5 - Color Moire Reduction: Off
@@ -174,6 +180,7 @@
 [MakerNotes, NikonCapture, Image] 1 - Color Boost Level: 10
 [MakerNotes, NikonCapture, Image] 1990472197 - Vignette Control: Off
 [MakerNotes, NikonCapture, Image] 2892748224 - Vignette Control Intensity: 80
+[MakerNotes, NikonCapture, Image] 0 - Red Eye Correction: Off
 [MakerNotes, NikonCapture, Image] 2875116126 - Photo Effects: On
 [MakerNotes, NikonCapture, Image] 0 - Brightness Adj: 0
 [MakerNotes, NikonCapture, Image] 8 - Enhance Dark Tones: Off
@@ -181,7 +188,9 @@
 [MakerNotes, NikonCapture, Image] 4 - Photo Effects Red: 0
 [MakerNotes, NikonCapture, Image] 6 - Photo Effects Green: 0
 [MakerNotes, NikonCapture, Image] 8 - Photo Effects Blue: 0
+[MakerNotes, NikonCapture, Image] 801145905 - Straighten Angle: 0
 [MakerNotes, NikonCapture, Image] 1785607862 - D-Lighting HQ Selected: No
+[MakerNotes, NikonCapture, Image] 210313803 - Color Aberration Control: Off
 [MakerNotes, NikonCapture, Image] 3461698730 - D-Lighting HS: Off
 [MakerNotes, NikonCapture, Image] 0 - D-Lighting HS Adjustment: 25
 [MakerNotes, NikonCapture, Image] 1 - D-Lighting HS Color Boost: 60

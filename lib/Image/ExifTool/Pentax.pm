@@ -23,6 +23,7 @@
 #              10) David Buret private communication (tests with *istD)
 #              11) http://forums.dpreview.com/forums/read.asp?forum=1036&message=17465929
 #              12) Derby Chang private communication
+#              13) http://homepage3.nifty.com/kamisaka/makernote/makernote_pentax.htm
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -31,9 +32,8 @@ package Image::ExifTool::Pentax;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.31';
+$VERSION = '1.33';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -147,6 +147,53 @@ my %pentaxCities = (
         Groups => { 2 => 'Image' },
         Writable => 'int32u',
     },
+    0x0005 => { #13
+        Name => 'PentaxModelID',
+        PrintHex => 1,
+        PrintConv => { #PH
+            0x0000d => 'Optio 330/430',
+            0x12926 => 'Optio 230',
+            0x12958 => 'Optio 330GS',
+            0x12962 => 'Optio 450/550',
+            0x1296c => 'Optio S',
+            0x12994 => '*ist D',
+            0x129b2 => 'Optio 33L',
+            0x129bc => 'Optio 33LF',
+            0x129c6 => 'Optio 33WR/43WR/555',
+            0x129d5 => 'Optio S4',
+            0x12a02 => 'Optio MX',
+            0x12a16 => 'Optio S4i',
+            0x12a34 => 'Optio 30',
+            0x12a52 => 'Optio S30',
+            0x12a66 => 'Optio 750Z',
+            0x12a70 => 'Optio SV',
+            0x12a75 => 'Optio SVi',
+            0x12a7a => 'Optio X',
+            0x12a8e => 'Optio S5i',
+            0x12a98 => 'Optio S50',
+            0x12aa2 => '*ist DS',
+            0x12ab6 => 'Optio MX4',
+            0x12ac0 => 'Optio S5n',
+            0x12aca => 'Optio WP',
+            0x12afc => 'Optio S55',
+            0x12b10 => 'Optio S5z',
+            0x12b1a => '*ist DL',
+            0x12b24 => 'Optio S60',
+            0x12b2e => 'Optio S45',
+            0x12b38 => 'Optio S6',
+            0x12b4c => 'Optio WPi', #13
+            0x12b56 => 'BenQ DC X600',
+            0x12b60 => '*ist DS2',
+            0x12b62 => 'Samsung GX-1S',
+            0x12b6a => 'Optio A10',
+            0x12b7e => '*ist DL2',
+            0x12b80 => 'Samsung GX-1L',
+            0x12b9c => 'K100D',
+            0x12bb0 => 'Optio T10',
+            0x12be2 => 'Optio W10',
+            0x12bf6 => 'Optio M10',
+        },
+    },
     0x0006 => { #5
         # Note: Year is int16u in MM byte ordering regardless of EXIF byte order
         Name => 'Date',
@@ -190,14 +237,22 @@ my %pentaxCities = (
             4 => '1600x1200',
             5 => '2048x1536',
             8 => '2560x1920', #PH (Optio WP)
+            10 => '3264x2448', #13
             19 => '320x240', #PH (Optio WP)
+            20 => '2288x1712', #13
             21 => '2592x1944',
             22 => '2304x1728', #2
+            23 => '3056x2296', #13
+            25 => '2816x2212', #13
+            '0 0' => '2304x1728', #13
+            '5 0' => '2048x1536', #13
+            '8 0' => '2560x1920', #13
             '32 2' => '960x640', #7
             '33 2' => '1152x768', #7
             '34 2' => '1536x1024', #7
             '35 1' => '2400x1600', #7
             '36 0' => '3008x2008',  #PH
+            '37 0' => '3008x2000', #13
         },
     },
     # 0x000a - (See note below)
@@ -206,6 +261,8 @@ my %pentaxCities = (
         Writable => 'int16u',
         PrintConv => {
             0 => 'Program', #PH
+            2 => 'Program AE', #13
+            3 => 'Manual', #13
             5 => 'Portrait',
             6 => 'Landscape',
             8 => 'Sport', #PH
@@ -219,6 +276,8 @@ my %pentaxCities = (
             18 => 'Text',
             19 => 'Panorama', #PH
             30 => 'Self Portrait', #PH
+            31 => 'Illustrations', #13
+            33 => 'Digital Filter', #13
             37 => 'Museum', #PH
             38 => 'Food', #PH
             40 => 'Green Mode', #PH
@@ -229,6 +288,14 @@ my %pentaxCities = (
             54 => 'Candlelight', #PH
             55 => 'Natural Skin Tone', #PH
             56 => 'Synchro Sound Record', #PH
+            '0 0' => 'Auto', #13
+            '0 2' => 'Program AE', #13
+            '5 2' => 'Portrait', #13
+            '6 2' => 'Landscape', #13
+            '9 1' => 'Night Scene', #13
+            '13 1' => 'Candlelight', #13
+            '15 1' => 'Flower', #13
+            '255 0' => 'Digital Filter?', #13
         },
     },
     0x000c => { #PH
@@ -374,6 +441,13 @@ my %pentaxCities = (
             3 => 'Fluorescent', #2
             4 => 'Tungsten',
             5 => 'Manual',
+            6 => 'DaylightFluorescent', #13
+            7 => 'DaywhiteFluorescent', #13
+            8 => 'WhiteFluorescent', #13
+            9 => 'Flash', #13
+            10 => 'Cloudy', #13
+            65534 => 'Unknown', #13
+            65535 => 'User Selected', #13
         },
     },
     0x001a => { #5
@@ -509,6 +583,17 @@ my %pentaxCities = (
         Writable => 'int32u',
     },
     # 0x0032 - normally 4 zero bytes, but "\x02\0\0\0" for a cropped pic (PH)
+    # and "\0\0\0\x04" for Digital filter (ref 13)
+    # and "\x04\0\0\0" for Color filter (ref 13)
+    # 0x0033 - RecordMode ? (ref 13)
+    # 0x0034 - DriveMode ? (ref 13)
+    0x0037 => { #13
+        Name => 'ColorSpace',
+        PrintConv => {
+            0 => 'sRGB',
+            1 => 'AdobeRGB',
+        },
+    },
     0x0039 => { #PH
         Name => 'RawImageSize',
         Writable => 'int16u',
@@ -573,16 +658,20 @@ my %pentaxCities = (
             '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
             '4 6' => 'smc PENTAX-FA 35-80mm F4-5.6',
             '4 15' => 'smc PENTAX-FA 28-105mm F4-5.6 [IF]',
-            '4 19' => 'TAMRON SP AF 90mm F2.8',
+            '4 16' => 'TAMRON AF 80-210mm F4-5.6 (178D)', #13
+            '4 19' => 'TAMRON SP AF 90mm F2.8 (172E)',
             '4 20' => 'smc PENTAX-FA 28-80mm F3.5-5.6',
+            '4 22' => 'TOKINA 28-80mm F3.5-5.6', #13
             '4 23' => 'smc PENTAX-FA 20-35mm F4 AL',
             '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
+            '4 25' => 'TAMRON SP AF 14mm F2.8', #13
             '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
             '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF]Macro (285D)',
             '4 28' => 'smc PENTAX-FA 35mm F2 AL',
             '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
             '4 35' => 'smc PENTAX-FA 100-300mm F4.7-5.8',
             '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO (572D)',
+            '4 37' => 'TAMRON SP AF 24-135mm F3.5-5.6 AD AL (190D)', #13
             '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
             '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
             '4 41' => 'TAMRON AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] MACRO (A03)',
@@ -594,6 +683,7 @@ my %pentaxCities = (
             '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
             '4 51' => 'smc PENTAX-D FA 50mmF2.8 MACRO',
             '4 52' => 'smc PENTAX-D FA 100mmF2.8 MACRO',
+            '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
             '4 247' => 'smc PENTAX-DA 10-17mm F3.5-4.5 ED [IF] Fisheye zoom', #10
             '4 248' => 'smc PENTAX-DA 12-24mm F4 ED AL [IF]', #10
             '4 249' => 'TAMRON XR DiII 18-200mm F3.5-6.3 (A14)',
@@ -633,6 +723,12 @@ my %pentaxCities = (
         },
     },
     # 0x0041 - increments for each cropped pic (PH)
+    0x0049 => { #13
+        Name => 'NoiseReduction',
+        Writable => 'int16u',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    # 0x004f - PictureFinish ? (ref 13)
     0x0200 => {
         Name => 'BlackPoint', #5
         Writable => 'int16u',
@@ -643,6 +739,7 @@ my %pentaxCities = (
         Writable => 'int16u',
         Count => 4,
     },
+    # 0x0207 - LensInformation ? (ref 13) - includes focus distance!
     0x03fe => { #PH
         Name => 'DataDump',
         Writable => 0,

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
 [File, File, Image]  - File Name: Writer_14_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1253 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:03:05 14:23:36
+[File, File, Time]  - File Modification Date/Time: 2006:06:05 09:10:44
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -39,8 +39,8 @@
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.946
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.017
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3443.946
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3442.017
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera

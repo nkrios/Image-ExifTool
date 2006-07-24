@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.09';
+$VERSION = '1.12';
 
 sub WritePS($$);
 sub CheckPS($$$);
@@ -45,7 +45,7 @@ sub CheckPS($$$);
     ModDate => {
         Name => 'ModifyDate',
         Priority => 0,
-        Groups => { 2 => 'Author' },
+        Groups => { 2 => 'Time' },
         Writable => 'string',
     },
     Pages       => { Priority => 0 },
@@ -178,10 +178,13 @@ sub ProcessPS($$)
 #
     $raf->Read($data, 4) == 4 or return 0;
     # accept either ASCII or DOS binary postscript file format
-    return 0 unless $data =~ /^(%!PS|\xc5\xd0\xd3\xc6)/;
-    # process DOS binary file header
-    if ($data =~ /^\xc5\xd0\xd3\xc6/) {
-        # save DOS header then seek ahead and check PS header
+    return 0 unless $data =~ /^(%!PS|%!Ad|\xc5\xd0\xd3\xc6)/;
+    if ($data =~ /^%!Ad/) {
+        # I've seen PS files start with "%!Adobe-PS"...
+        return 0 unless $raf->Read($data, 6) == 6 and $data eq "obe-PS";
+    } elsif ($data =~ /^\xc5\xd0\xd3\xc6/) {
+        # process DOS binary file header
+        # - save DOS header then seek ahead and check PS header
         $raf->Read($dos, 26) == 26 or return 0;
         SetByteOrder('II');
         unless ($raf->Seek(Get32u(\$dos, 0), 0) and
@@ -223,7 +226,25 @@ sub ProcessPS($$)
 #
     my ($buff, $mode, $endToken);
     my $tagTablePtr = GetTagTable('Image::ExifTool::PostScript::Main');
-    while ($raf->ReadLine($data)) {
+    my (@lines, $altnl);
+    if ($/ eq "\x0d") {
+        $altnl = "\x0a";
+    } else {
+        $/ = "\x0a";        # end on any LF (even if DOS CR+LF)
+        $altnl = "\x0d";
+    }
+    for (;;) {
+        if (@lines) {
+            $data = shift @lines;
+        } else {
+            $raf->ReadLine($data) or last;
+            # check for alternate newlines as efficiently as possible
+            if ($data =~ /$altnl/) {
+                # split into separate lines
+                @lines = split /$altnl/, $data, -1;
+                $data = shift @lines;
+            }
+        }
         if ($mode) {
             if (not $endToken) {
                 $buff .= $data;
@@ -261,7 +282,7 @@ sub ProcessPS($$)
             # only allow 'ImageData' to have single leading '%'
             next unless $data =~ /^%%/ or $1 eq 'ImageData';
             # extract information from PostScript tags in comments
-            chomp $val;
+            $val =~ s/\x0d*\x0a*$//;        # remove trailing CR, LF or CR/LF
             if ($val =~ s/^\((.*)\)$/$1/) { # remove brackets if necessary
                 $val =~ s/\) \(/, /g;       # convert contained brackets too
             }
@@ -316,6 +337,10 @@ This module is loaded automatically by Image::ExifTool when required.
 
 This code reads meta information from EPS (Encapsulated PostScript), PS
 (PostScript) and AI (Adobe Illustrator) files.
+
+=head1 NOTES
+
+Currently doesn't handle continued lines ("%+" syntax).
 
 =head1 AUTHOR
 

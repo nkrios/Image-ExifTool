@@ -950,12 +950,12 @@ sub WriteExif($$$)
         my $emptyData = '';
         $dataPt = \$emptyData;
     }
+    my $dataPos = $$dirInfo{DataPos} || 0;
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $dataLen = $$dirInfo{DataLen} || length($$dataPt);
     my $dirLen = $$dirInfo{DirLen} || ($dataLen - $dirStart);
     my $base = $$dirInfo{Base} || 0;
     my $firstBase = $base;
-    my $dataPos = $$dirInfo{DataPos} || 0;
     my $raf = $$dirInfo{RAF};
     my $dirName = $$dirInfo{DirName} || 'unknown';
     my $fixup = $$dirInfo{Fixup} || new Image::ExifTool::Fixup;
@@ -1080,8 +1080,9 @@ sub WriteExif($$$)
 
         # fix base offsets
         if ($dirName eq 'MakerNotes' and $$dirInfo{Parent} eq 'ExifIFD' and
-            FixBase($exifTool, $dirInfo))
+            Image::ExifTool::MakerNotes::FixBase($exifTool, $dirInfo))
         {
+            # update local variables from fixed values
             $base = $$dirInfo{Base};
             $dataPos = $$dirInfo{DataPos};
         }
@@ -1119,6 +1120,7 @@ sub WriteExif($$$)
         my @valFixups;      # list of fixups for offsets in valBuff
         # fixup for offsets in dirBuff
         my $dirFixup = new Image::ExifTool::Fixup;
+        my $entryBasedFixup;
         my $index = 0;
         my $lastTagID = -1;
         my ($oldInfo, $oldFormat, $oldFormName, $oldCount, $oldSize, $oldValue);
@@ -1159,7 +1161,15 @@ sub WriteExif($$$)
                     $oldSize = $oldCount * $formatSize[$oldFormat];
                     my $readFromFile;
                     if ($oldSize > 4) {
-                        $valuePtr = Get32u($dataPt, $valuePtr) - $dataPos;
+                        $valuePtr = Get32u($dataPt, $valuePtr);
+                        # convert offset to pointer in $$dataPt
+                        if ($$dirInfo{EntryBased} or (ref $$tagTablePtr{$oldID} eq 'HASH' and
+                            $tagTablePtr->{$oldID}->{EntryBased}))
+                        {
+                            $valuePtr += $entry;
+                        } else {
+                            $valuePtr -= $dataPos;
+                        }
                         # get value by seeking in file if we are allowed
                         if ($valuePtr < 0 or $valuePtr+$oldSize > $dataLen) {
                             if ($raf) {
@@ -1357,7 +1367,8 @@ sub WriteExif($$$)
 #
                     $newInfo = $$addDirs{$newID} or warn('internal error'), next;
                     # make sure we don't try to generate a new MakerNotes directory
-                    next if $$newInfo{MakerNotes};
+                    # or a SubIFD
+                    next if $$newInfo{MakerNotes} or $$newInfo{Name} eq 'SubIFD';
                     my $subTable;
                     if ($newInfo->{SubDirectory}->{TagTable}) {
                         $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
@@ -1472,8 +1483,9 @@ sub WriteExif($$$)
                             TagInfo => $newInfo,
                             RAF => $raf,
                         );
-                        if ($$newInfo{SubDirectory} and $newInfo->{SubDirectory}->{FixBase}) {
-                            $subdirInfo{FixBase} = 1;
+                        if ($$newInfo{SubDirectory}) {
+                            $subdirInfo{FixBase} = 1 if $newInfo->{SubDirectory}->{FixBase};
+                            $subdirInfo{EntryBased} = $newInfo->{SubDirectory}->{EntryBased};
                         }
                         # get the proper tag table for these maker notes
                         my $subTable;
@@ -1518,18 +1530,7 @@ sub WriteExif($$$)
                             $newValue = substr($oldValue, 0, $loc) . $subdir;
                             my $makerFixup = $subdirInfo{Fixup};
                             my $previewInfo = $exifTool->{PREVIEW_INFO};
-                            if (not $subdirInfo{Relative}) {
-                                # don't shift anything if relative flag set to zero (Pentax patch)
-                                unless (defined $subdirInfo{Relative}) {
-                                    my $baseShift = $base - $subdirInfo{Base};
-                                    $makerFixup->{Start} += $valLen + $loc;
-                                    $makerFixup->{Shift} += $baseShift;
-                                    push @valFixups, $makerFixup;
-                                    if ($previewInfo and not $previewInfo->{NoBaseShift}) {
-                                        $previewInfo->{BaseShift} = $baseShift;
-                                    }
-                                }
-                            } else {
+                            if ($subdirInfo{Relative}) {
                                 # apply a one-time fixup to $loc since offsets are relative
                                 $makerFixup->{Start} += $loc;
                                 # shift all offsets to be relative to new base
@@ -1550,6 +1551,15 @@ sub WriteExif($$$)
                                     $previewInfo->{BaseShift} = $baseShift;
                                     $previewInfo->{Relative} = 1;
                                 }
+                            } elsif (not defined $subdirInfo{Relative}) {
+                                # don't shift anything if relative flag set to zero (Pentax patch)
+                                my $baseShift = $base - $subdirInfo{Base};
+                                $makerFixup->{Start} += $valLen + $loc;
+                                $makerFixup->{Shift} += $baseShift;
+                                push @valFixups, $makerFixup;
+                                if ($previewInfo and not $previewInfo->{NoBaseShift}) {
+                                    $previewInfo->{BaseShift} = $baseShift;
+                                }
                             }
                             $newValuePt = \$newValue;   # write new value
                         }
@@ -1559,6 +1569,7 @@ sub WriteExif($$$)
                 # process existing subdirectory unless we are overwriting it entirely
                 } elsif ($$newInfo{SubDirectory} and $isNew <= 0 and not $isOverwriting) {
 
+                    my $subdir = $$newInfo{SubDirectory};
                     if ($$newInfo{SubIFD}) {
 #
 # rewrite existing sub IFD's
@@ -1606,12 +1617,12 @@ sub WriteExif($$$)
                                 $subdirInfo{DataLen} = $subSize + 2;
                             }
                             my $subTable = $tagTablePtr;
-                            if ($newInfo->{SubDirectory}->{TagTable}) {
-                                $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
+                            if ($$subdir{TagTable}) {
+                                $subTable = GetTagTable($$subdir{TagTable});
                             }
-                            my $subdir = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
-                            return undef unless defined $subdir;
-                            next unless length($subdir);
+                            my $subdirData = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
+                            return undef unless defined $subdirData;
+                            next unless length($subdirData);
                             # temporarily set value to subdirectory index
                             # (will set to actual offset later when we know what it is)
                             $newValue .= Set32u(0xfeedf00d);
@@ -1625,7 +1636,7 @@ sub WriteExif($$$)
                             }
                             # add to list of subdirectories we will add later
                             push @subdirs, {
-                                DataPt => \$subdir,
+                                DataPt => \$subdirData,
                                 Table => $subTable,
                                 Fixup => $subdirInfo{Fixup},
                                 Offset => $offset,
@@ -1638,26 +1649,26 @@ sub WriteExif($$$)
                         $newFormat = $formatNumber{$newFormName};
                         $newValuePt = \$newValue;
 
-                    } elsif ((not defined $newInfo->{SubDirectory}->{Start} or
-                             $newInfo->{SubDirectory}->{Start} =~ /\$valuePtr/) and
-                             $newInfo->{SubDirectory}->{TagTable})
+                    } elsif ((not defined $$subdir{Start} or
+                             $$subdir{Start} =~ /\$valuePtr/) and
+                             $$subdir{TagTable})
                     {
 #
 # rewrite other existing subdirectories ('$valuePtr' type only)
 #
                         # set subdirectory Start and Base
                         my $subdirStart = $valuePtr;
-                        if ($newInfo->{SubDirectory}->{Start}) {
+                        if ($$subdir{Start}) {
                             #### eval Start ($valuePtr)
-                            $subdirStart = eval $newInfo->{SubDirectory}->{Start};
+                            $subdirStart = eval $$subdir{Start};
                             # must adjust directory size if start changed
                             $oldSize -= $subdirStart - $valuePtr;
                         }
                         my $subdirBase = $base;
-                        if ($newInfo->{SubDirectory}->{Base}) {
+                        if ($$subdir{Base}) {
                             my $start = $subdirStart + $dataPos;
                             #### eval Base ($start)
-                            $subdirBase += eval $newInfo->{SubDirectory}->{Base};
+                            $subdirBase += eval $$subdir{Base};
                         }
                         my $subFixup = new Image::ExifTool::Fixup;
                         my %subdirInfo = (
@@ -1671,7 +1682,7 @@ sub WriteExif($$$)
                             Fixup => $subFixup,
                             RAF => $raf,
                         );
-                        my $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
+                        my $subTable = GetTagTable($$subdir{TagTable});
                         $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                         if (defined $newValue) {
                             my $hdrLen = $subdirStart - $valuePtr;
@@ -1743,7 +1754,13 @@ sub WriteExif($$$)
                     $$newValuePt .= "\0";
                     ++$newSize;
                 }
-                $offsetVal = Set32u(length $valBuff);
+                my $entryBased;
+                if ($$dirInfo{EntryBased} or ($newInfo and $$newInfo{EntryBased})) {
+                    $entryBased = 1;
+                    $offsetVal = Set32u(length($valBuff) - length($dirBuff));
+                } else {
+                    $offsetVal = Set32u(length $valBuff);
+                }
                 my $dataTag;
                 if ($newInfo and $$newInfo{DataTag}) {
                     $dataTag = $$newInfo{DataTag};
@@ -1762,7 +1779,12 @@ sub WriteExif($$$)
                 }
                 $valBuff .= $$newValuePt;       # add value data to buffer
                 # must save a fixup pointer for every pointer in the directory
-                $dirFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                if ($entryBased) {
+                    $entryBasedFixup or $entryBasedFixup = new Image::ExifTool::Fixup;
+                    $entryBasedFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                } else {
+                    $dirFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                }
             } else {
                 $offsetVal = $$newValuePt;      # save value in offset if 4 bytes or less
                 # must pad value with zeros if less than 4 bytes
@@ -1802,6 +1824,12 @@ sub WriteExif($$$)
         if ($ifd and not $newEntries) {
             $verbose and print $out "  Deleting IFD1\n";
             last;   # don't write IFD1 if empty
+        }
+        # apply one-time fixup for entry-based offsets
+        if ($entryBasedFixup) {
+            $entryBasedFixup->{Shift} = length($dirBuff) + 4;
+            $entryBasedFixup->ApplyFixup(\$dirBuff);
+            undef $entryBasedFixup;
         }
         # add directory entry count to start of IFD and next IFD pointer to end
         # (temporarily set next IFD pointer to zero)

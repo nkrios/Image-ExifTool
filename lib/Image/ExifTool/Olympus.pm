@@ -531,14 +531,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'NearLensStep',
         Writable => 'int16u',
     },
-# 
+#
 # Olympus really screwed up the format of the following subdirectories (for the
 # E-1 and E-300 anyway). Not only is the subdirectory value data not included in
 # the size, but also the count is 2 bytes short for the subdirectory itself
 # (presumably the Olympus programmers forgot about the 2-byte entry count at the
 # start of the subdirectory).  This mess is straightened out and these subdirs
 # are written properly when ExifTool rewrites the file. - PH
-# 
+#
     0x2010 => { #PH
         Name => 'Equipment',
         SubDirectory => {
@@ -1473,7 +1473,7 @@ sub ExtenderStatus($$$)
 {
     my ($extender, $lensType, $maxAperture) = @_;
     my @info = split ' ', $extender;
-    # validate that extender identifier is reasonable 
+    # validate that extender identifier is reasonable
     return 0 unless @info >= 4 and $info[2];
     # if it's not an EC-14 (id 0 4) then assume it was really attached
     # (other extenders don't seem to affect the reported max aperture)

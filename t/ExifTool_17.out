@@ -1,4 +1,4 @@
-  ExifToolVersion = 6.06
+  ExifToolVersion = 6.27
   FileName = ExifTool.jpg
   Directory = t/images
   FileSize = 2697
@@ -287,9 +287,15 @@ JPEG APP1 (2442 bytes):
   | | | | BulbDuration = 40
   | | | | - Tag 0x0018 (4 bytes, int32s[1]):
   | | | |     0484: 28 00 00 00                                     [(...]
+  | | | | CameraType = 252
+  | | | | - Tag 0x001a (2 bytes, int16s[1]):
+  | | | |     0488: fc 00                                           [..]
   | | | | AutoRotate = 0
   | | | | - Tag 0x001b (2 bytes, int16s[1]):
   | | | |     048a: 00 00                                           [..]
+  | | | | NDFilter = -1
+  | | | | - Tag 0x001c (2 bytes, int16s[1]):
+  | | | |     048c: ff ff                                           [..]
   | | | | Self-timer2 = 0
   | | | | - Tag 0x001d (2 bytes, int16s[1]):
   | | | |     048e: 00 00                                           [..]
@@ -379,7 +385,7 @@ JPEG APP1 (2442 bytes):
   | | |         07ae: 65 05 8d 07 40 03 3f 03 7f 03 ba 06 40 03 3f 03 [e...@.?.....@.?.]
   | | |         07be: dd 03 ba 06 40 03 3f 03 dc 03 7c 00 7b 00 7c 00 [....@.?...|.{.|.]
   | | |         07ce: 7b 00                                           [{.]
-  | | | + [BinaryData directory, 82 bytes]
+  | | | + [BinaryData directory, 80 bytes]
   | | | | WB_RGGBLevelsAuto = 1719 832 831 990
   | | | | - Tag 0x0000 (8 bytes, int16u[4]):
   | | | |     0780: b7 06 40 03 3f 03 de 03                         [..@.?...]

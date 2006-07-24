@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.08
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
 [File, File, Image]  - File Name: Writer_9_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 9 kB
@@ -43,8 +43,8 @@
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
-[EXIF, ExifIFD, Image] 41486 - Focal Plane X Resolution: 3443.946
-[EXIF, ExifIFD, Image] 41487 - Focal Plane Y Resolution: 3442.017
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3443.946
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3442.017
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -107,7 +107,9 @@
 [MakerNotes, Canon, Image] 21 - F Number: 14
 [MakerNotes, Canon, Image] 22 - Exposure Time: 128
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
+[MakerNotes, Canon, Image] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
+[MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
@@ -190,10 +192,10 @@
 [Composite, Composite, Image]  - Shutter Speed: 4
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
-[Composite, Composite, Camera]  - Blue Balance: 1.19062
+[Composite, Composite, Camera]  - Blue Balance: 1.190619
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 52.7mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 4.26 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
-[Composite, Composite, Camera]  - Red Balance: 2.06735
+[Composite, Composite, Camera]  - Red Balance: 2.067348

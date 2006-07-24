@@ -21,6 +21,8 @@ html/TagNames/DICOM.html
 html/TagNames/DNG.html
 html/TagNames/EXIF.html
 html/TagNames/Extra.html
+html/TagNames/Flash.html
+html/TagNames/FlashPix.html
 html/TagNames/FujiFilm.html
 html/TagNames/GPS.html
 html/TagNames/GeoTiff.html
@@ -36,6 +38,7 @@ html/TagNames/Leaf.html
 html/TagNames/MIE.html
 html/TagNames/MIFF.html
 html/TagNames/MNG.html
+html/TagNames/MPEG.html
 html/TagNames/Minolta.html
 html/TagNames/MinoltaRaw.html
 html/TagNames/Nikon.html
@@ -51,8 +54,10 @@ html/TagNames/PostScript.html
 html/TagNames/PrintIM.html
 html/TagNames/QuickTime.html
 html/TagNames/RIFF.html
+html/TagNames/Real.html
 html/TagNames/Ricoh.html
 html/TagNames/Sanyo.html
+html/TagNames/Shortcuts.html
 html/TagNames/Sigma.html
 html/TagNames/SigmaRaw.html
 html/TagNames/Sony.html
@@ -91,6 +96,8 @@ lib/Image/ExifTool/DICOM.pm
 lib/Image/ExifTool/DNG.pm
 lib/Image/ExifTool/Exif.pm
 lib/Image/ExifTool/Fixup.pm
+lib/Image/ExifTool/Flash.pm
+lib/Image/ExifTool/FlashPix.pm
 lib/Image/ExifTool/FujiFilm.pm
 lib/Image/ExifTool/GIF.pm
 lib/Image/ExifTool/GPS.pm
@@ -107,6 +114,7 @@ lib/Image/ExifTool/Leaf.pm
 lib/Image/ExifTool/MIE.pm
 lib/Image/ExifTool/MIFF.pm
 lib/Image/ExifTool/MNG.pm
+lib/Image/ExifTool/MPEG.pm
 lib/Image/ExifTool/MakerNotes.pm
 lib/Image/ExifTool/Minolta.pm
 lib/Image/ExifTool/MinoltaRaw.pm
@@ -125,6 +133,7 @@ lib/Image/ExifTool/PrintIM.pm
 lib/Image/ExifTool/QuickTime.pm
 lib/Image/ExifTool/README
 lib/Image/ExifTool/RIFF.pm
+lib/Image/ExifTool/Real.pm
 lib/Image/ExifTool/Ricoh.pm
 lib/Image/ExifTool/Sanyo.pm
 lib/Image/ExifTool/Shift.pl
@@ -181,6 +190,8 @@ t/ExifTool_6.out
 t/ExifTool_7.out
 t/ExifTool_8.out
 t/ExifTool_9.out
+t/Flash.t
+t/Flash_2.out
 t/FujiFilm.t
 t/FujiFilm_2.out
 t/FujiFilm_3.out
@@ -258,6 +269,10 @@ t/QuickTime.t
 t/QuickTime_2.out
 t/RIFF.t
 t/RIFF_2.out
+t/Real.t
+t/Real_2.out
+t/Real_3.out
+t/Real_4.out
 t/Ricoh.t
 t/Ricoh_2.out
 t/Ricoh_3.out
@@ -287,6 +302,7 @@ t/Writer_18.out
 t/Writer_19.out
 t/Writer_2.out
 t/Writer_22.out
+t/Writer_24.out
 t/Writer_4.out
 t/Writer_6.out
 t/Writer_7.out
@@ -303,6 +319,7 @@ t/images/DICOM.dcm
 t/images/DNG.dng
 t/images/ExifTool.jpg
 t/images/ExifTool.tif
+t/images/Flash.swf
 t/images/FujiFilm.jpg
 t/images/GIF.gif
 t/images/GPS.jpg
@@ -334,6 +351,9 @@ t/images/Photoshop.psd
 t/images/PostScript.eps
 t/images/QuickTime.mov
 t/images/RIFF.wav
+t/images/Real.ra
+t/images/Real.ram
+t/images/Real.rm
 t/images/Ricoh.jpg
 t/images/Sanyo.jpg
 t/images/Sigma.jpg

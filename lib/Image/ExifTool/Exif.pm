@@ -22,6 +22,7 @@
 #              10) http://partners.adobe.com/public/developer/en/tiff/TIFFPM6.pdf
 #              11) Robert Mucke private communication
 #              12) http://www.broomscloset.com/closet/photo/exif/TAG2000-22_DIS12234-2.PDF
+#              13) http://www.microsoft.com/whdc/xps/wmphoto.mspx
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -32,7 +33,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '1.97';
+$VERSION = '2.02';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -940,9 +941,7 @@ my %longBin = (
         ValueConv => '2 ** ($val / 2)',
         PrintConv => 'sprintf("%.1f",$val)',
     },
-    0x9203 => {
-        Name => 'BrightnessValue',
-    },
+    0x9203 => 'BrightnessValue',
     0x9204 => {
         Name => 'ExposureCompensation',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
@@ -1147,8 +1146,8 @@ my %longBin = (
         PrintConv => 'Image::ExifTool::Exif::PrintSFR($val)',
     },
     0xa20d => 'Noise',
-    0xa20e => 'FocalPlaneXResolution',
-    0xa20f => 'FocalPlaneYResolution',
+    0xa20e => { Name => 'FocalPlaneXResolution', Groups => { 2 => 'Camera' } },
+    0xa20f => { Name => 'FocalPlaneYResolution', Groups => { 2 => 'Camera' } },
     0xa210 => {
         Name => 'FocalPlaneResolutionUnit',
         Groups => { 2 => 'Camera' },
@@ -1191,6 +1190,8 @@ my %longBin = (
     0xa300 => {
         Name => 'FileSource',
         PrintConv => {
+            1 => 'Film Scanner',
+            2 => 'Reflection Print Scanner',
             3 => 'Digital Camera',
             # handle the case where Sigma incorrectly gives this tag a count of 4
             "\3\0\0\0" => 'Sigma Digital Camera',
@@ -1307,6 +1308,148 @@ my %longBin = (
     0xa480 => 'GDALMetadata', #3
     0xa481 => 'GDALNoData', #3
     0xa500 => 'Gamma',
+#
+# Windows Media Photo WDP tags
+#
+    0xbc01 => { #13
+        Name => 'PixelFormat',
+        Notes => q{
+            tags 0xbc** are used in Windows Media Photo WDP images. The actual
+            PixelFormat values are 16-byte GUID's but the leading 15 bytes,
+            '6fddc324-4e03-4bfe-b1853d77768dc9', have been removed below to avoid
+            unnecessary clutter
+        },
+        ValueConv => q{
+            require Image::ExifTool::ASF;
+            Image::ExifTool::ASF::GetGUID($val);
+            # GUID's are too long, so remove redundant information
+            $val =~ s/^6fddc324-4e03-4bfe-b1853d77768dc9/0x/;
+            return $val;
+        },
+        PrintConv => {
+            '0x0d' => '24-bit RGB',
+            '0x0c' => '24-bit BGR',
+            '0x0e' => '32-bit BGR',
+            '0x15' => '48-bit RGB',
+            '0x12' => '48-bit RGB Fixed Point',
+            '0x3b' => '48-bit RGB Half',
+            '0x18' => '96-bit RGB Fixed Point',
+            '0x1b' => '128-bit RGB Float',
+            '0x0f' => '32-bit BGRA',
+            '0x16' => '64-bit RGBA',
+            '0x1d' => '64-bit RGBA Fixed Point',
+            '0x3a' => '64-bit RGBA Half',
+            '0x1e' => '128-bit RGBA Fixed Point',
+            '0x19' => '128-bit RGBA Float',
+            '0x10' => '32-bit PBGRA',
+            '0x17' => '64-bit PRGBA',
+            '0x1a' => '128-bit PRGBA Float',
+            '0x1c' => '32-bit CMYK',
+            '0x2c' => '40-bit CMYK Alpha',
+            '0x1f' => '64-bit CMYK',
+            '0x2d' => '80-bit CMYK Alpha',
+            '0x20' => '24-bit 3 Channels',
+            '0x21' => '32-bit 4 Channels',
+            '0x22' => '40-bit 5 Channels',
+            '0x23' => '48-bit 6 Channels',
+            '0x24' => '56-bit 7 Channels',
+            '0x25' => '64-bit 8 Channels',
+            '0x2e' => '32-bit 3 Channels Alpha',
+            '0x2f' => '40-bit 4 Channels Alpha',
+            '0x30' => '48-bit 5 Channels Alpha',
+            '0x31' => '56-bit 6 Channels Alpha',
+            '0x32' => '64-bit 7 Channels Alpha',
+            '0x33' => '72-bit 8 Channels Alpha',
+            '0x26' => '48-bit 3 Channels',
+            '0x27' => '64-bit 4 Channels',
+            '0x28' => '80-bit 5 Channels',
+            '0x29' => '96-bit 6 Channels',
+            '0x2a' => '112-bit 7 Channels',
+            '0x2b' => '128-bit 8 Channels',
+            '0x34' => '64-bit 3 Channels Alpha',
+            '0x35' => '80-bit 4 Channels Alpha',
+            '0x36' => '96-bit 5 Channels Alpha',
+            '0x37' => '112-bit 6 Channels Alpha',
+            '0x38' => '128-bit 7 Channels Alpha',
+            '0x39' => '144-bit 8 Channels Alpha',
+            '0x08' => '8-bit Gray',
+            '0x0b' => '16-bit Gray',
+            '0x13' => '16-bit Gray Fixed Point',
+            '0x3e' => '16-bit Gray Half',
+            '0x3f' => '32-bit Gray Fixed Point',
+            '0x11' => '32-bit Gray Float',
+            '0x05' => 'Black & White',
+            '0x09' => '16-bit BGR555',
+            '0x0a' => '16-bit BGR565',
+            '0x13' => '32-bit BGR101010',
+            '0x3d' => '32-bit RGBE',
+        },
+    },
+    0xbc04 => { #13
+        Name => 'ImageType',
+        PrintConv => { BITMASK => {
+            0 => 'Preview',
+            1 => 'Page',
+        } },
+    },
+    0xbc02 => { #13
+        Name => 'Transfomation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Mirror vertical',
+            2 => 'Mirror horizontal',
+            3 => 'Rotate 180',
+            4 => 'Rotate 90 CW',
+            5 => 'Mirror horizontal and rotate 90 CW',
+            6 => 'Mirror horizontal and rotate 270 CW',
+            7 => 'Rotate 270 CW',
+        },
+    },
+    0xbc03 => { #13
+        Name => 'Uncompressed',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
+    0xbcc0 => { #13
+        Name => 'ImageOffset',
+        Flags => 'IsOffset',
+        OffsetPair => 0xbcc1,  # point to associated byte count
+    },
+    0xbcc1 => { #13
+        Name => 'ImageByteCount',
+        OffsetPair => 0xbcc0,  # point to associated offset
+    },
+    0xbcc2 => { #13
+        Name => 'AlphaOffset',
+        Flags => 'IsOffset',
+        OffsetPair => 0xbcc3,  # point to associated byte count
+    },
+    0xbcc3 => { #13
+        Name => 'AlphaByteCount',
+        OffsetPair => 0xbcc2,  # point to associated offset
+    },
+    0xbcc4 => { #13
+        Name => 'ImageDataDiscard',
+        PrintConv => {
+            0 => 'Full Resolution',
+            1 => 'Flexbits Discarded',
+            2 => 'HighPass Frequency Data Discarded',
+            3 => 'Highpass and LowPass Frequency Data Discarded',
+        },
+    },
+    0xbcc5 => { #13
+        Name => 'AlphaDataDiscard',
+        PrintConv => {
+            0 => 'Full Resolution',
+            1 => 'Flexbits Discarded',
+            2 => 'HighPass Frequency Data Discarded',
+            3 => 'Highpass and LowPass Frequency Data Discarded',
+        },
+    },
+    0xbc80 => 'ImageWidth', #13
+    0xbc81 => 'ImageHeight', #13
+    0xbc82 => 'WidthResolution', #13
+    0xbc83 => 'HeightResolution', #13
+#
     0xc427 => 'OceScanjobDesc', #3
     0xc428 => 'OceApplicationSelector', #3
     0xc429 => 'OceIDNumber', #3
@@ -1321,7 +1464,9 @@ my %longBin = (
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
-    # DNG tags 0xc6XX (ref 2 unless otherwise stated)
+#
+# DNG tags 0xc6XX (ref 2 unless otherwise stated)
+#
     0xc612 => {
         Name => 'DNGVersion',
         Notes => 'tags 0xc612-0xc65d are used in DNG images',
@@ -1541,7 +1686,10 @@ my %longBin = (
         PrintConv => 'sprintf("%.1f", $val)',
     },
     CircleOfConfusion => {
-        Notes => 'this value may be incorrect if image has been resized',
+        Notes => q{
+            this value may be incorrect if image has been resized.  Calculated as
+            D/1440, where D is the focal plane diagonal in mm
+        },
         Require => {
             0 => 'ScaleFactor35efl',
         },
@@ -1877,7 +2025,7 @@ sub ConvertParameter($)
 
 #------------------------------------------------------------------------------
 # Calculate Red/BlueBalance
-# Inputs: 0) 0=red, 1=blue, 1-5) WB_RGGB/RGBG/RBGG/GRBG/RBLevels, 
+# Inputs: 0) 0=red, 1=blue, 1-5) WB_RGGB/RGBG/RBGG/GRBG/RBLevels,
 #         6) red or blue level, 7) green level
 my @rggbLookup = (
     [ 0, 1, 2, 3 ], # RGGB
@@ -2004,86 +2152,8 @@ sub ExtractImage($$$$)
         $image = $exifTool->ExtractBinary($offset, $len, $tag);
         return undef unless defined $image;
     }
-    HtmlDump($exifTool, $offset, $len, "$tag data", "$tag\\nSize: $len bytes", 8);
+    $exifTool->HtmlDump($offset, $len, "$tag data", "$tag\\nSize: $len bytes", 8);
     return $exifTool->ValidateImage(\$image, $tag);
-}
-
-#------------------------------------------------------------------------------
-# Get lowest address value ptr in a directory
-# Inputs: 0) Data pointer, 1) dir start
-# Returns: pointer with lowest value (or undef if no valid pointers)
-# Notes: Directory size should be validated before calling this routine
-sub GetFirstValuePtr($$)
-{
-    my ($dataPt, $dirStart) = @_;
-    my $numEntries = Get16u($dataPt, $dirStart);
-    my ($index, $rtnVal);
-    for ($index=0; $index<$numEntries; ++$index) {
-        my $entry = $dirStart + 2 + 12 * $index;
-        my $format = Get16u($dataPt, $entry+2);
-        last if $format < 1 or $format > 13;
-        my $count = Get32u($dataPt, $entry+4);
-        my $size = $count * $Image::ExifTool::Exif::formatSize[$format];
-        next if $size <= 4;
-        my $valuePtr = Get32u($dataPt, $entry+8);
-        next if $valuePtr & 1;  # (avoids funny CaplioRR30 offsets)
-        # take minimum difference (this is for first value in block)
-        $rtnVal = $valuePtr if not defined $rtnVal or $rtnVal > $valuePtr;
-    }
-    return $rtnVal;
-}
-
-#------------------------------------------------------------------------------
-# Fix offset base if necessary
-# Inputs: 0) ExifTool object ref, 1) DirInfo hash ref
-# Return: amount of base shift (and $dirInfo Base and DataPos are updated)
-sub FixBase($$)
-{
-    my ($exifTool, $dirInfo) = @_;
-    my $dirName = $$dirInfo{DirName};
-    my $dirStart = $$dirInfo{DirStart} || 0;
-    my $minPt = GetFirstValuePtr($$dirInfo{DataPt}, $dirStart);
-
-    return 0 unless defined $minPt;
-
-    my $dataPos = $$dirInfo{DataPos};
-    my $dirEnd = $dirStart + 2 + 12 * Get16u($$dirInfo{DataPt}, $dirStart);
-    my $diff = ($minPt - $dataPos) - $dirEnd;
-    my $fixBase = $exifTool->Options('FixBase');
-    my $setBase = (defined $fixBase and $fixBase ne '') ? 1 : 0;
-
-    # normal value data starts 4 bytes after IFD, but allow 0-4...
-    return 0 unless $diff > 4 or $diff < 0 or $setBase;
-    # ...but this may be different for some camera makes
-    my ($makeDiff, $relative) = Image::ExifTool::MakerNotes::GetMakerNoteOffset($exifTool);
-
-    # no base change unless necessary
-    return 0 unless (defined $makeDiff and $diff != $makeDiff) or $setBase;
-
-    my $fix;
-    $makeDiff = 4 unless defined $makeDiff;
-    $fix = $makeDiff - $diff;       # assume standard diff for this make
-    if ($$dirInfo{FixBase}) {
-        # set flag if offsets are relative
-        if ($dataPos - $fix + $dirStart < 0) {
-            $$dirInfo{Relative} = (defined $relative) ? $relative : 1;
-        }
-        if ($setBase) {
-            $fix += $fixBase;
-            $exifTool->Warn("Adjusted $dirName base by $fixBase",1);
-        }
-    } elsif (defined $fixBase) {
-        $fix = $fixBase if $fixBase ne '';
-        $exifTool->Warn("Adjusted $dirName base by $fix",1);
-    } else {
-        if ($diff < 0 or $diff > 16 or $exifTool->Options('Verbose')) {
-            $exifTool->Warn("Possibly incorrect maker notes offsets (fix by $fix?)",1);
-        }
-        return 0;   # don't do the fix
-    }
-    $$dirInfo{Base} += $fix;
-    $$dirInfo{DataPos} -= $fix;
-    return $fix;
 }
 
 #------------------------------------------------------------------------------
@@ -2171,7 +2241,7 @@ sub ProcessExif($$$)
     if (defined $$dirInfo{MakerNoteAddr}) {
         $makerAddr = $$dirInfo{MakerNoteAddr};
         delete $$dirInfo{MakerNoteAddr};
-        if (FixBase($exifTool, $dirInfo)) {
+        if (Image::ExifTool::MakerNotes::FixBase($exifTool, $dirInfo)) {
             $base = $$dirInfo{Base};
             $dataPos = $$dirInfo{DataPos};
         }
@@ -2179,18 +2249,18 @@ sub ProcessExif($$$)
     if ($htmlDump) {
         if (defined $makerAddr) {
             my $hdrLen = $dirStart + $dataPos + $base - $makerAddr;
-            HtmlDump($exifTool, $makerAddr, $hdrLen, 'MakerNotes header',
+            $exifTool->HtmlDump($makerAddr, $hdrLen, 'MakerNotes header',
                      "$name header\\nSize: $hdrLen bytes") if $hdrLen > 0;
         }
         my $str = "$name entry count";
-        HtmlDump($exifTool, $dirStart + $dataPos + $base, 2, "$name entries",
+        $exifTool->HtmlDump($dirStart + $dataPos + $base, 2, "$name entries",
                  "$name\\nNum entries: $numEntries", 0);
         my $tip;
         if ($bytesFromEnd >= 4) {
             my $nxt = ($name =~ /^IFD(\d+)/) ? "IFD" . ($1 + 1) : 'Next IFD';
             $tip = sprintf("$nxt offset: 0x%.4x", Get32u($dataPt, $dirEnd));
         }
-        HtmlDump($exifTool, $dirEnd + $dataPos + $base, 4, "Next IFD", $tip, 0);
+        $exifTool->HtmlDump($dirEnd + $dataPos + $base, 4, "Next IFD", $tip, 0);
         $name = $dirName if $name =~ /^MakerNote/;
     }
 
@@ -2202,7 +2272,7 @@ sub ProcessExif($$$)
         my $format = Get16u($dataPt, $entry+2);
         my $count = Get32u($dataPt, $entry+4);
         if ($format < 1 or $format > 13) {
-            HtmlDump($exifTool,$entry+$dataPos+$base,12,"[invalid IFD entry]",
+            $exifTool->HtmlDump($entry+$dataPos+$base,12,"[invalid IFD entry]",
                      "Bad format value: $format", 1);
             # warn unless the IFD was just padded with zeros
             $format and $exifTool->Warn(
@@ -2220,7 +2290,15 @@ sub ProcessExif($$$)
                 $exifTool->Warn(sprintf("Invalid size ($size) for $dirName tag 0x%x",$tagID));
                 next;
             }
-            $valuePtr = Get32u($dataPt, $valuePtr) - $dataPos;
+            $valuePtr = Get32u($dataPt, $valuePtr);
+            # convert offset to pointer in $$dataPt
+            if ($$dirInfo{EntryBased} or (ref $$tagTablePtr{$tagID} eq 'HASH' and
+                $tagTablePtr->{$tagID}->{EntryBased}))
+            {
+                $valuePtr += $entry;
+            } else {
+                $valuePtr -= $dataPos;
+            }
             if ($valuePtr < 0 or $valuePtr+$size > $dataLen) {
                 # get value by seeking in file if we are allowed
                 if ($raf) {
@@ -2233,14 +2311,15 @@ sub ProcessExif($$$)
                         $valueDataLen = $size;
                         $valuePtr = 0;
                     } else {
-                        $exifTool->Error("Error reading value for $dirName entry $index");
-                        return undef;
+                        $exifTool->Warn("Error reading value for $dirName entry $index");
+                        return 0;
                     }
                 } else {
                     my $tagStr = sprintf("0x%x",$tagID);
                     $exifTool->Warn("Bad $dirName directory pointer for tag $tagStr");
                     next unless $htmlDump;
-                    $valueDataPt = \ (' ' x $size);
+                    $size = -1;     # size is meaningless
+                    $valueDataPt = \ '';
                     $valueDataPos = $valuePtr = 0;
                     $valueDataLen = -1; # flag the bad pointer
                 }
@@ -2321,29 +2400,37 @@ sub ProcessExif($$$)
                 # build our tool tip
                 my $tip = sprintf("$name $tagName\\nTag ID: 0x%.4x\\n", $tagID) .
                           "Format: $formatName[$format]\[$count]\\nSize: $size bytes\\n";
-                $tip .= sprintf("Value offset: 0x%.4x\\n", Get32u($dataPt,$entry+8)) if $size > 4;
-                my $tval = (length $val < 32) ? $val : substr($val,0,28) . '[...]';
+                if ($size > 4) {
+                    my $offPt = Get32u($dataPt,$entry+8);
+                    $tip .= sprintf("Value offset: 0x%.4x\\n", $offPt);
+                    my $actPt = $valuePtr + $valueDataPos + $base - $$exifTool{EXIF_POS};
+                    $tip .= sprintf("Actual offset: 0x%.4x\\n", $actPt) if $actPt != $offPt;
+                }
+                my $tval;
                 if ($valueDataLen < 0) {
                     $tval = '<bad offset>';
-                } elsif ($formatStr =~ /^(string|undef|binary)/) {
-                    # translate all characters that could mess up JavaScript
-                    $tval =~ tr/\\\x00-\x1f\x7f-\xff/./;
-                    $tval =~ tr/"/'/;
-                    $tval = "$tval";
-                } elsif ($tagInfo and Image::ExifTool::IsInt($tval)) {
-                    if ($$tagInfo{IsOffset}) {
-                        $tval = sprintf('0x%.4x', $tval);
-                    } elsif ($$tagInfo{PrintHex}) {
-                        $tval = sprintf('0x%x', $tval);
+                } else {
+                    $tval = (length $val < 32) ? $val : substr($val,0,28) . '[...]';
+                    if ($formatStr =~ /^(string|undef|binary)/) {
+                        # translate all characters that could mess up JavaScript
+                        $tval =~ tr/\\\x00-\x1f\x7f-\xff/./;
+                        $tval =~ tr/"/'/;
+                        $tval = "$tval";
+                    } elsif ($tagInfo and Image::ExifTool::IsInt($tval)) {
+                        if ($$tagInfo{IsOffset}) {
+                            $tval = sprintf('0x%.4x', $tval);
+                        } elsif ($$tagInfo{PrintHex}) {
+                            $tval = sprintf('0x%x', $tval);
+                        }
                     }
                 }
                 $tip .= "Value: $tval";
-                HtmlDump($exifTool,$entry+$dataPos+$base, 12, "$dname $colName", $tip, 1);
+                $exifTool->HtmlDump($entry+$dataPos+$base, 12, "$dname $colName", $tip, 1);
                 next if $valueDataLen < 0;  # don't process bad pointer entry
                 if ($size > 4 ) {
                     my $exifDumpPos = $valuePtr + $valueDataPos + $base;
                     # add value data block (underlining maker notes data)
-                    HtmlDump($exifTool,$exifDumpPos,$size,"$dname $tagName value",'',
+                    $exifTool->HtmlDump($exifDumpPos,$size,"$dname $tagName value",'',
                              $tagName eq 'MakerNotes' ? 4 : 0);
                 }
             } else {
@@ -2401,9 +2488,12 @@ sub ProcessExif($$$)
                     # set local $valuePtr relative to file $base for eval
                     my $valuePtr = $subdirStart + $subdirDataPos;
                     #### eval Start ($valuePtr, $val)
-                    $subdirStart = eval($$subdir{Start});
+                    my $newStart = eval($$subdir{Start});
                     # convert back to relative to $subdirDataPt
-                    $subdirStart -= $subdirDataPos;
+                    $newStart -= $subdirDataPos;
+                    # must adjust directory size if start changed
+                    $size -= $newStart - $subdirStart unless $$subdir{BadOffset};
+                    $subdirStart = $newStart;
                 }
                 # this is a pain, but some maker notes are always a specific
                 # byte order, regardless of the byte order of the file
@@ -2503,6 +2593,7 @@ sub ProcessExif($$$)
                     RAF      => $raf,
                     Parent   => $dirName,
                     FixBase  => $$subdir{FixBase},
+                    EntryBased=> $$subdir{EntryBased},
                     TagInfo  => $tagInfo,
                     SubIFD   => $$tagInfo{SubIFD},
                 );
@@ -2655,6 +2746,8 @@ under the same terms as Perl itself.
 =item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html>
 
 =item L<http://hul.harvard.edu/jhove/tiff-tags.html>
+
+=item L<http://www.microsoft.com/whdc/xps/wmphoto.mspx>
 
 =back
 

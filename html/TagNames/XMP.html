@@ -5,32 +5,32 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h2>XMP Tags</h2>
 
-XMP stands for &apos;Extensible Metadata Platform&apos;, an XML/RDF-based metadata
+XMP stands for &#39;Extensible Metadata Platform&#39;, an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, PNG,
 MIFF, PS, PDF, PSD and DNG.
 
-<p>The XMP <b>Tag ID</b>&apos;s aren&apos;t listed because in most cases they are identical
+<p>The XMP <b>Tag ID</b>&#39;s aren&#39;t listed because in most cases they are identical
 to the <b>Tag Name</b>.
 
 <p>All XMP information is stored as character strings.  The <b>Writable</b> column
 specifies the information format:  <code>integer</code> is a string of digits
-(possibly beginning with a &apos;+&apos; or &apos;-&apos;), <code>real</code> is a floating point number,
-<code>rational</code> is two <code>integer</code> strings separated by a &apos;/&apos; character, <code>date</code>
-is a date/time string in the format &apos;YYYY:MM:DD HH:MM:SS[+/-HH:MM]&apos;,
-<code>boolean</code> is either &apos;True&apos; or &apos;False&apos;, and <code>lang-alt</code> is a list of string
+(possibly beginning with a &#39;+&#39; or &#39;-&#39;), <code>real</code> is a floating point number,
+<code>rational</code> is two <code>integer</code> strings separated by a &#39;/&#39; character, <code>date</code>
+is a date/time string in the format &#39;YYYY:MM:DD HH:MM:SS[+/-HH:MM]&#39;,
+<code>boolean</code> is either &#39;True&#39; or &#39;False&#39;, and <code>lang-alt</code> is a list of string
 alternatives in different languages. Currently, ExifTool only writes the
-&apos;x-default&apos; language in <code>lang-alt</code> lists.
+&#39;x-default&#39; language in <code>lang-alt</code> lists.
 
 <p>The XMP tags are organized according to schema namespace in the following
 tables. The table names correspond to the XMP namespace prefixes, which are
-used to generate the family 1 group names by adding the prefix &apos;XMP-&apos;.  If
+used to generate the family 1 group names by adding the prefix &#39;XMP-&#39;.  If
 the same XMP tag name exists in more than one group, all groups are written
 unless a family 1 group name is specified. ie) If XMP:Contrast is specified,
 information will be written to both XMP-crs:Contrast and XMP-exif:Contrast.
 
 <p>ExifTool will extract XMP information even if it is not listed in these
-tables.  For example, the <code>pdfx</code> namespace doesn&apos;t have a predefined set of
+tables.  For example, the <code>pdfx</code> namespace doesn&#39;t have a predefined set of
 tag names because it is used to store application-defined PDF information,
 but this information is extracted by ExifTool anyway.
 
@@ -315,10 +315,10 @@ Photoshop Camera Raw Schema tags.
 <tr valign='top'>
 <td>ToneCurveName</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;Custom&apos; = Custom
-  <br>&apos;Linear&apos; = Linear
-  <br>&apos;Medium Contrast&apos; = Medium Contrast
-  <br>&apos;Strong Contrast&apos; = Strong Contrast</font></td></tr>
+<td><font size='-1'>&#39;Custom&#39; = Custom
+  <br>&#39;Linear&#39; = Linear
+  <br>&#39;Medium Contrast&#39; = Medium Contrast
+  <br>&#39;Strong Contrast&#39; = Strong Contrast</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Version</td>
 <td align='center'>string</td>
@@ -334,15 +334,15 @@ Photoshop Camera Raw Schema tags.
 <tr valign='top'>
 <td>WhiteBalance</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;As Shot&apos; = As Shot
-  <br>&apos;Auto&apos; = Auto
-  <br>&apos;Cloudy&apos; = Cloudy
-  <br>&apos;Custom&apos; = Custom
-  <br>&apos;Daylight&apos; = Daylight
-  <br>&apos;Flash&apos; = Flash
-  <br>&apos;Fluorescent&apos; = Fluorescent
-  <br>&apos;Shade&apos; = Shade
-  <br>&apos;Tungsten&apos; = Tungsten</font></td></tr>
+<td><font size='-1'>&#39;As Shot&#39; = As Shot
+  <br>&#39;Auto&#39; = Auto
+  <br>&#39;Cloudy&#39; = Cloudy
+  <br>&#39;Custom&#39; = Custom
+  <br>&#39;Daylight&#39; = Daylight
+  <br>&#39;Flash&#39; = Flash
+  <br>&#39;Fluorescent&#39; = Fluorescent
+  <br>&#39;Shade&#39; = Shade
+  <br>&#39;Tungsten&#39; = Tungsten</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='dc'>XMP dc Tags</a></h2>
@@ -432,14 +432,14 @@ other XMP tags.
 <tr valign='top'>
 <td>LicenseType</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;adware&apos; = Adware
-  <br>&apos;commercial&apos; = Commercial
-  <br>&apos;demo&apos; = Demo
-  <br>&apos;freeware&apos; = Freeware
-  <br>&apos;open source&apos; = Open Source
-  <br>&apos;public domain&apos; = Public Domain
-  <br>&apos;shareware&apos; = Shareware
-  <br>&apos;unknown&apos; = Unknown</font></td></tr>
+<td><font size='-1'>&#39;adware&#39; = Adware
+  <br>&#39;commercial&#39; = Commercial
+  <br>&#39;demo&#39; = Demo
+  <br>&#39;freeware&#39; = Freeware
+  <br>&#39;open source&#39; = Open Source
+  <br>&#39;public domain&#39; = Public Domain
+  <br>&#39;shareware&#39; = Shareware
+  <br>&#39;unknown&#39; = Unknown</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>OS</td>
 <td align='center'>integer</td>
@@ -631,8 +631,8 @@ EXIF schema for EXIF tags.
 <td align='center'>integer</td>
 <td><font size='-1'>1 = mm
   <br>10 = cm
-  <br>&apos;0.001&apos; = um
-  <br>&apos;25.4&apos; = inches</font></td></tr>
+  <br>&#39;0.001&#39; = um
+  <br>&#39;25.4&#39; = inches</font></td></tr>
 <tr valign='top'>
 <td>FocalPlaneXResolution</td>
 <td align='center'>rational</td>
@@ -669,8 +669,8 @@ EXIF schema for EXIF tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>GPSDestBearingRef</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;M&apos; = Magnetic North
-  <br>&apos;T&apos; = True North</font></td></tr>
+<td><font size='-1'>&#39;M&#39; = Magnetic North
+  <br>&#39;T&#39; = True North</font></td></tr>
 <tr valign='top'>
 <td>GPSDestDistance</td>
 <td align='center'>rational</td>
@@ -678,9 +678,9 @@ EXIF schema for EXIF tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>GPSDestDistanceRef</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;K&apos; = Kilometers
-  <br>&apos;M&apos; = Miles
-  <br>&apos;N&apos; = Nautical Miles</font></td></tr>
+<td><font size='-1'>&#39;K&#39; = Kilometers
+  <br>&#39;M&#39; = Miles
+  <br>&#39;N&#39; = Nautical Miles</font></td></tr>
 <tr valign='top'>
 <td>GPSDestLatitude</td>
 <td align='center'>string</td>
@@ -705,8 +705,8 @@ EXIF schema for EXIF tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>GPSImgDirectionRef</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;M&apos; = Magnetic North
-  <br>&apos;T&apos; = True North</font></td></tr>
+<td><font size='-1'>&#39;M&#39; = Magnetic North
+  <br>&#39;T&#39; = True North</font></td></tr>
 <tr valign='top'>
 <td>GPSLatitude</td>
 <td align='center'>string</td>
@@ -739,14 +739,14 @@ EXIF schema for EXIF tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>GPSSpeedRef</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;K&apos; = km/h
-  <br>&apos;M&apos; = mph
-  <br>&apos;N&apos; = knots</font></td></tr>
+<td><font size='-1'>&#39;K&#39; = km/h
+  <br>&#39;M&#39; = mph
+  <br>&#39;N&#39; = knots</font></td></tr>
 <tr valign='top'>
 <td>GPSStatus</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;A&apos; = Measurement In Progress
-  <br>&apos;V&apos; = Measurement Interoperability</font></td></tr>
+<td><font size='-1'>&#39;A&#39; = Measurement In Progress
+  <br>&#39;V&#39; = Measurement Interoperability</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>GPSTimeStamp</td>
 <td align='center'>date</td>
@@ -758,8 +758,8 @@ EXIF schema for EXIF tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>GPSTrackRef</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;M&apos; = Magnetic North
-  <br>&apos;T&apos; = True North</font></td></tr>
+<td><font size='-1'>&#39;M&#39; = Magnetic North
+  <br>&#39;T&#39; = True North</font></td></tr>
 <tr valign='top'>
 <td>GPSVersionID</td>
 <td align='center'>string</td>
@@ -1286,12 +1286,12 @@ EXIF schema for TIFF tags.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>YCbCrSubSampling</td>
 <td align='center'>string</td>
-<td><font size='-1'>&apos;1 1&apos; = YCbCr4:4:4
-  <br>&apos;1 2&apos; = YCbCr4:4:0
-  <br>&apos;2 1&apos; = YCbCr4:2:2
-  <br>&apos;2 2&apos; = YCbCr4:2:0
-  <br>&apos;4 1&apos; = YCbCr4:1:1
-  <br>&apos;4 2&apos; = YCbCr4:1:0</font></td></tr>
+<td><font size='-1'>&#39;1 1&#39; = YCbCr4:4:4
+  <br>&#39;1 2&#39; = YCbCr4:4:0
+  <br>&#39;2 1&#39; = YCbCr4:2:2
+  <br>&#39;2 2&#39; = YCbCr4:2:0
+  <br>&#39;4 1&#39; = YCbCr4:1:1
+  <br>&#39;4 2&#39; = YCbCr4:1:0</font></td></tr>
 <tr valign='top'>
 <td>YResolution</td>
 <td align='center'>rational</td>
@@ -1872,90 +1872,94 @@ XMP Media Management schema tags.
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>PreservedFileName</td>
+<td align='center'>string</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
 <td>RenditionClass</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>RenditionOfDocumentID</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>RenditionOfInstanceID</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>RenditionOfManager</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>RenditionOfManagerVariant</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>RenditionOfManageTo</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>RenditionOfManageUI</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>RenditionOfRenditionClass</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>RenditionOfRenditionParams</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>RenditionOfVersionID</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>RenditionParams</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>SaveID</td>
 <td align='center'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>VersionID</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsComments</td>
 <td align='center'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>VersionsEventAction</td>
 <td align='center'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsEventInstanceID</td>
 <td align='center'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>VersionsEventParameters</td>
 <td align='center'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsEventSoftwareAgent</td>
 <td align='center'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>VersionsEventWhen</td>
 <td align='center'>date+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsModifier</td>
 <td align='center'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>VersionsModifyDate</td>
 <td align='center'>date+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>VersionsVersion</td>
 <td align='center'>string+</td>
 <td>&nbsp;</td></tr>
@@ -2120,6 +2124,6 @@ XMP Paged-Text schema tags.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 17, 2006</i>
+<br><i>Last revised Jul 21, 2006</i>
 </body>
 </html>
