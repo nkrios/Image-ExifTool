@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 sub WritePS($$);
 sub CheckPS($$$);
@@ -248,7 +248,7 @@ sub ProcessPS($$)
         if ($mode) {
             if (not $endToken) {
                 $buff .= $data;
-                next unless $data =~ m{<\?xpacket end=.w.\?>$/};
+                next unless $data =~ m{<\?xpacket end=.(w|r).\?>($/|$)};
             } elsif ($data !~ /^$endToken/i) {
                 if ($mode eq 'XMP') {
                     $buff .= $data;
@@ -276,7 +276,7 @@ sub ProcessPS($$)
             $buff = $data;
             undef $endToken;    # no end token (just look for xpacket end)
             # XMP could be contained in a single line (if newlines are different)
-            next unless $data =~ m{<\?xpacket end=.w.\?>$/};
+            next unless $data =~ m{<\?xpacket end=.(w|r).\?>($/|$)};
         } elsif ($data =~ /^%%?(\w+): ?(.*)/s and $$tagTablePtr{$1}) {
             my ($tag, $val) = ($1, $2);
             # only allow 'ImageData' to have single leading '%'

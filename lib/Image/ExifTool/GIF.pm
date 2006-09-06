@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 #------------------------------------------------------------------------------
 # Process meta information in GIF image
@@ -60,112 +60,112 @@ sub ProcessGIF($$)
             $length = 3 * (2 << (ord($s) & 0x07));
             $raf->Read($buff, $length) == $length or return 0; # skip color table
             Write($outfile, $buff) or $err = 1 if $outfile;
-            # write the comment first if necessary
-            if ($outfile and defined $newComment) {
-                if ($type ne 'GIF87a') {
-                    # write comment marker
-                    Write($outfile, "\x21\xfe") or $err = 1;
-                    my $len = length($newComment);
-                    # write out the comment in 255-byte chunks, each
-                    # chunk beginning with a length byte
-                    my $n;
-                    for ($n=0; $n<$len; $n+=255) {
-                        my $size = $len - $n;
-                        $size > 255 and $size = 255;
-                        my $str = substr($newComment,$n,$size);
-                        Write($outfile, pack('C',$size), $str) or $err = 1;
-                    }
-                    Write($outfile, "\0") or $err = 1;  # empty chunk as terminator
-                    undef $newComment;
-                    ++$exifTool->{CHANGED};     # increment file changed flag
-                } else {
-                    $exifTool->Warn("The GIF87a format doesn't support comments");
+        }
+        # write the comment first if necessary
+        if ($outfile and defined $newComment) {
+            if ($type ne 'GIF87a') {
+                # write comment marker
+                Write($outfile, "\x21\xfe") or $err = 1;
+                my $len = length($newComment);
+                # write out the comment in 255-byte chunks, each
+                # chunk beginning with a length byte
+                my $n;
+                for ($n=0; $n<$len; $n+=255) {
+                    my $size = $len - $n;
+                    $size > 255 and $size = 255;
+                    my $str = substr($newComment,$n,$size);
+                    Write($outfile, pack('C',$size), $str) or $err = 1;
                 }
+                Write($outfile, "\0") or $err = 1;  # empty chunk as terminator
+                undef $newComment;
+                ++$exifTool->{CHANGED};     # increment file changed flag
+            } else {
+                $exifTool->Warn("The GIF87a format doesn't support comments");
             }
-            my $comment;
-            for (;;) {
+        }
+        my $comment;
+        for (;;) {
+            last unless $raf->Read($ch, 1);
+            if (ord($ch) == 0x2c) {
+                Write($outfile, $ch) or $err = 1 if $outfile;
+                # image descriptor
+                last unless $raf->Read($buff, 8) == 8;
                 last unless $raf->Read($ch, 1);
-                if (ord($ch) == 0x2c) {
-                    Write($outfile, $ch) or $err = 1 if $outfile;
-                    # image descriptor
-                    last unless $raf->Read($buff, 8) == 8;
-                    last unless $raf->Read($ch, 1);
-                    Write($outfile, $buff, $ch) or $err = 1 if $outfile;
-                    if (ord($ch) & 0x80) { # does color table exist?
-                        $length = 3 * (2 << (ord($ch) & 0x07));
-                        # skip the color table
-                        last unless $raf->Read($buff, $length) == $length;
-                        Write($outfile, $buff) or $err = 1 if $outfile;
-                    }
-                    # skip "LZW Minimum Code Size" byte
-                    last unless $raf->Read($buff, 1);
-                    Write($outfile,$buff) or $err = 1 if $outfile;
-                    # skip image blocks
-                    for (;;) {
-                        last unless $raf->Read($ch, 1);
-                        Write($outfile, $ch) or $err = 1 if $outfile;
-                        last unless ord($ch);
-                        last unless $raf->Read($buff, ord($ch));
-                        Write($outfile,$buff) or $err = 1 if $outfile;
-                    }
-                    next;  # continue with next field
+                Write($outfile, $buff, $ch) or $err = 1 if $outfile;
+                if (ord($ch) & 0x80) { # does color table exist?
+                    $length = 3 * (2 << (ord($ch) & 0x07));
+                    # skip the color table
+                    last unless $raf->Read($buff, $length) == $length;
+                    Write($outfile, $buff) or $err = 1 if $outfile;
                 }
+                # skip "LZW Minimum Code Size" byte
+                last unless $raf->Read($buff, 1);
+                Write($outfile,$buff) or $err = 1 if $outfile;
+                # skip image blocks
+                for (;;) {
+                    last unless $raf->Read($ch, 1);
+                    Write($outfile, $ch) or $err = 1 if $outfile;
+                    last unless ord($ch);
+                    last unless $raf->Read($buff, ord($ch));
+                    Write($outfile,$buff) or $err = 1 if $outfile;
+                }
+                next;  # continue with next field
+            }
 #               last if ord($ch) == 0x3b;  # normal end of GIF marker
-                unless (ord($ch) == 0x21) {
-                    if ($outfile) {
-                        Write($outfile, $ch) or $err = 1;
-                        # copy the rest of the file
-                        while ($raf->Read($buff, 65536)) {
-                            Write($outfile, $buff) or $err = 1;
-                        }
+            unless (ord($ch) == 0x21) {
+                if ($outfile) {
+                    Write($outfile, $ch) or $err = 1;
+                    # copy the rest of the file
+                    while ($raf->Read($buff, 65536)) {
+                        Write($outfile, $buff) or $err = 1;
                     }
+                }
+                $rtnVal = 1;
+                last;
+            }
+            # get extension block type/size
+            last unless $raf->Read($s, 2) == 2;
+            # get marker and block size
+            ($a,$length) = unpack("C"x2, $s);
+            if ($a == 0xfe) {  # is this a comment?
+                if ($setComment) {
+                    ++$exifTool->{CHANGED}; # increment the changed flag
+                } else {
+                    Write($outfile, $ch, $s) or $err = 1 if $outfile;
+                }
+                while ($length) {
+                    last unless $raf->Read($buff, $length) == $length;
+                    $verbose > 2 and Image::ExifTool::HexDump(\$buff, undef, Out => $out);
+                    if (defined $comment) {
+                        $comment .= $buff;  # add to comment string
+                    } else {
+                        $comment = $buff;
+                    }
+                    last unless $raf->Read($ch, 1);  # read next block header
+                    unless ($setComment) {
+                        Write($outfile, $buff, $ch) or $err = 1 if $outfile;
+                    }
+                    $length = ord($ch);  # get next block size
+                }
+                last if $length;    # was a read error if length isn't zero
+                # all done once we have found the comment unless writing file
+                unless ($outfile) {
                     $rtnVal = 1;
                     last;
                 }
-                # get extension block type/size
-                last unless $raf->Read($s, 2) == 2;
-                # get marker and block size
-                ($a,$length) = unpack("C"x2, $s);
-                if ($a == 0xfe) {  # is this a comment?
-                    if ($setComment) {
-                        ++$exifTool->{CHANGED}; # increment the changed flag
-                    } else {
-                        Write($outfile, $ch, $s) or $err = 1 if $outfile;
-                    }
-                    while ($length) {
-                        last unless $raf->Read($buff, $length) == $length;
-                        $verbose > 2 and Image::ExifTool::HexDump(\$buff, undef, Out => $out);
-                        if (defined $comment) {
-                            $comment .= $buff;  # add to comment string
-                        } else {
-                            $comment = $buff;
-                        }
-                        last unless $raf->Read($ch, 1);  # read next block header
-                        unless ($setComment) {
-                            Write($outfile, $buff, $ch) or $err = 1 if $outfile;
-                        }
-                        $length = ord($ch);  # get next block size
-                    }
-                    last if $length;    # was a read error if length isn't zero
-                    # all done once we have found the comment unless writing file
-                    unless ($outfile) {
-                        $rtnVal = 1;
-                        last;
-                    }
-                } else {
-                    Write($outfile, $ch, $s) or $err = 1 if $outfile;
-                    # skip the block
-                    while ($length) {
-                        last unless $raf->Read($buff, $length) == $length;
-                        Write($outfile, $buff) or $err = 1 if $outfile;
-                        last unless $raf->Read($ch, 1);  # read next block header
-                        Write($outfile, $ch) or $err = 1 if $outfile;
-                        $length = ord($ch);  # get next block size
-                    }
+            } else {
+                Write($outfile, $ch, $s) or $err = 1 if $outfile;
+                # skip the block
+                while ($length) {
+                    last unless $raf->Read($buff, $length) == $length;
+                    Write($outfile, $buff) or $err = 1 if $outfile;
+                    last unless $raf->Read($ch, 1);  # read next block header
+                    Write($outfile, $ch) or $err = 1 if $outfile;
+                    $length = ord($ch);  # get next block size
                 }
             }
-            $exifTool->FoundTag('Comment', $comment) if $comment;
         }
+        $exifTool->FoundTag('Comment', $comment) if $comment;
     }
     # set return value to -1 if we only had a write error
     $rtnVal = -1 if $rtnVal and $err;

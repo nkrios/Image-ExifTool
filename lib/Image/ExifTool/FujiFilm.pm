@@ -7,6 +7,7 @@
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_fuji.htm
+#               3) Michael Meissner private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::FujiFilm;
@@ -16,7 +17,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.07';
+$VERSION = '1.09';
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -133,6 +134,18 @@ $VERSION = '1.07';
             0x4 => 'Sports',
             0x5 => 'Night Scene',
             0x6 => 'Program AE',
+            0x7 => 'Natural Light', #3
+            0x8 => 'Anti-blur', #3
+            0xa => 'Sunset', #3
+            0xb => 'Museum', #3
+            0xc => 'Party', #3
+            0xd => 'Flower', #3
+            0xe => 'Text', #3
+            0xf => 'Natural Light & Flash', #3
+            0x10 => 'Beach', #3
+            0x11 => 'Snow', #3
+            0x12 => 'Fireworks', #3
+            0x13 => 'Underwater', #3
             0x100 => 'Aperture-priority AE',
             0x200 => 'Shutter speed priority AE',
             0x300 => 'Manual',
@@ -149,6 +162,7 @@ $VERSION = '1.07';
         PrintConv => {
             0 => 'Off',
             1 => 'On',
+            2 => 'No flash & flash', #3
         },
     },
     0x1101 => {
@@ -157,6 +171,7 @@ $VERSION = '1.07';
     },
     0x1210 => { #2
         Name => 'ColorMode',
+        Writable => 'int16u',
         PrintHex => 1,
         PrintConv => {
             0x00 => 'Standard',
@@ -309,6 +324,11 @@ under the same terms as Perl itself.
 =item (...plus testing with my own FinePix 2400 Zoom)
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Michael Meissner for decoding some new PictureMode and
+AutoBracketing values.
 
 =head1 SEE ALSO
 

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Writer_14_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1253 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:06:05 09:10:44
+[File, File, Time]  - File Modification Date/Time: 2006:09:01 12:52:48
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -53,6 +53,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 29.3
 [Composite, Composite, Image]  - Shutter Speed: 4
 [Composite, Composite, Image]  - Circle Of Confusion: 0.001 mm
+[Composite, Composite, Image]  - EV: 5.6
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 997.1mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 80.59 m
 [Composite, Composite, Image]  - Image Size: 8x8

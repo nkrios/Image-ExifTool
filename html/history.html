@@ -6,11 +6,83 @@
 <!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-(I'll be away from about July 28 to Aug. 21/06, so don't expect any updates or
-email responses during this period. - PH)<p>
-
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.29.tar.gz">Version 6.29</a>. (Other versions are
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.36.tar.gz">Version 6.36</a>. (Other versions are
 considered development releases, and are not uploaded to CPAN.)<p>
+
+<b>Sept. 6, 2006 - Version 6.36</b> (production release)
+<ul>
+<li>Added a few more Canon LensType's
+<li>Improved decoding of Canon 400D ExposureTime and FileNumber
+<li>Decode AFPointsUsed for PowerShot models with 9 AF points
+<li>Fixed decoding of Canon 5D PictureStyle
+</ul>
+
+<b>Sept. 5, 2006 - Version 6.35</b>
+<ul>
+<li>Added Canon NumAFPoints tag
+<li>Added support for Canon 400D custom functions
+<li>Renamed Canon AFPointsUsed20D to AFPointsUsed and decode for 30D and 400D
+<li>Changed phrasing in a text string to bypass bug in rpm build causing it to
+    obtain incorrect dependencies
+</ul>
+
+<b>Sept. 3, 2006 - Version 6.34</b>
+<ul>
+<li>Removed empirical offset from Canon:MeasuredEV
+</ul>
+
+<b>Sept. 1, 2006 - Version 6.33</b>
+<ul>
+<li>Added Composite:EV and Canon:MeasuredEV tags [comments welcome]
+</ul>
+
+<b>Sept. 1, 2006 - Version 6.32</b>
+<ul>
+<li>Decode a new value of "Auto High" for Canon CameraISO
+<li>Added new Canon AutoISO tag, renamed Canon:ISO tag to ShotISO, and added a
+    new composite ISO tag to give the ISO that was actually used
+<li>Decode CanonModelID's for recently announced Canon cameras (400D, etc)
+<li>Decode PentaxModelID for Optio S7
+<li>XMP Changes:
+    <ul>
+    <li>Added support for rdf:nodeID attribute in XMP information
+    <li>Changed XMP file MIME type from application/xmp to application/rdf+xml
+        to correspond with XMP specification
+    <li>Write 'rdf:about' instead of 'about' (unqualified use now deprecated)
+    <li>Don't write blank-line padding (as per XMP spec) for .XMP files
+    <li>Fixed problem extracting XMP information from some EPS files
+    <li>Fixed typos in some (not commonly used) XMP namespace URI's
+    </ul>
+<li>Fixed FocalLength conversion for some Pentax-built BenQ and Samsung models
+</ul>
+
+<b>Aug. 23, 2006 - Version 6.31</b>
+<ul>
+<li>Decode a number of new values for FujiFilm PictureMode (thanks Michael
+    Meissner)
+<li>Properly parse AVI DateTimeOriginal tag when month name is all capitals
+<li>Improved compatibility when running "exiftool" with no arguments (thanks
+    Jesse Zhang)
+<li>Added support for Nikon D80 lens information and recognize a new lens
+    (thanks Robert Rottmerhusen)
+<li>Improvements to Pentax maker note decoding (thanks Ger Vermeulen)
+<li>Fixed problem when extracting information from image in memory when the
+    UTF-8 flag is set for the image data (fixes install on RHEL 3)
+</ul>
+
+<b>July 28, 2006 - Version 6.30</b>
+<ul>
+<li>Added ability to read/write APP0 CIFF segment (found in Canon PowerShot A5
+    and PowerShot Pro 70 images)
+<li>Improved decoding of Canon 30D FileNumber (was ShutterCount)
+<li>Made EXIF tags ImageNumber and ImageHistory writable
+<li>Fixed decoding of TargetExposureTime for Canon 20D/250D and ExposureTime
+    for Kiss Digital N
+<li>Fixed problem processing GIF images which don't contain a color table
+<li>Fixed bug in EXIF tag name documentation introduced in 6.12 where ExifIFD
+    group was not properly shown
+<li>Fixed typo in exiftool pod documentation ("GROUP:TAG" was reversed)
+</ul>
 
 <b>July 24, 2006 - Version 6.29</b> (production release)
 <ul>

@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 my %offOn = (
     0 => 'Off',
@@ -31,7 +31,7 @@ my %offOn = (
         Name => 'MakerNoteOffset',
         Writable => 'int32u',
     },
-    0x0100 => 'SanyoThumbnail',
+    0x0100 => { Name => 'SanyoThumbnail',   Writable => 'undef' },
     0x0200 => {
         Name => 'SpecialMode',
         Writable => 'int32u',

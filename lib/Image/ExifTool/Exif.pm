@@ -33,7 +33,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.02';
+$VERSION = '2.06';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -984,21 +984,26 @@ my %longBin = (
             0x01 => 'Fired',
             0x05 => 'Fired, Return not detected',
             0x07 => 'Fired, Return detected',
+            0x08 => 'On, Did not fire', # not charged up?
             0x09 => 'On',
             0x0d => 'On, Return not detected',
             0x0f => 'On, Return detected',
             0x10 => 'Off',
+            0x14 => 'Off, Did not fire, Return not detected',
             0x18 => 'Auto, Did not fire',
             0x19 => 'Auto, Fired',
             0x1d => 'Auto, Fired, Return not detected',
             0x1f => 'Auto, Fired, Return detected',
             0x20 => 'No flash function',
+            0x30 => 'Off, No flash function',
             0x41 => 'Fired, Red-eye reduction',
             0x45 => 'Fired, Red-eye reduction, Return not detected',
             0x47 => 'Fired, Red-eye reduction, Return detected',
             0x49 => 'On, Red-eye reduction',
             0x4d => 'On, Red-eye reduction, Return not detected',
             0x4f => 'On, Red-eye reduction, Return detected',
+            0x50 => 'Off, Red-eye reduction',
+            0x58 => 'Auto, Did not fire, Red-eye reduction',
             0x59 => 'Auto, Fired, Red-eye reduction',
             0x5d => 'Auto, Fired, Red-eye reduction, Return not detected',
             0x5f => 'Auto, Fired, Red-eye reduction, Return detected',
@@ -1118,6 +1123,7 @@ my %longBin = (
     0xa000 => 'FlashpixVersion',
     0xa001 => {
         Name => 'ColorSpace',
+        Notes => 'the value of 2 is not standard EXIF',
         PrintConv => {
             1 => 'sRGB',
             2 => 'Adobe RGB',
@@ -1649,6 +1655,15 @@ my %longBin = (
         ValueConv => '$val[0] || $val[1]',
         PrintConv => 'sprintf("%.1f", $val)',
     },
+    EV => {
+        Require => {
+            0 => 'Aperture',
+            1 => 'ShutterSpeed',
+            2 => 'ISO',
+        },
+        ValueConv => 'Image::ExifTool::Exif::CalculateEV($val[0],$val[1],$prt[2])',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
     FocalLength35efl => {
         Description => 'Focal Length',
         Notes => 'this value may be incorrect if image has been resized',
@@ -1871,6 +1886,22 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::Exif::Composite');
 sub AUTOLOAD
 {
     return Image::ExifTool::DoAutoLoad($AUTOLOAD, @_);
+}
+
+#------------------------------------------------------------------------------
+# Calculate EV (Exposure Value)
+# Inputs: 0) Aperture, 1) ShutterSpeed, 2) ISO
+# Returns: EV
+sub CalculateEV($$$)
+{
+    local $_;
+    # do validity checks on arguments
+    return undef unless @_ >= 3;
+    foreach (@_) {
+        return undef unless defined $_ and Image::ExifTool::IsFloat($_) and $_ > 0;
+    }
+    # (EV 0 is defined as f/1.0 at 1 second with ISO 100)
+    return (2*log($_[0]) - log($_[1]) - log($_[2]/100)) / log(2);
 }
 
 #------------------------------------------------------------------------------

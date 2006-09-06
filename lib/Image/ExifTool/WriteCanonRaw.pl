@@ -499,25 +499,31 @@ sub WriteCRW($$)
     my $rtnVal = 0;
     my ($buff, $err, $sig);
 
-    $raf->Read($buff,2) == 2 or return 0;
-    SetByteOrder($buff)      or return 0;
-    $raf->Read($buff,4) == 4 or return 0;
-    $raf->Read($sig,8) == 8  or return 0;   # get file signature
-    $sig eq 'HEAPCCDR'       or return 0;   # validate signature
+    $raf->Read($buff,2) == 2    or return 0;
+    SetByteOrder($buff)         or return 0;
+    $raf->Read($buff,4) == 4    or return 0;
+    $raf->Read($sig,8) == 8     or return 0;   # get file signature
+    $sig =~ /^HEAP(CCDR|JPGM)/  or return 0;   # validate signature
+    my $type = $1;
     my $hlen = Get32u(\$buff, 0);   # get header length
 
+    if ($exifTool->{DEL_GROUP}) {
+        if ($type eq 'CCDR') {
+            $exifTool->Error("Can't delete groups in CRW file");
+            return 0;
+        } elsif ($exifTool->{DEL_GROUP}->{MakerNotes}) {
+            ++$exifTool->{CHANGED};
+            return 1;
+        }
+    }
+
     # write header
-    $raf->Seek(0, 0)         or return 0;
+    $raf->Seek(0, 0)            or return 0;
     $raf->Read($buff, $hlen) == $hlen or return 0;
     Write($outfile, $buff) or $err = 1;
 
-    $raf->Seek(0, 2)         or return 0;   # seek to end of file
+    $raf->Seek(0, 2)            or return 0;   # seek to end of file
     my $filesize = $raf->Tell() or return 0;
-
-    if ($exifTool->{DEL_GROUP}) {
-        $exifTool->Error("Can't delete groups in CRW file");
-        return 0;
-    }
 
     # build directory information for main raw directory
     my %dirInfo = (
@@ -530,7 +536,6 @@ sub WriteCRW($$)
         OutFile  => $outfile,
         OutPos   => $hlen,
     );
-
     # process the raw directory
     my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
     my $msg = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);

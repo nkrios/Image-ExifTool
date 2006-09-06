@@ -36,7 +36,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.45';
+$VERSION = '1.47';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -149,6 +149,7 @@ my %nikonLensIDs = (
     '8A 54 6A 6A 24 24 8C 0E' => 'AF-S VR Micro-Nikkor 105mm f/2.8G IF-ED', #10
     '8B 40 2D 80 2C 3C 8D 0E' => 'AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED',
     '8C 40 2D 53 2C 3C 8E 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
+    '8F 40 2D 72 2C 3C 91 06' => 'AF-S DX Zoom-Nikkor 18-135mm f/3.5-5.6G IF-ED',
 #
     '06 3F 68 68 2C 2C 06 00' => 'Cosina 100mm F/3.5 Macro',
 #
@@ -268,8 +269,8 @@ my %nikonLensIDs = (
         # (may be different than ISO setting if auto)
         Name => 'ISO',
         Writable => 'int16u',
-        Priority => 0,  # the EXIF ISO is more reliable
         Count => 2,
+        Priority => 0,  # the EXIF ISO is more reliable
         Groups => { 2 => 'Image' },
         PrintConv => '$_=$val;s/^0 //;$_',
         PrintConvInv => '"0 $val"',
@@ -383,6 +384,8 @@ my %nikonLensIDs = (
     },
     0x001b => { #15
         Name => 'CropHiSpeed',
+        Writable => 'int16u',
+        Count => 7,
         PrintConv => q{
             my @a = split ' ', $val;
             return "Unknown ($val)" unless @a == 7;
@@ -496,6 +499,7 @@ my %nikonLensIDs = (
     },
     0x008a => { #15
         Name => 'AutoBracketRelease',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'None',
             1 => 'Auto Release',
@@ -616,7 +620,7 @@ my %nikonLensIDs = (
         },
         # note: this information is encrypted if the version is 02xx
         { #8
-            Condition => '$$valPt =~ /^0201/',
+            Condition => '$$valPt =~ /^020(1|2)/', # D80 is version 0202 (PH)
             Name => 'LensData0201',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensData01',
@@ -642,7 +646,10 @@ my %nikonLensIDs = (
         PrintConvInv => '$val=~tr/a-zA-Z/ /;$val',
     },
     0x00a0 => { Name => 'SerialNumber',     Writable => 'string' }, #2
-    0x00a2 => { Name => 'ImageDataSize' }, # size of compressed image data plus EOI segment (ref 10)
+    0x00a2 => { # size of compressed image data plus EOI segment (ref 10)
+        Name => 'ImageDataSize',
+        Writable => 'int32u',
+    },
     0x00a5 => { #15
         Name => 'ImageCount',
         Writable => 'int32u',
@@ -669,6 +676,7 @@ my %nikonLensIDs = (
     0x00ad => { Name => 'AFResponse',       Writable => 'string' }, #14
     0x00b1 => { #14
         Name => 'HighISONoiseReduction',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'On for ISO 1600/3200',
@@ -696,7 +704,10 @@ my %nikonLensIDs = (
             TagTable => 'Image::ExifTool::NikonCapture::Main',
         },
     },
-    0x0e09 => 'NikonCaptureVersion', #12
+    0x0e09 => { #12
+        Name => 'NikonCaptureVersion',
+        Writable => 'string',
+    },
     # 0x0e0e is in D70 Nikon Capture files (not out-of-the-camera D70 files) - PH
     0x0e0e => { #PH
         Name => 'NikonCaptureOffsets',

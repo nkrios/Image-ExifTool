@@ -1,4 +1,4 @@
-  ExifToolVersion = 6.27
+  ExifToolVersion = 6.35
   FileName = ExifTool.jpg
   Directory = t/images
   FileSize = 2697
@@ -236,9 +236,15 @@ JPEG APP1 (2442 bytes):
   | | |         0484: 28 00 00 00 fc 00 00 00 ff ff 00 00 00 00 00 00 [(...............]
   | | |         0494: 00 00                                           [..]
   | | | + [BinaryData directory, 66 bytes]
-  | | | | ISO = 160
+  | | | | AutoISO = 0
+  | | | | - Tag 0x0001 (2 bytes, int16s[1]):
+  | | | |     0456: 00 00                                           [..]
+  | | | | ShotISO = 160
   | | | | - Tag 0x0002 (2 bytes, int16s[1]):
   | | | |     0458: a0 00                                           [..]
+  | | | | MeasuredEV = -200
+  | | | | - Tag 0x0003 (2 bytes, int16s[1]):
+  | | | |     045a: 38 ff                                           [8.]
   | | | | TargetAperture = 244
   | | | | - Tag 0x0004 (2 bytes, int16s[1]):
   | | | |     045c: f4 00                                           [..]
@@ -425,6 +431,9 @@ JPEG APP1 (2442 bytes):
   | | |         07e0: f6 03 60 02 00 00 00 00 00 00 a0 fd 0a fc 00 00 [..`.............]
   | | |         07f0: 00 00 06 fe 00 00 fa 01 00 00 00 00 00 00 ff ff [................]
   | | | + [BinaryData directory, 48 bytes]
+  | | | | NumAFPoints = 7
+  | | | | - Tag 0x0001 (2 bytes, int16u[1]):
+  | | | |     07d2: 07 00                                           [..]
   | | | | CanonImageWidth = 3072
   | | | | - Tag 0x0002 (2 bytes, int16u[1]):
   | | | |     07d4: 00 0c                                           [..]

@@ -33,7 +33,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '0.20';
+$VERSION = '0.21';
 
 sub ProcessMIEGroup($$$);
 sub WriteMIEGroup($$$);
@@ -144,8 +144,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Currently defined types are ACR, AIFC, AIFF, ASF, AVI, BMP, CR2, CRW, DICOM,
             DNG, EPS, ERF, GIF, ICC, JNG, JP2, JPEG, MIE, MIFF, MNG, MOS, MOV, MP3, MP4,
             MPEG, MRW, NEF, ORF, PBM, PDF, PGM, PICT, PNG, PPM, PS, PSD, QTIF, RAF, RAW,
-            RIFF, SR2, SRF, TIFF, WAV, WMA, WMV, X3F and XMP.  Other types should simply
-            use the common file extension.
+            RIFF, SR2, SRF, TIFF, WAV, WMA, WMV, X3F and XMP.  Other types should use
+            the common file extension.
         },
     },
    '1Directory' => { Name => 'SubfileDirectory' },

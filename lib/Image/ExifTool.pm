@@ -24,10 +24,10 @@ use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables @tableOrd
             $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old $myAPP5hdr
             @loadAllTables %UserDefined);
 
-$VERSION = '6.29';
+$VERSION = '6.36';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
-    Public => [ qw(
+    Public => [qw(
         ImageInfo Options ClearOptions ExtractInfo GetInfo WriteInfo CombineInfo
         GetTagList GetFoundTags GetRequestedTags GetValue SetNewValue
         SetNewValuesFromFile GetNewValues CountNewValues SaveNewValues
@@ -253,7 +253,7 @@ my %mimeType = (
     WMA  => 'audio/x-ms-wma',
     WMV  => 'video/x-ms-wmv',
     X3F  => 'image/x-raw',
-    XMP  => 'application/xmp',
+    XMP  => 'application/rdf+xml',
 );
 
 # module names for each file type
@@ -493,10 +493,10 @@ my $evalWarning;    # eval warning message
 
 # special tag names (not used for tag info)
 my %specialTags = (
-    PROCESS_PROC=>1, WRITE_PROC=>1, CHECK_PROC=>1, GROUPS=>1, FORMAT=>1,
-    FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1, DID_TAG_ID=>1, WRITABLE=>1,
-    NOTES=>1, IS_OFFSET=>1, EXTRACT_UNKNOWN=>1, NAMESPACE=>1, PREFERRED=>1,
-    PARENT=>1, PRIORITY=>1, WRITE_GROUP=>1, LANG_INFO=>1, VARS=>1,
+    PROCESS_PROC=>1, WRITE_PROC=>1, CHECK_PROC=>1, GROUPS=>1, DATAMEMBER=>1,
+    FORMAT=>1, FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1, DID_TAG_ID=>1,
+    WRITABLE=>1, NOTES=>1, IS_OFFSET=>1, EXTRACT_UNKNOWN=>1, NAMESPACE=>1,
+    PREFERRED=>1, PARENT=>1, PRIORITY=>1, WRITE_GROUP=>1, LANG_INFO=>1, VARS=>1,
 );
 
 #------------------------------------------------------------------------------
@@ -1452,6 +1452,12 @@ sub ParseArguments($;@)
                 }
             } elsif (ref $arg eq 'SCALAR' or UNIVERSAL::isa($arg,'GLOB')) {
                 next if defined $self->{RAF};
+                # convert image data from UTF-8 to character stream if necessary
+                # (patches RHEL 3 UTF8 LANG problem)
+                if (ref $arg eq 'SCALAR' and eval 'require Encode; Encode::is_utf8($$arg)') {
+                    my $buff = pack('C*', unpack('U*', $$arg));
+                    $arg = \$buff;
+                }
                 $self->{RAF} = new File::RandomAccess($arg);
                 # set filename to empty string to indicate that
                 # we have a file but we didn't open it
@@ -2557,7 +2563,7 @@ sub ProcessJPEG($$)
                 HexDump($segDataPt, undef, %dumpParms, %extraParms);
             }
         }
-        if ($marker == 0xe0) {              # APP0 (JFIF)
+        if ($marker == 0xe0) {              # APP0 (JFIF, CIFF)
             if ($$segDataPt =~ /^JFIF\0/) {
                 $self->HtmlDump($segPos-4, $length+4, "JFIF segment",
                          'Size: ' . ($length + 4) . ' bytes', 0);
@@ -2574,6 +2580,12 @@ sub ProcessJPEG($$)
                 my $tagTablePtr = GetTagTable('Image::ExifTool::JFIF::Extension');
                 my $tagInfo = $self->GetTagInfo($tagTablePtr, 0x10);
                 $self->FoundTag($tagInfo, substr($$segDataPt, 6));
+            } elsif ($$segDataPt =~ /^(II|MM).{4}HEAPJPGM/) {
+                my %dirInfo = (
+                    RAF => new File::RandomAccess($segDataPt),
+                );
+                require Image::ExifTool::CanonRaw;
+                Image::ExifTool::CanonRaw::ProcessCRW($self, \%dirInfo);
             }
         } elsif ($marker == 0xe1) {         # APP1 (EXIF, XMP)
             if ($$segDataPt =~ /^Exif\0/) { # (some Kodak cameras don't put a second \0)
@@ -3512,6 +3524,8 @@ sub ProcessBinaryData($$$)
     if ($unknown > 1 and defined $$tagTablePtr{FIRST_ENTRY}) {
         # scan through entire binary table
         @tags = ($$tagTablePtr{FIRST_ENTRY}..(int($size/$increment) - 1));
+    } elsif ($$dirInfo{DataMember}) {
+        @tags = @{$$dirInfo{DataMember}};
     } else {
         # extract known tags in numerical order
         @tags = sort { $a <=> $b } TagTableKeys($tagTablePtr);

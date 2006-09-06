@@ -384,7 +384,9 @@ my %writeTable = (
         Writable => 'rational64u',
         PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
+    0x9211 => 'int32u',     # ImageNumber
     0x9212 => 'string',     # SecurityClassification
+    0x9213 => 'string',     # ImageHistory
     0x9214 => {             # SubjectLocation
         Writable => 'int16u',
         Count => 4,  # write this SubjectLocation with 4 and the other with 2 values

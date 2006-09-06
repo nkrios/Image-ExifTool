@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub ProcessPanasonicType2($$$);
 
@@ -229,6 +229,7 @@ sub ProcessPanasonicType2($$$);
     },
     0x30 => { #7
         Name => 'Rotation',
+        Writable => 'int16u',
         PrintConv => {
             1 => 'Horizontal (normal)',
             6 => 'Rotate 90 CW', #PH (ref 7 gives 270 CW)
@@ -237,6 +238,7 @@ sub ProcessPanasonicType2($$$);
     },
     0x32 => { #7
         Name => 'ColorMode',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Normal',
             1 => 'Natural',

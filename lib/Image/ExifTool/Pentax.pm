@@ -24,6 +24,7 @@
 #              11) http://forums.dpreview.com/forums/read.asp?forum=1036&message=17465929
 #              12) Derby Chang private communication
 #              13) http://homepage3.nifty.com/kamisaka/makernote/makernote_pentax.htm
+#              14) Ger Vermeulen private communication (tests with Optio S6)
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -33,7 +34,7 @@ package Image::ExifTool::Pentax;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.33';
+$VERSION = '1.36';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -107,6 +108,7 @@ my %pentaxCities = (
     67 => 'Nairobi',
     68 => 'Amsterdam',
     69 => 'Stockholm',
+    70 => 'Lisbon', #14
 );
 
 %Image::ExifTool::Pentax::Main = (
@@ -149,6 +151,7 @@ my %pentaxCities = (
     },
     0x0005 => { #13
         Name => 'PentaxModelID',
+        Writable => 'int32u',
         PrintHex => 1,
         PrintConv => { #PH
             0x0000d => 'Optio 330/430',
@@ -192,6 +195,7 @@ my %pentaxCities = (
             0x12bb0 => 'Optio T10',
             0x12be2 => 'Optio W10',
             0x12bf6 => 'Optio M10',
+            0x12c28 => 'Optio S7',
         },
     },
     0x0006 => { #5
@@ -236,14 +240,14 @@ my %pentaxCities = (
             3 => '1280x960', #PH (Optio WP)
             4 => '1600x1200',
             5 => '2048x1536',
-            8 => '2560x1920', #PH (Optio WP)
+            8 => '2560x1920 or 2304x1728', #PH (Optio WP) or #14
             10 => '3264x2448', #13
             19 => '320x240', #PH (Optio WP)
             20 => '2288x1712', #13
             21 => '2592x1944',
-            22 => '2304x1728', #2
+            22 => '2304x1728 or 2592x1944', #2 or #14
             23 => '3056x2296', #13
-            25 => '2816x2212', #13
+            25 => '2816x2212 or 2816x2112', #13 or #14
             '0 0' => '2304x1728', #13
             '5 0' => '2048x1536', #13
             '8 0' => '2560x1920', #13
@@ -269,7 +273,7 @@ my %pentaxCities = (
             9 => 'Night Scene',
             11 => 'Soft', #PH
             12 => 'Surf & Snow',
-            13 => 'Sunset',
+            13 => 'Sunset or Candlelight', #14 (Candlelight)
             14 => 'Autumn',
             15 => 'Flower',
             17 => 'Fireworks',
@@ -288,6 +292,7 @@ my %pentaxCities = (
             54 => 'Candlelight', #PH
             55 => 'Natural Skin Tone', #PH
             56 => 'Synchro Sound Record', #PH
+            58 => 'Frame Composite', #14
             '0 0' => 'Auto', #13
             '0 2' => 'Program AE', #13
             '5 2' => 'Portrait', #13
@@ -345,6 +350,7 @@ my %pentaxCities = (
         PrintHex => 1,
         PrintConv => {
             0xffff => 'None',
+            0 => 'Multiple', #14
             1 => 'Top-left',
             2 => 'Top-center',
             3 => 'Top-right',
@@ -374,7 +380,7 @@ my %pentaxCities = (
         Name => 'FNumber',
         Writable => 'int16u',
         Priority => 0,
-        ValueConv => '$val * 0.1',
+        ValueConv => '$val / 10',
         ValueConvInv => '$val * 10',
         PrintConv => 'sprintf("%.1f",$val)',
         PrintConvInv => '$val',
@@ -415,7 +421,7 @@ my %pentaxCities = (
     0x0016 => { #PH
         Name => 'ExposureCompensation',
         Writable => 'int16u',
-        ValueConv => '($val - 50) * 0.1',
+        ValueConv => '($val - 50) / 10',
         ValueConvInv => 'int($val * 10 + 50.5)',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         PrintConvInv => 'eval $val',
@@ -454,10 +460,10 @@ my %pentaxCities = (
         Name => 'WhiteBalanceMode',
         Writable => 'int16u',
         PrintConv => {
-            1 => 'Auto (Daylight?)',
-            2 => 'Auto (Shade?)',
-            3 => 'Auto (Flash?)',
-            4 => 'Auto (Tungsten?)',
+            1 => 'Auto (Daylight)',
+            2 => 'Auto (Shade)',
+            3 => 'Auto (Flash)',
+            4 => 'Auto (Tungsten)',
             0xffff => 'User-Selected',
             0xfffe => 'Preset (Fireworks?)', #PH
         },
@@ -474,23 +480,29 @@ my %pentaxCities = (
         ValueConv => '$val / 256',
         ValueConvInv => 'int($val * 256 + 0.5)',
     },
-    # Would be nice if there was a general way to determine units for FocalLength.
-    # Optio 550 uses .1mm while *istD, Optio S and Optio WP use .01 - PH
     0x001d => [
+        # Would be nice if there was a general way to determine units for FocalLength...
         {
-            Condition => '$self->{CameraModel} =~ /(\*ist D|Optio [A-Z])/',
+            # Optio 30, 33WR, 43WR, 450, 550, 555, 750Z, X
             Name => 'FocalLength',
+            Condition => '$self->{CameraModel} =~ /^PENTAX Optio (30|33WR|43WR|450|550|555|750Z|X)\b/',
             Writable => 'int32u',
-            ValueConv => '$val * 0.01',
-            ValueConvInv => '$val / 0.01',
+            Priority => 0,
+            ValueConv => '$val / 10',
+            ValueConvInv => '$val * 10',
             PrintConv => 'sprintf("%.1fmm",$val)',
             PrintConvInv => '$val=~s/mm//;$val',
         },
         {
+            # K100D, Optio 230, 330GS, 33L, 33LF, A10, M10, MX, MX4, S, S30,
+            # S4, S4i, S5i, S5n, S5z, S6, S45, S50, S55, S60, SV, Svi, W10, WP,
+            # *ist D, DL, DL2, DS, DS2
+            # (Note: the Optio S6 seems to report the minimum focal length - PH)
             Name => 'FocalLength',
             Writable => 'int32u',
-            ValueConv => '$val * 0.1',
-            ValueConvInv => '$val / 0.1',
+            Priority => 0,
+            ValueConv => '$val / 100',
+            ValueConvInv => '$val * 100',
             PrintConv => 'sprintf("%.1fmm",$val)',
             PrintConvInv => '$val=~s/mm//;$val',
         },
@@ -499,10 +511,11 @@ my %pentaxCities = (
     0x001e => {
         Name => 'DigitalZoom',
         Writable => 'int16u',
+        ValueConv => '$val / 100', #14
+        ValueConvInv => '$val * 100', #14
     },
     0x001f => {
         Name => 'Saturation',
-        Notes => 'Pentax models',
         Writable => 'int16u',
         PrintConv => {
             0 => 'Low', #PH
@@ -518,7 +531,6 @@ my %pentaxCities = (
     },
     0x0020 => {
         Name => 'Contrast',
-        Notes => 'Pentax models',
         Writable => 'int16u',
         PrintConv => {
             0 => 'Low', #PH
@@ -534,7 +546,6 @@ my %pentaxCities = (
     },
     0x0021 => {
         Name => 'Sharpness',
-        Notes => 'Pentax models',
         Writable => 'int16u',
         PrintConv => {
             0 => 'Soft', #PH
@@ -589,6 +600,7 @@ my %pentaxCities = (
     # 0x0034 - DriveMode ? (ref 13)
     0x0037 => { #13
         Name => 'ColorSpace',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'sRGB',
             1 => 'AdobeRGB',
@@ -824,13 +836,13 @@ my %pentaxCities = (
     0x2a => {
         Name => 'FNumber',
         Format => 'int32u',
-        ValueConv => '$val * 0.1',
+        ValueConv => '$val / 10',
         PrintConv => 'sprintf("%.1f",$val)',
     },
     0x32 => {
         Name => 'ExposureCompensation',
         Format => 'int32s',
-        ValueConv => '$val * 0.1',
+        ValueConv => '$val / 10',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x44 => {
@@ -848,7 +860,7 @@ my %pentaxCities = (
     0x48 => {
         Name => 'FocalLength',
         Writable => 'int32u',
-        ValueConv => '$val * 0.1',
+        ValueConv => '$val / 10',
         PrintConv => 'sprintf("%.1fmm",$val)',
     },
     0xaf => {

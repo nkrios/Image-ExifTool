@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 %Image::ExifTool::Casio::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -227,6 +227,7 @@ $VERSION = '1.15';
     },
     0x0019 => { #4
         Name => 'FlashIntensity',
+        Writable => 'int16u',
         PrintConv => {
             1 => 'Normal',
             2 => 'Weak',
@@ -507,6 +508,7 @@ $VERSION = '1.15';
     # 0x301e - MultiBracket ? (ref 3)
     0x3020 => { #3
         Name => 'ImageStabilization',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'On',

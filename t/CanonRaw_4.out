@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.36
 [File, File, Image]  - File Name: CanonRaw_4_failed.crw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
@@ -25,7 +25,7 @@
 [MakerNotes, CanonRaw, Camera] 2070 - Original File Name: CRW_1602.CRW
 [MakerNotes, CanonRaw, Camera] 2071 - Thumbnail File Name: CRW_1602.THM
 [MakerNotes, CanonRaw, Camera] 2053 - User Comment: 
-[MakerNotes, CanonRaw, Camera] 6164 - Measured EV: -0.375
+[MakerNotes, CanonRaw, Camera] 6164 - Measured EV: -6.19999980926514
 [MakerNotes, CanonRaw, Camera] 2053 - Canon File Description: EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, CanonRaw, Camera] 2069 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, CanonRaw, Camera] 2064 - Owner's Name: Phil Harvey
@@ -38,7 +38,9 @@
 [MakerNotes, Canon, Image] 1 - Focal Length: 34mm
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 35.00mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
-[MakerNotes, Canon, Image] 2 - ISO: 100
+[MakerNotes, Canon, Image] 1 - Auto ISO: 100
+[MakerNotes, Canon, Image] 2 - Shot ISO: 100
+[MakerNotes, Canon, Image] 3 - Measured EV: -6.2
 [MakerNotes, Canon, Image] 4 - Target Aperture: 14
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/60
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
@@ -73,7 +75,7 @@
 [MakerNotes, Canon, Camera] 13 - Contrast: +1
 [MakerNotes, Canon, Camera] 14 - Saturation: +1
 [MakerNotes, Canon, Camera] 15 - Sharpness: +1
-[MakerNotes, Canon, Camera] 16 - Camera ISO: Use shot ISO instead
+[MakerNotes, Canon, Camera] 16 - Camera ISO: Use ShotISO
 [MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 19 - AF Point: Manual AF point selection
@@ -97,11 +99,12 @@
 [MakerNotes, Canon, Image] 7 - Sensor Right Border: 3143
 [MakerNotes, Canon, Image] 8 - Sensor Bottom Border: 2063
 [MakerNotes, CanonRaw, Camera] 6197 - Decoder Table: 1 0 514 4120111
+[MakerNotes, Canon, Image] 1 - Num AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
 [MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
-[MakerNotes, Canon, Image] 22 - AF Points Used: Center
+[MakerNotes, Canon, Image] 22 - AF Points Used: (none)
 [MakerNotes, CanonRaw, Camera] 4270 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 0 - WB RGGB Levels Auto: 1719 832 831 990
 [MakerNotes, Canon, Camera] 4 - WB RGGB Levels Daylight: 1722 832 831 989
@@ -121,6 +124,7 @@
 [Composite, Composite, Image]  - Aperture: 14.3
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
+[Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.1
 [Composite, Composite, Camera]  - Shooting Mode: Manual
@@ -128,6 +132,7 @@
 [Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
 [Composite, Composite, Camera]  - Blue Balance: 1.190619
 [Composite, Composite, Image]  - Circle Of Confusion: 0.027 mm
+[Composite, Composite, Image]  - EV: 5.7
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 38.4mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 3.05 m
 [Composite, Composite, Image]  - Image Size: 3072x2048

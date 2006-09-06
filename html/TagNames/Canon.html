@@ -81,16 +81,18 @@
   <br>CustomFunctions20D
   <br>CustomFunctions30D
   <br>CustomFunctions350D
+  <br>CustomFunctions400D
   <br>CustomFunctionsD30
   <br>CustomFunctionsD60
   <br>CustomFunctionsUnknown</td>
-<td align='center'>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
+<td align='center'>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions5D'>CanonCustom Functions5D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions30D'>CanonCustom Functions30D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#Functions350D'>CanonCustom Functions350D Tags</a>
+  <br>--&gt; <a href='CanonCustom.html#Functions400D'>CanonCustom Functions400D Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FuncsUnknown'>CanonCustom FuncsUnknown Tags</a></td></tr>
@@ -163,9 +165,13 @@
   <br>0x1960000 = PowerShot A540
   <br>0x1970000 = PowerShot SD600 / Digital IXUS 60 / IXY Digital 70
   <br>0x1990000 = PowerShot A530
+  <br>0x2020000 = PowerShot A710 IS
+  <br>0x2030000 = PowerShot A640
+  <br>0x2040000 = PowerShot A630
   <br>0x3010000 = PowerShot Pro90 IS
   <br>0x4040000 = PowerShot G1
   <br>0x6040000 = PowerShot S100 / Digital IXUS / IXY Digital
+  <br>0x4007d675 = HV10
   <br>0x80000001 = EOS-1D
   <br>0x80000167 = EOS-1DS
   <br>0x80000168 = EOS 10D
@@ -176,7 +182,8 @@
   <br>0x80000189 = EOS Digital Rebel XT / 350D / Kiss Digital N
   <br>0x80000213 = EOS 5D
   <br>0x80000232 = EOS-1D Mark II N
-  <br>0x80000234 = EOS 30D</font></td></tr>
+  <br>0x80000234 = EOS 30D
+  <br>0x80000236 = EOS Digital Rebel XTi / 400D / Kiss Digital X</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0012</td>
 <td>CanonPictureInfo</td>
@@ -540,6 +547,7 @@
   <br>165 = Canon EF 70-200mm f/2.8 L
   <br>166 = Canon EF 70-200mm f/2.8 L + x1.4
   <br>167 = Canon EF 70-200mm f/2.8 L + x2
+  <br>168 = Canon EF 28mm f/1.8 USM
   <br>169 = Canon EF17-35mm f/2.8L or Sigma 15-30mm f/3.5-4.5 EX DG Aspherical
   <br>170 = Canon EF 200mm f/2.8L II
   <br>173 = Canon EF 180mm Macro f/3.5L or Sigma 180mm F3.5 or 150mm f/2.8 Macro
@@ -560,6 +568,7 @@
   <br>202 = Canon EF 28-80 f/3.5-5.6 USM IV
   <br>211 = Canon EF 28-200mm f/3.5-5.6
   <br>213 = Canon EF 90-300mm f/4.5-5.6
+  <br>214 = Canon EF-S 18-55mm f/3.5-4.5 USM
   <br>224 = Canon EF 70-200mm f/2.8L IS USM
   <br>225 = Canon EF 70-200mm f/2.8L IS USM + x1.4
   <br>226 = Canon EF 70-200mm f/2.8L IS USM + x2
@@ -567,7 +576,8 @@
   <br>230 = Canon EF 24-70mm f/2.8L
   <br>231 = Canon EF 17-40mm f/4L
   <br>232 = Canon EF 70-300mm f/4.5-5.6 DO IS USM
-  <br>237 = Canon EF 24-105mm f/4L IS</font></td></tr>
+  <br>237 = Canon EF 24-105mm f/4L IS
+  <br>242 = Canon EF 70-200mm f/4L IS USM</font></td></tr>
 <tr valign='top'>
 <td align='right'>23</td>
 <td>LongFocal</td>
@@ -680,9 +690,10 @@
   <br>2 = Zoom</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
-<td>FocalLength</td>
-<td align='center'>int16u</td>
-<td>&nbsp;</td></tr>
+<td>FocalLength
+  <br>ScaledFocalLength</td>
+<td align='center'>int16u<br>int16u</td>
+<td><font size='-1'><font color="#666666">(this value is scaled by 32, 100 or 1000 for non-EOS models)</font></font></td></tr>
 <tr valign='top'>
 <td align='right'>2</td>
 <td>FocalPlaneXSize</td>
@@ -701,10 +712,20 @@
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
-<td align='right'>2</td>
-<td>ISO</td>
+<td align='right'>1</td>
+<td>AutoISO</td>
 <td align='center'>int16s</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(valid only when CameraISO is Auto or Auto High)</font></font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>2</td>
+<td>ShotISO</td>
+<td align='center'>int16s</td>
+<td><font size='-1'><font color="#666666">(not valid when CameraISO is Auto or Auto High)</font></font></td></tr>
+<tr valign='top'>
+<td align='right'>3</td>
+<td>MeasuredEV</td>
+<td align='center'>int16s</td>
+<td><font size='-1'><font color="#666666">(offset by -5 EV from the calculated value for most models)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>4</td>
 <td>TargetAperture</td>
@@ -946,6 +967,7 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
   <br>165 = Canon EF 70-200mm f/2.8 L
   <br>166 = Canon EF 70-200mm f/2.8 L + x1.4
   <br>167 = Canon EF 70-200mm f/2.8 L + x2
+  <br>168 = Canon EF 28mm f/1.8 USM
   <br>169 = Canon EF17-35mm f/2.8L or Sigma 15-30mm f/3.5-4.5 EX DG Aspherical
   <br>170 = Canon EF 200mm f/2.8L II
   <br>173 = Canon EF 180mm Macro f/3.5L or Sigma 180mm F3.5 or 150mm f/2.8 Macro
@@ -966,6 +988,7 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
   <br>202 = Canon EF 28-80 f/3.5-5.6 USM IV
   <br>211 = Canon EF 28-200mm f/3.5-5.6
   <br>213 = Canon EF 90-300mm f/4.5-5.6
+  <br>214 = Canon EF-S 18-55mm f/3.5-4.5 USM
   <br>224 = Canon EF 70-200mm f/2.8L IS USM
   <br>225 = Canon EF 70-200mm f/2.8L IS USM + x1.4
   <br>226 = Canon EF 70-200mm f/2.8L IS USM + x2
@@ -973,7 +996,8 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
   <br>230 = Canon EF 24-70mm f/2.8L
   <br>231 = Canon EF 17-40mm f/4L
   <br>232 = Canon EF 70-300mm f/4.5-5.6 DO IS USM
-  <br>237 = Canon EF 24-105mm f/4L IS</font></td></tr>
+  <br>237 = Canon EF 24-105mm f/4L IS
+  <br>242 = Canon EF 70-200mm f/4L IS USM</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>18</td>
 <td>ShortFocal</td>
@@ -1283,26 +1307,31 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td align='right'>1</td>
+<td>NumAFPoints</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>2</td>
 <td>CanonImageWidth</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>3</td>
 <td>CanonImageHeight</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>4</td>
 <td>CanonImageWidthAsShot</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>5</td>
 <td>CanonImageHeightAsShot</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>22</td>
 <td>AFPointsUsed</td>
 <td align='center'>int16u</td>
@@ -1314,11 +1343,12 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
   <br>Bit 4 = Top
   <br>Bit 5 = Mid-left
   <br>Bit 6 = Left</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td align='right'>26</td>
-<td>AFPointsUsed20D</td>
+<td>AFPointsUsed</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>Bit 0 = Top
+<td><font size='-1'><font color="#666666">(20D, 30D and 400D)</font>
+  <br>Bit 0 = Top
   <br>Bit 1 = Upper-left
   <br>Bit 2 = Upper-right
   <br>Bit 3 = Left
@@ -1339,7 +1369,9 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
 <td>FileNumber
   <br>ShutterCount</td>
 <td align='center'>int32u<br>int32u</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(the location of the upper 4 bits of the directory number is a mystery for
+the EOS 30D, so the reported directory number will be incorrect for original
+images with a directory number of 164 or greater)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>3</td>
 <td>BracketMode</td>
@@ -2342,6 +2374,6 @@ This table is used by the 5D and 1DmkIIN.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 12, 2006</i>
+<br><i>Last revised Sep 6, 2006</i>
 </body>
 </html>

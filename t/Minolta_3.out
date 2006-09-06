@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Minolta_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 13 kB
-[File, File, Time]  - File Modification Date/Time: 2006:07:06 09:10:25
+[File, File, Time]  - File Modification Date/Time: 2006:09:01 12:52:04
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -131,5 +131,6 @@
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.008 mm
 [Composite, Composite, Image]  - Depth of Field: 0.19 m (1.91 - 2.10)
+[Composite, Composite, Image]  - EV: 12.5
 [Composite, Composite, Camera]  - Focal Length: 42.3mm (35mm equivalent: 167.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 42.01 m

@@ -1162,8 +1162,17 @@ sub WriteInfo($$;$$)
 #
     if (ref $infile) {
         $inRef = $infile;
-        # make sure we are at the start of the file
-        seek($inRef, 0, 0) if UNIVERSAL::isa($inRef,'GLOB');
+        if (UNIVERSAL::isa($inRef,'GLOB')) {
+            seek($inRef, 0, 0); # make sure we are at the start of the file
+        } elsif (eval 'require Encode; Encode::is_utf8($$inref)') {
+            # convert image data from UTF-8 to character stream if necessary
+            if (defined $outfile) {
+                my $buff = pack('C*', unpack('U*', $$inRef));
+                $inRef = \$buff;
+            } else {
+                $$inRef = pack('C*', unpack('U*', $$inRef));
+            }
+        }
     } elsif (defined $infile and $infile ne '') {
         if (open(EXIFTOOL_FILE2, defined $outfile ? $infile : "+<$infile")) {
             $fileType = GetFileType($infile);
@@ -1332,15 +1341,15 @@ sub WriteInfo($$;$$)
         if ($rtnVal <= 0 or not $self->{CHANGED}) {
             # nothing changed, so no need to write $outBuff
         } elsif (UNIVERSAL::isa($inRef,'GLOB')) {
-                my $len = length($outBuff);
-                my $size;
-                $rtnVal = -1 unless
-                    seek($inRef, 0, 2) and          # seek to the end of file
-                    ($size = tell $inRef) >= 0 and  # get the file size
-                    seek($inRef, 0, 0) and          # seek back to the start
-                    print $inRef $outBuff and       # write the new data
-                    ($len >= $size or               # if necessary:
-                    eval 'truncate($inRef, $len)'); #  shorten output file
+            my $len = length($outBuff);
+            my $size;
+            $rtnVal = -1 unless
+                seek($inRef, 0, 2) and          # seek to the end of file
+                ($size = tell $inRef) >= 0 and  # get the file size
+                seek($inRef, 0, 0) and          # seek back to the start
+                print $inRef $outBuff and       # write the new data
+                ($len >= $size or               # if necessary:
+                eval 'truncate($inRef, $len)'); #  shorten output file
         } else {
             $$inRef = $outBuff;                 # replace original data
         }
@@ -3047,7 +3056,10 @@ sub WriteJPEG($$)
         }
         # rewrite this segment only if we are changing a tag which
         # is contained in its directory
-        while (exists $$editDirs{$markerName}) {
+        while (exists $$editDirs{$markerName} or
+            # patch to allow editing of APP0 CIFF information
+            ($marker == 0xe0 and $$segDataPt =~ /^(II|MM).{4}HEAPJPGM/ and $$editDirs{MakerNotes}))
+        {
             my $oldChanged = $self->{CHANGED};
             if ($marker == 0xe1) {              # APP1 (EXIF, XMP)
                 # check for EXIF data
@@ -3251,6 +3263,21 @@ sub WriteJPEG($$)
                     if (defined $newData and length $newData) {
                         $$segDataPt = "JFIF\0" . $newData;
                     }
+                } elsif ($$segDataPt =~ /^(II|MM).{4}HEAPJPGM/) {
+                    my $newData = '';
+                    my %dirInfo = (
+                        RAF => new File::RandomAccess($segDataPt),
+                        OutFile => \$newData,
+                    );
+                    require Image::ExifTool::CanonRaw;
+                    if (Image::ExifTool::CanonRaw::WriteCRW($self, \%dirInfo) > 0) {
+                        if (length $newData) {
+                            $$segDataPt = $newData;
+                        } else {
+                            $verbose and print $out "Deleting APP0\n";
+                            undef $segDataPt;
+                        }
+                    }
                 }
             }
             last;   # didn't want to loop anyway
@@ -3432,6 +3459,12 @@ sub WriteBinaryData($$$)
     unless ($increment) {
         warn "Unknown format $defaultFormat\n";
         return undef;
+    }
+    # extract data members first if necessary
+    if ($$tagTablePtr{DATAMEMBER}) {
+        $$dirInfo{DataMember} = $$tagTablePtr{DATAMEMBER};
+        $self->ProcessBinaryData($dirInfo, $tagTablePtr);
+        delete $$dirInfo{DataMember};
     }
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart} || 0;

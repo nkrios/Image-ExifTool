@@ -36,7 +36,7 @@ The Pentax tags are also used in Asahi cameras.
 <tr valign='top'>
 <td>0x0005</td>
 <td>PentaxModelID</td>
-<td align='center'>Y</td>
+<td align='center'>int32u</td>
 <td><font size='-1'>0xd = Optio 330/430
   <br>0x12926 = Optio 230
   <br>0x12958 = Optio 330GS
@@ -77,7 +77,8 @@ The Pentax tags are also used in Asahi cameras.
   <br>0x12b9c = K100D
   <br>0x12bb0 = Optio T10
   <br>0x12be2 = Optio W10
-  <br>0x12bf6 = Optio M10</font></td></tr>
+  <br>0x12bf6 = Optio M10
+  <br>0x12c28 = Optio S7</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0006</td>
 <td>Date</td>
@@ -107,14 +108,14 @@ The Pentax tags are also used in Asahi cameras.
   <br>3 = 1280x960
   <br>4 = 1600x1200
   <br>5 = 2048x1536
-  <br>8 = 2560x1920
+  <br>8 = 2560x1920 or 2304x1728
   <br>10 = 3264x2448
   <br>19 = 320x240
   <br>20 = 2288x1712
   <br>21 = 2592x1944
-  <br>22 = 2304x1728
+  <br>22 = 2304x1728 or 2592x1944
   <br>23 = 3056x2296
-  <br>25 = 2816x2212
+  <br>25 = 2816x2212 or 2816x2112
   <br>&#39;0 0&#39; = 2304x1728
   <br>&#39;32 2&#39; = 960x640
   <br>&#39;33 2&#39; = 1152x768
@@ -137,7 +138,7 @@ The Pentax tags are also used in Asahi cameras.
   <br>9 = Night Scene
   <br>11 = Soft
   <br>12 = Surf &amp; Snow
-  <br>13 = Sunset
+  <br>13 = Sunset or Candlelight
   <br>14 = Autumn
   <br>15 = Flower
   <br>17 = Fireworks
@@ -156,6 +157,7 @@ The Pentax tags are also used in Asahi cameras.
   <br>54 = Candlelight
   <br>55 = Natural Skin Tone
   <br>56 = Synchro Sound Record
+  <br>58 = Frame Composite
   <br>&#39;0 0&#39; = Auto
   <br>&#39;0 2&#39; = Program AE
   <br>&#39;13 1&#39; = Candlelight
@@ -195,7 +197,8 @@ The Pentax tags are also used in Asahi cameras.
 <td>0x000f</td>
 <td>AutoAFPoint</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>0x1 = Top-left
+<td><font size='-1'>0x0 = Multiple
+  <br>0x1 = Top-left
   <br>0x2 = Top-center
   <br>0x3 = Top-right
   <br>0x4 = Left
@@ -281,10 +284,10 @@ The Pentax tags are also used in Asahi cameras.
 <td>0x001a</td>
 <td>WhiteBalanceMode</td>
 <td align='center'>int16u</td>
-<td><font size='-1'>1 = Auto (Daylight?)
-  <br>2 = Auto (Shade?)
-  <br>3 = Auto (Flash?)
-  <br>4 = Auto (Tungsten?)
+<td><font size='-1'>1 = Auto (Daylight)
+  <br>2 = Auto (Shade)
+  <br>3 = Auto (Flash)
+  <br>4 = Auto (Tungsten)
   <br>65534 = Preset (Fireworks?)
   <br>65535 = User-Selected</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -311,8 +314,7 @@ The Pentax tags are also used in Asahi cameras.
 <td>0x001f</td>
 <td>Saturation</td>
 <td align='center'>int16u</td>
-<td><font size='-1'><font color="#666666">(Pentax models)</font>
-  <br>0 = Low
+<td><font size='-1'>0 = Low
   <br>1 = Normal
   <br>2 = High
   <br>3 = Med Low
@@ -324,8 +326,7 @@ The Pentax tags are also used in Asahi cameras.
 <td>0x0020</td>
 <td>Contrast</td>
 <td align='center'>int16u</td>
-<td><font size='-1'><font color="#666666">(Pentax models)</font>
-  <br>0 = Low
+<td><font size='-1'>0 = Low
   <br>1 = Normal
   <br>2 = High
   <br>3 = Med Low
@@ -337,8 +338,7 @@ The Pentax tags are also used in Asahi cameras.
 <td>0x0021</td>
 <td>Sharpness</td>
 <td align='center'>int16u</td>
-<td><font size='-1'><font color="#666666">(Pentax models)</font>
-  <br>0 = Soft
+<td><font size='-1'>0 = Soft
   <br>1 = Normal
   <br>2 = Hard
   <br>3 = Med Soft
@@ -425,7 +425,8 @@ The Pentax tags are also used in Asahi cameras.
   <br>66 = Athens
   <br>67 = Nairobi
   <br>68 = Amsterdam
-  <br>69 = Stockholm</font></td></tr>
+  <br>69 = Stockholm
+  <br>70 = Lisbon</font></td></tr>
 <tr valign='top'>
 <td>0x0024</td>
 <td>DestinationCity</td>
@@ -499,7 +500,8 @@ The Pentax tags are also used in Asahi cameras.
   <br>66 = Athens
   <br>67 = Nairobi
   <br>68 = Amsterdam
-  <br>69 = Stockholm</font></td></tr>
+  <br>69 = Stockholm
+  <br>70 = Lisbon</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0025</td>
 <td>HometownDST</td>
@@ -520,7 +522,7 @@ The Pentax tags are also used in Asahi cameras.
 <tr valign='top'>
 <td>0x0037</td>
 <td>ColorSpace</td>
-<td align='center'>Y</td>
+<td align='center'>int16u</td>
 <td><font size='-1'>0 = sRGB
   <br>1 = AdobeRGB</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -744,6 +746,6 @@ This information is found in Pentax MOV video images.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 5, 2006</i>
+<br><i>Last revised Aug 28, 2006</i>
 </body>
 </html>

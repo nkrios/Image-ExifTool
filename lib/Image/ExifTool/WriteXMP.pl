@@ -225,38 +225,27 @@ my %nsURI = (
     pdfx      => 'http://ns.adobe.com/pdfx/1.3/',
     photoshop => 'http://ns.adobe.com/photoshop/1.0/',
     rdf       => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    rdfs      => 'http://www.w3.org/2000/01/rdf-schema#',
     stDim     => 'http://ns.adobe.com/xap/1.0/sType/Dimensions#',
     stEvt     => 'http://ns.adobe.com/xap/1.0/sType/ResourceEvent#',
-    stFnt     => 'http:ns.adobe.com/xap/1.0/sType/Font#',
+    stFnt     => 'http://ns.adobe.com/xap/1.0/sType/Font#',
     stJob     => 'http://ns.adobe.com/xap/1.0/sType/Job#',
     stRef     => 'http://ns.adobe.com/xap/1.0/sType/ResourceRef#',
     stVer     => 'http://ns.adobe.com/xap/1.0/sType/Version#',
     tiff      => 'http://ns.adobe.com/tiff/1.0/',
    'x'        => 'adobe:ns:meta/',
-    xapG      => 'http://ns/adobe.com/xap/1.0/g/',
-    xapGImg   => 'http://ns/adobe.com/xap/1.0/g/img/',
+    xapG      => 'http://ns.adobe.com/xap/1.0/g/',
+    xapGImg   => 'http://ns.adobe.com/xap/1.0/g/img/',
     xmp       => 'http://ns.adobe.com/xap/1.0/',
     xmpBJ     => 'http://ns.adobe.com/xap/1.0/bj/',
     xmpDM     => 'http://ns.adobe.com/xmp/1.0/DynamicMedia/',
     xmpMM     => 'http://ns.adobe.com/xap/1.0/mm/',
     xmpRights => 'http://ns.adobe.com/xap/1.0/rights/',
     xmpTPg    => 'http://ns.adobe.com/xap/1.0/t/pg/',
-    xmpidq    => 'http://ns/adobe.com/xmp/Identifier/qual/1.0',
+    xmpidq    => 'http://ns.adobe.com/xmp/Identifier/qual/1.0/',
     Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
     xmpPLUS   => 'http://ns.adobe.com/xap/1.0/PLUS/',
     dex       => 'http://ns.optimasc.com/dex/1.0/',
-);
-
-# these are the attributes that we handle for properties that contain
-# sub-properties.  Attributes for simple properties are easy, and we
-# just copy them over.  These are harder since we don't store attributes
-# for properties without simple values.  (maybe this will change...)
-my %recognizedAttrs = (
-    'x:xaptk' => 1,
-    'x:xmptk' => 1,
-    'about' => 1,
-    'rdf:about' => 1,
-    'rdf:parseType' => 1,
 );
 
 my $seeded;     # flag indicating we seeded our random number generateor
@@ -440,97 +429,116 @@ sub SetPropertyPath($$;$$)
 }
 
 #------------------------------------------------------------------------------
-# Capture shorthand XMP properties
-# Inputs: 0) ExifTool object reference, 1) Pointer to tag table
-#         2) reference to array of XMP property path (last is current property)
-#         3) reference to hash of property attributes
-#         4) true to set error on unrecognized attributes
-# Returns: number of shorthand properties captured
-sub CaptureShorthand($$$;$)
-{
-    my ($exifTool, $propList, $attrs, $setError) = @_;
-    my $attr;
-    my @attrList = keys %$attrs;
-    my $count = 0;
-    foreach $attr (@attrList) {
-        if ($attr =~ /^xmlns:(.*)/) {
-            # remember all namespaces (except x which we open ourselves)
-            my $ns = $1;
-            my $nsUsed = $exifTool->{XMP_NS};
-            unless ($ns eq 'x' or $ns eq 'iX' or defined $$nsUsed{$ns}) {
-                $$nsUsed{$ns} = $$attrs{$attr};
-            }
-        } elsif ($recognizedAttrs{$attr}) {
-            # save UUID to use same ID when writing
-            if ($attr eq 'about') {
-                if (not $exifTool->{XMP_UUID}) {
-                    $exifTool->{XMP_UUID} = $$attrs{about};
-                } elsif ($exifTool->{XMP_UUID} ne $$attrs{about}) {
-                    $exifTool->Error("Multiple XMP UUID's not handled", 1);
-                }
-            }
-        } else {
-            # check for RDF shorthand format
-            my ($ns,$name);
-            if ($attr =~ /(.*):(.*)/) {
-                $ns = $1;
-                $name = $2;
-            } else {
-                my $prop = $$propList[$#$propList];
-                $ns = $1 if $prop =~ /(.*):/;   # take namespace from enclosing property
-                $name = $attr;
-            }
-            if ($ns and not $ignoreNamespace{$ns}) {
-                # save this shorthand property
-                push @$propList, "$ns:$name";
-                CaptureXMP($exifTool, $propList, $$attrs{$attr});
-                pop @$propList;
-                # remove this attribute from list since we handled it
-                delete $$attrs{$attr};
-                ++$count;
-            } elsif ($setError) {
-                $exifTool->{XMP_ERROR} = "Can't handle XMP attribute '$attr'";
-            }
-        }
-    }
-    return $count;
-}
-
-#------------------------------------------------------------------------------
 # Save XMP property name/value for rewriting
-# Inputs: 0) ExifTool object reference, 1) Pointer to tag table
-#         2) reference to array of XMP property path (last is current property)
-#         3) property value, 4) optional reference to hash of property attributes
+# Inputs: 0) ExifTool object reference
+#         1) reference to array of XMP property path (last is current property)
+#         2) property value, 3) optional reference to hash of property attributes
 sub CaptureXMP($$$;$)
 {
     my ($exifTool, $propList, $val, $attrs) = @_;
-    $attrs or $attrs = { };
-
-    if (defined $val) {
-        return unless @$propList > 2;
-        if ($$propList[0] =~ /^x:x(a|m)pmeta$/ and
-            $$propList[1] eq 'rdf:RDF' and
-            $$propList[2] eq $rdfDesc)
-        {
-            # capture any shorthand properties in the attribute list
-            my $shorthand = CaptureShorthand($exifTool, $propList, $attrs);
-            # no properties to save yet if this is just the description
-            return unless @$propList > 3;
-            # save information about this property
-            my $capture = $exifTool->{XMP_CAPTURE};
-            my $path = join('/', @$propList[3..$#$propList]);
-            if (defined $$capture{$path}) {
-                $exifTool->{XMP_ERROR} = "Duplicate XMP property: $path";
-            } elsif (length $val or not $shorthand) {
-                $$capture{$path} = [$val, $attrs];
-            }
+    return unless defined $val and @$propList > 2;
+    if ($$propList[0] =~ /^x:x(a|m)pmeta$/ and
+        $$propList[1] eq 'rdf:RDF' and
+        $$propList[2] =~ /$rdfDesc( |$)/)
+    {
+        # no properties to save yet if this is just the description
+        return unless @$propList > 3;
+        # save information about this property
+        my $capture = $exifTool->{XMP_CAPTURE};
+        my $path = join('/', @$propList[3..$#$propList]);
+        if (defined $$capture{$path}) {
+            $exifTool->{XMP_ERROR} = "Duplicate XMP property: $path";
         } else {
-            $exifTool->{XMP_ERROR} = 'Improperly enclosed XMP property: ' . join('/',@$propList);
+            $$capture{$path} = [$val, $attrs || { }];
         }
     } else {
-        # this property has sub-properties, so just handle the attributes
-        # (set an error on any unrecognized attributes here, because they will be lost)
-        CaptureShorthand($exifTool, $propList, $attrs, 1);
+        $exifTool->{XMP_ERROR} = 'Improperly enclosed XMP property: ' . join('/',@$propList);
+    }
+}
+
+#------------------------------------------------------------------------------
+# Save information about resource containing blank node with nodeID
+# Inputs: 0) reference to blank node information hash
+#         1) reference to property list
+#         2) property value
+#         3) [optional] reference to attribute hash
+# Notes: This routine and ProcessBlankInfo() are also used for reading information, but
+#        are uncommon so are put in this file to reduce compile time for the common case
+sub SaveBlankInfo($$$;$)
+{
+    my ($blankInfo, $propListPt, $val, $attrs) = @_;
+    
+    my $propPath = join '/', @$propListPt;
+    my @ids = ($propPath =~ m{ #([^ /]*)}g);
+    my $id;
+    # split the property path at each nodeID
+    foreach $id (@ids) {
+        my ($pre, $prop, $post) = ($propPath =~ m{^(.*?)/([^/]*) #$id((/.*)?)$});
+        defined $pre or warn("internal error parsing nodeID's"), next;
+        # the element with the nodeID should be in the path prefix for subject
+        # nodes and the path suffix for object nodes
+        unless ($prop eq $rdfDesc) {
+            if ($post) {
+                $post = "/$prop$post";
+            } else {
+                $pre = "$pre/$prop";
+            }
+        }
+        $blankInfo->{Prop}->{$id}->{Pre}->{$pre} = 1;
+        if ((defined $post and length $post) or (defined $val and length $val)) {
+            # save the property value and attributes for each unique path suffix
+            $blankInfo->{Prop}->{$id}->{Post}->{$post} = [ $val, $attrs, $propPath ];
+        }
+    }
+}
+
+#------------------------------------------------------------------------------
+# Process blank-node information
+# Inputs: 0) ExifTool object reference
+#         1) reference to tag table
+#         2) reference to blank node information hash
+#         3) flag set for writing
+sub ProcessBlankInfo($$$;$)
+{
+    my ($exifTool, $tagTablePtr, $blankInfo, $isWriting) = @_;
+    $exifTool->VPrint(1, "  [Elements with nodeID set:]\n") unless $isWriting;
+    my ($id, $pre, $post);
+    # handle each nodeID separately
+    foreach $id (sort keys %{$$blankInfo{Prop}}) {
+        my $path = $blankInfo->{Prop}->{$id};
+        # flag all resource names so we can warn later if some are unused
+        my %unused;
+        foreach $post (keys %{$path->{Post}}) {
+            $unused{$post} = 1;
+        }
+        # combine property paths for all possible paths through this node
+        foreach $pre (sort keys %{$path->{Pre}}) {
+            # there will be no description for the object of a blank node
+            next unless $pre =~ m{/$rdfDesc/};
+            foreach $post (sort keys %{$path->{Post}}) {
+                my @propList = split m{/}, "$pre$post";
+                my ($val, $attrs) = @{$path->{Post}->{$post}};
+                if ($isWriting) {
+                    CaptureXMP($exifTool, \@propList, $val, $attrs);
+                } else {
+                    FoundXMP($exifTool, $tagTablePtr, \@propList, $val);
+                }
+                delete $unused{$post};
+            }
+        }
+        # save information from unused properties (if RDF is malformed like f-spot output)
+        if (%unused) {
+            $exifTool->Options('Verbose') and $exifTool->Warn("An XMP resource is about nothing");
+            foreach $post (sort keys %unused) {
+                my ($val, $attrs, $propPath) = @{$path->{Post}->{$post}};
+                my @propList = split m{/}, $propPath;
+                if ($isWriting) {
+                    CaptureXMP($exifTool, \@propList, $val, $attrs);
+                } else {
+                    FoundXMP($exifTool, $tagTablePtr, \@propList, $val);
+                }
+            }
+        }
     }
 }
 
@@ -794,7 +802,7 @@ sub WriteXMP($$;$)
             # open the new description
             $prop = $rdfDesc;
             %nsCur = %nsNew;            # save current namespaces
-            $newData .= "\n <$prop about='$uuid'";
+            $newData .= "\n <$prop rdf:about='$uuid'";
             foreach (sort keys %nsCur) {
                 $newData .= "\n  xmlns:$_='$nsCur{$_}'";
             }
@@ -862,7 +870,7 @@ sub WriteXMP($$;$)
                 $len += length($pad) * $num;
             }
             $len < $dirLen and $newData .= (' ' x ($dirLen - $len - 1)) . "\n";
-        } elsif (not $exifTool->Options('Compact')) {
+        } elsif (not $exifTool->Options('Compact') and not $xmpFile) {
             $newData .= $pad x 24;
         }
         $newData .= $pktClose;

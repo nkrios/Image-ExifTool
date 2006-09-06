@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.32
 [File, File, Image]  - File Type: TIFF
 [File, File, Image]  - MIME Type: image/tiff
 [EXIF, IFD0, Image] 254 - Subfile Type: Full-resolution Image
@@ -10,7 +10,7 @@
 [EXIF, IFD0, Image] 270 - Image Description: Modified TIFF
 [EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
-[EXIF, IFD0, Image] 273 - Strip Offsets: 6750
+[EXIF, IFD0, Image] 273 - Strip Offsets: 6754
 [EXIF, IFD0, Image] 277 - Samples Per Pixel: 3
 [EXIF, IFD0, Image] 278 - Rows Per Strip: 120
 [EXIF, IFD0, Image] 279 - Strip Byte Counts: 1048

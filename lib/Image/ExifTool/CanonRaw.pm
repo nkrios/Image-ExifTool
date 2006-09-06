@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.35';
+$VERSION = '1.36';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -262,6 +262,7 @@ sub BuildMakerNotes($$$$$$);
     },
     0x1814 => { #3
         Name => 'MeasuredEV',
+        Notes => 'offset by -5 EV from the calculated value',
         Format => 'float',
     },
     0x1817 => {
@@ -365,6 +366,7 @@ sub BuildMakerNotes($$$$$$);
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    DATAMEMBER => [ 0, 6 ], # indices of data members to extract when writing
     WRITABLE => 1,
     FORMAT => 'string',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -724,7 +726,7 @@ sub ProcessCRW($$)
     SetByteOrder($buff)           or return 0;
     $raf->Read($buff,4) == 4      or return 0;
     $raf->Read($sig,8) == 8       or return 0;  # get file signature
-    $sig eq 'HEAPCCDR'            or return 0;  # validate signature
+    $sig =~ /^HEAP(CCDR|JPGM)/    or return 0;  # validate signature
     my $hlen = Get32u(\$buff, 0);
 
     $raf->Seek(0, 2)              or return 0;  # seek to end of file
@@ -733,7 +735,8 @@ sub ProcessCRW($$)
     # initialize maker note data if building maker notes
     $buildMakerNotes and InitMakerNotes($exifTool);
 
-    $exifTool->SetFileType();   # set the FileType tag
+    # set the FileType tag unless already done (ie. CIFF APP0 record in JPEG image)
+    $exifTool->SetFileType() unless $exifTool->GetValue('FileType');
 
     # build directory information for main raw directory
     my %dirInfo = (

@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Canon;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessCanonCustom($$$);
 sub WriteCanonCustom($$$);
@@ -777,7 +777,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
 );
 
-# Custom functions for the 350D (PH - unconfirmed)
+# Custom functions for the 350D (PH)
 %Image::ExifTool::CanonCustom::Functions350D = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonCustom,
@@ -846,6 +846,97 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         PrintConv => {
             0 => '1st-curtain sync',
             1 => '2nd-curtain sync',
+        },
+    },
+);
+
+# Custom functions for the 400D (PH)
+%Image::ExifTool::CanonCustom::Functions400D = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&ProcessCanonCustom,
+    WRITE_PROC => \&WriteCanonCustom,
+    CHECK_PROC => \&CheckCanonCustom,
+    WRITABLE => 'int8u',
+    0 => {
+        Name => 'SetButtonCrossKeysFunc',
+        PrintConv => {
+            0 => 'Set: Picture Style',
+            1 => 'Set: Quality',
+            2 => 'Set: Flash Exposure Comp',
+            3 => 'Set: Playback',
+            4 => 'Cross keys: AF frame selec.',
+        },
+    },
+    1 => {
+        Name => 'LongExposureNoiseReduction',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Auto',
+            2 => 'On',
+        },
+    },
+    2 => {
+        Name => 'FlashSyncSpeedAv',
+        PrintConv => {
+            0 => 'Auto',
+            1 => '1/200 Fixed',
+        },
+    },
+    3 => {
+        Name => 'Shutter-AELock',
+        PrintConv => {
+            0 => 'AF/AE lock',
+            1 => 'AE lock/AF',
+            2 => 'AF/AF lock, No AE lock',
+            3 => 'AE/AF, No AE lock',
+        },
+    },
+    4 => {
+        Name => 'AFAssistBeam',
+        PrintConv => {
+            0 => 'Emits',
+            1 => 'Does not emit',
+            2 => 'Only emits ext. flash',
+        },
+    },
+    5 => {
+        Name => 'ExposureLevelIncrements',
+        PrintConv => {
+            0 => '1/3 Stop',
+            1 => '1/2 Stop',
+        },
+    },
+    6 => {
+        Name => 'MirrorLockup',
+        PrintConv => \%disableEnable,
+    },
+    7 => {
+        Name => 'ETTLII',
+        Description => 'E-TTL II',
+        PrintConv => {
+            0 => 'Evaluative',
+            1 => 'Average',
+        },
+    },
+    8 => {
+        Name => 'ShutterCurtainSync',
+        PrintConv => {
+            0 => '1st-curtain sync',
+            1 => '2nd-curtain sync',
+        },
+    },
+    9 => {
+        Name => 'MagnifiedView',
+        PrintConv => {
+            0 => 'Image playback only',
+            1 => 'Image review and playback',
+        },
+    },
+    10 => {
+        Name => 'LCDDisplayAtPowerOn',
+        PrintConv => {
+            0 => 'Display',
+            1 => 'Retain power OFF status',
         },
     },
 );

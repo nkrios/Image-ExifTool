@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: MIE.mie
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 2022 bytes
@@ -62,3 +62,4 @@
 [MIE, MIE-Main, Other] data - Subfile: (Binary data 20 bytes)
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Shutter Speed: 4
+[Composite, Composite, Image]  - EV: 1.6

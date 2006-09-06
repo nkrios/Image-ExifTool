@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..8\n"; }
+BEGIN { $| = 1; print "1..12\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -61,7 +61,9 @@ my $testnum = 1;
         } elsif (ref $val eq 'SCALAR') {
             $val = 'v2';
         } elsif ($val =~ /^\d+(\.\d*)?$/) {
-            $val += ($val / 10) + 1;
+            # (add extra .001 to avoid problem with aperture of 4.85
+            #  getting rounded to 4.8 or 4.9 and causing failed tests)
+            $val += ($val / 10) + 1.001;
             $1 or $val = int($val);
         } else {
             $val .= '-v2';
@@ -74,6 +76,8 @@ my $testnum = 1;
     undef $info;
     my $image;
     $exifTool->WriteInfo('t/images/IPTC-XMP.jpg',\$image);
+    # this is effectively what the RHEL 3 UTF8 LANG problem does:
+    # $image = pack("U*", unpack("C*", $image));
     
     my $exifTool2 = new Image::ExifTool;
     $exifTool2->Options(Duplicates => 1);
@@ -139,6 +143,27 @@ my $testnum = 1;
     $exifTool->WriteInfo('t/images/XMP.xmp',$testfile);
     print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
     print "ok $testnum\n";
+}
+
+# test 9-12: Test reading/writing XMP with blank nodes
+{
+    my $file;
+    foreach $file ('XMP2.xmp', 'XMP3.xmp') {
+        ++$testnum;
+        my $exifTool = new Image::ExifTool;
+        my $info = $exifTool->ImageInfo("t/images/$file", {Duplicates => 1});
+        print 'not ' unless check($exifTool, $info, $testname, $testnum);
+        print "ok $testnum\n";
+    
+        ++$testnum;
+        my $testfile = "t/${testname}_${testnum}_failed.xmp";
+        unlink $testfile;
+        $exifTool->SetNewValue('XMP:Author' => 'Phil');
+        my $image;
+        $exifTool->WriteInfo("t/images/$file", $testfile);
+        print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
+        print "ok $testnum\n";
+    }
 }
 
 # end

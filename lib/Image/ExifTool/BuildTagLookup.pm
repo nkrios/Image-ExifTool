@@ -411,8 +411,19 @@ TagID:  foreach $tagID (@keys) {
                     $note =~ s/(^[ \t]+|[ \t]+$)//mg;
                     push @values, "($note)";
                 }
+                my $writable;
+                if (defined $$tagInfo{Writable}) {
+                    $writable = $$tagInfo{Writable};
+                } elsif (not $$tagInfo{SubDirectory}) {
+                    $writable = $$table{WRITABLE};
+                }
+                $writable = $$tagInfo{Format} if $writable and $$tagInfo{Format};
                 my $writeGroup;
-                $writeGroup = $$tagInfo{WriteGroup} || '-';
+                $writeGroup = $$tagInfo{WriteGroup};
+                unless ($writeGroup) {
+                    $writeGroup = $$table{WRITE_GROUP} if $writable;
+                    $writeGroup = '-' unless $writeGroup;
+                }
                 $format = $$tagInfo{Format} if defined $$tagInfo{Format};
                 if ($$tagInfo{SubDirectory}) {
                     # don't show XMP structure tags
@@ -478,13 +489,6 @@ TagID:  foreach $tagID (@keys) {
                         }
                     }
                 }
-                my $writable;
-                if (defined $$tagInfo{Writable}) {
-                    $writable = $$tagInfo{Writable};
-                } elsif (not $$tagInfo{SubDirectory}) {
-                    $writable = $$table{WRITABLE};
-                }
-                $writable = $$tagInfo{Format} if $writable and $$tagInfo{Format};
                 if ($subdir) {
                     # flag a subdirectory by setting writable to '-'
                     # (if this is a writable subdirectory, prefix writable by '-')

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: FujiFilm.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1373 bytes
@@ -73,5 +73,6 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
+[Composite, Composite, Image]  - EV: 9.6
 [Composite, Composite, Camera]  - Focal Length: 6.0mm (35mm equivalent: 39.6mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 2.26 m

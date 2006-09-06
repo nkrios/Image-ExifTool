@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -134,6 +134,7 @@
 [Composite, Composite, Camera]  - Blue Balance: 2.097656
 [Composite, Composite, Image]  - Circle Of Confusion: 0.020 mm
 [Composite, Composite, Image]  - Depth of Field: 0.03 m (0.69 - 0.72)
+[Composite, Composite, Image]  - EV: 8.0
 [Composite, Composite, Camera]  - Focal Length: 50.0mm (35mm equivalent: 75.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 31.20 m
 [Composite, Composite, Image]  - Image Size: 8x8

@@ -1,4 +1,4 @@
-  ExifToolVersion = 6.27
+  ExifToolVersion = 6.35
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
@@ -65,7 +65,9 @@
   | | | | FocalPlaneYSize = 610
   | | | 2)  CanonShotInfo (SubDirectory) -->
   | | | + [BinaryData directory, 66 bytes]
-  | | | | ISO = 160
+  | | | | AutoISO = 0
+  | | | | ShotISO = 160
+  | | | | MeasuredEV = -160
   | | | | TargetAperture = 116
   | | | | TargetExposureTime = 189
   | | | | ExposureCompensation = 0
@@ -142,6 +144,7 @@
   | | | 8)  DecoderTable = 1 0 514 4120111
   | | | 9)  CanonPictureInfo (SubDirectory) -->
   | | | + [BinaryData directory, 48 bytes]
+  | | | | NumAFPoints = 7
   | | | | CanonImageWidth = 3072
   | | | | CanonImageHeight = 2048
   | | | | CanonImageWidthAsShot = 3072

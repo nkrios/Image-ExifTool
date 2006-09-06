@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Sanyo.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 2 kB
@@ -86,5 +86,6 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/185
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.000 mm
+[Composite, Composite, Image]  - EV: 11.1
 [Composite, Composite, Camera]  - Focal Length: 23.1mm (35mm equivalent: 11113.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 1238.24 m

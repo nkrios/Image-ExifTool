@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.19
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: QuickTime.mov
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1938 bytes
@@ -47,4 +47,5 @@
 [Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Image]  - Image Size: 320x240
 [Composite, Composite, Image]  - Shutter Speed: 1/38
+[Composite, Composite, Image]  - EV: 10.3
 [Composite, Composite, Camera]  - Focal Length: 18.9mm

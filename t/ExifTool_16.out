@@ -2,12 +2,13 @@
 AEBBracketValue : 0
 AFPointsUsed : (none)
 AutoExposureBracketing : Off
+AutoISO : 100
 AutoRotate : None
 BracketMode : Off
 BracketShotNumber : 0
 BracketValue : 0
 BulbDuration : 4
-CameraISO : Use shot ISO instead
+CameraISO : Use ShotISO
 CameraType : EOS Mid-range
 CanonExposureMode : Manual
 CanonFileLength : 4480822
@@ -43,14 +44,15 @@ FocusDistanceLower : 5.46
 FocusDistanceUpper : -0.01
 FocusMode : Manual Focus
 FocusRange : Not Known
-ISO (1) : 100
 LensType : Unknown (-1)
 LongFocal : 55
 MacroMode : Unknown (0)
 MaxAperture : 4
+MeasuredEV : -6.2
 MeteringMode : Center-weighted averaging
 MinAperture : 27
 NDFilter : Unknown (-1)
+NumAFPoints : 7
 OwnerName : Phil Harvey
 Quality : RAW
 Saturation : +1
@@ -61,6 +63,7 @@ SerialNumber : 0560018150
 SerialNumberFormat : Format 1
 Sharpness : +1
 ShortFocal : 18
+ShotISO : 100
 SlowShutter : None
 TargetAperture : 14
 WB_RGGBLevelsAuto : 1719 832 831 990
@@ -80,9 +83,11 @@ Aperture : 14.0
 BlueBalance : 1.190619
 CircleOfConfusion : 0.019 mm
 DriveMode : Continuous shooting
+EV : 5.6
 FlashOn : Off
 FocalLength35efl : 34.0mm (35mm equivalent: 52.7mm)
 HyperfocalDistance : 4.26 m
+ISO (1) : 100
 ImageSize : 8x8
 Lens : 18.0 - 55.0mm
 Lens35efl : 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)

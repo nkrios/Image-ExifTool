@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Pentax.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1693 bytes
@@ -74,11 +74,11 @@
 [MakerNotes, Pentax, Camera] 22 - Exposure Compensation: 0
 [MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
 [MakerNotes, Pentax, Camera] 25 - White Balance: Auto
-[MakerNotes, Pentax, Camera] 26 - White Balance Mode: Auto (Daylight?)
+[MakerNotes, Pentax, Camera] 26 - White Balance Mode: Auto (Daylight)
 [MakerNotes, Pentax, Camera] 27 - Blue Balance: 0.30859375
 [MakerNotes, Pentax, Camera] 28 - Red Balance: 0.37109375
 [MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm
-[MakerNotes, Pentax, Camera] 30 - Digital Zoom: 100
+[MakerNotes, Pentax, Camera] 30 - Digital Zoom: 1
 [MakerNotes, Pentax, Camera] 31 - Saturation: Normal
 [MakerNotes, Pentax, Camera] 32 - Contrast: Normal
 [MakerNotes, Pentax, Camera] 33 - Sharpness: Normal
@@ -94,5 +94,6 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/500
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
+[Composite, Composite, Image]  - EV: 14.9
 [Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 3.76 m

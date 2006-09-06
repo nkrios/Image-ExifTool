@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Panasonic.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 7 kB
@@ -82,5 +82,6 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/400
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.004 mm
+[Composite, Composite, Image]  - EV: 13.0
 [Composite, Composite, Camera]  - Focal Length: 4.6mm (35mm equivalent: 35.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 1.34 m

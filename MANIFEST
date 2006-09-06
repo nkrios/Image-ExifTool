@@ -205,11 +205,15 @@ t/GeoTiff.t
 t/GeoTiff_2.out
 t/GeoTiff_3.out
 t/IPTC-XMP.t
+t/IPTC-XMP_10.out
+t/IPTC-XMP_11.out
+t/IPTC-XMP_12.out
 t/IPTC-XMP_2.out
 t/IPTC-XMP_4.out
 t/IPTC-XMP_6.out
 t/IPTC-XMP_7.out
 t/IPTC-XMP_8.out
+t/IPTC-XMP_9.out
 t/JVC.t
 t/JVC_2.out
 t/JVC_3.out
@@ -362,4 +366,6 @@ t/images/Sony.jpg
 t/images/Unknown.jpg
 t/images/Writer.jpg
 t/images/XMP.xmp
+t/images/XMP2.xmp
+t/images/XMP3.xmp
 xmp2iptc.args

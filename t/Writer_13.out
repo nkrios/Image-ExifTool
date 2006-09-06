@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.35
 [File, File, Image]  - File Name: Writer_13_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4 kB
@@ -41,7 +41,7 @@
 [MakerNotes, Canon, Camera] 13 - Contrast: +1
 [MakerNotes, Canon, Camera] 14 - Saturation: +1
 [MakerNotes, Canon, Camera] 15 - Sharpness: +1
-[MakerNotes, Canon, Camera] 16 - Camera ISO: Use shot ISO instead
+[MakerNotes, Canon, Camera] 16 - Camera ISO: Use ShotISO
 [MakerNotes, Canon, Camera] 17 - Metering Mode: Evaluative
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 19 - AF Point: Manual AF point selection
@@ -60,7 +60,9 @@
 [MakerNotes, Canon, Image] 1 - Focal Length: 24mm
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
-[MakerNotes, Canon, Image] 2 - ISO: 100
+[MakerNotes, Canon, Image] 1 - Auto ISO: 100
+[MakerNotes, Canon, Image] 2 - Shot ISO: 100
+[MakerNotes, Canon, Image] 3 - Measured EV: -5.0
 [MakerNotes, Canon, Image] 4 - Target Aperture: 3.6
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/60
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
@@ -85,6 +87,7 @@
 [MakerNotes, Canon, Camera] 9 - Owner's Name: Phil Harvey
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS Digital Rebel / 300D / Kiss Digital
+[MakerNotes, Canon, Image] 1 - Num AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
@@ -115,6 +118,7 @@
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Camera]  - Flash Type: Built-In Flash
+[Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Red Eye Reduction: Off
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
@@ -124,6 +128,7 @@
 [Composite, Composite, Camera]  - WB RGGB Levels: 1740 832 831 931
 [Composite, Composite, Camera]  - Blue Balance: 1.119663
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
+[Composite, Composite, Image]  - EV: 9.7
 [Composite, Composite, Camera]  - Focal Length: 24.0mm (35mm equivalent: 37.2mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 8.25 m
 [Composite, Composite, Image]  - Image Size: 8x8

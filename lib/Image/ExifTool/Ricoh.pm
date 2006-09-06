@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessRicohText($$$);
 
@@ -25,8 +25,8 @@ sub ProcessRicohText($$$);
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
     NOTES => 'These tags are used by Ricoh Caplio camera models.',
-    0x0001 => 'MakerNoteType',
-    0x0002 => 'MakerNoteVersion',
+    0x0001 => { Name => 'MakerNoteType',    Writable => 'string' },
+    0x0002 => { Name => 'MakerNoteVersion', Writable => 'string' },
     0x0e00 => {
         Name => 'PrintIM',
         Writable => 0,

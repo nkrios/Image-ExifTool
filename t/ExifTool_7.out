@@ -6,6 +6,7 @@
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Modify Date: 2003:12:04 06:46:52
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
+[EXIF, ExifIFD, Image] 34855 - ISO: 100
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:12:04 06:46:52
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2003:12:04 06:46:52
@@ -43,7 +44,7 @@
 [MakerNotes, Canon, Camera] 13 - Contrast: +1
 [MakerNotes, Canon, Camera] 14 - Saturation: +1
 [MakerNotes, Canon, Camera] 15 - Sharpness: +1
-[MakerNotes, Canon, Camera] 16 - Camera ISO: Use shot ISO instead
+[MakerNotes, Canon, Camera] 16 - Camera ISO: Use ShotISO
 [MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Manual
@@ -61,7 +62,9 @@
 [MakerNotes, Canon, Image] 1 - Focal Length: 34mm
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
-[MakerNotes, Canon, Image] 2 - ISO: 100
+[MakerNotes, Canon, Image] 1 - Auto ISO: 100
+[MakerNotes, Canon, Image] 2 - Shot ISO: 100
+[MakerNotes, Canon, Image] 3 - Measured EV: -6.2
 [MakerNotes, Canon, Image] 4 - Target Aperture: 14
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
@@ -102,6 +105,7 @@
 [MakerNotes, Canon, Camera] 32 - WB RGGB Levels Kelvin: 1722 832 831 988
 [MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
+[MakerNotes, Canon, Image] 1 - Num AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072

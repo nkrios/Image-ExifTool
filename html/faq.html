@@ -33,6 +33,7 @@ pre {
 <li><a href="#Q7">Deleting all EXIF from a TIFF</a>
 <li><a href="#Q8">Changing Make or Model tag</a>
 <li><a href="#Q9">Tag locations when copying</a>
+<li><a href="#Q10">Coded character sets</a>
 </ol></td></tr></table>
 
 <hr>
@@ -263,8 +264,38 @@ contradictory information to different groups, but you wouldn't do this now,
 would you?)
 </blockquote>
 
+<a name="Q10"></a>
+<p>10. <b>"How does ExifTool handle coded character sets?"</b>
+
+<blockquote>
+Certain meta information formats allow coded character sets other than plain
+ASCII.  All 8-bit encodings are passed straight through ExifTool without
+translation (while reading or writing).  However, 16 or 32-bit formats (ie.
+Unicode) are translated to (when reading) or from (when writing) UTF-8 by
+default, or Windows Latin1 with the <code>'-L'</code> option.  Specifically,
+here is how coded character sets are handled in EXIF, IPTC and XMP information:
+
+<p><b>EXIF</b>: Most textual EXIF information is stored in ASCII format, however
+some EXIF tags (ie. UserComment) may be also be encoded in Unicode or JIS.  When
+reading information, Unicode text is translated to either UTF-8 or Windows
+Latin1 depending on the ExifTool options, and other encodings are not
+translated.  When writing, no translation is performed, and these tags are
+written as ASCII.  However, the EXIF "XP" tags (XPTitle, XPComment, etc) are
+always stored as Unicode, and are read and written as either UTF-8 or Windows
+Latin1, depending on the options settings.
+
+<p><b>IPTC</b>: ExifTool does not translate IPTC text.  It is the user's
+responsibility to interpret the text properly according to the value of the IPTC
+CodedCharacterSet tag, and to update this tag if necessary when writing.  For
+example, CodedCharacterSet should be set to "ESC&nbsp;%&nbsp;G" for UTF-8
+encoding.  Consult the <a href="http://www.iptc.org/IIM/">IPTC specification</a>
+for details.
+
+<p><b>XMP</b>: All textual information in XMP is read and written as UTF-8.
+</blockquote>
+
 <hr>
-<i>Last revised Mar. 29, 2006</i>
+<i>Last revised Aug. 30, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

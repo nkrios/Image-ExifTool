@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Sigma.x3f
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1464 bytes
-[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:22
+[File, File, Time]  - File Modification Date/Time: 2005:10:17 09:33:06
 [File, File, Image]  - File Type: X3F
 [File, File, Image]  - MIME Type: image/x-raw
 [SigmaRaw, SigmaRaw, Other] 1 - File Version: 2.2
@@ -51,5 +51,6 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.7
 [Composite, Composite, Image]  - Shutter Speed: 1/108
 [Composite, Composite, Image]  - Circle Of Confusion: 0.018 mm
+[Composite, Composite, Image]  - EV: 12.9
 [Composite, Composite, Camera]  - Focal Length: 30.0mm (35mm equivalent: 51.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 6.10 m

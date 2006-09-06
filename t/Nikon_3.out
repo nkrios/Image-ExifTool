@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Nikon_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2006:05:02 10:53:54
+[File, File, Time]  - File Modification Date/Time: 2006:09:01 12:52:07
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -83,5 +83,6 @@
 [Composite, Composite, Image]  - Aperture: 9.4
 [Composite, Composite, Image]  - Shutter Speed: 1/213
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Image]  - EV: 14.2
 [Composite, Composite, Camera]  - Focal Length: 8.6mm
 [Composite, Composite, Image]  - Image Size: 8x8

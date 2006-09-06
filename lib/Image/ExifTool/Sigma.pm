@@ -14,12 +14,12 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 %Image::ExifTool::Sigma::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    WRITABLE => 1,
+    WRITABLE => 'string',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0002 => 'SerialNumber',
     0x0003 => 'DriveMode',

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Olympus_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2006:06:05 09:10:10
+[File, File, Time]  - File Modification Date/Time: 2006:09:01 12:52:12
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -247,5 +247,6 @@
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.015 mm
 [Composite, Composite, Image]  - Depth of Field: 0.17 m (0.63 - 0.80)
+[Composite, Composite, Image]  - EV: 9.0
 [Composite, Composite, Camera]  - Focal Length: 20.0mm (35mm equivalent: 40.1mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 5.93 m

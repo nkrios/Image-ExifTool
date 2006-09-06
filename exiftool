@@ -266,7 +266,7 @@ while ($_ = shift) {
 # print help
 unless ((@tags and not $outOpt) or @files or @newValues) {
     Die "Nothing to write\n" if $outOpt;
-    unless ($helped or not system qq{perldoc "$0"}) {
+    unless ($helped or not system('perldoc',$0)) {
         print "Run 'perldoc exiftool' for help on exiftool.\n";
     }
     exit 0;
@@ -1234,7 +1234,7 @@ single argument, because that would be interpreted as a tag name.
 Extract information for specified tag.  See
 L<Image::ExifTool::TagNames|Image::ExifTool::TagNames> for documentation on
 available tag names.  The tag name may begin with an optional group name
-followed by a colon.  (ie. C<-TAG:GROUP>, where C<GROUP> is any valid family
+followed by a colon.  (ie. C<-GROUP:TAG>, where C<GROUP> is any valid family
 0 or 1 group name optionally prefixed by a family number.  Use the C<-listg>
 option to list valid group names.)  If no tags are specified, all available
 information is extracted.

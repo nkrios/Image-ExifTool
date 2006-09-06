@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
@@ -235,6 +235,7 @@
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Image]  - Shutter Speed: 1/20
 [Composite, Composite, Camera]  - Blue Balance: 1.860377
+[Composite, Composite, Image]  - EV: 6.9
 [Composite, Composite, Camera]  - Focal Length: 18.0mm
 [Composite, Composite, Image]  - Image Size: 3040x2014
 [Composite, Composite, Camera]  - Red Balance: 1.803774

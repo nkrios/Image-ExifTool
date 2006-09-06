@@ -799,13 +799,13 @@ JpgFromRawLength in SubIFD2 of DNG images)</font></font></td></tr>
 <td>0x829a</td>
 <td>ExposureTime</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x829d</td>
 <td>FNumber</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x82a5</td>
@@ -1051,7 +1051,7 @@ JpgFromRawLength in SubIFD2 of DNG images)</font></font></td></tr>
 <td>0x8822</td>
 <td>ExposureProgram</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>1 = Manual
   <br>2 = Program AE
   <br>3 = Aperture-priority AE
@@ -1064,7 +1064,7 @@ JpgFromRawLength in SubIFD2 of DNG images)</font></font></td></tr>
 <td>0x8824</td>
 <td>SpectralSensitivity</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x8825</td>
@@ -1076,7 +1076,7 @@ JpgFromRawLength in SubIFD2 of DNG images)</font></font></td></tr>
 <td>0x8827</td>
 <td>ISO</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x8828</td>
@@ -1094,14 +1094,14 @@ JpgFromRawLength in SubIFD2 of DNG images)</font></font></td></tr>
 <td>0x882a</td>
 <td>TimeZoneOffset</td>
 <td align='center'>int16s[n]</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'><font color="#666666">(1 or 2 values: 1. The time zone offset of DateTimeOriginal from GMT in
 hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x882b</td>
 <td>SelfTimerMode</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x885c</td>
@@ -1131,73 +1131,73 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <td>0x9000</td>
 <td>ExifVersion</td>
 <td align='center'>undef</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9003</td>
 <td>DateTimeOriginal</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9004</td>
 <td>CreateDate</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9101</td>
 <td>ComponentsConfiguration</td>
 <td align='center'>undef</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9102</td>
 <td>CompressedBitsPerPixel</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9201</td>
 <td>ShutterSpeedValue</td>
 <td align='center'>rational64s</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9202</td>
 <td>ApertureValue</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9203</td>
 <td>BrightnessValue</td>
 <td align='center'>rational64s</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9204</td>
 <td>ExposureCompensation</td>
 <td align='center'>rational64s</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9205</td>
 <td>MaxApertureValue</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9206</td>
 <td>SubjectDistance</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9207</td>
 <td>MeteringMode</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>1 = Average
   <br>2 = Center-weighted average
   <br>3 = Spot
@@ -1209,7 +1209,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <td>0x9208</td>
 <td>LightSource</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>1 = Daylight
   <br>2 = Fluorescent
   <br>3 = Tungsten
@@ -1234,26 +1234,31 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <td>0x9209</td>
 <td>Flash</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0x0 = No Flash
   <br>0x1 = Fired
   <br>0x5 = Fired, Return not detected
   <br>0x7 = Fired, Return detected
+  <br>0x8 = On, Did not fire
   <br>0x9 = On
   <br>0xd = On, Return not detected
   <br>0xf = On, Return detected
   <br>0x10 = Off
+  <br>0x14 = Off, Did not fire, Return not detected
   <br>0x18 = Auto, Did not fire
   <br>0x19 = Auto, Fired
   <br>0x1d = Auto, Fired, Return not detected
   <br>0x1f = Auto, Fired, Return detected
   <br>0x20 = No flash function
+  <br>0x30 = Off, No flash function
   <br>0x41 = Fired, Red-eye reduction
   <br>0x45 = Fired, Red-eye reduction, Return not detected
   <br>0x47 = Fired, Red-eye reduction, Return detected
   <br>0x49 = On, Red-eye reduction
   <br>0x4d = On, Red-eye reduction, Return not detected
   <br>0x4f = On, Red-eye reduction, Return detected
+  <br>0x50 = Off, Red-eye reduction
+  <br>0x58 = Auto, Did not fire, Red-eye reduction
   <br>0x59 = Auto, Fired, Red-eye reduction
   <br>0x5d = Auto, Fired, Red-eye reduction, Return not detected
   <br>0x5f = Auto, Fired, Red-eye reduction, Return detected</font></td></tr>
@@ -1261,7 +1266,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <td>0x920a</td>
 <td>FocalLength</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x920b</td>
@@ -1305,14 +1310,14 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9211</td>
 <td>ImageNumber</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>int32u</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9212</td>
 <td>SecurityClassification</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>&#39;C&#39; = Confidential
   <br>&#39;R&#39; = Restricted
   <br>&#39;S&#39; = Secret
@@ -1321,14 +1326,14 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9213</td>
 <td>ImageHistory</td>
-<td align='center'>N</td>
-<td align='center'>-</td>
+<td align='center'>string</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9214</td>
 <td>SubjectLocation</td>
 <td align='center'>int16u[4]</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9215</td>
@@ -1443,25 +1448,25 @@ hours, 2. If present, the time zone offset of ModifyDate)</font></font></td></tr
 <td>0x9286</td>
 <td>UserComment</td>
 <td align='center'>undef</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9290</td>
 <td>SubSecTime</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x9291</td>
 <td>SubSecTimeOriginal</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x9292</td>
 <td>SubSecTimeDigitized</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x935c</td>
@@ -1506,33 +1511,34 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa000</td>
 <td>FlashpixVersion</td>
 <td align='center'>undef</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa001</td>
 <td>ColorSpace</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
-<td><font size='-1'>1 = sRGB
+<td align='center'>ExifIFD</td>
+<td><font size='-1'><font color="#666666">(the value of 2 is not standard EXIF)</font>
+  <br>1 = sRGB
   <br>2 = Adobe RGB
   <br>65535 = Uncalibrated</font></td></tr>
 <tr valign='top'>
 <td>0xa002</td>
 <td>ExifImageWidth</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa003</td>
 <td>ExifImageLength</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xa004</td>
 <td>RelatedSoundFile</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa005</td>
@@ -1544,7 +1550,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa20b</td>
 <td>FlashEnergy</td>
 <td align='center'>rational64u[n]</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa20c</td>
@@ -1562,19 +1568,19 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa20e</td>
 <td>FocalPlaneXResolution</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xa20f</td>
 <td>FocalPlaneYResolution</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa210</td>
 <td>FocalPlaneResolutionUnit</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>1 = mm
   <br>10 = cm
   <br>&#39;0.001&#39; = um
@@ -1601,13 +1607,13 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa214</td>
 <td>SubjectLocation</td>
 <td align='center'>int16u[2]</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xa215</td>
 <td>ExposureIndex</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa216</td>
@@ -1619,7 +1625,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa217</td>
 <td>SensingMethod</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>1 = Not defined
   <br>2 = One-chip color area
   <br>3 = Two-chip color area
@@ -1631,7 +1637,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa300</td>
 <td>FileSource</td>
 <td align='center'>undef</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>1 = Film Scanner
   <br>2 = Reflection Print Scanner
   <br>3 = Digital Camera</font></td></tr>
@@ -1639,26 +1645,26 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa301</td>
 <td>SceneType</td>
 <td align='center'>undef</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>1 = Directly photographed</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa302</td>
 <td>CFAPattern</td>
 <td align='center'>undef</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xa401</td>
 <td>CustomRendered</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Custom</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa402</td>
 <td>ExposureMode</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0 = Auto
   <br>1 = Manual
   <br>2 = Auto bracket</font></td></tr>
@@ -1666,26 +1672,26 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa403</td>
 <td>WhiteBalance</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0 = Auto
   <br>1 = Manual</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa404</td>
 <td>DigitalZoomRatio</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xa405</td>
 <td>FocalLengthIn35mmFormat</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa406</td>
 <td>SceneCaptureType</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0 = Standard
   <br>1 = Landscape
   <br>2 = Portrait
@@ -1694,7 +1700,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa407</td>
 <td>GainControl</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0 = None
   <br>1 = Low gain up
   <br>2 = High gain up
@@ -1704,7 +1710,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa408</td>
 <td>Contrast</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Low
   <br>2 = High</font></td></tr>
@@ -1712,7 +1718,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa409</td>
 <td>Saturation</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Low
   <br>2 = High</font></td></tr>
@@ -1720,7 +1726,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa40a</td>
 <td>Sharpness</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>0 = Normal
   <br>1 = Soft
   <br>2 = Hard</font></td></tr>
@@ -1734,7 +1740,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa40c</td>
 <td>SubjectDistanceRange</td>
 <td align='center'>int16u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'>1 = Macro
   <br>2 = Close
   <br>3 = Distant</font></td></tr>
@@ -1742,7 +1748,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa420</td>
 <td>ImageUniqueID</td>
 <td align='center'>string</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xa480</td>
@@ -1760,7 +1766,7 @@ ImageDescription exists)</font></font></td></tr>
 <td>0xa500</td>
 <td>Gamma</td>
 <td align='center'>rational64u</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xbc01</td>
@@ -2299,7 +2305,7 @@ unnecessary clutter)</font>
 <td>0xfde8</td>
 <td>OwnerName</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td><font size='-1'><font color="#666666">(tags 0xfde8-0xfe58 are generated by Photoshop Camera RAW -- some
 names are the same as other EXIF tags, but ExifTool will avoid
 writing these unless they already exist in the file)</font></font></td></tr>
@@ -2307,85 +2313,85 @@ writing these unless they already exist in the file)</font></font></td></tr>
 <td>0xfde9</td>
 <td>SerialNumber</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xfdea</td>
 <td>Lens</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xfe4c</td>
 <td>RawFile</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe4d</td>
 <td>Converter</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xfe4e</td>
 <td>WhiteBalance</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe51</td>
 <td>Exposure</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xfe52</td>
 <td>Shadows</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe53</td>
 <td>Brightness</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xfe54</td>
 <td>Contrast</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe55</td>
 <td>Saturation</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xfe56</td>
 <td>Sharpness</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xfe57</td>
 <td>Smoothness</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0xfe58</td>
 <td>MoireFilter</td>
 <td align='center'>string/</td>
-<td align='center'>-</td>
+<td align='center'>ExifIFD</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 7, 2006</i>
+<br><i>Last revised Sep 3, 2006</i>
 </body>
 </html>

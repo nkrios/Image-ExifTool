@@ -3,13 +3,14 @@ AFPointsUsed: (none)
 Aperture: 14.0
 ApertureValue: 14.0
 AutoExposureBracketing: Off
+AutoISO: 100
 AutoRotate: None
 BlueBalance: 1.190619
 BracketMode: Off
 BracketShotNumber: 0
 BracketValue: 0
 BulbDuration: 4
-CameraISO: Use shot ISO instead
+CameraISO: Use ShotISO
 CameraType: EOS Mid-range
 CanonExposureMode: Manual
 CanonFileLength: 4480822
@@ -37,10 +38,11 @@ DateTimeOriginal: 2003:12:04 06:46:52
 DigitalZoom: Unknown (-1)
 Directory: t/images
 DriveMode: Continuous shooting
+EV: 5.6
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 6.27
+ExifToolVersion: 6.35
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -92,12 +94,14 @@ MacroMode: Unknown (0)
 Make: Canon
 MaxAperture: 4
 MaxApertureValue: 4.5
+MeasuredEV: -6.2
 MeteringMode: Center-weighted averaging
 MeteringMode (1): Average
 MinAperture: 27
 Model: Canon EOS DIGITAL REBEL
 ModifyDate: 2003:12:04 06:46:52
 NDFilter: Unknown (-1)
+NumAFPoints: 7
 Orientation: Horizontal (normal)
 OwnerName: Phil Harvey
 Quality: RAW
@@ -117,6 +121,7 @@ SerialNumberFormat: Format 1
 Sharpness: +1
 ShootingMode: Manual
 ShortFocal: 18
+ShotISO: 100
 ShutterSpeed: 4
 ShutterSpeedValue: 0
 SlowShutter: None

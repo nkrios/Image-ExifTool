@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.07
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: Olympus.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1573 bytes
@@ -65,5 +65,6 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/30
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
+[Composite, Composite, Image]  - EV: 6.9
 [Composite, Composite, Camera]  - Focal Length: 7.0mm (35mm equivalent: 38.8mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 4.52 m

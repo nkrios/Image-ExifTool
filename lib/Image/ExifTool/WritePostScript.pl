@@ -140,7 +140,7 @@ sub WritePSDirectory($$$$$)
         $beforeXMP = $1;
         my $xmp = $2;
         my $p1 = pos($$dataPt);
-        unless ($$dataPt =~ m{<\?xpacket end=.w.\?>}sg) {
+        unless ($$dataPt =~ m{<\?xpacket end=.(w|r).\?>}sg) {
             $exifTool->Warn('No XMP packet end');
             return WriteXMPDir($outfile, $flags, $$dataPt);
         }

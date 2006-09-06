@@ -8,6 +8,7 @@
 #               02/27/2005 - P. Harvey Also read UTF-16 and UTF-32 XMP
 #               08/30/2005 - P. Harvey Split tag tables into separate namespaces
 #               10/24/2005 - P. Harvey Added ability to parse .XMP files
+#               08/25/2006 - P. Harvey Added ability to handle blank nodes
 #
 # References:   1) http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf
 #               2) http://www.w3.org/TR/rdf-syntax-grammar/  (20040210)
@@ -38,14 +39,16 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.51';
+$VERSION = '1.52';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
 sub ProcessXMP($$;$);
 sub WriteXMP($$;$);
-sub ParseXMPElement($$$;$$);
+sub ParseXMPElement($$$;$$$);
 sub DecodeBase64($);
+sub SaveBlankInfo($$$;$);
+sub ProcessBlankInfo($$$;$);
 
 # conversions for GPS coordinates
 sub ToDegrees
@@ -86,6 +89,18 @@ my %longConv = (
     'xapBJ'        => 'xmpBJ',
     'xapMM'        => 'xmpMM',
     'xapRights'    => 'xmpRights',
+);
+
+# these are the attributes that we handle for properties that contain
+# sub-properties.  Attributes for simple properties are easy, and we
+# just copy them over.  These are harder since we don't store attributes
+# for properties without simple values.  (maybe this will change...)
+my %recognizedAttrs = (
+    'x:xaptk' => 1,
+    'x:xmptk' => 1,
+    'rdf:about' => 1,
+    'rdf:parseType' => 1,
+    'rdf:nodeID' => 1,
 );
 
 # main XMP tag table
@@ -1558,6 +1573,7 @@ sub GetXMPTagID($)
         # split name into namespace and property name
         # (Note: namespace can be '' for property qualifiers)
         my ($ns, $nm) = ($prop =~ /(.*?):(.*)/) ? ($1, $2) : ('', $prop);
+        $nm =~ s/ .*//;     # remove nodeID if it exists
         if ($ignoreNamespace{$ns}) {
             # special case: don't ignore rdf numbered items
             next unless $prop =~ /^rdf:(_\d+)$/;
@@ -1598,13 +1614,14 @@ sub GetXMPTagID($)
 #         1) Pointer to tag table
 #         2) reference to array of XMP property names (last is current property)
 #         3) property value
+# Returns: 1 if valid tag was found
 sub FoundXMP($$$$)
 {
     local $_;
     my ($exifTool, $tagTablePtr, $props, $val) = @_;
 
     my ($tag, $namespace) = GetXMPTagID($props);
-    return unless $tag;     # ignore things that aren't valid tags
+    return 0 unless $tag;   # ignore things that aren't valid tags
 
     # translate namespace if necessary
     $namespace = $xlatNamespace{$namespace} if $xlatNamespace{$namespace};
@@ -1638,6 +1655,7 @@ sub FoundXMP($$$$)
         my $tagID = join('/',@$props);
         $exifTool->VerboseInfo($tagID, $tagInfo, Value=>$val);
     }
+    return 1;
 }
 
 #------------------------------------------------------------------------------
@@ -1647,19 +1665,28 @@ sub FoundXMP($$$$)
 #         2) reference to XMP data
 #         3) start of xmp element
 #         4) reference to array of enclosing XMP property names (undef if none)
+#         5) reference to blank node information hash
 # Returns: Number of contained XMP elements
-sub ParseXMPElement($$$;$$)
+sub ParseXMPElement($$$;$$$)
 {
-    my $exifTool = shift;
-    my $tagTablePtr = shift;
-    my $dataPt = shift;
-    my $start = shift || 0;
-    my $propListPt = shift || [ ];
+    my ($exifTool, $tagTablePtr, $dataPt, $start, $propListPt, $blankInfo) = @_;
     my $count = 0;
     my $isWriting = $exifTool->{XMP_CAPTURE};
+    $start or $start = 0;
+    $propListPt or $propListPt = [ ];
+
+    my $processBlankInfo;
+    # create empty blank node information hash if necessary
+    $blankInfo or $blankInfo = $processBlankInfo = { Prop => { } };
+    # keep track of current nodeID at this nesting level
+    my $oldNodeID = $$blankInfo{NodeID};
 
     pos($$dataPt) = $start;
-    Element: while ($$dataPt =~ m/<([\w:-]+)(.*?)>/sg) {
+    Element: for (;;) {
+        # reset nodeID before processing each element
+        my $nodeID = $$blankInfo{NodeID} = $oldNodeID;
+        # get next element
+        last unless $$dataPt =~ m/<([\w:-]+)(.*?)>/sg;
         my ($prop, $attrs) = ($1, $2);
         my $val = '';
         # only look for closing token if this is not an empty element
@@ -1685,65 +1712,130 @@ sub ParseXMPElement($$$;$$)
         # push this property name onto our hierarchy list
         push @$propListPt, $prop;
 
-        if ($isWriting) {
-            my %attrs;
-            $attrs{$1} = $3 while $attrs =~ m/(\S+)=(['"])(.*?)\2/sg;
-            # add index to list items so we can keep them in order
-            # (this also enables us to keep structure elements grouped properly
-            # for lists of structures, like JobRef)
-            if ($prop eq 'rdf:li') {
-                $$propListPt[$#$propListPt] = sprintf('rdf:li %.3d', $count);
+        # extract property attributes
+        my (%attrs, @attrs);
+        while ($attrs =~ m/(\S+)=(['"])(.*?)\2/sg) {
+            push @attrs, $1;    # preserve order
+            $attrs{$1} = $3;
+        }
+
+        # add index to list items so we can keep them in order
+        # (this also enables us to keep structure elements grouped properly
+        # for lists of structures, like JobRef)
+        $$propListPt[-1] .= sprintf(' %.3d', $count) if $prop eq 'rdf:li';
+
+        # add nodeID to property path (with leading ' #') if it exists
+        if (defined $attrs{'rdf:nodeID'}) {
+            $nodeID = $$blankInfo{NodeID} = $attrs{'rdf:nodeID'};
+            delete $attrs{'rdf:nodeID'};
+            $$propListPt[-1] .= ' #' . $nodeID;
+        }
+
+        # trim comments and whitespace from rdf:Description properties only
+        if ($prop eq 'rdf:Description') {
+            $val =~ s/<!--.*?-->//g;
+            $val =~ s/^\s*(.*)\s*$/$1/;
+        }
+        # handle properties inside element attributes (RDF shorthand format):
+        # (attributes take the form a:b='c' or a:b="c")
+        my ($shortName, $shorthand, $ignored);
+        foreach $shortName (@attrs) {
+            my $propName = $shortName;
+            my ($ns, $name);
+            if ($propName =~ /(.*?):(.*)/) {
+                $ns = $1;   # specified namespace
+                $name = $2;
+            } elsif ($prop =~ /(.*?):/) {
+                $ns = $1;   # assume same namespace as parent
+                $name = $propName;
+                $propName = "$ns:$name";    # generate full property name
+            } else {
+                # a property qualifier is the only property name that may not
+                # have a namespace, and a qualifier shouldn't have attributes,
+                # but what the heck, let's allow this anyway
+                $ns = '';
+                $name = $propName;
             }
-            if (ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt)) {
+            if ($isWriting) {
+                # keep track of our namespaces when writing
+                if ($ns eq 'xmlns') {
+                    unless ($name eq 'x' or $name eq 'iX') {
+                        my $nsUsed = $exifTool->{XMP_NS};
+                        $$nsUsed{$name} = $attrs{$shortName} unless defined $$nsUsed{$name};
+                    }
+                    next;
+                } elsif ($recognizedAttrs{$propName}) {
+                    # save UUID to use same ID when writing
+                    if ($propName eq 'rdf:about') {
+                        if (not $exifTool->{XMP_UUID}) {
+                            $exifTool->{XMP_UUID} = $attrs{about};
+                        } elsif ($exifTool->{XMP_UUID} ne $attrs{about}) {
+                            $exifTool->Error("Multiple XMP UUID's not handled", 1);
+                        }
+                    }
+                    next;
+                }
+            }
+            if ($ignoreNamespace{$ns}) {
+                $ignored = $propName;
+                next;
+            }
+            my $shortVal = $attrs{$shortName};
+            delete $attrs{$shortName};  # don't re-use this attribute
+            push @$propListPt, $propName;
+            # save this shorthand XMP property
+            if (defined $nodeID) {
+                SaveBlankInfo($blankInfo, $propListPt, $shortVal);
+            } elsif ($isWriting) {
+                CaptureXMP($exifTool, $propListPt, $shortVal);
+            } else {
+                FoundXMP($exifTool, $tagTablePtr, $propListPt, $shortVal);
+            }
+            pop @$propListPt;
+            $shorthand = 1;
+        }
+        if ($isWriting) {
+            if (ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt, $blankInfo)) {
                 # undefine value since we found more properties within this one
                 undef $val;
+                # set an error on any ignored attributes here, because they will be lost
+                $exifTool->{XMP_ERROR} = "Can't handle XMP attribute '$ignored'" if $ignored;
             }
-            CaptureXMP($exifTool, $propListPt, $val, \%attrs);
-        } else {
-            # trim comments and whitespace from rdf:Description properties only
-            if ($prop eq 'rdf:Description') {
-                $val =~ s/<!--.*?-->//g;
-                $val =~ s/^\s*(.*)\s*$/$1/;
-            }
-            # handle properties inside element attributes (RDF shorthand format):
-            # (attributes take the form a:b='c' or a:b="c")
-            my $shorthand;
-            while ($attrs =~ m/(\S+)=(['"])(.*?)\2/sg) {
-                my ($shortName, $shortVal) = ($1, $3);
-                my $ns;
-                if ($shortName =~ /(.*?):/) {
-                    $ns = $1;   # specified namespace
-                } elsif ($prop =~ /(.*?):/) {
-                    $ns = $1;   # assume same namespace as parent
-                    $shortName = "$ns:$shortName";    # add namespace to property name
+            if (defined $val and (length $val or not $shorthand)) {
+                if (defined $nodeID) {
+                    SaveBlankInfo($blankInfo, $propListPt, $val, \%attrs);
                 } else {
-                    # a property qualifier is the only property name that may not
-                    # have a namespace, and a qualifier shouldn't have attributes,
-                    # but what the heck, let's allow this anyway
-                    $ns = '';
+                    CaptureXMP($exifTool, $propListPt, $val, \%attrs);
                 }
-                $ignoreNamespace{$ns} and next;
-                push @$propListPt, $shortName;
-                # save this shorthand XMP property
-                FoundXMP($exifTool, $tagTablePtr, $propListPt, $shortVal);
-                pop @$propListPt;
-                $shorthand = 1;
             }
+        } else {
             # if element value is empty, take value from 'resource' attribute
             # (preferentially) or 'about' attribute (if no 'resource')
             $val = $2 if $val eq '' and ($attrs =~ /\bresource=(['"])(.*?)\1/ or
                                          $attrs =~ /\babout=(['"])(.*?)\1/);
+
             # look for additional elements contained within this one
-            if (!ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt)) {
+            if (!ParseXMPElement($exifTool, $tagTablePtr, \$val, 0, $propListPt, $blankInfo)) {
                 # there are no contained elements, so this must be a simple property value
                 # (unless we already extracted shorthand values from this element)
                 if (length $val or not $shorthand) {
-                    FoundXMP($exifTool, $tagTablePtr, $propListPt, $val);
+                    if (defined $nodeID) {
+                        SaveBlankInfo($blankInfo, $propListPt, $val);
+                    } else {
+                        FoundXMP($exifTool, $tagTablePtr, $propListPt, $val);
+                    }
                 }
             }
         }
         pop @$propListPt;
         ++$count;
+    }
+#
+# process resources referenced by blank nodeID's
+#
+    if ($processBlankInfo and %{$$blankInfo{Prop}}) {
+        ProcessBlankInfo($exifTool, $tagTablePtr, $blankInfo, $isWriting);
+        %$blankInfo = ();   # free some memory
     }
     return $count;  # return the number of elements found at this level
 }

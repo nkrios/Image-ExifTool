@@ -45,7 +45,7 @@
     WRITABLE => 'string',
     NewXMPxxxTag1 => { },
     NewXMPxxxTag2 => { Groups => { 2 => 'Author' } },
-    NewXMPxxxTag3 => { },
+    NewXMPxxxTag3 => { List => 'Bag' },
 );
 
 # The %Image::ExifTool::UserDefined hash defines new tags to be

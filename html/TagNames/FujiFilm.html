@@ -100,6 +100,18 @@
   <br>0x4 = Sports
   <br>0x5 = Night Scene
   <br>0x6 = Program AE
+  <br>0x7 = Natural Light
+  <br>0x8 = Anti-blur
+  <br>0xa = Sunset
+  <br>0xb = Museum
+  <br>0xc = Party
+  <br>0xd = Flower
+  <br>0xe = Text
+  <br>0xf = Natural Light &amp; Flash
+  <br>0x10 = Beach
+  <br>0x11 = Snow
+  <br>0x12 = Fireworks
+  <br>0x13 = Underwater
   <br>0x100 = Aperture-priority AE
   <br>0x200 = Shutter speed priority AE
   <br>0x300 = Manual</font></td></tr>
@@ -108,7 +120,8 @@
 <td>AutoBracketing</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
+  <br>1 = On
+  <br>2 = No flash &amp; flash</font></td></tr>
 <tr valign='top'>
 <td>0x1101</td>
 <td>SequenceNumber</td>
@@ -117,7 +130,7 @@
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x1210</td>
 <td>ColorMode</td>
-<td align='center'>Y</td>
+<td align='center'>int16u</td>
 <td><font size='-1'>0x0 = Standard
   <br>0x10 = Chrome
   <br>0x30 = B &amp; W</font></td></tr>
@@ -209,6 +222,6 @@
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 7, 2006</i>
+<br><i>Last revised Sep 5, 2006</i>
 </body>
 </html>

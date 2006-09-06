@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.04
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: IPTC-XMP_7_failed.xmp
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 8 kB
+[File, File, Image]  - File Size: 5 kB
 [File, File, Time]  - File Modification Date/Time: 2006:01:03 14:32:38
 [File, File, Image]  - File Type: XMP
-[File, File, Image]  - MIME Type: application/xmp
+[File, File, Image]  - MIME Type: application/rdf+xml
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
@@ -70,5 +70,6 @@
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Shutter Speed: 1/64
+[Composite, Composite, Image]  - EV: 9.6
 [Composite, Composite, Camera]  - Focal Length: 6.0mm
 [Composite, Composite, Image]  - Image Size: 100x80

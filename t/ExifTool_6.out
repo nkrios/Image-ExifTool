@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
 [File, File, Image]  - File Name: ExifTool.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
@@ -47,6 +47,7 @@
 [Composite, Composite, Image]  - Aperture: 14.0
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
+[Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
@@ -55,6 +56,7 @@
 [Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
 [Composite, Composite, Camera]  - Blue Balance: 1.190619
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
+[Composite, Composite, Image]  - EV: 5.6
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 52.7mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 4.26 m
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
