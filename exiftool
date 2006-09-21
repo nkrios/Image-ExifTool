@@ -833,6 +833,7 @@ sub GetImageInfo($$)
     }
 
     if ($isWriting) {
+        $verbose and print "======== $file\n";
         my $success = SetImageInfo($exifTool, $file);
         $info = $exifTool->GetInfo('Warning', 'Error');
         if ($info->{Warning}) {
@@ -1196,29 +1197,29 @@ file by renaming it to C<FILE_original>.  (Note: Be sure to verify that the
 new file is OK before erasing the original.)
 
 Below is a list of file types and meta information formats currently
-supported by exiftool (r = read support, w = write support):
+supported by ExifTool (r = read, w = write, c = create):
 
-                 File Type                      Meta Information
-    -----------------------------------        ------------------
-    JPEG  r/w     ICC   r/w     MIFF  r        EXIF           r/w
-    TIFF  r/w     MIE   r/w     PICT  r        GPS            r/w
-    GIF   r/w     PPM   r/w     QTIF  r        IPTC           r/w
-    CRW   r/w     PGM   r/w     RIFF  r        XMP            r/w
-    CR2   r/w     PBM   r/w     AIFF  r        MakerNotes     r/w
-    ERF   r/w     WDP   r/w     AVI   r        Photoshop IRB  r/w
-    NEF   r/w     JP2   r       WAV   r        AFCP           r/w
-    PEF   r/w     BMP   r       MPG   r        JFIF           r/w
-    MRW   r/w     FPX   r       MP3   r        ICC Profile    r/w
-    MOS   r/w     ORF   r       MP4   r        MIE            r/w
-    DNG   r/w     RAF   r       MOV   r        FlashPix       r
-    PNG   r/w     RAW   r       ASF   r        GeoTIFF        r
-    MNG   r/w     SRF   r       WMA   r        PrintIM        r
-    JNG   r/w     SR2   r       WMV   r        ID3            r
-    XMP   r/w     X3F   r       RA    r
-    THM   r/w     DCM   r       RM    r
-    PSD   r/w     ACR   r       RAM   r
-    EPS   r/w     AI    r       SWF   r
-    PS    r/w     PDF   r
+                File Types                 |    Meta Information
+  ---------------------------------------  |  --------------------
+  ACR   r       MIE   r/w/c   PSD   r/w    |  EXIF           r/w/c
+  AI    r       MIFF  r       QTIF  r      |  GPS            r/w/c
+  AIFF  r       MNG   r/w     RA    r      |  IPTC           r/w/c
+  ARW   r       MOS   r/w     RAF   r      |  XMP            r/w/c
+  ASF   r       MOV   r       RAM   r      |  MakerNotes     r/w/c
+  AVI   r       MP3   r       RAW   r      |  Photoshop IRB  r/w/c
+  BMP   r       MP4   r       RIFF  r      |  ICC Profile    r/w/c
+  CR2   r/w     MPG   r       RM    r      |  MIE            r/w/c
+  CRW   r/w     MRW   r/w     SR2   r      |  JFIF           r/w
+  DCM   r       NEF   r/w     SRF   r      |  CIFF           r/w
+  DNG   r/w     ORF   r       SWF   r      |  AFCP           r/w
+  EPS   r/w     PBM   r/w     THM   r/w    |  FlashPix       r
+  ERF   r/w     PDF   r       TIFF  r/w    |  GeoTIFF        r
+  FPX   r       PEF   r/w     WAV   r      |  PrintIM        r
+  GIF   r/w     PGM   r/w     WDP   r/w    |  ID3            r
+  ICC   r/w/c   PICT  r       WMA   r      |  Kodak Meta     r
+  JNG   r/w     PNG   r/w     WMV   r      |  ASCII APP12    r
+  JP2   r       PPM   r/w     X3F   r      |  Adobe APP14    r
+  JPEG  r/w     PS    r/w     XMP   r/w/c  |
 
 =head1 OPTIONS
 
@@ -1531,7 +1532,7 @@ line.
 Set the value of writable tags from information in the specified source
 file.  Tag names on the command line after this option specify information
 to be extracted (or excluded) from the source file.  If no tags are
-specified, then all tags found in the source file are used.  More than one
+specified, then all tags found in the source file are copied.  More than one
 C<-TagsFromFile> option may be specified to set tag values from information
 in different files.
 
@@ -1543,51 +1544,63 @@ case the information is written to the original group, unless redirected to
 a different group.
 
 C<SRCFILE> may be the same as C<FILE> to move information around within a
-file.  C<@> may be used to represent C<FILE> (ie. C<-TagsFromFile @>),
-permitting this feature to be used when batch processing multiple files.
-Specified tags are then copied from file in turn as it is rewritten.  As a
-convenience, C<-TagsFromFile @> is assumed for any redirected tags which are
-specified without a prior C<-TagsFromFile> option.
+file.  C<@> may be used to represent the source file (ie. C<-TagsFromFile
+@>), permitting this feature to be used for batch processing multiple files
+(see note 3 below).  Specified tags are then copied from each file in turn
+as it is rewritten.  For advanced batch use, the source file name may also
+be specified using a C<FMT> string in which %d, %f and %e represent the
+directory, file name and extension of C<FILE>.  See C<-w> option for C<FMT>
+string examples.
 
-A powerful information redirection feature allows a destination tag to be
-specified for each extracted tag.  With this feature, information may be
-written to a tag with a different name or group.  This is done using
+A powerful redirection feature allows a destination tag to be specified for
+each extracted tag.  With this feature, information may be written to a tag
+with a different name or group.  This is done using
 E<quot>C<'-SRCTAGE<gt>DSTTAG'>E<quot> on the command line after
 C<-TagsFromFile> (E<quot>C<'-DSTTAGE<lt>SRCTAG'>E<quot> also works).  Note
 that this argument must be quoted to prevent shell redirection, and there is
 no C<=> sign as there is when setting new values.  Both source and
 destination tags may be prefixed by a group name, and C<All> or C<*> may be
 used as a tag or group name.  If no destination group is specified, then the
-information is written to the preferred group.
+information is written to the preferred group.  As a convenience,
+C<-TagsFromFile @> is assumed for any redirected tags which are specified
+without a prior C<-TagsFromFile> option.
 
-An extension of this redirection feature allows expressions involving tag
+An extension of the redirection feature allows expressions involving tag
 names to be used on the right hand side of the C<E<lt>> symbol with the
-syntax E<quot>C<'-DSTTAGE<lt>EXP'>E<quot>, where C<EXP> is an expression
-containing tag names with leading C<$> symbols.  See the C<-p> option for
-more details about this syntax.  Expressions starting with a C<=> sign must
-insert a single space after the C<E<lt>> to avoid confusion with the
-C<E<lt>=> syntax which would otherwise attempt to set the tag value from the
-contents of a file.  A single space at the start of an expression is removed
-if it exists, but all other whitespace is preserved.
+syntax E<quot>C<'-DSTTAGE<lt>EXP'>E<quot>, where tag names in C<EXP> are
+prefixed with a C<$> symbol.  See the C<-p> option for more details about
+this syntax.  Expressions starting with a C<=> sign must insert a single
+space after the C<E<lt>> to avoid confusion with the C<E<lt>=> syntax which
+would otherwise attempt to set the tag value from the contents of a file.  A
+single space at the start of an expression is removed if it exists, but all
+other whitespace is preserved.
 
 See L</COPYING EXAMPLES> for examples using C<-TagsFromFile>.
 
-For advanced batch use, the source file name may also be specified using a
-C<FMT> string in which %d, %f and %e represent the directory, file name and
-extension of C<FILE>.  See C<-w> option for C<FMT> string examples.
+Notes:
 
-Be aware of the difference between excluding a tag from being copied
+1) Be aware of the difference between excluding a tag from being copied
 (C<--TAG>), and deleting a tag (C<-TAG=>).  Excluding a tag will prevent it
 from being copied to the destination image, but deleting a tag will remove
 it if it already exists.
 
-Note that the maker note information is set as a block, so it isn't affected
-like other information by subsequent tag assignments on the command line.
-For example, to copy all information but the thumbnail image, use
-C<-ThumbnailImage=> after C<-TagsFromFile> on the command line.  Since the
-preview image is referenced from the maker notes and may be rather large, it
-is not copied.  Instead, the preview image must be transferred separately if
-desired.
+2) The maker note information is set as a block, so it isn't affected like
+other information by subsequent tag assignments on the command line.  Also,
+since the PreviewImage referenced from the maker notes may be rather large,
+it is not copied.  Instead, it must be transferred separately if desired.
+
+3) When performing complex batch processing, it is important to note that
+the order of operations is different for tags copied in batch mode.  In
+general, tags are copied from batch-mode files after all other command-line
+arguments have been applied.  (The exception is that a group delete is
+always performed last if there are no subsequent tag assignments on the
+command line.)  For example, the following two commands are not equivalent:
+
+    # (not batch mode): sets xmp:title to 'NEW'
+    exiftool -tagsfromfile a.jpg -xmp:title -xmp:title=NEW a.jpg
+
+    # (batch mode): preserves original title if it exists
+    exiftool -tagsfromfile @ -xmp:title -xmp:title=NEW a.jpg
 
 =item B<-u>
 
@@ -1757,6 +1770,12 @@ Delete only the specified category (C<xxx>) from all files in directory.
 
 Delete all meta information from an image.
 
+=item exiftool -all= -comment='lonely' dst.jpg
+
+Delete all meta information from an image and add a comment back in.  (Note
+that the order is important: C<-comment='lonely' -all=> would also delete
+the new comment.)
+
 =item exiftool -Photoshop:All= dst.jpg
 
 Delete Photoshop meta information from an image (note that the Photoshop
@@ -1828,6 +1847,11 @@ the information to the preferred groups.
 
 Copy the values of all writable tags from C<src.jpg> to C<dst.jpg>,
 preserving the original tag groups.
+
+=item exiftool -all= -tagsfromfile src.jpg -exif:all dst.jpg
+
+Erase all meta information from C<dst.jpg> image, then copy EXIF tags from
+C<src.jpg>.
 
 =item exiftool -tagsfromfile a.jpg out.xmp
 

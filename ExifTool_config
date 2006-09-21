@@ -4,19 +4,22 @@
 # Description:  Sample user configuration file for Image::ExifTool
 #
 # Notes:        This example file shows how to define your own shortcuts and
-#               add new XMP and PNG tags.  Note that unknown XMP and PNG tags
+#               add new EXIF, IPTC, XMP and PNG tags.  Note that unknown tags
 #               are extracted even if they aren't defined, but tags must be
-#               defined to be written.
+#               defined to be written.  Also note that it is possible to
+#               override an existing tag definition with a new tag.
 #
-#               The following 7 new tags are defined below:
+#               As an example, the following 9 new tags are defined below:
 #
-#                   1.  XMP-xxx:NewXMPxxxTag1
-#                   2.  XMP-xxx:NewXMPxxxTag2
-#                   3.  XMP-xxx:NewXMPxxxTag3
-#                   4.  XMP-xmp:NewXMPxmpTag
-#                   5.  PNG:NewPngTag1
-#                   6.  PNG:NewPngTag2
-#                   7.  PNG:NewPngTag3
+#                   1.  EXIF:NewEXIFTag
+#                   2.  IPTC:NewIPTCTag
+#                   3.  XMP-xxx:NewXMPxxxTag1
+#                   4.  XMP-xxx:NewXMPxxxTag2
+#                   5.  XMP-xxx:NewXMPxxxTag3
+#                   6.  XMP-xmp:NewXMPxmpTag
+#                   7.  PNG:NewPngTag1
+#                   8.  PNG:NewPngTag2
+#                   9.  PNG:NewPngTag3
 #
 #               To activate this file, copy it to ".ExifTool_config" in your
 #               home directory or in a directory specified by the EXIFTOOL_HOME
@@ -51,6 +54,22 @@
 # The %Image::ExifTool::UserDefined hash defines new tags to be
 # added to existing tables.
 %Image::ExifTool::UserDefined = (
+    # All EXIF tags are added to the Main table, and WriteGroup is used to
+    # specify where the tag is written (default is ExifIFD if not specified)
+    'Image::ExifTool::Exif::Main' => {
+        0xd000 => {
+            Name => 'NewEXIFTag',
+            Writable => 'int16u',
+            WriteGroup => 'IFD0',
+        },
+    },
+    # IPTC tags are added to a specific record type (ie. application record):
+    'Image::ExifTool::IPTC::ApplicationRecord' => {
+        300 => {
+            Name => 'NewIPTCTag',
+            Format => 'string[0,16]',
+        },
+    },
     # new XMP namespaces must be added to the Main XMP table
     'Image::ExifTool::XMP::Main' => {
         xxx => {

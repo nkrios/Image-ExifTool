@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub FixWrongFormat($);
 
@@ -322,6 +322,28 @@ my %durationInfo = (
             },
         },
         {
+            Name => 'SanyoMOV',
+            Condition => q{
+                $$valPt =~ /^SANYO DIGITAL CAMERA\0/ and
+                $self->{VALUE}->{FileType} eq "MOV"
+            },
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Sanyo::MOV',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
+            Name => 'SanyoMP4',
+            Condition => q{
+                $$valPt =~ /^SANYO DIGITAL CAMERA\0/ and
+                $self->{VALUE}->{FileType} eq "MP4"
+            },
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Sanyo::MP4',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
             Name => 'UnknownTags',
             Unknown => 1,
             ValueConv => '\$val'
@@ -470,6 +492,8 @@ sub ProcessMOV($$;$)
                         DirStart => 0,
                         DirLen => $size,
                         DirName => $$tagInfo{Name},
+                        # Base needed for IsOffset tags in binary data
+                        Base => $raf->Tell() - $size + ($$dirInfo{Base} || 0),
                     );
                     if ($$subdir{ByteOrder} and $$subdir{ByteOrder} =~ /^Little/) {
                         SetByteOrder('II');

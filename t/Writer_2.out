@@ -5,12 +5,13 @@ ApertureValue: 14.0
 AutoExposureBracketing: Off
 AutoISO: 100
 AutoRotate: None
+BaseISO: 100
 BlueBalance: 1.190619
 BracketMode: Off
 BracketShotNumber: 0
 BracketValue: 0
 BulbDuration: 4
-CameraISO: Use ShotISO
+CameraISO: n/a
 CameraType: EOS Mid-range
 CanonExposureMode: Manual
 CanonFileLength: 4480822
@@ -43,7 +44,7 @@ EV: 5.6
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 6.35
+ExifToolVersion: 6.41
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -52,7 +53,7 @@ ExposureTime: 4
 ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
-FileModifyDate: 2006:09:05 15:54:03
+FileModifyDate: 2006:09:18 10:35:21
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FileSize: 3 kB
@@ -95,7 +96,7 @@ MacroMode: Unknown (0)
 Make: Canon
 MaxAperture: 4
 MaxApertureValue: 4.5
-MeasuredEV: -6.2
+MeasuredEV: -6.25
 MeteringMode: Center-weighted averaging
 MeteringMode (1): Average
 MinAperture: 27
@@ -122,7 +123,6 @@ SerialNumberFormat: Format 1
 Sharpness: +1
 ShootingMode: Manual
 ShortFocal: 18
-ShotISO: 100
 ShutterSpeed: 4
 ShutterSpeedValue: 0
 SlowShutter: None

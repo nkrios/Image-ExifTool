@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 #------------------------------------------------------------------------------
 # Process meta information in GIF image
@@ -43,6 +43,9 @@ sub ProcessGIF($$)
         Write($outfile, $type, $s) or $err = 1;
         if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{File}) {
             $setComment = 1;
+            if ($exifTool->{DEL_GROUP}->{File} == 2) {
+                $newComment = $exifTool->GetNewValues('Comment');
+            }
         } else {
             my $newValueHash;
             $newComment = $exifTool->GetNewValues('Comment', \$newValueHash);

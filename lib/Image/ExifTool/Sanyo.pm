@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 my %offOn = (
     0 => 'Off',
@@ -166,6 +166,7 @@ my %offOn = (
             3 => 'Night',
             4 => 'User 1',
             5 => 'User 2',
+            6 => 'Lamp', #PH
         },
     },
     0x0223 => {
@@ -204,6 +205,111 @@ my %offOn = (
         Name => 'DataDump',
         Writable => 0,
         ValueConv => '\$val',
+    },
+);
+
+# tags in Sanyo MOV videos (PH - observations from an E6 sample)
+# (note: very similar to information in Nikon/Pentax videos)
+%Image::ExifTool::Sanyo::MOV = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        This information is found in Sanyo MOV video images, and is very similar to
+        information found in Pentax MOV and Nikon QT videos.
+    },
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[5]',
+        PrintConv => 'ucfirst(lc($val))',
+    },
+    0x18 => {
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Format => 'string[8]',
+    },
+    0x26 => {
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x2a => {
+        Name => 'FNumber',
+        Format => 'int32u',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x32 => {
+        Name => 'ExposureCompensation',
+        Format => 'int32s',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    0x44 => {
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Daylight',
+            2 => 'Shade',
+            3 => 'Fluorescent', #2
+            4 => 'Tungsten',
+            5 => 'Manual',
+        },
+    },
+    0x48 => {
+        Name => 'FocalLength',
+        Writable => 'int32u',
+        ValueConv => '$val * 0.1',
+        PrintConv => 'sprintf("%.1fmm",$val)',
+    },
+);
+
+# tags in Sanyo MP4 videos (PH - from C4, C5 and HD1A samples)
+# (there is still a lot more information here that could be decoded!)
+%Image::ExifTool::Sanyo::MP4 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'This information is found in Sanyo MP4 video images.',
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[5]',
+        PrintConv => 'ucfirst(lc($val))',
+    },
+    0x18 => {
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Format => 'string[8]',
+    },
+    # (0x2e has values 0x31, 0x33 and 0x3c in my samples, but
+    # some of the shutter speeds should be around 1/500 or so)
+    0x32 => {
+        Name => 'FNumber',
+        Format => 'int32u',
+        ValueConv => '$val / 10',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x6a => {
+        Name => 'ISO',
+        Format => 'int32u',
+    },
+# (these tags are shifted by +1 byte for the C4 compared to the HD1A, so we can't use them)
+#     0xfe => {
+#         Name => 'ThumbnailLength',
+#         Format => 'int32u',
+#     },
+#     0x102 => {
+#         Name => 'ThumbnailOffset',
+#         IsOffset => 1,
+#         Format => 'int32u',
+#         RawConv => '$val + 0xf2',
+#     },
+    # so instead, look for the JPEG header using brute force...
+    0x800 => {
+        Name => 'ThumbnailImage',
+        Notes => 'position varies',
+        Format => 'undef[$size - 0x800]',
+        ValueConv => '$val=~s/.*(?=\xff\xd8\xff\xc4)//; $self->ValidateImage(\$val,$tag)',
     },
 );
 

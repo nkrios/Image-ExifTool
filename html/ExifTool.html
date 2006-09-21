@@ -119,7 +119,7 @@ generate the returned information hash and tag list.
     <br>2-N) [optional] list of tag names to find (or tag list reference or
     options reference, see below)
 </td></tr>
-<tr><td><b>Returns</b></td><td>Hash reference for tag/value pairs</td></tr>
+<tr><td><b>Returns</b></td><td>Reference to hash of tag key/value pairs</td></tr>
 </table></blockquote>
 
 <b>Examples:</b>
@@ -219,9 +219,9 @@ current file position, and on return the new file position is not specified.
 A reference to image data in memory.
 
 </td></tr><tr><td valign='top'><b>ARRAY&nbsp;ref</b></td><td>
-Reference to a list of tag names.  On entry, any elements in the
-list are added to the list of requested tags.  On return, this list
-is updated to contain a sorted list of tag names in the proper case.
+Reference to a list of tag names.  On entry, any elements in the list are
+added to the list of requested tags.  On return, this list is updated to
+contain an ordered list of tag keys for all extracted tags.
 
 </td></tr><tr><td valign='top'><b>HASH&nbsp;ref</b></td><td>
 Reference to a hash containing the options settings.  See
@@ -232,11 +232,13 @@ take precedence over <a href="#Options">Options</a> settings.
 
 <b>Return Value:</b>
 
-<p>ImageInfo returns a reference to a hash of tag/value pairs. The keys of the
-hash are the tag identifiers, which are similar to the tag names but may have an
-embedded instance number if more than one tag with that name was found in the image.
-Use <a href="#GetTagName">GetTagName</a> to remove the instance number from the
-tag.  Note that the case of the tags may not be the same as requested.
+<p>L</ImageInfo> returns a reference to a hash of tag key/value pairs.  The
+tag keys are identifiers, which are similar to the tag names but may have an
+embedded instance number if multiple tags with the same name were extracted
+from the image.  Many of the ExifTool functions require a tag key as an
+argument.  Use <a href="#GetTagName">GetTagName</a> to get the tag name for
+a given tag key.  Note that the case of the tag names may not be the same as
+requested.
 
 <p>Values of the returned hash are usually simple scalars, but a scalar
 reference is used to indicate binary data and an array reference may be used
@@ -482,8 +484,8 @@ Extract all meta information from an image.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>ExtractInfo($;@)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1-N) Same as <a href="#ImageInfo">ImageInfo</a> except that a list of tags is
-    not returned if an ARRAY reference is given.
+    <br>1-N) Same as <a href="#ImageInfo">ImageInfo</a> except that a list of tag
+    keys is not returned if an ARRAY reference is given.
 </td></tr>
 <tr><td><b>Returns</b></td><td>1 if this was a valid image, 0 otherwise</td></tr>
 </table></blockquote>
@@ -959,7 +961,7 @@ my $result = $exifTool-&gt;<b>SetFileModifyDate</b>($file);
 <hr><h2><a name="SetFileName">SetFileName</a></h2>
 Set the file name and directory.  If not specified, the new file name is
 derived from the new values of the FileName and Directory tags.  If the
-FileName tag contains a '/', then the file is renamed into a new directory. 
+FileName tag contains a '/', then the file is renamed into a new directory.
 If FileName ends with '/', then it is taken as a directory name and the file
 is moved into the new directory.  The new value for the Directory tag takes
 precedence over any directory specified in FileName.

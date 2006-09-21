@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.40
 [File, File, Image]  - File Name: MIE_3_failed.mie
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
@@ -14,7 +14,7 @@
 [MIE, MIE-Camera, Camera] ExposureComp - Exposure Compensation: 0
 [MIE, MIE-Camera, Camera] ExposureMode - Exposure Mode: Manual
 [MIE, MIE-Camera, Camera] ExposureTime - Exposure Time: 4
-[MIE, MIE-Camera, Camera] FNumber - F Number: 3.5
+[MIE, MIE-Camera, Camera] FNumber - F Number: 11
 [MIE, MIE-Flash, Camera] ExposureComp - Flash Exposure Comp: 0
 [MIE, MIE-Flash, Camera] GuideNumber - Flash Guide Number: 0
 [MIE, MIE-Camera, Camera] FocusMode - Focus Mode: Manual Focus

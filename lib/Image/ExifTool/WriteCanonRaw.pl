@@ -8,6 +8,7 @@
 package Image::ExifTool::CanonRaw;
 
 use strict;
+use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool::Fixup;
 
 # mappings to from RAW tagID to MakerNotes tagID

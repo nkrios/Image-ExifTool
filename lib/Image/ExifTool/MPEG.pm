@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -305,6 +305,38 @@ $VERSION = '1.01';
     #'Bit62'    => 'IntraQuantMatrixFlag',
 );
 
+# composite tags
+%Image::ExifTool::MPEG::Composite = (
+    Duration => {
+        Groups => { 2 => 'Video' },
+        Require => {
+            0 => 'FileSize',
+        },
+        Desire => {
+            1 => 'AudioBitrate',
+            2 => 'VideoBitrate',
+        },
+        # calculate duration as file size divided by total bitrate
+        # (note: this is only approximate!)
+        ValueConv => q{
+            return undef unless $val[1] or $val[2];
+            return undef if $prt[1] and not $prt[1] =~ /^\d+$/;
+            return undef if $val[2] and not $val[2] =~ /^\d+$/;
+            return (8 * $val[0]) / (($prt[1]||0) + ($val[2]||0));
+        },
+        PrintConv => q{
+            my $h = int($val / 3600);
+            my $m = int($val / 60 - $h * 60);
+            my $s = $val - $h * 3600 - $m * 60;
+            return sprintf("%d:%.2d:%05.2f (approx)",$h,$m,$s);
+        },
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::MPEG::Composite');
+
+
 #------------------------------------------------------------------------------
 # Process information in an MPEG audio or video frame header
 # Inputs: 0) ExifTool object ref, 1) tag table ref, 2-N) list of 32-bit data words
@@ -380,9 +412,44 @@ sub ProcessMPEGVideo($$)
     {
         return 0;
     }
+    # set file type if not done already
+    $exifTool->SetFileType('MPEG') unless $exifTool->GetValue('FileType');
+
     my $tagTablePtr = GetTagTable('Image::ExifTool::MPEG::Video');
     ProcessFrameHeader($exifTool, $tagTablePtr, $w1, $w2);
     return 1;
+}
+
+#------------------------------------------------------------------------------
+# Read MPEG audio and video frame headers
+# Inputs: 0) ExifTool object reference, 1) Reference to audio/video data
+# Returns: 1 on success, 0 if no video header was found
+sub ProcessMPEGAudioVideo($$)
+{
+    my ($exifTool, $buffPt) = @_;
+    my %found;
+    my $rtnVal = 0;
+    my %proc = ( audio => \&ProcessMPEGAudio, video => \&ProcessMPEGVideo );
+
+    delete $exifTool->{AudioBitrate};
+    delete $exifTool->{VideoBitrate};
+
+    while ($$buffPt =~ /\0\0\x01(\xb3|\xc0)/g) {
+        my $type = $1 eq "\xb3" ? 'video' : 'audio';
+        next if $found{$type};
+        my $len = length($$buffPt) - pos($$buffPt);
+        last if $len < 4;
+        $len > 256 and $len = 256;
+        my $dat = substr($$buffPt, pos($$buffPt), $len);
+        # process MPEG audio or video
+        if (&{$proc{$type}}($exifTool, \$dat)) {
+            $rtnVal = 1;
+            $found{$type} = 1;
+            # done if we found audio and video
+            last if scalar(keys %found) == 2;
+        }
+    }
+    return $rtnVal;
 }
 
 #------------------------------------------------------------------------------
@@ -393,33 +460,16 @@ sub ProcessMPEG($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my ($buff, $rtnVal, %found);
+    my $buff;
 
     $raf->Read($buff, 4) == 4 or return 0;
     return 0 unless $buff =~ /^\0\0\x01[\xb0-\xbf]/;
     $exifTool->SetFileType();
 
-    my %proc = ( audio => \&ProcessMPEGAudio, video => \&ProcessMPEGVideo );
-
     $raf->Seek(0,0);
     $raf->Read($buff, 65536) or return 0;
 
-    while ($buff =~ /\0\0\x01(\xb3|\xc0)/g) {
-        my $type = $1 eq "\xb3" ? 'video' : 'audio';
-        next if $found{$type};
-        my $len = length($buff) - pos($buff);
-        last if $len < 4;
-        $len > 256 and $len = 256;
-        my $dat = substr($buff, pos($buff), $len);
-        # process MPEG audio or video
-        if (&{$proc{$type}}($exifTool, \$dat)) {
-            $rtnVal = 1;
-            $found{$type} = 1;
-            # done if we found audio and video
-            last if scalar(keys %found) == 2;
-        }
-    }
-    return $rtnVal;
+    return ProcessMPEGAudioVideo($exifTool, \$buff);
 }
 
 1;  # end

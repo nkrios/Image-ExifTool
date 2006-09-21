@@ -16,17 +16,132 @@
 #               8) http://www.chauveau-central.net/mrw-format/
 #               9) CPAN Forum post by 'geve' (http://www.cpanforum.com/threads/2168)
 #              10) http://homepage3.nifty.com/kamisaka/makernote/makernote_km.htm
+#              11) http://www.dyxum.com/dforum/forum_posts.asp?TID=6371&PN=1
+#              12) http://www.minolta-forum.de/forum/index.php?showtopic=14914
+#              13) http://www.mhohner.de/minolta/lenses.php
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %minoltaLensIDs);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.24';
+$VERSION = '1.25';
 
+# lens ID numbers (ref 3)
+%minoltaLensIDs = (
+    0 => 'Minolta AF 28-85mm F3.5-4.5',
+    1 => 'Minolta AF 80-200mm F2.8 HS-APO G',
+    2 => 'Minolta AF 28-70mm F2.8 G',
+    3 => 'Minolta AF 28-80mm F4-5.6',
+    5 => 'Minolta AF 35-70mm F3.5-4.5',
+    6 => 'Minolta AF 24-85mm F3.5-4.5 [New]',
+    # 7 => 'AF 100-400mm F4.5-6.7 (D)', ??
+    7 => 'Minolta AF 100-300mm F4.5-5.6 APO [New]',
+    8 => 'Minolta AF 70-210mm F4.5-5.6',
+    9 => 'Minolta AF 50mm F3.5 Macro',
+    10 => 'Minolta AF 28-105mm F3.5-4.5 [New]',
+    11 => 'Minolta AF 300mm F4 HS-APO G',
+    12 => 'Minolta AF 100mm F2.8 Soft Focus',
+    13 => 'Minolta AF 75-300mm F4.5-5.6',
+    14 => 'Minolta AF 100-400mm F4.5-6.7 APO',
+    15 => 'Minolta AF 400mm F4.5 HS-APO G',
+    16 => 'Minolta AF 17-35mm F3.5 G',
+    17 => 'Minolta AF 20-35mm F3.5-4.5',
+    18 => 'Minolta AF 28-80mm F3.5-5.6 II',
+    19 => 'Minolta AF 35mm F1.4',
+    20 => 'Minolta STF 135mm F2.8 [T4.5]',
+    22 => 'Minolta AF 35-80mm F4-5.6',
+    23 => 'Minolta AF 200mm F4 G APO Macro',
+    24 => 'Minolta AF 24-105mm F3.5-4.5 (D)', # or Sigma 18-50mm F2.8',
+    25 => 'Minolta AF 100-300mm F4.5-5.6 (D)',
+    27 => 'Minolta AF 85mm F1.4 G',
+    28 => 'Minolta AF 100mm F2.8 Macro (D)',
+    29 => 'Minolta AF 75-300mm F4.5-5.6 (D)',
+    30 => 'Minolta AF 28-80mm F3.5-5.6 (D)',
+    31 => 'Minolta AF 50mm F2.8 Macro(D)', #?? or AF 50mm F3.5 Macro',
+    # 32 => 'AF 100-400mm F4.5-6.7 (D) x1.5', ??
+    32 => 'Minolta AF 300mm F2.8 G',
+    33 => 'Minolta AF 70-200mm F2.8 G (D) SSM',
+    35 => 'Minolta AF 85mm F1.4 G (D) Limited',
+    36 => 'Minolta AF 28-100mm F3.5-5.6 (D)',
+    38 => 'KonicaMinolta AF 17-35mm F2.8-4 (D)',
+    39 => 'Minolta AF 28-75mm F2.8 (D)',
+    40 => 'KonicaMinolta AF DT 18-70mm F3.5-5.6 (D)', # (also Sony version)
+    41 => 'Minolta AF DT 11-18mm F4.5-5.6 (D)',
+    42 => 'Minolta AF DT 18-200mm F3.5-6.3 (D)',
+    43 => 'Minolta AF 35mm F1.4 G',
+    44 => 'Minolta AF 50mm F1.4',
+    45 => 'Carl Zeiss Planar T* 85mm F1.4 ZA',
+    46 => 'Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA',
+    47 => 'Carl Zeiss Sonnar T* 135mm F1.8 ZA',
+    128 => 'Tamron 18-200, 28-300 or 80-300mm F3.5-6.3',
+    129 => 'Tamron 200-400mm F5.6 LD', #12
+    138 => 'Soligor 19-35mm F3.5-4.5', #11
+    25501 => 'Minolta AF 50mm F1.7', #7
+    25511 => 'Minolta AF 35-70mm F4', # or Sigma UC AF 28-70mm F3.5-4.5 or Sigma M-AF 70-200mm F2.8 EX Aspherical', #/12/12
+    25521 => 'Minolta AF 28-85mm F3.5-4.5 [New]', # or Tokina 19-35mm F3.5-4.5 or Tokina 28-70mm F2.8 AT-X', #3/7
+    25531 => 'Minolta AF 28-135mm F4-4.5',
+    25541 => 'Minolta AF 35-105mm F3.5-4.5', #13
+    25551 => 'Minolta AF 70-210mm F4 Macro', # or Sigma 70-210mm F4-5.6 APO or Sigma M-AF 70-200mm F2.8 EX APO', #7/6
+    25561 => 'Minolta AF 135mm F2.8',
+    25571 => 'Minolta AF 28mm F2.8',
+    25581 => 'Minolta AF 24-50mm F4',
+    25601 => 'Minolta AF 100-200mm F4.5',
+    25611 => 'Minolta AF 75-300mm F4.5-5.6', #13 # or Sigma 70-300mm F4-5.6 or Sigma 300mm F4 APO Macro', #12/3/7
+    25621 => 'Minolta AF 50mm F1.4 [New]', #13
+    25631 => 'Minolta AF 300mm F2.8 G',
+    25641 => 'Minolta AF 50mm F2.8 Macro',
+    25651 => 'Minolta AF 600mm F4',
+    25661 => 'Minolta AF 24mm F2.8',
+    25721 => 'Minolta AF 500mm F8 Reflex',
+    25781 => 'Minolta AF 16mm F2.8 Fisheye', # or Sigma 8mm F4 Fisheye',
+    25791 => 'Minolta AF 20mm F2.8',
+    25811 => 'Minolta AF 100mm F2.8 Macro New', # or Tamron 90mm F2.8 Macro or Sigma 180mm F5.6 Macro',
+    25858 => 'Minolta AF 35-105mm F3.5-4.5 New', # or Tamron 24-135mm F3.5-5.6',
+    25881 => 'Minolta AF 70-210mm F3.5-4.5',
+    25891 => 'Minolta AF 80-200 F2.8 APO', # or Tokina 80-200mm F2.8',
+    25911 => 'Minolta AF 35mm F1.4', #(from Sony list)
+    25921 => 'Minolta AF 85mm F1.4 G (D)',
+    25931 => 'Minolta AF 200mm F2.8 G APO',
+    25941 => 'Minolta AF 3X-1X F1.7-2.8 Macro',
+    25961 => 'Minolta AF 28mm F2',
+    25971 => 'Minolta AF 35mm F2',
+    25981 => 'Minolta AF 100mm F2',
+    26041 => 'Minolta AF 80-200mm F4.5-5.6',
+    26051 => 'Minolta AF 35-80mm F4-5.6', #(from Sony list)
+    26061 => 'Minolta AF 100-300mm F4.5-5.6 (D)',
+    26071 => 'Minolta AF 35-80mm F4-5.6', #13
+    26081 => 'Minolta AF 300mm F2.8 G',
+    26091 => 'Minolta AF 600mm F4 HS-APO G',
+    26121 => 'Minolta AF 200mm F2.8 G HS-APO',
+    26131 => 'Minolta AF 50mm F1.7 New',
+    26151 => 'Minolta AF 28-105mm F3.5-4.5 Power Zoom',
+    26161 => 'Minolta AF 35-200mm F4.5-5.6 Power Zoom',
+    26181 => 'Minolta AF 28-80mm F4-5.6 Power Zoom',
+    26191 => 'Minolta AF 80-200mm F4.5-5.6 Power Zoom',
+    26201 => 'Minolta AF 28-70mm F2.8 G', #11
+    26211 => 'Minolta AF 100-300mm F4.5-5.6 Power Zoom',
+    26241 => 'Minolta AF 35-80mm F4-5.6 Power Zoom',
+    26281 => 'Minolta AF 80-200mm F2.8 G', #11
+    26291 => 'Minolta AF 85mm F1.4 New',
+    26311 => 'Minolta AF 100-300mm F4.5-5.6 APO', #11
+    26321 => 'Minolta AF 24-50mm F4 New',
+    26381 => 'Minolta AF 50mm F2.8 Macro New',
+    26391 => 'Minolta AF 100mm F2.8 Macro',
+    26411 => 'Minolta AF 20mm F2.8 New',
+    26421 => 'Minolta AF 24mm F2.8 New',
+    26441 => 'Minolta AF 100-400mm F4.5-6.7 APO', #11
+    26621 => 'Minolta AF 50mm F1.4 New',
+    26671 => 'Minolta AF 35mm F2 New',
+    26681 => 'Minolta AF 28mm F2 New',
+    26721 => 'Minolta AF 24-105mm F3.5-4.5 (D)', #11
+    45741 => 'AF 200mm F2.8 G x2', # or Tokina 300mm F2.8 x2',
+);
+
+# Minolta tag table
 %Image::ExifTool::Minolta::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -217,59 +332,7 @@ $VERSION = '1.24';
     0x010c => { #3 (Alpha 7)
         Name => 'LensID',
         Writable => 'int32u',
-        PrintConv => {
-            1 => 'AF80-200mm F2.8G',
-            2 => 'AF28-70mm F2.8G',
-            6 => 'AF24-85mm F3.5-4.5',
-            7 => 'AF100-400mm F4.5-6.7(D)',
-            11 => 'AF300mm F4G',
-            12 => 'AF100mm F2.8 Soft',
-            15 => 'AF400mm F4.5G',
-            16 => 'AF17-35mm F3.5G',
-            19 => 'AF35mm/1.4',
-            20 => 'STF135mm F2.8[T4.5]',
-            23 => 'AF200mm F4G Macro',
-            24 => 'AF24-105mm F3.5-4.5(D) or SIGMA 18-50mm F2.8',
-            25 => 'AF100-300mm F4.5-5.6(D)',
-            27 => 'AF85mm F1.4G',
-            28 => 'AF100mm F2.8 Macro(D)',
-            29 => 'AF75-300mm F4.5-5.6(D)',
-            30 => 'AF28-80mm F3.5-5.6(D)',
-            31 => 'AF50mm F2.8 Macro(D) or AF50mm F3.5 Macro',
-            32 => 'AF100-400mm F4.5-6.7(D) x1.5',
-            33 => 'AF70-200mm F2.8G SSM',
-            35 => 'AF85mm F1.4G(D) Limited',
-            38 => 'AF17-35mm F2.8-4(D)',
-            39 => 'AF28-75mm F2.8(D)',
-            40 => 'AFDT18-70mm F3.5-5.6(D)', #6
-            128 => 'TAMRON 18-200, 28-300 or 80-300mm F3.5-6.3',
-            25501 => 'AF50mm F1.7', #7
-            25521 => 'TOKINA 19-35mm F3.5-4.5 or TOKINA 28-70mm F2.8 AT-X', #3/7
-            25541 => 'AF35-105mm F3.5-4.5',
-            25551 => 'AF70-210mm F4 Macro or SIGMA 70-210mm F4-5.6 APO', #7/6
-            25581 => 'AF24-50mm F4',
-            25611 => 'SIGMA 70-300mm F4-5.6 or SIGMA 300mm F4 APO Macro', #3/7
-            25621 => 'AF50mm F1.4 NEW',
-            25631 => 'AF300mm F2.8G',
-            25641 => 'AF50mm F2.8 Macro',
-            25661 => 'AF24mm F2.8',
-            25721 => 'AF500mm F8 Reflex',
-            25781 => 'AF16mm F2.8 Fisheye or SIGMA 8mm F4 Fisheye',
-            25791 => 'AF20mm F2.8',
-            25811 => 'AF100mm F2.8 Macro(D), TAMRON 90mm F2.8 Macro or SIGMA 180mm F5.6 Macro',
-            25858 => 'TAMRON 24-135mm F3.5-5.6',
-            25891 => 'TOKINA 80-200mm F2.8',
-            25921 => 'AF85mm F1.4G(D)',
-            25931 => 'AF200mm F2.8G',
-            25961 => 'AF28mm F2',
-            25981 => 'AF100mm F2',
-            26061 => 'AF100-300mm F4.5-5.6(D)',
-            26081 => 'AF300mm F2.8G',
-            26121 => 'AF200mm F2.8G(D)',
-            26131 => 'AF50mm F1.7',
-            26241 => 'AF35-80mm F4-5.6',
-            45741 => 'AF200mm F2.8G x2 or TOKINA 300mm F2.8 x2',
-        },
+        PrintConv => \%minoltaLensIDs,
     },
     # 0x010e - WhiteBalance according to ref #10
     0x0114 => { #8
@@ -919,7 +982,7 @@ $VERSION = '1.24';
             0x200 => 'Manual',
         },
     },
-    # 0x0f=0x11 something to do with WB RGB levels as shot? (PH)
+    # 0x0f-0x11 something to do with WB RGB levels as shot? (PH)
     # 0x12-0x17 RGB levels for other WB modes (with G missing)? (PH)
     0x1f => { #PH
         Name => 'Flash',

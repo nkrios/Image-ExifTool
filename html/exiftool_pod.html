@@ -57,29 +57,29 @@ to rewrite <code>FILE</code> with the specified information, preserving the orig
 file by renaming it to <code>FILE_original</code>.  (Note: Be sure to verify that the
 new file is OK before erasing the original.)</p>
 <p>Below is a list of file types and meta information formats currently
-supported by exiftool (r = read support, w = write support):</p>
+supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
-                 File Type                      Meta Information
-    -----------------------------------        ------------------
-    JPEG  r/w     ICC   r/w     MIFF  r        EXIF           r/w
-    TIFF  r/w     MIE   r/w     PICT  r        GPS            r/w
-    GIF   r/w     PPM   r/w     QTIF  r        IPTC           r/w
-    CRW   r/w     PGM   r/w     RIFF  r        XMP            r/w
-    CR2   r/w     PBM   r/w     AIFF  r        MakerNotes     r/w
-    ERF   r/w     WDP   r/w     AVI   r        Photoshop IRB  r/w
-    NEF   r/w     JP2   r       WAV   r        AFCP           r/w
-    PEF   r/w     BMP   r       MPG   r        JFIF           r/w
-    MRW   r/w     FPX   r       MP3   r        ICC Profile    r/w
-    MOS   r/w     ORF   r       MP4   r        MIE            r/w
-    DNG   r/w     RAF   r       MOV   r        FlashPix       r
-    PNG   r/w     RAW   r       ASF   r        GeoTIFF        r
-    MNG   r/w     SRF   r       WMA   r        PrintIM        r
-    JNG   r/w     SR2   r       WMV   r        ID3            r
-    XMP   r/w     X3F   r       RA    r
-    THM   r/w     DCM   r       RM    r
-    PSD   r/w     ACR   r       RAM   r
-    EPS   r/w     AI    r       SWF   r
-    PS    r/w     PDF   r</pre>
+                File Types                 |    Meta Information
+  ---------------------------------------  |  --------------------
+  ACR   r       MIE   r/w/c   PSD   r/w    |  EXIF           r/w/c
+  AI    r       MIFF  r       QTIF  r      |  GPS            r/w/c
+  AIFF  r       MNG   r/w     RA    r      |  IPTC           r/w/c
+  ARW   r       MOS   r/w     RAF   r      |  XMP            r/w/c
+  ASF   r       MOV   r       RAM   r      |  MakerNotes     r/w/c
+  AVI   r       MP3   r       RAW   r      |  Photoshop IRB  r/w/c
+  BMP   r       MP4   r       RIFF  r      |  ICC Profile    r/w/c
+  CR2   r/w     MPG   r       RM    r      |  MIE            r/w/c
+  CRW   r/w     MRW   r/w     SR2   r      |  JFIF           r/w
+  DCM   r       NEF   r/w     SRF   r      |  CIFF           r/w
+  DNG   r/w     ORF   r       SWF   r      |  AFCP           r/w
+  EPS   r/w     PBM   r/w     THM   r/w    |  FlashPix       r
+  ERF   r/w     PDF   r       TIFF  r/w    |  GeoTIFF        r
+  FPX   r       PEF   r/w     WAV   r      |  PrintIM        r
+  GIF   r/w     PGM   r/w     WDP   r/w    |  ID3            r
+  ICC   r/w/c   PICT  r       WMA   r      |  Kodak Meta     r
+  JNG   r/w     PNG   r/w     WMV   r      |  ASCII APP12    r
+  JP2   r       PPM   r/w     X3F   r      |  Adobe APP14    r
+  JPEG  r/w     PS    r/w     XMP   r/w/c  |</pre>
 <p>
 </p>
 <hr />
@@ -490,7 +490,7 @@ line.
 Set the value of writable tags from information in the specified source
 file.  Tag names on the command line after this option specify information
 to be extracted (or excluded) from the source file.  If no tags are
-specified, then all tags found in the source file are used.  More than one
+specified, then all tags found in the source file are copied.  More than one
 <code>-TagsFromFile</code> option may be specified to set tag values from information
 in different files.
 </dd>
@@ -504,57 +504,74 @@ a different group.</p>
 </dd>
 <dd>
 <p><code>SRCFILE</code> may be the same as <code>FILE</code> to move information around within a
-file.  <code>@</code> may be used to represent <code>FILE</code> (ie. <code>-TagsFromFile @</code>),
-permitting this feature to be used when batch processing multiple files.
-Specified tags are then copied from file in turn as it is rewritten.  As a
-convenience, <code>-TagsFromFile @</code> is assumed for any redirected tags which are
-specified without a prior <code>-TagsFromFile</code> option.</p>
+file.  <code>@</code> may be used to represent the source file (ie. <code>-TagsFromFile
+@</code>), permitting this feature to be used for batch processing multiple files
+(see note 3 below).  Specified tags are then copied from each file in turn
+as it is rewritten.  For advanced batch use, the source file name may also
+be specified using a <code>FMT</code> string in which %d, %f and %e represent the
+directory, file name and extension of <code>FILE</code>.  See <code>-w</code> option for <code>FMT</code>
+string examples.</p>
 </dd>
 <dd>
-<p>A powerful information redirection feature allows a destination tag to be
-specified for each extracted tag.  With this feature, information may be
-written to a tag with a different name or group.  This is done using
+<p>A powerful redirection feature allows a destination tag to be specified for
+each extracted tag.  With this feature, information may be written to a tag
+with a different name or group.  This is done using
 &quot;<code>'-SRCTAG&gt;DSTTAG'</code>&quot; on the command line after
 <code>-TagsFromFile</code> (&quot;<code>'-DSTTAG&lt;SRCTAG'</code>&quot; also works).  Note
 that this argument must be quoted to prevent shell redirection, and there is
 no <code>=</code> sign as there is when setting new values.  Both source and
 destination tags may be prefixed by a group name, and <code>All</code> or <code>*</code> may be
 used as a tag or group name.  If no destination group is specified, then the
-information is written to the preferred group.</p>
+information is written to the preferred group.  As a convenience,
+<code>-TagsFromFile @</code> is assumed for any redirected tags which are specified
+without a prior <code>-TagsFromFile</code> option.</p>
 </dd>
 <dd>
-<p>An extension of this redirection feature allows expressions involving tag
+<p>An extension of the redirection feature allows expressions involving tag
 names to be used on the right hand side of the <code>&lt;</code> symbol with the
-syntax &quot;<code>'-DSTTAG&lt;EXP'</code>&quot;, where <code>EXP</code> is an expression
-containing tag names with leading <code>$</code> symbols.  See the <code>-p</code> option for
-more details about this syntax.  Expressions starting with a <code>=</code> sign must
-insert a single space after the <code>&lt;</code> to avoid confusion with the
-<code>&lt;=</code> syntax which would otherwise attempt to set the tag value from the
-contents of a file.  A single space at the start of an expression is removed
-if it exists, but all other whitespace is preserved.</p>
+syntax &quot;<code>'-DSTTAG&lt;EXP'</code>&quot;, where tag names in <code>EXP</code> are
+prefixed with a <code>$</code> symbol.  See the <code>-p</code> option for more details about
+this syntax.  Expressions starting with a <code>=</code> sign must insert a single
+space after the <code>&lt;</code> to avoid confusion with the <code>&lt;=</code> syntax which
+would otherwise attempt to set the tag value from the contents of a file.  A
+single space at the start of an expression is removed if it exists, but all
+other whitespace is preserved.</p>
 </dd>
 <dd>
 <p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples using <code>-TagsFromFile</code>.</p>
 </dd>
 <dd>
-<p>For advanced batch use, the source file name may also be specified using a
-<code>FMT</code> string in which %d, %f and %e represent the directory, file name and
-extension of <code>FILE</code>.  See <code>-w</code> option for <code>FMT</code> string examples.</p>
+<p>Notes:</p>
 </dd>
 <dd>
-<p>Be aware of the difference between excluding a tag from being copied
+<p>1) Be aware of the difference between excluding a tag from being copied
 (<a href="#item__2d_2dtag"><code>--TAG</code></a>), and deleting a tag (<code>-TAG=</code>).  Excluding a tag will prevent it
 from being copied to the destination image, but deleting a tag will remove
 it if it already exists.</p>
 </dd>
 <dd>
-<p>Note that the maker note information is set as a block, so it isn't affected
-like other information by subsequent tag assignments on the command line.
-For example, to copy all information but the thumbnail image, use
-<code>-ThumbnailImage=</code> after <code>-TagsFromFile</code> on the command line.  Since the
-preview image is referenced from the maker notes and may be rather large, it
-is not copied.  Instead, the preview image must be transferred separately if
-desired.</p>
+<p>2) The maker note information is set as a block, so it isn't affected like
+other information by subsequent tag assignments on the command line.  Also,
+since the PreviewImage referenced from the maker notes may be rather large,
+it is not copied.  Instead, it must be transferred separately if desired.</p>
+</dd>
+<dd>
+<p>3) When performing complex batch processing, it is important to note that
+the order of operations is different for tags copied in batch mode.  In
+general, tags are copied from batch-mode files after all other command-line
+arguments have been applied.  (The exception is that a group delete is
+always performed last if there are no subsequent tag assignments on the
+command line.)  For example, the following two commands are not equivalent:</p>
+</dd>
+<dd>
+<pre>
+    # (not batch mode): sets xmp:title to 'NEW'
+    exiftool -tagsfromfile a.jpg -xmp:title -xmp:title=NEW a.jpg</pre>
+</dd>
+<dd>
+<pre>
+    # (batch mode): preserves original title if it exists
+    exiftool -tagsfromfile @ -xmp:title -xmp:title=NEW a.jpg</pre>
 </dd>
 <p></p>
 <dt><strong><a name="item__2du"><strong>-u</strong></a></strong><br />
@@ -779,6 +796,14 @@ Delete only the specified category (<code>xxx</code>) from all files in director
 Delete all meta information from an image.
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2dall_3d__2dcomment_3d_27lonely_27_dst_2">exiftool -all= -comment='lonely' dst.jpg</a></strong><br />
+</dt>
+<dd>
+Delete all meta information from an image and add a comment back in.  (Note
+that the order is important: <code>-comment='lonely' -all=</code> would also delete
+the new comment.)
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__2dphotoshop_3aall_3d_dst_2ejpg">exiftool -Photoshop:All= dst.jpg</a></strong><br />
 </dt>
 <dd>
@@ -873,6 +898,13 @@ the information to the preferred groups.
 <dd>
 Copy the values of all writable tags from <code>src.jpg</code> to <code>dst.jpg</code>,
 preserving the original tag groups.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dall_3d__2dtagsfromfile_src_2ejpg__2dex">exiftool -all= -tagsfromfile src.jpg -exif:all dst.jpg</a></strong><br />
+</dt>
+<dd>
+Erase all meta information from <code>dst.jpg</code> image, then copy EXIF tags from
+<code>src.jpg</code>.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg_out_2exmp">exiftool -tagsfromfile a.jpg out.xmp</a></strong><br />

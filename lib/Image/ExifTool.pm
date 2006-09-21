@@ -24,7 +24,7 @@ use vars qw($VERSION @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables @tableOrd
             $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old $myAPP5hdr
             @loadAllTables %UserDefined);
 
-$VERSION = '6.36';
+$VERSION = '6.42';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
     Public => [qw(
@@ -118,13 +118,14 @@ my @createTypes = qw(XMP ICC MIE);
 
 # file type lookup for all recognized file extensions
 my %fileTypeLookup = (
-    ASF  => 'ASF',  # Microsoft Advanced Systems Format
-    AVI  => 'RIFF', # Audio Video Interleaved (RIFF-based)
     ACR  => 'DICM', # American College of Radiology ACR-NEMA
     AI   => ['PDF','PS'], # Adobe Illustrator (PDF-like or PS-like)
     AIF  => 'AIFF', # Audio Interchange File Format (.3)
     AIFC => 'AIFF', # Audio Interchange File Format Compressed
     AIFF => 'AIFF', # Audio Interchange File Format (.4)
+    ARW  => 'TIFF', # Sony Alpha RAW format (TIFF-like)
+    ASF  => 'ASF',  # Microsoft Advanced Systems Format
+    AVI  => 'RIFF', # Audio Video Interleaved (RIFF-based)
     BMP  => 'BMP',  # Windows BitMaP
     CR2  => 'TIFF', # Canon RAW 2 format (TIFF-like)
     CRW  => 'CRW',  # Canon RAW format
@@ -202,6 +203,7 @@ my %fileTypeLookup = (
 my %mimeType = (
     AIFF => 'audio/aiff',
     ASF  => 'video/x-ms-asf',
+    ARW  => 'image/x-raw',
     AVI  => 'video/avi',
     BMP  => 'image/bmp',
     CR2  => 'image/x-raw',
@@ -1526,7 +1528,7 @@ sub SetFoundTags($)
             if ($reqTag =~ /^(\d+)?(.+?):(.+)/) {
                 ($family, $group, $tag) = ($1, $2, $3);
                 $allGrp = 1 if $group =~ /^(\*|all)$/i;
-                $family = -1 unless defined $family
+                $family = -1 unless defined $family;
             } else {
                 $tag = $reqTag;
                 $family = -1;
@@ -2499,12 +2501,15 @@ sub ProcessJPEG($$)
             if ($wantPreview and $self->{VALUE}->{PreviewImageStart}) {
                 my $buff;
                 my $pos = $raf->Tell();
-                # most previews start right after the JPEG EOI, but the
-                # Olympus E-20 preview is 508 bytes into the trailer...
-                if ($raf->Read($buff, 1024) and $buff =~ /\xff\xd8\xff/g) {
+                # most previews start right after the JPEG EOI, but the Olympus E-20
+                # preview is 508 bytes into the trailer, and the K-M Maxxum 7D preview
+                # is 979 bytes in, but Minolta previews can have a random first byte...
+                if ($raf->Read($buff, 1024) and ($buff =~ /\xff\xd8\xff./g or
+                    ($self->{CameraMake} =~ /Minolta/i and $buff =~ /.\xd8\xff\xdb/g)))
+                {
                     # adjust PreviewImageStart to this location
                     my $start = $self->{VALUE}->{PreviewImageStart};
-                    my $actual = $pos + pos($buff) - 3;
+                    my $actual = $pos + pos($buff) - 4;
                     if ($start ne $actual and $verbose > 1) {
                         print $out "(Fixed PreviewImage location: $start -> $actual)\n";
                     }
@@ -2847,7 +2852,6 @@ sub ProcessTIFF($$;$)
         DirStart => $offset,
         DirLen   => length $$dataPt,
         RAF      => $raf,
-        Multi    => 1,
         DirName  => 'IFD0',
         Parent   => $fileType,
         ImageData=> 1, # set flag to get information to copy image data later
@@ -3507,10 +3511,6 @@ sub ProcessBinaryData($$$)
     my $unknown = $self->{OPTIONS}->{Unknown};
     my $dataPos;
 
-    if ($verbose) {
-        $self->VerboseDir('BinaryData', undef, $size);
-        $dataPos = $$dirInfo{DataPos} || 0;
-    }
     # get default format ('int8u' unless specified)
     my $defaultFormat = $$tagTablePtr{FORMAT} || 'int8u';
     my $increment = $formatSize{$defaultFormat};
@@ -3526,9 +3526,14 @@ sub ProcessBinaryData($$$)
         @tags = ($$tagTablePtr{FIRST_ENTRY}..(int($size/$increment) - 1));
     } elsif ($$dirInfo{DataMember}) {
         @tags = @{$$dirInfo{DataMember}};
+        $verbose = 0;   # no verbose output of extracted values when writing
     } else {
         # extract known tags in numerical order
         @tags = sort { $a <=> $b } TagTableKeys($tagTablePtr);
+    }
+    if ($verbose) {
+        $self->VerboseDir('BinaryData', undef, $size);
+        $dataPos = $$dirInfo{DataPos} || 0;
     }
     my $index;
     my $nextIndex = 0;
@@ -3556,6 +3561,7 @@ sub ProcessBinaryData($$$)
                 #### eval Format (%val, $size)
                 $count = eval $count;
                 $@ and warn("Format $$tagInfo{Name}: $@"), next;
+                next if $count < 0;
             } elsif ($format eq 'string') {
                 # allow string with no specified count to run to end of block
                 $count = ($size > $entry) ? $size - $entry : 0;

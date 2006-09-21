@@ -162,7 +162,8 @@
   <br>2 = TV
   <br>3 = Night
   <br>4 = User 1
-  <br>5 = User 2</font></td></tr>
+  <br>5 = User 2
+  <br>6 = Lamp</font></td></tr>
 <tr valign='top'>
 <td>0x0223</td>
 <td>ManualFocusDistance</td>
@@ -196,9 +197,91 @@
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='MOV'>Sanyo MOV Tags</a></h2>
+This information is found in Sanyo MOV video images, and is very similar to
+information found in Pentax MOV and Nikon QT videos.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>Make</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>24</td>
+<td>Model</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>38</td>
+<td>ExposureTime</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>42</td>
+<td>FNumber</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>50</td>
+<td>ExposureCompensation</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>68</td>
+<td>WhiteBalance</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Auto
+  <br>1 = Daylight
+  <br>2 = Shade
+  <br>3 = Fluorescent
+  <br>4 = Tungsten
+  <br>5 = Manual</font></td></tr>
+<tr valign='top'>
+<td align='right'>72</td>
+<td>FocalLength</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MP4'>Sanyo MP4 Tags</a></h2>
+This information is found in Sanyo MP4 video images.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>Make</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>24</td>
+<td>Model</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>50</td>
+<td>FNumber</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>106</td>
+<td>ISO</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>2048</td>
+<td>ThumbnailImage</td>
+<td align='center'>N</td>
+<td><font size='-1'><font color="#666666">(position varies)</font></font></td></tr>
+</table></td></tr></table></blockquote>
+
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 5, 2006</i>
+<br><i>Last revised Sep 20, 2006</i>
 </body>
 </html>

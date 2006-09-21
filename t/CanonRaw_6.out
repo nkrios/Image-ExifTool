@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.35
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.41
 [File, File, Image]  - File Name: CanonRaw_6_failed.cr2
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 11 kB
-[File, File, Time]  - File Modification Date/Time: 2006:09:05 15:52:53
+[File, File, Time]  - File Modification Date/Time: 2006:09:18 10:34:16
 [File, File, Image]  - File Type: CR2
 [File, File, Image]  - MIME Type: image/x-raw
 [EXIF, IFD0, Image] 256 - Image Width: 1536
@@ -97,8 +97,8 @@
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 35.00mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.37mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
-[MakerNotes, Canon, Image] 2 - Shot ISO: 400
-[MakerNotes, Canon, Image] 3 - Measured EV: 3.0
+[MakerNotes, Canon, Image] 2 - Base ISO: 400
+[MakerNotes, Canon, Image] 3 - Measured EV: 3.00
 [MakerNotes, Canon, Image] 4 - Target Aperture: 8
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/15
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0

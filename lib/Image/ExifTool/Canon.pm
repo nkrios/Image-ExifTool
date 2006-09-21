@@ -39,7 +39,7 @@ use Image::ExifTool::Exif;
 
 sub WriteCanon($$$);
 
-$VERSION = '1.46';
+$VERSION = '1.49';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
@@ -67,6 +67,7 @@ my %canonLensTypes = ( #4
     39 => 'Canon EF 75-300mm f/4-5.6',
     40 => 'Canon EF 28-80mm f/3.5-5.6',
     43 => 'Canon EF 28-105mm f/4-5.6', #10
+    45 => 'Canon EF-S 18-55mm f/3.5-5.6', #PH
     124 => 'Canon MP-E 65mm f/2.8 1-5x Macro Photo', #9
     125 => 'Canon TS-E 24mm f/3.5L',
     126 => 'Canon TS-E 45mm f/2.8', #15
@@ -194,13 +195,17 @@ my %canonLensTypes = ( #4
     0x1810000 => 'PowerShot SD450 / Digital IXUS 55 / IXY Digital 60',
     0x1870000 => 'PowerShot SD400 / Digital IXUS 50 / IXY Digital 55',
     0x1880000 => 'PowerShot A420',
+    0x1890000 => 'PowerShot SD900 / Digital IXUS 900 Ti', # (IXY?)
     0x1900000 => 'PowerShot SD550 / Digital IXUS 750 / IXY Digital 700',
     0x1920000 => 'PowerShot A700',
-    0x1940000 => 'PowerShot SD700 IS / Digital IXUS 800 IS',
+    0x1940000 => 'PowerShot SD700 IS / Digital IXUS 800 IS / IXY Digital 800 IS',
     0x1950000 => 'PowerShot S3 IS',
     0x1960000 => 'PowerShot A540',
     0x1970000 => 'PowerShot SD600 / Digital IXUS 60 / IXY Digital 70',
+    0x1980000 => 'PowerShot G7',
     0x1990000 => 'PowerShot A530',
+    0x2000000 => 'PowerShot SD800 IS / Digital IXUS 850 IS', # (IXY?)
+    0x2010000 => 'PowerShot SD40 / Digital IXUS i7 zoom', # (IXY?)
     0x2020000 => 'PowerShot A710 IS',
     0x2030000 => 'PowerShot A640',
     0x2040000 => 'PowerShot A630',
@@ -1025,19 +1030,18 @@ my %longBin = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     1 => { #PH
         Name => 'AutoISO',
-        Notes => 'valid only when CameraISO is Auto or Auto High',
-        ValueConv => 'exp(Image::ExifTool::Canon::CanonEv($val)*log(2))*100',
-        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(log($val/100)/log(2))',
+        Notes => 'actual ISO used = BaseISO * AutoISO / 100',
+        ValueConv => 'exp($val/32*log(2))*100',
+        ValueConvInv => '32*log($val/100)/log(2)',
         PrintConv => 'sprintf("%.0f",$val)',
         PrintConvInv => '$val',
     },
     2 => {
-        Name => 'ShotISO',
+        Name => 'BaseISO',
         Priority => 0,
-        Notes => 'not valid when CameraISO is Auto or Auto High',
-        # lookup tables can't predict new values, so calculate ISO instead - PH
-        ValueConv => 'exp(Image::ExifTool::Canon::CanonEv($val)*log(2))*100/32',
-        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(log($val*32/100)/log(2))',
+        RawConv => '$val ? $val : undef',
+        ValueConv => 'exp($val/32*log(2))*100/32',
+        ValueConvInv => '32*log($val*32/100)/log(2)',
         PrintConv => 'sprintf("%.0f",$val)',
         PrintConvInv => '$val',
     },
@@ -1046,7 +1050,7 @@ my %longBin = (
         Notes => 'offset by -5 EV from the calculated value for most models',
         ValueConv => '$val / 32',
         ValueConvInv => '$val * 32',
-        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConv => 'sprintf("%.2f",$val)',
         PrintConvInv => '$val',
     },
     4 => { #2, 9
@@ -2223,15 +2227,14 @@ my %longBin = (
         Priority => 0,  # let EXIF:ISO take priority
         Desire => {
             0 => 'Canon:CameraISO',
-            1 => 'Canon:ShotISO',
+            1 => 'Canon:BaseISO',
             2 => 'Canon:AutoISO',
         },
+        Notes => 'use CameraISO if numerical, otherwise calculate as BaseISO * AutoISO / 100',
         ValueConv => q{
-            if (defined $val[0]) {
-                return $val[0] if $val[0] =~ /^\d+$/;  # use CameraISO if numerical
-                return $val[2] if $val[0] =~ /Auto/;   # use AutoISO for Auto settings
-            }
-            return $val[1];     # otherwise use ShotISO
+            return $val[0] if $val[0] and $val[0] =~ /^\d+$/;
+            return undef unless $val[1] and $val[2];
+            return $val[1] * $val[2] / 100;
         },
         PrintConv => 'sprintf("%.0f",$val)',
     },
@@ -2293,7 +2296,7 @@ sub CameraISO($;$)
     my ($val, $inv) = @_;
     my $rtnVal;
     my %isoLookup = (
-         0 => 'Use ShotISO',
+         0 => 'n/a',
         14 => 'Auto High', #PH (S3IS)
         15 => 'Auto',
         16 => 50,

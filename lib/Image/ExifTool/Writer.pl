@@ -19,6 +19,8 @@ use Image::ExifTool::TagLookup qw(FindTagInfo TagExists);
 sub AssembleRational($$@);
 sub LastInList($);
 sub CreateDirectory($);
+sub RemoveNewValueHash($$$);
+sub RemoveNewValuesForGroup($$);
 
 my $loadedAllTables;    # flag indicating we loaded all tables
 my $evalWarning;        # eval warning message
@@ -67,6 +69,12 @@ my %dirMap = (
 my @delGroups = qw(
     AFCP EXIF ExifIFD File GlobParamIFD GPS IFD0 IFD1 InteropIFD
     ICC_Profile IPTC MakerNotes PNG MIE Photoshop PrintIM SubIFD XMP
+);
+# group names of new tag values to remove when deleting an entire group
+my %removeGroups = (
+    IFD0    => [ 'EXIF', 'MakerNotes' ],
+    EXIF    => [ 'MakerNotes' ],
+    ExifIFD => [ 'MakerNotes', 'InteropIFD' ],
 );
 # group names to translate for writing
 my %translateWriteGroup = (
@@ -193,6 +201,8 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                         } else {
                             $self->{DEL_GROUP}->{$grp} = 1;
                             $verbose > 1 and print $out "Deleting all $grp tags\n";
+                            # remove all of this group from previous new values
+                            $self->RemoveNewValuesForGroup($grp);
                         }
                     }
                 } else {
@@ -247,7 +257,7 @@ ReturnNow:  return ($numSet, $err) if wantarray;
     }
     # get group name that we're looking for
     my $foundMatch = 0;
-    my $ifdName;
+    my ($ifdName, $mieGroup);
     if ($wantGroup) {
         # set $ifdName if this group is a valid IFD or SubIFD name
         if ($wantGroup =~ /^IFD(\d+)$/i) {
@@ -255,7 +265,7 @@ ReturnNow:  return ($numSet, $err) if wantarray;
         } elsif ($wantGroup =~ /^SubIFD(\d+)$/i) {
             $ifdName = "SubIFD$1";
         } elsif ($wantGroup =~ /^MIE(\d*-?)(\w+)$/i) {
-            $ifdName = "MIE$1" . ucfirst(lc($2));
+            $mieGroup = "MIE$1" . ucfirst(lc($2));
         } else {
             $ifdName = $exifDirs{lc($wantGroup)};
             if ($wantGroup =~ /^XMP\b/i) {
@@ -280,12 +290,15 @@ ReturnNow:  return ($numSet, $err) if wantarray;
             # only set tag in specified group
             $writeGroup = $self->GetGroup($tagInfo, 0);
             unless (lc($writeGroup) eq $lcWant) {
-                if ($writeGroup eq 'EXIF' or $writeGroup eq 'MIE') {
+                if ($writeGroup eq 'EXIF') {
                     next unless $ifdName;
                     $writeGroup = $ifdName;  # write to the specified IFD
+                } elsif ($writeGroup eq 'MIE') {    
+                    next unless $mieGroup;
+                    $writeGroup = $mieGroup; # write to specific MIE group
                 } else {
                     # allow group1 name to be specified
-                    my $grp1 = $self->GetGroup($tagInfo, 0);
+                    my $grp1 = $self->GetGroup($tagInfo, 1);
                     unless ($grp1 and lc($grp1) eq $lcWant) {
                         # must also check group1 name directly in case it is different
                         $grp1 = $tagInfo->{Groups}->{1};
@@ -578,6 +591,15 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                          grep(/^$/,@{$newValueHash->{DelValue}}))
                 {
                     $newValueHash->{IsCreating} = 1;
+                }
+            }
+            if ($self->{DEL_GROUP} and $newValueHash->{IsCreating}) {
+                my $grp;
+                foreach $grp (keys %{$self->{DEL_GROUP}}) {
+                    next if $self->{DEL_GROUP}->{$grp} == 2;
+                    # set flag indicating tags were written after this group was deleted
+                    $self->{DEL_GROUP}->{$grp} = 2;
+                    $verbose > 1 and print $out "[writing new tags after deleting $grp group]\n";
                 }
             }
             if ($shift or not $options{DelValue}) {
@@ -1266,7 +1288,7 @@ sub WriteInfo($$;$$)
                 $rtnVal = $self->WriteJPEG(\%dirInfo);
             } elsif ($type eq 'TIFF') {
                 # don't allow rewriting of Sony raw images
-                if ($tiffType =~ /^(SRF|SR2)$/) {
+                if ($tiffType =~ /^(SRF|SR2|ARW)$/) {
                     $fileType = $tiffType;
                     undef $rtnVal;
                 } else {
@@ -1720,7 +1742,6 @@ sub GetWriteGroup($)
 sub GetNewValueHash($$;$$)
 {
     my ($self, $tagInfo, $writeGroup, $opts) = @_;
-    my $saveHash = $self->{SAVE_NEW_VALUE};
     my $newValueHash = $self->{NEW_VALUE}->{$tagInfo};
 
     my %opts;   # quick lookup for options
@@ -1736,28 +1757,9 @@ sub GetNewValueHash($$;$$)
     # remove this entry if deleting, or if creating a new entry and
     # this entry is marked with "Save" flag
     if (defined $newValueHash and ($opts{'delete'} or
-        ($opts{'create'} and $saveHash and $newValueHash->{Save})))
+        ($opts{'create'} and $newValueHash->{Save})))
     {
-        my $firstHash = $self->{NEW_VALUE}->{$tagInfo};
-        if ($newValueHash eq $firstHash) {
-            # remove first entry from linked list
-            if ($newValueHash->{Next}) {
-                $self->{NEW_VALUE}->{$tagInfo} = $newValueHash->{Next};
-            } else {
-                delete $self->{NEW_VALUE}->{$tagInfo};
-            }
-        } else {
-            # find the list element pointing to this hash
-            $firstHash = $firstHash->{Next} while $firstHash->{Next} ne $newValueHash;
-            # remove from linked list
-            $firstHash->{Next} = $newValueHash->{Next};
-        }
-        # save the existing entry if necessary
-        if ($saveHash and $newValueHash->{Save}) {
-            # add to linked list of saved new value hashes
-            $newValueHash->{Next} = $saveHash->{$tagInfo};
-            $saveHash->{$tagInfo} = $newValueHash;
-        }
+        $self->RemoveNewValueHash($newValueHash, $tagInfo);
         undef $newValueHash;
     }
     if (not defined $newValueHash and $opts{'create'}) {
@@ -1810,6 +1812,71 @@ sub LoadAllTables()
             }
         }
         $loadedAllTables = 1;
+    }
+}
+
+#------------------------------------------------------------------------------
+# Remove new value hash from linked list (and save if necessary)
+# Inputs: 0) ExifTool object reference, 1) new value hash ref, 2) tagInfo ref
+sub RemoveNewValueHash($$$)
+{
+    my ($self, $newValueHash, $tagInfo) = @_;
+    my $firstHash = $self->{NEW_VALUE}->{$tagInfo};
+    if ($newValueHash eq $firstHash) {
+        # remove first entry from linked list
+        if ($newValueHash->{Next}) {
+            $self->{NEW_VALUE}->{$tagInfo} = $newValueHash->{Next};
+        } else {
+            delete $self->{NEW_VALUE}->{$tagInfo};
+        }
+    } else {
+        # find the list element pointing to this hash
+        $firstHash = $firstHash->{Next} while $firstHash->{Next} ne $newValueHash;
+        # remove from linked list
+        $firstHash->{Next} = $newValueHash->{Next};
+    }
+    # save the existing entry if necessary
+    if ($newValueHash->{Save}) {
+        my $saveHash = $self->{SAVE_NEW_VALUE};
+        # add to linked list of saved new value hashes
+        $newValueHash->{Next} = $saveHash->{$tagInfo};
+        $saveHash->{$tagInfo} = $newValueHash;
+    }
+}
+
+#------------------------------------------------------------------------------
+# Remove all new value entries for specified group
+# Inputs: 0) ExifTool object reference, 1) group name
+sub RemoveNewValuesForGroup($$)
+{
+    my ($self, $group) = @_;
+
+    return unless $self->{NEW_VALUE};
+
+    # make list of all groups we must remove
+    my @groups = ( $group );
+    push @groups, @{$removeGroups{$group}} if $removeGroups{$group};
+
+    my ($out, @keys, $hashKey);
+    $out = $self->{OPTIONS}->{TextOut} if $self->{OPTIONS}->{Verbose} > 1;
+
+    # loop though all new values, and remove any in this group
+    @keys = keys %{$self->{NEW_VALUE}};
+    foreach $hashKey (@keys) {
+        my $newValueHash = $self->{NEW_VALUE}->{$hashKey};
+        # loop through each entry in linked list
+        for (;;) {
+            my $nextHash = $newValueHash->{Next};
+            my $tagInfo = $newValueHash->{TagInfo};
+            my $grp0 = $self->GetGroup($tagInfo, 0);
+            my $wgrp = $newValueHash->{WriteGroup};
+            if (grep /^($grp0|$wgrp)$/, @groups) {
+                $out and print $out "Removed new value for $wgrp:$$tagInfo{Name}\n";
+                # remove from linked list
+                $self->RemoveNewValueHash($newValueHash, $tagInfo);
+            }
+            $newValueHash = $nextHash or last;
+        }
     }
 }
 
@@ -1972,26 +2039,42 @@ sub WriteDirectory($$$;$)
     my $grp0 = $tagTablePtr->{GROUPS}->{0};
     $dirName or $dirName = $$dirInfo{DirName} = $grp0;
     if ($self->{DEL_GROUP}) {
-        my $delGroupPtr = $self->{DEL_GROUP};
+        my $delGroup = $self->{DEL_GROUP};
         # delete entire directory if specified
         my $grp1 = $dirName;
-        if ($$delGroupPtr{$grp0} or $$delGroupPtr{$grp1}) {
-            if ($self->{FILE_TYPE} ne 'JPEG' and $self->{FILE_TYPE} ne 'PNG') {
+        my $delFlag = ($$delGroup{$grp0} or $$delGroup{$grp1});
+        if ($delFlag) {
+            unless ($self->{FILE_TYPE} eq 'JPEG' or $self->{FILE_TYPE} eq 'PNG') {
                 # restrict delete logic to prevent entire tiff image from being killed
                 # (don't allow IFD0 to be deleted, and delete only ExifIFD if EXIF specified)
                 if ($grp1 eq 'IFD0') {
-                    $$delGroupPtr{IFD0} and $self->Warn("Can't delete IFD0 from $self->{FILE_TYPE} image",1);
+                    $$delGroup{IFD0} and $self->Warn("Can't delete IFD0 from $self->{FILE_TYPE} image",1);
                     undef $grp1;
-                } elsif ($grp0 eq 'EXIF' and $$delGroupPtr{$grp0}) {
-                    undef $grp1 unless $$delGroupPtr{$grp1} or $grp1 eq 'ExifIFD';
+                } elsif ($grp0 eq 'EXIF' and $$delGroup{$grp0}) {
+                    undef $grp1 unless $$delGroup{$grp1} or $grp1 eq 'ExifIFD';
                 }
             }
             if ($grp1) {
-                ++$self->{CHANGED};
-                $out and print $out "  Deleting $grp1\n";
-                # can no longer validate TIFF_END if deleting an entire IFD
-                delete $self->{TIFF_END} if $dirName =~ /IFD/;
-                return '';
+                if ($$dirInfo{DataPt} or $$dirInfo{RAF}) {
+                    ++$self->{CHANGED};
+                    $out and print $out "  Deleting $grp1\n";
+                    # can no longer validate TIFF_END if deleting an entire IFD
+                    delete $self->{TIFF_END} if $dirName =~ /IFD/;
+                }
+                if ($delFlag == 2 and $self->{ADD_DIRS}->{$grp1}) {
+                    # create new empty directory
+                    my $data = '';
+                    my %dirInfo = (
+                        DirName => $$dirInfo{DirName},
+                        DirStart => 0,
+                        DirLen => 0,
+                        NewDataPos => $$dirInfo{NewDataPos},
+                        Fixup => $$dirInfo{Fixup},
+                    );
+                    $dirInfo = \%dirInfo;
+                } else {
+                    return '';
+                }
             }
         }
     }
@@ -2682,6 +2765,7 @@ sub WriteJPEG($$)
     # figure out what segments we need to write for the tags we have set
     my $addDirs = $self->{ADD_DIRS};
     my $editDirs = $self->{EDIT_DIRS};
+    my $delGroup = $self->{DEL_GROUP} || { };
 
     # set input record separator to 0xff (the JPEG marker) to make reading quicker
     my $oldsep = $/;
@@ -2733,8 +2817,9 @@ sub WriteJPEG($$)
                 } elsif ($marker == 0xed) {
                     $s =~ /^$psAPP13hdr/   and $dirName = 'Photoshop';
                 }
-                # don't add directory if it already exists
-                delete $$addDirs{$dirName} if defined $dirName;
+                # initialize doneDir as a flag that the directory exists
+                # (unless we are deleting it anyway)
+                $doneDir{$dirName} = 0 if defined $dirName and not $$delGroup{$dirName};
             }
             $raf->Seek($len, 1) or last;
         }
@@ -2791,7 +2876,7 @@ sub WriteJPEG($$)
             # don't create anything before APP0 or EXIF APP1 (containing IFD0)
             last if $markerName eq 'APP0' or $dirCount{IFD0};
             # EXIF information must come immediately after APP0
-            if (exists $$addDirs{IFD0} and not $doneDir{IFD0}) {
+            if (exists $$addDirs{IFD0} and not defined $doneDir{IFD0}) {
                 $doneDir{IFD0} = 1;
                 $verbose and print $out "Creating APP1:\n";
                 # write new EXIF data
@@ -2808,7 +2893,6 @@ sub WriteJPEG($$)
                     NewDataPos => 8,    # new data will come after TIFF header
                     DirName => 'IFD0',
                     Parent  => $markerName,
-                    Multi   => 1,
                 );
                 my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                 if (defined $buff and length $buff) {
@@ -2834,7 +2918,7 @@ sub WriteJPEG($$)
             }
             # Photoshop APP13 segment next
             last if $dirCount{Photoshop};
-            if (exists $$addDirs{Photoshop} and not $doneDir{Photoshop}) {
+            if (exists $$addDirs{Photoshop} and not defined $doneDir{Photoshop}) {
                 $doneDir{Photoshop} = 1;
                 $verbose and print $out "Creating APP13:\n";
                 # write new Photoshop APP13 record to memory
@@ -2850,7 +2934,7 @@ sub WriteJPEG($$)
             }
             # then XMP APP1 segment
             last if $dirCount{XMP};
-            if (exists $$addDirs{XMP} and not $doneDir{XMP}) {
+            if (exists $$addDirs{XMP} and not defined $doneDir{XMP}) {
                 $doneDir{XMP} = 1;
                 $verbose and print $out "Creating APP1:\n";
                 # write new XMP data
@@ -2872,9 +2956,9 @@ sub WriteJPEG($$)
             }
             # then ICC_Profile APP2 segment
             last if $dirCount{ICC_Profile};
-            if (exists $$addDirs{ICC_Profile} and not $doneDir{ICC_Profile}) {
+            if (exists $$addDirs{ICC_Profile} and not defined $doneDir{ICC_Profile}) {
                 $doneDir{ICC_Profile} = 1;
-                next if $self->{DEL_GROUP} and $self->{DEL_GROUP}->{ICC_Profile};
+                next if $$delGroup{ICC_Profile} and $$delGroup{ICC_Profile} != 2;
                 $verbose and print $out "Creating APP2:\n";
                 # write new ICC_Profile data
                 my $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
@@ -2889,9 +2973,9 @@ sub WriteJPEG($$)
             }
             # finally, COM segment
             last if $dirCount{COM};
-            if (exists $$addDirs{COM} and not $doneDir{COM}) {
+            if (exists $$addDirs{COM} and not defined $doneDir{COM}) {
                 $doneDir{COM} = 1;
-                next if $self->{DEL_GROUP} and $self->{DEL_GROUP}->{File};
+                next if $$delGroup{File} and $$delGroup{File} != 2;
                 my $newComment = $self->GetNewValues('Comment');
                 if (defined $newComment and length($newComment)) {
                     $verbose and print $out "Creating COM:\n";
@@ -3130,7 +3214,7 @@ sub WriteJPEG($$)
                 }
             } elsif ($marker == 0xe2) {         # APP2 (ICC Profile)
                 if ($$segDataPt =~ /^ICC_PROFILE\0/) {
-                    if ($self->{DEL_GROUP} and $self->{DEL_GROUP}->{ICC_Profile}) {
+                    if ($$delGroup{ICC_Profile}) {
                         ++$self->{CHANGED};
                         $verbose and print $out "  Deleting ICC_Profile segment\n";
                         next Marker;
@@ -3227,14 +3311,15 @@ sub WriteJPEG($$)
                 my $newComment;
                 unless ($doneDir{COM}) {
                     $doneDir{COM} = 1;
-                    unless ($self->{DEL_GROUP} and $self->{DEL_GROUP}->{File}) {
+                    unless ($$delGroup{File} and $$delGroup{File} != 2) {
                         my $tagInfo = $Image::ExifTool::Extra{Comment};
                         my $newValueHash = $self->GetNewValueHash($tagInfo);
-                        unless (IsOverwriting($newValueHash, $segData)) {
+                        if (IsOverwriting($newValueHash, $segData) or $$delGroup{File}) {
+                            $newComment = GetNewValues($newValueHash);
+                        } else {
                             delete $$editDirs{COM}; # we aren't editing COM after all
                             last;
                         }
-                        $newComment = GetNewValues($newValueHash);
                     }
                 }
                 $verbose > 1 and print $out "    - Comment = '$$segDataPt'\n";

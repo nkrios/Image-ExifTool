@@ -9,6 +9,8 @@
 package Image::ExifTool::Exif;
 
 use strict;
+use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
+            %lightSource %compression %photometricInterpretation %orientation);
 
 use Image::ExifTool::Fixup;
 
@@ -968,6 +970,8 @@ sub WriteExif($$$)
     my ($nextIfdPos, %offsetData, $inMakerNotes);
     my $deleteAll = 0;
 
+    # allow multiple IFD's in IFD0-IFD1-IFD2... chain
+    $$dirInfo{Multi} = 1 if $dirName eq 'IFD0';
     $inMakerNotes = 1 if $tagTablePtr->{GROUPS}->{0} eq 'MakerNotes';
     my $ifd;
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1024,7 +1028,7 @@ sub WriteExif($$$)
         my $mustRead;
         if ($dirStart < 0 or $dirStart > $dataLen-2) {
             $mustRead = 1;
-        } else {
+        } elsif ($dirLen > 2) {
             my $len = 2 + 12 * Get16u($dataPt, $dirStart);
             $mustRead = 1 if $dirStart + $len > $dataLen;
         }
@@ -1320,7 +1324,7 @@ sub WriteExif($$$)
                             unless ($isNew) {
                                 ++$exifTool->{CHANGED};
                                 $val = $exifTool->Printable($val);
-                                $verbose > 1 and print $out "    - $$newInfo{Name} = '$val'\n";
+                                $verbose > 1 and print $out "    - $dirName:$$newInfo{Name} = '$val'\n";
                             }
                             next;
                         }
@@ -1348,9 +1352,9 @@ sub WriteExif($$$)
                             if ($verbose > 1) {
                                 $val = $exifTool->Printable($val);
                                 $newVal = $exifTool->Printable($newVal);
-                                print $out "    - $$newInfo{Name} = '$val'\n" unless $isNew;
+                                print $out "    - $dirName:$$newInfo{Name} = '$val'\n" unless $isNew;
                                 my $str = $newValueHash ? '' : ' (mandatory)';
-                                print $out "    + $$newInfo{Name} = '$newVal'$str\n";
+                                print $out "    + $dirName:$$newInfo{Name} = '$newVal'$str\n";
                             }
                         }
                     } else {
@@ -1454,7 +1458,9 @@ sub WriteExif($$$)
 #
                 if ($$newInfo{MakerNotes}) {
                     # don't write new makernotes if we are deleting this group
-                    if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{MakerNotes}) {
+                    if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{MakerNotes} and
+                        ($exifTool->{DEL_GROUP}->{MakerNotes} != 2 or $isNew <= 0))
+                    {
                         if ($isNew <= 0) {
                             ++$exifTool->{CHANGED};
                             $verbose and print $out "  Deleting MakerNotes\n";
@@ -1608,6 +1614,10 @@ sub WriteExif($$$)
                                         $subSize = 12 * Get16u(\$buff, 0) and
                                         $raf->Read($buf2,$subSize) == $subSize)
                                 {
+                                    if (defined $subSize and not $subSize) {
+                                        next unless $exifTool->Error("$subdirName IFD has zero entries", 1);
+                                        return undef;
+                                    }
                                     return ExifErr($exifTool, "Can't read $subdirName data", $inMakerNotes);
                                 }
                                 UpdateTiffEnd($exifTool, $pt+$base+2+$subSize);
@@ -1917,7 +1927,16 @@ sub WriteExif($$$)
                 if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{$dirName}) {
                     $verbose and print $out "  Deleting $dirName\n";
                     ++$exifTool->{CHANGED};
-                    last;   # don't write this IFD (or any subsequent IFD)
+                    if ($exifTool->{DEL_GROUP}->{$dirName} == 2 and
+                        $exifTool->{ADD_DIRS}->{$dirName})
+                    {
+                        $ifd = "\0" x 2;    # start with empty IFD
+                        $dataPt = \$ifd;
+                        $dirStart = 0;
+                        $dirLen = $dataLen = 2;
+                    } else {
+                        last;   # don't write this IFD (or any subsequent IFD)
+                    }
                 } else {
                     $verbose and print $out "  Rewriting $dirName\n";
                 }

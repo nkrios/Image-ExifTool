@@ -33,7 +33,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.06';
+$VERSION = '2.07';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -2212,7 +2212,9 @@ sub ProcessExif($$$)
 
     $verbose = -1 if $htmlDump; # mix htmlDump into verbose so we can test for both at once
     $dirName eq 'EXIF' and $dirName = $$dirInfo{DirName} = 'IFD0';
+    $$dirInfo{Multi} = 1 if $dirName eq 'IFD0';
     $htmlDump and $name = ($dirName eq 'MakerNotes') ? $$dirInfo{Name} : $dirName;
+
     my ($numEntries, $dirEnd);
     if ($dirStart >= 0 and $dirStart <= $dataLen-2) {
         # make sure data is large enough (patches bug in Olympus subdirectory lengths)

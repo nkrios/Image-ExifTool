@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -463,6 +463,9 @@ sub FoundPNG($$$$;$$)
                 my ($isOverwriting, $newVal);
                 if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{PNG}) {
                     $isOverwriting = 1;
+                    if ($exifTool->{DEL_GROUP}->{PNG} == 2) {
+                        $newVal = $exifTool->GetNewValues($tagInfo);
+                    }
                 } else {
                     my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
                     $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash, $val);

@@ -660,7 +660,7 @@ sub WriteMIEGroup($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $optCompress = $exifTool->Options('Compress');
     my $out = $exifTool->Options('TextOut');
-    my ($buff, $msg, $err, $ok, $sync);
+    my ($buff, $msg, $err, $ok, $sync, $delGroup);
     my $tag = '';
     my $deletedTag = '';
 
@@ -683,6 +683,14 @@ sub WriteMIEGroup($$$)
     $isWriting{$grp} = 1;           # ie. 'MIE-Doc'
     $isWriting{$grp1} = 1;          # ie. 'MIE1-Doc2'
     $isWriting{"MIE$n"} = 1;        # ie. 'MIE1'
+
+    # determine if we are deleting this group
+    if ($exifTool->{DEL_GROUP}) {
+        $delGroup = 1 if $exifTool->{DEL_GROUP}->{MIE} or
+                         $exifTool->{DEL_GROUP}->{$grp} or
+                         $exifTool->{DEL_GROUP}->{$grp1} or
+                         $exifTool->{DEL_GROUP}->{"MIE$n"};
+    }
 
     # prepare lookups and lists for writing
     my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
@@ -726,11 +734,12 @@ sub WriteMIEGroup($$$)
                     last;
                 }
             }
-            # don't rewrite free bytes
-            if ($format eq 0x80) {
+            # don't rewrite free bytes or information in deleted groups
+            if ($format eq 0x80 or ($delGroup and $tagLen and ($format & 0xf0) != 0x10)) {
                 $raf->Seek($valLen, 1) or $msg = 'Seek error', last;
                 if ($verbose > 1) {
-                    print $out "    - $grp1:$tag ($valLen free bytes)\n";
+                    my $free = ($format eq 0x80) ? ' free' : '';
+                    print $out "    - $grp1:$tag ($valLen$free bytes)\n";
                 }
                 next;
             }
@@ -1101,7 +1110,11 @@ sub WriteMIEGroup($$$)
             $msg = WriteMIEGroup($exifTool, \%subdirInfo, $subTablePtr);
             SetByteOrder($oldOrder);
             last if $msg;
-            $toWrite = '' unless defined $msg;
+            if (defined $msg) {
+                undef $msg; # no problem if nothing written
+            } else {
+                $toWrite = '';
+            }
             next;
         }
         # just copy existing element

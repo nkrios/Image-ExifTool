@@ -34,7 +34,7 @@
 package Image::ExifTool::XMP;
 
 use strict;
-use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK %ignoreNamespace %xlatNamespace);
+use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK);
 use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
@@ -78,10 +78,10 @@ my %longConv = (
 );
 
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
-%ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
+my %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
 
 # translate XMP namespaces for use in family 1 group names
-%xlatNamespace = (
+my %xlatNamespace = (
     # shorten ugly IPTC Core namespace prefix
     'Iptc4xmpCore' => 'iptcCore',
     # also translate older 'xap...' prefixes to 'xmp...'

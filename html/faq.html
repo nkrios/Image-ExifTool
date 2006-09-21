@@ -31,7 +31,7 @@ pre {
 </ol></td><td valign='top'><ol start=6>
 <li><a href="#Q6">"Can't convert TAG" errors</a>
 <li><a href="#Q7">Deleting all EXIF from a TIFF</a>
-<li><a href="#Q8">Changing Make or Model tag</a>
+<li><a href="#Q8">Writing the Make or Model tag</a>
 <li><a href="#Q9">Tag locations when copying</a>
 <li><a href="#Q10">Coded character sets</a>
 </ol></td></tr></table>
@@ -145,6 +145,11 @@ example, the following commands are all valid and accomplish the same thing:
 exiftool -flash=0x1 -n image.jpg
 exiftool -flash=fired image.jpg
 </pre>
+Programmers: If you are calling Image::ExifTool functions from your own script,
+the two techniques look like this:
+<pre>$exifTool->SetNewValue(GPSAltitudeRef => 'Above Sea Level');
+$exifTool->SetNewValue(GPSAltitudeRef => 0, Type => 'ValueConv');
+</pre>
 </blockquote>
 
 <a name="Q7"></a>
@@ -165,7 +170,8 @@ must be deleted separately from a TIFF file if desired.
 </blockquote>
 
 <a name="Q8"></a>
-<p>8. <b>"All maker note information is lost if I change the Make or Model tag"</b>
+<p>8a. <b>"All maker note information is lost if I change the Make or Model tag"</b> or
+<br>8b. <b>"I can't copy maker note information to an image"</b>
 
 <blockquote>
 The Make and Model tags are used by some image utilities (including ExifTool) to
@@ -179,6 +185,12 @@ first place.
 <p>If you really want to delete the Make and Model information, you might as
 well delete the maker notes too.  You can do this with the following command:
 <pre>exiftool -make= -model= -makernotes:all= image.jpg
+</pre>
+
+<p>For the same reason, maker notes can not be copied to an image with an
+incompatible Make or Model.  To do this, the Make and Model tags must also be
+copied.  ie)
+<pre>exiftool -tagsfromfile src.jpg -makernotes -make -model dst.jpg
 </pre>
 </blockquote>
 
@@ -295,7 +307,7 @@ for details.
 </blockquote>
 
 <hr>
-<i>Last revised Aug. 30, 2006</i>
+<i>Last revised Sept. 13, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

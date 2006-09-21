@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessID3v2($$$);
 
@@ -602,12 +602,21 @@ sub ProcessID3($$)
         $raf->Seek(0, 0);
     }
 #
-# extract information from first audio frame header
-# (if it exists in the first 256 bytes)
+# extract information from first audio/video frame headers
+# (if one is found in the first 256 bytes)
 #
-    require Image::ExifTool::MPEG;
-    $rtnVal = 1 if $raf->Read($buff, 256) and
-        Image::ExifTool::MPEG::ProcessMPEGAudio($exifTool, \$buff) > 0;
+    if ($raf->Read($buff, 256)) {
+        require Image::ExifTool::MPEG;
+        if ($buff =~ /\0\0\x01(\xb3|\xc0)/) {
+            # look for A/V headers in first 64kB
+            my $buf2;
+            $raf->Read($buf2, 65280) and $buff .= $buf2;
+            $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudioVideo($exifTool, \$buff) > 0;
+        } else {
+            # look for audio frame sync in first 256 bytes
+            $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudio($exifTool, \$buff) > 0;
+        }
+    }
 #
 # look for ID3v1 trailer
 #

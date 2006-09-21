@@ -158,13 +158,17 @@
   <br>0x1810000 = PowerShot SD450 / Digital IXUS 55 / IXY Digital 60
   <br>0x1870000 = PowerShot SD400 / Digital IXUS 50 / IXY Digital 55
   <br>0x1880000 = PowerShot A420
+  <br>0x1890000 = PowerShot SD900 / Digital IXUS 900 Ti
   <br>0x1900000 = PowerShot SD550 / Digital IXUS 750 / IXY Digital 700
   <br>0x1920000 = PowerShot A700
-  <br>0x1940000 = PowerShot SD700 IS / Digital IXUS 800 IS
+  <br>0x1940000 = PowerShot SD700 IS / Digital IXUS 800 IS / IXY Digital 800 IS
   <br>0x1950000 = PowerShot S3 IS
   <br>0x1960000 = PowerShot A540
   <br>0x1970000 = PowerShot SD600 / Digital IXUS 60 / IXY Digital 70
+  <br>0x1980000 = PowerShot G7
   <br>0x1990000 = PowerShot A530
+  <br>0x2000000 = PowerShot SD800 IS / Digital IXUS 850 IS
+  <br>0x2010000 = PowerShot SD40 / Digital IXUS i7 zoom
   <br>0x2020000 = PowerShot A710 IS
   <br>0x2030000 = PowerShot A640
   <br>0x2040000 = PowerShot A630
@@ -521,6 +525,7 @@
   <br>39 = Canon EF 75-300mm f/4-5.6
   <br>40 = Canon EF 28-80mm f/3.5-5.6
   <br>43 = Canon EF 28-105mm f/4-5.6
+  <br>45 = Canon EF-S 18-55mm f/3.5-5.6
   <br>124 = Canon MP-E 65mm f/2.8 1-5x Macro Photo
   <br>125 = Canon TS-E 24mm f/3.5L
   <br>126 = Canon TS-E 45mm f/2.8
@@ -715,12 +720,12 @@
 <td align='right'>1</td>
 <td>AutoISO</td>
 <td align='center'>int16s</td>
-<td><font size='-1'><font color="#666666">(valid only when CameraISO is Auto or Auto High)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(actual ISO used = BaseISO * AutoISO / 100)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>2</td>
-<td>ShotISO</td>
+<td>BaseISO</td>
 <td align='center'>int16s</td>
-<td><font size='-1'><font color="#666666">(not valid when CameraISO is Auto or Auto High)</font></font></td></tr>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td align='right'>3</td>
 <td>MeasuredEV</td>
@@ -941,6 +946,7 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
   <br>39 = Canon EF 75-300mm f/4-5.6
   <br>40 = Canon EF 28-80mm f/3.5-5.6
   <br>43 = Canon EF 28-105mm f/4-5.6
+  <br>45 = Canon EF-S 18-55mm f/3.5-5.6
   <br>124 = Canon MP-E 65mm f/2.8 1-5x Macro Photo
   <br>125 = Canon TS-E 24mm f/3.5L
   <br>126 = Canon TS-E 45mm f/2.8
@@ -2374,6 +2380,6 @@ This table is used by the 5D and 1DmkIIN.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 6, 2006</i>
+<br><i>Last revised Sep 18, 2006</i>
 </body>
 </html>

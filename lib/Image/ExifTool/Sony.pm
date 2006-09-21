@@ -7,6 +7,7 @@
 #
 # References:   1) http://www.cybercom.net/~dcoffin/dcraw/
 #               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm
+#               3) Thomas Bodenmann private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Sony;
@@ -15,11 +16,14 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
+use Image::ExifTool::Minolta;
 
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
+
+my %sonyLensIDs;    # filled in based on Minolta LensID's
 
 %Image::ExifTool::Sony::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -33,7 +37,10 @@ sub ProcessSR2($$$);
         },
     },
     0xb020 => 'ColorModeSetting', #PH
-    0xb027 => 'LensID', #2
+    0xb027 => { #2
+        Name => 'LensID',
+        PrintConv => \%sonyLensIDs,
+    },
     0xb028 => { #2
         # (used by the DSLR-A100)
         Name => 'MinoltaMakerNote',
@@ -130,6 +137,16 @@ sub ProcessSR2($$$);
     GROUPS => { 0 => 'MakerNotes', 1 => 'SR2', 2 => 'Camera' },
     0x7770 => 'ColorMode', #PH
 );
+
+# fill in Sony LensID lookup based on Minolta values
+{
+    my $id;
+    foreach $id (keys %Image::ExifTool::Minolta::minoltaLensIDs) {
+        # higher numbered lenses are missing last digit of ID
+        my $sonyID = ($id < 10000) ? $id : int($id / 10);
+        $sonyLensIDs{$sonyID} = $Image::ExifTool::Minolta::minoltaLensIDs{$id};
+    }
+}
 
 #------------------------------------------------------------------------------
 # decrypt Sony data (ref 1)
@@ -315,7 +332,13 @@ under the same terms as Perl itself.
 
 =item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
+=item L<http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm>
+
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Thomas Bodenmann for providing information about the LensID's.
 
 =head1 SEE ALSO
 

@@ -13,8 +13,8 @@
 <font color='#cc0000' size='+2'><b>Read</b> <i>and</i> <b>Write</b> Meta Information!</font>
 
 <h3>
-<a href="Image-ExifTool-6.36.tar.gz">
-Download        Version 6.36</a> (1028 KB) - Sept. 6, 2006
+<a href="Image-ExifTool-6.42.tar.gz">
+Download        Version 6.42</a> (1037 KB) - Sept. 21, 2006
 (<a href="history.html">Version History</a>)</h3>
 
 <p>ExifTool is a <a href="ExifTool.html">Perl module</a> with an included 
@@ -76,12 +76,13 @@ detailed exif data of /any/ tool I've found.</i>"
 </blockquote>
 
 <h2><a name="Supported">Supported File Types</a></h2>
-ExifTool can read and/or write information from the following file types:
+ExifTool can <b>R</b>ead, <b>W</b>rite and/or <b>C</b>reate files in the following formats:
 <blockquote><table cellpadding=2 cellspacing=0 border=1>
-<tr bgcolor='#dddddd'><th>File Type</th><th>Read/Write</th><th>Description</th></tr>
+<tr bgcolor='#dddddd'><th>File Type</th><th>Support</th><th>Description</th></tr>
 <tr><td>ACR</td><td>R</td><td>American College of Radiology ACR-NEMA (DICOM-like)</td></tr>
 <tr><td>AI</td><td>R</td><td>Adobe Illustrator (PS or PDF)</td></tr>
 <tr><td>AIFF, AIF, AIFC</td><td>R</td><td>Audio Interchange File Format</td></tr>
+<tr><td>ARW</td><td>R</td><td>Sony Alpha RAW format (TIFF-based)</td></tr>
 <tr><td>ASF</td><td>R</td><td>Microsoft Advanced Systems Format</td></tr>
 <tr><td>AVI</td><td>R</td><td>Audio Video Interleaved (RIFF-based)</td></tr>
 <tr><td>BMP, DIB</td><td>R</td><td>Windows BitMaP / Device Independent Bitmap</td></tr>
@@ -92,10 +93,10 @@ ExifTool can read and/or write information from the following file types:
 <tr><td>ERF</td><td>R/W</td><td>Epson RAW Format (TIFF-based)</td></tr>
 <tr><td>FPX</td><td>R</td><td>FlashPix image</td></tr>
 <tr><td>GIF</td><td>R/W</td><td>Compuserve Graphics Interchange Format</td></tr>
-<tr><td>ICC, ICM</td><td>R/W</td><td>International Color Consortium color profile</td></tr>
+<tr><td>ICC, ICM</td><td>R/W/C</td><td>International Color Consortium color profile</td></tr>
 <tr><td>JP2, JPX</td><td>R</td><td>JPEG 2000 image</td></tr>
-<tr><td>JPEG, JPG</td><td>R/W</td><td>Joint Photographic Experts Group image</td></tr>
-<tr><td>MIE</td><td>R/W</td><td>Meta Infomation Encapsulation format</td></tr>
+<tr><td>JPEG, JPG</td><td>R/W</td><td>Joint Photographic Experts Group image (<a href="#JPEG">see table below</a>)</td></tr>
+<tr><td>MIE</td><td>R/W/C</td><td>Meta Infomation Encapsulation format</td></tr>
 <tr><td>MIFF, MIF</td><td>R</td><td>Magick Image File Format</td></tr>
 <tr><td>MOS</td><td>R/W</td><td>Creo Leaf Mosaic (TIFF-based)</td></tr>
 <tr><td>MOV, QT</td><td>R</td><td>Apple QuickTime Movie</td></tr>
@@ -118,18 +119,39 @@ ExifTool can read and/or write information from the following file types:
 <tr><td>RAM, RPM</td><td>R</td><td>Real Audio/Plug-in Metafile</td></tr>
 <tr><td>RAW</td><td>R</td><td>Kyocera Contax N Digital RAW Format</td></tr>
 <tr><td>RAW</td><td>R</td><td>Panasonic RAW format (TIFF-based)</td></tr>
-<tr><td>RM, RV, RMVB</td><td>R</td><td>Real Media/Video [Variable Bitrate]</td></tr>
 <tr><td>RIFF, RIF</td><td>R</td><td>Resource Interchange File Format</td></tr>
+<tr><td>RM, RV, RMVB</td><td>R</td><td>Real Media/Video [Variable Bitrate]</td></tr>
 <tr><td>SR2</td><td>R</td><td>Sony RAW Format 2 (TIFF-based)</td></tr>
 <tr><td>SRF</td><td>R</td><td>Sony RAW Format (TIFF-based)</td></tr>
 <tr><td>SWF</td><td>R</td><td>Shockwave Flash</td></tr>
 <tr><td>THM</td><td>R/W</td><td>Canon Thumbnail (JPG)</td></tr>
 <tr><td>TIFF, TIF</td><td>R/W</td><td>Tagged Image File Format</td></tr>
 <tr><td>WAV</td><td>R</td><td>Windows digital audio WAVeform (RIFF-based)</td></tr>
-<tr><td>WMA, WMV</td><td>R</td><td>Windows Media Audio/Video (ASF-based)</td></tr>
 <tr><td>WDP</td><td>R/W</td><td>Windows Media Photo (TIFF-based)</td></tr>
+<tr><td>WMA, WMV</td><td>R</td><td>Windows Media Audio/Video (ASF-based)</td></tr>
 <tr><td>X3F</td><td>R</td><td>Sigma/Foveon RAW format</td></tr>
-<tr><td>XMP</td><td>R/W</td><td>Extensible Metadata Platform data file</td></tr>
+<tr><td>XMP</td><td>R/W/C</td><td>Extensible Metadata Platform data file</td></tr>
+</table></blockquote>
+
+<h3><a name="JPEG">Supported JPEG Meta Information</a></h3>
+ExifTool can <b>R</b>ead, <b>W</b>rite and/or <b>C</b>reate the following types
+of meta information in JPEG images:
+<blockquote><table cellpadding=2 cellspacing=0 border=1>
+<tr bgcolor='#dddddd'><th>JPEG Meta Information</th><th>Support</th><th>Description</th></tr>
+<tr><td>APP0 - JFIF</td><td>R/W</td><td>JPEG File Interchange Format</td></tr>
+<tr><td>APP0 - JFXX</td><td>R</td><td>Extended JFIF</td></tr>
+<tr><td>APP0 - CIFF</td><td>R/W</td><td>Camera Image File Format (used by some Canon models)</td></tr>
+<tr><td>APP1 - EXIF</td><td>R/W/C</td><td>Exchangeable Image File Format (including maker notes)</td></tr>
+<tr><td>APP1 - XMP</td><td>R/W/C</td><td>Extensible Metadata Platform</td></tr>
+<tr><td>APP2 - ICC</td><td>R/W/C</td><td>International Color Consortium (multi-segment)</td></tr>
+<tr><td>APP2 - FXPR</td><td>R</td><td>FlashPix Ready (multi-segment)</td></tr>
+<tr><td>APP3 - Kodak Meta</td><td>R</td><td>EXIF-like Kodak information</td></tr>
+<tr><td>APP12 - Picture Info</td><td>R</td><td>(ASCII textual information)</td></tr>
+<tr><td>APP13 - Photoshop IRB</td><td>R/W/C</td><td>Image Resource Block (multi-segment, includes IPTC)</td></tr>
+<tr><td>APP14 - Adobe</td><td>R</td><td>Adobe information</td></tr>
+<tr><td>COM</td><td>R/W/C</td><td>JPEG comments (multi-segment)</td></tr>
+<tr><td>AFCP trailer</td><td>R/W</td><td>AXS File Concatination Protocol (includes IPTC)</td></tr>
+<tr><td>PreviewImage trailer</td><td>R/W/C</td><td>(preview image written after JPEG EOI)</td></tr>
 </table></blockquote>
 
 <h2><font color='#cc0000'>Writer Limitations</font></h2>
@@ -516,7 +538,8 @@ a stand-alone Mac OS X droplet to extract preview images from RAW files (thanks 
 Also, visit the <a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool Forum</a>.
 
 <p>Feel free to drop me a note if you find ExifTool useful, or if you have any
-comments, suggestions or questions.  My e-mail address is in the README file.
+comments, suggestions or questions.  My e-mail address is on the first line of
+the README file.
 
 <h2>License</h2>
 

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.36
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.41
 [File, File, Image]  - File Name: CanonRaw_4_failed.crw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
@@ -25,7 +25,7 @@
 [MakerNotes, CanonRaw, Camera] 2070 - Original File Name: CRW_1602.CRW
 [MakerNotes, CanonRaw, Camera] 2071 - Thumbnail File Name: CRW_1602.THM
 [MakerNotes, CanonRaw, Camera] 2053 - User Comment: 
-[MakerNotes, CanonRaw, Camera] 6164 - Measured EV: -6.19999980926514
+[MakerNotes, CanonRaw, Camera] 6164 - Measured EV: -6.25
 [MakerNotes, CanonRaw, Camera] 2053 - Canon File Description: EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, CanonRaw, Camera] 2069 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, CanonRaw, Camera] 2064 - Owner's Name: Phil Harvey
@@ -39,8 +39,8 @@
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 35.00mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
-[MakerNotes, Canon, Image] 2 - Shot ISO: 100
-[MakerNotes, Canon, Image] 3 - Measured EV: -6.2
+[MakerNotes, Canon, Image] 2 - Base ISO: 100
+[MakerNotes, Canon, Image] 3 - Measured EV: -6.25
 [MakerNotes, Canon, Image] 4 - Target Aperture: 14
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/60
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
@@ -75,7 +75,7 @@
 [MakerNotes, Canon, Camera] 13 - Contrast: +1
 [MakerNotes, Canon, Camera] 14 - Saturation: +1
 [MakerNotes, Canon, Camera] 15 - Sharpness: +1
-[MakerNotes, Canon, Camera] 16 - Camera ISO: Use ShotISO
+[MakerNotes, Canon, Camera] 16 - Camera ISO: n/a
 [MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 19 - AF Point: Manual AF point selection

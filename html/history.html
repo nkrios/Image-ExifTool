@@ -6,8 +6,48 @@
 <!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.36.tar.gz">Version 6.36</a>. (Other versions are
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.42.tar.gz">Version 6.42</a>. (Other versions are
 considered development releases, and are not uploaded to CPAN.)<p>
+
+<b>Sept. 21, 2006 - Version 6.42</b> (production release)
+<ul>
+<li>Re-worked Sony and Minolta LensID lists and added a number of new lenses
+<li>Extract maker note information from Sanyo MOV and MP4 videos
+<li>Recognize ARW extension of Sony Alpha-100 RAW images
+<li>Improved extraction of PreviewImage from damaged Minolta images
+</u>
+
+<b>Sept. 18, 2006 - Version 6.41</b>
+<ul>
+<li>Fixed calculation of Canon ISO in some images and renamed ShotISO to BaseISO
+<li>Minor improvment to order of operations when deleting multiple groups and
+    adding back information in batch mode
+</ul>
+
+<b>Sept. 14, 2006 - Version 6.40</b>
+<ul>
+<li>Added ability to delete a group and write back information in one step
+    <ul>
+    <li>Compatibility warning: This changes previous behaviour when adding and
+        deleting information in the same operation if new tag values are set
+        after a group has been flagged for deletion
+    </ul>
+<li>Fixed problem writing to specific MIE groups
+<li>Minor improvements to verbose output while writing
+<li>Added a few new CanonModelID's (PowerShot G7, SD900, SD800IS, SD40)
+</ul>
+
+<b>Sept. 12, 2006 - Version 6.37</b>
+<ul>
+<li>Decode Sony LensID's (thanks Thomas Bodenmann)
+<li>Added another Canon LensType
+<li>Added shortcut MakerNotes tag to represent the maker notes tags from all
+    manufacturers (useful when copying tags between files)
+<li>Improved MPEG decoding and calculate approx. Duration based on avg. bitrate
+<li>Issue a minor error when rewriting an empty IFD (previously this was fatal)
+<li>Print 2 decimal points of MeasuredEV (avoids round-off errors resulting in
+    failed tests on some systems)
+</ul>
 
 <b>Sept. 6, 2006 - Version 6.36</b> (production release)
 <ul>

@@ -1893,7 +1893,7 @@ GPSAltitude and GPSAltitudeRef.
    Index   Tag Name                             Writable
    -----   --------                             --------
       1    AutoISO                              int16s
-      2    ShotISO                              int16s
+      2    BaseISO                              int16s
       3    MeasuredEV                           int16s
       4    TargetAperture                       int16s
       5    TargetExposureTime                   int16s
@@ -3743,6 +3743,33 @@ information.
   0x0225   FlashMode                            int16u
   0x0e00   PrintIM                              PrintIM
   0x0f00   DataDump                             N
+
+=head3 Sanyo MOV Tags
+
+This information is found in Sanyo MOV video images, and is very similar to
+information found in Pentax MOV and Nikon QT videos.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    Make                                 N
+     24    Model                                N
+     38    ExposureTime                         N
+     42    FNumber                              N
+     50    ExposureCompensation                 N
+     68    WhiteBalance                         N
+     72    FocalLength                          N
+
+=head3 Sanyo MP4 Tags
+
+This information is found in Sanyo MP4 video images.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    Make                                 N
+     24    Model                                N
+     50    FNumber                              N
+    106    ISO                                  N
+   2048    ThumbnailImage                       N
 
 =head2 Sigma Tags
 
@@ -8005,6 +8032,8 @@ if they don't exist in this table.
   'SelO'       PlaySelection                    N
   'TAGS'       PentaxTags                       Pentax MOV
                NikonTags                        Nikon MOV
+               SanyoMOV                         Sanyo MOV
+               SanyoMP4                         Sanyo MP4
                UnknownTags?
   'WLOC'       WindowLocation                   N
   'name'       Name                             N
@@ -8684,6 +8713,9 @@ is extracted.
   DateTimeOriginal     DateTimeCreated          N
   DriveMode            ContinuousDrive          N
                        Self-timer
+  Duration             FileSize                 N
+                       AudioBitrate
+                       VideoBitrate
   Duration             FrameRate                N
                        FrameCount
   EV                   Aperture                 N
@@ -8707,7 +8739,7 @@ is extracted.
                        Aperture
                        CircleOfConfusion
   ISO                  Canon:CameraISO          N
-                       Canon:ShotISO
+                       Canon:BaseISO
                        Canon:AutoISO
   ImageHeight          PostScript:ImageData     N
                        PostScript:BoundingBox
@@ -8894,6 +8926,42 @@ for more details.
                        SensingMethod
                        CFAPattern
                        ThumbnailImageIFD
+  MakerNotes           MakerNoteCanon           Y
+                       MakerNoteCasio
+                       MakerNoteCasio2
+                       MakerNoteFujiFilm
+                       MakerNoteJVC
+                       MakerNoteJVCText
+                       MakerNoteKodak1a
+                       MakerNoteKodak1b
+                       MakerNoteKodak2
+                       MakerNoteKodak3
+                       MakerNoteKodak4
+                       MakerNoteKodak5
+                       MakerNoteKodak6a
+                       MakerNoteKodak6b
+                       MakerNoteKodakUnknown
+                       MakerNoteKyocera
+                       MakerNoteMinolta
+                       MakerNoteMinolta2
+                       MakerNoteMinolta3
+                       MakerNoteMinolta4
+                       MakerNoteNikon
+                       MakerNoteNikon2
+                       MakerNoteNikon3
+                       MakerNoteOlympus
+                       MakerNoteLeica
+                       MakerNotePanasonic
+                       MakerNotePanasonic2
+                       MakerNotePentax
+                       MakerNoteRicoh
+                       MakerNoteRicohText
+                       MakerNoteSanyo
+                       MakerNoteSigma
+                       MakerNoteSony
+                       MakerNoteSonySRF
+                       MakerNoteSonySR2
+                       MakerNoteUnknown
   Nikon                Model                    Y
                        SubSecDateTimeOriginal
                        ShutterCount

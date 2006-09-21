@@ -1,4 +1,4 @@
-  ExifToolVersion = 6.35
+  ExifToolVersion = 6.41
   FileName = ExifTool.jpg
   Directory = t/images
   FileSize = 2697
@@ -239,7 +239,7 @@ JPEG APP1 (2442 bytes):
   | | | | AutoISO = 0
   | | | | - Tag 0x0001 (2 bytes, int16s[1]):
   | | | |     0456: 00 00                                           [..]
-  | | | | ShotISO = 160
+  | | | | BaseISO = 160
   | | | | - Tag 0x0002 (2 bytes, int16s[1]):
   | | | |     0458: a0 00                                           [..]
   | | | | MeasuredEV = -200

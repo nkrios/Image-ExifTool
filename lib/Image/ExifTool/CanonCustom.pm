@@ -791,7 +791,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             1 => 'Set: Quality',
             2 => 'Set: Parameter',
             3 => 'Set: Playback',
-            4 => 'Cross keys: AF frame selec.',
+            4 => 'Cross keys: AF point select',
         },
     },
     1 => {
@@ -864,7 +864,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             1 => 'Set: Quality',
             2 => 'Set: Flash Exposure Comp',
             3 => 'Set: Playback',
-            4 => 'Cross keys: AF frame selec.',
+            4 => 'Cross keys: AF point select',
         },
     },
     1 => {
@@ -936,7 +936,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         Name => 'LCDDisplayAtPowerOn',
         PrintConv => {
             0 => 'Display',
-            1 => 'Retain power OFF status',
+            1 => 'Retain power off status',
         },
     },
 );

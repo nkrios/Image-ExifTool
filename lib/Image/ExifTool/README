@@ -38,7 +38,6 @@ with tag keys.  Below is an explanation of the meaning of each special key:
     OutFile     - Output file or scalar reference
     Parent      - Name of parent directory
     RAF         - Reference to File::RandomAccess object if available
-    Multi       - True if we should scan for multiple IFD's
     NewDataPos  - File position of new data (write proc only)
     Fixup       - Reference to hash of offset fixups (used in EXIF writing only)
     FixBase     - Flag set to attempt to fix base offsets

@@ -170,7 +170,6 @@ sub AddChunks($$)
                 SetByteOrder($byteOrder);
             }
             $dirInfo{NewDataPos} = 8,   # new data will come after TIFF header
-            $dirInfo{Multi} = 1,        # allow multiple IFD's
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
             if (defined $buff and length $buff) {
                 my $tiffHdr = $byteOrder . Set16u(42) . Set32u(8);

@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..24\n"; }
+BEGIN { $| = 1; print "1..26\n"; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -472,6 +472,29 @@ my $testOK;
         print 'not ';
     }
     print "ok $testnum\n";
+}
+
+# test 25/26: Test order of delete operations
+{
+    my $i;
+    for ($i=0; $i<2; ++$i) {
+        ++$testnum;
+        my $exifTool = new Image::ExifTool;
+        $exifTool->SetNewValuesFromFile('t/images/Nikon.jpg', 'all:all', '-makernotes:all');
+        $exifTool->SetNewValue(fnumber => 26) if $i == 1;
+        $exifTool->SetNewValue('exififd:all'); # delete all exifIFD
+        $exifTool->SetNewValue(fnumber => 25) if $i == 0;
+        $testfile = "t/${testname}_${testnum}_failed.jpg";
+        unlink $testfile;
+        $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+        my $info = $exifTool->ImageInfo($testfile);
+        if (check($exifTool, $info, $testname, $testnum)) {
+            unlink $testfile;
+        } else {
+            print 'not ';
+        }
+        print "ok $testnum\n";
+    }
 }
 
 # end

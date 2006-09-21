@@ -4,11 +4,12 @@ AFPointsUsed : (none)
 AutoExposureBracketing : Off
 AutoISO : 100
 AutoRotate : None
+BaseISO : 100
 BracketMode : Off
 BracketShotNumber : 0
 BracketValue : 0
 BulbDuration : 4
-CameraISO : Use ShotISO
+CameraISO : n/a
 CameraType : EOS Mid-range
 CanonExposureMode : Manual
 CanonFileLength : 4480822
@@ -48,7 +49,7 @@ LensType : Unknown (-1)
 LongFocal : 55
 MacroMode : Unknown (0)
 MaxAperture : 4
-MeasuredEV : -6.2
+MeasuredEV : -6.25
 MeteringMode : Center-weighted averaging
 MinAperture : 27
 NDFilter : Unknown (-1)
@@ -63,7 +64,6 @@ SerialNumber : 0560018150
 SerialNumberFormat : Format 1
 Sharpness : +1
 ShortFocal : 18
-ShotISO : 100
 SlowShutter : None
 TargetAperture : 14
 WB_RGGBLevelsAuto : 1719 832 831 990

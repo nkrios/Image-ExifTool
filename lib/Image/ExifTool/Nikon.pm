@@ -1057,6 +1057,7 @@ my %nikonFocalConversions = (
     },
     0x18 => {
         Name => 'Model',
+        Description => 'Camera Model Name',
         Format => 'string[8]',
     },
     0x26 => {
