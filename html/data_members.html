@@ -15,13 +15,13 @@ header file.  (but this is Perl, so I couldn't do that...)
 	writing (Note: entry may exist but be undefined for top-level
 	directory!)</td></tr>
 
-<tr><td>CHANGED</td><td>Number of tags changed during writing</td></tr>
-
 <tr><td>CameraMake</td><td>Camera make set during reading and writing</td></tr>
 
 <tr><td>CameraModel</td><td>Camera model name set during reading and writing</td></tr>
 
 <tr><td>CameraType</td><td>Camera type used for decoding some Olympus tags</td></tr>
+
+<tr><td>CHANGED</td><td>Number of tags changed during writing</td></tr>
 
 <tr><td>DEL_GROUP</td><td>Hash of groups to delete.  Value is 1 to delete group
     completely, or 2 if tags were added back after deleting the group.</td></tr>
@@ -32,6 +32,9 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>DIR_NAME</td><td>Name of directory currently being processed</td></tr>
 
+<tr><td>DONE_ID3</td><td>Set to 1 if audio file was scanned for ID3,
+    or 2 if there was an ID3v1 trailer found</td></tr>
+
 <tr><td>DROP_TAGS</td><td>Flag to exclude "Drop" tags when writing</td></tr>
 
 <tr><td>EDIT_DIRS</td><td>Hash of parent directories for each directory edited during
@@ -40,7 +43,7 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>EXIF_BYTE_ORDER</td><td>Byte ordering for main EXIF directory</td></tr>
 
-<tr><td>EXIF_DATA</td><td>Reference to EXIF data while reading file</td></tr>
+<tr><td>EXIF_DATA</td><td>EXIF data block (valid while reading from file)</td></tr>
 
 <tr><td>EXIF_POS</td><td>Position of EXIF data in file</td></tr>
 
@@ -53,9 +56,11 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>FILE_TYPE</td><td>File type (JPEG, TIFF, etc...)</td></tr>
 
+<tr><td>FIRST_EXIF_POS</td><td>Position of first EXIF in file</td></tr>
+
 <tr><td>FOUND_TAGS</td><td>Found tags with proper case and order</td></tr>
 
-<tr><td>GROUP1</td><td>Hash of family 1 gruop names (ie. IFD name or XMP namespace),
+<tr><td>GROUP1</td><td>Hash of family 1 group names (ie. IFD name or XMP namespace),
     keyed by tag key</td></tr>
 
 <tr><td>INDENT</td><td>Indent string for verbose output</td></tr>
@@ -71,6 +76,9 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>MAKER_NOTE_FIXUP</td><td>Fixup information for maker notes extracted with the MakerNotes
     option.  Used by SetNewValuesFromFile() to adjust offsets in maker note IFD</td></tr>
+
+<tr><td>MOVED_KEY</td><td>Tag key of last tag replaced by a higher priority tag
+    in a call to FoundTag().</td></tr>
 
 <tr><td>NEW_VALUE</td><td>Hash of new value information keyed by tag info reference.
 	Elements of new value information hash are:

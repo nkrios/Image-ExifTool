@@ -11,6 +11,7 @@
 #                          display something useful
 #               07/08/05 - P. Harvey Added support for reading PSD files
 #               01/07/06 - P. Harvey Added PSD write support
+#               11/04/06 - P. Harvey Added handling of resource name
 #
 # References:   1) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 #               2) http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html
@@ -24,7 +25,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.27';
+$VERSION = '1.30';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -102,7 +103,11 @@ my %psdMap = (
         },
     },
     0x0408 => { Unknown => 1, Name => 'GridGuidesInfo' },
-    0x0409 => { Unknown => 1, Name => 'ThumbnailResource' },
+    0x0409 => {
+        Name => 'PhotoshopBGRThumbnail',
+        Notes => 'this is a JPEG image, but in BGR format instead of RGB',
+        ValueConv => 'my $img=substr($val,0x1c);$self->ValidateImage(\$img,$tag)',
+    },
     0x040a => {
         Name => 'CopyrightFlag',
         Writable => 'int8u',
@@ -170,6 +175,7 @@ my %psdMap = (
             TagTable => 'Image::ExifTool::XMP::Main',
         },
     },
+    # 0x07d0-0x0bb6 Path information
     0x0bb7 => { Unknown => 1, Name => 'ClippingPathName' },
     0x2710 => { Unknown => 1, Name => 'PrintFlagsInfo' },
 );
@@ -273,6 +279,11 @@ my %psdMap = (
     },
 );
 
+# tags for unknown resource types
+%Image::ExifTool::Photoshop::Unknown = (
+    GROUPS => { 2 => 'Unknown' },
+);
+
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary
 #
@@ -319,22 +330,29 @@ sub ProcessPhotoshop($$$)
     $verbose and $exifTool->VerboseDir('Photoshop', 0, $$dirInfo{DirLen});
 
     # scan through resource blocks:
-    # Format: 0) Type, 4 bytes - "8BIM"
+    # Format: 0) Type, 4 bytes - "8BIM" (or the rare "PHUT" or "DCSR")
     #         1) TagID,2 bytes
     #         2) Name, pascal string padded to even no. bytes
     #         3) Size, 4 bytes - N
     #         4) Data, N bytes
     while ($pos + 8 < $dirEnd) {
         my $type = substr($$dataPt, $pos, 4);
-        if ($type ne '8BIM') {
+        my ($ttPtr, $extra, $val, $name);
+        if ($type eq '8BIM') {
+            $ttPtr = $tagTablePtr;
+        } elsif ($type =~ /^(PHUT|DCSR)$/) {
+            $ttPtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Unknown');
+        } else {
             $exifTool->Warn("Bad Photoshop IRB resource");
             last;
         }
         my $tag = Get16u($dataPt, $pos + 4);
-        my $namelen = 1 + Get8u($dataPt, $pos + 6);
-        ++$namelen if $namelen & 0x01;
+        $pos += 6;  # point to start of name
+        my $nameLen = Get8u($dataPt, $pos);
+        my $namePos = ++$pos;
         # skip resource block name (pascal string, padded to an even # of bytes)
-        $pos += 6 + $namelen;
+        $pos += $nameLen;
+        ++$pos unless $nameLen & 0x01;
         if ($pos + 4 > $dirEnd) {
             $exifTool->Warn("Bad Photoshop resource block");
             last;
@@ -346,7 +364,22 @@ sub ProcessPhotoshop($$$)
             last;
         }
         $success = 1;
-        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+        if ($nameLen) {
+            $name = substr($$dataPt, $namePos, $nameLen);
+            $extra = qq{, Name="$name"};
+        } else {
+            $name = '';
+        }
+        my $tagInfo = $exifTool->GetTagInfo($ttPtr, $tag);
+        # append resource name to value if requested (braced by "/#...#/")
+        if ($tagInfo and defined $$tagInfo{SetResourceName} and
+            $$tagInfo{SetResourceName} eq '1' and $name !~ m{/#})
+        {
+            $val = substr($$dataPt, $pos, $size) . '/#' . $name . '#/';
+        }
+        $exifTool->HandleTag($ttPtr, $tag, $val,
+            TagInfo => $tagInfo,
+            Extra   => $extra,
             DataPt  => $dataPt,
             DataPos => $$dirInfo{DataPos},
             Size    => $size,
@@ -439,6 +472,17 @@ This module is loaded automatically by Image::ExifTool when required.
 Photoshop writes its own format of meta information called a Photoshop IRB
 resource which is located in the APP13 record of JPEG files.  This module
 contains the definitions to read this information.
+
+=head1 NOTES
+
+Photoshop IRB blocks may have an associated resource name.  These names are
+usually just an empty string, but if not empty they are displayed in the
+verbose level 2 (or greater) output.  A special C<SetResourceName> flag may
+be set to '1' in the tag information hash to cause the resource name to be
+appended to the value when extracted.  If this is done, the returned value
+has the form "VALUE/#NAME#/".  When writing, the writer routine looks for
+this syntax (if C<SetResourceName> is defined), and and uses the embedded
+name to set the name of the new resource.
 
 =head1 AUTHOR
 

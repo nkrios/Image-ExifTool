@@ -55,6 +55,7 @@ and explain the following individual functions in more detail:
 <li><a href="#GetAllTags">GetAllTags</a>
 <li><a href="#GetWritableTags">GetWritableTags</a>
 <li><a href="#GetAllGroups">GetAllGroups</a>
+<li><a href="#GetDeleteGroups">GetDeleteGroups</a>
 <li><a href="#GetFileType">GetFileType</a>
 <li><a href="#CanWrite">CanWrite</a>
 <li><a href="#CanCreate">CanCreate</a>
@@ -103,6 +104,11 @@ my $exifTool = <a href="#new">new</a> Image::ExifTool;
 $exifTool-&gt;<a href="#SetNewValue">SetNewValue</a>(Author =&gt; 'Phil Harvey');
 $exifTool-&gt;<a href="#WriteInfo">WriteInfo</a>('image.jpg','modified_image.jpg');
 </pre></td></tr></table></blockquote>
+
+<hr><h2><a name="Config">Configuration</a></h2>
+
+User-defined tags can be added via the ExifTool configuration file.  See
+"<a href="config.html">ExifTool_config</a>" in the ExifTool distribution for more details.
 
 <hr><h2><a name="ImageInfo">ImageInfo</a></h2>
 
@@ -232,13 +238,13 @@ take precedence over <a href="#Options">Options</a> settings.
 
 <b>Return Value:</b>
 
-<p>L</ImageInfo> returns a reference to a hash of tag key/value pairs.  The
-tag keys are identifiers, which are similar to the tag names but may have an
-embedded instance number if multiple tags with the same name were extracted
-from the image.  Many of the ExifTool functions require a tag key as an
-argument.  Use <a href="#GetTagName">GetTagName</a> to get the tag name for
-a given tag key.  Note that the case of the tag names may not be the same as
-requested.
+<p><a href="#ImageInfo">ImageInfo</a> returns a reference to a hash of tag
+key/value pairs.  The tag keys are identifiers, which are similar to the tag
+names but may have an embedded instance number if multiple tags with the
+same name were extracted from the image.  Many of the ExifTool functions
+require a tag key as an argument.  Use <a href="#GetTagName">GetTagName</a>
+to get the tag name for a given tag key.  Note that the case of the tag
+names may not be the same as requested.
 
 <p>Values of the returned hash are usually simple scalars, but a scalar
 reference is used to indicate binary data and an array reference may be used
@@ -344,10 +350,10 @@ to a specific function.
     are not necessarily extracted unless this option is set or the tag is
     specifically requested by name.</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
-<tr><td>ByteOrder</td><td>The byte order for newly created EXIF segments when writing.
-    If EXIF information already exists, the existing order is used instead.  If not
-    defined, the order of the maker notes is used (if maker notes are copied), otherwise
-    it defaults to 'MM'.</td>
+<tr><td>ByteOrder</td><td>The byte order for newly created EXIF segments when
+    writing.  Note that if EXIF information already exists, the existing order is
+    maintained.  If ByteOrder is not defined, then the order of the maker notes is
+    used (if they are being copied), otherwise big-endian ('MM') order is assumed.</td>
     <td align='center'>'MM','II' or undef</td><td align=center>undef</td></tr>
 <tr><td>Charset</td><td>Character set for converting 16-bit Unicode character strings.</td>
     <td><table>
@@ -378,8 +384,8 @@ to a specific function.
     <td align='center'>undef</td></tr>
 <tr><td>FastScan</td>
     <td>Flag to increase speed of extracting information from JPEG images.  With this
-    option set, ExifTool will not scan to the end of a JPEG image to check for an AFCP
-    or PreviewImage trailer.</td>
+    option set, ExifTool will not scan to the end of a JPEG image to check for an AFCP,
+    CanonVRD, FotoStation, PhotoMechanic or PreviewImage trailer.</td>
     <td>1 or 0</td>
     <td align='center'>0</td></tr>
 <tr><td>FixBase</td>
@@ -400,8 +406,15 @@ to a specific function.
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>No HTML dump</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>1 KB size limit</td></tr>
     <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>16 KB size limit</td></tr>
-    <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Full dump</td></tr>
+    <tr><td valign='top' align=center><b>3</b>&nbsp;=</td><td>Full dump</td></tr>
     </table></td><td align=center>0</td></tr>
+<tr><td>HtmlDumpBase</td><td>Specifies the base for HTML dump offsets.  If not
+    defined, the EXIF/TIFF base offset is used.</td>
+    <td><table>
+    <tr><td valign='top' align=right><b>0</b>&nbsp;=</td><td>Absolute offsets</td></tr>
+    <tr><td valign='top' align=right><b>any other #</b>&nbsp;=</td><td>Relative offsets</td></tr>
+    <tr><td valign='top' align=right><b>undef</b>&nbsp;=</td><td>EXIF/TIFF offsets</td></tr>
+    </table></td><td align=center>undef</td></tr>
 <tr><td>IgnoreMinorErrors</td><td>Causes some minor errors to be ignored.
     This option is provided mainly to allow writing of files when minor errors
     occur, but also allows thumbnail and preview images to be extracted even if
@@ -412,6 +425,11 @@ to a specific function.
 <tr><td>MakerNotes</td><td>Flag to cause MakerNotes data and other writable subdirectories
     (such as PrintIM) to be extracted as a data block.</td>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
+<tr><td>MissingTagValue</td><td><a name="MissingTagValue">Value</a> for missing tags in
+    expressions evaluated by <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>.
+    If not set, a minor error is issued for missing values, or the value
+    is set to '' if IgnoreMinorErrors is set.</td>
+    <td align='center'>Any string, or undef</td><td align='center'>undef</td></tr>
 <tr><td>PrintConv</td><td><a name="PrintConv"></a>Flag to enable print conversion.  Also enables inverse print
     conversion for writing.</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>Sort</td><td>Specifies order to sort tags in the returned tag list</td>
@@ -431,7 +449,8 @@ to a specific function.
 <tr><td>Unknown</td><td>Flag to get values of unknown tags</td>
     <td><table>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Unknown tags not extracted</td></tr>
-    <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Unknown tags extracted from EXIF directories</td></tr>
+    <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Unknown tags are extracted from EXIF
+        (and other tagged-format) directories</td></tr>
     <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Unknown tags also extracted from binary data blocks</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr><td>Verbose</td><td>Print verbose messages to file specified by TextOut option.
@@ -832,7 +851,8 @@ in a specified file.
  expression containing tag names with leading '$' symbols (ie.
  'Comment&lt;Filename: $filename').  Braces '{}' may be used around the tag
  name to separate it from subsequent text, and a '$$' is used to to represent
- a '$' symbol.
+ a '$' symbol.  (The behaviour for missing tags in expressions is defined by
+ the <a href="#MissingTagValue">MissingTagValue</a> option.)
 </td></tr>
 <tr><td><b>Returns</b></td><td>A hash of information that was set
 successfully.  May include Warning or Error entries if there were problems
@@ -986,11 +1006,12 @@ necessary.
 
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
 Set the order of the preferred groups when adding new information.  In
-subsequent calls to <a href="#SetNewValue">SetNewValue</a>, new information will
-be created in the first valid group of this list.  This has an impact only if
-the group is not specified and the tag name exists in more than one group.  The
-default order is EXIF, GPS, IPTC, XMP and MakerNotes.  Any family 0 group name
-may be used.  Case is not significant.
+subsequent calls to <a href="#SetNewValue">SetNewValue</a>, new information
+will be created in the first valid group of this list.  This has an impact
+only if the group is not specified when calling
+<a href="#SetNewValue">SetNewValue</a>, and if the tag name exists in more
+than one group.  The default order is EXIF, IPTC, XMP then MakerNotes.  Any
+family 0 group name may be used.  Case is not significant.
 <blockquote><table border=1 cellspacing=0 cellpadding=4>
 <tr><td><b>Prototype</b></td><td>SetNewGroups($;@)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
@@ -1213,37 +1234,68 @@ separated into the ICC-header group.
 <blockquote><table cellpadding=4 cellspacing=0 border=1>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (General Location)</b></td>
-<td>AFCP, AIFF, APP12, APP14, ASF, BMP, Composite, DICOM, DNG, EXIF,
-ExifTool, File, Flash, FlashPix, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF,
-Jpeg2000, Leaf, MIE, MIFF, MNG, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
-Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real, SigmaRaw, XMP
+<td>AFCP, AIFF, APE, APP12, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
+CanonVRD, Composite, DICOM, DNG, EXIF, ExifTool, FLAC, File, Flash,
+FlashPix, FotoStation, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, JPEG,
+Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
+PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real,
+SigmaRaw, Vorbis, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AFCP, AIFF, APP12, APP14, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio,
-Composite, DICOM, DNG, ExifIFD, ExifTool, File, Flash, FlashPix, FujiFilm,
-GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
-IPTC, InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera,
+<td>AFCP, AIFF, APE, ASF, Adobe, BMP, Canon, CanonCustom, CanonRaw,
+CanonVRD, Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool,
+FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff,
+GlobParamIFD, GraphConv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
+ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC,
+InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+KodakEffectsIFD, KyoceraRaw, Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera,
 MIE-Doc, MIE-Extender, MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
 MIE-MakerNotes, MIE-Meta, MIE-Preview, MIE-Thumbnail, MIE-Unknown,
-MIE-Video, MIFF, MNG, MPEG, MakerUnknown, MetaIFD, Minolta, MinoltaRaw,
-Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT, PNG, Panasonic,
-Pentax, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real, Real-CONT,
-Real-MDPR, Real-PROP, Real-RA3, Real-RA4 Real-RA5, Real-RJMD, Ricoh, SR2,
-SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
+MinoltaRaw, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT, PNG,
+Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
+PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR, Real-PROP,
+Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#, Sanyo,
+Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive, XMP-aux,
+XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
+XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
-<td>Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,
-Unknown, Video
+<td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
+Time, Unknown, Video
 </td></tr>
 </table></blockquote>
 <b>Example:</b>
 <blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
 @groupList = Image::ExifTool::<b>GetAllGroups</b>($family);
+</pre></td></tr></table></blockquote>
+
+<hr><h2><a name="GetDeleteGroups">GetDeleteGroups</a></h2>
+Get list of all deletable group names.
+<blockquote><table border=1 cellspacing=0 cellpadding=4>
+<tr><td><b>Prototype</b></td><td>GetDelGroups()</td></tr>
+<tr><td valign='top'><b>Inputs</b></td>
+<td>None
+</td></tr>
+<tr><td><b>Returns</b></td><td>A list of deletable group names in
+alphabetical order.
+</td></tr>
+</table></blockquote>
+<p>Below is a current list of deletable group names.  All names in this list
+are either family 0 or family 1 group names, with the exception of 'Trailer'
+which allows all trailers in JPEG and TIFF-format images to be deleted at
+once, including unknown trailers.  To schedule a group for deletion, call
+<a href="#SetNewValue">SetNewValue</a> with an undefined value and a tag
+name like 'Trailer:*'.
+<blockquote>AFCP, CIFF, CanonVRD, EXIF, ExifIFD, Ducky, File, FlashPix,
+FotoStation, GlobParamIFD, GPS, IFD0, IFD1, InteropIFD, ICC_Profile, IPTC,
+JFIF, MakerNotes, Meta, MetaIFD, MIE, PhotoMechanic, Photoshop, PNG,
+PrintIM, RMETA, SubIFD, Trailer, XMP
+</blockquote>
+<b>Example:</b>
+<blockquote><table cellpadding=4 bgcolor='#dddddd'><tr><td><pre>
+my @delGroups = Image::ExifTool::<b>GetDelGroups</b>();
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetFileType">GetFileType</a></h2>

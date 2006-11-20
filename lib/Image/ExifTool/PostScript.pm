@@ -96,7 +96,7 @@ sub CheckPS($$$);
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::PostScript::Composite');
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::PostScript::Composite);
 
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary

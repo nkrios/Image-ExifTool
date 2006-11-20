@@ -27,7 +27,7 @@ directory is created if it didn't already exist.
 
 <p>Writing the <b>FileName</b> tag renames a file.  If the new <b>FileName</b>
 has a directory specification (ie. contains a '/' character), then the file
-is also moved to the specified directory (see example 5 below).  Existing
+is also moved to the specified directory (see example 6 below).  Existing
 files will not be overwritten.
 
 <p>The <b>%d</b>, <b>%f</b> and <b>%e</b> file name format codes may be used to
@@ -42,7 +42,7 @@ is essential to specify a format for the file (and/or directory) name.  The
 examples below demonstrate the use of this feature.  Also, a quick reference of
 <a href="#codes">common date format codes</a> is included.
 
-<h3>Notes:</h3> 
+<h3>Notes:</h3>
 
 Writing the <b>FileName</b> and/or <b>Directory</b> tags alone causes the file
 to be renamed or moved, not copied.  However, if any other tags are written at
@@ -57,7 +57,7 @@ this case to remove the original copy.
 create a copy of the file, even if no meta-information tags are written.  To do
 this, a dummy file name or directory (to be overridden by the <b>FileName</b> or
 <b>Directory</b> tag) must be specified for the <b>-o</b> option. (See example
-4 below.)
+5 below.)
 
 <p>If the <b>-d</b> option is used, the unformatted date/time value must be
 valid (ie. in the form "YYYY:mm:dd HH:MM:SS"), otherwise the date formatting
@@ -83,6 +83,17 @@ DateTimeOriginal, in the form '<code>2006-03-27</code>'.
 </blockquote>
 
 <table cellpadding=6><tr><td valign='top'>&nbsp;3.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+exiftool '-filename&lt;%f_$imagesize.%e' dir
+</span></code></td></tr></table>
+<blockquote>
+This example uses an expression to add the image size to the name of all images
+in directory '<code>dir</code>'. For example, this would remame a 640x480 image
+called '<code>image.jpg</code>' to '<code>image_640x480.jpg</code>'. (Note that
+the single quotes are necessary in Unix shells due to the '<code>$</code>'
+symbol, but double quotes are required in a Windows cmd shell.)
+</blockquote>
+
+<table cellpadding=6><tr><td valign='top'>&nbsp;4.</td><td bgcolor='#dddddd'><code><span id='BLK'>
 exiftool -r -directory=%e_images/%d pics
 </span></code></td></tr></table>
 <blockquote>
@@ -92,7 +103,7 @@ example the file '<code>pics/toys/new_car.jpg</code>' is moved to
 '<code>jpg_images/pics/toys/new_car.jpg</code>'.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;4.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;5.</td><td bgcolor='#dddddd'><code><span id='BLK'>
 exiftool -r -o dummy/ -directory=%e_images/%d pics
 </span></code></td></tr></table>
 <blockquote>
@@ -102,7 +113,7 @@ the <code>-o</code> option is used.  Note that the trailing '<code>/</code>' on
 interpreted as a file name.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;5.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;6.</td><td bgcolor='#dddddd'><code><span id='BLK'>
 exiftool -r -d %Y/%m/%d/image_%H%M%S.%%e "-filename&lt;filemodifydate" DIR
 </span></code></td></tr></table>
 <blockquote>
@@ -116,14 +127,14 @@ directory hierarchy based on date of file modification, with path names like
 The following examples demonstrate the interaction of this feature with
 other ExifTool options:<p>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;6.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;7.</td><td bgcolor='#dddddd'><code><span id='BLK'>
 exiftool -filename=new.jpg dir/image.jpg
 </span></code></td></tr></table>
 <blockquote>
 Rename '<code>dir/image.jpg</code>' to '<code>dir/new.jpg</code>'.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;7.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;8.</td><td bgcolor='#dddddd'><code><span id='BLK'>
 exiftool -filename=new.jpg -comment=xxx dir/image.jpg
 </span></code></td></tr></table>
 <blockquote>
@@ -132,7 +143,7 @@ Copy '<code>dir/image.jpg</code>', add a new comment, and write output to
 not changed.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;8.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;9.</td><td bgcolor='#dddddd'><code><span id='BLK'>
 exiftool -filename=new.jpg -comment=xxx -overwrite_original dir/image.jpg
 </span></code></td></tr></table>
 <blockquote>
@@ -141,7 +152,7 @@ Rewrite '<code>dir/image.jpg</code>', adding a new comment and writing output to
 removed.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;9.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>10.</td><td bgcolor='#dddddd'><code><span id='BLK'>
 exiftool -o tmp/ -filename=new.jpg image.jpg<br>
 exiftool -o tmp/xxx.jpg -filename=new.jpg image.jpg<br>
 exiftool -o tmp/new.jpg image.jpg
@@ -158,7 +169,7 @@ directory.  As illustrated in example 4 above, the file is rewritten instead of
 simply being renamed when the '<code>-o</code>' option is used.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>10.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>11.</td><td bgcolor='#dddddd'><code><span id='BLK'>
 exiftool -directory=dir1 -filename=dir2/out.jpg -o dir3/ dir4/image.jpg<br>
 </span></code></td></tr></table>
 <blockquote>

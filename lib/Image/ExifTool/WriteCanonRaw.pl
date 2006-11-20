@@ -218,27 +218,15 @@ sub WriteCR2($$$)
             $exifTool->CopyImageData($$dirInfo{ImageData}, $outfile) or return 0;
             delete $$dirInfo{ImageData};
         }
-        # write anything after the end of a Canon RAW image
-        if ($exifTool->{TIFF_END}) {
-            $raf->Seek($exifTool->{TIFF_END}, 0) or return 0;
-            my $extra = 0;
-            while ($raf->Read($newData, 65536)) {
-                Write($outfile, $newData) or return 0;
-                $extra += length $newData;
-            }
-            if ($extra) {
-                $exifTool->VPrint(0, "Note: $extra extra bytes copied after normal end of CR2\n");
-            }
-        }
     }
     return 1;
 }
 
 #------------------------------------------------------------------------------
-# Write CanonRaw information
+# Write CanonRaw (CRW) information
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
 #         2) tag table reference
-# Returns: undefined on error, else success message
+# Returns: true on sucess
 # Notes: Increments ExifTool CHANGED flag for each tag changed This routine is
 # different from all of the other write routines because Canon RAW files are
 # designed well!  So it isn't necessary to buffer the data in memory before
@@ -251,23 +239,23 @@ sub WriteCanonRaw($$$)
     $exifTool or return 1;    # allow dummy access to autoload this package
     my $blockStart = $$dirInfo{DirStart};
     my $blockSize = $$dirInfo{DirLen};
-    my $raf = $$dirInfo{RAF} or return undef;
-    my $outfile = $$dirInfo{OutFile} or return undef;
-    my $outPos = $$dirInfo{OutPos} or return undef;
+    my $raf = $$dirInfo{RAF} or return 0;
+    my $outfile = $$dirInfo{OutFile} or return 0;
+    my $outPos = $$dirInfo{OutPos} or return 0;
     my $outBase = $outPos;
     my $verbose = $exifTool->Options('Verbose');
     my $out = $exifTool->Options('TextOut');
     my ($buff, $tagInfo);
 
     # 4 bytes at end of block give directory position within block
-    $raf->Seek($blockStart+$blockSize-4, 0) or return undef;
-    $raf->Read($buff, 4) == 4 or return undef;
+    $raf->Seek($blockStart+$blockSize-4, 0) or return 0;
+    $raf->Read($buff, 4) == 4 or return 0;
     my $dirOffset = Get32u(\$buff,0) + $blockStart;
-    $raf->Seek($dirOffset, 0) or return undef;
-    $raf->Read($buff, 2) == 2 or return undef;
+    $raf->Seek($dirOffset, 0) or return 0;
+    $raf->Read($buff, 2) == 2 or return 0;
     my $entries = Get16u(\$buff,0);             # get number of entries in directory
     # read the directory (10 bytes per entry)
-    $raf->Read($buff, 10 * $entries) == 10 * $entries or return undef;
+    $raf->Read($buff, 10 * $entries) == 10 * $entries or return 0;
     my $newDir = '';
 
     # get hash of new information keyed by tagID
@@ -305,7 +293,7 @@ sub WriteCanonRaw($$$)
                 $newDir .= Set16u($addTag) . Set32u(length($newVal)) .
                            Set32u($outPos - $outBase);
                 # write new value data
-                Write($outfile, $newVal) or return undef;
+                Write($outfile, $newVal) or return 0;
                 $outPos += length($newVal);     # update current position
                 $verbose > 1 and print $out "    + CanonRaw:$$tagInfo{Name}\n";
                 ++$exifTool->{CHANGED};
@@ -314,7 +302,7 @@ sub WriteCanonRaw($$$)
             $delTag{$addTag} = 1;
         }
         last unless defined $tag;           # all done if no more directory entries
-        return undef if $tag & 0x8000;      # top bit should not be set
+        return 0 if $tag & 0x8000;      # top bit should not be set
         my $tagID = $tag & 0x3fff;          # get tag ID
         my $tagType = ($tag >> 8) & 0x38;   # get tag type
         my $valueInDir = ($tag & 0x4000);   # flag for value in directory
@@ -351,17 +339,17 @@ sub WriteCanonRaw($$$)
                     OutPos   => $outPos,
                 );
                 my $result = $exifTool->WriteDirectory(\%subdirInfo, $tagTablePtr);
-                return undef unless $result;
+                return 0 unless $result;
                 # set size and pointer for this new directory
                 $size = $subdirInfo{OutPos} - $outPos;
                 $valuePtr = $outPos - $outBase;
                 $outPos = $subdirInfo{OutPos};
             } else {
                 # verify that the value data is within this block
-                $valuePtr + $size <= $blockSize or return undef;
+                $valuePtr + $size <= $blockSize or return 0;
                 # read value from file
-                $raf->Seek($ptr, 0) or return undef;
-                $raf->Read($value, $size) == $size or return undef;
+                $raf->Seek($ptr, 0) or return 0;
+                $raf->Read($value, $size) == $size or return 0;
             }
         }
         # set count from tagInfo count if necessary
@@ -376,7 +364,7 @@ sub WriteCanonRaw($$$)
             if ($subdir and $$subdir{TagTable}) {
                 my $name = $$tagInfo{Name};
                 my $newTagTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
-                return undef unless $newTagTable;
+                return 0 unless $newTagTable;
                 my $subdirStart = 0;
                 #### eval Start ()
                 $subdirStart = eval $$subdir{Start} if $$subdir{Start};
@@ -469,7 +457,7 @@ sub WriteCanonRaw($$$)
             $value .= "\0" if $size & 0x01;
             $valuePtr = $outPos - $outBase;
             # write out value data
-            Write($outfile, $value) or return undef;
+            Write($outfile, $value) or return 0;
             $outPos += length($value);  # update current position in outfile
         }
         # create new directory entry
@@ -479,12 +467,14 @@ sub WriteCanonRaw($$$)
     $entries = length($newDir) / 10;
     $newDir = Set16u($entries) . $newDir . Set32u($outPos - $outBase);
     # write directory data
-    Write($outfile, $newDir) or return undef;
+    Write($outfile, $newDir) or return 0;
 
     # update current output file position in dirInfo
     $$dirInfo{OutPos} = $outPos + length($newDir);
+    # save outfile directory start (needed for rewriting VRD trailer)
+    $$dirInfo{OutDirStart} = $outPos - $outBase;
 
-    return 'Success';
+    return 1;
 }
 
 #------------------------------------------------------------------------------
@@ -508,11 +498,12 @@ sub WriteCRW($$)
     my $type = $1;
     my $hlen = Get32u(\$buff, 0);   # get header length
 
-    if ($exifTool->{DEL_GROUP}) {
+    my $delGroup = $exifTool->{DEL_GROUP};
+    if ($delGroup and $$delGroup{MakerNotes}) {
         if ($type eq 'CCDR') {
-            $exifTool->Error("Can't delete groups in CRW file");
+            $exifTool->Error("Can't delete Makernotes group in CRW file");
             return 0;
-        } elsif ($exifTool->{DEL_GROUP}->{MakerNotes}) {
+        } else {
             ++$exifTool->{CHANGED};
             return 1;
         }
@@ -539,19 +530,37 @@ sub WriteCRW($$)
     );
     # process the raw directory
     my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
-    my $msg = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
-    if ($msg) {
-        if ($err) {
-            $rtnVal = -1;
-        } else {
-            $rtnVal = 1;    # success!
+    my $success = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
+
+    while ($success) {
+        # check to see if trailer(s) exist(s)
+        my $trailInfo = Image::ExifTool::IdentifyTrailer($raf) or last;
+        # delete all trailers if specified
+        if ($delGroup and $$delGroup{Trailer}) {
+            $exifTool->VPrint(0,"  Deleting $$trailInfo{DirName} trailer\n");
+            ++$exifTool->{CHANGED};
+            last;
         }
+        # rewrite the trailer(s)
+        $buff = '';
+        $$trailInfo{OutFile} = \$buff;
+        $success = $exifTool->ProcessTrailers($trailInfo) or last;
+        my $trailPt = $$trailInfo{OutFile};
+        my $len = length $$trailPt;
+        last if $len < 4;   # all done if trailers were deleted
+        # must update DirStart pointer at end of trailer for
+        my $newDirStart = Set32u($dirInfo{OutDirStart});
+        my $pad = ($len & 0x01) ? ' ' : ''; # add pad byte if necessary
+        Write($outfile, $pad, substr($$trailPt,0,$len-4), $newDirStart) or $err = 1;
+        last;
+    }
+    if ($success) {
+        $rtnVal = $err ? -1 : 1;
     } else {
         $exifTool->Error('Error rewriting CRW file');
     }
     return $rtnVal;
 }
-
 
 1; # end
 

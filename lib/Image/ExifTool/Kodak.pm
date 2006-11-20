@@ -480,10 +480,10 @@ Z7560.
 %Image::ExifTool::Kodak::Meta = (
     GROUPS => { 0 => 'Meta', 1 => 'MetaIFD', 2 => 'Image'},
     NOTES => q{
-These tags are found in the APP3 "Meta" segment of JPEG images from Kodak
-cameras such as the DC280, DC3400, DC5000 and MC3.  The structure of this
-segment is similar to the APP1 "Exif" segment, but a different set of tags
-is used.
+        These tags are found in the APP3 "Meta" segment of JPEG images from Kodak
+        cameras such as the DC280, DC3400, DC5000 and MC3.  The structure of this
+        segment is similar to the APP1 "Exif" segment, but a different set of tags
+        is used.
     },
     0xc350 => 'FilmProductCode',
     0xc351 => 'ImageSourceEK',
@@ -579,7 +579,7 @@ is used.
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::Kodak::Composite');
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Kodak::Composite);
 
 1;  # end
 

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: Writer_14_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1253 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:09:01 12:52:48
+[File, File, Time]  - File Modification Date/Time: 2006:11:17 13:52:05
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -35,7 +35,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 160
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 120
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM - DCF thumbnail file
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
@@ -53,7 +53,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 29.3
 [Composite, Composite, Image]  - Shutter Speed: 4
 [Composite, Composite, Image]  - Circle Of Confusion: 0.001 mm
-[Composite, Composite, Image]  - EV: 5.6
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 997.1mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 80.59 m
 [Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Image]  - Light Value: 5.6

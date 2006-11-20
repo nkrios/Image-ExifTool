@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         DNG.pm
 #
-# Description:  Extract DNG-specific information
+# Description:  Read DNG-specific information
 #
 # Revisions:    01/09/2006 - P. Harvey Created
 #
@@ -27,12 +27,12 @@ sub ProcessDNGMakerNotes($$$);
         This table defines tags extracted from the DNG OriginalRawFileData
         information.  All other DNG tags are defined in the EXIF table.
     },
-    0 => { Name => 'OriginalRawImage',    ValueConv => '\$val' },
-    1 => { Name => 'OriginalRawResource', ValueConv => '\$val' },
+    0 => { Name => 'OriginalRawImage',    Binary => 1 },
+    1 => { Name => 'OriginalRawResource', Binary => 1 },
     2 => 'OriginalRawFileType',
     3 => 'OriginalRawCreator',
-    4 => { Name => 'OriginalTHMImage',    ValueConv => '\$val' },
-    5 => { Name => 'OriginalTHMResource', ValueConv => '\$val' },
+    4 => { Name => 'OriginalTHMImage',    Binary => 1 },
+    5 => { Name => 'OriginalTHMResource', Binary => 1 },
     6 => 'OriginalTHMFileType',
     7 => 'OriginalTHMCreator',
 );
@@ -227,7 +227,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::DNG.pm - Extract DNG-specific information
+Image::ExifTool::DNG.pm - Read DNG-specific information
 
 =head1 SYNOPSIS
 

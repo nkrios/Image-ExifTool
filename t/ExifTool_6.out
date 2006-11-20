@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
-[File, File, Image]  - File Name: ExifTool.jpg
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[File, File, Image]  - File Name: Canon.jpg
 [File, File, Image]  - Directory: t/images
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
+[File, File, Time]  - File Modification Date/Time: 2006:10:16 12:04:41
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
@@ -31,7 +31,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 160
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 120
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM - DCF thumbnail file
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
@@ -56,8 +56,8 @@
 [Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
 [Composite, Composite, Camera]  - Blue Balance: 1.190619
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
-[Composite, Composite, Image]  - EV: 5.6
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 52.7mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 4.26 m
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+[Composite, Composite, Image]  - Light Value: 5.6
 [Composite, Composite, Camera]  - Red Balance: 2.067348

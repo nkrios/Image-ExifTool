@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.46
 [File, File, Image]  - File Name: GPS_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2006:06:05 09:09:50
+[File, File, Time]  - File Modification Date/Time: 2006:10:07 20:05:11
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 120
@@ -44,19 +44,19 @@
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Unknown (0)
 [EXIF, ExifIFD, Image] 41729 - Scene Type: Unknown (0)
+[EXIF, GPS, Location] 0 - GPS Version ID: 2.0.0.0
+[EXIF, GPS, Location] 1 - GPS Latitude Ref: South
+[EXIF, GPS, Location] 2 - GPS Latitude: 12 deg 21' 23.34"
+[EXIF, GPS, Location] 3 - GPS Longitude Ref: West
+[EXIF, GPS, Location] 4 - GPS Longitude: 1 deg 54' 51.00"
+[EXIF, GPS, Time] 7 - GPS Time Stamp: 14:58:24
+[EXIF, GPS, Location] 18 - GPS Map Datum: WGS84
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1050
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
-[GPS, GPS, Location] 0 - GPS Version ID: 2.0.0.0
-[GPS, GPS, Location] 1 - GPS Latitude Ref: South
-[GPS, GPS, Location] 2 - GPS Latitude: 12 deg 21' 23.34"
-[GPS, GPS, Location] 3 - GPS Longitude Ref: West
-[GPS, GPS, Location] 4 - GPS Longitude: 1 deg 54' 51.00"
-[GPS, GPS, Time] 7 - GPS Time Stamp: 14:58:24
-[GPS, GPS, Location] 18 - GPS Map Datum: WGS84
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 120 - Caption-Abstract: Communications
 [IPTC, IPTC, Author] 122 - Writer-Editor: Ian Britton

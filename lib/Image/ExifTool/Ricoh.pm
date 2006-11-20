@@ -13,11 +13,13 @@ package Image::ExifTool::Ricoh;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessRicohText($$$);
+sub ProcessRicohRMETA($$$);
 
 %Image::ExifTool::Ricoh::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -113,7 +115,7 @@ sub ProcessRicohText($$$);
         Name => 'PreviewImageStart',
         Format => 'int16u',
         Flags => 'IsOffset',
-        OffsetPair => 30,  # associated byte count tagID
+        OffsetPair => 30,   # associated byte count tagID
         DataTag => 'PreviewImage',
         Protected => 2,
     },
@@ -194,16 +196,65 @@ sub ProcessRicohText($$$);
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessRicohText,
     NOTES => q{
-Ricoh RDC models such as the RDC-i700, RDC-5000, RDC-6000, RDC-7 and
-RDC-4300 use a text-based format for their maker notes instead of the IFD
-format used by the Caplio models.  Below is a list of known tags in this
-information.
+        Ricoh RDC models such as the RDC-i700, RDC-5000, RDC-6000, RDC-7 and
+        RDC-4300 use a text-based format for their maker notes instead of the IFD
+        format used by the Caplio models.  Below is a list of known tags in this
+        information.
     },
     Rev => 'Revision',
     Rv => 'Revision',
     Rg => 'RedGain',
     Gg => 'GreenGain',
     Bg => 'BlueGain',
+);
+
+%Image::ExifTool::Ricoh::RMETA = (
+    GROUPS => { 0 => 'APP5', 1 => 'RMETA', 2 => 'Image' },
+    PROCESS_PROC => \&Image::ExifTool::Ricoh::ProcessRicohRMETA,
+    NOTES => q{
+        The Ricoh Caplio Pro G3 has the ability to add custom fields to the APP5
+        "RMETA" segment of JPEG images.  While only a few observed tags have been
+        defined below, ExifTool will extract any information found here.
+    },
+    'Sign type' => { Name => 'SignType', PrintConv => {
+        1 => 'Directional',
+        2 => 'Warning',
+        3 => 'Information',
+    } },
+    Location => { PrintConv => {
+        1 => 'Verge',
+        2 => 'Gantry',
+        3 => 'Central reservation',
+        4 => 'Roundabout',
+    } },
+    Lit => { PrintConv => {
+        1 => 'Yes',
+        2 => 'No',
+    } },
+    Condition => { PrintConv => {
+        1 => 'Good',
+        2 => 'Fair',
+        3 => 'Poor',
+        4 => 'Damaged',
+    } },
+    Azimuth => { PrintConv => {
+        1 => 'N',
+        2 => 'NNE',
+        3 => 'NE',
+        4 => 'ENE',
+        5 => 'E',
+        6 => 'ESE',
+        7 => 'SE',
+        8 => 'SSE',
+        9 => 'S',
+        10 => 'SSW',
+        11 => 'SW',
+        12 => 'WSW',
+        13 => 'W',
+        14 => 'WNW',
+        15 => 'NW',
+        16 => 'NNW',
+    } },
 );
 
 #------------------------------------------------------------------------------
@@ -250,6 +301,103 @@ sub ProcessRicohText($$$)
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         $exifTool->FoundTag($tagInfo, $val);
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Process Ricoh APP5 RMETA information
+# Inputs: 0) ExifTool object reference
+#         1) Reference to directory information hash
+#         2) Pointer to tag table for this directory
+# Returns: 1 on success, otherwise returns 0 and sets a Warning
+sub ProcessRicohRMETA($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart};
+    my $dataLen = length($$dataPt);
+    my $verbose = $exifTool->Options('Verbose');
+
+    $dataLen > 6 or $exifTool->Warn('Truncated Ricoh RMETA data'), return 0;
+    my $byteOrder = substr($$dataPt, $dirStart, 2);
+    SetByteOrder($byteOrder) or $exifTool->Warn('Bad Ricoh RMETA data'), return 0;
+    my (@tags, @vals, @nums, $valPos);
+    my $pos = $dirStart + 6;
+    while ($pos <= $dataLen - 4) {
+        my $type = Get16u($dataPt, $pos);
+        my $size = Get16u($dataPt, $pos + 2);
+        $pos += 4;
+        $size -= 2;
+        if ($size < 0 or $pos + $size > $dataLen) {
+            $exifTool->Warn('Corrupted Ricoh RMETA data');
+            last;
+        }
+        if ($type eq 1) {
+            # save the tag names
+            my $tags = substr($$dataPt, $pos, $size);
+            $tags =~ s/\0+$//;  # remove trailing nulls
+            @tags = split /\0/, $tags;
+        } elsif ($type eq 2) {
+            # save the ASCII tag values
+            my $vals = substr($$dataPt, $pos, $size);
+            $vals =~ s/\0+$//;
+            @vals = split /\0/, $vals;
+            $valPos = $pos; # save position of first ASCII value
+        } elsif ($type eq 3) {
+            # save the numerical tag values
+            my $nums = substr($$dataPt, $pos, $size);
+            @nums = unpack($byteOrder eq 'MM' ? 'n*' : 'v*', $nums);
+        } elsif ($type eq 0) {
+            $pos += 2;  # why 2 extra bytes?
+        }
+        $pos += $size;
+    }
+    if (@tags or @vals) {
+        if (@tags != @vals) {
+            my ($nt, $nv) = (scalar(@tags), scalar(@vals));
+            $exifTool->Warn("Number of tags ($nt) and values ($nv) differs in Ricoh RMETA");
+        }
+        # find next tag in null-delimited list
+        # unpack numerical values from block of int16u values
+        my ($tag, $name, $val);
+        foreach $tag (@tags) {
+            $val = shift @vals;
+            last unless defined $val;
+            ($name = $tag) =~ s/\b([a-z])/\U$1/gs;  # make capitalize all words
+            $name =~ s/ (\w)/\U$1/g;                # remove special characters
+            $name = 'RMETA_Unknown' unless length($name);
+            my $num = shift @nums;
+            my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+            if ($tagInfo) {
+                # make sure print conversion is defined
+                $$tagInfo{PrintConv} = { } unless $$tagInfo{PrintConv};
+            } else {
+                # create tagInfo hash
+                $tagInfo = { Name => $name, PrintConv => { } };
+                Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            }
+            if (defined $num) {
+                # add conversion for this value (if it doesn't already exist)
+                $tagInfo->{PrintConv}->{$num} = $val;
+            } else {
+                # no numerical value so use string value directly
+                delete $tagInfo->{PrintConv}->{$val};
+                $num = $val;
+            }
+            if ($verbose) {
+                $exifTool->VerboseInfo($tag, $tagInfo,
+                    Table   => $tagTablePtr,
+                    Value   => $num,
+                    DataPt  => $dataPt,
+                    DataPos => $$dirInfo{DataPos},
+                    Start   => $valPos,
+                    Size    => length($val),
+                );
+            }
+            $exifTool->FoundTag($tagInfo, $num);
+            $valPos += length($val) + 1;
+        }
     }
     return 1;
 }

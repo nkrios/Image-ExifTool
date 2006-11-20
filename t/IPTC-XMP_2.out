@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: IPTC-XMP.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 20 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:03 14:32:38
+[File, File, Time]  - File Modification Date/Time: 2005:12:31 16:05:50
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 100
@@ -148,12 +148,12 @@
 [ICC_Profile, ICC_Profile, Image] rTRC - Red Tone Reproduction Curve: (Binary data 2060 bytes)
 [ICC_Profile, ICC_Profile, Image] gTRC - Green Tone Reproduction Curve: (Binary data 2060 bytes)
 [ICC_Profile, ICC_Profile, Image] bTRC - Blue Tone Reproduction Curve: (Binary data 2060 bytes)
-[APP14, APP14, Image] 0 - DCT Encode Version: 100
-[APP14, APP14, Image] 1 - APP14 Flags 0: (none)
-[APP14, APP14, Image] 2 - APP14 Flags 1: (none)
-[APP14, APP14, Image] 3 - Color Transform: YCbCr
+[APP14, Adobe, Image] 0 - DCT Encode Version: 100
+[APP14, Adobe, Image] 1 - APP14 Flags 0: (none)
+[APP14, Adobe, Image] 2 - APP14 Flags 1: (none)
+[APP14, Adobe, Image] 3 - Color Transform: YCbCr
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Image Size: 100x80
 [Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Image]  - EV: 9.6
 [Composite, Composite, Camera]  - Focal Length: 6.0mm
+[Composite, Composite, Image]  - Light Value: 9.6

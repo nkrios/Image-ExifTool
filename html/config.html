@@ -3,29 +3,42 @@
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <pre>
-<font color='#aa0000'>#------------------------------------------------------------------------------
+<font color="#aa0000">#------------------------------------------------------------------------------
 # File:         ExifTool_config  --&gt;  ~/.ExifTool_config
 #
 # Description:  Sample user configuration file for Image::ExifTool
 #
-# Notes:        This example config file defines 7 new tags:
+# Notes:        This example file shows how to define your own shortcuts and
+#               add new EXIF, IPTC, XMP, PNG and Composite tags.
 #
-#                   1.  XMP-xxx:NewXMPxxxTag1
-#                   2.  XMP-xxx:NewXMPxxxTag2
-#                   3.  XMP-xxx:NewXMPxxxTag3
-#                   4.  XMP-xmp:NewXMPxmpTag
-#                   5.  PNG:NewPngTag1
-#                   6.  PNG:NewPngTag2
-#                   7.  PNG:NewPngTag3
+#               Note that unknown tags may be extracted even if they aren't
+#               defined, but tags must be defined to be written.  Also note
+#               that it is possible to override an existing tag definition
+#               with a new tag.
 #
-#               To activate this file, copy it to ".ExifTool_config" in your
-#               home directory or in a directory specified by the EXIFTOOL_HOME
-#               environment variable.
+#               To activate this file, rename it to ".ExifTool_config" and
+#               place it in your home directory or the application script
+#               directory.  This causes ExifTool to automatically load the file
+#               when run.  Your home directory is determined by the first
+#               defined of the following environment variables:
 #
-#               ExifTool automatically loads a file named ".ExifTool_config"
-#               if it exists in your home directory (or directory specified by
-#               the EXIFTOOL_HOME environment).  This example file shows how to
-#               define your own shortcuts and add new XMP and PNG tags.
+#                   1. EXIFTOOL_HOME
+#                   2. HOME
+#                   3. HOMEDRIVE + HOMEPATH
+#                   4. (the current directory)
+#
+#               This sample file defines the following 9 new tags as well as a
+#               number of Shortcut and Composite tags:
+#
+#                   1.  EXIF:NewEXIFTag
+#                   2.  IPTC:NewIPTCTag
+#                   3.  XMP-xxx:NewXMPxxxTag1
+#                   4.  XMP-xxx:NewXMPxxxTag2
+#                   5.  XMP-xxx:NewXMPxxxTag3
+#                   6.  XMP-xmp:NewXMPxmpTag
+#                   7.  PNG:NewPngTag1
+#                   8.  PNG:NewPngTag2
+#                   9.  PNG:NewPngTag3
 #
 #               For detailed information on the definition of tag tables and
 #               tag information hashes, see lib/Image/ExifTool/README.
@@ -39,23 +52,40 @@
     MyAlias =&gt; 'FocalLengthIn35mmFormat',
 );
 
-<font color='#aa0000'># This is a basic example of the definition for a new XMP namespace.
+<font color="#aa0000"># This is a basic example of the definition for a new XMP namespace.
 # After defining this table (which may have any name), a corresponding
 # "SubDirectory" entry must be added to the Main XMP table through
 # the %Image::ExifTool::UserDefined definition below.</font>
 %Image::ExifTool::UserDefined::xxx = (
     GROUPS =&gt; { 0 =&gt; 'XMP', 1 =&gt; 'XMP-xxx', 2 =&gt; 'Image' },
-    NAMESPACE =&gt; [ 'xxx' =&gt; 'http://ns.myname.com/xxx/1.0/' ],
+    NAMESPACE =&gt; { 'xxx' =&gt; 'http://ns.myname.com/xxx/1.0/' },
     WRITABLE =&gt; 'string',
+    <font color="#aa0000"># replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")</font>
     NewXMPxxxTag1 =&gt; { },
     NewXMPxxxTag2 =&gt; { Groups =&gt; { 2 =&gt; 'Author' } },
-    NewXMPxxxTag3 =&gt; { List => 'Bag' },
+    NewXMPxxxTag3 =&gt; { List =&gt; 'Bag' },
 );
 
-<font color='#aa0000'># The %Image::ExifTool::UserDefined hash defines new tags to be
+<font color="#aa0000"># The %Image::ExifTool::UserDefined hash defines new tags to be
 # added to existing tables.</font>
 %Image::ExifTool::UserDefined = (
-    <font color='#aa0000'># new XMP namespaces must be added to the Main XMP table</font>
+    <font color="#aa0000"># All EXIF tags are added to the Main table, and WriteGroup is used to
+    # specify where the tag is written (default is ExifIFD if not specified):</font>
+    'Image::ExifTool::Exif::Main' =&gt; {
+        0xd000 =&gt; {
+            Name =&gt; 'NewEXIFTag',
+            Writable =&gt; 'int16u',
+            WriteGroup =&gt; 'IFD0',
+        },
+    },
+    <font color="#aa0000"># IPTC tags are added to a specific record type (ie. application record):</font>
+    'Image::ExifTool::IPTC::ApplicationRecord' =&gt; {
+        300 =&gt; {
+            Name =&gt; 'NewIPTCTag',
+            Format =&gt; 'string[0,16]',
+        },
+    },
+    <font color="#aa0000"># new XMP namespaces (ie. XMP-xxx) must be added to the Main XMP table:</font>
     'Image::ExifTool::XMP::Main' =&gt; {
         xxx =&gt; {
             SubDirectory =&gt; {
@@ -63,19 +93,70 @@
             },
         },
     },
-    <font color='#aa0000'># XMP tags may also be added to existing namespaces</font>
+    <font color="#aa0000"># XMP tags may also be added to existing namespaces:</font>
     'Image::ExifTool::XMP::xmp' =&gt; {
         NewXMPxmpTag =&gt; { Groups =&gt; { 2 =&gt; 'Author' } },
     },
-    <font color='#aa0000'># new PNG tags are added to the PNG::TextualData table</font>
+    <font color="#aa0000"># new PNG tags are added to the PNG::TextualData table:</font>
     'Image::ExifTool::PNG::TextualData' =&gt; {
         NewPngTag1 =&gt; { },
         NewPngTag2 =&gt; { },
         NewPngTag3 =&gt; { },
     },
+    <font color="#aa0000"># Composite tags are added to the Composite table:</font>
+    'Image::ExifTool::Composite' =&gt; {
+        <font color="#aa0000"># Composite tags are unique: The Require/Desire elements list
+        # tags that must/may exist, and the keys of these hashes are used
+        # as indices in the @val array of the ValueConv expression to
+        # derive the composite tag value.  (See the Composite table in
+        # Image::ExifTool::Exif for more examples.)</font>
+        BaseName =&gt; {
+            Require =&gt; {
+                0 =&gt; 'FileName',
+            },
+            <font color="#aa0000"># remove the extension from FileName</font>
+            ValueConv =&gt; 'my $name=$val[0]; $name=~s/\..*?$//; $name',
+        },
+        Extension =&gt; {
+            Require =&gt; {
+                0 =&gt; 'FileName',
+            },
+            ValueConv =&gt; '$val[0]=~/\.([^.]*)$/; $1',
+        },
+        <font color="#aa0000"># override CircleOfConfusion tag to use D/1750 instead of D/1440</font>
+        CircleOfConfusion =&gt; {
+            Require =&gt; {
+                0 =&gt; 'ScaleFactor35efl',
+            },
+            ValueConv =&gt; 'sqrt(24*24+36*36) / ($val[0] * 1750)',
+            PrintConv =&gt; 'sprintf("%.3f mm",$val)',
+        },
+        <font color="#aa0000"># get latitude/logitude reference from XMP lat/long tags
+        # (used to set EXIF GPS position from XMP tags)</font>
+        GPSLatitudeRef =&gt; {
+            Require =&gt; {
+                0 =&gt; 'XMP:GPSLatitude',
+            },
+            ValueConv =&gt; '$val[0] &lt; 0 ? "S" : "N"',
+            PrintConv =&gt; {
+                N =&gt; 'North',
+                S =&gt; 'South',
+            },
+        },
+        GPSLongitudeRef =&gt; {
+            Require =&gt; {
+                0 =&gt; 'XMP:GPSLongitude',
+            },
+            ValueConv =&gt; '$val[0] &lt; 0 ? "W" : "E"',
+            PrintConv =&gt; {
+                E =&gt; 'East',
+                W =&gt; 'West',
+            },
+        },
+    },
 );
 
-<font color='#aa0000'>#------------------------------------------------------------------------------</font>
+<font color="#aa0000">#------------------------------------------------------------------------------</font>
 </pre>
 <hr>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>

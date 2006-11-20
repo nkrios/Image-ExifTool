@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..6\n"; }
+BEGIN { $| = 1; print "1..6\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -46,7 +46,7 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     # set IgnoreMinorErrors option to allow invalid JpgFromRaw to be written
     $exifTool->Options(IgnoreMinorErrors => 1);
-    $exifTool->SetNewValuesFromFile('t/images/ExifTool.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/Canon.jpg');
     $exifTool->SetNewValue(SerialNumber => 1234);
     $exifTool->SetNewValue(OwnerName => 'Phil Harvey');
     $exifTool->SetNewValue(JpgFromRaw => 'not a real image');

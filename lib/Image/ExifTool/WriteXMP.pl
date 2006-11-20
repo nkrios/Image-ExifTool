@@ -248,7 +248,6 @@ my %nsURI = (
     dex       => 'http://ns.optimasc.com/dex/1.0/',
 );
 
-my $seeded;     # flag indicating we seeded our random number generateor
 my $x_toolkit = "x:xmptk='Image::ExifTool $Image::ExifTool::VERSION'";
 my $rdfDesc = 'rdf:Description';
 #
@@ -260,7 +259,8 @@ my $xmpOpen = "<x:xmpmeta xmlns:x='$nsURI{x}' $x_toolkit>\n";
 my $rdfOpen = "<rdf:RDF xmlns:rdf='$nsURI{rdf}'>\n";
 my $rdfClose = "</rdf:RDF>\n";
 my $xmpClose = "</x:xmpmeta>\n";
-my $pktClose =  "<?xpacket end='w'?>";
+my $pktCloseW =  "<?xpacket end='w'?>"; # writable by default
+my $pktCloseR =  "<?xpacket end='r'?>";
 
 # Update XMP tag tables when this library is loaded:
 # - generate all TagID's (required when writing)
@@ -269,20 +269,13 @@ my $pktClose =  "<?xpacket end='w'?>";
 {
     my $mainTable = GetTagTable('Image::ExifTool::XMP::Main');
     GenerateTagIDs($mainTable);
-    my $mainTag;
+    my ($mainTag, $ns, $tag);
     foreach $mainTag (keys %$mainTable) {
         my $mainInfo = $mainTable->{$mainTag};
         next unless ref $mainInfo eq 'HASH' and $mainInfo->{SubDirectory};
         my $table = GetTagTable($mainInfo->{SubDirectory}->{TagTable});
-        # add new namespace if NAMESPACE is ns/uri pair
-        if (ref $$table{NAMESPACE} eq 'ARRAY') {
-            my $ns = $table->{NAMESPACE}->[0];
-            $nsURI{$ns} = $table->{NAMESPACE}->[1];
-            $$table{NAMESPACE} = $ns;
-        }
         $$table{WRITE_PROC} = \&WriteXMP;   # set WRITE_PROC for all tables
         GenerateTagIDs($table);
-        my $tag;
         $table->{CHECK_PROC} = \&CheckXMP; # add our write check routine
         foreach $tag (TagTableKeys($table)) {
             my $tagInfo = $$table{$tag};
@@ -296,11 +289,43 @@ my $pktClose =  "<?xpacket end='w'?>";
             $$tagInfo{PrintConvInv} = '$val' unless $$tagInfo{PrintConvInv};
             $$tagInfo{ValueConvInv} = '$val' unless $$tagInfo{ValueConvInv};
         }
+        # add new namespace if NAMESPACE is ns/uri pair
+        next unless ref $$table{NAMESPACE};
+        my $nsRef = $$table{NAMESPACE};
+        # recognize as either a list or hash
+        if (ref $nsRef eq 'ARRAY') {
+            $ns = $$nsRef[0];
+            $nsURI{$ns} = $$nsRef[1];
+        } else { # must be a hash
+            ($ns) = keys %$nsRef;
+            $nsURI{$ns} = $$nsRef{$ns};
+        }
+        $$table{NAMESPACE} = $ns;
     }
 }
 
 #------------------------------------------------------------------------------
-# check XMP values for validity and format accordingly
+# Validate XMP packet and set read or read/write mode
+# Inputs: 0) XMP data reference, 1) 'r' = read only, 'w' or undef = read/write
+# Returns: true if XMP is good (and adds packet header/trailer if necessary)
+sub ValidateXMP($;$)
+{
+    my ($xmpPt, $mode) = @_;
+    unless ($$xmpPt =~ /^\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/) {
+        return '' unless $$xmpPt =~ /^<x:xmpmeta/;
+        # add required xpacket header/trailer
+        $$xmpPt = $pktOpen . $$xmpPt . $pktCloseW;
+    }
+    $mode = 'w' unless $mode;
+    my $end = substr($$xmpPt, -32, 32);
+    # check for proper xpacket trailer and set r/w mode if necessary
+    return '' unless $end =~ s/(e\0*n\0*d\0*=\0*['"]\0*)([rw])(\0*['"]\0*\?\0*>)/$1$mode$3/;
+    substr($$xmpPt, -32, 32) = $end if $2 ne $mode;
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Check XMP values for validity and format accordingly
 # Inputs: 0) ExifTool object reference, 1) tagInfo hash reference,
 #         2) raw value reference
 # Returns: error string or undef (and may change value) on success
@@ -352,10 +377,7 @@ sub CheckXMP($$$)
         }
     } elsif ($format eq '1') {
         # this is the entire XMP data block
-        return undef if $$valPtr =~ /^\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/;
-        return 'Invalid XMP data' unless $$valPtr =~ /^<x:xmpmeta/;
-        # add required xpacket header/trailer
-        $$valPtr = $pktOpen . $$valPtr . $pktClose;
+        return 'Invalid XMP data' unless ValidateXMP($valPtr);
     } else {
         return "Unknown XMP format: $format";
     }
@@ -579,6 +601,7 @@ sub ConformPathToNamespace($$)
 # Returns: with tag table: new XMP data (may be empty if no XMP data) or undef on error
 #          without tag table: 1 on success, 0 if not valid XMP file, -1 on write error
 # Notes: May set dirInfo InPlace flag to rewrite with specified DirLen
+#        May set dirInfo ReadOnly flag to write as read-only XMP ('r' mode and no padding)
 sub WriteXMP($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -652,12 +675,12 @@ sub WriteXMP($$;$)
         # find existing property
         my $capList = $capture{$path};
         my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+        my $overwrite = Image::ExifTool::IsOverwriting($newValueHash);
         my %attrs;
         # delete existing entry if necessary
         if ($capList) {
             # take attributes from old values if they exist
             %attrs = %{$capList->[1]};
-            my $overwrite = Image::ExifTool::IsOverwriting($newValueHash);
             if ($overwrite) {
                 my ($delPath, @matchingPaths);
                 # check to see if this is an indexed list item
@@ -673,6 +696,7 @@ sub WriteXMP($$;$)
                     if ($overwrite < 0) {
                         # only overwrite specific values
                         next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
+                        $overwrite = 1;
                     }
                     $exifTool->VPrint(1, "    - XMP:$$tagInfo{Name} = '$val'\n");
                     # save attributes and path from this deleted property
@@ -707,6 +731,7 @@ sub WriteXMP($$;$)
                 }
             }
         }
+        next unless $overwrite > 0;
         # get list of new values (done if no new values specified)
         my @newValues = Image::ExifTool::GetNewValues($newValueHash) or next;
         # don't add new tag if it didn't exist before unless specified
@@ -859,7 +884,7 @@ sub WriteXMP($$;$)
         if ($$dirInfo{InPlace}) {
             # pad to specified DirLen
             my $dirLen = $$dirInfo{DirLen} || length $$dataPt;
-            my $len = length($newData) + length($pktClose);
+            my $len = length($newData) + length($pktCloseW);
             if ($len > $dirLen) {
                 $exifTool->Warn('Not enough room to edit XMP in place');
                 return undef;
@@ -870,10 +895,12 @@ sub WriteXMP($$;$)
                 $len += length($pad) * $num;
             }
             $len < $dirLen and $newData .= (' ' x ($dirLen - $len - 1)) . "\n";
-        } elsif (not $exifTool->Options('Compact') and not $xmpFile) {
+        } elsif (not $exifTool->Options('Compact') and
+                 not $xmpFile and not $$dirInfo{ReadOnly})
+        {
             $newData .= $pad x 24;
         }
-        $newData .= $pktClose;
+        $newData .= ($$dirInfo{ReadOnly} ? $pktCloseR : $pktCloseW);
     }
     # return empty data if no properties exist
     $newData = '' unless %capture or $$dirInfo{InPlace};

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: Writer_10_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -38,7 +38,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2048
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1536
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM - DCF thumbnail file
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
@@ -63,18 +63,19 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1786
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
-[MakerNotes, Pentax, Camera] 1 - Pentax Mode: Night-scene
+[MakerNotes, Pentax, Camera] 1 - Pentax Mode: Night Scene
 [MakerNotes, Pentax, Image] 2 - Preview Image Size: 320x240
 [MakerNotes, Pentax, Image] 3 - Preview Image Length: 0
 [MakerNotes, Pentax, Image] 4 - Preview Image Start: 1358
 [MakerNotes, Pentax, Camera] 5 - Pentax Model ID: Optio S
 [MakerNotes, Pentax, Time] 6 - Date: 2003:03:06
 [MakerNotes, Pentax, Time] 7 - Time: 13:09:25
-[MakerNotes, Pentax, Camera] 8 - Image Quality: Better
+[MakerNotes, Pentax, Camera] 8 - Quality: Better
 [MakerNotes, Pentax, Image] 9 - Pentax Image Size: 2048x1536
 [MakerNotes, Pentax, Camera] 11 - Picture Mode: Program
 [MakerNotes, Pentax, Camera] 12 - Flash Mode: Off
 [MakerNotes, Pentax, Camera] 13 - Focus Mode: Normal
+[MakerNotes, Pentax, Camera] 14 - AF Point Selected: Auto
 [MakerNotes, Pentax, Camera] 15 - Auto AF Point: Center
 [MakerNotes, Pentax, Camera] 16 - Focus Position: 2
 [MakerNotes, Pentax, Camera] 18 - Exposure Time: 1/463
@@ -108,7 +109,7 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/500
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
-[Composite, Composite, Image]  - EV: 14.9
 [Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 3.76 m
 [Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Image]  - Light Value: 14.9

@@ -1,8 +1,8 @@
-  ExifToolVersion = 6.41
-  FileName = ExifTool.jpg
+  ExifToolVersion = 6.51
+  FileName = Canon.jpg
   Directory = t/images
   FileSize = 2697
-  FileModifyDate = 1136399961
+  FileModifyDate = 1161014681
   FileType = JPEG
   MIMEType = image/jpeg
 JPEG APP1 (2442 bytes):
@@ -291,8 +291,8 @@ JPEG APP1 (2442 bytes):
   | | | | - Tag 0x0016 (2 bytes, int16s[1]):
   | | | |     0480: 20 ff                                           [ .]
   | | | | BulbDuration = 40
-  | | | | - Tag 0x0018 (4 bytes, int32s[1]):
-  | | | |     0484: 28 00 00 00                                     [(...]
+  | | | | - Tag 0x0018 (2 bytes, int16s[1]):
+  | | | |     0484: 28 00                                           [(.]
   | | | | CameraType = 252
   | | | | - Tag 0x001a (2 bytes, int16s[1]):
   | | | |     0488: fc 00                                           [..]
@@ -541,4 +541,5 @@ JPEG DHT (73 bytes):
     0a4d: 00 00 00 00 00 10 01 00 00 00 00 00 00 00 00 00 [................]
     0a5d: 00 00 00 00 00 00 00 11 01 00 00 00 00 00 00 00 [................]
     0a6d: 00 00 00 00 00 00 00 00 00                      [.........]
-JPEG SOS (end of parsing)
+JPEG SOS
+JPEG EOI

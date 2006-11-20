@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: Sigma_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1575 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:09:01 12:52:36
+[File, File, Time]  - File Modification Date/Time: 2006:11:17 13:52:03
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -80,6 +80,6 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/320
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.018 mm
-[Composite, Composite, Image]  - EV: 14.3
 [Composite, Composite, Camera]  - Focal Length: 60.0mm (35mm equivalent: 102.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 25.46 m
+[Composite, Composite, Image]  - Light Value: 14.3

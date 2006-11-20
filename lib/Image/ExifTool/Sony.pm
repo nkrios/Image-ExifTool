@@ -18,7 +18,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -36,7 +36,44 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
-    0xb020 => 'ColorModeSetting', #PH
+    # 0xb020 string with observed values "Standard", "None" and "Real"
+    0xb021 => { #2
+        Name => 'ColorTemperature',
+        PrintConv => '$val ? $val : "Auto"',
+    },
+    0xb023 => { #PH (A100)
+        Name => 'SceneMode',
+        PrintConv => {
+            0 => 'Manual (P,A,S or M)',
+            1 => 'Portrait',
+            4 => 'Sunset',
+            5 => 'Sports',
+            6 => 'Landscape',
+            8 => 'Macro',
+            16 => 'Auto',
+            17 => 'Night Portrait',
+        },
+    },
+    0xb024 => { #PH (A100)
+        Name => 'ZoneMatching',
+        PrintConv => {
+            0 => 'ISO Setting Used',
+            1 => 'High Key',
+            2 => 'Low Key',
+        },
+    },
+    0xb025 => { #PH (A100)
+        Name => 'DynamicRangeOptimizer',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Standard',
+            2 => 'Advanced',
+        },
+    },
+    0xb026 => { #PH (A100)
+        Name => 'ImageStabilization',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
     0xb027 => { #2
         Name => 'LensID',
         PrintConv => \%sonyLensIDs,
@@ -50,6 +87,20 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
             Start => '$val',
         },
     },
+    0xb029 => { #2
+        Name => 'ColorMode',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'Standard',
+            1 => 'Vivid',
+            2 => 'Portrait',
+            3 => 'Landscape',
+            4 => 'Sunset',
+            5 => 'Night Scene',
+            6 => 'B&W',
+            7 => 'Adobe RGB',
+        },
+    },
     0xb040 => { #2
         Name => 'Macro',
         PrintConv => { 0 => 'Off', 1 => 'On' },
@@ -58,12 +109,24 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
         Name => 'ExposureMode',
         PrintConv => {
             0 => 'Auto',
+            5 => 'Landscape',
             6 => 'Program',
             7 => 'Aperture Priority',
             8 => 'Shutter Priority',
             9 => 'Night Scene',
             15 => 'Manual',
         },
+    },
+    0xb047 => { #2
+        Name => 'Quality',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Fine',
+        },
+    },
+    0xb04e => { #2
+        Name => 'LongExposureNoiseReduction',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
     },
 );
 

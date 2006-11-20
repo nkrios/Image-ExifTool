@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.36';
+$VERSION = '1.39';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -56,7 +56,7 @@ sub BuildMakerNotes($$$$$$);
     0x0001 => { #3
         Name => 'FreeBytes',
         Format => 'undef',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x0032 => { Name => 'CanonColorInfo1', Writable => 0 },
     0x0805 => [
@@ -144,31 +144,40 @@ sub BuildMakerNotes($$$$$$);
             TagTable => 'Image::ExifTool::Canon::SensorInfo',
         },
     },
-    # this tag has only be verified for the 10D in CRW files, but this
-    # is the way it works for the other models with JPG files...
+    # this tag has only be verified for the 10D in CRW files, but the D30 and D60
+    # also produce CRW images and have CustomFunction information in their JPEG's
     0x1033 => [
         {
-            Condition => '$self->{CameraModel} =~ /10D/',
-            Name => 'CanonCustomFunctions10D',
-            Writable => 0,
+            Name => 'CustomFunctions10D',
+            Condition => '$self->{CameraModel} =~ /EOS 10D/',
             SubDirectory => {
+                Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions10D',
             },
         },
         {
-            Condition => '$self->{CameraModel} =~ /20D/',
-            Name => 'CanonCustomFunctions20D',
-            Writable => 0,
+            Name => 'CustomFunctionsD30',
+            Condition => '$self->{CameraModel} =~ /EOS D30\b/',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::CanonCustom::Functions20D',
+                Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+                TagTable => 'Image::ExifTool::CanonCustom::FunctionsD30',
             },
         },
         {
-            # assume everything else is a D30/D60
-            Name => 'CanonCustomFunctionsD30',
-            Writable => 0,
+            Name => 'CustomFunctionsD60',
+            Condition => '$self->{CameraModel} =~ /EOS D60\b/',
             SubDirectory => {
+                # the stored size in the D60 apparently doesn't include the size word:
+                Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size-2,$size)',
+                # (D60 custom functions are basically the same as D30)
                 TagTable => 'Image::ExifTool::CanonCustom::FunctionsD30',
+            },
+        },
+        {
+            Name => 'CustomFunctionsUnknown',
+            SubDirectory => {
+                Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+                TagTable => 'Image::ExifTool::CanonCustom::FuncsUnknown',
             },
         },
     ],
@@ -262,7 +271,10 @@ sub BuildMakerNotes($$$$$$);
     },
     0x1814 => { #3
         Name => 'MeasuredEV',
-        Notes => 'offset by -5 EV from the calculated value',
+        Notes => q{
+            this the Canon name for what should properly be called MeasuredLV, and is
+            offset by about -5 EV from the calculated LV for most models
+        },
         Format => 'float',
     },
     0x1817 => {
@@ -305,7 +317,7 @@ sub BuildMakerNotes($$$$$$);
     0x2005 => {
         Name => 'RawData',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x2007 => {
         Name => 'JpgFromRaw',
@@ -735,7 +747,7 @@ sub ProcessCRW($$)
     # initialize maker note data if building maker notes
     $buildMakerNotes and InitMakerNotes($exifTool);
 
-    # set the FileType tag unless already done (ie. CIFF APP0 record in JPEG image)
+    # set the FileType tag unless already done (ie. APP0 CIFF record in JPEG image)
     $exifTool->SetFileType() unless $exifTool->GetValue('FileType');
 
     # build directory information for main raw directory
@@ -756,6 +768,10 @@ sub ProcessCRW($$)
 
     # finish building maker notes if necessary
     $buildMakerNotes and SaveMakerNotes($exifTool);
+
+    # process trailers if they exist
+    my $trailInfo = Image::ExifTool::IdentifyTrailer($raf);
+    $exifTool->ProcessTrailers($trailInfo) if $trailInfo;
 
     return 1;
 }

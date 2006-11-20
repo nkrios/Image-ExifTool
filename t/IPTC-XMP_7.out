@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: IPTC-XMP_7_failed.xmp
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:03 14:32:38
+[File, File, Time]  - File Modification Date/Time: 2005:12:31 16:05:50
 [File, File, Image]  - File Type: XMP
 [File, File, Image]  - MIME Type: application/rdf+xml
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
@@ -30,6 +30,7 @@
 [XMP, XMP-exif, Camera] MaxApertureValue - Max Aperture Value: 3.5
 [XMP, XMP-exif, Camera] MeteringMode - Metering Mode: Multi-segment
 [XMP, XMP-exif, Image] PixelXDimension - Exif Image Width: 100
+[XMP, XMP-exif, Image] PixelYDimension - Exif Image Length: 80
 [XMP, XMP-exif, Image] SceneType - Scene Type: Directly photographed
 [XMP, XMP-exif, Camera] SensingMethod - Sensing Method: One-chip color area
 [XMP, XMP-exif, Image] ShutterSpeedValue - Shutter Speed Value: 1/64
@@ -43,7 +44,6 @@
 [XMP, XMP-photoshop, Time] DateCreated - Date Created: 2004:02:26
 [XMP, XMP-photoshop, Image] Headline - Headline: No headline
 [XMP, XMP-photoshop, Image] Instructions - Instructions: What instructions
-[XMP, XMP-photoshop, Author] Source - Source: I'm the source
 [XMP, XMP-photoshop, Location] State - State: Ont
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference?
@@ -70,6 +70,6 @@
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Image]  - EV: 9.6
 [Composite, Composite, Camera]  - Focal Length: 6.0mm
 [Composite, Composite, Image]  - Image Size: 100x80
+[Composite, Composite, Image]  - Light Value: 9.6

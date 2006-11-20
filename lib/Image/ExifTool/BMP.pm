@@ -6,6 +6,7 @@
 # Revisions:    07/16/2005 - P. Harvey Created
 #
 # References:   1) http://www.fortunecity.com/skyscraper/windows/364/bmpffrmt.html
+#               2) http://www.fourcc.org/rgb.php
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::BMP;
@@ -14,15 +15,15 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # BMP chunks
 %Image::ExifTool::BMP::Main = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Image' },
     NOTES => q{
-There really isn't much meta information in a BMP file as such, just a bit
-of image related information.
+        There really isn't much meta information in a BMP file as such, just a bit
+        of image related information.
     },
     4 => {
         Name => 'ImageWidth',
@@ -43,11 +44,15 @@ of image related information.
     16 => {
         Name => 'Compression',
         Format => 'int32u',
+        # (formatted as string[4] for some values in AVI images)
+        ValueConv => '$val > 256 ? unpack("A4",pack("V",$val)) : $val',
         PrintConv => {
             0 => 'None',
             1 => '8-Bit RLE',
             2 => '4-Bit RLE',
             3 => 'Bitfields',
+            4 => 'JPEG', #2
+            5 => 'PNG', #2
         },
     },
     20 => {

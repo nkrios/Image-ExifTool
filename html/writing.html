@@ -127,9 +127,9 @@ An unfortunate aspect of the JPEG format is that the size of a single segment is
 limited to less than 64 kB.  With the 2-byte size word at the start of each
 segment, this leaves 65533 bytes for data.  The EXIF specification states that
 the data must fit within a single <b>APP1</b> segment (which results in the
-preview image problem discussed below), however Photoshop <b>APP13</b> and ICC
-Profile <b>APP2</b> information may span multiple segments.  This multi-segment
-information is handled properly by ExifTool.
+preview image problem discussed below), however <b>APP13</b> Photoshop and
+<b>APP2</b> ICC Profile and FPXR information may span multiple segments.  This
+multi-segment information is handled properly by ExifTool.
 
 <p>JPEG comments may also exceed the size of a single <b>COM</b> segment. If
 necessary, comments are automatically split into separate segments when writing.
@@ -177,7 +177,7 @@ SceneCaptureType.  To handle this ambiguity, ExifTool will delete the tag if it
 exists in IFD0 when it is written to ExifIFD, and vice versa.
 
 <hr>
-<i>Last revised Feb. 27, 2006</i>
+<i>Last revised Oct. 16, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

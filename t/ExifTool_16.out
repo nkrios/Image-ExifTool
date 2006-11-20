@@ -83,7 +83,6 @@ Aperture : 14.0
 BlueBalance : 1.190619
 CircleOfConfusion : 0.019 mm
 DriveMode : Continuous shooting
-EV : 5.6
 FlashOn : Off
 FocalLength35efl : 34.0mm (35mm equivalent: 52.7mm)
 HyperfocalDistance : 4.26 m
@@ -91,6 +90,7 @@ ISO (1) : 100
 ImageSize : 8x8
 Lens : 18.0 - 55.0mm
 Lens35efl : 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+LightValue : 5.6
 RedBalance : 2.067348
 ScaleFactor35efl : 1.6
 ShootingMode : Manual
@@ -128,8 +128,8 @@ UserComment :
 WhiteBalance (1) : Auto
 ---- File ----
 Directory : t/images
-FileModifyDate : 2006:01:04 13:39:21
-FileName : ExifTool.jpg
+FileModifyDate : 2006:10:16 12:04:41
+FileName : Canon.jpg
 FileSize : 3 kB
 FileType : JPEG
 ImageHeight : 8
@@ -145,7 +145,7 @@ XResolution : 180
 YCbCrPositioning : Centered
 YResolution : 180
 ---- InteropIFD ----
-InteropIndex : THM
+InteropIndex : THM - DCF thumbnail file
 InteropVersion : 0100
 RelatedImageLength : 2048
 RelatedImageWidth : 3072

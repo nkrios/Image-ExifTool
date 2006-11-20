@@ -11,6 +11,32 @@ package Image::ExifTool::Photoshop;
 use strict;
 
 #------------------------------------------------------------------------------
+# Strip resource name from value prepare resource name for writing into IRB
+# Inputs: 0) tagInfo ref, 1) resource name (padded pascal string), 2) new value ref
+# Returns: none (updates name and value if necessary)
+sub SetResourceName($$$)
+{
+    my ($tagInfo, $name, $valPt) = @_;
+    my $setName = $$tagInfo{SetResourceName};
+    if (defined $setName) {
+        # extract resource name from value
+        if ($$valPt =~ m{.*/#(.{0,255})#/$}s) {
+            $name = $1;
+            # strip name from value
+            $$valPt = substr($$valPt, 0, -4 - length($name));
+        } elsif ($setName eq '1') {
+            return;     # use old name
+        } else {
+            $name = $setName;
+        }
+        # convert to padded pascal string
+        $name = chr(length $name) . $name;
+        $name .= "\0" if length($name) & 0x01;
+        $_[1] = $name;  # return new name
+    }
+}
+
+#------------------------------------------------------------------------------
 # Write Photoshop IRB resource
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
 #         2) tag table reference
@@ -42,7 +68,7 @@ sub WritePhotoshop($$$)
 # rewrite existing tags in the old directory, deleting ones as necessary
 # (the Photoshop directory entries aren't in any particular order)
 #
-    # Format: 0) Type, 4 bytes - "8BIM"
+    # Format: 0) Type, 4 bytes - "8BIM" (or the rare "PHUT" or "DCSR")
     #         1) TagID,2 bytes
     #         2) Name, pascal string padded to even no. bytes
     #         3) Size, 4 bytes - N
@@ -52,7 +78,7 @@ sub WritePhotoshop($$$)
         # each entry must be on same even byte boundary as directory start
         ++$pos if ($pos ^ $start) & 0x01;
         my $type = substr($$dataPt, $pos, 4);
-        if ($type ne '8BIM') {
+        if ($type !~ /^(8BIM|PHUT|DCSR)$/) {
             $exifTool->Error("Bad Photoshop IRB resource");
             undef $newData;
             last;
@@ -74,7 +100,7 @@ sub WritePhotoshop($$$)
             undef $newData;
             last;
         }
-        if ($$newTags{$tagID}) {
+        if ($$newTags{$tagID} and $type eq '8BIM') {
             $tagInfo = $$newTags{$tagID};
             delete $$newTags{$tagID};
             my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
@@ -85,16 +111,20 @@ sub WritePhotoshop($$$)
                 $value = Image::ExifTool::GetNewValues($newValueHash);
                 ++$exifTool->{CHANGED};
                 next unless defined $value;     # next if tag is being deleted
+                # set resource name if necessary
+                SetResourceName($tagInfo, $name, \$value);
                 $verbose > 1 and print $out "    + Photoshop:$$tagInfo{Name} = '$value'\n";
             }
         } else {
-            $tagInfo = $$editDirs{$tagID};
-            unless ($tagInfo) {
-                $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
-                if ($tagInfo) {
-                    # rewrite all Photoshop subdirectories
-                    undef $tagInfo unless $$tagInfo{SubDirectory} and
-                        $tagInfo->{SubDirectory}->{TagTable} =~ /^Image::ExifTool::Photoshop/;
+            if ($type eq '8BIM') {
+                $tagInfo = $$editDirs{$tagID};
+                unless ($tagInfo) {
+                    $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
+                    if ($tagInfo) {
+                        # rewrite all Photoshop subdirectories
+                        undef $tagInfo unless $$tagInfo{SubDirectory} and
+                            $tagInfo->{SubDirectory}->{TagTable} =~ /^Image::ExifTool::Photoshop/;
+                    }
                 }
             }
             if ($tagInfo) {
@@ -112,6 +142,7 @@ sub WritePhotoshop($$$)
                 if (defined $newValue) {
                     next unless length $newValue;   # remove subdirectory entry
                     $value = $newValue;
+                    SetResourceName($tagInfo, $name, \$value);
                 } else {
                     $value = substr($$dataPt, $pos, $size); # rewrite old directory
                 }
@@ -130,6 +161,7 @@ sub WritePhotoshop($$$)
 #
     my @tagsLeft = sort { $a <=> $b } keys(%$newTags), keys(%$addDirs);
     foreach $tagID (@tagsLeft) {
+        my $name = "\0\0";
         if ($$newTags{$tagID}) {
             $tagInfo = $$newTags{$tagID};
             my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
@@ -150,9 +182,11 @@ sub WritePhotoshop($$$)
             $value = $exifTool->WriteDirectory(\%subdirInfo, $subTable, $writeProc);
             next unless $value;
         }
+        # set resource name if necessary
+        SetResourceName($tagInfo, $name, \$value);
         $size = length($value);
         # write the new directory entry
-        $newData .= '8BIM' . Set16u($tagID) . "\0\0" . Set32u($size) . $value;
+        $newData .= '8BIM' . Set16u($tagID) . $name . Set32u($size) . $value;
         $newData .= "\0" if $size & 0x01;   # must null pad to even numbered byte
         ++$exifTool->{CHANGED};
     }
@@ -175,6 +209,17 @@ This file is autoloaded by Image::ExifTool::Photoshop.
 =head1 DESCRIPTION
 
 This file contains routines to write Photoshop metadata.
+
+=head1 NOTES
+
+Photoshop IRB blocks may have an associated resource name.  By default, the
+existing name is preserved when rewriting a resource, and an empty name is
+used when creating a new resource.  However, a different resource name may
+be specified by defining a C<SetResourceName> entry in the tag information
+hash.  With this defined, a new resource name may be appended to the value
+in the form "VALUE/#NAME#/" (the slashes and hashes are literal).  If
+C<SetResourceName> is anything other than '1', the value is used as a
+default resource name, and applied if no appended name is provided.
 
 =head1 AUTHOR
 

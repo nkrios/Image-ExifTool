@@ -40,11 +40,10 @@ DateTimeOriginal: 2003:12:04 06:46:52
 DigitalZoom: Unknown (-1)
 Directory: t
 DriveMode: Continuous shooting
-EV: 5.6
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 6.41
+ExifToolVersion: 6.57
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -53,7 +52,7 @@ ExposureTime: 4
 ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
-FileModifyDate: 2006:09:18 10:35:21
+FileModifyDate: 2006:11:17 13:52:04
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FileSize: 3 kB
@@ -85,11 +84,12 @@ ISO (1): 100
 ImageHeight: 8
 ImageSize: 8x8
 ImageWidth: 8
-InteropIndex: THM
+InteropIndex: THM - DCF thumbnail file
 InteropVersion: 0100
 Lens: 18.0 - 55.0mm
 Lens35efl: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
 LensType: Unknown (-1)
+LightValue: 5.6
 LongFocal: 55
 MIMEType: image/jpeg
 MacroMode: Unknown (0)

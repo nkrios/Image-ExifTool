@@ -4,12 +4,26 @@
 # Description:  Sample user configuration file for Image::ExifTool
 #
 # Notes:        This example file shows how to define your own shortcuts and
-#               add new EXIF, IPTC, XMP and PNG tags.  Note that unknown tags
-#               are extracted even if they aren't defined, but tags must be
-#               defined to be written.  Also note that it is possible to
-#               override an existing tag definition with a new tag.
+#               add new EXIF, IPTC, XMP, PNG and Composite tags.
 #
-#               As an example, the following 9 new tags are defined below:
+#               Note that unknown tags may be extracted even if they aren't
+#               defined, but tags must be defined to be written.  Also note
+#               that it is possible to override an existing tag definition
+#               with a new tag.
+#
+#               To activate this file, rename it to ".ExifTool_config" and
+#               place it in your home directory or the application script
+#               directory.  This causes ExifTool to automatically load the file
+#               when run.  Your home directory is determined by the first
+#               defined of the following environment variables:
+#
+#                   1. EXIFTOOL_HOME
+#                   2. HOME
+#                   3. HOMEDRIVE + HOMEPATH
+#                   4. (the current directory)
+#
+#               This sample file defines the following 9 new tags as well as a
+#               number of Shortcut and Composite tags:
 #
 #                   1.  EXIF:NewEXIFTag
 #                   2.  IPTC:NewIPTCTag
@@ -21,11 +35,6 @@
 #                   8.  PNG:NewPngTag2
 #                   9.  PNG:NewPngTag3
 #
-#               To activate this file, copy it to ".ExifTool_config" in your
-#               home directory or in a directory specified by the EXIFTOOL_HOME
-#               environment variable.  This causes ExifTool to automatically
-#               load the file when run.
-#               
 #               For detailed information on the definition of tag tables and
 #               tag information hashes, see lib/Image/ExifTool/README.
 #------------------------------------------------------------------------------
@@ -44,8 +53,9 @@
 # the %Image::ExifTool::UserDefined definition below.
 %Image::ExifTool::UserDefined::xxx = (
     GROUPS => { 0 => 'XMP', 1 => 'XMP-xxx', 2 => 'Image' },
-    NAMESPACE => [ 'xxx' => 'http://ns.myname.com/xxx/1.0/' ],
+    NAMESPACE => { 'xxx' => 'http://ns.myname.com/xxx/1.0/' },
     WRITABLE => 'string',
+    # replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")
     NewXMPxxxTag1 => { },
     NewXMPxxxTag2 => { Groups => { 2 => 'Author' } },
     NewXMPxxxTag3 => { List => 'Bag' },
@@ -55,7 +65,7 @@
 # added to existing tables.
 %Image::ExifTool::UserDefined = (
     # All EXIF tags are added to the Main table, and WriteGroup is used to
-    # specify where the tag is written (default is ExifIFD if not specified)
+    # specify where the tag is written (default is ExifIFD if not specified):
     'Image::ExifTool::Exif::Main' => {
         0xd000 => {
             Name => 'NewEXIFTag',
@@ -70,7 +80,7 @@
             Format => 'string[0,16]',
         },
     },
-    # new XMP namespaces must be added to the Main XMP table
+    # new XMP namespaces (ie. XMP-xxx) must be added to the Main XMP table:
     'Image::ExifTool::XMP::Main' => {
         xxx => {
             SubDirectory => {
@@ -78,15 +88,66 @@
             },
         },
     },
-    # XMP tags may also be added to existing namespaces
+    # XMP tags may also be added to existing namespaces:
     'Image::ExifTool::XMP::xmp' => {
         NewXMPxmpTag => { Groups => { 2 => 'Author' } },
     },
-    # new PNG tags are added to the PNG::TextualData table
+    # new PNG tags are added to the PNG::TextualData table:
     'Image::ExifTool::PNG::TextualData' => {
         NewPngTag1 => { },
         NewPngTag2 => { },
         NewPngTag3 => { },
+    },
+    # Composite tags are added to the Composite table:
+    'Image::ExifTool::Composite' => {
+        # Composite tags are unique: The Require/Desire elements list
+        # tags that must/may exist, and the keys of these hashes are used
+        # as indices in the @val array of the ValueConv expression to
+        # derive the composite tag value.  (See the Composite table in
+        # Image::ExifTool::Exif for more examples.)
+        BaseName => {
+            Require => {
+                0 => 'FileName',
+            },
+            # remove the extension from FileName
+            ValueConv => 'my $name=$val[0]; $name=~s/\..*?$//; $name',
+        },
+        Extension => {
+            Require => {
+                0 => 'FileName',
+            },
+            ValueConv => '$val[0]=~/\.([^.]*)$/; $1',
+        },
+        # override CircleOfConfusion tag to use D/1750 instead of D/1440
+        CircleOfConfusion => {
+            Require => {
+                0 => 'ScaleFactor35efl',
+            },
+            ValueConv => 'sqrt(24*24+36*36) / ($val[0] * 1750)',
+            PrintConv => 'sprintf("%.3f mm",$val)',
+        },
+        # get latitude/logitude reference from XMP lat/long tags
+        # (used to set EXIF GPS position from XMP tags)
+        GPSLatitudeRef => {
+            Require => {
+                0 => 'XMP:GPSLatitude',
+            },
+            ValueConv => '$val[0] < 0 ? "S" : "N"',
+            PrintConv => {
+                N => 'North',
+                S => 'South',
+            },
+        },
+        GPSLongitudeRef => {
+            Require => {
+                0 => 'XMP:GPSLongitude',
+            },
+            ValueConv => '$val[0] < 0 ? "W" : "E"',
+            PrintConv => {
+                E => 'East',
+                W => 'West',
+            },
+        },
     },
 );
 

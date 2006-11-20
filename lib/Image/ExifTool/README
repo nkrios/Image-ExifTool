@@ -16,7 +16,7 @@ the tag (explained later).
 Twenty-one special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
 FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE, NOTES, IS_OFFSET,
 EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, PARENT, PRIORITY, WRITE_GROUP, LANG_INFO,
-VARS and DATAMEMBER) are used to provide additional information about a table. 
+VARS and DATAMEMBER) are used to provide additional information about a table.
 The special keys have names that are all capitalized to avoid possible conflicts
 with tag keys.  Below is an explanation of the meaning of each special key:
 
@@ -112,8 +112,11 @@ with tag keys.  Below is an explanation of the meaning of each special key:
   EXTRACT_UNKNOWN : Used in PDF tables to specify a directory where all unknown
   tags should be extracted.
 
-  NAMESPACE : Namespace prefix for tags in the XMP table.  May be a reference to
-  a list of the namespace prefix and URI if the URI needs specifying.
+  NAMESPACE : Namespace prefix for tags in the XMP table.  If this isn't a
+  standard (pre-defined) namespace, then the URI must be defined as well.  To do
+  this, the NAMESPACE value is a reference to either a list or a hash, where the
+  first element (or hash key) is the namespace prefix and and the second element
+  (or hash value) is the URI.
 
   PREFERRED : Set to true if the tags in this table should always be added when
   writing information.  Overrides the order specified by SetNewGroups().
@@ -133,9 +136,9 @@ with tag keys.  Below is an explanation of the meaning of each special key:
   VARS : Used to store additional module-specific variables for the table.
 
   DATAMEMBER : BinaryData tables only.  Gives a reference to a list of tag ID's
-  which must be extracted as data members when writing. 
+  which must be extracted as data members when writing.
 
-The remaining entries in a tag table are the EXIF tags with their associated
+The remaining entries in a tag table are the tag IDs with their associated
 information.  The information may exist in one of three forms:  1) A simple
 scalar which is the name of the tag, 2) A reference to a hash of information
 describing this tag, or 3) a reference to a list of hashes which contain
@@ -147,17 +150,18 @@ numerical.
   Name          : The tag name.  Tag names need not be unique.  If they aren't
                   unique, duplicate tags overwrite values of previous tags
                   unless the Duplicates option is set or the new tag has lower
-                  Priority.  With Duplicates set, the name of the previous tag
-                  is changed to the form "TagName (N)" where N starts at 1 and
-                  increments for subsequent duplicate tags.  A tag should start
-                  with an uppercase letter, and contain only the charcters in
-                  the set [A-Za-z0-9_-].
+                  Priority.  With Duplicates set, to allow multiple tags with
+                  the same name to exist in the tag information hash, the key of
+                  the previous tag is changed to the form "TagName (N)", where N
+                  starts at 1 and increments for subsequent duplicate tags.  A
+                  tag name should start with an uppercase letter, and contain
+                  only the charcters in the set [A-Za-z0-9_-].
 
   Description   : A more readable description of tag name.  If a tag doesn't
                   specify a Description, then the tag Name is used instead, with
                   spaces inserted between the words.
 
-  Notes         : Notes for this tag in the html TagNames documentation.
+  Notes         : Notes for this tag in the HTML TagNames documentation.
 
   Groups        : Hash lookup for group names for this tag.
 
@@ -178,6 +182,9 @@ numerical.
                   values to write, or the number of characters in a fixed-length
                   string.  A value of -1 indicates that the count is variable
                   and should be determined by the number of values provided.
+                  Note that this count that corresponds to the specified Format,
+                  so if a different-sized Writable format is defined, the actual
+                  count written to the file will be different.
 
   Flags         : Flags to specify characteristics for this tag.  May be a
                   simple scalar flag name, a reference to a list of flag names,
@@ -187,11 +194,52 @@ numerical.
                   and may be written directly as members if desired. The
                   available flag names are:
 
+                  'Avoid' - avoid creating this tag if possible.
+
+                  'Binary' - set to 1 for binary data.  This has the same effect
+                  as setting ValueConv to '\$val', but it it a bit cleaner and
+                  avoids dummy ValueConvInv entries for writable tags.  Has no
+                  effect if ValueConv is defined for the tag.
+
+                  'DataMember' - name of exiftool data member associated with
+                  this tag if it should be stored as a special data member when
+                  writing information.  Necessary only if the value of the tag
+                  affects other written information.
+
+                  'DataTag' - associated tag name containing data for offset or
+                  byte count tags.
+
+                  'Drop' - set to 1 for tags that should be excluded when
+                  rebuilding maker notes when copying all tags.
+
+                  'EntryBased' - set to 1 if the offset for this value is based
+                  on the IFD entry position.  This allows individual values to
+                  be entry-based even though some others aren't (as with the
+                  Casio PrintIM information).
+
+                  'IsOffset' - flag set if the tag represents an offset to some
+                  data, and causes value will be adjusted to an absolute file
+                  offset.  If set to 2, the offset base of the parent directory
+                  is used even if the base changes for the current directory
+                  (only some maker notes are this messed up).
+
                   'List' - indicates that duplicate entries of this tag are
                   allowed, and will be accumulated in a list.  Note that for XMP
                   information, 3 different types of lists are supported and the
-                  value of this flag specifies the type of list: 'Bag', 'Seq' or
-                  'Alt'.
+                  List value specifies the type: 'Bag', 'Seq' or 'Alt'.
+
+                  'MakerNotes' - set if this tag is maker note data.
+
+                  'OffsetPair' - set if the tag represents half of an offset/
+                  byte count pair.  Data for these tags must be handled
+                  separately.  Value is the tagID for the paired tag.
+
+                  'Permanent' - flag indicates that a tag is permanent, and
+                  can't be added or deleted from the file.  By default, all
+                  MakerNotes tags are permanent unless otherwise specified.
+
+                  'PrintHex' - specifies that unknown PrintConv values should
+                  be printed in hex (ie. 'Unknown (0x0)')
 
                   'Priority' - gives the priority of this tag while reading.  If
                   set to zero, this tag will not override the value of previous
@@ -208,53 +256,23 @@ numerical.
                   Bit 0x02 indicates a 'protected' tag, which should not be set
                   directly by the user.
 
-                  'PrintHex' - specifies that unknown PrintConv values should
-                  be printed in hex (ie. "Unknown (0x0)")
+                  'SeparateTable' - set to list PrintConv values in a separate
+                  table in the HTML documentation.  Value is 1 or the name of
+                  the module where the table should be located.
+
+                  'SetResourceName' - [Photoshop tags only] set to 1 to append
+                  resource name to the extracted value (ie. 'VALUE/#NAME#/').
+                  Also allows resource name to be appended when writing new
+                  values.  May be set to any value other than 1 for a default
+                  resource name to use when writing if an appended name is not
+                  provided.
 
                   'SubIFD' - used in writing to determine that the tag specifies
                   an offset to a sub-IFD.  When this flag is set, the Group1
                   name gives the name of the IFD.
 
-                  'IsOffset' - flag set if the tag represents an offset to some
-                  data, and causes value will be adjusted to an absolute file
-                  offset.  If set to '2', the offset base of the parent
-                  directory is used even if the base changes for the current
-                  directory (only some maker notes are this messed up).
-
-                  'OffsetPair' - set if the tag represents half of an offset/
-                  byte count pair.  Data for these tags must be handled
-                  separately.  Value is the tagID for the paired tag.
-
-                  'DataTag' - associated tag name containing data for offset or
-                  byte count tags.
-
-                  'MakerNotes' - set if this tag is maker note data.
-
-                  'DataMember' - name of exiftool data member associated with
-                  this tag if it should be stored as a special data member when
-                  writing information.  Necessary only if the value of the tag
-                  affects other written information.
-
-                  'Permanent' - flag indicates that a tag is permanent, and
-                  can't be added or deleted from the file.  By default, all
-                  MakerNotes tags are permanent unless otherwise specified.
-
-                  'Avoid' - avoid creating this tag if possible.
-
                   'Unknown' - this is an unknown tag (only extracted when the
-                  Unknown option is set.
-
-                  'SeparateTable' - set to list PrintConv values in a separate
-                  table in the HTML documentation.  Value is 1 or the name of
-                  the module where the table should be located.
-
-                  'Drop' - set to 1 for tags that should be excluded when
-                  rebuilding maker notes when copying all tags.
-                  
-                  'EntryBased' - set to 1 if the offset for this value is based
-                  on the IFD entry position.  This allows individual values to
-                  be entry-based even though some others aren't (as with the
-                  Casio PrintIM information).
+                  Unknown option is set).
 
   RawConv       : Used to convert the Raw value at extraction time (while the
                   image file is still open, unlike ValueConv and PrintConv below
@@ -275,32 +293,32 @@ numerical.
   ValueConv     : Used to convert the Raw value to a useable form. May be a hash
                   reference to act as a lookup table, a scalar which is
                   evaluated as a Perl expression, or a code reference to a
-                  subroutine.  If a hash reference is used and the Raw value doesn't
-                  appear as one of the keys, then the converted value is set to
-                  "Unknown (X)", where X is the Raw value (unless a special
-                  'BITMASK' key exists, in which case the hash referenced by
-                  'BITMASK' is used to decode individual value bits).  In an
-                  expression, $self is a reference to the current ExifTool
-                  object, $val is the Raw value, and $tag is the tag name.  The
-                  subroutine takes 2 arguments: the Raw value and a reference to
-                  the current ExifTool object.  The expression or subroutine is
-                  evaluated when and if the tag value is requested (ie. only
-                  after all extraction is complete), so if necessary at this
-                  time the value of all other tags are available via calls to
-                  $self->GetValue("Tag","Raw"). (Note: In theory, types other
-                  than "Raw" may be accessed, but they are slower and may lead
-                  to cyclical dependencies so they should be avoided).  When
-                  evaluated, the expression or subroutine returns a scalar for
-                  the converted value, or a scalar reference to a binary data
-                  value.  The return value should always be defined -- use
-                  RawConv instead to return undef if it is necessary to test the
-                  value for validity, otherwise an undef tag may hide a
-                  previously defined value when the Duplicates option is not
-                  enabled.  Composite tags which Require or Desire other tags
-                  may access the ValueConv, PrintConv and Raw values of these
-                  tags through the elements of the @val, @prt and @raw lists
-                  respectively.  If ValueConv is not specified, the Raw value is
-                  not converted.
+                  subroutine.  If a hash reference is used and the Raw value
+                  doesn't appear as one of the keys, then the converted value is
+                  set to "Unknown (X)", where X is the Raw value (unless a
+                  special 'BITMASK' key exists, in which case the hash
+                  referenced by 'BITMASK' is used to decode individual value
+                  bits).  In an expression, $self is a reference to the current
+                  ExifTool object, $val is the Raw value, and $tag is the tag
+                  name.  The subroutine takes 2 arguments: the Raw value and a
+                  reference to the current ExifTool object.  The expression or
+                  subroutine is evaluated when and if the tag value is requested
+                  (ie. only after all extraction is complete), so if necessary
+                  at this time the values of all other tags are available via
+                  calls to $self->GetValue("Tag","Raw"). (Note: In theory, types
+                  other than "Raw" may be accessed, but they are slower and may
+                  lead to cyclical dependencies so they should be avoided).
+                  When evaluated, the expression or subroutine returns a scalar
+                  for the converted value, or a scalar reference to a binary
+                  data value (see the 'Binary' flag).  The return value should
+                  always be defined -- use RawConv instead to return undef if it
+                  is necessary to test the value for validity, otherwise an
+                  undef tag may hide a previously defined value when the
+                  Duplicates option is not enabled.  Composite tags which
+                  Require or Desire other tags may access the ValueConv,
+                  PrintConv and Raw values of these tags through the elements of
+                  the @val, @prt and @raw lists respectively.  If ValueConv is
+                  not specified, the Raw value is not converted.
 
   PrintConv     : This entry is similar to ValueConv above, except that it is
                   used to further convert the tag value to a human readable

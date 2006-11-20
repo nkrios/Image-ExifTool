@@ -235,8 +235,7 @@ my $debug;          # set to 1 to enabled debugging code
         Name => 'MakerNoteMinolta4',
         Condition => '$self->{CameraMake} =~ /^(Konica Minolta|Minolta)/i',
         Notes => 'not EXIF-based',
-        ValueConv => '\$val',
-        ValueConvInv => '$val',
+        Binary => 1,
     },
     {
         # this maker notes starts with a standard TIFF header at offset 0x0a
@@ -273,7 +272,7 @@ my $debug;          # set to 1 to enabled debugging code
         # (if Make is 'SEIKO EPSON CORP.', starts with "EPSON\0")
         # (if Make is 'OLYMPUS OPTICAL CO.,LTD' or 'OLYMPUS CORPORATION',
         #  starts with "OLYMP\0")
-        Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON|AGFA )/',
+        Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON|AGFA )/i',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Olympus::Main',
             Start => '$valuePtr+8',
@@ -352,12 +351,24 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteSanyo',
         # (starts with "SANYO\0")
+        Condition => '$self->{CameraMake}=~/^SANYO/ and $self->{CameraModel} !~ /^C4\b/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sanyo::Main',
+            Validate => '$val =~ /^SANYO/',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteSanyoC4',
+        # The C4 offsets are wrong by 12, so they must be fixed
         Condition => '$self->{CameraMake}=~/^SANYO/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sanyo::Main',
             Validate => '$val =~ /^SANYO/',
             Start => '$valuePtr + 8',
             ByteOrder => 'Unknown',
+            FixBase => 1,
         },
     },
     {

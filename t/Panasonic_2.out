@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: Panasonic.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -34,7 +34,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2016
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1512
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -82,6 +82,6 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/400
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.004 mm
-[Composite, Composite, Image]  - EV: 13.0
 [Composite, Composite, Camera]  - Focal Length: 4.6mm (35mm equivalent: 35.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 1.34 m
+[Composite, Composite, Image]  - Light Value: 13.0

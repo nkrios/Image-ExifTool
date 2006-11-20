@@ -20,7 +20,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.06';
+$VERSION = '1.07';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare testVerbose);
 
@@ -93,7 +93,8 @@ sub closeEnough($$)
 
     # of course, the version number will change...
     return 1 if $line1 =~ /^(.*ExifTool.*)\b\d{1,2}\.\d{2}\b(.*)/s and
-                $line2 eq "$1$Image::ExifTool::VERSION$2";
+               ($line2 eq "$1$Image::ExifTool::VERSION$Image::ExifTool::RELEASE$2" or
+                $line2 eq "$1$Image::ExifTool::VERSION$2");
 
     # allow different FileModifyDate's
     return 1 if $line1 =~ /File\s?Modif.*Date/ and
@@ -113,12 +114,26 @@ sub closeEnough($$)
         # can't compare any more if either line was truncated (ie. ends with '[...]')
         return $lenChanged if $tok1 =~ /\Q[...]\E$/ or $tok2 =~ /\Q[...]\E$/;
         # check to see if both tokens are floating point numbers (with decimal points!)
+        $tok1 =~ s/[^\d.]+$//; $tok2 =~ s/[^\d.]+$//;   # remove trailing units
         last unless Image::ExifTool::IsFloat($tok1) and
                     Image::ExifTool::IsFloat($tok2) and
                     $tok1 =~ /\./ and $tok2 =~ /\./;
-        # numbers are bad if not the same to 5 significant figures
         last if $tok1 == 0 or $tok2 == 0;
-        last if abs(($tok1-$tok2)/($tok1+$tok2)) > 1e-5;
+        # numbers are bad if not the same to 5 significant figures
+        if (abs(($tok1-$tok2)/($tok1+$tok2)) > 1e-5) {
+            # (but allow last digit to be different due to round-off errors)
+            my ($int1, $int2);
+            ($int1 = $tok1) =~ tr/0-9//dc;
+            ($int2 = $tok2) =~ tr/0-9//dc;
+            if (length($int1) != length($int2)) {
+                if (length($int1) > length($int2)) {
+                    $int1 = substr($int1, 0, length($int2));
+                } else {
+                    $int2 = substr($int2, 0, length($int1));
+                }
+            }
+            last if abs($int1-$int2) > 1.00001;
+        }
         # set flag if length changed
         $lenChanged = 1 if length($tok1) ne length($tok2);
     }

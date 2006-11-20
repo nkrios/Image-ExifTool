@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 5.76
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.51
 [File, File, Image]  - File Name: PNG.png
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 117 bytes
-[File, File, Time]  - File Modification Date/Time: 2005:06:13 14:37:08
+[File, File, Image]  - File Size: 572 bytes
+[File, File, Time]  - File Modification Date/Time: 2006:10:27 11:40:18
 [File, File, Image]  - File Type: PNG
 [File, File, Image]  - MIME Type: image/png
 [PNG, PNG, Image] 0 - Image Width: 16
@@ -14,4 +14,5 @@
 [PNG, PNG, Image] 12 - Interlace: Noninterlaced
 [PNG, PNG, Image] bKGD - Background Color: 0
 [PNG, PNG, Image] Comment - Comment: test comment
+[XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [Composite, Composite, Image]  - Image Size: 16x16

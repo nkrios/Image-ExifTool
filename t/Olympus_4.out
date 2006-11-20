@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: OlympusE1.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -36,7 +36,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2560
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1920
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
@@ -55,7 +55,7 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 7088
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Olympus, Camera] 512 - Special Mode: Fast, Sequence: 2, Panorama: (none)
-[MakerNotes, Olympus, Camera] 513 - Image Quality: SHQ (Fine)
+[MakerNotes, Olympus, Camera] 513 - Quality: SHQ (Fine)
 [MakerNotes, Olympus, Camera] 514 - Macro: Off
 [MakerNotes, Olympus, Camera] 515 - Black & White Mode: Off
 [MakerNotes, Olympus, Camera] 516 - Digital Zoom: 0.0
@@ -167,6 +167,6 @@
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Image]  - Circle Of Confusion: 0.015 mm
 [Composite, Composite, Image]  - Depth of Field: 0.17 m (0.63 - 0.80)
-[Composite, Composite, Image]  - EV: 9.0
 [Composite, Composite, Camera]  - Focal Length: 20.0mm (35mm equivalent: 40.1mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 5.93 m
+[Composite, Composite, Image]  - Light Value: 9.0

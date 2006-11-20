@@ -19,16 +19,18 @@
 #              11) http://www.dyxum.com/dforum/forum_posts.asp?TID=6371&PN=1
 #              12) http://www.minolta-forum.de/forum/index.php?showtopic=14914
 #              13) http://www.mhohner.de/minolta/lenses.php
+#              14) Jeffery Small private communication (tests with 7D)
+#              15) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
 
 use strict;
-use vars qw($VERSION %minoltaLensIDs);
+use vars qw($VERSION %minoltaLensIDs %minoltaColorMode);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.25';
+$VERSION = '1.30';
 
 # lens ID numbers (ref 3)
 %minoltaLensIDs = (
@@ -55,13 +57,13 @@ $VERSION = '1.25';
     20 => 'Minolta STF 135mm F2.8 [T4.5]',
     22 => 'Minolta AF 35-80mm F4-5.6',
     23 => 'Minolta AF 200mm F4 G APO Macro',
-    24 => 'Minolta AF 24-105mm F3.5-4.5 (D)', # or Sigma 18-50mm F2.8',
+    24 => 'Minolta AF 24-105mm F3.5-4.5 (D)', # or Sigma 18-50mm F2.8 or Sigma 17-70mm F2.8-4.5 (D)',
     25 => 'Minolta AF 100-300mm F4.5-5.6 (D)',
     27 => 'Minolta AF 85mm F1.4 G',
     28 => 'Minolta AF 100mm F2.8 Macro (D)',
     29 => 'Minolta AF 75-300mm F4.5-5.6 (D)',
-    30 => 'Minolta AF 28-80mm F3.5-5.6 (D)',
-    31 => 'Minolta AF 50mm F2.8 Macro(D)', #?? or AF 50mm F3.5 Macro',
+    30 => 'Minolta AF 28-80mm F3.5-5.6 (D)', # or Sigma AF 12-24mm F4.5-5.6 EX DG',
+    31 => 'Minolta AF 50mm F2.8 Macro (D) or AF 50mm F3.5 Macro',
     # 32 => 'AF 100-400mm F4.5-6.7 (D) x1.5', ??
     32 => 'Minolta AF 300mm F2.8 G',
     33 => 'Minolta AF 70-200mm F2.8 G (D) SSM',
@@ -69,7 +71,7 @@ $VERSION = '1.25';
     36 => 'Minolta AF 28-100mm F3.5-5.6 (D)',
     38 => 'KonicaMinolta AF 17-35mm F2.8-4 (D)',
     39 => 'Minolta AF 28-75mm F2.8 (D)',
-    40 => 'KonicaMinolta AF DT 18-70mm F3.5-5.6 (D)', # (also Sony version)
+    40 => 'KonicaMinolta or Sony AF DT 18-70mm F3.5-5.6 (D)',
     41 => 'Minolta AF DT 11-18mm F4.5-5.6 (D)',
     42 => 'Minolta AF DT 18-200mm F3.5-6.3 (D)',
     43 => 'Minolta AF 35mm F1.4 G',
@@ -97,7 +99,7 @@ $VERSION = '1.25';
     25651 => 'Minolta AF 600mm F4',
     25661 => 'Minolta AF 24mm F2.8',
     25721 => 'Minolta AF 500mm F8 Reflex',
-    25781 => 'Minolta AF 16mm F2.8 Fisheye', # or Sigma 8mm F4 Fisheye',
+    25781 => 'Minolta AF 16mm F2.8 Fisheye', # or Sigma 8mm F4 Fisheye or Sigma 14mm F3.5',
     25791 => 'Minolta AF 20mm F2.8',
     25811 => 'Minolta AF 100mm F2.8 Macro New', # or Tamron 90mm F2.8 Macro or Sigma 180mm F5.6 Macro',
     25858 => 'Minolta AF 35-105mm F3.5-4.5 New', # or Tamron 24-135mm F3.5-5.6',
@@ -138,7 +140,24 @@ $VERSION = '1.25';
     26671 => 'Minolta AF 35mm F2 New',
     26681 => 'Minolta AF 28mm F2 New',
     26721 => 'Minolta AF 24-105mm F3.5-4.5 (D)', #11
-    45741 => 'AF 200mm F2.8 G x2', # or Tokina 300mm F2.8 x2',
+    45741 => 'Minolta AF 200mm F2.8 G x2', # or Tokina 300mm F2.8 x2',
+);
+
+%minoltaColorMode = (
+    0 => 'Natural color',
+    1 => 'Black & White',
+    2 => 'Vivid color',
+    3 => 'Solarization',
+    4 => 'Adobe RGB',
+    5 => 'Sepia', #10
+    9 => 'Natural', #10
+    12 => 'Portrait', #10
+    13 => 'Natural sRGB',
+    14 => 'Natural+ sRGB',
+    15 => 'Landscape', #10
+    16 => 'Evening', #10
+    17 => 'Night Scene', #10
+    18 => 'Night Portrait', #10
 );
 
 # Minolta tag table
@@ -210,41 +229,43 @@ $VERSION = '1.25';
         Writable => 'int32u',
         Protected => 2,
     },
-# needs verification:
-#    0x0100 => { #10
-#        Name => 'SceneMode',
-#        PrintConv => {
-#            0 => 'Standard',
-#            1 => 'Portrait',
-#            2 => 'Text',
-#            3 => 'Night Scene',
-#            4 => 'Evening Scene',
-#            5 => 'Sports',
-#            6 => 'Landscape',
-#            9 => 'Super Macro',
-#        },
-#    },
-    0x0101 => {
-        Name => 'ColorMode',
-        Priority => 0, # Other ColorMode is more reliable for A2
-        Writable => 'int32u',
+    0x0100 => { #10 (needs verification - PH)
+        Name => 'SceneMode',
         PrintConv => {
-            0 => 'Natural color',
-            1 => 'Black & White',
-            2 => 'Vivid color',
-            3 => 'Solarization',
-            4 => 'Adobe RGB',
-            5 => 'Sepia', #10
-            9 => 'Natural', #10
-            12 => 'Portrait', #10
-            13 => 'Natural sRGB',
-            14 => 'Natural+ sRGB',
-            15 => 'Landscape', #10
-            16 => 'Evening', #10
-            17 => 'Night Scene', #10
-            18 => 'Night Portrait', #10
+            0 => 'Standard',
+            1 => 'Portrait',
+            2 => 'Text',
+            3 => 'Night Scene',
+            4 => 'Evening Scene',
+            5 => 'Sports',
+            6 => 'Landscape',
+            9 => 'Super Macro',
         },
     },
+    0x0101 => [
+        {
+            Name => 'ColorMode',
+            Condition => '$self->{CameraMake} !~ /^SONY/',
+            Priority => 0, # Other ColorMode is more reliable for A2
+            Writable => 'int32u',
+            PrintConv => \%minoltaColorMode,
+        },
+        { #15
+            Name => 'ColorMode',
+            Writable => 'int32u',
+            Notes => 'Sony DSLR-A100',
+            PrintConv => {
+                0 => 'Standard',
+                1 => 'Vivid', #PH
+                2 => 'Portrait',
+                3 => 'Landscape',
+                4 => 'Sunset',
+                5 => 'Night Scene',
+                6 => 'B&W',
+                7 => 'Adobe RGB',
+            },
+        },
+    ],
     0x0102 => {
         Name => 'MinoltaQuality',
         Writable => 'int32u',
@@ -292,11 +313,11 @@ $VERSION = '1.25';
             },
         },
     ],
-# looks wrong:
-#    0x0104 => { #10
-#        Name => 'ExposureCompensation',
-#        Writable => 'rational64s',
-#    },
+    0x0104 => { #14
+        Name => 'FlashExposureComp',
+        Description => 'Flash Exposure Compensation',
+        Writable => 'rational64s',
+    },
 # needs verification:
 #    0x0105 => { #10
 #        Name => 'Teleconverter',
@@ -335,14 +356,31 @@ $VERSION = '1.25';
         PrintConv => \%minoltaLensIDs,
     },
     # 0x010e - WhiteBalance according to ref #10
-    0x0114 => { #8
-        Name => 'MinoltaCameraSettings5D',
-        Condition => '$self->{CameraModel} =~ /^(DYNAX 5D|MAXXUM 5D|ALPHA SWEET)/',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Minolta::CameraSettings5D',
-            ByteOrder => 'BigEndian',
-        },
+    0x0113 => { #PH
+        Name => 'ImageStabilization',
+        Condition => '$self->{CameraModel} eq "DSLR-A100"',
+        Notes => 'valid for Sony A100 only',
+        Writable => 'int32u',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
     },
+    0x0114 => [
+        { #8
+            Name => 'MinoltaCameraSettings5D',
+            Condition => '$self->{CameraModel} =~ /^(DYNAX 5D|MAXXUM 5D|ALPHA SWEET)/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Minolta::CameraSettings5D',
+                ByteOrder => 'BigEndian',
+            },
+        },
+        { #PH
+            Name => 'MinoltaCameraSettingsA100',
+            Condition => '$self->{CameraModel} eq "DSLR-A100"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Minolta::CameraSettingsA100',
+                ByteOrder => 'BigEndian', # required because order differs for ARW and JPG images
+            },
+        },
+    ],
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -378,8 +416,8 @@ $VERSION = '1.25';
         Name => 'ExposureMode',
         PrintConv => {
             0 => 'Program',
-            1 => 'Aperture priority',
-            2 => 'Shutter priority',
+            1 => 'Aperture Priority',
+            2 => 'Shutter Priority',
             3 => 'Manual',
         },
     },
@@ -416,7 +454,7 @@ $VERSION = '1.25';
             2 => 'Fine',
             3 => 'Standard',
             4 => 'Economy',
-            5 => 'Extra fine',
+            5 => 'Extra Fine',
         },
     },
     6 => {
@@ -1147,6 +1185,125 @@ $VERSION = '1.25';
     },
 );
 
+# Camera settings used by the Sony DSLR-A100 (ref PH)
+%Image::ExifTool::Minolta::CameraSettingsA100 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    NOTES => 'Camera settings information for the Sony DSLR-A100.',
+    WRITABLE => 1,
+    PRIORITY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    0x00 => { #15
+        Name => 'ExposureMode',
+        PrintHex => 1,
+        PrintConv => {
+            0 => 'Program',
+            1 => 'Aperture Priority',
+            2 => 'Shutter Priority',
+            3 => 'Manual',
+            4 => 'Auto',
+            0x1013 => 'Portrait',
+            0x1053 => 'Landscape',
+        },
+    },
+    0x01 => { #15
+        Name => 'ExposureCompensation',
+        ValueConv => '$val / 100 - 3',
+        ValueConvInv => 'int(($val + 3) * 100 + 0.5)',
+    },
+    # 0x09 some sort of APEX value (ref 15)
+    0x0b => { #15
+        Name => 'WhiteBalance',
+        PrintHex => 1,
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Daylight',
+            2 => 'Cloudy',
+            3 => 'Shade',
+            4 => 'Tungsten',
+            5 => 'Fluorescent',
+            6 => 'Flash',
+            0x100 => 'Kelvin',
+            0x200 => 'Manual',
+        },
+    },
+    # 0x12 => 'MeteringMode' (ref 15)
+    # 0x13 => 'ISO' (ref 15)
+    # 0x14 => 'ZoneMatching' (ref 15)
+    # 0x15 => 'DynamicRangeOptimizer' (ref 15)
+    0x16 => { #15
+        Name => 'ColorMode',
+        PrintConv => {
+            0 => 'Standard',
+            1 => 'Vivid',
+            2 => 'Portrait',
+            3 => 'Landscape',
+            4 => 'Sunset',
+            5 => 'Night Scene',
+            7 => 'B&W',
+            8 => 'Adobe RGB',
+        },
+    },
+    # 0x17 => 'ColorSpace' (ref 15)
+    0x18 => { #15
+        Name => 'Sharpness',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+    },
+    0x19 => { #15
+        Name => 'Contrast',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+    },
+    0x1a => { #15
+        Name => 'Saturation',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+    },
+    0x1e => { #PH
+        Name => 'DriveMode',
+        PrintConv => {
+            0 => 'Single Frame',
+            1 => 'Continuous',
+            2 => 'Self-Timer',
+            3 => 'Continuous Bracketing',
+            4 => 'Single-Frame Bracketing',
+            5 => 'White Balance Bracketing',
+        },
+    },
+    0x3f => { #PH
+        Name => 'NoiseReduction',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x5a => { #15
+        Name => 'Rotation',
+        PrintConv => {
+            0 => 0,
+            1 => 270,
+            2 => 90,
+        },
+    },
+    0x5e => { #15
+        Name => 'ColorTemperature',
+        ValueConv => '$val * 100',
+        ValueConvInv => '$val / 100',
+    },
+    0x87 => { #15
+        Name => 'ImageStabilization',
+        Writable => 'int32u',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+);
+
 # basic Minolta white balance lookup
 my %minoltaWhiteBalance = (
     0 => 'Auto',
@@ -1227,8 +1384,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Jay Al-Saadi, Niels Kristian Bech Jensen, Shingo Noguchi and Pedro
-Corte-Real for the information they provided.
+Thanks to Jay Al-Saadi, Niels Kristian Bech Jensen, Shingo Noguchi, Pedro
+Corte-Real and Jeffery Small for the information they provided.
 
 =head1 SEE ALSO
 

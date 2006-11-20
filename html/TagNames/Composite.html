@@ -40,7 +40,7 @@ is extracted.
 <td>CircleOfConfusion</td>
 <td align='center'>N</td>
 <td>ScaleFactor35efl</td>
-<td><font size='-1'><font color="#666666">(this value may be incorrect if image has been resized.  Calculated as
+<td><font size='-1'><font color="#666666">(this value may be incorrect if the image has been resized.  Calculated as
 D/1440, where D is the focal plane diagonal in mm)</font></font></td></tr>
 <tr valign='top'>
 <td>ConditionalFEC</td>
@@ -55,7 +55,7 @@ D/1440, where D is the focal plane diagonal in mm)</font></font></td></tr>
   <br>FocalLength
   <br>Aperture
   <br>CircleOfConfusion</td>
-<td><font size='-1'><font color="#666666">(this value may be incorrect if image has been resized)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(this value may be incorrect if the image has been resized)</font></font></td></tr>
 <tr valign='top'>
 <td>DateCreated</td>
 <td align='center'>N</td>
@@ -84,22 +84,22 @@ D/1440, where D is the focal plane diagonal in mm)</font></font></td></tr>
 <tr valign='top'>
 <td>Duration</td>
 <td align='center'>N</td>
-<td>FileSize
-  <br>AudioBitrate
-  <br>VideoBitrate</td>
+<td>FLAC:SampleRate
+  <br>FLAC:Channels
+  <br>FLAC:TotalSamples</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Duration</td>
 <td align='center'>N</td>
-<td>FrameRate
-  <br>FrameCount</td>
+<td>FileSize
+  <br>AudioBitrate
+  <br>VideoBitrate</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>EV</td>
+<td>Duration</td>
 <td align='center'>N</td>
-<td>Aperture
-  <br>ShutterSpeed
-  <br>ISO</td>
+<td>FrameRate
+  <br>FrameCount</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>ExtenderStatus</td>
@@ -131,7 +131,7 @@ an attempt to represent the actual status of the extender.)</font>
 <td align='center'>N</td>
 <td>FocalLength
   <br>ScaleFactor35efl</td>
-<td><font size='-1'><font color="#666666">(this value may be incorrect if image has been resized)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(this value may be incorrect if the image has been resized)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>GPSDateTime</td>
 <td align='center'>N</td>
@@ -152,7 +152,7 @@ an attempt to represent the actual status of the extender.)</font>
 <td>FocalLength
   <br>Aperture
   <br>CircleOfConfusion</td>
-<td><font size='-1'><font color="#666666">(this value may be incorrect if image has been resized)</font></font></td></tr>
+<td><font size='-1'><font color="#666666">(this value may be incorrect if the image has been resized)</font></font></td></tr>
 <tr valign='top'>
 <td>ISO</td>
 <td align='center'>N</td>
@@ -217,6 +217,19 @@ an attempt to represent the actual status of the extender.)</font>
 <td align='center'>N</td>
 <td>Nikon:Lens
   <br>Nikon:LensType</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>LightValue</td>
+<td align='center'>N</td>
+<td>Aperture
+  <br>ShutterSpeed
+  <br>ISO</td>
+<td><font size='-1'><font color="#666666">(calculated LV -- similar to exposure value but includes ISO speed)</font></font></td></tr>
+<tr valign='top'>
+<td>OtherImage</td>
+<td align='center'>N</td>
+<td>OtherImageStart
+  <br>OtherImageLength</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>PreviewImage</td>
@@ -324,6 +337,6 @@ an attempt to represent the actual status of the extender.)</font>
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 18, 2006</i>
+<br><i>Last revised Nov 17, 2006</i>
 </body>
 </html>

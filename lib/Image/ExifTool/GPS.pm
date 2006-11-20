@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.07';
+$VERSION = '1.09';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -22,14 +22,15 @@ my %coordConv = (
 );
 
 %Image::ExifTool::GPS::Main = (
+    GROUPS => { 0 => 'EXIF', 1 => 'GPS', 2 => 'Location' },
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
-    GROUPS => { 2 => 'Location' },
+    WRITE_GROUP => 'GPS',
     NOTES => q{
-When adding GPS information to an image, it is important to set all of the
-following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
-GPSAltitude and GPSAltitudeRef.
+        When adding GPS information to an image, it is important to set all of the
+        following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
+        GPSAltitude and GPSAltitudeRef.
     },
     0x0000 => {
         Name => 'GPSVersionID',
@@ -115,6 +116,7 @@ GPSAltitude and GPSAltitudeRef.
     },
     0x000B => {
         Name => 'GPSDOP',
+        Description => 'GPS Degree Of Precision',
         Writable => 'rational64u',
     },
     0x000C => {

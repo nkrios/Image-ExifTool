@@ -58,11 +58,11 @@ they don't appear in these tables.
         Name => 'ToneMatrix',
         Description => 'ICC To Tone Matrix',
         Format => 'int8u',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     PDA_histogram_data => {
         Name => 'PDAHistogram',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     pattern_ratation_angle => {
         Name => 'PatternAngle',

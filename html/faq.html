@@ -23,17 +23,18 @@ pre {
 
 <font size='+1'><b>Index</b></font>
 <table><tr><td><ol>
-<li><a href="#Q1">Discussing ExifTool issues</a>
+<li><a href="#Q1">Discussion forum</a>
 <li><a href="#Q2">Determining tag names</a>
 <li><a href="#Q3">Problems with duplicate tags</a>
 <li><a href="#Q4">Aperture and shutter speed</a>
 <li><a href="#Q5">Date and time formats</a>
-</ol></td><td valign='top'><ol start=6>
 <li><a href="#Q6">"Can't convert TAG" errors</a>
+</ol></td><td valign='top'><ol start=7>
 <li><a href="#Q7">Deleting all EXIF from a TIFF</a>
 <li><a href="#Q8">Writing the Make or Model tag</a>
 <li><a href="#Q9">Tag locations when copying</a>
 <li><a href="#Q10">Coded character sets</a>
+<li><a href="#Q11">User-defined tags</a>
 </ol></td></tr></table>
 
 <hr>
@@ -299,15 +300,59 @@ Latin1, depending on the options settings.
 <p><b>IPTC</b>: ExifTool does not translate IPTC text.  It is the user's
 responsibility to interpret the text properly according to the value of the IPTC
 CodedCharacterSet tag, and to update this tag if necessary when writing.  For
-example, CodedCharacterSet should be set to "ESC&nbsp;%&nbsp;G" for UTF-8
+example, CodedCharacterSet should be set to <code>'ESC % G'</code> for UTF-8
 encoding.  Consult the <a href="http://www.iptc.org/IIM/">IPTC specification</a>
 for details.
 
 <p><b>XMP</b>: All textual information in XMP is read and written as UTF-8.
 </blockquote>
 
+<a name="Q11"></a>
+<p>11. <b>"My user-defined tags don't work"</b>
+
+<blockquote>
+For examples of how to add user-defined tags, see the
+<a href="config.html">ExifTool_config</a> file in the ExifTool distribution. To
+activate this file, rename it to <code>'.ExifTool_config'</code> and copy it to
+your <b>HOME</b> directory. With this installed, you should be able to write and
+read the example tags (such as <code>'NewXMPxxxTag1'</code>).  Try this first
+before you attempt to define your own tags.
+
+<p>If this doesn't work, the most common problem is that the
+<code>'.ExifTool_config'</code> configuration file isn't getting loaded
+properly, and there are two things you
+can try:  1) Set either the <b>HOME</b> or the <b>EXIFTOOL_HOME</b> environment
+variable to the name of the directory where you put your
+<code>'.ExifTool_config'</code> file, or 2) put the config file in the same
+directory as the exiftool script.  (Also, be sure the config filename starts
+with a <code>'.'</code>!)
+
+<p>If necessary, you can verify that ExifTool is loading your config file by
+adding the following line to your file:
+
+<pre>print "LOADED!\n";
+</pre>
+
+<p>If you see a <code>'LOADED!'</code> message when you run exiftool, but your
+new tags still don't work, make sure you are using the proper tag name and that
+the file you are writing can support these names.  Try copying the
+<code>'t/images/Writer.jpg'</code> file from the distribution and running
+exiftool with the following command:
+
+<pre>exiftool -v3 -NewXMPxxxTag1=test Writer.jpg
+</pre>
+
+If ExifTool recognizes the new tag, the first line of output from this command
+should be
+
+<pre>"Writing XMP-xxx:NewXMPxxxTag1"
+</pre>
+
+Then you can read back the new tag with <code>'exiftool -s Writer.jpg'</code>.
+</blockquote>
+
 <hr>
-<i>Last revised Sept. 13, 2006</i>
+<i>Last revised Nov. 9, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

@@ -47,7 +47,7 @@ my %manufacturer = (
 sub CheckIPTC($$$)
 {
     my ($exifTool, $tagInfo, $valPtr) = @_;
-    my $format = $$tagInfo{Format};
+    my $format = $$tagInfo{Format} || $tagInfo->{Table}->{FORMAT} || '';
     if ($format =~ /^int(\d+)/) {
         my $bytes = int(($1 || 0) / 8);
         if ($bytes ne 1 and $bytes ne 2 and $bytes ne 4) {
@@ -100,7 +100,7 @@ sub FormatIPTC($$)
 
 #------------------------------------------------------------------------------
 # generate IPTC-format date
-# Inputs: 0) EXIF-format date string (YYYY:MM:DD)
+# Inputs: 0) EXIF-format date string (YYYY:MM:DD) or date/time string
 # Returns: IPTC-format date string (YYYYMMDD), or undef on error
 sub IptcDate($)
 {
@@ -111,12 +111,12 @@ sub IptcDate($)
 
 #------------------------------------------------------------------------------
 # generate IPTC-format time
-# Inputs: 0) EXIF-format time string (HH:MM:SS[+/-HH:MM])
+# Inputs: 0) EXIF-format time string (HH:MM:SS[+/-HH:MM]) or date/time string
 # Returns: IPTC-format time string (HHMMSS+HHMM), or undef on error
 sub IptcTime($)
 {
     my $val = shift;
-    if ($val =~ /\s*\b(\d{1,2}):?(\d{1,2}):?(\d{1,2})(\S*)/) {
+    if ($val =~ /\s*\b(\d{1,2}):?(\d{1,2}):?(\d{1,2})(\S*)\s*$/) {
         $val = sprintf("%.2d%.2d%.2d",$1,$2,$3);
         my $tz = $4;
         if ($tz =~ /([+-]\d{1,2}):?(\d{1,2})/) {
@@ -205,7 +205,7 @@ sub WriteIPTC($$$)
     my %recordNum;
     foreach $tag (Image::ExifTool::TagTableKeys($tagTablePtr)) {
         $tagInfo = $tagTablePtr->{$tag};
-        $tagInfo->{SubDirectory} or next;
+        $$tagInfo{SubDirectory} or next;
         my $table = $tagInfo->{SubDirectory}->{TagTable} or next;
         my $subTablePtr = Image::ExifTool::GetTagTable($table);
         $recordNum{$subTablePtr} = $tag;
@@ -215,10 +215,10 @@ sub WriteIPTC($$$)
     # loop through new values and accumulate all IPTC information
     # into lists based on their IPTC record type
     foreach $tagInfo ($exifTool->GetNewTagInfoList()) {
-        next unless $exifTool->GetGroup($tagInfo, 0) eq 'IPTC';
-        my $table = $tagInfo->{Table};
+        my $table = $$tagInfo{Table};
         my $record = $recordNum{$table};
-        next unless defined $record; # shouldn't happen
+        # ignore tags we aren't writing to this directory
+        next unless defined $record;
         $iptcInfo{$record} = [] unless defined $iptcInfo{$record};
         push @{$iptcInfo{$record}}, $tagInfo;
     }
@@ -232,7 +232,7 @@ sub WriteIPTC($$$)
         @{$iptcInfo{$record}} = sort { $$a{TagID} <=> $$b{TagID} } @{$iptcInfo{$record}};
         # build hash of all tagIDs to set
         foreach $tagInfo (@{$iptcInfo{$record}}) {
-            $set{$record}->{$tagInfo->{TagID}} = $tagInfo;
+            $set{$record}->{$$tagInfo{TagID}} = $tagInfo;
         }
     }
 
@@ -301,7 +301,9 @@ sub WriteIPTC($$$)
                                 $newData = substr($newData, 0, $lastRecPos);
                                 $verbose > 1 and print $out "    - $num mandatory tags\n";
                             }
-                        } elsif ($mandatory{$lastRec}) {
+                        } elsif ($mandatory{$lastRec} and
+                                 $tagTablePtr eq \%Image::ExifTool::IPTC::Main)
+                        {
                             # add required mandatory tags
                             my $mandatory = $mandatory{$lastRec};
                             my ($mandTag, $subTablePtr);
@@ -332,7 +334,7 @@ sub WriteIPTC($$$)
                     $allMandatory = 1;
                 }
                 $tagInfo = ${$iptcInfo{$newRec}}[0];
-                my $newTag = $tagInfo->{TagID};
+                my $newTag = $$tagInfo{TagID};
                 # compare current entry with entry next in line to write out
                 # (write out our tags in numerical order even though
                 # this isn't required by the IPTC spec)
@@ -398,7 +400,7 @@ sub WriteIPTC($$$)
             my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
             $len = $pos - $valuePtr;
             my $val = substr($$dataPt, $valuePtr, $len);
-            if ($tagInfo->{Format} and $tagInfo->{Format} =~ /^int/) {
+            if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^int/) {
                 $val = 0;
                 my $i;
                 for ($i=0; $i<$len; ++$i) {

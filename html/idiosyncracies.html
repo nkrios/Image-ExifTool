@@ -102,11 +102,21 @@ subdirectory.
 <p><b>Rollei:</b> The DK4010 writes all maker notes offsets relative to the
 start of the individual IFD entry.
 
+<p><b>Skanhex:</b> With some Skanhex models (SX-210Z3, SX-330Z3, SX3300,
+SX410Z3), the 264-byte makernotes block contains no useful information, and
+overlaps values from the ExifIFD.  For these models there is also a large block
+(typically 1195 bytes) of unreferenced information in the EXIF data immediately
+following the IteropIFD.  This block begins with the character sequence
+"SKANH\0", and contains exactly the same information in all 20 of my sample
+images that contain this block (except for a variable amount of padding at the
+end with 0xff bytes).  These quirks also affect some Gateway, Jenoptik, Medion,
+Samsung and Yakumo models built by Skanhex.
+
 <p><b>Toshiba:</b> The PDR-3310 writes all maker notes offsets relative to the
 start of the individual IFD entry.  (very similar to Konica KD-300Z)
 
 <hr>
-<i>Last revised Jun. 21, 2006</i>
+<i>Last revised Oct. 24, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

@@ -136,17 +136,47 @@ sub AddChunks($$)
     my $addTags = $exifTool->{ADD_PNG};
     delete $exifTool->{ADD_PNG};
     my ($tag, $dir, $err, $tagTablePtr);
+
     foreach $tag (sort keys %$addTags) {
         my $tagInfo = $$addTags{$tag};
         my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-        next unless Image::ExifTool::IsCreating($newValueHash);
+        # (always create native PNG information, so don't check IsCreating())
+        next unless Image::ExifTool::IsOverwriting($newValueHash) > 0;
         my $val = Image::ExifTool::GetNewValues($newValueHash);
         if (defined $val) {
-            my $data = "tEXt$tag\0$val";
+            my $data;
+            if ($$tagInfo{Table} eq \%Image::ExifTool::PNG::TextualData) {
+                $data = "tEXt$tag\0$val";
+            } else {
+                $data = "$tag$val";
+            }
+            # write as compressed zTXt if specified
+            if ($exifTool->Options('Compress')) {
+                my $warn;
+                if (eval 'require Compress::Zlib') {
+                    my $buff;
+                    my $deflate = Compress::Zlib::deflateInit();
+                    $buff = $deflate->deflate($val) if $deflate;
+                    if (defined $buff) {
+                        $buff .= $deflate->flush();
+                        # only write as zTXt if it actually saves space
+                        if (length($buff) < length($val) - 1) {
+                            $data = "zTXt$tag\0\0$buff";
+                        } else {
+                            $warn = 'uncompressed data is smaller';
+                        }
+                    } else {
+                        $warn = 'deflate error';
+                    }
+                } else {
+                    $warn = 'Compress::Zlib not available'; 
+                }
+                $warn and $exifTool->Warn("PNG:$$tagInfo{Name} not compressed ($warn)", 1);
+            }
             my $hdr = pack('N', length($data) - 4);
             my $cbuf = pack('N', CalculateCRC(\$data, undef));
             Write($outfile, $hdr, $data, $cbuf) or $err = 1;
-            $exifTool->VPrint(1, "    + $$tagInfo{Name} = '$val'\n");
+            $exifTool->VPrint(1, "    + PNG:$$tagInfo{Name} = '",$exifTool->Printable($val),"'\n");
             ++$exifTool->{CHANGED};
         }
     }
@@ -177,13 +207,22 @@ sub AddChunks($$)
                 WriteProfile($outfile, 'APP1', \$buff, 'generic') or $err = 1;
             }
         } elsif ($dir eq 'XMP') {
-            $exifTool->VPrint(0, "Creating XMP profile:\n");
-            # write new XMP data
+            $exifTool->VPrint(0, "Creating XMP iTXt chunk:\n");
             $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
+            $dirInfo{ReadOnly} = 1;
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
-            if (defined $buff and length $buff) {
-                $buff = $Image::ExifTool::xmpAPP1hdr . $buff;
-                WriteProfile($outfile, 'APP1', \$buff, 'generic') or $err = 1;
+            if (defined $buff and length $buff and
+                # the packet is read-only (because of CRC)
+                Image::ExifTool::XMP::ValidateXMP(\$buff, 'r'))
+            {
+                # (previously, XMP was created as a non-standard XMP profile chunk)
+                # $buff = $Image::ExifTool::xmpAPP1hdr . $buff;
+                # WriteProfile($outfile, 'APP1', \$buff, 'generic') or $err = 1;
+                # (but now write XMP iTXt chunk according to XMP specification)
+                $buff = "iTXtXML:com.adobe.xmp\0\0\0\0\0" . $buff;
+                my $hdr = pack('N', length($buff) - 4);
+                my $cbuf = pack('N', CalculateCRC(\$buff, undef));
+                Write($outfile, $hdr, $buff, $cbuf) or $err = 1;
             }
         } elsif ($dir eq 'IPTC') {
             $exifTool->VPrint(0, "Creating IPTC profile:\n");
@@ -224,6 +263,20 @@ These routines are autoloaded by Image::ExifTool::PNG.
 =head1 DESCRIPTION
 
 This file contains routines to write PNG metadata.
+
+=head1 NOTES
+
+Compress::Zlib is required to write compressed text.
+
+Existing text tags are always rewritten in their original form (compressed
+zTXt, uncompressed tEXt or internation iTXt), so pre-existing compressed
+information can only be modified if Compress::Zlib is available.
+
+Newly created textual information is written in uncompressed tEXt form by
+default, or as compressed zTXt if the Compress option is used and
+Compress::Zlib is available (but only if the resulting compressed data is
+smaller than the original text, which isn't always the case for short text
+strings).
 
 =head1 AUTHOR
 

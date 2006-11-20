@@ -50,11 +50,11 @@ my $cryptInfo;      # encryption object reference (plus additional information)
     GROUPS => { 2 => 'Image' },
     EXTRACT_UNKNOWN => 1, # extract all unknown tags in this directory
     NOTES => q{
-As well as the tags listed below, the PDF specification allows for
-user-defined tags to exist in the Info dictionary.  These tags, which should
-have corresponding XMP-pdfx entries in the PDF Metadata, are also extracted
-by ExifTool.
-},
+        As well as the tags listed below, the PDF specification allows for
+        user-defined tags to exist in the Info dictionary.  These tags, which should
+        have corresponding XMP-pdfx entries in the PDF Metadata, are also extracted
+        by ExifTool.
+    },
     Title       => { },
     Author      => { Groups => { 2 => 'Author' } },
     Subject     => { },
@@ -699,7 +699,7 @@ sub DecodeStream($$)
                 $$dict{oldFilter} = $$dict{Filter};
                 $$dict{Filter} = '';
             } else {
-                $exifTool->Warn("Error inflating stream");
+                $exifTool->Warn('Error inflating stream');
                 return 0;
             }
         } else {
@@ -720,7 +720,7 @@ sub DecodeStream($$)
         my $cols = $dict->{DecodeParms}->{Columns};
         unless ($cols) {
             # currently only support 'up' prediction
-            WarnOnce($exifTool,"No Columns for decoding stream");
+            WarnOnce($exifTool,'No Columns for decoding stream');
             return 0;
         }
         my @bytes = unpack('C*', $$dict{stream});

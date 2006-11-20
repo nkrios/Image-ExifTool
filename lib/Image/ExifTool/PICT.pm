@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ReadPictValue($$$;$);
 
@@ -279,7 +279,7 @@ The PICT format contains no true meta information, except for the possible
 exception of the LongComment opcode.  By default, only ImageWidth,
 ImageHeight and X/YResolution are extracted from a PICT image.  Tags in the
 following table represent image opcodes.  Extraction of these tags is
-experimental, and is only enabled when the Verbose option is set.
+experimental, and is only enabled with the Verbose or Unknown options.
     },
     0x0000 => {
         Name => 'Nop',
@@ -1145,9 +1145,9 @@ sub ProcessPICT($$)
     $exifTool->FoundTag('YResolution', $vRes) if $vRes;
 
     # don't extract image opcodes unless verbose
-    return 1 unless $verbose;
+    return 1 unless $verbose or $exifTool->Options('Unknown');
 
-    printf $out "PICT version $vers%s\n", $extended ? ' extended' : '';
+    $verbose and printf $out "PICT version $vers%s\n", $extended ? ' extended' : '';
 
     my $tagTablePtr = GetTagTable('Image::ExifTool::PICT::Main');
 
@@ -1193,7 +1193,20 @@ sub ProcessPICT($$)
             $exifTool->Warn("Error reading $$tagInfo{Name} information");
             last;
         }
-        # $exifTool->FoundTag($tagInfo, $val);
+        if (ref $val eq 'HASH') {
+            # extract JPEG image from CompressedQuickTime imageData
+            if ($$tagInfo{Name} eq 'CompressedQuickTime' and
+                ref $val->{imageDescr} eq 'HASH' and
+                $val->{imageDescr}->{compressor} and
+                $val->{imageDescr}->{compressor} eq 'Photo - JPEG' and
+                ref $val->{imageData} eq 'SCALAR' and
+                $exifTool->ValidateImage($val->{imageData}, 'PreviewImage'))
+            {
+                $exifTool->FoundTag('PreviewImage', $val->{imageData});
+            }
+        } else {
+            # $exifTool->FoundTag($tagInfo, $val);
+        }
     }
     $success or $exifTool->Warn('End of picture not found');
     return 1;
@@ -1219,7 +1232,7 @@ This module contains routines required by Image::ExifTool to read PICT
 =head1 NOTES
 
 Extraction of PICT opcodes is experimental, and is only enabled with the
-Verbose option.
+Verbose or the Unknown option.
 
 =head1 AUTHOR
 

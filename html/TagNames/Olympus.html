@@ -11,7 +11,7 @@ and Agfa cameras.
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -41,12 +41,12 @@ and Agfa cameras.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0088</td>
 <td>PreviewImageStart</td>
-<td align='center'>N*</td>
+<td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0089</td>
 <td>PreviewImageLength</td>
-<td align='center'>N*</td>
+<td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0100</td>
@@ -158,8 +158,8 @@ with 1)</font></font></td></tr>
 <tr valign='top'>
 <td>0x0280</td>
 <td>PreviewImage</td>
-<td align='center'>undef</td>
-<td><font size='-1'><font color="#666666">(Epson ERF preview image)</font></font></td></tr>
+<td align='center'>int8u</td>
+<td><font size='-1'><font color="#666666">(found in ERF and JPG images from some Epson models)</font></font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0300</td>
 <td>PreCaptureFrames</td>
@@ -277,7 +277,7 @@ with 1)</font></font></td></tr>
 <tr valign='top'>
 <td>0x1011</td>
 <td>ColorMatrix</td>
-<td align='center'>int16s[9]</td>
+<td align='center'>int16u[9]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x1012</td>
@@ -454,7 +454,7 @@ spaces instead of linefeeds).  Below are tags which have been observed, but
 any information found here will be extracted, even if the tag is not listed.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'Resolution'</td>
@@ -471,7 +471,7 @@ any information found here will be extracted, even if the tag is not listed.
 <h2><a name='Equipment'>Olympus Equipment Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -590,7 +590,7 @@ any information found here will be extracted, even if the tag is not listed.
 <h2><a name='CameraSettings'>Olympus CameraSettings Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -883,7 +883,7 @@ any information found here will be extracted, even if the tag is not listed.
 <h2><a name='RawDevelopment'>Olympus RawDevelopment Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -960,7 +960,7 @@ any information found here will be extracted, even if the tag is not listed.
 <h2><a name='ImageProcessing'>Olympus ImageProcessing Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -975,7 +975,7 @@ any information found here will be extracted, even if the tag is not listed.
 <tr valign='top'>
 <td>0x0200</td>
 <td>ColorMatrix</td>
-<td align='center'>int16s[9]</td>
+<td align='center'>int16u[9]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0300</td>
@@ -1039,7 +1039,7 @@ any information found here will be extracted, even if the tag is not listed.
 <h2><a name='FocusInfo'>Olympus FocusInfo Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -1060,7 +1060,7 @@ any information found here will be extracted, even if the tag is not listed.
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0x0305</td>
 <td>FocusDistance</td>
-<td align='center'>int32u[2]</td>
+<td align='center'>rational64u</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x1201</td>
@@ -1092,7 +1092,7 @@ any information found here will be extracted, even if the tag is not listed.
 These tags are found only in ORF images of some models (ie. C8080WZ).
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0100</td>
@@ -1173,7 +1173,7 @@ These tags are found only in ORF images of some models (ie. C8080WZ).
 <td>0x0601</td>
 <td>YCbCrCoefficients</td>
 <td align='center'>N</td>
-<td>&nbsp;</td></tr>
+<td><font size='-1'><font color="#666666">(stored as int16u[6], but extracted as rational32u[3])</font></font></td></tr>
 <tr valign='top'>
 <td>0x0611</td>
 <td>ValidPixelDepth</td>
@@ -1259,6 +1259,6 @@ These tags are found only in ORF images of some models (ie. C8080WZ).
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 24, 2006</i>
+<br><i>Last revised Nov 8, 2006</i>
 </body>
 </html>

@@ -25,16 +25,18 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::Shortcuts;
 use Image::ExifTool::XMP qw(EscapeHTML);
+use Image::ExifTool::IPTC;
 use Image::ExifTool::Nikon;
 use Image::ExifTool::Real;
 
-$VERSION = '1.37';
+$VERSION = '1.46';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
 
 # colors for html pages
 my $noteFont = '<font color="#666666">';
+my $noteFontSmall = '<font color="#666666" size="-1">';
 my $bgHeading = q{bgcolor='#ffbb77'};
 my $bgBody = q{bgcolor='#ffffff'};
 my $bgRow = q{bgcolor='#ffeebb'};
@@ -59,24 +61,24 @@ specific meta information that is extracted or written in an image.
 ~head1 TAG TABLES
 },
     ExifTool => q{
-The tables listed below give the names of all tags recognized by ExifTool,
-excluding unknown tags.
-
+The tables listed below give the names of all tags recognized by ExifTool.
+},
+    ExifTool2 => q{
 A B<Tag ID> or B<Index> is given in the first column of each table.  A
 B<Tag ID> is the computer-readable equivalent of a tag name, and is the
 identifier that is actually stored in the file.  An B<Index> refers to the
 location of the information, and is used if the information is stored at a
 fixed position in a data block.
 
-A B<Tag Name> is the handle by which the information is accessed.  In some
-instances, more than one name may correspond to a single tag ID.  In these
-cases, the actual name used depends on the context in which the information
-is found.  Case is not significant for tag names.  A question mark after a
-tag name indicates that the information is either not understood, not
-verified, or not very useful -- these tags are not extracted by ExifTool
-unless the Unknown (-u) option is enabled.  Be aware that some tag names are
-different than the descriptions printed out by default when extracting
-information with "exiftool".  To see the tag names instead of the
+A B<Tag Name> is the handle by which the information is accessed in
+ExifTool.  In some instances, more than one name may correspond to a single
+tag ID.  In these cases, the actual name used depends on the context in
+which the information is found.  Case is not significant for tag names.  A
+question mark after a tag name indicates that the information is either not
+understood, not verified, or not very useful -- these tags are not extracted
+by ExifTool unless the Unknown (-u) option is enabled.  Be aware that some
+tag names are different than the descriptions printed out by default when
+extracting information with "exiftool".  To see the tag names instead of the
 descriptions, use "exiftool -s".
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
@@ -89,20 +91,20 @@ of values written, or the number of characters in a fixed-length string
 (including a null terminator which is added if required).
 
 An asterisk (C<*>) after an entry in the B<Writable> column indicates a
-'protected' tag which is not writable directly, but is set via a Composite
+"protected" tag which is not writable directly, but is set via a Composite
 tag.  A tilde (C<~>) indicates a tag this is only writable when print
 conversion is disabled (by setting PrintConv to 0, or using the -n option).
-A slash (C</>) indicates an 'avoided' tag that is not created unless the
+A slash (C</>) indicates an "avoided" tag that is not created unless the
 group is specified (due to name conflicts with other tags).  An exclamation
 point (C<!>) indicates a tag that is considered unsafe to write under normal
-circumstances.  These 'unsafe' tags are not set when calling
+circumstances.  These "unsafe" tags are not set when calling
 SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  A plus sign
-(C<+>) indicates a 'list' tag which supports multiple instances.
+(C<+>) indicates a "list" tag which supports multiple instances.
 
-The HTML version of this document also lists possible B<Values> for all tags
-which have a discrete set of values, and gives B<Notes> for some tags.
+The HTML version of these tables also list possible B<Values> for
+discrete-valued tags, as well as B<Notes> for some tags.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -112,8 +114,9 @@ documentation or run "exiftool -s" on a file containing the information in
 question.
 },
     EXIF => q{
-EXIF stands for 'Exchangeable Image File Format'.  This type of information
-may be found in JPG, TIFF, PNG, MIFF and DNG images.
+EXIF stands for "Exchangeable Image File Format".  This type of information
+is formatted according to the TIFF specification, and may be found in JPG,
+TIFF, PNG, MIFF and DNG images.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
@@ -135,7 +138,7 @@ fixed-length strings.  For these, the indicated string lengths include a
 null terminator which is added automatically by ExifTool.
 },
     XMP => q{
-XMP stands for 'Extensible Metadata Platform', an XML/RDF-based metadata
+XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, PNG,
 MIFF, PS, PDF, PSD and DNG.
@@ -147,17 +150,18 @@ All XMP information is stored as character strings.  The B<Writable> column
 specifies the information format:  C<integer> is a string of digits
 (possibly beginning with a '+' or '-'), C<real> is a floating point number,
 C<rational> is two C<integer> strings separated by a '/' character, C<date>
-is a date/time string in the format 'YYYY:MM:DD HH:MM:SS[+/-HH:MM]',
-C<boolean> is either 'True' or 'False', and C<lang-alt> is a list of string
+is a date/time string in the format "YYYY:MM:DD HH:MM:SS[+/-HH:MM]",
+C<boolean> is either "True" or "False", and C<lang-alt> is a list of string
 alternatives in different languages. Currently, ExifTool only writes the
-'x-default' language in C<lang-alt> lists.
+"x-default" language in C<lang-alt> lists.
 
-The XMP tags are organized according to schema namespace in the following
-tables. The table names correspond to the XMP namespace prefixes, which are
-used to generate the family 1 group names by adding the prefix 'XMP-'.  If
-the same XMP tag name exists in more than one group, all groups are written
-unless a family 1 group name is specified. ie) If XMP:Contrast is specified,
-information will be written to both XMP-crs:Contrast and XMP-exif:Contrast.
+The XMP tags are organized according to schema B<Namespace> in the following
+tables.  Note that a few of the longer namespace prefixes given below have
+been shortened for convenience (since the family 1 group names are derived
+from these by adding a leading "XMP-").  In cases where a tag name exists in
+more than one namespace, less common namespaces are avoided when writing.
+However, any namespace may be written by specifying a family 1 group name
+for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.
 
 ExifTool will extract XMP information even if it is not listed in these
 tables.  For example, the C<pdfx> namespace doesn't have a predefined set of
@@ -165,7 +169,7 @@ tag names because it is used to store application-defined PDF information,
 but this information is extracted by ExifTool anyway.
 },
     IPTC => q{
-IPTC stands for 'International Press Telecommunications Council'.  This is
+IPTC stands for "International Press Telecommunications Council".  This is
 an older meta information format that is slowly being phased out in favor of
 XMP.  IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS, PDF, PSD
 and DNG images.
@@ -201,7 +205,7 @@ much of the Kodak information remains unknown.
 },
     'Kodak SpecialEffects' => q{
 The Kodak SpecialEffects and Borders tags are found in sub-IFD's within the
-Kodak "Meta" JPEG APP3 segment.
+Kodak JPEG APP3 "Meta" segment.
 },
     Minolta => q{
 These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn't
@@ -231,11 +235,11 @@ Unknown (-u) or Verbose (-v) options to see information about the unknown
 tags.
 },
     CanonRaw => q{
-These tags apply only to CRW-format Canon RAW files.  When writing CanonRaw
-information, the length of the information is preserved (and the new
-information is truncated or padded as required) unless B<Writable> is
-C<resize>.  Currently, only JpgFromRaw and ThumbnailImage are allowed to
-change size.
+These tags apply to CRW-format Canon RAW files and information in the APP0
+"CIFF" segment of JPEG images.  When writing CanonRaw/CIFF information, the
+length of the information is preserved (and the new information is truncated
+or padded as required) unless B<Writable> is C<resize>. Currently, only
+JpgFromRaw and ThumbnailImage are allowed to change size.
 },
     Unknown => q{
 The following tags are decoded in unsupported maker notes.  Use the Unknown
@@ -360,13 +364,12 @@ sub new
             $table = GetTagTable($tableName);
         }
         my $tableNum = $tableNum{$tableName};
+        my $writeProc = $table->{WRITE_PROC};
         $longID{$tableName} = 0;
         $longName{$tableName} = 0;
-        # call write proc if it exists in case it adds tags to the table
-        my $writeProc = $table->{WRITE_PROC};
-        $writeProc and &$writeProc();
         # save all tag names
-        my ($tagID, $binaryTable, $noID);
+        my ($tagID, $binaryTable, $noID, $isIPTC);
+        $isIPTC = 1 if $$table{WRITE_PROC} and $$table{WRITE_PROC} eq \&Image::ExifTool::IPTC::WriteIPTC;
         $noID = 1 if $short =~ /^(Composite|XMP|Extra|Shortcuts|ASF.*)$/;
         if ($table->{PROCESS_PROC} and
            ($table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData or
@@ -374,7 +377,7 @@ sub new
         {
             $binaryTable = 1;
             $id{$tableName} = 'Index';
-        } elsif ($short eq 'IPTC') {
+        } elsif ($isIPTC and $$table{PROCESS_PROC}) { #only the main IPTC table has a PROCESS_PROC
             $id{$tableName} = 'Record';
         } elsif (not $noID) {
             $id{$tableName} = 'Tag ID';
@@ -417,7 +420,6 @@ TagID:  foreach $tagID (@keys) {
                 } elsif (not $$tagInfo{SubDirectory}) {
                     $writable = $$table{WRITABLE};
                 }
-                $writable = $$tagInfo{Format} if $writable and $$tagInfo{Format};
                 my $writeGroup;
                 $writeGroup = $$tagInfo{WriteGroup};
                 unless ($writeGroup) {
@@ -513,19 +515,29 @@ TagID:  foreach $tagID (@keys) {
                         $writable = 'N';
                     } else {
                         $writable eq '1' and $writable = $format ? $format : 'Y';
-                        my $count = $$tagInfo{Count};
-                        if ($count) {
+                        my $count = $$tagInfo{Count} || 1;
+                        # adjust count to Writable size if different than Format
+                        if ($writable and $format and $writable ne $format and
+                            $Image::ExifTool::Exif::formatNumber{$writable} and
+                            $Image::ExifTool::Exif::formatNumber{$format})
+                        {
+                            my $n1 = $Image::ExifTool::Exif::formatNumber{$format};
+                            my $n2 = $Image::ExifTool::Exif::formatNumber{$writable};
+                            $count *= $Image::ExifTool::Exif::formatSize[$n1] /
+                                      $Image::ExifTool::Exif::formatSize[$n2];
+                        }
+                        if ($count != 1) {
                             $count = 'n' if $count < 0;
                             $writable .= "[$count]";
                         }
                         $writable .= '~' if $noPrintConvInv;
+                        # add a '*' if this tag is protected or a '~' for unsafe tags
+                        if ($$tagInfo{Protected}) {
+                            $writable .= '*' if $$tagInfo{Protected} & 0x02;
+                            $writable .= '!' if $$tagInfo{Protected} & 0x01;
+                        }
+                        $writable .= '/' if $$tagInfo{Avoid};
                     }
-                    # add a '*' if this tag is protected or a '~' for unsafe tags
-                    if ($$tagInfo{Protected}) {
-                        $writable .= '*' if $$tagInfo{Protected} & 0x02;
-                        $writable .= '!' if $$tagInfo{Protected} & 0x01;
-                    }
-                    $writable .= '/' if $$tagInfo{Avoid};
                     $writable .= '+' if $$tagInfo{List};
                 }
                 # don't duplicate a tag name unless an entry is different
@@ -583,7 +595,7 @@ TagID:  foreach $tagID (@keys) {
 #
             my $tagIDstr;
             if ($tagID =~ /^\d+$/) {
-                if ($binaryTable or $short =~ /^IPTC\b/ or $short =~ /^CanonCustom/) {
+                if ($binaryTable or $isIPTC or $short =~ /^CanonCustom/) {
                     $tagIDstr = $tagID;
                 } else {
                     $tagIDstr = sprintf("0x%.4x",$tagID);
@@ -748,9 +760,14 @@ sub NumbersFirst
     } elsif ($bNum) {
         $rtnVal = 1;
     } else {
-        $caseInsensitive and $rtnVal = (lc($a) cmp lc($b));
-        $rtnVal or $rtnVal = ($a cmp $b);
+        my ($a2, $b2) = ($a, $b);
+        # expand numbers to 3 digits (with restrictions to avoid messing up ascii-hex tags)
+        $a2 =~ s/(\d+)/sprintf("%.3d",$1)/eg if $a2 =~ /^(APP)?[0-9 ]*$/ and length($a2)<16;
+        $b2 =~ s/(\d+)/sprintf("%.3d",$1)/eg if $b2 =~ /^(APP)?[0-9 ]*$/ and length($b2)<16;
+        $caseInsensitive and $rtnVal = (lc($a2) cmp lc($b2));
+        $rtnVal or $rtnVal = ($a2 cmp $b2);
     }
+    return $rtnVal;
 }
 
 #------------------------------------------------------------------------------
@@ -845,6 +862,39 @@ sub GetTableOrder()
         foreach (@$fix) {
             splice(@sortedTables, $pos, 0, @{$fixOrder{$_}});
         }
+    }
+    # tweak the table order
+    my %tweakOrder = (
+        JPEG    => '-',     # JPEG comes first
+        IPTC    => 'Exif',  # put IPTC after EXIF,
+        GPS     => 'XMP',   # etc...
+        GeoTiff => 'GPS',
+        Leaf    => 'Kodak',
+        Unknown => 'Sony',
+        PrintIM => 'ICC_Profile',
+        Olympus => 'NikonCapture',
+        Pentax  => 'Panasonic',
+        Ricoh   => 'Pentax',
+        Sanyo   => 'Ricoh',
+        PhotoMechanic => 'FotoStation',
+    );
+    my @tweak = sort keys %tweakOrder;
+    while (@tweak) {
+        my $table = shift @tweak;
+        my $first = $tweakOrder{$table};
+        if ($tweakOrder{$first}) {
+            push @tweak, $table;    # must defer this till later
+            next;
+        }
+        delete $tweakOrder{$table}; # because the table won't move again
+        my @moving = grep /^Image::ExifTool::$table\b/, @sortedTables;
+        my @notMoving = grep !/^Image::ExifTool::$table\b/, @sortedTables;
+        my @after;
+        while (@notMoving) {
+            last if $notMoving[-1] =~ /^Image::ExifTool::$first\b/;
+            unshift @after, pop @notMoving;
+        }
+        @sortedTables = (@notMoving, @moving, @after);
     }
     return @sortedTables
 }
@@ -963,68 +1013,62 @@ sub WriteTagNames($$)
     my $sepTable = $self->{SEPARATE_TABLE};
     my $success = 1;
     my %htmlFiles;
+    my $columns = 5;    # number of columns in html index
+    my $percent = int(100 / $columns);
 
     # open the file and write the header
     open(PODFILE,">$podFile") or return 0;
-    print PODFILE Doc2Pod($docs{PodHeader}), $docs{ExifTool};
+    print PODFILE Doc2Pod($docs{PodHeader}), $docs{ExifTool}, $docs{ExifTool2};
     mkdir "$htmldir/TagNames";
     OpenHtmlFile($htmldir) or return 0;
     print HTMLFILE "<blockquote>\n";
     print HTMLFILE "<table width='100%' $bgHeading cellspacing=2 cellpadding=0>\n";
     print HTMLFILE "<tr $bgBody><td><table width='100%' cellspacing=1 cellpadding=2>\n";
-    print HTMLFILE "<tr $bgHeading><th colspan=3><font size='+1'>Tag Table Index</font></th></tr>\n";
-    print HTMLFILE "<tr $bgRow valign='top'><td>\n";
+    print HTMLFILE "<tr $bgHeading><th colspan=$columns><font size='+1'>Tag Table Index</font></th></tr>\n";
+    print HTMLFILE "<tr $bgRow valign='top'><td width='$percent%'>\n";
     # write the index
     my @tableNames = GetTableOrder();
     push @tableNames, 'Image::ExifTool::Shortcuts::Main';   # do Shortcuts last
-    # add headings for any missing Main tables
+    # get list of headings and add any missing ones
     my $heading = 'xxx';
-    my @tableIndexNames;
+    my (@tableIndexNames, @headings);
     foreach $tableName (@tableNames) {
         $short = $$shortName{$tableName};
         my @names = split ' ', $short;
         my $class = shift @names;
         if (@names) {
             # add heading for tables without a Main
-            unless($class =~ /^$heading/) {
+            unless ($heading eq $class) {
                 $heading = $class;
                 push @tableIndexNames, $heading;
+                push @headings, $heading;
             }
         } else {
             $heading = $short;
+            push @headings, $heading;
         }
         push @tableIndexNames, $tableName;
     }
     @tableNames = @tableIndexNames;
-    # print index table
+    # print html index of headings only
     my $count = 0;
-    my $lines = int((scalar(@tableNames) + 2) / 3);
-    foreach $tableName (@tableNames) {
+    my $lines = int((scalar(@headings) + $columns - 1) / $columns);
+    foreach $tableName (@headings) {
         if ($count) {
             if ($count % $lines) {
-                print HTMLFILE '<br>';
+                print HTMLFILE "<br>\n";
             } else {
-                print HTMLFILE "</td><td>\n";
+                print HTMLFILE "</td><td width='$percent%'>\n";
             }
         }
         $short = $$shortName{$tableName};
-        my $indent = '';
-        if ($short) {
-            my @names = split ' ', $short;
-            my $class = shift @names;
-            $url = "$class.html";
-            if (@names) {
-                $url .= '#' . join '_', @names;
-                $indent = '&nbsp; &nbsp; ';
-            }
-        } else {
-            $short = $tableName;
-            $url = "$short.html";
-        }
-        print HTMLFILE "$indent<a href='$url'>$short</a>\n";
+        $short = $tableName unless $short;
+        $url = "$short.html";
+        print HTMLFILE "<a href='$url'>$short</a>";
         ++$count;
     }
-    print HTMLFILE "</td></tr></table></td></tr></table></blockquote>\n\n";
+    print HTMLFILE "\n</td></tr></table></td></tr></table></blockquote>\n";
+    print HTMLFILE Doc2Html($docs{ExifTool2}),"\n";
     # write all the tag tables
     while (@tableNames or @sepTables) {
         while (@sepTables) {
@@ -1102,7 +1146,7 @@ sub WriteTagNames($$)
         }
         $id = '' if $short =~ /^XMP/;
         if ($id) {
-            $hid = "<th>$id</th>";
+            ($hid = "<th>$id</th>") =~ s/ /&nbsp;/g;
             $wTag -= $podIdLen - $wID;
             $wID = $podIdLen;
             my $longTag = $self->{LONG_NAME}->{$tableName};
@@ -1189,6 +1233,13 @@ sub WriteTagNames($$)
             if ($wrStr =~ /^-/) {
                 $subdir = 1;
                 @vals = @$values;
+                # remove Notes if subdir has Notes as well
+                shift @vals if $vals[0] =~ /^\(/ and @vals >= @$writable;
+                foreach (@vals) { /^\(/ and $_ = '-' }
+                my $i;  # fill in any missing entries from non-directory tags
+                for ($i=0; $i<@$writable; ++$i) {
+                    $vals[$i] = $$writable[$i] unless defined $vals[$i];
+                }
                 if ($$sepTable{$vals[0]}) {
                     $wrStr =~ s/^-//;
                     $wrStr = 'N' unless $wrStr;
@@ -1258,8 +1309,13 @@ sub WriteTagNames($$)
             my @values;
             if (@$values) {
                 if ($isSubdir) {
+                    my $smallNote;
                     foreach (@$values) {
-                        /^\(/ and push(@values,"$noteFont$_</font>"), next;
+                        if (/^\(/) {
+                            $smallNote = 1 if $n <= 1;
+                            push @values, ($smallNote ? $noteFontSmall : $noteFont) . "$_</font>";
+                            next;
+                        }
                         /=/ and push(@values, $_), next;
                         my @names = split;
                         $url = (shift @names) . '.html';
@@ -1271,6 +1327,8 @@ sub WriteTagNames($$)
                         }
                         push @values, "--&gt; <a href='$url'>$_$suffix</a>";
                     }
+                    # put small note last
+                    $smallNote and push @values, shift @values;
                 } else {
                     foreach (@$values) {
                         $_ = EscapeHTML($_);

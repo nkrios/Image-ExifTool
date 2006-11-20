@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2005:11:09 11:22:45
+[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
 [File, File, Image]  - File Type: NEF
 [File, File, Image]  - MIME Type: image/x-raw
 [EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
@@ -105,7 +105,7 @@
 [MakerNotes, Nikon, Camera] 131 - Lens Type: G
 [MakerNotes, Nikon, Camera] 132 - Lens: 18-70mm f/3.5-4.5
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Did Not Fire
-[MakerNotes, Nikon, Camera] 0 - AF Mode: Single Area
+[MakerNotes, Nikon, Camera] 0 - AF Area Mode: Single Area
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
 [MakerNotes, Nikon, Camera] 2 - AF Points Used: Lower-right
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Single-Frame
@@ -235,8 +235,8 @@
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Image]  - Shutter Speed: 1/20
 [Composite, Composite, Camera]  - Blue Balance: 1.860377
-[Composite, Composite, Image]  - EV: 6.9
 [Composite, Composite, Camera]  - Focal Length: 18.0mm
 [Composite, Composite, Image]  - Image Size: 3040x2014
+[Composite, Composite, Image]  - Light Value: 6.9
 [Composite, Composite, Camera]  - Red Balance: 1.803774
 [Composite, Composite, Image]  - Date/Time Original: 2004:06:09 16:02:35.00

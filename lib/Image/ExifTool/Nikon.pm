@@ -36,7 +36,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.47';
+$VERSION = '1.51';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -150,6 +150,7 @@ my %nikonLensIDs = (
     '8B 40 2D 80 2C 3C 8D 0E' => 'AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED',
     '8C 40 2D 53 2C 3C 8E 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
     '8F 40 2D 72 2C 3C 91 06' => 'AF-S DX Zoom-Nikkor 18-135mm f/3.5-5.6G IF-ED',
+    '94 40 2D 53 2C 3C 96 06' => 'AF-S DX 18-55mm f/3.5-5.6G II ED', #10 (D40)
 #
     '06 3F 68 68 2C 2C 06 00' => 'Cosina 100mm F/3.5 Macro',
 #
@@ -272,8 +273,9 @@ my %nikonLensIDs = (
         Count => 2,
         Priority => 0,  # the EXIF ISO is more reliable
         Groups => { 2 => 'Image' },
-        PrintConv => '$_=$val;s/^0 //;$_',
-        PrintConvInv => '"0 $val"',
+        # first number is 1 for "Hi ISO" modes (H0.3, H0.7 and H1.0 on D80) - PH
+        PrintConv => '$_=$val;s/^0 //;s/^1 (\d+)/Hi $1/;$_',
+        PrintConvInv => '$_=$val;/^\d+/ ? "0 $_" : (s/Hi ?//i ? "1 $_" : $_)',
     },
     0x0003 => { Name => 'ColorMode',    Writable => 'string' },
     0x0004 => { Name => 'Quality',      Writable => 'string' },
@@ -288,7 +290,7 @@ my %nikonLensIDs = (
         Writable => 'string',
         Count => 13,
     },
-    0x000b => { Name => 'WhiteBalanceFineTune', Writable => 'int16u' }, #2
+    0x000b => { Name => 'WhiteBalanceFineTune', Writable => 'int16s' }, #2
     0x000c => {
         Name => 'ColorBalance1',
         Writable => 'rational64u',
@@ -322,7 +324,7 @@ my %nikonLensIDs = (
     0x0010 => {
         Name => 'DataDump',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x0011 => {
         Name => 'NikonPreview',
@@ -404,7 +406,7 @@ my %nikonLensIDs = (
         Writable => 'int16u',
         PrintConv => {
             1 => 'sRGB',
-            2 => 'AdobeRGB',
+            2 => 'Adobe RGB',
         },
     },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
@@ -518,7 +520,7 @@ my %nikonLensIDs = (
     0x008c => {
         Name => 'NEFCurve1',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x008d => { Name => 'ColorHue' ,        Writable => 'string' }, #2
     # SceneMode takes on the following values: PORTRAIT, PARTY/INDOOR, NIGHT PORTRAIT,
@@ -542,7 +544,7 @@ my %nikonLensIDs = (
     0x0096 => {
         Name => 'NEFCurve2',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x0097 => [ #4
         {
@@ -645,6 +647,7 @@ my %nikonLensIDs = (
         PrintConv => '$val=~s/ / x /;"$val um"',
         PrintConvInv => '$val=~tr/a-zA-Z/ /;$val',
     },
+    # 0x009c - observed values: "", "TWO-SHOT" - PH
     0x00a0 => { Name => 'SerialNumber',     Writable => 'string' }, #2
     0x00a2 => { # size of compressed image data plus EOI segment (ref 10)
         Name => 'ImageDataSize',
@@ -731,7 +734,7 @@ my %nikonLensIDs = (
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
-        Name => 'AFMode',
+        Name => 'AFAreaMode',
         PrintConv => {
             0 => 'Single Area',
             1 => 'Dynamic Area',
@@ -841,10 +844,7 @@ my %nikonLensIDs = (
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0x0003 => {
-        Name => 'Quality',
-        Description => 'Image Quality',
-    },
+    0x0003 => 'Quality',
     0x0004 => 'ColorMode',
     0x0005 => 'ImageAdjustment',
     0x0006 => 'CCDSensitivity',
@@ -1138,7 +1138,7 @@ my %nikonFocalConversions = (
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::Nikon::Composite');
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Nikon::Composite);
 
 
 #------------------------------------------------------------------------------

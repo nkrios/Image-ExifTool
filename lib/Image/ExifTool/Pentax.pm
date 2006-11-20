@@ -25,6 +25,7 @@
 #              12) Derby Chang private communication
 #              13) http://homepage3.nifty.com/kamisaka/makernote/makernote_pentax.htm
 #              14) Ger Vermeulen private communication (tests with Optio S6)
+#              15) Barney Garrett private communication (tests with Samsung GX-1S)
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -33,8 +34,9 @@ package Image::ExifTool::Pentax;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.36';
+$VERSION = '1.40';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -121,7 +123,7 @@ my %pentaxCities = (
         Writable => 'int16u',
         PrintConv => {
             0 => 'Auto',
-            1 => 'Night-scene',
+            1 => 'Night Scene',
             2 => 'Manual',
         },
     },
@@ -165,6 +167,7 @@ my %pentaxCities = (
             0x129c6 => 'Optio 33WR/43WR/555',
             0x129d5 => 'Optio S4',
             0x12a02 => 'Optio MX',
+            0x12a0c => 'Optio S40',
             0x12a16 => 'Optio S4i',
             0x12a34 => 'Optio 30',
             0x12a52 => 'Optio S30',
@@ -192,10 +195,16 @@ my %pentaxCities = (
             0x12b7e => '*ist DL2',
             0x12b80 => 'Samsung GX-1L',
             0x12b9c => 'K100D',
+            0x12b9d => 'K110D',
             0x12bb0 => 'Optio T10',
             0x12be2 => 'Optio W10',
             0x12bf6 => 'Optio M10',
+            0x12c1e => 'K10D',
+            0x12c20 => 'Samsung GX10',
             0x12c28 => 'Optio S7',
+            0x12c32 => 'Optio M20',
+            0x12c3c => 'Optio W20',
+            0x12c46 => 'Optio A20',
         },
     },
     0x0006 => { #5
@@ -219,7 +228,6 @@ my %pentaxCities = (
     },
     0x0008 => {
         Name => 'Quality',
-        Description => 'Image Quality',
         Writable => 'int16u',
         PrintConv => {
             0 => 'Good',
@@ -275,7 +283,7 @@ my %pentaxCities = (
             12 => 'Surf & Snow',
             13 => 'Sunset or Candlelight', #14 (Candlelight)
             14 => 'Autumn',
-            15 => 'Flower',
+            15 => 'Macro',
             17 => 'Fireworks',
             18 => 'Text',
             19 => 'Panorama', #PH
@@ -299,7 +307,7 @@ my %pentaxCities = (
             '6 2' => 'Landscape', #13
             '9 1' => 'Night Scene', #13
             '13 1' => 'Candlelight', #13
-            '15 1' => 'Flower', #13
+            '15 1' => 'Macro', #13
             '255 0' => 'Digital Filter?', #13
         },
     },
@@ -344,6 +352,25 @@ my %pentaxCities = (
             },
         },
     ],
+    0x000e => { #7
+        Name => 'AFPointSelected',
+        Writable => 'int16u',
+        PrintConv => {
+            0xffff => 'Auto',
+            0xfffe => 'Fixed Center',
+            1 => 'Upper-left',
+            2 => 'Top',
+            3 => 'Upper-right',
+            4 => 'Left',
+            5 => 'Mid-left',
+            6 => 'Center',
+            7 => 'Mid-right',
+            8 => 'Right',
+            9 => 'Lower-left',
+            10 => 'Bottom',
+            11 => 'Lower-right',
+        },
+    },
     0x000f => { #PH
         Name => 'AutoAFPoint',
         Writable => 'int16u',
@@ -426,8 +453,7 @@ my %pentaxCities = (
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         PrintConvInv => 'eval $val',
     },
-    # AE Metering Mode Tag - W. Smith 12 FEB 04
-    0x0017 => {
+    0x0017 => { #3
         Name => 'MeteringMode',
         Writable => 'int16u',
         PrintConv => {
@@ -436,8 +462,16 @@ my %pentaxCities = (
             2 => 'Spot',
         },
     },
-    # White Balance Tag - W. Smith 12 FEB 04
-    0x0019 => {
+    0x0018 => { #7/PH
+        Name => 'ExposureBracketStep',
+        Writable => 'int16',
+        # don't apply conversion if this is 2 integers
+        ValueConv => '$val=~/ / ? $val : $val / 3',
+        ValueConvInv => '$val=~/ / ? $val : int($val * 3 + 0.5)',
+        PrintConv => '$val=~/ / ? $val : sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x0019 => { #3
         Name => 'WhiteBalance',
         Writable => 'int16u',
         PrintConv => {
@@ -507,8 +541,7 @@ my %pentaxCities = (
             PrintConvInv => '$val=~s/mm//;$val',
         },
     ],
-    # Digital Zoom Tag - W. Smith 12 FEB 04
-    0x001e => {
+    0x001e => { #3
         Name => 'DigitalZoom',
         Writable => 'int16u',
         ValueConv => '$val / 100', #14
@@ -593,17 +626,82 @@ my %pentaxCities = (
         Name => 'FrameNumber',
         Writable => 'int32u',
     },
+    # 0x002b - definitely exposure related somehow (PH)
     # 0x0032 - normally 4 zero bytes, but "\x02\0\0\0" for a cropped pic (PH)
     # and "\0\0\0\x04" for Digital filter (ref 13)
     # and "\x04\0\0\0" for Color filter (ref 13)
-    # 0x0033 - RecordMode ? (ref 13)
-    # 0x0034 - DriveMode ? (ref 13)
+    0x0033 => { #PH (K110D/K100D)
+        Name => 'PictureMode',
+        Writable => 'int8u',
+        Count => 3,
+        PrintConv => {
+            # Program dial modes
+            '0 0 0'  => 'Program', # K110D
+            '0 4 0'  => 'Standard', #13
+            '0 5 0'  => 'Portrait', # K110D
+            '0 6 0'  => 'Landscape', # K110D
+            '0 7 0'  => 'Macro', # K110D
+            '0 8 0'  => 'Sport', # K110D
+            '0 9 0'  => 'Night Scene Portrait', # K110D
+            '0 10 0' => 'No Flash', # K110D
+            # SCN modes (menu-selected)
+            '0 11 0' => 'Night Scene', # K100D
+            '0 12 0' => 'Surf & Snow', # K100D
+            '0 13 0' => 'Text', # K100D
+            '0 14 0' => 'Sunset', # K100D
+            '0 15 0' => 'Kids', # K100D
+            '0 16 0' => 'Pet', # K100D
+            '0 17 0' => 'Candlelight', # K100D
+            '0 18 0' => 'Museum', # K100D
+            # AUTO PICT modes (auto-selected)
+            '1 4 0'  => 'Auto PICT (Standard)', #13
+            '1 5 0'  => 'Auto PICT (Portrait)', #7 (K100D)
+            '1 6 0'  => 'Auto PICT (Landscape)', # K110D
+            '1 7 0'  => 'Auto PICT (Macro)', #13
+            '1 8 0'  => 'Auto PICT (Sport)', #13
+            # Manual dial modes
+            '2 0 0'  => 'Program AE', #13
+            '3 0 0'  => 'Green Mode', # (unconfirmed)
+            '4 0 0'  => 'Shutter Speed Priority', # K110D
+            '5 0 0'  => 'Aperture Priority', # K110D
+            '8 0 0'  => 'Manual', # K110D
+            '9 0 0'  => 'Bulb', # K110D
+            # *istD modes (ref 7)
+            '2 0 1'  => 'Program AE', #7
+            '2 1 1'  => 'Hi-speed Program', #7
+            '2 2 1'  => 'DOF Program', #7
+            '2 3 1'  => 'MTF Program', #7
+            '3 0 1'  => 'Green Mode', #7
+            '4 0 1'  => 'Shutter Speed Priority', #7
+            '5 0 1'  => 'Aperture Priority', #7
+            '6 0 1'  => 'Program Tv Shift', #7
+            '7 0 1'  => 'Program Av Shift', #7
+            '8 0 1'  => 'Manual', #7
+            '9 0 1'  => 'Bulb', #7
+            '10 0 1' => 'Aperture Priority (Off-Auto-Aperture)', #7
+            '11 0 1' => 'Manual (Off-Auto-Aperture)', #7
+            '12 0 1' => 'Bulb (Off-Auto-Aperture)', #7
+        },
+    },
+    0x0034 => { #7/PH
+        Name => 'DriveMode',
+        Writable => 'int8u',
+        Count => 4,
+        PrintConv => {
+            '0 0 0 0' => 'Single-frame',
+            '1 0 0 0' => 'Continuous',
+            '0 1 0 0' => 'Self-timer (12 sec)',
+            '0 2 0 0' => 'Self-timer (2 sec)',
+            '0 0 1 0' => 'Remote Control?', # needs validation
+            '0 0 0 1' => 'Multiple Exposure',
+        },
+    },
     0x0037 => { #13
         Name => 'ColorSpace',
         Writable => 'int16u',
         PrintConv => {
             0 => 'sRGB',
-            1 => 'AdobeRGB',
+            1 => 'Adobe RGB',
         },
     },
     0x0039 => { #PH
@@ -612,7 +710,31 @@ my %pentaxCities = (
         Count => 2,
         PrintConv => '$_=$val;s/ /x/;$_',
     },
-    0x003f => {     #PH
+    0x003c => { #7/PH
+        Name => 'AFPointsUsed',
+        # not writable because I'm not decoding these 4 bytes fully:
+        # Nibble pattern: XSSSYUUU
+        # X = unknown (AF focused flag?, 0 or 1)
+        # SSS = selected AF point bitmask (0x000 or 0x7ff if unused)
+        # Y = unknown (observed 0,6,7,b,e, always 0 if SSS is 0x000 or 0x7ff)
+        # UUU = af points used
+        Format => 'int32u',
+        ValueConv => '$val & 0x7ff', # ignore other bits for now
+        PrintConv => { BITMASK => {
+            0 => 'Upper-left',
+            1 => 'Top',
+            2 => 'Upper-right',
+            3 => 'Left',
+            4 => 'Mid-left',
+            5 => 'Center',
+            6 => 'Mid-right',
+            7 => 'Right',
+            8 => 'Lower-left',
+            9 => 'Bottom',
+            10 => 'Lower-right',
+        } },
+    },
+    0x003f => { #PH
         Name => 'LensType',
         Writable => 'int8u',
         Count => 2,
@@ -696,6 +818,8 @@ my %pentaxCities = (
             '4 51' => 'smc PENTAX-D FA 50mmF2.8 MACRO',
             '4 52' => 'smc PENTAX-D FA 100mmF2.8 MACRO',
             '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
+            '4 245' => 'Schneider D-XENON 50-200mm', #15
+            '4 246' => 'Schneider D-XENON 18-55mm', #15
             '4 247' => 'smc PENTAX-DA 10-17mm F3.5-4.5 ED [IF] Fisheye zoom', #10
             '4 248' => 'smc PENTAX-DA 12-24mm F4 ED AL [IF]', #10
             '4 249' => 'TAMRON XR DiII 18-200mm F3.5-6.3 (A14)',
@@ -732,25 +856,29 @@ my %pentaxCities = (
             '6 10' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
             '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
             '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
+            '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH (K10D)
+            '7 244' => 'smc PENTAX-DA 16-45mm F4 ED AL', #PH (K10D)
         },
     },
     # 0x0041 - increments for each cropped pic (PH)
+    # 0x0047 - increments every few pictures for unknown reason (PH)
     0x0049 => { #13
         Name => 'NoiseReduction',
         Writable => 'int16u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
     # 0x004f - PictureFinish ? (ref 13)
-    0x0200 => {
-        Name => 'BlackPoint', #5
+    0x0200 => { #5
+        Name => 'BlackPoint',
         Writable => 'int16u',
         Count => 4,
     },
-    0x0201 => {
-        Name => 'WhitePoint', #5
+    0x0201 => { #5
+        Name => 'WhitePoint',
         Writable => 'int16u',
         Count => 4,
     },
+    # 0x0205 - Also stores PictureMode (PH)
     # 0x0207 - LensInformation ? (ref 13) - includes focus distance!
     0x03fe => { #PH
         Name => 'DataDump',
@@ -773,19 +901,19 @@ my %pentaxCities = (
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
-    0x1000 => {
-        Name => 'HometownCityCode', #PH
+    0x1000 => { #PH
+        Name => 'HometownCityCode',
         Writable => 'undef',
         Count => 4,
     },
-    0x1001 => {
-        Name => 'DestinationCityCode', #PH
+    0x1001 => { #PH
+        Name => 'DestinationCityCode',
         Writable => 'undef',
         Count => 4,
     },
-    0x2000 => {
-        Name => 'PreviewImageData', #PH (Optio 330RS)
-        ValueConv => '\$val',
+    0x2000 => { #PH (Optio 330RS)
+        Name => 'PreviewImageData',
+        Binary => 1,
     },
 );
 
@@ -925,8 +1053,8 @@ the information should be stored to deduce the correct offsets.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Wayne Smith, John Francis and Douglas O'Brien for help figuring
-out some Pentax tags, and to Denis Bourez, Kazumichi Kawabata and David
-Buret for adding to the LensType list.
+out some Pentax tags, and to Denis Bourez, Kazumichi Kawabata, David Buret
+and Barney Garrett for adding to the LensType list.
 
 =head1 AUTHOR
 

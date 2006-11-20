@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.49
 [File, File, Image]  - File Name: Casio.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1203 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -33,7 +33,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2048
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1536
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
@@ -43,7 +43,7 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 926
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Casio, Camera] 1 - Recording Mode: Single Shutter
-[MakerNotes, Casio, Camera] 2 - Image Quality: Fine
+[MakerNotes, Casio, Camera] 2 - Quality: Fine
 [MakerNotes, Casio, Camera] 3 - Focus Mode: Auto
 [MakerNotes, Casio, Camera] 4 - Flash Mode: Red-eye Reduction
 [MakerNotes, Casio, Camera] 5 - Flash Intensity: Normal

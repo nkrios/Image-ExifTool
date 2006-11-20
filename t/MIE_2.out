@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: MIE.mie
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 2022 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:05:03 14:15:57
+[File, File, Time]  - File Modification Date/Time: 2006:05:03 14:20:10
 [File, File, Image]  - File Type: MIE
 [File, File, Image]  - MIME Type: image/x-mie-jpeg
 [MIE, MIE-Main, Other] 0Type - Subfile Type: JPEG
@@ -62,4 +62,4 @@
 [MIE, MIE-Main, Other] data - Subfile: (Binary data 20 bytes)
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Shutter Speed: 4
-[Composite, Composite, Image]  - EV: 1.6
+[Composite, Composite, Image]  - Light Value: 1.6

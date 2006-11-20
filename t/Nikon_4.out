@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2005:01:31 11:57:40
+[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -41,8 +41,6 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: Uncalibrated
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 3008
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2000
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R03
-[EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41729 - Scene Type: Directly photographed
@@ -74,7 +72,7 @@
 [MakerNotes, NikonPreview, Image] 282 - X Resolution: 300
 [MakerNotes, NikonPreview, Image] 283 - Y Resolution: 300
 [MakerNotes, NikonPreview, Image] 296 - Resolution Unit: inches
-[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2424
+[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2412
 [MakerNotes, NikonPreview, Image] 514 - Preview Image Length: 0
 [MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -5/3
@@ -86,7 +84,7 @@
 [MakerNotes, Nikon, Camera] 131 - Lens Type: G
 [MakerNotes, Nikon, Camera] 132 - Lens: 18-70mm f/3.5-4.5
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Fired, TTL Mode
-[MakerNotes, Nikon, Camera] 0 - AF Mode: Single Area
+[MakerNotes, Nikon, Camera] 0 - AF Area Mode: Single Area
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
 [MakerNotes, Nikon, Camera] 2 - AF Points Used: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Continuous
@@ -132,9 +130,9 @@
 [Composite, Composite, Camera]  - Blue Balance: 1.410156
 [Composite, Composite, Image]  - Circle Of Confusion: 0.020 mm
 [Composite, Composite, Image]  - Depth of Field: 0.02 m (0.62 - 0.64)
-[Composite, Composite, Image]  - EV: 9.6
 [Composite, Composite, Camera]  - Focal Length: 56.0mm (35mm equivalent: 84.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 31.31 m
 [Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Image]  - Light Value: 9.6
 [Composite, Composite, Camera]  - Red Balance: 2.332031
 [Composite, Composite, Image]  - Date/Time Original: 2005:01:14 08:57:59.20

@@ -141,7 +141,7 @@ my %advancedContentEncryption = (
             3 => 'GIF',
         },
     },
-    1 => { Name => 'BannerImage', ValueConv => '\$val' },
+    1 => { Name => 'BannerImage', Binary => 1 },
     2 => 'BannerImageURL',
     3 => 'CopyrightURL',
 );
@@ -149,7 +149,7 @@ my %advancedContentEncryption = (
 %Image::ExifTool::ASF::ExtendedDescr = (
     PROCESS_PROC => \&ProcessExtendedContentDescription,
     GROUPS => { 2 => 'Video' },
-    ASFLeakyBucketPairs => { ValueConv => '\$val' },
+    ASFLeakyBucketPairs => { Binary => 1 },
     AspectRatioX => {},
     AspectRatioY => {},
     Author => { Groups => { 2 => 'Author' } },

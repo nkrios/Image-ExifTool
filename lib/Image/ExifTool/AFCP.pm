@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         AFCP.pm
 #
-# Description:  Read AFCP meta information from a file
+# Description:  Read/write AFCP trailer
 #
 # Revisions:    12/26/2005 - P. Harvey Created
 #
@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 sub ProcessAFCP($$);
 
@@ -50,24 +50,27 @@ images, but not other image formats.
 #------------------------------------------------------------------------------
 # Read/write AFCP information in a file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
-# (Set 'ScanForAFCP' member in dirInfo to scan from current position for AFCP and
-#  actual AFCP position is returned as 'DataPos'.)
+# (Set 'ScanForAFCP' member in dirInfo to scan from current position for AFCP)
 # Returns: 1 on success, 0 if this file didn't contain AFCP information
 #          -1 on write error or if the offsets were incorrect on reading
-# Notes: restores original file position before returning
+# - updates DataPos to point to actual AFCP start if ScanForAFCP is set
+# - updates DirLen to trailer length
+# - returns Fixup reference in dirInfo hash when writing
 sub ProcessAFCP($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my $curPos = $raf->Tell();
+    my $offset = $$dirInfo{Offset} || 0;    # offset from end of file
     my $rtnVal = 0;
 
 NoAFCP: for (;;) {
         my ($buff, $fix, $dirBuff, $valBuff, $fixup, $vers);
         # look for AXS trailer
-        last unless $raf->Seek(-12, 2) and
+        last unless $raf->Seek(-12-$offset, 2) and
                     $raf->Read($buff, 12) == 12 and
                     $buff =~ /^(AXS(!|\*))/;
+        my $endPos = $raf->Tell();
         my $hdr = $1;
         SetByteOrder($2 eq '!' ? 'MM' : 'II');
         my $startPos = Get32u(\$buff, 4);
@@ -100,7 +103,10 @@ NoAFCP: for (;;) {
             # calculate shift for fixing AFCP offsets
             $fix = $actualPos - $startPos;
         }
-        $$dirInfo{DataPos} = $startPos + $fix;  # return actual AFCP position
+        # set variables returned in dirInfo hash
+        $$dirInfo{DataPos} = $startPos + $fix;  # actual start position
+        $$dirInfo{DirLen} = $endPos - ($startPos + $fix);
+
         $rtnVal = 1;
         my $verbose = $exifTool->Options('Verbose');
         my $out = $exifTool->Options('TextOut');
@@ -114,26 +120,30 @@ NoAFCP: for (;;) {
             }
             $dirBuff = $valBuff = '';
             require Image::ExifTool::Fixup;
-            $fixup = $$dirInfo{Fixup} || new Image::ExifTool::Fixup;
+            $fixup = $$dirInfo{Fixup};
+            $fixup or $fixup = $$dirInfo{Fixup} = new Image::ExifTool::Fixup;
             $vers = substr($buff, 4, 2); # get version number
+        } else {
+            $exifTool->DumpTrailer($dirInfo) if $verbose or $exifTool->{HTML_DUMP};
         }
-        my $numEntries = Get16u(\$buff, 6);
-        $verbose and print $out "AFCP trailer ($numEntries entries):\n";
         # read AFCP directory data
+        my $numEntries = Get16u(\$buff, 6);
         my $dir;
         unless ($raf->Read($dir, 12 * $numEntries) == 12 * $numEntries) {
             $exifTool->Error('Error reading AFCP directory', 1);
             last;
         }
-        if ($verbose > 1) {
+        if ($verbose > 2 and not $outfile) {
             my $dat = $buff . $dir;
+            print $out "  AFCP Directory:\n";
             Image::ExifTool::HexDump(\$dat, undef,
                 Addr   => $$dirInfo{DataPos},
                 Width  => 12,
                 Prefix => $exifTool->{INDENT},
+                Out => $out,
             );
         }
-        $fix and $exifTool->Warn("AFCP offsets are off by $fix (fixed)", 1);
+        $fix and $exifTool->Warn("Adjusted AFCP offsets by $fix", 1);
 #
 # process AFCP directory
 #
@@ -200,7 +210,6 @@ NoAFCP: for (;;) {
         }
         last;
     }
-    $raf->Seek($curPos, 0); # restore original file position
     return $rtnVal;
 }
 
@@ -210,7 +219,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::AFCP - Read AFCP meta information from a file
+Image::ExifTool::AFCP - Read/write AFCP trailer
 
 =head1 SYNOPSIS
 
@@ -232,9 +241,13 @@ It is a poorly designed protocol because (like TIFF) it uses absolute
 offsets to specify data locations.  This is a huge blunder because it makes
 the AFCP information dependent on the file length, so it is easily
 invalidated by image editing software which doesn't recognize the AFCP
-trailer to fix up these offsets when the file length changes.
+trailer to fix up these offsets when the file length changes.  ExifTool will
+attempt to fix these invalid offsets if possible.
 
-ExifTool will attempt to fix these invalid offsets if possible.
+Scanning for AFCP information may be time consuming, especially when reading
+from a sequential device, since the information is at the end of the file.
+In these instances, the ExifTool FastScan option may be used to disable
+scanning for AFCP information.
 
 =head1 AUTHOR
 

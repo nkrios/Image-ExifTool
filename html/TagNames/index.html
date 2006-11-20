@@ -5,24 +5,94 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h2>ExifTool Tag Names</h2>
 
-The tables listed below give the names of all tags recognized by ExifTool,
-excluding unknown tags.
+The tables listed below give the names of all tags recognized by ExifTool.
 
-<p>A <b>Tag ID</b> or <b>Index</b> is given in the first column of each table.  A
+<blockquote>
+<table width='100%' bgcolor='#ffbb77' cellspacing=2 cellpadding=0>
+<tr bgcolor='#ffffff'><td><table width='100%' cellspacing=1 cellpadding=2>
+<tr bgcolor='#ffbb77'><th colspan=5><font size='+1'>Tag Table Index</font></th></tr>
+<tr bgcolor='#ffeebb' valign='top'><td width='20%'>
+<a href='JPEG.html'>JPEG</a><br>
+<a href='EXIF.html'>EXIF</a><br>
+<a href='IPTC.html'>IPTC</a><br>
+<a href='XMP.html'>XMP</a><br>
+<a href='GPS.html'>GPS</a><br>
+<a href='GeoTiff.html'>GeoTiff</a><br>
+<a href='ICC_Profile.html'>ICC_Profile</a><br>
+<a href='PrintIM.html'>PrintIM</a><br>
+<a href='Photoshop.html'>Photoshop</a><br>
+<a href='Canon.html'>Canon</a><br>
+<a href='CanonCustom.html'>CanonCustom</a><br>
+<a href='Casio.html'>Casio</a><br>
+<a href='FujiFilm.html'>FujiFilm</a></td><td width='20%'>
+<a href='JVC.html'>JVC</a><br>
+<a href='Kodak.html'>Kodak</a><br>
+<a href='Leaf.html'>Leaf</a><br>
+<a href='Minolta.html'>Minolta</a><br>
+<a href='Nikon.html'>Nikon</a><br>
+<a href='NikonCapture.html'>NikonCapture</a><br>
+<a href='Olympus.html'>Olympus</a><br>
+<a href='Panasonic.html'>Panasonic</a><br>
+<a href='Pentax.html'>Pentax</a><br>
+<a href='Ricoh.html'>Ricoh</a><br>
+<a href='Sanyo.html'>Sanyo</a><br>
+<a href='Sigma.html'>Sigma</a><br>
+<a href='Sony.html'>Sony</a></td><td width='20%'>
+<a href='Unknown.html'>Unknown</a><br>
+<a href='DNG.html'>DNG</a><br>
+<a href='CanonRaw.html'>CanonRaw</a><br>
+<a href='KyoceraRaw.html'>KyoceraRaw</a><br>
+<a href='MinoltaRaw.html'>MinoltaRaw</a><br>
+<a href='SigmaRaw.html'>SigmaRaw</a><br>
+<a href='JFIF.html'>JFIF</a><br>
+<a href='FlashPix.html'>FlashPix</a><br>
+<a href='APP12.html'>APP12</a><br>
+<a href='AFCP.html'>AFCP</a><br>
+<a href='CanonVRD.html'>CanonVRD</a><br>
+<a href='FotoStation.html'>FotoStation</a><br>
+<a href='PhotoMechanic.html'>PhotoMechanic</a></td><td width='20%'>
+<a href='Jpeg2000.html'>Jpeg2000</a><br>
+<a href='BMP.html'>BMP</a><br>
+<a href='PICT.html'>PICT</a><br>
+<a href='PNG.html'>PNG</a><br>
+<a href='MNG.html'>MNG</a><br>
+<a href='MIFF.html'>MIFF</a><br>
+<a href='PDF.html'>PDF</a><br>
+<a href='PostScript.html'>PostScript</a><br>
+<a href='ID3.html'>ID3</a><br>
+<a href='Vorbis.html'>Vorbis</a><br>
+<a href='FLAC.html'>FLAC</a><br>
+<a href='APE.html'>APE</a><br>
+<a href='MPC.html'>MPC</a></td><td width='20%'>
+<a href='MPEG.html'>MPEG</a><br>
+<a href='QuickTime.html'>QuickTime</a><br>
+<a href='Flash.html'>Flash</a><br>
+<a href='Real.html'>Real</a><br>
+<a href='RIFF.html'>RIFF</a><br>
+<a href='AIFF.html'>AIFF</a><br>
+<a href='ASF.html'>ASF</a><br>
+<a href='DICOM.html'>DICOM</a><br>
+<a href='MIE.html'>MIE</a><br>
+<a href='Extra.html'>Extra</a><br>
+<a href='Composite.html'>Composite</a><br>
+<a href='Shortcuts.html'>Shortcuts</a>
+</td></tr></table></td></tr></table></blockquote>
+
+A <b>Tag ID</b> or <b>Index</b> is given in the first column of each table.  A
 <b>Tag ID</b> is the computer-readable equivalent of a tag name, and is the
 identifier that is actually stored in the file.  An <b>Index</b> refers to the
 location of the information, and is used if the information is stored at a
 fixed position in a data block.
 
-<p>A <b>Tag Name</b> is the handle by which the information is accessed.  In some
-instances, more than one name may correspond to a single tag ID.  In these
-cases, the actual name used depends on the context in which the information
-is found.  Case is not significant for tag names.  A question mark after a
-tag name indicates that the information is either not understood, not
-verified, or not very useful -- these tags are not extracted by ExifTool
-unless the Unknown (-u) option is enabled.  Be aware that some tag names are
-different than the descriptions printed out by default when extracting
-information with &quot;exiftool&quot;.  To see the tag names instead of the
+<p>A <b>Tag Name</b> is the handle by which the information is accessed in
+ExifTool.  In some instances, more than one name may correspond to a single
+tag ID.  In these cases, the actual name used depends on the context in
+which the information is found.  Case is not significant for tag names.  A
+question mark after a tag name indicates that the information is either not
+understood, not verified, or not very useful -- these tags are not extracted
+by ExifTool unless the Unknown (-u) option is enabled.  Be aware that some
+tag names are different than the descriptions printed out by default when
+extracting information with &quot;exiftool&quot;.  To see the tag names instead of the
 descriptions, use &quot;exiftool -s&quot;.
 
 <p>The <b>Writable</b> column indicates whether the tag is writable by ExifTool.
@@ -35,20 +105,20 @@ of values written, or the number of characters in a fixed-length string
 (including a null terminator which is added if required).
 
 <p>An asterisk (<code>*</code>) after an entry in the <b>Writable</b> column indicates a
-&#39;protected&#39; tag which is not writable directly, but is set via a Composite
+&quot;protected&quot; tag which is not writable directly, but is set via a Composite
 tag.  A tilde (<code>~</code>) indicates a tag this is only writable when print
 conversion is disabled (by setting PrintConv to 0, or using the -n option).
-A slash (<code>/</code>) indicates an &#39;avoided&#39; tag that is not created unless the
+A slash (<code>/</code>) indicates an &quot;avoided&quot; tag that is not created unless the
 group is specified (due to name conflicts with other tags).  An exclamation
 point (<code>!</code>) indicates a tag that is considered unsafe to write under normal
-circumstances.  These &#39;unsafe&#39; tags are not set when calling
+circumstances.  These &quot;unsafe&quot; tags are not set when calling
 SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  A plus sign
-(<code>+</code>) indicates a &#39;list&#39; tag which supports multiple instances.
+(<code>+</code>) indicates a &quot;list&quot; tag which supports multiple instances.
 
-<p>The HTML version of this document also lists possible <b>Values</b> for all tags
-which have a discrete set of values, and gives <b>Notes</b> for some tags.
+<p>The HTML version of these tables also list possible <b>Values</b> for
+discrete-valued tags, as well as <b>Notes</b> for some tags.
 
 <p><b>Note</b>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -57,329 +127,9 @@ types of meta information.  To determine a tag name, either consult this
 documentation or run &quot;exiftool -s&quot; on a file containing the information in
 question.
 
-<blockquote>
-<table width='100%' bgcolor='#ffbb77' cellspacing=2 cellpadding=0>
-<tr bgcolor='#ffffff'><td><table width='100%' cellspacing=1 cellpadding=2>
-<tr bgcolor='#ffbb77'><th colspan=3><font size='+1'>Tag Table Index</font></th></tr>
-<tr bgcolor='#ffeebb' valign='top'><td>
-<a href='EXIF.html'>EXIF</a>
-<br><a href='XMP.html'>XMP</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#aux'>XMP aux</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#cc'>XMP cc</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#crs'>XMP crs</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#dc'>XMP dc</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#dex'>XMP dex</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#exif'>XMP exif</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#iptcCore'>XMP iptcCore</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#pdf'>XMP pdf</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#photoshop'>XMP photoshop</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#PixelLive'>XMP PixelLive</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#tiff'>XMP tiff</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#xmp'>XMP xmp</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#xmpBJ'>XMP xmpBJ</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#xmpDM'>XMP xmpDM</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#xmpMM'>XMP xmpMM</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#xmpPLUS'>XMP xmpPLUS</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#xmpRights'>XMP xmpRights</a>
-<br>&nbsp; &nbsp; <a href='XMP.html#xmpTPg'>XMP xmpTPg</a>
-<br><a href='IPTC.html'>IPTC</a>
-<br>&nbsp; &nbsp; <a href='IPTC.html#EnvelopeRecord'>IPTC EnvelopeRecord</a>
-<br>&nbsp; &nbsp; <a href='IPTC.html#ApplicationRecord'>IPTC ApplicationRecord</a>
-<br>&nbsp; &nbsp; <a href='IPTC.html#NewsPhoto'>IPTC NewsPhoto</a>
-<br>&nbsp; &nbsp; <a href='IPTC.html#PreObjectData'>IPTC PreObjectData</a>
-<br>&nbsp; &nbsp; <a href='IPTC.html#ObjectData'>IPTC ObjectData</a>
-<br>&nbsp; &nbsp; <a href='IPTC.html#PostObjectData'>IPTC PostObjectData</a>
-<br><a href='Leaf.html'>Leaf</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#CameraProfile'>Leaf CameraProfile</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#CaptureProfile'>Leaf CaptureProfile</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#ImageProfile'>Leaf ImageProfile</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#ShootSetup'>Leaf ShootSetup</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#CameraSetup'>Leaf CameraSetup</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#CaptureSetup'>Leaf CaptureSetup</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#Neutrals'>Leaf Neutrals</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#Selection'>Leaf Selection</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#Sharpness'>Leaf Sharpness</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#ToneCurve'>Leaf ToneCurve</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#ColorSetup'>Leaf ColorSetup</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#LookHeader'>Leaf LookHeader</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#SaveSetup'>Leaf SaveSetup</a>
-<br>&nbsp; &nbsp; <a href='Leaf.html#SubIFD'>Leaf SubIFD</a>
-<br><a href='ICC_Profile.html'>ICC_Profile</a>
-<br>&nbsp; &nbsp; <a href='ICC_Profile.html#Header'>ICC_Profile Header</a>
-<br>&nbsp; &nbsp; <a href='ICC_Profile.html#Chromaticity'>ICC_Profile Chromaticity</a>
-<br>&nbsp; &nbsp; <a href='ICC_Profile.html#ColorantTable'>ICC_Profile ColorantTable</a>
-<br>&nbsp; &nbsp; <a href='ICC_Profile.html#Measurement'>ICC_Profile Measurement</a>
-<br>&nbsp; &nbsp; <a href='ICC_Profile.html#ViewingConditions'>ICC_Profile ViewingConditions</a>
-<br><a href='Photoshop.html'>Photoshop</a>
-<br>&nbsp; &nbsp; <a href='Photoshop.html#Resolution'>Photoshop Resolution</a>
-<br>&nbsp; &nbsp; <a href='Photoshop.html#JPEG_Quality'>Photoshop JPEG_Quality</a>
-<br>&nbsp; &nbsp; <a href='Photoshop.html#Header'>Photoshop Header</a>
-<br><a href='GPS.html'>GPS</a>
-<br><a href='Canon.html'>Canon</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#CameraSettings'>Canon CameraSettings</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#FocalLength'>Canon FocalLength</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#ShotInfo'>Canon ShotInfo</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#Panorama'>Canon Panorama</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#ColorInfoD30'>Canon ColorInfoD30</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#CameraInfo'>Canon CameraInfo</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#PictureInfo'>Canon PictureInfo</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#FileInfo'>Canon FileInfo</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#Processing'>Canon Processing</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#ColorBalance'>Canon ColorBalance</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#Flags'>Canon Flags</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#ModifiedInfo'>Canon ModifiedInfo</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#PreviewImageInfo'>Canon PreviewImageInfo</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#SensorInfo'>Canon SensorInfo</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#ColorBalance1'>Canon ColorBalance1</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#ColorBalance2'>Canon ColorBalance2</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#ColorBalance3'>Canon ColorBalance3</a>
-<br>&nbsp; &nbsp; <a href='Canon.html#ColorInfo'>Canon ColorInfo</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions5D'>CanonCustom Functions5D</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions10D'>CanonCustom Functions10D</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions20D'>CanonCustom Functions20D</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions30D'>CanonCustom Functions30D</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions350D'>CanonCustom Functions350D</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#Functions400D'>CanonCustom Functions400D</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#FuncsUnknown'>CanonCustom FuncsUnknown</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#PersonalFuncs'>CanonCustom PersonalFuncs</a>
-<br>&nbsp; &nbsp; <a href='CanonCustom.html#PersonalFuncValues'>CanonCustom PersonalFuncValues</a>
-<br><a href='Casio.html'>Casio</a>
-<br>&nbsp; &nbsp; <a href='Casio.html#Type2'>Casio Type2</a>
-<br><a href='PrintIM.html'>PrintIM</a>
-<br><a href='FujiFilm.html'>FujiFilm</a>
-<br><a href='JVC.html'>JVC</a>
-<br>&nbsp; &nbsp; <a href='JVC.html#Text'>JVC Text</a>
-<br><a href='Kodak.html'>Kodak</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Type2'>Kodak Type2</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Type3'>Kodak Type3</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Type4'>Kodak Type4</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Type5'>Kodak Type5</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Type6'>Kodak Type6</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Unknown'>Kodak Unknown</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Meta'>Kodak Meta</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#SpecialEffects'>Kodak SpecialEffects</a>
-<br>&nbsp; &nbsp; <a href='Kodak.html#Borders'>Kodak Borders</a>
-<br><a href='Unknown.html'>Unknown</a>
-<br><a href='Minolta.html'>Minolta</a>
-<br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings</a>
-<br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings7D'>Minolta CameraSettings7D</a>
-<br>&nbsp; &nbsp; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D</a>
-</td><td>
-<a href='Olympus.html'>Olympus</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#TextInfo'>Olympus TextInfo</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#Equipment'>Olympus Equipment</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#CameraSettings'>Olympus CameraSettings</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#RawDevelopment'>Olympus RawDevelopment</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#ImageProcessing'>Olympus ImageProcessing</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#FocusInfo'>Olympus FocusInfo</a>
-<br>&nbsp; &nbsp; <a href='Olympus.html#RawInfo'>Olympus RawInfo</a>
-<br><a href='Nikon.html'>Nikon</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#PreviewImage'>Nikon PreviewImage</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#AFInfo'>Nikon AFInfo</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance1'>Nikon ColorBalance1</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#ColorBalance3'>Nikon ColorBalance3</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#LensData00'>Nikon LensData00</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#LensData01'>Nikon LensData01</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#CaptureOffsets'>Nikon CaptureOffsets</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#Type2'>Nikon Type2</a>
-<br>&nbsp; &nbsp; <a href='Nikon.html#MOV'>Nikon MOV</a>
-<br><a href='NikonCapture.html'>NikonCapture</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#CropData'>NikonCapture CropData</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#RedEyeData'>NikonCapture RedEyeData</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#Brightness'>NikonCapture Brightness</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#DLightingHQ'>NikonCapture DLightingHQ</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#NoiseReduction'>NikonCapture NoiseReduction</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#PhotoEffects'>NikonCapture PhotoEffects</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#ColorBoost'>NikonCapture ColorBoost</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#WBAdjData'>NikonCapture WBAdjData</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#DLightingHS'>NikonCapture DLightingHS</a>
-<br>&nbsp; &nbsp; <a href='NikonCapture.html#UnsharpData'>NikonCapture UnsharpData</a>
-<br><a href='Pentax.html'>Pentax</a>
-<br>&nbsp; &nbsp; <a href='Pentax.html#MOV'>Pentax MOV</a>
-<br><a href='Panasonic.html'>Panasonic</a>
-<br>&nbsp; &nbsp; <a href='Panasonic.html#Type2'>Panasonic Type2</a>
-<br>&nbsp; &nbsp; <a href='Panasonic.html#Raw'>Panasonic Raw</a>
-<br><a href='Ricoh.html'>Ricoh</a>
-<br>&nbsp; &nbsp; <a href='Ricoh.html#ImageInfo'>Ricoh ImageInfo</a>
-<br>&nbsp; &nbsp; <a href='Ricoh.html#Subdir'>Ricoh Subdir</a>
-<br>&nbsp; &nbsp; <a href='Ricoh.html#Text'>Ricoh Text</a>
-<br><a href='Sanyo.html'>Sanyo</a>
-<br>&nbsp; &nbsp; <a href='Sanyo.html#MOV'>Sanyo MOV</a>
-<br>&nbsp; &nbsp; <a href='Sanyo.html#MP4'>Sanyo MP4</a>
-<br><a href='Sigma.html'>Sigma</a>
-<br><a href='Sony.html'>Sony</a>
-<br>&nbsp; &nbsp; <a href='Sony.html#SRF'>Sony SRF</a>
-<br>&nbsp; &nbsp; <a href='Sony.html#SR2Private'>Sony SR2Private</a>
-<br>&nbsp; &nbsp; <a href='Sony.html#SR2SubIFD'>Sony SR2SubIFD</a>
-<br>&nbsp; &nbsp; <a href='Sony.html#SR2DataIFD'>Sony SR2DataIFD</a>
-<br><a href='DNG.html'>DNG</a>
-<br>&nbsp; &nbsp; <a href='DNG.html#MakerNotes'>DNG MakerNotes</a>
-<br>&nbsp; &nbsp; <a href='DNG.html#OriginalRaw'>DNG OriginalRaw</a>
-<br><a href='CanonRaw.html'>CanonRaw</a>
-<br>&nbsp; &nbsp; <a href='CanonRaw.html#MakeModel'>CanonRaw MakeModel</a>
-<br>&nbsp; &nbsp; <a href='CanonRaw.html#RawJpgInfo'>CanonRaw RawJpgInfo</a>
-<br>&nbsp; &nbsp; <a href='CanonRaw.html#ImageFormat'>CanonRaw ImageFormat</a>
-<br>&nbsp; &nbsp; <a href='CanonRaw.html#TimeStamp'>CanonRaw TimeStamp</a>
-<br>&nbsp; &nbsp; <a href='CanonRaw.html#ImageInfo'>CanonRaw ImageInfo</a>
-<br>&nbsp; &nbsp; <a href='CanonRaw.html#FlashInfo'>CanonRaw FlashInfo</a>
-<br>&nbsp; &nbsp; <a href='CanonRaw.html#ExposureInfo'>CanonRaw ExposureInfo</a>
-<br><a href='KyoceraRaw.html'>KyoceraRaw</a>
-<br><a href='MinoltaRaw.html'>MinoltaRaw</a>
-<br>&nbsp; &nbsp; <a href='MinoltaRaw.html#PRD'>MinoltaRaw PRD</a>
-<br>&nbsp; &nbsp; <a href='MinoltaRaw.html#RIF'>MinoltaRaw RIF</a>
-<br>&nbsp; &nbsp; <a href='MinoltaRaw.html#WBG'>MinoltaRaw WBG</a>
-<br><a href='SigmaRaw.html'>SigmaRaw</a>
-<br>&nbsp; &nbsp; <a href='SigmaRaw.html#Header'>SigmaRaw Header</a>
-<br>&nbsp; &nbsp; <a href='SigmaRaw.html#HeaderExt'>SigmaRaw HeaderExt</a>
-<br>&nbsp; &nbsp; <a href='SigmaRaw.html#Properties'>SigmaRaw Properties</a>
-<br><a href='GeoTiff.html'>GeoTiff</a>
-<br><a href='JFIF.html'>JFIF</a>
-<br>&nbsp; &nbsp; <a href='JFIF.html#Extension'>JFIF Extension</a>
-<br><a href='Jpeg2000.html'>Jpeg2000</a>
-<br>&nbsp; &nbsp; <a href='Jpeg2000.html#ImageHeader'>Jpeg2000 ImageHeader</a>
-<br>&nbsp; &nbsp; <a href='Jpeg2000.html#CaptureResolution'>Jpeg2000 CaptureResolution</a>
-<br>&nbsp; &nbsp; <a href='Jpeg2000.html#DisplayResolution'>Jpeg2000 DisplayResolution</a>
-<br><a href='BMP.html'>BMP</a>
-<br><a href='PICT.html'>PICT</a>
-<br><a href='PNG.html'>PNG</a>
-<br>&nbsp; &nbsp; <a href='PNG.html#ImageHeader'>PNG ImageHeader</a>
-<br>&nbsp; &nbsp; <a href='PNG.html#PrimaryChromaticities'>PNG PrimaryChromaticities</a>
-<br>&nbsp; &nbsp; <a href='PNG.html#TextualData'>PNG TextualData</a>
-<br>&nbsp; &nbsp; <a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel</a>
-<br><a href='MNG.html'>MNG</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#Background'>MNG Background</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#BasisObject'>MNG BasisObject</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#ClipObjects'>MNG ClipObjects</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#CloneObject'>MNG CloneObject</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#DefineObject'>MNG DefineObject</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#DeltaPNGHeader'>MNG DeltaPNGHeader</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#JNGHeader'>MNG JNGHeader</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#Loop'>MNG Loop</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#MagnifyObject'>MNG MagnifyObject</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#MNGHeader'>MNG MNGHeader</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#MoveObjects'>MNG MoveObjects</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#PasteImage'>MNG PasteImage</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#PromoteParent'>MNG PromoteParent</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#ShowObjects'>MNG ShowObjects</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#TerminationAction'>MNG TerminationAction</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#ExportImage'>MNG ExportImage</a>
-<br>&nbsp; &nbsp; <a href='MNG.html#FramePriority'>MNG FramePriority</a>
-<br><a href='MIFF.html'>MIFF</a>
-<br><a href='PDF.html'>PDF</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#Info'>PDF Info</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#Root'>PDF Root</a>
-</td><td>
-&nbsp; &nbsp; <a href='PDF.html#Metadata'>PDF Metadata</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#Pages'>PDF Pages</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#Kids'>PDF Kids</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#PieceInfo'>PDF PieceInfo</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#AdobePhotoshop'>PDF AdobePhotoshop</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#Private'>PDF Private</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#ImageResources'>PDF ImageResources</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#Resources'>PDF Resources</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#ColorSpace'>PDF ColorSpace</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#DefaultRGB'>PDF DefaultRGB</a>
-<br>&nbsp; &nbsp; <a href='PDF.html#ICCBased'>PDF ICCBased</a>
-<br><a href='PostScript.html'>PostScript</a>
-<br><a href='DICOM.html'>DICOM</a>
-<br><a href='ID3.html'>ID3</a>
-<br>&nbsp; &nbsp; <a href='ID3.html#v1'>ID3 v1</a>
-<br>&nbsp; &nbsp; <a href='ID3.html#v2_2'>ID3 v2_2</a>
-<br>&nbsp; &nbsp; <a href='ID3.html#v2_3'>ID3 v2_3</a>
-<br>&nbsp; &nbsp; <a href='ID3.html#v2_4'>ID3 v2_4</a>
-<br><a href='MPEG.html'>MPEG</a>
-<br>&nbsp; &nbsp; <a href='MPEG.html#Audio'>MPEG Audio</a>
-<br>&nbsp; &nbsp; <a href='MPEG.html#Video'>MPEG Video</a>
-<br><a href='Flash.html'>Flash</a>
-<br><a href='Real.html'>Real</a>
-<br>&nbsp; &nbsp; <a href='Real.html#Media'>Real Media</a>
-<br>&nbsp; &nbsp; <a href='Real.html#ContentDescr'>Real ContentDescr</a>
-<br>&nbsp; &nbsp; <a href='Real.html#MediaProps'>Real MediaProps</a>
-<br>&nbsp; &nbsp; <a href='Real.html#FileInfo'>Real FileInfo</a>
-<br>&nbsp; &nbsp; <a href='Real.html#Properties'>Real Properties</a>
-<br>&nbsp; &nbsp; <a href='Real.html#Metadata'>Real Metadata</a>
-<br>&nbsp; &nbsp; <a href='Real.html#Audio'>Real Audio</a>
-<br>&nbsp; &nbsp; <a href='Real.html#AudioV3'>Real AudioV3</a>
-<br>&nbsp; &nbsp; <a href='Real.html#AudioV4'>Real AudioV4</a>
-<br>&nbsp; &nbsp; <a href='Real.html#AudioV5'>Real AudioV5</a>
-<br>&nbsp; &nbsp; <a href='Real.html#Metafile'>Real Metafile</a>
-<br><a href='RIFF.html'>RIFF</a>
-<br>&nbsp; &nbsp; <a href='RIFF.html#Info'>RIFF Info</a>
-<br>&nbsp; &nbsp; <a href='RIFF.html#Exif'>RIFF Exif</a>
-<br>&nbsp; &nbsp; <a href='RIFF.html#Hdrl'>RIFF Hdrl</a>
-<br>&nbsp; &nbsp; <a href='RIFF.html#Stream'>RIFF Stream</a>
-<br>&nbsp; &nbsp; <a href='RIFF.html#StreamHeader'>RIFF StreamHeader</a>
-<br>&nbsp; &nbsp; <a href='RIFF.html#AVIHeader'>RIFF AVIHeader</a>
-<br>&nbsp; &nbsp; <a href='RIFF.html#Format'>RIFF Format</a>
-<br><a href='AIFF.html'>AIFF</a>
-<br>&nbsp; &nbsp; <a href='AIFF.html#Common'>AIFF Common</a>
-<br>&nbsp; &nbsp; <a href='AIFF.html#Comment'>AIFF Comment</a>
-<br>&nbsp; &nbsp; <a href='AIFF.html#FormatVers'>AIFF FormatVers</a>
-<br><a href='ASF.html'>ASF</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#Header'>ASF Header</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#ContentBranding'>ASF ContentBranding</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#HeaderExtension'>ASF HeaderExtension</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#Metadata'>ASF Metadata</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#ContentDescr'>ASF ContentDescr</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#CodecList'>ASF CodecList</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#FileProperties'>ASF FileProperties</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#StreamProperties'>ASF StreamProperties</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#ExtendedDescr'>ASF ExtendedDescr</a>
-<br>&nbsp; &nbsp; <a href='ASF.html#Preview'>ASF Preview</a>
-<br><a href='QuickTime.html'>QuickTime</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#Movie'>QuickTime Movie</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#MovieHdr'>QuickTime MovieHdr</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#Track'>QuickTime Track</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#Media'>QuickTime Media</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#Minf'>QuickTime Minf</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#Stbl'>QuickTime Stbl</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#TrackHdr'>QuickTime TrackHdr</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#UserData'>QuickTime UserData</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#Video'>QuickTime Video</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#Preview'>QuickTime Preview</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#ImageFile'>QuickTime ImageFile</a>
-<br>&nbsp; &nbsp; <a href='QuickTime.html#ImageDesc'>QuickTime ImageDesc</a>
-<br><a href='FlashPix.html'>FlashPix</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#CompObj'>FlashPix CompObj</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#AudioInfo'>FlashPix AudioInfo</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#DataObject'>FlashPix DataObject</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#Extensions'>FlashPix Extensions</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#GlobalInfo'>FlashPix GlobalInfo</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#Image'>FlashPix Image</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#ImageInfo'>FlashPix ImageInfo</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#Operation'>FlashPix Operation</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#SummaryInfo'>FlashPix SummaryInfo</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#Transform'>FlashPix Transform</a>
-<br>&nbsp; &nbsp; <a href='FlashPix.html#SubimageHeader'>FlashPix SubimageHeader</a>
-<br><a href='APP12.html'>APP12</a>
-<br><a href='APP14.html'>APP14</a>
-<br><a href='AFCP.html'>AFCP</a>
-<br><a href='MIE.html'>MIE</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Meta'>MIE Meta</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Audio'>MIE Audio</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Camera'>MIE Camera</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Extender'>MIE Extender</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Flash'>MIE Flash</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Lens'>MIE Lens</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Doc'>MIE Doc</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Geo'>MIE Geo</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Image'>MIE Image</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#MakerNotes'>MIE MakerNotes</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Unknown'>MIE Unknown</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Preview'>MIE Preview</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Thumbnail'>MIE Thumbnail</a>
-<br>&nbsp; &nbsp; <a href='MIE.html#Video'>MIE Video</a>
-<br><a href='Extra.html'>Extra</a>
-<br><a href='Composite.html'>Composite</a>
-<br><a href='Shortcuts.html'>Shortcuts</a>
-</td></tr></table></td></tr></table></blockquote>
-
 <p><a href='../index.html'>&lt;-- Back to ExifTool Home Page</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 20, 2006</i>
+<br><i>Last revised Nov 17, 2006</i>
 </body>
 </html>

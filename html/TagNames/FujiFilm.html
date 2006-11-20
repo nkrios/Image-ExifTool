@@ -6,7 +6,7 @@
 <h2>FujiFilm Tags</h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -14,11 +14,17 @@
 <td align='center'>undef</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0010</td>
+<td>InternalSerialNumber</td>
+<td align='center'>string</td>
+<td><font size='-1'><font color="#666666">(this number is unique, and contains the date of manufacture, but doesn&#39;t
+necessarily correspond to the camera body number -- this needs to be checked)</font></font></td></tr>
+<tr valign='top'>
 <td>0x1000</td>
 <td>Quality</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1001</td>
 <td>Sharpness</td>
 <td align='center'>int16u</td>
@@ -27,7 +33,7 @@
   <br>3 = Normal
   <br>4 = Hard
   <br>5 = Hard2</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1002</td>
 <td>WhiteBalance</td>
 <td align='center'>int16u</td>
@@ -39,7 +45,7 @@
   <br>0x302 = White Fluorescent
   <br>0x400 = Incandescent
   <br>0xf00 = Custom</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1003</td>
 <td>Saturation</td>
 <td align='center'>int16u</td>
@@ -47,14 +53,14 @@
   <br>0x100 = High
   <br>0x200 = Low
   <br>0x300 = None (B&amp;W)</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1004</td>
 <td>Contrast</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0x0 = Normal
   <br>0x100 = High
   <br>0x200 = Low</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1010</td>
 <td>FujiFlashMode</td>
 <td align='center'>int16u</td>
@@ -62,35 +68,35 @@
   <br>1 = On
   <br>2 = Off
   <br>3 = Red-eye reduction</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1011</td>
 <td>FlashStrength</td>
 <td align='center'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1020</td>
 <td>Macro</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1021</td>
 <td>FocusMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Auto
   <br>1 = Manual</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1023</td>
 <td>FocusPixel</td>
 <td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1030</td>
 <td>SlowSync</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1031</td>
 <td>PictureMode</td>
 <td align='center'>int16u</td>
@@ -115,50 +121,50 @@
   <br>0x100 = Aperture-priority AE
   <br>0x200 = Shutter speed priority AE
   <br>0x300 = Manual</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1100</td>
 <td>AutoBracketing</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On
   <br>2 = No flash &amp; flash</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1101</td>
 <td>SequenceNumber</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1210</td>
 <td>ColorMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0x0 = Standard
   <br>0x10 = Chrome
   <br>0x30 = B &amp; W</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1300</td>
 <td>BlurWarning</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = None
   <br>1 = Blur Warning</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1301</td>
 <td>FocusWarning</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Good
   <br>1 = Out of focus</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1302</td>
 <td>ExposureWarning</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Good
   <br>1 = Bad exposure</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1400</td>
 <td>DynamicRange</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>1 = Standard
   <br>3 = Wide</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1401</td>
 <td>FilmMode</td>
 <td align='center'>int16u</td>
@@ -167,7 +173,7 @@
   <br>0x200 = F2/Fujichrome
   <br>0x300 = F3/Studio Portrait Ex
   <br>0x400 = F4/Velvia</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1402</td>
 <td>DynamicRangeSetting</td>
 <td align='center'>int16u</td>
@@ -177,42 +183,42 @@
   <br>0x200 = Wide1 (230%)
   <br>0x201 = Wide2 (400%)
   <br>0x8000 = Film Simulation Mode</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1403</td>
 <td>DevelopmentDynamicRange</td>
-<td align='center'>Y</td>
+<td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1404</td>
 <td>MinFocalLength</td>
 <td align='center'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1405</td>
 <td>MaxFocalLength</td>
 <td align='center'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x1406</td>
 <td>MaxApertureAtMinFocal</td>
 <td align='center'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x1407</td>
 <td>MaxApertureAtMaxFocal</td>
 <td align='center'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8000</td>
 <td>FileSource</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x8002</td>
 <td>OrderNumber</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x8003</td>
 <td>FrameNumber</td>
 <td align='center'>int16u</td>
@@ -222,6 +228,6 @@
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 5, 2006</i>
+<br><i>Last revised Oct 31, 2006</i>
 </body>
 </html>

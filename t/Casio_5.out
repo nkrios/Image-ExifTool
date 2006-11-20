@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.49
 [File, File, Image]  - File Name: Casio_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1683 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:07:06 12:31:58
+[File, File, Time]  - File Modification Date/Time: 2006:10:20 09:52:01
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -34,7 +34,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2048
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1536
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
@@ -57,7 +57,7 @@
 [MakerNotes, Casio, Image] 3 - Preview Image Length: 26
 [MakerNotes, Casio, Image] 4 - Preview Image Start: 1408
 [MakerNotes, Casio, Camera] 8192 - Preview Image: (Binary data 26 bytes)
-[MakerNotes, Casio, Camera] 8193 - Casio Type 2 0x2001: 0302
+[MakerNotes, Casio, Camera] 8193 - Firmware Date: 2003:02:28 09:45
 [MakerNotes, Casio, Camera] 8194 - Casio Type 2 0x2002: 
 [MakerNotes, Casio, Camera] 8195 - Casio Type 2 0x2003: 
 [MakerNotes, Casio, Camera] 8209 - White Balance Bias: 87 93

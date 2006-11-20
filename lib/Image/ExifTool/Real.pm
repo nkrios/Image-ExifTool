@@ -358,11 +358,10 @@ sub ProcessSerialData($$$)
     my $size = $$dirInfo{DirLen};
     my $base = $$dirInfo{Base} || 0;
     my $verbose = $exifTool->Options('Verbose');
-    my $unknown = $exifTool->Options('Unknown');
     my $dataPos = $$dirInfo{DataPos} || 0;
 
     # temporarily set Unknown option so GetTagInfo() will return unknown tags
-    $exifTool->Options(Unknown => 1);
+    my $unknown = $exifTool->Options(Unknown => 1);
 
     $verbose and $exifTool->VerboseDir('SerialData', undef, $size);
 
@@ -373,7 +372,8 @@ sub ProcessSerialData($$$)
     my $pos = 0;
     for ($index=0; $$tagTablePtr{$index} and $pos <= $size; ++$index) {
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $index) or last;
-        last unless $tagInfo eq $$tagTablePtr{$index};  # don't add unknown tags
+        # don't process tags that fail a condition
+        last unless $tagInfo eq $$tagTablePtr{$index};
         my $format = $$tagInfo{Format};
         my $count = 1;
         if ($format) {

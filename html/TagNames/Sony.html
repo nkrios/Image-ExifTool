@@ -12,7 +12,7 @@ tags.
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0e00</td>
@@ -20,10 +20,42 @@ tags.
 <td align='center'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td>0xb020</td>
-<td>ColorModeSetting</td>
+<td>0xb021</td>
+<td>ColorTemperature</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>0xb023</td>
+<td>SceneMode</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Manual (P,A,S or M)
+  <br>1 = Portrait
+  <br>4 = Sunset
+  <br>5 = Sports
+  <br>6 = Landscape
+  <br>8 = Macro
+  <br>16 = Auto
+  <br>17 = Night Portrait</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xb024</td>
+<td>ZoneMatching</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = ISO Setting Used
+  <br>1 = High Key
+  <br>2 = Low Key</font></td></tr>
+<tr valign='top'>
+<td>0xb025</td>
+<td>DynamicRangeOptimizer</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Off
+  <br>1 = Standard
+  <br>2 = Advanced</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xb026</td>
+<td>ImageStabilization</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
 <tr valign='top'>
 <td>0xb027</td>
 <td>LensID</td>
@@ -56,14 +88,14 @@ tags.
   <br>28 = Minolta AF 100mm F2.8 Macro (D)
   <br>29 = Minolta AF 75-300mm F4.5-5.6 (D)
   <br>30 = Minolta AF 28-80mm F3.5-5.6 (D)
-  <br>31 = Minolta AF 50mm F2.8 Macro(D)
+  <br>31 = Minolta AF 50mm F2.8 Macro (D) or AF 50mm F3.5 Macro
   <br>32 = Minolta AF 300mm F2.8 G
   <br>33 = Minolta AF 70-200mm F2.8 G (D) SSM
   <br>35 = Minolta AF 85mm F1.4 G (D) Limited
   <br>36 = Minolta AF 28-100mm F3.5-5.6 (D)
   <br>38 = KonicaMinolta AF 17-35mm F2.8-4 (D)
   <br>39 = Minolta AF 28-75mm F2.8 (D)
-  <br>40 = KonicaMinolta AF DT 18-70mm F3.5-5.6 (D)
+  <br>40 = KonicaMinolta or Sony AF DT 18-70mm F3.5-5.6 (D)
   <br>41 = Minolta AF DT 11-18mm F4.5-5.6 (D)
   <br>42 = Minolta AF DT 18-200mm F3.5-6.3 (D)
   <br>43 = Minolta AF 35mm F1.4 G
@@ -132,28 +164,53 @@ tags.
   <br>2667 = Minolta AF 35mm F2 New
   <br>2668 = Minolta AF 28mm F2 New
   <br>2672 = Minolta AF 24-105mm F3.5-4.5 (D)
-  <br>4574 = AF 200mm F2.8 G x2</font></td></tr>
+  <br>4574 = Minolta AF 200mm F2.8 G x2</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>0xb028</td>
 <td>MinoltaMakerNote</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='Minolta.html'>Minolta Tags</a></td></tr>
 <tr valign='top'>
+<td>0xb029</td>
+<td>ColorMode</td>
+<td align='center'>int32u</td>
+<td><font size='-1'>0 = Standard
+  <br>1 = Vivid
+  <br>2 = Portrait
+  <br>3 = Landscape
+  <br>4 = Sunset
+  <br>5 = Night Scene
+  <br>6 = B&amp;W
+  <br>7 = Adobe RGB</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0xb040</td>
 <td>Macro</td>
 <td align='center'>N</td>
 <td><font size='-1'>0 = Off
   <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0xb041</td>
 <td>ExposureMode</td>
 <td align='center'>N</td>
 <td><font size='-1'>0 = Auto
+  <br>5 = Landscape
   <br>6 = Program
   <br>7 = Aperture Priority
   <br>8 = Shutter Priority
   <br>9 = Night Scene
   <br>15 = Manual</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0xb047</td>
+<td>Quality</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Normal
+  <br>1 = Fine</font></td></tr>
+<tr valign='top'>
+<td>0xb04e</td>
+<td>LongExposureNoiseReduction</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SRF'>Sony SRF Tags</a></h2>
@@ -163,7 +220,7 @@ while SRF6 uses standard EXIF tags.  All information other than SRF0 is
 encrypted, but thanks to Dave Coffin the decryption algorithm is known.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -182,7 +239,7 @@ The SR2 format uses the DNGPrivateData tag to reference a private IFD
 containing these tags.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x7200</td>
@@ -205,7 +262,7 @@ containing these tags.
 Tags in the encrypted SR2SubIFD
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x7303</td>
@@ -232,7 +289,7 @@ Tags in the encrypted SR2SubIFD
 <h2><a name='SR2DataIFD'>Sony SR2DataIFD Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x7770</td>
@@ -244,6 +301,6 @@ Tags in the encrypted SR2SubIFD
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 21, 2006</i>
+<br><i>Last revised Nov 17, 2006</i>
 </body>
 </html>

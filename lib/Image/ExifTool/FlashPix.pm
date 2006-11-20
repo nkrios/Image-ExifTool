@@ -114,15 +114,14 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         The FlashPix file format, introduced in 1996, was developed by Kodak,
         Hewlett-Packard and Microsoft.  Internally the FPX file structure mimics
         that of an old DOS disk with fixed-sized "sectors" (usually 512 bytes) and a
-        "file allocation table" (FAT).  The format never became popular and is no
-        longer supported by many applications.
+        "file allocation table" (FAT).  No wonder the format never became popular.
 
         However, some of the structures used in FlashPix streams are part of the
-        EXIF specification, and are still being used in the FPXR APP2 segment of
+        EXIF specification, and are still being used in the APP2 FPXR segment of
         JPEG images by some Kodak and Hewlett-Packard digital cameras.
 
-        ExifTool extracts FlashPix information from both FPX images and the FPXR
-        APP2 segment of JPEG images.
+        ExifTool extracts FlashPix information from both FPX images and the APP2
+        FPXR segment of JPEG images.
     },
     "\x05SummaryInformation" => {
         Name => 'SummaryInfo',
@@ -223,7 +222,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         The Dictionary, CodePage and LocalIndicator tags are common to all FlashPix
         property tables, even though they are only listed in the SummaryInfo table.
     },
-    0x00 => { Name => 'Dictionary', Groups => { 2 => 'Other' }, ValueConv => '\$val' },
+    0x00 => { Name => 'Dictionary', Groups => { 2 => 'Other' }, Binary => 1 },
     0x01 => { Name => 'CodePage', Groups => { 2 => 'Other' } },
     0x02 => 'Title',
     0x03 => 'Subject',
@@ -240,7 +239,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x0e => 'PageCount',
     0x0f => 'WordCount',
     0x10 => 'CharCount',
-    0x11 => { Name => 'ThumbnailClip', ValueConv => '\$val' },
+    0x11 => { Name => 'ThumbnailClip', Binary => 1 },
     0x12 => 'Software',
     0x13 => 'Security',
     0x80000000 => { Name => 'LocaleIndicator', Groups => { 2 => 'Other' } },
@@ -523,7 +522,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     },
     0x02000005 => 'DecimationPrefilterWidth',
     0x02000007 => 'SubimageICC_Profile',
-    0x03000001 => { Name => 'JPEGTables', ValueConv => '\$val' },
+    0x03000001 => { Name => 'JPEGTables', Binary => 1 },
     0x03000002 => 'MaxJPEGTableIndex',
 );
 
@@ -673,16 +672,16 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         Require => {
             0 => 'ScreenNail',
         },
+        Binary => 1,
         RawConv => q{
             return undef unless $val[0] =~ /\xff\xd8\xff/g;
             return substr($val[0], pos($val[0])-3);
         },
-        ValueConv => '\$val',
     },
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::FlashPix::Composite');
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::FlashPix::Composite);
 
 #------------------------------------------------------------------------------
 # Read FlashPix value
@@ -1022,7 +1021,7 @@ sub ProcessFPXR($$$)
             my $len = length $$obj{Stream};
             if ($len >= $$obj{Size}) {
                 if ($verbose) {
-                    $exifTool->VPrint(0, "  + [FXPR stream, Contents index $index, $len bytes]\n");
+                    $exifTool->VPrint(0, "  + [FPXR stream, Contents index $index, $len bytes]\n");
                 }
                 if ($len > $$obj{Size}) {
                     $exifTool->Warn('Extra data in FPXR segment (truncated)');
@@ -1290,7 +1289,7 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains routines required by Image::ExifTool to extract
-FlashPix meta information from FPX images, and from the FPXR APP2 segment of
+FlashPix meta information from FPX images, and from the APP2 FPXR segment of
 JPEG images.
 
 =head1 AUTHOR

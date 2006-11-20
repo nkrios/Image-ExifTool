@@ -7,7 +7,7 @@
 These tags are used by Ricoh Caplio camera models.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
@@ -128,7 +128,7 @@ These tags are used by Ricoh Caplio camera models.
 <h2><a name='Subdir'>Ricoh Subdir Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0004</td>
@@ -149,7 +149,7 @@ format used by the Caplio models.  Below is a list of known tags in this
 information.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'Bg'</td>
@@ -178,9 +178,68 @@ information.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='RMETA'>Ricoh RMETA Tags</a></h2>
+The Ricoh Caplio Pro G3 has the ability to add custom fields to the APP5
+&quot;RMETA&quot; segment of JPEG images.  While only a few observed tags have been
+defined below, ExifTool will extract any information found here.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'Azimuth'</td>
+<td>Azimuth</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = N
+  <br>2 = NNE
+  <br>3 = NE
+  <br>4 = ENE
+  <br>5 = E
+  <br>6 = ESE
+  <br>7 = SE
+  <br>8 = SSE
+  <br>9 = S
+  <br>10 = SSW
+  <br>11 = SW
+  <br>12 = WSW
+  <br>13 = W
+  <br>14 = WNW
+  <br>15 = NW
+  <br>16 = NNW</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Condition'</td>
+<td>Condition</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = Good
+  <br>2 = Fair
+  <br>3 = Poor
+  <br>4 = Damaged</font></td></tr>
+<tr valign='top'>
+<td>'Lit'</td>
+<td>Lit</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = Yes
+  <br>2 = No</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'Location'</td>
+<td>Location</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = Verge
+  <br>2 = Gantry
+  <br>3 = Central reservation
+  <br>4 = Roundabout</font></td></tr>
+<tr valign='top'>
+<td>'Sign type'</td>
+<td>SignType</td>
+<td align='center'>N</td>
+<td><font size='-1'>1 = Directional
+  <br>2 = Warning
+  <br>3 = Information</font></td></tr>
+</table></td></tr></table></blockquote>
+
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 5, 2006</i>
+<br><i>Last revised Oct 31, 2006</i>
 </body>
 </html>

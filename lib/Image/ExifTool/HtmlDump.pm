@@ -11,7 +11,7 @@ package Image::ExifTool::HtmlDump;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.07';
 
 sub DumpTable($$$;$$$$);
 sub Open($$$;@);
@@ -131,23 +131,30 @@ sub new
     local $_;
     my $that = shift;
     my $class = ref($that) || $that || 'Image::ExifTool::HtmlDump';
-    return bless { Block => {} }, $class;
+    return bless { Block => {}, TipNum => 0 }, $class;
 }
 
 #------------------------------------------------------------------------------
 # Add information to dump
 # Inputs: 0) HTML dump hash ref, 1) absolute offset in file, 2) data size,
-#         3) comment string, 4) tool tip, 5) bit flags (see below)
+#         3) comment string, 4) tool tip (or SAME to use previous tip),
+#         5) bit flags (see below)
 # Bits: 0x01 - print at start of line
 #       0x02 - print red address
 #       0x04 - make red background
 #       0x08 - limit block length
+# Notes: Block will be shown in 'unused' color if comment string begins with '['
 sub Add($$$$;$$)
 {
-    my ($self, $start, $size, $msg, $tip, $flag) = @_;
+    my ($self, $start, $size, $msg, $tip, $flag, $sameTip) = @_;
     my $block = $$self{Block};
     $$block{$start} or $$block{$start} = [ ];
-    push @{$$block{$start}}, [ $size, $msg, $tip, $flag ];
+    if ($tip and $tip eq 'SAME') {
+        $tip = '';
+    } else {
+        ++$self->{TipNum};
+    }
+    push @{$$block{$start}}, [ $size, $msg, $tip, $flag, $self->{TipNum} ];
 }
 
 #------------------------------------------------------------------------------
@@ -191,7 +198,7 @@ sub Print($$;$$$$$)
     $bkgStart = $bkgEnd = 0;
     $bkgSpan = '';
     my $index = 0;  # numerical index corresponding to 'AA'
-    my %names;
+    my @names;
     for ($i=0; $i<@starts; ++$i) {
         my $start = $starts[$i];
         my $bytes = $start - $pos;
@@ -205,30 +212,22 @@ sub Print($$;$$$$$)
             my $str = ($bytes > 1) ? "unused $bytes bytes" : 'pad byte';
             $self->DumpTable($pos-$dataPos, \$buff, "[$str]", "t$index", 0x108);
             ++$index;
+            $pos = $start;  # dumped unused data up to the start of this block
         }
         my $parms;
         my $parmList = $$block{$start};
         foreach $parms (@$parmList) {
-            my ($len, $msg, $tip, $flag) = @$parms;
+            my ($len, $msg, $tip, $flag, $tipNum) = @$parms;
             next unless $len > 0;
             $flag = 0 unless defined $flag;
-            my ($word) = split ' ', $msg;
             # generate same name for all blocks starting with the same message word
-            my $name;
+            my $name = $names[$tipNum];
             my $idx = $index;
-            if ($word and $word =~ /_\d{2}$/) {
-                $name = $names{$word};
-                if ($name) {
-                    # get index from existing ID
-                    $idx = substr($name, 1);
-                } else {
-                    $name = $names{$word} = "t$index";
-                    ++$index;
-                }
-                # change the "value" message to shorten it a bit
-                $msg =~ s/^$word // if $msg =~ / value$/;
+            if ($name) {
+                # get index from existing ID
+                $idx = substr($name, 1);
             } else {
-                $name = "t$index";
+                $name = $names[$tipNum] = "t$index";
                 ++$index;
             }
             if ($flag == 4) {

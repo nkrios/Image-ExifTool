@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         ID3.pm
 #
-# Description:  Read ID3 meta information from MP3 audio files
+# Description:  Read ID3 meta information
 #
 # Revisions:    09/12/2005 - P. Harvey Created
 #
@@ -15,16 +15,27 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 sub ProcessID3v2($$$);
+
+# audio formats that we process after an ID3v2 header (in order)
+my @audioFormats = qw(APE MPC FLAC Ogg MP3);
+
+# audio formats where the processing proc is in a different module
+my %audioModule = (
+    MP3 => 'ID3',
+    Ogg => 'Vorbis',
+);
+
+my %warnedOnce;     # hash of warnings we issued
 
 # This table is just for documentation purposes
 %Image::ExifTool::ID3::Main = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData, # (not really)
     NOTES => q{
-        ID3 information is found in different types of audio files, most notably MP3
-        files.
+        ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE and
+        RealAudio files.
     },
     ID3v1 => {
         Name => 'ID3v1',
@@ -229,7 +240,7 @@ ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
     IPL => 'InvolvedPeople',
     PIC => {
         Name => 'Picture',
-        ValueConv => '\$val',
+        Binary => 1,
     },
   # POP => 'Popularimeter',
     TAL => 'Album',
@@ -287,7 +298,7 @@ ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
 my %id3v2_common = (
     APIC => {
         Name => 'Picture',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     COMM => 'Comment',
   # OWNE => 'Ownership', # enc(1), _price, 00, _date(8), Seller
@@ -446,52 +457,121 @@ sub DecodeString($$)
 }
 
 #------------------------------------------------------------------------------
+# Issue one warning of each type
+# Inputs: 0) ExifTool object reference, 1) warning
+sub WarnOnce($$)
+{
+    my ($exifTool, $warn) = @_;
+    unless ($warnedOnce{$warn}) {
+        $warnedOnce{$warn} = 1;
+        $exifTool->Warn($warn);
+    }
+}
+#------------------------------------------------------------------------------
 # Process ID3v2 information
 # Inputs: 0) ExifTool object reference, 1) directory information reference
 #         2) tag table reference
 sub ProcessID3v2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $dataPt = $$dirInfo{DataPt};
-    my $offset = $$dirInfo{DirStart};
-    my $size = $$dirInfo{DirLen};
-    my $vers = $$dirInfo{Version};
+    my $dataPt  = $$dirInfo{DataPt};
+    my $offset  = $$dirInfo{DirStart};
+    my $size    = $$dirInfo{DirLen};
+    my $vers    = $$dirInfo{Version};
     my $verbose = $exifTool->Options('Verbose');
-    my ($id, $len, $flags, $hi);
+    my $len;    # frame data length
 
     $verbose and $exifTool->VerboseDir($tagTablePtr->{GROUPS}->{1}, 0, $size);
+    undef %warnedOnce;
 
     for (;;$offset+=$len) {
-        if ($vers >= 0x0300) {
-            # version 2.3/2.4 frame header is 10 bytes
-            last if $offset + 10 > $size;
-            ($id, $len, $flags) = unpack("x${offset}a4Nn",$$dataPt);
-            last if $id eq "\0\0\0\0";
-            $offset += 10;
-        } else {
+        my ($id, $flags, $hi);
+        if ($vers < 0x0300) {
             # version 2.2 frame header is 6 bytes
             last if $offset + 6 > $size;
             ($id, $hi, $len) = unpack("x${offset}a3Cn",$$dataPt);
             last if $id eq "\0\0\0";
             $len += $hi << 16;
             $offset += 6;
+        } else {
+            # version 2.3/2.4 frame header is 10 bytes
+            last if $offset + 10 > $size;
+            ($id, $len, $flags) = unpack("x${offset}a4Nn",$$dataPt);
+            last if $id eq "\0\0\0\0";
+            $offset += 10;
         }
         last if $offset + $len > $size;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $id);
-        if ($verbose) {
-            $exifTool->VerboseInfo($id, $tagInfo,
-                Table  => $tagTablePtr,
-                Value  => substr($$dataPt, $offset, $len),
-                DataPt => $dataPt,
-                Size   => $len,
-                Start  => $offset,
-            );
+        next unless $tagInfo or $verbose;
+
+        # decode v2.3 and v2.4 flags
+        my %flags;
+        if ($flags) {
+            if ($vers < 0x0400) {
+                # version 2.3 flags
+                $flags & 0x80 and $flags{Compress} = 1;
+                $flags & 0x40 and $flags{Encrypt}  = 1;
+                $flags & 0x20 and $flags{GroupID}  = 1;
+            } else {
+                # version 2.4 flags
+                $flags & 0x40 and $flags{GroupID}  = 1;
+                $flags & 0x08 and $flags{Compress} = 1;
+                $flags & 0x04 and $flags{Encrypt}  = 1;
+                $flags & 0x02 and $flags{Unsync}   = 1;
+                $flags & 0x01 and $flags{DataLen}  = 1;
+            }
         }
+        if ($flags{Encrypt}) {
+            WarnOnce($exifTool, 'Encrypted frames currently not supported');
+            next;
+        }
+        # extract the value
+        my $val = substr($$dataPt, $offset, $len);
+
+        # handle the flags
+        if ($flags{Unsync}) {
+            # reverse the unsynchronization
+            $val =~ s/\xff\x00/\xff/g;
+        }
+        if ($flags{GroupID}) {
+            length($val) >= 1 or $exifTool->Warn("Short $id frame"), next;
+            # ignore the grouping identity byte
+            $val = substr($val, 1);
+        }
+        if ($flags{DataLen} or $flags{Compress}) {
+            length($val) >= 4 or $exifTool->Warn("Short $id frame"), next;
+            # ignore data length word
+            $val = substr($val, 4);
+        }
+        if ($flags{Compress}) {
+            if (eval 'require Compress::Zlib') {
+                my $inflate = Compress::Zlib::inflateInit();
+                my ($buff, $stat);
+                $inflate and ($buff, $stat) = $inflate->inflate($val);
+                if ($inflate and $stat == Compress::Zlib::Z_STREAM_END()) {
+                    $val = $buff;
+                } else {
+                    $exifTool->Warn("Error inflating $id frame");
+                    next;
+                }
+            } else {
+                WarnOnce($exifTool,'Install Compress::Zlib to decode compressed frames');
+                next;
+            }
+        }
+        $verbose and $exifTool->VerboseInfo($id, $tagInfo,
+            Table   => $tagTablePtr,
+            Value   => $val,
+            DataPt  => $dataPt,
+            DataPos => $$dirInfo{DataPos},
+            Size    => $len,
+            Start   => $offset,
+        );
         next unless $tagInfo;
 #
 # decode data in this frame
 #
-        my $val = substr($$dataPt, $offset, $len);
+        my $valLen = length($val);  # actual value length (after decompression, etc)
         if ($id =~ /^T[^X]/ or $id =~ /^(IPL|IPLS)$/) {
             $val = DecodeString($exifTool, $val);
         } elsif ($id =~ /^(TXX|TXXX|WXX|WXXX)$/) {
@@ -499,25 +579,25 @@ sub ProcessID3v2($$$)
             foreach (0..1) { $vals[$_] = '' unless defined $vals[$_]; }
             ($val = "($vals[0]) $vals[1]") =~ s/^\(\) //;
         } elsif ($id =~ /^(COM|COMM|ULT|USLT)$/) {
-            $len > 4 or $exifTool->Warn("Short $id frame"), next;
+            $valLen > 4 or $exifTool->Warn("Short $id frame"), next;
             substr($val, 1, 3) = '';    # remove language code
             my @vals = DecodeString($exifTool, $val);
             foreach (0..1) { $vals[$_] = '' unless defined $vals[$_]; }
             ($val = "($vals[0]) $vals[1]") =~ s/^\(\) //;
         } elsif ($id eq 'USER') {
-            $len > 4 or $exifTool->Warn('Short USER frame'), next;
+            $valLen > 4 or $exifTool->Warn('Short USER frame'), next;
             substr($val, 1, 3) = '';    # remove language code
             $val = DecodeString($exifTool, $val);
         } elsif ($id =~ /^(CNT|PCNT)$/) {
-            $len >= 4 or $exifTool->Warn("Short $id frame"), next;
+            $valLen >= 4 or $exifTool->Warn("Short $id frame"), next;
             my $cnt = unpack('N', $val);
             my $i;
-            for ($i=4; $i<$len; ++$i) {
+            for ($i=4; $i<$valLen; ++$i) {
                 $cnt = $cnt * 256 + unpack("x${i}C", $val);
             }
             $val = $cnt;
         } elsif ($id =~ /^(PIC|APIC)$/) {
-            $len >= 4 or $exifTool->Warn("Short $id frame"), next;
+            $valLen >= 4 or $exifTool->Warn("Short $id frame"), next;
             my $enc = unpack('C', $val);
             my $hdr = ($id eq 'PIC') ? '.{5}.*?\0' : '..*?\0..*?\0';
             # remove header (encoding, image format or MIME type, picture type, description)
@@ -529,67 +609,80 @@ sub ProcessID3v2($$$)
         }
         $exifTool->FoundTag($tagInfo, $val);
     }
+    undef %warnedOnce;
 }
 
 #------------------------------------------------------------------------------
 # Extract ID3 information from an audio file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this file didn't contain ID3 information
+# - also processes audio data if any ID3 information was found
+# - sets ExifTool DONE_ID3 to 1 when called, or to 2 if an ID3v1 trailer exists
 sub ProcessID3($$)
 {
     my ($exifTool, $dirInfo) = @_;
+    
+    return 0 if $exifTool->{DONE_ID3};  # avoid infinite recursion
+    $exifTool->{DONE_ID3} = 1;
+
     # allow this to be called with either RAF or DataPt
     my $raf = $$dirInfo{RAF} || new File::RandomAccess($$dirInfo{DataPt});
-    my $buff;
+    my ($buff, %id3Header, %id3Trailer, $hBuff, $tBuff, $tBuffPos, $tagTablePtr);
     my $rtnVal = 0;
+    my $hdrEnd = 0;
 
     # read first 3 bytes of file
+    $raf->Seek(0, 0);
     return 0 unless $raf->Read($buff, 3) == 3;
 #
-# look for ID3v2 header
+# identify ID3v2 header
 #
-    if ($buff =~ /^ID3/) {
-        # set file type if not done already
-        $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
+    while ($buff =~ /^ID3/) {
         $rtnVal = 1;
-        $raf->Read($buff, 7) == 7 or $exifTool->Warn('Short ID3 header'), return 1;
-        my ($vers, $flags, $size) = unpack('nCN', $buff);
-        $size & 0x80808080 and $exifTool->Warn('Invalid ID3 header'), return 1;
+        $raf->Read($hBuff, 7) == 7 or $exifTool->Warn('Short ID3 header'), last;
+        my ($vers, $flags, $size) = unpack('nCN', $hBuff);
+        $size & 0x80808080 and $exifTool->Warn('Invalid ID3 header'), last;
         my $verStr = sprintf("2.%d.%d", $vers >> 8, $vers & 0xff);
-        $exifTool->VPrint(0, "ID3v$verStr:\n");
         if ($vers >= 0x0500) {
             $exifTool->Warn("Unsupported ID3 version: $verStr");
-            return 1;
+            last;
         }
         $size =  ($size & 0x0000007f) |
                 (($size & 0x00007f00) >> 1) |
                 (($size & 0x007f0000) >> 2) |
                 (($size & 0x7f000000) >> 3);
-        unless ($raf->Read($buff, $size) == $size) {
+        unless ($raf->Read($hBuff, $size) == $size) {
             $exifTool->Warn('Truncated ID3 data');
-            return 1;
+            last;
         }
         if ($flags & 0x80) {
             # reverse the unsynchronization
-            $buff =~ s/\xff\x00/\xff/g;
+            $hBuff =~ s/\xff\x00/\xff/g;
         }
+        my $pos = 10;
         if ($flags & 0x40) {
             # skip the extended header
-            $size >= 4 or $exifTool->Warn('Bad ID3 extended header'), return 1;
-            my $len = unpack('N', $buff);
-            if ($len > length($buff) - 4) {
+            $size >= 4 or $exifTool->Warn('Bad ID3 extended header'), last;
+            my $len = unpack('N', $hBuff);
+            if ($len > length($hBuff) - 4) {
                 $exifTool->Warn('Truncated ID3 extended header');
-                return 1;
+                last;
             }
-            $buff = substr($buff, $len + 4);
+            $hBuff = substr($hBuff, $len + 4);
+            $pos += $len + 4;
         }
-        my %dirInfo = (
-            DataPt => \$buff,
+        if ($flags & 0x10) {
+            # ignore v2.4 footer (10 bytes long)
+            $raf->Seek(10, 1);
+        }
+        %id3Header = (
+            DataPt   => \$hBuff,
+            DataPos  => $pos,
             DirStart => 0,
-            DirLen => length($buff),
-            Version => $vers,
+            DirLen   => length($hBuff),
+            Version  => $vers,
+            DirName  => "ID3v$verStr",
         );
-        my $tagTablePtr;
         if ($vers >= 0x0400) {
             $tagTablePtr = GetTagTable('Image::ExifTool::ID3::v2_4');
         } elsif ($vers >= 0x0300) {
@@ -597,42 +690,65 @@ sub ProcessID3($$)
         } else {
             $tagTablePtr = GetTagTable('Image::ExifTool::ID3::v2_2');
         }
-        $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
-    } else {
-        $raf->Seek(0, 0);
+        $hdrEnd = $raf->Tell();
+        last;
     }
 #
-# extract information from first audio/video frame headers
-# (if one is found in the first 256 bytes)
+# read ID3v1 trailer if it exists
 #
-    if ($raf->Read($buff, 256)) {
-        require Image::ExifTool::MPEG;
-        if ($buff =~ /\0\0\x01(\xb3|\xc0)/) {
-            # look for A/V headers in first 64kB
-            my $buf2;
-            $raf->Read($buf2, 65280) and $buff .= $buf2;
-            $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudioVideo($exifTool, \$buff) > 0;
-        } else {
-            # look for audio frame sync in first 256 bytes
-            $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudio($exifTool, \$buff) > 0;
+    if ($raf->Seek(-128, 2) and $raf->Read($tBuff, 128) == 128 and $tBuff =~ /^TAG/) {
+        $exifTool->{DONE_ID3} = 2;  # set to 2 as flag that trailer exists
+        %id3Trailer = (
+            DataPt   => \$tBuff,
+            DataPos  => $raf->Tell() - 128,
+            DirStart => 0,
+            DirLen   => length($tBuff),
+        );
+        $rtnVal = 1;
+    }
+#
+# process the the information
+#
+    if ($rtnVal) {
+        # first process audio data if it exists
+        if ($$dirInfo{RAF}) {
+            my $type = $exifTool->{FILE_TYPE};  # save file type
+            # check current file type first
+            my @types = grep /^$type$/, @audioFormats;
+            push @types, grep(!/^$type$/, @audioFormats);
+            my $oldType = $exifTool->{FILE_TYPE};
+            foreach $type (@types) {
+                # seek to end of ID3 header
+                $raf->Seek($hdrEnd, 0);
+                # set type for this file if we are successful
+                $exifTool->{FILE_TYPE} = $type;
+                my $module = $audioModule{$type} || $type;
+                require "Image/ExifTool/$module.pm" or next;
+                my $func = "Image::ExifTool::${module}::Process$type";
+                # process the file
+                no strict 'refs';
+                &$func($exifTool, $dirInfo) and last;
+                use strict 'refs';
+            }
+            $exifTool->{FILE_TYPE} = $type;     # restore original file type
+        }
+        # set file type to MP3 if we didn't find audio data
+        $exifTool->SetFileType('MP3') unless $exifTool->{VALUE}->{FileType};
+        # process ID3v2 header if it exists
+        if (%id3Header) {
+            $exifTool->VPrint(0, "$id3Header{DirName}:\n");
+            $exifTool->ProcessDirectory(\%id3Header, $tagTablePtr);
+        }
+        # process ID3v1 trailer if it exists
+        if (%id3Trailer) {
+            $exifTool->VPrint(0, "ID3v1:\n");
+            SetByteOrder('MM');
+            $tagTablePtr = GetTagTable('Image::ExifTool::ID3::v1');
+            $exifTool->ProcessDirectory(\%id3Trailer, $tagTablePtr);
         }
     }
-#
-# look for ID3v1 trailer
-#
-    if ($raf->Seek(-128, 2) and $raf->Read($buff, 128) == 128 and $buff =~ /^TAG/) {
-        $rtnVal or $exifTool->SetFileType();
-        $rtnVal = 1;
-        $exifTool->VPrint(0, "ID3v1:\n");
-        SetByteOrder('MM');
-        my %dirInfo = (
-            DataPt => \$buff,
-            DirStart => 0,
-            DirLen => length($buff),
-        );
-        my $tagTablePtr = GetTagTable('Image::ExifTool::ID3::v1');
-        $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
-    }
+    # return file pointer to start of file to read audio data if necessary
+    $raf->Seek(0, 0);
     return $rtnVal;
 }
 
@@ -644,17 +760,31 @@ sub ProcessMP3($$)
 {
     my ($exifTool, $dirInfo) = @_;
 
-    return 1 if ProcessID3($exifTool, $dirInfo);
+    # must first check for leading/trailing ID3 information
+    unless ($exifTool->{DONE_ID3}) {
+        require Image::ExifTool::ID3;
+        Image::ExifTool::ID3::ProcessID3($exifTool, $dirInfo) and return 1;
+    }
     my $raf = $$dirInfo{RAF};
-    return 0 unless $raf->Seek(0, 0);   # rewind file
+    my $rtnVal = 0;
     my $buff;
-    # see if this could be an MP3 file
-    return 0 unless $raf->Read($buff, 2) == 2;
-    # could be an MP3 file if it starts with 0xfff*
-    my $word = unpack('n', $buff);
-    return 0 unless ($word & 0xfff0) == 0xfff0;
-    $exifTool->SetFileType();
-    return 1;
+#
+# extract information from first audio/video frame headers
+# (if found in the first 256 bytes)
+#
+    if ($raf->Read($buff, 256)) {
+        require Image::ExifTool::MPEG;
+        if ($buff =~ /\0\0\x01(\xb3|\xc0)/) {
+            # look for A/V headers in first 64kB
+            my $buf2;
+            $raf->Read($buf2, 65280) and $buff .= $buf2;
+            $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudioVideo($exifTool, \$buff);
+        } else {
+            # look for audio frame sync in first 256 bytes
+            $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudio($exifTool, \$buff);
+        }
+    }
+    return $rtnVal;
 }
 
 1;  # end
@@ -663,7 +793,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::ID3 - Read ID3 meta information from MP3 audio files
+Image::ExifTool::ID3 - Read ID3 meta information
 
 =head1 SYNOPSIS
 

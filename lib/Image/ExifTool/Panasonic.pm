@@ -12,6 +12,7 @@
 #               5) CPAN forum post by 'hardloaf' (http://www.cpanforum.com/threads/2183)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
 #               7) http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm
+#               8) Marcel Coenen private communication (DMC-FZ50)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Panasonic;
@@ -20,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessPanasonicType2($$$);
 
@@ -127,7 +128,7 @@ sub ProcessPanasonicType2($$$);
     0x21 => { #2
         Name => 'DataDump',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x23 => {
         Name => 'WhiteBalanceBias',
@@ -245,6 +246,12 @@ sub ProcessPanasonicType2($$$);
         },
     },
     # 0x33 - RedModeBirthday? (ref 7)
+    0x36 => { #8
+        Name => 'TravelDay',
+        Writable => 'int16u',
+        PrintConv => '$val == 65535 ? "n/a" : $val',
+        PrintConvInv => '$val =~ /(\d+)/ ? $1 : $val',
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -370,7 +377,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Tels for the information he provided on decoding some tags.
+Thanks to Tels for the information he provided on decoding some tags, and to
+Marcel Coenen for decoding the TravelDay tag.
 
 =head1 SEE ALSO
 

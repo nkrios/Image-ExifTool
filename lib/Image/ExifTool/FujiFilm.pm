@@ -17,7 +17,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.09';
+$VERSION = '1.11';
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -28,9 +28,24 @@ $VERSION = '1.09';
         Name => 'Version',
         Writable => 'undef',
     },
+    0x0010 => { #PH (how does this compare to actual serial number?)
+        Name => 'InternalSerialNumber',
+        Writable => 'string',
+        Notes => q{
+            this number is unique, and contains the date of manufacture, but doesn't
+            necessarily correspond to the camera body number -- this needs to be checked
+        },
+        # ie) "FPX20017035 592D31313034060427796060110384"
+        #                              yymmdd
+        PrintConv => q{
+            return $val unless $val=~/^(.{24})(\d{2})(\d{2})(\d{2})(.*)/;
+            my $yr = $2 + ($2 < 70 ? 2000 : 1900);
+            return "$1 $yr:$3:$4 $5";
+        },
+        PrintConvInv => '$_=$val; s/ (19|20)(\d{2}):(\d{2}):(\d{2}) /$2$3$4/; $_',
+    },
     0x1000 => {
         Name => 'Quality',
-        Description => 'Image Quality',
         Writable => 'string',
     },
     0x1001 => {
@@ -236,34 +251,37 @@ $VERSION = '1.09';
             0x8000 => 'Film Simulation Mode',
         },
     },
-    0x1403 => 'DevelopmentDynamicRange', #2
+    0x1403 => { #2
+        Name => 'DevelopmentDynamicRange',
+        Writable => 'int16u',
+    },
     0x1404 => { #2
         Name => 'MinFocalLength',
-        Format => 'rational64s',
+        Writable => 'rational64s',
     },
     0x1405 => { #2
         Name => 'MaxFocalLength',
-        Format => 'rational64s',
+        Writable => 'rational64s',
     },
     0x1406 => { #2
         Name => 'MaxApertureAtMinFocal',
-        Format => 'rational64s',
+        Writable => 'rational64s',
     },
     0x1407 => { #2
         Name => 'MaxApertureAtMaxFocal',
-        Format => 'rational64s',
+        Writable => 'rational64s',
     },
     0x8000 => { #2
         Name => 'FileSource',
-        Format => 'string',
+        Writable => 'string',
     },
     0x8002 => { #2
         Name => 'OrderNumber',
-        Format => 'int32u',
+        Writable => 'int32u',
     },
     0x8003 => { #2
         Name => 'FrameNumber',
-        Format => 'int16u',
+        Writable => 'int16u',
     },
 );
 

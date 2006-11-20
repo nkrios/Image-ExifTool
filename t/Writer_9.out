@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.41
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: Writer_9_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 9 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:39:21
+[File, File, Time]  - File Modification Date/Time: 2006:10:16 12:04:41
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -39,10 +39,8 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 160
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 120
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: THM
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
-[EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
-[EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3443.946
 [EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3442.017
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
@@ -60,11 +58,11 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 300
 [EXIF, IFD1, Image] 283 - Y Resolution: 300
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2412
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2388
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
-[MakerNotes, Canon, Camera] 3 - Image Quality: RAW
+[MakerNotes, Canon, Camera] 3 - Quality: RAW
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
 [MakerNotes, Canon, Camera] 7 - Focus Mode: Manual Focus
@@ -198,9 +196,9 @@
 [Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
 [Composite, Composite, Camera]  - Blue Balance: 1.190619
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
-[Composite, Composite, Image]  - EV: 5.6
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 52.7mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 4.26 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+[Composite, Composite, Image]  - Light Value: 5.6
 [Composite, Composite, Camera]  - Red Balance: 2.067348

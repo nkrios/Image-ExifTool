@@ -24,7 +24,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.26';
+$VERSION = '1.30';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -60,7 +60,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x0081 => {
         Name => 'PreviewImageData',
-        ValueConv => '\$val',
+        Binary => 1,
         Writable => 0,
     },
     0x0088 => {
@@ -82,8 +82,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ThumbnailImage',
         Writable => 'undef',
         WriteCheck => '$self->CheckImage(\$val)',
-        ValueConv => '\$val',
-        ValueConvInv => '$val',
+        Binary => 1,
     },
     0x0101 => {
         Name => 'ColorMode',
@@ -147,7 +146,6 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x0201 => {
         Name => 'Quality',
-        Description => 'Image Quality',
         Writable => 'int16u',
         Notes => q{
             Quality values are decoded based on the CameraType tag. All types
@@ -241,12 +239,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'string',
     },
     0x0280 => { #PH
-        Name => 'PreviewImage',
-        Notes => 'Epson ERF preview image',
+        %Image::ExifTool::previewImageTagInfo,
+        Notes => 'found in ERF and JPG images from some Epson models',
         Format => 'undef',
         Writable => 'int8u',
-        ValueConv => '$self->ValidateImage(\$val,"PreviewImage")',
-        ValueConvInv => '$val',
     },
     0x0300 => { #6
         Name => 'PreCaptureFrames',
@@ -276,12 +272,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x0f00 => {
         Name => 'DataDump',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x0f01 => { #6
         Name => 'DataDump2',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x1000 => { #6
         Name => 'ShutterSpeedValue',
@@ -587,9 +583,9 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 %Image::ExifTool::Olympus::TextInfo = (
     PROCESS_PROC => \&Image::ExifTool::APP12::ProcessAPP12,
     NOTES => q{
-This information is in text format (similar to APP12 information, but with
-spaces instead of linefeeds).  Below are tags which have been observed, but
-any information found here will be extracted, even if the tag is not listed.
+        This information is in text format (similar to APP12 information, but with
+        spaces instead of linefeeds).  Below are tags which have been observed, but
+        any information found here will be extracted, even if the tag is not listed.
     },
     GROUPS => { 0 => 'MakerNotes', 1 => 'Olympus', 2 => 'Image' },
     Resolution => { },
@@ -1304,6 +1300,7 @@ any information found here will be extracted, even if the tag is not listed.
     # 0x301 Related to inverse of focus distance
     0x305 => { #4
         Name => 'FocusDistance',
+        Writable => 'rational64u',
         # this rational value looks like it is in mm when the denominator is
         # 1 (E-1), and cm when denominator is 10 (E-300), so if we ignore the
         # denominator we are consistently in mm - PH
@@ -1395,6 +1392,7 @@ any information found here will be extracted, even if the tag is not listed.
     0x600 => 'BlackLevel2',
     0x601 => {
         Name => 'YCbCrCoefficients',
+        Notes => 'stored as int16u[6], but extracted as rational32u[3]',
         Format => 'rational32u',
     },
     0x611 => 'ValidPixelDepth',
@@ -1458,7 +1456,7 @@ any information found here will be extracted, even if the tag is not listed.
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::Olympus::Composite');
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Olympus::Composite);
 
 
 #------------------------------------------------------------------------------
@@ -1535,9 +1533,14 @@ sub PrintLensInfo($$)
     );
     my $make = $make{$info[0]} || "Unknown Make ($info[0])";
     my $str = "$info[0] $info[2]";
-    my $model = $model{$type}->{"$str $info[3]"} || $model{$type}->{$str} || "Unknown Model ($str)";
     my $rel = $release{$info[3]};
-    $rel = " Unknown Release ($info[3])" unless defined $rel;
+    my $model = $model{$type}->{"$str $info[3]"};
+    if ($model) {
+        $rel = '';  # don't print release if it is used to differentiate models
+    } else {
+        $rel = " Unknown Release ($info[3])" unless defined $rel;
+        $model = $model{$type}->{$str} || "Unknown Model ($str)";
+    }
     return "$make $model$rel";
 }
 

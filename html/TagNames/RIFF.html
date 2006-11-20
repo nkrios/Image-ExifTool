@@ -9,7 +9,7 @@ in two types of RIFF <code>LIST</code> chunks: <code>INFO</code> and <code>exif<
 information about the audio content is extracted from the <code>fmt </code> chunk.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'LIST_INFO'</td>
@@ -28,15 +28,15 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <td>--&gt; <a href='RIFF.html#Hdrl'>RIFF Hdrl Tags</a></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>'fmt '</td>
-<td>Format</td>
+<td>AudioFormat</td>
 <td align='center'>-</td>
-<td>--&gt; <a href='RIFF.html#Format'>RIFF Format Tags</a></td></tr>
+<td>--&gt; <a href='RIFF.html#AudioFormat'>RIFF AudioFormat Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Info'>RIFF Info Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'IARL'</td>
@@ -158,7 +158,7 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <h2><a name='Exif'>RIFF Exif Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'ecor'</td>
@@ -200,7 +200,7 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <h2><a name='Hdrl'>RIFF Hdrl Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'IDIT'</td>
@@ -227,8 +227,20 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <h2><a name='Stream'>RIFF Stream Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'strd'</td>
+<td>StreamData</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='RIFF.html#StreamData'>RIFF StreamData Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'strf'</td>
+<td>AudioFormat
+  <br>VideoFormat</td>
+<td align='center'>-<br>-</td>
+<td>--&gt; <a href='RIFF.html#AudioFormat'>RIFF AudioFormat Tags</a>
+  <br>--&gt; <a href='BMP.html'>BMP Tags</a></td></tr>
 <tr valign='top'>
 <td>'strh'</td>
 <td>StreamHeader</td>
@@ -237,6 +249,186 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <tr bgcolor='#ffeebb' valign='top'>
 <td>'strn'</td>
 <td>StreamName</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='StreamData'>RIFF StreamData Tags</a></h2>
+This chunk contains EXIF information in FujiFilm F30 AVI files.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'AVIF'</td>
+<td>AVIF</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AudioFormat'>RIFF AudioFormat Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>Encoding</td>
+<td align='center'>N</td>
+<td><font size='-1'>0x1 = Microsoft PCM
+  <br>0x2 = Microsoft ADPCM
+  <br>0x3 = Microsoft IEEE float
+  <br>0x4 = Compaq VSELP
+  <br>0x5 = IBM CVSD
+  <br>0x6 = Microsoft a-Law
+  <br>0x7 = Microsoft u-Law
+  <br>0x8 = Microsoft DTS
+  <br>0x9 = DRM
+  <br>0xa = WMA 9 Speech
+  <br>0x10 = OKI-ADPCM
+  <br>0x11 = Intel IMA/DVI-ADPCM
+  <br>0x12 = Videologic Mediaspace ADPCM
+  <br>0x13 = Sierra ADPCM
+  <br>0x14 = Antex G.723 ADPCM
+  <br>0x15 = DSP Solutions DIGISTD
+  <br>0x16 = DSP Solutions DIGIFIX
+  <br>0x17 = Dialoic OKI ADPCM
+  <br>0x18 = Media Vision ADPCM
+  <br>0x19 = HP CU
+  <br>0x20 = Yamaha ADPCM
+  <br>0x21 = SONARC Speech Compression
+  <br>0x22 = DSP Group True Speech
+  <br>0x23 = Echo Speech Corp.
+  <br>0x24 = Virtual Music Audiofile AF36
+  <br>0x25 = Audio Processing Tech.
+  <br>0x26 = Virtual Music Audiofile AF10
+  <br>0x27 = Aculab Prosody 1612
+  <br>0x28 = Merging Tech. LRC
+  <br>0x30 = Dolby AC2
+  <br>0x31 = Microsoft GSM610
+  <br>0x32 = MSN Audio
+  <br>0x33 = Antex ADPCME
+  <br>0x34 = Control Resources VQLPC
+  <br>0x35 = DSP Solutions DIGIREAL
+  <br>0x36 = DSP Solutions DIGIADPCM
+  <br>0x37 = Control Resources CR10
+  <br>0x38 = Natural MicroSystems VBX ADPCM
+  <br>0x39 = Crystal Semiconductor IMA ADPCM
+  <br>0x3a = Echo Speech ECHOSC3
+  <br>0x3b = Rockwell ADPCM
+  <br>0x3c = Rockwell DIGITALK
+  <br>0x3d = Xebec Multimedia
+  <br>0x40 = Antex G.721 ADPCM
+  <br>0x41 = Antex G.728 CELP
+  <br>0x42 = Microsoft MSG723
+  <br>0x45 = ITU-T G.726
+  <br>0x50 = Microsoft MPEG
+  <br>0x51 = RT23 or PAC
+  <br>0x52 = InSoft RT24
+  <br>0x53 = InSoft PAC
+  <br>0x55 = MP3
+  <br>0x59 = Cirrus
+  <br>0x60 = Cirrus Logic
+  <br>0x61 = ESS Tech. PCM
+  <br>0x62 = Voxware Inc.
+  <br>0x63 = Canopus ATRAC
+  <br>0x64 = APICOM G.726 ADPCM
+  <br>0x65 = APICOM G.722 ADPCM
+  <br>0x66 = Microsoft DSAT
+  <br>0x67 = Micorsoft DSAT DISPLAY
+  <br>0x69 = Voxware Byte Aligned
+  <br>0x70 = Voxware AC8
+  <br>0x71 = Voxware AC10
+  <br>0x72 = Voxware AC16
+  <br>0x73 = Voxware AC20
+  <br>0x74 = Voxware MetaVoice
+  <br>0x75 = Voxware MetaSound
+  <br>0x76 = Voxware RT29HW
+  <br>0x77 = Voxware VR12
+  <br>0x78 = Voxware VR18
+  <br>0x79 = Voxware TQ40
+  <br>0x80 = Soundsoft
+  <br>0x81 = Voxware TQ60
+  <br>0x82 = Microsoft MSRT24
+  <br>0x83 = AT&amp;T G.729A
+  <br>0x84 = Motion Pixels MVI MV12
+  <br>0x85 = DataFusion G.726
+  <br>0x86 = DataFusion GSM610
+  <br>0x88 = Iterated Systems Audio
+  <br>0x89 = Onlive
+  <br>0x91 = Siemens SBC24
+  <br>0x92 = Sonic Foundry Dolby AC3 APDIF
+  <br>0x93 = MediaSonic G.723
+  <br>0x94 = Aculab Prosody 8kbps
+  <br>0x97 = ZyXEL ADPCM
+  <br>0x98 = Philips LPCBB
+  <br>0x99 = Studer Professional Audio Packed
+  <br>0xa0 = Malden PhonyTalk
+  <br>0x100 = Rhetorex ADPCM
+  <br>0x101 = IBM u-Law
+  <br>0x102 = IBM a-Law
+  <br>0x103 = IBM ADPCM
+  <br>0x111 = Vivo G.723
+  <br>0x112 = Vivo Siren
+  <br>0x123 = Digital G.723
+  <br>0x125 = Sanyo LD ADPCM
+  <br>0x130 = Sipro Lab ACEPLNET
+  <br>0x131 = Sipro Lab ACELP4800
+  <br>0x132 = Sipro Lab ACELP8V3
+  <br>0x133 = Sipro Lab G.729
+  <br>0x134 = Sipro Lab G.729A
+  <br>0x135 = Sipro Lab Kelvin
+  <br>0x140 = Dictaphone G.726 ADPCM
+  <br>0x150 = Qualcomm PureVoice
+  <br>0x151 = Qualcomm HalfRate
+  <br>0x155 = Ring Zero Systems TUBGSM
+  <br>0x160 = Microsoft Audio1
+  <br>0x200 = Creative Labs ADPCM
+  <br>0x202 = Creative Labs FASTSPEECH8
+  <br>0x203 = Creative Labs FASTSPEECH10
+  <br>0x210 = UHER ADPCM
+  <br>0x220 = Quarterdeck Corp.
+  <br>0x230 = I-Link VC
+  <br>0x240 = Aureal Semiconductor Raw Sport
+  <br>0x250 = Interactive Products HSX
+  <br>0x251 = Interactive Products RPELP
+  <br>0x260 = Consistent CS2
+  <br>0x270 = Sony SCX
+  <br>0x300 = Fujitsu FM TOWNS SND
+  <br>0x400 = Brooktree Digital
+  <br>0x450 = QDesign Music
+  <br>0x680 = AT&amp;T VME VMPCM
+  <br>0x681 = AT&amp;T TCP
+  <br>0x1000 = Olivetti GSM
+  <br>0x1001 = Olivetti ADPCM
+  <br>0x1002 = Olivetti CELP
+  <br>0x1003 = Olivetti SBC
+  <br>0x1004 = Olivetti OPR
+  <br>0x1100 = Lernout &amp; Hauspie
+  <br>0x1400 = Norris Comm. Inc.
+  <br>0x1401 = ISIAudio
+  <br>0x1500 = AT&amp;T Soundspace Music Compression
+  <br>0x2000 = FAST Multimedia DVM
+  <br>0xfffe = Extensible
+  <br>0xffff = Development</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>NumChannels</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>2</td>
+<td>SampleRate</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>4</td>
+<td>AvgBytesPerSec</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>7</td>
+<td>BitsPerSample</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -257,6 +449,16 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>1</td>
 <td>Codec</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>10</td>
+<td>Quality</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>11</td>
+<td>SampleSize</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -298,72 +500,9 @@ information about the audio content is extracted from the <code>fmt </code> chun
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='Format'>RIFF Format Tags</a></h2>
-<blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
-<td>Encoding</td>
-<td align='center'>N</td>
-<td><font size='-1'>0x1 = PCM
-  <br>0x2 = ADPCM
-  <br>0x3 = IEEE float
-  <br>0x4 = VSELP
-  <br>0x5 = IBM CVSD
-  <br>0x6 = a-Law
-  <br>0x7 = u-Law
-  <br>0x8 = DTS
-  <br>0x9 = DRM
-  <br>0x10 = OKI-ADPCM
-  <br>0x11 = IMA-ADPCM
-  <br>0x12 = Mediaspace ADPCM
-  <br>0x13 = Sierra ADPCM
-  <br>0x14 = G723 ADPCM
-  <br>0x15 = DIGISTD
-  <br>0x16 = DIGIFIX
-  <br>0x30 = Dolby AC2
-  <br>0x31 = GSM610
-  <br>0x3b = Rockwell ADPCM
-  <br>0x3c = Rockwell DIGITALK
-  <br>0x40 = G721 ADPCM
-  <br>0x41 = G728 CELP
-  <br>0x50 = MPEG
-  <br>0x52 = RT24
-  <br>0x53 = PAC
-  <br>0x55 = MP3
-  <br>0x64 = G726 ADPCM
-  <br>0x65 = G722 ADPCM
-  <br>0x101 = IBM u-Law
-  <br>0x102 = IBM a-Law
-  <br>0x103 = IBM ADPCM
-  <br>0xffff = Development</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>1</td>
-<td>NumChannels</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>2</td>
-<td>SampleRate</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>4</td>
-<td>AvgBytesPerSec</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>7</td>
-<td>BitsPerSample</td>
-<td align='center'>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 24, 2006</i>
+<br><i>Last revised Oct 31, 2006</i>
 </body>
 </html>

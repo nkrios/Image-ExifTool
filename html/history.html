@@ -6,8 +6,210 @@
 <!-- Use line width of 80 -->
 <h1>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.42.tar.gz">Version 6.42</a>. (Other versions are
+<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.57.tar.gz">Version 6.57</a>. (Other versions are
 considered development releases, and are not uploaded to CPAN.)<p>
+
+<b>Nov. 19, 2006 - Version 6.57</b>
+<ul>
+<li>Missing tags in -p and redirection expressions are now set to an empty
+    string ('') by default, or a dash ('-') if the -f option is used
+<li>Added ability to use %f,%d,%e tokens in "-TAG<=FILE" argument
+<li>Added new Nikon LensID (thanks Werner Kober)
+<li>Set missing tags to '' instead of '-' in redirected
+<li>Changed name of LV tag to LightValue
+<li>Improved decoding of Sony DSLR-A100 maker notes
+<li>Attempted to clarify date/time shift documentation in Shift.pl
+<li>Fixed bug which could result in CanonVRD information not being recognized
+<li>Fixed bug in new SetResourceName feature of user-defined Photoshop tags
+<li>API Changes:
+    <ul>
+    <li>Added MissingTagValue option
+    </ul>
+</ul>
+
+<b>Nov. 15, 2006 - Version 6.56</b> - "Audio Update"
+<ul>
+<li>Added read support for a number of audio file formats: Ogg Vorbis,
+    Ogg FLAC, FLAC, APE (Monkey's Audio) and MPC (Musepack)
+<li>Improved parsing of ID3 v2.3 and v2.4 information
+<li>Added a number of new Pentax *istD tags (thanks Douglas O'Brien)
+<li>Added ability to print processed file names when writing (-v0 option)
+<li>Patched problem with makernotes offsets in Sanyo C4 images
+<li>Fixed problem that prevented some Olympus RAW files from being written
+<li>Fixed problem where XMP text could be improperly converted as a rational
+</ul>
+
+<b>Nov. 8, 2006 - Version 6.55</b>
+<ul>
+<li>Added read/write support for Canon VRD (Recipe Data) files and trailers
+<li>Changed name of CanonDPP module and group to CanonVRD
+</ul>
+
+<b>Nov. 3, 2006 - Version 6.54</b>
+<ul>
+<li>Added write support for ORF (Olympus RAW) images
+<li>Added Panasonic TravelDay tag (thanks Marcel Coenen)
+<li>Show Photoshop resource block names in verbose output, and preserve these
+    names when copying tags from file
+<li>Changed write format of Nikon WhiteBalanceFineTune from int16u to int16s
+    (thanks Giridhar Appaji Nag)
+<li>Allow Flags to be used in UserDefined tags
+<li>Added trailer signature to MIE format specification
+<li>Fixed problem with the -list and -listw options (dynamically loaded tags
+    weren't appearing in the list)
+</ul>
+
+<b>Nov. 1, 2006 - Version 6.53</b>
+<ul>
+<li>IMPORTANT: Fixed bug introduced in 6.51 which could result in a corrupted
+    image (!!) when rewriting TIFF-format files containing an unknown trailer
+    (this includes all TIFF-based RAW formats except CR2).  The good news is
+    that unknown trailers should be very uncommon, and nobody has reported any
+    problems yet, so with any luck I caught this before it affected anyone.  But
+    please update immediately to 6.53 if you downloaded 6.51 or 6.52.
+</ul>
+
+<b>Nov. 1, 2006 - Version 6.52</b>
+<ul>
+<li>Added read/write support for trailers in CRW images
+<li>Dropped historic support for obsolete -group# option
+</ul>
+
+<b>Oct. 31, 2006 - Version 6.51</b> - "Trailer Update"
+<ul>
+<li>Improved handling of trailers in JPEG and TIFF-format images:
+    <ul>
+    <li>Added read/write support for PhotoMechanic and FotoStation trailers
+    <li>Recognize and handle Canon DPP trailers
+    <li>Added AFCP trailer read/write support for TIFF (previously JPEG only)
+    <li>Added ability to read/write multiple trailers in the same image
+    <li>Trailers are now dumped with verbose and htmlDump options
+    <li>Trailers are now deleted when deleting all tags
+    <li>Added ability to delete trailers individually by group or altogether
+        with "-Trailer:all="
+    </ul>
+<li>Changed reading/writing XMP in PNG images to conform with XMP specification
+    (but continue to support the XMP profile format used previously)
+<li>Avoid writing duplicate XMP tags in less common namespaces
+<li>More consistent handling of unknown IPTC tags
+<li>Added -listd option to list deletable groups
+<li>IPTC time-only tags may now be set from date/time values (this already
+    worked for date-only tags)
+<li>Fixed problem rewriting international text (iTXt) chunks in PNG images
+<li>API Changes:
+    <ul>
+    <li>Added GetDeleteGroups() routine
+    </ul>
+</ul>
+
+<b>Oct. 26, 2006 - Version 6.50</b>
+<ul>
+<li>Changed name of new "-eval" option to "-if"
+<li>Added read support for PhotoStudio Unicode comment (thanks Dec Anisimov)
+<li>Recognize the "PHUT" Photoshop IRB resource type (thanks Dec Anisimov)
+<li>Extract PhotoshopBGRThumbnail image from Photoshop information
+<li>Write PNG compressed text for new tags when -z option is used
+<li>Added ability to write PNG:ModifyDate
+<li>Don't print Olympus LensType "release" if used to differentiate lenses
+<li>Changed TagName documentation to show actual format written instead of
+    format used to interpret the data (which differs only for a few odd tags)
+<li>Fixed bug in PNG writer which could cause duplicate tags to be written
+<li>Fixed minor problem in HtmlDump output
+<li>Fixed logic bug when writing XMP using += or -=
+</ul>
+
+<b>Oct. 21, 2006 - Version 6.49</b>
+<ul>
+<li>Added -eval option for conditional batch processing [changed to -if in 6.50]
+<li>Allow .ExifTool_config file to be placed in application directory
+<li>Decode copyright information from JPEG APP12 "Ducky" segment
+<li>Decode Casio FirmwareDate
+<li>Added IFD0 ProcessingSoftware tag (0x000b, written by ACD Systems)
+<li>Added print conversion for InteropIndex
+<li>Write InteropVersion automatically when creating a new InteropIFD
+<li>Made RelatedImageFileFormat writable
+<li>Protect all InteropIFD tags from being copied by default with -TagsFromFile
+<li>Renamed XMP ExifImageHeight to ExifImageLength (to correspond with EXIF tag)
+</ul>
+
+<b>Oct. 19, 2006 - Version 6.48</b>
+<ul>
+<li>Decode Minolta 7D FlashExposureComp (thanks Jeffery Small)
+<li>Decode InternalSerialNumber from newer FujiFilm models
+<li>Improved decoding of new Pentax PictureMode tag (thanks Doug O'Brien)
+<li>Updated CustomFunctions in Canon CRW images and recognize CIFF extension
+<li>Added a couple new Pentax LensType's (thanks Barney Garrett)
+<li>Changed "AdobeRGB" to "Adobe RGB" in all ColorSpace values for consistency
+<li>Fixed bug in recent update to extract large preview from Epson JPEG images
+<li>Fixed problem in -htmldump output introduced in 6.46
+<li>Various documentation improvements and updates
+</ul>
+
+<b>Oct. 15, 2006 - Version 6.47</b>
+<ul>
+<li>Decode JPEG APP6 "EPPIM" segment used in Toshiba images
+<li>Process PICT images to extract JPEG preview when -u option is used
+<li>Added OtherImage composite tag
+<li>Added PentaxModelID for K110D and a new K110D PictureMode tag
+<li>Fixed problem extracting CoverArt from some MP4 audio files
+<li>Fixed problem decoding Canon BulbDuration (affects Composite ShutterSpeed)
+<li>Fixed problem reading/writing large Epson preview image in R-D1 JPEG images
+    and allow large (>64kB) preview images for all make/models
+</ul>
+
+<b>Oct. 11, 2006 - Version 6.46</b>
+<ul>
+<li>The "-ext" option now overrides internal file selection rules
+<li>Expand filename wildcards on Windows command line (thanks Marjolein Katsma)
+<li>Enhanced warnings when copying information to a specific tag
+<li>Changed family 0 group name:  GPS-&gt;EXIF
+<li>Changed family 1 group names: APP12-&gt;PictureInfo,GraphicConverter-&gt;GraphConv
+<li>Added a couple of new Pentax LensType's
+<li>Added JPEG.pm module (mainly for documentation purposes)
+<li>Fixed bug when re-writing NEF files which caused new preview image written
+    by Nikon Capture 4.4.0 to be lost
+<li>Fixed bug which could cause problems if a user-defined composite tag is
+    created with the same name as an existing tag
+</ul>
+
+<b>Oct. 6, 2006 - Version 6.45</b>
+<ul>
+<li>Added ability to create JFIF segment
+<li>Decode information in JPEG APP8 "SPIFF", APP12 "Ducky", and APP15
+    GraphicConverter segments
+<li>Improved html dump feature to dump all JPEG APP segments
+<li>Decode maker notes in FujiFilm AVI videos
+<li>Changed name of Nikon AFMode tag to AFAreaMode (thanks Tobias Briseno)
+<li>Changed "Image Quality" description to "Quality"
+<li>Added option to allow the htmlDump base offset to be specified
+<li>Changed EV tag name to LV since this is technically more correct
+<li>Print warnings if syntax problems are found in .ExifTool_config file
+<li>Use HOMEDRIVE and HOMEPATH (Windows cmd shell environment variables) for
+    .ExifTool_config path if neither EXIFTOOL_HOME nor HOME are available
+<li>Fixed some problems which were causing failed tests when using ActivePerl
+<li>User-defined Composite tags now override composite tags of the same name
+<li>Added a few more PentaxModelID's (K10D, A20, M20, W20)
+</ul>
+
+<b>Oct. 2, 2006 - Version 6.44</b>
+<ul>
+<li>Now deletes all JPEG APP segments when deleting all information
+<li>Decode Ricoh APP5 RMETA information (custom fields in Caplio Pro G3 images)
+<li>Decode AVI Audio/Video stream headers
+<li>Recognize and preserve PhotoMechanic trailer when editing TIFF-based images
+<li>Added ability to delete JFIF, CIFF, Meta and FlashPix groups
+<li>Added ability to exclude groups when deleting all information
+<li>Added a number of new Canon, Nikon, Pentax, Sony and Minolta tags
+<li>Added description for GPSDOP tag (GPS Degree Of Precision)
+</ul>
+
+<b>Sept. 26, 2006 - Version 6.43</b>
+<ul>
+<li>Added read support for M4A audio files
+<li>Simplified and documented technique for adding user-defined Composite tags
+<li>Issue minor warning when a tag used in an expression doesn't exist, instead
+    of silently inserting a '-' (use -m option for previous behaviour)
+</ul>
 
 <b>Sept. 21, 2006 - Version 6.42</b> (production release)
 <ul>
@@ -15,7 +217,7 @@ considered development releases, and are not uploaded to CPAN.)<p>
 <li>Extract maker note information from Sanyo MOV and MP4 videos
 <li>Recognize ARW extension of Sony Alpha-100 RAW images
 <li>Improved extraction of PreviewImage from damaged Minolta images
-</u>
+</ul>
 
 <b>Sept. 18, 2006 - Version 6.41</b>
 <ul>

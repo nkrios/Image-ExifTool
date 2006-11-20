@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 %Image::ExifTool::Casio::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -42,7 +42,6 @@ $VERSION = '1.16';
     },
     0x0002 => {
         Name => 'Quality',
-        Description => 'Image Quality',
         Writable => 'int16u',
         PrintConv => { 1 => 'Economy', 2 => 'Normal', 3 => 'Fine' },
     },
@@ -377,6 +376,35 @@ $VERSION = '1.16';
         # (nasty that they double-reference the image!)
         %Image::ExifTool::previewImageTagInfo,
     },
+    0x2001 => { #PH
+        # I downloaded images from 12 different EX-Z50 cameras, and they showed
+        # only 3 distinct dates here (2004:08:31 18:55, 2004:09:13 14:14, and
+        # 2004:11:26 17:07), so I'm guessing this is a firmware version date - PH
+        Name => 'FirmwareDate',
+        Writable => 'string',
+        Format => 'undef', # the 'string' contains nulls
+        Count => 18,
+        PrintConv => q{
+            $_ = $val;
+            if (/^(\d{2})(\d{2})\0\0(\d{2})(\d{2})\0\0(\d{2})\0{4}$/) {
+                my $yr = $1 + ($1 < 70 ? 2000 : 1900);
+                return "$yr:$2:$3 $4:$5";
+            }
+            tr/\0/./;  s/\.+$//;
+            return "Unknown ($_)";
+        },
+        PrintConvInv => q{
+            $_ = $val;
+            if (/^(19|20)(\d{2}):(\d{2}):(\d{2}) (\d{2}):(\d{2})$/) {
+                return "$2$3\0\0$4$5\0\0$6\0\0\0\0";
+            } elsif (/^Unknown\s*\((.*)\)$/i) {
+                $_ = $1;  tr/./\0/;
+                return $_;
+            } else {
+                return undef;
+            }
+        },
+    },
     0x2011 => {
         Name => 'WhiteBalanceBias',
         Writable => 'int16u',
@@ -403,6 +431,7 @@ $VERSION = '1.16';
         PrintConv => '"$val m"',
         PrintConvInv => '$val=~s/ .*//;$val',
     },
+    # 0x2023 looks interesting (values 0,1,2,3,5 in samples) - PH
     0x2034 => {
         Name => 'FlashDistance',
         Writable => 'int16u',

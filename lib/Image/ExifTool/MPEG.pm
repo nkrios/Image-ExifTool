@@ -334,7 +334,7 @@ $VERSION = '1.02';
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::MPEG::Composite');
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::MPEG::Composite);
 
 
 #------------------------------------------------------------------------------
@@ -387,7 +387,7 @@ sub ProcessMPEGAudio($$)
         last;
     }
     # set file type if not done already
-    $exifTool->SetFileType() unless $exifTool->GetValue('FileType');
+    $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
 
     my $tagTablePtr = GetTagTable('Image::ExifTool::MPEG::Audio');
     ProcessFrameHeader($exifTool, $tagTablePtr, $word);
@@ -413,7 +413,7 @@ sub ProcessMPEGVideo($$)
         return 0;
     }
     # set file type if not done already
-    $exifTool->SetFileType('MPEG') unless $exifTool->GetValue('FileType');
+    $exifTool->SetFileType('MPEG') unless $exifTool->{VALUE}->{FileType};
 
     my $tagTablePtr = GetTagTable('Image::ExifTool::MPEG::Video');
     ProcessFrameHeader($exifTool, $tagTablePtr, $w1, $w2);

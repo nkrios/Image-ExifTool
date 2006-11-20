@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: PostScript_3_failed.eps
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 13 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:03 14:32:38
+[File, File, Time]  - File Modification Date/Time: 2005:12:31 16:05:50
 [File, File, Image]  - File Type: EPS
 [File, File, Image]  - MIME Type: application/postscript
 [PostScript, PostScript, Image] Creator - Creator: phil made it
@@ -105,6 +105,6 @@
 [Composite, Composite, Image]  - Image Height: 8
 [Composite, Composite, Image]  - Image Width: 8
 [Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Image]  - EV: 9.6
 [Composite, Composite, Camera]  - Focal Length: 6.0mm
 [Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Image]  - Light Value: 9.6

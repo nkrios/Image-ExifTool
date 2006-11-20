@@ -43,11 +43,14 @@ my %mandatory = (
         0x9101 => "\1\2\3\0", # ComponentsConfiguration
         0xa000 => '0100',   # FlashpixVersion
         0xa001 => 0xffff,   # ColorSpace (uncalibrated)
-       # 0xa002 => ????,     # ExifImageWidth
-       # 0xa003 => ????,     # ExifImageLength
+      # 0xa002 => ????,     # ExifImageWidth
+      # 0xa003 => ????,     # ExifImageLength
     },
     GPS => {
         0x0000 => '2 2 0 0',# GPSVersionID
+    },
+    InteropIFD => {
+        0x0002 => '0100',   # InteropVersion
     },
 );
 
@@ -60,24 +63,28 @@ my %mandatory = (
 # - Protected is 1 if the tag shouldn't be copied with SetNewValuesFromFile()
 my %writeTable = (
     0x0001 => {             # InteropIndex
+        Protected => 1,
         Writable => 'string',
         WriteGroup => 'InteropIFD',
     },
     0x0002 => {             # InteropVersion
+        Protected => 1,
         Writable => 'undef',
         WriteGroup => 'InteropIFD',
+    },
+    0x000b => {             # ProcessingSoftware
+        Writable => 'string',
+        WriteGroup => 'IFD0',
     },
     0x00fe => {             # SubfileType
         Protected => 1,
         Writable => 'int32u',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$val',
     },
     0x00ff => {             # OldSubfileType
         Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$val',
     },
     0x0100 => {             # ImageWidth
         Protected => 1,
@@ -283,11 +290,18 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Count => 6,
     },
+    0x1000 => {             # RelatedImageFileFormat
+        Protected => 1,
+        Writable => 'string',
+        WriteGroup => 'InteropIFD',
+    },
     0x1001 => {             # RelatedImageWidth
+        Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'InteropIFD',
     },
-    0x1002 => {             # RelatedImageHeight
+    0x1002 => {             # RelatedImageLength (is really the height)
+        Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'InteropIFD',
     },
@@ -1046,7 +1060,6 @@ sub WriteExif($$$)
             unless ($raf->Read($buf2, $len) == $len) {
                 return ExifErr($exifTool, "Error reading $dirName", $inMakerNotes);
             }
-            UpdateTiffEnd($exifTool, $offset+$base+2+$len);
             $buff .= $buf2;
             # make copy of dirInfo since we're going to modify it
             my %newDirInfo = %$dirInfo;
@@ -1057,6 +1070,10 @@ sub WriteExif($$$)
             $dataPos = $$dirInfo{DataPos} = $offset;
             $dataLen = $$dirInfo{DataLen} = $len + 2;
             $dirLen = $$dirInfo{DirLen} = $dataLen;
+            # update tiff end and account for nextIFD pointer if next 4 bytes are 0
+            # (nextIFD is only written for some IFD's)
+            $len += 4 if not $$dirInfo{Multi} and $raf->Read($buf2,4)==4 and $buf2 eq "\0\0\0\0";
+            UpdateTiffEnd($exifTool, $offset+$base+2+$len);
         }
         my ($len, $numEntries);
         if ($dirStart + 4 < $dataLen) {
@@ -1165,6 +1182,7 @@ sub WriteExif($$$)
                     $valueDataLen = $dataLen;
                     $valuePtr = $entry + 8;
                     $oldSize = $oldCount * $formatSize[$oldFormat];
+                    $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID);
                     my $readFromFile;
                     if ($oldSize > 4) {
                         $valuePtr = Get32u($dataPt, $valuePtr);
@@ -1178,30 +1196,60 @@ sub WriteExif($$$)
                         }
                         # get value by seeking in file if we are allowed
                         if ($valuePtr < 0 or $valuePtr+$oldSize > $dataLen) {
-                            if ($raf) {
-                                if ($raf->Seek($base + $valuePtr + $dataPos, 0) and
-                                    $raf->Read($oldValue, $oldSize) == $oldSize)
-                                {
-                                    UpdateTiffEnd($exifTool, $base+$valuePtr+$dataPos+$oldSize);
-                                    $valueDataPt = \$oldValue;
-                                    $valueDataPos = $valuePtr + $dataPos;
-                                    $valueDataLen = $oldSize;
-                                    $valuePtr = 0;
-                                    $readFromFile = 1;
+                            my ($pos, $tagStr, $invalidPreview);
+                            if ($oldInfo) {
+                                $tagStr = $$oldInfo{Name};
+                            } elsif (defined $oldInfo) {
+                                my $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \ '');
+                                $tagStr = $$tmpInfo{Name} if $tmpInfo;
+                            }
+                            $tagStr or $tagStr = sprintf("tag 0x%x",$oldID);
+                            # allow PreviewImage to run outside EXIF segment
+                            if (not $raf and $tagStr eq 'PreviewImage') {
+                                $raf = $exifTool->{RAF};
+                                if ($raf) {
+                                    $pos = $raf->Tell();
                                 } else {
+                                    $invalidPreview = 1;
+                                }
+                            }
+                            if ($raf) {
+                                my $success = ($raf->Seek($base + $valuePtr + $dataPos, 0) and
+                                               $raf->Read($oldValue, $oldSize) == $oldSize);
+                                if (defined $pos) {
+                                    $raf->Seek($pos, 0);
+                                    undef $raf;
+                                    unless ($success and $oldValue =~ /^(\xff\xd8\xff|.\xd8\xff\xdb)/s) {
+                                        $exifTool->Error("Bad PreviewImage pointer in $dirName", 1);
+                                        $invalidPreview = 1;
+                                        $success = 1;   # continue writing directory
+                                    }
+                                }
+                                unless ($success) {
                                     return ExifErr($exifTool, "Error reading value for $dirName entry $index", $inMakerNotes);
                                 }
-                            } else {
-                                return ExifErr($exifTool, "Bad EXIF directory pointer for $dirName entry $index", $inMakerNotes);
+                            } elsif (not $invalidPreview) {
+                                return ExifErr($exifTool, "Bad $dirName directory pointer for $tagStr", $inMakerNotes);
                             }
+                            if ($invalidPreview) {
+                                $oldValue = 'none';     # flag for missing preview
+                                $oldSize = length $oldValue;
+                                $valuePtr = 0;
+                            } else {
+                                UpdateTiffEnd($exifTool, $base+$valuePtr+$dataPos+$oldSize);
+                            }
+                            # update pointers for value just read from file
+                            $valueDataPt = \$oldValue;
+                            $valueDataPos = $valuePtr + $dataPos;
+                            $valueDataLen = $oldSize;
+                            $valuePtr = 0;
+                            $readFromFile = 1;
                         }
                     }
                     # read value if we haven't already
                     $oldValue = substr($$valueDataPt, $valuePtr, $oldSize) unless $readFromFile;
-                    # get tagInfo if available
-                    $oldInfo = $$tagTablePtr{$oldID};
-                    # must evaluate condition if necessary
-                    if ($oldInfo and (ref $oldInfo ne 'HASH' or $$oldInfo{Condition})) {
+                    # get tagInfo using value if necessary
+                    if (defined $oldInfo and not $oldInfo) {
                         $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \$oldValue);
                     }
                     # override format we use to read the value if specified
@@ -1216,7 +1264,9 @@ sub WriteExif($$$)
                             $readFormName = $$oldInfo{Format};
                             $readFormat = $formatNumber{$readFormName};
                             unless ($readFormat) {
-                                return ExifErr($exifTool, "Bad format name $readFormName", $inMakerNotes);
+                                # we aren't reading in a standard EXIF format, so rewrite in old format
+                                $readFormName = $oldFormName;
+                                $readFormat = $oldFormat;
                             }
                             # adjust number of items to read if format size changed
                             $readCount = $oldSize / $formatSize[$readFormat];
@@ -1606,7 +1656,7 @@ sub WriteExif($$$)
                                 Fixup => new Image::ExifTool::Fixup,
                                 RAF => $raf,
                             );
-                            # read subdirectory from file if necessary
+                            # read IFD from file if necessary
                             if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
                                 my ($buff, $buf2, $subSize);
                                 unless ($raf and $raf->Seek($pt + $base, 0) and
@@ -1620,13 +1670,15 @@ sub WriteExif($$$)
                                     }
                                     return ExifErr($exifTool, "Can't read $subdirName data", $inMakerNotes);
                                 }
-                                UpdateTiffEnd($exifTool, $pt+$base+2+$subSize);
                                 $buff .= $buf2;
                                 # change subdirectory information to data we just read
                                 $subdirInfo{DataPt} = \$buff;
                                 $subdirInfo{DirStart} = 0;
                                 $subdirInfo{DataPos} = $pt;
                                 $subdirInfo{DataLen} = $subSize + 2;
+                                # update tiff end, trying to account for nextIFD pointer
+                                $subSize += 4 if $raf->Read($buf2,4)==4 and $buf2 eq "\0\0\0\0";
+                                UpdateTiffEnd($exifTool, $pt+$base+2+$subSize);
                             }
                             my $subTable = $tagTablePtr;
                             if ($$subdir{TagTable}) {
@@ -1705,7 +1757,7 @@ sub WriteExif($$$)
                             $newValuePt = \$newValue;
                         }
                         unless (defined $$newValuePt) {
-                            $exifTool->Error("Internal error writing $dirName:$$newInfo{Name}");
+                            $exifTool->Error("Error writing $dirName:$$newInfo{Name}");
                             return undef;
                         }
                         next unless length $$newValuePt;
@@ -1736,6 +1788,7 @@ sub WriteExif($$$)
                         $newFormName = 'int32u';
                         $newFormat = $formatNumber{$newFormName};
                         $newValue = WriteValue(join(' ',@vals), $newFormName, $newCount);
+                        die "Internal error writing offsets\n" unless defined $newValue;
                     }
                     $offsetInfo or $offsetInfo = $offsetInfo[$ifd] = { };
                     # save location of valuePtr in new directory
@@ -1810,7 +1863,7 @@ sub WriteExif($$$)
                 if (defined $$mandatory{$newID}) {
                     # values must correspond to mandatory values
                     my $mandVal = WriteValue($$mandatory{$newID}, $newFormName, $newCount);
-                    if ($mandVal eq $$newValuePt) {
+                    if (defined $mandVal and $mandVal eq $$newValuePt) {
                         ++$allMandatory;        # count mandatory tags
                         last;
                     }
@@ -2012,8 +2065,9 @@ sub WriteExif($$$)
                 for ($n=0; $n<$count; ++$n) {
                     my $oldEnd;
                     if (@$oldOffset and @$oldSize) {
-                        # update TIFF_END as if we had read this data from file
+                        # calculate end offset of this block
                         $oldEnd = $$oldOffset[$n] + $$oldSize[$n];
+                        # update TIFF_END as if we read this data from file
                         UpdateTiffEnd($exifTool, $oldEnd + $dbase);
                     }
                     my $offsetPos = $offsets + $n * 4;
@@ -2049,6 +2103,12 @@ sub WriteExif($$$)
                         my $pad = 0;
                         ++$pad if $size & 0x01 and ($n+1 >= $count or not $oldEnd or
                                   $oldEnd != $$oldOffset[$n+1]);
+                        # preserve original image padding if specified
+                        if ($_[1]->{PreserveImagePadding} and $n+1 < $count and
+                            $oldEnd and $$oldOffset[$n+1] > $oldEnd)
+                        {
+                            $pad = $$oldOffset[$n+1] - $oldEnd;
+                        }
                         # copy data later
                         push @imageData, [$offset+$dbase+$dpos, $size, $pad];
                         $size += $pad; # account for pad byte if necessary
@@ -2067,7 +2127,9 @@ sub WriteExif($$$)
                         $exifTool->Warn("ThumbnailImage runs outside EXIF data by $diff bytes -- Truncated");
                         # set the size to the available data
                         $size -= $diff;
-                        WriteValue($size, $formatStr, 1, \$newData, $byteCountPos);
+                        unless (WriteValue($size, $formatStr, 1, \$newData, $byteCountPos)) {
+                            warn 'Internal error writing thumbnail size';
+                        }
                         # get the truncated image
                         $buff = substr($$dataPt, $offset, $size);
                     } elsif ($$tagInfo{Name} eq 'PreviewImageStart' and $exifTool->{FILE_TYPE} eq 'JPEG') {
@@ -2127,7 +2189,7 @@ sub WriteExif($$$)
             # now that we know the size of the EXIF data, first test to see if our new image fits
             # inside the EXIF segment (remember about the TIFF and EXIF headers: 8+6 bytes)
             if (($$pt ne 'LOAD' and length($$pt) + length($newData) + 14 <= 0xfffd) or
-                $previewInfo->{IsValue})
+                $previewInfo->{IsShort}) # must fit in this segment if using short pointers
             {
                 # It fits! (or must exist in EXIF segment), so fixup the
                 # PreviewImage pointers and stuff the preview image in here

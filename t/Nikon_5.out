@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 13:29:47
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -39,7 +39,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2464
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1632
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -56,6 +56,7 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown (0)
+[EXIF, GPS, Location] 0 - GPS Version ID: 2.2.0.0
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 300
 [EXIF, IFD1, Image] 283 - Y Resolution: 300
@@ -91,7 +92,7 @@
 [MakerNotes, Nikon, Camera] 131 - Lens Type: D
 [MakerNotes, Nikon, Camera] 132 - Lens: 50mm f/1.8
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Did Not Fire
-[MakerNotes, Nikon, Camera] 0 - AF Mode: Single Area
+[MakerNotes, Nikon, Camera] 0 - AF Area Mode: Single Area
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
 [MakerNotes, Nikon, Camera] 2 - AF Points Used: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Delay
@@ -122,7 +123,6 @@
 [MakerNotes, Nikon, Camera] 16 - Max Aperture At Max Focal: 1.8
 [MakerNotes, Nikon, Camera] 17 - MCU Version: 122
 [MakerNotes, Nikon, Camera] 18 - Effective Max Aperture: 1.8
-[GPS, GPS, Location] 0 - GPS Version ID: 2.2.0.0
 [Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - Lens ID: AF Nikkor 50mm f/1.8D
@@ -134,9 +134,9 @@
 [Composite, Composite, Camera]  - Blue Balance: 2.097656
 [Composite, Composite, Image]  - Circle Of Confusion: 0.020 mm
 [Composite, Composite, Image]  - Depth of Field: 0.03 m (0.69 - 0.72)
-[Composite, Composite, Image]  - EV: 8.0
 [Composite, Composite, Camera]  - Focal Length: 50.0mm (35mm equivalent: 75.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 31.20 m
 [Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Image]  - Light Value: 8.0
 [Composite, Composite, Camera]  - Red Balance: 2.195313
 [Composite, Composite, Image]  - Date/Time Original: 2005:03:18 02:55:18.16

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.33
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: Minolta_4_failed.mrw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:09:01 12:52:05
+[File, File, Time]  - File Modification Date/Time: 2006:11:17 13:51:57
 [File, File, Image]  - File Type: MRW
 [File, File, Image]  - MIME Type: image/x-raw
 [MakerNotes, MinoltaRaw, Camera] 0 - Firmware ID: 27200001
@@ -71,10 +71,10 @@
 [MakerNotes, Minolta, Camera] 64 - Compressed Image Size: 16072064
 [MakerNotes, Minolta, Camera] 136 - Preview Image Start: 2082
 [MakerNotes, Minolta, Camera] 137 - Preview Image Length: 26
-[MakerNotes, Minolta, Camera] 256 - Minolta 0x0100: 0
+[MakerNotes, Minolta, Camera] 256 - Scene Mode: Standard
 [MakerNotes, Minolta, Camera] 257 - Color Mode: Natural
 [MakerNotes, Minolta, Camera] 258 - Minolta Quality: Raw
-[MakerNotes, Minolta, Camera] 260 - Minolta 0x0104: 0
+[MakerNotes, Minolta, Camera] 260 - Flash Exposure Compensation: 0
 [MakerNotes, MinoltaRaw, Camera] 0 - WB Scale: 2 2 2 2
 [MakerNotes, MinoltaRaw, Camera] 4 - WB Levels: 438 256 256 509
 [MakerNotes, MinoltaRaw, Image] 1 - Saturation: 0
@@ -138,6 +138,6 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/5
 [Composite, Composite, Image]  - Circle Of Confusion: 0.008 mm
 [Composite, Composite, Image]  - Depth of Field: inf (2.40 m - inf)
-[Composite, Composite, Image]  - EV: 5.9
 [Composite, Composite, Camera]  - Focal Length: 7.2mm (35mm equivalent: 28.0mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 2.40 m
+[Composite, Composite, Image]  - Light Value: 5.9

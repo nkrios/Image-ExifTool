@@ -9,7 +9,7 @@ with a question mark after their name are not extracted unless the Unknown
 option is set.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'PICT'</td>
@@ -56,7 +56,7 @@ option is set.
 <h2><a name='Movie'>QuickTime Movie Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'mvhd'</td>
@@ -155,7 +155,7 @@ option is set.
 <h2><a name='Track'>QuickTime Track Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'mdia'</td>
@@ -178,7 +178,7 @@ option is set.
 MP4 only (most tags unknown because ISO charges for the specification).
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'minf'</td>
@@ -191,20 +191,34 @@ MP4 only (most tags unknown because ISO charges for the specification).
 MP4 only (most tags unknown because ISO charges for the specification).
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
+<td>'dinf'</td>
+<td>Dinf</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='QuickTime.html#Dinf'>QuickTime Dinf Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>'stbl'</td>
 <td>Stbl</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='QuickTime.html#Stbl'>QuickTime Stbl Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Dinf'>QuickTime Dinf Tags</a></h2>
+MP4 only (most tags unknown because ISO charges for the specification).
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr><td colspan=4 align='center'>[no tags known]</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Stbl'>QuickTime Stbl Tags</a></h2>
 MP4 only (most tags unknown because ISO charges for the specification).
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr><td colspan=4 align='center'>[no tags known]</td></tr>
 </table></td></tr></table></blockquote>
@@ -268,7 +282,7 @@ record.  ExifTool will extract any multi-language user data tags found, even
 if they don&#39;t exist in this table.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'AllF'</td>
@@ -304,110 +318,289 @@ if they don&#39;t exist in this table.
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>'meta'</td>
+<td>Meta</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
+<tr valign='top'>
 <td>'name'</td>
 <td>Name</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>'ptv '</td>
 <td>PrintToVideo</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='QuickTime.html#Video'>QuickTime Video Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9cpy"</td>
 <td>Copyright</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9day"</td>
 <td>CreateDate</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9dir"</td>
 <td>Director</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9ed1"</td>
 <td>Edit1</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9ed2"</td>
 <td>Edit2</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9ed3"</td>
 <td>Edit3</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9ed4"</td>
 <td>Edit4</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9ed5"</td>
 <td>Edit5</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9ed6"</td>
 <td>Edit6</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9ed7"</td>
 <td>Edit7</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9ed8"</td>
 <td>Edit8</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9ed9"</td>
 <td>Edit9</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9fmt"</td>
 <td>Format</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9inf"</td>
 <td>Information</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9prd"</td>
 <td>Producer</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9prf"</td>
 <td>Performers</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9req"</td>
 <td>Requirements</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>"\xa9src"</td>
 <td>Source</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>"\xa9wrt"</td>
 <td>Writer</td>
 <td align='center'>N</td>
 <td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Meta'>QuickTime Meta Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'ilst'</td>
+<td>InfoList</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='QuickTime.html#InfoList'>QuickTime InfoList Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='InfoList'>QuickTime InfoList Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td>'----'</td>
+<td>iTunesInfo</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='QuickTime.html#iTunesInfo'>QuickTime iTunesInfo Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'aART'</td>
+<td>AlbumArtist</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'apid'</td>
+<td>AppleStoreID</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'auth'</td>
+<td>Author</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'covr'</td>
+<td>CoverArt</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'cpil'</td>
+<td>Compilation</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = No
+  <br>1 = Yes</font></td></tr>
+<tr valign='top'>
+<td>'cprt'</td>
+<td>Copyright</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'disk'</td>
+<td>DiskNumber</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'dscp'</td>
+<td>Description</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'gnre'</td>
+<td>Genre</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'perf'</td>
+<td>Performer</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'pgap'</td>
+<td>PlayGap</td>
+<td align='center'>N</td>
+<td><font size='-1'>0 = Insert Gap
+  <br>1 = No Gap</font></td></tr>
+<tr valign='top'>
+<td>'rtng'</td>
+<td>Rating</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'titl'</td>
+<td>Title</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>'tmpo'</td>
+<td>BeatsPerMinute</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>'trkn'</td>
+<td>TrackNumber</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>"\xa9ART"</td>
+<td>Artist</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>"\xa9alb"</td>
+<td>Album</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>"\xa9cmt"</td>
+<td>Comment</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>"\xa9com"</td>
+<td>Composer</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>"\xa9day"</td>
+<td>Year</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>"\xa9des"</td>
+<td>Description</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>"\xa9gen"</td>
+<td>Genre</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>"\xa9grp"</td>
+<td>Grouping</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>"\xa9lyr"</td>
+<td>Lyrics</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>"\xa9nam"</td>
+<td>Title</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>"\xa9too"</td>
+<td>Encoder</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>"\xa9trk"</td>
+<td>Track</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td>"\xa9wrt"</td>
+<td>Composer</td>
+<td align='center'>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='iTunesInfo'>QuickTime iTunesInfo Tags</a></h2>
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr><td colspan=4 align='center'>[no tags known]</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Video'>QuickTime Video Tags</a></h2>
@@ -463,7 +656,7 @@ if they don&#39;t exist in this table.
 Tags used in QTIF QuickTime Image Files.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>'idat'</td>
@@ -547,6 +740,6 @@ Tags used in QTIF QuickTime Image Files.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 20, 2006</i>
+<br><i>Last revised Oct 31, 2006</i>
 </body>
 </html>

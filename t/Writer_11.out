@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.46
 [File, File, Image]  - File Name: Writer_11_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:02:06 11:57:21
+[File, File, Time]  - File Modification Date/Time: 2006:10:07 20:06:07
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -16,8 +16,8 @@
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: Uncalibrated
-[GPS, GPS, Location] 0 - GPS Version ID: 2.2.0.0
-[GPS, GPS, Location] 2 - GPS Latitude: 44 deg 14' 12.25"
+[EXIF, GPS, Location] 0 - GPS Version ID: 2.2.0.0
+[EXIF, GPS, Location] 2 - GPS Latitude: 44 deg 14' 12.25"
 [IPTC, IPTC, Image] 22 - File Version: 12
 [IPTC, IPTC, Other] 0 - Envelope Record Version: 4
 [XMP, XMP-dc, Author] contributor - Contributor: Guess who

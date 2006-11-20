@@ -13,7 +13,7 @@ different places.)
 
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0000</td>
@@ -62,6 +62,18 @@ image stabilization is enabled)</font></font></td></tr>
 <td align='center'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0100</td>
+<td>SceneMode</td>
+<td align='center'>Y</td>
+<td><font size='-1'>0 = Standard
+  <br>1 = Portrait
+  <br>2 = Text
+  <br>3 = Night Scene
+  <br>4 = Evening Scene
+  <br>5 = Sports
+  <br>6 = Landscape
+  <br>9 = Super Macro</font></td></tr>
+<tr valign='top'>
 <td>0x0101</td>
 <td>ColorMode</td>
 <td align='center'>int32u</td>
@@ -78,8 +90,17 @@ image stabilization is enabled)</font></font></td></tr>
   <br>15 = Landscape
   <br>16 = Evening
   <br>17 = Night Scene
-  <br>18 = Night Portrait</font></td></tr>
-<tr valign='top'>
+  <br>18 = Night Portrait
+  <br><font color="#666666">(Sony DSLR-A100)</font>
+  <br>0 = Standard
+  <br>1 = Vivid
+  <br>2 = Portrait
+  <br>3 = Landscape
+  <br>4 = Sunset
+  <br>5 = Night Scene
+  <br>6 = B&amp;W
+  <br>7 = Adobe RGB</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0102</td>
 <td>MinoltaQuality</td>
 <td align='center'>int32u</td>
@@ -89,7 +110,7 @@ image stabilization is enabled)</font></font></td></tr>
   <br>3 = Standard
   <br>4 = Economy
   <br>5 = Extra fine</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x0103</td>
 <td>MinoltaQuality
   <br>MinoltaImageSize</td>
@@ -108,6 +129,11 @@ image stabilization is enabled)</font></font></td></tr>
   <br>5 = 2560x1920
   <br>6 = 2272x1704
   <br>7 = 2048x1536</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td>0x0104</td>
+<td>FlashExposureComp</td>
+<td align='center'>rational64s</td>
+<td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>0x0107</td>
 <td>ImageStabilization</td>
@@ -158,14 +184,14 @@ image stabilization is enabled)</font></font></td></tr>
   <br>28 = Minolta AF 100mm F2.8 Macro (D)
   <br>29 = Minolta AF 75-300mm F4.5-5.6 (D)
   <br>30 = Minolta AF 28-80mm F3.5-5.6 (D)
-  <br>31 = Minolta AF 50mm F2.8 Macro(D)
+  <br>31 = Minolta AF 50mm F2.8 Macro (D) or AF 50mm F3.5 Macro
   <br>32 = Minolta AF 300mm F2.8 G
   <br>33 = Minolta AF 70-200mm F2.8 G (D) SSM
   <br>35 = Minolta AF 85mm F1.4 G (D) Limited
   <br>36 = Minolta AF 28-100mm F3.5-5.6 (D)
   <br>38 = KonicaMinolta AF 17-35mm F2.8-4 (D)
   <br>39 = Minolta AF 28-75mm F2.8 (D)
-  <br>40 = KonicaMinolta AF DT 18-70mm F3.5-5.6 (D)
+  <br>40 = KonicaMinolta or Sony AF DT 18-70mm F3.5-5.6 (D)
   <br>41 = Minolta AF DT 11-18mm F4.5-5.6 (D)
   <br>42 = Minolta AF DT 18-200mm F3.5-6.3 (D)
   <br>43 = Minolta AF 35mm F1.4 G
@@ -234,18 +260,27 @@ image stabilization is enabled)</font></font></td></tr>
   <br>26671 = Minolta AF 35mm F2 New
   <br>26681 = Minolta AF 28mm F2 New
   <br>26721 = Minolta AF 24-105mm F3.5-4.5 (D)
-  <br>45741 = AF 200mm F2.8 G x2</font></td></tr>
+  <br>45741 = Minolta AF 200mm F2.8 G x2</font></td></tr>
 <tr valign='top'>
-<td>0x0114</td>
-<td>MinoltaCameraSettings5D</td>
-<td align='center'>-</td>
-<td>--&gt; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D Tags</a></td></tr>
+<td>0x0113</td>
+<td>ImageStabilization</td>
+<td align='center'>int32u</td>
+<td><font size='-1'><font color="#666666">(valid for Sony A100 only)</font>
+  <br>0 = Off
+  <br>1 = On</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
+<td>0x0114</td>
+<td>MinoltaCameraSettings5D
+  <br>MinoltaCameraSettingsA100</td>
+<td align='center'>-<br>-</td>
+<td>--&gt; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D Tags</a>
+  <br>--&gt; <a href='Minolta.html#CameraSettingsA100'>Minolta CameraSettingsA100 Tags</a></td></tr>
+<tr valign='top'>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x0f00</td>
 <td>MinoltaCameraSettings2</td>
 <td align='center'>N</td>
@@ -268,8 +303,8 @@ tags are disabled.
 <td>ExposureMode</td>
 <td align='center'>int32u</td>
 <td><font size='-1'>0 = Program
-  <br>1 = Aperture priority
-  <br>2 = Shutter priority
+  <br>1 = Aperture Priority
+  <br>2 = Shutter Priority
   <br>3 = Manual</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>2</td>
@@ -304,7 +339,7 @@ tags are disabled.
   <br>2 = Fine
   <br>3 = Standard
   <br>4 = Economy
-  <br>5 = Extra fine</font></td></tr>
+  <br>5 = Extra Fine</font></td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td align='right'>6</td>
 <td>DriveMode</td>
@@ -909,9 +944,107 @@ version)</font></font></td></tr>
   <br>1 = On</font></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='CameraSettingsA100'>Minolta CameraSettingsA100 Tags</a></h2>
+Camera settings information for the Sony DSLR-A100.
+<blockquote>
+<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
+<tr valign='top'>
+<td align='right'>0</td>
+<td>ExposureMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0x0 = Program
+  <br>0x1 = Aperture Priority
+  <br>0x2 = Shutter Priority
+  <br>0x3 = Manual
+  <br>0x4 = Auto
+  <br>0x1013 = Portrait
+  <br>0x1053 = Landscape</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>1</td>
+<td>ExposureCompensation</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>11</td>
+<td>WhiteBalance</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0x0 = Auto
+  <br>0x1 = Daylight
+  <br>0x2 = Cloudy
+  <br>0x3 = Shade
+  <br>0x4 = Tungsten
+  <br>0x5 = Fluorescent
+  <br>0x6 = Flash
+  <br>0x100 = Kelvin
+  <br>0x200 = Manual</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>22</td>
+<td>ColorMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Standard
+  <br>1 = Vivid
+  <br>2 = Portrait
+  <br>3 = Landscape
+  <br>4 = Sunset
+  <br>5 = Night Scene
+  <br>7 = B&amp;W
+  <br>8 = Adobe RGB</font></td></tr>
+<tr valign='top'>
+<td align='right'>24</td>
+<td>Sharpness</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>25</td>
+<td>Contrast</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr valign='top'>
+<td align='right'>26</td>
+<td>Saturation</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>30</td>
+<td>DriveMode</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Single Frame
+  <br>1 = Continuous
+  <br>2 = Self-Timer
+  <br>3 = Continuous Bracketing
+  <br>4 = Single-Frame Bracketing
+  <br>5 = White Balance Bracketing</font></td></tr>
+<tr valign='top'>
+<td align='right'>63</td>
+<td>NoiseReduction</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>90</td>
+<td>Rotation</td>
+<td align='center'>int16u</td>
+<td><font size='-1'>0 = 0
+  <br>1 = 270
+  <br>2 = 90</font></td></tr>
+<tr valign='top'>
+<td align='right'>94</td>
+<td>ColorTemperature</td>
+<td align='center'>int16u</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
+<td align='right'>135</td>
+<td>ImageStabilization</td>
+<td align='center'>int32u[0.5]</td>
+<td><font size='-1'>0 = Off
+  <br>1 = On</font></td></tr>
+</table></td></tr></table></blockquote>
+
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 21, 2006</i>
+<br><i>Last revised Nov 17, 2006</i>
 </body>
 </html>

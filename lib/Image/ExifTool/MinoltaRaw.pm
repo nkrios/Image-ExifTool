@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         MinoltaRaw.pm
 #
-# Description:  Read and write Konica-Minolta RAW (MRW) meta information
+# Description:  Read/write Konica-Minolta RAW (MRW) meta information
 #
 # Revisions:    03/11/2006 - P. Harvey Split out from Minolta.pm
 #

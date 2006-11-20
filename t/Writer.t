@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..26\n"; }
+BEGIN { $| = 1; print "1..26\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -53,7 +53,7 @@ sub binaryCompare($$)
     my $testFile1 = "t/${testname}_${testnum}_failed.jpg";
     -e $testFile1 and unlink $testFile1;
     $exifTool->SetNewValue('Comment','New comment in JPG file');
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testFile1);
+    $exifTool->WriteInfo('t/images/Canon.jpg', $testFile1);
     my $info = ImageInfo($testFile1);
     print 'not ' unless check($info, $testname, $testnum);
     print "ok $testnum\n";
@@ -63,7 +63,7 @@ sub binaryCompare($$)
     -e $testFile2 and unlink $testFile2;
     $exifTool->SetNewValue('Comment');
     $exifTool->WriteInfo($testFile1, $testFile2);
-    if (binaryCompare($testFile2, 't/images/ExifTool.jpg')) {
+    if (binaryCompare($testFile2, 't/images/Canon.jpg')) {
         unlink $testFile1;
         unlink $testFile2;
     } else {
@@ -130,7 +130,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(FocalPlaneResolutionUnit => 'mm');
     $exifTool->SetNewValue(Category => 'IPTC test');
     $exifTool->SetNewValue(Description => 'New description');
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile1);
+    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile1);
     my $info = $exifTool->ImageInfo($testfile1);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
@@ -168,7 +168,7 @@ sub binaryCompare($$)
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Duplicates => 1, Binary => 1, List => 1);
-    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg');
+    my $info = $exifTool->ImageInfo('t/images/Canon.jpg');
     my $tag;
     foreach $tag (keys %$info) {
         my $group = $exifTool->GetGroup($tag);
@@ -177,7 +177,7 @@ sub binaryCompare($$)
     }
     undef $info;
     my $image;
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', \$image);
+    $exifTool->WriteInfo('t/images/Canon.jpg', \$image);
     $exifTool->Options(Unknown => 1, Binary => 0, List => 0);
     $info = $exifTool->ImageInfo(\$image);
     $testfile = "t/${testname}_${testnum}_failed.jpg";
@@ -199,7 +199,7 @@ sub binaryCompare($$)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValuesFromFile('t/images/ExifTool.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/Canon.jpg');
     $exifTool->SetNewValuesFromFile('t/images/ExifTool.tif', 'ICC_Profile');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
@@ -221,7 +221,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValuesFromFile('t/images/Pentax.jpg');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -288,7 +288,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValue('All' => undef, Group => 'MakerNotes');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -306,7 +306,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValuesFromFile('t/images/Olympus.jpg', @copyTags);
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -486,7 +486,7 @@ my $testOK;
         $exifTool->SetNewValue(fnumber => 25) if $i == 0;
         $testfile = "t/${testname}_${testnum}_failed.jpg";
         unlink $testfile;
-        $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+        $exifTool->WriteInfo('t/images/Canon.jpg', $testfile);
         my $info = $exifTool->ImageInfo($testfile);
         if (check($exifTool, $info, $testname, $testnum)) {
             unlink $testfile;

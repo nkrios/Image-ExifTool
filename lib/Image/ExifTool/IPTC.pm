@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
@@ -457,8 +457,7 @@ my %fileFormat = (
     125 => {
         Name => 'RasterizedCaption',
         Format => 'string[7360]',
-        ValueConv => '\$val',
-        ValueConvInv => '$val',
+        Binary => 1,
     },
     130 => {
         Name => 'ImageType',
@@ -553,8 +552,7 @@ my %fileFormat = (
         Name => 'ObjectPreviewData',
         Groups => { 2 => 'Image' },
         Format => 'string[0,256000]',
-        ValueConv => '\$val',
-        ValueConvInv => '$val',
+        Binary => 1,
     },
     225 => { # (format not certain)
         Name => 'ClassifyState',
@@ -664,17 +662,17 @@ my %fileFormat = (
         Name => 'ICC_Profile',
         # ...could add SubDirectory support to read into this (if anybody cares)
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     70 => {
         Name => 'ColorCalibrationMatrix',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     80 => {
         Name => 'LookupTable',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     84 => {
         Name => 'NumIndexEntries',
@@ -683,7 +681,7 @@ my %fileFormat = (
     85 => {
         Name => 'ColorPalette',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     86 => {
         Name => 'IPTCBitsPerSample',
@@ -743,7 +741,7 @@ my %fileFormat = (
     125 => {
         Name => 'EndPoints',
         Writable => 0,
-        ValueConv => '\$val',
+        Binary => 1,
     },
     130 => {
         Name => 'ExcursionTolerance',
@@ -769,6 +767,8 @@ my %fileFormat = (
 
 # Record 7 -- Pre-object Data
 %Image::ExifTool::IPTC::PreObjectData = (
+    # (not actually writable, but used in BuildTagLookup to recognize IPTC tables)
+    WRITE_PROC => \&WriteIPTC,
     10 => {
         Name => 'SizeMode',
         Format => 'int8u',
@@ -793,16 +793,17 @@ my %fileFormat = (
 
 # Record 8 -- ObjectData
 %Image::ExifTool::IPTC::ObjectData = (
+    WRITE_PROC => \&WriteIPTC,
     10 => {
         Name => 'SubFile',
         Flags => 'List',
-        ValueConv => '\$val',
-        ValueConvInv => '$val',
+        Binary => 1,
     },
 );
 
 # Record 9 -- PostObjectData
 %Image::ExifTool::IPTC::PostObjectData = (
+    WRITE_PROC => \&WriteIPTC,
     10 => {
         Name => 'ConfirmedObjectSize',
         Format => 'int32u',
@@ -835,8 +836,11 @@ sub ProcessIPTC($$$)
     my %listTags;
 
     $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
-    my $dirCount = $exifTool->{DIR_COUNT}->{IPTC} = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
-    $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
+    if ($tagTablePtr eq \%Image::ExifTool::IPTC::Main) {
+        my $dirCount = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
+        $exifTool->{DIR_COUNT}->{IPTC} = $dirCount;
+        $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
+    }
     while ($pos + 5 <= $dirEnd) {
         my $buff = substr($$dataPt, $pos, 5);
         my ($id, $rec, $tag, $len) = unpack("CCCn", $buff);
@@ -881,7 +885,32 @@ sub ProcessIPTC($$$)
         }
         my $val = substr($$dataPt, $pos, $len);
         my $recordPtr = Image::ExifTool::GetTagTable($tableName);
+
+        # add tagInfo for all unknown tags:
+        unless ($$recordPtr{$tag}) {
+            # - no Format so format is auto-detected
+            # - no Name so name is generated automatically with decimal tag number
+            Image::ExifTool::AddTagToTable($recordPtr, $tag, { Unknown => 1 });
+        }
+
         my $tagInfo = $exifTool->GetTagInfo($recordPtr, $tag);
+        my $format;
+        $format = $$tagInfo{Format} if $tagInfo;
+        # use logic to determine format if not specified
+        unless ($format) {
+            $format = 'int' if $len <= 4 and $len != 3 and $val =~ /[\0-\x08]/;
+        }
+        if ($format and $len <= 8) {    # limit integer conversion to 8 bytes long
+            if ($format =~ /^int/) {
+                $val = 0;
+                my $i;
+                for ($i=0; $i<$len; ++$i) {
+                    $val = $val * 256 + ord(substr($$dataPt, $pos+$i, 1));
+                }
+            } elsif ($format !~ /^(string|digits)/) {
+                warn("Invalid IPTC format: $format");
+            }
+        }
         $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
             Table   => $tagTablePtr,
             Value   => $val,
@@ -891,29 +920,14 @@ sub ProcessIPTC($$$)
             Start   => $pos,
             Extra   => ', ' . $tableInfo->{Name} . ' record',
         );
+        # prevent adding tags to list from another IPTC directory
         if ($tagInfo) {
-            my $format = $tagInfo->{Format};
-            if (ref $tagInfo eq 'HASH' and $format) {
-                if ($format =~ /^int/) {
-                    $val = 0;
-                    my $i;
-                    for ($i=0; $i<$len; ++$i) {
-                        $val = $val * 256 + ord(substr($$dataPt, $pos+$i, 1));
-                    }
-                } elsif ($format !~ /^(string|digits)/) {
-                    warn("Invalid IPTC format: $format");
-                }
-            }
-            # prevent adding tags to list from another IPTC directory
             if ($$tagInfo{List}) {
                 $exifTool->{NO_LIST} = 1 unless $listTags{$tagInfo};
                 $listTags{$tagInfo} = 1;    # list the next one we see
             }
-        } else {
-            $tagInfo = { Name => sprintf("IPTC_%d", $tag) };
-            Image::ExifTool::AddTagToTable($recordPtr, $tag, $tagInfo);
+            $exifTool->FoundTag($tagInfo, $val);
         }
-        $exifTool->FoundTag($tagInfo, $val);
         delete $exifTool->{NO_LIST};
         $success = 1;
 

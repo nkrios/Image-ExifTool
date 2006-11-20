@@ -6,12 +6,12 @@
 <h1>The Canon RAW (CRW) File Format</h1>
 
 This is a description of the Canon CRW file format.  CRW files are written in
-CIFF format.  The original Canon CIFF documentation can be downloaded from
-<a href="http://xyrion.org/ciff/">http://xyrion.org/ciff/</a> (which I finally
-discovered after writing this document!).  Note that Canon uses two different
-RAW formats, and some camera models produce CR2 instead of CRW files.  The CR2
-files use a TIFF format, which is different than the CRW CIFF format documented
-here.
+Camera Image File Format (CIFF).  The original Canon CIFF documentation can be
+downloaded from <a href="http://xyrion.org/ciff/">http://xyrion.org/ciff/</a>
+(which I finally discovered after writing this document!).  Note that Canon uses
+two different RAW formats, and some camera models produce CR2 instead of CRW
+files.  The CR2 files use a TIFF format, which is different than the CRW CIFF
+format documented here.
 
 <h3>Comments about the CRW Format</h3>
 
@@ -30,18 +30,18 @@ data (unlike the EXIF standard which is the reverse).
 
 <blockquote><font size='-1'>
 <b>A short rant about TIFF inadequacies:</b>
-<br>TIFF format on the other hand, really sucks in comparison.  (This includes
-JPEG too, since JPEG uses TIFF format to store the EXIF information.  In fact,
-EXIF is worse because it specifies that the value data comes AFTER the directory
-information, which by design requires all offsets to be fixed up after the
-length of the directory is known... grrr.)  So re-writing a TIFF file is a major
-pain in the butt -- all offsets require adjusting whenever anything is moved in
-the file, and to do this properly the software must understand the format of ALL
-contained data structures to be able to adjust embedded offsets. This presents a
-near impossible situation because of structures like the maker notes where the
-format is undocumented and varies for different camera models.  This is why most
-of the software out there that can rewrite a TIFF or JPEG file will scramble the
-maker notes!
+<br>TIFF format on the other hand, really sucks in comparison (this includes
+JPEG too, since JPEG uses TIFF format to store the EXIF information).  The main
+problems are the use of absolute offsets and the ambiguity between integers and
+pointers (such as those used for custom IFD's).  Because absolute offsets
+require adjusting whenever anything is moved in the file, the format of ALL
+contained data structures must be understood to properly edit the file.  This
+results in an impossible situation when presented with undocumented custom
+structures like those used in the maker notes written by modern digital cameras.
+This is why it is so common for image editors to either scramble the maker notes
+or discard them completely.  The official TIFF recommendation is that unknown
+information should be discarded when rewriting the image, but for many,
+including myself, this option is simply unacceptable.
 </font></blockquote>
 
 The bottom line is that rewriting a Canon CRW file is about 20 times easier,
@@ -62,8 +62,8 @@ presumably this could be "MM" for future models.
 <td align='left'>32-bit integer giving the length of the CRW file header.  For
 current camera models the header is 26 bytes long.</td></tr>
 <tr align='center'><td>6</td><td>8</td><td>"HEAPCCDR"</td><td>Signature</td>
-<td align='left'>A series of characters identifying the file as a Canon CRW
-file.</td></tr>
+<td align='left'>This series of characters identifies the file as a Canon CRW
+file.  The signature is "HEAPJPGM" for CIFF information in APP0 of JPEG images.</td></tr>
 <tr align='center'><td>14</td><td>4</td><td>0x00010002</td><td>CRWVersion</td>
 <td align='left'>32-bit integer giving the major (high 16 bits) and minor
 (low 16 bits) CRW file version numbers.  The version is 1.2 for current cameras.</td></tr>
@@ -310,7 +310,7 @@ remain constant for all camera models.
 
 <p><hr>
 Please e-mail me if you find any errors or omissions in this document.  My address is phil at owl.phy.queensu.ca - Thanks!
-<p><i>P. Harvey - Last revised Jun. 27, 2006</i>
+<p><i>P. Harvey - Last revised Oct. 30, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

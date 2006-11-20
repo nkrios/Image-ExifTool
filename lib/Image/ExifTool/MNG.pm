@@ -43,7 +43,7 @@ $VERSION = '1.00';
     },
     DBYK => {
         Name => 'DropByKeyword',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     DEFI => {
         Name => 'DefineObject',
@@ -72,7 +72,7 @@ $VERSION = '1.00';
     },
     FRAM => {
         Name => 'Frame',
-        ValueConv => '\$val',
+        Binary => 1,
     },
 #   IJNG
 #   IPNG
@@ -102,11 +102,11 @@ $VERSION = '1.00';
     },
     nEED => {
         Name => 'ResourcesNeeded',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     ORDR => {
         Name => 'OrderingRestrictions',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     PAST => {
         Name => 'PasteImage',
@@ -118,7 +118,7 @@ $VERSION = '1.00';
     },
     PPLT => {
         Name => 'PartialPalette',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     PROM => {
         Name => 'PromoteParent',
@@ -126,7 +126,7 @@ $VERSION = '1.00';
     },
     SAVE => {
         Name => 'SaveObjects',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     SEEK => {
         Name => 'SeekPoint',

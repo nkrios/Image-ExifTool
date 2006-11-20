@@ -5,8 +5,12 @@
 #
 # Revisions:    10/04/2005 - P. Harvey Created
 #               12/19/2005 - P. Harvey Added MP4 support
+#               09/22/2006 - P. Harvey Added M4A support
 #
 # References:   1) http://developer.apple.com/documentation/QuickTime/
+#               2) http://search.cpan.org/dist/MP4-Info-1.04/
+#               3) http://www.geocities.com/xhelmboyx/quicktime/formats/mp4-layout.txt
+#               4) http://wiki.multimedia.cx/index.php?title=Apple_QuickTime
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::QuickTime;
@@ -16,9 +20,10 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.09';
+$VERSION = '1.11';
 
 sub FixWrongFormat($);
+sub ProcessMOV($$;$);
 
 # information for time/date-based tags (time zero is Jan 1, 1904)
 my %timeInfo = (
@@ -41,14 +46,14 @@ my %durationInfo = (
         with a question mark after their name are not extracted unless the Unknown
         option is set.
     },
-    free => { Unknown => 1, ValueConv => '\$val' },
-    skip => { Unknown => 1, ValueConv => '\$val' },
-    wide => { Unknown => 1, ValueConv => '\$val' },
+    free => { Unknown => 1, Binary => 1 },
+    skip => { Unknown => 1, Binary => 1 },
+    wide => { Unknown => 1, Binary => 1 },
     ftyp => { #MP4
         Name => 'FrameType',
         Unknown => 1,
         Notes => 'MP4 only',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     pnot => {
         Name => 'Preview',
@@ -56,13 +61,13 @@ my %durationInfo = (
     },
     PICT => {
         Name => 'PreviewPICT',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     moov => {
         Name => 'Movie',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Movie' },
     },
-    mdat => { Unknown => 1, ValueConv => '\$val' },
+    mdat => { Unknown => 1, Binary => 1 },
 );
 
 # atoms used in QTIF files
@@ -76,7 +81,7 @@ my %durationInfo = (
     },
     idat => {
         Name => 'ImageData',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     iicc => {
         Name => 'ICC_Profile',
@@ -296,6 +301,13 @@ my %durationInfo = (
         Name => 'PlayAllFrames',
         Format => 'int8u',
     },
+    meta => {
+        Name => 'Meta',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::Meta',
+            HasVersion => 1, # must skip 4-byte version number header
+        },
+    },
    'ptv '=> {
         Name => 'PrintToVideo',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Video' },
@@ -346,9 +358,82 @@ my %durationInfo = (
         {
             Name => 'UnknownTags',
             Unknown => 1,
-            ValueConv => '\$val'
+            Binary => 1
         },
     ],
+);
+
+# meta atoms
+%Image::ExifTool::QuickTime::Meta = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    ilst => {
+        Name => 'InfoList',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::InfoList',
+            HasData => 1, # process atoms as containers with 'data' elements
+        },
+    },
+);
+
+# info list atoms
+# -> these atoms are unique, and contain one or more 'data' atoms
+%Image::ExifTool::QuickTime::InfoList = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Audio' },
+    "\xa9ART" => 'Artist',
+    "\xa9alb" => 'Album',
+    "\xa9cmt" => 'Comment',
+    "\xa9com" => 'Composer',
+    "\xa9day" => 'Year',
+    "\xa9des" => 'Description', #4
+    "\xa9gen" => 'Genre',
+    "\xa9grp" => 'Grouping',
+    "\xa9lyr" => 'Lyrics',
+    "\xa9nam" => 'Title',
+    "\xa9too" => 'Encoder',
+    "\xa9trk" => 'Track',
+    "\xa9wrt" => 'Composer',
+    '----' => {
+        Name => 'iTunesInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::iTunesInfo' },
+    },
+    aART => 'AlbumArtist',
+    apid => 'AppleStoreID',
+    auth => 'Author',
+    covr => 'CoverArt',
+    cpil => {
+        Name => 'Compilation',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
+    cprt => 'Copyright',
+    disk => {
+        Name => 'DiskNumber',
+        ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
+    },
+    dscp => 'Description',
+    gnre => 'Genre',
+    perf => 'Performer',
+    pgap => {
+        Name => 'PlayGap',
+        PrintConv => {
+            0 => 'Insert Gap',
+            1 => 'No Gap',
+        },
+    },
+    rtng => 'Rating', # int
+    titl => 'Title',
+    tmpo => 'BeatsPerMinute', # int
+    trkn => {
+        Name => 'TrackNumber',
+        ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
+    },
+);
+
+# info list atoms
+%Image::ExifTool::QuickTime::iTunesInfo = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Audio' },
 );
 
 # print to video data block
@@ -385,19 +470,27 @@ my %durationInfo = (
     },
 );
 
-# MP4 media
 %Image::ExifTool::QuickTime::Minf = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
+    dinf => {
+        Name => 'Dinf',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Dinf' },
+    },
     stbl => {
         Name => 'Stbl',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Stbl' },
     },
 );
 
-# MP4 media
 %Image::ExifTool::QuickTime::Stbl = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
+);
+
+%Image::ExifTool::QuickTime::Dinf = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
@@ -426,10 +519,16 @@ sub ProcessMOV($$;$)
     my $raf = $$dirInfo{RAF};
     my $dataPt = $$dirInfo{DataPt};
     my $verbose = $exifTool->Options('Verbose');
+    my $dataPos = $$dirInfo{Base} || 0;
     my ($buff, $tag, $size, $track);
 
+    # more convenient to package data as a RandomAccess file
     $raf or $raf = new File::RandomAccess($dataPt);
+    # skip leading 4-byte version number if necessary
+    ($raf->Read($buff,4) == 4 and $dataPos += 4) or return 0 if $$dirInfo{HasVersion};
+    # read size/tag name atom header
     $raf->Read($buff,8) == 8 or return 0;
+    $dataPos += 8;
     $tagTablePtr or $tagTablePtr = GetTagTable('Image::ExifTool::QuickTime::Main');
     ($size, $tag) = unpack('Na4', $buff);
     if ($dataPt) {
@@ -438,9 +537,15 @@ sub ProcessMOV($$;$)
         # check on file type if called with a RAF
         $$tagTablePtr{$tag} or return 0;
         if ($tag eq 'ftyp') {
-            $exifTool->SetFileType('MP4');
+            # read ahead 4 bytes to see if this is an M4A file
+            my $ftyp = 'MP4';
+            if ($raf->Read($buff, 4) == 4) {
+                $raf->Seek(-4, 1);
+                $ftyp = 'M4A' if $buff eq 'M4A ';
+            }
+            $exifTool->SetFileType($ftyp);  # MP4 or M4A
         } else {
-            $exifTool->SetFileType();
+            $exifTool->SetFileType();       # MOV
         }
         SetByteOrder('MM');
     }
@@ -449,6 +554,7 @@ sub ProcessMOV($$;$)
             last if $size == 0;
             $size == 1 or $exifTool->Warn('Invalid atom size'), last;
             $raf->Read($buff, 8) == 8 or last;
+            $dataPos += 8;
             my ($hi, $lo) = unpack('NN', $buff);
             $hi and $exifTool->Warn('End of processing at large atom'), last;
             $size = $lo;
@@ -471,18 +577,26 @@ sub ProcessMOV($$;$)
                     Name => "Unknown_$name",
                     Description => "Unknown $name",
                     Unknown => 1,
-                    ValueConv => '\$val',
+                    Binary => 1,
                 };
             }
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         if (defined $tagInfo or $verbose) {
             my $val;
-            $raf->Read($val, $size) == $size or last;
+            unless ($raf->Read($val, $size) == $size) {
+                $exifTool->Warn("Truncated '$tag' data");
+                last;
+            }
             # use value to get tag info if necessary
             $tagInfo or $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag, \$val);
-            if ($verbose) {
-                $exifTool->VerboseInfo($tag, $tagInfo, Value => $val, DataPt => \$val);
+            my $hasData = ($$dirInfo{HasData} and $val =~ /^\0...data\0/s);
+            if ($verbose and not $hasData) {
+                $exifTool->VerboseInfo($tag, $tagInfo,
+                    Value => $val,
+                    DataPt => \$val,
+                    DataPos => $dataPos,
+                );
             }
             if ($tagInfo) {
                 my $subdir = $$tagInfo{SubDirectory};
@@ -492,8 +606,10 @@ sub ProcessMOV($$;$)
                         DirStart => 0,
                         DirLen => $size,
                         DirName => $$tagInfo{Name},
+                        HasData => $$subdir{HasData},
+                        HasVersion => $$subdir{HasVersion},
                         # Base needed for IsOffset tags in binary data
-                        Base => $raf->Tell() - $size + ($$dirInfo{Base} || 0),
+                        Base => $dataPos,
                     );
                     if ($$subdir{ByteOrder} and $$subdir{ByteOrder} =~ /^Little/) {
                         SetByteOrder('II');
@@ -506,6 +622,38 @@ sub ProcessMOV($$;$)
                     $exifTool->ProcessDirectory(\%dirInfo, $subTable);
                     delete $exifTool->{SET_GROUP1};
                     SetByteOrder('MM');
+                } elsif ($hasData) {
+                    # handle atoms containing 'data' tags
+                    my $pos = 0;
+                    for (;;) {
+                        last if $pos + 16 > $size;
+                        my ($len, $type, $flags) = unpack("x${pos}Na4N", $val);
+                        last if $pos + $len > $size;
+                        my $value;
+                        if ($type eq 'data' and $len >= 16) {
+                            $pos += 16;
+                            $len -= 16;
+                            $value = substr($val, $pos, $len);
+                            # format flags: 0x0=binary, 0x1=text, 0xd=image, 0x15=boolean 
+                            if ($flags == 0x0015) {
+                                $value = $len ? ReadValue(\$value, $len-1, 'int8u', 1, 1) : '';
+                            } elsif ($flags != 0x01 and not $$tagInfo{ValueConv}) {
+                                # make binary data a scalar reference unless a ValueConv exists
+                                my $buf = $value;
+                                $value = \$buf;
+                            }
+                        }
+                        $exifTool->VerboseInfo($tag, $tagInfo,
+                            Value => ref $value ? $$value : $value,
+                            DataPt => \$val,
+                            DataPos => $dataPos,
+                            Start => $pos,
+                            Size => $len,
+                            Extra => sprintf(", Type='$type', Flags=0x%x",$flags)
+                        ) if $verbose;
+                        $exifTool->FoundTag($tagInfo, $value) if defined $value;
+                        $pos += $len;
+                    }
                 } else {
                     if ($tag =~ /^\xa9/) {
                         # parse international text to extract first string
@@ -521,9 +669,10 @@ sub ProcessMOV($$;$)
                 }
             }
         } else {
-            $raf->Seek($size, 1) or last;
+            $raf->Seek($size, 1) or $exifTool->Warn("Truncated '$tag' data"), last;
         }
         $raf->Read($buff, 8) == 8 or last;
+        $dataPos += $size + 8;
         ($size, $tag) = unpack('Na4', $buff);
     }
     return 1;

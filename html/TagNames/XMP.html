@@ -5,7 +5,7 @@
 <body text='#000000' bgcolor='#ffffff'>
 <h2>XMP Tags</h2>
 
-XMP stands for &#39;Extensible Metadata Platform&#39;, an XML/RDF-based metadata
+XMP stands for &quot;Extensible Metadata Platform&quot;, an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, PNG,
 MIFF, PS, PDF, PSD and DNG.
@@ -17,17 +17,18 @@ to the <b>Tag Name</b>.
 specifies the information format:  <code>integer</code> is a string of digits
 (possibly beginning with a &#39;+&#39; or &#39;-&#39;), <code>real</code> is a floating point number,
 <code>rational</code> is two <code>integer</code> strings separated by a &#39;/&#39; character, <code>date</code>
-is a date/time string in the format &#39;YYYY:MM:DD HH:MM:SS[+/-HH:MM]&#39;,
-<code>boolean</code> is either &#39;True&#39; or &#39;False&#39;, and <code>lang-alt</code> is a list of string
+is a date/time string in the format &quot;YYYY:MM:DD HH:MM:SS[+/-HH:MM]&quot;,
+<code>boolean</code> is either &quot;True&quot; or &quot;False&quot;, and <code>lang-alt</code> is a list of string
 alternatives in different languages. Currently, ExifTool only writes the
-&#39;x-default&#39; language in <code>lang-alt</code> lists.
+&quot;x-default&quot; language in <code>lang-alt</code> lists.
 
-<p>The XMP tags are organized according to schema namespace in the following
-tables. The table names correspond to the XMP namespace prefixes, which are
-used to generate the family 1 group names by adding the prefix &#39;XMP-&#39;.  If
-the same XMP tag name exists in more than one group, all groups are written
-unless a family 1 group name is specified. ie) If XMP:Contrast is specified,
-information will be written to both XMP-crs:Contrast and XMP-exif:Contrast.
+<p>The XMP tags are organized according to schema <b>Namespace</b> in the following
+tables.  Note that a few of the longer namespace prefixes given below have
+been shortened for convenience (since the family 1 group names are derived
+from these by adding a leading &quot;XMP-&quot;).  In cases where a tag name exists in
+more than one namespace, less common namespaces are avoided when writing.
+However, any namespace may be written by specifying a family 1 group name
+for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.
 
 <p>ExifTool will extract XMP information even if it is not listed in these
 tables.  For example, the <code>pdfx</code> namespace doesn&#39;t have a predefined set of
@@ -71,42 +72,46 @@ but this information is extracted by ExifTool anyway.
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#pdf'>XMP pdf Tags</a></td></tr>
 <tr valign='top'>
+<td>photomech</td>
+<td align='center'>-</td>
+<td>--&gt; <a href='PhotoMechanic.html#XMP'>PhotoMechanic XMP Tags</a></td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>photoshop</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#photoshop'>XMP photoshop Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>PixelLive</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#PixelLive'>XMP PixelLive Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>tiff</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#tiff'>XMP tiff Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>xmp</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmp'>XMP xmp Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>xmpBJ</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpBJ'>XMP xmpBJ Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>xmpDM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpDM'>XMP xmpDM Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>xmpMM</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpMM'>XMP xmpMM Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>xmpPLUS</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpPLUS'>XMP xmpPLUS Tags</a></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>xmpRights</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpRights'>XMP xmpRights Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>xmpTPg</td>
 <td align='center'>-</td>
 <td>--&gt; <a href='XMP.html#xmpTPg'>XMP xmpTPg Tags</a></td></tr>
@@ -212,7 +217,7 @@ Photoshop Camera Raw Schema tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Contrast</td>
-<td align='center'>integer</td>
+<td align='center'>integer/</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>CropAngle</td>
@@ -286,7 +291,7 @@ Photoshop Camera Raw Schema tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Saturation</td>
-<td align='center'>integer</td>
+<td align='center'>integer/</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Shadows</td>
@@ -298,7 +303,7 @@ Photoshop Camera Raw Schema tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Sharpness</td>
-<td align='center'>integer</td>
+<td align='center'>integer/</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Temperature</td>
@@ -333,7 +338,7 @@ Photoshop Camera Raw Schema tags.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>WhiteBalance</td>
-<td align='center'>string</td>
+<td align='center'>string/</td>
 <td><font size='-1'>&#39;As Shot&#39; = As Shot
   <br>&#39;Auto&#39; = Auto
   <br>&#39;Cloudy&#39; = Cloudy
@@ -834,7 +839,7 @@ EXIF schema for EXIF tags.
 <td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
-<td>ExifImageHeight</td>
+<td>ExifImageLength</td>
 <td align='center'>integer</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
@@ -930,9 +935,8 @@ EXIF schema for EXIF tags.
 
 <h2><a name='iptcCore'>XMP iptcCore Tags</a></h2>
 IPTC Core schema tags.  The actual IPTC Core namespace schema prefix is
-<code>Iptc4xmpCore</code>, which is the name used in the file, but ExifTool uses
-<code>iptcCore</code> to generate the family 1 group name of XMP-iptcCore because
-XMP-Iptc4xmpCore is a bit lengthy.
+&quot;Iptc4xmpCore&quot;, which is the prefix recorded in the file, but ExifTool
+shortens this for the &quot;XMP-iptcCore&quot; family 1 group name.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
@@ -992,7 +996,7 @@ XMP-Iptc4xmpCore is a bit lengthy.
 </table></td></tr></table></blockquote>
 
 <h2><a name='pdf'>XMP pdf Tags</a></h2>
-Adobe PDF schema tags.  The official XMP specification only defines
+Adobe PDF schema tags.  The official XMP specification defines only
 Keywords, PDFVersion and Producer.  The other tags are included because they
 have been observed in PDF files, but Creator, Subject and Title are avoided
 when writing due to name conflicts with XMP-dc tags.
@@ -1082,7 +1086,7 @@ Adobe Photoshop schema tags.
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Source</td>
-<td align='center'>string</td>
+<td align='center'>string/</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>State</td>
@@ -1103,8 +1107,9 @@ Adobe Photoshop schema tags.
 </table></td></tr></table></blockquote>
 
 <h2><a name='PixelLive'>XMP PixelLive Tags</a></h2>
-PixelLive schema tags.  These tags are not writable because they are
-uncommon and there are name conflicts with other more common tags.
+PixelLive schema tags.  These tags are not writable becase they are very
+uncommon and I haven&#39;t been able to locate a reference which gives the
+namespace URI.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
@@ -1299,10 +1304,9 @@ EXIF schema for TIFF tags.
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmp'>XMP xmp Tags</a></h2>
-XMP Basic schema tags.  If the older <code>xap</code>, <code>xapBJ</code>, <code>xapMM</code> or
-<code>xapRights</code> namespace prefixes are found, they are translated to the newer
-<code>xmp</code>, <code>xmpBJ</code>, <code>xmpMM</code> and <code>xmpRights</code> prefixes for use in family 1
-group names.
+XMP Basic schema tags.  If the older &quot;xap&quot;, &quot;xapBJ&quot;, &quot;xapMM&quot; or &quot;xapRights&quot;
+namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
+&quot;xmpBJ&quot;, &quot;xmpMM&quot; and &quot;xmpRights&quot; prefixes for use in family 1 group names.
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
 <table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
@@ -1325,7 +1329,7 @@ group names.
 <td>&nbsp;</td></tr>
 <tr valign='top'>
 <td>Identifier</td>
-<td align='center'>string+</td>
+<td align='center'>string/+</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
 <td>Label</td>
@@ -2124,6 +2128,6 @@ XMP Paged-Text schema tags.
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 21, 2006</i>
+<br><i>Last revised Oct 30, 2006</i>
 </body>
 </html>

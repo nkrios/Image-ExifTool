@@ -57,32 +57,40 @@ ExifTool provides an extensible set of perl modules to read and write meta
 information in image, audio and video files, including the maker note
 information of many digital cameras by various manufacturers such as Canon,
 Casio, FujiFilm, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
-Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo and Sigma/Foveon.
+Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo, Sigma/Foveon and
+Sony.
 
 Below is a list of file types and meta information formats currently
 supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       MIE   r/w/c   PSD   r/w    |  EXIF           r/w/c
-  AI    r       MIFF  r       QTIF  r      |  GPS            r/w/c
-  AIFF  r       MNG   r/w     RA    r      |  IPTC           r/w/c
-  ARW   r       MOS   r/w     RAF   r      |  XMP            r/w/c
-  ASF   r       MOV   r       RAM   r      |  MakerNotes     r/w/c
-  AVI   r       MP3   r       RAW   r      |  Photoshop IRB  r/w/c
-  BMP   r       MP4   r       RIFF  r      |  ICC Profile    r/w/c
-  CR2   r/w     MPG   r       RM    r      |  MIE            r/w/c
-  CRW   r/w     MRW   r/w     SR2   r      |  JFIF           r/w
-  DCM   r       NEF   r/w     SRF   r      |  CIFF           r/w
-  DNG   r/w     ORF   r       SWF   r      |  AFCP           r/w
-  EPS   r/w     PBM   r/w     THM   r/w    |  FlashPix       r
-  ERF   r/w     PDF   r       TIFF  r/w    |  GeoTIFF        r
-  FPX   r       PEF   r/w     WAV   r      |  PrintIM        r
-  GIF   r/w     PGM   r/w     WDP   r/w    |  ID3            r
-  ICC   r/w/c   PICT  r       WMA   r      |  Kodak Meta     r
-  JNG   r/w     PNG   r/w     WMV   r      |  ASCII APP12    r
-  JP2   r       PPM   r/w     X3F   r      |  Adobe APP14    r
-  JPEG  r/w     PS    r/w     XMP   r/w/c  |
+  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
+  AI    r       MIE   r/w/c   PSD   r/w    |  GPS            r/w/c
+  AIFF  r       MIFF  r       QTIF  r      |  IPTC           r/w/c
+  APE   r       MNG   r/w     RA    r      |  XMP            r/w/c
+  ARW   r       MOS   r/w     RAF   r      |  MakerNotes     r/w/c
+  ASF   r       MOV   r       RAM   r      |  Photoshop IRB  r/w/c
+  AVI   r       MP3   r       RAW   r      |  ICC Profile    r/w/c
+  BMP   r       MP4   r       RIFF  r      |  MIE            r/w/c
+  CR2   r/w     MPC   r       RM    r      |  JFIF           r/w/c
+  CRW   r/w     MPG   r       SR2   r      |  CIFF           r/w
+  DCM   r       MRW   r/w     SRF   r      |  AFCP           r/w
+  DNG   r/w     NEF   r/w     SWF   r      |  FlashPix       r
+  EPS   r/w     OGG   r       THM   r/w    |  GeoTIFF        r
+  ERF   r/w     ORF   r/w     TIFF  r/w    |  PrintIM        r
+  FLAC  r       PBM   r/w     VRD   r/w    |  ID3            r
+  FPX   r       PDF   r       WAV   r      |  Kodak Meta     r
+  GIF   r/w     PEF   r/w     WDP   r/w    |  Ricoh RMETA    r
+  ICC   r/w/c   PGM   r/w     WMA   r      |  Picture Info   r
+  JNG   r/w     PICT  r       WMV   r      |  Adobe APP14    r
+  JP2   r       PNG   r/w     X3F   r      |  APE            r
+  JPEG  r/w     PPM   r/w     XMP   r/w/c  |  (and more)
+
+=head1 CONFIGURATION
+
+User-defined tags can be added via the ExifTool configuration file.  See
+"ExifTool_config" in the ExifTool distribution for more details.
 
 =head1 METHODS
 
@@ -312,11 +320,11 @@ Default is 0.
 
 =item ByteOrder
 
-The byte order for newly created EXIF segments when writing. If EXIF
-information already exists, the existing order is used instead.  Valid
-values are 'MM', 'II' and undef.  If not defined, the order of the maker
-notes is used (if maker notes are copied), otherwise 'MM' is used. Default
-is undef.
+The byte order for newly created EXIF segments when writing.  Note that if
+EXIF information already exists, the existing order is maintained.  Valid
+values are 'MM', 'II' and undef.  If ByteOrder is not defined (the default),
+then the maker note byte order is used (if they are being copied), otherwise
+big-endian ('MM') order is assumed.
 
 =item Charset
 
@@ -378,7 +386,8 @@ name with a '-' in the arguments to L</ImageInfo>.
 
 Flag to increase speed of extracting information from JPEG images.  With
 this option set, ExifTool will not scan to the end of a JPEG image to check
-for an AFCP or PreviewImage trailer.  Default is 0.
+for an AFCP, CanonVRD, FotoStation, PhotoMechanic or PreviewImage trailer.
+Default 0.
 
 =item FixBase
 
@@ -404,6 +413,11 @@ Dump information in hex to dynamic HTML web page.  The value may be 0-3 for
 increasingly larger limits on the maximum block size.  Default is 0.  Output
 goes to the file specified by the TextOut option (\*STDOUT by default).
 
+=item HtmlDumpBase
+
+Specifies base for HTML dump offsets.  If not defined, the EXIF/TIFF base
+offset is used.  Set to 0 for absolute offsets.  Default is undef.
+
 =item IgnoreMinorErrors
 
 Causes minor errors to be downgraded to warnings, and minor warnings to be
@@ -421,6 +435,12 @@ concatenating them into comma-separated strings.  Default is 0.
 
 Flag to cause MakerNotes data and other writable subdirectories (such as
 PrintIM) to be extracted as a data block.
+
+=item MissingTagValue
+
+Value for missing tags in expressions evaluated by L</SetNewValuesFromFile>.
+If not set, a minor error is issued for missing values, or the value is set
+to '' if L<IgnoreMinorErrors> is set.  Default is undef.
 
 =item PrintConv
 
@@ -451,8 +471,8 @@ Output file reference for Verbose and HtmlDump options.  Default is
 =item Unknown
 
 Flag to get the values of unknown tags.  If set to 1, unknown tags are
-extracted from EXIF directories.  If set to 2, unknown tags are also
-extracted from binary data blocks.  Default is 0.
+extracted from EXIF (or other tagged-format) directories.  If set to 2,
+unknown tags are also extracted from binary data blocks.  Default is 0.
 
 =item Verbose
 
@@ -929,7 +949,9 @@ order, so exclusions apply only to tags included earlier in the list.  An
 extension of this feature allows the tag value to be set from an expression
 containing tag names with leading '$' symbols (ie. 'CommentE<lt>Filename:
 $filename').  Braces '{}' may be used around the tag name to separate it
-from subsequent text, and a '$$' is used to to represent a '$' symbol.
+from subsequent text, and a '$$' is used to to represent a '$' symbol.  (The
+behaviour for missing tags in expressions is defined by the
+L</MissingTagValue> option.)
 
 By default, this routine will commute information between same-named tags in
 different groups, allowing information to be translated between images with
@@ -1066,6 +1088,8 @@ Set the file modification time from the new value of the FileModifyDate tag.
 1 if the time was changed, 0 if nothing was done, or -1 if there was an
 error setting the time.
 
+=back
+
 =head2 SetFileName
 
 Set the file name and directory.  If not specified, the new file name is
@@ -1104,10 +1128,9 @@ Will not overwrite existing files. New directories are created as necessary.
 Set the order of the preferred groups when adding new information.  In
 subsequent calls to L</SetNewValue>, new information will be created in the
 first valid group of this list.  This has an impact only if the group is not
-specified and the tag name exists in more than one group.  The default order
-is EXIF, GPS, IPTC, XMP and MakerNotes.  The default order is EXIF, GPS,
-IPTC, XMP and MakerNotes.  Any family 0 group name may be used.  Case is not
-significant.
+specified when calling L</SetNewValue> and if the tag name exists in more
+than one group.  The default order is EXIF, IPTC, XMP then MakerNotes.  Any
+family 0 group name may be used.  Case is not significant.
 
     $exifTool->SetNewGroups('XMP','EXIF','IPTC');
 
@@ -1391,34 +1414,66 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (General Location):
 
-AFCP, AIFF, APP12, APP14, ASF, BMP, Composite, DICOM, DNG, EXIF, ExifTool,
-File, Flash, FlashPix, GPS, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, Jpeg2000,
-Leaf, MIE, MIFF, MNG, MPEG, MakerNotes, Meta, PDF, PICT, PNG, Photoshop,
-PostScript, PrintIM, QuickTime, RIFF, Real, SigmaRaw, XMP
+AFCP, AIFF, APE, APP12, APP14, APP15, APP5, APP6, APP8, ASF, BMP, CanonVRD,
+Composite, DICOM, DNG, EXIF, ExifTool, FLAC, File, Flash, FlashPix,
+FotoStation, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, JPEG, Jpeg2000, Leaf,
+MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG, PhotoMechanic,
+Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real, SigmaRaw, Vorbis, XMP
 
 =item Family 1 (Specific Location):
 
-AFCP, AIFF, APP12, APP14, ASF, BMP, Canon, CanonCustom, CanonRaw, Casio,
-Composite, DICOM, DNG, ExifIFD, ExifTool, File, Flash, FlashPix, FujiFilm,
-GPS, GeoTiff, GlobParamIFD, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
-IPTC, InteropIFD, JFIF, JVC, Jpeg2000, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KyoceraRaw, Leaf, LeafSubIFD, MIE-Audio, MIE-Camera,
-MIE-Doc, MIE-Extender, MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
-MIE-MakerNotes, MIE-Meta, MIE-Preview, MIE-Thumbnail, MIE-Unknown,
-MIE-Video, MIFF, MNG, MPEG, MakerUnknown, MetaIFD, Minolta, MinoltaRaw,
-Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT, PNG, Panasonic,
-Pentax, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real, Real-CONT,
-Real-MDPR, Real-PROP, Real-RA3, Real-RA4 Real-RA5, Real-RJMD, Ricoh, SR2,
-SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, XMP, XMP-PixelLive,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+AFCP, AIFF, APE, ASF, Adobe, BMP, Canon, CanonCustom, CanonRaw, CanonVRD,
+Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool, FLAC, File,
+Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD,
+GraphConv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
+ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF,
+JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw,
+Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG,
+MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture,
+NikonPreview, Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic,
+Photoshop, PictureInfo, PostScript, PrintIM, QuickTime, RIFF, RMETA, Real,
+Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
+Ricoh, SPIFF, SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis,
+XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif,
+XMP-iptcCore, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 
-Audio, Author, Camera, ExifTool, Image, Location, Other, Printing, Time,
-Unknown, Video
+Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
+Time, Unknown, Video
+
+=back
+
+=head2 GetDeleteGroups [static]
+
+Get list of all deletable group names.
+
+    @delGroups = Image::ExifTool::GetDeleteGroups();
+
+=over 4
+
+=item Inputs:
+
+None.
+
+=item Return Values:
+
+A list of deletable group names in alphabetical order.  The current list of
+deletable group names is:
+
+AFCP, CIFF, CanonVRD, EXIF, ExifIFD, Ducky, File, FlashPix, FotoStation,
+GlobParamIFD, GPS, IFD0, IFD1, InteropIFD, ICC_Profile, IPTC, JFIF,
+MakerNotes, Meta, MetaIFD, MIE, PhotoMechanic, Photoshop, PNG, PrintIM,
+RMETA, SubIFD, Trailer, XMP
+
+All names in this list are either family 0 or family 1 group names, with the
+exception of 'Trailer' which allows all trailers in JPEG and TIFF-format
+images to be deleted at once, including unknown trailers.  To schedule a
+group for deletion, call L</SetNewValue> with an undefined value and a tag
+name like 'Trailer:*'.
 
 =back
 

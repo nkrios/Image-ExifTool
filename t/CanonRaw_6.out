@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.41
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
 [File, File, Image]  - File Name: CanonRaw_6_failed.cr2
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 11 kB
-[File, File, Time]  - File Modification Date/Time: 2006:09:18 10:34:16
+[File, File, Time]  - File Modification Date/Time: 2006:11:17 13:51:51
 [File, File, Image]  - File Type: CR2
 [File, File, Image]  - MIME Type: image/x-raw
 [EXIF, IFD0, Image] 256 - Image Width: 1536
@@ -37,7 +37,7 @@
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 3456
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2304
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98
+[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3954.233
 [EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3958.763
@@ -66,7 +66,7 @@
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Normal
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
-[MakerNotes, Canon, Camera] 3 - Image Quality: RAW
+[MakerNotes, Canon, Camera] 3 - Quality: RAW
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Single
 [MakerNotes, Canon, Camera] 7 - Focus Mode: One-shot AF
@@ -78,7 +78,7 @@
 [MakerNotes, Canon, Camera] 15 - Sharpness: Normal
 [MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
-[MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Aperture-Priority AE
+[MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Aperture-priority AE
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18
@@ -139,6 +139,7 @@
 [MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2304
 [MakerNotes, Canon, Image] 22 - AF Points Used: Center
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 2
+[MakerNotes, Canon, Camera] 131 - Original Decision Data: 0
 [MakerNotes, Canon, Image] 1 - File Number: 100-0024
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
@@ -194,15 +195,15 @@
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.1
-[Composite, Composite, Camera]  - Shooting Mode: Aperture-Priority AE
+[Composite, Composite, Camera]  - Shooting Mode: Aperture-priority AE
 [Composite, Composite, Image]  - Shutter Speed: 1/15
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - WB RGGB Levels: 2002 1185 1187 2364
 [Composite, Composite, Camera]  - Blue Balance: 1.993255
 [Composite, Composite, Image]  - Circle Of Confusion: 0.027 mm
-[Composite, Composite, Image]  - EV: 7.9
 [Composite, Composite, Camera]  - Focal Length: 55.0mm (35mm equivalent: 62.3mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 14.24 m
 [Composite, Composite, Image]  - Image Size: 1536x1024
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 20.4 - 62.3mm)
+[Composite, Composite, Image]  - Light Value: 7.9
 [Composite, Composite, Camera]  - Red Balance: 1.688027

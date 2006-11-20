@@ -14,8 +14,8 @@
 #
 #               For unrecognized file types, this command may be used:
 #
-#                 exiftool -o new.mie "-subfilename<SRC" "-subfiletype<TYPE" \
-#                    "-subfilemimetype<MIME" "-subfile<=SRC"
+#                 exiftool -o new.mie -subfilename=SRC -subfiletype=TYPE \
+#                    -subfilemimetype=MIME "-subfile<=SRC"
 #
 #               where SRC, TYPE and MIME represent the source file name, file
 #               type and MIME type respectively.
@@ -33,7 +33,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '0.21';
+$VERSION = '0.24';
 
 sub ProcessMIEGroup($$$);
 sub WriteMIEGroup($$$);
@@ -111,8 +111,7 @@ my %mieMap = (
 # convenience variables for common tagInfo entries
 my %binaryConv = (
     Writable => 'undef',
-    ValueConv => '\$val',
-    ValueConvInv => '$val',
+    Binary => 1,
 );
 my %dateConv = (
     Shift => 'Time',
@@ -166,6 +165,16 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'SubfileResource',
         Notes => 'subfile resource fork if it exists',
         %binaryConv,
+    },
+    zmie => {
+        Name => 'TrailerSignature',
+        Writable => 'undef',
+        Notes => q{
+            used as the last element in the main "0MIE" group to identify a MIE trailer
+            when appended to another type of file.  ExifTool will create this tag if set
+            to any value, but always with an empty data block
+        },
+        ValueConvInv => '""',   # data block must be empty
     },
 );
 
@@ -1414,7 +1423,7 @@ sub ProcessMIE($$)
         if ($outfile) {
 
             if ($VERSION < 1) {
-                $exifTool->Error("MIE format still in development (version $VERSION)",1);
+                $exifTool->Warn("MIE format still in development (version $VERSION)");
             }
 
             # generate lookup for MIE format codes if not done already
@@ -1467,7 +1476,7 @@ information in MIE files.
 
 =head1 WHAT IS MIE?
 
-MIE stands for Meta Information Encapsulation.  The MIE format is an
+MIE stands for "Meta Information Encapsulation".  The MIE format is an
 extensible, dedicated meta information format which supports storage of
 binary as well as textual meta information.  MIE can be used to encapsulate
 meta information from many sources and bundle it together with any type of
@@ -1480,17 +1489,17 @@ common file and meta information formats, and comparing them to MIE.  The
 following features are rated for each format with a score of 0 to 10:
 
   1) Extensible (can incorporate user-defined information).
-  2) Tag ID's meaningful (hints to meaning of unknown information).
-  3) Sequential read/written ability (streamable).
+  2) Meaningful tag ID's (hint to meaning of unknown information).
+  3) Sequential read/write ability (streamable).
   4) Hierarchical information structure.
   5) Easy to implement reader/writer/editor.
-  6) Data order well defined.
+  6) Order of information well defined.
   7) Large data lengths supported: >64kB (+5) and >4GB (+5).
   8) Localized text strings.
   9) Multiple documents in a single file.
  10) Compact format doesn't squander disk space or bandwidth.
  11) Compressed meta information supported.
- 12) Relocatable data elements.
+ 12) Relocatable data elements (ie. no fixed offsets).
  13) Binary meta information (+7) with variable byte order (+3).
  14) Mandatory tags not required (because that would be stupid).
  15) Append information to end of file without editing.
@@ -1506,6 +1515,7 @@ following features are rated for each format with a score of 0 to 10:
      RIFF    0  5 10 10 10  0  5  0  0 10  0 10  7 10  0     77
      JPEG   10  0 10  0 10  0  0  0  0 10  0 10  7 10  0     67
      EPS    10 10 10  0  0  0 10  0 10  0  0  5  0 10  0     65
+     CIFF    0  0  0 10 10  0  5  0  0 10  0 10 10 10  0     65
      TIFF    0  0  0 10  5 10  5  0 10 10  0  0 10  0  0     60
      EXIF    0  0  0 10  5 10  0  0  0 10  0  0 10  0  0     45
      IPTC    0  0 10  0  8  0  0  0  0 10  0 10  7  0  0     45
@@ -1522,7 +1532,8 @@ important because meta information is routinely lost when files are edited.
 
 Also, the MIE format supports multiple files by simple concatination,
 enabling all kinds of wonderful features such as linear databases, edit
-histories or non-intrusive file updates.
+histories or non-intrusive file updates.  This ability can also be leveraged
+to allow MIE-format trailers to be added to some other file types.
 
 =head1 MIE FORMAT SPECIFICATION
 
@@ -1541,8 +1552,9 @@ and may store data from zero to 2^64-1 bytes in length.
 
 The first element in the MIE file must be an uncompressed MIE group element
 with a tag name of "0MIE".  This restriction allows the first 8 bytes of a
-MIE file to be used to identify a MIE format file.  The following tables
-list these byte sequences for big-endian and little-endian MIE-format files:
+MIE file to be used to identify a MIE format file.  The following table
+lists the two possible initial byte sequences for a MIE-format file (the
+first for big-endian, and the second for little-endian byte ordering):
 
     Byte Number:      0    1    2    3    4    5    6    7
 
@@ -1565,9 +1577,9 @@ byte 3 may have any value (0x00 to 0xff).
     1 byte  TagLength (T)
     1 byte  DataLength (gives D if DataLength < 253)
     T bytes TagName (T given by TagLength)
-    2 bytes DataLength2 [exists only if DataLength == 255]
-    4 bytes DataLength4 [exists only if DataLength == 254]
-    8 bytes DataLength8 [exists only if DataLength == 253]
+    2 bytes DataLength2 [exists only if DataLength == 255 (0xff)]
+    4 bytes DataLength4 [exists only if DataLength == 254 (0xfe)]
+    8 bytes DataLength8 [exists only if DataLength == 253 (0xfd)]
     D bytes DataBlock (D given by DataLength)
 
 The minimum element length is 4 bytes (for a group terminator).  The maximum
@@ -1696,7 +1708,10 @@ uncompressed data (add 0x04 to each value for compressed data):
     the stored values.
 
  6) Rational values are treated as two separate integers.  The numerator
-    always comes first regardless of the byte ordering.
+    always comes first regardless of the byte ordering.  In a signed
+    rational value, only the numerator is signed.  The denominator of all
+    rational values is unsigned (ie. a signed 32-bit rational of
+    0x80000000/0x80000000 evaluates to -1, not +1).
 
  7) 32-bit fixed point values are converted to floating point by treating
     them as an integer and dividing by an appropriate value.  ie)
@@ -1713,19 +1728,20 @@ valid, but the TagLength of 0 is valid only for the MIE group terminator.
 
 DataLength is an unsigned byte that gives the number of bytes in the data
 block.  A value between 0 and 252 gives the data length directly, and
-numbers from 253 to 255 are reserved for special codes.  Codes of 255, 254
-and 253 indicate that the element contains an additional 2, 4 or 8 byte
-unsigned integer representing the data length.
+numbers from 253 to 255 are reserved for extended DataLength codes.  Codes
+of 255, 254 and 253 indicate that the element contains an additional 2, 4 or
+8 byte unsigned integer representing the data length.
 
-    0-252 = length of data block
-    255   = use DataLength2
-    254   = use DataLength4
-    253   = use DataLength8
+    0-252      - length of data block
+    255 (0xff) - use DataLength2
+    254 (0xfe) - use DataLength4
+    253 (0xfd) - use DataLength8
 
 A DataLength of zero is valid for any element except a compressed MIE group.
 A zero DataLength for an uncompressed MIE group indicates that the group
 length is unknown.  For other elements, a zero length indicates there is no
-associated data.
+associated data.  A terminator element must have a DataLength of 0, 6 or 10,
+and may not use an extended DataLength.
 
 =head3 TagName
 
@@ -1761,7 +1777,7 @@ rule allows tags to begin with a digit (0-9) if they must come before other
 tags in the sort order, or a lowercase letter (a-z) if they must come after.
 For instance, the '0Type' element begins with a digit so it comes before,
 and the 'data' element begins with a lowercase letter so that it comes after
-meta information tags in the main '0MIE' group.
+meta information tags in the main "0MIE" group.
 
 Sets of tags which would require a common prefix should be added in a
 separate MIE instead of adding the prefix to all tag names.  For example,
@@ -1815,24 +1831,26 @@ over entire MIE groups.  For compressed groups DataLength must be non-zero,
 and is the length of the compressed group data (which includes the
 compressed group terminator).
 
-The group terminator has a FormatCode and TagLength of zero.  Terminators
-usually also have a DataLength of zero.  Hence, the byte sequence for a
-terminator is commonly 7e 00 00 00 (hex).  However, the terminator may also
-have a DataLength of 6 or 10 bytes, and an associated data block containing
-information about the length and byte ordering of the preceeding group.
-This additional information is recommended for file-level groups, and is
-used in multi-document MIE files to allow the file to be scanned backwards
-to quickly locate the last documents in the file, and may also allow some
-documents to be recovered if part of the file is corrupted.  The structure
-of this optional terminator data block is as follows:
+=head3 Group Terminator
+
+The group terminator has a FormatCode and TagLength of zero.  The terminator
+DataLength must be 0, 6 or 10 bytes, and extended DataLength codes may not
+be used.  With a zero DataLength, the byte sequence for a terminator is "7e
+00 00 00" (hex).  With a DataLength of 6 or 10 bytes, the terminator data
+block contains information about the length and byte ordering of the
+preceeding group.  This additional information is recommended for file-level
+groups, and is used in multi-document MIE files to allow the file to be
+scanned backwards to quickly locate the last documents in the file, and may
+also allow some documents to be recovered if part of the file is corrupted.
+The structure of this optional terminator data block is as follows:
 
     4 or 8 bytes  GroupLength (unsigned integer)
-    1 byte        FormatCode (0x10 or 0x18, same as MIE group element)
+    1 byte        ByteOrder (0x10 or 0x18, same as MIE group)
     1 byte        GroupLengthSize (0x04 or 0x08)
 
-The FormatCode and GroupLengthSize give the byte ordering and number of
-bytes in the GroupLength integer.  The GroupLength gives the total length of
-the group ending with this terminator, including the lengths of the MIE
+The ByteOrder and GroupLengthSize values give the byte ordering and size of
+the GroupLength integer.  The GroupLength value is the total length of the
+entire MIE group ending with this terminator, including the opening MIE
 group element and the terminator itself.
 
 =head3 File-level MIE groups
@@ -1852,13 +1870,14 @@ multiple documents in a single MIE file.  Furthermore, the MIE structure
 enables multi-document files to be generated by simply concatinating two or
 more MIE files.
 
-=head3 Scanning Backwards through a MIE File
+=head2 Scanning Backwards through a MIE File
 
 The steps below give an algorithm to quickly locate the last document in a
 MIE file:
 
-1) Read the last 10 bytes of the file.  A valid MIE file must be a minimum
-of 12 bytes long.
+1) Read the last 10 bytes of the file.  (Note that a valid MIE file may be
+as short as 12 bytes long, but a file this length contains only an an empty
+MIE group.)
 
 2) If the last byte of the file is zero, then it is not possible to scan
 backward through the file, so the file must be scanned from the beginning.
@@ -1873,30 +1892,56 @@ ordering or 0x18 for little-endian ordering, otherwise this isn't a valid
 MIE file.
 
 5) The preceeding 4 or 8 bytes give the length of the complete file-level
-MIE group, including the leading MIE group element and the terminator
-element.  The value is an unsigned integer stored with the specified byte
-order.  From the current file position (at the end of the 10 bytes we read
-in step 1), seek backward by this number of bytes to find the start of the
-MIE group element for this document.
+MIE group (GroupLength).  This length includes both the leading MIE group
+element and the terminator element itself.  The value is an unsigned integer
+stored with the specified byte order.  From the current file position (at
+the end of the data read in step 1), seek backward by this number of bytes
+to find the start of the MIE group element for this document.
 
 This algorithm may be repeated again beginning at this point in the file to
 locate the next-to-last document, etc.
 
-The table below lists all 5 valid patterns for the last 10 bytes of a
-file-level MIE group (numbers in hex):
+The table below lists all 5 valid patterns for the last 14 bytes of a
+file-level MIE group, with all numbers in hex.  The comments indicate the
+length and byte ordering of GroupLength (xx) if available:
 
-  ?? ?? ?? ?? ?? ?? ?? ?? 00 00  - can not seek backwards
-  ?? ?? ?? ?? GG GG GG GG 10 04  - 4 byte group length (G), big endian
-  ?? ?? ?? ?? GG GG GG GG 18 04  - 4 byte group length (G), little endian
-  GG GG GG GG GG GG GG GG 10 08  - 8 byte group length (G), big endian
-  GG GG GG GG GG GG GG GG 18 08  - 8 byte group length (G), little endian
+  ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 7e 00 00 00  - (no GroupLength)
+  ?? ?? ?? ?? 7e 00 00 06 xx xx xx xx 10 04  - 4 bytes, big endian
+  ?? ?? ?? ?? 7e 00 00 06 xx xx xx xx 18 04  - 4 bytes, little endian
+  7e 00 00 0a xx xx xx xx xx xx xx xx 10 08  - 8 bytes, big endian
+  7e 00 00 0a xx xx xx xx xx xx xx xx 18 08  - 8 bytes, little endian
 
-=head2 MIE Date/Time Format
+=head2 Trailer Signature
 
-All MIE dates are the form "YYYY:mm:dd HH:MM:SS+HH:MM".  The timezone is
-recommended but not required.
+The MIE format may be used for trailer information appended to other types
+of files.  When this is done, a signature must appear at the end of the main
+MIE group to uniquely identify the MIE format trailer.  To achieve this, a
+"zmie" trailer signature is written as the last element in the main "0MIE"
+group.  This element has a FormatCode of 0, a TagLength of 4, a DataLength
+of 0, and a TagName of "zmie".  With this signature, the hex byte sequence
+"7e 00 04 00 7a 6d 69 65" appears immediately before the final group
+terminator, and the last 22 bytes of the trailer correspond to one of the
+following 4 patterns (where the trailer length is given by "xx", as above):
 
-=head2 MIE File MIME Type
+  ?? ?? ?? ?? 7e 00 04 00 7a 6d 69 65 7e 00 00 06 xx xx xx xx 10 04
+  ?? ?? ?? ?? 7e 00 04 00 7a 6d 69 65 7e 00 00 06 xx xx xx xx 18 04
+  7e 00 04 00 7a 6d 69 65 7e 00 00 0a xx xx xx xx xx xx xx xx 10 08
+  7e 00 04 00 7a 6d 69 65 7e 00 00 0a xx xx xx xx xx xx xx xx 18 08
+
+Note that the zero-DataLength terminator may not be used here because the
+trailer length must be known for seeking backwards from the end of the file.
+
+Multiple trailers may be appended to the same file using this technique.
+
+=head2 Date/Time Format
+
+All MIE dates are the form "YYYY:mm:dd HH:MM:SS.ss+HH:MM".  The fractional
+seconds (".ss") are optional, and if included may contain any number of
+significant digits (unlike all other fields which are a fixed number of
+digits).  The timezone ("+HH:MM" or "-HH:MM") is recommended but not
+required.  If not given, the local system timezone is assumed.
+
+=head2 MIME Type
 
 The basic MIME type for a MIE file is "application/x-mie", however the
 specific MIME type depends on the type of subfile, and is obtained by adding
@@ -1907,6 +1952,38 @@ that the "x-" is not duplicated if the subfile MIME type already starts with
 file of type "image/x-mie-raw", not "image/x-mie-x-raw".  In the case of
 multiple documents in a MIE file, the MIME type is taken from the first
 document.
+
+=head2 Levels of Support
+
+Basic MIE reader/writer applications may choose not to provide support for
+some advanced features of the MIE format.  Features which may not be
+supported by all software are:
+
+=over 4
+
+=item Compression
+
+Software not supporting compression must ignore compressed elements and
+groups, but should be able to process the remaining information.
+
+=item Large data lengths
+
+Some software may limit the maximum size of a MIE group or element.
+Historically, a limit of 2GB may be imposed by some systems.  However,
+8-byte data lengths should be supported by all applications provided the
+value doesn't exceed the system limit.  (ie. For systems with a 2GB limit,
+8-byte data lengths should be supported if the upper 17 bits are all zero.)
+If a data length above the system limit is encountered, it may be necessary
+for the application to stop processing if it can not seek to the next
+element in the file.
+
+=back
+
+=head2 Revisions
+
+  2006-11-09 - Added Levels of Support
+  2006-11-03 - Added Trailer Signature
+  2005-11-18 - Original specification created
 
 =head1 AUTHOR
 

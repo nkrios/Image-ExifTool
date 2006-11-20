@@ -36,11 +36,11 @@ sub ProcessX3FProperties($$$);
     },
     IMAG => {
         Name => 'PreviewImage',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     IMA2 => {
         Name => 'PreviewImage',
-        ValueConv => '\$val',
+        Binary => 1,
     },
 );
 

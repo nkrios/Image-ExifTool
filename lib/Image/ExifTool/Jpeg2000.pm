@@ -75,7 +75,7 @@ my %jp2ResolutionUnit = (
             },
             {
                 Name => 'ColorSpecification',
-                ValueConv => '\$val',
+                Binary => 1,
             },
         ],
         pclr => 'Palette',

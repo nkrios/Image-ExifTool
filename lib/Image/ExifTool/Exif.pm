@@ -33,7 +33,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.07';
+$VERSION = '2.16';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -165,10 +165,19 @@ my %longBin = (
     0x1 => {
         Name => 'InteropIndex',
         Description => 'Interoperability Index',
+        PrintConv => {
+            R98 => 'R98 - DCF basic file (sRGB)',
+            R03 => 'R03 - DCF option file (Adobe RGB)',
+            THM => 'THM - DCF thumbnail file',
+        },
     },
     0x2 => {
         Name => 'InteropVersion',
         Description => 'Interoperability Version',
+    },
+    0x0b => { #PH
+        Name => 'ProcessingSoftware',
+        Notes => 'used by ACD Systems Digital Imaging',
     },
     0xfe => {
         Name => 'SubfileType',
@@ -266,14 +275,14 @@ my %longBin = (
                 ($self->{TIFF_TYPE} ne "DNG" or $self->{DIR_NAME} !~ /^SubIFD[12]$/)
             ],
             Name => 'StripOffsets',
-            Flags => 'IsOffset',
+            IsOffset => 1,
             OffsetPair => 0x117,  # point to associated byte counts
             ValueConv => 'length($val) > 32 ? \$val : $val',
         },
         {
             Condition => '$self->{DIR_NAME} eq "IFD0"',
             Name => 'PreviewImageStart',
-            Flags => 'IsOffset',
+            IsOffset => 1,
             OffsetPair => 0x117,
             Notes => q{
                 PreviewImageStart in IFD0 of CR2 images and SubIFD1 of DNG images, and
@@ -288,7 +297,7 @@ my %longBin = (
         {
             Condition => '$self->{DIR_NAME} eq "SubIFD1"',
             Name => 'PreviewImageStart',
-            Flags => 'IsOffset',
+            IsOffset => 1,
             OffsetPair => 0x117,
             DataTag => 'PreviewImage',
             Writable => 'int32u',
@@ -298,7 +307,7 @@ my %longBin = (
         },
         {
             Name => 'JpgFromRawStart',
-            Flags => 'IsOffset',
+            IsOffset => 1,
             OffsetPair => 0x117,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
@@ -387,7 +396,7 @@ my %longBin = (
     0x11f => 'YPosition',
     0x120 => {
         Name => 'FreeOffsets',
-        Flags => 'IsOffset',
+        IsOffset => 1,
         OffsetPair => 0x121,
         ValueConv => 'length($val) > 32 ? \$val : $val',
     },
@@ -408,7 +417,7 @@ my %longBin = (
     },
     0x123 => {
         Name => 'GrayResponseCurve',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x124 => {
         Name => 'T4Options',
@@ -437,7 +446,7 @@ my %longBin = (
     0x12c => 'ColorResponseUnit', #9
     0x12d => {
         Name => 'TransferFunction',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x131 => {
         Name => 'Software',
@@ -470,14 +479,14 @@ my %longBin = (
     0x140 => {
         Name => 'ColorMap',
         Format => 'binary',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x141 => 'HalftoneHints',
     0x142 => 'TileWidth',
     0x143 => 'TileLength',
     0x144 => {
         Name => 'TileOffsets',
-        Flags => 'IsOffset',
+        IsOffset => 1,
         OffsetPair => 0x145,
         ValueConv => 'length($val) > 32 ? \$val : $val',
     },
@@ -540,7 +549,7 @@ my %longBin = (
     },
     0x15b => {
         Name => 'JPEGTables',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x15f => { #10
         Name => 'OPIProxy',
@@ -600,8 +609,13 @@ my %longBin = (
     0x201 => [
         {
             Name => 'ThumbnailOffset',
-            Condition => '$self->{DIR_NAME} eq "IFD1"',
-            Flags => 'IsOffset',
+            # thumbnail is found in IFD1 of JPEG and TIFF images, and
+            # IFD0 of EXIF information in FujiFilm AVI (RIFF) videos
+            Condition => q{
+                $self->{DIR_NAME} eq 'IFD1' or
+                ($self->{FILE_TYPE} eq 'RIFF' and $self->{DIR_NAME} eq 'IFD0')
+            },
+            IsOffset => 1,
             OffsetPair => 0x202,
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
@@ -611,7 +625,7 @@ my %longBin = (
         {
             Name => 'PreviewImageStart',
             Condition => '$self->{DIR_NAME} eq "MakerNotes"',
-            Flags => 'IsOffset',
+            IsOffset => 1,
             OffsetPair => 0x202,
             DataTag => 'PreviewImage',
             Writable => 'int32u',
@@ -621,7 +635,7 @@ my %longBin = (
         {
             Name => 'JpgFromRawStart',
             Condition => '$self->{DIR_NAME} eq "SubIFD"',
-            Flags => 'IsOffset',
+            IsOffset => 1,
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
@@ -633,7 +647,7 @@ my %longBin = (
         {
             Name => 'JpgFromRawStart',
             Condition => '$self->{DIR_NAME} eq "IFD2"',
-            Flags => 'IsOffset',
+            IsOffset => 1,
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
@@ -644,13 +658,17 @@ my %longBin = (
         },
         {
             Name => 'OtherImageStart',
+            IsOffset => 1,
             OffsetPair => 0x202,
         },
     ],
     0x202 => [
         {
             Name => 'ThumbnailLength',
-            Condition => '$self->{DIR_NAME} eq "IFD1"',
+            Condition => q{
+                $self->{DIR_NAME} eq 'IFD1' or
+                ($self->{FILE_TYPE} eq 'RIFF' and $self->{DIR_NAME} eq 'IFD0')
+            },
             OffsetPair => 0x201,
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
@@ -853,16 +871,16 @@ my %longBin = (
     0x87af => {
         Name => 'GeoTiffDirectory',
         Format => 'binary',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x87b0 => {
         Name => 'GeoTiffDoubleParams',
         Format => 'binary',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x87b1 => {
         Name => 'GeoTiffAsciiParams',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0x8822 => {
         Name => 'ExposureProgram',
@@ -895,8 +913,7 @@ my %longBin = (
     0x8827 => 'ISO',
     0x8828 => {
         Name => 'Opto-ElectricConvFactor',
-        ValueConv => '\$val',
-        ValueConvInv => '$val',
+        Binary => 1,
     },
     0x8829 => 'Interlace',
     0x882a => 'TimeZoneOffset',
@@ -1123,7 +1140,10 @@ my %longBin = (
     0xa000 => 'FlashpixVersion',
     0xa001 => {
         Name => 'ColorSpace',
-        Notes => 'the value of 2 is not standard EXIF',
+        Notes => q{
+            the value of 2 is not standard EXIF.  Instead, an Adobe RGB image is
+            indicated by "Uncalibrated" with an InteropIndex of "R03"'
+        },
         PrintConv => {
             1 => 'sRGB',
             2 => 'Adobe RGB',
@@ -1417,7 +1437,7 @@ my %longBin = (
     },
     0xbcc0 => { #13
         Name => 'ImageOffset',
-        Flags => 'IsOffset',
+        IsOffset => 1,
         OffsetPair => 0xbcc1,  # point to associated byte count
     },
     0xbcc1 => { #13
@@ -1426,7 +1446,7 @@ my %longBin = (
     },
     0xbcc2 => { #13
         Name => 'AlphaOffset',
-        Flags => 'IsOffset',
+        IsOffset => 1,
         OffsetPair => 0xbcc3,  # point to associated byte count
     },
     0xbcc3 => { #13
@@ -1504,7 +1524,7 @@ my %longBin = (
     },
     0xc618 => {
         Name => 'LinearizationTable',
-        ValueConv => '\$val',
+        Binary => 1,
     },
     0xc619 => 'BlackLevelRepeatDim',
     0xc61a => 'BlackLevel',
@@ -1562,7 +1582,7 @@ my %longBin = (
         },
         {
             Name => 'DNGPrivateData',
-            ValueConv => '\$val',
+            Binary => 1,
         },
     ],
     0xc635 => {
@@ -1655,18 +1675,19 @@ my %longBin = (
         ValueConv => '$val[0] || $val[1]',
         PrintConv => 'sprintf("%.1f", $val)',
     },
-    EV => {
+    LightValue => {
+        Notes => 'calculated LV -- similar to exposure value but includes ISO speed',
         Require => {
             0 => 'Aperture',
             1 => 'ShutterSpeed',
             2 => 'ISO',
         },
-        ValueConv => 'Image::ExifTool::Exif::CalculateEV($val[0],$val[1],$prt[2])',
+        ValueConv => 'Image::ExifTool::Exif::CalculateLV($val[0],$val[1],$prt[2])',
         PrintConv => 'sprintf("%.1f",$val)',
     },
     FocalLength35efl => {
         Description => 'Focal Length',
-        Notes => 'this value may be incorrect if image has been resized',
+        Notes => 'this value may be incorrect if the image has been resized',
         Groups => { 2 => 'Camera' },
         Require => {
             0 => 'FocalLength',
@@ -1702,7 +1723,7 @@ my %longBin = (
     },
     CircleOfConfusion => {
         Notes => q{
-            this value may be incorrect if image has been resized.  Calculated as
+            this value may be incorrect if the image has been resized.  Calculated as
             D/1440, where D is the focal plane diagonal in mm
         },
         Require => {
@@ -1712,7 +1733,7 @@ my %longBin = (
         PrintConv => 'sprintf("%.3f mm",$val)',
     },
     HyperfocalDistance => {
-        Notes => 'this value may be incorrect if image has been resized',
+        Notes => 'this value may be incorrect if the image has been resized',
         Require => {
             0 => 'FocalLength',
             1 => 'Aperture',
@@ -1726,7 +1747,7 @@ my %longBin = (
     },
     DOF => {
         Description => 'Depth of Field',
-        Notes => 'this value may be incorrect if image has been resized',
+        Notes => 'this value may be incorrect if the image has been resized',
         Require => {
             0 => 'FocusDistance', # FocusDistance in meters, 0 means 'inf'
             1 => 'FocalLength',
@@ -1809,6 +1830,14 @@ my %longBin = (
         RawConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"JpgFromRaw")',
         ValueConvInv => '$val',
     },
+    OtherImage => {
+        Require => {
+            0 => 'OtherImageStart',
+            1 => 'OtherImageLength',
+        },
+        # retrieve the thumbnail from our EXIF data
+        RawConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"OtherImage")',
+    },
     PreviewImageSize => {
         Require => {
             0 => 'PreviewImageWidth',
@@ -1877,7 +1906,7 @@ my %longBin = (
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::Exif::Composite');
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Exif::Composite);
 
 
 #------------------------------------------------------------------------------
@@ -1889,10 +1918,10 @@ sub AUTOLOAD
 }
 
 #------------------------------------------------------------------------------
-# Calculate EV (Exposure Value)
+# Calculate LV (Light Value)
 # Inputs: 0) Aperture, 1) ShutterSpeed, 2) ISO
-# Returns: EV
-sub CalculateEV($$$)
+# Returns: LV value
+sub CalculateLV($$$)
 {
     local $_;
     # do validity checks on arguments
@@ -1900,7 +1929,7 @@ sub CalculateEV($$$)
     foreach (@_) {
         return undef unless defined $_ and Image::ExifTool::IsFloat($_) and $_ > 0;
     }
-    # (EV 0 is defined as f/1.0 at 1 second with ISO 100)
+    # (A light value of 0 is defined as f/1.0 at 1 second with ISO 100)
     return (2*log($_[0]) - log($_[1]) - log($_[2]/100)) / log(2);
 }
 
@@ -2318,6 +2347,7 @@ sub ProcessExif($$$)
         my $valueDataPos = $dataPos;
         my $valueDataLen = $dataLen;
         my $valuePtr = $entry + 8;      # pointer to value within $$dataPt
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
         if ($size > 4) {
             if ($size > 0x7fffffff) {
                 $exifTool->Warn(sprintf("Invalid size ($size) for $dirName tag 0x%x",$tagID));
@@ -2334,8 +2364,8 @@ sub ProcessExif($$$)
             }
             if ($valuePtr < 0 or $valuePtr+$size > $dataLen) {
                 # get value by seeking in file if we are allowed
+                my $buff;
                 if ($raf) {
-                    my $buff;
                     if ($raf->Seek($base + $valuePtr + $dataPos,0) and
                         $raf->Read($buff,$size) == $size)
                     {
@@ -2348,13 +2378,33 @@ sub ProcessExif($$$)
                         return 0;
                     }
                 } else {
-                    my $tagStr = sprintf("0x%x",$tagID);
-                    $exifTool->Warn("Bad $dirName directory pointer for tag $tagStr");
-                    next unless $htmlDump;
-                    $size = -1;     # size is meaningless
-                    $valueDataPt = \ '';
-                    $valueDataPos = $valuePtr = 0;
-                    $valueDataLen = -1; # flag the bad pointer
+                    my $tagStr;
+                    if ($tagInfo) {
+                        $tagStr = $$tagInfo{Name};
+                    } elsif (defined $tagInfo) {
+                        my $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \ '');
+                        $tagStr = $$tmpInfo{Name} if $tmpInfo;
+                    }
+                    $tagStr or $tagStr = sprintf("tag 0x%x",$tagID);
+                    # allow PreviewImage to run outside EXIF data
+                    if ($tagStr eq 'PreviewImage' and $exifTool->{RAF}) {
+                        my $pos = $exifTool->{RAF}->Tell();
+                        $buff = $exifTool->ExtractBinary($base + $valuePtr + $dataPos, $size, 'PreviewImage');
+                        $exifTool->{RAF}->Seek($pos, 0);
+                        $valueDataPt = \$buff;
+                        $valueDataPos = $valuePtr + $dataPos;
+                        $valueDataLen = $size;
+                        $valuePtr = 0;
+                    } else {
+                        $exifTool->Warn("Bad $dirName directory pointer for $tagStr");
+                    }
+                    unless (defined $buff) {
+                        next unless $htmlDump;
+                        $size = -1;     # size is meaningless
+                        $valueDataPt = \ '';
+                        $valueDataPos = $valuePtr = 0;
+                        $valueDataLen = -1; # flag the bad pointer
+                    }
                 }
             }
         }
@@ -2382,10 +2432,10 @@ sub ProcessExif($$$)
                         ValueConv => '$_=$val;s/.*: //;$_', # remove descr
                     };
                     Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
+                    $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
                 }
             }
         }
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
         if (defined $tagInfo and not $tagInfo) {
             # GetTagInfo() required the value for a Condition
             my $tmpVal = substr($$valueDataPt, $valuePtr, $size < 48 ? $size : 48);
@@ -2413,7 +2463,6 @@ sub ProcessExif($$$)
         if ($verbose) {
             if ($htmlDump) {
                 my $tagName;
-                my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
                 if ($tagID == 0x927c and $dirName eq 'ExifIFD') {
                     $tagName = 'MakerNotes';
                 } elsif ($tagInfo) {
@@ -2436,7 +2485,7 @@ sub ProcessExif($$$)
                 if ($size > 4) {
                     my $offPt = Get32u($dataPt,$entry+8);
                     $tip .= sprintf("Value offset: 0x%.4x\\n", $offPt);
-                    my $actPt = $valuePtr + $valueDataPos + $base - $$exifTool{EXIF_POS};
+                    my $actPt = $valuePtr + $valueDataPos + $base - ($$exifTool{EXIF_POS} || 0);
                     $tip .= sprintf("Actual offset: 0x%.4x\\n", $actPt) if $actPt != $offPt;
                 }
                 my $tval;
@@ -2460,11 +2509,11 @@ sub ProcessExif($$$)
                 $tip .= "Value: $tval";
                 $exifTool->HtmlDump($entry+$dataPos+$base, 12, "$dname $colName", $tip, 1);
                 next if $valueDataLen < 0;  # don't process bad pointer entry
-                if ($size > 4 ) {
+                if ($size > 4) {
                     my $exifDumpPos = $valuePtr + $valueDataPos + $base;
                     # add value data block (underlining maker notes data)
-                    $exifTool->HtmlDump($exifDumpPos,$size,"$dname $tagName value",'',
-                             $tagName eq 'MakerNotes' ? 4 : 0);
+                    $exifTool->HtmlDump($exifDumpPos,$size,"$tagName value",'SAME',
+                        ($tagName eq 'MakerNotes' and $tagInfo and $$tagInfo{SubDirectory}) ? 4 : 0);
                 }
             } else {
                 my $fstr = $formatName[$format];

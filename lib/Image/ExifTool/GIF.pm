@@ -5,7 +5,10 @@
 #
 # Revisions:    10/18/2005 - P. Harvey Separated from ExifTool.pm
 #
-# Notes:        GIF really doesn't have much meta information, except for comments
+# References:   http://www.w3.org/Graphics/GIF/spec-gif89a.txt
+#
+# Notes:        GIF really doesn't have much meta information, except for
+#               comments which are allowed in GIF89a images
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::GIF;
@@ -191,7 +194,8 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to read and
-write GIF meta information.
+write GIF meta information.  GIF87a images contain no meta information, and
+only the Comment tag is currently supported in GIF89a images.
 
 =head1 AUTHOR
 
@@ -199,6 +203,14 @@ Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item L<http://www.w3.org/Graphics/GIF/spec-gif89a.txt>
+
+=back
 
 =head1 SEE ALSO
 

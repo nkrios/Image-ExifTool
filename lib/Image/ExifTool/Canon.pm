@@ -39,7 +39,7 @@ use Image::ExifTool::Exif;
 
 sub WriteCanon($$$);
 
-$VERSION = '1.49';
+$VERSION = '1.53';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
@@ -132,7 +132,6 @@ my %canonLensTypes = ( #4
     232 => 'Canon EF 70-300mm f/4.5-5.6 DO IS USM', #15
     237 => 'Canon EF 24-105mm f/4L IS', #15
     242 => 'Canon EF 70-200mm f/4L IS USM', #PH
-    
 );
 
 # Canon model ID numbers (PH)
@@ -515,6 +514,10 @@ my %longBin = (
     },
     # 0x19 => 'InteropFooter', # what is this for?
     # 0x1d => 'MicaRa', ???? #15
+    0x83 => { #PH
+        Name => 'OriginalDecisionData',
+        Writable => 'int32u',
+    },
     0x90 => {   # used by 1D and 1Ds
         Name => 'CustomFunctions1D',
         SubDirectory => {
@@ -552,6 +555,15 @@ my %longBin = (
     0x95 => { #PH (observed in 5D sample image)
         Name => 'LensType',
         Writable => 'string',
+    },
+    0x96 => { #PH
+        Name => 'InternalSerialNumber',
+        Writable => 'string',
+    },
+    0x97 => { #PH
+        Name => 'DustRemovalData',
+        # some interesting stuff is stored in here, like LensType and InternalSerialNumber...
+        Binary => 1,
     },
     0xa0 => {
         Name => 'ProccessingInfo',
@@ -650,8 +662,7 @@ my %longBin = (
         # (5kB for most models, but 22kb for 5D and 30D)
         Name => 'UnknownBlock1',
         Format => 'undef',
-        Unknown => 1,
-        ValueConv => '\$val',
+        Flags => [ 'Unknown', 'Binary' ],
     },
     0x4003 => { #PH
         Name => 'ColorInfo',
@@ -662,9 +673,8 @@ my %longBin = (
     0x4005 => { #PH
         Name => 'UnknownBlock2',
         Notes => 'unknown 49kB block, not copied to JPEG images',
-        Unknown => 1,
-        Drop => 1, # not found in JPEG images (too large for APP1 anyway)
-        ValueConv => '\$val',
+        # 'Drop' because not found in JPEG images (too large for APP1 anyway)
+        Flags => [ 'Unknown', 'Binary', 'Drop' ],
     },
 );
 
@@ -693,7 +703,6 @@ my %longBin = (
     },
     3 => {
         Name => 'Quality',
-        Description => 'Image Quality',
         PrintConv => \%canonQuality,
     },
     4 => {
@@ -733,6 +742,7 @@ my %longBin = (
            16 => 'Pan Focus', #PH
         },
     },
+    # 9 => 1 for fine jpeg, 7 for raw + small jpeg (30D) - PH
     10 => {
         Name => 'CanonImageSize',
         PrintConv => \%canonImageSize,
@@ -851,8 +861,8 @@ my %longBin = (
         PrintConv => {
             0 => 'Easy',
             1 => 'Program AE',
-            2 => 'Shutter Speed Priority AE',
-            3 => 'Aperture-Priority AE',
+            2 => 'Shutter speed priority AE',
+            3 => 'Aperture-priority AE',
             4 => 'Manual',
             5 => 'Depth-of-field AE',
             6 => 'M-Dep', #PH
@@ -1047,7 +1057,10 @@ my %longBin = (
     },
     3 => { #9/PH
         Name => 'MeasuredEV',
-        Notes => 'offset by -5 EV from the calculated value for most models',
+        Notes => q{
+            this the Canon name for what should properly be called MeasuredLV, and is
+            offset by about -5 EV from the calculated LV for most models
+        },
         ValueConv => '$val / 32',
         ValueConvInv => '$val * 32',
         PrintConv => 'sprintf("%.2f",$val)',
@@ -1191,7 +1204,6 @@ my %longBin = (
     ],
     24 => {
         Name => 'BulbDuration',
-        Format => 'int32s',
         ValueConv => '$val / 10',
         ValueConvInv => '$val * 10',
     },
@@ -2241,7 +2253,7 @@ my %longBin = (
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags('Image::ExifTool::Canon::Composite');
+Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Canon::Composite);
 
 
 #------------------------------------------------------------------------------

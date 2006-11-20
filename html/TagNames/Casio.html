@@ -6,7 +6,7 @@
 <h2>Casio Tags</h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0001</td>
@@ -187,7 +187,7 @@
 <h2><a name='Type2'>Casio Type2 Tags</a></h2>
 <blockquote>
 <table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag ID</th><th>Tag Name</th>
+<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
 <tr valign='top'>
 <td>0x0002</td>
@@ -283,11 +283,16 @@
 <td align='center'>undef</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x2001</td>
+<td>FirmwareDate</td>
+<td align='center'>string[18]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x2011</td>
 <td>WhiteBalanceBias</td>
 <td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x2012</td>
 <td>WhiteBalance</td>
 <td align='center'>int16u</td>
@@ -298,17 +303,17 @@
   <br>6 = Fluorescent
   <br>10 = Tungsten
   <br>12 = Flash</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x2022</td>
 <td>ObjectDistance</td>
 <td align='center'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x2034</td>
 <td>FlashDistance</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3000</td>
 <td>RecordMode</td>
 <td align='center'>int16u</td>
@@ -317,19 +322,19 @@
   <br>4 = Aperture Priority
   <br>5 = Manual
   <br>6 = Best Shot</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x3001</td>
 <td>SelfTimer</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>1 = Off</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3002</td>
 <td>Quality</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>1 = Economy
   <br>2 = Normal
   <br>3 = Fine</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x3003</td>
 <td>FocusMode</td>
 <td align='center'>int16u</td>
@@ -338,69 +343,69 @@
   <br>2 = Macro
   <br>3 = Single-Area Auto Focus
   <br>6 = Multi-Area Auto Focus</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3006</td>
 <td>TimeZone</td>
 <td align='center'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x3007</td>
 <td>BestShotMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off
   <br>1 = On?</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3008</td>
 <td>AutoISO</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>1 = On
   <br>2 = Off</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x3011</td>
 <td>Sharpness</td>
-<td align='center'>int16s</td>
-<td>&nbsp;</td></tr>
-<tr valign='top'>
-<td>0x3012</td>
-<td>Contrast</td>
-<td align='center'>int16s</td>
+<td align='center'>undef[2]</td>
 <td>&nbsp;</td></tr>
 <tr bgcolor='#ffeebb' valign='top'>
-<td>0x3013</td>
-<td>Saturation</td>
-<td align='center'>int16s</td>
+<td>0x3012</td>
+<td>Contrast</td>
+<td align='center'>undef[2]</td>
 <td>&nbsp;</td></tr>
 <tr valign='top'>
+<td>0x3013</td>
+<td>Saturation</td>
+<td align='center'>undef[2]</td>
+<td>&nbsp;</td></tr>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3014</td>
 <td>CCDISOSensitivity</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x3015</td>
 <td>ColorMode</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3016</td>
 <td>Enhancement</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x3017</td>
 <td>Filter</td>
 <td align='center'>int16u</td>
 <td><font size='-1'>0 = Off</font></td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x301c</td>
 <td>SequenceNumber</td>
 <td align='center'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr valign='top'>
 <td>0x301d</td>
 <td>BracketSequence</td>
 <td align='center'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr bgcolor='#ffeebb' valign='top'>
 <td>0x3020</td>
 <td>ImageStabilization</td>
 <td align='center'>int16u</td>
@@ -412,6 +417,6 @@
 <p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 5, 2006</i>
+<br><i>Last revised Oct 31, 2006</i>
 </body>
 </html>

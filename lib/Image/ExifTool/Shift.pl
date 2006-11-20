@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# File:         Shift.pm
+# File:         Shift.pl
 #
 # Description:  ExifTool time shifting routines
 #
@@ -464,17 +464,19 @@ values.
 
 =head1 DETAILS
 
-Time shifts are applied to standard EXIF-formatted date, time or date/time
-values.  Here are some general rules and examples to explain how shift
-strings are interpreted:
+Time shifts are applied to standard EXIF-formatted date/time values (ie.
+C<2005:03:14 18:55:00>).  Date-only and time-only values may also be
+shifted, and an optional timezone (ie. C<-05:00>) is also supported.  Here
+are some general rules and examples to explain how shift strings are
+interpreted:
 
-Date shifts are specified in the following formats:
+Date-only shifts are specified in the following formats:
 
     'Y:M:D'     - shift date by 'Y' years, 'M' months and 'D' days
     'M:D'       - shift months and days only
     'D'         - shift specified number of days
 
-Time shifts are specified in the following formats:
+Time-only shifts are specified in the following formats:
 
     'h:m:s'     - shift time by 'h' hours, 'm' minutes and 's' seconds
     'h:m'       - shift hours and minutes only
@@ -487,19 +489,21 @@ Timezone shifts are specified in the following formats:
     '+h'        - shift timezone hours only
     '-h'        - negative shift of timezone hours only
 
-Date and time fields have the same format, so if only one is given it is
-assumed to be a time shift if applied to a time or a date/time value, or a
-date shift if applied to a date value.  For example:
+A valid shift value consists of one or two arguments, separated by a space.
+If only one is provided, it is assumed to be a time shift when applied to a
+time or a date/time value, or a date shift when applied to a date value.
+For example:
 
     '7'         - shift by 1 hour if applied to a time or date/time
                   value, or by one day if applied to a date value
     '2:0'       - shift 2 hours (time, date/time), or 2 months (date)
+    '5:0:0'     - shift 5 hours (time, date/time), or 5 years (date)
     '0:0:1'     - shift 1 sec (time, date/time), or 1 day (date)
 
-Shifts may combine any or all of these fields into a single string.  The
-date field comes first, separated by a space, then the time and timezone
-fields.  ie:
+If two arguments are given, the date shift is first, followed by the time
+shift:
 
+    '3:0:0 0'         - shift date by 3 years
     '0 15:30'         - shift time by 15 hours and 30 minutes
     '1:0:0 0:0:0+5:0' - shift date by 1 year and timezone by 5 hours
 
@@ -511,13 +515,14 @@ Numbers specified in shift fields may contain a decimal point:
     '2.5 0'     - 2 days 12 hours (date/time), 12 hours (time) or
                   2 days (date)
 
-And finally, a zero is assumed for any missing numbers:
+And to save typing, a zero is assumed for any missing numbers:
 
     '1::'       - shift by 1 hour (time, date/time) or 1 year (date)
+    '26:: 0'    - shift date by 26 years
     '+:30       - shift timezone by 30 minutes
 
-Below are some sample shifts and their results ('Dir' is the applied shift
-direction: '+' is positive, '-' is negative):
+Below are some specific examples applied to real date/time values ('Dir' is
+the applied shift direction: '+' is positive, '-' is negative):
 
      Original Date/Time     Shift   Dir    Shifted Date/Time
     ---------------------  -------  ---  ---------------------

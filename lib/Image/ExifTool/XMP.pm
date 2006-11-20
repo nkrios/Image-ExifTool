@@ -39,7 +39,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.52';
+$VERSION = '1.56';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -49,6 +49,7 @@ sub ParseXMPElement($$$;$$$);
 sub DecodeBase64($);
 sub SaveBlankInfo($$$;$);
 sub ProcessBlankInfo($$$;$);
+sub ValidateXMP($;$);
 
 # conversions for GPS coordinates
 sub ToDegrees
@@ -80,10 +81,11 @@ my %longConv = (
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
 my %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
 
-# translate XMP namespaces for use in family 1 group names
+# translate XMP namespaces when reading
 my %xlatNamespace = (
     # shorten ugly IPTC Core namespace prefix
     'Iptc4xmpCore' => 'iptcCore',
+    'photomechanic'=> 'photomech',
     # also translate older 'xap...' prefixes to 'xmp...'
     'xap'          => 'xmp',
     'xapBJ'        => 'xmpBJ',
@@ -179,6 +181,10 @@ my %recognizedAttrs = (
         Name => 'dex',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::dex' },
     },
+    photomech => {
+        Name => 'photomech',
+        SubDirectory => { TagTable => 'Image::ExifTool::PhotoMechanic::XMP' },
+    },
 );
 
 #
@@ -229,10 +235,9 @@ my %recognizedAttrs = (
     WRITE_PROC => \&WriteXMP,
     WRITABLE => 'string',
     NOTES => q{
-XMP Basic schema tags.  If the older C<xap>, C<xapBJ>, C<xapMM> or
-C<xapRights> namespace prefixes are found, they are translated to the newer
-C<xmp>, C<xmpBJ>, C<xmpMM> and C<xmpRights> prefixes for use in family 1
-group names.
+        XMP Basic schema tags.  If the older "xap", "xapBJ", "xapMM" or "xapRights"
+        namespace prefixes are found, they are translated to the newer "xmp",
+        "xmpBJ", "xmpMM" and "xmpRights" prefixes for use in family 1 group names.
     },
     Advisory    => { List => 'Bag' },
     BaseURL     => { },
@@ -243,7 +248,7 @@ group names.
         PrintConv => '$self->ConvertDateTime($val)',
     },
     CreatorTool => { },
-    Identifier  => { List => 'Bag' },
+    Identifier  => { Avoid => 1, List => 'Bag' },
     Label       => { },
     MetadataDate => {
         Groups => { 2 => 'Time'  },
@@ -623,7 +628,7 @@ group names.
     WRITE_PROC => \&WriteXMP,
     WRITABLE => 'string',
     NOTES => q{
-        Adobe PDF schema tags.  The official XMP specification only defines
+        Adobe PDF schema tags.  The official XMP specification defines only
         Keywords, PDFVersion and Producer.  The other tags are included because they
         have been observed in PDF files, but Creator, Subject and Title are avoided
         when writing due to name conflicts with XMP-dc tags.
@@ -670,7 +675,7 @@ group names.
     },
     Headline        => { },
     Instructions    => { },
-    Source          => { Groups => { 2 => 'Author' } },
+    Source          => { Groups => { 2 => 'Author' }, Avoid => 1 },
     State           => { Groups => { 2 => 'Location' } },
     # the documentation doesn't show this as a 'Bag', but that's the
     # way Photoshop7.0 writes it - PH
@@ -697,7 +702,7 @@ group names.
     ChromaticAberrationB=> { Writable => 'integer' },
     ChromaticAberrationR=> { Writable => 'integer' },
     ColorNoiseReduction => { Writable => 'integer' },
-    Contrast        => { Writable => 'integer' },
+    Contrast        => { Writable => 'integer', Avoid => 1 },
     CropTop         => { Writable => 'real' },
     CropLeft        => { Writable => 'real' },
     CropBottom      => { Writable => 'real' },
@@ -722,10 +727,10 @@ group names.
     RawFileName     => { },
     RedHue          => { Writable => 'integer' },
     RedSaturation   => { Writable => 'integer' },
-    Saturation      => { Writable => 'integer' },
+    Saturation      => { Writable => 'integer', Avoid => 1 },
     Shadows         => { Writable => 'integer' },
     ShadowTint      => { Writable => 'integer' },
-    Sharpness       => { Writable => 'integer' },
+    Sharpness       => { Writable => 'integer', Avoid => 1 },
     Temperature     => { Writable => 'integer' },
     Tint            => { Writable => 'integer' },
     ToneCurve       => { List => 'Seq' },
@@ -741,6 +746,7 @@ group names.
     VignetteAmount  => { Writable => 'integer' },
     VignetteMidpoint=> { Writable => 'integer' },
     WhiteBalance    => {
+        Avoid => 1,
         PrintConv => {
            'As Shot'    => 'As Shot',
             Auto        => 'Auto',
@@ -880,7 +886,7 @@ group names.
         Writable => 'integer',
     },
     PixelYDimension => {
-        Name => 'ExifImageHeight',
+        Name => 'ExifImageLength',
         Writable => 'integer',
     },
     MakerNote => { },
@@ -1383,9 +1389,8 @@ group names.
     WRITABLE => 'string',
     NOTES => q{
         IPTC Core schema tags.  The actual IPTC Core namespace schema prefix is
-        C<Iptc4xmpCore>, which is the name used in the file, but ExifTool uses
-        C<iptcCore> to generate the family 1 group name of XMP-iptcCore because
-        XMP-Iptc4xmpCore is a bit lengthy.
+        "Iptc4xmpCore", which is the prefix recorded in the file, but ExifTool
+        shortens this for the "XMP-iptcCore" family 1 group name.
     },
     CountryCode         => { Groups => { 2 => 'Location' } },
     CreatorContactInfo => {
@@ -1412,15 +1417,16 @@ group names.
     NAMESPACE => 'PixelLive',
     WRITE_PROC => \&WriteXMP,
     NOTES => q{
-        PixelLive schema tags.  These tags are not writable because they are
-        uncommon and there are name conflicts with other more common tags.
+        PixelLive schema tags.  These tags are not writable becase they are very
+        uncommon and I haven't been able to locate a reference which gives the
+        namespace URI.
     },
-    AUTHOR    => { Name => 'Author', Groups => { 2 => 'Author'} },
-    COMMENTS  => { Name => 'Comments' },
-    COPYRIGHT => { Name => 'Copyright', Groups => { 2 => 'Author'} },
-    DATE      => { Name => 'Date', Groups => { 2 => 'Time'} },
-    GENRE     => { Name => 'Genre' },
-    TITLE     => { Name => 'Title' },
+    AUTHOR    => { Name => 'Author',   Avoid => 1, Groups => { 2 => 'Author'} },
+    COMMENTS  => { Name => 'Comments', Avoid => 1 },
+    COPYRIGHT => { Name => 'Copyright',Avoid => 1, Groups => { 2 => 'Author'} },
+    DATE      => { Name => 'Date',     Avoid => 1, Groups => { 2 => 'Time'} },
+    GENRE     => { Name => 'Genre',    Avoid => 1 },
+    TITLE     => { Name => 'Title',    Avoid => 1 },
 );
 
 # Picture Licensing Universal System schema properties (xmpPLUS)
@@ -1636,9 +1642,9 @@ sub FoundXMP($$$$)
     $tagTablePtr = GetTagTable($table);
 
     # convert quotient and date values to a more sensible format
-    if ($val =~ /^(-?\d+)\/(-?\d+)/) {
+    if ($val =~ m{^(-?\d+)/(-?\d+)$}) {
         $val = $1 / $2 if $2;       # calculate quotient
-    } elsif ($val =~ /^(\d{4})-(\d{2})-(\d{2}).{1}(\d{2}:\d{2}:\d{2})(\S*)/) {
+    } elsif ($val =~ /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2}:\d{2})(\S*)$/) {
         $val = "$1:$2:$3 $4$5";     # convert back to EXIF time format
     }
     # look up this tag in the appropriate table
