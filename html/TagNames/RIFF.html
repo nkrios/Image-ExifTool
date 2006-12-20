@@ -1,281 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>RIFF Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>RIFF Tags</h2>
+<body>
+<h2 class='top'>RIFF Tags</h2>
 Windows WAV and AVI files are RIFF format files.  Meta information embedded
 in two types of RIFF <code>LIST</code> chunks: <code>INFO</code> and <code>exif</code>.  As well, some
 information about the audio content is extracted from the <code>fmt </code> chunk.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'LIST_INFO'</td>
 <td>Info</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='RIFF.html#Info'>RIFF Info Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'LIST_exif'</td>
 <td>Exif</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='RIFF.html#Exif'>RIFF Exif Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>'LIST_hdrl'</td>
 <td>Hdrl</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='RIFF.html#Hdrl'>RIFF Hdrl Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'fmt '</td>
 <td>AudioFormat</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='RIFF.html#AudioFormat'>RIFF AudioFormat Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Info'>RIFF Info Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'IARL'</td>
 <td>ArchivalLocation</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'IART'</td>
 <td>Artist</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ICMS'</td>
 <td>Commissioned</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'ICMT'</td>
 <td>Comment</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ICOP'</td>
 <td>Copyright</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'ICRD'</td>
 <td>DateCreated</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ICRP'</td>
 <td>Cropped</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'IDIM'</td>
 <td>Dimensions</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'IDPI'</td>
 <td>DotsPerInch</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'IENG'</td>
 <td>Engineer</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'IGNR'</td>
 <td>Genre</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'IKEY'</td>
 <td>Keywords</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ILGT'</td>
 <td>Lightness</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'IMED'</td>
 <td>Medium</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'INAM'</td>
 <td>Title</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'IPLT'</td>
 <td>NumColors</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'IPRD'</td>
 <td>Product</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'ISBJ'</td>
 <td>Subject</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ISFT'</td>
 <td>Software</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'ISHP'</td>
 <td>Sharpness</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ISRC'</td>
 <td>Source</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'ISRF'</td>
 <td>SourceForm</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ITCH'</td>
 <td>Technician</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Exif'>RIFF Exif Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'ecor'</td>
 <td>Make</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'emdl'</td>
 <td>Model</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'emnt'</td>
 <td>MakerNotes</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'erel'</td>
 <td>RelatedImageFile</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'etim'</td>
 <td>TimeCreated</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'eucm'</td>
 <td>UserComment</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ever'</td>
 <td>ExifVersion</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Hdrl'>RIFF Hdrl Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'IDIT'</td>
 <td>DateTimeOriginal</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'ISMP'</td>
 <td>TimeCode</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'LIST_strl'</td>
 <td>Stream</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='RIFF.html#Stream'>RIFF Stream Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'avih'</td>
 <td>AVIHeader</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='RIFF.html#AVIHeader'>RIFF AVIHeader Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Stream'>RIFF Stream Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'strd'</td>
 <td>StreamData</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='RIFF.html#StreamData'>RIFF StreamData Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'strf'</td>
 <td>AudioFormat
   <br>VideoFormat</td>
-<td align='center'>-<br>-</td>
+<td class='c'>-<br>-</td>
 <td>--&gt; <a href='RIFF.html#AudioFormat'>RIFF AudioFormat Tags</a>
   <br>--&gt; <a href='BMP.html'>BMP Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>'strh'</td>
 <td>StreamHeader</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='RIFF.html#StreamHeader'>RIFF StreamHeader Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'strn'</td>
 <td>StreamName</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='StreamData'>RIFF StreamData Tags</a></h2>
 This chunk contains EXIF information in FujiFilm F30 AVI files.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'AVIF'</td>
 <td>AVIF</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='AudioFormat'>RIFF AudioFormat Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>Encoding</td>
-<td align='center'>N</td>
-<td><font size='-1'>0x1 = Microsoft PCM
+<td class='c'>N</td>
+<td><span class='s'>0x1 = Microsoft PCM
   <br>0x2 = Microsoft ADPCM
   <br>0x3 = Microsoft IEEE float
   <br>0x4 = Compaq VSELP
@@ -410,99 +420,101 @@ This chunk contains EXIF information in FujiFilm F30 AVI files.
   <br>0x1500 = AT&amp;T Soundspace Music Compression
   <br>0x2000 = FAST Multimedia DVM
   <br>0xfffe = Extensible
-  <br>0xffff = Development</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>1</td>
+  <br>0xffff = Development</span></td></tr>
+<tr class='b'>
+<td class='r'>1</td>
 <td>NumChannels</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>2</td>
+<tr>
+<td class='r'>2</td>
 <td>SampleRate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>4</td>
+<tr class='b'>
+<td class='r'>4</td>
 <td>AvgBytesPerSec</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>7</td>
+<tr>
+<td class='r'>7</td>
 <td>BitsPerSample</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='StreamHeader'>RIFF StreamHeader Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>StreamType</td>
-<td align='center'>N</td>
-<td><font size='-1'>&#39;auds&#39; = Audio
+<td class='c'>N</td>
+<td><span class='s'>&#39;auds&#39; = Audio
   <br>&#39;mids&#39; = MIDI
   <br>&#39;txts&#39; = Text
-  <br>&#39;vids&#39; = Video</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>1</td>
+  <br>&#39;vids&#39; = Video</span></td></tr>
+<tr class='b'>
+<td class='r'>1</td>
 <td>Codec</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>10</td>
+<tr>
+<td class='r'>10</td>
 <td>Quality</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>11</td>
+<tr class='b'>
+<td class='r'>11</td>
 <td>SampleSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='AVIHeader'>RIFF AVIHeader Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>FrameRate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>1</td>
+<tr class='b'>
+<td class='r'>1</td>
 <td>MaxDataRate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>4</td>
+<tr>
+<td class='r'>4</td>
 <td>FrameCount</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>6</td>
+<tr class='b'>
+<td class='r'>6</td>
 <td>StreamCount</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>8</td>
+<tr>
+<td class='r'>8</td>
 <td>ImageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>9</td>
+<tr class='b'>
+<td class='r'>9</td>
 <td>ImageHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Oct 31, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

@@ -12,6 +12,7 @@
 #               02/20/06 - P. Harvey Fixed bug where seek past end of file could
 #                          generate "substr outside string" warning
 #               06/10/06 - P. Harvey Decreased $CHUNK_SIZE from 64k to 8k
+#               11/23/06 - P. Harvey Limit reads to < 0x80000000 bytes
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.
@@ -32,7 +33,7 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.05';
+$VERSION = '1.06';
 @ISA = qw(Exporter);
 
 # constants
@@ -163,6 +164,9 @@ sub Read($$$)
     my $self = shift;
     my $len = $_[1];
     my $rtnVal;
+
+    # avoid dying with "Negative length" error
+    return 0 if $len & 0x80000000;
 
     if ($self->{TESTED} < 0) {
         my $buff;

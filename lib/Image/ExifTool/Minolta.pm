@@ -16,7 +16,8 @@
 #               8) http://www.chauveau-central.net/mrw-format/
 #               9) CPAN Forum post by 'geve' (http://www.cpanforum.com/threads/2168)
 #              10) http://homepage3.nifty.com/kamisaka/makernote/makernote_km.htm
-#              11) http://www.dyxum.com/dforum/forum_posts.asp?TID=6371&PN=1
+#              11) http://www.dyxum.com/dforum/forum_posts.asp?TID=6371&PN=1 and
+#                  http://www.dyxum.com/dAdmin/lenses/MakerNoteList_Public.asp?stro=makr
 #              12) http://www.minolta-forum.de/forum/index.php?showtopic=14914
 #              13) http://www.mhohner.de/minolta/lenses.php
 #              14) Jeffery Small private communication (tests with 7D)

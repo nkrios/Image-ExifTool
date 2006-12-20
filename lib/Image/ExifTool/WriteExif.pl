@@ -857,6 +857,8 @@ sub RebuildMakerNotes($$$)
         # must set a few member variables used while writing...
         $newTool->{CameraMake} = $exifTool->{CameraMake};
         $newTool->{CameraModel} = $exifTool->{CameraModel};
+        # fix base offsets if specified
+        $newTool->Options(FixBase => $exifTool->Options('FixBase'));
         # set FILE_TYPE to JPEG so PREVIEW_INFO will be generated
         $newTool->{FILE_TYPE} = 'JPEG';
         # drop any large tags
@@ -878,6 +880,8 @@ sub RebuildMakerNotes($$$)
             # and relative to the makernotes Base
             $makerFixup->{Shift} += $dataPos + $dirStart +
                                     $$dirInfo{Base} - $subdirInfo{Base};
+            # repair incorrect offsets if offsets were fixed
+            $makerFixup->{Shift} += $subdirInfo{FixedBy} || 0;
             # fix up pointers to the specified offset
             $makerFixup->ApplyFixup(\$rtnValue);
         }
@@ -1006,7 +1010,7 @@ sub WriteExif($$$)
                     # need value to evaluate the condition
                     my ($val) = $exifTool->GetNewValues($tagInfo);
                     # must convert to binary for evaluating in Condition
-                    if ($$tagInfo{Format}) {
+                    if ($$tagInfo{Format} and defined $val) {
                         $val = WriteValue($val, $$tagInfo{Format}, $$tagInfo{Count});
                     }
                     if (defined $val) {
@@ -1182,7 +1186,12 @@ sub WriteExif($$$)
                     $valueDataLen = $dataLen;
                     $valuePtr = $entry + 8;
                     $oldSize = $oldCount * $formatSize[$oldFormat];
-                    $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID);
+                    # must try direct method first so we will get unknown tags too
+                    # (this is necessary so we don't miss a tag we want to Drop)
+                    $oldInfo = $$tagTablePtr{$oldID};
+                    if (ref $oldInfo ne 'HASH' or $$oldInfo{Condition}) {
+                        $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID);
+                    }
                     my $readFromFile;
                     if ($oldSize > 4) {
                         $valuePtr = Get32u($dataPt, $valuePtr);
@@ -1371,6 +1380,9 @@ sub WriteExif($$$)
                         $newVal = Image::ExifTool::GetNewValues($newValueHash) unless defined $newVal;
                         # value undefined if deleting this tag
                         if ($xDelete{$newID} or not defined $newVal) {
+                            if ($$newInfo{RawConvInv} and defined $$newValueHash{Value}) {
+                                goto NoOverwrite;   # error in RawConvInv, so rewrite existing tag
+                            }
                             unless ($isNew) {
                                 ++$exifTool->{CHANGED};
                                 $val = $exifTool->Printable($val);
@@ -1388,13 +1400,11 @@ sub WriteExif($$$)
                             $newValue = WriteValue($newVal, $newFormName, $newCount);
                             unless (defined $newValue) {
                                 $exifTool->Warn("Error writing $dirName:$$newInfo{Name}");
-                                next if $isNew > 0;
-                                $isNew = -1;    # rewrite existing tag
+                                goto NoOverwrite;
                             }
                         } else {
                             $exifTool->Warn("Can't write zero length $$newInfo{Name} in $tagTablePtr->{GROUPS}->{1}");
-                            next if $isNew > 0;
-                            $isNew = -1;        # rewrite existing tag
+                            goto NoOverwrite;
                         }
                         if ($isNew >= 0) {
                             $newCount = length($newValue) / $formatSize[$newFormat];
@@ -1408,7 +1418,7 @@ sub WriteExif($$$)
                             }
                         }
                     } else {
-                        next if $isNew > 0;
+NoOverwrite:            next if $isNew > 0;
                         $isNew = -1;        # rewrite existing tag
                     }
                     # set format for EXIF IFD if different than conversion format
@@ -1475,6 +1485,8 @@ sub WriteExif($$$)
                 # just rewrite existing tag
                 $newID = $oldID;
                 $newValue = $oldValue;
+                $newFormat = $oldFormat; # (just in case it changed)
+                $newFormName = $oldFormName;
             }
             if ($newInfo) {
 #
@@ -1976,23 +1988,24 @@ sub WriteExif($$$)
         if ($dirName =~ /^IFD(\d+)$/) {
             $dirName = 'IFD' . ($1+1);
             $exifTool->{DIR_NAME} = $dirName;
-            if ($offset) {
-                if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{$dirName}) {
-                    $verbose and print $out "  Deleting $dirName\n";
-                    ++$exifTool->{CHANGED};
-                    if ($exifTool->{DEL_GROUP}->{$dirName} == 2 and
-                        $exifTool->{ADD_DIRS}->{$dirName})
-                    {
-                        $ifd = "\0" x 2;    # start with empty IFD
-                        $dataPt = \$ifd;
-                        $dirStart = 0;
-                        $dirLen = $dataLen = 2;
-                    } else {
-                        last;   # don't write this IFD (or any subsequent IFD)
-                    }
+            next unless $offset;
+            if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{$dirName}) {
+                $verbose and print $out "  Deleting $dirName\n";
+                $raf and $exifTool->Error("Deleting $dirName also deletes subsequent" .
+                                          " IFD's and possibly image data", 1);
+                ++$exifTool->{CHANGED};
+                if ($exifTool->{DEL_GROUP}->{$dirName} == 2 and
+                    $exifTool->{ADD_DIRS}->{$dirName})
+                {
+                    $ifd = "\0" x 2;    # start with empty IFD
+                    $dataPt = \$ifd;
+                    $dirStart = 0;
+                    $dirLen = $dataLen = 2;
                 } else {
-                    $verbose and print $out "  Rewriting $dirName\n";
+                    last;   # don't write this IFD (or any subsequent IFD)
                 }
+            } else {
+                $verbose and print $out "  Rewriting $dirName\n";
             }
         }
     }

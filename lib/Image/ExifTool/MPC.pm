@@ -22,7 +22,7 @@ $VERSION = '1.00';
     PROCESS_PROC => \&Image::ExifTool::FLAC::ProcessBitStream,
     GROUPS => { 2 => 'Audio' },
     NOTES => q{
-        Tags used in Musepack audio files.  ExifTool also extracts ID3 and APE
+        Tags used in Musepack (MPC) audio files.  ExifTool also extracts ID3 and APE
         information from these files.
     },
     'Bit032-063' => 'TotalFrames',

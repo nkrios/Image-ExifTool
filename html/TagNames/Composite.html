@@ -1,27 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Composite Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>Composite Tags</h2>
+<body>
+<h2 class='top'>Composite Tags</h2>
 
 The values of the composite tags are derived from the values of other tags.
 These are convenience tags which are calculated after all other information
 is extracted.
 
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Derived From</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Derived From</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>Aperture</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FNumber
   <br>ApertureValue</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>BlueBalance</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>WB_RGGBLevels
   <br>WB_RGBGLevels
   <br>WB_RBGGLevels
@@ -30,179 +34,184 @@ is extracted.
   <br>WB_BlueLevel
   <br>WB_GreenLevel</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CFAPattern</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>CFARepeatPatternDim
   <br>CFAPattern2</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CircleOfConfusion</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>ScaleFactor35efl</td>
-<td><font size='-1'><font color="#666666">(this value may be incorrect if the image has been resized.  Calculated as
-D/1440, where D is the focal plane diagonal in mm)</font></font></td></tr>
-<tr valign='top'>
+<td><span class='s'><span class='n'>(this value may be incorrect if the image has been resized.  Calculated as
+D/1440, where D is the focal plane diagonal in mm)</span></span></td></tr>
+<tr>
 <td>ConditionalFEC</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FlashExposureComp
   <br>FlashBits</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DOF</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FocusDistance
   <br>FocalLength
   <br>Aperture
   <br>CircleOfConfusion</td>
-<td><font size='-1'><font color="#666666">(this value may be incorrect if the image has been resized)</font></font></td></tr>
-<tr valign='top'>
+<td><span class='s'><span class='n'>(this value may be incorrect if the image has been resized)</span></span></td></tr>
+<tr>
 <td>DateCreated</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>Kodak:YearCreated
   <br>Kodak:MonthDayCreated</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DateTimeCreated</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>DateCreated
   <br>TimeCreated</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DateTimeOriginal</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>DateTimeCreated</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
+<td>DigitalZoom</td>
+<td class='c'>N</td>
+<td>Canon:ZoomSourceWidth
+  <br>Canon:ZoomTargetWidth
+  <br>Canon:DigitalZoom</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>DriveMode</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>ContinuousDrive
   <br>Self-timer</td>
-<td><font size='-1'>0 = Continuous shooting
+<td><span class='s'>0 = Continuous shooting
   <br>1 = Self-timer Operation
-  <br>2 = Single-frame shooting</font></td></tr>
-<tr valign='top'>
+  <br>2 = Single-frame shooting</span></td></tr>
+<tr class='b'>
 <td>Duration</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FLAC:SampleRate
   <br>FLAC:Channels
   <br>FLAC:TotalSamples</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>Duration</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FileSize
   <br>AudioBitrate
   <br>VideoBitrate</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>Duration</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FrameRate
   <br>FrameCount</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>ExtenderStatus</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>Olympus:Extender
   <br>Olympus:LensType
   <br>MaxApertureValue</td>
-<td><font size='-1'><font color="#666666">(Olympus cameras have the quirk that they may retain the extender settings
+<td><span class='s'><span class='n'>(Olympus cameras have the quirk that they may retain the extender settings
 after the extender is removed until the camera is powered off.  This tag is
-an attempt to represent the actual status of the extender.)</font>
+an attempt to represent the actual status of the extender.)</span>
   <br>0 = Not attached
   <br>1 = Attached
-  <br>2 = Removed</font></td></tr>
-<tr valign='top'>
+  <br>2 = Removed</span></td></tr>
+<tr class='b'>
 <td>FlashOn</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FlashBits
   <br>Flash</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>FlashType</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FlashBits</td>
-<td><font size='-1'>0 = Built-In Flash
-  <br>1 = External</font></td></tr>
-<tr valign='top'>
+<td><span class='s'>0 = Built-In Flash
+  <br>1 = External</span></td></tr>
+<tr class='b'>
 <td>FocalLength35efl</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FocalLength
   <br>ScaleFactor35efl</td>
-<td><font size='-1'><font color="#666666">(this value may be incorrect if the image has been resized)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td><span class='s'><span class='n'>(this value may be incorrect if the image has been resized)</span></span></td></tr>
+<tr>
 <td>GPSDateTime</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>GPSDateStamp
   <br>GPSTimeStamp</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>GPSPosition</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>GPSLatitude
   <br>GPSLongitude
   <br>GPSLatitudeRef
   <br>GPSLongitudeRef</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>HyperfocalDistance</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FocalLength
   <br>Aperture
   <br>CircleOfConfusion</td>
-<td><font size='-1'><font color="#666666">(this value may be incorrect if the image has been resized)</font></font></td></tr>
-<tr valign='top'>
+<td><span class='s'><span class='n'>(this value may be incorrect if the image has been resized)</span></span></td></tr>
+<tr class='b'>
 <td>ISO</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>Canon:CameraISO
   <br>Canon:BaseISO
   <br>Canon:AutoISO</td>
-<td><font size='-1'><font color="#666666">(use CameraISO if numerical, otherwise calculate as BaseISO * AutoISO / 100)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td><span class='s'><span class='n'>(use CameraISO if numerical, otherwise calculate as BaseISO * AutoISO / 100)</span></span></td></tr>
+<tr>
 <td>ImageHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>ImageSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>ImageWidth
   <br>ImageHeight</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>ImageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>JpgFromRaw</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>JpgFromRawStart
   <br>JpgFromRawLength</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>Lens</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>ShortFocal
-  <br>LongFocal
-  <br>FocalUnits</td>
+  <br>LongFocal</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>Lens35efl</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>ShortFocal
   <br>LongFocal
-  <br>FocalUnits
   <br>Lens
   <br>ScaleFactor35efl</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>LensID</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>Nikon:LensIDNumber
   <br>LensFStops
   <br>MinFocalLength
@@ -212,46 +221,46 @@ an attempt to represent the actual status of the extender.)</font>
   <br>MCUVersion
   <br>Nikon:LensType</td>
 <td>--&gt; <a href='Nikon.html#LensID'>Nikon LensID</a></td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>LensSpec</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>Nikon:Lens
   <br>Nikon:LensType</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>LightValue</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>Aperture
   <br>ShutterSpeed
   <br>ISO</td>
-<td><font size='-1'><font color="#666666">(calculated LV -- similar to exposure value but includes ISO speed)</font></font></td></tr>
-<tr valign='top'>
+<td><span class='s'><span class='n'>(calculated LV -- similar to exposure value but includes ISO speed)</span></span></td></tr>
+<tr class='b'>
 <td>OtherImage</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>OtherImageStart
   <br>OtherImageLength</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>PreviewImage</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>PreviewImageStart
   <br>PreviewImageLength
   <br>PreviewImageValid</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>PreviewImageSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>PreviewImageWidth
   <br>PreviewImageHeight</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>PreviewImage</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>ScreenNail</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>RedBalance</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>WB_RGGBLevels
   <br>WB_RGBGLevels
   <br>WB_RBGGLevels
@@ -260,18 +269,19 @@ an attempt to represent the actual status of the extender.)</font>
   <br>WB_RedLevel
   <br>WB_GreenLevel</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>RedEyeReduction</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>CanonFlashMode
   <br>FlashBits</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr valign='top'>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class='b'>
 <td>ScaleFactor35efl</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FocalLength
   <br>FocalLengthIn35mmFormat
+  <br>Composite:DigitalZoom
   <br>FocalPlaneDiagonal
   <br>FocalPlaneXSize
   <br>FocalPlaneYSize
@@ -284,42 +294,42 @@ an attempt to represent the actual status of the extender.)</font>
   <br>ExifImageLength
   <br>ImageWidth
   <br>ImageHeight</td>
-<td><font size='-1'><font color="#666666">(this value and any derived values may be incorrect if image has been resized)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td><span class='s'><span class='n'>(this value and any derived values may be incorrect if image has been resized)</span></span></td></tr>
+<tr>
 <td>ShootingMode</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>CanonExposureMode
   <br>EasyMode</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>ShutterCurtainHack</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>FlashBits
   <br>ShutterCurtainSync</td>
-<td><font size='-1'>0 = 1st-curtain sync
-  <br>1 = 2nd-curtain sync</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td><span class='s'>0 = 1st-curtain sync
+  <br>1 = 2nd-curtain sync</span></td></tr>
+<tr>
 <td>ShutterSpeed</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>ExposureTime
   <br>ShutterSpeedValue
   <br>BulbDuration</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>SubSecDateTimeOriginal</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>DateTimeOriginal
   <br>SubSecTimeOriginal</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr>
 <td>ThumbnailImage</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>ThumbnailOffset
   <br>ThumbnailLength</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr class='b'>
 <td>WB_RGGBLevels</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>Canon:WhiteBalance
   <br>WB_RGGBLevelsAsShot
   <br>WB_RGGBLevelsAuto
@@ -334,9 +344,9 @@ an attempt to represent the actual status of the extender.)</font>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 17, 2006</i>
+<br><i>Last revised Dec 8, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

@@ -1,294 +1,298 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Olympus Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>Olympus Tags</h2>
+<body>
+<h2 class='top'>Olympus Tags</h2>
 
 Tags 0x0000 through 0x0103 are used by some older Olympus cameras, and are
 the same as Konica/Minolta tags.  The Olympus tags are also used for Epson
 and Agfa cameras.
 
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0000</td>
 <td>MakerNoteVersion</td>
-<td align='center'>undef</td>
+<td class='c'>undef</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0001</td>
 <td>MinoltaCameraSettingsOld</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0003</td>
 <td>MinoltaCameraSettings</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0040</td>
 <td>CompressedImageSize</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0081</td>
 <td>PreviewImageData</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0088</td>
 <td>PreviewImageStart</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0089</td>
 <td>PreviewImageLength</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0100</td>
 <td>ThumbnailImage</td>
-<td align='center'>undef</td>
+<td class='c'>undef</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0101</td>
 <td>ColorMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Natural color
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Natural color
   <br>1 = Black&amp;white
   <br>2 = Vivid color
   <br>3 = Solarization
-  <br>4 = Adobe RGB</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>4 = Adobe RGB</span></td></tr>
+<tr class='b'>
 <td>0x0102</td>
 <td>MinoltaQuality</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Raw
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Raw
   <br>1 = Superfine
   <br>2 = Fine
   <br>3 = Normal
   <br>4 = Economy
-  <br>5 = Extra fine</font></td></tr>
-<tr valign='top'>
+  <br>5 = Extra fine</span></td></tr>
+<tr>
 <td>0x0103</td>
 <td>MinoltaQuality</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Raw
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Raw
   <br>1 = Superfine
   <br>2 = Fine
   <br>3 = Normal
   <br>4 = Economy
-  <br>5 = Extra fine</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>5 = Extra fine</span></td></tr>
+<tr class='b'>
 <td>0x0200</td>
 <td>SpecialMode</td>
-<td align='center'>int32u[3]~</td>
-<td><font size='-1'><font color="#666666">(3 numbers: 1. Shooting mode: 0=Normal, 2=Fast, 3=Panorama;
+<td class='c'>int32u[3]~</td>
+<td><span class='s'><span class='n'>(3 numbers: 1. Shooting mode: 0=Normal, 2=Fast, 3=Panorama;
 2. Sequence Number; 3. Panorama Direction: 1=Left-Right,
-2=Right-Left, 3=Bottom-Top, 4=Top-Bottom)</font></font></td></tr>
-<tr valign='top'>
+2=Right-Left, 3=Bottom-Top, 4=Top-Bottom)</span></span></td></tr>
+<tr>
 <td>0x0201</td>
 <td>Quality</td>
-<td align='center'>int16u~</td>
-<td><font size='-1'><font color="#666666">(Quality values are decoded based on the CameraType tag. All types
+<td class='c'>int16u~</td>
+<td><span class='s'><span class='n'>(Quality values are decoded based on the CameraType tag. All types
 represent SQ, HQ and SHQ as sequential integers, but in general
 SX-type cameras start with a value of 0 for SQ while others start
-with 1)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+with 1)</span></span></td></tr>
+<tr class='b'>
 <td>0x0202</td>
 <td>Macro</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
   <br>1 = On
-  <br>2 = Super Macro</font></td></tr>
-<tr valign='top'>
+  <br>2 = Super Macro</span></td></tr>
+<tr>
 <td>0x0203</td>
 <td>BWMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class='b'>
 <td>0x0204</td>
 <td>DigitalZoom</td>
-<td align='center'>rational64u</td>
+<td class='c'>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0205</td>
 <td>FocalPlaneDiagonal</td>
-<td align='center'>rational64u</td>
+<td class='c'>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0206</td>
 <td>LensDistortionParams</td>
-<td align='center'>int16s[6]</td>
+<td class='c'>int16s[6]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0207</td>
 <td>CameraType</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0208</td>
 <td>TextInfo</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Olympus.html#TextInfo'>Olympus TextInfo Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0209</td>
 <td>CameraID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x020b</td>
 <td>EpsonImageWidth</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x020c</td>
 <td>EpsonImageHeight</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x020d</td>
 <td>EpsonSoftware</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0280</td>
 <td>PreviewImage</td>
-<td align='center'>int8u</td>
-<td><font size='-1'><font color="#666666">(found in ERF and JPG images from some Epson models)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int8u</td>
+<td><span class='s'><span class='n'>(found in ERF and JPG images from some Epson models)</span></span></td></tr>
+<tr class='b'>
 <td>0x0300</td>
 <td>PreCaptureFrames</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0302</td>
 <td>OneTouchWB</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
   <br>1 = On
-  <br>2 = On (Preset)</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = On (Preset)</span></td></tr>
+<tr class='b'>
 <td>0x0404</td>
 <td>SerialNumber</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0e00</td>
 <td>PrintIM</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0f00</td>
 <td>DataDump</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0f01</td>
 <td>DataDump2</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1000</td>
 <td>ShutterSpeedValue</td>
-<td align='center'>rational64s</td>
+<td class='c'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1001</td>
 <td>ISOValue</td>
-<td align='center'>rational64s</td>
+<td class='c'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1002</td>
 <td>ApertureValue</td>
-<td align='center'>rational64s</td>
+<td class='c'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1003</td>
 <td>BrightnessValue</td>
-<td align='center'>rational64s</td>
+<td class='c'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1004</td>
 <td>FlashMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>2 = On
-  <br>3 = Off</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>2 = On
+  <br>3 = Off</span></td></tr>
+<tr>
 <td>0x1005</td>
 <td>FlashDevice</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = None
+<td class='c'>int16u</td>
+<td><span class='s'>0 = None
   <br>1 = Internal
   <br>4 = External
-  <br>5 = Internal + External</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>5 = Internal + External</span></td></tr>
+<tr class='b'>
 <td>0x1006</td>
 <td>ExposureCompensation</td>
-<td align='center'>rational64s</td>
+<td class='c'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1007</td>
 <td>SensorTemperature</td>
-<td align='center'>int16s</td>
+<td class='c'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1008</td>
 <td>LensTemperature</td>
-<td align='center'>int16s</td>
+<td class='c'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x100b</td>
 <td>FocusMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Auto
-  <br>1 = Manual</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Auto
+  <br>1 = Manual</span></td></tr>
+<tr class='b'>
 <td>0x100c</td>
 <td>ManualFocusDistance</td>
-<td align='center'>rational64u</td>
+<td class='c'>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x100d</td>
 <td>ZoomStepCount</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x100e</td>
 <td>FocusStepCount</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x100f</td>
 <td>Sharpness</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Normal
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Normal
   <br>1 = Hard
-  <br>2 = Soft</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = Soft</span></td></tr>
+<tr class='b'>
 <td>0x1010</td>
 <td>FlashChargeLevel</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1011</td>
 <td>ColorMatrix</td>
-<td align='center'>int16u[9]</td>
+<td class='c'>int16u[9]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1012</td>
 <td>BlackLevel</td>
-<td align='center'>int16u[4]</td>
+<td class='c'>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1015</td>
 <td>WBMode</td>
-<td align='center'>int16u[2]</td>
-<td><font size='-1'>1 = Auto
+<td class='c'>int16u[2]</td>
+<td><span class='s'>1 = Auto
   <br>&#39;1 0&#39; = Auto
   <br>&#39;1 2&#39; = Auto (2)
   <br>&#39;1 4&#39; = Auto (4)
@@ -299,152 +303,152 @@ with 1)</font></font></td></tr>
   <br>&#39;2 6&#39; = 5500 Kelvin
   <br>&#39;2 7&#39; = 6500 Kelvin
   <br>&#39;2 8&#39; = 7500 Kelvin
-  <br>&#39;3 0&#39; = One-touch</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>&#39;3 0&#39; = One-touch</span></td></tr>
+<tr class='b'>
 <td>0x1017</td>
 <td>RedBalance</td>
-<td align='center'>int16u[2]</td>
+<td class='c'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1018</td>
 <td>BlueBalance</td>
-<td align='center'>int16u[2]</td>
+<td class='c'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x101a</td>
 <td>SerialNumber</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1023</td>
 <td>FlashExposureComp</td>
-<td align='center'>rational64s</td>
+<td class='c'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1026</td>
 <td>ExternalFlashBounce</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = No
-  <br>1 = Yes</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr>
 <td>0x1027</td>
 <td>ExternalFlashZoom</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1028</td>
 <td>ExternalFlashMode</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1029</td>
 <td>Contrast</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = High
+<td class='c'>int16u</td>
+<td><span class='s'>0 = High
   <br>1 = Normal
-  <br>2 = Low</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = Low</span></td></tr>
+<tr class='b'>
 <td>0x102a</td>
 <td>SharpnessFactor</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x102b</td>
 <td>ColorControl</td>
-<td align='center'>int16u[6]</td>
+<td class='c'>int16u[6]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x102c</td>
 <td>ValidBits</td>
-<td align='center'>int16u[2]</td>
+<td class='c'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x102d</td>
 <td>CoringFilter</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x102e</td>
 <td>OlympusImageWidth</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x102f</td>
 <td>OlympusImageHeight</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1034</td>
 <td>CompressionRatio</td>
-<td align='center'>rational64u</td>
+<td class='c'>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1035</td>
 <td>PreviewImageValid</td>
-<td align='center'>int32u</td>
-<td><font size='-1'>0 = No
-  <br>1 = Yes</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int32u</td>
+<td><span class='s'>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr class='b'>
 <td>0x1036</td>
 <td>PreviewImageStart</td>
-<td align='center'>int32u*</td>
+<td class='c'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1037</td>
 <td>PreviewImageLength</td>
-<td align='center'>int32u*</td>
+<td class='c'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1039</td>
 <td>CCDScanMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Interlaced
-  <br>1 = Progressive</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Interlaced
+  <br>1 = Progressive</span></td></tr>
+<tr>
 <td>0x103a</td>
 <td>NoiseReduction</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class='b'>
 <td>0x103b</td>
 <td>InfinityLensStep</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x103c</td>
 <td>NearLensStep</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2010</td>
 <td>Equipment</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Olympus.html#Equipment'>Olympus Equipment Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2020</td>
 <td>CameraSettings</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Olympus.html#CameraSettings'>Olympus CameraSettings Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2030</td>
 <td>RawDevelopment</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Olympus.html#RawDevelopment'>Olympus RawDevelopment Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2040</td>
 <td>ImageProcessing</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Olympus.html#ImageProcessing'>Olympus ImageProcessing Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2050</td>
 <td>FocusInfo</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Olympus.html#FocusInfo'>Olympus FocusInfo Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>0x3000</td>
 <td>RawInfo</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Olympus.html#RawInfo'>Olympus RawInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
@@ -453,244 +457,247 @@ This information is in text format (similar to APP12 information, but with
 spaces instead of linefeeds).  Below are tags which have been observed, but
 any information found here will be extracted, even if the tag is not listed.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'Resolution'</td>
 <td>Resolution</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'Type'</td>
 <td>CameraType</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Equipment'>Olympus Equipment Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0000</td>
 <td>EquipmentVersion</td>
-<td align='center'>undef[4]</td>
+<td class='c'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0100</td>
 <td>CameraType2</td>
-<td align='center'>string[6]</td>
+<td class='c'>string[6]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0101</td>
 <td>SerialNumber</td>
-<td align='center'>string[32]</td>
+<td class='c'>string[32]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0102</td>
 <td>InternalSerialNumber</td>
-<td align='center'>string[32]</td>
-<td><font size='-1'><font color="#666666">(16 digits: 0-3=model, 4=year, 5-6=month, 8-12=unit number)</font></font></td></tr>
-<tr valign='top'>
+<td class='c'>string[32]</td>
+<td><span class='s'><span class='n'>(16 digits: 0-3=model, 4=year, 5-6=month, 8-12=unit number)</span></span></td></tr>
+<tr>
 <td>0x0103</td>
 <td>FocalPlaneDiagonal</td>
-<td align='center'>rational64u</td>
+<td class='c'>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0104</td>
 <td>BodyFirmwareVersion</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0201</td>
 <td>LensType</td>
-<td align='center'>int8u[6]~</td>
-<td><font size='-1'><font color="#666666">(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int8u[6]~</td>
+<td><span class='s'><span class='n'>(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown)</span></span></td></tr>
+<tr class='b'>
 <td>0x0202</td>
 <td>LensSerialNumber</td>
-<td align='center'>string[32]</td>
+<td class='c'>string[32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0204</td>
 <td>LensFirmwareVersion</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0206</td>
 <td>MaxApertureAtMaxFocal</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0207</td>
 <td>MinFocalLength</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0208</td>
 <td>MaxFocalLength</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x020a</td>
 <td>MaxApertureAtCurrentFocal</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0301</td>
 <td>Extender</td>
-<td align='center'>int8u[6]~</td>
-<td><font size='-1'><font color="#666666">(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown.)</font></font></td></tr>
-<tr valign='top'>
+<td class='c'>int8u[6]~</td>
+<td><span class='s'><span class='n'>(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown.)</span></span></td></tr>
+<tr>
 <td>0x0302</td>
 <td>ExtenderSerialNumber</td>
-<td align='center'>string[32]</td>
+<td class='c'>string[32]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0303</td>
 <td>ExtenderModel</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0304</td>
 <td>ExtenderFirmwareVersion</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1000</td>
 <td>FlashType</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = None
+<td class='c'>int16u</td>
+<td><span class='s'>0 = None
   <br>2 = Simple E-System
-  <br>3 = E-System</font></td></tr>
-<tr valign='top'>
+  <br>3 = E-System</span></td></tr>
+<tr>
 <td>0x1001</td>
 <td>FlashModel</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = None
+<td class='c'>int16u</td>
+<td><span class='s'>0 = None
   <br>1 = FL-20
   <br>2 = FL-50
   <br>3 = RF-11
   <br>4 = TF-22
-  <br>5 = FL-36</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>5 = FL-36</span></td></tr>
+<tr class='b'>
 <td>0x1002</td>
 <td>FlashFirmwareVersion</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1003</td>
 <td>FlashSerialNumber</td>
-<td align='center'>string[32]</td>
+<td class='c'>string[32]</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Olympus CameraSettings Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0000</td>
 <td>CameraSettingsVersion</td>
-<td align='center'>undef[4]</td>
+<td class='c'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0100</td>
 <td>PreviewImageValid</td>
-<td align='center'>int32u</td>
-<td><font size='-1'>0 = No
-  <br>1 = Yes</font></td></tr>
-<tr valign='top'>
+<td class='c'>int32u</td>
+<td><span class='s'>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr>
 <td>0x0101</td>
 <td>PreviewImageStart</td>
-<td align='center'>int32u*</td>
+<td class='c'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0102</td>
 <td>PreviewImageLength</td>
-<td align='center'>int32u*</td>
+<td class='c'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0200</td>
 <td>ExposureMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Manual
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Manual
   <br>2 = Program
   <br>3 = Aperture-priority AE
   <br>4 = Shutter speed priority AE
-  <br>5 = Program-shift</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>5 = Program-shift</span></td></tr>
+<tr class='b'>
 <td>0x0201</td>
 <td>AELock</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>0x0202</td>
 <td>MeteringMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>2 = Center Weighted
+<td class='c'>int16u</td>
+<td><span class='s'>2 = Center Weighted
   <br>3 = Spot
   <br>5 = ESP
   <br>261 = Pattern+AF
   <br>515 = Spot+Highlight control
-  <br>1027 = Spot+Shadow control</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>1027 = Spot+Shadow control</span></td></tr>
+<tr class='b'>
 <td>0x0300</td>
 <td>MacroMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>0x0301</td>
 <td>FocusMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Single AF
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Single AF
   <br>1 = Sequential shooting AF
   <br>2 = Continuous AF
   <br>3 = Multi AF
-  <br>10 = MF</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>10 = MF</span></td></tr>
+<tr class='b'>
 <td>0x0302</td>
 <td>FocusProcess</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = AF Not Used
-  <br>1 = AF Used</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = AF Not Used
+  <br>1 = AF Used</span></td></tr>
+<tr>
 <td>0x0303</td>
 <td>AFSearch</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Not Ready
-  <br>1 = Ready</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Not Ready
+  <br>1 = Ready</span></td></tr>
+<tr class='b'>
 <td>0x0304</td>
 <td>AFAreas</td>
-<td align='center'>int32u[64]~</td>
+<td class='c'>int32u[64]~</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0400</td>
 <td>FlashMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
   <br>Bit 0 = On
   <br>Bit 1 = Fill-in
   <br>Bit 2 = Red-eye
   <br>Bit 3 = Slow-sync
   <br>Bit 4 = Forced On
-  <br>Bit 5 = 2nd Curtain</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>Bit 5 = 2nd Curtain</span></td></tr>
+<tr class='b'>
 <td>0x0401</td>
 <td>FlashExposureCompensation</td>
-<td align='center'>rational64s</td>
+<td class='c'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0500</td>
 <td>WhiteBalance2</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Auto
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Auto
   <br>16 = 7500K (Fine Weather with Shade)
   <br>17 = 6000K (Cloudy)
   <br>18 = 5300K (Fine Weather)
@@ -706,53 +713,53 @@ any information found here will be extracted, even if the tag is not listed.
   <br>259 = Custom WB 4
   <br>512 = Custom WB 5400K
   <br>513 = Custom WB 2900K
-  <br>514 = Custom WB 8000K</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>514 = Custom WB 8000K</span></td></tr>
+<tr class='b'>
 <td>0x0501</td>
 <td>WhiteBalanceTemperature</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0502</td>
 <td>WhiteBalanceBracket</td>
-<td align='center'>int16s</td>
+<td class='c'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0503</td>
 <td>CustomSaturation</td>
-<td align='center'>int16s[3]~</td>
-<td><font size='-1'><font color="#666666">(3 numbers: 1. CS Value, 2. Min, 3. Max)</font></font></td></tr>
-<tr valign='top'>
+<td class='c'>int16s[3]~</td>
+<td><span class='s'><span class='n'>(3 numbers: 1. CS Value, 2. Min, 3. Max)</span></span></td></tr>
+<tr>
 <td>0x0504</td>
 <td>ModifiedSaturation</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
   <br>1 = CM1 (Red Enhance)
   <br>2 = CM2 (Green Enhance)
   <br>3 = CM3 (Blue Enhance)
-  <br>4 = CM4 (Skin Tones)</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>4 = CM4 (Skin Tones)</span></td></tr>
+<tr class='b'>
 <td>0x0505</td>
 <td>ContrastSetting</td>
-<td align='center'>int16s[3]</td>
-<td><font size='-1'><font color="#666666">(3 numbers: 1. Contrast, 2. Min, 3. Max)</font></font></td></tr>
-<tr valign='top'>
+<td class='c'>int16s[3]</td>
+<td><span class='s'><span class='n'>(3 numbers: 1. Contrast, 2. Min, 3. Max)</span></span></td></tr>
+<tr>
 <td>0x0506</td>
 <td>SharpnessSetting</td>
-<td align='center'>int16s[3]</td>
-<td><font size='-1'><font color="#666666">(3 numbers: 1. Sharpness, 2. Min, 3. Max)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16s[3]</td>
+<td><span class='s'><span class='n'>(3 numbers: 1. Sharpness, 2. Min, 3. Max)</span></span></td></tr>
+<tr class='b'>
 <td>0x0507</td>
 <td>ColorSpace</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = sRGB
+<td class='c'>int16u</td>
+<td><span class='s'>0 = sRGB
   <br>1 = Adobe RGB
-  <br>2 = Pro Photo RGB</font></td></tr>
-<tr valign='top'>
+  <br>2 = Pro Photo RGB</span></td></tr>
+<tr>
 <td>0x0509</td>
 <td>SceneMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Standard
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Standard
   <br>6 = Auto
   <br>7 = Sport
   <br>8 = Portrait
@@ -776,489 +783,493 @@ any information found here will be extracted, even if the tag is not listed.
   <br>44 = Underwater Wide2
   <br>45 = Low Key
   <br>46 = Children
-  <br>48 = Nature Macro</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>48 = Nature Macro</span></td></tr>
+<tr class='b'>
 <td>0x050a</td>
 <td>NoiseReduction</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
   <br>1 = Noise Reduction
   <br>2 = Noise Filter
   <br>3 = Noise Reduction + Noise Filter
   <br>4 = Noise Filter (ISO Boost)
-  <br>5 = Noise Reduction + Noise Filter (ISO Boost)</font></td></tr>
-<tr valign='top'>
+  <br>5 = Noise Reduction + Noise Filter (ISO Boost)</span></td></tr>
+<tr>
 <td>0x050b</td>
 <td>DistortionCorrection</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class='b'>
 <td>0x050c</td>
 <td>ShadingCompensation</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>0x050d</td>
 <td>CompressionFactor</td>
-<td align='center'>rational64u</td>
+<td class='c'>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x050f</td>
 <td>Gradation</td>
-<td align='center'>int16s[3]</td>
-<td><font size='-1'>&#39;-1 -1 1&#39; = Low Key
+<td class='c'>int16s[3]</td>
+<td><span class='s'>&#39;-1 -1 1&#39; = Low Key
   <br>&#39;0 -1 1&#39; = Normal
-  <br>&#39;1 -1 1&#39; = High Key</font></td></tr>
-<tr valign='top'>
+  <br>&#39;1 -1 1&#39; = High Key</span></td></tr>
+<tr>
 <td>0x0520</td>
 <td>PictureMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Vivid
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Vivid
   <br>2 = Natural
   <br>3 = Muted
   <br>256 = Monotone
-  <br>512 = Sepia</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>512 = Sepia</span></td></tr>
+<tr class='b'>
 <td>0x0521</td>
 <td>PictureModeSaturation</td>
-<td align='center'>int16s[3]</td>
+<td class='c'>int16s[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0522</td>
 <td>PictureModeHue?</td>
-<td align='center'>int16s</td>
+<td class='c'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0523</td>
 <td>PictureModeContrast</td>
-<td align='center'>int16s[3]</td>
+<td class='c'>int16s[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0524</td>
 <td>PictureModeSharpness</td>
-<td align='center'>int16s[3]</td>
+<td class='c'>int16s[3]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0525</td>
 <td>PictureModeBWFilter</td>
-<td align='center'>int16s</td>
-<td><font size='-1'>0 = n/a
+<td class='c'>int16s</td>
+<td><span class='s'>0 = n/a
   <br>1 = Neutral
   <br>2 = Yellow
   <br>3 = Orange
   <br>4 = Red
-  <br>5 = Green</font></td></tr>
-<tr valign='top'>
+  <br>5 = Green</span></td></tr>
+<tr>
 <td>0x0526</td>
 <td>PictureModeTone</td>
-<td align='center'>int16s</td>
-<td><font size='-1'>0 = n/a
+<td class='c'>int16s</td>
+<td><span class='s'>0 = n/a
   <br>1 = Neutral
   <br>2 = Sepia
   <br>3 = Blue
   <br>4 = Purple
-  <br>5 = Green</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>5 = Green</span></td></tr>
+<tr class='b'>
 <td>0x0600</td>
 <td>Sequence</td>
-<td align='center'>int16u[n]~</td>
-<td><font size='-1'><font color="#666666">(2 or 3 numbers: 1. Mode, 2. Shot number, 3. Mode bits)</font></font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u[n]~</td>
+<td><span class='s'><span class='n'>(2 or 3 numbers: 1. Mode, 2. Shot number, 3. Mode bits)</span></span></td></tr>
+<tr>
 <td>0x0601</td>
 <td>PanoramaMode</td>
-<td align='center'>int16u~</td>
-<td><font size='-1'><font color="#666666">(2 numbers: 1. Mode, 2. Shot number)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u~</td>
+<td><span class='s'><span class='n'>(2 numbers: 1. Mode, 2. Shot number)</span></span></td></tr>
+<tr class='b'>
 <td>0x0603</td>
 <td>ImageQuality2</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = SQ
+<td class='c'>int16u</td>
+<td><span class='s'>1 = SQ
   <br>2 = HQ
   <br>3 = SHQ
-  <br>4 = RAW</font></td></tr>
+  <br>4 = RAW</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='RawDevelopment'>Olympus RawDevelopment Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0000</td>
 <td>RawDevVersion</td>
-<td align='center'>undef[4]</td>
+<td class='c'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0100</td>
 <td>RawDevExposureBiasValue</td>
-<td align='center'>rational64s</td>
+<td class='c'>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0101</td>
 <td>RawDevWhiteBalanceValue</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0102</td>
 <td>RawDevWBFineAdjustment</td>
-<td align='center'>int16s</td>
+<td class='c'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0103</td>
 <td>RawDevGrayPoint</td>
-<td align='center'>int16u[3]</td>
+<td class='c'>int16u[3]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0104</td>
 <td>RawDevSaturationEmphasis</td>
-<td align='center'>int16s[3]</td>
+<td class='c'>int16s[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0105</td>
 <td>RawDevMemoryColorEmphasis</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0106</td>
 <td>RawDevContrastValue</td>
-<td align='center'>int16s[3]</td>
+<td class='c'>int16s[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0107</td>
 <td>RawDevSharpnessValue</td>
-<td align='center'>int16s[3]</td>
+<td class='c'>int16s[3]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0108</td>
 <td>RawDevColorSpace</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0109</td>
 <td>RawDevEngine</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x010a</td>
 <td>RawDevNoiseReduction</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x010b</td>
 <td>RawDevEditStatus</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x010c</td>
 <td>RawDevSettings</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ImageProcessing'>Olympus ImageProcessing Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0000</td>
 <td>ImageProcessingVersion</td>
-<td align='center'>undef[4]</td>
+<td class='c'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0100</td>
 <td>WB_RBLevels</td>
-<td align='center'>int16u[2]</td>
+<td class='c'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0200</td>
 <td>ColorMatrix</td>
-<td align='center'>int16u[9]</td>
+<td class='c'>int16u[9]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0300</td>
 <td>SmoothingParameter1</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0310</td>
 <td>SmoothingParameter2</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0600</td>
 <td>SmoothingThresholds</td>
-<td align='center'>int16u[4]</td>
+<td class='c'>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0610</td>
 <td>SmoothingThreshold2</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0611</td>
 <td>ValidBits</td>
-<td align='center'>int16u[2]</td>
+<td class='c'>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0614</td>
 <td>OlympusImageWidth2</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0615</td>
 <td>OlympusImageHeight2</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1010</td>
 <td>NoiseReduction2</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
   <br>1 = Noise Filter
   <br>2 = Noise Reduction
   <br>3 = Noise Reduction + Noise Filter
   <br>4 = Noise Filter (ISO Boost)
-  <br>5 = Noise Reduction + Noise Filter (ISO Boost)</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>5 = Noise Reduction + Noise Filter (ISO Boost)</span></td></tr>
+<tr class='b'>
 <td>0x1011</td>
 <td>DistortionCorrection2</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>0x1012</td>
 <td>ShadingCompensation2</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FocusInfo'>Olympus FocusInfo Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0000</td>
 <td>FocusInfoVersion</td>
-<td align='center'>undef[4]</td>
+<td class='c'>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0209</td>
 <td>AutoFocus?</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>0x0300</td>
 <td>ZoomStepCount</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0305</td>
 <td>FocusDistance</td>
-<td align='center'>rational64u</td>
+<td class='c'>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1201</td>
 <td>ExternalFlash</td>
-<td align='center'>int16u[2]</td>
-<td><font size='-1'>&#39;0 0&#39; = Off
-  <br>&#39;1 0&#39; = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u[2]</td>
+<td><span class='s'>&#39;0 0&#39; = Off
+  <br>&#39;1 0&#39; = On</span></td></tr>
+<tr class='b'>
 <td>0x1208</td>
 <td>InternalFlash</td>
-<td align='center'>int16u[n]</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int16u[n]</td>
+<td><span class='s'>0 = Off
   <br>1 = On
   <br>&#39;0 0&#39; = Off
-  <br>&#39;1 0&#39; = On</font></td></tr>
-<tr valign='top'>
+  <br>&#39;1 0&#39; = On</span></td></tr>
+<tr>
 <td>0x1209</td>
 <td>ManualFlash</td>
-<td align='center'>int16u[2]~</td>
-<td><font size='-1'><font color="#666666">(2 numbers: 1. 0=Off, 1=On, 2. Flash strength)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u[2]~</td>
+<td><span class='s'><span class='n'>(2 numbers: 1. 0=Off, 1=On, 2. Flash strength)</span></span></td></tr>
+<tr class='b'>
 <td>0x1500</td>
 <td>SensorTemperature</td>
-<td align='center'>int16s</td>
+<td class='c'>int16s</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='RawInfo'>Olympus RawInfo Tags</a></h2>
 These tags are found only in ORF images of some models (ie. C8080WZ).
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0100</td>
 <td>WB_RBLevelsUsed</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0110</td>
 <td>WB_RBLevelsAuto</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0120</td>
 <td>WB_RBLevelsShade</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0121</td>
 <td>WB_RBLevelsCloudy</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0122</td>
 <td>WB_RBLevelsFineWeather</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0123</td>
 <td>WB_RBLevelsTungsten</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0124</td>
 <td>WB_RBLevelsEveningSunlight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0130</td>
 <td>WB_RBLevelsDaylightFluor</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0131</td>
 <td>WB_RBLevelsDayWhiteFluor</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0132</td>
 <td>WB_RBLevelsCoolWhiteFluor</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0133</td>
 <td>WB_RBLevelsWhiteFluorescent</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0200</td>
 <td>ColorMatrix2</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0310</td>
 <td>CoringFilter</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0311</td>
 <td>CoringValues</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0600</td>
 <td>BlackLevel2</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0601</td>
 <td>YCbCrCoefficients</td>
-<td align='center'>N</td>
-<td><font size='-1'><font color="#666666">(stored as int16u[6], but extracted as rational32u[3])</font></font></td></tr>
-<tr valign='top'>
+<td class='c'>N</td>
+<td><span class='s'><span class='n'>(stored as int16u[6], but extracted as rational32u[3])</span></span></td></tr>
+<tr>
 <td>0x0611</td>
 <td>ValidPixelDepth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0614</td>
 <td>FinalImageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0615</td>
 <td>FinalImageHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1000</td>
 <td>WhiteBalanceComp</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1010</td>
 <td>SaturationSetting</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1011</td>
 <td>HueSetting</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1012</td>
 <td>ContrastSetting</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1013</td>
 <td>SharpnessSetting</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2000</td>
 <td>CMExposureCompensation</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2001</td>
 <td>CMWhiteBalance</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2002</td>
 <td>CMWhiteBalanceComp</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2010</td>
 <td>CMWhiteBalanceGrayPoint</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2020</td>
 <td>CMSaturation</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2021</td>
 <td>CMHue</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2022</td>
 <td>CMContrast</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2023</td>
 <td>CMSharpness</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Nov 8, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

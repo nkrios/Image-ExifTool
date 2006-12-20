@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.64
 [File, File, Image]  - File Name: CanonRaw.crw
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
@@ -47,6 +47,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
+[MakerNotes, Canon, Image] 10 - Optical Zoom Code: 8
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: +2/3
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
@@ -68,6 +69,7 @@
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: On
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
 [MakerNotes, Canon, Camera] 7 - Focus Mode: AI Focus AF
+[MakerNotes, Canon, Camera] 9 - Record Mode: CRW+THM
 [MakerNotes, Canon, Camera] 10 - Canon Image Size: Large
 [MakerNotes, Canon, Camera] 11 - Easy Mode: Manual
 [MakerNotes, Canon, Camera] 12 - Digital Zoom: Unknown (-1)
@@ -80,8 +82,8 @@
 [MakerNotes, Canon, Camera] 19 - AF Point: Manual AF point selection
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Program AE
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
-[MakerNotes, Canon, Camera] 23 - Long Focal: 55
-[MakerNotes, Canon, Camera] 24 - Short Focal: 18
+[MakerNotes, Canon, Camera] 23 - Long Focal: 55mm
+[MakerNotes, Canon, Camera] 24 - Short Focal: 18mm
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 3.6
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 22

@@ -1,144 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Ricoh Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>Ricoh Tags</h2>
+<body>
+<h2 class='top'>Ricoh Tags</h2>
 These tags are used by Ricoh Caplio camera models.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0001</td>
 <td>MakerNoteType</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0002</td>
 <td>MakerNoteVersion</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0e00</td>
 <td>PrintIM</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1001</td>
 <td>ImageInfo</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Ricoh.html#ImageInfo'>Ricoh ImageInfo Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1003</td>
 <td>Sharpness</td>
-<td align='center'>int32u</td>
-<td><font size='-1'>0 = Sharp
+<td class='c'>int32u</td>
+<td><span class='s'>0 = Sharp
   <br>1 = Normal
-  <br>2 = Soft</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = Soft</span></td></tr>
+<tr class='b'>
 <td>0x2001</td>
 <td>RicohSubdir
   <br>RicohRR1Subdir</td>
-<td align='center'>-<br>-</td>
+<td class='c'>-<br>-</td>
 <td>--&gt; <a href='Ricoh.html#Subdir'>Ricoh Subdir Tags</a>
   <br>--&gt; <a href='Ricoh.html#Subdir'>Ricoh Subdir Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ImageInfo'>Ricoh ImageInfo Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>RicohImageWidth</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>2</td>
+<tr class='b'>
+<td class='r'>2</td>
 <td>RicohImageHeight</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>6</td>
+<tr>
+<td class='r'>6</td>
 <td>RicohDate</td>
-<td align='center'>int8u[7]</td>
+<td class='c'>int8u[7]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>28</td>
+<tr class='b'>
+<td class='r'>28</td>
 <td>PreviewImageStart</td>
-<td align='center'>int16u*</td>
+<td class='c'>int16u*</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>30</td>
+<tr>
+<td class='r'>30</td>
 <td>PreviewImageLength</td>
-<td align='center'>int16u*</td>
+<td class='c'>int16u*</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>32</td>
+<tr class='b'>
+<td class='r'>32</td>
 <td>FlashMode</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int8u</td>
+<td><span class='s'>0 = Off
   <br>1 = Auto
-  <br>2 = On</font></td></tr>
-<tr valign='top'>
-<td align='right'>33</td>
+  <br>2 = On</span></td></tr>
+<tr>
+<td class='r'>33</td>
 <td>Macro</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>34</td>
+<td class='c'>int8u</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class='b'>
+<td class='r'>34</td>
 <td>Sharpness</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = Sharp
+<td class='c'>int8u</td>
+<td><span class='s'>0 = Sharp
   <br>1 = Normal
-  <br>2 = Soft</font></td></tr>
-<tr valign='top'>
-<td align='right'>38</td>
+  <br>2 = Soft</span></td></tr>
+<tr>
+<td class='r'>38</td>
 <td>WhiteBalance</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = Auto
+<td class='c'>int8u</td>
+<td><span class='s'>0 = Auto
   <br>1 = Daylight
   <br>2 = Cloudy
   <br>3 = Tungsten
-  <br>4 = Fluorescent</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>39</td>
+  <br>4 = Fluorescent</span></td></tr>
+<tr class='b'>
+<td class='r'>39</td>
 <td>ISOSetting</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = Auto
+<td class='c'>int8u</td>
+<td><span class='s'>0 = Auto
   <br>1 = 64
   <br>2 = 100
   <br>4 = 200
   <br>6 = 400
   <br>7 = 800
-  <br>8 = 1600</font></td></tr>
-<tr valign='top'>
-<td align='right'>40</td>
+  <br>8 = 1600</span></td></tr>
+<tr>
+<td class='r'>40</td>
 <td>Saturation</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = High
+<td class='c'>int8u</td>
+<td><span class='s'>0 = High
   <br>1 = Normal
   <br>2 = Low
-  <br>3 = None (B&amp;W)</font></td></tr>
+  <br>3 = None (B&amp;W)</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Subdir'>Ricoh Subdir Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0004</td>
 <td>RicohDateTime1</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0005</td>
 <td>RicohDateTime2</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -148,33 +154,34 @@ RDC-4300 use a text-based format for their maker notes instead of the IFD
 format used by the Caplio models.  Below is a list of known tags in this
 information.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'Bg'</td>
 <td>BlueGain</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'Gg'</td>
 <td>GreenGain</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'Rev'</td>
 <td>Revision</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'Rg'</td>
 <td>RedGain</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'Rv'</td>
 <td>Revision</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -183,14 +190,15 @@ The Ricoh Caplio Pro G3 has the ability to add custom fields to the APP5
 &quot;RMETA&quot; segment of JPEG images.  While only a few observed tags have been
 defined below, ExifTool will extract any information found here.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'Azimuth'</td>
 <td>Azimuth</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = N
+<td class='c'>N</td>
+<td><span class='s'>1 = N
   <br>2 = NNE
   <br>3 = NE
   <br>4 = ENE
@@ -205,41 +213,41 @@ defined below, ExifTool will extract any information found here.
   <br>13 = W
   <br>14 = WNW
   <br>15 = NW
-  <br>16 = NNW</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>16 = NNW</span></td></tr>
+<tr class='b'>
 <td>'Condition'</td>
 <td>Condition</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Good
+<td class='c'>N</td>
+<td><span class='s'>1 = Good
   <br>2 = Fair
   <br>3 = Poor
-  <br>4 = Damaged</font></td></tr>
-<tr valign='top'>
+  <br>4 = Damaged</span></td></tr>
+<tr>
 <td>'Lit'</td>
 <td>Lit</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Yes
-  <br>2 = No</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>N</td>
+<td><span class='s'>1 = Yes
+  <br>2 = No</span></td></tr>
+<tr class='b'>
 <td>'Location'</td>
 <td>Location</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Verge
+<td class='c'>N</td>
+<td><span class='s'>1 = Verge
   <br>2 = Gantry
   <br>3 = Central reservation
-  <br>4 = Roundabout</font></td></tr>
-<tr valign='top'>
+  <br>4 = Roundabout</span></td></tr>
+<tr>
 <td>'Sign type'</td>
 <td>SignType</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Directional
+<td class='c'>N</td>
+<td><span class='s'>1 = Directional
   <br>2 = Warning
-  <br>3 = Information</font></td></tr>
+  <br>3 = Information</span></td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Oct 31, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

@@ -1,9 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>FlashPix Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>FlashPix Tags</h2>
+<body>
+<h2 class='top'>FlashPix Tags</h2>
 The FlashPix file format, introduced in 1996, was developed by Kodak,
 Hewlett-Packard and Microsoft.  Internally the FPX file structure mimics
 that of an old DOS disk with fixed-sized &quot;sectors&quot; (usually 512 bytes) and a
@@ -16,357 +19,364 @@ JPEG images by some Kodak and Hewlett-Packard digital cameras.
 <p>ExifTool extracts FlashPix information from both FPX images and the APP2
 FPXR segment of JPEG images.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>"\x01CompObj"</td>
 <td>CompObj</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#CompObj'>FlashPix CompObj Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>"\x05Audio Info"</td>
 <td>AudioInfo</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#AudioInfo'>FlashPix AudioInfo Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>"\x05Data Object"</td>
 <td>DataObject</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#DataObject'>FlashPix DataObject Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>"\x05Extension List"</td>
 <td>Extensions</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#Extensions'>FlashPix Extensions Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>"\x05Global Info"</td>
 <td>GlobalInfo</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#GlobalInfo'>FlashPix GlobalInfo Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>"\x05Image Contents"</td>
 <td>Image</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#Image'>FlashPix Image Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>"\x05Image Info"</td>
 <td>ImageInfo</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#ImageInfo'>FlashPix ImageInfo Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>"\x05Operation"</td>
 <td>Operation</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#Operation'>FlashPix Operation Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>"\x05Screen Nail"</td>
 <td>ScreenNail</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>"\x05SummaryInformation"</td>
 <td>SummaryInfo</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#SummaryInfo'>FlashPix SummaryInfo Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>"\x05Transform"</td>
 <td>Transform</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#Transform'>FlashPix Transform Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'Audio Stream'</td>
 <td>AudioStream</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>'ICC Profile 0001'</td>
 <td>ICC_Profile</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'Subimage 0000 Header'</td>
 <td>SubimageHeader</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='FlashPix.html#SubimageHeader'>FlashPix SubimageHeader Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CompObj'>FlashPix CompObj Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>CompObjUserTypeLen</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>1</td>
+<tr class='b'>
+<td class='r'>1</td>
 <td>CompObjUserType</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='AudioInfo'>FlashPix AudioInfo Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr><td colspan=4 align='center'>[no tags known]</td></tr>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr><td colspan=4 class='c'>[no tags known]</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='DataObject'>FlashPix DataObject Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x10000</td>
 <td>DataObjectID</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10002</td>
 <td>LockedPropertyList</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10003</td>
 <td>DataObjectTitle</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10004</td>
 <td>LastModifier</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10005</td>
 <td>RevisionNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10006</td>
 <td>DataCreateDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10007</td>
 <td>DataModifyDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10008</td>
 <td>CreatingApplication</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10100</td>
 <td>DataObjectStatus</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10101</td>
 <td>CreatingTransform</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10102</td>
 <td>UsingTransforms</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10000000</td>
 <td>CachedImageHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10000001</td>
 <td>CachedImageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Extensions'>FlashPix Extensions Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0001</td>
 <td>ExtensionName</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0002</td>
 <td>ExtensionClassID</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0003</td>
 <td>ExtensionPersistence</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Always Valid
+<td class='c'>N</td>
+<td><span class='s'>0 = Always Valid
   <br>1 = Invalidated By Modification
-  <br>2 = Potentially Invalidated By Modification</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = Potentially Invalidated By Modification</span></td></tr>
+<tr class='b'>
 <td>0x0004</td>
 <td>ExtensionCreateDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0005</td>
 <td>ExtensionModifyDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0006</td>
 <td>CreatingApplication</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0007</td>
 <td>ExtensionDescription</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1000</td>
 <td>Storage-StreamPathname</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2000</td>
 <td>FlashPixStreamPathname</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2001</td>
 <td>FlashPixStreamFieldOffset</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x3000</td>
 <td>PropertySetPathname</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x3001</td>
 <td>PropertySetIDCodes</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x3002</td>
 <td>PropertyVectorElements</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x4000</td>
 <td>SubimageResolutions</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10000000</td>
 <td>UsedExtensionNumbers</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='GlobalInfo'>FlashPix GlobalInfo Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x10002</td>
 <td>LockedPropertyList</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10003</td>
 <td>TransformedImageTitle</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10004</td>
 <td>LastModifier</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10100</td>
 <td>VisibleOutputs</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10101</td>
 <td>MaximumImageIndex</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10102</td>
 <td>MaximumTransformIndex</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10103</td>
 <td>MaximumOperationIndex</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Image'>FlashPix Image Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x1000000</td>
 <td>NumberOfResolutions</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1000002</td>
 <td>ImageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1000003</td>
 <td>ImageHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1000004</td>
 <td>DefaultDisplayHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x1000005</td>
 <td>DefaultDisplayWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x1000006</td>
 <td>DisplayUnits</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = inches
+<td class='c'>N</td>
+<td><span class='s'>0 = inches
   <br>1 = meters
   <br>2 = cm
-  <br>3 = mm</font></td></tr>
-<tr valign='top'>
+  <br>3 = mm</span></td></tr>
+<tr>
 <td>0x2000000</td>
 <td>SubimageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2000001</td>
 <td>SubimageHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2000002</td>
 <td>SubimageColor</td>
-<td align='center'>N</td>
-<td><font size='-1'>&#39;01 0000&#39; = Opacity Only
+<td class='c'>N</td>
+<td><span class='s'>&#39;01 0000&#39; = Opacity Only
   <br>&#39;01 0001&#39; = Monochrome
   <br>&#39;01 8000&#39; = Opacity Only (uncalibrated)
   <br>&#39;01 8001&#39; = Monochrome (uncalibrated)
@@ -377,233 +387,234 @@ FPXR segment of JPEG images.
   <br>&#39;04 0002&#39; = YCbCr with Opacity
   <br>&#39;04 0003&#39; = RGB with Opacity
   <br>&#39;04 8002&#39; = YCbCr with Opacity (uncalibrated)
-  <br>&#39;04 8003&#39; = RGB with Opacity (uncalibrated)</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>&#39;04 8003&#39; = RGB with Opacity (uncalibrated)</span></td></tr>
+<tr class='b'>
 <td>0x2000003</td>
 <td>SubimageNumericalFormat</td>
-<td align='center'>N</td>
-<td><font size='-1'>17 = 8-bit, Unsigned
+<td class='c'>N</td>
+<td><span class='s'>17 = 8-bit, Unsigned
   <br>18 = 16-bit, Unsigned
-  <br>19 = 32-bit, Unsigned</font></td></tr>
-<tr valign='top'>
+  <br>19 = 32-bit, Unsigned</span></td></tr>
+<tr>
 <td>0x2000004</td>
 <td>DecimationMethod</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = None (Full-sized Image)
-  <br>8 = 8-point Prefilter</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>N</td>
+<td><span class='s'>0 = None (Full-sized Image)
+  <br>8 = 8-point Prefilter</span></td></tr>
+<tr class='b'>
 <td>0x2000005</td>
 <td>DecimationPrefilterWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2000007</td>
 <td>SubimageICC_Profile</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x3000001</td>
 <td>JPEGTables</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x3000002</td>
 <td>MaxJPEGTableIndex</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ImageInfo'>FlashPix ImageInfo Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x21000000</td>
 <td>FileSource</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Film Scanner
+<td class='c'>N</td>
+<td><span class='s'>1 = Film Scanner
   <br>2 = Reflection Print Scanner
   <br>3 = Digital Camera
   <br>4 = Video Capture
-  <br>5 = Computer Graphics</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>5 = Computer Graphics</span></td></tr>
+<tr class='b'>
 <td>0x21000001</td>
 <td>SceneType</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Original Scene
+<td class='c'>N</td>
+<td><span class='s'>1 = Original Scene
   <br>2 = Second Generation Scene
-  <br>3 = Digital Scene Generation</font></td></tr>
-<tr valign='top'>
+  <br>3 = Digital Scene Generation</span></td></tr>
+<tr>
 <td>0x21000002</td>
 <td>CreationPathVector</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x21000003</td>
 <td>SoftwareRelease</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x21000004</td>
 <td>UserDefinedID</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x21000005</td>
 <td>SharpnessApproximation</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x22000000</td>
 <td>Copyright</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x22000001</td>
 <td>OriginalImageBroker</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x22000002</td>
 <td>DigitalImageBroker</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x22000003</td>
 <td>Authorship</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x22000004</td>
 <td>IntellectualPropertyNotes</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x23000000</td>
 <td>TestTarget</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Color Chart
+<td class='c'>N</td>
+<td><span class='s'>1 = Color Chart
   <br>2 = Grey Card
   <br>3 = Greyscale
   <br>4 = Resolution Chart
   <br>5 = Inch Scale
   <br>6 = Centimeter Scale
   <br>7 = Millimeter Scale
-  <br>8 = Micrometer Scale</font></td></tr>
-<tr valign='top'>
+  <br>8 = Micrometer Scale</span></td></tr>
+<tr>
 <td>0x23000002</td>
 <td>GroupCaption</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x23000003</td>
 <td>CaptionText</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x23000004</td>
 <td>People</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x23000007</td>
 <td>Things</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2300000a</td>
 <td>DateTimeOriginal</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2300000b</td>
 <td>Events</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2300000c</td>
 <td>Places</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2300000f</td>
 <td>ContentDescriptionNotes</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x24000000</td>
 <td>Make</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x24000001</td>
 <td>Model</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x24000002</td>
 <td>SerialNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x25000000</td>
 <td>CreateDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x25000001</td>
 <td>ExposureTime</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x25000002</td>
 <td>FNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x25000003</td>
 <td>ExposureProgram</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Manual
+<td class='c'>N</td>
+<td><span class='s'>1 = Manual
   <br>2 = Program AE
   <br>3 = Aperture-priority AE
   <br>4 = Shutter speed priority AE
   <br>5 = Creative (Slow speed)
   <br>6 = Action (High speed)
   <br>7 = Portrait
-  <br>8 = Landscape</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>8 = Landscape</span></td></tr>
+<tr class='b'>
 <td>0x25000004</td>
 <td>BrightnessValue</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x25000005</td>
 <td>ExposureCompensation</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x25000006</td>
 <td>SubjectDistance</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x25000007</td>
 <td>MeteringMode</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Average
+<td class='c'>N</td>
+<td><span class='s'>1 = Average
   <br>2 = Center-weighted average
   <br>3 = Spot
   <br>4 = Multi-spot
   <br>5 = Multi-segment
   <br>6 = Partial
-  <br>255 = Other</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>255 = Other</span></td></tr>
+<tr class='b'>
 <td>0x25000008</td>
 <td>LightSource</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Daylight
+<td class='c'>N</td>
+<td><span class='s'>1 = Daylight
   <br>2 = Fluorescent
   <br>3 = Tungsten
   <br>4 = Flash
@@ -622,228 +633,229 @@ FPXR segment of JPEG images.
   <br>22 = D75
   <br>23 = D50
   <br>24 = ISO Studio Tungsten
-  <br>255 = Other</font></td></tr>
-<tr valign='top'>
+  <br>255 = Other</span></td></tr>
+<tr>
 <td>0x25000009</td>
 <td>FocalLength</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x2500000a</td>
 <td>MaxApertureValue</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2500000b</td>
 <td>Flash</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = No Flash
-  <br>2 = Flash Fired</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>N</td>
+<td><span class='s'>1 = No Flash
+  <br>2 = Flash Fired</span></td></tr>
+<tr class='b'>
 <td>0x2500000c</td>
 <td>FlashEnergy</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2500000d</td>
 <td>FlashReturn</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Subject Outside Flash Range
-  <br>2 = Subject Inside Flash Range</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>N</td>
+<td><span class='s'>1 = Subject Outside Flash Range
+  <br>2 = Subject Inside Flash Range</span></td></tr>
+<tr class='b'>
 <td>0x2500000e</td>
 <td>BackLight</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Front Lit
+<td class='c'>N</td>
+<td><span class='s'>1 = Front Lit
   <br>2 = Back Lit 1
-  <br>3 = Back Lit 2</font></td></tr>
-<tr valign='top'>
+  <br>3 = Back Lit 2</span></td></tr>
+<tr>
 <td>0x2500000f</td>
 <td>SubjectLocation</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x25000010</td>
 <td>ExposureIndex</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x25000011</td>
 <td>SpecialEffectsOpticalFilter</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = None
+<td class='c'>N</td>
+<td><span class='s'>1 = None
   <br>2 = Colored
   <br>3 = Diffusion
   <br>4 = Multi-image
   <br>5 = Polarizing
   <br>6 = Split-field
-  <br>7 = Star</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>7 = Star</span></td></tr>
+<tr class='b'>
 <td>0x25000012</td>
 <td>PerPictureNotes</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x26000000</td>
 <td>SensingMethod</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Monochrome area
+<td class='c'>N</td>
+<td><span class='s'>1 = Monochrome area
   <br>2 = One-chip color area
   <br>3 = Two-chip color area
   <br>4 = Three-chip color area
   <br>5 = Color sequential area
   <br>6 = Monochrome linear
   <br>7 = Trilinear
-  <br>8 = Color sequential linear</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>8 = Color sequential linear</span></td></tr>
+<tr class='b'>
 <td>0x26000001</td>
 <td>FocalPlaneXResolution</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x26000002</td>
 <td>FocalPlaneYResolution</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x26000003</td>
 <td>FocalPlaneResolutionUnit</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = mm
+<td class='c'>N</td>
+<td><span class='s'>1 = mm
   <br>10 = cm
   <br>&#39;0.001&#39; = um
-  <br>&#39;25.4&#39; = inches</font></td></tr>
-<tr valign='top'>
+  <br>&#39;25.4&#39; = inches</span></td></tr>
+<tr>
 <td>0x26000004</td>
 <td>SpatialFrequencyResponse</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x26000005</td>
 <td>CFAPattern</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x26000007</td>
 <td>ISO</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x26000008</td>
 <td>Opto-ElectricConvFactor</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x27000000</td>
 <td>FilmBrand</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x27000001</td>
 <td>FilmCategory</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x27000002</td>
 <td>FilmSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x27000003</td>
 <td>FilmRollNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x27000004</td>
 <td>FilmFrameNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x28000000</td>
 <td>ScannerMake</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x28000001</td>
 <td>ScannerModel</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x28000002</td>
 <td>ScannerSerialNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x28000003</td>
 <td>ScanSoftware</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x28000004</td>
 <td>ScanSoftwareRevisionDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x28000005</td>
 <td>ServiceOrganizationName</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x28000006</td>
 <td>ScanOperatorID</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x28000008</td>
 <td>ScanDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x28000009</td>
 <td>ModifyDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x2800000a</td>
 <td>ScannerPixelSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x29000000</td>
 <td>OriginalScannedImageSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x29000001</td>
 <td>OriginalDocumentSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x29000002</td>
 <td>OriginalMedium</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Continuous Tone Image
+<td class='c'>N</td>
+<td><span class='s'>1 = Continuous Tone Image
   <br>2 = Halftone Image
-  <br>3 = Line Art</font></td></tr>
-<tr valign='top'>
+  <br>3 = Line Art</span></td></tr>
+<tr>
 <td>0x29000003</td>
 <td>TypeOfOriginal</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = B&amp;W Print
+<td class='c'>N</td>
+<td><span class='s'>1 = B&amp;W Print
   <br>2 = Color Print
   <br>3 = B&amp;W Document
-  <br>4 = Color Document</font></td></tr>
+  <br>4 = Color Document</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Operation'>FlashPix Operation Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x10000</td>
 <td>OperationID</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -851,253 +863,256 @@ FPXR segment of JPEG images.
 The Dictionary, CodePage and LocalIndicator tags are common to all FlashPix
 property tables, even though they are only listed in the SummaryInfo table.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0000</td>
 <td>Dictionary</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0001</td>
 <td>CodePage</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0002</td>
 <td>Title</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0003</td>
 <td>Subject</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0004</td>
 <td>Author</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0005</td>
 <td>Keywords</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0006</td>
 <td>Comments</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0007</td>
 <td>Template</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0008</td>
 <td>LastSavedBy</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0009</td>
 <td>RevisionNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x000a</td>
 <td>TotalEditTime</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x000b</td>
 <td>LastPrinted</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x000c</td>
 <td>CreateDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x000d</td>
 <td>ModifyDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x000e</td>
 <td>PageCount</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x000f</td>
 <td>WordCount</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0010</td>
 <td>CharCount</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0011</td>
 <td>ThumbnailClip</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0012</td>
 <td>Software</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0013</td>
 <td>Security</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x80000000</td>
 <td>LocaleIndicator</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Transform'>FlashPix Transform Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x10000</td>
 <td>TransformNodeID</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10001</td>
 <td>OperationClassID</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10002</td>
 <td>LockedPropertyList</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10003</td>
 <td>TransformTitle</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10004</td>
 <td>LastModifier</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10005</td>
 <td>RevisionNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10006</td>
 <td>TransformCreateDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10007</td>
 <td>TransformModifyDate</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10008</td>
 <td>CreatingApplication</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10100</td>
 <td>InputDataObjectList</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10101</td>
 <td>OutputDataObjectList</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10102</td>
 <td>OperationNumber</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10000000</td>
 <td>ResultAspectRatio</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10000001</td>
 <td>RectangleOfInterest</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10000002</td>
 <td>Filtering</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10000003</td>
 <td>SpatialOrientation</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x10000004</td>
 <td>ColortwistMatrix</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x10000005</td>
 <td>ContrastAdjustment</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SubimageHeader'>FlashPix SubimageHeader Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>1</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>1</td>
 <td>SubimageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>2</td>
+<tr class='b'>
+<td class='r'>2</td>
 <td>SubimageHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>3</td>
+<tr>
+<td class='r'>3</td>
 <td>SubimageTileCount</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>4</td>
+<tr class='b'>
+<td class='r'>4</td>
 <td>SubimageTileWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>5</td>
+<tr>
+<td class='r'>5</td>
 <td>SubimageTileHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>6</td>
+<tr class='b'>
+<td class='r'>6</td>
 <td>NumChannels</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Nov 6, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

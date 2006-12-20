@@ -1,114 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>JPEG Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>JPEG Tags</h2>
+<body>
+<h2 class='top'>JPEG Tags</h2>
 This table lists information extracted by ExifTool from JPEG images.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'APP0'</td>
 <td>JFIF
   <br>JFXX
   <br>CIFF</td>
-<td align='center'>-<br>-<br>-</td>
+<td class='c'>-<br>-<br>-</td>
 <td>--&gt; <a href='JFIF.html'>JFIF Tags</a>
   <br>--&gt; <a href='JFIF.html#Extension'>JFIF Extension Tags</a>
   <br>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'APP1'</td>
 <td>EXIF
   <br>XMP</td>
-<td align='center'>-<br>-</td>
+<td class='c'>-<br>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a>
   <br>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>'APP2'</td>
 <td>ICC_Profile
   <br>FPXR</td>
-<td align='center'>-<br>-</td>
+<td class='c'>-<br>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a>
   <br>--&gt; <a href='FlashPix.html'>FlashPix Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'APP3'</td>
 <td>Meta</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Kodak.html#Meta'>Kodak Meta Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>'APP5'</td>
 <td>RMETA</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Ricoh.html#RMETA'>Ricoh RMETA Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'APP6'</td>
 <td>EPPIM</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='JPEG.html#APP6'>JPEG APP6 Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>'APP8'</td>
 <td>SPIFF</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='JPEG.html#APP8'>JPEG APP8 Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'APP10'</td>
 <td>Comment</td>
-<td align='center'>N</td>
-<td><font size='-1'><font color="#666666">(PhotoStudio Unicode comment)</font></font></td></tr>
-<tr valign='top'>
+<td class='c'>N</td>
+<td><span class='s'><span class='n'>(PhotoStudio Unicode comment)</span></span></td></tr>
+<tr>
 <td>'APP12'</td>
 <td>PictureInfo
   <br>Ducky</td>
-<td align='center'>-<br>-</td>
+<td class='c'>-<br>-</td>
 <td>--&gt; <a href='APP12.html'>APP12 Tags</a>
   <br>--&gt; <a href='APP12.html#Ducky'>APP12 Ducky Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'APP13'</td>
 <td>Photoshop</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>'APP14'</td>
 <td>Adobe</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='JPEG.html#APP14'>JPEG APP14 Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'APP15'</td>
 <td>GraphicConverter</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='JPEG.html#APP15'>JPEG APP15 Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>'COM'</td>
 <td>Comment</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>'Trailer'</td>
 <td>AFCP
   <br>CanonVRD
   <br>FotoStation
   <br>PhotoMechanic
+  <br>MIE
   <br>PreviewImage</td>
-<td align='center'>-<br>-<br>-<br>-<br>Y</td>
+<td class='c'>-<br>-<br>-<br>-<br>-<br>Y</td>
 <td>--&gt; <a href='AFCP.html'>AFCP Tags</a>
   <br>--&gt; <a href='CanonVRD.html'>CanonVRD Tags</a>
   <br>--&gt; <a href='FotoStation.html'>FotoStation Tags</a>
-  <br>--&gt; <a href='PhotoMechanic.html'>PhotoMechanic Tags</a></td></tr>
+  <br>--&gt; <a href='PhotoMechanic.html'>PhotoMechanic Tags</a>
+  <br>--&gt; <a href='MIE.html'>MIE Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='APP6'>JPEG APP6 Tags</a></h2>
 APP6 is used in by the Toshiba PDR-M700 to store a TIFF structure containing
 PrintIM information.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0xc4a5</td>
 <td>PrintIM</td>
-<td align='center'>undef</td>
+<td class='c'>undef</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
@@ -117,44 +124,45 @@ This information is found in APP8 of SPIFF-style JPEG images (the &quot;official
 yet rarely used JPEG file format standard: Still Picture Interchange File
 Format).
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>SPIFFVersion</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>2</td>
+<tr class='b'>
+<td class='r'>2</td>
 <td>ProfileID</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Not Specified
+<td class='c'>N</td>
+<td><span class='s'>0 = Not Specified
   <br>1 = Continuous-tone Base
   <br>2 = Continuous-tone Progressive
   <br>3 = Bi-level Facsimile
-  <br>4 = Continuous-tone Facsimile</font></td></tr>
-<tr valign='top'>
-<td align='right'>3</td>
+  <br>4 = Continuous-tone Facsimile</span></td></tr>
+<tr>
+<td class='r'>3</td>
 <td>ColorComponents</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>6</td>
+<tr class='b'>
+<td class='r'>6</td>
 <td>ImageHeight</td>
-<td align='center'>N</td>
-<td><font size='-1'><font color="#666666">(at index 4 in specification, but there are 2 extra bytes here in my only
-SPIFF sample, version 1.2)</font></font></td></tr>
-<tr valign='top'>
-<td align='right'>10</td>
+<td class='c'>N</td>
+<td><span class='s'><span class='n'>(at index 4 in specification, but there are 2 extra bytes here in my only
+SPIFF sample, version 1.2)</span></span></td></tr>
+<tr>
+<td class='r'>10</td>
 <td>ImageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>14</td>
+<tr class='b'>
+<td class='r'>14</td>
 <td>ColorSpace</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Bi-level
+<td class='c'>N</td>
+<td><span class='s'>0 = Bi-level
   <br>1 = YCbCr, ITU-R BT 709, video
   <br>2 = No color space specified
   <br>3 = YCbCr, ITU-R BT 601-1, RGB
@@ -165,87 +173,89 @@ SPIFF sample, version 1.2)</font></font></td></tr>
   <br>11 = CMY
   <br>12 = CMYK
   <br>13 = YCCK
-  <br>14 = CIELab</font></td></tr>
-<tr valign='top'>
-<td align='right'>15</td>
+  <br>14 = CIELab</span></td></tr>
+<tr>
+<td class='r'>15</td>
 <td>BitsPerSample</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>16</td>
+<tr class='b'>
+<td class='r'>16</td>
 <td>Compression</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Uncompressed, interleaved, 8 bits per sample
+<td class='c'>N</td>
+<td><span class='s'>0 = Uncompressed, interleaved, 8 bits per sample
   <br>1 = Modified Huffman
   <br>2 = Modified READ
   <br>3 = Modified Modified READ
   <br>4 = JBIG
-  <br>5 = JPEG</font></td></tr>
-<tr valign='top'>
-<td align='right'>17</td>
+  <br>5 = JPEG</span></td></tr>
+<tr>
+<td class='r'>17</td>
 <td>ResolutionUnits</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = None
+<td class='c'>N</td>
+<td><span class='s'>0 = None
   <br>1 = inches
-  <br>2 = cm</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>18</td>
+  <br>2 = cm</span></td></tr>
+<tr class='b'>
+<td class='r'>18</td>
 <td>YResolution</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>22</td>
+<tr>
+<td class='r'>22</td>
 <td>XResolution</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='APP14'>JPEG APP14 Tags</a></h2>
 The &quot;Adobe&quot; APP14 segment stores image encoding information for DCT filters.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>DCTEncodeVersion</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>1</td>
+<tr class='b'>
+<td class='r'>1</td>
 <td>APP14Flags0</td>
-<td align='center'>N</td>
-<td><font size='-1'>Bit 15 = Encoded with Blend=1 downsampling</font></td></tr>
-<tr valign='top'>
-<td align='right'>2</td>
+<td class='c'>N</td>
+<td><span class='s'>Bit 15 = Encoded with Blend=1 downsampling</span></td></tr>
+<tr>
+<td class='r'>2</td>
 <td>APP14Flags1</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>3</td>
+<tr class='b'>
+<td class='r'>3</td>
 <td>ColorTransform</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Unknown (RGB or CMYK)
+<td class='c'>N</td>
+<td><span class='s'>0 = Unknown (RGB or CMYK)
   <br>1 = YCbCr
-  <br>2 = YCCK</font></td></tr>
+  <br>2 = YCCK</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='APP15'>JPEG APP15 Tags</a></h2>
 APP15 is used by GraphicConverter to store JPEG quality.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>'Q'</td>
 <td>Quality</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 8, 2006</i>
+<br><i>Last revised Dec 11, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

@@ -1,6 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>The Canon RAW (CRW) File Format</title>
+<style type="text/css">
+<!--
+h1       { margin: 0 0 .5em 0 }
+table.norm      { border-collapse: collapse;
+                  border: 1px solid gray; }
+table.norm th   { border: 1px solid gray; background: #dddddd }
+table.norm th.lt{ background: #eeeeee }
+table.norm td   { border: 1px solid gray; background: #ffffff;
+                  padding: 2px 4px }
+table.box       { padding: .2em; background: #dddddd }
+-->
+</style>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>The Canon RAW (CRW) File Format</h1>
@@ -39,8 +53,8 @@ contained data structures must be understood to properly edit the file.  This
 results in an impossible situation when presented with undocumented custom
 structures like those used in the maker notes written by modern digital cameras.
 This is why it is so common for image editors to either scramble the maker notes
-or discard them completely.  The official TIFF recommendation is that unknown
-information should be discarded when rewriting the image, but for many,
+or discard them completely.  The official TIFF recommendation is to discard
+unknown information when rewriting the image (as Photoshop does), but for many,
 including myself, this option is simply unacceptable.
 </font></blockquote>
 
@@ -51,7 +65,7 @@ and much less prone to errors than rewriting a TIFF or JPEG.
 <h3>File Header</h3>
 A Canon CRW file starts with the following byte sequence:
 <blockquote>
-<table border=1 cellspacing=0 cellpadding=2><tr bgcolor='#dddddd'><th>Offset</th>
+<table class='norm'><tr><th>Offset</th>
 <th>Number<br>of&nbsp;bytes</th><th>Value</th><th>Name</th><th>Description</th></tr>
 <tr align='center'><td>0</td><td>2</td><td>"II"</td><td>ByteOrder</td>
 <td align='left'>"II" means Intel (little-endian) order, which is the only order I've
@@ -75,8 +89,8 @@ file.  The signature is "HEAPJPGM" for CIFF information in APP0 of JPEG images.<
 The root directory block begins immediately after the file header (at the position
 specified by <b>HeaderLength</b>), and ends at the end of the file.  The structure
 of this block is as follows:
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Offset<br>within block</th><th>Number<br>of bytes</th><th>Value</th>
+<blockquote><table class='norm'>
+<tr><th>Offset<br>within block</th><th>Number<br>of bytes</th><th>Value</th>
 <th>Name</th><th>Description</th></tr>
 <tr align='center'><td>0</td><td>S</td><td>-<br>-<br>-<br>-<br>-</td><td>ValueData</td>
 <td align='left'>The value data referenced by offsets in the directory</td></tr>
@@ -84,6 +98,8 @@ of this block is as follows:
 <td align='left'>16-bit integer giving the number of directory entries</td></tr>
 <tr align='center'><td>S + 2</td><td>N * 10</td><td>-<br>-<br>-</td><td>DirEntries</td>
 <td align='left'>The CRW directory entries</td></tr>
+<tr align='center'><td>S + 2 + N*10</td><td><i>any</i></td><td>-</td><td>OtherData</td>
+<td align='left'><i>(be aware there may be other data hiding here)</i></td></tr>
 <tr align='center'><td>BlockSize - 4</td><td>4</td><td>S</td><td>DirStart</td>
 <td align='left'>32-bit integer giving the size of the <b>ValueData</b></td></tr>
 </table></blockquote>
@@ -94,12 +110,19 @@ entries in the directory, then read the directory entries.
 
 <p>The <b>ValueData</b> may contain complete subdirectory blocks, each of which has the
 same format as specified above (and these subdirectories may themselves contain
-sub-subdirectories...).
+sub-subdirectories...).  For these subdirectories, <b>BlockSize</b> is given by
+the <b>Size</b> specified in the corresponding directory entry.  For the root
+directory, <b>BlockSize</b> is the length of the file.
+
+<p>The <b>OtherData</b> normally does not exist (ie. the <b>DirEntries</b>
+usually end at the <b>DirStart</b> pointer), but this is not always the case:
+Canon Digital Photo Professional uses this area in the root directory block to
+store VRD data in edited CRW images.
 
 <h3>CRW Directory Entry Format</h3>
 The CRW directory consists of N 10-byte entries.  The format of each entry is as follows:
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Offset<br>within entry</th><th>Number<br>of bytes</th>
+<blockquote><table class='norm'>
+<tr><th>Offset<br>within entry</th><th>Number<br>of bytes</th>
 <th>Name</th><th>Description</th></tr>
 <tr align='center'><td>0</td><td>2</td><td>Tag</td>
 <td align='left'>16-bit integer identifying the type of data</td></tr>
@@ -120,8 +143,8 @@ must be padded with a zero byte.
 
 <h3>Tag Bits</h3>
 The 16-bit <b>Tag</b> value is composed of 3 bit fields, as follows:
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>Bits</th><th>Mask</th><th>Name</th><th>Description</th></tr>
+<blockquote><table class='norm'>
+<tr><th>Bits</th><th>Mask</th><th>Name</th><th>Description</th></tr>
 <tr align='center'><td>14-15</td><td>0xc000</td><td>DataLocation</td>
     <td align='left'>Specifies the location of the data</td></tr>
 <tr align='center'><td>11-13</td><td>0x3800</td><td>DataFormat</td>
@@ -134,8 +157,8 @@ The 16-bit <b>Tag</b> value is composed of 3 bit fields, as follows:
 Value data may either be stored in the <b>ValueData</b> block, or within the <b>Size</b>
 and <b>Offset</b> fields of the directory entry if it is less than 8 bytes long.
 The <b>DataLocation</b> bits specify where the value is stored:
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>DataLocation</th><th>Where</th><th>Description</th></tr>
+<blockquote><table class='norm'>
+<tr><th>DataLocation</th><th>Where</th><th>Description</th></tr>
 <tr align='center'><td>0x0000</td><td>ValueData</td>
     <td align='left'>Values are stored in the <b>ValueData</b> block, at the specified <b>Offset</b>
     and <b>Size</b></td></tr>
@@ -147,8 +170,8 @@ The <b>DataLocation</b> bits specify where the value is stored:
 
 <h4>DataFormat</h4>
 Three <b>Tag</b> bits are used to specify the data format:
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>DataFormat</th><th>Alignment</th><th>Description</th></tr>
+<blockquote><table class='norm'>
+<tr><th>DataFormat</th><th>Alignment</th><th>Description</th></tr>
 <tr align='center'><td>0x0000</td><td>1-Byte</td>
     <td align='left'>A series of bytes</td></tr>
 <tr align='center'><td>0x0800</td><td>1-Byte</td>
@@ -174,16 +197,16 @@ maker notes when found in a JPEG or TIFF image.  Also listed is the TagID of the
 below is an observed size of the value data, and is not necessarily expected to
 remain constant for all camera models.
 
-<blockquote><table border=1 cellspacing=0 cellpadding=2>
-<tr bgcolor='#dddddd'><th>TagID</th><th>EXIF</th><th>SubDir</th><th>Name</th><th>Size</th><th>Description</th></tr>
-<tr bgcolor='#eeeeee'><th colspan=6>1-Byte Alignment</th></tr>
-<tr align='center'><td>0x0000</td><td>-</td><td>Any</td><td>NullRecord</td><td>0</td>
+<blockquote><table class='norm'>
+<tr><th>TagID</th><th>EXIF</th><th>SubDir</th><th>Name</th><th>Size</th><th>Description</th></tr>
+<tr><th class='lt' colspan=6>1-Byte Alignment</th></tr>
+<tr align='center'><td>0x0000</td><td>-</td><td><i>any</i></td><td>NullRecord</td><td>0</td>
     <td align='left'>This is a null directory entry</td></tr>
-<tr align='center'><td>0x0001</td><td>-</td><td>Any</td><td>FreeBytes</td><td>Varies</td>
+<tr align='center'><td>0x0001</td><td>-</td><td><i>any</i></td><td>FreeBytes</td><td><i>varies</i></td>
     <td align='left'>Unused bytes in the <b>ValueData</b></td></tr>
 <tr align='center'><td>0x0032</td><td>-</td><td>0x300b</td><td>CanonColorInfo1</td><td>2048</td>
     <td align='left'>Block of color information (format unknown)</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=6>ASCII Strings</th></tr>
+<tr><th class='lt' colspan=6>ASCII Strings</th></tr>
 <tr align='center'><td>0x0805</td><td>-</td><td>0x2804</td><td>CanonFileDescription</td><td>32</td>
     <td align='left'>Description of the file format.
     ie) "EOS DIGITAL REBEL CMOS RAW"</td></tr>
@@ -205,7 +228,7 @@ remain constant for all camera models.
     <td align='left'>Original file name. ie) "CRW_1834.CRW"</td></tr>
 <tr align='center'><td>0x0817</td><td>-</td><td>0x300a</td><td>ThumbnailFileName</td><td>32</td>
     <td align='left'>Thumbnail file name. ie) "CRW_1834.THM"</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=6>2-Byte Alignment</th></tr>
+<tr><th class='lt' colspan=6>2-Byte Alignment</th></tr>
 <tr align='center'><td>0x100a</td><td>-</td><td>0x300a</td><td>TargetImageType</td><td>2</td>
     <td align='left'>0=real-world subject, 1=written document</td></tr>
 <tr align='center'><td>0x1010</td><td>-</td><td>0x3002</td><td>ShutterReleaseMethod</td><td>2</td>
@@ -219,7 +242,7 @@ remain constant for all camera models.
 <tr align='center'><td>0x1029</td><td>0x02</td><td>0x300b</td><td>FocalLength</td><td>8</td>
     <td align='left'>Four 16 bit integers: 0) unknown, 1) focal length in mm, 2-3) sensor width
     and height in units of 1/1000 inch</td></tr>
-<tr align='center'><td>0x102a</td><td>0x04</td><td>0x300b</td><td>CanonShotInfo</td><td>Varies</td>
+<tr align='center'><td>0x102a</td><td>0x04</td><td>0x300b</td><td>CanonShotInfo</td><td><i>varies</i></td>
     <td align='left'>Data block giving <a href="TagNames/Canon.html#ShotInfo">shot information</a></td></tr>
 <tr align='center'><td>0x102c</td><td>-</td><td>?</td><td>CanonColorInfo2</td><td>?</td>
     <td align='left'>Data block of color information (format unknown)</td></tr>
@@ -229,9 +252,9 @@ remain constant for all camera models.
     <td align='left'>Encrypted 8x8 white sample</td></tr>
 <tr align='center'><td>0x1031</td><td>-</td><td>0x300b</td><td>SensorInfo</td><td>34</td>
     <td align='left'><a href="TagNames/Canon.html#SensorInfo">Sensor size and resolution information</a></td></tr>
-<tr align='center'><td>0x1033</td><td>0x0f</td><td>0x300b</td><td>CanonCustomFunctions</td><td>Varies</td>
+<tr align='center'><td>0x1033</td><td>0x0f</td><td>0x300b</td><td>CanonCustomFunctions</td><td><i>varies</i></td>
     <td align='left'>Data block giving <a href="TagNames/CanonCustom.html#Functions10D">Canon custom settings</a></td></tr>
-<tr align='center'><td>0x1038</td><td>0x12</td><td>0x300b</td><td>CanonPictureInfo</td><td>Varies</td>
+<tr align='center'><td>0x1038</td><td>0x12</td><td>0x300b</td><td>CanonPictureInfo</td><td><i>varies</i></td>
     <td align='left'>Data block giving <a href="TagNames/Canon.html#PictureInfo">picture-specific information</a></td></tr>
 <tr align='center'><td>0x1039</td><td>0x13</td><td>0x300b</td><td>?</td><td>8</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1093</td><td>0x93</td><td>0x300b</td><td>CanonFileInfo</td><td>18</td>
@@ -253,7 +276,7 @@ remain constant for all camera models.
     <td align='left'>Data block giving <a href="TagNames/CanonRaw.html#RawJpgInfo">embedded JPG information</a></td></tr>
 <tr align='center'><td>0x10c0</td><td>0xc0</td><td>0x300b</td><td>?</td><td>26</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10c1</td><td>0xc1</td><td>0x300b</td><td>?</td><td>26</td><td align='left'>-</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=6>4-Byte Alignment</th></tr>
+<tr><th class='lt' colspan=6>4-Byte Alignment</th></tr>
 <tr align='center'><td>0x1803</td><td>-</td><td>0x300a</td><td>ImageFormat</td><td>8</td>
     <td align='left'>32-bit integer specifying image format (0x20001 for CRW), followed
     by 32-bit float giving target compression ratio</td></tr>
@@ -284,33 +307,35 @@ remain constant for all camera models.
     <td align='left'>RAW decoder table</td></tr>
 <tr align='center'><td>0x183b</td><td>0x15</td><td>0x300b</td><td>SerialNumberFormat</td><td>4</td>
     <td align='left'>32-bit integer (0x90000000=format 1, 0xa0000000=format 2)</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=6>Mixed Data Records</th></tr>
-<tr align='center'><td>0x2005</td><td>-</td><td>Root</td><td>RawData</td><td>Varies</td>
+<tr><th class='lt' colspan=6>Mixed Data Records</th></tr>
+<tr align='center'><td>0x2005</td><td>-</td><td><i>root</i></td><td>RawData</td><td><i>varies</i></td>
     <td align='left'>The raw data itself (the bulk of the CRW file)</td></tr>
-<tr align='center'><td>0x2007</td><td>-</td><td>Root</td><td>JpgFromRaw</td><td>Varies</td>
+<tr align='center'><td>0x2007</td><td>-</td><td><i>root</i></td><td>JpgFromRaw</td><td><i>varies</i></td>
     <td align='left'>The embedded JPEG image (2048x1360 pixels for the 300D with Canon firmware)</td></tr>
-<tr align='center'><td>0x2008</td><td>-</td><td>Root</td><td>ThumbnailImage</td><td>Varies</td>
+<tr align='center'><td>0x2008</td><td>-</td><td><i>root</i></td><td>ThumbnailImage</td><td><i>varies</i></td>
     <td align='left'>Thumbnail image (JPEG, 160x120 pixels)</td></tr>
-<tr bgcolor='#eeeeee'><th colspan=6>SubDirectory Blocks</th></tr>
-<tr align='center'><td>0x2804</td><td>-</td><td>0x300a</td><td>ImageDescription</td><td>Varies</td>
+<tr><th class='lt' colspan=6>SubDirectory Blocks</th></tr>
+<tr align='center'><td>0x2804</td><td>-</td><td>0x300a</td><td>ImageDescription</td><td><i>varies</i></td>
     <td align='left'>The image description subdirectory</td></tr>
-<tr align='center'><td>0x2807</td><td>-</td><td>0x300a</td><td>CameraObject</td><td>Varies</td>
+<tr align='center'><td>0x2807</td><td>-</td><td>0x300a</td><td>CameraObject</td><td><i>varies</i></td>
     <td align='left'>The camera object subdirectory</td></tr>
-<tr align='center'><td>0x3002</td><td>-</td><td>0x300a</td><td>ShootingRecord</td><td>Varies</td>
+<tr align='center'><td>0x3002</td><td>-</td><td>0x300a</td><td>ShootingRecord</td><td><i>varies</i></td>
     <td align='left'>The shooting record subdirectory</td></tr>
-<tr align='center'><td>0x3003</td><td>-</td><td>0x300a</td><td>MeasuredInfo</td><td>Varies</td>
+<tr align='center'><td>0x3003</td><td>-</td><td>0x300a</td><td>MeasuredInfo</td><td><i>varies</i></td>
     <td align='left'>The measured information subdirectory</td></tr>
-<tr align='center'><td>0x3004</td><td>-</td><td>0x2807</td><td>CameraSpecification</td><td>Varies</td>
+<tr align='center'><td>0x3004</td><td>-</td><td>0x2807</td><td>CameraSpecification</td><td><i>varies</i></td>
     <td align='left'>The camera specification subdirectory</td></tr>
-<tr align='center'><td>0x300a</td><td>-</td><td>Root</td><td>ImageProps</td><td>Varies</td>
+<tr align='center'><td>0x300a</td><td>-</td><td><i>root</i></td><td>ImageProps</td><td><i>varies</i></td>
     <td align='left'>The main subdirectory containing all meta information</td></tr>
-<tr align='center'><td>0x300b</td><td>-</td><td>0x300a</td><td>ExifInformation</td><td>Varies</td>
+<tr align='center'><td>0x300b</td><td>-</td><td>0x300a</td><td>ExifInformation</td><td><i>varies</i></td>
     <td align='left'>The subdirectory containing most of the JPEG/TIFF EXIF information</td></tr>
 </table></blockquote>
 
+<h3>Revisions</h3>
+Nov. 28, 2006 - Highlight the possibility of <b>OtherData</b> existing in the directory block
 <p><hr>
 Please e-mail me if you find any errors or omissions in this document.  My address is phil at owl.phy.queensu.ca - Thanks!
-<p><i>P. Harvey - Last revised Oct. 30, 2006</i>
+<p><i>P. Harvey - Last revised Nov. 28, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

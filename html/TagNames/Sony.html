@@ -1,9 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Sony Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>Sony Tags</h2>
+<body>
+<h2 class='top'>Sony Tags</h2>
 
 The maker notes in images from current Sony camera models contain a wealth
 of information, but very little is known about these tags.  Use the ExifTool
@@ -11,56 +14,57 @@ Unknown (-u) or Verbose (-v) options to see information about the unknown
 tags.
 
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0e00</td>
 <td>PrintIM</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0xb021</td>
 <td>ColorTemperature</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0xb023</td>
 <td>SceneMode</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Manual (P,A,S or M)
+<td class='c'>N</td>
+<td><span class='s'>0 = Manual (P,A,S or M)
   <br>1 = Portrait
   <br>4 = Sunset
   <br>5 = Sports
   <br>6 = Landscape
   <br>8 = Macro
   <br>16 = Auto
-  <br>17 = Night Portrait</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>17 = Night Portrait</span></td></tr>
+<tr class='b'>
 <td>0xb024</td>
 <td>ZoneMatching</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = ISO Setting Used
+<td class='c'>N</td>
+<td><span class='s'>0 = ISO Setting Used
   <br>1 = High Key
-  <br>2 = Low Key</font></td></tr>
-<tr valign='top'>
+  <br>2 = Low Key</span></td></tr>
+<tr>
 <td>0xb025</td>
 <td>DynamicRangeOptimizer</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Off
+<td class='c'>N</td>
+<td><span class='s'>0 = Off
   <br>1 = Standard
-  <br>2 = Advanced</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = Advanced</span></td></tr>
+<tr class='b'>
 <td>0xb026</td>
 <td>ImageStabilization</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr valign='top'>
+<td class='c'>N</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>0xb027</td>
 <td>LensID</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Minolta AF 28-85mm F3.5-4.5
+<td class='c'>N</td>
+<td><span class='s'>0 = Minolta AF 28-85mm F3.5-4.5
   <br>1 = Minolta AF 80-200mm F2.8 HS-APO G
   <br>2 = Minolta AF 28-70mm F2.8 G
   <br>3 = Minolta AF 28-80mm F4-5.6
@@ -164,53 +168,53 @@ tags.
   <br>2667 = Minolta AF 35mm F2 New
   <br>2668 = Minolta AF 28mm F2 New
   <br>2672 = Minolta AF 24-105mm F3.5-4.5 (D)
-  <br>4574 = Minolta AF 200mm F2.8 G x2</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>4574 = Minolta AF 200mm F2.8 G x2</span></td></tr>
+<tr class='b'>
 <td>0xb028</td>
 <td>MinoltaMakerNote</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Minolta.html'>Minolta Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>0xb029</td>
 <td>ColorMode</td>
-<td align='center'>int32u</td>
-<td><font size='-1'>0 = Standard
+<td class='c'>int32u</td>
+<td><span class='s'>0 = Standard
   <br>1 = Vivid
   <br>2 = Portrait
   <br>3 = Landscape
   <br>4 = Sunset
   <br>5 = Night Scene
   <br>6 = B&amp;W
-  <br>7 = Adobe RGB</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>7 = Adobe RGB</span></td></tr>
+<tr class='b'>
 <td>0xb040</td>
 <td>Macro</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
-<tr valign='top'>
+<td class='c'>N</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>0xb041</td>
 <td>ExposureMode</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Auto
+<td class='c'>N</td>
+<td><span class='s'>0 = Auto
   <br>5 = Landscape
   <br>6 = Program
   <br>7 = Aperture Priority
   <br>8 = Shutter Priority
   <br>9 = Night Scene
-  <br>15 = Manual</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>15 = Manual</span></td></tr>
+<tr class='b'>
 <td>0xb047</td>
 <td>Quality</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Normal
-  <br>1 = Fine</font></td></tr>
-<tr valign='top'>
+<td class='c'>N</td>
+<td><span class='s'>0 = Normal
+  <br>1 = Fine</span></td></tr>
+<tr>
 <td>0xb04e</td>
 <td>LongExposureNoiseReduction</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Off
-  <br>1 = On</font></td></tr>
+<td class='c'>N</td>
+<td><span class='s'>0 = Off
+  <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SRF'>Sony SRF Tags</a></h2>
@@ -219,88 +223,92 @@ The maker notes in SRF (Sony Raw Format) images contain 7 IFD&#39;s (with family
 while SRF6 uses standard EXIF tags.  All information other than SRF0 is
 encrypted, but thanks to Dave Coffin the decryption algorithm is known.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0000</td>
 <td>SRF2_Key</td>
-<td align='center'>N</td>
-<td><font size='-1'><font color="#666666">(key to decrypt maker notes from the start of SRF2)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>N</td>
+<td><span class='s'><span class='n'>(key to decrypt maker notes from the start of SRF2)</span></span></td></tr>
+<tr class='b'>
 <td>0x0001</td>
 <td>DataKey</td>
-<td align='center'>N</td>
-<td><font size='-1'><font color="#666666">(key to decrypt the rest of the file from the end of the maker notes)</font></font></td></tr>
+<td class='c'>N</td>
+<td><span class='s'><span class='n'>(key to decrypt the rest of the file from the end of the maker notes)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SR2Private'>Sony SR2Private Tags</a></h2>
 The SR2 format uses the DNGPrivateData tag to reference a private IFD
 containing these tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x7200</td>
 <td>SR2SubIFDOffset</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x7201</td>
 <td>SR2SubIFDLength</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x7221</td>
 <td>SR2SubIFDKey</td>
-<td align='center'>N</td>
-<td><font size='-1'><font color="#666666">(key to decrypt SR2SubIFD)</font></font></td></tr>
+<td class='c'>N</td>
+<td><span class='s'><span class='n'>(key to decrypt SR2SubIFD)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SR2SubIFD'>Sony SR2SubIFD Tags</a></h2>
 Tags in the encrypted SR2SubIFD
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x7303</td>
 <td>WB_GRBGLevels</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x74a0</td>
 <td>MaxApertureAtMaxFocal</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x74a1</td>
 <td>MaxApertureAtMinFocal</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x74c0</td>
 <td>SR2DataIFD</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='Sony.html#SR2DataIFD'>Sony SR2DataIFD Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SR2DataIFD'>Sony SR2DataIFD Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x7770</td>
 <td>ColorMode</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Nov 17, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

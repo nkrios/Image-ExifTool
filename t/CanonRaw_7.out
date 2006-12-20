@@ -1,83 +1,20 @@
 [ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.66
-[File, File, Image]  - File Name: DNG.dng
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 13 kB
-[File, File, Time]  - File Modification Date/Time: 2006:02:26 09:30:53
-[File, File, Image]  - File Type: DNG
-[File, File, Image]  - MIME Type: image/x-raw
-[EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
-[EXIF, IFD0, Image] 256 - Image Width: 8
-[EXIF, IFD0, Image] 257 - Image Height: 8
-[EXIF, IFD0, Image] 258 - Bits Per Sample: 8 8 8
-[EXIF, IFD0, Image] 259 - Compression: Uncompressed
-[EXIF, IFD0, Image] 262 - Photometric Interpretation: RGB
+[File, File, Image]  - File Name: CanonRaw_7_failed.jpg
+[File, File, Image]  - Directory: t
+[File, File, Image]  - File Size: 12 kB
+[File, File, Time]  - File Modification Date/Time: 2006:12:15 10:40:43
+[File, File, Image]  - File Type: JPEG
+[File, File, Image]  - MIME Type: image/jpeg
+[File, File, Image]  - Image Width: 8
+[File, File, Image]  - Image Height: 8
 [EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS 350D DIGITAL
-[EXIF, IFD0, Image] 273 - Strip Offsets: 13470
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
-[EXIF, IFD0, Image] 277 - Samples Per Pixel: 3
-[EXIF, IFD0, Image] 278 - Rows Per Strip: 8
-[EXIF, IFD0, Image] 279 - Strip Byte Counts: 192
-[EXIF, IFD0, Image] 284 - Planar Configuration: Chunky
+[EXIF, IFD0, Image] 282 - X Resolution: 72
+[EXIF, IFD0, Image] 283 - Y Resolution: 72
+[EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Modify Date: 2005:08:03 18:59:18
-[EXIF, IFD0, Author] 315 - Artist: unknown
-[EXIF, SubIFD, Image] 254 - Subfile Type: Full-resolution Image
-[EXIF, SubIFD, Image] 256 - Image Width: 3516
-[EXIF, SubIFD, Image] 257 - Image Height: 2328
-[EXIF, SubIFD, Image] 258 - Bits Per Sample: 16
-[EXIF, SubIFD, Image] 259 - Compression: JPEG
-[EXIF, SubIFD, Image] 262 - Photometric Interpretation: Color Filter Array
-[EXIF, SubIFD, Image] 277 - Samples Per Pixel: 1
-[EXIF, SubIFD, Image] 284 - Planar Configuration: Chunky
-[EXIF, SubIFD, Image] 322 - Tile Width: 256
-[EXIF, SubIFD, Image] 323 - Tile Length: 240
-[EXIF, SubIFD, Image] 324 - Tile Offsets: 12494
-[EXIF, SubIFD, Image] 325 - Tile Byte Counts: 22
-[EXIF, SubIFD, Image] 33421 - CFA Repeat Pattern Dim: 2 2
-[EXIF, SubIFD, Image] 33422 - CFA Pattern 2: 0 1 1 2
-[EXIF, SubIFD, Image] 50710 - CFA Plane Color: Red,Green,Blue
-[EXIF, SubIFD, Image] 50711 - CFA Layout: Rectangular
-[EXIF, SubIFD, Image] 50713 - Black Level Repeat Dim: 1 1
-[EXIF, SubIFD, Image] 50714 - Black Level: 0
-[EXIF, SubIFD, Image] 50717 - White Level: 4095
-[EXIF, SubIFD, Image] 50718 - Default Scale: 1 1
-[EXIF, SubIFD, Image] 50719 - Default Crop Origin: 10 5
-[EXIF, SubIFD, Image] 50720 - Default Crop Size: 3456 2304
-[EXIF, SubIFD, Image] 50733 - Bayer Green Split: 0
-[EXIF, SubIFD, Image] 50738 - Anti Alias Strength: 1
-[EXIF, SubIFD, Image] 50780 - Best Quality Scale: 1
-[EXIF, SubIFD, Image] 50829 - Active Area: 14 42 2328 3516
-[EXIF, SubIFD, Image] 50830 - Masked Areas: 14 0 2328 40
-[EXIF, SubIFD1, Image] 254 - Subfile Type: Reduced-resolution image
-[EXIF, SubIFD1, Image] 256 - Image Width: 1024
-[EXIF, SubIFD1, Image] 257 - Image Height: 683
-[EXIF, SubIFD1, Image] 258 - Bits Per Sample: 8 8 8
-[EXIF, SubIFD1, Image] 259 - Compression: JPEG
-[EXIF, SubIFD1, Image] 262 - Photometric Interpretation: YCbCr
-[EXIF, SubIFD1, Image] 273 - Preview Image Start: 12780
-[EXIF, SubIFD1, Image] 277 - Samples Per Pixel: 3
-[EXIF, SubIFD1, Image] 278 - Rows Per Strip: 683
-[EXIF, SubIFD1, Image] 279 - Preview Image Length: 26
-[EXIF, SubIFD1, Image] 284 - Planar Configuration: Chunky
-[EXIF, SubIFD1, Image] 529 - Y Cb Cr Coefficients: 0.299 0.587 0.114
-[EXIF, SubIFD1, Image] 530 - Y Cb Cr Sub Sampling: YCbCr4:2:0
-[EXIF, SubIFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, SubIFD1, Image] 532 - Reference Black White: 0 255 128 255 128 255
-[EXIF, SubIFD2, Image] 254 - Subfile Type: Reduced-resolution image
-[EXIF, SubIFD2, Image] 256 - Image Width: 3456
-[EXIF, SubIFD2, Image] 257 - Image Height: 2304
-[EXIF, SubIFD2, Image] 258 - Bits Per Sample: 8 8 8
-[EXIF, SubIFD2, Image] 259 - Compression: JPEG
-[EXIF, SubIFD2, Image] 262 - Photometric Interpretation: YCbCr
-[EXIF, SubIFD2, Image] 273 - Jpg From Raw Start: 13070
-[EXIF, SubIFD2, Image] 277 - Samples Per Pixel: 3
-[EXIF, SubIFD2, Image] 278 - Rows Per Strip: 2304
-[EXIF, SubIFD2, Image] 279 - Jpg From Raw Length: 29
-[EXIF, SubIFD2, Image] 284 - Planar Configuration: Chunky
-[EXIF, SubIFD2, Image] 529 - Y Cb Cr Coefficients: 0.299 0.587 0.114
-[EXIF, SubIFD2, Image] 530 - Y Cb Cr Sub Sampling: YCbCr4:4:4
-[EXIF, SubIFD2, Image] 531 - Y Cb Cr Positioning: Co-sited
-[EXIF, SubIFD2, Image] 532 - Reference Black White: 0 255 128 255 128 255
+[EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/15
 [EXIF, ExifIFD, Image] 33437 - F Number: 8.0
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Aperture-priority AE
@@ -85,13 +22,18 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2005:08:03 18:59:18
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2005:08:03 18:59:18
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: 0
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/15
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 8.0
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
-[EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 4.0
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Average
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 55.0mm
+[EXIF, ExifIFD, Image] 37510 - User Comment: 
+[EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
+[EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
+[EXIF, ExifIFD, Image] 40962 - Exif Image Width: 3456
+[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2304
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3954.233
 [EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3958.763
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
@@ -99,68 +41,9 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
-[EXIF, IFD0, Image] 37393 - Image Number: 24
-[EXIF, IFD0, Image] 50706 - DNG Version: 1 1 0 0
-[EXIF, IFD0, Image] 50707 - DNG Backward Version: 1 1 0 0
-[EXIF, IFD0, Image] 50708 - Unique Camera Model: Canon EOS 350D
-[EXIF, IFD0, Image] 50709 - Localized Camera Model: Canon EOS 350D Digital
-[EXIF, IFD0, Image] 50721 - Color Matrix 1: 0.6159 -0.0945 -0.0745 -0.6846 1.3563 0.3684 -0.0802 0.1086 0.7555
-[EXIF, IFD0, Image] 50722 - Color Matrix 2: 0.6018 -0.0617 -0.0965 -0.8645 1.5881 0.2975 -0.153 0.1719 0.7642
-[EXIF, IFD0, Image] 50723 - Camera Calibration 1: 1.0069 0 0 0 1 0 0 0 1.0027
-[EXIF, IFD0, Image] 50724 - Camera Calibration 2: 1.0069 0 0 0 1 0 0 0 1.0027
-[EXIF, IFD0, Image] 50727 - Analog Balance: 1 1 1
-[EXIF, IFD0, Image] 50728 - As Shot Neutral: 0.592408 1 0.501692
-[EXIF, IFD0, Image] 50730 - Baseline Exposure: 0.25
-[EXIF, IFD0, Image] 50731 - Baseline Noise: 1.33
-[EXIF, IFD0, Image] 50732 - Baseline Sharpness: 1.5
-[EXIF, IFD0, Image] 50734 - Linear Response Limit: 1
-[EXIF, IFD0, Camera] 50735 - Camera Serial Number: 012345678
-[EXIF, IFD0, Camera] 50736 - DNG Lens Info: 18-55mm f/inf-inf
-[EXIF, IFD0, Image] 50739 - Shadow Scale: 1
-[EXIF, IFD0, Image] 50778 - Calibration Illuminant 1: Standard Light A
-[EXIF, IFD0, Image] 50779 - Calibration Illuminant 2: D65
-[EXIF, IFD0, Image] 50781 - Raw Data Unique ID: 0358DB4E08632D90925171A6BB8848A2
-[EXIF, IFD0, Image] 50827 - Original Raw File Name: Canon350D.CR2
-[XMP, XMP-exif, Image] ExifVersion - Exif Version: 0221
-[XMP, XMP-exif, Image] ExposureTime - Exposure Time: 1/15
-[XMP, XMP-exif, Image] ShutterSpeedValue - Shutter Speed Value: 1/15
-[XMP, XMP-exif, Image] FNumber - F Number: 8.0
-[XMP, XMP-exif, Image] ApertureValue - Aperture Value: 8.0
-[XMP, XMP-exif, Camera] ExposureProgram - Exposure Program: Aperture-priority AE
-[XMP, XMP-exif, Image] ISOSpeedRatings - ISO: 400
-[XMP, XMP-exif, Time] DateTimeOriginal - Date/Time Original: 2005:08:03 18:59:18-04:00
-[XMP, XMP-exif, Time] DateTimeDigitized - Date/Time Digitized: 2005:08:03 18:59:18-04:00
-[XMP, XMP-exif, Image] ExposureBiasValue - Exposure Compensation: 0
-[XMP, XMP-exif, Camera] MaxApertureValue - Max Aperture Value: 4.0
-[XMP, XMP-exif, Camera] MeteringMode - Metering Mode: Average
-[XMP, XMP-exif, Camera] FlashFired - Flash Fired: False
-[XMP, XMP-exif, Camera] FlashReturn - Flash Return: No return detection
-[XMP, XMP-exif, Camera] FlashMode - Flash Mode: Off
-[XMP, XMP-exif, Camera] FlashFunction - Flash Function: False
-[XMP, XMP-exif, Camera] FlashRedEyeMode - Flash Red Eye Mode: False
-[XMP, XMP-exif, Camera] FocalLength - Focal Length: 55.0mm
-[XMP, XMP-exif, Image] CustomRendered - Custom Rendered: Normal
-[XMP, XMP-exif, Camera] ExposureMode - Exposure Mode: Auto
-[XMP, XMP-exif, Camera] WhiteBalance - White Balance: Auto
-[XMP, XMP-exif, Camera] SceneCaptureType - Scene Capture Type: Standard
-[XMP, XMP-exif, Camera] FocalPlaneXResolution - Focal Plane X Resolution: 3954.23340961098
-[XMP, XMP-exif, Camera] FocalPlaneYResolution - Focal Plane Y Resolution: 3958.76288659794
-[XMP, XMP-exif, Camera] FocalPlaneResolutionUnit - Focal Plane Resolution Unit: inches
-[XMP, XMP-aux, Camera] SerialNumber - Serial Number: 012345678
-[XMP, XMP-aux, Camera] LensInfo - Lens Info: 18/1 55/1 0/0 0/0
-[XMP, XMP-aux, Camera] Lens - Lens: 18.0-55.0 mm
-[XMP, XMP-aux, Camera] ImageNumber - Image Number: 24
-[XMP, XMP-aux, Camera] FlashCompensation - Flash Compensation: 0
-[XMP, XMP-aux, Camera] OwnerName - Owner Name: unknown
-[XMP, XMP-aux, Camera] Firmware - Firmware: 1.0.2
-[XMP, XMP-tiff, Camera] Make - Make: Canon
-[XMP, XMP-tiff, Camera] Model - Camera Model Name: Canon EOS 350D DIGITAL
-[XMP, XMP-tiff, Time] DateTime - Date/Time Modified: 2005:08:03 18:59:18-04:00
-[XMP, XMP-tiff, Image] Orientation - Orientation: Horizontal (normal)
-[XMP, XMP-dc, Other] Creator - Creator: unknown
-[DNG, DNG, Image] 10 - Maker Note Length: 8340
-[DNG, DNG, Image] 14 - Maker Note Byte Order: II
-[DNG, DNG, Image] 16 - Original Maker Note Offset: 700
+[EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
+[EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
+[EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Normal
 [MakerNotes, Canon, Camera] 2 - Self-timer: 0
 [MakerNotes, Canon, Camera] 3 - Quality: RAW
@@ -194,6 +77,7 @@
 [MakerNotes, Canon, Image] 1 - Focal Length: 55mm
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.04mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.37mm
+[MakerNotes, Canon, Camera] 3 - Canon Flash Info: 100 0 0 0
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 400
 [MakerNotes, Canon, Image] 3 - Measured EV: 3.00
@@ -220,7 +104,8 @@
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS 350D DIGITAL
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware 1.0.2
 [MakerNotes, Canon, Camera] 9 - Owner's Name: unknown
-[MakerNotes, Canon, Camera] 12 - Camera Body No.: 0012345678
+[MakerNotes, Canon, Camera] 12 - Camera Body No.: 0123456789
+[MakerNotes, Canon, Camera] 13 - Canon 0x000d: <1024 bytes all zero>
 [MakerNotes, CanonCustom, Camera] 0 - Set Button Cross Keys Func: Normal
 [MakerNotes, CanonCustom, Camera] 1 - Long Exposure Noise Reduction: Off
 [MakerNotes, CanonCustom, Camera] 2 - Flash Sync Speed Av: Auto
@@ -237,7 +122,9 @@
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3456
 [MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2304
 [MakerNotes, Canon, Image] 22 - AF Points Used: Center
+[MakerNotes, Canon, Camera] 19 - Canon 0x0013: 0 159 7 112
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 2
+[MakerNotes, Canon, Camera] 25 - Canon 0x0019: 1
 [MakerNotes, Canon, Camera] 131 - Original Decision Data: 0
 [MakerNotes, Canon, Image] 1 - File Number: 100-0024
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
@@ -250,6 +137,7 @@
 [MakerNotes, Canon, Image] 14 - Filter Effect: None
 [MakerNotes, Canon, Image] 15 - Toning Effect: None
 [MakerNotes, Canon, Image] 1 - Tone Curve: Standard
+[MakerNotes, Canon, Image] 2 - Canon Processing 0x0002: 0
 [MakerNotes, Canon, Image] 3 - Sharpness Frequency: n/a
 [MakerNotes, Canon, Image] 4 - Sensor Red Level: 0
 [MakerNotes, Canon, Image] 5 - Sensor Blue Level: 0
@@ -260,6 +148,8 @@
 [MakerNotes, Canon, Image] 11 - Digital Gain: 0
 [MakerNotes, Canon, Image] 12 - WB Shift AB: 0
 [MakerNotes, Canon, Image] 13 - WB Shift GM: 0
+[MakerNotes, Canon, Camera] 170 - Canon 0x00aa: 10 580 1024 1024 500
+[MakerNotes, Canon, Camera] 208 - Canon 0x00d0: 0
 [MakerNotes, Canon, Image] 1 - Sensor Width: 3516
 [MakerNotes, Canon, Image] 2 - Sensor Height: 2328
 [MakerNotes, Canon, Image] 5 - Sensor Left Border: 52
@@ -286,16 +176,24 @@
 [MakerNotes, Canon, Camera] 69 - Color Temp Custom 1: 5200
 [MakerNotes, Canon, Camera] 70 - WB RGGB Levels Custom 2: 2312 1022 1024 1501
 [MakerNotes, Canon, Camera] 74 - Color Temp Custom 2: 5200
+[MakerNotes, Canon, Camera] 16386 - Unknown Block 1: (Binary data 5352 bytes)
+[MakerNotes, Canon, Camera] 1 - Canon Color Info 0x0001: 0
 [MakerNotes, Canon, Camera] 2 - Color Hue: 0
+[XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0mm
+[XMP, XMP-aux, Camera] OwnerName - Owner Name: unknown
+[XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0123456789
+[XMP, XMP-crs, Image] ToneCurve - Tone Curve: Standard
+[XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
+[XMP, XMP-tiff, Image] ImageLength - Image Height: 1024
+[XMP, XMP-tiff, Image] ImageWidth - Image Width: 1536
+[XMP, XMP-tiff, Image] PhotometricInterpretation - Photometric Interpretation: RGB
+[XMP, XMP-tiff, Image] PlanarConfiguration - Planar Configuration: Chunky
+[XMP, XMP-tiff, Image] SamplesPerPixel - Samples Per Pixel: 3
 [Composite, Composite, Image]  - Aperture: 8.0
-[Composite, Composite, Image]  - CFA Pattern: [Red,Green][Green,Blue]
 [Composite, Composite, Camera]  - Drive Mode: Single-frame shooting
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - ISO: 400
-[Composite, Composite, Image]  - Image Size: 3516x2328
-[Composite, Composite, Image]  - Jpg From Raw: (Binary data 29 bytes)
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
-[Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Aperture-priority AE
 [Composite, Composite, Image]  - Shutter Speed: 1/15
@@ -304,6 +202,7 @@
 [Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 55.0mm (35mm equivalent: 85.9mm)
 [Composite, Composite, Image]  - Hyperfocal Distance: 19.66 m
+[Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 28.1 - 85.9mm)
 [Composite, Composite, Image]  - Light Value: 7.9
 [Composite, Composite, Camera]  - Red Balance: 1.688027

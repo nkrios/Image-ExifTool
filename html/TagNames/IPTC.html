@@ -1,9 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>IPTC Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>IPTC Tags</h2>
+<body>
+<h2 class='top'>IPTC Tags</h2>
 
 IPTC stands for &quot;International Press Telecommunications Council&quot;.  This is
 an older meta information format that is slowly being phased out in favor of
@@ -20,61 +23,63 @@ are not null terminated.
 own set of tags.
 
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Record</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>1</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Record</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>1</td>
 <td>IPTCEnvelope</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='IPTC.html#EnvelopeRecord'>IPTC EnvelopeRecord Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>2</td>
+<tr class='b'>
+<td class='r'>2</td>
 <td>IPTCApplication</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='IPTC.html#ApplicationRecord'>IPTC ApplicationRecord Tags</a></td></tr>
-<tr valign='top'>
-<td align='right'>3</td>
+<tr>
+<td class='r'>3</td>
 <td>IPTCNewsPhoto</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='IPTC.html#NewsPhoto'>IPTC NewsPhoto Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>7</td>
+<tr class='b'>
+<td class='r'>7</td>
 <td>IPTCPreObjectData</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='IPTC.html#PreObjectData'>IPTC PreObjectData Tags</a></td></tr>
-<tr valign='top'>
-<td align='right'>8</td>
+<tr>
+<td class='r'>8</td>
 <td>IPTCObjectData</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='IPTC.html#ObjectData'>IPTC ObjectData Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>9</td>
+<tr class='b'>
+<td class='r'>9</td>
 <td>IPTCPostObjectData</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='IPTC.html#PostObjectData'>IPTC PostObjectData Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='EnvelopeRecord'>IPTC EnvelopeRecord Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>EnvelopeRecordVersion</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>5</td>
+<tr class='b'>
+<td class='r'>5</td>
 <td>Destination</td>
-<td align='center'>string[0,1024]+</td>
+<td class='c'>string[0,1024]+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>20</td>
+<tr>
+<td class='r'>20</td>
 <td>FileFormat</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = No ObjectData
+<td class='c'>int16u</td>
+<td><span class='s'>0 = No ObjectData
   <br>1 = IPTC-NAA Digital Newsphoto Parameter Record
   <br>2 = IPTC7901 Recommended Message Format
   <br>3 = Tagged Image File Format (Adobe/Aldus Image data)
@@ -103,335 +108,336 @@ own set of tags.
   <br>26 = Tape Archive [.TAR]
   <br>27 = Tidningarnas Telegrambyra NITF version (TTNITF DTD)
   <br>28 = Ritzaus Bureau NITF version (RBNITF DTD)
-  <br>29 = Corel Draw [.CDR]</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>22</td>
+  <br>29 = Corel Draw [.CDR]</span></td></tr>
+<tr class='b'>
+<td class='r'>22</td>
 <td>FileVersion</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>30</td>
+<tr>
+<td class='r'>30</td>
 <td>ServiceIdentifier</td>
-<td align='center'>string[0,10]</td>
+<td class='c'>string[0,10]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>40</td>
+<tr class='b'>
+<td class='r'>40</td>
 <td>EnvelopeNumber</td>
-<td align='center'>digits[8]</td>
+<td class='c'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>50</td>
+<tr>
+<td class='r'>50</td>
 <td>ProductID</td>
-<td align='center'>string[0,32]+</td>
+<td class='c'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>60</td>
+<tr class='b'>
+<td class='r'>60</td>
 <td>EnvelopePriority</td>
-<td align='center'>digits[1]</td>
+<td class='c'>digits[1]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>70</td>
+<tr>
+<td class='r'>70</td>
 <td>DateSent</td>
-<td align='center'>digits[8]</td>
+<td class='c'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>80</td>
+<tr class='b'>
+<td class='r'>80</td>
 <td>TimeSent</td>
-<td align='center'>string[11]</td>
+<td class='c'>string[11]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>90</td>
+<tr>
+<td class='r'>90</td>
 <td>CodedCharacterSet</td>
-<td align='center'>string[0,32]</td>
-<td><font size='-1'><font color="#666666">(this must be set to &quot;ESC % G&quot; if UTF-8 characters are used in
-ApplicationRecord or NewsPhoto string values)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>100</td>
+<td class='c'>string[0,32]</td>
+<td><span class='s'><span class='n'>(this must be set to &quot;ESC % G&quot; if UTF-8 characters are used in
+ApplicationRecord or NewsPhoto string values)</span></span></td></tr>
+<tr class='b'>
+<td class='r'>100</td>
 <td>UniqueObjectName</td>
-<td align='center'>string[14,80]</td>
+<td class='c'>string[14,80]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>120</td>
+<tr>
+<td class='r'>120</td>
 <td>ARMIdentifier</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>122</td>
+<tr class='b'>
+<td class='r'>122</td>
 <td>ARMVersion</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ApplicationRecord'>IPTC ApplicationRecord Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>ApplicationRecordVersion</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>3</td>
+<tr class='b'>
+<td class='r'>3</td>
 <td>ObjectTypeReference</td>
-<td align='center'>string[3,67]</td>
+<td class='c'>string[3,67]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>4</td>
+<tr>
+<td class='r'>4</td>
 <td>ObjectAttributeReference</td>
-<td align='center'>string[4,68]+</td>
+<td class='c'>string[4,68]+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>5</td>
+<tr class='b'>
+<td class='r'>5</td>
 <td>ObjectName</td>
-<td align='center'>string[0,64]</td>
+<td class='c'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>7</td>
+<tr>
+<td class='r'>7</td>
 <td>EditStatus</td>
-<td align='center'>string[0,64]</td>
+<td class='c'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>8</td>
+<tr class='b'>
+<td class='r'>8</td>
 <td>EditorialUpdate</td>
-<td align='center'>digits[2]</td>
+<td class='c'>digits[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>10</td>
+<tr>
+<td class='r'>10</td>
 <td>Urgency</td>
-<td align='center'>digits[1]</td>
+<td class='c'>digits[1]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>12</td>
+<tr class='b'>
+<td class='r'>12</td>
 <td>SubjectReference</td>
-<td align='center'>string[13,236]+</td>
+<td class='c'>string[13,236]+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>15</td>
+<tr>
+<td class='r'>15</td>
 <td>Category</td>
-<td align='center'>string[0,3]</td>
+<td class='c'>string[0,3]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>20</td>
+<tr class='b'>
+<td class='r'>20</td>
 <td>SupplementalCategories</td>
-<td align='center'>string[0,32]+</td>
+<td class='c'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>22</td>
+<tr>
+<td class='r'>22</td>
 <td>FixtureIdentifier</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>25</td>
+<tr class='b'>
+<td class='r'>25</td>
 <td>Keywords</td>
-<td align='center'>string[0,64]+</td>
+<td class='c'>string[0,64]+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>26</td>
+<tr>
+<td class='r'>26</td>
 <td>ContentLocationCode</td>
-<td align='center'>string[3]+</td>
+<td class='c'>string[3]+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>27</td>
+<tr class='b'>
+<td class='r'>27</td>
 <td>ContentLocationName</td>
-<td align='center'>string[0,64]+</td>
+<td class='c'>string[0,64]+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>30</td>
+<tr>
+<td class='r'>30</td>
 <td>ReleaseDate</td>
-<td align='center'>digits[8]</td>
+<td class='c'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>35</td>
+<tr class='b'>
+<td class='r'>35</td>
 <td>ReleaseTime</td>
-<td align='center'>string[11]</td>
+<td class='c'>string[11]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>37</td>
+<tr>
+<td class='r'>37</td>
 <td>ExpirationDate</td>
-<td align='center'>digits[8]</td>
+<td class='c'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>38</td>
+<tr class='b'>
+<td class='r'>38</td>
 <td>ExpirationTime</td>
-<td align='center'>string[11]</td>
+<td class='c'>string[11]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>40</td>
+<tr>
+<td class='r'>40</td>
 <td>SpecialInstructions</td>
-<td align='center'>string[0,256]</td>
+<td class='c'>string[0,256]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>42</td>
+<tr class='b'>
+<td class='r'>42</td>
 <td>ActionAdvised</td>
-<td align='center'>digits[2]</td>
-<td><font size='-1'>01 = Object Kill
+<td class='c'>digits[2]</td>
+<td><span class='s'>01 = Object Kill
   <br>02 = Object Replace
   <br>03 = Ojbect Append
-  <br>04 = Object Reference</font></td></tr>
-<tr valign='top'>
-<td align='right'>45</td>
+  <br>04 = Object Reference</span></td></tr>
+<tr>
+<td class='r'>45</td>
 <td>ReferenceService</td>
-<td align='center'>string[0,10]+</td>
+<td class='c'>string[0,10]+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>47</td>
+<tr class='b'>
+<td class='r'>47</td>
 <td>ReferenceDate</td>
-<td align='center'>digits[8]+</td>
+<td class='c'>digits[8]+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>50</td>
+<tr>
+<td class='r'>50</td>
 <td>ReferenceNumber</td>
-<td align='center'>digits[8]+</td>
+<td class='c'>digits[8]+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>55</td>
+<tr class='b'>
+<td class='r'>55</td>
 <td>DateCreated</td>
-<td align='center'>digits[8]</td>
+<td class='c'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>60</td>
+<tr>
+<td class='r'>60</td>
 <td>TimeCreated</td>
-<td align='center'>string[11]</td>
+<td class='c'>string[11]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>62</td>
+<tr class='b'>
+<td class='r'>62</td>
 <td>DigitalCreationDate</td>
-<td align='center'>digits[8]</td>
+<td class='c'>digits[8]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>63</td>
+<tr>
+<td class='r'>63</td>
 <td>DigitalCreationTime</td>
-<td align='center'>string[11]</td>
+<td class='c'>string[11]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>65</td>
+<tr class='b'>
+<td class='r'>65</td>
 <td>OriginatingProgram</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>70</td>
+<tr>
+<td class='r'>70</td>
 <td>ProgramVersion</td>
-<td align='center'>string[0,10]</td>
+<td class='c'>string[0,10]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>75</td>
+<tr class='b'>
+<td class='r'>75</td>
 <td>ObjectCycle</td>
-<td align='center'>string[1]</td>
-<td><font size='-1'>&#39;a&#39; = Morning
+<td class='c'>string[1]</td>
+<td><span class='s'>&#39;a&#39; = Morning
   <br>&#39;b&#39; = Both Morning and Evening
-  <br>&#39;p&#39; = Evening</font></td></tr>
-<tr valign='top'>
-<td align='right'>80</td>
+  <br>&#39;p&#39; = Evening</span></td></tr>
+<tr>
+<td class='r'>80</td>
 <td>By-line</td>
-<td align='center'>string[0,32]+</td>
+<td class='c'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>85</td>
+<tr class='b'>
+<td class='r'>85</td>
 <td>By-lineTitle</td>
-<td align='center'>string[0,32]+</td>
+<td class='c'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>90</td>
+<tr>
+<td class='r'>90</td>
 <td>City</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>92</td>
+<tr class='b'>
+<td class='r'>92</td>
 <td>Sub-location</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>95</td>
+<tr>
+<td class='r'>95</td>
 <td>Province-State</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>100</td>
+<tr class='b'>
+<td class='r'>100</td>
 <td>Country-PrimaryLocationCode</td>
-<td align='center'>string[3]</td>
+<td class='c'>string[3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>101</td>
+<tr>
+<td class='r'>101</td>
 <td>Country-PrimaryLocationName</td>
-<td align='center'>string[0,64]</td>
+<td class='c'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>103</td>
+<tr class='b'>
+<td class='r'>103</td>
 <td>OriginalTransmissionReference</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>105</td>
+<tr>
+<td class='r'>105</td>
 <td>Headline</td>
-<td align='center'>string[0,256]</td>
+<td class='c'>string[0,256]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>110</td>
+<tr class='b'>
+<td class='r'>110</td>
 <td>Credit</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>115</td>
+<tr>
+<td class='r'>115</td>
 <td>Source</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>116</td>
+<tr class='b'>
+<td class='r'>116</td>
 <td>CopyrightNotice</td>
-<td align='center'>string[0,128]</td>
+<td class='c'>string[0,128]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>118</td>
+<tr>
+<td class='r'>118</td>
 <td>Contact</td>
-<td align='center'>string[0,128]+</td>
+<td class='c'>string[0,128]+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>120</td>
+<tr class='b'>
+<td class='r'>120</td>
 <td>Caption-Abstract</td>
-<td align='center'>string[0,2000]</td>
+<td class='c'>string[0,2000]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>121</td>
+<tr>
+<td class='r'>121</td>
 <td>LocalCaption</td>
-<td align='center'>string[0,256]</td>
-<td><font size='-1'><font color="#666666">(I haven&#39;t found a reference for the format of tags 121, 184-188 and
+<td class='c'>string[0,256]</td>
+<td><span class='s'><span class='n'>(I haven&#39;t found a reference for the format of tags 121, 184-188 and
 225-232, so I have just make them writable as strings with
 reasonable length.  Beware that if this is wrong, other utilities
-won&#39;t be able to read these tags as written by ExifTool.)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>122</td>
+won&#39;t be able to read these tags as written by ExifTool.)</span></span></td></tr>
+<tr class='b'>
+<td class='r'>122</td>
 <td>Writer-Editor</td>
-<td align='center'>string[0,32]+</td>
+<td class='c'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>125</td>
+<tr>
+<td class='r'>125</td>
 <td>RasterizedCaption</td>
-<td align='center'>string[7360]</td>
+<td class='c'>string[7360]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>130</td>
+<tr class='b'>
+<td class='r'>130</td>
 <td>ImageType</td>
-<td align='center'>string[2]</td>
+<td class='c'>string[2]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>131</td>
+<tr>
+<td class='r'>131</td>
 <td>ImageOrientation</td>
-<td align='center'>string[1]</td>
-<td><font size='-1'>&#39;L&#39; = Landscape
+<td class='c'>string[1]</td>
+<td><span class='s'>&#39;L&#39; = Landscape
   <br>&#39;P&#39; = Portrait
-  <br>&#39;S&#39; = Square</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>135</td>
+  <br>&#39;S&#39; = Square</span></td></tr>
+<tr class='b'>
+<td class='r'>135</td>
 <td>LanguageIdentifier</td>
-<td align='center'>string[2,3]</td>
+<td class='c'>string[2,3]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>150</td>
+<tr>
+<td class='r'>150</td>
 <td>AudioType</td>
-<td align='center'>string[2]</td>
-<td><font size='-1'>&#39;0T&#39; = Text Only
+<td class='c'>string[2]</td>
+<td><span class='s'>&#39;0T&#39; = Text Only
   <br>&#39;1A&#39; = Mono Actuality
   <br>&#39;1C&#39; = Mono Question and Answer Session
   <br>&#39;1M&#39; = Mono Music
@@ -447,57 +453,57 @@ won&#39;t be able to read these tags as written by ExifTool.)</font></font></td>
   <br>&#39;2R&#39; = Stereo Raw Sound
   <br>&#39;2S&#39; = Stereo Scener
   <br>&#39;2V&#39; = Stereo Voicer
-  <br>&#39;2W&#39; = Stereo Wrap</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>151</td>
+  <br>&#39;2W&#39; = Stereo Wrap</span></td></tr>
+<tr class='b'>
+<td class='r'>151</td>
 <td>AudioSamplingRate</td>
-<td align='center'>digits[6]</td>
+<td class='c'>digits[6]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>152</td>
+<tr>
+<td class='r'>152</td>
 <td>AudioSamplingResolution</td>
-<td align='center'>digits[2]</td>
+<td class='c'>digits[2]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>153</td>
+<tr class='b'>
+<td class='r'>153</td>
 <td>AudioDuration</td>
-<td align='center'>digits[6]</td>
+<td class='c'>digits[6]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>154</td>
+<tr>
+<td class='r'>154</td>
 <td>AudioOutcue</td>
-<td align='center'>string[0,64]</td>
+<td class='c'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>184</td>
+<tr class='b'>
+<td class='r'>184</td>
 <td>JobID</td>
-<td align='center'>string[0,64]</td>
+<td class='c'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>185</td>
+<tr>
+<td class='r'>185</td>
 <td>MasterDocumentID</td>
-<td align='center'>string[0,256]</td>
+<td class='c'>string[0,256]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>186</td>
+<tr class='b'>
+<td class='r'>186</td>
 <td>ShortDocumentID</td>
-<td align='center'>string[0,64]</td>
+<td class='c'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>187</td>
+<tr>
+<td class='r'>187</td>
 <td>UniqueDocumentID</td>
-<td align='center'>string[0,128]</td>
+<td class='c'>string[0,128]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>188</td>
+<tr class='b'>
+<td class='r'>188</td>
 <td>OwnerID</td>
-<td align='center'>string[0,128]</td>
+<td class='c'>string[0,128]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>200</td>
+<tr>
+<td class='r'>200</td>
 <td>ObjectPreviewFileFormat</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = No ObjectData
+<td class='c'>int16u</td>
+<td><span class='s'>0 = No ObjectData
   <br>1 = IPTC-NAA Digital Newsphoto Parameter Record
   <br>2 = IPTC7901 Recommended Message Format
   <br>3 = Tagged Image File Format (Adobe/Aldus Image data)
@@ -526,92 +532,93 @@ won&#39;t be able to read these tags as written by ExifTool.)</font></font></td>
   <br>26 = Tape Archive [.TAR]
   <br>27 = Tidningarnas Telegrambyra NITF version (TTNITF DTD)
   <br>28 = Ritzaus Bureau NITF version (RBNITF DTD)
-  <br>29 = Corel Draw [.CDR]</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>201</td>
+  <br>29 = Corel Draw [.CDR]</span></td></tr>
+<tr class='b'>
+<td class='r'>201</td>
 <td>ObjectPreviewFileVersion</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>202</td>
+<tr>
+<td class='r'>202</td>
 <td>ObjectPreviewData</td>
-<td align='center'>string[0,256000]</td>
+<td class='c'>string[0,256000]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>225</td>
+<tr class='b'>
+<td class='r'>225</td>
 <td>ClassifyState</td>
-<td align='center'>string[0,64]</td>
+<td class='c'>string[0,64]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>228</td>
+<tr>
+<td class='r'>228</td>
 <td>SimilarityIndex</td>
-<td align='center'>string[0,32]</td>
+<td class='c'>string[0,32]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>230</td>
+<tr class='b'>
+<td class='r'>230</td>
 <td>DocumentNotes</td>
-<td align='center'>string[0,1024]</td>
+<td class='c'>string[0,1024]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>231</td>
+<tr>
+<td class='r'>231</td>
 <td>DocumentHistory</td>
-<td align='center'>string[0,256]</td>
+<td class='c'>string[0,256]</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>232</td>
+<tr class='b'>
+<td class='r'>232</td>
 <td>ExifCameraInfo</td>
-<td align='center'>string[0,4096]</td>
+<td class='c'>string[0,4096]</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='NewsPhoto'>IPTC NewsPhoto Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>NewsPhotoVersion</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>10</td>
+<tr class='b'>
+<td class='r'>10</td>
 <td>IPTCPictureNumber</td>
-<td align='center'>string[16]</td>
-<td><font size='-1'><font color="#666666">(4 numbers: 1-Manufacturer ID, 2-Equipment ID, 3-Date, 4-Sequence)</font></font></td></tr>
-<tr valign='top'>
-<td align='right'>20</td>
+<td class='c'>string[16]</td>
+<td><span class='s'><span class='n'>(4 numbers: 1-Manufacturer ID, 2-Equipment ID, 3-Date, 4-Sequence)</span></span></td></tr>
+<tr>
+<td class='r'>20</td>
 <td>IPTCImageWidth</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>30</td>
+<tr class='b'>
+<td class='r'>30</td>
 <td>IPTCImageHeight</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>40</td>
+<tr>
+<td class='r'>40</td>
 <td>IPTCPixelWidth</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>50</td>
+<tr class='b'>
+<td class='r'>50</td>
 <td>IPTCPixelHeight</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>55</td>
+<tr>
+<td class='r'>55</td>
 <td>SupplementalType</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = Main Image
+<td class='c'>int8u</td>
+<td><span class='s'>0 = Main Image
   <br>1 = Reduced Resolution Image
   <br>2 = Logo
-  <br>3 = Rasterized Caption</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>60</td>
+  <br>3 = Rasterized Caption</span></td></tr>
+<tr class='b'>
+<td class='r'>60</td>
 <td>ColorRepresentation</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0x0 = No Image, Single Frame
+<td class='c'>int16u</td>
+<td><span class='s'>0x0 = No Image, Single Frame
   <br>0x100 = Monochrome, Single Frame
   <br>0x300 = 3 Components, Single Frame
   <br>0x301 = 3 Components, Frame Sequential in Multiple Objects
@@ -624,181 +631,184 @@ won&#39;t be able to read these tags as written by ExifTool.)</font></font></td>
   <br>0x402 = 4 Components, Frame Sequential in One Object
   <br>0x403 = 4 Components, Line Sequential
   <br>0x404 = 4 Components, Pixel Sequential
-  <br>0x405 = 4 Components, Special Interleaving</font></td></tr>
-<tr valign='top'>
-<td align='right'>64</td>
+  <br>0x405 = 4 Components, Special Interleaving</span></td></tr>
+<tr>
+<td class='r'>64</td>
 <td>InterchangeColorSpace</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>1 = X,Y,Z CIE
+<td class='c'>int8u</td>
+<td><span class='s'>1 = X,Y,Z CIE
   <br>2 = RGB SMPTE
   <br>3 = Y,U,V (K) (D65)
   <br>4 = RGB Device Dependent
   <br>5 = CMY (K) Device Dependent
   <br>6 = Lab (K) CIE
   <br>7 = YCbCr
-  <br>8 = sRGB</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>65</td>
+  <br>8 = sRGB</span></td></tr>
+<tr class='b'>
+<td class='r'>65</td>
 <td>ColorSequence</td>
-<td align='center'>int8u</td>
+<td class='c'>int8u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>66</td>
+<tr>
+<td class='r'>66</td>
 <td>ICC_Profile</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>70</td>
+<tr class='b'>
+<td class='r'>70</td>
 <td>ColorCalibrationMatrix</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>80</td>
+<tr>
+<td class='r'>80</td>
 <td>LookupTable</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>84</td>
+<tr class='b'>
+<td class='r'>84</td>
 <td>NumIndexEntries</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>85</td>
+<tr>
+<td class='r'>85</td>
 <td>ColorPalette</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>86</td>
+<tr class='b'>
+<td class='r'>86</td>
 <td>IPTCBitsPerSample</td>
-<td align='center'>int8u</td>
+<td class='c'>int8u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>90</td>
+<tr>
+<td class='r'>90</td>
 <td>SampleStructure</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = OrthogonalConstangSampling
+<td class='c'>int8u</td>
+<td><span class='s'>0 = OrthogonalConstangSampling
   <br>1 = Orthogonal4-2-2Sampling
-  <br>2 = CompressionDependent</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>100</td>
+  <br>2 = CompressionDependent</span></td></tr>
+<tr class='b'>
+<td class='r'>100</td>
 <td>ScanningDirection</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = L-R, Top-Bottom
+<td class='c'>int8u</td>
+<td><span class='s'>0 = L-R, Top-Bottom
   <br>1 = R-L, Top-Bottom
   <br>2 = L-R, Bottom-Top
   <br>3 = R-L, Bottom-Top
   <br>4 = Top-Bottom, L-R
   <br>5 = Bottom-Top, L-R
   <br>6 = Top-Bottom, R-L
-  <br>7 = Bottom-Top, R-L</font></td></tr>
-<tr valign='top'>
-<td align='right'>102</td>
+  <br>7 = Bottom-Top, R-L</span></td></tr>
+<tr>
+<td class='r'>102</td>
 <td>IPTCImageRotation</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = 0
+<td class='c'>int8u</td>
+<td><span class='s'>0 = 0
   <br>1 = 90
   <br>2 = 180
-  <br>3 = 270</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>110</td>
+  <br>3 = 270</span></td></tr>
+<tr class='b'>
+<td class='r'>110</td>
 <td>DataCompressionMethod</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>120</td>
+<tr>
+<td class='r'>120</td>
 <td>QuantizationMethod</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = Linear Reflectance/Transmittance
+<td class='c'>int8u</td>
+<td><span class='s'>0 = Linear Reflectance/Transmittance
   <br>1 = Linear Density
   <br>2 = IPTC Ref B
   <br>3 = Linear Dot Percent
   <br>4 = AP Domestic Analogue
   <br>5 = Compression Method Specific
   <br>6 = Color Space Specific
-  <br>7 = Gamma Compensated</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>125</td>
+  <br>7 = Gamma Compensated</span></td></tr>
+<tr class='b'>
+<td class='r'>125</td>
 <td>EndPoints</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>130</td>
+<tr>
+<td class='r'>130</td>
 <td>ExcursionTolerance</td>
-<td align='center'>int8u</td>
-<td><font size='-1'>0 = Not Allowed
-  <br>1 = Allowed</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>135</td>
+<td class='c'>int8u</td>
+<td><span class='s'>0 = Not Allowed
+  <br>1 = Allowed</span></td></tr>
+<tr class='b'>
+<td class='r'>135</td>
 <td>BitsPerComponent</td>
-<td align='center'>int8u</td>
+<td class='c'>int8u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>140</td>
+<tr>
+<td class='r'>140</td>
 <td>MaximumDensityRange</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>145</td>
+<tr class='b'>
+<td class='r'>145</td>
 <td>GammaCompensatedValue</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PreObjectData'>IPTC PreObjectData Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>10</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>10</td>
 <td>SizeMode</td>
-<td align='center'>N</td>
-<td><font size='-1'>0 = Size Not Known
-  <br>1 = Size Known</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>20</td>
+<td class='c'>N</td>
+<td><span class='s'>0 = Size Not Known
+  <br>1 = Size Known</span></td></tr>
+<tr class='b'>
+<td class='r'>20</td>
 <td>MaxSubfileSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
-<td align='right'>90</td>
+<tr>
+<td class='r'>90</td>
 <td>ObjectSizeAnnounced</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>95</td>
+<tr class='b'>
+<td class='r'>95</td>
 <td>MaximumObjectSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ObjectData'>IPTC ObjectData Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>10</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>10</td>
 <td>SubFile</td>
-<td align='center'>N+</td>
+<td class='c'>N+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PostObjectData'>IPTC PostObjectData Tags</a></h2>
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>10</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>10</td>
 <td>ConfirmedObjectSize</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Oct 31, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

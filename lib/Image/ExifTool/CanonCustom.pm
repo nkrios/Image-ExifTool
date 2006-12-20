@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Canon;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub ProcessCanonCustom($$$);
 sub WriteCanonCustom($$$);
@@ -234,7 +234,11 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     2 => {
         Name => 'LongExposureNoiseReduction',
-        PrintConv => \%offOn,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Auto',
+            2 => 'On',
+        },
     },
     3 => {
         Name => 'FlashSyncSpeedAv',

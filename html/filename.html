@@ -5,7 +5,8 @@
   <title>FileName and Directory tags</title>
 <style type="text/css">
 <!--
-#BLK { color: #000000 } /* black color */
+h1       { margin: 0 0 .5em 0 }
+code.blk { color: #000000 } /* black color */
 code {
     color: #880000;
     font-family: monospace;
@@ -30,12 +31,16 @@ has a directory specification (ie. contains a '/' character), then the file
 is also moved to the specified directory (see example 6 below).  Existing
 files will not be overwritten.
 
-<p>The <b>%d</b>, <b>%f</b> and <b>%e</b> file name format codes may be used to
+<p>The <b>%d</b>, <b>%f</b>, <b>%e</b> file name format codes may be used to
 represent the directory, name and extension of the original file when specifying
 <b>FileName</b> and <b>Directory</b> tags via the command-line interface. (In a
-similar way to the <b>-o</b>, <b>-w</b> and <b>-tagsFromFile</b> options.)  Note
-that these codes must be escaped with an extra '%' if used within a date format
-string.
+similar way to the <b>-o</b>, <b>-w</b> and <b>-tagsFromFile</b> options.)
+Also, <b>%c</b> may be used to add a copy number to the output file name to
+avoid collisions with existing file names.  Note that these codes must be
+escaped with an extra '%' if used within a date format string.  Modifiers may
+also be used to change the default behaviour of these format codes.  See the <a
+href="exiftool_pod.html#item__2dw_ext_or_fmt">-w option</a> documentation for
+details.
 
 <p>When organizing files by date/time, use of the <b>-d</b> (date format) option
 is essential to specify a format for the file (and/or directory) name.  The
@@ -65,26 +70,27 @@ will fail and the file will not be renamed or moved.
 
 <h2>Examples</h2>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;1.</td><td bgcolor='#dddddd'><code><span id='BLK'>
-exiftool -d %Y%m%d_%H%M%S.%%e "-filename&lt;CreateDate" DIR
-</span></code></td></tr></table>
+<table cellpadding=6><tr><td valign='top'>&nbsp;1.</td><td bgcolor='#dddddd'><code class='blk'>
+exiftool -d %Y%m%d_%H%M%%-c.%%e "-filename&lt;CreateDate" DIR
+</code></td></tr></table>
 <blockquote>
 Rename all images in directory '<code>DIR</code>' to names like
-'<code>20060327_105859.ext</code>', with individual file names derived from the
-value of the CreateDate tag, and extensions of the original images.
+'<code>20060327_1058-2.jpg</code>', with individual file names derived from the
+value of the CreateDate (plus a copy number with a leading '-' if a file with
+the same name already exists), and with the same extension as the original image.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;2.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;2.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -d %Y-%m-%d "-directory&lt;datetimeoriginal" image.jpg
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 Move '<code>image.jpg</code>' into a directory with a name given by
 DateTimeOriginal, in the form '<code>2006-03-27</code>'.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;3.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;3.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool '-filename&lt;%f_$imagesize.%e' dir
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 This example uses an expression to add the image size to the name of all images
 in directory '<code>dir</code>'. For example, this would remame a 640x480 image
@@ -93,9 +99,9 @@ the single quotes are necessary in Unix shells due to the '<code>$</code>'
 symbol, but double quotes are required in a Windows cmd shell.)
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;4.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;4.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -r -directory=%e_images/%d pics
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 Recursively move all images based in directory '<code>pics</code>' to
 separate directory trees organized by file extension.  For instance, in this
@@ -103,9 +109,9 @@ example the file '<code>pics/toys/new_car.jpg</code>' is moved to
 '<code>jpg_images/pics/toys/new_car.jpg</code>'.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;5.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;5.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -r -o dummy/ -directory=%e_images/%d pics
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 Same as example 3 above, but images are rewritten instead of being moved since
 the <code>-o</code> option is used.  Note that the trailing '<code>/</code>' on
@@ -113,12 +119,12 @@ the <code>-o</code> option is used.  Note that the trailing '<code>/</code>' on
 interpreted as a file name.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;6.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;6.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -r -d %Y/%m/%d/image_%H%M%S.%%e "-filename&lt;filemodifydate" DIR
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 Recusively rename all images in '<code>DIR</code>' and any contained
-subdirectories to the form '<code>image_HHMMSS.ext</code>' (where
+subdirectories to the form '<code>image_HHMMSS.EXT</code>' (where
 '<code>ext</code>' is the original file extension), and move them into a new
 directory hierarchy based on date of file modification, with path names like
 '<code>2006/03/27/image_105859.jpg</code>'.
@@ -127,36 +133,36 @@ directory hierarchy based on date of file modification, with path names like
 The following examples demonstrate the interaction of this feature with
 other ExifTool options:<p>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;7.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;7.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -filename=new.jpg dir/image.jpg
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 Rename '<code>dir/image.jpg</code>' to '<code>dir/new.jpg</code>'.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;8.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;8.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -filename=new.jpg -comment=xxx dir/image.jpg
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 Copy '<code>dir/image.jpg</code>', add a new comment, and write output to
 '<code>dir/new.jpg</code>'. The original file '<code>dir/image.jpg</code>' is
 not changed.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>&nbsp;9.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>&nbsp;9.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -filename=new.jpg -comment=xxx -overwrite_original dir/image.jpg
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 Rewrite '<code>dir/image.jpg</code>', adding a new comment and writing output to
 '<code>dir/new.jpg</code>'. The original file '<code>dir/image.jpg</code>' is
 removed.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>10.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>10.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -o tmp/ -filename=new.jpg image.jpg<br>
 exiftool -o tmp/xxx.jpg -filename=new.jpg image.jpg<br>
 exiftool -o tmp/new.jpg image.jpg
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 A file name or directory specified via the <b>FileName</b> or <b>Directory</b>
 tag takes precedence over that specified by the <b>-o</b> option, so these three
@@ -169,9 +175,9 @@ directory.  As illustrated in example 4 above, the file is rewritten instead of
 simply being renamed when the '<code>-o</code>' option is used.
 </blockquote>
 
-<table cellpadding=6><tr><td valign='top'>11.</td><td bgcolor='#dddddd'><code><span id='BLK'>
+<table cellpadding=6><tr><td valign='top'>11.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -directory=dir1 -filename=dir2/out.jpg -o dir3/ dir4/image.jpg<br>
-</span></code></td></tr></table>
+</code></td></tr></table>
 <blockquote>
 This example demonstrates the priorities of directory names specified using
 different techniques.  The output directory is taken from the first directory
@@ -221,6 +227,7 @@ extra '%' must be added to pass the format code through the date/time parser:
 <tr><th>%%d</th><td>- original file directory</td></tr>
 <tr><th>%%f</th><td>- original file name</td></tr>
 <tr><th>%%e</th><td>- original file extension</td></tr>
+<tr><th>%%c</th><td>- copy number (output files only)</td></tr>
 </table></blockquote>
 <hr>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>

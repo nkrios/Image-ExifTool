@@ -489,7 +489,7 @@ sub CaptureXMP($$$;$)
 sub SaveBlankInfo($$$;$)
 {
     my ($blankInfo, $propListPt, $val, $attrs) = @_;
-    
+
     my $propPath = join '/', @$propListPt;
     my @ids = ($propPath =~ m{ #([^ /]*)}g);
     my $id;
@@ -676,7 +676,7 @@ sub WriteXMP($$;$)
         my $capList = $capture{$path};
         my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
         my $overwrite = Image::ExifTool::IsOverwriting($newValueHash);
-        my %attrs;
+        my (%attrs, $deleted);
         # delete existing entry if necessary
         if ($capList) {
             # take attributes from old values if they exist
@@ -696,7 +696,6 @@ sub WriteXMP($$;$)
                     if ($overwrite < 0) {
                         # only overwrite specific values
                         next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
-                        $overwrite = 1;
                     }
                     $exifTool->VPrint(1, "    - XMP:$$tagInfo{Name} = '$val'\n");
                     # save attributes and path from this deleted property
@@ -709,6 +708,7 @@ sub WriteXMP($$;$)
                 next unless $delPath or $$tagInfo{List};
                 if ($delPath) {
                     $path = $delPath;
+                    $deleted = 1;
                 } else {
                     # don't change tag if we couldn't delete old copy unless this is a list
                     next unless $$tagInfo{List};
@@ -731,13 +731,21 @@ sub WriteXMP($$;$)
                 }
             }
         }
-        next unless $overwrite > 0;
+        # check to see if we want to create this tag
+        # (create non-avoided tags in XMP data files by default)
+        my $isCreating = (Image::ExifTool::IsCreating($newValueHash) or
+                          ($preferred and not $$tagInfo{Avoid}));
+
+        # don't add new values unless...
+            # ...tag existed before and was deleted
+        next unless $deleted or
+            # ...tag is List and it existed before or we are creating it
+            ($$tagInfo{List} and ($capList or $isCreating)) or
+            # ...tag didn't exist before and we are creating it
+            (not $capList and $isCreating);
+
         # get list of new values (done if no new values specified)
         my @newValues = Image::ExifTool::GetNewValues($newValueHash) or next;
-        # don't add new tag if it didn't exist before unless specified
-        # (or unless this is an XMP data file and we aren't avoiding this tag)
-        next unless $capList or Image::ExifTool::IsCreating($newValueHash) or
-            ($preferred and not $$tagInfo{Avoid});
 
         # set default language attribute for lang-alt lists
         # (currently on support changing the default language)

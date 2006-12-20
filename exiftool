@@ -28,6 +28,7 @@ sub DoSetFromFile($$$);
 sub ScanDir($$);
 sub LoadPrintFormat($);
 sub FilenameSPrintf($;$);
+sub NextUnusedFilename($);
 sub CreateDirectory($);
 sub OpenOutputFile($);
 sub AcceptFile($);
@@ -97,10 +98,26 @@ my $scanWritable;   # flag to process only writable file types
 my $doGlob;         # flag set to do filename wildcard expansion
 my $condition;      # conditional processing of files
 my $evalWarning;    # warning from eval
+my $pause;          # pause before returning
 
+# exit routine
+sub Exit {
+    if ($pause) {
+        if (eval 'require Term::ReadKey') {
+            print STDERR "-- press any key --";
+            Term::ReadKey::ReadMode('cbreak');
+            Term::ReadKey::ReadKey(0);
+            print STDERR "\b \b" x 20;
+        } else {
+            print STDERR "-- press RETURN --\n";
+            <STDIN>;
+        }
+    }
+    exit shift;
+}
 # my warn and die routines
 sub Warn { warn(@_) if $quiet < 2 or $_[0] =~ /^Error/; }
-sub Die  { Warn @_; exit 1; }
+sub Die  { Warn @_; Exit 1; }
 sub WarnOnce($) {
     Warn(@_) and $warnedOnce{$_[0]} = 1 unless $warnedOnce{$_[0]};
 }
@@ -162,7 +179,7 @@ while ($_ = shift) {
             }
             next;
         }
-        /^ver$/i and print("$Image::ExifTool::VERSION$Image::ExifTool::RELEASE\n"), exit 0;
+        /^ver$/i and print("$Image::ExifTool::VERSION$Image::ExifTool::RELEASE\n"), Exit 0;
         if (/^(all)?tagsfromfile(=.*)?$/i) {
             $setTagsFile = $2 ? substr($2,1) : (@ARGV ? shift : '');
             $setTagsFile eq '' and Die "File must be specified for -TagsFromFile option\n";
@@ -229,6 +246,7 @@ while ($_ = shift) {
             }
             next;
         }
+        /^k$/i and $pause = 1, next;
         /^l$/  and --$outFormat, next;
         /^L$/  and $mainTool->Options(Charset => 'Latin'), next;
         /^m$/i and $mainTool->Options(IgnoreMinorErrors => 1), next;
@@ -272,7 +290,6 @@ while ($_ = shift) {
             push @newValues, $_;
             $doSetFileName = 1 if /^(filename|directory)\b/i;
         } else {
-            s/\ball\b/\*/ig;    # replace 'all' with '*' in tag names
             if (not $setTagsFile and /(<|>)/) {
                 # assume '-tagsFromFile @' if tags are being redirected
                 # and -tagsFromFile hasn't already been specified
@@ -303,7 +320,7 @@ unless ((@tags and not $outOpt) or @files or @newValues) {
     unless ($helped or not system('perldoc',$0)) {
         print "Run 'perldoc exiftool' for help on exiftool.\n";
     }
-    exit 0;
+    Exit 0;
 }
 
 if ($overwriteOrig > 1 and $outOpt) {
@@ -405,7 +422,7 @@ if (@newValues) {
         }
     } elsif (not $outOpt and not @tags) {
         Warn "Nothing to do.\n";
-        exit 1;
+        Exit 1;
     }
 } elsif (grep /^(\*:)?\*$/, @exclude) {
     Die "All tags excluded -- nothing to do.\n";
@@ -484,9 +501,9 @@ if (($countDir or $totWr or $countFailed or $tot > 1 or $outputExt) and
     printf("%5d output files created\n", $countCreated) if $outputExt;
 }
 # return error status if we had any errors
-exit 1 if $countBadWr or $countBadCr or $countBad;
+Exit 1 if $countBadWr or $countBadCr or $countBad;
 
-exit 0;     # all done
+Exit 0;     # all done
 
 
 #------------------------------------------------------------------------------
@@ -846,6 +863,7 @@ sub SetImageInfo($$)
                     }
                 }
             }
+            $outfile = NextUnusedFilename($outfile);
             if (-e $outfile and not $doSetFileName) {
                 Warn "Error: '$outfile' already exists - $infile\n";
                 ++$countBadWr;
@@ -913,6 +931,7 @@ sub SetImageInfo($$)
                 $newDir = FilenameSPrintf($newDir, $infile);
                 $outfile = Image::ExifTool::GetNewFileName(defined $outfile ? $outfile : $infile, $newDir);
             }
+            $outfile = NextUnusedFilename($outfile);
             if (-e $outfile) {
                 if ($infile ne $outfile) {
                     Warn "Error: '$outfile' already exists - $infile\n";
@@ -968,18 +987,19 @@ sub SetImageInfo($$)
     # rewrite the file
     my $success = $exifTool->WriteInfo($file, $outfile);
 
+    # get file time if preserving it
+    my ($modTime, $accTime);
+    if ($preserveTime and $success and -e $file) {
+        $modTime = $^T - (-M $file) * (24 * 3600);
+        $accTime = $^T - (-A $file) * (24 * 3600);
+    }
     if ($success == 1) {
         ++$countGoodWr;
         # preserve the original file times
         if (defined $tmpFile) {
             if (-e $file) {
-                my ($modTime, $accTime);
-                if ($preserveTime) {
-                    $modTime = $^T - (-M $file) * (24 * 3600);
-                    $accTime = $^T - (-A $file) * (24 * 3600);
-                    unless (utime($accTime, $modTime, $tmpFile)) {
-                        Warn "Error setting file time - $file\n";
-                    }
+                if ($preserveTime and not utime($accTime, $modTime, $tmpFile)) {
+                    Warn "Error setting file time - $file\n";
                 }
                 if ($isTemporary) {
                     # move original out of the way
@@ -1004,7 +1024,7 @@ sub SetImageInfo($$)
                             close(TMP_FILE);
                             close(ORIG_FILE) or $err = 1;
                             if ($err) {
-                                Warn "Error preserving creator for $file\n";
+                                Warn "Couldn't overwrite in place - $file\n";
                                 rename($tmpFile, $file) or die "Error renaming $tmpFile to $file\n";
                             } else {
                                 unlink $tmpFile;
@@ -1040,6 +1060,9 @@ sub SetImageInfo($$)
             ++$countSameWr;
             unlink $tmpFile;
         } else {
+            if (defined $accTime and not utime($accTime, $modTime, $outfile)) {
+                Warn "Error setting file time - $file\n";
+            }
             if ($overwriteOrig) {
                 unlink $file or Warn "Error erasing original $file\n";
             }
@@ -1117,7 +1140,7 @@ sub ScanDir($$)
 # Load print format file
 # Inputs: 0) file name
 # - saves lines of file to @printFmt list
-# - adds tag names to @tag list
+# - adds tag names to @tags list
 sub LoadPrintFormat($)
 {
     my $file = shift || Die "Must specify file for -p option\n";
@@ -1126,6 +1149,8 @@ sub LoadPrintFormat($)
         /^#/ and next;  # ignore comments
         push @printFmt, $_;
         push @tags, /\$((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)/g;
+        # tags contained in braces too...
+        push @tags, /\$\{((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)\}/g;
     }
     close(FMT_FILE);
     @tags or Die "Print format file doesn't contain any tag names!\n";
@@ -1154,16 +1179,43 @@ sub FilenameSPrintf($;$)
     while ($fmt =~ /(%([-+]?)(\d*)\.?(\d*)(d|f|e))/g) {
         $filename .= substr($fmt, $pos, pos($fmt) - $pos - length($1));
         $pos = pos($fmt);
-        my ($wid, $skip, $code) = ($3, $4 || 0, $5);
+        my ($sign, $wid, $skip, $code) = ($2, $3, $4 || 0, $5);
         my $len = length $part{$code};
         next unless $skip < $len;
         $wid = $len - $skip if $wid eq '' or $wid + $skip > $len;
-        $skip = $len - $wid - $skip if $2 eq '-';
+        $skip = $len - $wid - $skip if $sign eq '-';
         $filename .= substr($part{$code}, $skip, $wid);
     }
     $filename .= substr($fmt, $pos); # add rest of file name
     $filename =~ s{//}{/}g; # remove double slashes
     return $filename;
+}
+
+#------------------------------------------------------------------------------
+# Expand '%c' codes if filename to get next unused file name
+# Inputs: 0) file name format string
+# Returns: new file name
+sub NextUnusedFilename($)
+{
+    my $fmt = shift;
+    return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*c/;
+    my $copy = 0;
+    for (;;) {
+        my ($filename, $pos) = ('', 0);
+        while ($fmt =~ /(%([-+]?)(\d*)(\.?)(\d*)c)/g) {
+            $filename .= substr($fmt, $pos, pos($fmt) - $pos - length($1));
+            $pos = pos($fmt);
+            my ($sign, $wid, $dec, $wid2) = ($2, $3 || 0, $4, $5 || 0);
+            next unless $dec or $copy;
+            $filename .= '-' if $sign eq '-';
+            $wid = $wid2 if $wid < $wid2;
+            $filename .= $wid ? sprintf("%.${wid}d",$copy) : $copy;
+        }
+        $filename .= substr($fmt, $pos); # add rest of file name
+        # return now with filename unless file exists
+        return $filename unless -e $filename;
+        ++$copy;
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -1203,10 +1255,11 @@ sub OpenOutputFile($)
     my ($fp, $outfile);
     if ($outputExt) {
         ($outfile = $file) =~ tr/\\/\//;
-        if (not defined FilenameSPrintf($outputExt)) {
+        if ($outputExt =~ /%[-+]?\d*\.?\d*(d|f|e|c)/) {
             # make filename from printf-like $outputExt
             $outfile = FilenameSPrintf($outputExt, $file);
             return () unless defined $outfile;
+            $outfile = NextUnusedFilename($outfile);
             CreateDirectory($outfile);  # create directory if necessary
         } else {
             $outfile =~ s/\.[^.\/]*$//; # remove extension if it exists
@@ -1561,6 +1614,12 @@ conditions must be satisfied to process the file.  Below are a few examples:
     # set EXIF ISO value if possible, unless it is set already
     exiftool '-exif:iso<iso' -if 'not $exif:iso' dir
 
+=item B<-k>
+
+Pause with the message C<-- press any key --> before terminating.  This
+option is used to prevent the command window from closing when run as a
+Windows drag and drop application.
+
 =item B<-l>
 
 Use B<l>ong 2-line Canon-style output format.
@@ -1614,7 +1673,8 @@ Set the B<o>utput file or directory name when writing information.  (Without
 this option, the original file is renamed to C<FILE_original> and output is
 sent to I<FILE>.)  The output file name may also be specified using a I<FMT>
 string in which %d, %f and %e represent the directory, file name and
-extension of I<FILE>.  See the B<-w> option for I<FMT> string examples.
+extension of I<FILE>.  Also, %c may be used to add a copy number.  See the
+B<-w> option for I<FMT> string examples.
 
 The output file is taken to be a directory name if it already exists as a
 directory or if the name ends with '/'.  Output directories are created if
@@ -1804,22 +1864,25 @@ extension (including the '.') with the specified extension (and a '.' is
 added to the start of I<EXT> if it didn't contain one).  Alternatively, a
 I<FMT> string may be used to give more control over the output file name and
 directory.  In the format string, %d, %f and %e represent the directory,
-filename and extension of the source file.  %d includes the trailing '/' if
-necessary, but %e does not include the leading '.'.  For example:
+filename and extension of the source file, and %c represents a copy number
+which is automatically incremented if the file already exists.  %d includes
+the trailing '/' if necessary, but %e does not include the leading '.'.  For
+example:
 
     -w %d%f.txt       # same effect as "-w txt"
-    -w dir/%f_%e.out  # writes files to "dir" as "FILE_EXT.out"
-    -w dir2/%d%f.txt  # writes to "dir2", keeping dir structure
+    -w dir/%f_%e.out  # write files to "dir" as "FILE_EXT.out"
+    -w dir2/%d%f.txt  # write to "dir2", keeping dir structure
+    -w a%c.txt        # write to "a.txt" or "a1.txt" or "a2.txt"...
 
 Existing files will not be overwritten, and output directories are created
 automatically if necessary.
 
 Advanced feature:  A substring of the original file name, directory or
-extension may be taken by specifying a string length immediately following
-the '%' character.  If the length is negative, the substring is taken from
-the end.  The substring position (characters to ignore at the start or end
-of the string) may be given by a second optional value after a decimal
-point.  For example:
+extension may be taken by specifying a field width immediately following the
+'%' character.  If the width is negative, the substring is taken from the
+end.  The substring position (characters to ignore at the start or end of
+the string) may be given by a second optional value after a decimal point.
+For example:
 
     Input File Name     Format Specifier    Output File Name
     ----------------    ----------------    ----------------
@@ -1828,7 +1891,21 @@ point.  For example:
     Picture-123.jpg     %7f.%-3f            Picture.123
     Picture-123a.jpg    Meta%-3.1f.txt      Meta123.txt
 
-This same I<FMT> syntax is used with the B<-o> and B<-TagsFromFile> options.
+For %c, these modifiers have a different effects.  If a field width is given,
+the copy number is padded with zeros to the specified width, and a leading '-'
+is used to add a dash before the copy number.  By default, a copy number of zero
+is omitted, but this can be changed by adding a decimal point to the modifier.
+For example:
+
+    -w A%-cZ.txt      # AZ.txt, A-1Z.txt, A-2Z.txt...
+    -w B%5c.txt       # B.txt, B00001.txt, B00002.txt...
+    -w C%.c.txt       # C0.txt, C1.txt, C2.txt...
+    -w D%-.c.txt      # D-0.txt, D-1.txt, D-2.txt...
+    -w E%-.4c.txt     # E-0000.txt, E-0001.txt, E-0002.txt...
+    -w F_%.c.txt      # F_0.txt, F_1.txt F_2.txt...
+
+This same I<FMT> syntax is used with the B<-o> and B<-TagsFromFile> options,
+although %c is only valid for output file names.
 
 =item B<-x> I<TAG>
 
@@ -2038,8 +2115,9 @@ C<src.jpg>.
 
 Copy meta information C<a.jpg> to an XMP data file.  If the XMP data file
 C<out.xmp> already exists, it will be updated with the new information.
-Otherwise the XMP data file will be created.  Only XMP and ICC files may be
-created like this (other file types may be edited but not created).
+Otherwise the XMP data file will be created.  Only XMP, ICC and MIE files
+may be created like this (other file types may be edited but not created).
+See L</WRITING EXAMPLES> above for another technique to generate XMP files.
 
 =item exiftool -tagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg
 
@@ -2101,10 +2179,14 @@ By writing the C<FileName> and C<Directory> tags, files are renamed and/or
 moved to new directories.  This can be particularly useful and powerful for
 organizing files by date when combined with the B<-d> option.  New
 directories are created as necessary, but existing files will not be
-overwritten.  The file name format codes %d, %f and %e (see the B<-w> option
-for details) may be used to represent the directory, name and extension of
-the original file, but note that if used within a date format string, an
-extra '%' must be added to pass these codes through the date/time parser.
+overwritten.  The format codes %d, %f and %e may be used in the new file
+name to represent the directory, name and extension of the original file,
+and %c may be used to add a copy number if the file already exists (see the
+B<-w> option for details).  Note that if used within a date format string,
+an extra '%' must be added to pass these codes through the date/time parser.
+(And further note that in a Windows batch file, all '%' characters must also
+be escaped, so in this extreme case a '%%%%f' is necessary to pass a simple
+'%f' through the two levels of parsing.)
 
 =over 5
 
@@ -2128,11 +2210,13 @@ C<2005/10/12/image.jpg>.
 
 Rename all files in C<dir> by adding FocalLength to the file name.
 
-=item exiftool '-FileName<CreateDate' -d %Y%m%d_%H%M%S.%%e dir
+=item exiftool '-FileName<CreateDate' -d %Y%m%d_%H%M%S%%-c.%%e dir
 
 Rename all images in C<dir> according to the C<CreateDate> date and time,
-preserving the original file extensions.  Note the extra '%' added to the
-file extension code (C<%%e>) since it is used in a date format string.
+adding a copy number with leading '-' if the file already exists (C<%-c>),
+and preserving the original file extension (C<%e>).  Note the extra '%'
+necessary to escape the filename codes (C<%c> and C<%e>) in the date format
+string.
 
 =item exiftool -r '-FileName<CreateDate' -d %Y-%m-%d/%H%M_%%f.%%e dir
 

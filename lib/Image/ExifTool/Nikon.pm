@@ -27,6 +27,7 @@
 #              13) Roger Larsson private communication (tests with D200)
 #              14) http://homepage3.nifty.com/kamisaka/makernote/makernote_nikon.htm
 #              15) http://tomtia.plala.jp/DigitalCamera/MakerNote/index.asp
+#              16) Jeffrey Friedl private communication (D200 with firmware update)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -36,7 +37,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.51';
+$VERSION = '1.57';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -149,10 +150,11 @@ my %nikonLensIDs = (
     '8A 54 6A 6A 24 24 8C 0E' => 'AF-S VR Micro-Nikkor 105mm f/2.8G IF-ED', #10
     '8B 40 2D 80 2C 3C 8D 0E' => 'AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED',
     '8C 40 2D 53 2C 3C 8E 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
+    '8D 44 5C 8E 34 3C 8F 0E' => 'AF-S VR Zoom-Nikkor 70-300mm f/4.5-5.6G IF-ED', #10
     '8F 40 2D 72 2C 3C 91 06' => 'AF-S DX Zoom-Nikkor 18-135mm f/3.5-5.6G IF-ED',
-    '94 40 2D 53 2C 3C 96 06' => 'AF-S DX 18-55mm f/3.5-5.6G II ED', #10 (D40)
+    '94 40 2D 53 2C 3C 96 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED II', #10 (D40)
 #
-    '06 3F 68 68 2C 2C 06 00' => 'Cosina 100mm F/3.5 Macro',
+    '06 3F 68 68 2C 2C 06 00' => 'Cosina 100mm f/3.5 Macro',
 #
     '26 48 11 11 30 30 1C 02' => 'Sigma 8mm F4 EX Circular Fisheye',
     '48 3C 19 31 30 3C 4B 06' => 'Sigma 10-20mm F4-5.6 EX DC HSM',
@@ -188,7 +190,8 @@ my %nikonLensIDs = (
     '48 54 3E 3E 0C 0C 4B 06' => 'Sigma 30mm F1.4 EX DC HSM',
     '02 40 44 73 2B 36 02 00' => 'Sigma 35-135mm F3.5-4.5 a',
     '32 54 50 50 24 24 35 02' => 'Sigma 50mm F2.8 EX DG Macro',
-    '48 3C 50 A0 30 40 4B 02' => 'Sigma 50-500mmF4-6.3 EX APO RF HSM',
+    '7A 47 50 76 24 24 4B 06' => 'Sigma APO 50-150mm F2.8 EX DC HSM',
+    '48 3C 50 A0 30 40 4B 02' => 'Sigma 50-500mm F4-6.3 EX APO RF HSM',
     '26 3C 54 80 30 3C 1C 06' => 'Sigma 55-200mm F4-5.6 DC',
     '48 54 5C 80 24 24 4B 02' => 'Sigma 70-200mm F2.8 EX APO IF HSM',
     '26 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 DG MACRO',
@@ -207,42 +210,46 @@ my %nikonLensIDs = (
 #
     '03 43 5C 81 35 35 02 00' => 'Soligor AF C/D ZOOM UMCS 70-210mm 1:4.5',
 #
-    '00 3C 1F 37 30 30 00 06' => 'Tokina AT-X 124 AF PRO DX - AF 12-24mm f/4',
-    '00 40 2B 2B 2C 2C 00 02' => 'Tokina AT-X 17 AF PRO - AF 17mm f/3.5',
-    '25 48 3C 5C 24 24 1B 02' => 'Tokina AT-X287AF PRO SV 28-70mm F2.8',
-    '00 48 3C 60 24 24 00 02' => 'Tokina AT-X280AF PRO 28-80mm F2.8 ASPHERICAL',
-    '14 54 60 80 24 24 0B 00' => 'Tokina AT-X828AF 80-200mm F2.8',
-    '24 44 60 98 34 3C 1A 02' => 'Tokina AT-X840AF II 80-400mm F4.5-5.6',
+    '00 40 18 2B 2C 34 00 06' => 'Tokina AT-X 107 DX Fish-Eye - AF 10-17mm F3.5-4.5',
+    '00 3C 1F 37 30 30 00 06' => 'Tokina AT-X 124 AF PRO DX - AF 12-24mm F4',
+    '00 40 2B 2B 2C 2C 00 02' => 'Tokina AT-X 17 AF PRO - AF 17mm F3.5',
+    '25 48 3C 5C 24 24 1B 02' => 'Tokina AT-X 287 AF PRO SV 28-70mm F2.8',
+    '00 48 3C 60 24 24 00 02' => 'Tokina AT-X 280 AF PRO 28-80mm F2.8 ASPHERICAL',
+    '00 48 50 72 24 24 00 06' => 'Tokina AT-X 535 PRO DX - AF 50-135mm F2.8',
+    '14 54 60 80 24 24 0B 00' => 'Tokina AT-X 828 AF 80-200mm F2.8',
+    '24 44 60 98 34 3C 1A 02' => 'Tokina AT-X 840 AF II 80-400mm F4.5-5.6',
     '00 54 68 68 24 24 00 02' => 'Tokina AT-X M100 PRO D - 100mm F2.8',
-    '14 48 68 8E 30 30 0B 00' => 'Tokina AT-X340AF II 100-300mm F4',
-    '00 54 8E 8E 24 24 00 02' => 'Tokina AT-X300AF PRO 300mm F2.8',
+    '14 48 68 8E 30 30 0B 00' => 'Tokina AT-X 340 AF II 100-300mm F4',
+    '00 54 8E 8E 24 24 00 02' => 'Tokina AT-X 300 AF PRO 300mm F2.8',
+    '00 44 60 98 34 3C 00 02' => 'Tokina AT-X 840D 80-400mm F4.5-5.6', #PH
 #
-    '00 36 1C 2D 34 3C 00 06' => 'Tamron SP AF11-18mm F/4.5-5.6 Di II LD Aspherical (IF)',
-    '07 46 2B 44 24 30 03 02' => 'Tamron SP AF17-35mm F/2.8-4 Di LD Aspherical (IF)',
+    '00 36 1C 2D 34 3C 00 06' => 'Tamron SP AF11-18mm f/4.5-5.6 Di II LD Aspherical (IF)',
+    '07 46 2B 44 24 30 03 02' => 'Tamron SP AF17-35mm f/2.8-4 Di LD Aspherical (IF)',
     '00 3F 2D 80 2B 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)',
-    '00 3F 2D 80 2C 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) MACRO',
-    '07 40 30 45 2D 35 03 02' => 'Tamron AF19-35mm F3.5-4.5',
+    '00 3F 2D 80 2C 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro',
+    '07 40 30 45 2D 35 03 02' => 'Tamron AF19-35mm f/3.5-4.5',
     '00 49 30 48 22 2B 00 02' => 'Tamron SP AF20-40mm f/2.7-3.5',
-    '45 41 37 72 2C 3C 48 02' => 'Tamron SP AF24-135mm F3.5-5.6 AD ASPHERICAL(IF)MACRO',
-    '33 54 3C 5E 24 24 62 02' => 'Tamron SP AF28-75mm F2.8 XR Di LD ASPHERICAL(IF)MACRO',
+    '45 41 37 72 2C 3C 48 02' => 'Tamron SP AF24-135mm f/3.5-5.6 AD Aspherical (IF) Macro',
+    '33 54 3C 5E 24 24 62 02' => 'Tamron SP AF28-75mm f/2.8 XR Di LD Aspherical (IF) Macro',
     '10 3D 3C 60 2C 3C D2 02' => 'Tamron AF28-80mm f/3.5-5.6 Aspherical',
-    '45 3D 3C 60 2C 3C 48 02' => 'Tamron AF 28-80mm F3.5-5.6 ASPHERICAL',
+    '45 3D 3C 60 2C 3C 48 02' => 'Tamron AF28-80mm f/3.5-5.6 Aspherical',
     '00 48 3C 6A 24 24 00 02' => 'Tamron SP AF28-105mm f/2.8',
     '0B 3E 3D 7F 2F 3D 0E 02' => 'Tamron AF28-200mm f/3.8-5.6D',
     '0B 3E 3D 7F 2F 3D 0E 00' => 'Tamron AF28-200mm f/3.8-5.6',
     '4D 41 3C 8E 2B 40 62 02' => 'Tamron AF28-300mm f/3.5-6.3 XR Di LD Aspherical (IF)',
     '4D 41 3C 8E 2C 40 62 02' => 'Tamron AF28-300mm f/3.5-6.3D',
-    '69 48 5C 8E 30 3C 6F 02' => 'Tamron AF70-300mm F4-5.6 LD MACRO 1:2',
+    '69 48 5C 8E 30 3C 6F 02' => 'Tamron AF70-300mm f/4-5.6 LD Macro 1:2',
     '32 53 64 64 24 24 35 02' => 'Tamron SP AF90mm f/2.8 Di 1:1 Macro',
-    '00 4C 7C 7C 2C 2C 00 02' => 'Tamron SP AF180mm F3.5 Di Model B01',
+    '00 4C 7C 7C 2C 2C 00 02' => 'Tamron SP AF180mm f/3.5 Di Model B01',
     '20 3C 80 98 3D 3D 1E 02' => 'Tamron AF200-400mm f/5.6 LD IF',
     '00 3E 80 A0 38 3F 00 02' => 'Tamron SP AF200-500mm f/5-6.3 Di LD (IF)',
-    '00 3F 80 A0 38 3F 00 02' => 'Tamron SP AF200-500mm F5-6.3 Di',
+    '00 3F 80 A0 38 3F 00 02' => 'Tamron SP AF200-500mm f/5-6.3 Di',
+    '00 53 2B 50 24 24 00 06' => 'Tamron SP AF17-50mm F2.8 (A16)', #PH
 #
     '00 00 00 00 00 00 00 01' => 'Manual Lens No CPU',
-    '1E 5D 64 64 20 20 13 00' => 'Unknown 90mm F/2.5',
-    '2F 40 30 44 2C 34 29 02' => 'Unknown 20-35mm F/3.5-4.5D',
-    '12 3B 68 8D 3D 43 09 02' => 'Unknown 100-290mm F5.6-6.7',
+    '1E 5D 64 64 20 20 13 00' => 'Unknown 90mm f/2.5',
+    '2F 40 30 44 2C 34 29 02' => 'Unknown 20-35mm f/3.5-4.5D',
+    '12 3B 68 8D 3D 43 09 02' => 'Unknown 100-290mm f/5.6-6.7',
 );
 
 # Nikon maker note tags
@@ -376,13 +383,13 @@ my %nikonLensIDs = (
     },
     0x0019 => { #5
         Name => 'ExposureBracketValue',
-        Format => 'rational64s',
+        Writable => 'rational64s',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         PrintConvInv => 'eval $val',
     },
     0x001a => { #PH
         Name => 'ImageProcessing',
-        Format => 'string',
+        Writable => 'string',
     },
     0x001b => { #15
         Name => 'CropHiSpeed',
@@ -408,6 +415,11 @@ my %nikonLensIDs = (
             1 => 'sRGB',
             2 => 'Adobe RGB',
         },
+    },
+    0x0020 => { #16
+        Name => 'ImageAuthentication',
+        Writable => 'int8u',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
     },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
     0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
@@ -589,7 +601,7 @@ my %nikonLensIDs = (
             },
         },
         {
-            Condition => '$$valPt =~ /^02/', # (0204=D2X,0206=D2Hs,0207=D200)
+            Condition => '$$valPt =~ /^02/', # (D2X=0204,D2Hs=0206,D200=0207,D40=0208)
             Name => 'ColorBalance02',
             Writable => 0,
             SubDirectory => {
@@ -622,7 +634,7 @@ my %nikonLensIDs = (
         },
         # note: this information is encrypted if the version is 02xx
         { #8
-            Condition => '$$valPt =~ /^020(1|2)/', # D80 is version 0202 (PH)
+            Condition => '$$valPt =~ /^020(1|2)/', # D80/D40 are version 0202 (PH)
             Name => 'LensData0201',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensData01',
@@ -968,15 +980,15 @@ my %nikonFocalConversions = (
     0x0c => 'MCUVersion', #8
 );
 
-# Nikon lens data (note: needs decrypting if LensDataVersion is 0201)
+# Nikon lens data (note: needs decrypting if LensDataVersion is 020x)
 %Image::ExifTool::Nikon::LensData01 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 0,
     NOTES => q{
-        Nikon encrypts the LensData information below if LensDataVersion is 0201,
-        but  the decryption algorithm is known so the information can be extracted.
-        It isn't yet writable, however, because the encryption adds complications
-        which make writing more difficult.
+        Nikon encrypts the LensData information below if LensDataVersion is 0201 or
+        higher, but  the decryption algorithm is known so the information can be
+        extracted.  It isn't yet writable, however, because the encryption adds
+        complications which make writing more difficult.
     },
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x00 => {
@@ -996,6 +1008,7 @@ my %nikonFocalConversions = (
         # With older AF lenses this does not work... (ref 13)
         # ie) AF Nikkor 50mm f/1.4 => 48 (0x30)
         # AF Zoom-Nikkor 35-105mm f/3.5-4.5 => @35mm => 15 (0x0f), @105mm => 141 (0x8d)
+        Notes => 'this focus distance is approximate, and not very accurate for some lenses',
         Name => 'FocusDistance',
         ValueConv => '0.01 * 10**($val/40)', # in m
         ValueConvInv => '$val>0 ? 40*log($val*100)/log(10) : 0',
@@ -1336,7 +1349,7 @@ sub ProcessNikon($$$)
             my %subdirInfo = (
                 DataPt   => \$data,
                 DirStart => $offset,
-                DirLen   => length($data),
+                DirLen   => length($data) - $offset,
             );
             if ($verbose > 2) {
                 $exifTool->VerboseDir("Decrypted $$tagInfo{Name}");

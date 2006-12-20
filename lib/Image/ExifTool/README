@@ -119,7 +119,10 @@ with tag keys.  Below is an explanation of the meaning of each special key:
   (or hash value) is the URI.
 
   PREFERRED : Set to true if the tags in this table should always be added when
-  writing information.  Overrides the order specified by SetNewGroups().
+  writing information.  Overrides the order specified by SetNewGroups().  When
+  this feature is used, it may also be desireable to specify a preferred group
+  when calling InitWriteDirs() to write these tags; this avoids creating other
+  directories for tags which are already being creating in the preferred group.
 
   PARENT : Used internally to store the parent table name of a user-defined tag
   table so the appropriate module can be loaded as required.
@@ -135,8 +138,8 @@ with tag keys.  Below is an explanation of the meaning of each special key:
 
   VARS : Used to store additional module-specific variables for the table.
 
-  DATAMEMBER : BinaryData tables only.  Gives a reference to a list of tag ID's
-  which must be extracted as data members when writing.
+  DATAMEMBER : BinaryData tables only.  A reference to a list of tag ID's which
+  must be extracted as data members when writing.
 
 The remaining entries in a tag table are the tag IDs with their associated
 information.  The information may exist in one of three forms:  1) A simple
@@ -204,7 +207,8 @@ numerical.
                   'DataMember' - name of exiftool data member associated with
                   this tag if it should be stored as a special data member when
                   writing information.  Necessary only if the value of the tag
-                  affects other written information.
+                  affects other written information.  Currently only used for
+                  tags in EXIF tables.
 
                   'DataTag' - associated tag name containing data for offset or
                   byte count tags.
@@ -282,13 +286,13 @@ numerical.
                   and $self as arguments.  For Composite tags, $val is a
                   reference to a hash of component tag names, and @val may be
                   used to access the Raw values of these tags. The returned
-                  value may be a scalar with is used as the new Raw value, a
+                  value may be a scalar which is used as the new Raw value, a
                   scalar reference to a binary data value, or undefined to
                   indicate that the tag should be ignored.  Note: RawConv should
-                  only be used if necessary.  It is preferable to use ValueConv
-                  instead of RawConv because ValueConv is only executed if the
-                  tag value is requested, while RawConv is executed for all
-                  extracted tags.
+                  only be used if necessary (in general, only if the tag may
+                  be ignored).  It is preferable to use ValueConv instead of
+                  RawConv because ValueConv is only executed if the tag value is
+                  requested, while RawConv is executed for all extracted tags.
 
   ValueConv     : Used to convert the Raw value to a useable form. May be a hash
                   reference to act as a lookup table, a scalar which is
@@ -330,11 +334,22 @@ numerical.
                   (which it is by default), and if the result of the ValueConv
                   is not a scalar reference.
 
+  RawConvInv    : The inverse of RawConv.  This should only be used in very rare
+                  situations when the raw value can not be predetermined.
+                  Unlike the other inverse conversions which are applied in
+                  SetNewValue(), this conversion is applied in WriteInfo() as
+                  the file is being written.  This is important because it means
+                  that FILE_TYPE and any DataMember tags ocurring before this
+                  tag in the file are available.  Beware that if the return
+                  value is not defined, the tag will be deleted unless there is
+                  specific code to avoid this (currently, only EXIF and Binary
+                  data directories handle this case).
+
   ValueConvInv  : The inverse of ValueConv.  Only necessary if ValueConv is
                   specified and this tag is Writable.  Note that DataMember tags
                   may NOT be used in the inverse conversions because these
                   conversions are done before the input file is parsed.
-                  Instead, a Condition must be used.
+                  Instead, a Condition or RawConvInv must be used.
 
   PrintConvInv  : The inverse of PrintConv.  Only necessary if PrintConv is
                   specified and this tag is Writable.
@@ -419,6 +434,9 @@ numerical.
 
   Struct        : [XMP tags only] Used by XMP writer code to specify name of XMP
                   structure so the PropertyPath can be determined.
+
+  Units         : [MIE tags only] Reference to a list of valid units strings.
+                  The default units are the first item in the list.
 
   TagID         : [reserved] This entry is used internally by GetTagID() to
                   cache tag ID numbers for speed.

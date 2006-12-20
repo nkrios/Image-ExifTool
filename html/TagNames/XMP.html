@@ -1,9 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>XMP Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>XMP Tags</h2>
+<body>
+<h2 class='top'>XMP Tags</h2>
 
 XMP stands for &quot;Extensible Metadata Platform&quot;, an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
@@ -36,310 +39,314 @@ tag names because it is used to store application-defined PDF information,
 but this information is extracted by ExifTool anyway.
 
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Namespace</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Namespace</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>aux</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#aux'>XMP aux Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>cc</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#cc'>XMP cc Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>crs</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#crs'>XMP crs Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>dc</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#dc'>XMP dc Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>dex</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#dex'>XMP dex Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>exif</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#exif'>XMP exif Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>iptcCore</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#iptcCore'>XMP iptcCore Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>pdf</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#pdf'>XMP pdf Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>photomech</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='PhotoMechanic.html#XMP'>PhotoMechanic XMP Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>photoshop</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#photoshop'>XMP photoshop Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>PixelLive</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#PixelLive'>XMP PixelLive Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>tiff</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#tiff'>XMP tiff Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>xmp</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#xmp'>XMP xmp Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>xmpBJ</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#xmpBJ'>XMP xmpBJ Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>xmpDM</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#xmpDM'>XMP xmpDM Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>xmpMM</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#xmpMM'>XMP xmpMM Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>xmpPLUS</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#xmpPLUS'>XMP xmpPLUS Tags</a></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>xmpRights</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#xmpRights'>XMP xmpRights Tags</a></td></tr>
-<tr valign='top'>
+<tr>
 <td>xmpTPg</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='XMP.html#xmpTPg'>XMP xmpTPg Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='aux'>XMP aux Tags</a></h2>
 Photoshop Auxiliary schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>Firmware</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FlashCompensation</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ImageNumber</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Lens</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>LensInfo</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>OwnerName</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>SerialNumber</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='cc'>XMP cc Tags</a></h2>
 Creative Commons schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>License</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='crs'>XMP crs Tags</a></h2>
 Photoshop Camera Raw Schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>AutoBrightness</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>AutoContrast</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>AutoExposure</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>AutoShadows</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>BlueHue</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>BlueSaturation</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Brightness</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CameraProfile</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ChromaticAberrationB</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ChromaticAberrationR</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ColorNoiseReduction</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Contrast</td>
-<td align='center'>integer/</td>
+<td class='c'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CropAngle</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CropBottom</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CropHeight</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CropLeft</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CropRight</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CropTop</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CropUnits</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = pixels
+<td class='c'>integer</td>
+<td><span class='s'>0 = pixels
   <br>1 = inches
-  <br>2 = cm</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = cm</span></td></tr>
+<tr class='b'>
 <td>CropWidth</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Exposure</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GreenHue</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GreenSaturation</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>HasCrop</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>HasSettings</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>LuminanceSmoothing</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RawFileName</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>RedHue</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RedSaturation</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Saturation</td>
-<td align='center'>integer/</td>
+<td class='c'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Shadows</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ShadowTint</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Sharpness</td>
-<td align='center'>integer/</td>
+<td class='c'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Temperature</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Tint</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ToneCurve</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ToneCurveName</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;Custom&#39; = Custom
+<td class='c'>string</td>
+<td><span class='s'>&#39;Custom&#39; = Custom
   <br>&#39;Linear&#39; = Linear
   <br>&#39;Medium Contrast&#39; = Medium Contrast
-  <br>&#39;Strong Contrast&#39; = Strong Contrast</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>&#39;Strong Contrast&#39; = Strong Contrast</span></td></tr>
+<tr class='b'>
 <td>Version</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VignetteAmount</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VignetteMidpoint</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>WhiteBalance</td>
-<td align='center'>string/</td>
-<td><font size='-1'>&#39;As Shot&#39; = As Shot
+<td class='c'>string/</td>
+<td><span class='s'>&#39;As Shot&#39; = As Shot
   <br>&#39;Auto&#39; = Auto
   <br>&#39;Cloudy&#39; = Cloudy
   <br>&#39;Custom&#39; = Custom
@@ -347,74 +354,75 @@ Photoshop Camera Raw Schema tags.
   <br>&#39;Flash&#39; = Flash
   <br>&#39;Fluorescent&#39; = Fluorescent
   <br>&#39;Shade&#39; = Shade
-  <br>&#39;Tungsten&#39; = Tungsten</font></td></tr>
+  <br>&#39;Tungsten&#39; = Tungsten</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='dc'>XMP dc Tags</a></h2>
 Dublin Core schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>Contributor</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Coverage</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Creator</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Date</td>
-<td align='center'>date+</td>
+<td class='c'>date+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Description</td>
-<td align='center'>lang-alt</td>
+<td class='c'>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Format</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Identifier</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Language</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Publisher</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Relation</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Rights</td>
-<td align='center'>lang-alt</td>
+<td class='c'>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Source</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Subject</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Title</td>
-<td align='center'>lang-alt</td>
+<td class='c'>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Type</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -423,364 +431,366 @@ Description Explorer schema tags.  These tags are not very common.  The
 Source and Rating tags are avoided when writing due to name conflicts with
 other XMP tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>CRC32</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FFID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>LicenseType</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;adware&#39; = Adware
+<td class='c'>string</td>
+<td><span class='s'>&#39;adware&#39; = Adware
   <br>&#39;commercial&#39; = Commercial
   <br>&#39;demo&#39; = Demo
   <br>&#39;freeware&#39; = Freeware
   <br>&#39;open source&#39; = Open Source
   <br>&#39;public domain&#39; = Public Domain
   <br>&#39;shareware&#39; = Shareware
-  <br>&#39;unknown&#39; = Unknown</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>&#39;unknown&#39; = Unknown</span></td></tr>
+<tr class='b'>
 <td>OS</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Rating</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Revision</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ShortDescription</td>
-<td align='center'>lang-alt</td>
+<td class='c'>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Source</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='exif'>XMP exif Tags</a></h2>
 EXIF schema for EXIF tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>ApertureValue</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>BrightnessValue</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CFAPatternColumns</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CFAPatternRows</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CFAPatternValues</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ColorSpace</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = sRGB
+<td class='c'>integer</td>
+<td><span class='s'>1 = sRGB
   <br>2 = Adobe RGB
   <br>65535 = Uncalibrated
-  <br>4294967295 = Uncalibrated</font></td></tr>
-<tr valign='top'>
+  <br>4294967295 = Uncalibrated</span></td></tr>
+<tr>
 <td>ComponentsConfiguration</td>
-<td align='center'>integer+</td>
-<td><font size='-1'>0 = .
+<td class='c'>integer+</td>
+<td><span class='s'>0 = .
   <br>1 = Y
   <br>2 = Cb
   <br>3 = Cr
   <br>4 = R
   <br>5 = G
-  <br>6 = B</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>6 = B</span></td></tr>
+<tr class='b'>
 <td>CompressedBitsPerPixel</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Contrast</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Normal
+<td class='c'>integer</td>
+<td><span class='s'>0 = Normal
   <br>1 = Low
-  <br>2 = High</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = High</span></td></tr>
+<tr class='b'>
 <td>CustomRendered</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Normal
-  <br>1 = Custom</font></td></tr>
-<tr valign='top'>
+<td class='c'>integer</td>
+<td><span class='s'>0 = Normal
+  <br>1 = Custom</span></td></tr>
+<tr>
 <td>DateTimeDigitized</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DateTimeOriginal</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DeviceSettingDescriptionColumns</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DeviceSettingDescriptionRows</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DeviceSettingDescriptionSettings</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DigitalZoomRatio</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ExifVersion</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ExposureCompensation</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ExposureIndex</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ExposureMode</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Auto
+<td class='c'>integer</td>
+<td><span class='s'>0 = Auto
   <br>1 = Manual
-  <br>2 = Auto bracket</font></td></tr>
-<tr valign='top'>
+  <br>2 = Auto bracket</span></td></tr>
+<tr>
 <td>ExposureProgram</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = Manual
+<td class='c'>integer</td>
+<td><span class='s'>1 = Manual
   <br>2 = Program AE
   <br>3 = Aperture-priority AE
   <br>4 = Shutter speed priority AE
   <br>5 = Creative (Slow speed)
   <br>6 = Action (High speed)
   <br>7 = Portrait
-  <br>8 = Landscape</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>8 = Landscape</span></td></tr>
+<tr class='b'>
 <td>ExposureTime</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FileSource</td>
-<td align='center'>integer</td>
-<td><font size='-1'>3 = Digital Camera</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>integer</td>
+<td><span class='s'>3 = Digital Camera</span></td></tr>
+<tr class='b'>
 <td>FlashEnergy</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FlashFired</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FlashFunction</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FlashMode</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Unknown
+<td class='c'>integer</td>
+<td><span class='s'>0 = Unknown
   <br>1 = On
   <br>2 = Off
-  <br>3 = Auto</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>3 = Auto</span></td></tr>
+<tr class='b'>
 <td>FlashpixVersion</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FlashRedEyeMode</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FlashReturn</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = No return detection
+<td class='c'>integer</td>
+<td><span class='s'>0 = No return detection
   <br>2 = Return not detected
-  <br>3 = Return detected</font></td></tr>
-<tr valign='top'>
+  <br>3 = Return detected</span></td></tr>
+<tr>
 <td>FNumber</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FocalLength</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FocalLengthIn35mmFormat</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FocalPlaneResolutionUnit</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = mm
+<td class='c'>integer</td>
+<td><span class='s'>1 = mm
   <br>10 = cm
   <br>&#39;0.001&#39; = um
-  <br>&#39;25.4&#39; = inches</font></td></tr>
-<tr valign='top'>
+  <br>&#39;25.4&#39; = inches</span></td></tr>
+<tr>
 <td>FocalPlaneXResolution</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FocalPlaneYResolution</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GainControl</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = None
+<td class='c'>integer</td>
+<td><span class='s'>0 = None
   <br>1 = Low gain up
   <br>2 = High gain up
   <br>3 = Low gain down
-  <br>4 = High gain down</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>4 = High gain down</span></td></tr>
+<tr class='b'>
 <td>GPSAltitude</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GPSAltitudeRef</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Above Sea Level
-  <br>1 = Below Sea Level</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>integer</td>
+<td><span class='s'>0 = Above Sea Level
+  <br>1 = Below Sea Level</span></td></tr>
+<tr class='b'>
 <td>GPSAreaInformation</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GPSDestBearing</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSDestBearingRef</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;M&#39; = Magnetic North
-  <br>&#39;T&#39; = True North</font></td></tr>
-<tr valign='top'>
+<td class='c'>string</td>
+<td><span class='s'>&#39;M&#39; = Magnetic North
+  <br>&#39;T&#39; = True North</span></td></tr>
+<tr>
 <td>GPSDestDistance</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSDestDistanceRef</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;K&#39; = Kilometers
+<td class='c'>string</td>
+<td><span class='s'>&#39;K&#39; = Kilometers
   <br>&#39;M&#39; = Miles
-  <br>&#39;N&#39; = Nautical Miles</font></td></tr>
-<tr valign='top'>
+  <br>&#39;N&#39; = Nautical Miles</span></td></tr>
+<tr>
 <td>GPSDestLatitude</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSDestLongitude</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GPSDifferential</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = No Correction
-  <br>1 = Differential Corrected</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>integer</td>
+<td><span class='s'>0 = No Correction
+  <br>1 = Differential Corrected</span></td></tr>
+<tr class='b'>
 <td>GPSDOP</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GPSImgDirection</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSImgDirectionRef</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;M&#39; = Magnetic North
-  <br>&#39;T&#39; = True North</font></td></tr>
-<tr valign='top'>
+<td class='c'>string</td>
+<td><span class='s'>&#39;M&#39; = Magnetic North
+  <br>&#39;T&#39; = True North</span></td></tr>
+<tr>
 <td>GPSLatitude</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSLongitude</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GPSMapDatum</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSMeasureMode</td>
-<td align='center'>integer</td>
-<td><font size='-1'>2 = 2-Dimensional
-  <br>3 = 3-Dimensional</font></td></tr>
-<tr valign='top'>
+<td class='c'>integer</td>
+<td><span class='s'>2 = 2-Dimensional
+  <br>3 = 3-Dimensional</span></td></tr>
+<tr>
 <td>GPSProcessingMethod</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSSatellites</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GPSSpeed</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSSpeedRef</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;K&#39; = km/h
+<td class='c'>string</td>
+<td><span class='s'>&#39;K&#39; = km/h
   <br>&#39;M&#39; = mph
-  <br>&#39;N&#39; = knots</font></td></tr>
-<tr valign='top'>
+  <br>&#39;N&#39; = knots</span></td></tr>
+<tr>
 <td>GPSStatus</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;A&#39; = Measurement In Progress
-  <br>&#39;V&#39; = Measurement Interoperability</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>string</td>
+<td><span class='s'>&#39;A&#39; = Measurement In Progress
+  <br>&#39;V&#39; = Measurement Interoperability</span></td></tr>
+<tr class='b'>
 <td>GPSTimeStamp</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>GPSTrack</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>GPSTrackRef</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;M&#39; = Magnetic North
-  <br>&#39;T&#39; = True North</font></td></tr>
-<tr valign='top'>
+<td class='c'>string</td>
+<td><span class='s'>&#39;M&#39; = Magnetic North
+  <br>&#39;T&#39; = True North</span></td></tr>
+<tr>
 <td>GPSVersionID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ImageUniqueID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ISO</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>LightSource</td>
-<td align='center'>string</td>
-<td><font size='-1'>1 = Daylight
+<td class='c'>string</td>
+<td><span class='s'>1 = Daylight
   <br>2 = Fluorescent
   <br>3 = Tungsten
   <br>4 = Flash
@@ -799,138 +809,138 @@ EXIF schema for EXIF tags.
   <br>22 = D75
   <br>23 = D50
   <br>24 = ISO Studio Tungsten
-  <br>255 = Other</font></td></tr>
-<tr valign='top'>
+  <br>255 = Other</span></td></tr>
+<tr>
 <td>MakerNote</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>MaxApertureValue</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>MeteringMode</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = Average
+<td class='c'>integer</td>
+<td><span class='s'>1 = Average
   <br>2 = Center-weighted average
   <br>3 = Spot
   <br>4 = Multi-spot
   <br>5 = Multi-segment
   <br>6 = Partial
-  <br>255 = Other</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>255 = Other</span></td></tr>
+<tr class='b'>
 <td>OECFColumns</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>OECFNames</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>OECFRows</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>OECFValues</td>
-<td align='center'>rational+</td>
+<td class='c'>rational+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ExifImageWidth</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ExifImageLength</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>RelatedSoundFile</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Saturation</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Normal
+<td class='c'>integer</td>
+<td><span class='s'>0 = Normal
   <br>1 = Low
-  <br>2 = High</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = High</span></td></tr>
+<tr class='b'>
 <td>SceneCaptureType</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Standard
+<td class='c'>integer</td>
+<td><span class='s'>0 = Standard
   <br>1 = Landscape
   <br>2 = Portrait
-  <br>3 = Night</font></td></tr>
-<tr valign='top'>
+  <br>3 = Night</span></td></tr>
+<tr>
 <td>SceneType</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = Directly photographed</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>integer</td>
+<td><span class='s'>1 = Directly photographed</span></td></tr>
+<tr class='b'>
 <td>SensingMethod</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = Not defined
+<td class='c'>integer</td>
+<td><span class='s'>1 = Not defined
   <br>2 = One-chip color area
   <br>3 = Two-chip color area
   <br>4 = Three-chip color area
   <br>5 = Color sequential area
   <br>7 = Trilinear
-  <br>8 = Color sequential linear</font></td></tr>
-<tr valign='top'>
+  <br>8 = Color sequential linear</span></td></tr>
+<tr>
 <td>Sharpness</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Normal
+<td class='c'>integer</td>
+<td><span class='s'>0 = Normal
   <br>1 = Soft
-  <br>2 = Hard</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = Hard</span></td></tr>
+<tr class='b'>
 <td>ShutterSpeedValue</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>SpatialFrequencyResponseColumns</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>SpatialFrequencyResponseNames</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>SpatialFrequencyResponseRows</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>SpatialFrequencyResponseValues</td>
-<td align='center'>rational+</td>
+<td class='c'>rational+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>SpectralSensitivity</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>SubjectArea</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>SubjectDistance</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>SubjectDistanceRange</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Unknown
+<td class='c'>integer</td>
+<td><span class='s'>0 = Unknown
   <br>1 = Macro
   <br>2 = Close
-  <br>3 = Distant</font></td></tr>
-<tr valign='top'>
+  <br>3 = Distant</span></td></tr>
+<tr>
 <td>SubjectLocation</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>UserComment</td>
-<td align='center'>lang-alt</td>
+<td class='c'>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>WhiteBalance</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = Auto
-  <br>1 = Manual</font></td></tr>
+<td class='c'>integer</td>
+<td><span class='s'>0 = Auto
+  <br>1 = Manual</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='iptcCore'>XMP iptcCore Tags</a></h2>
@@ -938,60 +948,61 @@ IPTC Core schema tags.  The actual IPTC Core namespace schema prefix is
 &quot;Iptc4xmpCore&quot;, which is the prefix recorded in the file, but ExifTool
 shortens this for the &quot;XMP-iptcCore&quot; family 1 group name.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>CountryCode</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CreatorContactInfoCiAdrCity</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CreatorContactInfoCiAdrCtry</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CreatorContactInfoCiAdrExtadr</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CreatorContactInfoCiAdrPcode</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CreatorContactInfoCiAdrRegion</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CreatorContactInfoCiEmailWork</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CreatorContactInfoCiTelWork</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CreatorContactInfoCiUrlWork</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>IntellectualGenre</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Location</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Scene</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>SubjectCode</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1001,108 +1012,110 @@ Keywords, PDFVersion and Producer.  The other tags are included because they
 have been observed in PDF files, but Creator, Subject and Title are avoided
 when writing due to name conflicts with XMP-dc tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>Author</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CreationDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Creator</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Keywords</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ModDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>PDFVersion</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Producer</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Subject</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Title</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='photoshop'>XMP photoshop Tags</a></h2>
 Adobe Photoshop schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>AuthorsPosition</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CaptionWriter</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Category</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>City</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Country</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Credit</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DateCreated</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Headline</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Instructions</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Source</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>State</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>SupplementalCategories</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>TransmissionReference</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Urgency</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1111,53 +1124,55 @@ PixelLive schema tags.  These tags are not writable becase they are very
 uncommon and I haven&#39;t been able to locate a reference which gives the
 namespace URI.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>Author</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Comments</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Copyright</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Date</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Genre</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Title</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='tiff'>XMP tiff Tags</a></h2>
 EXIF schema for TIFF tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>Artist</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>BitsPerSample</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Compression</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = Uncompressed
+<td class='c'>integer</td>
+<td><span class='s'>1 = Uncompressed
   <br>2 = CCITT 1D
   <br>3 = T4/Group 3 Fax
   <br>4 = T6/Group 4 Fax
@@ -1183,50 +1198,50 @@ EXIF schema for TIFF tags.
   <br>34676 = SGILog
   <br>34677 = SGILog24
   <br>34712 = JPEG 2000
-  <br>34713 = Nikon NEF Compressed</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>34713 = Nikon NEF Compressed</span></td></tr>
+<tr class='b'>
 <td>Copyright</td>
-<td align='center'>lang-alt</td>
+<td class='c'>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DateTime</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ImageDescription</td>
-<td align='center'>lang-alt</td>
+<td class='c'>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ImageHeight</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ImageWidth</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Make</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Model</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Orientation</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = Horizontal (normal)
+<td class='c'>integer</td>
+<td><span class='s'>1 = Horizontal (normal)
   <br>2 = Mirror horizontal
   <br>3 = Rotate 180
   <br>4 = Mirror vertical
   <br>5 = Mirror horizontal and rotate 270 CW
   <br>6 = Rotate 90 CW
   <br>7 = Mirror horizontal and rotate 90 CW
-  <br>8 = Rotate 270 CW</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>8 = Rotate 270 CW</span></td></tr>
+<tr class='b'>
 <td>PhotometricInterpretation</td>
-<td align='center'>integer</td>
-<td><font size='-1'>0 = WhiteIsZero
+<td class='c'>integer</td>
+<td><span class='s'>0 = WhiteIsZero
   <br>1 = BlackIsZero
   <br>2 = RGB
   <br>3 = RGB Palette
@@ -1239,67 +1254,67 @@ EXIF schema for TIFF tags.
   <br>32803 = Color Filter Array
   <br>32844 = Pixar LogL
   <br>32845 = Pixar LogLuv
-  <br>34892 = Linear Raw</font></td></tr>
-<tr valign='top'>
+  <br>34892 = Linear Raw</span></td></tr>
+<tr>
 <td>PlanarConfiguration</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = Chunky
-  <br>2 = Planar</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>integer</td>
+<td><span class='s'>1 = Chunky
+  <br>2 = Planar</span></td></tr>
+<tr class='b'>
 <td>PrimaryChromaticities</td>
-<td align='center'>rational+</td>
+<td class='c'>rational+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ReferenceBlackWhite</td>
-<td align='center'>rational+</td>
+<td class='c'>rational+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ResolutionUnit</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = None
+<td class='c'>integer</td>
+<td><span class='s'>1 = None
   <br>2 = inches
-  <br>3 = cm</font></td></tr>
-<tr valign='top'>
+  <br>3 = cm</span></td></tr>
+<tr>
 <td>SamplesPerPixel</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Software</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>TransferFunction</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>WhitePoint</td>
-<td align='center'>rational+</td>
+<td class='c'>rational+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>XResolution</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>YCbCrCoefficients</td>
-<td align='center'>rational+</td>
+<td class='c'>rational+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>YCbCrPositioning</td>
-<td align='center'>integer</td>
-<td><font size='-1'>1 = Centered
-  <br>2 = Co-sited</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>integer</td>
+<td><span class='s'>1 = Centered
+  <br>2 = Co-sited</span></td></tr>
+<tr class='b'>
 <td>YCbCrSubSampling</td>
-<td align='center'>string</td>
-<td><font size='-1'>&#39;1 1&#39; = YCbCr4:4:4
+<td class='c'>string</td>
+<td><span class='s'>&#39;1 1&#39; = YCbCr4:4:4
   <br>&#39;1 2&#39; = YCbCr4:4:0
   <br>&#39;2 1&#39; = YCbCr4:2:2
   <br>&#39;2 2&#39; = YCbCr4:2:0
   <br>&#39;4 1&#39; = YCbCr4:1:1
-  <br>&#39;4 2&#39; = YCbCr4:1:0</font></td></tr>
-<tr valign='top'>
+  <br>&#39;4 2&#39; = YCbCr4:1:0</span></td></tr>
+<tr>
 <td>YResolution</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1308,826 +1323,833 @@ XMP Basic schema tags.  If the older &quot;xap&quot;, &quot;xapBJ&quot;, &quot;x
 namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 &quot;xmpBJ&quot;, &quot;xmpMM&quot; and &quot;xmpRights&quot; prefixes for use in family 1 group names.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>Advisory</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>BaseURL</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>CreateDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>CreatorTool</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Identifier</td>
-<td align='center'>string/+</td>
+<td class='c'>string/+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Label</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>MetadataDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ModifyDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Nickname</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Rating</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ThumbnailsFormat</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ThumbnailsHeight</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ThumbnailsImage</td>
-<td align='center'>N+</td>
+<td class='c'>N+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ThumbnailsWidth</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmpBJ'>XMP xmpBJ Tags</a></h2>
 XMP Basic Job Ticket schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>JobRefId</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>JobRefName</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>JobRefUrl</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmpDM'>XMP xmpDM Tags</a></h2>
 XMP Dynamic Media schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>AbsPeakAudioFilePath</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Album</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>AltTapeName</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>AltTimecodeTimeFormat</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>AltTimecodeTimeValue</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Artist</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>AudioChannelType</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>AudioCompressor</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>AudioModDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>AudioSampleRate</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>AudioSampleType</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>BeatSpliceParamsRiseInDecibel</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>BeatSpliceParamsRiseInTimeDuration</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>BeatSpliceParamsUseFileBeatsMarker</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Composer</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ContributedMediaDuration</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ContributedMediaManaged</td>
-<td align='center'>boolean+</td>
+<td class='c'>boolean+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ContributedMediaPath</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ContributedMediaStartTime</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ContributedMediaTrack</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ContributedMediaWebStatement</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Copyright</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Duration</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Engineer</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FileDataRate</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Genre</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Instrument</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>IntroTime</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Key</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>LogComment</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Loop</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>MarkersComment</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>MarkersDuration</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>MarkersLocation</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>MarkersName</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>MarkersStartTime</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>MarkersTarget</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>MarkersType</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>MetadataModDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>NumberOfBeats</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>OutCue</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ProjectRefPath</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ProjectRefType</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>PullDown</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RelativePeakAudioFilePath</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>RelativeTimestamp</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ReleaseDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ResampleParamsQuality</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ScaleType</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Scene</td>
-<td align='center'>string/</td>
+<td class='c'>string/</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ShotDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ShotLocation</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ShotName</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>SpeakerPlacement</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>StartTimecodeTimeFormat</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>StartTimecodeTimeValue</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>StretchMode</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>TapeName</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Tempo</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>TimeScaleParamsFrameOverlappingPercentage</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>TimeScaleParamsFrameSize</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>TimeScaleParamsQuality</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>TimeSignature</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>TrackNumber</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoAlphaMode</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoAlphaPremultipleColorA</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoAlphaPremultipleColorB</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoAlphaPremultipleColorBlack</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoAlphaPremultipleColorBlue</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoAlphaPremultipleColorCyan</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoAlphaPremultipleColorGreen</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoAlphaPremultipleColorL</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoAlphaPremultipleColorMagenta</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoAlphaPremultipleColorMode</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoAlphaPremultipleColorRed</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoAlphaPremultipleColorSwatchName</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoAlphaPremultipleColorType</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoAlphaPremultipleColorYellow</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoAlphaUnityIsTransparent</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoColorSpace</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoCompressor</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoFieldOrder</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoFrameRate</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoFrameSizeH</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoFrameSizeUnit</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoFrameSizeW</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoModDate</td>
-<td align='center'>date</td>
+<td class='c'>date</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VideoPixelAspectRatio</td>
-<td align='center'>rational</td>
+<td class='c'>rational</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VideoPixelDepth</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmpMM'>XMP xmpMM Tags</a></h2>
 XMP Media Management schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>DerivedFromDocumentID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DerivedFromInstanceID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DerivedFromManager</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DerivedFromManagerVariant</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DerivedFromManageTo</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DerivedFromManageUI</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DerivedFromRenditionClass</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DerivedFromRenditionParams</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>DerivedFromVersionID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>DocumentID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>HistoryAction</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>HistoryInstanceID</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>HistoryParameters</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>HistorySoftwareAgent</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>HistoryWhen</td>
-<td align='center'>date+</td>
+<td class='c'>date+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>LastURL</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ManagedFromDocumentID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ManagedFromInstanceID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ManagedFromManager</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ManagedFromManagerVariant</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ManagedFromManageTo</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ManagedFromManageUI</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ManagedFromRenditionClass</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ManagedFromRenditionParams</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ManagedFromVersionID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Manager</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ManagerVariant</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ManageTo</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ManageUI</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>PreservedFileName</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RenditionClass</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>RenditionOfDocumentID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RenditionOfInstanceID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>RenditionOfManager</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RenditionOfManagerVariant</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>RenditionOfManageTo</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RenditionOfManageUI</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>RenditionOfRenditionClass</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RenditionOfRenditionParams</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>RenditionOfVersionID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>RenditionParams</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>SaveID</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VersionID</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VersionsComments</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VersionsEventAction</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VersionsEventInstanceID</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VersionsEventParameters</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VersionsEventSoftwareAgent</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VersionsEventWhen</td>
-<td align='center'>date+</td>
+<td class='c'>date+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VersionsModifier</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>VersionsModifyDate</td>
-<td align='center'>date+</td>
+<td class='c'>date+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>VersionsVersion</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmpPLUS'>XMP xmpPLUS Tags</a></h2>
 XMP Picture Licensing Universal System (PLUS) schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>CreditLineReq</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ReuseAllowed</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmpRights'>XMP xmpRights Tags</a></h2>
 XMP Rights Management schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>Certificate</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Marked</td>
-<td align='center'>boolean</td>
+<td class='c'>boolean</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Owner</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>UsageTerms</td>
-<td align='center'>lang-alt</td>
+<td class='c'>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>WebStatement</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmpTPg'>XMP xmpTPg Tags</a></h2>
 XMP Paged-Text schema tags.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>ColorantsA</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ColorantsB</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ColorantsBlack</td>
-<td align='center'>real+</td>
+<td class='c'>real+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ColorantsBlue</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ColorantsCyan</td>
-<td align='center'>real+</td>
+<td class='c'>real+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ColorantsGreen</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ColorantsL</td>
-<td align='center'>real+</td>
+<td class='c'>real+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ColorantsMagenta</td>
-<td align='center'>real+</td>
+<td class='c'>real+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ColorantsMode</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ColorantsRed</td>
-<td align='center'>integer+</td>
+<td class='c'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ColorantsSwatchName</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>ColorantsType</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>ColorantsYellow</td>
-<td align='center'>real+</td>
+<td class='c'>real+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FontsChildFontFiles</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FontsComposite</td>
-<td align='center'>boolean+</td>
+<td class='c'>boolean+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FontsFontFace</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FontsFontFamily</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FontsFontFileName</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FontsFontName</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>FontsFontType</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>FontsVersionString</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>MaxPageSizeH</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>MaxPageSizeUnit</td>
-<td align='center'>string</td>
+<td class='c'>string</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>MaxPageSizeW</td>
-<td align='center'>real</td>
+<td class='c'>real</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>NPages</td>
-<td align='center'>integer</td>
+<td class='c'>integer</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>PlateNames</td>
-<td align='center'>string+</td>
+<td class='c'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Oct 30, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

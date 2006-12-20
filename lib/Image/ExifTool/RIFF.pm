@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 # type of current stream
 $Image::ExifTool::RIFF::streamType = '';
@@ -228,7 +228,7 @@ my %riffEncoding = ( #2
     ICRD => {
         Name => 'DateCreated',
         Groups => { 2 => 'Time' },
-        ValueConv => '$val=~s/-/:/g;$val',
+        ValueConv => '$_=$val; s/-/:/g; s/\0.*//s; $_',
     },
     ICRP => 'Cropped',
     IDIM => 'Dimensions',
@@ -278,6 +278,7 @@ my %riffEncoding = ( #2
         Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         ValueConv => 'Image::ExifTool::RIFF::ConvertRIFFDate($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     ISMP => 'TimeCode',
     LIST_strl => {

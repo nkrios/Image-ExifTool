@@ -11,7 +11,7 @@ package Image::ExifTool::HtmlDump;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.10';
 
 sub DumpTable($$$;$$$$);
 sub Open($$$;@);
@@ -33,47 +33,42 @@ my $htmlHeader2 = <<_END_PART_2_;
 <style type="text/css">
 <!--
 /* character style ID's */
-#D { color: #000000 } /* default color */
-#V { color: #ff0000 } /* duplicate block 1 */
-#W { color: #004400 } /* normal block 1 */
-#X { color: #ff4488 } /* duplicate block 2 */
-#Y { color: #448844 } /* normal block 2 */
-#U { color: #cc8844 } /* unused data block */
-#H { color: #0000ff } /* highlighted tag name */
-#M { text-decoration: underline } /* maker notes data */
+.D { color: #000000 } /* default color */
+.V { color: #ff0000 } /* duplicate block 1 */
+.W { color: #004400 } /* normal block 1 */
+.X { color: #ff4488 } /* duplicate block 2 */
+.Y { color: #448844 } /* normal block 2 */
+.U { color: #cc8844 } /* unused data block */
+.H { color: #0000ff } /* highlighted tag name */
+.F { color: #aa00dd } /* actual offset differs */
+.M { text-decoration: underline } /* maker notes data */
 /* table styles */
 table.dump {
-  border-top-style: solid;
-  border-bottom-style: solid;
-  border-width: 1;
-  border-color: #888888;
-  padding-top: 4;
-  padding-bottom: 4;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
 }
-table.dump td {
-  padding-left: 4;
-  padding-right: 4;
-}
+table.dump td { padding: .2em .3em }
 td.c2 {
-  border-left-style: solid;
-  border-right-style: solid;
-  border-width: 1;
-  border-color: #888888;
-  padding-left: 4;
-  padding-right: 4;
+  border-left: 1px solid gray;
+  border-right: 1px solid gray;
 }
 -->
 </style>
 <script language="JavaScript" type="text/JavaScript">
 <!-- Begin
 var t = new Array;
-function GetSpansByClass(classname) {
+var mspan = new Array;
+function GetElementsByClass(classname, tagname) {
   var found = new Array();
-  var list = document.getElementsByTagName('span');
+  var list = document.getElementsByTagName(tagname);
   var len = list.length;
   for (var i=0, j=0; i<len; ++i) {
-    if (list[i].className == classname) {
-      found[j++] = list[i];
+    var classes = list[i].className.split(' ');
+    for (var k=0; k<classes.length; ++k) {
+      if (classes[k] == classname) {
+        found[j++] = list[i];
+        break;
+      }
     }
   }
   delete list;
@@ -104,10 +99,14 @@ function high(e,on) {
       list[i].style.background = col;
       if (tip) list[i].title += tip;
     }
-    // use class name to highlight corresponding span elements
-    list = GetSpansByClass(targ.name);
-    for (var i=0; i<list.length; ++i) {
-      list[i].style.background = col;
+    // use class name to highlight span elements if necessary
+    for (var i=0; i<mspan.length; ++i) {
+      if (mspan[i] != targ.name) continue;
+      list = GetElementsByClass(targ.name, 'span');
+      for (var j=0; j<list.length; ++j) {
+        list[j].style.background = col;
+      }
+      break;
     }
   }
 }
@@ -116,7 +115,7 @@ _END_PART_2_
 my $htmlHeader3 = q[
 // End --->
 </script></head>
-<body bgcolor='#ffffff'><noscript><b id='V'>--&gt;
+<body bgcolor='#ffffff'><noscript><b class='V'>--&gt;
 Enable JavaScript for active highlighting and information tool tips!
 </b></noscript><table class='dump' cellspacing=0 cellpadding=2>
 <tr><td valign='top'><pre>];
@@ -141,7 +140,7 @@ sub new
 #         5) bit flags (see below)
 # Bits: 0x01 - print at start of line
 #       0x02 - print red address
-#       0x04 - make red background
+#       0x04 - maker notes data ('M'-class span)
 #       0x08 - limit block length
 # Notes: Block will be shown in 'unused' color if comment string begins with '['
 sub Add($$$$;$$)
@@ -181,6 +180,7 @@ sub Print($$;$$$$$)
     $$self{Open} = [];
     $$self{Closed} = [];
     $$self{TipList} = [];
+    $$self{MSpanList} = [];
     $$self{Cols} = [ '', '', '', '' ];  # text columns
     # set dump size limits (limits are 4x smaller if bit 0x08 set in flags)
     if ($level <= 1) {
@@ -197,7 +197,7 @@ sub Print($$;$$$$$)
     }
     $bkgStart = $bkgEnd = 0;
     $bkgSpan = '';
-    my $index = 0;  # numerical index corresponding to 'AA'
+    my $index = 0;  # initialize tooltip index
     my @names;
     for ($i=0; $i<@starts; ++$i) {
         my $start = $starts[$i];
@@ -233,8 +233,8 @@ sub Print($$;$$$$$)
             if ($flag == 4) {
                 $bkgStart = $start - $dataPos;
                 $bkgEnd = $bkgStart + $len;
-                # strictly speaking, 'span' doesn't permit 'name', so use 'class' instead
-                $bkgSpan = "<span id='M' class='$name'>";
+                $bkgSpan = "<span class='$name M'>";
+                push @{$self->{MSpanList}}, $name;
                 next;
             }
             $tip and $self->{TipList}->[$idx] = $tip;
@@ -264,6 +264,10 @@ sub Print($$;$$$$$)
     Write($outfile, $htmlHeader1, $title);
     if ($self->{Cols}->[0]) {
         Write($outfile, $htmlHeader2);
+        my $mspan = \@{$$self{MSpanList}};
+        for ($i=0; $i<@$mspan; ++$i) {
+            Write($outfile, qq(mspan[$i] = "$$mspan[$i]";\n));
+        }
         my $tips = \@{$$self{TipList}};
         for ($i=0; $i<@$tips; ++$i) {
             Write($outfile, qq(t[$i] = "$$tips[$i]";\n)) if defined $$tips[$i];
@@ -379,7 +383,7 @@ sub DumpTable($$$;$$$$)
     my ($f0, $dblRef, $id);
     if (($endPos and $pos < $endPos) or $flag & 0x02) {
         # display double-reference addresses in red
-        $f0 = "<span id='V'>";
+        $f0 = "<span class='V'>";
         $dblRef = 1 if $endPos and $pos < $endPos;
     } else {
         $f0 = '';
@@ -399,7 +403,7 @@ sub DumpTable($$$;$$$$)
             }
             ++$id unless $dblRef;
         }
-        $name = qq{<a name='$name' id='$id'>};
+        $name = qq{<a name='$name' class='$id'>};
         $msg and $msg = "$name$msg</a>";
     } else {
         $name = '';
@@ -449,7 +453,7 @@ sub DumpTable($$$;$$$$)
         if ($dblRef and $p >= $endPos) {
             $dblRef = 0;
             ++$id;
-            $name =~ s/id='.'/id='$id'/;
+            $name =~ s/class='.'/class='$id'/;
             $f0 = '';
             $self->Open('fgd', $f0, 0);
         }

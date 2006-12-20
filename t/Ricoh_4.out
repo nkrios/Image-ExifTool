@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.58
 [File, File, Image]  - File Name: Ricoh2.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -56,7 +56,7 @@
 [EXIF, GPS, Location] 8 - GPS Satellites: 24,23,20,17,13,11,04                           
 [EXIF, GPS, Location] 9 - GPS Status: Measurement In Progress
 [EXIF, GPS, Location] 10 - GPS Measure Mode: 3-Dimensional Measurement
-[EXIF, GPS, Location] 11 - GPS Degree Of Precision: 2.6
+[EXIF, GPS, Location] 11 - GPS Dilution Of Precision: 2.6
 [EXIF, GPS, Location] 12 - GPS Speed Ref: knots
 [EXIF, GPS, Location] 13 - GPS Speed: 0
 [EXIF, GPS, Location] 14 - GPS Track Ref: True North

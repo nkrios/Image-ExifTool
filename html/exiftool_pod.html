@@ -357,6 +357,14 @@ conditions must be satisfied to process the file.  Below are a few examples:
     exiftool '-exif:iso&lt;iso' -if 'not $exif:iso' dir</pre>
 </dd>
 <p></p>
+<dt><strong><a name="item__2dk"><strong>-k</strong></a></strong><br />
+</dt>
+<dd>
+Pause with the message <code>-- press any key --</code> before terminating.  This
+option is used to prevent the command window from closing when run as a
+Windows drag and drop application.
+</dd>
+<p></p>
 <dt><strong><a name="item__2dl"><strong>-l</strong></a></strong><br />
 </dt>
 <dd>
@@ -428,7 +436,8 @@ Set the <strong>o</strong>utput file or directory name when writing information.
 this option, the original file is renamed to <code>FILE_original</code> and output is
 sent to <em>FILE</em>.)  The output file name may also be specified using a <em>FMT</em>
 string in which %d, %f and %e represent the directory, file name and
-extension of <em>FILE</em>.  See the <strong>-w</strong> option for <em>FMT</em> string examples.
+extension of <em>FILE</em>.  Also, %c may be used to add a copy number.  See the
+<strong>-w</strong> option for <em>FMT</em> string examples.
 </dd>
 <dd>
 <p>The output file is taken to be a directory name if it already exists as a
@@ -669,14 +678,17 @@ extension (including the '.') with the specified extension (and a '.' is
 added to the start of <em>EXT</em> if it didn't contain one).  Alternatively, a
 <em>FMT</em> string may be used to give more control over the output file name and
 directory.  In the format string, %d, %f and %e represent the directory,
-filename and extension of the source file.  %d includes the trailing '/' if
-necessary, but %e does not include the leading '.'.  For example:
+filename and extension of the source file, and %c represents a copy number
+which is automatically incremented if the file already exists.  %d includes
+the trailing '/' if necessary, but %e does not include the leading '.'.  For
+example:
 </dd>
 <dd>
 <pre>
     -w %d%f.txt       # same effect as &quot;-w txt&quot;
-    -w dir/%f_%e.out  # writes files to &quot;dir&quot; as &quot;FILE_EXT.out&quot;
-    -w dir2/%d%f.txt  # writes to &quot;dir2&quot;, keeping dir structure</pre>
+    -w dir/%f_%e.out  # write files to &quot;dir&quot; as &quot;FILE_EXT.out&quot;
+    -w dir2/%d%f.txt  # write to &quot;dir2&quot;, keeping dir structure
+    -w a%c.txt        # write to &quot;a.txt&quot; or &quot;a1.txt&quot; or &quot;a2.txt&quot;...</pre>
 </dd>
 <dd>
 <p>Existing files will not be overwritten, and output directories are created
@@ -684,11 +696,11 @@ automatically if necessary.</p>
 </dd>
 <dd>
 <p>Advanced feature:  A substring of the original file name, directory or
-extension may be taken by specifying a string length immediately following
-the '%' character.  If the length is negative, the substring is taken from
-the end.  The substring position (characters to ignore at the start or end
-of the string) may be given by a second optional value after a decimal
-point.  For example:</p>
+extension may be taken by specifying a field width immediately following the
+'%' character.  If the width is negative, the substring is taken from the
+end.  The substring position (characters to ignore at the start or end of
+the string) may be given by a second optional value after a decimal point.
+For example:</p>
 </dd>
 <dd>
 <pre>
@@ -700,7 +712,24 @@ point.  For example:</p>
     Picture-123a.jpg    Meta%-3.1f.txt      Meta123.txt</pre>
 </dd>
 <dd>
-<p>This same <em>FMT</em> syntax is used with the <strong>-o</strong> and <strong>-TagsFromFile</strong> options.</p>
+<p>For %c, these modifiers have a different effects.  If a field width is given,
+the copy number is padded with zeros to the specified width, and a leading '-'
+is used to add a dash before the copy number.  By default, a copy number of zero
+is omitted, but this can be changed by adding a decimal point to the modifier.
+For example:</p>
+</dd>
+<dd>
+<pre>
+    -w A%-cZ.txt      # AZ.txt, A-1Z.txt, A-2Z.txt...
+    -w B%5c.txt       # B.txt, B00001.txt, B00002.txt...
+    -w C%.c.txt       # C0.txt, C1.txt, C2.txt...
+    -w D%-.c.txt      # D-0.txt, D-1.txt, D-2.txt...
+    -w E%-.4c.txt     # E-0000.txt, E-0001.txt, E-0002.txt...
+    -w F_%.c.txt      # F_0.txt, F_1.txt F_2.txt...</pre>
+</dd>
+<dd>
+<p>This same <em>FMT</em> syntax is used with the <strong>-o</strong> and <strong>-TagsFromFile</strong> options,
+although %c is only valid for output file names.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dx_tag"><strong>-x</strong> <em>TAG</em></a></strong><br />
@@ -979,8 +1008,9 @@ Erase all meta information from <code>dst.jpg</code> image, then copy EXIF tags 
 <dd>
 Copy meta information <code>a.jpg</code> to an XMP data file.  If the XMP data file
 <code>out.xmp</code> already exists, it will be updated with the new information.
-Otherwise the XMP data file will be created.  Only XMP and ICC files may be
-created like this (other file types may be edited but not created).
+Otherwise the XMP data file will be created.  Only XMP, ICC and MIE files
+may be created like this (other file types may be edited but not created).
+See <a href="#writing_examples">WRITING EXAMPLES</a> above for another technique to generate XMP files.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2dxmp_3aall_3d__">exiftool -tagsFromFile a.jpg -XMP:All= -ThumbnailImage= -m b.jpg</a></strong><br />
@@ -1061,10 +1091,14 @@ Exposure=1/60''.
 moved to new directories.  This can be particularly useful and powerful for
 organizing files by date when combined with the <strong>-d</strong> option.  New
 directories are created as necessary, but existing files will not be
-overwritten.  The file name format codes %d, %f and %e (see the <strong>-w</strong> option
-for details) may be used to represent the directory, name and extension of
-the original file, but note that if used within a date format string, an
-extra '%' must be added to pass these codes through the date/time parser.</p>
+overwritten.  The format codes %d, %f and %e may be used in the new file
+name to represent the directory, name and extension of the original file,
+and %c may be used to add a copy number if the file already exists (see the
+<strong>-w</strong> option for details).  Note that if used within a date format string,
+an extra '%' must be added to pass these codes through the date/time parser.
+(And further note that in a Windows batch file, all '%' characters must also
+be escaped, so in this extreme case a '%%%%f' is necessary to pass a simple
+'%f' through the two levels of parsing.)</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dfilename_3dnew_2ejpg_dir_2fold_2ejpg">exiftool -filename=new.jpg dir/old.jpg</a></strong><br />
 </dt>
@@ -1094,12 +1128,14 @@ day of <code>DateTimeOriginal</code>.  ie) This command would move the file
 Rename all files in <code>dir</code> by adding FocalLength to the file name.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__27_2dfilename_3ccreatedate_27__2dd__25y_">exiftool '-FileName&lt;CreateDate' -d %Y%m%d_%H%M%S.%%e dir</a></strong><br />
+<dt><strong><a name="item_exiftool__27_2dfilename_3ccreatedate_27__2dd__25y_">exiftool '-FileName&lt;CreateDate' -d %Y%m%d_%H%M%S%%-c.%%e dir</a></strong><br />
 </dt>
 <dd>
 Rename all images in <code>dir</code> according to the <code>CreateDate</code> date and time,
-preserving the original file extensions.  Note the extra '%' added to the
-file extension code (<code>%%e</code>) since it is used in a date format string.
+adding a copy number with leading '-' if the file already exists (<code>%-c</code>),
+and preserving the original file extension (<code>%e</code>).  Note the extra '%'
+necessary to escape the filename codes (<code>%c</code> and <code>%e</code>) in the date format
+string.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dr__27_2dfilename_3ccreatedate_27__2dd_">exiftool -r '-FileName&lt;CreateDate' -d %Y-%m-%d/%H%M_%%f.%%e dir</a></strong><br />

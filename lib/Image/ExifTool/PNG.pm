@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -781,7 +781,8 @@ sub ProcessPNG($$)
         $exifTool->{ADD_PNG} = $exifTool->GetNewTagInfoHash(
             \%Image::ExifTool::PNG::Main,
             \%Image::ExifTool::PNG::TextualData);
-        $exifTool->InitWriteDirs('JPEG');   # use same directories as JPEG
+        # initialize with same directories as JPEG, but PNG tags take priority
+        $exifTool->InitWriteDirs('JPEG','PNG');
     }
     my ($fileType, $hdrChunk, $endChunk) = @{$pngLookup{$sig}};
     $exifTool->SetFileType($fileType);  # set the FileType tag

@@ -21,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -719,13 +719,16 @@ sub ProcessICC_Profile($$$)
         # format the value unless this is a subdirectory
         my $value;
         $value = FormatICCTag($dataPt, $valuePtr, $size) unless $subdir;
+        my $fmt;
+        $fmt = substr($$dataPt, $valuePtr, 4) if $size > 4;
         $verbose and $exifTool->VerboseInfo($tagID, $tagInfo,
-            'Table'  => $tagTablePtr,
-            'Index'  => $index,
-            'Value'  => $value,
-            'DataPt' => $dataPt,
-            'Size'   => $size,
-            'Start'  => $valuePtr,
+            Table  => $tagTablePtr,
+            Index  => $index,
+            Value  => $value,
+            DataPt => $dataPt,
+            Size   => $size,
+            Start  => $valuePtr,
+            Format => "type '$fmt'",
         );
         if ($subdir) {
             my $name = $$tagInfo{Name};

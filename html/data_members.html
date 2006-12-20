@@ -1,6 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html>
 <head>
 <title>ExifTool Object Data Members</title>
+<style type="text/css">
+<!--
+h1       { margin: 0 0 .5em 0 }
+table.norm      { border-collapse: collapse;
+                  border: 1px solid gray; }
+table.norm th   { border: 1px solid gray; background: #dddddd }
+table.norm td   { border: 1px solid gray; background: #ffffff;
+                  padding: 2px 4px }
+table.clear td  { border: 0 }
+-->
+</style>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h1>ExifTool Object Data Members</h1>
@@ -9,7 +22,7 @@ The following table lists the data members of the ExifTool object.
 If this was C++, these would be documented next to the definitions in the
 header file.  (but this is Perl, so I couldn't do that...)
 
-<p><table border=1 cellpadding=4 cellspacing=0><tr><th>Name</th><th>Description</th></tr>
+<p><table class='norm'><tr><th>Name</th><th>Description</th></tr>
 
 <tr><td>ADD_DIRS</td><td>Hash of parent directories for each directory added during
 	writing (Note: entry may exist but be undefined for top-level
@@ -82,7 +95,7 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>NEW_VALUE</td><td>Hash of new value information keyed by tag info reference.
 	Elements of new value information hash are:
-    <table><tr><td>TagInfo</td><td>-</td><td>tag information reference</td></tr>
+    <table class='clear'><tr><td>TagInfo</td><td>-</td><td>tag information reference</td></tr>
     <tr><td>DelValue</td><td>-</td><td>list of specific values to delete</td></tr>
     <tr><td>Value</td><td>-</td><td>list of values to add</td></tr>
     <tr valign='top'><td>IsCreating</td><td>-</td><td>must be set for the tag to be added.  otherwise just
@@ -102,7 +115,7 @@ header file.  (but this is Perl, so I couldn't do that...)
 
 <tr><td>PREVIEW_INFO</td><td>Information about preview image used while writing JPEG
     images only.  This is a reference to a hash with the following entries:
-    <table>
+    <table class='clear'>
     <tr><td>BaseShift</td><td>-</td><td>shift for base of pointer offsets</td></tr>
     <tr valign='top'><td>Data</td><td>-</td><td>data for PreviewImage to be written (may either be data
     for the old or new image, or 'LOAD' to indicate that the data must be loaded from outside

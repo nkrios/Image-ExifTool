@@ -33,7 +33,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.16';
+$VERSION = '2.20';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -1705,18 +1705,19 @@ my %longBin = (
         Desire => {
             0 => 'FocalLength',
             1 => 'FocalLengthIn35mmFormat',
-            2 => 'FocalPlaneDiagonal',
-            3 => 'FocalPlaneXSize',
-            4 => 'FocalPlaneYSize',
-            5 => 'FocalPlaneResolutionUnit',
-            6 => 'FocalPlaneXResolution',
-            7 => 'FocalPlaneYResolution',
-            8 => 'CanonImageWidth',
-            9 => 'CanonImageHeight',
-           10 => 'ExifImageWidth',
-           11 => 'ExifImageLength',
-           12 => 'ImageWidth',
-           13 => 'ImageHeight',
+            2 => 'Composite:DigitalZoom',
+            3 => 'FocalPlaneDiagonal',
+            4 => 'FocalPlaneXSize',
+            5 => 'FocalPlaneYSize',
+            6 => 'FocalPlaneResolutionUnit',
+            7 => 'FocalPlaneXResolution',
+            8 => 'FocalPlaneYResolution',
+            9 => 'CanonImageWidth',
+           10 => 'CanonImageHeight',
+           11 => 'ExifImageWidth',
+           12 => 'ExifImageLength',
+           13 => 'ImageWidth',
+           14 => 'ImageHeight',
         },
         ValueConv => 'Image::ExifTool::Exif::CalcScaleFactor35efl(@val)',
         PrintConv => 'sprintf("%.1f", $val)',
@@ -1937,11 +1938,12 @@ sub CalculateLV($$$)
 # Calculate scale factor for 35mm effective focal length
 # Inputs: 0) Focal length
 #         1) Focal length in 35mm format
-#         2) Focal plane diagonal size (in mm)
-#         3/4) Focal plane X/Y size (in mm)
-#         5) focal plane resolution units (in mm)
-#         6/7) Focal plane X/Y resolution
-#         8/9,10/11...) Image width/height in order of precedence (first valid pair is used)
+#         2) Canon digital zoom factor
+#         3) Focal plane diagonal size (in mm)
+#         4/5) Focal plane X/Y size (in mm)
+#         6) focal plane resolution units (in mm)
+#         7/8) Focal plane X/Y resolution
+#         9/10,11/12...) Image width/height in order of precedence (first valid pair is used)
 # Returns: 35mm conversion factor (or undefined if it can't be calculated)
 sub CalcScaleFactor35efl
 {
@@ -1950,6 +1952,7 @@ sub CalcScaleFactor35efl
 
     return $foc35 / $focal if $focal and $foc35;
 
+    my $digz = shift || 1;
     my $diag = shift;
     unless ($diag and Image::ExifTool::IsFloat($diag)) {
         my $xsize = shift;
@@ -1960,6 +1963,8 @@ sub CalcScaleFactor35efl
             my $units = shift || return undef;
             my $x_res = shift || return undef;
             my $y_res = shift || return undef;
+            Image::ExifTool::IsFloat($x_res) and $x_res != 0 or return undef;
+            Image::ExifTool::IsFloat($y_res) and $y_res != 0 or return undef;
             my ($w, $h);
             for (;;) {
                 @_ < 2 and return undef;
@@ -1977,7 +1982,7 @@ sub CalcScaleFactor35efl
             return undef unless $diag > 1 and $diag < 100;
         }
     }
-    return sqrt(36*36+24*24) / $diag;
+    return sqrt(36*36+24*24) * $digz / $diag;
 }
 
 #------------------------------------------------------------------------------
@@ -2165,10 +2170,9 @@ sub PrintCFAPattern($)
 sub ExifDate($)
 {
     my $date = shift;
-    $date =~ tr/ -\//:/;    # use ':' (not ' ', '-' or '/') as a separator
     $date =~ s/\0$//;       # remove any null terminator
-    # add separators if they don't exist
-    $date =~ s/^(\d{4})(\d{2})(\d{2})$/$1:$2:$3/;
+    # separate year:month:day with colons (instead of -, /, space or nothing)
+    $date =~ s/(\d{4})[- \/:]*(\d{2})[- \/:]*(\d{2})$/$1:$2:$3/;
     return $date;
 }
 
@@ -2176,7 +2180,7 @@ sub ExifDate($)
 # translate time into standard EXIF format
 # Inputs: 0) time
 # Returns: time in format '10:30:55'
-# - bad formats recognized: '10 30 55', '103055', '103055'
+# - bad formats recognized: '10 30 55', '103055', '103055+0500'
 # - removes null terminator if it exists
 # - leaves time zone intact if specified (ie. '10:30:55+05:00')
 sub ExifTime($)
@@ -2462,7 +2466,7 @@ sub ProcessExif($$$)
 
         if ($verbose) {
             if ($htmlDump) {
-                my $tagName;
+                my ($tagName, $colName);
                 if ($tagID == 0x927c and $dirName eq 'ExifIFD') {
                     $tagName = 'MakerNotes';
                 } elsif ($tagInfo) {
@@ -2471,14 +2475,6 @@ sub ProcessExif($$$)
                     $tagName = sprintf("Tag 0x%.4x",$tagID);
                 }
                 my $dname = sprintf("${name}_%.2d", $index);
-                # make name highlighted if value in value data block
-                my $colName;
-                if ($size > 4) {
-                    my $style = ($valueDataLen < 0) ? 'V' : 'H';
-                    $colName = "<span id='$style'>$tagName</span>";
-                } else {
-                    $colName = $tagName;
-                }
                 # build our tool tip
                 my $tip = sprintf("$name $tagName\\nTag ID: 0x%.4x\\n", $tagID) .
                           "Format: $formatName[$format]\[$count]\\nSize: $size bytes\\n";
@@ -2486,7 +2482,15 @@ sub ProcessExif($$$)
                     my $offPt = Get32u($dataPt,$entry+8);
                     $tip .= sprintf("Value offset: 0x%.4x\\n", $offPt);
                     my $actPt = $valuePtr + $valueDataPos + $base - ($$exifTool{EXIF_POS} || 0);
-                    $tip .= sprintf("Actual offset: 0x%.4x\\n", $actPt) if $actPt != $offPt;
+                    # highlight tag name (red for bad size)
+                    my $style = ($valueDataLen < 0) ? 'V' : 'H';
+                    if ($actPt != $offPt) {
+                        $tip .= sprintf("Actual offset: 0x%.4x\\n", $actPt);
+                        $style = 'F' if $style eq 'H';  # purple for different offsets
+                    }
+                    $colName = "<span class='$style'>$tagName</span>";
+                } else {
+                    $colName = $tagName;
                 }
                 my $tval;
                 if ($valueDataLen < 0) {

@@ -139,6 +139,7 @@ my $testnum = 1;
     unlink $testfile;
     $exifTool->SetNewValue(Label => 'Blue');
     $exifTool->SetNewValue(Rating => 3);
+    $exifTool->SetNewValue(Subject => 'test2', AddValue => 1);
     $exifTool->Options(Compact => 1);
     $exifTool->WriteInfo('t/images/XMP.xmp',$testfile);
     print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);

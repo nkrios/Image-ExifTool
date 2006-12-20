@@ -71,6 +71,7 @@ html/TagNames/Unknown.html
 html/TagNames/Vorbis.html
 html/TagNames/XMP.html
 html/TagNames/index.html
+html/TagNames/style.css
 html/canon_raw.html
 html/config.html
 html/data_members.html
@@ -124,6 +125,7 @@ lib/Image/ExifTool/Kodak.pm
 lib/Image/ExifTool/KyoceraRaw.pm
 lib/Image/ExifTool/Leaf.pm
 lib/Image/ExifTool/MIE.pm
+lib/Image/ExifTool/MIEUnits.pod
 lib/Image/ExifTool/MIFF.pm
 lib/Image/ExifTool/MNG.pm
 lib/Image/ExifTool/MPC.pm
@@ -186,6 +188,7 @@ t/CanonRaw_2.out
 t/CanonRaw_4.out
 t/CanonRaw_5.out
 t/CanonRaw_6.out
+t/CanonRaw_7.out
 t/CanonVRD.t
 t/CanonVRD_2.out
 t/CanonVRD_3.out

@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..3\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..4\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -25,7 +25,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/images/MIE.mie');
+    my $info = $exifTool->ImageInfo('t/images/MIE.mie', '-filename', '-directory');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -34,7 +34,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->Options(IgnoreMinorErrors => 1); # necessary until final version released
+    $exifTool->Options(IgnoreMinorErrors => 1); # to copy invalid thumbnail
     $exifTool->SetNewValuesFromFile('t/images/Nikon.jpg','*:*');
     $exifTool->SetNewValue('EXIF:XResolution' => 200);
     $exifTool->SetNewValue('MIE:FNumber' => 11);
@@ -52,5 +52,22 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
+# test 4: Create a MIE file from scratch
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->Options(IgnoreMinorErrors => 1); # to copy invalid thumbnail
+    $exifTool->SetNewValuesFromFile('t/images/MIE.mie');
+    $testfile = "t/${testname}_${testnum}_failed.mie";
+    unlink $testfile;
+    $exifTool->WriteInfo(undef, $testfile);
+    my $info = $exifTool->ImageInfo($testfile, '-filename', '-directory');
+    if (check($exifTool, $info, $testname, $testnum, 2)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
 
 # end

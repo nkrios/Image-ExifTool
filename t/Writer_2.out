@@ -43,7 +43,7 @@ DriveMode: Continuous shooting
 EasyMode: Manual
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 6.57
+ExifToolVersion: 6.64
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -52,7 +52,7 @@ ExposureTime: 4
 ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
-FileModifyDate: 2006:11:17 13:52:04
+FileModifyDate: 2006:12:08 11:50:40
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FileSize: 3 kB
@@ -90,7 +90,7 @@ Lens: 18.0 - 55.0mm
 Lens35efl: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
 LensType: Unknown (-1)
 LightValue: 5.6
-LongFocal: 55
+LongFocal: 55mm
 MIMEType: image/jpeg
 MacroMode: Unknown (0)
 Make: Canon
@@ -104,9 +104,11 @@ Model: Canon EOS DIGITAL REBEL
 ModifyDate: 2003:12:04 06:46:52
 NDFilter: Unknown (-1)
 NumAFPoints: 7
+OpticalZoomCode: 8
 Orientation: Horizontal (normal)
 OwnerName: Phil Harvey
 Quality: RAW
+RecordMode: CRW+THM
 RedBalance: 2.067348
 RelatedImageLength: 2048
 RelatedImageWidth: 3072
@@ -122,7 +124,7 @@ SerialNumber: 0560018150
 SerialNumberFormat: Format 1
 Sharpness: +1
 ShootingMode: Manual
-ShortFocal: 18
+ShortFocal: 18mm
 ShutterSpeed: 4
 ShutterSpeedValue: 0
 SlowShutter: None

@@ -29,17 +29,19 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Nikon;
 use Image::ExifTool::Real;
 
-$VERSION = '1.46';
+$VERSION = '1.48';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
 
 # colors for html pages
-my $noteFont = '<font color="#666666">';
-my $noteFontSmall = '<font color="#666666" size="-1">';
-my $bgHeading = q{bgcolor='#ffbb77'};
-my $bgBody = q{bgcolor='#ffffff'};
-my $bgRow = q{bgcolor='#ffeebb'};
+my $noteFont = "<span class='n'>";
+my $noteFontSmall = "<span class='n s'>";
+
+my $docType = q{<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+};
+
 
 my $caseInsensitive;    # flag to ignore case when sorting tag names
 
@@ -131,11 +133,18 @@ images.
 These GPS tags are part of the EXIF standard, and are stored in a separate
 IFD within the EXIF information.
 
-ExifTool is very flexible about the input format for lat/long coordinates,
-and will accept 3 floating point numbers (for degrees, minutes and seconds)
-separated by just about anything.  Many other GPS tags have values which are
-fixed-length strings.  For these, the indicated string lengths include a
-null terminator which is added automatically by ExifTool.
+ExifTool is very flexible about the input format when writing lat/long
+coordinates, and will accept from 1 to 3 floating point numbers (for decimal
+degrees, degrees and minutes, or degrees, minutes and seconds) separated by
+just about anything, and will format them properly according to the EXIF
+specification.
+
+Some GPS tags have values which are fixed-length strings. For these, the
+indicated string lengths include a null terminator which is added
+automatically by ExifTool.  Remember that the descriptive values are used
+when writing (ie. 'Above Sea Level', not '0') unless the print conversion is
+disabled (with '-n' on the command line, or the PrintConv option in the
+API).
 },
     XMP => q{
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
@@ -908,6 +917,7 @@ sub OpenHtmlFile($;$$)
 {
     my ($htmldir, $category, $sepTable) = @_;
     my ($htmlFile, $head, $title, $url, $class);
+    my $top = '';
 
     if ($category) {
         my @names = split ' ', $category;
@@ -925,15 +935,18 @@ sub OpenHtmlFile($;$$)
         open(HTMLFILE,">>${htmlFile}_tmp") or return 0;
     } else {
         open(HTMLFILE,">${htmlFile}_tmp") or return 0;
-        print HTMLFILE "<html>\n<head>\n<title>$title</title>\n</head>\n";
-        print HTMLFILE "<body text='#000000' $bgBody>\n";
+        print HTMLFILE "$docType<html>\n<head>\n<title>$title</title>\n";
+        print HTMLFILE "<link rel=stylesheet type='text/css' href='style.css' title='Style'>\n";
+        print HTMLFILE "</head>\n<body>\n";
         if ($category ne $class and $docs{$class}) {
-            print HTMLFILE "<h2>$class Tags</h2>\n" or return 0;
+            print HTMLFILE "<h2 class='top'>$class Tags</h2>\n" or return 0;
             print HTMLFILE Doc2Html($docs{$class}),"\n" or return 0;
+        } else {
+            $top = " class='top'";
         }
     }
     $head = "<a name='$url'>$head</a>" if $url;
-    print HTMLFILE "<h2>$head</h2>\n" or return 0;
+    print HTMLFILE "<h2$top>$head</h2>\n" or return 0;
     print HTMLFILE Doc2Html($docs{$category}),"\n" if $docs{$category};
     $createdFiles{$htmlFile} = 1;
     return 1;
@@ -942,8 +955,10 @@ sub OpenHtmlFile($;$$)
 #------------------------------------------------------------------------------
 # Close all html files and write trailers
 # Returns: true on success
-sub CloseHtmlFiles()
+# Inputs: 0) flag to preserve file date
+sub CloseHtmlFiles($)
 {
+    my $preserveDate = shift;
     my $success = 1;
     # get the date
     my ($sec,$min,$hr,$day,$mon,$yr) = localtime;
@@ -953,16 +968,22 @@ sub CloseHtmlFiles()
     my $htmlFile;
     foreach $htmlFile (keys %createdFiles) {
         my $tmpFile = $htmlFile . '_tmp';
+        my $fileDate = $date;
+        if ($preserveDate) {
+            my @lines = `grep '<i>Last revised' $htmlFile`;
+            $fileDate = $1 if @lines and $lines[-1] =~ m{<i>Last revised (.*)</i>};
+        }
         open(HTMLFILE,">>$tmpFile") or $success = 0, next;
         # write the trailers
+        print HTMLFILE "<hr>\n";
+        print HTMLFILE "(This document generated automatically by Image::ExifTool::BuildTagLookup)\n";
+        print HTMLFILE "<br><i>Last revised $fileDate</i>\n";
         if ($htmlFile =~ /index\.html$/) {
-            print HTMLFILE "<p><a href='../index.html'>&lt;-- Back to ExifTool Home Page</a>\n";
+            print HTMLFILE "<p><a href='../index.html'>&lt;-- Back to ExifTool home page</a>\n";
         } else {
             print HTMLFILE "<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>\n"
         }
-        print HTMLFILE "<hr>\n";
-        print HTMLFILE "(This document generated automatically by Image::ExifTool::BuildTagLookup)\n";
-        print HTMLFILE "<br><i>Last revised $date</i>\n</body>\n</html>\n" or $success = 0;
+        print HTMLFILE "</body>\n</html>\n" or $success = 0;
         close HTMLFILE or $success = 0;
         # check for differences and only use new file if it was changed
         # (so the date only gets updated if changes were really made)
@@ -1022,10 +1043,10 @@ sub WriteTagNames($$)
     mkdir "$htmldir/TagNames";
     OpenHtmlFile($htmldir) or return 0;
     print HTMLFILE "<blockquote>\n";
-    print HTMLFILE "<table width='100%' $bgHeading cellspacing=2 cellpadding=0>\n";
-    print HTMLFILE "<tr $bgBody><td><table width='100%' cellspacing=1 cellpadding=2>\n";
-    print HTMLFILE "<tr $bgHeading><th colspan=$columns><font size='+1'>Tag Table Index</font></th></tr>\n";
-    print HTMLFILE "<tr $bgRow valign='top'><td width='$percent%'>\n";
+    print HTMLFILE "<table width='100%' class='frame'><tr><td>\n";
+    print HTMLFILE "<table width='100%' class='inner' cellspacing=1><tr class='h'>\n";
+    print HTMLFILE "<th colspan=$columns><span class='l'>Tag Table Index</span></th></tr>\n";
+    print HTMLFILE "<tr class='b'><td width='$percent%'>\n";
     # write the index
     my @tableNames = GetTableOrder();
     push @tableNames, 'Image::ExifTool::Shortcuts::Main';   # do Shortcuts last
@@ -1088,8 +1109,9 @@ sub WriteTagNames($$)
             if (OpenHtmlFile($htmldir, $tableName, 1)) {
                 print HTMLFILE Doc2Html($notes), "\n" if $notes;
                 print HTMLFILE "<blockquote>\n";
-                print HTMLFILE "<table $bgHeading cellspacing=2 cellpadding=0><tr $bgBody><td>\n";
-                print HTMLFILE "<table cellspacing=1 cellpadding=0><tr $bgHeading><th>$head</th><th>Value</th></tr>\n";
+                print HTMLFILE "<table class='frame'><tr><td>\n";
+                print HTMLFILE "<table class='inner' cellspacing=1>\n";
+                print HTMLFILE "<tr class='h'><th>$head</th><th>Value</th></tr>\n";
                 foreach (sort NumbersFirst keys %$printConv) {
                     next if $_ eq 'Notes';
                     my $val = EscapeHTML($_);
@@ -1195,10 +1217,11 @@ sub WriteTagNames($$)
             print HTMLFILE Doc2Html($notes), "\n";
         }
         print HTMLFILE "<blockquote>\n";
-        print HTMLFILE "<table $bgHeading cellspacing=2 cellpadding=0><tr $bgBody><td>\n";
-        print HTMLFILE "<table cellspacing=1 cellpadding=2><tr $bgHeading>$hid<th>$tagNameHeading</th>\n";
-        print HTMLFILE "<th>Writable</th>$derived<th>Values / ${noteFont}Notes</font></th></tr>\n";
-        my $rowCol = 1;
+        print HTMLFILE "<table class='frame'><tr><td>\n";
+        print HTMLFILE "<table class='inner' cellspacing=1>\n";
+        print HTMLFILE "<tr class='h'>$hid<th>$tagNameHeading</th>\n";
+        print HTMLFILE "<th>Writable</th>$derived<th>Values / ${noteFont}Notes</span></th></tr>\n";
+        my $rowClass = 1;
         my $infoCount = 0;
         my $infoList;
         foreach $infoList (@$info) {
@@ -1210,7 +1233,7 @@ sub WriteTagNames($$)
             } elsif ($tagIDstr =~ /^\d+$/) {
                 $w = $wID - 3;
                 $idStr = sprintf "  %${w}d    ", $tagIDstr;
-                $align = " align='right'";
+                $align = " class='r'";
             } else {
                 $tagIDstr =~ s/^'$prefix/'/ if $prefix;
                 $w = $wID;
@@ -1290,7 +1313,7 @@ sub WriteTagNames($$)
             foreach (@$tagNames) {
                 push @htmlTags, EscapeHTML($_);
             }
-            $rowCol = $rowCol ? '' : " $bgRow";
+            $rowClass = $rowClass ? '' : " class='b'";
             my $isSubdir;
             if ($$writable[0] =~ /^-/) {
                 $isSubdir = 1;
@@ -1298,12 +1321,12 @@ sub WriteTagNames($$)
                     s/^-(.+)/$1/;
                 }
             }
-            print HTMLFILE "<tr$rowCol valign='top'>\n";
+            print HTMLFILE "<tr$rowClass>\n";
             print HTMLFILE "<td$align>$tagIDstr</td>\n" if $id;
             print HTMLFILE "<td>", join("\n  <br>",@htmlTags), "</td>\n";
-            print HTMLFILE "<td align='center'>",join('<br>',@$writable),"</td>\n";
+            print HTMLFILE "<td class='c'>",join('<br>',@$writable),"</td>\n";
             print HTMLFILE '<td>',join("\n  <br>",@$require),"</td>\n" if $composite;
-            print HTMLFILE "<td align='center'>",join('<br>',@$writeGroup),"</td>\n" if $showGrp;
+            print HTMLFILE "<td class='c'>",join('<br>',@$writeGroup),"</td>\n" if $showGrp;
             print HTMLFILE "<td>";
             my $close = '';
             my @values;
@@ -1313,7 +1336,7 @@ sub WriteTagNames($$)
                     foreach (@$values) {
                         if (/^\(/) {
                             $smallNote = 1 if $n <= 1;
-                            push @values, ($smallNote ? $noteFontSmall : $noteFont) . "$_</font>";
+                            push @values, ($smallNote ? $noteFontSmall : $noteFont) . "$_</span>";
                             next;
                         }
                         /=/ and push(@values, $_), next;
@@ -1332,11 +1355,11 @@ sub WriteTagNames($$)
                 } else {
                     foreach (@$values) {
                         $_ = EscapeHTML($_);
-                        /^\(/ and $_ = "$noteFont$_</font>";
+                        /^\(/ and $_ = "$noteFont$_</span>";
                         push @values, $_;
                     }
-                    print HTMLFILE "<font size='-1'>";
-                    $close = '</font>';
+                    print HTMLFILE "<span class='s'>";
+                    $close = '</span>';
                 }
             } else {
                 push @values, '&nbsp;';
@@ -1348,12 +1371,12 @@ sub WriteTagNames($$)
             my $cols = 3;
             ++$cols if $hid;
             ++$cols if $derived;
-            print HTMLFILE "<tr><td colspan=$cols align='center'>[no tags known]</td></tr>\n";
+            print HTMLFILE "<tr><td colspan=$cols class='c'>[no tags known]</td></tr>\n";
         }
         print HTMLFILE "</table></td></tr></table></blockquote>\n\n";
     }
     close(HTMLFILE) or $success = 0;
-    CloseHtmlFiles() or $success = 0;
+    CloseHtmlFiles($$self{PRESERVE_DATE}) or $success = 0;
     print PODFILE Doc2Pod($docs{PodTrailer}) or $success = 0;
     close(PODFILE) or $success = 0;
     return $success;

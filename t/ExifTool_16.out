@@ -46,7 +46,7 @@ FocusDistanceUpper : -0.01
 FocusMode : Manual Focus
 FocusRange : Not Known
 LensType : Unknown (-1)
-LongFocal : 55
+LongFocal : 55mm
 MacroMode : Unknown (0)
 MaxAperture : 4
 MeasuredEV : -6.25
@@ -54,8 +54,10 @@ MeteringMode : Center-weighted averaging
 MinAperture : 27
 NDFilter : Unknown (-1)
 NumAFPoints : 7
+OpticalZoomCode : 8
 OwnerName : Phil Harvey
 Quality : RAW
+RecordMode : CRW+THM
 Saturation : +1
 Self-timer : 0
 Self-timer2 : 0
@@ -63,7 +65,7 @@ SequenceNumber : 0
 SerialNumber : 0560018150
 SerialNumberFormat : Format 1
 Sharpness : +1
-ShortFocal : 18
+ShortFocal : 18mm
 SlowShutter : None
 TargetAperture : 14
 WB_RGGBLevelsAuto : 1719 832 831 990

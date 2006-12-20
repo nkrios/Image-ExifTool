@@ -28,6 +28,7 @@
 #              15) http://homepage3.nifty.com/kamisaka/makernote/makernote_canon.htm and
 #                  http://homepage3.nifty.com/kamisaka/makernote/CanonLens.htm (2006/07/04)
 #              16) Emil Sit private communication (tests with 30D)
+#              17) http://www.asahi-net.or.jp/~xp8t-ymzk/s10exif.htm
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -39,7 +40,7 @@ use Image::ExifTool::Exif;
 
 sub WriteCanon($$$);
 
-$VERSION = '1.53';
+$VERSION = '1.57';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
@@ -194,7 +195,7 @@ my %canonLensTypes = ( #4
     0x1810000 => 'PowerShot SD450 / Digital IXUS 55 / IXY Digital 60',
     0x1870000 => 'PowerShot SD400 / Digital IXUS 50 / IXY Digital 55',
     0x1880000 => 'PowerShot A420',
-    0x1890000 => 'PowerShot SD900 / Digital IXUS 900 Ti', # (IXY?)
+    0x1890000 => 'PowerShot SD900 / Digital IXUS 900 Ti / IXY Digital 1000',
     0x1900000 => 'PowerShot SD550 / Digital IXUS 750 / IXY Digital 700',
     0x1920000 => 'PowerShot A700',
     0x1940000 => 'PowerShot SD700 IS / Digital IXUS 800 IS / IXY Digital 800 IS',
@@ -203,8 +204,8 @@ my %canonLensTypes = ( #4
     0x1970000 => 'PowerShot SD600 / Digital IXUS 60 / IXY Digital 70',
     0x1980000 => 'PowerShot G7',
     0x1990000 => 'PowerShot A530',
-    0x2000000 => 'PowerShot SD800 IS / Digital IXUS 850 IS', # (IXY?)
-    0x2010000 => 'PowerShot SD40 / Digital IXUS i7 zoom', # (IXY?)
+    0x2000000 => 'PowerShot SD800 IS / Digital IXUS 850 IS / IXY Digital 900 IS',
+    0x2010000 => 'PowerShot SD40 / Digital IXUS i7 / IXY Digital L4',
     0x2020000 => 'PowerShot A710 IS',
     0x2030000 => 'PowerShot A640',
     0x2040000 => 'PowerShot A630',
@@ -240,6 +241,8 @@ my %canonImageSize = (
     5 => 'Medium 1', #PH
     6 => 'Medium 2', #PH
     7 => 'Medium 3', #PH
+    8 => 'Postcard', #PH (SD200 1600x1200 with DateStamp option)
+    9 => 'Widescreen', #PH (SD900 3648x2048)
 );
 my %canonWhiteBalance = (
     0 => 'Auto',
@@ -264,6 +267,11 @@ my %canonWhiteBalance = (
 # picture styles used by the 5D
 # (styles 0x4X may be downloaded from Canon)
 my %pictureStyles = ( #12
+    0x00 => 'None', #PH
+    0x01 => 'Standard', #PH guess (1D)
+    0x02 => 'Set 1', #PH guess (1D)
+    0x03 => 'Set 2', #PH guess (1D)
+    0x04 => 'Set 3', #PH guess (1D)
     0x21 => 'User Def. 1',
     0x22 => 'User Def. 2',
     0x23 => 'User Def. 3',
@@ -688,6 +696,7 @@ my %longBin = (
     WRITABLE => 1,
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
+    DATAMEMBER => [ 25 ],   # FocalUnits necessary writing
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     1 => {
         Name => 'MacroMode',
@@ -742,7 +751,18 @@ my %longBin = (
            16 => 'Pan Focus', #PH
         },
     },
-    # 9 => 1 for fine jpeg, 7 for raw + small jpeg (30D) - PH
+    9 => { #PH
+        Name => 'RecordMode',
+        PrintConv => {
+            1 => 'JPEG',
+            2 => 'CRW+THM', # (300D,etc)
+            3 => 'AVI+THM', # (30D)
+            4 => 'TIF', # +THM? (1Ds) (unconfirmed)
+            5 => 'TIF+JPEG', # (1D) (unconfirmed)
+            6 => 'CR2', # +THM? (1D,30D,350D)
+            7 => 'CR2+JPEG', # (S30)
+        },
+    },
     10 => {
         Name => 'CanonImageSize',
         PrintConv => \%canonImageSize,
@@ -785,8 +805,8 @@ my %longBin = (
         Name => 'DigitalZoom',
         PrintConv => {
             0 => 'None',
-            1 => 'x2',
-            2 => 'x4',
+            1 => '2x',
+            2 => '4x',
             3 => 'Other',  # value obtained from 2*#37/#36
         },
     },
@@ -876,12 +896,27 @@ my %longBin = (
     23 => {
         Name => 'LongFocal',
         Format => 'int16u',
+        # this is a bit tricky, but we need the FocalUnits to convert this to mm
+        RawConvInv => '$val * ($$self{FocalUnits} || 1)',
+        ValueConv => '$val / ($$self{FocalUnits} || 1)',
+        ValueConvInv => '$val',
+        PrintConv => '"${val}mm"',
+        PrintConvInv => '$val=~s/mm//;$val',
     },
     24 => {
         Name => 'ShortFocal',
         Format => 'int16u',
+        RawConvInv => '$val * ($$self{FocalUnits} || 1)',
+        ValueConv => '$val / ($$self{FocalUnits} || 1)',
+        ValueConvInv => '$val',
+        PrintConv => '"${val}mm"',
+        PrintConvInv => '$val=~s/mm//;$val',
     },
-    25 => 'FocalUnits',
+    25 => {
+        Name => 'FocalUnits',
+        DataMember => 'FocalUnits',
+        RawConv => '$$self{FocalUnits} = $val',
+    },
     26 => { #9
         Name => 'MaxAperture',
         RawConv => '$val > 0 ? $val : undef',
@@ -991,24 +1026,25 @@ my %longBin = (
             2 => 'Zoom',
         },
     },
-    1 => [
-        {
-            Name => 'FocalLength',
-            Condition => '$self->{CameraModel} =~ /EOS/',
-            RawConv => '$val ? $val : undef', # don't use if value is zero
-            # the EXIF FocalLength is more reliable, so set this priority to zero
-            Priority => 0,
-            PrintConv => '"${val}mm"',
-            PrintConvInv => '$val=~s/mm//;$val',
+    1 => {
+        Name => 'FocalLength',
+        # the EXIF FocalLength is more reliable, so set this priority to zero
+        Priority => 0,
+        RawConv => '$val ? $val : undef', # don't use if value is zero
+        RawConvInv => q{
+            my $focalUnits = $$self{FocalUnits};
+            unless ($focalUnits) {
+                $focalUnits = 1;
+                # (this happens when writing FocalLength to CRW images)
+                $self->Warn("FocalUnits not available for FocalLength conversion (1 assumed)");
+            }
+            return $val * $focalUnits;
         },
-        {
-            Name => 'ScaledFocalLength',
-            Notes => 'this value is scaled by 32, 100 or 1000 for non-EOS models',
-            RawConv => '$val ? $val : undef', # don't use if value is zero
-            PrintConv => '"${val}mm"',
-            PrintConvInv => '$val=~s/mm//;$val',
-        },
-    ],
+        ValueConv => '$val / ($$self{FocalUnits} || 1)',
+        ValueConvInv => '$val',
+        PrintConv => '"${val}mm"',
+        PrintConvInv => '$val=~s/mm//;$val',
+    },
     2 => { #4
         Name => 'FocalPlaneXSize',
         # focal plane image dimensions in 1/1000 inch -- convert to mm
@@ -1106,8 +1142,12 @@ my %longBin = (
         Name => 'SequenceNumber',
         Description => 'Shot Number In Continuous Burst',
     },
-    # 10 - (8 for all EOS samples, [0-6,8,16,20,28,32,39] for other models - PH)
-    # (10 is optical zoom, 0-6 as reported by http://www.asahi-net.or.jp/~xp8t-ymzk/s10exif.htm)
+    10 => { #PH/17
+        Name => 'OpticalZoomCode',
+        Notes => 'for many PowerShot models, a this is 0-6 for wide-tele zoom',
+        # (for many models, 0-6 represent 0-100% zoom, but it is always 8 for
+        #  EOS models, and I have seen values of 16,20,28,32 and 39 too...)
+    },
     # 11 - (8 for all EOS samples, [0,8] for other models - PH)
     13 => { #PH
         Name => 'FlashGuideNumber',
@@ -1207,6 +1247,8 @@ my %longBin = (
         ValueConv => '$val / 10',
         ValueConvInv => '$val * 10',
     },
+    # 25 - (usually 0, but 1 for 2s timer?, 19 for small AVI, 14 for large
+    #       AVI, and -6 and -10 for shots 1 and 2 with stitch assist - PH)
     26 => { #15
         Name => 'CameraType',
         PrintConv => {
@@ -1334,8 +1376,7 @@ my %longBin = (
         Name => 'PictureStyle',
         Format => 'int16u',
         Condition => '$self->{CameraModel} =~ /EOS(-1Ds? Mark II| 5D)$/',
-        Notes => '5D only; 1DmkII values are currently unknown',
-        # (1DmkII's have some unknown values here)
+        Notes => '5D only and 1D(s)mkII only',
         PrintHex => 1,
         PrintConv => \%pictureStyles,
     },
@@ -1513,6 +1554,7 @@ my %longBin = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     1 => { #PH
         Name => 'NumAFPoints',
+        DataMember => 'NumAFPoints',
         RawConv => '$self->{NumAFPoints} = $val',
     },
     2 => 'CanonImageWidth',
@@ -1739,8 +1781,11 @@ my %longBin = (
         RawConv => '$val<0 ? undef : $val',
         PrintConv => {
             0 => 'Off',
+            # what do these modes mean?:
             1 => 'On (mode 1)',
             2 => 'On (mode 2)',
+            3 => 'On (mode 3)', # (1DmkII,5D)
+            4 => 'On (mode 4)', # (30D)
         },
     },
     9 => { #PH
@@ -2125,10 +2170,8 @@ my %longBin = (
         Require => {
             0 => 'ShortFocal',
             1 => 'LongFocal',
-            2 => 'FocalUnits',
         },
-        RawConv => '$val[2] ? $val : undef',
-        ValueConv => '$val[0] / $val[2]',
+        ValueConv => '$val[0]',
         PrintConv => 'Image::ExifTool::Canon::PrintFocalRange(@val)',
     },
     Lens35efl => {
@@ -2136,14 +2179,13 @@ my %longBin = (
         Require => {
             0 => 'ShortFocal',
             1 => 'LongFocal',
-            2 => 'FocalUnits',
-            4 => 'Lens',
+            3 => 'Lens',
         },
         Desire => {
-            3 => 'ScaleFactor35efl',
+            2 => 'ScaleFactor35efl',
         },
-        ValueConv => '$val[4] * ($val[3] ? $val[3] : 1)',
-        PrintConv => '$prt[4] . ($val[3] ? sprintf(" (35mm equivalent: %s)",Image::ExifTool::Canon::PrintFocalRange(@val)) : "")',
+        ValueConv => '$val[3] * ($val[2] ? $val[2] : 1)',
+        PrintConv => '$prt[3] . ($val[2] ? sprintf(" (35mm equivalent: %s)",Image::ExifTool::Canon::PrintFocalRange(@val)) : "")',
     },
     ShootingMode => {
         Require => {
@@ -2250,6 +2292,18 @@ my %longBin = (
         },
         PrintConv => 'sprintf("%.0f",$val)',
     },
+    DigitalZoom => {
+        Require => {
+            0 => 'Canon:ZoomSourceWidth',
+            1 => 'Canon:ZoomTargetWidth',
+            2 => 'Canon:DigitalZoom',
+        },
+        RawConv => q{
+            return undef unless $val[2] == 3 and $val[0];
+            return $val[1] / $val[0];
+        },
+        PrintConv => 'sprintf("%.2fx",$val)',
+    }
 );
 
 # add our composite tags
@@ -2334,16 +2388,16 @@ sub CameraISO($;$)
 
 #------------------------------------------------------------------------------
 # Print range of focal lengths
-# Inputs: 0) short focal, 1) long focal, 2) focal units, 3) optional scaling factor
+# Inputs: 0) short focal, 1) long focal, 2) optional scaling factor
 sub PrintFocalRange(@)
 {
-    my ($short, $long, $units, $scale) = @_;
+    my ($short, $long, $scale) = @_;
 
-    $scale and $units /= $scale;    # correct for 35efl scaling factor if given
+    $scale or $scale = 1;
     if ($short == $long) {
-        return sprintf("%.1fmm", $short / $units);
+        return sprintf("%.1fmm", $short * $scale);
     } else {
-        return sprintf("%.1f - %.1fmm", $short / $units, $long / $units);
+        return sprintf("%.1f - %.1fmm", $short * $scale, $long * $scale);
     }
 }
 

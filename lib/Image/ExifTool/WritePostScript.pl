@@ -452,8 +452,8 @@ sub WritePS($$)
     # get hash of new information keyed by tagID and directories to add/edit
     my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
 
-    # figure out which directories we need to write
-    $exifTool->InitWriteDirs(\%psMap);
+    # figure out which directories we need to write (PostScript takes priority)
+    $exifTool->InitWriteDirs(\%psMap, 'PostScript');
     my $addDirs = $exifTool->{ADD_DIRS};
     my $editDirs = $exifTool->{EDIT_DIRS};
     my %doneDir;

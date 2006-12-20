@@ -20,7 +20,7 @@ package Image::ExifTool::Kodak;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 %Image::ExifTool::Kodak::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -308,7 +308,7 @@ Z7560.
         ValueConvInv => '$val=~tr/:./ /;$val',
     },
     0x1e => { #PH
-        Name => 'AnalogZoom',
+        Name => 'OpticalZoom',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',

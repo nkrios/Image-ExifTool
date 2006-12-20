@@ -201,7 +201,11 @@ sub WriteCR2($$$)
     # CR2 has a 16-byte header
     $$dirInfo{NewDataPos} = 16;
     my $newData = $exifTool->WriteDirectory($dirInfo, $tagTablePtr);
-    return 0 unless defined $newData and $$dirInfo{LastIFD};
+    return 0 unless defined $newData;
+    unless ($$dirInfo{LastIFD}) {
+        $exifTool->Error("CR2 image IFD may not be deleted");
+        return 0;
+    }
 
     if (length($newData)) {
         # build 16 byte header for Canon RAW file

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.66
 [File, File, Image]  - File Name: CanonRaw_6_failed.cr2
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 11 kB
-[File, File, Time]  - File Modification Date/Time: 2006:11:17 13:51:51
+[File, File, Time]  - File Modification Date/Time: 2006:12:20 07:58:47
 [File, File, Image]  - File Type: CR2
 [File, File, Image]  - MIME Type: image/x-raw
 [EXIF, IFD0, Image] 256 - Image Width: 1536
@@ -11,7 +11,7 @@
 [EXIF, IFD0, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS 350D DIGITAL
-[EXIF, IFD0, Image] 273 - Preview Image Start: 11482
+[EXIF, IFD0, Image] 273 - Preview Image Start: 11506
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 279 - Preview Image Length: 26
 [EXIF, IFD0, Image] 282 - X Resolution: 72
@@ -46,20 +46,20 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 11422
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 11446
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD2, Image] 256 - Image Width: 384
 [EXIF, IFD2, Image] 257 - Image Height: 256
 [EXIF, IFD2, Image] 258 - Bits Per Sample: 8 8 8
 [EXIF, IFD2, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD2, Image] 262 - Photometric Interpretation: RGB
-[EXIF, IFD2, Image] 273 - Strip Offsets: 11466
+[EXIF, IFD2, Image] 273 - Strip Offsets: 11490
 [EXIF, IFD2, Image] 277 - Samples Per Pixel: 3
 [EXIF, IFD2, Image] 278 - Rows Per Strip: 256
 [EXIF, IFD2, Image] 279 - Strip Byte Counts: 16
 [EXIF, IFD2, Image] 284 - Planar Configuration: Chunky
 [EXIF, IFD3, Image] 259 - Compression: JPEG (old-style)
-[EXIF, IFD3, Image] 273 - Strip Offsets: 11450
+[EXIF, IFD3, Image] 273 - Strip Offsets: 11474
 [EXIF, IFD3, Image] 279 - Strip Byte Counts: 16
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [IPTC, IPTC, Other] 25 - Keywords: CR2 test
@@ -70,6 +70,7 @@
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Single
 [MakerNotes, Canon, Camera] 7 - Focus Mode: One-shot AF
+[MakerNotes, Canon, Camera] 9 - Record Mode: CR2
 [MakerNotes, Canon, Camera] 10 - Canon Image Size: Unknown (-1)
 [MakerNotes, Canon, Camera] 11 - Easy Mode: Manual
 [MakerNotes, Canon, Camera] 12 - Digital Zoom: None
@@ -80,8 +81,8 @@
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Aperture-priority AE
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
-[MakerNotes, Canon, Camera] 23 - Long Focal: 55
-[MakerNotes, Canon, Camera] 24 - Short Focal: 18
+[MakerNotes, Canon, Camera] 23 - Long Focal: 55mm
+[MakerNotes, Canon, Camera] 24 - Short Focal: 18mm
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 4
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 27
@@ -105,6 +106,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
+[MakerNotes, Canon, Image] 10 - Optical Zoom Code: 8
 [MakerNotes, Canon, Image] 13 - Flash Guide Number: 0
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
@@ -157,7 +159,7 @@
 [MakerNotes, Canon, Image] 6 - White Balance Red: 0
 [MakerNotes, Canon, Image] 7 - White Balance Blue: 0
 [MakerNotes, Canon, Image] 9 - Color Temperature: 5200
-[MakerNotes, Canon, Image] 10 - Picture Style: Unknown (0)
+[MakerNotes, Canon, Image] 10 - Picture Style: None
 [MakerNotes, Canon, Image] 11 - Digital Gain: 0
 [MakerNotes, Canon, Image] 12 - WB Shift AB: 0
 [MakerNotes, Canon, Image] 13 - WB Shift GM: 0

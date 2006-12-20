@@ -10,12 +10,12 @@
 #
 #                 exiftool -o new.mie -tagsfromfile SRC "-mie:all<all" \
 #                    "-subfilename<filename" "-subfiletype<filetype" \
-#                    "-subfilemimetype<mimetype" "-subfile<=SRC"
+#                    "-subfilemimetype<mimetype" "-subfiledata<=SRC"
 #
 #               For unrecognized file types, this command may be used:
 #
 #                 exiftool -o new.mie -subfilename=SRC -subfiletype=TYPE \
-#                    -subfilemimetype=MIME "-subfile<=SRC"
+#                    -subfilemimetype=MIME "-subfiledata<=SRC"
 #
 #               where SRC, TYPE and MIME represent the source file name, file
 #               type and MIME type respectively.
@@ -33,10 +33,12 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '0.24';
+$VERSION = '1.10';
 
+sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
 sub WriteMIEGroup($$$);
+sub CheckMIE($$$);
 sub GetLangInfo($$);
 
 # local variables
@@ -89,9 +91,12 @@ my %mieMap = (
    'MIE-Preview'    => 'MIE-Meta',
    'MIE-Thumbnail'  => 'MIE-Meta',
    'MIE-Video'      => 'MIE-Meta',
-   'MIE-Extender'   => 'MIE-Camera',
    'MIE-Flash'      => 'MIE-Camera',
    'MIE-Lens'       => 'MIE-Camera',
+   'MIE-Orient'     => 'MIE-Camera',
+   'MIE-Extender'   => 'MIE-Lens',
+   'MIE-GPS'        => 'MIE-Geo',
+   'MIE-UTM'        => 'MIE-Geo',
     EXIF            => 'MIE-Meta',
     XMP             => 'MIE-Meta',
     IPTC            => 'MIE-Meta',
@@ -108,12 +113,23 @@ my %mieMap = (
     MakerNotes      => 'ExifIFD',
 );
 
+# default table settings
+my %tableDefaults = (
+    PROCESS_PROC => \&ProcessMIE,
+    WRITE_PROC   => \&ProcessMIE,
+    CHECK_PROC   => \&CheckMIE,
+    LANG_INFO    => \&GetLangInfo,
+    WRITABLE     => 'string',
+    PREFERRED    => 1,
+);
+
 # convenience variables for common tagInfo entries
 my %binaryConv = (
     Writable => 'undef',
     Binary => 1,
 );
-my %dateConv = (
+my %dateInfo = (
+    Groups => { 2 => 'Time' },
     Shift => 'Time',
     PrintConv => '$self->ConvertDateTime($val)',
     PrintConvInv => '$val',
@@ -123,29 +139,49 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # MIE info
 %Image::ExifTool::MIE::Main = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Main' },
     WRITE_GROUP => 'MIE-Main',
-    WRITABLE => 'string',
-    PREFERRED => 1,
     NOTES => q{
-        MIE is flexible format which may be used as either a standalone meta
-        information format, or for encapsulation of any other file type.  The tables
-        below represent currently defined MIE tags, however ExifTool will also
-        extract any other information present in a MIE file.
+        MIE is a flexible format which may be used as either a standalone meta
+        information format, or to encapsulate other files and information.  The
+        tables below represent currently defined MIE tags, however ExifTool will
+        also extract any other information present in a MIE file.
+
+        When writing MIE information, some special features are supported:
+
+        1) String values may be written as ASCII or UTF-8.  ExifTool will
+        automatically detect the presence of wide characters and set the format code
+        appropriately.  Internally, UTF-8 text may be stored as UTF-16 or UTF-32 if
+        it is more compact.
+
+        2) All MIE string-value tags support localized text.  Localized values are
+        written by adding a language/country code to the tag name in the form
+        C<TAG-xx_YY>, where C<TAG> is the tag name, C<xx> is a 2-character lower
+        case ISO 639-1 language code, and C<YY> is a 2-character upper case ISO
+        3166-1 alpha 2 country code (ie. C<Title-en_US>).  But as usual, the user
+        interface is case-insensitive, and ExifTool will write the correct case to
+        the file.
+
+        3) Some numerical MIE tags allow units of measurement to be specified.  For
+        these tags, units may be added in brackets immediately following the value
+        (ie. C<55(mi/h)>).  If no units are specified, the default units are
+        written.
     },
    '0Type' => {
         Name => 'SubfileType',
         Notes => q{
-            Currently defined types are ACR, AIFC, AIFF, ASF, AVI, BMP, CR2, CRW, DICOM,
-            DNG, EPS, ERF, GIF, ICC, JNG, JP2, JPEG, MIE, MIFF, MNG, MOS, MOV, MP3, MP4,
-            MPEG, MRW, NEF, ORF, PBM, PDF, PGM, PICT, PNG, PPM, PS, PSD, QTIF, RAF, RAW,
-            RIFF, SR2, SRF, TIFF, WAV, WMA, WMV, X3F and XMP.  Other types should use
-            the common file extension.
+            Currently defined types are ACR, AI, AIFF, APE, ARW, ASF, AVI, BMP, CR2,
+            CRW, DCM, DNG, EPS, ERF, FLAC, FPX, GIF, ICC, JNG, JP2, JPEG, MIE, MIFF MNG,
+            MOS, MOV, MP3, MP4, MPC, MPEG, MRW, NEF, OGG, ORF, PBM, PDF, PEF, PGM, PICT,
+            PNG, PPM, PS, PSD, QTIF, RA, RAF, RAW, RIFF, RM, SR2, SRF, SWF, TIFF, VRD,
+            WAV, WDP, WMA, WMV, X3F and XMP.  Other types should use the common file
+            extension.
         },
+    },
+   '0Vers' => {
+        Name => 'MIEVersion',
+        Notes => 'default version is 1.1 if not specified',
     },
    '1Directory' => { Name => 'SubfileDirectory' },
    '1Name'      => { Name => 'SubfileName' },
@@ -157,14 +193,22 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         },
     },
     data => {
-        Name => 'Subfile',
+        Name => 'SubfileData',
         Notes => 'the subfile data',
         %binaryConv,
     },
-    resource => {
+    rsrc => {
         Name => 'SubfileResource',
         Notes => 'subfile resource fork if it exists',
         %binaryConv,
+    },
+    zmd5 => {
+        Name => 'MD5Digest',
+        Notes => q{
+            16-byte MD5 digest written in binary form or as a 32-character hex-encoded
+            ASCII string. Value is an MD5 digest of the entire 0MIE group as it would be
+            with the digest value itself set to all null bytes
+        },
     },
     zmie => {
         Name => 'TrailerSignature',
@@ -180,17 +224,27 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # MIE meta information group
 %Image::ExifTool::MIE::Meta = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Meta', 2 => 'Image' },
     WRITE_GROUP => 'MIE-Meta',
-    WRITABLE => 'string',
-    PREFERRED => 1,
-    Audio       => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Audio', DirName => 'MIE-Audio' } },
-    Camera      => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Camera', DirName => 'MIE-Camera' } },
-    Document    => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Doc', DirName => 'MIE-Doc' } },
+    Audio => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Audio',
+            DirName => 'MIE-Audio',
+        },
+    },
+    Camera => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Camera',
+            DirName => 'MIE-Camera',
+        },
+    },
+    Document => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Doc',
+            DirName => 'MIE-Doc',
+        },
+    },
     EXIF => {
         SubDirectory => {
             TagTable => 'Image::ExifTool::Exif::Main',
@@ -198,37 +252,67 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             WriteProc => \&Image::ExifTool::WriteTIFF,
         },
     },
-    Geo         => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Geo', DirName => 'MIE-Geo' } },
-    ICCProfile  => { Name => 'ICC_Profile', SubDirectory => { TagTable => 'Image::ExifTool::ICC_Profile::Main' } },
-    ID3         => { SubDirectory => { TagTable => 'Image::ExifTool::ID3::Main' } },
-    IPTC        => { SubDirectory => { TagTable => 'Image::ExifTool::IPTC::Main' } },
-    Image       => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Image', DirName => 'MIE-Image' } },
-    MakerNotes  => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::MakerNotes', DirName => 'MIE-MakerNotes' } },
-    Preview     => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Preview', DirName => 'MIE-Preview' } },
-    Thumbnail   => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Thumbnail', DirName => 'MIE-Thumbnail' } },
-    Video       => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Video', DirName => 'MIE-Video' } },
-    XMP         => { SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' } },
+    Geo => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Geo',
+            DirName => 'MIE-Geo',
+        },
+    },
+    ICCProfile  => {
+        Name => 'ICC_Profile',
+        SubDirectory => { TagTable => 'Image::ExifTool::ICC_Profile::Main' },
+    },
+    ID3  => { SubDirectory => { TagTable => 'Image::ExifTool::ID3::Main' } },
+    IPTC => { SubDirectory => { TagTable => 'Image::ExifTool::IPTC::Main' } },
+    Image => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Image',
+            DirName => 'MIE-Image',
+        },
+    },
+    MakerNotes => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::MakerNotes',
+            DirName => 'MIE-MakerNotes',
+        },
+    },
+    Preview => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Preview',
+            DirName => 'MIE-Preview',
+        },
+    },
+    Thumbnail => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Thumbnail',
+            DirName => 'MIE-Thumbnail',
+        },
+    },
+    Video => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Video',
+            DirName => 'MIE-Video',
+        },
+    },
+    XMP => { SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' } },
 );
 
 # MIE document information
 %Image::ExifTool::MIE::Doc = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Doc', 2 => 'Document' },
     WRITE_GROUP => 'MIE-Doc',
-    WRITABLE => 'string',
-    PREFERRED => 1,
     NOTES => 'Information describing the main document, image or file.',
     Author      => { Groups => { 2 => 'Author' } },
     Comment     => { },
     Contributors=> { Groups => { 2 => 'Author' }, List => 1 },
     Copyright   => { Groups => { 2 => 'Author' } },
-    CreateDate  => { %dateConv, Groups => { 2 => 'Time' } },
+    CreateDate  => { %dateInfo },
+    EMail       => { Groups => { 2 => 'Author' } },
     Keywords    => { List => 1 },
-    ModifyDate  => { %dateConv, Groups => { 2 => 'Time' } },
-    OriginalDate=> { Name => 'DateTimeOriginal', %dateConv, Groups => { 2 => 'Time' } },
+    ModifyDate  => { %dateInfo },
+    OriginalDate=> { Name => 'DateTimeOriginal', %dateInfo },
+    Phone       => { Name => 'PhoneNumber', Groups => { 2 => 'Author' } },
     References  => { List => 1 },
     Software    => { },
     Title       => { },
@@ -237,49 +321,134 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # MIE geographic information
 %Image::ExifTool::MIE::Geo = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Geo', 2 => 'Location' },
     WRITE_GROUP => 'MIE-Geo',
-    WRITABLE => 'string',
-    PREFERRED => 1,
-    NOTES => 'Information describing geographic location.',
+    NOTES => 'Information related to geographic location.',
     Address     => { },
     City        => { },
     Country     => { },
-    Elevation   => { Writable => 'rational64s', Notes => 'm above sea level' },
+    GPS => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::GPS',
+            DirName => 'MIE-GPS',
+        },
+    },
+    PostalCode  => { },
+    State       => { Notes => 'state or province' },
+    UTM => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::UTM',
+            DirName => 'MIE-UTM',
+        },
+    },
+);
+
+# MIE GPS information
+%Image::ExifTool::MIE::GPS = (
+    %tableDefaults,
+    GROUPS => { 1 => 'MIE-GPS', 2 => 'Location' },
+    WRITE_GROUP => 'MIE-GPS',
+    Altitude   => {
+        Name => 'GPSAltitude',
+        Writable => 'rational64s',
+        Units => [ qw(m ft) ],
+        Notes => q{'m' above sea level unless 'ft' specified},
+    },
+    Bearing => {
+        Name => 'GPSDestBearing',
+        Writable => 'rational64s',
+        Units => [ qw(deg deg{mag}) ],
+        Notes => q{'deg' CW from true north unless 'deg{mag}' specified},
+    },
+    Datum   => { Name => 'GPSMapDatum', Notes => 'WGS-84 assumed if not specified' },
+    Differential => {
+        Name => 'GPSDifferential',
+        Writable => 'int8u',
+        PrintConv => {
+            0 => 'No Correction',
+            1 => 'Differential Corrected',
+        },
+    },
+    Distance => {
+        Name => 'GPSDestDistance',
+        Writable => 'rational64s',
+        Units => [ qw(km mi nmi) ],
+        Notes => q{'km' unless 'mi' or 'nmi' specified},
+    },
+    Heading  => {
+        Name => 'GPSTrack',
+        Writable => 'rational64s',
+        Units => [ qw(deg deg{mag}) ],
+        Notes => q{'deg' CW from true north unless 'deg{mag}' specified},
+    },
     Latitude => {
-        Notes => 'degrees, negative for south latitudes',
+        Name => 'GPSLatitude',
+        Writable => 'rational64s',
+        Count => -1,
+        Notes => q{
+            1 to 3 numbers: degrees, minutes then seconds.  South latitudes are stored
+            as all negative numbers, but may be entered as positive numbers with a
+            trailing 'S' for convenience.  For example, these are all equivalent: "-40
+            -30", "-40.5", "40 30 0.00 S"
+        },
+        ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val, 1)',
+        ValueConvInv => 'Image::ExifTool::GPS::ToDMS($self, $val, 0)',
         PrintConv    => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")',
         PrintConvInv => 'Image::ExifTool::GPS::ToDegrees($val, 1)',
     },
     Longitude => {
-        Notes => 'degrees, negative for west longitudes',
-        ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
-        ValueConvInv => 'Image::ExifTool::GPS::ToDMS($self, $val)',
+        Name => 'GPSLongitude',
+        Writable => 'rational64s',
+        Count => -1,
+        Notes => q{
+            1 to 3 numbers: degrees, minutes then seconds.  West longitudes are
+            negative, but may be entered as positive numbers with a trailing 'W'
+        },
+        ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val, 1)',
+        ValueConvInv => 'Image::ExifTool::GPS::ToDMS($self, $val, 0)',
         PrintConv    => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")',
         PrintConvInv => 'Image::ExifTool::GPS::ToDegrees($val, 1)',
     },
-    State       => { },
+    MeasureMode => {
+        Name => 'GPSMeasureMode',
+        Writable => 'int8u',
+        PrintConv => { 2 => '2-D', 3 => '3-D' },
+    },
+    Satellites => 'GPSSatellites',
+    Speed => {
+        Name => 'GPSSpeed',
+        Writable => 'rational64s',
+        Units => [ qw(km/h mi/h m/s kn) ],
+        Notes => q{'km/h' unless 'mi/h', 'm/s' or 'kn' specified},
+    },
+    DateTime => { Name => 'GPSDateTime', %dateInfo },
+);
+
+# MIE UTM information
+%Image::ExifTool::MIE::UTM = (
+    %tableDefaults,
+    GROUPS => { 1 => 'MIE-UTM', 2 => 'Location' },
+    WRITE_GROUP => 'MIE-UTM',
+    Datum    => { Name => 'UTMMapDatum', Notes => 'WGS-84 assumed if not specified' },
+    Easting  => { Name => 'UTMEasting' },
+    Northing => { Name => 'UTMNorthing' },
+    Zone     => { Name => 'UTMZone', Writable => 'int8s' },
 );
 
 # MIE image information
 %Image::ExifTool::MIE::Image = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Image', 2 => 'Image' },
     WRITE_GROUP => 'MIE-Image',
-    WRITABLE => 'string',
-    PREFERRED => 1,
    '0Type'          => { Name => 'FullSizeImageType', Notes => 'JPEG if not specified' },
    '1Name'          => { Name => 'FullSizeImageName' },
     BitDepth        => { Name => 'BitDepth', Writable => 'int16u' },
     ColorSpace      => { Notes => 'standard ColorSpace values are "sRGB" and "Adobe RGB"' },
-    Components      => { Name => 'ComponentsConfiguration', Notes => 'string composed of R, G, B, Y, Cb and Cr' },
+    Components      => {
+        Name => 'ComponentsConfiguration',
+        Notes => 'string composed of R, G, B, Y, Cb and Cr',
+    },
     Compression     => { Name => 'CompressionRatio', Writable => 'rational32u' },
     ImageSize       => {
         Writable => 'int16u',
@@ -288,25 +457,31 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => '$val=~tr/ /x/;$val',
         PrintConvInv => '$val=~tr/x/ /;$val',
     },
-    Resolution      => { Writable => 'rational64u', Count => -1, Notes => '2 or 3 values for XY or XYZ resolution' },
-    ResolutionUnits => { Writable => 'int16u', PrintConv => { 0 => 'none', 1 => 'inches', 2 => 'cm' } },
+    Resolution      => {
+        Writable => 'rational64u',
+        Units => [ qw(/in /cm /deg /arcmin /arcsec), '' ],
+        Count => -1,
+        Notes => q{
+            1 to 3 values.  A single value for equal resolution in all directions, or
+            separate X, Y and Z values if necessary.  Units are '/in' unless '/cm',
+            '/deg', '/arcmin', '/arcsec' or '' specified
+        },
+        PrintConv => '$val=~tr/ /x/;$val',
+        PrintConvInv => '$val=~tr/x/ /;$val',
+    },
     data => {
         Name => 'FullSizeImage',
         %binaryConv,
         ValueConv => '$self->ValidateImage(\$val,$tag)',
+        ValueConvInv => '$val',
     },
 );
 
 # MIE preview image
 %Image::ExifTool::MIE::Preview = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Preview', 2 => 'Image' },
     WRITE_GROUP => 'MIE-Preview',
-    WRITABLE => 'string',
-    PREFERRED => 1,
    '0Type'  => { Name => 'PreviewImageType', Notes => 'JPEG if not specified' },
    '1Name'  => { Name => 'PreviewImageName' },
     ImageSize => {
@@ -320,19 +495,15 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'PreviewImage',
         %binaryConv,
         ValueConv => '$self->ValidateImage(\$val,$tag)',
+        ValueConvInv => '$val',
     },
 );
 
 # MIE thumbnail image
 %Image::ExifTool::MIE::Thumbnail = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Thumbnail', 2 => 'Image' },
     WRITE_GROUP => 'MIE-Thumbnail',
-    WRITABLE => 'string',
-    PREFERRED => 1,
    '0Type'  => { Name => 'ThumbnailImageType', Notes => 'JPEG if not specified' },
    '1Name'  => { Name => 'ThumbnailImageName' },
     ImageSize => {
@@ -346,23 +517,19 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ThumbnailImage',
         %binaryConv,
         ValueConv => '$self->ValidateImage(\$val,$tag)',
+        ValueConvInv => '$val',
     },
 );
 
 # MIE audio information
 %Image::ExifTool::MIE::Audio = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Audio', 2 => 'Audio' },
     WRITE_GROUP => 'MIE-Audio',
-    WRITABLE => 'string',
-    PREFERRED => 1,
     NOTES => q{
         For the Audio group (and any other group containing a 'data' element), tags
         refer to the contained data if present, otherwise they refer to the main
-        Subfile data.  The '0Type' and '1Name' elements should exist only if 'data'
+        SubfileData.  The C<0Type> and C<1Name> elements should exist only if C<data>
         is present.
     },
    '0Type'      => { Name => 'RelatedAudioFileType', Notes => 'MP3 if not specified' },
@@ -377,14 +544,9 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # MIE video information
 %Image::ExifTool::MIE::Video = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Video', 2 => 'Video' },
     WRITE_GROUP => 'MIE-Video',
-    WRITABLE => 'string',
-    PREFERRED => 1,
    '0Type'      => { Name => 'RelatedVideoFileType', Notes => 'MOV if not specified' },
    '1Name'      => { Name => 'RelatedVideoFileName' },
     Codec       => { },
@@ -394,18 +556,16 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # MIE camera information
 %Image::ExifTool::MIE::Camera = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Camera', 2 => 'Camera' },
     WRITE_GROUP => 'MIE-Camera',
-    WRITABLE => 'string',
-    PREFERRED => 1,
-    AnalogZoom      => { Writable => 'rational64u' },
-    BlueBalance     => { Writable => 'rational64u' },
-    ColorTemperature=> { Writable => 'int32u' },
     Brightness      => { Writable => 'int8s' },
+    ColorTemperature=> { Writable => 'int32u' },
+    ColorBalance    => {
+        Writable => 'rational64u',
+        Count => 3,
+        Notes => 'RGB scaling factors',
+    },
     Contrast        => { Writable => 'int8s' },
     DigitalZoom     => { Writable => 'rational64u' },
     ExposureComp    => { Name => 'ExposureCompensation', Writable => 'rational64s' },
@@ -415,48 +575,105 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
-    Extender        => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Extender', DirName => 'MIE-Extender' } },
-    FNumber         => { Writable => 'rational64u' },
-    Flash           => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Flash', DirName => 'MIE-Flash' } },
+    Flash => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Flash',
+            DirName => 'MIE-Flash',
+        },
+    },
     FirmwareVersion => { },
-    FocalLength     => { Writable => 'rational64u', Notes => 'includes affect of extender, if any' },
-    FocusDistance   => { Writable => 'rational64u' },
     FocusMode       => { },
     ISO             => { Writable => 'int16u' },
-    ISOSetting      => { Writable => 'int16u', Notes => '0 = Auto, otherwise manual ISO speed setting' },
+    ISOSetting      => {
+        Writable => 'int16u',
+        Notes => '0 = Auto, otherwise manual ISO speed setting',
+    },
     ImageNumber     => { Writable => 'int32u' },
     ImageQuality    => { Notes => 'Economy, Normal, Fine, Super Fine or Raw' },
     ImageStabilization => { Writable => 'int8u', %offOn },
-    Lens            => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Lens', DirName => 'MIE-Lens' } },
+    Lens => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Lens',
+            DirName => 'MIE-Lens',
+        },
+    },
     Make            => { },
-    MaxAperture     => { Writable => 'rational64u' },
-    MaxApertureAtMaxFocal => { Writable => 'rational64u' },
-    MaxFocalLength  => { Writable => 'rational64u' },
     MeasuredEV      => { Writable => 'rational64s' },
-    MinAperture     => { Writable => 'rational64u' },
-    MinFocalLength  => { Writable => 'rational64u' },
     Model           => { },
-    Orientation     => { Writable => 'int16u', Notes => 'CW rotation angle of camera' },
     OwnerName       => { },
-    RedBalance      => { Writable => 'rational64u' },
+    Orientation     => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Orient',
+            DirName => 'MIE-Orient',
+        },
+    },
     Saturation      => { Writable => 'int8s' },
-    SensorSize      => { Writable => 'rational64u', Count => 2, Notes => 'width and height of active sensor area in mm' },
+    SensorSize      => {
+        Writable => 'rational64u',
+        Count => 2,
+        Notes => 'width and height of active sensor area in mm',
+    },
     SerialNumber    => { },
     Sharpness       => { Writable => 'int8s' },
     ShootingMode    => { },
 );
 
+# Camera orientation information
+%Image::ExifTool::MIE::Orient = (
+    %tableDefaults,
+    GROUPS => { 1 => 'MIE-Orient', 2 => 'Camera' },
+    WRITE_GROUP => 'MIE-Orient',
+    NOTES => 'These tags describe the camera orientation.',
+    Azimuth     => {
+        Writable => 'rational64s',
+        Units => [ qw(deg deg{mag}) ],
+        Notes => q{'deg' CW from true north unless 'deg{mag}' specified},
+    },
+    Declination => { Writable => 'rational64s' },
+    Elevation   => { Writable => 'rational64s' },
+    RightAscension => { Writable => 'rational64s' },
+    Rotation    => { Writable => 'rational64s', Notes => 'CW rotation angle about lens axis' },
+);
+
+# MIE camera lens information
+%Image::ExifTool::MIE::Lens = (
+    %tableDefaults,
+    GROUPS => { 1 => 'MIE-Lens', 2 => 'Camera' },
+    WRITE_GROUP => 'MIE-Lens',
+    NOTES => q{
+        All recorded lens parameters (focal length, aperture, etc) include the
+        effects of the extender if present.
+    },
+    Extender => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Extender',
+            DirName => 'MIE-Extender',
+        },
+    },
+    FNumber         => { Writable => 'rational64u' },
+    FocalLength     => { Writable => 'rational64u', Notes => 'all focal lengths in mm' },
+    FocusDistance   => {
+        Writable => 'rational64u',
+        Units => [ qw(m ft) ],
+        Notes => q{'m' unless 'ft' specified},
+    },
+    Make            => { Name => 'LensMake' },
+    MaxAperture     => { Writable => 'rational64u' },
+    MaxApertureAtMaxFocal => { Writable => 'rational64u' },
+    MaxFocalLength  => { Writable => 'rational64u' },
+    MinAperture     => { Writable => 'rational64u' },
+    MinFocalLength  => { Writable => 'rational64u' },
+    Model           => { Name => 'LensModel' },
+    OpticalZoom     => { Writable => 'rational64u' },
+    SerialNumber    => { Name => 'LensSerialNumber' },
+);
+
 # MIE lens extender information
 %Image::ExifTool::MIE::Extender = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Extender', 2 => 'Camera' },
     WRITE_GROUP => 'MIE-Extender',
-    WRITABLE => 'string',
-    PREFERRED => 1,
-    Magnification   => { Writable => 'rational64s' },
+    Magnification   => { Name => 'ExtenderMagnification', Writable => 'rational64s' },
     Make            => { Name => 'ExtenderMake' },
     Model           => { Name => 'ExtenderModel' },
     SerialNumber    => { Name => 'ExtenderSerialNumber' },
@@ -464,14 +681,9 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # MIE camera flash information
 %Image::ExifTool::MIE::Flash = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-Flash', 2 => 'Camera' },
     WRITE_GROUP => 'MIE-Flash',
-    WRITABLE => 'string',
-    PREFERRED => 1,
     ExposureComp    => { Name => 'FlashExposureComp', Writable => 'rational64s' },
     Fired           => { Name => 'FlashFired', Writable => 'int8u', PrintConv => \%noYes },
     GuideNumber     => { Name => 'FlashGuideNumber' },
@@ -482,30 +694,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     Type            => { Name => 'FlashType', Notes => '"Internal" or "External"' },
 );
 
-# MIE camera lens information
-%Image::ExifTool::MIE::Lens = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
-    GROUPS => { 1 => 'MIE-Lens', 2 => 'Camera' },
-    WRITE_GROUP => 'MIE-Lens',
-    WRITABLE => 'string',
-    PREFERRED => 1,
-    Make            => { Name => 'LensMake' },
-    Model           => { Name => 'LensModel' },
-    SerialNumber    => { Name => 'LensSerialNumber' },
-);
-
 # MIE maker notes information
 %Image::ExifTool::MIE::MakerNotes = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    WRITE_PROC => \&Image::ExifTool::MIE::ProcessMIE,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    LANG_INFO => \&GetLangInfo,
+    %tableDefaults,
     GROUPS => { 1 => 'MIE-MakerNotes' },
     WRITE_GROUP => 'MIE-MakerNotes',
-    PREFERRED => 1,
     NOTES => q{
         MIE maker notes are contained within separate groups for each manufacturer
         to avoid name conflicts.  Currently no specific manufacturer information has
@@ -526,7 +719,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 );
 
 %Image::ExifTool::MIE::Unknown = (
-    PROCESS_PROC => \&Image::ExifTool::MIE::ProcessMIE,
+    PROCESS_PROC => \&ProcessMIE,
     GROUPS => { 1 => 'MIE-Unknown' },
 );
 
@@ -549,7 +742,8 @@ sub GetLangInfo($$)
         $langInfo = {
             %$tagInfo,
             Name => $$tagInfo{Name} . '-' . $langCode,
-            Description => Image::ExifTool::MakeDescription($$tagInfo{Name}) . " ($langCode)",
+            Description => Image::ExifTool::MakeDescription($$tagInfo{Name}) .
+                           " ($langCode)",
         };
         Image::ExifTool::AddTagToTable($table, $tagID, $langInfo);
     }
@@ -656,6 +850,34 @@ sub ReadMIEValue($$$$$)
 }
 
 #------------------------------------------------------------------------------
+# validate raw values for writing
+# Inputs: 0) ExifTool object ref, 1) tagInfo hash ref, 2) raw value ref
+# Returns: error string or undef (and possibly changes value) on success
+sub CheckMIE($$$)
+{
+    my ($exifTool, $tagInfo, $valPtr) = @_;
+    my $format = $$tagInfo{Writable} || $tagInfo->{Table}->{WRITABLE};
+    my $err;
+
+    return 'No writable format' if not $format or $format eq '1';
+    # handle units if supported by this tag
+    my $ulist = $$tagInfo{Units};
+    if ($ulist and $$valPtr =~ /(.*)\((.*)\)$/) {
+        my ($val, $units) = ($1, $2);
+        ($units) = grep /^$units$/i, @$ulist;
+        defined $units or return 'Allowed units: (' . join('|', @$ulist) . ')';
+        $err = Image::ExifTool::CheckValue(\$val, $format, $$tagInfo{Count});
+        # add units back onto value
+        $$valPtr = "$val($units)" unless $err;
+    } elsif ($format !~ /^(utf|string|undef)/ and $$valPtr =~ /\)$/) {
+        return 'Units not supported';
+    } else {
+        $err = Image::ExifTool::CheckValue($valPtr, $format, $$tagInfo{Count});
+    }
+    return $err;
+}
+
+#------------------------------------------------------------------------------
 # Rewrite a MIE directory
 # Inputs: 0) ExifTool object reference, 1) DirInfo reference, 2) tag table ptr
 # Returns: undef on success, otherwise error message (empty message if nothing to write)
@@ -669,7 +891,7 @@ sub WriteMIEGroup($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $optCompress = $exifTool->Options('Compress');
     my $out = $exifTool->Options('TextOut');
-    my ($buff, $msg, $err, $ok, $sync, $delGroup);
+    my ($msg, $err, $ok, $sync, $delGroup);
     my $tag = '';
     my $deletedTag = '';
 
@@ -709,10 +931,11 @@ sub WriteMIEGroup($$$)
 
     # loop through elements in MIE group
     MieElement: for (;;) {
-        my ($format, $tagLen, $valLen, $buf2);
+        my ($format, $tagLen, $valLen, $units, $oldHdr, $buff);
         my $lastTag = $tag;
         if ($raf) {
-            my $n = $raf->Read($buff, 4);
+            # read first 4 bytes of element header
+            my $n = $raf->Read($oldHdr, 4);
             if ($n != 4) {
                 last if $n or defined $sync;
                 undef $raf; # all done reading
@@ -720,13 +943,16 @@ sub WriteMIEGroup($$$)
             }
         }
         if ($raf) {
-            ($sync, $format, $tagLen, $valLen) = unpack('aC3', $buff);
+            ($sync, $format, $tagLen, $valLen) = unpack('aC3', $oldHdr);
             $sync eq '~' or $msg = 'Invalid sync byte', last;
 
             # read tag name
             if ($tagLen) {
                 $raf->Read($tag, $tagLen) == $tagLen or last;
+                $oldHdr .= $tag;    # add tag to element header
                 $exifTool->Warn("MIE tag '$tag' out of sequence") if $tag lt $lastTag;
+                # separate units from tag name if they exist
+                $units = $1 if $tag =~ s/\((.*)\)$//;
             } else {
                 $tag = '';
             }
@@ -735,9 +961,10 @@ sub WriteMIEGroup($$$)
             if ($valLen > 252) {
                 # calculate number of bytes in extended DataLength
                 my $n = 1 << (256 - $valLen);
-                $raf->Read($buf2, $n) == $n or last;
+                $raf->Read($buff, $n) == $n or last;
+                $oldHdr .= $buff;   # add to old header
                 my $fmt = 'int' . ($n * 8) . 'u';
-                $valLen = ReadValue(\$buf2, 0, $fmt, 1, $n);
+                $valLen = ReadValue(\$buff, 0, $fmt, 1, $n);
                 if ($valLen > 0x7fffffff) {
                     $msg = "Can't write $tag (DataLength > 2GB not yet supported)";
                     last;
@@ -895,7 +1122,7 @@ sub WriteMIEGroup($$$)
                         $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash);
                         last unless $isOverwriting;
                     }
-                    my $val;
+                    my ($val, $cmpVal);
                     if ($isOverwriting < 0 or $verbose > 1) {
                         # check to be sure we can uncompress the value if necessary
                         HasZlib($exifTool, 'edit') or last if $format & 0x04;
@@ -905,6 +1132,9 @@ sub WriteMIEGroup($$$)
                         if ($format & 0x04) {
                             my $stat;
                             my $inflate = Compress::Zlib::inflateInit();
+                            # must save original compressed value in case we decide
+                            # not to overwrite it later
+                            $cmpVal = $oldVal;
                             $inflate and ($oldVal, $stat) = $inflate->inflate($oldVal);
                             unless ($inflate and $stat == Compress::Zlib::Z_STREAM_END()) {
                                 $msg = "Error inflating $tag";
@@ -941,17 +1171,21 @@ sub WriteMIEGroup($$$)
                             $raf->Seek($valLen, 1) or $msg = 'Seek error';
                         }
                         if ($verbose > 1) {
+                            $val .= "($units)" if defined $units;
                             $val = $exifTool->Printable($val);
                             print $out "    - $grp1:$$newInfo{Name} = '$val'\n";
                         }
                         $deletedTag = $tag;     # remember that we deleted this tag
                         ++$exifTool->{CHANGED}; # we deleted the old value
                     } else {
-                        unless (defined $oldVal) {
+                        if (defined $oldVal) {
+                            # write original compressed value
+                            $oldVal = $cmpVal if defined $cmpVal;
+                        } else {
                             $raf->Read($oldVal, $valLen) == $valLen or last MieElement;
                         }
                         # write the old value now
-                        Write($outfile, $toWrite, $buff, $tag, $oldVal) or $err = 1;
+                        Write($outfile, $toWrite, $oldHdr, $oldVal) or $err = 1;
                         $toWrite = '';
                     }
                     unless (@newVals) {
@@ -1006,14 +1240,26 @@ sub WriteMIEGroup($$$)
             # write the new or edited element
             while (defined $newFormat) {
                 my $valPt = \$newVal;
+                # remove units from value and add to tag name if supported by this tag
+                if ($$newInfo{Units}) {
+                    my $val2;
+                    if ($$valPt =~ /(.*)\((.*)\)$/) {
+                        $val2 = $1;
+                        $newTag .= "($2)";
+                    } else {
+                        $val2 = $$valPt;
+                        # add default units
+                        my $ustr = '(' . $newInfo->{Units}->[0] . ')';
+                        $newTag .= $ustr;
+                        $$valPt .= $ustr;
+                    }
+                    $valPt = \$val2;
+                }
                 # convert value if necessary
                 if ($writable !~ /^(utf|string|undef)/) {
-                    my $wrVal = WriteValue($newVal, $writable, $$newInfo{Count});
-                    unless (defined $wrVal) {
-                        $exifTool->Warn("Error writing $newTag");
-                        last;
-                    }
-                    $valPt = \$wrVal;
+                    my $val3 = WriteValue($$valPt, $writable, $$newInfo{Count});
+                    defined $val3 or $exifTool->Warn("Error writing $newTag"), last;
+                    $valPt = \$val3;
                 }
                 my $len = length $$valPt;
                 # compress value before writing if required
@@ -1021,20 +1267,20 @@ sub WriteMIEGroup($$$)
                     HasZlib($exifTool, 'write'))
                 {
                     my $deflate = Compress::Zlib::deflateInit();
-                    my $val2;
+                    my $val4;
                     if ($deflate) {
-                        $val2 = $deflate->deflate($$valPt);
-                        $val2 .= $deflate->flush() if defined $val2;
+                        $val4 = $deflate->deflate($$valPt);
+                        $val4 .= $deflate->flush() if defined $val4;
                     }
-                    if (defined $val2) {
-                        my $len2 = length $val2;
-                        my $saved = $len - $len2;
+                    if (defined $val4) {
+                        my $len4 = length $val4;
+                        my $saved = $len - $len4;
                         # only use compressed data if it is smaller
                         if ($saved > 0) {
                             $verbose and print $out "  [$newTag compression saved $saved bytes]\n";
                             $newFormat |= 0x04; # set compressed bit
-                            $len = $len2;       # set length
-                            $valPt = \$val2;    # set value pointer
+                            $len = $len4;       # set length
+                            $valPt = \$val4;    # set value pointer
                         } elsif ($verbose) {
                             print $out "  [$newTag compression saved $saved bytes -- written uncompressed]\n";
                         }
@@ -1133,8 +1379,7 @@ sub WriteMIEGroup($$$)
             Write($outfile, $toWrite) or $err = 1;
             $toWrite = '';
         }
-        $tag .= $buf2 if defined $buf2; # add extra data length if nececessary
-        Write($outfile, $buff, $tag, $oldVal) or $err = 1;
+        Write($outfile, $oldHdr, $oldVal) or $err = 1;
     }
     # return error message
     if ($err) {
@@ -1191,11 +1436,13 @@ sub ProcessMIEGroup($$$)
         $sync eq '~' or $msg = 'Invalid sync byte', last;
 
         # read tag name
-        my $tag;
+        my ($tag, $units);
         if ($tagLen) {
             $raf->Read($tag, $tagLen) == $tagLen or last;
             $exifTool->Warn("MIE tag '$tag' out of sequence") if $tag lt $lastTag;
             $lastTag = $tag;
+            # separate units from tag name if they exist
+            $units = $1 if $tag =~ s/\((.*)\)$//;
         } else {
             $tag = '';
         }
@@ -1306,13 +1553,21 @@ sub ProcessMIEGroup($$$)
                 }
                 # save type or mime type
                 $mime = $val if $tag eq '0Type' or $tag eq '2MIME';
-                $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
-                    DataPt => \$value,
-                    DataPos => $raf->Tell() - $valLen,
-                    Size => $valLen,
-                    Format => $formatStr,
-                    Value => $val,
-                );
+                if ($verbose) {
+                    my $count;
+                    my $s = Image::ExifTool::FormatSize($formatStr);
+                    if ($s and $formatStr !~ /^(utf|string|undef)/) {
+                        $count = $valLen / $s;
+                    }
+                    $exifTool->VerboseInfo($lastTag, $tagInfo,
+                        DataPt => \$value,
+                        DataPos => $raf->Tell() - $valLen,
+                        Size => $valLen,
+                        Format => $formatStr,
+                        Value => $val,
+                        Count => $count,
+                    );
+                }
                 if ($$tagInfo{SubDirectory}) {
                     my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
                     my %subdirInfo = (
@@ -1332,6 +1587,8 @@ sub ProcessMIEGroup($$$)
                     my @vals = split "\0", $val;
                     $exifTool->FoundTag($tagInfo, \@vals);
                 } else {
+                    # add units to value if specified
+                    $val .= "($units)" if defined $units;
                     $exifTool->FoundTag($tagInfo, $val);
                 }
             } else {
@@ -1353,14 +1610,56 @@ sub ProcessMIEGroup($$$)
 # Read/write a MIE file
 # Inputs: 0) ExifTool object reference, 1) DirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid MIE file, or -1 on write error
+# - process as a trailer if "Trailer" flag set in dirInfo
 sub ProcessMIE($$)
 {
     my ($exifTool, $dirInfo) = @_;
     return 1 unless defined $exifTool;
     my $raf = $$dirInfo{RAF};
     my $outfile = $$dirInfo{OutFile};
-    my ($buff, $err, $msg);
+    my ($buff, $err, $msg, $pos, $end);
     my $numDocs = 0;
+#
+# process as a trailer (from end of file) if specified
+#
+    if ($$dirInfo{Trailer}) {
+        my $offset = $$dirInfo{Offset} || 0;    # offset from end of file
+        $raf->Seek(-10 - $offset, 2) or return 0;
+        for (;;) {
+            # read and validate last 10 bytes
+            $raf->Read($buff, 10) == 10 or last;
+            last unless $buff =~ /~\0\0\x06.{4}(\x10|\x18)(\x04)$/s or
+                        $buff =~ /(\x10|\x18)(\x08)$/s;
+            SetByteOrder($1 eq "\x10" ? 'MM' : 'II');
+            my $len = ($2 eq "\x04") ? Get32u(\$buff, 4) : Get64u(\$buff);
+            my $curPos = $raf->Tell() or last;
+            last if $len < 12 or $len > $curPos;
+            # validate element header if 8-byte offset was used
+            if ($2 eq "\x08") {
+                last if $len < 14;
+                $raf->Seek($curPos - 14, 0) and $raf->Read($buff, 4) or last;
+                last unless $buff eq "~\0\0\x0a";
+            }
+            # looks like a good group, so remember start position
+            $pos = $curPos - $len;
+            $end = $curPos unless $end;
+            # seek to 10 bytes from end of previous group
+            $raf->Seek($pos - 10, 0) or last;
+        }
+        # seek to start of first MIE group
+        return 0 unless defined $pos and $raf->Seek($pos, 0);
+        # update DataPos and DirLen for ProcessTrailers()
+        $$dirInfo{DataPos} = $pos;
+        $$dirInfo{DirLen} = $end - $pos;
+        if ($outfile and $exifTool->{DEL_GROUP}->{MIE}) {
+            # delete the trailer
+            $exifTool->VPrint(0,"  Deleting MIE trailer\n");
+            ++$exifTool->{CHANGED};
+            return 1;
+        } elsif ($exifTool->Options('Verbose') or $exifTool->{HTML_DUMP}) {
+            $exifTool->DumpTrailer($dirInfo);
+        }
+    }
 #
 # loop through all documents in MIE file
 #
@@ -1370,13 +1669,6 @@ sub ProcessMIE($$)
         if ($num == 8) {
             # verify file identifier
             if ($buff =~ /^~(\x10|\x18)\x04(.)0MIE/) {
-                # this is a MIE document -- increment document count
-                unless ($numDocs) {
-                    $exifTool->SetFileType();   # this is a valid MIE file
-                    $exifTool->{NO_LIST} = 1;   # handle lists ourself
-                    $exifTool->{MIE_COUNT} = { };
-                    undef $hasZlib;
-                }
                 SetByteOrder($1 eq "\x10" ? 'MM' : 'II');
                 my $len = ord($2);
                 # skip extended DataLength if it exists
@@ -1389,12 +1681,12 @@ sub ProcessMIE($$)
                 if ($buff =~ /^~/) {
                     $msg = 'Non-standard file-level MIE element';
                 } else {
-                    $msg = 'Invalid file-level data';
+                    $msg = 'Invalid MIE file-level data';
                 }
             }
         } elsif ($numDocs) {
             last unless $num;   # OK, all done with file
-            $msg = 'Truncated element header';
+            $msg = 'Truncated MIE element header';
         } else {
             return 0 if $num or not $outfile;
             # we have the ability to create a MIE file from scratch
@@ -1402,12 +1694,21 @@ sub ProcessMIE($$)
             SetByteOrder('MM'); # write big-endian
         }
         if ($msg) {
+            last if $$dirInfo{Trailer}; # allow other trailers after MIE
             if ($outfile) {
                 $exifTool->Error($msg);
             } else {
                 $exifTool->Warn($msg);
             }
             last;
+        }
+        # this is a new MIE document -- increment document count
+        unless ($numDocs) {
+            # this is a valid MIE file (unless a trailer on another file)
+            $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
+            $exifTool->{NO_LIST} = 1;   # handle lists ourself
+            $exifTool->{MIE_COUNT} = { };
+            undef $hasZlib;
         }
         ++$numDocs;
 
@@ -1421,18 +1722,14 @@ sub ProcessMIE($$)
             # don't define Parent so WriteMIEGroup() writes extended terminator
         );
         if ($outfile) {
-
-            if ($VERSION < 1) {
-                $exifTool->Warn("MIE format still in development (version $VERSION)");
-            }
-
             # generate lookup for MIE format codes if not done already
             unless (%mieCode) {
                 foreach (keys %mieFormat) {
                     $mieCode{$mieFormat{$_}} = $_;
                 }
             }
-            $exifTool->InitWriteDirs(\%mieMap);
+            # initialize write directories, with MIE tags taking priority
+            $exifTool->InitWriteDirs(\%mieMap, 'MIE');
             $subdirInfo{ToWrite} = '~' . MIEGroupFormat(1) . "\x04\xfe0MIE\0\0\0\0";
             $msg = WriteMIEGroup($exifTool, \%subdirInfo, $tagTablePtr);
             if ($msg) {
@@ -1530,16 +1827,12 @@ method of adding meta information to a file.  The meta information is
 logically separated from the original file data, which is extremely
 important because meta information is routinely lost when files are edited.
 
-Also, the MIE format supports multiple files by simple concatination,
+Also, the MIE format supports multiple files by simple concatenation,
 enabling all kinds of wonderful features such as linear databases, edit
 histories or non-intrusive file updates.  This ability can also be leveraged
 to allow MIE-format trailers to be added to some other file types.
 
 =head1 MIE FORMAT SPECIFICATION
-
-NOTE: The MIE format specification is currently under development.  Until
-version 1.00 is released these specifications may be subject to changes
-which may not be backwardly compatible.
 
 =head2 File Structure
 
@@ -1600,9 +1893,9 @@ The format code is a bitmask that defines the format of the data:
 
 =over 4
 
-B<FormatType> (bitmask 0xf0):
+=item FormatType (bitmask 0xf0):
 
-    0x00 - other (unknown) format data
+    0x00 - other (or unknown) data
     0x10 - MIE group
     0x20 - text string
     0x30 - list of null-separated text strings
@@ -1612,11 +1905,11 @@ B<FormatType> (bitmask 0xf0):
     0x70 - floating point
     0x80 - free space
 
-B<TypeModifier> (bitmask 0x08):
+=item TypeModifier (bitmask 0x08):
 
-Modifies the meaning of certain FormatTypes (0x00-0x50):
+Modifies the meaning of certain FormatTypes (0x00-0x60):
 
-    0x08 - data may be byte swapped according to FormatSize
+    0x08 - other data sensitive to MIE group byte order
     0x18 - MIE group with little-endian byte ordering
     0x28 - UTF encoded text string
     0x38 - UTF encoded text string list
@@ -1624,12 +1917,12 @@ Modifies the meaning of certain FormatTypes (0x00-0x50):
     0x58 - signed rational (denominator is always unsigned)
     0x68 - signed fixed-point
 
-B<Compressed> (bitmask 0x04):
+=item Compressed (bitmask 0x04):
 
 If this bit is set, the data block is compressed using Zlib deflate.  An
 entire MIE group may be compressed, with the exception of file-level groups.
 
-B<FormatSize> (bitmask 0x03):
+=item FormatSize (bitmask 0x03):
 
 Gives the byte size of each data element:
 
@@ -1648,11 +1941,11 @@ an even multiple of the format size in bytes.
 The following is a list of all currently defined MIE FormatCode values for
 uncompressed data (add 0x04 to each value for compressed data):
 
-    0x00 - unknown data (byte order must be preserved)
-    0x08 - other 8-bit data (not affected by byte swapping)
-    0x09 - other 16-bit data (may be byte swapped)
-    0x0a - other 32-bit data (may be byte swapped)
-    0x0b - other 64-bit data (may be byte swapped)
+    0x00 - other data (insensitive to MIE group byte order) (1)
+    0x01 - other 16-bit data (may be byte swapped)
+    0x02 - other 32-bit data (may be byte swapped)
+    0x03 - other 64-bit data (may be byte swapped)
+    0x08 - other data (sensitive to MIE group byte order) (1)
     0x10 - MIE group with big-endian values (1)
     0x18 - MIE group with little-endian values (1)
     0x20 - ASCII string (2,3)
@@ -1683,41 +1976,77 @@ uncompressed data (add 0x04 to each value for compressed data):
     0x73 - 64-bit IEEE double (not recommended for portability reasons) (5)
     0x80 - free space (value data does not contain useful information)
 
- 1) The byte ordering specified by the MIE group TypeModifier applies to the
-    MIE group element as well as all elements in the group.
+Notes:
 
- 2) The TagName of a string element may have an 6-character suffix to
-    indicate a specific locale. (ie. "Title-en_US", or "Keywords-de_DE").
+=over 4
 
- 3) Text strings are not normally null terminated, however they may be
-    padded with one or more null characters to the end of the data block to
-    allow strings to be edited within fixed-length data blocks.
+=item 1.
 
- 4) A list of text strings separated by null characters.  These lists must
-    not be null padded or null terminated, since this would be interpreted
-    as additional zero-length strings.  For ASCII and UTF-8 strings, the
-    null character is a single zero (0x00) byte.  For UTF-16 or UTF-32
-    strings, the null character is 2 or 4 zero bytes respectively.
+The byte ordering specified by the MIE group TypeModifier applies to the MIE
+group element as well as all elements within the group.  Data for all
+FormatCodes except 0x08 (other data, sensitive to byte order) may be
+transferred between MIE groups with different byte order by byte swapping
+the uncompressed data according to the specified data format.  The following
+list illustrates the byte-swapping pattern, based on FormatSize, for all
+format types except rational (FormatType 0x50).
 
- 5) 64-bit integers and doubles are subject to the specified byte ordering
-    for both 32-bit words and bytes within these words.  For instance, the
-    high order byte is always the first byte if big-endian, and the eighth
-    byte if little-endian.  This means that some swapping is always
-    necessary for these values on systems where the byte order differs from
-    the word order (ie. some ARM systems), regardless of the endian-ness of
-    the stored values.
+      FormatSize              Change in Byte Sequence
+    --------------      -----------------------------------
+    0x00 (8 bits)       0 1 2 3 4 5 6 7 --> 0 1 2 3 4 5 6 7 (no change)
+    0x01 (16 bits)      0 1 2 3 4 5 6 7 --> 1 0 3 2 5 4 7 6
+    0x02 (32 bits)      0 1 2 3 4 5 6 7 --> 3 2 1 0 7 6 5 4
+    0x03 (64 bits)      0 1 2 3 4 5 6 7 --> 7 6 5 4 3 2 1 0
 
- 6) Rational values are treated as two separate integers.  The numerator
-    always comes first regardless of the byte ordering.  In a signed
-    rational value, only the numerator is signed.  The denominator of all
-    rational values is unsigned (ie. a signed 32-bit rational of
-    0x80000000/0x80000000 evaluates to -1, not +1).
+Rational values consist of two integers, so they are swapped as the next
+lower FormatSize.  For example, a 32-bit rational (FormatSize 0x02, and
+FormatCode 0x52 or 0x5a) is swapped as two 16-bit values (ie. as if it had
+FormatSize 0x01).
 
- 7) 32-bit fixed point values are converted to floating point by treating
-    them as an integer and dividing by an appropriate value.  ie)
+=item 2.
 
-        16-bit fixed value = 16-bit integer value / 256.0
-        32-bit fixed value = 32-bit integer value / 65536.0
+The TagName of a string element may have an 6-character suffix to indicate a
+specific locale. (ie. "Title-en_US", or "Keywords-de_DE").
+
+=item 3.
+
+Text strings are not normally null terminated, however they may be padded
+with one or more null characters to the end of the data block to allow
+strings to be edited within fixed-length data blocks.
+
+=item 4.
+
+A list of text strings separated by null characters.  These lists must not
+be null padded or null terminated, since this would be interpreted as
+additional zero-length strings.  For ASCII and UTF-8 strings, the null
+character is a single zero (0x00) byte.  For UTF-16 or UTF-32 strings, the
+null character is 2 or 4 zero bytes respectively.
+
+=item 5.
+
+64-bit integers and doubles are subject to the specified byte ordering for
+both 32-bit words and bytes within these words.  For instance, the high
+order byte is always the first byte if big-endian, and the eighth byte if
+little-endian.  This means that some swapping is always necessary for these
+values on systems where the byte order differs from the word order (ie. some
+ARM systems), regardless of the endian-ness of the stored values.
+
+=item 6.
+
+Rational values are treated as two separate integers.  The numerator always
+comes first regardless of the byte ordering.  In a signed rational value,
+only the numerator is signed.  The denominator of all rational values is
+unsigned (ie. a signed 32-bit rational of 0x80000000/0x80000000 evaluates to
+-1, not +1).
+
+=item 7.
+
+32-bit fixed point values are converted to floating point by treating them
+as an integer and dividing by an appropriate value.  ie)
+
+    16-bit fixed value = 16-bit integer value / 256.0
+    32-bit fixed value = 32-bit integer value / 65536.0
+
+=back
 
 =head3 TagLength
 
@@ -1748,23 +2077,14 @@ and may not use an extended DataLength.
 The TagName string is 0 to 255 bytes long, and is composed of the ASCII
 characters A-Z, a-z, 0-9 and underline ('_').  Also, a dash ('-') is used to
 separate the language/country code in the TagName of a localized text
-string.  The TagName string is NOT null terminated.  A MIE element with a
-tag string of zero length is reserved for the group terminator.
+string, and a units string (possibly containing other ASCII characters) may
+be appear in brackets at the end of the TagName.  The TagName string is NOT
+null terminated.  A MIE element with a tag string of zero length is reserved
+for the group terminator.
 
 MIE elements are sorted alphabetically by TagName within each group.
 Multiple elements with the same TagName are allowed, even within the same
 group.
-
-Tag names for localized text strings have an 6-character suffix with the
-following format:  The first character is a dash ('-'), followed by a
-2-character lower case ISO 639-1 language code, then an underline ('_'), and
-ending with a 2-character upper case ISO 3166-1 alpha 2 country code.  (ie.
-"-en_US", "-en_GB", "-de_DE" or "-fr_FR".  Note that "GB", and not "UK" is
-the code for Great Britain, although "UK" should be recognized for
-compatiblity reasons.)  The suffix is included when sorting the tags
-alphabetically, so the default locale (with no tag-name suffix) always comes
-first.  If the country is unknown or not applicable, a country code of "XX"
-should be used.
 
 TagNames should be meaningful.  Words should be lowercase with an uppercase
 first character, and acronyms should be all upper case.  The underline ("_")
@@ -1778,6 +2098,25 @@ tags in the sort order, or a lowercase letter (a-z) if they must come after.
 For instance, the '0Type' element begins with a digit so it comes before,
 and the 'data' element begins with a lowercase letter so that it comes after
 meta information tags in the main "0MIE" group.
+
+Tag names for localized text strings have an 6-character suffix with the
+following format:  The first character is a dash ('-'), followed by a
+2-character lower case ISO 639-1 language code, then an underline ('_'), and
+ending with a 2-character upper case ISO 3166-1 alpha 2 country code.  (ie.
+"-en_US", "-en_GB", "-de_DE" or "-fr_FR".  Note that "GB", and not "UK" is
+the code for Great Britain, although "UK" should be recognized for
+compatibility reasons.)  The suffix is included when sorting the tags
+alphabetically, so the default locale (with no tag-name suffix) always comes
+first.  If the country is unknown or not applicable, a country code of "XX"
+should be used.
+
+Tags with numerical values may allow units of measurement to be specified.
+The units string is stored in brackets at the end of the tag name, and is
+composed of zero or more ASCII characters in the range 0x21 to 0x7d,
+excluding the bracket characters 0x28 and 0x29.  (ie. "Resolution(/cm)" or
+"SpecificHeat(J/kg.K)".)  See L<Image::ExifTool::MIEUnits> for details. Unit
+strings are not localized, and may not be used in combination with localized
+text strings.
 
 Sets of tags which would require a common prefix should be added in a
 separate MIE instead of adding the prefix to all tag names.  For example,
@@ -1800,11 +2139,11 @@ These extended DataLength fields exist only if DataLength is 255, 254 or
 253, and are respectively 2, 4 or 8 byte unsigned integers giving the data
 block length.  One of these values must be used if the data block is larger
 than 252 bytes, but they may be used if desired for smaller blocks too
-(although this may add a few unecessary bytes to the MIE element).
+(although this may add a few unnecessary bytes to the MIE element).
 
 =head3 DataBlock
 
-The data for the MIE element.  The format of the data is given by the
+The data value for the MIE element.  The format of the data is given by the
 FormatCode.  For MIE group elements, the data includes all contained
 elements and the group terminator.
 
@@ -1838,11 +2177,11 @@ DataLength must be 0, 6 or 10 bytes, and extended DataLength codes may not
 be used.  With a zero DataLength, the byte sequence for a terminator is "7e
 00 00 00" (hex).  With a DataLength of 6 or 10 bytes, the terminator data
 block contains information about the length and byte ordering of the
-preceeding group.  This additional information is recommended for file-level
-groups, and is used in multi-document MIE files to allow the file to be
-scanned backwards to quickly locate the last documents in the file, and may
-also allow some documents to be recovered if part of the file is corrupted.
-The structure of this optional terminator data block is as follows:
+preceding group.  This additional information is recommended for file-level
+groups, and is used in multi-document MIE files and MIE trailers to allow
+the file to be scanned backwards from the end.  (This may also allow some
+documents to be recovered if part of the file is corrupted.)  The structure
+of this optional terminator data block is as follows:
 
     4 or 8 bytes  GroupLength (unsigned integer)
     1 byte        ByteOrder (0x10 or 0x18, same as MIE group)
@@ -1867,7 +2206,7 @@ the group length and byte order.
 
 It is valid to have more than one "0MIE" group at the file level, allowing
 multiple documents in a single MIE file.  Furthermore, the MIE structure
-enables multi-document files to be generated by simply concatinating two or
+enables multi-document files to be generated by simply concatenating two or
 more MIE files.
 
 =head2 Scanning Backwards through a MIE File
@@ -1891,8 +2230,8 @@ isn't a valid MIE file.
 ordering or 0x18 for little-endian ordering, otherwise this isn't a valid
 MIE file.
 
-5) The preceeding 4 or 8 bytes give the length of the complete file-level
-MIE group (GroupLength).  This length includes both the leading MIE group
+5) The preceding 4 or 8 bytes give the length of the complete file-level MIE
+group (GroupLength).  This length includes both the leading MIE group
 element and the terminator element itself.  The value is an unsigned integer
 stored with the specified byte order.  From the current file position (at
 the end of the data read in step 1), seek backward by this number of bytes
@@ -1933,13 +2272,44 @@ trailer length must be known for seeking backwards from the end of the file.
 
 Multiple trailers may be appended to the same file using this technique.
 
-=head2 Date/Time Format
+=head2 MIE Data Values
 
-All MIE dates are the form "YYYY:mm:dd HH:MM:SS.ss+HH:MM".  The fractional
-seconds (".ss") are optional, and if included may contain any number of
-significant digits (unlike all other fields which are a fixed number of
-digits).  The timezone ("+HH:MM" or "-HH:MM") is recommended but not
-required.  If not given, the local system timezone is assumed.
+MIE data values for a given tag are usually not restricted to a specific
+FormatCode.  Any value may be represented in any appropriate format,
+including numbers represented in string (ASCII or UTF) form.
+
+It is preferred that closely related values with the same format are written
+to a single tag instead of using multiple tags.  This improves localization
+of like values and decreases MIE element overhead.  For instance, instead of
+separate ImageWidth and ImageHeight tags, a single ImageSize tag is defined.
+
+Tags which may take on a discrete set of values should have meaningful
+values if possible.  This improves the extensibility of the format and
+allows a more reasonable interpretation of unrecognized values.
+
+=head3 Numerical Representation
+
+Integer and floating point numbers may be represented in binary or string
+form.  In string form, integers are a series of digits with an optional
+leading sign (ie. "[+|-]DDDDDD"), and multiple values are separated by a
+single space character (ie. "23 128 -32").  Floating point numbers are
+similar but may also contain a decimal point and/or a signed exponent with a
+leading 'e' character (ie. "[+|-]DD[.DDDDDD][e(+|-)EEE]").  The string "inf"
+is used to represent infinity.  One advantage of numerical strings is that
+they can have an arbitrarily high precision because the possible number of
+significant digits is virtually unlimited.
+
+Note that numerical values may have associated units of measurement which
+are specified in the L</TagName> string.
+
+=head3 Date/Time Format
+
+All MIE dates are strings in the form "YYYY:mm:dd HH:MM:SS.ss+HH:MM".  The
+fractional seconds (".ss") are optional, and if included may contain any
+number of significant digits (unlike all other fields which are a fixed
+number of digits and must be padded with leading zeros if necessary).  The
+timezone ("+HH:MM" or "-HH:MM") is recommended but not required.  If not
+given, the local system timezone is assumed.
 
 =head2 MIME Type
 
@@ -1981,6 +2351,10 @@ element in the file.
 
 =head2 Revisions
 
+  2006-12-20 - MIE 1.1:  Changed meaning of TypeModifier bit (0x08) for
+               unknown data (FormatType 0x00), and documented byte swapping
+  2006-12-14 - MIE 1.0:  Added Data Values and Numerical Representations
+               sections, and added ability to specify units in tag names
   2006-11-09 - Added Levels of Support
   2006-11-03 - Added Trailer Signature
   2005-11-18 - Original specification created
@@ -1995,7 +2369,7 @@ copyright Phil Harvey, and is covered by the same free-use license.
 
 =head1 SEE ALSO
 
-L<Image::ExifTool::TagNames/MIE Tags>,
+L<Image::ExifTool::TagNames/MIE Tags>, L<Image::ExifTool::MIEUnits>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

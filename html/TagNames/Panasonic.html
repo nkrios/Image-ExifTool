@@ -1,73 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Panasonic Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>Panasonic Tags</h2>
+<body>
+<h2 class='top'>Panasonic Tags</h2>
 
 Panasonic tags are also used for Leica cameras.
 
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0001</td>
 <td>ImageQuality</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>2 = High
+<td class='c'>int16u</td>
+<td><span class='s'>2 = High
   <br>3 = Normal
   <br>6 = Very High
-  <br>7 = Raw</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>7 = Raw</span></td></tr>
+<tr class='b'>
 <td>0x0002</td>
 <td>FirmwareVersion</td>
-<td align='center'>int8u[4]</td>
+<td class='c'>int8u[4]</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0003</td>
 <td>WhiteBalance</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Auto
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Auto
   <br>2 = Daylight
   <br>3 = Cloudy
   <br>4 = Halogen
   <br>5 = Manual
   <br>8 = Flash
-  <br>10 = Black &amp; White</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>10 = Black &amp; White</span></td></tr>
+<tr class='b'>
 <td>0x0007</td>
 <td>FocusMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Auto
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Auto
   <br>2 = Manual
   <br>4 = Auto, Focus button
-  <br>5 = Auto, Continuous</font></td></tr>
-<tr valign='top'>
+  <br>5 = Auto, Continuous</span></td></tr>
+<tr>
 <td>0x000f</td>
 <td>SpotMode</td>
-<td align='center'>int8u[2]</td>
-<td><font size='-1'>&#39;0 1&#39; = Spot Mode On
-  <br>&#39;0 16&#39; = Spot Mode Off</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int8u[2]</td>
+<td><span class='s'>&#39;0 1&#39; = Spot Mode On
+  <br>&#39;0 16&#39; = Spot Mode Off</span></td></tr>
+<tr class='b'>
 <td>0x001a</td>
 <td>ImageStabilizer</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>2 = On, Mode 1
+<td class='c'>int16u</td>
+<td><span class='s'>2 = On, Mode 1
   <br>3 = Off
-  <br>4 = On, Mode 2</font></td></tr>
-<tr valign='top'>
+  <br>4 = On, Mode 2</span></td></tr>
+<tr>
 <td>0x001c</td>
 <td>MacroMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = On
+<td class='c'>int16u</td>
+<td><span class='s'>1 = On
   <br>2 = Off
-  <br>257 = Tele-Macro</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>257 = Tele-Macro</span></td></tr>
+<tr class='b'>
 <td>0x001f</td>
 <td>ShootingMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Normal
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Normal
   <br>2 = Portrait
   <br>3 = Scenery
   <br>4 = Sports
@@ -82,103 +86,103 @@ Panasonic tags are also used for Leica cameras.
   <br>19 = Party
   <br>20 = Snow
   <br>21 = Night Scenery
-  <br>22 = Food</font></td></tr>
-<tr valign='top'>
+  <br>22 = Food</span></td></tr>
+<tr>
 <td>0x0020</td>
 <td>Audio</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Yes
-  <br>2 = No</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Yes
+  <br>2 = No</span></td></tr>
+<tr class='b'>
 <td>0x0021</td>
 <td>DataDump</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0023</td>
 <td>WhiteBalanceBias</td>
-<td align='center'>int16s</td>
+<td class='c'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0024</td>
 <td>FlashBias</td>
-<td align='center'>int16s</td>
+<td class='c'>int16s</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0025</td>
 <td>InternalSerialNumber</td>
-<td align='center'>undef[16]</td>
-<td><font size='-1'><font color="#666666">(this number is unique, and contains the date of manufacture, but is not the
-same as the number printed on the camera body)</font></font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>undef[16]</td>
+<td><span class='s'><span class='n'>(this number is unique, and contains the date of manufacture, but is not the
+same as the number printed on the camera body)</span></span></td></tr>
+<tr class='b'>
 <td>0x0028</td>
 <td>ColorEffect</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Off
   <br>2 = Warm
   <br>3 = Cool
   <br>4 = Black &amp; White
-  <br>5 = Sepia</font></td></tr>
-<tr valign='top'>
+  <br>5 = Sepia</span></td></tr>
+<tr>
 <td>0x002a</td>
 <td>BurstMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Off
   <br>1 = Low/High Quality
-  <br>2 = Infinite</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>2 = Infinite</span></td></tr>
+<tr class='b'>
 <td>0x002b</td>
 <td>SequenceNumber</td>
-<td align='center'>int32u</td>
+<td class='c'>int32u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x002c</td>
 <td>Contrast</td>
-<td align='center'>int16u</td>
-<td><font size='-1'><font color="#666666">(Panasonic models)</font>
+<td class='c'>int16u</td>
+<td><span class='s'><span class='n'>(Panasonic models)</span>
   <br>0x0 = Normal
   <br>0x1 = Low
   <br>0x2 = High
-  <br><font color="#666666">(Leica models)</font>
+  <br><span class='n'>(Leica models)</span>
   <br>0x100 = Low
   <br>0x110 = Normal
-  <br>0x120 = High</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>0x120 = High</span></td></tr>
+<tr class='b'>
 <td>0x002d</td>
 <td>NoiseReduction</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Standard
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Standard
   <br>1 = Low
-  <br>2 = High</font></td></tr>
-<tr valign='top'>
+  <br>2 = High</span></td></tr>
+<tr>
 <td>0x002e</td>
 <td>SelfTimer</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Off
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Off
   <br>2 = 10s
-  <br>3 = 2s</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>3 = 2s</span></td></tr>
+<tr class='b'>
 <td>0x0030</td>
 <td>Rotation</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>1 = Horizontal (normal)
+<td class='c'>int16u</td>
+<td><span class='s'>1 = Horizontal (normal)
   <br>6 = Rotate 90 CW
-  <br>8 = Rotate 270 CW</font></td></tr>
-<tr valign='top'>
+  <br>8 = Rotate 270 CW</span></td></tr>
+<tr>
 <td>0x0032</td>
 <td>ColorMode</td>
-<td align='center'>int16u</td>
-<td><font size='-1'>0 = Normal
-  <br>1 = Natural</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<td class='c'>int16u</td>
+<td><span class='s'>0 = Normal
+  <br>1 = Natural</span></td></tr>
+<tr class='b'>
 <td>0x0036</td>
 <td>TravelDay</td>
-<td align='center'>int16u</td>
+<td class='c'>int16u</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0e00</td>
 <td>PrintIM</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
@@ -186,119 +190,121 @@ same as the number printed on the camera body)</font></font></td></tr>
 This type of maker notes is used by models such as the NV-DS65, PV-D2002,
 PV-DC3000, PV-L2001 and PV-SD4090.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
-<td align='right'>0</td>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
+<td class='r'>0</td>
 <td>MakerNoteVersion</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
-<td align='right'>3</td>
+<tr class='b'>
+<td class='r'>3</td>
 <td>Gain</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Raw'>Panasonic Raw Tags</a></h2>
 These tags are found in IFD0 of Panasonic RAW images.
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>0x0001</td>
 <td>PanasonicRawVersion</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0002</td>
 <td>SensorWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0003</td>
 <td>SensorHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0006</td>
 <td>ImageHeight</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0007</td>
 <td>ImageWidth</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0017</td>
 <td>ISO</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0024</td>
 <td>WB_RedLevel</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0025</td>
 <td>WB_GreenLevel</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0026</td>
 <td>WB_BlueLevel</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x010f</td>
 <td>Make</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0110</td>
 <td>Model</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x0111</td>
 <td>StripOffsets</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0112</td>
 <td>Orientation</td>
-<td align='center'>N</td>
-<td><font size='-1'>1 = Horizontal (normal)
+<td class='c'>N</td>
+<td><span class='s'>1 = Horizontal (normal)
   <br>2 = Mirror horizontal
   <br>3 = Rotate 180
   <br>4 = Mirror vertical
   <br>5 = Mirror horizontal and rotate 270 CW
   <br>6 = Rotate 90 CW
   <br>7 = Mirror horizontal and rotate 90 CW
-  <br>8 = Rotate 270 CW</font></td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+  <br>8 = Rotate 270 CW</span></td></tr>
+<tr class='b'>
 <td>0x0116</td>
 <td>RowsPerStrip</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>0x0117</td>
 <td>StripByteCounts</td>
-<td align='center'>N</td>
+<td class='c'>N</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>0x8769</td>
 <td>ExifOffset</td>
-<td align='center'>-</td>
+<td class='c'>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Nov 2, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

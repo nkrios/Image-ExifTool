@@ -15,17 +15,17 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessID3v2($$$);
 
 # audio formats that we process after an ID3v2 header (in order)
-my @audioFormats = qw(APE MPC FLAC Ogg MP3);
+my @audioFormats = qw(APE MPC FLAC OGG MP3);
 
 # audio formats where the processing proc is in a different module
 my %audioModule = (
     MP3 => 'ID3',
-    Ogg => 'Vorbis',
+    OGG => 'Vorbis',
 );
 
 my %warnedOnce;     # hash of warnings we issued
@@ -194,6 +194,7 @@ my %genre = (
 %Image::ExifTool::ID3::v1 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 1 => 'ID3v1', 2 => 'Audio' },
+    PRIORITY => 0,  # let ID3v2 tags replace these if they come later
     3 => {
         Name => 'Title',
         Format => 'string[30]',

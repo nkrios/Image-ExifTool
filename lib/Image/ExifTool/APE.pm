@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 # APE metadata blocks
 %Image::ExifTool::APE::Main = (
@@ -81,7 +81,7 @@ sub MakeTag($$)
     my $name = ucfirst(lc($tag));
     # remove invalid characters in tag name and capitalize following letters
     $name =~ s/[^\w-]+(.?)/\U$1/sg;
-    $name =~ s/(_)(.)/$1\U$2/g;
+    $name =~ s/([a-z0-9])_([a-z])/$1\U$2/g;
     Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name });
 }
 

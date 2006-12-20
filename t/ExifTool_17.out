@@ -1,4 +1,4 @@
-  ExifToolVersion = 6.51
+  ExifToolVersion = 6.64
   FileName = Canon.jpg
   Directory = t/images
   FileSize = 2697
@@ -128,6 +128,9 @@ JPEG APP1 (2442 bytes):
   | | | | FocusMode = 3
   | | | | - Tag 0x0007 (2 bytes, int16s[1]):
   | | | |     03f6: 03 00                                           [..]
+  | | | | RecordMode = 2
+  | | | | - Tag 0x0009 (2 bytes, int16s[1]):
+  | | | |     03fa: 02 00                                           [..]
   | | | | CanonImageSize = 0
   | | | | - Tag 0x000a (2 bytes, int16s[1]):
   | | | |     03fc: 00 00                                           [..]
@@ -263,6 +266,9 @@ JPEG APP1 (2442 bytes):
   | | | | SequenceNumber = 0
   | | | | - Tag 0x0009 (2 bytes, int16s[1]):
   | | | |     0466: 00 00                                           [..]
+  | | | | OpticalZoomCode = 8
+  | | | | - Tag 0x000a (2 bytes, int16s[1]):
+  | | | |     0468: 08 00                                           [..]
   | | | | FlashGuideNumber = 0
   | | | | - Tag 0x000d (2 bytes, int16s[1]):
   | | | |     046e: 00 00                                           [..]

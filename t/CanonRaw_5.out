@@ -1,8 +1,8 @@
-  ExifToolVersion = 6.41
+  ExifToolVersion = 6.64
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
-  FileModifyDate = 1113662230
+  FileModifyDate = 1131997641
   FileType = CRW
   MIMEType = image/x-raw
   + [Raw directory with 3 entries]
@@ -74,6 +74,7 @@
   | | | | WhiteBalance = 0
   | | | | SlowShutter = 3
   | | | | SequenceNumber = 0
+  | | | | OpticalZoomCode = 8
   | | | | FlashGuideNumber = -1
   | | | | AFPointsUsed2 = 0
   | | | | FlashExposureComp = 20
@@ -104,6 +105,7 @@
   | | | | CanonFlashMode = 2
   | | | | ContinuousDrive = 1
   | | | | FocusMode = 2
+  | | | | RecordMode = 2
   | | | | CanonImageSize = 0
   | | | | EasyMode = 1
   | | | | DigitalZoom = -1

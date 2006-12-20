@@ -16,7 +16,7 @@ Image::ExifTool - Read and write meta information
 
 =head1 SYNOPSIS
 
-  use Image::ExifTool 'ImageInfo';
+  use Image::ExifTool qw(:Public);
 
   # ---- Simple procedural usage ----
 
@@ -90,7 +90,12 @@ supported by ExifTool (r = read, w = write, c = create):
 =head1 CONFIGURATION
 
 User-defined tags can be added via the ExifTool configuration file.  See
-"ExifTool_config" in the ExifTool distribution for more details.
+"ExifTool_config" in the ExifTool distribution for more details.  If
+necessary, the configuration feature can be disabled by setting the ExifTool
+C<noConfig> flag before loading Image::ExifTool.  For example:
+
+    BEGIN { $Image::ExifTool::noConfig = 1 }
+    use Image::ExifTool;
 
 =head1 METHODS
 
@@ -170,7 +175,7 @@ followed by a colon.  The group name may begin with a family number
 name of '*' may be used, thus allowing 'GROUP:*' to represent all tags in a
 specific group, or a group name of '*' may be used, in which case all
 available instances of the specified tag are returned regardless of the
-L<Duplicates> setting (ie. '*:WhiteBalance').  And finally, a leading '-'
+L</Duplicates> setting (ie. '*:WhiteBalance').  And finally, a leading '-'
 indicates tags to be excluded (ie. '-IFD1:*').
 
 Note that keys in the returned information hash and elements of the returned
@@ -188,7 +193,7 @@ A reference to an open image file.  If you use this method (or a SCALAR
 reference) to access information in an image, the FileName and Directory
 tags will not be returned.  (Also, the FileSize and FileModifyDate tags will
 not be returned unless it is a plain file.)  Image processing begins at the
-current file position, and on return the new file position is not specified.
+current file position, and on return the file position is unspecified.
 
 =item SCALAR ref
 
@@ -440,7 +445,7 @@ PrintIM) to be extracted as a data block.
 
 Value for missing tags in expressions evaluated by L</SetNewValuesFromFile>.
 If not set, a minor error is issued for missing values, or the value is set
-to '' if L<IgnoreMinorErrors> is set.  Default is undef.
+to '' if L</IgnoreMinorErrors> is set.  Default is undef.
 
 =item PrintConv
 
@@ -610,9 +615,9 @@ this routine is successful.
 =item Notes:
 
 The source file name may be undefined to create a file from scratch
-(currently only .XMP files can be created in this way).  If undefined, the
-destination file type is required unless the type can be determined from the
-destination file name.
+(currently only XMP, ICC and MIE files can be created in this way).  If
+undefined, the destination file type is required unless the type can be
+determined from the destination file name.
 
 The destination file name may be undefined to edit a file in place (make
 sure you have backups!).  If a destination file name is given, the specified
@@ -847,7 +852,8 @@ a scalar, scalar reference, or list reference to set a list of values.
 =item Type
 
 The type of value being set.  Valid values are PrintConv, ValueConv or Raw.
-Default is PrintConv if the L<PrintConv> Option is set, otherwise ValueConv.
+Default is PrintConv if the L</PrintConv> Option is set, otherwise
+ValueConv.
 
 =item AddValue
 
@@ -1429,16 +1435,17 @@ GraphConv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
 ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF,
 JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw,
 Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
-MIE-Flash, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Preview, MIE-Thumbnail, MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG,
-MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture,
-NikonPreview, Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic,
-Photoshop, PictureInfo, PostScript, PrintIM, QuickTime, RIFF, RMETA, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Ricoh, SPIFF, SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis,
-XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif,
-XMP-iptcCore, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp,
-XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
+MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
+MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
+MinoltaRaw, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT, PNG,
+Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
+PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR, Real-PROP,
+Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#, Sanyo,
+Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive, XMP-aux,
+XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
+XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 
@@ -1482,12 +1489,15 @@ name like 'Trailer:*'.
 Get type of file given file name.
 
     my $type = Image::ExifTool::GetFileType($filename);
+    my $desc = Image::ExifTool::GetFileType($filename, 1);
 
 =over 4
 
 =item Inputs:
 
 0) [optional] File name (or just an extension)
+
+1) [optional]  Flag to return a description instead of a type
 
 =item Return Value:
 

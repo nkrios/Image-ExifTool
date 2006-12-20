@@ -5,7 +5,8 @@
   <title>ExifTool FAQ</title>
 <style type="text/css">
 <!--
-#BLK { color: #000000 } /* black color */
+h1       { margin: 0 0 .5em 0 }
+span.blk { color: #000000 } /* black color */
 code {
     color: #880000;
     font-family: monospace;
@@ -35,6 +36,7 @@ pre {
 <li><a href="#Q9">Tag locations when copying</a>
 <li><a href="#Q10">Coded character sets</a>
 <li><a href="#Q11">User-defined tags</a>
+<li><a href="#Q12">Database import</a>
 </ol></td></tr></table>
 
 <hr>
@@ -54,6 +56,12 @@ When you run exiftool, by default it prints descriptions, not tag names, for
 the information it extracts.  To print the tag names instead, use the
 <code>'-s'</code> option.  Also, see the <a href="TagNames/index.html">tag names
 documentation</a> for a complete list of available tag names.
+
+<p>Tag names may be optionally prefixed by a family 0 or 1 group name to
+specify a particular information type or location.  Use the
+<code>'-g0'</code> and <code>'-g1'</code> (or <code>'-G0'</code> and
+<code>'-G1'</code>) options when extracting information to see the
+corresponding group names.
 </blockquote>
 
 <a name="Q3"></a>
@@ -239,30 +247,30 @@ the original group.)
 <p>Here are some examples to show you the type of control you have over where
 the information is written. All commands in each example are equivalent:
 
-<pre><span id='BLK'># copy all tags to preferred groups (no destination group)</span>
+<pre><span class='blk'># copy all tags to preferred groups (no destination group)</span>
 exiftool -tagsfromfile src.jpg dst.jpg
 exiftool -tagsfromfile src.jpg -all dst.jpg
 exiftool -tagsfromfile src.jpg "-all&gt;all" dst.jpg
 exiftool -tagsfromfile src.jpg "-all:all&gt;all" dst.jpg
 
-<span id='BLK'># copy all tags, preserving original group (destination group 'all')</span>
+<span class='blk'># copy all tags, preserving original group (destination group 'all')</span>
 exiftool -tagsfromfile src.jpg -all:all dst.jpg
 exiftool -tagsfromfile src.jpg "-all&gt;all:all" dst.jpg
 exiftool -tagsfromfile src.jpg "-all:all&gt;all:all" dst.jpg
 
-<span id='BLK'># copy all tags to EXIF group only (destination group 'exif')</span>
+<span class='blk'># copy all tags to EXIF group only (destination group 'exif')</span>
 exiftool -tagsfromfile src.jpg "-all&gt;exif:all" dst.jpg
 exiftool -tagsfromfile src.jpg "-all:all&gt;exif:all" dst.jpg
 
-<span id='BLK'># copy XMP tags to XMP group (destination group 'xmp' or 'all')</span>
+<span class='blk'># copy XMP tags to XMP group (destination group 'xmp' or 'all')</span>
 exiftool -tagsfromfile src.jpg "-xmp:all" dst.jpg
 exiftool -tagsfromfile src.jpg "-xmp:all&gt;xmp:all" dst.jpg
 exiftool -tagsfromfile src.jpg "-xmp:all&gt;all:all" dst.jpg
 
-<span id='BLK'># copy XMP tags to preferred groups (no destination group)</span>
+<span class='blk'># copy XMP tags to preferred groups (no destination group)</span>
 exiftool -tagsfromfile src.jpg "-xmp:all&gt;all" dst.jpg
 
-<span id='BLK'># copy XMP tags to EXIF only (destination group 'exif')</span>
+<span class='blk'># copy XMP tags to EXIF only (destination group 'exif')</span>
 exiftool -tagsfromfile src.jpg "-xmp:all&gt;exif:all" dst.jpg
 </pre>
 
@@ -351,8 +359,46 @@ should be
 Then you can read back the new tag with <code>'exiftool -s Writer.jpg'</code>.
 </blockquote>
 
+<a name="Q12"></a>
+<p>12. <b>"How do I import information into a database from exiftool?"</b>
+
+<blockquote>
+It is usually easiest to import information which is formatted as a
+tab-delimited list of values.  The following exiftool options may be useful
+for this purpose:
+<pre>-t  - use a tab instead of spaces to separate output values
+-S  - very short format (with -t, prints only tag values)
+-q  - quiet (supresses any other messages)
+-f  - force '-' to be printed for non-existent values
+-r  - recursively process files in subdirectories
+</pre>
+
+And here is an example of an actual command using these options:
+
+<pre>exiftool -t -S -q -f -r -filename -aperture -ISO t/images > out.txt
+</pre>
+
+This command recursively processes all images in the <code>'t/images'</code>
+directory, extracting FileName, Aperture and ISO tags, and writing the
+output to a file called <code>'out.txt'</code>.  After the command has
+executed, the output file will contain information in the following format:
+
+<pre>Canon.jpg       14.0    100
+Casio.jpg       2.0     -
+Nikon.nef       3.5     200
+OlympusE1.jpg   4.5     400
+</pre>
+
+It should be possible to import a file like this directly into most database
+applications.  On the command line, any list of tag names may be used, and
+any number of file or directory names may be specified. (Hint: If your
+command line starts to get too long, you may want to look into using the
+<code>'-@'</code> option and/or the <a href="index.html#shortcut">ShortCut</a>
+feature).
+</blockquote>
+
 <hr>
-<i>Last revised Nov. 9, 2006</i>
+<i>Last revised Nov. 30, 2006</i>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>
 </body>
 </html>

@@ -193,7 +193,6 @@ sub ProcessPhotoMechanic($$)
         } elsif ($exifTool->{DEL_GROUP}->{PhotoMechanic}) {
             # delete the trailer
             $verbose and printf $out "  Deleting PhotoMechanic trailer\n";
-            $verbose = 0;   # no more verbose messages after this
             ++$exifTool->{CHANGED};
         } else {
             # rewrite the trailer

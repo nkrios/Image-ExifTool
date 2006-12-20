@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.39';
+$VERSION = '1.40';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -387,12 +387,14 @@ sub BuildMakerNotes($$$$$$);
     0 => {
         Name => 'Make',
         Format => 'string[6]',  # "Canon\0"
+        DataMember => 'CameraMake',
         RawConv => '$self->{CameraMake} = $val',
     },
     6 => {
         Name => 'Model',
         Format => 'string[$size-6]',
         Description => 'Camera Model Name',
+        DataMember => 'CameraModel',
         RawConv => '$self->{CameraModel} = $val',
     },
 );

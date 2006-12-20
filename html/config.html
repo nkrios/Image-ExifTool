@@ -1,9 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html>
 <head><title>~/.ExifTool_config</title>
+<style type="text/css">
+<!--
+h1       { margin: 0 0 .5em 0 }
+code.blk { color: #000000 } /* black color */
+span.com { color: #aa0000 }
+code {
+    color: #880000;
+    font-family: monospace;
+}
+-->
+</style>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <pre>
-<font color="#aa0000">#------------------------------------------------------------------------------
+<span class='com'>#------------------------------------------------------------------------------
 # File:         ExifTool_config  --&gt;  ~/.ExifTool_config
 #
 # Description:  Sample user configuration file for Image::ExifTool
@@ -46,31 +59,33 @@
 
 # Shortcut tags are used when extracting information to simplify
 # commonly used commands.  They can be used to represent groups
-# of tags, or to provide an alias for a tag name.</font>
+# of tags, or to provide an alias for a tag name.</span>
 %Image::ExifTool::Shortcuts::UserDefined = (
     MyShortcut =&gt; ['createdate','exposuretime','aperture'],
     MyAlias =&gt; 'FocalLengthIn35mmFormat',
 );
 
-<font color="#aa0000"># This is a basic example of the definition for a new XMP namespace.
+<span class='com'># NOTE: All tag names used in the following tables are case sensitive.
+
+# This is a basic example of the definition for a new XMP namespace.
 # After defining this table (which may have any name), a corresponding
 # "SubDirectory" entry must be added to the Main XMP table through
-# the %Image::ExifTool::UserDefined definition below.</font>
+# the %Image::ExifTool::UserDefined definition below.</span>
 %Image::ExifTool::UserDefined::xxx = (
     GROUPS =&gt; { 0 =&gt; 'XMP', 1 =&gt; 'XMP-xxx', 2 =&gt; 'Image' },
     NAMESPACE =&gt; { 'xxx' =&gt; 'http://ns.myname.com/xxx/1.0/' },
     WRITABLE =&gt; 'string',
-    <font color="#aa0000"># replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")</font>
+    <span class='com'># replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")</span>
     NewXMPxxxTag1 =&gt; { },
     NewXMPxxxTag2 =&gt; { Groups =&gt; { 2 =&gt; 'Author' } },
     NewXMPxxxTag3 =&gt; { List =&gt; 'Bag' },
 );
 
-<font color="#aa0000"># The %Image::ExifTool::UserDefined hash defines new tags to be
-# added to existing tables.</font>
+<span class='com'># The %Image::ExifTool::UserDefined hash defines new tags to be added
+# to existing tables.</span>
 %Image::ExifTool::UserDefined = (
-    <font color="#aa0000"># All EXIF tags are added to the Main table, and WriteGroup is used to
-    # specify where the tag is written (default is ExifIFD if not specified):</font>
+    <span class='com'># All EXIF tags are added to the Main table, and WriteGroup is used to
+    # specify where the tag is written (default is ExifIFD if not specified):</span>
     'Image::ExifTool::Exif::Main' =&gt; {
         0xd000 =&gt; {
             Name =&gt; 'NewEXIFTag',
@@ -78,14 +93,14 @@
             WriteGroup =&gt; 'IFD0',
         },
     },
-    <font color="#aa0000"># IPTC tags are added to a specific record type (ie. application record):</font>
+    <span class='com'># IPTC tags are added to a specific record type (ie. application record):</span>
     'Image::ExifTool::IPTC::ApplicationRecord' =&gt; {
         300 =&gt; {
             Name =&gt; 'NewIPTCTag',
             Format =&gt; 'string[0,16]',
         },
     },
-    <font color="#aa0000"># new XMP namespaces (ie. XMP-xxx) must be added to the Main XMP table:</font>
+    <span class='com'># new XMP namespaces (ie. XMP-xxx) must be added to the Main XMP table:</span>
     'Image::ExifTool::XMP::Main' =&gt; {
         xxx =&gt; {
             SubDirectory =&gt; {
@@ -93,28 +108,28 @@
             },
         },
     },
-    <font color="#aa0000"># XMP tags may also be added to existing namespaces:</font>
+    <span class='com'># XMP tags may also be added to existing namespaces:</span>
     'Image::ExifTool::XMP::xmp' =&gt; {
         NewXMPxmpTag =&gt; { Groups =&gt; { 2 =&gt; 'Author' } },
     },
-    <font color="#aa0000"># new PNG tags are added to the PNG::TextualData table:</font>
+    <span class='com'># new PNG tags are added to the PNG::TextualData table:</span>
     'Image::ExifTool::PNG::TextualData' =&gt; {
         NewPngTag1 =&gt; { },
         NewPngTag2 =&gt; { },
         NewPngTag3 =&gt; { },
     },
-    <font color="#aa0000"># Composite tags are added to the Composite table:</font>
+    <span class='com'># Composite tags are added to the Composite table:</span>
     'Image::ExifTool::Composite' =&gt; {
-        <font color="#aa0000"># Composite tags are unique: The Require/Desire elements list
+        <span class='com'># Composite tags are unique: The Require/Desire elements list
         # tags that must/may exist, and the keys of these hashes are used
         # as indices in the @val array of the ValueConv expression to
         # derive the composite tag value.  (See the Composite table in
-        # Image::ExifTool::Exif for more examples.)</font>
+        # Image::ExifTool::Exif for more examples.)</span>
         BaseName =&gt; {
             Require =&gt; {
                 0 =&gt; 'FileName',
             },
-            <font color="#aa0000"># remove the extension from FileName</font>
+            <span class='com'># remove the extension from FileName</span>
             ValueConv =&gt; 'my $name=$val[0]; $name=~s/\..*?$//; $name',
         },
         Extension =&gt; {
@@ -123,7 +138,7 @@
             },
             ValueConv =&gt; '$val[0]=~/\.([^.]*)$/; $1',
         },
-        <font color="#aa0000"># override CircleOfConfusion tag to use D/1750 instead of D/1440</font>
+        <span class='com'># override CircleOfConfusion tag to use D/1750 instead of D/1440</span>
         CircleOfConfusion =&gt; {
             Require =&gt; {
                 0 =&gt; 'ScaleFactor35efl',
@@ -131,8 +146,8 @@
             ValueConv =&gt; 'sqrt(24*24+36*36) / ($val[0] * 1750)',
             PrintConv =&gt; 'sprintf("%.3f mm",$val)',
         },
-        <font color="#aa0000"># get latitude/logitude reference from XMP lat/long tags
-        # (used to set EXIF GPS position from XMP tags)</font>
+        <span class='com'># get latitude/logitude reference from XMP lat/long tags
+        # (used to set EXIF GPS position from XMP tags)</span>
         GPSLatitudeRef =&gt; {
             Require =&gt; {
                 0 =&gt; 'XMP:GPSLatitude',
@@ -156,7 +171,7 @@
     },
 );
 
-<font color="#aa0000">#------------------------------------------------------------------------------</font>
+<span class='com'>#------------------------------------------------------------------------------</span>
 </pre>
 <hr>
 <p><a href="index.html">&lt;-- Back to ExifTool home page</a>

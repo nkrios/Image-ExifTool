@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 my $MAX_PACKETS = 2;    # maximum packets to scan from each stream at start of file
 
@@ -75,7 +75,7 @@ sub DecodeCoverArt($);
         Vorbis and Ogg FLAC audio files, however ExifTool will extract values from
         any tag found, even if not listed here.
     },
-    Vendor    => { Notes => 'from comment header' },
+    vendor    => { Notes => 'from comment header' },
     TITLE     => { Name => 'Title' },
     VERSION   => { Name => 'Version' },
     ALBUM     => { Name => 'Album' },
@@ -104,6 +104,10 @@ sub DecodeCoverArt($);
     REPLAYGAIN_TRACK_GAIN => { Name => 'ReplayGainTrackGain' },
     REPLAYGAIN_ALBUM_PEAK => { Name => 'ReplayGainAlbumPeak' },
     REPLAYGAIN_ALBUM_GAIN => { Name => 'ReplayGainAlbumGain' },
+    # observed in "Xiph.Org libVorbis I 20020717" ogg:
+    ENCODED_USING => { Name => 'EncodedUsing' },
+    ENCODED_BY  => { Name => 'EncodedBy' },
+    COMMENT     => { Name => 'Comment' },
 );
 
 #------------------------------------------------------------------------------
@@ -132,7 +136,7 @@ sub ProcessComments($$$)
             $buff =~ /(.*?)=(.*)/s or last;
             ($tag, $val) = ($1, $2);
         } else {
-            $tag = 'Vendor';
+            $tag = 'vendor';
             $val = $buff;
             $num = ($pos + 4 < $end) ? Get32u($dataPt, $pos) : 0;
             $exifTool->VPrint(0, "  + [Vorbis comments with $num entries]\n");
@@ -143,7 +147,7 @@ sub ProcessComments($$$)
             my $name = ucfirst(lc($tag));
             # remove invalid characters in tag name and capitalize following letters
             $name =~ s/[^\w-]+(.?)/\U$1/sg;
-            $name =~ s/(_)(.)/$1\U$2/g;
+            $name =~ s/([a-z0-9])_([a-z])/$1\U$2/g;
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name });
         }
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
@@ -187,7 +191,7 @@ sub ProcessPacket($$$)
 # Extract information from an Ogg Vorbis or Ogg FLAC file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid Ogg Vorbis file
-sub ProcessOgg($$)
+sub ProcessOGG($$)
 {
     my ($exifTool, $dirInfo) = @_;
 

@@ -24,18 +24,14 @@ use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old
             $myAPP5hdr @loadAllTables %UserDefined);
 
-$VERSION = '6.57';
+$VERSION = '6.66';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
+    # all public non-object-oriented functions
     Public => [qw(
-        ImageInfo Options ClearOptions ExtractInfo GetInfo WriteInfo CombineInfo
-        GetTagList GetFoundTags GetRequestedTags GetValue SetNewValue
-        SetNewValuesFromFile GetNewValues CountNewValues SaveNewValues
-        RestoreNewValues SetFileModifyDate SetNewGroups GetNewGroups GetTagID
-        GetDescription GetGroup GetGroups BuildCompositeTags GetTagName
-        GetShortcuts GetAllTags GetWritableTags GetAllGroups GetDeleteGroups
-        GetFileType CanWrite CanCreate
+        ImageInfo GetTagName GetShortcuts GetAllTags GetWritableTags
+        GetAllGroups GetDeleteGroups GetFileType CanWrite CanCreate
     )],
     DataAccess => [qw(
         ReadValue GetByteOrder SetByteOrder ToggleByteOrder Get8u Get8s Get16u
@@ -113,7 +109,7 @@ sub WriteTIFF($$$);
 # Notes: 1) There is no need to test for like types separately here
 # 2) Put types with no file signature at end of list to avoid false matches
 @fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIE MIFF PS PDF PSD XMP
-                BMP PPM RIFF AIFF ASF MOV MPEG Real SWF Ogg FLAC APE MPC ICC
+                BMP PPM RIFF AIFF ASF MOV MPEG Real SWF OGG FLAC APE MPC ICC
                 VRD QTIF FPX PICT MP3 DICM RAW);
 
 # file types that we can write (edit)
@@ -125,91 +121,91 @@ my @createTypes = qw(XMP ICC MIE);
 
 # file type lookup for all recognized file extensions
 my %fileTypeLookup = (
-    ACR  => 'DICM', # American College of Radiology ACR-NEMA
-    AI   => ['PDF','PS'], # Adobe Illustrator (PDF-like or PS-like)
-    AIF  => 'AIFF', # Audio Interchange File Format (.3)
-    AIFC => 'AIFF', # Audio Interchange File Format Compressed
-    AIFF => 'AIFF', # Audio Interchange File Format (.4)
-    APE  => 'APE',  # Monkey's Audio format
-    ARW  => 'TIFF', # Sony Alpha RAW format (TIFF-like)
-    ASF  => 'ASF',  # Microsoft Advanced Systems Format
-    AVI  => 'RIFF', # Audio Video Interleaved (RIFF-based)
-    BMP  => 'BMP',  # Windows BitMaP
-    CIFF => 'CRW',  # Camera Image File Format (same as CRW)
-    CR2  => 'TIFF', # Canon RAW 2 format (TIFF-like)
-    CRW  => 'CRW',  # Canon RAW format
-    DC3  => 'DICM', # DICOM image file
-    DCM  => 'DICM', # DICOM image file
-    DIB  => 'BMP',  # Device Independent Bitmap (aka. BMP)
-    DIC  => 'DICM', # DICOM image file
-    DICM => 'DICM', # DICOM image file
-    DNG  => 'TIFF', # Digital Negative (TIFF-like)
-    EPS  => 'EPS',  # Encapsulated PostScript Format (.3)
-    EPSF => 'EPS',  # Encapsulated PostScript Format (.4)
-    ERF  => 'TIFF', # Epson Raw Format (TIFF-like)
-    FLAC => 'FLAC', # Free Lossless Audio Codec
-    FPX  => 'FPX',  # FlashPix
-    GIF  => 'GIF',  # Compuserve Graphics Interchange Format
-    ICC  => 'ICC',  # International Color Consortium
-    ICM  => 'ICC',  # International Color Consortium
-    JNG  => 'PNG',  # JPG Network Graphics (PNG-like)
-    JP2  => 'JP2',  # JPEG 2000 file
-    JPEG => 'JPEG', # Joint Photographic Experts Group (.4)
-    JPG  => 'JPEG', # Joint Photographic Experts Group (.3)
-    JPX  => 'JP2',  # JPEG 2000 file
-    M4A  => 'MOV',  # MPG4 Audio (QuickTime-based)
-    MIE  => 'MIE',  # Meta Information Encapsulation format
-    MIF  => 'MIFF', # Magick Image File Format (.3)
-    MIFF => 'MIFF', # Magick Image File Format (.4)
-    MNG  => 'PNG',  # Multiple-image Network Graphics (PNG-like)
-    MOS  => 'TIFF', # Creo Leaf Mosaic (TIFF-like)
-    MOV  => 'MOV',  # Apple QuickTime movie
-    MP3  => 'MP3',  # MPEG Layer 3 audio (uses ID3 information)
-    MP4  => 'MOV',  # MPEG Layer 4 video (QuickTime-based)
-    MPC  => 'MPC',  # Musepack Audio
-    MPEG => 'MPEG', # MPEG audio/video format 1
-    MPG  => 'MPEG', # MPEG audio/video format 1
-    MRW  => 'MRW',  # Minolta RAW format
-    NEF  => 'TIFF', # Nikon (RAW) Electronic Format (TIFF-like)
-    OGG  => 'Ogg',  # Ogg Vorbis audio file
-    ORF  => 'ORF',  # Olympus RAW format
-    PBM  => 'PPM',  # Portable BitMap (PPM-like)
-    PCT  => 'PICT', # Apple PICTure (.3)
-    PDF  => 'PDF',  # Adobe Portable Document Format
-    PEF  => 'TIFF', # Pentax (RAW) Electronic Format (TIFF-like)
-    PGM  => 'PPM',  # Portable Gray Map (PPM-like)
-    PICT => 'PICT', # Apple PICTure (.4)
-    PNG  => 'PNG',  # Portable Network Graphics
-    PPM  => 'PPM',  # Portable Pixel Map
-    PS   => 'PS',   # PostScript
-    PSD  => 'PSD',  # PhotoShop Drawing
-    QIF  => 'QTIF', # QuickTime Image File (.3 alternate)
-    QT   => 'MOV',  # QuickTime movie
-    QTI  => 'QTIF', # QuickTime Image File (.3)
-    QTIF => 'QTIF', # QuickTime Image File (.4)
-    RA   => 'Real', # Real Audio
-    RAF  => 'RAF',  # FujiFilm RAW Format
-    RAM  => 'Real', # Real Audio Metafile
-    RAW  => 'RAW',  # Kyocera Contax N Digital RAW or Panasonic RAW
-    RIF  => 'RIFF', # Resource Interchange File Format (.3)
-    RIFF => 'RIFF', # Resource Interchange File Format (.4)
-    RM   => 'Real', # Real Media
-    RMVB => 'Real', # Real Media Variable Bitrate
-    RPM  => 'Real', # Real Media Plug-in Metafile
-    RV   => 'Real', # Real Video
-    SR2  => 'TIFF', # Sony RAW Format 2 (TIFF-like)
-    SRF  => 'TIFF', # Sony RAW Format (TIFF-like)
-    SWF  => 'SWF',  # Shockwave Flash
-    THM  => 'JPEG', # Canon Thumbnail (aka. JPG)
-    TIF  => 'TIFF', # Tagged Image File Format (.3)
-    TIFF => 'TIFF', # Tagged Image File Format (.4)
-    VRD  => 'VRD',  # Canon VRD Recipe Data (written by DPP)
-    WAV  => 'RIFF', # WAVeform (Windows digital audio format)
-    WDP  => 'TIFF', # Windows Media Photo (TIFF-based)
-    WMA  => 'ASF',  # Windows Media Audio (ASF-based)
-    WMV  => 'ASF',  # Windows Media Video (ASF-based)
-    X3F  => 'X3F',  # Sigma RAW format
-    XMP  => 'XMP',  # Extensible Metadata Platform data file
+    ACR  => ['DICM', 'American College of Radiology ACR-NEMA'],
+    AI   => [['PDF','PS'], 'Adobe Illustrator (PDF-like or PS-like)'],
+    AIF  => ['AIFF', 'Audio Interchange File Format'],
+    AIFC => ['AIFF', 'Audio Interchange File Format Compressed'],
+    AIFF => ['AIFF', 'Audio Interchange File Format'],
+    APE  => ['APE',  "Monkey's Audio format"],
+    ARW  => ['TIFF', 'Sony Alpha RAW format (TIFF-like)'],
+    ASF  => ['ASF',  'Microsoft Advanced Systems Format'],
+    AVI  => ['RIFF', 'Audio Video Interleaved (RIFF-based)'],
+    BMP  => ['BMP',  'Windows BitMaP'],
+    CIFF => ['CRW',  'Camera Image File Format (same as CRW)'],
+    CR2  => ['TIFF', 'Canon RAW 2 format (TIFF-like)'],
+    CRW  => ['CRW',  'Canon RAW format'],
+    DC3  => ['DICM', 'DICOM image file'],
+    DCM  => ['DICM', 'DICOM image file'],
+    DIB  => ['BMP',  'Device Independent Bitmap (aka. BMP)'],
+    DIC  => ['DICM', 'DICOM image file'],
+    DICM => ['DICM', 'DICOM image file'],
+    DNG  => ['TIFF', 'Digital Negative (TIFF-like)'],
+    EPS  => ['EPS',  'Encapsulated PostScript Format'],
+    EPSF => ['EPS',  'Encapsulated PostScript Format'],
+    ERF  => ['TIFF', 'Epson Raw Format (TIFF-like)'],
+    FLAC => ['FLAC', 'Free Lossless Audio Codec'],
+    FPX  => ['FPX',  'FlashPix'],
+    GIF  => ['GIF',  'Compuserve Graphics Interchange Format'],
+    ICC  => ['ICC',  'International Color Consortium'],
+    ICM  => ['ICC',  'International Color Consortium'],
+    JNG  => ['PNG',  'JPG Network Graphics (PNG-like)'],
+    JP2  => ['JP2',  'JPEG 2000 file'],
+    JPEG => ['JPEG', 'Joint Photographic Experts Group'],
+    JPG  => ['JPEG', 'Joint Photographic Experts Group'],
+    JPX  => ['JP2',  'JPEG 2000 file'],
+    M4A  => ['MOV',  'MPG4 Audio (QuickTime-based)'],
+    MIE  => ['MIE',  'Meta Information Encapsulation format'],
+    MIF  => ['MIFF', 'Magick Image File Format'],
+    MIFF => ['MIFF', 'Magick Image File Format'],
+    MNG  => ['PNG',  'Multiple-image Network Graphics (PNG-like)'],
+    MOS  => ['TIFF', 'Creo Leaf Mosaic (TIFF-like)'],
+    MOV  => ['MOV',  'Apple QuickTime movie'],
+    MP3  => ['MP3',  'MPEG Layer 3 audio (uses ID3 information)'],
+    MP4  => ['MOV',  'MPEG Layer 4 video (QuickTime-based)'],
+    MPC  => ['MPC',  'Musepack Audio'],
+    MPEG => ['MPEG', 'MPEG audio/video format 1'],
+    MPG  => ['MPEG', 'MPEG audio/video format 1'],
+    MRW  => ['MRW',  'Minolta RAW format'],
+    NEF  => ['TIFF', 'Nikon (RAW) Electronic Format (TIFF-like)'],
+    OGG  => ['OGG',  'Ogg Vorbis audio file'],
+    ORF  => ['ORF',  'Olympus RAW format'],
+    PBM  => ['PPM',  'Portable BitMap (PPM-like)'],
+    PCT  => ['PICT', 'Apple PICTure'],
+    PDF  => ['PDF',  'Adobe Portable Document Format'],
+    PEF  => ['TIFF', 'Pentax (RAW) Electronic Format (TIFF-like)'],
+    PGM  => ['PPM',  'Portable Gray Map (PPM-like)'],
+    PICT => ['PICT', 'Apple PICTure'],
+    PNG  => ['PNG',  'Portable Network Graphics'],
+    PPM  => ['PPM',  'Portable Pixel Map'],
+    PS   => ['PS',   'PostScript'],
+    PSD  => ['PSD',  'PhotoShop Drawing'],
+    QIF  => ['QTIF', 'QuickTime Image File'],
+    QT   => ['MOV',  'QuickTime movie'],
+    QTI  => ['QTIF', 'QuickTime Image File'],
+    QTIF => ['QTIF', 'QuickTime Image File'],
+    RA   => ['Real', 'Real Audio'],
+    RAF  => ['RAF',  'FujiFilm RAW Format'],
+    RAM  => ['Real', 'Real Audio Metafile'],
+    RAW  => ['RAW',  'Kyocera Contax N Digital RAW or Panasonic RAW'],
+    RIF  => ['RIFF', 'Resource Interchange File Format'],
+    RIFF => ['RIFF', 'Resource Interchange File Format'],
+    RM   => ['Real', 'Real Media'],
+    RMVB => ['Real', 'Real Media Variable Bitrate'],
+    RPM  => ['Real', 'Real Media Plug-in Metafile'],
+    RV   => ['Real', 'Real Video'],
+    SR2  => ['TIFF', 'Sony RAW Format 2 (TIFF-like)'],
+    SRF  => ['TIFF', 'Sony RAW Format (TIFF-like)'],
+    SWF  => ['SWF',  'Shockwave Flash'],
+    THM  => ['JPEG', 'Canon Thumbnail (aka. JPG)'],
+    TIF  => ['TIFF', 'Tagged Image File Format'],
+    TIFF => ['TIFF', 'Tagged Image File Format'],
+    VRD  => ['VRD',  'Canon VRD Recipe Data (written by DPP)'],
+    WAV  => ['RIFF', 'WAVeform (Windows digital audio format)'],
+    WDP  => ['TIFF', 'Windows Media Photo (TIFF-based)'],
+    WMA  => ['ASF',  'Windows Media Audio (ASF-based)'],
+    WMV  => ['ASF',  'Windows Media Video (ASF-based)'],
+    X3F  => ['X3F',  'Sigma RAW format'],
+    XMP  => ['XMP',  'Extensible Metadata Platform data file'],
 );
 
 # MIME types for applicable file types above
@@ -245,7 +241,7 @@ my %mimeType = (
     MPEG => 'video/mpeg',
     MRW  => 'image/x-raw',
     NEF  => 'image/x-raw',
-    Ogg  => 'audio/x-ogg',
+    OGG  => 'audio/x-ogg',
     ORF  => 'image/x-raw',
     PBM  => 'image/x-portable-bitmap',
     PDF  => 'application/pdf',
@@ -290,7 +286,7 @@ my %moduleName = (
     MOV  => 'QuickTime',
     MP3  => 'ID3',
     MRW  => 'MinoltaRaw',
-    Ogg  => 'Vorbis',
+    OGG  => 'Vorbis',
     ORF  => 'Olympus',
     PS   => 'PostScript',
     PSD  => 'Photoshop',
@@ -1356,19 +1352,23 @@ sub GetShortcuts()
 
 #------------------------------------------------------------------------------
 # Get file type for specified extension
-# Inputs: 1) file name or extension (case is not significant)
-# Returns: File type or undef if extension not supported.  In array context,
-#          may return more than one file type if the file may be different formats.
-#          Returns list of all recognized extensions if no file specified
-sub GetFileType(;$)
+# Inputs: 0) file name or extension (case is not significant)
+#         1) flag to return long description instead of type
+# Returns: File type (or desc) or undef if extension not supported.  In array
+#          context, may return more than one file type if the file may be
+#          different formats.  Returns list of all recognized extensions if no
+#          file specified
+sub GetFileType(;$$)
 {
     local $_;
-    my $file = shift;
+    my ($file, $desc) = @_;
     return sort keys %fileTypeLookup unless defined $file;
     my $fileType;
     my $fileExt = GetFileExtension($file);
     $fileExt = uc($file) unless $fileExt;
     $fileExt and $fileType = $fileTypeLookup{$fileExt}; # look up the file type
+    return $$fileType[1] if $desc;  # return description if specified
+    $fileType = $$fileType[0];      # get file type (or list of types)
     if (wantarray) {
         return () unless $fileType;
         return @$fileType if ref $fileType eq 'ARRAY';
@@ -1409,7 +1409,12 @@ sub CanCreate($)
 # Inputs: 0) ExifTool object reference
 sub Init($)
 {
+    local $_;
     my $self = shift;
+    # delete all DataMember variables (lower-case names)
+    foreach (keys %$self) {
+        /[a-z]/ and delete $self->{$_};
+    }
     delete $self->{FOUND_TAGS};     # list of found tags
     delete $self->{EXIF_DATA};      # the EXIF data block
     delete $self->{EXIF_POS};       # EXIF position in file
@@ -2072,7 +2077,8 @@ sub GetRational64u($$)
 sub GetFixed16s($$)
 {
     my ($dataPt, $pos) = @_;
-    return int((Get16s($dataPt, $pos) / 0x100) * 1000 + 0.5) / 1000;
+    my $val = Get16s($dataPt, $pos) / 0x100;
+    return int($val * 1000 + ($val<0 ? -0.5 : 0.5)) / 1000;
 }
 sub GetFixed16u($$)
 {
@@ -2093,10 +2099,10 @@ sub GetFixed32u($$)
     return int((Get32u($dataPt, $pos) / 0x10000) * 1e5 + 0.5) / 1e5;
 }
 # Inputs: 0) value, 1) data ref, 2) offset
-sub Set8s($;$$)   { return DoPackStd('c', @_); }
-sub Set8u($;$$)   { return DoPackStd('C', @_); }
-sub Set16u($;$$)  { return DoPackStd('S', @_); }
-sub Set32u($;$$)  { return DoPackStd('L', @_); }
+sub Set8s(@)  { return DoPackStd('c', @_); }
+sub Set8u(@)  { return DoPackStd('C', @_); }
+sub Set16u(@) { return DoPackStd('S', @_); }
+sub Set32u(@) { return DoPackStd('L', @_); }
 
 #------------------------------------------------------------------------------
 # Get current byte order ('II' or 'MM')
@@ -2439,11 +2445,11 @@ sub IdentifyTrailer($;$)
     my $raf = shift;
     my $offset = shift || 0;
     my $pos = $raf->Tell();
-    my ($buff, $type);
-    # read last 64 (or 12) bytes at specified offset from end of file
-    if (($raf->Seek(-64-$offset, 2) and $raf->Read($buff, 64) == 64) or
-        ($raf->Seek(-12-$offset, 2) and $raf->Read($buff, 12) == 12))
-    {
+    my ($buff, $type, $len);
+    while ($raf->Seek(-$offset, 2) and ($len = $raf->Tell()) > 0) {
+        # read up to 64 bytes before specified offset from end of file
+        $len = 64 if $len > 64;
+        $raf->Seek(-$len, 1) and $raf->Read($buff, $len) == $len or last;
         if ($buff =~ /AXS(!|\*).{8}$/s) {
             $type = 'AFCP';
         } elsif ($buff =~ /\xa1\xb2\xc3\xd4$/) {
@@ -2452,9 +2458,14 @@ sub IdentifyTrailer($;$)
             $type = 'PhotoMechanic';
         } elsif ($buff =~ /^CANON OPTIONAL DATA\0/) {
             $type = 'CanonVRD';
+        } elsif ($buff =~ /~\0\x04\0zmie~\0\0\x06.{4}[\x10\x18]\x04$/s or
+                 $buff =~ /~\0\x04\0zmie~\0\0\x0a.{8}[\x10\x18]\x08$/s)
+        {
+            $type = 'MIE';
         }
+        last;
     }
-    $raf->Seek($pos, 0);
+    $raf->Seek($pos, 0);    # restore original file position
     return $type ? { RAF => $raf, DirName => $type } : undef;
 }
 
@@ -3738,7 +3749,7 @@ sub ProcessBinaryData($$$)
     my ($self, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $offset = $$dirInfo{DirStart} || 0;
-    my $size = $$dirInfo{DirLen} || length($$dataPt);
+    my $size = $$dirInfo{DirLen} || (length($$dataPt) - $offset);
     my $base = $$dirInfo{Base} || 0;
     my $verbose = $self->{OPTIONS}->{Verbose};
     my $unknown = $self->{OPTIONS}->{Unknown};

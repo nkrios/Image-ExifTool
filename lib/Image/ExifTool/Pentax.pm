@@ -13,19 +13,20 @@
 #
 # References:   1) Image::MakerNotes::Pentax
 #               2) http://johnst.org/sw/exiftags/ (Asahi cameras)
-#               3) Wayne Smith private communication (tests with Optio 550)
+#               3) Wayne Smith private communication (Optio 550)
 #               4) http://kobe1995.jp/~kaz/astro/istD.html
-#               5) John Francis private communication (tests with ist-D/ist-DS)
+#               5) John Francis private communication (ist-D/ist-DS)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
-#               7) Douglas O'Brien private communication (tests with *istD)
+#               7) Douglas O'Brien private communication (*istD)
 #               8) Denis Bourez private communication
 #               9) Kazumichi Kawabata private communication
-#              10) David Buret private communication (tests with *istD)
+#              10) David Buret private communication (*istD)
 #              11) http://forums.dpreview.com/forums/read.asp?forum=1036&message=17465929
 #              12) Derby Chang private communication
 #              13) http://homepage3.nifty.com/kamisaka/makernote/makernote_pentax.htm
-#              14) Ger Vermeulen private communication (tests with Optio S6)
-#              15) Barney Garrett private communication (tests with Samsung GX-1S)
+#              14) Ger Vermeulen private communication (Optio S6)
+#              15) Barney Garrett private communication (Samsung GX-1S)
+#              16) Axel Kellner private communication (K10D)
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -36,7 +37,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.40';
+$VERSION = '1.42';
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -661,26 +662,33 @@ my %pentaxCities = (
             '1 8 0'  => 'Auto PICT (Sport)', #13
             # Manual dial modes
             '2 0 0'  => 'Program AE', #13
-            '3 0 0'  => 'Green Mode', # (unconfirmed)
+            '3 0 0'  => 'Green Mode', #16
             '4 0 0'  => 'Shutter Speed Priority', # K110D
             '5 0 0'  => 'Aperture Priority', # K110D
             '8 0 0'  => 'Manual', # K110D
             '9 0 0'  => 'Bulb', # K110D
             # *istD modes (ref 7)
-            '2 0 1'  => 'Program AE', #7
-            '2 1 1'  => 'Hi-speed Program', #7
-            '2 2 1'  => 'DOF Program', #7
-            '2 3 1'  => 'MTF Program', #7
-            '3 0 1'  => 'Green Mode', #7
-            '4 0 1'  => 'Shutter Speed Priority', #7
-            '5 0 1'  => 'Aperture Priority', #7
-            '6 0 1'  => 'Program Tv Shift', #7
-            '7 0 1'  => 'Program Av Shift', #7
-            '8 0 1'  => 'Manual', #7
-            '9 0 1'  => 'Bulb', #7
-            '10 0 1' => 'Aperture Priority (Off-Auto-Aperture)', #7
-            '11 0 1' => 'Manual (Off-Auto-Aperture)', #7
-            '12 0 1' => 'Bulb (Off-Auto-Aperture)', #7
+            '2 0 1'  => 'Program AE', # 'User Program AE' according to ref 16
+            '2 1 1'  => 'Hi-speed Program',
+            '2 2 1'  => 'DOF Program',
+            '2 3 1'  => 'MTF Program',
+            '3 0 1'  => 'Green Mode',
+            '4 0 1'  => 'Shutter Speed Priority',
+            '5 0 1'  => 'Aperture Priority',
+            '6 0 1'  => 'Program Tv Shift',
+            '7 0 1'  => 'Program Av Shift',
+            '8 0 1'  => 'Manual',
+            '9 0 1'  => 'Bulb',
+            '10 0 1' => 'Aperture Priority (Off-Auto-Aperture)',
+            '11 0 1' => 'Manual (Off-Auto-Aperture)',
+            '12 0 1' => 'Bulb (Off-Auto-Aperture)',
+            # K10D modes (ref 16)
+            '13 0 0' => 'Shutter & Aperture Priority AE',
+            '13 0 1' => 'Shutter & Aperture Priority AE (1)', #PH guess
+            '15 0 0' => 'Sensitivity Priority AE',
+            '15 0 1' => 'Sensitivity Priority AE (1)',
+            '16 0 0' => 'Flash X-Sync Speed AE',
+            '16 0 1' => 'Flash X-Sync Speed AE (1)', #PH guess
         },
     },
     0x0034 => { #7/PH

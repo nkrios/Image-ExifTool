@@ -1,9 +1,12 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <title>Shortcuts Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h2>Shortcuts Tags</h2>
+<body>
+<h2 class='top'>Shortcuts Tags</h2>
 
 Shortcut tags are convenience tags that represent one or more other tag
 names.  They are used like regular tags to read and write the information
@@ -15,19 +18,20 @@ may be added via the %Image::ExifTool::Shortcuts::UserDefined lookup in the
 for more details.
 
 <blockquote>
-<table bgcolor='#ffbb77' cellspacing=2 cellpadding=0><tr bgcolor='#ffffff'><td>
-<table cellspacing=1 cellpadding=2><tr bgcolor='#ffbb77'><th>Tag Name</th>
-<th>Writable</th><th>Refers To</th><th>Values / <font color="#666666">Notes</font></th></tr>
-<tr valign='top'>
+<table class='frame'><tr><td>
+<table class='inner' cellspacing=1>
+<tr class='h'><th>Tag Name</th>
+<th>Writable</th><th>Refers To</th><th>Values / <span class='n'>Notes</span></th></tr>
+<tr>
 <td>AllDates</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>DateTimeOriginal
   <br>CreateDate
   <br>ModifyDate</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Canon</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>FileName
   <br>Model
   <br>DateTimeOriginal
@@ -58,9 +62,9 @@ for more details.
   <br>OwnerName
   <br>SerialNumber</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Canon20D</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>FileName
   <br>Model
   <br>DateTimeOriginal
@@ -94,9 +98,9 @@ for more details.
   <br>OwnerName
   <br>SerialNumber</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>Common</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>FileName
   <br>FileSize
   <br>Model
@@ -110,9 +114,9 @@ for more details.
   <br>WhiteBalance
   <br>Flash</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>D70Boring</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>Make
   <br>XResolution
   <br>YResolution
@@ -132,9 +136,9 @@ for more details.
   <br>CFAPattern
   <br>ThumbnailImageIFD</td>
 <td>&nbsp;</td></tr>
-<tr bgcolor='#ffeebb' valign='top'>
+<tr class='b'>
 <td>MakerNotes</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>MakerNoteCanon
   <br>MakerNoteCasio
   <br>MakerNoteCasio2
@@ -166,16 +170,16 @@ for more details.
   <br>MakerNoteRicoh
   <br>MakerNoteRicohText
   <br>MakerNoteSanyo
-  <br>MaerkNoteSanyoC4
+  <br>MakerNoteSanyoC4
   <br>MakerNoteSigma
   <br>MakerNoteSony
   <br>MakerNoteSonySRF
   <br>MakerNoteSonySR2
   <br>MakerNoteUnknown</td>
 <td>&nbsp;</td></tr>
-<tr valign='top'>
+<tr>
 <td>Nikon</td>
-<td align='center'>Y</td>
+<td class='c'>Y</td>
 <td>Model
   <br>SubSecDateTimeOriginal
   <br>ShutterCount
@@ -207,9 +211,9 @@ for more details.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 13, 2006</i>
+<br><i>Last revised Dec 4, 2006</i>
+<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
 </body>
 </html>

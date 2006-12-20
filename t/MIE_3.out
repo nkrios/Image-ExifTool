@@ -1,30 +1,30 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.66
 [File, File, Image]  - File Name: MIE_3_failed.mie
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
+[File, File, Time]  - File Modification Date/Time: 2006:01:07 13:38:59
 [File, File, Image]  - File Type: MIE
 [File, File, Image]  - MIME Type: image/x-mie-jpeg
 [MIE, MIE-Main, Other] 0Type - Subfile Type: JPEG
+[MIE, MIE-Main, Other] 0Vers - MIE Version: 1.1
 [MIE, MIE-Main, Other] 1Name - Subfile Name: dummy.jpg
 [MIE, MIE-Main, Other] 2MIME - Subfile MIME Type: image/jpeg
-[MIE, MIE-Camera, Camera] BlueBalance - Blue Balance: 1.190619
 [MIE, MIE-Camera, Camera] ColorTemperature - Color Temperature: 5200
 [MIE, MIE-Camera, Camera] Contrast - Contrast: 1
 [MIE, MIE-Camera, Camera] ExposureComp - Exposure Compensation: 0
 [MIE, MIE-Camera, Camera] ExposureMode - Exposure Mode: Manual
 [MIE, MIE-Camera, Camera] ExposureTime - Exposure Time: 4
-[MIE, MIE-Camera, Camera] FNumber - F Number: 11
 [MIE, MIE-Flash, Camera] ExposureComp - Flash Exposure Comp: 0
 [MIE, MIE-Flash, Camera] GuideNumber - Flash Guide Number: 0
 [MIE, MIE-Camera, Camera] FocusMode - Focus Mode: Manual Focus
 [MIE, MIE-Camera, Camera] ISO - ISO: 100
+[MIE, MIE-Lens, Camera] FNumber - F Number: 11
+[MIE, MIE-Lens, Camera] MaxAperture - Max Aperture: 4
+[MIE, MIE-Lens, Camera] MinAperture - Min Aperture: 27
 [MIE, MIE-Camera, Camera] Make - Make: FUJIFILM
-[MIE, MIE-Camera, Camera] MaxAperture - Max Aperture: 4
-[MIE, MIE-Camera, Camera] MinAperture - Min Aperture: 27
 [MIE, MIE-Camera, Camera] Model - Model: FinePix2400Zoom
+[MIE, MIE-Orient, Camera] Rotation - Rotation: 90
 [MIE, MIE-Camera, Camera] OwnerName - Owner Name: Phil Harvey
-[MIE, MIE-Camera, Camera] RedBalance - Red Balance: 2.067348
 [MIE, MIE-Camera, Camera] Saturation - Saturation: 1
 [MIE, MIE-Camera, Camera] SerialNumber - Serial Number: 0560018150
 [MIE, MIE-Camera, Camera] Sharpness - Sharpness: 1
@@ -57,9 +57,10 @@
 [MIE, MIE-Image, Image] ColorSpace - Color Space: sRGB
 [MIE, MIE-Image, Image] Components - Components Configuration: YCbCr
 [MIE, MIE-Image, Image] ImageSize - Image Size: 100x80
+[MIE, MIE-Image, Image] Resolution - Resolution: 118x118(/cm)
 [MIE, MIE-Thumbnail, Image] ImageSize - Thumbnail Image Size: 160x120
 [MIE, MIE-Thumbnail, Image] data - Thumbnail Image: (Binary data 28 bytes)
-[MIE, MIE-Main, Other] data - Subfile: (Binary data 20 bytes)
+[MIE, MIE-Main, Other] data - Subfile Data: (Binary data 20 bytes)
 [EXIF, IFD0, Image] 270 - Image Description:           
 [EXIF, IFD0, Camera] 271 - Make: NIKON
 [EXIF, IFD0, Camera] 272 - Camera Model Name: E775

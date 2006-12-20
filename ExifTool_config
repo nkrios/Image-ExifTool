@@ -47,6 +47,8 @@
     MyAlias => 'FocalLengthIn35mmFormat',
 );
 
+# NOTE: All tag names used in the following tables are case sensitive.
+
 # This is a basic example of the definition for a new XMP namespace.
 # After defining this table (which may have any name), a corresponding
 # "SubDirectory" entry must be added to the Main XMP table through
@@ -61,8 +63,8 @@
     NewXMPxxxTag3 => { List => 'Bag' },
 );
 
-# The %Image::ExifTool::UserDefined hash defines new tags to be
-# added to existing tables.
+# The %Image::ExifTool::UserDefined hash defines new tags to be added
+# to existing tables.
 %Image::ExifTool::UserDefined = (
     # All EXIF tags are added to the Main table, and WriteGroup is used to
     # specify where the tag is written (default is ExifIFD if not specified):

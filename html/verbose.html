@@ -1,6 +1,15 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
   <title>ExifTool Verbose Option</title>
+<style type="text/css">
+<!--
+h2, h3    { margin: 0 0 .5em 0 }
+pre       { padding: 0; margin: 0px 2px }
+table.box { padding: .2em; background: #dddddd }
+-->
+</style>
 </head>
 <body text='#000000' bgcolor='#ffffff'>
 <h2>ExifTool Verbose Option</h2>
@@ -14,7 +23,7 @@ specific Verbose level.  For example, -v2 sets Verbose = 2.  Without a number,
 -v increments the current Verbose level by one. Multiple -v options are allowed,
 so the following two examples give the same result:
 
-<blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
+<blockquote><table class='box' width='100%'><tr><td><pre>
 exiftool -v -v -v t/images/Canon.jpg
 
 exiftool -v3 t/images/Canon.jpg
@@ -28,7 +37,7 @@ from the file, before any conversions are applied.  For unknown tags, the tag
 numbers are printed instead of a name.  Also printed are details of the file and
 directory structure:
 
-<blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
+<blockquote><table class='box' width='100%'><tr><td><pre>
   ExifToolVersion = 6.47
   FileName = Canon.jpg
   Directory = t/images
@@ -60,7 +69,7 @@ JPEG APP1 (2442 bytes):
 Prints all of the information from Verbose = 1, plus additional information
 about the tag number, data size and format:
 
-<blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
+<blockquote><table class='box' width='100%'><tr><td><pre>
   ExifToolVersion = 6.47
   FileName = Canon.jpg
   Directory = t/images
@@ -103,13 +112,13 @@ JPEG APP1 (2442 bytes):
 </pre></td></tr></table></blockquote>
 
 <h3>Verbose = 3</h3>
-Adds a hex dump of the binary data associated with each tag.  As of version
-5.69, the hex offsets are relative to the start of the file (previously they
-were relative to the start of the TIFF header, like the HtmlDump output still
-is, which is the native base for TIFF IFD offsets).  If the data is very long,
-only the first few lines of the dump are printed:
+Adds a hex dump of the binary data associated with each tag.  The hex offsets
+are relative to the start of the file, unlike the default HtmlDump output where
+offsets are relative to the start of the TIFF header (the native base for
+TIFF/EXIF offsets).  If the data is very long, only the first few lines of the
+dump are printed:
 
-<blockquote><table cellpadding=4 bgcolor='#dddddd' width='100%'><tr><td><pre>
+<blockquote><table class='box' width='100%'><tr><td><pre>
   ExifToolVersion = 6.47
   FileName = Canon.jpg
   Directory = t/images

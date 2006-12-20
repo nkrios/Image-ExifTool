@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -537,7 +537,7 @@ sub GetValueBlocks($$)
 # Fix base for value offsets in maker notes IFD (if necessary)
 # Inputs: 0) ExifTool object ref, 1) DirInfo hash ref
 # Return: amount of base shift (and $dirInfo Base and DataPos are updated,
-#         and Relative or EntryBased may be set)
+#         FixedBy is set if offsets fixed, and Relative or EntryBased may be set)
 sub FixBase($$)
 {
     local $_;
@@ -660,6 +660,7 @@ sub FixBase($$)
     # use default padding of 4 bytes unless already specified
     $makeDiff = 4 unless defined $makeDiff;
     my $fix = $makeDiff - $diff;    # assume standard diff for this make
+    my $fixedBy;
 
     if ($$dirInfo{FixBase}) {
         # set flag if offsets are relative (base is at or above directory start)
@@ -667,12 +668,12 @@ sub FixBase($$)
             $$dirInfo{Relative} = (defined $relative) ? $relative : 1;
         }
         if ($setBase) {
+            $fixedBy = $fixBase;
             $fix += $fixBase;
-            $exifTool->Warn("Adjusted $dirName base by $fixBase",1);
         }
     } elsif (defined $fixBase) {
         $fix = $fixBase if $fixBase ne '';
-        $exifTool->Warn("Adjusted $dirName base by $fix",1);
+        $fixedBy = $fix;
     } else {
         # print warning unless difference looks reasonable
         if ($diff < 0 or $diff > 16 or ($diff & 0x01)) {
@@ -680,6 +681,10 @@ sub FixBase($$)
         }
         # don't do the fix (but we already adjusted base if entry-based)
         return $shift;
+    }
+    if (defined $fixedBy) {
+        $exifTool->Warn("Adjusted $dirName base by $fixedBy",1);
+        $$dirInfo{FixedBy} = $fixedBy;
     }
     $$dirInfo{Base} += $fix;
     $$dirInfo{DataPos} -= $fix;

@@ -15,6 +15,7 @@
 #               7) Michael Meissner private communication
 #               8) Shingo Noguchi, PhotoXP (http://www.daifukuya.com/photoxp/)
 #               9) Mark Dapoz private communication
+#              10) Lilo Huang private communication (E-330)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -24,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.30';
+$VERSION = '1.32';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -1515,11 +1516,16 @@ sub PrintLensInfo($$)
             '0 24'  => 'Zuiko Digital 14-45mm F3.5-5.6',
             '0 32'  => 'Zuiko Digital 35mm F3.5 Macro', #9
             '0 34'  => 'Zuiko Digital 17.5-45mm F3.5-5.6', #9
+            '0 35'  => 'Zuiko Digital ED 14-42mm F3.5-5.6', #PH
+            '0 36'  => 'Zuiko Digital ED 40-150mm F4.0-5.6', #PH
             # Sigma lenses
             '1 1'   => '18-50mm F3.5-5.6', #8
             '1 2'   => '55-200mm F4.0-5.6 DC',
             '1 3'   => '18-125mm F3.5-5.6 DC',
             '1 4'   => '18-125mm F3.5-5.6', #7
+            '1 5'   => '30mm F1.4', #10
+            '1 7'   => '105mm F2.8 DG', #PH
+            '1 8'   => '150mm F2.8 DG HSM', #PH
         },
         Extender => {
             # Olympus extenders

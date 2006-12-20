@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.64
 [File, File, Image]  - File Name: Writer_6_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2006:11:17 13:52:04
+[File, File, Time]  - File Modification Date/Time: 2006:12:08 11:50:40
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -55,6 +55,7 @@
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
 [MakerNotes, Canon, Camera] 7 - Focus Mode: Manual Focus
+[MakerNotes, Canon, Camera] 9 - Record Mode: CRW+THM
 [MakerNotes, Canon, Camera] 10 - Canon Image Size: Large
 [MakerNotes, Canon, Camera] 11 - Easy Mode: Manual
 [MakerNotes, Canon, Camera] 12 - Digital Zoom: Unknown (-1)
@@ -66,8 +67,8 @@
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Manual
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
-[MakerNotes, Canon, Camera] 23 - Long Focal: 55
-[MakerNotes, Canon, Camera] 24 - Short Focal: 18
+[MakerNotes, Canon, Camera] 23 - Long Focal: 55mm
+[MakerNotes, Canon, Camera] 24 - Short Focal: 18mm
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 4
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 27
@@ -88,6 +89,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
+[MakerNotes, Canon, Image] 10 - Optical Zoom Code: 8
 [MakerNotes, Canon, Image] 13 - Flash Guide Number: 0
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off

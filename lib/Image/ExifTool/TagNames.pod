@@ -90,6 +90,7 @@ This table lists information extracted by ExifTool from JPEG images.
                CanonVRD                         CanonVRD
                FotoStation                      FotoStation
                PhotoMechanic                    PhotoMechanic
+               MIE                              MIE
                PreviewImage                     Y
 
 =head3 JPEG APP6 Tags
@@ -1325,15 +1326,23 @@ XMP Paged-Text schema tags.
 These GPS tags are part of the EXIF standard, and are stored in a separate
 IFD within the EXIF information.
 
-ExifTool is very flexible about the input format for lat/long coordinates,
-and will accept 3 floating point numbers (for degrees, minutes and seconds)
-separated by just about anything.  Many other GPS tags have values which are
-fixed-length strings.  For these, the indicated string lengths include a
-null terminator which is added automatically by ExifTool.
+ExifTool is very flexible about the input format when writing lat/long
+coordinates, and will accept from 1 to 3 floating point numbers (for decimal
+degrees, degrees and minutes, or degrees, minutes and seconds) separated by
+just about anything, and will format them properly according to the EXIF
+specification.
+
+Some GPS tags have values which are fixed-length strings. For these, the
+indicated string lengths include a null terminator which is added
+automatically by ExifTool.  Remember that the descriptive values are used
+when writing (ie. 'Above Sea Level', not '0') unless the print conversion is
+disabled (with '-n' on the command line, or the PrintConv option in the
+API).
 
 When adding GPS information to an image, it is important to set all of the
 following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
-GPSAltitude and GPSAltitudeRef.
+GPSAltitude and GPSAltitudeRef.  ExifTool will write the required
+GPSVersionID tag automatically if new a GPS IFD is added to an image.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -1729,6 +1738,7 @@ This information is found in the PSD file header.
       4    CanonFlashMode                       int16s
       5    ContinuousDrive                      int16s
       7    FocusMode                            int16s
+      9    RecordMode                           int16s
      10    CanonImageSize                       int16s
      11    EasyMode                             int16s
      12    DigitalZoom                          int16s
@@ -1763,7 +1773,6 @@ This information is found in the PSD file header.
    -----   --------                             --------
       0    FocalType                            int16u
       1    FocalLength                          int16u
-           ScaledFocalLength                    int16u
       2    FocalPlaneXSize                      int16u
       3    FocalPlaneYSize                      int16u
 
@@ -1780,6 +1789,7 @@ This information is found in the PSD file header.
       7    WhiteBalance                         int16s
       8    SlowShutter                          int16s
       9    SequenceNumber                       int16s
+     10    OpticalZoomCode                      int16s
      13    FlashGuideNumber                     int16s
      14    AFPointsUsed2                        int16s
      15    FlashExposureComp                    int16s
@@ -2542,7 +2552,7 @@ These tags are used by the DC240, DC280, DC3400 and DC5000.
      12    YearCreated                          int16u
      14    MonthDayCreated                      int8u[2]
      16    TimeCreated                          int8u[4]
-     30    AnalogZoom                           int16u
+     30    OpticalZoom                          int16u
      55    Sharpness                            int8s
      56    ExposureTime                         int32u
      60    FNumber                              int16u
@@ -3125,6 +3135,7 @@ Camera settings information for the Sony DSLR-A100.
   0x001b   CropHiSpeed                          int16u[7]~
   0x001d   SerialNumber                         N
   0x001e   ColorSpace                           int16u
+  0x0020   ImageAuthentication                  int8u
   0x0080   ImageAdjustment                      string
   0x0081   ToneComp                             string
   0x0082   AuxiliaryLens                        string
@@ -3228,10 +3239,10 @@ This structure is used by the D100 and newer D1X models.
 
 =head3 Nikon LensData01 Tags
 
-Nikon encrypts the LensData information below if LensDataVersion is 0201,
-but  the decryption algorithm is known so the information can be extracted.
-It isn't yet writable, however, because the encryption adds complications
-which make writing more difficult.
+Nikon encrypts the LensData information below if LensDataVersion is 0201 or
+higher, but  the decryption algorithm is known so the information can be
+extracted.  It isn't yet writable, however, because the encryption adds
+complications which make writing more difficult.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -4825,6 +4836,511 @@ the "XMP-photomech" family 1 group name.
   'Prefs'              Prefs                    string
   'TimeCreated'        TimeCreated              string/
 
+=head2 MIE Tags
+
+MIE is a flexible format which may be used as either a standalone meta
+information format, or to encapsulate other files and information.  The
+tables below represent currently defined MIE tags, however ExifTool will
+also extract any other information present in a MIE file.
+
+When writing MIE information, some special features are supported:
+
+1) String values may be written as ASCII or UTF-8.  ExifTool will
+automatically detect the presence of wide characters and set the format code
+appropriately.  Internally, UTF-8 text may be stored as UTF-16 or UTF-32 if
+it is more compact.
+
+2) All MIE string-value tags support localized text.  Localized values are
+written by adding a language/country code to the tag name in the form
+C<TAG-xx_YY>, where C<TAG> is the tag name, C<xx> is a 2-character lower
+case ISO 639-1 language code, and C<YY> is a 2-character upper case ISO
+3166-1 alpha 2 country code (ie. C<Title-en_US>).  But as usual, the user
+interface is case-insensitive, and ExifTool will write the correct case to
+the file.
+
+3) Some numerical MIE tags allow units of measurement to be specified.  For
+these tags, units may be added in brackets immediately following the value
+(ie. C<55(mi/h)>).  If no units are specified, the default units are
+written.
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  '0Type'              SubfileType              string
+  '0Vers'              MIEVersion               string
+  '1Directory'         SubfileDirectory         string
+  '1Name'              SubfileName              string
+  '2MIME'              SubfileMIMEType          string
+  'Meta'               Meta                     MIE Meta
+  'data'               SubfileData              undef
+  'rsrc'               SubfileResource          undef
+  'zmd5'               MD5Digest                string
+  'zmie'               TrailerSignature         undef
+
+=head3 MIE Meta Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Audio'              Audio                    MIE Audio
+  'Camera'             Camera                   MIE Camera
+  'Document'           Document                 MIE Doc
+  'EXIF'               EXIF                     EXIF
+  'Geo'                Geo                      MIE Geo
+  'ICCProfile'         ICC_Profile              ICC_Profile
+  'ID3'                ID3                      ID3
+  'IPTC'               IPTC                     IPTC
+  'Image'              Image                    MIE Image
+  'MakerNotes'         MakerNotes               MIE MakerNotes
+  'Preview'            Preview                  MIE Preview
+  'Thumbnail'          Thumbnail                MIE Thumbnail
+  'Video'              Video                    MIE Video
+  'XMP'                XMP                      XMP
+
+=head3 MIE Audio Tags
+
+For the Audio group (and any other group containing a 'data' element), tags
+refer to the contained data if present, otherwise they refer to the main
+SubfileData.  The C<0Type> and C<1Name> elements should exist only if C<data>
+is present.
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  '0Type'              RelatedAudioFileType     string
+  '1Name'              RelatedAudioFileName     string
+  'Channels'           Channels                 int8u
+  'Compression'        AudioCompression         string
+  'Duration'           Duration                 rational64u
+  'SampleBits'         SampleBits               int16u
+  'SampleRate'         SampleRate               int32u
+  'data'               RelatedAudioFile         undef
+
+=head3 MIE Camera Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Brightness'         Brightness               int8s
+  'ColorBalance'       ColorBalance             rational64u[3]
+  'ColorTemperature'   ColorTemperature         int32u
+  'Contrast'           Contrast                 int8s
+  'DigitalZoom'        DigitalZoom              rational64u
+  'ExposureComp'       ExposureCompensation     rational64s
+  'ExposureMode'       ExposureMode             string
+  'ExposureTime'       ExposureTime             rational64u
+  'FirmwareVersion'    FirmwareVersion          string
+  'Flash'              Flash                    MIE Flash
+  'FocusMode'          FocusMode                string
+  'ISO'                ISO                      int16u
+  'ISOSetting'         ISOSetting               int16u
+  'ImageNumber'        ImageNumber              int32u
+  'ImageQuality'       ImageQuality             string
+  'ImageStabilization' ImageStabilization       int8u
+  'Lens'               Lens                     MIE Lens
+  'Make'               Make                     string
+  'MeasuredEV'         MeasuredEV               rational64s
+  'Model'              Model                    string
+  'Orientation'        Orientation              MIE Orient
+  'OwnerName'          OwnerName                string
+  'Saturation'         Saturation               int8s
+  'SensorSize'         SensorSize               rational64u[2]
+  'SerialNumber'       SerialNumber             string
+  'Sharpness'          Sharpness                int8s
+  'ShootingMode'       ShootingMode             string
+
+=head3 MIE Flash Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'ExposureComp'       FlashExposureComp        rational64s
+  'Fired'              FlashFired               int8u
+  'GuideNumber'        FlashGuideNumber         string
+  'Make'               FlashMake                string
+  'Mode'               FlashMode                string
+  'Model'              FlashModel               string
+  'SerialNumber'       FlashSerialNumber        string
+  'Type'               FlashType                string
+
+=head3 MIE Lens Tags
+
+All recorded lens parameters (focal length, aperture, etc) include the
+effects of the extender if present.
+
+  Tag ID                  Tag Name              Writable
+  ------                  --------              --------
+  'Extender'              Extender              MIE Extender
+  'FNumber'               FNumber               rational64u
+  'FocalLength'           FocalLength           rational64u
+  'FocusDistance'         FocusDistance         rational64u
+  'Make'                  LensMake              string
+  'MaxAperture'           MaxAperture           rational64u
+  'MaxApertureAtMaxFocal' MaxApertureAtMaxFocal rational64u
+  'MaxFocalLength'        MaxFocalLength        rational64u
+  'MinAperture'           MinAperture           rational64u
+  'MinFocalLength'        MinFocalLength        rational64u
+  'Model'                 LensModel             string
+  'OpticalZoom'           OpticalZoom           rational64u
+  'SerialNumber'          LensSerialNumber      string
+
+=head3 MIE Extender Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Magnification'      ExtenderMagnification    rational64s
+  'Make'               ExtenderMake             string
+  'Model'              ExtenderModel            string
+  'SerialNumber'       ExtenderSerialNumber     string
+
+=head3 MIE Orient Tags
+
+These tags describe the camera orientation.
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Azimuth'            Azimuth                  rational64s
+  'Declination'        Declination              rational64s
+  'Elevation'          Elevation                rational64s
+  'RightAscension'     RightAscension           rational64s
+  'Rotation'           Rotation                 rational64s
+
+=head3 MIE Doc Tags
+
+Information describing the main document, image or file.
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Author'             Author                   string
+  'Comment'            Comment                  string
+  'Contributors'       Contributors             string+
+  'Copyright'          Copyright                string
+  'CreateDate'         CreateDate               string
+  'EMail'              EMail                    string
+  'Keywords'           Keywords                 string+
+  'ModifyDate'         ModifyDate               string
+  'OriginalDate'       DateTimeOriginal         string
+  'Phone'              PhoneNumber              string
+  'References'         References               string+
+  'Software'           Software                 string
+  'Title'              Title                    string
+  'URL'                URL                      string
+
+=head3 MIE Geo Tags
+
+Information related to geographic location.
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Address'            Address                  string
+  'City'               City                     string
+  'Country'            Country                  string
+  'GPS'                GPS                      MIE GPS
+  'PostalCode'         PostalCode               string
+  'State'              State                    string
+  'UTM'                UTM                      MIE UTM
+
+=head3 MIE GPS Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Altitude'           GPSAltitude              rational64s
+  'Bearing'            GPSDestBearing           rational64s
+  'DateTime'           GPSDateTime              string
+  'Datum'              GPSMapDatum              string
+  'Differential'       GPSDifferential          int8u
+  'Distance'           GPSDestDistance          rational64s
+  'Heading'            GPSTrack                 rational64s
+  'Latitude'           GPSLatitude              rational64s[n]
+  'Longitude'          GPSLongitude             rational64s[n]
+  'MeasureMode'        GPSMeasureMode           int8u
+  'Satellites'         GPSSatellites            string
+  'Speed'              GPSSpeed                 rational64s
+
+=head3 MIE UTM Tags
+
+  Tag ID       Tag Name                         Writable
+  ------       --------                         --------
+  'Datum'      UTMMapDatum                      string
+  'Easting'    UTMEasting                       string
+  'Northing'   UTMNorthing                      string
+  'Zone'       UTMZone                          int8s
+
+=head3 MIE Image Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  '0Type'              FullSizeImageType        string
+  '1Name'              FullSizeImageName        string
+  'BitDepth'           BitDepth                 int16u
+  'ColorSpace'         ColorSpace               string
+  'Components'         ComponentsConfiguration  string
+  'Compression'        CompressionRatio         rational32u
+  'ImageSize'          ImageSize                int16u[n]
+  'Resolution'         Resolution               rational64u[n]
+  'data'               FullSizeImage            undef
+
+=head3 MIE MakerNotes Tags
+
+MIE maker notes are contained within separate groups for each manufacturer
+to avoid name conflicts.  Currently no specific manufacturer information has
+been defined.
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Canon'              Canon                    MIE Unknown
+  'Casio'              Casio                    MIE Unknown
+  'FujiFilm'           FujiFilm                 MIE Unknown
+  'Kodak'              Kodak                    MIE Unknown
+  'KonicaMinolta'      KonicaMinolta            MIE Unknown
+  'Nikon'              Nikon                    MIE Unknown
+  'Olympus'            Olympus                  MIE Unknown
+  'Panasonic'          Panasonic                MIE Unknown
+  'Pentax'             Pentax                   MIE Unknown
+  'Ricoh'              Ricoh                    MIE Unknown
+  'Sigma'              Sigma                    MIE Unknown
+  'Sony'               Sony                     MIE Unknown
+
+=head3 MIE Unknown Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
+
+=head3 MIE Preview Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  '0Type'              PreviewImageType         string
+  '1Name'              PreviewImageName         string
+  'ImageSize'          PreviewImageSize         int16u[n]
+  'data'               PreviewImage             undef
+
+=head3 MIE Thumbnail Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  '0Type'              ThumbnailImageType       string
+  '1Name'              ThumbnailImageName       string
+  'ImageSize'          ThumbnailImageSize       int16u[n]
+  'data'               ThumbnailImage           undef
+
+=head3 MIE Video Tags
+
+  Tag ID       Tag Name                         Writable
+  ------       --------                         --------
+  '0Type'      RelatedVideoFileType             string
+  '1Name'      RelatedVideoFileName             string
+  'Codec'      Codec                            string
+  'Duration'   Duration                         rational64u
+  'data'       RelatedVideoFile                 undef
+
+=head2 ID3 Tags
+
+ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE and
+RealAudio files.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+  'ID3v1'  ID3v1                                ID3 v1
+  'ID3v22' ID3v2_2                              ID3 v2_2
+  'ID3v23' ID3v2_3                              ID3 v2_3
+  'ID3v24' ID3v2_4                              ID3 v2_4
+
+=head3 ID3 v1 Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      3    Title                                N
+     33    Artist                               N
+     63    Album                                N
+     93    Year                                 N
+     97    Comment                              N
+    127    Genre                                N
+
+=head3 ID3 v2_2 Tags
+
+ExifTool extracts mainly text-based tags from ID3v2 information.  The tags
+in the tables below are those extracted by ExifTool, and don't represent a
+complete list of available ID3v2 tags.
+
+ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'CNT'    PlayCounter                          N
+  'COM'    Comment                              N
+  'IPL'    InvolvedPeople                       N
+  'PIC'    Picture                              N
+  'TAL'    Album                                N
+  'TBP'    BeatsPerMinute                       N
+  'TCM'    Composer                             N
+  'TCO'    Genre                                N
+  'TCP'    Compilation                          N
+  'TCR'    Copyright                            N
+  'TDA'    Date                                 N
+  'TDY'    PlaylistDelay                        N
+  'TEN'    EncodedBy                            N
+  'TFT'    FileType                             N
+  'TIM'    Time                                 N
+  'TKE'    InitialKey                           N
+  'TLA'    Language                             N
+  'TLE'    Length                               N
+  'TMT'    Media                                N
+  'TOA'    OriginalArtist                       N
+  'TOF'    OriginalFilename                     N
+  'TOL'    OriginalLyricist                     N
+  'TOR'    OriginalReleaseYear                  N
+  'TOT'    OriginalAlbum                        N
+  'TP1'    Artist                               N
+  'TP2'    Band                                 N
+  'TP3'    Conductor                            N
+  'TP4'    InterpretedBy                        N
+  'TPA'    PartOfSet                            N
+  'TPB'    Publisher                            N
+  'TRC'    ISRC                                 N
+  'TRD'    RecordingDates                       N
+  'TRK'    Track                                N
+  'TSI'    Size                                 N
+  'TSS'    EncoderSettings                      N
+  'TT1'    Grouping                             N
+  'TT2'    Title                                N
+  'TT3'    Subtitle                             N
+  'TXT'    Lyricist                             N
+  'TXX'    UserDefinedText                      N
+  'TYE'    Year                                 N
+  'ULT'    Lyrics                               N
+  'WAF'    FileRUL                              N
+  'WAR'    ArtistURL                            N
+  'WAS'    SourceURL                            N
+  'WCM'    CommercialURL                        N
+  'WCP'    CopyrightURL                         N
+  'WPB'    PublisherURL                         N
+  'WXX'    UserDefinedURL                       N
+
+=head3 ID3 v2_3 Tags
+
+ID3 version 2.3 tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'APIC'   Picture                              N
+  'COMM'   Comment                              N
+  'IPLS'   InvolvedPeople                       N
+  'PCNT'   PlayCounter                          N
+  'TALB'   Album                                N
+  'TBPM'   BeatsPerMinute                       N
+  'TCOM'   Composer                             N
+  'TCON'   Genre                                N
+  'TCOP'   Copyright                            N
+  'TDAT'   Date                                 N
+  'TDLY'   PlaylistDelay                        N
+  'TENC'   EncodedBy                            N
+  'TEXT'   Lyricist                             N
+  'TFLT'   FileType                             N
+  'TIME'   Time                                 N
+  'TIT1'   Grouping                             N
+  'TIT2'   Title                                N
+  'TIT3'   Subtitle                             N
+  'TKEY'   InitialKey                           N
+  'TLAN'   Language                             N
+  'TLEN'   Length                               N
+  'TMED'   Media                                N
+  'TOAL'   OriginalAlbum                        N
+  'TOFN'   OriginalFilename                     N
+  'TOLY'   OriginalLyricist                     N
+  'TOPE'   OriginalArtist                       N
+  'TORY'   OriginalReleaseYear                  N
+  'TOWN'   FileOwner                            N
+  'TPE1'   Artist                               N
+  'TPE2'   Band                                 N
+  'TPE3'   Conductor                            N
+  'TPE4'   InterpretedBy                        N
+  'TPOS'   PartOfSet                            N
+  'TPUB'   Publisher                            N
+  'TRCK'   Track                                N
+  'TRDA'   RecordingDates                       N
+  'TRSN'   InternetRadioStationName             N
+  'TRSO'   InternetRadioStationOwner            N
+  'TSIZ'   Size                                 N
+  'TSRC'   ISRC                                 N
+  'TSSE'   EncoderSettings                      N
+  'TXXX'   UserDefinedText                      N
+  'TYER'   Year                                 N
+  'USER'   TermsOfUse                           N
+  'USLT'   Lyrics                               N
+  'WCOM'   CommercialURL                        N
+  'WCOP'   CopyrightURL                         N
+  'WOAF'   FileRUL                              N
+  'WOAR'   ArtistURL                            N
+  'WOAS'   SourceURL                            N
+  'WORS'   InternetRadioStationURL              N
+  'WPAY'   PaymentURL                           N
+  'WPUB'   PublisherURL                         N
+  'WXXX'   UserDefinedURL                       N
+
+=head3 ID3 v2_4 Tags
+
+ID3 version 2.4 tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'APIC'   Picture                              N
+  'COMM'   Comment                              N
+  'PCNT'   PlayCounter                          N
+  'TALB'   Album                                N
+  'TBPM'   BeatsPerMinute                       N
+  'TCOM'   Composer                             N
+  'TCON'   Genre                                N
+  'TCOP'   Copyright                            N
+  'TDEN'   EncodingTime                         N
+  'TDLY'   PlaylistDelay                        N
+  'TDOR'   OriginalReleaseTime                  N
+  'TDRC'   RecordingTime                        N
+  'TDRL'   ReleaseTime                          N
+  'TDTG'   TaggingTime                          N
+  'TENC'   EncodedBy                            N
+  'TEXT'   Lyricist                             N
+  'TFLT'   FileType                             N
+  'TIPL'   InvolvedPeople                       N
+  'TIT1'   Grouping                             N
+  'TIT2'   Title                                N
+  'TIT3'   Subtitle                             N
+  'TKEY'   InitialKey                           N
+  'TLAN'   Language                             N
+  'TLEN'   Length                               N
+  'TMCL'   MusicianCredits                      N
+  'TMED'   Media                                N
+  'TMOO'   Mood                                 N
+  'TOAL'   OriginalAlbum                        N
+  'TOFN'   OriginalFilename                     N
+  'TOLY'   OriginalLyricist                     N
+  'TOPE'   OriginalArtist                       N
+  'TOWN'   FileOwner                            N
+  'TPE1'   Artist                               N
+  'TPE2'   Band                                 N
+  'TPE3'   Conductor                            N
+  'TPE4'   InterpretedBy                        N
+  'TPOS'   PartOfSet                            N
+  'TPRO'   ProducedNotice                       N
+  'TPUB'   Publisher                            N
+  'TRCK'   Track                                N
+  'TRSN'   InternetRadioStationName             N
+  'TRSO'   InternetRadioStationOwner            N
+  'TSOA'   AlbumSortOrder                       N
+  'TSOP'   PerformerSortOrder                   N
+  'TSOT'   TitleSortOrder                       N
+  'TSRC'   ISRC                                 N
+  'TSSE'   EncoderSettings                      N
+  'TSST'   SetSubtitle                          N
+  'TXXX'   UserDefinedText                      N
+  'USER'   TermsOfUse                           N
+  'USLT'   Lyrics                               N
+  'WCOM'   CommercialURL                        N
+  'WCOP'   CopyrightURL                         N
+  'WOAF'   FileRUL                              N
+  'WOAR'   ArtistURL                            N
+  'WOAS'   SourceURL                            N
+  'WORS'   InternetRadioStationURL              N
+  'WPAY'   PaymentURL                           N
+  'WPUB'   PublisherURL                         N
+  'WXXX'   UserDefinedURL                       N
+
 =head2 Jpeg2000 Tags
 
   Tag ID   Tag Name                             Writable
@@ -5580,217 +6096,6 @@ This is the PDF document catalog.
   'Version'            Version                  string
   'begin_xml_packet'   XMP                      XMP
 
-=head2 ID3 Tags
-
-ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE and
-RealAudio files.
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-  'ID3v1'  ID3v1                                ID3 v1
-  'ID3v22' ID3v2_2                              ID3 v2_2
-  'ID3v23' ID3v2_3                              ID3 v2_3
-  'ID3v24' ID3v2_4                              ID3 v2_4
-
-=head3 ID3 v1 Tags
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      3    Title                                N
-     33    Artist                               N
-     63    Album                                N
-     93    Year                                 N
-     97    Comment                              N
-    127    Genre                                N
-
-=head3 ID3 v2_2 Tags
-
-ExifTool extracts mainly text-based tags from ID3v2 information.  The tags
-in the tables below are those extracted by ExifTool, and don't represent a
-complete list of available ID3v2 tags.
-
-ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  'CNT'    PlayCounter                          N
-  'COM'    Comment                              N
-  'IPL'    InvolvedPeople                       N
-  'PIC'    Picture                              N
-  'TAL'    Album                                N
-  'TBP'    BeatsPerMinute                       N
-  'TCM'    Composer                             N
-  'TCO'    Genre                                N
-  'TCP'    Compilation                          N
-  'TCR'    Copyright                            N
-  'TDA'    Date                                 N
-  'TDY'    PlaylistDelay                        N
-  'TEN'    EncodedBy                            N
-  'TFT'    FileType                             N
-  'TIM'    Time                                 N
-  'TKE'    InitialKey                           N
-  'TLA'    Language                             N
-  'TLE'    Length                               N
-  'TMT'    Media                                N
-  'TOA'    OriginalArtist                       N
-  'TOF'    OriginalFilename                     N
-  'TOL'    OriginalLyricist                     N
-  'TOR'    OriginalReleaseYear                  N
-  'TOT'    OriginalAlbum                        N
-  'TP1'    Artist                               N
-  'TP2'    Band                                 N
-  'TP3'    Conductor                            N
-  'TP4'    InterpretedBy                        N
-  'TPA'    PartOfSet                            N
-  'TPB'    Publisher                            N
-  'TRC'    ISRC                                 N
-  'TRD'    RecordingDates                       N
-  'TRK'    Track                                N
-  'TSI'    Size                                 N
-  'TSS'    EncoderSettings                      N
-  'TT1'    Grouping                             N
-  'TT2'    Title                                N
-  'TT3'    Subtitle                             N
-  'TXT'    Lyricist                             N
-  'TXX'    UserDefinedText                      N
-  'TYE'    Year                                 N
-  'ULT'    Lyrics                               N
-  'WAF'    FileRUL                              N
-  'WAR'    ArtistURL                            N
-  'WAS'    SourceURL                            N
-  'WCM'    CommercialURL                        N
-  'WCP'    CopyrightURL                         N
-  'WPB'    PublisherURL                         N
-  'WXX'    UserDefinedURL                       N
-
-=head3 ID3 v2_3 Tags
-
-ID3 version 2.3 tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  'APIC'   Picture                              N
-  'COMM'   Comment                              N
-  'IPLS'   InvolvedPeople                       N
-  'PCNT'   PlayCounter                          N
-  'TALB'   Album                                N
-  'TBPM'   BeatsPerMinute                       N
-  'TCOM'   Composer                             N
-  'TCON'   Genre                                N
-  'TCOP'   Copyright                            N
-  'TDAT'   Date                                 N
-  'TDLY'   PlaylistDelay                        N
-  'TENC'   EncodedBy                            N
-  'TEXT'   Lyricist                             N
-  'TFLT'   FileType                             N
-  'TIME'   Time                                 N
-  'TIT1'   Grouping                             N
-  'TIT2'   Title                                N
-  'TIT3'   Subtitle                             N
-  'TKEY'   InitialKey                           N
-  'TLAN'   Language                             N
-  'TLEN'   Length                               N
-  'TMED'   Media                                N
-  'TOAL'   OriginalAlbum                        N
-  'TOFN'   OriginalFilename                     N
-  'TOLY'   OriginalLyricist                     N
-  'TOPE'   OriginalArtist                       N
-  'TORY'   OriginalReleaseYear                  N
-  'TOWN'   FileOwner                            N
-  'TPE1'   Artist                               N
-  'TPE2'   Band                                 N
-  'TPE3'   Conductor                            N
-  'TPE4'   InterpretedBy                        N
-  'TPOS'   PartOfSet                            N
-  'TPUB'   Publisher                            N
-  'TRCK'   Track                                N
-  'TRDA'   RecordingDates                       N
-  'TRSN'   InternetRadioStationName             N
-  'TRSO'   InternetRadioStationOwner            N
-  'TSIZ'   Size                                 N
-  'TSRC'   ISRC                                 N
-  'TSSE'   EncoderSettings                      N
-  'TXXX'   UserDefinedText                      N
-  'TYER'   Year                                 N
-  'USER'   TermsOfUse                           N
-  'USLT'   Lyrics                               N
-  'WCOM'   CommercialURL                        N
-  'WCOP'   CopyrightURL                         N
-  'WOAF'   FileRUL                              N
-  'WOAR'   ArtistURL                            N
-  'WOAS'   SourceURL                            N
-  'WORS'   InternetRadioStationURL              N
-  'WPAY'   PaymentURL                           N
-  'WPUB'   PublisherURL                         N
-  'WXXX'   UserDefinedURL                       N
-
-=head3 ID3 v2_4 Tags
-
-ID3 version 2.4 tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  'APIC'   Picture                              N
-  'COMM'   Comment                              N
-  'PCNT'   PlayCounter                          N
-  'TALB'   Album                                N
-  'TBPM'   BeatsPerMinute                       N
-  'TCOM'   Composer                             N
-  'TCON'   Genre                                N
-  'TCOP'   Copyright                            N
-  'TDEN'   EncodingTime                         N
-  'TDLY'   PlaylistDelay                        N
-  'TDOR'   OriginalReleaseTime                  N
-  'TDRC'   RecordingTime                        N
-  'TDRL'   ReleaseTime                          N
-  'TDTG'   TaggingTime                          N
-  'TENC'   EncodedBy                            N
-  'TEXT'   Lyricist                             N
-  'TFLT'   FileType                             N
-  'TIPL'   InvolvedPeople                       N
-  'TIT1'   Grouping                             N
-  'TIT2'   Title                                N
-  'TIT3'   Subtitle                             N
-  'TKEY'   InitialKey                           N
-  'TLAN'   Language                             N
-  'TLEN'   Length                               N
-  'TMCL'   MusicianCredits                      N
-  'TMED'   Media                                N
-  'TMOO'   Mood                                 N
-  'TOAL'   OriginalAlbum                        N
-  'TOFN'   OriginalFilename                     N
-  'TOLY'   OriginalLyricist                     N
-  'TOPE'   OriginalArtist                       N
-  'TOWN'   FileOwner                            N
-  'TPE1'   Artist                               N
-  'TPE2'   Band                                 N
-  'TPE3'   Conductor                            N
-  'TPE4'   InterpretedBy                        N
-  'TPOS'   PartOfSet                            N
-  'TPRO'   ProducedNotice                       N
-  'TPUB'   Publisher                            N
-  'TRCK'   Track                                N
-  'TRSN'   InternetRadioStationName             N
-  'TRSO'   InternetRadioStationOwner            N
-  'TSOA'   AlbumSortOrder                       N
-  'TSOP'   PerformerSortOrder                   N
-  'TSOT'   TitleSortOrder                       N
-  'TSRC'   ISRC                                 N
-  'TSSE'   EncoderSettings                      N
-  'TSST'   SetSubtitle                          N
-  'TXXX'   UserDefinedText                      N
-  'USER'   TermsOfUse                           N
-  'USLT'   Lyrics                               N
-  'WCOM'   CommercialURL                        N
-  'WCOP'   CopyrightURL                         N
-  'WOAF'   FileRUL                              N
-  'WOAR'   ArtistURL                            N
-  'WOAS'   SourceURL                            N
-  'WORS'   InternetRadioStationURL              N
-  'WPAY'   PaymentURL                           N
-  'WPUB'   PublisherURL                         N
-  'WXXX'   UserDefinedURL                       N
-
 =head2 Vorbis Tags
 
 ExifTool extracts the following Vorbis information from Ogg files.  As well
@@ -5822,12 +6127,15 @@ any tag found, even if not listed here.
   ------                  --------              --------
   'ALBUM'                 Album                 N
   'ARTIST'                Artist                N+
+  'COMMENT'               Comment               N
   'CONTACT'               Contact               N+
   'COPYRIGHT'             Copyright             N
   'COVERART'              CoverArt              N
   'COVERARTMIME'          CoverArtMIMEType      N
   'DATE'                  Date                  N
   'DESCRIPTION'           Description           N
+  'ENCODED_BY'            EncodedBy             N
+  'ENCODED_USING'         EncodedUsing          N
   'GENRE'                 Genre                 N
   'ISRC'                  ISRCNumber            N
   'LICENSE'               License               N
@@ -5841,7 +6149,7 @@ any tag found, even if not listed here.
   'TITLE'                 Title                 N
   'TRACKNUMBER'           TrackNumber           N
   'VERSION'               Version               N
-  'Vendor'                Vendor                N
+  'vendor'                Vendor                N
 
 =head2 FLAC Tags
 
@@ -5914,7 +6222,7 @@ APE MAC audio header for version 3.97 or earlier.
 
 =head2 MPC Tags
 
-Tags used in Musepack audio files.  ExifTool also extracts ID3 and APE
+Tags used in Musepack (MPC) audio files.  ExifTool also extracts ID3 and APE
 information from these files.
 
   Tag ID               Tag Name                 Writable
@@ -8903,237 +9211,6 @@ and element numbers in hexadecimal, as given in the DICOM specification.
   FFFE,E00D  EndOfItems                         N
   FFFE,E0DD  EndOfSequence                      N
 
-=head2 MIE Tags
-
-MIE is flexible format which may be used as either a standalone meta
-information format, or for encapsulation of any other file type.  The tables
-below represent currently defined MIE tags, however ExifTool will also
-extract any other information present in a MIE file.
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  '0Type'              SubfileType              string
-  '1Directory'         SubfileDirectory         string
-  '1Name'              SubfileName              string
-  '2MIME'              SubfileMIMEType          string
-  'Meta'               Meta                     MIE Meta
-  'data'               Subfile                  undef
-  'resource'           SubfileResource          undef
-  'zmie'               TrailerSignature         undef
-
-=head3 MIE Meta Tags
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  'Audio'              Audio                    MIE Audio
-  'Camera'             Camera                   MIE Camera
-  'Document'           Document                 MIE Doc
-  'EXIF'               EXIF                     EXIF
-  'Geo'                Geo                      MIE Geo
-  'ICCProfile'         ICC_Profile              ICC_Profile
-  'ID3'                ID3                      ID3
-  'IPTC'               IPTC                     IPTC
-  'Image'              Image                    MIE Image
-  'MakerNotes'         MakerNotes               MIE MakerNotes
-  'Preview'            Preview                  MIE Preview
-  'Thumbnail'          Thumbnail                MIE Thumbnail
-  'Video'              Video                    MIE Video
-  'XMP'                XMP                      XMP
-
-=head3 MIE Audio Tags
-
-For the Audio group (and any other group containing a 'data' element), tags
-refer to the contained data if present, otherwise they refer to the main
-Subfile data.  The '0Type' and '1Name' elements should exist only if 'data'
-is present.
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  '0Type'              RelatedAudioFileType     string
-  '1Name'              RelatedAudioFileName     string
-  'Channels'           Channels                 int8u
-  'Compression'        AudioCompression         string
-  'Duration'           Duration                 rational64u
-  'SampleBits'         SampleBits               int16u
-  'SampleRate'         SampleRate               int32u
-  'data'               RelatedAudioFile         undef
-
-=head3 MIE Camera Tags
-
-  Tag ID                  Tag Name              Writable
-  ------                  --------              --------
-  'AnalogZoom'            AnalogZoom            rational64u
-  'BlueBalance'           BlueBalance           rational64u
-  'Brightness'            Brightness            int8s
-  'ColorTemperature'      ColorTemperature      int32u
-  'Contrast'              Contrast              int8s
-  'DigitalZoom'           DigitalZoom           rational64u
-  'ExposureComp'          ExposureCompensation  rational64s
-  'ExposureMode'          ExposureMode          string
-  'ExposureTime'          ExposureTime          rational64u
-  'Extender'              Extender              MIE Extender
-  'FNumber'               FNumber               rational64u
-  'FirmwareVersion'       FirmwareVersion       string
-  'Flash'                 Flash                 MIE Flash
-  'FocalLength'           FocalLength           rational64u
-  'FocusDistance'         FocusDistance         rational64u
-  'FocusMode'             FocusMode             string
-  'ISO'                   ISO                   int16u
-  'ISOSetting'            ISOSetting            int16u
-  'ImageNumber'           ImageNumber           int32u
-  'ImageQuality'          ImageQuality          string
-  'ImageStabilization'    ImageStabilization    int8u
-  'Lens'                  Lens                  MIE Lens
-  'Make'                  Make                  string
-  'MaxAperture'           MaxAperture           rational64u
-  'MaxApertureAtMaxFocal' MaxApertureAtMaxFocal rational64u
-  'MaxFocalLength'        MaxFocalLength        rational64u
-  'MeasuredEV'            MeasuredEV            rational64s
-  'MinAperture'           MinAperture           rational64u
-  'MinFocalLength'        MinFocalLength        rational64u
-  'Model'                 Model                 string
-  'Orientation'           Orientation           int16u
-  'OwnerName'             OwnerName             string
-  'RedBalance'            RedBalance            rational64u
-  'Saturation'            Saturation            int8s
-  'SensorSize'            SensorSize            rational64u[2]
-  'SerialNumber'          SerialNumber          string
-  'Sharpness'             Sharpness             int8s
-  'ShootingMode'          ShootingMode          string
-
-=head3 MIE Extender Tags
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  'Magnification'      Magnification            rational64s
-  'Make'               ExtenderMake             string
-  'Model'              ExtenderModel            string
-  'SerialNumber'       ExtenderSerialNumber     string
-
-=head3 MIE Flash Tags
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  'ExposureComp'       FlashExposureComp        rational64s
-  'Fired'              FlashFired               int8u
-  'GuideNumber'        FlashGuideNumber         string
-  'Make'               FlashMake                string
-  'Mode'               FlashMode                string
-  'Model'              FlashModel               string
-  'SerialNumber'       FlashSerialNumber        string
-  'Type'               FlashType                string
-
-=head3 MIE Lens Tags
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  'Make'               LensMake                 string
-  'Model'              LensModel                string
-  'SerialNumber'       LensSerialNumber         string
-
-=head3 MIE Doc Tags
-
-Information describing the main document, image or file.
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  'Author'             Author                   string
-  'Comment'            Comment                  string
-  'Contributors'       Contributors             string+
-  'Copyright'          Copyright                string
-  'CreateDate'         CreateDate               string
-  'Keywords'           Keywords                 string+
-  'ModifyDate'         ModifyDate               string
-  'OriginalDate'       DateTimeOriginal         string
-  'References'         References               string+
-  'Software'           Software                 string
-  'Title'              Title                    string
-  'URL'                URL                      string
-
-=head3 MIE Geo Tags
-
-Information describing geographic location.
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  'Address'            Address                  string
-  'City'               City                     string
-  'Country'            Country                  string
-  'Elevation'          Elevation                rational64s
-  'Latitude'           Latitude                 string
-  'Longitude'          Longitude                string
-  'State'              State                    string
-
-=head3 MIE Image Tags
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  '0Type'              FullSizeImageType        string
-  '1Name'              FullSizeImageName        string
-  'BitDepth'           BitDepth                 int16u
-  'ColorSpace'         ColorSpace               string
-  'Components'         ComponentsConfiguration  string
-  'Compression'        CompressionRatio         rational32u
-  'ImageSize'          ImageSize                int16u[n]
-  'Resolution'         Resolution               rational64u[n]
-  'ResolutionUnits'    ResolutionUnits          int16u
-  'data'               FullSizeImage            N
-
-=head3 MIE MakerNotes Tags
-
-MIE maker notes are contained within separate groups for each manufacturer
-to avoid name conflicts.  Currently no specific manufacturer information has
-been defined.
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  'Canon'              Canon                    MIE Unknown
-  'Casio'              Casio                    MIE Unknown
-  'FujiFilm'           FujiFilm                 MIE Unknown
-  'Kodak'              Kodak                    MIE Unknown
-  'KonicaMinolta'      KonicaMinolta            MIE Unknown
-  'Nikon'              Nikon                    MIE Unknown
-  'Olympus'            Olympus                  MIE Unknown
-  'Panasonic'          Panasonic                MIE Unknown
-  'Pentax'             Pentax                   MIE Unknown
-  'Ricoh'              Ricoh                    MIE Unknown
-  'Sigma'              Sigma                    MIE Unknown
-  'Sony'               Sony                     MIE Unknown
-
-=head3 MIE Unknown Tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  [no tags known]
-
-=head3 MIE Preview Tags
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  '0Type'              PreviewImageType         string
-  '1Name'              PreviewImageName         string
-  'ImageSize'          PreviewImageSize         int16u[n]
-  'data'               PreviewImage             N
-
-=head3 MIE Thumbnail Tags
-
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  '0Type'              ThumbnailImageType       string
-  '1Name'              ThumbnailImageName       string
-  'ImageSize'          ThumbnailImageSize       int16u[n]
-  'data'               ThumbnailImage           N
-
-=head3 MIE Video Tags
-
-  Tag ID       Tag Name                         Writable
-  ------       --------                         --------
-  '0Type'      RelatedVideoFileType             string
-  '1Name'      RelatedVideoFileName             string
-  'Codec'      Codec                            string
-  'Duration'   Duration                         rational64u
-  'data'       RelatedVideoFile                 undef
-
 =head2 Extra Tags
 
 The extra tags represent information found in the image but not associated
@@ -9193,6 +9270,9 @@ is extracted.
   DateTimeCreated      DateCreated              N
                        TimeCreated
   DateTimeOriginal     DateTimeCreated          N
+  DigitalZoom          Canon:ZoomSourceWidth    N
+                       Canon:ZoomTargetWidth
+                       Canon:DigitalZoom
   DriveMode            ContinuousDrive          N
                        Self-timer
   Duration             FLAC:SampleRate          N
@@ -9233,10 +9313,8 @@ is extracted.
                        JpgFromRawLength
   Lens                 ShortFocal               N
                        LongFocal
-                       FocalUnits
   Lens35efl            ShortFocal               N
                        LongFocal
-                       FocalUnits
                        Lens
                        ScaleFactor35efl
   LensID               Nikon:LensIDNumber       N
@@ -9271,6 +9349,7 @@ is extracted.
                        FlashBits
   ScaleFactor35efl     FocalLength              N
                        FocalLengthIn35mmFormat
+                       Composite:DigitalZoom
                        FocalPlaneDiagonal
                        FocalPlaneXSize
                        FocalPlaneYSize
@@ -9444,7 +9523,7 @@ for more details.
                        MakerNoteRicoh
                        MakerNoteRicohText
                        MakerNoteSanyo
-                       MaerkNoteSanyoC4
+                       MakerNoteSanyoC4
                        MakerNoteSigma
                        MakerNoteSony
                        MakerNoteSonySRF

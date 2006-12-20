@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..6\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..7\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -107,6 +107,24 @@ my $testnum = 1;
     }
     warn "\n  Test $testnum: Error reading file suffix\n" if $success == 1;
     print 'not ' unless $success == 2;
+    print "ok $testnum\n";
+}
+
+# test 7: Test copying all information from a CR2 image to a JPEG
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/images/CanonRaw.cr2');
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    $exifTool->Options(Unknown => 1);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
     print "ok $testnum\n";
 }
 

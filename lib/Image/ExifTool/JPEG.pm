@@ -10,7 +10,7 @@ package Image::ExifTool::JPEG;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # (this main JPEG table is for documentation purposes only)
 %Image::ExifTool::JPEG::Main = (
@@ -117,6 +117,13 @@ $VERSION = '1.04';
         Name => 'PhotoMechanic',
         Condition => '$$valPt =~ /cbipcbbl$/',
         SubDirectory => { TagTable => 'Image::ExifTool::PhotoMechanic::Main' },
+      }, {
+        Name => 'MIE',
+        Condition => q{
+            $$valPt =~ /~\0\x04\0zmie~\0\0\x06.{4}[\x10\x18]\x04$/s or
+            $$valPt =~ /~\0\x04\0zmie~\0\0\x0a.{8}[\x10\x18]\x08$/s
+        },
+        SubDirectory => { TagTable => 'Image::ExifTool::MIE::Main' },
       }, {
         Name => 'PreviewImage',
         Condition => '$$valPt =~ /^\xff\xd8\xff/',

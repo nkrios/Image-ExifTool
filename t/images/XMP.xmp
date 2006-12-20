@@ -57,6 +57,11 @@
    photoshop:ColorMode="3"
    photoshop:ICCProfile="sRGB IEC61966-2.1"
    photoshop:History="">
+   <dc:subject>
+    <rdf:Bag>
+     <rdf:li>test1</rdf:li>
+    </rdf:Bag>
+   </dc:subject>
    <exif:ComponentsConfiguration>
     <rdf:Seq>
      <rdf:li>1</rdf:li>

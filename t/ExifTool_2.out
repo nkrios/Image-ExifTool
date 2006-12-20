@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.65
 [File, File, Image]  - File Name: ExifTool.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 24 kB
-[File, File, Time]  - File Modification Date/Time: 2006:10:30 11:54:58
+[File, File, Time]  - File Modification Date/Time: 2006:12:13 14:36:55
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Comment: A PhotoStudio Unicode comment;;
@@ -106,7 +106,7 @@
 [MakerNotes, CIFF, Camera] 2059 - Canon Firmware Version: Firmware Version 01.00
 [MakerNotes, CIFF, Camera] 1 - Free Bytes: (Binary data 12 bytes)
 [MakerNotes, CIFF, Image] 0 - Focal Type: Fixed
-[MakerNotes, CIFF, Image] 1 - Scaled Focal Length: 5mm
+[MakerNotes, CIFF, Image] 1 - Focal Length: 5mm
 [MakerNotes, CIFF, Image] 2 - Focal Plane X Size: 5.05mm
 [MakerNotes, CIFF, Image] 3 - Focal Plane Y Size: 3.71mm
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
@@ -273,6 +273,8 @@
 [APP14, Adobe, Image] 2 - APP14 Flags 1: (none)
 [APP14, Adobe, Image] 3 - Color Transform: YCbCr
 [APP15, GraphConv, Image] Q - Quality: 70
+[MIE, MIE-Doc, Author] Copyright - Copyright: .. 2006 Phil Harvey
+[MIE, MIE-Main, Other] zmie - Trailer Signature: 
 [PhotoMechanic, PhotoMechanic, Image] 221 - Tagged: Yes
 [PhotoMechanic, PhotoMechanic, Image] 222 - Color Class: 6 (Typical alt)
 [PhotoMechanic, PhotoMechanic, Image] 216 - Rotation: 180

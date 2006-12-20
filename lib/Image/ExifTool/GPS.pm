@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.09';
+$VERSION = '1.11';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -30,7 +30,8 @@ my %coordConv = (
     NOTES => q{
         When adding GPS information to an image, it is important to set all of the
         following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
-        GPSAltitude and GPSAltitudeRef.
+        GPSAltitude and GPSAltitudeRef.  ExifTool will write the required
+        GPSVersionID tag automatically if new a GPS IFD is added to an image.
     },
     0x0000 => {
         Name => 'GPSVersionID',
@@ -116,7 +117,7 @@ my %coordConv = (
     },
     0x000B => {
         Name => 'GPSDOP',
-        Description => 'GPS Degree Of Precision',
+        Description => 'GPS Dilution Of Precision',
         Writable => 'rational64u',
     },
     0x000C => {
@@ -236,6 +237,7 @@ my %coordConv = (
         Name => 'GPSDateStamp',
         Groups => { 2 => 'Time' },
         Writable => 'string',
+        Notes => 'YYYY:MM:DD',
         Count => 11,
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
