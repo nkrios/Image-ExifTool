@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -164,6 +164,7 @@ $VERSION = '1.09';
     # This shortcut may be useful when copying tags between files to either
     # copy the maker notes as a block or prevent it from being copied
     MakerNotes => [
+        'MakerNotes',   # (for RIFF MakerNotes)
         'MakerNoteCanon',
         'MakerNoteCasio',
         'MakerNoteCasio2',
@@ -196,6 +197,7 @@ $VERSION = '1.09';
         'MakerNoteRicohText',
         'MakerNoteSanyo',
         'MakerNoteSanyoC4',
+        'MakerNoteSanyoPatch',
         'MakerNoteSigma',
         'MakerNoteSony',
         'MakerNoteSonySRF',
@@ -254,7 +256,7 @@ FocalLengthIn35mmFormat.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

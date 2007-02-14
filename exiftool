@@ -306,7 +306,7 @@ while ($_ = shift) {
                 push @tags, $_;
             }
         }
-    } elsif ($doGlob) {
+    } elsif ($doGlob and /[*?]/) {
         # glob each filespec if necessary - MK/20061010
         push @files, File::Glob::bsd_glob($_);
     } else {
@@ -317,8 +317,19 @@ while ($_ = shift) {
 # print help
 unless ((@tags and not $outOpt) or @files or @newValues) {
     Die "Nothing to write\n" if $outOpt;
-    unless ($helped or not system('perldoc',$0)) {
-        print "Run 'perldoc exiftool' for help on exiftool.\n";
+    unless ($helped) {
+        # catch warnings if we have problems running perldoc
+        local $SIG{'__WARN__'} = sub { $evalWarning = $_[0] };
+        no warnings;
+        open SAVEERR, ">&STDERR";
+        use warnings;
+        open STDERR, '>/dev/null';
+        if (system('perldoc',$0)) {
+            print "Syntax:  exiftool [OPTIONS] FILE\n\n";
+            print "Consult the exiftool documentation for a full list of options.\n";
+        }
+        close STDERR;
+        open STDERR, '>&SAVEERR';
     }
     Exit 0;
 }
@@ -526,7 +537,7 @@ sub GetImageInfo($$)
     # evaluate -if expression for conditional processing
     if (defined $condition) {
         # catch run time errors as well as compile errors
-        local $SIG{'__WARN__'} = sub { $evalWarning = $_[0]; };
+        local $SIG{'__WARN__'} = sub { $evalWarning = $_[0] };
         undef $evalWarning;
 
         my %info;
@@ -541,10 +552,14 @@ sub GetImageInfo($$)
 
         $@ and $evalWarning = $@;
         if ($evalWarning) {
-            chomp $evalWarning;
-            $evalWarning =~ s/ at \(eval .*//s;
-            delete $SIG{'__WARN__'};
-            Warn "Condition: $evalWarning - $file\n";
+            # fail condition if warning is issued
+            undef $result;
+            if ($verbose) {
+                chomp $evalWarning;
+                $evalWarning =~ s/ at \(eval .*//s;
+                delete $SIG{'__WARN__'};
+                Warn "Condition: $evalWarning - $file\n";
+            }
         }
         unless ($result) {
             $verbose and print "-------- $file (failed condition)\n";
@@ -633,12 +648,8 @@ sub GetImageInfo($$)
     # (because we are likely ignoring them and piping stdout to file)
     # or if there is none of the requested information available
     if ($binaryOutput or not %$info) {
-        my $warns = $exifTool->GetInfo('Warning', 'Error');
-        foreach (sort keys %$warns) {
-            my $type = $_;
-            $type =~ s/ .*//;
-            Warn "$type: $$warns{$_} - $file\n";
-        }
+        my $errs = $exifTool->GetInfo('Warning', 'Error');
+        PrintErrors($exifTool, $errs, $file);
     }
     # escape characters for html if requested
     if ($escapeHTML) {
@@ -657,9 +668,13 @@ sub GetImageInfo($$)
     if (@printFmt) {
         # output using print format file (-p) option
         foreach (@printFmt) {
-            print $fp $exifTool->InsertTagValues(\@foundTags, $_);
+            my $line = $exifTool->InsertTagValues(\@foundTags, $_, 'Warn');
+            next unless defined $line;
+            print $fp $line;
             ++$lineCount;
         }
+        my $errs = $exifTool->GetInfo('Warning', 'Error');
+        PrintErrors($exifTool, $errs, $file);
     } elsif (not $disableOutput) {
         print $fp "<table>\n" if $htmlOutput;
         my $lastGroup = '';
@@ -1014,7 +1029,7 @@ sub SetImageInfo($$)
                     if ($overwriteOrig > 1) {
                         # copy temporary file over top of original to preserve attributes
                         my ($err, $buff);
-                        open(TMP_FILE, $tmpFile) or die "Error opening $tmpFile\n";
+                        open(TMP_FILE, $tmpFile) or Die "Error opening $tmpFile\n";
                         binmode(TMP_FILE);
                         if (open(ORIG_FILE, ">$file")) {
                             binmode(ORIG_FILE);
@@ -1025,7 +1040,7 @@ sub SetImageInfo($$)
                             close(ORIG_FILE) or $err = 1;
                             if ($err) {
                                 Warn "Couldn't overwrite in place - $file\n";
-                                rename($tmpFile, $file) or die "Error renaming $tmpFile to $file\n";
+                                rename($tmpFile, $file) or Die "Error renaming $tmpFile to $file\n";
                             } else {
                                 unlink $tmpFile;
                                 if ($preserveTime and not utime($accTime, $modTime, $file)) {
@@ -1137,22 +1152,36 @@ sub ScanDir($$)
 }
 
 #------------------------------------------------------------------------------
+# Add print format entry
+# Inputs: 0) expression string
+sub AddPrintFormat($)
+{
+    my $expr = shift;
+    push @printFmt, $expr;
+    # add to list of requested tags
+    push @tags, $expr =~ /\$((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)/g;
+    # tags contained in braces too...
+    push @tags, $expr =~ /\$\{((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)\}/g;
+}
+
+#------------------------------------------------------------------------------
 # Load print format file
 # Inputs: 0) file name
 # - saves lines of file to @printFmt list
 # - adds tag names to @tags list
 sub LoadPrintFormat($)
 {
-    my $file = shift || Die "Must specify file for -p option\n";
-    open(FMT_FILE, $file) or Die "Can't open file: $file\n";
-    foreach (<FMT_FILE>) {
-        /^#/ and next;  # ignore comments
-        push @printFmt, $_;
-        push @tags, /\$((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)/g;
-        # tags contained in braces too...
-        push @tags, /\$\{((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)\}/g;
+    my $arg = shift || Die "Must specify file or expression for -p option\n";
+    if (open(FMT_FILE, $arg)) {
+        foreach (<FMT_FILE>) {
+            /^#/ and next;  # ignore comments
+            AddPrintFormat($_);
+        }
+        close(FMT_FILE);
+    } else {
+        Die "Can't open file: $arg\n" unless $arg =~ /\$/;
+        AddPrintFormat($arg . "\n");
     }
-    close(FMT_FILE);
     @tags or Die "Print format file doesn't contain any tag names!\n";
 }
 
@@ -1167,7 +1196,7 @@ sub FilenameSPrintf($;$)
     # return format string straight away if no tokens
     return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*(d|f|e)/;
     return undef unless defined $file;
-    $file =~ s/\\/\//g; # make sure we are using forward slashes
+    $file =~ tr/\\/\//; # make sure we are using forward slashes
     # split filename into directory, file, extension
     my @parts = ($file =~ /^(.*?)([^\/]*?)[.]?([^.\/]*)$/);
     @parts or Warn("Error: Bad pattern match for file $file\n"), return undef;
@@ -1385,27 +1414,29 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
-  AI    r       MIE   r/w/c   PSD   r/w    |  GPS            r/w/c
-  AIFF  r       MIFF  r       QTIF  r      |  IPTC           r/w/c
-  APE   r       MNG   r/w     RA    r      |  XMP            r/w/c
-  ARW   r       MOS   r/w     RAF   r      |  MakerNotes     r/w/c
-  ASF   r       MOV   r       RAM   r      |  Photoshop IRB  r/w/c
-  AVI   r       MP3   r       RAW   r      |  ICC Profile    r/w/c
-  BMP   r       MP4   r       RIFF  r      |  MIE            r/w/c
-  CR2   r/w     MPC   r       RM    r      |  JFIF           r/w/c
-  CRW   r/w     MPG   r       SR2   r      |  CIFF           r/w
-  DCM   r       MRW   r/w     SRF   r      |  AFCP           r/w
-  DNG   r/w     NEF   r/w     SWF   r      |  FlashPix       r
-  EPS   r/w     OGG   r       THM   r/w    |  GeoTIFF        r
-  ERF   r/w     ORF   r/w     TIFF  r/w    |  PrintIM        r
-  FLAC  r       PBM   r/w     VRD   r/w    |  ID3            r
-  FPX   r       PDF   r       WAV   r      |  Kodak Meta     r
-  GIF   r/w     PEF   r/w     WDP   r/w    |  Ricoh RMETA    r
-  ICC   r/w/c   PGM   r/w     WMA   r      |  Picture Info   r
-  JNG   r/w     PICT  r       WMV   r      |  Adobe APP14    r
-  JP2   r       PNG   r/w     X3F   r      |  APE            r
-  JPEG  r/w     PPM   r/w     XMP   r/w/c  |  (and more)
+  ACR   r       M4A   r       PSD   r/w    |  EXIF           r/w/c
+  AI    r       MIE   r/w/c   QTIF  r      |  GPS            r/w/c
+  AIFF  r       MIFF  r       RA    r      |  IPTC           r/w/c
+  APE   r       MNG   r/w     RAF   r      |  XMP            r/w/c
+  ARW   r       MOS   r/w     RAM   r      |  MakerNotes     r/w/c
+  ASF   r       MOV   r       RAW   r      |  Photoshop IRB  r/w/c
+  AVI   r       MP3   r       RIFF  r      |  ICC Profile    r/w/c
+  BMP   r       MP4   r       RM    r      |  MIE            r/w/c
+  CR2   r/w     MPC   r       SR2   r      |  JFIF           r/w/c
+  CRW   r/w     MPG   r       SRF   r      |  CIFF           r/w
+  DCM   r       MRW   r/w     SWF   r      |  AFCP           r/w
+  DNG   r/w     NEF   r/w     THM   r/w    |  DICOM          r
+  DOC   r       OGG   r       TIFF  r/w    |  FlashPix       r
+  EPS   r/w     ORF   r/w     VRD   r/w    |  GeoTIFF        r
+  ERF   r/w     PBM   r/w     WAV   r      |  PrintIM        r
+  FLAC  r       PDF   r       WDP   r/w    |  ID3            r
+  FPX   r       PEF   r/w     WMA   r      |  Kodak Meta     r
+  GIF   r/w     PGM   r/w     WMV   r      |  Ricoh RMETA    r
+  HTML  r       PICT  r       X3F   r      |  Picture Info   r
+  ICC   r/w/c   PNG   r/w     XLS   r      |  Adobe APP14    r
+  JNG   r/w     PPM   r/w     XMP   r/w/c  |  APE            r
+  JP2   r       PPT   r                    |  Vorbis         r
+  JPEG  r/w     PS    r/w                  |  (and more)
 
 Note:  If I<FILE> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are written.
@@ -1701,16 +1732,18 @@ copies of your image files.
 
 Similar to the B<-overwrite_original> option except that an extra step is
 added to allow the original file attributes to be preserved.  On a Macintosh
-for example, this preserves the original file type, creator and icon.
+for example, this preserves the original file type, creator and icon.  The
+extra step results in slower performance, so the B<-overwrite_original>
+option should be used instead unless necessary.
 
-=item B<-p> I<FMTFILE>
+=item B<-p> I<FMTFILE> or I<EXPR>
 
-B<P>rint output in the format specified by the given file (and ignore other
-format options).  Tag names in the format file begin with a C<$> symbol and
-may contain an optional group name.  Case is not significant.  Braces C<{}>
-may be used around the tag name to separate it from subsequent text.  Use
-C<$$> to represent a C<$> symbol.  Lines beginning with C<#> are ignored.
-For example, this format file:
+B<P>rint output in the format specified by the given file or expression (and
+ignore other format options).  Tag names in the format file begin with a
+C<$> symbol and may contain an optional group name.  Case is not
+significant.  Braces C<{}> may be used around the tag name to separate it
+from subsequent text.  Use C<$$> to represent a C<$> symbol.  In the file,
+lines beginning with C<#> are ignored. For example, this format file:
 
     # this is a comment line
     File $FileName was created on $DateTimeOriginal
@@ -1721,8 +1754,10 @@ produces output like this:
     File test.jpg was created on 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
 
-If a tag does not exist, the value is set to '-' in the output if the B<-f>
-option is used, or '' otherwise.
+If a tag does not exist, the output value is set to '-' if the B<-f> option
+is used.  Otherwise a minor warning is issued and the line with the missing
+tag is not printed.  However, if the B<-m> option is used, minor warnings
+are ignored and the line is printed with an empty tag value.
 
 =item B<-P>
 
@@ -1795,7 +1830,10 @@ destination tags may be prefixed by a group name, and C<All> or C<*> may be
 used as a tag or group name.  If no destination group is specified, the
 information is written to the preferred group.  As a convenience,
 C<-TagsFromFile @> is assumed for any redirected tags which are specified
-without a prior B<-TagsFromFile> option.
+without a prior B<-TagsFromFile> option.  Copied tags may also be added or
+deleted from a list with arguments of the form
+E<quot>'-I<SRCTAG>+E<gt>I<DSTTAG>'E<quot> or
+E<quot>'-I<SRCTAG>-E<gt>I<DSTTAG>'E<quot>.
 
 An extension of the redirection feature allows expressions involving tag
 names to be used on the right hand side of the C<E<lt>> symbol with the
@@ -1948,6 +1986,11 @@ Print standard Canon information from two image files.
 Recursively extract common meta information from files in C<pictures>
 directory, writing text output into files with the same names but with a
 C<.txt> extension.
+
+=item exiftool -p '$filename has date $dateTimeOriginal' -q -f dir
+
+Print one line of output containing the file name and DateTimeOriginal for
+each image in directory C<dir>.
 
 =item exiftool -b -ThumbnailImage image.jpg > thumbnail.jpg
 
@@ -2165,6 +2208,10 @@ inverse conversion.
 Recursively rewrite all C<JPG> images in C<dir> with information copied from
 the corresponding C<CRW> images in the same directories.
 
+=item exiftool '-make+>keywords' image.jpg
+
+Add camera make to list of keywords.
+
 =item exiftool '-comment<ISO=$exif:iso Exposure=${shutterspeed}' dir
 
 Set the Comment tag of all images in C<dir> from the values of the EXIF:ISO
@@ -2265,7 +2312,7 @@ Macintosh filesystems.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey
+Copyright 2003-2007, Phil Harvey
 
 This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.

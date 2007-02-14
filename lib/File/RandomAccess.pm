@@ -33,7 +33,7 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.06';
+$VERSION = '1.07';
 @ISA = qw(Exporter);
 
 # constants
@@ -134,19 +134,18 @@ sub Seek($$;$)
     $whence = 0 unless defined $whence;
     my $rtnVal;
     if ($self->{TESTED} < 0) {
-        $rtnVal = 1;
+        my $newPos;
         if ($whence == 0) {
-            $self->{POS} = $num;
+            $newPos = $num;                 # from start of file
         } elsif ($whence == 1) {
-            $self->{POS} += $num;
+            $newPos = $num + $self->{POS};  # relative to current position
         } else {
-            $self->Slurp();     # read whole file into buffer
-            if ($self->{LEN} >= $num) {
-                # position relative to end of file
-                $self->{POS} = $self->{LEN} + $num;
-            } else {
-                $rtnVal = 0;    # seek error
-            }
+            $self->Slurp();                 # read whole file into buffer
+            $newPos = $num + $self->{LEN};  # relative to end of file
+        }
+        if ($newPos >= 0) {
+            $self->{POS} = $newPos;
+            $rtnVal = 1;
         }
     } else {
         $rtnVal = seek($self->{FILE_PT}, $num, $whence);

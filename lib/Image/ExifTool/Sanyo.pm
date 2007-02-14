@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 my %offOn = (
     0 => 'Off',
@@ -319,6 +319,23 @@ my %offOn = (
     },
 );
 
+#------------------------------------------------------------------------------
+# Patch incorrect offsets in J1, J2, J4, S1, S3 and S4 maker notes
+# Inputs: 0) valuePtr, 1) end of previous value, 2) value size, 3) tag ID, 4) write flag
+sub FixOffsets($$$$;$)
+{
+    my ($valuePtr, $valEnd, $size, $tagID, $wFlag) = @_;
+    # ignore existing offsets and calculate reasonable values instead
+    if ($tagID == 0x100) {
+        # just ignore the SanyoThumbnail when writing (pointer is garbage)
+        $_[0] = undef if $wFlag;
+    } else {
+        $_[0] = $valEnd;    # set value pointer to next logical location
+        ++$size if $size & 0x01;
+        $_[1] += $size;     # update end-of-value pointer
+    }
+}
+
 
 1;  # end
 
@@ -339,7 +356,7 @@ Sanyo maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

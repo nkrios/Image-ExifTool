@@ -5,7 +5,7 @@
 #
 # URL:          http://owl.phy.queensu.ca/~phil/exiftool/
 #
-# Legal:        Copyright (c) 2003-2006 Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -65,27 +65,29 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
-  AI    r       MIE   r/w/c   PSD   r/w    |  GPS            r/w/c
-  AIFF  r       MIFF  r       QTIF  r      |  IPTC           r/w/c
-  APE   r       MNG   r/w     RA    r      |  XMP            r/w/c
-  ARW   r       MOS   r/w     RAF   r      |  MakerNotes     r/w/c
-  ASF   r       MOV   r       RAM   r      |  Photoshop IRB  r/w/c
-  AVI   r       MP3   r       RAW   r      |  ICC Profile    r/w/c
-  BMP   r       MP4   r       RIFF  r      |  MIE            r/w/c
-  CR2   r/w     MPC   r       RM    r      |  JFIF           r/w/c
-  CRW   r/w     MPG   r       SR2   r      |  CIFF           r/w
-  DCM   r       MRW   r/w     SRF   r      |  AFCP           r/w
-  DNG   r/w     NEF   r/w     SWF   r      |  FlashPix       r
-  EPS   r/w     OGG   r       THM   r/w    |  GeoTIFF        r
-  ERF   r/w     ORF   r/w     TIFF  r/w    |  PrintIM        r
-  FLAC  r       PBM   r/w     VRD   r/w    |  ID3            r
-  FPX   r       PDF   r       WAV   r      |  Kodak Meta     r
-  GIF   r/w     PEF   r/w     WDP   r/w    |  Ricoh RMETA    r
-  ICC   r/w/c   PGM   r/w     WMA   r      |  Picture Info   r
-  JNG   r/w     PICT  r       WMV   r      |  Adobe APP14    r
-  JP2   r       PNG   r/w     X3F   r      |  APE            r
-  JPEG  r/w     PPM   r/w     XMP   r/w/c  |  (and more)
+  ACR   r       M4A   r       PSD   r/w    |  EXIF           r/w/c
+  AI    r       MIE   r/w/c   QTIF  r      |  GPS            r/w/c
+  AIFF  r       MIFF  r       RA    r      |  IPTC           r/w/c
+  APE   r       MNG   r/w     RAF   r      |  XMP            r/w/c
+  ARW   r       MOS   r/w     RAM   r      |  MakerNotes     r/w/c
+  ASF   r       MOV   r       RAW   r      |  Photoshop IRB  r/w/c
+  AVI   r       MP3   r       RIFF  r      |  ICC Profile    r/w/c
+  BMP   r       MP4   r       RM    r      |  MIE            r/w/c
+  CR2   r/w     MPC   r       SR2   r      |  JFIF           r/w/c
+  CRW   r/w     MPG   r       SRF   r      |  CIFF           r/w
+  DCM   r       MRW   r/w     SWF   r      |  AFCP           r/w
+  DNG   r/w     NEF   r/w     THM   r/w    |  DICOM          r
+  DOC   r       OGG   r       TIFF  r/w    |  FlashPix       r
+  EPS   r/w     ORF   r/w     VRD   r/w    |  GeoTIFF        r
+  ERF   r/w     PBM   r/w     WAV   r      |  PrintIM        r
+  FLAC  r       PDF   r       WDP   r/w    |  ID3            r
+  FPX   r       PEF   r/w     WMA   r      |  Kodak Meta     r
+  GIF   r/w     PGM   r/w     WMV   r      |  Ricoh RMETA    r
+  HTML  r       PICT  r       X3F   r      |  Picture Info   r
+  ICC   r/w/c   PNG   r/w     XLS   r      |  Adobe APP14    r
+  JNG   r/w     PPM   r/w     XMP   r/w/c  |  APE            r
+  JP2   r       PPT   r                    |  Vorbis         r
+  JPEG  r/w     PS    r/w                  |  (and more)
 
 =head1 CONFIGURATION
 
@@ -929,6 +931,9 @@ in a specified file.
     # set new value from a different tag in specific group
     $exifTool->SetNewValuesFromFile($fp, 'IPTC:Keywords>XMP-dc:Subject');
 
+    # add all IPTC keywords to XMP subject list
+    $exifTool->SetNewValuesFromFile($fp, 'IPTC:Keywords+>XMP-dc:Subject');
+
     # set new value from an expression involving other tags
     $exifTool->SetNewValuesFromFile($file,
         'Comment<ISO=$ISO Aperture=$aperture Exposure=$shutterSpeed');
@@ -950,14 +955,15 @@ to set all tags from a group (ie. 'XMP:*').  A special feature allows tag
 names of the form 'SRCTAG>DSTTAG' (or 'DSTTAGE<lt>SRCTAG') to be specified
 to copy information to a tag with a different name or a specified group.
 Both 'SRCTAG' and 'DSTTAG' may use '*' and/or be prefixed by a group name
-(ie. 'modifyDate>fileModifyDate' or '*>xmp:*').  Tags are evaluated in
-order, so exclusions apply only to tags included earlier in the list.  An
-extension of this feature allows the tag value to be set from an expression
-containing tag names with leading '$' symbols (ie. 'CommentE<lt>Filename:
-$filename').  Braces '{}' may be used around the tag name to separate it
-from subsequent text, and a '$$' is used to to represent a '$' symbol.  (The
-behaviour for missing tags in expressions is defined by the
-L</MissingTagValue> option.)
+(ie. 'modifyDate>fileModifyDate' or '*>xmp:*').  Copied tags may also be
+added or deleted from a list with arguments of the form 'SRCTAG+>DSTTAG' or
+'SRCTAG->DSTTAG'.  Tags are evaluated in order, so exclusions apply only to
+tags included earlier in the list.  An extension of this feature allows the
+tag value to be set from an expression containing tag names with leading '$'
+symbols (ie. 'CommentE<lt>Filename: $filename').  Braces '{}' may be used
+around the tag name to separate it from subsequent text, and a '$$' is used
+to to represent a '$' symbol.  (The behaviour for missing tags in
+expressions is defined by the L</MissingTagValue> option.)
 
 By default, this routine will commute information between same-named tags in
 different groups, allowing information to be translated between images with
@@ -1418,34 +1424,36 @@ Here is a complete list of groups for each family:
 
 =over 4
 
-=item Family 0 (General Location):
+=item Family 0 (Information Type):
 
 AFCP, AIFF, APE, APP12, APP14, APP15, APP5, APP6, APP8, ASF, BMP, CanonVRD,
 Composite, DICOM, DNG, EXIF, ExifTool, FLAC, File, Flash, FlashPix,
-FotoStation, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, JPEG, Jpeg2000, Leaf,
-MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG, PhotoMechanic,
-Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real, SigmaRaw, Vorbis, XMP
+FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, JFIF, JPEG, Jpeg2000,
+Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
+PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real,
+SigmaRaw, Vorbis, XMP
 
 =item Family 1 (Specific Location):
 
 AFCP, AIFF, APE, ASF, Adobe, BMP, Canon, CanonCustom, CanonRaw, CanonVRD,
 Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool, FLAC, File,
 Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD,
-GraphConv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
-ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF,
-JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw,
-Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
-MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
-MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
-MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
-MinoltaRaw, Nikon, NikonCapture, NikonPreview, Olympus, PDF, PICT, PNG,
-Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
-PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR, Real-PROP,
-Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#, Sanyo,
-Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive, XMP-aux,
-XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-pdf,
-XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
-XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+GraphConv, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv,
+ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1,
+ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JPEG, JVC,
+Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw, Leaf,
+LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender, MIE-Flash,
+MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
+MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
+MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
+PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR,
+Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#,
+Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore,
+XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 
@@ -1548,7 +1556,7 @@ this can only be done with XMP files.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey
+Copyright 2003-2007, Phil Harvey
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

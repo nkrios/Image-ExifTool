@@ -21,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessPanasonicType2($$$);
 
@@ -252,6 +252,11 @@ sub ProcessPanasonicType2($$$);
         PrintConv => '$val == 65535 ? "n/a" : $val',
         PrintConvInv => '$val =~ /(\d+)/ ? $1 : $val',
     },
+    0x51 => {
+        Name => 'LensType',
+        Writable => 'string',
+    },
+    # 0x53 - string "NO_ACCESSORY" on DMC-L1
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -360,7 +365,7 @@ Panasonic and Leica maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

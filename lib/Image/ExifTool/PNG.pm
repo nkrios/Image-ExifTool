@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -472,7 +472,7 @@ sub FoundPNG($$$$;$$)
                 return 1 unless $exifTool->{EDIT_DIRS}->{$tagName};
                 $$outBuff = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                 # if this was an XMP directory, we must make it read-only
-                $tagName eq 'XMP' and Image::ExifTool::XMP::ValidateXMP($outBuff,'r');
+                $tagName eq 'XMP' and Image::ExifTool::XMP::ValidateXMP(\$outBuff,'r');
                 delete $exifTool->{ADD_DIRS}->{$tagName};
             } else {
                 $processed = $exifTool->ProcessDirectory(\%subdirInfo, $subTable, $processProc);
@@ -486,7 +486,7 @@ sub FoundPNG($$$$;$$)
             {
                 # write new value for this tag if necessary
                 my ($isOverwriting, $newVal);
-                if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{PNG}) {
+                if ($exifTool->{DEL_GROUP}->{PNG}) {
                     # remove this tag now, but keep in ADD_PNG list to add back later
                     $isOverwriting = 1;
                 } else {
@@ -912,7 +912,7 @@ and JNG (JPEG Network Graphics) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

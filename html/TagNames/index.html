@@ -6,15 +6,15 @@
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
 <body>
-<h2 class='top'>ExifTool Tag Names</h2>
-
+<h2 class=top>ExifTool Tag Names</h2>
+<p>
 The tables listed below give the names of all tags recognized by ExifTool.
-
+</p>
 <blockquote>
-<table width='100%' class='frame'><tr><td>
-<table width='100%' class='inner' cellspacing=1><tr class='h'>
-<th colspan=5><span class='l'>Tag Table Index</span></th></tr>
-<tr class='b'><td width='20%'>
+<table width='100%' class=frame><tr><td>
+<table width='100%' class=inner cellspacing=1><tr class=h>
+<th colspan=5><span class=l>Tag Table Index</span></th></tr>
+<tr class=b><td width='20%'>
 <a href='JPEG.html'>JPEG</a><br>
 <a href='EXIF.html'>EXIF</a><br>
 <a href='IPTC.html'>IPTC</a><br>
@@ -44,8 +44,8 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='Unknown.html'>Unknown</a><br>
 <a href='DNG.html'>DNG</a><br>
 <a href='CanonRaw.html'>CanonRaw</a><br>
-<a href='KyoceraRaw.html'>KyoceraRaw</a><br>
 <a href='MinoltaRaw.html'>MinoltaRaw</a><br>
+<a href='KyoceraRaw.html'>KyoceraRaw</a><br>
 <a href='SigmaRaw.html'>SigmaRaw</a><br>
 <a href='JFIF.html'>JFIF</a><br>
 <a href='FlashPix.html'>FlashPix</a><br>
@@ -76,16 +76,17 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='AIFF.html'>AIFF</a><br>
 <a href='ASF.html'>ASF</a><br>
 <a href='DICOM.html'>DICOM</a><br>
+<a href='HTML.html'>HTML</a><br>
 <a href='Extra.html'>Extra</a><br>
 <a href='Composite.html'>Composite</a><br>
 <a href='Shortcuts.html'>Shortcuts</a>
 </td></tr></table></td></tr></table></blockquote>
-
+<p>
 A <b>Tag ID</b> or <b>Index</b> is given in the first column of each table.  A
 <b>Tag ID</b> is the computer-readable equivalent of a tag name, and is the
 identifier that is actually stored in the file.  An <b>Index</b> refers to the
 location of the information, and is used if the information is stored at a
-fixed position in a data block.
+fixed position in a data block.</p>
 
 <p>A <b>Tag Name</b> is the handle by which the information is accessed in
 ExifTool.  In some instances, more than one name may correspond to a single
@@ -95,17 +96,17 @@ question mark after a tag name indicates that the information is either not
 understood, not verified, or not very useful -- these tags are not extracted
 by ExifTool unless the Unknown (-u) option is enabled.  Be aware that some
 tag names are different than the descriptions printed out by default when
-extracting information with &quot;exiftool&quot;.  To see the tag names instead of the
-descriptions, use &quot;exiftool -s&quot;.
+extracting information with exiftool.  To see the tag names instead of the
+descriptions, use <code>exiftool -s</code>.</p>
 
 <p>The <b>Writable</b> column indicates whether the tag is writable by ExifTool.
-Anything but an &quot;N&quot; in this column means the tag is writable.  A &quot;Y&quot;
+Anything but an <code>N</code> in this column means the tag is writable.  A <code>Y</code>
 indicates writable information that is either unformatted or written using
 the existing format.  Other expressions give details about the information
 format, and vary depending on the general type of information.  The format
 name may be followed by a number in square brackets to indicate the number
 of values written, or the number of characters in a fixed-length string
-(including a null terminator which is added if required).
+(including a null terminator which is added if required).</p>
 
 <p>An asterisk (<code>*</code>) after an entry in the <b>Writable</b> column indicates a
 &quot;protected&quot; tag which is not writable directly, but is set via a Composite
@@ -118,21 +119,21 @@ circumstances.  These &quot;unsafe&quot; tags are not set when calling
 SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  A plus sign
-(<code>+</code>) indicates a &quot;list&quot; tag which supports multiple instances.
+(<code>+</code>) indicates a &quot;list&quot; tag which supports multiple instances.</p>
 
 <p>The HTML version of these tables also list possible <b>Values</b> for
-discrete-valued tags, as well as <b>Notes</b> for some tags.
+discrete-valued tags, as well as <b>Notes</b> for some tags.</p>
 
 <p><b>Note</b>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
 reason for this is to make the tag names more consistent across different
 types of meta information.  To determine a tag name, either consult this
-documentation or run &quot;exiftool -s&quot; on a file containing the information in
+documentation or run <code>exiftool -s</code> on a file containing the information in
 question.
-
+</p>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 11, 2006</i>
-<p><a href='../index.html'>&lt;-- Back to ExifTool home page</a>
+<br><i>Last revised Jan 30, 2007</i>
+<p class=lf><a href='../index.html'>&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

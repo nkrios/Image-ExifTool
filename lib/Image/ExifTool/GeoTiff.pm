@@ -5,6 +5,7 @@
 #
 # Revisions:    02/23/04 - P. Harvey Created
 #               02/25/04 - P. Harvey Added new codes from libgeotiff-1.2.1
+#               02/01/07 - P. Harvey Added new codes from libgeotiff-1.2.3
 #
 # Reference:    ftp://ftp.remotesensing.org/geotiff/libgeotiff/libgeotiff-1.1.4.tar.gz
 #------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # format codes for geoTiff directory entries
 my %geoTiffFormat = (
@@ -24,7 +25,7 @@ my %geoTiffFormat = (
     0x87b1 => 'string',
 );
 
-my $epsg_units = {
+my %epsg_units = (
     9001 => 'Linear Meter',
     9002 => 'Linear Foot',
     9003 => 'Linear Foot US Survey',
@@ -49,7 +50,7 @@ my $epsg_units = {
     9107 => 'Angular DMS',
     9108 => 'Angular DMS Hemisphere',
     32767 => 'User Defined',
-};
+);
 
 %Image::ExifTool::GeoTiff::Main = (
     GROUPS => { 2 => 'Location' },
@@ -442,12 +443,14 @@ my $epsg_units = {
     },
     2052 => {
         Name => 'GeogLinearUnits',
-        PrintConv => $epsg_units,
+        SeparateTable => 'Units',
+        PrintConv => \%epsg_units,
     },
     2053 => 'GeogLinearUnitSize',
     2054 => {
         Name => 'GeogAngularUnits',
-        PrintConv => $epsg_units,
+        SeparateTable => 'Units',
+        PrintConv => \%epsg_units,
     },
     2055 => 'GeogAngularUnitSize',
     2056 => {
@@ -497,22 +500,30 @@ my $epsg_units = {
     2059 => 'GeogInvFlattening',
     2060 => {
         Name => 'GeogAzimuthUnits',
-        PrintConv => $epsg_units,
+        SeparateTable => 'Units',
+        PrintConv => \%epsg_units,
     },
     2061 => 'GeogPrimeMeridianLong',
     3072 => {
         Name => 'ProjectedCSType',
         PrintConv => {
             # epsg_pcs
+            2100 => 'GGRS87 Greek Grid',
+            2176 => 'ETRS89 Poland CS2000 zone 5',
+            2177 => 'ETRS89 Poland CS2000 zone 6',
+            2177 => 'ETRS89 Poland CS2000 zone 7',
+            2178 => 'ETRS89 Poland CS2000 zone 8',
+            2180 => 'ETRS89 Poland CS92',
             2204 => 'NAD27 Tennessee',
             2205 => 'NAD83 Kentucky North',
-            2100 => 'GGRS87 Greek Grid',
             2391 => 'KKJ Finland zone 1',
             2392 => 'KKJ Finland zone 2',
             2393 => 'KKJ Finland zone 3',
             2394 => 'KKJ Finland zone 4',
             2400 => 'RT90 2 5 gon W',
             2600 => 'Lietuvos Koordinoei Sistema 1994',
+            3053 => 'Hjorsey 1955 Lambert',
+            3057 => 'ISN93 Lambert 1993',
             3300 => 'Estonian Coordinate System of 1992',
             20137 => 'Adindan UTM zone 37N',
             20138 => 'Adindan UTM zone 38N',
@@ -1963,12 +1974,14 @@ my $epsg_units = {
             25 => 'VanDerGrinten',
             26 => 'New Zealand Map Grid',
             27 => 'Transverse Mercator South Orientated',
+            28 => 'Cylindrical Equal Area',
             32767 => 'User Defined',
         },
     },
     3076 => {
         Name => 'ProjLinearUnits',
-        PrintConv => $epsg_units,
+        SeparateTable => 'Units',
+        PrintConv => \%epsg_units,
     },
     3077 => 'ProjLinearUnitSize',
     3078 => 'ProjStdParallel1',
@@ -2045,7 +2058,8 @@ my $epsg_units = {
     },
     4099 => {
         Name => 'VerticalUnits',
-        PrintConv => $epsg_units,
+        SeparateTable => 'Units',
+        PrintConv => \%epsg_units,
     },
 );
 
@@ -2155,7 +2169,7 @@ coordinates.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

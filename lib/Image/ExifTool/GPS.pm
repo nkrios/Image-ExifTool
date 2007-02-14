@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.11';
+$VERSION = '1.13';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -225,13 +225,13 @@ my %coordConv = (
         Name => 'GPSProcessingMethod',
         Writable => 'undef',
         PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-        PrintConvInv => '"ASCII\0\0\0$val"',
+        PrintConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
     0x001C => {
         Name => 'GPSAreaInformation',
         Writable => 'undef',
         PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-        PrintConvInv => '"ASCII\0\0\0$val"',
+        PrintConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
     0x001D => {
         Name => 'GPSDateStamp',
@@ -265,34 +265,26 @@ my %coordConv = (
         ValueConv => '"$val[0] $val[1]"',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    GPSPosition => {
+    GPSLatitude => {
         Require => {
-            0 => 'GPSLatitude',
-            1 => 'GPSLongitude',
+            0 => 'GPS:GPSLatitude',
+            1 => 'GPS:GPSLatitudeRef',
         },
-        Desire => {
-            2 => 'GPSLatitudeRef',
-            3 => 'GPSLongitudeRef',
+        ValueConv => '$val[1] =~ /^S/i ? -$val[0] : $val[0]',
+        PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")',
+    },
+    GPSLongitude => {
+        Require => {
+            0 => 'GPS:GPSLongitude',
+            1 => 'GPS:GPSLongitudeRef',
         },
-        ValueConv => q{
-            foreach (0..1) {
-                # set sign from lat/long reference direction if it exists
-                next unless $val[$_+2];
-                $val[$_] = abs($val[$_]);
-                $val[$_] = -$val[$_] if $val[$_+2] =~ /^(S|W)/i;
-            }
-            return "$val[0] $val[1]";
-        },
-        PrintConv => q{
-            my $lat  = Image::ExifTool::GPS::ToDMS($self, $val[0], 1, 'N');
-            my $long = Image::ExifTool::GPS::ToDMS($self, $val[1], 1, 'E');
-            return "$lat, $long";
-        },
+        ValueConv => '$val[1] =~ /^W/i ? -$val[0] : $val[0]',
+        PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")',
     },
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::GPS::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::GPS');
 
 #------------------------------------------------------------------------------
 # Convert degrees to DMS, or whatever the current settings are
@@ -374,7 +366,7 @@ GPS (Global Positioning System) meta information in EXIF data.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

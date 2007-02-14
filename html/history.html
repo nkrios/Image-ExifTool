@@ -3,18 +3,126 @@
 <html>
 <head>
   <title>ExifTool Version History</title>
-<style type="text/css">
-<!--
-h1 { margin: 0 0 .5em 0 }
--->
-</style>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
+<body>
 <!-- Use line width of 80 -->
-<h1>ExifTool Version History</h1>
+<h1 class='up'>ExifTool Version History</h1>
 
-<b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.66.tar.gz">Version 6.66</a>. (Other versions are
-considered development releases, and are not uploaded to CPAN.)<p>
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-6.75.tar.gz">Version 6.75</a>. (Other versions are
+considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
+
+<b>Feb. 14, 2007 - Version 6.75</b>
+<ul>
+<li>Added read support for DOC, XLS and PPT documents
+<li>Added Composite GPS tags to facilitate copying GPS between EXIF and XMP
+<li>Added patch for problems in Sanyo J1, J2, J4, S1, S3 and S4 maker notes
+<li>Added new Microsoft OffsetSchema tag (new, ill-conceived PhotoInfo tag)
+<li>Decode more Pentax tags and improved decoding for some K10D tags
+<li>Shortened tag name of HTML:MSSmartTagsPreventParsing to NoMSSmartTags
+<li>Fixed oversight to allow new IPTC and XMP records to be added to ORF images
+<li>Fixed problem extracting RIFF MakerNotes by tag name
+<li>Fixed problem with drag-n-drop of Windows files on a network drive
+<li>Fixed problem copying GPSAltitude from EXIF to XMP
+</ul>
+
+<b>Feb. 2, 2007 - Version 6.74</b>
+<ul>
+<li>Added support for chained SubIFD's in TIFF images
+<li>Updated GeoTiff support for new definitions in libgeotiff-1.2.3
+<li>Fixed problem when rewriting unknown records in Adobe DNGPrivateData
+<li>Fixed bug introduced in 6.47 that could prevent Photoshop EXIF CameraRAW
+    tags from being extracted properly
+</ul>
+
+<b>Jan. 31, 2007 - Version 6.73</b>
+<ul>
+<li>Added read support for meta information in HTML and XHTML documents
+<li>Added ability to write certain EXIF tags (ie. UserComment) as Unicode
+<li>Added character set translation for XMP information; the -L option now works
+    for all common meta information formats! (see updated <a href="faq.html#Q10">FAQ #10</a> for details)
+<li>Added a few more XMP-microsoft tags (thanks Kees Moerman)
+<li>Decode FirmwareRevision found in some Canon PowerShot models
+<li>Preserve date/time tags that exist in the wrong EXIF IFD when shifting times
+<li>Fixed bug which could result in an incorrect value for the Directory tag
+<li>Fixed problem parsing XMP with BOM introduced in 6.71
+</ul>
+
+<b>Jan. 25, 2007 - Version 6.72</b>
+<ul>
+<li>Added XMP-microsoft:LastKeywordIPTC tag
+<li>Changed name of new MicrosoftPhoto Rating2 tag to RatingPercent
+<li>Fixed problem where rdf:about attribute could be lost when writing XMP
+</ul>
+
+<b>Jan. 24, 2007 - Version 6.71</b>
+<ul>
+<li>Decode a lot of new Pentax DSLR information (thanks Cvetan Ivanov)
+<li>Patched Microsoft Photo bugs in XMP formatting
+<li>Patched Microsoft Photo bug in EXIF Unicode text byte ordering
+<li>Added support for XMP-microsoft tags and 2 new Microsoft EXIF tags
+<li>Added a few new XMP tags (NativeDigest, ColorMode and ICCProfileName)
+<li>Added ability to add or delete copied tags from list (ie. "-SRCTAG+&gt;DSTTAG")
+<li>Added a few more Canon EasyMode values (thanks Samson Tai)
+<li>Added CanonModelID values for new A450, A460 and A550
+<li>Changed the -if option so the condition automatically fails if the
+    expression generates a warning (use -v to show the warning)
+<li>Specified LF character (0x0a) for MIE text newline sequence
+<li>Catch warnings if perldoc doesn't exist when running with no arguments
+<li>Minor tweaks/fixes to htmldump output
+</ul>
+
+<b>Jan. 19, 2007 - Version 6.70</b> "IPTC Character Coding"
+<ul>
+<li>Translate coded characters in IPTC string values (UTF8 and Latin only), and
+    assume Latin encoding if no CodedCharacterSet (see <a href="faq.html#Q10">FAQ #10</a> for details)
+<li>Enhanced IPTC:CodedCharacterSet print conversion so "ESC % G" is now printed
+    as "UTF8" (either may be used when writing)
+<li>Specified ISO 8859-1 character set for MIE ASCII string values
+<li>Added warnings for UTF-8 conversion errors
+<li>Decode a few new Pentax tags
+<li>Decode maker notes in Pentax DNG images
+</ul>
+
+<b>Jan. 8, 2007 - Version 6.69</b>
+<ul>
+<li>Decode information in NikonScanIFD
+<li>Enhanced -p option to allow expressions to be used
+<li>The -p option no longer suppresses error and warning messages
+<li>Made ImageSourceData writable
+<li>Reduced font size of htmldump output
+<li>Fixed "Argument isn't numeric" error when reading an image with a missing
+    IFD offset
+</ul>
+
+<b>Jan. 3, 2007 - Version 6.68</b>
+<ul>
+<li>Added mechanism to allow Composite tags to be writable
+<li>Recognize XMP sidecar files that begin with a UTF BOM (byte order mark)
+<li>Changed TIFF ImageSourceData tag to a Binary data type
+<li>Fixed problem which could cause warning when writing XMP in PNG images
+<li>Fixed bug when shifting times in an XMP sidecar file that caused an invalid
+    date/time to be written if the tag didn't previously exist
+<li>Fixed problem where writing to a JPEG image containing a PreviewImage could
+    report that the file was updated even if nothing was changed
+</ul>
+
+<b>Dec. 30, 2006 - Version 6.67</b> - "Adobe DNGPrivateData"
+<ul>
+<li>Added ability to write MakerNote information written by Adobe DNG Converter
+<li>Added ability to copy Adobe MakerNote and CRW information from DNG images
+<li>Added ability to read/write Adobe CRW and MRW information in DNG images
+<li>Added ability to read Adobe SR2 information in DNG images
+<li>Added a few more Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Added ability to delete a specific MIE document in multi-document files
+<li>Improved handling of tags in multi-document MIE files
+<li>Improved verbose and htmlDump output for unknown JPEG trailers
+<li>Improved handling of ignored minor errors when writing MakerNotes
+<li>Decode Panasonic LensType tag
+<li>Changed description for Canon:OwnerName tag
+<li>Minor changes to HtmlDump output
+<li>Fixed parsing of XMP date/time values with no seconds
+</ul>
 
 <b>Dec. 20, 2006 - Version 6.66</b> (production release)
 <ul>
@@ -65,7 +173,7 @@ considered development releases, and are not uploaded to CPAN.)<p>
 
 <b>Dec. 4, 2006 - Version 6.61</b>
 <ul>
-<li>Makernotes offsets are now permanently fixed when the makernotes are copied
+<li>MakerNotes offsets are now permanently fixed when the makernotes are copied
     using -tagsFromFile with the -F option
 <li>Fixed typo in MakerNoteSanyoC4 tag name of MakerNotes shortcut
 <li>Minor improvements to htmldump style
@@ -2922,8 +3030,8 @@ considered development releases, and are not uploaded to CPAN.)<p>
 <b>Nov. 20, 2003 - Version 1.11</b>
 <ul>
 <li>Attempt to fix problem on hp
-<li>clean up code a bit
-<li>added '-ver' command-line option
+<li>Clean up code a bit
+<li>Added '-ver' command-line option
 </ul>
 
 <b>Nov. 20, 2003 - Version 1.10</b>
@@ -2937,6 +3045,6 @@ considered development releases, and are not uploaded to CPAN.)<p>
 </ul>
 
 <hr>
-<p><a href="index.html">&lt;-- Back to ExifTool home page</a>
+<p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

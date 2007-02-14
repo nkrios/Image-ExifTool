@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -79,10 +79,7 @@ sub BuildMakerNotes($$$$$$);
     0x080b => 'CanonFirmwareVersion',
     0x080c => 'ComponentVersion', #3
     0x080d => 'ROMOperationMode', #3
-    0x0810 => {
-        Name => 'OwnerName',
-        Description => "Owner's Name",
-    },
+    0x0810 => 'OwnerName',
     0x0815 => 'CanonImageType',
     0x0816 => 'OriginalFileName',
     0x0817 => 'ThumbnailFileName',
@@ -805,7 +802,7 @@ tags.)
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

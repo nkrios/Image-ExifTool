@@ -4,26 +4,7 @@
 # Description:  Read/write MIE meta information
 #
 # Revisions:    11/18/2005 - P. Harvey Created
-#
-# Notes:        The following command line will create a MIE file from any other
-#               recognized file type.
-#
-#                 exiftool -o new.mie -tagsfromfile SRC "-mie:all<all" \
-#                    "-subfilename<filename" "-subfiletype<filetype" \
-#                    "-subfilemimetype<mimetype" "-subfiledata<=SRC"
-#
-#               For unrecognized file types, this command may be used:
-#
-#                 exiftool -o new.mie -subfilename=SRC -subfiletype=TYPE \
-#                    -subfilemimetype=MIME "-subfiledata<=SRC"
-#
-#               where SRC, TYPE and MIME represent the source file name, file
-#               type and MIME type respectively.
 #------------------------------------------------------------------------------
-
-# things to document:
-# - MIE tags (with note about flexibility of format types)
-# - BOM is optional in UTF strings (order taken from group byte ordering)
 
 package Image::ExifTool::MIE;
 
@@ -33,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.10';
+$VERSION = '1.12';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -50,7 +31,7 @@ my %mieFormat = (
     0x00 => 'undef',
     0x10 => 'MIE',
     0x18 => 'MIE',
-    0x20 => 'string', # ASCII
+    0x20 => 'string', # ASCII (ISO 8859-1)
     0x28 => 'utf8',
     0x29 => 'utf16',
     0x2a => 'utf32',
@@ -143,17 +124,18 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     GROUPS => { 1 => 'MIE-Main' },
     WRITE_GROUP => 'MIE-Main',
     NOTES => q{
-        MIE is a flexible format which may be used as either a standalone meta
-        information format, or to encapsulate other files and information.  The
-        tables below represent currently defined MIE tags, however ExifTool will
-        also extract any other information present in a MIE file.
+        MIE is a flexible format which may be used as a stand-alone meta information
+        format, for encapsulation of other files and information, or as a trailer
+        appended to other file formats.  The tables below represent currently
+        defined MIE tags, however ExifTool will also extract any other information
+        present in a MIE file.
 
         When writing MIE information, some special features are supported:
 
-        1) String values may be written as ASCII or UTF-8.  ExifTool will
-        automatically detect the presence of wide characters and set the format code
-        appropriately.  Internally, UTF-8 text may be stored as UTF-16 or UTF-32 if
-        it is more compact.
+        1) String values may be written as ASCII (ISO 8859-1) or UTF-8.  ExifTool
+        automatically detects the presence of wide characters and treats the string
+        appropriately. Internally, UTF-8 text may be converted to UTF-16 or UTF-32
+        and stored in this format in the file if it is more compact.
 
         2) All MIE string-value tags support localized text.  Localized values are
         written by adding a language/country code to the tag name in the form
@@ -181,7 +163,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
    '0Vers' => {
         Name => 'MIEVersion',
-        Notes => 'default version is 1.1 if not specified',
+        Notes => 'version 1.1 is assumed if not specified',
     },
    '1Directory' => { Name => 'SubfileDirectory' },
    '1Name'      => { Name => 'SubfileName' },
@@ -488,6 +470,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'PreviewImageSize',
         Writable => 'int16u',
         Count => -1,
+        Notes => '2 or 3 values, for number of XY or XYZ pixels',
         PrintConv => '$val=~tr/ /x/;$val',
         PrintConvInv => '$val=~tr/x/ /;$val',
     },
@@ -510,6 +493,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ThumbnailImageSize',
         Writable => 'int16u',
         Count => -1,
+        Notes => '2 or 3 values, for number of XY or XYZ pixels',
         PrintConv => '$val=~tr/ /x/;$val',
         PrintConvInv => '$val=~tr/x/ /;$val',
     },
@@ -916,7 +900,7 @@ sub WriteMIEGroup($$$)
     $isWriting{"MIE$n"} = 1;        # ie. 'MIE1'
 
     # determine if we are deleting this group
-    if ($exifTool->{DEL_GROUP}) {
+    if (%{$exifTool->{DEL_GROUP}}) {
         $delGroup = 1 if $exifTool->{DEL_GROUP}->{MIE} or
                          $exifTool->{DEL_GROUP}->{$grp} or
                          $exifTool->{DEL_GROUP}->{$grp1} or
@@ -977,6 +961,7 @@ sub WriteMIEGroup($$$)
                     my $free = ($format eq 0x80) ? ' free' : '';
                     print $out "    - $grp1:$tag ($valLen$free bytes)\n";
                 }
+                ++$exifTool->{CHANGED} if $delGroup;
                 next;
             }
         } else {
@@ -1024,6 +1009,9 @@ sub WriteMIEGroup($$$)
                         $compress = 1;
                         $valLen = length $oldVal;    # uncompressed value length
                     }
+                } else {
+                    # don't create this directory unless necessary
+                    next unless $$addDirs{$newTag};
                 }
 
                 if ($isMieGroup) {
@@ -1060,7 +1048,7 @@ sub WriteMIEGroup($$$)
                     # message is defined but empty if nothing was written
                     if (defined $msg) {
                         undef $msg; # not a problem if nothing was written
-                        last MieElement;
+                        next;
                     } elsif (not $compress) {
                         # group was written already
                         $toWrite = '';
@@ -1082,9 +1070,6 @@ sub WriteMIEGroup($$$)
                             DirStart => 0,
                             DirLen => $valLen,
                         );
-                    } else {
-                        # don't create this directory unless necessary
-                        next unless $$addDirs{$newTag};
                     }
                     $subdirInfo{Parent} = $dirName;
                     my $writeProc = $newInfo->{SubDirectory}->{WriteProc};
@@ -1617,7 +1602,7 @@ sub ProcessMIE($$)
     return 1 unless defined $exifTool;
     my $raf = $$dirInfo{RAF};
     my $outfile = $$dirInfo{OutFile};
-    my ($buff, $err, $msg, $pos, $end);
+    my ($buff, $err, $msg, $pos, $end, $isCreating);
     my $numDocs = 0;
 #
 # process as a trailer (from end of file) if specified
@@ -1692,6 +1677,7 @@ sub ProcessMIE($$)
             # we have the ability to create a MIE file from scratch
             $buff = ''; # start from nothing
             SetByteOrder('MM'); # write big-endian
+            $isCreating = 1;
         }
         if ($msg) {
             last if $$dirInfo{Trailer}; # allow other trailers after MIE
@@ -1736,7 +1722,7 @@ sub ProcessMIE($$)
                 $exifTool->Error($msg);
                 $err = 1;
                 last;
-            } elsif (defined $msg) {
+            } elsif (defined $msg and $isCreating) {
                 $exifTool->Error('Nothing to write');
                 last;
             }
@@ -1798,7 +1784,7 @@ following features are rated for each format with a score of 0 to 10:
  11) Compressed meta information supported.
  12) Relocatable data elements (ie. no fixed offsets).
  13) Binary meta information (+7) with variable byte order (+3).
- 14) Mandatory tags not required (because that would be stupid).
+ 14) Mandatory tags not required (an unecessary complication).
  15) Append information to end of file without editing.
 
                           Feature number                   Total
@@ -1832,7 +1818,7 @@ enabling all kinds of wonderful features such as linear databases, edit
 histories or non-intrusive file updates.  This ability can also be leveraged
 to allow MIE-format trailers to be added to some other file types.
 
-=head1 MIE FORMAT SPECIFICATION
+=head1 MIE 1.1 FORMAT SPECIFICATION (2007-01-21)
 
 =head2 File Structure
 
@@ -1948,32 +1934,32 @@ uncompressed data (add 0x04 to each value for compressed data):
     0x08 - other data (sensitive to MIE group byte order) (1)
     0x10 - MIE group with big-endian values (1)
     0x18 - MIE group with little-endian values (1)
-    0x20 - ASCII string (2,3)
-    0x28 - UTF-8 string (2,3)
-    0x29 - UTF-16 string (2,3)
-    0x2a - UTF-32 string (2,3)
-    0x30 - ASCII string list (2,4)
-    0x38 - UTF-8 string list (2,4)
-    0x39 - UTF-16 string list (2,4)
-    0x3a - UTF-32 string list (2,4)
+    0x20 - ASCII (ISO 8859-1) string (2,3)
+    0x28 - UTF-8 string (2,3,4)
+    0x29 - UTF-16 string (2,3,4)
+    0x2a - UTF-32 string (2,3,4)
+    0x30 - ASCII (ISO 8859-1) string list (3,5)
+    0x38 - UTF-8 string list (3,4,5)
+    0x39 - UTF-16 string list (3,4,5)
+    0x3a - UTF-32 string list (3,4,5)
     0x40 - unsigned 8-bit integer
     0x41 - unsigned 16-bit integer
     0x42 - unsigned 32-bit integer
-    0x43 - unsigned 64-bit integer (5)
+    0x43 - unsigned 64-bit integer (6)
     0x48 - signed 8-bit integer
     0x49 - signed 16-bit integer
     0x4a - signed 32-bit integer
-    0x4b - signed 64-bit integer (5)
-    0x52 - unsigned 32-bit rational (16-bit numerator then denominator) (6)
-    0x53 - unsigned 64-bit rational (32-bit numerator then denominator) (6)
-    0x5a - signed 32-bit rational (denominator is unsigned) (6)
-    0x5b - signed 64-bit rational (denominator is unsigned) (6)
-    0x61 - unsigned 16-bit fixed-point (high 8 bits is integer part) (7)
-    0x62 - unsigned 32-bit fixed-point (high 16 bits is integer part) (7)
-    0x69 - signed 16-bit fixed-point (high 8 bits is signed integer) (7)
-    0x6a - signed 32-bit fixed-point (high 16 bits is signed integer) (7)
+    0x4b - signed 64-bit integer (6)
+    0x52 - unsigned 32-bit rational (16-bit numerator then denominator) (7)
+    0x53 - unsigned 64-bit rational (32-bit numerator then denominator) (7)
+    0x5a - signed 32-bit rational (denominator is unsigned) (7)
+    0x5b - signed 64-bit rational (denominator is unsigned) (7)
+    0x61 - unsigned 16-bit fixed-point (high 8 bits is integer part) (8)
+    0x62 - unsigned 32-bit fixed-point (high 16 bits is integer part) (8)
+    0x69 - signed 16-bit fixed-point (high 8 bits is signed integer) (8)
+    0x6a - signed 32-bit fixed-point (high 16 bits is signed integer) (8)
     0x72 - 32-bit IEEE float (not recommended for portability reasons)
-    0x73 - 64-bit IEEE double (not recommended for portability reasons) (5)
+    0x73 - 64-bit IEEE double (not recommended for portability reasons) (6)
     0x80 - free space (value data does not contain useful information)
 
 Notes:
@@ -2011,9 +1997,16 @@ specific locale. (ie. "Title-en_US", or "Keywords-de_DE").
 
 Text strings are not normally null terminated, however they may be padded
 with one or more null characters to the end of the data block to allow
-strings to be edited within fixed-length data blocks.
+strings to be edited within fixed-length data blocks.  Newlines in the text
+are indicated by a single LF (0x0a) character.
 
 =item 4.
+
+UTF strings must not begin with a byte order mark (BOM) since the byte order
+and byte size are specified by the MIE format.  If a BOM is found, it should
+be treated as a zero-width non-breaking space.
+
+=item 5.
 
 A list of text strings separated by null characters.  These lists must not
 be null padded or null terminated, since this would be interpreted as
@@ -2021,7 +2014,7 @@ additional zero-length strings.  For ASCII and UTF-8 strings, the null
 character is a single zero (0x00) byte.  For UTF-16 or UTF-32 strings, the
 null character is 2 or 4 zero bytes respectively.
 
-=item 5.
+=item 6.
 
 64-bit integers and doubles are subject to the specified byte ordering for
 both 32-bit words and bytes within these words.  For instance, the high
@@ -2030,7 +2023,7 @@ little-endian.  This means that some swapping is always necessary for these
 values on systems where the byte order differs from the word order (ie. some
 ARM systems), regardless of the endian-ness of the stored values.
 
-=item 6.
+=item 7.
 
 Rational values are treated as two separate integers.  The numerator always
 comes first regardless of the byte ordering.  In a signed rational value,
@@ -2038,7 +2031,7 @@ only the numerator is signed.  The denominator of all rational values is
 unsigned (ie. a signed 32-bit rational of 0x80000000/0x80000000 evaluates to
 -1, not +1).
 
-=item 7.
+=item 8.
 
 32-bit fixed point values are converted to floating point by treating them
 as an integer and dividing by an appropriate value.  ie)
@@ -2086,11 +2079,11 @@ MIE elements are sorted alphabetically by TagName within each group.
 Multiple elements with the same TagName are allowed, even within the same
 group.
 
-TagNames should be meaningful.  Words should be lowercase with an uppercase
-first character, and acronyms should be all upper case.  The underline ("_")
-is provided to allow separation of two acronyms or two numbers, but it
-shouldn't be used unless necessary.  No separation is necessary between an
-acronym and a word (ie. "ISOSetting").
+TagNames should be meaningful.  Case is significant.  Words should be
+lowercase with an uppercase first character, and acronyms should be all
+upper case.  The underline ("_") is provided to allow separation of two
+acronyms or two numbers, but it shouldn't be used unless necessary.  No
+separation is necessary between an acronym and a word (ie. "ISOSetting").
 
 All TagNames should start with an uppercase letter.  An exception to this
 rule allows tags to begin with a digit (0-9) if they must come before other
@@ -2214,28 +2207,43 @@ more MIE files.
 The steps below give an algorithm to quickly locate the last document in a
 MIE file:
 
-1) Read the last 10 bytes of the file.  (Note that a valid MIE file may be
-as short as 12 bytes long, but a file this length contains only an an empty
-MIE group.)
+=over 4
 
-2) If the last byte of the file is zero, then it is not possible to scan
+=item 1.
+
+Read the last 10 bytes of the file.  (Note that a valid MIE file may be as
+short as 12 bytes long, but a file this length contains only an an empty MIE
+group.)
+
+=item 2.
+
+If the last byte of the file is zero, then it is not possible to scan
 backward through the file, so the file must be scanned from the beginning.
 Otherwise, proceed to the next step.
 
-3) If the last byte is 4 or 8, the terminator contains information about the
+=item 3.
+
+If the last byte is 4 or 8, the terminator contains information about the
 byte ordering and length of the group.  Otherwise, stop here because this
 isn't a valid MIE file.
 
-4) The next-to-last byte must be either 0x10 indicating big-endian byte
+=item 4.
+
+The next-to-last byte must be either 0x10 indicating big-endian byte
 ordering or 0x18 for little-endian ordering, otherwise this isn't a valid
 MIE file.
 
-5) The preceding 4 or 8 bytes give the length of the complete file-level MIE
-group (GroupLength).  This length includes both the leading MIE group
-element and the terminator element itself.  The value is an unsigned integer
-stored with the specified byte order.  From the current file position (at
-the end of the data read in step 1), seek backward by this number of bytes
-to find the start of the MIE group element for this document.
+=item 5.
+
+The value of the preceding 4 or 8 bytes gives the length of the complete
+file-level MIE group (GroupLength).  This length includes both the leading
+MIE group element and the terminator element itself.  The value is an
+unsigned integer with a byte length given in step 3), and a byte order from
+step 4).  From the current file position (at the end of the data read in
+step 1), seek backward by this number of bytes to find the start of the MIE
+group element for this document.
+
+=back
 
 This algorithm may be repeated again beginning at this point in the file to
 locate the next-to-last document, etc.
@@ -2349,19 +2357,106 @@ element in the file.
 
 =back
 
-=head2 Revisions
+=head1 EXAMPLES
 
+This section gives examples for working with MIE information using ExifTool.
+
+=head2 Encapsulating Information with Data in a MIE File
+
+The following command encapsulates any file recognized by ExifTool inside a
+MIE file, and initializes MIE tags from information within the file:
+
+    exiftool -o new.mie -tagsfromfile FILE '-mie:all<all' \
+        '-subfilename<filename' '-subfiletype<filetype' \
+        '-subfilemimetype<mimetype' '-subfiledata<=FILE'
+
+where C<FILE> is the name of the file.
+
+For unrecognized files, this command may be used:
+
+    exiftool -o new.mie -subfilename=FILE -subfiletype=TYPE \
+        -subfilemimetype=MIME '-subfiledata<=FILE'
+
+where C<TYPE> and C<MIME> represent the source file type and MIME type
+respectively.
+
+=head2 Adding a MIE Trailer to a File
+
+The MIE format may also be used to store information in a trailer appended
+to another type of file.  Beware that trailers may not be compatible with
+all file formats, but JPEG and TIFF are two formats where additional trailer
+information doesn't create any problems for normal parsing of the file.
+Also note that this technique has the disadvantage that trailer information
+is commonly lost if the file is subsequently edited by other software.
+
+Creating a MIE trailer with ExifTool is a two-step process since ExifTool
+can't currently be used to add a MIE trailer directly.  The example below
+illustrates the steps for adding a MIE trailer with a small preview image
+(C<small.jpg>) to a destination JPEG image (C<dst.jpg>).
+
+Step 1) Create a MIE file with a TrailerSignature containing the desired
+information:
+
+    exiftool -o new.mie -trailersignature=1 -tagsfromfile small.jpg \
+        '-previewimagetype<filetype' '-previewimagesize<imagesize' \
+        '-previewimagename<filename' '-previewimage<=small.jpg'
+
+Step 2) Append the MIE information to another file.  In Unix, this can be
+done with the 'cat' command:
+
+    cat new.mie >> dst.jpg
+
+Once added, ExifTool may be used to edit or delete a MIE trailer in a JPEG
+or TIFF image.
+
+=head2 Multiple MIE Documents in a Single File
+
+The MIE specification allows multiple MIE documents (or trailers) to exist
+in a single file.  A file like this may be created by simply concatenating
+MIE documents.  ExifTool may be used to access information in a specific
+document by adding a copy number to the MIE group name.  For example:
+
+    # write the Author tag in the second MIE document
+    exiftool -mie2:author=phil test.mie
+
+    # delete the first MIE document from a file
+    exiftool -mie1:all= test.mie
+
+=head2 Units of Measurement
+
+Some MIE tags allow values to be specified in different units of
+measurement.  In the MIE file format these units are combined with the tag
+name, but when using ExifTool they are specified in brackets after the
+value:
+
+    exiftool -mie:gpsaltitude='7500(ft)' test.mie
+
+If no units are provided, the default units are written.
+
+=head2 Localized Text
+
+Localized text values are accessed by adding a language/country code to the
+tag name.  For example:
+
+    exiftool -comment-en_us='this is a comment' test.mie
+
+=head1 REVISIONS
+
+  2007-01-21 - Specified LF character (0x0a) for text newline sequence
+  2007-01-19 - Specified ISO 8859-1 character set for extended ASCII codes
+  2007-01-01 - Improved wording of Step 5 for scanning backwards in MIE file
+  2006-12-30 - Added EXAMPLES section and note about UTF BOM
   2006-12-20 - MIE 1.1:  Changed meaning of TypeModifier bit (0x08) for
                unknown data (FormatType 0x00), and documented byte swapping
   2006-12-14 - MIE 1.0:  Added Data Values and Numerical Representations
                sections, and added ability to specify units in tag names
-  2006-11-09 - Added Levels of Support
+  2006-11-09 - Added Levels of Support section
   2006-11-03 - Added Trailer Signature
   2005-11-18 - Original specification created
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.  The MIE format itself is also

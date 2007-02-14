@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.04';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -710,7 +710,7 @@ sub ProcessExtendedContentDescription($$$)
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 2;
     my $count = Get16u($dataPt, 0);
-    $verbose and $exifTool->VerboseDir($$dirInfo{DirName}, $count);
+    $exifTool->VerboseDir($dirInfo, $count);
     my $pos = 2;
     my $i;
     for ($i=0; $i<$count; ++$i) {
@@ -773,7 +773,7 @@ sub ProcessCodecList($$$)
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 20;
     my $count = Get32u($dataPt, 16);
-    $verbose and $exifTool->VerboseDir($$dirInfo{DirName}, $count);
+    $exifTool->VerboseDir($dirInfo, $count);
     my $pos = 20;
     my $i;
     my %codecType = ( 1 => 'Video', 2 => 'Audio' );
@@ -784,12 +784,12 @@ sub ProcessCodecList($$$)
         my $nameLen = Get16u($dataPt, $pos + 2) * 2;
         $pos += 4;
         return 0 if $pos + $nameLen + 2 > $dirLen;
-        my $name = Image::ExifTool::Unicode2Latin(substr($$dataPt,$pos,$nameLen),'v');
+        my $name = $exifTool->Unicode2Byte(substr($$dataPt,$pos,$nameLen),'II');
         $exifTool->HandleTag($tagTablePtr, "${type}Name", $name);
         my $descLen = Get16u($dataPt, $pos + $nameLen) * 2;
         $pos += $nameLen + 2;
         return 0 if $pos + $descLen + 2 > $dirLen;
-        my $desc = Image::ExifTool::Unicode2Latin(substr($$dataPt,$pos,$descLen),'v');
+        my $desc = $exifTool->Unicode2Byte(substr($$dataPt,$pos,$descLen),'II');
         $exifTool->HandleTag($tagTablePtr, "${type}Description", $desc);
         my $infoLen = Get16u($dataPt, $pos + $descLen);
         $pos += $descLen + 2 + $infoLen;
@@ -809,7 +809,7 @@ sub ProcessMetadata($$$)
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 2;
     my $count = Get16u($dataPt, 0);
-    $verbose and $exifTool->VerboseDir($$dirInfo{DirName}, $count);
+    $exifTool->VerboseDir($dirInfo, $count);
     my $pos = 2;
     my $i;
     for ($i=0; $i<$count; ++$i) {
@@ -955,7 +955,7 @@ Windows Media Audio (WMA) and Windows Media Video (WMV) files.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

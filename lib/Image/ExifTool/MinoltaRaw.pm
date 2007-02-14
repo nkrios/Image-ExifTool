@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # Minolta MRW tags
 %Image::ExifTool::MinoltaRaw::Main = (
@@ -236,7 +236,7 @@ sub ProcessMRW($$)
 
     $raf->Read($data,8) == 8 or return 0;
     $data =~ /^\0MRM/ or return 0;
-    $exifTool->SetFileType();
+    $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
     SetByteOrder('MM');
     my $tagTablePtr = GetTagTable('Image::ExifTool::MinoltaRaw::Main');
     if ($outfile) {
@@ -246,7 +246,7 @@ sub ProcessMRW($$)
     my $offset = Get32u(\$data, 4) + 8;
     my $pos = 8;
     my $rtnVal = 1;
-    $verbose and printf $out "  [Data Offset: 0x%x]\n", $offset;
+    $verbose and printf $out "  [MRW Data Offset: 0x%x]\n", $offset;
     # loop through MRW segments (ref 1)
     while ($pos < $offset) {
         $raf->Read($data,8) == 8 or $err = 1, last;
@@ -302,6 +302,8 @@ sub ProcessMRW($$)
         }
         $pos += $len;
     }
+    $pos == $offset or $err = 1;    # meta information length check
+
     if ($outfile) {
         # write the file header then the buffered meta information
         Write($outfile, "\0MRM", Set32u(length $outBuff), $outBuff) or $rtnVal = -1;
@@ -333,7 +335,7 @@ write Konica-Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

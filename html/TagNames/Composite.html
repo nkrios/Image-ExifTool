@@ -6,26 +6,26 @@
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
 <body>
-<h2 class='top'>Composite Tags</h2>
-
+<h2 class=top>Composite Tags</h2>
+<p>
 The values of the composite tags are derived from the values of other tags.
 These are convenience tags which are calculated after all other information
 is extracted.
-
+</p>
 <blockquote>
-<table class='frame'><tr><td>
-<table class='inner' cellspacing=1>
-<tr class='h'><th>Tag Name</th>
-<th>Writable</th><th>Derived From</th><th>Values / <span class='n'>Notes</span></th></tr>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Derived From</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td>Aperture</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FNumber
   <br>ApertureValue</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>BlueBalance</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>WB_RGGBLevels
   <br>WB_RGBGLevels
   <br>WB_RBGGLevels
@@ -36,174 +36,196 @@ is extracted.
 <td>&nbsp;</td></tr>
 <tr>
 <td>CFAPattern</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>CFARepeatPatternDim
   <br>CFAPattern2</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>CircleOfConfusion</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>ScaleFactor35efl</td>
-<td><span class='s'><span class='n'>(this value may be incorrect if the image has been resized.  Calculated as
+<td><span class=s><span class=n>(this value may be incorrect if the image has been resized.  Calculated as
 D/1440, where D is the focal plane diagonal in mm)</span></span></td></tr>
 <tr>
 <td>ConditionalFEC</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FlashExposureComp
   <br>FlashBits</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>DOF</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FocusDistance
   <br>FocalLength
   <br>Aperture
   <br>CircleOfConfusion</td>
-<td><span class='s'><span class='n'>(this value may be incorrect if the image has been resized)</span></span></td></tr>
+<td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
 <tr>
 <td>DateCreated</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>Kodak:YearCreated
   <br>Kodak:MonthDayCreated</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>DateTimeCreated</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>DateCreated
   <br>TimeCreated</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>DateTimeOriginal</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>DateTimeCreated</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>DigitalZoom</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>Canon:ZoomSourceWidth
   <br>Canon:ZoomTargetWidth
   <br>Canon:DigitalZoom</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>DriveMode</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>ContinuousDrive
   <br>Self-timer</td>
-<td><span class='s'>0 = Continuous shooting
+<td><span class=s>0 = Continuous shooting
   <br>1 = Self-timer Operation
   <br>2 = Single-frame shooting</span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>Duration</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FLAC:SampleRate
   <br>FLAC:Channels
   <br>FLAC:TotalSamples</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>Duration</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FileSize
   <br>AudioBitrate
   <br>VideoBitrate</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>Duration</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FrameRate
   <br>FrameCount</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>ExtenderStatus</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>Olympus:Extender
   <br>Olympus:LensType
   <br>MaxApertureValue</td>
-<td><span class='s'><span class='n'>(Olympus cameras have the quirk that they may retain the extender settings
+<td><span class=s><span class=n>(Olympus cameras have the quirk that they may retain the extender settings
 after the extender is removed until the camera is powered off.  This tag is
 an attempt to represent the actual status of the extender.)</span>
   <br>0 = Not attached
   <br>1 = Attached
   <br>2 = Removed</span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>FlashOn</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FlashBits
   <br>Flash</td>
-<td><span class='s'>0 = Off
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr>
 <td>FlashType</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FlashBits</td>
-<td><span class='s'>0 = Built-In Flash
+<td><span class=s>0 = Built-In Flash
   <br>1 = External</span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>FocalLength35efl</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FocalLength
   <br>ScaleFactor35efl</td>
-<td><span class='s'><span class='n'>(this value may be incorrect if the image has been resized)</span></span></td></tr>
+<td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
 <tr>
 <td>GPSDateTime</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>GPSDateStamp
   <br>GPSTimeStamp</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
+<td>GPSLatitude</td>
+<td class=c>N</td>
+<td>GPS:GPSLatitude
+  <br>GPS:GPSLatitudeRef</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>GPSLatitudeRef</td>
+<td class=c>N</td>
+<td>XMP:GPSLatitude</td>
+<td><span class=s>&#39;N&#39; = North
+  <br>&#39;S&#39; = South</span></td></tr>
+<tr class=b>
+<td>GPSLongitude</td>
+<td class=c>N</td>
+<td>GPS:GPSLongitude
+  <br>GPS:GPSLongitudeRef</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>GPSLongitudeRef</td>
+<td class=c>N</td>
+<td>XMP:GPSLongitude</td>
+<td><span class=s>&#39;E&#39; = East
+  <br>&#39;W&#39; = West</span></td></tr>
+<tr class=b>
 <td>GPSPosition</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>GPSLatitude
-  <br>GPSLongitude
-  <br>GPSLatitudeRef
-  <br>GPSLongitudeRef</td>
+  <br>GPSLongitude</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>HyperfocalDistance</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FocalLength
   <br>Aperture
   <br>CircleOfConfusion</td>
-<td><span class='s'><span class='n'>(this value may be incorrect if the image has been resized)</span></span></td></tr>
-<tr class='b'>
+<td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
+<tr class=b>
 <td>ISO</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>Canon:CameraISO
   <br>Canon:BaseISO
   <br>Canon:AutoISO</td>
-<td><span class='s'><span class='n'>(use CameraISO if numerical, otherwise calculate as BaseISO * AutoISO / 100)</span></span></td></tr>
+<td><span class=s><span class=n>(use CameraISO if numerical, otherwise calculate as BaseISO * AutoISO / 100)</span></span></td></tr>
 <tr>
 <td>ImageHeight</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>ImageSize</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>ImageWidth
   <br>ImageHeight</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>ImageWidth</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>JpgFromRaw</td>
-<td class='c'>Y</td>
+<td class=c>Y</td>
 <td>JpgFromRawStart
   <br>JpgFromRawLength</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>Lens</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>ShortFocal
   <br>LongFocal</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>Lens35efl</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>ShortFocal
   <br>LongFocal
   <br>Lens
@@ -211,7 +233,7 @@ an attempt to represent the actual status of the extender.)</span>
 <td>&nbsp;</td></tr>
 <tr>
 <td>LensID</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>Nikon:LensIDNumber
   <br>LensFStops
   <br>MinFocalLength
@@ -220,47 +242,49 @@ an attempt to represent the actual status of the extender.)</span>
   <br>MaxApertureAtMaxFocal
   <br>MCUVersion
   <br>Nikon:LensType</td>
-<td>--&gt; <a href='Nikon.html#LensID'>Nikon LensID</a></td></tr>
-<tr class='b'>
+<td>--&gt; <a href='Nikon.html#LensID'>Nikon LensID Values</a></td></tr>
+<tr class=b>
 <td>LensSpec</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>Nikon:Lens
   <br>Nikon:LensType</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>LightValue</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>Aperture
   <br>ShutterSpeed
   <br>ISO</td>
-<td><span class='s'><span class='n'>(calculated LV -- similar to exposure value but includes ISO speed)</span></span></td></tr>
-<tr class='b'>
+<td><span class=s><span class=n>(calculated LV -- similar to exposure value but includes ISO speed)</span></span></td></tr>
+<tr class=b>
 <td>OtherImage</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>OtherImageStart
   <br>OtherImageLength</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>PreviewImage</td>
-<td class='c'>Y</td>
+<td class=c>Y</td>
 <td>PreviewImageStart
   <br>PreviewImageLength
-  <br>PreviewImageValid</td>
+  <br>PreviewImageValid
+  <br>PreviewImageStart (1)
+  <br>PreviewImageLength (1)</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>PreviewImageSize</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>PreviewImageWidth
   <br>PreviewImageHeight</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>PreviewImage</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>ScreenNail</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>RedBalance</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>WB_RGGBLevels
   <br>WB_RGBGLevels
   <br>WB_RBGGLevels
@@ -271,14 +295,14 @@ an attempt to represent the actual status of the extender.)</span>
 <td>&nbsp;</td></tr>
 <tr>
 <td>RedEyeReduction</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>CanonFlashMode
   <br>FlashBits</td>
-<td><span class='s'>0 = Off
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>ScaleFactor35efl</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FocalLength
   <br>FocalLengthIn35mmFormat
   <br>Composite:DigitalZoom
@@ -294,42 +318,42 @@ an attempt to represent the actual status of the extender.)</span>
   <br>ExifImageLength
   <br>ImageWidth
   <br>ImageHeight</td>
-<td><span class='s'><span class='n'>(this value and any derived values may be incorrect if image has been resized)</span></span></td></tr>
+<td><span class=s><span class=n>(this value and any derived values may be incorrect if image has been resized)</span></span></td></tr>
 <tr>
 <td>ShootingMode</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>CanonExposureMode
   <br>EasyMode</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>ShutterCurtainHack</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>FlashBits
   <br>ShutterCurtainSync</td>
-<td><span class='s'>0 = 1st-curtain sync
+<td><span class=s>0 = 1st-curtain sync
   <br>1 = 2nd-curtain sync</span></td></tr>
 <tr>
 <td>ShutterSpeed</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>ExposureTime
   <br>ShutterSpeedValue
   <br>BulbDuration</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>SubSecDateTimeOriginal</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>DateTimeOriginal
   <br>SubSecTimeOriginal</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>ThumbnailImage</td>
-<td class='c'>Y</td>
+<td class=c>Y</td>
 <td>ThumbnailOffset
   <br>ThumbnailLength</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>WB_RGGBLevels</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>Canon:WhiteBalance
   <br>WB_RGGBLevelsAsShot
   <br>WB_RGGBLevelsAuto
@@ -346,7 +370,7 @@ an attempt to represent the actual status of the extender.)</span>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 8, 2006</i>
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<br><i>Last revised Feb 12, 2007</i>
+<p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

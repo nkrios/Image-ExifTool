@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.66
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.70
 [File, File, Image]  - File Name: MIE_3_failed.mie
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
@@ -26,7 +26,7 @@
 [MIE, MIE-Orient, Camera] Rotation - Rotation: 90
 [MIE, MIE-Camera, Camera] OwnerName - Owner Name: Phil Harvey
 [MIE, MIE-Camera, Camera] Saturation - Saturation: 1
-[MIE, MIE-Camera, Camera] SerialNumber - Serial Number: 0560018150
+[MIE, MIE-Camera, Camera] SerialNumber - Serial Number: 0560012345
 [MIE, MIE-Camera, Camera] Sharpness - Sharpness: 1
 [MIE, MIE-Camera, Camera] ShootingMode - Shooting Mode: Manual
 [MIE, MIE-Doc, Document] Comment - Comment: I can eat glass and it doesn't hurt me.

@@ -162,7 +162,8 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     },
     0x7200 => {
         Name => 'SR2SubIFDOffset',
-        Flags => 'IsOffset',
+        # (adjusting offset messes up calculations for AdobeSR2 in DNG images)
+        # Flags => 'IsOffset',
         OffsetPair => 0x7201,
         RawConv => '$self->{SR2SubIFDOffset} = $val',
     },
@@ -315,6 +316,8 @@ sub ProcessSR2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
+    my $dataPos = $$dirInfo{DataPos};
+    my $dataLen = $$dirInfo{DataLen} || length $$dataPt;
     my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
     my $result = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
@@ -324,9 +327,15 @@ sub ProcessSR2($$$)
     my $key = $exifTool->{SR2SubIFDKey};
     my $raf = $$dirInfo{RAF};
     my $base = $$dirInfo{Base} || 0;
-    if ($offset and $length and defined $key and $raf) {
+    if ($offset and $length and defined $key) {
         my $buff;
-        if ($raf->Seek($offset+$base, 0) and $raf->Read($buff, $length)) {
+        # read encrypted SR2SubIFD from file
+        if (($raf and $raf->Seek($offset+$base, 0) and
+                $raf->Read($buff, $length) == $length) or
+            # or read from data (when processing Adobe DNGPrivateData)
+            ($offset - $dataPos >= 0 and $offset - $dataPos + $length < $dataLen and 
+                ($buff = substr($$dataPt, $offset - $dataPos, $length))))
+        {
             Decrypt(\$buff, 0, $length, $key);
             # display decrypted data in verbose mode
             if ($verbose > 2) {
@@ -340,6 +349,7 @@ sub ProcessSR2($$$)
                 Image::ExifTool::HexDump(\$buff, $length, %parms);
             }
             my %dirInfo = (
+                Base => $base,
                 DataPt => \$buff,
                 DataLen => length $buff,
                 DirStart => 0,
@@ -384,7 +394,7 @@ documentation.  You can use "exiftool -v3" to dump these blocks in hex.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

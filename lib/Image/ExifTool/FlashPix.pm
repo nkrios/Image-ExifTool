@@ -8,6 +8,7 @@
 # References:   1) http://www.exif.org/Exif2-2.PDF
 #               2) http://www.graphcomp.com/info/specs/livepicture/fpx.pdf
 #               3) http://search.cpan.org/~jdb/libwin32/
+#               4) http://msdn2.microsoft.com/en-us/library/aa380374.aspx
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::FlashPix;
@@ -18,12 +19,14 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
 sub ProcessProperties($$$);
-sub ReadFPXValue($$$$);
+sub ReadFPXValue($$$$$;$);
+sub ConvertTimeSpan($);
+sub ProcessHyperlinks($$);
 
 # sector type constants
 sub HDR_SIZE           () { 512; }
@@ -37,6 +40,10 @@ sub VT_VECTOR          () { 0x1000; }
 sub VT_ARRAY           () { 0x2000; }
 sub VT_BYREF           () { 0x4000; }
 sub VT_RESERVED        () { 0x8000; }
+
+# other constants
+sub VT_VARIANT         () { 12; }
+sub VT_LPSTR           () { 30; }
 
 # list of OLE format codes (unsupported codes commented out)
 my %oleFormat = (
@@ -121,12 +128,21 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         JPEG images by some Kodak and Hewlett-Packard digital cameras.
 
         ExifTool extracts FlashPix information from both FPX images and the APP2
-        FPXR segment of JPEG images.
+        FPXR segment of JPEG images.  As well, FlashPix information is extracted
+        from DOC, XLS and PPT (Microsoft Word, Excel and PowerPoint) documents since
+        the FlashPix file format is closely related to the formats of these files.
     },
     "\x05SummaryInformation" => {
         Name => 'SummaryInfo',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FlashPix::SummaryInfo',
+        },
+    },
+    "\x05DocumentSummaryInformation" => {
+        Name => 'DocumentInfo',
+        Multi => 1, # flag to process UserDefined information after this
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::FlashPix::DocumentInfo',
         },
     },
     "\x01CompObj" => {
@@ -162,9 +178,9 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         },
     },
     'Subimage 0000 Header' => {
-        Name => 'SubimageHeader',
+        Name => 'SubimageHdr',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::FlashPix::SubimageHeader',
+            TagTable => 'Image::ExifTool::FlashPix::SubimageHdr',
             DirStart => 0x1c,   # skip stream header
         },
     },
@@ -212,6 +228,17 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         # strip off stream header
         ValueConv => 'length($val) > 0x1c and $val = substr($val, 0x1c); \$val',
     },
+    "Current User" => { #PH
+        Name => 'CurrentUser',
+        # not sure what the rest of this data is, but extract ASCII name from it - PH
+        ValueConv => q{
+            return undef if length $val < 12;
+            my ($size,$pos) = unpack('x4VV', $val);
+            my $len = $size - $pos - 4;
+            return undef if $len < 0 or length $val < $size + 8;
+            return substr($val, 8 + $pos, $len);
+        },
+    },
 );
 
 # Summary Information properties
@@ -223,16 +250,16 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         property tables, even though they are only listed in the SummaryInfo table.
     },
     0x00 => { Name => 'Dictionary', Groups => { 2 => 'Other' }, Binary => 1 },
-    0x01 => { Name => 'CodePage', Groups => { 2 => 'Other' } },
+    0x01 => { Name => 'CodePage',   Groups => { 2 => 'Other' } },
     0x02 => 'Title',
     0x03 => 'Subject',
-    0x04 => { Name => 'Author', Groups => { 2 => 'Author' } },
+    0x04 => { Name => 'Author',     Groups => { 2 => 'Author' } },
     0x05 => 'Keywords',
     0x06 => 'Comments',
     0x07 => 'Template',
-    0x08 => { Name => 'LastSavedBy', Groups => { 2 => 'Author' } },
+    0x08 => { Name => 'LastSavedBy',Groups => { 2 => 'Author' } },
     0x09 => 'RevisionNumber',
-    0x0a => 'TotalEditTime',
+    0x0a => { Name => 'TotalEditTime', PrintConv => \&ConvertTimeSpan },
     0x0b => 'LastPrinted',
     0x0c => { Name => 'CreateDate', Groups => { 2 => 'Time' } },
     0x0d => { Name => 'ModifyDate', Groups => { 2 => 'Time' } },
@@ -243,6 +270,49 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x12 => 'Software',
     0x13 => 'Security',
     0x80000000 => { Name => 'LocaleIndicator', Groups => { 2 => 'Other' } },
+);
+
+# Document Summary Information properties (ref 4)
+%Image::ExifTool::FlashPix::DocumentInfo = (
+    PROCESS_PROC => \&ProcessProperties,
+    GROUPS => { 2 => 'Document' },
+    NOTES => q{
+        The DocumentSummaryInformation property set includes a UserDefined property
+        set for which only the Hyperlinks and HyperlinkBase tags are pre-defined. 
+        However, ExifTool will also extract any other information found in the
+        UserDefined properties.
+    },
+    0x02 => 'Category',
+    0x03 => 'PresentationTarget',
+    0x04 => 'Bytes',
+    0x05 => 'Lines',
+    0x06 => 'Paragraphs',
+    0x07 => 'Slides',
+    0x08 => 'Notes',
+    0x09 => 'HiddenSlides',
+    0x0a => 'MMClips',
+    0x0b => 'ScaleCrop',
+    0x0c => 'HeadingPairs',
+    0x0d => 'TitleOfParts',
+    0x0e => 'Manager',
+    0x0f => 'Company',
+    0x10 => 'LinksUpToDate',
+    0x11 => 'CharCountWithSpaces',
+  # 0x12 ?
+    0x13 => 'SharedDoc', #PH (unconfirmed)
+  # 0x14 ?
+  # 0x15 ?
+    0x16 => 'HyperlinksChanged',
+    0x17 => { #PH (unconfirmed)
+        Name => 'AppVersion',
+        # (not sure what the lower 16 bits mean, so print them in hex inside brackets)
+        ValueConv => 'sprintf("%d (%.4x)",$val >> 16, $val & 0xffff)',
+    },
+   '_PID_LINKBASE' => 'HyperlinkBase',
+   '_PID_HLINKS' => {
+        Name => 'Hyperlinks',
+        RawConv => \&ProcessHyperlinks,
+    },
 );
 
 # Image Information properties
@@ -271,10 +341,10 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x21000003 => 'SoftwareRelease',
     0x21000004 => 'UserDefinedID',
     0x21000005 => 'SharpnessApproximation',
-    0x22000000 => { Name => 'Copyright', Groups => { 2 => 'Author' } },
-    0x22000001 => { Name => 'OriginalImageBroker', Groups => { 2 => 'Author' } },
-    0x22000002 => { Name => 'DigitalImageBroker', Groups => { 2 => 'Author' } },
-    0x22000003 => { Name => 'Authorship', Groups => { 2 => 'Author' } },
+    0x22000000 => { Name => 'Copyright',                 Groups => { 2 => 'Author' } },
+    0x22000001 => { Name => 'OriginalImageBroker',       Groups => { 2 => 'Author' } },
+    0x22000002 => { Name => 'DigitalImageBroker',        Groups => { 2 => 'Author' } },
+    0x22000003 => { Name => 'Authorship',                Groups => { 2 => 'Author' } },
     0x22000004 => { Name => 'IntellectualPropertyNotes', Groups => { 2 => 'Author' } },
     0x23000000 => {
         Name => 'TestTarget',
@@ -297,14 +367,14 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x2300000B => 'Events',
     0x2300000C => 'Places',
     0x2300000F => 'ContentDescriptionNotes',
-    0x24000000 => { Name => 'Make', Groups => { 2 => 'Camera' } },
+    0x24000000 => { Name => 'Make',             Groups => { 2 => 'Camera' } },
     0x24000001 => {
         Name => 'Model',
         Description => 'Camera Model Name',
         Groups => { 2 => 'Camera' },
     },
-    0x24000002 => { Name => 'SerialNumber', Groups => { 2 => 'Camera' } },
-    0x25000000 => { Name => 'CreateDate', Groups => { 2 => 'Time' } },
+    0x24000002 => { Name => 'SerialNumber',     Groups => { 2 => 'Camera' } },
+    0x25000000 => { Name => 'CreateDate',       Groups => { 2 => 'Time' } },
     0x25000001 => {
         Name => 'ExposureTime',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
@@ -450,7 +520,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x28000004 => { Name => 'ScanSoftwareRevisionDate', Groups => { 2 => 'Time' } },
     0x28000005 => 'ServiceOrganizationName',
     0x28000006 => 'ScanOperatorID',
-    0x28000008 => { Name => 'ScanDate', Groups => { 2 => 'Time' } },
+    0x28000008 => { Name => 'ScanDate',   Groups => { 2 => 'Time' } },
     0x28000009 => { Name => 'ModifyDate', Groups => { 2 => 'Time' } },
     0x2800000A => 'ScannerPixelSize',
 );
@@ -564,7 +634,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
 );
 
 # Subimage Header tags
-%Image::ExifTool::FlashPix::SubimageHeader = (
+%Image::ExifTool::FlashPix::SubimageHdr = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FORMAT => 'int32u',
 #   0 => 'HeaderLength',
@@ -681,16 +751,67 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::FlashPix::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::FlashPix');
+
+#------------------------------------------------------------------------------
+# Process hyperlinks from PID_HYPERLINKS array
+# (ref http://msdn.microsoft.com/archive/default.asp?url=/archive/en-us/dnaro97ta/html/msdn_hyper97.asp)
+# Inputs: 0) value, 1) ExifTool ref
+# Returns: list of hyperlinks
+sub ProcessHyperlinks($$)
+{
+    my ($val, $exifTool) = @_;
+
+    # process as an array of VT_VARIANT's
+    my $dirEnd = length $val;
+    return undef if $dirEnd < 4;
+    my $num = Get32u(\$val, 0);
+    my $valPos = 4;
+    my ($i, @vals);
+    for ($i=0; $i<$num; ++$i) {
+        # read VT_BLOB entries as an array of VT_VARIANT's
+        my $value = ReadFPXValue($exifTool, \$val, $valPos, VT_VARIANT, $dirEnd);
+        last unless defined $value;
+        push @vals, $value;
+    }
+    # filter values to extract only the links
+    my @links;
+    for ($i=0; $i<@vals; $i+=6) {
+        push @links, $vals[$i+4];    # get address
+        $links[-1] .= '#' . $vals[$i+5] if length $vals[$i+5]; # add subaddress
+    }
+    return \@links;
+}
+
+#------------------------------------------------------------------------------
+# Print conversion for time span value
+sub ConvertTimeSpan($)
+{
+    my $val = shift;
+    if (Image::ExifTool::IsFloat($val) and $val != 0) {
+        if ($val < 60) {
+            $val = "$val seconds";
+        } elsif ($val < 3600) {
+            $val = sprintf("%.1f minutes", $val / 60);
+        } elsif ($val < 24 * 3600) {
+            $val = sprintf("%.1f hours", $val / 3600);
+        } else {
+            $val = sprintf("%.1f days", $val / (24 * 3600));
+        }
+    }
+    return $val;
+}
 
 #------------------------------------------------------------------------------
 # Read FlashPix value
-# Inputs: 0) data reference, 1) value offset, 2) FPX format number, 3) end offset
+# Inputs: 0) ExifTool ref, 1) data ref, 2) value offset, 3) FPX format number,
+#         4) end offset, 5) options: 0x01=no padding, 0x02=translate to UTF8
 # Returns: converted value (or list of values in list context) and updates
 #          value offset to end of value if successful, or returns undef on error
-sub ReadFPXValue($$$$)
+sub ReadFPXValue($$$$$;$)
 {
-    my ($dataPt, $valPos, $type, $dirEnd) = @_;
+    my ($exifTool, $dataPt, $valPos, $type, $dirEnd, $opts) = @_;
+    $opts = 0 unless defined $opts;
     my @vals;
 
     my $format = $oleFormat{$type & 0x0fff};
@@ -700,6 +821,7 @@ sub ReadFPXValue($$$$)
         my $flags = $type & 0xf000;
         if ($flags) {
             if ($flags == VT_VECTOR) {
+                $opts |= 0x01;  # values don't seem to be padded inside vectors
                 my $size = $oleFormatSize{VT_VECTOR};
                 last if $valPos + $size > $dirEnd;
                 $count = Get32u($dataPt, $valPos);
@@ -725,15 +847,19 @@ sub ReadFPXValue($$$$)
             if ($format eq 'VT_VARIANT') {
                 my $subType = Get32u($dataPt, $valPos);
                 $valPos += $size;
-                $val = ReadFPXValue($dataPt, $valPos, $subType, $dirEnd);
+                $val = ReadFPXValue($exifTool, $dataPt, $valPos, $subType, $dirEnd, $opts);
                 last unless defined $val;
                 push @vals, $val;
                 next;   # avoid adding $size to $valPos again
             } elsif ($format eq 'VT_FILETIME') {
-                $val = Image::ExifTool::Get64u($dataPt, $valPos);
-                # convert to secs and shift from Jan 1, 1601 to Jan 1, 1970
-                $val = $val * 1e-7 - 134774 * 24 * 3600 if $val != 0;
-                $val = Image::ExifTool::ConvertUnixTime($val);
+                # get time in seconds
+                $val = 1e-7 * Image::ExifTool::Get64u($dataPt, $valPos);
+                # print as date/time if value is greater than one year (PH hack)
+                if ($val > 365 * 24 * 3600) {
+                    # shift from Jan 1, 1601 to Jan 1, 1970
+                    $val -= 134774 * 24 * 3600 if $val != 0;
+                    $val = Image::ExifTool::ConvertUnixTime($val);
+                }
             } elsif ($format eq 'VT_DATE') {
                 $val = Image::ExifTool::GetDouble($dataPt, $valPos);
                 # shift zero from Dec 30, 1899 to Jan 1, 1970 and convert to secs
@@ -744,17 +870,25 @@ sub ReadFPXValue($$$$)
                 $len *= 2 if $format eq 'VT_LPWSTR';    # convert to byte count
                 last if $valPos + $len + 4 > $dirEnd;
                 $val = substr($$dataPt, $valPos + 4, $len);
-                # convert from Unicode if necessary
-                $val = Image::ExifTool::Unicode2Latin($val, 'v') if $format eq 'VT_LPWSTR';
-                $val =~ s/\0.*//s;
+                if ($format eq 'VT_LPWSTR') {
+                    # convert wide string from Unicode
+                    $val = $exifTool->Unicode2Byte($val);
+                } elsif ($opts & 0x02) {
+                    # convert from Latin1 to UTF-8
+                    $val = Image::ExifTool::Latin2Unicode($val,'v');
+                    $val = Image::ExifTool::Unicode2UTF8($val,'v');
+                }
+                $val =~ s/\0.*//s;  # truncate at null terminator
                 # update position for string length
-                # (strings are padded to align on even 32-bit boundaries)
-                $valPos += ($len + 3) & 0xfffffffc;
+                # (the spec states that strings should be padded to align
+                #  on even 32-bit boundaries, but this isn't always the case)
+                $valPos += ($opts & 0x01) ? $len : ($len + 3) & 0xfffffffc;
             } elsif ($format eq 'VT_BLOB' or $format eq 'VT_CF') {
                 my $len = Get32u($dataPt, $valPos);
                 last if $valPos + $len + 4 > $dirEnd;
                 $val = substr($$dataPt, $valPos + 4, $len);
                 # update position for data length plus padding
+                # (does this padding disappear in arrays too?)
                 $valPos += ($len + 3) & 0xfffffffc;
             } elsif ($format eq 'VT_CLSID') {
                 $val = Image::ExifTool::ASF::GetGUID(substr($$dataPt, $valPos, $size));
@@ -766,7 +900,7 @@ sub ReadFPXValue($$$$)
         @vals = ( join ', ', @vals ) if @vals > 1 and not wantarray;
         last;   # didn't really want to loop
     }
-    $_[1] = $valPos;    # return updated value position
+    $_[2] = $valPos;    # return updated value position
 
     if (wantarray) {
         return @vals;
@@ -803,7 +937,7 @@ sub ProcessProperties($$$)
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $pos;
     my $dirEnd = $pos + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
-    my $out;
+    my ($out, $n);
 
     if ($dirLen < 48) {
         $exifTool->Warn('Truncated FPX properties');
@@ -820,7 +954,9 @@ sub ProcessProperties($$$)
         $exifTool->Warn('Bad FPX property section offset');
         return 0;
     }
-    for (;;) {
+    for ($n=0; $n<2; ++$n) {
+        my %dictionary;     # dictionary to translate user-defined properties
+        my $opts = 0;       # option flags for converting values
         last if $pos + 8 > $dirEnd;
         # read property section header
         my $size = Get32u($dataPt, $pos);
@@ -840,8 +976,36 @@ sub ProcessProperties($$$)
             last if $valStart >= $dirEnd;
             my $valPos = $valStart;
             my $type = Get32u($dataPt, $pos + $offset);
-            my $val = ReadFPXValue($dataPt, $valPos, $type, $dirEnd);
-            defined $val or $exifTool->Warn('Error reading property value');
+            if ($tag == 0) {
+                # read dictionary to get tag name lookup for this property set
+                my $i;
+                for ($i=0; $i<$type; ++$i) {
+                    last if $valPos + 8 > $dirEnd;
+                    $tag = Get32u($dataPt, $valPos);
+                    my $len = Get32u($dataPt, $valPos + 4);
+                    $valPos += 8 + $len;
+                    last if $valPos > $dirEnd;
+                    my $name = substr($$dataPt, $valPos - $len, $len);
+                    $name =~ s/\0.*//s;
+                    next unless length $name;
+                    $dictionary{$tag} = $name;
+                    next if $$tagTablePtr{$name};
+                    $tag = $name;
+                    $name =~ tr/a-zA-Z0-9//dc;
+                    next unless length $name;
+                    Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => ucfirst($name) });
+                }
+                next;
+            }
+            # use tag name from dictionary if available
+            my ($custom, $val);
+            if (defined $dictionary{$tag}) {
+                $tag = $dictionary{$tag};
+                $custom = 1;
+            }
+            my @vals = ReadFPXValue($exifTool, $dataPt, $valPos, $type, $dirEnd, $opts);
+            @vals or $exifTool->Warn('Error reading property value');
+            $val = @vals > 1 ? \@vals : $vals[0];
             my $format = $type & 0x0fff;
             my $flags = $type & 0xf000;
             my $formStr = $oleFormat{$format} || "Type $format";
@@ -849,13 +1013,18 @@ sub ProcessProperties($$$)
             my $tagInfo;
             # check for common tag ID's: Dictionary, CodePage and LocaleIndicator
             # (must be done before masking because masked tags may overlap these ID's)
-            if ($tag == 0 or $tag == 1 or $tag == 0x80000000) {
+            if (not $custom and ($tag == 1 or $tag == 0x80000000)) {
                 # get tagInfo from SummaryInfo table
                 my $summaryTable = GetTagTable('Image::ExifTool::FlashPix::SummaryInfo');
                 $tagInfo = $exifTool->GetTagInfo($summaryTable, $tag);
+                if ($tag == 1 and $val == 1252 and $exifTool->Options('Charset') eq 'UTF8') {
+                    # set flag to translate 8-bit text only if
+                    # code page is cp1252 and Charset is UTF8
+                    $opts |= 0x02;
+                }
             } elsif ($$tagTablePtr{$tag}) {
                 $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-            } elsif ($$tagTablePtr{VARS}) {
+            } elsif ($$tagTablePtr{VARS} and not $custom) {
                 # mask off insignificant bits of tag ID if necessary
                 my $masked = $$tagTablePtr{VARS};
                 my $mask;
@@ -873,11 +1042,13 @@ sub ProcessProperties($$$)
                 Format => $formStr,
                 Index => $index,
                 TagInfo => $tagInfo,
+                Extra => ", type=$type",
             );
         }
         # issue warning if we hit end of property section prematurely
         $exifTool->Warn('Truncated property data') if $index < $numEntries;
-        last;
+        last unless $$dirInfo{Multi};
+        $pos += $size;
     }
 
     return 1;
@@ -1080,7 +1251,9 @@ sub ProcessFPX($$)
     # check signature
     return 0 unless $buff =~ /^\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1/;
 
-    $exifTool->SetFileType();
+    my $fileType = $exifTool->{FILE_EXT};
+    $fileType = 'FPX' unless $fileType and $fileType =~ /^(DOC|XLS|PPT)$/;
+    $exifTool->SetFileType($fileType);
     SetByteOrder(substr($buff, 0x1c, 2) eq "\xff\xfe" ? 'MM' : 'II');
     my $tagTablePtr = GetTagTable('Image::ExifTool::FlashPix::Main');
     my $verbose = $exifTool->Options('Verbose');
@@ -1262,6 +1435,7 @@ sub ProcessFPX($$)
                     DataPt => \$buff,
                     DirStart => $tagInfo->{SubDirectory}->{DirStart},
                     DirLen => length $buff,
+                    Multi => $$tagInfo{Multi},
                 );
                 my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
                 $exifTool->ProcessDirectory(\%dirInfo, $subTablePtr);
@@ -1294,7 +1468,7 @@ JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

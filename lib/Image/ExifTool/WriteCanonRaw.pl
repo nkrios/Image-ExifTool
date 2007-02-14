@@ -502,8 +502,7 @@ sub WriteCRW($$)
     my $type = $1;
     my $hlen = Get32u(\$buff, 0);   # get header length
 
-    my $delGroup = $exifTool->{DEL_GROUP};
-    if ($delGroup and $$delGroup{MakerNotes}) {
+    if ($exifTool->{DEL_GROUP}->{MakerNotes}) {
         if ($type eq 'CCDR') {
             $exifTool->Error("Can't delete Makernotes group in CRW file");
             return 0;
@@ -540,7 +539,7 @@ sub WriteCRW($$)
         # check to see if trailer(s) exist(s)
         my $trailInfo = Image::ExifTool::IdentifyTrailer($raf) or last;
         # delete all trailers if specified
-        if ($delGroup and $$delGroup{Trailer}) {
+        if ($exifTool->{DEL_GROUP}->{Trailer}) {
             $exifTool->VPrint(0,"  Deleting $$trailInfo{DirName} trailer\n");
             ++$exifTool->{CHANGED};
             last;
@@ -592,7 +591,7 @@ files, and would lead to far fewer problems with corrupted metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

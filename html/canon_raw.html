@@ -3,29 +3,23 @@
 <html>
 <head>
 <title>The Canon RAW (CRW) File Format</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 <style type="text/css">
 <!--
-h1       { margin: 0 0 .5em 0 }
-table.norm      { border-collapse: collapse;
-                  border: 1px solid gray; }
-table.norm th   { border: 1px solid gray; background: #dddddd }
-table.norm th.lt{ background: #eeeeee }
-table.norm td   { border: 1px solid gray; background: #ffffff;
-                  padding: 2px 4px }
-table.box       { padding: .2em; background: #dddddd }
+table.norm th.lt { background: #eee }
 -->
 </style>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h1>The Canon RAW (CRW) File Format</h1>
+<body>
+<h1 class='up'>The Canon RAW (CRW) File Format</h1>
 
-This is a description of the Canon CRW file format.  CRW files are written in
+<p>This is a description of the Canon CRW file format.  CRW files are written in
 Camera Image File Format (CIFF).  The original Canon CIFF documentation can be
 downloaded from <a href="http://xyrion.org/ciff/">http://xyrion.org/ciff/</a>
 (which I finally discovered after writing this document!).  Note that Canon uses
 two different RAW formats, and some camera models produce CR2 instead of CRW
 files.  The CR2 files use a TIFF format, which is different than the CRW CIFF
-format documented here.
+format documented here.</p>
 
 <h3>Comments about the CRW Format</h3>
 
@@ -36,13 +30,13 @@ they are relative to the start of the data block for each directory.  This
 allows subdirectories within a file to be moved or copied to another file
 without having to adjust the offsets, which is fantastic because it means that
 rewriter software doesn't have to understand the complete format in order to be
-able to successfully rewrite the file.
+able to successfully rewrite the file.</p>
 
 <p>Also, the data comes before the directories in the file, which is the natural
 way to write information and minimizes the amount memory needed to buffer the
-data (unlike the EXIF standard which is the reverse).
+data (unlike the EXIF standard which is the reverse).</p>
 
-<blockquote><font size='-1'>
+<blockquote class='aside'>
 <b>A short rant about TIFF inadequacies:</b>
 <br>TIFF format on the other hand, really sucks in comparison (this includes
 JPEG too, since JPEG uses TIFF format to store the EXIF information).  The main
@@ -56,14 +50,14 @@ This is why it is so common for image editors to either scramble the maker notes
 or discard them completely.  The official TIFF recommendation is to discard
 unknown information when rewriting the image (as Photoshop does), but for many,
 including myself, this option is simply unacceptable.
-</font></blockquote>
+</blockquote>
 
-The bottom line is that rewriting a Canon CRW file is about 20 times easier,
-and much less prone to errors than rewriting a TIFF or JPEG.
+<p>The bottom line is that rewriting a Canon CRW file is about 20 times easier,
+and much less prone to errors than rewriting a TIFF or JPEG.</p>
 
 <h2>CRW (CIFF) Format Specification</h2>
 <h3>File Header</h3>
-A Canon CRW file starts with the following byte sequence:
+<p>A Canon CRW file starts with the following byte sequence:</p>
 <blockquote>
 <table class='norm'><tr><th>Offset</th>
 <th>Number<br>of&nbsp;bytes</th><th>Value</th><th>Name</th><th>Description</th></tr>
@@ -86,9 +80,9 @@ file.  The signature is "HEAPJPGM" for CIFF information in APP0 of JPEG images.<
 </table></blockquote>
 
 <h3>Directory Block Structure</h3>
-The root directory block begins immediately after the file header (at the position
+<p>The root directory block begins immediately after the file header (at the position
 specified by <b>HeaderLength</b>), and ends at the end of the file.  The structure
-of this block is as follows:
+of this block is as follows:</p>
 <blockquote><table class='norm'>
 <tr><th>Offset<br>within block</th><th>Number<br>of bytes</th><th>Value</th>
 <th>Name</th><th>Description</th></tr>
@@ -104,23 +98,25 @@ of this block is as follows:
 <td align='left'>32-bit integer giving the size of the <b>ValueData</b></td></tr>
 </table></blockquote>
 
-To parse a CRW directory block, first read the 4 bytes at the end of the block
-to get the location of <b>DirCount</b>.  Next read <b>DirCount</b> to determine the number of
-entries in the directory, then read the directory entries.
+<p>To parse a CRW directory block, first read the 4 bytes at the end of the
+block to get the location of <b>DirCount</b>.  Next read <b>DirCount</b> to
+determine the number of entries in the directory, then read the directory
+entries.</p>
 
-<p>The <b>ValueData</b> may contain complete subdirectory blocks, each of which has the
-same format as specified above (and these subdirectories may themselves contain
-sub-subdirectories...).  For these subdirectories, <b>BlockSize</b> is given by
-the <b>Size</b> specified in the corresponding directory entry.  For the root
-directory, <b>BlockSize</b> is the length of the file.
+<p>The <b>ValueData</b> may contain complete subdirectory blocks, each of which
+has the same format as specified above (and these subdirectories may themselves
+contain sub-subdirectories...).  For these subdirectories, <b>BlockSize</b> is
+given by the <b>Size</b> specified in the corresponding directory entry.  For
+the root directory, <b>BlockSize</b> is the length of the file.</p>
 
 <p>The <b>OtherData</b> normally does not exist (ie. the <b>DirEntries</b>
 usually end at the <b>DirStart</b> pointer), but this is not always the case:
 Canon Digital Photo Professional uses this area in the root directory block to
-store VRD data in edited CRW images.
+store VRD data in edited CRW images.</p>
 
 <h3>CRW Directory Entry Format</h3>
-The CRW directory consists of N 10-byte entries.  The format of each entry is as follows:
+<p>The CRW directory consists of N 10-byte entries.  The format of each entry is
+as follows:</p>
 <blockquote><table class='norm'>
 <tr><th>Offset<br>within entry</th><th>Number<br>of bytes</th>
 <th>Name</th><th>Description</th></tr>
@@ -133,16 +129,17 @@ The CRW directory consists of N 10-byte entries.  The format of each entry is as
     <b>ValueData</b> block to the start of the value data for this directory entry</td></tr>
 </table></blockquote>
 
-Data values with lengths shorter than 8 bytes may be stored in the directory <b>Size</b> and <b>Offset</b>
-fields.  For these values the <b>DataLocation</b> bits in the <b>Tag</b> are set to 0x4000
-(see <b>DataLocation</b> table below).
+<p>Data values with lengths shorter than 8 bytes may be stored in the directory
+<b>Size</b> and <b>Offset</b> fields.  For these values the <b>DataLocation</b>
+bits in the <b>Tag</b> are set to 0x4000 (see <b>DataLocation</b> table
+below).</p>
 
-<p>Data stored in the <b>ValueData</b> block must be aligned on even 2-byte boundaries, yielding
-<b>Offset</b>s which are divisible by 2.  To achieve this, records with an odd number of bytes
-must be padded with a zero byte.
+<p>Data stored in the <b>ValueData</b> block must be aligned on even 2-byte
+boundaries, yielding <b>Offset</b>s which are divisible by 2.  To achieve this,
+records with an odd number of bytes must be padded with a zero byte.</p>
 
 <h3>Tag Bits</h3>
-The 16-bit <b>Tag</b> value is composed of 3 bit fields, as follows:
+<p>The 16-bit <b>Tag</b> value is composed of 3 bit fields, as follows:</p>
 <blockquote><table class='norm'>
 <tr><th>Bits</th><th>Mask</th><th>Name</th><th>Description</th></tr>
 <tr align='center'><td>14-15</td><td>0xc000</td><td>DataLocation</td>
@@ -154,9 +151,9 @@ The 16-bit <b>Tag</b> value is composed of 3 bit fields, as follows:
 </table></blockquote>
 
 <h4>DataLocation</h4>
-Value data may either be stored in the <b>ValueData</b> block, or within the <b>Size</b>
-and <b>Offset</b> fields of the directory entry if it is less than 8 bytes long.
-The <b>DataLocation</b> bits specify where the value is stored:
+<p>Value data may either be stored in the <b>ValueData</b> block, or within the
+<b>Size</b> and <b>Offset</b> fields of the directory entry if it is less than 8
+bytes long. The <b>DataLocation</b> bits specify where the value is stored:</p>
 <blockquote><table class='norm'>
 <tr><th>DataLocation</th><th>Where</th><th>Description</th></tr>
 <tr align='center'><td>0x0000</td><td>ValueData</td>
@@ -169,7 +166,7 @@ The <b>DataLocation</b> bits specify where the value is stored:
 </table></blockquote>
 
 <h4>DataFormat</h4>
-Three <b>Tag</b> bits are used to specify the data format:
+<p>Three <b>Tag</b> bits are used to specify the data format:</p>
 <blockquote><table class='norm'>
 <tr><th>DataFormat</th><th>Alignment</th><th>Description</th></tr>
 <tr align='center'><td>0x0000</td><td>1-Byte</td>
@@ -189,13 +186,13 @@ Three <b>Tag</b> bits are used to specify the data format:
 </table></blockquote>
 
 <h4>TagID = DataFormat + TagIndex</h4>
-Together, the <b>DataFormat</b> and <b>TagIndex</b> fields form a <b>TagID</b>
+<p>Together, the <b>DataFormat</b> and <b>TagIndex</b> fields form a <b>TagID</b>
 which can be used to identify tags within the CRW file. The following is a list
 of known <b>TagID</b> values and their corresponding tag numbers in the <b>EXIF</b>
 maker notes when found in a JPEG or TIFF image.  Also listed is the TagID of the
 <b>SubDir</b>ectory where the information is found.  The <b>Size</b> listed
 below is an observed size of the value data, and is not necessarily expected to
-remain constant for all camera models.
+remain constant for all camera models.</p>
 
 <blockquote><table class='norm'>
 <tr><th>TagID</th><th>EXIF</th><th>SubDir</th><th>Name</th><th>Size</th><th>Description</th></tr>
@@ -332,10 +329,13 @@ remain constant for all camera models.
 </table></blockquote>
 
 <h3>Revisions</h3>
-Nov. 28, 2006 - Highlight the possibility of <b>OtherData</b> existing in the directory block
-<p><hr>
-Please e-mail me if you find any errors or omissions in this document.  My address is phil at owl.phy.queensu.ca - Thanks!
-<p><i>P. Harvey - Last revised Nov. 28, 2006</i>
-<p><a href="index.html">&lt;-- Back to ExifTool home page</a>
+<p>Nov. 28, 2006 - Highlight the possibility of <b>OtherData</b> existing in the
+directory block</p>
+<hr>
+Please e-mail me if you find any errors or omissions in this document.  My
+address is phil at owl.phy.queensu.ca - Thanks!
+<p class='lf'><i>Created Jan. 28, 2005</i>
+<br><i>Last revised Nov. 28, 2006</i></p>
+<p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

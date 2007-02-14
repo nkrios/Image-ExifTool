@@ -13,13 +13,13 @@ use strict;
 # mandatory IPTC tags for each record
 my %mandatory = (
     1 => {
-        0 => 4,     # EnvelopeRecordVersion
+        0  => 4,        # EnvelopeRecordVersion
     },
     2 => {
-        0 => 4,     # ApplicationRecordVersion
+        0  => 4,        # ApplicationRecordVersion
     },
     3 => {
-        0 => 4,     # NewsPhotoVersion
+        0  => 4,        # NewsPhotoVersion
     },
 );
 
@@ -38,6 +38,62 @@ my %manufacturer = (
     11 => 'Sandia Imaging Systems Inc, USA',
     12 => 'Visualize, Spain',
 );
+
+my %iptcCharsetInv = ( 'UTF8' => "\x1b%G" );
+
+# ISO 2022 Character Coding Notes
+# -------------------------------
+# Character set designation: (0x1b I F, or 0x1b I I F)
+# Initial character 0x1b (ESC)
+# Intermediate character I:
+#   0x28 ('(') - G0, 94 chars
+#   0x29 (')') - G1, 94 chars
+#   0x2a ('*') - G2, 94 chars
+#   0x2b ('+') - G3, 94 chars
+#   0x2c (',') - G1, 96 chars
+#   0x2d ('-') - G2, 96 chars
+#   0x2e ('.') - G3, 96 chars
+#   0x24 I ('$I') - multiple byte graphic sets (I from above)
+#   I 0x20 ('I ') - dynamically redefinable character sets
+# Final character:
+#   0x30 - 0x3f = private character set
+#   0x40 - 0x7f = standardized character set
+# Character set invocation:
+#   G0 : SI = 0x15
+#   G1 : SO = 0x14,             LS1R = 0x1b 0x7e ('~')
+#   G2 : LS2 = 0x1b 0x6e ('n'), LS2R = 0x1b 0x7d ('}')
+#   G3 : LS3 = 0x1b 0x6f ('o'), LS3R = 0x1b 0x7c ('|')
+#   (the locking shift "R" codes shift into 0x80-0xff space)
+# Single character invocation:
+#   G2 : SS2 = 0x1b 0x8e (or 0x4e in 7-bit)
+#   G3 : SS3 = 0x1b 0x8f (or 0x4f in 7-bit)
+# Control chars (designated and invoked)
+#   C0 : 0x1b 0x21 F (0x21 = '!')
+#   C1 : 0x1b 0x22 F (0x22 = '"')
+# Complete codes (control+graphics, designated and involked)
+#   0x1b 0x25 F   (0x25 = '%')
+#   0x1b 0x25 I F
+#   0x1b 0x25 0x47 ("\x1b%G") - UTF-8
+#   0x1b 0x25 0x40 ("\x1b%@") - return to ISO 2022
+# -------------------------------
+
+#------------------------------------------------------------------------------
+# Inverse print conversion for CodedCharacterSet
+# Inputs: 0) value
+sub PrintInvCodedCharset($)
+{
+    my $val = shift;
+    my $code = $iptcCharsetInv{lc($val)};
+    unless ($code) {
+        if (($code = $val) =~ s/ESC /\x1b/g) {  # translate ESC chars
+            $code =~ s/, \x1b/\x1b/g;   # remove comma separators
+            $code =~ tr/ //d;           # remove spaces
+        } else {
+            warn "Bad syntax (use 'UTF8' or 'ESC X Y[, ...]')\n";
+        }
+    }
+    return $code;
+}
 
 #------------------------------------------------------------------------------
 # validate raw values for writing
@@ -81,19 +137,43 @@ sub CheckIPTC($$$)
 }
 
 #------------------------------------------------------------------------------
-# format IPTC data
-# Inputs: 0) tagInfo pointer, 1) value reference (changed if necessary)
-sub FormatIPTC($$)
+# format IPTC data for writing
+# Inputs: 0) ExifTool object ref, 1) tagInfo pointer,
+#         2) value reference (changed if necessary),
+#         3) reference to character set for translation (changed if necessary)
+#         4) record number, 5) flag set to read value (instead of write)
+sub FormatIPTC($$$$$;$)
 {
-    my ($tagInfo, $valPtr) = @_;
-    if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^int(\d+)/) {
-        my $len = int(($1 || 0) / 8);
-        if ($len == 1) {        # 1 byte
-            $$valPtr = chr($$valPtr);
-        } elsif ($len == 2) {   # 2-byte integer
-            $$valPtr = pack('n', $$valPtr);
-        } else {                # 4-byte integer
-            $$valPtr = pack('N', $$valPtr);
+    my ($exifTool, $tagInfo, $valPtr, $xlatPtr, $rec, $read) = @_;
+    return unless $$tagInfo{Format};
+    if ($$tagInfo{Format} =~ /^int(\d+)/) {
+        if ($read) {
+            my $len = length($$valPtr);
+            if ($len <= 8) {    # limit integer conversion to 8 bytes long
+                my $val = 0;
+                my $i;
+                for ($i=0; $i<$len; ++$i) {
+                    $val = $val * 256 + ord(substr($$valPtr, $i, 1));
+                }
+                $$valPtr = $val;
+            }
+        } else {
+            my $len = int(($1 || 0) / 8);
+            if ($len == 1) {        # 1 byte
+                $$valPtr = chr($$valPtr);
+            } elsif ($len == 2) {   # 2-byte integer
+                $$valPtr = pack('n', $$valPtr);
+            } else {                # 4-byte integer
+                $$valPtr = pack('N', $$valPtr);
+            }
+        }
+    } elsif ($$tagInfo{Format} =~ /^string/) {
+        if ($rec == 1) {
+            if ($$tagInfo{Name} eq 'CodedCharacterSet') {
+                $$xlatPtr = HandleCodedCharset($exifTool, $$valPtr);
+            }
+        } elsif ($$xlatPtr and $rec < 7 and $$valPtr =~ /[\x80-\xff]/) {
+            TranslateCodedString($exifTool, $valPtr, $xlatPtr, $read);
         }
     }
 }
@@ -195,6 +275,10 @@ sub WriteIPTC($$$)
     my $out = $exifTool->Options('TextOut');
     my ($tagInfo, %iptcInfo, $tag);
 
+    # begin by assuming IPTC is coded in Latin unless otherwise specified
+    my $xlat = $exifTool->Options('Charset');
+    undef $xlat if $xlat eq 'Latin';
+
     # make sure our dataLen is defined (note: allow zero length directory)
     unless (defined $dirLen) {
         my $dataLen = $$dirInfo{DataLen};
@@ -235,19 +319,19 @@ sub WriteIPTC($$$)
             $set{$record}->{$$tagInfo{TagID}} = $tagInfo;
         }
     }
-
     # run through the old IPTC data, inserting our records in
     # sequence and deleting existing records where necessary
     # (the IPTC specification states that records must occur in
     # numerical order, but tags within records need not be ordered)
     my $pos = $start;
-    my $tail = $pos;    # old data written up to this point
+    my $tail = $pos;        # old data written up to this point
     my $dirEnd = $start + $dirLen;
     my $newData = '';
     my $lastRec = -1;
     my $lastRecPos = 0;
     my $allMandatory = 0;
-    my %foundRec;       # found flags: 0x01-existed before, 0x02-deleted, 0x04-created
+    my %foundRec;           # found flags: 0x01-existed before, 0x02-deleted, 0x04-created
+
     for (;;$tail=$pos) {
         # get next IPTC record from input directory
         my ($id, $rec, $tag, $len, $valuePtr);
@@ -307,7 +391,7 @@ sub WriteIPTC($$$)
                             # add required mandatory tags
                             my $mandatory = $mandatory{$lastRec};
                             my ($mandTag, $subTablePtr);
-                            foreach $mandTag (sort keys %$mandatory) {
+                            foreach $mandTag (sort { $a <=> $b } keys %$mandatory) {
                                 next if $foundRec{$lastRec}->{$mandTag};
                                 unless ($subTablePtr) {
                                     $tagInfo = $tagTablePtr->{$lastRec};
@@ -318,8 +402,8 @@ sub WriteIPTC($$$)
                                 $tagInfo = $subTablePtr->{$mandTag} or warn("WriteIPTC: Internal error 2\n"), next;
                                 my $value = $mandatory->{$mandTag};
                                 $verbose > 1 and print $out "    + IPTC:$$tagInfo{Name} = '$value' (mandatory)\n";
-                                # convert to int if necessary
-                                FormatIPTC($tagInfo, \$value);
+                                # apply necessary format conversions
+                                FormatIPTC($exifTool, $tagInfo, \$value, \$xlat, $lastRec);
                                 $len = length $value;
                                 # generate our new entry
                                 my $entry = pack("CCCn", 0x1c, $lastRec, $mandTag, length($value));
@@ -365,8 +449,8 @@ sub WriteIPTC($$$)
                             my $mandatory = $mandatory{$newRec};
                             $allMandatory = 0 unless $mandatory and $mandatory->{$newTag};
                         }
-                        # convert to int if necessary
-                        FormatIPTC($tagInfo, \$value);
+                        # apply necessary format conversions
+                        FormatIPTC($exifTool, $tagInfo, \$value, \$xlat, $newRec);
                         # (note: IPTC string values are NOT null terminated)
                         $len = length $value;
                         # generate our new entry
@@ -400,13 +484,7 @@ sub WriteIPTC($$$)
             my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
             $len = $pos - $valuePtr;
             my $val = substr($$dataPt, $valuePtr, $len);
-            if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^int/) {
-                $val = 0;
-                my $i;
-                for ($i=0; $i<$len; ++$i) {
-                    $val = $val * 256 + ord(substr($$dataPt, $valuePtr+$i, 1));
-                }
-            }
+            FormatIPTC($exifTool, $tagInfo, \$val, \$xlat, $rec, 1);
             if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
                 $verbose > 1 and print $out "    - IPTC:$$tagInfo{Name} = '$val'\n";
                 ++$exifTool->{CHANGED};
@@ -416,11 +494,17 @@ sub WriteIPTC($$$)
                 $allMandatory and ++$allMandatory;
                 next;
             }
+        } elsif ($rec == 1 and $tag == 90) {
+            # handle CodedCharacterSet tag
+            my $val = substr($$dataPt, $valuePtr, $pos - $valuePtr);
+            $xlat = HandleCodedCharset($exifTool, $val);
         }
         # reset allMandatory flag if a non-mandatory tag is written
         if ($allMandatory) {
             my $mandatory = $mandatory{$rec};
-            $allMandatory = 0 unless $mandatory and $mandatory->{$tag};
+            unless ($mandatory and $mandatory->{$tag}) {
+                $allMandatory = 0;
+            }
         }
         # write out the record
         $newData .= substr($$dataPt, $tail, $pos-$tail);
@@ -455,7 +539,7 @@ seldom-used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

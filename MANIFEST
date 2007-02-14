@@ -29,6 +29,7 @@ html/TagNames/FotoStation.html
 html/TagNames/FujiFilm.html
 html/TagNames/GPS.html
 html/TagNames/GeoTiff.html
+html/TagNames/HTML.html
 html/TagNames/ICC_Profile.html
 html/TagNames/ID3.html
 html/TagNames/IPTC.html
@@ -73,6 +74,7 @@ html/TagNames/XMP.html
 html/TagNames/index.html
 html/TagNames/style.css
 html/canon_raw.html
+html/commentary.html
 html/config.html
 html/data_members.html
 html/exiftool_pod.html
@@ -82,7 +84,9 @@ html/history.html
 html/htmldump.html
 html/idiosyncracies.html
 html/index.html
+html/install.html
 html/models.html
+html/style.css
 html/verbose.html
 html/writing.html
 iptc2xmp.args
@@ -114,6 +118,7 @@ lib/Image/ExifTool/FujiFilm.pm
 lib/Image/ExifTool/GIF.pm
 lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
+lib/Image/ExifTool/HTML.pm
 lib/Image/ExifTool/HtmlDump.pm
 lib/Image/ExifTool/ICC_Profile.pm
 lib/Image/ExifTool/ID3.pm
@@ -201,6 +206,7 @@ t/DICOM.t
 t/DICOM_2.out
 t/DNG.t
 t/DNG_2.out
+t/DNG_3.out
 t/ExifTool.t
 t/ExifTool_16.out
 t/ExifTool_17.out
@@ -218,6 +224,8 @@ t/FLAC.t
 t/FLAC_2.out
 t/FLAC_3.out
 t/Flash.t
+t/FlashPix.t
+t/FlashPix_2.out
 t/Flash_2.out
 t/FotoStation.t
 t/FotoStation_2.out
@@ -234,6 +242,8 @@ t/GPS_3.out
 t/GeoTiff.t
 t/GeoTiff_2.out
 t/GeoTiff_3.out
+t/HTML.t
+t/HTML_2.out
 t/IPTC-XMP.t
 t/IPTC-XMP_10.out
 t/IPTC-XMP_11.out
@@ -370,11 +380,13 @@ t/images/ExifTool.tif
 t/images/FLAC.flac
 t/images/FLAC.ogg
 t/images/Flash.swf
+t/images/FlashPix.ppt
 t/images/FotoStation.jpg
 t/images/FujiFilm.jpg
 t/images/GIF.gif
 t/images/GPS.jpg
 t/images/GeoTiff.tif
+t/images/HTML.html
 t/images/IPTC-XMP.jpg
 t/images/JVC.jpg
 t/images/JVC2.jpg

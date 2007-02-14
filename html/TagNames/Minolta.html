@@ -6,70 +6,70 @@
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
 <body>
-<h2 class='top'>Minolta Tags</h2>
-
+<h2 class=top>Minolta Tags</h2>
+<p>
 These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn&#39;t
 make things easy for decoders because the meaning of some tags and the
 location where some information is stored is different for different camera
 models.  (Take MinoltaQuality for example, which may be located in 5
 different places.)
-
+</p>
 <blockquote>
-<table class='frame'><tr><td>
-<table class='inner' cellspacing=1>
-<tr class='h'><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td>0x0000</td>
 <td>MakerNoteVersion</td>
-<td class='c'>undef[4]</td>
+<td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0001</td>
 <td>MinoltaCameraSettingsOld</td>
-<td class='c'>-</td>
+<td class=c>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings Tags</a></td></tr>
 <tr>
 <td>0x0003</td>
 <td>MinoltaCameraSettings</td>
-<td class='c'>-</td>
+<td class=c>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings'>Minolta CameraSettings Tags</a></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0004</td>
 <td>MinoltaCameraSettings7D</td>
-<td class='c'>-</td>
+<td class=c>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings7D'>Minolta CameraSettings7D Tags</a></td></tr>
 <tr>
 <td>0x0018</td>
 <td>ImageStabilization</td>
-<td class='c'>N</td>
-<td><span class='s'><span class='n'>(a block of binary data which exists in DiMAGE A2 (and A1/X1?) images only if
+<td class=c>N</td>
+<td><span class=s><span class=n>(a block of binary data which exists in DiMAGE A2 (and A1/X1?) images only if
 image stabilization is enabled)</span></span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0040</td>
 <td>CompressedImageSize</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0081</td>
 <td>PreviewImage</td>
-<td class='c'>undef</td>
+<td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0088</td>
 <td>PreviewImageStart</td>
-<td class='c'>int32u*</td>
+<td class=c>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0089</td>
 <td>PreviewImageLength</td>
-<td class='c'>int32u*</td>
+<td class=c>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0100</td>
 <td>SceneMode</td>
-<td class='c'>Y</td>
-<td><span class='s'>0 = Standard
+<td class=c>Y</td>
+<td><span class=s>0 = Standard
   <br>1 = Portrait
   <br>2 = Text
   <br>3 = Night Scene
@@ -80,8 +80,8 @@ image stabilization is enabled)</span></span></td></tr>
 <tr>
 <td>0x0101</td>
 <td>ColorMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Natural color
+<td class=c>int32u</td>
+<td><span class=s>0 = Natural color
   <br>1 = Black &amp; White
   <br>2 = Vivid color
   <br>3 = Solarization
@@ -95,7 +95,7 @@ image stabilization is enabled)</span></span></td></tr>
   <br>16 = Evening
   <br>17 = Night Scene
   <br>18 = Night Portrait
-  <br><span class='n'>(Sony DSLR-A100)</span>
+  <br><span class=n>(Sony DSLR-A100)</span>
   <br>0 = Standard
   <br>1 = Vivid
   <br>2 = Portrait
@@ -104,11 +104,11 @@ image stabilization is enabled)</span></span></td></tr>
   <br>5 = Night Scene
   <br>6 = B&amp;W
   <br>7 = Adobe RGB</span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0102</td>
 <td>MinoltaQuality</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Raw
+<td class=c>int32u</td>
+<td><span class=s>0 = Raw
   <br>1 = Super Fine
   <br>2 = Fine
   <br>3 = Standard
@@ -118,49 +118,49 @@ image stabilization is enabled)</span></span></td></tr>
 <td>0x0103</td>
 <td>MinoltaQuality
   <br>MinoltaImageSize</td>
-<td class='c'>int32u<br>int32u</td>
-<td><span class='s'><span class='n'>(quality for DiMAGE A2/7Hi)</span>
+<td class=c>int32u<br>int32u</td>
+<td><span class=s><span class=n>(quality for DiMAGE A2/7Hi)</span>
   <br>0 = Raw
   <br>1 = Super Fine
   <br>2 = Fine
   <br>3 = Standard
   <br>4 = Economy
   <br>5 = Extra fine
-  <br><span class='n'>(image size for other models except A200)</span>
+  <br><span class=n>(image size for other models except A200)</span>
   <br>1 = 1600x1200
   <br>2 = 1280x960
   <br>3 = 640x480
   <br>5 = 2560x1920
   <br>6 = 2272x1704
   <br>7 = 2048x1536</span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0104</td>
 <td>FlashExposureComp</td>
-<td class='c'>rational64s</td>
+<td class=c>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0107</td>
 <td>ImageStabilization</td>
-<td class='c'>int32u</td>
-<td><span class='s'>1 = Off
+<td class=c>int32u</td>
+<td><span class=s>1 = Off
   <br>5 = On</span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x010a</td>
 <td>ZoneMatching</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = ISO Setting Used
+<td class=c>int32u</td>
+<td><span class=s>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
 <tr>
 <td>0x010b</td>
 <td>ColorTemperature</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x010c</td>
 <td>LensID</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Minolta AF 28-85mm F3.5-4.5
+<td class=c>int32u</td>
+<td><span class=s>0 = Minolta AF 28-85mm F3.5-4.5
   <br>1 = Minolta AF 80-200mm F2.8 HS-APO G
   <br>2 = Minolta AF 28-70mm F2.8 G
   <br>3 = Minolta AF 28-80mm F4-5.6
@@ -268,67 +268,67 @@ image stabilization is enabled)</span></span></td></tr>
 <tr>
 <td>0x0113</td>
 <td>ImageStabilization</td>
-<td class='c'>int32u</td>
-<td><span class='s'><span class='n'>(valid for Sony A100 only)</span>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(valid for Sony A100 only)</span>
   <br>0 = Off
   <br>1 = On</span></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0114</td>
 <td>MinoltaCameraSettings5D
   <br>MinoltaCameraSettingsA100</td>
-<td class='c'>-<br>-</td>
+<td class=c>-<br>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D Tags</a>
   <br>--&gt; <a href='Minolta.html#CameraSettingsA100'>Minolta CameraSettingsA100 Tags</a></td></tr>
 <tr>
 <td>0x0e00</td>
 <td>PrintIM</td>
-<td class='c'>-</td>
+<td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr class='b'>
+<tr class=b>
 <td>0x0f00</td>
 <td>MinoltaCameraSettings2</td>
-<td class='c'>N</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Minolta CameraSettings Tags</a></h2>
-There is some variability in CameraSettings information between different
+<p>There is some variability in CameraSettings information between different
 models (and sometimes even between different firmware versions), so this
 information may not be as reliable as it should be.  Because of this, tags
 in the following tables are set to lower priority to prevent them from
 superceeding the values of same-named tags in other locations when duplicate
-tags are disabled.
+tags are disabled.</p>
 <blockquote>
-<table class='frame'><tr><td>
-<table class='inner' cellspacing=1>
-<tr class='h'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class='r'>1</td>
+<td class=r>1</td>
 <td>ExposureMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Program
+<td class=c>int32u</td>
+<td><span class=s>0 = Program
   <br>1 = Aperture Priority
   <br>2 = Shutter Priority
   <br>3 = Manual</span></td></tr>
-<tr class='b'>
-<td class='r'>2</td>
+<tr class=b>
+<td class=r>2</td>
 <td>FlashMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Fill flash
+<td class=c>int32u</td>
+<td><span class=s>0 = Fill flash
   <br>1 = Red-eye reduction
   <br>2 = Rear flash sync
   <br>3 = Wireless</span></td></tr>
 <tr>
-<td class='r'>3</td>
+<td class=r>3</td>
 <td>WhiteBalance</td>
-<td class='c'>int32u~</td>
+<td class=c>int32u~</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>4</td>
+<tr class=b>
+<td class=r>4</td>
 <td>MinoltaImageSize</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Full
+<td class=c>int32u</td>
+<td><span class=s>0 = Full
   <br>1 = 1600x1200
   <br>2 = 1280x960
   <br>3 = 640x480
@@ -336,20 +336,20 @@ tags are disabled.
   <br>7 = 2560x1920
   <br>8 = 3264x2176</span></td></tr>
 <tr>
-<td class='r'>5</td>
+<td class=r>5</td>
 <td>MinoltaQuality</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Raw
+<td class=c>int32u</td>
+<td><span class=s>0 = Raw
   <br>1 = Super Fine
   <br>2 = Fine
   <br>3 = Standard
   <br>4 = Economy
   <br>5 = Extra Fine</span></td></tr>
-<tr class='b'>
-<td class='r'>6</td>
+<tr class=b>
+<td class=r>6</td>
 <td>DriveMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Single
+<td class=c>int32u</td>
+<td><span class=s>0 = Single
   <br>1 = Continuous
   <br>2 = Self-timer
   <br>4 = Bracketing
@@ -357,166 +357,166 @@ tags are disabled.
   <br>6 = UHS continuous
   <br>7 = HS continuous</span></td></tr>
 <tr>
-<td class='r'>7</td>
+<td class=r>7</td>
 <td>MeteringMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Multi-segment
+<td class=c>int32u</td>
+<td><span class=s>0 = Multi-segment
   <br>1 = Center weighted
   <br>2 = Spot</span></td></tr>
-<tr class='b'>
-<td class='r'>8</td>
+<tr class=b>
+<td class=r>8</td>
 <td>ISO</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>9</td>
+<td class=r>9</td>
 <td>ExposureTime</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>10</td>
+<tr class=b>
+<td class=r>10</td>
 <td>FNumber</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>11</td>
+<td class=r>11</td>
 <td>MacroMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Off
+<td class=c>int32u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class='b'>
-<td class='r'>12</td>
+<tr class=b>
+<td class=r>12</td>
 <td>DigitalZoom</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Off
+<td class=c>int32u</td>
+<td><span class=s>0 = Off
   <br>1 = Electronic magnification
   <br>2 = 2x</span></td></tr>
 <tr>
-<td class='r'>13</td>
+<td class=r>13</td>
 <td>ExposureCompensation</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>14</td>
+<tr class=b>
+<td class=r>14</td>
 <td>BracketStep</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = 1/3 EV
+<td class=c>int32u</td>
+<td><span class=s>0 = 1/3 EV
   <br>1 = 2/3 EV
   <br>2 = 1 EV</span></td></tr>
 <tr>
-<td class='r'>16</td>
+<td class=r>16</td>
 <td>IntervalLength</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>17</td>
+<tr class=b>
+<td class=r>17</td>
 <td>IntervalNumber</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>18</td>
+<td class=r>18</td>
 <td>FocalLength</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>19</td>
+<tr class=b>
+<td class=r>19</td>
 <td>FocusDistance</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>20</td>
+<td class=r>20</td>
 <td>FlashFired</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = No
+<td class=c>int32u</td>
+<td><span class=s>0 = No
   <br>1 = Yes</span></td></tr>
-<tr class='b'>
-<td class='r'>21</td>
+<tr class=b>
+<td class=r>21</td>
 <td>MinoltaDate</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>22</td>
+<td class=r>22</td>
 <td>MinoltaTime</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>23</td>
+<tr class=b>
+<td class=r>23</td>
 <td>MaxAperture</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>26</td>
+<td class=r>26</td>
 <td>FileNumberMemory</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Off
+<td class=c>int32u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class='b'>
-<td class='r'>27</td>
+<tr class=b>
+<td class=r>27</td>
 <td>LastFileNumber</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>28</td>
+<td class=r>28</td>
 <td>ColorBalanceRed</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>29</td>
+<tr class=b>
+<td class=r>29</td>
 <td>ColorBalanceGreen</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>30</td>
+<td class=r>30</td>
 <td>ColorBalanceBlue</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>31</td>
+<tr class=b>
+<td class=r>31</td>
 <td>Saturation</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>32</td>
+<td class=r>32</td>
 <td>Contrast</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>33</td>
+<tr class=b>
+<td class=r>33</td>
 <td>Sharpness</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Hard
+<td class=c>int32u</td>
+<td><span class=s>0 = Hard
   <br>1 = Normal
   <br>2 = Soft</span></td></tr>
 <tr>
-<td class='r'>34</td>
+<td class=r>34</td>
 <td>SubjectProgram</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = None
+<td class=c>int32u</td>
+<td><span class=s>0 = None
   <br>1 = Portrait
   <br>2 = Text
   <br>3 = Night portrait
   <br>4 = Sunset
   <br>5 = Sports action</span></td></tr>
-<tr class='b'>
-<td class='r'>35</td>
+<tr class=b>
+<td class=r>35</td>
 <td>FlashExposureComp</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>36</td>
+<td class=r>36</td>
 <td>ISOSetting</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = 100
+<td class=c>int32u</td>
+<td><span class=s>0 = 100
   <br>1 = 200
   <br>2 = 400
   <br>3 = 800
   <br>4 = Auto
   <br>5 = 64</span></td></tr>
-<tr class='b'>
-<td class='r'>37</td>
+<tr class=b>
+<td class=r>37</td>
 <td>MinoltaModelID</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = DiMAGE 7, X1, X21 or X31
+<td class=c>int32u</td>
+<td><span class=s>0 = DiMAGE 7, X1, X21 or X31
   <br>1 = DiMAGE 5
   <br>2 = DiMAGE S304
   <br>3 = DiMAGE S404
@@ -525,150 +525,150 @@ tags are disabled.
   <br>6 = DiMAGE A1
   <br>7 = DiMAGE A2 or S414</span></td></tr>
 <tr>
-<td class='r'>38</td>
+<td class=r>38</td>
 <td>IntervalMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Still Image
+<td class=c>int32u</td>
+<td><span class=s>0 = Still Image
   <br>1 = Time-lapse Movie</span></td></tr>
-<tr class='b'>
-<td class='r'>39</td>
+<tr class=b>
+<td class=r>39</td>
 <td>FolderName</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Standard Form
+<td class=c>int32u</td>
+<td><span class=s>0 = Standard Form
   <br>1 = Data Form</span></td></tr>
 <tr>
-<td class='r'>40</td>
+<td class=r>40</td>
 <td>ColorMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Natural color
+<td class=c>int32u</td>
+<td><span class=s>0 = Natural color
   <br>1 = Black &amp; White
   <br>2 = Vivid color
   <br>3 = Solarization
   <br>4 = Adobe RGB</span></td></tr>
-<tr class='b'>
-<td class='r'>41</td>
+<tr class=b>
+<td class=r>41</td>
 <td>ColorFilter</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>42</td>
+<td class=r>42</td>
 <td>BWFilter</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>43</td>
+<tr class=b>
+<td class=r>43</td>
 <td>InternalFlash</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = No
+<td class=c>int32u</td>
+<td><span class=s>0 = No
   <br>1 = Fired</span></td></tr>
 <tr>
-<td class='r'>44</td>
+<td class=r>44</td>
 <td>Brightness</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>45</td>
+<tr class=b>
+<td class=r>45</td>
 <td>SpotFocusPointX</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>46</td>
+<td class=r>46</td>
 <td>SpotFocusPointY</td>
-<td class='c'>int32u</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>47</td>
+<tr class=b>
+<td class=r>47</td>
 <td>WideFocusZone</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = No zone
+<td class=c>int32u</td>
+<td><span class=s>0 = No zone
   <br>1 = Center zone (horizontal orientation)
   <br>2 = Center zone (vertical orientation)
   <br>3 = Left zone
   <br>4 = Right zone</span></td></tr>
 <tr>
-<td class='r'>48</td>
+<td class=r>48</td>
 <td>FocusMode</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = AF
+<td class=c>int32u</td>
+<td><span class=s>0 = AF
   <br>1 = MF</span></td></tr>
-<tr class='b'>
-<td class='r'>49</td>
+<tr class=b>
+<td class=r>49</td>
 <td>FocusArea</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Wide Focus (normal)
+<td class=c>int32u</td>
+<td><span class=s>0 = Wide Focus (normal)
   <br>1 = Spot Focus</span></td></tr>
 <tr>
-<td class='r'>50</td>
+<td class=r>50</td>
 <td>DECPosition</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = Exposure
+<td class=c>int32u</td>
+<td><span class=s>0 = Exposure
   <br>1 = Contrast
   <br>2 = Saturation
   <br>3 = Filter</span></td></tr>
-<tr class='b'>
-<td class='r'>51</td>
+<tr class=b>
+<td class=r>51</td>
 <td>ColorProfile</td>
-<td class='c'>int32u</td>
-<td><span class='s'><span class='n'>(DiMAGE 7Hi only)</span>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(DiMAGE 7Hi only)</span>
   <br>0 = Not Embedded
   <br>1 = Embedded</span></td></tr>
 <tr>
-<td class='r'>52</td>
+<td class=r>52</td>
 <td>DataImprint</td>
-<td class='c'>int32u</td>
-<td><span class='s'><span class='n'>(DiMAGE 7Hi only)</span>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(DiMAGE 7Hi only)</span>
   <br>0 = None
   <br>1 = YYYY/MM/DD
   <br>2 = MM/DD/HH:MM
   <br>3 = Text
   <br>4 = Text + ID#</span></td></tr>
-<tr class='b'>
-<td class='r'>63</td>
+<tr class=b>
+<td class=r>63</td>
 <td>FlashMetering</td>
-<td class='c'>int32u</td>
-<td><span class='s'>0 = ADI (Advanced Distance Integration)
+<td class=c>int32u</td>
+<td><span class=s>0 = ADI (Advanced Distance Integration)
   <br>1 = Pre-flash TTl
   <br>2 = Manual flash control</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings7D'>Minolta CameraSettings7D Tags</a></h2>
 <blockquote>
-<table class='frame'><tr><td>
-<table class='inner' cellspacing=1>
-<tr class='h'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class='r'>0</td>
+<td class=r>0</td>
 <td>ExposureMode</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Program
+<td class=c>int16u</td>
+<td><span class=s>0 = Program
   <br>1 = Aperture Priority
   <br>2 = Shutter Priority
   <br>3 = Manual
   <br>4 = Auto?
   <br>5 = Program-shift A
   <br>6 = Program-shift S</span></td></tr>
-<tr class='b'>
-<td class='r'>2</td>
+<tr class=b>
+<td class=r>2</td>
 <td>MinoltaImageSize</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Large
+<td class=c>int16u</td>
+<td><span class=s>0 = Large
   <br>1 = Medium
   <br>2 = Small</span></td></tr>
 <tr>
-<td class='r'>3</td>
+<td class=r>3</td>
 <td>MinoltaQuality</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = RAW
+<td class=c>int16u</td>
+<td><span class=s>0 = RAW
   <br>16 = Fine
   <br>32 = Normal
   <br>34 = RAW+JPEG
   <br>48 = Economy</span></td></tr>
-<tr class='b'>
-<td class='r'>4</td>
+<tr class=b>
+<td class=r>4</td>
 <td>WhiteBalance</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Auto
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
   <br>1 = Daylight
   <br>2 = Shade
   <br>3 = Cloudy
@@ -677,18 +677,18 @@ tags are disabled.
   <br>256 = Kelvin
   <br>512 = Manual</span></td></tr>
 <tr>
-<td class='r'>14</td>
+<td class=r>14</td>
 <td>FocusMode</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Single-shot AF
+<td class=c>int16u</td>
+<td><span class=s>0 = Single-shot AF
   <br>1 = Continuous AF
   <br>3 = Automatic AF
   <br>4 = Manual</span></td></tr>
-<tr class='b'>
-<td class='r'>16</td>
+<tr class=b>
+<td class=r>16</td>
 <td>AFPoints</td>
-<td class='c'>int16u</td>
-<td><span class='s'>Bit 0 = Center
+<td class=c>int16u</td>
+<td><span class=s>Bit 0 = Center
   <br>Bit 1 = Top
   <br>Bit 2 = Top-Right
   <br>Bit 3 = Right
@@ -698,16 +698,16 @@ tags are disabled.
   <br>Bit 7 = Left
   <br>Bit 8 = Top-Left</span></td></tr>
 <tr>
-<td class='r'>21</td>
+<td class=r>21</td>
 <td>Flash</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Off
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class='b'>
-<td class='r'>28</td>
+<tr class=b>
+<td class=r>28</td>
 <td>ISOSetting</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Auto
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
   <br>1 = 100
   <br>3 = 200
   <br>4 = 400
@@ -715,132 +715,132 @@ tags are disabled.
   <br>6 = 1600
   <br>7 = 3200</span></td></tr>
 <tr>
-<td class='r'>30</td>
+<td class=r>30</td>
 <td>ExposureCompensation</td>
-<td class='c'>int16s</td>
+<td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>37</td>
+<tr class=b>
+<td class=r>37</td>
 <td>ColorSpace</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Natural sRGB
+<td class=c>int16u</td>
+<td><span class=s>0 = Natural sRGB
   <br>1 = Natural+ sRGB
   <br>4 = Adobe RGB</span></td></tr>
 <tr>
-<td class='r'>38</td>
+<td class=r>38</td>
 <td>Sharpness</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>39</td>
+<tr class=b>
+<td class=r>39</td>
 <td>Contrast</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>40</td>
+<td class=r>40</td>
 <td>Saturation</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>45</td>
+<tr class=b>
+<td class=r>45</td>
 <td>FreeMemoryCardImages</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>63</td>
+<td class=r>63</td>
 <td>ColorTemperature</td>
-<td class='c'>int16s</td>
+<td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>70</td>
+<tr class=b>
+<td class=r>70</td>
 <td>Rotation</td>
-<td class='c'>int16u</td>
-<td><span class='s'>72 = Horizontal (normal)
+<td class=c>int16u</td>
+<td><span class=s>72 = Horizontal (normal)
   <br>76 = Rotate 90 CW
   <br>82 = Rotate 270 CW</span></td></tr>
 <tr>
-<td class='r'>71</td>
+<td class=r>71</td>
 <td>FNumber</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>72</td>
+<tr class=b>
+<td class=r>72</td>
 <td>ExposureTime</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>74</td>
+<td class=r>74</td>
 <td>FreeMemoryCardImages</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>94</td>
+<tr class=b>
+<td class=r>94</td>
 <td>ImageNumber</td>
-<td class='c'>int16u</td>
-<td><span class='s'><span class='n'>(this information may appear at index 98 (0x62), depending on firmware
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(this information may appear at index 98 (0x62), depending on firmware
 version)</span></span></td></tr>
 <tr>
-<td class='r'>96</td>
+<td class=r>96</td>
 <td>NoiseReduction</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Off
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class='b'>
-<td class='r'>98</td>
+<tr class=b>
+<td class=r>98</td>
 <td>ImageNumber2</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>113</td>
+<td class=r>113</td>
 <td>ImageStabilization</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Off
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class='b'>
-<td class='r'>117</td>
+<tr class=b>
+<td class=r>117</td>
 <td>ZoneMatchingOn</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Off
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings5D'>Minolta CameraSettings5D Tags</a></h2>
 <blockquote>
-<table class='frame'><tr><td>
-<table class='inner' cellspacing=1>
-<tr class='h'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class='r'>10</td>
+<td class=r>10</td>
 <td>ExposureMode</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Program
+<td class=c>int16u</td>
+<td><span class=s>0 = Program
   <br>1 = Aperture Priority
   <br>2 = Shutter Priority
   <br>3 = Manual
   <br>4 = Auto?
   <br>4131 = Connected Copying?</span></td></tr>
-<tr class='b'>
-<td class='r'>12</td>
+<tr class=b>
+<td class=r>12</td>
 <td>MinoltaImageSize</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Large
+<td class=c>int16u</td>
+<td><span class=s>0 = Large
   <br>1 = Medium
   <br>2 = Small</span></td></tr>
 <tr>
-<td class='r'>13</td>
+<td class=r>13</td>
 <td>MinoltaQuality</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = RAW
+<td class=c>int16u</td>
+<td><span class=s>0 = RAW
   <br>16 = Fine
   <br>32 = Normal
   <br>34 = RAW+JPEG
   <br>48 = Economy</span></td></tr>
-<tr class='b'>
-<td class='r'>14</td>
+<tr class=b>
+<td class=r>14</td>
 <td>WhiteBalance</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Auto
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
   <br>1 = Daylight
   <br>2 = Cloudy
   <br>3 = Shade
@@ -850,23 +850,23 @@ version)</span></span></td></tr>
   <br>256 = Kelvin
   <br>512 = Manual</span></td></tr>
 <tr>
-<td class='r'>31</td>
+<td class=r>31</td>
 <td>Flash</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Did not fire
+<td class=c>int16u</td>
+<td><span class=s>0 = Did not fire
   <br>1 = Fired</span></td></tr>
-<tr class='b'>
-<td class='r'>37</td>
+<tr class=b>
+<td class=r>37</td>
 <td>MeteringMode</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Multi-segment
+<td class=c>int16u</td>
+<td><span class=s>0 = Multi-segment
   <br>1 = Center weighted
   <br>2 = Spot</span></td></tr>
 <tr>
-<td class='r'>38</td>
+<td class=r>38</td>
 <td>ISOSetting</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Auto
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
   <br>1 = 100
   <br>3 = 200
   <br>4 = 400
@@ -875,110 +875,110 @@ version)</span></span></td></tr>
   <br>7 = 3200
   <br>8 = 200 (Zone Matching High)
   <br>10 = 80 (Zone Matching Low)</span></td></tr>
-<tr class='b'>
-<td class='r'>48</td>
+<tr class=b>
+<td class=r>48</td>
 <td>Sharpness</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>49</td>
+<td class=r>49</td>
 <td>Contrast</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>50</td>
+<tr class=b>
+<td class=r>50</td>
 <td>Saturation</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>53</td>
+<td class=r>53</td>
 <td>ExposureTime</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>54</td>
+<tr class=b>
+<td class=r>54</td>
 <td>FNumber</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>55</td>
+<td class=r>55</td>
 <td>FreeMemoryCardImages</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>73</td>
+<tr class=b>
+<td class=r>73</td>
 <td>ColorTemperature</td>
-<td class='c'>int16s</td>
+<td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>80</td>
+<td class=r>80</td>
 <td>Rotation</td>
-<td class='c'>int16u</td>
-<td><span class='s'>72 = Horizontal (normal)
+<td class=c>int16u</td>
+<td><span class=s>72 = Horizontal (normal)
   <br>76 = Rotate 90 CW
   <br>82 = Rotate 270 CW</span></td></tr>
-<tr class='b'>
-<td class='r'>83</td>
+<tr class=b>
+<td class=r>83</td>
 <td>ExposureCompensation</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>84</td>
+<td class=r>84</td>
 <td>FreeMemoryCardImages</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>110</td>
+<tr class=b>
+<td class=r>110</td>
 <td>ColorTemperature</td>
-<td class='c'>int16s</td>
+<td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>174</td>
+<td class=r>174</td>
 <td>ImageNumber</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>176</td>
+<tr class=b>
+<td class=r>176</td>
 <td>NoiseReduction</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Off
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr>
-<td class='r'>189</td>
+<td class=r>189</td>
 <td>ImageStabilization</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Off
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettingsA100'>Minolta CameraSettingsA100 Tags</a></h2>
-Camera settings information for the Sony DSLR-A100.
+<p>Camera settings information for the Sony DSLR-A100.</p>
 <blockquote>
-<table class='frame'><tr><td>
-<table class='inner' cellspacing=1>
-<tr class='h'><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class='n'>Notes</span></th></tr>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class='r'>0</td>
+<td class=r>0</td>
 <td>ExposureMode</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0x0 = Program
+<td class=c>int16u</td>
+<td><span class=s>0x0 = Program
   <br>0x1 = Aperture Priority
   <br>0x2 = Shutter Priority
   <br>0x3 = Manual
   <br>0x4 = Auto
   <br>0x1013 = Portrait
   <br>0x1053 = Landscape</span></td></tr>
-<tr class='b'>
-<td class='r'>1</td>
+<tr class=b>
+<td class=r>1</td>
 <td>ExposureCompensation</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>11</td>
+<td class=r>11</td>
 <td>WhiteBalance</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0x0 = Auto
+<td class=c>int16u</td>
+<td><span class=s>0x0 = Auto
   <br>0x1 = Daylight
   <br>0x2 = Cloudy
   <br>0x3 = Shade
@@ -987,11 +987,11 @@ Camera settings information for the Sony DSLR-A100.
   <br>0x6 = Flash
   <br>0x100 = Kelvin
   <br>0x200 = Manual</span></td></tr>
-<tr class='b'>
-<td class='r'>22</td>
+<tr class=b>
+<td class=r>22</td>
 <td>ColorMode</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Standard
+<td class=c>int16u</td>
+<td><span class=s>0 = Standard
   <br>1 = Vivid
   <br>2 = Portrait
   <br>3 = Landscape
@@ -1000,59 +1000,59 @@ Camera settings information for the Sony DSLR-A100.
   <br>7 = B&amp;W
   <br>8 = Adobe RGB</span></td></tr>
 <tr>
-<td class='r'>24</td>
+<td class=r>24</td>
 <td>Sharpness</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>25</td>
+<tr class=b>
+<td class=r>25</td>
 <td>Contrast</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class='r'>26</td>
+<td class=r>26</td>
 <td>Saturation</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>30</td>
+<tr class=b>
+<td class=r>30</td>
 <td>DriveMode</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Single Frame
+<td class=c>int16u</td>
+<td><span class=s>0 = Single Frame
   <br>1 = Continuous
   <br>2 = Self-Timer
   <br>3 = Continuous Bracketing
   <br>4 = Single-Frame Bracketing
   <br>5 = White Balance Bracketing</span></td></tr>
 <tr>
-<td class='r'>63</td>
+<td class=r>63</td>
 <td>NoiseReduction</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = Off
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class='b'>
-<td class='r'>90</td>
+<tr class=b>
+<td class=r>90</td>
 <td>Rotation</td>
-<td class='c'>int16u</td>
-<td><span class='s'>0 = 0
+<td class=c>int16u</td>
+<td><span class=s>0 = 0
   <br>1 = 270
   <br>2 = 90</span></td></tr>
 <tr>
-<td class='r'>94</td>
+<td class=r>94</td>
 <td>ColorTemperature</td>
-<td class='c'>int16u</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class='b'>
-<td class='r'>135</td>
+<tr class=b>
+<td class=r>135</td>
 <td>ImageStabilization</td>
-<td class='c'>int32u[0.5]</td>
-<td><span class='s'>0 = Off
+<td class=c>int32u[0.5]</td>
+<td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
 <br><i>Last revised Nov 17, 2006</i>
-<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>
+<p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

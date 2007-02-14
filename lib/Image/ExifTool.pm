@@ -8,7 +8,7 @@
 # Revisions:    Nov. 12/03 - P. Harvey Created
 #               (See html/history.html for revision history)
 #
-# Legal:        Copyright (c) 2003-2006 Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old
             $myAPP5hdr @loadAllTables %UserDefined);
 
-$VERSION = '6.66';
+$VERSION = '6.75';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -80,6 +80,7 @@ sub DecodeBits($$);
 sub EncodeBits($$);
 sub HexDump($;$%);
 sub DumpTrailer($$);
+sub DumpUnknownTrailer($$);
 sub VerboseInfo($$$%);
 sub VerboseDir($$;$$);
 sub VPrint($$@);
@@ -102,7 +103,7 @@ sub WriteTIFF($$$);
     Jpeg2000 BMP BMP PICT PNG MNG MIFF PDF PostScript Photoshop::Header
     Panasonic::Raw Sony::SR2SubIFD ID3 Vorbis FLAC APE APE::NewHeader
     APE::OldHeader MPC MPEG::Audio MPEG::Video QuickTime QuickTime::ImageFile
-    Flash Real::Media Real::Audio Real::Metafile RIFF AIFF ASF DICOM MIE
+    Flash Real::Media Real::Audio Real::Metafile RIFF AIFF ASF DICOM MIE HTML
 );
 
 # recognized file types, in the order we test unknown files
@@ -110,7 +111,7 @@ sub WriteTIFF($$$);
 # 2) Put types with no file signature at end of list to avoid false matches
 @fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIE MIFF PS PDF PSD XMP
                 BMP PPM RIFF AIFF ASF MOV MPEG Real SWF OGG FLAC APE MPC ICC
-                VRD QTIF FPX PICT MP3 DICM RAW);
+                HTML VRD QTIF FPX PICT MP3 DICM RAW);
 
 # file types that we can write (edit)
 my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF PNG MIE PSD XMP PPM EPS PS ICC
@@ -140,12 +141,15 @@ my %fileTypeLookup = (
     DIC  => ['DICM', 'DICOM image file'],
     DICM => ['DICM', 'DICOM image file'],
     DNG  => ['TIFF', 'Digital Negative (TIFF-like)'],
+    DOC  => ['FPX',  'Microsoft Word Document (FPX-like)'],
     EPS  => ['EPS',  'Encapsulated PostScript Format'],
     EPSF => ['EPS',  'Encapsulated PostScript Format'],
     ERF  => ['TIFF', 'Epson Raw Format (TIFF-like)'],
     FLAC => ['FLAC', 'Free Lossless Audio Codec'],
     FPX  => ['FPX',  'FlashPix'],
     GIF  => ['GIF',  'Compuserve Graphics Interchange Format'],
+    HTM  => ['HTML', 'HyperText Markup Language'],
+    HTML => ['HTML', 'HyperText Markup Language'],
     ICC  => ['ICC',  'International Color Consortium'],
     ICM  => ['ICC',  'International Color Consortium'],
     JNG  => ['PNG',  'JPG Network Graphics (PNG-like)'],
@@ -177,6 +181,7 @@ my %fileTypeLookup = (
     PICT => ['PICT', 'Apple PICTure'],
     PNG  => ['PNG',  'Portable Network Graphics'],
     PPM  => ['PPM',  'Portable Pixel Map'],
+    PPT  => ['FPX',  'Microsoft PowerPoint presentation (FPX-like)'],
     PS   => ['PS',   'PostScript'],
     PSD  => ['PSD',  'PhotoShop Drawing'],
     QIF  => ['QTIF', 'QuickTime Image File'],
@@ -205,6 +210,8 @@ my %fileTypeLookup = (
     WMA  => ['ASF',  'Windows Media Audio (ASF-based)'],
     WMV  => ['ASF',  'Windows Media Video (ASF-based)'],
     X3F  => ['X3F',  'Sigma RAW format'],
+    XHTML=> ['HTML', 'Extensible HyperText Markup Language'],
+    XLS  => ['FPX',  'Microsoft Excel worksheet (FPX-like)'],
     XMP  => ['XMP',  'Extensible Metadata Platform data file'],
 );
 
@@ -223,9 +230,11 @@ my %mimeType = (
     ERF  => 'image/x-raw',
     DICM => 'application/dicom',
     DNG  => 'image/x-raw',
+    DOC  => 'application/msword',
     FLAC => 'audio/flac',
     FPX  => 'image/vnd.fpx',
     GIF  => 'image/gif',
+    HTML => 'text/html',
     JNG  => 'image/jng',
     JP2  => 'image/jpeg2000',
     JPEG => 'image/jpeg',
@@ -250,6 +259,7 @@ my %mimeType = (
     PICT => 'image/pict',
     PNG  => 'image/png',
     PPM  => 'image/x-portable-pixmap',
+    PPT  => 'application/vnd.ms-powerpoint',
     PS   => 'application/postscript',
     PSD  => 'application/photoshop',
     QTIF => 'image/x-quicktime',
@@ -270,6 +280,7 @@ my %mimeType = (
     WMA  => 'audio/x-ms-wma',
     WMV  => 'video/x-ms-wmv',
     X3F  => 'image/x-raw',
+    XLS  => 'application/vnd.ms-excel',
     XMP  => 'application/rdf+xml',
 );
 
@@ -505,6 +516,7 @@ sub new
 
     $self->ClearOptions();      # create default options hash
     $self->{VALUE} = { };       # must initialize this for warning messages
+    $self->{DEL_GROUP} = { };   # list of groups to delete when writing
 
     # initialize our new groups for writing
     $self->SetNewGroups(@defaultWriteGroups);
@@ -657,10 +669,18 @@ sub ExtractInfo($;@)
                 my $name = $filename;
                 # extract file name from pipe if necessary
                 $name =~ /\|$/ and $name =~ s/.*?"(.*)".*/$1/;
-                $name =~ s/(.*)\///;  # remove path
-                my $dir = $1;
+                my $dir;
+                if (eval 'require File::Basename') {
+                    $dir = File::Basename::dirname($name);
+                    $name = File::Basename::basename($name);
+                } else {
+                    $name =~ tr/\\/\//;
+                    if ($name =~ s/(.*)\///) {  # remove path
+                        $dir = length($1) ? $1 : '/';
+                    }
+                }
                 $self->FoundTag('FileName', $name);
-                $self->FoundTag('Directory', $dir) if $dir;
+                $self->FoundTag('Directory', $dir) if defined $dir and length $dir;
             }
             # open the file
             if (open(EXIFTOOL_FILE,$filename)) {
@@ -716,7 +736,7 @@ sub ExtractInfo($;@)
                     # must be a format error since we couldn't read it, otherwise
                     # it is likely we don't support images of this type
                     $self->Error(GetFileType($filename) ?
-                        'Image format error' : 'Unknown image type');
+                        'File format error' : 'Unknown file type');
                     last;   # all done
                 }
                 # last ditch effort to scan past unknown header for JPEG/TIFF
@@ -1843,11 +1863,19 @@ sub ExpandShortcuts($)
 
 #------------------------------------------------------------------------------
 # Add hash of composite tags to our composites
-# Inputs: 0) hash reference to table of composite tags to add, 1) overwrite existing tag
+# Inputs: 0) hash reference to table of composite tags to add or module name,
+#         1) overwrite existing tag
 sub AddCompositeTags($;$)
 {
     local $_;
     my ($add, $overwrite) = @_;
+    my $module;
+    unless (ref $add) {
+        $module = $add;
+        $add .= '::Composite';
+        no strict 'refs';
+        $add = \%$add;
+    }
     my $defaultGroups = $$add{GROUPS};
 
     # make sure default groups are defined in families 0 and 1
@@ -1865,6 +1893,7 @@ sub AddCompositeTags($;$)
         my $tagInfo = $$add{$tagID};
         # tagID's MUST be the exact tag name for logic in BuildCompositeTags()
         my $tag = $$tagInfo{Name};
+        $$tagInfo{Module} = $module if $$tagInfo{Writable};
         # allow composite tags with the same name
         my ($t, $n);
         while ($Image::ExifTool::Composite{$tag} and not $overwrite) {
@@ -1872,6 +1901,7 @@ sub AddCompositeTags($;$)
             $tag = "${t}_$n";
         }
         # add this composite tag to our main composite table
+        $$tagInfo{Table} = \%Image::ExifTool::Composite;
         $Image::ExifTool::Composite{$tag} = $tagInfo;
         # set all default groups in tag
         my $groups = $$tagInfo{Groups};
@@ -2222,9 +2252,8 @@ sub ReadValue($$$$$)
         $len = 1;
     }
     unless ($count) {
-        return '' if defined $count;
+        return '' if defined $count or $size < $len;
         $count = int($size / $len);
-        return '' unless $count;
     }
     # make sure entry is inside data
     if ($len * $count > $size) {
@@ -2313,6 +2342,8 @@ sub MakeDescription($;$)
     $desc =~ s/([A-Z])([A-Z][a-z])/$1 $2/g;
     # put spaces after numbers (if more than one character following number)
     $desc =~ s/(\d)([A-Z]\S)/$1 $2/g;
+    # remove space in hex number
+    $desc =~ s/ 0x ([\dA-Fa-f])/ 0x$1/g;
     $desc .= ' ' . $tagID if defined $tagID;
     return $desc;
 }
@@ -2488,7 +2519,7 @@ sub ProcessJPEG($$)
     return 0 unless $raf->Read($s, 2) == 2 and $s eq "\xff\xd8";
     $dumpParms{MaxLen} = 128 if $verbose < 4;
     $self->SetFileType();   # set FileType tag
-    $self->HtmlDump(0, 2, 'JPEG header','SOI Marker');
+    $self->HtmlDump(0, 2, 'JPEG header', 'SOI Marker');
 
     # set input record separator to 0xff (the JPEG marker) to make reading quicker
     my $oldsep = $/;
@@ -2556,23 +2587,17 @@ sub ProcessJPEG($$)
             $self->FoundTag('ImageHeight', $h);
             next;
         } elsif ($marker == 0xd9) {         # EOI
-            if ($verbose) {
-                print $out "JPEG EOI\n";
-                unless ($htmlDump and not $trailInfo) {
-                    $self->DumpTrailer({RAF => $raf, DirName => 'JPEG'});
-                }
-            }
+            $verbose and print $out "JPEG EOI\n";
+            my $pos = $raf->Tell();
             if ($htmlDump and $dumpEnd) {
-                my $pos = $raf->Tell() - 2;
-                $self->HtmlDump($dumpEnd, $pos-$dumpEnd, '[JPEG Image Data]', undef, 0x08);
-                $self->HtmlDump($pos, 2, 'JPEG EOI', undef);
+                $self->HtmlDump($dumpEnd, $pos-2-$dumpEnd, '[JPEG Image Data]', undef, 0x08);
+                $self->HtmlDump($pos-2, 2, 'JPEG EOI', undef);
                 $dumpEnd = 0;
             }
             $success = 1;
             # we are here because we are looking for trailer information
             if ($wantPreview and $self->{VALUE}->{PreviewImageStart}) {
                 my $buff;
-                my $pos = $raf->Tell();
                 # most previews start right after the JPEG EOI, but the Olympus E-20
                 # preview is 508 bytes into the trailer, and the K-M Maxxum 7D preview
                 # is 979 bytes in, but Minolta previews can have a random first byte...
@@ -2591,10 +2616,23 @@ sub ProcessJPEG($$)
             }
             # process trailer now or finish processing trailers
             # and scan for AFCP if necessary
+            my $fromEnd = 0;
             if ($trailInfo) {
                 $$trailInfo{ScanForAFCP} = 1;   # scan now if necessary
                 $self->ProcessTrailers($trailInfo);
+                # save offset from end of file to start of first trailer
+                $fromEnd = $$trailInfo{Offset};
                 undef $trailInfo;
+            }
+            # finally, dump remaining information in JPEG trailer
+            if ($verbose or $htmlDump) {
+                $raf->Seek(0, 2);
+                my $endPos = $raf->Tell() - $fromEnd;
+                $self->DumpUnknownTrailer({
+                    RAF => $raf,
+                    DataPos => $pos,
+                    DirLen => $endPos - $pos
+                }) if $endPos > $pos;
             }
             last;       # all done parsing file
         } elsif ($marker == 0xda) {         # SOS
@@ -2682,9 +2720,9 @@ sub ProcessJPEG($$)
                 );
                 if ($htmlDump) {
                     $self->HtmlDump($segPos-4, 4, 'APP1 header',
-                             "APP1 Header\\nData size: $length bytes");
-                    $self->HtmlDump($segPos, $hdrLen, "Exif header",
-                             'APP1 Identifier\nData type: Exif');
+                             "Data size: $length bytes");
+                    $self->HtmlDump($segPos, $hdrLen, 'Exif header',
+                             'APP1 data type: Exif');
                     $dumpEnd = $segPos + $length;
                     undef $dumpType;    # (already dumped)
                 }
@@ -2904,8 +2942,7 @@ sub ProcessJPEG($$)
         }
         if ($htmlDump and defined $dumpType) {
             my $desc = $markerName . ($dumpType ? " $dumpType" : '') . ' segment';
-            $self->HtmlDump($segPos-4, $length+4, $desc,
-                            "$desc\\nSize: " . ($length + 4) . ' bytes', 0x08);
+            $self->HtmlDump($segPos-4, $length+4, $desc, undef, 0x08);
             $dumpEnd = $segPos + $length;
         }
         undef $$segDataPt;
@@ -2973,9 +3010,8 @@ sub ProcessTIFF($$;$)
 
     if ($self->{HTML_DUMP}) {
         my $o = (GetByteOrder() eq 'II') ? 'Little' : 'Big';
-        $self->HtmlDump($base, 4, "TIFF header", "TIFF Header\\nByte order: $o endian", 0);
-        $self->HtmlDump($base+4, 4, "IFD0 pointer",
-                 sprintf("IFD0 offset: 0x%.4x",$offset), 0);
+        $self->HtmlDump($base, 4, "TIFF header", "Byte order: $o endian", 0);
+        $self->HtmlDump($base+4, 4, "IFD0 pointer", sprintf("Offset: 0x%.4x",$offset), 0);
     }
     if ($raf) {
         # Canon CR2 images usually have an offset of 16, but it may be
@@ -3107,7 +3143,7 @@ sub ProcessTIFF($$;$)
             $buf eq "\0" and --$extra, ++$self->{TIFF_END};
         }
         if ($extra > 0) {
-            if ($self->{DEL_GROUP} and $self->{DEL_GROUP}->{Trailer}) {
+            if ($self->{DEL_GROUP}->{Trailer}) {
                 $self->VPrint(0, "  Deleting trailer ($extra bytes)\n");
                 ++$self->{CHANGED};
             } else {

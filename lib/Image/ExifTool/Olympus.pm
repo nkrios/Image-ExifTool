@@ -25,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -637,7 +637,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'BodyFirmwareVersion',
         Writable => 'int32u',
         PrintConv => '$val=sprintf("%x",$val);$val=~s/(.{3})$/\.$1/;$val',
-        PrintConvInv => '$val=~s/\.//;hex($val)',
+        PrintConvInv => '$val=sprintf("%.3f",$val);$val=~s/\.//;hex($val)',
     },
     0x201 => { #6
         Name => 'LensType',
@@ -664,7 +664,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'LensFirmwareVersion',
         Writable => 'int32u',
         PrintConv => '$val=sprintf("%x",$val);$val=~s/(.{3})$/\.$1/;$val',
-        PrintConvInv => '$val=~s/\.//;hex($val)',
+        PrintConvInv => '$val=sprintf("%.3f",$val);$val=~s/\.//;hex($val)',
     },
     0x206 => { #5
         Name => 'MaxApertureAtMaxFocal',
@@ -710,7 +710,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ExtenderFirmwareVersion',
         Writable => 'int32u',
         PrintConv => '$val=sprintf("%x",$val);$val=~s/(.{3})$/\.$1/;$val',
-        PrintConvInv => '$val=~s/\.//;hex($val)',
+        PrintConvInv => '$val=sprintf("%.3f",$val);$val=~s/\.//;hex($val)',
     },
     0x1000 => { #6
         Name => 'FlashType',
@@ -737,7 +737,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'FlashFirmwareVersion',
         Writable => 'int32u',
         PrintConv => '$val=sprintf("%x",$val);$val=~s/(.{3})$/\.$1/;$val',
-        PrintConvInv => '$val=~s/\.//;hex($val)',
+        PrintConvInv => '$val=sprintf("%.3f",$val);$val=~s/\.//;hex($val)',
     },
     0x1003 => { #4
         Name => 'FlashSerialNumber',
@@ -1457,7 +1457,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Olympus::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Olympus');
 
 
 #------------------------------------------------------------------------------
@@ -1607,7 +1607,7 @@ Olympus or Epson maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

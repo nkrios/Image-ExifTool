@@ -834,7 +834,7 @@ experimental, and is only enabled with the Verbose or Unknown options.
             Format => 'LongComment',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::ICC_Profile::Main',
-                Start => '$valuePt + 4',
+                Start => '$valuePtr + 4',
             },
         },
     ],
@@ -1236,7 +1236,7 @@ Verbose or the Unknown option.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

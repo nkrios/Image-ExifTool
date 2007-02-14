@@ -28,6 +28,7 @@
 #              14) http://homepage3.nifty.com/kamisaka/makernote/makernote_nikon.htm
 #              15) http://tomtia.plala.jp/DigitalCamera/MakerNote/index.asp
 #              16) Jeffrey Friedl private communication (D200 with firmware update)
+#              17) http://www.wohlberg.net/public/software/photo/nstiffexif/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -37,7 +38,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.57';
+$VERSION = '1.61';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -165,6 +166,7 @@ my %nikonLensIDs = (
     '26 40 27 3F 2C 34 1C 02' => 'Sigma 15-30mm F3.5-4.5 EX Aspherical DG DF',
     '48 48 2B 44 24 30 4B 06' => 'Sigma 17-35mm F2.8-4 EX DG  Aspherical HSM',
     '26 54 2B 44 24 30 1C 02' => 'Sigma 17-35mm F2.8-4 EX ASPHERICAL',
+    '7F 48 2B 5C 24 34 1C 06' => 'Sigma 17-70mm F2.8-4.5 DC MACRO Asp. IF',
     '26 48 2D 50 24 24 1C 06' => 'Sigma 18-50mm F2.8 EX DC',
     '26 40 2D 50 2C 3C 1C 06' => 'Sigma 18-50mm F3.5-5.6 DC',
     '26 40 2D 70 2B 3C 1C 06' => 'Sigma 18-125mm F3.5-5.6 DC',
@@ -174,6 +176,7 @@ my %nikonLensIDs = (
     '02 46 37 37 25 25 02 00' => 'Sigma 24mm F2.8 Macro',
     '26 48 37 56 24 24 1C 02' => 'Sigma 24-60mm F2.8 EX DG',
     '26 54 37 5C 24 24 1C 02' => 'Sigma 24-70mm F2.8 EX DG Macro',
+    '67 54 37 5C 24 24 1C 02' => 'Sigma 24-70mm F2.8 EX DG Macro',
     '26 40 37 5C 2C 3C 1C 02' => 'Sigma 24-70mm F3.5-5.6 ASPHERICAL HF',
     '26 54 37 73 24 34 1C 02' => 'Sigma 24-135mm F2.8-4.5',
     '26 58 3C 3C 14 14 1C 02' => 'Sigma 28mm F1.8 EX DG DF',
@@ -194,18 +197,21 @@ my %nikonLensIDs = (
     '48 3C 50 A0 30 40 4B 02' => 'Sigma 50-500mm F4-6.3 EX APO RF HSM',
     '26 3C 54 80 30 3C 1C 06' => 'Sigma 55-200mm F4-5.6 DC',
     '48 54 5C 80 24 24 4B 02' => 'Sigma 70-200mm F2.8 EX APO IF HSM',
+    '26 3C 5C 82 30 3C 1C 02' => 'Sigma 70-210mm F4-5.6 UC-II',
     '26 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 DG MACRO',
     '56 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 APO Macro Super II',
     '02 37 5E 8E 35 3D 02 00' => 'Sigma 75-300mm F4.5-5.6 APO',
     '02 48 65 65 24 24 02 00' => 'Sigma 90mm F2.8 Macro',
     '77 44 61 98 34 3C 7B 0E' => 'Sigma 80-400mm f4.5-5.6 EX OS',
     '48 48 68 8E 30 30 4B 02' => 'Sigma 100-300mm F4 EX IF HSM',
+    '48 54 6F 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM',
     '26 44 73 98 34 3C 1C 02' => 'Sigma 135-400mm F4.5-5.6 APO Aspherical',
     '48 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM',
     '26 40 7B A0 34 40 1C 02' => 'Sigma APO 170-500mm F5-6.3 ASPHERICAL RF',
     '48 4C 7D 7D 2C 2C 4B 02' => 'Sigma APO MACRO 180mm F3.5 EX DG HSM',
     '48 54 8E 8E 24 24 4B 02' => 'Sigma APO 300mm F2.8 EX DG HSM',
     '26 48 8E 8E 30 30 1C 02' => 'Sigma APO TELE MACRO 300mm F4',
+    '48 3C 8E B0 3C 3C 4B 02' => 'Sigma APO 300-800 F5.6 EX DG HSM',
     '02 2F 98 98 3D 3D 02 00' => 'Sigma 400mm F5.6 APO',
 #
     '03 43 5C 81 35 35 02 00' => 'Soligor AF C/D ZOOM UMCS 70-210mm 1:4.5',
@@ -218,13 +224,14 @@ my %nikonLensIDs = (
     '00 48 50 72 24 24 00 06' => 'Tokina AT-X 535 PRO DX - AF 50-135mm F2.8',
     '14 54 60 80 24 24 0B 00' => 'Tokina AT-X 828 AF 80-200mm F2.8',
     '24 44 60 98 34 3C 1A 02' => 'Tokina AT-X 840 AF II 80-400mm F4.5-5.6',
+    '00 44 60 98 34 3C 00 02' => 'Tokina AT-X 840D 80-400mm F4.5-5.6', #PH
     '00 54 68 68 24 24 00 02' => 'Tokina AT-X M100 PRO D - 100mm F2.8',
     '14 48 68 8E 30 30 0B 00' => 'Tokina AT-X 340 AF II 100-300mm F4',
     '00 54 8E 8E 24 24 00 02' => 'Tokina AT-X 300 AF PRO 300mm F2.8',
-    '00 44 60 98 34 3C 00 02' => 'Tokina AT-X 840D 80-400mm F4.5-5.6', #PH
 #
     '00 36 1C 2D 34 3C 00 06' => 'Tamron SP AF11-18mm f/4.5-5.6 Di II LD Aspherical (IF)',
     '07 46 2B 44 24 30 03 02' => 'Tamron SP AF17-35mm f/2.8-4 Di LD Aspherical (IF)',
+    '00 53 2B 50 24 24 00 06' => 'Tamron SP AF17-50mm F2.8 (A16)', #PH
     '00 3F 2D 80 2B 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)',
     '00 3F 2D 80 2C 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro',
     '07 40 30 45 2D 35 03 02' => 'Tamron AF19-35mm f/3.5-4.5',
@@ -244,7 +251,6 @@ my %nikonLensIDs = (
     '20 3C 80 98 3D 3D 1E 02' => 'Tamron AF200-400mm f/5.6 LD IF',
     '00 3E 80 A0 38 3F 00 02' => 'Tamron SP AF200-500mm f/5-6.3 Di LD (IF)',
     '00 3F 80 A0 38 3F 00 02' => 'Tamron SP AF200-500mm f/5-6.3 Di',
-    '00 53 2B 50 24 24 00 06' => 'Tamron SP AF17-50mm F2.8 (A16)', #PH
 #
     '00 00 00 00 00 00 00 01' => 'Manual Lens No CPU',
     '1E 5D 64 64 20 20 13 00' => 'Unknown 90mm f/2.5',
@@ -542,6 +548,29 @@ my %nikonLensIDs = (
     # LightSource shows 3 values COLORED SPEEDLIGHT NATURAL.
     # (SPEEDLIGHT when flash goes. Have no idea about difference between other two.)
     0x0090 => { Name => 'LightSource',      Writable => 'string' }, #2
+    0x0091 => [
+        {
+            Condition => '$$valPt =~ /^02/',
+            Name => 'Nikon0x0091Encrypted',
+            Writable => 0,
+            Unknown => 1, # no tags known so don't process unless necessary
+            Notes => 'this information is encrypted for versions 02xx',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::Nikon0x0091',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 4,
+            },
+        },
+        {
+            Name => 'Nikon0x0091',
+            Writable => 0,
+            Unknown => 1,
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::Nikon0x0091',
+                DirOffset => 4,
+            },
+        },
+    ],
     0x0092 => { #2
         Name => 'HueAdjustment',
         Writable => 'int16s',
@@ -733,8 +762,83 @@ my %nikonLensIDs = (
             Start => '$valuePtr + 4',
         },
     },
-    # 0x0e10 - unknown (written by Nikon Capture)
+    0x0e10 => { #17
+        Name => 'NikonScanIFD',
+        Groups => { 1 => 'NikonScan', 2 => 'Image' },
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::Scan',
+            Start => '$val',
+        },
+    },
     # 0x0e13 - some sort of edit history written by Nikon Capture
+);
+
+# NikonScan IFD entries (ref 17)
+%Image::ExifTool::Nikon::Scan = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITE_GROUP => 'NikonScan',
+    WRITABLE => 1,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'NikonScan', 2 => 'Image' },
+    NOTES => 'This information is written by the Nikon Scan software.',
+    0x02 => { Name => 'FilmType',    Writable => 'string', },
+    0x40 => { Name => 'MultiSample', Writable => 'string' },
+    0x41 => { Name => 'BitDepth',    Writable => 'int16u' },
+    0x50 => {
+        Name => 'MasterGain',
+        Writable => 'rational64s',
+        PrintConv => 'sprintf("%.2f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x51 => {
+        Name => 'ColorGain',
+        Writable => 'rational64s',
+        Count => 3,
+        PrintConv => 'sprintf("%.2f %.2f %.2f",split(" ",$val))',
+        PrintConvInv => '$val',
+    },
+    0x100 => { Name => 'DigitalICE', Writable => 'string' },
+    0x110 => {
+        Name => 'ROCInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::ROC' },
+    },
+    0x120 => {
+        Name => 'GEMInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::GEM' },
+    },
+);
+
+# ref 17
+%Image::ExifTool::Nikon::ROC = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    FORMAT => 'int32u',
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'NikonScan', 2 => 'Image' },
+    0 => {
+        Name => 'DigitalROC',
+        ValueConv => '$val / 10',
+        ValueConvInv => 'int($val * 10)',
+    },
+);
+
+# ref 17
+%Image::ExifTool::Nikon::GEM = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    FORMAT => 'int32u',
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'NikonScan', 2 => 'Image' },
+    0 => {
+        Name => 'DigitalGEM',
+        ValueConv => '$val<95 ? $val/20-1 : 4',
+        ValueConvInv => '$val == 4 ? 95 : int(($val + 1) * 20)',
+    },
 );
 
 # Nikon AF information (ref 13)
@@ -1054,6 +1158,41 @@ my %nikonFocalConversions = (
     },
 );
 
+# not sure what is in this information, but it is encrypted for some cameras
+%Image::ExifTool::Nikon::Nikon0x0091 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    DATAMEMBER => [ 0 ],
+    0 => {
+        Name => 'Nikon0x0091Version',
+        RawConv => '$$self{Nikon0x0091Version} = $val',
+        Format => 'string[4]',
+    },
+    0x66 => {
+        Name => 'VR_0x66',
+        Condition => '$$self{Nikon0x0091Version} =~ /^(0204)$/',
+        Format => 'int8u',
+        Unknown => 1,
+        PrintConv => {
+            0 => 'VR off',
+            1 => 'VR on (normal)',
+            2 => 'VR on (active)',
+        }
+    },
+    0x82 => {
+        Name => 'VR_0x82',
+        Condition => '$$self{Nikon0x0091Version} =~ /^(0204)$/',
+        Format => 'int8u',
+        Unknown => 1,
+        PrintConv => {
+            0 => 'VR off',
+            1 => 'VR on (normal)',
+            2 => 'code 2 (active?)',
+        }
+    },
+);
+
 # tags in Nikon QuickTime videos (PH - observations with Coolpix S3)
 # (note: very similar to information in Pentax videos)
 %Image::ExifTool::Nikon::MOV = (
@@ -1133,7 +1272,7 @@ my %nikonFocalConversions = (
         PrintConv => '"$prt[0] $prt[1]"',
     },
     LensID => {
-        SeparateTable => 'Nikon',   # print values in a separate table
+        SeparateTable => 'Nikon LensID',    # print values in a separate table
         Require => {
             0 => 'Nikon:LensIDNumber',
             1 => 'LensFStops',
@@ -1151,7 +1290,7 @@ my %nikonFocalConversions = (
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Nikon::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Nikon');
 
 
 #------------------------------------------------------------------------------
@@ -1387,7 +1526,7 @@ Nikon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -1403,6 +1542,8 @@ under the same terms as Perl itself.
 =item L<http://members.aol.com/khancock/pilot/nbuddy/>
 
 =item L<http://www.rottmerhusen.com/objektives/lensid/nikkor.html>
+
+=item L<http://www.wohlberg.net/public/software/photo/nstiffexif/>
 
 =back
 

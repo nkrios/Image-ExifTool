@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
 [File, File, Image]  - File Name: Minolta_4_failed.mrw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:11:17 13:51:57
+[File, File, Time]  - File Modification Date/Time: 2007:01:28 08:40:42
 [File, File, Image]  - File Type: MRW
 [File, File, Image]  - MIME Type: image/x-raw
 [MakerNotes, MinoltaRaw, Camera] 0 - Firmware ID: 27200001
@@ -136,8 +136,8 @@
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 3.9
 [Composite, Composite, Image]  - Shutter Speed: 1/5
-[Composite, Composite, Image]  - Circle Of Confusion: 0.008 mm
+[Composite, Composite, Camera]  - Circle Of Confusion: 0.008 mm
 [Composite, Composite, Image]  - Depth of Field: inf (2.40 m - inf)
 [Composite, Composite, Camera]  - Focal Length: 7.2mm (35mm equivalent: 28.0mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 2.40 m
+[Composite, Composite, Camera]  - Hyperfocal Distance: 2.40 m
 [Composite, Composite, Image]  - Light Value: 5.9

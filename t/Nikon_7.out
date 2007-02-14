@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.69
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
+[File, File, Time]  - File Modification Date/Time: 2007:01:05 12:52:24
 [File, File, Image]  - File Type: NEF
 [File, File, Image]  - MIME Type: image/x-raw
 [EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
@@ -13,7 +13,7 @@
 [EXIF, IFD0, Image] 262 - Photometric Interpretation: RGB
 [EXIF, IFD0, Camera] 271 - Make: NIKON CORPORATION
 [EXIF, IFD0, Camera] 272 - Camera Model Name: NIKON D70
-[EXIF, IFD0, Image] 273 - Strip Offsets: 6136
+[EXIF, IFD0, Image] 273 - Strip Offsets: 6170
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 277 - Samples Per Pixel: 3
 [EXIF, IFD0, Image] 278 - Rows Per Strip: 106
@@ -30,7 +30,7 @@
 [EXIF, SubIFD, Image] 282 - X Resolution: 1
 [EXIF, SubIFD, Image] 283 - Y Resolution: 0
 [EXIF, SubIFD, Image] 296 - Resolution Unit: inches
-[EXIF, SubIFD, Image] 513 - Jpg From Raw Start: 1220
+[EXIF, SubIFD, Image] 513 - Jpg From Raw Start: 1120
 [EXIF, SubIFD, Image] 514 - Jpg From Raw Length: 29
 [EXIF, SubIFD1, Image] 254 - Subfile Type: Full-resolution Image
 [EXIF, SubIFD1, Image] 256 - Image Width: 3040
@@ -38,7 +38,7 @@
 [EXIF, SubIFD1, Image] 258 - Bits Per Sample: 12
 [EXIF, SubIFD1, Image] 259 - Compression: Nikon NEF Compressed
 [EXIF, SubIFD1, Image] 262 - Photometric Interpretation: Color Filter Array
-[EXIF, SubIFD1, Image] 273 - Strip Offsets: 1476
+[EXIF, SubIFD1, Image] 273 - Strip Offsets: 1376
 [EXIF, SubIFD1, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, SubIFD1, Image] 277 - Samples Per Pixel: 1
 [EXIF, SubIFD1, Image] 278 - Rows Per Strip: 2014
@@ -97,7 +97,7 @@
 [MakerNotes, NikonPreview, Image] 282 - X Resolution: 72
 [MakerNotes, NikonPreview, Image] 283 - Y Resolution: 72
 [MakerNotes, NikonPreview, Image] 296 - Resolution Unit: inches
-[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 6058
+[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 5958
 [MakerNotes, NikonPreview, Image] 514 - Preview Image Length: 26
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 200
 [MakerNotes, Nikon, Camera] 25 - Exposure Bracket Value: 0
@@ -201,6 +201,11 @@
 [MakerNotes, Nikon, Camera] 1 - IFD0 Offset: 8
 [MakerNotes, Nikon, Camera] 2 - Preview IFD Offset: 11362
 [MakerNotes, Nikon, Camera] 3 - Sub IFD Offset: 1440
+[MakerNotes, NikonScan, Image] 2 - Film Type: POSITIVE       
+[MakerNotes, NikonScan, Image] 65 - Bit Depth: 8
+[MakerNotes, NikonScan, Image] 80 - Master Gain: 0.00
+[MakerNotes, NikonScan, Image] 81 - Color Gain: 0.00 0.00 0.00
+[MakerNotes, NikonScan, Image] 256 - Digital ICE: Normal
 [ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: NKON
 [ICC_Profile, ICC-header, Image] 8 - Profile Version: 2.2.0
 [ICC_Profile, ICC-header, Image] 12 - Profile Class: Display Device Profile

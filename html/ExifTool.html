@@ -3,34 +3,28 @@
 <html>
 <head>
 <title>Image::ExifTool</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 <style type="text/css">
 <!--
-h1      { margin: 0 0 .5em 0 }
-pre     { padding: 0; margin: 0px 2px }
-table.norm     { border-collapse: collapse;
-                   border: 1px solid gray; }
-table.norm th  { border: 1px solid gray; background: #dddddd }
-table.norm td  { border: 1px solid gray; background: #ffffff;
-                 padding: 2px 4px }
-table.clear td { border: 0 }
-table.box      { padding: .2em; background: #dddddd }
+pre  { padding: 0; margin: 0px 2px }
+ul   { margin-top: 0 }
 -->
 </style>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h1>The Image::ExifTool Perl Library Module</h1>
+<body>
+<h1 class='up'>The Image::ExifTool Perl Library Module</h1>
 
 <h2>Description</h2>
 
-The Image::ExifTool library provides an extensible set of perl modules to read and
-write meta information in a wide variety of image, audio and video files.
+<p>The Image::ExifTool library provides an extensible set of Perl modules to read and
+write meta information in a wide variety of image, audio and video files.</p>
 
 <hr><h2>Index</h2>
 
 <p>The following sections of this document give examples of how to use Image::ExifTool,
-and explain the following individual functions in more detail:
+and explain the following individual functions in more detail:</p>
 
-<p><table><tr><td>
+<table><tr><td>
 <ul>
 <li><a href="#ImageInfo">ImageInfo</a>
 <li><a href="#new">new</a>
@@ -79,15 +73,15 @@ and explain the following individual functions in more detail:
 
 <hr><h2><a name="UsingExifTool">Using ExifTool</a></h2>
 
-The ExifTool module may be used by simply calling the
-<a href="#ImageInfo">ImageInfo</a> function:
+<p>The ExifTool module may be used by simply calling the
+<a href="#ImageInfo">ImageInfo</a> function:</p>
 
 <blockquote><table class='box'><tr><td><pre>
 use Image::ExifTool qw(:Public);
 my $info = <a href="#ImageInfo">ImageInfo</a>('image.jpg');
 </pre></td></tr></table></blockquote>
 
-or in a more object-oriented fashion, by creating an ExifTool object:
+<p>or in a more object-oriented fashion, by creating an ExifTool object:</p>
 
 <blockquote><table class='box'><tr><td><pre>
 use Image::ExifTool qw;
@@ -95,12 +89,12 @@ my $exifTool = <a href="#new">new</a> Image::ExifTool;
 my $info = $exifTool-&gt;<a href="#ImageInfo">ImageInfo</a>('image.jpg');
 </pre></td></tr></table></blockquote>
 
-The object-oriented method allows more flexibility, but is slightly more
-complicated.  You choose the method that you prefer.
+<p>The object-oriented method allows more flexibility, but is slightly more
+complicated.  You choose the method that you prefer.</p>
 
 <p>The $info value returned by <a href="#ImageInfo">ImageInfo</a> in the above
 examples is a reference to a hash containing the tag/value pairs.  Here is a
-simplified example which prints out this information:
+simplified example which prints out this information:</p>
 
 <blockquote><table class='box'><tr><td><pre>
 foreach (keys %$info) {
@@ -108,10 +102,10 @@ foreach (keys %$info) {
 }
 </pre></td></tr></table></blockquote>
 
-See <a href="#ImageInfo">ImageInfo</a> for a more detailed description of the
-info hash entries.
+<p>See <a href="#ImageInfo">ImageInfo</a> for a more detailed description of the
+info hash entries.</p>
 
-<p>And the technique for writing meta information is equally simple:
+<p>And the technique for writing meta information is equally simple:</p>
 
 <blockquote><table class='box'><tr><td><pre>
 use Image::ExifTool;
@@ -122,10 +116,10 @@ $exifTool-&gt;<a href="#WriteInfo">WriteInfo</a>('image.jpg','modified_image.jpg
 
 <hr><h2><a name="Config">Configuration</a></h2>
 
-User-defined tags can be added via the ExifTool configuration file.  See
+<p>User-defined tags can be added via the ExifTool configuration file.  See
 "<a href="config.html">ExifTool_config</a>" in the ExifTool distribution for
 more details. If necessary, the configuration feature can be disabled by setting
-the ExifTool "noConfig" flag before loading Image::ExifTool.  ie)
+the ExifTool "noConfig" flag before loading Image::ExifTool.  ie)</p>
 
 <blockquote><table class='box'><tr><td><pre>
 BEGIN { $Image::ExifTool::noConfig = 1 }
@@ -134,23 +128,23 @@ use Image::ExifTool;
 
 <hr><h2><a name="ImageInfo">ImageInfo</a></h2>
 
-Obtain meta information from image.  This is the one-step function for obtaining
+<p>Obtain meta information from image.  This is the one-step function for obtaining
 meta information from an image.  Internally, <a href="#ImageInfo">ImageInfo</a>
 calls <a href="#ExtractInfo">ExtractInfo</a> to extract data from the image, and
 <a href="#GetInfo">GetInfo</a> and <a href="#GetTagList">GetTagList</a> to
-generate the returned information hash and tag list.
+generate the returned information hash and tag list.</p>
 
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>ImageInfo($;@)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) [optional] ExifTool object reference
-    <br>1) File name, file reference or scalar reference
-    <br>2-N) [optional] list of tag names to find (or tag list reference or
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] ExifTool object reference
+    <br><b>1)</b> File name, file reference or scalar reference
+    <br><b>2-N)</b> [<i>optional</i>] list of tag names to find (or tag list reference or
     options reference, see below)
 </td></tr>
 <tr><td><b>Returns</b></td><td>Reference to hash of tag key/value pairs</td></tr>
 </table></blockquote>
 
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 
 <blockquote>Non object-oriented example showing use of options and returning tag list:
 <table class='box'><tr><td><pre>
@@ -163,7 +157,7 @@ $info = <b>ImageInfo</b>('image.jpg', \@ioTagList, {Sort =&gt; 'Group0'});
 
 <blockquote>Object-oriented example to read from a file that is already open:
 <table class='box'><tr><td><pre>
-my $exifTool = new Image::ExifTool;
+my $exifTool = <a href="#new">new</a> Image::ExifTool;
 
 $info = $exifTool-&gt;<b>ImageInfo</b>(\*FILE_PT, 'Aperture', 'ShutterSpeed', 'ISO');
 </pre></td></tr></table></blockquote>
@@ -185,11 +179,11 @@ my $thumbInfo = <b>ImageInfo</b>($$info{ThumbnailImage});
 my $filename = shift || die "Please specify filename\n";
 my @ioTagList = qw(filename imagesize xmp:creator exif:* -ifd1:*);
 
-$exifTool-&gt;Options(Unknown =&gt; 1, DateFormat =&gt; '%H:%M:%S %a. %b. %e, %Y');
+$exifTool-&gt;<a href="#Options">Options</a>(Unknown =&gt; 1, DateFormat =&gt; '%H:%M:%S %a. %b. %e, %Y');
 $info = $exifTool-&gt;<b>ImageInfo</b>($filename, \@ioTagList);
 </pre></td></tr></table></blockquote>
 
-<b>Function Arguments:</b>
+<p><b>Function Arguments:</b></p>
 
 <p><a href="#ImageInfo">ImageInfo</a> is very flexible about the arguments
 passed to it, and interprets them based on their type.  It may be called with
@@ -198,10 +192,10 @@ file name), a file reference (a reference to the image file) or a SCALAR
 reference (a reference to the image in memory).  Other arguments are optional.
 The order of the arguments is not significant, except that the first SCALAR is
 taken to be the file name unless a file reference or scalar reference comes
-earlier in the argument list.
+earlier in the argument list.</p>
 
 <p>Below is a more detailed explanation of how the <a href="#ImageInfo">ImageInfo</a>
-function arguments are interpreted.
+function arguments are interpreted.</p>
 
 <blockquote><table class='norm'>
 <tr><td valign='top'><b>ExifTool&nbsp;ref</b></td><td>
@@ -215,27 +209,26 @@ Must be the first argument if used.
 The first scalar argument is taken to be the file name unless an earlier
 argument specified the image data via a file reference (file ref) or data
 reference (SCALAR ref).  The remaining scalar arguments are names of tags
-for requested information.  If no tags are specified, all possible
-information is extracted.
-
-<p>Tag names are case-insensitive and may be prefixed by an optional group
-name followed by a colon.  The group name may begin with a family number
-(ie. '1IPTC:Keywords'), to restrict matches to a specific family.  A tag
-name of '*' may be used, thus allowing 'GROUP:*' to represent all tags in a
-specific group, or a group name of '*' may be used, in which case all
-available instances of the specified tag are returned regardless of the
-<a href="#Duplicates">Duplicates</a> setting (ie. '*:WhiteBalance').  And
-finally, a leading '-' indicates tags to be excluded (ie. '-IFD1:*').
-
-<p>Note that keys in the returned information hash and elements of the
+for requested information.  If no tags are specified, all possible information
+is extracted.<br>&nbsp;<br> Tag names are case-insensitive and may be prefixed
+by an optional group name followed by a colon.  The group name may begin with a
+family number (ie. '<code>1IPTC:Keywords</code>'), to restrict matches to a
+specific family.  A tag name of '<code>*</code>' may be used, thus allowing
+'<code>GROUP:*</code>' to represent all tags in a specific group, or a group
+name of '<code>*</code>' may be used, in which case all available instances of
+the specified tag are returned regardless of the <a
+href="#Duplicates">Duplicates</a> setting (ie. '<code>*:WhiteBalance</code>'). 
+And finally, a leading '<code>-</code>' indicates tags to be excluded (ie.
+'<code>-IFD1:*</code>').
+<br>&nbsp;<br>
+Note that keys in the returned information hash and elements of the
 returned tag list are not necessarily the same as these tag names -- group
 names are removed, the case may be changed, and an instance number may be
 added.  For this reason it is best to use either the keys of the returned
 hash or the elements of the tag array when accessing the tag values.
-
-<p>See the <a href="TagNames/index.html">TagNames</a> documentation for a
+<br>&nbsp;<br>
+See the <a href="TagNames/index.html">TagNames</a> documentation for a
 complete list of ExifTool tag names.
-
 </td></tr><tr><td valign='top'><b>File&nbsp;ref</b></td><td>
 A reference to an open image file.  If you use this method (or a SCALAR
 reference) to access information in an image, the FileName and Directory
@@ -258,7 +251,7 @@ options. Options specified as arguments to <a href="#ImageInfo">ImageInfo</a>
 take precedence over <a href="#Options">Options</a> settings.
 </td></tr></table></blockquote>
 
-<b>Return Value:</b>
+<p><b>Return Value:</b></p>
 
 <p><a href="#ImageInfo">ImageInfo</a> returns a reference to a hash of tag
 key/value pairs.  The tag keys are identifiers, which are similar to the tag
@@ -266,7 +259,7 @@ names but may have an embedded instance number if multiple tags with the
 same name were extracted from the image.  Many of the ExifTool functions
 require a tag key as an argument.  Use <a href="#GetTagName">GetTagName</a>
 to get the tag name for a given tag key.  Note that the case of the tag
-names may not be the same as requested.
+names may not be the same as requested.</p>
 
 <p>Values of the returned hash are usually simple scalars, but a scalar
 reference is used to indicate binary data and an array reference may be used
@@ -275,13 +268,13 @@ string if and only if the PrintConv option is enabled and the List option is
 disabled (which are the defaults).  Note that binary values are not
 necessarily extracted unless specifically requested or the Binary option is
 set.  If not extracted the value is a reference to a string of the form
-"Binary data ##### bytes".
+"<code>Binary data ##### bytes</code>".</p>
 
 <p>Here is a simple example to print out the information returned by
 <a href="#ImageInfo">ImageInfo</a>.  It shows how to print out a human-friendly
 output for all returned tag values, and works for either setting of the
 PrintConv option (although binary data will be printed to the console if
-PrintConv is disabled):
+PrintConv is disabled):</p>
 
 <blockquote><table class='box'><tr><td><pre>
 foreach (keys %$info) {
@@ -295,7 +288,7 @@ foreach (keys %$info) {
 }
 </pre></td></tr></table></blockquote>
 
-and gives output like this (PrintConv enabled):
+<p>and gives output like this (PrintConv enabled):</p>
 
 <blockquote><table class='box'><tr><td><pre>
 WhiteBalance             : Auto
@@ -312,10 +305,10 @@ Sharpness                : Soft
 ResolutionUnit           : inches
 </pre></td></tr></table></blockquote>
 
-<b>Notes:</b>
+<p><b>Notes:</b></p>
 
 <p>As well as tags representing information extracted from the image,
-the following tags generated by ExifTool may be returned:
+the following tags generated by ExifTool may be returned:</p>
 
 <blockquote><table class='norm'>
 <tr><td><b>ExifToolVersion</b></td><td>The ExifTool version number</td></tr>
@@ -325,15 +318,15 @@ while extracting information</td></tr>
 </table></blockquote>
 
 <hr><h2><a name="new">new</a></h2>
-Create a new ExifTool object.
-<p><b>Example:</b>
+<p>Create a new ExifTool object.</p>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $exifTool = <b>new</b> Image::ExifTool;
 </pre></td></tr></table></blockquote>
 
-Note that ExifTool uses AUTOLOAD to load non-member methods, so any class
+<p>Note that ExifTool uses AUTOLOAD to load non-member methods, so any class
 using Image::ExifTool as a base class must define an AUTOLOAD which calls
-Image::ExifTool::DoAutoLoad().  ie)
+Image::ExifTool::DoAutoLoad().  ie)</p>
 
 <blockquote><table class='box'><tr><td><pre>
 sub AUTOLOAD
@@ -347,21 +340,21 @@ The following functions require an ExifTool object as the first argument
 </b></center></td></tr></table>
 
 <hr><h2><a name="Options">Options</a></h2>
-Get/set ExifTool options.  This function can be called to set the default
+<p>Get/set ExifTool options.  This function can be called to set the default
 options for an ExifTool object.  Options set this way are in effect for
 all function calls but may be overridden by options passed as arguments
-to a specific function.
+to a specific function.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>Options($$;@)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) Parameter name (see table below)
-    <br>2) [optional] Option value if specified (may be undef to clear option)
-    <br>3-N) [optional] Additional parameter/value pairs
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> Parameter name (see table below)
+    <br><b>2)</b> [<i>optional</i>] Option value if specified (may be undef to clear option)
+    <br><b>3-N)</b> [<i>optional</i>] Additional parameter/value pairs
 </td></tr>
 <tr><td><b>Returns</b></td><td>Previous value of last specified parameter</td></tr>
 </table></blockquote>
 
-<b>Available options:</b>
+<p><b>Available options:</b></p>
 
 <blockquote>
 <table class='norm'>
@@ -394,7 +387,7 @@ to a specific function.
     printing GPS coordinates.  This is a printf format string with specifiers
     for degrees, minutes and seconds in that order, however minutes and seconds
     may be omitted.  The default is equivalent to using a format string of
-    q{%d&nbsp;deg&nbsp;%d'&nbsp;%.2f"}.
+    <code>q{%d&nbsp;deg&nbsp;%d'&nbsp;%.2f"}</code>.
     </td><td align=center>undef</td></tr>
 <tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td>
     <td align=center>undef</td></tr>
@@ -434,7 +427,7 @@ to a specific function.
     defined, the EXIF/TIFF base offset is used.</td>
     <td><table class='clear'>
     <tr><td valign='top' align=right><b>0</b>&nbsp;=</td><td>Absolute offsets</td></tr>
-    <tr><td valign='top' align=right><b>any other #</b>&nbsp;=</td><td>Relative offsets</td></tr>
+    <tr><td valign='top' align=right><b><i>non-zero</i></b>&nbsp;=</td><td>Relative offsets</td></tr>
     <tr><td valign='top' align=right><b>undef</b>&nbsp;=</td><td>EXIF/TIFF offsets</td></tr>
     </table></td><td align=center>undef</td></tr>
 <tr><td>IgnoreMinorErrors</td><td>Causes some minor errors to be ignored.
@@ -487,7 +480,7 @@ to a specific function.
     </table></td><td align=center>0</td></tr>
 </table></blockquote>
 
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 $exifTool-&gt;<b>Options</b>(Exclude =&gt; 'OwnerName');
 </pre></td></tr></table></blockquote>
@@ -497,7 +490,7 @@ $exifTool-&gt;<b>Options</b>(Group0 =&gt; ['EXIF', 'MakerNotes']);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-$exifTool-&gt;<b>Options</b>(Group1 =&gt; '-IFD1');  # ignore IFD1 tags
+$exifTool-&gt;<b>Options</b>(Group1 =&gt; '-IFD1');  <span class='com'># ignore IFD1 tags</span>
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
@@ -513,48 +506,48 @@ my $isVerbose = $exifTool-&gt;<b>Options</b>('Verbose');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="ClearOptions">ClearOptions</a></h2>
-Reset all options to their default values.
+<p>Reset all options to their default values.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>ClearOptions()</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
 </table></blockquote>
 
 <hr><h2><a name="ExtractInfo">ExtractInfo</a></h2>
-Extract all meta information from an image.
+<p>Extract all meta information from an image.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>ExtractInfo($;@)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1-N) Same as <a href="#ImageInfo">ImageInfo</a> except that a list of tag
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1-N)</b> Same as <a href="#ImageInfo">ImageInfo</a> except that a list of tag
     keys is not returned if an ARRAY reference is given.
 </td></tr>
 <tr><td><b>Returns</b></td><td>1 if this was a valid image, 0 otherwise</td></tr>
 </table></blockquote>
-The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:
+<p>The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:</p>
 <blockquote>
 Binary, Composite, DateFormat, Unknown and Verbose.
 </blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 $success = $exifTool-&gt;<b>ExtractInfo</b>('image.jpg', \%options);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetInfo">GetInfo</a></h2>
-<a href="#GetInfo">GetInfo</a> is called to return meta information
+<p><a href="#GetInfo">GetInfo</a> is called to return meta information
 after it has been extracted from the image by a previous call to
 <a href="#ExtractInfo">ExtractInfo</a> or <a href="#ImageInfo">ImageInfo</a>.
 This function may be called repeatedly after a single call to
-<a href="#ExtractInfo">ExtractInfo</a> or <a href="#ImageInfo">ImageInfo</a>.
+<a href="#ExtractInfo">ExtractInfo</a> or <a href="#ImageInfo">ImageInfo</a>.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetInfo($;@)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1-N) Same as <a href="#ImageInfo">ImageInfo</a> except that an image
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1-N)</b> Same as <a href="#ImageInfo">ImageInfo</a> except that an image
     can not be specified
 </td></tr>
 <tr><td><b>Returns</b></td><td>Reference to information hash, the same as with
     <a href="#ImageInfo">ImageInfo</a></td></tr>
 </table></blockquote>
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 $info = $exifTool-&gt;<b>GetInfo</b>('ImageWidth', 'ImageHeight');
 </pre></td></tr></table></blockquote>
@@ -566,172 +559,172 @@ $info = $exifTool-&gt;<b>GetInfo</b>(\@ioTagList);
 <blockquote><table class='box'><tr><td><pre>
 $info = $exifTool-&gt;<b>GetInfo</b>({Group2 =&gt; ['Author', 'Location']});
 </pre></td></tr></table></blockquote>
-The following options are effective in the call to <a href="#GetInfo">GetInfo</a>:
+<p>The following options are effective in the call to <a href="#GetInfo">GetInfo</a>:</p>
 <blockquote>
 Duplicates, Exclude, Group#, PrintConv (and Sort if tag list reference is given).
 </blockquote>
 
 <hr><h2><a name="WriteInfo">WriteInfo</a></h2>
-Write meta information to a file.  The specified source file is rewritten to the
+<p>Write meta information to a file.  The specified source file is rewritten to the
 same-type destination file with new information as specified by previous calls
 to <a href="#SetNewValue">SetNewValue</a>.  The necessary segments and/or
 directories are created in the destination file as required to store the
 specified information.  May be called repeatedly to write the same information
 to additional files without the need to call
-<a href="#SetNewValue">SetNewValue</a> again.
+<a href="#SetNewValue">SetNewValue</a> again.</p>
 
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>WriteInfo($$;$$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) Source file name, file reference, or scalar reference
-    <br>2) [optional] Destination file name, file or scalar reference
-    <br>3) [optional] Destination file type
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> Source file name, file reference, or scalar reference
+    <br><b>2)</b> [<i>optional</i>] Destination file name, file or scalar reference
+    <br><b>3)</b> [<i>optional</i>] Destination file type
 </td></tr>
 <tr><td><b>Returns</b></td><td>1 if file was written OK, 2 if file was written
 but no changes made, 0 on file write error.
 </td></tr>
 </table></blockquote>
-The source file name may be undefined to create a file from scratch
+<p>The source file name may be undefined to create a file from scratch
 (currently only XMP, ICC and MIE files can be created in this way).  If
 undefined, the destination file type is required unless the type can be
-determined from the destination file name.
+determined from the destination file name.</p>
 <p>The destination file name may be undefined to edit a file in place (make
 sure you have backups!).  If a destination file name is given, the specified
 file must not exist because existing destination files will not be
-overwritten.
-<p>The destination file type is only used if the source file is undefined.
-<p><b>Examples:</b>
+overwritten.</p>
+<p>The destination file type is only used if the source file is undefined.</p>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
-# add information to a source file, writing output to new file
+<span class='com'># add information to a source file, writing output to new file</span>
 my $result = $exifTool-&gt;<b>WriteInfo</b>($srcfile, $dstfile);
 
-# create XMP data file from scratch
+<span class='com'># create XMP data file from scratch</span>
 $exifTool-&gt;<b>WriteInfo</b>(undef, $dstfile, 'XMP');
 
-# edit file in place (you do have backups, right?)
+<span class='com'># edit file in place (you do have backups, right?)</span>
 $exifTool-&gt;<b>WriteInfo</b>($srcfile);
 
-# retrieve error and warning messages
-$errorMessage = $exifTool-&gt;GetValue('Error');
-$warningMessage = $exifTool-&gt;GetValue('Warning');
+<span class='com'># retrieve error and warning messages</span>
+$errorMessage = $exifTool-&gt;<a href="#GetValue">GetValue</a>('Error');
+$warningMessage = $exifTool-&gt;<a href="#GetValue">GetValue</a>('Warning');
 </pre></td></tr></table></blockquote>
 <p>If an error code is returned, an Error tag is set and GetValue('Error') can
 be called to obtain the error description.  A Warning tag mag be set even if
-this routine is successful.
+this routine is successful.</p>
 
 <hr><h2><a name="CombineInfo">CombineInfo</a></h2>
-Combine information from more than one information hash into a single hash.
+<p>Combine information from more than one information hash into a single hash.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>CombineInfo($;@)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1-N) List of info hash references
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1-N)</b> List of info hash references
 </td></tr>
 <tr><td><b>Returns</b></td><td>Reference to combined information hash</td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 $info = $exifTool-&gt;<b>CombineInfo</b>($info1, $info2, $info3);
 </pre></td></tr></table></blockquote>
-If the Duplicates option is disabled and duplicate tags exist, the order of
+<p>If the Duplicates option is disabled and duplicate tags exist, the order of
 the hashes is significant.  In this case, the value used is the first value
 found as the hashes are scanned in order of input.  The Duplicates option
-is the only option that is in effect for this function.
+is the only option that is in effect for this function.</p>
 
 <hr><h2><a name="GetTagList">GetTagList</a></h2>
-Get a sorted list of tags from the specified information hash or tag list.
+<p>Get a sorted list of tags from the specified information hash or tag list.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetTagList($;$$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) [optional] Reference to info hash or tag list
-    <br>2) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#')
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> [<i>optional</i>] Reference to info hash or tag list
+    <br><b>2)</b> [<i>optional</i>] Sort order ('File', 'Input', 'Alpha' or 'Group#')
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of tags in specified order</td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 @tags = $exifTool-&gt;<b>GetTagList</b>($info, 'Group0');
 </pre></td></tr></table></blockquote>
-If the information hash or tag list reference is not provided, then the list
+<p>If the information hash or tag list reference is not provided, then the list
 of found tags from the last call to <a href="#ImageInfo">ImageInfo</a>,
 <a href="#ExtractInfo">ExtractInfo</a> or <a href="#GetInfo">GetInfo</a>
 is used instead, and the result is the same as if
 <a href="#GetFoundTags">GetFoundTags</a> was called.  If sort order is not
-specified, the sort order is taken from the current options settings.
+specified, the sort order is taken from the current options settings.</p>
 
 <hr><h2><a name="GetFoundTags">GetFoundTags</a></h2>
-Get list of found tags in specified sort order.  The found tags are the
+<p>Get list of found tags in specified sort order.  The found tags are the
 tags for the information obtained from the most recent call to
 <a href="#ImageInfo">ImageInfo</a>, <a href="#ExtractInfo">ExtractInfo</a>
-or <a href="#GetInfo">GetInfo</a> for this object.
+or <a href="#GetInfo">GetInfo</a> for this object.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetFoundTags($;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#')
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> [<i>optional</i>] Sort order ('File', 'Input', 'Alpha' or 'Group#')
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of tags in specified order</td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my @tags = $exifTool-&gt;<b>GetFoundTags</b>('File');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetRequestedTags">GetRequestedTags</a></h2>
-Get list of requested tags.  These are the tags that were specified
+<p>Get list of requested tags.  These are the tags that were specified
 in the arguments of the most recent call to <a href="#ImageInfo">ImageInfo</a>,
 <a href="#ExtractInfo">ExtractInfo</a> or <a href="#GetInfo">GetInfo</a>,
 including tags specified via a tag list reference.  They are returned
 in the same order that they were specified.  Shortcut tags are expanded
-in the list.
+in the list.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetRequestedTags($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of requested tags (empty if no tags
 specifically requested)</td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my @requestedTags = $exifTool-&gt;<b>GetRequestedTags</b>();
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetValue">GetValue</a></h2>
-Get the value of a specified tag.  The returned value is either the
+<p>Get the value of a specified tag.  The returned value is either the
 human-readable (PrintConv) value, the converted machine-readable (ValueConv)
 value, or the original raw (Raw) value.  If the value type is not specified,
 the PrintConv value is returned if the PrintConv option is set, otherwise the
 ValueConv value is returned.  The PrintConv values are the same as the values
 returned by <a href="#ImageInfo">ImageInfo</a> and <a href="#GetInfo">GetInfo</a>
-in the tag/value hash unless the PrintConv option is disabled.
+in the tag/value hash unless the PrintConv option is disabled.</p>
 <p>Tags which represent lists of multiple values (as may happen with
-'Keywords' for example) are handled specially.  In scalar context, the
-returned PrintConv value for these tags is either a comma-separated string
-of values or a list reference (depending on the List option setting), and
-the ValueConv value is always a list reference.  But in list context,
-<a href="#GetValue">GetValue</a> always returns the list itself.
+'<code>Keywords</code>' for example) are handled specially.  In scalar context,
+the returned PrintConv value for these tags is either a comma-separated string
+of values or a list reference (depending on the List option setting), and the
+ValueConv value is always a list reference.  But in list context,
+<a href="#GetValue">GetValue</a> always returns the list itself.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetValue($$;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) Tag key
-    <br>2) [optional] Value type, 'PrintConv', 'ValueConv', 'Both' or 'Raw'
-    <p>The default value type is 'PrintConv' if the PrintConv option is set,
-    otherwise the default is 'ValueConv'.  A value type of 'Both' returns
-    both ValueConv and PrintConv values as a list.
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> Tag key
+    <br><b>2)</b> [<i>optional</i>] Value type, 'PrintConv', 'ValueConv', 'Both' or 'Raw'
+    <br>&nbsp;<br>The default value type is 'PrintConv' if the PrintConv option
+    is set, otherwise the default is 'ValueConv'.  A value type of 'Both'
+    returns both ValueConv and PrintConv values as a list.
 </td></tr>
 <tr><td><b>Returns</b></td><td>
 The value of the specified tag.  If the tag represents a list of values and
 the List option is disabled then PrintConv returns a comma separated string
 of values, otherwise a reference to the list is returned in scalar context.
 The list itself is returned in list context.  Values may also be scalar
-references to binary data.
-<p>Note: It is possible for <a href="#GetValue">GetValue</a> to return an
+references to binary data.<br>&nbsp;<br>
+Note: It is possible for <a href="#GetValue">GetValue</a> to return an
 undefined ValueConv or PrintConv value (or an empty list in list context)
 even if the tag exists, since it is possible for these conversions to yield
 undefined values.
 </td></tr>
 </table></blockquote>
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
-# PrintConv example
+<span class='com'># PrintConv example</span>
 my $val = $exifTool-&gt;<b>GetValue</b>($tag);
 if (ref $val eq 'SCALAR') {
     print "$tag = (unprintable value)\n";
@@ -739,7 +732,7 @@ if (ref $val eq 'SCALAR') {
     print "$tag = $val\n";
 }
 
-# ValueConv examples
+<span class='com'># ValueConv examples</span>
 my $val = $exifTool-&gt;<b>GetValue</b>($tag, 'ValueConv');
 if (ref $val eq 'ARRAY') {
     print "$tag is a list of values\n";
@@ -753,23 +746,23 @@ my @keywords = $exifTool-&gt;<b>GetValue</b>('Keywords', 'ValueConv');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewValue">SetNewValue</a></h2>
-Set the new value for a tag.  The routine may be called multiple times to set
+<p>Set the new value for a tag.  The routine may be called multiple times to set
 the values of many tags before using <a href="#WriteInfo">WriteInfo</a> to write
-the new values to an image.
-<p>For list-type tags (like Keywords), either call repeatedly with the same tag
-name for each value, or call with a reference to the list of values.
+the new values to an image.</p>
+<p>For list-type tags (like <code>Keywords</code>), either call repeatedly with
+the same tag name for each value, or call with a reference to the list of values.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>SetNewValue($;$$$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
- <br>1) [optional] Tag key or tag name, or undefined to clear all new values.
- A tag name of '*' can be used when deleting tags to delete all tags, or all
- tags in a specified group.  The tag name may be prefixed by group name,
- separated by a colon (ie. 'GROUP:TAG'), which is equivalent to using a
- 'Group' option argument.
- <br>2) [optional] New value for tag.  Undefined to delete tag from file.
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+ <br><b>1)</b> [<i>optional</i>] Tag key or tag name, or undefined to clear all
+ new values. A tag name of '<code>*</code>' can be used when deleting tags to
+ delete all tags, or all tags in a specified group.  The tag name may be
+ prefixed by group name, separated by a colon (ie. '<code>GROUP:TAG</code>'),
+ which is equivalent to using a 'Group' option argument.
+ <br><b>2)</b> [<i>optional</i>] New value for tag.  Undefined to delete tag from file.
      May be a scalar, scalar reference, or list reference to set a list
      of values.
- <br>3-N) [optional] SetNewValue options hash entries (see below).
+ <br><b>3-N)</b> [<i>optional</i>] SetNewValue options hash entries (see below).
 </td></tr>
 <tr><td><b>Returns</b></td><td>Scalar context: The number of tags set, and
 errors are printed to STDERR.
@@ -819,119 +812,129 @@ errors are printed to STDERR.
     <tr><td valign='top' align=right><b>-1</b>&nbsp;=</td><td>Negative shift</td></tr>
     </table></td><td align=center>undef</td></tr>
 </table></blockquote>
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
-# set a new value for a tag (errors go to STDERR)
+<span class='com'># set a new value for a tag (errors go to STDERR)</span>
 $success = $exifTool-&gt;<b>SetNewValue</b>($tag, $value);
 
-# set a new value and capture any error message
+<span class='com'># set a new value and capture any error message</span>
 ($success, $errStr) = $exifTool-&gt;<b>SetNewValue</b>($tag, $value);
 
-# delete information for specified tag if it exists in image
-# (also resets AddValue and DelValue options for this tag)
+<span class='com'># delete information for specified tag if it exists in image
+# (also resets AddValue and DelValue options for this tag)</span>
 $exifTool-&gt;<b>SetNewValue</b>($tag);
 
-# reset all values from previous calls to SetNewValue()
+<span class='com'># reset all values from previous calls to SetNewValue()</span>
 $exifTool-&gt;<b>SetNewValue</b>();
 
-# delete a specific keyword
+<span class='com'># delete a specific keyword</span>
 $exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, DelValue =&gt; 1);
 
-# write a list of keywords
+<span class='com'># write a list of keywords</span>
 $exifTool-&gt;<b>SetNewValue</b>('Keywords', ['word1','word2']);
 
-# add a keyword without replacing existing keywords
+<span class='com'># add a keyword without replacing existing keywords</span>
 $exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; $word, AddValue =&gt; 1);
 
-# set a tag in a specific group
+<span class='com'># set a tag in a specific group</span>
 $exifTool-&gt;<b>SetNewValue</b>(Headline =&gt; $val, Group =&gt; 'XMP');
-$exifTool-&gt;<b>SetNewValue</b>('XMP:Headline' =&gt; $val);  # equivalent
+$exifTool-&gt;<b>SetNewValue</b>('XMP:Headline' =&gt; $val);  <span class='com'># equivalent</span>
 
-# shift original date/time back by 1 hour
+<span class='com'># shift original date/time back by 1 hour</span>
 $exifTool-&gt;<b>SetNewValue</b>(DateTimeOriginal =&gt; '1:00', Shift =&gt; -1);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewValuesFromFile">SetNewValuesFromFile</a></h2>
-A very powerful routine that sets new values for tags from information found
-in a specified file.
+<p>A very powerful routine that sets new values for tags from information found
+in a specified file.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>SetNewValuesFromFile($$;@)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
- <br>1) File name, file reference, or scalar reference
- <br>2-N) [optional] List of tag names to set.  All writable tags are set if
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+ <br><b>1)</b> File name, file reference, or scalar reference
+ <br><b>2-N)</b> [<i>optional</i>] List of tag names to set.  All writable tags are set if
  none are specified.  The tag names are not case sensitive, and may be prefixed
- by an optional family 0 or 1 group name, separated by a colon (ie. 'exif:iso').
- A leading '-' indicates tags to be excuded (ie. '-comment').  An asterisk ('*')
- may be used for the tag name, and is useful when a group is specified to set
- all tags from a group (ie. 'XMP:*').  A special feature allows tag names of the
- form 'SRCTAG&gt;DSTTAG' (or 'DSTTAG&lt;SRCTAG') to be specified to copy
- information to a tag with a different name or a specified group.  Both 'SRCTAG'
- and 'DSTTAG' may use '*' and/or be prefixed by a group name (ie.
- 'modifyDate&gt;fileModifyDate' or '*&gt;xmp:*').  Tags are evaluated in order,
- so exclusions apply only to tags included earlier in the list.
- An extension of this feature allows the tag value to be set from an
- expression containing tag names with leading '$' symbols (ie.
- 'Comment&lt;Filename: $filename').  Braces '{}' may be used around the tag
- name to separate it from subsequent text, and a '$$' is used to to represent
- a '$' symbol.  (The behaviour for missing tags in expressions is defined by
- the <a href="#MissingTagValue">MissingTagValue</a> option.)
+ by an optional family 0 or 1 group name, separated by a colon (ie.
+ '<code>exif:iso</code>'). A leading '<code>-</code>' indicates tags to be
+ excuded (ie. '<code>-comment</code>').  An asterisk ('<code>*</code>') may be
+ used for the tag name, and is useful when a group is specified to set all tags
+ from a group (ie. '<code>XMP:*</code>').
+ <br>&nbsp;<br>
+ A special feature allows tag names of the form '<code>SRCTAG&gt;DSTTAG</code>'
+ (or '<code>DSTTAG&lt;SRCTAG</code>') to be specified to copy information to a
+ tag with a different name or a specified group.  Both '<code>SRCTAG</code>' and
+ '<code>DSTTAG</code>' may use '<code>*</code>' and/or be prefixed by a group
+ name (ie. '<code>modifyDate&gt;fileModifyDate</code>' or
+ '<code>*&gt;xmp:*</code>').  Copied tags may also be added or deleted from a
+ list with arguments of the form '<code>SRCTAG+&gt;DSTTAG</code>' or
+ '<code>SRCTAG-&gt;DSTTAG</code>'.  Tags are evaluated in order, so exclusions
+ apply only to tags included earlier in the list.  An extension of this feature
+ allows the tag value to be set from an expression containing tag names with
+ leading '<code>$</code>' symbols (ie. '<code>Comment&lt;Filename:
+ $filename</code>'). Braces '<code>{}</code>' may be used around the tag name to
+ separate it from subsequent text, and a '<code>$$</code>' is used to to
+ represent a '<code>$</code>' symbol.  (The behaviour for missing tags in
+ expressions is defined by the <a href="#MissingTagValue">MissingTagValue</a>
+ option.)
 </td></tr>
 <tr><td><b>Returns</b></td><td>A hash of information that was set
 successfully.  May include Warning or Error entries if there were problems
 reading the input file.
 </td></tr>
 </table></blockquote>
-By default, this routine will commute information between same-named tags in
+<p>By default, this routine will commute information between same-named tags in
 different groups, allowing information to be translated between images with
 different formats.  This behaviour may be modified by specifying a group name
-for extracted tags (even if '*' is used as a group name), in which case the
-information is written to the original group, unless redirected to a different
-group.  (For example, a tag name of '*:*' may be specified to copy all
-information while preserving the original groups.)
-<p><b>Examples:</b>
+for extracted tags (even if '<code>*</code>' is used as a group name), in which
+case the information is written to the original group, unless redirected to a
+different group.  (For example, a tag name of '<code>*:*</code>' may be
+specified to copy all information while preserving the original groups.)</p>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
-# set new values from all information in a file...
+<span class='com'># set new values from all information in a file...</span>
 my $info = $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile);
-# ...then write these values to another image
-my $result = $exifTool-&gt;WriteInfo($file2, $outFile);
+<span class='com'># ...then write these values to another image</span>
+my $result = $exifTool-&gt;<a href="#WriteInfo">WriteInfo</a>($file2, $outFile);
 
-# set all new values, preserving original groups
+<span class='com'># set all new values, preserving original groups</span>
 $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile, '*:*');
 
-# set specific information
+<span class='com'># set specific information</span>
 $exifTool-&gt;<b>SetNewValuesFromFile</b>($srcFile, $tag1, $tag2...);
 
-# set new value from a different tag in specific group
+<span class='com'># set new value from a different tag in specific group</span>
 $exifTool-&gt;<b>SetNewValuesFromFile</b>($src, 'IPTC:Keywords&gt;XMP-dc:Subject');
 
-# set new value from an expression involving other tags
+<span class='com'># add all IPTC keywords to XMP subject list</span>
+$exifTool-&gt;<b>SetNewValuesFromFile</b>($src, 'IPTC:Keywords+&gt;XMP-dc:Subject');
+
+<span class='com'># set new value from an expression involving other tags</span>
 $exifTool-><b>SetNewValuesFromFile</b>($file,
     'Comment&lt;ISO=$ISO Aperture=$aperture Exposure=$shutterSpeed');
 </pre></td></tr></table></blockquote>
-<b>Notes:</b>
+<p><b>Notes:</b></p>
 <p>The PrintConv option applies to this routine, but it should normally be left
-on to provide more reliable transfer of information between groups.
+on to provide more reliable transfer of information between groups.</p>
 <p>If a preview image exists, it is not copied.  The preview image must be
-transferred separately if desired.
+transferred separately if desired.</p>
 <p>When simply copying all information between files of the same type, it is
-usually desireable to preserve the original groups by specifying '*:*' for
-the tags to set.
+usually desireable to preserve the original groups by specifying
+'<code>*:*</code>' for the tags to set.</p>
 
 <hr><h2><a name="GetNewValues">GetNewValues</a></h2>
-Get list of new Raw values for the specified tag.  These are the values
+<p>Get list of new Raw values for the specified tag.  These are the values
 that will be written to file.  Only tags which support a 'List' may return
-more than one value.
+more than one value.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetNewValues($$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
- <br>1) Tag key or tag name
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+ <br><b>1)</b> Tag key or tag name
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of new Raw tag values.
 The list may be empty if the tag is being deleted
 (ie. if SetNewValue was called without a value).
 </td></tr>
 </table></blockquote>
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $rawVal = $exifTool-&gt;<b>GetNewValues</b>($tag);
 
@@ -939,10 +942,10 @@ my @rawVals = $exifTool-&gt;<b>GetNewValues</b>($tag);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="CountNewValues">CountNewValues</a></h2>
-Return the total number of new values set.
+<p>Return the total number of new values set.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>CountNewValues($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
 <tr><td><b>Returns</b></td><td>In scalar context, returns the total number
 of tags with new values set.  In list context, also returns the number of
@@ -950,152 +953,152 @@ of tags with new values set.  In list context, also returns the number of
 and FileModifyDate which can be changed without the need to rewrite the
 file.</td></tr>
 </table></blockquote>
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $numSet = $exifTool-&gt;<b>CountNewValues</b>();
 my ($numSet, $numQuick) = $exifTool-&gt;<b>CountNewValues</b>();
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SaveNewValues">SaveNewValues</a></h2>
-Save state of new values to be later restored by <a href="#RestoreNewValues">RestoreNewValues</a>.
+<p>Save state of new values to be later restored by <a href="#RestoreNewValues">RestoreNewValues</a>.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>SaveNewValues($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
-$exifTool-&gt;<b>SaveNewValues</b>();         # save state of new values
-$exifTool-&gt;SetNewValue(ISO =&gt; 100); # set new value for ISO
-$exifTool-&gt;WriteInfo($src, $dst1);  # write ISO plus any previous new values
-$exifTool-&gt;<b>RestoreNewValues</b>();      # restore previous new values
-$exifTool-&gt;WriteInfo($src, $dst2);  # write previous new values only
+$exifTool-&gt;<b>SaveNewValues</b>();         <span class='com'># save state of new values</span>
+$exifTool-&gt;<a href="#SetNewValue">SetNewValue</a>(ISO =&gt; 100); <span class='com'># set new value for ISO</span>
+$exifTool-&gt;<a href="#WriteInfo">WriteInfo</a>($src, $dst1);  <span class='com'># write ISO plus any previous new values</span>
+$exifTool-&gt;<b>RestoreNewValues</b>();      <span class='com'># restore previous new values</span>
+$exifTool-&gt;<a href="#WriteInfo">WriteInfo</a>($src, $dst2);  <span class='com'># write previous new values only</span>
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="RestoreNewValues">RestoreNewValues</a></h2>
-Restore new values to the settings that existed when
+<p>Restore new values to the settings that existed when
 <a href="#SaveNewValues">SaveNewValues</a> was last called.  May be called
 repeatedly after a single call to <a href="#SaveNewValues">SaveNewValues</a>.
-See <a href="#SaveNewValues">SaveNewValues</a> above for an example.
+See <a href="#SaveNewValues">SaveNewValues</a> above for an example.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>RestoreNewValues($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
 </table></blockquote>
 
 <hr><h2><a name="SetFileModifyDate">SetFileModifyDate</a></h2>
-Set the file modification time from the new value of the FileModifyDate tag.
+<p>Set the file modification time from the new value of the FileModifyDate tag.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>SetFileModifyDate($$;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
- <br>1) File name
- <br>2) [optional] Base time if applying shift (in days before $^T)
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+ <br><b>1)</b> File name
+ <br><b>2)</b> [<i>optional</i>] Base time if applying shift (in days before $^T)
 </td></tr>
 <tr><td><b>Returns</b></td><td>1 if the time was changed, 0 if nothing was
 done, or -1 if there was an error setting the time.
 </td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $result = $exifTool-&gt;<b>SetFileModifyDate</b>($file);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetFileName">SetFileName</a></h2>
-Set the file name and directory.  If not specified, the new file name is
-derived from the new values of the FileName and Directory tags.  If the
-FileName tag contains a '/', then the file is renamed into a new directory.
-If FileName ends with '/', then it is taken as a directory name and the file
-is moved into the new directory.  The new value for the Directory tag takes
-precedence over any directory specified in FileName.
+<p>Set the file name and directory.  If not specified, the new file name is
+derived from the new values of the FileName and Directory tags.  If the FileName
+tag contains a '<code>/</code>', then the file is renamed into a new directory.
+If FileName ends with '<code>/</code>', then it is taken as a directory name and
+the file is moved into the new directory.  The new value for the Directory tag
+takes precedence over any directory specified in FileName.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>SetFileName($$;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
- <br>1) Current file name
- <br>2) [optional] New file name
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+ <br><b>1)</b> Current file name
+ <br><b>2)</b> [<i>optional</i>] New file name
 </td></tr>
 <tr><td><b>Returns</b></td><td>1 if the file name or directory was changed,
 0 if nothing was done, or -1 if there was an error renaming the file.
 </td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $result = $exifTool-&gt;<b>SetFileName</b>($file);
 my $result = $exifTool-&gt;<b>SetFileName</b>($file, $newName);
 </pre></td></tr></table></blockquote>
-<b>Notes:</b>
+<p><b>Notes:</b></p>
 <p>Will not overwrite existing files. New directories are created as
-necessary.
+necessary.</p>
 
 <hr><h2><a name="SetNewGroups">SetNewGroups</a></h2>
-Set the order of the preferred groups when adding new information.  In
+<p>Set the order of the preferred groups when adding new information.  In
 subsequent calls to <a href="#SetNewValue">SetNewValue</a>, new information
 will be created in the first valid group of this list.  This has an impact
 only if the group is not specified when calling
 <a href="#SetNewValue">SetNewValue</a>, and if the tag name exists in more
 than one group.  The default order is EXIF, IPTC, XMP then MakerNotes.  Any
-family 0 group name may be used.  Case is not significant.
+family 0 group name may be used.  Case is not significant.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>SetNewGroups($;@)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-<br>1-N) Groups in order of priority.  If no groups are specified, the
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+<br><b>1-N)</b> Groups in order of priority.  If no groups are specified, the
 priorities are reset to the defaults.
 </td></tr>
 </table></blockquote>
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 $exifTool-&gt;<b>SetNewGroups</b>('XMP','EXIF','IPTC');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetNewGroups">GetNewGroups</a></h2>
-Get current group priority list.
+<p>Get current group priority list.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetNewGroups($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of group names in order of write
 priority.  Highest priority first.
 </td></tr>
 </table></blockquote>
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 @groups = $exifTool-&gt;<b>GetNewGroups</b>();
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetTagID">GetTagID</a></h2>
-Get the ID for the specified tag.  The ID is the IFD tag number in EXIF
+<p>Get the ID for the specified tag.  The ID is the IFD tag number in EXIF
 information, the property name in XMP information, or the data offset in a
 binary data block. For some tags, such as Composite tags where there is no ID,
-an empty string is returned.
+an empty string is returned.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetTagID($$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) Tag key
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> Tag key
 </td></tr>
 <tr><td><b>Returns</b></td><td>Tag ID or '' of there is no ID for this tag</td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $id = $exifTool-&gt;<b>GetTagID</b>($tag);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetDescription">GetDescription</a></h2>
-Get description for specified tag.  This function will always return a defined
-value.  In the case where the description doesn't exist, the tag name is returned.
+<p>Get description for specified tag.  This function will always return a defined
+value.  In the case where the description doesn't exist, the tag name is returned.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetDescription($$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) Tag key
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> Tag key
 </td></tr>
 <tr><td><b>Returns</b></td><td>Tag description</td></tr>
 </table></blockquote>
 
 <hr><h2><a name="GetGroup">GetGroup</a></h2>
-Get group name for specified tag.
+<p>Get group name for specified tag.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetGroup($$;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) Tag key
-    <br>2) [optional] Group family number
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> Tag key
+    <br><b>2)</b> [<i>optional</i>] Group family number
 </td></tr>
 <tr><td valign='top'><b>Returns</b></td><td>Group name (or 'Other' if tag has no
 group). If no group family is specified, returns the name of group in family 0
@@ -1104,18 +1107,18 @@ context.  See <a href="#GetAllGroups">GetAllGroups</a> for a list of group
 names.
 </td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $group = $exifTool-&gt;<b>GetGroup</b>($tag, 0);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetGroups">GetGroups</a></h2>
-Get list of group names for all tags in specified information hash.
+<p>Get list of group names for all tags in specified information hash.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetGroups($;$$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
-    <br>1) [optional] Information hash reference (default is all extracted info)
-    <br>2) [optional] Group family number (default 0)
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
+    <br><b>1)</b> [<i>optional</i>] Information hash reference (default is all extracted info)
+    <br><b>2)</b> [<i>optional</i>] Group family number (default 0)
 </td></tr>
 <tr><td valign='top'><b>Returns</b></td><td>
 List of group names in alphabetical order.
@@ -1124,38 +1127,38 @@ all extracted information.  See <a href="#GetAllGroups">GetAllGroups</a> for
 a complete list of group names.
 </td></tr>
 </table></blockquote>
-<b>Examples:</b>
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my @groups = $exifTool-&gt;<b>GetGroups</b>($info, $family);
 </pre></td></tr></table></blockquote>
 <blockquote>Example of one way to print information organized by group
 <table class='box'><tr><td><pre>
-my $exifTool = new Image::ExifTool;
-$exifTool-&gt;ExtractInfo('t/images/ExifTool.jpg');
+my $exifTool = <a href="#new">new</a> Image::ExifTool;
+$exifTool-&gt;<a href="#ExtractInfo">ExtractInfo</a>('t/images/ExifTool.jpg');
 
 my $family = 1;
 my @groups = $exifTool-&gt;<b>GetGroups</b>($family);
 my $group;
 foreach $group (@groups) {
     print "---- $group ----\n";
-    my $info = $exifTool-&gt;GetInfo({"Group$family" =&gt; $group});
-    foreach ($exifTool-&gt;GetTagList($info)) {
+    my $info = $exifTool-&gt;<a href="#GetInfo">GetInfo</a>({"Group$family" =&gt; $group});
+    foreach ($exifTool-&gt;<a href="#GetTagList">GetTagList</a>($info)) {
         print "$_ : $$info{$_}\n";
     }
 }
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="BuildCompositeTags">BuildCompositeTags</a></h2>
-Builds composite tags from required tags.  The composite tags are convenience
+<p>Builds composite tags from required tags.  The composite tags are convenience
 tags which are derived from the values of other tags.  This routine is called
-automatically by <a href="#ImageInfo">ImageInfo</a> if the Composite option is set.
+automatically by <a href="#ImageInfo">ImageInfo</a> if the Composite option is set.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>BuildCompositeTags($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) ExifTool object reference
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
 <tr><td><b>Returns</b></td><td>(none)</td></tr>
 </table></blockquote>
-<b>Notes:</b>
+<p><b>Notes:</b></p>
 <ol>
 <li>Tag values are calculated in alphabetical order unless a tag Require's
 or Desire's another composite tag, in which case the calculation is
@@ -1177,28 +1180,29 @@ ExifTool object
 <p>The names of all the following functions, plus
 <a href="#ImageInfo">ImageInfo</a>, may be imported into the current namespace
 with the "Public" tag.  When this is done, the functions can be accessed without
-the need to prefix the function name with "Image::ExifTool::".  For example:
+the need to prefix the function name with "<code>Image::ExifTool::</code>".  For
+example:</p>
 <blockquote><table class='box'><tr><td><pre>
 use Image::ExifTool ':Public';
-$tagName = GetTagName($tag);
+$tagName = <a href="#GetTagName">GetTagName</a>($tag);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetTagName">GetTagName</a></h2>
-Get name of tag from tag identifier.  This is a convenience function that
-strips the embedded instance number, if it exists, from the tag key.
+<p>Get name of tag from tag identifier.  This is a convenience function that
+strips the embedded instance number, if it exists, from the tag key.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetTagName($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) Tag key
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> Tag key
 </td></tr>
 <tr><td><b>Returns</b></td><td>Tag name</td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 $tagName = Image::ExifTool::<b>GetTagName</b>($tag);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetShortcuts">GetShortcuts</a></h2>
-Get list of tag shortcut names.
+<p>Get list of tag shortcut names.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetShortcuts()</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>(none)
@@ -1207,10 +1211,10 @@ Get list of tag shortcut names.
 </table></blockquote>
 
 <hr><h2><a name="GetAllTags">GetAllTags</a></h2>
-Get list of all available tag names.
+<p>Get list of all available tag names.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetAllTags(;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) [optional] Group name
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] Group name
 </td></tr>
 <tr><td><b>Returns</b></td><td>A list of all available tags in alphabetical
 order, or all tags in specified group.  The group name is case insensitive,
@@ -1220,10 +1224,10 @@ the specific IFD).
 </table></blockquote>
 
 <hr><h2><a name="GetWritableTags">GetWritableTags</a></h2>
-Get list of all writable tag names.
+<p>Get list of all writable tag names.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetWritableTags(;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) [optional] Group name
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] Group name
 </td></tr>
 <tr><td><b>Returns</b></td><td>A list of all writable tags in alphabetical
 order. These are the tags for which values may be set through
@@ -1235,17 +1239,17 @@ the specific IFD).
 </table></blockquote>
 
 <hr><h2><a name="GetAllGroups">GetAllGroups</a></h2>
-Get list of all group names in specified family.
+<p>Get list of all group names in specified family.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetAllGroups($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td>0) Group family number (0-2)
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> Group family number (0-2)
 </td></tr>
 <tr><td><b>Returns</b></td>
 <td>A list of all groups in the specified family in alphabetical order</td></tr>
 </table></blockquote>
-Three families of groups are currently defined: 0, 1 and 2. Families 0 and 1
+<p>Three families of groups are currently defined: 0, 1 and 2. Families 0 and 1
 are based on the file structure, and family 2 classifies information based
-on the logical category to which the information refers.
+on the logical category to which the information refers.</p>
 
 <p>Families 0 and 1 are similar except that family 1 is more specific, and
 sub-divides the EXIF, MakerNotes, XMP and ICC_Profile groups to give more
@@ -1254,20 +1258,20 @@ EXIF group is split up based on the specific IFD (Image File Directory), the
 MakerNotes group is divided into groups for each manufacturer, and the XMP
 group is separated based on the XMP namespace prefix.  Note that only common
 XMP namespaces are listed below but additional namespaces may be present in
-some XMP data.  Also note that the 'XMP-xmp...' group names may appear in
-the older form 'XMP-xap...' since these names evolved as the XMP standard
-was developed.  The ICC_Profile group is broken down to give information
-about the specific ICC_Profile tag from which multiple values were
+some XMP data.  Also note that the '<code>XMP-xmp</code>...' group names may
+appear in the older form '<code>XMP-xap</code>...' since these names evolved as
+the XMP standard was developed.  The ICC_Profile group is broken down to give
+information about the specific ICC_Profile tag from which multiple values were
 extracted. As well, information extracted from the ICC_Profile header is
-separated into the ICC-header group.
+separated into the ICC-header group.</p>
 
-<p>Here is a complete list of groups for each family:
+<p>Here is a complete list of groups for each family:</p>
 <blockquote><table class='norm'>
 <tr><th>Family</th><th>Group Names</th></tr>
-<tr><td><b>0 (General Location)</b></td>
+<tr><td><b>0 (Information&nbsp;Type)</b></td>
 <td>AFCP, AIFF, APE, APP12, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
 CanonVRD, Composite, DICOM, DNG, EXIF, ExifTool, FLAC, File, Flash,
-FlashPix, FotoStation, GeoTiff, ICC_Profile, ID3, IPTC, JFIF, JPEG,
+FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, JFIF, JPEG,
 Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
 PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real,
 SigmaRaw, Vorbis, XMP
@@ -1276,35 +1280,35 @@ SigmaRaw, Vorbis, XMP
 <td>AFCP, AIFF, APE, ASF, Adobe, BMP, Canon, CanonCustom, CanonRaw,
 CanonVRD, Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool,
 FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff,
-GlobParamIFD, GraphConv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
-ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC,
-InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KyoceraRaw, Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera,
-MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens,
-MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail,
-MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes,
-MakerUnknown, MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture,
-NikonPreview, Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic,
-Photoshop, PictureInfo, PostScript, PrintIM, QuickTime, RIFF, RMETA, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Ricoh, SPIFF, SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#,
-Vorbis, XMP, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
-XMP-exif, XMP-iptcCore, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff,
-XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights,
-XMP-xmpTPg
+GlobParamIFD, GraphConv, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
+HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
+ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF,
+JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw,
+Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
+MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
+MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
+MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
+PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR,
+Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#,
+Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore,
+XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
 Time, Unknown, Video
 </td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 @groupList = Image::ExifTool::<b>GetAllGroups</b>($family);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetDeleteGroups">GetDeleteGroups</a></h2>
-Get list of all deletable group names.
+<p>Get list of all deletable group names.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetDelGroups()</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
@@ -1315,28 +1319,28 @@ alphabetical order.
 </td></tr>
 </table></blockquote>
 <p>Below is a current list of deletable group names.  All names in this list
-are either family 0 or family 1 group names, with the exception of 'Trailer'
-which allows all trailers in JPEG and TIFF-format images to be deleted at
-once, including unknown trailers.  To schedule a group for deletion, call
-<a href="#SetNewValue">SetNewValue</a> with an undefined value and a tag
-name like 'Trailer:*'.
+are either family 0 or family 1 group names, with the exception of
+'<code>Trailer</code>' which allows all trailers in JPEG and TIFF-format images
+to be deleted at once, including unknown trailers.  To schedule a group for
+deletion, call <a href="#SetNewValue">SetNewValue</a> with an undefined value
+and a tag name like '<code>Trailer:*</code>'.</p>
 <blockquote>AFCP, CIFF, CanonVRD, EXIF, ExifIFD, Ducky, File, FlashPix,
 FotoStation, GlobParamIFD, GPS, IFD0, IFD1, InteropIFD, ICC_Profile, IPTC,
 JFIF, MakerNotes, Meta, MetaIFD, MIE, PhotoMechanic, Photoshop, PNG,
 PrintIM, RMETA, SubIFD, Trailer, XMP
 </blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my @delGroups = Image::ExifTool::<b>GetDelGroups</b>();
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetFileType">GetFileType</a></h2>
-Get type of file given file name.
+<p>Get type of file given file name.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetFileType(;$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
-<td>0) [optional] File name (or just an extension)
-<br>1) [optional] Flag to return a description instead of a type
+<td><b>0)</b> [<i>optional</i>] File name (or just an extension)
+<br><b>1)</b> [<i>optional</i>] Flag to return a description instead of a type
 </td></tr>
 <tr><td><b>Returns</b></td><td>A string, based on the file extension, which
 represents the type of file (or a description of the file type).  Returns
@@ -1345,41 +1349,41 @@ may return more than one file type if the file may be different formats.
 With no arguments, returns a list of extensions for all recognized file types.
 </td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $type = Image::ExifTool::<b>GetFileType</b>($filename);
 my $desc = Image::ExifTool::<b>GetFileType</b>($filename, 1);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="CanWrite">CanWrite</a></h2>
-Can the specified file or file type be written?
+<p>Can the specified file or file type be written?</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>CanWrite($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
-<td>0) File name, file extension, or file type</td></tr>
+<td><b>0)</b> File name, file extension, or file type</td></tr>
 <tr><td><b>Returns</b></td><td>True if the file type can be
 written (edited).</td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $writable = Image::ExifTool::<b>CanWrite</b>($filename);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="CanCreate">CanCreate</a></h2>
-Can the specified file or file type be created?
+<p>Can the specified file or file type be created?</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>CanCreate($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
-<td>0) File name, file extension, or file type</td></tr>
+<td><b>0)</b> File name, file extension, or file type</td></tr>
 <tr><td><b>Returns</b></td><td>True if the file type can be created
 from scratch.  Currently, this can only be done with XMP files.</td></tr>
 </table></blockquote>
-<b>Example:</b>
+<p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $creatable = Image::ExifTool::<b>CanCreate</b>($filename);
 </pre></td></tr></table></blockquote>
 
 <hr>
-<p><a href="index.html">&lt;-- Back to ExifTool home page</a>
+<p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

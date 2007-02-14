@@ -12,23 +12,24 @@
 #               02/10/06 - P. Harvey Decode a lot of new tags (ref 12)
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
-#               2) Michael Rommel private communication (tests with Digital Ixus)
-#               3) Daniel Pittman private communication (tests with PowerShot S70)
+#               2) Michael Rommel private communication (Digital Ixus)
+#               3) Daniel Pittman private communication (PowerShot S70)
 #               4) http://www.wonderland.org/crw/
-#               5) Juha Eskelinen private communication (tests with 20D)
-#               6) Richard S. Smith private communication (tests with 20D)
-#               7) Denny Priebe private communication (tests with 1D MkII)
+#               5) Juha Eskelinen private communication (20D)
+#               6) Richard S. Smith private communication (20D)
+#               7) Denny Priebe private communication (1D MkII)
 #               8) Irwin Poche private communication
-#               9) Michael Tiemann private communication (tests with 1D MkII)
-#              10) Volker Gering private communication (tests with 1D MkII)
+#               9) Michael Tiemann private communication (1D MkII)
+#              10) Volker Gering private communication (1D MkII)
 #              11) "cip" private communication
-#              12) Rainer Honle private communication (tests with 5D)
+#              12) Rainer Honle private communication (5D)
 #              13) http://www.cybercom.net/~dcoffin/dcraw/
 #              14) (bozi) http://www.cpanforum.com/threads/2476 and /2563
 #              15) http://homepage3.nifty.com/kamisaka/makernote/makernote_canon.htm and
 #                  http://homepage3.nifty.com/kamisaka/makernote/CanonLens.htm (2006/07/04)
-#              16) Emil Sit private communication (tests with 30D)
+#              16) Emil Sit private communication (30D)
 #              17) http://www.asahi-net.or.jp/~xp8t-ymzk/s10exif.htm
+#              18) Samson Tai private communication (G7)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -40,7 +41,7 @@ use Image::ExifTool::Exif;
 
 sub WriteCanon($$$);
 
-$VERSION = '1.57';
+$VERSION = '1.60';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
@@ -209,6 +210,9 @@ my %canonLensTypes = ( #4
     0x2020000 => 'PowerShot A710 IS',
     0x2030000 => 'PowerShot A640',
     0x2040000 => 'PowerShot A630',
+    0x2100000 => 'PowerShot A460',
+    0x2180000 => 'PowerShot A550',
+    0x2190000 => 'PowerShot A450',
     0x3010000 => 'PowerShot Pro90 IS',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
@@ -359,7 +363,6 @@ my %longBin = (
     0x9 => {
         Name => 'OwnerName',
         Writable => 'string',
-        Description => "Owner's Name",
     },
     0xa => {
         Name => 'ColorInfoD30',
@@ -522,6 +525,26 @@ my %longBin = (
     },
     # 0x19 => 'InteropFooter', # what is this for?
     # 0x1d => 'MicaRa', ???? #15
+    0x1e => { #PH
+        Name => 'FirmwareRevision',
+        Writable => 'int32u',
+        # as a hex number: 0xAVVVRR00, where (a bit of guessing here...)
+        #  A = 'a' for alpha, 'b' for beta?
+        #  V = version? (100,101 for normal releases, 100,110,120,130,170 for alpha/beta)
+        #  R = revision? (01-07, except 00 for alpha/beta releases)
+        PrintConv => q{
+            my $rev = sprintf("%.8x", $val);
+            my ($rel, $v1, $v2, $r1, $r2) = ($rev =~ /^(.)(.)(..)0?(.+)(..)$/);
+            my %r = ( a => 'Alpha ', b => 'Beta ', '0' => '' );
+            $rel = defined $r{$rel} ? $r{$rel} : "Unknown($rel) ";
+            return "$rel$v1.$v2 rev $r1.$r2",
+        },
+        PrintConvInv => q{
+            $_=$val; s/Alpha ?/a/i; s/Beta ?/b/i;
+            s/Unknown ?\((.)\)/$1/i; s/ ?rev ?(.)\./0$1/; s/ ?rev ?//;
+            tr/a-fA-F0-9//dc; return hex $_;
+        },
+    },
     0x83 => { #PH
         Name => 'OriginalDecisionData',
         Writable => 'int32u',
@@ -799,6 +822,10 @@ my %longBin = (
             26 => 'Digital Macro', #PH
             27 => 'My Colors', #PH
             28 => 'Still Image', #15 (animation frame?)
+            30 => 'Color Accent', #18
+            31 => 'Color Swap', #18
+            32 => 'Aquarium', #18
+            33 => 'ISO 3200', #18
         },
     },
     12 => {
@@ -891,6 +918,7 @@ my %longBin = (
     22 => { #4
         Name => 'LensType',
         RawConv => '$val ? $val : undef', # don't use if value is zero
+        SeparateTable => 1,
         PrintConv => \%canonLensTypes,
     },
     23 => {
@@ -1144,6 +1172,7 @@ my %longBin = (
     },
     10 => { #PH/17
         Name => 'OpticalZoomCode',
+        Groups => { 2 => 'Camera' },
         Notes => 'for many PowerShot models, a this is 0-6 for wide-tele zoom',
         # (for many models, 0-6 represent 0-100% zoom, but it is always 8 for
         #  EOS models, and I have seen values of 16,20,28,32 and 39 too...)
@@ -1159,6 +1188,7 @@ my %longBin = (
     14 => { #2
         Name => 'AFPointsUsed2',
         Notes => 'used by D30, D60 and some PowerShot/Ixus models',
+        Groups => { 2 => 'Camera' },
         Flags => 'PrintHex',
         RawConv => '$val==0 ? undef : $val',
         PrintConv => {
@@ -1251,6 +1281,7 @@ my %longBin = (
     #       AVI, and -6 and -10 for shots 1 and 2 with stitch assist - PH)
     26 => { #15
         Name => 'CameraType',
+        Groups => { 2 => 'Camera' },
         PrintConv => {
             248 => 'EOS High-end',
             250 => 'Compact',
@@ -1288,10 +1319,11 @@ my %longBin = (
     WRITABLE => 1,
     FORMAT => 'int8s',
     FIRST_ENTRY => 0,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.',
     0x04 => { #9
         Name => 'ExposureTime',
+        Groups => { 2 => 'Image' },
         Format => 'int8u',
         Priority => 0,
         RawConv => '$val ? $val : undef',
@@ -1313,6 +1345,7 @@ my %longBin = (
     0x0d => { #9
         Name => 'LensType',
         Format => 'int8u',
+        SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
         PrintConv => \%canonLensTypes,
     },
@@ -1376,7 +1409,7 @@ my %longBin = (
         Name => 'PictureStyle',
         Format => 'int16u',
         Condition => '$self->{CameraModel} =~ /EOS(-1Ds? Mark II| 5D)$/',
-        Notes => '5D only and 1D(s)mkII only',
+        Notes => '1DmkII, 1DSmkII and 5D only',
         PrintHex => 1,
         PrintConv => \%pictureStyles,
     },
@@ -1394,6 +1427,7 @@ my %longBin = (
     },
     0xd0 => {
         Name => 'ImageNumber',
+        Groups => { 2 => 'Image' },
         Format => 'int16u',
         Condition => '$self->{CameraModel} =~ /EOS 5D/',
         Notes => '5D only',
@@ -1512,6 +1546,7 @@ my %longBin = (
     0x11c => {
         Name => 'TimeStamp',
         Format => 'int32u',
+        Groups => { 2 => 'Time' },
         RawConv => '$val ? $val : undef',
         ValueConv => 'ConvertUnixTime($val)',
         ValueConvInv => 'GetUnixTime($val)',
@@ -1554,6 +1589,7 @@ my %longBin = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     1 => { #PH
         Name => 'NumAFPoints',
+        Groups => { 2 => 'Camera' },
         DataMember => 'NumAFPoints',
         RawConv => '$self->{NumAFPoints} = $val',
     },
@@ -1563,6 +1599,7 @@ my %longBin = (
     5 => 'CanonImageHeightAsShot',
     22 => { #PH (300D)
         Name => 'AFPointsUsed',
+        Groups => { 2 => 'Camera' },
         # (cameras with 7 AF points)
         Condition => '$self->{NumAFPoints} == 7',
         Notes => '10D, 300D and 350D',
@@ -1579,6 +1616,7 @@ my %longBin = (
     },
     26 => { #12 (20D)
         Name => 'AFPointsUsed',
+        Groups => { 2 => 'Camera' },
         # (cameras with 9 AF points)
         Condition => '$self->{NumAFPoints} == 9',
         Notes => '20D, 30D and 400D',
@@ -2025,7 +2063,7 @@ my %longBin = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    NOTES => 'This table is used by the 5D and 1DmkIIN.',
+    NOTES => 'This table is used by the 1DmkIIN, 5D, 30D and 400D.',
     FORMAT => 'int16u',
     FIRST_ENTRY => 0,
     WRITABLE => 1,
@@ -2307,7 +2345,7 @@ my %longBin = (
 );
 
 # add our composite tags
-Image::ExifTool::AddCompositeTags(\%Image::ExifTool::Canon::Composite);
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Canon');
 
 
 #------------------------------------------------------------------------------
@@ -2549,7 +2587,7 @@ Canon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -2577,7 +2615,7 @@ the Digital Ixus and PowerShot S70 cameras, Juha Eskelinen and Emil Sit for
 figuring out the 20D and 30D FileNumber, Denny Priebe for figuring out a
 couple of 1D tags, and Michael Tiemann and Rainer Honle for decoding a
 number of new tags.  Also thanks to everyone who made contributions to the
-LensType lookup list.
+LensType lookup list or the meanings of other tag values.
 
 =head1 SEE ALSO
 

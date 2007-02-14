@@ -7,24 +7,6 @@
 #
 # Limitations:  - only writes x-default language in Alt Lang lists
 #------------------------------------------------------------------------------
-#
-# Syntax names
-#
-#   RDF Description ID about parseType resource li nodeID datatype
-#
-# Class names
-#
-#   Seq Bag Alt Statement Property XMLLiteral List
-#
-# Property names
-#
-#   subject predicate object type value first rest _n
-#   (where n is a decimal integer greater than zero with no leading zeros)
-#
-# Resource names
-#
-#   nil
-#
 package Image::ExifTool::XMP;
 
 use strict;
@@ -243,9 +225,10 @@ my %nsURI = (
     xmpRights => 'http://ns.adobe.com/xap/1.0/rights/',
     xmpTPg    => 'http://ns.adobe.com/xap/1.0/t/pg/',
     xmpidq    => 'http://ns.adobe.com/xmp/Identifier/qual/1.0/',
-    Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
     xmpPLUS   => 'http://ns.adobe.com/xap/1.0/PLUS/',
     dex       => 'http://ns.optimasc.com/dex/1.0/',
+    Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
+    MicrosoftPhoto => 'http://ns.microsoft.com/photo/1.0',
 );
 
 my $x_toolkit = "x:xmptk='Image::ExifTool $Image::ExifTool::VERSION'";
@@ -254,7 +237,7 @@ my $rdfDesc = 'rdf:Description';
 # packet/xmp/rdf headers and trailers
 #
 my $pktOpen = "<?xpacket begin='\xef\xbb\xbf' id='W5M0MpCehiHzreSzNTczkc9d'?>\n";
-my $xmlOpen = "\xef\xbb\xbf<?xml version='1.0' encoding='UTF-8'?>\n";
+my $xmlOpen = "<?xml version='1.0' encoding='UTF-8'?>\n";
 my $xmpOpen = "<x:xmpmeta xmlns:x='$nsURI{x}' $x_toolkit>\n";
 my $rdfOpen = "<rdf:RDF xmlns:rdf='$nsURI{rdf}'>\n";
 my $rdfClose = "</rdf:RDF>\n";
@@ -276,7 +259,7 @@ my $pktCloseR =  "<?xpacket end='r'?>";
         my $table = GetTagTable($mainInfo->{SubDirectory}->{TagTable});
         $$table{WRITE_PROC} = \&WriteXMP;   # set WRITE_PROC for all tables
         GenerateTagIDs($table);
-        $table->{CHECK_PROC} = \&CheckXMP; # add our write check routine
+        $table->{CHECK_PROC} = \&CheckXMP;  # add our write check routine
         foreach $tag (TagTableKeys($table)) {
             my $tagInfo = $$table{$tag};
             next unless ref $tagInfo eq 'HASH';
@@ -312,7 +295,7 @@ sub ValidateXMP($;$)
 {
     my ($xmpPt, $mode) = @_;
     unless ($$xmpPt =~ /^\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/) {
-        return '' unless $$xmpPt =~ /^<x:xmpmeta/;
+        return '' unless $$xmpPt =~ /^<x(mp)?:xmpmeta/;
         # add required xpacket header/trailer
         $$xmpPt = $pktOpen . $$xmpPt . $pktCloseW;
     }
@@ -332,6 +315,12 @@ sub ValidateXMP($;$)
 sub CheckXMP($$$)
 {
     my ($exifTool, $tagInfo, $valPtr) = @_;
+    # convert value from Latin if necessary
+    if ($exifTool->{OPTIONS}->{Charset} eq 'Latin' and $$valPtr =~ /[\x80-\xff]/) {
+        # convert from Latin to UTF-8
+        my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
+        $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
+    }
     my $format = $tagInfo->{Writable};
     # if no format specified, value is a simple string
     return undef unless $format and $format ne 'string';
@@ -516,10 +505,8 @@ sub SaveBlankInfo($$$;$)
 
 #------------------------------------------------------------------------------
 # Process blank-node information
-# Inputs: 0) ExifTool object reference
-#         1) reference to tag table
-#         2) reference to blank node information hash
-#         3) flag set for writing
+# Inputs: 0) ExifTool object ref, 1) tag table ref,
+#         2) blank node information hash ref, 3) flag set for writing
 sub ProcessBlankInfo($$$;$)
 {
     my ($exifTool, $tagTablePtr, $blankInfo, $isWriting) = @_;
@@ -550,7 +537,7 @@ sub ProcessBlankInfo($$$;$)
         }
         # save information from unused properties (if RDF is malformed like f-spot output)
         if (%unused) {
-            $exifTool->Options('Verbose') and $exifTool->Warn("An XMP resource is about nothing");
+            $exifTool->Options('Verbose') and $exifTool->Warn('An XMP resource is about nothing');
             foreach $post (sort keys %unused) {
                 my ($val, $attrs, $propPath) = @{$path->{Post}->{$post}};
                 my @propList = split m{/}, $propPath;
@@ -674,6 +661,11 @@ sub WriteXMP($$;$)
         $path = ConformPathToNamespace($exifTool, $path);
         # find existing property
         my $capList = $capture{$path};
+        # MicrosoftPhoto screws up the case of some tags, so test for this
+        unless ($capList) {
+            my ($path2) = grep /^\Q$path\E$/i, keys %capture;
+            $path2 and $capList = $capture{$path = $path2};
+        }
         my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
         my $overwrite = Image::ExifTool::IsOverwriting($newValueHash);
         my (%attrs, $deleted);
@@ -734,7 +726,8 @@ sub WriteXMP($$;$)
         # check to see if we want to create this tag
         # (create non-avoided tags in XMP data files by default)
         my $isCreating = (Image::ExifTool::IsCreating($newValueHash) or
-                          ($preferred and not $$tagInfo{Avoid}));
+                          ($preferred and not $$tagInfo{Avoid} and
+                            not defined $$newValueHash{Shift}));
 
         # don't add new values unless...
             # ...tag existed before and was deleted
@@ -789,7 +782,12 @@ sub WriteXMP($$;$)
 #
     # start writing the XMP data
     my $newData = '';
-    $newData .= $pktOpen unless $$exifTool{XMP_NO_XPACKET};
+    if ($$exifTool{XMP_NO_XPACKET}) {
+        # write BOM if flag is set
+        $newData .= "\xef\xbb\xbf" if $$exifTool{XMP_NO_XPACKET} == 2;
+    } else {
+        $newData .= $pktOpen;
+    }
     $newData .= $xmlOpen if $$exifTool{XMP_IS_XML};
     $newData .= $xmpOpen . $rdfOpen;
 
@@ -947,7 +945,7 @@ This file contains routines to write XMP metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

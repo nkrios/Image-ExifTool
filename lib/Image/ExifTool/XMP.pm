@@ -39,7 +39,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.57';
+$VERSION = '1.65';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -86,6 +86,7 @@ my %xlatNamespace = (
     # shorten ugly IPTC Core namespace prefix
     'Iptc4xmpCore' => 'iptcCore',
     'photomechanic'=> 'photomech',
+    'MicrosoftPhoto' => 'microsoft',
     # also translate older 'xap...' prefixes to 'xmp...'
     'xap'          => 'xmp',
     'xapBJ'        => 'xmpBJ',
@@ -184,6 +185,10 @@ my %recognizedAttrs = (
     photomech => {
         Name => 'photomech',
         SubDirectory => { TagTable => 'Image::ExifTool::PhotoMechanic::XMP' },
+    },
+    microsoft => {
+        Name => 'microsoft',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Microsoft' },
     },
 );
 
@@ -666,6 +671,7 @@ my %recognizedAttrs = (
     Category        => { },
     City            => { Groups => { 2 => 'Location' } },
     Country         => { Groups => { 2 => 'Location' } },
+    ColorMode       => { }, #PH
     Credit          => { Groups => { 2 => 'Author' } },
     DateCreated => {
         Groups => { 2 => 'Time' },
@@ -675,6 +681,7 @@ my %recognizedAttrs = (
     },
     Headline        => { },
     Instructions    => { },
+    ICCProfile      => { Name => 'ICCProfileName' }, #PH
     Source          => { Groups => { 2 => 'Author' }, Avoid => 1 },
     State           => { Groups => { 2 => 'Location' } },
     # the documentation doesn't show this as a 'Bag', but that's the
@@ -691,6 +698,7 @@ my %recognizedAttrs = (
     WRITE_PROC => \&WriteXMP,
     WRITABLE => 'string',
     NOTES => 'Photoshop Camera Raw Schema tags.',
+    AlreadyApplied  => { Writable => 'boolean' }, #PH (written by LightRoom beta 4.1)
     AutoBrightness  => { Writable => 'boolean' },
     AutoContrast    => { Writable => 'boolean' },
     AutoExposure    => { Writable => 'boolean' },
@@ -845,6 +853,7 @@ my %recognizedAttrs = (
         Groups => { 2 => 'Author' },
         Writable => 'lang-alt',
     },
+    NativeDigest => { }, #PH
 );
 
 # Exif schema properties (exif)
@@ -1267,6 +1276,8 @@ my %recognizedAttrs = (
     GPSAltitude     => {
         Groups => { 2 => 'Location' },
         Writable => 'rational',
+        PrintConv => '"$val metres"',
+        PrintConvInv => '$val=~s/\s*m.*//;$val',
     },
     GPSTimeStamp    => {
         Groups => { 2 => 'Time' },
@@ -1363,6 +1374,7 @@ my %recognizedAttrs = (
             1 => 'Differential Corrected',
         },
     },
+    NativeDigest => { }, #PH
 );
 
 # Auxiliary schema properties (aux) - not fully documented
@@ -1486,11 +1498,73 @@ my %recognizedAttrs = (
     ffid        => { Name => 'FFID' },
 );
 
+# Microsoft Photo schema properties (MicrosoftPhoto) (ref PH)
+%Image::ExifTool::XMP::Microsoft = (
+    GROUPS => { 1 => 'XMP-microsoft', 2 => 'Image' },
+    NAMESPACE => 'MicrosoftPhoto',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => q{
+        Microsoft Photo schema tags.  This is likely not a complete list, but
+        represents tags which have been observed in sample images.  The actual
+        namespace prefix is "MicrosoftPhoto", but ExifTool shortens this to
+        "XMP-microsoft" in the group1 family name.
+    },
+    CameraSerialNumber => { },
+    DateAcquired => {
+        Groups => { 2 => 'Time'  },
+        Writable => 'date',
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    FlashManufacturer  => { },
+    FlashModel         => { },
+    LastKeywordIPTC    => { List => 'Bag' },
+    LastKeywordXMP     => { List => 'Bag' },
+    LensManufacturer   => { },
+    LensModel          => { },
+    Rating => {
+        Name => 'RatingPercent',
+        Notes => q{
+            normal Rating values of 1,2,3,4 and 5 stars correspond to RatingPercent
+            values of 1,25,50,75 and 99 respectively
+        },
+    },
+);
+
 # table to add tags in other namespaces
 %Image::ExifTool::XMP::other = (
     GROUPS => { 2 => 'Unknown' },
 );
 
+# Composite XMP tags
+%Image::ExifTool::XMP::Composite = (
+    # get latitude/logitude reference from XMP lat/long tags
+    # (used to set EXIF GPS position from XMP tags)
+    GPSLatitudeRef => {
+        Require => {
+            0 => 'XMP:GPSLatitude',
+        },
+        ValueConv => '$val[0] < 0 ? "S" : "N"',
+        PrintConv => {
+            N => 'North',
+            S => 'South',
+        },
+    },
+    GPSLongitudeRef => {
+        Require => {
+            0 => 'XMP:GPSLongitude',
+        },
+        ValueConv => '$val[0] < 0 ? "W" : "E"',
+        PrintConv => {
+            E => 'East',
+            W => 'West',
+        },
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::XMP');
 
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary
@@ -1644,12 +1718,21 @@ sub FoundXMP($$$$)
     # convert quotient and date values to a more sensible format
     if ($val =~ m{^(-?\d+)/(-?\d+)$}) {
         $val = $1 / $2 if $2;       # calculate quotient
-    } elsif ($val =~ /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2}:\d{2})(\S*)$/) {
-        $val = "$1:$2:$3 $4$5";     # convert back to EXIF time format
+    } elsif ($val =~ /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})(:\d{2})?(\S*)$/) {
+        my $s = $5 || ':00';        # seconds may be missing
+        $val = "$1:$2:$3 $4$s$6";   # convert back to EXIF time format
+    } elsif ($exifTool->{OPTIONS}->{Charset} eq 'Latin' and $val =~ /[\x80-\xff]/) {
+        # convert from UTF-8 to Latin
+        $val = Image::ExifTool::UTF82Unicode($val,'n',$exifTool);
+        $val = Image::ExifTool::Unicode2Latin($val,'n',$exifTool);
     }
     # look up this tag in the appropriate table
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
     unless ($tagInfo) {
+        if ($exifTool->{OPTIONS}->{Verbose}) {
+            my $group1 = $namespace ? "XMP-$namespace" : $tagTablePtr->{GROUPS}->{1};
+            $exifTool->VPrint(0, $exifTool->{INDENT}, "[adding $group1:$tag]\n");
+        }
         # construct tag information for this unknown tag
         $tagInfo = { Name => ucfirst($tag) };
         Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
@@ -1715,8 +1798,19 @@ sub ParseXMPElement($$$;$$$)
                 $val .= "</$prop>";
             }
         }
-        # push this property name onto our hierarchy list
-        push @$propListPt, $prop;
+        if ($prop eq 'rdf:li') {
+            # add index to list items so we can keep them in order
+            # (this also enables us to keep structure elements grouped properly
+            # for lists of structures, like JobRef)
+            $prop .= sprintf(' %.3d', $count);
+        } elsif ($prop eq 'rdf:Description') {
+            # trim comments and whitespace from rdf:Description properties only
+            $val =~ s/<!--.*?-->//g;
+            $val =~ s/^\s*(.*)\s*$/$1/;
+        } elsif ($prop eq 'xmp:xmpmeta') {
+            # patch MicrosoftPhoto unconformity
+            $prop = 'x:xmpmeta';
+        }
 
         # extract property attributes
         my (%attrs, @attrs);
@@ -1725,23 +1819,16 @@ sub ParseXMPElement($$$;$$$)
             $attrs{$1} = $3;
         }
 
-        # add index to list items so we can keep them in order
-        # (this also enables us to keep structure elements grouped properly
-        # for lists of structures, like JobRef)
-        $$propListPt[-1] .= sprintf(' %.3d', $count) if $prop eq 'rdf:li';
-
         # add nodeID to property path (with leading ' #') if it exists
         if (defined $attrs{'rdf:nodeID'}) {
             $nodeID = $$blankInfo{NodeID} = $attrs{'rdf:nodeID'};
             delete $attrs{'rdf:nodeID'};
-            $$propListPt[-1] .= ' #' . $nodeID;
+            $prop .= ' #' . $nodeID;
         }
 
-        # trim comments and whitespace from rdf:Description properties only
-        if ($prop eq 'rdf:Description') {
-            $val =~ s/<!--.*?-->//g;
-            $val =~ s/^\s*(.*)\s*$/$1/;
-        }
+        # push this property name onto our hierarchy list
+        push @$propListPt, $prop;
+
         # handle properties inside element attributes (RDF shorthand format):
         # (attributes take the form a:b='c' or a:b="c")
         my ($shortName, $shorthand, $ignored);
@@ -1751,7 +1838,7 @@ sub ParseXMPElement($$$;$$$)
             if ($propName =~ /(.*?):(.*)/) {
                 $ns = $1;   # specified namespace
                 $name = $2;
-            } elsif ($prop =~ /(.*?):/) {
+            } elsif ($prop =~ /(\S*?):/) {
                 $ns = $1;   # assume same namespace as parent
                 $name = $propName;
                 $propName = "$ns:$name";    # generate full property name
@@ -1774,8 +1861,8 @@ sub ParseXMPElement($$$;$$$)
                     # save UUID to use same ID when writing
                     if ($propName eq 'rdf:about') {
                         if (not $exifTool->{XMP_UUID}) {
-                            $exifTool->{XMP_UUID} = $attrs{about};
-                        } elsif ($exifTool->{XMP_UUID} ne $attrs{about}) {
+                            $exifTool->{XMP_UUID} = $attrs{$shortName};
+                        } elsif ($exifTool->{XMP_UUID} ne $attrs{$shortName}) {
                             $exifTool->Error("Multiple XMP UUID's not handled", 1);
                         }
                     }
@@ -1858,26 +1945,32 @@ sub ProcessXMP($$;$)
     my $dirLen = $$dirInfo{DirLen};
     my $dataLen = $$dirInfo{DataLen};
     my $rtnVal = 0;
+    my $bom = 0;
     my ($buff, $fmt, $isXML);
 
     # read information from XMP file if necessary
     unless ($dataPt) {
         my $raf = $$dirInfo{RAF} or return 0;
-        $raf->Read($buff, 64) or return 0;
+        $raf->Read($buff, 128) or return 0;
         my $buf2;
         ($buf2 = $buff) =~ tr/\0//d;    # cheap conversion to UTF-8
         # check to see if this is XMP format
         # - CS2 writes .XMP files without the "xpacket begin"
-        unless ($buf2 =~ /^(<\?xpacket begin=|<x:xmpmeta)/) {
-            # also recognize XML files
-            if ($buf2 =~ /^\xfe\xff<\?xml/g) {
+        unless ($buf2 =~ /^(<\?xpacket begin=|<x(mp)?:xmpmeta)/) {
+            # also recognize XML files (and .XMP files with BOM)
+            if ($buf2 =~ /^(\xfe\xff)(<\?xml|<x(mp)?:xmpmeta)/g) {
                 $fmt = 'n';     # UTF-16 or 32 MM with BOM
-            } elsif ($buf2 =~ /^\xff\xfe<\?xml/g) {
+            } elsif ($buf2 =~ /^(\xff\xfe)(<\?xml|<x(mp)?:xmpmeta)/g) {
                 $fmt = 'v';     # UTF-16 or 32 II with BOM
-            } elsif ($buf2 =~ /^(\xef\xbb\xbf)?<\?xml/g) {
+            } elsif ($buf2 =~ /^(\xef\xbb\xbf)?(<\?xml|<x(mp)?:xmpmeta)/g) {
                 $fmt = 0;       # UTF-8 with BOM or unknown encoding without BOM
             } else {
                 return 0;       # not XMP or XML
+            }
+            $bom = 1 if $1;
+            if ($2 eq '<?xml') {
+                return 0 unless $buf2 =~ /<x(mp)?:xmpmeta/;
+                $isXML = 1;
             }
             if ($buff =~ /^\0\0/) {
                 $fmt = 'N';     # UTF-32 MM with or without BOM
@@ -1890,7 +1983,6 @@ sub ProcessXMP($$;$)
                     $fmt = 'v'; # UTF-16 II without BOM
                 }
             }
-            $isXML = 1;
         }
         $raf->Seek(0, 2) or return 0;
         my $size = $raf->Tell() or return 0;
@@ -1922,11 +2014,11 @@ sub ProcessXMP($$;$)
     delete $$exifTool{XMP_IS_XML};
     if ($isXML) {
         $$exifTool{XMP_IS_XML} = 1;
-        $$exifTool{XMP_NO_XPACKET} = 1;
+        $$exifTool{XMP_NO_XPACKET} = 1 + $bom;
     } elsif ($$dataPt =~ /\G\Q$begin\E/) {
         delete $$exifTool{XMP_NO_XPACKET};
-    } elsif ($$dataPt =~ /<x:xmpmeta/) {
-        $$exifTool{XMP_NO_XPACKET} = 1;
+    } elsif ($$dataPt =~ /<x(mp)?:xmpmeta/) {
+        $$exifTool{XMP_NO_XPACKET} = 1 + $bom;
     } else {
         delete $$exifTool{XMP_NO_XPACKET};
         # check for UTF-16 encoding (insert one \0 between characters)
@@ -2003,7 +2095,7 @@ information.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

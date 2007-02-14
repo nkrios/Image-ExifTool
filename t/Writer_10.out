@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
 [File, File, Image]  - File Name: Writer_10_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
+[File, File, Time]  - File Modification Date/Time: 2006:01:07 13:39:08
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -92,11 +92,11 @@
 [MakerNotes, Pentax, Camera] 31 - Saturation: Normal
 [MakerNotes, Pentax, Camera] 32 - Contrast: Normal
 [MakerNotes, Pentax, Camera] 33 - Sharpness: Normal
-[MakerNotes, Pentax, Camera] 34 - World Time Location: Destination
-[MakerNotes, Pentax, Camera] 35 - Hometown City: London
-[MakerNotes, Pentax, Camera] 36 - Destination City: Los Angeles
-[MakerNotes, Pentax, Camera] 37 - Hometown DST: Yes
-[MakerNotes, Pentax, Camera] 38 - Destination DST: Yes
+[MakerNotes, Pentax, Time] 34 - World Time Location: Destination
+[MakerNotes, Pentax, Time] 35 - Hometown City: London
+[MakerNotes, Pentax, Time] 36 - Destination City: Los Angeles
+[MakerNotes, Pentax, Time] 37 - Hometown DST: Yes
+[MakerNotes, Pentax, Time] 38 - Destination DST: Yes
 [XMP, XMP-dc, Time] date - Date: 2003-03-06
 [XMP, XMP-exif, Camera] FlashMode - Flash Mode: Off
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
@@ -108,8 +108,8 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
 [Composite, Composite, Image]  - Shutter Speed: 1/500
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
+[Composite, Composite, Camera]  - Circle Of Confusion: 0.005 mm
 [Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 3.76 m
+[Composite, Composite, Camera]  - Hyperfocal Distance: 3.76 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Light Value: 14.9

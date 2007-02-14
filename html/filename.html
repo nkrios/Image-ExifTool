@@ -3,70 +3,61 @@
 <html>
 <head>
   <title>FileName and Directory tags</title>
-<style type="text/css">
-<!--
-h1       { margin: 0 0 .5em 0 }
-code.blk { color: #000000 } /* black color */
-code {
-    color: #880000;
-    font-family: monospace;
-}
--->
-</style>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
-<body text='#000000' bgcolor='#ffffff'>
-<h1>Writing "FileName" and "Directory" tags</h1>
+<body>
+<h2 class='up'>Writing "FileName" and "Directory" tags</h2>
 
-By writing the <b>FileName</b> and/or <b>Directory</b> tags, ExifTool can be
-used to rename and/or move images into directories according to any
-information contained in the image.  The most useful application of this
-feature is to organize images by date/time, but any other tag value may also
-be used.
+<p>By writing the <b>FileName</b> and/or <b>Directory</b> tags, ExifTool can be
+used to rename and/or move images into directories according to any information
+contained in the image.  The most useful application of this feature is to
+organize images by date/time, but any other tag value may also be used.</p>
 
 <p>Writing the <b>Directory</b> tag moves a file to a specified directory.  The
-directory is created if it didn't already exist.
+directory is created if it didn't already exist.</p>
 
 <p>Writing the <b>FileName</b> tag renames a file.  If the new <b>FileName</b>
-has a directory specification (ie. contains a '/' character), then the file
-is also moved to the specified directory (see example 6 below).  Existing
-files will not be overwritten.
+has a directory specification (ie. contains a '<code>/</code>' character), then
+the file is also moved to the specified directory (see example 6 below). 
+Existing files will not be overwritten.</p>
 
-<p>The <b>%d</b>, <b>%f</b>, <b>%e</b> file name format codes may be used to
-represent the directory, name and extension of the original file when specifying
-<b>FileName</b> and <b>Directory</b> tags via the command-line interface. (In a
-similar way to the <b>-o</b>, <b>-w</b> and <b>-tagsFromFile</b> options.)
-Also, <b>%c</b> may be used to add a copy number to the output file name to
-avoid collisions with existing file names.  Note that these codes must be
-escaped with an extra '%' if used within a date format string.  Modifiers may
-also be used to change the default behaviour of these format codes.  See the <a
-href="exiftool_pod.html#item__2dw_ext_or_fmt">-w option</a> documentation for
-details.
+<p>The <code>%d</code>, <code>%f</code>, <code>%e</code> file name format codes
+may be used to represent the directory, name and extension of the original file
+when specifying <b>FileName</b> and <b>Directory</b> tags via the command-line
+interface. (In a similar way to the <code>-o</code>, <code>-w</code> and
+<code>-TagsFromFile</code> options.) Also, <code>%c</code> may be used to add a
+copy number to the output file name to avoid collisions with existing file
+names. Note that these codes must be escaped with an extra <code>%</code> if
+used within a date format string.  Modifiers may also be used to change the
+default behaviour of these format codes.  See the
+<a href="exiftool_pod.html#item__2dw_ext_or_fmt">-w option</a> documentation for
+details.</p>
 
-<p>When organizing files by date/time, use of the <b>-d</b> (date format) option
-is essential to specify a format for the file (and/or directory) name.  The
-examples below demonstrate the use of this feature.  Also, a quick reference of
-<a href="#codes">common date format codes</a> is included.
+<p>When organizing files by date/time, use of the <code>-d</code> (date format)
+option is essential to specify a format for the file (and/or directory) name. 
+The examples below demonstrate the use of this feature.  Also, a quick reference
+of <a href="#codes">common date format codes</a> is included.</p>
 
 <h3>Notes:</h3>
 
-Writing the <b>FileName</b> and/or <b>Directory</b> tags alone causes the file
-to be renamed or moved, not copied.  However, if any other tags are written at
-the same time, then the file is rewritten to the new destination and the
+<p>Writing the <b>FileName</b> and/or <b>Directory</b> tags alone causes the
+file to be renamed or moved, not copied.  However, if any other tags are written
+at the same time, then the file is rewritten to the new destination and the
 original file is left unchanged.  (The only exception to this is
 <b>FileModifyDate</b> tag, which will not cause the file to be rewritten because
 it is the only other writable tag not representing meta information within the
-file.)  But if desired, the <b>-overwrite_original</b> option may be used in
-this case to remove the original copy.
+file.)  But if desired, the <code>-overwrite_original</code> option may be used
+in this case to remove the original copy.</p>
 
-<p>Conversely, the <b>-o</b> option may be used to force exiftool to always
-create a copy of the file, even if no meta-information tags are written.  To do
-this, a dummy file name or directory (to be overridden by the <b>FileName</b> or
-<b>Directory</b> tag) must be specified for the <b>-o</b> option. (See example
-5 below.)
+<p>Conversely, the <code>-o</code> option may be used to force exiftool to
+always create a copy of the file, even if no meta-information tags are written. 
+To do this, a dummy file name or directory (to be overridden by the
+<b>FileName</b> or <b>Directory</b> tag) must be specified for the
+<code>-o</code> option. (See example 5 below.)</p>
 
-<p>If the <b>-d</b> option is used, the unformatted date/time value must be
-valid (ie. in the form "YYYY:mm:dd HH:MM:SS"), otherwise the date formatting
-will fail and the file will not be renamed or moved.
+<p>If the <code>-d</code> option is used, the unformatted date/time value must
+be valid (ie. in the form "<code>YYYY:mm:dd HH:MM:SS</code>"), otherwise the
+date formatting will fail and the file will not be renamed or moved.</p>
 
 <h2>Examples</h2>
 
@@ -76,8 +67,9 @@ exiftool -d %Y%m%d_%H%M%%-c.%%e "-filename&lt;CreateDate" DIR
 <blockquote>
 Rename all images in directory '<code>DIR</code>' to names like
 '<code>20060327_1058-2.jpg</code>', with individual file names derived from the
-value of the CreateDate (plus a copy number with a leading '-' if a file with
-the same name already exists), and with the same extension as the original image.
+value of the CreateDate (plus a copy number with a leading '<code>-</code>' if a
+file with the same name already exists), and with the same extension as the
+original image.
 </blockquote>
 
 <table cellpadding=6><tr><td valign='top'>&nbsp;2.</td><td bgcolor='#dddddd'><code class='blk'>
@@ -130,8 +122,8 @@ directory hierarchy based on date of file modification, with path names like
 '<code>2006/03/27/image_105859.jpg</code>'.
 </blockquote>
 
-The following examples demonstrate the interaction of this feature with
-other ExifTool options:<p>
+<p>The following examples demonstrate the interaction of this feature with
+other ExifTool options:</p>
 
 <table cellpadding=6><tr><td valign='top'>&nbsp;7.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -filename=new.jpg dir/image.jpg
@@ -165,14 +157,14 @@ exiftool -o tmp/new.jpg image.jpg
 </code></td></tr></table>
 <blockquote>
 A file name or directory specified via the <b>FileName</b> or <b>Directory</b>
-tag takes precedence over that specified by the <b>-o</b> option, so these three
-commands all have the same effect: '<code>tmp/new.jpg</code>' is created without
-changing '<code>image.jpg</code>'.  Note that in the first command, the trailing
-'<code>/</code>' on '<code>tmp/</code>' is necessary if the '<code>tmp</code>'
-directory doesn't already exist, otherwise '<code>tmp</code>' would be taken as
-a file name and '<code>new.jpg</code>' would be created in the current
-directory.  As illustrated in example 4 above, the file is rewritten instead of
-simply being renamed when the '<code>-o</code>' option is used.
+tag takes precedence over that specified by the <code>-o</code> option, so these
+three commands all have the same effect: '<code>tmp/new.jpg</code>' is created
+without changing '<code>image.jpg</code>'.  Note that in the first command, the
+trailing '<code>/</code>' on '<code>tmp/</code>' is necessary if the
+'<code>tmp</code>' directory doesn't already exist, otherwise '<code>tmp</code>'
+would be taken as a file name and '<code>new.jpg</code>' would be created in the
+current directory.  As illustrated in example 4 above, the file is rewritten
+instead of simply being renamed when the '<code>-o</code>' option is used.
 </blockquote>
 
 <table cellpadding=6><tr><td valign='top'>11.</td><td bgcolor='#dddddd'><code class='blk'>
@@ -182,20 +174,20 @@ exiftool -directory=dir1 -filename=dir2/out.jpg -o dir3/ dir4/image.jpg<br>
 This example demonstrates the priorities of directory names specified using
 different techniques.  The output directory is taken from the first directory
 specified from the following list:  1) the <b>Directory</b> tag, 2) the
-<b>FileName</b> tag, 3) the <b>-o</b> option, or 4) the original source file, in
-that order.  Note that both the <b>FileName</b> tag and the <b>-o</b> option may
-be used without a directory specification, in which case the directory with the
-next highest priority is used.  So in this example, the output file is
-'<code>dir1/image.jpg</code>'.  The order of the arguments on the command line
-is not significant.
+<b>FileName</b> tag, 3) the <code>-o</code> option, or 4) the original source
+file, in that order.  Note that both the <b>FileName</b> tag and the
+<code>-o</code> option may be used without a directory specification, in which
+case the directory with the next highest priority is used.  So in this example,
+the output file is '<code>dir1/image.jpg</code>'.  The order of the arguments on
+the command line is not significant.
 </blockquote>
 
 <a name="codes"></a><h2>Common Date Format Codes</h2>
-Date format codes are used in the argument to the <b>-d</b> option to
+<p>Date format codes are used in the argument to the <code>-d</code> option to
 represent components of the date/time string. The codes listed below
 represent those which are common across most systems, but additional codes
 will be available on your specific system -- see your <i>strftime</i> man
-page for details.
+page for details.</p>
 <blockquote><table>
 <tr><th>%a</th><td>- abbreviated locale weekday name</td></tr>
 <tr><th>%A</th><td>- full locale weekday name</td></tr>
@@ -219,10 +211,11 @@ page for details.
 <tr><th>%Z</th><td>- time zone name</td></tr>
 <tr><th>%%</th><td>- a literal '%' character</td></tr>
 </table></blockquote>
-Note that ExifTool file name format codes may be used inside a date format
-string when a date/time tag is used to set the value of the <b>FileName</b>
-or <b>Directory</b> tags via the command-line interface.  In this case, an
-extra '%' must be added to pass the format code through the date/time parser:
+<p>Note that ExifTool file name format codes may be used inside a date format
+string when a date/time tag is used to set the value of the <b>FileName</b> or
+<b>Directory</b> tags via the command-line interface.  In this case, an extra
+<code>%</code> must be added to pass the format code through the date/time
+parser:</p>
 <blockquote><table>
 <tr><th>%%d</th><td>- original file directory</td></tr>
 <tr><th>%%f</th><td>- original file name</td></tr>
@@ -230,6 +223,6 @@ extra '%' must be added to pass the format code through the date/time parser:
 <tr><th>%%c</th><td>- copy number (output files only)</td></tr>
 </table></blockquote>
 <hr>
-<p><a href="index.html">&lt;-- Back to ExifTool home page</a>
+<p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -11,7 +11,7 @@ package Image::ExifTool::HtmlDump;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.14';
 
 sub DumpTable($$$;$$$$);
 sub Open($$$;@);
@@ -21,7 +21,7 @@ my ($bkgStart, $bkgEnd, $bkgSpan);
 
 my $htmlHeader1 = <<_END_PART_1_;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-"http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd">
+ "http://www.w3.org/TR/1998/REC-html40-19980424/loose.dtd">
 <html>
 <head>
 <title>
@@ -52,6 +52,9 @@ td.c2 {
   border-left: 1px solid gray;
   border-right: 1px solid gray;
 }
+pre   { margin: 0 }
+table { font-size: .9em }
+body  { color: black; background: white }
 -->
 </style>
 <script language="JavaScript" type="text/JavaScript">
@@ -115,9 +118,9 @@ _END_PART_2_
 my $htmlHeader3 = q[
 // End --->
 </script></head>
-<body bgcolor='#ffffff'><noscript><b class='V'>--&gt;
+<body><noscript><b class=V>--&gt;
 Enable JavaScript for active highlighting and information tool tips!
-</b></noscript><table class='dump' cellspacing=0 cellpadding=2>
+</b></noscript><table class=dump cellspacing=0 cellpadding=2>
 <tr><td valign='top'><pre>];
 
 my $preMouse = q(<pre onmouseover="high(event,1)" onmouseout="high(event,0)">);
@@ -151,6 +154,12 @@ sub Add($$$$;$$)
     if ($tip and $tip eq 'SAME') {
         $tip = '';
     } else {
+        $tip = defined $tip ? '\n' . $tip : '';
+        my $m = $msg;
+        $m =~ s/<.*?>//g;       # remove html format codes
+        $tip = "$m$tip";        # add msg as first line in tooltip
+        # add size if not already done
+        $tip .= "\\n($size bytes)" unless $tip =~ /\\nSize:/;
         ++$self->{TipNum};
     }
     push @{$$block{$start}}, [ $size, $msg, $tip, $flag, $self->{TipNum} ];
@@ -206,12 +215,14 @@ sub Print($$;$$$$$)
             if ($pos >= $dataPos and $pos + $bytes <= $dataEnd) {
                 $buff = substr($$dataPt, $pos-$dataPos, $bytes);
             } else {
-                $raf->Seek($pos, 0);
-                $raf->Read($buff, $bytes);
+                $buff = '';
+                $raf->Seek($pos, 0) and $raf->Read($buff, $bytes);
             }
-            my $str = ($bytes > 1) ? "unused $bytes bytes" : 'pad byte';
-            $self->DumpTable($pos-$dataPos, \$buff, "[$str]", "t$index", 0x108);
-            ++$index;
+            if (length $bytes) {
+                my $str = ($bytes > 1) ? "unused $bytes bytes" : 'pad byte';
+                $self->DumpTable($pos-$dataPos, \$buff, "[$str]", "t$index", 0x108);
+                ++$index;
+            }
             $pos = $start;  # dumped unused data up to the start of this block
         }
         my $parms;
@@ -220,7 +231,7 @@ sub Print($$;$$$$$)
             my ($len, $msg, $tip, $flag, $tipNum) = @$parms;
             next unless $len > 0;
             $flag = 0 unless defined $flag;
-            # generate same name for all blocks starting with the same message word
+            # generate same name for all blocks indexed by this tooltip
             my $name = $names[$tipNum];
             my $idx = $index;
             if ($name) {
@@ -242,9 +253,10 @@ sub Print($$;$$$$$)
             if ($start >= $dataPos and $end <= $dataEnd) {
                 $buff = substr($$dataPt, $start-$dataPos, $len);
             } else {
-                $raf->Seek($start, 0);
-                $raf->Read($buff, $len);
+                $buff = '';
+                $raf->Seek($start, 0) and $raf->Read($buff, $len);
             }
+            next unless length $buff;
             # set flag to continue this line if next block is contiguous
             if ($i+1 < @starts and $parms eq $$parmList[-1] and
                 ($end == $starts[$i+1] or ($end < $starts[$i+1] and $end >= $pos)))
@@ -276,7 +288,7 @@ sub Print($$;$$$$$)
         Write($outfile, $htmlHeader3, $self->{Cols}->[0]);
         Write($outfile, '</pre></td><td valign="top">',
                         $preMouse, $self->{Cols}->[1]);
-        Write($outfile, '</pre></td><td class="c2" valign="top">',
+        Write($outfile, '</pre></td><td class=c2 valign="top">',
                         $preMouse, $self->{Cols}->[2]);
         Write($outfile, '</pre></td><td valign="top">',
                         $preMouse, $self->{Cols}->[3]);
@@ -383,7 +395,7 @@ sub DumpTable($$$;$$$$)
     my ($f0, $dblRef, $id);
     if (($endPos and $pos < $endPos) or $flag & 0x02) {
         # display double-reference addresses in red
-        $f0 = "<span class='V'>";
+        $f0 = "<span class=V>";
         $dblRef = 1 if $endPos and $pos < $endPos;
     } else {
         $f0 = '';
@@ -403,7 +415,7 @@ sub DumpTable($$$;$$$$)
             }
             ++$id unless $dblRef;
         }
-        $name = qq{<a name='$name' class='$id'>};
+        $name = qq{<a name=$name class=$id>};
         $msg and $msg = "$name$msg</a>";
     } else {
         $name = '';
@@ -453,7 +465,7 @@ sub DumpTable($$$;$$$$)
         if ($dblRef and $p >= $endPos) {
             $dblRef = 0;
             ++$id;
-            $name =~ s/class='.'/class='$id'/;
+            $name =~ s/class=\w\b/class=$id/;
             $f0 = '';
             $self->Open('fgd', $f0, 0);
         }
@@ -563,7 +575,7 @@ display linefeeds in the tool tips.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

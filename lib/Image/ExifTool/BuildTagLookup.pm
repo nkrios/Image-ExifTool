@@ -29,13 +29,13 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Nikon;
 use Image::ExifTool::Real;
 
-$VERSION = '1.48';
+$VERSION = '1.54';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
 
 # colors for html pages
-my $noteFont = "<span class='n'>";
+my $noteFont = "<span class=n>";
 my $noteFontSmall = "<span class='n s'>";
 
 my $docType = q{<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -80,11 +80,11 @@ question mark after a tag name indicates that the information is either not
 understood, not verified, or not very useful -- these tags are not extracted
 by ExifTool unless the Unknown (-u) option is enabled.  Be aware that some
 tag names are different than the descriptions printed out by default when
-extracting information with "exiftool".  To see the tag names instead of the
-descriptions, use "exiftool -s".
+extracting information with exiftool.  To see the tag names instead of the
+descriptions, use C<exiftool -s>.
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
-Anything but an "N" in this column means the tag is writable.  A "Y"
+Anything but an C<N> in this column means the tag is writable.  A C<Y>
 indicates writable information that is either unformatted or written using
 the existing format.  Other expressions give details about the information
 format, and vary depending on the general type of information.  The format
@@ -112,13 +112,13 @@ B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
 reason for this is to make the tag names more consistent across different
 types of meta information.  To determine a tag name, either consult this
-documentation or run "exiftool -s" on a file containing the information in
+documentation or run C<exiftool -s> on a file containing the information in
 question.
 },
     EXIF => q{
 EXIF stands for "Exchangeable Image File Format".  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, MIFF and DNG images.
+TIFF, PNG, MIFF and WDP images, as well as many TIFF-based RAW images.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
@@ -260,8 +260,8 @@ to extract meta information, but they are only a small fraction of the total
 number of available PDF tags.
 },
     DNG => q{
-The main DNG tags are found in the EXIF table.  The tables below define tags
-found within structures of these main tag values.
+The main DNG tags are found in the EXIF table.  The tables below define only
+information found within structures of these main DNG tag values.
 },
     MPEG => q{
 The MPEG format doesn't specify any file-level meta information.  In lieu of
@@ -300,7 +300,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 ~head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -323,7 +323,7 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that || 'Image::ExifTool::BuildTagLookup';
     my $self = bless {}, $class;
-    my %subdirs;
+    my (%subdirs, %isShortcut);
     my %count = (
         'unique tag names' => 0,
         'total tags' => 0,
@@ -332,7 +332,7 @@ sub new
 # loop through all tables, accumulating TagLookup and TagName information
 #
     my (%tagNameInfo, %id, %longID, %longName, %shortName, %tableNum,
-        %tagLookup, %tagExists, %tableWritable, %sepTable);
+        %tagLookup, %tagExists, %tableWritable, %sepTable, %compositeModules);
     $self->{TAG_NAME_INFO} = \%tagNameInfo;
     $self->{TAG_ID} = \%id;
     $self->{LONG_ID} = \%longID;
@@ -343,6 +343,7 @@ sub new
     $self->{TAG_EXISTS} = \%tagExists;
     $self->{TABLE_WRITABLE} = \%tableWritable;
     $self->{SEPARATE_TABLE} = \%sepTable;
+    $self->{COMPOSITE_MODULES} = \%compositeModules;
 
     Image::ExifTool::LoadAllTables();
     my @tableNames = sort keys %allTables;
@@ -359,6 +360,14 @@ sub new
         $short =~ s/^Exif\b/EXIF/;
         $shortName{$tableName} = $short;    # remember short name
         $tableNum{$tableName} = $tableNum++;
+    }
+    # make lookup table to check for shortcut tags
+    my $tag;
+    foreach $tag (keys %Image::ExifTool::Shortcuts::Main) {
+        my $entry = $Image::ExifTool::Shortcuts::Main{$tag};
+        # ignore if shortcut tag name includes itself
+        next if ref $entry eq 'ARRAY' and grep /^$tag$/, @$entry;
+        $isShortcut{lc($tag)} = 1;
     }
     foreach $tableName (@tableNames) {
         # create short table name
@@ -459,8 +468,9 @@ TagID:  foreach $tagID (@keys) {
                     if ($$tagInfo{SeparateTable}) {
                         $subdir = 1;
                         my $s = $$tagInfo{SeparateTable};
-                        ($s = $short) =~ s/ .*// if $s eq '1';
-                        $s .= " $$tagInfo{Name}";
+                        $s = $$tagInfo{Name} if $s eq '1';
+                        # add module name if not specified
+                        $s =~ / / or ($short =~ /^(\w+)/ and $s = "$1 $s");
                         push @values, $s;
                         $sepTable{$s} = $printConv;
                     } else {
@@ -500,11 +510,9 @@ TagID:  foreach $tagID (@keys) {
                         }
                     }
                 }
-                if ($subdir) {
-                    # flag a subdirectory by setting writable to '-'
-                    # (if this is a writable subdirectory, prefix writable by '-')
+                if ($subdir and not $$tagInfo{SeparateTable}) {
+                    # subdirectories are only writable if specified explicitly
                     $writable = '-' . ($$tagInfo{Writable} ? $writable : '');
-                    $writable = '-N' if $$tagInfo{SeparateTable} and $writable eq '-';
                 } else {
                     # not writable if we can't do the inverse conversions
                     my $noPrintConvInv;
@@ -513,6 +521,7 @@ TagID:  foreach $tagID (@keys) {
                             next unless $$tagInfo{$_};
                             next if $$tagInfo{$_ . 'Inv'};
                             next if ref $$tagInfo{$_} eq 'HASH';
+                            next if $$tagInfo{WriteAlso};
                             if ($_ eq 'ValueConv') {
                                 undef $writable;
                             } else {
@@ -548,10 +557,18 @@ TagID:  foreach $tagID (@keys) {
                         $writable .= '/' if $$tagInfo{Avoid};
                     }
                     $writable .= '+' if $$tagInfo{List};
+                    # Œseparate tables link like subdirectories (flagged with leading '-')
+                    $writable = "-$writable" if $subdir;
                 }
                 # don't duplicate a tag name unless an entry is different
                 my $name = $$tagInfo{Name};
                 my $lcName = lc($name);
+                # check for conflicts with shortcut names
+                if ($isShortcut{$lcName} and $short ne 'Shortcuts' and
+                    ($$tagInfo{Writable} or not $$tagInfo{SubDirectory}))
+                {
+                    warn "WARNING: $short $name is a shortcut tag!\n";
+                }
                 $name .= '?' if $$tagInfo{Unknown};
                 unless (@tagNames and $tagNames[-1] eq $name and
                     $writeGroup[-1] eq $writeGroup and $writable[-1] eq $writable)
@@ -598,6 +615,9 @@ TagID:  foreach $tagID (@keys) {
                 }
                 $tableWritable{$tableName} = 1;
                 $tagLookup{$lcName}->{$tableNum} = $tagIDs;
+                if ($short eq 'Composite' and $$tagInfo{Module}) {
+                    $compositeModules{$lcName} = $$tagInfo{Module};
+                }
             }
 #
 # save TagName information
@@ -666,6 +686,7 @@ sub WriteTagLookup($$)
     }
     print OUTFILE "\n# list of tables containing writable tags\n";
     print OUTFILE "my \@tableList = (\n";
+
 #
 # write table list
 #
@@ -732,6 +753,15 @@ sub WriteTagLookup($$)
         next if $$tagLookup{$tag};
         print OUTFILE "\t'$tag' => 1,\n";
     }
+#
+# write module lookup for writable composite tags
+#
+    my $compositeModules = $self->{COMPOSITE_MODULES};
+    print OUTFILE ");\n\n# module names for writable Composite tags\n";
+    print OUTFILE "my \%compositeModules = (\n";
+    foreach (sort keys %$compositeModules) {
+        print OUTFILE "\t'$_' => '$$compositeModules{$_}',\n";
+    }
     print OUTFILE ");\n\n";
 #
 # finish writing TagLookup.pm and clean up
@@ -797,7 +827,7 @@ sub Doc2Pod($)
 sub Doc2Html($)
 {
     my $doc = EscapeHTML(shift);
-    $doc =~ s/\n\n/\n\n<p>/g;
+    $doc =~ s/\n\n/<\/p>\n\n<p>/g;
     $doc =~ s/B&lt;(.*?)&gt;/<b>$1<\/b>/sg;
     $doc =~ s/C&lt;(.*?)&gt;/<code>$1<\/code>/sg;
     return $doc;
@@ -880,6 +910,7 @@ sub GetTableOrder()
         GeoTiff => 'GPS',
         Leaf    => 'Kodak',
         Unknown => 'Sony',
+        DNG     => 'Unknown',
         PrintIM => 'ICC_Profile',
         Olympus => 'NikonCapture',
         Pentax  => 'Panasonic',
@@ -939,15 +970,15 @@ sub OpenHtmlFile($;$$)
         print HTMLFILE "<link rel=stylesheet type='text/css' href='style.css' title='Style'>\n";
         print HTMLFILE "</head>\n<body>\n";
         if ($category ne $class and $docs{$class}) {
-            print HTMLFILE "<h2 class='top'>$class Tags</h2>\n" or return 0;
-            print HTMLFILE Doc2Html($docs{$class}),"\n" or return 0;
+            print HTMLFILE "<h2 class=top>$class Tags</h2>\n" or return 0;
+            print HTMLFILE '<p>',Doc2Html($docs{$class}),"</p>\n" or return 0;
         } else {
-            $top = " class='top'";
+            $top = " class=top";
         }
     }
     $head = "<a name='$url'>$head</a>" if $url;
     print HTMLFILE "<h2$top>$head</h2>\n" or return 0;
-    print HTMLFILE Doc2Html($docs{$category}),"\n" if $docs{$category};
+    print HTMLFILE '<p>',Doc2Html($docs{$category}),"</p>\n" if $docs{$category};
     $createdFiles{$htmlFile} = 1;
     return 1;
 }
@@ -978,10 +1009,11 @@ sub CloseHtmlFiles($)
         print HTMLFILE "<hr>\n";
         print HTMLFILE "(This document generated automatically by Image::ExifTool::BuildTagLookup)\n";
         print HTMLFILE "<br><i>Last revised $fileDate</i>\n";
+        print HTMLFILE "<p class=lf><a href=";
         if ($htmlFile =~ /index\.html$/) {
-            print HTMLFILE "<p><a href='../index.html'>&lt;-- Back to ExifTool home page</a>\n";
+            print HTMLFILE "'../index.html'>&lt;-- Back to ExifTool home page</a></p>\n";
         } else {
-            print HTMLFILE "<p><a href='index.html'>&lt;-- ExifTool Tag Names</a>\n"
+            print HTMLFILE "'index.html'>&lt;-- ExifTool Tag Names</a></p>\n"
         }
         print HTMLFILE "</body>\n</html>\n" or $success = 0;
         close HTMLFILE or $success = 0;
@@ -1043,10 +1075,10 @@ sub WriteTagNames($$)
     mkdir "$htmldir/TagNames";
     OpenHtmlFile($htmldir) or return 0;
     print HTMLFILE "<blockquote>\n";
-    print HTMLFILE "<table width='100%' class='frame'><tr><td>\n";
-    print HTMLFILE "<table width='100%' class='inner' cellspacing=1><tr class='h'>\n";
-    print HTMLFILE "<th colspan=$columns><span class='l'>Tag Table Index</span></th></tr>\n";
-    print HTMLFILE "<tr class='b'><td width='$percent%'>\n";
+    print HTMLFILE "<table width='100%' class=frame><tr><td>\n";
+    print HTMLFILE "<table width='100%' class=inner cellspacing=1><tr class=h>\n";
+    print HTMLFILE "<th colspan=$columns><span class=l>Tag Table Index</span></th></tr>\n";
+    print HTMLFILE "<tr class=b><td width='$percent%'>\n";
     # write the index
     my @tableNames = GetTableOrder();
     push @tableNames, 'Image::ExifTool::Shortcuts::Main';   # do Shortcuts last
@@ -1089,7 +1121,7 @@ sub WriteTagNames($$)
         ++$count;
     }
     print HTMLFILE "\n</td></tr></table></td></tr></table></blockquote>\n";
-    print HTMLFILE Doc2Html($docs{ExifTool2}),"\n";
+    print HTMLFILE '<p>',Doc2Html($docs{ExifTool2}),"</p>\n";
     # write all the tag tables
     while (@tableNames or @sepTables) {
         while (@sepTables) {
@@ -1109,14 +1141,51 @@ sub WriteTagNames($$)
             if (OpenHtmlFile($htmldir, $tableName, 1)) {
                 print HTMLFILE Doc2Html($notes), "\n" if $notes;
                 print HTMLFILE "<blockquote>\n";
-                print HTMLFILE "<table class='frame'><tr><td>\n";
-                print HTMLFILE "<table class='inner' cellspacing=1>\n";
-                print HTMLFILE "<tr class='h'><th>$head</th><th>Value</th></tr>\n";
+                print HTMLFILE "<table class=frame><tr><td>\n";
+                print HTMLFILE "<table class='inner sep' cellspacing=1>\n";
+                my $align = ' class=r';
+                my $wid = 0;
+                my @keys;
                 foreach (sort NumbersFirst keys %$printConv) {
                     next if $_ eq 'Notes';
-                    my $val = EscapeHTML($_);
-                    $val =~ /\s/ and $val =  "'$val'";
-                    print HTMLFILE "<tr><td>$val</td><td>= $$printConv{$_}</td></tr>\n";
+                    $align = '' if $align and /[^\d]/;
+                    my $w = length($_) + length($$printConv{$_});
+                    $wid = $w if $wid < $w;
+                    push @keys, $_;
+                }
+                # print in multiple columns if there is room
+                my $cols = int(80 / ($wid + 4));
+                $cols = 1 if $cols < 1 or $cols > @keys;
+                my $rows = int((scalar(@keys) + $cols - 1) / $cols);
+                my ($r, $c);
+                print HTMLFILE '<tr class=h>';
+                for ($c=0; $c<$cols; ++$c) {
+                    print HTMLFILE "<th>Value</th><th>$head</th>";
+                }
+                print HTMLFILE "</tr>\n";
+                for ($r=0; $r<$rows; ++$r) {
+                    print HTMLFILE '<tr>';
+                    for ($c=0; $c<$cols; ++$c) {
+                        my $key = $keys[$r + $c*$rows];
+                        my ($val, $prt);
+                        if (defined $key) {
+                            $val = EscapeHTML($key);
+                            $val =~ /\s/ and $val =  "'$val'";
+                            $prt = "= $$printConv{$key}";
+                        } else {
+                            $val = $prt = '&nbsp;';
+                        }
+                        my ($vc, $pc);
+                        if ($c & 0x01) {
+                            $pc = ' class=b';
+                            $vc = $align ? " class='r b'" : $pc;
+                        } else {
+                            $vc = $align;
+                            $pc = '';
+                        }
+                        print HTMLFILE "<td$vc>$val</td><td$pc>$prt</td>\n";
+                    }
+                    print HTMLFILE '</tr>';
                 }
                 print HTMLFILE "</table></td></tr></table></blockquote>\n\n";
             }
@@ -1212,14 +1281,11 @@ sub WriteTagNames($$)
         print PODFILE $line,"\n";
         close HTMLFILE;
         OpenHtmlFile($htmldir, $short) or $success = 0;
-        if ($notes) {
-            print HTMLFILE "<p>" if $docs{$short};
-            print HTMLFILE Doc2Html($notes), "\n";
-        }
+        print HTMLFILE '<p>',Doc2Html($notes), "</p>\n" if $notes;
         print HTMLFILE "<blockquote>\n";
-        print HTMLFILE "<table class='frame'><tr><td>\n";
-        print HTMLFILE "<table class='inner' cellspacing=1>\n";
-        print HTMLFILE "<tr class='h'>$hid<th>$tagNameHeading</th>\n";
+        print HTMLFILE "<table class=frame><tr><td>\n";
+        print HTMLFILE "<table class=inner cellspacing=1>\n";
+        print HTMLFILE "<tr class=h>$hid<th>$tagNameHeading</th>\n";
         print HTMLFILE "<th>Writable</th>$derived<th>Values / ${noteFont}Notes</span></th></tr>\n";
         my $rowClass = 1;
         my $infoCount = 0;
@@ -1233,7 +1299,7 @@ sub WriteTagNames($$)
             } elsif ($tagIDstr =~ /^\d+$/) {
                 $w = $wID - 3;
                 $idStr = sprintf "  %${w}d    ", $tagIDstr;
-                $align = " class='r'";
+                $align = " class=r";
             } else {
                 $tagIDstr =~ s/^'$prefix/'/ if $prefix;
                 $w = $wID;
@@ -1313,7 +1379,7 @@ sub WriteTagNames($$)
             foreach (@$tagNames) {
                 push @htmlTags, EscapeHTML($_);
             }
-            $rowClass = $rowClass ? '' : " class='b'";
+            $rowClass = $rowClass ? '' : " class=b";
             my $isSubdir;
             if ($$writable[0] =~ /^-/) {
                 $isSubdir = 1;
@@ -1324,9 +1390,9 @@ sub WriteTagNames($$)
             print HTMLFILE "<tr$rowClass>\n";
             print HTMLFILE "<td$align>$tagIDstr</td>\n" if $id;
             print HTMLFILE "<td>", join("\n  <br>",@htmlTags), "</td>\n";
-            print HTMLFILE "<td class='c'>",join('<br>',@$writable),"</td>\n";
+            print HTMLFILE "<td class=c>",join('<br>',@$writable),"</td>\n";
             print HTMLFILE '<td>',join("\n  <br>",@$require),"</td>\n" if $composite;
-            print HTMLFILE "<td class='c'>",join('<br>',@$writeGroup),"</td>\n" if $showGrp;
+            print HTMLFILE "<td class=c>",join('<br>',@$writeGroup),"</td>\n" if $showGrp;
             print HTMLFILE "<td>";
             my $close = '';
             my @values;
@@ -1346,7 +1412,7 @@ sub WriteTagNames($$)
                         my $suffix = ' Tags';
                         if ($$sepTable{$_}) {
                             push @sepTables, $_;
-                            $suffix = '';
+                            $suffix = ' Values';
                         }
                         push @values, "--&gt; <a href='$url'>$_$suffix</a>";
                     }
@@ -1358,7 +1424,7 @@ sub WriteTagNames($$)
                         /^\(/ and $_ = "$noteFont$_</span>";
                         push @values, $_;
                     }
-                    print HTMLFILE "<span class='s'>";
+                    print HTMLFILE "<span class=s>";
                     $close = '</span>';
                 }
             } else {
@@ -1371,7 +1437,7 @@ sub WriteTagNames($$)
             my $cols = 3;
             ++$cols if $hid;
             ++$cols if $derived;
-            print HTMLFILE "<tr><td colspan=$cols class='c'>[no tags known]</td></tr>\n";
+            print HTMLFILE "<tr><td colspan=$cols class=c>[no tags known]</td></tr>\n";
         }
         print HTMLFILE "</table></td></tr></table></blockquote>\n\n";
     }
@@ -1411,7 +1477,7 @@ documentation.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -44,7 +44,7 @@ sub ProcessGIF($$)
     $verbose and print $out "GIF file version $type\n";
     if ($outfile) {
         Write($outfile, $type, $s) or $err = 1;
-        if ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{File}) {
+        if ($exifTool->{DEL_GROUP}->{File}) {
             $setComment = 1;
             if ($exifTool->{DEL_GROUP}->{File} == 2) {
                 $newComment = $exifTool->GetNewValues('Comment');
@@ -199,7 +199,7 @@ only the Comment tag is currently supported in GIF89a images.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

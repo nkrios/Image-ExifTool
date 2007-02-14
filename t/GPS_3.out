@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.46
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.75
 [File, File, Image]  - File Name: GPS_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2006:10:07 20:05:11
+[File, File, Time]  - File Modification Date/Time: 2007:02:12 07:49:33
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 120
@@ -76,7 +76,9 @@
 [IPTC, IPTC, Other] 25 - Keywords: Communications
 [IPTC, IPTC, Author] 116 - Copyright Notice: ian Britton - FreeFoto.com
 [Composite, Composite, Image]  - Aperture: 0.6
-[Composite, Composite, Other]  - GPS Position: 12 deg 21' 23.34" S, 1 deg 54' 51.00" W
+[Composite, Composite, Other]  - GPS Latitude: 12 deg 21' 23.34" S
+[Composite, Composite, Other]  - GPS Longitude: 1 deg 54' 51.00" W
+[Composite, Composite, Image]  - GPS Position: 12 deg 21' 23.34" S, 1 deg 54' 51.00" W
 [Composite, Composite, Image]  - Image Size: 120x80
 [Composite, Composite, Image]  - Shutter Speed: 1/724
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

@@ -15,7 +15,7 @@
 #               2) http://johnst.org/sw/exiftags/ (Asahi cameras)
 #               3) Wayne Smith private communication (Optio 550)
 #               4) http://kobe1995.jp/~kaz/astro/istD.html
-#               5) John Francis private communication (ist-D/ist-DS)
+#               5) John Francis (http://www.panix.com/~johnf/raw/index.html) (ist-D/ist-DS)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
 #               7) Douglas O'Brien private communication (*istD)
 #               8) Denis Bourez private communication
@@ -27,6 +27,7 @@
 #              14) Ger Vermeulen private communication (Optio S6)
 #              15) Barney Garrett private communication (Samsung GX-1S)
 #              16) Axel Kellner private communication (K10D)
+#              17) Cvetan Ivanov private communication (K100D)
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -37,7 +38,132 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.42';
+$VERSION = '1.45';
+
+# pentax lens type codes (ref 4)
+my %pentaxLensType = (
+    '0 0' => 'M-42 or No Lens', #17
+    '1 0' => 'K,M Lens',
+    '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mm F5.6)
+    '3 0' => 'SIGMA',
+    '3 17' => 'smc PENTAX-FA SOFT 85mm F2.8',
+    '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
+    '3 19' => 'smc PENTAX-F 24-50mm F4',
+    '3 20' => 'smc PENTAX-F 35-80mm F4-5.6',
+    '3 21' => 'smc PENTAX-F 80-200mm F4.7-5.6',
+    '3 22' => 'smc PENTAX-F FISH-EYE 17-28mm F3.5-4.5',
+    '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6',
+    '3 24' => 'smc PENTAX-F 35-135mm F3.5-4.5',
+    '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or SIGMA AF 28-300 F3.5-5.6 DL IF', #11 (sigma)
+    # or '3 25' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
+    '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
+    '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5',
+    '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5',
+    # or '3 28' => 'Tokina 19-35mm F3.5-4.5 AF', #12
+    '3 29' => 'PENTAX-F 28-80mm F3.5-4.5 or SIGMA AF 18-125mm F3.5-5.6 DC', #11 (sigma)
+    '3 30' => 'PENTAX-F 70-200mm F4-5.6',
+    '3 31' => 'smc PENTAX-F 70-210mm F4-5.6',
+    # or '3 31' => 'Tokina AF 730 75-300mm F4.5-5.6',
+    '3 32' => 'smc PENTAX-F 50mm F1.4',
+    '3 33' => 'smc PENTAX-F 50mm F1.7',
+    '3 34' => 'smc PENTAX-F 135mm F2.8 [IF]',
+    '3 35' => 'smc PENTAX-F 28mm F2.8',
+    '3 36' => 'SIGMA 20mm F1.8 EX DG ASPHERICAL RF',
+    '3 38' => 'smc PENTAX-F* 300mm F4.5 ED[IF]',
+    '3 39' => 'smc PENTAX-F* 600mm F4 ED[IF]',
+    '3 40' => 'smc PENTAX-F MACRO 100mm F2.8',
+    '3 41' => 'smc PENTAX-F MACRO 50mm F2.8',
+    '3 44' => 'SIGMA 18-50mm F3.5-5.6 DC, 12-24mm F4.5 EX DG or Tamron 35-90mm F4 AF', #4,12,12
+    '3 46' => 'SIGMA APO 70-200mm F2.8 EX',
+    '3 50' => 'smc PENTAX-FA 28-70mm F4 AL',
+    '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
+    '3 52' => 'smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF]',
+    '3 53' => 'smc PENTAX-FA 28-80mm F3.5-5.6 AL',
+    '3 247' => 'smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]',
+    '3 248' => 'smc PENTAX-DA 12-24mm F4 ED AL[IF]',
+    '3 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED',
+    '3 251' => 'smc PENTAX-DA 40mm F2.8 Limited',
+    '3 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL',
+    '3 253' => 'smc PENTAX-DA 14mm F2.8 ED[IF]',
+    '3 254' => 'smc PENTAX-DA 16-45mm F4 ED AL',
+    '3 255' => 'SIGMA',
+    # '3 255' => 'SIGMA 18-200mm F3.5-6.3 DC', #8
+    # '3 255' => 'SIGMA DL-II 35-80mm F4-5.6', #12
+    # '3 255' => 'SIGMA DL Zoom 75-300mm F4-5.6', #12
+    # '3 255' => 'SIGMA DF EX Aspherical 28-70mm F2.8', #12
+    '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
+    '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
+    '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
+    '4 6' => 'smc PENTAX-FA 35-80mm F4-5.6',
+    '4 12' => 'smc PENTAX-FA 50mm F1.4', #17
+    '4 15' => 'smc PENTAX-FA 28-105mm F4-5.6 [IF]',
+    '4 16' => 'TAMRON AF 80-210mm F4-5.6 (178D)', #13
+    '4 19' => 'TAMRON SP AF 90mm F2.8 (172E)',
+    '4 20' => 'smc PENTAX-FA 28-80mm F3.5-5.6',
+    '4 22' => 'TOKINA 28-80mm F3.5-5.6', #13
+    '4 23' => 'smc PENTAX-FA 20-35mm F4 AL',
+    '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
+    '4 25' => 'TAMRON SP AF 14mm F2.8', #13
+    '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
+    '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF]Macro (285D)',
+    '4 28' => 'smc PENTAX-FA 35mm F2 AL',
+    '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
+    '4 35' => 'smc PENTAX-FA 100-300mm F4.7-5.8',
+    '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO (572D)',
+    '4 37' => 'TAMRON SP AF 24-135mm F3.5-5.6 AD AL (190D)', #13
+    '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
+    '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
+    '4 41' => 'TAMRON AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] MACRO (A03)',
+    '4 43' => 'smc PENTAX-FA 28-90mm F3.5-5.6',
+    '4 44' => 'smc PENTAX-FA J 75-300mm F4.5-5.8 AL',
+    '4 45' => 'TAMRON 28-300mm F3.5-6.3 Ultra zoom XR',
+    '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
+    '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
+    '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
+    '4 51' => 'smc PENTAX-D FA 50mmF2.8 MACRO',
+    '4 52' => 'smc PENTAX-D FA 100mmF2.8 MACRO',
+    '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
+    '4 245' => 'Schneider D-XENON 50-200mm', #15
+    '4 246' => 'Schneider D-XENON 18-55mm', #15
+    '4 247' => 'smc PENTAX-DA 10-17mm F3.5-4.5 ED [IF] Fisheye zoom', #10
+    '4 248' => 'smc PENTAX-DA 12-24mm F4 ED AL [IF]', #10
+    '4 249' => 'TAMRON XR DiII 18-200mm F3.5-6.3 (A14)',
+    '4 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED', #8
+    '4 251' => 'smc PENTAX-DA 40mm F2.8 Limited', #9
+    '4 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL', #8
+    '4 253' => 'smc PENTAX-DA 14mm F2.8 ED[IF]',
+    '4 254' => 'smc PENTAX-DA 16-45mm F4 ED AL',
+    '5 1' => 'smc PENTAX-FA* 24mm F2 AL[IF]',
+    '5 2' => 'smc PENTAX-FA 28mm F2.8 AL',
+    '5 3' => 'smc PENTAX-FA 50mm F1.7',
+    '5 4' => 'smc PENTAX-FA 50mm F1.4',
+    '5 5' => 'smc PENTAX-FA* 600mm F4 ED[IF]',
+    '5 6' => 'smc PENTAX-FA* 300mm F4.5 ED[IF]',
+    '5 7' => 'smc PENTAX-FA 135mm F2.8 [IF]',
+    '5 8' => 'smc PENTAX-FA MACRO 50mm F2.8',
+    '5 9' => 'smc PENTAX-FA MACRO 100mm F2.8',
+    '5 10' => 'smc PENTAX-FA* 85mm F1.4 [IF]',
+    '5 11' => 'smc PENTAX-FA* 200mmF2.8 ED[IF]',
+    '5 12' => 'smc PENTAX-FA 28-80mm F3.5-4.7',
+    '5 13' => 'smc PENTAX-FA 70-200mm F4-5.6',
+    '5 14' => 'smc PENTAX-FA* 250-600mm F5.6 ED[IF]',
+    '5 15' => 'smc PENTAX-FA 28-105mm F4-5.6',
+    '5 16' => 'smc PENTAX-FA 100-300mm F4.5-5.6',
+    '6 1' => 'smc PENTAX-FA* 85mm F1.4[IF]',
+    '6 2' => 'smc PENTAX-FA* 200mm F2.8 ED[IF]',
+    '6 3' => 'smc PENTAX-FA* 300mm F2.8 ED[IF]',
+    '6 4' => 'smc PENTAX-FA* 28-70mm F2.8 AL',
+    '6 5' => 'smc PENTAX-FA* 80-200mm F2.8 ED[IF]',
+    '6 6' => 'smc PENTAX-FA* 28-70mm F2.8 AL',
+    '6 7' => 'smc PENTAX-FA* 80-200mm F2.8 ED[IF]',
+    '6 8' => 'smc PENTAX-FA 28-70mm F4AL',
+    '6 9' => 'smc PENTAX-FA 20mm F2.8',
+    '6 10' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
+    '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
+    '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
+    '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH (K10D)
+    '7 244' => 'smc PENTAX-DA 16-45mm F4 ED AL', #PH (K10D)
+);
 
 # Pentax city codes - PH (from Optio WP)
 my %pentaxCities = (
@@ -119,6 +245,13 @@ my %pentaxCities = (
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
+    0x0000 => { #5
+        Name => 'PentaxVersion',
+        Writable => 'int8u',
+        Count => 4,
+        PrintConv => '$val=~tr/ /./; $val',
+        PrintConvInv => '$val=~tr/./ /; $val',
+    },
     0x0001 => {
         Name => 'PentaxMode',
         Writable => 'int16u',
@@ -316,6 +449,7 @@ my %pentaxCities = (
         Name => 'FlashMode',
         Writable => 'int16u',
         PrintHex => 1,
+        ValueConv => '$val=~s/ .*//; $val',
         PrintConv => {
             0x000 => 'Auto, Did not fire',
             0x001 => 'Off',
@@ -324,7 +458,11 @@ my %pentaxCities = (
             0x102 => 'On',
             0x103 => 'Auto, Fired, Red-eye reduction',
             0x104 => 'On, Red-eye reduction',
+            0x105 => 'On, Wireless',
             0x108 => 'On, Soft',
+            0x109 => 'On, Slow-sync',
+            0x10a => 'On, Slow-sync, Red-eye reduction',
+            0x10b => 'On, Trailing-curtain Sync',
         },
     },
     0x000d => [
@@ -339,6 +477,8 @@ my %pentaxCities = (
                 2 => 'Infinity',
                 3 => 'Manual',
                 5 => 'Pan Focus',
+                16 => 'AF-S', #17
+                17 => 'AF-C', #17
             },
         },
         {
@@ -427,14 +567,14 @@ my %pentaxCities = (
             8 => 160, #PH
             9 => 200,
             10 => 250, #(NC)
-            11 => 320, #(NC)
+            11 => 320, #PH
             12 => 400,
             13 => 500, #(NC)
             14 => 640, #(NC)
             15 => 800,
             16 => 1000, #(NC)
             17 => 1250, #(NC)
-            18 => 1600, #(NC)
+            18 => 1600, #PH
             21 => 3200, #(NC)
             50 => 50, #PH
             100 => 100, #PH
@@ -443,6 +583,7 @@ my %pentaxCities = (
             800 => 800, #PH
             1600 => 1600, #PH
             3200 => 3200, #PH
+            # have seen 268 for ISO 1600 on K10D - PH
         },
     },
     # 0x0015 - Related to measured EV? ranges from -2 to 6 if interpreted as signed int (PH)
@@ -463,14 +604,63 @@ my %pentaxCities = (
             2 => 'Spot',
         },
     },
-    0x0018 => { #7/PH
-        Name => 'ExposureBracketStep',
-        Writable => 'int16',
-        # don't apply conversion if this is 2 integers
-        ValueConv => '$val=~/ / ? $val : $val / 3',
-        ValueConvInv => '$val=~/ / ? $val : int($val * 3 + 0.5)',
-        PrintConv => '$val=~/ / ? $val : sprintf("%.1f",$val)',
-        PrintConvInv => '$val',
+    0x0018 => { #PH
+        Name => 'AutoBracketing',
+        Writable => 'int16u',
+        Count => -1,
+        Notes => q{
+            one or two numbers: exposure bracket step in EV, then extended bracket if
+            available.  Extended bracket values are printed as 'WB-BA', 'WB-GM',
+            'Saturation', 'Sharpness' or 'Contrast' followed by '+1', '+2' or '+3' for
+            step size
+        },
+        ValueConv => sub {
+            my @v = split(' ', shift);
+            if ($v[0] < 10) {
+                $v[0] /= 3;     # 1=.3ev, 2=.7, 3=1...
+            } else {
+                $v[0] -= 9.5;   # 10=.5ev, 11=1.5...
+            }
+            return "@v";
+        },
+        ValueConvInv => sub {
+            my @v = split(' ', shift);
+            if (abs($v[0]-int($v[0])-.5) > 0.05) {
+                $v[0] = int($v[0] * 3 + 0.5);
+            } else {
+                $v[0] = int($v[0] + 10);
+            }
+            return "@v";
+        },
+        PrintConv => sub {
+            my @v = split(' ', shift);
+            $v[0] = sprintf('%.1f', $v[0]) if $v[0];
+            if ($v[1]) {
+                my %s = (1=>'WB-BA',2=>'WB-GM',3=>'Saturation',4=>'Sharpness',5=>'Contrast');
+                my $t = $v[1] >> 8;
+                $v[1] = sprintf('%s+%d', $s{$t} || "Unknown($t)", $v[1] & 0xff);
+            } elsif (defined $v[1]) {
+                $v[1] = 'No Extended Bracket',
+            }
+            return join(' EV, ', @v);
+        },
+        PrintConvInv => sub {
+            my @v = split(/, ?/, shift);
+            $v[0] =~ s/ ?EV//i;
+            if ($v[1]) {
+                my %s = ('WB-BA'=>1,'WB-GM'=>2,Saturation=>3,Sharpness=>4,Contrast=>5);
+                if ($v[1] =~ /^No\b/i) {
+                    $v[1] = 0;
+                } elsif ($v[1] =~ /Unknown\((\d+)\)\+(\d+)/i) {
+                    $v[1] = ($1 << 8) + $2;
+                } elsif ($v[1] =~ /([\w-]+)\+(\d+)/ and $s{$1}) {
+                    $v[1] = ($s{$1} << 8) + $2;
+                } else {
+                    warn "Bad extended bracket\n";
+                }
+            }
+            return "@v";
+        },
     },
     0x0019 => { #3
         Name => 'WhiteBalance',
@@ -499,8 +689,12 @@ my %pentaxCities = (
             2 => 'Auto (Shade)',
             3 => 'Auto (Flash)',
             4 => 'Auto (Tungsten)',
+            7 => 'Auto (DaywhiteFluorescent)', #17 (K100D guess)
+            8 => 'Auto (WhiteFluorescent)', #17 (K100D guess)
+            10 => 'Auto (Cloudy)', #17 (K100D guess)
             0xffff => 'User-Selected',
             0xfffe => 'Preset (Fireworks?)', #PH
+            # 0xfffd observed in K100D (ref 17)
         },
     },
     0x001b => { #6
@@ -557,6 +751,8 @@ my %pentaxCities = (
             2 => 'High', #PH
             3 => 'Med Low', #2
             4 => 'Med High', #2
+            5 => 'Very Low', #(NC)
+            6 => 'Very High', #(NC)
             # the *istD has pairs of values - PH
             '0 0' => 'Low',
             '1 0' => 'Normal',
@@ -572,6 +768,8 @@ my %pentaxCities = (
             2 => 'High', #PH
             3 => 'Med Low', #2
             4 => 'Med High', #2
+            5 => 'Very Low', #PH
+            6 => 'Very High', #(NC)
             # the *istD has pairs of values - PH
             '0 0' => 'Low',
             '1 0' => 'Normal',
@@ -587,6 +785,8 @@ my %pentaxCities = (
             2 => 'Hard', #PH
             3 => 'Med Soft', #2
             4 => 'Med Hard', #2
+            5 => 'Very Soft', #(NC)
+            6 => 'Very Hard', #(NC)
             # the *istD has pairs of values - PH
             '0 0' => 'Soft',
             '1 0' => 'Normal',
@@ -595,6 +795,7 @@ my %pentaxCities = (
     },
     0x0022 => { #PH
         Name => 'WorldTimeLocation',
+        Groups => { 2 => 'Time' },
         Writable => 'int16u',
         PrintConv => {
             0 => 'Hometown',
@@ -603,21 +804,27 @@ my %pentaxCities = (
     },
     0x0023 => { #PH
         Name => 'HometownCity',
+        Groups => { 2 => 'Time' },
         Writable => 'int16u',
+        SeparateTable => 'City',
         PrintConv => \%pentaxCities,
     },
     0x0024 => { #PH
         Name => 'DestinationCity',
+        Groups => { 2 => 'Time' },
         Writable => 'int16u',
+        SeparateTable => 'City',
         PrintConv => \%pentaxCities,
     },
     0x0025 => { #PH
         Name => 'HometownDST',
+        Groups => { 2 => 'Time' },
         Writable => 'int16u',
         PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
     0x0026 => { #PH
         Name => 'DestinationDST',
+        Groups => { 2 => 'Time' },
         Writable => 'int16u',
         PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
@@ -689,6 +896,8 @@ my %pentaxCities = (
             '15 0 1' => 'Sensitivity Priority AE (1)',
             '16 0 0' => 'Flash X-Sync Speed AE',
             '16 0 1' => 'Flash X-Sync Speed AE (1)', #PH guess
+            # other modes
+            '0 0 1'  => 'Program', #17 (K100D)
         },
     },
     0x0034 => { #7/PH
@@ -711,6 +920,11 @@ my %pentaxCities = (
             0 => 'sRGB',
             1 => 'Adobe RGB',
         },
+    },
+    0x0038 => { #5 (PEF only)
+        Name => 'ImageAreaOffset',
+        Writable => 'int16u',
+        Count => 2,
     },
     0x0039 => { #PH
         Name => 'RawImageSize',
@@ -746,136 +960,44 @@ my %pentaxCities = (
         Name => 'LensType',
         Writable => 'int8u',
         Count => 2,
-        PrintConv => {  #4
-            '1 0' => 'K,M Lens',
-            '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mm F5.6)
-            '3 0' => 'SIGMA',
-            '3 17' => 'smc PENTAX-FA SOFT 85mm F2.8',
-            '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
-            '3 19' => 'smc PENTAX-F 24-50mm F4',
-            '3 20' => 'smc PENTAX-F 35-80mm F4-5.6',
-            '3 21' => 'smc PENTAX-F 80-200mm F4.7-5.6',
-            '3 22' => 'smc PENTAX-F FISH-EYE 17-28mm F3.5-4.5',
-            '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6',
-            '3 24' => 'smc PENTAX-F 35-135mm F3.5-4.5',
-            '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or SIGMA AF 28-300 F3.5-5.6 DL IF', #11 (sigma)
-            # or '3 25' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
-            '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
-            '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5',
-            '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5',
-            # or '3 28' => 'Tokina 19-35mm F3.5-4.5 AF', #12
-            '3 29' => 'PENTAX-F 28-80mm F3.5-4.5 or SIGMA AF 18-125mm F3.5-5.6 DC', #11 (sigma)
-            '3 30' => 'PENTAX-F 70-200mm F4-5.6',
-            '3 31' => 'smc PENTAX-F 70-210mm F4-5.6',
-            # or '3 31' => 'Tokina AF 730 75-300mm F4.5-5.6',
-            '3 32' => 'smc PENTAX-F 50mm F1.4',
-            '3 33' => 'smc PENTAX-F 50mm F1.7',
-            '3 34' => 'smc PENTAX-F 135mm F2.8 [IF]',
-            '3 35' => 'smc PENTAX-F 28mm F2.8',
-            '3 36' => 'SIGMA 20mm F1.8 EX DG ASPHERICAL RF',
-            '3 38' => 'smc PENTAX-F* 300mm F4.5 ED[IF]',
-            '3 39' => 'smc PENTAX-F* 600mm F4 ED[IF]',
-            '3 40' => 'smc PENTAX-F MACRO 100mm F2.8',
-            '3 41' => 'smc PENTAX-F MACRO 50mm F2.8',
-            '3 44' => 'SIGMA 18-50mm F3.5-5.6 DC, 12-24mm F4.5 EX DG or Tamron 35-90mm F4 AF', #4,12,12
-            '3 46' => 'SIGMA APO 70-200mm F2.8 EX',
-            '3 50' => 'smc PENTAX-FA 28-70mm F4 AL',
-            '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
-            '3 52' => 'smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF]',
-            '3 53' => 'smc PENTAX-FA 28-80mm F3.5-5.6 AL',
-            '3 247' => 'smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]',
-            '3 248' => 'smc PENTAX-DA 12-24mm F4 ED AL[IF]',
-            '3 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED',
-            '3 251' => 'smc PENTAX-DA 40mm F2.8 Limited',
-            '3 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL',
-            '3 253' => 'smc PENTAX-DA 14mm F2.8 ED[IF]',
-            '3 254' => 'smc PENTAX-DA 16-45mm F4 ED AL',
-            '3 255' => 'SIGMA',
-            # '3 255' => 'SIGMA 18-200mm F3.5-6.3 DC', #8
-            # '3 255' => 'SIGMA DL-II 35-80mm F4-5.6', #12
-            # '3 255' => 'SIGMA DL Zoom 75-300mm F4-5.6', #12
-            # '3 255' => 'SIGMA DF EX Aspherical 28-70mm F2.8', #12
-            '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
-            '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
-            '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
-            '4 6' => 'smc PENTAX-FA 35-80mm F4-5.6',
-            '4 15' => 'smc PENTAX-FA 28-105mm F4-5.6 [IF]',
-            '4 16' => 'TAMRON AF 80-210mm F4-5.6 (178D)', #13
-            '4 19' => 'TAMRON SP AF 90mm F2.8 (172E)',
-            '4 20' => 'smc PENTAX-FA 28-80mm F3.5-5.6',
-            '4 22' => 'TOKINA 28-80mm F3.5-5.6', #13
-            '4 23' => 'smc PENTAX-FA 20-35mm F4 AL',
-            '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
-            '4 25' => 'TAMRON SP AF 14mm F2.8', #13
-            '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
-            '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF]Macro (285D)',
-            '4 28' => 'smc PENTAX-FA 35mm F2 AL',
-            '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
-            '4 35' => 'smc PENTAX-FA 100-300mm F4.7-5.8',
-            '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO (572D)',
-            '4 37' => 'TAMRON SP AF 24-135mm F3.5-5.6 AD AL (190D)', #13
-            '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
-            '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
-            '4 41' => 'TAMRON AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] MACRO (A03)',
-            '4 43' => 'smc PENTAX-FA 28-90mm F3.5-5.6',
-            '4 44' => 'smc PENTAX-FA J 75-300mm F4.5-5.8 AL',
-            '4 45' => 'TAMRON 28-300mm F3.5-6.3 Ultra zoom XR',
-            '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
-            '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
-            '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
-            '4 51' => 'smc PENTAX-D FA 50mmF2.8 MACRO',
-            '4 52' => 'smc PENTAX-D FA 100mmF2.8 MACRO',
-            '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
-            '4 245' => 'Schneider D-XENON 50-200mm', #15
-            '4 246' => 'Schneider D-XENON 18-55mm', #15
-            '4 247' => 'smc PENTAX-DA 10-17mm F3.5-4.5 ED [IF] Fisheye zoom', #10
-            '4 248' => 'smc PENTAX-DA 12-24mm F4 ED AL [IF]', #10
-            '4 249' => 'TAMRON XR DiII 18-200mm F3.5-6.3 (A14)',
-            '4 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED', #8
-            '4 251' => 'smc PENTAX-DA 40mm F2.8 Limited', #9
-            '4 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL', #8
-            '4 253' => 'smc PENTAX-DA 14mm F2.8 ED[IF]',
-            '4 254' => 'smc PENTAX-DA 16-45mm F4 ED AL',
-            '5 1' => 'smc PENTAX-FA* 24mm F2 AL[IF]',
-            '5 2' => 'smc PENTAX-FA 28mm F2.8 AL',
-            '5 3' => 'smc PENTAX-FA 50mm F1.7',
-            '5 4' => 'smc PENTAX-FA 50mm F1.4',
-            '5 5' => 'smc PENTAX-FA* 600mm F4 ED[IF]',
-            '5 6' => 'smc PENTAX-FA* 300mm F4.5 ED[IF]',
-            '5 7' => 'smc PENTAX-FA 135mm F2.8 [IF]',
-            '5 8' => 'smc PENTAX-FA MACRO 50mm F2.8',
-            '5 9' => 'smc PENTAX-FA MACRO 100mm F2.8',
-            '5 10' => 'smc PENTAX-FA* 85mm F1.4 [IF]',
-            '5 11' => 'smc PENTAX-FA* 200mmF2.8 ED[IF]',
-            '5 12' => 'smc PENTAX-FA 28-80mm F3.5-4.7',
-            '5 13' => 'smc PENTAX-FA 70-200mm F4-5.6',
-            '5 14' => 'smc PENTAX-FA* 250-600mm F5.6 ED[IF]',
-            '5 15' => 'smc PENTAX-FA 28-105mm F4-5.6',
-            '5 16' => 'smc PENTAX-FA 100-300mm F4.5-5.6',
-            '6 1' => 'smc PENTAX-FA* 85mm F1.4[IF]',
-            '6 2' => 'smc PENTAX-FA* 200mm F2.8 ED[IF]',
-            '6 3' => 'smc PENTAX-FA* 300mm F2.8 ED[IF]',
-            '6 4' => 'smc PENTAX-FA* 28-70mm F2.8 AL',
-            '6 5' => 'smc PENTAX-FA* 80-200mm F2.8 ED[IF]',
-            '6 6' => 'smc PENTAX-FA* 28-70mm F2.8 AL',
-            '6 7' => 'smc PENTAX-FA* 80-200mm F2.8 ED[IF]',
-            '6 8' => 'smc PENTAX-FA 28-70mm F4AL',
-            '6 9' => 'smc PENTAX-FA 20mm F2.8',
-            '6 10' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
-            '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
-            '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
-            '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH (K10D)
-            '7 244' => 'smc PENTAX-DA 16-45mm F4 ED AL', #PH (K10D)
-        },
+        SeparateTable => 1,
+        PrintConv => \%pentaxLensType,
     },
     # 0x0041 - increments for each cropped pic (PH)
-    # 0x0047 - increments every few pictures for unknown reason (PH)
+    #          (DigitalFilter according to ref 5)
+    0x0047 => { #PH
+        Name => 'CameraTemperature',
+        Writable => 'int8s',
+        PrintConv => '"$val C"',
+        PrintConvInv => '$val=~s/ ?c$//i; $val',
+    },
     0x0049 => { #13
         Name => 'NoiseReduction',
         Writable => 'int16u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
-    # 0x004f - PictureFinish ? (ref 13)
+    0x004d => { #PH
+        Name => 'FlashExposureComp',
+        Writable => 'int32s',
+        ValueConv => '$val / 256',
+        ValueConvInv => 'int($val * 256 + ($val > 0 ? 0.5 : -0.5))',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
+        PrintConvInv => '$val',
+    },
+    0x004f => { #PH
+        Name => 'ImageTone',
+        PrintConv => {
+            0 => 'Natural',
+            1 => 'Bright',
+        },
+    },
+    0x005c => { #PH
+        Name => 'ShakeReductionInfo',
+        Format => 'undef',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::SRInfo',
+        },
+    },
     0x0200 => { #5
         Name => 'BlackPoint',
         Writable => 'int16u',
@@ -887,7 +1009,82 @@ my %pentaxCities = (
         Count => 4,
     },
     # 0x0205 - Also stores PictureMode (PH)
-    # 0x0207 - LensInformation ? (ref 13) - includes focus distance!
+    0x0206 => { #PH
+        Name => 'AEInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::AEInfo',
+        },
+    },
+    0x0207 => { #PH
+        Name => 'LensInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::LensInfo',
+        },
+    },
+    0x0208 => { #PH
+        Name => 'FlashInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::FlashInfo',
+        },
+    },
+    0x0209 => {
+        Name => 'AEDump',
+        Flags => ['Unknown','Binary'],
+    },
+    0x020a => {
+        Name => 'FlashADump',
+        Flags => ['Unknown','Binary'],
+    },
+    0x020b => {
+        Name => 'FlashBDump',
+        Flags => ['Unknown','Binary'],
+    },
+    0x020d => { #PH
+        Name => 'WB_RGGBLevelsDaylight',
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x020e => { #PH
+        Name => 'WB_RGGBLevelsShade',
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x020f => { #PH
+        Name => 'WB_RGGBLevelsCloud',
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x0210 => { #PH
+        Name => 'WB_RGGBLevelsTungsten',
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x0211 => { #PH
+        Name => 'WB_RGGBLevelsFluorescentD',
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x0212 => { #PH
+        Name => 'WB_RGGBLevelsFluorescentN',
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x0213 => { #PH
+        Name => 'WB_RGGBLevelsFluorescentW',
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x0214 => { #PH
+        Name => 'WB_RGGBLevelsFlash',
+        Writable => 'int16u',
+        Count => 4,
+    },
+    0x0216 => { #PH
+        Name => 'BatteryInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::BatteryInfo',
+        },
+    },
     0x03fe => { #PH
         Name => 'DataDump',
         Writable => 0,
@@ -951,6 +1148,184 @@ my %pentaxCities = (
 #            3 => 'Sepia',
 #        },
 #    },
+
+# shake reduction information (ref PH)
+%Image::ExifTool::Pentax::SRInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'Shake reduction information.',
+    0 => {
+        Name => 'SRResult',
+        Notes => '0=not stabilized?, 1=stabilized?, 64=not ready?',
+    },
+    1 => {
+        Name => 'ShakeReduction',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    2 => 'SR_SWSToSWRTime',
+);
+
+# auto-exposure information (ref PH)
+%Image::ExifTool::Pentax::AEInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'AEExposureTime',
+        Notes => 'val = 24 * 2**((32-raw)/8)',
+        ValueConv => '24*exp(-($val-32)*log(2)/8)',
+        ValueConvInv => '-log($val/24)*8/log(2)+32',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    1 => {
+        Name => 'AEAperture',
+        Notes => 'val = (2**((raw-4)/16)) / 16',
+        ValueConv => 'exp(($val-4)*log(2)/16)/16',
+        ValueConvInv => 'log($val*16)*16/log(2)+4',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    2 => {
+        Name => 'AE_ISO',
+        Notes => 'val = 100 * 2**((raw-32)/8)',
+        ValueConv => '100*exp(($val-32)*log(2)/8)',
+        ValueConvInv => 'log($val/100)*8/log(2)+32',
+        PrintConv => 'int($val + 0.5)',
+        PrintConvInv => '$val',
+    },
+    3 => 'AEXv',
+    4 => 'AEBXv',
+    5 => 'AEFlashTv',
+    6 => {
+        Name => 'AEProgramMode',
+        PrintConv => {
+            0 => 'Manual/Program AE',
+            1 => 'Aperture Priority/Bulb',
+            2 => 'Shutter Speed Priority',
+            3 => 'Program',
+            35 => 'Standard',
+            43 => 'Portrait',
+            51 => 'Landscape',
+            59 => 'Macro',
+            67 => 'Sport',
+            75 => 'Night Scene Portrait',
+            83 => 'No Flash',
+            91 => 'Night Scene',
+            99 => 'Surf & Snow',
+            107 => 'Text',
+            115 => 'Sunset',
+            123 => 'Kids',
+            131 => 'Pet',
+            139 => 'Candlelight',
+            147 => 'Museum',
+        },
+    },
+    7 => {
+        Name => 'AEExtra',
+        Unknown => 1,
+    },
+);
+
+# lens information (ref PH)
+%Image::ExifTool::Pentax::LensInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    # (must decode focus distance!)
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'LensType',
+        Format => 'int8u[4]',
+        Priority => 0,
+        Notes => q{
+            for most models the first 2 bytes are LensType, but for the K10D the
+            decoding is a bit different
+        },
+        # this is a bit funny and needs testing with more lenses on the K10D
+        ValueConv => q{
+            my @v = split(' ',$val);
+            if ($v[0] & 0x80) {
+                $v[0] &= 0x7f;
+                $v[1] = GetByteOrder() eq 'MM' ? $v[2] * 256 + $v[3] : $v[3] * 256 + $v[2];
+            }
+            return "$v[0] $v[1]";
+        },
+        PrintConv => \%pentaxLensType,
+        SeparateTable => 1,
+    },
+    4 => {
+        Name => 'LensCoefficients',
+        Format => 'int8u[9]',
+    },
+);
+
+# flash information (ref PH)
+%Image::ExifTool::Pentax::FlashInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => 'FlashStatus',
+    1 => {
+        Name => 'FlashModeCode',
+        PrintConv => {
+            149 => 'On, Wireless',
+            192 => 'On',
+            193 => 'On, Red-eye reduction',
+            200 => 'On, Slow-sync',
+            201 => 'On, Slow-sync, Red-eye reduction',
+            202 => 'On, Trailing-curtain Sync',
+            240 => 'Off (240)',
+            241 => 'Off (241)',
+            242 => 'Off (242)',
+        },
+    },
+    2 => 'ExternalFlashMode',
+    3 => 'InternalFlashMagni',
+    4 => 'TTL_DA_AUp',
+    5 => 'TTL_DA_ADown',
+    6 => 'TTL_DA_BUp',
+    7 => 'TTL_DA_BDown',
+    # ? => 'ExternalFlashMagniA',
+    # ? => 'ExternalFlashMagniB',
+);
+
+# battery information (ref PH)
+%Image::ExifTool::Pentax::BatteryInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'BatteryType',
+        ValueConv => '$val - 128',
+        ValueConvInv => '$val + 128',
+    },
+    1 => {
+        Name => 'BatteryBodyGripStates',
+        Notes => 'body and grip battery state',
+        ValueConv => '($val >> 8) . " " . ($val & 0x0f)',
+        ValueConvInv => 'my @a=split(" ",$val); ($a[0] << 8) + $a[1]',
+    },
+    2 => 'BatteryADBodyNoLoad',
+    3 => 'BatteryADBodyLoad',
+    4 => 'BatteryADGripNoLoad',
+    5 => 'BatteryADGripLoad',
+);
 
 # tags in Pentax QuickTime videos (PH - tests with Optio WP)
 # (note: very similar to information in Nikon videos)
@@ -1060,13 +1435,14 @@ the information should be stored to deduce the correct offsets.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Wayne Smith, John Francis and Douglas O'Brien for help figuring
-out some Pentax tags, and to Denis Bourez, Kazumichi Kawabata, David Buret
-and Barney Garrett for adding to the LensType list.
+Thanks to Wayne Smith, John Francis, Douglas O'Brien and Cvetan Ivanov for
+help figuring out some Pentax tags, and to Denis Bourez, Kazumichi Kawabata,
+David Buret and Barney Garrett for adding to the LensType list, and to Ger
+Vermeulen for contributing print conversion values for some tags.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

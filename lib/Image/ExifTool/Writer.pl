@@ -69,6 +69,7 @@ my %jpegMap = (
 my %dirMap = (
     JPEG => \%jpegMap,
     TIFF => \%tiffMap,
+    ORF  => \%tiffMap,
 );
 
 # groups we are allowed to delete (Note: these names must either
@@ -152,7 +153,7 @@ sub SetNewValue($;$$%)
     unless (defined $tag) {
         # remove any existing set values
         delete $self->{NEW_VALUE};
-        delete $self->{DEL_GROUP};
+        $self->{DEL_GROUP} = { };
         $verbose > 1 and print $out "Cleared new values\n";
         return 1;
     }
@@ -203,13 +204,13 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                 my (@del, $grp);
                 if ($wantGroup) {
                     @del = grep /^$wantGroup$/i, @delGroups;
+                    push @del, uc($wantGroup) if $wantGroup =~ /^MIE\d+$/i;
                 } else {
-                    # push all groups plus '*', except 'IFD1'
-                    push @del, (grep !/^IFD1$/, @delGroups), '*';
+                    # push all groups plus '*', except IFD1 and a few others
+                    push @del, (grep !/^(IFD1|SubIFD|InteropIFD|GlobParamIFD)$/, @delGroups), '*';
                 }
                 if (@del) {
                     ++$numSet;
-                    $self->{DEL_GROUP} or $self->{DEL_GROUP} = { };
                     foreach $grp (@del) {
                         if ($options{Replace} and $options{Replace} > 1) {
                             delete $self->{DEL_GROUP}->{$grp};
@@ -312,6 +313,11 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                 } elsif ($writeGroup eq 'MIE') {
                     next unless $mieGroup;
                     $writeGroup = $mieGroup; # write to specific MIE group
+                    # set specific write group with document number if specified
+                    if ($writeGroup =~ /^MIE\d+$/ and $tagInfo->{Table}->{WRITE_GROUP}) {
+                        $writeGroup = $tagInfo->{Table}->{WRITE_GROUP};
+                        $writeGroup =~ s/^MIE/$mieGroup/;
+                    }
                 } else {
                     # allow group1 name to be specified
                     my $grp1 = $self->GetGroup($tagInfo, 1);
@@ -342,7 +348,7 @@ ReturnNow:  return ($numSet, $err) if wantarray;
         # don't write tag if protected
         next if $tagInfo->{Protected} and not ($tagInfo->{Protected} & $protected);
         # set specific write group (if we didn't already)
-        unless ($writeGroup and not $translateWriteGroup{$writeGroup}) {
+        if (not $writeGroup or $translateWriteGroup{$writeGroup}) {
             # use default write group
             $writeGroup = $tagInfo->{WriteGroup} || $tagInfo->{Table}->{WRITE_GROUP};
             # use group 0 name if no WriteGroup specified
@@ -409,7 +415,7 @@ ReturnNow:  return ($numSet, $err) if wantarray;
 #
 # generate new value hash for each tag
 #
-    my ($prioritySet, @requireTags, $createGroups);
+    my ($prioritySet, $createGroups);
     # sort tag info list in reverse order of priority (higest number last)
     # so we get the highest priority error message in the end
     @tagInfoList = sort { $tagPriority{$a} <=> $tagPriority{$b} } @tagInfoList;
@@ -512,7 +518,7 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                         $verbose > 2 and print $out "$err\n";
                         last;
                     }
-                } else {
+                } elsif (not $$tagInfo{WriteAlso}) {
                     $err = "Can't convert value for $wgrp1:$tag (no ${type}Inv)";
                     $verbose > 2 and print $out "$err\n";
                     undef $val;
@@ -612,7 +618,7 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                     $newValueHash->{CreateGroups} = $createGroups;
                 }
             }
-            if ($self->{DEL_GROUP} and $newValueHash->{IsCreating}) {
+            if (%{$self->{DEL_GROUP}} and $newValueHash->{IsCreating}) {
                 my $grp;
                 foreach $grp (keys %{$self->{DEL_GROUP}}) {
                     next if $self->{DEL_GROUP}->{$grp} == 2;
@@ -651,12 +657,6 @@ ReturnNow:  return ($numSet, $err) if wantarray;
         }
         ++$numSet;
         $prioritySet = 1 if $preferred{$tagInfo};
-        # set markers in required tags
-        if ($$tagInfo{Require}) {
-            foreach (keys %{$$tagInfo{Require}}) {
-                push @requireTags, $tagInfo->{Require}->{$_};
-            }
-        }
         # also write related tags
         my $writeAlso = $$tagInfo{WriteAlso};
         if ($writeAlso) {
@@ -666,7 +666,9 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                 my $v = eval $writeAlso->{$wtag};
                 $@ and warn($@), next;
                 my ($n,$e) = $self->SetNewValue($wtag, $v, Type => 'ValueConv',
+                                                Protected => $protected | 0x02,
                                                 CreateGroups => $createGroups);
+                print $out "Not writing $wtag ($e)\n" if $e and $verbose > 1;
                 $numSet += $n;
             }
         }
@@ -684,15 +686,6 @@ ReturnNow:  return ($numSet, $err) if wantarray;
         warn "$err\n" unless wantarray;
     } elsif ($err and not $verbose) {
         undef $err;
-    }
-    # set markers to create all required tags too
-    if (@requireTags) {
-        # set marker to 'feed' value later
-        $value = 0xfeedfeed if defined $value;
-        foreach $tag (@requireTags) {
-            $self->SetNewValue($tag, $value, Protected=>0x02,
-                               CreateGroups => $createGroups);
-        }
     }
     return ($numSet, $err) if wantarray;
     return $numSet;
@@ -760,14 +753,17 @@ sub SetNewValuesFromFile($$;@)
     my (@setList, $set, %setMatches);
     foreach (@setTags) {
         $tag = lc($_);  # change tag name to all lower case
-        my ($fam, $grp, $dst, $dstGrp, $dstTag, $expr);
+        my ($fam, $grp, $dst, $dstGrp, $dstTag, $expr, $opt);
         # handle redirection to another tag
         if ($tag =~ /(.+?)\s*(>|<)\s*(.+)/) {
             $dstGrp = '';
             if ($2 eq '>') {
                 ($tag, $dstTag) = ($1, $3);
+                # flag add and delete (ie. '+<' and '-<') redirections
+                $opt = $1 if $tag =~ s/\s*([-+])$// or $dstTag =~ s/^([-+])\s*//;
             } else {
                 ($tag, $dstTag) = ($3, $1);
+                $opt = $1 if $dstTag =~ s/\s*([-+])$//;
                 # handle expressions
                 if ($tag =~ /\$/) {
                     $tag = $_;  # restore original case
@@ -775,8 +771,12 @@ sub SetNewValuesFromFile($$;@)
                     # and flag expression by starting with '@'
                     $tag =~ s/(.+?)\s*(>|<) ?/\@/;
                     $expr = 1;  # flag this expression
+                } else {
+                    $opt = $1 if $tag =~ s/^([-+])\s*//;
                 }
             }
+            # translate '+' and '-' to appropriate SetNewValue option
+            $opt and $opt = { '+' => 'AddValue', '-' => 'DelValue' }->{$opt};
             $dstTag =~ s/\ball\b/\*/g;       # replace 'all' with '*'
             ($dstGrp, $dstTag) = ($1, $2) if $dstTag =~ /(.+?):(.+)/;
             # ignore leading family number
@@ -812,7 +812,7 @@ sub SetNewValuesFromFile($$;@)
         }
         $grp or $grp = '*';     # use '*' for any group
         # save in reverse order so we don't set tags before an exclude
-        unshift @setList, [ $fam, $grp, $tag, $dst ];
+        unshift @setList, [ $fam, $grp, $tag, $dst, $opt ];
     }
     # 2) initialize lists of matching tags for each condition
     foreach $set (@setList) {
@@ -853,7 +853,7 @@ sub SetNewValuesFromFile($$;@)
     foreach $set (reverse @setList) {
         # handle expressions
         if ($$set[2] =~ s/^\@//) {
-            my $val = $srcExifTool->InsertTagValues(\@tags, $$set[2], 1);
+            my $val = $srcExifTool->InsertTagValues(\@tags, $$set[2], 'Error');
             unless (defined $val) {
                 # return warning if one of the tags didn't exist
                 $tag = NextTagKey(\%rtnInfo, 'Warning');
@@ -863,6 +863,8 @@ sub SetNewValuesFromFile($$;@)
             }
             my ($dstGrp, $dstTag) = @{$$set[3]};
             my %opts = ( Protected => 1, Replace => 1 );
+            # add or delete value if specified
+            $opts{$$set[4]} = 1 if $$set[4];
             $opts{Group} = $dstGrp if $dstGrp;
             my @rtnVals = $self->SetNewValue($dstTag, $val, %opts);
             $rtnInfo{$dstTag} = $val if $rtnVals[0]; # tag was set successfully
@@ -895,6 +897,8 @@ sub SetNewValuesFromFile($$;@)
                 $dstTag = $tag;
                 $noWarn = 1;
             }
+            # add or delete value if specified
+            $opts{$$set[4]} = 1 if $$set[4];
             # allow protected tags to be copied if specified explicitly
             $opts{Protected} = 1 unless $$set[2] eq '*';
             $opts{Replace} = 1;     # replace the first value found
@@ -1004,7 +1008,7 @@ sub CountNewValues($)
     my $newVal = $self->{NEW_VALUE};
     my $num = 0;
     $num += scalar keys %$newVal if $newVal;
-    $num += scalar keys %{$self->{DEL_GROUP}} if $self->{DEL_GROUP};
+    $num += scalar keys %{$self->{DEL_GROUP}};
     return $num unless wantarray;
     my $quick = 0;
     if ($newVal) {
@@ -1623,9 +1627,12 @@ sub GetDeleteGroups()
 #------------------------------------------------------------------------------
 # convert tag names to values in a string (ie. "${EXIF:ISO}x $$" --> "100x $")
 # Inputs: 0) ExifTool object ref, 1) reference to list of found tags
-#         2) string with embedded tag names, 3) Options: undef=set missing tags to '',
-#            1=issue error on missing tag, Hash ref=substitute $info{} expressions
-# Returns: string with embedded tag values
+#         2) string with embedded tag names, 3) Options:
+#               undef    - set missing tags to '',
+#              'Error'   - issue minor error on missing tag (and return undef),
+#              'Warn'    - issue minor warning on missing tag (and return undef),
+#               Hash ref - hash for return of tag/value pairs
+# Returns: string with embedded tag values (or '$info{TAGNAME}' entries with Hash ref option)
 # Notes: tag names are not case sensitive, uses MissingTagValue option if set
 sub InsertTagValues($$$;$)
 {
@@ -1670,7 +1677,8 @@ sub InsertTagValues($$$;$)
         } elsif (not defined $val and not ref $opt) {
             $val = $self->{OPTIONS}->{MissingTagValue};
             unless (defined $val) {
-                return undef if $opt and $self->Error("Tag '$tag' not defined", 1);
+                no strict 'refs';
+                return undef if $opt and &$opt($self, "Tag '$tag' not defined", 1);
                 $val = '';
             }
         }
@@ -2113,6 +2121,10 @@ sub InitWriteDirs($$;$)
             # tag belongs to directory specified by WriteGroup, or by
             # the Group0 name if WriteGroup not defined
             my $dirName = $newValueHash->{WriteGroup};
+            # remove MIE copy number(s) if they exist
+            if ($dirName =~ /^MIE\d*(-[a-z]+)?\d*$/i) {
+                $dirName = 'MIE' . ($1 || '');
+            }
             my @dirNames;
             while ($dirName) {
                 my $parent = $$fileDirs{$dirName};
@@ -2137,7 +2149,7 @@ sub InitWriteDirs($$;$)
             $newValueHash = $newValueHash->{Next};
         }
     }
-    if ($self->{DEL_GROUP}) {
+    if (%{$self->{DEL_GROUP}}) {
         # add delete groups to list of edited groups
         foreach (keys %{$self->{DEL_GROUP}}) {
             my $dirName = $_;
@@ -2183,7 +2195,7 @@ sub WriteDirectory($$$;$)
     my $dirName = $$dirInfo{DirName};
     my $grp0 = $tagTablePtr->{GROUPS}->{0};
     $dirName or $dirName = $$dirInfo{DirName} = $grp0;
-    if ($self->{DEL_GROUP}) {
+    if (%{$self->{DEL_GROUP}}) {
         my $delGroup = $self->{DEL_GROUP};
         # delete entire directory if specified
         my $grp1 = $dirName;
@@ -2480,7 +2492,8 @@ sub DumpTrailer($$)
         if ($htmlDump) {
             my $num = $raf->Read($buff, $size) or return;
             my $desc = "$trailer trailer";
-            $self->HtmlDump($pos, $num, $desc, "$desc\\nSize: $size bytes", 0x08);
+            $desc = "[$desc]" if $trailer eq 'Unknown';
+            $self->HtmlDump($pos, $num, $desc, undef, 0x08);
             last;
         }
         my $out = $self->{OPTIONS}->{TextOut};
@@ -2514,6 +2527,42 @@ sub DumpTrailer($$)
 }
 
 #------------------------------------------------------------------------------
+# Dump unknown trailer information
+# Inputs: 0) ExifTool ref, 1) dirInfo ref (with RAF, DataPos and DirLen defined)
+# Notes: changes dirInfo elements
+sub DumpUnknownTrailer($$)
+{
+    my ($self, $dirInfo) = @_;
+    my $pos = $$dirInfo{DataPos};
+    my $endPos = $pos + $$dirInfo{DirLen};
+    # account for preview image trailer
+    my $prePos = $self->{VALUE}->{PreviewImageStart};
+    my $preLen = $self->{VALUE}->{PreviewImageLength};
+    if ($prePos and $preLen and $prePos + $preLen > $pos) {
+        # dump data before preview image
+        if ($prePos > $pos) {
+            $$dirInfo{DirName} = 'Unknown';
+            $$dirInfo{DirLen}  = $prePos - $pos;
+            $self->DumpTrailer($dirInfo);
+        }
+        # dump preview image if verbose (it is htmlDump'd by ExtractImage)
+        if ($self->{OPTIONS}->{Verbose}) {
+            $$dirInfo{DirName} = 'PreviewImage';
+            $$dirInfo{DataPos} = $prePos;
+            $$dirInfo{DirLen}  = $preLen;
+            $self->DumpTrailer($dirInfo);
+        }
+        return if $prePos + $preLen >= $endPos;
+        # set dirInfo for remaining unknown data
+        $$dirInfo{DataPos} = $prePos + $preLen;
+        $$dirInfo{DirLen} = $endPos - $$dirInfo{DataPos};
+    }
+    # dump unknown trailer
+    $$dirInfo{DirName} = 'Unknown';
+    $self->DumpTrailer($dirInfo);
+}
+
+#------------------------------------------------------------------------------
 # Find last element in linked list
 # Inputs: 0) element in list
 # Returns: Last element in list
@@ -2528,12 +2577,17 @@ sub LastInList($)
 
 #------------------------------------------------------------------------------
 # Print verbose directory information
-# Inputs: 0) ExifTool object reference, 1) directory name
+# Inputs: 0) ExifTool object reference, 1) directory name or dirInfo ref
 #         2) number of entries in directory (or 0 if unknown)
 #         3) optional size of directory in bytes
 sub VerboseDir($$;$$)
 {
     my ($self, $name, $entries, $size) = @_;
+    return unless $self->{OPTIONS}->{Verbose};
+    if (ref $name eq 'HASH') {
+        $size = $$name{DirLen} unless $size;
+        $name = $$name{Name} || $$name{DirName};
+    }
     my $indent = substr($self->{INDENT}, 0, -2);
     my $out = $self->{OPTIONS}->{TextOut};
     my $str;
@@ -2550,6 +2604,7 @@ sub VerboseDir($$;$$)
 #------------------------------------------------------------------------------
 # convert unicode characters to Windows Latin1 (cp1252)
 # Inputs: 0) 16-bit unicode character string, 1) unpack format
+#         3) optional ExifTool ref to set warning on encoding error
 # Returns: 8-bit Windows Latin1 encoded string
 my %unicode2latin = (
     0x20ac => 0x80,  0x0160 => 0x8a,  0x2013 => 0x96,
@@ -2562,12 +2617,20 @@ my %unicode2latin = (
     0x02c6 => 0x88,  0x201d => 0x94,  0x017e => 0x9e,
     0x2030 => 0x89,  0x2022 => 0x95,  0x0178 => 0x9f,
 );
-sub Unicode2Latin($$)
+sub Unicode2Latin($$;$)
 {
     my ($val, $fmt) = @_;
     my @uni = unpack("$fmt*",$val);
     foreach (@uni) {
-        $_ = $unicode2latin{$_} || ord('?') if $_ > 0xff;
+        next if $_ <= 0xff;
+        $_ = $unicode2latin{$_};
+        next if $_;
+        $_ = ord('?');  # set to '?'
+        my $self = $_[2];
+        if ($self and not $$self{LatinWarning}) {
+            $self->Warn('Some character(s) could not be encoded in Latin');
+            $$self{LatinWarning} = 1;
+        }
     }
     # repack as a Latin string
     my $outVal = pack('C*',@uni);
@@ -2607,21 +2670,39 @@ sub Unicode2UTF8($$)
 {
     my ($val, $fmt) = @_;
     my $outVal;
-    # repack as a UTF-8 string
-    $outVal = pack('C0U*',unpack("$fmt*",$val));
-    $outVal =~ s/\0.*//s;    # truncate at null terminator
+    if ($] >= 5.006001) {
+        # repack as a UTF-8 string
+        $outVal = pack('C0U*',unpack("$fmt*",$val));
+        $outVal =~ s/\0.*//s;    # truncate at null terminator
+    } else {
+        # Perl < 5.6.1 didn't support UTF-8, so convert to Latin instead
+        $outVal = Unicode2Latin($val, $fmt);
+    }
     return $outVal;
 }
 
 #------------------------------------------------------------------------------
 # convert UTF-8 encoded string to 16-bit unicode (Perl 5.6.1 or later)
-# Input: 0) UTF-8 string, 1) short unpack format
+# Input: 0) UTF-8 string, 1) short unpack format, 2) optional ExifTool ref for warnings
 # Returns: 16-bit unicode character string
-sub UTF82Unicode($$)
+sub UTF82Unicode($$;$)
 {
-    my ($str, $fmt) = @_;
-    # repack UTF-8 string as 16-bit integers
-    $str = pack("$fmt*",unpack('U0U*',$str)) . "\0\0";
+    my ($str, $fmt, $exifTool) = @_;
+    if ($] >= 5.006001) {
+        # handle warnings from malformed UTF-8
+        local $SIG{'__WARN__'} = sub { $evalWarning = $_[0]; };
+        undef $evalWarning;
+        # repack UTF-8 string as 16-bit integers
+        $str = pack("$fmt*",unpack('U0U*',$str)) . "\0\0";
+        if ($evalWarning and $exifTool and not $$exifTool{WarnBadUTF8}) {
+            $exifTool->Warn('Malformed UTF-8 character(s)');
+            $$exifTool{WarnBadUTF8} = 1;
+            undef $evalWarning;
+        }
+    } else {
+        # treat as Latin since this version of Perl doesn't support UTF-8
+        $str = Latin2Unicode($str, $fmt);
+    }
     return $str;
 }
 
@@ -2637,8 +2718,8 @@ sub Unicode2Byte($$;$) {
     $val =~ s/^(\xff\xfe|\xfe\xff)// and $byteOrder = ($1 eq "\xff\xfe") ? 'MM' : 'II';
     my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
     # convert to Latin if specified or if no UTF-8 support in this Perl version
-    if ($self->Options('Charset') eq 'Latin' or $] < 5.006001) {
-        return Unicode2Latin($val, $fmt);
+    if ($self->Options('Charset') eq 'Latin') {
+        return Unicode2Latin($val, $fmt, $self);
     } else {
         return Unicode2UTF8($val, $fmt);
     }
@@ -2652,10 +2733,10 @@ sub Byte2Unicode($$;$)
 {
     my ($self, $val, $byteOrder) = @_;
     my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
-    if ($self->Options('Charset') eq 'Latin' or $] < 5.006001) {
+    if ($self->Options('Charset') eq 'Latin') {
         return Latin2Unicode($val, $fmt);
     } else {
-        return UTF82Unicode($val, $fmt);
+        return UTF82Unicode($val, $fmt, $self);
     }
 }
 
@@ -3097,7 +3178,7 @@ sub WriteJPEG($$)
     # figure out what segments we need to write for the tags we have set
     my $addDirs = $self->{ADD_DIRS};
     my $editDirs = $self->{EDIT_DIRS};
-    my $delGroup = $self->{DEL_GROUP} || { };
+    my $delGroup = $self->{DEL_GROUP};
 
     # set input record separator to 0xff (the JPEG marker) to make reading quicker
     my $oldsep = $/;
@@ -3434,7 +3515,7 @@ sub WriteJPEG($$)
                     # write the saved preview image
                     Write($outfile, $previewInfo->{Data}) or $err = 1;
                     delete $previewInfo->{Data};
-                    ++$self->{CHANGED};
+                    # (don't increment CHANGED because we could be rewriting existing preview)
                     $delPreview = 1;    # remove old preview
                 }
             }
@@ -4039,7 +4120,7 @@ used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

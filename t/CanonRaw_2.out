@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
 [File, File, Image]  - File Name: CanonRaw.crw
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
@@ -28,7 +28,7 @@
 [MakerNotes, CanonRaw, Camera] 6164 - Measured EV: -0.375
 [MakerNotes, CanonRaw, Camera] 2053 - Canon File Description: EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, CanonRaw, Camera] 2069 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
-[MakerNotes, CanonRaw, Camera] 2064 - Owner's Name: Phil Harvey
+[MakerNotes, CanonRaw, Camera] 2064 - Owner Name: Phil Harvey
 [MakerNotes, CanonRaw, Camera] 0 - Make: Canon
 [MakerNotes, CanonRaw, Camera] 6 - Camera Model Name: Canon EOS DIGITAL REBEL
 [MakerNotes, CanonRaw, Camera] 6155 - Camera Body No.: 0560018150
@@ -47,7 +47,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
-[MakerNotes, Canon, Image] 10 - Optical Zoom Code: 8
+[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: 8
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: +2/3
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
@@ -56,7 +56,7 @@
 [MakerNotes, Canon, Image] 21 - F Number: 3.6
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/64
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
-[MakerNotes, Canon, Image] 26 - Camera Type: EOS Mid-range
+[MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
@@ -100,12 +100,12 @@
 [MakerNotes, Canon, Image] 7 - Sensor Right Border: 3143
 [MakerNotes, Canon, Image] 8 - Sensor Bottom Border: 2063
 [MakerNotes, CanonRaw, Camera] 6197 - Decoder Table: 1 0 514 4120111
-[MakerNotes, Canon, Image] 1 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 1 - Num AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
 [MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
-[MakerNotes, Canon, Image] 22 - AF Points Used: Center
+[MakerNotes, Canon, Camera] 22 - AF Points Used: Center
 [MakerNotes, CanonRaw, Camera] 4270 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 0 - WB RGGB Levels Auto: 1740 832 831 931
 [MakerNotes, Canon, Camera] 4 - WB RGGB Levels Daylight: 1722 832 831 989
@@ -137,9 +137,9 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Camera]  - WB RGGB Levels: 1740 832 831 931
 [Composite, Composite, Camera]  - Blue Balance: 1.119663
-[Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
+[Composite, Composite, Camera]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 24.0mm (35mm equivalent: 37.2mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 8.34 m
+[Composite, Composite, Camera]  - Hyperfocal Distance: 8.34 m
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
 [Composite, Composite, Image]  - Light Value: 9.7
 [Composite, Composite, Camera]  - Red Balance: 2.092604

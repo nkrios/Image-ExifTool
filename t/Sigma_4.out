@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
 [File, File, Image]  - File Name: Sigma.x3f
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1464 bytes
@@ -50,7 +50,7 @@
 [Composite, Composite, Image]  - Image Size: 2268x1512
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.7
 [Composite, Composite, Image]  - Shutter Speed: 1/108
-[Composite, Composite, Image]  - Circle Of Confusion: 0.018 mm
+[Composite, Composite, Camera]  - Circle Of Confusion: 0.018 mm
 [Composite, Composite, Camera]  - Focal Length: 30.0mm (35mm equivalent: 51.0mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 6.10 m
+[Composite, Composite, Camera]  - Hyperfocal Distance: 6.10 m
 [Composite, Composite, Image]  - Light Value: 12.9

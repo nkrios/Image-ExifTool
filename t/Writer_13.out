@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
 [File, File, Image]  - File Name: Writer_13_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4 kB
@@ -70,7 +70,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
-[MakerNotes, Canon, Image] 10 - Optical Zoom Code: 8
+[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: 8
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: +2/3
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
@@ -79,22 +79,22 @@
 [MakerNotes, Canon, Image] 21 - F Number: 3.6
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/64
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
-[MakerNotes, Canon, Image] 26 - Camera Type: EOS Mid-range
+[MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
 [MakerNotes, Canon, Camera] 8 - File Number: 116-1602
-[MakerNotes, Canon, Camera] 9 - Owner's Name: Phil Harvey
+[MakerNotes, Canon, Camera] 9 - Owner Name: Phil Harvey
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS Digital Rebel / 300D / Kiss Digital
-[MakerNotes, Canon, Image] 1 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 1 - Num AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
 [MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
-[MakerNotes, Canon, Image] 22 - AF Points Used: Center
+[MakerNotes, Canon, Camera] 22 - AF Points Used: Center
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 1
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
@@ -129,9 +129,9 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Camera]  - WB RGGB Levels: 1740 832 831 931
 [Composite, Composite, Camera]  - Blue Balance: 1.119663
-[Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
+[Composite, Composite, Camera]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 24.0mm (35mm equivalent: 37.2mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 8.25 m
+[Composite, Composite, Camera]  - Hyperfocal Distance: 8.25 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
 [Composite, Composite, Image]  - Light Value: 9.7

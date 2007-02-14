@@ -486,7 +486,7 @@ sub ProcessCanonVRD($$)
             $exifTool->DumpTrailer($dirInfo) if $verbose or $exifTool->{HTML_DUMP};
         }
         $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
-    } elsif ($exifTool->{DEL_GROUP} and $exifTool->{DEL_GROUP}->{CanonVRD}) {
+    } elsif ($exifTool->{DEL_GROUP}->{CanonVRD}) {
         # delete CanonVRD information
         if ($exifTool->{FILE_TYPE} eq 'VRD') {
             $exifTool->Error("Can't delete all CanonVRD information from a VRD file");
@@ -526,7 +526,7 @@ as a trailer in JPEG, CRW and CR2 images.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
 [File, File, Image]  - File Name: Pentax_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1571 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:11:17 13:51:59
+[File, File, Time]  - File Modification Date/Time: 2007:01:28 08:41:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -78,11 +78,11 @@
 [MakerNotes, Pentax, Camera] 31 - Saturation: Normal
 [MakerNotes, Pentax, Camera] 32 - Contrast: Normal
 [MakerNotes, Pentax, Camera] 33 - Sharpness: Normal
-[MakerNotes, Pentax, Camera] 34 - World Time Location: Destination
-[MakerNotes, Pentax, Camera] 35 - Hometown City: London
-[MakerNotes, Pentax, Camera] 36 - Destination City: Los Angeles
-[MakerNotes, Pentax, Camera] 37 - Hometown DST: Yes
-[MakerNotes, Pentax, Camera] 38 - Destination DST: Yes
+[MakerNotes, Pentax, Time] 34 - World Time Location: Destination
+[MakerNotes, Pentax, Time] 35 - Hometown City: London
+[MakerNotes, Pentax, Time] 36 - Destination City: Los Angeles
+[MakerNotes, Pentax, Time] 37 - Hometown DST: Yes
+[MakerNotes, Pentax, Time] 38 - Destination DST: Yes
 [MakerNotes, Pentax, Camera] 39 - Pentax 0x0027: ....
 [MakerNotes, Pentax, Camera] 42 - Pentax 0x002a: 2379
 [MakerNotes, Pentax, Camera] 44 - Pentax 0x002c: 93
@@ -98,7 +98,7 @@
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
 [Composite, Composite, Image]  - Shutter Speed: 1/500
-[Composite, Composite, Image]  - Circle Of Confusion: 0.005 mm
+[Composite, Composite, Camera]  - Circle Of Confusion: 0.005 mm
 [Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 3.76 m
+[Composite, Composite, Camera]  - Hyperfocal Distance: 3.76 m
 [Composite, Composite, Image]  - Light Value: 14.9

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.64
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
 [File, File, Image]  - File Name: Writer_9_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 9 kB
-[File, File, Time]  - File Modification Date/Time: 2006:10:16 12:04:41
+[File, File, Time]  - File Modification Date/Time: 2006:10:03 15:10:31
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -99,7 +99,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
-[MakerNotes, Canon, Image] 10 - Optical Zoom Code: 8
+[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: 8
 [MakerNotes, Canon, Image] 13 - Flash Guide Number: 0
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
@@ -109,7 +109,7 @@
 [MakerNotes, Canon, Image] 21 - F Number: 14
 [MakerNotes, Canon, Image] 22 - Exposure Time: 128
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
-[MakerNotes, Canon, Image] 26 - Camera Type: EOS Mid-range
+[MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
@@ -121,7 +121,7 @@
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 1
 [MakerNotes, Canon, Camera] 8 - File Number: 118-1861
-[MakerNotes, Canon, Camera] 9 - Owner's Name: Phil Harvey
+[MakerNotes, Canon, Camera] 9 - Owner Name: Phil Harvey
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS Digital Rebel / 300D / Kiss Digital
 [MakerNotes, Canon, Image] 14 - Canon File Length: 4480822
 [MakerNotes, Canon, Camera] 0 - WB RGGB Levels Auto: 1719 832 831 990
@@ -135,12 +135,12 @@
 [MakerNotes, Canon, Camera] 32 - WB RGGB Levels Kelvin: 1722 832 831 988
 [MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
-[MakerNotes, Canon, Image] 1 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 1 - Num AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
 [MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
 [MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
-[MakerNotes, Canon, Image] 22 - AF Points Used: (none)
+[MakerNotes, Canon, Camera] 22 - AF Points Used: (none)
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
@@ -197,9 +197,9 @@
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
 [Composite, Composite, Camera]  - Blue Balance: 1.190619
-[Composite, Composite, Image]  - Circle Of Confusion: 0.019 mm
+[Composite, Composite, Camera]  - Circle Of Confusion: 0.019 mm
 [Composite, Composite, Camera]  - Focal Length: 34.0mm (35mm equivalent: 52.7mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 4.26 m
+[Composite, Composite, Camera]  - Hyperfocal Distance: 4.26 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
 [Composite, Composite, Image]  - Light Value: 5.6

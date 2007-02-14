@@ -259,9 +259,9 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        # Headerless Nikon maker notes
+        # headerless Nikon maker notes
         Name => 'MakerNoteNikon3',
-        Condition => '$self->{CameraMake}=~/^NIKON/',
+        Condition => '$self->{CameraMake}=~/^NIKON/i',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             ByteOrder => 'Unknown', # most are little-endian, but D1 is big
@@ -275,7 +275,7 @@ my $debug;          # set to 1 to enabled debugging code
         Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON|AGFA )/i',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Olympus::Main',
-            Start => '$valuePtr+8',
+            Start => '$valuePtr + 8',
             ByteOrder => 'Unknown',
         },
     },
@@ -286,7 +286,7 @@ my $debug;          # set to 1 to enabled debugging code
         SubDirectory => {
             # Leica uses the same format as Panasonic
             TagTable => 'Image::ExifTool::Panasonic::Main',
-            Start => '$valuePtr+8',
+            Start => '$valuePtr + 8',
             ByteOrder => 'Unknown',
         },
     },
@@ -296,7 +296,7 @@ my $debug;          # set to 1 to enabled debugging code
         Condition => '$self->{CameraMake} =~ /^Panasonic/ and $$valPt!~/^MKE/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Main',
-            Start => '$valuePtr+12',
+            Start => '$valuePtr + 12',
             ByteOrder => 'Unknown',
         },
     },
@@ -351,7 +351,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteSanyo',
         # (starts with "SANYO\0")
-        Condition => '$self->{CameraMake}=~/^SANYO/ and $self->{CameraModel} !~ /^C4\b/',
+        Condition => '$self->{CameraMake}=~/^SANYO/ and $self->{CameraModel} !~ /^(C4|J\d|S\d)\b/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sanyo::Main',
             Validate => '$val =~ /^SANYO/',
@@ -362,13 +362,25 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteSanyoC4',
         # The C4 offsets are wrong by 12, so they must be fixed
-        Condition => '$self->{CameraMake}=~/^SANYO/',
+        Condition => '$self->{CameraMake}=~/^SANYO/ and $self->{CameraModel} =~ /^C4\b/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sanyo::Main',
             Validate => '$val =~ /^SANYO/',
             Start => '$valuePtr + 8',
             ByteOrder => 'Unknown',
             FixBase => 1,
+        },
+    },
+    {
+        Name => 'MakerNoteSanyoPatch',
+        # The J1, J2, J4, S1, S3 and S4 offsets are completely screwy
+        Condition => '$self->{CameraMake}=~/^SANYO/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sanyo::Main',
+            Validate => '$val =~ /^SANYO/',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'Unknown',
+            FixOffsets => 'Image::ExifTool::Sanyo::FixOffsets($valuePtr, $valEnd, $size, $tagID, $wFlag)',
         },
     },
     {
@@ -542,6 +554,8 @@ sub FixBase($$)
 {
     local $_;
     my ($exifTool, $dirInfo) = @_;
+    return 0 if $$dirInfo{FixOffsets}; # don't fix base if fixing offsets individually
+
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $entryBased = $$dirInfo{EntryBased};
@@ -878,7 +892,7 @@ maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -66,27 +66,29 @@ supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
-  AI    r       MIE   r/w/c   PSD   r/w    |  GPS            r/w/c
-  AIFF  r       MIFF  r       QTIF  r      |  IPTC           r/w/c
-  APE   r       MNG   r/w     RA    r      |  XMP            r/w/c
-  ARW   r       MOS   r/w     RAF   r      |  MakerNotes     r/w/c
-  ASF   r       MOV   r       RAM   r      |  Photoshop IRB  r/w/c
-  AVI   r       MP3   r       RAW   r      |  ICC Profile    r/w/c
-  BMP   r       MP4   r       RIFF  r      |  MIE            r/w/c
-  CR2   r/w     MPC   r       RM    r      |  JFIF           r/w/c
-  CRW   r/w     MPG   r       SR2   r      |  CIFF           r/w
-  DCM   r       MRW   r/w     SRF   r      |  AFCP           r/w
-  DNG   r/w     NEF   r/w     SWF   r      |  FlashPix       r
-  EPS   r/w     OGG   r       THM   r/w    |  GeoTIFF        r
-  ERF   r/w     ORF   r/w     TIFF  r/w    |  PrintIM        r
-  FLAC  r       PBM   r/w     VRD   r/w    |  ID3            r
-  FPX   r       PDF   r       WAV   r      |  Kodak Meta     r
-  GIF   r/w     PEF   r/w     WDP   r/w    |  Ricoh RMETA    r
-  ICC   r/w/c   PGM   r/w     WMA   r      |  Picture Info   r
-  JNG   r/w     PICT  r       WMV   r      |  Adobe APP14    r
-  JP2   r       PNG   r/w     X3F   r      |  APE            r
-  JPEG  r/w     PPM   r/w     XMP   r/w/c  |  (and more)</pre>
+  ACR   r       M4A   r       PSD   r/w    |  EXIF           r/w/c
+  AI    r       MIE   r/w/c   QTIF  r      |  GPS            r/w/c
+  AIFF  r       MIFF  r       RA    r      |  IPTC           r/w/c
+  APE   r       MNG   r/w     RAF   r      |  XMP            r/w/c
+  ARW   r       MOS   r/w     RAM   r      |  MakerNotes     r/w/c
+  ASF   r       MOV   r       RAW   r      |  Photoshop IRB  r/w/c
+  AVI   r       MP3   r       RIFF  r      |  ICC Profile    r/w/c
+  BMP   r       MP4   r       RM    r      |  MIE            r/w/c
+  CR2   r/w     MPC   r       SR2   r      |  JFIF           r/w/c
+  CRW   r/w     MPG   r       SRF   r      |  CIFF           r/w
+  DCM   r       MRW   r/w     SWF   r      |  AFCP           r/w
+  DNG   r/w     NEF   r/w     THM   r/w    |  DICOM          r
+  DOC   r       OGG   r       TIFF  r/w    |  FlashPix       r
+  EPS   r/w     ORF   r/w     VRD   r/w    |  GeoTIFF        r
+  ERF   r/w     PBM   r/w     WAV   r      |  PrintIM        r
+  FLAC  r       PDF   r       WDP   r/w    |  ID3            r
+  FPX   r       PEF   r/w     WMA   r      |  Kodak Meta     r
+  GIF   r/w     PGM   r/w     WMV   r      |  Ricoh RMETA    r
+  HTML  r       PICT  r       X3F   r      |  Picture Info   r
+  ICC   r/w/c   PNG   r/w     XLS   r      |  Adobe APP14    r
+  JNG   r/w     PPM   r/w     XMP   r/w/c  |  APE            r
+  JP2   r       PPT   r                    |  Vorbis         r
+  JPEG  r/w     PS    r/w                  |  (and more)</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are written.
 However, the <strong>-ext</strong> option may be used to force processing of files with
@@ -470,18 +472,20 @@ copies of your image files.
 <dd>
 Similar to the <strong>-overwrite_original</strong> option except that an extra step is
 added to allow the original file attributes to be preserved.  On a Macintosh
-for example, this preserves the original file type, creator and icon.
+for example, this preserves the original file type, creator and icon.  The
+extra step results in slower performance, so the <strong>-overwrite_original</strong>
+option should be used instead unless necessary.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dp_fmtfile"><strong>-p</strong> <em>FMTFILE</em></a></strong><br />
+<dt><strong><a name="item__2dp_fmtfile_or_expr"><strong>-p</strong> <em>FMTFILE</em> or <em>EXPR</em></a></strong><br />
 </dt>
 <dd>
-<strong>P</strong>rint output in the format specified by the given file (and ignore other
-format options).  Tag names in the format file begin with a <code>$</code> symbol and
-may contain an optional group name.  Case is not significant.  Braces <code>{}</code>
-may be used around the tag name to separate it from subsequent text.  Use
-<code>$$</code> to represent a <code>$</code> symbol.  Lines beginning with <code>#</code> are ignored.
-For example, this format file:
+<strong>P</strong>rint output in the format specified by the given file or expression (and
+ignore other format options).  Tag names in the format file begin with a
+<code>$</code> symbol and may contain an optional group name.  Case is not
+significant.  Braces <code>{}</code> may be used around the tag name to separate it
+from subsequent text.  Use <code>$$</code> to represent a <code>$</code> symbol.  In the file,
+lines beginning with <code>#</code> are ignored. For example, this format file:
 </dd>
 <dd>
 <pre>
@@ -498,8 +502,10 @@ For example, this format file:
     (f/5.6, 1/60s, ISO 100)</pre>
 </dd>
 <dd>
-<p>If a tag does not exist, the value is set to '-' in the output if the <strong>-f</strong>
-option is used, or '' otherwise.</p>
+<p>If a tag does not exist, the output value is set to '-' if the <strong>-f</strong> option
+is used.  Otherwise a minor warning is issued and the line with the missing
+tag is not printed.  However, if the <strong>-m</strong> option is used, minor warnings
+are ignored and the line is printed with an empty tag value.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dp"><strong>-P</strong></a></strong><br />
@@ -589,7 +595,10 @@ destination tags may be prefixed by a group name, and <code>All</code> or <code>
 used as a tag or group name.  If no destination group is specified, the
 information is written to the preferred group.  As a convenience,
 <code>-TagsFromFile @</code> is assumed for any redirected tags which are specified
-without a prior <strong>-TagsFromFile</strong> option.</p>
+without a prior <strong>-TagsFromFile</strong> option.  Copied tags may also be added or
+deleted from a list with arguments of the form
+&quot;'-<em>SRCTAG</em>+&gt;<em>DSTTAG</em>'&quot; or
+&quot;'-<em>SRCTAG</em>-&gt;<em>DSTTAG</em>'&quot;.</p>
 </dd>
 <dd>
 <p>An extension of the redirection feature allows expressions involving tag
@@ -785,6 +794,13 @@ Print standard Canon information from two image files.
 Recursively extract common meta information from files in <code>pictures</code>
 directory, writing text output into files with the same names but with a
 <code>.txt</code> extension.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dp__27_24filename_has_date__24datetimeo">exiftool -p '$filename has date $dateTimeOriginal' -q -f dir</a></strong><br />
+</dt>
+<dd>
+Print one line of output containing the file name and DateTimeOriginal for
+each image in directory <code>dir</code>.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2db__2dthumbnailimage_image_2ejpg__3e_th">exiftool -b -ThumbnailImage image.jpg &gt; thumbnail.jpg</a></strong><br />
@@ -1075,6 +1091,12 @@ Recursively rewrite all <code>JPG</code> images in <code>dir</code> with informa
 the corresponding <code>CRW</code> images in the same directories.
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__27_2dmake_2b_3ekeywords_27_image_2ejpg">exiftool '-make+&gt;keywords' image.jpg</a></strong><br />
+</dt>
+<dd>
+Add camera make to list of keywords.
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__27_2dcomment_3ciso_3d_24exif_3aiso_expos">exiftool '-comment&lt;ISO=$exif:iso Exposure=${shutterspeed}' dir</a></strong><br />
 </dt>
 <dd>
@@ -1197,7 +1219,7 @@ Macintosh filesystems.</p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Copyright 2003-2006, Phil Harvey</p>
+<p>Copyright 2003-2007, Phil Harvey</p>
 <p>This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.</p>
 <p>

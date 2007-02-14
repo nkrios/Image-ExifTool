@@ -128,29 +128,8 @@
             ValueConv => 'sqrt(24*24+36*36) / ($val[0] * 1750)',
             PrintConv => 'sprintf("%.3f mm",$val)',
         },
-        # get latitude/logitude reference from XMP lat/long tags
-        # (used to set EXIF GPS position from XMP tags)
-        GPSLatitudeRef => {
-            Require => {
-                0 => 'XMP:GPSLatitude',
-            },
-            ValueConv => '$val[0] < 0 ? "S" : "N"',
-            PrintConv => {
-                N => 'North',
-                S => 'South',
-            },
-        },
-        GPSLongitudeRef => {
-            Require => {
-                0 => 'XMP:GPSLongitude',
-            },
-            ValueConv => '$val[0] < 0 ? "W" : "E"',
-            PrintConv => {
-                E => 'East',
-                W => 'West',
-            },
-        },
     },
 );
 
 #------------------------------------------------------------------------------
+1;  #end

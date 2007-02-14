@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
 [File, File, Image]  - File Name: Sigma.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1531 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
+[File, File, Time]  - File Modification Date/Time: 2006:01:07 13:39:10
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -76,7 +76,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.7
 [Composite, Composite, Image]  - Shutter Speed: 1/320
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Image]  - Circle Of Confusion: 0.018 mm
+[Composite, Composite, Camera]  - Circle Of Confusion: 0.018 mm
 [Composite, Composite, Camera]  - Focal Length: 60.0mm (35mm equivalent: 102.0mm)
-[Composite, Composite, Image]  - Hyperfocal Distance: 25.46 m
+[Composite, Composite, Camera]  - Hyperfocal Distance: 25.46 m
 [Composite, Composite, Image]  - Light Value: 14.3

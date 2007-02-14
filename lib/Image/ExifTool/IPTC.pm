@@ -12,13 +12,25 @@
 package Image::ExifTool::IPTC;
 
 use strict;
-use vars qw($VERSION $AUTOLOAD);
+use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.19';
+$VERSION = '1.20';
+
+%iptcCharset = (
+    "\x1b%G"  => 'UTF8',
+   # don't translate these (at least until we handle ISO 2022 shift codes)
+   # because the sets are only designated and not invoked 
+   # "\x1b,A"  => 'Latin',  # G0 = ISO 8859-1 (similar to Latin1, but codes 0x80-0x9f are missing)
+   # "\x1b-A"  => 'Latin',  # G1     "
+   # "\x1b.A"  => 'Latin',  # G2
+   # "\x1b/A"  => 'Latin',  # G3
+);
 
 sub ProcessIPTC($$$);
 sub WriteIPTC($$$);
 sub CheckIPTC($$$);
+sub PrintCodedCharset($);
+sub PrintInvCodedCharset($);
 
 my %fileFormat = (
     0 => 'No ObjectData',
@@ -161,13 +173,16 @@ my %fileFormat = (
     90 => {
         Name => 'CodedCharacterSet',
         Notes => q{
-            this must be set to "ESC % G" if UTF-8 characters are used in
-            ApplicationRecord or NewsPhoto string values
+            values are entered in the form "ESC X Y[, ...]".  The escape sequence for
+            UTF-8 character coding is "ESC % G", but this is displayed as "UTF8" for
+            convenience.  Either string may be used when writing.  The value of this tag
+            affects the decoding of string values in the Application and NewsPhoto
+            records
         },
         Format => 'string[0,32]',
         # convert ISO 2022 escape sequences to a more readable format
-        PrintConv => '$_=$val; s/(.)/ $1/g; s/ \x1b/, ESC/g; s/^,? //; $_',
-        PrintConvInv => '$_=$val; s/ESC /\x1b/g; tr/, //d; $_',
+        PrintConv => \&PrintCodedCharset,
+        PrintConvInv => \&PrintInvCodedCharset,
     },
     100 => {
         Name => 'UniqueObjectName',
@@ -820,6 +835,69 @@ sub AUTOLOAD
 }
 
 #------------------------------------------------------------------------------
+# Print conversion for CodedCharacterSet
+# Inputs: 0) value
+sub PrintCodedCharset($)
+{
+    my $val = shift;
+    return $iptcCharset{$val} if $iptcCharset{$val};
+    $val =~ s/(.)/ $1/g;
+    $val =~ s/ \x1b/, ESC/g;
+    $val =~ s/^,? //;
+    return $val;
+}
+        
+#------------------------------------------------------------------------------
+# Handle CodedCharacterSet
+# Inputs: 0) ExifTool ref, 1) CodedCharacterSet value
+# Returns: external character set if translation required (or 'bad' if unknown)
+sub HandleCodedCharset($$)
+{
+    my ($exifTool, $val) = @_;
+    my $xlat = $exifTool->Options('Charset');
+    if ($iptcCharset{$val}) {
+        # no need to translate if destination is the same
+        undef $xlat if $xlat eq $iptcCharset{$val};
+    } elsif ($val =~ /^\x1b\x25/) {
+        # some unknown character set involked
+        $xlat = 'bad';  # flag unsupported coding
+    } else {
+        # translate all other codes as Latin
+        undef $xlat if $xlat eq 'Latin';
+    }
+    return $xlat;
+}
+
+#------------------------------------------------------------------------------
+# Encode or decode coded string
+# Inputs: 0) ExifTool ref, 1) value ptr, 2) destination charset ('Latin','UTF8' or 'bad')
+#         3) flag set to decode (read) value from IPTC
+# Updates value on return
+sub TranslateCodedString($$$$)
+{
+    my ($exifTool, $valPtr, $xlatPtr, $read) = @_;
+    my $escaped;
+    if ($$xlatPtr eq 'bad') {
+        $exifTool->Warn('Some IPTC characters not converted (unsupported CodedCharacterSet)');
+        undef $$xlatPtr;
+    } elsif ($$xlatPtr eq 'Latin' xor $read) {
+        # don't yet support reading ISO 2022 shifted character sets
+        if (not $read or $$valPtr !~ /[\x14\x15\x1b]/) {
+            # convert from Latin to UTF-8
+            my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
+            $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
+        } elsif (not $$exifTool{WarnShift2022}) {
+            $exifTool->Warn('Some IPTC characters not converted (ISO 2022 shifting not supported)');
+            $$exifTool{WarnShift2022} = 1;
+        }
+    } else {
+        # convert from UTF-8 to Latin
+        my $val = Image::ExifTool::UTF82Unicode($$valPtr,'n',$exifTool);
+        $$valPtr = Image::ExifTool::Unicode2Latin($val,'n',$exifTool);
+    }
+}
+
+#------------------------------------------------------------------------------
 # get IPTC info
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 #         2) reference to tag table
@@ -835,6 +913,10 @@ sub ProcessIPTC($$$)
     my $success = 0;
     my %listTags;
 
+    # begin by assuming IPTC is Latin (so no translation if Charset is Latin)
+    my $xlat = $exifTool->Options('Charset');
+    undef $xlat if $xlat eq 'Latin';
+    
     $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
     if ($tagTablePtr eq \%Image::ExifTool::IPTC::Main) {
         my $dirCount = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
@@ -900,14 +982,25 @@ sub ProcessIPTC($$$)
         unless ($format) {
             $format = 'int' if $len <= 4 and $len != 3 and $val =~ /[\0-\x08]/;
         }
-        if ($format and $len <= 8) {    # limit integer conversion to 8 bytes long
+        if ($format) {
             if ($format =~ /^int/) {
-                $val = 0;
-                my $i;
-                for ($i=0; $i<$len; ++$i) {
-                    $val = $val * 256 + ord(substr($$dataPt, $pos+$i, 1));
+                if ($len <= 8) {    # limit integer conversion to 8 bytes long
+                    $val = 0;
+                    my $i;
+                    for ($i=0; $i<$len; ++$i) {
+                        $val = $val * 256 + ord(substr($$dataPt, $pos+$i, 1));
+                    }
                 }
-            } elsif ($format !~ /^(string|digits)/) {
+            } elsif ($format =~ /^string/) {
+                if ($rec == 1) {
+                    # handle CodedCharacterSet tag
+                    $xlat = HandleCodedCharset($exifTool, $val) if $tag == 90;
+                # translate characters if necessary and special characters exist
+                } elsif ($xlat and $rec < 7 and $val =~ /[\x80-\xff]/) {
+                    # translate to specified character set
+                    TranslateCodedString($exifTool, \$val, \$xlat, 1);
+                }
+            } elsif ($format !~ /^digits/) {
                 warn("Invalid IPTC format: $format");
             }
         }
@@ -958,7 +1051,7 @@ image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2006, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.58
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.75
 [File, File, Image]  - File Name: Ricoh2.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -91,7 +91,9 @@
 [APP5, RMETA, Image] Azimuth - Azimuth: E
 [Composite, Composite, Image]  - Aperture: 5.5
 [Composite, Composite, Time]  - GPS Date/Time: 2006:05:26 10:47:24
-[Composite, Composite, Other]  - GPS Position: 42 deg 2' 4.47" N, 0 deg 30' 27.01" W
+[Composite, Composite, Other]  - GPS Latitude: 42 deg 2' 4.47" N
+[Composite, Composite, Other]  - GPS Longitude: 0 deg 30' 27.01" W
+[Composite, Composite, Image]  - GPS Position: 42 deg 2' 4.47" N, 0 deg 30' 27.01" W
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Shutter Speed: 1/1740
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)

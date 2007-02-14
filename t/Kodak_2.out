@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.75
 [File, File, Image]  - File Name: Kodak.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -72,7 +72,7 @@
 [MakerNotes, Kodak, Camera] 104 - Digital Zoom: 1
 [MakerNotes, Kodak, Camera] 107 - Sharpness: Normal
 [FlashPix, FlashPix, Other] 1 - Code Page: 1200
-[FlashPix, FlashPix, Other] 268435456 - Used Extension Numbers: 1 2
+[FlashPix, FlashPix, Other] 268435456 - Used Extension Numbers: 1, 2
 [FlashPix, FlashPix, Other] 1 - Extension Name: Screen nail
 [FlashPix, FlashPix, Other] 2 - Extension Class ID: 10000230-6FC0-11D0-BD01-00609719A180
 [FlashPix, FlashPix, Other] 3 - Extension Persistence: Invalidated By Modification
