@@ -224,7 +224,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PhotoMechanic - Read/Write Photo Mechanic information
+Image::ExifTool::PhotoMechanic - Read/write Photo Mechanic information
 
 =head1 SYNOPSIS
 

@@ -46,55 +46,7 @@ The Pentax tags are also used in Asahi cameras.
 <td>0x0005</td>
 <td>PentaxModelID</td>
 <td class=c>int32u</td>
-<td><span class=s>0xd = Optio 330/430
-  <br>0x12926 = Optio 230
-  <br>0x12958 = Optio 330GS
-  <br>0x12962 = Optio 450/550
-  <br>0x1296c = Optio S
-  <br>0x12994 = *ist D
-  <br>0x129b2 = Optio 33L
-  <br>0x129bc = Optio 33LF
-  <br>0x129c6 = Optio 33WR/43WR/555
-  <br>0x129d5 = Optio S4
-  <br>0x12a02 = Optio MX
-  <br>0x12a0c = Optio S40
-  <br>0x12a16 = Optio S4i
-  <br>0x12a34 = Optio 30
-  <br>0x12a52 = Optio S30
-  <br>0x12a66 = Optio 750Z
-  <br>0x12a70 = Optio SV
-  <br>0x12a75 = Optio SVi
-  <br>0x12a7a = Optio X
-  <br>0x12a8e = Optio S5i
-  <br>0x12a98 = Optio S50
-  <br>0x12aa2 = *ist DS
-  <br>0x12ab6 = Optio MX4
-  <br>0x12ac0 = Optio S5n
-  <br>0x12aca = Optio WP
-  <br>0x12afc = Optio S55
-  <br>0x12b10 = Optio S5z
-  <br>0x12b1a = *ist DL
-  <br>0x12b24 = Optio S60
-  <br>0x12b2e = Optio S45
-  <br>0x12b38 = Optio S6
-  <br>0x12b4c = Optio WPi
-  <br>0x12b56 = BenQ DC X600
-  <br>0x12b60 = *ist DS2
-  <br>0x12b62 = Samsung GX-1S
-  <br>0x12b6a = Optio A10
-  <br>0x12b7e = *ist DL2
-  <br>0x12b80 = Samsung GX-1L
-  <br>0x12b9c = K100D
-  <br>0x12b9d = K110D
-  <br>0x12bb0 = Optio T10
-  <br>0x12be2 = Optio W10
-  <br>0x12bf6 = Optio M10
-  <br>0x12c1e = K10D
-  <br>0x12c20 = Samsung GX10
-  <br>0x12c28 = Optio S7
-  <br>0x12c32 = Optio M20
-  <br>0x12c3c = Optio W20
-  <br>0x12c46 = Optio A20</span></td></tr>
+<td>--&gt; <a href='Pentax.html#PentaxModelID'>Pentax PentaxModelID Values</a></td></tr>
 <tr>
 <td>0x0006</td>
 <td>Date</td>
@@ -641,46 +593,108 @@ step size)</span></span></td></tr>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x0215</td>
+<td>CameraInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Pentax.html#CameraInfo'>Pentax CameraInfo Tags</a></td></tr>
+<tr>
 <td>0x0216</td>
 <td>BatteryInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#BatteryInfo'>Pentax BatteryInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x03fe</td>
 <td>DataDump</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0402</td>
 <td>ToneCurve</td>
 <td class=c>Y~</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0403</td>
 <td>ToneCurves</td>
 <td class=c>Y~</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x1000</td>
 <td>HometownCityCode</td>
 <td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x1001</td>
 <td>DestinationCityCode</td>
 <td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x2000</td>
 <td>PreviewImageData</td>
 <td class=c>Y</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
+
+<h2><a name='PentaxModelID'>Pentax PentaxModelID Values</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>PentaxModelID</th><th>Value</th><th>PentaxModelID</th></tr>
+<tr><td class=r>13</td><td>= Optio 330/430</td>
+<td class='r b'>76540</td><td class=b>= Optio S55</td>
+</tr><tr><td class=r>76070</td><td>= Optio 230</td>
+<td class='r b'>76560</td><td class=b>= Optio S5z</td>
+</tr><tr><td class=r>76120</td><td>= Optio 330GS</td>
+<td class='r b'>76570</td><td class=b>= *ist DL</td>
+</tr><tr><td class=r>76130</td><td>= Optio 450/550</td>
+<td class='r b'>76580</td><td class=b>= Optio S60</td>
+</tr><tr><td class=r>76140</td><td>= Optio S</td>
+<td class='r b'>76590</td><td class=b>= Optio S45</td>
+</tr><tr><td class=r>76180</td><td>= *ist D</td>
+<td class='r b'>76600</td><td class=b>= Optio S6</td>
+</tr><tr><td class=r>76210</td><td>= Optio 33L</td>
+<td class='r b'>76620</td><td class=b>= Optio WPi</td>
+</tr><tr><td class=r>76220</td><td>= Optio 33LF</td>
+<td class='r b'>76630</td><td class=b>= BenQ DC X600</td>
+</tr><tr><td class=r>76230</td><td>= Optio 33WR/43WR/555</td>
+<td class='r b'>76640</td><td class=b>= *ist DS2</td>
+</tr><tr><td class=r>76245</td><td>= Optio S4</td>
+<td class='r b'>76642</td><td class=b>= Samsung GX-1S</td>
+</tr><tr><td class=r>76290</td><td>= Optio MX</td>
+<td class='r b'>76650</td><td class=b>= Optio A10</td>
+</tr><tr><td class=r>76300</td><td>= Optio S40</td>
+<td class='r b'>76670</td><td class=b>= *ist DL2</td>
+</tr><tr><td class=r>76310</td><td>= Optio S4i</td>
+<td class='r b'>76672</td><td class=b>= Samsung GX-1L</td>
+</tr><tr><td class=r>76340</td><td>= Optio 30</td>
+<td class='r b'>76700</td><td class=b>= K100D</td>
+</tr><tr><td class=r>76370</td><td>= Optio S30</td>
+<td class='r b'>76701</td><td class=b>= K110D</td>
+</tr><tr><td class=r>76390</td><td>= Optio 750Z</td>
+<td class='r b'>76720</td><td class=b>= Optio T10</td>
+</tr><tr><td class=r>76400</td><td>= Optio SV</td>
+<td class='r b'>76770</td><td class=b>= Optio W10</td>
+</tr><tr><td class=r>76405</td><td>= Optio SVi</td>
+<td class='r b'>76790</td><td class=b>= Optio M10</td>
+</tr><tr><td class=r>76410</td><td>= Optio X</td>
+<td class='r b'>76830</td><td class=b>= K10D</td>
+</tr><tr><td class=r>76430</td><td>= Optio S5i</td>
+<td class='r b'>76832</td><td class=b>= Samsung GX10</td>
+</tr><tr><td class=r>76440</td><td>= Optio S50</td>
+<td class='r b'>76840</td><td class=b>= Optio S7</td>
+</tr><tr><td class=r>76450</td><td>= *ist DS</td>
+<td class='r b'>76850</td><td class=b>= Optio M20</td>
+</tr><tr><td class=r>76470</td><td>= Optio MX4</td>
+<td class='r b'>76860</td><td class=b>= Optio W20</td>
+</tr><tr><td class=r>76480</td><td>= Optio S5n</td>
+<td class='r b'>76870</td><td class=b>= Optio A20</td>
+</tr><tr><td class=r>76490</td><td>= Optio WP</td>
+<td class='r b'>&nbsp;</td><td class=b>&nbsp;</td>
+</tr></table></td></tr></table></blockquote>
 
 <h2><a name='City'>Pentax City Values</a></h2>
 <blockquote>
@@ -879,7 +893,7 @@ step size)</span></span></td></tr>
 </tr><tr><td>'6 13'</td><td>= smc PENTAX-FA* 400mm F5.6 ED[IF]</td>
 </tr><tr><td>'6 14'</td><td>= smc PENTAX-FA* MACRO 200mm F4 ED[IF]</td>
 </tr><tr><td>'7 243'</td><td>= smc PENTAX-DA 70mm F2.4 Limited</td>
-</tr><tr><td>'7 244'</td><td>= smc PENTAX-DA 16-45mm F4 ED AL</td>
+</tr><tr><td>'7 244'</td><td>= smc PENTAX-DA 21mm F3.2 AL Limited</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='SRInfo'>Pentax SRInfo Tags</a></h2>
@@ -1011,12 +1025,14 @@ decoding is a bit different)</span></td></tr>
 <td><span class=s>149 = On, Wireless
   <br>192 = On
   <br>193 = On, Red-eye reduction
+  <br>194 = Auto, Fired
   <br>200 = On, Slow-sync
   <br>201 = On, Slow-sync, Red-eye reduction
   <br>202 = On, Trailing-curtain Sync
   <br>240 = Off (240)
   <br>241 = Off (241)
-  <br>242 = Off (242)</span></td></tr>
+  <br>242 = Off (242)
+  <br>244 = Off (244)</span></td></tr>
 <tr>
 <td class=r>2</td>
 <td>ExternalFlashMode</td>
@@ -1046,6 +1062,34 @@ decoding is a bit different)</span></td></tr>
 <td class=r>7</td>
 <td>TTL_DA_BDown</td>
 <td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfo'>Pentax CameraInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>PentaxModelID</td>
+<td class=c>int32u</td>
+<td>--&gt; <a href='Pentax.html#PentaxModelID'>Pentax PentaxModelID Values</a></td></tr>
+<tr class=b>
+<td class=r>1</td>
+<td>ManufactureDate</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>2</td>
+<td>ModelRevision</td>
+<td class=c>int32u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>4</td>
+<td>InternalSerialNumber</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1138,7 +1182,7 @@ decoding is a bit different)</span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 12, 2007</i>
+<br><i>Last revised Feb 16, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

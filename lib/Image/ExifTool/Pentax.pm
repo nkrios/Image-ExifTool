@@ -38,7 +38,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.45';
+$VERSION = '1.46';
 
 # pentax lens type codes (ref 4)
 my %pentaxLensType = (
@@ -162,10 +162,63 @@ my %pentaxLensType = (
     '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH (K10D)
-    '7 244' => 'smc PENTAX-DA 16-45mm F4 ED AL', #PH (K10D)
+    '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
 );
 
-# Pentax city codes - PH (from Optio WP)
+# Pentax model ID codes (PH)
+my %pentaxModelID = (
+    0x0000d => 'Optio 330/430',
+    0x12926 => 'Optio 230',
+    0x12958 => 'Optio 330GS',
+    0x12962 => 'Optio 450/550',
+    0x1296c => 'Optio S',
+    0x12994 => '*ist D',
+    0x129b2 => 'Optio 33L',
+    0x129bc => 'Optio 33LF',
+    0x129c6 => 'Optio 33WR/43WR/555',
+    0x129d5 => 'Optio S4',
+    0x12a02 => 'Optio MX',
+    0x12a0c => 'Optio S40',
+    0x12a16 => 'Optio S4i',
+    0x12a34 => 'Optio 30',
+    0x12a52 => 'Optio S30',
+    0x12a66 => 'Optio 750Z',
+    0x12a70 => 'Optio SV',
+    0x12a75 => 'Optio SVi',
+    0x12a7a => 'Optio X',
+    0x12a8e => 'Optio S5i',
+    0x12a98 => 'Optio S50',
+    0x12aa2 => '*ist DS',
+    0x12ab6 => 'Optio MX4',
+    0x12ac0 => 'Optio S5n',
+    0x12aca => 'Optio WP',
+    0x12afc => 'Optio S55',
+    0x12b10 => 'Optio S5z',
+    0x12b1a => '*ist DL',
+    0x12b24 => 'Optio S60',
+    0x12b2e => 'Optio S45',
+    0x12b38 => 'Optio S6',
+    0x12b4c => 'Optio WPi', #13
+    0x12b56 => 'BenQ DC X600',
+    0x12b60 => '*ist DS2',
+    0x12b62 => 'Samsung GX-1S',
+    0x12b6a => 'Optio A10',
+    0x12b7e => '*ist DL2',
+    0x12b80 => 'Samsung GX-1L',
+    0x12b9c => 'K100D',
+    0x12b9d => 'K110D',
+    0x12bb0 => 'Optio T10',
+    0x12be2 => 'Optio W10',
+    0x12bf6 => 'Optio M10',
+    0x12c1e => 'K10D',
+    0x12c20 => 'Samsung GX10',
+    0x12c28 => 'Optio S7',
+    0x12c32 => 'Optio M20',
+    0x12c3c => 'Optio W20',
+    0x12c46 => 'Optio A20',
+);
+
+# Pentax city codes - (PH, Optio WP)
 my %pentaxCities = (
     0 => 'Pago Pago',
     1 => 'Honolulu',
@@ -289,57 +342,8 @@ my %pentaxCities = (
         Name => 'PentaxModelID',
         Writable => 'int32u',
         PrintHex => 1,
-        PrintConv => { #PH
-            0x0000d => 'Optio 330/430',
-            0x12926 => 'Optio 230',
-            0x12958 => 'Optio 330GS',
-            0x12962 => 'Optio 450/550',
-            0x1296c => 'Optio S',
-            0x12994 => '*ist D',
-            0x129b2 => 'Optio 33L',
-            0x129bc => 'Optio 33LF',
-            0x129c6 => 'Optio 33WR/43WR/555',
-            0x129d5 => 'Optio S4',
-            0x12a02 => 'Optio MX',
-            0x12a0c => 'Optio S40',
-            0x12a16 => 'Optio S4i',
-            0x12a34 => 'Optio 30',
-            0x12a52 => 'Optio S30',
-            0x12a66 => 'Optio 750Z',
-            0x12a70 => 'Optio SV',
-            0x12a75 => 'Optio SVi',
-            0x12a7a => 'Optio X',
-            0x12a8e => 'Optio S5i',
-            0x12a98 => 'Optio S50',
-            0x12aa2 => '*ist DS',
-            0x12ab6 => 'Optio MX4',
-            0x12ac0 => 'Optio S5n',
-            0x12aca => 'Optio WP',
-            0x12afc => 'Optio S55',
-            0x12b10 => 'Optio S5z',
-            0x12b1a => '*ist DL',
-            0x12b24 => 'Optio S60',
-            0x12b2e => 'Optio S45',
-            0x12b38 => 'Optio S6',
-            0x12b4c => 'Optio WPi', #13
-            0x12b56 => 'BenQ DC X600',
-            0x12b60 => '*ist DS2',
-            0x12b62 => 'Samsung GX-1S',
-            0x12b6a => 'Optio A10',
-            0x12b7e => '*ist DL2',
-            0x12b80 => 'Samsung GX-1L',
-            0x12b9c => 'K100D',
-            0x12b9d => 'K110D',
-            0x12bb0 => 'Optio T10',
-            0x12be2 => 'Optio W10',
-            0x12bf6 => 'Optio M10',
-            0x12c1e => 'K10D',
-            0x12c20 => 'Samsung GX10',
-            0x12c28 => 'Optio S7',
-            0x12c32 => 'Optio M20',
-            0x12c3c => 'Optio W20',
-            0x12c46 => 'Optio A20',
-        },
+        SeparateTable => 1,
+        PrintConv => \%pentaxModelID,
     },
     0x0006 => { #5
         # Note: Year is int16u in MM byte ordering regardless of EXIF byte order
@@ -835,9 +839,9 @@ my %pentaxCities = (
         Writable => 'int32u',
     },
     # 0x002b - definitely exposure related somehow (PH)
-    # 0x0032 - normally 4 zero bytes, but "\x02\0\0\0" for a cropped pic (PH)
+    # 0x0032 - normally 4 zero bytes, but "\x02\0\0\0" for a cropped pic (PH, Optio WP)
     # and "\0\0\0\x04" for Digital filter (ref 13)
-    # and "\x04\0\0\0" for Color filter (ref 13)
+    # and "\x04\0\0\0" for Color filter (ref 13) (PH - digital or color filter, K10D)
     0x0033 => { #PH (K110D/K100D)
         Name => 'PictureMode',
         Writable => 'int8u',
@@ -956,6 +960,7 @@ my %pentaxCities = (
             10 => 'Lower-right',
         } },
     },
+    # 0x003d = 8192 (PH, K10D)
     0x003f => { #PH
         Name => 'LensType',
         Writable => 'int8u',
@@ -1078,6 +1083,12 @@ my %pentaxCities = (
         Name => 'WB_RGGBLevelsFlash',
         Writable => 'int16u',
         Count => 4,
+    },
+    0x0215 => { #PH
+        Name => 'CameraInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::CameraInfo',
+        },
     },
     0x0216 => { #PH
         Name => 'BatteryInfo',
@@ -1281,15 +1292,17 @@ my %pentaxCities = (
     1 => {
         Name => 'FlashModeCode',
         PrintConv => {
-            149 => 'On, Wireless',
-            192 => 'On',
-            193 => 'On, Red-eye reduction',
-            200 => 'On, Slow-sync',
-            201 => 'On, Slow-sync, Red-eye reduction',
-            202 => 'On, Trailing-curtain Sync',
-            240 => 'Off (240)',
-            241 => 'Off (241)',
-            242 => 'Off (242)',
+            149 => 'On, Wireless', # K10D
+            192 => 'On', # K10D
+            193 => 'On, Red-eye reduction', # *istDS2, K10D
+            194 => 'Auto, Fired', # K100D, K110D
+            200 => 'On, Slow-sync', # K10D
+            201 => 'On, Slow-sync, Red-eye reduction', # K10D
+            202 => 'On, Trailing-curtain Sync', # K10D
+            240 => 'Off (240)', # *istD, *istDS, K100D, K10D
+            241 => 'Off (241)', # *istDL
+            242 => 'Off (242)', # *istDS, *istDL2, K100D, K110D
+            244 => 'Off (244)', # K100D, K110D (either "Auto, Did not fire" or "Off")
         },
     },
     2 => 'ExternalFlashMode',
@@ -1300,6 +1313,39 @@ my %pentaxCities = (
     7 => 'TTL_DA_BDown',
     # ? => 'ExternalFlashMagniA',
     # ? => 'ExternalFlashMagniB',
+);
+
+# camera manufacture information (ref PH)
+%Image::ExifTool::Pentax::CameraInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    FORMAT => 'int32u',
+    0 => {
+        Name => 'PentaxModelID',
+        Priority => 0, # (Optio SVi uses incorrect Optio SV ID here)
+        SeparateTable => 1,
+        PrintConv => \%pentaxModelID,
+    },
+    1 => {
+        Name => 'ManufactureDate',
+        ValueConv => q{
+            $val =~ /^(\d{4})(\d{2})(\d{2})$/ and return "$1:$2:$2";
+            # Optio A10 and A20 leave "200" off the year
+            $val =~ /^(\d)(\d{2})(\d{2})$/ and return "200$1:$2:$3";
+            return "Unknown($val)";
+        },
+        ValueConvInv => '$val=~tr/0-9//dc; $val',
+    },
+    2 => {
+        Name => 'ModelRevision',
+        Format => 'int32u[2]',
+        ValueConv => '$val=~tr/ /./; $val',
+        ValueConvInv => '$val=~tr/./ /; $val',
+    },
+    4 => 'InternalSerialNumber',
 );
 
 # battery information (ref PH)

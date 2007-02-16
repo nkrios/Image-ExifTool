@@ -3899,6 +3899,7 @@ The Pentax tags are also used in Asahi cameras.
   0x0212   WB_RGGBLevelsFluorescentN            int16u[4]
   0x0213   WB_RGGBLevelsFluorescentW            int16u[4]
   0x0214   WB_RGGBLevelsFlash                   int16u[4]
+  0x0215   CameraInfo                           Pentax CameraInfo
   0x0216   BatteryInfo                          Pentax BatteryInfo
   0x03fe   DataDump                             N
   0x0402   ToneCurve                            Y~
@@ -3950,6 +3951,15 @@ Shake reduction information.
       5    TTL_DA_ADown                         int8u
       6    TTL_DA_BUp                           int8u
       7    TTL_DA_BDown                         int8u
+
+=head3 Pentax CameraInfo Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    PentaxModelID                        int32u
+      1    ManufactureDate                      int32u
+      2    ModelRevision                        int32u[2]
+      4    InternalSerialNumber                 int32u
 
 =head3 Pentax BatteryInfo Tags
 

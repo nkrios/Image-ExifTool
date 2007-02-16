@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         NikonCapture.pm
 #
-# Description:  Read/Write Nikon Capture information
+# Description:  Read/write Nikon Capture information
 #
 # Revisions:    11/08/2005 - P. Harvey Created
 #
@@ -642,7 +642,7 @@ sub ProcessNikonCapture($$$)
 
 =head1 NAME
 
-Image::ExifTool::NikonCapture - Read/Write Nikon Capture information
+Image::ExifTool::NikonCapture - Read/write Nikon Capture information
 
 =head1 SYNOPSIS
 

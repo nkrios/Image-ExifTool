@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.76
 [File, File, Image]  - File Name: HTML.html
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 2 kB
@@ -7,15 +7,15 @@
 [File, File, Image]  - MIME Type: text/html
 [HTML, HTML, Document] title - Title: ExifTool HTML Test
 [HTML, HTTP-equiv, Document] content-type - Content Type: text/html; charset="iso-8859-1"
-[HTML, HTML-dc, Image] title - Title: ExifTool HTML Test
+[HTML, HTML-dc, Document] title - Title: ExifTool HTML Test
 [HTML, HTML-dc, Author] creator - Creator: Phil Harvey, Another Creator
 [HTML, HTML-dc, Time] date - Date: 2007-30-01
-[HTML, HTML-dc, Image] format - Format: Daisy 2.02
-[HTML, HTML-dc, Image] identifier - Identifier: DTB00345
+[HTML, HTML-dc, Document] format - Format: Daisy 2.02
+[HTML, HTML-dc, Document] identifier - Identifier: DTB00345
 [HTML, HTML-dc, Document] language - Language: EN
 [HTML, HTML-dc, Author] publisher - Publisher: TPB
 [HTML, HTML-dc, Author] source - Source: 0-065-01022-1
-[HTML, HTML-dc, Image] subject - Subject: Qb
+[HTML, HTML-dc, Document] subject - Subject: Qb
 [HTML, HTML-ncc, Time] sourcedate - Source Date: 1993
 [HTML, HTML-ncc, Document] sourceedition - Source Edition: 1
 [HTML, HTML-ncc, Document] sourcepublisher - Source Publisher: Phil's Desktop

@@ -511,7 +511,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::CanonVRD - Read/Write Canon VRD information
+Image::ExifTool::CanonVRD - Read/write Canon VRD information
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Photoshop.pm
 #
-# Description:  Read/Write Photoshop IRB meta information
+# Description:  Read/write Photoshop IRB meta information
 #
 # Revisions:    02/06/04 - P. Harvey Created
 #               02/25/04 - P. Harvey Added hack for problem with old photoshops
@@ -461,7 +461,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Photoshop - Read/Write Photoshop IRB meta information
+Image::ExifTool::Photoshop - Read/write Photoshop IRB meta information
 
 =head1 SYNOPSIS
 

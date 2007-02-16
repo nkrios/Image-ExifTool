@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::PostScript;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # HTML info
 # (tag ID's are case insensitive and must be all lower case in tables)
@@ -84,17 +84,17 @@ $VERSION = '1.01';
         List => 'Seq',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    description => { Groups => { 2 => 'Image'  } },
-   'format'     => { Groups => { 2 => 'Image'  } },
-    identifier  => { Groups => { 2 => 'Image'  } },
+    description => { },
+   'format'     => { },
+    identifier  => { },
     language    => { List => 'Bag' },
     publisher   => { Groups => { 2 => 'Author' }, List => 'Bag' },
     relation    => { List => 'Bag' },
     rights      => { Groups => { 2 => 'Author' } },
     source      => { Groups => { 2 => 'Author' } },
-    subject     => { Groups => { 2 => 'Image'  }, List => 'Bag' },
-    title       => { Groups => { 2 => 'Image'  } },
-    type        => { Groups => { 2 => 'Image'  }, List => 'Bag' },
+    subject     => { List => 'Bag' },
+    title       => { },
+    type        => { List => 'Bag' },
 );
 
 # ref 2
@@ -214,8 +214,12 @@ sub ProcessHTML($$)
         unless ($attrs =~ m{/$}) {  # self-contained XHTML tags end in '/>'
             # look for element close
             my $pos = pos($doc);
-            if ($doc =~ m{(.*?)</$tagName>}sg) {
-                $val = $1;
+            my $close = "</$tagName>";
+            # the following doesn't work on Solaris Perl 5.6.1 due to Perl bug:
+            # if ($doc =~ m{(.*?)</$tagName>}sg) {
+            #     $val = $1;
+            if ($doc =~ m{$close}sg) {
+                $val = substr($doc, $pos, pos($doc)-$pos-length($close));
             } else {
                 pos($doc) = $pos;
                 next unless $tag eq 'meta'; # META tags don't need to be closed
