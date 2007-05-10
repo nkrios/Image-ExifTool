@@ -4,7 +4,7 @@
 # Description:  Sample user configuration file for Image::ExifTool
 #
 # Notes:        This example file shows how to define your own shortcuts and
-#               add new EXIF, IPTC, XMP, PNG and Composite tags.
+#               add new EXIF, IPTC, XMP, PNG, MIE and Composite tags.
 #
 #               Note that unknown tags may be extracted even if they aren't
 #               defined, but tags must be defined to be written.  Also note
@@ -22,7 +22,7 @@
 #                   3. HOMEDRIVE + HOMEPATH
 #                   4. (the current directory)
 #
-#               This sample file defines the following 9 new tags as well as a
+#               This sample file defines the following 11 new tags as well as a
 #               number of Shortcut and Composite tags:
 #
 #                   1.  EXIF:NewEXIFTag
@@ -34,6 +34,8 @@
 #                   7.  PNG:NewPngTag1
 #                   8.  PNG:NewPngTag2
 #                   9.  PNG:NewPngTag3
+#                  10.  MIE-Meta:NewMieTag1
+#                  11.  MIE-Test:NewMieTag2
 #
 #               For detailed information on the definition of tag tables and
 #               tag information hashes, see lib/Image/ExifTool/README.
@@ -54,13 +56,22 @@
 # "SubDirectory" entry must be added to the Main XMP table through
 # the %Image::ExifTool::UserDefined definition below.
 %Image::ExifTool::UserDefined::xxx = (
-    GROUPS => { 0 => 'XMP', 1 => 'XMP-xxx', 2 => 'Image' },
-    NAMESPACE => { 'xxx' => 'http://ns.myname.com/xxx/1.0/' },
-    WRITABLE => 'string',
+    GROUPS        => { 0 => 'XMP', 1 => 'XMP-xxx', 2 => 'Image' },
+    NAMESPACE     => { 'xxx' => 'http://ns.myname.com/xxx/1.0/' },
+    WRITABLE      => 'string',
     # replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")
     NewXMPxxxTag1 => { },
     NewXMPxxxTag2 => { Groups => { 2 => 'Author' } },
     NewXMPxxxTag3 => { List => 'Bag' },
+);
+
+# Adding a new MIE group requires a few extra definitions
+use Image::ExifTool::MIE;
+%Image::ExifTool::UserDefined::MIETest = (
+    %Image::ExifTool::MIE::tableDefaults,   # default MIE table entries
+    GROUPS      => { 0 => 'MIE', 1 => 'MIE-Test', 2 => 'Document' },
+    WRITE_GROUP => 'MIE-Test',
+    NewMieTag2  => { },     # new user-defined tag in MIE-Test group
 );
 
 # The %Image::ExifTool::UserDefined hash defines new tags to be added
@@ -100,6 +111,20 @@
         NewPngTag2 => { },
         NewPngTag3 => { },
     },
+    # add a new MIE tag (NewMieTag1) and group (MIE-Test) to MIE-Meta
+    # (Note: MIE group names must NOT end with a number)
+    'Image::ExifTool::MIE::Meta' => {
+        NewMieTag1 => {
+            Writable => 'rational64u',
+            Units => [ qw(cm in) ],
+        },
+        Test => {
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::UserDefined::MIETest',
+                DirName => 'MIE-Test',
+            },
+        },
+    },
     # Composite tags are added to the Composite table:
     'Image::ExifTool::Composite' => {
         # Composite tags are unique: The Require/Desire elements list
@@ -112,7 +137,7 @@
                 0 => 'FileName',
             },
             # remove the extension from FileName
-            ValueConv => 'my $name=$val[0]; $name=~s/\..*?$//; $name',
+            ValueConv => '$val[0] =~ /(.*)\./ ? $1 : $val[0]',
         },
         Extension => {
             Require => {

@@ -20,7 +20,7 @@ package Image::ExifTool::Kodak;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 %Image::ExifTool::Kodak::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -28,12 +28,13 @@ $VERSION = '1.07';
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     NOTES => q{
-The table below contains the most common set of Kodak tags.  The following
-Kodak camera models have been tested and found to use these tags:  CX6330,
-CX7330, CX7430, CX7525, CX7530, DC4800, DC4900, DX3500, DX3600, DX3900,
-DX4330, DX4530, DX4900, DX6340, DX6440, DX6490, DX7440, DX7590, DX7630,
-EasyShare-One, LS420, LS443, LS633, LS743, LS753, Z700, Z730, Z740, Z760 and
-Z7560.
+        The table below contains the most common set of Kodak tags.  The following
+        Kodak camera models have been tested and found to use these tags: C360,
+        C663, C875, CX6330, CX6445, CX7330, CX7430, CX7525, CX7530, DC4800, DC4900,
+        DX3500, DX3600, DX3900, DX4330, DX4530, DX4900, DX6340, DX6440, DX6490,
+        DX7440, DX7590, DX7630, EasyShare-One, LS420, LS443, LS633, LS743, LS753,
+        V530, V550, V570, V603, V610, V705, Z650, Z700, Z710, Z730, Z740, Z760 and
+        Z7590.
     },
     WRITABLE => 1,
     FIRST_ENTRY => 8,
@@ -258,7 +259,11 @@ Z7560.
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    NOTES => 'These tags are used by the DC265 and DC290.',
+    NOTES => q{
+        These tags are used by the Kodak DC220, DC260, DC265 and DC290,
+        Hewlett-Packard PhotoSmart 618, C500 and C912, Pentax EI-200 and EI-2000,
+        and Minolta EX1500Z.
+    },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     0x08 => { #PH
@@ -357,8 +362,8 @@ Z7560.
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     NOTES => q{
-        These tags are used by the CX4200, CX4210, CX4230, CX4300, CX6200 and
-        CX6230.
+        These tags are used by the CX4200, CX4210, CX4230, CX4300, CX4310, CX6200
+        and CX6230.
     },
     WRITABLE => 1,
     FIRST_ENTRY => 0,

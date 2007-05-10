@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.69
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.90
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
@@ -84,7 +84,7 @@
 [IPTC, IPTC2, Location] 90 - City: Kingston
 [IPTC, IPTC2, Location] 95 - Province-State: Ontario
 [IPTC, IPTC2, Location] 101 - Country-Primary Location Name: Canada
-[MakerNotes, Nikon, Camera] 1 - Firmware Version: 2.10
+[MakerNotes, Nikon, Camera] 1 - Maker Note Version: 2.10
 [MakerNotes, Nikon, Image] 2 - ISO: 200
 [MakerNotes, Nikon, Camera] 4 - Quality: Raw
 [MakerNotes, Nikon, Camera] 5 - White Balance: Auto
@@ -118,6 +118,7 @@
 [MakerNotes, Nikon, Camera] 150 - NEF Curve 2: (Binary data 17 bytes)
 [MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 478 265 493 265
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
+[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 102.4mm
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 3.6
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 0xf1
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 2.37 m

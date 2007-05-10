@@ -31,7 +31,7 @@ use vars qw($VERSION %minoltaLensIDs %minoltaColorMode);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 # lens ID numbers (ref 3)
 %minoltaLensIDs = (
@@ -543,7 +543,7 @@ $VERSION = '1.30';
         ValueConv => '$val / 1000',
         ValueConvInv => '$val * 1000',
         PrintConv => '$val ? "$val m" : "inf"',
-        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/\s.*//, $val',
+        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/\s*m$//, $val',
     },
     20 => {
         Name => 'FlashFired',

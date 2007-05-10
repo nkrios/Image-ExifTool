@@ -24,12 +24,12 @@ BEGIN {
 use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::Shortcuts;
-use Image::ExifTool::XMP qw(EscapeHTML);
+use Image::ExifTool::HTML qw(EscapeHTML);
 use Image::ExifTool::IPTC;
 use Image::ExifTool::Nikon;
 use Image::ExifTool::Real;
 
-$VERSION = '1.54';
+$VERSION = '1.56';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -275,7 +275,9 @@ and RPM).
 },
     Extra => q{
 The extra tags represent information found in the image but not associated
-with any other tag group.
+with any other tag group.  The three writable "pseudo" tags (Filename,
+Directory and FileModifyDate) may be written without the need to rewrite the
+file since their values are not contained within the file data.
 },
     Composite => q{
 The values of the composite tags are derived from the values of other tags.
@@ -344,6 +346,7 @@ sub new
     $self->{TABLE_WRITABLE} = \%tableWritable;
     $self->{SEPARATE_TABLE} = \%sepTable;
     $self->{COMPOSITE_MODULES} = \%compositeModules;
+    $self->{COUNT} = \%count;
 
     Image::ExifTool::LoadAllTables();
     my @tableNames = sort keys %allTables;
@@ -464,40 +467,58 @@ TagID:  foreach $tagID (@keys) {
                     }
                 }
                 my $printConv = $$tagInfo{PrintConv};
-                if (ref $printConv eq 'HASH') {
-                    if ($$tagInfo{SeparateTable}) {
-                        $subdir = 1;
-                        my $s = $$tagInfo{SeparateTable};
-                        $s = $$tagInfo{Name} if $s eq '1';
-                        # add module name if not specified
-                        $s =~ / / or ($short =~ /^(\w+)/ and $s = "$1 $s");
-                        push @values, $s;
-                        $sepTable{$s} = $printConv;
-                    } else {
-                        $caseInsensitive = 0;
-                        my @pk = sort NumbersFirst keys %$printConv;
-                        my $bits;
-                        foreach (@pk) {
-                            next if $_ eq '';
-                            $_ eq 'BITMASK' and $bits = $$printConv{$_}, next;
-                            my $index;
-                            if ($$tagInfo{PrintHex}) {
-                                $index = sprintf('0x%x',$_);
-                            } elsif (/^[-+]?\d+$/) {
-                                $index = $_;
-                            } else {
-                                # ignore unprintable values
-                                next if /[\x00-\x1f\x80-\xff]/;
-                                $index = "'$_'";
-                            }
-                            push @values, "$index = " . $$printConv{$_};
+                if (ref($printConv) =~ /^(HASH|ARRAY)$/) {
+                    my (@printConvList, @indexList, $index);
+                    if (ref $printConv eq 'ARRAY') {
+                        for ($index=0; $index<@$printConv; ++$index) {
+                            next if ref $$printConv[$index] ne 'HASH';
+                            push @printConvList, $$printConv[$index];
+                            push @indexList, $index;
                         }
-                        if ($bits) {
-                            my @pk = sort NumbersFirst keys %$bits;
+                        $printConv = shift @printConvList;
+                        $index = shift @indexList;
+                    }
+                    while (defined $printConv) {
+                        push @values, "[Value $index]" if defined $index;
+                        if ($$tagInfo{SeparateTable}) {
+                            $subdir = 1;
+                            my $s = $$tagInfo{SeparateTable};
+                            $s = $$tagInfo{Name} if $s eq '1';
+                            # add module name if not specified
+                            $s =~ / / or ($short =~ /^(\w+)/ and $s = "$1 $s");
+                            push @values, $s;
+                            $sepTable{$s} = $printConv;
+                            # add PrintHex flag to PrintConv so we can check it later
+                            $$printConv{PrintHex} = 1 if $$tagInfo{PrintHex};
+                        } else {
+                            $caseInsensitive = 0;
+                            my @pk = sort NumbersFirst keys %$printConv;
+                            my $bits;
                             foreach (@pk) {
-                                push @values, "Bit $_ = " . $$bits{$_};
+                                next if $_ eq '';
+                                $_ eq 'BITMASK' and $bits = $$printConv{$_}, next;
+                                my $index;
+                                if ($$tagInfo{PrintHex}) {
+                                    $index = sprintf('0x%x',$_);
+                                } elsif (/^[-+]?\d+$/) {
+                                    $index = $_;
+                                } else {
+                                    # ignore unprintable values
+                                    next if /[\x00-\x1f\x80-\xff]/;
+                                    $index = "'$_'";
+                                }
+                                push @values, "$index = " . $$printConv{$_};
+                            }
+                            if ($bits) {
+                                my @pk = sort NumbersFirst keys %$bits;
+                                foreach (@pk) {
+                                    push @values, "Bit $_ = " . $$bits{$_};
+                                }
                             }
                         }
+                        last unless @printConvList;
+                        $printConv = shift @printConvList;
+                        $index = shift @indexList;
                     }
                 } elsif ($printConv and $printConv =~ /DecodeBits\(\$val,\s*(\{.*\})\s*\)/s) {
                     my $bits = eval $1;
@@ -520,7 +541,7 @@ TagID:  foreach $tagID (@keys) {
                         foreach ('PrintConv','ValueConv') {
                             next unless $$tagInfo{$_};
                             next if $$tagInfo{$_ . 'Inv'};
-                            next if ref $$tagInfo{$_} eq 'HASH';
+                            next if ref($$tagInfo{$_}) =~ /^(HASH|ARRAY)$/;
                             next if $$tagInfo{WriteAlso};
                             if ($_ eq 'ValueConv') {
                                 undef $writable;
@@ -624,7 +645,7 @@ TagID:  foreach $tagID (@keys) {
 #
             my $tagIDstr;
             if ($tagID =~ /^\d+$/) {
-                if ($binaryTable or $isIPTC or $short =~ /^CanonCustom/) {
+                if ($binaryTable or $isIPTC or ($short =~ /^CanonCustom/ and $tagID < 256)) {
                     $tagIDstr = $tagID;
                 } else {
                     $tagIDstr = sprintf("0x%.4x",$tagID);
@@ -650,7 +671,6 @@ TagID:  foreach $tagID (@keys) {
             push @$info, [ $tagIDstr, \@tagNames, \@writable, \@values, \@require, \@writeGroup ];
         }
     }
-    $self->{COUNT} = \%count;
     return $self;
 }
 
@@ -986,10 +1006,11 @@ sub OpenHtmlFile($;$$)
 #------------------------------------------------------------------------------
 # Close all html files and write trailers
 # Returns: true on success
-# Inputs: 0) flag to preserve file date
+# Inputs: 0) BuildTagLookup object reference
 sub CloseHtmlFiles($)
 {
-    my $preserveDate = shift;
+    my $self = shift;
+    my $preserveDate = $$self{PRESERVE_DATE};
     my $success = 1;
     # get the date
     my ($sec,$min,$hr,$day,$mon,$yr) = localtime;
@@ -997,6 +1018,8 @@ sub CloseHtmlFiles($)
     $yr += 1900;
     my $date = "$month[$mon] $day, $yr";
     my $htmlFile;
+    my $countNewFiles = 0;
+    my $countSameFiles = 0;
     foreach $htmlFile (keys %createdFiles) {
         my $tmpFile = $htmlFile . '_tmp';
         my $fileDate = $date;
@@ -1040,13 +1063,18 @@ sub CloseHtmlFiles($)
             }
             close TEMPFILE;
             if ($useNewFile) {
+                ++$countNewFiles;
                 rename $tmpFile, $htmlFile or warn("Error renaming temporary file\n"), $success = 0;
             } else {
+                ++$countSameFiles;
                 unlink $tmpFile;   # erase new file and use existing file
             }
         }
         last unless $success;
     }
+    # save number of files processed so we can check the results later
+    $self->{COUNT}->{'HTML files changed'} = $countNewFiles;
+    $self->{COUNT}->{'HTML files unchanged'} = $countSameFiles;
     return $success;
 }
 
@@ -1066,7 +1094,7 @@ sub WriteTagNames($$)
     my $sepTable = $self->{SEPARATE_TABLE};
     my $success = 1;
     my %htmlFiles;
-    my $columns = 5;    # number of columns in html index
+    my $columns = 6;    # number of columns in html index
     my $percent = int(100 / $columns);
 
     # open the file and write the header
@@ -1147,12 +1175,13 @@ sub WriteTagNames($$)
                 my $wid = 0;
                 my @keys;
                 foreach (sort NumbersFirst keys %$printConv) {
-                    next if $_ eq 'Notes';
+                    next if /^(Notes|PrintHex)$/;
                     $align = '' if $align and /[^\d]/;
                     my $w = length($_) + length($$printConv{$_});
                     $wid = $w if $wid < $w;
                     push @keys, $_;
                 }
+                $wid = length($tableName)+7 if $wid < length($tableName)+7;
                 # print in multiple columns if there is room
                 my $cols = int(80 / ($wid + 4));
                 $cols = 1 if $cols < 1 or $cols > @keys;
@@ -1167,23 +1196,27 @@ sub WriteTagNames($$)
                     print HTMLFILE '<tr>';
                     for ($c=0; $c<$cols; ++$c) {
                         my $key = $keys[$r + $c*$rows];
-                        my ($val, $prt);
+                        my ($index, $prt);
                         if (defined $key) {
-                            $val = EscapeHTML($key);
-                            $val =~ /\s/ and $val =  "'$val'";
+                            $index = $key;
                             $prt = "= $$printConv{$key}";
+                            if ($$printConv{PrintHex}) {
+                                $index = sprintf('0x%x',$index);
+                            } elsif ($index !~ /^[-+]?\d+$/) {
+                                $index = "'" . EscapeHTML($index) . "'";
+                            }
                         } else {
-                            $val = $prt = '&nbsp;';
+                            $index = $prt = '&nbsp;';
                         }
-                        my ($vc, $pc);
+                        my ($ic, $pc);
                         if ($c & 0x01) {
                             $pc = ' class=b';
-                            $vc = $align ? " class='r b'" : $pc;
+                            $ic = $align ? " class='r b'" : $pc;
                         } else {
-                            $vc = $align;
+                            $ic = $align;
                             $pc = '';
                         }
-                        print HTMLFILE "<td$vc>$val</td><td$pc>$prt</td>\n";
+                        print HTMLFILE "<td$ic>$index</td><td$pc>$prt</td>\n";
                     }
                     print HTMLFILE '</tr>';
                 }
@@ -1442,7 +1475,7 @@ sub WriteTagNames($$)
         print HTMLFILE "</table></td></tr></table></blockquote>\n\n";
     }
     close(HTMLFILE) or $success = 0;
-    CloseHtmlFiles($$self{PRESERVE_DATE}) or $success = 0;
+    CloseHtmlFiles($self) or $success = 0;
     print PODFILE Doc2Pod($docs{PodTrailer}) or $success = 0;
     close(PODFILE) or $success = 0;
     return $success;

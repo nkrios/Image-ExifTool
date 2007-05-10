@@ -14,7 +14,7 @@
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td>0x0001</td>
-<td>FirmwareVersion</td>
+<td>MakerNoteVersion</td>
 <td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -241,12 +241,11 @@
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0091</td>
-<td>Nikon0x0091Encrypted?
-  <br>Nikon0x0091?</td>
+<td>ShotInfo
+  <br>ShotInfo?</td>
 <td class=c>-<br>-</td>
-<td>--&gt; <a href='Nikon.html#Nikon0x0091'>Nikon Nikon0x0091 Tags</a>
-  <br>--&gt; <a href='Nikon.html#Nikon0x0091'>Nikon Nikon0x0091 Tags</a>
-  <br><span class='n s'>(this information is encrypted for versions 02xx)</span></td></tr>
+<td>--&gt; <a href='Nikon.html#ShotInfo'>Nikon ShotInfo Tags</a>
+  <br>--&gt; <a href='Nikon.html#ShotInfo'>Nikon ShotInfo Tags</a></td></tr>
 <tr class=b>
 <td>0x0092</td>
 <td>HueAdjustment</td>
@@ -352,6 +351,11 @@
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x00b0</td>
+<td>MultiExposure</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Nikon.html#MultiExposure'>Nikon MultiExposure Tags</a></td></tr>
+<tr>
 <td>0x00b1</td>
 <td>HighISONoiseReduction</td>
 <td class=c>int16u</td>
@@ -360,27 +364,27 @@
   <br>2 = Weak
   <br>4 = Normal
   <br>6 = Strong</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0e01</td>
 <td>NikonCaptureData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='NikonCapture.html'>NikonCapture Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0e09</td>
 <td>NikonCaptureVersion</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0e0e</td>
 <td>NikonCaptureOffsets</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#CaptureOffsets'>Nikon CaptureOffsets Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0e10</td>
 <td>NikonScanIFD</td>
 <td class=c>-</td>
@@ -508,7 +512,8 @@
   <br>Bit 10 = Far Right</span></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='Nikon0x0091'>Nikon Nikon0x0091 Tags</a></h2>
+<h2><a name='ShotInfo'>Nikon ShotInfo Tags</a></h2>
+<p>This information is encrypted for ShotInfoVersion 02xx.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -516,7 +521,7 @@
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td class=r>0</td>
-<td>Nikon0x0091Version</td>
+<td>ShotInfoVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -526,6 +531,16 @@
 <td><span class=s>0 = VR off
   <br>1 = VR on (normal)
   <br>2 = VR on (active)</span></td></tr>
+<tr>
+<td class=r>106</td>
+<td>ShutterCount</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>110</td>
+<td>DeletedImageCount</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 <tr>
 <td class=r>130</td>
 <td>VR_0x82?</td>
@@ -549,6 +564,8 @@
 </table></td></tr></table></blockquote>
 
 <h2><a name='ColorBalance2'>Nikon ColorBalance2 Tags</a></h2>
+<p>This information is encrypted for most camera models, and if encrypted is
+not currently writable by exiftool.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -639,65 +656,101 @@ complications which make writing more difficult.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td class=r>4</td>
+<td>ExitPupilPosition</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td class=r>5</td>
 <td>AFAperture</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>8</td>
 <td>FocusPosition</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>9</td>
 <td>FocusDistance</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(this focus distance is approximate, and not very accurate for some lenses)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>10</td>
 <td>FocalLength</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>11</td>
 <td>LensIDNumber</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(see LensID values below)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>12</td>
 <td>LensFStops</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>13</td>
 <td>MinFocalLength</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>14</td>
 <td>MaxFocalLength</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>15</td>
 <td>MaxApertureAtMinFocal</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>16</td>
 <td>MaxApertureAtMaxFocal</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>17</td>
 <td>MCUVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>18</td>
 <td>EffectiveMaxAperture</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MultiExposure'>Nikon MultiExposure Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>MultiExposureVersion</td>
+<td class=c>string[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>1</td>
+<td>MultiExposureMode</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Off
+  <br>1 = Multiple Exposure
+  <br>2 = Image Overlay</span></td></tr>
+<tr>
+<td class=r>2</td>
+<td>MultiExposureShots</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>3</td>
+<td>MultiExposureAutoGain</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CaptureOffsets'>Nikon CaptureOffsets Tags</a></h2>
@@ -925,14 +978,17 @@ that order.
 </tr><tr><td>'00 40 18 2B 2C 34 00 06'</td><td>= Tokina AT-X 107 DX Fish-Eye - AF 10-17mm F3.5-4.5</td>
 </tr><tr><td>'00 40 2B 2B 2C 2C 00 02'</td><td>= Tokina AT-X 17 AF PRO - AF 17mm F3.5</td>
 </tr><tr><td>'00 44 60 98 34 3C 00 02'</td><td>= Tokina AT-X 840D 80-400mm F4.5-5.6</td>
+</tr><tr><td>'00 48 29 50 24 24 00 06'</td><td>= Tokina AT-X 165 PRO DX - AF 16-50mm F2.8</td>
 </tr><tr><td>'00 48 3C 60 24 24 00 02'</td><td>= Tokina AT-X 280 AF PRO 28-80mm F2.8 ASPHERICAL</td>
 </tr><tr><td>'00 48 3C 6A 24 24 00 02'</td><td>= Tamron SP AF28-105mm f/2.8</td>
 </tr><tr><td>'00 48 50 72 24 24 00 06'</td><td>= Tokina AT-X 535 PRO DX - AF 50-135mm F2.8</td>
 </tr><tr><td>'00 49 30 48 22 2B 00 02'</td><td>= Tamron SP AF20-40mm f/2.7-3.5</td>
 </tr><tr><td>'00 4C 7C 7C 2C 2C 00 02'</td><td>= Tamron SP AF180mm f/3.5 Di Model B01</td>
-</tr><tr><td>'00 53 2B 50 24 24 00 06'</td><td>= Tamron SP AF17-50mm F2.8 (A16)</td>
+</tr><tr><td>'00 53 2B 50 24 24 00 06'</td><td>= Tamron SP AF17-50mm f/2.8 (A16)</td>
 </tr><tr><td>'00 54 68 68 24 24 00 02'</td><td>= Tokina AT-X M100 PRO D - 100mm F2.8</td>
 </tr><tr><td>'00 54 8E 8E 24 24 00 02'</td><td>= Tokina AT-X 300 AF PRO 300mm F2.8</td>
+</tr><tr><td>'01 00 00 00 00 00 02 00'</td><td>= AF Teleconverter TC-16A 1.6x</td>
+</tr><tr><td>'01 00 00 00 00 00 08 00'</td><td>= AF Teleconverter TC-16A 1.6x</td>
 </tr><tr><td>'01 58 50 50 14 14 02 00'</td><td>= AF Nikkor 50mm f/1.8</td>
 </tr><tr><td>'02 2F 98 98 3D 3D 02 00'</td><td>= Sigma 400mm F5.6 APO</td>
 </tr><tr><td>'02 37 5E 8E 35 3D 02 00'</td><td>= Sigma 75-300mm F4.5-5.6 APO</td>
@@ -950,6 +1006,7 @@ that order.
 </tr><tr><td>'05 54 50 50 0C 0C 04 00'</td><td>= AF Nikkor 50mm f/1.4</td>
 </tr><tr><td>'06 3F 68 68 2C 2C 06 00'</td><td>= Cosina 100mm f/3.5 Macro</td>
 </tr><tr><td>'06 54 53 53 24 24 06 00'</td><td>= AF Micro-Nikkor 55mm f/2.8</td>
+</tr><tr><td>'07 40 2F 44 2C 34 03 02'</td><td>= Tamron AF19-35mm f/3.5-4.5 N</td>
 </tr><tr><td>'07 40 30 45 2D 35 03 02'</td><td>= Tamron AF19-35mm f/3.5-4.5</td>
 </tr><tr><td>'07 40 3C 62 2C 34 03 00'</td><td>= AF Zoom-Nikkor 28-85mm f/3.5-4.5</td>
 </tr><tr><td>'07 46 2B 44 24 30 03 02'</td><td>= Tamron SP AF17-35mm f/2.8-4 Di LD Aspherical (IF)</td>
@@ -961,6 +1018,7 @@ that order.
 </tr><tr><td>'0B 48 7C 7C 24 24 05 00'</td><td>= AF Nikkor 180mm f/2.8 IF-ED</td>
 </tr><tr><td>'0D 40 44 72 2C 34 07 00'</td><td>= AF Zoom-Nikkor 35-135mm f/3.5-4.5</td>
 </tr><tr><td>'0E 48 5C 81 30 30 05 00'</td><td>= AF Zoom-Nikkor 70-210mm f/4</td>
+</tr><tr><td>'0E 4A 31 48 23 2D 0E 02'</td><td>= Tamron SP AF20-40mm f/2.7-3.5</td>
 </tr><tr><td>'0F 58 50 50 14 14 05 00'</td><td>= AF Nikkor 50mm f/1.8 N</td>
 </tr><tr><td>'10 3D 3C 60 2C 3C D2 02'</td><td>= Tamron AF28-80mm f/3.5-5.6 Aspherical</td>
 </tr><tr><td>'10 48 8E 8E 30 30 08 00'</td><td>= AF Nikkor 300mm f/4 IF-ED</td>
@@ -980,6 +1038,7 @@ that order.
 </tr><tr><td>'1D 42 44 5C 2A 34 12 00'</td><td>= AF Zoom-Nikkor 35-70mm f/3.3-4.5 N</td>
 </tr><tr><td>'1E 54 56 56 24 24 13 00'</td><td>= AF Micro-Nikkor 60mm f/2.8</td>
 </tr><tr><td>'1E 5D 64 64 20 20 13 00'</td><td>= Unknown 90mm f/2.5</td>
+</tr><tr><td>'1F 54 6A 6A 24 24 14 00'</td><td>= AF Micro-Nikkor 105mm f/2.8</td>
 </tr><tr><td>'20 3C 80 98 3D 3D 1E 02'</td><td>= Tamron AF200-400mm f/5.6 LD IF</td>
 </tr><tr><td>'20 48 60 80 24 24 15 00'</td><td>= AF Zoom-Nikkor ED 80-200mm f/2.8</td>
 </tr><tr><td>'22 48 72 72 18 18 16 00'</td><td>= AF DC-Nikkor 135mm f/2</td>
@@ -1115,12 +1174,13 @@ that order.
 </tr><tr><td>'8C 40 2D 53 2C 3C 8E 06'</td><td>= AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED</td>
 </tr><tr><td>'8D 44 5C 8E 34 3C 8F 0E'</td><td>= AF-S VR Zoom-Nikkor 70-300mm f/4.5-5.6G IF-ED</td>
 </tr><tr><td>'8F 40 2D 72 2C 3C 91 06'</td><td>= AF-S DX Zoom-Nikkor 18-135mm f/3.5-5.6G IF-ED</td>
+</tr><tr><td>'90 3B 53 80 30 3C 92 0E'</td><td>= AF-S DX VR Zoom-Nikkor 55-200mm f/4-5.6G IF-ED</td>
 </tr><tr><td>'94 40 2D 53 2C 3C 96 06'</td><td>= AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED II</td>
 </tr></table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 6, 2007</i>
+<br><i>Last revised May 8, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

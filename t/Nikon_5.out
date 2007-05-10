@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.90
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:07 13:39:01
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -49,7 +49,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Manual
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 1
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 75
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 75mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: Low gain up
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -64,7 +64,7 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 3202
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
-[MakerNotes, Nikon, Camera] 1 - Firmware Version: 2.10
+[MakerNotes, Nikon, Camera] 1 - Maker Note Version: 2.10
 [MakerNotes, Nikon, Image] 2 - ISO: 800
 [MakerNotes, Nikon, Camera] 4 - Quality: Fine
 [MakerNotes, Nikon, Camera] 5 - White Balance: Preset0
@@ -109,8 +109,10 @@
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 2
 [MakerNotes, Nikon, Camera] 170 - Saturation: Normal
 [MakerNotes, Nikon, Camera] 177 - High ISO Noise Reduction: Normal
+[MakerNotes, Nikon, Camera] 0 - Shot Info Version: 0206
 [MakerNotes, Nikon, Camera] 0 - WB RGGB Levels: 562 256 256 537
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0201
+[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 60.2mm
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 1.9
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 0x11
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 0.71 m

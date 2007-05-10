@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.90
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
@@ -49,7 +49,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 1
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 84
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 84mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: None
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -57,7 +57,7 @@
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown (0)
 [EXIF, ExifIFD, Image] 42240 - Gamma: 2.2
-[MakerNotes, Nikon, Camera] 1 - Firmware Version: 2.10
+[MakerNotes, Nikon, Camera] 1 - Maker Note Version: 2.10
 [MakerNotes, Nikon, Image] 2 - ISO: 200
 [MakerNotes, Nikon, Camera] 4 - Quality: Fine
 [MakerNotes, Nikon, Camera] 5 - White Balance: Auto
@@ -96,6 +96,7 @@
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
 [MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 597 256 361 256
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
+[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 89.0mm
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 4.6
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 0x21
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 0.63 m

@@ -39,9 +39,9 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.65';
+$VERSION = '1.70';
 @ISA = qw(Exporter);
-@EXPORT_OK = qw(EscapeHTML UnescapeHTML);
+@EXPORT_OK = qw(EscapeXML UnescapeXML);
 
 sub ProcessXMP($$;$);
 sub WriteXMP($$;$);
@@ -50,6 +50,7 @@ sub DecodeBase64($);
 sub SaveBlankInfo($$$;$);
 sub ProcessBlankInfo($$$;$);
 sub ValidateXMP($;$);
+sub UnescapeChar($$);
 
 # conversions for GPS coordinates
 sub ToDegrees
@@ -189,6 +190,10 @@ my %recognizedAttrs = (
     microsoft => {
         Name => 'microsoft',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Microsoft' },
+    },
+    lr => {
+        Name => 'lr',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Lightroom' },
     },
 );
 
@@ -682,6 +687,7 @@ my %recognizedAttrs = (
     Headline        => { },
     Instructions    => { },
     ICCProfile      => { Name => 'ICCProfileName' }, #PH
+    LegacyIPTCDigest=> { }, #PH
     Source          => { Groups => { 2 => 'Author' }, Avoid => 1 },
     State           => { Groups => { 2 => 'Location' } },
     # the documentation doesn't show this as a 'Bag', but that's the
@@ -691,7 +697,7 @@ my %recognizedAttrs = (
     Urgency         => { Writable => 'integer' },
 );
 
-# Photoshop Camera Raw Schema properties (crs) - (ref 8)
+# Photoshop Camera Raw Schema properties (crs) - (ref 8,PH)
 %Image::ExifTool::XMP::crs = (
     GROUPS => { 1 => 'XMP-crs', 2 => 'Image' },
     NAMESPACE => 'crs',
@@ -767,6 +773,49 @@ my %recognizedAttrs = (
             Custom      => 'Custom',
         },
     },
+    # new tags observed in Adobe Lightroom output - PH
+    IncrementalTemperature      => { Writable => 'integer' },
+    IncrementalTint             => { Writable => 'integer' },
+    FillLight                   => { Writable => 'integer' },
+    Vibrance                    => { Writable => 'integer' },
+    HighlightRecovery           => { Writable => 'integer' },
+    HueAdjustmentRed            => { Writable => 'integer' },
+    HueAdjustmentOrange         => { Writable => 'integer' },
+    HueAdjustmentYellow         => { Writable => 'integer' },
+    HueAdjustmentGreen          => { Writable => 'integer' },
+    HueAdjustmentAqua           => { Writable => 'integer' },
+    HueAdjustmentBlue           => { Writable => 'integer' },
+    HueAdjustmentPurple         => { Writable => 'integer' },
+    HueAdjustmentMagenta        => { Writable => 'integer' },
+    SaturationAdjustmentRed     => { Writable => 'integer' },
+    SaturationAdjustmentOrange  => { Writable => 'integer' },
+    SaturationAdjustmentYellow  => { Writable => 'integer' },
+    SaturationAdjustmentGreen   => { Writable => 'integer' },
+    SaturationAdjustmentAqua    => { Writable => 'integer' },
+    SaturationAdjustmentBlue    => { Writable => 'integer' },
+    SaturationAdjustmentPurple  => { Writable => 'integer' },
+    SaturationAdjustmentMagenta => { Writable => 'integer' },
+    LuminanceAdjustmentRed      => { Writable => 'integer' },
+    LuminanceAdjustmentOrange   => { Writable => 'integer' },
+    LuminanceAdjustmentYellow   => { Writable => 'integer' },
+    LuminanceAdjustmentGreen    => { Writable => 'integer' },
+    LuminanceAdjustmentAqua     => { Writable => 'integer' },
+    LuminanceAdjustmentBlue     => { Writable => 'integer' },
+    LuminanceAdjustmentPurple   => { Writable => 'integer' },
+    LuminanceAdjustmentMagenta  => { Writable => 'integer' },
+    SplitToningShadowHue        => { Writable => 'integer' },
+    SplitToningShadowSaturation => { Writable => 'integer' },
+    SplitToningHighlightHue     => { Writable => 'integer' },
+    SplitToningHighlightSaturation => { Writable => 'integer' },
+    SplitToningBalance          => { Writable => 'integer' },
+    ParametricShadows           => { Writable => 'integer' },
+    ParametricDarks             => { Writable => 'integer' },
+    ParametricLights            => { Writable => 'integer' },
+    ParametricHighlights        => { Writable => 'integer' },
+    ParametricShadowSplit       => { Writable => 'integer' },
+    ParametricMidtoneSplit      => { Writable => 'integer' },
+    ParametricHighlightSplit    => { Writable => 'integer' },
+    ConvertToGrayscale          => { Writable => 'boolean' },
 );
 
 # Tiff schema properties (tiff)
@@ -1007,8 +1056,8 @@ my %recognizedAttrs = (
     SubjectDistance => {
         Groups => { 2 => 'Camera' },
         Writable => 'rational',
-        PrintConv => '"$val m"',
-        PrintConvInv => '$val=~s/ m$//;$val',
+        PrintConv => '$val eq "inf" ? $val : "$val m"',
+        PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     MeteringMode => {
         Groups => { 2 => 'Camera' },
@@ -1110,18 +1159,12 @@ my %recognizedAttrs = (
     FocalPlaneResolutionUnit => {
         Groups => { 2 => 'Camera' },
         Writable => 'integer',
-        ValueConv => {
-            1 => '25.4',
-            2 => '25.4',
-            3 => '10',
-            4 => '1',
-            5 => '0.001',
-        },
         PrintConv => {
-            25.4 => 'inches',
-            10 => 'cm',
-            1 => 'mm',
-            0.001 => 'um',
+            1 => 'None', # (not standard EXIF)
+            2 => 'inches',
+            3 => 'cm',
+            4 => 'mm',   # (not standard EXIF)
+            5 => 'um',   # (not standard EXIF)
         },
     },
     SubjectLocation => {
@@ -1273,13 +1316,13 @@ my %recognizedAttrs = (
             1 => 'Below Sea Level',
         },
     },
-    GPSAltitude     => {
+    GPSAltitude => {
         Groups => { 2 => 'Location' },
         Writable => 'rational',
-        PrintConv => '"$val metres"',
-        PrintConvInv => '$val=~s/\s*m.*//;$val',
+        PrintConv => '$val eq "inf" ? $val : "$val m"',
+        PrintConvInv => '$val=~s/\s*m$//;$val',
     },
-    GPSTimeStamp    => {
+    GPSTimeStamp => {
         Groups => { 2 => 'Time' },
         Writable => 'date',
         Shift => 'Time',
@@ -1508,7 +1551,7 @@ my %recognizedAttrs = (
         Microsoft Photo schema tags.  This is likely not a complete list, but
         represents tags which have been observed in sample images.  The actual
         namespace prefix is "MicrosoftPhoto", but ExifTool shortens this to
-        "XMP-microsoft" in the group1 family name.
+        "XMP-microsoft" in the family 1 group name.
     },
     CameraSerialNumber => { },
     DateAcquired => {
@@ -1530,6 +1573,16 @@ my %recognizedAttrs = (
             values of 1,25,50,75 and 99 respectively
         },
     },
+);
+
+# Adobe Lightroom schema properties (lr) (ref PH)
+%Image::ExifTool::XMP::Lightroom = (
+    GROUPS => { 1 => 'XMP-lr', 2 => 'Image' },
+    NAMESPACE => 'lr',
+    WRITE_PROC => \&WriteXMP,
+    WRITABLE => 'string',
+    NOTES => 'Adobe Lightroom "lr" schema tags.',
+    privateRTKInfo => { },
 );
 
 # table to add tags in other namespaces
@@ -1575,34 +1628,56 @@ sub AUTOLOAD
 }
 
 #------------------------------------------------------------------------------
-# Escape necessary HTML(XML) characters
+# Escape necessary XML characters in UTF-8 string
 # Inputs: 0) string to be escaped
 # Returns: escaped string
-sub EscapeHTML($)
+my %charName = ('"'=>'quot', '&'=>'amp', "'"=>'#39', '<'=>'lt', '>'=>'gt');
+sub EscapeXML($)
 {
-    local $_ = shift;
-    s/&/&amp;/sg;
-    s/>/&gt;/sg;
-    s/</&lt;/sg;
-    s/'/&#39;/sg;
-    s/"/&quot;/sg;
-    return $_;
+    my $str = shift;
+    $str =~ s/([&><'"])/&$charName{$1};/sg; # escape necessary XML characters
+    return $str;
 }
 
 #------------------------------------------------------------------------------
-# Unescape necessary HTML(XML) characters
+# Unescape XML character references (entities and numerical)
 # Inputs: 0) string to be unescaped
+#         1) optional hash reference to convert entity names to numbers
 # Returns: unescaped string
-sub UnescapeHTML($)
+my %charNum = ('quot'=>34, 'amp'=>38, 'apos'=>39, 'lt'=>60, 'gt'=>62);
+sub UnescapeXML($;$)
 {
-    local $_ = shift;
-    s/&gt;/>/sg;
-    s/&lt;/</sg;
-    s/&apos;/'/sg;
-    s/&#39;/'/sg;
-    s/&quot;/"/sg;
-    s/&amp;/&/sg;   # do this last or things like '&amp;lt;' will get double-unescaped
-    return $_;
+    my ($str, $conv) = @_;
+    $conv = \%charNum unless $conv;
+    $str =~ s/&(#?\w+);/UnescapeChar($1,$conv)/sge;
+    return $str;
+}
+
+#------------------------------------------------------------------------------
+# Convert XML character reference to UTF-8
+# Inputs: 0) XML character reference stripped of the '&' and ';' (ie. 'quot', '#34', '#x22')
+#         1) hash reference for looking up character numbers by name
+# Returns: UTF-8 equivalent (or original character on conversion error)
+sub UnescapeChar($$)
+{
+    my ($ch, $conv) = @_;
+    my $val = $$conv{$ch};
+    unless (defined $val) {
+        if ($ch =~ /^#x([0-9a-fA-F]+)$/) {
+            $val = hex($1);
+        } elsif ($ch =~ /^#(\d+)$/) {
+            $val = $1;
+        } else {
+            return "&$ch;"; # should issue a warning here?
+        }
+    }
+    if ($val < 0x80) {
+        return chr($val);   # simple ASCII
+    } elsif ($] >= 5.006001) {
+        return pack('C0U', $val);
+    } else {
+        return Image::ExifTool::PackUTF8($val);
+    }
 }
 
 #------------------------------------------------------------------------------
@@ -1715,29 +1790,36 @@ sub FoundXMP($$$$)
     # change pointer to the table for this namespace
     $tagTablePtr = GetTagTable($table);
 
-    # convert quotient and date values to a more sensible format
-    if ($val =~ m{^(-?\d+)/(-?\d+)$}) {
-        $val = $1 / $2 if $2;       # calculate quotient
-    } elsif ($val =~ /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})(:\d{2})?(\S*)$/) {
-        my $s = $5 || ':00';        # seconds may be missing
-        $val = "$1:$2:$3 $4$s$6";   # convert back to EXIF time format
-    } elsif ($exifTool->{OPTIONS}->{Charset} eq 'Latin' and $val =~ /[\x80-\xff]/) {
-        # convert from UTF-8 to Latin
-        $val = Image::ExifTool::UTF82Unicode($val,'n',$exifTool);
-        $val = Image::ExifTool::Unicode2Latin($val,'n',$exifTool);
-    }
     # look up this tag in the appropriate table
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+
     unless ($tagInfo) {
         if ($exifTool->{OPTIONS}->{Verbose}) {
             my $group1 = $namespace ? "XMP-$namespace" : $tagTablePtr->{GROUPS}->{1};
             $exifTool->VPrint(0, $exifTool->{INDENT}, "[adding $group1:$tag]\n");
         }
         # construct tag information for this unknown tag
-        $tagInfo = { Name => ucfirst($tag) };
+        $tagInfo = { Name => ucfirst($tag), WasAdded => 1 };
         Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
     }
-    $tag = $exifTool->FoundTag($tagInfo, UnescapeHTML($val));
+    if ($exifTool->{OPTIONS}->{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
+        # convert from UTF-8 to specified characterset
+        $val = $exifTool->UTF82Charset($val);
+    }
+    # convert rational and date values to a more sensible format
+    my $fmt = $$tagInfo{Writable};
+    my $new = $$tagInfo{WasAdded};
+    if ($fmt or $new) {
+        if (($new or $fmt eq 'rational') and $val =~ m{^(-?\d+)/(-?\d+)$}) {
+            $val = $1 / $2 if $2;       # calculate quotient
+        } elsif (($new or $fmt eq 'date') and
+            $val =~ /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})(:\d{2})?(\S*)$/)
+        {
+            my $s = $5 || ':00';        # seconds may be missing
+            $val = "$1:$2:$3 $4$s$6";   # convert back to EXIF time format
+        }
+    }
+    $tag = $exifTool->FoundTag($tagInfo, UnescapeXML($val));
     $exifTool->SetGroup1($tag, "XMP-$namespace") if $namespace;
 
     if ($exifTool->Options('Verbose')) {
@@ -1814,7 +1896,7 @@ sub ParseXMPElement($$$;$$$)
 
         # extract property attributes
         my (%attrs, @attrs);
-        while ($attrs =~ m/(\S+)=(['"])(.*?)\2/sg) {
+        while ($attrs =~ m/(\S+?)=(['"])(.*?)\2/sg) {
             push @attrs, $1;    # preserve order
             $attrs{$1} = $3;
         }
@@ -1952,7 +2034,7 @@ sub ProcessXMP($$;$)
     unless ($dataPt) {
         my $raf = $$dirInfo{RAF} or return 0;
         $raf->Read($buff, 128) or return 0;
-        my $buf2;
+        my ($buf2, $double);
         ($buf2 = $buff) =~ tr/\0//d;    # cheap conversion to UTF-8
         # check to see if this is XMP format
         # - CS2 writes .XMP files without the "xpacket begin"
@@ -1964,6 +2046,8 @@ sub ProcessXMP($$;$)
                 $fmt = 'v';     # UTF-16 or 32 II with BOM
             } elsif ($buf2 =~ /^(\xef\xbb\xbf)?(<\?xml|<x(mp)?:xmpmeta)/g) {
                 $fmt = 0;       # UTF-8 with BOM or unknown encoding without BOM
+            } elsif ($buf2 =~ /^(\xfe\xff|\xff\xfe|\xef\xbb\xbf)(<\?xpacket begin=)/g) {
+                $double = $1;   # double-encoded UTF
             } else {
                 return 0;       # not XMP or XML
             }
@@ -1988,6 +2072,28 @@ sub ProcessXMP($$;$)
         my $size = $raf->Tell() or return 0;
         $raf->Seek(0, 0) or return 0;
         $raf->Read($buff, $size) == $size or return 0;
+        # decode the first layer of double-encoded UTF text
+        if ($double) {
+            $buff = substr($buff, length $double);  # remove leading BOM
+            Image::ExifTool::SetWarning(undef);     # clear old warning
+            local $SIG{'__WARN__'} = \&Image::ExifTool::SetWarning;
+            my $tmp;
+            # assume that character data has been re-encoded in UTF, so re-pack
+            # as characters and look for warnings indicating a false assumption
+            if ($double eq "\xef\xbb\xbf") {
+                $tmp = Image::ExifTool::UTF82Unicode($buff, 'C');
+            } else {
+                my $fmt = ($double eq "\xfe\xff") ? 'n' : 'v';
+                $tmp = pack('C*', unpack("$fmt*",$buff));
+            }
+            if (Image::ExifTool::GetWarning()) {
+                $exifTool->Warn('Superfluous BOM at start of XMP');
+            } else {
+                $exifTool->Warn('XMP is double UTF-encoded');
+                $buff = $tmp;   # use the decoded XMP
+            }
+            $size = length $buff;
+        }
         $dataPt = \$buff;
         $dirStart = 0;
         $dirLen = $dataLen = $size;
@@ -2050,15 +2156,9 @@ sub ProcessXMP($$;$)
     if ($fmt) {
         # translate into UTF-8
         if ($] >= 5.006001) {
-            $buff = pack('C0U*',unpack("x$dirStart$fmt*",$$dataPt));
+            $buff = pack('C0U*', unpack("x$dirStart$fmt*",$$dataPt));
         } else {
-            # hack for pre 5.6.1 (because the code to do the
-            # translation properly is unnecesarily bulky)
-            my @unpk = unpack("x$dirStart$fmt*",$$dataPt);
-            foreach (@unpk) {
-                $_ > 0xff and $_ = ord('?');
-            }
-            $buff = pack('C*', @unpk);
+            $buff = Image::ExifTool::PackUTF8(unpack("x$dirStart$fmt*",$$dataPt));
         }
         $dataPt = \$buff;
         $dirStart = 0;

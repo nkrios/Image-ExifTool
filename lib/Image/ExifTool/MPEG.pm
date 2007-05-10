@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -467,7 +467,7 @@ sub ProcessMPEG($$)
     $exifTool->SetFileType();
 
     $raf->Seek(0,0);
-    $raf->Read($buff, 65536) or return 0;
+    $raf->Read($buff, 65536*4) or return 0;
 
     return ProcessMPEGAudioVideo($exifTool, \$buff);
 }

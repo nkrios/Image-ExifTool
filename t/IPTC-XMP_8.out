@@ -1,14 +1,19 @@
 <?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>
-<x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='Image::ExifTool 6.59'>
+<x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='Image::ExifTool 6.77'>
 <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
 
  <rdf:Description rdf:about=''
   xmlns:dc='http://purl.org/dc/elements/1.1/'>
   <dc:format>image/jpeg</dc:format>
+  <dc:rights>
+   <rdf:Alt>
+    <rdf:li xml:lang='x-default'>© Copyright Phil Harvey</rdf:li>
+   </rdf:Alt>
+  </dc:rights>
   <dc:subject>
    <rdf:Bag>
     <rdf:li>test1</rdf:li>
-    <rdf:li>test2</rdf:li>
+    <rdf:li>char test: &amp; &gt; &lt; &#39; &quot;</rdf:li>
    </rdf:Bag>
   </dc:subject>
  </rdf:Description>

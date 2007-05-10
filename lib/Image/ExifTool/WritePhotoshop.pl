@@ -119,11 +119,14 @@ sub WritePhotoshop($$$)
             if ($type eq '8BIM') {
                 $tagInfo = $$editDirs{$tagID};
                 unless ($tagInfo) {
-                    $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
-                    if ($tagInfo) {
-                        # rewrite all Photoshop subdirectories
-                        undef $tagInfo unless $$tagInfo{SubDirectory} and
-                            $tagInfo->{SubDirectory}->{TagTable} =~ /^Image::ExifTool::Photoshop/;
+                    # process subdirectory anyway if writable (except EXIF to avoid recursion)
+                    # --> this allows IPTC to be processed if found here in TIFF images
+                    my $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
+                    if ($tmpInfo and $$tmpInfo{SubDirectory} and
+                        $tmpInfo->{SubDirectory}->{TagTable} ne 'Image::ExifTool::Exif::Main')
+                    {
+                        my $table = Image::ExifTool::GetTagTable($tmpInfo->{SubDirectory}->{TagTable});
+                        $tagInfo = $tmpInfo if $$table{WRITE_PROC};
                     }
                 }
             }

@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.41';
+$VERSION = '1.42';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -52,7 +52,7 @@ sub BuildMakerNotes($$$$$$);
     WRITE_PROC => \&WriteCanonRaw,
     CHECK_PROC => \&CheckCanonRaw,
     WRITABLE => 1,
-    0x0000 => 'NullRecord', #3
+    0x0000 => { Name => 'NullRecord', Writable => 'undef' }, #3
     0x0001 => { #3
         Name => 'FreeBytes',
         Format => 'undef',
@@ -64,9 +64,11 @@ sub BuildMakerNotes($$$$$$);
         {
             Condition => '$self->{DIR_NAME} eq "ImageDescription"',
             Name => 'CanonFileDescription',
+            Writable => 'string[32]',
         },
         {
             Name => 'UserComment',
+            Writable => 'string[256]',
         },
     ],
     0x080a => {
@@ -76,15 +78,16 @@ sub BuildMakerNotes($$$$$$);
             TagTable => 'Image::ExifTool::CanonRaw::MakeModel',
         },
     },
-    0x080b => 'CanonFirmwareVersion',
-    0x080c => 'ComponentVersion', #3
-    0x080d => 'ROMOperationMode', #3
-    0x0810 => 'OwnerName',
-    0x0815 => 'CanonImageType',
-    0x0816 => 'OriginalFileName',
-    0x0817 => 'ThumbnailFileName',
+    0x080b => { Name => 'CanonFirmwareVersion', Writable => 'string[32]' },
+    0x080c => { Name => 'ComponentVersion',     Writable => 'string'     }, #3
+    0x080d => { Name => 'ROMOperationMode',     Writable => 'string[8]'  }, #3
+    0x0810 => { Name => 'OwnerName',            Writable => 'string[32]' },
+    0x0815 => { Name => 'CanonImageType',       Writable => 'string[32]' },
+    0x0816 => { Name => 'OriginalFileName',     Writable => 'string[32]' },
+    0x0817 => { Name => 'ThumbnailFileName',    Writable => 'string[32]' },
     0x100a => { #3
         Name => 'TargetImageType',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Real-world Subject',
             1 => 'Written Document',
@@ -92,6 +95,7 @@ sub BuildMakerNotes($$$$$$);
     },
     0x1010 => { #3
         Name => 'ShutterReleaseMethod',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Single Shot',
             2 => 'Continuous Shooting',
@@ -99,13 +103,14 @@ sub BuildMakerNotes($$$$$$);
     },
     0x1011 => { #3
         Name => 'ShutterReleaseTiming',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Priority on shutter',
             1 => 'Priority on focus',
         },
     },
-    0x1016 => 'ReleaseSetting', #3
-    0x101c => 'BaseISO', #3
+    0x1016 => { Name => 'ReleaseSetting',       Writable => 'int16u' }, #3
+    0x101c => { Name => 'BaseISO',              Writable => 'int16u' }, #3
     0x1028=> { #PH
         Name => 'CanonFlashInfo',
         Writable => 'int16u',
@@ -209,9 +214,13 @@ sub BuildMakerNotes($$$$$$);
             TagTable => 'Image::ExifTool::CanonRaw::RawJpgInfo',
         },
     },
-    0x10ae => 'ColorTemperature',
+    0x10ae => {
+        Name => 'ColorTemperature',
+        Writable => 'int16u',
+    },
     0x10b4 => {
         Name => 'ColorSpace',
+        Writable => 'int16u',
         PrintConv => {
             1 => 'sRGB',
             2 => 'Adobe RGB',
@@ -225,9 +234,10 @@ sub BuildMakerNotes($$$$$$);
             TagTable => 'Image::ExifTool::CanonRaw::ImageFormat',
         },
     },
-    0x1804 => 'RecordID', #3
+    0x1804 => { Name => 'RecordID', Writable => 'int32u' }, #3
     0x1806 => { #3
         Name => 'SelfTimerTime',
+        Writable => 'int32u',
         ValueConv => '$val / 1000',
         ValueConvInv => '$val * 1000',
         PrintConv => '"$val sec"',
@@ -237,10 +247,11 @@ sub BuildMakerNotes($$$$$$);
         Name => 'TargetDistanceSetting',
         Format => 'float',
         PrintConv => '"$val mm"',
-        PrintConvInv => '$val=~s/\s*mm//;$val',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     0x180b => {
         Name => 'SerialNumber',
+        Writable => 'int32u',
         Description => 'Camera Body No.',
         PrintConv => 'sprintf("%.10d",$val)',
         PrintConvInv => '$val',
@@ -276,6 +287,7 @@ sub BuildMakerNotes($$$$$$);
     },
     0x1817 => {
         Name => 'FileNumber',
+        Writable => 'int32u',
         Groups => { 2 => 'Image' },
         PrintConv => '$_=$val;s/(\d+)(\d{4})/$1-$2/;$_',
         PrintConvInv => '$_=$val;s/-//;$_',
@@ -289,12 +301,13 @@ sub BuildMakerNotes($$$$$$);
     },
     0x1834 => { #PH
         Name => 'CanonModelID',
-        Writable => 0,
+        Writable => 'int32u',
         PrintHex => 1,
         Notes => q{
             this is the complete list of model ID numbers, but note that many of these
             models do not produce CRW images
         },
+        SeparateTable => 'Canon CanonModelID',
         PrintConv => \%Image::ExifTool::Canon::canonModelID,
     },
     0x1835 => {

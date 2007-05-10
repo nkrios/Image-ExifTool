@@ -71,8 +71,9 @@ my $testnum = 1;
         # eat return values so warning don't get printed
         my @x = $exifTool->SetNewValue($tag, $val, Group=>$group, Replace=>1);
     }
-    # also try adding an IPTC Core tag
+    # also try writing a few specific tags
     $exifTool->SetNewValue(CreatorContactInfoCiAdrCtry => 'Canada');
+    $exifTool->SetNewValue(CodedCharacterSet => 'UTF8');
     undef $info;
     my $image;
     $exifTool->WriteInfo('t/images/IPTC-XMP.jpg',\$image);
@@ -139,7 +140,7 @@ my $testnum = 1;
     unlink $testfile;
     $exifTool->SetNewValue(Label => 'Blue');
     $exifTool->SetNewValue(Rating => 3);
-    $exifTool->SetNewValue(Subject => 'test2', AddValue => 1);
+    $exifTool->SetNewValue(Subject => q{char test: & > < ' "}, AddValue => 1);
     $exifTool->Options(Compact => 1);
     $exifTool->WriteInfo('t/images/XMP.xmp',$testfile);
     print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);

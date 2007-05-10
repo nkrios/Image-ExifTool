@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
 [File, File, Image]  - File Name: ExifTool.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 24 kB
-[File, File, Time]  - File Modification Date/Time: 2006:12:15 16:11:47
+[File, File, Time]  - File Modification Date/Time: 2006:12:13 14:36:55
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Comment: A PhotoStudio Unicode comment;;
@@ -66,7 +66,7 @@
 [APP8, SPIFF, Image] 14 - Color Space: YCbCr, ITU-R BT 709, video
 [APP8, SPIFF, Image] 15 - Bits Per Sample: 8
 [APP8, SPIFF, Image] 16 - Compression: JPEG
-[APP8, SPIFF, Image] 17 - Resolution Units: inches
+[APP8, SPIFF, Image] 17 - Resolution Unit: inches
 [APP8, SPIFF, Image] 18 - Y Resolution: 300
 [APP8, SPIFF, Image] 22 - X Resolution: 300
 [MakerNotes, CIFF, Image] 0 - File Format: JPEG (lossy)

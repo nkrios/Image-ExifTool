@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
 [File, File, Image]  - File Name: Sanyo_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2007:01:28 08:41:19
+[File, File, Time]  - File Modification Date/Time: 2007:03:21 11:07:59
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -45,7 +45,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Manual
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 0
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 11113
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 11113mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Night
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: High gain up
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal

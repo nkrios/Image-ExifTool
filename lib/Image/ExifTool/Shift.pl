@@ -12,19 +12,6 @@ use strict;
 
 sub ShiftTime($$$;$);
 
-my $evalWarning;    # capture eval warnings
-
-#------------------------------------------------------------------------------
-# Clean unnecessary information from warning
-# Inputs: 0) warning string "warning at file line #"
-# Returns: "warning"
-sub CleanWarning($)
-{
-    my  $str = shift;
-    $str =~ s/ at .*//s;
-    return $str;
-}
-
 #------------------------------------------------------------------------------
 # apply shift to value in new value hash
 # Inputs: 0) shift type, 1) shift string, 2) value to shift, 3) new value hash ref
@@ -48,8 +35,8 @@ sub ApplyShift($$$;$)
     }
 
     # initialize handler for eval warnings
-    local $SIG{'__WARN__'} = sub { $evalWarning = $_[0]; };
-    undef $evalWarning;
+    local $SIG{'__WARN__'} = \&SetWarning;
+    SetWarning(undef);
 
     # shift is applied to ValueConv value, so we must ValueConv-Shift-ValueConvInv
     my ($conv, $err);
@@ -66,8 +53,8 @@ sub ApplyShift($$$;$)
         }
         # handle errors
         $err and return $err;
-        $@ and $evalWarning = $@;
-        $evalWarning and return CleanWarning($evalWarning);
+        $@ and SetWarning($@);
+        GetWarning() and return CleanWarning();
     }
     # update value in new value hash
     $newValueHash->{Value} = [ $val ];
@@ -470,13 +457,13 @@ shifted, and an optional timezone (ie. C<-05:00>) is also supported.  Here
 are some general rules and examples to explain how shift strings are
 interpreted:
 
-Date-only shifts are specified in the following formats:
+Date-only values are shifted using the following formats:
 
     'Y:M:D'     - shift date by 'Y' years, 'M' months and 'D' days
     'M:D'       - shift months and days only
     'D'         - shift specified number of days
 
-Time-only shifts are specified in the following formats:
+Time-only values are shifted using the following formats:
 
     'h:m:s'     - shift time by 'h' hours, 'm' minutes and 's' seconds
     'h:m'       - shift hours and minutes only
@@ -491,8 +478,8 @@ Timezone shifts are specified in the following formats:
 
 A valid shift value consists of one or two arguments, separated by a space.
 If only one is provided, it is assumed to be a time shift when applied to a
-time or a date/time value, or a date shift when applied to a date value.
-For example:
+time-only or a date/time value, or a date shift when applied to a date-only
+value.  For example:
 
     '7'         - shift by 1 hour if applied to a time or date/time
                   value, or by one day if applied to a date value
@@ -521,10 +508,10 @@ And to save typing, a zero is assumed for any missing numbers:
     '26:: 0'    - shift date by 26 years
     '+:30       - shift timezone by 30 minutes
 
-Below are some specific examples applied to real date/time values ('Dir' is
-the applied shift direction: '+' is positive, '-' is negative):
+Below are some specific examples applied to real date and/or time values
+('Dir' is the applied shift direction: '+' is positive, '-' is negative):
 
-     Original Date/Time     Shift   Dir    Shifted Date/Time
+     Original Value         Shift   Dir    Shifted Value
     ---------------------  -------  ---  ---------------------
     '20:30:00'             '5'       +   '01:30:00'
     '2005:01:27'           '5'       +   '2005:02:01'

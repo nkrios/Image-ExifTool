@@ -28,6 +28,7 @@
 #              15) Barney Garrett private communication (Samsung GX-1S)
 #              16) Axel Kellner private communication (K10D)
 #              17) Cvetan Ivanov private communication (K100D)
+#              18) http://www.gvsoft.homedns.org/exif/makernote-pentax-type3.html
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -38,7 +39,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.46';
+$VERSION = '1.52';
 
 # pentax lens type codes (ref 4)
 my %pentaxLensType = (
@@ -120,8 +121,8 @@ my %pentaxLensType = (
     '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
     '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
     '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
-    '4 51' => 'smc PENTAX-D FA 50mmF2.8 MACRO',
-    '4 52' => 'smc PENTAX-D FA 100mmF2.8 MACRO',
+    '4 51' => 'smc PENTAX-D FA 50mm F2.8 MACRO',
+    '4 52' => 'smc PENTAX-D FA 100mm F2.8 MACRO',
     '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
     '4 245' => 'Schneider D-XENON 50-200mm', #15
     '4 246' => 'Schneider D-XENON 18-55mm', #15
@@ -143,7 +144,7 @@ my %pentaxLensType = (
     '5 8' => 'smc PENTAX-FA MACRO 50mm F2.8',
     '5 9' => 'smc PENTAX-FA MACRO 100mm F2.8',
     '5 10' => 'smc PENTAX-FA* 85mm F1.4 [IF]',
-    '5 11' => 'smc PENTAX-FA* 200mmF2.8 ED[IF]',
+    '5 11' => 'smc PENTAX-FA* 200mm F2.8 ED[IF]',
     '5 12' => 'smc PENTAX-FA 28-80mm F3.5-4.7',
     '5 13' => 'smc PENTAX-FA 70-200mm F4-5.6',
     '5 14' => 'smc PENTAX-FA* 250-600mm F5.6 ED[IF]',
@@ -161,6 +162,7 @@ my %pentaxLensType = (
     '6 10' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
+    '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH (K10D)
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
 );
@@ -216,6 +218,11 @@ my %pentaxModelID = (
     0x12c32 => 'Optio M20',
     0x12c3c => 'Optio W20',
     0x12c46 => 'Optio A20',
+    0x12c8c => 'Optio M30',
+    0x12c78 => 'Optio E30',
+    0x12c82 => 'Optio T30',
+    0x12c96 => 'Optio W30',
+    0x12ca0 => 'Optio A30',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -387,6 +394,7 @@ my %pentaxCities = (
             4 => '1600x1200',
             5 => '2048x1536',
             8 => '2560x1920 or 2304x1728', #PH (Optio WP) or #14
+            9 => '3072x2304', #PH (Optio M30)
             10 => '3264x2448', #13
             19 => '320x240', #PH (Optio WP)
             20 => '2288x1712', #13
@@ -394,14 +402,16 @@ my %pentaxCities = (
             22 => '2304x1728 or 2592x1944', #2 or #14
             23 => '3056x2296', #13
             25 => '2816x2212 or 2816x2112', #13 or #14
+            27 => '3648x2736', #PH (Optio A20)
             '0 0' => '2304x1728', #13
+            '4 0' => '1600x1200', #PH (Optio MX4)
             '5 0' => '2048x1536', #13
             '8 0' => '2560x1920', #13
             '32 2' => '960x640', #7
             '33 2' => '1152x768', #7
             '34 2' => '1536x1024', #7
             '35 1' => '2400x1600', #7
-            '36 0' => '3008x2008',  #PH
+            '36 0' => '3008x2008 or 3040x2024',  #PH
             '37 0' => '3008x2000', #13
         },
     },
@@ -839,7 +849,20 @@ my %pentaxCities = (
         Writable => 'int32u',
     },
     # 0x002b - definitely exposure related somehow (PH)
-    # 0x0032 - normally 4 zero bytes, but "\x02\0\0\0" for a cropped pic (PH, Optio WP)
+    0x0032 => { #13
+        Name => 'ImageProcessing',
+        Writable => 'undef',
+        Format => 'int8u',
+        Count => 4,
+        PrintConv => {
+            '0 0' => 'Unprocessed', #PH
+            '0 0 0 0' => 'Unprocessed',
+            '0 0 0 4' => 'Digital Filter',
+            '2 0 0 0' => 'Cropped', #PH
+            '4 0 0 0' => 'Color Filter',
+            '16 0 0 0' => 'Frame Synthesis?',
+        },
+    },
     # and "\0\0\0\x04" for Digital filter (ref 13)
     # and "\x04\0\0\0" for Color filter (ref 13) (PH - digital or color filter, K10D)
     0x0033 => { #PH (K110D/K100D)
@@ -1055,7 +1078,7 @@ my %pentaxCities = (
         Count => 4,
     },
     0x020f => { #PH
-        Name => 'WB_RGGBLevelsCloud',
+        Name => 'WB_RGGBLevelsCloudy',
         Writable => 'int16u',
         Count => 4,
     },
@@ -1131,6 +1154,20 @@ my %pentaxCities = (
         Name => 'PreviewImageData',
         Binary => 1,
     },
+    # 0x2011 WhiteBalanceBias (ref 18)
+    # 0x2012 WhiteBalance (ref 18)
+    # 0x2022 ObjectDistance in mm (ref 18)
+    # 0x2034 FlashDistance (ref 18)
+    # 0x3000 RecordMode (ref 18)
+    # 0x3001 SelfTimer? (ref 18)
+    # 0x3002 Quality (ref 18)
+    # 0x3003 FocusMode (ref 18)
+    # 0x3006 TimeZone (ref 18)
+    # 0x3007 BestshotMode (ref 18)
+    # 0x3014 ISO (ref 18)
+    # 0x3015 ColorMode 0=off (ref 18)
+    # 0x3016 Enhancemnt 0=off (ref 18)
+    # 0x3017 Filter, 0=off (ref 18)
 );
 
 # NOTE: These are from Image::MakerNotes::Pentax.pm, but they don't seem to work - PH
@@ -1265,7 +1302,7 @@ my %pentaxCities = (
         # this is a bit funny and needs testing with more lenses on the K10D
         ValueConv => q{
             my @v = split(' ',$val);
-            if ($v[0] & 0x80) {
+            if ($v[0] & 0x80 or $$self{CameraModel} =~ /^PENTAX K10D\b/) {
                 $v[0] &= 0x7f;
                 $v[1] = GetByteOrder() eq 'MM' ? $v[2] * 256 + $v[3] : $v[3] * 256 + $v[2];
             }

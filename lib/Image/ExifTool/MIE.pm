@@ -9,12 +9,12 @@
 package Image::ExifTool::MIE;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %tableDefaults);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.12';
+$VERSION = '1.14';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -25,6 +25,7 @@ sub GetLangInfo($$);
 # local variables
 my $hasZlib;        # 1=Zlib available, 0=no Zlib
 my %mieCode;        # reverse lookup for MIE format names
+my $doneMieMap;     # flag indicating we added user-defined groups to %mieMap
 
 # MIE format codes
 my %mieFormat = (
@@ -94,16 +95,6 @@ my %mieMap = (
     MakerNotes      => 'ExifIFD',
 );
 
-# default table settings
-my %tableDefaults = (
-    PROCESS_PROC => \&ProcessMIE,
-    WRITE_PROC   => \&ProcessMIE,
-    CHECK_PROC   => \&CheckMIE,
-    LANG_INFO    => \&GetLangInfo,
-    WRITABLE     => 'string',
-    PREFERRED    => 1,
-);
-
 # convenience variables for common tagInfo entries
 my %binaryConv = (
     Writable => 'undef',
@@ -117,6 +108,16 @@ my %dateInfo = (
 );
 my %noYes = ( 0 => 'No', 1 => 'Yes' );
 my %offOn = ( 0 => 'Off', 1 => 'On' );
+
+# default entries for MIE tag tables
+%tableDefaults = (
+    PROCESS_PROC => \&ProcessMIE,
+    WRITE_PROC   => \&ProcessMIE,
+    CHECK_PROC   => \&CheckMIE,
+    LANG_INFO    => \&GetLangInfo,
+    WRITABLE     => 'string',
+    PREFERRED    => 1,
+);
 
 # MIE info
 %Image::ExifTool::MIE::Main = (
@@ -616,7 +617,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     Declination => { Writable => 'rational64s' },
     Elevation   => { Writable => 'rational64s' },
     RightAscension => { Writable => 'rational64s' },
-    Rotation    => { Writable => 'rational64s', Notes => 'CW rotation angle about lens axis' },
+    Rotation => {
+        Writable => 'rational64s',
+        Notes => 'CW rotation angle of camera about lens axis',
+    },
 );
 
 # MIE camera lens information
@@ -708,6 +712,53 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 );
 
 #------------------------------------------------------------------------------
+# Add user-defined MIE groups to %mieMap
+# Inputs: none;  Returns: nothing, but sets $doneMieMap flag
+sub UpdateMieMap()
+{
+    $doneMieMap = 1;    # set flag so we only do this once
+    return unless %Image::ExifTool::UserDefined;
+    my ($tableName, @tables, %doneTable, $tagID);
+    # get list of top-level MIE tables with user-defined tags
+    foreach $tableName (keys %Image::ExifTool::UserDefined) {
+        next unless $tableName =~ /^Image::ExifTool::MIE::/;
+        my $userTable = $Image::ExifTool::UserDefined{$tableName};
+        my $tagTablePtr = GetTagTable($tableName) or next;
+        # copy the WRITE_GROUP from the actual table
+        $$userTable{WRITE_GROUP} = $$tagTablePtr{WRITE_GROUP};
+        # add to list of tables to process
+        $doneTable{$tableName} = 1;
+        push @tables, [$tableName, $userTable];
+    }
+    # recursively add all user-defined groups to MIE map
+    while (@tables) {
+        my ($tableName, $tagTablePtr) = @{shift @tables};
+        my $parent = $$tagTablePtr{WRITE_GROUP};
+        $parent or warn("No WRITE_GROUP for $tableName\n"), next;
+        $mieMap{$parent} or warn("$parent is not in MIE map\n"), next;
+        foreach $tagID (TagTableKeys($tagTablePtr)) {
+            my $tagInfo = $$tagTablePtr{$tagID};
+            next unless ref $tagInfo eq 'HASH' and $$tagInfo{SubDirectory};
+            my $subTableName = $tagInfo->{SubDirectory}->{TagTable};
+            my $subTablePtr = GetTagTable($subTableName) or next;
+            # only care about MIE tables
+            next unless $$subTablePtr{PROCESS_PROC} and
+                        $$subTablePtr{PROCESS_PROC} eq \&ProcessMIE;
+            my $group = $$subTablePtr{WRITE_GROUP};
+            $group or warn("No WRITE_GROUP for $subTableName\n"), next;
+            if ($mieMap{$group} and $mieMap{$group} ne $parent) {
+                warn("$group already has different parent ($mieMap{$group})\n"), next;
+            }
+            $mieMap{$group} = $parent;  # add to map
+            # process tables within this one too
+            $doneTable{$subTableName} and next;
+            $doneTable{$subTableName} = 1;
+            push @tables, [$subTableName, $subTablePtr];
+        }
+    }
+}
+
+#------------------------------------------------------------------------------
 # Get localized version of tagInfo hash
 # Inputs: 0) tagInfo hash ref, 1) locale code (ie. "en_CA")
 # Returns: new tagInfo hash ref, or undef if invalid
@@ -772,18 +823,19 @@ sub IsUTF8($)
     my $rtnVal = 0;
     pos($_[0]) = 0; # start at beginning of string
     for (;;) {
-        last unless $_[0] =~ /([\xc0-\xff])/g;
+        last unless $_[0] =~ /([\x80-\xff])/g;
         my $ch = ord($1);
-        return -1 if $ch >= 0xfe;  # 0xfe and 0xff are not valid in UTF-8 strings
+        # minimum lead byte for 2-byte sequence is 0xc2 (overlong sequences
+        # not allowed), 0xf8-0xfd are restricted by RFC 3629 (no 5 or 6 byte
+        # sequences), and 0xfe and 0xff are not valid in UTF-8 strings
+        return -1 if $ch < 0xc2 or $ch >= 0xf8;
+        # determine number of bytes remaining in sequence
         my $n = 1;
-        foreach (0xe0, 0xf0, 0xf8, 0xfc) {
-            last if $ch < $_;
-            ++$n;
-        }
+        $n += ($ch >= 0xf0) ? 2 : 1 if $ch >= 0xe0;
         return -1 unless $_[0] =~ /\G[\x80-\xbf]{$n}/g;
         # character code is greater than 0xffff if more than 2 extra bytes were
         # required in the UTF-8 character
-        $rtnVal < 2 and $rtnVal = ($n > 2) ? 2 : 1;
+        $rtnVal |= ($n > 2) ? 2 : 1;
     }
     return $rtnVal;
 }
@@ -815,12 +867,7 @@ sub ReadMIEValue($$$$$)
             if ($] >= 5.006001) {
                 $val = pack('C0U*', @unpk);
             } else {
-                # hack for pre 5.6.1 (because the code to do the
-                # translation properly is unnecesarily bulky)
-                foreach (@unpk) {
-                    $_ > 0xff and $_ = ord('?');
-                }
-                $val = pack('C*', @unpk);
+                $val = Image::ExifTool::PackUTF8(@unpk);
             }
         }
         # truncate at null unless this is a list
@@ -1270,7 +1317,7 @@ sub WriteMIEGroup($$$)
                             print $out "  [$newTag compression saved $saved bytes -- written uncompressed]\n";
                         }
                     } else {
-                        $exifTool->Warn("Error deflating $newTag -- written uncompressed");
+                        $exifTool->Warn("Error deflating $newTag (written uncompressed)");
                     }
                 }
                 # calculate the DataLength code
@@ -1714,6 +1761,8 @@ sub ProcessMIE($$)
                     $mieCode{$mieFormat{$_}} = $_;
                 }
             }
+            # update %mieMap with user-defined MIE groups
+            UpdateMieMap() unless $doneMieMap;
             # initialize write directories, with MIE tags taking priority
             $exifTool->InitWriteDirs(\%mieMap, 'MIE');
             $subdirInfo{ToWrite} = '~' . MIEGroupFormat(1) . "\x04\xfe0MIE\0\0\0\0";
@@ -2112,8 +2161,8 @@ strings are not localized, and may not be used in combination with localized
 text strings.
 
 Sets of tags which would require a common prefix should be added in a
-separate MIE instead of adding the prefix to all tag names.  For example,
-instead of these TagName's:
+separate MIE group instead of adding the prefix to all tag names.  For
+example, instead of these TagName's:
 
     ExternalFlashType
     ExternalFlashSerialNumber
@@ -2461,6 +2510,14 @@ Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.  The MIE format itself is also
 copyright Phil Harvey, and is covered by the same free-use license.
+
+=head1 REFERENCES
+
+=over 4
+
+=item L<http://owl.phy.queensu.ca/~phil/exiftool/MIE1.1-20070121.pdf>
+
+=back
 
 =head1 SEE ALSO
 

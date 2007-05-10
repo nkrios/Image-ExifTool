@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.24';
+$VERSION = '1.31';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -61,21 +61,61 @@ my $debug;          # set to 1 to enabled debugging code
         # The Fuji programmers really botched this one up,
         # but with a bit of work we can still read this directory
         Name => 'MakerNoteFujiFilm',
-        # (starts with "FUJIFILM")
-        Condition => '$self->{CameraMake} =~ /^FUJIFILM/',
+        # (starts with "FUJIFILM" -- also used by some Leica, Minolta and Sharp models)
+        Condition => '$$valPt =~ /^FUJIFILM/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FujiFilm::Main',
             # there is an 8-byte maker tag (FUJIFILM) we must skip over
             OffsetPt => '$valuePtr+8',
-            ByteOrder => 'LittleEndian',
             # the pointers are relative to the subdirectory start
             # (before adding the offsetPt) - PH
             Base => '$start',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    {
+        Name => 'MakerNoteHP',  # PhotoSmart 720 (also Vivitar 3705, 3705B and 3715)
+        Condition => '$$valPt =~ /^(Hewlett-Packard|Vivitar)/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::HP::Main',
+            ProcessProc => \&ProcessUnknown,
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteHP2', # PhotoSmart E427
+        Condition => q{
+            $self->{CameraMake} =~ /^Hewlett-Packard/ and
+            $$valPt !~ /^.{8}Hewlett-Packard/s and
+            $$valPt !~ /^IIII/ and $$valPt =~ /^\d{3}.\0/s
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::HP::Type2',
+            Start => '$valuePtr',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    {
+        Name => 'MakerNoteHP4', # PhotoSmart M627
+        Condition => '$$valPt =~ /^IIII\x04\0/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::HP::Type4',
+            Start => '$valuePtr',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    {
+        Name => 'MakerNoteHP6', # PhotoSmart M425, M525 and M527
+        Condition => '$$valPt =~ /^IIII\x06\0/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::HP::Type6',
+            Start => '$valuePtr',
+            ByteOrder => 'LittleEndian',
         },
     },
     {
         Name => 'MakerNoteJVC',
-        Condition => '$self->{CameraMake}=~/^JVC/ and $$valPt=~/^JVC /',
+        Condition => '$$valPt=~/^JVC /',
         SubDirectory => {
             TagTable => 'Image::ExifTool::JVC::Main',
             Start => '$valuePtr + 4',
@@ -108,8 +148,12 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
+        # used by various Kodak, HP, Pentax and Minolta models
         Name => 'MakerNoteKodak2',
-        Condition => '$self->{CameraMake}=~/^EASTMAN KODAK/i and $$valPt=~/^.{8}Eastman/s',
+        Condition => q{
+            $$valPt =~ /^.{8}Eastman Kodak/s or
+            $$valPt =~ /^\x01\0[\0\x01]\0\0\0\x04\0[a-zA-Z]{4}/
+        },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type2',
             ByteOrder => 'BigEndian',
@@ -192,7 +236,7 @@ my $debug;          # set to 1 to enabled debugging code
         Name => 'MakerNoteMinolta',
         Condition => q{
             $self->{CameraMake}=~/^(Konica Minolta|Minolta)/i and
-            $$valPt !~ /^(MINOL|CAMER|FUJIFILM|MLY0|KC|\+M\+M|\xd7)/
+            $$valPt !~ /^(MINOL|CAMER|MLY0|KC|\+M\+M|\xd7)/
         },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::Main',
@@ -200,12 +244,10 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        # the DiMAGE E323 (MINOL) and E500 (CAMER)
+        # the DiMAGE E323 (MINOL) and E500 (CAMER), and some models
+        # of Mustek, Pentax, Ricoh and Vivitar (CAMER).
         Name => 'MakerNoteMinolta2',
-        Condition => q{
-            $self->{CameraMake} =~ /^(Konica Minolta|Minolta)/i and
-            $$valPt =~ /^(MINOL|CAMER)/
-        },
+        Condition => '$$valPt =~ /^(MINOL|CAMER)\0/ and $$self{OlympusCAMER} = 1',
         SubDirectory => {
             # these models use Olympus tags in the range 0x200-0x221 plus 0xf00
             TagTable => 'Image::ExifTool::Olympus::Main',
@@ -214,25 +256,11 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        # the DiMAGE F200
-        Name => 'MakerNoteMinolta3',
-        Condition => q{
-            $self->{CameraMake} =~ /^(Konica Minolta|Minolta)/i and
-            $$valPt =~ /^FUJIFILM/
-        },
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::FujiFilm::Main',
-            OffsetPt => '$valuePtr+8',
-            ByteOrder => 'LittleEndian',
-            Base => '$start',
-        },
-    },
-    {
         # /^MLY0/ - DiMAGE G400, G500, G530, G600
         # /^KC/   - Revio KD-420Z, DiMAGE E203
         # /^+M+M/ - DiMAGE E201
         # /^\xd7/ - DiMAGE RD3000
-        Name => 'MakerNoteMinolta4',
+        Name => 'MakerNoteMinolta3',
         Condition => '$self->{CameraMake} =~ /^(Konica Minolta|Minolta)/i',
         Notes => 'not EXIF-based',
         Binary => 1,
@@ -244,8 +272,8 @@ my $debug;          # set to 1 to enabled debugging code
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             Start => '$valuePtr + 18',
-            ByteOrder => 'Unknown',
             Base => '$start - 8',
+            ByteOrder => 'Unknown',
         },
     },
     {
@@ -272,10 +300,21 @@ my $debug;          # set to 1 to enabled debugging code
         # (if Make is 'SEIKO EPSON CORP.', starts with "EPSON\0")
         # (if Make is 'OLYMPUS OPTICAL CO.,LTD' or 'OLYMPUS CORPORATION',
         #  starts with "OLYMP\0")
-        Condition => '$self->{CameraMake} =~ /^(OLYMPUS|SEIKO EPSON|AGFA )/i',
+        Condition => '$$valPt =~ /^(OLYMP|EPSON)\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Olympus::Main',
             Start => '$valuePtr + 8',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteOlympus2',
+        # new Olympus maker notes start with "OLYMPUS\0"
+        Condition => '$$valPt =~ /^OLYMPUS\0/ and $$self{OlympusType2} = 1',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::Main',
+            Start => '$valuePtr + 12',
+            Base => '$start - 12',
             ByteOrder => 'Unknown',
         },
     },
@@ -319,10 +358,10 @@ my $debug;          # set to 1 to enabled debugging code
             # process as Unknown maker notes because the start offset and
             # byte ordering are so variable
             ProcessProc => \&ProcessUnknown,
-            ByteOrder => 'Unknown',
             # offsets can be totally whacky for Pentax maker notes,
             # so attempt to fix the offset base if possible
             FixBase => 1,
+            ByteOrder => 'Unknown',
         },
     },
     {
@@ -343,9 +382,9 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        # Samsung PreviewImage
+        # PreviewImage (Samsung Digimax plus some other types of cameras)
         %Image::ExifTool::previewImageTagInfo,
-        Condition => '$self->{CameraMake}=~/^Samsung/ and $self->{CameraModel}=~/^<Digimax/',
+        Condition => '$$valPt =~ /^\xff\xd8\xff\xdb/',
         Notes => 'Samsung preview image',
     },
     {
@@ -367,8 +406,8 @@ my $debug;          # set to 1 to enabled debugging code
             TagTable => 'Image::ExifTool::Sanyo::Main',
             Validate => '$val =~ /^SANYO/',
             Start => '$valuePtr + 8',
-            ByteOrder => 'Unknown',
             FixBase => 1,
+            ByteOrder => 'Unknown',
         },
     },
     {
@@ -396,12 +435,12 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteSony',
-        # (starts with "SONY DSC \0")
+        # (starts with "SONY DSC \0" or "SONY CAM \0")
         Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE}!~/^(SRF|SR2|DNG)$/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
             # validate the maker note because this is sometimes garbage
-            Validate => 'defined($val) and $val =~ /^SONY DSC/',
+            Validate => 'defined($val) and $val =~ /^SONY (DSC|CAM)/',
             Start => '$valuePtr + 12',
             ByteOrder => 'Unknown',
         },
@@ -554,29 +593,59 @@ sub FixBase($$)
 {
     local $_;
     my ($exifTool, $dirInfo) = @_;
-    return 0 if $$dirInfo{FixOffsets}; # don't fix base if fixing offsets individually
+    # don't fix base if fixing offsets individually or if we don't want to fix them
+    return 0 if $$dirInfo{FixOffsets} or $$dirInfo{NoFixBase};
 
     my $dataPt = $$dirInfo{DataPt};
+    my $dataPos = $$dirInfo{DataPos};
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $entryBased = $$dirInfo{EntryBased};
-
-    # get hash of value block positions
-    my ($valBlock, $valBlkAdj) = GetValueBlocks($dataPt, $dirStart);
-    return 0 unless %$valBlock;
+    my $dirName = $$dirInfo{DirName};
+    my $fixBase = $exifTool->Options('FixBase');
+    my $setBase = (defined $fixBase and $fixBase ne '') ? 1 : 0;
+    my ($fix, $fixedBy);
+#
+# handle special case of Canon maker notes with TIFF trailer containing original offset
+#
+    if ($$exifTool{CameraMake} =~ /^Canon/ and $$dirInfo{DirLen} > 8) {
+        my $trailerPos = $dirStart + $$dirInfo{DirLen} - 8;
+        my $trailer = substr($$dataPt, $trailerPos, 8);
+        if ($trailer =~ /^(II\x2a\0|MM\0\x2a)/ and  # check for TIFF trailer
+            substr($trailer,0,2) eq GetByteOrder()) # validate byte ordering
+        {
+            if ($$exifTool{HTML_DUMP}) {
+                my $filePos = ($$dirInfo{Base} || 0) + $dataPos + $trailerPos;
+                $exifTool->HtmlDump($filePos, 8, '[Canon MakerNote trailer]')
+            }
+            if ($setBase) {
+                $fix = $fixBase;
+            } else {
+                my $oldOffset = Get32u(\$trailer, 4);
+                my $newOffset = $dirStart + $dataPos;
+                $fix = $newOffset - $oldOffset;
+                return 0 unless $fix;
+            }
+            $exifTool->Warn("Adjusted $dirName base by $fix", 1);
+            $$dirInfo{FixedBy} = $fix;
+            $$dirInfo{Base} += $fix;
+            $$dirInfo{DataPos} -= $fix;
+            return $fix;
+        }
+    }
 #
 # analyze value offsets to see if they need fixing.  The first task is to
 # determine the minimum valid offset used (this is tricky, because we have
 # to weed out bad offsets written by some cameras)
 #
-    my $dataPos = $$dirInfo{DataPos};
+    # get hash of value block positions
+    my ($valBlock, $valBlkAdj) = GetValueBlocks($dataPt, $dirStart);
+    return 0 unless %$valBlock;
+
     my $ifdLen = 2 + 12 * Get16u($$dirInfo{DataPt}, $dirStart);
     my $ifdEnd = $dirStart + $ifdLen;
     my ($relative, @offsets) = GetMakerNoteOffset($exifTool);
     my $makeDiff = $offsets[0];
-    my $fixBase = $exifTool->Options('FixBase');
-    my $setBase = (defined $fixBase and $fixBase ne '') ? 1 : 0;
     my $verbose = $exifTool->Options('Verbose');
-    my $dirName = $$dirInfo{DirName};
     my ($diff, $shift);
 
     # calculate expected minimum value offset
@@ -626,7 +695,7 @@ sub FixBase($$)
         # calculate difference from normal
         $diff = ($minPt - $dataPos) - $ifdEnd;
         $shift = 0;
-        $countOverlap and $exifTool->Warn("Overlapping $dirName values");
+        $countOverlap and $exifTool->Warn("Overlapping $dirName values",1);
         if ($entryBased) {
             $exifTool->Warn("$dirName offsets do NOT look entry-based");
             undef $entryBased;
@@ -673,8 +742,7 @@ sub FixBase($$)
 #
     # use default padding of 4 bytes unless already specified
     $makeDiff = 4 unless defined $makeDiff;
-    my $fix = $makeDiff - $diff;    # assume standard diff for this make
-    my $fixedBy;
+    $fix = $makeDiff - $diff;   # assume standard diff for this make
 
     if ($$dirInfo{FixBase}) {
         # set flag if offsets are relative (base is at or above directory start)
@@ -835,8 +903,9 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
                 #  a handle to verify this field)
                 # verify format
                 next IFD_TRY if $format < 1 or $format > 13;
-                # count must be reasonable
-                next IFD_TRY if $count == 0 or $count & 0xff000000;
+                # count must be reasonable (can't test for zero count because
+                # cameras like the 1DmkIII use this value)
+                next IFD_TRY if $count & 0xff000000;
             }
             $$dirInfo{DirStart} += $offset;    # update directory start
             $$dirInfo{DirLen} -= $offset;
@@ -858,6 +927,7 @@ sub ProcessUnknown($$$)
 
     my $loc = LocateIFD($exifTool, $dirInfo);
     if (defined $loc) {
+        $exifTool->{UnknownByteOrder} = GetByteOrder();
         if ($exifTool->Options('Verbose') > 1) {
             my $out = $exifTool->Options('TextOut');
             my $indent = $exifTool->{INDENT};
@@ -867,6 +937,7 @@ sub ProcessUnknown($$$)
         }
         $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
     } else {
+        $exifTool->{UnknownByteOrder} = ''; # indicates we tried but didn't set byte order
         $exifTool->Warn("Unrecognized $$dirInfo{DirName}");
     }
     return $success;

@@ -25,7 +25,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.30';
+$VERSION = '1.32';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -438,9 +438,37 @@ sub ProcessPSD($$)
         if ($data) {
             $len = Set32u(length $data);
             Write($outfile, $len, $data) or $err = 1;
-            # copy over the rest of the file
-            while ($raf->Read($data, 65536)) {
-                Write($outfile, $data) or $err = 1;
+            # look for trailer and edit if necessary
+            my $trailInfo = Image::ExifTool::IdentifyTrailer($raf);
+            if ($trailInfo) {
+                my $tbuf = '';
+                $$trailInfo{OutFile} = \$tbuf;  # rewrite trailer(s)
+                # rewrite all trailers to buffer
+                if ($exifTool->ProcessTrailers($trailInfo)) {
+                    my $copyBytes = $$trailInfo{DataPos} - $raf->Tell();
+                    if ($copyBytes >= 0) {
+                        # copy remaining PSD file up to start of trailer
+                        while ($copyBytes) {
+                            my $n = ($copyBytes > 65536) ? 65536 : $copyBytes;
+                            $raf->Read($data, $n) == $n or $err = 1;
+                            Write($outfile, $data) or $err = 1;
+                            $copyBytes -= $n;
+                        }
+                        # write the trailer (or not)
+                        $exifTool->WriteTrailerBuffer($trailInfo, $outfile) or $err = 1;
+                    } else {
+                        $exifTool->Warn('Overlapping trailer');
+                        undef $trailInfo;
+                    }
+                } else {
+                    undef $trailInfo;
+                }
+            }
+            unless ($trailInfo) {
+                # copy over the rest of the file
+                while ($raf->Read($data, 65536)) {
+                    Write($outfile, $data) or $err = 1;
+                }
             }
         } else {
             $err = 1;
@@ -450,6 +478,9 @@ sub ProcessPSD($$)
         $exifTool->Warn('File format error');
     } else {
         ProcessPhotoshop($exifTool, \%dirInfo, $tagTablePtr);
+        # process trailers if they exist
+        my $trailInfo = Image::ExifTool::IdentifyTrailer($raf);
+        $exifTool->ProcessTrailers($trailInfo) if $trailInfo;
     }
     return $rtnVal;
 }
@@ -482,7 +513,8 @@ be set to '1' in the tag information hash to cause the resource name to be
 appended to the value when extracted.  If this is done, the returned value
 has the form "VALUE/#NAME#/".  When writing, the writer routine looks for
 this syntax (if C<SetResourceName> is defined), and and uses the embedded
-name to set the name of the new resource.
+name to set the name of the new resource.  This allows the resource names to
+be preserved when copying Photoshop information via user-defined tags.
 
 =head1 AUTHOR
 

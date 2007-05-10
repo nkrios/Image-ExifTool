@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.43
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.87
 [File, File, Image]  - File Name: Photoshop_3_failed.psd
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 14 kB
-[File, File, Time]  - File Modification Date/Time: 2006:09:25 09:23:13
+[File, File, Image]  - File Size: 16 kB
+[File, File, Time]  - File Modification Date/Time: 2007:04:14 20:44:08
 [File, File, Image]  - File Type: PSD
 [File, File, Image]  - MIME Type: application/photoshop
 [Photoshop, Photoshop, Image] 6 - Num Channels: 3
@@ -91,4 +91,11 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 388
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 0
+[PhotoMechanic, PhotoMechanic, Image] 222 - Color Class: 6 (Typical alt)
+[PhotoMechanic, PhotoMechanic, Image] 216 - Rotation: 180
+[PhotoMechanic, PhotoMechanic, Image] 217 - Crop Left: 438
+[PhotoMechanic, PhotoMechanic, Image] 218 - Crop Top: 618
+[PhotoMechanic, PhotoMechanic, Image] 219 - Crop Right: 890
+[PhotoMechanic, PhotoMechanic, Image] 220 - Crop Bottom: 1072
+[PhotoMechanic, PhotoMechanic, Image] 221 - Tagged: No
 [Composite, Composite, Image]  - Image Size: 8x8

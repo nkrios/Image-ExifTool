@@ -189,6 +189,7 @@ sub ProcessRicohRMETA($$$);
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     0x0004 => { Name => 'RicohDateTime1', Groups => { 2 => 'Time' } }, #PH
     0x0005 => { Name => 'RicohDateTime2', Groups => { 2 => 'Time' } }, #PH
+    # 0x000E ProductionNumber? (ref 2)
 );
 
 # Ricoh text-type maker notes (PH)

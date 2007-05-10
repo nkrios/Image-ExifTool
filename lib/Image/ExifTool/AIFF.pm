@@ -170,7 +170,7 @@ sub ProcessAIFF($$)
         }
         $pos += $len2;
     }
-    $err and $exifTool->Warn('Error reading AIFF file -- corrupted?');
+    $err and $exifTool->Warn('Error reading AIFF file (corrupted?)');
     return 1;
 }
 

@@ -29,6 +29,7 @@
 #              15) http://tomtia.plala.jp/DigitalCamera/MakerNote/index.asp
 #              16) Jeffrey Friedl private communication (D200 with firmware update)
 #              17) http://www.wohlberg.net/public/software/photo/nstiffexif/
+#              18) Anonymous user private communication (D70, D200, D2x)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -38,7 +39,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.61';
+$VERSION = '1.69';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -50,6 +51,8 @@ my %nikonLensIDs = (
     },
     # (hex digits must be uppercase in keys below)
     '01 58 50 50 14 14 02 00' => 'AF Nikkor 50mm f/1.8',
+    '01 00 00 00 00 00 02 00' => 'AF Teleconverter TC-16A 1.6x',
+    '01 00 00 00 00 00 08 00' => 'AF Teleconverter TC-16A 1.6x',
     '02 42 44 5C 2A 34 02 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
     '02 42 44 5C 2A 34 08 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
     '03 48 5C 81 30 30 02 00' => 'AF Zoom-Nikkor 70-210mm f/4',
@@ -77,6 +80,7 @@ my %nikonLensIDs = (
     '1C 48 30 30 24 24 12 00' => 'AF Nikkor 20mm f/2.8',
     '1D 42 44 5C 2A 34 12 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5 N',
     '1E 54 56 56 24 24 13 00' => 'AF Micro-Nikkor 60mm f/2.8',
+    '1F 54 6A 6A 24 24 14 00' => 'AF Micro-Nikkor 105mm f/2.8',
     '20 48 60 80 24 24 15 00' => 'AF Zoom-Nikkor ED 80-200mm f/2.8',
     '22 48 72 72 18 18 16 00' => 'AF DC-Nikkor 135mm f/2',
     '24 48 60 80 24 24 1A 02' => 'AF Zoom-Nikkor ED 80-200mm f/2.8D',
@@ -153,6 +157,7 @@ my %nikonLensIDs = (
     '8C 40 2D 53 2C 3C 8E 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
     '8D 44 5C 8E 34 3C 8F 0E' => 'AF-S VR Zoom-Nikkor 70-300mm f/4.5-5.6G IF-ED', #10
     '8F 40 2D 72 2C 3C 91 06' => 'AF-S DX Zoom-Nikkor 18-135mm f/3.5-5.6G IF-ED',
+    '90 3B 53 80 30 3C 92 0E' => 'AF-S DX VR Zoom-Nikkor 55-200mm f/4-5.6G IF-ED',
     '94 40 2D 53 2C 3C 96 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED II', #10 (D40)
 #
     '06 3F 68 68 2C 2C 06 00' => 'Cosina 100mm f/3.5 Macro',
@@ -218,6 +223,7 @@ my %nikonLensIDs = (
 #
     '00 40 18 2B 2C 34 00 06' => 'Tokina AT-X 107 DX Fish-Eye - AF 10-17mm F3.5-4.5',
     '00 3C 1F 37 30 30 00 06' => 'Tokina AT-X 124 AF PRO DX - AF 12-24mm F4',
+    '00 48 29 50 24 24 00 06' => 'Tokina AT-X 165 PRO DX - AF 16-50mm F2.8',
     '00 40 2B 2B 2C 2C 00 02' => 'Tokina AT-X 17 AF PRO - AF 17mm F3.5',
     '25 48 3C 5C 24 24 1B 02' => 'Tokina AT-X 287 AF PRO SV 28-70mm F2.8',
     '00 48 3C 60 24 24 00 02' => 'Tokina AT-X 280 AF PRO 28-80mm F2.8 ASPHERICAL',
@@ -231,11 +237,13 @@ my %nikonLensIDs = (
 #
     '00 36 1C 2D 34 3C 00 06' => 'Tamron SP AF11-18mm f/4.5-5.6 Di II LD Aspherical (IF)',
     '07 46 2B 44 24 30 03 02' => 'Tamron SP AF17-35mm f/2.8-4 Di LD Aspherical (IF)',
-    '00 53 2B 50 24 24 00 06' => 'Tamron SP AF17-50mm F2.8 (A16)', #PH
+    '00 53 2B 50 24 24 00 06' => 'Tamron SP AF17-50mm f/2.8 (A16)', #PH
     '00 3F 2D 80 2B 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)',
     '00 3F 2D 80 2C 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro',
+    '07 40 2F 44 2C 34 03 02' => 'Tamron AF19-35mm f/3.5-4.5 N',
     '07 40 30 45 2D 35 03 02' => 'Tamron AF19-35mm f/3.5-4.5',
     '00 49 30 48 22 2B 00 02' => 'Tamron SP AF20-40mm f/2.7-3.5',
+    '0E 4A 31 48 23 2D 0E 02' => 'Tamron SP AF20-40mm f/2.7-3.5',
     '45 41 37 72 2C 3C 48 02' => 'Tamron SP AF24-135mm f/3.5-5.6 AD Aspherical (IF) Macro',
     '33 54 3C 5E 24 24 62 02' => 'Tamron SP AF28-75mm f/2.8 XR Di LD Aspherical (IF) Macro',
     '10 3D 3C 60 2C 3C D2 02' => 'Tamron AF28-80mm f/3.5-5.6 Aspherical',
@@ -269,7 +277,7 @@ my %nikonLensIDs = (
     0x0001 => { #2
         # the format differs for different models.  for D70, this is a string '0210',
         # but for the E775 it is binary: "\x00\x01\x00\x00"
-        Name => 'FirmwareVersion',
+        Name => 'MakerNoteVersion',
         Writable => 'undef',
         Count => 4,
         # convert to string if binary
@@ -548,25 +556,24 @@ my %nikonLensIDs = (
     # LightSource shows 3 values COLORED SPEEDLIGHT NATURAL.
     # (SPEEDLIGHT when flash goes. Have no idea about difference between other two.)
     0x0090 => { Name => 'LightSource',      Writable => 'string' }, #2
-    0x0091 => [
+    0x0091 => [ #18
         {
             Condition => '$$valPt =~ /^02/',
-            Name => 'Nikon0x0091Encrypted',
-            Writable => 0,
-            Unknown => 1, # no tags known so don't process unless necessary
-            Notes => 'this information is encrypted for versions 02xx',
+            Name => 'ShotInfo',
+            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Nikon::Nikon0x0091',
+                TagTable => 'Image::ExifTool::Nikon::ShotInfo',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 4,
+                DecryptLen => 0x90,
             },
         },
         {
-            Name => 'Nikon0x0091',
+            Name => 'ShotInfo',
             Writable => 0,
-            Unknown => 1,
+            Unknown => 1, # no tags known so don't process unless necessary
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Nikon::Nikon0x0091',
+                TagTable => 'Image::ExifTool::Nikon::ShotInfo',
                 DirOffset => 4,
             },
         },
@@ -591,7 +598,6 @@ my %nikonLensIDs = (
         {
             Condition => '$$valPt =~ /^0100/', # (D100)
             Name => 'ColorBalance0100',
-            Writable => 0,
             SubDirectory => {
                 Start => '$valuePtr + 72',
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance1',
@@ -600,7 +606,6 @@ my %nikonLensIDs = (
         {
             Condition => '$$valPt =~ /^0102/', # (D2H)
             Name => 'ColorBalance0102',
-            Writable => 0,
             SubDirectory => {
                 Start => '$valuePtr + 10',
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
@@ -609,7 +614,6 @@ my %nikonLensIDs = (
         {
             Condition => '$$valPt =~ /^0103/', # (D70)
             Name => 'ColorBalance0103',
-            Writable => 0,
             # D70:  at file offset 'tag-value + base + 20', 4 16 bits numbers,
             # v[0]/v[1] , v[2]/v[3] are the red/blue multipliers.
             SubDirectory => {
@@ -620,19 +624,19 @@ my %nikonLensIDs = (
         {
             Condition => '$$valPt =~ /^0205/', # (D50)
             Name => 'ColorBalance0205',
-            Writable => 0,
+            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 4,
-                DecryptLen => 22, # 324 bytes encrypted, but don't need to decrypt it all
+                DecryptLen => 22, # 284 bytes encrypted, but don't need to decrypt it all
                 DirOffset => 14,
             },
         },
         {
             Condition => '$$valPt =~ /^02/', # (D2X=0204,D2Hs=0206,D200=0207,D40=0208)
             Name => 'ColorBalance02',
-            Writable => 0,
+            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
@@ -665,6 +669,7 @@ my %nikonLensIDs = (
         { #8
             Condition => '$$valPt =~ /^020(1|2)/', # D80/D40 are version 0202 (PH)
             Name => 'LensData0201',
+            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensData01',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
@@ -718,6 +723,13 @@ my %nikonLensIDs = (
     0x00ab => { Name => 'VariProgram',      Writable => 'string' }, #2
     0x00ac => { Name => 'ImageStabilization',Writable=> 'string' }, #14
     0x00ad => { Name => 'AFResponse',       Writable => 'string' }, #14
+    0x00b0 => { #PH
+        Name => 'MultiExposure',
+        Condition => '$$valPt =~ /^0100/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::MultiExposure',
+        },
+    },
     0x00b1 => { #14
         Name => 'HighISONoiseReduction',
         Writable => 'int16u',
@@ -729,6 +741,7 @@ my %nikonLensIDs = (
             6 => 'Strong',
         },
     },
+    # 0x00b2 (string: 'Normal', 0xc3's, 0xff's or 0x20's)
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -743,7 +756,6 @@ my %nikonLensIDs = (
     # utility that blindly copies the maker notes (not ExifTool) - PH
     0x0e01 => {
         Name => 'NikonCaptureData',
-        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::NikonCapture::Main',
         },
@@ -755,7 +767,6 @@ my %nikonLensIDs = (
     # 0x0e0e is in D70 Nikon Capture files (not out-of-the-camera D70 files) - PH
     0x0e0e => { #PH
         Name => 'NikonCaptureOffsets',
-        Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::CaptureOffsets',
             Validate => '$val =~ /^0100/',
@@ -931,6 +942,10 @@ my %nikonLensIDs = (
     WRITABLE => 1,
     FORMAT => 'int16u',
     FIRST_ENTRY => 0,
+    NOTES => q{
+        This information is encrypted for most camera models, and if encrypted is
+        not currently writable by exiftool.
+    },
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'WB_RGGBLevels',
@@ -1097,7 +1112,14 @@ my %nikonFocalConversions = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x00 => {
         Name => 'LensDataVersion',
-        Format => 'undef[4]',
+        Format => 'string[4]',
+    },
+    0x04 => { #8
+        Name => 'ExitPupilPosition',
+        ValueConv => '$val ? 2048 / $val : $val',
+        ValueConvInv => '$val ? 2048 / $val : $val',
+        PrintConv => 'sprintf("%.1fmm",$val)',
+        PrintConvInv => '$val=~s/ ?mm$//; $val',
     },
     0x05 => { #8
         Name => 'AFAperture',
@@ -1117,7 +1139,7 @@ my %nikonFocalConversions = (
         ValueConv => '0.01 * 10**($val/40)', # in m
         ValueConvInv => '$val>0 ? 40*log($val*100)/log(10) : 0',
         PrintConv => '$val ? sprintf("%.2f m",$val) : "inf"',
-        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/\s.*//, $val',
+        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/\s*m$//, $val',
     },
     0x0a => { #8/9
         Name => 'FocalLength',
@@ -1158,38 +1180,81 @@ my %nikonFocalConversions = (
     },
 );
 
-# not sure what is in this information, but it is encrypted for some cameras
-%Image::ExifTool::Nikon::Nikon0x0091 = (
+# information encrypted in some cameras - ref 18
+%Image::ExifTool::Nikon::ShotInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     DATAMEMBER => [ 0 ],
-    0 => {
-        Name => 'Nikon0x0091Version',
-        RawConv => '$$self{Nikon0x0091Version} = $val',
+    NOTES => 'This information is encrypted for ShotInfoVersion 02xx.',
+    0x00 => {
+        Name => 'ShotInfoVersion',
+        RawConv => '$$self{ShotInfoVersion} = $val',
         Format => 'string[4]',
     },
     0x66 => {
         Name => 'VR_0x66',
-        Condition => '$$self{Nikon0x0091Version} =~ /^(0204)$/',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
         Format => 'int8u',
         Unknown => 1,
         PrintConv => {
             0 => 'VR off',
             1 => 'VR on (normal)',
             2 => 'VR on (active)',
-        }
+        },
+    },
+    # 6a, 6e not correct for 0103 (D70), 0207 (D200)
+    0x6a => {
+        Name => 'ShutterCount',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
+        Format => 'int32u',
+        Priority => 0,
+    },
+    0x6e => {
+        Name => 'DeletedImageCount',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
+        Format => 'int32u',
+        Priority => 0,
     },
     0x82 => {
         Name => 'VR_0x82',
-        Condition => '$$self{Nikon0x0091Version} =~ /^(0204)$/',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
         Format => 'int8u',
         Unknown => 1,
         PrintConv => {
             0 => 'VR off',
             1 => 'VR on (normal)',
             2 => 'code 2 (active?)',
-        }
+        },
+    },
+    # note: DecryptLen currently set to 0x90
+);
+
+# Multi exposure / image overlay information (ref PH)
+%Image::ExifTool::Nikon::MultiExposure = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    FORMAT => 'int32u',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'MultiExposureVersion',
+        Format => 'string[4]',
+    },
+    1 => {
+        Name => 'MultiExposureMode',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Multiple Exposure',
+            2 => 'Image Overlay',
+        },
+    },
+    2 => 'MultiExposureShots',
+    3 => {
+        Name => 'MultiExposureAutoGain',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
     },
 );
 
@@ -1460,7 +1525,10 @@ sub ProcessNikon($$$)
             my ($start, $len, $offset);
             if ($tagInfo and $$tagInfo{SubDirectory}) {
                 $start = $tagInfo->{SubDirectory}->{DecryptStart};
-                $len = $tagInfo->{SubDirectory}->{DecryptLen};
+                # may decrypt only part of the information to save time
+                if ($verbose < 3 and $exifTool->Options('Unknown') < 2) {
+                    $len = $tagInfo->{SubDirectory}->{DecryptLen};
+                }
                 $offset = $tagInfo->{SubDirectory}->{DirOffset};
             }
             $start or $start = 0;
@@ -1478,10 +1546,10 @@ sub ProcessNikon($$$)
             }
             # use fixed serial numbers if no good serial number found
             unless ($serial =~ /^\d+$/) {
-                if ($exifTool->{CameraModel} =~ /\bD200$/) {
-                    $serial = 0x60; # D200 (ref 10)
-                } else {
+                if ($exifTool->{CameraModel} =~ /\bD50$/) {
                     $serial = 0x22; # D50 (ref 8)
+                } else {
+                    $serial = 0x60; # D200 (ref 10), D40X (ref PH)
                 }
             }
             $data = Decrypt(\$data, $serial, $count, $start, $len);

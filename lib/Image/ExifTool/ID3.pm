@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessID3v2($$$);
 
@@ -198,15 +198,18 @@ my %genre = (
     3 => {
         Name => 'Title',
         Format => 'string[30]',
+        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
     },
     33 => {
         Name => 'Artist',
         Groups => { 2 => 'Author' },
         Format => 'string[30]',
+        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
     },
     63 => {
         Name => 'Album',
         Format => 'string[30]',
+        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
     },
     93 => {
         Name => 'Year',
@@ -216,6 +219,7 @@ my %genre = (
     97 => {
         Name => 'Comment',
         Format => 'string[30]',
+        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
     },
     127 => {
         Name => 'Genre',
@@ -297,14 +301,29 @@ ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
 
 # tags common to ID3v2.3 and ID3v2.4
 my %id3v2_common = (
+  # AENC => 'AudioEncryption', # Owner, preview start, preview length, encr data
     APIC => {
         Name => 'Picture',
         Binary => 1,
     },
     COMM => 'Comment',
+  # COMR => 'Commercial',
+  # ENCR => 'EncryptionMethod',
+  # ETCO => 'EventTimingCodes',
+  # GEOB => 'GeneralEncapsulatedObject',
+  # GRID => 'GroupIdentification',
+  # LINK => 'LinkedInformation',
+  # MCDI => 'MusicCDIdentifier',
+  # MLLT => 'MPEGLocationLookupTable',
   # OWNE => 'Ownership', # enc(1), _price, 00, _date(8), Seller
     PCNT => 'PlayCounter',
   # POPM => 'Popularimeter', # _email, 00, rating(1), counter(4-N)
+  # POSS => 'PostSynchronization',
+  # PRIV => 'Private',
+  # RBUF => 'RecommendedBufferSize',
+  # RVRB => 'Reverb',
+  # SYLT => 'SynchronizedLyricText',
+  # SYTC => 'SynchronizedTempoCodes',
     TALB => 'Album',
     TBPM => 'BeatsPerMinute',
     TCOM => 'Composer',
@@ -346,8 +365,9 @@ my %id3v2_common = (
     TSRC => 'ISRC', # (international standard recording code)
     TSSE => 'EncoderSettings',
     TXXX => 'UserDefinedText',
-    USLT => 'Lyrics',
+  # UFID => 'UniqueFileID',
     USER => 'TermsOfUse',
+    USLT => 'Lyrics',
     WCOM => 'CommercialURL',
     WCOP => 'CopyrightURL',
     WOAF => 'FileRUL',
@@ -359,13 +379,15 @@ my %id3v2_common = (
     WXXX => 'UserDefinedURL',
 );
 
-# Tags for ID3v2.3
+# Tags for ID3v2.3 (http://www.id3.org/id3v2.3.0)
 %Image::ExifTool::ID3::v2_3 = (
     PROCESS_PROC => \&Image::ExifTool::ID3::ProcessID3v2,
     GROUPS => { 1 => 'ID3v2_3', 2 => 'Audio' },
     NOTES => 'ID3 version 2.3 tags',
     %id3v2_common,  # include common tags
+  # EQUA => 'Equalization',
     IPLS => 'InvolvedPeople',
+  # RVAD => 'RelativeVolumeAdjustment',
     TDAT => { Name => 'Date', Groups => { 2 => 'Time' } },
     TIME => { Name => 'Time', Groups => { 2 => 'Time' } },
     TORY => 'OriginalReleaseYear',
@@ -374,12 +396,16 @@ my %id3v2_common = (
     TYER => { Name => 'Year', Groups => { 2 => 'Time' } },
 );
 
-# Tags for ID3v2.4
+# Tags for ID3v2.4 (http://www.id3.org/id3v2.4.0-frames)
 %Image::ExifTool::ID3::v2_4 = (
     PROCESS_PROC => \&Image::ExifTool::ID3::ProcessID3v2,
     GROUPS => { 1 => 'ID3v2_4', 2 => 'Audio' },
     NOTES => 'ID3 version 2.4 tags',
     %id3v2_common,  # include common tags
+  # EQU2 => 'Equalization',
+  # RVA2 => 'RelativeVolumeAdjustment',
+  # SEEK => 'Seek',
+  # SIGN => 'Signature',
     TDEN => { Name => 'EncodingTime',       Groups => { 2 => 'Time' } },
     TDOR => { Name => 'OriginalReleaseTime',Groups => { 2 => 'Time' } },
     TDRC => { Name => 'RecordingTime',      Groups => { 2 => 'Time' } },
@@ -437,21 +463,25 @@ sub DecodeString($$)
     my ($exifTool, $val) = @_;
     return '' unless length $val;
     my $enc = unpack('C', $val);
-    return "<Unknown encoding> $val" unless $enc == 0 or $enc == 1;
     $val = substr($val, 1); # remove encoding byte
     $val =~ s/\0+$//;       # remove null padding if it exists
     my @vals;
-    if ($enc) {
+    if ($enc == 0) {        # ISO 8859-1
+        $val = $exifTool->Latin2Charset($val);
+        @vals = split "\0", $val;
+    } elsif ($enc == 3) {   # UTF-8
+        $val = $exifTool->UTF82Charset($val);
+        @vals = split "\0", $val;
+    } elsif ($enc == 1 or $enc == 2) {  # UTF-16 with BOM, or UTF-16BE
+        my $bom = $val =~ s/^(\xfe\xff|\xff\xfe)// ? $1 : "\xfe\xff";
+        my %order = ( "\xfe\xff" => 'MM', "\xff\xfe", => 'II' );
         @vals = split "\0\0", $val;
         foreach $val (@vals) {
-            if ($val =~ s/^\xfe\xff//) {
-                $val = $exifTool->Unicode2Byte($val, 'MM');
-            } elsif ($val =~ s/^\xff\xfe//) {
-                $val = $exifTool->Unicode2Byte($val, 'II');
-            } # (else not really unicode)
+            $val =~ s/^$bom//;          # remove BOM if it exists
+            $val = $exifTool->Unicode2Charset($val, $order{$bom});
         }
     } else {
-        @vals = split "\0", $val;
+        return "<Unknown encoding $enc> $val";
     }
     return @vals if wantarray;
     return join('/',@vals);

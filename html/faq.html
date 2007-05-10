@@ -21,13 +21,14 @@ pre { color: #800; margin-left: 2em }
 <li><a href="#Q4">Aperture and shutter speed</a>
 <li><a href="#Q5">Date and time formats</a>
 <li><a href="#Q6">"Can't convert TAG" errors</a>
-</ol></td><td valign='top'><ol start=7>
 <li><a href="#Q7">Deleting all EXIF from a TIFF</a>
+</ol></td><td valign='top'><ol start=8>
 <li><a href="#Q8">Writing the Make or Model tag</a>
 <li><a href="#Q9">Tag locations when copying</a>
 <li><a href="#Q10">Coded character sets</a>
 <li><a href="#Q11">User-defined tags</a>
 <li><a href="#Q12">Database import</a>
+<li><a href="#Q13">Output file size</a>
 </ol></td></tr></table>
 
 <hr>
@@ -285,18 +286,20 @@ ASCII.   Unless otherwise specified, 8-bit encodings are passed straight through
 ExifTool without translation, and multi-byte encodings are translated to UTF-8
 by default, or Windows Latin1 with the <code>&#8209;L</code> option (or by
 setting the "<code>Charset</code>" option to "<code>Latin</code>" via the API).
-When writing, the inverse translation is performed.  More specific details are
-given below about how character coding is handled for EXIF, IPTC and XMP
-information:</blockquote>
+When writing, the inverse translation is performed.  (Alternatively, special
+characters may be translated to HTML character entities by using the
+<code>&#8209;E</code> option, but this only applies when reading.)  More
+specific details are given below about how character coding is handled for EXIF,
+IPTC, XMP and ID3 information:</blockquote>
 
 <blockquote><b>EXIF</b>: Most textual EXIF information is stored in ASCII
 format, however some EXIF tags (UserComment, GPSProcessingMethod and
 GPSAreaInformation) may be also be encoded in Unicode or JIS.  When reading
-information, Unicode text is translated to either UTF-8 or Windows Latin1
-depending on the ExifTool options.  Other encodings are not translated.  When
-writing, text is stored as ASCII unless the string contains special characters,
-in which case it is translated from UTF-8 or Latin1 (depending on the
-<code>&#8209;L</code> option) and stored as Unicode.  The EXIF "XP" tags
+information, Unicode text is translated to UTF-8, or Windows Latin1
+with the <code>&#8209;L</code> option.  Other encodings are not translated. 
+When writing, text is stored as ASCII unless the string contains special
+characters, in which case it is translated from UTF-8 or Latin1 (depending on
+the <code>&#8209;L</code> option) and stored as Unicode.  The EXIF "XP" tags
 (XPTitle, XPComment, etc) are always stored as Unicode, and are read and written
 as either UTF-8, or Windows Latin1 with the <code>&#8209;L</code>
 option.</blockquote>
@@ -315,14 +318,22 @@ See the <a href="http://www.iptc.org/IIM/">IPTC specification</a> for more
 information about IPTC character coding.</blockquote>
 
 <blockquote><b>XMP</b>: Exiftool reads XMP encoded as UTF-8, UTF-16 or UTF-32,
-and converts them all to UTF-8 internally.  When writing, ExifTool always
-encodes XMP as UTF-8.  By default no further translation is performed, however
-the <code>&#8209;L</code> option may be used used to translate text to Windows
-Latin1 when reading or from Windows Latin1 when writing.</blockquote>
+and converts them all to UTF-8 internally.  Also, all XML character entity
+references and numeric character references are converted.  When writing,
+ExifTool always encodes XMP as UTF-8, converting the following 5 characters to
+XML character references: <code>&amp; &lt; &gt; &#39; &quot;</code>. By default
+no further translation is performed, however the <code>&#8209;L</code> option
+may be used used to translate text to Windows Latin1 when reading or from
+Windows Latin1 when writing.</blockquote>
 
-<blockquote>Note:  ExifTool requires Perl verion 5.6.1 or later for the UTF-8
-translation features.
-</blockquote>
+<blockquote><b>ID3</b>: The ID3v1 specification officially supports only ISO
+8859-1 encoding although some applications may incorrectly use other character
+sets.  ExifTool assumes proper ISO 8859-1 encoding and translates to UTF-8 by
+default, or disables translation with the <code>&#8209;L</code> option (since
+ISO 8859-1 is a subset of Windows Latin1).  ID3v2 text is may be stored with a
+number of different encodings, and ExifTool translates them all to UTF-8 by
+default or Windows Latin1 with the <code>&#8209;L</code> option.  ExifTool does
+not currently write ID3 information.</blockquote>
 
 <a name="Q11"></a>
 <p>11. <b>"My user-defined tags don't work"</b></p>
@@ -408,8 +419,34 @@ command line starts to get too long, you may want to look into using the
 feature).
 </blockquote>
 
+<a name="Q13"></a>
+<p>13. <b>"Why is my file smaller after I use ExifTool to write information?"</b></p>
+
+<blockquote>
+There are various specific reasons why this can happen, but the general answer
+is:  When ExifTool writes an image, the meta information may be restructured in
+such a way that it takes less space than in the original file.</blockquote>
+
+<blockquote>For instance, the EXIF/TIFF standard allows for blocks of
+unreferenced data to exist in an image.  Some digital cameras write JPEG or
+TIFF-based RAW files which contain large blocks of unused data, usually filled
+with binary zeros.  The reason for this could be to simplify camera algorithms
+by allowing variable-sized information to be written at fixed offsets in the
+output image.  When ExifTool rewrites an image it does not copy these unused
+blocks.  This can result in a significant reduction in file size for some
+images.
+</blockquote>
+
+<blockquote>Also, the size of an XMP record may easily shrink or grow when it is
+rewritten, even if no meta information is changed.  This is partly due to the
+fact that the XMP specification recommends a few KB of padding at the end of the
+record (ExifTool adds 2424 bytes by default), and partly due to the flexibility
+of the XMP format which allows the information to be written in various styles,
+some of which are more compact than others.
+</blockquote>
+
 <hr>
-<i>Last revised Feb. 9, 2007</i>
+<i>Last revised Apr. 30, 2007</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

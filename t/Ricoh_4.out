@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.75
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
 [File, File, Image]  - File Name: Ricoh2.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -51,7 +51,7 @@
 [EXIF, GPS, Location] 3 - GPS Longitude Ref: West
 [EXIF, GPS, Location] 4 - GPS Longitude: 0 deg 30' 27.01"
 [EXIF, GPS, Location] 5 - GPS Altitude Ref: Above Sea Level
-[EXIF, GPS, Location] 6 - GPS Altitude: 117 metres
+[EXIF, GPS, Location] 6 - GPS Altitude: 117 m
 [EXIF, GPS, Time] 7 - GPS Time Stamp: 10:47:24
 [EXIF, GPS, Location] 8 - GPS Satellites: 24,23,20,17,13,11,04                           
 [EXIF, GPS, Location] 9 - GPS Status: Measurement In Progress

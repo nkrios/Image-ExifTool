@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.89
 [File, File, Image]  - File Name: Pentax_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1571 bytes
-[File, File, Time]  - File Modification Date/Time: 2007:01:28 08:41:00
+[File, File, Time]  - File Modification Date/Time: 2007:05:07 12:38:28
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -41,7 +41,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: inf
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 62
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 62mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: Low gain down
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -87,7 +87,7 @@
 [MakerNotes, Pentax, Camera] 42 - Pentax 0x002a: 2379
 [MakerNotes, Pentax, Camera] 44 - Pentax 0x002c: 93
 [MakerNotes, Pentax, Camera] 49 - Pentax 0x0031: 0
-[MakerNotes, Pentax, Camera] 50 - Pentax 0x0032: 
+[MakerNotes, Pentax, Camera] 50 - Image Processing: Unprocessed
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x01000000
 [PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x05000000

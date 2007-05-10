@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>exiftool Application Documentation</title>
-<link rev="made" href="mailto:root@b01.apple.com" />
+<link rev="made" href="mailto:root@b19.apple.com" />
 </head>
 
 <body style="background-color: white">
@@ -21,6 +21,11 @@
 	<li><a href="#synopsis">SYNOPSIS</a></li>
 	<li><a href="#description">DESCRIPTION</a></li>
 	<li><a href="#options">OPTIONS</a></li>
+	<ul>
+
+		<li><a href="#advanced_options">Advanced Options</a></li>
+	</ul>
+
 	<li><a href="#reading_examples">READING EXAMPLES</a></li>
 	<li><a href="#writing_examples">WRITING EXAMPLES</a></li>
 	<li><a href="#copying_examples">COPYING EXAMPLES</a></li>
@@ -66,29 +71,29 @@ supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PSD   r/w    |  EXIF           r/w/c
-  AI    r       MIE   r/w/c   QTIF  r      |  GPS            r/w/c
-  AIFF  r       MIFF  r       RA    r      |  IPTC           r/w/c
-  APE   r       MNG   r/w     RAF   r      |  XMP            r/w/c
-  ARW   r       MOS   r/w     RAM   r      |  MakerNotes     r/w/c
-  ASF   r       MOV   r       RAW   r      |  Photoshop IRB  r/w/c
-  AVI   r       MP3   r       RIFF  r      |  ICC Profile    r/w/c
-  BMP   r       MP4   r       RM    r      |  MIE            r/w/c
-  CR2   r/w     MPC   r       SR2   r      |  JFIF           r/w/c
-  CRW   r/w     MPG   r       SRF   r      |  CIFF           r/w
-  DCM   r       MRW   r/w     SWF   r      |  AFCP           r/w
-  DNG   r/w     NEF   r/w     THM   r/w    |  DICOM          r
-  DOC   r       OGG   r       TIFF  r/w    |  FlashPix       r
-  EPS   r/w     ORF   r/w     VRD   r/w    |  GeoTIFF        r
-  ERF   r/w     PBM   r/w     WAV   r      |  PrintIM        r
-  FLAC  r       PDF   r       WDP   r/w    |  ID3            r
-  FPX   r       PEF   r/w     WMA   r      |  Kodak Meta     r
-  GIF   r/w     PGM   r/w     WMV   r      |  Ricoh RMETA    r
-  HTML  r       PICT  r       X3F   r      |  Picture Info   r
-  ICC   r/w/c   PNG   r/w     XLS   r      |  Adobe APP14    r
-  JNG   r/w     PPM   r/w     XMP   r/w/c  |  APE            r
-  JP2   r       PPT   r                    |  Vorbis         r
-  JPEG  r/w     PS    r/w                  |  (and more)</pre>
+  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
+  AI    r       MEF   r       PSD   r/w    |  GPS            r/w/c
+  AIFF  r       MIE   r/w/c   QTIF  r      |  IPTC           r/w/c
+  APE   r       MIFF  r       RA    r      |  XMP            r/w/c
+  ARW   r       MNG   r/w     RAF   r      |  MakerNotes     r/w/c
+  ASF   r       MOS   r/w     RAM   r      |  Photoshop IRB  r/w/c
+  AVI   r       MOV   r       RAW   r/w    |  ICC Profile    r/w/c
+  BMP   r       MP3   r       RIFF  r      |  MIE            r/w/c
+  CR2   r/w     MP4   r       RM    r      |  JFIF           r/w/c
+  CRW   r/w     MPC   r       SR2   r      |  CIFF           r/w
+  DCM   r       MPG   r       SRF   r      |  AFCP           r/w
+  DNG   r/w     MRW   r/w     SWF   r      |  DICOM          r
+  DOC   r       NEF   r/w     THM   r/w    |  FlashPix       r
+  EPS   r/w     OGG   r       TIFF  r/w    |  GeoTIFF        r
+  ERF   r/w     ORF   r/w     VRD   r/w    |  PrintIM        r
+  FLAC  r       PBM   r/w     WAV   r      |  ID3            r
+  FPX   r       PDF   r       WDP   r/w    |  Kodak Meta     r
+  GIF   r/w     PEF   r/w     WMA   r      |  Ricoh RMETA    r
+  HTML  r       PGM   r/w     WMV   r      |  Picture Info   r
+  ICC   r/w/c   PICT  r       X3F   r      |  Adobe APP14    r
+  JNG   r/w     PNG   r/w     XLS   r      |  APE            r
+  JP2   r       PPM   r/w     XMP   r/w/c  |  Vorbis         r
+  JPEG  r/w     PPT   r                    |  (and more)</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are written.
 However, the <strong>-ext</strong> option may be used to force processing of files with
@@ -175,15 +180,30 @@ may also be given by a <em>FMT</em> string where %d, %f and %e represent the
 directory, file name and extension of the original <em>FILE</em> (see the <strong>-w</strong>
 option for more details).  Note that quotes are required around this
 argument to prevent shell redirection since it contains a <code>&lt;</code> symbol.
+<code>+&lt;=</code> or <code>-&lt;=</code> may also be used to add or delete specific list
+entries, or to shift date/time values.
 </dd>
 <p></p>
 <dt><strong><a name="item__2d_40_argfile"><strong>-@</strong> <em>ARGFILE</em></a></strong><br />
 </dt>
 <dd>
 Read command-line arguments from the specified file.  The file contains one
-argument per line.  Blank lines and lines beginning with <code>#</code> and are
-ignored.  <em>ARGFILE</em> may exist relative to either the current directory or
-the exiftool directory unless an absolute pathname is given.
+argument per line (NOT one option per line -- some options require
+additional arguments which must be placed on separate lines).  Blank lines
+and lines beginning with <code>#</code> and are ignored.   Normal shell processing of
+arguments is not performed, which among other things means that arguments
+should not be quoted.  <em>ARGFILE</em> may exist relative to either the current
+directory or the exiftool directory unless an absolute pathname is given.
+</dd>
+<dd>
+<p>For example, the following <em>ARGFILE</em> will set the value of Copyright to
+``Copyright YYYY, Phil Harvey'', where ``YYYY'' is the year of CreateDate:</p>
+</dd>
+<dd>
+<pre>
+    -d
+    %Y
+    -copyright&lt;Copyright $createdate, Phil Harvey</pre>
 </dd>
 <p></p>
 <dt><strong><a name="item__2da"><strong>-a</strong></a></strong><br />
@@ -449,8 +469,8 @@ necessary.  Existing files will not be overwritten.  Combining the
 be erased after the output file is successfully written.</p>
 </dd>
 <dd>
-<p>A special feature of this option allows it to be used to create certain types
-of files from scratch.  Currently, this can only be done with XMP and
+<p>A special feature of this option allows it to be used to create certain
+types of files from scratch.  Currently, this can only be done with XMP and
 ICC/ICM files.  The file is created from a combination of information in
 <em>FILE</em> and tag values assigned on the command line.  This is done by
 specifying a file extension of '.XMP', '.ICC' or '.ICM' for <em>OUTFILE</em>.  The
@@ -704,7 +724,11 @@ example:
 automatically if necessary.</p>
 </dd>
 <dd>
-<p>Advanced feature:  A substring of the original file name, directory or
+<p>Note:  In a Windows BAT file the '%' character is represented by ``%%'', so
+an argument like ``%d%f.txt'' is written as ``%%d%%f.txt''.</p>
+</dd>
+<dd>
+<p>Advanced features:  A substring of the original file name, directory or
 extension may be taken by specifying a field width immediately following the
 '%' character.  If the width is negative, the substring is taken from the
 end.  The substring position (characters to ignore at the start or end of
@@ -721,20 +745,27 @@ For example:</p>
     Picture-123a.jpg    Meta%-3.1f.txt      Meta123.txt</pre>
 </dd>
 <dd>
-<p>For %c, these modifiers have a different effects.  If a field width is given,
-the copy number is padded with zeros to the specified width, and a leading '-'
-is used to add a dash before the copy number.  By default, a copy number of zero
-is omitted, but this can be changed by adding a decimal point to the modifier.
-For example:</p>
+<p>For %c, these modifiers have a different effects.  If a field width is
+given, the copy number is padded with zeros to the specified width.  A
+leading '-' adds a dash before the copy number, and a '+' adds an underline.
+By default, a copy number of zero is omitted, but this can be changed by
+adding a decimal point to the modifier.  For example:</p>
 </dd>
 <dd>
 <pre>
-    -w A%-cZ.txt      # AZ.txt, A-1Z.txt, A-2Z.txt...
-    -w B%5c.txt       # B.txt, B00001.txt, B00002.txt...
-    -w C%.c.txt       # C0.txt, C1.txt, C2.txt...
-    -w D%-.c.txt      # D-0.txt, D-1.txt, D-2.txt...
-    -w E%-.4c.txt     # E-0000.txt, E-0001.txt, E-0002.txt...
-    -w F_%.c.txt      # F_0.txt, F_1.txt F_2.txt...</pre>
+    -w A%-cZ.txt      # AZ.txt, A-1Z.txt, A-2Z.txt ...
+    -w B%5c.txt       # B.txt, B00001.txt, B00002.txt ...
+    -w C%.c.txt       # C0.txt, C1.txt, C2.txt ...
+    -w D%-.c.txt      # D-0.txt, D-1.txt, D-2.txt ...
+    -w E%-.4c.txt     # E-0000.txt, E-0001.txt, E-0002.txt ...
+    -w F%+c.txt       # F.txt, F_1.txt F_2.txt ...
+    -w G%-lc.txt      # G.txt, G-b.txt, G-c.txt ...</pre>
+</dd>
+<dd>
+<p>The format codes may also be modified by 'l' or 'u' to specify lower or
+upper case respectively (ie. ``%le'' for a lower case file extension).  When
+used to modify the copy number, the numbers are changed to an alphabetical
+base (ie. as with ``%lc'' in the last example above).</p>
 </dd>
 <dd>
 <p>This same <em>FMT</em> syntax is used with the <strong>-o</strong> and <strong>-TagsFromFile</strong> options,
@@ -756,6 +787,42 @@ When reading, causes information to be extracted from .g<strong>z</strong> and .
 compressed images.  (Only one image per archive.)  When writing, causes
 compressed information to be written if supported by the image format.  (ie.
 The PNG format supports compressed text.)
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="advanced_options">Advanced Options</a></h2>
+<p>The following options allow complex processing to be performed with a single
+command without the need for additional scripting.  This may be particularly
+useful for implementations such as Windows drag-and-drop applications.
+These options may also be used to improve performance in multi-pass
+processing by reducing the overhead required to load exiftool for each
+invocation.</p>
+<dl>
+<dt><strong><a name="item__2dcommon_args"><strong>-common_args</strong></a></strong><br />
+</dt>
+<dd>
+Specifies that all arguments following this option are common to all
+executed commands when <strong>-execute</strong> is used.  This is the only option that
+may not be used inside a <strong>-@</strong> <em>ARGFILE</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dexecute"><strong>-execute</strong></a></strong><br />
+</dt>
+<dd>
+Execute command for all arguments up to this point on the command line.
+Allows multiple commands to be executed from a single command line.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dsrcfile_fmt"><strong>-srcfile</strong> <em>FMT</em></a></strong><br />
+</dt>
+<dd>
+Specify a different source file to be processed based on the name of the
+original file.  This may be useful in some special situations for processing
+related preview images or sidecar files.  See the <strong>-w</strong> option for a
+description of the <em>FMT</em> syntax.  Note that file name <em>FMT</em> strings for
+all options are based on the original file name specified on the command
+line, not the name of the source file specified by <strong>-srcfile</strong>.
 </dd>
 <p></p></dl>
 <p>
@@ -859,7 +926,7 @@ directory (which is created if it didn't exist), with names of the form
 special characters such as <code>&gt;</code>, <code>&lt;</code> or any white space.  These
 quoting techniques are shell dependent, but the examples below will work for
 most Unix shells.  With the Windows cmd shell however, double quotes should
-be used around the entire argument (ie. ``-Comment=This is a new comment'')</p>
+be used (ie. -Comment=``This is a new comment'').</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dcomment_3d_27this_is_a_new_comment_27_">exiftool -Comment='This is a new comment' dst.jpg</a></strong><br />
 </dt>
@@ -1104,6 +1171,23 @@ Set the Comment tag of all images in <code>dir</code> from the values of the EXI
 and ShutterSpeed tags.  The resulting comment will be in the form ``ISO=100
 Exposure=1/60''.
 </dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dif__27_24jpgfromraw_27__2db__2djpgfrom">exiftool -if '$jpgfromraw' -b -jpgfromraw -w %d%f_%ue.jpg -execute
+-if '$previewimage' -b -previewimage -w %d%f_%ue.jpg -execute
+-tagsfromfile @ -srcfile %d%f_%ue.jpg -overwrite_original
+-common_args --ext jpg DIR</a></strong><br />
+</dt>
+<dd>
+[Advanced] Extract JpgFromRaw or PreviewImage from all but JPG files in DIR,
+saving them with file names like <code>image_EXT.jpg</code>, then add all meta
+information from the original files to the extracted images.  Here, the
+command line is broken into three sections (separated by <strong>-execute</strong>
+options), and each is executed as if it were a separate command.  The
+<strong>-common_args</strong> option causes the <code>--ext jpg DIR</code> arguments to be applied
+to all three commands, and the <strong>-srcfile</strong> option allows the extracted JPG
+image to be the source file for the third command (whereas the RAW files are
+the source files for the other two commands).
+</dd>
 <p></p></dl>
 <p>
 </p>
@@ -1119,7 +1203,7 @@ and %c may be used to add a copy number if the file already exists (see the
 <strong>-w</strong> option for details).  Note that if used within a date format string,
 an extra '%' must be added to pass these codes through the date/time parser.
 (And further note that in a Windows batch file, all '%' characters must also
-be escaped, so in this extreme case a '%%%%f' is necessary to pass a simple
+be escaped, so in this extreme case '%%%%f' is necessary to pass a simple
 '%f' through the two levels of parsing.)</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dfilename_3dnew_2ejpg_dir_2fold_2ejpg">exiftool -filename=new.jpg dir/old.jpg</a></strong><br />
@@ -1200,8 +1284,16 @@ Extract information from an embedded thumbnail image.
 Add an IPTC keyword in a pipeline, saving output to a new file.
 </dd>
 <p></p>
+<dt><strong><a name="item_wget__2dqo__2d_http_3a_2f_2fa_2edomain_2ecom_2fbig">wget -qO - <a href="http://a.domain.com/bigfile.jpg">http://a.domain.com/bigfile.jpg</a> | exiftool -fast -</a></strong><br />
+</dt>
+<dd>
+Extract information from an image over the internet using the GNU wget
+utility.  The <strong>-fast</strong> option prevents exiftool from scanning for trailer
+information, so only the meta information header is transferred.
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool_a_2ejpg__2dthumbnailimage__2db__7c_exifto">exiftool a.jpg -thumbnailimage -b | exiftool -comment=wow - |
-      exiftool a.jpg -thumbnailimage'&lt;=-'</a></strong><br />
+exiftool a.jpg -thumbnailimage'&lt;=-'</a></strong><br />
 </dt>
 <dd>
 Add a comment to an embedded thumbnail image.  (Why anyone would want to do

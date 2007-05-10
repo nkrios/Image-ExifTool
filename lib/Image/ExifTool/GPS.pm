@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.13';
+$VERSION = '1.17';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -81,8 +81,8 @@ my %coordConv = (
     0x0006 => {
         Name => 'GPSAltitude',
         Writable => 'rational64u',
-        PrintConv => '"$val metres"',
-        PrintConvInv => '$val=~s/\s*m.*//;$val',
+        PrintConv => '$val eq "inf" ? $val : "$val m"',
+        PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     0x0007 => {
         Name => 'GPSTimeStamp',
@@ -90,8 +90,31 @@ my %coordConv = (
         Writable => 'rational64u',
         Count => 3,
         Shift => 'Time',
-        ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
+        ValueConv => sub {
+            my $val = shift;
+            my ($h,$m,$s) = split ' ', $val;
+            my $f = (($h || 0) * 60 + ($m || 0)) * 60 + ($s || 0);
+            $h = int($f / 3600); $f -= $h * 3600;
+            $m = int($f / 60);   $f -= $m * 60;
+            $s = int($f);        $f -= $s;
+            $f = int($f * 1000000 + 0.5);
+            if ($f) {
+                ($f = sprintf(".%.6d", $f)) =~ s/0+$//;
+            } else {
+                $f = ''
+            }
+            return sprintf("%.2d:%.2d:%.2d$f",$h,$m,$s);
+        },
         ValueConvInv => '$val=~tr/:/ /;$val',
+        # pull time out of any format date/time string
+        # (eventually handle timezones? -- timestamp should be UTC)
+        PrintConvInv => sub {
+            my $v = shift;
+            $v =~ s/[-+].*//s; # remove timezone
+            my @a = ($v =~ /((?=\d|\.\d)\d*(?:\.\d*)?)/g);
+            push @a, '00' while @a < 3;
+            return "$a[-3]:$a[-2]:$a[-1]";
+        },
     },
     0x0008 => {
         Name => 'GPSSatellites',
@@ -242,6 +265,8 @@ my %coordConv = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => '$val',
+        # pull date out of any format date/time string
+        PrintConvInv => '$val=~/(\d{4}).*?(\d{2}).*?(\d{2})/ ? "$1:$2:$3" : $val',
     },
     0x001E => {
         Name => 'GPSDifferential',
@@ -310,7 +335,7 @@ sub ToDMS($$;$$)
         if ($doPrintConv eq '1') {
             $fmt = ($exifTool->Options('CoordFormat') || q{%d deg %d' %.2f"}) . $ref;
         } else {
-            $fmt = "%d,%.2f$ref";   # use XMP standard format
+            $fmt = "%d,%.6f$ref";   # use XMP standard format
         }
         # count the number of format specifiers
         $num = ($fmt =~ tr/%/%/);
@@ -342,7 +367,7 @@ sub ToDegrees($;$)
     my ($d, $m, $s) = ($val =~ /((?:[+-]?)(?=\d|\.\d)\d*(?:\.\d*)?)/g);
     my $deg = ($d || 0) + (($m || 0) + ($s || 0)/60) / 60;
     # make negative if S or W coordinate
-    $deg = -$deg if $doSign and $val =~ /[^A-Z](S|W)$/i;
+    $deg = -$deg if $doSign ? $val =~ /[^A-Z](S|W)$/i : $deg < 0;
     return $deg;
 }
 

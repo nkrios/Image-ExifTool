@@ -56,7 +56,7 @@ Image::ExifTool - Read and write meta information
 ExifTool provides an extensible set of perl modules to read and write meta
 information in image, audio and video files, including the maker note
 information of many digital cameras by various manufacturers such as Canon,
-Casio, FujiFilm, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
+Casio, FujiFilm, HP, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
 Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo, Sigma/Foveon and
 Sony.
 
@@ -65,29 +65,29 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PSD   r/w    |  EXIF           r/w/c
-  AI    r       MIE   r/w/c   QTIF  r      |  GPS            r/w/c
-  AIFF  r       MIFF  r       RA    r      |  IPTC           r/w/c
-  APE   r       MNG   r/w     RAF   r      |  XMP            r/w/c
-  ARW   r       MOS   r/w     RAM   r      |  MakerNotes     r/w/c
-  ASF   r       MOV   r       RAW   r      |  Photoshop IRB  r/w/c
-  AVI   r       MP3   r       RIFF  r      |  ICC Profile    r/w/c
-  BMP   r       MP4   r       RM    r      |  MIE            r/w/c
-  CR2   r/w     MPC   r       SR2   r      |  JFIF           r/w/c
-  CRW   r/w     MPG   r       SRF   r      |  CIFF           r/w
-  DCM   r       MRW   r/w     SWF   r      |  AFCP           r/w
-  DNG   r/w     NEF   r/w     THM   r/w    |  DICOM          r
-  DOC   r       OGG   r       TIFF  r/w    |  FlashPix       r
-  EPS   r/w     ORF   r/w     VRD   r/w    |  GeoTIFF        r
-  ERF   r/w     PBM   r/w     WAV   r      |  PrintIM        r
-  FLAC  r       PDF   r       WDP   r/w    |  ID3            r
-  FPX   r       PEF   r/w     WMA   r      |  Kodak Meta     r
-  GIF   r/w     PGM   r/w     WMV   r      |  Ricoh RMETA    r
-  HTML  r       PICT  r       X3F   r      |  Picture Info   r
-  ICC   r/w/c   PNG   r/w     XLS   r      |  Adobe APP14    r
-  JNG   r/w     PPM   r/w     XMP   r/w/c  |  APE            r
-  JP2   r       PPT   r                    |  Vorbis         r
-  JPEG  r/w     PS    r/w                  |  (and more)
+  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
+  AI    r       MEF   r       PSD   r/w    |  GPS            r/w/c
+  AIFF  r       MIE   r/w/c   QTIF  r      |  IPTC           r/w/c
+  APE   r       MIFF  r       RA    r      |  XMP            r/w/c
+  ARW   r       MNG   r/w     RAF   r      |  MakerNotes     r/w/c
+  ASF   r       MOS   r/w     RAM   r      |  Photoshop IRB  r/w/c
+  AVI   r       MOV   r       RAW   r/w    |  ICC Profile    r/w/c
+  BMP   r       MP3   r       RIFF  r      |  MIE            r/w/c
+  CR2   r/w     MP4   r       RM    r      |  JFIF           r/w/c
+  CRW   r/w     MPC   r       SR2   r      |  CIFF           r/w
+  DCM   r       MPG   r       SRF   r      |  AFCP           r/w
+  DNG   r/w     MRW   r/w     SWF   r      |  DICOM          r
+  DOC   r       NEF   r/w     THM   r/w    |  FlashPix       r
+  EPS   r/w     OGG   r       TIFF  r/w    |  GeoTIFF        r
+  ERF   r/w     ORF   r/w     VRD   r/w    |  PrintIM        r
+  FLAC  r       PBM   r/w     WAV   r      |  ID3            r
+  FPX   r       PDF   r       WDP   r/w    |  Kodak Meta     r
+  GIF   r/w     PEF   r/w     WMA   r      |  Ricoh RMETA    r
+  HTML  r       PGM   r/w     WMV   r      |  Picture Info   r
+  ICC   r/w/c   PICT  r       X3F   r      |  Adobe APP14    r
+  JNG   r/w     PNG   r/w     XLS   r      |  APE            r
+  JP2   r       PPM   r/w     XMP   r/w/c  |  Vorbis         r
+  JPEG  r/w     PPT   r                    |  (and more)
 
 =head1 CONFIGURATION
 
@@ -335,11 +335,14 @@ big-endian ('MM') order is assumed.
 
 =item Charset
 
-Character set for converting 16-bit Unicode character strings.  Valid values
-are:
+Character set for converting special characters.  Valid values are:
 
   UTF8  - UTF-8 characters (the default)
   Latin - Windows Latin1 (cp1252)
+
+Note that this option affects some types of information when reading/writing
+the file and other types when getting/setting tag values, so it must be
+defined for both types of access.
 
 =item Compact
 
@@ -411,7 +414,7 @@ or undef (the default) for no base adjustment.
 Extract tags only for specified groups in family # (Group0 assumed if #
 not given).  The option value may be a single group name or a reference
 to a list of groups.  Case is significant in group names.  Specify a
-group to be excluded by preceeding group name with a '-'.  See
+group to be excluded by preceding group name with a '-'.  See
 L</GetAllGroups> for a list of available groups.
 
 =item HtmlDump
@@ -440,8 +443,15 @@ concatenating them into comma-separated strings.  Default is 0.
 
 =item MakerNotes
 
-Flag to cause MakerNotes data and other writable subdirectories (such as
-PrintIM) to be extracted as a data block.
+Flag to cause MakerNotes and other writable subdirectories (such as PrintIM)
+to be extracted as a data block.  Normally when the MakerNotes are extracted
+they are rebuilt to include data outside the boundaries of the original
+maker note data block, but a value of 2 disables this feature.  Possible
+values are:
+
+  0 - Do not extract writable subdirectories [default]
+  1 - Extract and rebuild maker notes into self-contained block
+  2 - Extract without rebuilding maker notes
 
 =item MissingTagValue
 
@@ -596,7 +606,8 @@ additional files without the need to call L</SetNewValue> again.
 
 0) ExifTool object reference
 
-1) Source file name, file reference, or scalar reference
+1) Source file name, file reference, scalar reference, or undefined to
+create a file from scratch
 
 2) [optional] Destination file name, file or scalar reference
 
@@ -608,7 +619,7 @@ additional files without the need to call L</SetNewValue> again.
 file write error.
 
 If an error code is returned, an Error tag is set and GetValue('Error') can
-be called to obtain the error description.  A Warning tag mag be set even if
+be called to obtain the error description.  A Warning tag may be set even if
 this routine is successful.
 
     $errorMessage = $exifTool->GetValue('Error');
@@ -864,7 +875,7 @@ the list.  Valid values are 0 or 1.  Default is 0.
 
 =item DelValue
 
-Delete the exisiting tag if it has the specified value.  Valid values are
+Delete the existing tag if it has the specified value.  Valid values are
 0 or 1.  Default is 0.
 
 =item Group
@@ -890,8 +901,8 @@ names indicating 'unsafe' and 'protected' tags.  Default is 0.
 
 Flag to replace the previous new value for this tag (ie. replace the value
 set in a previous call to L</SetNewValue>).  Valid values are 0 (don't
-repace), 1 (replace with specified new value) or 2 (reset previous new value
-only).
+replace), 1 (replace with specified new value) or 2 (reset previous new
+value only).
 
 =item Shift
 
@@ -949,7 +960,7 @@ in a specified file.
 2-N) [optional] List of tag names to set.  All writable tags are set if none
 are specified.  The tag names are not case sensitive, and may be prefixed by
 an optional family 0 or 1 group name, separated by a colon (ie. 'exif:iso').
-A leading '-' indicates tags to be excuded (ie. '-comment').  An asterisk
+A leading '-' indicates tags to be excluded (ie. '-comment').  An asterisk
 ('*') may be used for the tag name, and is useful when a group is specified
 to set all tags from a group (ie. 'XMP:*').  A special feature allows tag
 names of the form 'SRCTAG>DSTTAG' (or 'DSTTAGE<lt>SRCTAG') to be specified
@@ -987,7 +998,7 @@ If a preview image exists, it is not copied.  The preview image must be
 transferred separately if desired.
 
 When simply copying all information between files of the same type, it is
-usually desireable to preserve the original groups by specifying '*:*' for
+usually desirable to preserve the original groups by specifying '*:*' for
 the tags to set.
 
 =back
@@ -1022,7 +1033,7 @@ deleted (ie. if SetNewValue was called without a value).
 Return the total number of new values set.
 
     $numSet = $exifTool->CountNewValues();
-    ($numSet, $numQuick) = $exifTool->CountNewValues();
+    ($numSet, $numPseudo) = $exifTool->CountNewValues();
 
 =over 4
 
@@ -1033,9 +1044,9 @@ Return the total number of new values set.
 =item Return Values:
 
 In scalar context, returns the total number of tags with new values set.  In
-list context, also returns the number of "quick" tag values which have been
-set.  "Quick" tags are tags like FileName and FileModifyDate which can be
-changed without the need to rewrite the file.
+list context, also returns the number of "pseudo" tag values which have been
+set.  "Pseudo" tags are tags like FileName and FileModifyDate which are not
+contained within the file and can be changed without rewriting the file.
 
 =back
 
@@ -1438,7 +1449,7 @@ SigmaRaw, Vorbis, XMP
 AFCP, AIFF, APE, ASF, Adobe, BMP, Canon, CanonCustom, CanonRaw, CanonVRD,
 Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool, FLAC, File,
 Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD,
-GraphConv, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv,
+GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv,
 ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1,
 ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JPEG, JVC,
 Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw, Leaf,
@@ -1451,7 +1462,7 @@ PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
 PostScript, PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR,
 Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#,
 Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-lr,
 XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp,
 XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 

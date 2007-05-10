@@ -370,7 +370,10 @@ to a specific function.</p>
     maintained.  If ByteOrder is not defined, then the order of the maker notes is
     used (if they are being copied), otherwise big-endian ('MM') order is assumed.</td>
     <td align='center'>'MM','II' or undef</td><td align=center>undef</td></tr>
-<tr><td>Charset</td><td>Character set for converting 16-bit Unicode character strings.</td>
+<tr><td>Charset</td><td>Character set for converting special characters. Note
+    that this option affects some types of information when reading/writing the
+    file and other types when getting/setting tag values, so it must be defined
+    for both types of access.</td>
     <td><table class='clear'>
     <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF-8 characters</td></tr>
     <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
@@ -395,7 +398,7 @@ to a specific function.</p>
 <tr><td>Exclude</td>
     <td>Exclude specified tags</td>
     <td>Tag name or reference to a list of tag names to exclude.  Case is not significant.
-    Tags may also be excluded by preceeding their name with a '-' in the arguments to ImageInfo.</td>
+    Tags may also be excluded by preceding their name with a '-' in the arguments to ImageInfo.</td>
     <td align='center'>undef</td></tr>
 <tr><td>FastScan</td>
     <td>Flag to increase speed of extracting information from JPEG images.  With this
@@ -437,9 +440,15 @@ to a specific function.</p>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>List</td><td>Flag to extract lists of PrintConv values into arrays instead of concatenating
     them into comma-separated strings.</td><td align='center'>0 or 1</td><td align='center'>0</td></tr>
-<tr><td>MakerNotes</td><td>Flag to cause MakerNotes data and other writable subdirectories
-    (such as PrintIM) to be extracted as a data block.</td>
-    <td align='center'>0 or 1</td><td align='center'>0</td></tr>
+<tr><td>MakerNotes</td><td>Flag to cause MakerNotes and other writable subdirectories
+    (such as PrintIM) to be extracted as a data block.  Normally when the MakerNotes
+    are extracted they are rebuilt to include data outside the boundaries of the
+    original maker note data block, but a value of 2 disables this feature.</td>
+    <td><table class='clear'>
+    <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Don't extract writable subdirectories</td></tr>
+    <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Extract and rebuild makernotes into self-contained block</td></tr>
+    <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Extract without rebuilding makernotes</td></tr>
+    </table></td><td align=center>0</td></tr>
 <tr><td>MissingTagValue</td><td><a name="MissingTagValue">Value</a> for missing tags in
     expressions evaluated by <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>.
     If not set, a minor error is issued for missing values, or the value
@@ -576,7 +585,8 @@ to additional files without the need to call
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>WriteInfo($$;$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
-    <br><b>1)</b> Source file name, file reference, or scalar reference
+    <br><b>1)</b> Source file name, file reference, scalar reference, or undefined
+    to create a file from scratch
     <br><b>2)</b> [<i>optional</i>] Destination file name, file or scalar reference
     <br><b>3)</b> [<i>optional</i>] Destination file type
 </td></tr>
@@ -609,7 +619,7 @@ $errorMessage = $exifTool-&gt;<a href="#GetValue">GetValue</a>('Error');
 $warningMessage = $exifTool-&gt;<a href="#GetValue">GetValue</a>('Warning');
 </pre></td></tr></table></blockquote>
 <p>If an error code is returned, an Error tag is set and GetValue('Error') can
-be called to obtain the error description.  A Warning tag mag be set even if
+be called to obtain the error description.  A Warning tag may be set even if
 this routine is successful.</p>
 
 <hr><h2><a name="CombineInfo">CombineInfo</a></h2>
@@ -855,7 +865,7 @@ in a specified file.</p>
  none are specified.  The tag names are not case sensitive, and may be prefixed
  by an optional family 0 or 1 group name, separated by a colon (ie.
  '<code>exif:iso</code>'). A leading '<code>-</code>' indicates tags to be
- excuded (ie. '<code>-comment</code>').  An asterisk ('<code>*</code>') may be
+ excluded (ie. '<code>-comment</code>').  An asterisk ('<code>*</code>') may be
  used for the tag name, and is useful when a group is specified to set all tags
  from a group (ie. '<code>XMP:*</code>').
  <br>&nbsp;<br>
@@ -917,7 +927,7 @@ on to provide more reliable transfer of information between groups.</p>
 <p>If a preview image exists, it is not copied.  The preview image must be
 transferred separately if desired.</p>
 <p>When simply copying all information between files of the same type, it is
-usually desireable to preserve the original groups by specifying
+usually desirable to preserve the original groups by specifying
 '<code>*:*</code>' for the tags to set.</p>
 
 <hr><h2><a name="GetNewValues">GetNewValues</a></h2>
@@ -949,14 +959,14 @@ my @rawVals = $exifTool-&gt;<b>GetNewValues</b>($tag);
 </td></tr>
 <tr><td><b>Returns</b></td><td>In scalar context, returns the total number
 of tags with new values set.  In list context, also returns the number of
-"quick" tag values which have been set.  "Quick" tags are tags like FileName
-and FileModifyDate which can be changed without the need to rewrite the
-file.</td></tr>
+"pseudo" tag values which have been set.  "Pseudo" tags are tags like FileName
+and FileModifyDate which are not contained within the file and can be changed
+without rewriting the file.</td></tr>
 </table></blockquote>
 <p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 my $numSet = $exifTool-&gt;<b>CountNewValues</b>();
-my ($numSet, $numQuick) = $exifTool-&gt;<b>CountNewValues</b>();
+my ($numSet, $numPseudo) = $exifTool-&gt;<b>CountNewValues</b>();
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SaveNewValues">SaveNewValues</a></h2>
@@ -1280,7 +1290,7 @@ SigmaRaw, Vorbis, XMP
 <td>AFCP, AIFF, APE, ASF, Adobe, BMP, Canon, CanonCustom, CanonRaw,
 CanonVRD, Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool,
 FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff,
-GlobParamIFD, GraphConv, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
+GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
 HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
 ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF,
 JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw,
@@ -1293,7 +1303,7 @@ PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
 PostScript, PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR,
 Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#,
 Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-lr,
 XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp,
 XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>

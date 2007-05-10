@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -470,7 +470,6 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x26000003 => {
         Name => 'FocalPlaneResolutionUnit',
         Groups => { 2 => 'Camera' },
-        ValueConv => $Image::ExifTool::Exif::Main{0xa210}->{ValueConv},
         PrintConv => $Image::ExifTool::Exif::Main{0xa210}->{PrintConv},
     },
     0x26000004 => 'SpatialFrequencyResponse',
@@ -697,7 +696,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x10000001 => 'RectangleOfInterest',
     0x10000002 => 'Filtering',
     0x10000003 => 'SpatialOrientation',
-    0x10000004 => 'ColortwistMatrix',
+    0x10000004 => 'ColorTwistMatrix',
     0x10000005 => 'ContrastAdjustment',
 );
 
@@ -872,7 +871,7 @@ sub ReadFPXValue($$$$$;$)
                 $val = substr($$dataPt, $valPos + 4, $len);
                 if ($format eq 'VT_LPWSTR') {
                     # convert wide string from Unicode
-                    $val = $exifTool->Unicode2Byte($val);
+                    $val = $exifTool->Unicode2Charset($val);
                 } elsif ($opts & 0x02) {
                     # convert from Latin1 to UTF-8
                     $val = Image::ExifTool::Latin2Unicode($val,'v');

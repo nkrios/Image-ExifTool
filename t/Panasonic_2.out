@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.90
 [File, File, Image]  - File Name: Panasonic.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:07 13:39:07
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -43,7 +43,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 0
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 35
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 35mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: None
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -58,10 +58,10 @@
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Panasonic, Camera] 1 - Image Quality: High
-[MakerNotes, Panasonic, Camera] 2 - Firmware Version: 0.1.0.8
+[MakerNotes, Panasonic, Camera] 2 - Production Version: 0.1.0.8
 [MakerNotes, Panasonic, Camera] 3 - White Balance: Auto
 [MakerNotes, Panasonic, Camera] 7 - Focus Mode: Auto
-[MakerNotes, Panasonic, Camera] 15 - Spot Mode: Spot Mode On
+[MakerNotes, Panasonic, Camera] 15 - AF Mode: Spot Mode On
 [MakerNotes, Panasonic, Camera] 26 - Image Stabilizer: On, Mode 2
 [MakerNotes, Panasonic, Camera] 28 - Macro Mode: Off
 [MakerNotes, Panasonic, Camera] 31 - Shooting Mode: Program

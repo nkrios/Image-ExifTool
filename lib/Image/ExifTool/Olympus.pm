@@ -25,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.33';
+$VERSION = '1.36';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -204,7 +204,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'FocalPlaneDiagonal',
         Writable => 'rational64u',
         PrintConv => '"$val mm"',
-        PrintConvInv => '$val=~s/\s+.*//;$val',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     0x0206 => { #6
         Name => 'LensDistortionParams',
@@ -534,50 +534,131 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 # the size, but also the count is 2 bytes short for the subdirectory itself
 # (presumably the Olympus programmers forgot about the 2-byte entry count at the
 # start of the subdirectory).  This mess is straightened out and these subdirs
-# are written properly when ExifTool rewrites the file. - PH
+# are written properly when ExifTool rewrites the file.  (This problem has been
+# fixed in the new-style MakerNoteOlympus2 maker notes since a standard SubIFD
+# offset value is used.) - PH
 #
-    0x2010 => { #PH
-        Name => 'Equipment',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::Equipment',
-            ByteOrder => 'Unknown',
+    0x2010 => [ #PH
+        {
+            Name => 'Equipment',
+            Condition => 'not $$self{OlympusType2}',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::Equipment',
+                ByteOrder => 'Unknown',
+            },
         },
-    },
-    0x2020 => { #PH
-        Name => 'CameraSettings',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::CameraSettings',
-            ByteOrder => 'Unknown',
+        {
+            Name => 'Equipment2',
+            Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+            Flags => 'SubIFD',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::Equipment',
+                Start => '$val',
+            },
         },
-    },
-    0x2030 => { #PH
-        Name => 'RawDevelopment',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::RawDevelopment',
-            ByteOrder => 'Unknown',
+    ],
+    0x2020 => [ #PH
+        {
+            Name => 'CameraSettings',
+            Condition => 'not $$self{OlympusType2}',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::CameraSettings',
+                ByteOrder => 'Unknown',
+            },
         },
-    },
-    0x2040 => { #PH
-        Name => 'ImageProcessing',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::ImageProcessing',
-            ByteOrder => 'Unknown',
+        {
+            Name => 'CameraSettings2',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::CameraSettings',
+                Start => '$val',
+            },
         },
-    },
-    0x2050 => { #PH
-        Name => 'FocusInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FocusInfo',
-            ByteOrder => 'Unknown',
+    ],
+    0x2030 => [ #PH
+        {
+            Name => 'RawDevelopment',
+            Condition => 'not $$self{OlympusType2}',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::RawDevelopment',
+                ByteOrder => 'Unknown',
+            },
         },
-    },
-    0x3000 => { #6
-        Name => 'RawInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::RawInfo',
-            ByteOrder => 'Unknown',
+        {
+            Name => 'RawDevelopment2',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::RawDevelopment',
+                Start => '$val',
+            },
         },
-    },
+    ],
+    0x2040 => [ #PH
+        {
+            Name => 'ImageProcessing',
+            Condition => 'not $$self{OlympusType2}',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::ImageProcessing',
+                ByteOrder => 'Unknown',
+            },
+        },
+        {
+            Name => 'ImageProcessing2',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::ImageProcessing',
+                Start => '$val',
+            },
+        },
+    ],
+    0x2050 => [ #PH
+        {
+            Name => 'FocusInfo',
+            Condition => 'not ($$self{OlympusType2} or $$self{OlympusCAMER})',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FocusInfo',
+                ByteOrder => 'Unknown',
+            },
+        },
+        {
+            Name => 'FocusInfo2',
+            Condition => 'not $$self{OlympusCAMER}',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FocusInfo',
+                Start => '$val',
+            },
+        },
+        {
+            # ASCII-based camera parameters if makernotes starts with "CAMER\0"
+            Name => 'CameraParameters',
+            Writable => 'undef',
+            Binary => 1,
+        },
+    ],
+    0x3000 => [
+        { #6
+            Name => 'RawInfo',
+            Condition => 'not $$self{OlympusType2}',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::RawInfo',
+                ByteOrder => 'Unknown',
+            },
+        },
+        { #PH
+            Name => 'RawInfo2',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::RawInfo',
+                Start => '$val',
+            },
+        },
+    ],
 );
 
 # TextInfo tags
@@ -631,7 +712,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'FocalPlaneDiagonal',
         Writable => 'rational64u',
         PrintConv => '"$val mm"',
-        PrintConvInv => '$val=~s/\s+.*//;$val',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     0x104 => { #6
         Name => 'BodyFirmwareVersion',
@@ -1125,6 +1206,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             4 => 'RAW',
         },
     },
+    0x901 => { #PH (u770SW)
+        # 2 numbers: 1st looks like meters above sea level, 2nd is usually 3x the 1st (feet?)
+        Name => 'ManometerReading',
+        Writable => 'int32s',
+        Count => 2,
+    },
 );
 
 # Subdir 3 (ref 6)
@@ -1318,7 +1405,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             return "$val 1";
         },
         PrintConv => '$val ? "$val m" : "inf"',
-        PrintConvInv => '$val eq "inf" ? 0 : $val =~ s/\s.*//, $val',
+        PrintConvInv => '$val eq "inf" ? 0 : $val=~s/\s*m$//, $val',
     },
     # 0x31a Continuous AF parameters?
     # 0x1200-0x1209 Flash information:

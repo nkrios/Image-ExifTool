@@ -110,7 +110,7 @@ sub ProcessAPP12($$$);
         Name => 'Copyright',
         Format => 'undef[$size-16]',
         Groups => { 2 => 'Author' },
-        ValueConv => '$self->Unicode2Byte($val)',
+        ValueConv => '$self->Unicode2Charset($val)',
     },
 );
 

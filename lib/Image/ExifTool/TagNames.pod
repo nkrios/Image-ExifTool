@@ -118,7 +118,7 @@ Format).
      14    ColorSpace                           N
      15    BitsPerSample                        N
      16    Compression                          N
-     17    ResolutionUnits                      N
+     17    ResolutionUnit                       N
      18    YResolution                          N
      22    XResolution                          N
 
@@ -372,6 +372,10 @@ images.
            MakerNoteCasio            ExifIFD    Casio
            MakerNoteCasio2           ExifIFD    Casio Type2
            MakerNoteFujiFilm         ExifIFD    FujiFilm
+           MakerNoteHP               ExifIFD    HP
+           MakerNoteHP2              ExifIFD    HP Type2
+           MakerNoteHP4              ExifIFD    HP Type4
+           MakerNoteHP6              ExifIFD    HP Type6
            MakerNoteJVC              ExifIFD    JVC
            MakerNoteJVCText          ExifIFD    JVC Text
            MakerNoteKodak1a          ExifIFD    Kodak
@@ -386,12 +390,12 @@ images.
            MakerNoteKyocera          ExifIFD    Unknown
            MakerNoteMinolta          ExifIFD    Minolta
            MakerNoteMinolta2         ExifIFD    Olympus
-           MakerNoteMinolta3         ExifIFD    FujiFilm
-           MakerNoteMinolta4         ExifIFD    undef
+           MakerNoteMinolta3         ExifIFD    undef
            MakerNoteNikon            ExifIFD    Nikon
            MakerNoteNikon2           ExifIFD    Nikon Type2
            MakerNoteNikon3           ExifIFD    Nikon
            MakerNoteOlympus          ExifIFD    Olympus
+           MakerNoteOlympus2         ExifIFD    Olympus
            MakerNoteLeica            ExifIFD    Panasonic
            MakerNotePanasonic        ExifIFD    Panasonic
            MakerNotePanasonic2       ExifIFD    Panasonic Type2
@@ -654,6 +658,7 @@ own set of tags.
     200    ObjectPreviewFileFormat              int16u
     201    ObjectPreviewFileVersion             int16u
     202    ObjectPreviewData                    string[0,256000]
+    221    Prefs                                string[0,64]
     225    ClassifyState                        string[0,64]
     228    SimilarityIndex                      string[0,32]
     230    DocumentNotes                        string[0,1024]
@@ -753,6 +758,7 @@ but this information is extracted by ExifTool anyway.
   dex                                           XMP dex
   exif                                          XMP exif
   iptcCore                                      XMP iptcCore
+  lr                                            XMP Lightroom
   microsoft                                     XMP Microsoft
   pdf                                           XMP pdf
   photomech                                     PhotoMechanic XMP
@@ -808,6 +814,7 @@ Photoshop Camera Raw Schema tags.
   ChromaticAberrationR                          integer
   ColorNoiseReduction                           integer
   Contrast                                      integer/
+  ConvertToGrayscale                            boolean
   CropAngle                                     real
   CropBottom                                    real
   CropHeight                                    real
@@ -817,23 +824,64 @@ Photoshop Camera Raw Schema tags.
   CropUnits                                     integer
   CropWidth                                     real
   Exposure                                      real
+  FillLight                                     integer
   GreenHue                                      integer
   GreenSaturation                               integer
   HasCrop                                       boolean
   HasSettings                                   boolean
+  HighlightRecovery                             integer
+  HueAdjustmentAqua                             integer
+  HueAdjustmentBlue                             integer
+  HueAdjustmentGreen                            integer
+  HueAdjustmentMagenta                          integer
+  HueAdjustmentOrange                           integer
+  HueAdjustmentPurple                           integer
+  HueAdjustmentRed                              integer
+  HueAdjustmentYellow                           integer
+  IncrementalTemperature                        integer
+  IncrementalTint                               integer
+  LuminanceAdjustmentAqua                       integer
+  LuminanceAdjustmentBlue                       integer
+  LuminanceAdjustmentGreen                      integer
+  LuminanceAdjustmentMagenta                    integer
+  LuminanceAdjustmentOrange                     integer
+  LuminanceAdjustmentPurple                     integer
+  LuminanceAdjustmentRed                        integer
+  LuminanceAdjustmentYellow                     integer
   LuminanceSmoothing                            integer
+  ParametricDarks                               integer
+  ParametricHighlights                          integer
+  ParametricHighlightSplit                      integer
+  ParametricLights                              integer
+  ParametricMidtoneSplit                        integer
+  ParametricShadows                             integer
+  ParametricShadowSplit                         integer
   RawFileName                                   string
   RedHue                                        integer
   RedSaturation                                 integer
   Saturation                                    integer/
+  SaturationAdjustmentAqua                      integer
+  SaturationAdjustmentBlue                      integer
+  SaturationAdjustmentGreen                     integer
+  SaturationAdjustmentMagenta                   integer
+  SaturationAdjustmentOrange                    integer
+  SaturationAdjustmentPurple                    integer
+  SaturationAdjustmentRed                       integer
+  SaturationAdjustmentYellow                    integer
   Shadows                                       integer
   ShadowTint                                    integer
   Sharpness                                     integer/
+  SplitToningBalance                            integer
+  SplitToningHighlightHue                       integer
+  SplitToningHighlightSaturation                integer
+  SplitToningShadowHue                          integer
+  SplitToningShadowSaturation                   integer
   Temperature                                   integer
   Tint                                          integer
   ToneCurve                                     string+
   ToneCurveName                                 string
   Version                                       string
+  Vibrance                                      integer
   VignetteAmount                                integer
   VignetteMidpoint                              integer
   WhiteBalance                                  string/
@@ -1000,12 +1048,20 @@ shortens this for the "XMP-iptcCore" family 1 group name.
   Scene                                         string+
   SubjectCode                                   string+
 
+=head3 XMP Lightroom Tags
+
+Adobe Lightroom "lr" schema tags.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  PrivateRTKInfo                                string
+
 =head3 XMP Microsoft Tags
 
 Microsoft Photo schema tags.  This is likely not a complete list, but
 represents tags which have been observed in sample images.  The actual
 namespace prefix is "MicrosoftPhoto", but ExifTool shortens this to
-"XMP-microsoft" in the group1 family name.
+"XMP-microsoft" in the family 1 group name.
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1055,6 +1111,7 @@ Adobe Photoshop schema tags.
   Headline                                      string
   ICCProfileName                                string
   Instructions                                  string
+  LegacyIPTCDigest                              string
   Source                                        string/
   State                                         string
   SupplementalCategories                        string+
@@ -1713,6 +1770,7 @@ This information is found in the PSD file header.
   0x000a   ColorInfoD30                         Canon ColorInfoD30
   0x000c   SerialNumber                         int32u
   0x000d   CanonCameraInfo                      Canon CameraInfo
+           CanonCameraInfo1DmkIII               Canon CameraInfo1DmkIII
   0x000e   CanonFileLength                      int32u
   0x000f   CustomFunctions1D                    CanonCustom Functions1D
            CustomFunctions5D                    CanonCustom Functions5D
@@ -1737,6 +1795,7 @@ This information is found in the PSD file header.
   0x0095   LensType                             string
   0x0096   InternalSerialNumber                 string
   0x0097   DustRemovalData                      N
+  0x0099   CustomFunctions1DmkIII               CanonCustom Functions1DmkIII
   0x00a0   ProccessingInfo                      Canon Processing
   0x00a1   ToneCurveTable                       N
   0x00a2   SharpnessTable                       N
@@ -1758,6 +1817,7 @@ This information is found in the PSD file header.
   0x4002   UnknownBlock1?                       N
   0x4003   ColorInfo                            Canon ColorInfo
   0x4005   UnknownBlock2?                       N
+  0x4008   BlackLevel?                          N
 
 =head3 Canon CameraSettings Tags
 
@@ -1907,6 +1967,12 @@ Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.
     270    UserDef2PictureStyle                 int16u
     272    UserDef3PictureStyle                 int16u
     284    TimeStamp                            int32u
+
+=head3 Canon CameraInfo1DmkIII Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      4    ExposureTime                         int8u
 
 =head3 Canon PictureInfo Tags
 
@@ -2154,6 +2220,9 @@ This table is used by the 1DmkIIN, 5D, 30D and 400D.
 
 =head3 CanonCustom Functions1D Tags
 
+These custom functions are used by all 1D models up to but not including the
+Mark III.
+
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
       0    FocusingScreen                       int8u
@@ -2396,6 +2465,74 @@ Personal function settings for the EOS-1D.
      23    PF25ColorMatrix                      int16u
      24    PF27Value                            int16u
 
+=head3 CanonCustom Functions1DmkIII Tags
+
+The EOS 1D Mark III has 57 custom function tags divided into four main
+groups: 1. Exposure (0x0101-0x010f), 2. Image (0x0201-0x0203), Flash
+Exposure (0x0304-0x0306) and Display (0x0407-0x0409), 3. Auto Focus
+(0x0501-0x050e) and Drive (0x060f-0x0611), and 4. Operation (0x0701-0x070a)
+and Others (0x080b-0x0810).
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0101   ExposureLevelIncrements              int32u
+  0x0102   ISOSpeedIncrements                   int32u
+  0x0103   ISOSpeedRange                        int32u[3]
+  0x0104   AEBAutoCancel                        int32u
+  0x0105   AEBSequence                          int32u
+  0x0106   AEBShotCount                         int32u
+  0x0107   SpotMeterLinkToAFPoint               int32u
+  0x0108   SafetyShift                          int32u
+  0x0109   UsableShootingModes                  int32u[2]
+  0x010a   UsableMeteringModes                  int32u[2]
+  0x010b   ExposureModeInManual                 int32u
+  0x010c   ShutterSpeedRange                    int32u[3]
+  0x010d   ApertureRange                        int32u[3]
+  0x010e   ApplyShootingMeteringMode            int32u[8]
+  0x010f   FlashSyncSpeedAv                     int32u
+  0x0201   LongExposureNoiseReduction           int32u
+  0x0202   HighISONoiseReduction                int32u
+  0x0203   HighlightTonePriority                int32u
+  0x0304   ETTLII                               int32u
+  0x0305   ShutterCurtainSync                   int32u
+  0x0306   FlashFiring                          int32u
+  0x0407   ViewInfoDuringExposure               int32u
+  0x0408   LCDIlluminationDuringBulb            int32u
+  0x0409   InfoButtonWhenShooting               int32u
+  0x0501   USMLensElectronicMF                  int32u
+  0x0502   AIServoTrackingSensitivity           int32u
+  0x0503   AIServoImagePriority                 int32u
+  0x0504   AIServoTrackingMethod                int32u
+  0x0505   LensDriveNoAF                        int32u
+  0x0506   LensAFStopButton                     int32u
+  0x0507   AFMicroadjustment                    int32u[5]
+  0x0508   AFExpansionWithSelectedPoint         int32u
+  0x0509   SelectableAFPoint                    int32u
+  0x050a   SwitchToRegisteredAFPoint            int32u
+  0x050b   AFPointAutoSelection                 int32u
+  0x050c   AFPointDisplayDuringFocus            int32u
+  0x050d   AFPointBrightness                    int32u
+  0x050e   AFAssistBeam                         int32u
+  0x060f   MirrorLockup                         int32u
+  0x0610   ContinuousShootingSpeed              int32u[3]
+  0x0611   ContinuousShotLimit                  int32u[2]
+  0x0701   ShutterButtonAFOnButton              int32u
+  0x0702   AFOnAELockButtonSwitch               int32u
+  0x0703   QuickControlDialInMeter              int32u
+  0x0704   SetButtonWhenShooting                int32u
+  0x0705   ManualTv                             int32u
+  0x0706   DialDirectionTvAv                    int32u
+  0x0707   AvSettingWithoutLens                 int32u
+  0x0708   WBMediaImageSizeSetting              int32u
+  0x0709   LockMicrophoneButton                 int32u
+  0x070a   ButtonFunctionControlOff             int32u
+  0x080b   FocusingScreen                       int32u
+  0x080c   TimerLength                          int32u[4]
+  0x080d   ShortReleaseTimeLag                  int32u
+  0x080e   AddAspectRatioInfo                   int32u
+  0x080f   AddOriginalDecisionData              int32u
+  0x0810   LiveViewExposureSimulation           int32u
+
 =head2 Casio Tags
 
   Tag ID   Tag Name                             Writable
@@ -2495,6 +2632,53 @@ Personal function settings for the EOS-1D.
   0x8002   OrderNumber                          int32u
   0x8003   FrameNumber                          int16u
 
+=head2 HP Tags
+
+These tables list tags found in the maker notes of some Hewlett-Packard
+camera models.
+
+The first table lists tags found in the EXIF-format maker notes of the
+PhotoSmart 720 (which are also used by the Vivitar ViviCam 3705, 3705B and
+3715.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0e00   PrintIM                              PrintIM
+
+=head3 HP Type2 Tags
+
+These tags are used by the PhotoSmart E427.
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'Lens Shading'       LensShading              N
+  'PreviewImage'       PreviewImage             N
+  'Serial Number'      SerialNumber             N
+
+=head3 HP Type4 Tags
+
+These tags are used by the PhotoSmart M627.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     12    MaxAperture                          N
+     16    ExposureTime                         N
+     20    CameraDateTime                       N
+     52    ISO                                  N
+     92    SerialNumber                         N
+
+=head3 HP Type6 Tags
+
+These tags are used by the PhotoSmart M425, M525 and M527.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     12    FNumber                              N
+     16    ExposureTime                         N
+     20    CameraDateTime                       N
+     52    ISO                                  N
+     88    SerialNumber                         N
+
 =head2 JVC Tags
 
 JVC EXIF maker note tags.
@@ -2520,11 +2704,12 @@ frequently with different models.  Some information has been decoded, but
 much of the Kodak information remains unknown.
 
 The table below contains the most common set of Kodak tags.  The following
-Kodak camera models have been tested and found to use these tags:  CX6330,
-CX7330, CX7430, CX7525, CX7530, DC4800, DC4900, DX3500, DX3600, DX3900,
-DX4330, DX4530, DX4900, DX6340, DX6440, DX6490, DX7440, DX7590, DX7630,
-EasyShare-One, LS420, LS443, LS633, LS743, LS753, Z700, Z730, Z740, Z760 and
-Z7560.
+Kodak camera models have been tested and found to use these tags: C360,
+C663, C875, CX6330, CX6445, CX7330, CX7430, CX7525, CX7530, DC4800, DC4900,
+DX3500, DX3600, DX3900, DX4330, DX4530, DX4900, DX6340, DX6440, DX6490,
+DX7440, DX7590, DX7630, EasyShare-One, LS420, LS443, LS633, LS743, LS753,
+V530, V550, V570, V603, V610, V705, Z650, Z700, Z710, Z730, Z740, Z760 and
+Z7590.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2565,7 +2750,9 @@ Z7560.
 
 =head3 Kodak Type2 Tags
 
-These tags are used by the DC265 and DC290.
+These tags are used by the Kodak DC220, DC260, DC265 and DC290,
+Hewlett-Packard PhotoSmart 618, C500 and C912, Pentax EI-200 and EI-2000,
+and Minolta EX1500Z.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2599,8 +2786,8 @@ These tags are used by the DC200 and DC215.
 
 =head3 Kodak Type5 Tags
 
-These tags are used by the CX4200, CX4210, CX4230, CX4300, CX6200 and
-CX6230.
+These tags are used by the CX4200, CX4210, CX4230, CX4300, CX4310, CX6200
+and CX6230.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -3141,7 +3328,7 @@ Camera settings information for the Sony DSLR-A100.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0001   FirmwareVersion                      undef[4]
+  0x0001   MakerNoteVersion                     undef[4]
   0x0002   ISO                                  int16u[2]
   0x0003   ColorMode                            string
   0x0004   Quality                              string
@@ -3183,8 +3370,8 @@ Camera settings information for the Sony DSLR-A100.
   0x008d   ColorHue                             string
   0x008f   SceneMode                            string
   0x0090   LightSource                          string
-  0x0091   Nikon0x0091Encrypted?                Nikon Nikon0x0091
-           Nikon0x0091?                         Nikon Nikon0x0091
+  0x0091   ShotInfo                             Nikon ShotInfo
+           ShotInfo?                            Nikon ShotInfo
   0x0092   HueAdjustment                        int16s
   0x0094   Saturation                           int16s
   0x0095   NoiseReduction                       string
@@ -3211,6 +3398,7 @@ Camera settings information for the Sony DSLR-A100.
   0x00ab   VariProgram                          string
   0x00ac   ImageStabilization                   string
   0x00ad   AFResponse                           string
+  0x00b0   MultiExposure                        Nikon MultiExposure
   0x00b1   HighISONoiseReduction                int16u
   0x0e00   PrintIM                              PrintIM
   0x0e01   NikonCaptureData                     NikonCapture
@@ -3238,12 +3426,16 @@ Camera settings information for the Sony DSLR-A100.
       1    AFPoint                              int8u
       2    AFPointsUsed                         int16u
 
-=head3 Nikon Nikon0x0091 Tags
+=head3 Nikon ShotInfo Tags
+
+This information is encrypted for ShotInfoVersion 02xx.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      0    Nikon0x0091Version                   N
+      0    ShotInfoVersion                      N
     102    VR_0x66?                             N
+    106    ShutterCount                         N
+    110    DeletedImageCount                    N
     130    VR_0x82?                             N
 
 =head3 Nikon ColorBalance1 Tags
@@ -3253,6 +3445,9 @@ Camera settings information for the Sony DSLR-A100.
       0    WB_RBGGLevels                        int16u[4]!
 
 =head3 Nikon ColorBalance2 Tags
+
+This information is encrypted for most camera models, and if encrypted is
+not currently writable by exiftool.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -3289,6 +3484,7 @@ complications which make writing more difficult.
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    LensDataVersion                      N
+      4    ExitPupilPosition                    N
       5    AFAperture                           N
       8    FocusPosition                        N
       9    FocusDistance                        N
@@ -3301,6 +3497,15 @@ complications which make writing more difficult.
      16    MaxApertureAtMaxFocal                N
      17    MCUVersion                           N
      18    EffectiveMaxAperture                 N
+
+=head3 Nikon MultiExposure Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    MultiExposureVersion                 string[4]
+      1    MultiExposureMode                    int32u
+      2    MultiExposureShots                   int32u
+      3    MultiExposureAutoGain                int32u
 
 =head3 Nikon CaptureOffsets Tags
 
@@ -3589,11 +3794,18 @@ and Agfa cameras.
   0x103b   InfinityLensStep                     int16u
   0x103c   NearLensStep                         int16u
   0x2010   Equipment                            Olympus Equipment
+           Equipment2                           Olympus Equipment
   0x2020   CameraSettings                       Olympus CameraSettings
+           CameraSettings2                      Olympus CameraSettings
   0x2030   RawDevelopment                       Olympus RawDevelopment
+           RawDevelopment2                      Olympus RawDevelopment
   0x2040   ImageProcessing                      Olympus ImageProcessing
+           ImageProcessing2                     Olympus ImageProcessing
   0x2050   FocusInfo                            Olympus FocusInfo
+           FocusInfo2                           Olympus FocusInfo
+           CameraParameters                     undef
   0x3000   RawInfo                              Olympus RawInfo
+           RawInfo2                             Olympus RawInfo
 
 =head3 Olympus TextInfo Tags
 
@@ -3674,6 +3886,7 @@ any information found here will be extracted, even if the tag is not listed.
   0x0600   Sequence                             int16u[n]~
   0x0601   PanoramaMode                         int16u~
   0x0603   ImageQuality2                        int16u
+  0x0901   ManometerReading                     int32s[2]
 
 =head3 Olympus RawDevelopment Tags
 
@@ -3771,10 +3984,10 @@ Panasonic tags are also used for Leica cameras.
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x0001   ImageQuality                         int16u
-  0x0002   FirmwareVersion                      int8u[4]
+  0x0002   ProductionVersion                    int8u[4]
   0x0003   WhiteBalance                         int16u
   0x0007   FocusMode                            int16u
-  0x000f   SpotMode                             int8u[2]
+  0x000f   AFMode                               int8u[2]
   0x001a   ImageStabilizer                      int16u
   0x001c   MacroMode                            int16u
   0x001f   ShootingMode                         int16u
@@ -3791,14 +4004,20 @@ Panasonic tags are also used for Leica cameras.
   0x002e   SelfTimer                            int16u
   0x0030   Rotation                             int16u
   0x0032   ColorMode                            int16u
+  0x0033   BabyAge                              string
+  0x0035   ConversionLens                       int16u
   0x0036   TravelDay                            int16u
+  0x0042   FilmMode                             int16u
   0x0051   LensType                             string
+  0x0052   LensSerialNumber                     string
+  0x0053   AccessoryType                        string
   0x0e00   PrintIM                              PrintIM
 
 =head3 Panasonic Type2 Tags
 
 This type of maker notes is used by models such as the NV-DS65, PV-D2002,
-PV-DC3000, PV-L2001 and PV-SD4090.
+PV-DC3000, PV-DV203, PV-DV401, PV-DV702, PV-L2001, PV-SD4090, PV-SD5000 and
+iPalm.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -3811,19 +4030,19 @@ These tags are found in IFD0 of Panasonic RAW images.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0001   PanasonicRawVersion                  N
+  0x0001   PanasonicRawVersion                  undef
   0x0002   SensorWidth                          N
   0x0003   SensorHeight                         N
   0x0006   ImageHeight                          N
   0x0007   ImageWidth                           N
-  0x0017   ISO                                  N
-  0x0024   WB_RedLevel                          N
-  0x0025   WB_GreenLevel                        N
-  0x0026   WB_BlueLevel                         N
-  0x010f   Make                                 N
-  0x0110   Model                                N
+  0x0017   ISO                                  int16u
+  0x0024   WB_RedLevel                          int16u
+  0x0025   WB_GreenLevel                        int16u
+  0x0026   WB_BlueLevel                         int16u
+  0x010f   Make                                 string
+  0x0110   Model                                string
   0x0111   StripOffsets                         N
-  0x0112   Orientation                          N
+  0x0112   Orientation                          int16u
   0x0116   RowsPerStrip                         N
   0x0117   StripByteCounts                      N
   0x8769   ExifOffset                           EXIF
@@ -3871,6 +4090,7 @@ The Pentax tags are also used in Asahi cameras.
   0x0025   HometownDST                          int16u
   0x0026   DestinationDST                       int16u
   0x0029   FrameNumber                          int32u
+  0x0032   ImageProcessing                      undef[4]
   0x0033   PictureMode                          int8u[3]
   0x0034   DriveMode                            int8u[4]
   0x0037   ColorSpace                           int16u
@@ -3893,7 +4113,7 @@ The Pentax tags are also used in Asahi cameras.
   0x020b   FlashBDump?                          Y
   0x020d   WB_RGGBLevelsDaylight                int16u[4]
   0x020e   WB_RGGBLevelsShade                   int16u[4]
-  0x020f   WB_RGGBLevelsCloud                   int16u[4]
+  0x020f   WB_RGGBLevelsCloudy                  int16u[4]
   0x0210   WB_RGGBLevelsTungsten                int16u[4]
   0x0211   WB_RGGBLevelsFluorescentD            int16u[4]
   0x0212   WB_RGGBLevelsFluorescentN            int16u[4]
@@ -4128,18 +4348,35 @@ These tags are used in Sigma/Foveon cameras.
   0x000a   Lens                                 string
   0x000b   ColorSpace                           string
   0x000c   ExposureCompensation                 string
+           UnknownCompensation?                 rational64s
   0x000d   Contrast                             string
+           Contrast                             rational64s
   0x000e   Shadow                               string
+           Shadow                               rational64s
   0x000f   Highlight                            string
+           Highlight                            rational64s
   0x0010   Saturation                           string
+           Saturation                           rational64s
   0x0011   Sharpness                            string
+           Sharpness                            rational64s
   0x0012   X3FillLight                          string
+           X3FillLight                          rational64s
   0x0014   ColorAdjustment                      string
+           ColorAdjustment                      rational64s[3]
   0x0015   AdjustmentMode                       string
   0x0016   Quality                              string
   0x0017   Firmware                             string
   0x0018   Software                             string
   0x0019   AutoBracket                          string
+  0x001d   MakerNoteVersion                     string
+  0x0022   AdjustmentMode?                      string
+  0x0030   LensApertureRange                    string
+  0x0031   FNumber                              rational64u
+  0x0032   ExposureTime                         rational64u
+  0x0035   ExposureCompensation                 rational64s
+  0x003a   FlashExposureComp                    rational64s
+  0x003b   Firmware                             string
+  0x003c   WhiteBalance                         string
 
 =head2 Sony Tags
 
@@ -4243,6 +4480,10 @@ who wants to use this information).
            MakerNoteCasio                       Casio
            MakerNoteCasio2                      Casio Type2
            MakerNoteFujiFilm                    FujiFilm
+           MakerNoteHP                          HP
+           MakerNoteHP2                         HP Type2
+           MakerNoteHP4                         HP Type4
+           MakerNoteHP6                         HP Type6
            MakerNoteJVC                         JVC
            MakerNoteJVCText                     JVC Text
            MakerNoteKodak1a                     Kodak
@@ -4257,12 +4498,12 @@ who wants to use this information).
            MakerNoteKyocera                     Unknown
            MakerNoteMinolta                     Minolta
            MakerNoteMinolta2                    Olympus
-           MakerNoteMinolta3                    FujiFilm
-           MakerNoteMinolta4                    undef
+           MakerNoteMinolta3                    undef
            MakerNoteNikon                       Nikon
            MakerNoteNikon2                      Nikon Type2
            MakerNoteNikon3                      Nikon
            MakerNoteOlympus                     Olympus
+           MakerNoteOlympus2                    Olympus
            MakerNoteLeica                       Panasonic
            MakerNotePanasonic                   Panasonic
            MakerNotePanasonic2                  Panasonic Type2
@@ -4307,24 +4548,24 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0000   NullRecord                           Y
+  0x0000   NullRecord                           undef
   0x0001   FreeBytes                            undef
   0x0032   CanonColorInfo1                      N
-  0x0805   CanonFileDescription                 Y
-           UserComment                          Y
+  0x0805   CanonFileDescription                 string[32]
+           UserComment                          string[256]
   0x080a   CanonRawMakeModel                    CanonRaw MakeModel
-  0x080b   CanonFirmwareVersion                 Y
-  0x080c   ComponentVersion                     Y
-  0x080d   ROMOperationMode                     Y
-  0x0810   OwnerName                            Y
-  0x0815   CanonImageType                       Y
-  0x0816   OriginalFileName                     Y
-  0x0817   ThumbnailFileName                    Y
-  0x100a   TargetImageType                      Y
-  0x1010   ShutterReleaseMethod                 Y
-  0x1011   ShutterReleaseTiming                 Y
-  0x1016   ReleaseSetting                       Y
-  0x101c   BaseISO                              Y
+  0x080b   CanonFirmwareVersion                 string[32]
+  0x080c   ComponentVersion                     string
+  0x080d   ROMOperationMode                     string[8]
+  0x0810   OwnerName                            string[32]
+  0x0815   CanonImageType                       string[32]
+  0x0816   OriginalFileName                     string[32]
+  0x0817   ThumbnailFileName                    string[32]
+  0x100a   TargetImageType                      int16u
+  0x1010   ShutterReleaseMethod                 int16u
+  0x1011   ShutterReleaseTiming                 int16u
+  0x1016   ReleaseSetting                       int16u
+  0x101c   BaseISO                              int16u
   0x1028   CanonFlashInfo?                      int16u[4]
   0x1029   CanonFocalLength                     Canon FocalLength
   0x102a   CanonShotInfo                        Canon ShotInfo
@@ -4338,21 +4579,21 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
   0x1038   CanonPictureInfo                     Canon PictureInfo
   0x1093   CanonFileInfo                        Canon FileInfo
   0x10a9   ColorBalance                         Canon ColorBalance
-  0x10ae   ColorTemperature                     Y
-  0x10b4   ColorSpace                           Y
+  0x10ae   ColorTemperature                     int16u
+  0x10b4   ColorSpace                           int16u
   0x10b5   RawJpgInfo                           CanonRaw RawJpgInfo
   0x1803   ImageFormat                          CanonRaw ImageFormat
-  0x1804   RecordID                             Y
-  0x1806   SelfTimerTime                        Y
+  0x1804   RecordID                             int32u
+  0x1806   SelfTimerTime                        int32u
   0x1807   TargetDistanceSetting                float
-  0x180b   SerialNumber                         Y
+  0x180b   SerialNumber                         int32u
   0x180e   TimeStamp                            CanonRaw TimeStamp
   0x1810   ImageInfo                            CanonRaw ImageInfo
   0x1813   FlashInfo                            CanonRaw FlashInfo
   0x1814   MeasuredEV                           float
-  0x1817   FileNumber                           Y
+  0x1817   FileNumber                           int32u
   0x1818   ExposureInfo                         CanonRaw ExposureInfo
-  0x1834   CanonModelID                         N
+  0x1834   CanonModelID                         int32u
   0x1835   DecoderTable                         N
   0x183b   SerialNumberFormat                   int32u
   0x2005   RawData                              N
@@ -4861,7 +5102,7 @@ property tables, even though they are only listed in the SummaryInfo table.
   0x10000001   RectangleOfInterest              N
   0x10000002   Filtering                        N
   0x10000003   SpatialOrientation               N
-  0x10000004   ColortwistMatrix                 N
+  0x10000004   ColorTwistMatrix                 N
   0x10000005   ContrastAdjustment               N
 
 =head3 FlashPix SubimageHdr Tags
@@ -9580,7 +9821,9 @@ These tags have a family 1 group name of "HTTP-equiv".
 =head2 Extra Tags
 
 The extra tags represent information found in the image but not associated
-with any other tag group.
+with any other tag group.  The three writable "pseudo" tags (Filename,
+Directory and FileModifyDate) may be written without the need to rewrite the
+file since their values are not contained within the file data.
 
   Tag Name                                      Writable
   --------                                      --------
@@ -9846,29 +10089,15 @@ for more details.
                        ISO
                        WhiteBalance
                        Flash
-  D70Boring            Make                     Y
-                       XResolution
-                       YResolution
-                       ResolutionUnit
-                       YCbCrPositioning
-                       FileSource
-                       SceneType
-                       ThumbnailOffset
-                       ThumbnailLength
-                       CreateDate
-                       ComponentsConfiguration
-                       InteropIndex
-                       InteropVersion
-                       SubSecTime
-                       SubSecTimeDigitized
-                       SensingMethod
-                       CFAPattern
-                       ThumbnailImageIFD
   MakerNotes           MakerNotes               Y
                        MakerNoteCanon
                        MakerNoteCasio
                        MakerNoteCasio2
                        MakerNoteFujiFilm
+                       MakerNoteHP
+                       MakerNoteHP2
+                       MakerNoteHP4
+                       MakerNoteHP6
                        MakerNoteJVC
                        MakerNoteJVCText
                        MakerNoteKodak1a
@@ -9884,11 +10113,11 @@ for more details.
                        MakerNoteMinolta
                        MakerNoteMinolta2
                        MakerNoteMinolta3
-                       MakerNoteMinolta4
                        MakerNoteNikon
                        MakerNoteNikon2
                        MakerNoteNikon3
                        MakerNoteOlympus
+                       MakerNoteOlympus2
                        MakerNoteLeica
                        MakerNotePanasonic
                        MakerNotePanasonic2

@@ -229,6 +229,7 @@ my %nsURI = (
     dex       => 'http://ns.optimasc.com/dex/1.0/',
     Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
     MicrosoftPhoto => 'http://ns.microsoft.com/photo/1.0',
+    lr        => 'http://ns.adobe.com/lightroom/1.0/',
 );
 
 my $x_toolkit = "x:xmptk='Image::ExifTool $Image::ExifTool::VERSION'";
@@ -599,6 +600,7 @@ sub WriteXMP($$;$)
     my $changed = 0;
     my $xmpFile = (not $tagTablePtr);   # this is an XMP data file if no $tagTablePtr
     my $preferred = $xmpFile;   # write XMP as preferred if this is an XMP file
+    my $verbose = $exifTool->Options('Verbose');
 #
 # extract existing XMP information into %capture hash
 #
@@ -689,7 +691,10 @@ sub WriteXMP($$;$)
                         # only overwrite specific values
                         next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
                     }
-                    $exifTool->VPrint(1, "    - XMP:$$tagInfo{Name} = '$val'\n");
+                    if ($verbose > 1) {
+                        my $grp = $exifTool->GetGroup($tagInfo, 1);
+                        $exifTool->VPrint(1, "    - $grp:$$tagInfo{Name} = '$val'\n");
+                    }
                     # save attributes and path from this deleted property
                     # so we can replace it exactly
                     %attrs = %$attrs;
@@ -746,9 +751,12 @@ sub WriteXMP($$;$)
             $attrs{'xml:lang'} = 'x-default';
         }
         for (;;) {
-            my $newValue = EscapeHTML(shift @newValues);
+            my $newValue = EscapeXML(shift @newValues);
             $capture{$path} = [ $newValue, \%attrs ];
-            $exifTool->VPrint(1, "    + XMP:$$tagInfo{Name} = '$newValue'\n");
+            if ($verbose > 1) {
+                my $grp = $exifTool->GetGroup($tagInfo, 1);
+                $exifTool->VPrint(1, "    + $grp:$$tagInfo{Name} = '$newValue'\n");
+            }
             ++$changed;
             last unless @newValues;
             $path =~ m/ (\d{3})/g or warn("Internal error: no list index!\n"), next;

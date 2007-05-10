@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.13';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -138,29 +138,6 @@ $VERSION = '1.10';
         'FlashMode',
         'FlashExposureComp',
     ],
-    # This shortcut intends to remove tags which contain no useful
-    #  information given that the file was created with a Nikon D70.
-    # Use "--d70boring" to suppress tags in this list.
-    D70Boring => [
-        'Make',
-        'XResolution',
-        'YResolution',
-        'ResolutionUnit',
-        'YCbCrPositioning',
-        'FileSource',
-        'SceneType',
-        'ThumbnailOffset',
-        'ThumbnailLength',
-        'CreateDate',
-        'ComponentsConfiguration',
-        'InteropIndex',
-        'InteropVersion',
-        'SubSecTime',
-        'SubSecTimeDigitized',
-        'SensingMethod',
-        'CFAPattern',
-        'ThumbnailImageIFD',
-    ],
     # This shortcut may be useful when copying tags between files to either
     # copy the maker notes as a block or prevent it from being copied
     MakerNotes => [
@@ -169,6 +146,10 @@ $VERSION = '1.10';
         'MakerNoteCasio',
         'MakerNoteCasio2',
         'MakerNoteFujiFilm',
+        'MakerNoteHP',
+        'MakerNoteHP2',
+        'MakerNoteHP4',
+        'MakerNoteHP6',
         'MakerNoteJVC',
         'MakerNoteJVCText',
         'MakerNoteKodak1a',
@@ -184,11 +165,11 @@ $VERSION = '1.10';
         'MakerNoteMinolta',
         'MakerNoteMinolta2',
         'MakerNoteMinolta3',
-        'MakerNoteMinolta4',
         'MakerNoteNikon',
         'MakerNoteNikon2',
         'MakerNoteNikon3',
         'MakerNoteOlympus',
+        'MakerNoteOlympus2',
         'MakerNoteLeica',
         'MakerNotePanasonic',
         'MakerNotePanasonic2',

@@ -13,6 +13,8 @@
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
 #               7) http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm
 #               8) Marcel Coenen private communication (DMC-FZ50)
+#               9) http://forums.dpreview.com/forums/read.asp?forum=1033&message=22756430
+#              10) Jens Duttke private communication (TZ3,FZ30,FZ50)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Panasonic;
@@ -21,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.16';
+$VERSION = '1.21';
 
 sub ProcessPanasonicType2($$$);
 
@@ -41,7 +43,7 @@ sub ProcessPanasonicType2($$$);
         },
     },
     0x02 => {
-        Name => 'FirmwareVersion',
+        Name => 'ProductionVersion',
         Format => 'int8u',  # (format type is 'undef', but it should really be int8u)
         Writable => 'int8u',
         Count => 4,
@@ -59,6 +61,7 @@ sub ProcessPanasonicType2($$$);
             5 => 'Manual',
             8 => 'Flash',
             10 => 'Black & White', #3 (Leica)
+            11 => 'Manual', #PH (FZ8)
         },
     },
     0x07 => {
@@ -72,12 +75,21 @@ sub ProcessPanasonicType2($$$);
         },
     },
     0x0f => {
-        Name => 'SpotMode',
+        Name => 'AFMode',
         Writable => 'int8u',
         Count => 2,
-        PrintConv => {
-            '0 1'  => 'Spot Mode On',
-            '0 16' => 'Spot Mode Off',
+        PrintConv => { #PH
+            '0 1'   => 'Spot Mode On', # (maybe 9-area for some cameras?)
+            '0 16'  => 'Spot Mode Off or 3-area (high speed)', # (FZ8 is 3-area)
+            '1 0'   => 'Spot Focusing', # (FZ8)
+            '1 1'   => '5-area', # (FZ8)
+            '16'    => 'Normal?', # (only AFMode for DMC-LC20)
+            '16 0'  => '1-area', # (FZ8)
+            '16 16' => '1-area (high speed)', # (FZ8)
+            '32 0'  => '3-area (auto)?', # (DMC-L1 guess)
+            '32 1'  => '3-area (left)?', # (DMC-L1 guess)
+            '32 2'  => '3-area (center)?', # (DMC-L1 guess)
+            '32 3'  => '3-area (right)?', # (DMC-L1 guess)
         },
     },
     0x1a => {
@@ -118,6 +130,10 @@ sub ProcessPanasonicType2($$$);
             20 => 'Snow',
             21 => 'Night Scenery',
             22 => 'Food', #7
+            23 => 'Baby', #10
+            27 => 'High Sensitivity', #7
+            29 => 'Underwater', #7
+            33 => 'Pet', #10
         },
     },
     0x20 => {
@@ -162,6 +178,7 @@ sub ProcessPanasonicType2($$$);
     0x28 => {
         Name => 'ColorEffect',
         Writable => 'int16u',
+        # FX30 manual: (ColorMode) natural, vivid, cool, warm, b/w, sepia
         PrintConv => {
             1 => 'Off',
             2 => 'Warm',
@@ -193,32 +210,19 @@ sub ProcessPanasonicType2($$$);
             3 => '2s',
         },
     },
-    0x2c => [
-        {
-            Name => 'Contrast',
-            Condition => '$self->{CameraMake} =~ /^Panasonic/i',
-            Notes => 'Panasonic models',
-            Flags => 'PrintHex',
-            Writable => 'int16u',
-            PrintConv => {
-                0 => 'Normal',
-                1 => 'Low',
-                2 => 'High',
-            }
-        },
-        {
-            Name => 'Contrast',
-            Notes => 'Leica models',
-            Flags => 'PrintHex',
-            Writable => 'int16u',
-            PrintConv => {
-                #3 (Leica)
-                0x100 => 'Low',
-                0x110 => 'Normal',
-                0x120 => 'High',
-            }
-        },
-    ],
+    0x2c => {
+        Name => 'Contrast',
+        Flags => 'PrintHex',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Low',
+            2 => 'High',
+            0x100 => 'Low',
+            0x110 => 'Normal',
+            0x120 => 'High',
+        }
+    },
     0x2d => {
         Name => 'NoiseReduction',
         Writable => 'int16u',
@@ -245,18 +249,58 @@ sub ProcessPanasonicType2($$$);
             1 => 'Natural',
         },
     },
+    0x033 => { #10
+        Name => 'BabyAge',
+        Writable => 'string',
+        PrintConv => '$val eq "9999:99:99 00:00:00" ? "(not set)" : $val',
+        PrintConvInv => '$val =~ /^\d/ ? $val : "9999:99:99 00:00:00"',
+    },
     # 0x33 - RedModeBirthday? (ref 7)
+    # 0x34 - OpticalZoom? (1=standardZoom, 2-EXOpticsZoom) (ref 7)
+    0x35 => { #9
+        Name => 'ConversionLens',
+        Writable => 'int16u',
+        PrintConv => { #PH (unconfirmed)
+            1 => 'Off',
+            2 => 'Wide',
+            3 => 'Telephoto',
+            4 => 'Macro',
+        },
+    },
     0x36 => { #8
         Name => 'TravelDay',
         Writable => 'int16u',
         PrintConv => '$val == 65535 ? "n/a" : $val',
         PrintConvInv => '$val =~ /(\d+)/ ? $1 : $val',
     },
+    # 0x40 Chroma? (ref 7)
+    0x42 => { #7 (DMC-L1)
+        Name => 'FilmMode',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Standard (color)',
+            2 => 'Dynamic (color)',
+            3 => 'Nature (color)',
+            4 => 'Smooth (color)',
+            5 => 'Standard (B&W)',
+            6 => 'Dynamic (B&W)',
+            7 => 'Smooth (B&W)',
+            # 8 => 'My Film 1'? (from owner manual)
+            # 9 => 'My Film 2'?
+        },
+    },
     0x51 => {
         Name => 'LensType',
         Writable => 'string',
     },
-    # 0x53 - string "NO_ACCESSORY" on DMC-L1
+    0x52 => { #7 (DMC-L1)
+        Name => 'LensSerialNumber',
+        Writable => 'string',
+    },
+    0x53 => { #7 (DMC-L1)
+        Name => 'AccessoryType',
+        Writable => 'string',
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -265,6 +309,8 @@ sub ProcessPanasonicType2($$$);
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
+    # 0x8001 SceneMode? (ref 7)
+    # 0x8010 TravelTime? (ref 7)
 );
 
 # Type 2 tags (ref PH)
@@ -275,7 +321,8 @@ sub ProcessPanasonicType2($$$);
     FORMAT => 'int16u',
     NOTES => q{
         This type of maker notes is used by models such as the NV-DS65, PV-D2002,
-        PV-DC3000, PV-L2001 and PV-SD4090.
+        PV-DC3000, PV-DV203, PV-DV401, PV-DV702, PV-L2001, PV-SD4090, PV-SD5000 and
+        iPalm.
     },
     0 => {
         Name => 'MakerNoteVersion',
@@ -289,19 +336,38 @@ sub ProcessPanasonicType2($$$);
 # Tags found in Panasonic RAW images
 %Image::ExifTool::Panasonic::Raw = (
     GROUPS => { 0 => 'EXIF', 1 => 'IFD0', 2 => 'Image'},
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITE_GROUP => 'IFD0',   # default write group
     NOTES => 'These tags are found in IFD0 of Panasonic RAW images.',
-    0x01 => 'PanasonicRawVersion',
+    0x01 => {
+        Name => 'PanasonicRawVersion',
+        Writable => 'undef',
+    },
     0x02 => 'SensorWidth', #5/PH
     0x03 => 'SensorHeight', #5/PH
     0x06 => 'ImageHeight', #5/PH
     0x07 => 'ImageWidth', #5/PH
-    0x17 => 'ISO', #5
-    0x24 => 'WB_RedLevel', #6
-    0x25 => 'WB_GreenLevel', #6
-    0x26 => 'WB_BlueLevel', #6
+    0x17 => { #5
+        Name => 'ISO',
+        Writable => 'int16u',
+    },
+    0x24 => { #6
+        Name => 'WB_RedLevel',
+        Writable => 'int16u',
+    },
+    0x25 => { #6
+        Name => 'WB_GreenLevel',
+        Writable => 'int16u',
+    },
+    0x26 => { #6
+        Name => 'WB_BlueLevel',
+        Writable => 'int16u',
+    },
     0x10f => {
         Name => 'Make',
         Groups => { 2 => 'Camera' },
+        Writable => 'string',
         DataMember => 'CameraMake',
         # save this value as an ExifTool member variable
         RawConv => '$self->{CameraMake} = $val',
@@ -310,6 +376,7 @@ sub ProcessPanasonicType2($$$);
         Name => 'Model',
         Description => 'Camera Model Name',
         Groups => { 2 => 'Camera' },
+        Writable => 'string',
         DataMember => 'CameraModel',
         # save this value as an ExifTool member variable
         RawConv => '$self->{CameraModel} = $val',
@@ -322,6 +389,7 @@ sub ProcessPanasonicType2($$$);
     },
     0x112 => {
         Name => 'Orientation',
+        Writable => 'int16u',
         PrintConv => \%Image::ExifTool::Exif::orientation,
         Priority => 0,  # so IFD1 doesn't take precedence
     },
@@ -378,12 +446,16 @@ under the same terms as Perl itself.
 
 =item L<http://johnst.org/sw/exiftags/>
 
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
+
+=item L<http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm>
+
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Tels for the information he provided on decoding some tags, and to
-Marcel Coenen for decoding the TravelDay tag.
+Marcel Coenen and Jens Duttke for their contributions.
 
 =head1 SEE ALSO
 

@@ -30,6 +30,7 @@ sub LoadPrintFormat($);
 sub FilenameSPrintf($;$);
 sub NextUnusedFilename($);
 sub CreateDirectory($);
+sub SourceFile($);
 sub OpenOutputFile($);
 sub AcceptFile($);
 sub SlurpFile($$);
@@ -43,62 +44,67 @@ END {
     Cleanup();
 }
 
-my @files;          # list of files and directories to scan
-my @tags;           # list of tags to extract
-my @newValues;      # list of new tag values to set
-my $outFormat = 0;  # 0=Canon format, 1=same-line, 2=tag names, 3=values only
-my $tabFormat = 0;  # non-zero for tab output format
-my $recurse;        # recurse into subdirectories
-my @ignore;         # directory names to ignore
-my $count = 0;      # count of files scanned
-my $countBad = 0;   # count of files with errors
-my $countCreated=0; # count output files created
-my $countDir = 0;   # count of directories scanned
-my $countGoodWr = 0;# count files written OK
-my $countGoodCr = 0;# count files created OK
-my $countSameWr = 0;# count files written OK but not changed
-my $countBadWr = 0; # count write errors
-my $countBadCr = 0; # count files not created due to errors
-my $countNewDir = 0;# count of directories created
-my $countFailed = 0;# count files that failed condition
-my $outputExt;      # extension for output file (or undef for no output)
-my $forcePrint;     # force printing of tags whose values weren't found
-my $helped;         # flag to avoid printing help if no tags specified
-my $htmlOutput = 0; # flag for html-formatted output
-my $escapeHTML;     # flag to escape printed values for html
-my $binaryOutput;   # flag for binary output
-my $doSetFileName;  # flag set if FileName may be written
-my $showGroup;      # number of group to show (may be zero or '')
-my $allGroup;       # show group name for all tags
-my $preserveTime;   # flag to preserve times of updated files
-my $multiFile;      # non-zero if we are scanning multiple files
-my $showTagID;      # non-zero to show tag ID's
-my @printFmt;       # the contents of the print format file
-my $tmpFile;        # temporary file to delete on exit
-my $tmpText;        # temporary text file
-my $binaryStdout;   # flag set if we output binary to stdout
-my $isWriting = 0;  # flag set if we are writing tags
-my $outOpt;         # output file or directory name
-my $doUnzip;        # flag to extract info from .gz and .bz2 files
-my %setTags;        # hash of list references for tags to set from files
+# declare all static variables
+my @commonArgs;     # arguments common to all commands
 my @dynamicFiles;   # list of -tagsFromFile files with dynamic names
 my @dynamicValues;  # list of -TAG<=FMT pairs for setting new values
-my $setTagsFile;    # filename for last TagsFromFile option
 my @exclude;        # list of excluded tags
+my @files;          # list of files and directories to scan
+my @ignore;         # directory names to ignore
+my @newValues;      # list of new tag values to set
+my @printFmt;       # the contents of the print format file
+my @tags;           # list of tags to extract
 my %excludeGrp;     # hash of tags excluded by group
-my $allInGroup;     # flag to show all tags in a group
-my $disableOutput;  # flag to disable normal output
-my $quiet = 0;      # flag to disable printing of informational messages / warnings
-my $overwriteOrig=0;# flag to overwrite original file
-my $filterFlag = 0; # file filter flag (0x01=deny extensions, 0x02=allow extensions)
 my %filterExt;      # lookup for filtered extensions
-my $verbose;        # verbose setting
+my %setTags;        # hash of list references for tags to set from files
 my %warnedOnce;     # lookup for once-only warnings
-my $scanWritable;   # flag to process only writable file types
-my $doGlob;         # flag set to do filename wildcard expansion
+my $allGroup;       # show group name for all tags
+my $allInGroup;     # flag to show all tags in a group
+my $binaryOutput;   # flag for binary output
+my $binaryStdout;   # flag set if we output binary to stdout
 my $condition;      # conditional processing of files
+my $count;          # count of files scanned
+my $countBad;       # count of files with errors
+my $countBadCr;     # count files not created due to errors
+my $countBadWr;     # count write errors
+my $countCreated;   # count output files created
+my $countDir;       # count of directories scanned
+my $countFailed;    # count files that failed condition
+my $countGoodCr;    # count files created OK
+my $countGoodWr;    # count files written OK
+my $countNewDir;    # count of directories created
+my $countSameWr;    # count files written OK but not changed
+my $disableOutput;  # flag to disable normal output
+my $doGlob;         # flag set to do filename wildcard expansion
+my $doSetFileName;  # flag set if FileName may be written
+my $doUnzip;        # flag to extract info from .gz and .bz2 files
+my $escapeHTML;     # flag to escape printed values for html
 my $evalWarning;    # warning from eval
+my $filterFlag;     # file filter flag (0x01=deny extensions, 0x02=allow extensions)
+my $forcePrint;     # force printing of tags whose values weren't found
+my $helped;         # flag to avoid printing help if no tags specified
+my $htmlOutput;     # flag for html-formatted output
+my $isWriting;      # flag set if we are writing tags
+my $mainTool;       # main ExifTool object
+my $multiFile;      # non-zero if we are scanning multiple files
+my $outFormat;      # 0=Canon format, 1=same-line, 2=tag names, 3=values only
+my $outOpt;         # output file or directory name
+my $outputExt;      # extension for output file (or undef for no output)
+my $overwriteOrig;  # flag to overwrite original file
 my $pause;          # pause before returning
+my $preserveTime;   # flag to preserve times of updated files
+my $quiet;          # flag to disable printing of informational messages / warnings
+my $recurse;        # recurse into subdirectories
+my $rtnVal;         # command return value (0=success)
+my $scanWritable;   # flag to process only writable file types
+my $setTagsFile;    # filename for last TagsFromFile option
+my $showGroup;      # number of group to show (may be zero or '')
+my $showTagID;      # non-zero to show tag ID's
+my $srcFmt;         # source file name format string
+my $tabFormat;      # non-zero for tab output format
+my $tmpFile;        # temporary file to delete on exit
+my $tmpText;        # temporary text file
+my $verbose;        # verbose setting
 
 # exit routine
 sub Exit {
@@ -133,6 +139,88 @@ sub Cleanup() {
 # main script
 #
 
+# separate arguments common to all commands
+if (grep /^-common_args$/i, @ARGV) {
+    my (@newArgs, $common);
+    foreach (@ARGV) {
+        if (/^-common_args$/i) {
+            $common = 1;
+            next;
+        } elsif ($common) {
+            push @commonArgs, $_;
+        }
+        push @newArgs, $_;
+    }
+    @ARGV = @newArgs;
+}
+
+# loop over sets of command-line arguments separated by "-execute"
+Command: while (@ARGV or not defined $rtnVal) {
+
+# local variables
+my $doneCommonArgs;
+
+$rtnVal = 0 unless defined $rtnVal;
+
+# initialize all static variables
+# (not done: @commonArgs, $helped, $pause)
+undef @dynamicFiles;
+undef @dynamicValues;
+undef @exclude;
+undef @files;
+undef @ignore;
+undef @newValues;
+undef @printFmt;
+undef @tags;
+undef %excludeGrp;
+undef %filterExt;
+undef %setTags;
+undef %warnedOnce;
+undef $allGroup;
+undef $allInGroup;
+undef $binaryOutput;
+undef $binaryStdout;
+undef $condition;
+undef $disableOutput;
+undef $doGlob;
+undef $doSetFileName;
+undef $doUnzip;
+undef $escapeHTML;
+undef $evalWarning;
+undef $forcePrint;
+undef $multiFile;
+undef $outOpt;
+undef $outputExt;
+undef $preserveTime;
+undef $recurse;
+undef $scanWritable;
+undef $setTagsFile;
+undef $showGroup;
+undef $showTagID;
+undef $srcFmt;
+undef $tmpFile;
+undef $tmpText;
+undef $verbose;
+
+$count = 0;
+$countBad = 0;
+$countBadCr = 0;
+$countBadWr = 0;
+$countCreated = 0;
+$countDir = 0;
+$countFailed = 0;
+$countGoodCr = 0;
+$countGoodWr = 0;
+$countNewDir = 0;
+$countSameWr = 0;
+$filterFlag = 0;
+$htmlOutput = 0;
+$isWriting = 0;
+$outFormat = 0;
+$overwriteOrig = 0;
+$quiet = 0;
+$tabFormat = 0;
+
 # for Windows, use globbing for wildcard expansion if available - MK/20061010
 if ($^O eq 'MSWin32' and eval "require File::Glob") {
     # override the core glob forcing case insensitivity
@@ -140,7 +228,7 @@ if ($^O eq 'MSWin32' and eval "require File::Glob") {
     $doGlob = 1;
 }
 
-my $mainTool = new Image::ExifTool;     # create ExifTool object
+$mainTool = new Image::ExifTool;        # create ExifTool object
 $mainTool->Options(Duplicates => 0);    # don't save duplicates by default
 
 # parse command-line options
@@ -179,7 +267,11 @@ while ($_ = shift) {
             }
             next;
         }
-        /^ver$/i and print("$Image::ExifTool::VERSION$Image::ExifTool::RELEASE\n"), Exit 0;
+        if (/^ver$/i) {
+            print("$Image::ExifTool::VERSION$Image::ExifTool::RELEASE\n");
+            $helped = 1;
+            next;
+        }
         if (/^(all)?tagsfromfile(=.*)?$/i) {
             $setTagsFile = $2 ? substr($2,1) : (@ARGV ? shift : '');
             $setTagsFile eq '' and Die "File must be specified for -TagsFromFile option\n";
@@ -194,21 +286,34 @@ while ($_ = shift) {
                     Die "Error opening arg file $argFile\n";
                 }
             }
+            my @newArgs;
             foreach (<ARGFILE>) {
                 s/^\s+//; s/\s+$//s; # remove leading/trailing white space
-                s/\s*=\s*/=/;        # remove white space around '=' sign
-                push @ARGV, $_ unless $_ eq '' or /^#/;
+                # remove white space before, and single space after '=', '+=', '-=' or '<='
+                s/^([-\w]+)\s*([-+<]?=) ?/$1$2/;
+                push @newArgs, $_ unless $_ eq '' or /^#/;
             }
             close(ARGFILE);
+            unshift @ARGV, @newArgs;
             next;
         }
         /^a$/i and $mainTool->Options(Duplicates => 1), next;
-        /^b$/i and $binaryOutput = 1, next;
+        /^b$/i and $mainTool->Options(Binary => 1), $binaryOutput = 1,  next;
         /^c$/  and $mainTool->Options('CoordFormat', shift || Die "Expecting coordinate format for -c option\n"), next;
         /^d$/  and $mainTool->Options('DateFormat', shift || Die "Expecting date format for -d option\n"), next;
         /^D$/  and $showTagID = 'D', next;
         /^e$/  and $mainTool->Options(Composite => 0), next;
         /^E$/  and $escapeHTML = 1, next;
+        # undocumented debugging option "-echo"
+        /^echo$/i and print(shift,"\n"), $helped=1, next;
+        if (/^execute$/i) {
+            $helped = 1;
+            last if $doneCommonArgs or not @commonArgs;
+            # execute common arguments for each command
+            unshift @ARGV, @commonArgs, '-execute';
+            $doneCommonArgs = 1;
+            next;
+        }
         if (/^-?ext$/i) {
             my $ext = shift;
             defined $ext or Die "Expecting extension for -ext option\n";
@@ -264,6 +369,7 @@ while ($_ = shift) {
         /^r$/i and $recurse = 1, next;
         /^s$/  and ++$outFormat, next;
         /^S$/  and $outFormat+=2, next;
+        /^srcfile$/i and $srcFmt = shift || Die("Expecting FMT for -srcfile option\n"), next;
         /^t$/i and $tabFormat = 1, next;
         /^u$/  and $mainTool->Options(Unknown => $mainTool->Options('Unknown')+1), next;
         /^U$/  and $mainTool->Options(Unknown => 2), next;
@@ -316,7 +422,11 @@ while ($_ = shift) {
 
 # print help
 unless ((@tags and not $outOpt) or @files or @newValues) {
-    Die "Nothing to write\n" if $outOpt;
+    if ($outOpt) {
+        Warn "Nothing to write\n";
+        $rtnVal = 1;
+        next;
+    }
     unless ($helped) {
         # catch warnings if we have problems running perldoc
         local $SIG{'__WARN__'} = sub { $evalWarning = $_[0] };
@@ -331,16 +441,25 @@ unless ((@tags and not $outOpt) or @files or @newValues) {
         close STDERR;
         open STDERR, '>&SAVEERR';
     }
-    Exit 0;
+    next;
 }
 
 if ($overwriteOrig > 1 and $outOpt) {
-    Die "Can't overwrite in place when -o option is used\n";
+    Warn "Can't overwrite in place when -o option is used\n";
+    $rtnVal = 1;
+    next;
 }
+
+# must be UTF8 for HTML conversion
+$escapeHTML and $mainTool->Options(Charset => 'UTF8');
 
 # can't do anything if no file specified
 unless (@files) {
-    Die "No file specified\n" unless $outOpt;
+    unless ($outOpt) {
+        Warn "No file specified\n";
+        $rtnVal = 1;
+        next;
+    }
     push @files, '';    # create file from nothing
 }
 
@@ -362,6 +481,7 @@ if ($verbose) {
 
 # validate all tags we're writing
 if (@newValues) {
+    my %addDelOpt = ( '+' => 'AddValue', '-' => 'DelValue' );   # add/delete option lookup
     foreach (@newValues) {
         /(.*?)=(.*)/s or next;
         my ($tag, $newVal) = ($1, $2);
@@ -374,11 +494,19 @@ if (@newValues) {
                 push @dynamicFiles, $newVal;
                 next;   # set tags from dynamic file later
             }
-            -e $newVal or Die "File '$newVal' does not exist for -TagsFromFile option\n";
+            unless (-e $newVal) {
+                Warn "File '$newVal' does not exist for -TagsFromFile option\n";
+                $rtnVal = 1;
+                next Command;
+            }
             # set specified tags from this file
             $verbose and print("Setting new values from $newVal\n");
             my $info = $mainTool->SetNewValuesFromFile($newVal, @{$setTags{$newVal}});
-            $info->{Error} and Die "Error: $info->{Error} - $newVal\n";
+            if ($info->{Error}) {
+                Warn "Error: $info->{Error} - $newVal\n";
+                $rtnVal = 1;
+                next Command;
+            }
             if ($info->{Warning}) {
                 Warn "Warning: $info->{Warning} - $newVal\n";
                 delete $info->{Warning};
@@ -397,10 +525,12 @@ if (@newValues) {
             if (defined FilenameSPrintf($newVal)) {
                 SlurpFile($newVal, \$newVal) or next;
             } else {
+                $tag =~ s/([-+])$// and $opts{$addDelOpt{$1}} = 1;
                 # verify that this tag can be written
                 my $result = Image::ExifTool::IsWritable($tag);
                 if ($result) {
-                    push @dynamicValues, [ $tag, $newVal ];
+                    # add to list of dynamic tag values
+                    push @dynamicValues, [ $tag, $newVal, \%opts ];
                     ++$isWriting;
                 } elsif (defined $result) {
                     Warn "Tag '$tag' is not writable\n";
@@ -410,11 +540,10 @@ if (@newValues) {
                 next;
             }
         }
-        $tag =~ s/\+// and $opts{AddValue} = 1;
-        if ($tag =~ s/-$//) {
-            $opts{DelValue} = 1;
+        if ($tag =~ s/([-+])$//) {
+            $opts{$addDelOpt{$1}} = 1;  # set AddValue or DelValue option
             # set $newVal to '' if deleting nothing
-            $newVal = '' unless defined $newVal;
+            $newVal = '' if $1 eq '-' and not defined $newVal;
         }
         my ($rtn, $wrn) = $mainTool->SetNewValue($tag, $newVal, %opts);
         ++$isWriting if $rtn;
@@ -433,10 +562,13 @@ if (@newValues) {
         }
     } elsif (not $outOpt and not @tags) {
         Warn "Nothing to do.\n";
-        Exit 1;
+        $rtnVal = 1;
+        next;
     }
 } elsif (grep /^(\*:)?\*$/, @exclude) {
-    Die "All tags excluded -- nothing to do.\n";
+    Warn "All tags excluded -- nothing to do.\n";
+    $rtnVal = 1;
+    next;
 }
 # save current state of new values if setting values from target file
 # or if we may be translating to a different format
@@ -471,7 +603,11 @@ if ($outputExt) {
 if ($outOpt) {
     my $type = GetFileType($outOpt);
     if ($type) {
-        CanWrite($type) or Die "Can't write $type files\n";
+        unless (CanWrite($type)) {
+            Warn "Can't write $type files\n";
+            $rtnVal = 1;
+            next;
+        }
         $scanWritable = $type unless CanCreate($type);
     } else {
         $scanWritable = 1;
@@ -511,10 +647,13 @@ if (($countDir or $totWr or $countFailed or $tot > 1 or $outputExt) and
     printf("%5d files could not be read\n", $countBad) if $countBad;
     printf("%5d output files created\n", $countCreated) if $outputExt;
 }
-# return error status if we had any errors
-Exit 1 if $countBadWr or $countBadCr or $countBad;
 
-Exit 0;     # all done
+# set error status if we had any errors
+$rtnVal = 1 if $countBadWr or $countBadCr or $countBad;
+
+} # end "Command" loop
+
+Exit $rtnVal;   # all done
 
 
 #------------------------------------------------------------------------------
@@ -522,8 +661,9 @@ Exit 0;     # all done
 # Inputs: 0) ExifTool object reference, 1) file name
 sub GetImageInfo($$)
 {
-    my ($exifTool, $file) = @_;
+    my ($exifTool, $orig) = @_;
     my (@foundTags, $info, $writeOnly);
+    my $file = SourceFile($orig);
     my $pipe = $file;
 
     if ($doUnzip) {
@@ -542,10 +682,12 @@ sub GetImageInfo($$)
 
         my %info;
         my $oldVerbose = $exifTool->Options(Verbose => 0);
+        my $oldDups = $exifTool->Options(Duplicates => 1);
         # extract information and build expression for evaluation
         $info = $exifTool->ImageInfo($pipe, \@foundTags);
         my $cond = $exifTool->InsertTagValues(\@foundTags, $condition, \%info);
         $exifTool->Options(Verbose => $oldVerbose);
+        $exifTool->Options(Duplicates => $oldDups);
 
         #### eval "-if" condition (%info)
         my $result = eval $cond;
@@ -569,7 +711,7 @@ sub GetImageInfo($$)
     }
     my ($fp, $outfile);
     if ($outputExt and $verbose) {
-        ($fp, $outfile) = OpenOutputFile($file);
+        ($fp, $outfile) = OpenOutputFile($orig);
         $fp or return;
         $tmpText = $outfile;    # deletes file if we exit prematurely
         $exifTool->Options(TextOut => $fp);
@@ -577,7 +719,7 @@ sub GetImageInfo($$)
 
     if ($isWriting) {
         print "======== $file\n" if defined $verbose;
-        my $success = SetImageInfo($exifTool, $file);
+        my $success = SetImageInfo($exifTool, $orig);
         $info = $exifTool->GetInfo('Warning', 'Error');
         PrintErrors($exifTool, $info, $file);
         # close output text file if necessary
@@ -653,14 +795,14 @@ sub GetImageInfo($$)
     }
     # escape characters for html if requested
     if ($escapeHTML) {
-        require Image::ExifTool::XMP;
+        require Image::ExifTool::HTML;
         foreach (keys %$info) {
-            $$info{$_} = Image::ExifTool::XMP::EscapeHTML($$info{$_});
+            $$info{$_} = Image::ExifTool::HTML::EscapeHTML($$info{$_});
         }
     }
 
     # open output file (or stdout if no output file)
-    ($fp, $outfile) = OpenOutputFile($file);
+    ($fp, $outfile) = OpenOutputFile($orig);
     return unless $fp;
 
     # print the results for this file
@@ -820,13 +962,14 @@ sub GetImageInfo($$)
 #------------------------------------------------------------------------------
 # Set information in file
 # Inputs: 0) ExifTool object reference
-#         1) source file name ('' to create from scratch)
+#         1) original source file name ('' to create from scratch)
 # Returns: true on success
 sub SetImageInfo($$)
 {
-    my ($exifTool, $file) = @_;
+    my ($exifTool, $orig) = @_;
     my ($outfile, $restored, $isTemporary, $isStdout);
-    my $infile = $file;    # save original file argument
+    my $file = SourceFile($orig);
+    my $infile = $file;    # save infile in case we change it again
 
     undef $tmpFile; # make sure this isn't defined
 
@@ -838,9 +981,9 @@ sub SetImageInfo($$)
             $isStdout = 1;
             last;
         } else {
-            $outfile = FilenameSPrintf($outOpt, $file);
+            $outfile = FilenameSPrintf($outOpt, $orig);
             if ($outfile eq '') {
-                Warn "Can't create file with zero-length name from $file\n";
+                Warn "Can't create file with zero-length name from $orig\n";
                 ++$countBadCr;
                 return 0;
             }
@@ -895,11 +1038,11 @@ sub SetImageInfo($$)
         $restored = 1;
         my ($dyVal, $buff);
         foreach $dyVal (@dynamicValues) {
-            my $file = FilenameSPrintf($$dyVal[1], $infile);
+            my $dyfile = FilenameSPrintf($$dyVal[1], $orig);
             my ($rtn, $wrn);
-            if (defined $file and SlurpFile($file, \$buff)) {
-                $verbose and print "Reading $$dyVal[0] from $file\n";
-                ($rtn, $wrn) = $mainTool->SetNewValue($$dyVal[0], $buff);
+            if (defined $dyfile and SlurpFile($dyfile, \$buff)) {
+                $verbose and print "Reading $$dyVal[0] from $dyfile\n";
+                ($rtn, $wrn) = $mainTool->SetNewValue($$dyVal[0], $buff, %{$$dyVal[2]});
                 $wrn and Warn "$wrn\n";
             }
             # remove this tag if we couldn't set it properly
@@ -914,9 +1057,9 @@ sub SetImageInfo($$)
         foreach $dyFile (@dynamicFiles) {
             my $fromFile;
             if ($dyFile eq '@') {
-                $fromFile = $infile;
+                $fromFile = $orig;
             } else {
-                $fromFile = FilenameSPrintf($dyFile, $infile);
+                $fromFile = FilenameSPrintf($dyFile, $orig);
                 ++$countBadWr, return 0 unless defined $fromFile;
             }
             # set new values values from file
@@ -934,17 +1077,17 @@ sub SetImageInfo($$)
         my $newDir = $exifTool->GetNewValues('Directory');
         if ($newFileName or $newDir or ($doSetFileName and defined $outfile)) {
             if ($newFileName) {
-                $newFileName = FilenameSPrintf($newFileName, $infile);
+                $newFileName = FilenameSPrintf($newFileName, $orig);
                 if (defined $outfile) {
-                    $outfile = Image::ExifTool::GetNewFileName($infile, $outfile) if $infile ne '';
+                    $outfile = Image::ExifTool::GetNewFileName($orig, $outfile) if $orig ne '';
                     $outfile = Image::ExifTool::GetNewFileName($outfile, $newFileName);
-                } elsif ($infile ne '') {
-                    $outfile = Image::ExifTool::GetNewFileName($infile, $newFileName);
+                } elsif ($orig ne '') {
+                    $outfile = Image::ExifTool::GetNewFileName($orig, $newFileName);
                 }
             }
             if ($newDir) {
-                $newDir = FilenameSPrintf($newDir, $infile);
-                $outfile = Image::ExifTool::GetNewFileName(defined $outfile ? $outfile : $infile, $newDir);
+                $newDir = FilenameSPrintf($newDir, $orig);
+                $outfile = Image::ExifTool::GetNewFileName(defined $outfile ? $outfile : $orig, $newDir);
             }
             $outfile = NextUnusedFilename($outfile);
             if (-e $outfile) {
@@ -965,19 +1108,19 @@ sub SetImageInfo($$)
         }
         unless (defined $tmpFile) {
             # only need to rewrite file if we set a valid tag
-            my ($numSet, $numQuick) = $exifTool->CountNewValues();
+            my ($numSet, $numPseudo) = $exifTool->CountNewValues();
             unless ($numSet) {
                 if (-e $file) {
                     ++$countSameWr;
                     return 1;
                 } else {
-                    Warn("Warning: File not found - $file\n");
+                    Warn("Error: File not found - $file\n");
                     ++$countBadWr;
                     return 0;
                 }
             }
             # quickly rename file and/or set file date if this is all we are doing
-            if ($numSet == $numQuick) {
+            if ($numSet == $numPseudo) {
                 my $r1 = $exifTool->SetFileModifyDate($file);
                 my $r2 = 0;
                 $r2 = $exifTool->SetFileName($file, $outfile) if defined $outfile;
@@ -994,6 +1137,11 @@ sub SetImageInfo($$)
             unless (defined $outfile) {
                 # write to a truly temporary file
                 $outfile = "${file}_exiftool_tmp";
+                if (-e $outfile) {
+                    Warn("Error: Temporary file already exists: $outfile\n");
+                    ++$countBadWr;
+                    return 0;
+                }
                 $isTemporary = 1;
             }
             $tmpFile = $outfile;
@@ -1009,7 +1157,6 @@ sub SetImageInfo($$)
         $accTime = $^T - (-A $file) * (24 * 3600);
     }
     if ($success == 1) {
-        ++$countGoodWr;
         # preserve the original file times
         if (defined $tmpFile) {
             if (-e $file) {
@@ -1029,45 +1176,56 @@ sub SetImageInfo($$)
                     if ($overwriteOrig > 1) {
                         # copy temporary file over top of original to preserve attributes
                         my ($err, $buff);
-                        open(TMP_FILE, $tmpFile) or Die "Error opening $tmpFile\n";
-                        binmode(TMP_FILE);
+                        my $newFile = $tmpFile;
+                        open(NEW_FILE, $newFile) or Die "Error opening $newFile\n";
+                        binmode(NEW_FILE);
+                        # must not erase temporary file now if interrupted
+                        undef $tmpFile;
                         if (open(ORIG_FILE, ">$file")) {
+                            $tmpFile = $file; # original is now our temporary file
                             binmode(ORIG_FILE);
-                            while (read(TMP_FILE, $buff, 65536)) {
+                            while (read(NEW_FILE, $buff, 65536)) {
                                 print ORIG_FILE $buff or $err = 1;
                             }
-                            close(TMP_FILE);
+                            close(NEW_FILE);
                             close(ORIG_FILE) or $err = 1;
                             if ($err) {
                                 Warn "Couldn't overwrite in place - $file\n";
-                                rename($tmpFile, $file) or Die "Error renaming $tmpFile to $file\n";
+                                undef $tmpFile;
+                                rename($newFile, $file) or Die "Error renaming $newFile to $file\n";
                             } else {
-                                unlink $tmpFile;
+                                undef $tmpFile;
+                                unlink $newFile;
                                 if ($preserveTime and not utime($accTime, $modTime, $file)) {
                                     Warn "Error setting file time - $file\n";
                                 }
                             }
+                            ++$countGoodWr;
                         } else {
-                            close(TMP_FILE);
+                            close(NEW_FILE);
                             Warn "Error opening $file for writing\n";
-                            unlink $tmpFile;
+                            unlink $newFile;
+                            ++$countBadWr;
                         }
+                    # simply rename temporary file to replace original
+                    } elsif (rename($tmpFile, $file)) {
+                        ++$countGoodWr;
                     } else {
-                        # simply rename temporary file to replace original
-                        unless (rename($tmpFile, $file)) {
-                            Warn "Error renaming temporary file to $file\n";
-                            unlink $tmpFile;
-                        }
+                        Warn "Error renaming temporary file to $file\n";
+                        unlink $tmpFile;
+                        ++$countBadWr;
                     }
                 } elsif ($overwriteOrig) {
                     # erase original file
                     unlink $file or Warn "Error erasing original $file\n";
+                    ++$countGoodWr;
                 }
             } else {
                 # this file was created from scratch, not edited
                 ++$countGoodCr;
-                --$countGoodWr;
             }
+        } else {
+            ++$countGoodWr;
         }
     } elsif ($success) {
         if ($isTemporary) {
@@ -1194,7 +1352,7 @@ sub FilenameSPrintf($;$)
 {
     my ($fmt, $file) = @_;
     # return format string straight away if no tokens
-    return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*(d|f|e)/;
+    return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*[lu]?[dfe]/;
     return undef unless defined $file;
     $file =~ tr/\\/\//; # make sure we are using forward slashes
     # split filename into directory, file, extension
@@ -1205,15 +1363,17 @@ sub FilenameSPrintf($;$)
         $part{$_} = shift @parts;
     }
     my ($filename, $pos) = ('', 0);
-    while ($fmt =~ /(%([-+]?)(\d*)\.?(\d*)(d|f|e))/g) {
+    while ($fmt =~ /(%([-+]?)(\d*)\.?(\d*)([lu]?)([dfe]))/g) {
         $filename .= substr($fmt, $pos, pos($fmt) - $pos - length($1));
         $pos = pos($fmt);
-        my ($sign, $wid, $skip, $code) = ($2, $3, $4 || 0, $5);
+        my ($sign, $wid, $skip, $case, $code) = ($2, $3, $4 || 0, $5, $6);
         my $len = length $part{$code};
         next unless $skip < $len;
         $wid = $len - $skip if $wid eq '' or $wid + $skip > $len;
         $skip = $len - $wid - $skip if $sign eq '-';
-        $filename .= substr($part{$code}, $skip, $wid);
+        my $part = substr($part{$code}, $skip, $wid);
+        $part = ($case eq 'u') ? uc($part) : lc($part) if $case;
+        $filename .= $part;
     }
     $filename .= substr($fmt, $pos); # add rest of file name
     $filename =~ s{//}{/}g; # remove double slashes
@@ -1227,23 +1387,33 @@ sub FilenameSPrintf($;$)
 sub NextUnusedFilename($)
 {
     my $fmt = shift;
-    return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*c/;
-    my $copy = 0;
+    return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*[lu]?c/;
+    my %sep = ( '-' => '-', '+' => '_' );
+    my ($copy, $alpha) = (0, 'a');
     for (;;) {
         my ($filename, $pos) = ('', 0);
-        while ($fmt =~ /(%([-+]?)(\d*)(\.?)(\d*)c)/g) {
+        while ($fmt =~ /(%([-+]?)(\d*)(\.?)(\d*)([lu]?)c)/g) {
             $filename .= substr($fmt, $pos, pos($fmt) - $pos - length($1));
             $pos = pos($fmt);
-            my ($sign, $wid, $dec, $wid2) = ($2, $3 || 0, $4, $5 || 0);
+            my ($sign, $wid, $dec, $wid2, $case) = ($2, $3 || 0, $4, $5 || 0, $6);
             next unless $dec or $copy;
-            $filename .= '-' if $sign eq '-';
+            # add dash or underline separator if '-' or '+' specified
+            $filename .= $sep{$sign} if $sign;
             $wid = $wid2 if $wid < $wid2;
-            $filename .= $wid ? sprintf("%.${wid}d",$copy) : $copy;
+            if ($case) {
+                my $str = ($wid and $wid > length $alpha) ? 'a' x ($wid - length($alpha)) : '';
+                $str .= $alpha;
+                $str = uc $str if $case eq 'u';
+                $filename .= $str;
+            } else {
+                $filename .= $wid ? sprintf("%.${wid}d",$copy) : $copy;
+            }
         }
         $filename .= substr($fmt, $pos); # add rest of file name
         # return now with filename unless file exists
         return $filename unless -e $filename;
         ++$copy;
+        ++$alpha;
     }
 }
 
@@ -1284,7 +1454,7 @@ sub OpenOutputFile($)
     my ($fp, $outfile);
     if ($outputExt) {
         ($outfile = $file) =~ tr/\\/\//;
-        if ($outputExt =~ /%[-+]?\d*\.?\d*(d|f|e|c)/) {
+        if ($outputExt =~ /%[-+]?\d*\.?\d*[lu]?[dfec]/) {
             # make filename from printf-like $outputExt
             $outfile = FilenameSPrintf($outputExt, $file);
             return () unless defined $outfile;
@@ -1360,6 +1530,16 @@ sub PrintTagList(@)
 }
 
 #------------------------------------------------------------------------------
+# Get source file name for specified file
+# Inputs: 0) file name
+sub SourceFile($)
+{
+    my $file = shift;
+    return $file unless $srcFmt;
+    return FilenameSPrintf($srcFmt, $file);
+}
+
+#------------------------------------------------------------------------------
 # Print warnings and errors from info hash
 # Inputs: 0) ExifTool object ref, 1) info hash, 2) file name
 sub PrintErrors($$$)
@@ -1414,29 +1594,29 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PSD   r/w    |  EXIF           r/w/c
-  AI    r       MIE   r/w/c   QTIF  r      |  GPS            r/w/c
-  AIFF  r       MIFF  r       RA    r      |  IPTC           r/w/c
-  APE   r       MNG   r/w     RAF   r      |  XMP            r/w/c
-  ARW   r       MOS   r/w     RAM   r      |  MakerNotes     r/w/c
-  ASF   r       MOV   r       RAW   r      |  Photoshop IRB  r/w/c
-  AVI   r       MP3   r       RIFF  r      |  ICC Profile    r/w/c
-  BMP   r       MP4   r       RM    r      |  MIE            r/w/c
-  CR2   r/w     MPC   r       SR2   r      |  JFIF           r/w/c
-  CRW   r/w     MPG   r       SRF   r      |  CIFF           r/w
-  DCM   r       MRW   r/w     SWF   r      |  AFCP           r/w
-  DNG   r/w     NEF   r/w     THM   r/w    |  DICOM          r
-  DOC   r       OGG   r       TIFF  r/w    |  FlashPix       r
-  EPS   r/w     ORF   r/w     VRD   r/w    |  GeoTIFF        r
-  ERF   r/w     PBM   r/w     WAV   r      |  PrintIM        r
-  FLAC  r       PDF   r       WDP   r/w    |  ID3            r
-  FPX   r       PEF   r/w     WMA   r      |  Kodak Meta     r
-  GIF   r/w     PGM   r/w     WMV   r      |  Ricoh RMETA    r
-  HTML  r       PICT  r       X3F   r      |  Picture Info   r
-  ICC   r/w/c   PNG   r/w     XLS   r      |  Adobe APP14    r
-  JNG   r/w     PPM   r/w     XMP   r/w/c  |  APE            r
-  JP2   r       PPT   r                    |  Vorbis         r
-  JPEG  r/w     PS    r/w                  |  (and more)
+  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
+  AI    r       MEF   r       PSD   r/w    |  GPS            r/w/c
+  AIFF  r       MIE   r/w/c   QTIF  r      |  IPTC           r/w/c
+  APE   r       MIFF  r       RA    r      |  XMP            r/w/c
+  ARW   r       MNG   r/w     RAF   r      |  MakerNotes     r/w/c
+  ASF   r       MOS   r/w     RAM   r      |  Photoshop IRB  r/w/c
+  AVI   r       MOV   r       RAW   r/w    |  ICC Profile    r/w/c
+  BMP   r       MP3   r       RIFF  r      |  MIE            r/w/c
+  CR2   r/w     MP4   r       RM    r      |  JFIF           r/w/c
+  CRW   r/w     MPC   r       SR2   r      |  CIFF           r/w
+  DCM   r       MPG   r       SRF   r      |  AFCP           r/w
+  DNG   r/w     MRW   r/w     SWF   r      |  DICOM          r
+  DOC   r       NEF   r/w     THM   r/w    |  FlashPix       r
+  EPS   r/w     OGG   r       TIFF  r/w    |  GeoTIFF        r
+  ERF   r/w     ORF   r/w     VRD   r/w    |  PrintIM        r
+  FLAC  r       PBM   r/w     WAV   r      |  ID3            r
+  FPX   r       PDF   r       WDP   r/w    |  Kodak Meta     r
+  GIF   r/w     PEF   r/w     WMA   r      |  Ricoh RMETA    r
+  HTML  r       PGM   r/w     WMV   r      |  Picture Info   r
+  ICC   r/w/c   PICT  r       X3F   r      |  Adobe APP14    r
+  JNG   r/w     PNG   r/w     XLS   r      |  APE            r
+  JP2   r       PPM   r/w     XMP   r/w/c  |  Vorbis         r
+  JPEG  r/w     PPT   r                    |  (and more)
 
 Note:  If I<FILE> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are written.
@@ -1510,13 +1690,25 @@ may also be given by a I<FMT> string where %d, %f and %e represent the
 directory, file name and extension of the original I<FILE> (see the B<-w>
 option for more details).  Note that quotes are required around this
 argument to prevent shell redirection since it contains a C<E<lt>> symbol.
+C<+E<lt>=> or C<-E<lt>=> may also be used to add or delete specific list
+entries, or to shift date/time values.
 
 =item B<-@> I<ARGFILE>
 
 Read command-line arguments from the specified file.  The file contains one
-argument per line.  Blank lines and lines beginning with C<#> and are
-ignored.  I<ARGFILE> may exist relative to either the current directory or
-the exiftool directory unless an absolute pathname is given.
+argument per line (NOT one option per line -- some options require
+additional arguments which must be placed on separate lines).  Blank lines
+and lines beginning with C<#> and are ignored.   Normal shell processing of
+arguments is not performed, which among other things means that arguments
+should not be quoted.  I<ARGFILE> may exist relative to either the current
+directory or the exiftool directory unless an absolute pathname is given.
+
+For example, the following I<ARGFILE> will set the value of Copyright to
+"Copyright YYYY, Phil Harvey", where "YYYY" is the year of CreateDate:
+
+    -d
+    %Y
+    -copyright<Copyright $createdate, Phil Harvey
 
 =item B<-a>
 
@@ -1713,8 +1905,8 @@ necessary.  Existing files will not be overwritten.  Combining the
 B<-overwrite_original> option with B<-o> causes the original source file to
 be erased after the output file is successfully written.
 
-A special feature of this option allows it to be used to create certain types
-of files from scratch.  Currently, this can only be done with XMP and
+A special feature of this option allows it to be used to create certain
+types of files from scratch.  Currently, this can only be done with XMP and
 ICC/ICM files.  The file is created from a combination of information in
 I<FILE> and tag values assigned on the command line.  This is done by
 specifying a file extension of '.XMP', '.ICC' or '.ICM' for I<OUTFILE>.  The
@@ -1915,7 +2107,10 @@ example:
 Existing files will not be overwritten, and output directories are created
 automatically if necessary.
 
-Advanced feature:  A substring of the original file name, directory or
+Note:  In a Windows BAT file the '%' character is represented by "%%", so
+an argument like "%d%f.txt" is written as "%%d%%f.txt".
+
+Advanced features:  A substring of the original file name, directory or
 extension may be taken by specifying a field width immediately following the
 '%' character.  If the width is negative, the substring is taken from the
 end.  The substring position (characters to ignore at the start or end of
@@ -1929,18 +2124,24 @@ For example:
     Picture-123.jpg     %7f.%-3f            Picture.123
     Picture-123a.jpg    Meta%-3.1f.txt      Meta123.txt
 
-For %c, these modifiers have a different effects.  If a field width is given,
-the copy number is padded with zeros to the specified width, and a leading '-'
-is used to add a dash before the copy number.  By default, a copy number of zero
-is omitted, but this can be changed by adding a decimal point to the modifier.
-For example:
+For %c, these modifiers have a different effects.  If a field width is
+given, the copy number is padded with zeros to the specified width.  A
+leading '-' adds a dash before the copy number, and a '+' adds an underline.
+By default, a copy number of zero is omitted, but this can be changed by
+adding a decimal point to the modifier.  For example:
 
-    -w A%-cZ.txt      # AZ.txt, A-1Z.txt, A-2Z.txt...
-    -w B%5c.txt       # B.txt, B00001.txt, B00002.txt...
-    -w C%.c.txt       # C0.txt, C1.txt, C2.txt...
-    -w D%-.c.txt      # D-0.txt, D-1.txt, D-2.txt...
-    -w E%-.4c.txt     # E-0000.txt, E-0001.txt, E-0002.txt...
-    -w F_%.c.txt      # F_0.txt, F_1.txt F_2.txt...
+    -w A%-cZ.txt      # AZ.txt, A-1Z.txt, A-2Z.txt ...
+    -w B%5c.txt       # B.txt, B00001.txt, B00002.txt ...
+    -w C%.c.txt       # C0.txt, C1.txt, C2.txt ...
+    -w D%-.c.txt      # D-0.txt, D-1.txt, D-2.txt ...
+    -w E%-.4c.txt     # E-0000.txt, E-0001.txt, E-0002.txt ...
+    -w F%+c.txt       # F.txt, F_1.txt F_2.txt ...
+    -w G%-lc.txt      # G.txt, G-b.txt, G-c.txt ...
+
+The format codes may also be modified by 'l' or 'u' to specify lower or
+upper case respectively (ie. "%le" for a lower case file extension).  When
+used to modify the copy number, the numbers are changed to an alphabetical
+base (ie. as with "%lc" in the last example above).
 
 This same I<FMT> syntax is used with the B<-o> and B<-TagsFromFile> options,
 although %c is only valid for output file names.
@@ -1957,6 +2158,39 @@ When reading, causes information to be extracted from .gB<z> and .bB<z>2
 compressed images.  (Only one image per archive.)  When writing, causes
 compressed information to be written if supported by the image format.  (ie.
 The PNG format supports compressed text.)
+
+=back
+
+=head2 Advanced Options
+
+The following options allow complex processing to be performed with a single
+command without the need for additional scripting.  This may be particularly
+useful for implementations such as Windows drag-and-drop applications.
+These options may also be used to improve performance in multi-pass
+processing by reducing the overhead required to load exiftool for each
+invocation.
+
+=over 5
+
+=item B<-common_args>
+
+Specifies that all arguments following this option are common to all
+executed commands when B<-execute> is used.  This is the only option that
+may not be used inside a B<-@> I<ARGFILE>.
+
+=item B<-execute>
+
+Execute command for all arguments up to this point on the command line.
+Allows multiple commands to be executed from a single command line.
+
+=item B<-srcfile> I<FMT>
+
+Specify a different source file to be processed based on the name of the
+original file.  This may be useful in some special situations for processing
+related preview images or sidecar files.  See the B<-w> option for a
+description of the I<FMT> syntax.  Note that file name I<FMT> strings for
+all options are based on the original file name specified on the command
+line, not the name of the source file specified by B<-srcfile>.
 
 =back
 
@@ -2034,7 +2268,7 @@ Note that quotes are necessary around arguments which contain certain
 special characters such as C<E<gt>>, C<E<lt>> or any white space.  These
 quoting techniques are shell dependent, but the examples below will work for
 most Unix shells.  With the Windows cmd shell however, double quotes should
-be used around the entire argument (ie. "-Comment=This is a new comment")
+be used (ie. -Comment="This is a new comment").
 
 =over 5
 
@@ -2218,6 +2452,21 @@ Set the Comment tag of all images in C<dir> from the values of the EXIF:ISO
 and ShutterSpeed tags.  The resulting comment will be in the form "ISO=100
 Exposure=1/60".
 
+=item exiftool -if '$jpgfromraw' -b -jpgfromraw -w %d%f_%ue.jpg -execute
+-if '$previewimage' -b -previewimage -w %d%f_%ue.jpg -execute
+-tagsfromfile @ -srcfile %d%f_%ue.jpg -overwrite_original
+-common_args --ext jpg DIR
+
+[Advanced] Extract JpgFromRaw or PreviewImage from all but JPG files in DIR,
+saving them with file names like C<image_EXT.jpg>, then add all meta
+information from the original files to the extracted images.  Here, the
+command line is broken into three sections (separated by B<-execute>
+options), and each is executed as if it were a separate command.  The
+B<-common_args> option causes the C<--ext jpg DIR> arguments to be applied
+to all three commands, and the B<-srcfile> option allows the extracted JPG
+image to be the source file for the third command (whereas the RAW files are
+the source files for the other two commands).
+
 =back
 
 =head1 RENAMING EXAMPLES
@@ -2232,7 +2481,7 @@ and %c may be used to add a copy number if the file already exists (see the
 B<-w> option for details).  Note that if used within a date format string,
 an extra '%' must be added to pass these codes through the date/time parser.
 (And further note that in a Windows batch file, all '%' characters must also
-be escaped, so in this extreme case a '%%%%f' is necessary to pass a simple
+be escaped, so in this extreme case '%%%%f' is necessary to pass a simple
 '%f' through the two levels of parsing.)
 
 =over 5
@@ -2296,8 +2545,14 @@ Extract information from an embedded thumbnail image.
 
 Add an IPTC keyword in a pipeline, saving output to a new file.
 
+=item wget -qO - http://a.domain.com/bigfile.jpg | exiftool -fast -
+
+Extract information from an image over the internet using the GNU wget
+utility.  The B<-fast> option prevents exiftool from scanning for trailer
+information, so only the meta information header is transferred.
+
 =item exiftool a.jpg -thumbnailimage -b | exiftool -comment=wow - |
-      exiftool a.jpg -thumbnailimage'<=-'
+exiftool a.jpg -thumbnailimage'<=-'
 
 Add a comment to an embedded thumbnail image.  (Why anyone would want to do
 this I don't know, but I've included this as an example to illustrate the

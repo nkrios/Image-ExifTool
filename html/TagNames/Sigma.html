@@ -49,12 +49,17 @@ These tags are used in Sigma/Foveon cameras.
 <td>0x0008</td>
 <td>ExposureMode</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>&#39;A&#39; = Aperture-priority AE
+  <br>&#39;M&#39; = Manual
+  <br>&#39;P&#39; = Program AE
+  <br>&#39;S&#39; = Shutter speed priority AE</span></td></tr>
 <tr class=b>
 <td>0x0009</td>
 <td>MeteringMode</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>8 = Multi-segment
+  <br>&#39;A&#39; = Average
+  <br>&#39;C&#39; = Center-weighted average</span></td></tr>
 <tr>
 <td>0x000a</td>
 <td>Lens</td>
@@ -67,43 +72,51 @@ These tags are used in Sigma/Foveon cameras.
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x000c</td>
-<td>ExposureCompensation</td>
-<td class=c>string</td>
+<td>ExposureCompensation
+  <br>UnknownCompensation?</td>
+<td class=c>string<br>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x000d</td>
-<td>Contrast</td>
-<td class=c>string</td>
+<td>Contrast
+  <br>Contrast</td>
+<td class=c>string<br>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x000e</td>
-<td>Shadow</td>
-<td class=c>string</td>
+<td>Shadow
+  <br>Shadow</td>
+<td class=c>string<br>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x000f</td>
-<td>Highlight</td>
-<td class=c>string</td>
+<td>Highlight
+  <br>Highlight</td>
+<td class=c>string<br>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0010</td>
-<td>Saturation</td>
-<td class=c>string</td>
+<td>Saturation
+  <br>Saturation</td>
+<td class=c>string<br>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x0011</td>
-<td>Sharpness</td>
-<td class=c>string</td>
+<td>Sharpness
+  <br>Sharpness</td>
+<td class=c>string<br>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0012</td>
-<td>X3FillLight</td>
-<td class=c>string</td>
+<td>X3FillLight
+  <br>X3FillLight</td>
+<td class=c>string<br>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x0014</td>
-<td>ColorAdjustment</td>
-<td class=c>string</td>
+<td>ColorAdjustment
+  <br>ColorAdjustment</td>
+<td class=c>string<br>rational64s[3]</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0015</td>
@@ -130,11 +143,56 @@ These tags are used in Sigma/Foveon cameras.
 <td>AutoBracket</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x001d</td>
+<td>MakerNoteVersion</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0022</td>
+<td>AdjustmentMode?</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0030</td>
+<td>LensApertureRange</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0031</td>
+<td>FNumber</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0032</td>
+<td>ExposureTime</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0035</td>
+<td>ExposureCompensation</td>
+<td class=c>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x003a</td>
+<td>FlashExposureComp</td>
+<td class=c>rational64s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x003b</td>
+<td>Firmware</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x003c</td>
+<td>WhiteBalance</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 31, 2006</i>
+<br><i>Last revised Feb 20, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

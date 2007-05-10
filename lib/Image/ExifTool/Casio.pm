@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 %Image::ExifTool::Casio::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -97,7 +97,7 @@ $VERSION = '1.18';
         ValueConv => '$val / 1000', #4
         ValueConvInv => '$val * 1000',
         PrintConv => '"$val m"',
-        PrintConvInv => '$val=~s/ .*//;$val',
+        PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     0x0007 => {
         Name => 'WhiteBalance',
@@ -111,6 +111,7 @@ $VERSION = '1.18';
             129 => 'Manual',
         },
     },
+    # 0x0009 Bulb? (ref unknown)
     0x000a => {
         Name => 'DigitalZoom',
         Writable => 'int32u',
@@ -430,7 +431,7 @@ $VERSION = '1.18';
         ValueConv => '$val / 1000',
         ValueConvInv => '$val * 1000',
         PrintConv => '"$val m"',
-        PrintConvInv => '$val=~s/ .*//;$val',
+        PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     # 0x2023 looks interesting (values 0,1,2,3,5 in samples) - PH
     0x2034 => {

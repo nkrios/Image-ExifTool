@@ -22,7 +22,7 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 <tr>
 <td>0x0000</td>
 <td>NullRecord</td>
-<td class=c>Y</td>
+<td class=c>undef</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x0001</td>
@@ -38,7 +38,7 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 <td>0x0805</td>
 <td>CanonFileDescription
   <br>UserComment</td>
-<td class=c>Y<br>Y</td>
+<td class=c>string[32]<br>string[256]</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x080a</td>
@@ -48,65 +48,65 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 <tr class=b>
 <td>0x080b</td>
 <td>CanonFirmwareVersion</td>
-<td class=c>Y</td>
+<td class=c>string[32]</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x080c</td>
 <td>ComponentVersion</td>
-<td class=c>Y</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x080d</td>
 <td>ROMOperationMode</td>
-<td class=c>Y</td>
+<td class=c>string[8]</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0810</td>
 <td>OwnerName</td>
-<td class=c>Y</td>
+<td class=c>string[32]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x0815</td>
 <td>CanonImageType</td>
-<td class=c>Y</td>
+<td class=c>string[32]</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0816</td>
 <td>OriginalFileName</td>
-<td class=c>Y</td>
+<td class=c>string[32]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x0817</td>
 <td>ThumbnailFileName</td>
-<td class=c>Y</td>
+<td class=c>string[32]</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x100a</td>
 <td>TargetImageType</td>
-<td class=c>Y</td>
+<td class=c>int16u</td>
 <td><span class=s>0 = Real-world Subject
   <br>1 = Written Document</span></td></tr>
 <tr class=b>
 <td>0x1010</td>
 <td>ShutterReleaseMethod</td>
-<td class=c>Y</td>
+<td class=c>int16u</td>
 <td><span class=s>0 = Single Shot
   <br>2 = Continuous Shooting</span></td></tr>
 <tr>
 <td>0x1011</td>
 <td>ShutterReleaseTiming</td>
-<td class=c>Y</td>
+<td class=c>int16u</td>
 <td><span class=s>0 = Priority on shutter
   <br>1 = Priority on focus</span></td></tr>
 <tr class=b>
 <td>0x1016</td>
 <td>ReleaseSetting</td>
-<td class=c>Y</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x101c</td>
 <td>BaseISO</td>
-<td class=c>Y</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x1028</td>
@@ -167,12 +167,12 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 <tr class=b>
 <td>0x10ae</td>
 <td>ColorTemperature</td>
-<td class=c>Y</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x10b4</td>
 <td>ColorSpace</td>
-<td class=c>Y</td>
+<td class=c>int16u</td>
 <td><span class=s>1 = sRGB
   <br>2 = Adobe RGB
   <br>65535 = Uncalibrated</span></td></tr>
@@ -189,12 +189,12 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 <tr class=b>
 <td>0x1804</td>
 <td>RecordID</td>
-<td class=c>Y</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x1806</td>
 <td>SelfTimerTime</td>
-<td class=c>Y</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x1807</td>
@@ -204,7 +204,7 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 <tr>
 <td>0x180b</td>
 <td>SerialNumber</td>
-<td class=c>Y</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x180e</td>
@@ -230,7 +230,7 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
 <tr class=b>
 <td>0x1817</td>
 <td>FileNumber</td>
-<td class=c>Y</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x1818</td>
@@ -240,100 +240,10 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
 <tr class=b>
 <td>0x1834</td>
 <td>CanonModelID</td>
-<td class=c>N</td>
-<td><span class=s><span class=n>(this is the complete list of model ID numbers, but note that many of these
-models do not produce CRW images)</span>
-  <br>0x1010000 = PowerShot A30
-  <br>0x1040000 = PowerShot S300 / Digital IXUS 300 / IXY Digital 300
-  <br>0x1060000 = PowerShot A20
-  <br>0x1080000 = PowerShot A10
-  <br>0x1090000 = PowerShot S110 / Digital IXUS v / IXY Digital 200
-  <br>0x1100000 = PowerShot G2
-  <br>0x1110000 = PowerShot S40
-  <br>0x1120000 = PowerShot S30
-  <br>0x1130000 = PowerShot A40
-  <br>0x1140000 = EOS D30
-  <br>0x1150000 = PowerShot A100
-  <br>0x1160000 = PowerShot S200 / Digital IXUS v2 / IXY Digital 200a
-  <br>0x1170000 = PowerShot A200
-  <br>0x1180000 = PowerShot S330 / Digital IXUS 330 / IXY Digital 300a
-  <br>0x1190000 = PowerShot G3
-  <br>0x1210000 = PowerShot S45
-  <br>0x1230000 = PowerShot SD100 / Digital IXUS II / IXY Digital 30
-  <br>0x1240000 = PowerShot S230 / Digital IXUS v3 / IXY Digital 320
-  <br>0x1250000 = PowerShot A70
-  <br>0x1260000 = PowerShot A60
-  <br>0x1270000 = PowerShot S400 / Digital IXUS 400 / IXY Digital 400
-  <br>0x1290000 = PowerShot G5
-  <br>0x1300000 = PowerShot A300
-  <br>0x1310000 = PowerShot S50
-  <br>0x1340000 = PowerShot A80
-  <br>0x1350000 = PowerShot SD10 / Digital IXUS i / IXY Digital L
-  <br>0x1360000 = PowerShot S1 IS
-  <br>0x1370000 = PowerShot Pro1
-  <br>0x1380000 = PowerShot S70
-  <br>0x1390000 = PowerShot S60
-  <br>0x1400000 = PowerShot G6
-  <br>0x1410000 = PowerShot S500 / Digital IXUS 500 / IXY Digital 500
-  <br>0x1420000 = PowerShot A75
-  <br>0x1440000 = PowerShot SD110 / Digital IXUS IIs / IXY Digital 30a
-  <br>0x1450000 = PowerShot A400
-  <br>0x1470000 = PowerShot A310
-  <br>0x1490000 = PowerShot A85
-  <br>0x1520000 = PowerShot S410 / Digital IXUS 430 / IXY Digital 450
-  <br>0x1530000 = PowerShot A95
-  <br>0x1540000 = PowerShot SD300 / Digital IXUS 40 / IXY Digital 50
-  <br>0x1550000 = PowerShot SD200 / Digital IXUS 30 / IXY Digital 40
-  <br>0x1560000 = PowerShot A520
-  <br>0x1570000 = PowerShot A510
-  <br>0x1590000 = PowerShot SD20 / Digital IXUS i5 / IXY Digital L2
-  <br>0x1640000 = PowerShot S2 IS
-  <br>0x1650000 = PowerShot SD430 / IXUS Wireless / IXY Wireless
-  <br>0x1660000 = PowerShot SD500 / Digital IXUS 700 / IXY Digital 600
-  <br>0x1668000 = EOS D60
-  <br>0x1700000 = PowerShot SD30 / Digital IXUS i zoom / IXY Digital L3
-  <br>0x1740000 = PowerShot A430
-  <br>0x1750000 = PowerShot A410
-  <br>0x1760000 = PowerShot S80
-  <br>0x1780000 = PowerShot A620
-  <br>0x1790000 = PowerShot A610
-  <br>0x1800000 = PowerShot SD630 / Digital IXUS 65 / IXY Digital 80
-  <br>0x1810000 = PowerShot SD450 / Digital IXUS 55 / IXY Digital 60
-  <br>0x1870000 = PowerShot SD400 / Digital IXUS 50 / IXY Digital 55
-  <br>0x1880000 = PowerShot A420
-  <br>0x1890000 = PowerShot SD900 / Digital IXUS 900 Ti / IXY Digital 1000
-  <br>0x1900000 = PowerShot SD550 / Digital IXUS 750 / IXY Digital 700
-  <br>0x1920000 = PowerShot A700
-  <br>0x1940000 = PowerShot SD700 IS / Digital IXUS 800 IS / IXY Digital 800 IS
-  <br>0x1950000 = PowerShot S3 IS
-  <br>0x1960000 = PowerShot A540
-  <br>0x1970000 = PowerShot SD600 / Digital IXUS 60 / IXY Digital 70
-  <br>0x1980000 = PowerShot G7
-  <br>0x1990000 = PowerShot A530
-  <br>0x2000000 = PowerShot SD800 IS / Digital IXUS 850 IS / IXY Digital 900 IS
-  <br>0x2010000 = PowerShot SD40 / Digital IXUS i7 / IXY Digital L4
-  <br>0x2020000 = PowerShot A710 IS
-  <br>0x2030000 = PowerShot A640
-  <br>0x2040000 = PowerShot A630
-  <br>0x2100000 = PowerShot A460
-  <br>0x2180000 = PowerShot A550
-  <br>0x2190000 = PowerShot A450
-  <br>0x3010000 = PowerShot Pro90 IS
-  <br>0x4040000 = PowerShot G1
-  <br>0x6040000 = PowerShot S100 / Digital IXUS / IXY Digital
-  <br>0x4007d675 = HV10
-  <br>0x80000001 = EOS-1D
-  <br>0x80000167 = EOS-1DS
-  <br>0x80000168 = EOS 10D
-  <br>0x80000170 = EOS Digital Rebel / 300D / Kiss Digital
-  <br>0x80000174 = EOS-1D Mark II
-  <br>0x80000175 = EOS 20D
-  <br>0x80000188 = EOS-1Ds Mark II
-  <br>0x80000189 = EOS Digital Rebel XT / 350D / Kiss Digital N
-  <br>0x80000213 = EOS 5D
-  <br>0x80000232 = EOS-1D Mark II N
-  <br>0x80000234 = EOS 30D
-  <br>0x80000236 = EOS Digital Rebel XTi / 400D / Kiss Digital X</span></td></tr>
+<td class=c>int32u</td>
+<td>--&gt; <a href='Canon.html#CanonModelID'>Canon CanonModelID Values</a>
+  <br><span class='n s'>(this is the complete list of model ID numbers, but note that many of these
+models do not produce CRW images)</span></td></tr>
 <tr>
 <td>0x1835</td>
 <td>DecoderTable</td>
@@ -578,7 +488,7 @@ models do not produce CRW images)</span>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 19, 2006</i>
+<br><i>Last revised Mar 21, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

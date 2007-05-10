@@ -24,7 +24,6 @@ sub RemoveNewValueHash($$$);
 sub RemoveNewValuesForGroup($$);
 
 my $loadedAllTables;    # flag indicating we loaded all tables
-my $evalWarning;        # eval warning message
 
 # the following is a road map of where we write each directory
 # in the different types of files.
@@ -111,6 +110,9 @@ my %intRange = (
 );
 my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 
+# value separators when conversion list is used (in SetNewValue)
+my %listSep = ( PrintConv => '; ?', ValueConv => ' ' );
+
 #------------------------------------------------------------------------------
 # Set tag value
 # Inputs: 0) ExifTool object reference
@@ -141,6 +143,7 @@ my $maxSegmentLen = 0xfffd; # maximum length of data in a JPEG segment
 #           Next - pointer to next newValueHash (if more than one)
 #           Self - ExifTool object reference
 #           Shift - shift value
+#           MAKER_NOTE_FIXUP - pointer to fixup if necessary for a maker note value
 sub SetNewValue($;$$%)
 {
     local $_;
@@ -445,10 +448,19 @@ ReturnNow:  return ($numSet, $err) if wantarray;
                 next;
             }
         }
-        # convert the value
         my $val = $value;
-        # can't delete permanent tags, so set value to empty string instead
-        $val = '' if not defined $val and $permanent;
+        if (defined $val) {
+            # check to make sure this is a List or Shift tag if adding
+            if ($options{AddValue} and not ($shift or $tagInfo->{List})) {
+                $err = "Can't add $wgrp1:$tag (not a List type)";
+                $verbose > 2 and print $out "$err\n";
+                next;
+            }
+        } else {
+            # can't delete permanent tags, so set value to empty string instead
+            $val = '' if $permanent;
+        }
+        # convert the value
         my $type;
         if ($shift) {
             # add '+' or '-' prefix to indicate shift direction
@@ -465,65 +477,89 @@ ReturnNow:  return ($numSet, $err) if wantarray;
             $type = $options{Type};
             $type or $type = $self->Options('PrintConv') ? 'PrintConv' : 'ValueConv';
         }
-        while (defined $val and not $shift) {
+Conv:   while (defined $val and not $shift) {
             my $conv = $tagInfo->{$type};
             my $convInv = $tagInfo->{"${type}Inv"};
-            if ($convInv) {
-                # capture eval warnings too
-                local $SIG{'__WARN__'} = sub { $evalWarning = $_[0]; };
-                undef $evalWarning;
-                if (ref($convInv) eq 'CODE') {
-                    $val = &$convInv($val, $self);
-                } else {
-                    #### eval PrintConvInv/ValueConvInv ($val, $self)
-                    $val = eval $convInv;
-                    $@ and $evalWarning = $@;
+            my (@valList, $index, $convList, $convInvList);
+            # handle conversion lists
+            if (ref $conv eq 'ARRAY' or ref $convInv eq 'ARRAY') {
+                @valList = split /$listSep{$type}/, $val;
+                $val = $valList[$index = 0];
+                if (ref $conv eq 'ARRAY') {
+                    $convList = $conv;
+                    $conv = $$conv[0];
                 }
-                if ($evalWarning) {
-                    chomp $evalWarning;
-                    $evalWarning =~ s/ at \(eval .*//s;
-                    $err = "$evalWarning in $wgrp1:$tag (${type}Inv)";
-                    $verbose > 2 and print $out "$err\n";
-                    undef $val;
-                    last;
-                } elsif (not defined $val) {
-                    $err = "Error converting value for $wgrp1:$tag (${type}Inv)";
-                    $verbose > 2 and print $out "$err\n";
-                    last;
+                if (ref $convInv eq 'ARRAY') {
+                    $convInvList = $convInv;
+                    $convInv = $$convInv[0];
                 }
-            } elsif ($conv) {
-                if (ref $conv eq 'HASH') {
-                    my $multi;
-                    if ($$conv{BITMASK}) {
-                        my $lookupBits = $$conv{BITMASK};
-                        my ($val2, $err2) = EncodeBits($val, $lookupBits);
-                        if ($err2) {
-                            $err = "Can't encode $wgrp1:$tag ($err2)";
-                            $verbose > 2 and print $out "$err\n";
-                            undef $val;
-                            last;
-                        } elsif (defined $val2) {
-                            $val = $val2;
-                        } else {
-                            delete $$conv{BITMASK};
-                            ($val, $multi) = ReverseLookup($val, $conv);
-                            $$conv{BITMASK} = $lookupBits;
-                        }
+            }
+            # loop through multiple values if necessary
+            for (;;) {
+                if ($convInv) {
+                    # capture eval warnings too
+                    local $SIG{'__WARN__'} = \&SetWarning;
+                    undef $evalWarning;
+                    if (ref($convInv) eq 'CODE') {
+                        $val = &$convInv($val, $self);
                     } else {
-                        ($val, $multi) = ReverseLookup($val, $conv);
+                        #### eval PrintConvInv/ValueConvInv ($val, $self)
+                        $val = eval $convInv;
+                        $@ and $evalWarning = $@;
                     }
-                    unless (defined $val) {
-                        $err = "Can't convert $wgrp1:$tag (" .
-                               ($multi ? 'matches more than one' : 'not in') . " $type)";
+                    if ($evalWarning) {
+                        $err = CleanWarning() . " in $wgrp1:$tag (${type}Inv)";
                         $verbose > 2 and print $out "$err\n";
-                        last;
+                        undef $val;
+                        last Conv;
+                    } elsif (not defined $val) {
+                        $err = "Error converting value for $wgrp1:$tag (${type}Inv)";
+                        $verbose > 2 and print $out "$err\n";
+                        last Conv;
                     }
-                } elsif (not $$tagInfo{WriteAlso}) {
-                    $err = "Can't convert value for $wgrp1:$tag (no ${type}Inv)";
-                    $verbose > 2 and print $out "$err\n";
-                    undef $val;
+                } elsif ($conv) {
+                    if (ref $conv eq 'HASH') {
+                        my $multi;
+                        if ($$conv{BITMASK}) {
+                            my $lookupBits = $$conv{BITMASK};
+                            my ($val2, $err2) = EncodeBits($val, $lookupBits);
+                            if ($err2) {
+                                $err = "Can't encode $wgrp1:$tag ($err2)";
+                                $verbose > 2 and print $out "$err\n";
+                                undef $val;
+                                last Conv;
+                            } elsif (defined $val2) {
+                                $val = $val2;
+                            } else {
+                                delete $$conv{BITMASK};
+                                ($val, $multi) = ReverseLookup($val, $conv);
+                                $$conv{BITMASK} = $lookupBits;
+                            }
+                        } else {
+                            ($val, $multi) = ReverseLookup($val, $conv);
+                        }
+                        unless (defined $val) {
+                            $err = "Can't convert $wgrp1:$tag (" .
+                                   ($multi ? 'matches more than one' : 'not in') . " $type)";
+                            $verbose > 2 and print $out "$err\n";
+                            last Conv;
+                        }
+                    } elsif (not $$tagInfo{WriteAlso}) {
+                        $err = "Can't convert value for $wgrp1:$tag (no ${type}Inv)";
+                        $verbose > 2 and print $out "$err\n";
+                        undef $val;
+                        last Conv;
+                    }
+                }
+                last unless @valList;
+                $valList[$index] = $val;
+                if (++$index >= @valList) {
+                    $val = join ' ', @valList;
                     last;
                 }
+                $conv = $$convList[$index] if $convList;
+                $convInv = $$convInvList[$index] if $convInvList;
+                $val = $valList[$index];
             }
             # cycle through PrintConv, ValueConv
             if ($type eq 'PrintConv') {
@@ -574,13 +610,12 @@ ReturnNow:  return ($numSet, $err) if wantarray;
 
         # set value in NEW_VALUE hash
         if (defined $val) {
-            if ($options{AddValue} and not ($shift or $tagInfo->{List})) {
-                $err = "Can't add $wgrp1:$tag (not a List type)";
-                $verbose > 2 and print $out "$err\n";
-                next;
-            }
             # we are editing this tag, so create a NEW_VALUE hash entry
             my $newValueHash = $self->GetNewValueHash($tagInfo, $writeGroup, 'create');
+            # save maker note information if writing maker notes
+            if ($$tagInfo{MakerNotes}) {
+                $newValueHash->{MAKER_NOTE_FIXUP} = $self->{MAKER_NOTE_FIXUP};
+            }
             if ($options{DelValue} or $options{AddValue} or $shift) {
                 # flag any AddValue or DelValue by creating the DelValue list
                 $newValueHash->{DelValue} or $newValueHash->{DelValue} = [ ];
@@ -718,6 +753,7 @@ sub SetNewValuesFromFile($$;@)
         FixBase     => $$options{FixBase},
         DateFormat  => $$options{DateFormat},
         PrintConv   => $$options{PrintConv},
+        Composite   => $$options{Composite},
         MissingTagValue   => $$options{MissingTagValue},
         IgnoreMinorErrors => $$options{IgnoreMinorErrors},
     );
@@ -1000,8 +1036,8 @@ sub GetNewValues($;$$)
 # Return the total number of new values set
 # Inputs: 0) ExifTool object reference
 # Returns: Scalar context) Number of new values that have been set
-#          List context) Number of new values, number of "quick" values
-# ("quick" values are those which don't require rewriting the file to change)
+#          List context) Number of new values, number of "pseudo" values
+# ("pseudo" values are those which don't require rewriting the file to change)
 sub CountNewValues($)
 {
     my $self = shift;
@@ -1010,15 +1046,15 @@ sub CountNewValues($)
     $num += scalar keys %$newVal if $newVal;
     $num += scalar keys %{$self->{DEL_GROUP}};
     return $num unless wantarray;
-    my $quick = 0;
+    my $pseudo = 0;
     if ($newVal) {
         my $tag;
-        # (Note: all "quick" tags must be found in Extra table)
+        # (Note: all "pseudo" tags must be found in Extra table)
         foreach $tag (qw{FileName Directory FileModifyDate}) {
-            ++$quick if defined $$newVal{$Image::ExifTool::Extra{$tag}};
+            ++$pseudo if defined $$newVal{$Image::ExifTool::Extra{$tag}};
         }
     }
-    return ($num, $quick);
+    return ($num, $pseudo);
 }
 
 #------------------------------------------------------------------------------
@@ -1231,8 +1267,8 @@ sub WriteInfo($$;$$)
 #
     if (not defined $outfile and defined $infile) {
         my $newFileName =  $self->GetNewValues('FileName', \$newValueHash);
-        my ($numNew, $numQuick) = $self->CountNewValues();
-        if ($numNew == $numQuick) {
+        my ($numNew, $numPseudo) = $self->CountNewValues();
+        if ($numNew == $numPseudo) {
             $rtnVal = 2;
             if (defined $fileModifyDate and (not ref $infile or UNIVERSAL::isa($infile,'GLOB'))) {
                 $self->SetFileModifyDate($infile) > 0 and $rtnVal = 1;
@@ -1261,10 +1297,10 @@ sub WriteInfo($$;$$)
         } elsif (eval 'require Encode; Encode::is_utf8($$inref)') {
             # convert image data from UTF-8 to character stream if necessary
             if (defined $outfile) {
-                my $buff = pack('C*', unpack('U*', $$inRef));
+                my $buff = pack('C*', unpack('U0U*', $$inRef));
                 $inRef = \$buff;
             } else {
-                $$inRef = pack('C*', unpack('U*', $$inRef));
+                $$inRef = pack('C*', unpack('U0U*', $$inRef));
             }
         }
     } elsif (defined $infile and $infile ne '') {
@@ -1360,7 +1396,7 @@ sub WriteInfo($$;$$)
                 $rtnVal = $self->WriteJPEG(\%dirInfo);
             } elsif ($type eq 'TIFF') {
                 # don't allow rewriting of Sony raw images
-                if ($tiffType =~ /^(SRF|SR2|ARW)$/) {
+                if ($tiffType =~ /^(SRF|SR2|ARW|RAW)$/) {
                     $fileType = $tiffType;
                     undef $rtnVal;
                 } else {
@@ -1402,6 +1438,9 @@ sub WriteInfo($$;$$)
             } elsif ($type eq 'VRD') {
                 require Image::ExifTool::CanonVRD;
                 $rtnVal = Image::ExifTool::CanonVRD::ProcessVRD($self, \%dirInfo);
+            } elsif ($type eq 'RAW') {
+                $rtnVal = $self->ProcessTIFF(\%dirInfo);
+                $rtnVal or $self->Error('ExifTool does not support writing this type of RAW file');
             } else {
                 undef $rtnVal;  # flag that we don't write this type of file
             }
@@ -1422,7 +1461,7 @@ sub WriteInfo($$;$$)
         # print file format errors
         unless ($rtnVal) {
             if ($fileType and defined $rtnVal) {
-                $self->{VALUE}->{Error} or $self->Error("Format error in file");
+                $self->{VALUE}->{Error} or $self->Error('Format error in file');
             } elsif ($fileType) {
                 $self->Error("ExifTool does not yet support writing of $fileType files");
             } else {
@@ -1654,10 +1693,13 @@ sub InsertTagValues($$$;$)
             $line =~ s/^\}// if $group =~ s/^\{//;
             # find the specified tag
             my @matches = grep /^$tag(\s|$)/i, @$foundTags;
+            $tag = "$group:$tag";
             foreach $tg (@matches) {
                 my @groups = $self->GetGroup($tg, $family);
-                next unless grep /^$group$/i, @groups;
+                my ($grp) = grep /^$group$/i, @groups;
+                next unless defined $grp;
                 $val = $self->GetValue($tg);
+                $tag = "$grp:$tg";
                 last;
             }
         } else {
@@ -1667,7 +1709,10 @@ sub InsertTagValues($$$;$)
             unless (defined $val) {
                 # check for tag name with different case
                 ($tg) = grep /^$tag$/i, @$foundTags;
-                $val = $self->GetValue($tg) if defined $tg;
+                if (defined $tg) {
+                    $val = $self->GetValue($tg);
+                    $tag = $tg;
+                }
             }
         }
         if (ref $val eq 'ARRAY') {
@@ -1683,9 +1728,8 @@ sub InsertTagValues($$$;$)
             }
         }
         if (ref $opt eq 'HASH') {
-            $tg = '' unless defined $tg;
-            $rtnStr .= "$pre\$info{'$tg'}";
-            $$opt{$tg} = $val;
+            $rtnStr .= "$pre\$info{'$tag'}";
+            $$opt{$tag} = $val;
         } else {
             $rtnStr .= "$pre$val";
         }
@@ -1705,7 +1749,7 @@ sub IsWritable($)
     return undef unless @tagInfo;
     my $tagInfo;
     foreach $tagInfo (@tagInfo) {
-        return 1 if $$tagInfo{Writable} or $tagInfo->{Table}->{Writable};
+        return 1 if $$tagInfo{Writable} or $tagInfo->{Table}->{WRITABLE};
     }
     return 0;
 }
@@ -2113,7 +2157,7 @@ sub InitWriteDirs($$;$)
     }
     my @tagInfoList = $self->GetNewTagInfoList();
     my $tagInfo;
-    for $tagInfo (@tagInfoList) {
+    foreach $tagInfo (@tagInfoList) {
         my $newValueHash = $self->GetNewValueHash($tagInfo);
         for (;;) {
             # are we creating this tag? (otherwise just deleting or editing it)
@@ -2167,6 +2211,12 @@ sub InitWriteDirs($$;$)
             }
         }
     }
+    # special case to edit JFIF to get resolutions if editing EXIF information
+    if ($$editDirs{IFD0} and $$fileDirs{JFIF}) {
+        $$editDirs{JFIF} = 'IFD1';
+        $$editDirs{APP0} = undef;
+    }
+  
     if ($self->{OPTIONS}->{Verbose}) {
         my $out = $self->{OPTIONS}->{TextOut};
         print $out "  Editing tags in: ";
@@ -2274,9 +2324,11 @@ sub WriteDirectory($$$;$)
         print $out "  $verb $dirName\n";
     }
     my $saveOrder = GetByteOrder();
+    my $oldChanged = $self->{CHANGED};
     $self->{DIR_NAME} = $dirName;
     my $newData = &$writeProc($self, $dirInfo, $tagTablePtr);
     $self->{DIR_NAME} = $oldDir;
+    $self->{CHANGED} = $oldChanged unless defined $newData; # nothing changed if error occurred
     SetByteOrder($saveOrder);
     print $out "  Deleting $dirName\n" if $out and defined $newData and not length $newData;
     return $newData;
@@ -2602,10 +2654,88 @@ sub VerboseDir($$;$$)
 }
 
 #------------------------------------------------------------------------------
-# convert unicode characters to Windows Latin1 (cp1252)
-# Inputs: 0) 16-bit unicode character string, 1) unpack format
+# Pack Unicode numbers into UTF8 string
+# Inputs: 0-N) list of Unicode numbers
+# Returns: Packed UTF-8 string
+sub PackUTF8(@)
+{
+    my @out;
+    while (@_) {
+        my $ch = pop;
+        unshift(@out, $ch), next if $ch < 0x80;
+        unshift(@out, 0x80 | ($ch & 0x3f));
+        $ch >>= 6;
+        unshift(@out, 0xc0 | $ch), next if $ch < 0x20;
+        unshift(@out, 0x80 | ($ch & 0x3f));
+        $ch >>= 6;
+        unshift(@out, 0xe0 | $ch), next if $ch < 0x10;
+        unshift(@out, 0x80 | ($ch & 0x3f));
+        $ch >>= 6;
+        unshift(@out, 0xf0 | ($ch & 0x07));
+    }
+    return pack('C*', @out);
+}
+
+#------------------------------------------------------------------------------
+# Unpack numbers from UTF8 string
+# Inputs: 0) UTF-8 string
+# Returns: List of Unicode numbers (sets $evalWarning on error)
+sub UnpackUTF8($)
+{
+    my (@out, $pos);
+    pos($_[0]) = $pos = 0;  # start at beginning of string
+    for (;;) {
+        my ($ch, $newPos, $val, $byte);
+        if ($_[0] =~ /([\x80-\xff])/g) {
+            $ch = ord($1);
+            $newPos = pos($_[0]) - 1;
+        } else {
+            $newPos = length $_[0];
+        }
+        # unpack 7-bit characters
+        my $len = $newPos - $pos;
+        push @out, unpack("x${pos}C$len",$_[0]) if $len;
+        last unless defined $ch;
+        $pos = $newPos + 1;
+        # minimum lead byte for 2-byte sequence is 0xc2 (overlong sequences
+        # not allowed), 0xf8-0xfd are restricted by RFC 3629 (no 5 or 6 byte
+        # sequences), and 0xfe and 0xff are not valid in UTF-8 strings
+        if ($ch < 0xc2 or $ch >= 0xf8) {
+            push @out, ord('?');    # invalid UTF-8
+            $evalWarning = 'Bad UTF-8';
+            next;
+        }
+        # decode 2, 3 and 4-byte sequences
+        my $n = 1;
+        if ($ch < 0xe0) {
+            $val = $ch & 0x1f;      # 2-byte sequence
+        } elsif ($ch < 0xf0) {
+            $val = $ch & 0x0f;      # 3-byte sequence
+            ++$n;
+        } else {
+            $val = $ch & 0x07;      # 4-byte sequence
+            $n += 2;
+        }
+        unless ($_[0] =~ /\G([\x80-\xbf]{$n})/g) {
+            pos($_[0]) = $pos;      # restore position
+            push @out, ord('?');    # invalid UTF-8
+            $evalWarning = 'Bad UTF-8';
+            next;
+        }
+        foreach $byte (unpack 'C*', $1) {
+            $val = ($val << 6) | ($byte & 0x3f);
+        }
+        push @out, $val;    # save Unicode character value
+        $pos += $n;         # position at end of UTF-8 character
+    }
+    return @out;
+}
+
+#------------------------------------------------------------------------------
+# Convert Unicode characters to Windows Latin1 (cp1252)
+# Inputs: 0) 16-bit Unicode character string, 1) unpack format
 #         3) optional ExifTool ref to set warning on encoding error
-# Returns: 8-bit Windows Latin1 encoded string
+# Returns: 8-bit Windows Latin1 encoded string (truncates at null terminator)
 my %unicode2latin = (
     0x20ac => 0x80,  0x0160 => 0x8a,  0x2013 => 0x96,
     0x201a => 0x82,  0x2039 => 0x8b,  0x2014 => 0x97,
@@ -2633,15 +2763,15 @@ sub Unicode2Latin($$;$)
         }
     }
     # repack as a Latin string
-    my $outVal = pack('C*',@uni);
+    my $outVal = pack('C*', @uni);
     $outVal =~ s/\0.*//s;    # truncate at null terminator
     return $outVal;
 }
 
 #------------------------------------------------------------------------------
-# convert Windows Latin1 characters to unicode
+# Convert Windows Latin1 characters to Unicode
 # Inputs: 0) 8-bit Windows Latin1 character string (cp1252), 1) unpack format
-# Returns: 16-bit unicode character string
+# Returns: 16-bit Unicode character string
 my %latin2unicode;
 sub Latin2Unicode($$)
 {
@@ -2652,67 +2782,65 @@ sub Latin2Unicode($$)
         }
     }
     my ($val, $fmt) = @_;
-    my @latin = unpack('C*',$val);
+    my @latin = unpack('C*', $val);
     foreach (@latin) {
         $_ = $latin2unicode{$_} if $latin2unicode{$_};
     }
-    # repack as a 16-bit unicode string (plus null terminator)
-    my $outVal = pack("$fmt*",@latin) . "\0\0";
+    # repack as a 16-bit unicode string
+    my $outVal = pack("$fmt*", @latin);
     return $outVal;
 }
 
 #------------------------------------------------------------------------------
-# convert 16-bit unicode characters to UTF-8
-# Inputs: 0) 16-bit unicode character string, 1) short unpack format
-# Returns: UTF-8 encoded string
-# Notes: Only works for Perl 5.6.1 or later
+# Convert Unicode characters to UTF-8
+# Inputs: 0) Unicode character string, 1) Unicode character format (n,v,N,V)
+# Returns: UTF-8 encoded string (truncates at null terminator)
 sub Unicode2UTF8($$)
 {
     my ($val, $fmt) = @_;
     my $outVal;
     if ($] >= 5.006001) {
-        # repack as a UTF-8 string
+        # let Perl do it
         $outVal = pack('C0U*',unpack("$fmt*",$val));
-        $outVal =~ s/\0.*//s;    # truncate at null terminator
     } else {
-        # Perl < 5.6.1 didn't support UTF-8, so convert to Latin instead
-        $outVal = Unicode2Latin($val, $fmt);
+        # do it ourself
+        $outVal = PackUTF8(unpack("$fmt*",$val));
     }
+    $outVal =~ s/\0.*//s;    # truncate at null terminator
     return $outVal;
 }
 
 #------------------------------------------------------------------------------
-# convert UTF-8 encoded string to 16-bit unicode (Perl 5.6.1 or later)
-# Input: 0) UTF-8 string, 1) short unpack format, 2) optional ExifTool ref for warnings
-# Returns: 16-bit unicode character string
+# Convert UTF-8 encoded string to Unicode string
+# Input: 0) UTF-8 string, 1) Unicode format, 2) optional ExifTool ref for warnings
+# Returns: Unicode character string in specified format
 sub UTF82Unicode($$;$)
 {
     my ($str, $fmt, $exifTool) = @_;
+    undef $evalWarning;
     if ($] >= 5.006001) {
         # handle warnings from malformed UTF-8
-        local $SIG{'__WARN__'} = sub { $evalWarning = $_[0]; };
-        undef $evalWarning;
-        # repack UTF-8 string as 16-bit integers
-        $str = pack("$fmt*",unpack('U0U*',$str)) . "\0\0";
-        if ($evalWarning and $exifTool and not $$exifTool{WarnBadUTF8}) {
-            $exifTool->Warn('Malformed UTF-8 character(s)');
-            $$exifTool{WarnBadUTF8} = 1;
-            undef $evalWarning;
-        }
+        local $SIG{'__WARN__'} = \&SetWarning;
+        # repack UTF-8 string in specified format
+        $str = pack("$fmt*", unpack('U0U*',$str));
     } else {
-        # treat as Latin since this version of Perl doesn't support UTF-8
-        $str = Latin2Unicode($str, $fmt);
+        # do it ourself
+        $str = pack("$fmt*", UnpackUTF8($str));
+    }
+    if ($evalWarning and $exifTool and not $$exifTool{WarnBadUTF8}) {
+        $exifTool->Warn('Malformed UTF-8 character(s)');
+        $$exifTool{WarnBadUTF8} = 1;
     }
     return $str;
 }
 
 #------------------------------------------------------------------------------
-# convert 16-bit unicode character string to 8-bit (Latin or UTF-8)
-# Inputs: 0) ExifTool object reference, 1) 16-bit unicode string (in specified byte order)
+# Convert 16-bit unicode character string to 8-bit (Latin or UTF-8)
+# Inputs: 0) ExifTool ref, 1) 16-bit unicode string (in specified byte order)
 #         2) Optional byte order (current byte order used if not specified)
-# Returns: 8-bit character string
+# Returns: 8-bit character string (truncates at null terminator)
 my %unpackShort = ( 'II' => 'v', 'MM' => 'n' );
-sub Unicode2Byte($$;$) {
+sub Unicode2Charset($$;$) {
     my ($self, $val, $byteOrder) = @_;
     # check for (and remove) byte order mark and set byte order accordingly if it exists
     $val =~ s/^(\xff\xfe|\xfe\xff)// and $byteOrder = ($1 eq "\xff\xfe") ? 'MM' : 'II';
@@ -2726,10 +2854,10 @@ sub Unicode2Byte($$;$) {
 }
 
 #------------------------------------------------------------------------------
-# convert 8-bit character string to 16-bit unicode
-# Inputs: 0) ExifTool object reference, 1) Latin or UTF-8 string, 2) optional byte order
+# Convert 8-bit character string to 16-bit unicode
+# Inputs: 0) ExifTool ref, 1) Latin or UTF-8 string, 2) optional byte order
 # Returns: 16-bit unicode character string (in specified byte order)
-sub Byte2Unicode($$;$)
+sub Charset2Unicode($$;$)
 {
     my ($self, $val, $byteOrder) = @_;
     my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
@@ -2741,7 +2869,7 @@ sub Byte2Unicode($$;$)
 }
 
 #------------------------------------------------------------------------------
-# assemble a continuing fraction into a rational value
+# Assemble a continuing fraction into a rational value
 # Inputs: 0) numerator, 1) denominator
 #         2-N) list of fraction denominators, deepest first
 # Returns: numerator, denominator (in list context)
@@ -2753,7 +2881,7 @@ sub AssembleRational($$@)
 }
 
 #------------------------------------------------------------------------------
-# convert a floating point number into a rational
+# Convert a floating point number into a rational
 # Inputs: 0) floating point number, 1) optional maximum value (defaults to 0x7fffffff)
 # Returns: numerator, denominator (in list context)
 # Notes: these routines were a bit tricky, but fun to write!
@@ -3099,6 +3227,11 @@ sub ProcessTrailers($$)
 sub WriteTrailerBuffer($$$)
 {
     my ($self, $trailInfo, $outfile) = @_;
+    if ($self->{DEL_GROUP}->{Trailer}) {
+        $self->VPrint(0, "  Deleting trailer ($$trailInfo{Offset} bytes)\n");
+        ++$self->{CHANGED};
+        return 1;
+    }
     my $pos = Tell($outfile);
     my $trailPt = $$trailInfo{OutFile};
     # apply fixup if necessary (AFCP requires this)

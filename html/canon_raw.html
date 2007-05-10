@@ -99,8 +99,8 @@ of this block is as follows:</p>
 </table></blockquote>
 
 <p>To parse a CRW directory block, first read the 4 bytes at the end of the
-block to get the location of <b>DirCount</b>.  Next read <b>DirCount</b> to
-determine the number of entries in the directory, then read the directory
+block to get the location (S) of <b>DirCount</b>.  Next read <b>DirCount</b> to
+determine the number of entries (N) in the directory, then read the directory
 entries.</p>
 
 <p>The <b>ValueData</b> may contain complete subdirectory blocks, each of which

@@ -2588,7 +2588,7 @@ sub ProcessDICM($$)
         # stop indenting for list if we reached EndOfItems tag
         $exifTool->{INDENT} =~ s/..$// if $verbose and $tag eq 'FFFE,E00D';
     }
-    $err and $exifTool->Warn('Error reading DICOM file -- corrupted?');
+    $err and $exifTool->Warn('Error reading DICOM file (corrupted?)');
     return 1;
 }
 

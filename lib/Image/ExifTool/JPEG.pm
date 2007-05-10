@@ -218,7 +218,7 @@ $VERSION = '1.05';
         },
     },
     17 => {
-        Name => 'ResolutionUnits',
+        Name => 'ResolutionUnit',
         PrintConv => {
             0 => 'None',
             1 => 'inches',

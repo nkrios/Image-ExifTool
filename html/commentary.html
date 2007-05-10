@@ -22,9 +22,11 @@ information such as this.</p>
 
 <p>A significant problem is that an IFD (image file directory) pointer has
 the same format code as a long integer, so information in any non-recognized
-IFD is lost when the image is rewritten.  (There is a seldom-used format
+IFD is lost when the image is rewritten.  There is a seldom-used format
 code of 13 that has been proposed to indicate an IFD, but this is not part
-of the EXIF/TIFF specification and has not in common usage.)</p>
+of the EXIF/TIFF specification and is not in common usage.  [Hey! Olympus
+has just started using this code for the IFD's in the maker notes of their
+new Camera models! - 2007/03/08]</p>
 
 <p>Also, it was wrong to specify a count instead of a size for each
 directory entry because this makes it impossible to add new format types
@@ -35,27 +37,35 @@ data).</p>
 <p>All these shortcomings make TIFF a very non-extensible format which by
 design will result in the loss of non-standard information.</p>
 
-<p>And we don't learn from our mistakes (ok, maybe some of us can, but
+<p>And we don't learn from our mistakes (OK, maybe some of us can, but
 apparently not big corporations like Adobe or Microsoft), because the new
 DNG and WDP formats are TIFF-based too.</p>
 
 <h3>EXIF Maker notes</h3>
 <p>Maker notes are a can of worms.  The EXIF specification unfortunately
-made no mention about the information format of the maker notes.  It really
-should have provided a maker note IFD tag to allow IFD-style maker notes to
-be used.  Many manufacturers implemented it this way, but each with a
-different technique and many with <a href="idiosyncracies.html">odd
-quirks</a>. This deficiency combined with problems in the TIFF (EXIF) format
-mean that most software will quite unknowingly scramble your maker notes
-when an image is rewritten.  To prevent this, specific knowledge about files
-written by individual manufacturers is necessary, and of course the
-manufacturers are not prone to divulging this information to the public so
-it must all be reverse engineered.</p>
+made no mention about the information format of the maker notes.  If
+properly designed, the specification would have provided a maker note IFD
+tag to allow IFD-style maker notes to be used.  Many manufacturers
+implemented it this way, but each with a different technique and many with
+<a href="idiosyncracies.html">odd quirks</a>. This deficiency combined with
+problems in the TIFF (EXIF) format mean that most software will quite
+unknowingly scramble your maker notes when an image is rewritten.  To
+prevent this, specific knowledge about files written by individual
+manufacturers is necessary, and of course the manufacturers are not prone to
+divulging this information to the public so it must all be reverse
+engineered.</p>
+
+<p>The official TIFF recommendation is to delete unknown information when
+rewriting an image, and this irresponsible strategy has been adopted by some
+applications such as Adobe Photoshop, resulting in a total loss of maker
+note information. This is very unfortunate because even corrupted maker
+notes contain useful information, and smart utilities (like ExifTool) are
+often able to recover the information from damaged maker notes.</p>
 
 <h3>JPEG</h3>
 <p>The JPEG format acts only as a container for meta information, and
 defines no meta information format itself.  But it sucks just a as a
-container format because it limits the maxiumum contiguous block size to
+container format because it limits the maximum contiguous block size to
 64kB.  This causes problems because many cameras store more than 64kB of
 additional information in their JPEG images.  Usually, this is due to the
 medium-sized JPEG image that many cameras embed for preview purposes. It
@@ -97,9 +107,9 @@ Adobe's best efforts, XMP still isn't very well supported by meta
 information editing tools.  The best hope for small application developers
 is to link against an off-the-shelf XMP or XML library.  Apparently Adobe
 realizes this and is now providing an XMP development kit, but this solution
-is useful for those platforms and computer languages that they choose to
-support, and even then the libraries are likely to be prohibitively unwieldy
-(too bulky and complex) for a small application.</p>
+is only useful for those platforms and computer languages that they choose
+to support, and even then the libraries are likely to be prohibitively
+unwieldy (too bulky and complex) for a small application.</p>
 
 <h3>PDF</h3>
 <p>...and I thought XMP was too complicated.  PDF is just insane.  Because
@@ -108,7 +118,7 @@ writing.</p>
 
 <h3>PNG</h3>
 <p>PNG sucks because meta information can be stored only in text format.
-This was a huge oversight, and as a work-around software (ie. ImageMagick)
+This was a huge mistake, and as a work-around software (ie. ImageMagick)
 must encode binary information in ASCII-hex, then compress it to offset the
 increase in size, and store it as a compressed text block.  This adds
 unnecessary complexity, greatly slows down processing, and makes it much
@@ -116,21 +126,21 @@ harder to develop software which supports PNG meta information.</p>
 
 <h3>PICT</h3>
 <p>The PICT format just plain sucks.  It is one of the worst-designed image
-formats I have seen (second only to FlashPix).  I don't believe that it was
+formats in existence, second only to FlashPix.  I don't believe that it was
 originally designed as a file format.  Instead it appears to have emerged
 from the internal Apple QuickDraw structures.  The files are not designed to
 be processed by any software other than the Mac OS.  Intimate knowledge of
 the QuickDraw structures is required just to parse the PICT image, even if
 the reader doesn't care about the contained information.  Because of this,
 PICT images are very fragile and a simple data error or programming bug will
-invalidate an entire image.  For these reasons the PICT format never gained
-popularity outside the Apple world.  Also, the concept of meta information
-is all but ignored in the PICT design.</p>
+invalidate an entire image.  Possibly for these reasons the PICT format
+never gained popularity outside the Apple world.  Also, the concept of meta
+information is all but ignored in the PICT design.</p>
 
 <h3>FlashPix</h3>
 <p>Oh. My. God.  Don't get me started on this one.  Let's just say that basing
-a file format on the File Allocation Table (FAT) structure of a floppy disk
-with fixed 512-byte sectors is monumentally idiotic.</p>
+an image file format on the File Allocation Table (FAT) structure of a
+floppy disk with fixed 512-byte sectors is monumentally idiotic.</p>
 
 <h3>DICOM Medical Images</h3>
 <p>The DICOM format is reasonably well designed.  The UID's are cumbersome,
@@ -214,7 +224,7 @@ offers a number of other features:</p>
 <p>OK.  Flame away.  I can take it.</p>
 <hr>
 <i>Created Nov. 15, 2005</i>
-<br><i>Last revised Jan. 7, 2007</i>
+<br><i>Last revised Mar. 8, 2007</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

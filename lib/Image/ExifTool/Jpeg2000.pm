@@ -15,11 +15,11 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 sub ProcessJpeg2000Box($$$);
 
-my %jp2ResolutionUnit = (
+my %resolutionUnit = (
     -3 => 'km',
     -2 => '100 m',
     -1 => '10 m',
@@ -239,11 +239,13 @@ my %jp2ResolutionUnit = (
     },
     8 => {
         Name => 'CaptureYResolutionUnit',
-        PrintConv => \%jp2ResolutionUnit,
+        SeparateTable => 'ResolutionUnit',
+        PrintConv => \%resolutionUnit,
     },
     9 => {
         Name => 'CaptureXResolutionUnit',
-        PrintConv => \%jp2ResolutionUnit,
+        SeparateTable => 'ResolutionUnit',
+        PrintConv => \%resolutionUnit,
     },
 );
 
@@ -261,11 +263,13 @@ my %jp2ResolutionUnit = (
     },
     8 => {
         Name => 'DisplayYResolutionUnit',
-        PrintConv => \%jp2ResolutionUnit,
+        SeparateTable => 'ResolutionUnit',
+        PrintConv => \%resolutionUnit,
     },
     9 => {
         Name => 'DisplayXResolutionUnit',
-        PrintConv => \%jp2ResolutionUnit,
+        SeparateTable => 'ResolutionUnit',
+        PrintConv => \%resolutionUnit,
     },
 );
 

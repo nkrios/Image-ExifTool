@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
 [File, File, Image]  - File Name: Minolta_4_failed.mrw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2007:01:28 08:40:42
+[File, File, Time]  - File Modification Date/Time: 2007:03:21 11:07:53
 [File, File, Image]  - File Type: MRW
 [File, File, Image]  - MIME Type: image/x-raw
 [MakerNotes, MinoltaRaw, Camera] 0 - Firmware ID: 27200001
@@ -118,7 +118,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Manual
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 0
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 28
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 28mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: None
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal

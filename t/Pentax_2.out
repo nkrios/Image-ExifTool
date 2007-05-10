@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.89
 [File, File, Image]  - File Name: Pentax.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1693 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:01:07 13:39:08
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -41,7 +41,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: inf
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 62
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 62mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: Low gain down
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -88,6 +88,7 @@
 [MakerNotes, Pentax, Time] 36 - Destination City: Los Angeles
 [MakerNotes, Pentax, Time] 37 - Hometown DST: Yes
 [MakerNotes, Pentax, Time] 38 - Destination DST: Yes
+[MakerNotes, Pentax, Camera] 50 - Image Processing: Unprocessed
 [Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)

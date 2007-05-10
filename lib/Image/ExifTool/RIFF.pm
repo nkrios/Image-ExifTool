@@ -564,7 +564,7 @@ sub ProcessRIFF($$)
         }
         $pos += $len2;
     }
-    $err and $exifTool->Warn('Error reading RIFF file -- corrupted?');
+    $err and $exifTool->Warn('Error reading RIFF file (corrupted?)');
     return 1;
 }
 

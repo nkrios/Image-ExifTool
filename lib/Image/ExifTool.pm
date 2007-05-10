@@ -19,12 +19,12 @@ use strict;
 require 5.004;  # require 5.004 for UNIVERSAL::isa (otherwise 5.002 would do)
 require Exporter;
 use File::RandomAccess;
-
+    
 use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old
-            $myAPP5hdr @loadAllTables %UserDefined);
+            @loadAllTables %UserDefined $evalWarning);
 
-$VERSION = '6.76';
+$VERSION = '6.90';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -48,6 +48,9 @@ $RELEASE = '';
 );
 # set all of our EXPORT_TAGS in EXPORT_OK
 Exporter::export_ok_tags(keys %EXPORT_TAGS);
+
+# test for problems that can arise if encoding.pm is used
+{ my $t = "\xff"; die "Incompatible encoding!\n" if ord($t) != 0xff; }
 
 # The following functions defined in Image::ExifTool::Writer are declared
 # here so their prototypes will be available.  The Writer routines will be
@@ -94,6 +97,14 @@ sub WriteDirectory($$$;$);
 sub WriteBinaryData($$$);
 sub CheckBinaryData($$$);
 sub WriteTIFF($$$);
+sub Charset2Unicode($$;$);
+sub Latin2Unicode($$);
+sub UTF82Unicode($$;$);
+sub Unicode2Charset($$;$);
+sub Unicode2Latin($$;$);
+sub Unicode2UTF8($$);
+sub PackUTF8(@);
+sub UnpackUTF8($);
 
 # list of main tag tables to load in LoadAllTables() (sub-tables are recursed
 # automatically).  Note: They will appear in this order in the documentation
@@ -158,6 +169,7 @@ my %fileTypeLookup = (
     JPG  => ['JPEG', 'Joint Photographic Experts Group'],
     JPX  => ['JP2',  'JPEG 2000 file'],
     M4A  => ['MOV',  'MPG4 Audio (QuickTime-based)'],
+    MEF  => ['TIFF', 'Mamiya (RAW) Electronic Format (TIFF-like)'],
     MIE  => ['MIE',  'Meta Information Encapsulation format'],
     MIF  => ['MIFF', 'Magick Image File Format'],
     MIFF => ['MIFF', 'Magick Image File Format'],
@@ -239,6 +251,7 @@ my %mimeType = (
     JP2  => 'image/jpeg2000',
     JPEG => 'image/jpeg',
     M4A  => 'audio/mp4',
+    MEF  => 'image/x-raw',
     MIE  => 'application/x-mie',
     MIFF => 'application/x-magick-image',
     MNG  => 'video/mng',
@@ -442,7 +455,6 @@ sub DummyWriteProc { return 1; }
 @tableOrder = ( );  # order the tables were loaded
 
 my $didTagID;       # flag indicating we are accessing tag ID's
-my $evalWarning;    # eval warning message
 
 # composite tags (accumulation of all Composite tag tables)
 %Image::ExifTool::Composite = (
@@ -457,6 +469,7 @@ my $evalWarning;    # eval warning message
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     GROUPS => { 0 => 'JFIF', 1 => 'JFIF', 2 => 'Image' },
+    DATAMEMBER => [ 2, 3, 5 ],
     0 => {
         Name => 'JFIFVersion',
         Format => 'int8u[2]',
@@ -465,6 +478,7 @@ my $evalWarning;    # eval warning message
     2 => {
         Name => 'ResolutionUnit',
         Writable => 1,
+        RawConv => '$$self{JFIFResolutionUnit} = $val',
         PrintConv => {
             0 => 'None',
             1 => 'inches',
@@ -477,12 +491,14 @@ my $evalWarning;    # eval warning message
         Format => 'int16u',
         Writable => 1,
         Priority => -1,
+        RawConv => '$$self{JFIFXResolution} = $val',
     },
     5 => {
         Name => 'YResolution',
         Format => 'int16u',
         Writable => 1,
         Priority => -1,
+        RawConv => '$$self{JFIFYResolution} = $val',
     },
 );
 %Image::ExifTool::JFIF::Extension = (
@@ -502,6 +518,31 @@ my %specialTags = (
 );
 
 #------------------------------------------------------------------------------
+# Warning handler routines (warning string stored in $evalWarning)
+#
+# Set warning message
+# Inputs: 0) warning string (undef to reset warning)
+sub SetWarning($) { $evalWarning = $_[0]; }
+
+# Get warning message
+sub GetWarning()  { return $evalWarning; }
+
+# Clean unnecessary information (line number, LF) from warning
+# Inputs: 0) warning string or undef to use current warning
+# Returns: cleaned warning
+sub CleanWarning(;$)
+{
+    my $str = shift;
+    unless (defined $str) {
+        return undef unless defined $evalWarning;
+        $str = $evalWarning;
+    }
+    $str = $1 if $str =~ /(.*) at /s;
+    $str =~ s/\s+$//s;
+    return $str;
+}
+
+#==============================================================================
 # New - create new ExifTool object
 # Inputs: 0) reference to exiftool object or ExifTool class name
 sub new
@@ -1013,8 +1054,15 @@ sub GetValue($$;$)
         }
         # save old ValueConv value if we want Both
         $valueConv = $value if $type eq 'Both' and $convType eq 'PrintConv';
+        my ($i, $val, $vals, @values, $convList);
+        # split into list if conversion is an array
+        if (ref $conversion eq 'ARRAY') {
+            $convList = $conversion;
+            $conversion = $$convList[0];
+            my @valList = split ' ', $value;
+            $value = \@valList;
+        }
         # initialize array so we can iterate over values in list
-        my ($i, $val, $vals, @values);
         if (ref $value eq 'ARRAY') {
             $i = 0;
             $vals = $value;
@@ -1038,9 +1086,9 @@ sub GetValue($$;$)
                         $value = "Unknown ($val)";
                     }
                 }
-            } else {
+            } elsif (defined $conversion) {
                 # call subroutine or do eval to convert value
-                local $SIG{'__WARN__'} = sub { $evalWarning = $_[0]; };
+                local $SIG{'__WARN__'} = \&SetWarning;
                 undef $evalWarning;
                 if (ref($conversion) eq 'CODE') {
                     $value = &$conversion($val, $self);
@@ -1059,11 +1107,11 @@ sub GetValue($$;$)
                     $@ and $evalWarning = $@;
                 }
                 if ($evalWarning) {
-                    chomp $evalWarning;
-                    $evalWarning =~ s/ at \(eval .*//s;
                     delete $SIG{'__WARN__'};
-                    warn "$convType $tag: $evalWarning\n";
+                    warn "$convType $tag: " . CleanWarning() . "\n";
                 }
+            } else {
+                $value = $val;
             }
             last unless $vals;
             # save this converted value and step to next value in list
@@ -1073,9 +1121,14 @@ sub GetValue($$;$)
                 last;
             }
             $val = $$vals[$i];
+            $conversion = $$convList[$i] if $convList;
         }
         # return undefined now if no value
         return wantarray ? () : undef unless defined $value;
+        # join back into single value if split for conversion list
+        if ($convList and ref $value eq 'ARRAY') {
+            $value = join($convType eq 'PrintConv' ? '; ' : ' ', @$value);
+        }
     }
     if ($type eq 'Both') {
         # $valueConv is undefined if there was no print conversion done
@@ -1511,7 +1564,7 @@ sub ParseArguments($;@)
                 # convert image data from UTF-8 to character stream if necessary
                 # (patches RHEL 3 UTF8 LANG problem)
                 if (ref $arg eq 'SCALAR' and eval 'require Encode; Encode::is_utf8($$arg)') {
-                    my $buff = pack('C*', unpack('U*', $$arg));
+                    my $buff = pack('C*', unpack('U0U*', $$arg));
                     $arg = \$buff;
                 }
                 $self->{RAF} = new File::RandomAccess($arg);
@@ -2284,6 +2337,34 @@ sub ReadValue($$$$$)
 }
 
 #------------------------------------------------------------------------------
+# Convert UTF-8 to current character set
+# Inputs: 0) ExifTool ref, 1) UTF-8 string
+# Return: Converted string
+sub UTF82Charset($$)
+{
+    my ($self, $val) = @_;
+    if ($self->{OPTIONS}->{Charset} eq 'Latin' and $val =~ /[\x80-\xff]/) {
+        $val = Image::ExifTool::UTF82Unicode($val,'n',$self);
+        $val = Image::ExifTool::Unicode2Latin($val,'n',$self);
+    }
+    return $val;
+}
+
+#------------------------------------------------------------------------------
+# Convert Latin to current character set
+# Inputs: 0) ExifTool ref, 1) Latin string
+# Return: Converted string
+sub Latin2Charset($$)
+{
+    my ($self, $val) = @_;
+    if ($self->{OPTIONS}->{Charset} eq 'UTF8' and $val =~ /[\x80-\xff]/) {
+        $val = Image::ExifTool::Latin2Unicode($val,'n');
+        $val = Image::ExifTool::Unicode2UTF8($val,'n');
+    }
+    return $val;
+}
+
+#------------------------------------------------------------------------------
 # Decode bit mask
 # Inputs: 0) value to decode, 1) Reference to hash for decoding
 sub DecodeBits($$)
@@ -2861,7 +2942,7 @@ sub ProcessJPEG($$)
             }
         } elsif ($marker == 0xea) {         # APP10 (PhotoStudio Unicode comments)
             if ($$segDataPt =~ /^UNICODE\0/) {
-                my $comment = $self->Unicode2Byte(substr($$segDataPt,8), 'MM');
+                my $comment = $self->Unicode2Charset(substr($$segDataPt,8), 'MM');
                 $self->FoundTag('Comment', $comment);
             }
         } elsif ($marker == 0xec) {         # APP12 (Ducky, Picture Info)
@@ -3021,6 +3102,7 @@ sub ProcessTIFF($$;$)
             $$dataPt .= $canonSig;
             if ($canonSig =~ /^CR\x02\0/) {
                 $fileType = 'CR2';
+                $self->HtmlDump($base+8, 8, '[CR2 header]') if $self->{HTML_DUMP};
             } else {
                 undef $canonSig;
             }

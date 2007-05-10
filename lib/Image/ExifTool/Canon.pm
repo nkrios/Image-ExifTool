@@ -30,6 +30,8 @@
 #              16) Emil Sit private communication (30D)
 #              17) http://www.asahi-net.or.jp/~xp8t-ymzk/s10exif.htm
 #              18) Samson Tai private communication (G7)
+#              19) Warren Stockton private communication
+#              20) Bogdan private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -41,14 +43,15 @@ use Image::ExifTool::Exif;
 
 sub WriteCanon($$$);
 
-$VERSION = '1.60';
+$VERSION = '1.69';
 
 my %canonLensTypes = ( #4
     1 => 'Canon EF 50mm f/1.8',
     2 => 'Canon EF 28mm f/2.8',
     3 => 'Canon EF 135mm f/2.8 Soft', #15
     4 => 'Sigma UC Zoom 35-135mm f/4-5.6',
-    6 => 'Tokina AF193-2 19-35mm f/3.5-4.5',
+    6 => 'Sigma 18-125mm F3.5-5.6 DC IF ASP or Tokina AF193-2 19-35mm f/3.5-4.5',
+    7 => 'Canon EF 100-300mm F5.6L', #15
     # 10 can be 3 different Sigma lenses:
     # Sigma 50mm f/2.8 EX or Sigma 28mm f/1.8
     # or Sigma 105mm f/2.8 Macro EX (ref 15)
@@ -56,6 +59,7 @@ my %canonLensTypes = ( #4
     11 => 'Canon EF 35mm f/2', #9
     13 => 'Canon EF 15mm f/2.8', #9
     21 => 'Canon EF 80-200mm f/2.8L',
+    22 => 'Tokina AT-X280AF PRO 28-80mm F2.8 ASPHERICAL', #15
     # 26 can also be 2 Tamron lenses: (ref 15)
     # Tamron SP AF 90mm f/2.8 Di Macro or Tamron SP AF 180mm F3.5 Di Macro
     26 => 'Canon EF 100mm f/2.8 Macro or Cosina 100mm f/3.5 Macro AF or Tamron',
@@ -119,6 +123,7 @@ my %canonLensTypes = ( #4
     186 => 'Canon EF 70-200mm f/4L', #9
     190 => 'Canon EF 100mm f/2.8 Macro',
     191 => 'Canon EF 400mm f/4 DO IS', #9
+    # 196 Canon 75-300mm F4? #15
     197 => 'Canon EF 75-300mm f/4-5.6 IS',
     198 => 'Canon EF 50mm f/1.4 USM', #9
     202 => 'Canon EF 28-80 f/3.5-5.6 USM IV',
@@ -132,7 +137,12 @@ my %canonLensTypes = ( #4
     230 => 'Canon EF 24-70mm f/2.8L', #9
     231 => 'Canon EF 17-40mm f/4L',
     232 => 'Canon EF 70-300mm f/4.5-5.6 DO IS USM', #15
+    234 => 'Canon EF-S 17-85mm f4-5.6 IS USM', #19
+    235 => 'Canon EF-S10-22mm F3.5-4.5 USM', #15
+    236 => 'Canon EF-S60mm F2.8 Macro USM', #15
     237 => 'Canon EF 24-105mm f/4L IS', #15
+    238 => 'Canon EF 70-300mm F4-5.6 IS USM', #15
+    241 => 'Canon EF 50mm F1.2L USM', #15
     242 => 'Canon EF 70-200mm f/4L IS USM', #PH
 );
 
@@ -194,6 +204,7 @@ my %canonLensTypes = ( #4
     0x1790000 => 'PowerShot A610',
     0x1800000 => 'PowerShot SD630 / Digital IXUS 65 / IXY Digital 80',
     0x1810000 => 'PowerShot SD450 / Digital IXUS 55 / IXY Digital 60',
+    0x1820000 => 'PowerShot TX1',
     0x1870000 => 'PowerShot SD400 / Digital IXUS 50 / IXY Digital 55',
     0x1880000 => 'PowerShot A420',
     0x1890000 => 'PowerShot SD900 / Digital IXUS 900 Ti / IXY Digital 1000',
@@ -210,16 +221,25 @@ my %canonLensTypes = ( #4
     0x2020000 => 'PowerShot A710 IS',
     0x2030000 => 'PowerShot A640',
     0x2040000 => 'PowerShot A630',
+    0x2090000 => 'PowerShot S5 IS',
     0x2100000 => 'PowerShot A460',
+    0x2120000 => 'PowerShot SD850 IS / Digital IXUS 950 IS', #IXY?
+    0x2130000 => 'PowerShot A570 IS',
+    0x2140000 => 'PowerShot A560',
+    0x2150000 => 'PowerShot SD750 / Digital IXUS 75 / IXY Digital 90',
+    0x2160000 => 'PowerShot SD1000 / Digital IXUS 70 / IXY Digital 10',
     0x2180000 => 'PowerShot A550',
     0x2190000 => 'PowerShot A450',
     0x3010000 => 'PowerShot Pro90 IS',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
     0x4007d675 => 'HV10',
+    0x4007d777 => 'iVIS DC50',
+    0x4007d778 => 'iVIS HV20',
     0x80000001 => 'EOS-1D',
     0x80000167 => 'EOS-1DS',
     0x80000168 => 'EOS 10D',
+    0x80000169 => 'EOS-1D Mark III',
     0x80000170 => 'EOS Digital Rebel / 300D / Kiss Digital',
     0x80000174 => 'EOS-1D Mark II',
     0x80000175 => 'EOS 20D',
@@ -403,9 +423,16 @@ my %longBin = (
     0xd => [
         {
             Name => 'CanonCameraInfo',
-            Condition => '$self->{CameraModel} =~ /\b(1D|5D)/',
+            Condition => '$self->{CameraModel} =~ /\b(1D(?! Mark III)|5D)/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::CameraInfo',
+            },
+        },
+        {
+            Name => 'CanonCameraInfo1DmkIII',
+            Condition => '$self->{CameraModel} =~ /\b1D Mark III/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::CameraInfo1DmkIII',
             },
         },
     ],
@@ -465,7 +492,7 @@ my %longBin = (
         },
         {
             Name => 'CustomFunctions400D',
-            Condition => '$self->{CameraModel} =~ /\b(400D|REBEL XTi|Kiss Digital X)\b/',
+            Condition => '$self->{CameraModel} =~ /\b(400D|REBEL XTi|Kiss Digital X|K236)\b/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions400D',
@@ -501,6 +528,7 @@ my %longBin = (
         Name => 'CanonModelID',
         Writable => 'int32u',
         PrintHex => 1,
+        SeparateTable => 1,
         PrintConv => \%canonModelID,
     },
     0x12 => {
@@ -596,6 +624,13 @@ my %longBin = (
         # some interesting stuff is stored in here, like LensType and InternalSerialNumber...
         Binary => 1,
     },
+    0x99 => { #PH (EOS 1D Mark III)
+        Name => 'CustomFunctions1DmkIII',
+        SubDirectory => {
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+            TagTable => 'Image::ExifTool::CanonCustom::Functions1DmkIII',
+        },
+    },
     0xa0 => {
         Name => 'ProccessingInfo',
         SubDirectory => {
@@ -677,7 +712,7 @@ my %longBin = (
             },
         },
         {   # (int16u[796])
-            Condition => '$self->{CameraModel} =~ /\b(1D Mark II N|5D|30D|400D|REBEL XTi|Kiss Digital X)\b/',
+            Condition => '$self->{CameraModel} =~ /\b(1D Mark II N|5D|30D|400D|REBEL XTi|Kiss Digital X|K236)\b/',
             Name => 'ColorBalance3',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::ColorBalance3',
@@ -706,6 +741,10 @@ my %longBin = (
         Notes => 'unknown 49kB block, not copied to JPEG images',
         # 'Drop' because not found in JPEG images (too large for APP1 anyway)
         Flags => [ 'Unknown', 'Binary', 'Drop' ],
+    },
+    0x4008 => { #PH guess (1DmkIII)
+        Name => 'BlackLevel',
+        Unknown => 1,
     },
 );
 
@@ -896,11 +935,20 @@ my %longBin = (
         PrintConv => {
             0x2005 => 'Manual AF point selection',
             0x3000 => 'None (MF)',
-            0x3001 => 'Auto-selected',
+            0x3001 => 'Auto AF point selection',
             0x3002 => 'Right',
             0x3003 => 'Center',
             0x3004 => 'Left',
             0x4001 => 'Auto AF point selection',
+            0x4002 => 'Top', #PH guess (A560/A570IS)
+            0x4003 => 'Upper-left', #PH guess (A560/A570IS)
+            0x4004 => 'Upper-right', #PH guess (A560/A570IS)
+            0x4005 => 'Left', #PH guess (A560/A570IS)
+            0x4006 => 'Center', #PH guess (A560/A570IS)
+            0x4007 => 'Right', #PH guess (A560/A570IS)
+            0x4008 => 'Lower-left', #PH guess (A560/A570IS)
+            0x4009 => 'Lower-right', #PH guess (A560/A570IS)
+            0x400a => 'Bottom', #PH guess (A560/A570IS)
         },
     },
     20 => {
@@ -1075,20 +1123,24 @@ my %longBin = (
     },
     2 => { #4
         Name => 'FocalPlaneXSize',
+        Notes => 'not valid for 1DmkIII',
+        Condition => '$$self{CameraModel} !~ /1D Mark III/',
         # focal plane image dimensions in 1/1000 inch -- convert to mm
         RawConv => '$val < 40 ? undef : $val',  # must be reasonable
         ValueConv => '$val * 25.4 / 1000',
         ValueConvInv => 'int($val * 1000 / 25.4 + 0.5)',
         PrintConv => 'sprintf("%.2fmm",$val)',
-        PrintConvInv => '$val=~s/\s*mm.*//;$val',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     3 => {
         Name => 'FocalPlaneYSize',
+        Notes => 'not valid for 1DmkIII',
+        Condition => '$$self{CameraModel} !~ /1D Mark III/',
         RawConv => '$val < 40 ? undef : $val',  # must be reasonable
         ValueConv => '$val * 25.4 / 1000',
         ValueConvInv => 'int($val * 1000 / 25.4 + 0.5)',
         PrintConv => 'sprintf("%.2fmm",$val)',
-        PrintConvInv => '$val=~s/\s*mm.*//;$val',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
 );
 
@@ -1286,6 +1338,7 @@ my %longBin = (
             248 => 'EOS High-end',
             250 => 'Compact',
             252 => 'EOS Mid-range',
+            255 => 'DV Camera', #PH
         },
     },
     27 => {
@@ -1307,6 +1360,28 @@ my %longBin = (
         RawConv => '$val >= 0 ? $val : undef',
         ValueConv => '$val / 10',
         ValueConvInv => '$val * 10',
+    },
+);
+
+# Canon camera information for 1DmkIII (MakerNotes tag 0x0d) - PH
+%Image::ExifTool::Canon::CameraInfo1DmkIII = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8s',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x04 => { #9
+        Name => 'ExposureTime',
+        Groups => { 2 => 'Image' },
+        Format => 'int8u',
+        Priority => 0,
+        RawConv => '$val ? $val : undef',
+        ValueConv => 'exp(4*log(2)*(1-Image::ExifTool::Canon::CanonEv($val-24)))',
+        ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(1-log($val)/(4*log(2)))+24',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
     },
 );
 
@@ -1547,6 +1622,7 @@ my %longBin = (
         Name => 'TimeStamp',
         Format => 'int32u',
         Groups => { 2 => 'Time' },
+        Shift => 'Time',
         RawConv => '$val ? $val : undef',
         ValueConv => 'ConvertUnixTime($val)',
         ValueConvInv => 'GetUnixTime($val)',
@@ -1597,23 +1673,45 @@ my %longBin = (
     3 => 'CanonImageHeight',
     4 => 'CanonImageWidthAsShot',
     5 => 'CanonImageHeightAsShot',
-    22 => { #PH (300D)
-        Name => 'AFPointsUsed',
-        Groups => { 2 => 'Camera' },
-        # (cameras with 7 AF points)
-        Condition => '$self->{NumAFPoints} == 7',
-        Notes => '10D, 300D and 350D',
-        RawConv => '($val & 0xff00) == 0xff00 ? undef : $val',
-        PrintConv => { BITMASK => {
-            0 => 'Right',
-            1 => 'Mid-right',
-            2 => 'Bottom',
-            3 => 'Center',
-            4 => 'Top',
-            5 => 'Mid-left',
-            6 => 'Left',
-        } },
-    },
+    22 => [ #PH (300D)
+        {
+            Name => 'AFPointsUsed',
+            Groups => { 2 => 'Camera' },
+            # (older cameras with 7 AF points)
+            Condition => q{
+                $self->{NumAFPoints} == 7 and
+                $self->{CameraModel} !~ /\b(350D|REBEL XT|Kiss Digital N)\b/
+            },
+            Notes => '10D and 300D',
+            RawConv => '($val & 0xff00) == 0xff00 ? undef : $val',
+            PrintConv => { BITMASK => {
+                0 => 'Right',
+                1 => 'Mid-right',
+                2 => 'Bottom',
+                3 => 'Center',
+                4 => 'Top',
+                5 => 'Mid-left',
+                6 => 'Left',
+            } },
+        },
+        { #20 (350D)
+            Name => 'AFPointsUsed',
+            Groups => { 2 => 'Camera' },
+            # (newer cameras with 7 AF points)
+            Condition => '$self->{NumAFPoints} == 7',
+            Notes => '350D',
+            RawConv => '($val & 0xff00) == 0xff00 ? undef : $val',
+            PrintConv => { BITMASK => {
+                0 => 'Bottom',
+                1 => 'Left',
+                2 => 'Mid-left',
+                3 => 'Center',
+                4 => 'Mid-right',
+                5 => 'Right',
+                6 => 'Top',
+            } },
+        },
+    ],
     26 => { #12 (20D)
         Name => 'AFPointsUsed',
         Groups => { 2 => 'Camera' },
@@ -1748,7 +1846,7 @@ my %longBin = (
         },
         { #16
             Name => 'FileNumber',
-            Condition => '$self->{CameraModel} =~ /\b(30D|400D|REBEL XTi|Kiss Digital X)\b/',
+            Condition => '$self->{CameraModel} =~ /\b(30D|400D|REBEL XTi|Kiss Digital X|K236)\b/',
             Format => 'int32u',
             Notes => q{
                 the location of the upper 4 bits of the directory number is a mystery for

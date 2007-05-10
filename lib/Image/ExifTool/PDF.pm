@@ -473,7 +473,7 @@ sub ExtractObject($$;$$)
         Decrypt(\$objData) if $cryptInfo;
         # convert from UTF-16 (big endian) to UTF-8 or Latin if necessary
         if ($objData =~ s/^\xfe\xff//) {
-            $objData = $exifTool->Unicode2Byte($objData, 'MM');
+            $objData = $exifTool->Unicode2Charset($objData, 'MM');
         }
         return $objData;
 #
@@ -896,7 +896,7 @@ sub ProcessDict($$$$;$)
 
     $nesting = ($nesting || 0) + 1;
     if ($nesting > 50) {
-        WarnOnce($exifTool, 'Nesting too deep -- directory ignored');
+        WarnOnce($exifTool, 'Nesting too deep (directory ignored)');
         return;
     }
 #

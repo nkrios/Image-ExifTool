@@ -83,7 +83,7 @@ my %iptcCharsetInv = ( 'UTF8' => "\x1b%G" );
 sub PrintInvCodedCharset($)
 {
     my $val = shift;
-    my $code = $iptcCharsetInv{lc($val)};
+    my $code = $iptcCharsetInv{uc($val)};
     unless ($code) {
         if (($code = $val) =~ s/ESC /\x1b/g) {  # translate ESC chars
             $code =~ s/, \x1b/\x1b/g;   # remove comma separators
@@ -484,8 +484,10 @@ sub WriteIPTC($$$)
             my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
             $len = $pos - $valuePtr;
             my $val = substr($$dataPt, $valuePtr, $len);
+            my $oldXlat = $xlat;
             FormatIPTC($exifTool, $tagInfo, \$val, \$xlat, $rec, 1);
             if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
+                $xlat = $oldXlat;   # don't change translation (not writing this value)
                 $verbose > 1 and print $out "    - IPTC:$$tagInfo{Name} = '$val'\n";
                 ++$exifTool->{CHANGED};
                 # set deleted flag to indicate we found and deleted this tag

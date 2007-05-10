@@ -38,6 +38,7 @@ my $testnum = 1;
         [YResolution => '120'],
         [Creator => 'Phil Harvey'],
         ['By-Line' => 'Phil Again'],
+        [Tagged => No],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Photoshop.psd');
     print "ok $testnum\n";

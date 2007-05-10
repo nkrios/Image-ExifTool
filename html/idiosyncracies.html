@@ -8,8 +8,9 @@
 <body>
 <h1 class='up'>Maker Note Idiosyncracies</h1>
 
-<p>It really is suprising how stupid some (...many, ...most?) manufacturers seem
-to be when it comes to writing what should be a fairly simple file format.</p>
+<p>It really is surprising how stupid some (...many, ...most?) manufacturers
+seem to be when it comes to writing what should be a fairly simple file
+format.</p>
 
 <p>One positive thing is that most manufacturers seem to have adopted the use of
 an EXIF-like IFD (Image File Directory) structure for their maker notes.  But
@@ -52,8 +53,14 @@ even though other offsets aren't.</p>
 <p><b>Concord:</b> Some models write PrintIM information with an entry-based
 offset like Casio.</p>
 
+<p><b>Hewlett-Packard:</b> The PhotoSmart 720 (one of the few HP models to use
+EXIF-format maker notes) uses a format code of 5 (rational64u) for tag 0x0204,
+but stores a rational32u value.  Other models show about as much standardization
+as the Kodak point-and-shoot lineup.</p>
+
 <p><b>Kodak:</b> Professional DCS Photo Desk software writes a cyclical EXIF
-directory such that the InteropIFD pointer points back to IFD0.</p>
+directory such that the InteropIFD pointer points back to IFD0.
+Point-and-shoot models show little standardization in maker note format.</p>
 
 <p><b>Konica:</b> The KD-300Z writes all maker notes offsets relative to the
 start of the individual IFD entry.</p>
@@ -108,7 +115,7 @@ start of the individual IFD entry.</p>
 
 <p><b>Sanyo:</b> The offsets written in the maker notes of the J1, J2, J3, S1,
 S3 and S4 have very little to do with reality.  Apparently the Sanyo
-programmers have no understanding of the concept of an IFD offset.
+programmers have no understanding of the concept of an IFD offset.</p>
 
 <p><b>Skanhex:</b> With some Skanhex models (SX-210Z3, SX-330Z3, SX3300,
 SX410Z3), the 264-byte makernotes block contains no useful information, and
@@ -125,7 +132,7 @@ start of the individual IFD entry.  (very similar to Konica KD-300Z)</p>
 
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised Jan. 14, 2007</i>
+<br><i>Last revised May 4, 2007</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

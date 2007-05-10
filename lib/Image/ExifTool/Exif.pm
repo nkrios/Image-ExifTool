@@ -33,7 +33,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.29';
+$VERSION = '2.36';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -622,6 +622,7 @@ my %longBin = (
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
+            WriteCondition => '$$self{FILE_TYPE} ne "TIFF"',
             Protected => 2,
         },
         {
@@ -675,6 +676,7 @@ my %longBin = (
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
+            WriteCondition => '$$self{FILE_TYPE} ne "TIFF"',
             Protected => 2,
         },
         {
@@ -977,7 +979,7 @@ my %longBin = (
     0x9206 => {
         Name => 'SubjectDistance',
         Groups => { 2 => 'Camera' },
-        PrintConv => '"$val m"',
+        PrintConv => '$val eq "inf" ? $val : "${val} m"',
     },
     0x9207 => {
         Name => 'MeteringMode',
@@ -1049,18 +1051,12 @@ my %longBin = (
     0x9210 => {
         Name => 'FocalPlaneResolutionUnit',
         Groups => { 2 => 'Camera' },
-        ValueConv => {
-            1 => '25.4',
-            2 => '25.4',
-            3 => '10',
-            4 => '1',
-            5 => '0.001',
-        },
         PrintConv => {
-            25.4 => 'inches',
-            10 => 'cm',
-            1 => 'mm',
-            0.001 => 'um',
+            1 => 'None',
+            2 => 'inches',
+            3 => 'cm',
+            4 => 'mm',
+            5 => 'um',
         },
     },
     0x9211 => 'ImageNumber',
@@ -1122,28 +1118,28 @@ my %longBin = (
     0x9c9b => {
         Name => 'XPTitle',
         Format => 'undef',
-        ValueConv => '$self->Unicode2Byte($val,"II")',
+        ValueConv => '$self->Unicode2Charset($val,"II")',
     },
     0x9c9c => {
         Name => 'XPComment',
         Format => 'undef',
-        ValueConv => '$self->Unicode2Byte($val,"II")',
+        ValueConv => '$self->Unicode2Charset($val,"II")',
     },
     0x9c9d => {
         Name => 'XPAuthor',
         Groups => { 2 => 'Author' },
         Format => 'undef',
-        ValueConv => '$self->Unicode2Byte($val,"II")',
+        ValueConv => '$self->Unicode2Charset($val,"II")',
     },
     0x9c9e => {
         Name => 'XPKeywords',
         Format => 'undef',
-        ValueConv => '$self->Unicode2Byte($val,"II")',
+        ValueConv => '$self->Unicode2Charset($val,"II")',
     },
     0x9c9f => {
         Name => 'XPSubject',
         Format => 'undef',
-        ValueConv => '$self->Unicode2Byte($val,"II")',
+        ValueConv => '$self->Unicode2Charset($val,"II")',
     },
     0xa000 => 'FlashpixVersion',
     0xa001 => {
@@ -1185,18 +1181,12 @@ my %longBin = (
     0xa210 => {
         Name => 'FocalPlaneResolutionUnit',
         Groups => { 2 => 'Camera' },
-        ValueConv => {
-            1 => '25.4',
-            2 => '25.4',
-            3 => '10',
-            4 => '1',
-            5 => '0.001',
-        },
         PrintConv => {
-            25.4 => 'inches',
-            10 => 'cm',
-            1 => 'mm',
-            0.001 => 'um',
+            1 => 'None', # (not standard EXIF)
+            2 => 'inches',
+            3 => 'cm',
+            4 => 'mm',   # (not standard EXIF)
+            5 => 'um',   # (not standard EXIF)
         },
     },
     0xa211 => 'ImageNumber',
@@ -1276,6 +1266,7 @@ my %longBin = (
     0xa405 => {
         Name => 'FocalLengthIn35mmFormat',
         Groups => { 2 => 'Camera' },
+        PrintConv => '"${val}mm"',
     },
     0xa406 => {
         Name => 'SceneCaptureType',
@@ -1347,76 +1338,78 @@ my %longBin = (
 #
     0xbc01 => { #13
         Name => 'PixelFormat',
+        PrintHex => 1,
+        Format => 'undef',
         Notes => q{
             tags 0xbc** are used in Windows Media Photo WDP images. The actual
             PixelFormat values are 16-byte GUID's but the leading 15 bytes,
-            '6fddc324-4e03-4bfe-b1853d77768dc9', have been removed below to avoid
+            '6fddc324-4e03-4bfe-b1853-d77768dc9', have been removed below to avoid
             unnecessary clutter
         },
         ValueConv => q{
             require Image::ExifTool::ASF;
-            Image::ExifTool::ASF::GetGUID($val);
+            $val = Image::ExifTool::ASF::GetGUID($val);
             # GUID's are too long, so remove redundant information
-            $val =~ s/^6fddc324-4e03-4bfe-b1853d77768dc9/0x/;
+            $val =~ s/^6fddc324-4e03-4bfe-b185-3d77768dc9//i and $val = hex($val);
             return $val;
         },
         PrintConv => {
-            '0x0d' => '24-bit RGB',
-            '0x0c' => '24-bit BGR',
-            '0x0e' => '32-bit BGR',
-            '0x15' => '48-bit RGB',
-            '0x12' => '48-bit RGB Fixed Point',
-            '0x3b' => '48-bit RGB Half',
-            '0x18' => '96-bit RGB Fixed Point',
-            '0x1b' => '128-bit RGB Float',
-            '0x0f' => '32-bit BGRA',
-            '0x16' => '64-bit RGBA',
-            '0x1d' => '64-bit RGBA Fixed Point',
-            '0x3a' => '64-bit RGBA Half',
-            '0x1e' => '128-bit RGBA Fixed Point',
-            '0x19' => '128-bit RGBA Float',
-            '0x10' => '32-bit PBGRA',
-            '0x17' => '64-bit PRGBA',
-            '0x1a' => '128-bit PRGBA Float',
-            '0x1c' => '32-bit CMYK',
-            '0x2c' => '40-bit CMYK Alpha',
-            '0x1f' => '64-bit CMYK',
-            '0x2d' => '80-bit CMYK Alpha',
-            '0x20' => '24-bit 3 Channels',
-            '0x21' => '32-bit 4 Channels',
-            '0x22' => '40-bit 5 Channels',
-            '0x23' => '48-bit 6 Channels',
-            '0x24' => '56-bit 7 Channels',
-            '0x25' => '64-bit 8 Channels',
-            '0x2e' => '32-bit 3 Channels Alpha',
-            '0x2f' => '40-bit 4 Channels Alpha',
-            '0x30' => '48-bit 5 Channels Alpha',
-            '0x31' => '56-bit 6 Channels Alpha',
-            '0x32' => '64-bit 7 Channels Alpha',
-            '0x33' => '72-bit 8 Channels Alpha',
-            '0x26' => '48-bit 3 Channels',
-            '0x27' => '64-bit 4 Channels',
-            '0x28' => '80-bit 5 Channels',
-            '0x29' => '96-bit 6 Channels',
-            '0x2a' => '112-bit 7 Channels',
-            '0x2b' => '128-bit 8 Channels',
-            '0x34' => '64-bit 3 Channels Alpha',
-            '0x35' => '80-bit 4 Channels Alpha',
-            '0x36' => '96-bit 5 Channels Alpha',
-            '0x37' => '112-bit 6 Channels Alpha',
-            '0x38' => '128-bit 7 Channels Alpha',
-            '0x39' => '144-bit 8 Channels Alpha',
-            '0x08' => '8-bit Gray',
-            '0x0b' => '16-bit Gray',
-            '0x13' => '16-bit Gray Fixed Point',
-            '0x3e' => '16-bit Gray Half',
-            '0x3f' => '32-bit Gray Fixed Point',
-            '0x11' => '32-bit Gray Float',
-            '0x05' => 'Black & White',
-            '0x09' => '16-bit BGR555',
-            '0x0a' => '16-bit BGR565',
-            '0x13' => '32-bit BGR101010',
-            '0x3d' => '32-bit RGBE',
+            0x0d => '24-bit RGB',
+            0x0c => '24-bit BGR',
+            0x0e => '32-bit BGR',
+            0x15 => '48-bit RGB',
+            0x12 => '48-bit RGB Fixed Point',
+            0x3b => '48-bit RGB Half',
+            0x18 => '96-bit RGB Fixed Point',
+            0x1b => '128-bit RGB Float',
+            0x0f => '32-bit BGRA',
+            0x16 => '64-bit RGBA',
+            0x1d => '64-bit RGBA Fixed Point',
+            0x3a => '64-bit RGBA Half',
+            0x1e => '128-bit RGBA Fixed Point',
+            0x19 => '128-bit RGBA Float',
+            0x10 => '32-bit PBGRA',
+            0x17 => '64-bit PRGBA',
+            0x1a => '128-bit PRGBA Float',
+            0x1c => '32-bit CMYK',
+            0x2c => '40-bit CMYK Alpha',
+            0x1f => '64-bit CMYK',
+            0x2d => '80-bit CMYK Alpha',
+            0x20 => '24-bit 3 Channels',
+            0x21 => '32-bit 4 Channels',
+            0x22 => '40-bit 5 Channels',
+            0x23 => '48-bit 6 Channels',
+            0x24 => '56-bit 7 Channels',
+            0x25 => '64-bit 8 Channels',
+            0x2e => '32-bit 3 Channels Alpha',
+            0x2f => '40-bit 4 Channels Alpha',
+            0x30 => '48-bit 5 Channels Alpha',
+            0x31 => '56-bit 6 Channels Alpha',
+            0x32 => '64-bit 7 Channels Alpha',
+            0x33 => '72-bit 8 Channels Alpha',
+            0x26 => '48-bit 3 Channels',
+            0x27 => '64-bit 4 Channels',
+            0x28 => '80-bit 5 Channels',
+            0x29 => '96-bit 6 Channels',
+            0x2a => '112-bit 7 Channels',
+            0x2b => '128-bit 8 Channels',
+            0x34 => '64-bit 3 Channels Alpha',
+            0x35 => '80-bit 4 Channels Alpha',
+            0x36 => '96-bit 5 Channels Alpha',
+            0x37 => '112-bit 6 Channels Alpha',
+            0x38 => '128-bit 7 Channels Alpha',
+            0x39 => '144-bit 8 Channels Alpha',
+            0x08 => '8-bit Gray',
+            0x0b => '16-bit Gray',
+            0x13 => '16-bit Gray Fixed Point',
+            0x3e => '16-bit Gray Half',
+            0x3f => '32-bit Gray Fixed Point',
+            0x11 => '32-bit Gray Float',
+            0x05 => 'Black & White',
+            0x09 => '16-bit BGR555',
+            0x0a => '16-bit BGR565',
+            0x13 => '32-bit BGR101010',
+            0x3d => '32-bit RGBE',
         },
     },
     0xbc04 => { #13
@@ -2001,7 +1994,7 @@ sub CalculateLV($$$)
 #         2) Canon digital zoom factor
 #         3) Focal plane diagonal size (in mm)
 #         4/5) Focal plane X/Y size (in mm)
-#         6) focal plane resolution units (in mm)
+#         6) focal plane resolution units (1=None,2=inches,3=cm,4=mm,5=um)
 #         7/8) Focal plane X/Y resolution
 #         9/10,11/12...) Image width/height in order of precedence (first valid pair is used)
 # Returns: 35mm conversion factor (or undefined if it can't be calculated)
@@ -2020,7 +2013,8 @@ sub CalcScaleFactor35efl
         if ($xsize and $ysize) {
             $diag = sqrt($xsize * $xsize + $ysize * $ysize);
         } else {
-            my $units = shift || return undef;
+            # get number of mm in units (assume inches unless otherwise specified)
+            my $units = { 3=>10, 4=>1, 5=>0.001 }->{ shift() || '' } || 25.4;
             my $x_res = shift || return undef;
             my $y_res = shift || return undef;
             Image::ExifTool::IsFloat($x_res) and $x_res != 0 or return undef;
@@ -2093,7 +2087,7 @@ sub ConvertExifText($$)
         my $order;
         $order = ($ii > $mm) ? 'II' : 'MM' if $ii != $mm;
         # convert from unicode
-        $str = $exifTool->Unicode2Byte($str, $order);
+        $str = $exifTool->Unicode2Charset($str, $order);
     } else {
         # assume everything else is ASCII (Don't convert JIS... yet)
         $str =~ s/\0.*//s;   # truncate at null terminator
@@ -2614,8 +2608,8 @@ sub ProcessExif($$$)
 #
         my $subdir = $$tagInfo{SubDirectory};
         if ($subdir) {
+            my (@values, $newTagTable, $dirNum, $newByteOrder, $invalid);
             my $tagStr = $$tagInfo{Name};
-            my @values;
             if ($$subdir{MaxSubdirs}) {
                 @values = split ' ', $val;
                 # limit the number of subdirectories we parse
@@ -2626,13 +2620,9 @@ sub ProcessExif($$$)
                 }
                 $val = shift @values;
             }
-            my ($newTagTable, $dirNum);
             if ($$subdir{TagTable}) {
                 $newTagTable = GetTagTable($$subdir{TagTable});
-                unless ($newTagTable) {
-                    warn "Unknown tag table $$subdir{TagTable}\n";
-                    next;
-                }
+                $newTagTable or warn("Unknown tag table $$subdir{TagTable}"), next;
             } else {
                 $newTagTable = $tagTablePtr;    # use existing table
             }
@@ -2649,7 +2639,7 @@ sub ProcessExif($$$)
                     #### eval Start ($valuePtr, $val)
                     my $newStart = eval($$subdir{Start});
                     unless (Image::ExifTool::IsInt($newStart)) {
-                        $exifTool->Warn("Bad value for $$tagInfo{Name}");
+                        $exifTool->Warn("Bad value for $tagStr");
                         last;
                     }
                     # convert back to relative to $subdirDataPt
@@ -2661,16 +2651,17 @@ sub ProcessExif($$$)
                 # this is a pain, but some maker notes are always a specific
                 # byte order, regardless of the byte order of the file
                 my $oldByteOrder = GetByteOrder();
-                my $newByteOrder = $$subdir{ByteOrder};
+                $newByteOrder = $$subdir{ByteOrder};
                 if ($newByteOrder) {
                     if ($newByteOrder =~ /^Little/i) {
                         $newByteOrder = 'II';
                     } elsif ($newByteOrder =~ /^Big/i) {
                         $newByteOrder = 'MM';
                     } elsif ($$subdir{OffsetPt}) {
-                        warn "Can't have variable byte ordering for SubDirectories using OffsetPt\n";
+                        undef $newByteOrder;
+                        warn "Can't have variable byte ordering for SubDirectories using OffsetPt";
                         last;
-                    } else {
+                    } elsif ($subdirStart + 2 <= $subdirDataLen) {
                         # attempt to determine the byte ordering by checking
                         # at the number of directory entries.  This is an int16u
                         # that should be a reasonable value.
@@ -2695,9 +2686,14 @@ sub ProcessExif($$$)
                 }
                 # add offset to the start of the directory if necessary
                 if ($$subdir{OffsetPt}) {
-                    SetByteOrder($newByteOrder);
                     #### eval OffsetPt ($valuePtr)
-                    $subdirStart += Get32u($subdirDataPt, eval $$subdir{OffsetPt});
+                    my $pos = eval $$subdir{OffsetPt};
+                    if ($pos + 4 > $subdirDataLen) {
+                        $exifTool->Warn("Bad $tagStr OffsetPt");
+                        last;
+                    }                    
+                    SetByteOrder($newByteOrder);
+                    $subdirStart += Get32u($subdirDataPt, $pos);
                     SetByteOrder($oldByteOrder);
                 }
                 if ($subdirStart < 0 or $subdirStart + 2 > $subdirDataLen) {
@@ -2707,12 +2703,11 @@ sub ProcessExif($$$)
                     if ($raf) {
                         # read the directory from the file
                         if ($raf->Seek($subdirStart + $base,0)) {
-                            my $buff;
+                            my ($buff, $buf2);
                             if ($raf->Read($buff,2) == 2) {
                                 # get no. dir entries
                                 $size = 12 * Get16u(\$buff, 0);
                                 # read dir (plus next IFD pointer)
-                                my $buf2;
                                 if ($raf->Read($buf2,$size+4) >= $size) {
                                     # set up variables to process new subdir data
                                     $buff .= $buf2;
@@ -2763,6 +2758,7 @@ sub ProcessExif($$$)
                 );
                 if ($$tagInfo{MakerNotes}) {
                     $subdirInfo{MakerNoteAddr} = $valuePtr + $valueDataPos + $base;
+                    $subdirInfo{NoFixBase} = 1 if $$subdir{Base};
                 }
                 # some Pentax cameras (Optio 330) write maker notes in IFD0
                 # set directory IFD name from group name of family 1 in tag information if it exists
@@ -2778,6 +2774,7 @@ sub ProcessExif($$$)
                 my $ok = 0;
                 if (defined $$subdir{Validate} and not eval $$subdir{Validate}) {
                     $exifTool->Warn("Invalid $tagStr data");
+                    $invalid = 1;
                 } else {
                     # process the subdirectory
                     $ok = $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable, $$subdir{ProcessProc});
@@ -2792,31 +2789,44 @@ sub ProcessExif($$$)
                 @values or last;
                 $val = shift @values;           # continue with next subdir
             }
-            next unless $exifTool->Options('MakerNotes') or
-                        $exifTool->{REQ_TAG_LOOKUP}->{lc($$tagInfo{Name})};
+            my $doMaker = $exifTool->Options('MakerNotes');
+            next unless $doMaker or $exifTool->{REQ_TAG_LOOKUP}->{lc($tagStr)};
+            # extract as a block if specified
             if ($$tagInfo{MakerNotes}) {
-                # this is a pain, but we must rebuild maker notes to include
-                # all the value data if data was outside the maker notes
-                my %makerDirInfo = (
-                    Name       => $tagStr,
-                    Base       => $base,
-                    DataPt     => $valueDataPt,
-                    DataPos    => $valueDataPos,
-                    DataLen    => $valueDataLen,
-                    DirStart   => $valuePtr,
-                    DirLen     => $size,
-                    RAF        => $raf,
-                    Parent     => $dirName,
-                    DirName    => 'MakerNotes',
-                    FixOffsets => $$subdir{FixOffsets},
-                    TagInfo    => $tagInfo,
-                );
-                $makerDirInfo{FixBase} = 1 if $$subdir{FixBase};
-                my $val2 = RebuildMakerNotes($exifTool, $newTagTable, \%makerDirInfo);
-                if (defined $val2) {
-                    $val = $val2;
+                # save maker note byte order (if it was significant and valid)
+                if ($$subdir{ByteOrder} and not $invalid) {
+                    $exifTool->{MAKER_NOTE_BYTE_ORDER} = 
+                        defined ($exifTool->{UnknownByteOrder}) ? 
+                                 $exifTool->{UnknownByteOrder} : $newByteOrder;
+                }
+                if ($doMaker and $doMaker eq '2') {
+                    # extract maker notes without rebuilding (no fixup information)
+                    delete $exifTool->{MAKER_NOTE_FIXUP};
                 } else {
-                    $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                    # this is a pain, but we must rebuild maker notes to include
+                    # all the value data if data was outside the maker notes
+                    my %makerDirInfo = (
+                        Name       => $tagStr,
+                        Base       => $base,
+                        DataPt     => $valueDataPt,
+                        DataPos    => $valueDataPos,
+                        DataLen    => $valueDataLen,
+                        DirStart   => $valuePtr,
+                        DirLen     => $size,
+                        RAF        => $raf,
+                        Parent     => $dirName,
+                        DirName    => 'MakerNotes',
+                        FixOffsets => $$subdir{FixOffsets},
+                        TagInfo    => $tagInfo,
+                    );
+                    $makerDirInfo{FixBase} = 1 if $$subdir{FixBase};
+                    # rebuild maker notes (creates $exifTool->{MAKER_NOTE_FIXUP})
+                    my $val2 = RebuildMakerNotes($exifTool, $newTagTable, \%makerDirInfo);
+                    if (defined $val2) {
+                        $val = $val2;
+                    } else {
+                        $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                    }
                 }
             } else {
                 # extract this directory as a block if specified

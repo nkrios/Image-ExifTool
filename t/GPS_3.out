@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.75
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.79
 [File, File, Image]  - File Name: GPS_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2007:02:12 07:49:33
+[File, File, Time]  - File Modification Date/Time: 2007:03:02 15:21:50
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 120
@@ -49,13 +49,14 @@
 [EXIF, GPS, Location] 2 - GPS Latitude: 12 deg 21' 23.34"
 [EXIF, GPS, Location] 3 - GPS Longitude Ref: West
 [EXIF, GPS, Location] 4 - GPS Longitude: 1 deg 54' 51.00"
-[EXIF, GPS, Time] 7 - GPS Time Stamp: 14:58:24
+[EXIF, GPS, Time] 7 - GPS Time Stamp: 15:21:10.55
 [EXIF, GPS, Location] 18 - GPS Map Datum: WGS84
+[EXIF, GPS, Time] 29 - GPS Date Stamp: 2007:03:02
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1050
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 1074
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 120 - Caption-Abstract: Communications
@@ -76,6 +77,7 @@
 [IPTC, IPTC, Other] 25 - Keywords: Communications
 [IPTC, IPTC, Author] 116 - Copyright Notice: ian Britton - FreeFoto.com
 [Composite, Composite, Image]  - Aperture: 0.6
+[Composite, Composite, Time]  - GPS Date/Time: 2007:03:02 15:21:10.55
 [Composite, Composite, Other]  - GPS Latitude: 12 deg 21' 23.34" S
 [Composite, Composite, Other]  - GPS Longitude: 1 deg 54' 51.00" W
 [Composite, Composite, Image]  - GPS Position: 12 deg 21' 23.34" S, 1 deg 54' 51.00" W

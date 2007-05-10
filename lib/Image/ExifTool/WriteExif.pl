@@ -29,7 +29,7 @@ my %mandatory = (
     IFD0 => {
         0x011a => 72,       # XResolution
         0x011b => 72,       # YResolution
-        0x0128 => 2,        # Resoution unit (inches)
+        0x0128 => 2,        # Resolution unit (inches)
         0x0213 => 1,        # YCbCrPositioning (centered)
       # 0x8769 => ????,     # ExifOffset
     },
@@ -37,7 +37,7 @@ my %mandatory = (
         0x0103 => 6,        # Compression (JPEG)
         0x011a => 72,       # XResolution
         0x011b => 72,       # YResolution
-        0x0128 => 2,        # Resoution unit (inches)
+        0x0128 => 2,        # Resolution unit (inches)
     },
     ExifIFD => {
         0x9000 => '0220',   # ExifVersion
@@ -217,7 +217,7 @@ my %writeTable = (
         Writable => 'string',
         Shift => 'Time',
         WriteGroup => 'IFD0',
-        PrintConvInv => '$val',   # (only works if date format not set)
+        PrintConvInv => 'Image::ExifTool::Exif::ExifDateTime($val)', 
     },
     0x013b => {             # Artist
         Writable => 'string',
@@ -360,12 +360,12 @@ my %writeTable = (
     0x9003 => {             # DateTimeOriginal
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => '$val',   # (only works if date format not set)
+        PrintConvInv => 'Image::ExifTool::Exif::ExifDateTime($val)', 
     },
     0x9004 => {             # CreateDate
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => '$val',   # (only works if date format not set)
+        PrintConvInv => 'Image::ExifTool::Exif::ExifDateTime($val)', 
     },
     0x9101 => {             # ComponentsConfiguration
         Writable => 'undef',
@@ -402,7 +402,7 @@ my %writeTable = (
     },
     0x9206 => {             # SubjectDistance
         Writable => 'rational64u',
-        PrintConvInv => '$val=~s/ m$//;$val',
+        PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     0x9207 => 'int16u',     # MeteringMode
     0x9208 => 'int16u',     # LightSource
@@ -440,28 +440,28 @@ my %writeTable = (
             with the -L option. XPTitle is ignored by Windows Explorer if
             ImageDescription exists
         },
-        ValueConvInv => '$self->Byte2Unicode($val,"II")',
+        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
     },
     0x9c9c => {             # XPComment
         Writable => 'int8u',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$self->Byte2Unicode($val,"II")',
+        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
     },
     0x9c9d => {             # XPAuthor
         Writable => 'int8u',
         WriteGroup => 'IFD0',
         Notes => 'ignored by Windows Explorer if Artist exists',
-        ValueConvInv => '$self->Byte2Unicode($val,"II")',
+        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
     },
     0x9c9e => {             # XPKeywords
         Writable => 'int8u',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$self->Byte2Unicode($val,"II")',
+        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
     },
     0x9c9f => {             # XPSubject
         Writable => 'int8u',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$self->Byte2Unicode($val,"II")',
+        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
     },
     0xa000 => 'undef',      # FlashpixVersion
     0xa001 => 'int16u',     # ColorSpace
@@ -499,7 +499,10 @@ my %writeTable = (
     0xa402 => 'int16u',     # ExposureMode
     0xa403 => 'int16u',     # WhiteBalance
     0xa404 => 'rational64u',# DigitalZoomRatio
-    0xa405 => 'int16u',     # FocalLengthIn35mmFormat
+    0xa405 => {             # FocalLengthIn35mmFormat
+        Writable => 'int16u',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
+    },
     0xa406 => 'int16u',     # SceneCaptureType
     0xa407 => 'int16u',     # GainControl
     0xa408 => {             # Contrast
@@ -760,6 +763,27 @@ my %writeTable = (
 InsertWritableProperties('Image::ExifTool::Exif::Main', \%writeTable, \&CheckExif);
 
 #------------------------------------------------------------------------------
+# Change date/time string to standard EXIF formatting
+# Inputs: 0) Date/Time string
+# Returns: formatted date/time string (or undef and issues warning on error)
+sub ExifDateTime($)
+{
+    my $val = shift;
+    my $rtnVal;
+    if ($val =~ /(\d{4})/g) {           # get YYYY
+        my $yr = $1;
+        my @a = ($val =~ /\d{2}/g);     # get MM, DD, and maybe hh, mm, ss
+        if (@a >= 2) {
+            push @a, '00' while @a < 5; # add hh, mm, ss if not given
+            # construct properly formatted date/time string
+            $rtnVal = "$yr:$a[0]:$a[1] $a[2]:$a[3]:$a[4]";
+        }
+    }
+    $rtnVal or warn "Improperly formatted date/time\n";
+    return $rtnVal;
+}
+
+#------------------------------------------------------------------------------
 # Get binary CFA Pattern from a text string
 # Inputs: CFA pattern string (ie. '[Blue,Green][Green,Red]')
 # Returns: Binary CFA data or prints warning and returns undef on error
@@ -815,7 +839,7 @@ sub EncodeExifText($$)
     my ($exifTool, $val) = @_;
     # does the string contain special characters?
     if ($val =~ /[\x80-\xff]/) {
-        return "UNICODE\0" . $exifTool->Byte2Unicode($val);
+        return "UNICODE\0" . $exifTool->Charset2Unicode($val);
     } else {
         return "ASCII\0\0\0$val";
     }
@@ -857,7 +881,7 @@ sub InsertWritableProperties($$;$)
 # (some manufacturers put value data outside maker notes!!)
 # Inputs: 0) ExifTool object reference, 1) tag table reference,
 #         2) dirInfo reference
-# Returns: new maker note data, or undef on error
+# Returns: new maker note data (and creates MAKER_NOTE_FIXUP), or undef on error
 sub RebuildMakerNotes($$$)
 {
     my ($exifTool, $tagTablePtr, $dirInfo) = @_;
@@ -925,7 +949,6 @@ sub RebuildMakerNotes($$$)
             $exifTool->{MAKER_NOTE_FIXUP} = $makerFixup;    # save fixup for later
         }
     }
-    $exifTool->{MAKER_NOTE_BYTE_ORDER} = GetByteOrder();    # save maker note byte ordering
     SetByteOrder($saveOrder);
 
     return $rtnValue;
@@ -1180,6 +1203,14 @@ sub WriteExif($$$)
         my $mandatory = $mandatory{$dirName};
         my $allMandatory;
         if ($mandatory) {
+            # use X/Y resolution values from JFIF if available
+            if ($dirName eq 'IFD0' and defined $$exifTool{JFIFYResolution}) {
+                my %ifd0Vals = %$mandatory;
+                $ifd0Vals{0x011a} = $$exifTool{JFIFXResolution};
+                $ifd0Vals{0x011b} = $$exifTool{JFIFYResolution};
+                $ifd0Vals{0x0128} = $$exifTool{JFIFResolutionUnit} + 1;
+                $mandatory = \%ifd0Vals;
+            }
             $allMandatory = 0;  # initialize to zero
             # add mandatory tags if creating a new directory
             unless ($numEntries) {
@@ -1612,8 +1643,10 @@ NoOverwrite:            next if $isNew > 0;
                     if ($isNew >= 0 and $set{$newID}) {
                         # we are writing a whole new maker note block
                         # --> add fixup information if necessary
-                        if ($exifTool->{MAKER_NOTE_FIXUP}) {
-                            my $makerFixup = $exifTool->{MAKER_NOTE_FIXUP}->Clone();
+                        my $newValueHash = $exifTool->GetNewValueHash($newInfo, $dirName);
+                        if ($newValueHash and $newValueHash->{MAKER_NOTE_FIXUP}) {
+                            # must clone fixup because we will be shifting it
+                            my $makerFixup = $newValueHash->{MAKER_NOTE_FIXUP}->Clone();
                             my $valLen = length($valBuff);
                             $makerFixup->{Start} += $valLen;
                             push @valFixups, $makerFixup;
@@ -1633,9 +1666,11 @@ NoOverwrite:            next if $isNew > 0;
                             RAF => $raf,
                         );
                         if ($$newInfo{SubDirectory}) {
-                            $subdirInfo{FixBase} = 1 if $newInfo->{SubDirectory}->{FixBase};
-                            $subdirInfo{FixOffsets} = $newInfo->{SubDirectory}->{FixOffsets};
-                            $subdirInfo{EntryBased} = $newInfo->{SubDirectory}->{EntryBased};
+                            my $sub = $$newInfo{SubDirectory};
+                            $subdirInfo{FixBase} = 1 if $$sub{FixBase};
+                            $subdirInfo{FixOffsets} = $$sub{FixOffsets};
+                            $subdirInfo{EntryBased} = $$sub{EntryBased};
+                            $subdirInfo{NoFixBase} = 1 if $$sub{Base};
                         }
                         # get the proper tag table for these maker notes
                         my $subTable;
@@ -1670,7 +1705,7 @@ NoOverwrite:            next if $isNew > 0;
                             # rewrite maker notes
                             $subdir = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                         } else {
-                            $exifTool->Warn('Maker notes could not be parsed');
+                            $exifTool->Warn('Maker notes could not be parsed',1);
                         }
                         if (defined $subdir) {
                             next unless length $subdir;
@@ -1717,14 +1752,17 @@ NoOverwrite:            next if $isNew > 0;
                     SetByteOrder($saveOrder);
 
                 # process existing subdirectory unless we are overwriting it entirely
-                } elsif ($$newInfo{SubDirectory} and $isNew <= 0 and not $isOverwriting) {
+                } elsif ($$newInfo{SubDirectory} and $isNew <= 0 and not $isOverwriting
+                    # don't edit directory if Writable is set to 0
+                    and (not defined $$newInfo{Writable} or $$newInfo{Writable}))
+                {
 
                     my $subdir = $$newInfo{SubDirectory};
                     if ($$newInfo{SubIFD}) {
 #
 # rewrite existing sub IFD's
 #
-                        my $subdirName = $newInfo->{Groups}->{1};
+                        my $subdirName = $newInfo->{Groups}->{1} || $$newInfo{Name};
                         # must handle sub-IFD's specially since the values
                         # are actually offsets to subdirectories
                         unless ($readCount) {   # can't have zero count
@@ -1833,7 +1871,7 @@ NoOverwrite:            next if $isNew > 0;
                         }
                         my $subdirBase = $base;
                         if ($$subdir{Base}) {
-                            my $start = $subdirStart + $dataPos;
+                            my $start = $subdirStart + $valueDataPos;
                             #### eval Base ($start)
                             $subdirBase += eval $$subdir{Base};
                         }
@@ -2105,8 +2143,8 @@ NoOverwrite:            next if $isNew > 0;
             if ($exifTool->{DEL_GROUP}->{$dirName} == 2 and
                 $exifTool->{ADD_DIRS}->{$dirName})
             {
-                $ifd = "\0" x 2;    # start with empty IFD
-                $dataPt = \$ifd;
+                my $emptyIFD = "\0" x 2;    # start with empty IFD
+                $dataPt = \$emptyIFD;
                 $dirStart = 0;
                 $dirLen = $dataLen = 2;
             } else {
@@ -2244,7 +2282,7 @@ NoOverwrite:            next if $isNew > 0;
                     } elsif ($$tagInfo{Name} eq 'ThumbnailOffset' and $offset>=0 and $offset<$dataLen) {
                         # Grrr.  The Canon 350D writes the thumbnail with an incorrect byte count
                         my $diff = $offset + $size - $dataLen;
-                        $exifTool->Warn("ThumbnailImage runs outside EXIF data by $diff bytes -- Truncated");
+                        $exifTool->Warn("ThumbnailImage runs outside EXIF data by $diff bytes (truncated)",1);
                         # set the size to the available data
                         $size -= $diff;
                         unless (WriteValue($size, $formatStr, 1, \$newData, $byteCountPos)) {

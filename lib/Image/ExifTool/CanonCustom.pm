@@ -14,12 +14,16 @@ package Image::ExifTool::CanonCustom;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
+use Image::ExifTool::Exif;
 
-$VERSION = '1.12';
+$VERSION = '1.14';
 
 sub ProcessCanonCustom($$$);
+sub ProcessCanonCustom2($$$);
 sub WriteCanonCustom($$$);
+sub WriteCanonCustom2($$$);
 sub CheckCanonCustom($$$);
 sub ConvertPFn($);
 sub ConvertPFnInv($);
@@ -39,6 +43,10 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     WRITE_PROC => \&WriteCanonCustom,
     CHECK_PROC => \&CheckCanonCustom,
     WRITABLE => 'int8u',
+    NOTES => q{
+        These custom functions are used by all 1D models up to but not including the
+        Mark III.
+    },
     0 => {
         Name => 'FocusingScreen',
         PrintConv => {
@@ -1169,6 +1177,531 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     24 => 'PF27Value',
 );
 
+
+# Custom functions for the 1D Mark III (ref PH)
+%Image::ExifTool::CanonCustom::Functions1DmkIII = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&ProcessCanonCustom2,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITE_PROC => \&WriteCanonCustom2,
+    WRITABLE => 'int32u',
+    NOTES => q{
+        The EOS 1D Mark III has 57 custom function tags divided into four main
+        groups: 1. Exposure (0x0101-0x010f), 2. Image (0x0201-0x0203), Flash
+        Exposure (0x0304-0x0306) and Display (0x0407-0x0409), 3. Auto Focus
+        (0x0501-0x050e) and Drive (0x060f-0x0611), and 4. Operation (0x0701-0x070a)
+        and Others (0x080b-0x0810).
+    },
+    # grouped in 4 groups:
+    # 1) Exposure
+    0x0101 => {
+        Name => 'ExposureLevelIncrements',
+        PrintConv => {
+            0 => '1/3-stop set, 1/3-stop comp.',
+            1 => '1-stop set, 1/3-stop comp.',
+            2 => '1/2-stop set, 1/2-stop comp.',
+        },
+    },
+    0x0102 => {
+        Name => 'ISOSpeedIncrements',
+        PrintConv => {
+            0 => '1/3-stop',
+            1 => '1-stop',
+        },
+    },
+    0x0103 => {
+        Name => 'ISOSpeedRange',
+        Count => 3,
+        # (this decoding may not be valid for CR2 images?)
+        ValueConv => [
+            undef,
+            '$val < 1000 ? exp(($val/8-9)*log(2))*100 : 0', # (educated guess)
+            '$val < 1000 ? exp(($val/8-9)*log(2))*100 : 0', # (educated guess)
+        ],
+        ValueConvInv => [
+            undef,
+            '$val ? int(8*(log($val/100)/log(2)+9) + 0.5) : 0xffffffff',
+            '$val ? int(8*(log($val/100)/log(2)+9) + 0.5) : 0xffffffff',
+        ],
+        PrintConv => [
+            \%disableEnable,
+            'sprintf("Max %.0f",$val)',
+            'sprintf("Min %.0f",$val)',
+        ],
+        PrintConvInv => [
+            undef,
+            '$val=~/([\d.]+)/ ? $1 : 0',
+            '$val=~/([\d.]+)/ ? $1 : 0',
+        ],
+    },
+    0x0104 => {
+        Name => 'AEBAutoCancel',
+        PrintConv => \%onOff,
+    },
+    0x0105 => {
+        Name => 'AEBSequence',
+        PrintConv => {
+            0 => '0,-,+',
+            2 => '-,0,+',
+            3 => '+,0,-',
+        },
+    },
+    0x0106 => {
+        Name => 'AEBShotCount',
+        PrintConv => {
+            0 => 3,
+            1 => 2,
+            2 => 5,
+            3 => 7,
+        },
+    },
+    0x0107 => {
+        Name => 'SpotMeterLinkToAFPoint',
+        PrintConv => {
+            0 => 'Disable (use center AF point)',
+            1 => 'Enable (use active AF point)',
+        },
+    },
+    0x0108 => {
+        Name => 'SafetyShift',
+        PrintConv => {
+            0 => 'Disable',
+            1 => 'Enable (Tv/Av)',
+            2 => 'Enable (ISO speed)',
+        },
+    },
+    0x0109 => {
+        Name => 'UsableShootingModes',
+        Count => 2,
+        PrintConv => [
+            \%disableEnable,
+            'sprintf("Flags 0x%x",$val)', # (M, Tv, Av, P, Bulb)
+        ],
+        PrintConvInv => [
+            undef,
+            '$val=~/0x([\dA-F]+)/i ? hex($1) : undef',
+        ],
+    },
+    0x010a => {
+        Name => 'UsableMeteringModes',
+        Count => 2,
+        PrintConv => [
+            \%disableEnable,
+            'sprintf("Flags 0x%x",$val)', # (evaluative,partial,spot,center-weighted average)
+        ],
+        PrintConvInv => [
+            undef,
+            '$val=~/0x([\dA-F]+)/i ? hex($1) : undef',
+        ],
+    },
+    0x010b => {
+        Name => 'ExposureModeInManual',
+        PrintConv => {
+            0 => 'Specified metering mode',
+            1 => 'Evaluative metering',
+            2 => 'Partial metering',
+            3 => 'Spot metering',
+            4 => 'Center-weighted average',
+        },
+    },
+    0x010c => {
+        Name => 'ShutterSpeedRange',
+        Count => 3,
+        ValueConv => [
+            undef,
+            'exp(-($val/8-7)*log(2))',
+            'exp(-($val/8-7)*log(2))',
+        ],
+        ValueConvInv => [
+            undef,
+            'int(-8*(log($val)/log(2)-7) + 0.5)',
+            'int(-8*(log($val)/log(2)-7) + 0.5)',
+        ],
+        PrintConv => [
+            \%disableEnable,
+            '"Hi " . Image::ExifTool::Exif::PrintExposureTime($val)',
+            '"Lo " . Image::ExifTool::Exif::PrintExposureTime($val)',
+        ],
+        PrintConvInv => [
+            undef,
+            '$val=~m{([\d./]+)} ? eval $1 : 0',
+            '$val=~m{([\d./]+)} ? eval $1 : 0',
+        ],
+    },
+    0x010d => {
+        Name => 'ApertureRange',
+        Count => 3,
+        ValueConv => [
+            undef,
+            'exp(($val/8-1)*log(2)/2)',
+            'exp(($val/8-1)*log(2)/2)',
+        ],
+        ValueConvInv => [
+            undef,
+            'int(8*(log($val)*2/log(2)+1) + 0.5)',
+            'int(8*(log($val)*2/log(2)+1) + 0.5)',
+        ],
+        PrintConv => [
+            \%disableEnable,
+            'sprintf("Closed %.2g",$val)',
+            'sprintf("Open %.2g",$val)',
+        ],
+        PrintConvInv => [
+            undef,
+            '$val=~/([\d.]+)/ ? $1 : 0',
+            '$val=~/([\d.]+)/ ? $1 : 0',
+        ],
+    },
+    0x010e => {
+        Name => 'ApplyShootingMeteringMode',
+        Count => 8,
+        PrintConv => [
+            \%disableEnable,
+        ],
+    },
+    0x010f => {
+        Name => 'FlashSyncSpeedAv',
+        PrintConv => {
+            0 => 'Auto',
+            1 => '1/200 Fixed',
+        },
+    },
+    #### 2a) Image
+    0x0201 => {
+        Name => 'LongExposureNoiseReduction',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Auto',
+            2 => 'On',
+        },
+    },
+    0x0202 => {
+        Name => 'HighISONoiseReduction',
+        PrintConv => \%offOn,
+    },
+    0x0203 => {
+        Name => 'HighlightTonePriority',
+        PrintConv => \%disableEnable
+    },
+    #### 2b) Flash exposure
+    0x0304 => {
+        Name => 'ETTLII',
+        Description => 'E-TTL II',
+        PrintConv => {
+            0 => 'Evaluative',
+            1 => 'Average',
+        },
+    },
+    0x0305 => {
+        Name => 'ShutterCurtainSync',
+        PrintConv => {
+            0 => '1st-curtain sync',
+            1 => '2nd-curtain sync',
+        },
+    },
+    0x0306 => {
+        Name => 'FlashFiring',
+        PrintConv => {
+            0 => 'Fires',
+            1 => 'Does not fire',
+        },
+    },
+    #### 2c) Display
+    0x0407 => {
+        Name => 'ViewInfoDuringExposure',
+        PrintConv => \%disableEnable,
+    },
+    0x0408 => {
+        Name => 'LCDIlluminationDuringBulb',
+        PrintConv => \%offOn,
+    },
+    0x0409 => {
+        Name => 'InfoButtonWhenShooting',
+        PrintConv => {
+            0 => 'Displays camera settings',
+            1 => 'Displays shooting functions',
+        },
+    },
+    #### 3a) Auto focus
+    0x0501 => {
+        Name => 'USMLensElectronicMF',
+        PrintConv => {
+            0 => 'Turns on after one-shot AF',
+            1 => 'Turns off after one-shot AF',
+            2 => 'Always turned off',
+        },
+    },
+    0x0502 => {
+        Name => 'AIServoTrackingSensitivity',
+        PrintConv => { # (needs verification)
+            0 => 'Standard',
+            1 => 'Slow',
+            2 => 'Moderately slow',
+            3 => 'Moderately fast',
+            4 => 'Fast',
+        },
+    },
+    0x0503 => {
+        Name => 'AIServoImagePriority',
+        PrintConv => {
+            0 => '1: AF, 2: Tracking',
+            1 => '1: AF, 2: Drive speed',
+            2 => '1: Release, 2: Drive speed',
+        },
+    },
+    0x0504 => {
+        Name => 'AIServoTrackingMethod',
+        PrintConv => {
+            0 => 'Main focus point priority',
+            1 => 'Continuous AF track priority',
+        },
+    },
+    0x0505 => {
+        Name => 'LensDriveNoAF',
+        PrintConv => {
+            0 => 'Focus search on',
+            1 => 'Focus search off',
+        },
+    },
+    0x0506 => {
+        Name => 'LensAFStopButton',
+        PrintConv => {
+            0 => 'AF stop',
+            1 => 'AF start',
+            2 => 'AE lock',
+            3 => 'AF point: M->Auto/Auto->ctr',
+            4 => 'One Shot <-> AI servo',
+            # MORE ENTRIES HERE?
+        },
+    },
+    0x0507 => {
+        Name => 'AFMicroadjustment',
+        Count => 5,
+        PrintConv => [
+            {
+                0 => 'Disable',
+                1 => 'Adjust all by same amount',
+                2 => 'Adjust by lens',
+            },
+            # DECODE OTHER VALUES
+        ],
+    },
+    0x0508 => {
+        Name => 'AFExpansionWithSelectedPoint',
+        PrintConv => {
+            0 => 'Disable',
+            1 => 'Enable (left/right assist points)',
+            2 => 'Enable (surrounding assist points)',
+        },
+    },
+    0x0509 => {
+        Name => 'SelectableAFPoint',
+        PrintConv => {
+            0 => '19 points',
+            1 => 'Inner 9 points',
+            2 => 'Outer 9 points',
+        },
+    },
+    0x050a => {
+        Name => 'SwitchToRegisteredAFPoint',
+        PrintConv => \%disableEnable,
+    },
+    0x050b => {
+        Name => 'AFPointAutoSelection',
+        PrintConv => {
+            0 => 'Control-direct:disable/Main:enable',
+            1 => 'Control-direct:disable/Main:disable',
+            2 => 'Control-direct:enable/Main:enable',
+        },
+    },
+    0x050c => {
+        Name => 'AFPointDisplayDuringFocus',
+        PrintConv => {
+            0 => 'On',
+            1 => 'Off',
+            2 => 'On (when focus achieved)',
+        },
+    },
+    0x050d => {
+        Name => 'AFPointBrightness',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Brighter',
+        },
+    },
+    0x050e => {
+        Name => 'AFAssistBeam',
+        PrintConv => {
+            0 => 'Emits',
+            1 => 'Does not emit',
+        },
+    },
+    #### 3b) Drive
+    0x060f => {
+        Name => 'MirrorLockup',
+        PrintConv => {
+            0 => 'Disable',
+            1 => 'Enable',
+            2 => 'Enable: Down with Set',
+        },
+    },
+    0x0610 => {
+        Name => 'ContinuousShootingSpeed',
+        Count => 3,
+        PrintConv => [
+            \%disableEnable,
+            '"Hi $val"',
+            '"Lo $val"',
+        ],
+        PrintConvInv => [
+            undef,
+            '$val=~/(\d+)/ ? $1 : 0',
+            '$val=~/(\d+)/ ? $1 : 0',
+        ],
+    },
+    0x0611 => {
+        Name => 'ContinuousShotLimit',
+        Count => 2,
+        PrintConv => [
+            \%disableEnable,
+            '"$val shots"',
+        ],
+        PrintConvInv => [
+            undef,
+            '$val=~/(\d+)/ ? $1 : 0',
+        ],
+    },
+    #### 4a) Operation
+    0x0701 => {
+        Name => 'ShutterButtonAFOnButton',
+        PrintConv => {
+            0 => 'Metering + AF start',
+            1 => 'Metering + AF start/AF stop',
+            2 => 'Metering start/Meter + AF start',
+            3 => 'AE lock/Metering + AF start',
+            4 => 'Metering + AF start / disable',
+        },
+    },
+    0x0702 => {
+        Name => 'AFOnAELockButtonSwitch',
+        PrintConv => \%disableEnable,
+    },
+    0x0703 => {
+        Name => 'QuickControlDialInMeter',
+        PrintConv => {
+            0 => 'Exposure comp/Aperture',
+            1 => 'AF point selection',
+            2 => 'ISO speed',
+        },
+    },
+    0x0704 => {
+        Name => 'SetButtonWhenShooting',
+        PrintConv => {
+            0 => 'Normal (disabled)',
+            1 => 'White balance',
+            2 => 'Image size',
+            3 => 'ISO speed',
+            4 => 'Picture style',
+            5 => 'Record func. + media/folder',
+            6 => 'Menu display',
+            7 => 'Image playback',
+        },
+    },
+    0x0705 => {
+        Name => 'ManualTv',
+        Description => 'Manual Tv/Av For M',
+        PrintConv => {
+            0 => 'Tv=Main/Av=Control',
+            1 => 'Tv=Control/Av=Main',
+        },
+    },
+    0x0706 => {
+        Name => 'DialDirectionTvAv',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Reversed',
+        },
+    },
+    0x0707 => {
+        Name => 'AvSettingWithoutLens',
+        PrintConv => \%disableEnable,
+    },
+    0x0708 => {
+        Name => 'WBMediaImageSizeSetting',
+        PrintConv => {
+            0 => 'Rear LCD panel',
+            1 => 'LCD monitor',
+        },
+    },
+    0x0709 => {
+        Name => 'LockMicrophoneButton',
+        PrintConv => {
+            0 => 'Protect (holding:sound rec.)',
+            1 => 'Sound rec. (protect:disable)',
+        },
+    },
+    0x070a => {
+        Name => 'ButtonFunctionControlOff',
+        PrintConv => {
+            0 => 'Normal (enable)',
+            1 => 'Disable main, Control, Multi-control',
+        },
+    },
+    #### 4b) Others
+    0x080b => {
+        Name => 'FocusingScreen',
+        PrintConv => {
+            0 => 'Ec-CIV',
+            1 => 'Ec-A,B,C,CII,CIII,D,H,I,L',
+            2 => 'Ec-S',
+            3 => 'Ec-N,R',
+        },
+    },
+    0x080c => {
+        Name => 'TimerLength',
+        Count => 4,
+        PrintConv => [
+            \%disableEnable,
+            '"6 sec: $val"',
+            '"16 sec: $val"',
+            '"After release: $val"',
+        ],
+        PrintConvInv => [
+            undef,
+            '$val=~/(\d+)$/ ? $1 : 0',
+            '$val=~/(\d+)$/ ? $1 : 0',
+            '$val=~/(\d+)$/ ? $1 : 0',
+        ],
+    },
+    0x080d => {
+        Name => 'ShortReleaseTimeLag',
+        PrintConv => \%disableEnable,
+    },
+    0x080e => {
+        Name => 'AddAspectRatioInfo',
+        PrintConv => {
+            0 => 'Off',
+            1 => '6:6',
+            2 => '3:4',
+            3 => '4:5',
+            4 => '6:7',
+            5 => '10:12',
+            6 => '5:7',
+        },
+    },
+    0x080f => {
+        Name => 'AddOriginalDecisionData',
+        PrintConv => \%offOn,
+    },
+    0x0810 => {
+        Name => 'LiveViewExposureSimulation',
+        PrintConv => {
+            0 => 'Disable (LCD auto adjust)',
+            1 => 'Enable (simulates exposure)',
+        },
+    },
+);
+
 #------------------------------------------------------------------------------
 # Conversion routines
 # Inputs: 0) value to convert
@@ -1187,7 +1720,118 @@ sub ConvertPfnInv($)
 }
 
 #------------------------------------------------------------------------------
-# process Canon custom directory
+# Read/Write Canon custom 2 directory (used by 1D Mark III)
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessCanonCustom2($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $offset = $$dirInfo{DirStart};
+    my $size = $$dirInfo{DirLen};
+    my $write = $$dirInfo{Write};
+    my $verbose = $exifTool->Options('Verbose');
+    my $newTags;
+
+    # first entry in array must be the size
+    my $len = Get16u($dataPt, $offset);
+    unless ($len == $size and $len >= 8) {
+        $exifTool->Warn("Invalid CanonCustom2 data");
+        return 0;
+    }
+    # get group count
+    my $count = Get32u($dataPt, $offset + 4);
+    if ($write) {
+        $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
+        $exifTool->VPrint(0, "  Rewriting CanonCustom2\n") if $verbose;
+    } elsif ($verbose) {
+        $exifTool->VerboseDir('CanonCustom2', $count);
+    }
+    my $pos = $offset + 8;
+    my $end = $offset + $size;
+    # loop through group records
+    for (; $pos<$end; ) {
+        last if $pos + 12 > $end;
+        my $recNum = Get32u($dataPt, $pos);
+        my $recLen = Get32u($dataPt, $pos + 4);
+        my $recCount = Get32u($dataPt, $pos + 8);
+        last if $recLen < 8;    # must be at least 8 bytes for recNum and recLen
+        $pos += 12;
+        my $recPos = $pos;
+        my $recEnd = $pos + $recLen;
+        if ($verbose and not $write) {
+            $exifTool->VerboseDir("CanonCustom2 group $recNum", $recCount);
+        }
+        my ($i, $num, $tag);
+        for ($i=0; $recPos + 8 < $recEnd; ++$i, $recPos+=4*$num) {
+            $tag = Get32u($dataPt, $recPos);
+            $num = Get32u($dataPt, $recPos + 4);
+            $recPos += 8;
+            last if $recPos + $num * 4 > $recEnd;
+            my $val = ReadValue($dataPt, $recPos, 'int32u', $num, $num * 4);
+            if ($write) {
+                # write new value
+                my $tagInfo = $$newTags{$tag};
+                next unless $tagInfo;
+                my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+                next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
+                my $newVal = Image::ExifTool::GetNewValues($newValueHash);
+                next unless defined $newVal;    # can't delete from a custom table
+                WriteValue($newVal, 'int32u', $num, $dataPt, $recPos);
+                if ($verbose > 1) {
+                    $exifTool->VPrint(0, "    - CanonCustom:$$tagInfo{Name} = '$val'\n",
+                                         "    + CanonCustom:$$tagInfo{Name} = '$newVal'\n");
+                }
+                ++$exifTool->{CHANGED};
+            } else {
+                # extract the value
+                my $oldInfo = $$tagTablePtr{$tag};
+                $exifTool->HandleTag($tagTablePtr, $tag, $val,
+                    Index  => $i,
+                    Format => 'int32u',
+                    Count  => $num,
+                    Size   => $num * 4,
+                );
+                my $tagInfo = $$tagTablePtr{$tag};
+                # generate properly formatted description if we just added the tag
+                if ($tagInfo and not $oldInfo) {
+                    ($$tagInfo{Description} = $$tagInfo{Name}) =~ tr/_/ /;
+                    $$tagInfo{Description} =~ s/CanonCustom Functions/Canon Custom Functions /;
+                }
+            }
+        }
+        $pos += $recLen - 8;
+    }
+    if ($pos != $end) {
+        $exifTool->Warn('Possibly corrupted CanonCustom2 data');
+        return 0;
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Write Canon custom 2 data
+# Inputs: 0) ExifTool object reference, 1) dirInfo hash ref, 2) tag table ref
+# Returns: New custom data block or undefined on error
+sub WriteCanonCustom2($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    $exifTool or return 1;    # allow dummy access to autoload this package
+    my $dataPt = $$dirInfo{DataPt};
+    # edit a copy of the custom function 2 data
+    my $buff = substr($$dataPt, $$dirInfo{DirStart}, $$dirInfo{DirLen});
+    my %dirInfo = (
+        DataPt   => \$buff,
+        DirStart => 0,
+        DirLen   => $$dirInfo{DirLen},
+        Write    => 1,
+    );
+    ProcessCanonCustom2($exifTool, \%dirInfo, $tagTablePtr) or return undef;
+    return $buff;
+}
+
+#------------------------------------------------------------------------------
+# Process Canon custom directory
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 sub ProcessCanonCustom($$$)
@@ -1199,7 +1843,7 @@ sub ProcessCanonCustom($$$)
     my $verbose = $exifTool->Options('Verbose');
 
     # first entry in array must be the size
-    my $len = Image::ExifTool::Get16u($dataPt,$offset);
+    my $len = Get16u($dataPt,$offset);
     unless ($len == $size or ($$exifTool{CameraModel}=~/\bD60\b/ and $len+2 == $size)) {
         $exifTool->Warn("Invalid CanonCustom data");
         return 0;
@@ -1208,7 +1852,7 @@ sub ProcessCanonCustom($$$)
     my $pos;
     for ($pos=2; $pos<$size; $pos+=2) {
         # ($pos is position within custom directory)
-        my $val = Image::ExifTool::Get16u($dataPt,$offset+$pos);
+        my $val = Get16u($dataPt,$offset+$pos);
         my $tag = ($val >> 8);
         $val = ($val & 0xff);
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
@@ -1222,9 +1866,8 @@ sub ProcessCanonCustom($$$)
 }
 
 #------------------------------------------------------------------------------
-# check new value for Canon custom data block
-# Inputs: 0) ExifTool object reference, 1) tagInfo hash reference,
-#         2) raw value reference
+# Check new value for Canon custom data block
+# Inputs: 0) ExifTool object reference, 1) tagInfo hash ref, 2) raw value ref
 # Returns: error string or undef (and may modify value) on success
 sub CheckCanonCustom($$$)
 {
@@ -1233,9 +1876,8 @@ sub CheckCanonCustom($$$)
 }
 
 #------------------------------------------------------------------------------
-# write Canon custom data
-# Inputs: 0) ExifTool object reference, 1) ,
-#         2) tag table referencesource dirInfo reference
+# Write Canon custom data
+# Inputs: 0) ExifTool object reference, 1) dirInfo hash ref, 2) tag table ref
 # Returns: New custom data block or undefined on error
 sub WriteCanonCustom($$$)
 {
@@ -1250,14 +1892,15 @@ sub WriteCanonCustom($$$)
     $dataPt = \$newData;
 
     # first entry in array must be the size
-    unless (Image::ExifTool::Get16u($dataPt,0) == $dirLen) {
+    my $len = Get16u($dataPt, 0);
+    unless ($len == $dirLen or ($$exifTool{CameraModel}=~/\bD60\b/ and $len+2 == $dirLen)) {
         $exifTool->Warn("Invalid CanonCustom data");
         return undef;
     }
     my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
     my $pos;
     for ($pos=2; $pos<$dirLen; $pos+=2) {
-        my $val = Image::ExifTool::Get16u($dataPt, $pos);
+        my $val = Get16u($dataPt, $pos);
         my $tag = ($val >> 8);
         my $tagInfo = $$newTags{$tag};
         next unless $tagInfo;
@@ -1266,7 +1909,7 @@ sub WriteCanonCustom($$$)
         next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
         my $newVal = Image::ExifTool::GetNewValues($newValueHash);
         next unless defined $newVal;    # can't delete from a custom table
-        Image::ExifTool::Set16u(($newVal & 0xff) + ($tag << 8), $dataPt, $pos);
+        Set16u(($newVal & 0xff) + ($tag << 8), $dataPt, $pos);
         if ($verbose > 1) {
             $exifTool->VPrint(0, "    - $dirName:$$tagInfo{Name} = '$val'\n",
                                  "    + $dirName:$$tagInfo{Name} = '$newVal'\n");

@@ -284,61 +284,67 @@ numerical.
   RawConv       : Used to convert the Raw value at extraction time (while the
                   image file is still open, unlike ValueConv and PrintConv below
                   which are done later only if the value is requested).  May be
-                  a scalar expression using $val (the Raw tag value) and $self
-                  (the current ExifTool object), or a code reference with $val
-                  and $self as arguments.  For Composite tags, $val is a
-                  reference to a hash of component tag names, and @val may be
-                  used to access the Raw values of these tags. The returned
-                  value may be a scalar which is used as the new Raw value, a
-                  scalar reference to a binary data value, or undefined to
-                  indicate that the tag should be ignored.  Unlike the other
-                  Conv routines, RawConv may also return an ARRAY reference for
-                  a list of values.  Also, RawConv may generate Warning or Error
-                  tags, while ValueConv and PrintConv may not.  Note: RawConv
-                  should only be used if necessary (in general, only if the tag
-                  may be ignored).  It is preferable to use ValueConv instead of
-                  RawConv because ValueConv is only executed if the tag value is
-                  requested, while RawConv is executed for all extracted tags.
+                  a scalar expression using $val (the Raw tag value), $self (the
+                  current ExifTool object) and $tag (the tag name), or a code
+                  reference with $val and $self as arguments.  For Composite
+                  tags, $val is a reference to a hash of component tag names,
+                  and @val may be used to access the Raw values of these tags.
+                  The returned value may be a scalar which is used as the new
+                  Raw value, a scalar reference to a binary data value, or
+                  undefined to indicate that the tag should be ignored.  Unlike
+                  the other Conv routines, RawConv may also return an ARRAY
+                  reference for a list of values.  Also, RawConv may generate
+                  Warning or Error tags, while ValueConv and PrintConv may not.
+                  Note: RawConv should only be used if necessary (in general,
+                  only if the tag may be ignored).  It is preferable to use
+                  ValueConv instead of RawConv because ValueConv is only
+                  executed if the tag value is requested, while RawConv is
+                  executed for all extracted tags.
 
   ValueConv     : Used to convert the Raw value to a useable form. May be a hash
                   reference to act as a lookup table, a scalar which is
                   evaluated as a Perl expression, or a code reference to a
-                  subroutine.  If a hash reference is used and the Raw value
-                  doesn't appear as one of the keys, then the converted value is
-                  set to "Unknown (X)", where X is the Raw value (unless a
-                  special 'BITMASK' key exists, in which case the hash
-                  referenced by 'BITMASK' is used to decode individual value
-                  bits).  In an expression, $self is a reference to the current
-                  ExifTool object, $val is the Raw value, and $tag is the tag
-                  name.  The subroutine takes 2 arguments: the Raw value and a
-                  reference to the current ExifTool object.  The expression or
-                  subroutine is evaluated when and if the tag value is requested
-                  (ie. only after all extraction is complete), so if necessary
-                  at this time the values of all other tags are available via
-                  calls to $self->GetValue("Tag","Raw"). (Note: In theory, types
-                  other than "Raw" may be accessed, but they are slower and may
-                  lead to cyclical dependencies so they should be avoided).
-                  When evaluated, the expression or subroutine returns a scalar
-                  for the converted value, or a scalar reference to a binary
-                  data value (see the 'Binary' flag).  The return value should
-                  always be defined -- use RawConv instead to return undef if it
-                  is necessary to test the value for validity, otherwise an
-                  undef tag may hide a previously defined value when the
-                  Duplicates option is not enabled.  Composite tags which
-                  Require or Desire other tags may access the ValueConv,
-                  PrintConv and Raw values of these tags through the elements of
-                  the @val, @prt and @raw lists respectively.  If ValueConv is
-                  not specified, the Raw value is not converted.
+                  subroutine.  May also be a list reference, in which case the
+                  value is split at whitespace into a list of values and each
+                  value is converted by the associated entry in the ValueConv
+                  list.  If a hash reference is used and the Raw value doesn't
+                  appear as one of the keys, then the converted value is set to
+                  "Unknown (X)", where X is the Raw value (unless a special
+                  'BITMASK' key exists, in which case the hash referenced by
+                  'BITMASK' is used to decode individual value bits).  In an
+                  expression, $self is a reference to the current ExifTool
+                  object, $val is the Raw value, and $tag is the tag name.  The
+                  subroutine takes 2 arguments: the Raw value and a reference to
+                  the current ExifTool object.  The expression or subroutine is
+                  evaluated when and if the tag value is requested (ie. only
+                  after all extraction is complete), so if necessary at this
+                  time the values of all other tags are available via calls to
+                  $self->GetValue("Tag","Raw"). (Note: In theory, types other
+                  than "Raw" may be accessed, but they are slower and may lead
+                  to cyclical dependencies so they should be avoided). When
+                  evaluated, the expression or subroutine returns a scalar for
+                  the converted value, or a scalar reference to a binary data
+                  value (see the 'Binary' flag).  The return value should always
+                  be defined -- use RawConv instead to return undef if it is
+                  necessary to test the value for validity, otherwise an undef
+                  tag may hide a previously defined value when the Duplicates
+                  option is not enabled.  Composite tags which Require or Desire
+                  other tags may access the ValueConv, PrintConv and Raw values
+                  of these tags through the elements of the @val, @prt and @raw
+                  lists respectively.  If ValueConv is not specified, the Raw
+                  value is not converted.
 
   PrintConv     : This entry is similar to ValueConv above, except that it is
                   used to further convert the tag value to a human readable
                   form.  It can be either a hash lookup, a scalar Perl
-                  expression or a code reference.  In this expression, $self,
-                  $val and $tag may be used as with ValueConv, but the returned
-                  value should always be defined.  Note that the print
-                  conversion is only done if the PrintConv option is enabled
-                  (which it is by default), and if the result of the ValueConv
-                  is not a scalar reference.
+                  expression, a code reference or a list reference.  In this
+                  expression, $self, $val and $tag may be used as with
+                  ValueConv, but the returned value should always be defined. 
+                  Note that the print conversion is only done if the PrintConv
+                  option is enabled (which it is by default), and if the result
+                  of the ValueConv is not a scalar reference.  If it is a list
+                  reference, then the converted values are joined by '; ' in the
+                  output string.
 
   RawConvInv    : The inverse of RawConv.  This should only be used in very rare
                   situations when the raw value can not be predetermined.
@@ -348,7 +354,7 @@ numerical.
                   that FILE_TYPE and any DataMember tags ocurring before this
                   tag in the file are available.  Beware that if the return
                   value is not defined, the tag will be deleted unless there is
-                  specific code to avoid this (currently, only EXIF and Binary
+                  specific logic to avoid this (currently, only EXIF and Binary
                   data directories handle this case).
 
   ValueConvInv  : The inverse of ValueConv.  Only necessary for Writable tags
@@ -405,7 +411,10 @@ numerical.
                   value.  For EXIF tables, the Writable flag may be different
                   than the Format flag, in which case Format is used for
                   converting the binary value and Writable specifies the format
-                  code written to the EXIF IFD.
+                  code written to the EXIF IFD.  For SubDirectories in EXIF
+                  information, this flag is only defined if the SubDirectory is
+                  writable as a block, or if the SubDirectory can not be edited
+                  (in which case Writable is set to 0).
 
   WriteAlso     : Used for writable tag to specify other tags to write when this
                   tag is written.  The value is a hash reference.  The hash keys
@@ -480,7 +489,9 @@ numerical.
                   subdirectory.  This need not be specified if the offset is the
                   same as the current directory, which is normally the case.
                   May use $start to represent the subdirectory start location
-                  relative to the current base.
+                  relative to the current base.  If this is defined, the
+                  automatic validation of base offsets is disabled for maker
+                  notes directories.
 
      EntryBased : Flag indicating that the offsets are based on the indidual
                   directory entry position, so offsets are incremented by 12
@@ -515,7 +526,7 @@ numerical.
 
      FixBase    : Flag set if base offsets should be fixed.  Used to add a
                   constant to maker notes offsets to fix damage done by some
-                  image editing utilities.
+                  image editing utilities. (maker notes only)
 
      FixOffsets : Expression to evaluate for each value pointer to patch
                   problems with some EXIF maker note offsets.  May access the

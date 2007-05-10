@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.86
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 100
@@ -15,7 +15,7 @@
 [EXIF, IFD0, Image] 283 - Y Resolution: 80
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Image] 305 - Software: Adobe Photoshop 7.0-v2
-[EXIF, IFD0, Time] 306 - Modify Date: 2004:02:26 09:36:46-v2
+[EXIF, IFD0, Time] 306 - Modify Date: 2004:02:26 09:36:46
 [EXIF, IFD0, Author] 315 - Artist: Phil Harvey-v2
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, IFD0, Author] 33432 - Copyright: Copyright 2004 Phil Harvey-v2
@@ -23,8 +23,8 @@
 [EXIF, ExifIFD, Camera] 34850 - Exposure Program: Program AE
 [EXIF, ExifIFD, Image] 34855 - ISO: 111
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 232
-[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2001:05:19 18:36:41-v2
-[EXIF, ExifIFD, Time] 36868 - Create Date: 2001:05:19 18:36:41-v2
+[EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2001:05:19 18:36:41
+[EXIF, ExifIFD, Time] 36868 - Create Date: 2001:05:19 18:36:41
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 2.761
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/64
@@ -49,8 +49,10 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 902
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 890
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 0
+[IPTC, IPTC, Other] 90 - Coded Character Set: UTF8
+[IPTC, IPTC, Other] 0 - Envelope Record Version: 4
 [IPTC, IPTC, Other] 0 - Application Record Version: 3
 [IPTC, IPTC, Other] 5 - Object Name: Test IPTC picture-v2
 [IPTC, IPTC, Other] 10 - Urgency: 9

@@ -17,7 +17,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -35,10 +35,11 @@ $VERSION = '1.11';
             this number is unique, and contains the date of manufacture, but doesn't
             necessarily correspond to the camera body number -- this needs to be checked
         },
-        # ie) "FPX20017035 592D31313034060427796060110384"
-        #                              yymmdd
+        # ie)  "FPX20017035 592D31313034060427796060110384"
+        # "FPX 20495643     592D313335310701318AD010110047" (F40fd)
+        #                               yymmdd
         PrintConv => q{
-            return $val unless $val=~/^(.{24})(\d{2})(\d{2})(\d{2})(.*)/;
+            return $val unless $val=~/^(.*)(\d{2})(\d{2})(\d{2})(.{12})$/;
             my $yr = $2 + ($2 < 70 ? 2000 : 1900);
             return "$1 $yr:$3:$4 $5";
         },

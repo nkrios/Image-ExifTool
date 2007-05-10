@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.20';
+$VERSION = '1.22';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -569,6 +569,22 @@ my %fileFormat = (
         Format => 'string[0,256000]',
         Binary => 1,
     },
+    221 => {
+        Name => 'Prefs',
+        Groups => { 2 => 'Image' },
+        Format => 'string[0,64]',
+        Notes => 'PhotoMechanic preferences',
+        PrintConv => q{
+            $val =~ s[\s*(\d+):\s*(\d+):\s*(\d+):\s*(\S*)]
+                     [Tagged:$1, ColorClass:$2, Rating:$3, FrameNum:$4];
+            return $val;
+        },
+        PrintConvInv => q{
+            $val =~ s[Tagged:\s*(\d+).*ColorClass:\s*(\d+).*Rating:\s*(\d+).*FrameNum:\s*(\S*)]
+                     [$1:$2:$3:$4]is;
+            return $val;
+        },
+    },
     225 => { # (format not certain)
         Name => 'ClassifyState',
         Format => 'string[0,64]',
@@ -911,7 +927,7 @@ sub ProcessIPTC($$$)
     my $dirEnd = $pos + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
-    my %listTags;
+    my (%listTags, $lastRec, $recordPtr, $recordName);
 
     # begin by assuming IPTC is Latin (so no translation if Charset is Latin)
     my $xlat = $exifTool->Options('Charset');
@@ -936,15 +952,21 @@ sub ProcessIPTC($$$)
             $exifTool->Warn(sprintf('Bad IPTC data tag (marker 0x%x)',$id));
             last;
         }
-        my $tableInfo = $tagTablePtr->{$rec};
-        unless ($tableInfo) {
-            $verbose and $exifTool->Warn("Unrecognized IPTC record: $rec");
-            last;   # stop now because we're probably reading garbage
-        }
-        my $tableName = $tableInfo->{SubDirectory}->{TagTable};
-        unless ($tableName) {
-            $exifTool->Warn("No table for IPTC record $rec!");
-            last;   # this shouldn't happen
+        if (not defined $lastRec or $lastRec != $rec) {
+            my $tableInfo = $tagTablePtr->{$rec};
+            unless ($tableInfo) {
+                $exifTool->Warn("Unrecognized IPTC record: $rec");
+                last;   # stop now because we're probably reading garbage
+            }
+            my $tableName = $tableInfo->{SubDirectory}->{TagTable};
+            unless ($tableName) {
+                $exifTool->Warn("No table for IPTC record $rec!");
+                last;   # this shouldn't happen
+            }
+            $recordName = $$tableInfo{Name};
+            $recordPtr = Image::ExifTool::GetTagTable($tableName);
+            $exifTool->VPrint(0,$$exifTool{INDENT},"-- $recordName record --\n");
+            $lastRec = $rec;
         }
         $pos += 5;      # step to after field header
         # handle extended IPTC entry if necessary
@@ -966,7 +988,6 @@ sub ProcessIPTC($$$)
             last;
         }
         my $val = substr($$dataPt, $pos, $len);
-        my $recordPtr = Image::ExifTool::GetTagTable($tableName);
 
         # add tagInfo for all unknown tags:
         unless ($$recordPtr{$tag}) {
@@ -1011,7 +1032,7 @@ sub ProcessIPTC($$$)
             DataPos => $$dirInfo{DataPos},
             Size    => $len,
             Start   => $pos,
-            Extra   => ', ' . $tableInfo->{Name} . ' record',
+            Extra   => ", $recordName record",
         );
         # prevent adding tags to list from another IPTC directory
         if ($tagInfo) {

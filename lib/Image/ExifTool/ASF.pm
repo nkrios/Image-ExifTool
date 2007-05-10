@@ -634,7 +634,7 @@ sub ProcessContentDescription($$$)
         my $len = shift @len;
         next unless $len;
         return 0 if $pos + $len > $dirLen;
-        my $val = $exifTool->Unicode2Byte(substr($$dataPt,$pos,$len),'II');
+        my $val = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$len),'II');
         $exifTool->HandleTag($tagTablePtr, $tag, $val);
         $pos += $len;
     }
@@ -680,7 +680,7 @@ sub ReadASF($$$$$)
     my ($exifTool, $dataPt, $pos, $format, $size) = @_;
     my @vals;
     if ($format == 0) { # unicode string
-        $vals[0] = $exifTool->Unicode2Byte(substr($$dataPt,$pos,$size),'II');
+        $vals[0] = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$size),'II');
     } elsif ($format == 2) { # 4-byte boolean
         @vals = ReadValue($dataPt, $pos, 'int32u', undef, $size);
         foreach (@vals) {
@@ -784,12 +784,12 @@ sub ProcessCodecList($$$)
         my $nameLen = Get16u($dataPt, $pos + 2) * 2;
         $pos += 4;
         return 0 if $pos + $nameLen + 2 > $dirLen;
-        my $name = $exifTool->Unicode2Byte(substr($$dataPt,$pos,$nameLen),'II');
+        my $name = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$nameLen),'II');
         $exifTool->HandleTag($tagTablePtr, "${type}Name", $name);
         my $descLen = Get16u($dataPt, $pos + $nameLen) * 2;
         $pos += $nameLen + 2;
         return 0 if $pos + $descLen + 2 > $dirLen;
-        my $desc = $exifTool->Unicode2Byte(substr($$dataPt,$pos,$descLen),'II');
+        my $desc = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$descLen),'II');
         $exifTool->HandleTag($tagTablePtr, "${type}Description", $desc);
         my $infoLen = Get16u($dataPt, $pos + $descLen);
         $pos += $descLen + 2 + $infoLen;

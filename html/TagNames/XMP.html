@@ -72,54 +72,58 @@ but this information is extracted by ExifTool anyway.
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#iptcCore'>XMP iptcCore Tags</a></td></tr>
 <tr class=b>
+<td>lr</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#Lightroom'>XMP Lightroom Tags</a></td></tr>
+<tr>
 <td>microsoft</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#Microsoft'>XMP Microsoft Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>pdf</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#pdf'>XMP pdf Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>photomech</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PhotoMechanic.html#XMP'>PhotoMechanic XMP Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>photoshop</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#photoshop'>XMP photoshop Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>PixelLive</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#PixelLive'>XMP PixelLive Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>tiff</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#tiff'>XMP tiff Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmp</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmp'>XMP xmp Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpBJ</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpBJ'>XMP xmpBJ Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpDM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpDM'>XMP xmpDM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpMM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpMM'>XMP xmpMM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpPLUS</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpPLUS'>XMP xmpPLUS Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpRights</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpRights'>XMP xmpRights Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpTPg</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpTPg'>XMP xmpTPg Tags</a></td></tr>
@@ -235,42 +239,50 @@ but this information is extracted by ExifTool anyway.
 <td class=c>integer/</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>ConvertToGrayscale</td>
+<td class=c>boolean</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>CropAngle</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CropBottom</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CropHeight</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CropLeft</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CropRight</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CropTop</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CropUnits</td>
 <td class=c>integer</td>
 <td><span class=s>0 = pixels
   <br>1 = inches
   <br>2 = cm</span></td></tr>
-<tr>
+<tr class=b>
 <td>CropWidth</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Exposure</td>
 <td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>FillLight</td>
+<td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GreenHue</td>
@@ -289,7 +301,111 @@ but this information is extracted by ExifTool anyway.
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>HighlightRecovery</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>HueAdjustmentAqua</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>HueAdjustmentBlue</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>HueAdjustmentGreen</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>HueAdjustmentMagenta</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>HueAdjustmentOrange</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>HueAdjustmentPurple</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>HueAdjustmentRed</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>HueAdjustmentYellow</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>IncrementalTemperature</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>IncrementalTint</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LuminanceAdjustmentAqua</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LuminanceAdjustmentBlue</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LuminanceAdjustmentGreen</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LuminanceAdjustmentMagenta</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LuminanceAdjustmentOrange</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LuminanceAdjustmentPurple</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LuminanceAdjustmentRed</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LuminanceAdjustmentYellow</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>LuminanceSmoothing</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ParametricDarks</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ParametricHighlights</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ParametricHighlightSplit</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ParametricLights</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ParametricMidtoneSplit</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ParametricShadows</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ParametricShadowSplit</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -309,6 +425,38 @@ but this information is extracted by ExifTool anyway.
 <td class=c>integer/</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>SaturationAdjustmentAqua</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SaturationAdjustmentBlue</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SaturationAdjustmentGreen</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SaturationAdjustmentMagenta</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SaturationAdjustmentOrange</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SaturationAdjustmentPurple</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SaturationAdjustmentRed</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SaturationAdjustmentYellow</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>Shadows</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
@@ -321,27 +469,51 @@ but this information is extracted by ExifTool anyway.
 <td class=c>integer/</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>Temperature</td>
+<td>SplitToningBalance</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>Tint</td>
+<td>SplitToningHighlightHue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>SplitToningHighlightSaturation</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SplitToningShadowHue</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SplitToningShadowSaturation</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Temperature</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Tint</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>ToneCurve</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ToneCurveName</td>
 <td class=c>string</td>
 <td><span class=s>&#39;Custom&#39; = Custom
   <br>&#39;Linear&#39; = Linear
   <br>&#39;Medium Contrast&#39; = Medium Contrast
   <br>&#39;Strong Contrast&#39; = Strong Contrast</span></td></tr>
-<tr>
+<tr class=b>
 <td>Version</td>
 <td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Vibrance</td>
+<td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>VignetteAmount</td>
@@ -652,10 +824,11 @@ other XMP tags.</p>
 <tr class=b>
 <td>FocalPlaneResolutionUnit</td>
 <td class=c>integer</td>
-<td><span class=s>1 = mm
-  <br>10 = cm
-  <br>&#39;0.001&#39; = um
-  <br>&#39;25.4&#39; = inches</span></td></tr>
+<td><span class=s>1 = None
+  <br>2 = inches
+  <br>3 = cm
+  <br>4 = mm
+  <br>5 = um</span></td></tr>
 <tr>
 <td>FocalPlaneXResolution</td>
 <td class=c>rational</td>
@@ -1018,11 +1191,24 @@ shortens this for the &quot;XMP-iptcCore&quot; family 1 group name.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Lightroom'>XMP Lightroom Tags</a></h2>
+<p>Adobe Lightroom &quot;lr&quot; schema tags.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>PrivateRTKInfo</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Microsoft'>XMP Microsoft Tags</a></h2>
 <p>Microsoft Photo schema tags.  This is likely not a complete list, but
 represents tags which have been observed in sample images.  The actual
 namespace prefix is &quot;MicrosoftPhoto&quot;, but ExifTool shortens this to
-&quot;XMP-microsoft&quot; in the group1 family name.</p>
+&quot;XMP-microsoft&quot; in the family 1 group name.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1167,22 +1353,26 @@ when writing due to name conflicts with XMP-dc tags.</p>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>LegacyIPTCDigest</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>Source</td>
 <td class=c>string/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>State</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SupplementalCategories</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>TransmissionReference</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Urgency</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
@@ -2222,7 +2412,7 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 30, 2007</i>
+<br><i>Last revised Apr 27, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

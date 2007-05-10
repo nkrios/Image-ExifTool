@@ -201,7 +201,8 @@ sub ExtractUnicodeString($$$)
         last unless $$chars[$i];
     }
     my $buff = pack('v*',@$chars[$pos..$i-1]);
-    return $exifTool->Unicode2Byte($buff, 'II');
+    my $val = $exifTool->Unicode2Charset($buff, 'II');
+    return $val;
 }
 
 #------------------------------------------------------------------------------

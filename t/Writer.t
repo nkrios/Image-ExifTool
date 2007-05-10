@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..26\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..27\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -495,6 +495,26 @@ my $testOK;
         }
         print "ok $testnum\n";
     }
+}
+
+# test 27: Check that mandatory EXIF resolution tags get taken from JFIF
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue('exif:all');     # delete all EXIF
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    $exifTool->SetNewValue();
+    $exifTool->SetNewValue('exif:datetimeoriginal', '2000:01:02 03:04:05');
+    $exifTool->WriteInfo($testfile);
+    my $info = $exifTool->ImageInfo($testfile, 'XResolution', 'YResolution', 'DateTimeOriginal');
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
 }
 
 # end

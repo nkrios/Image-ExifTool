@@ -8,9 +8,16 @@
 <body>
 <h2 class='up'>ExifTool Object Data Members</h2>
 
-<p>The following table lists the data members of the ExifTool object.
-If this was C++, these would be documented next to the definitions in the
-header file.  (but this is Perl, so I couldn't do that...)</p>
+<p>The following table lists the data members of the ExifTool object.  (If this
+was C++, these would be documented next to the definitions in the header file,
+but this is Perl, so I couldn't do that...)</p>
+
+<p>Aside from the variables defined below, there may be other temporary
+variables added by individual modules. Temporary variables are identified by
+at least one lower case letter in their name, and are deleted before reading or
+writing each new image. CameraMake, CameraModel and CameraType are temporary
+variables, but are guaranteed to be defined while processing an image because
+they are initialized to '' instead of being deleted.</p>
 
 <blockquote><table class='norm'><tr><th>Name</th><th>Description</th></tr>
 
@@ -71,14 +78,15 @@ header file.  (but this is Perl, so I couldn't do that...)</p>
 <tr><td>IO_TAG_LIST</td><td>List for output of requested tags in proper case and order</td></tr>
 
 <tr><td>MAKER_NOTE_BYTE_ORDER</td><td>Byte order of extracted maker notes if extracted
-    as a block with MakerNotes option set.</td></tr>
+    as a block.</td></tr>
 
 <tr><td>MAKER_NOTE_INFO</td><td>Used by Image::ExifTool::CanonRaw as temporary storage for
     maker note information when synthesizing maker notes from CRW file with the
     MakerNotes option.</td></tr>
 
 <tr><td>MAKER_NOTE_FIXUP</td><td>Fixup information for maker notes extracted with the MakerNotes
-    option.  Used by SetNewValuesFromFile() to adjust offsets in maker note IFD</td></tr>
+    option (unless MakerNotes option is 2). Used by SetNewValuesFromFile() to adjust offsets
+    in maker note IFD</td></tr>
 
 <tr><td>MOVED_KEY</td><td>Tag key of last tag replaced by a higher priority tag
     in a call to FoundTag().</td></tr>

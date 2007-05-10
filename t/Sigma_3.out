@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.73
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
 [File, File, Image]  - File Name: Sigma_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1575 bytes
-[File, File, Time]  - File Modification Date/Time: 2007:01:28 08:41:22
+[File, File, Time]  - File Modification Date/Time: 2007:03:21 11:08:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Image Width: 8
@@ -38,7 +38,7 @@
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Custom
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Manual
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 102
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 102mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Image] 42016 - Image Unique ID: 303230303030313986D2C53F8ABDA2A6
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
@@ -54,8 +54,8 @@
 [MakerNotes, Sigma, Camera] 5 - AF Mode: AF-S
 [MakerNotes, Sigma, Camera] 6 - Focus Setting: AF
 [MakerNotes, Sigma, Camera] 7 - White Balance: Sunlight
-[MakerNotes, Sigma, Camera] 8 - Exposure Mode: P
-[MakerNotes, Sigma, Camera] 9 - Metering Mode: 8
+[MakerNotes, Sigma, Camera] 8 - Exposure Mode: Program AE
+[MakerNotes, Sigma, Camera] 9 - Metering Mode: Multi-segment
 [MakerNotes, Sigma, Camera] 10 - Lens: 24 to 70
 [MakerNotes, Sigma, Camera] 11 - Color Space: sRGB
 [MakerNotes, Sigma, Camera] 12 - Exposure Compensation: +0.8

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.51
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.87
 [File, File, Image]  - File Name: PhotoMechanic.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -29,6 +29,7 @@
 [IPTC, IPTC, Other] 40 - Special Instructions: Special ins
 [IPTC, IPTC, Other] 10 - Urgency: 8
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright
+[IPTC, IPTC, Image] 221 - Prefs: Tagged:0, ColorClass:0, Rating:0, FrameNum:-00001
 [Photoshop, Photoshop, Image] 0 - X Resolution: 200
 [Photoshop, Photoshop, Image] 2 - Displayed Units X: inches
 [Photoshop, Photoshop, Image] 4 - Y Resolution: 200
