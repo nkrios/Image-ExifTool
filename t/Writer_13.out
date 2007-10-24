@@ -1,12 +1,17 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
 [File, File, Image]  - File Name: Writer_13_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4 kB
 [File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 8
-[File, File, Image]  - Image Height: 8
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image] ImageWidth - Image Width: 8
+[File, File, Image] ImageHeight - Image Height: 8
+[File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
+[File, File, Image] BitsPerSample - Bits Per Sample: 8
+[File, File, Image] ColorComponents - Color Components: 3
+[File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -30,7 +35,7 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: High
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
-[MakerNotes, Canon, Camera] 2 - Self-timer: 0
+[MakerNotes, Canon, Camera] 2 - Self-timer: Off
 [MakerNotes, Canon, Camera] 3 - Quality: RAW
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: On
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
@@ -57,6 +62,7 @@
 [MakerNotes, Canon, Camera] 29 - Flash Bits: E-TTL, Built-in
 [MakerNotes, Canon, Camera] 36 - Zoom Source Width: 3072
 [MakerNotes, Canon, Camera] 37 - Zoom Target Width: 3072
+[MakerNotes, Canon, Camera] 41 - Manual Flash Output: n/a
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
 [MakerNotes, Canon, Image] 1 - Focal Length: 24mm
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
@@ -89,12 +95,17 @@
 [MakerNotes, Canon, Camera] 9 - Owner Name: Phil Harvey
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS Digital Rebel / 300D / Kiss Digital
-[MakerNotes, Canon, Camera] 1 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 0 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 1 - Valid AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
-[MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
-[MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
-[MakerNotes, Canon, Camera] 22 - AF Points Used: Center
+[MakerNotes, Canon, Camera] 4 - AF Image Width: 3072
+[MakerNotes, Canon, Camera] 5 - AF Image Height: 2048
+[MakerNotes, Canon, Camera] 6 - AF Area Width: 151
+[MakerNotes, Canon, Camera] 7 - AF Area Height: 151
+[MakerNotes, Canon, Camera] 8 - AF Area X Positions: 1014 608 0 0 0 -608 -1014
+[MakerNotes, Canon, Camera] 9 - AF Area Y Positions: 0 0 -506 0 506 0 0
+[MakerNotes, Canon, Camera] 10 - AF Points In Focus: 3
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 1
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0

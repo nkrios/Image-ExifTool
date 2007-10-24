@@ -10,8 +10,9 @@ package Image::ExifTool::HtmlDump;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool;    # only for FinishTiffDump()
 
-$VERSION = '1.14';
+$VERSION = '1.17';
 
 sub DumpTable($$$;$$$$);
 sub Open($$$;@);
@@ -140,7 +141,7 @@ sub new
 # Add information to dump
 # Inputs: 0) HTML dump hash ref, 1) absolute offset in file, 2) data size,
 #         3) comment string, 4) tool tip (or SAME to use previous tip),
-#         5) bit flags (see below)
+#         5) bit flags (see below), 6) true to use same tooltip as last call
 # Bits: 0x01 - print at start of line
 #       0x02 - print red address
 #       0x04 - maker notes data ('M'-class span)
@@ -183,7 +184,7 @@ sub Print($$;$$$$$)
     $level or $level = 0;
     my $tell = $raf->Tell();
     my @starts = sort { $a <=> $b } keys %$block;
-    my $pos = $starts[0] || 0;
+    my $pos = 0;
     my $dataEnd = $dataPos + ($dataPt ? length($$dataPt) : 0);
     # initialize member variables
     $$self{Open} = [];
@@ -218,7 +219,7 @@ sub Print($$;$$$$$)
                 $buff = '';
                 $raf->Seek($pos, 0) and $raf->Read($buff, $bytes);
             }
-            if (length $bytes) {
+            if (length $buff) {
                 my $str = ($bytes > 1) ? "unused $bytes bytes" : 'pad byte';
                 $self->DumpTable($pos-$dataPos, \$buff, "[$str]", "t$index", 0x108);
                 ++$index;
@@ -476,6 +477,9 @@ sub DumpTable($$$;$$$$)
         if ($cols < 16) {
             $c[1] .= ($cols == 8 ? '  ' : ' ');
             next;
+        } elsif ($flag & 0x01 and $cols < $len) {
+            $c[1] .= ' ';
+            next;   # put it all on one line
         }
         unless ($$self{Msg}) {
             $c[3] .= $msg;
@@ -522,6 +526,97 @@ sub DumpTable($$$;$$$$)
         $self->{Cols}->[$i] .= $c[$i];
     }
     delete $$self{TmpCols};
+}
+
+#------------------------------------------------------------------------------
+# Finish dumping of TIFF image data
+# Inputs: 0) HtmlDump object ref, 1) ExifTool object ref, 2) length of file
+# (this really belongs in Image::ExifTool::Exif, but is placed here so it
+#  is only compiled when needed)
+sub FinishTiffDump($$$)
+{
+    my ($self, $exifTool, $size) = @_;
+    my ($tag, $key, $start, $blockInfo, $i);
+
+    # list of all indirectly referenced TIFF data tags
+    my %offsetPair = (
+        StripOffsets      => 'StripByteCounts',
+        TileOffsets       => 'TileByteCounts',
+        FreeOffsets       => 'FreeByteCounts',
+        ThumbnailOffset   => 'ThumbnailLength',
+        PreviewImageStart => 'PreviewImageLength',
+        JpgFromRawStart   => 'JpgFromRawLength',
+        OtherImageStart   => 'OtherImageLength',
+        ImageOffset       => 'ImageByteCount',
+        AlphaOffset       => 'AlphaByteCount',
+    );
+
+    # add TIFF data to html dump
+    foreach $tag (keys %offsetPair) {
+        my $info = $exifTool->GetInfo($tag);
+        next unless %$info;
+        foreach $key (%$info) {
+            my $name = Image::ExifTool::GetTagName($key);
+            my $grp1 = $exifTool->GetGroup($key, 1);
+            my $info2 = $exifTool->GetInfo($offsetPair{$tag}, { Group1 => $grp1 });
+            next unless %$info2;
+            my ($key2) = keys %$info2;
+            my $offsets = $$info{$key};
+            my $byteCounts = $$info2{$key2};
+            # (long lists may be SCALAR references)
+            my @offsets = split ' ', (ref $offsets ? $$offsets : $offsets);
+            my @byteCounts = split ' ', (ref $byteCounts ? $$byteCounts : $byteCounts);
+            my $num = scalar @offsets;
+            my $li = 0;
+            my $padBytes = 0;
+            for ($i=0; @offsets and @byteCounts; ++$i) {
+                my $offset = shift @offsets;
+                my $byteCount = shift @byteCounts;
+                my $end = $offset + $byteCount;
+                if (@offsets and @byteCounts) {
+                    # show data as contiguous if only normal pad bytes between blocks
+                    if ($end & 0x01 and $end + 1 == $offsets[0]) {
+                        $end += 1;
+                        ++$padBytes;    # count them
+                    }
+                    if ($end == $offsets[0]) {
+                        # combine these two blocks
+                        $byteCounts[0] += $offsets[0] - $offset;
+                        $offsets[0] = $offset;
+                        next;
+                    }
+                }
+                my $msg = $exifTool->GetGroup($key, 1) . ':' . $tag;
+                $msg =~ s/(Offsets?|Start)$/ /;
+                if ($num > 1) {
+                    $msg .= "$li-" if $li != $i;
+                    $msg .= "$i ";
+                    $li = $i + 1;
+                }
+                $msg .= "data";
+                my $tip = "Size: $byteCount bytes";
+                $tip .= ", incl. $padBytes pad bytes" if $padBytes;
+                $self->Add($offset, $byteCount, "($msg)", $tip, 0x08);
+            }
+        }
+    }
+    # find offset of last dumped information, and dump any unknown trailer
+    my $last = 0;
+    my $block = $$self{Block};
+    foreach $start (keys %$block) {
+        foreach $blockInfo (@{$$block{$start}}) {
+            my $end = $start + $$blockInfo[0];
+            $last = $end if $last < $end;
+        }
+    }
+    my $diff = $size - $last;
+    if ($diff > 0 and ($last or $exifTool->Options('Unknown'))) {
+        if ($diff > 1 or $size & 0x01) {
+            $self->Add($last, $diff, "[unknown data]", "Size: $diff bytes", 0x08);
+        } else {
+            $self->Add($last, $diff, "[trailing pad byte]", undef, 0x08);
+        }
+    }
 }
 
 #------------------------------------------------------------------------------

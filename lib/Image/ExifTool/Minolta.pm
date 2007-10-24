@@ -31,7 +31,7 @@ use vars qw($VERSION %minoltaLensIDs %minoltaColorMode);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.31';
+$VERSION = '1.33';
 
 # lens ID numbers (ref 3)
 %minoltaLensIDs = (
@@ -211,9 +211,9 @@ $VERSION = '1.31';
         Writable => 'int32u',
     },
     0x0081 => {
-        # preview image in TIFF format files
+        # JPEG preview found in DiMAGE 7 images
         %Image::ExifTool::previewImageTagInfo,
-        Permanent => 1,     # don't add this to a file because it doesn't exist in JPEG images
+        Permanent => 1,     # don't add this to a file
     },
     0x0088 => {
         Name => 'PreviewImageStart',
@@ -765,7 +765,7 @@ $VERSION = '1.31';
         Name => 'FlashMetering',
         PrintConv => {
             0 => 'ADI (Advanced Distance Integration)',
-            1 => 'Pre-flash TTl',
+            1 => 'Pre-flash TTL',
             2 => 'Manual flash control',
         },
     },
@@ -1288,9 +1288,9 @@ $VERSION = '1.31';
     0x5a => { #15
         Name => 'Rotation',
         PrintConv => {
-            0 => 0,
-            1 => 270,
-            2 => 90,
+            0 => 'Horizontal (Normal)',
+            1 => 'Rotate 270 CW',
+            2 => 'Rotate 90 CW',
         },
     },
     0x5e => { #15
@@ -1336,13 +1336,18 @@ sub ConvertWhiteBalance($)
     my $val = shift;
     my $printConv = $minoltaWhiteBalance{$val};
     unless (defined $printConv) {
-        # the A2 values can be shifted by += 3 settings, where
-        # each setting adds or subtracts 0x001000 (ref 2)
-        my $type = ($val & 0xff000000) + 0x800000;
-        if ($type and $printConv = $minoltaWhiteBalance{$type}) {
-            $printConv .= sprintf("%+.8g", ($val - $type) / 0x10000);
+        if ($val & 0xffff0000) {
+            # the A2 values can be shifted by += 3 settings, where
+            # each setting adds or subtracts 0x0010000 (ref 2)
+            my $type = ($val & 0xff000000) + 0x800000;
+            if ($minoltaWhiteBalance{$type}) {
+                $printConv = $minoltaWhiteBalance{$type} .
+                             sprintf("%+.8g", ($val - $type) / 0x10000);
+            } else {
+                $printConv = sprintf("Unknown (0x%x)", $val);
+            }
         } else {
-            $printConv = sprintf("Unknown (0x%x)", $val);
+            $printConv = sprintf("Unknown ($val)");
         }
     }
     return $printConv;

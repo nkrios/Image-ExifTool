@@ -368,7 +368,9 @@ to a specific function.</p>
 <tr><td>ByteOrder</td><td>The byte order for newly created EXIF segments when
     writing.  Note that if EXIF information already exists, the existing order is
     maintained.  If ByteOrder is not defined, then the order of the maker notes is
-    used (if they are being copied), otherwise big-endian ('MM') order is assumed.</td>
+    used (if they are being copied), otherwise big-endian ('MM') order is assumed.
+    This can also be set via the ExifByteOrder tag, but the ByteOrder option takes
+    precedence if both are set.</td>
     <td align='center'>'MM','II' or undef</td><td align=center>undef</td></tr>
 <tr><td>Charset</td><td>Character set for converting special characters. Note
     that this option affects some types of information when reading/writing the
@@ -378,13 +380,13 @@ to a specific function.</p>
     <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF-8 characters</td></tr>
     <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
     </table></td><td align=center>'UTF8'</td></tr>
-<tr><td>Compact</td><td>Write compact output.  The XMP specification suggests that
-    the data be padded with blanks to allow in-place editing.  By setting this
+<tr><td>Compact</td><td>Flag to write compact output.  The XMP specification suggests
+    that the data be padded with blanks to allow in-place editing.  By setting this
     flag, 2kB is saved for files with XMP data.</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Composite</td><td>Flag to calculate Composite tags</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
-<tr><td>Compress</td><td>Write new values in compressed format if possible.  Has
-    no effect unless Compress::Zlib is installed.</td>
+<tr><td>Compress</td><td>Flag to write new values in compressed format if possible.
+    Has no effect unless Compress::Zlib is installed.</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>CoordFormat</td><td>Format for GPS coordinates</td><td> Format for
     printing GPS coordinates.  This is a printf format string with specifiers
@@ -403,9 +405,10 @@ to a specific function.</p>
 <tr><td>FastScan</td>
     <td>Flag to increase speed of extracting information from JPEG images.  With this
     option set, ExifTool will not scan to the end of a JPEG image to check for an AFCP,
-    CanonVRD, FotoStation, PhotoMechanic or PreviewImage trailer.</td>
-    <td>1 or 0</td>
-    <td align='center'>0</td></tr>
+    CanonVRD, FotoStation, PhotoMechanic, MIE or PreviewImage trailer.  Also, when
+    combined with the ScanForXMP option, prevents scanning for XMP in recognized file
+    types.</td>
+    <td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>FixBase</td>
     <td>Fix maker notes base offset.  Allows values to be extracted from maker notes
     which have been corrupted by editing with 3rd party software.</td>
@@ -433,15 +436,16 @@ to a specific function.</p>
     <tr><td valign='top' align=right><b><i>non-zero</i></b>&nbsp;=</td><td>Relative offsets</td></tr>
     <tr><td valign='top' align=right><b>undef</b>&nbsp;=</td><td>EXIF/TIFF offsets</td></tr>
     </table></td><td align=center>undef</td></tr>
-<tr><td>IgnoreMinorErrors</td><td>Causes some minor errors to be ignored.
+<tr><td>IgnoreMinorErrors</td><td>Flag to ignore minor errors.  Causes minor errors
+    to be downgraded to warnings, and minor warnings to be ignored.  
     This option is provided mainly to allow writing of files when minor errors
     occur, but also allows thumbnail and preview images to be extracted even if
     they don't have a recognizable header.</td>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>List</td><td>Flag to extract lists of PrintConv values into arrays instead of concatenating
     them into comma-separated strings.</td><td align='center'>0 or 1</td><td align='center'>0</td></tr>
-<tr><td>MakerNotes</td><td>Flag to cause MakerNotes and other writable subdirectories
-    (such as PrintIM) to be extracted as a data block.  Normally when the MakerNotes
+<tr><td>MakerNotes</td><td>Option to extract MakerNotes and other writable
+    subdirectories (such as PrintIM) as a data block.  Normally when the MakerNotes
     are extracted they are rebuilt to include data outside the boundaries of the
     original maker note data block, but a value of 2 disables this feature.</td>
     <td><table class='clear'>
@@ -456,6 +460,10 @@ to a specific function.</p>
     <td align='center'>Any string, or undef</td><td align='center'>undef</td></tr>
 <tr><td>PrintConv</td><td><a name="PrintConv"></a>Flag to enable print conversion.  Also enables inverse print
     conversion for writing.</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td>ScanForXMP</td><td><a name="ScanForXMP"></a>Flag for scan all files (even unrecognized
+    formats) for XMP information unless XMP was already found in the file.  When combined with
+    the FastScan option, only unrecognized file types are scanned for XMP.  
+    </td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Sort</td><td>Specifies order to sort tags in the returned tag list</td>
     <td><table class='clear'>
     <tr><td valign='top' align=center><b>Input</b></td><td>Sort in same order as input tag arguments</td></tr>
@@ -470,7 +478,7 @@ to a specific function.</p>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>TextOut</td><td>Output file for Verbose and HtmlDump options.</td>
     <td align='center'>File reference</td><td align=center>\*STDOUT</td></tr>
-<tr><td>Unknown</td><td>Flag to get values of unknown tags</td>
+<tr><td>Unknown</td><td>Control extraction of unknown tags</td>
     <td><table class='clear'>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Unknown tags not extracted</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Unknown tags are extracted from EXIF
@@ -799,9 +807,10 @@ errors are printed to STDERR.
     <td>Bitmask of tag protection levels to write:
     <table class='clear'>
     <tr><td valign='top' align=center><b>0x01</b>&nbsp;=</td>
-    <td>Write '<a href="TagNames/index.html">unsafe</a>' tags</td></tr>
+    <td>Write '<a href="TagNames/index.html">unsafe</a>' tags (ie. tags not copied
+        automatically via <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>)</td></tr>
     <tr><td valign='top' align=center><b>0x02</b>&nbsp;=</td>
-    <td>Write '<a href="TagNames/index.html">protected</a>' tags</td></tr>
+    <td>Write '<a href="TagNames/index.html">protected</a>' tags (internal use only)</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr><td>Replace</td><td>Replace previous new value for this tag (ie. replace the value
     set in a previous call to <a href="#SetNewValue">SetNewValue</a>)</td>
@@ -922,7 +931,7 @@ $exifTool-><b>SetNewValuesFromFile</b>($file,
     'Comment&lt;ISO=$ISO Aperture=$aperture Exposure=$shutterSpeed');
 </pre></td></tr></table></blockquote>
 <p><b>Notes:</b></p>
-<p>The PrintConv option applies to this routine, but it should normally be left
+<p>The PrintConv option applies to this routine, but it normally should be left
 on to provide more reliable transfer of information between groups.</p>
 <p>If a preview image exists, it is not copied.  The preview image must be
 transferred separately if desired.</p>
@@ -1279,15 +1288,15 @@ separated into the ICC-header group.</p>
 <blockquote><table class='norm'>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
-<td>AFCP, AIFF, APE, APP12, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
-CanonVRD, Composite, DICOM, DNG, EXIF, ExifTool, FLAC, File, Flash,
+<td>AFCP, AIFF, APE, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
+CanonVRD, Composite, DICOM, DNG, Ducky, EXIF, ExifTool, FLAC, File, Flash,
 FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, JFIF, JPEG,
 Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
-PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real,
+PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, Real,
 SigmaRaw, Vorbis, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AFCP, AIFF, APE, ASF, Adobe, BMP, Canon, CanonCustom, CanonRaw,
+<td>AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
 CanonVRD, Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool,
 FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff,
 GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
@@ -1300,12 +1309,13 @@ MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
 MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
 MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
 PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
-PostScript, PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR,
-Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#,
-Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-lr,
-XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp,
-XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+PostScript, PrintIM, QuickTime, RAF, RAF2, RIFF, RMETA, Real, Real-CONT,
+Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF,
+SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP,
+XMP-DICOM, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
+XMP-exif, XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
+XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,

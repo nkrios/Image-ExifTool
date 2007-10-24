@@ -20,7 +20,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -557,7 +557,10 @@ sub ProcessMOV($$;$)
             $raf->Read($buff, 8) == 8 or last;
             $dataPos += 8;
             my ($hi, $lo) = unpack('NN', $buff);
-            $hi and $exifTool->Warn('End of processing at large atom'), last;
+            if ($hi or $lo > 0x7fffffff) {
+                $exifTool->Warn('End of processing at large atom');
+                last;
+            }
             $size = $lo;
         }
         $size -= 8;
@@ -583,7 +586,8 @@ sub ProcessMOV($$;$)
             }
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
-        if (defined $tagInfo or $verbose) {
+        # load values only if associated with a tag (or verbose) and < 16MB long
+        if ((defined $tagInfo or $verbose) and $size < 0x1000000) {
             my $val;
             unless ($raf->Read($val, $size) == $size) {
                 $exifTool->Warn("Truncated '$tag' data");

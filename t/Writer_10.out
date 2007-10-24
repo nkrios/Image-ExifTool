@@ -1,12 +1,17 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.89
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
 [File, File, Image]  - File Name: Writer_10_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
 [File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 8
-[File, File, Image]  - Image Height: 8
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image] ImageWidth - Image Width: 8
+[File, File, Image] ImageHeight - Image Height: 8
+[File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
+[File, File, Image] BitsPerSample - Bits Per Sample: 8
+[File, File, Image] ColorComponents - Color Components: 3
+[File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, IFD0, Camera] 271 - Make: PENTAX Corporation 
 [EXIF, IFD0, Camera] 272 - Camera Model Name: PENTAX Optio S 
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -24,7 +29,7 @@
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:03:06 13:09:25
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2003:03:06 13:09:25
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.3580729
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.3580729167
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 14.0
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
@@ -42,8 +47,8 @@
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
-[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3443.946
-[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3442.017
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3443.946188
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3442.016807
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -63,7 +68,7 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1786
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
-[MakerNotes, Pentax, Camera] 1 - Pentax Mode: Night Scene
+[MakerNotes, Pentax, Camera] 1 - Pentax Model Type: 1
 [MakerNotes, Pentax, Image] 2 - Preview Image Size: 320x240
 [MakerNotes, Pentax, Image] 3 - Preview Image Length: 0
 [MakerNotes, Pentax, Image] 4 - Preview Image Start: 1358
@@ -76,7 +81,7 @@
 [MakerNotes, Pentax, Camera] 12 - Flash Mode: Off
 [MakerNotes, Pentax, Camera] 13 - Focus Mode: Normal
 [MakerNotes, Pentax, Camera] 14 - AF Point Selected: Auto
-[MakerNotes, Pentax, Camera] 15 - Auto AF Point: Center
+[MakerNotes, Pentax, Camera] 15 - AF Points In Focus: Center
 [MakerNotes, Pentax, Camera] 16 - Focus Position: 2
 [MakerNotes, Pentax, Camera] 18 - Exposure Time: 1/463
 [MakerNotes, Pentax, Camera] 19 - F Number: 5.6
@@ -98,8 +103,9 @@
 [MakerNotes, Pentax, Time] 37 - Hometown DST: Yes
 [MakerNotes, Pentax, Time] 38 - Destination DST: Yes
 [MakerNotes, Pentax, Camera] 50 - Image Processing: Unprocessed
-[XMP, XMP-dc, Time] date - Date: 2003-03-06
+[XMP, XMP-dc, Time] date - Date: 2003:03:06
 [XMP, XMP-exif, Camera] FlashMode - Flash Mode: Off
+[XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 8
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 8

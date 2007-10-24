@@ -8,6 +8,7 @@
 # References:   1) http://www.color.org/icc_specs2.html (ICC.1:2003-09)
 #               2) http://www.color.org/icc_specs2.html (ICC.1:2001-04)
 #               3) http://developer.apple.com/documentation/GraphicsImaging/Reference/ColorSync_Manager/ColorSync_Manager.pdf
+#               4) http://www.color.org/privatetag2007-01.pdf
 #
 # Notes:        The ICC profile information is different: the format of each
 #               tag is embedded in the information instead of in the directory
@@ -21,11 +22,12 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.09';
+$VERSION = '1.13';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
 sub WriteICC_Profile($$;$);
+sub ValidateICC($);
 
 # illuminant type definitions
 my %illuminantType = (
@@ -192,6 +194,9 @@ my %profileClass = (
     mmod => 'MakeAndModel',
     dscm => 'ProfileDescriptionML',
     ndin => 'NativeDisplayInfo',
+    
+    # Microsoft custom tags (ref http://msdn2.microsoft.com/en-us/library/ms536870.aspx)
+    MS00 => 'WCSProfiles',
 
     # the following entry represents the ICC profile header, and doesn't
     # exist as a tag in the directory.  It is only in this table to provide
@@ -270,12 +275,13 @@ my %profileClass = (
     },
     56 => {
         Name => 'DeviceAttributes',
-        Format => 'int32u',
+        Format => 'int32u[2]',
         PrintConv => q[
-            ($val & 0x01 ? "Transparency, " : "Reflective, ") .
-            ($val & 0x02 ? "Matte, " : "Glossy, ") .
-            ($val & 0x04 ? "Negative, " : "Positive, ") .
-            ($val & 0x08 ? "B&W" : "Color")
+            my @v = split ' ', $val;
+            ($v[1] & 0x01 ? "Transparency, " : "Reflective, ") .
+            ($v[1] & 0x02 ? "Matte, " : "Glossy, ") .
+            ($v[1] & 0x04 ? "Negative, " : "Positive, ") .
+            ($v[1] & 0x08 ? "B&W" : "Color");
         ],
     },
     64 => {
@@ -349,7 +355,7 @@ my %profileClass = (
     28 => {
         Name => 'MeasurementFlare',
         Format => 'fixed32u',
-        PrintConv => '$val*100 . " %"',  # change into a percent
+        PrintConv => '$val*100 . "%"',  # change into a percent
     },
     32 => {
         Name => 'MeasurementIlluminant',
@@ -487,7 +493,7 @@ sub FormatICCTag($$$)
     }
     # dateTimeType
     if ($type eq 'dtim' and $size >= 20) {
-        return sprintf("%.4d:$.2d:%.2d %.2d:%.2d:%.2d",
+        return sprintf("%.4d:%.2d:%.2d %.2d:%.2d:%.2d",
                Get16u($dataPt, $offset+8),  Get16u($dataPt, $offset+10),
                Get16u($dataPt, $offset+12), Get16u($dataPt, $offset+14),
                Get16u($dataPt, $offset+16), Get16u($dataPt, $offset+18));
@@ -559,7 +565,12 @@ sub FormatICCTag($$$)
 sub WriteICC($$)
 {
     my ($exifTool, $dirInfo) = @_;
-    my $buff = WriteICC_Profile($exifTool, $dirInfo);
+    # first make sure this is a valid ICC file (or no file at all)
+    my $raf = $$dirInfo{RAF};
+    my $buff;
+    return 0 if $raf->Read($buff, 24) and ValidateICC(\$buff);
+    # now write the new ICC
+    $buff = WriteICC_Profile($exifTool, $dirInfo);
     if (defined $buff and length $buff) {
         Write($$dirInfo{OutFile}, $buff) or return -1;
     } else {
@@ -578,7 +589,10 @@ sub WriteICC_Profile($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access
-    my $newValueHash = $exifTool->GetNewValueHash($Image::ExifTool::Extra{ICC_Profile});
+    my $dirName = $$dirInfo{DirName} || 'ICC_Profile';
+    # (don't write AsShotICCProfile or CurrentICCProfile here)
+    return undef unless $dirName eq 'ICC_Profile';
+    my $newValueHash = $exifTool->GetNewValueHash($Image::ExifTool::Extra{$dirName});
     return undef unless Image::ExifTool::IsOverwriting($newValueHash);
     my $val = Image::ExifTool::GetNewValues($newValueHash);
     $val = '' unless defined $val;
@@ -652,6 +666,14 @@ sub ProcessICC_Profile($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $raf;
 
+    # extract binary ICC_Profile data block if binary mode or requested
+    if ($exifTool->{OPTIONS}->{Binary} or $exifTool->{REQ_TAG_LOOKUP}->{icc_profile} and
+        # (don't extract from AsShotICCProfile or CurrentICCProfile)
+        (not $$dirInfo{Name} or $$dirInfo{Name} eq 'ICC_Profile'))
+    {
+        $exifTool->FoundTag('ICC_Profile', substr($$dataPt, $dirStart, $dirLen));
+    }
+
     SetByteOrder('MM');     # ICC_Profile is always big-endian
 
     # check length of table
@@ -667,10 +689,6 @@ sub ProcessICC_Profile($$$)
     {
         $exifTool->Warn("Bad ICC_Profile table ($numEntries entries)");
         return 0;
-    }
-    # extract binary ICC_Profile data block if binary mode or requested
-    if ($exifTool->{OPTIONS}->{Binary} or $exifTool->{REQ_TAG_LOOKUP}->{icc_profile}) {
-        $exifTool->FoundTag('ICC_Profile', substr($$dataPt, $dirStart, $dirLen));
     }
 
     if ($verbose) {

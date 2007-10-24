@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -313,8 +313,8 @@ $VERSION = '1.03';
             0 => 'FileSize',
         },
         Desire => {
-            1 => 'AudioBitrate',
-            2 => 'VideoBitrate',
+            1 => 'MPEG:AudioBitrate',
+            2 => 'MPEG:VideoBitrate',
         },
         # calculate duration as file size divided by total bitrate
         # (note: this is only approximate!)

@@ -18,7 +18,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.14';
+$VERSION = '1.17';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -831,7 +831,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         PrintConv => {
             0 => 'Emits',
             1 => 'Does not emit',
-            2 => 'Only emits ext. flash',
+            2 => 'Only ext. flash emits',
         },
     },
     5 => {
@@ -908,7 +908,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         PrintConv => {
             0 => 'Emits',
             1 => 'Does not emit',
-            2 => 'Only emits ext. flash',
+            2 => 'Only ext. flash emits',
         },
     },
     5 => {
@@ -1177,31 +1177,47 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     24 => 'PF27Value',
 );
 
-
-# Custom functions for the 1D Mark III (ref PH)
-%Image::ExifTool::CanonCustom::Functions1DmkIII = (
+# Custom functions used by the 1D Mark III and later models (ref PH)
+%Image::ExifTool::CanonCustom::Functions2 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessCanonCustom2,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITE_PROC => \&WriteCanonCustom2,
-    WRITABLE => 'int32u',
+    WRITABLE => 'int32s',
     NOTES => q{
-        The EOS 1D Mark III has 57 custom function tags divided into four main
-        groups: 1. Exposure (0x0101-0x010f), 2. Image (0x0201-0x0203), Flash
-        Exposure (0x0304-0x0306) and Display (0x0407-0x0409), 3. Auto Focus
-        (0x0501-0x050e) and Drive (0x060f-0x0611), and 4. Operation (0x0701-0x070a)
-        and Others (0x080b-0x0810).
+        Beginning with the EOS 1D Mark III, Canon finally created a set of custom
+        function tags which are consistent across models.  The EOS 1D Mark III has
+        57 custom function tags divided into four main groups: 1. Exposure
+        (0x0101-0x010f), 2. Image (0x0201-0x0203), Flash Exposure (0x0304-0x0306)
+        and Display (0x0407-0x0409), 3. Auto Focus (0x0501-0x050e) and Drive
+        (0x060f-0x0611), and 4. Operation (0x0701-0x070a) and Others
+        (0x080b-0x0810).  The table below lists tags used by the EOS 1D Mark III, as
+        well as newer values and tags used by the EOS 40D.  It is expected that
+        future models will re-use some of these tags (possibly with minor value
+        changes), as well as defining additional new tags of their own.
     },
     # grouped in 4 groups:
     # 1) Exposure
-    0x0101 => {
-        Name => 'ExposureLevelIncrements',
-        PrintConv => {
-            0 => '1/3-stop set, 1/3-stop comp.',
-            1 => '1-stop set, 1/3-stop comp.',
-            2 => '1/2-stop set, 1/2-stop comp.',
+    0x0101 => [
+        {
+            Name => 'ExposureLevelIncrements',
+            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Notes => '40D',
+            PrintConv => {
+                0 => '1/3 Stop',
+                1 => '1/2 Stop',
+            },
         },
-    },
+        {
+            Name => 'ExposureLevelIncrements',
+            Notes => '1D Mark III',
+            PrintConv => {
+                0 => '1/3-stop set, 1/3-stop comp.',
+                1 => '1-stop set, 1/3-stop comp.',
+                2 => '1/2-stop set, 1/2-stop comp.',
+            },
+        },
+    ],
     0x0102 => {
         Name => 'ISOSpeedIncrements',
         PrintConv => {
@@ -1209,41 +1225,54 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             1 => '1-stop',
         },
     },
-    0x0103 => {
-        Name => 'ISOSpeedRange',
-        Count => 3,
-        # (this decoding may not be valid for CR2 images?)
-        ValueConv => [
-            undef,
-            '$val < 1000 ? exp(($val/8-9)*log(2))*100 : 0', # (educated guess)
-            '$val < 1000 ? exp(($val/8-9)*log(2))*100 : 0', # (educated guess)
-        ],
-        ValueConvInv => [
-            undef,
-            '$val ? int(8*(log($val/100)/log(2)+9) + 0.5) : 0xffffffff',
-            '$val ? int(8*(log($val/100)/log(2)+9) + 0.5) : 0xffffffff',
-        ],
-        PrintConv => [
-            \%disableEnable,
-            'sprintf("Max %.0f",$val)',
-            'sprintf("Min %.0f",$val)',
-        ],
-        PrintConvInv => [
-            undef,
-            '$val=~/([\d.]+)/ ? $1 : 0',
-            '$val=~/([\d.]+)/ ? $1 : 0',
-        ],
-    },
+    0x0103 => [
+        {
+            Name => 'ISOExpansion',
+            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Notes => '40D',
+            PrintConv => {
+                0 => 'Off',
+                1 => 'On',
+            },
+        },
+        {
+            Name => 'ISOSpeedRange',
+            Notes => '1D Mark III',
+            Count => 3,
+            # (this decoding may not be valid for CR2 images?)
+            ValueConv => [
+                undef,
+                '$val < 1000 ? exp(($val/8-9)*log(2))*100 : 0', # (educated guess)
+                '$val < 1000 ? exp(($val/8-9)*log(2))*100 : 0', # (educated guess)
+            ],
+            ValueConvInv => [
+                undef,
+                '$val ? int(8*(log($val/100)/log(2)+9) + 0.5) : 0xffffffff',
+                '$val ? int(8*(log($val/100)/log(2)+9) + 0.5) : 0xffffffff',
+            ],
+            PrintConv => [
+                \%disableEnable,
+                'sprintf("Max %.0f",$val)',
+                'sprintf("Min %.0f",$val)',
+            ],
+            PrintConvInv => [
+                undef,
+                '$val=~/([\d.]+)/ ? $1 : 0',
+                '$val=~/([\d.]+)/ ? $1 : 0',
+            ],
+        },
+    ],
     0x0104 => {
         Name => 'AEBAutoCancel',
         PrintConv => \%onOff,
     },
     0x0105 => {
         Name => 'AEBSequence',
+        Notes => 'value of 2 not used by 40D',
         PrintConv => {
             0 => '0,-,+',
-            2 => '-,0,+',
-            3 => '+,0,-',
+            1 => '-,0,+',
+            2 => '+,0,-',
         },
     },
     0x0106 => {
@@ -1264,6 +1293,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0108 => {
         Name => 'SafetyShift',
+        Notes => 'value of 2 not used by 40D',
         PrintConv => {
             0 => 'Disable',
             1 => 'Enable (Tv/Av)',
@@ -1359,13 +1389,25 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             \%disableEnable,
         ],
     },
-    0x010f => {
-        Name => 'FlashSyncSpeedAv',
-        PrintConv => {
-            0 => 'Auto',
-            1 => '1/200 Fixed',
+    0x010f => [
+        {
+            Name => 'FlashSyncSpeedAv',
+            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Notes => '40D',
+            PrintConv => {
+                0 => 'Auto',
+                1 => '1/250 Fixed',
+            },
         },
-    },
+        {
+            Name => 'FlashSyncSpeedAv',
+            Notes => '1D Mark III',
+            PrintConv => {
+                0 => 'Auto',
+                1 => '1/300 Fixed',
+            },
+        },
+    ],
     #### 2a) Image
     0x0201 => {
         Name => 'LongExposureNoiseReduction',
@@ -1426,19 +1468,19 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0501 => {
         Name => 'USMLensElectronicMF',
         PrintConv => {
-            0 => 'Turns on after one-shot AF',
-            1 => 'Turns off after one-shot AF',
-            2 => 'Always turned off',
+            0 => 'Enable after one-shot AF',
+            1 => 'Disable after one-shot AF',
+            2 => 'Disable in AF mode',
         },
     },
     0x0502 => {
         Name => 'AIServoTrackingSensitivity',
-        PrintConv => { # (needs verification)
+        PrintConv => {
+           -2 => 'Slow',
+           -1 => 'Medium Slow',
             0 => 'Standard',
-            1 => 'Slow',
-            2 => 'Moderately slow',
-            3 => 'Moderately fast',
-            4 => 'Fast',
+            1 => 'Medium Fast',
+            2 => 'Fast',
         },
     },
     0x0503 => {
@@ -1465,13 +1507,15 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0506 => {
         Name => 'LensAFStopButton',
+        Notes => 'value of 6 not used by 40D',
         PrintConv => {
             0 => 'AF stop',
             1 => 'AF start',
             2 => 'AE lock',
             3 => 'AF point: M->Auto/Auto->ctr',
             4 => 'One Shot <-> AI servo',
-            # MORE ENTRIES HERE?
+            5 => 'IS start',
+            6 => 'Switch to registered AF point',
         },
     },
     0x0507 => {
@@ -1531,14 +1575,33 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x050e => {
         Name => 'AFAssistBeam',
+        Notes => 'value of 2 not used by 1D Mark III',
         PrintConv => {
             0 => 'Emits',
             1 => 'Does not emit',
+            2 => 'Only ext. flash emits',
         },
+    },
+    0x050f => { # new for 40D
+        Name => 'AFPointSelectionMethod',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Multi-controller direct',
+            2 => 'Quick Control Dial direct',
+        },
+    },
+    0x0510 => { # new for 40D
+        Name => 'SuperimposedDisplay',
+        PrintConv => \%onOff,
+    },
+    0x0511 => { # new for 40D
+        Name => 'AFDuringLiveView',
+        PrintConv => \%disableEnable,
     },
     #### 3b) Drive
     0x060f => {
         Name => 'MirrorLockup',
+        Notes => 'value of 2 not used by 40D',
         PrintConv => {
             0 => 'Disable',
             1 => 'Enable',
@@ -1594,19 +1657,34 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             2 => 'ISO speed',
         },
     },
-    0x0704 => {
-        Name => 'SetButtonWhenShooting',
-        PrintConv => {
-            0 => 'Normal (disabled)',
-            1 => 'White balance',
-            2 => 'Image size',
-            3 => 'ISO speed',
-            4 => 'Picture style',
-            5 => 'Record func. + media/folder',
-            6 => 'Menu display',
-            7 => 'Image playback',
+    0x0704 => [
+        {
+            Name => 'SetButtonWhenShooting',
+            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Notes => '40D',
+            PrintConv => {
+                0 => 'Normal (disabled)',
+                1 => 'Image quality',
+                2 => 'Picture style',
+                3 => 'Menu display',
+                4 => 'Image playback',
+            },
         },
-    },
+        {
+            Name => 'SetButtonWhenShooting',
+            Notes => '1D Mark III',
+            PrintConv => {
+                0 => 'Normal (disabled)',
+                1 => 'White balance',
+                2 => 'Image size',
+                3 => 'ISO speed',
+                4 => 'Picture style',
+                5 => 'Record func. + media/folder',
+                6 => 'Menu display',
+                7 => 'Image playback',
+            },
+        },
+    ],
     0x0705 => {
         Name => 'ManualTv',
         Description => 'Manual Tv/Av For M',
@@ -1648,15 +1726,28 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
     },
     #### 4b) Others
-    0x080b => {
-        Name => 'FocusingScreen',
-        PrintConv => {
-            0 => 'Ec-CIV',
-            1 => 'Ec-A,B,C,CII,CIII,D,H,I,L',
-            2 => 'Ec-S',
-            3 => 'Ec-N,R',
+    0x080b => [
+        {
+            Name => 'FocusingScreen',
+            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Notes => '40D',
+            PrintConv => {
+                0 => 'Ef-A',
+                1 => 'Ef-D',
+                2 => 'Ef-S',
+            },
         },
-    },
+        {
+            Name => 'FocusingScreen',
+            Notes => '1D Mark III',
+            PrintConv => {
+                0 => 'Ec-CIV',
+                1 => 'Ec-A,B,C,CII,CIII,D,H,I,L',
+                2 => 'Ec-S',
+                3 => 'Ec-N,R',
+            },
+        },
+    ],
     0x080c => {
         Name => 'TimerLength',
         Count => 4,
@@ -1768,7 +1859,7 @@ sub ProcessCanonCustom2($$$)
             $num = Get32u($dataPt, $recPos + 4);
             $recPos += 8;
             last if $recPos + $num * 4 > $recEnd;
-            my $val = ReadValue($dataPt, $recPos, 'int32u', $num, $num * 4);
+            my $val = ReadValue($dataPt, $recPos, 'int32s', $num, $num * 4);
             if ($write) {
                 # write new value
                 my $tagInfo = $$newTags{$tag};
@@ -1777,7 +1868,7 @@ sub ProcessCanonCustom2($$$)
                 next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
                 my $newVal = Image::ExifTool::GetNewValues($newValueHash);
                 next unless defined $newVal;    # can't delete from a custom table
-                WriteValue($newVal, 'int32u', $num, $dataPt, $recPos);
+                WriteValue($newVal, 'int32s', $num, $dataPt, $recPos);
                 if ($verbose > 1) {
                     $exifTool->VPrint(0, "    - CanonCustom:$$tagInfo{Name} = '$val'\n",
                                          "    + CanonCustom:$$tagInfo{Name} = '$newVal'\n");

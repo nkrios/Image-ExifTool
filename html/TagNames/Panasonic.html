@@ -22,12 +22,14 @@ Panasonic tags are also used for Leica cameras.
 <td><span class=s>2 = High
   <br>3 = Normal
   <br>6 = Very High
-  <br>7 = Raw</span></td></tr>
+  <br>7 = Raw
+  <br>9 = Motion Picture</span></td></tr>
 <tr class=b>
 <td>0x0002</td>
-<td>ProductionVersion</td>
-<td class=c>int8u[4]</td>
-<td>&nbsp;</td></tr>
+<td>FirmwareVersion</td>
+<td class=c>undef</td>
+<td><span class=s><span class=n>(for some camera models such as the FZ30 this may be an internal production
+reference number and not the actual firmware version)</span></span></td></tr>
 <tr>
 <td>0x0003</td>
 <td>WhiteBalance</td>
@@ -65,7 +67,7 @@ Panasonic tags are also used for Leica cameras.
   <br>&#39;32 3&#39; = 3-area (right)?</span></td></tr>
 <tr class=b>
 <td>0x001a</td>
-<td>ImageStabilizer</td>
+<td>ImageStabilization</td>
 <td class=c>int16u</td>
 <td><span class=s>2 = On, Mode 1
   <br>3 = Off
@@ -91,16 +93,25 @@ Panasonic tags are also used for Leica cameras.
   <br>8 = Shutter Priority
   <br>9 = Macro
   <br>11 = Manual
+  <br>12 = Movie Preview
   <br>13 = Panning
+  <br>14 = Simple
   <br>18 = Fireworks
   <br>19 = Party
   <br>20 = Snow
   <br>21 = Night Scenery
   <br>22 = Food
   <br>23 = Baby
+  <br>24 = Soft Skin
+  <br>25 = Candlelight
+  <br>26 = Starry Night
   <br>27 = High Sensitivity
   <br>29 = Underwater
-  <br>33 = Pet</span></td></tr>
+  <br>30 = Beach
+  <br>31 = Aerial Photo
+  <br>32 = Sunset
+  <br>33 = Pet
+  <br>34 = Intelligent ISO</span></td></tr>
 <tr>
 <td>0x0020</td>
 <td>Audio</td>
@@ -129,6 +140,11 @@ Panasonic tags are also used for Leica cameras.
 <td><span class=s><span class=n>(this number is unique, and contains the date of manufacture, but is not the
 same as the number printed on the camera body)</span></span></td></tr>
 <tr class=b>
+<td>0x0026</td>
+<td>PanasonicExifVersion</td>
+<td class=c>undef</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x0028</td>
 <td>ColorEffect</td>
 <td class=c>int16u</td>
@@ -137,6 +153,12 @@ same as the number printed on the camera body)</span></span></td></tr>
   <br>3 = Cool
   <br>4 = Black &amp; White
   <br>5 = Sepia</span></td></tr>
+<tr class=b>
+<td>0x0029</td>
+<td>TimeSincePowerOn</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(time in 1/100 sec from when the camera was powered on to when the image is
+written to memory card)</span></span></td></tr>
 <tr>
 <td>0x002a</td>
 <td>BurstMode</td>
@@ -190,8 +212,14 @@ same as the number printed on the camera body)</span></span></td></tr>
 <td>0x0033</td>
 <td>BabyAge</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(or pet age)</span></span></td></tr>
 <tr>
+<td>0x0034</td>
+<td>OpticalZoomMode</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Standard
+  <br>2 = EX Optics</span></td></tr>
+<tr class=b>
 <td>0x0035</td>
 <td>ConversionLens</td>
 <td class=c>int16u</td>
@@ -199,12 +227,23 @@ same as the number printed on the camera body)</span></span></td></tr>
   <br>2 = Wide
   <br>3 = Telephoto
   <br>4 = Macro</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0036</td>
 <td>TravelDay</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x003a</td>
+<td>WorldTimeLocation</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Home
+  <br>2 = Destination</span></td></tr>
 <tr>
+<td>0x003c</td>
+<td>ProgramISO</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0042</td>
 <td>FilmMode</td>
 <td class=c>int16u</td>
@@ -215,26 +254,95 @@ same as the number printed on the camera body)</span></span></td></tr>
   <br>5 = Standard (B&amp;W)
   <br>6 = Dynamic (B&amp;W)
   <br>7 = Smooth (B&amp;W)</span></td></tr>
+<tr>
+<td>0x0046</td>
+<td>WBAdjustAB</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(positive is a shift toward blue)</span></span></td></tr>
 <tr class=b>
+<td>0x0047</td>
+<td>WBAdjustGM</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(positive is a shift toward green)</span></span></td></tr>
+<tr>
 <td>0x0051</td>
 <td>LensType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0052</td>
 <td>LensSerialNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0053</td>
 <td>AccessoryType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
+<tr>
+<td>0x8000</td>
+<td>MakerNoteVersion</td>
+<td class=c>undef</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x8001</td>
+<td>SceneMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Normal
+  <br>2 = Portrait
+  <br>3 = Scenery
+  <br>4 = Sports
+  <br>5 = Night Portrait
+  <br>6 = Program
+  <br>7 = Aperture Priority
+  <br>8 = Shutter Priority
+  <br>9 = Macro
+  <br>11 = Manual
+  <br>12 = Movie Preview
+  <br>13 = Panning
+  <br>14 = Simple
+  <br>18 = Fireworks
+  <br>19 = Party
+  <br>20 = Snow
+  <br>21 = Night Scenery
+  <br>22 = Food
+  <br>23 = Baby
+  <br>24 = Soft Skin
+  <br>25 = Candlelight
+  <br>26 = Starry Night
+  <br>27 = High Sensitivity
+  <br>29 = Underwater
+  <br>30 = Beach
+  <br>31 = Aerial Photo
+  <br>32 = Sunset
+  <br>33 = Pet
+  <br>34 = Intelligent ISO</span></td></tr>
+<tr>
+<td>0x8004</td>
+<td>WBRedLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x8005</td>
+<td>WBGreenLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x8006</td>
+<td>WBBlueLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x8010</td>
+<td>BabyAge</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(or pet age)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Type2'>Panasonic Type2 Tags</a></h2>
@@ -248,7 +356,7 @@ iPalm.</p>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td class=r>0</td>
-<td>MakerNoteVersion</td>
+<td>MakerNoteType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -281,6 +389,16 @@ iPalm.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x0004</td>
+<td>SensorTopBorder</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0005</td>
+<td>SensorLeftBorder</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0006</td>
 <td>ImageHeight</td>
 <td class=c>N</td>
@@ -291,23 +409,33 @@ iPalm.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x0011</td>
+<td>RedBalance</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(found in Digilux 2 RAW images)</span></span></td></tr>
+<tr>
+<td>0x0012</td>
+<td>BlueBalance</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0017</td>
 <td>ISO</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0024</td>
-<td>WB_RedLevel</td>
+<td>WBRedLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x0025</td>
-<td>WB_GreenLevel</td>
+<td>WBGreenLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0026</td>
-<td>WB_BlueLevel</td>
+<td>WBBlueLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -352,11 +480,16 @@ iPalm.</p>
 <td>ExifOffset</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
+<tr>
+<td>0x8825</td>
+<td>GPSInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='GPS.html'>GPS Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 8, 2007</i>
+<br><i>Last revised Aug 30, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

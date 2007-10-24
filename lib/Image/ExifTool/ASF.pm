@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -862,7 +862,11 @@ sub ProcessASF($$;$)
             $rtnVal = 1;
         }
         my $size = Image::ExifTool::Get64u(\$buff, 16) - 24;
-        if ($size > 0xffffffff) {
+        if ($size < 0) {
+            $err = 'Invalid ASF object size';
+            last;
+        }
+        if ($size > 0x7fffffff) {
             $err = 'Large ASF objects not supported';
             last;
         }

@@ -26,10 +26,10 @@ use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::Shortcuts;
 use Image::ExifTool::HTML qw(EscapeHTML);
 use Image::ExifTool::IPTC;
+use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
-use Image::ExifTool::Real;
 
-$VERSION = '1.56';
+$VERSION = '1.59';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -66,11 +66,11 @@ specific meta information that is extracted or written in an image.
 The tables listed below give the names of all tags recognized by ExifTool.
 },
     ExifTool2 => q{
-A B<Tag ID> or B<Index> is given in the first column of each table.  A
-B<Tag ID> is the computer-readable equivalent of a tag name, and is the
-identifier that is actually stored in the file.  An B<Index> refers to the
-location of the information, and is used if the information is stored at a
-fixed position in a data block.
+B<Tag ID>, B<Index> or B<Sequence> is given in the first column of each
+table.  A B<Tag ID> is the computer-readable equivalent of a tag name, and
+is the identifier that is actually stored in the file.  An B<Index> refers
+to the location of a value when found at a fixed position within a data
+block, and B<Sequence> gives the order of values for a serial data stream.
 
 A B<Tag Name> is the handle by which the information is accessed in
 ExifTool.  In some instances, more than one name may correspond to a single
@@ -150,7 +150,8 @@ API).
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, PNG,
-MIFF, PS, PDF, PSD and DNG.
+MIFF, PS, PDF, PSD and DNG, as well as audio file formats supporting ID3v2
+information.
 
 The XMP B<Tag ID>'s aren't listed because in most cases they are identical
 to the B<Tag Name>.
@@ -161,8 +162,16 @@ specifies the information format:  C<integer> is a string of digits
 C<rational> is two C<integer> strings separated by a '/' character, C<date>
 is a date/time string in the format "YYYY:MM:DD HH:MM:SS[+/-HH:MM]",
 C<boolean> is either "True" or "False", and C<lang-alt> is a list of string
-alternatives in different languages. Currently, ExifTool only writes the
-"x-default" language in C<lang-alt> lists.
+alternatives in different languages.
+
+Individual languages for C<lang-alt> tags are accessed by suffixing the tag
+name with a '-', followed by an RFC 3066 language code (ie. "XMP:Title-fr",
+or "Rights-en-US").  A C<lang-alt> tag with no language code accesses the
+"x-default" language, but causes other languages to be deleted when writing.
+The "x-default" language code may be specified when writing a new value to
+write only the default language, but note that all languages are still
+deleted if "x-default" tag is deleted.  When reading, "x-default" is not
+specified.
 
 The XMP tags are organized according to schema B<Namespace> in the following
 tables.  Note that a few of the longer namespace prefixes given below have
@@ -391,13 +400,18 @@ sub new
         # save all tag names
         my ($tagID, $binaryTable, $noID, $isIPTC);
         $isIPTC = 1 if $$table{WRITE_PROC} and $$table{WRITE_PROC} eq \&Image::ExifTool::IPTC::WriteIPTC;
-        $noID = 1 if $short =~ /^(Composite|XMP|Extra|Shortcuts|ASF.*)$/;
-        if ($table->{PROCESS_PROC} and
-           ($table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData or
-            $table->{PROCESS_PROC} eq \&Image::ExifTool::Real::ProcessSerialData))
+        $noID = 1 if $short =~ /^(Composite|XMP|Extra|Shortcuts|ASF.*)$/ or $table->{VARS}->{NO_ID};
+        if (($table->{VARS} and $table->{VARS}->{INDEX}) or
+            ($table->{PROCESS_PROC} and
+             $table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData))
         {
             $binaryTable = 1;
             $id{$tableName} = 'Index';
+        } elsif ($table->{PROCESS_PROC} and
+            $table->{PROCESS_PROC} eq \&Image::ExifTool::Canon::ProcessSerialData)
+        {
+            $binaryTable = 1;
+            $id{$tableName} = 'Sequence';
         } elsif ($isIPTC and $$table{PROCESS_PROC}) { #only the main IPTC table has a PROCESS_PROC
             $id{$tableName} = 'Record';
         } elsif (not $noID) {
@@ -850,6 +864,7 @@ sub Doc2Html($)
     $doc =~ s/\n\n/<\/p>\n\n<p>/g;
     $doc =~ s/B&lt;(.*?)&gt;/<b>$1<\/b>/sg;
     $doc =~ s/C&lt;(.*?)&gt;/<code>$1<\/code>/sg;
+    $doc =~ s/L&lt;(.*?)&gt;/<a href="$1">$1<\/a>/sg;
     return $doc;
 }
 
@@ -1279,7 +1294,7 @@ sub WriteTagNames($$)
                 $wTag = $longTag;
                 warn "Notice: Long tags in $tableName table\n";
             }
-        } elsif ($short =~ /^(Extra|XMP|ASF)/) {
+        } elsif ($short !~ /^(Composite|Shortcuts)/) {
             $wTag += 9;
             $hid = '';
         } else {
@@ -1309,8 +1324,10 @@ sub WriteTagNames($$)
         $line .= sprintf " %-${wGrp}s", 'Group' if $showGrp;
         $line .= ' Writable';
         print PODFILE $line;
+        $line =~ s/Sequence /Sequence\t/;   # don't want an underline after 'Sequence'
         $line =~ s/\S/-/g;
         $line =~ s/- -/---/g;
+        $line =~ tr/\t/ /;
         print PODFILE $line,"\n";
         close HTMLFILE;
         OpenHtmlFile($htmldir, $short) or $success = 0;

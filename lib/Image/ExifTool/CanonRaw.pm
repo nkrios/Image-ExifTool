@@ -184,10 +184,10 @@ sub BuildMakerNotes($$$$$$);
         },
     ],
     0x1038 => {
-        Name => 'CanonPictureInfo',
+        Name => 'CanonAFInfo',
         Writable => 0,
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Canon::PictureInfo',
+            TagTable => 'Image::ExifTool::Canon::AFInfo',
         },
     },
     0x1093 => {

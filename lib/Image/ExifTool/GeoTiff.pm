@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # format codes for geoTiff directory entries
 my %geoTiffFormat = (
@@ -2078,73 +2078,73 @@ sub ProcessGeoTiff($)
     # restore or original EXIF byte order setting
     my $byteOrder = $exifTool->{EXIF_BYTE_ORDER};
     $byteOrder and SetByteOrder($byteOrder);
-    if (length($$dirData) < 8 or
-        length($$dirData) < 8 * (Get16u($dirData,6) + 1))
+    if (length($$dirData) >= 8 and
+        length($$dirData) >= 8 * (Get16u($dirData,6) + 1))
     {
-        $exifTool->Warn('Bad GeoTIFF directory');
-        return;
-    }
-    my $version    = Get16u($dirData,0);
-    my $revision   = Get16u($dirData,2);
-    my $minorRev   = Get16u($dirData,4);
-    my $numEntries = Get16u($dirData,6);
-
-    if ($verbose) {
-        $exifTool->{INDENT} .= '| ';
-        $exifTool->VerboseDir('GeoTiff',$numEntries);
-    }
-    # generate version number tag (not a real GeoTiff tag)
-    my $tagTable = Image::ExifTool::GetTagTable("Image::ExifTool::GeoTiff::Main");
-    my $tagInfo = $exifTool->GetTagInfo($tagTable, 1);
-    $tagInfo and $exifTool->FoundTag($tagInfo,"$version.$revision.$minorRev");
-
-    my $i;
-    for ($i=0; $i<$numEntries; ++$i) {
-        my $pt = 8 * ($i + 1);
-        my $tag    = Get16u($dirData, $pt);
-        $tagInfo   = $exifTool->GetTagInfo($tagTable, $tag) or next;
-        my $loc    = Get16u($dirData, $pt+2);
-        my $count  = Get16u($dirData, $pt+4);
-        my $offset = Get16u($dirData, $pt+6);
-        my $format = $geoTiffFormat{$loc};
-        my ($val, $dataPt);
-        if ($format eq 'double') {          # in the double parms
-            $dataPt = $doubleData;
-            $offset *= 8;
-            $val = Image::ExifTool::ReadValue($dataPt, $offset, $format,
-                                              $count, length($$doubleData)-$offset);
-        } elsif ($format eq 'string') {     # in the ASCII parms
-            $dataPt = $asciiData;
-            $val = substr($$dataPt, $offset, $count);
-            $val =~ s/(\0|\|)$//;   # remove trailing terminator (NULL or '|')
-        } elsif ($format eq 'int16u') {     # use the offset as the value
-            $dataPt = $dirData;
-            $val = $offset;
-            $offset = $pt+6;
-        } else {
-            $exifTool->Warn("Unknown GeoTiff location: $loc");
-            next;
+        my $version    = Get16u($dirData,0);
+        my $revision   = Get16u($dirData,2);
+        my $minorRev   = Get16u($dirData,4);
+        my $numEntries = Get16u($dirData,6);
+    
+        if ($verbose) {
+            $exifTool->{INDENT} .= '| ';
+            $exifTool->VerboseDir('GeoTiff',$numEntries);
         }
-        $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
-            'Table'  => $tagTable,
-            'Index'  => $i,
-            'Value'  => $val,
-            'DataPt' => $dataPt,
-            'Start'  => $offset,
-            'Format' => $format,
-            'Count'  => $count,
-            'Size'   => $count * Image::ExifTool::FormatSize($format),
-        );
-        $exifTool->FoundTag($tagInfo, $val);
-    }
-    if ($verbose) {
-        $exifTool->{INDENT} =~ s/..$//;
+        # generate version number tag (not a real GeoTiff tag)
+        my $tagTable = Image::ExifTool::GetTagTable("Image::ExifTool::GeoTiff::Main");
+        my $tagInfo = $exifTool->GetTagInfo($tagTable, 1);
+        $tagInfo and $exifTool->FoundTag($tagInfo,"$version.$revision.$minorRev");
+    
+        my $i;
+        for ($i=0; $i<$numEntries; ++$i) {
+            my $pt = 8 * ($i + 1);
+            my $tag    = Get16u($dirData, $pt);
+            $tagInfo   = $exifTool->GetTagInfo($tagTable, $tag) or next;
+            my $loc    = Get16u($dirData, $pt+2);
+            my $count  = Get16u($dirData, $pt+4);
+            my $offset = Get16u($dirData, $pt+6);
+            my $format = $geoTiffFormat{$loc};
+            my ($val, $dataPt);
+            if ($format eq 'double') {          # in the double parms
+                $dataPt = $doubleData;
+                $offset *= 8;
+                $val = Image::ExifTool::ReadValue($dataPt, $offset, $format,
+                                                  $count, length($$doubleData)-$offset);
+            } elsif ($format eq 'string') {     # in the ASCII parms
+                $dataPt = $asciiData;
+                $val = substr($$dataPt, $offset, $count);
+                $val =~ s/(\0|\|)$//;   # remove trailing terminator (NULL or '|')
+            } elsif ($format eq 'int16u') {     # use the offset as the value
+                $dataPt = $dirData;
+                $val = $offset;
+                $offset = $pt+6;
+            } else {
+                $exifTool->Warn("Unknown GeoTiff location: $loc");
+                next;
+            }
+            $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+                'Table'  => $tagTable,
+                'Index'  => $i,
+                'Value'  => $val,
+                'DataPt' => $dataPt,
+                'Start'  => $offset,
+                'Format' => $format,
+                'Count'  => $count,
+                'Size'   => $count * Image::ExifTool::FormatSize($format),
+            );
+            $exifTool->FoundTag($tagInfo, $val);
+        }
+        if ($verbose) {
+            $exifTool->{INDENT} =~ s/..$//;
+        }
     } else {
-        # this is duplicate information so delete it unless verbose
-        $exifTool->DeleteTag('GeoTiffDirectory');
-        $exifTool->DeleteTag('GeoTiffDoubleParams');
-        $exifTool->DeleteTag('GeoTiffAsciiParams');
+        $exifTool->Warn('Bad GeoTIFF directory');
     }
+    # must delete these tags once we've processed this information
+    # (to avoid re-processing if another EXIF directory is found)
+    $exifTool->DeleteTag('GeoTiffDirectory');
+    $exifTool->DeleteTag('GeoTiffDoubleParams');
+    $exifTool->DeleteTag('GeoTiffAsciiParams');
 }
 
 

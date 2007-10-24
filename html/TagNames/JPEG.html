@@ -50,12 +50,12 @@
 <td>'APP6'</td>
 <td>EPPIM</td>
 <td class=c>-</td>
-<td>--&gt; <a href='JPEG.html#APP6'>JPEG APP6 Tags</a></td></tr>
+<td>--&gt; <a href='JPEG.html#EPPIM'>JPEG EPPIM Tags</a></td></tr>
 <tr>
 <td>'APP8'</td>
 <td>SPIFF</td>
 <td class=c>-</td>
-<td>--&gt; <a href='JPEG.html#APP8'>JPEG APP8 Tags</a></td></tr>
+<td>--&gt; <a href='JPEG.html#SPIFF'>JPEG SPIFF Tags</a></td></tr>
 <tr class=b>
 <td>'APP10'</td>
 <td>Comment</td>
@@ -66,29 +66,36 @@
 <td>PictureInfo
   <br>Ducky</td>
 <td class=c>-<br>-</td>
-<td>--&gt; <a href='APP12.html'>APP12 Tags</a>
+<td>--&gt; <a href='APP12.html#PictureInfo'>APP12 PictureInfo Tags</a>
   <br>--&gt; <a href='APP12.html#Ducky'>APP12 Ducky Tags</a></td></tr>
 <tr class=b>
 <td>'APP13'</td>
-<td>Photoshop</td>
-<td class=c>-</td>
-<td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
+<td>Photoshop
+  <br>Adobe_CM</td>
+<td class=c>-<br>-</td>
+<td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a>
+  <br>--&gt; <a href='JPEG.html#AdobeCM'>JPEG AdobeCM Tags</a></td></tr>
 <tr>
 <td>'APP14'</td>
 <td>Adobe</td>
 <td class=c>-</td>
-<td>--&gt; <a href='JPEG.html#APP14'>JPEG APP14 Tags</a></td></tr>
+<td>--&gt; <a href='JPEG.html#Adobe'>JPEG Adobe Tags</a></td></tr>
 <tr class=b>
 <td>'APP15'</td>
 <td>GraphicConverter</td>
 <td class=c>-</td>
-<td>--&gt; <a href='JPEG.html#APP15'>JPEG APP15 Tags</a></td></tr>
+<td>--&gt; <a href='JPEG.html#GraphConv'>JPEG GraphConv Tags</a></td></tr>
 <tr>
 <td>'COM'</td>
 <td>Comment</td>
 <td class=c>Y</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'SOF'</td>
+<td>StartOfFrame</td>
+<td class=c>-</td>
+<td>--&gt; <a href='JPEG.html#SOF'>JPEG SOF Tags</a></td></tr>
+<tr>
 <td>'Trailer'</td>
 <td>AFCP
   <br>CanonVRD
@@ -104,7 +111,7 @@
   <br>--&gt; <a href='MIE.html'>MIE Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='APP6'>JPEG APP6 Tags</a></h2>
+<h2><a name='EPPIM'>JPEG EPPIM Tags</a></h2>
 <p>APP6 is used in by the Toshiba PDR-M700 to store a TIFF structure containing
 PrintIM information.</p>
 <blockquote>
@@ -119,7 +126,7 @@ PrintIM information.</p>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='APP8'>JPEG APP8 Tags</a></h2>
+<h2><a name='SPIFF'>JPEG SPIFF Tags</a></h2>
 <p>This information is found in APP8 of SPIFF-style JPEG images (the &quot;official&quot;
 yet rarely used JPEG file format standard: Still Picture Interchange File
 Format).</p>
@@ -208,7 +215,23 @@ SPIFF sample, version 1.2)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='APP14'>JPEG APP14 Tags</a></h2>
+<h2><a name='AdobeCM'>JPEG AdobeCM Tags</a></h2>
+<p>The &quot;Adobe_CM&quot; APP13 segment presumably contains color management
+information, but the meaning of the data is currently unknown.  If anyone
+has an idea about what this means, please let me know.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>AdobeCMType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Adobe'>JPEG Adobe Tags</a></h2>
 <p>The &quot;Adobe&quot; APP14 segment stores image encoding information for DCT filters.</p>
 <blockquote>
 <table class=frame><tr><td>
@@ -239,7 +262,7 @@ SPIFF sample, version 1.2)</span></span></td></tr>
   <br>2 = YCCK</span></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='APP15'>JPEG APP15 Tags</a></h2>
+<h2><a name='GraphConv'>JPEG GraphConv Tags</a></h2>
 <p>APP15 is used by GraphicConverter to store JPEG quality.</p>
 <blockquote>
 <table class=frame><tr><td>
@@ -253,9 +276,60 @@ SPIFF sample, version 1.2)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='SOF'>JPEG SOF Tags</a></h2>
+<p>This information is extracted from the JPEG Start Of Frame segment.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>BitsPerSample</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ColorComponents</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>EncodingProcess</td>
+<td class=c>N</td>
+<td><span class=s>0x0 = Baseline DCT, Huffman coding
+  <br>0x1 = Extended sequential DCT, Huffman coding
+  <br>0x2 = Progressive DCT, Huffman coding
+  <br>0x3 = Lossless, Huffman coding
+  <br>0x5 = Sequential DCT, differential Huffman coding
+  <br>0x6 = Progressive DCT, differential Huffman coding
+  <br>0x7 = Lossless, Differential Huffman coding
+  <br>0x9 = Extended sequential DCT, arithmetic coding
+  <br>0xa = Progressive DCT, arithmetic coding
+  <br>0xb = Lossless, arithmetic coding
+  <br>0xd = Sequential DCT, differential arithmetic coding
+  <br>0xe = Progressive DCT, differential arithmetic coding
+  <br>0xf = Lossless, differential arithmetic coding</span></td></tr>
+<tr class=b>
+<td>ImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>YCbCrSubSampling</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(calculated from components table)</span>
+  <br>&#39;1 1&#39; = YCbCr4:4:4 (1 1)
+  <br>&#39;1 2&#39; = YCbCr4:4:0 (1 2)
+  <br>&#39;2 1&#39; = YCbCr4:2:2 (2 1)
+  <br>&#39;2 2&#39; = YCbCr4:2:0 (2 2)
+  <br>&#39;4 1&#39; = YCbCr4:1:1 (4 1)
+  <br>&#39;4 2&#39; = YCbCr4:1:0 (4 2)</span></td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 21, 2007</i>
+<br><i>Last revised Oct 16, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

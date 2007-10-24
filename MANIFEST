@@ -102,6 +102,7 @@ lib/Image/ExifTool/APE.pm
 lib/Image/ExifTool/APP12.pm
 lib/Image/ExifTool/ASF.pm
 lib/Image/ExifTool/BMP.pm
+lib/Image/ExifTool/BigTIFF.pm
 lib/Image/ExifTool/BuildTagLookup.pm
 lib/Image/ExifTool/Canon.pm
 lib/Image/ExifTool/CanonCustom.pm
@@ -201,6 +202,12 @@ t/CanonRaw_7.out
 t/CanonVRD.t
 t/CanonVRD_2.out
 t/CanonVRD_3.out
+t/CanonVRD_4.out
+t/CanonVRD_5.out
+t/CanonVRD_6.out
+t/CanonVRD_7.out
+t/CanonVRD_8.out
+t/CanonVRD_9.out
 t/Canon_2.out
 t/Canon_3.out
 t/Casio.t
@@ -233,6 +240,7 @@ t/Flash.t
 t/FlashPix.t
 t/FlashPix_2.out
 t/Flash_2.out
+t/Flash_3.out
 t/FotoStation.t
 t/FotoStation_2.out
 t/FotoStation_3.out
@@ -254,6 +262,12 @@ t/IPTC-XMP.t
 t/IPTC-XMP_10.out
 t/IPTC-XMP_11.out
 t/IPTC-XMP_12.out
+t/IPTC-XMP_13.out
+t/IPTC-XMP_14.out
+t/IPTC-XMP_15.out
+t/IPTC-XMP_16.out
+t/IPTC-XMP_17.out
+t/IPTC-XMP_18.out
 t/IPTC-XMP_2.out
 t/IPTC-XMP_4.out
 t/IPTC-XMP_6.out
@@ -265,6 +279,7 @@ t/JVC_2.out
 t/JVC_3.out
 t/Jpeg2000.t
 t/Jpeg2000_2.out
+t/Jpeg2000_3.out
 t/Kodak.t
 t/Kodak_2.out
 t/Kodak_3.out
@@ -366,6 +381,12 @@ t/Writer_24.out
 t/Writer_25.out
 t/Writer_26.out
 t/Writer_27.out
+t/Writer_28.out
+t/Writer_29.out
+t/Writer_30.out
+t/Writer_31.out
+t/Writer_32.out
+t/Writer_33.out
 t/Writer_4.out
 t/Writer_6.out
 t/Writer_7.out
@@ -389,6 +410,7 @@ t/images/ExifTool.jpg
 t/images/ExifTool.tif
 t/images/FLAC.flac
 t/images/FLAC.ogg
+t/images/Flash.flv
 t/images/Flash.swf
 t/images/FlashPix.ppt
 t/images/FotoStation.jpg

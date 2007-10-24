@@ -1,11 +1,18 @@
 AEBBracketValue: 0
-AFPointsUsed: (none)
+AFAreaHeight: 151
+AFAreaWidth: 151
+AFAreaXPositions: 1014 608 0 0 0 -608 -1014
+AFAreaYPositions: 0 0 -506 0 506 0 0
+AFImageHeight: 2048
+AFImageWidth: 3072
+AFPointsInFocus: (none)
 Aperture: 14.0
 ApertureValue: 14.0
 AutoExposureBracketing: Off
 AutoISO: 100
 AutoRotate: None
 BaseISO: 100
+BitsPerSample: 8
 BlueBalance: 1.190619
 BracketMode: Off
 BracketShotNumber: 0
@@ -18,13 +25,12 @@ CanonFileLength: 4480822
 CanonFirmwareVersion: Firmware Version 1.1.1
 CanonFlashMode: Off
 CanonImageHeight: 2048
-CanonImageHeightAsShot: 2048
 CanonImageSize: Large
 CanonImageType: CRW:EOS DIGITAL REBEL CMOS RAW
 CanonImageWidth: 3072
-CanonImageWidthAsShot: 3072
 CanonModelID: EOS Digital Rebel / 300D / Kiss Digital
 CircleOfConfusion: 0.019 mm
+ColorComponents: 3
 ColorSpace: sRGB
 ColorSpace (1): sRGB
 ColorTemperature: 5200
@@ -41,9 +47,11 @@ DigitalZoom: Unknown (-1)
 Directory: t
 DriveMode: Continuous shooting
 EasyMode: Manual
+EncodingProcess: Baseline DCT, Huffman coding
+ExifByteOrder: Little-endian (Intel)
 ExifImageLength: 120
 ExifImageWidth: 160
-ExifToolVersion: 6.83
+ExifToolVersion: 6.98
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -52,7 +60,7 @@ ExposureTime: 4
 ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
-FileModifyDate: 2007:03:21 11:08:01
+FileModifyDate: 2007:09:21 08:09:38
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FileSize: 3 kB
@@ -94,6 +102,7 @@ LongFocal: 55mm
 MIMEType: image/jpeg
 MacroMode: Unknown (0)
 Make: Canon
+ManualFlashOutput: n/a
 MaxAperture: 4
 MaxApertureValue: 4.5
 MeasuredEV: -6.25
@@ -116,7 +125,7 @@ ResolutionUnit: inches
 Saturation: +1
 ScaleFactor35efl: 1.6
 SceneCaptureType: Standard
-Self-timer: 0
+Self-timer: Off
 Self-timer2: 0
 SensingMethod: One-chip color area
 SequenceNumber: 0
@@ -130,6 +139,7 @@ ShutterSpeedValue: 0
 SlowShutter: None
 TargetAperture: 14
 UserComment: 
+ValidAFPoints: 7
 WB_RGGBLevels: 1719 832 831 990
 WB_RGGBLevelsAuto: 1719 832 831 990
 WB_RGGBLevelsCloudy: 1878 832 831 903
@@ -144,6 +154,7 @@ WhiteBalance: Auto
 WhiteBalance (1): Auto
 XResolution: 180
 YCbCrPositioning: Centered
+YCbCrSubSampling: YCbCr4:2:0 (2 2)
 YResolution: 180
 ZoomSourceWidth: 3072
 ZoomTargetWidth: 3072

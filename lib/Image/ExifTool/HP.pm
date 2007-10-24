@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         HP.pm
 #
-# Description:  Process Hewlett-Packard maker notes
+# Description:  Hewlett-Packard maker notes tags
 #
 # Revisions:    2007-05-03 - P. Harvey Created
 #------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessHP($$$);
 
@@ -24,8 +24,7 @@ sub ProcessHP($$$);
         camera models.
         
         The first table lists tags found in the EXIF-format maker notes of the
-        PhotoSmart 720 (which are also used by the Vivitar ViviCam 3705, 3705B and
-        3715.
+        PhotoSmart 720 (also used by the Vivitar ViviCam 3705, 3705B and 3715).
     },
     0x0e00 => {
         Name => 'PrintIM',
@@ -130,14 +129,14 @@ sub ProcessHP($$$)
     }
     my $tagID;
     # brute-force scan for PreviewImage
-    if ($$dataPt =~ /(\xff\xd8\xff\xdb.*\xff\xd9)/gs) {
+    if ($$tagTablePtr{PreviewImage} and $$dataPt =~ /(\xff\xd8\xff\xdb.*\xff\xd9)/gs) {
         $exifTool->HandleTag($tagTablePtr, 'PreviewImage', $1);
         # truncate preview to speed subsequent tag scans
         my $buff = substr($$dataPt, 0, pos($$dataPt)-length($1));
         $dataPt = \$buff;
     }
     # scan for other tag ID's
-    foreach $tagID (TagTableKeys($tagTablePtr)) {
+    foreach $tagID (sort(TagTableKeys($tagTablePtr))) {
         next if $tagID eq 'PreviewImage';
         next unless $$dataPt =~ /$tagID:\s*([\x20-\x7f]+)/i;
         $exifTool->HandleTag($tagTablePtr, $tagID, $1);
@@ -151,7 +150,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::HP - Process Hewlett-Packard maker notes
+Image::ExifTool::HP - Hewlett-Packard maker notes tags
 
 =head1 SYNOPSIS
 

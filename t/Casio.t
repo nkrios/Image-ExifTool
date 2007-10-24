@@ -56,7 +56,7 @@ my $testnum = 1;
     my @writeInfo = (
         ['XResolution',300],
         ['YResolution',300],
-        ['Timezone','EST5EDT'],
+        ['ObjectDistance','3.5'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Casio2.jpg');
     print "ok $testnum\n";

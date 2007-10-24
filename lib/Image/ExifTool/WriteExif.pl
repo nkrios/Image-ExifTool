@@ -649,6 +649,36 @@ my %writeTable = (
         WriteGroup => 'SubIFD',
         Count => 4,
     },
+    0xc68f => {             # AsShotICCProfile
+        Writable => 'undef',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+        WriteCheck => q{
+            require Image::ExifTool::ICC_Profile;
+            return Image::ExifTool::ICC_Profile::ValidateICC(\$val);
+        },
+    },
+    0xc690 => {             # AsShotPreProfileMatrix
+        Writable => 'rational64s',
+        Count => -1,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc691 => {             # CurrentICCProfile
+        Writable => 'undef',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+        WriteCheck => q{
+            require Image::ExifTool::ICC_Profile;
+            return Image::ExifTool::ICC_Profile::ValidateICC(\$val);
+        },
+    },
+    0xc692 => {             # CurrentPreProfileMatrix
+        Writable => 'rational64s',
+        Count => -1,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
     0xea1d => {             # OffsetSchema
         Writable => 'int32s',
     },
@@ -911,9 +941,11 @@ sub RebuildMakerNotes($$$)
         my $newTool = new Image::ExifTool;
         # don't copy over preview image
         $newTool->SetNewValue(PreviewImage => '');
-        # must set a few member variables used while writing...
-        $newTool->{CameraMake} = $exifTool->{CameraMake};
-        $newTool->{CameraModel} = $exifTool->{CameraModel};
+        # copy all transient members over in case they are used for writing
+        # (CameraMake, CameraModel, etc)
+        foreach (grep /[a-z]/, keys %$exifTool) {
+            $$newTool{$_} = $$exifTool{$_};
+        }
         # fix base offsets if specified
         $newTool->Options(FixBase => $exifTool->Options('FixBase'));
         # set FILE_TYPE to JPEG so PREVIEW_INFO will be generated
@@ -1101,7 +1133,8 @@ sub WriteExif($$$)
                         $val = WriteValue($val, $$tagInfo{Format}, $$tagInfo{Count});
                     }
                     if (defined $val) {
-                        $curInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$val);
+                        $curInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$val,
+                                        $$tagInfo{Format} || 'undef', $$tagInfo{Count} || 1);
                     }
                 }
                 # don't set this tag unless valid for the current condition
@@ -1121,6 +1154,10 @@ sub WriteExif($$$)
                 # delete stuff from the wrong directory if setting somewhere else
                 $newValueHash = $exifTool->GetNewValueHash($tagInfo, $wrongDir);
                 next unless Image::ExifTool::IsOverwriting($newValueHash);
+                # don't cross delete if specifically deleting from the other directory
+                my $val = Image::ExifTool::GetNewValues($newValueHash);
+                next if not defined $val and $newValueHash->{WantGroup} and
+                        lc($newValueHash->{WantGroup}) eq lc($wrongDir);
                 # remove this tag if found in this IFD
                 $xDelete{$tagID} = 1;
             }
@@ -1316,7 +1353,7 @@ Entry:  for (;;) {
                             if ($oldInfo) {
                                 $tagStr = $$oldInfo{Name};
                             } elsif (defined $oldInfo) {
-                                my $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \ '');
+                                my $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \ '', $oldFormName, $oldCount);
                                 $tagStr = $$tmpInfo{Name} if $tmpInfo;
                             }
                             $tagStr or $tagStr = sprintf("tag 0x%x",$oldID);
@@ -1368,7 +1405,7 @@ Entry:  for (;;) {
                     $oldValue = substr($$valueDataPt, $valuePtr, $oldSize) unless $readFromFile;
                     # get tagInfo using value if necessary
                     if (defined $oldInfo and not $oldInfo) {
-                        $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \$oldValue);
+                        $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \$oldValue, $oldFormName, $oldCount);
                     }
                     # override format we use to read the value if specified
                     if ($oldInfo) {
@@ -1777,10 +1814,16 @@ NoOverwrite:            next if $isNew > 0;
                             my $pt = Image::ExifTool::ReadValue($valueDataPt, $valuePtr + $off,
                                             $readFormName, 1, $oldSize - $off);
                             my $subdirStart = $pt - $dataPos;
+                            my $subdirBase = $base;
+                            if ($$subdir{Base}) {
+                                my $start = $subdirStart + $valueDataPos;
+                                #### eval Base ($start)
+                                $subdirBase += eval $$subdir{Base};
+                            }
                             my %subdirInfo = (
-                                Base => $base,
+                                Base => $subdirBase,
                                 DataPt => $dataPt,
-                                DataPos => $dataPos,
+                                DataPos => $dataPos - $subdirBase + $base,
                                 DataLen => $dataLen,
                                 DirStart => $subdirStart,
                                 DirName => $subdirName . ($i ? $i : ''),
@@ -1850,7 +1893,7 @@ NoOverwrite:            next if $isNew > 0;
                             $subdirs[-1]->{Offset} = length($dirBuff) + 8;
                         }
                         # set new format to int32u for IFD
-                        $newFormName = 'int32u';
+                        $newFormName = $$newInfo{FixFormat} || 'int32u';
                         $newFormat = $formatNumber{$newFormName};
                         $newValuePt = \$newValue;
 
@@ -1882,6 +1925,7 @@ NoOverwrite:            next if $isNew > 0;
                             DataPos => $valueDataPos - $subdirBase + $base,
                             DataLen => $valueDataLen,
                             DirStart => $subdirStart,
+                            DirName => $$subdir{DirName},
                             DirLen => $oldSize,
                             Parent => $dirName,
                             Fixup => $subFixup,
@@ -1915,30 +1959,54 @@ NoOverwrite:            next if $isNew > 0;
 #
 # keep track of offsets
 #
-                    my $offsetInfo = $offsetInfo[$ifd];
-                    # save original values (for updating TIFF_END later)
-                    my @vals;
-                    if ($isNew <= 0) {
-                        @vals = ReadValue(\$oldValue, 0, $readFormName, $readCount, $oldSize);
+                    my $dataTag = $$newInfo{DataTag} || '';
+                    if ($dataTag eq 'CanonVRD') {
+                        # must decide now if we will write CanonVRD information
+                        my $hasVRD;
+                        if ($exifTool->{NEW_VALUE}->{$Image::ExifTool::Extra{CanonVRD}}) {
+                            # adding or deleting as a block
+                            $hasVRD = $exifTool->GetNewValues('CanonVRD') ? 1 : 0;
+                        } elsif ($exifTool->{DEL_GROUP}->{CanonVRD} or
+                                 $exifTool->{DEL_GROUP}->{Trailer})
+                        {
+                            $hasVRD = 0;    # deleting as a group
+                        } else {
+                            $hasVRD = ($$newValuePt ne "\0\0\0\0");
+                        }
+                        if ($hasVRD) {
+                            # add a fixup, and set this offset later
+                            $dirFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                        } else {
+                            # there is (or will soon be) no VRD information, so set pointer to zero
+                            $newValue = "\0" x length($$newValuePt);
+                            $newValuePt = \$newValue;
+                        }
+                    } else {
+                        my $offsetInfo = $offsetInfo[$ifd];
+                        # save original values (for updating TIFF_END later)
+                        my @vals;
+                        if ($isNew <= 0) {
+                            @vals = ReadValue(\$oldValue, 0, $readFormName, $readCount, $oldSize);
+                        }
+                        # only support int32 pointers (for now)
+                        if ($formatSize[$newFormat] != 4 and $$newInfo{IsOffset}) {
+                            die "Internal error (Offset not int32)" if $isNew > 0;
+                            die "Wrong count!" if $newCount != $readCount;
+                            # change to int32
+                            $newFormName = 'int32u';
+                            $newFormat = $formatNumber{$newFormName};
+                            $newValue = WriteValue(join(' ',@vals), $newFormName, $newCount);
+                            die "Internal error writing offsets\n" unless defined $newValue;
+                        }
+                        $offsetInfo or $offsetInfo = $offsetInfo[$ifd] = { };
+                        # save location of valuePtr in new directory
+                        # (notice we add 10 instead of 8 for valuePtr because
+                        # we will put a 2-byte count at start of directory later)
+                        my $ptr = $newStart + length($dirBuff) + 10;
+                        $newCount or $newCount = 1; # make sure count is set for offsetInfo
+                        # save value pointer and value count for each tag
+                        $offsetInfo->{$newID} = [$newInfo, $ptr, $newCount, \@vals, $newFormat];
                     }
-                    # only support int32 pointers (for now)
-                    if ($formatSize[$newFormat] != 4 and $$newInfo{IsOffset}) {
-                        die "Internal error (Offset not int32)" if $isNew > 0;
-                        die "Wrong count!" if $newCount != $readCount;
-                        # change to int32
-                        $newFormName = 'int32u';
-                        $newFormat = $formatNumber{$newFormName};
-                        $newValue = WriteValue(join(' ',@vals), $newFormName, $newCount);
-                        die "Internal error writing offsets\n" unless defined $newValue;
-                    }
-                    $offsetInfo or $offsetInfo = $offsetInfo[$ifd] = { };
-                    # save location of valuePtr in new directory
-                    # (notice we add 10 instead of 8 for valuePtr because
-                    # we will put a 2-byte count at start of directory later)
-                    my $ptr = $newStart + length($dirBuff) + 10;
-                    $newCount or $newCount = 1; # make sure count is set for offsetInfo
-                    # save value pointer and value count for each tag
-                    $offsetInfo->{$newID} = [$newInfo, $ptr, $newCount, \@vals, $newFormat];
 
                 } elsif ($$newInfo{DataMember}) {
 
@@ -2162,6 +2230,7 @@ NoOverwrite:            next if $isNew > 0;
 # copy over image data for IFD's, starting with the last IFD first
 #
     my @imageData; # image data blocks if requested
+    my $blockSize = 0;  # total size of blocks to copy later
     if (@offsetInfo) {
         my @writeLater;  # write image data last
         for ($ifd=$#offsetInfo; $ifd>=-1; --$ifd) {
@@ -2176,6 +2245,7 @@ NoOverwrite:            next if $isNew > 0;
                     my $tagInfo = $offsetInfo->{$tagID}->[0];
                     next unless $$tagInfo{IsOffset}; # handle byte counts with offsets
                     my $sizeInfo = $offsetInfo->{$$tagInfo{OffsetPair}};
+                    $sizeInfo or $exifTool->Error("No size tag for $dirName:$$tagInfo{Name}"), next;
                     my $dataTag = $$tagInfo{DataTag};
                     # write TIFF image data (strips or tiles) later if requested
                     if ($raf and defined $_[1]->{ImageData} and
@@ -2191,7 +2261,6 @@ NoOverwrite:            next if $isNew > 0;
                 last unless @writeLater;
                 @offsetList = @writeLater;
             }
-            my $blockSize = 0;  # total size of blocks to copy later
             my $offsetPair;
             foreach $offsetPair (@offsetList) {
                 my ($tagInfo, $offsets, $count, $oldOffset) = @{$$offsetPair[0]};
@@ -2336,6 +2405,10 @@ NoOverwrite:            next if $isNew > 0;
 #
     unless ($$dirInfo{Fixup}) {
         my $newDataPos = $$dirInfo{NewDataPos} || 0;
+        # adjust CanonVRD offset to point to end of regular TIFF if necessary
+        # (NOTE: This will be incorrect if multiple trailers exist,
+        #  but it is unlikely that it could ever be correct in this case anyway)
+        $fixup->SetMarkerPointers(\$newData, 'CanonVRD', length($newData) + $blockSize);
         if ($newDataPos) {
             $fixup->{Shift} += $newDataPos;
             $fixup->ApplyFixup(\$newData);

@@ -1,4 +1,4 @@
-  ExifToolVersion = 6.64
+  ExifToolVersion = 6.97
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
@@ -76,7 +76,7 @@
   | | | | SequenceNumber = 0
   | | | | OpticalZoomCode = 8
   | | | | FlashGuideNumber = -1
-  | | | | AFPointsUsed2 = 0
+  | | | | AFPointsInFocus = 0
   | | | | FlashExposureComp = 20
   | | | | AutoExposureBracketing = 0
   | | | | AEBBracketValue = 0
@@ -132,6 +132,7 @@
   | | | | ZoomSourceWidth = 3072
   | | | | ZoomTargetWidth = 3072
   | | | | PhotoEffect = -1
+  | | | | ManualFlashOutput = 0
   | | | | ColorTone = 0
   | | | 5)  CanonRaw_0x0036 = Binary data 3714 bytes
   | | | 6)  CanonModelID = 2147484016
@@ -144,14 +145,19 @@
   | | | | SensorRightBorder = 3143
   | | | | SensorBottomBorder = 2063
   | | | 8)  DecoderTable = 1 0 514 4120111
-  | | | 9)  CanonPictureInfo (SubDirectory) -->
-  | | | + [BinaryData directory, 48 bytes]
-  | | | | NumAFPoints = 7
-  | | | | CanonImageWidth = 3072
-  | | | | CanonImageHeight = 2048
-  | | | | CanonImageWidthAsShot = 3072
-  | | | | CanonImageHeightAsShot = 2048
-  | | | | AFPointsUsed = 8
+  | | | 9)  CanonAFInfo (SubDirectory) -->
+  | | | + [SerialData directory, 48 bytes]
+  | | | | 0)  NumAFPoints = 7
+  | | | | 1)  ValidAFPoints = 7
+  | | | | 2)  CanonImageWidth = 3072
+  | | | | 3)  CanonImageHeight = 2048
+  | | | | 4)  AFImageWidth = 3072
+  | | | | 5)  AFImageHeight = 2048
+  | | | | 6)  AFAreaWidth = 151
+  | | | | 7)  AFAreaHeight = 151
+  | | | | 8)  AFAreaXPositions = 1014 608 0 0 0 -608 -1014
+  | | | | 9)  AFAreaYPositions = 0 0 -506 0 506 0 0
+  | | | | 10) AFPointsInFocus = 8
   | | | 10) CanonRaw_0x10c0 = 26 331 372 372 177 240 428 429 277 186 510 511 442
   | | | 11) CanonRaw_0x10c1 = 26 299 375 375 170 202 394 395 240 153 453 454 375
   | | | 12) CanonRaw_0x10c2 = Binary data 884 bytes

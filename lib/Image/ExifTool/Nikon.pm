@@ -18,11 +18,11 @@
 #               4) http://www.cybercom.net/~dcoffin/dcraw/
 #               5) Brian Ristuccia private communication (tests with D70)
 #               6) Danek Duvall private communication (tests with D70)
-#               7) Tom Christiansen private communication (tchrist@perl.com)
+#               7) Tom Christiansen private communication (tests with D70)
 #               8) Robert Rottmerhusen private communication
 #               9) http://members.aol.com/khancock/pilot/nbuddy/
 #              10) Werner Kober private communication (D2H, D2X, D100, D70, D200)
-#              11) http://www.rottmerhusen.com/objektives/lensid/nikkor.html
+#              11) http://www.rottmerhusen.com/objektives/lensid/thirdparty.html
 #              12) http://libexif.sourceforge.net/internals/mnote-olympus-tag_8h-source.html
 #              13) Roger Larsson private communication (tests with D200)
 #              14) http://homepage3.nifty.com/kamisaka/makernote/makernote_nikon.htm
@@ -30,6 +30,9 @@
 #              16) Jeffrey Friedl private communication (D200 with firmware update)
 #              17) http://www.wohlberg.net/public/software/photo/nstiffexif/
 #              18) Anonymous user private communication (D70, D200, D2x)
+#              19) Jens Duttke private communication
+#              20) Bruce Stevens private communication
+#              21) Vladimir Sauta private communication (D80)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Nikon;
@@ -39,7 +42,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.69';
+$VERSION = '1.76';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -47,7 +50,8 @@ my %nikonLensIDs = (
         The Nikon LensID is constructed as a Composite tag from the raw hex values
         of 8 other tags: LensIDNumber, LensFStops, MinFocalLength, MaxFocalLength,
         MaxApertureAtMinFocal, MaxApertureAtMaxFocal, MCUVersion and LensType, in
-        that order.
+        that order.  (source:
+        L<http://www.rottmerhusen.com/objektives/lensid/thirdparty.html>)
     },
     # (hex digits must be uppercase in keys below)
     '01 58 50 50 14 14 02 00' => 'AF Nikkor 50mm f/1.8',
@@ -82,6 +86,7 @@ my %nikonLensIDs = (
     '1E 54 56 56 24 24 13 00' => 'AF Micro-Nikkor 60mm f/2.8',
     '1F 54 6A 6A 24 24 14 00' => 'AF Micro-Nikkor 105mm f/2.8',
     '20 48 60 80 24 24 15 00' => 'AF Zoom-Nikkor ED 80-200mm f/2.8',
+    '21 40 3C 5C 2C 34 16 00' => 'AF Zoom-Nikkor 28-70mm f/3.5-4.5',
     '22 48 72 72 18 18 16 00' => 'AF DC-Nikkor 135mm f/2',
     '24 48 60 80 24 24 1A 02' => 'AF Zoom-Nikkor ED 80-200mm f/2.8D',
     '25 48 44 5C 24 24 1B 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D',
@@ -123,6 +128,7 @@ my %nikonLensIDs = (
     '5D 48 3C 5C 24 24 63 02' => 'AF-S Zoom-Nikkor 28-70mm f/2.8D IF-ED',
     '5E 48 60 80 24 24 64 02' => 'AF-S Zoom-Nikkor 80-200mm f/2.8D IF-ED',
     '5F 40 3C 6A 2C 34 65 02' => 'AF Zoom-Nikkor 28-105mm f/3.5-4.5D IF',
+    '60 40 3C 60 2C 3C 66 02' => 'AF Zoom-Nikkor 28-80mm f/3.5-5.6D', #(http://www.exif.org/forum/topic.asp?TOPIC_ID=16)
     '61 44 5E 86 34 3C 67 02' => 'AF Zoom-Nikkor 75-240mm f/4.5-5.6D',
     '63 48 2B 44 24 24 68 02' => 'AF-S Nikkor 17-35mm f/2.8D IF-ED',
     '64 00 62 62 24 24 6A 02' => 'PC Micro-Nikkor 85mm f/2.8D',
@@ -153,16 +159,21 @@ my %nikonLensIDs = (
     '82 48 8E 8E 24 24 87 0E' => 'AF-S VR Nikkor 300mm f/2.8G IF-ED',
     '89 3C 53 80 30 3C 8B 06' => 'AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED',
     '8A 54 6A 6A 24 24 8C 0E' => 'AF-S VR Micro-Nikkor 105mm f/2.8G IF-ED', #10
+    '8B 40 2D 80 2C 3C FD 0E' => 'AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED', #21
     '8B 40 2D 80 2C 3C 8D 0E' => 'AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED',
     '8C 40 2D 53 2C 3C 8E 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED',
     '8D 44 5C 8E 34 3C 8F 0E' => 'AF-S VR Zoom-Nikkor 70-300mm f/4.5-5.6G IF-ED', #10
     '8F 40 2D 72 2C 3C 91 06' => 'AF-S DX Zoom-Nikkor 18-135mm f/3.5-5.6G IF-ED',
     '90 3B 53 80 30 3C 92 0E' => 'AF-S DX VR Zoom-Nikkor 55-200mm f/4-5.6G IF-ED',
+    '93 48 37 5C 24 24 95 06' => 'AF-S Nikkor 24-70 f/2.8G ED',
     '94 40 2D 53 2C 3C 96 06' => 'AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED II', #10 (D40)
+    '96 48 98 98 24 24 98 0E' => 'AF-S Nikkor 400mm f/2.8G ED VR',
+    '98 3C A6 A6 30 30 9A 0E' => 'AF-S Nikkor 600mm f/4G ED VR',
 #
     '06 3F 68 68 2C 2C 06 00' => 'Cosina 100mm f/3.5 Macro',
 #
     '26 48 11 11 30 30 1C 02' => 'Sigma 8mm F4 EX Circular Fisheye',
+    '79 40 11 11 2C 2C 1C 06' => 'Sigma 8mm F3.5 EX', #19
     '48 3C 19 31 30 3C 4B 06' => 'Sigma 10-20mm F4-5.6 EX DC HSM',
     '48 38 1F 37 34 3C 4B 06' => 'Sigma 12-24mm F4.5-5.6 EX Aspherical DG HSM',
     '02 3F 24 24 2C 2C 02 00' => 'Sigma 14mm F3.5',
@@ -174,6 +185,7 @@ my %nikonLensIDs = (
     '7F 48 2B 5C 24 34 1C 06' => 'Sigma 17-70mm F2.8-4.5 DC MACRO Asp. IF',
     '26 48 2D 50 24 24 1C 06' => 'Sigma 18-50mm F2.8 EX DC',
     '26 40 2D 50 2C 3C 1C 06' => 'Sigma 18-50mm F3.5-5.6 DC',
+    '7A 40 2D 50 2C 3C 4B 06' => 'Sigma 18-50mm F3.5-5.6 DC HSM',
     '26 40 2D 70 2B 3C 1C 06' => 'Sigma 18-125mm F3.5-5.6 DC',
     '26 40 2D 80 2C 40 1C 06' => 'Sigma 18-200mm F3.5-6.3 DC',
     '26 58 31 31 14 14 1C 02' => 'Sigma 20mm F1.8 EX Aspherical DG DF RF',
@@ -201,7 +213,10 @@ my %nikonLensIDs = (
     '7A 47 50 76 24 24 4B 06' => 'Sigma APO 50-150mm F2.8 EX DC HSM',
     '48 3C 50 A0 30 40 4B 02' => 'Sigma 50-500mm F4-6.3 EX APO RF HSM',
     '26 3C 54 80 30 3C 1C 06' => 'Sigma 55-200mm F4-5.6 DC',
+    '7A 3B 53 80 30 3C 4B 06' => 'Sigma 55-200mm F4-5.6 DC HSM',
+    '79 48 5C 5C 24 24 1C 06' => 'Sigma 70mm F2.8 EX DG Macro', #19
     '48 54 5C 80 24 24 4B 02' => 'Sigma 70-200mm F2.8 EX APO IF HSM',
+    '02 46 5C 82 25 25 02 00' => 'Sigma 70-210mm F2.8 APO', #19
     '26 3C 5C 82 30 3C 1C 02' => 'Sigma 70-210mm F4-5.6 UC-II',
     '26 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 DG MACRO',
     '56 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 APO Macro Super II',
@@ -212,12 +227,14 @@ my %nikonLensIDs = (
     '48 54 6F 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM',
     '26 44 73 98 34 3C 1C 02' => 'Sigma 135-400mm F4.5-5.6 APO Aspherical',
     '48 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM',
+    '48 4C 7C 7C 2C 2C 4B 02' => 'Sigma 180mm F3.5 EX DG Macro', #19
     '26 40 7B A0 34 40 1C 02' => 'Sigma APO 170-500mm F5-6.3 ASPHERICAL RF',
     '48 4C 7D 7D 2C 2C 4B 02' => 'Sigma APO MACRO 180mm F3.5 EX DG HSM',
     '48 54 8E 8E 24 24 4B 02' => 'Sigma APO 300mm F2.8 EX DG HSM',
     '26 48 8E 8E 30 30 1C 02' => 'Sigma APO TELE MACRO 300mm F4',
     '48 3C 8E B0 3C 3C 4B 02' => 'Sigma APO 300-800 F5.6 EX DG HSM',
     '02 2F 98 98 3D 3D 02 00' => 'Sigma 400mm F5.6 APO',
+    '02 37 A0 A0 34 34 02 00' => 'Sigma APO 500mm F4.5', #20
 #
     '03 43 5C 81 35 35 02 00' => 'Soligor AF C/D ZOOM UMCS 70-210mm 1:4.5',
 #
@@ -565,7 +582,7 @@ my %nikonLensIDs = (
                 TagTable => 'Image::ExifTool::Nikon::ShotInfo',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 4,
-                DecryptLen => 0x90,
+                DecryptLen => 0x24e,
             },
         },
         {
@@ -652,14 +669,14 @@ my %nikonLensIDs = (
     ],
     0x0098 => [
         { #8
-            Condition => '$$valPt =~ /^0100/',
+            Condition => '$$valPt =~ /^0100/', # D100, D1X - PH
             Name => 'LensData0100',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensData00',
             },
         },
         { #8
-            Condition => '$$valPt =~ /^0101/',
+            Condition => '$$valPt =~ /^0101/', # D70, D70s - PH
             Name => 'LensData0101',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensData01',
@@ -667,7 +684,10 @@ my %nikonLensIDs = (
         },
         # note: this information is encrypted if the version is 02xx
         { #8
-            Condition => '$$valPt =~ /^020(1|2)/', # D80/D40 are version 0202 (PH)
+            # 0201 - D200, D2Hs, D2X and D2Xs
+            # 0202 - D40, D40X and D80
+            # 0203 - D300
+            Condition => '$$valPt =~ /^020[1-3]/',
             Name => 'LensData0201',
             Writable => 0, # can't yet write encrypted data
             SubDirectory => {
@@ -730,15 +750,15 @@ my %nikonLensIDs = (
             TagTable => 'Image::ExifTool::Nikon::MultiExposure',
         },
     },
-    0x00b1 => { #14
+    0x00b1 => { #14/PH/19 (D80)
         Name => 'HighISONoiseReduction',
         Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
-            1 => 'On for ISO 1600/3200',
-            2 => 'Weak',
+            1 => 'Minimal', # for high ISO (>800) when setting is "Off"
+            2 => 'Low',     # Low,Normal,High take effect for ISO > 400
             4 => 'Normal',
-            6 => 'Strong',
+            6 => 'High',
         },
     },
     # 0x00b2 (string: 'Normal', 0xc3's, 0xff's or 0x20's)
@@ -889,7 +909,7 @@ my %nikonLensIDs = (
         },
     },
     2 => {
-        Name => 'AFPointsUsed',
+        Name => 'AFPointsInFocus',
         Format => 'int16u',
         PrintConv => {
             BITMASK => {
@@ -1063,7 +1083,7 @@ my %nikonFocalConversions = (
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    NOTES => 'This structure is used by the D100 and newer D1X models.',
+    NOTES => 'This structure is used by the D100, and D1X with firmware version 1.1.',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x00 => {
         Name => 'LensDataVersion',
@@ -1186,7 +1206,10 @@ my %nikonFocalConversions = (
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     DATAMEMBER => [ 0 ],
-    NOTES => 'This information is encrypted for ShotInfoVersion 02xx.',
+    NOTES => q{
+        This information is encrypted for ShotInfoVersion 02xx, and some tags are
+        only valid for specific versions.
+    },
     0x00 => {
         Name => 'ShotInfoVersion',
         RawConv => '$$self{ShotInfoVersion} = $val',
@@ -1197,10 +1220,11 @@ my %nikonFocalConversions = (
         Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
         Format => 'int8u',
         Unknown => 1,
+        Notes => 'D2X, D2Xs (unverified)',
         PrintConv => {
-            0 => 'VR off',
-            1 => 'VR on (normal)',
-            2 => 'VR on (active)',
+            0 => 'Off',
+            1 => 'On (normal)',
+            2 => 'On (active)',
         },
     },
     # 6a, 6e not correct for 0103 (D70), 0207 (D200)
@@ -1209,25 +1233,82 @@ my %nikonFocalConversions = (
         Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
         Format => 'int32u',
         Priority => 0,
+        Notes => 'D2X, D2Xs',
     },
     0x6e => {
         Name => 'DeletedImageCount',
         Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
         Format => 'int32u',
         Priority => 0,
+        Notes => 'D2X, D2Xs',
     },
-    0x82 => {
-        Name => 'VR_0x82',
-        Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
+    0x75 => { #19
+        Name => 'VibrationReduction',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0207)$/',
         Format => 'int8u',
-        Unknown => 1,
+        Notes => 'D200',
         PrintConv => {
-            0 => 'VR off',
-            1 => 'VR on (normal)',
-            2 => 'code 2 (active?)',
+            0 => 'Off',
+            1 => 'On (1)',
+            2 => 'On (2)',
         },
     },
-    # note: DecryptLen currently set to 0x90
+    0x82 => { # educated guess, needs verification
+        Name => 'VibrationReduction',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0204)$/',
+        Format => 'int8u',
+        Notes => 'D2X, D2Xs',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+        },
+    },
+    0x157 => { #19
+        Name => 'ShutterCount',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0205)$/',
+        Format => 'undef[2]',
+        Priority => 0,
+        Notes => 'D50',
+        # treat as a 2-byte big-endian integer
+        ValueConv => 'unpack("n", $val)',
+        ValueConvInv => 'pack("n",$val)',
+    },
+    0x1ae => { #19
+        Name => 'VibrationReduction',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0205)$/',
+        Format => 'int8u',
+        Notes => 'D50',
+        PrintHex => 1,
+        PrintConv => {
+            0x00 => 'n/a',
+            0x0c => 'Off',
+            0x0f => 'On',
+        },
+    },
+    0x24a => { #19
+        Name => 'ShutterCount',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0208)$/',
+        Format => 'int32u',
+        Priority => 0,
+        Notes => 'D80',
+    },
+    0x24e => { #19
+        Name => 'VibrationReduction',
+        Condition => '$$self{ShotInfoVersion} =~ /^(0208)$/',
+        Notes => 'D80',
+        PrintHex => 1,
+        PrintConv => {
+            0x00 => 'Off, Horizontal',
+            0x01 => 'Off, Rotated 270 CW',
+            0x02 => 'Off, Rotated 90 CW',
+            0x03 => 'Off, Rotated 180',
+            0x18 => 'On, Horizontal',
+            0x19 => 'On, Rotated 270 CW',
+            0x1a => 'On, Rotated 90 CW',
+            0x1b => 'On, Rotated 180',
+        },
+    },
+    # note: DecryptLen currently set to 0x24e
 );
 
 # Multi exposure / image overlay information (ref PH)
@@ -1609,7 +1690,9 @@ under the same terms as Perl itself.
 
 =item L<http://members.aol.com/khancock/pilot/nbuddy/>
 
-=item L<http://www.rottmerhusen.com/objektives/lensid/nikkor.html>
+=item L<http://www.rottmerhusen.com/objektives/lensid/thirdparty.html>
+
+=item L<http://homepage3.nifty.com/kamisaka/makernote/makernote_nikon.htm>
 
 =item L<http://www.wohlberg.net/public/software/photo/nstiffexif/>
 
@@ -1618,8 +1701,9 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Joseph Heled, Thomas Walter, Brian Ristuccia, Danek Duvall, Tom
-Christiansen, Robert Rottmerhusen, Werner Kober and Roger Larsson for their
-help figuring out some Nikon tags.
+Christiansen, Robert Rottmerhusen, Werner Kober, Roger Larsson and Jens
+Duttke for their help figuring out some Nikon tags, and Bruce Stevens for
+his additions to the LensID list.
 
 =head1 SEE ALSO
 

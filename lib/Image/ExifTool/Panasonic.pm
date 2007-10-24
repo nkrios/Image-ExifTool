@@ -23,9 +23,42 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.21';
+$VERSION = '1.26';
 
 sub ProcessPanasonicType2($$$);
+
+# conversions for ShootingMode and SceneMode
+my %shootingMode = (
+    1  => 'Normal',
+    2  => 'Portrait',
+    3  => 'Scenery',
+    4  => 'Sports',
+    5  => 'Night Portrait',
+    6  => 'Program',
+    7  => 'Aperture Priority',
+    8  => 'Shutter Priority',
+    9  => 'Macro',
+    11 => 'Manual',
+    12 => 'Movie Preview', #PH (LZ6)
+    13 => 'Panning',
+    14 => 'Simple', #PH (LZ6)
+    18 => 'Fireworks',
+    19 => 'Party',
+    20 => 'Snow',
+    21 => 'Night Scenery',
+    22 => 'Food', #7
+    23 => 'Baby', #10
+    24 => 'Soft Skin', #PH (LZ6)
+    25 => 'Candlelight', #PH (LZ6)
+    26 => 'Starry Night', #PH (LZ6)
+    27 => 'High Sensitivity', #7 (LZ6)
+    29 => 'Underwater', #7
+    30 => 'Beach', #PH (LZ6)
+    31 => 'Aerial Photo', #PH (LZ6)
+    32 => 'Sunset', #PH (LZ6)
+    33 => 'Pet', #10
+    34 => 'Intelligent ISO', #PH (LZ6)
+);
 
 %Image::ExifTool::Panasonic::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -40,15 +73,25 @@ sub ProcessPanasonicType2($$$);
             3 => 'Normal',
             6 => 'Very High', #3 (Leica)
             7 => 'Raw', #3 (Leica)
+            9 => 'Motion Picture', #PH (LZ6)
         },
     },
     0x02 => {
-        Name => 'ProductionVersion',
-        Format => 'int8u',  # (format type is 'undef', but it should really be int8u)
-        Writable => 'int8u',
-        Count => 4,
-        PrintConv => '$_=$val; tr/ /./; $_',
-        PrintConvInv => '$_=$val; tr/./ /; $_',
+        Name => 'FirmwareVersion',
+        Writable => 'undef',
+        Notes => q{
+            for some camera models such as the FZ30 this may be an internal production
+            reference number and not the actual firmware version
+        }, # (ref http://www.stevesforums.com/forums/view_topic.php?id=87764&forum_id=23&)
+        # (can be either binary or ascii -- add decimal points if binary)
+        ValueConv => '$val=~/[\0-\x2f]/ ? join(" ",unpack("C*",$val)) : $val',
+        ValueConvInv => q{
+            $val =~ /(\d+ ){3}\d+/ and $val = pack('C*',split(' ', $val));
+            length($val) == 4 or warn "Version must be 4 numbers\n";
+            return $val;
+        },
+        PrintConv => '$val=~tr/ /./; $val',
+        PrintConvInv => '$val=~tr/./ /; $val',
     },
     0x03 => {
         Name => 'WhiteBalance',
@@ -93,7 +136,7 @@ sub ProcessPanasonicType2($$$);
         },
     },
     0x1a => {
-        Name => 'ImageStabilizer',
+        Name => 'ImageStabilization',
         Writable => 'int16u',
         PrintConv => {
             2 => 'On, Mode 1',
@@ -113,28 +156,7 @@ sub ProcessPanasonicType2($$$);
     0x1f => {
         Name => 'ShootingMode',
         Writable => 'int16u',
-        PrintConv => {
-            1  => 'Normal',
-            2  => 'Portrait',
-            3  => 'Scenery',
-            4  => 'Sports',
-            5  => 'Night Portrait',
-            6  => 'Program',
-            7  => 'Aperture Priority',
-            8  => 'Shutter Priority',
-            9  => 'Macro',
-            11 => 'Manual',
-            13 => 'Panning',
-            18 => 'Fireworks',
-            19 => 'Party',
-            20 => 'Snow',
-            21 => 'Night Scenery',
-            22 => 'Food', #7
-            23 => 'Baby', #10
-            27 => 'High Sensitivity', #7
-            29 => 'Underwater', #7
-            33 => 'Pet', #10
-        },
+        PrintConv => \%shootingMode,
     },
     0x20 => {
         Name => 'Audio',
@@ -146,6 +168,7 @@ sub ProcessPanasonicType2($$$);
         Writable => 0,
         Binary => 1,
     },
+    # 0x22 - normally 0, but 2 for 'Simple' ShootingMode in LZ6 sample - PH
     0x23 => {
         Name => 'WhiteBalanceBias',
         Format => 'int16s',
@@ -175,6 +198,11 @@ sub ProcessPanasonicType2($$$);
         },
         PrintConvInv => '$_=$val; tr/A-Z0-9//dc; s/(.{3})(19|20)/$1/; $_',
     },
+    0x26 => { #PH
+        Name => 'PanasonicExifVersion',
+        Writable => 'undef',
+    },
+    # 0x27 - values: 0 (LZ6,FX10K)
     0x28 => {
         Name => 'ColorEffect',
         Writable => 'int16u',
@@ -187,7 +215,42 @@ sub ProcessPanasonicType2($$$);
             5 => 'Sepia',
         },
     },
-    # 0x29 => 'SubjectDistance?',
+    0x29 => { #10
+        Name => 'TimeSincePowerOn',
+        Writable => 'int32u',
+        Notes => q{
+            time in 1/100 sec from when the camera was powered on to when the image is
+            written to memory card
+        },
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => sub { # convert to format "[DD days ]HH:MM:SS.ss"
+            my $val = shift;
+            my $str = '';
+            if ($val >= 24 * 3600) {
+                my $d = int($val / (24 * 3600));
+                $str .= "$d days ";
+                $val -= $d * 24 * 3600;
+            }
+            my $h = int($val / 3600);
+            $val -= $h * 3600;
+            my $m = int($val / 60);
+            $val -= $m * 60;
+            my $s = int($val);
+            my $f = 100 * ($val - int($val));
+            return sprintf("%s%.2d:%.2d:%.2d.%.2d",$str,$h,$m,$s,$f);
+        },
+        PrintConvInv => sub {
+            my $val = shift;
+            my @vals = ($val =~ /\d+(?:\.\d*)?/g);
+            my $sec = 0;
+            $sec += 24 * 3600 * shift(@vals) if @vals > 3;
+            $sec += 3600 * shift(@vals) if @vals > 2;
+            $sec += 60 * shift(@vals) if @vals > 1;
+            $sec += shift(@vals) if @vals;
+            return $sec;
+        },
+    },
     0x2a => { #4
         Name => 'BurstMode',
         Writable => 'int16u',
@@ -201,15 +264,6 @@ sub ProcessPanasonicType2($$$);
         Name => 'SequenceNumber',
         Writable => 'int32u',
     },
-    0x2e => { #4
-        Name => 'SelfTimer',
-        Writable => 'int16u',
-        PrintConv => {
-            1 => 'Off',
-            2 => '10s',
-            3 => '2s',
-        },
-    },
     0x2c => {
         Name => 'Contrast',
         Flags => 'PrintHex',
@@ -218,6 +272,8 @@ sub ProcessPanasonicType2($$$);
             0 => 'Normal',
             1 => 'Low',
             2 => 'High',
+            # 3 - observed with LZ6 in "Aerial Photo" mode - PH
+            # 5 - observed with FX10 in "Underwater" mode - PH
             0x100 => 'Low',
             0x110 => 'Normal',
             0x120 => 'High',
@@ -232,6 +288,16 @@ sub ProcessPanasonicType2($$$);
             2 => 'High',
         },
     },
+    0x2e => { #4
+        Name => 'SelfTimer',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Off',
+            2 => '10s',
+            3 => '2s',
+        },
+    },
+    # 0x2f - values: 1 (LZ6,FX10K)
     0x30 => { #7
         Name => 'Rotation',
         Writable => 'int16u',
@@ -241,22 +307,31 @@ sub ProcessPanasonicType2($$$);
             8 => 'Rotate 270 CW', #PH (ref 7 gives 90 CW)
         },
     },
+    # 0x31 - values: 1-5 some sort of mode? (changes with FOC-L) (PH/10)
     0x32 => { #7
         Name => 'ColorMode',
         Writable => 'int16u',
         PrintConv => {
             0 => 'Normal',
             1 => 'Natural',
+            # 2 => observed in LZ6 for some shooting modes
         },
     },
-    0x033 => { #10
+    0x33 => { #10
         Name => 'BabyAge',
         Writable => 'string',
+        Notes => 'or pet age', #PH
         PrintConv => '$val eq "9999:99:99 00:00:00" ? "(not set)" : $val',
         PrintConvInv => '$val =~ /^\d/ ? $val : "9999:99:99 00:00:00"',
     },
-    # 0x33 - RedModeBirthday? (ref 7)
-    # 0x34 - OpticalZoom? (1=standardZoom, 2-EXOpticsZoom) (ref 7)
+    0x34 => { #7/PH
+        Name => 'OpticalZoomMode',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Standard',
+            2 => 'EX Optics',
+        },
+    },
     0x35 => { #9
         Name => 'ConversionLens',
         Writable => 'int16u',
@@ -273,6 +348,23 @@ sub ProcessPanasonicType2($$$);
         PrintConv => '$val == 65535 ? "n/a" : $val',
         PrintConvInv => '$val =~ /(\d+)/ ? $1 : $val',
     },
+    # 0x37 - values: 0,1,2 (LZ6, 0 for movie preview) and 257 (FX10K)
+    # 0x38 - values: 0,1,2 (LZ6, same as 0x37) and 1,2 (FX10K)
+    0x3a => {
+        Name => 'WorldTimeLocation',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Home',
+            2 => 'Destination',
+        },
+    },
+    # 0x3b - values: 1 (LZ6, FX10K)
+    0x3c => { #PH
+        Name => 'ProgramISO',
+        Writable => 'int16u',
+        PrintConv => '$val == 65535 ? "n/a" : $val',
+        PrintConvInv => '$val eq "n/a" ? 65535 : $val',
+    },
     # 0x40 Chroma? (ref 7)
     0x42 => { #7 (DMC-L1)
         Name => 'FilmMode',
@@ -288,6 +380,18 @@ sub ProcessPanasonicType2($$$);
             # 8 => 'My Film 1'? (from owner manual)
             # 9 => 'My Film 2'?
         },
+    },
+    0x46 => { #PH/10
+        Name => 'WBAdjustAB',
+        Format => 'int16s',
+        Writable => 'int16u',
+        Notes => 'positive is a shift toward blue',
+    },
+    0x47 => { #PH/10
+        Name => 'WBAdjustGM',
+        Format => 'int16s',
+        Writable => 'int16u',
+        Notes => 'positive is a shift toward green',
     },
     0x51 => {
         Name => 'LensType',
@@ -309,8 +413,40 @@ sub ProcessPanasonicType2($$$);
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
-    # 0x8001 SceneMode? (ref 7)
-    # 0x8010 TravelTime? (ref 7)
+    0x8000 => { #PH
+        Name => 'MakerNoteVersion',
+        Format => 'undef',
+    },
+    0x8001 => { #7/PH/10
+        Name => 'SceneMode',
+        Writable => 'int16u',
+        PrintConv => {
+            0  => 'Off',
+            %shootingMode,
+        },
+    },
+    # 0x8002 - values: 1,2 related to focus? (PH/10)
+    # 0x8003 - values: 1,2 related to focus? (PH/10)
+    0x8004 => { #PH/10
+        Name => 'WBRedLevel',
+        Writable => 'int16u',
+    },
+    0x8005 => { #PH/10
+        Name => 'WBGreenLevel',
+        Writable => 'int16u',
+    },
+    0x8006 => { #PH/10
+        Name => 'WBBlueLevel',
+        Writable => 'int16u',
+    },
+    # 0x8007 - values: 1,2
+    0x8010 => { #PH
+        Name => 'BabyAge',
+        Writable => 'string',
+        Notes => 'or pet age',
+        PrintConv => '$val eq "9999:99:99 00:00:00" ? "(not set)" : $val',
+        PrintConvInv => '$val =~ /^\d/ ? $val : "9999:99:99 00:00:00"',
+    },
 );
 
 # Type 2 tags (ref PH)
@@ -325,7 +461,7 @@ sub ProcessPanasonicType2($$$);
         iPalm.
     },
     0 => {
-        Name => 'MakerNoteVersion',
+        Name => 'MakerNoteType',
         Format => 'string[4]',
     },
     # seems to vary inversely with amount of light, so I'll call it 'Gain' - PH
@@ -346,22 +482,37 @@ sub ProcessPanasonicType2($$$);
     },
     0x02 => 'SensorWidth', #5/PH
     0x03 => 'SensorHeight', #5/PH
+    0x04 => 'SensorTopBorder', #10
+    0x05 => 'SensorLeftBorder', #10
     0x06 => 'ImageHeight', #5/PH
     0x07 => 'ImageWidth', #5/PH
+    0x11 => { #10
+        Name => 'RedBalance',
+        Writable => 'int16u',
+        ValueConv => '$val / 256',
+        ValueConvInv => 'int($val * 256 + 0.5)',
+        Notes => 'found in Digilux 2 RAW images',
+    },
+    0x12 => { #10
+        Name => 'BlueBalance',
+        Writable => 'int16u',
+        ValueConv => '$val / 256',
+        ValueConvInv => 'int($val * 256 + 0.5)',
+    },
     0x17 => { #5
         Name => 'ISO',
         Writable => 'int16u',
     },
     0x24 => { #6
-        Name => 'WB_RedLevel',
+        Name => 'WBRedLevel',
         Writable => 'int16u',
     },
     0x25 => { #6
-        Name => 'WB_GreenLevel',
+        Name => 'WBGreenLevel',
         Writable => 'int16u',
     },
     0x26 => { #6
-        Name => 'WB_BlueLevel',
+        Name => 'WBBlueLevel',
         Writable => 'int16u',
     },
     0x10f => {
@@ -409,6 +560,16 @@ sub ProcessPanasonicType2($$$);
         SubDirectory => {
             TagTable => 'Image::ExifTool::Exif::Main',
             DirName => 'ExifIFD',
+            Start => '$val',
+        },
+    },
+    0x8825 => {
+        Name => 'GPSInfo',
+        Groups => { 1 => 'GPS' },
+        Flags => 'SubIFD',
+        SubDirectory => {
+            DirName => 'GPS',
+            TagTable => 'Image::ExifTool::GPS::Main',
             Start => '$val',
         },
     },

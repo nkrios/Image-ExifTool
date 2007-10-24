@@ -285,6 +285,16 @@ sub WriteIPTC($$$)
         $dataLen = length($$dataPt) unless defined $dataLen;
         $dirLen = $dataLen - $start;
     }
+    # quick check for improperly byte-swapped IPTC
+    if ($dirLen >= 4 and substr($$dataPt, $start, 1) ne "\x1c" and
+                         substr($$dataPt, $start + 3, 1) eq "\x1c")
+    {
+        $exifTool->Warn('IPTC data was improperly byte-swapped');
+        my $newData = pack('N*', unpack('V*', substr($$dataPt, $start, $dirLen) . "\0\0\0"));
+        $dataPt = \$newData;
+        $start = 0;
+        # NOTE: MUST NOT access $dirInfo DataPt, DirStart or DataLen after this!
+    }
     # generate lookup so we can find the record numbers
     my %recordNum;
     foreach $tag (Image::ExifTool::TagTableKeys($tagTablePtr)) {

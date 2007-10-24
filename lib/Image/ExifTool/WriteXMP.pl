@@ -4,8 +4,6 @@
 # Description:  Write XMP meta information
 #
 # Revisions:    12/19/2004 - P. Harvey Created
-#
-# Limitations:  - only writes x-default language in Alt Lang lists
 #------------------------------------------------------------------------------
 package Image::ExifTool::XMP;
 
@@ -200,6 +198,7 @@ my %nsURI = (
     aux       => 'http://ns.adobe.com/exif/1.0/aux/',
     cc        => 'http://web.resource.org/cc/',
     crs       => 'http://ns.adobe.com/camera-raw-settings/1.0/',
+    crss      => 'http://ns.adobe.com/camera-raw-saved-settings/1.0/',
     dc        => 'http://purl.org/dc/elements/1.1/',
     exif      => 'http://ns.adobe.com/exif/1.0/',
     iX        => 'http://ns.adobe.com/iX/1.0/',
@@ -227,9 +226,11 @@ my %nsURI = (
     xmpidq    => 'http://ns.adobe.com/xmp/Identifier/qual/1.0/',
     xmpPLUS   => 'http://ns.adobe.com/xap/1.0/PLUS/',
     dex       => 'http://ns.optimasc.com/dex/1.0/',
+    mediapro  => 'http://ns.iview-multimedia.com/mediapro/1.0/',
     Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
     MicrosoftPhoto => 'http://ns.microsoft.com/photo/1.0',
     lr        => 'http://ns.adobe.com/lightroom/1.0/',
+    DICOM     => 'http://ns.adobe.com/DICOM/',
 );
 
 my $x_toolkit = "x:xmptk='Image::ExifTool $Image::ExifTool::VERSION'";
@@ -341,14 +342,14 @@ sub CheckXMP($$$)
             return 'Not an integer';
         }
     } elsif ($format eq 'date') {
-        if ($$valPtr =~ /(\d{4}):(\d{2}):(\d{2}) (\d{2}:\d{2}:\d{2})(.*)/) {
+        if ($$valPtr =~ /(\d{4}):(\d{2}):(\d{2}) (\d{2}:\d{2}(?::\d{2}(?:\.\d*)?)?)(.*)/) {
             my ($y, $m, $d, $t, $tz) = ($1, $2, $3, $4, $5);
             # use 'Z' for timezone unless otherwise specified
             $tz = 'Z' unless $tz and $tz =~ /([+-]\d{2}:\d{2})/;
             $$valPtr = "$y-$m-${d}T$t$tz";
-        } elsif ($$valPtr =~ /^\s*(\d{4}):(\d{2}):(\d{2})\s*$/) {
-            # this is just a date (no time)
-            $$valPtr = "$1-$2-$3";
+        } elsif ($$valPtr =~ /^\s*\d{4}(:\d{2}){0,2}\s*$/) {
+            # this is just a date (YYYY, YYYY-MM or YYYY-MM-DD)
+            $$valPtr =~ tr/:/-/;
         } elsif ($$valPtr =~ /^\s*(\d{2}:\d{2}:\d{2})(.*)\s*$/) {
             # this is just a time
             my ($t, $tz) = ($1, $2);
@@ -404,10 +405,10 @@ sub SetPropertyPath($$;$$)
     $propList and @propList = @$propList;
     push @propList, "$ns:$tagID";
     # lang-alt lists are handled specially, signified by Writable='lang-alt'
-    # (they aren't true lists since we currently only allow setting of
-    # the default language.)
     if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt') {
         $listType = 'Alt';
+        # remove language code from property path if it exists
+        $propList[-1] =~ s/-$$tagInfo{LangCode}$// if $$tagInfo{LangCode};
     } else {
         $listType = $$tagInfo{List};
     }
@@ -583,6 +584,13 @@ sub ConformPathToNamespace($$)
 }
 
 #------------------------------------------------------------------------------
+# sort tagInfo hash references by tag name
+sub ByTagName
+{
+    return $$a{Name} cmp $$b{Name};
+}
+
+#------------------------------------------------------------------------------
 # Write XMP information
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
 #         2) [optional] tag table reference
@@ -626,6 +634,8 @@ sub WriteXMP($$;$)
                 my $raf = $$dirInfo{RAF};
                 # allow empty XMP data so we can create something from nothing
                 if ($success or not $raf->Seek(0,2) or $raf->Tell()) {
+                    # no error message if not an XMP file
+                    return 0 unless $exifTool->{XMP_ERROR};
                     if ($exifTool->Error($err, $success)) {
                         delete $exifTool->{XMP_CAPTURE};
                         return 0;
@@ -648,7 +658,8 @@ sub WriteXMP($$;$)
 # add, delete or change information as specified
 #
     # get hash of all information we want to change
-    my @tagInfoList = $exifTool->GetNewTagInfoList();
+    # (sorted by tag name so alternate languages come last)
+    my @tagInfoList = sort ByTagName $exifTool->GetNewTagInfoList();
     my $tagInfo;
     foreach $tagInfo (@tagInfoList) {
         next unless $exifTool->GetGroup($tagInfo, 0) eq 'XMP';
@@ -670,13 +681,14 @@ sub WriteXMP($$;$)
         }
         my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
         my $overwrite = Image::ExifTool::IsOverwriting($newValueHash);
-        my (%attrs, $deleted);
+        my $writable = $$tagInfo{Writable} || '';
+        my (%attrs, $deleted, $added);
         # delete existing entry if necessary
         if ($capList) {
             # take attributes from old values if they exist
             %attrs = %{$capList->[1]};
             if ($overwrite) {
-                my ($delPath, @matchingPaths);
+                my ($delPath, @matchingPaths, $oldLang, $delLang);
                 # check to see if this is an indexed list item
                 if ($path =~ / /) {
                     my $pathPattern;
@@ -691,39 +703,57 @@ sub WriteXMP($$;$)
                         # only overwrite specific values
                         next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
                     }
+                    if ($writable eq 'lang-alt') {
+                        # get original language code (lc for comparisons)
+                        $oldLang = lc($$attrs{'xml:lang'} || 'x-default');
+                        # delete all if deleting "x-default" or writing with no LangCode
+                        # (XMP spec requires x-default language exist and be first in list)
+                        if ($oldLang eq 'x-default' and not ($newValueHash->{Value} or
+                            ($$tagInfo{LangCode} and $$tagInfo{LangCode} ne 'x-default')))
+                        {
+                            $delLang = 1;   # delete all languages
+                            $overwrite = 1; # force overwrite
+                        }
+                        if ($$tagInfo{LangCode} and not $delLang) {
+                            # only overwrite specified language
+                            next unless lc($$tagInfo{LangCode}) eq $oldLang;
+                        }
+                    }
                     if ($verbose > 1) {
                         my $grp = $exifTool->GetGroup($tagInfo, 1);
-                        $exifTool->VPrint(1, "    - $grp:$$tagInfo{Name} = '$val'\n");
+                        my $tagName = $$tagInfo{Name};
+                        $tagName =~ s/-$$tagInfo{LangCode}$// if $$tagInfo{LangCode};
+                        $tagName .= '-' . $$attrs{'xml:lang'} if $$attrs{'xml:lang'};
+                        $exifTool->VPrint(1, "    - $grp:$tagName = '$val'\n");
                     }
-                    # save attributes and path from this deleted property
+                    # save attributes and path from first deleted property
                     # so we can replace it exactly
-                    %attrs = %$attrs;
-                    $delPath = $path unless $delPath;
+                    unless ($delPath) {
+                        %attrs = %$attrs;
+                        $delPath = $path;
+                    }
                     delete $capture{$path};
                     ++$changed;
                 }
-                next unless $delPath or $$tagInfo{List};
+                next unless $delPath or $$tagInfo{List} or $oldLang;
                 if ($delPath) {
                     $path = $delPath;
                     $deleted = 1;
                 } else {
-                    # don't change tag if we couldn't delete old copy unless this is a list
-                    next unless $$tagInfo{List};
-                    # add to end of list (give it a large list index)
+                    # don't change tag if we couldn't delete old copy
+                    # unless this is a list or an lang-alt tag
+                    next unless $$tagInfo{List} or $oldLang;
                     $path =~ m/ (\d{3})/g or warn "Internal error: no list index!\n", next;
-                    my $listIndex = $1;
-                    my $pos = pos($path) - 3;
-                    for (;;) {
-                        substr($path, $pos, 3) = ++$listIndex;
-                        last unless $capture{$path};
-                    }
+                    $added = $1;
                 }
             } elsif ($path =~ m/ (\d{3})/g) {
+                $added = $1;
+            }
+            if (defined $added) {
                 # add to end of list
-                my $listIndex = $1;
                 my $pos = pos($path) - 3;
                 for (;;) {
-                    substr($path, $pos, 3) = ++$listIndex;
+                    substr($path, $pos, 3) = ++$added;
                     last unless $capture{$path};
                 }
             }
@@ -735,21 +765,32 @@ sub WriteXMP($$;$)
                             not defined $$newValueHash{Shift}));
 
         # don't add new values unless...
-            # ...tag existed before and was deleted
-        next unless $deleted or
-            # ...tag is List and it existed before or we are creating it
-            ($$tagInfo{List} and ($capList or $isCreating)) or
+            # ...tag existed before and was deleted, or we added it to a list
+        next unless $deleted or defined $added or
             # ...tag didn't exist before and we are creating it
             (not $capList and $isCreating);
 
-        # get list of new values (done if no new values specified)
+        # get list of new values (all done if no new values specified)
         my @newValues = Image::ExifTool::GetNewValues($newValueHash) or next;
 
-        # set default language attribute for lang-alt lists
-        # (currently on support changing the default language)
-        if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt') {
-            $attrs{'xml:lang'} = 'x-default';
+        # set language attribute for lang-alt lists
+        if ($writable eq 'lang-alt') {
+            $attrs{'xml:lang'} = $$tagInfo{LangCode} || 'x-default';
+            # must generate x-default entry as first entry if it didn't exist
+            unless ($capList or lc($attrs{'xml:lang'}) eq 'x-default') {
+                my $newValue = EscapeXML($newValues[0]);
+                $capture{$path} = [ $newValue, { %attrs, 'xml:lang' => 'x-default' } ];
+                if ($verbose > 1) {
+                    my $tagName = $$tagInfo{Name};
+                    $tagName =~ s/-$$tagInfo{LangCode}$/-x-default/;
+                    my $grp = $exifTool->GetGroup($tagInfo, 1);
+                    $exifTool->VPrint(1, "    + $grp:$tagName = '$newValue'\n");
+                }
+                $path =~ s/ 000/ 001/ or warn "Internal error: no list index!\n", next;
+            }
         }
+        
+        # add new value(s) to %capture hash
         for (;;) {
             my $newValue = EscapeXML(shift @newValues);
             $capture{$path} = [ $newValue, \%attrs ];
@@ -801,9 +842,11 @@ sub WriteXMP($$;$)
 
     # initialize current property path list
     my @curPropList;
-    my (%nsCur, $path, $prop, $n);
+    my (%nsCur, $prop, $n);
+    my @pathList = sort keys %capture;
 
-    foreach $path (sort keys %capture) {
+    while (@pathList) {
+        my $path = shift @pathList;
         my @propList = split('/',$path); # get property list
         # must open/close rdf:Description too
         unshift @propList, $rdfDesc;
@@ -825,7 +868,24 @@ sub WriteXMP($$;$)
             $newDesc = 1 unless $nsCur{$1};
         }
         my $closeTo = 0;
-        unless ($newDesc) {
+        if ($newDesc) {
+            # look forward to see if we will want to also open other namespaces
+            # (this is necessary to keep lists from being broken if a property
+            #  introduces a new namespace; plus it improves formatting)
+            my ($path2, $ns2);
+            foreach $path2 (@pathList) {
+                my @ns2s = ($path2 =~ m{(?:^|/)([^/]+?):}g);
+                my $opening = 0;
+                foreach $ns2 (@ns2s) {
+                    next if $ns2 eq 'rdf';
+                    $nsNew{$ns2} and ++$opening, next;
+                    last unless $opening and $nsURI{$ns2};
+                    # also open this namespace
+                    $nsNew{$ns2} = $nsURI{$ns2};
+                }
+                last unless $opening;
+            }
+        } else {
             # find first property where the current path differs from the new path
             for ($closeTo=0; $closeTo<@curPropList; ++$closeTo) {
                 last unless $closeTo < @propList;

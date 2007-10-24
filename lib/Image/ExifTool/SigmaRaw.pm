@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -90,6 +90,8 @@ sub ProcessX3FProperties($$$);
             A => 'Average',
         },
     },
+    AFAREA      => 'AFArea', # observed: CENTER_V
+    AFINFOCUS   => 'AFInFocus', # observed: H
     AFMODE      => 'FocusMode',
     AP_DESC     => 'ApertureDisplayed',
     APERTURE => {
@@ -103,6 +105,7 @@ sub ProcessX3FProperties($$$);
     CAMMODEL    => 'Model',
     CAMNAME     => 'CameraName',
     CAMSERIAL   => 'SerialNumber',
+    COLORSPACE  => 'ColorSpace', # observed: sRGB
     DRIVE => {
         Name => 'DriveMode',
         PrintConv => {
@@ -115,6 +118,7 @@ sub ProcessX3FProperties($$$);
             OFF    => 'Off',
         },
     },
+    EVAL_STATE  => 'EvalState', # observed: POST-EXPOSURE
     EXPCOMP => {
         Name => 'ExposureCompensation',
         Groups => { 2 => 'Image' },
@@ -136,6 +140,10 @@ sub ProcessX3FProperties($$$);
         Name => 'FlashMode',
         PrintConv => 'ucfirst(lc($val))',
     },
+    FLASHEXPCOMP=> 'FlashExpComp',
+    FLASHPOWER  => 'FlashPower',
+    FLASHTTLMODE=> 'FlashTTLMode', # observed: ON
+    FLASHTYPE   => 'FlashType', # observed: NONE
     FLENGTH => {
         Name => 'FocalLength',
         PrintConv => 'sprintf("%.1fmm",$val)',
@@ -187,6 +195,7 @@ sub ProcessX3FProperties($$$);
         PrintConv => '$self->ConvertDateTime($val)',
     },
     WB_DESC     => 'WhiteBalance',
+    VERSION_BF  => 'VersionBF',
 );
 
 #------------------------------------------------------------------------------
@@ -261,6 +270,7 @@ sub ProcessX3FProperties($$$)
     my $dataPt = $$dirInfo{DataPt};
     my $size = length($$dataPt);
     my $verbose = $exifTool->Options('Verbose');
+    my $unknown = $exifTool->Options('Unknown');
 
     unless ($size >= 24 and $$dataPt =~ /^SECp/) {
         $exifTool->Warn('Bad properties header');
@@ -284,6 +294,17 @@ sub ProcessX3FProperties($$$)
         }
         my $tag = ExtractUnicodeString($exifTool, \@chars, $namePos);
         my $val = ExtractUnicodeString($exifTool, \@chars, $valPos);
+        if (not $$tagTablePtr{$tag} and $unknown and $tag =~ /^\w+$/) {
+            my $tagInfo = {
+                Name => "SigmaRaw_$tag",
+                Description => Image::ExifTool::MakeDescription('SigmaRaw', $tag),
+                Unknown => 1,
+                Writable => 0,  # can't write unknown tags
+            };
+            # add tag information to table
+            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+        }
+        
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
             Index => $index,
             DataPt => $dataPt,

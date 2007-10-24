@@ -193,7 +193,8 @@ sub AddChunks($$)
             $exifTool->{TIFF_TYPE} = 'APP1';
             $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
             # use specified byte ordering or ordering from maker notes if set
-            my $byteOrder = $exifTool->Options('ByteOrder') || $exifTool->{MAKER_NOTE_BYTE_ORDER} || 'MM';
+            my $byteOrder = $exifTool->Options('ByteOrder') ||
+                $exifTool->GetNewValues('ExifByteOrder') || $exifTool->{MAKER_NOTE_BYTE_ORDER} || 'MM';
             unless (SetByteOrder($byteOrder)) {
                 warn "Invalid byte order '$byteOrder'\n";
                 $byteOrder = $exifTool->{MAKER_NOTE_BYTE_ORDER} || 'MM';

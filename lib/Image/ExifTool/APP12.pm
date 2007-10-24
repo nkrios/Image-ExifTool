@@ -4,19 +4,24 @@
 # Description:  Read APP12 meta information
 #
 # Revisions:    10/18/2005 - P. Harvey Created
+#
+# References:   1) Heinrich Giesen private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::APP12;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessAPP12($$$);
+sub ProcessDucky($$$);
+sub WriteDucky($$$);
 
 # APP12 tags (ref PH)
-%Image::ExifTool::APP12::Main = (
+%Image::ExifTool::APP12::PictureInfo = (
     PROCESS_PROC => \&ProcessAPP12,
     GROUPS => { 0 => 'APP12', 1 => 'PictureInfo', 2 => 'Image' },
     NOTES => q{
@@ -83,39 +88,161 @@ sub ProcessAPP12($$$);
 );
 
 # APP12 segment written in Photoshop "Save For Web" images
-# (from tests with Photoshop 7 files - PH)
+# (from tests with Photoshop 7 files - PH/1)
 %Image::ExifTool::APP12::Ducky = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 0 => 'APP12', 1 => 'Ducky', 2 => 'Image' },
-    FORMAT => 'int16s',
-    FIRST_ENTRY => 0,
+    PROCESS_PROC => \&ProcessDucky,
+    WRITE_PROC => \&WriteDucky,
+    GROUPS => { 0 => 'Ducky', 1 => 'Ducky', 2 => 'Image' },
+    WRITABLE => 'string',
     NOTES => q{
         Photoshop uses the JPEG APP12 "Ducky" segment to store some information in
         "Save for Web" images.
     },
-    # 0 = 1 in all my samples
-    # 1 = 4 in all my samples
-    # 2 = 0 in all my samples
-    3 => { #PH
+    1 => { #PH
         Name => 'Quality',
         Priority => 0,
+        Avoid => 1,
+        Writable => 'int32u',
+        ValueConv => 'unpack("N",$val)',    # 4-byte integer
+        ValueConvInv => 'pack("N",$val)',
         PrintConv => '"$val%"',
+        PrintConvInv => '$val=~/(\d+)/ ? $1 : undef',
     },
-    # 4 = 0 if no copyright string, 3 otherwise (maybe number of integers to follow?)
-    # ---- the following is only present if #4 above is 3 ----
-    # 5 = number of bytes in copyright string, including character count #7 and null terminator
-    # 6 = 0 in all my samples
-    # 7 = number of unicode characters in copyright string, excluding null terminator
-    8 => {
+    2 => { #1
+        Name => 'Comment',
+        Priority => 0,
+        Avoid => 1,
+        # (ignore 4-byte character count at start of value)
+        ValueConv => '$self->Unicode2Charset(substr($val,4),"MM")',
+        ValueConvInv => 'pack("N",length $val) . $self->Charset2Unicode($val,"MM")',
+    },
+    3 => { #PH
         Name => 'Copyright',
-        Format => 'undef[$size-16]',
+        Priority => 0,
+        Avoid => 1,
         Groups => { 2 => 'Author' },
-        ValueConv => '$self->Unicode2Charset($val)',
+        # (ignore 4-byte character count at start of value)
+        ValueConv => '$self->Unicode2Charset(substr($val,4),"MM")',
+        ValueConvInv => 'pack("N",length $val) . $self->Charset2Unicode($val,"MM")',
     },
 );
 
 #------------------------------------------------------------------------------
-# Process APP12 segment (ref PH)
+# Write APP12 Ducky segment
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: New directory data or undefined on error
+sub WriteDucky($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    $exifTool or return 1;    # allow dummy access to autoload this package
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = $$dirInfo{DirStart};
+    my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
+    my @addTags = sort { $a <=> $b } keys(%$newTags);
+    my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
+    my ($dirEnd, %doneTags);
+    if ($dataPt) {
+        $dirEnd = $pos + $$dirInfo{DirLen};
+    } else {
+        my $tmp = '';
+        $dataPt = \$tmp;
+        $pos = $dirEnd = 0;
+    }
+    my $newData = '';
+    SetByteOrder('MM');
+    # process all data blocks in Ducky segment
+    for (;;) {
+        my ($tag, $len, $val);
+        if ($pos + 4 <= $dirEnd) {
+            $tag = Get16u($dataPt, $pos);
+            $len = Get16u($dataPt, $pos + 2);
+            $pos += 4;
+            if ($pos + $len > $dirEnd) {
+                $exifTool->Warn('Invalid Ducky block length');
+                return undef;
+            }
+            $val = substr($$dataPt, $pos, $len);
+            $pos += $len;
+        } else {
+            last unless @addTags;
+            $tag = pop @addTags;
+            next if $doneTags{$tag};
+        }
+        $doneTags{$tag} = 1;
+        my $tagInfo = $$newTags{$tag};
+        if ($tagInfo) {
+            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+            my $isNew;
+            if (defined $val) {
+                if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
+                    if ($verbose > 1) {
+                        my $pval = $exifTool->Printable($val);
+                        print $out "    - Ducky:$$tagInfo{Name} = '$pval'\n";
+                    }
+                    $isNew = 1;
+                }
+            } else {
+                next unless Image::ExifTool::IsCreating($newValueHash);
+                $isNew = 1;
+            }
+            if ($isNew) {
+                $val = Image::ExifTool::GetNewValues($newValueHash);
+                ++$exifTool->{CHANGED};
+                next unless defined $val;   # next if tag is being deleted
+                if ($verbose > 1) {
+                    my $pval = $exifTool->Printable($val);
+                    print $out "    + Ducky:$$tagInfo{Name} = '$pval'\n";
+                }
+            }
+        }
+        $newData .= pack('nn', $tag, length $val) . $val;
+    }
+    $newData .= "\0\0" if length $newData;
+    return $newData;
+}
+
+#------------------------------------------------------------------------------
+# Process APP12 Ducky segment (ref PH)
+# Inputs: 0) ExifTool object reference, 1) Directory information ref, 2) tag table ref
+# Returns: 1 on success, 0 if this wasn't a recognized Ducky segment
+# Notes: This segment has the following format:
+#   1) 5 bytes: "Ducky"
+#   2) multiple data blocks (all integers are big endian):
+#      a) 2 bytes: block type (0=end, 1=Quality, 2=Comment, 3=Copyright)
+#      b) 2 bytes: block length (N)
+#      c) N bytes: block data
+sub ProcessDucky($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = $$dirInfo{DirStart};
+    my $dirEnd = $pos + $$dirInfo{DirLen};
+    SetByteOrder('MM');
+    # process all data blocks in Ducky segment
+    for (;;) {
+        last if $pos + 4 > $dirEnd;
+        my $tag = Get16u($dataPt, $pos);
+        my $len = Get16u($dataPt, $pos + 2);
+        $pos += 4;
+        if ($pos + $len > $dirEnd) {
+            $exifTool->Warn('Invalid Ducky block length');
+            last;
+        }
+        my $val = substr($$dataPt, $pos, $len);
+        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+            DataPt => $dataPt,
+            DataPos => $$dirInfo{DataPos},
+            Start => $pos,
+            Size => $len,
+        );
+        $pos += $len;
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Process APP12 Picture Info segment (ref PH)
 # Inputs: 0) ExifTool object reference, 1) Directory information ref, 2) tag table ref
 # Returns: 1 on success, 0 if this wasn't a recognized APP12
 sub ProcessAPP12($$$)
@@ -189,6 +316,10 @@ Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Heinrich Giesen for his help decoding APP12 "Ducky" information.
 
 =head1 SEE ALSO
 

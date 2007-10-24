@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>exiftool Application Documentation</title>
-<link rev="made" href="mailto:root@b19.apple.com" />
+<link rev="made" href="mailto:root@b05.apple.com" />
 </head>
 
 <body style="background-color: white">
@@ -71,29 +71,31 @@ supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
-  AI    r       MEF   r       PSD   r/w    |  GPS            r/w/c
-  AIFF  r       MIE   r/w/c   QTIF  r      |  IPTC           r/w/c
-  APE   r       MIFF  r       RA    r      |  XMP            r/w/c
-  ARW   r       MNG   r/w     RAF   r      |  MakerNotes     r/w/c
-  ASF   r       MOS   r/w     RAM   r      |  Photoshop IRB  r/w/c
-  AVI   r       MOV   r       RAW   r/w    |  ICC Profile    r/w/c
-  BMP   r       MP3   r       RIFF  r      |  MIE            r/w/c
-  CR2   r/w     MP4   r       RM    r      |  JFIF           r/w/c
-  CRW   r/w     MPC   r       SR2   r      |  CIFF           r/w
-  DCM   r       MPG   r       SRF   r      |  AFCP           r/w
-  DNG   r/w     MRW   r/w     SWF   r      |  DICOM          r
-  DOC   r       NEF   r/w     THM   r/w    |  FlashPix       r
-  EPS   r/w     OGG   r       TIFF  r/w    |  GeoTIFF        r
-  ERF   r/w     ORF   r/w     VRD   r/w    |  PrintIM        r
-  FLAC  r       PBM   r/w     WAV   r      |  ID3            r
-  FPX   r       PDF   r       WDP   r/w    |  Kodak Meta     r
-  GIF   r/w     PEF   r/w     WMA   r      |  Ricoh RMETA    r
-  HTML  r       PGM   r/w     WMV   r      |  Picture Info   r
-  ICC   r/w/c   PICT  r       X3F   r      |  Adobe APP14    r
-  JNG   r/w     PNG   r/w     XLS   r      |  APE            r
-  JP2   r       PPM   r/w     XMP   r/w/c  |  Vorbis         r
-  JPEG  r/w     PPT   r                    |  (and more)</pre>
+  ACR   r       JP2   r/w     PPT   r      |  EXIF           r/w/c
+  AI    r       JPEG  r/w     PS    r/w    |  GPS            r/w/c
+  AIFF  r       K25   r       PSD   r/w    |  IPTC           r/w/c
+  APE   r       M4A   r       QTIF  r      |  XMP            r/w/c
+  ARW   r       MEF   r/w     RA    r      |  MakerNotes     r/w/c
+  ASF   r       MIE   r/w/c   RAF   r      |  Photoshop IRB  r/w/c
+  AVI   r       MIFF  r       RAM   r      |  ICC Profile    r/w/c
+  BMP   r       MNG   r/w     RAW   r/w    |  MIE            r/w/c
+  BTF   r       MOS   r/w     RIFF  r      |  JFIF           r/w/c
+  CR2   r/w     MOV   r       RM    r      |  Ducky APP12    r/w/c
+  CRW   r/w     MP3   r       SR2   r      |  CIFF           r/w
+  CS1   r/w     MP4   r       SRF   r      |  AFCP           r/w
+  DCM   r       MPC   r       SWF   r      |  DICOM          r
+  DCR   r       MPG   r       THM   r/w    |  Flash          r
+  DNG   r/w     MRW   r/w     TIFF  r/w    |  FlashPix       r
+  DOC   r       NEF   r/w     VRD   r/w/c  |  GeoTIFF        r
+  EPS   r/w     OGG   r       WAV   r      |  PrintIM        r
+  ERF   r/w     ORF   r/w     WDP   r/w    |  ID3            r
+  FLAC  r       PBM   r/w     WMA   r      |  Kodak Meta     r
+  FLV   r       PDF   r       WMV   r      |  Ricoh RMETA    r
+  FPX   r       PEF   r/w     X3F   r      |  Picture Info   r
+  GIF   r/w     PGM   r/w     XLS   r      |  Adobe APP14    r
+  HTML  r       PICT  r       XMP   r/w/c  |  APE            r
+  ICC   r/w/c   PNG   r/w                  |  Vorbis         r
+  JNG   r/w     PPM   r/w                  |  (and more)</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are written.
 However, the <strong>-ext</strong> option may be used to force processing of files with
@@ -133,7 +135,8 @@ if used on the command line to prevent shell globbing.)</p>
 <dd>
 Exclude specified tag from extracted information.  Same as the <strong>-x</strong> option.
 May also be used following a <strong>-TagsFromFile</strong> option to exclude tags from
-being copied.
+being copied, or to exclude groups from being deleted when deleting all
+information (ie. <code>-all= --exif:all</code> deletes all but EXIF information).
 </dd>
 <p></p>
 <dt><strong><a name="item__2dtag_5b_2b_2d_5d_3d_5bvalue_5d"><strong>-</strong><em>TAG</em>[+-]<strong>=</strong>[<em>VALUE</em>]</a></strong><br />
@@ -147,7 +150,7 @@ add or remove entries from a list, or to shift date/time values (see
 <dd>
 <p>If a group name is not specified for <em>TAG</em>, then the information is written
 to the preferred group, which is the first group in the following list where
-<em>TAG</em> is valid:  1) EXIF, 2) GPS, 3) IPTC, 4) XMP, 5) MakerNotes.</p>
+<em>TAG</em> is valid:  1) EXIF, 2) IPTC, 3) XMP, 4) MakerNotes.</p>
 </dd>
 <dd>
 <p>The special <code>All</code> tag may be used in this syntax only if a <em>VALUE</em> is NOT
@@ -216,8 +219,10 @@ are suppressed.
 <dt><strong><a name="item__2db"><strong>-b</strong></a></strong><br />
 </dt>
 <dd>
-Output requested data in <strong>b</strong>inary format.  Mainly used for extracting
-embedded images.  Suppresses output of tag names and descriptions.
+Output requested data in <strong>b</strong>inary format without tag names or descriptions.
+This option is mainly used for extracting embedded images, but it may also
+be useful in separating values of list-type tags since a newline is used
+instead of a comma to separate these values in the <strong>-b</strong> output.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dc_fmt"><strong>-c</strong> <em>FMT</em></a></strong><br />
@@ -243,7 +248,8 @@ various formats:
 <dd>
 Set the format for <strong>d</strong>ate/time tag values.  Consult <code>strftime</code> man page
 for <em>FMT</em> syntax. The default format is equivalent to ``%Y:%m:%d %H:%M:%S''.
-This option has no effect on date-only or time-only tags.
+This option has no effect on date-only or time-only tags, and ignores
+timezone information if present.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dd"><strong>-D</strong></a></strong><br />
@@ -343,7 +349,8 @@ used together.  The verbose level controls the maximum length of the blocks
 dumped.  An <em>OFFSET</em> may be given to specify the base for displayed
 offsets.  If not provided, the EXIF/TIFF base offset is used.  Use
 <strong>-htmlDump0</strong> for absolute offsets.  Currently only EXIF and TIFF
-information is dumped.
+information is dumped, but the -u option can be used to give a raw hex dump
+of other file formats.
 </dd>
 <p></p>
 <dt><strong><a name="item__2di_dir"><strong>-i</strong> <em>DIR</em></a></strong><br />
@@ -397,7 +404,8 @@ Use <strong>l</strong>ong 2-line Canon-style output format.
 </dt>
 <dd>
 Convert 16-bit Unicode characters in output to Windows <strong>L</strong>atin1 (cp1252)
-instead of the default UTF-8.
+instead of the default UTF-8.  When writing, -L is used to specify that
+input text values are Latin1 instead of UTF-8.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dlist_2c__2dlistw_2c__2dlistf_2c__2dlistg_5bnum_"><strong>-list</strong>, <strong>-listw</strong>, <strong>-listf</strong>, <strong>-listg</strong>[<em>NUM</em>], <strong>-listd</strong></a></strong><br />
@@ -497,12 +505,12 @@ extra step results in slower performance, so the <strong>-overwrite_original</st
 option should be used instead unless necessary.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dp_fmtfile_or_expr"><strong>-p</strong> <em>FMTFILE</em> or <em>EXPR</em></a></strong><br />
+<dt><strong><a name="item__2dp_fmtfile_or_str"><strong>-p</strong> <em>FMTFILE</em> or <em>STR</em></a></strong><br />
 </dt>
 <dd>
-<strong>P</strong>rint output in the format specified by the given file or expression (and
-ignore other format options).  Tag names in the format file begin with a
-<code>$</code> symbol and may contain an optional group name.  Case is not
+<strong>P</strong>rint output in the format specified by the given file or string (and
+ignore other format options).  Tag names in the format file or string begin
+with a <code>$</code> symbol and may contain an optional group name.  Case is not
 significant.  Braces <code>{}</code> may be used around the tag name to separate it
 from subsequent text.  Use <code>$$</code> to represent a <code>$</code> symbol.  In the file,
 lines beginning with <code>#</code> are ignored. For example, this format file:
@@ -554,8 +562,16 @@ directory name.
 </dt>
 <dd>
 Print tag names instead of descriptions.  This is the <strong>s</strong>hort output
-format.  Add up to 3 <strong>-s</strong> options for even shorter formats.  Also effective
-when combined with <strong>-t</strong> or <strong>-h</strong> options.
+format.  Add up to 3 <strong>-s</strong> options for even shorter formats:
+</dd>
+<dd>
+<pre>
+    -s        - print tag names instead of descriptions
+    -s -s     - no extra spaces to column-align values
+    -s -s -s  - print values only</pre>
+</dd>
+<dd>
+<p>Also effective when combined with <strong>-t</strong> or <strong>-h</strong> options.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2ds"><strong>-S</strong></a></strong><br />
@@ -563,6 +579,14 @@ when combined with <strong>-t</strong> or <strong>-h</strong> options.
 <dd>
 Very <strong>s</strong>hort format.  The same as two <strong>-s</strong> options.  Extra spaces used
 to column-align values are not printed.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dscanforxmp"><strong>-ScanForXMP</strong></a></strong><br />
+</dt>
+<dd>
+Scan all files (even unrecognized formats) for XMP information unless found
+already.  When combined with the <strong>-fast</strong> option, only unrecognized file
+types are scanned.  Warning: It can be time consuming to scan large files.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dt"><strong>-t</strong></a></strong><br />
@@ -621,15 +645,15 @@ deleted from a list with arguments of the form
 &quot;'-<em>SRCTAG</em>-&gt;<em>DSTTAG</em>'&quot;.</p>
 </dd>
 <dd>
-<p>An extension of the redirection feature allows expressions involving tag
-names to be used on the right hand side of the <code>&lt;</code> symbol with the
-syntax &quot;'-<em>DSTTAG</em>&lt;<em>EXPR</em>'&quot;, where tag names in <em>EXPR</em>
-are prefixed with a <code>$</code> symbol.  See the <strong>-p</strong> option for more details
-about this syntax.  Expressions starting with a <code>=</code> sign must insert a
-single space after the <code>&lt;</code> to avoid confusion with the <code>&lt;=</code> syntax
-which would otherwise attempt to set the tag value from the contents of a
-file.  A single space at the start of an expression is removed if it exists,
-but all other whitespace is preserved.</p>
+<p>An extension of the redirection feature allows strings involving tag names
+to be used on the right hand side of the <code>&lt;</code> symbol with the syntax
+&quot;'-<em>DSTTAG</em>&lt;<em>STR</em>'&quot;, where tag names in <em>STR</em> are
+prefixed with a <code>$</code> symbol.  See the <strong>-p</strong> option for more details about
+this syntax.  Strings starting with a <code>=</code> sign must insert a single space
+after the <code>&lt;</code> to avoid confusion with the <code>&lt;=</code> syntax which would
+otherwise attempt to set the tag value from the contents of a file.  A
+single space at the start of the string is removed if it exists, but all
+other whitespace is preserved.</p>
 </dd>
 <dd>
 <p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples using <strong>-TagsFromFile</strong>.</p>
@@ -762,7 +786,7 @@ adding a decimal point to the modifier.  For example:</p>
     -w G%-lc.txt      # G.txt, G-b.txt, G-c.txt ...</pre>
 </dd>
 <dd>
-<p>The format codes may also be modified by 'l' or 'u' to specify lower or
+<p>All format codes may also be modified by 'l' or 'u' to specify lower or
 upper case respectively (ie. ``%le'' for a lower case file extension).  When
 used to modify the copy number, the numbers are changed to an alphabetical
 base (ie. as with ``%lc'' in the last example above).</p>
@@ -901,12 +925,19 @@ Print formatted date/time for all JPG files in a directory.
 Extract image resolution from EXIF IFD1 information (thumbnail image IFD).
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dxmp__2db_a_2ejpg__3e_xmp_2eout">exiftool -xmp -b a.jpg &gt; xmp.out</a></strong><br />
+<dt><strong><a name="item_exiftool__2dxmp__2db_a_2ejpg__3e_out_2exmp">exiftool -xmp -b a.jpg &gt; out.xmp</a></strong><br />
 </dt>
 <dd>
 Extract complete XMP data record intact from <code>a.jpg</code> and write it to
-<code>xmp.out</code> using the special <code>XMP</code> tag (see the Extra tags in
+<code>out.xmp</code> using the special <code>XMP</code> tag (see the Extra tags in
 <a href="TagNames/index.html">Image::ExifTool::TagNames</a>).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dicc_profile__2db__2dw_icc_image_2ejpg">exiftool -icc_profile -b -w icc image.jpg</a></strong><br />
+</dt>
+<dd>
+Save complete ICC_Profile from an image to an output file with the same name
+and an extension of <code>.icc</code>.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dhtmldump__2dw_tmp_2f_25f__25e_2ehtml_t">exiftool -htmldump -w tmp/%f_%e.html t/images</a></strong><br />
@@ -1027,12 +1058,12 @@ is provided as a shortcut for these three tags, allowing them to be accessed
 via a single tag.)
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dxmp_3acity_3dkingston_dst_2ejpg">exiftool -xmp:city=Kingston dst.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2dxmp_3acity_3dkingston_image1_2ejpg_ima">exiftool -xmp:city=Kingston image1.jpg image2.nef</a></strong><br />
 </dt>
 <dd>
-Write a tag to the XMP group (otherwise in this case the tag would get
-written to the IPTC group since <code>City</code> exists in both, and IPTC has
-priority).
+Write a tag to the XMP group of two images.  (Without the <code>xmp:</code> this tag
+would get written to the IPTC group since <code>City</code> exists in both, and IPTC
+is preferred by default.)
 </dd>
 <p></p>
 <dt><strong><a name="item_unknown">exiftool -LightSource-='Unknown (0)' dst.tiff</a></strong><br />
@@ -1057,6 +1088,12 @@ Create XMP meta information data files for all images in <code>dir</code>.
 </dt>
 <dd>
 Create an XMP data file only from tags defined on the command line.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__27_2dicc_profile_3c_3d_25d_25f_2eicc_27_">exiftool '-ICC_Profile&lt;=%d%f.icc' image.jpg</a></strong><br />
+</dt>
+<dd>
+Write ICC_Profile to an image from a <code>.icc</code> file of the same name.
 </dd>
 <p></p></dl>
 <p>
@@ -1170,6 +1207,12 @@ Add camera make to list of keywords.
 Set the Comment tag of all images in <code>dir</code> from the values of the EXIF:ISO
 and ShutterSpeed tags.  The resulting comment will be in the form ``ISO=100
 Exposure=1/60''.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ejpg__2dicc_profile_">exiftool -TagsFromFile src.jpg -icc_profile dst.jpg</a></strong><br />
+</dt>
+<dd>
+Copy ICC_Profile from one image to another.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dif__27_24jpgfromraw_27__2db__2djpgfrom">exiftool -if '$jpgfromraw' -b -jpgfromraw -w %d%f_%ue.jpg -execute

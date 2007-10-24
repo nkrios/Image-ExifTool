@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 #------------------------------------------------------------------------------
 # Read or write information in a PPM/PGM/PBM image
@@ -46,11 +46,11 @@ sub ProcessPPM($$)
         return 0 unless $buff =~ /^P([1-6])\s+/g;
         $num = $1;
         # note: may contain comments starting with '#'
-        if ($buff =~ /\G#/) {
+        if ($buff =~ /\G#/gc) {
             # must read more if we are in the middle of a comment
-            next unless $buff =~ /\G((#.*\n)*)\s*/g;
+            next unless $buff =~ /\G ?(.*\n(#.*\n)*)\s*/g;
             $info{Comment} = $1;
-            next if $buff =~ /\G#/;
+            next if $buff =~ /\G#/gc;
         } else {
             delete $info{Comment};
         }
@@ -59,11 +59,11 @@ sub ProcessPPM($$)
         $info{ImageHeight} = $2;
         $type = [qw{PPM PBM PGM}]->[$num % 3];
         last if $type eq 'PBM'; # (no MaxVal for PBM images)
-        if ($buff =~ /\G\s*#/) {
-            next unless $buff =~ /\G\s*((#.*\n)*)\s*/g;
+        if ($buff =~ /\G\s*#/gc) {
+            next unless $buff =~ /\G ?(.*\n(#.*\n)*)\s*/g;
             $info{Comment} = '' unless exists $info{Comment};
             $info{Comment} .= $1;
-            next if $buff =~ /\G#/;
+            next if $buff =~ /\G#/gc;
         }
         next unless $buff =~ /\G(\S+)\s/g;
         $info{MaxVal} = $1;

@@ -23,7 +23,7 @@ my %mapRawTag = (
     0x102a => 0x04, # CanonShotInfo
     0x102d => 0x01, # CanonCameraSettings
     0x1033 => 0x0f, # CanonCustomFunctions (only verified for 10D)
-    0x1038 => 0x12, # CanonPictureInfo
+    0x1038 => 0x12, # CanonAFInfo
     0x1039 => 0x13,
     0x1093 => 0x93,
     0x10a8 => 0xa8,
@@ -535,29 +535,30 @@ sub WriteCRW($$)
     my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
     my $success = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
 
+    my $trailPt;
     while ($success) {
         # check to see if trailer(s) exist(s)
         my $trailInfo = Image::ExifTool::IdentifyTrailer($raf) or last;
-        # delete all trailers if specified
-        if ($exifTool->{DEL_GROUP}->{Trailer}) {
-            $exifTool->VPrint(0,"  Deleting $$trailInfo{DirName} trailer\n");
-            ++$exifTool->{CHANGED};
-            last;
-        }
         # rewrite the trailer(s)
         $buff = '';
         $$trailInfo{OutFile} = \$buff;
         $success = $exifTool->ProcessTrailers($trailInfo) or last;
-        my $trailPt = $$trailInfo{OutFile};
-        my $len = length $$trailPt;
-        last if $len < 4;   # all done if trailers were deleted
-        # must update DirStart pointer at end of trailer for
-        my $newDirStart = Set32u($dirInfo{OutDirStart});
-        my $pad = ($len & 0x01) ? ' ' : ''; # add pad byte if necessary
-        Write($outfile, $pad, substr($$trailPt,0,$len-4), $newDirStart) or $err = 1;
+        $trailPt = $$trailInfo{OutFile};
+        # nothing to write if trailers were deleted
+        undef $trailPt if length($$trailPt) < 4;
         last;
     }
     if ($success) {
+        # add CanonVRD trailer if writing as a block
+        $trailPt = $exifTool->AddNewTrailers($trailPt,'CanonVRD');
+        # write trailer
+        if ($trailPt) {
+            # must append DirStart pointer to end of trailer
+            my $newDirStart = Set32u($dirInfo{OutDirStart});
+            my $len = length $$trailPt;
+            my $pad = ($len & 0x01) ? ' ' : ''; # add pad byte if necessary
+            Write($outfile, $pad, substr($$trailPt,0,$len-4), $newDirStart) or $err = 1;
+        }
         $rtnVal = $err ? -1 : 1;
     } else {
         $exifTool->Error('Error rewriting CRW file');

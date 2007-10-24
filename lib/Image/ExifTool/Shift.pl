@@ -39,15 +39,20 @@ sub ApplyShift($$$;$)
     SetWarning(undef);
 
     # shift is applied to ValueConv value, so we must ValueConv-Shift-ValueConvInv
-    my ($conv, $err);
-    foreach $conv ('ValueConv','Shift','ValueConvInv') {
-        if ($conv eq 'Shift') {
+    my ($type, $err);
+    foreach $type ('ValueConv','Shift','ValueConvInv') {
+        if ($type eq 'Shift') {
             #### eval ShiftXxx function
             $err = eval "Shift$func(\$val, \$shift, \$dir, \$shiftOffset)";
-        } elsif ($$tagInfo{$conv}) {
-            return "Can't handle $conv for $tag in ApplyShift()" if ref $$tagInfo{$conv};
-            #### eval ValueConv/ValueConvInv ($val, $self)
-            $val = eval $$tagInfo{$conv};
+        } elsif ($$tagInfo{$type}) {
+            my $conv = $$tagInfo{$type};
+            if (ref $conv eq 'CODE') {
+                $val = &$conv($val, $self);
+            } else {
+                return "Can't handle $type for $tag in ApplyShift()" if ref $$tagInfo{$type};
+                #### eval ValueConv/ValueConvInv ($val, $self)
+                $val = eval $$tagInfo{$type};
+            }
         } else {
             next;
         }
@@ -93,8 +98,8 @@ sub DaysInMonth($$)
     while ($mon > 12) { $mon -= 12; ++$year; }
     # return standard number of days unless february on a leap year
     return $days[$mon-1] unless $mon == 2 and not $year % 4;
-    # leap years don't occur on even centuries except at new millenia
-    return 29 if $year % 100 or not $year % 1000;
+    # leap years don't occur on even centuries except every 400 years
+    return 29 if $year % 100 or not $year % 400;
     return 28;
 }
 
@@ -542,7 +547,7 @@ designed to be very flexible in the way time shifts are specified and
 applied...
 
 The ability to shift dates by Y years, M months, etc, is somewhat
-contradictory with the goal of maintaining a constant shift for all time
+contradictory to the goal of maintaining a constant shift for all time
 values when applying a batch shift.  This is because shifting by 1 month can
 be equivalent to anything from 28 to 31 days, and 1 year can be 365 or 366
 days, depending on the starting date.

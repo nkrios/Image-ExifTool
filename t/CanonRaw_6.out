@@ -1,10 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
 [File, File, Image]  - File Name: CanonRaw_6_failed.cr2
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 11 kB
-[File, File, Time]  - File Modification Date/Time: 2007:03:21 11:07:45
+[File, File, Time]  - File Modification Date/Time: 2007:10:16 14:39:29
 [File, File, Image]  - File Type: CR2
 [File, File, Image]  - MIME Type: image/x-raw
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
 [EXIF, IFD0, Image] 256 - Image Width: 1536
 [EXIF, IFD0, Image] 257 - Image Height: 1024
 [EXIF, IFD0, Image] 258 - Bits Per Sample: 8 8 8
@@ -39,8 +40,8 @@
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2304
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
-[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3954.233
-[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3958.763
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3954.23341
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3958.762887
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
@@ -65,7 +66,7 @@
 [IPTC, IPTC, Other] 25 - Keywords: CR2 test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Normal
-[MakerNotes, Canon, Camera] 2 - Self-timer: 0
+[MakerNotes, Canon, Camera] 2 - Self-timer: Off
 [MakerNotes, Canon, Camera] 3 - Quality: RAW
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Single
@@ -92,6 +93,7 @@
 [MakerNotes, Canon, Camera] 36 - Zoom Source Width: 0
 [MakerNotes, Canon, Camera] 37 - Zoom Target Width: 0
 [MakerNotes, Canon, Camera] 40 - Photo Effect: Off
+[MakerNotes, Canon, Camera] 41 - Manual Flash Output: n/a
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
 [MakerNotes, Canon, Image] 0 - Focal Type: Zoom
 [MakerNotes, Canon, Image] 1 - Focal Length: 55mm
@@ -120,6 +122,7 @@
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
+[MakerNotes, Canon, Image] 33 - Flash Output: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS 350D DIGITAL
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware 1.0.2
 [MakerNotes, Canon, Camera] 9 - Owner Name: Phil Harvey
@@ -134,12 +137,17 @@
 [MakerNotes, CanonCustom, Camera] 7 - E-TTL II: Evaluative
 [MakerNotes, CanonCustom, Camera] 8 - Shutter Curtain Sync: 1st-curtain sync
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS Digital Rebel XT / 350D / Kiss Digital N
-[MakerNotes, Canon, Camera] 1 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 0 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 1 - Valid AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3456
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2304
-[MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3456
-[MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2304
-[MakerNotes, Canon, Camera] 22 - AF Points Used: Center
+[MakerNotes, Canon, Camera] 4 - AF Image Width: 3456
+[MakerNotes, Canon, Camera] 5 - AF Image Height: 2304
+[MakerNotes, Canon, Camera] 6 - AF Area Width: 189
+[MakerNotes, Canon, Camera] 7 - AF Area Height: 188
+[MakerNotes, Canon, Camera] 8 - AF Area X Positions: 0 -1237 -742 0 742 1237 0
+[MakerNotes, Canon, Camera] 9 - AF Area Y Positions: -617 0 0 0 0 0 617
+[MakerNotes, Canon, Camera] 10 - AF Points In Focus: 3
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 2
 [MakerNotes, Canon, Camera] 131 - Original Decision Data: 0
 [MakerNotes, Canon, Image] 1 - File Number: 100-0024
@@ -163,6 +171,7 @@
 [MakerNotes, Canon, Image] 11 - Digital Gain: 0
 [MakerNotes, Canon, Image] 12 - WB Shift AB: 0
 [MakerNotes, Canon, Image] 13 - WB Shift GM: 0
+[MakerNotes, Canon, Camera] 208 - VRD Offset: 0
 [MakerNotes, Canon, Image] 1 - Sensor Width: 3516
 [MakerNotes, Canon, Image] 2 - Sensor Height: 2328
 [MakerNotes, Canon, Image] 5 - Sensor Left Border: 52

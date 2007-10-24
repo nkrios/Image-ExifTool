@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.14';
+$VERSION = '1.19';
 
 sub WritePS($$);
 sub CheckPS($$$);
@@ -70,6 +70,13 @@ sub CheckPS($$$);
         Name => 'XMP',
         SubDirectory => {
             TagTable => 'Image::ExifTool::XMP::Main',
+        },
+    },
+    TIFFPreview => {
+        Binary => 1,
+        Notes => q{
+            not a real tag ID, but used to represent the TIFF preview extracted from DOS
+            EPS images
         },
     },
 );
@@ -205,10 +212,19 @@ sub ProcessPS($$)
 #
 # extract TIFF information from DOS header
 #
+    my $tagTablePtr = GetTagTable('Image::ExifTool::PostScript::Main');
     if ($dos) {
         my $base = Get32u(\$dos, 16);
         if ($base) {
             my $pos = $raf->Tell();
+            # extract the TIFF preview
+            my $len = Get32u(\$dos, 20);
+            my $val = $exifTool->ExtractBinary($base, $len, 'TIFFPreview');
+            if (defined $val and $val =~ /^(MM\0\x2a|II\x2a\0|Binary)/) {
+                $exifTool->HandleTag($tagTablePtr, 'TIFFPreview', $val);
+            } else {
+                $exifTool->Warn('Bad TIFF preview image');
+            }
             # extract information from TIFF in DOS header
             # (set Parent to '' to avoid setting FileType tag again)
             my %dirInfo = (
@@ -225,7 +241,6 @@ sub ProcessPS($$)
 # parse the postscript
 #
     my ($buff, $mode, $endToken);
-    my $tagTablePtr = GetTagTable('Image::ExifTool::PostScript::Main');
     my (@lines, $altnl);
     if ($/ eq "\x0d") {
         $altnl = "\x0a";
@@ -243,6 +258,11 @@ sub ProcessPS($$)
                 # split into separate lines
                 @lines = split /$altnl/, $data, -1;
                 $data = shift @lines;
+                if (@lines == 1 and $lines[0] eq $/) {
+                    # handle case of DOS newline data inside file using Unix newlines
+                    $data .= $lines[0];
+                    undef @lines;
+                }
             }
         }
         if ($mode) {
@@ -252,6 +272,8 @@ sub ProcessPS($$)
             } elsif ($data !~ /^$endToken/i) {
                 if ($mode eq 'XMP') {
                     $buff .= $data;
+                } elsif ($mode eq 'Document') {
+                    # ignore embedded documents 
                 } else {
                     # data is ASCII-hex encoded
                     $data =~ tr/0-9A-Fa-f//dc;  # remove all but hex characters
@@ -259,7 +281,7 @@ sub ProcessPS($$)
                 }
                 next;
             }
-        } elsif ($data =~ /^(%{1,2})(Begin)(_xml_packet|Photoshop|ICCProfile)/i) {
+        } elsif ($data =~ /^(%{1,2})(Begin)(_xml_packet|Photoshop|ICCProfile|Binary)/i) {
             # the beginning of a data block
             my %modeLookup = (
                 _xml_packet => 'XMP',
@@ -267,8 +289,16 @@ sub ProcessPS($$)
                 photoshop   => 'Photoshop',
             );
             $mode = $modeLookup{lc($3)};
+            unless ($mode or @lines) {
+                # skip binary data
+                $raf->Seek($1, 1) or last if $data =~ /^%{1,2}BeginBinary:\s*(\d+)/i;
+                next;
+            }
             $buff = '';
             $endToken = $1 . ($2 eq 'begin' ? 'end' : 'End') . $3;
+            next;
+        } elsif ($data =~ /^(%{1,2})(Begin)(Document)/i) {
+            $mode = 'Document';
             next;
         } elsif ($data =~ /^<\?xpacket begin=.{7,13}W5M0MpCehiHzreSzNTczkc9d/) {
             # pick up any stray XMP data
@@ -292,22 +322,24 @@ sub ProcessPS($$)
             next;
         }
         # extract information from buffered data
-        my %dirInfo = (
-            DataPt => \$buff,
-            DataLen => length $buff,
-            DirStart => 0,
-            DirLen => length $buff,
-            Parent => 'PostScript',
-        );
-        my $subTablePtr = GetTagTable("Image::ExifTool::${mode}::Main");
-        unless ($exifTool->ProcessDirectory(\%dirInfo, $subTablePtr)) {
-            $exifTool->Warn("Error processing $mode information in PostScript file");
+        if ($mode ne 'Document'){
+            my %dirInfo = (
+                DataPt => \$buff,
+                DataLen => length $buff,
+                DirStart => 0,
+            	DirLen => length $buff,
+            	Parent => 'PostScript',
+            );
+            my $subTablePtr = GetTagTable("Image::ExifTool::${mode}::Main");
+            unless ($exifTool->ProcessDirectory(\%dirInfo, $subTablePtr)) {
+                $exifTool->Warn("Error processing $mode information in PostScript file");
+            }
+            undef $buff;
         }
         undef $mode;
-        undef $buff;
     }
     $/ = $oldsep;   # restore original separator
-    $mode and PSErr($exifTool, "unterminated $mode data");
+    $mode and $mode ne 'Document' and PSErr($exifTool, "unterminated $mode data");
     return 1;
 }
 

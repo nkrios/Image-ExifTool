@@ -13,29 +13,31 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
-  AI    r       MEF   r       PSD   r/w    |  GPS            r/w/c
-  AIFF  r       MIE   r/w/c   QTIF  r      |  IPTC           r/w/c
-  APE   r       MIFF  r       RA    r      |  XMP            r/w/c
-  ARW   r       MNG   r/w     RAF   r      |  MakerNotes     r/w/c
-  ASF   r       MOS   r/w     RAM   r      |  Photoshop IRB  r/w/c
-  AVI   r       MOV   r       RAW   r/w    |  ICC Profile    r/w/c
-  BMP   r       MP3   r       RIFF  r      |  MIE            r/w/c
-  CR2   r/w     MP4   r       RM    r      |  JFIF           r/w/c
-  CRW   r/w     MPC   r       SR2   r      |  CIFF           r/w
-  DCM   r       MPG   r       SRF   r      |  AFCP           r/w
-  DNG   r/w     MRW   r/w     SWF   r      |  DICOM          r
-  DOC   r       NEF   r/w     THM   r/w    |  FlashPix       r
-  EPS   r/w     OGG   r       TIFF  r/w    |  GeoTIFF        r
-  ERF   r/w     ORF   r/w     VRD   r/w    |  PrintIM        r
-  FLAC  r       PBM   r/w     WAV   r      |  ID3            r
-  FPX   r       PDF   r       WDP   r/w    |  Kodak Meta     r
-  GIF   r/w     PEF   r/w     WMA   r      |  Ricoh RMETA    r
-  HTML  r       PGM   r/w     WMV   r      |  Picture Info   r
-  ICC   r/w/c   PICT  r       X3F   r      |  Adobe APP14    r
-  JNG   r/w     PNG   r/w     XLS   r      |  APE            r
-  JP2   r       PPM   r/w     XMP   r/w/c  |  Vorbis         r
-  JPEG  r/w     PPT   r                    |  (and more)
+  ACR   r       JP2   r/w     PPT   r      |  EXIF           r/w/c
+  AI    r       JPEG  r/w     PS    r/w    |  GPS            r/w/c
+  AIFF  r       K25   r       PSD   r/w    |  IPTC           r/w/c
+  APE   r       M4A   r       QTIF  r      |  XMP            r/w/c
+  ARW   r       MEF   r/w     RA    r      |  MakerNotes     r/w/c
+  ASF   r       MIE   r/w/c   RAF   r      |  Photoshop IRB  r/w/c
+  AVI   r       MIFF  r       RAM   r      |  ICC Profile    r/w/c
+  BMP   r       MNG   r/w     RAW   r/w    |  MIE            r/w/c
+  BTF   r       MOS   r/w     RIFF  r      |  JFIF           r/w/c
+  CR2   r/w     MOV   r       RM    r      |  Ducky APP12    r/w/c
+  CRW   r/w     MP3   r       SR2   r      |  CIFF           r/w
+  CS1   r/w     MP4   r       SRF   r      |  AFCP           r/w
+  DCM   r       MPC   r       SWF   r      |  DICOM          r
+  DCR   r       MPG   r       THM   r/w    |  Flash          r
+  DNG   r/w     MRW   r/w     TIFF  r/w    |  FlashPix       r
+  DOC   r       NEF   r/w     VRD   r/w/c  |  GeoTIFF        r
+  EPS   r/w     OGG   r       WAV   r      |  PrintIM        r
+  ERF   r/w     ORF   r/w     WDP   r/w    |  ID3            r
+  FLAC  r       PBM   r/w     WMA   r      |  Kodak Meta     r
+  FLV   r       PDF   r       WMV   r      |  Ricoh RMETA    r
+  FPX   r       PEF   r/w     X3F   r      |  Picture Info   r
+  GIF   r/w     PGM   r/w     XLS   r      |  Adobe APP14    r
+  HTML  r       PICT  r       XMP   r/w/c  |  APE            r
+  ICC   r/w/c   PNG   r/w                  |  Vorbis         r
+  JNG   r/w     PPM   r/w                  |  (and more)
 
 See html/index.html for more details about ExifTool features.
 

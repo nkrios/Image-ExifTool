@@ -25,6 +25,9 @@ they are initialized to '' instead of being deleted.</p>
 	writing (Note: entry may exist but be undefined for top-level
 	directory!)</td></tr>
 
+<tr><td>BASE</td><td>Absolute position of current image in containing file
+    (for example, when processing JPEG image in FujiFilm RAF file)</td></tr>
+
 <tr><td>CameraMake</td><td>Camera make set during reading and writing</td></tr>
 
 <tr><td>CameraModel</td><td>Camera model name set during reading and writing</td></tr>
@@ -107,6 +110,8 @@ they are initialized to '' instead of being deleted.</p>
 
 <tr><td>NO_LIST</td><td>Set if List tags shouldn't be accumulated into a list</td></tr>
 
+<tr><td>NO_UNKNOWN</td><td>Don't generate unknown tags automatically even if Unknown option is set</td></tr>
+
 <tr><td>NUM_FOUND</td><td>Number of tags found</td></tr>
 
 <tr><td>OPTIONS</td><td>ExifTool options</td></tr>
@@ -127,6 +132,9 @@ they are initialized to '' instead of being deleted.</p>
 <tr><td>PRIORITY</td><td>Hash of tag Priority values for current tag, keyed by tag name (not tag key!)</td></tr>
 
 <tr><td>PRIORITY_DIR</td><td>Name of priority IFD (ie. the IFD for the full resolution image)</td></tr>
+
+<tr><td>PROCESSED</td><td>Reference to hash of address/directory names which were processed
+    during reading and/or writing</td></tr>
 
 <tr><td>RAF</td><td>Random access file object for reading from input file</td></tr>
 

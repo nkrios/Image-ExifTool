@@ -1,10 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
 [File, File, Image]  - File Name: DNG.dng
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 13 kB
 [File, File, Time]  - File Modification Date/Time: 2006:02:26 09:30:53
 [File, File, Image]  - File Type: DNG
 [File, File, Image]  - MIME Type: image/x-raw
+[File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
 [EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
 [EXIF, IFD0, Image] 256 - Image Width: 8
 [EXIF, IFD0, Image] 257 - Image Height: 8
@@ -60,7 +61,7 @@
 [EXIF, SubIFD1, Image] 279 - Preview Image Length: 26
 [EXIF, SubIFD1, Image] 284 - Planar Configuration: Chunky
 [EXIF, SubIFD1, Image] 529 - Y Cb Cr Coefficients: 0.299 0.587 0.114
-[EXIF, SubIFD1, Image] 530 - Y Cb Cr Sub Sampling: YCbCr4:2:0
+[EXIF, SubIFD1, Image] 530 - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, SubIFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, SubIFD1, Image] 532 - Reference Black White: 0 255 128 255 128 255
 [EXIF, SubIFD2, Image] 254 - Subfile Type: Reduced-resolution image
@@ -75,7 +76,7 @@
 [EXIF, SubIFD2, Image] 279 - Jpg From Raw Length: 29
 [EXIF, SubIFD2, Image] 284 - Planar Configuration: Chunky
 [EXIF, SubIFD2, Image] 529 - Y Cb Cr Coefficients: 0.299 0.587 0.114
-[EXIF, SubIFD2, Image] 530 - Y Cb Cr Sub Sampling: YCbCr4:4:4
+[EXIF, SubIFD2, Image] 530 - Y Cb Cr Sub Sampling: YCbCr4:4:4 (1 1)
 [EXIF, SubIFD2, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, SubIFD2, Image] 532 - Reference Black White: 0 255 128 255 128 255
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/15
@@ -92,8 +93,8 @@
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Average
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 55.0mm
-[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3954.233
-[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3958.763
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3954.23341
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3958.762887
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
@@ -159,7 +160,7 @@
 [XMP, XMP-tiff, Image] Orientation - Orientation: Horizontal (normal)
 [XMP, XMP-dc, Other] Creator - Creator: unknown
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Normal
-[MakerNotes, Canon, Camera] 2 - Self-timer: 0
+[MakerNotes, Canon, Camera] 2 - Self-timer: Off
 [MakerNotes, Canon, Camera] 3 - Quality: RAW
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Single
@@ -186,6 +187,7 @@
 [MakerNotes, Canon, Camera] 36 - Zoom Source Width: 0
 [MakerNotes, Canon, Camera] 37 - Zoom Target Width: 0
 [MakerNotes, Canon, Camera] 40 - Photo Effect: Off
+[MakerNotes, Canon, Camera] 41 - Manual Flash Output: n/a
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
 [MakerNotes, Canon, Image] 0 - Focal Type: Zoom
 [MakerNotes, Canon, Image] 1 - Focal Length: 55mm
@@ -214,6 +216,7 @@
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self-timer 2: 0
+[MakerNotes, Canon, Image] 33 - Flash Output: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS 350D DIGITAL
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware 1.0.2
 [MakerNotes, Canon, Camera] 9 - Owner Name: unknown
@@ -228,12 +231,17 @@
 [MakerNotes, CanonCustom, Camera] 7 - E-TTL II: Evaluative
 [MakerNotes, CanonCustom, Camera] 8 - Shutter Curtain Sync: 1st-curtain sync
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS Digital Rebel XT / 350D / Kiss Digital N
-[MakerNotes, Canon, Camera] 1 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 0 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 1 - Valid AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3456
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2304
-[MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3456
-[MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2304
-[MakerNotes, Canon, Camera] 22 - AF Points Used: Center
+[MakerNotes, Canon, Camera] 4 - AF Image Width: 3456
+[MakerNotes, Canon, Camera] 5 - AF Image Height: 2304
+[MakerNotes, Canon, Camera] 6 - AF Area Width: 189
+[MakerNotes, Canon, Camera] 7 - AF Area Height: 188
+[MakerNotes, Canon, Camera] 8 - AF Area X Positions: 0 -1237 -742 0 742 1237 0
+[MakerNotes, Canon, Camera] 9 - AF Area Y Positions: -617 0 0 0 0 0 617
+[MakerNotes, Canon, Camera] 10 - AF Points In Focus: 3
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 2
 [MakerNotes, Canon, Camera] 131 - Original Decision Data: 0
 [MakerNotes, Canon, Image] 1 - File Number: 100-0024
@@ -257,6 +265,7 @@
 [MakerNotes, Canon, Image] 11 - Digital Gain: 0
 [MakerNotes, Canon, Image] 12 - WB Shift AB: 0
 [MakerNotes, Canon, Image] 13 - WB Shift GM: 0
+[MakerNotes, Canon, Camera] 208 - VRD Offset: 0
 [MakerNotes, Canon, Image] 1 - Sensor Width: 3516
 [MakerNotes, Canon, Image] 2 - Sensor Height: 2328
 [MakerNotes, Canon, Image] 5 - Sensor Left Border: 52

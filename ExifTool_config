@@ -12,7 +12,7 @@
 #               with a new tag.
 #
 #               To activate this file, rename it to ".ExifTool_config" and
-#               place it in your home directory or the application script
+#               place it in your home directory or the exiftool application
 #               directory.  This causes ExifTool to automatically load the file
 #               when run.  Your home directory is determined by the first
 #               defined of the following environment variables:
@@ -139,11 +139,13 @@ use Image::ExifTool::MIE;
             # remove the extension from FileName
             ValueConv => '$val[0] =~ /(.*)\./ ? $1 : $val[0]',
         },
+        # the following example demonstrates simplifications which may be
+        # used if only one tag is Require'd or Desire'd:
+        # 1) the Require/Desire lookup may be replaced with a simple tag name
+        # 2) "$val" may be used to represent "$val[0]" in the expression
         Extension => {
-            Require => {
-                0 => 'FileName',
-            },
-            ValueConv => '$val[0]=~/\.([^.]*)$/; $1',
+            Require => 'FileName',
+            ValueConv => '$val=~/\.([^.]*)$/; $1',
         },
         # override CircleOfConfusion tag to use D/1750 instead of D/1440
         CircleOfConfusion => {

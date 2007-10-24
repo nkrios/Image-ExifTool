@@ -14,12 +14,12 @@ package Image::ExifTool::Real;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
+use Image::ExifTool::Canon;
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessRealMeta($$$);
 sub ProcessRealProperties($$$);
-sub ProcessSerialData($$$);
 
 # Real property types (ref PH)
 my %propertyType = (
@@ -87,7 +87,7 @@ my %metadataFlag = (
 
 %Image::ExifTool::Real::Properties = (
     GROUPS => { 1 => 'Real-PROP', 2 => 'Video' },
-    PROCESS_PROC => \&ProcessSerialData,
+    PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
     FORMAT => 'int32u',
     0  => 'MaxBitRate',
     1  => 'AvgBitRate',
@@ -113,7 +113,7 @@ my %metadataFlag = (
 
 %Image::ExifTool::Real::MediaProps = (
     GROUPS => { 1 => 'Real-MDPR', 2 => 'Video' },
-    PROCESS_PROC => \&ProcessSerialData,
+    PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
     FORMAT => 'int32u',
     PRIORITY => 0,  # first stream takes priority
     0  => { Name => 'StreamNumber',  Format => 'int16u' },
@@ -233,7 +233,7 @@ my %metadataFlag = (
 
 %Image::ExifTool::Real::ContentDescr = (
     GROUPS => { 1 => 'Real-CONT', 2 => 'Video' },
-    PROCESS_PROC => \&ProcessSerialData,
+    PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
     FORMAT => 'int16u',
     0 => { Name => 'TitleLen',      Unknown => 1 },
     1 => { Name => 'Title',         Format => 'string[$val{0}]' },
@@ -266,7 +266,7 @@ my %metadataFlag = (
 
 %Image::ExifTool::Real::AudioV3 = (
     GROUPS => { 1 => 'Real-RA3', 2 => 'Audio' },
-    PROCESS_PROC => \&ProcessSerialData,
+    PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
     FORMAT => 'int8u',
     0  => { Name => 'Channels',       Format => 'int16u' },
     1  => { Name => 'Unknown',        Format => 'int16u[3]', Unknown => 1 },
@@ -284,7 +284,7 @@ my %metadataFlag = (
 
 %Image::ExifTool::Real::AudioV4 = (
     GROUPS => { 1 => 'Real-RA4', 2 => 'Audio' },
-    PROCESS_PROC => \&ProcessSerialData,
+    PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
     FORMAT => 'int16u',
     0  => { Name => 'FourCC1',        Format => 'undef[4]', Unknown => 1 },
     1  => { Name => 'AudioFileSize',  Format => 'int32u',   Unknown => 1 },
@@ -321,7 +321,7 @@ my %metadataFlag = (
 
 %Image::ExifTool::Real::AudioV5 = (
     GROUPS => { 1 => 'Real-RA5', 2 => 'Audio' },
-    PROCESS_PROC => \&ProcessSerialData,
+    PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
     FORMAT => 'int16u',
     0  => { Name => 'FourCC1',        Format => 'undef[4]', Unknown => 1 },
     1  => { Name => 'AudioFileSize',  Format => 'int32u',   Unknown => 1 },
@@ -342,91 +342,6 @@ my %metadataFlag = (
     16 => { Name => 'Genr',           Format => 'int32u',   Unknown => 1 },
     17 => { Name => 'FourCC3',        Format => 'undef[4]', Unknown => 1 },
 );
-
-#------------------------------------------------------------------------------
-# process a serial stream of binary data
-# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
-# Returns: 1 on success
-# Notes: The tagID's for serial stream tags are consecutive indices beginning
-#        at 0, and the corresponding values must be contiguous in memory.
-#        "Unknown" tags must be used to skip padding or unknown values.
-sub ProcessSerialData($$$)
-{
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $dataPt = $$dirInfo{DataPt};
-    my $offset = $$dirInfo{DirStart};
-    my $size = $$dirInfo{DirLen};
-    my $base = $$dirInfo{Base} || 0;
-    my $verbose = $exifTool->Options('Verbose');
-    my $dataPos = $$dirInfo{DataPos} || 0;
-
-    # temporarily set Unknown option so GetTagInfo() will return unknown tags
-    my $unknown = $exifTool->Options(Unknown => 1);
-
-    $verbose and $exifTool->VerboseDir('SerialData', undef, $size);
-
-    # get default format ('int8u' unless specified)
-    my $defaultFormat = $$tagTablePtr{FORMAT} || 'int8u';
-
-    my ($index, %val);
-    my $pos = 0;
-    for ($index=0; $$tagTablePtr{$index} and $pos <= $size; ++$index) {
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $index) or last;
-        # don't process tags that fail a condition
-        last unless $tagInfo eq $$tagTablePtr{$index};
-        my $format = $$tagInfo{Format};
-        my $count = 1;
-        if ($format) {
-            if ($format =~ /(.*)\[(.*)\]/) {
-                $format = $1;
-                $count = $2;
-                # evaluate count to allow count to be based on previous values
-                #### eval Format (%val, $size)
-                $count = eval $count;
-                $@ and warn("Format $$tagInfo{Name}: $@"), last;
-            } elsif ($format eq 'string') {
-                # allow string with no specified count to run to end of block
-                $count = ($size > $pos) ? $size - $pos : 0;
-            }
-        } else {
-            $format = $defaultFormat;
-        }
-        my $len = (Image::ExifTool::FormatSize($format) || 1) * $count;
-        last if $pos + $len > $size;
-        my $val = ReadValue($dataPt, $pos+$offset, $format, $count, $size-$pos);
-        last unless defined $val;
-        if ($verbose) {
-            $exifTool->VerboseInfo($index, $tagInfo,
-                Index  => $index,
-                Table  => $tagTablePtr,
-                Value  => $val,
-                DataPt => $dataPt,
-                Size   => $len,
-                Start  => $pos+$offset,
-                Addr   => $pos+$offset+$base+$dataPos,
-                Format => $format,
-                Count  => $count,
-            );
-        }
-        $val{$index} = $val;
-        if ($$tagInfo{SubDirectory}) {
-            my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-            my %dirInfo = (
-                DataPt => \$val,
-                DataPos => $dataPos + $pos,
-                DirStart => 0,
-                DirLen => length($val),
-            );
-            $exifTool->ProcessDirectory(\%dirInfo, $subTablePtr);
-        } elsif (not $$tagInfo{Unknown} or $unknown) {
-            # don't extract zero-length information
-            $exifTool->FoundTag($tagInfo, $val) if $count;
-        }
-        $pos += $len;
-    }
-    $exifTool->Options(Unknown => $unknown);    # restore Unknown option
-    return 1;
-}
 
 #------------------------------------------------------------------------------
 # Process Real NameValueProperties

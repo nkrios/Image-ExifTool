@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -938,6 +938,17 @@ sub ProcessIPTC($$$)
         my $dirCount = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
         $exifTool->{DIR_COUNT}->{IPTC} = $dirCount;
         $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
+    }
+    # quick check for improperly byte-swapped IPTC
+    if ($dirLen >= 4 and substr($$dataPt, $pos, 1) ne "\x1c" and
+                         substr($$dataPt, $pos + 3, 1) eq "\x1c")
+    {
+        $exifTool->Warn('IPTC data was improperly byte-swapped');
+        my $newData = pack('N*', unpack('V*', substr($$dataPt, $pos, $dirLen) . "\0\0\0"));
+        $dataPt = \$newData;
+        $pos = 0;
+        $dirEnd = $pos + $dirLen;
+        # NOTE: MUST NOT access $dirInfo DataPt, DirStart or DataLen after this!
     }
     while ($pos + 5 <= $dirEnd) {
         my $buff = substr($$dataPt, $pos, 5);

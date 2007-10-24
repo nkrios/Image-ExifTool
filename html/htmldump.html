@@ -171,7 +171,7 @@ t[79] = "IFD1-05 ThumbnailOffset\nTag ID: 0x0201\nFormat: int32u[1]\nSize: 4 byt
 t[80] = "IFD1-06 ThumbnailLength\nTag ID: 0x0202\nFormat: int32u[1]\nSize: 4 bytes\nValue: 28";
 t[81] = "IFD1-07 YCbCrPositioning\nTag ID: 0x0213\nFormat: int16u[1]\nSize: 2 bytes\nValue: 2";
 t[82] = "Next IFD\nIFD2 offset: 0x0000\n(4 bytes)";
-t[83] = "ThumbnailImage data\n(28 bytes)";
+t[83] = "(IFD1:Thumbnail data)\nSize: 28 bytes";
 t[84] = "[JPEG Image Data]\n(247 bytes)";
 t[85] = "JPEG EOI\n(2 bytes)";
 
@@ -191,16 +191,14 @@ double-referenced blocks are <a name=XC class=V>red</a> or
 indicates the value is referenced by an offset in the IFD (ie. the value is
 longer than 4 bytes), and a <a name=XD class=F>purple</a> name indicates
 that the actual offset differs from the recorded offset.  All data in the maker
-notes value block is <a name=XE class='W M'>underlined</a>. Note that in TIFF
-images, image data appears as <a name=XB class=U>[unused]</a>, and is only
-dumped if it occurs before the meta information.</span></p>
+notes value block is <a name=XE class='W M'>underlined</a>.</span></p>
 
 <p>Currently, only TIFF/EXIF and JPEG meta information is dumped.  By default,
 all offsets are relative to the start of the TIFF header (as below).  For a TIFF
 image this is at the start of the file, but for a JPEG image it is 6 bytes into
-the data of the APP1 EXIF segment.  However, this base offset can be specified
-on the command line with '-htmlDump#' (ie. '-htmlDump0' for absolute offsets),
-or via the API with the 'HtmlDumpBase' option.</p>
+the APP1 EXIF segment.  However, this base offset can be specified on the
+command line with '-htmlDump#' (ie. '-htmlDump0' for absolute offsets), or via
+the API with the 'HtmlDumpBase' option.</p>
 
 <noscript><b class=V>--&gt;
 Enable JavaScript for active highlighting and information tool tips!
@@ -615,7 +613,7 @@ DDDDDDDDDDDDDD..
 <a name=t81 class=Y>IFD1-07 YCbCrPositioning</a>
 <a name=t82 class=W>Next IFD</a>
 <a name=t76 class=Y>XResolution value</a> <a name=t77 class=W>YResolution value</a>
-<a name=t83 class=Y>ThumbnailImage data</a>
+<a name=t83 class=Y>(Thumbnail data)</a>
 <a name=t84 class=U>[JPEG Image Data]</a>
 
 

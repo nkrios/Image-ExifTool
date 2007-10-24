@@ -614,8 +614,13 @@ sub WritePS($$)
                         } else {
                             $raf->ReadLine($data) or undef($data), last;
                             $dos and CheckPSEnd($raf, $psEnd, $data);
-                            # split line if it contains other newline sequences
-                            SplitLine(\$data, \@lines) if $data =~ /$altnl/;
+                            if ($data =~ /[\x0d\x0a]%%EOF\b/g) {
+                                # split data before "%%EOF"
+                                # (necessary if data contains other newline sequences)
+                                my $pos = pos($data) - 5;
+                                push @lines, substr($data, $pos);
+                                $data = substr($data, 0, $pos);
+                            }
                         }
                         last if $data =~ /^%%EOF\b/;
                     }

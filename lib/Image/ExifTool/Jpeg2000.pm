@@ -4,6 +4,7 @@
 # Description:  Read JPEG 2000 meta information
 #
 # Revisions:    02/11/2005 - P. Harvey Created
+#               06/22/2007 - PH Added write support (EXIF, IPTC and XMP only)
 #
 # References:   1) http://www.jpeg.org/public/fcd15444-2.pdf
 #               2) ftp://ftp.remotesensing.org/jpeg2000/fcd15444-1.pdf
@@ -15,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.10';
+$VERSION = '1.12';
 
 sub ProcessJpeg2000Box($$$);
 
@@ -32,10 +33,42 @@ my %resolutionUnit = (
      6 => 'um',
 );
 
+# map of where information is written in JPEG2000 image
+my %jp2Map = (
+    IPTC         => 'UUID-IPTC',
+    IFD0         => 'UUID-EXIF',
+    XMP          => 'UUID-XMP',
+  # jp2h         => 'JP2',  (not yet functional)
+  # ICC_Profile  => 'jp2h', (not yet functional)
+    IFD1         => 'IFD0',
+    EXIF         => 'IFD0', # to write EXIF as a block
+    ExifIFD      => 'IFD0',
+    GPS          => 'IFD0',
+    SubIFD       => 'IFD0',
+    GlobParamIFD => 'IFD0',
+    PrintIM      => 'IFD0',
+    InteropIFD   => 'ExifIFD',
+    MakerNotes   => 'ExifIFD',
+);
+
+# UUID's for writable UUID directories (by tag name)
+my %uuid = (
+    'UUID-EXIF'   => 'JpgTiffExif->JP2',
+    'UUID-IPTC'   => "\x33\xc7\xa4\xd2\xb8\x1d\x47\x23\xa0\xba\xf1\xa3\xe0\x97\xad\x38",
+    'UUID-XMP'    => "\xbe\x7a\xcf\xcb\x97\xa9\x42\xe8\x9c\x71\x99\x94\x91\xe3\xaf\xac",
+  # (can't yet write GeoJP2 information)
+  # 'UUID-GeoJP2' => "\xb1\x4b\xf8\xbd\x08\x3d\x4b\x43\xa5\xae\x8c\xd7\xd5\xa6\xce\x03",
+);
+
 # JPEG 2000 "box" (ie. segment) names
 %Image::ExifTool::Jpeg2000::Main = (
     GROUPS => { 2 => 'Image' },
     PROCESS_PROC => \&ProcessJpeg2000Box,
+    WRITE_PROC => \&ProcessJpeg2000Box,
+    NOTES => q{
+        The tags below are extracted from JPEG 2000 images, however ExifTool
+        currently writes only EXIF, IPTC and XMP tags in these images.
+    },
    'jP  ' => 'JP2Signature', # (ref 1)
    "jP\x1a\x1a" => 'JP2Signature', # (ref 2)
     prfl => 'Profile',
@@ -69,7 +102,7 @@ my %resolutionUnit = (
                 ValueConv => 'unpack("x3N", $val)',
                 PrintConv => {
                     16 => 'sRGB',
-                    17 => 'Greyscale',
+                    17 => 'Grayscale',
                     18 => 'sYCC',
                 },
             },
@@ -152,12 +185,20 @@ my %resolutionUnit = (
     },
     uuid => [
         {
-            Name => 'UUID-GeoJP2',
-            # ref http://www.remotesensing.org/jpeg2000/
-            Condition => '$$valPt=~/^\xb1\x4b\xf8\xbd\x08\x3d\x4b\x43\xa5\xae\x8c\xd7\xd5\xa6\xce\x03/',
+            Name => 'UUID-EXIF',
+            Condition => '$$valPt=~/^JpgTiffExif->JP2/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Exif::Main',
                 ProcessProc => \&Image::ExifTool::ProcessTIFF,
+                WriteProc => \&Image::ExifTool::WriteTIFF,
+                Start => '$valuePtr + 16',
+            },
+        },
+        {
+            Name => 'UUID-IPTC',
+            Condition => '$$valPt=~/^\x33\xc7\xa4\xd2\xb8\x1d\x47\x23\xa0\xba\xf1\xa3\xe0\x97\xad\x38/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::IPTC::Main',
                 Start => '$valuePtr + 16',
             },
         },
@@ -167,6 +208,16 @@ my %resolutionUnit = (
             Condition => '$$valPt=~/^\xbe\x7a\xcf\xcb\x97\xa9\x42\xe8\x9c\x71\x99\x94\x91\xe3\xaf\xac/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::XMP::Main',
+                Start => '$valuePtr + 16',
+            },
+        },
+        {
+            Name => 'UUID-GeoJP2',
+            # ref http://www.remotesensing.org/jpeg2000/
+            Condition => '$$valPt=~/^\xb1\x4b\xf8\xbd\x08\x3d\x4b\x43\xa5\xae\x8c\xd7\xd5\xa6\xce\x03/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Exif::Main',
+                ProcessProc => \&Image::ExifTool::ProcessTIFF,
                 Start => '$valuePtr + 16',
             },
         },
@@ -274,9 +325,43 @@ my %resolutionUnit = (
 );
 
 #------------------------------------------------------------------------------
+# Create new JPEG 2000 boxes when writing
+# (Currently only supports adding certain UUID boxes)
+# Inputs: 0) ExifTool object ref, 1) Output file or scalar ref
+# Returns: 1 on success
+sub CreateNewBoxes($$)
+{
+    my ($exifTool, $outfile) = @_;
+    my $addDirs = $$exifTool{AddJp2Dirs};
+    delete $$exifTool{AddJp2Dirs};
+    my $dirName;
+    foreach $dirName (sort keys %$addDirs) {
+        next unless $uuid{$dirName};
+        my $tagInfo;
+        foreach $tagInfo (@{$Image::ExifTool::Jpeg2000::Main{uuid}}) {
+            next unless $$tagInfo{Name} eq $dirName;
+            my $subdir = $$tagInfo{SubDirectory};
+            my $tagTable = GetTagTable($$subdir{TagTable});
+            my %dirInfo = (
+                DirName => $dirName,
+                Parent => 'JP2',
+            );
+            my $newdir = $exifTool->WriteDirectory(\%dirInfo, $tagTable, $$subdir{WriteProc});
+            if (defined $newdir and length $newdir) {
+                my $boxhdr = pack('N', length($newdir) + 24) . 'uuid' . $uuid{$dirName};
+                Write($outfile, $boxhdr, $newdir) or return 0;
+                last;
+            }
+        }
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
 # Process JPEG 2000 box
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference, 2) Pointer to tag table
-# Returns: 1 on success
+# Returns: 1 on success when reading, or -1 on write error
+#          (or JP2 box or undef when writing from buffer)
 sub ProcessJpeg2000Box($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -286,51 +371,106 @@ sub ProcessJpeg2000Box($$$)
     my $dirLen = $$dirInfo{DirLen} || 0;
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $raf = $$dirInfo{RAF};
-    my $verbose = $exifTool->{OPTIONS}->{Verbose};
+    my $outfile = $$dirInfo{OutFile};
     my $dirEnd = $dirStart + $dirLen;
+    my ($err, $outBuff, $verbose);
 
+    if ($outfile) {
+        unless ($raf) {
+            # buffer output to be used for return value
+            $outBuff = '';
+            $outfile = \$outBuff;
+        }
+    } else {
+        # (must not set verbose flag when writing!)
+        $verbose = $exifTool->{OPTIONS}->{Verbose};
+    }
     # loop through all contained boxes
     my ($pos, $boxLen);
     for ($pos=$dirStart; ; $pos+=$boxLen) {
         my ($boxID, $buff, $valuePtr);
         if ($raf) {
             $dataPos = $raf->Tell();
-            $raf->Read($buff,8) == 8 or last;
+            my $n = $raf->Read($buff,8);
+            unless ($n == 8) {
+                $n and $err = '', last;
+                if ($outfile) {
+                    CreateNewBoxes($exifTool, $outfile) or $err = 1;
+                }
+                last;
+            }
             $dataPt = \$buff;
             $dirLen = 8;
             $pos = 0;
-        } else {
-            last if $pos >= $dirEnd - 8;
+        } elsif ($pos >= $dirEnd - 8) {
+            $err = '' unless $pos == $dirEnd;
+            last;
         }
         $boxLen = unpack("x$pos N",$$dataPt);
         $boxID = substr($$dataPt, $pos+4, 4);
         $pos += 8;
         if ($boxLen == 1) {
-            return 0 if $pos < $dirLen - 8 and not $raf;
-            $exifTool->Warn("Can't currently handle huge JPEG 2000 boxes");
-            last;   # can't currently handle huge boxes
+            if (not $raf and $pos < $dirLen - 8) {
+                $err = 'JPEG 2000 format error';
+            } else {
+                $err = "Can't currently handle huge JPEG 2000 boxes";
+            }
+            last;
         } elsif ($boxLen == 0) {
-            last if $raf;   # don't read the rest from file
+            if ($raf) {
+                if ($outfile) {
+                    CreateNewBoxes($exifTool, $outfile) or $err = 1;
+                    # copy over the rest of the file
+                    Write($outfile, $$dataPt) or $err = 1;
+                    while ($raf->Read($buff, 65536)) {
+                        Write($outfile, $buff) or $err = 1;
+                    }
+                }
+                last;   # (ignore the rest of the file when reading)
+            }
             $boxLen = $dirLen - $pos;
         } else {
             $boxLen -= 8;
         }
-        return 0 if $boxLen < 0;
+        $boxLen < 0 and $err = 'Invalid JPEG 2000 box length', last;
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID);
+        unless (defined $tagInfo or $verbose) {
+            # no need to process this box
+            if ($raf) {
+                if ($outfile) {
+                    Write($outfile, $$dataPt) or $err = 1;
+                    $raf->Read($buff,$boxLen) == $boxLen or $err = '', last;
+                    Write($outfile, $buff) or $err = 1;
+                } else {
+                    $raf->Seek($boxLen, 1) or $err = 'Seek error', last;
+                }
+            } elsif ($outfile) {
+                Write($outfile, substr($$dataPt, $pos-8, $boxLen+8)) or $err = '', last;
+            }
+            next;
+        }
         if ($raf) {
             # read the box data
             $dataPos = $raf->Tell();
-            $raf->Read($buff,$boxLen);
+            $raf->Read($buff,$boxLen) == $boxLen or $err = '', last;
             $valuePtr = 0;
             $dataLen = $boxLen;
+        } elsif ($boxLen + $pos > $dirStart + $dirLen) {
+            $err = '';
+            last;
         } else {
-            return 0 if $boxLen + $pos > $dirStart + $dirLen;
             $valuePtr = $pos;
         }
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID);
         if (defined $tagInfo and not $tagInfo) {
             # GetTagInfo() required the value for a Condition
             my $tmpVal = substr($$dataPt, $valuePtr, $boxLen < 48 ? $boxLen : 48);
             $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID, \$tmpVal);
+        }
+        # delete all UUID boxes if deleting all information
+        if ($outfile and $boxID eq 'uuid' and $exifTool->{DEL_GROUP}->{'*'}) {
+            $exifTool->VPrint(0, "  Deleting $$tagInfo{Name}\n");
+            ++$exifTool->{CHANGED};
+            next;
         }
         if ($verbose) {
             $exifTool->VerboseInfo($boxID, $tagInfo,
@@ -339,8 +479,8 @@ sub ProcessJpeg2000Box($$$)
                 Size   => $boxLen,
                 Start  => $valuePtr,
             );
+            next unless $tagInfo;
         }
-        next unless $tagInfo;
         if ($$tagInfo{SubDirectory}) {
             my $subdir = $$tagInfo{SubDirectory};
             my $subdirStart = $valuePtr;
@@ -348,51 +488,94 @@ sub ProcessJpeg2000Box($$$)
                 #### eval Start ($valuePtr)
                 $subdirStart = eval($$subdir{Start});
             }
+            my $subdirLen = $boxLen - ($subdirStart - $valuePtr);
             my %subdirInfo = (
                 Parent => 'JP2',
                 DataPt => $dataPt,
                 DataPos => $dataPos,
                 DataLen => $dataLen,
                 DirStart => $subdirStart,
-                DirLen => $boxLen - ($subdirStart - $valuePtr),
+                DirLen => $subdirLen,
                 DirName => $$tagInfo{Name},
+                OutFile => $outfile,
                 Base => $dataPos + $subdirStart,
             );
             my $subTable = GetTagTable($$subdir{TagTable}) || $tagTablePtr;
-            my $ok = $exifTool->ProcessDirectory(\%subdirInfo, $subTable, $$subdir{ProcessProc});
-            unless ($ok) {
-                return 0 if $subTable eq $tagTablePtr;
-                $exifTool->Warn("Unrecognized $$tagInfo{Name} box");
+            if ($outfile) {
+                # remove this directory from our create list
+                delete $exifTool->{AddJp2Dirs}->{$$tagInfo{Name}};
+                my $newdir;
+                # only edit writable UUID boxes
+                if ($uuid{$$tagInfo{Name}}) {
+                    $newdir = $exifTool->WriteDirectory(\%subdirInfo, $subTable, $$subdir{WriteProc});
+                    next if defined $newdir and not length $newdir; # next if deleting the box
+                }
+                # use old box data if not changed
+                defined $newdir or $newdir = substr($$dataPt, $subdirStart, $subdirLen);
+                my $prefixLen = $subdirStart - $valuePtr;
+                my $boxhdr = pack('N', length($newdir) + 8 + $prefixLen) . $boxID;
+                $boxhdr .= substr($$dataPt, $valuePtr, $prefixLen) if $prefixLen;
+                Write($outfile, $boxhdr, $newdir) or $err = 1;
+            } elsif (not $exifTool->ProcessDirectory(\%subdirInfo, $subTable, $$subdir{ProcessProc})) {
+                if ($subTable eq $tagTablePtr) {
+                    $err = 'JPEG 2000 format error';
+                } else {
+                    $err = "Unrecognized $$tagInfo{Name} box";
+                }
+                last;
             }
-        } elsif ($$tagInfo{Format}) {
+        } elsif ($$tagInfo{Format} and not $outfile) {
             # only save tag values if Format was specified
             my $val = ReadValue($dataPt, $valuePtr, $$tagInfo{Format}, undef, $boxLen);
             $exifTool->FoundTag($tagInfo, $val) if defined $val;
+        } elsif ($outfile) {
+            my $boxhdr = pack('N', $boxLen + 8) . $boxID;
+            Write($outfile, $boxhdr, substr($$dataPt, $valuePtr, $boxLen)) or $err = 1;
         }
     }
+    if (defined $err) {
+        $err or $err = 'Truncated JPEG 2000 box';
+        if ($outfile) {
+            $exifTool->Error($err) unless $err eq '1';
+            return $raf ? -1 : undef;
+        }
+        $exifTool->Warn($err);
+    }
+    return $outBuff if $outfile and not $raf;
     return 1;
 }
 
 #------------------------------------------------------------------------------
-# Extract meta information from a JPEG 2000 image
+# Read/write meta information from a JPEG 2000 image
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
-# Returns: 1 on success, 0 if this wasn't a valid JPEG 2000 file
+# Returns: 1 on success, 0 if this wasn't a valid JPEG 2000 file, or -1 on write error
 sub ProcessJP2($$)
 {
     my ($exifTool, $dirInfo) = @_;
-    my $hdr;
     my $raf = $$dirInfo{RAF};
+    my $outfile = $$dirInfo{OutFile};
     my $rtnVal = 0;
+    my $hdr;
 
     # check to be sure this is a valid JPG2000 file
     return 0 unless $raf->Read($hdr,12) == 12;
     return 0 unless $hdr eq "\x00\x00\x00\x0cjP  \x0d\x0a\x87\x0a" or     # (ref 1)
                     $hdr eq "\x00\x00\x00\x0cjP\x1a\x1a\x0d\x0a\x87\x0a"; # (ref 2)
-    $exifTool->SetFileType();
+
+    if ($outfile) {
+        Write($outfile, $hdr) or return -1;
+        $exifTool->InitWriteDirs(\%jp2Map);
+        # save list of directories to create
+        my %addDirs = %{$$exifTool{ADD_DIRS}};
+        $$exifTool{AddJp2Dirs} = \%addDirs;
+    } else {
+        $exifTool->SetFileType();
+    }
     SetByteOrder('MM'); # JPEG 2000 files are big-endian
     my %dirInfo = (
         RAF => $raf,
         DirName => 'JP2',
+        OutFile => $$dirInfo{OutFile},
     );
     my $tagTablePtr = GetTagTable('Image::ExifTool::Jpeg2000::Main');
     return $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
@@ -414,13 +597,6 @@ This module is used by Image::ExifTool
 
 This module contains routines required by Image::ExifTool to read JPEG 2000
 files.
-
-=head1 NOTES
-
-The JPEG 2000 code should be considered experimental, because I haven't
-found many JPEG 2000 images to test it on.  If you have any images that
-aren't decoded properly, please send them to me so I can improve the JPEG
-2000 support.  Thanks.
 
 =head1 AUTHOR
 

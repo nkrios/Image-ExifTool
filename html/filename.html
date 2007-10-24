@@ -214,7 +214,7 @@ page for details.</p>
 <p>Note that ExifTool file name format codes may be used inside a date format
 string when a date/time tag is used to set the value of the <b>FileName</b> or
 <b>Directory</b> tags via the command-line interface.  In this case, an extra
-<code>%</code> must be added to pass the format code through the date/time
+'<code>%</code>' must be added to pass the format code through the date/time
 parser:</p>
 <blockquote><table>
 <tr><th>%%d</th><td>- original file directory</td></tr>
@@ -222,6 +222,10 @@ parser:</p>
 <tr><th>%%e</th><td>- original file extension</td></tr>
 <tr><th>%%c</th><td>- copy number (output files only)</td></tr>
 </table></blockquote>
+<p>See the
+<a href="exiftool_pod.html#item__2dw_ext_or_fmt">-w option</a> in the exiftool
+application documentation for details about special features available with
+these name format codes.</p>
 <hr>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>

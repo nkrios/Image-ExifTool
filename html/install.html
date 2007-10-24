@@ -113,7 +113,7 @@ to your Desktop.
     cd Image-ExifTool-#.##
     sudo cp -r exiftool lib /usr/bin
 </pre>
-where "<code>#.##</code>" is replaced with the version number of ExifTool you downloaded.
+where "<code>#.##</code>" is the version number of the ExifTool you downloaded.
 <br><span class='lt'>(Note: The last step above will require you to enter your
 password.)</span></li>
 </ol>
@@ -122,7 +122,7 @@ password.)</span></li>
 <p><span class='lt'>(Note: The OS X installations above place exiftool and its
 "lib" directory in /usr/bin, while the standard Unix "make install" described
 below puts exiftool in /usr/bin and the individual libraries in
-/Library/Perl/#.#.#, where "#.#.#" is the Perl version.  If both sets of
+/Library/Perl/#.#.#, where "#.#.#" is your Perl version.  If both sets of
 libraries exist, /usr/bin/lib takes precedence for exiftool, but
 /Library/Perl/#.## is the default for any other Perl scripts.)</span></p>
 
@@ -133,13 +133,13 @@ libraries exist, /usr/bin/lib takes precedence for exiftool, but
 <li><b>Download</b> the <b>Image-ExifTool distribution</b> from the <a href="index.html">ExifTool home page</a>
 <br><span class='lt'>(The file you download will have a name like "<code>Image-ExifTool-#.##.tar.gz</code>".)</span></li>
 <li>Change to the download directory (with "<code>cd <i>DIR</i></code>"), and <b>type the following</b>:
-<pre class='code'>    tar -xzf Image-ExifTool-#.##.tar.gz
+<pre class='code'>    gzip -dc Image-ExifTool-#.##.tar.gz | tar -xf -
     cd Image-ExifTool-#.##
     perl Makefile.PL
     make test
     sudo make install
 </pre>
-where "<code>#.##</code>" is replaced with the version number of ExifTool you downloaded.
+where "<code>#.##</code>" is the version number of the ExifTool you downloaded.
 <br><span class='lt'>(Note: The last step above will require you to enter your
 password.  The "<code>make test</code>" step is not required, but useful because
 it runs a full suite of tests to validate that ExifTool is working properly on

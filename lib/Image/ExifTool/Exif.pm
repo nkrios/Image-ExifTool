@@ -33,7 +33,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.36';
+$VERSION = '2.42';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -43,13 +43,14 @@ sub EncodeExifText($$);
 sub ValidateIFD($;$);
 
 # byte sizes for the various EXIF format types below
-@formatSize = (0,1,1,2,4,8,1,1,2,4,8,4,8,4);
+@formatSize = (undef,1,1,2,4,8,1,1,2,4,8,4,8,4,undef,undef,8,8,8);
 
 @formatName = (
-    'err','int8u','string','int16u',
-    'int32u','rational64u','int8s','undef',
-    'int16s','int32s','rational64s','float',
-    'double', 'ifd'
+    undef, 'int8u', 'string', 'int16u',
+    'int32u', 'rational64u', 'int8s', 'undef',
+    'int16s', 'int32s', 'rational64s', 'float',
+    'double', 'ifd', undef, undef, # (14 is unicode, 15 is complex? http://remotesensing.org/libtiff/bigtiffdesign.html)
+    'int64u', 'int64s', 'ifd8', # (new BigTIFF formats)
 );
 
 # hash to look up EXIF format numbers by name
@@ -69,6 +70,9 @@ sub ValidateIFD($;$);
     'float'         => 11,  # FLOAT
     'double'        => 12,  # DOUBLE
     'ifd'           => 13,  # IFD (with int32u format)
+    'int64u'        => 16,  # LONG8 [BigTIFF]
+    'int64s'        => 17,  # SLONG8 [BigTIFF]
+    'ifd8'          => 18,  # IFD8 (with int64u format) [BigTIFF]
 );
 
 # EXIF LightSource PrintConv values
@@ -107,6 +111,7 @@ sub ValidateIFD($;$);
     9 => 'JBIG B&W', #3
     10 => 'JBIG Color', #3
     32766 => 'Next', #3
+    32769 => 'Epson ERF Compressed', #PH
     32771 => 'CCIRLEW', #3
     32773 => 'PackBits',
     32809 => 'Thunderscan', #3
@@ -122,7 +127,10 @@ sub ValidateIFD($;$);
     34676 => 'SGILog', #3
     34677 => 'SGILog24', #3
     34712 => 'JPEG 2000', #3
-    34713 => 'Nikon NEF Compressed',
+    34713 => 'Nikon NEF Compressed', #PH
+    65000 => 'Kodak DCR Compressed', #PH
+    65535 => 'Pentax PEF Compressed', #Jens
+    
 );
 
 %photometricInterpretation = (
@@ -726,12 +734,12 @@ my %longBin = (
     0x212 => {
         Name => 'YCbCrSubSampling',
         PrintConv => {
-            '1 1' => 'YCbCr4:4:4', #PH
-            '2 1' => 'YCbCr4:2:2', #6
-            '2 2' => 'YCbCr4:2:0', #6
-            '4 1' => 'YCbCr4:1:1', #6
-            '4 2' => 'YCbCr4:1:0', #PH
-            '1 2' => 'YCbCr4:4:0', #PH
+            '1 1' => 'YCbCr4:4:4 (1 1)', #PH
+            '2 1' => 'YCbCr4:2:2 (2 1)', #6
+            '2 2' => 'YCbCr4:2:0 (2 2)', #6
+            '4 1' => 'YCbCr4:1:1 (4 1)', #6
+            '4 2' => 'YCbCr4:1:0 (4 2)', #PH
+            '1 2' => 'YCbCr4:4:0 (1 2)', #PH
         },
         Priority => 0,
     },
@@ -1569,8 +1577,8 @@ my %longBin = (
             Flags => 'SubIFD',
             Format => 'int32u',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Sony::SR2Private',
                 DirName => 'SR2Private',
+                TagTable => 'Image::ExifTool::Sony::SR2Private',
                 Start => '$val',
             },
         },
@@ -1638,14 +1646,20 @@ my %longBin = (
     0xc68e => 'MaskedAreas',
     0xc68f => {
         Name => 'AsShotICCProfile',
+        Binary => 1,
+        Writable => 'undef', # must be defined here so tag will be extracted if specified
         SubDirectory => {
+            DirName => 'AsShotICCProfile',
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
         },
     },
     0xc690 => 'AsShotPreProfileMatrix',
     0xc691 => {
         Name => 'CurrentICCProfile',
+        Binary => 1,
+        Writable => 'undef', # must be defined here so tag will be extracted if specified
         SubDirectory => {
+            DirName => 'CurrentICCProfile',
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
         },
     },
@@ -1749,10 +1763,8 @@ my %longBin = (
             D/1440, where D is the focal plane diagonal in mm
         },
         Groups => { 2 => 'Camera' },
-        Require => {
-            0 => 'ScaleFactor35efl',
-        },
-        ValueConv => 'sqrt(24*24+36*36) / ($val[0] * 1440)',
+        Require => 'ScaleFactor35efl',
+        ValueConv => 'sqrt(24*24+36*36) / ($val * 1440)',
         PrintConv => 'sprintf("%.3f mm",$val)',
     },
     HyperfocalDistance => {
@@ -1804,14 +1816,12 @@ my %longBin = (
         ValueConv => '"$val[0] $val[1]"',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    # set the original date/time from DateTimeCreated if not set already
+    # create DateTimeOriginal from DateTimeCreated if not set already
     DateTimeOriginal => {
         Condition => 'not defined($oldVal)',
         Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
-        Require => {
-            0 => 'DateTimeCreated',
-        },
+        Require => 'DateTimeCreated',
         ValueConv => '$val[0]',
         PrintConv => '$prt[0]',
     },
@@ -1860,7 +1870,6 @@ my %longBin = (
             return undef if defined $val[2] and not $val[2];
             return Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],'PreviewImage');
         },
-        ValueConvInv => '$val',
     },
     JpgFromRaw => {
         Writable => 1,
@@ -1874,7 +1883,6 @@ my %longBin = (
             1 => 'JpgFromRawLength',
         },
         RawConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"JpgFromRaw")',
-        ValueConvInv => '$val',
     },
     OtherImage => {
         Require => {
@@ -1922,9 +1930,10 @@ my %longBin = (
             1 => 'WB_RGBGLevels',
             2 => 'WB_RBGGLevels',
             3 => 'WB_GRBGLevels',
-            4 => 'WB_RBLevels',
-            5 => 'WB_RedLevel',
-            6 => 'WB_GreenLevel',
+            4 => 'WB_GRGBLevels',
+            5 => 'WB_RBLevels',
+            6 => 'WBRedLevel',
+            7 => 'WBGreenLevel',
         },
         ValueConv => 'Image::ExifTool::Exif::RedBlueBalance(0,@val)',
         PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
@@ -1936,9 +1945,10 @@ my %longBin = (
             1 => 'WB_RGBGLevels',
             2 => 'WB_RBGGLevels',
             3 => 'WB_GRBGLevels',
-            4 => 'WB_RBLevels',
-            5 => 'WB_BlueLevel',
-            6 => 'WB_GreenLevel',
+            4 => 'WB_GRGBLevels',
+            5 => 'WB_RBLevels',
+            6 => 'WBBlueLevel',
+            7 => 'WBGreenLevel',
         },
         ValueConv => 'Image::ExifTool::Exif::RedBlueBalance(1,@val)',
         PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
@@ -2153,13 +2163,14 @@ sub ConvertParameter($)
 
 #------------------------------------------------------------------------------
 # Calculate Red/BlueBalance
-# Inputs: 0) 0=red, 1=blue, 1-5) WB_RGGB/RGBG/RBGG/GRBG/RBLevels,
-#         6) red or blue level, 7) green level
+# Inputs: 0) 0=red, 1=blue, 1-6) WB_RGGB/RGBG/RBGG/GRBG/GRGB/RBLevels,
+#         7) red or blue level, 8) green level
 my @rggbLookup = (
     [ 0, 1, 2, 3 ], # RGGB
     [ 0, 1, 3, 2 ], # RGBG
     [ 0, 2, 3, 1 ], # RBGG
     [ 1, 0, 3, 2 ], # GRBG
+    [ 1, 0, 2, 3 ], # GRGB
     [ 0, 256, 256, 1 ], # RB (green level is 256)
 );
 sub RedBlueBalance($@)
@@ -2279,7 +2290,6 @@ sub ExtractImage($$$$)
         $image = $exifTool->ExtractBinary($offset, $len, $tag);
         return undef unless defined $image;
     }
-    $exifTool->HtmlDump($offset, $len, "$tag data", undef, 8);
     return $exifTool->ValidateImage(\$image, $tag);
 }
 
@@ -2379,7 +2389,6 @@ sub ProcessExif($$$)
             my $hdrLen = $dirStart + $dataPos + $base - $makerAddr;
             $exifTool->HtmlDump($makerAddr, $hdrLen, "MakerNotes header", $name) if $hdrLen > 0;
         }
-        my $str = "$name entry count";
         $exifTool->HtmlDump($dirStart + $dataPos + $base, 2, "$name entries",
                  "Entry count: $numEntries");
         my $tip;
@@ -2400,13 +2409,14 @@ sub ProcessExif($$$)
         my $count = Get32u($dataPt, $entry+4);
         if ($format < 1 or $format > 13) {
             $exifTool->HtmlDump($entry+$dataPos+$base,12,"[invalid IFD entry]",
-                     "Bad format value: $format", 1);
+                     "Bad format type: $format", 1);
             # warn unless the IFD was just padded with zeros
             $format and $exifTool->Warn(
                 sprintf("Unknown format ($format) for $dirName tag 0x%x",$tagID));
             return 0 unless $index; # assume corrupted IFD if this is our first entry
             next;
         }
+        my $formatStr = $formatName[$format];   # get name of this format
         my $size = $count * $formatSize[$format];
         my $valueDataPt = $dataPt;
         my $valueDataPos = $dataPos;
@@ -2454,7 +2464,7 @@ sub ProcessExif($$$)
                     if ($tagInfo) {
                         $tagStr = $$tagInfo{Name};
                     } elsif (defined $tagInfo) {
-                        my $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \ '');
+                        my $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \ '', $formatStr, $count);
                         $tagStr = $$tmpInfo{Name} if $tmpInfo;
                     }
                     $tagStr or $tagStr = sprintf("tag 0x%x",$tagID);
@@ -2480,7 +2490,6 @@ sub ProcessExif($$$)
                 }
             }
         }
-        my $formatStr = $formatName[$format];   # get name of this format
         # treat single unknown byte as int8u
         $formatStr = 'int8u' if $format == 7 and $count == 1;
 
@@ -2508,7 +2517,7 @@ sub ProcessExif($$$)
         if (defined $tagInfo and not $tagInfo) {
             # GetTagInfo() required the value for a Condition
             my $tmpVal = substr($$valueDataPt, $valuePtr, $size < 48 ? $size : 48);
-            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$tmpVal);
+            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$tmpVal, $formatStr, $count);
         }
         # override EXIF format if specified
         my $origFormStr;
@@ -2802,9 +2811,9 @@ sub ProcessExif($$$)
                 if ($doMaker and $doMaker eq '2') {
                     # extract maker notes without rebuilding (no fixup information)
                     delete $exifTool->{MAKER_NOTE_FIXUP};
-                } else {
-                    # this is a pain, but we must rebuild maker notes to include
-                    # all the value data if data was outside the maker notes
+                } elsif (not $$tagInfo{NotIFD}) {
+                    # this is a pain, but we must rebuild EXIF-typemaker notes to
+                    # include all the value data if data was outside the maker notes
                     my %makerDirInfo = (
                         Name       => $tagStr,
                         Base       => $base,
@@ -2837,6 +2846,7 @@ sub ProcessExif($$$)
         # convert to absolute offsets if this tag is an offset
         if ($$tagInfo{IsOffset}) {
             my $offsetBase = $$tagInfo{IsOffset} eq '2' ? $firstBase : $base;
+            $offsetBase += $$exifTool{BASE};
             my @vals = split(' ',$val);
             foreach $val (@vals) {
                 $val += $offsetBase;

@@ -1,12 +1,17 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
 [File, File, Image]  - File Name: IPTC-XMP.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 20 kB
 [File, File, Time]  - File Modification Date/Time: 2005:12:31 16:05:50
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 100
-[File, File, Image]  - Image Height: 80
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image] ImageWidth - Image Width: 100
+[File, File, Image] ImageHeight - Image Height: 80
+[File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
+[File, File, Image] BitsPerSample - Bits Per Sample: 8
+[File, File, Image] ColorComponents - Color Components: 3
+[File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:4:4 (1 1)
 [JFIF, JFIF, Image] 0 - JFIF Version: 1.2
 [JFIF, JFIF, Image] 2 - Resolution Unit: inches
 [JFIF, JFIF, Image] 3 - X Resolution: 72
@@ -142,7 +147,7 @@
 [ICC_Profile, ICC-meas, Image] 8 - Measurement Observer: CIE 1931
 [ICC_Profile, ICC-meas, Image] 12 - Measurement Backing: 0 0 0
 [ICC_Profile, ICC-meas, Image] 24 - Measurement Geometry: Unknown (0)
-[ICC_Profile, ICC-meas, Image] 28 - Measurement Flare: 0.999 %
+[ICC_Profile, ICC-meas, Image] 28 - Measurement Flare: 0.999%
 [ICC_Profile, ICC-meas, Image] 32 - Measurement Illuminant: D65
 [ICC_Profile, ICC_Profile, Image] tech - Technology: Cathode Ray Tube Display
 [ICC_Profile, ICC_Profile, Image] rTRC - Red Tone Reproduction Curve: (Binary data 2060 bytes)

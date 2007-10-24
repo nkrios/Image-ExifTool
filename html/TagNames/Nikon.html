@@ -360,10 +360,10 @@
 <td>HighISONoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
-  <br>1 = On for ISO 1600/3200
-  <br>2 = Weak
+  <br>1 = Minimal
+  <br>2 = Low
   <br>4 = Normal
-  <br>6 = Strong</span></td></tr>
+  <br>6 = High</span></td></tr>
 <tr class=b>
 <td>0x0e00</td>
 <td>PrintIM</td>
@@ -412,6 +412,7 @@
   <br>9 = JBIG B&amp;W
   <br>10 = JBIG Color
   <br>32766 = Next
+  <br>32769 = Epson ERF Compressed
   <br>32771 = CCIRLEW
   <br>32773 = PackBits
   <br>32809 = Thunderscan
@@ -427,7 +428,9 @@
   <br>34676 = SGILog
   <br>34677 = SGILog24
   <br>34712 = JPEG 2000
-  <br>34713 = Nikon NEF Compressed</span></td></tr>
+  <br>34713 = Nikon NEF Compressed
+  <br>65000 = Kodak DCR Compressed
+  <br>65535 = Pentax PEF Compressed</span></td></tr>
 <tr class=b>
 <td>0x011a</td>
 <td>XResolution</td>
@@ -497,7 +500,7 @@
   <br>10 = Far Right</span></td></tr>
 <tr>
 <td class=r>2</td>
-<td>AFPointsUsed</td>
+<td>AFPointsInFocus</td>
 <td class=c>int16u</td>
 <td><span class=s>Bit 0 = Center
   <br>Bit 1 = Top
@@ -513,7 +516,8 @@
 </table></td></tr></table></blockquote>
 
 <h2><a name='ShotInfo'>Nikon ShotInfo Tags</a></h2>
-<p>This information is encrypted for ShotInfoVersion 02xx.</p>
+<p>This information is encrypted for ShotInfoVersion 02xx, and some tags are
+only valid for specific versions.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -528,26 +532,66 @@
 <td class=r>102</td>
 <td>VR_0x66?</td>
 <td class=c>N</td>
-<td><span class=s>0 = VR off
-  <br>1 = VR on (normal)
-  <br>2 = VR on (active)</span></td></tr>
+<td><span class=s><span class=n>(D2X, D2Xs (unverified))</span>
+  <br>0 = Off
+  <br>1 = On (normal)
+  <br>2 = On (active)</span></td></tr>
 <tr>
 <td class=r>106</td>
 <td>ShutterCount</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(D2X, D2Xs)</span></span></td></tr>
 <tr class=b>
 <td class=r>110</td>
 <td>DeletedImageCount</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(D2X, D2Xs)</span></span></td></tr>
 <tr>
-<td class=r>130</td>
-<td>VR_0x82?</td>
+<td class=r>117</td>
+<td>VibrationReduction</td>
 <td class=c>N</td>
-<td><span class=s>0 = VR off
-  <br>1 = VR on (normal)
-  <br>2 = code 2 (active?)</span></td></tr>
+<td><span class=s><span class=n>(D200)</span>
+  <br>0 = Off
+  <br>1 = On (1)
+  <br>2 = On (2)</span></td></tr>
+<tr class=b>
+<td class=r>130</td>
+<td>VibrationReduction</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(D2X, D2Xs)</span>
+  <br>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td class=r>343</td>
+<td>ShutterCount</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(D50)</span></span></td></tr>
+<tr class=b>
+<td class=r>430</td>
+<td>VibrationReduction</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(D50)</span>
+  <br>0x0 = n/a
+  <br>0xc = Off
+  <br>0xf = On</span></td></tr>
+<tr>
+<td class=r>586</td>
+<td>ShutterCount</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(D80)</span></span></td></tr>
+<tr class=b>
+<td class=r>590</td>
+<td>VibrationReduction</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(D80)</span>
+  <br>0x0 = Off, Horizontal
+  <br>0x1 = Off, Rotated 270 CW
+  <br>0x2 = Off, Rotated 90 CW
+  <br>0x3 = Off, Rotated 180
+  <br>0x18 = On, Horizontal
+  <br>0x19 = On, Rotated 270 CW
+  <br>0x1a = On, Rotated 90 CW
+  <br>0x1b = On, Rotated 180</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ColorBalance1'>Nikon ColorBalance1 Tags</a></h2>
@@ -592,7 +636,7 @@ not currently writable by exiftool.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='LensData00'>Nikon LensData00 Tags</a></h2>
-<p>This structure is used by the D100 and newer D1X models.</p>
+<p>This structure is used by the D100, and D1X with firmware version 1.1.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -963,7 +1007,8 @@ information found in Pentax MOV videos.</p>
 The Nikon LensID is constructed as a Composite tag from the raw hex values
 of 8 other tags: LensIDNumber, LensFStops, MinFocalLength, MaxFocalLength,
 MaxApertureAtMinFocal, MaxApertureAtMaxFocal, MCUVersion and LensType, in
-that order.
+that order.  (source:
+<a href="http://www.rottmerhusen.com/objektives/lensid/thirdparty.html">http://www.rottmerhusen.com/objektives/lensid/thirdparty.html</a>)
 <blockquote>
 <table class=frame><tr><td>
 <table class='inner sep' cellspacing=1>
@@ -992,6 +1037,7 @@ that order.
 </tr><tr><td>'01 58 50 50 14 14 02 00'</td><td>= AF Nikkor 50mm f/1.8</td>
 </tr><tr><td>'02 2F 98 98 3D 3D 02 00'</td><td>= Sigma 400mm F5.6 APO</td>
 </tr><tr><td>'02 37 5E 8E 35 3D 02 00'</td><td>= Sigma 75-300mm F4.5-5.6 APO</td>
+</tr><tr><td>'02 37 A0 A0 34 34 02 00'</td><td>= Sigma APO 500mm F4.5</td>
 </tr><tr><td>'02 3F 24 24 2C 2C 02 00'</td><td>= Sigma 14mm F3.5</td>
 </tr><tr><td>'02 3F 3C 5C 2D 35 02 00'</td><td>= Sigma 28-70mm F3.5-4.5 UC</td>
 </tr><tr><td>'02 40 44 73 2B 36 02 00'</td><td>= Sigma 35-135mm F3.5-4.5 a</td>
@@ -999,6 +1045,7 @@ that order.
 </tr><tr><td>'02 42 44 5C 2A 34 08 00'</td><td>= AF Zoom-Nikkor 35-70mm f/3.3-4.5</td>
 </tr><tr><td>'02 46 37 37 25 25 02 00'</td><td>= Sigma 24mm F2.8 Macro</td>
 </tr><tr><td>'02 46 3C 5C 25 25 02 00'</td><td>= Sigma 28-70mm F2.8</td>
+</tr><tr><td>'02 46 5C 82 25 25 02 00'</td><td>= Sigma 70-210mm F2.8 APO</td>
 </tr><tr><td>'02 48 65 65 24 24 02 00'</td><td>= Sigma 90mm F2.8 Macro</td>
 </tr><tr><td>'03 43 5C 81 35 35 02 00'</td><td>= Soligor AF C/D ZOOM UMCS 70-210mm 1:4.5</td>
 </tr><tr><td>'03 48 5C 81 30 30 02 00'</td><td>= AF Zoom-Nikkor 70-210mm f/4</td>
@@ -1041,6 +1088,7 @@ that order.
 </tr><tr><td>'1F 54 6A 6A 24 24 14 00'</td><td>= AF Micro-Nikkor 105mm f/2.8</td>
 </tr><tr><td>'20 3C 80 98 3D 3D 1E 02'</td><td>= Tamron AF200-400mm f/5.6 LD IF</td>
 </tr><tr><td>'20 48 60 80 24 24 15 00'</td><td>= AF Zoom-Nikkor ED 80-200mm f/2.8</td>
+</tr><tr><td>'21 40 3C 5C 2C 34 16 00'</td><td>= AF Zoom-Nikkor 28-70mm f/3.5-4.5</td>
 </tr><tr><td>'22 48 72 72 18 18 16 00'</td><td>= AF DC-Nikkor 135mm f/2</td>
 </tr><tr><td>'24 44 60 98 34 3C 1A 02'</td><td>= Tokina AT-X 840 AF II 80-400mm F4.5-5.6</td>
 </tr><tr><td>'24 48 60 80 24 24 1A 02'</td><td>= AF Zoom-Nikkor ED 80-200mm f/2.8D</td>
@@ -1114,6 +1162,7 @@ that order.
 </tr><tr><td>'48 48 68 8E 30 30 4B 02'</td><td>= Sigma 100-300mm F4 EX IF HSM</td>
 </tr><tr><td>'48 48 76 76 24 24 4B 06'</td><td>= Sigma 150mm F2.8 EX DG APO Macro HSM</td>
 </tr><tr><td>'48 48 8E 8E 24 24 4B 02'</td><td>= AF-S Nikkor 300mm f/2.8D IF-ED</td>
+</tr><tr><td>'48 4C 7C 7C 2C 2C 4B 02'</td><td>= Sigma 180mm F3.5 EX DG Macro</td>
 </tr><tr><td>'48 4C 7D 7D 2C 2C 4B 02'</td><td>= Sigma APO MACRO 180mm F3.5 EX DG HSM</td>
 </tr><tr><td>'48 54 3E 3E 0C 0C 4B 06'</td><td>= Sigma 30mm F1.4 EX DC HSM</td>
 </tr><tr><td>'48 54 5C 80 24 24 4B 02'</td><td>= Sigma 70-200mm F2.8 EX APO IF HSM</td>
@@ -1135,6 +1184,7 @@ that order.
 </tr><tr><td>'5D 48 3C 5C 24 24 63 02'</td><td>= AF-S Zoom-Nikkor 28-70mm f/2.8D IF-ED</td>
 </tr><tr><td>'5E 48 60 80 24 24 64 02'</td><td>= AF-S Zoom-Nikkor 80-200mm f/2.8D IF-ED</td>
 </tr><tr><td>'5F 40 3C 6A 2C 34 65 02'</td><td>= AF Zoom-Nikkor 28-105mm f/3.5-4.5D IF</td>
+</tr><tr><td>'60 40 3C 60 2C 3C 66 02'</td><td>= AF Zoom-Nikkor 28-80mm f/3.5-5.6D</td>
 </tr><tr><td>'61 44 5E 86 34 3C 67 02'</td><td>= AF Zoom-Nikkor 75-240mm f/4.5-5.6D</td>
 </tr><tr><td>'63 48 2B 44 24 24 68 02'</td><td>= AF-S Nikkor 17-35mm f/2.8D IF-ED</td>
 </tr><tr><td>'64 00 62 62 24 24 6A 02'</td><td>= PC Micro-Nikkor 85mm f/2.8D</td>
@@ -1158,8 +1208,12 @@ that order.
 </tr><tr><td>'77 44 61 98 34 3C 7B 0E'</td><td>= Sigma 80-400mm f4.5-5.6 EX OS</td>
 </tr><tr><td>'77 48 5C 80 24 24 7B 0E'</td><td>= AF-S VR Zoom-Nikkor 70-200mm f/2.8G IF-ED</td>
 </tr><tr><td>'78 40 37 6E 2C 3C 7C 0E'</td><td>= AF-S VR Zoom-Nikkor 24-120mm f/3.5-5.6G IF-ED</td>
+</tr><tr><td>'79 40 11 11 2C 2C 1C 06'</td><td>= Sigma 8mm F3.5 EX</td>
 </tr><tr><td>'79 40 3C 80 2C 3C 7F 06'</td><td>= AF Zoom-Nikkor 28-200mm f/3.5-5.6G IF-ED</td>
+</tr><tr><td>'79 48 5C 5C 24 24 1C 06'</td><td>= Sigma 70mm F2.8 EX DG Macro</td>
+</tr><tr><td>'7A 3B 53 80 30 3C 4B 06'</td><td>= Sigma 55-200mm F4-5.6 DC HSM</td>
 </tr><tr><td>'7A 3C 1F 37 30 30 7E 06'</td><td>= AF-S DX Zoom-Nikkor 12-24mm f/4G IF-ED</td>
+</tr><tr><td>'7A 40 2D 50 2C 3C 4B 06'</td><td>= Sigma 18-50mm F3.5-5.6 DC HSM</td>
 </tr><tr><td>'7A 47 50 76 24 24 4B 06'</td><td>= Sigma APO 50-150mm F2.8 EX DC HSM</td>
 </tr><tr><td>'7B 48 80 98 30 30 80 0E'</td><td>= AF-S VR Zoom-Nikkor 200-400mm f/4G IF-ED</td>
 </tr><tr><td>'7D 48 2B 53 24 24 82 06'</td><td>= AF-S DX Zoom-Nikkor 17-55mm f/2.8G IF-ED</td>
@@ -1171,16 +1225,20 @@ that order.
 </tr><tr><td>'89 3C 53 80 30 3C 8B 06'</td><td>= AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED</td>
 </tr><tr><td>'8A 54 6A 6A 24 24 8C 0E'</td><td>= AF-S VR Micro-Nikkor 105mm f/2.8G IF-ED</td>
 </tr><tr><td>'8B 40 2D 80 2C 3C 8D 0E'</td><td>= AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED</td>
+</tr><tr><td>'8B 40 2D 80 2C 3C FD 0E'</td><td>= AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED</td>
 </tr><tr><td>'8C 40 2D 53 2C 3C 8E 06'</td><td>= AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED</td>
 </tr><tr><td>'8D 44 5C 8E 34 3C 8F 0E'</td><td>= AF-S VR Zoom-Nikkor 70-300mm f/4.5-5.6G IF-ED</td>
 </tr><tr><td>'8F 40 2D 72 2C 3C 91 06'</td><td>= AF-S DX Zoom-Nikkor 18-135mm f/3.5-5.6G IF-ED</td>
 </tr><tr><td>'90 3B 53 80 30 3C 92 0E'</td><td>= AF-S DX VR Zoom-Nikkor 55-200mm f/4-5.6G IF-ED</td>
+</tr><tr><td>'93 48 37 5C 24 24 95 06'</td><td>= AF-S Nikkor 24-70 f/2.8G ED</td>
 </tr><tr><td>'94 40 2D 53 2C 3C 96 06'</td><td>= AF-S DX Zoom-Nikkor 18-55mm f/3.5-5.6G ED II</td>
+</tr><tr><td>'96 48 98 98 24 24 98 0E'</td><td>= AF-S Nikkor 400mm f/2.8G ED VR</td>
+</tr><tr><td>'98 3C A6 A6 30 30 9A 0E'</td><td>= AF-S Nikkor 600mm f/4G ED VR</td>
 </tr></table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 8, 2007</i>
+<br><i>Last revised Oct 23, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

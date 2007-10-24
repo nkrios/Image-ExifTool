@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..27\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..33\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -239,6 +239,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValue(FileVersion => 12, Group => 'IPTC');
     $exifTool->SetNewValue(Contributor => 'Guess who', Group => 'XMP');
     $exifTool->SetNewValue(GPSLatitude => q{44 deg 14' 12.25"}, Group => 'GPS');
+    $exifTool->SetNewValue('Ducky:Quality' => 50);
     my $testfile1 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile1;
     $exifTool->WriteInfo('t/images/Writer.jpg', $testfile1);
@@ -252,6 +253,7 @@ sub binaryCompare($$)
     $exifTool->SetNewValue('FileVersion');
     $exifTool->SetNewValue('Contributor');
     $exifTool->SetNewValue('GPSLatitude');
+    $exifTool->SetNewValue('Ducky:Quality');
     my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile2;
     $exifTool->WriteInfo($testfile1, $testfile2);
@@ -516,5 +518,86 @@ my $testOK;
     }
     print "ok $testnum\n";
 }
+
+# tests 28-30: Check cross delete behaviour when deleting tags
+{
+    my $group;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue('IFD0:ISO',100);
+    $exifTool->SetNewValue('ExifIFD:ISO',200);
+    $exifTool->WriteInfo('t/images/Writer.jpg', 't/tmp.jpg');
+    foreach $group ('EXIF', 'IFD0', 'ExifIFD') {
+        ++$testnum;
+        $exifTool->SetNewValue();   # reset values
+        $exifTool->SetNewValue("$group:ISO");     # delete ISO from specific group
+        $testfile = "t/${testname}_${testnum}_failed.jpg";
+        unlink $testfile;
+        $exifTool->WriteInfo('t/tmp.jpg', $testfile);
+        my $info = $exifTool->ImageInfo($testfile, 'FileName', 'ISO');
+        if (check($exifTool, $info, $testname, $testnum)) {
+            unlink $testfile;
+        } else {
+            print 'not ';
+        }
+        print "ok $testnum\n";
+    }
+    unlink 't/tmp.jpg';
+}
+
+# test 31: Delete all but EXIF (excluding IFD1) and IPTC information
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue('*');
+    $exifTool->SetNewValue('EXIF:*', undef, Replace => 2);
+    $exifTool->SetNewValue('ifd1:all');
+    $exifTool->SetNewValue('IPTC:*', undef, Replace => 2);
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# tests 32-33: Read/Write ICC Profile tags
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->Options(IgnoreMinorErrors => 1);
+    my $hdr = "\0\0\0\x18ADBE\x02\x10\0\0mntrRGB XYZ ";
+    $exifTool->SetNewValue(AsShotICCProfile => $hdr . '<dummy>', Protected => 1);
+    $exifTool->SetNewValue(CurrentICCProfile => $hdr . '<dummy 2>', Protected => 1);
+    $testfile = "t/${testname}_${testnum}_failed.tif";
+    unlink $testfile;
+    my @tags = qw(ICC_Profile AsShotICCProfile CurrentICCProfile);
+    $exifTool->WriteInfo('t/images/ExifTool.tif', $testfile);
+    my $info = $exifTool->ImageInfo($testfile, @tags);
+    unless (check($exifTool, $info, $testname, $testnum)) {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+
+    ++$testnum;
+    my $srcfile = $testfile;
+    $exifTool->SetNewValue();
+    $exifTool->SetNewValue(ICC_Profile => $hdr . '<another dummy>', Protected => 1);
+    $testfile = "t/${testname}_${testnum}_failed.tif";
+    unlink $testfile;
+    $exifTool->WriteInfo($srcfile, $testfile);
+    $info = $exifTool->ImageInfo($testfile, @tags);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $srcfile;
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
 
 # end

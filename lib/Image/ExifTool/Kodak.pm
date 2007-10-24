@@ -19,9 +19,14 @@ package Image::ExifTool::Kodak;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool::Exif;
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
+sub ProcessKodakIFD($$$);
+sub WriteKodakIFD($$$);
+
+# Kodak type 1 maker notes (ref 1)
 %Image::ExifTool::Kodak::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -254,6 +259,7 @@ $VERSION = '1.08';
     },
 );
 
+# Kodak type 2 maker notes (ref PH)
 %Image::ExifTool::Kodak::Type2 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -266,24 +272,25 @@ $VERSION = '1.08';
     },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    0x08 => { #PH
+    0x08 => {
         Name => 'KodakMaker',
         Format => 'string[32]',
     },
-    0x28 => { #PH
+    0x28 => {
         Name => 'KodakModel',
         Format => 'string[32]',
     },
-    0x6c => { #PH
+    0x6c => {
         Name => 'KodakImageWidth',
         Format => 'int32u',
     },
-    0x70 => { #PH
+    0x70 => {
         Name => 'KodakImageHeight',
         Format => 'int32u',
     },
 );
 
+# Kodak type 3 maker notes (ref PH)
 %Image::ExifTool::Kodak::Type3 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -304,7 +311,7 @@ $VERSION = '1.08';
         ValueConv => 'sprintf("%.2d:%.2d",split(" ", $val))',
         ValueConvInv => '$val=~tr/:./ /;$val',
     },
-    0x10 => { #PH
+    0x10 => {
         Name => 'TimeCreated',
         Groups => { 2 => 'Time' },
         Format => 'int8u[4]',
@@ -312,19 +319,19 @@ $VERSION = '1.08';
         ValueConv => 'sprintf("%2d:%.2d:%.2d.%.2d",split(" ", $val))',
         ValueConvInv => '$val=~tr/:./ /;$val',
     },
-    0x1e => { #PH
+    0x1e => {
         Name => 'OpticalZoom',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
     },
-    0x37 => { #PH
+    0x37 => {
         Name => 'Sharpness',
         Format => 'int8s',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
         PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
-    0x38 => { #PH
+    0x38 => {
         Name => 'ExposureTime',
         Format => 'int32u',
         ValueConv => '$val / 1e5',
@@ -332,18 +339,19 @@ $VERSION = '1.08';
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
-    0x3c => { #PH
+    0x3c => {
         Name => 'FNumber',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => 'int($val * 100 + 0.5)',
     },
-    0x4e => { #PH
+    0x4e => {
         Name => 'ISO',
         Format => 'int16u',
     },
 );
 
+# Kodak type 4 maker notes (ref PH)
 %Image::ExifTool::Kodak::Type4 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -352,12 +360,13 @@ $VERSION = '1.08';
     NOTES => 'These tags are used by the DC200 and DC215.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    0x20 => { #PH
+    0x20 => {
         Name => 'OriginalFileName',
         Format => 'string[12]',
     },
 );
 
+# Kodak type 5 maker notes (ref PH)
 %Image::ExifTool::Kodak::Type5 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -367,7 +376,7 @@ $VERSION = '1.08';
     },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    0x14 => { #PH
+    0x14 => {
         Name => 'ExposureTime',
         Format => 'int32u',
         ValueConv => '$val / 1e5',
@@ -375,7 +384,7 @@ $VERSION = '1.08';
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
-    0x1a => { #PH
+    0x1a => {
         Name => 'WhiteBalance',
         PrintConv => {
             1 => 'Daylight',
@@ -383,29 +392,29 @@ $VERSION = '1.08';
             3 => 'Tungsten',
         },
     },
-    0x1c => { #PH
+    0x1c => {
         Name => 'FNumber',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => 'int($val * 100 + 0.5)',
     },
-    0x1e => { #PH
+    0x1e => {
         Name => 'ISO',
         Format => 'int16u',
     },
-    0x20 => { #PH
+    0x20 => {
         Name => 'OpticalZoom',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
     },
-    0x22 => { #PH
+    0x22 => {
         Name => 'DigitalZoom',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
     },
-    0x27 => { #PH
+    0x27 => {
         Name => 'FlashMode',
         PrintConv => {
             0 => 'Auto',
@@ -414,23 +423,24 @@ $VERSION = '1.08';
             3 => 'Red-Eye',
         },
     },
-    0x2a => { #PH
+    0x2a => {
         Name => 'ImageRotated',
         PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
-    0x2b => { #PH
+    0x2b => {
         Name => 'Macro',
         PrintConv => { 0 => 'On', 1 => 'Off' },
     },
 );
 
+# Kodak type 6 maker notes (ref PH)
 %Image::ExifTool::Kodak::Type6 = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     NOTES => 'These tags are used by the DX3215 and DX3700.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    0x10 => { #PH
+    0x10 => {
         Name => 'ExposureTime',
         Format => 'int32u',
         ValueConv => '$val / 1e5',
@@ -438,34 +448,34 @@ $VERSION = '1.08';
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
-    0x14 => { #PH
+    0x14 => {
         Name => 'ISOSetting',
         Format => 'int32u',
         Unknown => 1,
     },
-    0x18 => { #PH
+    0x18 => {
         Name => 'FNumber',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => 'int($val * 100 + 0.5)',
     },
-    0x1a => { #PH
+    0x1a => {
         Name => 'ISO',
         Format => 'int16u',
     },
-    0x1c => { #PH
+    0x1c => {
         Name => 'OpticalZoom',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
     },
-    0x1e => { #PH
+    0x1e => {
         Name => 'DigitalZoom',
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
     },
-    0x22 => { #PH
+    0x22 => {
         Name => 'Flash',
         Format => 'int16u',
         PrintConv => {
@@ -475,6 +485,451 @@ $VERSION = '1.08';
     },
 );
 
+# Kodak type 7 maker notes (ref PH)
+%Image::ExifTool::Kodak::Type7 = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        The maker notes of models such as the C340, C433, CC533, LS755, V803 and
+        V1003 seem to start with the camera serial number.  The C310, C315, C330,
+        C643, C743, CD33, CD43, CX7220 and CX7300 maker notes are also decoded using
+        this table, although the strings for these cameras don't conform to the
+        usual Kodak serial number format, and instead have the model name followed
+        by 8 digits.
+    },
+    0 => { # (not confirmed)
+        Name => 'SerialNumber',
+        Format => 'string[16]',
+        ValueConv => '$val=~s/\s+$//; $val', # remove trailing whitespace
+        ValueConvInv => '$val',
+    },
+);
+
+# Kodak IFD-format maker notes (ref PH)
+%Image::ExifTool::Kodak::IFD = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        Newer Kodak models such as the P712, P850, P880, Z612 and Z712 use standard
+        TIFF IFD format for the maker notes.  There is a large amount of information
+        stored in these maker notes (with apparently much duplication), but
+        relatively few tags have so far been decoded.
+    },
+    0xfc00 => {
+        Name => 'SubIFD0',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD0',
+            Start => '$val',
+        },
+    },
+    # SubIFD1 and higher data is preceded by a TIFF byte order mark to indicate
+    # the byte ordering used
+    0xfc01 => {
+        Name => 'SubIFD1',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD1',
+            Start => '$val',
+            Base => '$start',
+        },
+    },
+    0xfc02 => {
+        Name => 'SubIFD2',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD2',
+            Start => '$val',
+            Base => '$start',
+        },
+    },
+    0xfc03 => {
+        Name => 'SubIFD3',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD3',
+            Start => '$val',
+            Base => '$start',
+        },
+    },
+    # (SubIFD4 has the pointer zeroed in my samples, but support it
+    # in case it is used by future models -- ignored if pointer is zero)
+    0xfc04 => {
+        Name => 'SubIFD4',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD4',
+            Start => '$val',
+            Base => '$start',
+        },
+    },
+    0xfc05 => {
+        Name => 'SubIFD5',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD5',
+            Start => '$val',
+            Base => '$start',
+        },
+    },
+    0xff00 => {
+        Name => 'CameraInfo',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::CameraInfo',
+            Start => '$val',
+        },
+    },
+);
+
+# Kodak SubIFD0 tags (ref PH)
+%Image::ExifTool::Kodak::SubIFD0 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'SubIFD0 through SubIFD5 tags are used by the Z612 and Z712.',
+    0xfa02 => {
+        Name => 'SceneMode',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Sport',
+            3 => 'Portrait',
+            4 => 'Landscape',
+            6 => 'Beach',
+            7 => 'Night Portrait',
+            8 => 'Night Landscape',
+            9 => 'Snow',
+            10 => 'Text',
+            11 => 'Fireworks',
+            12 => 'Macro',
+            13 => 'Museum',
+            16 => 'Children',
+            17 => 'Program',
+            18 => 'Aperture Priority',
+            19 => 'Shutter Priority',
+            20 => 'Manual',
+            25 => 'Back Light',
+            28 => 'Candlelight',
+            29 => 'Sunset',
+            31 => 'Panorama Left-Right',
+            32 => 'Panorama Right-Left',
+            33 => 'Smart Scene',
+            34 => 'High ISO',
+        },
+    },
+    # 0xfa04 - values: 0 (normally), 2 (panorama shots)
+    # 0xfa0f - values: 0 (normally), 1 (macro?)
+    # 0xfa11 - some sort of FNumber (x 100)
+    0xfa19 => {
+        Name => 'SerialNumber', # (verified with Z712 - PH)
+        Writable => 'string',
+    },
+    0xfa1d => {
+        Name => 'KodakImageWidth',
+        Writable => 'int16u',
+    },
+    0xfa1e => {
+        Name => 'KodakImageHeight',
+        Writable => 'int16u',
+    },
+    0xfa20 => {
+        Name => 'SensorWidth',
+        Writable => 'int16u',
+    },
+    0xfa21 => {
+        Name => 'SensorHeight',
+        Writable => 'int16u',
+    },
+    0xfa23 => {
+        Name => 'FNumber',
+        Writable => 'int16u',
+        Priority => 0,
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+    },
+    0xfa24 => {
+        Name => 'ExposureTime',
+        Writable => 'int32u',
+        Priority => 0,
+        ValueConv => '$val / 1e5',
+        ValueConvInv => '$val * 1e5',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0xfa2e => {
+        Name => 'ISO',
+        Writable => 'int16u',
+        Priority => 0,
+    },
+    0xfa3d => {
+        Name => 'OpticalZoom',
+        Writable => 'int16u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => 'sprintf("%.2f",$val)',
+        PrintConvInv => '$val=~s/ ?x//; $val',
+    },
+    0xfa46 => {
+        Name => 'ISO',
+        Writable => 'int16u',
+        Priority => 0,
+    },
+    # 0xfa4c - related to focal length (1=wide, 32=full zoom)
+    0xfa51 => {
+        Name => 'KodakImageWidth',
+        Writable => 'int16u',
+    },
+    0xfa52 => {
+        Name => 'KodakImageHeight',
+        Writable => 'int16u',
+    },
+    0xfa54 => {
+        Name => 'ThumbnailWidth',
+        Writable => 'int16u',
+    },
+    0xfa55 => {
+        Name => 'ThumbnailHeight',
+        Writable => 'int16u',
+    },
+    0xfa57 => {
+        Name => 'PreviewWidth',
+        Writable => 'int16u',
+    },
+    0xfa58 => {
+        Name => 'PreviewHeight',
+        Writable => 'int16u',
+    },
+);
+
+# Kodak SubIFD1 tags (ref PH)
+%Image::ExifTool::Kodak::SubIFD1 = (
+    PROCESS_PROC => \&ProcessKodakIFD,
+    WRITE_PROC => \&WriteKodakIFD,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x0027 => {
+        Name => 'ISO',
+        Writable => 'int16u',
+        Priority => 0,
+    },
+    0x0028 => {
+        Name => 'ISO',
+        Writable => 'int16u',
+        Priority => 0,
+    },
+);
+
+my %sceneModeUsed = (
+    0 => 'Program',
+    2 => 'Aperture Priority',
+    3 => 'Shutter Priority',
+    4 => 'Manual',
+    5 => 'Portrait',
+    6 => 'Sport',
+    7 => 'Children',
+    8 => 'Museum',
+    10 => 'High ISO',
+    11 => 'Text',
+    12 => 'Macro',
+    13 => 'Back Light',
+    16 => 'Landscape',
+    17 => 'Night Landscape',
+    18 => 'Night Portrait',
+    19 => 'Snow',
+    20 => 'Beach',
+    21 => 'Fireworks',
+    22 => 'Sunset',
+    23 => 'Candlelight',
+    28 => 'Panorama',
+);
+
+# Kodak SubIFD2 tags (ref PH)
+%Image::ExifTool::Kodak::SubIFD2 = (
+    PROCESS_PROC => \&ProcessKodakIFD,
+    WRITE_PROC => \&WriteKodakIFD,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x6002 => {
+        Name => 'SceneModeUsed',
+        Writable => 'int32u',
+        PrintConv => \%sceneModeUsed,
+    },
+    0x6006 => {
+        Name => 'OpticalZoom',
+        Writable => 'int32u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => 'sprintf("%.2f",$val)',
+        PrintConvInv => '$val=~s/ ?x//; $val',
+    },
+    # 0x6009 - some sort of FNumber (x 100)
+    0x6103 => {
+        Name => 'MaxAperture',
+        Writable => 'int32u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+    },
+    0xf002 => {
+        Name => 'SceneModeUsed',
+        Writable => 'int32u',
+        PrintConv => \%sceneModeUsed,
+    },
+    0xf006 => {
+        Name => 'OpticalZoom',
+        Writable => 'int32u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => 'sprintf("%.2f",$val)',
+        PrintConvInv => '$val=~s/ ?x//; $val',
+    },
+    # 0xf009 - some sort of FNumber (x 100)
+    0xf103 => {
+        Name => 'FNumber',
+        Writable => 'int32u',
+        Priority => 0,
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+    },
+    0xf104 => {
+        Name => 'ExposureTime',
+        Writable => 'int32u',
+        Priority => 0,
+        ValueConv => '$val / 1e6',
+        ValueConvInv => '$val * 1e6',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0xf105 => {
+        Name => 'ISO',
+        Writable => 'int32u',
+        Priority => 0,
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+);
+
+# Kodak SubIFD3 tags (ref PH)
+%Image::ExifTool::Kodak::SubIFD3 = (
+    PROCESS_PROC => \&ProcessKodakIFD,
+    WRITE_PROC => \&WriteKodakIFD,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x1000 => {
+        Name => 'OpticalZoom',
+        Writable => 'int16u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => 'sprintf("%.2f",$val)',
+        PrintConvInv => '$val=~s/ ?x//; $val',
+    },
+    # 0x1002 - related to focal length (1=wide, 32=full zoom)
+    # 0x1006 - pictures remaining? (gradually decreases as pictures are taken)
+);
+
+# Kodak SubIFD4 tags (ref PH)
+%Image::ExifTool::Kodak::SubIFD4 = (
+    PROCESS_PROC => \&ProcessKodakIFD,
+    WRITE_PROC => \&WriteKodakIFD,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+);
+
+# Kodak SubIFD5 tags (ref PH)
+%Image::ExifTool::Kodak::SubIFD5 = (
+    PROCESS_PROC => \&ProcessKodakIFD,
+    WRITE_PROC => \&WriteKodakIFD,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x000f => {
+        Name => 'OpticalZoom',
+        Writable => 'int16u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => 'sprintf("%.2f",$val)',
+        PrintConvInv => '$val=~s/ ?x//; $val',
+    },
+);
+
+# Decoded from P712, P850 and P880 samples (ref PH)
+%Image::ExifTool::Kodak::CameraInfo = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'These tags are used by the  P712, P850 and P880.',
+    0xf900 => {
+        Name => 'SensorWidth',
+        Writable => 'int16u',
+        Notes => 'effective sensor size',
+    },
+    0xf901 => {
+        Name => 'SensorHeight',
+        Writable => 'int16u',
+    },
+    0xf902 => {
+        Name => 'BayerPattern',
+        Writable => 'string',
+    },
+    0xf903 => {
+        Name => 'SensorFullWidth',
+        Writable => 'int16u',
+        Notes => 'includes black border?',
+    },
+    0xf904 => {
+        Name => 'SensorFullHeight',
+        Writable => 'int16u',
+    },
+    0xf907 => {
+        Name => 'KodakImageWidth',
+        Writable => 'int16u',
+    },
+    0xf908 => {
+        Name => 'KodakImageHeight',
+        Writable => 'int16u',
+    },
+    0xfa00 => {
+        Name => 'KodakInfoType',
+        Writable => 'string',
+    },
+    0xfa04 => {
+        Name => 'SerialNumber', # (unverified)
+        Writable => 'string',
+    },
+    0xfd04 => {
+        Name => 'FNumber',
+        Writable => 'int16u',
+        Priority => 0,
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+    },
+    0xfd05 => {
+        Name => 'ExposureTime',
+        Writable => 'int32u',
+        Priority => 0,
+        ValueConv => '$val / 1e6',
+        ValueConvInv => '$val * 1e6',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0xfd06 => {
+        Name => 'ISO',
+        Writable => 'int16u',
+        Priority => 0,
+    },
+);
+
+# treat unknown maker notes as binary data (allows viewing with -U)
 %Image::ExifTool::Kodak::Unknown = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -585,6 +1040,50 @@ $VERSION = '1.08';
 
 # add our composite tags
 Image::ExifTool::AddCompositeTags('Image::ExifTool::Kodak');
+
+#------------------------------------------------------------------------------
+# Process Kodak IFD (with leading byte order mark)
+# Inputs: 0) ExifTool object ref, 1) dirInfo hash ref, 2) tag table ref
+# Returns: 1 on success, otherwise returns 0 and sets a Warning
+sub ProcessKodakIFD($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    return 1 if $dirStart <= 0 or $dirStart + 2 > $$dirInfo{DataLen};
+    my $byteOrder = substr(${$$dirInfo{DataPt}}, $dirStart, 2);
+    return 1 unless Image::ExifTool::SetByteOrder($byteOrder);
+    $$dirInfo{DirStart} += 2;   # skip byte order mark
+    $$dirInfo{DirLen} -= 2;
+    if ($exifTool->{HTML_DUMP}) {
+        my $base = $$dirInfo{Base} + $$dirInfo{DataPos};
+        $exifTool->HtmlDump($dirStart+$base, 2, "Byte Order Mark");
+    }
+    return Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+}
+
+#------------------------------------------------------------------------------
+# Write Kodak IFD (with leading byte order mark)
+# Inputs: 0) ExifTool object ref, 1) source dirInfo ref, 2) tag table ref
+# Returns: Exif data block (may be empty if no Exif data) or undef on error
+sub WriteKodakIFD($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    return '' if $dirStart <= 0 or $dirStart + 2 > $$dirInfo{DataLen};
+    my $byteOrder = substr(${$$dirInfo{DataPt}}, $dirStart, 2);
+    return '' unless Image::ExifTool::SetByteOrder($byteOrder);
+    $$dirInfo{DirStart} += 2;   # skip byte order mark
+    $$dirInfo{DirLen} -= 2;
+    my $buff = Image::ExifTool::Exif::WriteExif($exifTool, $dirInfo, $tagTablePtr);
+    return $buff unless defined $buff and length $buff;
+    # apply one-time fixup for length of byte order mark
+    if ($$dirInfo{Fixup}) {
+        $dirInfo->{Fixup}->{Shift} += 2;
+        $$dirInfo{Fixup}->ApplyFixup(\$buff);
+        delete $$dirInfo{Fixup};
+    }
+    return Image::ExifTool::GetByteOrder() . $buff;
+}
 
 1;  # end
 

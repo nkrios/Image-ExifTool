@@ -73,11 +73,17 @@ my $testnum = 1;
 # test 7: Rewrite type 2 maker notes
 {
     ++$testnum;
-    my @writeInfo = (
-        [FocusDistance => 100],
-        [Macro => 'On'],
-    );
-    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Olympus2.jpg');
+    my $exifTool = new Image::ExifTool;
+    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->SetNewValue(FocusDistance => 100);
+    $exifTool->SetNewValue(Macro => 'On');
+    $exifTool->WriteInfo('t/images/Olympus2.jpg', $testfile);
+    if (testVerbose($testname, $testnum, $testfile, 2)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
     print "ok $testnum\n";
 }
 

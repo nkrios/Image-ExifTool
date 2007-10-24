@@ -212,7 +212,7 @@ sub check($$$;$$)
 # test writing feature by writing specified information to JPEG file
 # Inputs: 0) list reference to lists of SetNewValue arguments
 #         1) test name, 2) test number, 3) optional source file name,
-#         4) true to only check tags which were written
+#         4) true to only check tags which were written (or list ref for tags to check)
 # Returns: 1 if check passed
 sub writeCheck($$$;$$)
 {
@@ -222,6 +222,10 @@ sub writeCheck($$$;$$)
     my $testfile = "t/${testname}_${testnum}_failed.$ext";
     my $exifTool = new Image::ExifTool;
     my @tags;
+    if (ref $onlyWritten eq 'ARRAY') {
+        @tags = @$onlyWritten;
+        undef $onlyWritten;
+    }
     foreach (@$writeInfo) {
         $exifTool->SetNewValue(@$_);
         push @tags, $$_[0] if $onlyWritten;
@@ -239,7 +243,7 @@ sub writeCheck($$$;$$)
 #------------------------------------------------------------------------------
 # test verbose output
 # Inputs: 0) test name, 1) test number, 2) Input file, 3) verbose level
-# Returns: 0) ok value, 1) skip string if test must be skipped
+# Returns: 0) true if test passed
 sub testVerbose($$$$)
 {
     my ($testname, $testnum, $infile, $verbose) = @_;

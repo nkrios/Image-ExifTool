@@ -8,16 +8,18 @@
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_fuji.htm
 #               3) Michael Meissner private communication
+#               4) Paul Samuelson private communication (S5)
+#               5) http://www.cybercom.net/~dcoffin/dcraw/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::FujiFilm;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.12';
+$VERSION = '1.14';
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -72,7 +74,9 @@ $VERSION = '1.12';
             0x301 => 'Day White Fluorescent',
             0x302 => 'White Fluorescent',
             0x400 => 'Incandescent',
+            0x500 => 'Flash', #4
             0xf00 => 'Custom',
+            0xff0 => 'Kelvin', #4
         },
     },
     0x1003 => {
@@ -95,6 +99,10 @@ $VERSION = '1.12';
             0x100 => 'High',
             0x200 => 'Low',
         },
+    },
+    0x1005 => { #4
+        Name => 'ColorTemperature',
+        Writable => 'int16u',
     },
     0x1010 => {
         Name => 'FujiFlashMode',
@@ -286,6 +294,93 @@ $VERSION = '1.12';
     },
 );
 
+# tags in RAF images (ref 5)
+%Image::ExifTool::FujiFilm::RAF = (
+    GROUPS => { 0 => 'RAF', 1 => 'RAF', 2 => 'Image' },
+    NOTES => 'Tags extracted from FujiFilm RAF-format information.',
+    0x100 => {
+        Name => 'RawImageFullSize',
+        Format => 'int16u',
+        Groups => { 1 => 'RAF2' }, # (so RAF2 shows up in family 1 list)
+        Count => 2,
+        Notes => 'including borders',
+        ValueConv => 'my @v=reverse split(" ",$val);"@v"',
+        PrintConv => '$val=~tr/ /x/; $val',
+    },
+    0x121 => [
+        {
+            Name => 'RawImageSize',
+            Condition => '$$self{CameraModel} eq "FinePixS2Pro"',
+            Format => 'int16u',
+            Count => 2,
+            ValueConv => q{
+                my @v=split(" ",$val);
+                $v[0]*=2, $v[1]/=2;
+                return "@v";
+            },
+            PrintConv => '$val=~tr/ /x/; $val',
+        },
+        {
+            Name => 'RawImageSize',
+            Format => 'int16u',
+            Count => 2,
+            # values are height then width, adjusted for the layout
+            ValueConv => q{
+                my @v=reverse split(" ",$val);
+                $$self{FujiLayout} and $v[0]/=2, $v[1]*=2;
+                return "@v";
+            },
+            PrintConv => '$val=~tr/ /x/; $val',
+        },
+    ],
+    0x130 => {
+        Name => 'FujiLayout',
+        Format => 'int8u',
+        RawConv => q{
+            my ($v) = split ' ', $val;
+            $$self{FujiLayout} = $v & 0x80 ? 1 : 0;
+            return $val;
+        },
+    },
+    0x2ff0 => {
+        Name => 'WB_GRGBLevels',
+        Format => 'int16u',
+        Count => 4,
+    },
+);
+
+#------------------------------------------------------------------------------
+# get information from FujiFilm RAF directory
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference, 2) tag table ref
+# Returns: 1 if this was a valid FujiFilm directory
+sub ProcessFujiDir($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $raf = $$dirInfo{RAF};
+    my $offset = $$dirInfo{DirStart};
+    $raf->Seek($offset, 0) or return 0;
+    my $buff;
+    $raf->Read($buff, 4) or return 0;
+    my $entries = unpack 'N', $buff;
+    $entries < 256 or return 0;
+    SetByteOrder('MM');
+    while ($entries--) {
+        $raf->Read($buff,4) or return 0;
+        my ($tag, $len) = unpack 'nn', $buff;
+        my ($val, $vbuf);
+        $raf->Read($vbuf, $len) or return 0;
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        if ($tagInfo and $$tagInfo{Format}) {
+            $val = ReadValue(\$vbuf, 0, $$tagInfo{Format}, $$tagInfo{Count}, $len);
+            next unless defined $val;
+        } else {
+            $val = \$vbuf;
+        }
+        $exifTool->HandleTag($tagTablePtr, $tag, $val);
+    }
+    return 1;
+}
+
 #------------------------------------------------------------------------------
 # get information from FujiFilm RAW file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
@@ -293,20 +388,53 @@ $VERSION = '1.12';
 sub ProcessRAF($$)
 {
     my ($exifTool, $dirInfo) = @_;
-    my $buff;
+    my ($buff, $warn);
+
     my $raf = $$dirInfo{RAF};
-    $raf->Read($buff,8) == 8    or return 0;
-    $buff eq 'FUJIFILM'         or return 0;
-    $raf->Seek(84, 0)           or return 0;
-    $raf->Read($buff, 4) == 4   or return 0;
-    SetByteOrder('MM');
-    my $base = Get32u(\$buff, 0) + 12;
+    $raf->Read($buff,8) == 8        or return 0;
+    $buff eq 'FUJIFILM'             or return 0;
+    $raf->Seek(84, 0)               or return 0;
+    $raf->Read($buff, 8) == 8       or return 0;
+    my ($pos, $len) = unpack('NN', $buff);
+    $pos & 0x8000                  and return 0;
+    $raf->Seek($pos, 0)             or return 0;
+    $raf->Read($buff, $len) == $len or return 0;
     my %dirInfo = (
         Parent => 'RAF',
-        RAF    => $raf,
-        Base   => $base,
+        RAF    => new File::RandomAccess(\$buff),
     );
-    return $exifTool->ProcessTIFF(\%dirInfo);
+    $$exifTool{BASE} += $pos;
+    my $rtnVal = $exifTool->ProcessJPEG(\%dirInfo);
+    $$exifTool{BASE} -= $pos;
+    $exifTool->FoundTag('PreviewImage', \$buff) if $rtnVal;
+
+    if ($raf->Seek(92, 0) and $raf->Read($buff, 4)) {
+        my $tagTablePtr = GetTagTable('Image::ExifTool::FujiFilm::RAF');
+        %dirInfo = (
+            RAF => $raf,
+            DirStart => unpack('N', $buff),
+        );
+        $$exifTool{SET_GROUP1} = 'RAF';
+        ProcessFujiDir($exifTool, \%dirInfo, $tagTablePtr) or $warn = 1;
+    
+        # extract information from 2nd image if available
+        if ($pos > 120) {
+            $raf->Seek(120, 0) or return 0;
+            $raf->Read($buff, 4) or return 0;
+            my $start = unpack('N',$buff);
+            if ($start) {
+                $$dirInfo{DirStart} = $start;
+                $$exifTool{SET_GROUP1} = 'RAF2';
+                ProcessFujiDir($exifTool, \%dirInfo, $tagTablePtr) or $warn = 1;
+            }
+        }
+        delete $$exifTool{SET_GROUP1};
+    } else {
+        $warn = 1;
+    }
+    $warn and $exifTool->Warn('Possibly corrupt RAF information');
+
+    return $rtnVal;
 }
 
 1; # end
@@ -340,6 +468,10 @@ under the same terms as Perl itself.
 
 =item L<http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html>
 
+=item L<http://homepage3.nifty.com/kamisaka/makernote/makernote_fuji.htm>
+
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
+
 =item (...plus testing with my own FinePix 2400 Zoom)
 
 =back
@@ -347,7 +479,8 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Michael Meissner for decoding some new PictureMode and
-AutoBracketing values.
+AutoBracketing values, and to Paul Samuelson for decoding some WhiteBalance
+values and the ColorTemperature tag.
 
 =head1 SEE ALSO
 

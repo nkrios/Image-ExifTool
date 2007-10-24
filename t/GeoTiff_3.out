@@ -1,10 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.43
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
 [File, File, Image]  - File Name: GeoTiff_3_failed.tif
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:09:25 09:22:41
+[File, File, Time]  - File Modification Date/Time: 2007:09:21 08:09:25
 [File, File, Image]  - File Type: TIFF
 [File, File, Image]  - MIME Type: image/tiff
+[File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
 [EXIF, IFD0, Image] 256 - Image Width: 25
 [EXIF, IFD0, Image] 257 - Image Height: 24
 [EXIF, IFD0, Image] 258 - Bits Per Sample: 8

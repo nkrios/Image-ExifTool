@@ -423,6 +423,398 @@ and CX6230.</p>
   <br>1 = Fired</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Type7'>Kodak Type7 Tags</a></h2>
+<p>The maker notes of models such as the C340, C433, CC533, LS755, V803 and
+V1003 seem to start with the camera serial number.  The C310, C315, C330,
+C643, C743, CD33, CD43, CX7220 and CX7300 maker notes are also decoded using
+this table, although the strings for these cameras don&#39;t conform to the
+usual Kodak serial number format, and instead have the model name followed
+by 8 digits.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>SerialNumber</td>
+<td class=c>string[16]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='IFD'>Kodak IFD Tags</a></h2>
+<p>Newer Kodak models such as the P712, P850, P880, Z612 and Z712 use standard
+TIFF IFD format for the maker notes.  There is a large amount of information
+stored in these maker notes (with apparently much duplication), but
+relatively few tags have so far been decoded.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0xfc00</td>
+<td>SubIFD0</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#SubIFD0'>Kodak SubIFD0 Tags</a></td></tr>
+<tr class=b>
+<td>0xfc01</td>
+<td>SubIFD1</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#SubIFD1'>Kodak SubIFD1 Tags</a></td></tr>
+<tr>
+<td>0xfc02</td>
+<td>SubIFD2</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#SubIFD2'>Kodak SubIFD2 Tags</a></td></tr>
+<tr class=b>
+<td>0xfc03</td>
+<td>SubIFD3</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#SubIFD3'>Kodak SubIFD3 Tags</a></td></tr>
+<tr>
+<td>0xfc04</td>
+<td>SubIFD4</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#SubIFD4'>Kodak SubIFD4 Tags</a></td></tr>
+<tr class=b>
+<td>0xfc05</td>
+<td>SubIFD5</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#SubIFD5'>Kodak SubIFD5 Tags</a></td></tr>
+<tr>
+<td>0xff00</td>
+<td>CameraInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#CameraInfo'>Kodak CameraInfo Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SubIFD0'>Kodak SubIFD0 Tags</a></h2>
+<p>SubIFD0 through SubIFD5 tags are used by the Z612 and Z712.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0xfa02</td>
+<td>SceneMode</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Sport
+  <br>3 = Portrait
+  <br>4 = Landscape
+  <br>6 = Beach
+  <br>7 = Night Portrait
+  <br>8 = Night Landscape
+  <br>9 = Snow
+  <br>10 = Text
+  <br>11 = Fireworks
+  <br>12 = Macro
+  <br>13 = Museum
+  <br>16 = Children
+  <br>17 = Program
+  <br>18 = Aperture Priority
+  <br>19 = Shutter Priority
+  <br>20 = Manual
+  <br>25 = Back Light
+  <br>28 = Candlelight
+  <br>29 = Sunset
+  <br>31 = Panorama Left-Right
+  <br>32 = Panorama Right-Left
+  <br>33 = Smart Scene
+  <br>34 = High ISO</span></td></tr>
+<tr class=b>
+<td>0xfa19</td>
+<td>SerialNumber</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa1d</td>
+<td>KodakImageWidth</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfa1e</td>
+<td>KodakImageHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa20</td>
+<td>SensorWidth</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfa21</td>
+<td>SensorHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa23</td>
+<td>FNumber</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfa24</td>
+<td>ExposureTime</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa2e</td>
+<td>ISO</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfa3d</td>
+<td>OpticalZoom</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa46</td>
+<td>ISO</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfa51</td>
+<td>KodakImageWidth</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa52</td>
+<td>KodakImageHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfa54</td>
+<td>ThumbnailWidth</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa55</td>
+<td>ThumbnailHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfa57</td>
+<td>PreviewWidth</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa58</td>
+<td>PreviewHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SubIFD1'>Kodak SubIFD1 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0x0027</td>
+<td>ISO</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0028</td>
+<td>ISO</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SubIFD2'>Kodak SubIFD2 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0x6002</td>
+<td>SceneModeUsed</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Program
+  <br>2 = Aperture Priority
+  <br>3 = Shutter Priority
+  <br>4 = Manual
+  <br>5 = Portrait
+  <br>6 = Sport
+  <br>7 = Children
+  <br>8 = Museum
+  <br>10 = High ISO
+  <br>11 = Text
+  <br>12 = Macro
+  <br>13 = Back Light
+  <br>16 = Landscape
+  <br>17 = Night Landscape
+  <br>18 = Night Portrait
+  <br>19 = Snow
+  <br>20 = Beach
+  <br>21 = Fireworks
+  <br>22 = Sunset
+  <br>23 = Candlelight
+  <br>28 = Panorama</span></td></tr>
+<tr class=b>
+<td>0x6006</td>
+<td>OpticalZoom</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x6103</td>
+<td>MaxAperture</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xf002</td>
+<td>SceneModeUsed</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Program
+  <br>2 = Aperture Priority
+  <br>3 = Shutter Priority
+  <br>4 = Manual
+  <br>5 = Portrait
+  <br>6 = Sport
+  <br>7 = Children
+  <br>8 = Museum
+  <br>10 = High ISO
+  <br>11 = Text
+  <br>12 = Macro
+  <br>13 = Back Light
+  <br>16 = Landscape
+  <br>17 = Night Landscape
+  <br>18 = Night Portrait
+  <br>19 = Snow
+  <br>20 = Beach
+  <br>21 = Fireworks
+  <br>22 = Sunset
+  <br>23 = Candlelight
+  <br>28 = Panorama</span></td></tr>
+<tr>
+<td>0xf006</td>
+<td>OpticalZoom</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xf103</td>
+<td>FNumber</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xf104</td>
+<td>ExposureTime</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xf105</td>
+<td>ISO</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SubIFD3'>Kodak SubIFD3 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0x1000</td>
+<td>OpticalZoom</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SubIFD4'>Kodak SubIFD4 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=4 class=c>[no tags known]</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SubIFD5'>Kodak SubIFD5 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0x000f</td>
+<td>OpticalZoom</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfo'>Kodak CameraInfo Tags</a></h2>
+<p>These tags are used by the  P712, P850 and P880.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0xf900</td>
+<td>SensorWidth</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(effective sensor size)</span></span></td></tr>
+<tr class=b>
+<td>0xf901</td>
+<td>SensorHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xf902</td>
+<td>BayerPattern</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xf903</td>
+<td>SensorFullWidth</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(includes black border?)</span></span></td></tr>
+<tr>
+<td>0xf904</td>
+<td>SensorFullHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xf907</td>
+<td>KodakImageWidth</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xf908</td>
+<td>KodakImageHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfa00</td>
+<td>KodakInfoType</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfa04</td>
+<td>SerialNumber</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfd04</td>
+<td>FNumber</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xfd05</td>
+<td>ExposureTime</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xfd06</td>
+<td>ISO</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Unknown'>Kodak Unknown Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -681,7 +1073,7 @@ Kodak JPEG APP3 &quot;Meta&quot; segment.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 2, 2007</i>
+<br><i>Last revised Aug 24, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

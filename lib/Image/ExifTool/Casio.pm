@@ -18,8 +18,9 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.19';
+$VERSION = '1.21';
 
+# older Casio maker notes (ref 1)
 %Image::ExifTool::Casio::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -162,19 +163,9 @@ $VERSION = '1.19';
         },
     },
     0x0014 => {
-        Name => 'CCDSensitivity',
+        Name => 'ISO',
         Writable => 'int16u',
-        PrintConv => {
-            64  => 'Normal',
-            80  => 'Normal',
-            100 => 'High (or ISO 100)', #4
-            125 => '+1.0',
-            180 => 'ISO 180', #4
-            250 => '+2.0',
-            244 => '+3.0',
-            300 => 'ISO 300', #4
-            500 => 'ISO 500', #4
-        },
+        Priority => 0,
     },
     0x0016 => { #4
         Name => 'Enhancement',
@@ -188,7 +179,7 @@ $VERSION = '1.19';
         },
     },
     0x0017 => { #4
-        Name => 'Filter',
+        Name => 'ColorFilter',
         Writable => 'int16u',
         PrintConv => {
             1 => 'Off',
@@ -311,8 +302,8 @@ $VERSION = '1.19';
     },
     0x0014 => {
         Name => 'ISO',
-        Priority => 0,
         Writable => 'int16u',
+        Priority => 0,
         PrintConv => {
            3 => 50,
            4 => 64,
@@ -428,9 +419,9 @@ $VERSION = '1.19';
     0x2022 => {
         Name => 'ObjectDistance',
         Writable => 'int32u',
-        ValueConv => '$val / 1000',
-        ValueConvInv => '$val * 1000',
-        PrintConv => '"$val m"',
+        ValueConv => '$val >= 0x20000000 ? "inf" : $val / 1000',
+        ValueConvInv => '$val eq "inf" ? 0x20000000 : $val * 1000',
+        PrintConv => '$val eq "inf" ? $val : "$val m"',
         PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     # 0x2023 looks interesting (values 0,1,2,3,5 in samples) - PH
@@ -476,7 +467,7 @@ $VERSION = '1.19';
         },
     },
     0x3006 => {
-        Name => 'TimeZone',
+        Name => 'HometownCity',
         Writable => 'string',
     },
     0x3007 => {
@@ -508,9 +499,9 @@ $VERSION = '1.19';
         Writable => 'undef',
     },
     0x3014 => {
-        Name => 'CCDISOSensitivity',
+        Name => 'ISO',
         Writable => 'int16u',
-        Description => 'CCD ISO Sensitivity',
+        Priority => 0,
     },
     0x3015 => {
         Name => 'ColorMode',

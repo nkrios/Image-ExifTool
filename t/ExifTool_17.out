@@ -1,8 +1,8 @@
-  ExifToolVersion = 6.64
+  ExifToolVersion = 6.99
   FileName = Canon.jpg
   Directory = t/images
   FileSize = 2697
-  FileModifyDate = 1161014681
+  FileModifyDate = 1178019278
   FileType = JPEG
   MIMEType = image/jpeg
 JPEG APP1 (2442 bytes):
@@ -14,6 +14,7 @@ JPEG APP1 (2442 bytes):
     0056: 01 00 00 00 02 00 00 00 32 01 02 00 14 00 00 00 [........2.......]
     0066: a8 00 00 00 13 02 03 00 01 00 00 00 01 00 00 00 [................]
     [snip 2330 bytes]
+  ExifByteOrder = II
   + [IFD0 directory with 9 entries]
   | 0)  Make = Canon
   |     - Tag 0x010f (6 bytes, string[6]):
@@ -71,16 +72,16 @@ JPEG APP1 (2442 bytes):
   | | 7)  CompressedBitsPerPixel = 9
   | |     - Tag 0x9102 (8 bytes, rational64u[1]):
   | |         027a: 09 00 00 00 01 00 00 00                         [........]
-  | | 8)  ShutterSpeedValue = -2147484000
+  | | 8)  ShutterSpeedValue = -2147483648
   | |     - Tag 0x9201 (8 bytes, rational64s[1]):
   | |         0282: 00 00 00 80 01 00 00 00                         [........]
-  | | 9)  ApertureValue = 7.614716
+  | | 9)  ApertureValue = 7.614715576
   | |     - Tag 0x9202 (8 bytes, rational64u[1]):
   | |         028a: 5e 9d 07 00 00 00 01 00                         [^.......]
   | | 10) ExposureCompensation = 0
   | |     - Tag 0x9204 (8 bytes, rational64s[1]):
   | |         0292: 00 00 00 00 03 00 00 00                         [........]
-  | | 11) MaxApertureValue = 4.339844
+  | | 11) MaxApertureValue = 4.33984375
   | |     - Tag 0x9205 (8 bytes, rational64u[1]):
   | |         029a: 00 57 04 00 00 00 01 00                         [.W......]
   | | 12) MeteringMode = 1
@@ -209,6 +210,9 @@ JPEG APP1 (2442 bytes):
   | | | | PhotoEffect = -1
   | | | | - Tag 0x0028 (2 bytes, int16s[1]):
   | | | |     0438: ff ff                                           [..]
+  | | | | ManualFlashOutput = 0
+  | | | | - Tag 0x0029 (2 bytes, int16s[1]):
+  | | | |     043a: 00 00                                           [..]
   | | | | ColorTone = 0
   | | | | - Tag 0x002a (2 bytes, int16s[1]):
   | | | |     043c: 00 00                                           [..]
@@ -272,7 +276,7 @@ JPEG APP1 (2442 bytes):
   | | | | FlashGuideNumber = 0
   | | | | - Tag 0x000d (2 bytes, int16s[1]):
   | | | |     046e: 00 00                                           [..]
-  | | | | AFPointsUsed2 = 0
+  | | | | AFPointsInFocus = 0
   | | | | - Tag 0x000e (2 bytes, int16s[1]):
   | | | |     0470: 00 00                                           [..]
   | | | | FlashExposureComp = 0
@@ -361,7 +365,7 @@ JPEG APP1 (2442 bytes):
   | | | 12) CanonFileLength = 4480822
   | | |     - Tag 0x000e (4 bytes, int32u[1]):
   | | |         0344: 36 5f 44 00                                     [6_D.]
-  | | | 13) Canon_0x000d = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [snip]
+  | | | 13) CanonCameraInfoUnknown8 (SubDirectory) -->
   | | |     - Tag 0x000d (512 bytes, int8u[512]):
   | | |         0508: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
   | | |         0518: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
@@ -369,6 +373,7 @@ JPEG APP1 (2442 bytes):
   | | |         0538: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
   | | |         0548: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
   | | |         [snip 432 bytes]
+  | | | + [BinaryData directory, 512 bytes]
   | | | 14) Canon_0x0000 = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
   | | |     - Tag 0x0000 (36 bytes, int16u[18]):
   | | |         0708: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
@@ -431,30 +436,45 @@ JPEG APP1 (2442 bytes):
   | | | 21) ColorSpace = 1
   | | |     - Tag 0x00b4 (2 bytes, int16u[1]):
   | | |         03b0: 01 00                                           [..]
-  | | | 22) CanonPictureInfo (SubDirectory) -->
+  | | | 22) CanonAFInfo (SubDirectory) -->
   | | |     - Tag 0x0012 (48 bytes, int16u[24]):
   | | |         07d0: 07 00 07 00 00 0c 00 08 00 0c 00 08 97 00 97 00 [................]
   | | |         07e0: f6 03 60 02 00 00 00 00 00 00 a0 fd 0a fc 00 00 [..`.............]
   | | |         07f0: 00 00 06 fe 00 00 fa 01 00 00 00 00 00 00 ff ff [................]
-  | | | + [BinaryData directory, 48 bytes]
-  | | | | NumAFPoints = 7
-  | | | | - Tag 0x0001 (2 bytes, int16u[1]):
-  | | | |     07d2: 07 00                                           [..]
-  | | | | CanonImageWidth = 3072
-  | | | | - Tag 0x0002 (2 bytes, int16u[1]):
-  | | | |     07d4: 00 0c                                           [..]
-  | | | | CanonImageHeight = 2048
-  | | | | - Tag 0x0003 (2 bytes, int16u[1]):
-  | | | |     07d6: 00 08                                           [..]
-  | | | | CanonImageWidthAsShot = 3072
-  | | | | - Tag 0x0004 (2 bytes, int16u[1]):
-  | | | |     07d8: 00 0c                                           [..]
-  | | | | CanonImageHeightAsShot = 2048
-  | | | | - Tag 0x0005 (2 bytes, int16u[1]):
-  | | | |     07da: 00 08                                           [..]
-  | | | | AFPointsUsed = 0
-  | | | | - Tag 0x0016 (2 bytes, int16u[1]):
-  | | | |     07fc: 00 00                                           [..]
+  | | | + [SerialData directory, 48 bytes]
+  | | | | 0)  NumAFPoints = 7
+  | | | |     - Tag 0x0000 (2 bytes, int16u[1]):
+  | | | |         07d0: 07 00                                           [..]
+  | | | | 1)  ValidAFPoints = 7
+  | | | |     - Tag 0x0001 (2 bytes, int16u[1]):
+  | | | |         07d2: 07 00                                           [..]
+  | | | | 2)  CanonImageWidth = 3072
+  | | | |     - Tag 0x0002 (2 bytes, int16u[1]):
+  | | | |         07d4: 00 0c                                           [..]
+  | | | | 3)  CanonImageHeight = 2048
+  | | | |     - Tag 0x0003 (2 bytes, int16u[1]):
+  | | | |         07d6: 00 08                                           [..]
+  | | | | 4)  AFImageWidth = 3072
+  | | | |     - Tag 0x0004 (2 bytes, int16u[1]):
+  | | | |         07d8: 00 0c                                           [..]
+  | | | | 5)  AFImageHeight = 2048
+  | | | |     - Tag 0x0005 (2 bytes, int16u[1]):
+  | | | |         07da: 00 08                                           [..]
+  | | | | 6)  AFAreaWidth = 151
+  | | | |     - Tag 0x0006 (2 bytes, int16u[1]):
+  | | | |         07dc: 97 00                                           [..]
+  | | | | 7)  AFAreaHeight = 151
+  | | | |     - Tag 0x0007 (2 bytes, int16u[1]):
+  | | | |         07de: 97 00                                           [..]
+  | | | | 8)  AFAreaXPositions = 1014 608 0 0 0 -608 -1014
+  | | | |     - Tag 0x0008 (14 bytes, int16s[7]):
+  | | | |         07e0: f6 03 60 02 00 00 00 00 00 00 a0 fd 0a fc       [..`...........]
+  | | | | 9)  AFAreaYPositions = 0 0 -506 0 506 0 0
+  | | | |     - Tag 0x0009 (14 bytes, int16s[7]):
+  | | | |         07ee: 00 00 00 00 06 fe 00 00 fa 01 00 00 00 00       [..............]
+  | | | | 10) AFPointsInFocus = 0
+  | | | |     - Tag 0x000a (2 bytes, int16s[1]):
+  | | | |         07fc: 00 00                                           [..]
   | | | 23) Canon_0x0013 = 0 159 7 112
   | | |     - Tag 0x0013 (8 bytes, int16u[4]):
   | | |         0800: 00 00 9f 00 07 00 70 00                         [......p.]
@@ -502,10 +522,10 @@ JPEG APP1 (2442 bytes):
   | | | 3)  RelatedImageLength = 2048
   | | |     - Tag 0x1002 (2 bytes, int16u[1]):
   | | |         0988: 00 08                                           [..]
-  | | 22) FocalPlaneXResolution = 3443.946
+  | | 22) FocalPlaneXResolution = 3443.946188
   | |     - Tag 0xa20e (8 bytes, rational64u[1]):
   | |         094a: 00 e0 2e 00 7c 03 00 00                         [....|...]
-  | | 23) FocalPlaneYResolution = 3442.017
+  | | 23) FocalPlaneYResolution = 3442.016807
   | |     - Tag 0xa20f (8 bytes, rational64u[1]):
   | |         0952: 00 40 1f 00 53 02 00 00                         [.@..S...]
   | | 24) FocalPlaneResolutionUnit = 2
@@ -538,9 +558,8 @@ JPEG DQT (130 bytes):
     09e4: 36 44 36 2b 2b 36 44 44 44 42 35 42 44 44 44 44 [6D6++6DDDB5BDDDD]
     09f4: 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 44 [DDDDDDDDDDDDDDDD]
     [snip 18 bytes]
-JPEG SOF0:
-  ImageWidth = 8
-  ImageHeight = 8
+JPEG SOF0 (15 bytes):
+    0a1a: 08 00 08 00 08 03 01 22 00 02 11 01 03 11 01    [.......".......]
 JPEG DHT (73 bytes):
     0a2d: 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
     0a3d: 00 00 06 01 01 00 00 00 00 00 00 00 00 00 00 00 [................]

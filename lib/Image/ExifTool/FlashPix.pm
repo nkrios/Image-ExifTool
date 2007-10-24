@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -350,8 +350,8 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         Name => 'TestTarget',
         PrintConv => {
             1 => 'Color Chart',
-            2 => 'Grey Card',
-            3 => 'Greyscale',
+            2 => 'Gray Card',
+            3 => 'Grayscale',
             4 => 'Resolution Chart',
             5 => 'Inch Scale',
             6 => 'Centimeter Scale',
@@ -1061,13 +1061,15 @@ sub LoadChain($$$$$)
     my ($raf, $sect, $fatPt, $sectSize, $hdrSize) = @_;
     return undef unless $raf;
     my $chain = '';
+    my ($buff, %loadedSect);
     for (;;) {
         last if $sect == END_OF_CHAIN;
+        return undef if $loadedSect{$sect}; # avoid infinite loop
+        $loadedSect{$sect} = 1;
         my $offset = $sect * $sectSize + $hdrSize;
-        my $buff;
-        unless ($raf->Seek($offset, 0) and $raf->Read($buff, $sectSize) == $sectSize) {
-            return undef;   # error!
-        }
+        return undef unless $offset <= 0x7fffffff and
+                            $raf->Seek($offset, 0) and
+                            $raf->Read($buff, $sectSize) == $sectSize;
         $chain .= $buff;
         # step to next sector in chain
         return undef if $sect * 4 > length($$fatPt) - 4;
@@ -1157,8 +1159,6 @@ sub ProcessFPXR($$$)
     } elsif ($type == 2) {  # a "Stream Data" segment
 
         # get the contents list index and stream data offset
-        # (here I ignore the offset and assume data blocks are contiguous.
-        # If they aren't, I guess that is where the Default value comes in...)
         my ($index, $offset) = unpack('x7nN', $$dataPt);
         my $fpxr = $$exifTool{FPXR};
         if ($fpxr and $$fpxr[$index]) {
@@ -1166,7 +1166,7 @@ sub ProcessFPXR($$$)
             # extract stream data (after 13-byte header)
             if (not defined $$obj{Stream}) {
                 # ignore offset for first segment of this type
-                # (this isn't zero as one would expect in my sample images)
+                # (in my sample images, this isn't always zero as one would expect)
                 $$obj{Stream} = substr($$dataPt, $dirStart+13);
             } else {
                 # add data to the stream at the proper offset
@@ -1176,7 +1176,8 @@ sub ProcessFPXR($$$)
                         if ($pad > 0x10000) {
                             $exifTool->Warn("Bad FPXR stream offset ($offset)");
                         } else {
-                            $exifTool->Warn("Padding FPXR stream with $pad default bytes");
+                            # pad with default value to specified offset
+                            $exifTool->Warn("Padding FPXR stream with $pad default bytes",1);
                             $$obj{Stream} .= ($$obj{Default} x $pad);
                         }
                     }

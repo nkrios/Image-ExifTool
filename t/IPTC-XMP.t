@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..12\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..18\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -141,6 +141,7 @@ my $testnum = 1;
     $exifTool->SetNewValue(Label => 'Blue');
     $exifTool->SetNewValue(Rating => 3);
     $exifTool->SetNewValue(Subject => q{char test: & > < ' "}, AddValue => 1);
+    $exifTool->SetNewValue('Rights' => "\xc2\xa9 Copyright Someone Else");
     $exifTool->Options(Compact => 1);
     $exifTool->WriteInfo('t/images/XMP.xmp',$testfile);
     print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
@@ -167,5 +168,29 @@ my $testnum = 1;
         print "ok $testnum\n";
     }
 }
+
+# tests 13-18: Test writing/deleting XMP alternate languages
+{
+    my @writeList = (
+        [ ['Rights-x-default' => "\xc2\xa9 Copyright Another One"] ], # should overwrite x-default only
+        [ ['Rights-de-DE' => "\xc2\xa9 Urheberrecht Phil Harvey"] ],  # should create de-DE only
+        [ ['Rights-x-default' => undef] ],  # should delete all languages
+        [ ['Rights-fr' => undef] ],         # should delete fr only
+        [ ['Title-fr' => 'Test fr title'] ],# should also create x-default
+        [ ['Title-fr' => 'Test fr title'],
+          ['Title-x-default' => 'dTitle'] ],# should create x-default before fr
+    );
+    my $writeListRef;
+    foreach $writeListRef (@writeList) {
+        ++$testnum;
+        my $exifTool = new Image::ExifTool;
+        my $testfile = "t/${testname}_${testnum}_failed.xmp";
+        unlink $testfile;
+        print 'not ' unless writeCheck($writeListRef, $testname, $testnum, 't/images/XMP.xmp',
+                                       [ 'XMP-dc:*' ]);
+        print "ok $testnum\n";
+    }
+}
+
 
 # end

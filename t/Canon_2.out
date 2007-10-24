@@ -1,12 +1,17 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.85
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
 [File, File, Image]  - File Name: Canon1DmkIII.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 8 kB
 [File, File, Time]  - File Modification Date/Time: 2007:03:20 12:32:58
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 8
-[File, File, Image]  - Image Height: 8
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image] ImageWidth - Image Width: 8
+[File, File, Image] ImageHeight - Image Height: 8
+[File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
+[File, File, Image] BitsPerSample - Bits Per Sample: 8
+[File, File, Image] ColorComponents - Color Components: 3
+[File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS-1D Mark III
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -39,8 +44,8 @@
 [EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2592
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
-[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3512.195
-[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3521.739
+[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3512.195122
+[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3521.73913
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
@@ -54,7 +59,7 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 7548
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Normal
-[MakerNotes, Canon, Camera] 2 - Self-timer: 0
+[MakerNotes, Canon, Camera] 2 - Self-timer: Off
 [MakerNotes, Canon, Camera] 3 - Quality: Fine
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: External flash
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous, High
@@ -77,6 +82,7 @@
 [MakerNotes, Canon, Camera] 29 - Flash Bits: (none)
 [MakerNotes, Canon, Camera] 36 - Zoom Source Width: 0
 [MakerNotes, Canon, Camera] 37 - Zoom Target Width: 0
+[MakerNotes, Canon, Camera] 41 - Manual Flash Output: n/a
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
 [MakerNotes, Canon, Image] 1 - Focal Length: 35mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
@@ -100,15 +106,37 @@
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS High-end
 [MakerNotes, Canon, Image] 27 - Auto Rotate: Rotated by Software
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
+[MakerNotes, Canon, Image] 33 - Flash Output: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS-1D Mark III
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 5.3.1
 [MakerNotes, Canon, Camera] 9 - Owner Name: 
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 500292
+[MakerNotes, Canon, Image] 3 - F Number: 5.7
 [MakerNotes, Canon, Image] 4 - Exposure Time: 1/128
+[MakerNotes, Canon, Image] 6 - ISO: 3200
+[MakerNotes, Canon, Camera] 29 - Focal Length: 35mm
+[MakerNotes, Canon, Camera] 134 - Picture Style: Neutral
+[MakerNotes, Canon, Camera] 275 - Short Focal: 16mm
+[MakerNotes, Canon, Camera] 277 - Long Focal: 35mm
+[MakerNotes, Canon, Image] 370 - File Number: 232
+[MakerNotes, Canon, Camera] 374 - Shutter Count: 1
+[MakerNotes, Canon, Time] 1118 - Time Stamp: 1970:01:02 01:30:10
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS-1D Mark III
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 2
+[MakerNotes, Canon, Camera] 1 - AF Mode: Single-point AF
+[MakerNotes, Canon, Camera] 2 - Num AF Points: 45
+[MakerNotes, Canon, Camera] 3 - Valid AF Points: 45
+[MakerNotes, Canon, Image] 4 - Canon Image Width: 3888
+[MakerNotes, Canon, Image] 5 - Canon Image Width: 2592
+[MakerNotes, Canon, Camera] 6 - AF Image Width: 3888
+[MakerNotes, Canon, Camera] 7 - AF Image Height: 2592
+[MakerNotes, Canon, Camera] 8 - AF Area Widths: 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112
+[MakerNotes, Canon, Camera] 9 - AF Area Heights: 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168 168
+[MakerNotes, Canon, Camera] 10 - AF Area X Positions: -625 -416 -209 0 209 416 625 -917 -723 -520 -311 -104 104 311 520 723 917 -1041 -832 -625 -416 -206 0 206 416 625 832 1041 -917 -723 -520 -311 -104 104 311 520 723 917 -625 -416 -209 0 209 416 625
+[MakerNotes, Canon, Camera] 11 - AF Area Y Positions: -554 -554 -554 -554 -554 -554 -554 -277 -277 -277 -277 -277 -277 -277 -277 -277 -277 0 0 0 0 0 0 0 0 0 0 0 277 277 277 277 277 277 277 277 277 277 554 554 554 554 554 554 554
+[MakerNotes, Canon, Camera] 12 - AF Points In Focus: 13
+[MakerNotes, Canon, Camera] 13 - AF Points Selected: 13
 [MakerNotes, Canon, Camera] 131 - Original Decision Data: 0
-[MakerNotes, Canon, Image] 1 - Shutter Count: 490
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
 [MakerNotes, Canon, Image] 5 - Bracket Shot Number: 0
@@ -144,7 +172,7 @@
 [MakerNotes, CanonCustom, Camera] 1031 - View Info During Exposure: Disable
 [MakerNotes, CanonCustom, Camera] 1032 - LCD Illumination During Bulb: Off
 [MakerNotes, CanonCustom, Camera] 1033 - Info Button When Shooting: Displays camera settings
-[MakerNotes, CanonCustom, Camera] 1281 - USM Lens Electronic MF: Turns on after one-shot AF
+[MakerNotes, CanonCustom, Camera] 1281 - USM Lens Electronic MF: Enable after one-shot AF
 [MakerNotes, CanonCustom, Camera] 1282 - AI Servo Tracking Sensitivity: Standard
 [MakerNotes, CanonCustom, Camera] 1283 - AI Servo Image Priority: 1: AF, 2: Tracking
 [MakerNotes, CanonCustom, Camera] 1284 - AI Servo Tracking Method: Main focus point priority
@@ -190,6 +218,7 @@
 [MakerNotes, Canon, Image] 12 - WB Shift AB: 0
 [MakerNotes, Canon, Image] 13 - WB Shift GM: 0
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
+[MakerNotes, Canon, Camera] 208 - VRD Offset: 0
 [MakerNotes, Canon, Image] 1 - Sensor Width: 3984
 [MakerNotes, Canon, Image] 2 - Sensor Height: 2622
 [MakerNotes, Canon, Image] 5 - Sensor Left Border: 88

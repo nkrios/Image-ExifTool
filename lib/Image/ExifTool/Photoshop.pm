@@ -330,7 +330,7 @@ sub ProcessPhotoshop($$$)
     $verbose and $exifTool->VerboseDir('Photoshop', 0, $$dirInfo{DirLen});
 
     # scan through resource blocks:
-    # Format: 0) Type, 4 bytes - "8BIM" (or the rare "PHUT" or "DCSR")
+    # Format: 0) Type, 4 bytes - '8BIM' (or the rare 'PHUT', 'DCSR' or 'AgHg')
     #         1) TagID,2 bytes
     #         2) Name, pascal string padded to even no. bytes
     #         3) Size, 4 bytes - N
@@ -340,10 +340,11 @@ sub ProcessPhotoshop($$$)
         my ($ttPtr, $extra, $val, $name);
         if ($type eq '8BIM') {
             $ttPtr = $tagTablePtr;
-        } elsif ($type =~ /^(PHUT|DCSR)$/) {
+        } elsif ($type =~ /^(PHUT|DCSR|AgHg)$/) {
             $ttPtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Unknown');
         } else {
-            $exifTool->Warn("Bad Photoshop IRB resource");
+            $type =~ s/([^\w])/sprintf("\\x%.2x",ord($1))/ge;
+            $exifTool->Warn(qq{Bad Photoshop IRB resource "$type"});
             last;
         }
         my $tag = Get16u($dataPt, $pos + 4);

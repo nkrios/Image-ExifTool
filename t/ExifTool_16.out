@@ -1,6 +1,12 @@
 ---- Canon ----
 AEBBracketValue : 0
-AFPointsUsed : (none)
+AFAreaHeight : 151
+AFAreaWidth : 151
+AFAreaXPositions : 1014 608 0 0 0 -608 -1014
+AFAreaYPositions : 0 0 -506 0 506 0 0
+AFImageHeight : 2048
+AFImageWidth : 3072
+AFPointsInFocus : (none)
 AutoExposureBracketing : Off
 AutoISO : 100
 AutoRotate : None
@@ -16,11 +22,9 @@ CanonFileLength : 4480822
 CanonFirmwareVersion : Firmware Version 1.1.1
 CanonFlashMode : Off
 CanonImageHeight : 2048
-CanonImageHeightAsShot : 2048
 CanonImageSize : Large
 CanonImageType : CRW:EOS DIGITAL REBEL CMOS RAW
 CanonImageWidth : 3072
-CanonImageWidthAsShot : 3072
 CanonModelID : EOS Digital Rebel / 300D / Kiss Digital
 ColorSpace (1) : sRGB
 ColorTemperature : 5200
@@ -48,6 +52,7 @@ FocusRange : Not Known
 LensType : Unknown (-1)
 LongFocal : 55mm
 MacroMode : Unknown (0)
+ManualFlashOutput : n/a
 MaxAperture : 4
 MeasuredEV : -6.25
 MeteringMode : Center-weighted averaging
@@ -59,7 +64,7 @@ OwnerName : Phil Harvey
 Quality : RAW
 RecordMode : CRW+THM
 Saturation : +1
-Self-timer : 0
+Self-timer : Off
 Self-timer2 : 0
 SequenceNumber : 0
 SerialNumber : 0560018150
@@ -68,6 +73,7 @@ Sharpness : +1
 ShortFocal : 18mm
 SlowShutter : None
 TargetAperture : 14
+ValidAFPoints : 7
 WB_RGGBLevelsAuto : 1719 832 831 990
 WB_RGGBLevelsCloudy : 1878 832 831 903
 WB_RGGBLevelsCustom : 1722 832 831 989
@@ -129,14 +135,19 @@ ShutterSpeedValue : 0
 UserComment : 
 WhiteBalance (1) : Auto
 ---- File ----
+BitsPerSample : 8
+ColorComponents : 3
 Directory : t/images
-FileModifyDate : 2006:10:16 12:04:41
+EncodingProcess : Baseline DCT, Huffman coding
+ExifByteOrder : Little-endian (Intel)
+FileModifyDate : 2007:05:01 07:34:38
 FileName : Canon.jpg
 FileSize : 3 kB
 FileType : JPEG
 ImageHeight : 8
 ImageWidth : 8
 MIMEType : image/jpeg
+YCbCrSubSampling : YCbCr4:2:0 (2 2)
 ---- IFD0 ----
 Make : Canon
 Model : Canon EOS DIGITAL REBEL

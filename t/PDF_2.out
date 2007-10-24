@@ -1,10 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.43
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
 [File, File, Image]  - File Name: PDF.pdf
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 9 kB
-[File, File, Time]  - File Modification Date/Time: 2005:07:18 15:45:26
+[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
 [File, File, Image]  - File Type: PDF
 [File, File, Image]  - MIME Type: application/pdf
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 120 - Caption-Abstract: A witty caption
 [IPTC, IPTC, Author] 122 - Writer-Editor: I wrote it

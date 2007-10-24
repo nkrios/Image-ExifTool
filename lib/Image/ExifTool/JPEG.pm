@@ -10,7 +10,7 @@ package Image::ExifTool::JPEG;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.07';
 
 # (this main JPEG table is for documentation purposes only)
 %Image::ExifTool::JPEG::Main = (
@@ -59,12 +59,12 @@ $VERSION = '1.05';
     APP6 => {
         Name => 'EPPIM',
         Condition => '$$valPt =~ /^EPPIM\0/',
-        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::APP6' },
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::EPPIM' },
     },
     APP8 => {
         Name => 'SPIFF',
         Condition => '$$valPt =~ /^SPIFF\0/',
-        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::APP8' },
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::SPIFF' },
     },
     APP10 => {
         Name => 'Comment',
@@ -74,32 +74,40 @@ $VERSION = '1.05';
     APP12 => [{
         Name => 'PictureInfo',
         Condition => '$$valPt =~ /(\[picture info\]|Type=)/',
-        SubDirectory => { TagTable => 'Image::ExifTool::APP12::Main' },
+        SubDirectory => { TagTable => 'Image::ExifTool::APP12::PictureInfo' },
       }, {
         Name => 'Ducky',
-        Condition => '$$valPt =~ /^Ducky\0/',
+        Condition => '$$valPt =~ /^Ducky/',
         SubDirectory => { TagTable => 'Image::ExifTool::APP12::Ducky' },
     }],
-    APP13 => {
+    APP13 => [{
         Name => 'Photoshop',
         Condition => '$$valPt =~ /^(Photoshop 3.0\0|Adobe_Photoshop2.5)/',
         SubDirectory => { TagTable => 'Image::ExifTool::Photoshop::Main' },
-    },
+    }, {
+        Name => 'Adobe_CM',
+        Condition => '$$valPt =~ /^Adobe_CM/',
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::AdobeCM' },
+    }],
     APP14 => {
         Name => 'Adobe',
         Condition => '$$valPt =~ /^Adobe/',
-        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::APP14' },
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::Adobe' },
     },
     APP15 => {
         Name => 'GraphicConverter',
         Condition => '$$valPt =~ /^Q\s*(\d+)/',
-        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::APP15' },
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::GraphConv' },
     },
     COM => {
         Name => 'Comment',
         # note: flag as writable for documentation, but it won't show up
         # in the TagLookup as writable because there is no WRITE_PROC
         Writable => '1',
+    },
+    SOF => {
+        Name => 'StartOfFrame',
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::SOF' },
     },
     Trailer => [{
         Name => 'AFCP',
@@ -131,8 +139,8 @@ $VERSION = '1.05';
     }],
 );
 
-# APP6 EPPIM (Toshiba PrintIM) segment (ref PH, from PDR-M700 samples)
-%Image::ExifTool::JPEG::APP6 = (
+# EPPIM APP6 (Toshiba PrintIM) segment (ref PH, from PDR-M700 samples)
+%Image::ExifTool::JPEG::EPPIM = (
     GROUPS => { 0 => 'APP6', 1 => 'EPPIM', 2 => 'Image' },
     NOTES => q{
         APP6 is used in by the Toshiba PDR-M700 to store a TIFF structure containing
@@ -149,10 +157,10 @@ $VERSION = '1.05';
     },
 );
 
-# APP8 SPIFF segment.  Refs:
+# SPIFF APP8 segment.  Refs:
 # 1) http://www.fileformat.info/format/spiff/
 # 2) http://www.jpeg.org/public/spiff.pdf
-%Image::ExifTool::JPEG::APP8 = (
+%Image::ExifTool::JPEG::SPIFF = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'APP8', 1 => 'SPIFF', 2 => 'Image' },
     NOTES => q{
@@ -235,10 +243,23 @@ $VERSION = '1.05';
     },
 );
 
-# APP14 refs:
+# AdobeCM APP13 (no references)
+%Image::ExifTool::JPEG::AdobeCM = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'APP13', 1 => 'AdobeCM', 2 => 'Image' },
+    NOTES => q{
+        The "Adobe_CM" APP13 segment presumably contains color management
+        information, but the meaning of the data is currently unknown.  If anyone
+        has an idea about what this means, please let me know.
+    },
+    FORMAT => 'int16u',
+    0 => 'AdobeCMType',
+);
+
+# Adobe APP14 refs:
 # http://partners.adobe.com/public/developer/en/ps/sdk/5116.DCT_Filter.pdf
 # http://java.sun.com/j2se/1.5.0/docs/api/javax/imageio/metadata/doc-files/jpeg_metadata.html#color
-%Image::ExifTool::JPEG::APP14 = (
+%Image::ExifTool::JPEG::Adobe = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'APP14', 1 => 'Adobe', 2 => 'Image' },
     NOTES => 'The "Adobe" APP14 segment stores image encoding information for DCT filters.',
@@ -266,12 +287,11 @@ $VERSION = '1.05';
 );
 
 # GraphicConverter APP15 (ref PH)
-%Image::ExifTool::JPEG::APP15 = (
+%Image::ExifTool::JPEG::GraphConv = (
     GROUPS => { 0 => 'APP15', 1 => 'GraphConv', 2 => 'Image' },
     NOTES => 'APP15 is used by GraphicConverter to store JPEG quality.',
     'Q' => 'Quality',
 );
-
 
 1;  # end
 

@@ -1,6 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.70
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
 [File, File, Image]  - File Type: PNG
 [File, File, Image]  - MIME Type: image/png
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
 [PNG, PNG, Image] 0 - Image Width: 16
 [PNG, PNG, Image] 4 - Image Height: 16
 [PNG, PNG, Image] 8 - Bit Depth: 1
@@ -30,6 +31,7 @@
 [XMP, XMP-photoshop, Image] Instructions - Instructions: What instructions
 [XMP, XMP-photoshop, Location] State - State: Ont
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference?
+[XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 80
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 100

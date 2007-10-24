@@ -70,10 +70,18 @@
 <tr class=b>
 <td>0x000d</td>
 <td>CanonCameraInfo
-  <br>CanonCameraInfo1DmkIII</td>
-<td class=c>-<br>-</td>
+  <br>CanonCameraInfo1DmkIII
+  <br>CanonCameraInfo2
+  <br>CanonCameraInfoUnknown32
+  <br>CanonCameraInfoUnknown16
+  <br>CanonCameraInfoUnknown8</td>
+<td class=c>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Canon.html#CameraInfo'>Canon CameraInfo Tags</a>
-  <br>--&gt; <a href='Canon.html#CameraInfo1DmkIII'>Canon CameraInfo1DmkIII Tags</a></td></tr>
+  <br>--&gt; <a href='Canon.html#CameraInfo1DmkIII'>Canon CameraInfo1DmkIII Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfo2'>Canon CameraInfo2 Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfoUnknown32'>Canon CameraInfoUnknown32 Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfoUnknown16'>Canon CameraInfoUnknown16 Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfoUnknown8'>Canon CameraInfoUnknown8 Tags</a></td></tr>
 <tr>
 <td>0x000e</td>
 <td>CanonFileLength</td>
@@ -109,9 +117,9 @@
 <td>--&gt; <a href='Canon.html#CanonModelID'>Canon CanonModelID Values</a></td></tr>
 <tr class=b>
 <td>0x0012</td>
-<td>CanonPictureInfo</td>
+<td>CanonAFInfo</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Canon.html#PictureInfo'>Canon PictureInfo Tags</a></td></tr>
+<td>--&gt; <a href='Canon.html#AFInfo'>Canon AFInfo Tags</a></td></tr>
 <tr>
 <td>0x0015</td>
 <td>SerialNumberFormat</td>
@@ -119,126 +127,159 @@
 <td><span class=s>0x90000000 = Format 1
   <br>0xa0000000 = Format 2</span></td></tr>
 <tr class=b>
+<td>0x001c</td>
+<td>DateStampMode</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(only used in postcard mode)</span>
+  <br>0 = Off
+  <br>1 = Date
+  <br>2 = Date &amp; Time</span></td></tr>
+<tr>
+<td>0x001d</td>
+<td>MyColors</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#MyColors'>Canon MyColors Tags</a></td></tr>
+<tr class=b>
 <td>0x001e</td>
 <td>FirmwareRevision</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>0x0024</td>
+<td>FaceDetect1</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#FaceDetect1'>Canon FaceDetect1 Tags</a></td></tr>
+<tr class=b>
+<td>0x0025</td>
+<td>FaceDetect2</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#FaceDetect2'>Canon FaceDetect2 Tags</a></td></tr>
+<tr>
+<td>0x0026</td>
+<td>CanonAFInfo2</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#AFInfo2'>Canon AFInfo2 Tags</a></td></tr>
+<tr class=b>
 <td>0x0083</td>
 <td>OriginalDecisionData</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0090</td>
 <td>CustomFunctions1D</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0091</td>
 <td>PersonalFunctions</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#PersonalFuncs'>CanonCustom PersonalFuncs Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0092</td>
 <td>PersonalFunctionValues</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#PersonalFuncValues'>CanonCustom PersonalFuncValues Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0093</td>
 <td>CanonFileInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#FileInfo'>Canon FileInfo Tags</a></td></tr>
-<tr class=b>
-<td>0x0094</td>
-<td>AFPointsUsed1D</td>
-<td class=c>N</td>
-<td><span class=s><span class=n>(5 rows: A1-7, B1-10, C1-11, D1-10, E1-7, center point is C6)</span></span></td></tr>
 <tr>
+<td>0x0094</td>
+<td>AFPointsInFocus1D</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(EOS 1D -- 5 rows: A1-7, B1-10, C1-11, D1-10, E1-7, center point is C6)</span></span></td></tr>
+<tr class=b>
 <td>0x0095</td>
 <td>LensType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0096</td>
 <td>InternalSerialNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0097</td>
 <td>DustRemovalData</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0099</td>
-<td>CustomFunctions1DmkIII</td>
-<td class=c>-</td>
-<td>--&gt; <a href='CanonCustom.html#Functions1DmkIII'>CanonCustom Functions1DmkIII Tags</a></td></tr>
 <tr>
+<td>0x0099</td>
+<td>CustomFunctions2</td>
+<td class=c>-</td>
+<td>--&gt; <a href='CanonCustom.html#Functions2'>CanonCustom Functions2 Tags</a></td></tr>
+<tr class=b>
 <td>0x00a0</td>
 <td>ProccessingInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#Processing'>Canon Processing Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x00a1</td>
 <td>ToneCurveTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x00a2</td>
 <td>SharpnessTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x00a3</td>
 <td>SharpnessFreqTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x00a4</td>
 <td>WhiteBalanceTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x00a9</td>
 <td>ColorBalance</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ColorBalance'>Canon ColorBalance Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x00ae</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x00b0</td>
 <td>CanonFlags</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#Flags'>Canon Flags Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x00b1</td>
 <td>ModifiedInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ModifiedInfo'>Canon ModifiedInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x00b2</td>
 <td>ToneCurveMatching</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x00b3</td>
 <td>WhiteBalanceMatching</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x00b4</td>
 <td>ColorSpace</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = sRGB
   <br>2 = Adobe RGB</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x00b6</td>
 <td>PreviewImageInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#PreviewImageInfo'>Canon PreviewImageInfo Tags</a></td></tr>
+<tr>
+<td>0x00d0</td>
+<td>VRDOffset</td>
+<td class=c>int32u*</td>
+<td><span class=s><span class=n>(offset of VRD &quot;recipe data&quot; if it exists)</span></span></td></tr>
 <tr class=b>
 <td>0x00e0</td>
 <td>SensorInfo</td>
@@ -356,13 +397,19 @@
 </tr><tr><td class=r>0x2040000</td><td>= PowerShot A630</td>
 </tr><tr><td class=r>0x2090000</td><td>= PowerShot S5 IS</td>
 </tr><tr><td class=r>0x2100000</td><td>= PowerShot A460</td>
-</tr><tr><td class=r>0x2120000</td><td>= PowerShot SD850 IS / Digital IXUS 950 IS</td>
+</tr><tr><td class=r>0x2120000</td><td>= PowerShot SD850 IS / Digital IXUS 950 IS / IXY Digital 810 IS</td>
 </tr><tr><td class=r>0x2130000</td><td>= PowerShot A570 IS</td>
 </tr><tr><td class=r>0x2140000</td><td>= PowerShot A560</td>
 </tr><tr><td class=r>0x2150000</td><td>= PowerShot SD750 / Digital IXUS 75 / IXY Digital 90</td>
 </tr><tr><td class=r>0x2160000</td><td>= PowerShot SD1000 / Digital IXUS 70 / IXY Digital 10</td>
 </tr><tr><td class=r>0x2180000</td><td>= PowerShot A550</td>
 </tr><tr><td class=r>0x2190000</td><td>= PowerShot A450</td>
+</tr><tr><td class=r>0x2230000</td><td>= PowerShot G9</td>
+</tr><tr><td class=r>0x2240000</td><td>= PowerShot A650 IS</td>
+</tr><tr><td class=r>0x2260000</td><td>= PowerShot A720 IS</td>
+</tr><tr><td class=r>0x2290000</td><td>= PowerShot SX100 IS</td>
+</tr><tr><td class=r>0x2300000</td><td>= PowerShot SD950 IS / Digital IXUS 960 IS / IXY Digital 2000 IS</td>
+</tr><tr><td class=r>0x2310000</td><td>= PowerShot SD870 IS / Digital IXUS 860 IS / IXY Digital 910 IS</td>
 </tr><tr><td class=r>0x3010000</td><td>= PowerShot Pro90 IS</td>
 </tr><tr><td class=r>0x4040000</td><td>= PowerShot G1</td>
 </tr><tr><td class=r>0x6040000</td><td>= PowerShot S100 / Digital IXUS / IXY Digital</td>
@@ -378,7 +425,9 @@
 </tr><tr><td class=r>0x80000175</td><td>= EOS 20D</td>
 </tr><tr><td class=r>0x80000188</td><td>= EOS-1Ds Mark II</td>
 </tr><tr><td class=r>0x80000189</td><td>= EOS Digital Rebel XT / 350D / Kiss Digital N</td>
+</tr><tr><td class=r>0x80000190</td><td>= EOS 40D</td>
 </tr><tr><td class=r>0x80000213</td><td>= EOS 5D</td>
+</tr><tr><td class=r>0x80000215</td><td>= EOS-1Ds Mark III</td>
 </tr><tr><td class=r>0x80000232</td><td>= EOS-1D Mark II N</td>
 </tr><tr><td class=r>0x80000234</td><td>= EOS 30D</td>
 </tr><tr><td class=r>0x80000236</td><td>= EOS Digital Rebel XTi / 400D / Kiss Digital X</td>
@@ -568,15 +617,7 @@
   <br>0x3003 = Center
   <br>0x3004 = Left
   <br>0x4001 = Auto AF point selection
-  <br>0x4002 = Top
-  <br>0x4003 = Upper-left
-  <br>0x4004 = Upper-right
-  <br>0x4005 = Left
-  <br>0x4006 = Center
-  <br>0x4007 = Right
-  <br>0x4008 = Lower-left
-  <br>0x4009 = Lower-right
-  <br>0x400a = Bottom</span></td></tr>
+  <br>0x4006 = Face Detect</span></td></tr>
 <tr class=b>
 <td class=r>20</td>
 <td>CanonExposureMode</td>
@@ -657,7 +698,8 @@
 <td class=c>int16s</td>
 <td><span class=s>0 = Off
   <br>1 = On
-  <br>2 = On, Shot Only</span></td></tr>
+  <br>2 = On, Shot Only
+  <br>3 = On, Panning</span></td></tr>
 <tr class=b>
 <td class=r>35</td>
 <td>DisplayAperture</td>
@@ -686,6 +728,15 @@
   <br>6 = Custom
   <br>100 = My Color Data</span></td></tr>
 <tr class=b>
+<td class=r>41</td>
+<td>ManualFlashOutput</td>
+<td class=c>int16s</td>
+<td><span class=s>0x0 = n/a
+  <br>0x500 = Full
+  <br>0x502 = Medium
+  <br>0x504 = Low
+  <br>0x7fff = n/a</span></td></tr>
+<tr>
 <td class=r>42</td>
 <td>ColorTone</td>
 <td class=c>int16s</td>
@@ -734,8 +785,8 @@
 </tr><tr><td class=r>149</td><td>= Canon EF 100mm f/2</td>
 </tr><tr><td class=r>150</td><td>= Canon EF 14mm f/2.8L or Sigma 20mm EX f/1.8</td>
 </tr><tr><td class=r>151</td><td>= Canon EF 200mm f/2.8L</td>
-</tr><tr><td class=r>152</td><td>= Sigma 10-20mm F4-5.6 or 12-24mm f/4.5-5.6 or 14mm f/2.8</td>
-</tr><tr><td class=r>153</td><td>= Canon EF 35-350mm f/3.5-5.6L or Tamron AF 28-300mm or Sigma Bigma</td>
+</tr><tr><td class=r>152</td><td>= Sigma Lens (various models)</td>
+</tr><tr><td class=r>153</td><td>= Canon EF 35-350mm f/3.5-5.6L or Tamron or Sigma Bigma</td>
 </tr><tr><td class=r>155</td><td>= Canon EF 85mm f/1.8 USM</td>
 </tr><tr><td class=r>156</td><td>= Canon EF 28-105mm f/3.5-4.5 USM</td>
 </tr><tr><td class=r>160</td><td>= Canon EF 20-35mm f/3.5-4.5 USM</td>
@@ -776,8 +827,10 @@
 </tr><tr><td class=r>235</td><td>= Canon EF-S10-22mm F3.5-4.5 USM</td>
 </tr><tr><td class=r>236</td><td>= Canon EF-S60mm F2.8 Macro USM</td>
 </tr><tr><td class=r>237</td><td>= Canon EF 24-105mm f/4L IS</td>
-</tr><tr><td class=r>238</td><td>= Canon EF 70-300mm F4-5.6 IS USM</td>
-</tr><tr><td class=r>241</td><td>= Canon EF 50mm F1.2L USM</td>
+</tr><tr><td class=r>238</td><td>= Canon EF 70-300mm f/4-5.6 IS USM</td>
+</tr><tr><td class=r>239</td><td>= Canon EF 85mm f/1.2L II USM</td>
+</tr><tr><td class=r>240</td><td>= Canon EF-S 17-55mm f/2.8 IS USM</td>
+</tr><tr><td class=r>241</td><td>= Canon EF 50mm f/1.2L USM</td>
 </tr><tr><td class=r>242</td><td>= Canon EF 70-200mm f/4L IS USM</td>
 </tr></table></td></tr></table></blockquote>
 
@@ -893,7 +946,7 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r>14</td>
-<td>AFPointsUsed2</td>
+<td>AFPointsInFocus</td>
 <td class=c>int16s</td>
 <td><span class=s><span class=n>(used by D30, D60 and some PowerShot/Ixus models)</span>
   <br>0x3000 = None (MF)
@@ -976,6 +1029,11 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
 <td>Self-timer2</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r>33</td>
+<td>FlashOutput</td>
+<td class=c>int16s</td>
+<td><span class=s><span class=n>(this has a maximum value of 500 for models like the A570IS)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Panorama'>Canon Panorama Tags</a></h2>
@@ -1019,37 +1077,52 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo'>Canon CameraInfo Tags</a></h2>
-<p>Used by the 1D, 1DS, 1DmkII, 1DSmkII and 5D.</p>
+<p>Information in the &quot;CameraInfo&quot; records is tricky to decode because the
+encodings are very different than in other Canon records (even sometimes
+switching endianness between values within a single camera), plus there is
+considerable variation in format from model to model. The table below is
+common to the 1D, 1DS, 1DmkII, 1DSmkII and 5D, but individual tags may not
+be valid for all these models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td class=r>3</td>
+<td>FNumber</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(5D only)</span></span></td></tr>
+<tr class=b>
 <td class=r>4</td>
 <td>ExposureTime</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r>10</td>
-<td>FocalLength</td>
+<tr>
+<td class=r>6</td>
+<td>ISO</td>
 <td class=c>int8u</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(5D only)</span></span></td></tr>
+<tr class=b>
+<td class=r>9</td>
+<td>FocalLength</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(1DmkII and 1DsMkII only)</span></span></td></tr>
 <tr>
 <td class=r>13</td>
 <td>LensType</td>
 <td class=c>int8u</td>
 <td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
 <tr class=b>
-<td class=r>18</td>
+<td class=r>17</td>
 <td>ShortFocal</td>
-<td class=c>int8u</td>
-<td><span class=s><span class=n>(1D and 5D only)</span></span></td></tr>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(1DmkII and 1DsMkII only)</span></span></td></tr>
 <tr>
-<td class=r>20</td>
+<td class=r>19</td>
 <td>LongFocal</td>
-<td class=c>int8u</td>
-<td><span class=s><span class=n>(1D and 5D only)</span></span></td></tr>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(1DmkII and 1DsMkII only)</span></span></td></tr>
 <tr class=b>
 <td class=r>45</td>
 <td>FocalType</td>
@@ -1059,9 +1132,9 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
   <br>2 = Zoom</span></td></tr>
 <tr>
 <td class=r>56</td>
-<td>AFPointsUsed5D</td>
+<td>AFPointsInFocus5D</td>
 <td class=c>undef[2]</td>
-<td><span class=s><span class=n>(bit definitions are for big-endian int16u)</span>
+<td><span class=s><span class=n>(EOS 5D, bit definitions are for big-endian int16u)</span>
   <br>Bit 0 = Center
   <br>Bit 1 = Top
   <br>Bit 2 = Bottom
@@ -1349,83 +1422,407 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo1DmkIII'>Canon CameraInfo1DmkIII Tags</a></h2>
+<p>CameraInfo tags valid for the EOS 1D Mark III.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td class=r>3</td>
+<td>FNumber</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r>4</td>
 <td>ExposureTime</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r>6</td>
+<td>ISO</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>29</td>
+<td>FocalLength</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>134</td>
+<td>PictureStyle</td>
+<td class=c>int8u</td>
+<td><span class=s>0x0 = None
+  <br>0x1 = Standard
+  <br>0x2 = Set 1
+  <br>0x3 = Set 2
+  <br>0x4 = Set 3
+  <br>0x21 = User Def. 1
+  <br>0x22 = User Def. 2
+  <br>0x23 = User Def. 3
+  <br>0x41 = External 1
+  <br>0x42 = External 2
+  <br>0x43 = External 3
+  <br>0x81 = Standard
+  <br>0x82 = Portrait
+  <br>0x83 = Landscape
+  <br>0x84 = Neutral
+  <br>0x85 = Faithful
+  <br>0x86 = Monochrome</span></td></tr>
+<tr class=b>
+<td class=r>275</td>
+<td>ShortFocal</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>277</td>
+<td>LongFocal</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>370</td>
+<td>FileNumber</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>374</td>
+<td>ShutterCount</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(may be valid only for some 1DmkIII copies, even running the same firmware)</span></span></td></tr>
+<tr class=b>
+<td class=r>1118</td>
+<td>TimeStamp</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='PictureInfo'>Canon PictureInfo Tags</a></h2>
+<h2><a name='CameraInfo2'>Canon CameraInfo2 Tags</a></h2>
+<p>These tags used by a number of newer PowerShot models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>1</td>
-<td>NumAFPoints</td>
-<td class=c>int16u</td>
+<td class=r>0</td>
+<td>ISO</td>
+<td class=c>int32s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td class=r>5</td>
+<td>FNumber</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>6</td>
+<td>ExposureTime</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>23</td>
+<td>Rotation</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfoUnknown32'>Canon CameraInfoUnknown32 Tags</a></h2>
+<p>Unknown CameraInfo tags are divided into 3 tables based on format size.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=4 class=c>[no tags known]</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfoUnknown16'>Canon CameraInfoUnknown16 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=4 class=c>[no tags known]</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfoUnknown8'>Canon CameraInfoUnknown8 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=4 class=c>[no tags known]</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AFInfo'>Canon AFInfo Tags</a></h2>
+<p>Auto-focus information used by many older Canon models.  The values in this
+record are sequential, and some have variable sizes based on the value of
+NumAFPoints (which may be 1,5,7,9,15,45 or 53).  The AFArea coordinates are
+given in a system where the image has dimensions given by AFImageWidth and
+AFImageHeight, and 0,0 is the image center. The direction of the Y axis
+depends on the camera model, with positive Y upwards for EOS models, but
+apparently downwards for PowerShot models.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Sequence</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>NumAFPoints</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>1</td>
+<td>ValidAFPoints</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(number of AF points valid in the following information)</span></span></td></tr>
+<tr>
 <td class=r>2</td>
 <td>CanonImageWidth</td>
-<td class=c>int16u</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>3</td>
 <td>CanonImageHeight</td>
-<td class=c>int16u</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>4</td>
-<td>CanonImageWidthAsShot</td>
-<td class=c>int16u</td>
+<td>AFImageWidth</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(size of image in AF coordinates)</span></span></td></tr>
+<tr class=b>
+<td class=r>5</td>
+<td>AFImageHeight</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>5</td>
-<td>CanonImageHeightAsShot</td>
+<td class=r>6</td>
+<td>AFAreaWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>7</td>
+<td>AFAreaHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>8</td>
+<td>AFAreaXPositions</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>9</td>
+<td>AFAreaYPositions</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>10</td>
+<td>AFPointsInFocus</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>11</td>
+<td>PrimaryAFPoint
+  <br>Canon_AFInfo_0x000b?</td>
+<td class=c>N<br>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>12</td>
+<td>PrimaryAFPoint</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MyColors'>Canon MyColors Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>2</td>
+<td>MyColorMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>9 = Custom
+  <br>12 = Vivid
+  <br>13 = Neutral
+  <br>14 = Sepia
+  <br>15 = B&amp;W</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceDetect1'>Canon FaceDetect1 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>2</td>
+<td>FacesDetected</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>22</td>
-<td>AFPointsUsed</td>
+<td class=r>3</td>
+<td>FaceDetectFrameWidth</td>
 <td class=c>int16u</td>
-<td><span class=s><span class=n>(10D and 300D)</span>
-  <br>Bit 0 = Right
-  <br>Bit 1 = Mid-right
-  <br>Bit 2 = Bottom
-  <br>Bit 3 = Center
-  <br>Bit 4 = Top
-  <br>Bit 5 = Mid-left
-  <br>Bit 6 = Left
-  <br><span class=n>(350D)</span>
-  <br>Bit 0 = Bottom
-  <br>Bit 1 = Left
-  <br>Bit 2 = Mid-left
-  <br>Bit 3 = Center
-  <br>Bit 4 = Mid-right
-  <br>Bit 5 = Right
-  <br>Bit 6 = Top</span></td></tr>
+<td>&nbsp;</td></tr>
 <tr>
-<td class=r>26</td>
-<td>AFPointsUsed</td>
+<td class=r>4</td>
+<td>FaceDetectFrameHeight</td>
 <td class=c>int16u</td>
-<td><span class=s><span class=n>(20D, 30D and 400D)</span>
-  <br>Bit 0 = Top
-  <br>Bit 1 = Upper-left
-  <br>Bit 2 = Upper-right
-  <br>Bit 3 = Left
-  <br>Bit 4 = Center
-  <br>Bit 5 = Right
-  <br>Bit 6 = Lower-left
-  <br>Bit 7 = Lower-right
-  <br>Bit 8 = Bottom</span></td></tr>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>8</td>
+<td>Face0Position</td>
+<td class=c>int16s[2]</td>
+<td><span class=s><span class=n>(X-Y coordinates for the center of each face in the Face Detect frame at the
+time of focus lock. &quot;0 0&quot; is the center, and positive X and Y are to the
+right and downwards respectively)</span></span></td></tr>
+<tr>
+<td class=r>10</td>
+<td>Face1Position</td>
+<td class=c>int16s[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>12</td>
+<td>Face2Position</td>
+<td class=c>int16s[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>14</td>
+<td>Face3Position</td>
+<td class=c>int16s[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>16</td>
+<td>Face4Position</td>
+<td class=c>int16s[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>18</td>
+<td>Face5Position</td>
+<td class=c>int16s[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>20</td>
+<td>Face6Position</td>
+<td class=c>int16s[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>22</td>
+<td>Face7Position</td>
+<td class=c>int16s[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>24</td>
+<td>Face8Position</td>
+<td class=c>int16s[2]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceDetect2'>Canon FaceDetect2 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>2</td>
+<td>FacesDetected</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AFInfo2'>Canon AFInfo2 Tags</a></h2>
+<p>Newer version of the AFInfo record containing much of the same information
+(and coordinate confusion) as the older version.  In this record, values of
+9 and 45 have been observed for NumAFPoints.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Sequence</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>AFInfoSize?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>1</td>
+<td>AFMode</td>
+<td class=c>N</td>
+<td><span class=s>0 = Off (Manual Focus)
+  <br>2 = Single-point AF
+  <br>4 = Multi-point AF
+  <br>5 = Face Detect AF</span></td></tr>
+<tr>
+<td class=r>2</td>
+<td>NumAFPoints</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>3</td>
+<td>ValidAFPoints</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(number of AF points valid in the following information)</span></span></td></tr>
+<tr>
+<td class=r>4</td>
+<td>CanonImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>5</td>
+<td>CanonImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>6</td>
+<td>AFImageWidth</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(size of image in AF coordinates)</span></span></td></tr>
+<tr class=b>
+<td class=r>7</td>
+<td>AFImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>8</td>
+<td>AFAreaWidths</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>9</td>
+<td>AFAreaHeights</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>10</td>
+<td>AFAreaXPositions</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>11</td>
+<td>AFAreaYPositions</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>12</td>
+<td>AFPointsInFocus</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>13</td>
+<td>AFPointsSelected
+  <br>Canon_AFInfo2_0x000d?</td>
+<td class=c>N<br>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>14</td>
+<td>PrimaryAFPoint</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FileInfo'>Canon FileInfo Tags</a></h2>
@@ -2467,7 +2864,7 @@ images with a directory number of 164 or greater)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 10, 2007</i>
+<br><i>Last revised Oct 16, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

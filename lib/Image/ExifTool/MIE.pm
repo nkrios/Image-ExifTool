@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -765,24 +765,13 @@ sub UpdateMieMap()
 sub GetLangInfo($$)
 {
     my ($tagInfo, $langCode) = @_;
+    # check for properly formatted language code
+    return undef unless $langCode =~ /^[a-z]{2}([-_])[A-Z]{2}$/;
+    # use '_' as a separator, but recognize '_' or '-'
+    $langCode =~ tr/-/_/ if $1 eq '-';
     # can only set locale on string types
     return undef if $$tagInfo{Writable} and $$tagInfo{Writable} ne 'string';
-    # make a new tagInfo hash for this locale
-    my $table = $$tagInfo{Table};
-    Image::ExifTool::GenerateTagIDs($table);
-    my $tagID = $$tagInfo{TagID} . '-' . $langCode;
-    my $langInfo = $$table{$tagID};
-    unless ($langInfo) {
-        # make a new tagInfo entry for this locale
-        $langInfo = {
-            %$tagInfo,
-            Name => $$tagInfo{Name} . '-' . $langCode,
-            Description => Image::ExifTool::MakeDescription($$tagInfo{Name}) .
-                           " ($langCode)",
-        };
-        Image::ExifTool::AddTagToTable($table, $tagID, $langInfo);
-    }
-    return $langInfo;
+    return Image::ExifTool::GetLangInfo($tagInfo, $langCode);
 }
 
 #------------------------------------------------------------------------------
@@ -2378,7 +2367,8 @@ that the "x-" is not duplicated if the subfile MIME type already starts with
 "x-".  So a subfile with MIME type "image/x-raw" is contained within a MIE
 file of type "image/x-mie-raw", not "image/x-mie-x-raw".  In the case of
 multiple documents in a MIE file, the MIME type is taken from the first
-document.
+document.  Regardless of the subfile type, all MIE-format files should have
+a filename extension of ".MIE".
 
 =head2 Levels of Support
 

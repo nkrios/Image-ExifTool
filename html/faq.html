@@ -23,12 +23,13 @@ pre { color: #800; margin-left: 2em }
 <li><a href="#Q6">"Can't convert TAG" errors</a>
 <li><a href="#Q7">Deleting all EXIF from a TIFF</a>
 </ol></td><td valign='top'><ol start=8>
-<li><a href="#Q8">Writing the Make or Model tag</a>
+<li><a href="#Q8">Writing Make, Model and MakerNotes</a>
 <li><a href="#Q9">Tag locations when copying</a>
 <li><a href="#Q10">Coded character sets</a>
 <li><a href="#Q11">User-defined tags</a>
 <li><a href="#Q12">Database import</a>
 <li><a href="#Q13">Output file size</a>
+<li><a href="#Q14">GPS coordinate format</a>
 </ol></td></tr></table>
 
 <hr>
@@ -67,9 +68,11 @@ duplicated in different locations within an image.  When in doubt, use
 "<code>exiftool -a -G1 FILENAME</code>" to show all information and the
 locations in the file.  In this command, <code>&#8209;a</code> allows
 duplicate tags to be displayed, <code>&#8209;G1</code> shows the family 1
-group name (ie. the location) of each tag, and "<code>FILENAME</code>" is the
-name of your image file.  Also, it may be helpful to add <code>&#8209;s</code>
-to show the actual tag names instead of the descriptions.</blockquote>
+group name (ie. the location) of each tag, and "<code>FILENAME</code>" is
+the name of your image file.  Also, it may be helpful to add
+<code>&#8209;s</code> to show the actual tag names instead of the
+descriptions (and possibly <code>&#8209;D</code> or <code>&#8209;H</code> to
+show the tag ID numbers if you are familiar with these).</blockquote>
 
 <blockquote>If you are having problems with other software reading information
 written by ExifTool, if possible try first writing the information from the
@@ -172,7 +175,7 @@ must be deleted separately from a TIFF file if desired.
 </blockquote>
 
 <a name="Q8"></a>
-<p>8a. <b>"All maker note information is lost if I change the Make or Model tag"</b> or
+<p>8a. <b>"All maker note information is lost if I change the Make or Model tag"</b>, or
 <br>8b. <b>"I can't copy maker note information to an image"</b></p>
 
 <blockquote>
@@ -185,15 +188,19 @@ recognized. So it is a good idea not to edit the Make and Model tags in the
 first place.</blockquote>
 
 <blockquote>If you really want to delete the Make and Model information, you
-might as well delete the maker notes too.  You can do this with the following
-command:
+might as well delete the maker notes too.  You can do this with the either of
+the following commands:
 <pre>exiftool -make= -model= -makernotes:all= image.jpg
+exiftool -make= -model= -makernotes= image.jpg
 </pre>
 For the same reason, maker notes can not be copied to an image with an
 incompatible Make or Model.  To do this, the Make and Model tags must also be
 copied.  ie)
 <pre>exiftool -tagsfromfile src.jpg -makernotes -make -model dst.jpg
 </pre>
+(Note that in this case the "<code>-makernotes:all</code>" syntax does not
+work because it attempts to copy the maker note tags individually, but they
+must be copied as a block with "<code>-makernotes</code>".)
 </blockquote>
 
 <a name="Q9"></a>
@@ -282,27 +289,27 @@ specifically writing contradictory information to different groups.)
 
 <blockquote>
 Certain meta information formats allow coded character sets other than plain
-ASCII.   Unless otherwise specified, 8-bit encodings are passed straight through
-ExifTool without translation, and multi-byte encodings are translated to UTF-8
-by default, or Windows Latin1 with the <code>&#8209;L</code> option (or by
-setting the "<code>Charset</code>" option to "<code>Latin</code>" via the API).
-When writing, the inverse translation is performed.  (Alternatively, special
-characters may be translated to HTML character entities by using the
-<code>&#8209;E</code> option, but this only applies when reading.)  More
-specific details are given below about how character coding is handled for EXIF,
-IPTC, XMP and ID3 information:</blockquote>
+ASCII.   When reading, 8-bit encodings are passed straight through ExifTool
+without translation (unless otherwise specified below), and multi-byte encodings
+are translated to UTF-8 by default, or Windows Latin1 with the
+<code>&#8209;L</code> option (or by setting the "<code>Charset</code>" option to
+"<code>Latin</code>" via the API).  When writing, the inverse translations are
+performed.  (Alternatively, special characters may be translated to HTML
+character entities by using the <code>&#8209;E</code> option, but this only
+applies when reading.) More specific details are given below about how character
+coding is handled for EXIF, IPTC, XMP and ID3 information:</blockquote>
 
 <blockquote><b>EXIF</b>: Most textual EXIF information is stored in ASCII
 format, however some EXIF tags (UserComment, GPSProcessingMethod and
 GPSAreaInformation) may be also be encoded in Unicode or JIS.  When reading
-information, Unicode text is translated to UTF-8, or Windows Latin1
-with the <code>&#8209;L</code> option.  Other encodings are not translated. 
-When writing, text is stored as ASCII unless the string contains special
-characters, in which case it is translated from UTF-8 or Latin1 (depending on
-the <code>&#8209;L</code> option) and stored as Unicode.  The EXIF "XP" tags
-(XPTitle, XPComment, etc) are always stored as Unicode, and are read and written
-as either UTF-8, or Windows Latin1 with the <code>&#8209;L</code>
-option.</blockquote>
+information, Unicode text is translated to UTF-8, or Windows Latin1 with the
+<code>&#8209;L</code> option.  Other encodings are not translated. When writing,
+text is stored as ASCII unless the string contains special characters, in which
+case it is translated from UTF-8 or Latin1 (depending on the
+<code>&#8209;L</code> option) and stored as Unicode if allowed by the tag
+specification.  The EXIF "XP" tags (XPTitle, XPComment, etc) are always stored
+as Unicode, and are read and written as either UTF-8, or Windows Latin1 with the
+<code>&#8209;L</code> option.</blockquote>
 
 <blockquote><b>IPTC</b>: The value of the IPTC:CodedCharacterSet tag determines
 how the internal IPTC string values are interpreted.  If CodedCharacterSet
@@ -445,8 +452,44 @@ of the XMP format which allows the information to be written in various styles,
 some of which are more compact than others.
 </blockquote>
 
+<blockquote>ExifTool does not modify the image data itself, so editing a file is
+"lossless" as far as the image is concerned.</blockquote>
+
+<a name="Q14"></a>
+<p>14. <b>"What format do I use for writing GPS coordinates?"</b></p>
+
+<blockquote>ExifTool is very flexible in the formats allowed for entering GPS
+coordinates.  Any string containing between 1 and 3 floating point numbers is
+valid.  The numbers represent degrees, (and optionally) minutes and
+seconds.</blockquote>
+
+<blockquote>For EXIF GPS coordinates, the reference direction is specified
+separately with the EXIF:GPSLatitudeRef or EXIF:GPSLongitudeRef
+tag.</blockquote>
+
+<blockquote>For XMP GPS coordinates, the reference direction is specified within
+the XMP:GPSLatitude or XMP:GPSLongitude value, with west longitudes and south
+latitudes being specified either by negative coordinate values or by ending the
+string with "<code>W</code>" or "<code>S</code>". </blockquote>
+
+<blockquote>Here are some examples of equivalent ways to specify a GPS
+latitude in both EXIF and XMP:
+
+<pre>exiftool "-exif:gpslatitude=42 30 0.00" -exif:gpslatituderef=S a.jpg
+exiftool "-exif:gpslatitude=42 deg 30.00 min" -exif:gpslatituderef=S a.jpg
+exiftool -exif:gpslatitude=42.5 -exif:gpslatituderef=S a.jpg
+
+exiftool "-xmp:gpslatitude=42 30 0.00 S" a.jpg
+exiftool -xmp:gpslatitude=42.50S a.jpg
+exiftool -xmp:gpslatitude=-42.5 a.jpg
+</pre>
+
+Similar styles may be used for longitude.  ExifTool will convert any of these
+coordinate styles to the proper format for the specific tag used.
+</blockquote>
+
 <hr>
-<i>Last revised Apr. 30, 2007</i>
+<i>Last revised Sept. 17, 2007</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

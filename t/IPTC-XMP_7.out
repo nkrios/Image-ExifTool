@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.57
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.94
 [File, File, Image]  - File Name: IPTC-XMP_7_failed.xmp
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
@@ -49,6 +49,7 @@
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference?
 [XMP, XMP-photoshop, Image] Urgency - Urgency: 8
 [XMP, XMP-tiff, Author] Artist - Artist: Phil Harvey
+[XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Author] Copyright - Copyright: Copyright 2004 Phil Harvey
 [XMP, XMP-tiff, Image] ImageDescription - Image Description: A witty caption

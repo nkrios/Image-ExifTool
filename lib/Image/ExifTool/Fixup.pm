@@ -26,7 +26,7 @@ use Image::ExifTool qw(GetByteOrder SetByteOrder Get32u Get32s Set32u
                        Get16u Get16s Set16u);
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub AddFixup($$;$$);
 sub ApplyFixup($$);
@@ -176,7 +176,7 @@ sub HasMarker($$)
     my ($self, $marker) = @_;
     my $phash = $self->{Pointers};
     return 0 unless $phash;
-    return 1 if grep /^_$marker$/, keys %$phash;
+    return 1 if grep /_$marker$/, keys %$phash;
     return 0 unless $self->{Fixups};
     my $subFixup;
     foreach $subFixup (@{$self->{Fixups}}) {

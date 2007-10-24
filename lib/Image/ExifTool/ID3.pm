@@ -15,9 +15,10 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.09';
+$VERSION = '1.11';
 
 sub ProcessID3v2($$$);
+sub ProcessPrivate($$$);
 
 # audio formats that we process after an ID3v2 header (in order)
 my @audioFormats = qw(APE MPC FLAC OGG MP3);
@@ -313,13 +314,16 @@ my %id3v2_common = (
   # GEOB => 'GeneralEncapsulatedObject',
   # GRID => 'GroupIdentification',
   # LINK => 'LinkedInformation',
-  # MCDI => 'MusicCDIdentifier',
+    MCDI => { Name => 'MusicCDIdentifier', Binary => 1 },
   # MLLT => 'MPEGLocationLookupTable',
   # OWNE => 'Ownership', # enc(1), _price, 00, _date(8), Seller
     PCNT => 'PlayCounter',
   # POPM => 'Popularimeter', # _email, 00, rating(1), counter(4-N)
   # POSS => 'PostSynchronization',
-  # PRIV => 'Private',
+    PRIV => {
+        Name => 'Private',
+        SubDirectory => { TagTable => 'Image::ExifTool::ID3::Private' },
+    },
   # RBUF => 'RecommendedBufferSize',
   # RVRB => 'Reverb',
   # SYLT => 'SynchronizedLyricText',
@@ -421,6 +425,25 @@ my %id3v2_common = (
     TSST => 'SetSubtitle',
 );
 
+# ID3 PRIV tags (ref PH)
+%Image::ExifTool::ID3::Private = (
+    PROCESS_PROC => \&Image::ExifTool::ID3::ProcessPrivate,
+    GROUPS => { 1 => 'ID3', 2 => 'Audio' },
+    NOTES => 'ID3 private (PRIV) tags.',
+    XMP => {
+        SubDirectory => {
+            DirName => 'XMP',
+            TagTable => 'Image::ExifTool::XMP::Main',
+        },
+    },
+    PeakValue => {
+        ValueConv => 'length($val)==4 ? unpack("V",$val) : \$val',
+    },
+    AverageLevel => {
+        ValueConv => 'length($val)==4 ? unpack("V",$val) : \$val',
+    },
+);
+
 # can't share tagInfo hashes between two tables, so we must make
 # copies of the necessary hashes
 {
@@ -430,6 +453,38 @@ my %id3v2_common = (
         my %tagInfo = %{$id3v2_common{$tag}};
         $Image::ExifTool::ID3::v2_4{$tag} = \%tagInfo;
     }
+}
+
+#------------------------------------------------------------------------------
+# Process ID3 PRIV data
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+sub ProcessPrivate($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my ($tag, $start);
+    if ($$dataPt =~ /^(.*?)\0/) {
+        $tag = $1;
+        $start = length($tag) + 1;
+    } else {
+        $tag = '';
+        $start = 0;
+    }
+    unless ($$tagTablePtr{$tag}) {
+        $tag =~ tr{/ }{_}d; # translate '/' to '_' and remove spaces
+        $tag = 'private' unless $tag =~ /^[-\w]{1,24}$/;
+        unless ($$tagTablePtr{$tag}) {
+            Image::ExifTool::AddTagToTable($tagTablePtr, $tag,
+                { Name => ucfirst($tag), Binary => 1 });
+        }
+    }
+    my $key = $exifTool->HandleTag($tagTablePtr, $tag, undef,
+        Size  => length($$dataPt) - $start,
+        Start => $start,
+        DataPt => $dataPt,
+    );
+    # set group1 name
+    $exifTool->SetGroup1($key, $$exifTool{ID3_Ver}) if $key;
 }
 
 #------------------------------------------------------------------------------
@@ -464,23 +519,33 @@ sub DecodeString($$)
     return '' unless length $val;
     my $enc = unpack('C', $val);
     $val = substr($val, 1); # remove encoding byte
-    $val =~ s/\0+$//;       # remove null padding if it exists
     my @vals;
     if ($enc == 0) {        # ISO 8859-1
+        $val =~ s/\0+$//;   # remove any null padding
         $val = $exifTool->Latin2Charset($val);
         @vals = split "\0", $val;
     } elsif ($enc == 3) {   # UTF-8
+        $val =~ s/\0+$//;
         $val = $exifTool->UTF82Charset($val);
         @vals = split "\0", $val;
     } elsif ($enc == 1 or $enc == 2) {  # UTF-16 with BOM, or UTF-16BE
-        my $bom = $val =~ s/^(\xfe\xff|\xff\xfe)// ? $1 : "\xfe\xff";
+        my $bom = "\xfe\xff";
         my %order = ( "\xfe\xff" => 'MM', "\xff\xfe", => 'II' );
-        @vals = split "\0\0", $val;
-        foreach $val (@vals) {
-            $val =~ s/^$bom//;          # remove BOM if it exists
-            $val = $exifTool->Unicode2Charset($val, $order{$bom});
+        for (;;) {
+            my $v;
+            # split string at null terminators on word boundaries
+            if ($val =~ s/((..)*?)\0\0//) {
+                $v = $1;
+            } else {
+                last unless length $val > 1;
+                $v = $val;
+                $val = '';
+            }
+            $bom = $1 if $v =~ s/^(\xfe\xff|\xff\xfe)//;
+            push @vals, $exifTool->Unicode2Charset($v, $order{$bom});
         }
     } else {
+        $val =~ s/\0+$//;
         return "<Unknown encoding $enc> $val";
     }
     return @vals if wantarray;
@@ -500,8 +565,7 @@ sub WarnOnce($$)
 }
 #------------------------------------------------------------------------------
 # Process ID3v2 information
-# Inputs: 0) ExifTool object reference, 1) directory information reference
-#         2) tag table reference
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 sub ProcessID3v2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -533,8 +597,15 @@ sub ProcessID3v2($$$)
         }
         last if $offset + $len > $size;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $id);
-        next unless $tagInfo or $verbose;
-
+        unless ($tagInfo) {
+            next unless $verbose or $exifTool->Options('Unknown');
+            $id =~ tr/-A-Za-z0-9_//dc;
+            $id = 'unknown' unless length $id;
+            unless ($$tagTablePtr{$id}) {
+                $tagInfo = { Name => "ID3_$id", Binary => 1 };
+                Image::ExifTool::AddTagToTable($tagTablePtr, $id, $tagInfo);
+            }
+        }
         # decode v2.3 and v2.4 flags
         my %flags;
         if ($flags) {
@@ -603,18 +674,37 @@ sub ProcessID3v2($$$)
 # decode data in this frame
 #
         my $valLen = length($val);  # actual value length (after decompression, etc)
-        if ($id =~ /^T[^X]/ or $id =~ /^(IPL|IPLS)$/) {
-            $val = DecodeString($exifTool, $val);
-        } elsif ($id =~ /^(TXX|TXXX|WXX|WXXX)$/) {
+        if ($id =~ /^(TXX|TXXX)$/) {
+            # two encoded strings separated by a null
             my @vals = DecodeString($exifTool, $val);
             foreach (0..1) { $vals[$_] = '' unless defined $vals[$_]; }
             ($val = "($vals[0]) $vals[1]") =~ s/^\(\) //;
+        } elsif ($id =~ /^T/ or $id =~ /^(IPL|IPLS)$/) {
+            $val = DecodeString($exifTool, $val);
+        } elsif ($id =~ /^(WXX|WXXX)$/) {
+            # one encoded string and one Latin string separated by a null
+            my $enc = unpack('C', $val);
+            my $url;
+            if ($enc == 1 or $enc == 2) {
+                ($val, $url) = ($val =~ /^(.(?:..)*?)\0\0(.*)/);
+            } else {
+                ($val, $url) = ($val =~ /^(..*?)\0(.*)/);
+            }
+            unless (defined $val and defined $url) {
+                $exifTool->Warn("Invalid $id frame value");
+                next;
+            }               
+            $val = DecodeString($exifTool, $val);
+            $url =~ s/\0.*//;
+            $val = length($val) ? "($val) $url" : $url;
+        } elsif ($id =~ /^W/) {
+            $val =~ s/\0.*//;   # truncate at null
         } elsif ($id =~ /^(COM|COMM|ULT|USLT)$/) {
             $valLen > 4 or $exifTool->Warn("Short $id frame"), next;
             substr($val, 1, 3) = '';    # remove language code
             my @vals = DecodeString($exifTool, $val);
             foreach (0..1) { $vals[$_] = '' unless defined $vals[$_]; }
-            ($val = "($vals[0]) $vals[1]") =~ s/^\(\) //;
+            $val = length($vals[0]) ? "($vals[0]) $vals[1]" : $vals[1];
         } elsif ($id eq 'USER') {
             $valLen > 4 or $exifTool->Warn('Short USER frame'), next;
             substr($val, 1, 3) = '';    # remove language code
@@ -634,7 +724,12 @@ sub ProcessID3v2($$$)
             # remove header (encoding, image format or MIME type, picture type, description)
             $val =~ s/$hdr//s or $exifTool->Warn("Invalid $id frame"), next;
             $enc and $val =~ s/^\0//;   # remove 2nd terminator if Unicode encoding
-        } else {
+        } elsif ($id eq 'PRIV') {
+            # save version number to set group1 name for tag later
+            $exifTool->{ID3_Ver} = $tagTablePtr->{GROUPS}->{1};
+            $exifTool->HandleTag($tagTablePtr, $id, $val);
+            next;
+        } elsif (not $$tagInfo{Binary}) {
             $exifTool->Warn("Don't know how to handle $id frame");
             next;
         }

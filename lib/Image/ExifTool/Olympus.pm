@@ -16,6 +16,8 @@
 #               8) Shingo Noguchi, PhotoXP (http://www.daifukuya.com/photoxp/)
 #               9) Mark Dapoz private communication
 #              10) Lilo Huang private communication (E-330)
+#              11) http://olypedia.de/Olympus_Makernotes
+#              12) Ioannis Panagiotopoulos private communication (E-510)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -25,7 +27,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.36';
+$VERSION = '1.40';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -120,6 +122,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             4 => 'Economy',
             5 => 'Extra fine',
         },
+    },
+    0x0104 => { #11
+        Name => 'BodyFirmwareVersion',
+        Writable => 'string',
     },
 #
 # end Konica/Minolta tags
@@ -249,6 +255,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'PreCaptureFrames',
         Writable => 'int16u',
     },
+    0x0301 => { #11
+        Name => 'WhiteBoard',
+        Writable => 'int16u',
+    },
     0x0302 => { #6
         Name => 'OneTouchWB',
         Writable => 'int16u',
@@ -258,8 +268,60 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             2 => 'On (Preset)',
         },
     },
+    0x0303 => { #11
+        Name => 'WhiteBalanceBracket',
+        Writable => 'int16u',
+    },
+    0x0304 => { #11
+        Name => 'WhiteBalanceBias',
+        Writable => 'int16u',
+    },
+   # 0x0305 => 'PrintMaching', ? #11
+    0x0403 => { #11
+        Name => 'SceneMode',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Standard',
+            2 => 'Auto',
+            4 => 'Portrait',
+            5 => 'Landscape+Portrait',
+            6 => 'Landscape',
+            7 => 'Night Scene',
+            8 => 'Night+Portrait',
+            9 => 'Sport',
+            10 => 'Self Portrait',
+            11 => 'Indoor',
+            12 => 'Beach&Snow',
+            13 => 'Beach',
+            14 => 'Snow',
+            15 => 'Self Portrait+Self Timer',
+            16 => 'Sunset',
+            17 => 'Cuisine',
+            18 => 'Documents',
+            19 => 'Candle',
+            20 => 'Fireworks',
+            21 => 'Available Light',
+            22 => 'Vivid',
+            23 => 'Underwater Wide1',
+            24 => 'Underwater Macro',
+            25 => 'Museum',
+            26 => 'Behind Glass',
+            27 => 'Auction',
+            28 => 'Shoot&Select1',
+            29 => 'Shoot&Select2',
+            30 => 'Underwater Wide2',
+            31 => 'Digital Image Stabilization',
+            32 => 'Face Portrait',
+            33 => 'Pet',
+        },
+    },
     0x0404 => { #PH (D595Z, C7070WZ)
         Name => 'SerialNumber',
+        Writable => 'string',
+    },
+    0x0405 => { #11
+        Name => 'Firmware',
         Writable => 'string',
     },
     0x0e00 => {
@@ -342,6 +404,18 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'LensTemperature',
         Writable => 'int16s',
     },
+    0x1009 => { #11
+        Name => 'LightCondition',
+        Writable => 'int16u',
+    },
+    0x100a => { #11
+        Name => 'FocusRange',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Macro',
+        },
+    },
     0x100b => { #6
         Name => 'FocusMode',
         Writable => 'int16u',
@@ -353,6 +427,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x100c => { #6
         Name => 'ManualFocusDistance',
         Writable => 'rational64u',
+        PrintConv => '"$val mm"', #11
+        PrintConvInv => '$val=~s/\s*mm$//; $val',
     },
     0x100d => { #6
         Name => 'ZoomStepCount',
@@ -387,6 +463,16 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16u',
         Count => 4,
     },
+    0x1013 => { #11
+        Name => 'ColorTemperatureBG',
+        Writable => 'int16u',
+        Unknown => 1, # (doesn't look like a temperature)
+    },
+    0x1014 => { #11
+        Name => 'ColorTemperatureRG',
+        Writable => 'int16u',
+        Unknown => 1, # (doesn't look like a temperature)
+    },
     0x1015 => { #6
         Name => 'WBMode',
         Writable => 'int16u',
@@ -420,13 +506,65 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => '$val=~s/ .*//; $val / 256',
         ValueConvInv => '$val*=256;"$val 64"',
     },
+    0x1019 => { #11
+        Name => 'ColorMatrixNumber',
+        Writable => 'int16u',
+    },
     # 0x101a is same as CameraID ("OLYMPUS DIGITAL CAMERA") for C2500L - PH
     0x101a => { #3
         Name => 'SerialNumber',
         Writable => 'string',
     },
+    0x101b => { #11
+        Name => 'ExternalFlashAE1_0',
+        Writable => 'int32u',
+        Unknown => 1, # (what are these?)
+    },
+    0x101c => { #11
+        Name => 'ExternalFlashAE2_0',
+        Writable => 'int32u',
+        Unknown => 1,
+    },
+    0x101d => { #11
+        Name => 'InternalFlashAE1_0',
+        Writable => 'int32u',
+        Unknown => 1,
+    },
+    0x101e => { #11
+        Name => 'InternalFlashAE2_0',
+        Writable => 'int32u',
+        Unknown => 1,
+    },
+    0x101f => { #11
+        Name => 'ExternalFlashAE1',
+        Writable => 'int32u',
+        Unknown => 1,
+    },
+    0x1020 => { #11
+        Name => 'ExternalFlashAE2',
+        Writable => 'int32u',
+        Unknown => 1,
+    },
+    0x1021 => { #11
+        Name => 'InternalFlashAE1',
+        Writable => 'int32u',
+        Unknown => 1,
+    },
+    0x1022 => { #11
+        Name => 'InternalFlashAE2',
+        Writable => 'int32u',
+        Unknown => 1,
+    },
     0x1023 => { #6
         Name => 'FlashExposureComp',
+        Writable => 'rational64s',
+    },
+    0x1024 => { #11
+        Name => 'InternalFlashTable',
+        Writable => 'int16u',
+    },
+    0x1025 => { #11
+        Name => 'ExternalFlashGValue',
         Writable => 'rational64s',
     },
     0x1026 => { #6
@@ -480,6 +618,24 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'OlympusImageHeight',
         Writable => 'int32u',
     },
+    0x1030 => { #11
+        Name => 'SceneDetect',
+        Writable => 'int16u',
+    },
+    0x1031 => { #11
+        Name => 'SceneArea',
+        Writable => 'int32u',
+        Count => 8,
+        Unknown => 1, # (numbers don't make much sense?)
+    },
+    # 0x1032 HAFFINAL? #11
+    0x1033 => { #11
+        Name => 'SceneDetectArea',
+        Writable => 'int32u',
+        Count => 720,
+        Binary => 1,
+        Unknown => 1, # (but what does it mean?)
+    },
     0x1034 => { #3
         Name => 'CompressionRatio',
         Writable => 'rational64u',
@@ -503,6 +659,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         DataTag => 'PreviewImage',
         Writable => 'int32u',
         Protected => 2,
+    },
+    0x1038 => { #11
+        Name => 'AFResult',
+        Writable => 'int16u',
     },
     0x1039 => { #6
         Name => 'CCDScanMode',
@@ -528,6 +688,19 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'NearLensStep',
         Writable => 'int16u',
     },
+    0x103d => { #11
+        Name => 'LightValueCenter',
+        Writable => 'rational64s',
+    },
+    0x103e => { #11
+        Name => 'LightValuePeriphery',
+        Writable => 'rational64s',
+    },
+    0x103f => { #11
+        Name => 'FieldCount',
+        Writable => 'int16u',
+        Unknown => 1, # (but what does it mean?)
+    },
 #
 # Olympus really screwed up the format of the following subdirectories (for the
 # E-1 and E-300 anyway). Not only is the subdirectory value data not included in
@@ -551,6 +724,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Name => 'Equipment2',
             Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
             Flags => 'SubIFD',
+            FixFormat => 'ifd',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::Equipment',
                 Start => '$val',
@@ -570,6 +744,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Name => 'CameraSettings2',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
+            FixFormat => 'ifd',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::CameraSettings',
                 Start => '$val',
@@ -589,8 +764,29 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Name => 'RawDevelopment2',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
+            FixFormat => 'ifd',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawDevelopment',
+                Start => '$val',
+            },
+        },
+    ],
+    0x2031 => [ #11
+        {
+            Name => 'RawDev2',
+            Condition => 'not $$self{OlympusType2}',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::RawDevelopment2',
+                ByteOrder => 'Unknown',
+            },
+        },
+        {
+            Name => 'RawDev2_2',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::RawDevelopment2',
                 Start => '$val',
             },
         },
@@ -608,6 +804,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Name => 'ImageProcessing2',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
+            FixFormat => 'ifd',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::ImageProcessing',
                 Start => '$val',
@@ -628,6 +825,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Condition => 'not $$self{OlympusCAMER}',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
+            FixFormat => 'ifd',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FocusInfo',
                 Start => '$val',
@@ -640,6 +838,69 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Binary => 1,
         },
     ],
+    0x2100 => { #11
+        Name => 'Olympus2100',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x2200 => { #11
+        Name => 'Olympus2200',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x2300 => { #11
+        Name => 'Olympus2300',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x2400 => { #11
+        Name => 'Olympus2400',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x2500 => { #11
+        Name => 'Olympus2500',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x2600 => { #11
+        Name => 'Olympus2600',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x2700 => { #11
+        Name => 'Olympus2700',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x2800 => { #11
+        Name => 'Olympus2800',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x2900 => { #11
+        Name => 'Olympus2900',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::FETags',
+            ByteOrder => 'Unknown',
+        },
+    },
     0x3000 => [
         { #6
             Name => 'RawInfo',
@@ -653,6 +914,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Name => 'RawInfo2',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
+            FixFormat => 'ifd',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawInfo',
                 Start => '$val',
@@ -679,7 +941,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
 );
 
-# Subdir 1
+# Olympus Equipment IFD
 %Image::ExifTool::Olympus::Equipment = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -747,6 +1009,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => '$val=sprintf("%x",$val);$val=~s/(.{3})$/\.$1/;$val',
         PrintConvInv => '$val=sprintf("%.3f",$val);$val=~s/\.//;hex($val)',
     },
+    0x205 => { #11
+        Name => 'MaxApertureAtMinFocal',
+        Writable => 'int16u',
+        ValueConv => '$val ? sqrt(2)**($val/256) : 0',
+        ValueConvInv => '$val>0 ? int(512*log($val)/log(2)+0.5) : 0',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
     0x206 => { #5
         Name => 'MaxApertureAtMaxFocal',
         Writable => 'int16u',
@@ -769,6 +1039,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => '$val ? sqrt(2)**($val/256) : 0',
         ValueConvInv => '$val>0 ? int(512*log($val)/log(2)+0.5) : 0',
         PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x20b => { #11
+        Name => 'LensProperties',
+        Writable => 'int16u',
+        PrintConv => 'sprintf("0x%x",$val)',
         PrintConvInv => '$val',
     },
     0x301 => { #6
@@ -827,7 +1103,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
 );
 
-# Subdir 2
+# Olympus camera settings IFD
 %Image::ExifTool::Olympus::CameraSettings = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -892,7 +1168,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x300 => { #6
         Name => 'MacroMode',
         Writable => 'int16u',
-        PrintConv => \%offOn,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            2 => 'Super Macro', #11
+        },
     },
     0x301 => { #6
         Name => 'FocusMode',
@@ -1009,17 +1289,17 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ContrastSetting',
         Writable => 'int16s',
         Count => 3,
-        Notes => '3 numbers: 1. Contrast, 2. Min, 3. Max',
+        Notes => 'value, min, max',
         PrintConv => 'my @v=split " ",$val; "$v[0] (min $v[1], max $v[2])"',
-        PrintConvInv => '$val=$tr/-0-9 //dc;$val',
+        PrintConvInv => '$val=~tr/-0-9 //dc;$val',
     },
     0x506 => { #PH/4
         Name => 'SharpnessSetting',
         Writable => 'int16s',
         Count => 3,
-        Notes => '3 numbers: 1. Sharpness, 2. Min, 3. Max',
+        Notes => 'value, min, max',
         PrintConv => 'my @v=split " ",$val; "$v[0] (min $v[1], max $v[2])"',
-        PrintConvInv => '$val=$tr/-0-9 //dc;$val',
+        PrintConvInv => '$val=~tr/-0-9 //dc;$val',
     },
     0x507 => { #PH/4
         Name => 'ColorSpace',
@@ -1040,7 +1320,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             8 => 'Portrait',
             9 => 'Landscape+Portrait',
             10 => 'Landscape',
-            11 => 'Night scene',
+            11 => 'Night Scene',
             13 => 'Panorama', #6
             16 => 'Landscape+Portrait', #6
             17 => 'Night+Portrait',
@@ -1111,22 +1391,32 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x521 => { #6
         Name => 'PictureModeSaturation',
         Writable => 'int16s',
-        Count => 3, # value, min, max
+        Count => 3,
+        Notes => 'value, min, max',
+        PrintConv => 'my @v=split " ",$val; "$v[0] (min $v[1], max $v[2])"',
+        PrintConvInv => '$val=~tr/-0-9 //dc;$val',
     },
     0x522 => { #6
         Name => 'PictureModeHue',
         Writable => 'int16s',
-        Unknown => 1, # not confirmed
+        Unknown => 1, # (needs verification)
     },
     0x523 => { #6
         Name => 'PictureModeContrast',
         Writable => 'int16s',
-        Count => 3, # value, min, max
+        Count => 3,
+        Notes => 'value, min, max',
+        PrintConv => 'my @v=split " ",$val; "$v[0] (min $v[1], max $v[2])"',
+        PrintConvInv => '$val=~tr/-0-9 //dc;$val',
     },
     0x524 => { #6
         Name => 'PictureModeSharpness',
+        # verified as the Sharpness setting in the Picture Mode menu for the E-410
         Writable => 'int16s',
-        Count => 3, # value, min, max
+        Count => 3,
+        Notes => 'value, min, max',
+        PrintConv => 'my @v=split " ",$val; "$v[0] (min $v[1], max $v[2])"',
+        PrintConvInv => '$val=~tr/-0-9 //dc;$val',
     },
     0x525 => { #6
         Name => 'PictureModeBWFilter',
@@ -1152,8 +1442,19 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             5 => 'Green',
         },
     },
+    0x527 => { #12
+        Name => 'NoiseFilter',
+        Writable => 'int16s',
+        Count => 3,
+        PrintConv => {
+           '-2 -2 1' => 'Off',
+           '-1 -2 1' => 'Low',
+           '0 -2 1' => 'Standard',
+           '1 -2 1' => 'High',
+        },
+    },
     0x600 => { #PH/4
-        Name => 'Sequence',
+        Name => 'DriveMode',
         Writable => 'int16u',
         Count => -1,
         Notes => '2 or 3 numbers: 1. Mode, 2. Shot number, 3. Mode bits',
@@ -1214,7 +1515,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
 );
 
-# Subdir 3 (ref 6)
+# Olympus RAW processing IFD (ref 6)
 %Image::ExifTool::Olympus::RawDevelopment = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -1264,26 +1565,200 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x108 => {
         Name => 'RawDevColorSpace',
         Writable => 'int16u',
+        PrintConv => { #11
+            0 => 'sRGB',
+            1 => 'Adobe RGB',
+            2 => 'Pro Photo RGB',
+        },
     },
     0x109 => {
         Name => 'RawDevEngine',
         Writable => 'int16u',
+        PrintConv => { #11
+            0 => 'High Speed',
+            1 => 'High Function',
+            2 => 'Advanced High Speed',
+            3 => 'Advanced High Function',
+        },
     },
-    0x10A => {
+    0x10a => {
         Name => 'RawDevNoiseReduction',
         Writable => 'int16u',
+        PrintConv => { #11
+            BITMASK => {
+                0 => 'Noise Reduction',
+                1 => 'Noise Filter',
+                2 => 'ISO Boost',
+            },
+        },
     },
-    0x10B => {
+    0x10b => {
         Name => 'RawDevEditStatus',
         Writable => 'int16u',
+        PrintConv => { #11
+            0 => 'Original',
+            1 => 'Edited (Landscape)',
+            6 => 'Edited (Portrait)',
+            8 => 'Edited (Portrait)',
+        },
     },
-    0x10C => {
+    0x10c => {
         Name => 'RawDevSettings',
         Writable => 'int16u',
+        PrintConv => { #11
+            BITMASK => {
+                0 => 'WB Color Temp',
+                2 => 'WB Gray Point',
+                3 => 'Saturation',
+                4 => 'Contrast',
+                5 => 'Sharpness',
+                6 => 'Color Space',
+                7 => 'High Function',
+                8 => 'Noise Reduction',
+            },
+        },
     },
 );
 
-# Subdir 4
+# Olympus RAW processing B IFD (ref 11)
+%Image::ExifTool::Olympus::RawDevelopment2 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITABLE => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x000 => {
+        Name => 'RawDevVersion',
+        Writable => 'undef',
+        Count => 4,
+    },
+    0x100 => {
+        Name => 'RawDevExposureBiasValue',
+        Writable => 'rational64s',
+    },
+    0x101 => {
+        Name => 'RawDevWhiteBalance',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Color Temperature',
+            2 => 'Gray Point',
+        },
+    },
+    0x102 => {
+        Name => 'RawDevWhiteBalanceValue',
+        Writable => 'int16u',
+    },
+    0x103 => {
+        Name => 'RawDevWBFineAdjustment',
+        Writable => 'int16s',
+    },
+    0x104 => {
+        Name => 'RawDevGrayPoint',
+        Writable => 'int16u',
+        Count => 3,
+    },
+    0x105 => {
+        Name => 'RawDevContrastValue',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x106 => {
+        Name => 'RawDevSharpnessValue',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x107 => {
+        Name => 'RawDevSaturationEmphasis',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x108 => {
+        Name => 'RawDevMemoryColorEmphasis',
+        Writable => 'int16u',
+    },
+    0x109 => {
+        Name => 'RawDevColorSpace',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'sRGB',
+            1 => 'Adobe RGB',
+            2 => 'Pro Photo RGB',
+        },
+    },
+    0x10a => {
+        Name => 'RawDevNoiseReduction',
+        Writable => 'int16u',
+        PrintConv => {
+            BITMASK => {
+                0 => 'Noise Reduction',
+                1 => 'Noise Filter',
+                2 => 'ISO Boost',
+            },
+        },
+    },
+    0x10b => {
+        Name => 'RawDevEngine',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'High Speed',
+            1 => 'High Function',
+        },
+    },
+    0x10c => {
+        Name => 'RawDevPictureMode',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Vivid',
+            2 => 'Natural',
+            3 => 'Muted',
+            256 => 'Monotone',
+            512 => 'Sepia',
+        },
+    },
+    0x10d => {
+        Name => 'RawDevPMSaturation',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x10e => {
+        Name => 'RawDevPMContrast',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x10f => {
+        Name => 'RawDevPMSharpness',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x110 => {
+        Name => 'RawDevPM_BWFilter',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Neutral',
+            2 => 'Yellow',
+            3 => 'Orange',
+            4 => 'Red',
+            5 => 'Green',
+        },
+    },
+    0x111 => {
+        Name => 'RawDevPMPictureTone',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Neutral',
+            2 => 'Sepia',
+            3 => 'Blue',
+            4 => 'Purple',
+            5 => 'Green',
+        },
+    },
+    0x112 => {
+        Name => 'RawDevGradation',
+        Writable => 'int16s',
+        Count => 3,
+    },
+);
+
+# Olympus Image processing IFD
 %Image::ExifTool::Olympus::ImageProcessing = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -1362,9 +1837,16 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16u',
         PrintConv => \%offOn,
     },
+    0x1103 => { #PH
+        Name => 'UnknownBlock',
+        Writable => 'undef',
+        Notes => 'unknown 142kB block in ORF images, not copied to JPEG images',
+        # 'Drop' because too large for APP1 in JPEG images
+        Flags => [ 'Unknown', 'Binary', 'Drop' ],
+    },
 );
 
-# Subdir 5
+# Olympus Focus Info IFD
 %Image::ExifTool::Olympus::FocusInfo = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -1385,7 +1867,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ZoomStepCount',
         Writable => 'int16u',
     },
-    # 0x301 Related to inverse of focus distance
+    0x301 => { #11
+        Name => 'FocusStepCount',
+        Writable => 'int16u',
+    },
     0x305 => { #4
         Name => 'FocusDistance',
         Writable => 'rational64u',
@@ -1407,6 +1892,17 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => '$val ? "$val m" : "inf"',
         PrintConvInv => '$val eq "inf" ? 0 : $val=~s/\s*m$//, $val',
     },
+    0x308 => { #11
+        Name => 'AFPoint',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Left',
+            1 => 'Center (1)',
+            2 => 'Right',
+            3 => 'Center (3)',
+            255 => 'None',
+        },
+    },
     # 0x31a Continuous AF parameters?
     # 0x1200-0x1209 Flash information:
     0x1201 => { #6
@@ -1417,6 +1913,23 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             '0 0' => 'Off',
             '1 0' => 'On',
         },
+    },
+    0x1203 => { #11
+        Name => 'ExternalFlashGuideNumber',
+        Writable => 'rational64s',
+        Unknown => 1, # (needs verification)
+    },
+    0x1204 => { #11(reversed)/7
+        Name => 'ExternalFlashBounce',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Bounce or Off',
+            1 => 'Direct',
+        },
+    },
+    0x1205 => { #11 (ref converts to mm using table)
+        Name => 'ExternalFlashZoom',
+        Writable => 'rational64u',
     },
     0x1208 => { #6
         Name => 'InternalFlash',
@@ -1445,6 +1958,16 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'SensorTemperature',
         Writable => 'int16s',
     },
+    0x1600 => { # ref http://fourthirdsphoto.com/vbb/showpost.php?p=107607&postcount=15
+        Name => 'ImageStabilization',
+        Writable => 'undef',
+        # if the first 4 bytes are non-zero, then bit 0x01 of byte 44
+        # gives the stabilization mode
+        PrintConv => q{
+            $val =~ /^\0{4}/ ? 'Off' : 'On, ' .
+            (unpack('x44C',$val) & 0x01 ? 'Mode 1' : 'Mode 2')
+        },
+    },
     # 0x102a same as Subdir4-0x300
 );
 
@@ -1454,20 +1977,71 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     NOTES => 'These tags are found only in ORF images of some models (ie. C8080WZ).',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0x100 => 'WB_RBLevelsUsed',
-    0x110 => 'WB_RBLevelsAuto',
-    0x120 => 'WB_RBLevelsShade',
-    0x121 => 'WB_RBLevelsCloudy',
-    0x122 => 'WB_RBLevelsFineWeather',
-    0x123 => 'WB_RBLevelsTungsten',
-    0x124 => 'WB_RBLevelsEveningSunlight',
-    0x130 => 'WB_RBLevelsDaylightFluor',
-    0x131 => 'WB_RBLevelsDayWhiteFluor',
-    0x132 => 'WB_RBLevelsCoolWhiteFluor',
-    0x133 => 'WB_RBLevelsWhiteFluorescent',
+    0x000 => {
+        Name => 'RawInfoVersion',
+        Writable => 'undef',
+        Count => 4,
+    },
+    0x100 => {
+        Name => 'WB_RBLevelsUsed',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x110 => {
+        Name => 'WB_RBLevelsAuto',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x120 => {
+        Name => 'WB_RBLevelsShade',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x121 => {
+        Name => 'WB_RBLevelsCloudy',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x122 => {
+        Name => 'WB_RBLevelsFineWeather',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x123 => {
+        Name => 'WB_RBLevelsTungsten',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x124 => {
+        Name => 'WB_RBLevelsEveningSunlight',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x130 => {
+        Name => 'WB_RBLevelsDaylightFluor',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x131 => {
+        Name => 'WB_RBLevelsDayWhiteFluor',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x132 => {
+        Name => 'WB_RBLevelsCoolWhiteFluor',
+        Writable => 'int16',
+        Count => 2,
+    },
+    0x133 => {
+        Name => 'WB_RBLevelsWhiteFluorescent',
+        Writable => 'int16',
+        Count => 2,
+    },
     0x200 => {
         Name => 'ColorMatrix2',
         Format => 'int16s',
+        Writable => 'int16u',
+        Count => 9,
     },
     # 0x240 => 'ColorMatrixDefault', ?
     # 0x250 => 'ColorMatrixSaturation', ?
@@ -1475,19 +2049,49 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     # 0x252 => 'ColorMatrixContrast', ?
     # 0x300 => sharpness-related
     # 0x301 => list of sharpness-related values
-    0x310 => 'CoringFilter',
-    0x311 => 'CoringValues',
-    0x600 => 'BlackLevel2',
+    0x310 => {
+        Name => 'CoringFilter',
+        Writable => 'int16u',
+    },
+    0x311 => {
+        Name => 'CoringValues',
+        Writable => 'int16u',
+        Count => 11,
+    },
+    0x600 => {
+        Name => 'BlackLevel2',
+        Writable => 'int16u',
+        Count => 4,
+    },
     0x601 => {
         Name => 'YCbCrCoefficients',
         Notes => 'stored as int16u[6], but extracted as rational32u[3]',
         Format => 'rational32u',
     },
-    0x611 => 'ValidPixelDepth',
-    0x614 => 'FinalImageWidth',
-    0x615 => 'FinalImageHeight',
+    0x611 => {
+        Name => 'ValidPixelDepth',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x612 => { #11
+        Name => 'StartOffsetX',
+        Writable => 'int16u',
+    },
+    0x613 => { #11
+        Name => 'StartOffsetY',
+        Writable => 'int16u',
+    },
+    0x614 => {
+        Name => 'FinalImageWidth',
+        Writable => 'int32u',
+    },
+    0x615 => {
+        Name => 'FinalImageHeight',
+        Writable => 'int32u',
+    },
     0x1000 => {
         Name => 'LightSource',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Unknown',
             16 => 'Shade',
@@ -1495,29 +2099,93 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             18 => 'Fine Weather',
             20 => 'Tungsten (incandescent)',
             22 => 'Evening Sunlight',
-            33 => 'Daylight Fluorescent (D 5700 Ð 7100K)',
-            34 => 'Day White Fluorescent (N 4600 Ð 5400K)',
-            35 => 'Cool White Fluorescent (W 3900 Ð 4500K)',
-            36 => 'White Fluorescent (WW 3200 Ð 3700K)',
+            33 => 'Daylight Fluorescent (D 5700 - 7100K)',
+            34 => 'Day White Fluorescent (N 4600 - 5400K)',
+            35 => 'Cool White Fluorescent (W 3900 - 4500K)',
+            36 => 'White Fluorescent (WW 3200 - 3700K)',
             256 => 'One Touch White Balance',
             512 => 'Custom 1-4',
         },
     },
     # the following 5 tags all have 3 values: val, min, max
-    0x1000 => 'WhiteBalanceComp',
-    0x1010 => 'SaturationSetting',
-    0x1011 => 'HueSetting',
-    0x1012 => 'ContrastSetting',
-    0x1013 => 'SharpnessSetting',
+    0x1001 => {
+        Name => 'WhiteBalanceComp',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x1010 => {
+        Name => 'SaturationSetting',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x1011 => {
+        Name => 'HueSetting',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x1012 => {
+        Name => 'ContrastSetting',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x1013 => {
+        Name => 'SharpnessSetting',
+        Writable => 'int16s',
+        Count => 3,
+    },
     # settings written by Camedia Master 4.x
-    0x2000 => 'CMExposureCompensation',
-    0x2001 => 'CMWhiteBalance',
-    0x2002 => 'CMWhiteBalanceComp',
-    0x2010 => 'CMWhiteBalanceGrayPoint',
-    0x2020 => 'CMSaturation',
-    0x2021 => 'CMHue',
-    0x2022 => 'CMContrast',
-    0x2023 => 'CMSharpness',
+    0x2000 => {
+        Name => 'CMExposureCompensation',
+        Writable => 'rational64s',
+    },
+    0x2001 => {
+        Name => 'CMWhiteBalance',
+        Writable => 'int16u',
+    },
+    0x2002 => {
+        Name => 'CMWhiteBalanceComp',
+        Writable => 'int16s',
+    },
+    0x2010 => {
+        Name => 'CMWhiteBalanceGrayPoint',
+        Writable => 'int16u',
+        Count => 3,
+    },
+    0x2020 => {
+        Name => 'CMSaturation',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x2021 => {
+        Name => 'CMHue',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x2022 => {
+        Name => 'CMContrast',
+        Writable => 'int16s',
+        Count => 3,
+    },
+    0x2023 => {
+        Name => 'CMSharpness',
+        Writable => 'int16s',
+        Count => 3,
+    },
+);
+
+# Tags found only in some FE models
+%Image::ExifTool::Olympus::FETags = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        Some FE models write a large number of tags here, but most of this
+        information remains unknown.
+    },
+    0x0100 => {
+        Name => 'BodyFirmwareVersion',
+        Writable => 'string',
+    },
 );
 
 # Olympus composite tags
@@ -1584,6 +2252,8 @@ sub PrintLensInfo($$)
     my %make = (
         0 => 'Olympus',
         1 => 'Sigma',
+        2 => 'Leica',
+        3 => 'Leica',
     );
     my %model = (
         Lens => {
@@ -1613,6 +2283,13 @@ sub PrintLensInfo($$)
             '1 5'   => '30mm F1.4', #10
             '1 7'   => '105mm F2.8 DG', #PH
             '1 8'   => '150mm F2.8 DG HSM', #PH
+            '1 17'  => '135-400mm F4.5-5.6 DG ASP APO RF', #11
+            '1 18'  => '300-800mm F5.6 EX DG APO', #11
+            # Leica lenses (ref 11)
+            '2 1'   => 'D Vario Elmarit 14-50mm, F2.8-3.5 Asph.',
+            '2 2'   => 'D Summilux 25mm, F1.4 Asph.',
+            '3 1'   => 'D Vario Elmarit 14-50mm, F2.8-3.5 Asph.',
+            '3 2'   => 'D Summilux 25mm, F1.4 Asph.',
         },
         Extender => {
             # Olympus extenders
@@ -1709,12 +2386,15 @@ under the same terms as Perl itself.
 
 =item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/olympus_mn.html>
 
+=item L<http://olypedia.de/Olympus_Makernotes>
+
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Markku Hanninen, Remi Guyomarch, Frank Ledwon, Michael Meissner
-and Mark Dapoz for their help figuring out some Olympus tags.
+Thanks to Markku Hanninen, Remi Guyomarch, Frank Ledwon, Michael Meissner,
+Mark Dapoz and Ioannis Panagiotopoulos for their help figuring out some
+Olympus tags, and Lilo Huang for adding to the LensType list.
 
 =head1 SEE ALSO
 

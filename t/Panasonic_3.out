@@ -1,12 +1,17 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.90
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
 [File, File, Image]  - File Name: Panasonic_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2007:05:08 11:37:22
+[File, File, Time]  - File Modification Date/Time: 2007:09:21 08:09:31
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 8
-[File, File, Image]  - Image Height: 8
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image] ImageWidth - Image Width: 8
+[File, File, Image] ImageHeight - Image Height: 8
+[File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
+[File, File, Image] BitsPerSample - Bits Per Sample: 8
+[File, File, Image] ColorComponents - Color Components: 3
+[File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, IFD0, Camera] 271 - Make: Panasonic
 [EXIF, IFD0, Camera] 272 - Camera Model Name: DMC-FZ3
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -58,11 +63,11 @@
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Panasonic, Camera] 1 - Image Quality: High
-[MakerNotes, Panasonic, Camera] 2 - Production Version: 0.1.0.8
+[MakerNotes, Panasonic, Camera] 2 - Firmware Version: 0.1.0.8
 [MakerNotes, Panasonic, Camera] 3 - White Balance: Auto
 [MakerNotes, Panasonic, Camera] 7 - Focus Mode: Auto
 [MakerNotes, Panasonic, Camera] 15 - AF Mode: Spot Mode On
-[MakerNotes, Panasonic, Camera] 26 - Image Stabilizer: On, Mode 2
+[MakerNotes, Panasonic, Camera] 26 - Image Stabilization: On, Mode 2
 [MakerNotes, Panasonic, Camera] 28 - Macro Mode: Off
 [MakerNotes, Panasonic, Camera] 31 - Shooting Mode: Panning
 [MakerNotes, Panasonic, Camera] 32 - Audio: No
@@ -71,10 +76,10 @@
 [MakerNotes, Panasonic, Camera] 35 - White Balance Bias: 0
 [MakerNotes, Panasonic, Camera] 36 - Flash Bias: 0
 [MakerNotes, Panasonic, Camera] 37 - Internal Serial Number: (S00) 2004:07:19 no. 0102
-[MakerNotes, Panasonic, Camera] 38 - Panasonic 0x0026: 0100
+[MakerNotes, Panasonic, Camera] 38 - Panasonic Exif Version: 0100
 [MakerNotes, Panasonic, Camera] 39 - Panasonic 0x0027: 0
 [MakerNotes, Panasonic, Camera] 40 - Color Effect: Off
-[MakerNotes, Panasonic, Camera] 41 - Panasonic 0x0029: 696
+[MakerNotes, Panasonic, Camera] 41 - Time Since Power On: 00:00:06.96
 [MakerNotes, Panasonic, Camera] 42 - Burst Mode: Off
 [MakerNotes, Panasonic, Camera] 43 - Sequence Number: 0
 [MakerNotes, Panasonic, Camera] 44 - Contrast: Normal

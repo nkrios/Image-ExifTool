@@ -17,7 +17,7 @@
 #               4) http://kobe1995.jp/~kaz/astro/istD.html
 #               5) John Francis (http://www.panix.com/~johnf/raw/index.html) (ist-D/ist-DS)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
-#               7) Douglas O'Brien private communication (*istD)
+#               7) Douglas O'Brien private communication (*istD, K10D)
 #               8) Denis Bourez private communication
 #               9) Kazumichi Kawabata private communication
 #              10) David Buret private communication (*istD)
@@ -29,6 +29,7 @@
 #              16) Axel Kellner private communication (K10D)
 #              17) Cvetan Ivanov private communication (K100D)
 #              18) http://www.gvsoft.homedns.org/exif/makernote-pentax-type3.html
+#              19) Jens Duttke private communication
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -38,8 +39,11 @@ package Image::ExifTool::Pentax;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
+use Image::ExifTool::HP;
 
-$VERSION = '1.52';
+$VERSION = '1.61';
+
+sub CryptShutterCount($$);
 
 # pentax lens type codes (ref 4)
 my %pentaxLensType = (
@@ -55,8 +59,10 @@ my %pentaxLensType = (
     '3 22' => 'smc PENTAX-F FISH-EYE 17-28mm F3.5-4.5',
     '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6',
     '3 24' => 'smc PENTAX-F 35-135mm F3.5-4.5',
-    '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or SIGMA AF 28-300 F3.5-5.6 DL IF', #11 (sigma)
+    '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or SIGMA or Tokina',
+    # or '3 25' => SIGMA AF 28-300 F3.5-5.6 DL IF', #11
     # or '3 25' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
+    # or '3 25' => 'SIGMA 55-200mm F4-5.6 DC', #19
     '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
     '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5',
     '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5',
@@ -73,12 +79,16 @@ my %pentaxLensType = (
     '3 38' => 'smc PENTAX-F* 300mm F4.5 ED[IF]',
     '3 39' => 'smc PENTAX-F* 600mm F4 ED[IF]',
     '3 40' => 'smc PENTAX-F MACRO 100mm F2.8',
-    '3 41' => 'smc PENTAX-F MACRO 50mm F2.8',
-    '3 44' => 'SIGMA 18-50mm F3.5-5.6 DC, 12-24mm F4.5 EX DG or Tamron 35-90mm F4 AF', #4,12,12
+    '3 41' => 'smc PENTAX-F MACRO 50mm F2.8 or Sigma 50mm F2,8 MACRO', #4,16
+    #'3 44' => 'SIGMA 17-70mm F2.8-4.5 DC MACRO', (Bart Hickman)
+    #'3 44' => 'SIGMA 18-50mm F3.5-5.6 DC, 12-24mm F4.5 EX DG or Tamron 35-90mm F4 AF', #4,12,12
+    #'3 44' => 'SIGMA AF 10-20mm F4-5.6 EX DC', #19
+    '3 44' => 'Tamron 35-90mm F4 AF or various SIGMA models', #4,12,Bart,19
     '3 46' => 'SIGMA APO 70-200mm F2.8 EX',
     '3 50' => 'smc PENTAX-FA 28-70mm F4 AL',
     '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
     '3 52' => 'smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF]',
+    # or '3 52' => 'Tamron AF LD 28-200mm F3.8-5.6 (IF) Aspherical (171D), #19
     '3 53' => 'smc PENTAX-FA 28-80mm F3.5-5.6 AL',
     '3 247' => 'smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]',
     '3 248' => 'smc PENTAX-DA 12-24mm F4 ED AL[IF]',
@@ -92,6 +102,7 @@ my %pentaxLensType = (
     # '3 255' => 'SIGMA DL-II 35-80mm F4-5.6', #12
     # '3 255' => 'SIGMA DL Zoom 75-300mm F4-5.6', #12
     # '3 255' => 'SIGMA DF EX Aspherical 28-70mm F2.8', #12
+    # '3 255' => 'SIGMA AF Tele 400mm F5.6 Multi-coated', #19
     '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
     '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
     '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
@@ -106,11 +117,12 @@ my %pentaxLensType = (
     '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
     '4 25' => 'TAMRON SP AF 14mm F2.8', #13
     '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
-    '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF]Macro (285D)',
+    '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF] MACRO (285D)',
     '4 28' => 'smc PENTAX-FA 35mm F2 AL',
+    '4 29' => 'TAMRON AF 28-200mm F/3.8-5.6 LD Super II MACRO (371D)', #19
     '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
     '4 35' => 'smc PENTAX-FA 100-300mm F4.7-5.8',
-    '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO (572D)',
+    '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO', # both 572D and A17 (Di) - ref 19
     '4 37' => 'TAMRON SP AF 24-135mm F3.5-5.6 AD AL (190D)', #13
     '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
     '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
@@ -163,8 +175,11 @@ my %pentaxLensType = (
     '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
+    '7 238' => 'TAMRON AF 18-250mm F3.5-6.3 Di II LD Aspherical [IF] MACRO', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH (K10D)
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM', #19
+    '8 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM', #19
 );
 
 # Pentax model ID codes (PH)
@@ -209,12 +224,14 @@ my %pentaxModelID = (
     0x12b80 => 'Samsung GX-1L',
     0x12b9c => 'K100D',
     0x12b9d => 'K110D',
-    0x12bb0 => 'Optio T10',
+    0x12ba2 => 'K100D Super', #19
+    0x12bb0 => 'Optio T10/T20',
     0x12be2 => 'Optio W10',
     0x12bf6 => 'Optio M10',
     0x12c1e => 'K10D',
     0x12c20 => 'Samsung GX10',
     0x12c28 => 'Optio S7',
+    0x12c2d => 'Optio L20',
     0x12c32 => 'Optio M20',
     0x12c3c => 'Optio W20',
     0x12c46 => 'Optio A20',
@@ -223,6 +240,12 @@ my %pentaxModelID = (
     0x12c82 => 'Optio T30',
     0x12c96 => 'Optio W30',
     0x12ca0 => 'Optio A30',
+    0x12cb4 => 'Optio E40',
+    0x12cbe => 'Optio M40',
+    0x12cc8 => 'Optio Z10',
+    0x12cdc => 'Optio S10',
+    0x12ce6 => 'Optio A40',
+    0x12cf0 => 'Optio V10',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -312,23 +335,19 @@ my %pentaxCities = (
         PrintConv => '$val=~tr/ /./; $val',
         PrintConvInv => '$val=~tr/./ /; $val',
     },
-    0x0001 => {
-        Name => 'PentaxMode',
+    0x0001 => { #PH
+        Name => 'PentaxModelType',
         Writable => 'int16u',
-        PrintConv => {
-            0 => 'Auto',
-            1 => 'Night Scene',
-            2 => 'Manual',
-        },
+        # (values of 0-5 seem to group models into 6 categories, ref 13)
     },
-    0x0002 => {
+    0x0002 => { #PH
         Name => 'PreviewImageSize',
         Groups => { 2 => 'Image' },
         Writable => 'int16u',
         Count => 2,
         PrintConv => '$val =~ tr/ /x/; $val',
     },
-    0x0003 => {
+    0x0003 => { #PH
         Name => 'PreviewImageLength',
         OffsetPair => 0x0004, # point to associated offset
         DataTag => 'PreviewImage',
@@ -336,7 +355,7 @@ my %pentaxCities = (
         Writable => 'int32u',
         Protected => 2,
     },
-    0x0004 => {
+    0x0004 => { #PH
         Name => 'PreviewImageStart',
         IsOffset => 2,  # code to use original base
         Protected => 2,
@@ -359,6 +378,8 @@ my %pentaxCities = (
         Writable => 'undef',
         Count => 4,
         Shift => 'Time',
+        DataMember => 'PentaxDate',
+        RawConv => '$$self{PentaxDate} = $val', # save to decrypt ShutterCount
         ValueConv => 'length($val)==4 ? sprintf("%.4d:%.2d:%.2d",unpack("nC2",$val)) : "Unknown ($val)"',
         ValueConvInv => 'my @v=split /:/, $val;pack("nC2",$v[0],$v[1],$v[2])',
     },
@@ -368,10 +389,12 @@ my %pentaxCities = (
         Writable => 'undef',
         Count => 3,
         Shift => 'Time',
+        DataMember => 'PentaxTime',
+        RawConv => '$$self{PentaxTime} = $val', # save to decrypt ShutterCount
         ValueConv => 'length($val)>=3 ? sprintf("%.2d:%.2d:%.2d",unpack("C3",$val)) : "Unknown ($val)"',
         ValueConvInv => 'pack("C3",split(/:/,$val))',
     },
-    0x0008 => {
+    0x0008 => { #2
         Name => 'Quality',
         Writable => 'int16u',
         PrintConv => {
@@ -463,7 +486,7 @@ my %pentaxCities = (
         Name => 'FlashMode',
         Writable => 'int16u',
         PrintHex => 1,
-        ValueConv => '$val=~s/ .*//; $val',
+        ValueConv => '$val=~s/ .*//; $val', # ignore 2nd value
         PrintConv => {
             0x000 => 'Auto, Did not fire',
             0x001 => 'Off',
@@ -479,7 +502,7 @@ my %pentaxCities = (
             0x10b => 'On, Trailing-curtain Sync',
         },
     },
-    0x000d => [
+    0x000d => [ #2
         {
             Condition => '$self->{CameraMake} =~ /^PENTAX/',
             Name => 'FocusMode',
@@ -527,12 +550,12 @@ my %pentaxCities = (
         },
     },
     0x000f => { #PH
-        Name => 'AutoAFPoint',
+        Name => 'AFPointsInFocus',
         Writable => 'int16u',
         PrintHex => 1,
         PrintConv => {
             0xffff => 'None',
-            0 => 'Multiple', #14
+            0 => 'Fixed Center or Multiple', #PH/14
             1 => 'Top-left',
             2 => 'Top-center',
             3 => 'Top-right',
@@ -555,8 +578,9 @@ my %pentaxCities = (
         Priority => 0,
         ValueConv => '$val * 1e-5',
         ValueConvInv => '$val * 1e5',
-        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        # value may be 0xffffffff in Bulb mode (ref 19)
+        PrintConv => '$val > 42949 ? "Unknown (Bulb)" : Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => '$val=~/(unknown|bulb)/i ? $val : eval $val',
     },
     0x0013 => { #PH
         Name => 'FNumber',
@@ -960,7 +984,7 @@ my %pentaxCities = (
         PrintConv => '$_=$val;s/ /x/;$_',
     },
     0x003c => { #7/PH
-        Name => 'AFPointsUsed',
+        Name => 'AFPointsInFocus',
         # not writable because I'm not decoding these 4 bytes fully:
         # Nibble pattern: XSSSYUUU
         # X = unknown (AF focused flag?, 0 or 1)
@@ -968,6 +992,7 @@ my %pentaxCities = (
         # Y = unknown (observed 0,6,7,b,e, always 0 if SSS is 0x000 or 0x7ff)
         # UUU = af points used
         Format => 'int32u',
+        Notes => '*istD only',
         ValueConv => '$val & 0x7ff', # ignore other bits for now
         PrintConv => { BITMASK => {
             0 => 'Upper-left',
@@ -989,6 +1014,8 @@ my %pentaxCities = (
         Writable => 'int8u',
         Count => 2,
         SeparateTable => 1,
+        ValueConv => '$val=~s/^(\d+ \d+) 0$/$1/; $val',
+        ValueConvInv => '$val',
         PrintConv => \%pentaxLensType,
     },
     # 0x0041 - increments for each cropped pic (PH)
@@ -1014,6 +1041,7 @@ my %pentaxCities = (
     },
     0x004f => { #PH
         Name => 'ImageTone',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Natural',
             1 => 'Bright',
@@ -1025,6 +1053,24 @@ my %pentaxCities = (
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::SRInfo',
         },
+    },
+    0x005d => { #19/PH
+        # (used by all Pentax DSLR's except *istD and *istDS - PH)
+        # The lowest decrypted values observed are 246 for the first image from a
+        # brand new K10D, and 209 for one of the first 20 images from a new K10D,
+        # so either there are ~200 test images shot in the factory, or there is an
+        # offset of ~200 which is applied to this value before encryption
+        Name => 'ShutterCount',
+        Writable => 'undef',
+        Count => 4,
+        Notes => 'raw value is a big-endian 4-byte integer, encrypted using Date and Time',
+        RawConv => 'length($val) == 4 ? unpack("N",$val) : undef',
+        RawConvInv => q{
+            my $val = Image::ExifTool::Pentax::CryptShutterCount($val,$self);
+            return pack('N', $val);
+        },
+        ValueConv => \&CryptShutterCount,
+        ValueConvInv => '$val',
     },
     0x0200 => { #5
         Name => 'BlackPoint',
@@ -1056,8 +1102,41 @@ my %pentaxCities = (
         },
     },
     0x0209 => {
-        Name => 'AEDump',
-        Flags => ['Unknown','Binary'],
+        Name => 'AEMeteringSegments',
+        Format => 'int8u',
+        Count => 16,
+        Notes => q{
+            measurements from each of the 16 AE metering segments, converted to LV
+        },
+        # metering segment locations (ref 19):
+        # +-------------------------+
+        # |           14            |
+        # |    +---+---+---+---+    |
+        # |    | 5 | 3/1\ 2| 4 |    |
+        # |  +-+-+-+-+ - +-+-+-+-+  |
+        # +--+ 9 | 7 ||0|| 6 | 8 +--+
+        # |  +-+-+-+-+ - +-+-+-+-+  |
+        # |    |13 |11\ /10|12 |    |
+        # |    +---+---+---+---+    |
+        # |           15            |
+        # +-------------------------+
+        # convert to approximate LV equivalent (PH):
+        ValueConv => q{
+            my @a;
+            foreach (split ' ', $val) { push @a, $_ / 8 - 6; }
+            return join(' ', @a);
+        },
+        ValueConvInv => q{
+            my @a;
+            foreach (split ' ', $val) { push @a, int(($_ + 6) * 8 + 0.5); }
+            return join(' ', @a);
+        },
+        PrintConv => q{
+            my @a;
+            foreach (split ' ', $val) { push @a, sprintf('%.1f', $_); }
+            return join(' ', @a);
+        },
+        PrintConvInv => '$val',
     },
     0x020a => {
         Name => 'FlashADump',
@@ -1119,6 +1198,12 @@ my %pentaxCities = (
             TagTable => 'Image::ExifTool::Pentax::BatteryInfo',
         },
     },
+    0x021f => { #19
+        Name => 'AFInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::AFInfo',
+        },
+    },
     0x03fe => { #PH
         Name => 'DataDump',
         Writable => 0,
@@ -1140,81 +1225,40 @@ my %pentaxCities = (
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
-    0x1000 => { #PH
-        Name => 'HometownCityCode',
-        Writable => 'undef',
-        Count => 4,
-    },
-    0x1001 => { #PH
-        Name => 'DestinationCityCode',
-        Writable => 'undef',
-        Count => 4,
-    },
-    0x2000 => { #PH (Optio 330RS)
-        Name => 'PreviewImageData',
-        Binary => 1,
-    },
-    # 0x2011 WhiteBalanceBias (ref 18)
-    # 0x2012 WhiteBalance (ref 18)
-    # 0x2022 ObjectDistance in mm (ref 18)
-    # 0x2034 FlashDistance (ref 18)
-    # 0x3000 RecordMode (ref 18)
-    # 0x3001 SelfTimer? (ref 18)
-    # 0x3002 Quality (ref 18)
-    # 0x3003 FocusMode (ref 18)
-    # 0x3006 TimeZone (ref 18)
-    # 0x3007 BestshotMode (ref 18)
-    # 0x3014 ISO (ref 18)
-    # 0x3015 ColorMode 0=off (ref 18)
-    # 0x3016 Enhancemnt 0=off (ref 18)
-    # 0x3017 Filter, 0=off (ref 18)
 );
-
-# NOTE: These are from Image::MakerNotes::Pentax.pm, but they don't seem to work - PH
-#    0x0003 => {
-#        Name => 'Focus',
-#        PrintConv => {
-#            2 => 'Custom',
-#            3 => 'Auto',
-#        },
-#    },
-#    0x0004 => {
-#        Name => 'Flash',
-#        PrintConv => {
-#            1 => 'Auto',
-#            2 => 'On',
-#            4 => 'Off',
-#            6 => 'Red-eye reduction',
-#        },
-#    },
-#    0x000a => 'Zoom',
-#    0x0017 => {
-#        Name => 'Color',
-#        PrintConv => {
-#            1 => 'Full',
-#            2 => 'Black & White',
-#            3 => 'Sepia',
-#        },
-#    },
 
 # shake reduction information (ref PH)
 %Image::ExifTool::Pentax::SRInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'Shake reduction information.',
     0 => {
         Name => 'SRResult',
-        Notes => '0=not stabilized?, 1=stabilized?, 64=not ready?',
+        PrintConv => { #PH/19
+            0 => 'Not stabilized',
+            BITMASK => {
+                0 => 'Stabilized',
+                6 => 'Not ready',
+            },
+        },
     },
     1 => {
         Name => 'ShakeReduction',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
-    2 => 'SR_SWSToSWRTime',
+    2 => {
+        Name => 'SR_SWSToSWRTime',
+        # SWS=photometering switch, SWR=shutter release switch
+        # (from http://www.patentstorm.us/patents/6597867-description.html)
+        Notes => q{
+            time from when the shutter button was half pressed to when the shutter was
+            released
+        },
+    },
 );
 
 # auto-exposure information (ref PH)
@@ -1222,9 +1266,9 @@ my %pentaxCities = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'AEExposureTime',
         Notes => 'val = 24 * 2**((32-raw)/8)',
@@ -1236,6 +1280,7 @@ my %pentaxCities = (
     1 => {
         Name => 'AEAperture',
         Notes => 'val = (2**((raw-4)/16)) / 16',
+        # (same as val=2**((raw-68)/16), but 68 isn't a nice power of 2)
         ValueConv => 'exp(($val-4)*log(2)/16)/16',
         ValueConvInv => 'log($val*16)*16/log(2)+4',
         PrintConv => 'sprintf("%.1f",$val)',
@@ -1249,9 +1294,27 @@ my %pentaxCities = (
         PrintConv => 'int($val + 0.5)',
         PrintConvInv => '$val',
     },
-    3 => 'AEXv',
-    4 => 'AEBXv',
-    5 => 'AEFlashTv',
+    3 => {
+        Name => 'AEXv',
+        Notes => 'val = (raw-64)/8',
+        ValueConv => '($val-64)/8',
+        ValueConvInv => '$val * 8 + 64',
+    },
+    4 => {
+        Name => 'AEBXv',
+        Format => 'int8s',
+        Notes => 'val = raw / 8',
+        ValueConv => '$val/8',
+        ValueConvInv => '$val * 8',
+    },
+    5 => {
+        Name => 'AEFlashTv',
+        Notes => 'val = 24 * 2**((32-raw)/8)',
+        ValueConv => '24*exp(-($val-32)*log(2)/8)', #19
+        ValueConvInv => '-log($val/24)*8/log(2)+32',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
     6 => {
         Name => 'AEProgramMode',
         PrintConv => {
@@ -1287,10 +1350,10 @@ my %pentaxCities = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     # (must decode focus distance!)
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'LensType',
         Format => 'int8u[4]',
@@ -1302,8 +1365,8 @@ my %pentaxCities = (
         # this is a bit funny and needs testing with more lenses on the K10D
         ValueConv => q{
             my @v = split(' ',$val);
-            if ($v[0] & 0x80 or $$self{CameraModel} =~ /^PENTAX K10D\b/) {
-                $v[0] &= 0x7f;
+            if ($v[0] & 0xf0 or $$self{CameraModel} =~ /^PENTAX K10D\b/) {
+                $v[0] &= 0x0f;
                 $v[1] = GetByteOrder() eq 'MM' ? $v[2] * 256 + $v[3] : $v[3] * 256 + $v[2];
             }
             return "$v[0] $v[1]";
@@ -1312,8 +1375,16 @@ my %pentaxCities = (
         SeparateTable => 1,
     },
     4 => {
-        Name => 'LensCoefficients',
-        Format => 'int8u[9]',
+        Condition => '$$self{CameraModel} !~ /K10D/',
+        Name => 'LensCodes',
+        Format => 'int8u[16]',
+        Notes => 'all models but the K10D',
+    },
+    5 => {
+        Condition => '$$self{CameraModel} =~ /K10D/',
+        Name => 'LensCodes',
+        Format => 'int8u[16]',
+        Notes => 'K10D only',
     },
 );
 
@@ -1322,9 +1393,9 @@ my %pentaxCities = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => 'FlashStatus',
     1 => {
         Name => 'FlashModeCode',
@@ -1357,6 +1428,7 @@ my %pentaxCities = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     FORMAT => 'int32u',
@@ -1369,10 +1441,10 @@ my %pentaxCities = (
     1 => {
         Name => 'ManufactureDate',
         ValueConv => q{
-            $val =~ /^(\d{4})(\d{2})(\d{2})$/ and return "$1:$2:$2";
+            $val =~ /^(\d{4})(\d{2})(\d{2})$/ and return "$1:$2:$3";
             # Optio A10 and A20 leave "200" off the year
             $val =~ /^(\d)(\d{2})(\d{2})$/ and return "200$1:$2:$3";
-            return "Unknown($val)";
+            return "Unknown ($val)";
         },
         ValueConvInv => '$val=~tr/0-9//dc; $val',
     },
@@ -1390,24 +1462,66 @@ my %pentaxCities = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'BatteryType',
-        ValueConv => '$val - 128',
-        ValueConvInv => '$val + 128',
+        ValueConv => '$val & 0x7f',
+        ValueConvInv => '$val | 0x80',  # (not sure what this bit means)
     },
     1 => {
         Name => 'BatteryBodyGripStates',
         Notes => 'body and grip battery state',
-        ValueConv => '($val >> 8) . " " . ($val & 0x0f)',
-        ValueConvInv => 'my @a=split(" ",$val); ($a[0] << 8) + $a[1]',
+        ValueConv => '($val >> 4) . " " . ($val & 0x0f)',
+        ValueConvInv => 'my @a=split(" ",$val); ($a[0] << 4) + $a[1]',
     },
+    # internal and grip battery voltage Analogue to Digital measurements,
+    # open circuit and under load
     2 => 'BatteryADBodyNoLoad',
     3 => 'BatteryADBodyLoad',
     4 => 'BatteryADGripNoLoad',
     5 => 'BatteryADGripLoad',
+);
+
+# auto focus information (ref 19)
+%Image::ExifTool::Pentax::AFInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    0x0b => {
+        Name => 'AFPointsInFocus',
+        Notes => q{
+            may report two points in focus even though a single AFPoint has been
+            selected, in which case the selected AFPoint is the first reported
+        },
+        PrintConv => {
+            0 => 'None',
+            1 => 'Lower-left, Bottom',
+            2 => 'Bottom',
+            3 => 'Lower-right, Bottom',
+            4 => 'Mid-left, Center',
+            5 => 'Center (horizontal)', #PH (K10D)
+            6 => 'Mid-right, Center',
+            7 => 'Upper-left, Top',
+            8 => 'Top',
+            9 => 'Upper-right, Top',
+            10 => 'Right',
+            11 => 'Lower-left, Mid-left',
+            12 => 'Upper-left, Mid-left',
+            13 => 'Bottom, Center',
+            14 => 'Top, Center',
+            15 => 'Lower-right, Mid-right',
+            16 => 'Upper-right, Mid-right',
+            17 => 'Left',
+            18 => 'Mid-left',
+            19 => 'Center (vertical)', #PH (K10D)
+            20 => 'Mid-right',
+        },
+    },
 );
 
 # tags in Pentax QuickTime videos (PH - tests with Optio WP)
@@ -1463,6 +1577,162 @@ my %pentaxCities = (
     },
 );
 
+# Pentax type 2 (Casio-like) maker notes (ref 1)
+%Image::ExifTool::Pentax::Type2 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITABLE => 'int16u',
+    NOTES => q{
+        These tags are used by the Pentax Optio 330 and 430, and are similar to the
+        tags used by Casio.
+    },
+    0x0001 => {
+        Name => 'RecordingMode',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Night Scene',
+            2 => 'Manual',
+        },
+    },
+    0x0002 => {
+        Name => 'Quality',
+        PrintConv => {
+            0 => 'Good',
+            1 => 'Better',
+            2 => 'Best',
+        },
+    },
+    0x0003 => {
+        Name => 'FocusMode',
+        PrintConv => {
+            2 => 'Custom',
+            3 => 'Auto',
+        },
+    },
+    0x0004 => {
+        Name => 'FlashMode',
+        PrintConv => {
+            1 => 'Auto',
+            2 => 'On',
+            4 => 'Off',
+            6 => 'Red-eye reduction',
+        },
+    },
+    # Casio 0x0005 is FlashIntensity
+    # Casio 0x0006 is ObjectDistance
+    0x0007 => {
+        Name => 'WhiteBalance',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Daylight',
+            2 => 'Shade',
+            3 => 'Tungsten',
+            4 => 'Fluorescent',
+            5 => 'Manual',
+        },
+    },
+    0x000a => {
+        Name => 'DigitalZoom',
+        Writable => 'int32u',
+    },
+    0x000b => {
+        Name => 'Sharpness',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Soft',
+            2 => 'Hard',
+        },
+    },
+    0x000c => {
+        Name => 'Contrast',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Low',
+            2 => 'High',
+        },
+    },
+    0x000d => {
+        Name => 'Saturation',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Low',
+            2 => 'High',
+        },
+    },
+    0x0014 => {
+        Name => 'ISO',
+        Priority => 0,
+        PrintConv => {
+            10 => 100,
+            16 => 200,
+            50 => 50, #PH
+            100 => 100, #PH
+            200 => 200, #PH
+            400 => 400, #PH
+            800 => 800, #PH
+            1600 => 1600, #PH
+            3200 => 3200, #PH
+        },
+    },
+    0x0017 => {
+        Name => 'ColorFilter',
+        PrintConv => {
+            1 => 'Full',
+            2 => 'Black & White',
+            3 => 'Sepia',
+        },
+    },
+    # Casio 0x0018 is AFPoint
+    # Casio 0x0019 is FlashIntensity
+    0x0e00 => {
+        Name => 'PrintIM',
+        Description => 'Print Image Matching',
+        Writable => 0,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PrintIM::Main',
+        },
+    },
+    0x1000 => {
+        Name => 'HometownCityCode',
+        Writable => 'undef',
+        Count => 4,
+    },
+    0x1001 => { #PH
+        Name => 'DestinationCityCode',
+        Writable => 'undef',
+        Count => 4,
+    },
+);
+
+# ASCII-based maker notes of Optio E20 - PH
+%Image::ExifTool::Pentax::Type4 = (
+    PROCESS_PROC => \&Image::ExifTool::HP::ProcessHP,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        The following few tags are extracted from the wealth of information
+        available in maker notes of the Optio E20.  These maker notes are stored as
+        ASCII text in a format very similar to some HP models.
+    },
+   'F/W Version' => 'FirmwareVersion',
+);
+
+#------------------------------------------------------------------------------
+# Encrypt or decrypt Pentax ShutterCount (symmetrical encryption) - PH
+# Inputs: 0) shutter count value, 1) ExifTool object ref
+# Returns: Encrypted or decrypted ShutterCount
+sub CryptShutterCount($$)
+{
+    my ($val, $exifTool) = @_;
+    # Pentax Date and Time values are used in the encryption
+    return undef unless $$exifTool{PentaxDate} and $$exifTool{PentaxTime} and
+        length($$exifTool{PentaxDate})==4 and length($$exifTool{PentaxTime})>=3;
+    # get Date and Time as integers (after padding Time with a null byte)
+    my $date = unpack('N', $$exifTool{PentaxDate});
+    my $time = unpack('N', $$exifTool{PentaxTime} . "\0");
+    return $val ^ $date ^ (0xffffffff - $time);
+}
+
 
 1; # end
 
@@ -1512,16 +1782,17 @@ the information should be stored to deduce the correct offsets.
 
 =item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
-=item (...plus lots of testing with my Optio WP!)
+=item (...plus lots of testing with my Optio WP and K10D!)
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Wayne Smith, John Francis, Douglas O'Brien and Cvetan Ivanov for
-help figuring out some Pentax tags, and to Denis Bourez, Kazumichi Kawabata,
-David Buret and Barney Garrett for adding to the LensType list, and to Ger
-Vermeulen for contributing print conversion values for some tags.
+Thanks to Wayne Smith, John Francis, Douglas O'Brien Cvetan Ivanov and Jens
+Duttke for help figuring out some Pentax tags, Denis Bourez, Kazumichi
+Kawabata, David Buret, Barney Garrett and Axel Kellner for adding to the
+LensType list, and Ger Vermeulen for contributing print conversion values
+for some tags.
 
 =head1 AUTHOR
 

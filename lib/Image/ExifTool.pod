@@ -65,29 +65,31 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       M4A   r       PS    r/w    |  EXIF           r/w/c
-  AI    r       MEF   r       PSD   r/w    |  GPS            r/w/c
-  AIFF  r       MIE   r/w/c   QTIF  r      |  IPTC           r/w/c
-  APE   r       MIFF  r       RA    r      |  XMP            r/w/c
-  ARW   r       MNG   r/w     RAF   r      |  MakerNotes     r/w/c
-  ASF   r       MOS   r/w     RAM   r      |  Photoshop IRB  r/w/c
-  AVI   r       MOV   r       RAW   r/w    |  ICC Profile    r/w/c
-  BMP   r       MP3   r       RIFF  r      |  MIE            r/w/c
-  CR2   r/w     MP4   r       RM    r      |  JFIF           r/w/c
-  CRW   r/w     MPC   r       SR2   r      |  CIFF           r/w
-  DCM   r       MPG   r       SRF   r      |  AFCP           r/w
-  DNG   r/w     MRW   r/w     SWF   r      |  DICOM          r
-  DOC   r       NEF   r/w     THM   r/w    |  FlashPix       r
-  EPS   r/w     OGG   r       TIFF  r/w    |  GeoTIFF        r
-  ERF   r/w     ORF   r/w     VRD   r/w    |  PrintIM        r
-  FLAC  r       PBM   r/w     WAV   r      |  ID3            r
-  FPX   r       PDF   r       WDP   r/w    |  Kodak Meta     r
-  GIF   r/w     PEF   r/w     WMA   r      |  Ricoh RMETA    r
-  HTML  r       PGM   r/w     WMV   r      |  Picture Info   r
-  ICC   r/w/c   PICT  r       X3F   r      |  Adobe APP14    r
-  JNG   r/w     PNG   r/w     XLS   r      |  APE            r
-  JP2   r       PPM   r/w     XMP   r/w/c  |  Vorbis         r
-  JPEG  r/w     PPT   r                    |  (and more)
+  ACR   r       JP2   r/w     PPT   r      |  EXIF           r/w/c
+  AI    r       JPEG  r/w     PS    r/w    |  GPS            r/w/c
+  AIFF  r       K25   r       PSD   r/w    |  IPTC           r/w/c
+  APE   r       M4A   r       QTIF  r      |  XMP            r/w/c
+  ARW   r       MEF   r/w     RA    r      |  MakerNotes     r/w/c
+  ASF   r       MIE   r/w/c   RAF   r      |  Photoshop IRB  r/w/c
+  AVI   r       MIFF  r       RAM   r      |  ICC Profile    r/w/c
+  BMP   r       MNG   r/w     RAW   r/w    |  MIE            r/w/c
+  BTF   r       MOS   r/w     RIFF  r      |  JFIF           r/w/c
+  CR2   r/w     MOV   r       RM    r      |  Ducky APP12    r/w/c
+  CRW   r/w     MP3   r       SR2   r      |  CIFF           r/w
+  CS1   r/w     MP4   r       SRF   r      |  AFCP           r/w
+  DCM   r       MPC   r       SWF   r      |  DICOM          r
+  DCR   r       MPG   r       THM   r/w    |  Flash          r
+  DNG   r/w     MRW   r/w     TIFF  r/w    |  FlashPix       r
+  DOC   r       NEF   r/w     VRD   r/w/c  |  GeoTIFF        r
+  EPS   r/w     OGG   r       WAV   r      |  PrintIM        r
+  ERF   r/w     ORF   r/w     WDP   r/w    |  ID3            r
+  FLAC  r       PBM   r/w     WMA   r      |  Kodak Meta     r
+  FLV   r       PDF   r       WMV   r      |  Ricoh RMETA    r
+  FPX   r       PEF   r/w     X3F   r      |  Picture Info   r
+  GIF   r/w     PGM   r/w     XLS   r      |  Adobe APP14    r
+  HTML  r       PICT  r       XMP   r/w/c  |  APE            r
+  ICC   r/w/c   PNG   r/w                  |  Vorbis         r
+  JNG   r/w     PPM   r/w                  |  (and more)
 
 =head1 CONFIGURATION
 
@@ -331,7 +333,9 @@ The byte order for newly created EXIF segments when writing.  Note that if
 EXIF information already exists, the existing order is maintained.  Valid
 values are 'MM', 'II' and undef.  If ByteOrder is not defined (the default),
 then the maker note byte order is used (if they are being copied), otherwise
-big-endian ('MM') order is assumed.
+big-endian ('MM') order is assumed.  This can also be set via the
+ExifByteOrder tag, but the ByteOrder option takes precedence if both are
+set.
 
 =item Charset
 
@@ -346,9 +350,9 @@ defined for both types of access.
 
 =item Compact
 
-Write compact output.  Default is 0.  The XMP specification suggests that
-the data be padded with blanks to allow in-place editing.  By setting this
-flag, 2kB is saved for files with XMP data.
+Flag to write compact output.  Default is 0.  The XMP specification suggests
+that the data be padded with blanks to allow in-place editing.  By setting
+this flag, 2kB is saved for files with XMP data.
 
 =item Composite
 
@@ -356,8 +360,8 @@ Flag to calculate Composite tags automatically.  Default is 1.
 
 =item Compress
 
-Write new values in compressed format if possible.  Has no effect unless
-Compress::Zlib is installed.  Default is 0.
+Flag to write new values in compressed format if possible.  Has no effect
+unless Compress::Zlib is installed.  Default is 0.
 
 =item CoordFormat
 
@@ -386,9 +390,9 @@ value).  Default is 1.
 
 =item Exclude
 
-Exclude specified tags from tags extracted from an image. The option value
+Exclude specified tags from tags extracted from an image.  The option value
 is either a tag name or reference to a list of tag names to exclude.  The
-case of tag names is not significant. This option is ignored for
+case of tag names is not significant.  This option is ignored for
 specifically requested tags.  Tags may also be excluded by preceeding their
 name with a '-' in the arguments to L</ImageInfo>.
 
@@ -396,8 +400,9 @@ name with a '-' in the arguments to L</ImageInfo>.
 
 Flag to increase speed of extracting information from JPEG images.  With
 this option set, ExifTool will not scan to the end of a JPEG image to check
-for an AFCP, CanonVRD, FotoStation, PhotoMechanic or PreviewImage trailer.
-Default 0.
+for an AFCP, CanonVRD, FotoStation, PhotoMechanic, MIE or PreviewImage
+trailer.  Also, when combined with the ScanForXMP option, prevents scanning
+for XMP in recognized file types.  Default 0.
 
 =item FixBase
 
@@ -430,11 +435,12 @@ offset is used.  Set to 0 for absolute offsets.  Default is undef.
 
 =item IgnoreMinorErrors
 
-Causes minor errors to be downgraded to warnings, and minor warnings to be
-ignored.  This option is provided mainly to allow writing of files when
-minor errors occur, but also allows thumbnail and preview images to be
-extracted even if they don't have a recognizable header.  Minor
-errors/warnings are denoted by '[minor]' at the start of the message.
+Flag to ignore minor errors.  Causes minor errors to be downgraded to
+warnings, and minor warnings to be ignored.  This option is provided mainly
+to allow writing of files when minor errors occur, but also allows thumbnail
+and preview images to be extracted even if they don't have a recognizable
+header.  Minor errors/warnings are denoted by '[minor]' at the start of the
+message.
 
 =item List
 
@@ -443,11 +449,11 @@ concatenating them into comma-separated strings.  Default is 0.
 
 =item MakerNotes
 
-Flag to cause MakerNotes and other writable subdirectories (such as PrintIM)
-to be extracted as a data block.  Normally when the MakerNotes are extracted
-they are rebuilt to include data outside the boundaries of the original
-maker note data block, but a value of 2 disables this feature.  Possible
-values are:
+Option to extract MakerNotes and other writable subdirectories (such as
+PrintIM) as a data block.  Normally when the MakerNotes are extracted they
+are rebuilt to include data outside the boundaries of the original maker
+note data block, but a value of 2 disables this feature.  Possible values
+are:
 
   0 - Do not extract writable subdirectories [default]
   1 - Extract and rebuild maker notes into self-contained block
@@ -463,6 +469,12 @@ to '' if L</IgnoreMinorErrors> is set.  Default is undef.
 
 Flag to enable automatic print conversion.  Also enables inverse
 print conversion for writing.  Default is 1.
+
+=item ScanForXMP
+
+Flag for scan all files (even unrecognized formats) for XMP information
+unless XMP was already found in the file.  When combined with the FastScan
+option, only unrecognized file types are scanned for XMP.  Default is 0.
 
 =item Sort
 
@@ -892,8 +904,9 @@ otherwise.
 =item Protected
 
 Bit mask for tag protection levels to write.  Bit 0x01 allows writing of
-'unsafe' tags.  Bit 0x02 allows writing of 'protected' tags, and should only
-be used internally by ExifTool.  See
+'unsafe' tags (ie. tags not copied automatically via
+L</SetNewValuesFromFile>).  Bit 0x02 allows writing of 'protected' tags, and
+should only be used internally by ExifTool.  See
 L<Image::ExifTool::TagNames|Image::ExifTool::TagNames>, for a list of tag
 names indicating 'unsafe' and 'protected' tags.  Default is 0.
 
@@ -991,7 +1004,7 @@ Error entries if there were problems reading the input file.
 
 =item Notes:
 
-The PrintConv option applies to this routine, but it should normally be left
+The PrintConv option applies to this routine, but it normally should be left
 on to provide more reliable transfer of information between groups.
 
 If a preview image exists, it is not copied.  The preview image must be
@@ -1437,34 +1450,35 @@ Here is a complete list of groups for each family:
 
 =item Family 0 (Information Type):
 
-AFCP, AIFF, APE, APP12, APP14, APP15, APP5, APP6, APP8, ASF, BMP, CanonVRD,
-Composite, DICOM, DNG, EXIF, ExifTool, FLAC, File, Flash, FlashPix,
-FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, JFIF, JPEG, Jpeg2000,
-Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
-PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RIFF, Real,
+AFCP, AIFF, APE, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
+CanonVRD, Composite, DICOM, DNG, Ducky, EXIF, ExifTool, FLAC, File, Flash,
+FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, JFIF, JPEG,
+Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
+PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, Real,
 SigmaRaw, Vorbis, XMP
 
 =item Family 1 (Specific Location):
 
-AFCP, AIFF, APE, ASF, Adobe, BMP, Canon, CanonCustom, CanonRaw, CanonVRD,
-Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool, FLAC, File,
-Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD,
-GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv,
-ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ID3, ID3v1,
-ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF, JPEG, JVC,
-Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw, Leaf,
-LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender, MIE-Flash,
-MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
-MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
+AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
+CanonVRD, Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool,
+FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff,
+GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
+HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
+ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF,
+JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw,
+Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
+MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
+MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
 MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
 PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
-PostScript, PrintIM, QuickTime, RIFF, RMETA, Real, Real-CONT, Real-MDPR,
-Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SRF#,
-Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-PixelLive,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-lr,
-XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp,
-XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+PostScript, PrintIM, QuickTime, RAF, RAF2, RIFF, RMETA, Real, Real-CONT,
+Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF,
+SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP,
+XMP-DICOM, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
+XMP-exif, XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
+XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 

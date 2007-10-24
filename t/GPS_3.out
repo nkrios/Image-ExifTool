@@ -1,12 +1,17 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.79
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
 [File, File, Image]  - File Name: GPS_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2007:03:02 15:21:50
+[File, File, Time]  - File Modification Date/Time: 2007:09:21 08:09:26
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 120
-[File, File, Image]  - Image Height: 80
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image] ImageWidth - Image Width: 120
+[File, File, Image] ImageHeight - Image Height: 80
+[File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
+[File, File, Image] BitsPerSample - Bits Per Sample: 8
+[File, File, Image] ColorComponents - Color Components: 3
+[File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, IFD0, Image] 270 - Image Description: Communications
 [EXIF, IFD0, Camera] 271 - Make: FUJIFILM
 [EXIF, IFD0, Camera] 272 - Camera Model Name: FinePixS1Pro

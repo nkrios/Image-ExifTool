@@ -40,7 +40,7 @@
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
-[MakerNotes, Canon, Camera] 2 - Self-timer: 0
+[MakerNotes, Canon, Camera] 2 - Self-timer: Off
 [MakerNotes, Canon, Camera] 3 - Quality: RAW
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: Off
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
@@ -65,6 +65,7 @@
 [MakerNotes, Canon, Camera] 29 - Flash Bits: (none)
 [MakerNotes, Canon, Camera] 36 - Zoom Source Width: 3072
 [MakerNotes, Canon, Camera] 37 - Zoom Target Width: 3072
+[MakerNotes, Canon, Camera] 41 - Manual Flash Output: n/a
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
 [MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
@@ -107,9 +108,14 @@
 [MakerNotes, Canon, Camera] 28 - WB RGGB Levels Custom: 1722 832 831 989
 [MakerNotes, Canon, Camera] 32 - WB RGGB Levels Kelvin: 1722 832 831 988
 [MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
-[MakerNotes, Canon, Camera] 1 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 0 - Num AF Points: 7
+[MakerNotes, Canon, Camera] 1 - Valid AF Points: 7
 [MakerNotes, Canon, Image] 2 - Canon Image Width: 3072
 [MakerNotes, Canon, Image] 3 - Canon Image Height: 2048
-[MakerNotes, Canon, Image] 4 - Canon Image Width As Shot: 3072
-[MakerNotes, Canon, Image] 5 - Canon Image Height As Shot: 2048
-[MakerNotes, Canon, Camera] 22 - AF Points Used: (none)
+[MakerNotes, Canon, Camera] 4 - AF Image Width: 3072
+[MakerNotes, Canon, Camera] 5 - AF Image Height: 2048
+[MakerNotes, Canon, Camera] 6 - AF Area Width: 151
+[MakerNotes, Canon, Camera] 7 - AF Area Height: 151
+[MakerNotes, Canon, Camera] 8 - AF Area X Positions: 1014 608 0 0 0 -608 -1014
+[MakerNotes, Canon, Camera] 9 - AF Area Y Positions: 0 0 -506 0 506 0 0
+[MakerNotes, Canon, Camera] 10 - AF Points In Focus: (none)

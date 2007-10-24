@@ -17,7 +17,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 sub LocateObject($$);
 sub FetchObject($$$$);
@@ -644,10 +644,12 @@ sub ReadToNested($;$)
             next unless $2 eq '(' or $2 eq ')';
         } elsif ($2 eq '%') {
             # ignore the comment
-            my $pos = pos($$dataPt);
+            my $pos = pos($$dataPt) - 1;
             # remove everything from '%' up to but not including newline
-            $$dataPt =~ s/%\G.*//;
-            pos($$dataPt) = $pos - 1;
+            $$dataPt =~ /.*/g;
+            my $end = pos($$dataPt);
+            $$dataPt = substr($$dataPt, 0, $pos) . substr($$dataPt, $end);
+            pos($$dataPt) = $pos;
             next;
         }
         if ($closingDelim{$2}) {
@@ -979,9 +981,14 @@ sub ProcessDict($$$$;$)
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         unless ($$tagInfo{SubDirectory}) {
+            # convert from UTF-16 (big endian) to UTF-8 or Latin if necessary
+            # unless this is binary data (hex-encoded strings would not have been converted)
+            if ($val =~ s/^\xfe\xff// and not $$tagInfo{Binary}) {
+                $val = $exifTool->Unicode2Charset($val, 'MM');
+            }
             if ($$tagInfo{List}) {
-                # separate tokens in whitespace delimited lists
-                my @values = split ' ', $val;
+                # separate tokens in comma or whitespace delimited lists
+                my @values = ($val =~ /,/) ? split /,+\s*/, $val : split ' ', $val;
                 foreach $val (@values) {
                     $exifTool->FoundTag($tagInfo, $val);
                 }

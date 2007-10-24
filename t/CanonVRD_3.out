@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.55
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
 [File, File, Image]  - File Name: CanonVRD_3_failed.vrd
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1768 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:10:30 11:54:58
+[File, File, Time]  - File Modification Date/Time: 2007:10:04 11:27:02
 [File, File, Image]  - File Type: VRD
 [File, File, Image]  - MIME Type: application/unknown
 [CanonVRD, CanonVRD, Image] 2 - VRD Version: 2.00
@@ -43,16 +43,16 @@
 [CanonVRD, CanonVRD, Image] 618 - Check Mark: Clear
 [CanonVRD, CanonVRD, Image] 622 - Rotation: 0
 [CanonVRD, CanonVRD, Image] 624 - Work Color Space: sRGB
-[CanonVRD, CanonVRD, Image] 634 - Picture Style: Standard
-[CanonVRD, CanonVRD, Image] 656 - Raw Color Tone Adj: -4
-[CanonVRD, CanonVRD, Image] 658 - Raw Saturation Adj: 0
-[CanonVRD, CanonVRD, Image] 660 - Raw Contrast Adj: 0
-[CanonVRD, CanonVRD, Image] 662 - Raw Linear: No
-[CanonVRD, CanonVRD, Image] 664 - Raw Sharpness Adj: 1
-[CanonVRD, CanonVRD, Image] 666 - Raw Highlight Point: 4095
-[CanonVRD, CanonVRD, Image] 668 - Raw Shadow Point: 0
-[CanonVRD, CanonVRD, Image] 746 - Monochrome Filter Effect: Yellow
-[CanonVRD, CanonVRD, Image] 748 - Monochrome Toning Effect: Purple
-[CanonVRD, CanonVRD, Image] 750 - Monochrome Contrast: 3
-[CanonVRD, CanonVRD, Image] 752 - Monochrome Linear: No
-[CanonVRD, CanonVRD, Image] 754 - Monochrome Sharpness: 4
+[CanonVRD, CanonVRD, Image] 4 - Picture Style: Standard
+[CanonVRD, CanonVRD, Image] 26 - Raw Color Tone Adj: -4
+[CanonVRD, CanonVRD, Image] 28 - Raw Saturation Adj: 0
+[CanonVRD, CanonVRD, Image] 30 - Raw Contrast Adj: 0
+[CanonVRD, CanonVRD, Image] 32 - Raw Linear: No
+[CanonVRD, CanonVRD, Image] 34 - Raw Sharpness Adj: 1
+[CanonVRD, CanonVRD, Image] 36 - Raw Highlight Point: 4095
+[CanonVRD, CanonVRD, Image] 38 - Raw Shadow Point: 0
+[CanonVRD, CanonVRD, Image] 116 - Monochrome Filter Effect: Yellow
+[CanonVRD, CanonVRD, Image] 118 - Monochrome Toning Effect: Purple
+[CanonVRD, CanonVRD, Image] 120 - Monochrome Contrast: 3
+[CanonVRD, CanonVRD, Image] 122 - Monochrome Linear: No
+[CanonVRD, CanonVRD, Image] 124 - Monochrome Sharpness: 4

@@ -7,12 +7,35 @@
 </head>
 <body>
 <h2 class=top>CanonVRD Tags</h2>
-<p>Canon Digital Photo Professional writes VRD (Virtual? Recipe Data)
-information as a trailer record to JPEG, CRW and CR2 images, or as a
-stand-alone VRD file.  The tags listed below represent information found in
-this record.  The complete VRD data record may be extracted separately as a
-binary data block using the Extra &#39;CanonVRD&#39; tag, but this is not done
-unless specified explicitly.</p>
+<p>Canon Digital Photo Professional writes VRD (Recipe Data) information as a
+trailer record to JPEG, TIFF, CRW and CR2 images, or as a stand-alone VRD
+file. The tags listed below represent information found in this record.  The
+complete VRD data record may be accessed as a block using the Extra
+&#39;CanonVRD&#39; tag, but this tag is not extracted or copied unless specified
+explicitly.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>VRD1</td>
+<td class=c>-</td>
+<td>--&gt; <a href='CanonVRD.html#Ver1'>CanonVRD Ver1 Tags</a></td></tr>
+<tr class=b>
+<td class=r>1</td>
+<td>VRDStampTool</td>
+<td class=c>-</td>
+<td>--&gt; <a href='CanonVRD.html#StampTool'>CanonVRD StampTool Tags</a></td></tr>
+<tr>
+<td class=r>2</td>
+<td>VRD2</td>
+<td class=c>-</td>
+<td>--&gt; <a href='CanonVRD.html#Ver2'>CanonVRD Ver2 Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Ver1'>CanonVRD Ver1 Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -249,8 +272,30 @@ unless specified explicitly.</p>
   <br>2 = Wide Gamut RGB
   <br>3 = Apple RGB
   <br>4 = ColorMatch RGB</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='StampTool'>CanonVRD StampTool Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>634</td>
+<td class=r>0</td>
+<td>StampToolCount</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Ver2'>CanonVRD Ver2 Tags</a></h2>
+<p>Tags added in DPP version 2.0 and later.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>4</td>
 <td>PictureStyle</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Standard
@@ -260,43 +305,43 @@ unless specified explicitly.</p>
   <br>4 = Faithful
   <br>5 = Monochrome</span></td></tr>
 <tr class=b>
-<td class=r>656</td>
+<td class=r>26</td>
 <td>RawColorToneAdj</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>658</td>
+<td class=r>28</td>
 <td>RawSaturationAdj</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>660</td>
+<td class=r>30</td>
 <td>RawContrastAdj</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>662</td>
+<td class=r>32</td>
 <td>RawLinear</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = No
   <br>1 = Yes</span></td></tr>
 <tr class=b>
-<td class=r>664</td>
+<td class=r>34</td>
 <td>RawSharpnessAdj</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>666</td>
+<td class=r>36</td>
 <td>RawHighlightPoint</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>668</td>
+<td class=r>38</td>
 <td>RawShadowPoint</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>746</td>
+<td class=r>116</td>
 <td>MonochromeFilterEffect</td>
 <td class=c>int16s</td>
 <td><span class=s>-2 = None
@@ -305,7 +350,7 @@ unless specified explicitly.</p>
   <br>1 = Red
   <br>2 = Green</span></td></tr>
 <tr class=b>
-<td class=r>748</td>
+<td class=r>118</td>
 <td>MonochromeToningEffect</td>
 <td class=c>int16s</td>
 <td><span class=s>-2 = None
@@ -314,26 +359,47 @@ unless specified explicitly.</p>
   <br>1 = Purple
   <br>2 = Green</span></td></tr>
 <tr>
-<td class=r>750</td>
+<td class=r>120</td>
 <td>MonochromeContrast</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>752</td>
+<td class=r>122</td>
 <td>MonochromeLinear</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = No
   <br>1 = Yes</span></td></tr>
 <tr>
-<td class=r>754</td>
+<td class=r>124</td>
 <td>MonochromeSharpness</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>188</td>
+<td>ChrominanceNoiseReduction</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>58 = Low
+  <br>100 = High</span></td></tr>
+<tr>
+<td class=r>190</td>
+<td>LuminanceNoiseReduction</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>65 = Low
+  <br>100 = High</span></td></tr>
+<tr class=b>
+<td class=r>192</td>
+<td>ChrominanceNR_TIFF_JPEG</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>33 = Low
+  <br>100 = High</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 8, 2006</i>
+<br><i>Last revised Oct 17, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

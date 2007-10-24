@@ -1,12 +1,17 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.90
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
 [File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Image Width: 8
-[File, File, Image]  - Image Height: 8
+[File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
+[File, File, Image] ImageWidth - Image Width: 8
+[File, File, Image] ImageHeight - Image Height: 8
+[File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
+[File, File, Image] BitsPerSample - Bits Per Sample: 8
+[File, File, Image] ColorComponents - Color Components: 3
+[File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, IFD0, Camera] 271 - Make: NIKON CORPORATION
 [EXIF, IFD0, Camera] 272 - Camera Model Name: NIKON D70
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
@@ -86,7 +91,7 @@
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Fired, TTL Mode
 [MakerNotes, Nikon, Camera] 0 - AF Area Mode: Single Area
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
-[MakerNotes, Nikon, Camera] 2 - AF Points Used: Center
+[MakerNotes, Nikon, Camera] 2 - AF Points In Focus: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Continuous
 [MakerNotes, Nikon, Camera] 138 - Auto Bracket Release: None
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 5.33
@@ -118,6 +123,7 @@
 [MakerNotes, Nikon, Camera] 171 - Vari Program: 
 [XMP, XMP-aux, Camera] Lens - Lens: 18-70mm f/3.5-4.5
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: No= 20025585
+[XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 47
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 71

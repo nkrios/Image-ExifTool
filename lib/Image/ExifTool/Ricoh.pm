@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -378,14 +378,10 @@ sub ProcessRicohRMETA($$$)
                 $tagInfo = { Name => $name, PrintConv => { } };
                 Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
             }
-            if (defined $num) {
-                # add conversion for this value (if it doesn't already exist)
-                $tagInfo->{PrintConv}->{$num} = $val;
-            } else {
-                # no numerical value so use string value directly
-                delete $tagInfo->{PrintConv}->{$val};
-                $num = $val;
-            }
+            # use string value directly if no numerical value
+            $num = $val unless defined $num;
+            # add conversion for this value (replacing any existing entry)
+            $tagInfo->{PrintConv}->{$num} = $val;
             if ($verbose) {
                 $exifTool->VerboseInfo($tag, $tagInfo,
                     Table   => $tagTablePtr,

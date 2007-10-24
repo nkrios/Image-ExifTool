@@ -11,7 +11,8 @@
 XMP stands for &quot;Extensible Metadata Platform&quot;, an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, PNG,
-MIFF, PS, PDF, PSD and DNG.</p>
+MIFF, PS, PDF, PSD and DNG, as well as audio file formats supporting ID3v2
+information.</p>
 
 <p>The XMP <b>Tag ID</b>&#39;s aren&#39;t listed because in most cases they are identical
 to the <b>Tag Name</b>.</p>
@@ -22,8 +23,16 @@ specifies the information format:  <code>integer</code> is a string of digits
 <code>rational</code> is two <code>integer</code> strings separated by a &#39;/&#39; character, <code>date</code>
 is a date/time string in the format &quot;YYYY:MM:DD HH:MM:SS[+/-HH:MM]&quot;,
 <code>boolean</code> is either &quot;True&quot; or &quot;False&quot;, and <code>lang-alt</code> is a list of string
-alternatives in different languages. Currently, ExifTool only writes the
-&quot;x-default&quot; language in <code>lang-alt</code> lists.</p>
+alternatives in different languages.</p>
+
+<p>Individual languages for <code>lang-alt</code> tags are accessed by suffixing the tag
+name with a &#39;-&#39;, followed by an RFC 3066 language code (ie. &quot;XMP:Title-fr&quot;,
+or &quot;Rights-en-US&quot;).  A <code>lang-alt</code> tag with no language code accesses the
+&quot;x-default&quot; language, but causes other languages to be deleted when writing.
+The &quot;x-default&quot; language code may be specified when writing a new value to
+write only the default language, but note that all languages are still
+deleted if &quot;x-default&quot; tag is deleted.  When reading, &quot;x-default&quot; is not
+specified.</p>
 
 <p>The XMP tags are organized according to schema <b>Namespace</b> in the following
 tables.  Note that a few of the longer namespace prefixes given below have
@@ -64,17 +73,25 @@ but this information is extracted by ExifTool anyway.
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#dex'>XMP dex Tags</a></td></tr>
 <tr class=b>
+<td>DICOM</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#DICOM'>XMP DICOM Tags</a></td></tr>
+<tr>
 <td>exif</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#exif'>XMP exif Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>iptcCore</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#iptcCore'>XMP iptcCore Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>lr</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#Lightroom'>XMP Lightroom Tags</a></td></tr>
+<tr class=b>
+<td>mediapro</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#MediaPro'>XMP MediaPro Tags</a></td></tr>
 <tr>
 <td>microsoft</td>
 <td class=c>-</td>
@@ -223,11 +240,19 @@ but this information is extracted by ExifTool anyway.
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>CameraProfileDigest</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>ChromaticAberrationB</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ChromaticAberrationR</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Clarity</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -277,192 +302,208 @@ but this information is extracted by ExifTool anyway.
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>Defringe</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>Exposure</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>FillLight</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GreenHue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GreenSaturation</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HasCrop</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HasSettings</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HighlightRecovery</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentAqua</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentBlue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentGreen</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentMagenta</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentOrange</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentPurple</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentRed</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentYellow</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IncrementalTemperature</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IncrementalTint</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceAdjustmentAqua</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceAdjustmentBlue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceAdjustmentGreen</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceAdjustmentMagenta</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceAdjustmentOrange</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceAdjustmentPurple</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceAdjustmentRed</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceAdjustmentYellow</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceSmoothing</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ParametricDarks</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ParametricHighlights</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ParametricHighlightSplit</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ParametricLights</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ParametricMidtoneSplit</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ParametricShadows</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ParametricShadowSplit</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RawFileName</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RedHue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RedSaturation</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Saturation</td>
 <td class=c>integer/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SaturationAdjustmentAqua</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SaturationAdjustmentBlue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SaturationAdjustmentGreen</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SaturationAdjustmentMagenta</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SaturationAdjustmentOrange</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SaturationAdjustmentPurple</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SaturationAdjustmentRed</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SaturationAdjustmentYellow</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Shadows</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ShadowTint</td>
 <td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SharpenDetail</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SharpenEdgeMasking</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SharpenRadius</td>
+<td class=c>real</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>Sharpness</td>
@@ -656,6 +697,71 @@ other XMP tags.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='DICOM'>XMP DICOM Tags</a></h2>
+<p>DICOM schema tags.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>EquipmentInstitution</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>EquipmentManufacturer</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>PatientsBirthDate</td>
+<td class=c>date</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>PatientID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>PatientsName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>PatientsSex</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SeriesDateTime</td>
+<td class=c>date</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SeriesDescription</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SeriesModality</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SeriesNumber</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>StudyDateTime</td>
+<td class=c>date</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>StudyDescription</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>StudyID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>StudyPhysician</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='exif'>XMP exif Tags</a></h2>
 <p>EXIF schema for EXIF tags.</p>
 <blockquote>
@@ -775,7 +881,9 @@ other XMP tags.</p>
 <tr>
 <td>FileSource</td>
 <td class=c>integer</td>
-<td><span class=s>3 = Digital Camera</span></td></tr>
+<td><span class=s>1 = Film Scanner
+  <br>2 = Reflection Print Scanner
+  <br>3 = Digital Camera</span></td></tr>
 <tr class=b>
 <td>FlashEnergy</td>
 <td class=c>rational</td>
@@ -1199,8 +1307,45 @@ shortens this for the &quot;XMP-iptcCore&quot; family 1 group name.</p>
 <tr class=h><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>HierarchicalSubject</td>
+<td class=c>string+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>PrivateRTKInfo</td>
 <td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MediaPro'>XMP MediaPro Tags</a></h2>
+<p>IView MediaPro schema tags.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>CatalogSets</td>
+<td class=c>string+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Event</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Location</td>
+<td class=c>string/</td>
+<td><span class=s><span class=n>(avoided due to conflict with XMP-iptcCore:Location)</span></span></td></tr>
+<tr class=b>
+<td>People</td>
+<td class=c>string+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Status</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>UserFields</td>
+<td class=c>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1345,15 +1490,23 @@ when writing due to name conflicts with XMP-dc tags.</p>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>ICCProfileName</td>
+<td>History</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>Instructions</td>
+<td>ICCProfileName</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>Instructions</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>LegacyIPTCDigest</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SidecarForExtension</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -1442,6 +1595,7 @@ namespace URI.</p>
   <br>9 = JBIG B&amp;W
   <br>10 = JBIG Color
   <br>32766 = Next
+  <br>32769 = Epson ERF Compressed
   <br>32771 = CCIRLEW
   <br>32773 = PackBits
   <br>32809 = Thunderscan
@@ -1457,7 +1611,9 @@ namespace URI.</p>
   <br>34676 = SGILog
   <br>34677 = SGILog24
   <br>34712 = JPEG 2000
-  <br>34713 = Nikon NEF Compressed</span></td></tr>
+  <br>34713 = Nikon NEF Compressed
+  <br>65000 = Kodak DCR Compressed
+  <br>65535 = Pentax PEF Compressed</span></td></tr>
 <tr class=b>
 <td>Copyright</td>
 <td class=c>lang-alt</td>
@@ -2102,150 +2258,154 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td class=c>date+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>InstanceID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>LastURL</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagedFromDocumentID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ManagedFromInstanceID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagedFromManager</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ManagedFromManagerVariant</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagedFromManageTo</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ManagedFromManageUI</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagedFromRenditionClass</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ManagedFromRenditionParams</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagedFromVersionID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Manager</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagerVariant</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ManageTo</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManageUI</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>PreservedFileName</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionClass</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfDocumentID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfInstanceID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfManager</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfManagerVariant</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfManageTo</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfManageUI</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfRenditionClass</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfRenditionParams</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfVersionID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionParams</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SaveID</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VersionID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VersionsComments</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VersionsEventAction</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VersionsEventInstanceID</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VersionsEventParameters</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VersionsEventSoftwareAgent</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VersionsEventWhen</td>
 <td class=c>date+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VersionsModifier</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VersionsModifyDate</td>
 <td class=c>date+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VersionsVersion</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
@@ -2412,7 +2572,7 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 27, 2007</i>
+<br><i>Last revised Oct 11, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

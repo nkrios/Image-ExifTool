@@ -7,6 +7,8 @@
 </head>
 <body>
 <h2 class=top>Jpeg2000 Tags</h2>
+<p>The tags below are extracted from JPEG 2000 images, however ExifTool
+currently writes only EXIF, IPTC and XMP tags in these images.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -55,7 +57,7 @@
 <td class=c>-<br>N<br>N</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a>
   <br>16 = sRGB
-  <br>17 = Greyscale
+  <br>17 = Grayscale
   <br>18 = sYCC</td></tr>
 <tr>
 <td>'comp'</td>
@@ -229,12 +231,16 @@
 <td>&nbsp;</td></tr>
 <tr>
 <td>'uuid'</td>
-<td>UUID-GeoJP2
+<td>UUID-EXIF
+  <br>UUID-IPTC
   <br>UUID-XMP
+  <br>UUID-GeoJP2
   <br>UUID-Unknown</td>
-<td class=c>-<br>-<br>N</td>
+<td class=c>-<br>-<br>-<br>-<br>N</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a>
-  <br>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+  <br>--&gt; <a href='IPTC.html'>IPTC Tags</a>
+  <br>--&gt; <a href='XMP.html'>XMP Tags</a>
+  <br>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
 <tr class=b>
 <td>'xml '</td>
 <td>XML</td>
@@ -358,7 +364,7 @@
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 22, 2007</i>
+<br><i>Last revised Jul 5, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

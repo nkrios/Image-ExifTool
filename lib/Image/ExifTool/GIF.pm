@@ -17,7 +17,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 #------------------------------------------------------------------------------
 # Process meta information in GIF image
@@ -154,10 +154,12 @@ sub ProcessGIF($$)
                     $length = ord($ch);  # get next block size
                 }
                 last if $length;    # was a read error if length isn't zero
-                # all done once we have found the comment unless writing file
                 unless ($outfile) {
                     $rtnVal = 1;
-                    last;
+                    $exifTool->FoundTag('Comment', $comment) if $comment;
+                    undef $comment;
+                    # assume no more than one comment in FastScan mode
+                    last if $exifTool->Options('FastScan');
                 }
             } else {
                 Write($outfile, $ch, $s) or $err = 1 if $outfile;
