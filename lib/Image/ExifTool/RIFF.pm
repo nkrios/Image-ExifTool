@@ -397,7 +397,7 @@ my %riffEncoding = ( #2
             1 => 'FrameCount',
         },
         ValueConv => '$val[0] ? $val[1] / $val[0] : undef',
-        PrintConv => 'sprintf("%.2fs",$val)',
+        PrintConv => 'sprintf("%.2f s",$val)',
     },
 );
 
@@ -588,7 +588,7 @@ including Windows WAV audio and AVI video files.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

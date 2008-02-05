@@ -25,8 +25,8 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='PrintIM.html'>PrintIM</a><br>
 <a href='Photoshop.html'>Photoshop</a><br>
 <a href='Canon.html'>Canon</a><br>
-<a href='CanonCustom.html'>CanonCustom</a></td><td width='16%'>
-<a href='Casio.html'>Casio</a><br>
+<a href='CanonCustom.html'>CanonCustom</a><br>
+<a href='Casio.html'>Casio</a></td><td width='16%'>
 <a href='FujiFilm.html'>FujiFilm</a><br>
 <a href='HP.html'>HP</a><br>
 <a href='JVC.html'>JVC</a><br>
@@ -36,21 +36,21 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='Nikon.html'>Nikon</a><br>
 <a href='NikonCapture.html'>NikonCapture</a><br>
 <a href='Olympus.html'>Olympus</a><br>
-<a href='Panasonic.html'>Panasonic</a></td><td width='16%'>
+<a href='Panasonic.html'>Panasonic</a><br>
 <a href='Pentax.html'>Pentax</a><br>
-<a href='Ricoh.html'>Ricoh</a><br>
+<a href='Ricoh.html'>Ricoh</a></td><td width='16%'>
 <a href='Sanyo.html'>Sanyo</a><br>
 <a href='Sigma.html'>Sigma</a><br>
 <a href='Sony.html'>Sony</a><br>
 <a href='Unknown.html'>Unknown</a><br>
 <a href='DNG.html'>DNG</a><br>
-<a href='CanonRaw.html'>CanonRaw</a><br>
 <a href='MinoltaRaw.html'>MinoltaRaw</a><br>
+<a href='CanonRaw.html'>CanonRaw</a><br>
 <a href='KyoceraRaw.html'>KyoceraRaw</a><br>
-<a href='SigmaRaw.html'>SigmaRaw</a></td><td width='16%'>
+<a href='SigmaRaw.html'>SigmaRaw</a><br>
 <a href='JFIF.html'>JFIF</a><br>
 <a href='FlashPix.html'>FlashPix</a><br>
-<a href='APP12.html'>APP12</a><br>
+<a href='APP12.html'>APP12</a></td><td width='16%'>
 <a href='AFCP.html'>AFCP</a><br>
 <a href='CanonVRD.html'>CanonVRD</a><br>
 <a href='FotoStation.html'>FotoStation</a><br>
@@ -58,22 +58,23 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='MIE.html'>MIE</a><br>
 <a href='ID3.html'>ID3</a><br>
 <a href='Jpeg2000.html'>Jpeg2000</a><br>
-<a href='BMP.html'>BMP</a></td><td width='16%'>
+<a href='BMP.html'>BMP</a><br>
 <a href='PICT.html'>PICT</a><br>
 <a href='PNG.html'>PNG</a><br>
 <a href='MNG.html'>MNG</a><br>
-<a href='MIFF.html'>MIFF</a><br>
+<a href='MIFF.html'>MIFF</a></td><td width='16%'>
 <a href='PDF.html'>PDF</a><br>
 <a href='PostScript.html'>PostScript</a><br>
+<a href='ITC.html'>ITC</a><br>
 <a href='Vorbis.html'>Vorbis</a><br>
 <a href='FLAC.html'>FLAC</a><br>
 <a href='APE.html'>APE</a><br>
 <a href='MPC.html'>MPC</a><br>
-<a href='MPEG.html'>MPEG</a></td><td width='16%'>
+<a href='MPEG.html'>MPEG</a><br>
 <a href='QuickTime.html'>QuickTime</a><br>
 <a href='Flash.html'>Flash</a><br>
 <a href='Real.html'>Real</a><br>
-<a href='RIFF.html'>RIFF</a><br>
+<a href='RIFF.html'>RIFF</a></td><td width='16%'>
 <a href='AIFF.html'>AIFF</a><br>
 <a href='ASF.html'>ASF</a><br>
 <a href='DICOM.html'>DICOM</a><br>
@@ -111,16 +112,17 @@ of values written, or the number of characters in a fixed-length string
 
 <p>An asterisk (<code>*</code>) after an entry in the <b>Writable</b> column indicates a
 &quot;protected&quot; tag which is not writable directly, but is set via a Composite
-tag.  A tilde (<code>~</code>) indicates a tag this is only writable when print
-conversion is disabled (by setting PrintConv to 0, or using the -n option).
-A slash (<code>/</code>) indicates an &quot;avoided&quot; tag that is not created unless the
-group is specified (due to name conflicts with other tags).  An exclamation
-point (<code>!</code>) indicates a tag that is considered unsafe to write under normal
-circumstances.  These &quot;unsafe&quot; tags are not set when calling
+or Extra tag.  A tilde (<code>~</code>) indicates a tag this is only writable when
+print conversion is disabled (by setting PrintConv to 0, or using the -n
+option). A slash (<code>/</code>) indicates an &quot;avoided&quot; tag that is not created
+unless the group is specified (due to name conflicts with other tags).  An
+exclamation point (<code>!</code>) indicates a tag that is considered unsafe to write
+under normal circumstances.  These &quot;unsafe&quot; tags are not set when calling
 SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  A plus sign
-(<code>+</code>) indicates a &quot;list&quot; tag which supports multiple instances.</p>
+(<code>+</code>) indicates a &quot;list&quot; tag which supports multiple values while allowing
+individual values to be added and deleted.</p>
 
 <p>The HTML version of these tables also list possible <b>Values</b> for
 discrete-valued tags, as well as <b>Notes</b> for some tags.</p>
@@ -134,7 +136,7 @@ question.
 </p>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 16, 2007</i>
+<br><i>Last revised Feb 5, 2008</i>
 <p class=lf><a href='../index.html'>&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

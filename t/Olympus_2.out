@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Olympus.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1573 bytes
@@ -34,14 +34,14 @@
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.8
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Fired
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 7.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 7.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 640
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 480
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 480
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -70,6 +70,7 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/30
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.005 mm
-[Composite, Composite, Camera]  - Focal Length: 7.0mm (35mm equivalent: 38.8mm)
+[Composite, Composite, Image]  - Field Of View: 49.7 deg
+[Composite, Composite, Camera]  - Focal Length: 7.0 mm (35 mm equivalent: 38.8 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 4.52 m
 [Composite, Composite, Image]  - Light Value: 6.9

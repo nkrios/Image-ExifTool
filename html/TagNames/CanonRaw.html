@@ -134,11 +134,16 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#CameraSettings'>Canon CameraSettings Tags</a></td></tr>
 <tr>
+<td>0x1030</td>
+<td>WhiteSample</td>
+<td class=c>-</td>
+<td>--&gt; <a href='CanonRaw.html#WhiteSample'>CanonRaw WhiteSample Tags</a></td></tr>
+<tr class=b>
 <td>0x1031</td>
 <td>SensorInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#SensorInfo'>Canon SensorInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x1033</td>
 <td>CustomFunctions10D
   <br>CustomFunctionsD30
@@ -149,158 +154,159 @@ JpgFromRaw and ThumbnailImage are allowed to change size.
   <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FunctionsD30'>CanonCustom FunctionsD30 Tags</a>
   <br>--&gt; <a href='CanonCustom.html#FuncsUnknown'>CanonCustom FuncsUnknown Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x1038</td>
 <td>CanonAFInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#AFInfo'>Canon AFInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x1093</td>
 <td>CanonFileInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#FileInfo'>Canon FileInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x10a9</td>
 <td>ColorBalance</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ColorBalance'>Canon ColorBalance Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x10ae</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x10b4</td>
 <td>ColorSpace</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = sRGB
   <br>2 = Adobe RGB
   <br>65535 = Uncalibrated</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x10b5</td>
 <td>RawJpgInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html#RawJpgInfo'>CanonRaw RawJpgInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x1803</td>
 <td>ImageFormat</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html#ImageFormat'>CanonRaw ImageFormat Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x1804</td>
 <td>RecordID</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x1806</td>
 <td>SelfTimerTime</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x1807</td>
 <td>TargetDistanceSetting</td>
 <td class=c>float</td>
 <td>&nbsp;</td></tr>
-<tr>
-<td>0x180b</td>
-<td>SerialNumber</td>
-<td class=c>int32u</td>
-<td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x180b</td>
+<td>SerialNumber
+  <br>UnknownNumber?</td>
+<td class=c>int32u<br>Y</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x180e</td>
 <td>TimeStamp</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html#TimeStamp'>CanonRaw TimeStamp Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x1810</td>
 <td>ImageInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html#ImageInfo'>CanonRaw ImageInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x1813</td>
 <td>FlashInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html#FlashInfo'>CanonRaw FlashInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x1814</td>
 <td>MeasuredEV</td>
 <td class=c>float</td>
 <td><span class=s><span class=n>(this the Canon name for what should properly be called MeasuredLV, and is
 offset by about -5 EV from the calculated LV for most models)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>0x1817</td>
 <td>FileNumber</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x1818</td>
 <td>ExposureInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html#ExposureInfo'>CanonRaw ExposureInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x1834</td>
 <td>CanonModelID</td>
 <td class=c>int32u</td>
 <td>--&gt; <a href='Canon.html#CanonModelID'>Canon CanonModelID Values</a>
   <br><span class='n s'>(this is the complete list of model ID numbers, but note that many of these
 models do not produce CRW images)</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x1835</td>
 <td>DecoderTable</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
+<td class=c>-</td>
+<td>--&gt; <a href='CanonRaw.html#DecoderTable'>CanonRaw DecoderTable Tags</a></td></tr>
+<tr>
 <td>0x183b</td>
 <td>SerialNumberFormat</td>
 <td class=c>int32u</td>
 <td><span class=s>0x90000000 = Format 1
   <br>0xa0000000 = Format 2</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x2005</td>
 <td>RawData</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x2007</td>
 <td>JpgFromRaw</td>
 <td class=c>resize</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x2008</td>
 <td>ThumbnailImage</td>
 <td class=c>resize</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x2804</td>
 <td>ImageDescription</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x2807</td>
 <td>CameraObject</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x3002</td>
 <td>ShootingRecord</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x3003</td>
 <td>MeasuredInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x3004</td>
 <td>CameraSpecification</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x300a</td>
 <td>ImageProps</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x300b</td>
 <td>ExifInformation</td>
 <td class=c>-</td>
@@ -322,6 +328,39 @@ models do not produce CRW images)</span></td></tr>
 <td class=r>6</td>
 <td>Model</td>
 <td class=c>string[$size-6]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='WhiteSample'>CanonRaw WhiteSample Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>1</td>
+<td>WhiteSampleWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>2</td>
+<td>WhiteSampleHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>3</td>
+<td>WhiteSampleLeftBorder</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>4</td>
+<td>WhiteSampleTopBorder</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>5</td>
+<td>WhiteSampleBits</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -486,9 +525,32 @@ models do not produce CRW images)</span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='DecoderTable'>CanonRaw DecoderTable Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>DecoderTableNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>2</td>
+<td>CompressedDataOffset</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>3</td>
+<td>CompressedDataLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 12, 2007</i>
+<br><i>Last revised Feb 5, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

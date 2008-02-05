@@ -10,7 +10,11 @@
 <p>
 The tags listed in the PDF tables below are those which are used by ExifTool
 to extract meta information, but they are only a small fraction of the total
-number of available PDF tags.
+number of available PDF tags.</p>
+
+<p>When writing PDF files, ExifTool uses an increment update.  This has an
+advantage that the original PDF can be easily recovered by deleting the
+<code>PDF-update</code> pseudo-group (with <code>-PDF-update:all=</code> on the command line).
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -32,54 +36,63 @@ number of available PDF tags.
 <h2><a name='Info'>PDF Info Tags</a></h2>
 <p>As well as the tags listed below, the PDF specification allows for
 user-defined tags to exist in the Info dictionary.  These tags, which should
-have corresponding XMP-pdfx entries in the PDF Metadata, are also extracted
-by ExifTool.</p>
+have corresponding XMP-pdfx entries in the XMP of the PDF XML Metadata
+object, are also extracted by ExifTool.</p>
+
+<p><b>Writable</b> specifies the value format, and may be <code>string</code>, <code>date</code>,
+<code>integer</code>, <code>real</code>, <code>boolean</code> or <code>name</code> for PDF tags.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>'AAPL:Keywords'</td>
+<td>AppleKeywords</td>
+<td class=c>string+</td>
+<td><span class=s><span class=n>(keywords written by Apple utilities, although they seem to use PDF:Keywords
+when reading)</span></span></td></tr>
+<tr class=b>
 <td>'Author'</td>
 <td>Author</td>
-<td class=c>N</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'CreationDate'</td>
 <td>CreateDate</td>
-<td class=c>N</td>
+<td class=c>date</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'Creator'</td>
 <td>Creator</td>
-<td class=c>N</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'Keywords'</td>
 <td>Keywords</td>
-<td class=c>N+</td>
+<td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ModDate'</td>
 <td>ModifyDate</td>
-<td class=c>N</td>
+<td class=c>date</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'Producer'</td>
 <td>Producer</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'Subject'</td>
-<td>Subject</td>
-<td class=c>N</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'Title'</td>
-<td>Title</td>
-<td class=c>N</td>
+<td>'Subject'</td>
+<td>Subject</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'Title'</td>
+<td>Title</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'Trapped'</td>
 <td>Trapped</td>
 <td class=c>N</td>
@@ -103,6 +116,11 @@ by ExifTool.</p>
 <td>Pages</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PDF.html#Pages'>PDF Pages Tags</a></td></tr>
+<tr>
+<td>'Version'</td>
+<td>PDFVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Metadata'>PDF Metadata Tags</a></h2>
@@ -205,8 +223,8 @@ by ExifTool.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>'stream'</td>
-<td>Stream</td>
+<td>'_stream'</td>
+<td>_stream</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
 </table></td></tr></table></blockquote>
@@ -257,15 +275,15 @@ by ExifTool.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>'stream'</td>
-<td>Stream</td>
+<td>'_stream'</td>
+<td>_stream</td>
 <td class=c>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 17, 2006</i>
+<br><i>Last revised Dec 17, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

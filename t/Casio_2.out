@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Casio.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1203 bytes
@@ -33,11 +33,11 @@
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.0
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 13.3mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 13.3 mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2048
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1536
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1536
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -63,5 +63,5 @@
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Shutter Speed: 1/114
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - Focal Length: 13.3mm
+[Composite, Composite, Camera]  - Focal Length: 13.3 mm
 [Composite, Composite, Image]  - Light Value: 9.5

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -31,7 +31,7 @@
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2001:05:19 18:36:41
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2001:05:19 18:36:41
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 2.761
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 1.6
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/64
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 4.9
 [EXIF, ExifIFD, Image] 37379 - Brightness Value: 3
@@ -39,11 +39,11 @@
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 4.9
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: Fired
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0 mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 111
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 111
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 89
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 89
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3359
 [EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3359
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: cm
@@ -160,6 +160,6 @@
 [Composite, Composite, Image]  - Aperture: 4.9
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Camera]  - Focal Length: 6.0mm
+[Composite, Composite, Camera]  - Focal Length: 6.0 mm
 [Composite, Composite, Image]  - Image Size: 100x80
 [Composite, Composite, Image]  - Light Value: 10.4

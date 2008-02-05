@@ -373,13 +373,13 @@ my %advancedContentEncryption = (
         Name => 'PlayDuration',
         Format => 'int64u',
         ValueConv => '$val / 1e7',
-        PrintConv => '"$val sec"',
+        PrintConv => '"$val s"',
     },
     48 => {
         Name => 'SendDuration',
         Format => 'int64u',
         ValueConv => '$val / 1e7',
-        PrintConv => '"$val sec"',
+        PrintConv => '"$val s"',
     },
     56 => { Name => 'Preroll',      Format => 'int64u' },
     64 => { Name => 'Flags',        Format => 'int32u' },
@@ -413,7 +413,7 @@ my %advancedContentEncryption = (
         Name => 'TimeOffset',
         Format => 'int64u',
         ValueConv => '$val / 1e7',
-        PrintConv => '"$val sec"',
+        PrintConv => '"$val s"',
     },
     48 => {
         Name => 'StreamNumber',
@@ -959,7 +959,7 @@ Windows Media Audio (WMA) and Windows Media Video (WMV) files.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

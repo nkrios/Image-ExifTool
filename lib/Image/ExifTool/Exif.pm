@@ -14,7 +14,7 @@
 #               2) http://www.adobe.com/products/dng/pdfs/dng_spec.pdf
 #               3) http://www.awaresystems.be/imaging/tiff/tifftags.html
 #               4) http://www.remotesensing.org/libtiff/TIFFTechNote2.html
-#               5) http://www.asmail.be/msg0054681802.html
+#               5) http://www.exif.org/dcf.PDF
 #               6) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               7) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 #               8) http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
@@ -23,6 +23,9 @@
 #              11) Robert Mucke private communication
 #              12) http://www.broomscloset.com/closet/photo/exif/TAG2000-22_DIS12234-2.PDF
 #              13) http://www.microsoft.com/whdc/xps/wmphoto.mspx
+#              14) http://www.asmail.be/msg0054681802.html
+#              15) http://crousseau.free.fr/imgfmt_raw.htm
+#              16) http://www.cybercom.net/~dcoffin/dcraw/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -33,7 +36,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.42';
+$VERSION = '2.49';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -41,6 +44,9 @@ sub CheckExif($$$);
 sub RebuildMakerNotes($$$);
 sub EncodeExifText($$);
 sub ValidateIFD($;$);
+
+# size limit for loading binary data block into memory
+sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
 
 # byte sizes for the various EXIF format types below
 @formatSize = (undef,1,1,2,4,8,1,1,2,4,8,4,8,4,undef,undef,8,8,8);
@@ -77,6 +83,7 @@ sub ValidateIFD($;$);
 
 # EXIF LightSource PrintConv values
 %lightSource = (
+    0 => 'Unknown',
     1 => 'Daylight',
     2 => 'Fluorescent',
     3 => 'Tungsten',
@@ -172,6 +179,7 @@ my %longBin = (
     GROUPS => { 0 => 'EXIF', 1 => 'IFD0', 2 => 'Image'},
     WRITE_PROC => \&WriteExif,
     WRITE_GROUP => 'ExifIFD',   # default write group
+    SET_GROUP1 => 1, # set group1 name to directory name for all tags in table
     0x1 => {
         Name => 'InteropIndex',
         Description => 'Interoperability Index',
@@ -181,7 +189,7 @@ my %longBin = (
             THM => 'THM - DCF thumbnail file',
         },
     },
-    0x2 => {
+    0x2 => { #5
         Name => 'InteropVersion',
         Description => 'Interoperability Version',
     },
@@ -225,6 +233,7 @@ my %longBin = (
     },
     0x101 => {
         Name => 'ImageHeight',
+        Notes => 'called ImageLength in the EXIF specification',
         Priority => 0,
     },
     0x102 => {
@@ -268,7 +277,7 @@ my %longBin = (
         Groups => { 2 => 'Camera' },
         DataMember => 'CameraMake',
         # save this value as an ExifTool member variable
-        RawConv => '$self->{CameraMake} = $val',
+        RawConv => '$$self{CameraMake} = $val',
     },
     0x110 => {
         Name => 'Model',
@@ -276,13 +285,25 @@ my %longBin = (
         Groups => { 2 => 'Camera' },
         DataMember => 'CameraModel',
         # save this value as an ExifTool member variable
-        RawConv => '$self->{CameraModel} = $val',
+        RawConv => '$$self{CameraModel} = $val',
     },
     0x111 => [
         {
             Condition => q[
-                ($self->{TIFF_TYPE} ne "CR2" or $self->{DIR_NAME} ne "IFD0") and
-                ($self->{TIFF_TYPE} ne "DNG" or $self->{DIR_NAME} !~ /^SubIFD[12]$/)
+                $$self{TIFF_TYPE} eq 'MRW' and $$self{DIR_NAME} eq 'IFD0' and
+                $$self{CameraModel} =~ /^DiMAGE A200/
+            ],
+            Name => 'StripOffsets',
+            IsOffset => 1,
+            OffsetPair => 0x117,  # point to associated byte counts
+            # A200 stores this information in the wrong byte order!!
+            ValueConv => '$val=join(" ",unpack("N*",pack("V*",split(" ",$val))));\$val',
+            ByteOrder => 'LittleEndian',
+        },
+        {
+            Condition => q[
+                ($$self{TIFF_TYPE} ne 'CR2' or $$self{DIR_NAME} ne 'IFD0') and
+                ($$self{TIFF_TYPE} ne 'DNG' or $$self{DIR_NAME} !~ /^SubIFD[12]$/)
             ],
             Name => 'StripOffsets',
             IsOffset => 1,
@@ -290,7 +311,7 @@ my %longBin = (
             ValueConv => 'length($val) > 32 ? \$val : $val',
         },
         {
-            Condition => '$self->{DIR_NAME} eq "IFD0"',
+            Condition => '$$self{DIR_NAME} eq "IFD0"',
             Name => 'PreviewImageStart',
             IsOffset => 1,
             OffsetPair => 0x117,
@@ -301,18 +322,18 @@ my %longBin = (
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'IFD0',
-            WriteCondition => '$self->{TIFF_TYPE} eq "CR2"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "CR2"',
             Protected => 2,
         },
         {
-            Condition => '$self->{DIR_NAME} eq "SubIFD1"',
+            Condition => '$$self{DIR_NAME} eq "SubIFD1"',
             Name => 'PreviewImageStart',
             IsOffset => 1,
             OffsetPair => 0x117,
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'SubIFD1',
-            WriteCondition => '$self->{TIFF_TYPE} eq "DNG"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "DNG"',
             Protected => 2,
         },
         {
@@ -322,7 +343,7 @@ my %longBin = (
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'SubIFD2',
-            WriteCondition => '$self->{TIFF_TYPE} eq "DNG"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "DNG"',
             Protected => 2,
         },
     ],
@@ -342,15 +363,25 @@ my %longBin = (
     0x117 => [
         {
             Condition => q[
-                ($self->{TIFF_TYPE} ne "CR2" or $self->{DIR_NAME} ne "IFD0") and
-                ($self->{TIFF_TYPE} ne "DNG" or $self->{DIR_NAME} !~ /^SubIFD[12]$/)
+                $$self{TIFF_TYPE} eq 'MRW' and $$self{DIR_NAME} eq 'IFD0' and
+                $$self{CameraModel} =~ /^DiMAGE A200/
+            ],
+            Name => 'StripByteCounts',
+            OffsetPair => 0x111,   # point to associated offset
+            # A200 stores this information in the wrong byte order!!
+            ValueConv => '$val=join(" ",unpack("N*",pack("V*",split(" ",$val))));\$val',
+        },
+        {
+            Condition => q[
+                ($$self{TIFF_TYPE} ne 'CR2' or $$self{DIR_NAME} ne 'IFD0') and
+                ($$self{TIFF_TYPE} ne 'DNG' or $$self{DIR_NAME} !~ /^SubIFD[12]$/)
             ],
             Name => 'StripByteCounts',
             OffsetPair => 0x111,   # point to associated offset
             ValueConv => 'length($val) > 32 ? \$val : $val',
         },
         {
-            Condition => '$self->{DIR_NAME} eq "IFD0"',
+            Condition => '$$self{DIR_NAME} eq "IFD0"',
             Name => 'PreviewImageLength',
             OffsetPair => 0x111,
             Notes => q{
@@ -360,17 +391,17 @@ my %longBin = (
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'IFD0',
-            WriteCondition => '$self->{TIFF_TYPE} eq "CR2"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "CR2"',
             Protected => 2,
         },
         {
-            Condition => '$self->{DIR_NAME} eq "SubIFD1"',
+            Condition => '$$self{DIR_NAME} eq "SubIFD1"',
             Name => 'PreviewImageLength',
             OffsetPair => 0x111,
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'SubIFD1',
-            WriteCondition => '$self->{TIFF_TYPE} eq "DNG"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "DNG"',
             Protected => 2,
         },
         {
@@ -379,7 +410,7 @@ my %longBin = (
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'SubIFD2',
-            WriteCondition => '$self->{TIFF_TYPE} eq "DNG"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "DNG"',
             Protected => 2,
         },
     ],
@@ -464,6 +495,7 @@ my %longBin = (
     0x132 => {
         Name => 'ModifyDate',
         Groups => { 2 => 'Time' },
+        Notes => 'called DateTime by the EXIF spec',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     0x13b => {
@@ -515,15 +547,23 @@ my %longBin = (
         },
     },
     0x148 => 'ConsecutiveBadFaxLines', #3
-    0x14a => {
-        Name => 'SubIFD',
-        Groups => { 1 => 'SubIFD' },
-        Flags => 'SubIFD',
-        SubDirectory => {
-            Start => '$val',
-            MaxSubdirs => 3,
+    0x14a => [
+        {
+            Name => 'SubIFD',
+            Condition => '$$self{TIFF_TYPE} ne "ARW" or $$self{CameraModel} ne "DSLR-A100"',
+            Groups => { 1 => 'SubIFD' },
+            Flags => 'SubIFD',
+            SubDirectory => {
+                Start => '$val',
+                MaxSubdirs => 3,
+            },
         },
-    },
+        { #16
+            Name => 'DataOffset',
+            Notes => 'the data offset in Sony DSLR-A100 ARW images',
+            IsOffset => 1,
+        },
+    ],
     0x14c => {
         Name => 'InkSet',
         PrintConv => { #3
@@ -622,8 +662,8 @@ my %longBin = (
             # thumbnail is found in IFD1 of JPEG and TIFF images, and
             # IFD0 of EXIF information in FujiFilm AVI (RIFF) videos
             Condition => q{
-                $self->{DIR_NAME} eq 'IFD1' or
-                ($self->{FILE_TYPE} eq 'RIFF' and $self->{DIR_NAME} eq 'IFD0')
+                $$self{DIR_NAME} eq 'IFD1' or
+                ($$self{FILE_TYPE} eq 'RIFF' and $$self{DIR_NAME} eq 'IFD0')
             },
             IsOffset => 1,
             OffsetPair => 0x202,
@@ -635,7 +675,7 @@ my %longBin = (
         },
         {
             Name => 'PreviewImageStart',
-            Condition => '$self->{DIR_NAME} eq "MakerNotes"',
+            Condition => '$$self{DIR_NAME} eq "MakerNotes"',
             IsOffset => 1,
             OffsetPair => 0x202,
             DataTag => 'PreviewImage',
@@ -645,26 +685,26 @@ my %longBin = (
         },
         {
             Name => 'JpgFromRawStart',
-            Condition => '$self->{DIR_NAME} eq "SubIFD"',
+            Condition => '$$self{DIR_NAME} eq "SubIFD"',
             IsOffset => 1,
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'SubIFD',
             # JpgFromRaw is in SubIFD of NEF files
-            WriteCondition => '$self->{TIFF_TYPE} eq "NEF"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "NEF"',
             Protected => 2,
         },
         {
             Name => 'JpgFromRawStart',
-            Condition => '$self->{DIR_NAME} eq "IFD2"',
+            Condition => '$$self{DIR_NAME} eq "IFD2"',
             IsOffset => 1,
             OffsetPair => 0x202,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'IFD2',
             # JpgFromRaw is in IFD2 of PEF files
-            WriteCondition => '$self->{TIFF_TYPE} eq "PEF"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "PEF"',
             Protected => 2,
         },
         {
@@ -677,8 +717,8 @@ my %longBin = (
         {
             Name => 'ThumbnailLength',
             Condition => q{
-                $self->{DIR_NAME} eq 'IFD1' or
-                ($self->{FILE_TYPE} eq 'RIFF' and $self->{DIR_NAME} eq 'IFD0')
+                $$self{DIR_NAME} eq 'IFD1' or
+                ($$self{FILE_TYPE} eq 'RIFF' and $$self{DIR_NAME} eq 'IFD0')
             },
             OffsetPair => 0x201,
             DataTag => 'ThumbnailImage',
@@ -689,7 +729,7 @@ my %longBin = (
         },
         {
             Name => 'PreviewImageLength',
-            Condition => '$self->{DIR_NAME} eq "MakerNotes"',
+            Condition => '$$self{DIR_NAME} eq "MakerNotes"',
             OffsetPair => 0x201,
             DataTag => 'PreviewImage',
             Writable => 'int32u',
@@ -698,22 +738,22 @@ my %longBin = (
         },
         {
             Name => 'JpgFromRawLength',
-            Condition => '$self->{DIR_NAME} eq "SubIFD"',
+            Condition => '$$self{DIR_NAME} eq "SubIFD"',
             OffsetPair => 0x201,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'SubIFD',
-            WriteCondition => '$self->{TIFF_TYPE} eq "NEF"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "NEF"',
             Protected => 2,
         },
         {
             Name => 'JpgFromRawLength',
-            Condition => '$self->{DIR_NAME} eq "IFD2"',
+            Condition => '$$self{DIR_NAME} eq "IFD2"',
             OffsetPair => 0x201,
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'IFD2',
-            WriteCondition => '$self->{TIFF_TYPE} eq "PEF"',
+            WriteCondition => '$$self{TIFF_TYPE} eq "PEF"',
             Protected => 2,
         },
         {
@@ -735,9 +775,9 @@ my %longBin = (
         Name => 'YCbCrSubSampling',
         PrintConv => {
             '1 1' => 'YCbCr4:4:4 (1 1)', #PH
-            '2 1' => 'YCbCr4:2:2 (2 1)', #6
-            '2 2' => 'YCbCr4:2:0 (2 2)', #6
-            '4 1' => 'YCbCr4:1:1 (4 1)', #6
+            '2 1' => 'YCbCr4:2:2 (2 1)', #14
+            '2 2' => 'YCbCr4:2:0 (2 2)', #14
+            '4 1' => 'YCbCr4:1:1 (4 1)', #14
             '4 2' => 'YCbCr4:1:0 (4 2)', #PH
             '1 2' => 'YCbCr4:4:0 (1 2)', #PH
         },
@@ -764,9 +804,12 @@ my %longBin = (
             TagTable => 'Image::ExifTool::XMP::Main',
         },
     },
-    0x1000 => 'RelatedImageFileFormat',
-    0x1001 => 'RelatedImageWidth',
-    0x1002 => 'RelatedImageLength',
+    0x1000 => 'RelatedImageFileFormat', #5
+    0x1001 => 'RelatedImageWidth', #5
+    0x1002 => { #5
+        Name => 'RelatedImageHeight',
+        Notes => 'called RelatedImageLength by the DCF specification',
+    },
     # (0x474x tags written by MicrosoftPhoto)
     0x4746 => 'Rating', #PH
     0x4749 => 'RatingPercent', #PH
@@ -901,6 +944,7 @@ my %longBin = (
         Name => 'ExposureProgram',
         Groups => { 2 => 'Camera' },
         PrintConv => {
+            0 => 'Not Defined',
             1 => 'Manual',
             2 => 'Program AE',
             3 => 'Aperture-priority AE',
@@ -925,9 +969,13 @@ my %longBin = (
             Start => '$val',
         },
     },
-    0x8827 => 'ISO',
+    0x8827 => {
+        Name => 'ISO',
+        Notes => 'called ISOSpeedRatings by the EXIF spec',
+    },
     0x8828 => {
         Name => 'Opto-ElectricConvFactor',
+        Notes => 'called OECF by the EXIF spec',
         Binary => 1,
     },
     0x8829 => 'Interlace',
@@ -956,6 +1004,7 @@ my %longBin = (
     0x9004 => {
         Name => 'CreateDate',
         Groups => { 2 => 'Time' },
+        Notes => 'called DateTimeDigitized by the EXIF spec',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     0x9101 => {
@@ -993,6 +1042,7 @@ my %longBin = (
         Name => 'MeteringMode',
         Groups => { 2 => 'Camera' },
         PrintConv => {
+            0 => 'Unknown',
             1 => 'Average',
             2 => 'Center-weighted average',
             3 => 'Spot',
@@ -1044,7 +1094,7 @@ my %longBin = (
     0x920a => {
         Name => 'FocalLength',
         Groups => { 2 => 'Camera' },
-        PrintConv => 'sprintf("%.1fmm",$val)',
+        PrintConv => 'sprintf("%.1f mm",$val)',
     },
     # Note: tags 0x920b-0x9217 are duplicates of 0xa20b-0xa217
     # (The TIFF standard uses 0xa2xx, but you'll find both in images)
@@ -1089,12 +1139,12 @@ my %longBin = (
         Name => 'SensingMethod',
         Groups => { 2 => 'Camera' },
         PrintConv => {
-            1 => 'Monochrome area', #12
+            1 => 'Monochrome area', #12 (not standard EXIF)
             2 => 'One-chip color area',
             3 => 'Two-chip color area',
             4 => 'Three-chip color area',
             5 => 'Color sequential area',
-            6 => 'Monochrome linear', #12
+            6 => 'Monochrome linear', #12 (not standard EXIF)
             7 => 'Trilinear',
             8 => 'Color sequential linear',
         },
@@ -1162,8 +1212,14 @@ my %longBin = (
             0xffff => 'Uncalibrated',
         },
     },
-    0xa002 => 'ExifImageWidth',
-    0xa003 => 'ExifImageLength',
+    0xa002 => {
+        Name => 'ExifImageWidth',
+        Notes => 'called PixelXDimension by the EXIF spec',
+    },
+    0xa003 => {
+        Name => 'ExifImageHeight',
+        Notes => 'called PixelYDimension by the EXIF spec',
+    },
     0xa004 => 'RelatedSoundFile',
     0xa005 => {
         Name => 'InteropOffset',
@@ -1273,8 +1329,9 @@ my %longBin = (
     },
     0xa405 => {
         Name => 'FocalLengthIn35mmFormat',
+        Notes => 'called FocalLengthIn35mmFilm by the EXIF spec',
         Groups => { 2 => 'Camera' },
-        PrintConv => '"${val}mm"',
+        PrintConv => '"$val mm"',
     },
     0xa406 => {
         Name => 'SceneCaptureType',
@@ -1332,6 +1389,7 @@ my %longBin = (
         Name => 'SubjectDistanceRange',
         Groups => { 2 => 'Camera' },
         PrintConv => {
+            0 => 'Unknown',
             1 => 'Macro',
             2 => 'Close',
             3 => 'Distant',
@@ -1342,14 +1400,14 @@ my %longBin = (
     0xa481 => 'GDALNoData', #3
     0xa500 => 'Gamma',
 #
-# Windows Media Photo WDP tags
+# Windows Media Photo / HD Photo (WDP/HDP) tags
 #
     0xbc01 => { #13
         Name => 'PixelFormat',
         PrintHex => 1,
         Format => 'undef',
         Notes => q{
-            tags 0xbc** are used in Windows Media Photo WDP images. The actual
+            tags 0xbc** are used in Windows HD Photo (HDP and WDP) images. The actual
             PixelFormat values are 16-byte GUID's but the leading 15 bytes,
             '6fddc324-4e03-4bfe-b1853-d77768dc9', have been removed below to avoid
             unnecessary clutter
@@ -1420,15 +1478,8 @@ my %longBin = (
             0x3d => '32-bit RGBE',
         },
     },
-    0xbc04 => { #13
-        Name => 'ImageType',
-        PrintConv => { BITMASK => {
-            0 => 'Preview',
-            1 => 'Page',
-        } },
-    },
     0xbc02 => { #13
-        Name => 'Transfomation',
+        Name => 'Transformation',
         PrintConv => {
             0 => 'Horizontal (normal)',
             1 => 'Mirror vertical',
@@ -1444,6 +1495,17 @@ my %longBin = (
         Name => 'Uncompressed',
         PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
+    0xbc04 => { #13
+        Name => 'ImageType',
+        PrintConv => { BITMASK => {
+            0 => 'Preview',
+            1 => 'Page',
+        } },
+    },
+    0xbc80 => 'ImageWidth', #13
+    0xbc81 => 'ImageHeight', #13
+    0xbc82 => 'WidthResolution', #13
+    0xbc83 => 'HeightResolution', #13
     0xbcc0 => { #13
         Name => 'ImageOffset',
         IsOffset => 1,
@@ -1480,10 +1542,6 @@ my %longBin = (
             3 => 'Highpass and LowPass Frequency Data Discarded',
         },
     },
-    0xbc80 => 'ImageWidth', #13
-    0xbc81 => 'ImageHeight', #13
-    0xbc82 => 'WidthResolution', #13
-    0xbc83 => 'HeightResolution', #13
 #
     0xc427 => 'OceScanjobDesc', #3
     0xc428 => 'OceApplicationSelector', #3
@@ -1571,7 +1629,7 @@ my %longBin = (
     0xc633 => 'ShadowScale',
     0xc634 => [
         {
-            Condition => '$self->{TIFF_TYPE} eq "SR2"',
+            Condition => '$$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
             Name => 'SR2Private',
             Groups => { 1 => 'SR2' },
             Flags => 'SubIFD',
@@ -1612,6 +1670,14 @@ my %longBin = (
         PrintConv => {
             0 => 'Unsafe',
             1 => 'Safe',
+        },
+    },
+    0xc640 => { #15
+        Name => 'RawImageSegmentation',
+        # (int16u[3], not writable)
+        Notes => q{
+            used in segmented Canon CR2 images.  3 numbers: 1. Number of segments minus
+            one; 2. Pixel width of segments except last; 3. Pixel width of last segment
         },
     },
     0xc65a => {
@@ -1664,9 +1730,15 @@ my %longBin = (
         },
     },
     0xc692 => 'CurrentPreProfileMatrix',
-    # 0xea1c - unknown tag written by MicrosoftPhoto (undef)
-    #  observed: 1720 bytes in IFD0 or 1988 bytes in ExifIFD, in both cases
-    #  the data starts with "1c ea 00 00 00 08" followed by all 00's
+    0xea1c => { #13
+        Name => 'Padding',
+        Binary => 1,
+        Writable => 'undef',
+        # must start with 0x1c 0xea by the WM Photo specification
+        # (not sure what should happen if padding is only 1 byte)
+        # (why does MicrosoftPhoto write "1c ea 00 00 00 08"?)
+        RawConvInv => '$val=~s/^../\x1c\xea/s; $val',
+    },
     0xea1d => {
         Name => 'OffsetSchema',
         Notes => "Microsoft's ill-conceived maker note offset difference",
@@ -1731,7 +1803,7 @@ my %longBin = (
             1 => 'ScaleFactor35efl',
         },
         ValueConv => '$val[0] * ($val[1] ? $val[1] : 1)',
-        PrintConv => '$val[1] ? sprintf("%.1fmm (35mm equivalent: %.1fmm)", $val[0], $val) : sprintf("%.1fmm", $val)',
+        PrintConv => '$val[1] ? sprintf("%.1f mm (35 mm equivalent: %.1f mm)", $val[0], $val) : sprintf("%.1f mm", $val)',
     },
     ScaleFactor35efl => {
         Description => 'Scale Factor To 35mm Equivalent',
@@ -1750,7 +1822,7 @@ my %longBin = (
             9 => 'CanonImageWidth',
            10 => 'CanonImageHeight',
            11 => 'ExifImageWidth',
-           12 => 'ExifImageLength',
+           12 => 'ExifImageHeight',
            13 => 'ImageWidth',
            14 => 'ImageHeight',
         },
@@ -1782,7 +1854,7 @@ my %longBin = (
         PrintConv => 'sprintf("%.2f m", $val)',
     },
     DOF => {
-        Description => 'Depth of Field',
+        Description => 'Depth Of Field',
         Notes => 'this value may be incorrect if the image has been resized',
         Require => {
             0 => 'FocusDistance', # FocusDistance in meters, 0 means 'inf'
@@ -1804,6 +1876,42 @@ my %longBin = (
             my @v = split ' ', $val;
             $v[1] or return sprintf("inf (%.2f m - inf)", $v[0]);
             return sprintf("%.2f m (%.2f - %.2f)",$v[1]-$v[0],$v[0],$v[1]);
+        },
+    },
+    FOV => {
+        Description => 'Field Of View',
+        Notes => q{
+            calculated for the long image dimension, this value may be incorrect for
+            fisheye lenses, or if the image has been resized
+        },
+        Require => {
+            0 => 'FocalLength',
+            1 => 'ScaleFactor35efl',
+        },
+        Desire => {
+            2 => 'FocusDistance', # (multiply by 1000 to convert to mm)
+        },
+        # ref http://www.bobatkins.com/photography/technical/field_of_view.html
+        # (calculations below apply to rectilinear lenses only, not fisheye)
+        ValueConv => q{
+            return undef unless $val[0] and $val[1];
+            my $corr = 1;
+            if ($val[2]) {
+                my $d = 1000 * $val[2] - $val[0];
+                $corr += $val[0]/$d if $d > 0;
+            }
+            my $fd2 = atan2(36, 2*$val[0]*$val[1]*$corr);
+            my @fov = ( $fd2 * 360 / 3.14159 );
+            if ($val[2] and $val[2] > 0 and $val[2] < 10000) {
+                push @fov, 2 * $val[2] * sin($fd2) / cos($fd2);
+            }
+            return join(' ', @fov);
+        },
+        PrintConv => q{
+            my @v = split(' ',$val);
+            my $str = sprintf("%.1f deg", $v[0]);
+            $str .= sprintf(" (%.2f m)", $v[1]) if $v[1];
+            return $str;
         },
     },
     DateTimeCreated => { # used by IPTC, XMP, WAV, etc
@@ -1984,14 +2092,15 @@ sub AUTOLOAD
 #------------------------------------------------------------------------------
 # Calculate LV (Light Value)
 # Inputs: 0) Aperture, 1) ShutterSpeed, 2) ISO
-# Returns: LV value
+# Returns: LV value (and converts input values to floating point if necessary)
 sub CalculateLV($$$)
 {
     local $_;
     # do validity checks on arguments
     return undef unless @_ >= 3;
     foreach (@_) {
-        return undef unless defined $_ and Image::ExifTool::IsFloat($_) and $_ > 0;
+        return undef unless $_ and /([+-]?(?=\d|\.\d)\d*(\.\d*)?)/ and $1 > 0;
+        $_ = $1;    # extract float from any other garbage
     }
     # (A light value of 0 is defined as f/1.0 at 1 second with ISO 100)
     return (2*log($_[0]) - log($_[1]) - log($_[2]/100)) / log(2);
@@ -2066,7 +2175,7 @@ sub ConvertFraction($)
         } elsif ((int($val*3))/($val*3) > 0.999) {
             $str = sprintf("%+d/3", int($val * 3));
         } else {
-            $str = sprintf("%.3g", $val);
+            $str = sprintf("%+.3g", $val);
         }
     }
     return $str;
@@ -2083,9 +2192,9 @@ sub ConvertExifText($$)
     my $id = substr($val, 0, 8);
     my $str = substr($val, 8);
     # by the EXIF spec, the string should be "UNICODE\0", but apparently Kodak
-    # sometimes uses "Unicode\0" in the APP3 "Meta" information.  But unfortunately
-    # Ricoh uses "Unicode\0" in the RR30 EXIF UserComment when the text is actually
-    # ASCII, so only recognize uppercase "UNICODE\0" here.
+    # sometimes uses "Unicode\0" in the APP3 "Meta" information.  However,
+    # unfortunately Ricoh uses "Unicode\0" in the RR30 EXIF UserComment when
+    # the text is actually ASCII, so only recognize uppercase "UNICODE\0" here.
     if ($id eq "UNICODE\0") {
         # MicrosoftPhoto writes as little-endian even in big-endian EXIF,
         # so we must guess at the true byte ordering
@@ -2448,17 +2557,41 @@ sub ProcessExif($$$)
                 # get value by seeking in file if we are allowed
                 my $buff;
                 if ($raf) {
-                    if ($raf->Seek($base + $valuePtr + $dataPos,0) and
-                        $raf->Read($buff,$size) == $size)
+                    # avoid loading large binary data unless necessary
+                    # (ie. ImageSourceData -- layers in Photoshop TIFF image)
+                    while ($size > BINARY_DATA_LIMIT) {
+                        if ($tagInfo) {
+                            # make large unknown blocks binary data
+                            $$tagInfo{Binary} = 1 if $$tagInfo{Unknown};
+                            last unless $$tagInfo{Binary};   # must read non-binary data
+                            if ($exifTool->{OPTIONS}->{Binary}) {
+                                # read binary data if specified unless tagsFromFile won't use it
+                                last unless $$exifTool{TAGS_FROM_FILE} and $$tagInfo{Protected};
+                            }
+                            # must read if tag is specified by name
+                            last if $exifTool->{REQ_TAG_LOOKUP}->{lc($$tagInfo{Name})};
+                        } else {
+                            # must read value if needed for a condition
+                            last if defined $tagInfo;
+                        }
+                        $buff = "Binary data $size bytes";
+                        # (note: changing the value without changing $size will cause
+                        # a warning in the verbose output, but we need to maintain the
+                        # proper size for the htmlDump, so we can't change this)
+                        last;
+                    }
+                    # read from file if necessary
+                    unless (defined $buff or
+                            ($raf->Seek($base + $valuePtr + $dataPos,0) and
+                             $raf->Read($buff,$size) == $size))
                     {
-                        $valueDataPt = \$buff;
-                        $valueDataPos = $valuePtr + $dataPos;
-                        $valueDataLen = $size;
-                        $valuePtr = 0;
-                    } else {
                         $exifTool->Warn("Error reading value for $dirName entry $index");
                         return 0;
                     }
+                    $valueDataPt = \$buff;
+                    $valueDataPos = $valuePtr + $dataPos;
+                    $valueDataLen = length $buff;
+                    $valuePtr = 0;
                 } else {
                     my $tagStr;
                     if ($tagInfo) {
@@ -2765,11 +2898,11 @@ sub ProcessExif($$$)
                     TagInfo    => $tagInfo,
                     SubIFD     => $$tagInfo{SubIFD},
                 );
+                # (remember: some cameras incorrectly write maker notes in IFD0)
                 if ($$tagInfo{MakerNotes}) {
                     $subdirInfo{MakerNoteAddr} = $valuePtr + $valueDataPos + $base;
                     $subdirInfo{NoFixBase} = 1 if $$subdir{Base};
                 }
-                # some Pentax cameras (Optio 330) write maker notes in IFD0
                 # set directory IFD name from group name of family 1 in tag information if it exists
                 if ($$tagInfo{Groups}) {
                     $subdirInfo{DirName} = $tagInfo->{Groups}->{1};
@@ -2844,7 +2977,7 @@ sub ProcessExif($$$)
         }
  #..............................................................................
         # convert to absolute offsets if this tag is an offset
-        if ($$tagInfo{IsOffset}) {
+        if ($$tagInfo{IsOffset} and eval $$tagInfo{IsOffset}) {
             my $offsetBase = $$tagInfo{IsOffset} eq '2' ? $firstBase : $base;
             $offsetBase += $$exifTool{BASE};
             my @vals = split(' ',$val);
@@ -2855,8 +2988,8 @@ sub ProcessExif($$$)
         }
         # save the value of this tag
         $tagKey = $exifTool->FoundTag($tagInfo, $val);
-        # set the group 1 name for tags in main table
-        if (defined $tagKey and $tagTablePtr eq \%Image::ExifTool::Exif::Main) {
+        # set the group 1 name for tags in specified tables
+        if (defined $tagKey and $$tagTablePtr{SET_GROUP1}) {
             $exifTool->SetGroup1($tagKey, $dirName);
         }
     }
@@ -2905,7 +3038,7 @@ EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -2926,7 +3059,7 @@ under the same terms as Perl itself.
 
 =item L<http://www.remotesensing.org/libtiff/TIFFTechNote2.html>
 
-=item L<http://www.asmail.be/msg0054681802.html>
+=item L<http://www.exif.org/dcf.PDF>
 
 =item L<http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html>
 
@@ -2937,6 +3070,10 @@ under the same terms as Perl itself.
 =item L<http://hul.harvard.edu/jhove/tiff-tags.html>
 
 =item L<http://www.microsoft.com/whdc/xps/wmphoto.mspx>
+
+=item L<http://www.asmail.be/msg0054681802.html>
+
+=item L<http://crousseau.free.fr/imgfmt_raw.htm>
 
 =back
 

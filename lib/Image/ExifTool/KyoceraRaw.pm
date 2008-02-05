@@ -95,7 +95,7 @@ sub ReverseString($) { pack('C*',reverse unpack('C*',shift)) }
     0x70 => {
         Name => 'FocalLength',
         Format => 'int32u',
-        PrintConv => '"${val}mm"',
+        PrintConv => '"$val mm"',
     },
     0x7c => {
         Name => 'Lens',
@@ -150,7 +150,7 @@ meta information from Kyocera Contax N Digital RAW images.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

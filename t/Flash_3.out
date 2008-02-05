@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.92
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
 [File, File, Image]  - File Name: Flash.flv
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1358 bytes
@@ -39,7 +39,7 @@
 [Flash, Flash, Video] keyframesFilepositions - Key Frame Positions: 1463, 32674, 143320, 181650
 [Flash, Flash, Audio] audiocodecid - Audio Codec ID: 2
 [Flash, Flash, Video] videodatarate - Video Bitrate: 418659
-[Flash, Flash, Video] duration - Duration: 3.089s
+[Flash, Flash, Video] duration - Duration: 3.089 s
 [Flash, Flash, Video] hasCuePoints - Has Cue Points: Yes
 [Flash, Flash, Video] width - Image Width: 320
 [Flash, Flash, Audio] Bit0-3 - Audio Encoding: MP3

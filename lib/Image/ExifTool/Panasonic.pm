@@ -11,7 +11,7 @@
 #               4) Tels (http://bloodgate.com/) private communication (tests with FZ5)
 #               5) CPAN forum post by 'hardloaf' (http://www.cpanforum.com/threads/2183)
 #               6) http://www.cybercom.net/~dcoffin/dcraw/
-#               7) http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm
+#               7) http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm (2007/10/02)
 #               8) Marcel Coenen private communication (DMC-FZ50)
 #               9) http://forums.dpreview.com/forums/read.asp?forum=1033&message=22756430
 #              10) Jens Duttke private communication (TZ3,FZ30,FZ50)
@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.26';
+$VERSION = '1.29';
 
 sub ProcessPanasonicType2($$$);
 
@@ -38,10 +38,14 @@ my %shootingMode = (
     7  => 'Aperture Priority',
     8  => 'Shutter Priority',
     9  => 'Macro',
+    10 => 'Spot', #7
     11 => 'Manual',
     12 => 'Movie Preview', #PH (LZ6)
     13 => 'Panning',
     14 => 'Simple', #PH (LZ6)
+    15 => 'Color Effects', #7
+    # 16 => 'His XX RI?', #7
+    # 17 => 'Eco Mode?', #7
     18 => 'Fireworks',
     19 => 'Party',
     20 => 'Snow',
@@ -52,12 +56,16 @@ my %shootingMode = (
     25 => 'Candlelight', #PH (LZ6)
     26 => 'Starry Night', #PH (LZ6)
     27 => 'High Sensitivity', #7 (LZ6)
+    28 => 'Panorama Assist', #7
     29 => 'Underwater', #7
     30 => 'Beach', #PH (LZ6)
     31 => 'Aerial Photo', #PH (LZ6)
     32 => 'Sunset', #PH (LZ6)
     33 => 'Pet', #10
     34 => 'Intelligent ISO', #PH (LZ6)
+    # 35 => 'NOTE?', #7
+    36 => 'High Speed Continuous Shooting', #7
+    37 => 'Intelligent Auto', #7
 );
 
 %Image::ExifTool::Panasonic::Main = (
@@ -219,7 +227,7 @@ my %shootingMode = (
         Name => 'TimeSincePowerOn',
         Writable => 'int32u',
         Notes => q{
-            time in 1/100 sec from when the camera was powered on to when the image is
+            time in 1/100 s from when the camera was powered on to when the image is
             written to memory card
         },
         ValueConv => '$val / 100',
@@ -268,12 +276,21 @@ my %shootingMode = (
         Name => 'Contrast',
         Flags => 'PrintHex',
         Writable => 'int16u',
+        Priority => 0,
+        Notes => q{
+            this decoding seems to work for some models such as the LX2, FZ7, FZ8, FZ18
+            and FZ50, but may not be correct for other models such as the FX10, L1, L10
+            and LC80
+        },
         PrintConv => {
             0 => 'Normal',
             1 => 'Low',
             2 => 'High',
-            # 3 - observed with LZ6 in "Aerial Photo" mode - PH
-            # 5 - observed with FX10 in "Underwater" mode - PH
+            # 3 - observed with LZ6 - PH
+            # 5 - observed with FX01 - PH
+            6 => 'Medium Low', #PH (FZ18)
+            7 => 'Medium High', #PH (FZ18)
+            # DMC-LC1 values:
             0x100 => 'Low',
             0x110 => 'Normal',
             0x120 => 'High',
@@ -314,7 +331,7 @@ my %shootingMode = (
         PrintConv => {
             0 => 'Normal',
             1 => 'Natural',
-            # 2 => observed in LZ6 for some shooting modes
+            2 => 'Vivid',
         },
     },
     0x33 => { #10
@@ -350,6 +367,13 @@ my %shootingMode = (
     },
     # 0x37 - values: 0,1,2 (LZ6, 0 for movie preview) and 257 (FX10K)
     # 0x38 - values: 0,1,2 (LZ6, same as 0x37) and 1,2 (FX10K)
+    0x39 => { #7 (L1/L10)
+        Name => 'Contrast',
+        Format => 'int16s',
+        Writable => 'int16u',
+        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+    },
     0x3a => {
         Name => 'WorldTimeLocation',
         Writable => 'int16u',
@@ -365,7 +389,20 @@ my %shootingMode = (
         PrintConv => '$val == 65535 ? "n/a" : $val',
         PrintConvInv => '$val eq "n/a" ? 65535 : $val',
     },
-    # 0x40 Chroma? (ref 7)
+    0x40 => { #7 (L1/L10)
+        Name => 'Saturation',
+        Format => 'int16s',
+        Writable => 'int16u',
+        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+    },
+    0x41 => { #7 (L1/L10)
+        Name => 'Sharpness',
+        Format => 'int16s',
+        Writable => 'int16u',
+        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
+        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+    },
     0x42 => { #7 (DMC-L1)
         Name => 'FilmMode',
         Writable => 'int16u',
@@ -486,6 +523,17 @@ my %shootingMode = (
     0x05 => 'SensorLeftBorder', #10
     0x06 => 'ImageHeight', #5/PH
     0x07 => 'ImageWidth', #5/PH
+    # observed values for unknown tags - PH
+    # 0x08: 1
+    # 0x09: 1,3,4
+    # 0x0a: 12
+    # 0x0b: 0x860c,0x880a,0x880c
+    # 0x0c: 2 (only Leica Digilux 2)
+    # 0x0d: 0,1
+    # 0x0e,0x0f,0x10: 4095
+    # 0x18,0x19,0x1a,0x1c,0x1d,0x1e: 0
+    # 0x1b,0x27,0x29,0x2a,0x2b,0x2c: [binary data]
+    # 0x2d: 2,3
     0x11 => { #10
         Name => 'RedBalance',
         Writable => 'int16u',
@@ -514,6 +562,11 @@ my %shootingMode = (
     0x26 => { #6
         Name => 'WBBlueLevel',
         Writable => 'int16u',
+    },
+    0x2e => { #10
+        Name => 'PreviewImage',
+        Writable => 'undef',
+        Binary => 1,
     },
     0x10f => {
         Name => 'Make',
@@ -594,7 +647,7 @@ Panasonic and Leica maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

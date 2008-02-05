@@ -63,7 +63,7 @@ sub ProcessBitStream($$$);
             2 => 'FLAC:TotalSamples',
         },
         ValueConv => '$val[0] and $val[1] and $val[2] ? $val[2] / ($val[0] * $val[1]) : undef',
-        PrintConv => 'sprintf("%.2fs",$val)',
+        PrintConv => 'sprintf("%.2f s",$val)',
     },
 );
 
@@ -213,7 +213,7 @@ information from Free Lossless Audio Codec (FLAC) audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

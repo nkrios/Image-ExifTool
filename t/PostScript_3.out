@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: PostScript_3_failed.eps
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 13 kB
@@ -55,7 +55,6 @@
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2001:05:19 18:36:41
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2001:05:19 18:36:41
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 1.6
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/64
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 3.5
 [EXIF, ExifIFD, Image] 37379 - Brightness Value: 2
@@ -63,11 +62,11 @@
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: Fired
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0 mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 100
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 80
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 80
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3053
 [EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3053
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: cm
@@ -106,6 +105,6 @@
 [Composite, Composite, Image]  - Image Height: 8
 [Composite, Composite, Image]  - Image Width: 8
 [Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Camera]  - Focal Length: 6.0mm
+[Composite, Composite, Camera]  - Focal Length: 6.0 mm
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Light Value: 9.6

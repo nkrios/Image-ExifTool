@@ -31,6 +31,7 @@ ColorTemperature : 5200
 ColorTone : Normal
 ContinuousDrive : Continuous
 Contrast : +1
+ControlMode : Camera Local Control
 DigitalZoom : Unknown (-1)
 EasyMode : Manual
 ExposureCompensation : 0
@@ -41,16 +42,16 @@ FlashActivity : 0
 FlashBits : (none)
 FlashExposureComp : 0
 FlashGuideNumber : 0
-FocalLength (1) : 34mm
-FocalPlaneXSize : 23.22mm
-FocalPlaneYSize : 15.49mm
+FocalLength (1) : 34 mm
+FocalPlaneXSize : 23.22 mm
+FocalPlaneYSize : 15.49 mm
 FocalUnits : 1
 FocusDistanceLower : 5.46
 FocusDistanceUpper : -0.01
-FocusMode : Manual Focus
+FocusMode : Manual Focus (3)
 FocusRange : Not Known
 LensType : Unknown (-1)
-LongFocal : 55mm
+LongFocal : 55 mm
 MacroMode : Unknown (0)
 ManualFlashOutput : n/a
 MaxAperture : 4
@@ -64,15 +65,16 @@ OwnerName : Phil Harvey
 Quality : RAW
 RecordMode : CRW+THM
 Saturation : +1
-Self-timer : Off
-Self-timer2 : 0
+SelfTimer : Off
+SelfTimer2 : 0
 SequenceNumber : 0
 SerialNumber : 0560018150
 SerialNumberFormat : Format 1
-Sharpness : +1
-ShortFocal : 18mm
+Sharpness : 1
+ShortFocal : 18 mm
 SlowShutter : None
 TargetAperture : 14
+ThumbnailImageValidArea : 0 159 7 112
 ValidAFPoints : 7
 WB_RGGBLevelsAuto : 1719 832 831 990
 WB_RGGBLevelsCloudy : 1878 832 831 903
@@ -91,13 +93,14 @@ Aperture : 14.0
 BlueBalance : 1.190619
 CircleOfConfusion : 0.019 mm
 DriveMode : Continuous shooting
+FOV : 37.7 deg
 FlashOn : Off
-FocalLength35efl : 34.0mm (35mm equivalent: 52.7mm)
+FocalLength35efl : 34.0 mm (35 mm equivalent: 52.7 mm)
 HyperfocalDistance : 4.26 m
 ISO (1) : 100
 ImageSize : 8x8
-Lens : 18.0 - 55.0mm
-Lens35efl : 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+Lens : 18.0 - 55.0 mm
+Lens35efl : 18.0 - 55.0 mm (35mm equivalent: 27.9 - 85.3 mm)
 LightValue : 5.6
 RedBalance : 2.067348
 ScaleFactor35efl : 1.6
@@ -112,7 +115,7 @@ CompressedBitsPerPixel : 9
 CreateDate : 2003:12:04 06:46:52
 CustomRendered : Normal
 DateTimeOriginal : 2003:12:04 06:46:52
-ExifImageLength : 120
+ExifImageHeight : 120
 ExifImageWidth : 160
 ExifVersion : 0221
 ExposureCompensation (1) : 0
@@ -122,10 +125,10 @@ FNumber : 14.0
 FileSource : Digital Camera
 Flash : No Flash
 FlashpixVersion : 0100
-FocalLength : 34.0mm
+FocalLength : 34.0 mm
 FocalPlaneResolutionUnit : inches
-FocalPlaneXResolution : 3443.946
-FocalPlaneYResolution : 3442.017
+FocalPlaneXResolution : 3443.946188
+FocalPlaneYResolution : 3442.016807
 ISO : 100
 MaxApertureValue : 4.5
 MeteringMode (1) : Average
@@ -160,5 +163,5 @@ YResolution : 180
 ---- InteropIFD ----
 InteropIndex : THM - DCF thumbnail file
 InteropVersion : 0100
-RelatedImageLength : 2048
+RelatedImageHeight : 2048
 RelatedImageWidth : 3072

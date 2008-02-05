@@ -5,7 +5,7 @@
 #
 # URL:          http://owl.phy.queensu.ca/~phil/exiftool/
 #
-# Legal:        Copyright (c) 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -65,31 +65,32 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       JP2   r/w     PPT   r      |  EXIF           r/w/c
-  AI    r       JPEG  r/w     PS    r/w    |  GPS            r/w/c
-  AIFF  r       K25   r       PSD   r/w    |  IPTC           r/w/c
-  APE   r       M4A   r       QTIF  r      |  XMP            r/w/c
-  ARW   r       MEF   r/w     RA    r      |  MakerNotes     r/w/c
-  ASF   r       MIE   r/w/c   RAF   r      |  Photoshop IRB  r/w/c
-  AVI   r       MIFF  r       RAM   r      |  ICC Profile    r/w/c
-  BMP   r       MNG   r/w     RAW   r/w    |  MIE            r/w/c
-  BTF   r       MOS   r/w     RIFF  r      |  JFIF           r/w/c
-  CR2   r/w     MOV   r       RM    r      |  Ducky APP12    r/w/c
-  CRW   r/w     MP3   r       SR2   r      |  CIFF           r/w
-  CS1   r/w     MP4   r       SRF   r      |  AFCP           r/w
-  DCM   r       MPC   r       SWF   r      |  DICOM          r
-  DCR   r       MPG   r       THM   r/w    |  Flash          r
-  DNG   r/w     MRW   r/w     TIFF  r/w    |  FlashPix       r
-  DOC   r       NEF   r/w     VRD   r/w/c  |  GeoTIFF        r
-  EPS   r/w     OGG   r       WAV   r      |  PrintIM        r
-  ERF   r/w     ORF   r/w     WDP   r/w    |  ID3            r
-  FLAC  r       PBM   r/w     WMA   r      |  Kodak Meta     r
-  FLV   r       PDF   r       WMV   r      |  Ricoh RMETA    r
-  FPX   r       PEF   r/w     X3F   r      |  Picture Info   r
-  GIF   r/w     PGM   r/w     XLS   r      |  Adobe APP14    r
-  HTML  r       PICT  r       XMP   r/w/c  |  APE            r
-  ICC   r/w/c   PNG   r/w                  |  Vorbis         r
-  JNG   r/w     PPM   r/w                  |  (and more)
+  3FR   r       ITC   r       PNG   r/w    |  EXIF           r/w/c
+  ACR   r       JNG   r/w     PPM   r/w    |  GPS            r/w/c
+  AI    r       JP2   r/w     PPT   r      |  IPTC           r/w/c
+  AIFF  r       JPEG  r/w     PS    r/w    |  XMP            r/w/c
+  APE   r       K25   r       PSD   r/w    |  MakerNotes     r/w/c
+  ARW   r       KDC   r       QTIF  r      |  Photoshop IRB  r/w/c
+  ASF   r       M4A   r       RA    r      |  ICC Profile    r/w/c
+  AVI   r       MEF   r/w     RAF   r/w    |  MIE            r/w/c
+  BMP   r       MIE   r/w/c   RAM   r      |  JFIF           r/w/c
+  BTF   r       MIFF  r       RAW   r/w    |  Ducky APP12    r/w/c
+  CR2   r/w     MNG   r/w     RIFF  r      |  CIFF           r/w
+  CRW   r/w     MOS   r/w     RM    r      |  AFCP           r/w
+  CS1   r/w     MOV   r       SR2   r      |  JPEG 2000      r
+  DCM   r       MP3   r       SRF   r      |  DICOM          r
+  DCR   r       MP4   r       SWF   r      |  Flash          r
+  DNG   r/w     MPC   r       THM   r/w    |  FlashPix       r
+  DOC   r       MPG   r       TIFF  r/w    |  GeoTIFF        r
+  EPS   r/w     MRW   r/w     VRD   r/w/c  |  PrintIM        r
+  ERF   r/w     NEF   r/w     WAV   r      |  ID3            r
+  FLAC  r       OGG   r       WDP   r/w    |  Kodak Meta     r
+  FLV   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
+  FPX   r       PBM   r/w     WMV   r      |  Picture Info   r
+  GIF   r/w     PDF   r/w     X3F   r      |  Adobe APP14    r
+  HDP   r/w     PEF   r/w     XLS   r      |  APE            r
+  HTML  r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
+  ICC   r/w/c   PICT  r                    |  (and more)
 
 =head1 CONFIGURATION
 
@@ -100,6 +101,11 @@ C<noConfig> flag before loading Image::ExifTool.  For example:
 
     BEGIN { $Image::ExifTool::noConfig = 1 }
     use Image::ExifTool;
+
+=head1 EXPORTS
+
+Exports nothing by default, but L</ImageInfo> and all static functions may
+be exported with the C<:Public> export list.
 
 =head1 METHODS
 
@@ -197,7 +203,9 @@ A reference to an open image file.  If you use this method (or a SCALAR
 reference) to access information in an image, the FileName and Directory
 tags will not be returned.  (Also, the FileSize and FileModifyDate tags will
 not be returned unless it is a plain file.)  Image processing begins at the
-current file position, and on return the file position is unspecified.
+current file position, and on return the file position is unspecified.  May
+be either a standard GLOB reference, or a reference to a
+L<File::RandomAccess|File::RandomAccess> object;
 
 =item SCALAR ref
 
@@ -224,9 +232,10 @@ L</ImageInfo> returns a reference to a hash of tag key/value pairs.  The tag
 keys are identifiers, which are similar to the tag names but may have an
 embedded instance number if multiple tags with the same name were extracted
 from the image.  Many of the ExifTool functions require a tag key as an
-argument. Use L</GetTagName> to get the tag name for a given tag key.  Note
-that the case of the tag names may not be the same as requested.  Here is a
-simple example to print out the information returned by L</ImageInfo>:
+argument. Use L</GetTagName [static]> to get the tag name for a given tag
+key.  Note that the case of the tag names may not be the same as requested. 
+Here is a simple example to print out the information returned by
+L</ImageInfo>:
 
     foreach (sort keys %$info) {
         print "$_ => $$info{$_}\n";
@@ -339,7 +348,8 @@ set.
 
 =item Charset
 
-Character set for converting special characters.  Valid values are:
+Character set for encoding character strings containing code points above
+U+007F.  Valid values are:
 
   UTF8  - UTF-8 characters (the default)
   Latin - Windows Latin1 (cp1252)
@@ -378,10 +388,10 @@ output for the same coordinate using various formats:
 
 =item DateFormat
 
-Format for printing EXIF date/time.  See C<strftime> in the L<POSIX> package
-for details about the format string.  The default format is equivalent to
-"%Y:%m:%d %H:%M:%S".  If date can not be converted, value is left unchanged
-unless the StrictDate option is set.
+Format for printing date/time values.  See C<strftime> in the L<POSIX>
+package for details about the format string.  The default is similar to a
+format of "%Y:%m:%d %H:%M:%S".  If date can not be converted, value is left
+unchanged unless the StrictDate option is set.  Timezones are ignored.
 
 =item Duplicates
 
@@ -420,7 +430,7 @@ Extract tags only for specified groups in family # (Group0 assumed if #
 not given).  The option value may be a single group name or a reference
 to a list of groups.  Case is significant in group names.  Specify a
 group to be excluded by preceding group name with a '-'.  See
-L</GetAllGroups> for a list of available groups.
+L</GetAllGroups [static]> for a list of available groups.
 
 =item HtmlDump
 
@@ -1267,7 +1277,7 @@ Get group name for specified tag.
 Group name (or 'Other' if tag has no group).  If no group family is
 specified, L</GetGroup> returns the name of the group in family 0 when
 called in scalar context, or the names of groups for all families in list
-context. See L</GetAllGroups> for a list of groups in each famly.
+context. See L</GetAllGroups [static]> for a list of groups in each famly.
 
 =back
 
@@ -1452,10 +1462,10 @@ Here is a complete list of groups for each family:
 
 AFCP, AIFF, APE, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
 CanonVRD, Composite, DICOM, DNG, Ducky, EXIF, ExifTool, FLAC, File, Flash,
-FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, JFIF, JPEG,
-Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
-PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, Real,
-SigmaRaw, Vorbis, XMP
+FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, ITC, JFIF,
+JPEG, Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF,
+PICT, PNG, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
+RIFF, Real, SigmaRaw, Vorbis, XMP
 
 =item Family 1 (Specific Location):
 
@@ -1464,21 +1474,22 @@ CanonVRD, Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool,
 FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff,
 GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
 HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
-ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF,
-JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw,
-Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
-MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
-MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
-MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
-MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
-PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
-PostScript, PrintIM, QuickTime, RAF, RAF2, RIFF, RMETA, Real, Real-CONT,
-Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF,
-SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP,
-XMP-DICOM, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
-XMP-exif, XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
-XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
-XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC, InteropIFD,
+JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
+KyoceraRaw, Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc,
+MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
+MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
+MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown,
+MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PrintIM, QuickTime, RAF, RAF2, RIFF, RMETA, Real,
+Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
+Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, Sanyo, Sigma, SigmaRaw,
+Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-PixelLive, XMP-aux,
+XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-lr,
+XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop,
+XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS,
+XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 
@@ -1581,7 +1592,7 @@ this can only be done with XMP files.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey
+Copyright 2003-2008, Phil Harvey
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

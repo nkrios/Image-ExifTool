@@ -229,12 +229,14 @@ hash or the elements of the tag array when accessing the tag values.
 <br>&nbsp;<br>
 See the <a href="TagNames/index.html">TagNames</a> documentation for a
 complete list of ExifTool tag names.
+
 </td></tr><tr><td valign='top'><b>File&nbsp;ref</b></td><td>
 A reference to an open image file.  If you use this method (or a SCALAR
-reference) to access information in an image, the FileName and Directory
-tags will not be returned.  (Also, the FileSize and FileModifyDate tags will
-not be returned unless it is a plain file.)  Image processing begins at the
-current file position, and on return the file position is unspecified.
+reference) to access information in an image, the FileName and Directory tags
+will not be returned.  (Also, the FileSize and FileModifyDate tags will not be
+returned unless it is a plain file.)  Image processing begins at the current
+file position, and on return the file position is unspecified. May be either a
+standard GLOB reference or a reference to a File::RandomAccess object.
 
 </td></tr><tr><td valign='top'><b>SCALAR&nbsp;ref</b></td><td>
 A reference to image data in memory.
@@ -372,10 +374,10 @@ to a specific function.</p>
     This can also be set via the ExifByteOrder tag, but the ByteOrder option takes
     precedence if both are set.</td>
     <td align='center'>'MM','II' or undef</td><td align=center>undef</td></tr>
-<tr><td>Charset</td><td>Character set for converting special characters. Note
-    that this option affects some types of information when reading/writing the
-    file and other types when getting/setting tag values, so it must be defined
-    for both types of access.</td>
+<tr><td>Charset</td><td>Character set for encoding character strings containing code
+    points above U+007F.  Note that this option affects some types of information when
+    reading/writing the file and other types when getting/setting tag values, so it must
+    be defined for both types of access.</td>
     <td><table class='clear'>
     <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF-8 characters</td></tr>
     <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
@@ -388,13 +390,16 @@ to a specific function.</p>
 <tr><td>Compress</td><td>Flag to write new values in compressed format if possible.
     Has no effect unless Compress::Zlib is installed.</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
-<tr><td>CoordFormat</td><td>Format for GPS coordinates</td><td> Format for
-    printing GPS coordinates.  This is a printf format string with specifiers
-    for degrees, minutes and seconds in that order, however minutes and seconds
-    may be omitted.  The default is equivalent to using a format string of
+<tr><td>CoordFormat</td><td>Output format for GPS coordinates</td>
+    <td>A printf-style format string with specifiers for degrees, minutes and
+    seconds in that order, however minutes and seconds may be omitted. The
+    default is equivalent to a format string of
     <code>q{%d&nbsp;deg&nbsp;%d'&nbsp;%.2f"}</code>.
     </td><td align=center>undef</td></tr>
-<tr><td>DateFormat</td><td>Format for date/time</td><td align='center'>See strftime manpage for details</td>
+<tr><td>DateFormat</td><td>Output format for date/time values. If date can not
+    be converted, value is left unchanged unless the StrictDate option is set.
+    Timezones are ignored.</td> <td>See strftime manpage for details.  The default
+    is similar to a format string of <code>"%Y:%m:%d %H:%M:%S"</code>.</td>
     <td align=center>undef</td></tr>
 <tr><td><a name="Duplicates">Duplicates</a></td><td>Flag to save duplicate tag values</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>Exclude</td>
@@ -1290,10 +1295,10 @@ separated into the ICC-header group.</p>
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
 <td>AFCP, AIFF, APE, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
 CanonVRD, Composite, DICOM, DNG, Ducky, EXIF, ExifTool, FLAC, File, Flash,
-FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, JFIF, JPEG,
-Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF, PICT, PNG,
-PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, Real,
-SigmaRaw, Vorbis, XMP
+FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, ITC, JFIF,
+JPEG, Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF,
+PICT, PNG, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
+RIFF, Real, SigmaRaw, Vorbis, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
@@ -1301,21 +1306,22 @@ CanonVRD, Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool,
 FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff,
 GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
 HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
-ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, InteropIFD, JFIF,
-JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KyoceraRaw,
-Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender,
-MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
-MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
-MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
-MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
-PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
-PostScript, PrintIM, QuickTime, RAF, RAF2, RIFF, RMETA, Real, Real-CONT,
-Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF,
-SR2, SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP,
-XMP-DICOM, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
-XMP-exif, XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
-XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
-XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC, InteropIFD,
+JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
+KyoceraRaw, Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc,
+MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
+MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
+MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown,
+MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PrintIM, QuickTime, RAF, RAF2, RIFF, RMETA, Real,
+Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
+Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, Sanyo, Sigma, SigmaRaw,
+Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-PixelLive, XMP-aux,
+XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-lr,
+XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop,
+XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS,
+XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,

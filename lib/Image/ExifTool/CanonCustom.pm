@@ -18,7 +18,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1425,6 +1425,10 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         Name => 'HighlightTonePriority',
         PrintConv => \%disableEnable
     },
+    0x0204 => {
+        Name => 'AutoLightingOptimizer',
+        PrintConv => \%enableDisable,
+    },
     #### 2b) Flash exposure
     0x0304 => {
         Name => 'ETTLII',
@@ -1753,8 +1757,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         Count => 4,
         PrintConv => [
             \%disableEnable,
-            '"6 sec: $val"',
-            '"16 sec: $val"',
+            '"6 s: $val"',
+            '"16 s: $val"',
             '"After release: $val"',
         ],
         PrintConvInv => [
@@ -2032,7 +2036,7 @@ Image::ExifTool to read this information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

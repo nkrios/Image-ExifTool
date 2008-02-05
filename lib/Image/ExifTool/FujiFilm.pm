@@ -1,15 +1,17 @@
 #------------------------------------------------------------------------------
 # File:         FujiFilm.pm
 #
-# Description:  FujiFilm EXIF maker notes tags
+# Description:  Read/write FujiFilm maker notes and RAF images
 #
-# Revisions:    11/25/2003  - P. Harvey Created
+# Revisions:    11/25/2003 - P. Harvey Created
+#               11/14/2007 - PH Added abilty to write RAF images
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
-#               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_fuji.htm
+#               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_fuji.htm (2007/09/11)
 #               3) Michael Meissner private communication
 #               4) Paul Samuelson private communication (S5)
 #               5) http://www.cybercom.net/~dcoffin/dcraw/
+#               6) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::FujiFilm;
@@ -19,7 +21,9 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.14';
+$VERSION = '1.17';
+
+sub ProcessFujiDir($$$);
 
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -53,13 +57,18 @@ $VERSION = '1.14';
     },
     0x1001 => {
         Name => 'Sharpness',
+        Flags => 'PrintHex',
         Writable => 'int16u',
         PrintConv => {
-            1 => 'Soft',
-            2 => 'Soft2',
-            3 => 'Normal',
-            4 => 'Hard',
-            5 => 'Hard2',
+            0x01 => 'Soft',
+            0x02 => 'Soft2',
+            0x03 => 'Normal',
+            0x04 => 'Hard',
+            0x05 => 'Hard2',
+            0x82 => 'Medium Soft', #2
+            0x84 => 'Medium Hard', #2
+            0x8000 => 'Film Simulation', #2
+            0xffff => 'n/a', #2
         },
     },
     0x1002 => {
@@ -73,9 +82,16 @@ $VERSION = '1.14';
             0x300 => 'Daylight Fluorescent',
             0x301 => 'Day White Fluorescent',
             0x302 => 'White Fluorescent',
+            0x303 => 'Warm White Fluorescent', #2/PH (S5)
+            0x304 => 'Living Room Warm White Fluorescent', #2/PH (S5)
             0x400 => 'Incandescent',
             0x500 => 'Flash', #4
             0xf00 => 'Custom',
+            0xf01 => 'Custom2', #2
+            0xf02 => 'Custom3', #2
+            0xf03 => 'Custom4', #2
+            0xf04 => 'Custom5', #2
+            # 0xfe0 => 'Grey Point?', #2
             0xff0 => 'Kelvin', #4
         },
     },
@@ -85,9 +101,12 @@ $VERSION = '1.14';
         Writable => 'int16u',
         PrintConv => {
             0x0   => 'Normal',
+            0x080 => 'Medium High', #2
             0x100 => 'High',
+            0x180 => 'Medium Low', #2
             0x200 => 'Low',
             0x300 => 'None (B&W)', #2
+            0x8000 => 'Film Simulation', #2
         },
     },
     0x1004 => {
@@ -96,13 +115,42 @@ $VERSION = '1.14';
         Writable => 'int16u',
         PrintConv => {
             0x0   => 'Normal',
+            0x080 => 'Medium High', #2
             0x100 => 'High',
+            0x180 => 'Medium Low', #2
             0x200 => 'Low',
+            0x8000 => 'Film Simulation', #2
         },
     },
     0x1005 => { #4
         Name => 'ColorTemperature',
         Writable => 'int16u',
+    },
+    0x1006 => { #6
+        Name => 'Contrast',
+        Flags => 'PrintHex',
+        Writable => 'int16u',
+        PrintConv => {
+            0x0   => 'Normal',
+            0x100 => 'High',
+            0x300 => 'Low',
+        },
+    },
+    0x100a => { #2
+        Name => 'WhiteBalanceFineTune',
+        Writable => 'int32s',
+        Count => 2,
+        PrintConv => 'sprintf("Red %+d, Blue %+d", split(" ", $val))',
+        PrintConvInv => 'my @v=($val=~/-?\d+/g);"@v"',
+    },
+    0x100b => { #2
+        Name => 'NoiseReduction',
+        Flags => 'PrintHex',
+        Writable => 'int16u',
+        PrintConv => {
+            0x40 => 'Low',
+            0x80 => 'Normal',
+        },
     },
     0x1010 => {
         Name => 'FujiFlashMode',
@@ -112,10 +160,11 @@ $VERSION = '1.14';
             1 => 'On',
             2 => 'Off',
             3 => 'Red-eye reduction',
+            4 => 'External', #6
         },
     },
     0x1011 => {
-        Name => 'FlashStrength',
+        Name => 'FlashExposureComp', #6
         Writable => 'rational64s',
     },
     0x1020 => {
@@ -155,11 +204,13 @@ $VERSION = '1.14';
             0x0 => 'Auto',
             0x1 => 'Portrait',
             0x2 => 'Landscape',
+            0x3 => 'Macro', #6
             0x4 => 'Sports',
             0x5 => 'Night Scene',
             0x6 => 'Program AE',
             0x7 => 'Natural Light', #3
             0x8 => 'Anti-blur', #3
+            0x9 => 'Beach & Snow', #6
             0xa => 'Sunset', #3
             0xb => 'Museum', #3
             0xc => 'Party', #3
@@ -233,6 +284,7 @@ $VERSION = '1.14';
         PrintConv => {
             1 => 'Standard',
             3 => 'Wide',
+            # the S5Pro has 100%(STD),130%,170%,230%(W1),300%,400%(W2) - PH
         },
     },
     0x1401 => { #2
@@ -242,6 +294,9 @@ $VERSION = '1.14';
         PrintConv => {
             0x000 => 'F0/Standard',
             0x100 => 'F1/Studio Portrait',
+            0x110 => 'F1a/Studio Portrait Enhanced Saturation',
+            0x120 => 'F1b/Studio Portrait Smooth Skin Tone',
+            0x130 => 'F1c/Studio Portrait Increased Sharpness',
             0x200 => 'F2/Fujichrome',
             0x300 => 'F3/Studio Portrait Ex',
             0x400 => 'F4/Velvia',
@@ -257,7 +312,7 @@ $VERSION = '1.14';
             0x100 => 'Standard (100%)',
             0x200 => 'Wide1 (230%)',
             0x201 => 'Wide2 (400%)',
-            0x8000 => 'Film Simulation Mode',
+            0x8000 => 'Film Simulation',
         },
     },
     0x1403 => { #2
@@ -296,8 +351,15 @@ $VERSION = '1.14';
 
 # tags in RAF images (ref 5)
 %Image::ExifTool::FujiFilm::RAF = (
+    PROCESS_PROC => \&ProcessFujiDir,
     GROUPS => { 0 => 'RAF', 1 => 'RAF', 2 => 'Image' },
-    NOTES => 'Tags extracted from FujiFilm RAF-format information.',
+    PRIORITY => 0, # so the first RAF directory takes precedence
+    NOTES => q{
+        FujiFilm RAF images contain meta information stored in a proprietary
+        FujiFilm RAF format, as well as EXIF information stored inside an embedded
+        JPEG preview image.  The table below lists tags currently decoded from the
+        RAF-format information.
+    },
     0x100 => {
         Name => 'RawImageFullSize',
         Format => 'int16u',
@@ -359,13 +421,16 @@ sub ProcessFujiDir($$$)
     my $raf = $$dirInfo{RAF};
     my $offset = $$dirInfo{DirStart};
     $raf->Seek($offset, 0) or return 0;
-    my $buff;
+    my ($buff, $index);
     $raf->Read($buff, 4) or return 0;
     my $entries = unpack 'N', $buff;
     $entries < 256 or return 0;
+    $exifTool->Options('Verbose') and $exifTool->VerboseDir('Fuji', $entries);
     SetByteOrder('MM');
-    while ($entries--) {
+    my $pos = $offset + 4;
+    for ($index=0; $index<$entries; ++$index) {
         $raf->Read($buff,4) or return 0;
+        $pos += 4;
         my ($tag, $len) = unpack 'nn', $buff;
         my ($val, $vbuf);
         $raf->Read($vbuf, $len) or return 0;
@@ -373,64 +438,169 @@ sub ProcessFujiDir($$$)
         if ($tagInfo and $$tagInfo{Format}) {
             $val = ReadValue(\$vbuf, 0, $$tagInfo{Format}, $$tagInfo{Count}, $len);
             next unless defined $val;
+        } elsif ($len == 4) {
+            # interpret unknown 4-byte values as int32u
+            $val = Get32u(\$vbuf, 0);
         } else {
+            # treat other unknown values as binary data
             $val = \$vbuf;
         }
-        $exifTool->HandleTag($tagTablePtr, $tag, $val);
+        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+            Index   => $index,
+            DataPt  => \$vbuf,
+            DataPos => $pos,
+            Size    => $len,
+            TagInfo => $tagInfo,
+        );
+        $pos += $len;
     }
     return 1;
 }
 
 #------------------------------------------------------------------------------
-# get information from FujiFilm RAW file
+# write information to FujiFilm RAW file (RAF)
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
-# Returns: 1 if this was a valid FujiFilm RAW file
+# Returns: 1 on success, 0 if this wasn't a valid RAF file, or -1 on write error
+sub WriteRAF($$)
+{
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
+    my ($hdr, $jpeg, $outJpeg, $offset, $err, $buff);
+
+    $raf->Read($hdr,0x94) == 0x94  or return 0;
+    $hdr =~ /^FUJIFILM/            or return 0;
+    my $ver = substr($hdr, 0x3c, 4);
+    $ver =~ /^\d{4}$/              or return 0;
+
+    # get the position and size of embedded JPEG
+    my ($jpos, $jlen) = unpack('x84NN', $hdr);
+    # check to be sure the JPEG starts in the expected location
+    if ($jpos > 0x94 or $jpos < 0x68) {
+        $exifTool->Error("Unsupported or corrupted RAF image (version $ver)");
+        return 1;
+    }
+    # the following RAF version numbers have been tested:
+    # 0100 - E550 V1.00, E900 V1.00, S5600 V1.00, S6000fd V1.00, S6500fd V2.00
+    # 0106 - S5Pro V1.06
+    # 0114 - S9600 V1.00
+    # 0159 - S2Pro V1.00
+    # 0212 - S3Pro V2.12
+    # 0218 - S3Pro V2.18
+    # 0264 - F700  V2.00
+    # 0269 - S9500 V1.02
+    if ($ver !~ /^(0100|0106|0114|0159|0212|0218|0264|0269)$/) {
+        $exifTool->Error("RAF version $ver not yet tested", 1) and return 1;
+    }
+    # read the embedded JPEG
+    unless ($raf->Seek($jpos, 0) and $raf->Read($jpeg, $jlen) == $jlen) {
+        $exifTool->Error('Error reading RAF meta information');
+        return 1;
+    }
+    # use same write directories as JPEG
+    $exifTool->InitWriteDirs('JPEG');
+    # rewrite the embedded JPEG in memory
+    my %jpegInfo = (
+        Parent  => 'RAF',
+        RAF     => new File::RandomAccess(\$jpeg),
+        OutFile => \$outJpeg,
+    );
+    my $success = $exifTool->WriteJPEG(\%jpegInfo);
+    unless ($success and $outJpeg) {
+        $exifTool->Error("Invalid RAF format");
+        return 1;
+    }
+    return -1 if $success < 0;
+
+    # rewrite the RAF image
+    SetByteOrder('MM');
+    my $jpegLen = length $outJpeg;
+    # pad JPEG to an even 4 bytes (ALWAYS use padding as Fuji does)
+    my $pad = "\0" x (4 - ($jpegLen % 4));
+    # update JPEG size in header (size without padding)
+    Set32u(length($outJpeg), \$hdr, 0x58);
+    # get pointer to start of the next RAF block
+    my $nextPtr = Get32u(\$hdr, 0x5c);
+    # determine the length of padding at the end of the original JPEG
+    my $oldPadLen = $nextPtr - ($jpos + $jlen);
+    if ($oldPadLen > 31 or $oldPadLen < 0) {
+        $exifTool->Error('Bad RAF pointer at 0x5c');
+        return 1;
+    }
+    # calculate offset difference due to change in JPEG size
+    my $ptrDiff = length($outJpeg) + length($pad) - ($jlen + $oldPadLen);
+    # update necessary pointers in header
+    foreach $offset (0x5c, 0x64, 0x78, 0x80) {
+        last if $offset >= $jpos;    # some versions have a short header
+        my $oldPtr = Get32u(\$hdr, $offset);
+        next unless $oldPtr;        # don't update if pointer is zero
+        Set32u($oldPtr + $ptrDiff, \$hdr, $offset);
+    }
+    # write the new header
+    my $outfile = $$dirInfo{OutFile};
+    Write($outfile, substr($hdr, 0, $jpos)) or $err = 1;
+    # write the updated JPEG plus padding
+    Write($outfile, $outJpeg, $pad) or $err = 1;
+    # copy over the rest of the RAF image
+    unless ($raf->Seek($nextPtr, 0)) {
+        $exifTool->Error('Error reading RAF image');
+        return 1;
+    }
+    while ($raf->Read($buff, 65536)) {
+        Write($outfile, $buff) or $err = 1, last;
+    }
+    return $err ? -1 : 1;
+}
+
+#------------------------------------------------------------------------------
+# get information from FujiFilm RAW file (RAF)
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Returns: 1 if this was a valid RAF file
 sub ProcessRAF($$)
 {
     my ($exifTool, $dirInfo) = @_;
-    my ($buff, $warn);
+    my ($buff, $jpeg, $warn, $offset);
 
     my $raf = $$dirInfo{RAF};
-    $raf->Read($buff,8) == 8        or return 0;
-    $buff eq 'FUJIFILM'             or return 0;
-    $raf->Seek(84, 0)               or return 0;
-    $raf->Read($buff, 8) == 8       or return 0;
-    my ($pos, $len) = unpack('NN', $buff);
-    $pos & 0x8000                  and return 0;
-    $raf->Seek($pos, 0)             or return 0;
-    $raf->Read($buff, $len) == $len or return 0;
+    $raf->Read($buff,8) == 8          or return 0;
+    $buff eq 'FUJIFILM'               or return 0;
+    $raf->Seek(0x54, 0)               or return 0;
+    $raf->Read($buff, 8) == 8         or return 0;
+    my ($jpos, $jlen) = unpack('NN', $buff);
+    $jpos & 0x8000                   and return 0;
+    $raf->Seek($jpos, 0)              or return 0;
+    $raf->Read($jpeg, $jlen) == $jlen or return 0;
+
+    # extract information from embedded JPEG
     my %dirInfo = (
         Parent => 'RAF',
-        RAF    => new File::RandomAccess(\$buff),
+        RAF    => new File::RandomAccess(\$jpeg),
     );
-    $$exifTool{BASE} += $pos;
+    $$exifTool{BASE} += $jpos;
     my $rtnVal = $exifTool->ProcessJPEG(\%dirInfo);
-    $$exifTool{BASE} -= $pos;
-    $exifTool->FoundTag('PreviewImage', \$buff) if $rtnVal;
+    $$exifTool{BASE} -= $jpos;
+    $exifTool->FoundTag('PreviewImage', \$jpeg) if $rtnVal;
 
-    if ($raf->Seek(92, 0) and $raf->Read($buff, 4)) {
+    # extract information from Fuji RAF directories
+    my $num = '';
+    foreach $offset (0x5c, 0x78) {
+        last if $offset >= $jpos;
+        unless ($raf->Seek($offset, 0) and $raf->Read($buff, 4)) {
+            $warn = 1;
+            last;
+        }
+        my $start = unpack('N',$buff);
+        next unless $start;
+
         my $tagTablePtr = GetTagTable('Image::ExifTool::FujiFilm::RAF');
         %dirInfo = (
-            RAF => $raf,
-            DirStart => unpack('N', $buff),
+            RAF      => $raf,
+            DirStart => $start,
         );
-        $$exifTool{SET_GROUP1} = 'RAF';
-        ProcessFujiDir($exifTool, \%dirInfo, $tagTablePtr) or $warn = 1;
-    
-        # extract information from 2nd image if available
-        if ($pos > 120) {
-            $raf->Seek(120, 0) or return 0;
-            $raf->Read($buff, 4) or return 0;
-            my $start = unpack('N',$buff);
-            if ($start) {
-                $$dirInfo{DirStart} = $start;
-                $$exifTool{SET_GROUP1} = 'RAF2';
-                ProcessFujiDir($exifTool, \%dirInfo, $tagTablePtr) or $warn = 1;
-            }
-        }
+        $$exifTool{SET_GROUP1} = "RAF$num";
+        $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr) or $warn = 1;
         delete $$exifTool{SET_GROUP1};
-    } else {
-        $warn = 1;
+
+        $num = ($num || 1) + 1;
     }
     $warn and $exifTool->Warn('Possibly corrupt RAF information');
 
@@ -443,7 +613,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::FujiFilm - FujiFilm EXIF maker notes tags
+Image::ExifTool::FujiFilm - Read/write FujiFilm maker notes and RAF images
 
 =head1 SYNOPSIS
 
@@ -452,12 +622,12 @@ This module is loaded automatically by Image::ExifTool when required.
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to interpret
-FujiFilm maker notes in EXIF information, and to read FujiFilm RAW (RAF)
-images.
+FujiFilm maker notes in EXIF information, and to read/write FujiFilm RAW
+(RAF) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -478,9 +648,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Michael Meissner for decoding some new PictureMode and
-AutoBracketing values, and to Paul Samuelson for decoding some WhiteBalance
-values and the ColorTemperature tag.
+Thanks to Michael Meissner, Paul Samuelson and Jens Duttke for help decoding
+some FujiFilm information.
 
 =head1 SEE ALSO
 

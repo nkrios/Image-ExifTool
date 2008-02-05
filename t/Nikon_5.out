@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -33,9 +33,9 @@
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 1.7
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 50.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 50.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Time] 37520 - Sub Sec Time: 16
 [EXIF, ExifIFD, Time] 37521 - Sub Sec Time Original: 16
@@ -43,7 +43,7 @@
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2464
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1632
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1632
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
@@ -54,13 +54,13 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Manual
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 1
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 75mm
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 75 mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: Low gain up
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
-[EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown (0)
+[EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown
 [EXIF, GPS, Location] 0 - GPS Version ID: 2.2.0.0
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 300
@@ -112,20 +112,28 @@
 [MakerNotes, Nikon, Camera] 165 - Image Count: 2
 [MakerNotes, Nikon, Camera] 166 - Deleted Image Count: 0
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 2
+[MakerNotes, Nikon, Camera] 0 - Flash Info Version: 0100
+[MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
+[MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
+[MakerNotes, Nikon, Camera] 10 - Flash Exposure Compensation: 0
+[MakerNotes, Nikon, Camera] 15 - Flash Group A Control Mode: Off
+[MakerNotes, Nikon, Camera] 16 - Flash Group B Control Mode: Off
+[MakerNotes, Nikon, Camera] 17 - Flash Group A Exposure Comp: 0
+[MakerNotes, Nikon, Camera] 18 - Flash Group B Exposure Comp: 0
 [MakerNotes, Nikon, Camera] 170 - Saturation: Normal
 [MakerNotes, Nikon, Camera] 177 - High ISO Noise Reduction: Normal
 [MakerNotes, Nikon, Camera] 0 - Shot Info Version: 0206
 [MakerNotes, Nikon, Camera] 0 - WB RGGB Levels: 562 256 256 537
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0201
-[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 60.2mm
+[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 60.2 mm
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 1.9
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 0x11
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 0.71 m
-[MakerNotes, Nikon, Camera] 10 - Focal Length: 50.4mm
+[MakerNotes, Nikon, Camera] 10 - Focal Length: 50.4 mm
 [MakerNotes, Nikon, Camera] 11 - Lens ID Number: 118
 [MakerNotes, Nikon, Camera] 12 - Lens F Stops: 7.33
-[MakerNotes, Nikon, Camera] 13 - Min Focal Length: 50.4mm
-[MakerNotes, Nikon, Camera] 14 - Max Focal Length: 50.4mm
+[MakerNotes, Nikon, Camera] 13 - Min Focal Length: 50.4 mm
+[MakerNotes, Nikon, Camera] 14 - Max Focal Length: 50.4 mm
 [MakerNotes, Nikon, Camera] 15 - Max Aperture At Min Focal: 1.8
 [MakerNotes, Nikon, Camera] 16 - Max Aperture At Max Focal: 1.8
 [MakerNotes, Nikon, Camera] 17 - MCU Version: 122
@@ -140,8 +148,9 @@
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Blue Balance: 2.097656
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.020 mm
-[Composite, Composite, Image]  - Depth of Field: 0.03 m (0.69 - 0.72)
-[Composite, Composite, Camera]  - Focal Length: 50.0mm (35mm equivalent: 75.0mm)
+[Composite, Composite, Image]  - Depth Of Field: 0.03 m (0.69 - 0.72)
+[Composite, Composite, Image]  - Field Of View: 25.1 deg (0.32 m)
+[Composite, Composite, Camera]  - Focal Length: 50.0 mm (35 mm equivalent: 75.0 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 31.20 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Light Value: 8.0

@@ -29,7 +29,7 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '1.59';
+$VERSION = '1.65';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -46,6 +46,7 @@ my $docType = q{<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 my $caseInsensitive;    # flag to ignore case when sorting tag names
 
 # Descriptions for the TagNames documentation
+# (descriptions may also be defined in tag table NOTES)
 # Note: POD headers in these descriptions start with '~' instead of '=' to keep
 # from confusing POD parsers which apparently parse inside quoted strings.
 my %docs = (
@@ -94,16 +95,17 @@ of values written, or the number of characters in a fixed-length string
 
 An asterisk (C<*>) after an entry in the B<Writable> column indicates a
 "protected" tag which is not writable directly, but is set via a Composite
-tag.  A tilde (C<~>) indicates a tag this is only writable when print
-conversion is disabled (by setting PrintConv to 0, or using the -n option).
-A slash (C</>) indicates an "avoided" tag that is not created unless the
-group is specified (due to name conflicts with other tags).  An exclamation
-point (C<!>) indicates a tag that is considered unsafe to write under normal
-circumstances.  These "unsafe" tags are not set when calling
+or Extra tag.  A tilde (C<~>) indicates a tag this is only writable when
+print conversion is disabled (by setting PrintConv to 0, or using the -n
+option). A slash (C</>) indicates an "avoided" tag that is not created
+unless the group is specified (due to name conflicts with other tags).  An
+exclamation point (C<!>) indicates a tag that is considered unsafe to write
+under normal circumstances.  These "unsafe" tags are not set when calling
 SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  A plus sign
-(C<+>) indicates a "list" tag which supports multiple instances.
+(C<+>) indicates a "list" tag which supports multiple values while allowing
+individual values to be added and deleted.
 
 The HTML version of these tables also list possible B<Values> for
 discrete-valued tags, as well as B<Notes> for some tags.
@@ -118,14 +120,14 @@ question.
     EXIF => q{
 EXIF stands for "Exchangeable Image File Format".  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, MIFF and WDP images, as well as many TIFF-based RAW images.
+TIFF, PNG, MIFF and HDP images, as well as many TIFF-based RAW images.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
 ExifTool family 1 group names.  When writing EXIF information, the default
 B<Group> listed below is used unless another group is specified.
 
-Also listed in the table below are TIFF, DNG, WDP and other tags which are
+Also listed in the table below are TIFF, DNG, HDP and other tags which are
 not part of the EXIF specification, but may co-exist with EXIF tags in some
 images.
 },
@@ -160,7 +162,7 @@ All XMP information is stored as character strings.  The B<Writable> column
 specifies the information format:  C<integer> is a string of digits
 (possibly beginning with a '+' or '-'), C<real> is a floating point number,
 C<rational> is two C<integer> strings separated by a '/' character, C<date>
-is a date/time string in the format "YYYY:MM:DD HH:MM:SS[+/-HH:MM]",
+is a date/time string in the format "YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM]",
 C<boolean> is either "True" or "False", and C<lang-alt> is a list of string
 alternatives in different languages.
 
@@ -267,6 +269,10 @@ The following tags are decoded in unsupported maker notes.  Use the Unknown
 The tags listed in the PDF tables below are those which are used by ExifTool
 to extract meta information, but they are only a small fraction of the total
 number of available PDF tags.
+
+When writing PDF files, ExifTool uses an increment update.  This has an
+advantage that the original PDF can be easily recovered by deleting the
+C<PDF-update> pseudo-group (with C<-PDF-update:all=> on the command line).
 },
     DNG => q{
 The main DNG tags are found in the EXIF table.  The tables below define only
@@ -311,7 +317,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 ~head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -481,6 +487,7 @@ TagID:  foreach $tagID (@keys) {
                     }
                 }
                 my $printConv = $$tagInfo{PrintConv};
+                push @values, sprintf('[Mask 0x%x]',$$tagInfo{Mask}) if $$tagInfo{Mask};
                 if (ref($printConv) =~ /^(HASH|ARRAY)$/) {
                     my (@printConvList, @indexList, $index);
                     if (ref $printConv eq 'ARRAY') {
@@ -493,7 +500,25 @@ TagID:  foreach $tagID (@keys) {
                         $index = shift @indexList;
                     }
                     while (defined $printConv) {
-                        push @values, "[Value $index]" if defined $index;
+                        if (defined $index) {
+                            # (print indices of original values if reorganized)
+                            my $s = '';
+                            my $idx = $$tagInfo{Relist} ? $tagInfo->{Relist}->[$index] : $index;
+                            if (ref $idx) {
+                                $s = 's' if @$idx > 1;
+                                ($idx = join ', ', @$idx) =~ s/(.*),/$1 and/;
+                            } elsif (not $$tagInfo{Relist}) {
+                                while (@printConvList and $printConv eq $printConvList[0]) {
+                                    shift @printConvList;
+                                    $index = shift @indexList;
+                                }
+                                if ($idx != $index) {
+                                    $idx = "$idx-$index";
+                                    $s = 's';
+                                }
+                            }
+                            push @values, "[Value$s $idx]";
+                        }
                         if ($$tagInfo{SeparateTable}) {
                             $subdir = 1;
                             my $s = $$tagInfo{SeparateTable};
@@ -512,14 +537,18 @@ TagID:  foreach $tagID (@keys) {
                                 next if $_ eq '';
                                 $_ eq 'BITMASK' and $bits = $$printConv{$_}, next;
                                 my $index;
-                                if ($$tagInfo{PrintHex}) {
+                                if ($$tagInfo{PrintHex} or $$printConv{BITMASK}) {
                                     $index = sprintf('0x%x',$_);
                                 } elsif (/^[-+]?\d+$/) {
                                     $index = $_;
                                 } else {
-                                    # ignore unprintable values
-                                    next if /[\x00-\x1f\x80-\xff]/;
-                                    $index = "'$_'";
+                                    $index = $_;
+                                    # translate unprintable values
+                                    if ($index =~ s/([\x00-\x1f\x80-\xff])/sprintf("\\x%.2x",ord $1)/eg) {
+                                        $index = qq{"$index"};
+                                    } else {
+                                        $index = qq{'$index'};
+                                    }
                                 }
                                 push @values, "$index = " . $$printConv{$_};
                             }
@@ -535,7 +564,9 @@ TagID:  foreach $tagID (@keys) {
                         $index = shift @indexList;
                     }
                 } elsif ($printConv and $printConv =~ /DecodeBits\(\$val,\s*(\{.*\})\s*\)/s) {
+                    $$self{CameraModel} = '';   # needed for Nikon ShootingMode
                     my $bits = eval $1;
+                    delete $$self{CameraModel};
                     if ($@) {
                         warn $@;
                     } else {
@@ -658,8 +689,8 @@ TagID:  foreach $tagID (@keys) {
 # save TagName information
 #
             my $tagIDstr;
-            if ($tagID =~ /^\d+$/) {
-                if ($binaryTable or $isIPTC or ($short =~ /^CanonCustom/ and $tagID < 256)) {
+            if ($tagID =~ /^\d+(\.\d+)?$/) {
+                if ($1 or $binaryTable or $isIPTC or ($short =~ /^CanonCustom/ and $tagID < 256)) {
                     $tagIDstr = $tagID;
                 } else {
                     $tagIDstr = sprintf("0x%.4x",$tagID);
@@ -827,8 +858,8 @@ sub WriteTagLookup($$)
 sub NumbersFirst
 {
     my $rtnVal;
-    my $bNum = ($b =~ /^-?[0-9]+$/);
-    if ($a =~ /^-?[0-9]+$/) {
+    my $bNum = ($b =~ /^-?[0-9]+(\.\d*)?$/);
+    if ($a =~ /^-?[0-9]+(\.\d*)?$/) {
         $rtnVal = ($bNum ? $a <=> $b : -1);
     } elsif ($bNum) {
         $rtnVal = 1;
@@ -1346,9 +1377,9 @@ sub WriteTagNames($$)
             my ($align, $idStr, $w);
             if (not $id) {
                 $idStr = '  ';
-            } elsif ($tagIDstr =~ /^\d+$/) {
+            } elsif ($tagIDstr =~ /^\d+(\.\d+)?$/) {
                 $w = $wID - 3;
-                $idStr = sprintf "  %${w}d    ", $tagIDstr;
+                $idStr = sprintf "  %${w}g    ", $tagIDstr;
                 $align = " class=r";
             } else {
                 $tagIDstr =~ s/^'$prefix/'/ if $prefix;
@@ -1398,6 +1429,7 @@ sub WriteTagNames($$)
                 printf PODFILE " %-${w}s", shift(@reqs) || '';
             }
             printf PODFILE " $wrStr\n";
+            my $numTags = scalar @$tagNames;
             my $n = 0;
             while (@tags or @reqs or @vals) {
                 my $more = (@tags or @reqs);
@@ -1450,8 +1482,8 @@ sub WriteTagNames($$)
                 if ($isSubdir) {
                     my $smallNote;
                     foreach (@$values) {
-                        if (/^\(/) {
-                            $smallNote = 1 if $n <= 1;
+                        if (/^[[(]/) {
+                            $smallNote = 1 if $numTags < 2;
                             push @values, ($smallNote ? $noteFontSmall : $noteFont) . "$_</span>";
                             next;
                         }
@@ -1525,9 +1557,27 @@ documentation.
 
   $ok = $builder->WriteTagNames('lib/Image/ExifTool/TagNames.pod','html');
 
+=head1 MEMBER VARIABLES
+
+=over 4
+
+=item PRESERVE_DATE
+
+Flag to preserve "Last revised" date in HTML files.  Set before calling
+WriteTagNames().
+
+=item COUNT
+
+Reference to hash containing counting statistics.  Keys are the
+descriptions, and values are the numerical counts.  Valid after
+BuildTagLookup object is created, but additional statistics are added by
+WriteTagNames().
+
+=back
+
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

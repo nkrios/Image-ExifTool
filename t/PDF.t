@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..3\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..21\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -30,7 +30,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 4: Test Standard PDF decryption
+# test 3: Test Standard PDF decryption
 {
     ++$testnum;
     my $skip = '';
@@ -48,7 +48,7 @@ my $testnum = 1;
         my $data = pack('N', 0x34a290d3);
         my $err = Image::ExifTool::PDF::DecryptInit($exifTool, \%cryptInfo, $id);
         $err and warn "\n  $err\n";
-        Image::ExifTool::PDF::Decrypt(\$data);
+        Image::ExifTool::PDF::Crypt(\$data, '4 0 R');
         my $expected = 0x5924d335;
         my $got = unpack('N', $data);
         unless ($got == $expected) {
@@ -60,6 +60,95 @@ my $testnum = 1;
         $skip = ' # skip Requires Digest::MD5';
     }
     print "ok $testnum$skip\n";
+}
+
+# tests 4-21: Test writing, deleting and reverting two different files
+{
+    # do a bunch of edits
+    my @edits = ([  # (on file containing both PDF Info and XMP)
+        [   # test 4: write PDF and XMP information
+            [ 'PDF:Creator' => 'me'],
+            [ 'XMP:Creator' => 'you' ],
+            [ 'AllDates'    => '2:30', Shift => -1 ],
+        ],[ # test 5: delete all PDF
+            [ 'PDF:all' ],
+        ],[ # test 6: write some XMP
+            [ 'XMP:Author' => 'them' ],
+        ],[ # test 7: create new PDF
+            [ 'PDF:Keywords'  => 'one' ],
+            [ 'PDF:Keywords'  => 'two' ],
+            [ 'AppleKeywords' => 'three' ],
+            [ 'AppleKeywords' => 'four' ],
+        ],[ # test 8: delete all XMP
+            [ 'XMP:all' ],
+        ],[ # test 9: write some PDF
+            [ 'PDF:Keywords'  => 'another one', AddValue => 1 ],
+            [ 'AppleKeywords' => 'three',       DelValue => 1 ],
+        ],[ # test 10: create new XMP
+            [ 'XMP:Author' => 'us' ],
+        ],[ # test 11: write some PDF
+            [ 'PDF:Keywords'  => 'two',  DelValue => 1 ],
+            [ 'AppleKeywords' => 'five', AddValue => 1 ],
+        ],[ # test 12: delete re-added XMP
+            [ 'XMP:all' ],
+        ],
+    ],[             # (on file without PDF Info or XMP)
+        [   # test 14: create new XMP
+            [ 'XMP:Author' => 'him' ],
+        ],[ # test 15: create new PDF
+            [ 'PDF:Author' => 'her' ],
+        ],[ # test 16: delete XMP and PDF
+            [ 'XMP:all' ],
+            [ 'PDF:all' ],
+        ],[ # test 17: delete XMP and PDF again
+            [ 'XMP:all' ],
+            [ 'PDF:all' ],
+        ],[ # test 18: create new PDF
+            [ 'PDF:Author' => 'it' ],
+        ],[ # test 19: create new XMP
+            [ 'XMP:Author' => 'thing' ],
+        ],[ # test 20: delete all
+            [ 'all' ],
+        ],
+    ]);
+    my $testSet;
+    foreach $testSet (0,1) {
+        my ($edit, $testfile2, $lastOK);
+        my $testfile = 't/images/PDF' . ($testSet ? '2' : '') . '.pdf';
+        my $testfile1 = $testfile;
+        my $exifTool = new Image::ExifTool;
+        $exifTool->Options(PrintConv => 0);
+        foreach $edit (@{$edits[$testSet]}) {
+            ++$testnum;
+            $exifTool->SetNewValue();
+            $exifTool->SetNewValue(@$_) foreach @$edit;
+            $testfile2 = "t/${testname}_${testnum}_failed.pdf";
+            unlink $testfile2;
+            $exifTool->WriteInfo($testfile1, $testfile2);
+            my $info = $exifTool->ImageInfo($testfile2,
+                    qw{Filesize PDF:all XMP:Creator XMP:Author AllDates});
+            my $ok = check($exifTool, $info, $testname, $testnum);
+            print 'not ' unless $ok;
+            print "ok $testnum\n";
+            # erase source file if previous test was OK
+            unlink $testfile1 if $lastOK;
+            $lastOK = $ok;
+            $testfile1 = $testfile2;    # use this file for the next test
+        }
+        # revert all edits and compare with original file
+        ++$testnum;
+        $exifTool->SetNewValue('PDF-update:all');
+        $testfile2 = "t/${testname}_${testnum}_failed.pdf";
+        unlink $testfile2;
+        $exifTool->WriteInfo($testfile1, $testfile2);
+        if (binaryCompare($testfile2, $testfile)) {
+            unlink $testfile2;
+        } else {
+            print 'not ';
+        }
+        print "ok $testnum\n";
+        unlink $testfile1 if $lastOK;
+    }
 }
 
 # end

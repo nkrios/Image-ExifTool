@@ -25,7 +25,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -55,7 +55,7 @@ my %psdMap = (
     WRITE_PROC => \&WritePhotoshop,
     0x03e8 => { Unknown => 1, Name => 'Photoshop2Info' },
     0x03e9 => { Unknown => 1, Name => 'MacintoshPrintInfo' },
-    0x03ea => { Unknown => 1, Name => 'XMLData' }, #PH
+    0x03ea => { Unknown => 1, Name => 'XMLData', Binary => 1 }, #PH
     0x03eb => { Unknown => 1, Name => 'Photoshop2ColorTable' },
     0x03ed => {
         Name => 'ResolutionInfo',
@@ -519,7 +519,7 @@ be preserved when copying Photoshop information via user-defined tags.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

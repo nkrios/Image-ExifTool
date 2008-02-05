@@ -73,24 +73,6 @@ my %psMap = (
 
 
 #------------------------------------------------------------------------------
-# Check PS tag value
-# Inputs: 0) ExifTool object ref, 1) tag info ref, 2) value ref
-# Returns: undef on success, or error string
-sub CheckPS($$$)
-{
-    my ($exifTool, $tagInfo, $valPt) = @_;
-    # parentheses must be balanced (or escaped)
-    my $n = 0;
-    pos($$valPt) = 0;
-    while ($$valPt =~ /(\(|\))/g) {
-        $n += ($1 eq '(') ? 1 : -1;
-        last if $n < 0;
-    }
-    return 'Unmatched parentheses' unless $n == 0;
-    return undef;   # success
-}
-
-#------------------------------------------------------------------------------
 # Write XMP directory to file, with begin/end tokens if necessary
 # Inputs: 0) outfile ref, 1) flags hash ref, 2-N) data to write
 # Returns: true on success
@@ -263,6 +245,33 @@ PS_AFTER
 }
 
 #------------------------------------------------------------------------------
+# Encode postscript tag/value
+# Inputs: 0) tag ID, 1) value
+# Returns: postscript comment
+# - adds brackets, escapes special characters, and limits line length
+sub EncodeTag($$)
+{
+    my ($tag, $val) = @_;
+    unless ($val =~ /^\d+$/) {
+        $val =~ s/([()\\])/\\$1/g;  # escape brackets and backslashes
+        $val =~ s/\n/\\n/g;         # escape newlines
+        $val =~ s/\r/\\r/g;         # escape carriage returns
+        $val =~ s/\t/\\t/g;         # escape tabs
+        # use octal escape codes for other control characters
+        $val =~ s/([\x00-\x1f\x7f\xff])/sprintf("\\%.3o",ord($1))/ge;
+        $val = "($val)";
+    }
+    my $line = "%%$tag: $val";
+    # postscript line limit is 255 characters
+    # --> split if necessary using continuation comment "%%+"
+    my $n;
+    for ($n=255; length($line)>$n; $n+=255+length($/)) {
+        substr($line, $n, 0) = "$/%%+";
+    }
+    return $line . $/;
+}
+
+#------------------------------------------------------------------------------
 # Write new tags information in comments section
 # Inputs: 0) ExifTool object ref, 1) output file ref, 2) reference to new tag hash
 # Returns: true on success
@@ -285,14 +294,8 @@ sub WriteNewTags($$$)
             my $out = $exifTool->Options('TextOut');
             print $out "    + PostScript:$$tagInfo{Name} = '$val'\n";
         }
-        $val =~ /^\d+$/ or $val = "($val)"; # add brackets around strings
-        my $buff = "%%$tag: $val$/";
-        if (length $buff > 255) {
-            $exifTool->Warn("Value for too long for $tag");
-        } else {
-            Write($outfile, $buff) or $success = 0;
-            ++$exifTool->{CHANGED};
-        }
+        Write($outfile, EncodeTag($tag, $val)) or $success = 0;
+        ++$exifTool->{CHANGED};
     }
     # write XMP hint if necessary
     Write($outfile, "%ADO_ContainsXMP: MainFirst$/") or $success = 0 if $xmpHint;
@@ -540,10 +543,9 @@ sub WritePS($$)
                 my $tagInfo = $$newTags{$tag};
                 next unless ref $tagInfo;
                 delete $$newTags{$tag}; # write it then forget it
-                $val =~ s/\x0d*\x0a*$//;        # remove trailing CR, LF or CR/LF
-                if ($val =~ s/^\((.*)\)$/$1/) { # remove brackets if necessary
-                    $val =~ s/\) \(/, /g;       # convert contained brackets too
-                }
+                # decode comment string (reading continuation lines if necessary)
+                $val = DecodeComment($val, $raf, \@lines, \$data);
+                $val = join ', ', @$val if ref $val eq 'ARRAY';
                 my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
                 if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
                     $verbose > 1 and print $out "    - PostScript:$$tagInfo{Name} = '$val'\n";
@@ -551,15 +553,7 @@ sub WritePS($$)
                     ++$exifTool->{CHANGED};
                     next unless defined $val;   # next if tag is being deleted
                     $verbose > 1 and print $out "    + PostScript:$$tagInfo{Name} = '$val'\n";
-                    $val =~ /^\d+$/ or $val = "($val)"; # add brackets around strings
-                    $buff = "%%$tag: $val$/";
-                    if (length $buff > 255) {
-                        # lines in PS documents must be less than 256 characters
-                        # (don't yet support continuation with %%+ comment)
-                        $exifTool->Warn("Value for too long for $tag");
-                    } else {
-                        $data = $buff;  # write the new value
-                    }
+                    $data = EncodeTag($tag, $val);
                 }
             }
         # (note: Adobe InDesign doesn't put colon after %ADO_ContainsXMP -- doh!)
@@ -730,7 +724,7 @@ Thanks to Tim Kordick for his help testing the EPS writer.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -41,6 +41,10 @@ design will result in the loss of non-standard information.</p>
 apparently not big corporations like Adobe or Microsoft), because the new
 DNG and WDP formats are TIFF-based too.</p>
 
+<p>The EXIF specification also has some significant shortcomings to add to the
+TIFF problems, like minimal special character abilities, no language support,
+and no way to specify time zone.</p>
+
 <h3>EXIF Maker notes</h3>
 <p>Maker notes are a can of worms.  The EXIF specification unfortunately
 made no mention about the information format of the maker notes.  If
@@ -114,7 +118,9 @@ unwieldy (too bulky and complex) for a small application.</p>
 <h3>PDF</h3>
 <p>...and I thought XMP was too complicated.  PDF is just insane.  Because
 of this, it is unlikely that ExifTool will ever support this format for
-writing.</p>
+writing. [Dec. 18, 2007 Update: I have just added PDF write support using
+the incremental update feature of PDF.  It was still a bit of work, but
+somewhat simpler (and MUCH faster!) than rewriting the entire PDF.]</p>
 
 <h3>PNG</h3>
 <p>PNG sucks because meta information can be stored only in text format.
@@ -139,8 +145,9 @@ information is all but ignored in the PICT design.</p>
 
 <h3>FlashPix</h3>
 <p>Oh. My. God.  Don't get me started on this one.  Let's just say that basing
-an image file format on the File Allocation Table (FAT) structure of a
-floppy disk with fixed 512-byte sectors is monumentally idiotic.</p>
+an image file format on the File Allocation Table (FAT) structure of a floppy
+disk with fixed 512-byte sectors is monumentally idiotic.  Microsoft Word,
+Excel and PowerPoint documents also use this insane format.</p>
 
 <h3>DICOM Medical Images</h3>
 <p>The DICOM format is reasonably well designed.  The UID's are cumbersome,
@@ -218,13 +225,14 @@ offers a number of other features:</p>
 <li>Multiple documents in a single file
 </ul>
 
-<p>The specification for this format is described fully and implemented in
+<p>The specification for this format can be found
+<a href="MIE1.1-20070121.pdf">here</a>, and is implemented in
 <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/MIE.pm">Image::ExifTool::MIE.pm</a></p>
 
 <p>OK.  Flame away.  I can take it.</p>
 <hr>
 <i>Created Nov. 15, 2005</i>
-<br><i>Last revised Mar. 8, 2007</i>
+<br><i>Last revised Dec. 28, 2007</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

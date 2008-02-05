@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 %Image::ExifTool::Sigma::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -154,23 +154,41 @@ $VERSION = '1.04';
     0x0017 => 'Firmware',
     0x0018 => 'Software',
     0x0019 => 'AutoBracket',
-    # 0x001a - int32u: 1884 to 2016
-    # 0x001b - int32u: 20688 to 45335
-    # 0x001c - int16u[2]: "640 480"
+    0x001a => { #PH
+        Name => 'PreviewImageStart',
+        IsOffset => 1,
+        OffsetPair => 0x001b,
+        DataTag => 'PreviewImage',
+        Writable => 'int32u',
+        Protected => 2,
+    },
+    0x001b => { #PH
+        Name => 'PreviewImageLength',
+        OffsetPair => 0x001a,
+        DataTag => 'PreviewImage',
+        Writable => 'int32u',
+        Protected => 2,
+    },
+    0x001c => { #PH
+        Name => 'PreviewImageSize',
+        Writable => 'int16u',
+        Count => 2,
+    },
     0x001d => { #PH
         Name => 'MakerNoteVersion',
         Format => 'undef',
     },
-    # 0x001e - int16u: 0
-    # 0x001f - string: ""
+    # 0x001e - int16u: 0 or 4
+    # 0x001f - string: "" or "Center"
     # 0x0020-21 - string: " "
     0x0022 => { #PH
         Name => 'AdjustmentMode',
         Priority => 0,
         Unknown => 1,
     },
-    # 0x0023 - string: 10, 131, 150, 152, 169
-    # 0x0024-25 - string: ""
+    # 0x0023 - string: "", 10, 131, 150, 152, 169
+    # 0x0024 - string: "" or "Starting calibration file..."
+    # 0x0025 - string: "" or "0.70"
     # 0x0026-2e - int32u: 0
     # 0x002f - int32u: 0, 1
     0x0030 => 'LensApertureRange', #PH
@@ -186,14 +204,22 @@ $VERSION = '1.04';
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
-    # 0x0033 - string: "3909" to "12337687"
+    0x0033 => { #PH
+        Name => 'ExposureTime2',
+        Writable => 'string',
+        ValueConv => '$val * 1e-6',
+        ValueConvInv => 'int($val * 1e6 + 0.5)',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
     # 0x0034 - int32u: 0,1,2,3 or 4 (possibly AFPoint?)
     0x0035 => { #PH
         Name => 'ExposureCompensation',
         Writable => 'rational64s',
     },
     # 0x0036 - string: "                    "
-    # 0x0037-39 - string: ""
+    # 0x0037-38 - string: ""
+    # 0x0039 - string: "", 24, 28, 31, 33, 34
     0x003a => { #PH (guess!)
         Name => 'FlashExposureComp',
         Writable => 'rational64s',
@@ -224,7 +250,7 @@ Sigma and Foveon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

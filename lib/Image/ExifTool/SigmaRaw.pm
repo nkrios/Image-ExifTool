@@ -111,8 +111,8 @@ sub ProcessX3FProperties($$$);
         PrintConv => {
             SINGLE => 'Single Shot',
             MULTI  => 'Multi Shot',
-            '2S'   => '2-sec Timer',
-            '10S'  => '10-sec Timer',
+            '2S'   => '2 s Timer',
+            '10S'  => '10 s Timer',
             UP     => 'Mirror Up',
             AB     => 'Auto Bracket',
             OFF    => 'Off',
@@ -146,7 +146,7 @@ sub ProcessX3FProperties($$$);
     FLASHTYPE   => 'FlashType', # observed: NONE
     FLENGTH => {
         Name => 'FocalLength',
-        PrintConv => 'sprintf("%.1fmm",$val)',
+        PrintConv => 'sprintf("%.1f mm",$val)',
     },
     FLEQ35MM    => 'FocalLengthIn35mmFormat',
     FOCUS => {
@@ -452,7 +452,7 @@ Sigma and Foveon X3F images.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

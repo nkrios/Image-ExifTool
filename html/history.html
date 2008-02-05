@@ -9,8 +9,213 @@
 <!-- Use line width of 80 -->
 <h1 class='up'>ExifTool Version History</h1>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.00.tar.gz">Version 7.00</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.15.tar.gz">Version 7.15</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
+
+<b>Feb. 5, 2008 - Version 7.15</b> (production release)
+<ul>
+<li>Added a few new CanonModelID's and PentaxModelID's
+<li>Added support for new Pentax K20D/K200D values for some tags
+<li>Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Decode a few new Sigma tags, including PreviewImage
+<li>Decode a few more tags in Canon CRW images (thanks Dave Nicholson)
+<li>Recognize a few more FLV AudioEncoding and VideoEncoding values
+<li>Allow "pseudo" tags to be copied from unrecognized file types
+<li>Made FileModifyDate an "unsafe" tag so it isn't copied unless specified
+<li>Improved Sony ARW parsing (fix some problems and extract more tags)
+<li>Improved handling of timezone when writing EXIF and XMP information (the
+    timezone is now added to XMP date/time values and removed from EXIF
+    date/time values if necessary unless the -n option is used)
+<li>Changed all "sec" units to "s" with a leading space for consistency
+<li>Fixed bug introduced in version 6.91 that could prevent some XMP date/time
+    tags from being written when copying with "-all:all"
+</ul>
+
+<b>Jan. 25, 2008 - Version 7.14</b>
+<ul>
+<li>Added read support for Kodak KDC raw images
+<li>Added ability to read/write Canon OriginalDecisionData in JPEG, CR2 and DNG
+    images
+<li>Added ValueConv translations for some of the new Nikon PictureControl tags
+<li>Decode a number of new Nikon tags (thanks Jens Duttke and Gregor Dorlars)
+<li>Decode Canon CR2Segmentation tag (thanks Laurent Clevy)
+<li>Decode a new Canon CustomFunction of the EOS 450D
+<li>Improved handling of mandatory tags in EXIF information
+<li>Changed all FocalLength print conversions to add a space before "mm"
+<li>Renamed Canon Self-timer tags to SelfTimer for consistency
+<li>Fixed some problem with -htmlDump for some types of trailer information
+<li>Fixed problem which could give a runtime warning when attempting to delete a
+    permanent tag
+</ul>
+
+<b>Jan. 17, 2008 - Version 7.13</b>
+<ul>
+<li>Decode a couple more Nikon and Sony tags
+<li>Decode Windows HD Photo "Padding" tag
+<li>Recognize HDP (Windows HD Photo) file extension
+<li>Designated EXIF CompressedBitsPerPixel and ComponentsConfiguration as
+    "unsafe" tags so they aren't copied by -tagsFromFile by default
+<li>Changed priority of new Nikon D3/D300 ISO tag
+<li>Changed Canon LensType for a Tamron lens (thanks Monica Wallek)
+<li>Fixed incorrect TagID for new Panasonic Sharpness tag
+</ul>
+
+<b>Jan. 15, 2008 - Version 7.12</b>
+<ul>
+<li>Added read support for ITC (iTunes Cover Flow) files
+<li>Added ability to deal with corrupted IPTC written by Nikon Capture NX
+<li>Added a few new Canon LensType's (thanks Steve Balcombe and Laurent Clevy)
+<li>Decode a number of new Nikon D3/D300 tags (thanks Gregor Dorlars)
+<li>Decode a number of new FujiFilm and Panasonic tags and values
+<li>Decode ColorBalance information for the Canon 40D, 1DmkIII and 1DSmkIII
+<li>Improved decoding of Nikon D80 VibrationReduction tag (thanks Jens Duttke)
+<li>Renamed Pentax WBShiftBA and WBShiftGM tags to WBShiftAB and WBShiftMG (now
+    more consistent with Pentax software, but inconsistent with Canon naming)
+<li>Fixed a CanonImageHeight tag which was incorrectly named CanonImageWidth
+</ul>
+
+<b>Jan. 10, 2008 - Version 7.11</b>
+<ul>
+<li>Decode a number of new Canon tags and improved decoding of many old tags
+<li>Renamed EXIF:RelatedImageLength to RelatedImageHeight (hopefully all
+    ImageWidth/Height tag names are now consistent)
+</ul>
+
+<b>Jan. 7, 2008 - Version 7.10</b>
+<ul>
+<li>Added support for escape sequences and continuation comments in EPS files
+<li>Added ability to read/write Sony A700 PreviewImage (tag 0x2001)
+<li>Added a new Sony ColorMode value (thanks Philippe Devaux)
+<li>Decode a number of new Minolta tags
+<li>Improved handling of newlines when writing PDF information
+<li>Improved decoding of Canon 40D and 1DmkIII FocusDistance tags (thanks
+    Wolfgang Hoffmann)
+<li>Fixed problem creating multiple output meta files with some commands
+<li>Fixed problem deleting XMP by value for strings with escaped characters
+<li>Fixed bug when trying to write output image to console with "-o -"
+<li>Fixed problem where %c (copy number) was changed when the new file name
+    should have been the same as the source file
+</ul>
+
+<b>Jan. 3, 2008 - Version 7.09</b>
+<ul>
+<li>Decode Canon ThumbnailImageValidArea
+<li>Improved decoding of some Olympus tags (thanks Frank Ledwon)
+<li>Improved decoding of some Pentax tags (thanks Dave Nicholson)
+<li>Improved error messages when writing PDF files
+<li>Changed XMP-cc namespace URI (spec apparently changed for some reason)
+<li>Changed Photoshop XMLData to a binary data tag
+<li>Changed conversion strings for Canon ModifiedSharpnessFrequency values
+<li>Changed Olympus NoiseReduction "ISO Boost" value back to "Noise Filter (ISO
+    Boost)"
+<li>Fixed minor problem writing PDF cross-reference stream after multiple edits
+<li>Fixed problem redirecting some verbose output to an output text file
+</ul>
+
+<b>Dec. 21, 2007 - Version 7.08</b>
+<ul>
+<li>Added write support for PDF files which use only cross-reference streams
+<li>Added a number of new Olympus tags, and changed names of some existing tags
+<li>Fixed problem decoding some PDF cross-reference streams
+<li>Fixed bug introduced in 7.07 which broke copying between two List-type tags
+</ul>
+
+<b>Dec. 18, 2007 - Version 7.07</b>
+<ul>
+<li>Added ability to write XMP and PDF information to PDF files, with revert
+    capability! (use "-PDF-update:all=" to undo all exiftool edits)
+<li>Added PDF:AppleKeywords tag (written by Apple Preview)
+<li>Added Composite FOV (Field Of View) tag
+<li>Added a few more Minolta/Sony LensID's
+<li>Added new Canon and Pentax LensType's (thanks Magne Nilsen and Jens Duttke)
+<li>Added "Nothing changed" message in verbose mode for files that weren't
+    changed when writing
+<li>Added minor warning when invalid IFD entries are removed during writing (you
+    will get this, for instance, when ExifTool fixes the entry count problem in
+    Canon EOS 40D firmware 1.0.4 maker notes)
+<li>Patched Canon 40D firmware 1.0.4 problem for JPEG images too
+<li>Decode specified "unknown" zero values for four EXIF tags (ExposureProgram,
+    LightSource, MeteringMode and SubjectDistanceRange) instead of handling as a
+    truly unknown value (if this makes sense)
+<li>Extract PreviewImage from newer Panasonic RAW images (thanks Jens Duttke)
+<li>Recognize Pentax-type Kodak maker notes (ie. Easyshare 883)
+<li>Made "Entries out of sequence" a minor warning since this problem is fixed
+<li>Allow decimal seconds to be written in time values without needing to use -n
+<li>Improved parsing of PDF files
+<li>Improved behaviour when copying List-type tags to to non-List tags
+<li>Improved exiftool summary message for files that were copied without changes
+<li>Adjusted Pentax K10D battery percentage calibration
+<li>Changed names of Pentax FirmwareID tags
+<li>Fixed runtime warning that could occur with some invalid tag names
+<li>Fixed problem decoding Pentax:LensCodes for some images (thanks Jens Duttke)
+<li>API Changes:
+    <ul>
+    <li>Also allow File::RandomAccess reference as argument to ImageInfo()
+    </ul>
+</ul>
+
+<b>Dec. 7, 2007 - Version 7.06</b>
+<ul>
+<li>Permanently fix MakerNote offsets with -F option when writing
+<li>A few more Pentax tag improvements (thanks Dave and Jens)
+</ul>
+
+<b>Dec. 6, 2007 - Version 7.05</b>
+<ul>
+<li>Patched problem rewriting Canon 40D CR2 images caused by bug in the 40D
+    firmware 1.0.4 which writes an improperly formatted MakerNote IFD
+<li>More improvements in decoding Pentax K10D tags (thanks Dave Nicholson)
+<li>Translate non-standard XMP namespace prefixes
+<li>Changed a couple of Kodak Meta tags to Binary data type
+<li>Renamed Pentax MeasuredLV to EffectiveLV (thanks Jens Duttke)
+</ul>
+
+<b>Dec. 3, 2007 - Version 7.04</b>
+<ul>
+<li>COMPATIBILITY WARNING: Renamed EXIF:ExifImageLength to ExifImageHeight and
+    XMP:GPSTimeStamp to GPSDateTime
+<li>Added write support Minolta A200 MRW images
+<li>Added read support for Hasselblad 3FR raw images
+<li>Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Added a new Canon LensType (thanks Bogdan)
+<li>Added ability to insert a newline using "$/" in a print format string
+<li>Decode some new FujiFilm and Pentax tags (thanks Jens Duttke)
+<li>Decode some new Pentax and Canon tags (thanks Dave Nicholson)
+<li>Recognize a few new Olympus lenses (thanks Michael Meissner)
+<li>Improved decoding of Sony ARW images and added support for A700
+<li>Improved warnings for HtmlDump option
+<li>Improved string parsing when writing date/time tags
+<li>Fixed problem extracting Canon CRW RGGB values from DNG images
+</ul>
+
+<b>Nov. 17, 2007 - Version 7.03</b>
+<ul>
+<li>Fixed problem deleting XMP family 1 groups from JPEG images
+</ul>
+
+<b>Nov. 16, 2007 - Version 7.02</b>
+<ul>
+<li>Added ability to delete XMP family 1 groups (ie. "-XMP-crss:all=")
+<li>Fixed problem writing XMP as a block to XMP file
+</ul>
+
+<b>Nov. 15, 2007 - Version 7.01</b>
+<ul>
+<li>Added ability to write FujiFilm RAF images (thanks Jens Duttke)
+<li>Added -T option (equivalent to -t -S -q -f)
+<li>Decode a number of new Pentax tags and values (thanks Dave Nicholson)
+<li>Decode a new Canon LensType value (thanks Bogdan)
+<li>Decode the not-so-accurate FocusDistanceUpper and FocusDistanceLower in
+    Canon EOS 1DmkIII and 40D images (thanks Heiko Hinrichs)
+<li>Allow FileSource tag to be assigned values outside the EXIF standard
+<li>Made ImageSourceData a protected tag
+<li>Avoid loading huge binary data blocks into memory unless necessary (avoids
+    out-of-memory problem when processing huge, layered Photoshop TIFF images)
+<li>Improved HtmlDump speed and memory usage by not loading "snipped" data
+<li>Improved decoding of Nikon ShootingMode
+<li>Various improvements and bug fixes when reading FujiFilm RAF information
+<li>Fixed problem decoding CRW images where ImageWidth wasn't extracted with -U
+</ul>
 
 <b>Oct. 23, 2007 - Version 7.00</b> (production release)
 <ul>
@@ -42,6 +247,7 @@ considered development releases, and are not uploaded to <a href="http://search.
 <li>Fixed problem of misleading error messages when attempting to write
     unsupported file formats
 <li>Fixed problem outputting list-type tags with -b option
+<li>Fixed bug where the "image files created" count could miss some files
 <li>Fixed problem where "Error rebuilding maker notes" warning could be issued
     in cases where the maker notes do not need rebuilding
 </ul>
@@ -184,7 +390,7 @@ considered development releases, and are not uploaded to <a href="http://search.
 <li>Added read support for EXIF and IPTC and write support for EXIF, IPTC and
     XMP in JPEG 2000 images
 <li>Added read/write support for Sinar CS1 raw images
-<li>Added read support for Kodak DCR and K25 RAW images
+<li>Added read support for Kodak DCR and K25 raw images
 <li>Added ability to read/write improperly byte-swapped IPTC information
 <li>Added check for infinity value of Casio ObjectDistance
 <li>Added a new Nikon LensID (thanks Bruce Stevens)

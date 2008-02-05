@@ -7,32 +7,35 @@
 #               07/25/05 - P. Harvey Add support for encrypted documents
 #
 # References:   1) http://partners.adobe.com/public/developer/pdf/index_reference.html
-#               2) http://www.cr0.net:8040/code/crypto/rc4/
+#               2) http://search.cpan.org/dist/Crypt-RC4/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::PDF;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.10';
+$VERSION = '1.13';
 
-sub LocateObject($$);
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
 sub ReadToNested($;$);
-sub ProcessDict($$$$;$);
+sub ProcessDict($$$$;$$);
+sub ReadPDFValue($);
+sub CheckPDF($$$);
 
+my $cryptInfo;      # encryption object reference (plus additional information)
+my $lastFetched;    # last fetched object reference (used for decryption)
 my %warnedOnce;     # hash of warnings we issued
 my %streamObjs;     # hash of stream objects
 my %fetched;        # dicts fetched in verbose mode (to avoid cyclical recursion)
-my $lastFetched;    # last fetched object reference (used for decryption)
-my $cryptInfo;      # encryption object reference (plus additional information)
+my $pdfVer;         # version of PDF file being processed
 
 # tags in main PDF directories
 %Image::ExifTool::PDF::Main = (
+    VARS => { CAPTURE => ['Main','Prev'] },
     Info => {
         SubDirectory => {
             TagTable => 'Image::ExifTool::PDF::Info',
@@ -48,37 +51,62 @@ my $cryptInfo;      # encryption object reference (plus additional information)
 # tags in PDF Info directory
 %Image::ExifTool::PDF::Info = (
     GROUPS => { 2 => 'Image' },
+    VARS => { CAPTURE => ['Info'] },
     EXTRACT_UNKNOWN => 1, # extract all unknown tags in this directory
+    WRITE_PROC => \&Image::ExifTool::DummyWriteProc,
+    CHECK_PROC => \&CheckPDF,
+    WRITABLE => 'string',
     NOTES => q{
         As well as the tags listed below, the PDF specification allows for
         user-defined tags to exist in the Info dictionary.  These tags, which should
-        have corresponding XMP-pdfx entries in the PDF Metadata, are also extracted
-        by ExifTool.
+        have corresponding XMP-pdfx entries in the XMP of the PDF XML Metadata
+        object, are also extracted by ExifTool.
+
+        B<Writable> specifies the value format, and may be C<string>, C<date>,
+        C<integer>, C<real>, C<boolean> or C<name> for PDF tags.
     },
     Title       => { },
     Author      => { Groups => { 2 => 'Author' } },
     Subject     => { },
-    Keywords    => { List => 1 },  # this is a list of tokens
+    Keywords    => { List => 'string' },  # this is a string list
     Creator     => { },
     Producer    => { },
     CreationDate => {
         Name => 'CreateDate',
+        Writable => 'date',
         Groups => { 2 => 'Time' },
-        ValueConv => 'Image::ExifTool::PDF::ConvertPDFDate($self, $val)',
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)', 
     },
     ModDate => {
         Name => 'ModifyDate',
+        Writable => 'date',
         Groups => { 2 => 'Time' },
-        ValueConv => 'Image::ExifTool::PDF::ConvertPDFDate($self, $val)',
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)', 
     },
     Trapped => {
+        Writable => 0,
         # remove leading '/' from '/True' or '/False'
         ValueConv => '$val=~s{^/}{}; $val',
+        ValueConvInv => '"/$val"',
+    },
+    'AAPL:Keywords' => { #PH
+        Name => 'AppleKeywords',
+        List => 'array', # this is an array of values
+        Notes => q{
+            keywords written by Apple utilities, although they seem to use PDF:Keywords
+            when reading
+        },
     },
 );
 
 # tags in the PDF Root document catalog
 %Image::ExifTool::PDF::Root = (
+    # note: can't capture previous versions of Root since they are not parsed
+    VARS => { CAPTURE => ['Root'] },
     NOTES => 'This is the PDF document catalog.',
     Metadata => {
         SubDirectory => {
@@ -90,6 +118,7 @@ my $cryptInfo;      # encryption object reference (plus additional information)
             TagTable => 'Image::ExifTool::PDF::Pages',
         },
     },
+    Version => 'PDFVersion',
 );
 
 # tags in PDF Pages directory
@@ -151,7 +180,7 @@ my $cryptInfo;      # encryption object reference (plus additional information)
 
 # tags in PDF ICCBased directory
 %Image::ExifTool::PDF::ICCBased = (
-    stream => {
+    _stream => {
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
         },
@@ -187,7 +216,7 @@ my $cryptInfo;      # encryption object reference (plus additional information)
 
 # tags in PDF ImageResources directory
 %Image::ExifTool::PDF::ImageResources = (
-    stream => {
+    _stream => {
         SubDirectory => {
             TagTable => 'Image::ExifTool::Photoshop::Main',
         },
@@ -211,6 +240,14 @@ my $cryptInfo;      # encryption object reference (plus additional information)
 );
 
 #------------------------------------------------------------------------------
+# AutoLoad our writer routines when necessary
+#
+sub AUTOLOAD
+{
+    return Image::ExifTool::DoAutoLoad($AUTOLOAD, @_);
+}
+
+#------------------------------------------------------------------------------
 # Issue one warning of each type
 # Inputs: 0) ExifTool object reference, 1) warning
 sub WarnOnce($$)
@@ -223,24 +260,12 @@ sub WarnOnce($$)
 }
 
 #------------------------------------------------------------------------------
-# Set PDF format error warning
-# Inputs: 0) ExifTool object reference, 1) error string
-# Returns: 1
-sub PDFErr($$)
-{
-    my ($exifTool, $str) = @_;
-    $exifTool->Warn("PDF format error ($str)");
-    return 1;
-}
-
-#------------------------------------------------------------------------------
 # Convert from PDF to EXIF-style date/time
-# Inputs: 0) ExifTool object reference,
-#         1) PDF date/time string (D:yyyymmddhhmmss+hh'mm')
+# Inputs: 0) PDF date/time string (D:yyyymmddhhmmss+hh'mm')
 # Returns: EXIF date string (yyyy:mm:dd hh:mm:ss+hh:mm)
-sub ConvertPDFDate($$)
+sub ConvertPDFDate($)
 {
-    my ($exifTool, $date) = @_;
+    my $date = shift;
     # remove optional 'D:' prefix
     $date =~ s/^D://;
     # fill in default values if necessary
@@ -256,21 +281,24 @@ sub ConvertPDFDate($$)
         $date .= $t[0];
         $date .= ':' . ($t[1] || 0) if $t[0] ne 'Z';
     }
-    return $exifTool->ConvertDateTime($date);
+    return $date;
 }
 
 #------------------------------------------------------------------------------
-# Locate an object in the XRref tables
-# Inputs: 0) XRef reference, 1) object reference string
-# Returns: offset to object in file, or undefined on error
-sub LocateObject($$)
+# Locate any object in the XRef tables (including compressed objects)
+# Inputs: 0) XRef reference, 1) object reference string (or free object number)
+# Returns: offset to object in file or compressed object reference string,
+#          0 if object is free, or undefined on error
+sub LocateAnyObject($$)
 {
     my ($xref, $ref) = @_;
     return undef unless $xref;
-    return $$xref{$ref} if $$xref{$ref};
+    return $$xref{$ref} if exists $$xref{$ref};
     # get the object number
     return undef unless $ref =~ /^(\d+)/;
     my $objNum = $1;
+    # return 0 if the object number has been reused (old object is free)
+    return 0 if defined $$xref{$objNum};
 #
 # scan our XRef stream dictionaries for this object
 #
@@ -282,7 +310,7 @@ sub LocateObject($$)
         my $index = $$dict{Index};
         next if $objNum < $$index[0];
         # scan the tables for the specified object
-        my $size = $$dict{entry_size};
+        my $size = $$dict{_entry_size};
         my $num = scalar(@$index) / 2;
         my $tot = 0;
         my $i;
@@ -290,14 +318,14 @@ sub LocateObject($$)
             my $start = $$index[$i*2];
             my $count = $$index[$i*2+1];
             # table is in ascending order, so quit if we have passed the object
-            last if $objNum >= $start + $count;
-            if ($objNum >= $start) {
+            last if $objNum < $start;
+            if ($objNum < $start + $count) {
                 my $offset = $size * ($objNum - $start + $tot);
-                last if $offset + $size > length $$dict{stream};
-                my @c = unpack("x$offset C$size", $$dict{stream});
+                last if $offset + $size > length $$dict{_stream};
+                my @c = unpack("x$offset C$size", $$dict{_stream});
                 # extract values from this table entry
                 # (can be 1, 2, 3, 4, etc.. bytes per value)
-                my (@t, $j, $k, $ref2);
+                my (@t, $j, $k);
                 my $w = $$dict{W};
                 for ($j=0; $j<3; ++$j) {
                     # use default value if W entry is 0 (as per spec)
@@ -307,21 +335,29 @@ sub LocateObject($$)
                         $t[$j] = 256 * $t[$j] + shift(@c);
                     }
                 }
+                # by default, use "o g R" as the xref key
+                # (o = object number, g = generation number)
+                my $ref2 = "$objNum $t[2] R";
                 if ($t[0] == 1) {
-                    # normal object reference: use "o g R" as hash ref
-                    # (o = object number, g = generation number)
-                    $ref2 = "$objNum $t[2] R";
-                    # xref is offset of object from start
+                    # normal object reference:
+                    # $t[1]=offset of object from start, $t[2]=generation number
                     $$xref{$ref2} = $t[1];
                 } elsif ($t[0] == 2) {
                     # compressed object reference:
+                    # $t[1]=stream object number, $t[2]=index of object in stream
                     $ref2 = "$objNum 0 R";
-                    # xref is object index and stream object reference
                     $$xref{$ref2} = "I$t[2] $t[1] 0 R";
+                } elsif ($t[0] == 0) {
+                    # free object:
+                    # $t[1]=next free object in linked list, $t[2]=generation number
+                    $$xref{$ref2} = 0;
                 } else {
-                    last;
+                    # treat as a null object
+                    $$xref{$ref2} = undef;
                 }
+                $$xref{$objNum} = $t[1];    # remember offsets by object number too
                 return $$xref{$ref} if $ref eq $ref2;
+                return 0;   # object is free or was reused
             }
             $tot += $count;
         }
@@ -330,16 +366,30 @@ sub LocateObject($$)
 }
 
 #------------------------------------------------------------------------------
+# Locate a regular object in the XRef tables (does not include compressed objects)
+# Inputs: 0) XRef reference, 1) object reference string (or free object number)
+# Returns: offset to object in file, 0 if object is free,
+#          or undef on error or if object was compressed
+sub LocateObject($$)
+{
+    my ($xref, $ref) = @_;
+    my $offset = LocateAnyObject($xref, $ref);
+    return undef if $offset and $offset =~ /^I/;
+    return $offset;
+}
+
+#------------------------------------------------------------------------------
 # Fetch indirect object from file (from inside a stream if required)
-# Inputs: 0) ExifTool object reference, 1) object reference string, 2) xref lookup,
+# Inputs: 0) ExifTool object reference, 1) object reference string,
+#         2) xref lookup, 3) object name (for warning messages)
 # Returns: object data or undefined on error
 sub FetchObject($$$$)
 {
     my ($exifTool, $ref, $xref, $tag) = @_;
     $lastFetched = $ref;    # save this for decoding if necessary
-    my $offset = LocateObject($xref, $ref);
+    my $offset = LocateAnyObject($xref, $ref);
     unless ($offset) {
-        $exifTool->Warn("Bad $tag reference");
+        $exifTool->Warn("Bad $tag reference") unless defined $offset;
         return undef;
     }
     my ($data, $obj);
@@ -347,7 +397,7 @@ sub FetchObject($$$$)
         my $index = $1; # object index in stream
         my ($objNum) = split ' ', $ref; # save original object number
         $ref = $offset; # now a reference to the containing stream object
-        my $obj = $streamObjs{$ref};
+        $obj = $streamObjs{$ref};
         unless ($obj) {
             # don't try to load the same object stream twice
             return undef if defined $obj;
@@ -358,21 +408,21 @@ sub FetchObject($$$$)
             return undef unless defined $obj and ref($obj) eq 'HASH';
             return undef unless $$obj{First} and $$obj{N};
             return undef unless DecodeStream($exifTool, $obj);
-            # add a special 'table' entry to this dictionary which contains
+            # add a special '_table' entry to this dictionary which contains
             # the list of object number/offset pairs from the stream header
             my $num = $$obj{N} * 2;
-            my @table = split ' ', $$obj{stream}, $num;
+            my @table = split ' ', $$obj{_stream}, $num;
             return undef unless @table == $num;
             # remove everything before first object in stream
-            $$obj{stream} = substr($$obj{stream}, $$obj{First});
+            $$obj{_stream} = substr($$obj{_stream}, $$obj{First});
             $table[$num-1] =~ s/^(\d+).*/$1/;  # trim excess from last number
-            $$obj{table} = \@table;
+            $$obj{_table} = \@table;
             # save the object stream so we don't have to re-load it later
             $streamObjs{$ref} = $obj;
         }
         # verify that we have the specified object
         my $i = 2 * $index;
-        my $table = $$obj{table};
+        my $table = $$obj{_table};
         unless ($index < $$obj{N} and $$table[$i] == $objNum) {
             $exifTool->Warn("Bad index for stream object $tag");
             return undef;
@@ -381,8 +431,8 @@ sub FetchObject($$$$)
         # (offsets in table are in sequential order, so we can subract from
         #  the next offset to get the object length)
         $offset = $$table[$i + 1];
-        my $len = ($$table[$i + 3] || length($$obj{stream})) - $offset;
-        $data = substr($$obj{stream}, $offset, $len);
+        my $len = ($$table[$i + 3] || length($$obj{_stream})) - $offset;
+        $data = substr($$obj{_stream}, $offset, $len);
         return ExtractObject($exifTool, \$data);
     }
     my $raf = $exifTool->{RAF};
@@ -398,6 +448,66 @@ sub FetchObject($$$$)
 }
 
 #------------------------------------------------------------------------------
+# Convert PDF value to something readable
+# Inputs: 0) PDF object data
+# Returns: converted object
+sub ReadPDFValue($)
+{
+    my $str = shift;
+    # decode all strings in an array
+    if (ref $str eq 'ARRAY') {
+        # create new list to not alter the original data when rewriting
+        my ($val, @vals);
+        foreach $val (@$str) {
+            push @vals, ReadPDFValue($val);
+        }
+        return \@vals;
+    }
+    length $str or return $str;
+    my $delim = substr($str, 0, 1);
+    if ($delim eq '(') {    # literal string
+        $str = $1 if $str =~ /.*?\((.*)\)/s;    # remove brackets
+        # decode escape sequences in literal strings
+        while ($str =~ /\\(.)/sg) {
+            my $n = pos($str) - 2;
+            my $c = $1;
+            my $r;
+            if ($c =~ /[0-7]/) {
+                # get up to 2 more octal digits
+                $c .= $1 if $str =~ /\G([0-7]{1,2})/g;
+                # convert octal escape code
+                $r = chr(oct($c) & 0xff);
+            } elsif ($c eq "\x0d") {
+                # the string is continued if the line ends with '\'
+                # (also remove "\x0d\x0a")
+                $c .= $1 if $str =~ /\G(\x0a)/g;
+                $r = '';
+            } elsif ($c eq "\x0a") {
+                $r = '';
+            } else {
+                # convert escaped characters
+                ($r = $c) =~ tr/nrtbf/\n\r\t\b\f/;
+            }
+            substr($str, $n, length($c)+1) = $r;
+            # continue search after this character
+            pos($str) = $n + length($r);
+        }
+        Crypt(\$str, $lastFetched) if $cryptInfo;
+    } elsif ($delim eq '<') {   # hex string
+        # decode hex data
+        $str =~ tr/0-9A-Fa-f//dc;
+        $str .= '0' if length($str) & 0x01; # (by the spec)
+        $str = pack('H*', $str);
+        Crypt(\$str, $lastFetched) if $cryptInfo;
+    } elsif ($delim eq '/') {   # name
+        $str = substr($str, 1);
+        # convert escape codes (PDF 1.2 or later)
+        $str =~ s/#([0-9a-f]{2})/chr(hex($1))/sgei if $pdfVer >= 1.2;
+    }
+    return $str;
+}
+
+#------------------------------------------------------------------------------
 # Extract PDF object from combination of buffered data and file
 # Inputs: 0) ExifTool object reference, 1) data reference,
 #         2) optional raf reference, 3) optional xref table
@@ -407,8 +517,8 @@ sub FetchObject($$$$)
 #          c) indirect reference --> scalar reference
 #          d) string, name, integer, boolean, null --> scalar value
 # - updates $$dataPt on return to contain unused data
-# - creates two bogus entries ('stream' and 'tags') in dictionaries to represent
-#   the stream data and a list of the tags (not including 'stream' and 'tags')
+# - creates two bogus entries ('_stream' and '_tags') in dictionaries to represent
+#   the stream data and a list of the tags (not including '_stream' and '_tags')
 #   in their original order
 sub ExtractObject($$;$$)
 {
@@ -418,18 +528,18 @@ sub ExtractObject($$;$$)
     my $delim;
 
     for (;;) {
-        if ($$dataPt =~ /^\s*(<{1,2}|\[|\()/) {
+        if ($$dataPt =~ /^\s*(<{1,2}|\[|\()/s) {
             $delim = $1;
             $objData = ReadToNested($dataPt, $raf);
             return undef unless defined $objData;
             last;
-        } elsif ($$dataPt =~ s{^\s*(\S[^[(/<>\s]*)\s*}{}) {
+        } elsif ($$dataPt =~ s{^\s*(\S[^[(/<>\s]*)\s*}{}s) {
 #
 # extract boolean, numerical, string, name, null object or indirect reference
 #
             $objData = $1;
             # look for an indirect reference
-            if ($objData =~ /^\d+$/ and $$dataPt =~ s/^(\d+)\s+R//) {
+            if ($objData =~ /^\d+$/ and $$dataPt =~ s/^(\d+)\s+R//s) {
                 $objData .= "$1 R";
                 $objData = \$objData;   # return scalar reference
             }
@@ -439,59 +549,16 @@ sub ExtractObject($$;$$)
         $$dataPt .= $data;
     }
 #
-# extract literal string
+# return literal string or hex string without parsing
 #
-    if ($delim eq '(') {
-        $objData = $1 if $objData =~ /.*?\((.*)\)/s;    # remove brackets
-        # decode escape sequences in literal strings
-        while ($objData =~ /\\(.)/sg) {
-            my $n = pos($objData) - 2;
-            my $c = $1;
-            my $r;
-            if ($c =~ /[0-7]/) {
-                # get up to 2 more octal digits
-                $c .= $1 if $objData =~ /\G([0-7]{1,2})/g;
-                # convert octal escape code
-                $r = chr(oct($c) & 0xff);
-            } elsif ($c eq "\x0d") {
-                # the string is continued if the line ends with '\'
-                # (also remove "\x0d\x0a")
-                $c .= $1 if $objData =~ /\G(\x0a)/g;
-                $r = '';
-            } elsif ($c eq "\x0a") {
-                # (also remove "\x0a\x0d")
-                $c .= $1 if $objData =~ /\G(\x0d)/g;
-                $r = '';
-            } else {
-                # convert escaped characters
-                ($r = $c) =~ tr/nrtbf/\n\r\t\b\f/;
-            }
-            substr($objData, $n, length($c)+1) = $r;
-            # contine search after this character
-            pos($objData) = $n + length($r);
-        }
-        Decrypt(\$objData) if $cryptInfo;
-        # convert from UTF-16 (big endian) to UTF-8 or Latin if necessary
-        if ($objData =~ s/^\xfe\xff//) {
-            $objData = $exifTool->Unicode2Charset($objData, 'MM');
-        }
-        return $objData;
-#
-# extract hex string
-#
-    } elsif ($delim eq '<') {
-        # decode hex data
-        $objData =~ tr/0-9A-Fa-f//dc;
-        $objData .= '0' if length($objData) & 0x01; # (by the spec)
-        $objData = pack('H*', $objData);
-        Decrypt(\$objData) if $cryptInfo;
+    if ($delim eq '(' or $delim eq '<') {
         return $objData;
 #
 # extract array
 #
     } elsif ($delim eq '[') {
-        $objData =~ /.*?\[(.*)\]/s or return;    # remove brackets
-        my $data = $1;
+        $objData =~ /.*?\[(.*)\]/s or return;
+        my $data = $1;    # brackets removed
         my @list;
         for (;;) {
             last unless $data =~ m{\s*(\S[^[(/<>\s]*)}sg;
@@ -535,7 +602,7 @@ sub ExtractObject($$;$$)
             pos($objData) = 0;
         } elsif ($val =~ /^\d/) {
             my $pos = pos($objData);
-            if ($objData =~ /\G\s+(\d+)\s+R/g) {
+            if ($objData =~ /\G\s+(\d+)\s+R/sg) {
                 $val = \ "$val $1 R";   # make a reference
             } else {
                 pos($objData) = $pos;
@@ -543,7 +610,7 @@ sub ExtractObject($$;$$)
         }
         if ($$dict{$tag}) {
             # duplicate dictionary entries are not allowed
-            $exifTool->Warn("Duplicate $tag entry in dictionary (ignored)");
+            $exifTool->Warn('Duplicate $tag entry in dictionary (ignored)');
         } else {
             # save the entry
             push @tags, $tag;
@@ -551,7 +618,7 @@ sub ExtractObject($$;$$)
         }
     }
     return undef unless @tags;
-    $$dict{tags} = \@tags;
+    $$dict{_tags} = \@tags;
     return $dict unless $raf;   # direct objects can not have streams
 #
 # extract the stream object
@@ -562,17 +629,19 @@ sub ExtractObject($$;$$)
         $length = $$length;
         my $oldpos = $raf->Tell();
         # get the location of the object specifying the length
+        # (compressed objects are not allowd)
         my $offset = LocateObject($xref, $length) or return $dict;
-        $raf->Seek($offset, 0) or $exifTool->Warn("Bad Length offset"), return $dict;
+        $offset or $exifTool->Warn('Bad Length object'), return $dict;
+        $raf->Seek($offset, 0) or $exifTool->Warn('Bad Length offset'), return $dict;
         # verify that we are reading the expected object
-        $raf->ReadLine($data) or $exifTool->Warn("Error reading Length data"), return $dict;
+        $raf->ReadLine($data) or $exifTool->Warn('Error reading Length data'), return $dict;
         $length =~ s/R/obj/;
         unless ($data =~ /^$length/) {
             $exifTool->Warn("Length object ($length) not found at $offset");
             return $dict;
         }
-        $raf->ReadLine($data) or $exifTool->Warn("Error reading stream Length"), return $dict;
-        $data =~ /(\d+)/ or $exifTool->Warn("Stream length not found"), return $dict;
+        $raf->ReadLine($data) or $exifTool->Warn('Error reading stream Length'), return $dict;
+        $data =~ /(\d+)/ or $exifTool->Warn('Stream length not found'), return $dict;
         $length = $1;
         $raf->Seek($oldpos, 0); # restore position to start of stream
     }
@@ -584,21 +653,21 @@ sub ExtractObject($$;$$)
             # read an extra line because it may contain our \x0a
             $$dataPt .= $data if $raf->ReadLine($data);
             # remove our stream header
-            $$dataPt =~ s/^.*stream(\x0a|\x0d\x0a)//s;
+            $$dataPt =~ s/^\s*stream(\x0a|\x0d\x0a)//s;
             my $more = $length - length($$dataPt);
             if ($more > 0) {
                 unless ($raf->Read($data, $more) == $more) {
-                    $exifTool->Warn("Error reading stream data");
+                    $exifTool->Warn('Error reading stream data');
                     $$dataPt = '';
                     return $dict;
                 }
-                $$dict{stream} = $$dataPt . $data;
+                $$dict{_stream} = $$dataPt . $data;
                 $$dataPt = '';
             } elsif ($more < 0) {
-                $$dict{stream} = substr($$dataPt, 0, $length);
+                $$dict{_stream} = substr($$dataPt, 0, $length);
                 $$dataPt = substr($$dataPt, $length);
             } else {
-                $$dict{stream} = $$dataPt;
+                $$dict{_stream} = $$dataPt;
                 $$dataPt = '';
             }
             last;
@@ -681,31 +750,29 @@ sub DecodeStream($$)
 {
     my ($exifTool, $dict) = @_;
 
-    return 0 unless $$dict{stream}; # no stream to decode
+    return 0 unless $$dict{_stream}; # no stream to decode
     # apply decryption first if required
-    if ($cryptInfo and not $$dict{decrypted}) {
-        $$dict{decrypted} = 1;
-        if ($$cryptInfo{meta} or ($$dict{Type} and $$dict{Type} ne '/Metadata')) {
-            Decrypt(\$$dict{stream});
-        }
+    if ($cryptInfo and not $$dict{_decrypted}) {
+        $$dict{_decrypted} = 1;
+        CryptStream($dict, $lastFetched);
     }
     return 1 unless $$dict{Filter};
     if ($$dict{Filter} eq '/FlateDecode') {
         if (eval 'require Compress::Zlib') {
             my $inflate = Compress::Zlib::inflateInit();
             my ($buff, $stat);
-            $inflate and ($buff, $stat) = $inflate->inflate($$dict{stream});
+            $inflate and ($buff, $stat) = $inflate->inflate($$dict{_stream});
             if ($inflate and $stat == Compress::Zlib::Z_STREAM_END()) {
-                $$dict{stream} = $buff;
+                $$dict{_stream} = $buff;
                 # move Filter to prevent double decoding
-                $$dict{oldFilter} = $$dict{Filter};
+                $$dict{_oldFilter} = $$dict{Filter};
                 $$dict{Filter} = '';
             } else {
                 $exifTool->Warn('Error inflating stream');
                 return 0;
             }
         } else {
-            WarnOnce($exifTool,'Install Compress::Zlib to decode filtered streams');
+            WarnOnce($exifTool,'Install Compress::Zlib to process filtered streams');
             return 0;
         }
 #
@@ -725,12 +792,12 @@ sub DecodeStream($$)
             WarnOnce($exifTool,'No Columns for decoding stream');
             return 0;
         }
-        my @bytes = unpack('C*', $$dict{stream});
+        my @bytes = unpack('C*', $$dict{_stream});
         my @pre = (0) x $cols;  # initialize predictor array
         my $buff = '';
         while (@bytes > $cols) {
             unless (($_ = shift @bytes) == 2) {
-                WarnOnce($exifTool, "Unsupported PNG filter $_");
+                WarnOnce($exifTool, "Unsupported PNG filter $_"); # (yes, PNG)
                 return 0;
             }
             foreach (@pre) {
@@ -738,7 +805,7 @@ sub DecodeStream($$)
             }
             $buff .= pack('C*', @pre);
         }
-        $$dict{stream} = $buff;
+        $$dict{_stream} = $buff;
     } else {
         WarnOnce($exifTool, "Unsupported Filter $$dict{Filter}");
         return 0;
@@ -820,12 +887,13 @@ sub DecryptInit($$$)
     }
     $id or return "Can't decrypt (no document ID)";
     unless (eval 'require Digest::MD5') {
-        return 'Install Digest::MD5 to extract encrypted information';
+        return 'Install Digest::MD5 to process encrypted PDF';
     }
     # calculate file-level en/decryption key
     my $pad = "\x28\xBF\x4E\x5E\x4E\x75\x8A\x41\x64\x00\x4E\x56\xFF\xFA\x01\x08".
               "\x2E\x2E\x00\xB6\xD0\x68\x3E\x80\x2F\x0C\xA9\xFE\x64\x53\x69\x7A";
-    my $key = $pad . $$encrypt{O} . pack('V', $$encrypt{P}) . $id;
+    my $o = ReadPDFValue($$encrypt{O});
+    my $key = $pad . $o . pack('V', $$encrypt{P}) . $id;
     my $rep = 1;
     $$encrypt{meta} = 1; # set flag that Metadata is encrypted
     if ($rev >= 3) {
@@ -848,6 +916,7 @@ sub DecryptInit($$$)
         $key = substr(Digest::MD5::md5($key), 0, $len);
     }
     # decrypt U to see if a user password is required
+    my $u = ReadPDFValue($$encrypt{U});
     my $dat;
     if ($rev >= 3) {
         $dat = Digest::MD5::md5($pad . $id);
@@ -857,26 +926,27 @@ sub DecryptInit($$$)
             foreach (@key) { $_ ^= $i; }
             RC4Crypt(\$dat, pack('C*', @key));
         }
-        $dat .= substr($$encrypt{U}, 16);
+        $dat .= substr($u, 16);
     } else {
         $dat = $pad;
         RC4Crypt(\$dat, $key);
     }
-    $dat eq $$encrypt{U} or return 'Document is password encrypted';
+    $dat eq $u or return 'Document is password encrypted';
     $$encrypt{key} = $key;  # save the file-level encryption key
     $cryptInfo = $encrypt;  # save a reference to the Encrypt object
     return undef;           # success!
 }
 
 #------------------------------------------------------------------------------
-# Decrypt data
-# Inputs: 0) data reference
-sub Decrypt($)
+# Decrypt/Encrypt data
+# Inputs: 0) data ref, 1) PDF object reference to use as crypt key extension
+sub Crypt($$)
 {
-    my $dataPt = shift;
+    return unless $cryptInfo;
+    my ($dataPt, $keyExt) = @_;
     my $key = $$cryptInfo{key};
     my $len = length($key) + 5;
-    return unless $lastFetched =~ /^(I\d+ )?(\d+) (\d+)/;
+    return unless $keyExt =~ /^(I\d+ )?(\d+) (\d+)/;
     $key .= substr(pack('V', $2), 0, 3) . substr(pack('V', $3), 0, 2);
     $len = 16 if $len > 16;
     $key = substr(Digest::MD5::md5($key), 0, $len);
@@ -884,15 +954,28 @@ sub Decrypt($)
 }
 
 #------------------------------------------------------------------------------
+# Decrypt/Encrypt stream data
+# Inputs: 0) dictionary ref, 1) PDF object reference to use as crypt key extension
+sub CryptStream($$)
+{
+    my ($dict, $keyExt) = @_;
+    my $type = $$dict{Type} || '';
+    # XRef streams are not encrypted, and Metadata may or may not be encrypted
+    if ($type ne '/XRef' and ($$cryptInfo{meta} or $type ne '/Metadata')) {
+        Crypt(\$$dict{_stream}, $keyExt);
+    }
+}
+
+#------------------------------------------------------------------------------
 # Process PDF dictionary extract tag values
 # Inputs: 0) ExifTool object reference, 1) tag table reference
 #         2) dictionary reference, 3) cross-reference table reference,
-#         4) nesting depth
-sub ProcessDict($$$$;$)
+#         4) nesting depth, 5) dictionary capture type
+sub ProcessDict($$$$;$$)
 {
-    my ($exifTool, $tagTablePtr, $dict, $xref, $nesting) = @_;
+    my ($exifTool, $tagTablePtr, $dict, $xref, $nesting, $type) = @_;
     my $verbose = $exifTool->Options('Verbose');
-    my @tags = @{$$dict{tags}};
+    my @tags = @{$$dict{_tags}};
     my $index = 0;
     my $next;
 
@@ -900,6 +983,19 @@ sub ProcessDict($$$$;$)
     if ($nesting > 50) {
         WarnOnce($exifTool, 'Nesting too deep (directory ignored)');
         return;
+    }
+    # save entire dictionary for rewriting if specified
+    if ($$exifTool{PDF_CAPTURE} and $$tagTablePtr{VARS} and
+        $tagTablePtr->{VARS}->{CAPTURE})
+    {
+        my $name;
+        foreach $name (@{$tagTablePtr->{VARS}->{CAPTURE}}) {
+            next if $exifTool->{PDF_CAPTURE}->{$name};
+            # make sure we load the right type if indicated
+            next if $type and $type ne $name;
+            $exifTool->{PDF_CAPTURE}->{$name} = $dict;
+            last;
+        }
     }
 #
 # extract information from all tags in the dictionary
@@ -977,24 +1073,36 @@ sub ProcessDict($$$$;$)
         unless ($tagInfo) {
             # add any tag found in Info directory to table
             next unless $$tagTablePtr{EXTRACT_UNKNOWN};
-            $tagInfo = { Name => $tag };
+            my $name = $tag;
+            $name =~ s/[^-\w]/_/g;  # translate invalid characters in tag name
+            $tagInfo = { Name => $name };
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         unless ($$tagInfo{SubDirectory}) {
+            $val = ReadPDFValue($val);
+            my $format = $$tagInfo{Format} || $$tagInfo{Writable} || 'string';
+            $val = ConvertPDFDate($val) if $format eq 'date';
             # convert from UTF-16 (big endian) to UTF-8 or Latin if necessary
             # unless this is binary data (hex-encoded strings would not have been converted)
-            if ($val =~ s/^\xfe\xff// and not $$tagInfo{Binary}) {
-                $val = $exifTool->Unicode2Charset($val, 'MM');
-            }
-            if ($$tagInfo{List}) {
-                # separate tokens in comma or whitespace delimited lists
-                my @values = ($val =~ /,/) ? split /,+\s*/, $val : split ' ', $val;
-                foreach $val (@values) {
-                    $exifTool->FoundTag($tagInfo, $val);
+            if (ref $val) {
+                my $v;
+                foreach $v (@$val) {
+                    $exifTool->FoundTag($tagInfo, $v);
                 }
             } else {
-                # a tag value
-                $exifTool->FoundTag($tagInfo, $val);
+                if ($val =~ s/^\xfe\xff// and not $$tagInfo{Binary}) {
+                    $val = $exifTool->Unicode2Charset($val, 'MM');
+                }
+                if ($$tagInfo{List}) {
+                    # separate tokens in comma or whitespace delimited lists
+                    my @values = ($val =~ /,/) ? split /,+\s*/, $val : split ' ', $val;
+                    foreach $val (@values) {
+                        $exifTool->FoundTag($tagInfo, $val);
+                    }
+                } else {
+                    # a simple tag value
+                    $exifTool->FoundTag($tagInfo, $val);
+                }
             }
             next;
         }
@@ -1009,6 +1117,8 @@ sub ProcessDict($$$$;$)
         for (;;) {
             my $subDict = shift @subDicts or last;
             if (ref $subDict eq 'SCALAR') {
+                # only fetch once (other copies are obsolete)
+                next if $fetched{$$subDict};
                 # load dictionary via an indirect reference
                 $fetched{$$subDict} = 1;
                 $subDict = FetchObject($exifTool, $$subDict, $xref, $tag);
@@ -1017,11 +1127,11 @@ sub ProcessDict($$$$;$)
             if (ref $subDict eq 'ARRAY') {
                 # convert array of key/value pairs to a hash
                 next if @$subDict < 2;
-                my %hash = ( tags => [] );
+                my %hash = ( _tags => [] );
                 while (@$subDict >= 2) {
                     my $key = shift @$subDict;
                     $key =~ s/^\///;
-                    push @{$hash{tags}}, $key;
+                    push @{$hash{_tags}}, $key;
                     $hash{$key} = shift @$subDict;
                 }
                 $subDict = \%hash;
@@ -1037,14 +1147,14 @@ sub ProcessDict($$$$;$)
                 $index = 0;
                 $tagTablePtr = $subTablePtr;
                 $dict = $subDict;
-                @tags = @{$$subDict{tags}};
+                @tags = @{$$subDict{_tags}};
                 $exifTool->VerboseDir($tag, scalar(@tags));
             } else {
                 my $oldIndent = $exifTool->{INDENT};
                 my $oldDir = $exifTool->{DIR_NAME};
                 $exifTool->{INDENT} .= '| ';
                 $exifTool->{DIR_NAME} = $tag;
-                $exifTool->VerboseDir($tag, scalar(@{$$subDict{tags}}));
+                $exifTool->VerboseDir($tag, scalar(@{$$subDict{_tags}}));
                 ProcessDict($exifTool, $subTablePtr, $subDict, $xref, $nesting);
                 $exifTool->{INDENT} = $oldIndent;
                 $exifTool->{DIR_NAME} = $oldDir;
@@ -1052,23 +1162,23 @@ sub ProcessDict($$$$;$)
         }
     }
 #
-# extract information from stream object if it exists
+# extract information from stream object if it exists (ie. Metadata stream)
 #
-    return unless $$dict{stream};
-    my $tag = 'stream';
+    return unless $$dict{_stream};
+    my $tag = '_stream';
     # add Subtype (if it exists) to stream name and remove leading '/'
-    ($tag = "$$dict{Subtype}_$tag") =~ s/^\/// if $$dict{Subtype};
+    ($tag = $$dict{Subtype} . $tag) =~ s/^\/// if $$dict{Subtype};
     return unless $$tagTablePtr{$tag};
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
     # decode stream if necessary
     DecodeStream($exifTool, $dict) or return;
     # extract information from stream
     my %dirInfo = (
-        DataPt => \$$dict{stream},
-        DataLen => length $$dict{stream},
+        DataPt   => \$$dict{_stream},
+        DataLen  => length $$dict{_stream},
         DirStart => 0,
-        DirLen => length $$dict{stream},
-        Parent => 'PDF',
+        DirLen   => length $$dict{_stream},
+        Parent   => 'PDF',
     );
     my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
     unless ($exifTool->ProcessDirectory(\%dirInfo, $subTablePtr)) {
@@ -1085,14 +1195,19 @@ sub ReadPDF($$)
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my $verbose = $exifTool->Options('Verbose');
-    my ($data, $encrypt, $id);
+    my ($buff, $encrypt, $id);
 #
 # validate PDF file
 #
-    $raf->Read($data, 4) == 4 or return 0;
-    $data eq '%PDF' or return 0;
+    $raf->Read($buff, 10) >= 8 or return 0;
+    $buff =~ /^%PDF-(\d+\.\d+)/ or return 0;
+    $pdfVer = $1;
     $exifTool->SetFileType();   # set the FileType tag
-    my $tagTablePtr = GetTagTable('Image::ExifTool::PDF::Main');
+    $exifTool->Warn("May not be able to read a PDF version $pdfVer file") if $pdfVer >= 2.0;
+    # store PDFVersion tag
+    my $tagTablePtr = GetTagTable('Image::ExifTool::PDF::Root');
+    $exifTool->FoundTag($exifTool->GetTagInfo($tagTablePtr, 'Version'), $pdfVer);
+    $tagTablePtr = GetTagTable('Image::ExifTool::PDF::Main');
 #
 # read the xref tables referenced from startxref at the end of the file
 #
@@ -1102,45 +1217,70 @@ sub ReadPDF($$)
     my $len = $raf->Tell();
     $len = 1024 if $len > 1024;
     $raf->Seek(-$len, 2) or return -2;
-    $raf->Read($data, $len) == $len or return -3;
-    $data =~ /.*startxref(\x0d\x0a|\x0a\x0a|\x0d|\x0a)(\d+)\1%%EOF/s or return -4;
+    $raf->Read($buff, $len) == $len or return -3;
+    # find the last xref table in the file (may be multiple %%EOF marks)
+    $buff =~ /.*startxref(\x0d\x0a|\x0a\x0a|\x0d|\x0a)(\d+)\1%%EOF/s or return -4;
     $/ = $1;    # set input record separator
-    push @xrefOffsets, $2;
-    my (%xref, @mainDicts, %loaded);
+    push @xrefOffsets, $2, 'Main';
+    my (%xref, @mainDicts, %loaded, $mainFree);
+    # initialize variables to capture when rewriting
+    my $capture = $$exifTool{PDF_CAPTURE};
+    if ($capture) {
+        $capture->{startxref} = $2;
+        $capture->{xref} = \%xref;
+        $capture->{newline} = $/;
+        $capture->{mainFree} = $mainFree = { };
+    }
     while (@xrefOffsets) {
         my $offset = shift @xrefOffsets;
+        my $type = shift @xrefOffsets;
         next if $loaded{$offset};   # avoid infinite recursion
         unless ($raf->Seek($offset, 0)) {
             %loaded or return -5;
             $exifTool->Warn('Bad offset for secondary xref table');
             next;
         }
-        unless ($raf->ReadLine($data)) {
+        # Note: care must be taken because ReadLine may read more than we want if
+        # the newline sequence for this table is different than the rest of the file
+        unless ($raf->ReadLine($buff)) {
             %loaded or return -6;
             $exifTool->Warn('Bad offset for secondary xref table');
             next;
         }
         my $loadXRefStream;
-        if ($data eq "xref$/") {
+        if ($buff =~ s/^xref\s+//s) {
             # load xref table
             for (;;) {
-                $raf->ReadLine($data) or return -6;
-                last if $data eq "trailer$/";
-                my ($start, $num) = $data =~ /(\d+)\s+(\d+)/;
-                $num or return -4;
+                # read another line if necessary
+                $raf->ReadLine($buff) or return -6 unless $buff =~ /\S/;
+                last if $buff =~ s/^\s*trailer\s+//s;
+                $buff =~ s/\s*(\d+)\s+(\d+)\s+//s or return -4;
+                my ($start, $num) = ($1, $2);
+                $num and $raf->Seek(-length($buff), 1) or return -4;
                 my $i;
                 for ($i=0; $i<$num; ++$i) {
-                    $raf->Read($data, 20) == 20 or return -6;
-                    $data =~ /^(\d{10}) (\d{5}) (f|n)/ or return -4;
-                    next if $3 eq 'f';  # ignore free entries
-                    # save the object offset keyed by its reference
-                    my $ref = ($start + $i) . ' ' . int($2) . ' R';
-                    $xref{$ref} = int($1);
+                    $raf->Read($buff, 20) == 20 or return -6;
+                    $buff =~ /^\s*(\d{10}) (\d{5}) (f|n)/s or return -4;
+                    my $num = $start + $i;
+                    # save offset for newest copy of all objects
+                    # (or next object number for free objects)
+                    unless (defined $xref{$num}) {
+                        my ($offset, $gen) = (int($1), int($2));
+                        $xref{$num} = $offset;
+                        if ($3 eq 'f') {
+                            # save free objects in last xref table for rewriting
+                            $$mainFree{$num} =  [ $offset, $gen, 'f' ] if $mainFree;
+                            next;
+                        }
+                        # also save offset keyed by object reference string
+                        $xref{"$num $gen R"} = $offset;
+                    }
                 }
+                %xref or return -4; # xref table may not be empty
+                $buff = '';
             }
-            %xref or return -4;
-            $data = '';
-        } elsif ($data =~ s/^(\d+)\s+(\d+)\s+obj//) {
+            undef $mainFree;    # only do this for the last xref table
+        } elsif ($buff =~ s/^(\d+)\s+(\d+)\s+obj//s) {
             # this is a PDF-1.5 cross-reference stream dictionary
             $loadXRefStream = 1;
         } else {
@@ -1148,26 +1288,31 @@ sub ReadPDF($$)
             $exifTool->Warn('Invalid secondary xref table');
             next;
         }
-        my $mainDict = ExtractObject($exifTool, \$data, $raf, \%xref);
-        unless ($mainDict) {
+        my $mainDict = ExtractObject($exifTool, \$buff, $raf, \%xref);
+        unless (ref $mainDict eq 'HASH') {
             %loaded or return -8;
             $exifTool->Warn('Error loading secondary dictionary');
             next;
         }
         if ($loadXRefStream) {
             # decode and save our XRef stream from PDF-1.5 file
-            # (parse it later as required to avoid wasting time)
+            # (but parse it later as required to save time)
+            # Note: this technique can potentially result in an old object
+            # being used if the file was incrementally updated and an older
+            # object from an xref table was replaced by a newer object in an
+            # xref stream.  But doing so isn't a good idea (if allowed at all)
+            # because a PDF 1.4 consumer would also make this same mistake.
             if ($$mainDict{Type} eq '/XRef' and $$mainDict{W} and
                 @{$$mainDict{W}} > 2 and $$mainDict{Size} and
                 DecodeStream($exifTool, $mainDict))
             {
                 # create Index entry if it doesn't exist
                 $$mainDict{Index} or $$mainDict{Index} = [ 0, $$mainDict{Size} ];
-                # create 'entry_size' entry for internal use
+                # create '_entry_size' entry for internal use
                 my $w = $$mainDict{W};
                 my $size = 0;
                 foreach (@$w) { $size += $_; }
-                $$mainDict{entry_size} = $size;
+                $$mainDict{_entry_size} = $size;
                 # save this stream dictionary to use later if required
                 $xref{dicts} = [] unless $xref{dicts};
                 push @{$xref{dicts}}, $mainDict;
@@ -1178,14 +1323,14 @@ sub ReadPDF($$)
         }
         $loaded{$offset} = 1;
         # load XRef stream in hybrid file if it exists
-        push @xrefOffsets, $$mainDict{XRefStm} if $$mainDict{XRefStm};
+        push @xrefOffsets, $$mainDict{XRefStm}, 'XRefStm' if $$mainDict{XRefStm};
         $encrypt = $$mainDict{Encrypt} if $$mainDict{Encrypt};
         if ($$mainDict{ID} and ref $$mainDict{ID} eq 'ARRAY') {
-            $id = $mainDict->{ID}->[0];
+            $id = ReadPDFValue($mainDict->{ID}->[0]);
         }
-        push @mainDicts, $mainDict;
+        push @mainDicts, $mainDict, $type;
         # load previous xref table if it exists
-        push @xrefOffsets, $$mainDict{Prev} if $$mainDict{Prev};
+        push @xrefOffsets, $$mainDict{Prev}, 'Prev' if $$mainDict{Prev};
     }
 #
 # extract encryption information if necessary
@@ -1196,18 +1341,23 @@ sub ReadPDF($$)
         }
         # generate Encryption tag information
         my $err = DecryptInit($exifTool, $encrypt, $id);
-        $err and $exifTool->Warn($err), return -1;
+        if ($err) {
+            $exifTool->Warn($err);
+            $$capture{Error} = $err if $capture;
+            return -1;
+        }
     }
 #
 # extract the information beginning with each of the main dictionaries
 #
-    my $dict;
-    foreach $dict (@mainDicts) {
+    while (@mainDicts) {
+        my $dict = shift @mainDicts;
+        my $type = shift @mainDicts;
         if ($verbose) {
-            my $n = scalar(@{$$dict{tags}});
+            my $n = scalar(@{$$dict{_tags}});
             $exifTool->VPrint(0, "PDF dictionary with $n entries:\n");
         }
-        ProcessDict($exifTool, $tagTablePtr, $dict, \%xref);
+        ProcessDict($exifTool, $tagTablePtr, $dict, \%xref, 0, $type);
     }
     return 1;
 }
@@ -1234,6 +1384,7 @@ sub ProcessPDF($$)
 {
     my ($exifTool, $dirInfo) = @_;
 
+    undef $cryptInfo;   # (must not delete after returning)
     my $oldsep = $/;
     my $result = ReadPDF($exifTool, $dirInfo);
     $/ = $oldsep;   # restore input record separator in case it was changed
@@ -1245,7 +1396,6 @@ sub ProcessPDF($$)
     undef %warnedOnce;
     undef %streamObjs;
     undef %fetched;
-    undef $cryptInfo;
     return $result;
 }
 
@@ -1271,7 +1421,7 @@ information but only with a limited number of algorithms.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -1282,7 +1432,7 @@ under the same terms as Perl itself.
 
 =item L<http://partners.adobe.com/public/developer/pdf/index_reference.html>
 
-=item L<http://www.cr0.net:8040/code/crypto/rc4/>
+=item L<Crypt::RC4|Crypt::RC4>
 
 =back
 

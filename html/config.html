@@ -147,7 +147,7 @@ use Image::ExifTool::MIE;
             <span class='com'># remove the extension from FileName</span>
             ValueConv =&gt; 'my $name=$val[0]; $name=~s/\..*?$//; $name',
         },
-        <span class='com'># the following example demonstrates simplifications which may be
+        <span class='com'># the following examples demonstrate simplifications which may be
         # used if only one tag is Require'd or Desire'd:
         # 1) the Require/Desire lookup may be replaced with a simple tag name
         # 2) "$val" may be used to represent "$val[0]" in the expression</span>
@@ -157,11 +157,26 @@ use Image::ExifTool::MIE;
         },
         <span class='com'># override CircleOfConfusion tag to use D/1750 instead of D/1440</span>
         CircleOfConfusion =&gt; {
-            Require =&gt; {
-                0 =&gt; 'ScaleFactor35efl',
-            },
-            ValueConv =&gt; 'sqrt(24*24+36*36) / ($val[0] * 1750)',
+            Require =&gt; 'ScaleFactor35efl',
+            ValueConv =&gt; 'sqrt(24*24+36*36) / ($val * 1750)',
             PrintConv =&gt; 'sprintf("%.3f mm",$val)',
+        },
+        <span class='com'># define a tag to customize my lens names</span>
+        MyLens => {
+            Description => 'Lens Type',
+            Desire => {
+                0 => 'LensID',
+                1 => 'LensType',
+                2 => 'Lens',
+            },
+            ValueConv => q{
+                foreach (@prt) {
+                    next if not defined $_ or /Unknown/;
+                    return 'SIGMA 10-20mm F4-5.6 EX DC' if /various SIGMA/;
+                    return $_;
+                }
+                return undef;
+            },
         },
     },
 );

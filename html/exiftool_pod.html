@@ -71,31 +71,32 @@ supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       JP2   r/w     PPT   r      |  EXIF           r/w/c
-  AI    r       JPEG  r/w     PS    r/w    |  GPS            r/w/c
-  AIFF  r       K25   r       PSD   r/w    |  IPTC           r/w/c
-  APE   r       M4A   r       QTIF  r      |  XMP            r/w/c
-  ARW   r       MEF   r/w     RA    r      |  MakerNotes     r/w/c
-  ASF   r       MIE   r/w/c   RAF   r      |  Photoshop IRB  r/w/c
-  AVI   r       MIFF  r       RAM   r      |  ICC Profile    r/w/c
-  BMP   r       MNG   r/w     RAW   r/w    |  MIE            r/w/c
-  BTF   r       MOS   r/w     RIFF  r      |  JFIF           r/w/c
-  CR2   r/w     MOV   r       RM    r      |  Ducky APP12    r/w/c
-  CRW   r/w     MP3   r       SR2   r      |  CIFF           r/w
-  CS1   r/w     MP4   r       SRF   r      |  AFCP           r/w
-  DCM   r       MPC   r       SWF   r      |  DICOM          r
-  DCR   r       MPG   r       THM   r/w    |  Flash          r
-  DNG   r/w     MRW   r/w     TIFF  r/w    |  FlashPix       r
-  DOC   r       NEF   r/w     VRD   r/w/c  |  GeoTIFF        r
-  EPS   r/w     OGG   r       WAV   r      |  PrintIM        r
-  ERF   r/w     ORF   r/w     WDP   r/w    |  ID3            r
-  FLAC  r       PBM   r/w     WMA   r      |  Kodak Meta     r
-  FLV   r       PDF   r       WMV   r      |  Ricoh RMETA    r
-  FPX   r       PEF   r/w     X3F   r      |  Picture Info   r
-  GIF   r/w     PGM   r/w     XLS   r      |  Adobe APP14    r
-  HTML  r       PICT  r       XMP   r/w/c  |  APE            r
-  ICC   r/w/c   PNG   r/w                  |  Vorbis         r
-  JNG   r/w     PPM   r/w                  |  (and more)</pre>
+  3FR   r       ITC   r       PNG   r/w    |  EXIF           r/w/c
+  ACR   r       JNG   r/w     PPM   r/w    |  GPS            r/w/c
+  AI    r       JP2   r/w     PPT   r      |  IPTC           r/w/c
+  AIFF  r       JPEG  r/w     PS    r/w    |  XMP            r/w/c
+  APE   r       K25   r       PSD   r/w    |  MakerNotes     r/w/c
+  ARW   r       KDC   r       QTIF  r      |  Photoshop IRB  r/w/c
+  ASF   r       M4A   r       RA    r      |  ICC Profile    r/w/c
+  AVI   r       MEF   r/w     RAF   r/w    |  MIE            r/w/c
+  BMP   r       MIE   r/w/c   RAM   r      |  JFIF           r/w/c
+  BTF   r       MIFF  r       RAW   r/w    |  Ducky APP12    r/w/c
+  CR2   r/w     MNG   r/w     RIFF  r      |  CIFF           r/w
+  CRW   r/w     MOS   r/w     RM    r      |  AFCP           r/w
+  CS1   r/w     MOV   r       SR2   r      |  JPEG 2000      r
+  DCM   r       MP3   r       SRF   r      |  DICOM          r
+  DCR   r       MP4   r       SWF   r      |  Flash          r
+  DNG   r/w     MPC   r       THM   r/w    |  FlashPix       r
+  DOC   r       MPG   r       TIFF  r/w    |  GeoTIFF        r
+  EPS   r/w     MRW   r/w     VRD   r/w/c  |  PrintIM        r
+  ERF   r/w     NEF   r/w     WAV   r      |  ID3            r
+  FLAC  r       OGG   r       WDP   r/w    |  Kodak Meta     r
+  FLV   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
+  FPX   r       PBM   r/w     WMV   r      |  Picture Info   r
+  GIF   r/w     PDF   r/w     X3F   r      |  Adobe APP14    r
+  HDP   r/w     PEF   r/w     XLS   r      |  APE            r
+  HTML  r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
+  ICC   r/w/c   PICT  r                    |  (and more)</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are written.
 However, the <strong>-ext</strong> option may be used to force processing of files with
@@ -144,8 +145,10 @@ information (ie. <code>-all= --exif:all</code> deletes all but EXIF information)
 <dd>
 Write a new value for the specified tag (ie. <code>-comment=wow</code>), or delete the
 tag if no <em>VALUE</em> is given (ie. <code>-comment=</code>). <code>+=</code> and <code>-=</code> are used to
-add or remove entries from a list, or to shift date/time values (see
-<a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a> for details).
+add or remove existing entries from a list, or to shift date/time values
+(see <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift.pl">Image::ExifTool::Shift.pl</a> for details),
+and <code>-=</code> may be used to conditionally remove or replace a tag (see
+<a href="#writing_examples">WRITING EXAMPLES</a> for examples).
 </dd>
 <dd>
 <p>If a group name is not specified for <em>TAG</em>, then the information is written
@@ -248,8 +251,8 @@ various formats:
 <dd>
 Set the format for <strong>d</strong>ate/time tag values.  Consult <code>strftime</code> man page
 for <em>FMT</em> syntax. The default format is equivalent to ``%Y:%m:%d %H:%M:%S''.
-This option has no effect on date-only or time-only tags, and ignores
-timezone information if present.
+This option has no effect on date-only or time-only tags, ignores timezone
+information if present, and currently doesn't apply when writing.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dd"><strong>-D</strong></a></strong><br />
@@ -300,6 +303,9 @@ the file is modified.  This may cause the wrong values to be extracted for
 some maker note entries when reading the edited file.  This option allows an
 integer <em>OFFSET</em> to be specified for adjusting the maker notes base offset.
 If no <em>OFFSET</em> is given, ExifTool takes its best guess at the correct base.
+Note that exiftool will automatically fix the offsets for images which store
+original offset information (ie. newer Canon models).  Offsets are fixed
+permanently if used when writing an image.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dfast"><strong>-fast</strong></a></strong><br />
@@ -492,7 +498,8 @@ appropriate tag values are specified on the command line.</p>
 Overwrite the original <em>FILE</em> (instead of preserving it by adding
 <code>_original</code> to the file name) when writing information to an image.
 Caution: This option should only be used if you already have separate backup
-copies of your image files.
+copies of your image files.  The overwrite is implemented by renaming a
+temporary file.
 </dd>
 <p></p>
 <dt><strong><a name="item__2doverwrite_original_in_place"><strong>-overwrite_original_in_place</strong></a></strong><br />
@@ -500,9 +507,11 @@ copies of your image files.
 <dd>
 Similar to the <strong>-overwrite_original</strong> option except that an extra step is
 added to allow the original file attributes to be preserved.  On a Macintosh
-for example, this preserves the original file type, creator and icon.  The
-extra step results in slower performance, so the <strong>-overwrite_original</strong>
-option should be used instead unless necessary.
+for example, this preserves the original file type, creator and icon.  This
+is implemented by copying the contents of a temporary file over the
+original, then deleting the temporary file.  The extra step results in
+slower performance, so the <strong>-overwrite_original</strong> option should be used
+instead unless necessary.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dp_fmtfile_or_str"><strong>-p</strong> <em>FMTFILE</em> or <em>STR</em></a></strong><br />
@@ -512,8 +521,9 @@ option should be used instead unless necessary.
 ignore other format options).  Tag names in the format file or string begin
 with a <code>$</code> symbol and may contain an optional group name.  Case is not
 significant.  Braces <code>{}</code> may be used around the tag name to separate it
-from subsequent text.  Use <code>$$</code> to represent a <code>$</code> symbol.  In the file,
-lines beginning with <code>#</code> are ignored. For example, this format file:
+from subsequent text.  Use <code>$$</code> to represent a <code>$</code> symbol.  <code>$/</code> may be
+used for a newline.  In the file, lines beginning with <code>#</code> are ignored. For
+example, this format file:
 </dd>
 <dd>
 <pre>
@@ -539,7 +549,7 @@ are ignored and the line is printed with an empty tag value.</p>
 <dt><strong><a name="item__2dp"><strong>-P</strong></a></strong><br />
 </dt>
 <dd>
-<strong>P</strong>reserve date/time of original file when writing.
+<strong>P</strong>reserve date/time of original file (<code>FileModifyDate</code>) when writing.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dq"><strong>-q</strong></a></strong><br />
@@ -598,6 +608,12 @@ descriptions, or <strong>-S</strong> to print tag values only, tab-delimited on 
 line.
 </dd>
 <p></p>
+<dt><strong><a name="item__2dt"><strong>-T</strong></a></strong><br />
+</dt>
+<dd>
+Output tag values in <strong>T</strong>able form.  (Equivalent to <strong>-t -S -q -f</strong>.)
+</dd>
+<p></p>
 <dt><strong><a name="item__2dtagsfromfile_srcfile_or_fmt"><strong>-TagsFromFile</strong> <em>SRCFILE</em> or <em>FMT</em></a></strong><br />
 </dt>
 <dd>
@@ -634,7 +650,7 @@ with a different name or group.  This is done using
 &quot;'-<em>SRCTAG</em>&gt;<em>DSTTAG</em>'&quot; on the command line after
 <strong>-TagsFromFile</strong> (&quot;'-<em>DSTTAG</em>&lt;<em>SRCTAG</em>'&quot; also works).
 Note that this argument must be quoted to prevent shell redirection, and
-there is no <code>=</code> sign as when setting new values.  Both source and
+there is no <code>=</code> sign as when assigning new values.  Both source and
 destination tags may be prefixed by a group name, and <code>All</code> or <code>*</code> may be
 used as a tag or group name.  If no destination group is specified, the
 information is written to the preferred group.  As a convenience,
@@ -713,7 +729,8 @@ Print <strong>v</strong>erbose messages.  <em>NUM</em> specifies the level of ve
 range 0-5, with higher numbers being more verbose.  If <em>NUM</em> is not given,
 then each <strong>-v</strong> option increases the level of verbosity by 1.  This option
 suppresses normal console output unless specific tags are being extracted.
-<strong>-v0</strong> is used when writing to print only the processed file names.
+<strong>-v0</strong> is used when writing to print only the processed file names, and the
+``Nothing changed'' message for files that were not modified.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dver"><strong>-ver</strong></a></strong><br />
@@ -1019,6 +1036,12 @@ Delete Photoshop meta information from an image (note that the Photoshop
 information also includes IPTC).
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2dr__2dxmp_2dcrss_3aall_3d_dir">exiftool -r -XMP-crss:all= DIR</a></strong><br />
+</dt>
+<dd>
+Recursively delete all XMP-crss information from images in a directory.
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__27_2dthumbnailimage_3c_3dthumb_2ejpg_27_">exiftool '-ThumbnailImage&lt;=thumb.jpg' dst.jpg</a></strong><br />
 </dt>
 <dd>
@@ -1177,7 +1200,7 @@ Copy all possible information from <code>src.jpg</code> and write in XMP format 
 <code>dst.jpg</code>.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg__2d_40_iptc2xmp_2">exiftool -tagsFromFile a.jpg -@ iptc2xmp.args -iptc:all= a.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2d_40_iptc2xmp_2eargs__2diptc_3aall_3d_a">exiftool -@ iptc2xmp.args -iptc:all= a.jpg</a></strong><br />
 </dt>
 <dd>
 Translate IPTC information to XMP with appropriate tag name conversions, and
@@ -1297,7 +1320,7 @@ timestamp to the start of the filename, then moves them into new directories
 named by date.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__27_2dfilename_3c_24_7bcreatedate_7d__24f">exiftool '-FileName&lt;${CreateDate}_$filenumber.jpg' -d %Y%m%d dir/*.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__27_2dfilename_3c_24_7bcreatedate_7d__24f">exiftool '-FileName&lt;${CreateDate}_$filenumber.jpg' -d %Y%m%d *.jpg</a></strong><br />
 </dt>
 <dd>
 Set the filename of all JPG images in the current directory from the
@@ -1354,7 +1377,7 @@ Macintosh filesystems.</p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Copyright 2003-2007, Phil Harvey</p>
+<p>Copyright 2003-2008, Phil Harvey</p>
 <p>This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.</p>
 <p>

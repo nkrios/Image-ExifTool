@@ -8,7 +8,7 @@
 # Revisions:    Nov. 12/03 - P. Harvey Created
 #               (See html/history.html for revision history)
 #
-# Legal:        Copyright (c) 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -24,23 +24,23 @@ use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old
             @loadAllTables %UserDefined $evalWarning);
 
-$VERSION = '7.00';
+$VERSION = '7.15';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
-    # all public non-object-oriented functions
+    # all public non-object-oriented functions:
     Public => [qw(
         ImageInfo GetTagName GetShortcuts GetAllTags GetWritableTags
         GetAllGroups GetDeleteGroups GetFileType CanWrite CanCreate
     )],
+    # exports not part of the public API, but used by ExifTool modules:
     DataAccess => [qw(
         ReadValue GetByteOrder SetByteOrder ToggleByteOrder Get8u Get8s Get16u
         Get16s Get32u Get32s GetFloat GetDouble GetFixed32s Write WriteValue
         Tell Set8u Set8s Set16u Set32u
     )],
     Utils => [qw(
-        GetTagTable TagTableKeys GetTagInfoList GenerateTagIDs SetFileType
-        HtmlDump
+        GetTagTable TagTableKeys GetTagInfoList GenerateTagIDs
     )],
     Vars => [qw(
         %allTables @tableOrder @fileTypes
@@ -114,7 +114,7 @@ sub UnpackUTF8($);
 @loadAllTables = qw(
     PhotoMechanic Exif GeoTiff CanonRaw KyoceraRaw MinoltaRaw SigmaRaw JPEG
     Jpeg2000 BMP BMP PICT PNG MNG MIFF PDF PostScript Photoshop::Header
-    FujiFilm::RAF Panasonic::Raw Sony::SR2SubIFD ID3 Vorbis FLAC APE
+    FujiFilm::RAF Panasonic::Raw Sony::SR2SubIFD ITC ID3 Vorbis FLAC APE
     APE::NewHeader APE::OldHeader MPC MPEG::Audio MPEG::Video QuickTime
     QuickTime::ImageFile Flash Flash::FLV Real::Media Real::Audio
     Real::Metafile RIFF AIFF ASF DICOM MIE HTML
@@ -125,17 +125,18 @@ sub UnpackUTF8($);
 # 2) Put types with no file signature at end of list to avoid false matches
 @fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIE MIFF PS PDF PSD XMP
                 BMP PPM RIFF AIFF ASF MOV MPEG Real SWF FLV OGG FLAC APE MPC
-                ICC HTML VRD QTIF FPX PICT MP3 DICM RAW);
+                ICC ITC HTML VRD QTIF FPX PICT MP3 DICM RAW);
 
 # file types that we can write (edit)
-my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF PNG MIE PSD XMP PPM EPS PS ICC
-                    VRD JP2);
+my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF PNG MIE PSD XMP PPM EPS PS
+                    PDF ICC VRD JP2);
 
 # file types that we can create from scratch
 my @createTypes = qw(XMP ICC MIE VRD);
 
 # file type lookup for all recognized file extensions
 my %fileTypeLookup = (
+   '3FR' => ['TIFF', 'Hasselblad RAW format (TIFF-like)'],
     ACR  => ['DICM', 'American College of Radiology ACR-NEMA'],
     AI   => [['PDF','PS'], 'Adobe Illustrator (PDF-like or PS-like)'],
     AIF  => ['AIFF', 'Audio Interchange File Format'],
@@ -166,16 +167,19 @@ my %fileTypeLookup = (
     FLV  => ['FLV',  'Flash Video'],
     FPX  => ['FPX',  'FlashPix'],
     GIF  => ['GIF',  'Compuserve Graphics Interchange Format'],
+    HDP  => ['TIFF', 'Windows HD Photo (TIFF-based)'],
     HTM  => ['HTML', 'HyperText Markup Language'],
     HTML => ['HTML', 'HyperText Markup Language'],
     ICC  => ['ICC',  'International Color Consortium'],
     ICM  => ['ICC',  'International Color Consortium'],
+    ITC  => ['ITC',  'iTunes Cover Flow'],
     JNG  => ['PNG',  'JPG Network Graphics (PNG-like)'],
     JP2  => ['JP2',  'JPEG 2000 file'],
     JPEG => ['JPEG', 'Joint Photographic Experts Group'],
     JPG  => ['JPEG', 'Joint Photographic Experts Group'],
     JPX  => ['JP2',  'JPEG 2000 file'],
     K25  => ['TIFF', 'Kodak DC25 RAW (TIFF-like)'],
+    KDC  => ['TIFF', 'Kodak Digital Camera RAW (TIFF-like)'],
     M4A  => ['MOV',  'MPG4 Audio (QuickTime-based)'],
     MEF  => ['TIFF', 'Mamiya (RAW) Electronic Format (TIFF-like)'],
     MIE  => ['MIE',  'Meta Information Encapsulation format'],
@@ -238,6 +242,7 @@ my %fileTypeLookup = (
 # MIME types for applicable file types above
 # (missing entries default to 'application/unknown')
 my %mimeType = (
+   '3FR' => 'image/x-raw',
     AIFF => 'audio/aiff',
     APE  => 'audio/x-monkeys-audio',
     ASF  => 'video/x-ms-asf',
@@ -257,11 +262,14 @@ my %mimeType = (
     FLV  => 'video/x-flv',
     FPX  => 'image/vnd.fpx',
     GIF  => 'image/gif',
+    HDP  => 'image/vnd.ms-photo',
     HTML => 'text/html',
+    ITC  => 'application/itunes',
     JNG  => 'image/jng',
     JP2  => 'image/jpeg2000',
     JPEG => 'image/jpeg',
     K25  => 'image/x-raw',
+    KDC  => 'image/x-raw',
     M4A  => 'audio/mp4',
     MEF  => 'image/x-raw',
     MIE  => 'application/x-mie',
@@ -404,11 +412,14 @@ sub DummyWriteProc { return 1; }
         Notes => 'the filesystem modification time',
         Groups => { 2 => 'Time' },
         Writable => 1,
+        # all pseudo-tags must be protected so -tagsfromfile fails with
+        # unrecognized files unless a pseudo tag is specified explicitly
+        Protected => 1,
         Shift => 'Time',
         ValueConv => 'ConvertUnixTime($val,"local")',
         ValueConvInv => 'GetUnixTime($val,"local")',
         PrintConv => '$self->ConvertDateTime($val)',
-        PrintConvInv => '$val',
+        PrintConvInv => '$self->InverseDateTime($val)', 
     },
     MIMEType    => { },
     ImageWidth  => { },
@@ -417,7 +428,7 @@ sub DummyWriteProc { return 1; }
     YResolution => { },
     MaxVal      => { }, # max pixel value in PPM or PGM image
     EXIF => {
-        Notes => 'the full EXIF data block',
+        Notes => 'the full EXIF data block for JPEG images',
         Groups => { 0 => 'EXIF' },
         Binary => 1,
     },
@@ -442,7 +453,9 @@ sub DummyWriteProc { return 1; }
     CanonVRD => {
         Notes => 'the full Canon DPP VRD trailer block',
         Groups => { 0 => 'CanonVRD' },
+        WriteGroup => 'MakerNotes', # (so VRDOffset will get updated)
         Flags => ['Writable' ,'Protected', 'Binary'],
+        Permanent => 0, # (this is 1 by default for MakerNotes tags)
         WriteCheck => q{
             return undef if $val =~ /^CANON OPTIONAL DATA\0/;
             return 'Invalid CanonVRD data';
@@ -573,7 +586,7 @@ my %specialTags = (
     FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1, DID_TAG_ID=>1, WRITABLE=>1,
     NOTES=>1, IS_OFFSET=>1, EXTRACT_UNKNOWN=>1, NAMESPACE=>1, PREFERRED=>1,
     PARENT=>1, PRIORITY=>1, WRITE_GROUP=>1, LANG_INFO=>1, VARS=>1,
-    DATAMEMBER=>1,
+    DATAMEMBER=>1, SET_GROUP1=>1,
 );
 
 #------------------------------------------------------------------------------
@@ -918,9 +931,10 @@ sub ExtractInfo($;@)
             $pos = ($self->{FIRST_EXIF_POS} || 0) unless defined $pos;
             my $dataPt = defined $self->{EXIF_DATA} ? \$self->{EXIF_DATA} : undef;
             undef $dataPt if defined $self->{EXIF_POS} and $pos != $self->{EXIF_POS};
-            $self->{HTML_DUMP}->Print($raf, $dataPt, $pos,
+            my $success = $self->{HTML_DUMP}->Print($raf, $dataPt, $pos,
                 $options->{TextOut}, $options->{HtmlDump},
                 $self->{FILENAME} ? "HTML Dump ($self->{FILENAME})" : 'HTML Dump');
+            $self->Warn("Error reading $self->{HTML_DUMP}->{ERROR}") if $success < 0;
         }
 
         $raf->Close() if $filename;     # close the file if we opened it
@@ -1152,7 +1166,27 @@ sub GetValue($$;$)
             $convList = $conv;
             $conv = $$convList[0];
             my @valList = split ' ', $value;
-            $value = \@valList;
+            # reorganize list if specified (Note: The writer currently doesn't
+            # relist values, so they may be grouped but the order must not change)
+            my $relist = $$tagInfo{Relist};
+            if ($relist) {
+                my (@newList, $oldIndex);
+                foreach $oldIndex (@$relist) {
+                    my ($newVal, @join);
+                    if (ref $oldIndex) {
+                        foreach (@$oldIndex) {
+                            push @join, $valList[$_] if defined $valList[$_];
+                        }
+                        $newVal = join(' ', @join) if @join;
+                    } else {
+                        $newVal = $valList[$oldIndex];
+                    }
+                    push @newList, $newVal if defined $newVal;
+                }
+                $value = \@newList;
+            } else {
+                $value = \@valList;
+            }
         }
         # initialize array so we can iterate over values in list
         if (ref $value eq 'ARRAY') {
@@ -1669,6 +1703,9 @@ sub ParseArguments($;@)
                 # set filename to empty string to indicate that
                 # we have a file but we didn't open it
                 $self->{FILENAME} = '';
+            } elsif (UNIVERSAL::isa($arg, 'File::RandomAccess')) {
+                $self->{RAF} = $arg;
+                $self->{FILENAME} = '';
             } else {
                 warn "Don't understand ImageInfo argument $arg\n";
             }
@@ -1732,7 +1769,12 @@ sub SetFoundTags($)
             my (@matches, $group, $family, $allGrp, $allTag);
             if ($reqTag =~ /^(\d+)?(.+?):(.+)/) {
                 ($family, $group, $tag) = ($1, $2, $3);
-                $allGrp = 1 if $group =~ /^(\*|all)$/i;
+                if ($group =~ /^(\*|all)$/i) {
+                    $allGrp = 1;
+                } elsif ($group !~ /^[-\w]+$/) {
+                    $self->Warn("Invalid group name '$group'");
+                    $group = 'invalid';
+                }
                 $family = -1 unless defined $family;
             } else {
                 $tag = $reqTag;
@@ -1752,11 +1794,13 @@ sub SetFoundTags($)
             } elsif ($doDups or defined $group) {
                 # must also look for tags like "Tag (1)"
                 @matches = grep(/^$tag(\s|$)/i, keys %$tagHash);
-            } else {
+            } elsif ($tag =~ /^[-\w]+$/) {
                 # find first matching value
                 # (use in list context to return value instead of count)
                 ($matches[0]) = grep /^$tag$/i, keys %$tagHash;
                 defined $matches[0] or undef @matches;
+            } else {
+                $self->Warn("Invalid tag name '$tag'");
             }
             if (defined $group and not $allGrp) {
                 # keep only specified group
@@ -2179,9 +2223,9 @@ sub SetupTagTable($)
 # Inputs: 0) value;  Returns: true if value is a numerical type
 # Notes: May change commas to decimals in floats for use in other locales
 sub IsFloat($) {
-    return 1 if $_[0] =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/;
+    return 1 if $_[0] =~ /^[+-]?(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/;
     # allow comma separators (for other locales)
-    return 0 unless $_[0] =~ /^([+-]?)(?=\d|,\d)\d*(,\d*)?([Ee]([+-]?\d+))?$/;
+    return 0 unless $_[0] =~ /^[+-]?(?=\d|,\d)\d*(,\d*)?([Ee]([+-]?\d+))?$/;
     $_[0] =~ tr/,/./;   # but translate ',' to '.'
     return 1;
 }
@@ -2350,7 +2394,7 @@ sub GetByteOrder() { return $currentByteOrder; }
 
 #------------------------------------------------------------------------------
 # Set byte ordering
-# Inputs: 0) 'II'=intel, 'MM'=motorola
+# Inputs: 0) 'MM'=motorola, 'II'=intel (will translate 'BigEndian', 'LittleEndian')
 # Returns: 1 on success
 sub SetByteOrder($)
 {
@@ -2359,6 +2403,12 @@ sub SetByteOrder($)
     if ($order eq 'MM') {       # big endian (Motorola)
         %unpackStd = %unpackMotorola;
     } elsif ($order eq 'II') {  # little endian (Intel)
+        %unpackStd = %unpackIntel;
+    } elsif ($order =~ /^Big/i) {
+        $order = 'MM';
+        %unpackStd = %unpackMotorola;
+    } elsif ($order =~ /^Little/i) {
+        $order = 'II';
         %unpackStd = %unpackIntel;
     } else {
         return 0;
@@ -3284,9 +3334,10 @@ sub ProcessTIFF($$;$)
     $dataPt = \$self->{EXIF_DATA};
 
     # set byte ordering
-    SetByteOrder(substr($$dataPt,0,2)) or return 0;
+    my $byteOrder = substr($$dataPt,0,2);
+    SetByteOrder($byteOrder) or return 0;
     # save EXIF byte ordering
-    $self->{EXIF_BYTE_ORDER} = GetByteOrder();
+    $self->{EXIF_BYTE_ORDER} = $byteOrder;
 
     # verify the byte ordering
     my $identifier = Get16u($dataPt, 2);
@@ -3318,8 +3369,14 @@ sub ProcessTIFF($$;$)
             $raf->Seek(0);
             require Image::ExifTool::BigTIFF;
             return 1 if Image::ExifTool::BigTIFF::ProcessBTF($self, $dirInfo);
-        } elsif (Get8u($dataPt, 2) == 0xbc and $fileType eq 'TIFF') {
-            $fileType = 'WDP';  # Windows Media Photo file
+        } elsif (Get8u($dataPt, 2) == 0xbc and $byteOrder eq 'II' and $fileType eq 'TIFF') {
+            $fileType = 'HDP';  # Windows HD Photo file
+            # check version number
+            my $ver = Get8u($dataPt, 3);
+            if ($ver > 1) {
+                $self->Error("Windows HD Photo version $ver files not yet supported");
+                return 1;
+            }
         }
         # we have a valid TIFF (or whatever) file
         if ($fileType and not $self->{VALUE}->{FileType}) {
@@ -3786,6 +3843,12 @@ sub HandleTag($$$$;%)
     }
     if ($tagInfo) {
         if ($subdir) {
+            my $subdirStart = $parms{Start};
+            if ($$subdir{Start}) {
+                my $valuePtr = 0;
+                #### eval Start ()
+                $subdirStart += eval $$subdir{Start};
+            }
             $dataPt or $dataPt = \$val;
             # process subdirectory information
             my %dirInfo = (
@@ -3793,7 +3856,7 @@ sub HandleTag($$$$;%)
                 DataPt   => $dataPt,
                 DataLen  => length $$dataPt,
                 DataPos  => $parms{DataPos},
-                DirStart => $parms{Start},
+                DirStart => $subdirStart,
                 DirLen   => $parms{Size},
                 Parent   => $parms{Parent},
             );
@@ -4064,7 +4127,12 @@ sub ExtractBinary($$$;$)
 {
     my ($self, $offset, $length, $tag) = @_;
 
-    if ($tag and not $self->{OPTIONS}->{Binary} and
+    if ($tag and $tag eq 'PreviewImage') {
+        # save PreviewImage start/length in case we want to dump trailer
+        $$self{PreviewImageStart} = $offset;
+        $$self{PreviewImageLength} = $length;
+    }
+    if ($tag and not $self->{OPTIONS}->{Binary} and not $self->{OPTIONS}->{Verbose} and
         not $self->{REQ_TAG_LOOKUP}->{lc($tag)})
     {
         return "Binary data $length bytes";
@@ -4109,6 +4177,9 @@ sub ProcessBinaryData($$$)
     if ($unknown > 1 and defined $$tagTablePtr{FIRST_ENTRY}) {
         # scan through entire binary table
         @tags = ($$tagTablePtr{FIRST_ENTRY}..(int($size/$increment) - 1));
+        # add in floating point tag ID's if they exist
+        my @ftags = grep /\./, TagTableKeys($tagTablePtr);
+        @tags = sort { $a <=> $b } @tags, @ftags if @ftags;
     } elsif ($$dirInfo{DataMember}) {
         @tags = @{$$dirInfo{DataMember}};
         $verbose = 0;   # no verbose output of extracted values when writing
@@ -4138,7 +4209,7 @@ sub ProcessBinaryData($$$)
         }
         my $count = 1;
         my $format = $$tagInfo{Format};
-        my $entry = $index * $increment;        # relative offset of this entry
+        my $entry = int($index) * $increment;   # relative offset of this entry
         if ($format) {
             if ($format =~ /(.*)\[(.*)\]/) {
                 $format = $1;
@@ -4157,11 +4228,12 @@ sub ProcessBinaryData($$$)
         }
         if ($unknown > 1) {
             # calculate next valid index for unknown tag
-            my $ni = $index + ($formatSize{$format} * $count) / $increment;
+            my $ni = int($index) + ($formatSize{$format} * $count) / $increment;
             $nextIndex = $ni unless $nextIndex > $ni;
         }
         my $val = ReadValue($dataPt, $entry+$offset, $format, $count, $size-$entry);
         next unless defined $val;
+        $val &= $$tagInfo{Mask} if $$tagInfo{Mask};
         if ($verbose) {
             my $len = $count * ($formatSize{$format} || 1);
             $len > $size - $entry and $len = $size - $entry;

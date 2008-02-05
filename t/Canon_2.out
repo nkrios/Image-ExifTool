@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
 [File, File, Image]  - File Name: Canon1DmkIII.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 8 kB
-[File, File, Time]  - File Modification Date/Time: 2007:03:20 12:32:58
+[File, File, Time]  - File Modification Date/Time: 2008:01:18 12:41:29
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -33,7 +33,7 @@
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: On
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 35.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 35.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Time] 37520 - Sub Sec Time: 81
 [EXIF, ExifIFD, Time] 37521 - Sub Sec Time Original: 81
@@ -41,7 +41,7 @@
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 3888
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2592
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 2592
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3512.195122
@@ -56,10 +56,10 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 7548
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 8060
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Normal
-[MakerNotes, Canon, Camera] 2 - Self-timer: Off
+[MakerNotes, Canon, Camera] 2 - Self Timer: Off
 [MakerNotes, Canon, Camera] 3 - Quality: Fine
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: External flash
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous, High
@@ -73,8 +73,8 @@
 [MakerNotes, Canon, Camera] 17 - Metering Mode: Evaluative
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Program AE
-[MakerNotes, Canon, Camera] 23 - Long Focal: 35mm
-[MakerNotes, Canon, Camera] 24 - Short Focal: 16mm
+[MakerNotes, Canon, Camera] 23 - Long Focal: 35 mm
+[MakerNotes, Canon, Camera] 24 - Short Focal: 16 mm
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 2.8
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 23
@@ -84,7 +84,7 @@
 [MakerNotes, Canon, Camera] 37 - Zoom Target Width: 0
 [MakerNotes, Canon, Camera] 41 - Manual Flash Output: n/a
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
-[MakerNotes, Canon, Image] 1 - Focal Length: 35mm
+[MakerNotes, Canon, Image] 1 - Focal Length: 35 mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 3200
 [MakerNotes, Canon, Image] 3 - Measured EV: -1.38
@@ -98,6 +98,7 @@
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
+[MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: 0
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 0
 [MakerNotes, Canon, Image] 21 - F Number: 5.7
@@ -114,20 +115,27 @@
 [MakerNotes, Canon, Image] 3 - F Number: 5.7
 [MakerNotes, Canon, Image] 4 - Exposure Time: 1/128
 [MakerNotes, Canon, Image] 6 - ISO: 3200
-[MakerNotes, Canon, Camera] 29 - Focal Length: 35mm
+[MakerNotes, Canon, Camera] 29 - Focal Length: 35 mm
+[MakerNotes, Canon, Camera] 67 - Focus Distance Upper: 2.19
+[MakerNotes, Canon, Camera] 69 - Focus Distance Lower: 1.13
+[MakerNotes, Canon, Camera] 94 - White Balance: Auto
+[MakerNotes, Canon, Camera] 98 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 134 - Picture Style: Neutral
-[MakerNotes, Canon, Camera] 275 - Short Focal: 16mm
-[MakerNotes, Canon, Camera] 277 - Long Focal: 35mm
+[MakerNotes, Canon, Camera] 274 - Lens Type: Canon EF 16-35mm f/2.8L II
+[MakerNotes, Canon, Camera] 275 - Short Focal: 16 mm
+[MakerNotes, Canon, Camera] 277 - Long Focal: 35 mm
+[MakerNotes, Canon, Camera] 310 - Firmware Version: 5.3.1
 [MakerNotes, Canon, Image] 370 - File Number: 232
 [MakerNotes, Canon, Camera] 374 - Shutter Count: 1
 [MakerNotes, Canon, Time] 1118 - Time Stamp: 1970:01:02 01:30:10
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS-1D Mark III
+[MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 2
 [MakerNotes, Canon, Camera] 1 - AF Mode: Single-point AF
 [MakerNotes, Canon, Camera] 2 - Num AF Points: 45
 [MakerNotes, Canon, Camera] 3 - Valid AF Points: 45
 [MakerNotes, Canon, Image] 4 - Canon Image Width: 3888
-[MakerNotes, Canon, Image] 5 - Canon Image Width: 2592
+[MakerNotes, Canon, Image] 5 - Canon Image Height: 2592
 [MakerNotes, Canon, Camera] 6 - AF Image Width: 3888
 [MakerNotes, Canon, Camera] 7 - AF Image Height: 2592
 [MakerNotes, Canon, Camera] 8 - AF Area Widths: 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112 112
@@ -136,7 +144,7 @@
 [MakerNotes, Canon, Camera] 11 - AF Area Y Positions: -554 -554 -554 -554 -554 -554 -554 -277 -277 -277 -277 -277 -277 -277 -277 -277 -277 0 0 0 0 0 0 0 0 0 0 0 277 277 277 277 277 277 277 277 277 277 554 554 554 554 554 554 554
 [MakerNotes, Canon, Camera] 12 - AF Points In Focus: 13
 [MakerNotes, Canon, Camera] 13 - AF Points Selected: 13
-[MakerNotes, Canon, Camera] 131 - Original Decision Data: 0
+[MakerNotes, Canon, Camera] 131 - Original Decision Data Offset: 3326
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
 [MakerNotes, Canon, Image] 5 - Bracket Shot Number: 0
@@ -200,7 +208,7 @@
 [MakerNotes, CanonCustom, Camera] 1801 - Lock Microphone Button: Protect (holding:sound rec.)
 [MakerNotes, CanonCustom, Camera] 1802 - Button Function Control Off: Normal (enable)
 [MakerNotes, CanonCustom, Camera] 2059 - Focusing Screen: Ec-CIV
-[MakerNotes, CanonCustom, Camera] 2060 - Timer Length: Disable; 6 sec: 6; 16 sec: 16; After release: 2
+[MakerNotes, CanonCustom, Camera] 2060 - Timer Length: Disable; 6 s: 6; 16 s: 16; After release: 2
 [MakerNotes, CanonCustom, Camera] 2061 - Short Release Time Lag: Disable
 [MakerNotes, CanonCustom, Camera] 2062 - Add Aspect Ratio Info: Off
 [MakerNotes, CanonCustom, Camera] 2063 - Add Original Decision Data: Off
@@ -225,20 +233,48 @@
 [MakerNotes, Canon, Image] 6 - Sensor Top Border: 25
 [MakerNotes, Canon, Image] 7 - Sensor Right Border: 3975
 [MakerNotes, Canon, Image] 8 - Sensor Bottom Border: 2616
-[MakerNotes, Canon, Camera] 16385 - Color Balance Unknown: (Binary data 2490 bytes)
+[MakerNotes, Canon, Image] 9 - Black Mask Left Border: 0
+[MakerNotes, Canon, Image] 10 - Black Mask Top Border: 0
+[MakerNotes, Canon, Image] 11 - Black Mask Right Border: 0
+[MakerNotes, Canon, Image] 12 - Black Mask Bottom Border: 0
+[MakerNotes, Canon, Camera] 63 - WB RGGB Levels As Shot: 2275 1024 1024 1357
+[MakerNotes, Canon, Camera] 67 - Color Temp As Shot: 6142
+[MakerNotes, Canon, Camera] 68 - WB RGGB Levels Auto: 2275 1024 1024 1357
+[MakerNotes, Canon, Camera] 72 - Color Temp Auto: 6142
+[MakerNotes, Canon, Camera] 73 - WB RGGB Levels Measured: 2272 1026 1021 1355
+[MakerNotes, Canon, Camera] 77 - Color Temp Measured: 6142
+[MakerNotes, Canon, Camera] 83 - WB RGGB Levels Daylight: 2101 1024 1024 1535
+[MakerNotes, Canon, Camera] 87 - Color Temp Daylight: 5200
+[MakerNotes, Canon, Camera] 88 - WB RGGB Levels Shade: 2433 1024 1024 1259
+[MakerNotes, Canon, Camera] 92 - Color Temp Shade: 7000
+[MakerNotes, Canon, Camera] 93 - WB RGGB Levels Cloudy: 2270 1024 1024 1382
+[MakerNotes, Canon, Camera] 97 - Color Temp Cloudy: 6000
+[MakerNotes, Canon, Camera] 98 - WB RGGB Levels Tungsten: 1603 1134 1134 2760
+[MakerNotes, Canon, Camera] 102 - Color Temp Tungsten: 3200
+[MakerNotes, Canon, Camera] 103 - WB RGGB Levels Fluorescent: 1938 1073 1073 2419
+[MakerNotes, Canon, Camera] 107 - Color Temp Fluorescent: 3768
+[MakerNotes, Canon, Camera] 108 - WB RGGB Levels Kelvin: 2101 1024 1024 1535
+[MakerNotes, Canon, Camera] 112 - Color Temp Kelvin: 5210
+[MakerNotes, Canon, Camera] 113 - WB RGGB Levels Flash: 2422 1024 1024 1295
+[MakerNotes, Canon, Camera] 117 - Color Temp Flash: 6777
 [Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - ISO: 3200
 [Composite, Composite, Image]  - Image Size: 8x8
-[Composite, Composite, Camera]  - Lens: 16.0 - 35.0mm
+[Composite, Composite, Camera]  - Lens: 16.0 - 35.0 mm
+[Composite, Composite, Camera]  - Original Decision Data: (Binary data 512 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.3
 [Composite, Composite, Camera]  - Shooting Mode: Program AE
 [Composite, Composite, Image]  - Shutter Speed: 1/125
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Camera]  - WB RGGB Levels: 2275 1024 1024 1357
+[Composite, Composite, Camera]  - Blue Balance: 1.325195
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.023 mm
-[Composite, Composite, Camera]  - Focal Length: 35.0mm (35mm equivalent: 44.8mm)
+[Composite, Composite, Image]  - Field Of View: 43.7 deg
+[Composite, Composite, Camera]  - Focal Length: 35.0 mm (35 mm equivalent: 44.8 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 9.33 m
-[Composite, Composite, Camera]  - Lens: 16.0 - 35.0mm (35mm equivalent: 20.5 - 44.8mm)
+[Composite, Composite, Camera]  - Lens: 16.0 - 35.0 mm (35mm equivalent: 20.5 - 44.8 mm)
 [Composite, Composite, Image]  - Light Value: 6.9
+[Composite, Composite, Camera]  - Red Balance: 2.22168
 [Composite, Composite, Image]  - Date/Time Original: 2007:02:22 17:02:42.81

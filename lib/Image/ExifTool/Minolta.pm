@@ -18,6 +18,7 @@
 #              10) http://homepage3.nifty.com/kamisaka/makernote/makernote_km.htm
 #              11) http://www.dyxum.com/dforum/forum_posts.asp?TID=6371&PN=1 and
 #                  http://www.dyxum.com/dAdmin/lenses/MakerNoteList_Public.asp?stro=makr
+#                  http://dyxum.com/dforum/forum_posts.asp?TID=23435&PN=2
 #              12) http://www.minolta-forum.de/forum/index.php?showtopic=14914
 #              13) http://www.mhohner.de/minolta/lenses.php
 #              14) Jeffery Small private communication (tests with 7D)
@@ -31,7 +32,7 @@ use vars qw($VERSION %minoltaLensIDs %minoltaColorMode);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.33';
+$VERSION = '1.36';
 
 # lens ID numbers (ref 3)
 %minoltaLensIDs = (
@@ -80,12 +81,17 @@ $VERSION = '1.33';
     45 => 'Carl Zeiss Planar T* 85mm F1.4 ZA',
     46 => 'Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA',
     47 => 'Carl Zeiss Sonnar T* 135mm F1.8 ZA',
+    51 => 'Sony - AF DT 16-105mm F3.5-5.6', #11
     128 => 'Tamron 18-200, 28-300 or 80-300mm F3.5-6.3',
     129 => 'Tamron 200-400mm F5.6 LD', #12
+    137 => 'Cosina 70-210mm F2.8-4 AF', #11
     138 => 'Soligor 19-35mm F3.5-4.5', #11
     25501 => 'Minolta AF 50mm F1.7', #7
     25511 => 'Minolta AF 35-70mm F4', # or Sigma UC AF 28-70mm F3.5-4.5 or Sigma M-AF 70-200mm F2.8 EX Aspherical', #/12/12
-    25521 => 'Minolta AF 28-85mm F3.5-4.5 [New]', # or Tokina 19-35mm F3.5-4.5 or Tokina 28-70mm F2.8 AT-X', #3/7
+    25521 => 'Minolta AF 28-85mm F3.5-4.5 [New]',
+    # 25521 => 'Tokina 19-35mm F3.5-4.5', #3
+    # 25521 => 'Tokina 28-70mm F2.8 AT-X', #7
+    # 25521 => 'Tokina 80-400mm F4.5-5.6 AT-X AF II 840', #Jens
     25531 => 'Minolta AF 28-135mm F4-4.5',
     25541 => 'Minolta AF 35-105mm F3.5-4.5', #13
     25551 => 'Minolta AF 70-210mm F4 Macro', # or Sigma 70-210mm F4-5.6 APO or Sigma M-AF 70-200mm F2.8 EX APO', #7/6
@@ -131,6 +137,7 @@ $VERSION = '1.33';
     26281 => 'Minolta AF 80-200mm F2.8 G', #11
     26291 => 'Minolta AF 85mm F1.4 New',
     26311 => 'Minolta AF 100-300mm F4.5-5.6 APO', #11
+    # 26311 => 'Sony AF 100-300mm F4.5-5.6 APO', #11
     26321 => 'Minolta AF 24-50mm F4 New',
     26381 => 'Minolta AF 50mm F2.8 Macro New',
     26391 => 'Minolta AF 100mm F2.8 Macro',
@@ -142,6 +149,7 @@ $VERSION = '1.33';
     26681 => 'Minolta AF 28mm F2 New',
     26721 => 'Minolta AF 24-105mm F3.5-4.5 (D)', #11
     45741 => 'Minolta AF 200mm F2.8 G x2', # or Tokina 300mm F2.8 x2',
+    45851 => 'Tamron - SP AF 300 F2.8 LD IF', #11
 );
 
 %minoltaColorMode = (
@@ -230,8 +238,9 @@ $VERSION = '1.33';
         Writable => 'int32u',
         Protected => 2,
     },
-    0x0100 => { #10 (needs verification - PH)
+    0x0100 => { #10
         Name => 'SceneMode',
+        Writable => 'int32u',
         PrintConv => {
             0 => 'Standard',
             1 => 'Portrait',
@@ -319,17 +328,18 @@ $VERSION = '1.33';
         Description => 'Flash Exposure Compensation',
         Writable => 'rational64s',
     },
-# needs verification:
-#    0x0105 => { #10
-#        Name => 'Teleconverter',
-#        PrintConv => {
-#            0 => 'None',
-#            72 => 'Minolta AF 2x APO (D)',
-#            80 => 'Minolta AF 2x APO II',
-#            136 => 'Minolta AF 1.4x APO (D)',
-#            144 => 'Minolta AF 1.4x APO II',
-#        },
-#    },
+    0x0105 => { #10
+        Name => 'Teleconverter',
+        Writable => 'int32u',
+        PrintHex => 1,
+        PrintConv => {
+            0x00 => 'None',
+            0x48 => 'Minolta AF 2x APO (D)',
+            0x50 => 'Minolta AF 2x APO II',
+            0x88 => 'Minolta AF 1.4x APO (D)',
+            0x90 => 'Minolta AF 1.4x APO II',
+        },
+    },
     0x0107 => { #8
         Name => 'ImageStabilization',
         Writable => 'int32u',
@@ -429,6 +439,7 @@ $VERSION = '1.33';
             1 => 'Red-eye reduction',
             2 => 'Rear flash sync',
             3 => 'Wireless',
+            4 => 'Off?', #PH
         },
     },
     3 => {
@@ -535,8 +546,8 @@ $VERSION = '1.33';
         Name => 'FocalLength',
         ValueConv => '$val / 256',
         ValueConvInv => '$val * 256',
-        PrintConv => 'sprintf("%.1fmm",$val)',
-        PrintConvInv => '$val=~s/mm$//;$val',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     19 => {
         Name => 'FocusDistance',
@@ -851,15 +862,14 @@ $VERSION = '1.33';
         Name => 'Flash',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
-# needs verification:
-#    0x16 => { #10
-#        Name => 'FlashMode',
-#        PrintConv => {
-#            0 => 'Normal',
-#            1 => 'Red-eye reduction',
-#            2 => 'Rear flash sync',
-#        },
-#    },
+    0x16 => { #10
+        Name => 'FlashMode',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Red-eye reduction',
+            2 => 'Rear flash sync',
+        },
+    },
     0x1c => {
         Name => 'ISOSetting',
         PrintConv => {
@@ -910,13 +920,11 @@ $VERSION = '1.33';
         ValueConv => '$val * 100',
         ValueConvInv => '$val / 100',
     },
-# needs verification:
-#    0x40 => { #10
-#        Name => 'HueAdjustment',
-#        Unknown => 1,
-#        ValueConv => '$val - 10',
-#        ValueConvInv => '$val + 10',
-#    },
+    0x40 => { #10
+        Name => 'HueAdjustment',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+    },
     0x46 => {
         Name => 'Rotation',
         PrintConv => {
@@ -1030,15 +1038,14 @@ $VERSION = '1.33';
             1 => 'Fired',
         },
     },
-# needs verification:
-#    0x20 => { #10
-#        Name => 'FlashMode',
-#        PrintConv => {
-#            0 => 'Normal',
-#            1 => 'Red-eye reduction',
-#            2 => 'Rear flash sync',
-#        },
-#    },
+    0x20 => { #10
+        Name => 'FlashMode',
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Red-eye reduction',
+            2 => 'Rear flash sync',
+        },
+    },
     0x25 => {
         Name => 'MeteringMode',
         PrintConv => {
@@ -1067,17 +1074,16 @@ $VERSION = '1.33';
 #        ValueConv => '$val / 24',
 #        ValueConvInv => '$val * 24',
 #    },
-# needs verification:
-#    0x2f => { #10
-#        Name => 'ColorSpace',
-#        PrintConv => {
-#            0 => 'Natural sRGB',
-#            1 => 'Natural+ sRGB',
-#            2 => 'Monochrome',
-#            4 => 'Adobe RGB (ICC)',
-#            5 => 'Adobe RGB',
-#        },
-#    },
+    0x2f => { #10
+        Name => 'ColorSpace',
+        PrintConv => {
+            0 => 'Natural sRGB',
+            1 => 'Natural+ sRGB',
+            2 => 'Monochrome',
+            4 => 'Adobe RGB (ICC)',
+            5 => 'Adobe RGB',
+        },
+    },
     0x30 => {
         Name => 'Sharpness',
         ValueConv => '$val - 10',
@@ -1115,12 +1121,11 @@ $VERSION = '1.33';
         ValueConv => '$val * 100',
         ValueConvInv => '$val / 100',
     },
-# needs verification:
-#    0x4a => { #10
-#        Name => 'HueAdjustment',
-#        ValueConv => '$val - 10',
-#        ValueConvInv => '$val + 10',
-#    },
+    0x4a => { #10
+        Name => 'HueAdjustment',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+    },
     0x50 => {
         Name => 'Rotation',
         PrintConv => {
@@ -1137,15 +1142,14 @@ $VERSION = '1.33';
         PrintConvInv => 'eval $val',
     },
     0x54 => 'FreeMemoryCardImages',
-# needs verification:
-#    0x65 => { #10
-#        Name => 'Rotation',
-#        PrintConv => {
-#            0 => 'Horizontal (normal)',
-#            1=> 'Rotate 90 CW',
-#            2 => 'Rotate 270 CW',
-#        },
-#    },
+    0x65 => { #10
+        Name => 'Rotation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
     # 0x66 maybe program mode or some setting like this? (PH)
     0x6e => { #10
         Name => 'ColorTemperature',
@@ -1153,22 +1157,21 @@ $VERSION = '1.33';
         ValueConv => '$val * 100',
         ValueConvInv => '$val / 100',
     },
-# needs verification:
-#    0x71 => { #10
-#        Name => 'PictureFinish',
-#        PrintConv => {
-#            0 => 'Natural',
-#            1 => 'Natural+',
-#            2 => 'Portrait',
-#            3 => 'Wind Scene',
-#            4 => 'Evening Scene',
-#            5 => 'Night Scene',
-#            6 => 'Night Portrait',
-#            7 => 'Monochrome',
-#            8 => 'Adobe RGB',
-#            9 => 'Adobe RGB (ICC)',
-#        },
-#    },
+    0x71 => { #10
+        Name => 'PictureFinish',
+        PrintConv => {
+            0 => 'Natural',
+            1 => 'Natural+',
+            2 => 'Portrait',
+            3 => 'Wind Scene',
+            4 => 'Evening Scene',
+            5 => 'Night Scene',
+            6 => 'Night Portrait',
+            7 => 'Monochrome',
+            8 => 'Adobe RGB',
+            9 => 'Adobe RGB (ICC)',
+        },
+    },
     # 0x95 FlashStrength? (PH)
     # 0xa4 similar information to 0x27, except with different values
     0xae => {
@@ -1275,7 +1278,7 @@ $VERSION = '1.33';
         PrintConv => {
             0 => 'Single Frame',
             1 => 'Continuous',
-            2 => 'Self-Timer',
+            2 => 'Self-timer',
             3 => 'Continuous Bracketing',
             4 => 'Single-Frame Bracketing',
             5 => 'White Balance Bracketing',
@@ -1373,7 +1376,7 @@ and write Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

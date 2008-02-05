@@ -92,10 +92,12 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>7 = Aperture Priority
   <br>8 = Shutter Priority
   <br>9 = Macro
+  <br>10 = Spot
   <br>11 = Manual
   <br>12 = Movie Preview
   <br>13 = Panning
   <br>14 = Simple
+  <br>15 = Color Effects
   <br>18 = Fireworks
   <br>19 = Party
   <br>20 = Snow
@@ -106,12 +108,15 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>25 = Candlelight
   <br>26 = Starry Night
   <br>27 = High Sensitivity
+  <br>28 = Panorama Assist
   <br>29 = Underwater
   <br>30 = Beach
   <br>31 = Aerial Photo
   <br>32 = Sunset
   <br>33 = Pet
-  <br>34 = Intelligent ISO</span></td></tr>
+  <br>34 = Intelligent ISO
+  <br>36 = High Speed Continuous Shooting
+  <br>37 = Intelligent Auto</span></td></tr>
 <tr>
 <td>0x0020</td>
 <td>Audio</td>
@@ -157,7 +162,7 @@ same as the number printed on the camera body)</span></span></td></tr>
 <td>0x0029</td>
 <td>TimeSincePowerOn</td>
 <td class=c>int32u</td>
-<td><span class=s><span class=n>(time in 1/100 sec from when the camera was powered on to when the image is
+<td><span class=s><span class=n>(time in 1/100 s from when the camera was powered on to when the image is
 written to memory card)</span></span></td></tr>
 <tr>
 <td>0x002a</td>
@@ -175,9 +180,14 @@ written to memory card)</span></span></td></tr>
 <td>0x002c</td>
 <td>Contrast</td>
 <td class=c>int16u</td>
-<td><span class=s>0x0 = Normal
+<td><span class=s><span class=n>(this decoding seems to work for some models such as the LX2, FZ7, FZ8, FZ18
+and FZ50, but may not be correct for other models such as the FX10, L1, L10
+and LC80)</span>
+  <br>0x0 = Normal
   <br>0x1 = Low
   <br>0x2 = High
+  <br>0x6 = Medium Low
+  <br>0x7 = Medium High
   <br>0x100 = Low
   <br>0x110 = Normal
   <br>0x120 = High</span></td></tr>
@@ -207,7 +217,8 @@ written to memory card)</span></span></td></tr>
 <td>ColorMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Normal
-  <br>1 = Natural</span></td></tr>
+  <br>1 = Natural
+  <br>2 = Vivid</span></td></tr>
 <tr class=b>
 <td>0x0033</td>
 <td>BabyAge</td>
@@ -233,17 +244,32 @@ written to memory card)</span></span></td></tr>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x0039</td>
+<td>Contrast</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x003a</td>
 <td>WorldTimeLocation</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Home
   <br>2 = Destination</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x003c</td>
 <td>ProgramISO</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>0x0040</td>
+<td>Saturation</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x0041</td>
+<td>Sharpness</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x0042</td>
 <td>FilmMode</td>
 <td class=c>int16u</td>
@@ -254,42 +280,42 @@ written to memory card)</span></span></td></tr>
   <br>5 = Standard (B&amp;W)
   <br>6 = Dynamic (B&amp;W)
   <br>7 = Smooth (B&amp;W)</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0046</td>
 <td>WBAdjustAB</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is a shift toward blue)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0047</td>
 <td>WBAdjustGM</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is a shift toward green)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0051</td>
 <td>LensType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0052</td>
 <td>LensSerialNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0053</td>
 <td>AccessoryType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x8000</td>
 <td>MakerNoteVersion</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x8001</td>
 <td>SceneMode</td>
 <td class=c>int16u</td>
@@ -303,10 +329,12 @@ written to memory card)</span></span></td></tr>
   <br>7 = Aperture Priority
   <br>8 = Shutter Priority
   <br>9 = Macro
+  <br>10 = Spot
   <br>11 = Manual
   <br>12 = Movie Preview
   <br>13 = Panning
   <br>14 = Simple
+  <br>15 = Color Effects
   <br>18 = Fireworks
   <br>19 = Party
   <br>20 = Snow
@@ -317,28 +345,31 @@ written to memory card)</span></span></td></tr>
   <br>25 = Candlelight
   <br>26 = Starry Night
   <br>27 = High Sensitivity
+  <br>28 = Panorama Assist
   <br>29 = Underwater
   <br>30 = Beach
   <br>31 = Aerial Photo
   <br>32 = Sunset
   <br>33 = Pet
-  <br>34 = Intelligent ISO</span></td></tr>
-<tr>
+  <br>34 = Intelligent ISO
+  <br>36 = High Speed Continuous Shooting
+  <br>37 = Intelligent Auto</span></td></tr>
+<tr class=b>
 <td>0x8004</td>
 <td>WBRedLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x8005</td>
 <td>WBGreenLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x8006</td>
 <td>WBBlueLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x8010</td>
 <td>BabyAge</td>
 <td class=c>string</td>
@@ -439,21 +470,26 @@ iPalm.</p>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x002e</td>
+<td>PreviewImage</td>
+<td class=c>undef</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x010f</td>
 <td>Make</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0110</td>
 <td>Model</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0111</td>
 <td>StripOffsets</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0112</td>
 <td>Orientation</td>
 <td class=c>int16u</td>
@@ -465,22 +501,22 @@ iPalm.</p>
   <br>6 = Rotate 90 CW
   <br>7 = Mirror horizontal and rotate 90 CW
   <br>8 = Rotate 270 CW</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0116</td>
 <td>RowsPerStrip</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0117</td>
 <td>StripByteCounts</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x8769</td>
 <td>ExifOffset</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x8825</td>
 <td>GPSInfo</td>
 <td class=c>-</td>
@@ -489,7 +525,7 @@ iPalm.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Aug 30, 2007</i>
+<br><i>Last revised Jan 17, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

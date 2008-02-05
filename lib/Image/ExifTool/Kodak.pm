@@ -21,7 +21,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessKodakIFD($$$);
 sub WriteKodakIFD($$$);
@@ -968,8 +968,14 @@ my %sceneModeUsed = (
     0xc35e => 'SBA_RGBShifts',
     0xc35f => 'SBAInputImageColorspace',
     0xc360 => 'SBAInputImageBitDepth',
-    0xc361 => 'SBAExposureRecord',
-    0xc362 => 'UserAdjSBA_RGBShifts',
+    0xc361 => {
+        Name => 'SBAExposureRecord',
+        Binary => 1,
+    },
+    0xc362 => {
+        Name => 'UserAdjSBA_RGBShifts',
+        Binary => 1,
+    },
     0xc363 => 'ImageRotationStatus',
     0xc364 => 'RollGuidElements',
     0xc365 => 'MetadataNumber',
@@ -1104,7 +1110,7 @@ interpret Kodak maker notes EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -24,14 +24,24 @@ tags.
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 <tr class=b>
+<td>0x2001</td>
+<td>PreviewImage</td>
+<td class=c>undef</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xb020</td>
+<td>ColorReproduction</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0xb021</td>
 <td>ColorTemperature</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xb023</td>
 <td>SceneMode</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s>0 = Manual (P,A,S or M)
   <br>1 = Portrait
   <br>4 = Sunset
@@ -43,27 +53,27 @@ tags.
 <tr class=b>
 <td>0xb024</td>
 <td>ZoneMatching</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
 <tr>
 <td>0xb025</td>
 <td>DynamicRangeOptimizer</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = Standard
   <br>2 = Advanced</span></td></tr>
 <tr class=b>
 <td>0xb026</td>
 <td>ImageStabilization</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr>
 <td>0xb027</td>
 <td>LensID</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s>0 = Minolta AF 28-85mm F3.5-4.5
   <br>1 = Minolta AF 80-200mm F2.8 HS-APO G
   <br>2 = Minolta AF 28-70mm F2.8 G
@@ -107,8 +117,10 @@ tags.
   <br>45 = Carl Zeiss Planar T* 85mm F1.4 ZA
   <br>46 = Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA
   <br>47 = Carl Zeiss Sonnar T* 135mm F1.8 ZA
+  <br>51 = Sony - AF DT 16-105mm F3.5-5.6
   <br>128 = Tamron 18-200, 28-300 or 80-300mm F3.5-6.3
   <br>129 = Tamron 200-400mm F5.6 LD
+  <br>137 = Cosina 70-210mm F2.8-4 AF
   <br>138 = Soligor 19-35mm F3.5-4.5
   <br>2550 = Minolta AF 50mm F1.7
   <br>2551 = Minolta AF 35-70mm F4
@@ -168,7 +180,68 @@ tags.
   <br>2667 = Minolta AF 35mm F2 New
   <br>2668 = Minolta AF 28mm F2 New
   <br>2672 = Minolta AF 24-105mm F3.5-4.5 (D)
-  <br>4574 = Minolta AF 200mm F2.8 G x2</span></td></tr>
+  <br>4574 = Minolta AF 200mm F2.8 G x2
+  <br>4585 = Tamron - SP AF 300 F2.8 LD IF
+  <br>25501 = Minolta AF 50mm F1.7
+  <br>25511 = Minolta AF 35-70mm F4
+  <br>25521 = Minolta AF 28-85mm F3.5-4.5 [New]
+  <br>25531 = Minolta AF 28-135mm F4-4.5
+  <br>25541 = Minolta AF 35-105mm F3.5-4.5
+  <br>25551 = Minolta AF 70-210mm F4 Macro
+  <br>25561 = Minolta AF 135mm F2.8
+  <br>25571 = Minolta AF 28mm F2.8
+  <br>25581 = Minolta AF 24-50mm F4
+  <br>25601 = Minolta AF 100-200mm F4.5
+  <br>25611 = Minolta AF 75-300mm F4.5-5.6
+  <br>25621 = Minolta AF 50mm F1.4 [New]
+  <br>25631 = Minolta AF 300mm F2.8 G
+  <br>25641 = Minolta AF 50mm F2.8 Macro
+  <br>25651 = Minolta AF 600mm F4
+  <br>25661 = Minolta AF 24mm F2.8
+  <br>25721 = Minolta AF 500mm F8 Reflex
+  <br>25781 = Minolta AF 16mm F2.8 Fisheye
+  <br>25791 = Minolta AF 20mm F2.8
+  <br>25811 = Minolta AF 100mm F2.8 Macro New
+  <br>25858 = Minolta AF 35-105mm F3.5-4.5 New
+  <br>25881 = Minolta AF 70-210mm F3.5-4.5
+  <br>25891 = Minolta AF 80-200 F2.8 APO
+  <br>25911 = Minolta AF 35mm F1.4
+  <br>25921 = Minolta AF 85mm F1.4 G (D)
+  <br>25931 = Minolta AF 200mm F2.8 G APO
+  <br>25941 = Minolta AF 3X-1X F1.7-2.8 Macro
+  <br>25961 = Minolta AF 28mm F2
+  <br>25971 = Minolta AF 35mm F2
+  <br>25981 = Minolta AF 100mm F2
+  <br>26041 = Minolta AF 80-200mm F4.5-5.6
+  <br>26051 = Minolta AF 35-80mm F4-5.6
+  <br>26061 = Minolta AF 100-300mm F4.5-5.6 (D)
+  <br>26071 = Minolta AF 35-80mm F4-5.6
+  <br>26081 = Minolta AF 300mm F2.8 G
+  <br>26091 = Minolta AF 600mm F4 HS-APO G
+  <br>26121 = Minolta AF 200mm F2.8 G HS-APO
+  <br>26131 = Minolta AF 50mm F1.7 New
+  <br>26151 = Minolta AF 28-105mm F3.5-4.5 Power Zoom
+  <br>26161 = Minolta AF 35-200mm F4.5-5.6 Power Zoom
+  <br>26181 = Minolta AF 28-80mm F4-5.6 Power Zoom
+  <br>26191 = Minolta AF 80-200mm F4.5-5.6 Power Zoom
+  <br>26201 = Minolta AF 28-70mm F2.8 G
+  <br>26211 = Minolta AF 100-300mm F4.5-5.6 Power Zoom
+  <br>26241 = Minolta AF 35-80mm F4-5.6 Power Zoom
+  <br>26281 = Minolta AF 80-200mm F2.8 G
+  <br>26291 = Minolta AF 85mm F1.4 New
+  <br>26311 = Minolta AF 100-300mm F4.5-5.6 APO
+  <br>26321 = Minolta AF 24-50mm F4 New
+  <br>26381 = Minolta AF 50mm F2.8 Macro New
+  <br>26391 = Minolta AF 100mm F2.8 Macro
+  <br>26411 = Minolta AF 20mm F2.8 New
+  <br>26421 = Minolta AF 24mm F2.8 New
+  <br>26441 = Minolta AF 100-400mm F4.5-6.7 APO
+  <br>26621 = Minolta AF 50mm F1.4 New
+  <br>26671 = Minolta AF 35mm F2 New
+  <br>26681 = Minolta AF 28mm F2 New
+  <br>26721 = Minolta AF 24-105mm F3.5-4.5 (D)
+  <br>45741 = Minolta AF 200mm F2.8 G x2
+  <br>45851 = Tamron - SP AF 300 F2.8 LD IF</span></td></tr>
 <tr class=b>
 <td>0xb028</td>
 <td>MinoltaMakerNote</td>
@@ -185,17 +258,18 @@ tags.
   <br>4 = Sunset
   <br>5 = Night Scene
   <br>6 = B&amp;W
-  <br>7 = Adobe RGB</span></td></tr>
+  <br>7 = Adobe RGB
+  <br>12 = Neutral</span></td></tr>
 <tr class=b>
 <td>0xb040</td>
 <td>Macro</td>
-<td class=c>N</td>
+<td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr>
 <td>0xb041</td>
 <td>ExposureMode</td>
-<td class=c>N</td>
+<td class=c>int16u</td>
 <td><span class=s>0 = Auto
   <br>5 = Landscape
   <br>6 = Program
@@ -206,13 +280,21 @@ tags.
 <tr class=b>
 <td>0xb047</td>
 <td>Quality</td>
-<td class=c>N</td>
+<td class=c>int16u</td>
 <td><span class=s>0 = Normal
   <br>1 = Fine</span></td></tr>
 <tr>
+<td>0xb04b</td>
+<td>Anti-Blur</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On (Continuous)
+  <br>2 = On (Shooting)
+  <br>65535 = n/a</span></td></tr>
+<tr class=b>
 <td>0xb04e</td>
 <td>LongExposureNoiseReduction</td>
-<td class=c>N</td>
+<td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
@@ -262,6 +344,11 @@ containing these tags.</p>
 <td>SR2SubIFDKey</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(key to decrypt SR2SubIFD)</span></span></td></tr>
+<tr class=b>
+<td>0x7250</td>
+<td>MRWInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='MinoltaRaw.html'>MinoltaRaw Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SR2SubIFD'>Sony SR2SubIFD Tags</a></h2>
@@ -308,7 +395,7 @@ containing these tags.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 17, 2006</i>
+<br><i>Last revised Feb 5, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

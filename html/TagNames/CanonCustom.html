@@ -1421,49 +1421,55 @@ changes), as well as defining additional new tags of their own.</p>
 <td><span class=s>0 = Disable
   <br>1 = Enable</span></td></tr>
 <tr>
+<td>0x0204</td>
+<td>AutoLightingOptimizer</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Enable
+  <br>1 = Disable</span></td></tr>
+<tr class=b>
 <td>0x0304</td>
 <td>ETTLII</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Evaluative
   <br>1 = Average</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0305</td>
 <td>ShutterCurtainSync</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = 1st-curtain sync
   <br>1 = 2nd-curtain sync</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0306</td>
 <td>FlashFiring</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Fires
   <br>1 = Does not fire</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0407</td>
 <td>ViewInfoDuringExposure</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0408</td>
 <td>LCDIlluminationDuringBulb</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0409</td>
 <td>InfoButtonWhenShooting</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Displays camera settings
   <br>1 = Displays shooting functions</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0501</td>
 <td>USMLensElectronicMF</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Enable after one-shot AF
   <br>1 = Disable after one-shot AF
   <br>2 = Disable in AF mode</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0502</td>
 <td>AIServoTrackingSensitivity</td>
 <td class=c>int32s</td>
@@ -1472,26 +1478,26 @@ changes), as well as defining additional new tags of their own.</p>
   <br>0 = Standard
   <br>1 = Medium Fast
   <br>2 = Fast</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0503</td>
 <td>AIServoImagePriority</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = 1: AF, 2: Tracking
   <br>1 = 1: AF, 2: Drive speed
   <br>2 = 1: Release, 2: Drive speed</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0504</td>
 <td>AIServoTrackingMethod</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Main focus point priority
   <br>1 = Continuous AF track priority</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0505</td>
 <td>LensDriveNoAF</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Focus search on
   <br>1 = Focus search off</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0506</td>
 <td>LensAFStopButton</td>
 <td class=c>int32s</td>
@@ -1503,7 +1509,7 @@ changes), as well as defining additional new tags of their own.</p>
   <br>4 = One Shot &lt;-&gt; AI servo
   <br>5 = IS start
   <br>6 = Switch to registered AF point</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0507</td>
 <td>AFMicroadjustment</td>
 <td class=c>int32s[5]</td>
@@ -1511,47 +1517,47 @@ changes), as well as defining additional new tags of their own.</p>
   <br>0 = Disable
   <br>1 = Adjust all by same amount
   <br>2 = Adjust by lens</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0508</td>
 <td>AFExpansionWithSelectedPoint</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable
   <br>1 = Enable (left/right assist points)
   <br>2 = Enable (surrounding assist points)</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0509</td>
 <td>SelectableAFPoint</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = 19 points
   <br>1 = Inner 9 points
   <br>2 = Outer 9 points</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x050a</td>
 <td>SwitchToRegisteredAFPoint</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x050b</td>
 <td>AFPointAutoSelection</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Control-direct:disable/Main:enable
   <br>1 = Control-direct:disable/Main:disable
   <br>2 = Control-direct:enable/Main:enable</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x050c</td>
 <td>AFPointDisplayDuringFocus</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = On
   <br>1 = Off
   <br>2 = On (when focus achieved)</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x050d</td>
 <td>AFPointBrightness</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Normal
   <br>1 = Brighter</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x050e</td>
 <td>AFAssistBeam</td>
 <td class=c>int32s</td>
@@ -1559,26 +1565,26 @@ changes), as well as defining additional new tags of their own.</p>
   <br>0 = Emits
   <br>1 = Does not emit
   <br>2 = Only ext. flash emits</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x050f</td>
 <td>AFPointSelectionMethod</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Normal
   <br>1 = Multi-controller direct
   <br>2 = Quick Control Dial direct</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0510</td>
 <td>SuperimposedDisplay</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = On
   <br>1 = Off</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0511</td>
 <td>AFDuringLiveView</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x060f</td>
 <td>MirrorLockup</td>
 <td class=c>int32s</td>
@@ -1586,21 +1592,21 @@ changes), as well as defining additional new tags of their own.</p>
   <br>0 = Disable
   <br>1 = Enable
   <br>2 = Enable: Down with Set</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0610</td>
 <td>ContinuousShootingSpeed</td>
 <td class=c>int32s[3]</td>
 <td><span class=s>[Value 0]
   <br>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0611</td>
 <td>ContinuousShotLimit</td>
 <td class=c>int32s[2]</td>
 <td><span class=s>[Value 0]
   <br>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0701</td>
 <td>ShutterButtonAFOnButton</td>
 <td class=c>int32s</td>
@@ -1609,20 +1615,20 @@ changes), as well as defining additional new tags of their own.</p>
   <br>2 = Metering start/Meter + AF start
   <br>3 = AE lock/Metering + AF start
   <br>4 = Metering + AF start / disable</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0702</td>
 <td>AFOnAELockButtonSwitch</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0703</td>
 <td>QuickControlDialInMeter</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Exposure comp/Aperture
   <br>1 = AF point selection
   <br>2 = ISO speed</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0704</td>
 <td>SetButtonWhenShooting</td>
 <td class=c>int32s</td>
@@ -1641,43 +1647,43 @@ changes), as well as defining additional new tags of their own.</p>
   <br>5 = Record func. + media/folder
   <br>6 = Menu display
   <br>7 = Image playback</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0705</td>
 <td>ManualTv</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Tv=Main/Av=Control
   <br>1 = Tv=Control/Av=Main</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0706</td>
 <td>DialDirectionTvAv</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Normal
   <br>1 = Reversed</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0707</td>
 <td>AvSettingWithoutLens</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0708</td>
 <td>WBMediaImageSizeSetting</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Rear LCD panel
   <br>1 = LCD monitor</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0709</td>
 <td>LockMicrophoneButton</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Protect (holding:sound rec.)
   <br>1 = Sound rec. (protect:disable)</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x070a</td>
 <td>ButtonFunctionControlOff</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Normal (enable)
   <br>1 = Disable main, Control, Multi-control</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x080b</td>
 <td>FocusingScreen</td>
 <td class=c>int32s</td>
@@ -1690,20 +1696,20 @@ changes), as well as defining additional new tags of their own.</p>
   <br>1 = Ec-A,B,C,CII,CIII,D,H,I,L
   <br>2 = Ec-S
   <br>3 = Ec-N,R</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x080c</td>
 <td>TimerLength</td>
 <td class=c>int32s[4]</td>
 <td><span class=s>[Value 0]
   <br>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x080d</td>
 <td>ShortReleaseTimeLag</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x080e</td>
 <td>AddAspectRatioInfo</td>
 <td class=c>int32s</td>
@@ -1714,13 +1720,13 @@ changes), as well as defining additional new tags of their own.</p>
   <br>4 = 6:7
   <br>5 = 10:12
   <br>6 = 5:7</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x080f</td>
 <td>AddOriginalDecisionData</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0810</td>
 <td>LiveViewExposureSimulation</td>
 <td class=c>int32s</td>
@@ -1730,7 +1736,7 @@ changes), as well as defining additional new tags of their own.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 10, 2007</i>
+<br><i>Last revised Jan 25, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

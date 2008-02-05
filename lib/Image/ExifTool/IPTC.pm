@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -966,7 +966,7 @@ sub ProcessIPTC($$$)
         if (not defined $lastRec or $lastRec != $rec) {
             my $tableInfo = $tagTablePtr->{$rec};
             unless ($tableInfo) {
-                $exifTool->Warn("Unrecognized IPTC record: $rec");
+                $exifTool->Warn("Unrecognized IPTC record $rec, subsequent records ignored");
                 last;   # stop now because we're probably reading garbage
             }
             my $tableName = $tableInfo->{SubDirectory}->{TagTable};
@@ -1083,7 +1083,7 @@ image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

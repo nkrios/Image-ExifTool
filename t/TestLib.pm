@@ -10,6 +10,7 @@
 #                            object to be passed instead of tags hash ref.
 #               Oct. 30/04 - P. Harvey Split testCompare() into separate sub.
 #               May  18/05 - P. Harvey Tolerate round-off errors in floats.
+#               Feb. 02/08 - P. Harvey Allow different timezones in time values
 #------------------------------------------------------------------------------
 
 package t::TestLib;
@@ -20,11 +21,37 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.07';
+$VERSION = '1.09';
 @ISA = qw(Exporter);
-@EXPORT = qw(check writeCheck testCompare testVerbose);
+@EXPORT = qw(check writeCheck testCompare binaryCompare testVerbose);
 
 sub closeEnough($$);
+
+#------------------------------------------------------------------------------
+# compare 2 binary files
+# Inputs: 0) file name 1, 1) file name 2
+# Returns: 1 if files are identical
+sub binaryCompare($$)
+{
+    my ($file1, $file2) = @_;
+    my $success = 1;
+    open(TESTFILE1, $file1) or return 0;
+    unless (open(TESTFILE2, $file2)) {
+        close(TESTFILE1);
+        return 0;
+    }
+    binmode(TESTFILE1);
+    binmode(TESTFILE2);
+    my ($buf1, $buf2);
+    while (read(TESTFILE1, $buf1, 65536)) {
+        read(TESTFILE2, $buf2, 65536) or $success = 0, last;
+        $buf1 eq $buf2 or $success = 0, last;
+    }
+    read(TESTFILE2, $buf2, 65536) and $success = 0;
+    close(TESTFILE1);
+    close(TESTFILE2);
+    return $success
+}
 
 #------------------------------------------------------------------------------
 # Compare 2 files and return true and erase the 2nd file if they are the same
@@ -113,6 +140,11 @@ sub closeEnough($$)
         next if $tok1 eq $tok2;
         # can't compare any more if either line was truncated (ie. ends with '[...]')
         return $lenChanged if $tok1 =~ /\Q[...]\E$/ or $tok2 =~ /\Q[...]\E$/;
+        # allow times with different timezones
+        if ($tok1 =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/) {
+            my $date = $1;  # remove timezone
+            next if $tok2 =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/ and $date eq $1;
+        }
         # check to see if both tokens are floating point numbers (with decimal points!)
         $tok1 =~ s/[^\d.]+$//; $tok2 =~ s/[^\d.]+$//;   # remove trailing units
         last unless Image::ExifTool::IsFloat($tok1) and
@@ -143,9 +175,7 @@ sub closeEnough($$)
 #------------------------------------------------------------------------------
 # Compare extracted information against a standard output file
 # Inputs: 0) [optional] ExifTool object reference
-#         1) tag hash reference
-#         2) test name
-#         3) test number
+#         1) tag hash reference, 2) test name, 3) test number
 #         4) test number for comparison file (if different than this test)
 # Returns: 1 if check passed
 sub check($$$;$$)
@@ -181,6 +211,8 @@ sub check($$$;$$)
             } else {
                 $val = '(Binary data ' . length($$val) . ' bytes)';
             }
+        } elsif (ref $val eq 'ARRAY') {
+            $val = join(', ', @$val);
         } else {
             # make sure there are no linefeeds in output
             $val =~ tr/\x0a\x0d/;/;
@@ -243,7 +275,7 @@ sub writeCheck($$$;$$)
 #------------------------------------------------------------------------------
 # test verbose output
 # Inputs: 0) test name, 1) test number, 2) Input file, 3) verbose level
-# Returns: 0) true if test passed
+# Returns: true if test passed
 sub testVerbose($$$$)
 {
     my ($testname, $testnum, $infile, $verbose) = @_;

@@ -1,6 +1,6 @@
 Summary: perl module for image data extraction 
 Name: perl-Image-ExifTool
-Version: 7.00
+Version: 7.15
 Release: 1
 License: Artistic/GPL
 Group: Development/Libraries/Perl
@@ -21,31 +21,32 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       JP2   r/w     PPT   r      |  EXIF           r/w/c
-  AI    r       JPEG  r/w     PS    r/w    |  GPS            r/w/c
-  AIFF  r       K25   r       PSD   r/w    |  IPTC           r/w/c
-  APE   r       M4A   r       QTIF  r      |  XMP            r/w/c
-  ARW   r       MEF   r/w     RA    r      |  MakerNotes     r/w/c
-  ASF   r       MIE   r/w/c   RAF   r      |  Photoshop IRB  r/w/c
-  AVI   r       MIFF  r       RAM   r      |  ICC Profile    r/w/c
-  BMP   r       MNG   r/w     RAW   r/w    |  MIE            r/w/c
-  BTF   r       MOS   r/w     RIFF  r      |  JFIF           r/w/c
-  CR2   r/w     MOV   r       RM    r      |  Ducky APP12    r/w/c
-  CRW   r/w     MP3   r       SR2   r      |  CIFF           r/w
-  CS1   r/w     MP4   r       SRF   r      |  AFCP           r/w
-  DCM   r       MPC   r       SWF   r      |  DICOM          r
-  DCR   r       MPG   r       THM   r/w    |  Flash          r
-  DNG   r/w     MRW   r/w     TIFF  r/w    |  FlashPix       r
-  DOC   r       NEF   r/w     VRD   r/w/c  |  GeoTIFF        r
-  EPS   r/w     OGG   r       WAV   r      |  PrintIM        r
-  ERF   r/w     ORF   r/w     WDP   r/w    |  ID3            r
-  FLAC  r       PBM   r/w     WMA   r      |  Kodak Meta     r
-  FLV   r       PDF   r       WMV   r      |  Ricoh RMETA    r
-  FPX   r       PEF   r/w     X3F   r      |  Picture Info   r
-  GIF   r/w     PGM   r/w     XLS   r      |  Adobe APP14    r
-  HTML  r       PICT  r       XMP   r/w/c  |  APE            r
-  ICC   r/w/c   PNG   r/w                  |  Vorbis         r
-  JNG   r/w     PPM   r/w                  |  (and more)
+  3FR   r       ITC   r       PNG   r/w    |  EXIF           r/w/c
+  ACR   r       JNG   r/w     PPM   r/w    |  GPS            r/w/c
+  AI    r       JP2   r/w     PPT   r      |  IPTC           r/w/c
+  AIFF  r       JPEG  r/w     PS    r/w    |  XMP            r/w/c
+  APE   r       K25   r       PSD   r/w    |  MakerNotes     r/w/c
+  ARW   r       KDC   r       QTIF  r      |  Photoshop IRB  r/w/c
+  ASF   r       M4A   r       RA    r      |  ICC Profile    r/w/c
+  AVI   r       MEF   r/w     RAF   r/w    |  MIE            r/w/c
+  BMP   r       MIE   r/w/c   RAM   r      |  JFIF           r/w/c
+  BTF   r       MIFF  r       RAW   r/w    |  Ducky APP12    r/w/c
+  CR2   r/w     MNG   r/w     RIFF  r      |  CIFF           r/w
+  CRW   r/w     MOS   r/w     RM    r      |  AFCP           r/w
+  CS1   r/w     MOV   r       SR2   r      |  JPEG 2000      r
+  DCM   r       MP3   r       SRF   r      |  DICOM          r
+  DCR   r       MP4   r       SWF   r      |  Flash          r
+  DNG   r/w     MPC   r       THM   r/w    |  FlashPix       r
+  DOC   r       MPG   r       TIFF  r/w    |  GeoTIFF        r
+  EPS   r/w     MRW   r/w     VRD   r/w/c  |  PrintIM        r
+  ERF   r/w     NEF   r/w     WAV   r      |  ID3            r
+  FLAC  r       OGG   r       WDP   r/w    |  Kodak Meta     r
+  FLV   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
+  FPX   r       PBM   r/w     WMV   r      |  Picture Info   r
+  GIF   r/w     PDF   r/w     X3F   r      |  Adobe APP14    r
+  HDP   r/w     PEF   r/w     XLS   r      |  APE            r
+  HTML  r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
+  ICC   r/w/c   PICT  r                    |  (and more)
 
 See html/index.html for more details about ExifTool features.
 

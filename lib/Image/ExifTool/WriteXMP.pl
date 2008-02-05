@@ -191,48 +191,6 @@ my %xmpStruct = (
     },
 );
 
-# Lookup to translate our namespace prefixes into URI's.  This list need
-# not be complete, but it must contain an entry for each namespace prefix
-# (NAMESPACE) for writable tags in the XMP tables or the table above
-my %nsURI = (
-    aux       => 'http://ns.adobe.com/exif/1.0/aux/',
-    cc        => 'http://web.resource.org/cc/',
-    crs       => 'http://ns.adobe.com/camera-raw-settings/1.0/',
-    crss      => 'http://ns.adobe.com/camera-raw-saved-settings/1.0/',
-    dc        => 'http://purl.org/dc/elements/1.1/',
-    exif      => 'http://ns.adobe.com/exif/1.0/',
-    iX        => 'http://ns.adobe.com/iX/1.0/',
-    pdf       => 'http://ns.adobe.com/pdf/1.3/',
-    pdfx      => 'http://ns.adobe.com/pdfx/1.3/',
-    photoshop => 'http://ns.adobe.com/photoshop/1.0/',
-    rdf       => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-    rdfs      => 'http://www.w3.org/2000/01/rdf-schema#',
-    stDim     => 'http://ns.adobe.com/xap/1.0/sType/Dimensions#',
-    stEvt     => 'http://ns.adobe.com/xap/1.0/sType/ResourceEvent#',
-    stFnt     => 'http://ns.adobe.com/xap/1.0/sType/Font#',
-    stJob     => 'http://ns.adobe.com/xap/1.0/sType/Job#',
-    stRef     => 'http://ns.adobe.com/xap/1.0/sType/ResourceRef#',
-    stVer     => 'http://ns.adobe.com/xap/1.0/sType/Version#',
-    tiff      => 'http://ns.adobe.com/tiff/1.0/',
-   'x'        => 'adobe:ns:meta/',
-    xapG      => 'http://ns.adobe.com/xap/1.0/g/',
-    xapGImg   => 'http://ns.adobe.com/xap/1.0/g/img/',
-    xmp       => 'http://ns.adobe.com/xap/1.0/',
-    xmpBJ     => 'http://ns.adobe.com/xap/1.0/bj/',
-    xmpDM     => 'http://ns.adobe.com/xmp/1.0/DynamicMedia/',
-    xmpMM     => 'http://ns.adobe.com/xap/1.0/mm/',
-    xmpRights => 'http://ns.adobe.com/xap/1.0/rights/',
-    xmpTPg    => 'http://ns.adobe.com/xap/1.0/t/pg/',
-    xmpidq    => 'http://ns.adobe.com/xmp/Identifier/qual/1.0/',
-    xmpPLUS   => 'http://ns.adobe.com/xap/1.0/PLUS/',
-    dex       => 'http://ns.optimasc.com/dex/1.0/',
-    mediapro  => 'http://ns.iview-multimedia.com/mediapro/1.0/',
-    Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
-    MicrosoftPhoto => 'http://ns.microsoft.com/photo/1.0',
-    lr        => 'http://ns.adobe.com/lightroom/1.0/',
-    DICOM     => 'http://ns.adobe.com/DICOM/',
-);
-
 my $x_toolkit = "x:xmptk='Image::ExifTool $Image::ExifTool::VERSION'";
 my $rdfDesc = 'rdf:Description';
 #
@@ -269,10 +227,6 @@ my $pktCloseR =  "<?xpacket end='r'?>";
             # (normal tags will get set later if they are actually written)
             SetPropertyPath($table, $tag) if $$tagInfo{Struct};
             my $format = $$tagInfo{Writable};
-            next unless $format and $format eq 'date';
-            # add dummy conversion for dates (for now...)
-            $$tagInfo{PrintConvInv} = '$val' unless $$tagInfo{PrintConvInv};
-            $$tagInfo{ValueConvInv} = '$val' unless $$tagInfo{ValueConvInv};
         }
         # add new namespace if NAMESPACE is ns/uri pair
         next unless ref $$table{NAMESPACE};
@@ -342,21 +296,23 @@ sub CheckXMP($$$)
             return 'Not an integer';
         }
     } elsif ($format eq 'date') {
+        my ($y, $m, $d, $t, $tz);
         if ($$valPtr =~ /(\d{4}):(\d{2}):(\d{2}) (\d{2}:\d{2}(?::\d{2}(?:\.\d*)?)?)(.*)/) {
-            my ($y, $m, $d, $t, $tz) = ($1, $2, $3, $4, $5);
-            # use 'Z' for timezone unless otherwise specified
-            $tz = 'Z' unless $tz and $tz =~ /([+-]\d{2}:\d{2})/;
-            $$valPtr = "$y-$m-${d}T$t$tz";
+            ($y, $m, $d, $t, $tz) = ($1, $2, $3, $4, $5);
+            $$valPtr = "$y-$m-${d}T$t";
         } elsif ($$valPtr =~ /^\s*\d{4}(:\d{2}){0,2}\s*$/) {
             # this is just a date (YYYY, YYYY-MM or YYYY-MM-DD)
             $$valPtr =~ tr/:/-/;
-        } elsif ($$valPtr =~ /^\s*(\d{2}:\d{2}:\d{2})(.*)\s*$/) {
+        } elsif ($$valPtr =~ /^\s*(\d{2}:\d{2}(?::\d{2}(?:\.\d*)?)?)(.*)\s*$/) {
             # this is just a time
-            my ($t, $tz) = ($1, $2);
-            $tz = 'Z' unless $tz and $tz =~ /([+-]\d{2}:\d{2})/;
-            $$valPtr = "$t$tz";
+            ($t, $tz) = ($1, $2);
+            $$valPtr = $t;
         } else {
-            return "Invalid date or time format (should be YYYY:MM:DD HH:MM:SS[+/-HH:MM])";
+            return "Invalid date or time format (should be YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM])";
+        }
+        if ($tz) {
+            $tz =~ /^(Z|[+-]\d{2}:\d{2})$/ or return "Invalid time zone (must be Z or +/-HH:MM)";
+            $$valPtr .= $tz;
         }
     } elsif ($format eq 'lang-alt') {
         # nothing to do
@@ -655,6 +611,47 @@ sub WriteXMP($$;$)
         $uuid = '';
     }
 #
+# handle writing XMP as a block to XMP file
+#
+    if ($xmpFile) {
+        my $tagInfo = $Image::ExifTool::Extra{XMP};
+        if ($tagInfo and $exifTool->{NEW_VALUE}->{$tagInfo}) {
+            my $rtnVal = 1;
+            my $newVal = Image::ExifTool::GetNewValues($exifTool->{NEW_VALUE}->{$tagInfo});
+            if (defined $newVal and length $newVal) {
+                $exifTool->VPrint(0, "  Writing XMP as a block\n");
+                ++$exifTool->{CHANGED};
+                Write($$dirInfo{OutFile}, $newVal) or $rtnVal = -1;
+            } else {
+                $exifTool->Error("Can't delete all XMP from an XMP file");
+            }
+            delete $exifTool->{XMP_CAPTURE};
+            return $rtnVal;
+        }
+    }
+#
+# delete groups in family 1 if requested
+#
+    if (grep /^XMP-.+$/, keys %{$exifTool->{DEL_GROUP}}) {
+        my $del = $exifTool->{DEL_GROUP};
+        my $path;
+        foreach $path (keys %capture) {
+            my @propList = split('/',$path); # get property list
+            my ($tag, $namespace) = GetXMPTagID(\@propList);
+            # translate namespace if necessary
+            $namespace = $$xlatNamespace{$namespace} if $$xlatNamespace{$namespace};
+            my $grp = "XMP-$namespace";
+            if ($$del{uc($grp)}) {
+                if ($verbose > 1) {
+                    my $val = $capture{$path}->[0];
+                    $exifTool->VPrint(1, "    - $grp:$tag = '$val'\n");
+                }
+                delete $capture{$path};
+                ++$changed;
+            }
+        }
+    }
+#
 # add, delete or change information as specified
 #
     # get hash of all information we want to change
@@ -701,7 +698,7 @@ sub WriteXMP($$;$)
                     my ($val, $attrs) = @{$capture{$path}};
                     if ($overwrite < 0) {
                         # only overwrite specific values
-                        next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
+                        next unless Image::ExifTool::IsOverwriting($newValueHash, UnescapeXML($val));
                     }
                     if ($writable eq 'lang-alt') {
                         # get original language code (lc for comparisons)
@@ -823,8 +820,8 @@ sub WriteXMP($$;$)
             $exifTool->Error("Nothing to write");
             return 1;
         }
-        return 1 if Write($$dirInfo{OutFile}, $$dataPt);
-        return -1;
+        Write($$dirInfo{OutFile}, $$dataPt) or return -1;
+        return 1;
     }
 #
 # write out the new XMP information
@@ -990,8 +987,8 @@ sub WriteXMP($$;$)
     $exifTool->{CHANGED} += $changed;
     $debug > 1 and $newData and print $newData,"\n";
     return $newData unless $xmpFile;
-    return 1 if Write($$dirInfo{OutFile}, $newData);
-    return -1;
+    Write($$dirInfo{OutFile}, $newData) or return -1;
+    return 1;
 }
 
 
@@ -1013,7 +1010,7 @@ This file contains routines to write XMP metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

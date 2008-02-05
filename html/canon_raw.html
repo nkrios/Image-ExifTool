@@ -201,9 +201,14 @@ remain constant for all camera models.</p>
     <td align='left'>This is a null directory entry</td></tr>
 <tr align='center'><td>0x0001</td><td>-</td><td><i>any</i></td><td>FreeBytes</td><td><i>varies</i></td>
     <td align='left'>Unused bytes in the <b>ValueData</b></td></tr>
-<tr align='center'><td>0x0032</td><td>-</td><td>0x300b</td><td>CanonColorInfo1</td><td>2048</td>
+<tr align='center'><td>0x0006</td><td>-</td><td>0x300b</td><td>-</td><td>8</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x0032</td><td>-</td><td>0x300b</td><td>CanonColorInfo1</td><td>768 or 2048</td>
     <td align='left'>Block of color information (format unknown)</td></tr>
+<tr align='center'><td>0x0036</td><td>-</td><td>0x300b</td><td>?</td><td><i>varies</i></td><td align='left'>-</td></tr>
 <tr><th class='lt' colspan=6>ASCII Strings</th></tr>
+<tr align='center'><td>0x003f</td><td>-</td><td>0x300b</td><td>?</td><td>5120</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x0040</td><td>-</td><td>0x300b</td><td>?</td><td>256</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x0041</td><td>-</td><td>0x300b</td><td>?</td><td>256</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x0805</td><td>-</td><td>0x2804</td><td>CanonFileDescription</td><td>32</td>
     <td align='left'>Description of the file format.
     ie) "EOS DIGITAL REBEL CMOS RAW"</td></tr>
@@ -232,21 +237,23 @@ remain constant for all camera models.</p>
     <td align='left'>0=single shot, 1=continuous shooting</td></tr>
 <tr align='center'><td>0x1011</td><td>-</td><td>0x3002</td><td>ShutterReleaseTiming</td><td>2</td>
     <td align='left'>0=priority on shutter, 1=priority on focus</td></tr>
+<tr align='center'><td>0x1014</td><td>-</td><td>0x3002</td><td>-</td><td>8</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1016</td><td>-</td><td>0x3002</td><td>ReleaseSetting</td><td>2</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x101c</td><td>-</td><td>0x3004</td><td>BaseISO</td><td>2</td>
     <td align='left'>The camera body's base ISO sensitivity</td></tr>
+<tr align='center'><td>0x1026</td><td>-</td><td>0x300a</td><td>-</td><td>6</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1028</td><td>0x03</td><td>0x300b</td><td>CanonFlashInfo?</td><td>8</td><td align='left'>Unknown information, flash related</td></tr>
 <tr align='center'><td>0x1029</td><td>0x02</td><td>0x300b</td><td>FocalLength</td><td>8</td>
     <td align='left'>Four 16 bit integers: 0) unknown, 1) focal length in mm, 2-3) sensor width
     and height in units of 1/1000 inch</td></tr>
 <tr align='center'><td>0x102a</td><td>0x04</td><td>0x300b</td><td>CanonShotInfo</td><td><i>varies</i></td>
     <td align='left'>Data block giving <a href="TagNames/Canon.html#ShotInfo">shot information</a></td></tr>
-<tr align='center'><td>0x102c</td><td>-</td><td>?</td><td>CanonColorInfo2</td><td>?</td>
+<tr align='center'><td>0x102c</td><td>-</td><td>0x300b</td><td>CanonColorInfo2</td><td>256</td>
     <td align='left'>Data block of color information (format unknown)</td></tr>
-<tr align='center'><td>0x102d</td><td>0x01</td><td>0x300b</td><td>CanonCameraSettings</td><td>92</td>
+<tr align='center'><td>0x102d</td><td>0x01</td><td>0x300b</td><td>CanonCameraSettings</td><td><i>varies</i></td>
     <td align='left'>Data block giving <a href="TagNames/Canon.html#CameraSettings">camera settings</a></td></tr>
-<tr align='center'><td>0x1030</td><td>-</td><td>?</td><td>WhiteSample</td><td>?</td>
-    <td align='left'>Encrypted 8x8 white sample</td></tr>
+<tr align='center'><td>0x1030</td><td>-</td><td>0x300b</td><td>WhiteSample</td><td>102 or 118</td>
+    <td align='left'><a href="TagNames/CanonRaw.html#WhiteSample">White sample information</a> with encrypted 8x8 sample data</td></tr>
 <tr align='center'><td>0x1031</td><td>-</td><td>0x300b</td><td>SensorInfo</td><td>34</td>
     <td align='left'><a href="TagNames/Canon.html#SensorInfo">Sensor size and resolution information</a></td></tr>
 <tr align='center'><td>0x1033</td><td>0x0f</td><td>0x300b</td><td>CanonCustomFunctions</td><td><i>varies</i></td>
@@ -254,6 +261,8 @@ remain constant for all camera models.</p>
 <tr align='center'><td>0x1038</td><td>0x12</td><td>0x300b</td><td>CanonAFInfo</td><td><i>varies</i></td>
     <td align='left'>Data block giving <a href="TagNames/Canon.html#AFInfo">AF-specific information</a></td></tr>
 <tr align='center'><td>0x1039</td><td>0x13</td><td>0x300b</td><td>?</td><td>8</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x103c</td><td>-</td><td>0x300b</td><td>?</td><td>156</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x107f</td><td>-</td><td>0x300b</td><td>-</td><td><i>varies</i></td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1093</td><td>0x93</td><td>0x300b</td><td>CanonFileInfo</td><td>18</td>
     <td align='left'>Data block giving <a href="TagNames/Canon.html#FileInfo">file-specific information</a></td></tr>
 <tr align='center'><td>0x10a8</td><td>0xa8</td><td>0x300b</td><td>?</td><td>20</td><td align='left'>-</td></tr>
@@ -264,8 +273,10 @@ remain constant for all camera models.</p>
     fluorescent, flash, custom and kelvin. The final 4 entries appear to be some sort of
     baseline red, green1, green2 and blue levels.</td></tr>
 <tr align='center'><td>0x10aa</td><td>0xaa</td><td>0x300b</td><td>?</td><td>10</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x10ad</td><td>-</td><td>0x300b</td><td>?</td><td>62</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10ae</td><td>0xae</td><td>0x300b</td><td>ColorTemperature</td><td>2</td>
     <td align='left'>16-bit integer giving the color temperature</td></tr>
+<tr align='center'><td>0x10af</td><td>-</td><td>0x300b</td><td>?</td><td>2</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10b4</td><td>0xb4</td><td>0x300b</td><td>ColorSpace</td><td>2</td>
     <td align='left'>16-bit integer specifying the color space
     (1=sRGB, 2=Adobe RGB, 0xffff=uncalibrated)</td></tr>
@@ -273,23 +284,27 @@ remain constant for all camera models.</p>
     <td align='left'>Data block giving <a href="TagNames/CanonRaw.html#RawJpgInfo">embedded JPG information</a></td></tr>
 <tr align='center'><td>0x10c0</td><td>0xc0</td><td>0x300b</td><td>?</td><td>26</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10c1</td><td>0xc1</td><td>0x300b</td><td>?</td><td>26</td><td align='left'>-</td></tr>
+<tr align='center'><td>0x10c2</td><td>-</td><td>0x300b</td><td>?</td><td>884</td><td align='left'>-</td></tr>
 <tr><th class='lt' colspan=6>4-Byte Alignment</th></tr>
+<tr align='center'><td>0x107f</td><td>-</td><td>0x300b</td><td>?</td><td><i>varies</i></td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1803</td><td>-</td><td>0x300a</td><td>ImageFormat</td><td>8</td>
     <td align='left'>32-bit integer specifying image format (0x20001 for CRW), followed
     by 32-bit float giving target compression ratio</td></tr>
 <tr align='center'><td>0x1804</td><td>-</td><td>0x300a</td><td>RecordID</td><td>4</td>
     <td align='left'>The number of pictures taken since the camera was manufactured</td></tr>
+<tr align='center'><td>0x1805</td><td>-</td><td>0x3002</td><td>-</td><td>8</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1806</td><td>-</td><td>0x3002</td><td>SelfTimerTime</td><td>4</td>
     <td align='left'>32-bit integer giving self-timer time in milliseconds</td></tr>
 <tr align='center'><td>0x1807</td><td>-</td><td>0x3002</td><td>TargetDistanceSetting</td><td>4</td>
     <td align='left'>32-bit float giving target distance in mm</td></tr>
-<tr align='center'><td>0x180b</td><td>0x0c</td><td>0x2807</td><td>SerialNumber</td><td>4</td>
-    <td align='left'>The camera body number. ie) 00560012345</td></tr>
+<tr align='center'><td>0x180b</td><td>0x0c</td><td>0x3004</td><td>SerialNumber</td><td>4</td>
+    <td align='left'>The camera body number for EOS models. ie) 00560012345</td></tr>
 <tr align='center'><td>0x180e</td><td>-</td><td>0x300a</td><td>TimeStamp</td><td>12</td>
     <td align='left'>32-bit integer giving the time in seconds when the picture was taken,
     followed by a 32-bit timezone in seconds</td></tr>
 <tr align='center'><td>0x1810</td><td>-</td><td>0x300a</td><td>ImageInfo</td><td>28</td>
     <td align='left'>Data block containing <a href="TagNames/CanonRaw.html#ImageInfo">image information, including rotation</a></td></tr>
+<tr align='center'><td>0x1812</td><td>-</td><td>0x3004</td><td>-</td><td>40</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1813</td><td>-</td><td>0x3002</td><td>FlashInfo</td><td>8</td>
     <td align='left'>Two 32-bit floats: The flash guide number and the flash threshold</td></tr>
 <tr align='center'><td>0x1814</td><td>-</td><td>0x3003</td><td>MeasuredEV</td><td>4</td>
@@ -298,10 +313,11 @@ remain constant for all camera models.</p>
     <td align='left'>32-bit integer giving the number of this file. ie) 1181834</td></tr>
 <tr align='center'><td>0x1818</td><td>-</td><td>0x3002</td><td>ExposureInfo</td><td>12</td>
     <td align='left'>Three 32-bit floats: Exposure compensation, Tv, Av</td></tr>
+<tr align='center'><td>0x1819</td><td>-</td><td>0x300b</td><td>-</td><td>64</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1834</td><td>0x10</td><td>0x300b</td><td>CanonModelID</td><td>4</td>
     <td align='left'>Unsigned 32-bit integer giving unique model ID</td></tr>
 <tr align='center'><td>0x1835</td><td>-</td><td>0x300b</td><td>DecoderTable</td><td>16</td>
-    <td align='left'>RAW decoder table</td></tr>
+    <td align='left'><a href="TagNames/CanonRaw.html#DecoderTable">RAW decoder table information</a></td></tr>
 <tr align='center'><td>0x183b</td><td>0x15</td><td>0x300b</td><td>SerialNumberFormat</td><td>4</td>
     <td align='left'>32-bit integer (0x90000000=format 1, 0xa0000000=format 2)</td></tr>
 <tr><th class='lt' colspan=6>Mixed Data Records</th></tr>
@@ -329,6 +345,10 @@ remain constant for all camera models.</p>
 </table></blockquote>
 
 <h3>Revisions</h3>
+<p>Feb. 4, 2008 - Added a number of unknown TagID's, decode some tags in the
+WhiteSample and DecoderTable data blocks, and fix incorrect SubDir for
+SerialNumber tag</p>
+<p>Nov. 16, 2007 - Added a number of unknown blocks</p>
 <p>Sept. 12, 2007 - Change name of CanonPictureInfo record to CanonAFInfo</p>
 <p>Nov. 28, 2006 - Highlight the possibility of <b>OtherData</b> existing in the
 directory block</p>
@@ -336,7 +356,7 @@ directory block</p>
 Please e-mail me if you find any errors or omissions in this document.  My
 address is phil at owl.phy.queensu.ca - Thanks!
 <p class='lf'><i>Created Jan. 28, 2005</i>
-<br><i>Last revised Sept. 12, 2006</i></p>
+<br><i>Last revised Feb. 4, 2008</i></p>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

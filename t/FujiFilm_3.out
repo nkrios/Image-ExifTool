@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: FujiFilm_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1373 bytes
-[File, File, Time]  - File Modification Date/Time: 2007:09:21 08:09:25
+[File, File, Time]  - File Modification Date/Time: 2008:01:23 14:06:03
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -37,11 +37,11 @@
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: Fired
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0 mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 1600
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1200
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1200
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3053
@@ -63,7 +63,7 @@
 [MakerNotes, FujiFilm, Camera] 4097 - Sharpness: Normal
 [MakerNotes, FujiFilm, Camera] 4098 - White Balance: Day White Fluorescent
 [MakerNotes, FujiFilm, Camera] 4112 - Fuji Flash Mode: Red-eye reduction
-[MakerNotes, FujiFilm, Camera] 4113 - Flash Strength: 0
+[MakerNotes, FujiFilm, Camera] 4113 - Flash Exposure Comp: 0
 [MakerNotes, FujiFilm, Camera] 4128 - Macro: Off
 [MakerNotes, FujiFilm, Camera] 4129 - Focus Mode: Auto
 [MakerNotes, FujiFilm, Camera] 4144 - Slow Sync: Off
@@ -79,7 +79,8 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.005 mm
-[Composite, Composite, Camera]  - Focal Length: 6.0mm (35mm equivalent: 39.6mm)
+[Composite, Composite, Image]  - Field Of View: 48.9 deg
+[Composite, Composite, Camera]  - Focal Length: 6.0 mm (35 mm equivalent: 39.6 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 2.26 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Light Value: 9.6

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.94
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: IPTC-XMP_7_failed.xmp
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
@@ -22,7 +22,7 @@
 [XMP, XMP-exif, Image] FNumber - F Number: 3.5
 [XMP, XMP-exif, Image] FileSource - File Source: Digital Camera
 [XMP, XMP-exif, Image] FlashpixVersion - Flashpix Version: 0100
-[XMP, XMP-exif, Camera] FocalLength - Focal Length: 6.0mm
+[XMP, XMP-exif, Camera] FocalLength - Focal Length: 6.0 mm
 [XMP, XMP-exif, Camera] FocalPlaneResolutionUnit - Focal Plane Resolution Unit: cm
 [XMP, XMP-exif, Camera] FocalPlaneXResolution - Focal Plane X Resolution: 3053
 [XMP, XMP-exif, Camera] FocalPlaneYResolution - Focal Plane Y Resolution: 3053
@@ -30,11 +30,11 @@
 [XMP, XMP-exif, Camera] MaxApertureValue - Max Aperture Value: 3.5
 [XMP, XMP-exif, Camera] MeteringMode - Metering Mode: Multi-segment
 [XMP, XMP-exif, Image] PixelXDimension - Exif Image Width: 100
-[XMP, XMP-exif, Image] PixelYDimension - Exif Image Length: 80
+[XMP, XMP-exif, Image] PixelYDimension - Exif Image Height: 80
 [XMP, XMP-exif, Image] SceneType - Scene Type: Directly photographed
 [XMP, XMP-exif, Camera] SensingMethod - Sensing Method: One-chip color area
 [XMP, XMP-exif, Image] ShutterSpeedValue - Shutter Speed Value: 1/64
-[XMP, XMP-pdf, Image] Keywords - Keywords: XMP
+[XMP, XMP-pdf, Image] Keywords - Keywords: ExifTool, Test, XMP
 [XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
 [XMP, XMP-photoshop, Image] Category - Category: 1
@@ -71,6 +71,6 @@
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Camera]  - Focal Length: 6.0mm
+[Composite, Composite, Camera]  - Focal Length: 6.0 mm
 [Composite, Composite, Image]  - Image Size: 100x80
 [Composite, Composite, Image]  - Light Value: 9.6

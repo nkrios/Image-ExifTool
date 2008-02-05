@@ -490,7 +490,7 @@ value.  For example:
                   value, or by one day if applied to a date value
     '2:0'       - shift 2 hours (time, date/time), or 2 months (date)
     '5:0:0'     - shift 5 hours (time, date/time), or 5 years (date)
-    '0:0:1'     - shift 1 sec (time, date/time), or 1 day (date)
+    '0:0:1'     - shift 1 s (time, date/time), or 1 day (date)
 
 If two arguments are given, the date shift is first, followed by the time
 shift:
@@ -562,7 +562,7 @@ philosophy).
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

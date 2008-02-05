@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Sigma_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1575 bytes
-[File, File, Time]  - File Modification Date/Time: 2007:09:21 08:09:37
+[File, File, Time]  - File Modification Date/Time: 2008:01:23 14:06:16
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -33,17 +33,17 @@
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 60.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 60.0 mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2268
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1512
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1512
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Sigma Digital Camera
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Custom
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Manual
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 102mm
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 102 mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Image] 42016 - Image Unique ID: 303230303030313986D2C53F8ABDA2A6
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
@@ -85,6 +85,7 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/320
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.018 mm
-[Composite, Composite, Camera]  - Focal Length: 60.0mm (35mm equivalent: 102.0mm)
+[Composite, Composite, Image]  - Field Of View: 20.0 deg
+[Composite, Composite, Camera]  - Focal Length: 60.0 mm (35 mm equivalent: 102.0 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 25.46 m
 [Composite, Composite, Image]  - Light Value: 14.3

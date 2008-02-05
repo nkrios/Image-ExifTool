@@ -54,7 +54,7 @@ sub WriteAdobeStuff($$$);
 
         The maker notes ('MakN') are processed by ExifTool, but some information may
         have been lost by the Adobe DNG Converter.  This is because the Adobe DNG
-        Converter (as of version 3.3) doesn't properly handle information referenced
+        Converter (as of version 4.3) doesn't properly handle information referenced
         from inside the maker notes that lies outside the original maker notes
         block, and this information is lost when only the maker note block is copied
         to the DNG image.   While this isn't a big problem for most camera makes, it
@@ -672,7 +672,7 @@ information in DNG (Digital Negative) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -350,7 +350,14 @@ sub WriteIPTC($$$)
             ($id, $rec, $tag, $len) = unpack("CCCn", $buff);
             if ($id == 0x1c) {
                 if ($rec < $lastRec) {
-                    return undef if $exifTool->Warn("IPTC doesn't conform to spec: Records out of sequence", 1);
+                    if ($rec == 0) {
+                        return undef if $exifTool->Warn("IPTC record 0 encountered, subsequent records ignored", 1);
+                        undef $rec;
+                        $pos = $dirEnd;
+                        $len = 0;
+                    } else {
+                        return undef if $exifTool->Warn("IPTC doesn't conform to spec: Records out of sequence", 1);
+                    }
                 }
                 # handle extended IPTC entry if necessary
                 $pos += 5;      # step to after field header
@@ -551,7 +558,7 @@ seldom-used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

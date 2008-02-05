@@ -11,6 +11,7 @@
 # References:   1) http://www.cybercom.net/~dcoffin/dcraw/
 #               2) http://www.wonderland.org/crw/
 #               3) http://xyrion.org/ciff/CIFFspecV1R04.pdf
+#               4) Dave Nicholson private communication (PowerShot S30)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonRaw;
@@ -21,7 +22,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.42';
+$VERSION = '1.46';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -131,12 +132,27 @@ sub BuildMakerNotes($$$$$$);
             TagTable => 'Image::ExifTool::Canon::ShotInfo',
         },
     },
-    0x102c => { Name => 'CanonColorInfo2', Writable => 0 },
+    0x102c => {
+        Name => 'CanonColorInfo2',
+        Writable => 0,
+        # for the S30, the following information has been decoded: (ref 4)
+        # offset 66: int32u - shutter half press time in ms
+        # offset 70: int32u - image capture time in ms
+        # offset 74: int16u - custom white balance flag (0=Off, 512=On)
+    },
     0x102d => {
         Name => 'CanonCameraSettings',
         Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::CameraSettings',
+        },
+    },
+    0x1030 => { #4
+        Name => 'WhiteSample',
+        Writable => 0,
+        SubDirectory => {
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+            TagTable => 'Image::ExifTool::CanonRaw::WhiteSample',
         },
     },
     0x1031 => {
@@ -240,8 +256,8 @@ sub BuildMakerNotes($$$$$$);
         Writable => 'int32u',
         ValueConv => '$val / 1000',
         ValueConvInv => '$val * 1000',
-        PrintConv => '"$val sec"',
-        PrintConvInv => '$val=~s/\s*sec.*//;$val',
+        PrintConv => '"$val s"',
+        PrintConvInv => '$val=~s/\s*s.*//;$val',
     },
     0x1807 => {
         Name => 'TargetDistanceSetting',
@@ -249,13 +265,31 @@ sub BuildMakerNotes($$$$$$);
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
-    0x180b => {
-        Name => 'SerialNumber',
-        Writable => 'int32u',
-        Description => 'Camera Body No.',
-        PrintConv => 'sprintf("%.10d",$val)',
-        PrintConvInv => '$val',
-    },
+    0x180b => [
+        {
+            # D30
+            Name => 'SerialNumber',
+            Description => 'Camera Body No.',
+            Condition => '$$self{CameraModel} =~ /EOS D30\b/',
+            Writable => 'int32u',
+            PrintConv => 'sprintf("%x-%.5d",$val>>16,$val&0xffff)',
+            PrintConvInv => '$val=~/(.*)-(\d+)/ ? (hex($1)<<16)+$2 : undef',
+        },
+        {
+            # all EOS models (D30, 10D, 300D)
+            Name => 'SerialNumber',
+            Description => 'Camera Body No.',
+            Condition => '$$self{CameraModel} =~ /EOS/',
+            Writable => 'int32u',
+            PrintConv => 'sprintf("%.10d",$val)',
+            PrintConvInv => '$val',
+        },
+        {
+            # this is not SerialNumber for PowerShot models (but what is it?) - PH
+            Name => 'UnknownNumber',
+            Unknown => 1,
+        },
+    ],
     0x180e => {
         Name => 'TimeStamp',
         Writable => 0,
@@ -313,6 +347,9 @@ sub BuildMakerNotes($$$$$$);
     0x1835 => {
         Name => 'DecoderTable',
         Writable => 0,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::CanonRaw::DecoderTable',
+        },
     },
     0x183b => { #PH
         # display format for serial number
@@ -424,7 +461,7 @@ sub BuildMakerNotes($$$$$$);
         ValueConv => 'ConvertUnixTime($val)',
         ValueConvInv => 'GetUnixTime($val)',
         PrintConv => '$self->ConvertDateTime($val)',
-        PrintConvInv => '$val',
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     1 => { #3
         Name => 'TimeZoneCode',
@@ -522,7 +559,7 @@ sub BuildMakerNotes($$$$$$);
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     FORMAT => 'int32u',
-    FIRST_ENTRY => 1,
+    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     # Note: Don't make these writable (except rotation) because it confuses
     # Canon decoding software if the are changed
@@ -540,6 +577,35 @@ sub BuildMakerNotes($$$$$$);
     4 => 'ComponentBitDepth', #3
     5 => 'ColorBitDepth', #3
     6 => 'ColorBW', #3
+);
+
+# ref 4
+%Image::ExifTool::CanonRaw::DecoderTable = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FORMAT => 'int32u',
+    FIRST_ENTRY => 0,
+    0 => 'DecoderTableNumber',
+    2 => 'CompressedDataOffset',
+    3 => 'CompressedDataLength',
+);
+
+# ref 1/4
+%Image::ExifTool::CanonRaw::WhiteSample = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 1,
+    1 => 'WhiteSampleWidth',
+    2 => 'WhiteSampleHeight',
+    3 => 'WhiteSampleLeftBorder',
+    4 => 'WhiteSampleTopBorder',
+    5 => 'WhiteSampleBits',
+    # this is followed by the encrypted white sample values (ref 1)
 );
 
 #------------------------------------------------------------------------------
@@ -781,9 +847,11 @@ sub ProcessCRW($$)
     # finish building maker notes if necessary
     $buildMakerNotes and SaveMakerNotes($exifTool);
 
-    # process trailers if they exist
-    my $trailInfo = Image::ExifTool::IdentifyTrailer($raf);
-    $exifTool->ProcessTrailers($trailInfo) if $trailInfo;
+    # process trailers if they exist in CRW file (not in CIFF information!)
+    if ($$exifTool{FILE_TYPE} eq 'CRW') {
+        my $trailInfo = Image::ExifTool::IdentifyTrailer($raf);
+        $exifTool->ProcessTrailers($trailInfo) if $trailInfo;
+    }
 
     return 1;
 }
@@ -815,7 +883,7 @@ tags.)
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -833,6 +901,10 @@ under the same terms as Perl itself.
 =item L<http://owl.phy.queensu.ca/~phil/exiftool/canon_raw.html>
 
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Dave Nicholson for decoding a number of new tags.
 
 =head1 SEE ALSO
 

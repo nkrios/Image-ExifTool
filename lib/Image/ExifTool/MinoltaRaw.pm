@@ -15,13 +15,16 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
+
+sub ProcessMRW($$;$);
 
 # Minolta MRW tags
 %Image::ExifTool::MinoltaRaw::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::MinoltaRaw::ProcessMRW,
     NOTES => 'These tags are used in Minolta RAW format (MRW) images.',
-    "\0TTW" => {
+    "\0TTW" => { # TIFF Tags
         Name => 'MinoltaTTW',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Exif::Main',
@@ -30,18 +33,19 @@ $VERSION = '1.02';
             WriteProc => \&Image::ExifTool::WriteTIFF,
         },
     },
-    "\0PRD" => {
+    "\0PRD" => { # Raw Picture Dimensions
         Name => 'MinoltaPRD',
         SubDirectory => { TagTable => 'Image::ExifTool::MinoltaRaw::PRD' },
     },
-    "\0WBG" => {
+    "\0WBG" => { # White Balance Gains
         Name => 'MinoltaWBG',
         SubDirectory => { TagTable => 'Image::ExifTool::MinoltaRaw::WBG' },
     },
-    "\0RIF" => {
+    "\0RIF" => { # Requested Image Format
         Name => 'MinoltaRIF',
         SubDirectory => { TagTable => 'Image::ExifTool::MinoltaRaw::RIF' },
     },
+    # "\0CSA" is padding
 );
 
 # Minolta MRW PRD information (ref 2)
@@ -225,20 +229,28 @@ sub ConvertWBMode($)
 # Read or write Minolta MRW file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid MRW file, or -1 on write error
-sub ProcessMRW($$)
+sub ProcessMRW($$;$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $raf = $$dirInfo{RAF};
     my $outfile = $$dirInfo{OutFile};
     my $verbose = $exifTool->Options('Verbose');
     my $out = $exifTool->Options('TextOut');
     my ($data, $err, $outBuff);
 
+    if ($$dirInfo{DataPt}) {
+        # make a RAF object for MRW information extracted from other file types
+        $raf = new File::RandomAccess($$dirInfo{DataPt});
+        # MRW information in DNG images may not start at beginning of data block
+        $raf->Seek($$dirInfo{DirStart}, 0) if $$dirInfo{DirStart};
+    }
     $raf->Read($data,8) == 8 or return 0;
-    $data =~ /^\0MRM/ or return 0;
+    # "\0MRM" for big-endian (MRW images), and
+    # "\0MRI" for little-endian (MRWInfo in ARW images)
+    $data =~ /^\0MR([MI])/ or return 0;
+    SetByteOrder($1 . $1);
     $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
-    SetByteOrder('MM');
-    my $tagTablePtr = GetTagTable('Image::ExifTool::MinoltaRaw::Main');
+    $tagTablePtr = GetTagTable('Image::ExifTool::MinoltaRaw::Main');
     if ($outfile) {
         $exifTool->InitWriteDirs('TIFF'); # use same write dirs as TIFF
         $outBuff = '';
@@ -335,7 +347,7 @@ write Konica-Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

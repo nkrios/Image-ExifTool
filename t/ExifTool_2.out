@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.99
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
 [File, File, Image]  - File Name: ExifTool.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 24 kB
-[File, File, Time]  - File Modification Date/Time: 2007:10:04 18:46:04
+[File, File, Time]  - File Modification Date/Time: 2007:10:04 11:27:02
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -43,11 +43,11 @@
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: Fired
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0 mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 100
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 80
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 80
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3053
 [EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3053
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: cm
@@ -107,15 +107,14 @@
 [MakerNotes, CIFF, Camera] 2064 - Owner Name: 
 [MakerNotes, CIFF, Camera] 0 - Make: Canon
 [MakerNotes, CIFF, Camera] 6 - Camera Model Name: Canon PowerShot A5
-[MakerNotes, CIFF, Camera] 6155 - Camera Body No.: 0000000000
 [MakerNotes, CIFF, Camera] 4124 - Base ISO: 100
 [MakerNotes, CIFF, Camera] 2061 - ROM Operation Mode: USA
 [MakerNotes, CIFF, Camera] 2059 - Canon Firmware Version: Firmware Version 01.00
 [MakerNotes, CIFF, Camera] 1 - Free Bytes: (Binary data 12 bytes)
 [MakerNotes, CIFF, Image] 0 - Focal Type: Fixed
-[MakerNotes, CIFF, Image] 1 - Focal Length: 5mm
-[MakerNotes, CIFF, Image] 2 - Focal Plane X Size: 5.05mm
-[MakerNotes, CIFF, Image] 3 - Focal Plane Y Size: 3.71mm
+[MakerNotes, CIFF, Image] 1 - Focal Length: 5 mm
+[MakerNotes, CIFF, Image] 2 - Focal Plane X Size: 5.05 mm
+[MakerNotes, CIFF, Image] 3 - Focal Plane Y Size: 3.71 mm
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
@@ -187,8 +186,8 @@
 [Meta, MetaIFD, Image] 50014 - SBA RGB Shifts: 0 0 0
 [Meta, MetaIFD, Image] 50015 - SBA Input Image Colorspace: 3
 [Meta, MetaIFD, Image] 50016 - SBA Input Image Bit Depth: 12 12 12
-[Meta, MetaIFD, Image] 50017 - SBA Exposure Record: *.....E.!;.E.!;.........@.;...........F...ADBE...*...............)....U.,......2..............t.,..........>..~...Q...!...."R....,....>~........".,....>1.1..~....
-[Meta, MetaIFD, Image] 50018 - User Adj SBA RGB Shifts: 0 0 0
+[Meta, MetaIFD, Image] 50017 - SBA Exposure Record: (Binary data 368 bytes)
+[Meta, MetaIFD, Image] 50018 - User Adj SBA RGB Shifts: (Binary data 5 bytes)
 [Meta, MetaIFD, Image] 50019 - Image Rotation Status: 0
 [Meta, MetaIFD, Image] 50020 - Roll Guid Elements: 00000000000000000000000000000000
 [Meta, MetaIFD, Image] 50021 - Metadata Number: 0100
@@ -345,6 +344,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.9
 [Composite, Composite, Image]  - Shutter Speed: 1/155
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.004 mm
-[Composite, Composite, Camera]  - Focal Length: 6.0mm (35mm equivalent: 41.4mm)
+[Composite, Composite, Image]  - Field Of View: 47.0 deg
+[Composite, Composite, Camera]  - Focal Length: 6.0 mm (35 mm equivalent: 41.4 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 0.75 m
 [Composite, Composite, Image]  - Light Value: 14.2

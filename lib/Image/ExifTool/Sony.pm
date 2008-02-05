@@ -6,8 +6,9 @@
 # Revisions:    04/06/2004  - P. Harvey Created
 #
 # References:   1) http://www.cybercom.net/~dcoffin/dcraw/
-#               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm
+#               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm (2006/08/06)
 #               3) Thomas Bodenmann private communication
+#               4) Philippe Devaux private communication (A700)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Sony;
@@ -18,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.10';
+$VERSION = '1.14';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -36,13 +37,40 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
-    # 0xb020 string with observed values "Standard", "None" and "Real"
+    0x2001 => { #PH (A700)
+        Name => 'PreviewImage',
+        Writable => 'undef',
+        DataTag => 'PreviewImage',
+        WriteCheck => 'return $val=~/^(none|.{32}\xff\xd8\xff)/s ? undef : "Not a valid image"',
+        ValueConv => q{
+            return $val if $val =~ /^Binary/;
+            $val = substr($val,0x20) if length($val) > 0x20;
+            return $self->ValidateImage(\$val,$tag);
+        },
+        # must construct 0x20-byte header which contains length, width and height
+        ValueConvInv => q{
+            return 'none' unless $val;
+            my $e = new Image::ExifTool;
+            my $info = $e->ImageInfo(\$val,'ImageWidth','ImageHeight');
+            return undef unless $$info{ImageWidth} and $$info{ImageHeight};
+            my $size = Set32u($$info{ImageWidth}) . Set32u($$info{ImageHeight});
+            return Set32u(length $val) . $size . ("\0" x 8) . $size . ("\0" x 4) . $val;
+        },
+    },
+    0xb020 => { #2
+        Name => 'ColorReproduction',
+        # observed values: None, Standard, Vivid, Real, AdobeRGB - PH
+        Writable => 'string',
+    },
     0xb021 => { #2
         Name => 'ColorTemperature',
+        Writable => 'int32u',
         PrintConv => '$val ? $val : "Auto"',
+        PrintConvInv => '$val=~/Auto/i ? 0 : $val',
     },
     0xb023 => { #PH (A100)
         Name => 'SceneMode',
+        Writable => 'int32u',
         PrintConv => {
             0 => 'Manual (P,A,S or M)',
             1 => 'Portrait',
@@ -56,6 +84,7 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     },
     0xb024 => { #PH (A100)
         Name => 'ZoneMatching',
+        Writable => 'int32u',
         PrintConv => {
             0 => 'ISO Setting Used',
             1 => 'High Key',
@@ -64,6 +93,7 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     },
     0xb025 => { #PH (A100)
         Name => 'DynamicRangeOptimizer',
+        Writable => 'int32u',
         PrintConv => {
             0 => 'Off',
             1 => 'Standard',
@@ -72,10 +102,12 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     },
     0xb026 => { #PH (A100)
         Name => 'ImageStabilization',
+        Writable => 'int32u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
     0xb027 => { #2
         Name => 'LensID',
+        Writable => 'int32u',
         PrintConv => \%sonyLensIDs,
     },
     0xb028 => { #2
@@ -99,14 +131,17 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
             5 => 'Night Scene',
             6 => 'B&W',
             7 => 'Adobe RGB',
+            12 => 'Neutral', #4
         },
     },
     0xb040 => { #2
         Name => 'Macro',
+        Writable => 'int16u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
     0xb041 => { #2
         Name => 'ExposureMode',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Auto',
             5 => 'Landscape',
@@ -119,13 +154,25 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     },
     0xb047 => { #2
         Name => 'Quality',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Normal',
             1 => 'Fine',
         },
     },
+    0xb04b => { #2/PH
+        Name => 'Anti-Blur',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On (Continuous)', #PH (NC)
+            2 => 'On (Shooting)', #PH (NC)
+            65535 => 'n/a',
+        },
+    },
     0xb04e => { #2
         Name => 'LongExposureNoiseReduction',
+        Writable => 'int16u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
 );
@@ -178,19 +225,27 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
         Notes => 'key to decrypt SR2SubIFD',
         RawConv => '$self->{SR2SubIFDKey} = $val',
     },
+    0x7250 => { #1
+        Name => 'MRWInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MinoltaRaw::Main',
+        },
+    },
 );
 
 %Image::ExifTool::Sony::SR2SubIFD = (
-    GROUPS => { 0 => 'MakerNotes', 1 => 'SR2', 2 => 'Camera' },
+    GROUPS => { 0 => 'MakerNotes', 1 => 'SR2SubIFD', 2 => 'Camera' },
+    SET_GROUP1 => 1, # set group1 name to directory name for all tags in table
     NOTES => 'Tags in the encrypted SR2SubIFD',
     0x7303 => 'WB_GRBGLevels', #1
     0x74c0 => { #PH
         Name => 'SR2DataIFD',
+        Groups => { 1 => 'SR2DataIFD' }, # (needed to set SubIFD DirName)
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::SR2DataIFD',
             Start => '$val',
-            MaxSubdirs => 6,
+            MaxSubdirs => 20, # an A700 ARW has 14 of these! - PH
         },
     },
     0x74a0 => 'MaxApertureAtMaxFocal', #PH
@@ -198,17 +253,22 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
 );
 
 %Image::ExifTool::Sony::SR2DataIFD = (
-    GROUPS => { 0 => 'MakerNotes', 1 => 'SR2', 2 => 'Camera' },
-    0x7770 => 'ColorMode', #PH
+    GROUPS => { 0 => 'MakerNotes', 1 => 'SR2DataIFD', 2 => 'Camera' },
+    SET_GROUP1 => 1, # set group1 name to directory name for all tags in table
+    0x7770 => { #PH
+        Name => 'ColorMode',
+        Priority => 0,
+    },
 );
 
 # fill in Sony LensID lookup based on Minolta values
 {
+    %sonyLensIDs = %Image::ExifTool::Minolta::minoltaLensIDs;
     my $id;
     foreach $id (keys %Image::ExifTool::Minolta::minoltaLensIDs) {
-        # higher numbered lenses are missing last digit of ID
-        my $sonyID = ($id < 10000) ? $id : int($id / 10);
-        $sonyLensIDs{$sonyID} = $Image::ExifTool::Minolta::minoltaLensIDs{$id};
+        # higher numbered lenses are missing last digit of ID for some Sony models
+        next if $id < 10000;
+        $sonyLensIDs{int($id/10)} = $Image::ExifTool::Minolta::minoltaLensIDs{$id};
     }
 }
 
@@ -316,6 +376,11 @@ sub ProcessSR2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
+    # this may either be a normal IFD, or a MRW-file-like data block in newer ARW images
+    if ($dataPt and $$dataPt =~ /^\0MR[IM]/) {
+        require Image::ExifTool::MinoltaRaw;
+        return Image::ExifTool::MinoltaRaw::ProcessMRW($exifTool, $dirInfo);
+    }
     my $dataPos = $$dirInfo{DataPos};
     my $dataLen = $$dirInfo{DataLen} || length $$dataPt;
     my $dirLen = $$dirInfo{DirLen};
@@ -394,7 +459,7 @@ documentation.  You can use "exiftool -v3" to dump these blocks in hex.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -411,7 +476,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Thomas Bodenmann for providing information about the LensID's.
+Thanks to Thomas Bodenmann for providing information about the LensID's
+and Philippe Devaux for decoding a ColorMode value.
 
 =head1 SEE ALSO
 

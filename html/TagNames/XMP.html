@@ -21,7 +21,7 @@ to the <b>Tag Name</b>.</p>
 specifies the information format:  <code>integer</code> is a string of digits
 (possibly beginning with a &#39;+&#39; or &#39;-&#39;), <code>real</code> is a floating point number,
 <code>rational</code> is two <code>integer</code> strings separated by a &#39;/&#39; character, <code>date</code>
-is a date/time string in the format &quot;YYYY:MM:DD HH:MM:SS[+/-HH:MM]&quot;,
+is a date/time string in the format &quot;YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM]&quot;,
 <code>boolean</code> is either &quot;True&quot; or &quot;False&quot;, and <code>lang-alt</code> is a list of string
 alternatives in different languages.</p>
 
@@ -1052,9 +1052,12 @@ other XMP tags.</p>
 <td><span class=s>&#39;A&#39; = Measurement In Progress
   <br>&#39;V&#39; = Measurement Interoperability</span></td></tr>
 <tr class=b>
-<td>GPSTimeStamp</td>
+<td>GPSDateTime</td>
 <td class=c>date</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(a date/time tag called GPSTimeStamp by the XMP specification.  This tag is
+renamed here to prevent direct copy from EXIF:GPSTimeStamp which is a
+time-only tag.  Instead, the value of this tag should be taken from
+Composite:GPSDateTime when copying from EXIF)</span></span></td></tr>
 <tr>
 <td>GPSTrack</td>
 <td class=c>rational</td>
@@ -1079,7 +1082,8 @@ other XMP tags.</p>
 <tr class=b>
 <td>LightSource</td>
 <td class=c>string</td>
-<td><span class=s>1 = Daylight
+<td><span class=s>0 = Unknown
+  <br>1 = Daylight
   <br>2 = Fluorescent
   <br>3 = Tungsten
   <br>4 = Flash
@@ -1140,11 +1144,11 @@ other XMP tags.</p>
 <tr>
 <td>ExifImageWidth</td>
 <td class=c>integer</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called PixelXDimension by the XMP spec)</span></span></td></tr>
 <tr class=b>
-<td>ExifImageLength</td>
+<td>ExifImageHeight</td>
 <td class=c>integer</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called PixelYDimension by the XMP spec)</span></span></td></tr>
 <tr>
 <td>RelatedSoundFile</td>
 <td class=c>string</td>
@@ -1629,7 +1633,7 @@ namespace URI.</p>
 <tr>
 <td>ImageHeight</td>
 <td class=c>integer</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called ImageLength in the XMP specification)</span></span></td></tr>
 <tr class=b>
 <td>ImageWidth</td>
 <td class=c>integer</td>
@@ -2572,7 +2576,7 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 11, 2007</i>
+<br><i>Last revised Dec 21, 2007</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
@@ -59,9 +59,9 @@
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 18.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 18.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment:                                     
 [EXIF, ExifIFD, Time] 37520 - Sub Sec Time: 00
 [EXIF, ExifIFD, Time] 37521 - Sub Sec Time Original: 00
@@ -115,19 +115,20 @@
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode2
 [MakerNotes, Nikon, Camera] 144 - Light Source: Natural
 [MakerNotes, Nikon, Camera] 146 - Hue Adjustment: 0
+[MakerNotes, Nikon, Camera] 147 - NEF Compression: Lossy (type 1)
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
 [MakerNotes, Nikon, Camera] 150 - NEF Curve 2: (Binary data 17 bytes)
 [MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 478 265 493 265
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
-[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 102.4mm
+[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 102.4 mm
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 3.6
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 0xf1
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 2.37 m
-[MakerNotes, Nikon, Camera] 10 - Focal Length: 18.3mm
+[MakerNotes, Nikon, Camera] 10 - Focal Length: 18.3 mm
 [MakerNotes, Nikon, Camera] 11 - Lens ID Number: 127
 [MakerNotes, Nikon, Camera] 12 - Lens F Stops: 5.33
-[MakerNotes, Nikon, Camera] 13 - Min Focal Length: 18.3mm
-[MakerNotes, Nikon, Camera] 14 - Max Focal Length: 71.3mm
+[MakerNotes, Nikon, Camera] 13 - Min Focal Length: 18.3 mm
+[MakerNotes, Nikon, Camera] 14 - Max Focal Length: 71.3 mm
 [MakerNotes, Nikon, Camera] 15 - Max Aperture At Min Focal: 3.6
 [MakerNotes, Nikon, Camera] 16 - Max Aperture At Max Focal: 4.5
 [MakerNotes, Nikon, Camera] 17 - MCU Version: 132
@@ -242,7 +243,7 @@
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Image]  - Shutter Speed: 1/20
 [Composite, Composite, Camera]  - Blue Balance: 1.860377
-[Composite, Composite, Camera]  - Focal Length: 18.0mm
+[Composite, Composite, Camera]  - Focal Length: 18.0 mm
 [Composite, Composite, Image]  - Image Size: 3040x2014
 [Composite, Composite, Image]  - Light Value: 6.9
 [Composite, Composite, Camera]  - Red Balance: 1.803774

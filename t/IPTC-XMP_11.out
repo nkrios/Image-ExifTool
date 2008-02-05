@@ -1,11 +1,13 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.43
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.05
 [File, File, Image]  - File Name: XMP3.xmp
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 1007 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:09:01 08:55:33
+[File, File, Image]  - File Size: 1225 bytes
+[File, File, Time]  - File Modification Date/Time: 2007:12:04 10:40:35
 [File, File, Image]  - File Type: XMP
 [File, File, Image]  - MIME Type: application/rdf+xml
-[XMP, XMP-dc, Image] title - Title: ExifTool common node test
+[XMP, XMP-dc, Image] title - Title: ExifTool common node and nonstandard namespace prefix test
+[XMP, XMP-iptcCore, Location] CountryCode - Country Code: CA
+[XMP, XMP-iptcCore, Other] Scene - Scene: scene1
 [XMP, XMP-ph, Unknown] programmerExclamation - Programmer Exclamation: doh!
 [XMP, XMP-ph, Unknown] programmerFood - Programmer Food: cookies
 [XMP, XMP-ph, Unknown] programmerFullName - Programmer Full Name: Phil Harvey

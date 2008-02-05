@@ -211,7 +211,7 @@ with 1)</span></span></td></tr>
   <br>9 = Sport
   <br>10 = Self Portrait
   <br>11 = Indoor
-  <br>12 = Beach&amp;Snow
+  <br>12 = Beach &amp; Snow
   <br>13 = Beach
   <br>14 = Snow
   <br>15 = Self Portrait+Self Timer
@@ -227,12 +227,13 @@ with 1)</span></span></td></tr>
   <br>25 = Museum
   <br>26 = Behind Glass
   <br>27 = Auction
-  <br>28 = Shoot&amp;Select1
-  <br>29 = Shoot&amp;Select2
+  <br>28 = Shoot &amp; Select1
+  <br>29 = Shoot &amp; Select2
   <br>30 = Underwater Wide2
   <br>31 = Digital Image Stabilization
   <br>32 = Face Portrait
-  <br>33 = Pet</span></td></tr>
+  <br>33 = Pet
+  <br>34 = Smile Shot</span></td></tr>
 <tr>
 <td>0x0404</td>
 <td>SerialNumber</td>
@@ -527,7 +528,7 @@ with 1)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x1033</td>
-<td>SceneDetectArea?</td>
+<td>SceneDetectData?</td>
 <td class=c>int32u[720]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -796,7 +797,7 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <td>0x0301</td>
 <td>Extender</td>
 <td class=c>int8u[6]~</td>
-<td><span class=s><span class=n>(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown.)</span></span></td></tr>
+<td><span class=s><span class=n>(6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown)</span></span></td></tr>
 <tr>
 <td>0x0302</td>
 <td>ExtenderSerialNumber</td>
@@ -828,7 +829,9 @@ any information found here will be extracted, even if the tag is not listed.</p>
   <br>2 = FL-50
   <br>3 = RF-11
   <br>4 = TF-22
-  <br>5 = FL-36</span></td></tr>
+  <br>5 = FL-36
+  <br>6 = FL-50R
+  <br>7 = FL-36R</span></td></tr>
 <tr class=b>
 <td>0x1002</td>
 <td>FlashFirmwareVersion</td>
@@ -930,7 +933,7 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <td>0x0400</td>
 <td>FlashMode</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Off
+<td><span class=s>0x0 = Off
   <br>Bit 0 = On
   <br>Bit 1 = Fill-in
   <br>Bit 2 = Red-eye
@@ -1015,34 +1018,51 @@ any information found here will be extracted, even if the tag is not listed.</p>
   <br>9 = Landscape+Portrait
   <br>10 = Landscape
   <br>11 = Night Scene
+  <br>12 = Self Portrait
   <br>13 = Panorama
+  <br>14 = 2 in 1
+  <br>15 = Movie
   <br>16 = Landscape+Portrait
   <br>17 = Night+Portrait
+  <br>18 = Indoor
   <br>19 = Fireworks
   <br>20 = Sunset
   <br>22 = Macro
+  <br>23 = Super Macro
+  <br>24 = Food
   <br>25 = Documents
   <br>26 = Museum
-  <br>28 = Beach&amp;Snow
+  <br>27 = Shoot &amp; Select
+  <br>28 = Beach &amp; Snow
+  <br>29 = Self Protrait+Timer
   <br>30 = Candle
+  <br>31 = Available Light
+  <br>32 = Behind Glass
+  <br>33 = My Mode
+  <br>34 = Pet
   <br>35 = Underwater Wide1
   <br>36 = Underwater Macro
+  <br>37 = Shoot &amp; Select1
+  <br>38 = Shoot &amp; Select2
   <br>39 = High Key
   <br>40 = Digital Image Stabilization
+  <br>41 = Auction
+  <br>42 = Beach
+  <br>43 = Snow
   <br>44 = Underwater Wide2
   <br>45 = Low Key
   <br>46 = Children
-  <br>48 = Nature Macro</span></td></tr>
+  <br>47 = Vivid
+  <br>48 = Nature Macro
+  <br>49 = Underwater Snapshot
+  <br>50 = Shooting Guide</span></td></tr>
 <tr class=b>
 <td>0x050a</td>
 <td>NoiseReduction</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Off
-  <br>1 = Noise Reduction
-  <br>2 = Noise Filter
-  <br>3 = Noise Reduction + Noise Filter
-  <br>4 = Noise Filter (ISO Boost)
-  <br>5 = Noise Reduction + Noise Filter (ISO Boost)</span></td></tr>
+<td><span class=s>Bit 0 = Noise Reduction
+  <br>Bit 1 = Noise Filter
+  <br>Bit 2 = Noise Filter (ISO Boost)</span></td></tr>
 <tr>
 <td>0x050b</td>
 <td>DistortionCorrection</td>
@@ -1063,17 +1083,25 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <tr class=b>
 <td>0x050f</td>
 <td>Gradation</td>
-<td class=c>int16s[3]</td>
-<td><span class=s>&#39;-1 -1 1&#39; = Low Key
+<td class=c>int16s[n]</td>
+<td><span class=s><span class=n>(3 or 4 values)</span>
+  <br>[Values 0, 1 and 2]
+  <br>&#39;-1 -1 1&#39; = Low Key
   <br>&#39;0 -1 1&#39; = Normal
-  <br>&#39;1 -1 1&#39; = High Key</span></td></tr>
+  <br>&#39;1 -1 1&#39; = High Key
+  <br>[Value 3]
+  <br>0 = User-Selected
+  <br>1 = Auto-Override</span></td></tr>
 <tr>
 <td>0x0520</td>
 <td>PictureMode</td>
-<td class=c>int16u</td>
-<td><span class=s>1 = Vivid
+<td class=c>int16u[n]</td>
+<td><span class=s><span class=n>(1 or 2 values)</span>
+  <br>[Value 0]
+  <br>1 = Vivid
   <br>2 = Natural
   <br>3 = Muted
+  <br>4 = Portrait
   <br>256 = Monotone
   <br>512 = Sepia</span></td></tr>
 <tr class=b>
@@ -1143,10 +1171,21 @@ any information found here will be extracted, even if the tag is not listed.</p>
   <br>3 = SHQ
   <br>4 = RAW</span></td></tr>
 <tr class=b>
+<td>0x0900</td>
+<td>ManometerPressure</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x0901</td>
 <td>ManometerReading</td>
 <td class=c>int32s[2]</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0902</td>
+<td>ExtendedWBDetect</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='RawDevelopment'>Olympus RawDevelopment Tags</a></h2>
@@ -1221,7 +1260,7 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <td class=c>int16u</td>
 <td><span class=s>Bit 0 = Noise Reduction
   <br>Bit 1 = Noise Filter
-  <br>Bit 2 = ISO Boost</span></td></tr>
+  <br>Bit 2 = Noise Filter (ISO Boost)</span></td></tr>
 <tr>
 <td>0x010b</td>
 <td>RawDevEditStatus</td>
@@ -1314,7 +1353,7 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <td class=c>int16u</td>
 <td><span class=s>Bit 0 = Noise Reduction
   <br>Bit 1 = Noise Filter
-  <br>Bit 2 = ISO Boost</span></td></tr>
+  <br>Bit 2 = Noise Filter (ISO Boost)</span></td></tr>
 <tr>
 <td>0x010b</td>
 <td>RawDevEngine</td>
@@ -1368,6 +1407,22 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <td>RawDevGradation</td>
 <td class=c>int16s[3]</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>0x0113</td>
+<td>RawDevSaturation3</td>
+<td class=c>int16s[3]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0119</td>
+<td>RawDevAutoGradation</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td>0x0120</td>
+<td>RawDevPMNoiseFilter</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ImageProcessing'>Olympus ImageProcessing Tags</a></h2>
@@ -1387,72 +1442,245 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <td class=c>int16u[2]</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>0x0102</td>
+<td>WB_RBLevels3000K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0103</td>
+<td>WB_RBLevels3300K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0104</td>
+<td>WB_RBLevels3600K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0105</td>
+<td>WB_RBLevels3900K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0106</td>
+<td>WB_RBLevels4000K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0107</td>
+<td>WB_RBLevels4300K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0108</td>
+<td>WB_RBLevels4500K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0109</td>
+<td>WB_RBLevels4800K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x010a</td>
+<td>WB_RBLevels5300K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x010b</td>
+<td>WB_RBLevels6000K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x010c</td>
+<td>WB_RBLevels6600K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x010d</td>
+<td>WB_RBLevels7500K</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x010e</td>
+<td>WB_RBLevelsCWB1</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x010f</td>
+<td>WB_RBLevelsCWB2</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0110</td>
+<td>WB_RBLevelsCWB3</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0111</td>
+<td>WB_RBLevelsCWB4</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0113</td>
+<td>WB_GLevel3000K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0114</td>
+<td>WB_GLevel3300K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0115</td>
+<td>WB_GLevel3600K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0116</td>
+<td>WB_GLevel3900K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0117</td>
+<td>WB_GLevel4000K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0118</td>
+<td>WB_GLevel4300K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0119</td>
+<td>WB_GLevel4500K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x011a</td>
+<td>WB_GLevel4800K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x011b</td>
+<td>WB_GLevel5300K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x011c</td>
+<td>WB_GLevel6000K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x011d</td>
+<td>WB_GLevel6600K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x011e</td>
+<td>WB_GLevel7500K</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x011f</td>
+<td>WB_GLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0200</td>
 <td>ColorMatrix</td>
 <td class=c>int16u[9]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0300</td>
-<td>SmoothingParameter1</td>
+<td>Enhancer</td>
 <td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0301</td>
+<td>EnhancerValues</td>
+<td class=c>int16u[7]</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0310</td>
-<td>SmoothingParameter2</td>
+<td>CoringFilter</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0600</td>
-<td>SmoothingThresholds</td>
-<td class=c>int16u[4]</td>
+<td>0x0311</td>
+<td>CoringValues</td>
+<td class=c>int16u[7]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0610</td>
-<td>SmoothingThreshold2</td>
-<td class=c>int16u</td>
+<td>0x0600</td>
+<td>BlackLevel2</td>
+<td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x0610</td>
+<td>GainBase</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x0611</td>
 <td>ValidBits</td>
 <td class=c>int16u[2]</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0612</td>
+<td>CropLeft</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
 <tr>
+<td>0x0613</td>
+<td>CropTop</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0614</td>
-<td>OlympusImageWidth2</td>
+<td>CropWidth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0615</td>
+<td>CropHeight</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0615</td>
-<td>OlympusImageHeight2</td>
-<td class=c>int32u</td>
-<td>&nbsp;</td></tr>
-<tr>
 <td>0x1010</td>
 <td>NoiseReduction2</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Off
-  <br>1 = Noise Filter
-  <br>2 = Noise Reduction
-  <br>3 = Noise Reduction + Noise Filter
-  <br>4 = Noise Filter (ISO Boost)
-  <br>5 = Noise Reduction + Noise Filter (ISO Boost)</span></td></tr>
-<tr class=b>
+<td><span class=s>Bit 0 = Noise Reduction
+  <br>Bit 1 = Noise Filter
+  <br>Bit 2 = Noise Filter (ISO Boost)</span></td></tr>
+<tr>
 <td>0x1011</td>
 <td>DistortionCorrection2</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x1012</td>
 <td>ShadingCompensation2</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x1103</td>
 <td>UnknownBlock?</td>
 <td class=c>undef</td>
 <td><span class=s><span class=n>(unknown 142kB block in ORF images, not copied to JPEG images)</span></span></td></tr>
+<tr class=b>
+<td>0x1200</td>
+<td>FaceDetect</td>
+<td class=c>int32u[2]</td>
+<td><span class=s>&#39;0 0&#39; = Off
+  <br>&#39;1 0&#39; = On</span></td></tr>
+<tr>
+<td>0x1201</td>
+<td>FaceDetectArea</td>
+<td class=c>int16s[80]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FocusInfo'>Olympus FocusInfo Tags</a></h2>
@@ -1473,52 +1701,108 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr>
+<td>0x0210</td>
+<td>SceneDetect</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0211</td>
+<td>SceneArea?</td>
+<td class=c>int32u[8]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0212</td>
+<td>SceneDetectData?</td>
+<td class=c>int32u[720]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0300</td>
 <td>ZoomStepCount</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0301</td>
 <td>FocusStepCount</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0303</td>
+<td>FocusStepInfinity</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
 <tr>
+<td>0x0304</td>
+<td>FocusStepNear</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0305</td>
 <td>FocusDistance</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0308</td>
 <td>AFPoint</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Left
-  <br>1 = Center (1)
+<td><span class=s><span class=n>(for E-3, the value is separated into 2 parts: low 5 bits give AP point,
+upper bits give AF target selection mode)</span>
+  <br>[Value 0]
+  <br>0x0 = (none)
+  <br>0x1 = Top-left (horizontal)
+  <br>0x2 = Top-center (horizontal)
+  <br>0x3 = Top-right (horizontal)
+  <br>0x4 = Left (horizontal)
+  <br>0x5 = Mid-left (horizontal)
+  <br>0x6 = Center (horizontal)
+  <br>0x7 = Mid-right (horizontal)
+  <br>0x8 = Right (horizontal)
+  <br>0x9 = Bottom-left (horizontal)
+  <br>0xa = Bottom-center (horizontal)
+  <br>0xb = Bottom-right (horizontal)
+  <br>0xc = Top-left (vertical)
+  <br>0xd = Top-center (vertical)
+  <br>0xe = Top-right (vertical)
+  <br>0xf = Left (vertical)
+  <br>0x10 = Mid-left (vertical)
+  <br>0x11 = Center (vertical)
+  <br>0x12 = Mid-right (vertical)
+  <br>0x13 = Right (vertical)
+  <br>0x14 = Bottom-left (vertical)
+  <br>0x15 = Bottom-center (vertical)
+  <br>0x16 = Bottom-right (vertical)
+  <br>[Value 1]
+  <br>0x0 = Single Target
+  <br>0x40 = All Target
+  <br>0x80 = Dynamic Single Target
+  <br><span class=n>(other models)</span>
+  <br>0 = Left
+  <br>1 = Center (horizontal)
   <br>2 = Right
-  <br>3 = Center (3)
+  <br>3 = Center (vertical)
   <br>255 = None</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x1201</td>
 <td>ExternalFlash</td>
 <td class=c>int16u[2]</td>
 <td><span class=s>&#39;0 0&#39; = Off
   <br>&#39;1 0&#39; = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x1203</td>
 <td>ExternalFlashGuideNumber?</td>
 <td class=c>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x1204</td>
 <td>ExternalFlashBounce</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Bounce or Off
   <br>1 = Direct</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x1205</td>
 <td>ExternalFlashZoom</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x1208</td>
 <td>InternalFlash</td>
 <td class=c>int16u[n]</td>
@@ -1526,17 +1810,17 @@ any information found here will be extracted, even if the tag is not listed.</p>
   <br>1 = On
   <br>&#39;0 0&#39; = Off
   <br>&#39;1 0&#39; = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x1209</td>
 <td>ManualFlash</td>
 <td class=c>int16u[2]~</td>
 <td><span class=s><span class=n>(2 numbers: 1. 0=Off, 1=On, 2. Flash strength)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>0x1500</td>
 <td>SensorTemperature</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x1600</td>
 <td>ImageStabilization</td>
 <td class=c>undef~</td>
@@ -1657,22 +1941,22 @@ information remains unknown.</p>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0612</td>
-<td>StartOffsetX</td>
+<td>CropLeft</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x0613</td>
-<td>StartOffsetY</td>
+<td>CropTop</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0614</td>
-<td>FinalImageWidth</td>
+<td>CropWidth</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x0615</td>
-<td>FinalImageHeight</td>
+<td>CropHeight</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -1760,7 +2044,7 @@ information remains unknown.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 7, 2007</i>
+<br><i>Last revised Jan 3, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

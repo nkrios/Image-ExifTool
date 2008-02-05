@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
 [File, File, Image]  - File Name: Sanyo.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 2 kB
@@ -37,12 +37,12 @@
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-spot
 [EXIF, ExifIFD, Camera] 37384 - Light Source: Fine Weather
 [EXIF, ExifIFD, Camera] 37385 - Flash: Auto, Did not fire
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 23.1mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 23.1 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2000
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1496
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1496
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -50,7 +50,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Manual
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 0
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 11113mm
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 11113 mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: High gain up
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -82,7 +82,7 @@
 [MakerNotes, Sanyo, Camera] 542 - Resaved: No
 [MakerNotes, Sanyo, Camera] 543 - Scene Select: Off
 [MakerNotes, Sanyo, Camera] 547 - Manual Focus Distance: 1
-[MakerNotes, Sanyo, Camera] 548 - Sequence Shot Interval: 5 frames/sec
+[MakerNotes, Sanyo, Camera] 548 - Sequence Shot Interval: 5 frames/s
 [MakerNotes, Sanyo, Camera] 549 - Flash Mode: Red eye
 [MakerNotes, Sanyo, Camera] 3840 - Data Dump: (Binary data 260 bytes)
 [Composite, Composite, Image]  - Aperture: 6.9
@@ -91,6 +91,7 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/185
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.000 mm
-[Composite, Composite, Camera]  - Focal Length: 23.1mm (35mm equivalent: 11113.0mm)
+[Composite, Composite, Image]  - Field Of View: 0.2 deg
+[Composite, Composite, Camera]  - Focal Length: 23.1 mm (35 mm equivalent: 11113.0 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 1238.24 m
 [Composite, Composite, Image]  - Light Value: 11.1

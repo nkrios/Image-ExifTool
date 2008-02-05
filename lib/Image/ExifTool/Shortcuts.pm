@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -87,7 +87,7 @@ $VERSION = '1.16';
         'FocalLength',
         #'ImageSize', #wrong in CR2
         'ExifImageWidth', #instead
-        'ExifImageLength', #instead
+        'ExifImageHeight', #instead
         'Quality',
         'FlashOn',
         'FlashType',
@@ -186,8 +186,8 @@ $VERSION = '1.16';
         'MakerNoteSanyoPatch',
         'MakerNoteSigma',
         'MakerNoteSony',
+        'MakerNoteSony2',
         'MakerNoteSonySRF',
-        'MakerNoteSonySR2',
         'MakerNoteUnknown',
     ],
 );
@@ -242,7 +242,7 @@ FocalLengthIn35mmFormat.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

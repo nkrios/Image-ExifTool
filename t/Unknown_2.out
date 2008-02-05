@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Unknown.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 7 kB
@@ -37,7 +37,7 @@
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.8
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 57.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 57.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Time] 37520 - Sub Sec Time: 331
 [EXIF, ExifIFD, Time] 37521 - Sub Sec Time Original: 331
@@ -45,7 +45,7 @@
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2272
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1704
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1704
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
@@ -79,6 +79,6 @@
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Shutter Speed: 1/180
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - Focal Length: 57.0mm
+[Composite, Composite, Camera]  - Focal Length: 57.0 mm
 [Composite, Composite, Image]  - Light Value: 10.1
 [Composite, Composite, Image]  - Date/Time Original: 2005:08:10 06:24:38.331

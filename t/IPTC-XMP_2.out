@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: IPTC-XMP.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 20 kB
@@ -43,11 +43,11 @@
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: Fired
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 6.0 mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 100
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 80
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 80
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3053
 [EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3053
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: cm
@@ -160,5 +160,5 @@
 [Composite, Composite, Image]  - Aperture: 3.5
 [Composite, Composite, Image]  - Image Size: 100x80
 [Composite, Composite, Image]  - Shutter Speed: 1/64
-[Composite, Composite, Camera]  - Focal Length: 6.0mm
+[Composite, Composite, Camera]  - Focal Length: 6.0 mm
 [Composite, Composite, Image]  - Light Value: 9.6

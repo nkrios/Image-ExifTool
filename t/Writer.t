@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..33\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..34\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -21,51 +21,26 @@ my $testname = 'Writer';
 my $testnum = 1;
 my $testfile;
 
-# compare 2 binary files
-# Inputs: 0) file name 1, 1) file name 2
-# Returns: 1 if files are identical
-sub binaryCompare($$)
-{
-    my ($file1, $file2) = @_;
-    my $success = 1;
-    open(TESTFILE1, $file1) or return 0;
-    unless (open(TESTFILE2, $file2)) {
-        close(TESTFILE1);
-        return 0;
-    }
-    binmode(TESTFILE1);
-    binmode(TESTFILE2);
-    my ($buf1, $buf2);
-    while (read(TESTFILE1, $buf1, 65536)) {
-        read(TESTFILE2, $buf2, 65536) or $success = 0, last;
-        $buf1 eq $buf2 or $success = 0, last;
-    }
-    read(TESTFILE2, $buf2, 65536) and $success = 0;
-    close(TESTFILE1);
-    close(TESTFILE2);
-    return $success
-}
-
 # tests 2/3: Test writing new comment to JPEG file and removing it again
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $testFile1 = "t/${testname}_${testnum}_failed.jpg";
-    -e $testFile1 and unlink $testFile1;
+    my $testfile1 = "t/${testname}_${testnum}_failed.jpg";
+    -e $testfile1 and unlink $testfile1;
     $exifTool->SetNewValue('Comment','New comment in JPG file');
-    $exifTool->WriteInfo('t/images/Canon.jpg', $testFile1);
-    my $info = ImageInfo($testFile1);
+    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile1);
+    my $info = ImageInfo($testfile1);
     print 'not ' unless check($info, $testname, $testnum);
     print "ok $testnum\n";
 
     ++$testnum;
-    my $testFile2 = "t/${testname}_${testnum}_failed.jpg";
-    -e $testFile2 and unlink $testFile2;
+    my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
+    -e $testfile2 and unlink $testfile2;
     $exifTool->SetNewValue('Comment');
-    $exifTool->WriteInfo($testFile1, $testFile2);
-    if (binaryCompare($testFile2, 't/images/Canon.jpg')) {
-        unlink $testFile1;
-        unlink $testFile2;
+    $exifTool->WriteInfo($testfile1, $testfile2);
+    if (binaryCompare($testfile2, 't/images/Canon.jpg')) {
+        unlink $testfile1;
+        unlink $testfile2;
     } else {
         print 'not ';
     }
@@ -577,9 +552,7 @@ my $testOK;
     my @tags = qw(ICC_Profile AsShotICCProfile CurrentICCProfile);
     $exifTool->WriteInfo('t/images/ExifTool.tif', $testfile);
     my $info = $exifTool->ImageInfo($testfile, @tags);
-    unless (check($exifTool, $info, $testname, $testnum)) {
-        print 'not ';
-    }
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 
     ++$testnum;
@@ -599,5 +572,36 @@ my $testOK;
     print "ok $testnum\n";
 }
 
+# test 34: copy list tag to list and non-list tags
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->Options(List => 1);
+    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg',
+            'xmp:subject<iptc:keywords', 'comment<iptc:keywords');
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    $info = $exifTool->ImageInfo($testfile, 'xmp:subject', 'comment');
+    my $err = '';
+    my $val = $$info{Comment} || '';
+    my $expected = 'ExifTool, Test, XMP';
+    $err .= "  Comment is '$val', but expected '$expected'\n" unless $val eq $expected;
+    $val = $$info{Subject} || '';
+    if (ref $val eq 'ARRAY') {
+        unless (@$val == 3) {
+            $err .= "  Subject does not contain 3 values: '" . join(', ', @$val) . "'\n";
+        }
+    } else {
+        $err .= "  Subject is not an ARRAY: '$val'\n";
+    }
+    if ($err) {
+        warn "\n$err";
+        print 'not ';
+    } else {
+        unlink $testfile;
+    }
+    print "ok $testnum\n";
+}
 
 # end

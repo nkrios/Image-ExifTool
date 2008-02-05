@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Writer_10_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5 kB
@@ -29,24 +29,24 @@
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:03:06 13:09:25
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2003:03:06 13:09:25
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.3580729167
+[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 9
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 14.0
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.6
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 10.2mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 10.2 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2048
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1536
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1536
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: THM - DCF thumbnail file
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
-[EXIF, InteropIFD, Image] 4098 - Related Image Length: 2048
+[EXIF, InteropIFD, Image] 4098 - Related Image Height: 2048
 [EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3443.946188
 [EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3442.016807
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
@@ -55,7 +55,7 @@
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 62mm
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 62 mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: Low gain down
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -86,13 +86,14 @@
 [MakerNotes, Pentax, Camera] 18 - Exposure Time: 1/463
 [MakerNotes, Pentax, Camera] 19 - F Number: 5.6
 [MakerNotes, Pentax, Camera] 20 - ISO: 50
+[MakerNotes, Pentax, Camera] 21 - Light Reading: 26
 [MakerNotes, Pentax, Camera] 22 - Exposure Compensation: 0
 [MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
 [MakerNotes, Pentax, Camera] 25 - White Balance: Auto
 [MakerNotes, Pentax, Camera] 26 - White Balance Mode: Auto (Daylight)
 [MakerNotes, Pentax, Camera] 27 - Blue Balance: 0.30859375
 [MakerNotes, Pentax, Camera] 28 - Red Balance: 0.37109375
-[MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm
+[MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2 mm
 [MakerNotes, Pentax, Camera] 30 - Digital Zoom: 1
 [MakerNotes, Pentax, Camera] 31 - Saturation: Normal
 [MakerNotes, Pentax, Camera] 32 - Contrast: Normal
@@ -102,8 +103,10 @@
 [MakerNotes, Pentax, Time] 36 - Destination City: Los Angeles
 [MakerNotes, Pentax, Time] 37 - Hometown DST: Yes
 [MakerNotes, Pentax, Time] 38 - Destination DST: Yes
+[MakerNotes, Pentax, Camera] 39 - DSP Firmware Version: 1.00.06.00
 [MakerNotes, Pentax, Camera] 50 - Image Processing: Unprocessed
 [XMP, XMP-dc, Time] date - Date: 2003:03:06
+[XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 0.358072916666667
 [XMP, XMP-exif, Camera] FlashMode - Flash Mode: Off
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
@@ -116,7 +119,8 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/500
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.005 mm
-[Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)
+[Composite, Composite, Image]  - Field Of View: 32.4 deg
+[Composite, Composite, Camera]  - Focal Length: 10.2 mm (35 mm equivalent: 62.0 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 3.76 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Light Value: 14.9

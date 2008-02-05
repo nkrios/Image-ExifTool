@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Pentax_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1571 bytes
-[File, File, Time]  - File Modification Date/Time: 2007:10:09 15:10:14
+[File, File, Time]  - File Modification Date/Time: 2008:01:23 14:06:12
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
@@ -32,13 +32,13 @@
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.6
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 10.2mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 10.2 mm
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2048
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1536
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1536
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -46,7 +46,7 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: inf
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 62mm
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 62 mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: Low gain down
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -71,14 +71,14 @@
 [MakerNotes, Pentax, Camera] 18 - Exposure Time: 1/463
 [MakerNotes, Pentax, Camera] 19 - F Number: 5.6
 [MakerNotes, Pentax, Camera] 20 - ISO: 50
-[MakerNotes, Pentax, Camera] 21 - Pentax 0x0015: 26
+[MakerNotes, Pentax, Camera] 21 - Light Reading: 26
 [MakerNotes, Pentax, Camera] 22 - Exposure Compensation: 0
 [MakerNotes, Pentax, Camera] 23 - Metering Mode: Multi Segment
 [MakerNotes, Pentax, Camera] 25 - White Balance: Tungsten
 [MakerNotes, Pentax, Camera] 26 - White Balance Mode: Auto (Daylight)
 [MakerNotes, Pentax, Camera] 27 - Blue Balance: 0.30859375
 [MakerNotes, Pentax, Camera] 28 - Red Balance: 0.37109375
-[MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2mm
+[MakerNotes, Pentax, Camera] 29 - Focal Length: 10.2 mm
 [MakerNotes, Pentax, Camera] 30 - Digital Zoom: 1
 [MakerNotes, Pentax, Camera] 31 - Saturation: Normal
 [MakerNotes, Pentax, Camera] 32 - Contrast: Normal
@@ -88,7 +88,7 @@
 [MakerNotes, Pentax, Time] 36 - Destination City: Los Angeles
 [MakerNotes, Pentax, Time] 37 - Hometown DST: Yes
 [MakerNotes, Pentax, Time] 38 - Destination DST: Yes
-[MakerNotes, Pentax, Camera] 39 - Pentax 0x0027: ....
+[MakerNotes, Pentax, Camera] 39 - DSP Firmware Version: 1.00.06.00
 [MakerNotes, Pentax, Camera] 42 - Pentax 0x002a: 2379
 [MakerNotes, Pentax, Camera] 44 - Pentax 0x002c: 93
 [MakerNotes, Pentax, Camera] 49 - Pentax 0x0031: 0
@@ -104,6 +104,7 @@
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
 [Composite, Composite, Image]  - Shutter Speed: 1/500
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.005 mm
-[Composite, Composite, Camera]  - Focal Length: 10.2mm (35mm equivalent: 62.0mm)
+[Composite, Composite, Image]  - Field Of View: 32.4 deg
+[Composite, Composite, Camera]  - Focal Length: 10.2 mm (35 mm equivalent: 62.0 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 3.76 m
 [Composite, Composite, Image]  - Light Value: 14.9

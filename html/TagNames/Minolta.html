@@ -68,7 +68,7 @@ image stabilization is enabled)</span></span></td></tr>
 <tr class=b>
 <td>0x0100</td>
 <td>SceneMode</td>
-<td class=c>Y</td>
+<td class=c>int32u</td>
 <td><span class=s>0 = Standard
   <br>1 = Portrait
   <br>2 = Text
@@ -139,24 +139,33 @@ image stabilization is enabled)</span></span></td></tr>
 <td class=c>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>0x0105</td>
+<td>Teleconverter</td>
+<td class=c>int32u</td>
+<td><span class=s>0x0 = None
+  <br>0x48 = Minolta AF 2x APO (D)
+  <br>0x50 = Minolta AF 2x APO II
+  <br>0x88 = Minolta AF 1.4x APO (D)
+  <br>0x90 = Minolta AF 1.4x APO II</span></td></tr>
+<tr class=b>
 <td>0x0107</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
 <td><span class=s>1 = Off
   <br>5 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x010a</td>
 <td>ZoneMatching</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x010b</td>
 <td>ColorTemperature</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x010c</td>
 <td>LensID</td>
 <td class=c>int32u</td>
@@ -203,8 +212,10 @@ image stabilization is enabled)</span></span></td></tr>
   <br>45 = Carl Zeiss Planar T* 85mm F1.4 ZA
   <br>46 = Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA
   <br>47 = Carl Zeiss Sonnar T* 135mm F1.8 ZA
+  <br>51 = Sony - AF DT 16-105mm F3.5-5.6
   <br>128 = Tamron 18-200, 28-300 or 80-300mm F3.5-6.3
   <br>129 = Tamron 200-400mm F5.6 LD
+  <br>137 = Cosina 70-210mm F2.8-4 AF
   <br>138 = Soligor 19-35mm F3.5-4.5
   <br>25501 = Minolta AF 50mm F1.7
   <br>25511 = Minolta AF 35-70mm F4
@@ -264,27 +275,28 @@ image stabilization is enabled)</span></span></td></tr>
   <br>26671 = Minolta AF 35mm F2 New
   <br>26681 = Minolta AF 28mm F2 New
   <br>26721 = Minolta AF 24-105mm F3.5-4.5 (D)
-  <br>45741 = Minolta AF 200mm F2.8 G x2</span></td></tr>
-<tr>
+  <br>45741 = Minolta AF 200mm F2.8 G x2
+  <br>45851 = Tamron - SP AF 300 F2.8 LD IF</span></td></tr>
+<tr class=b>
 <td>0x0113</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(valid for Sony A100 only)</span>
   <br>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0114</td>
 <td>MinoltaCameraSettings5D
   <br>MinoltaCameraSettingsA100</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D Tags</a>
   <br>--&gt; <a href='Minolta.html#CameraSettingsA100'>Minolta CameraSettingsA100 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0f00</td>
 <td>MinoltaCameraSettings2</td>
 <td class=c>N</td>
@@ -318,7 +330,8 @@ tags are disabled.</p>
 <td><span class=s>0 = Fill flash
   <br>1 = Red-eye reduction
   <br>2 = Rear flash sync
-  <br>3 = Wireless</span></td></tr>
+  <br>3 = Wireless
+  <br>4 = Off?</span></td></tr>
 <tr>
 <td class=r>3</td>
 <td>WhiteBalance</td>
@@ -704,6 +717,13 @@ tags are disabled.</p>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr class=b>
+<td class=r>22</td>
+<td>FlashMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Normal
+  <br>1 = Red-eye reduction
+  <br>2 = Rear flash sync</span></td></tr>
+<tr>
 <td class=r>28</td>
 <td>ISOSetting</td>
 <td class=c>int16u</td>
@@ -714,42 +734,47 @@ tags are disabled.</p>
   <br>5 = 800
   <br>6 = 1600
   <br>7 = 3200</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>30</td>
 <td>ExposureCompensation</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>37</td>
 <td>ColorSpace</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Natural sRGB
   <br>1 = Natural+ sRGB
   <br>4 = Adobe RGB</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>38</td>
 <td>Sharpness</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>39</td>
 <td>Contrast</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>40</td>
 <td>Saturation</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>45</td>
 <td>FreeMemoryCardImages</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>63</td>
 <td>ColorTemperature</td>
 <td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>64</td>
+<td>HueAdjustment</td>
+<td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r>70</td>
@@ -856,13 +881,20 @@ version)</span></span></td></tr>
 <td><span class=s>0 = Did not fire
   <br>1 = Fired</span></td></tr>
 <tr class=b>
+<td class=r>32</td>
+<td>FlashMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Normal
+  <br>1 = Red-eye reduction
+  <br>2 = Rear flash sync</span></td></tr>
+<tr>
 <td class=r>37</td>
 <td>MeteringMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Multi-segment
   <br>1 = Center weighted
   <br>2 = Spot</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>38</td>
 <td>ISOSetting</td>
 <td class=c>int16u</td>
@@ -875,6 +907,15 @@ version)</span></span></td></tr>
   <br>7 = 3200
   <br>8 = 200 (Zone Matching High)
   <br>10 = 80 (Zone Matching Low)</span></td></tr>
+<tr>
+<td class=r>47</td>
+<td>ColorSpace</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Natural sRGB
+  <br>1 = Natural+ sRGB
+  <br>2 = Monochrome
+  <br>4 = Adobe RGB (ICC)
+  <br>5 = Adobe RGB</span></td></tr>
 <tr class=b>
 <td class=r>48</td>
 <td>Sharpness</td>
@@ -911,39 +952,65 @@ version)</span></span></td></tr>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r>74</td>
+<td>HueAdjustment</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r>80</td>
 <td>Rotation</td>
 <td class=c>int16u</td>
 <td><span class=s>72 = Horizontal (normal)
   <br>76 = Rotate 90 CW
   <br>82 = Rotate 270 CW</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r>83</td>
 <td>ExposureCompensation</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>84</td>
 <td>FreeMemoryCardImages</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r>101</td>
+<td>Rotation</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Horizontal (normal)
+  <br>1 = Rotate 90 CW
+  <br>2 = Rotate 270 CW</span></td></tr>
 <tr class=b>
 <td class=r>110</td>
 <td>ColorTemperature</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r>113</td>
+<td>PictureFinish</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Natural
+  <br>1 = Natural+
+  <br>2 = Portrait
+  <br>3 = Wind Scene
+  <br>4 = Evening Scene
+  <br>5 = Night Scene
+  <br>6 = Night Portrait
+  <br>7 = Monochrome
+  <br>8 = Adobe RGB
+  <br>9 = Adobe RGB (ICC)</span></td></tr>
+<tr class=b>
 <td class=r>174</td>
 <td>ImageNumber</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>176</td>
 <td>NoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>189</td>
 <td>ImageStabilization</td>
 <td class=c>int16u</td>
@@ -1020,7 +1087,7 @@ version)</span></span></td></tr>
 <td class=c>int16u</td>
 <td><span class=s>0 = Single Frame
   <br>1 = Continuous
-  <br>2 = Self-Timer
+  <br>2 = Self-timer
   <br>3 = Continuous Bracketing
   <br>4 = Single-Frame Bracketing
   <br>5 = White Balance Bracketing</span></td></tr>
@@ -1052,7 +1119,7 @@ version)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 1, 2007</i>
+<br><i>Last revised Jan 22, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

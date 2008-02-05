@@ -28,7 +28,7 @@ sub DoSetFromFile($$$);
 sub ScanDir($$);
 sub LoadPrintFormat($);
 sub FilenameSPrintf($;$);
-sub NextUnusedFilename($);
+sub NextUnusedFilename($;$);
 sub CreateDirectory($);
 sub SourceFile($);
 sub OpenOutputFile($);
@@ -74,6 +74,7 @@ my $countGoodCr;    # count files created OK
 my $countGoodWr;    # count files written OK
 my $countNewDir;    # count of directories created
 my $countSameWr;    # count files written OK but not changed
+my $countCopyWr;    # count of files copied without being changed
 my $disableOutput;  # flag to disable normal output
 my $doGlob;         # flag set to do filename wildcard expansion
 my $doSetFileName;  # flag set if FileName may be written
@@ -213,6 +214,7 @@ $countGoodCr = 0;
 $countGoodWr = 0;
 $countNewDir = 0;
 $countSameWr = 0;
+$countCopyWr = 0;
 $filterFlag = 0;
 $htmlOutput = 0;
 $isWriting = 0;
@@ -325,7 +327,7 @@ while ($_ = shift) {
         }
         if (/^f$/) {
             $forcePrint = 1;
-            $mainTool->Options(MissingTagValue => '-'), next;
+            $mainTool->Options(MissingTagValue => '-');
             next;
         }
         /^F([-+]?\d*)$/ and $mainTool->Options(FixBase => $1), next;
@@ -371,7 +373,12 @@ while ($_ = shift) {
         /^S$/  and $outFormat+=2, next;
         /^scanforxmp$/i and $mainTool->Options(ScanForXMP => 1), next;
         /^srcfile$/i and $srcFmt = shift || Die("Expecting FMT for -srcfile option\n"), next;
-        /^t$/i and $tabFormat = 1, next;
+        /^t$/  and $tabFormat = 1, next;
+        if (/^T$/) {
+            $tabFormat = 1; $outFormat+=2; ++$quiet; $forcePrint = 1;
+            $mainTool->Options(MissingTagValue => '-');
+            next;
+        }
         /^u$/  and $mainTool->Options(Unknown => $mainTool->Options('Unknown')+1), next;
         /^U$/  and $mainTool->Options(Unknown => 2), next;
         if (/^v(\d*)$/i) {
@@ -503,9 +510,17 @@ if (@newValues) {
             $verbose and print("Setting new values from $newVal\n");
             my $info = $mainTool->SetNewValuesFromFile($newVal, @{$setTags{$newVal}});
             if ($info->{Error}) {
-                Warn "Error: $info->{Error} - $newVal\n";
-                $rtnVal = 1;
-                next Command;
+                my $err = $info->{Error};
+                delete $info->{Error};
+                delete $info->{Warning};
+                if (%$info) {
+                    $info->{Warning} = $err;    # downgrade to a warning
+                } else {
+                    # no tags set so error must have been fatal
+                    Warn "Error: $err - $newVal\n";
+                    $rtnVal = 1;
+                    next Command;
+                }
             }
             if ($info->{Warning}) {
                 Warn "Warning: $info->{Warning} - $newVal\n";
@@ -553,14 +568,7 @@ if (@newValues) {
     foreach (@exclude) {
         $mainTool->SetNewValue($_, undef, Replace => 2);
     }
-    if ($isWriting) {
-        # create input file from scratch possible and it doesn't exist
-        # (by treating it as if we had used the -o option)
-        if (not $outOpt and @files == 1 and not -e $files[0] and CanCreate($files[0])) {
-            $outOpt = $files[0];
-            $files[0] = '';
-        }
-    } elsif (not $outOpt and not @tags) {
+    unless ($isWriting or $outOpt or @tags) {
         Warn "Nothing to do.\n";
         $rtnVal = 1;
         next;
@@ -631,7 +639,8 @@ foreach $file (@files) {
 
 # print summary and exit
 my $tot = $count + $countBad;
-my $totWr = $countGoodWr + $countBadWr + $countSameWr + $countGoodCr + $countBadCr;
+my $totWr = $countGoodWr + $countBadWr + $countSameWr + $countCopyWr +
+            $countGoodCr + $countBadCr;
 if (($countDir or $totWr or $countFailed or $tot > 1 or $outputExt) and
     not ($binaryStdout or $quiet))
 {
@@ -641,6 +650,7 @@ if (($countDir or $totWr or $countFailed or $tot > 1 or $outputExt) and
     printf("%5d image files created\n", $countGoodCr) if $countGoodCr;
     printf("%5d image files updated\n", $countGoodWr) if $totWr - $countGoodCr - $countBadCr;
     printf("%5d image files unchanged\n", $countSameWr) if $countSameWr;
+    printf("%5d image files copied\n", $countCopyWr) if $countCopyWr;
     printf("%5d files weren't updated due to errors\n", $countBadWr) if $countBadWr;
     printf("%5d files weren't created due to errors\n", $countBadCr) if $countBadCr;
     printf("%5d image files read\n", $count) if $tot>1 or ($countDir and not $totWr);
@@ -865,8 +875,8 @@ sub GetImageInfo($$)
             }
             if ($showTagID) {
                 $id = $exifTool->GetTagID($tag);
-                if ($id =~ /^\d+$/) {    # only print numeric ID's
-                    $id = sprintf("0x%.4x", $id) if $showTagID eq 'H';
+                if ($id =~ /^(\d+)(\.\d+)?$/) { # only print numeric ID's
+                    $id = sprintf("0x%.4x", $1) if $showTagID eq 'H';
                 } else {
                     $id = '-';
                 }
@@ -983,7 +993,6 @@ sub SetImageInfo($$)
     if (defined $outOpt) {
         if ($outOpt eq '-') {
             $isStdout = 1;
-            last;
         } else {
             $outfile = FilenameSPrintf($outOpt, $orig);
             if ($outfile eq '') {
@@ -1097,7 +1106,7 @@ sub SetImageInfo($$)
                 $newDir = FilenameSPrintf($newDir, $orig);
                 $outfile = Image::ExifTool::GetNewFileName(defined $outfile ? $outfile : $orig, $newDir);
             }
-            $outfile = NextUnusedFilename($outfile);
+            $outfile = NextUnusedFilename($outfile, $infile);
             if (-e $outfile) {
                 if ($infile ne $outfile) {
                     Warn "Error: '$outfile' already exists - $infile\n";
@@ -1115,17 +1124,32 @@ sub SetImageInfo($$)
             $tmpFile = $outfile if defined $outOpt;
         }
         unless (defined $tmpFile) {
-            # only need to rewrite file if we set a valid tag
+            # count the number of tags and pseudo-tags we are writing
             my ($numSet, $numPseudo) = $exifTool->CountNewValues();
-            unless ($numSet) {
-                if (-e $file) {
+            if (-e $file) {
+                unless ($numSet) {
+                    # no need to write if no tags set
                     ++$countSameWr;
+                    print "Nothing changed in $file\n" if defined $verbose;
                     return 1;
-                } else {
-                    Warn("Error: File not found - $file\n");
+                }
+            } elsif (CanCreate($file)) {
+                if ($numSet == $numPseudo) {
+                    # no need to write if no real tags
+                    Warn("Error: Nothing to write - $file\n");
                     ++$countBadWr;
                     return 0;
                 }
+                unless (defined $outfile) {
+                    # create file from scratch
+                    $outfile = $file;
+                    $file = '';
+                }
+            } else {
+                # file doesn't exist, and we can't create it
+                Warn("Error: File not found - $file\n");
+                ++$countBadWr;
+                return 0;
             }
             # quickly rename file and/or set file date if this is all we are doing
             if ($numSet == $numPseudo) {
@@ -1152,6 +1176,7 @@ sub SetImageInfo($$)
                 }
                 $isTemporary = 1;
             }
+            # new output file is temporary until we know it has been written properly
             $tmpFile = $outfile;
         }
     }
@@ -1249,8 +1274,9 @@ sub SetImageInfo($$)
             if ($overwriteOrig) {
                 unlink $file or Warn "Error erasing original $file\n";
             }
-            ++$countGoodWr;
+            ++$countCopyWr;
         }
+        print "Nothing changed in $file\n" if defined $verbose;
     } else {
         ++$countBadWr;
         unlink $tmpFile if defined $tmpFile;
@@ -1392,11 +1418,11 @@ sub FilenameSPrintf($;$)
 
 #------------------------------------------------------------------------------
 # Expand '%c' codes if filename to get next unused file name
-# Inputs: 0) file name format string
+# Inputs: 0) file name format string, 1) filename ok to use even if it exists
 # Returns: new file name
-sub NextUnusedFilename($)
+sub NextUnusedFilename($;$)
 {
-    my $fmt = shift;
+    my ($fmt, $okfile) = @_;
     return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*[lu]?c/;
     my %sep = ( '-' => '-', '+' => '_' );
     my ($copy, $alpha) = (0, 'a');
@@ -1422,6 +1448,7 @@ sub NextUnusedFilename($)
         $filename .= substr($fmt, $pos); # add rest of file name
         # return now with filename unless file exists
         return $filename unless -e $filename;
+        return $filename if defined $okfile and $filename eq $okfile;
         ++$copy;
         ++$alpha;
     }
@@ -1604,31 +1631,32 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  ACR   r       JP2   r/w     PPT   r      |  EXIF           r/w/c
-  AI    r       JPEG  r/w     PS    r/w    |  GPS            r/w/c
-  AIFF  r       K25   r       PSD   r/w    |  IPTC           r/w/c
-  APE   r       M4A   r       QTIF  r      |  XMP            r/w/c
-  ARW   r       MEF   r/w     RA    r      |  MakerNotes     r/w/c
-  ASF   r       MIE   r/w/c   RAF   r      |  Photoshop IRB  r/w/c
-  AVI   r       MIFF  r       RAM   r      |  ICC Profile    r/w/c
-  BMP   r       MNG   r/w     RAW   r/w    |  MIE            r/w/c
-  BTF   r       MOS   r/w     RIFF  r      |  JFIF           r/w/c
-  CR2   r/w     MOV   r       RM    r      |  Ducky APP12    r/w/c
-  CRW   r/w     MP3   r       SR2   r      |  CIFF           r/w
-  CS1   r/w     MP4   r       SRF   r      |  AFCP           r/w
-  DCM   r       MPC   r       SWF   r      |  DICOM          r
-  DCR   r       MPG   r       THM   r/w    |  Flash          r
-  DNG   r/w     MRW   r/w     TIFF  r/w    |  FlashPix       r
-  DOC   r       NEF   r/w     VRD   r/w/c  |  GeoTIFF        r
-  EPS   r/w     OGG   r       WAV   r      |  PrintIM        r
-  ERF   r/w     ORF   r/w     WDP   r/w    |  ID3            r
-  FLAC  r       PBM   r/w     WMA   r      |  Kodak Meta     r
-  FLV   r       PDF   r       WMV   r      |  Ricoh RMETA    r
-  FPX   r       PEF   r/w     X3F   r      |  Picture Info   r
-  GIF   r/w     PGM   r/w     XLS   r      |  Adobe APP14    r
-  HTML  r       PICT  r       XMP   r/w/c  |  APE            r
-  ICC   r/w/c   PNG   r/w                  |  Vorbis         r
-  JNG   r/w     PPM   r/w                  |  (and more)
+  3FR   r       ITC   r       PNG   r/w    |  EXIF           r/w/c
+  ACR   r       JNG   r/w     PPM   r/w    |  GPS            r/w/c
+  AI    r       JP2   r/w     PPT   r      |  IPTC           r/w/c
+  AIFF  r       JPEG  r/w     PS    r/w    |  XMP            r/w/c
+  APE   r       K25   r       PSD   r/w    |  MakerNotes     r/w/c
+  ARW   r       KDC   r       QTIF  r      |  Photoshop IRB  r/w/c
+  ASF   r       M4A   r       RA    r      |  ICC Profile    r/w/c
+  AVI   r       MEF   r/w     RAF   r/w    |  MIE            r/w/c
+  BMP   r       MIE   r/w/c   RAM   r      |  JFIF           r/w/c
+  BTF   r       MIFF  r       RAW   r/w    |  Ducky APP12    r/w/c
+  CR2   r/w     MNG   r/w     RIFF  r      |  CIFF           r/w
+  CRW   r/w     MOS   r/w     RM    r      |  AFCP           r/w
+  CS1   r/w     MOV   r       SR2   r      |  JPEG 2000      r
+  DCM   r       MP3   r       SRF   r      |  DICOM          r
+  DCR   r       MP4   r       SWF   r      |  Flash          r
+  DNG   r/w     MPC   r       THM   r/w    |  FlashPix       r
+  DOC   r       MPG   r       TIFF  r/w    |  GeoTIFF        r
+  EPS   r/w     MRW   r/w     VRD   r/w/c  |  PrintIM        r
+  ERF   r/w     NEF   r/w     WAV   r      |  ID3            r
+  FLAC  r       OGG   r       WDP   r/w    |  Kodak Meta     r
+  FLV   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
+  FPX   r       PBM   r/w     WMV   r      |  Picture Info   r
+  GIF   r/w     PDF   r/w     X3F   r      |  Adobe APP14    r
+  HDP   r/w     PEF   r/w     XLS   r      |  APE            r
+  HTML  r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
+  ICC   r/w/c   PICT  r                    |  (and more)
 
 Note:  If I<FILE> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are written.
@@ -1672,8 +1700,10 @@ information (ie. C<-all= --exif:all> deletes all but EXIF information).
 
 Write a new value for the specified tag (ie. C<-comment=wow>), or delete the
 tag if no I<VALUE> is given (ie. C<-comment=>). C<+=> and C<-=> are used to
-add or remove entries from a list, or to shift date/time values (see
-L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for details).
+add or remove existing entries from a list, or to shift date/time values
+(see L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for details),
+and C<-=> may be used to conditionally remove or replace a tag (see
+L</WRITING EXAMPLES> for examples).
 
 If a group name is not specified for I<TAG>, then the information is written
 to the preferred group, which is the first group in the following list where
@@ -1753,8 +1783,8 @@ various formats:
 
 Set the format for B<d>ate/time tag values.  Consult C<strftime> man page
 for I<FMT> syntax. The default format is equivalent to "%Y:%m:%d %H:%M:%S".
-This option has no effect on date-only or time-only tags, and ignores
-timezone information if present.
+This option has no effect on date-only or time-only tags, ignores timezone
+information if present, and currently doesn't apply when writing.
 
 =item B<-D>
 
@@ -1791,6 +1821,9 @@ the file is modified.  This may cause the wrong values to be extracted for
 some maker note entries when reading the edited file.  This option allows an
 integer I<OFFSET> to be specified for adjusting the maker notes base offset.
 If no I<OFFSET> is given, ExifTool takes its best guess at the correct base.
+Note that exiftool will automatically fix the offsets for images which store
+original offset information (ie. newer Canon models).  Offsets are fixed
+permanently if used when writing an image.
 
 =item B<-fast>
 
@@ -1936,15 +1969,18 @@ appropriate tag values are specified on the command line.
 Overwrite the original I<FILE> (instead of preserving it by adding
 C<_original> to the file name) when writing information to an image.
 Caution: This option should only be used if you already have separate backup
-copies of your image files.
+copies of your image files.  The overwrite is implemented by renaming a
+temporary file.
 
 =item B<-overwrite_original_in_place>
 
 Similar to the B<-overwrite_original> option except that an extra step is
 added to allow the original file attributes to be preserved.  On a Macintosh
-for example, this preserves the original file type, creator and icon.  The
-extra step results in slower performance, so the B<-overwrite_original>
-option should be used instead unless necessary.
+for example, this preserves the original file type, creator and icon.  This
+is implemented by copying the contents of a temporary file over the
+original, then deleting the temporary file.  The extra step results in
+slower performance, so the B<-overwrite_original> option should be used
+instead unless necessary.
 
 =item B<-p> I<FMTFILE> or I<STR>
 
@@ -1952,8 +1988,9 @@ B<P>rint output in the format specified by the given file or string (and
 ignore other format options).  Tag names in the format file or string begin
 with a C<$> symbol and may contain an optional group name.  Case is not
 significant.  Braces C<{}> may be used around the tag name to separate it
-from subsequent text.  Use C<$$> to represent a C<$> symbol.  In the file,
-lines beginning with C<#> are ignored. For example, this format file:
+from subsequent text.  Use C<$$> to represent a C<$> symbol.  C<$/> may be
+used for a newline.  In the file, lines beginning with C<#> are ignored. For
+example, this format file:
 
     # this is a comment line
     File $FileName was created on $DateTimeOriginal
@@ -1971,7 +2008,7 @@ are ignored and the line is printed with an empty tag value.
 
 =item B<-P>
 
-B<P>reserve date/time of original file when writing.
+B<P>reserve date/time of original file (C<FileModifyDate>) when writing.
 
 =item B<-q>
 
@@ -2014,6 +2051,10 @@ import).  May be combined with B<-s> to print tag names instead of
 descriptions, or B<-S> to print tag values only, tab-delimited on a single
 line.
 
+=item B<-T>
+
+Output tag values in B<T>able form.  (Equivalent to B<-t -S -q -f>.)
+
 =item B<-TagsFromFile> I<SRCFILE> or I<FMT>
 
 Copy tag values from I<SRCFILE> to I<FILE>.  Tag names on the command line
@@ -2046,7 +2087,7 @@ with a different name or group.  This is done using
 E<quot>'-I<SRCTAG>E<gt>I<DSTTAG>'E<quot> on the command line after
 B<-TagsFromFile> (E<quot>'-I<DSTTAG>E<lt>I<SRCTAG>'E<quot> also works).
 Note that this argument must be quoted to prevent shell redirection, and
-there is no C<=> sign as when setting new values.  Both source and
+there is no C<=> sign as when assigning new values.  Both source and
 destination tags may be prefixed by a group name, and C<All> or C<*> may be
 used as a tag or group name.  If no destination group is specified, the
 information is written to the preferred group.  As a convenience,
@@ -2109,7 +2150,8 @@ Print B<v>erbose messages.  I<NUM> specifies the level of verbosity in the
 range 0-5, with higher numbers being more verbose.  If I<NUM> is not given,
 then each B<-v> option increases the level of verbosity by 1.  This option
 suppresses normal console output unless specific tags are being extracted.
-B<-v0> is used when writing to print only the processed file names.
+B<-v0> is used when writing to print only the processed file names, and the
+"Nothing changed" message for files that were not modified.
 
 =item B<-ver>
 
@@ -2348,6 +2390,10 @@ Delete all meta information except JFIF group from an image.
 Delete Photoshop meta information from an image (note that the Photoshop
 information also includes IPTC).
 
+=item exiftool -r -XMP-crss:all= DIR
+
+Recursively delete all XMP-crss information from images in a directory.
+
 =item exiftool '-ThumbnailImageE<lt>=thumb.jpg' dst.jpg
 
 Set the thumbnail image from specified file (Note: The quotes are neccessary
@@ -2466,7 +2512,7 @@ redirecting information as in this example.)
 Copy all possible information from C<src.jpg> and write in XMP format to
 C<dst.jpg>.
 
-=item exiftool -tagsFromFile a.jpg -@ iptc2xmp.args -iptc:all= a.jpg
+=item exiftool -@ iptc2xmp.args -iptc:all= a.jpg
 
 Translate IPTC information to XMP with appropriate tag name conversions, and
 delete the original IPTC information from an image.  This example uses
@@ -2564,7 +2610,7 @@ recursively renames all images in a directory by adding a C<CreateDate>
 timestamp to the start of the filename, then moves them into new directories
 named by date.
 
-=item exiftool '-FileName<${CreateDate}_$filenumber.jpg' -d %Y%m%d dir/*.jpg
+=item exiftool '-FileName<${CreateDate}_$filenumber.jpg' -d %Y%m%d *.jpg
 
 Set the filename of all JPG images in the current directory from the
 CreateDate and FileNumber tags, in the form "20060507_118-1861.jpg".
@@ -2609,7 +2655,7 @@ Macintosh filesystems.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey
+Copyright 2003-2008, Phil Harvey
 
 This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.

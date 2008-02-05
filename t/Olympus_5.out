@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Olympus_5_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 7 kB
-[File, File, Time]  - File Modification Date/Time: 2007:09:21 08:09:31
+[File, File, Time]  - File Modification Date/Time: 2008:01:23 14:06:10
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -33,14 +33,14 @@
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.8
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 20.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 20.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2560
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1920
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1920
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -125,7 +125,7 @@
 [MakerNotes, Olympus, Camera] 1286 - Sharpness Setting: 1 (min -3, max 5)
 [MakerNotes, Olympus, Camera] 1287 - Color Space: sRGB
 [MakerNotes, Olympus, Camera] 1288 - Olympus Camera Settings 0x0508: 0
-[MakerNotes, Olympus, Camera] 1290 - Noise Reduction: Off
+[MakerNotes, Olympus, Camera] 1290 - Noise Reduction: (none)
 [MakerNotes, Olympus, Camera] 1291 - Distortion Correction: Off
 [MakerNotes, Olympus, Camera] 1292 - Shading Compensation: Off
 [MakerNotes, Olympus, Camera] 1293 - Compression Factor: 2.7
@@ -148,27 +148,27 @@
 [MakerNotes, Olympus, Camera] 268 - Raw Dev Settings: (none)
 [MakerNotes, Olympus, Camera] 0 - Image Processing Version: 010
 [MakerNotes, Olympus, Camera] 256 - WB RB Levels: 412 290
-[MakerNotes, Olympus, Camera] 287 - Olympus Image Processing 0x011f: 256
+[MakerNotes, Olympus, Camera] 287 - WB G Level: 256
 [MakerNotes, Olympus, Camera] 512 - Color Matrix: 356 -34 -66 -22 308 -30 6 -126 376
-[MakerNotes, Olympus, Camera] 768 - Smoothing Parameter 1: 576
-[MakerNotes, Olympus, Camera] 784 - Smoothing Parameter 2: 1536
-[MakerNotes, Olympus, Camera] 1536 - Smoothing Thresholds: 69 69 69 68
-[MakerNotes, Olympus, Camera] 1552 - Smoothing Threshold 2: 256
+[MakerNotes, Olympus, Camera] 768 - Enhancer: 576
+[MakerNotes, Olympus, Camera] 784 - Coring Filter: 0
+[MakerNotes, Olympus, Camera] 1536 - Black Level 2: 69 69 69 68
+[MakerNotes, Olympus, Camera] 1552 - Gain Base: 256
 [MakerNotes, Olympus, Camera] 1553 - Valid Bits: 12 0
-[MakerNotes, Olympus, Camera] 1554 - Olympus Image Processing 0x0612: 0 0
-[MakerNotes, Olympus, Camera] 1555 - Olympus Image Processing 0x0613: 0 0
-[MakerNotes, Olympus, Camera] 1556 - Olympus Image Width 2: 2560
-[MakerNotes, Olympus, Camera] 1557 - Olympus Image Height 2: 1920
+[MakerNotes, Olympus, Camera] 1554 - Crop Left: 0 0
+[MakerNotes, Olympus, Camera] 1555 - Crop Top: 0 0
+[MakerNotes, Olympus, Camera] 1556 - Crop Width: 2560
+[MakerNotes, Olympus, Camera] 1557 - Crop Height: 1920
 [MakerNotes, Olympus, Camera] 1559 - Olympus Image Processing 0x0617: 1
 [MakerNotes, Olympus, Camera] 2048 - Olympus Image Processing 0x0800: -0.0549249015748501 0.0199025515466928 -0.0028715955559[...]
 [MakerNotes, Olympus, Camera] 2049 - Olympus Image Processing 0x0801: 8194 8208 8250 8292 8352 8393 8469 8521 8587 8668 8725 [...]
-[MakerNotes, Olympus, Camera] 2050 - Olympus Image Processing 0x0802: 102.3897
+[MakerNotes, Olympus, Camera] 2050 - Olympus Image Processing 0x0802: 102.3897059
 [MakerNotes, Olympus, Camera] 4096 - Olympus Image Processing 0x1000: 1770
 [MakerNotes, Olympus, Camera] 4097 - Olympus Image Processing 0x1001: 233
 [MakerNotes, Olympus, Camera] 4098 - Olympus Image Processing 0x1002: 164
 [MakerNotes, Olympus, Camera] 4099 - Olympus Image Processing 0x1003: 1
 [MakerNotes, Olympus, Camera] 4100 - Olympus Image Processing 0x1004: 5
-[MakerNotes, Olympus, Camera] 4112 - Noise Reduction 2: Off
+[MakerNotes, Olympus, Camera] 4112 - Noise Reduction 2: (none)
 [MakerNotes, Olympus, Camera] 4113 - Distortion Correction 2: Off
 [MakerNotes, Olympus, Camera] 4114 - Shading Compensation 2: Off
 [MakerNotes, Olympus, Camera] 0 - Focus Info Version: 010
@@ -187,9 +187,9 @@
 [MakerNotes, Olympus, Camera] 525 - Olympus Focus Info 0x020d: 0
 [MakerNotes, Olympus, Camera] 526 - Olympus Focus Info 0x020e: 0 0 0 0 0
 [MakerNotes, Olympus, Camera] 527 - Olympus Focus Info 0x020f: 0 0 0 0 0
-[MakerNotes, Olympus, Camera] 528 - Olympus Focus Info 0x0210: 0
-[MakerNotes, Olympus, Camera] 529 - Olympus Focus Info 0x0211: 0 0 0 0 0 0 0 0
-[MakerNotes, Olympus, Camera] 530 - Olympus Focus Info 0x0212: 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0[...]
+[MakerNotes, Olympus, Camera] 528 - Scene Detect: 0
+[MakerNotes, Olympus, Camera] 529 - Scene Area: 0 0 0 0 0 0 0 0
+[MakerNotes, Olympus, Camera] 530 - Scene Detect Data: (Binary data 1439 bytes)
 [MakerNotes, Olympus, Camera] 531 - Olympus Focus Info 0x0213: 0
 [MakerNotes, Olympus, Camera] 532 - Olympus Focus Info 0x0214: 0
 [MakerNotes, Olympus, Camera] 533 - Olympus Focus Info 0x0215: 27641
@@ -198,7 +198,7 @@
 [MakerNotes, Olympus, Camera] 770 - Olympus Focus Info 0x0302: 0
 [MakerNotes, Olympus, Camera] 773 - Focus Distance: 0.705 m
 [MakerNotes, Olympus, Camera] 775 - Olympus Focus Info 0x0307: 0
-[MakerNotes, Olympus, Camera] 776 - AF Point: Center (1)
+[MakerNotes, Olympus, Camera] 776 - AF Point: Center (horizontal)
 [MakerNotes, Olympus, Camera] 777 - Olympus Focus Info 0x0309: 0
 [MakerNotes, Olympus, Camera] 778 - Olympus Focus Info 0x030a: -62
 [MakerNotes, Olympus, Camera] 779 - Olympus Focus Info 0x030b: 57
@@ -251,7 +251,8 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/100
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.015 mm
-[Composite, Composite, Image]  - Depth of Field: 0.17 m (0.63 - 0.80)
-[Composite, Composite, Camera]  - Focal Length: 20.0mm (35mm equivalent: 40.1mm)
+[Composite, Composite, Image]  - Depth Of Field: 0.17 m (0.63 - 0.80)
+[Composite, Composite, Image]  - Field Of View: 47.2 deg (0.62 m)
+[Composite, Composite, Camera]  - Focal Length: 20.0 mm (35 mm equivalent: 40.1 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 5.93 m
 [Composite, Composite, Image]  - Light Value: 9.0

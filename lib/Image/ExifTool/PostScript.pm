@@ -16,15 +16,13 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 sub WritePS($$);
-sub CheckPS($$$);
 
 # PostScript tag table
 %Image::ExifTool::PostScript::Main = (
     WRITE_PROC => \&WritePS,
-    CHECK_PROC => \&CheckPS,
     PREFERRED => 1, # always add these tags when writing
     GROUPS => { 2 => 'Image' },
     # Note: Make all of these tags priority 0 since the first one found at
@@ -172,6 +170,88 @@ sub SetInputRecordSeparator($)
 }
 
 #------------------------------------------------------------------------------
+# Decode comment from PostScript file
+# Inputs: 0) comment string, 1) RAF ref, 2) reference to lines array
+#         3) optional data reference for extra lines read from file
+# Returns: Decoded comment string (may be an array reference)
+# - handles multi-line comments and escape sequences
+sub DecodeComment($$$;$)
+{
+    my ($val, $raf, $lines, $dataPt) = @_;
+    $val =~ s/\x0d*\x0a*$//;        # remove trailing CR, LF or CR/LF
+    # check for continuation comments
+    for (;;) {
+        unless (@$lines) {
+            my $buff;
+            $raf->ReadLine($buff) or last;
+            my $altnl = $/ eq "\x0d" ? "\x0a" : "\x0d";
+            if ($buff =~ /$altnl/) {
+                # split into separate lines
+                @$lines = split /$altnl/, $buff, -1;
+                # handle case of DOS newline data inside file using Unix newlines
+                @$lines = ( $$lines[0] . $$lines[1] ) if @$lines == 2 and $$lines[1] eq $/;
+            } else {
+                push @$lines, $buff;
+            }
+        }
+        last unless $$lines[0] =~ s/^%%\+//;    # is the next line a continuation?
+        $$dataPt .= "%%+$$lines[0]" if $dataPt; # add to data if necessary
+        $$lines[0] =~ s/\x0d*\x0a*$//;          # remove trailing CR, LF or CR/LF
+        $val .= shift @$lines;
+    }
+    my @vals;
+    # handle bracketed string values
+    if ($val =~ s/^\((.*)\)$/$1/) { # remove brackets if necessary
+        # split into an array of strings if necessary
+        my $nesting = 1;
+        while ($val =~ /(\(|\))/g) {
+            my $bra = $1;
+            my $pos = pos($val) - 2;
+            my $backslashes = 0;
+            while ($pos and substr($val, $pos, 1) eq '\\') {
+                --$pos;
+                ++$backslashes;
+            }
+            next if $backslashes & 0x01;    # escaped if odd number
+            if ($bra eq '(') {
+                ++$nesting;
+            } else {
+                --$nesting;
+                unless ($nesting) {
+                    push @vals, substr($val, 0, pos($val)-1);
+                    $val = substr($val, pos($val));
+                    ++$nesting if $val =~ s/\s*\(//;
+                }
+            }
+        }
+        push @vals, $val;
+        foreach $val (@vals) {
+            # decode escape sequences in bracketed strings
+            # (similar to code in PDF.pm, but without line continuation)
+            while ($val =~ /\\(.)/sg) {
+                my $n = pos($val) - 2;
+                my $c = $1;
+                my $r;
+                if ($c =~ /[0-7]/) {
+                    # get up to 2 more octal digits
+                    $c .= $1 if $val =~ /\G([0-7]{1,2})/g;
+                    # convert octal escape code
+                    $r = chr(oct($c) & 0xff);
+                } else {
+                    # convert escaped characters
+                    ($r = $c) =~ tr/nrtbf/\n\r\t\b\f/;
+                }
+                substr($val, $n, length($c)+1) = $r;
+                # continue search after this character
+                pos($val) = $n + length($r);
+            }
+        }
+        $val = @vals > 1 ? \@vals : $vals[0];
+    }
+    return $val;
+}
+
+#------------------------------------------------------------------------------
 # Extract information from EPS, PS or AI file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 if this was a valid PostScript file
@@ -311,11 +391,8 @@ sub ProcessPS($$)
             my ($tag, $val) = ($1, $2);
             # only allow 'ImageData' to have single leading '%'
             next unless $data =~ /^%%/ or $1 eq 'ImageData';
-            # extract information from PostScript tags in comments
-            $val =~ s/\x0d*\x0a*$//;        # remove trailing CR, LF or CR/LF
-            if ($val =~ s/^\((.*)\)$/$1/) { # remove brackets if necessary
-                $val =~ s/\) \(/, /g;       # convert contained brackets too
-            }
+            # decode comment string (reading continuation lines if necessary)
+            $val = DecodeComment($val, $raf, \@lines);
             $exifTool->HandleTag($tagTablePtr, $tag, $val);
             next;
         } else {
@@ -376,7 +453,7 @@ Currently doesn't handle continued lines ("%+" syntax).
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

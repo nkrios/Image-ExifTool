@@ -37,7 +37,9 @@ my $testnum = 1;
         [ISOSpeedRange => 'Enable; 1600; 200'],
         [TimerLength => 'Enable; 6 sec: 5; 16 sec: 20; After release: 6'],
     );
-    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Canon1DmkIII.jpg', 1);
+    my @check = qw(ISOSpeedRange TimerLength OriginalDecisionData Warning);
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/Canon1DmkIII.jpg', \@check);
     print "ok $testnum\n";
 }
 

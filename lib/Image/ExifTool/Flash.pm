@@ -9,6 +9,7 @@
 # References:   1) http://www.the-labs.com/MacromediaFlash/SWF-Spec/SWFfileformat.html
 #               2) http://sswf.sourceforge.net/SWFalexref.html
 #               3) http://osflash.org/flv/
+#               4) http://www.irisa.fr/texmex/people/dufouil/ffmpegdoxy/flv_8h.html
 #
 # Notes:        I'll add AMF3 support if someone sends me a FLV with AMF3 data
 #------------------------------------------------------------------------------
@@ -20,7 +21,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::FLAC;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessMeta($$$;$);
 
@@ -39,7 +40,7 @@ sub ProcessMeta($$$;$);
     FrameCount   => { },
     Duration => {
         Notes => 'calculated from FrameRate and FrameCount',
-        PrintConv => 'sprintf("%.2f sec",$val)',
+        PrintConv => 'sprintf("%.2f s",$val)',
     },
 );
 
@@ -73,10 +74,11 @@ sub ProcessMeta($$$;$);
     'Bit0-3' => {
         Name => 'AudioEncoding',
         PrintConv => {
-            0 => 'Uncompressed',
+            0 => 'PCM-BE (uncompressed)', # PCM-BE according to ref 4
             1 => 'ADPCM',
             2 => 'MP3',
-            5 => 'Nellymoser 8kHz mono',
+            3 => 'PCM-LE (uncompressed)', #4
+            5 => 'Nellymoser 8kHz Mono',
             6 => 'Nellymoser',
         },
     },
@@ -112,8 +114,10 @@ sub ProcessMeta($$$;$);
         Name => 'VideoEncoding',
         PrintConv => {
             2 => 'Sorensen H.263',
-            3 => 'Screen video',
+            3 => 'Screen Video',
             4 => 'On2 VP6',
+            5 => 'On2 VP6 Alpha', #3
+            6 => 'Screen Video 2', #3
         },
     },
 );
@@ -151,7 +155,7 @@ sub ProcessMeta($$$;$);
     'datasize'      => 'DataSize',
     'duration' => {
         Name => 'Duration',
-        PrintConv => 'sprintf("%.3fs",$val)',
+        PrintConv => 'sprintf("%.3f s",$val)',
     },
     'filesize'      => 'FileSizeBytes',
     'framerate'     => {
@@ -582,7 +586,7 @@ will add AMF3 support.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -596,6 +600,8 @@ under the same terms as Perl itself.
 =item L<http://sswf.sourceforge.net/SWFalexref.html>
 
 =item L<http://osflash.org/flv/>
+
+=item L<http://www.irisa.fr/texmex/people/dufouil/ffmpegdoxy/flv_8h.html>
 
 =back
 

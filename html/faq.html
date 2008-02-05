@@ -22,14 +22,15 @@ pre { color: #800; margin-left: 2em }
 <li><a href="#Q5">Date and time formats</a>
 <li><a href="#Q6">"Can't convert TAG" errors</a>
 <li><a href="#Q7">Deleting all EXIF from a TIFF</a>
-</ol></td><td valign='top'><ol start=8>
 <li><a href="#Q8">Writing Make, Model and MakerNotes</a>
+</ol></td><td valign='top'><ol start=9>
 <li><a href="#Q9">Tag locations when copying</a>
 <li><a href="#Q10">Coded character sets</a>
 <li><a href="#Q11">User-defined tags</a>
 <li><a href="#Q12">Database import</a>
 <li><a href="#Q13">Output file size</a>
 <li><a href="#Q14">GPS coordinate format</a>
+<li><a href="#Q15">MakerNote errors</a>
 </ol></td></tr></table>
 
 <hr>
@@ -58,7 +59,7 @@ information to see the corresponding group names.
 </blockquote>
 
 <a name="Q3"></a>
-<p>3a. <b>"ExifTool reports the wrong value for a tag"</b>,
+<p>3a. <b>"ExifTool reports the wrong value or doesn't extract a tag"</b>,
 <br>3b. <b>"ExifTool doesn't write a tag properly"</b>, or
 <br>3c. <b>"Other software can't read information written by ExifTool"</b></p>
 
@@ -73,6 +74,12 @@ the name of your image file.  Also, it may be helpful to add
 <code>&#8209;s</code> to show the actual tag names instead of the
 descriptions (and possibly <code>&#8209;D</code> or <code>&#8209;H</code> to
 show the tag ID numbers if you are familiar with these).</blockquote>
+
+<blockquote>When duplicate tags exist, only one is extracted unless the
+<code>-a</code> option is used.  Beware that options like <code>-EXIF:all</code>
+select all EXIF tags from the extracted tags, so if any EXIF tags have been
+hidden by duplicate tags in other locations, they will not appear in the output
+for <code>-EXIF:all</code>.</blockquote>
 
 <blockquote>If you are having problems with other software reading information
 written by ExifTool, if possible try first writing the information from the
@@ -388,6 +395,14 @@ should be
 Then you can read back the new tag with "<code>exiftool -s Writer.jpg</code>".
 </blockquote>
 
+<blockquote>To specify the config file directory from within a Perl script when
+using the ExifTool API, set the <b>EXIFTOOL_HOME</b> environment variable before
+loading the ExifTool module:
+
+<pre>BEGIN { $ENV{EXIFTOOL_HOME} = '/config_file_directory' }
+use Image::ExifTool;
+</pre></blockquote>
+
 <a name="Q12"></a>
 <p>12. <b>"How do I import information into a database from exiftool?"</b></p>
 
@@ -407,10 +422,14 @@ And here is an example of an actual command using these options:
 <pre>exiftool -t -S -q -f -r -filename -aperture -ISO t/images > out.txt
 </pre>
 
-This command recursively processes all images in the "<code>t/images</code>"
-directory, extracting FileName, Aperture and ISO tags, and writing the
-output to a file called "<code>out.txt</code>".  After the command has
-executed, the output file will contain information in the following format:
+(Note that <code>-T</code> option may be used in place of
+<code>-t -S -q -f</code>.)</blockquote>
+
+<blockquote>This command recursively processes all images in the
+"<code>t/images</code>" directory, extracting FileName, Aperture and ISO tags,
+and writing the output to a file called "<code>out.txt</code>".  After the
+command has executed, the output file will contain information in the following
+format:
 
 <pre>Canon.jpg       14.0    100
 Casio.jpg       2.0     -
@@ -488,8 +507,39 @@ Similar styles may be used for longitude.  ExifTool will convert any of these
 coordinate styles to the proper format for the specific tag used.
 </blockquote>
 
+<a name="Q15"></a>
+<p>15. <b>"I get warnings or errors in the MakerNotes when reading or writing information"</b></p>
+
+<blockquote>Some problems like this may be caused by image editing software
+which doesn't properly update offsets in the MakerNotes when rewiting an image.
+ In many cases, ExifTool will detect this type of problem and issue a warning
+like this:
+
+<pre>Warning: [minor] Possibly incorrect maker notes offsets (fix by -340?)
+</pre>
+
+(Be aware that if multiple warnings occur, the <code>-a</code> option must be
+used so see them all, since by default only one warning is displayed per
+file.) If this warning occurs, you can use the <code>-F</code> option to attempt
+to fix the problem.  When writing, <code>-F</code> applies a permanent
+correction to the maker notes.  Note that if some Makernote information may be
+lost if the wrong correction is applied, or if the right correction is not
+applied, so care should be taken when writing images with this
+problem.</blockquote>
+
+<blockquote>Any error that occurs while writing will prevent the file from being
+written.  However, most Makernote errors are designated as <b>minor</b>, which
+allows them to be ignored by using the <code>-m</code> option.  For example:
+
+<pre>Error: [minor] Bad format (65535) for MakerNotes entry 17 - image.jpg
+</pre>
+
+Using <b>-m</b> will downgrade the minor error to a warning, allowing the file
+to be written, but note that some Makernote information may be lost when
+ignoring some types of errors like this.
+</blockquote>
 <hr>
-<i>Last revised Sept. 17, 2007</i>
+<i>Last revised Feb. 1, 2008</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

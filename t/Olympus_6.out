@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Olympus2.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 8 kB
@@ -33,14 +33,14 @@
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: -0.7
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.4
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 19.5mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 19.5 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment:                                                                                                                      
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 3072
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2304
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 2304
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
@@ -97,7 +97,7 @@
 [MakerNotes, Olympus, Camera] 1286 - Sharpness Setting: 0 (min -2, max 2)
 [MakerNotes, Olympus, Camera] 1287 - Color Space: sRGB
 [MakerNotes, Olympus, Camera] 1289 - Scene Mode: Standard
-[MakerNotes, Olympus, Camera] 1290 - Noise Reduction: Off
+[MakerNotes, Olympus, Camera] 1290 - Noise Reduction: (none)
 [MakerNotes, Olympus, Camera] 1291 - Distortion Correction: Off
 [MakerNotes, Olympus, Camera] 1292 - Shading Compensation: Off
 [MakerNotes, Olympus, Camera] 1293 - Compression Factor: 4
@@ -105,21 +105,26 @@
 [MakerNotes, Olympus, Camera] 1536 - Drive Mode: Single Shot
 [MakerNotes, Olympus, Camera] 1537 - Panorama Mode: Off
 [MakerNotes, Olympus, Camera] 1539 - Image Quality 2: SHQ
-[MakerNotes, Olympus, Camera] 2305 - Manometer Reading: 0 0
+[MakerNotes, Olympus, Camera] 2304 - Manometer Pressure: 0 kPa
+[MakerNotes, Olympus, Camera] 2305 - Manometer Reading: 0 m, 0 ft
 [MakerNotes, Olympus, Camera] 0 - Raw Dev Version: 0100
 [MakerNotes, Olympus, Camera] 267 - Raw Dev Edit Status: Original
 [MakerNotes, Olympus, Camera] 0 - Image Processing Version: 0111
 [MakerNotes, Olympus, Camera] 256 - WB RB Levels: 536 390
+[MakerNotes, Olympus, Camera] 287 - WB G Level: 0
 [MakerNotes, Olympus, Camera] 512 - Color Matrix: 348 -54 -42 -56 422 -114 -2 -132 388
-[MakerNotes, Olympus, Camera] 768 - Smoothing Parameter 1: 38
-[MakerNotes, Olympus, Camera] 784 - Smoothing Parameter 2: 15
-[MakerNotes, Olympus, Camera] 1536 - Smoothing Thresholds: 63 63 63 63
-[MakerNotes, Olympus, Camera] 4112 - Noise Reduction 2: Off
+[MakerNotes, Olympus, Camera] 768 - Enhancer: 38
+[MakerNotes, Olympus, Camera] 784 - Coring Filter: 15
+[MakerNotes, Olympus, Camera] 1536 - Black Level 2: 63 63 63 63
+[MakerNotes, Olympus, Camera] 4112 - Noise Reduction 2: (none)
 [MakerNotes, Olympus, Camera] 4113 - Distortion Correction 2: Off
 [MakerNotes, Olympus, Camera] 4114 - Shading Compensation 2: On
 [MakerNotes, Olympus, Camera] 0 - Focus Info Version: 0100
+[MakerNotes, Olympus, Camera] 528 - Scene Detect: 0
 [MakerNotes, Olympus, Camera] 768 - Zoom Step Count: 13
 [MakerNotes, Olympus, Camera] 769 - Focus Step Count: 321
+[MakerNotes, Olympus, Camera] 771 - Focus Step Infinity: 320
+[MakerNotes, Olympus, Camera] 772 - Focus Step Near: 375
 [MakerNotes, Olympus, Camera] 773 - Focus Distance: 385.8 m
 [MakerNotes, Olympus, Camera] 776 - AF Point: Left
 [MakerNotes, Olympus, Camera] 4609 - External Flash: Off
@@ -135,7 +140,8 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/250
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.005 mm
-[Composite, Composite, Image]  - Depth of Field: inf (4.46 m - inf)
-[Composite, Composite, Camera]  - Focal Length: 19.5mm (35mm equivalent: 111.3mm)
+[Composite, Composite, Image]  - Depth Of Field: inf (4.46 m - inf)
+[Composite, Composite, Image]  - Field Of View: 18.4 deg (124.77 m)
+[Composite, Composite, Camera]  - Focal Length: 19.5 mm (35 mm equivalent: 111.3 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 4.51 m
 [Composite, Composite, Image]  - Light Value: 16.3

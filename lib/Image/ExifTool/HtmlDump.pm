@@ -12,9 +12,9 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool;    # only for FinishTiffDump()
 
-$VERSION = '1.17';
+$VERSION = '1.20';
 
-sub DumpTable($$$;$$$$);
+sub DumpTable($$$;$$$$$);
 sub Open($$$;@);
 sub Write($@);
 
@@ -171,12 +171,13 @@ sub Add($$$$;$$)
 # Inputs: 0) Dump information hash reference, 1) source file RAF reference,
 #         2) data pointer, 3) data position, 4) output file or scalar reference,
 #         5) limit level (1-3), 6) title
-# Returns: non-zero if useful output was generated
+# Returns: non-zero if useful output was generated,
+#          or -1 on error loading data and ERROR is set to offending data name
 sub Print($$;$$$$$)
 {
     local $_;
     my ($self, $raf, $dataPt, $dataPos, $outfile, $level, $title) = @_;
-    my ($i, $buff, $rtnVal);
+    my ($i, $buff, $rtnVal, $limit, $err);
     my $block = $$self{Block};
     $dataPos = 0 unless $dataPos;
     $outfile = \*STDOUT unless ref $outfile;
@@ -194,12 +195,13 @@ sub Print($$;$$$$$)
     $$self{Cols} = [ '', '', '', '' ];  # text columns
     # set dump size limits (limits are 4x smaller if bit 0x08 set in flags)
     if ($level <= 1) {
-        $$self{Limit} = 1024;
+        $limit = 1024;
     } elsif ($level <= 2) {
-        $$self{Limit} = 16384;
+        $limit = 16384;
     } else {
-        delete $$self{Limit};   # no limit
+        $limit = 256 * 1024 * 1024; # never dump bigger than 256 MB
     }
+    $$self{Limit} = $limit;
     # pre-initialize open/closed hashes for all columns
     for ($i=0; $i<4; ++$i) {
         $self->{Open}->[$i] = { ID => [ ], Element => { } };
@@ -211,18 +213,37 @@ sub Print($$;$$$$$)
     my @names;
     for ($i=0; $i<@starts; ++$i) {
         my $start = $starts[$i];
-        my $bytes = $start - $pos;
-        if ($bytes > 0) {
-            if ($pos >= $dataPos and $pos + $bytes <= $dataEnd) {
-                $buff = substr($$dataPt, $pos-$dataPos, $bytes);
+        my $len = $start - $pos;
+        if ($len > 0) {
+            # only load as much of the block as we are going to dump
+            my $size = ($len > $limit) ? $limit / 2 : $len;
+            if ($pos >= $dataPos and $pos + $len <= $dataEnd) {
+                $buff = substr($$dataPt, $pos-$dataPos, $size);
+                if ($len != $size) {
+                    $buff .= substr($$dataPt, $pos-$dataPos+$len-$size, $size);
+                }
             } else {
                 $buff = '';
-                $raf->Seek($pos, 0) and $raf->Read($buff, $bytes);
+                unless ($raf->Seek($pos, 0) and $raf->Read($buff, $size) == $size) {
+                    $err = 'unused bytes',
+                }
+                if ($len != $size) {
+                    my $buf2 = '';
+                    unless ($raf->Seek($pos+$len-$size, 0) and
+                            $raf->Read($buf2, $size) == $size)
+                    {
+                        $err = 'unused bytes',
+                    }
+                    $buff .= $buf2;
+                    undef $buf2;
+                }
             }
             if (length $buff) {
-                my $str = ($bytes > 1) ? "unused $bytes bytes" : 'pad byte';
-                $self->DumpTable($pos-$dataPos, \$buff, "[$str]", "t$index", 0x108);
+                my $str = ($len > 1) ? "unused $len bytes" : 'pad byte';
+                $self->DumpTable($pos-$dataPos, \$buff, "[$str]", "t$index",
+                                 0x108, $len);
                 ++$index;
+                undef $buff;
             }
             $pos = $start;  # dumped unused data up to the start of this block
         }
@@ -251,11 +272,30 @@ sub Print($$;$$$$$)
             }
             $tip and $self->{TipList}->[$idx] = $tip;
             my $end = $start + $len;
+            # only load as much of the block as we are going to dump
+            my $size = ($len > $limit) ? $limit / 2 : $len;
             if ($start >= $dataPos and $end <= $dataEnd) {
-                $buff = substr($$dataPt, $start-$dataPos, $len);
+                $buff = substr($$dataPt, $start-$dataPos, $size);
+                if ($len != $size) {
+                    $buff .= substr($$dataPt, $start-$dataPos+$len-$size, $size);
+                }
             } else {
                 $buff = '';
-                $raf->Seek($start, 0) and $raf->Read($buff, $len);
+                unless ($raf->Seek($start, 0) and
+                        $raf->Read($buff, $size) == $size)
+                {
+                    $err = $msg;
+                }
+                if ($len != $size) {
+                    my $buf2 = '';
+                    unless ($raf->Seek($start+$len-$size, 0) and
+                            $raf->Read($buf2, $size) == $size)
+                    {
+                        $err = $msg;
+                    }
+                    $buff .= $buf2;
+                    undef $buf2;
+                }
             }
             next unless length $buff;
             # set flag to continue this line if next block is contiguous
@@ -266,7 +306,8 @@ sub Print($$;$$$$$)
                 $flag |= 0x100 unless $flag & 0x01 or $nextFlag & 0x01;
             }
             $self->DumpTable($start-$dataPos, \$buff, $msg, $name,
-                             $flag, $pos-$dataPos);
+                             $flag, $len, $pos-$dataPos);
+            undef $buff;
             $pos = $end if $pos < $end;
         }
     }
@@ -298,10 +339,16 @@ sub Print($$;$$$$$)
     } else {
         Write($outfile, "$title</title></head><body>\n",
                         "No EXIF or TIFF information found in image\n");
+        $rtnVal = 0;
     }
     Write($outfile, "</body></html>\n");
     for ($i=0; $i<4; ++$i) {
         $self->{Cols}->[$i] = '';   # free memory
+    }
+    if ($err) {
+        $err =~ tr/()//d;
+        $$self{ERROR} = $err;
+        return -1;
     }
     return $rtnVal;
 }
@@ -387,13 +434,15 @@ sub Open($$$;@)
 #------------------------------------------------------------------------------
 # Dump a block of data in HTML table form
 # Inputs: 0) HtmlDump object ref, 1) data position, 2) block pointer,
-#         3) message, 4) object name, 5) flag, 6) data end position
-sub DumpTable($$$;$$$$)
+#         3) message, 4) object name, 5) flag, 6) full block length (actual
+#         data may be shorter), 7) data end position
+sub DumpTable($$$;$$$$$)
 {
-    my ($self, $pos, $blockPt, $msg, $name, $flag, $endPos) = @_;
-    my $len = length $$blockPt;
+    my ($self, $pos, $blockPt, $msg, $name, $flag, $len, $endPos) = @_;
+    $len = length $$blockPt unless defined $len;
     $endPos = 0 unless $endPos;
     my ($f0, $dblRef, $id);
+    my $skipped = 0;
     if (($endPos and $pos < $endPos) or $flag & 0x02) {
         # display double-reference addresses in red
         $f0 = "<span class=V>";
@@ -447,7 +496,7 @@ sub DumpTable($$$;$$$$)
     for (;;) {
         $self->Open('bkg', ($p>=$bkgStart and $p<$bkgEnd) ? $bkgSpan : '', 1, 2);
         $self->Open('a', $name, 1, 2);
-        my $ch = substr($$blockPt,$p-$pos,1);
+        my $ch = substr($$blockPt,$p-$pos-$skipped,1);
         $c[1] .= sprintf("%.2x", ord($ch));
         # make the character HTML-friendly
         $ch =~ tr/\x00-\x1f\x7f-\xff/./;
@@ -502,6 +551,7 @@ sub DumpTable($$$;$$$$)
                     $c[2] .= "     [snip]     \n";
                     $c[3] .= "\n";
                     $p += $n;
+                    $skipped += $len - length $$blockPt;
                 }
             }
         }
@@ -670,7 +720,7 @@ display linefeeds in the tool tips.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

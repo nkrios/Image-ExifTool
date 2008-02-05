@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Ricoh.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1903 bytes
@@ -37,12 +37,12 @@
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37384 - Light Source: Other
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 7.5mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 7.5 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2272
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1704
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1704
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
@@ -62,5 +62,5 @@
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Shutter Speed: 1/274
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - Focal Length: 7.5mm
+[Composite, Composite, Camera]  - Focal Length: 7.5 mm
 [Composite, Composite, Image]  - Light Value: 10.3

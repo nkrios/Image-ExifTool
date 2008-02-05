@@ -43,7 +43,9 @@ problem mentioned above.</p>
 
 <p><b>Canon:</b> The 350D (firmware 1.0.1) gets the size of the thumbnail image
 wrong and reports it to be 10 bytes too long.  This can cause the reported
-thumbnail image data to run off the end of the APP1 segment.</p>
+thumbnail image data to run off the end of the APP1 segment.  A bug in version
+1.0.4 of the 40D firmware causes it to write a maker note entry count that is
+one greater than it should be.</p>
 
 <p><b>Casio:</b> The preview image is referenced by two different offsets (the
 PreviewImage tag plus a PreviewImageStart/PreviewImageLength pair).  Also, the
@@ -132,7 +134,7 @@ start of the individual IFD entry.  (very similar to Konica KD-300Z)</p>
 
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised May 4, 2007</i>
+<br><i>Last revised Dec. 19, 2007</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

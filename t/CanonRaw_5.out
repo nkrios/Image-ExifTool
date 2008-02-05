@@ -1,4 +1,4 @@
-  ExifToolVersion = 6.97
+  ExifToolVersion = 7.15
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
@@ -80,6 +80,7 @@
   | | | | FlashExposureComp = 20
   | | | | AutoExposureBracketing = 0
   | | | | AEBBracketValue = 0
+  | | | | ControlMode = 1
   | | | | FocusDistanceUpper = 142
   | | | | FocusDistanceLower = 119
   | | | | FNumber = 116
@@ -88,7 +89,7 @@
   | | | | CameraType = 252
   | | | | AutoRotate = 0
   | | | | NDFilter = -1
-  | | | | Self-timer2 = 0
+  | | | | SelfTimer2 = 0
   | | | 3)  CanonFileInfo (SubDirectory) -->
   | | | + [BinaryData directory, 18 bytes]
   | | | | BracketMode = 0
@@ -100,7 +101,7 @@
   | | | 4)  CanonCameraSettings (SubDirectory) -->
   | | | + [BinaryData directory, 92 bytes]
   | | | | MacroMode = 0
-  | | | | Self-timer = 0
+  | | | | SelfTimer = 0
   | | | | Quality = 4
   | | | | CanonFlashMode = 2
   | | | | ContinuousDrive = 1
@@ -131,6 +132,7 @@
   | | | | DisplayAperture = 0
   | | | | ZoomSourceWidth = 3072
   | | | | ZoomTargetWidth = 3072
+  | | | | SpotMeteringMode = -1
   | | | | PhotoEffect = -1
   | | | | ManualFlashOutput = 0
   | | | | ColorTone = 0
@@ -144,7 +146,15 @@
   | | | | SensorTopBorder = 16
   | | | | SensorRightBorder = 3143
   | | | | SensorBottomBorder = 2063
-  | | | 8)  DecoderTable = 1 0 514 4120111
+  | | | | BlackMaskLeftBorder = 24
+  | | | | BlackMaskTopBorder = 224
+  | | | | BlackMaskRightBorder = 40
+  | | | | BlackMaskBottomBorder = 1856
+  | | | 8)  DecoderTable (SubDirectory) -->
+  | | | + [BinaryData directory, 16 bytes]
+  | | | | DecoderTableNumber = 1
+  | | | | CompressedDataOffset = 514
+  | | | | CompressedDataLength = 4120111
   | | | 9)  CanonAFInfo (SubDirectory) -->
   | | | + [SerialData directory, 48 bytes]
   | | | | 0)  NumAFPoints = 7

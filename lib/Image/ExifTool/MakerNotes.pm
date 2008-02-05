@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.34';
+$VERSION = '1.37';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -30,7 +30,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteCanon',
         # (starts with an IFD)
-        Condition => '$self->{CameraMake} =~ /^Canon/',
+        Condition => '$$self{CameraMake} =~ /^Canon/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::Main',
             ByteOrder => 'Unknown',
@@ -41,7 +41,7 @@ my $debug;          # set to 1 to enabled debugging code
         # do negative lookahead assertion just to get tags
         # in a nice order for documentation
         # (starts with an IFD)
-        Condition => '$self->{CameraMake}=~/^CASIO(?! COMPUTER CO.,LTD)/',
+        Condition => '$$self{CameraMake}=~/^CASIO(?! COMPUTER CO.,LTD)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Main',
             ByteOrder => 'Unknown',
@@ -50,7 +50,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteCasio2',
         # (starts with "QVC\0")
-        Condition => '$self->{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
+        Condition => '$$self{CameraMake}=~/^CASIO COMPUTER CO.,LTD/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Type2',
             Start => '$valuePtr + 6',
@@ -85,7 +85,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteHP2', # PhotoSmart E427
         Condition => q{
-            $self->{CameraMake} =~ /^Hewlett-Packard/ and
+            $$self{CameraMake} =~ /^Hewlett-Packard/ and
             $$valPt !~ /^.{8}Hewlett-Packard/s and
             $$valPt !~ /^IIII/ and $$valPt =~ /^\d{3}.\0/s
         },
@@ -127,7 +127,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteJVCText',
-        Condition => '$self->{CameraMake}=~/^(JVC|Victor)/ and $$valPt=~/^VER:/',
+        Condition => '$$self{CameraMake}=~/^(JVC|Victor)/ and $$valPt=~/^VER:/',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::JVC::Text',
@@ -135,7 +135,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteKodak1a',
-        Condition => '$self->{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^KDK INFO/',
+        Condition => '$$self{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^KDK INFO/',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Main',
@@ -145,7 +145,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteKodak1b',
-        Condition => '$self->{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^KDK/',
+        Condition => '$$self{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^KDK/',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Main',
@@ -170,7 +170,7 @@ my $debug;          # set to 1 to enabled debugging code
         # not much to key on here, but we know the
         # upper byte of the year should be 0x07:
         Name => 'MakerNoteKodak3',
-        Condition => '$self->{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^.{12}\x07/s',
+        Condition => '$$self{CameraMake}=~/^EASTMAN KODAK/ and $$valPt=~/^.{12}\x07/s',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type3',
@@ -179,7 +179,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteKodak4',
-        Condition => '$self->{CameraMake}=~/^Eastman Kodak/ and $$valPt=~/^.{41}JPG/s',
+        Condition => '$$self{CameraMake}=~/^Eastman Kodak/ and $$valPt=~/^.{41}JPG/s',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type4',
@@ -189,8 +189,8 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteKodak5',
         Condition => q{
-            $self->{CameraMake}=~/^EASTMAN KODAK/ and
-            ($self->{CameraModel}=~/CX(4200|4230|4300|4310|6200|6230)/ or
+            $$self{CameraMake}=~/^EASTMAN KODAK/ and
+            ($$self{CameraModel}=~/CX(4200|4230|4300|4310|6200|6230)/ or
             # try to pick up similar models we haven't tested yet
             $$valPt=~/^\0(\x1a\x18|\x3a\x08|\x59\xf8|\x14\x80)\0/)
         },
@@ -203,8 +203,8 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteKodak6a',
         Condition => q{
-            $self->{CameraMake}=~/^EASTMAN KODAK/ and
-            $self->{CameraModel}=~/DX3215/
+            $$self{CameraMake}=~/^EASTMAN KODAK/ and
+            $$self{CameraModel}=~/DX3215/
         },
         NotIFD => 1,
         SubDirectory => {
@@ -215,8 +215,8 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteKodak6b',
         Condition => q{
-            $self->{CameraMake}=~/^EASTMAN KODAK/ and
-            $self->{CameraModel}=~/DX3700/
+            $$self{CameraMake}=~/^EASTMAN KODAK/ and
+            $$self{CameraModel}=~/DX3700/
         },
         NotIFD => 1,
         SubDirectory => {
@@ -230,7 +230,7 @@ my $debug;          # set to 1 to enabled debugging code
         # (confirmed serial numbers have the format KXXXX########, but we also
         #  accept other strings from sample images that may be serial numbers)
         Condition => q{
-            $self->{CameraMake}=~/Kodak/i and
+            $$self{CameraMake}=~/Kodak/i and
             $$valPt =~ /^[CK][A-Z\d]{3} ?[A-Z\d]{1,2}\d{2}[A-Z\d]\d{4}[ \0]/
         },
         NotIFD => 1,
@@ -244,7 +244,7 @@ my $debug;          # set to 1 to enabled debugging code
         # look for reasonable number of entries and check
         # format and count of first IFD entry
         Condition => q{
-            $self->{CameraMake}=~/Kodak/i and
+            $$self{CameraMake}=~/Kodak/i and
             ($$valPt =~ /^\0[\x02-\x7f]..\0[\x01-\x0c]\0\0/s or
              $$valPt =~ /^[\x02-\x7f]\0..[\x01-\x0c]\0..\0\0/s)
         },
@@ -256,7 +256,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteKodakUnknown',
-        Condition => '$self->{CameraMake}=~/Kodak/i',
+        Condition => '$$self{CameraMake}=~/Kodak/i and $$valPt!~/^AOC\0/',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Unknown',
@@ -266,7 +266,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteKyocera',
         # (starts with "KYOCERA")
-        Condition => '$self->{CameraMake}=~/^KYOCERA/',
+        Condition => '$$self{CameraMake}=~/^KYOCERA/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Unknown::Main',
             Start => '$valuePtr + 22',
@@ -278,7 +278,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteMinolta',
         Condition => q{
-            $self->{CameraMake}=~/^(Konica Minolta|Minolta)/i and
+            $$self{CameraMake}=~/^(Konica Minolta|Minolta)/i and
             $$valPt !~ /^(MINOL|CAMER|MLY0|KC|\+M\+M|\xd7)/
         },
         SubDirectory => {
@@ -304,7 +304,7 @@ my $debug;          # set to 1 to enabled debugging code
         # /^+M+M/ - DiMAGE E201
         # /^\xd7/ - DiMAGE RD3000
         Name => 'MakerNoteMinolta3',
-        Condition => '$self->{CameraMake} =~ /^(Konica Minolta|Minolta)/i',
+        Condition => '$$self{CameraMake} =~ /^(Konica Minolta|Minolta)/i',
         Notes => 'not EXIF-based',
         Binary => 1,
         NotIFD => 1,
@@ -312,7 +312,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         # this maker notes starts with a standard TIFF header at offset 0x0a
         Name => 'MakerNoteNikon',
-        Condition => '$self->{CameraMake}=~/^NIKON/i and $$valPt=~/^Nikon\x00\x02/',
+        Condition => '$$self{CameraMake}=~/^NIKON/i and $$valPt=~/^Nikon\x00\x02/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             Start => '$valuePtr + 18',
@@ -323,7 +323,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         # older Nikon maker notes
         Name => 'MakerNoteNikon2',
-        Condition => '$self->{CameraMake}=~/^NIKON/ and $$valPt=~/^Nikon\x00\x01/',
+        Condition => '$$self{CameraMake}=~/^NIKON/ and $$valPt=~/^Nikon\x00\x01/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Type2',
             Start => '$valuePtr + 8',
@@ -333,7 +333,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         # headerless Nikon maker notes
         Name => 'MakerNoteNikon3',
-        Condition => '$self->{CameraMake}=~/^NIKON/i',
+        Condition => '$$self{CameraMake}=~/^NIKON/i',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::Main',
             ByteOrder => 'Unknown', # most are little-endian, but D1 is big
@@ -365,7 +365,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteLeica',
         # (starts with "LEICA\0")
-        Condition => '$self->{CameraMake} =~ /^LEICA/',
+        Condition => '$$self{CameraMake} =~ /^LEICA/',
         SubDirectory => {
             # Leica uses the same format as Panasonic
             TagTable => 'Image::ExifTool::Panasonic::Main',
@@ -376,7 +376,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNotePanasonic',
         # (starts with "Panasonic\0")
-        Condition => '$self->{CameraMake} =~ /^Panasonic/ and $$valPt!~/^MKE/',
+        Condition => '$$self{CameraMake} =~ /^Panasonic/ and $$valPt!~/^MKE/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Main',
             Start => '$valuePtr + 12',
@@ -386,7 +386,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNotePanasonic2',
         # (starts with "Panasonic\0")
-        Condition => '$self->{CameraMake} =~ /^Panasonic/',
+        Condition => '$$self{CameraMake} =~ /^Panasonic/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Type2',
             ByteOrder => 'LittleEndian',
@@ -398,7 +398,7 @@ my $debug;          # set to 1 to enabled debugging code
         # (also used by some Samsung models)
         Condition => q{
             $$valPt=~/^AOC\0/ and
-            $self->{CameraModel} !~ /^PENTAX Optio ?[34]30RS\s*$/
+            $$self{CameraModel} !~ /^PENTAX Optio ?[34]30RS\s*$/
         },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::Main',
@@ -415,7 +415,7 @@ my $debug;          # set to 1 to enabled debugging code
         Name => 'MakerNotePentax2',
         # (starts with an IFD)
         # Casio-like maker notes used only by the Optio 330 and 430
-        Condition => '$self->{CameraMake}=~/^Asahi/ and $$valPt!~/^AOC\0/',
+        Condition => '$$self{CameraMake}=~/^Asahi/ and $$valPt!~/^AOC\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::Type2',
             ProcessProc => \&ProcessUnknown,
@@ -427,7 +427,7 @@ my $debug;          # set to 1 to enabled debugging code
         Name => 'MakerNotePentax3',
         # (starts with "AOC\0", like the more common Pentax maker notes)
         # Casio maker notes used only by the Optio 330RS and 430RS
-        Condition => '$self->{CameraMake}=~/^Asahi/',
+        Condition => '$$self{CameraMake}=~/^Asahi/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Type2',
             ProcessProc => \&ProcessUnknown,
@@ -439,7 +439,7 @@ my $debug;          # set to 1 to enabled debugging code
         Name => 'MakerNotePentax4',
         # (starts with 3 or 4 digits)
         # HP2-like text-based maker notes used by Optio E20
-        Condition => '$self->{CameraMake}=~/^PENTAX/ and $$valPt=~/^\d{3}/',
+        Condition => '$$self{CameraMake}=~/^PENTAX/ and $$valPt=~/^\d{3}/',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::Type4',
@@ -449,7 +449,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteRicoh',
-        Condition => '$self->{CameraMake}=~/^RICOH/ and $$valPt=~/^Ricoh/i',
+        Condition => '$$self{CameraMake}=~/^RICOH/ and $$valPt=~/^Ricoh/i',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Ricoh::Main',
             Start => '$valuePtr + 8',
@@ -458,7 +458,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteRicohText',
-        Condition => '$self->{CameraMake}=~/^RICOH/',
+        Condition => '$$self{CameraMake}=~/^RICOH/',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Ricoh::Text',
@@ -468,13 +468,13 @@ my $debug;          # set to 1 to enabled debugging code
     {
         # PreviewImage (Samsung Digimax plus some other types of cameras)
         %Image::ExifTool::previewImageTagInfo,
-        Condition => '$$valPt =~ /^\xff\xd8\xff\xdb/',
+        Condition => '$$valPt =~ /^\xff\xd8\xff\xdb/ and $$self{CameraMake}!~/(SONY|SANYO|SIGMA)/i',
         Notes => 'Samsung preview image',
     },
     {
         Name => 'MakerNoteSanyo',
         # (starts with "SANYO\0")
-        Condition => '$self->{CameraMake}=~/^SANYO/ and $self->{CameraModel} !~ /^(C4|J\d|S\d)\b/',
+        Condition => '$$self{CameraMake}=~/^SANYO/ and $$self{CameraModel}!~/^(C4|J\d|S\d)\b/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sanyo::Main',
             Validate => '$val =~ /^SANYO/',
@@ -485,7 +485,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteSanyoC4',
         # The C4 offsets are wrong by 12, so they must be fixed
-        Condition => '$self->{CameraMake}=~/^SANYO/ and $self->{CameraModel} =~ /^C4\b/',
+        Condition => '$$self{CameraMake}=~/^SANYO/ and $$self{CameraModel}=~/^C4\b/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sanyo::Main',
             Validate => '$val =~ /^SANYO/',
@@ -497,7 +497,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteSanyoPatch',
         # The J1, J2, J4, S1, S3 and S4 offsets are completely screwy
-        Condition => '$self->{CameraMake}=~/^SANYO/',
+        Condition => '$$self{CameraMake}=~/^SANYO/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sanyo::Main',
             Validate => '$val =~ /^SANYO/',
@@ -509,7 +509,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteSigma',
         # (starts with "SIGMA\0")
-        Condition => '$self->{CameraMake}=~/^(SIGMA|FOVEON)/',
+        Condition => '$$self{CameraMake}=~/^(SIGMA|FOVEON)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sigma::Main',
             Validate => '$val =~ /^(SIGMA|FOVEON)/',
@@ -520,29 +520,27 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteSony',
         # (starts with "SONY DSC \0" or "SONY CAM \0")
-        Condition => '$self->{CameraMake}=~/^SONY/ and $self->{TIFF_TYPE}!~/^(SRF|SR2|DNG)$/',
+        Condition => '$$self{CameraMake}=~/^SONY/ and $$valPt=~/^SONY (DSC|CAM)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
-            # validate the maker note because this is sometimes garbage
-            Validate => 'defined($val) and $val =~ /^SONY (DSC|CAM)/',
             Start => '$valuePtr + 12',
             ByteOrder => 'Unknown',
         },
     },
     {
-        Name => 'MakerNoteSonySRF',
-        Condition => '$self->{CameraMake}=~/^SONY/ and $$valPt =~ /^\x01\x00/',
+        Name => 'MakerNoteSony2', # used in SR2 and ARW images
+        Condition => '$$self{CameraMake}=~/^SONY/ and $$valPt!~/^\x01\x00/',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Sony::SRF',
+            TagTable => 'Image::ExifTool::Sony::Main',
             Start => '$valuePtr',
             ByteOrder => 'Unknown',
         },
     },
     {
-        Name => 'MakerNoteSonySR2',
-        Condition => '$self->{CameraMake}=~/^SONY/',
+        Name => 'MakerNoteSonySRF',
+        Condition => '$$self{CameraMake}=~/^SONY/',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Sony::Main',
+            TagTable => 'Image::ExifTool::Sony::SRF',
             Start => '$valuePtr',
             ByteOrder => 'Unknown',
         },
@@ -982,6 +980,8 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
                 # allow everything to be zero if not first entry
                 # because some manufacturers pad with null entries
                 next unless $format or $count or $index == 0;
+                # patch for Canon EOS 40D firmware 1.0.4 bug: allow zero format for last entry
+                next if $format==0 and $index==$num-1 and $$exifTool{CameraModel}=~/EOS 40D/;
                 # (would like to verify tag ID, but some manufactures don't
                 #  sort entries in order of tag ID so we don't have much of
                 #  a handle to verify this field)
@@ -1047,7 +1047,7 @@ maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

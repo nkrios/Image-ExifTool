@@ -10,15 +10,17 @@ The tables in these files are used as lookups based on the tag ID values.  The
 hash keys are the tag IDs (in decimal or hexadecimal if the ID is numerical as
 with EXIF tables, or the tag name if the ID is ASCII as with XMP tables).  In
 the case of a BinaryData table, the IDs are numerical and specify offsets into
-the binary data block.  The corresponding hash value provides information about
-the tag (explained later).
+the binary data block (floating point IDs allow multiple tags for the same
+offset, with the integer part being used for the offset).  The corresponding
+hash value provides information about the tag (explained later).
 
-Twenty-one special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
+Twenty-two special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
 FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE, NOTES, IS_OFFSET,
 EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, PARENT, PRIORITY, WRITE_GROUP, LANG_INFO,
-VARS and DATAMEMBER) are used to provide additional information about a table.
-The special keys have names that are all capitalized to avoid possible conflicts
-with tag keys.  Below is an explanation of the meaning of each special key:
+VARS, DATAMEMBER and SET_GROUP1) are used to provide additional information
+about a table. The special keys have names that are all capitalized to avoid
+possible conflicts with tag keys.  Below is an explanation of the meaning of
+each special key:
 
   PROCESS_PROC : Reference to a function used to process the directory for this
   table.  If PROCESS_PROC is not given, \&Image::ExifTool::Exif::ProcessExif is
@@ -147,8 +149,13 @@ with tag keys.  Below is an explanation of the meaning of each special key:
 
     NO_ID - Avoid printing "Tag ID" column in tag name documentation.
 
+    CAPTURE - Used by PDF module to name dictionaries to capture when writing.
+
   DATAMEMBER : BinaryData tables only.  A reference to a list of tag ID's which
   must be extracted as data members when writing.
+
+  SET_GROUP1 : [EXIF tables only] Set group1 name to the directory name for all
+  tags in the table.
 
 The remaining entries in a tag table are the tag IDs with their associated
 information.  The information may exist in one of three forms:  1) A simple
@@ -234,7 +241,9 @@ numerical.
                   data, and causes value will be adjusted to an absolute file
                   offset.  If set to 2, the offset base of the parent directory
                   is used even if the base changes for the current directory
-                  (only some maker notes are this messed up).
+                  (only some maker notes are this messed up).  May be set to an
+                  expression to be evaluated.  Expression may access $val and
+                  $exifTool.
 
                   'List' - indicates that duplicate entries of this tag are
                   allowed, and will be accumulated in a list.  Note that for XMP
@@ -340,11 +349,11 @@ numerical.
                   option is not enabled.  Composite tags which Require or Desire
                   other tags may access the ValueConv, PrintConv and Raw values
                   of these tags through the elements of the @val, @prt and @raw
-                  lists respectively (only if there was no RawConv or returned a
-                  hash reference).  For these tags, $val may be used in an
-                  expression to represent $val[0], and the first argument passed
-                  for a code reference is a reference to @val.  If ValueConv is
-                  not specified, the Raw value is not converted.
+                  lists respectively (only if there was no RawConv or it
+                  returned a hash reference).  For these tags, $val may be used
+                  in an expression to represent $val[0], and the first argument
+                  passed for a code reference is a reference to @val.  If
+                  ValueConv is not specified, the Raw value is not converted.
 
   PrintConv     : This entry is similar to ValueConv above, except that it is
                   used to further convert the tag value to a human readable
@@ -379,6 +388,20 @@ numerical.
 
   PrintConvInv  : The inverse of PrintConv.  Only necessary if for Writable tags
                   when PrintConv is specified (unless WriteAlso is used).
+
+  DelValue      : Raw value to be used when deleting a permanent tag.  (Note all
+                  MakerNotes tags are permanent.)  If not specified, an attempt
+                  is made to convert an empty string for the raw value.
+
+  Relist        : [Only if ValueConv or PrintConv is a list ref] Reference to a
+                  list of original value indices used to reorganize values. Each
+                  entry in the list may be a scalar index, or a reference to a
+                  list of indices to join values.  (Currently values may be
+                  joined, but the order of writable values must not be changed
+                  until this ability is added to the writer.)
+
+  Mask          : [BinaryData tags only] Bitmask for this value.  (Multiple tags
+                  may have the same index by using floating point indices.)
 
   Condition     : If given, specifies scalar which is evaluated as a Perl
                   expression at extraction time to decide whether the tag is

@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.15';
+$VERSION = '1.17';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -104,7 +104,7 @@ my %dateInfo = (
     Groups => { 2 => 'Time' },
     Shift => 'Time',
     PrintConv => '$self->ConvertDateTime($val)',
-    PrintConvInv => '$val',
+    PrintConvInv => '$self->InverseDateTime($val)',
 );
 my %noYes = ( 0 => 'No', 1 => 'Yes' );
 my %offOn = ( 0 => 'Off', 1 => 'On' );
@@ -1099,12 +1099,12 @@ sub WriteMIEGroup($$$)
                             $raf->Read($oldVal, $valLen) == $valLen or last MieElement;
                         }
                         %subdirInfo = (
-                            DataPt => \$oldVal,
+                            DataPt  => \$oldVal,
                             DataLen => $valLen,
                             DirName => $$newInfo{Name},
                             DataPos => $raf->Tell() - $valLen,
-                            DirStart => 0,
-                            DirLen => $valLen,
+                            DirStart=> 0,
+                            DirLen  => $valLen,
                         );
                     }
                     $subdirInfo{Parent} = $dirName;
@@ -1551,8 +1551,8 @@ sub ProcessMIEGroup($$$)
             }
             my %subdirInfo = (
                 DirName => $dirName || $tag,
-                RAF => $raf,
-                Parent => $$dirInfo{DirName},
+                RAF     => $raf,
+                Parent  => $$dirInfo{DirName},
             );
             # read from uncompressed data instead if necessary
             $subdirInfo{RAF} = new File::RandomAccess(\$value) if $format & 0x04;
@@ -1581,23 +1581,25 @@ sub ProcessMIEGroup($$$)
                         $count = $valLen / $s;
                     }
                     $exifTool->VerboseInfo($lastTag, $tagInfo,
-                        DataPt => \$value,
+                        DataPt  => \$value,
                         DataPos => $raf->Tell() - $valLen,
-                        Size => $valLen,
-                        Format => $formatStr,
-                        Value => $val,
-                        Count => $count,
+                        Size    => $valLen,
+                        Format  => $formatStr,
+                        Value   => $val,
+                        Count   => $count,
                     );
                 }
                 if ($$tagInfo{SubDirectory}) {
                     my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
                     my %subdirInfo = (
                         DirName => $$tagInfo{Name},
-                        DataPt => \$value,
+                        DataPt  => \$value,
                         DataPos => $raf->Tell() - $valLen,
                         DataLen => $valLen,
-                        DirStart => 0,
-                        DirLen => $valLen,
+                        DirStart=> 0,
+                        DirLen  => $valLen,
+                        Parent  => $$dirInfo{DirName},
+                        Base    => $raf->Tell() - $valLen,
                     );
                     my $processProc = $tagInfo->{SubDirectory}->{ProcessProc};
                     delete $exifTool->{SET_GROUP1};
@@ -2495,7 +2497,7 @@ tag name.  For example:
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.  The MIE format itself is also

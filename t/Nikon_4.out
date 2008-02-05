@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
@@ -31,13 +31,12 @@
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2005:01:14 08:57:59
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2005:01:14 08:57:59
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
-[EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 4
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 4.4
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Auto, Fired, Return detected
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 56.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 56.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: curve: fotogenics point and shoot   
 [EXIF, ExifIFD, Time] 37520 - Sub Sec Time: 20
 [EXIF, ExifIFD, Time] 37521 - Sub Sec Time Original: 20
@@ -45,7 +44,7 @@
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: Uncalibrated
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 3008
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 2000
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 2000
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera
 [EXIF, ExifIFD, Image] 41729 - Scene Type: Directly photographed
@@ -54,13 +53,13 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 1
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 84mm
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 84 mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: None
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
 [EXIF, ExifIFD, Camera] 41993 - Saturation: High
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
-[EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown (0)
+[EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown
 [EXIF, ExifIFD, Image] 42240 - Gamma: 2.2
 [MakerNotes, Nikon, Camera] 1 - Maker Note Version: 2.10
 [MakerNotes, Nikon, Image] 2 - ISO: 200
@@ -77,7 +76,7 @@
 [MakerNotes, NikonPreview, Image] 282 - X Resolution: 300
 [MakerNotes, NikonPreview, Image] 283 - Y Resolution: 300
 [MakerNotes, NikonPreview, Image] 296 - Resolution Unit: inches
-[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2412
+[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2392
 [MakerNotes, NikonPreview, Image] 514 - Preview Image Length: 0
 [MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -5/3
@@ -101,15 +100,15 @@
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
 [MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 597 256 361 256
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
-[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 89.0mm
+[MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 89.0 mm
 [MakerNotes, Nikon, Camera] 5 - AF Aperture: 4.6
 [MakerNotes, Nikon, Camera] 8 - Focus Position: 0x21
 [MakerNotes, Nikon, Camera] 9 - Focus Distance: 0.63 m
-[MakerNotes, Nikon, Camera] 10 - Focal Length: 56.6mm
+[MakerNotes, Nikon, Camera] 10 - Focal Length: 56.6 mm
 [MakerNotes, Nikon, Camera] 11 - Lens ID Number: 127
 [MakerNotes, Nikon, Camera] 12 - Lens F Stops: 5.33
-[MakerNotes, Nikon, Camera] 13 - Min Focal Length: 18.3mm
-[MakerNotes, Nikon, Camera] 14 - Max Focal Length: 71.3mm
+[MakerNotes, Nikon, Camera] 13 - Min Focal Length: 18.3 mm
+[MakerNotes, Nikon, Camera] 14 - Max Focal Length: 71.3 mm
 [MakerNotes, Nikon, Camera] 15 - Max Aperture At Min Focal: 3.6
 [MakerNotes, Nikon, Camera] 16 - Max Aperture At Max Focal: 4.5
 [MakerNotes, Nikon, Camera] 17 - MCU Version: 132
@@ -118,11 +117,20 @@
 [MakerNotes, Nikon, Camera] 160 - Serial Number: No= 20025585
 [MakerNotes, Nikon, Camera] 162 - Image Data Size: 2361498
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 526
+[MakerNotes, Nikon, Camera] 0 - Flash Info Version: 0100
+[MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
+[MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
+[MakerNotes, Nikon, Camera] 10 - Flash Exposure Compensation: 0
+[MakerNotes, Nikon, Camera] 15 - Flash Group A Control Mode: Off
+[MakerNotes, Nikon, Camera] 16 - Flash Group B Control Mode: Off
+[MakerNotes, Nikon, Camera] 17 - Flash Group A Exposure Comp: 0
+[MakerNotes, Nikon, Camera] 18 - Flash Group B Exposure Comp: 0
 [MakerNotes, Nikon, Camera] 169 - Image Optimization: Custom
 [MakerNotes, Nikon, Camera] 170 - Saturation: Enhanced
 [MakerNotes, Nikon, Camera] 171 - Vari Program: 
 [XMP, XMP-aux, Camera] Lens - Lens: 18-70mm f/3.5-4.5
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: No= 20025585
+[XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 4
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 47
@@ -136,8 +144,9 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/60
 [Composite, Composite, Camera]  - Blue Balance: 1.410156
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.020 mm
-[Composite, Composite, Image]  - Depth of Field: 0.02 m (0.62 - 0.64)
-[Composite, Composite, Camera]  - Focal Length: 56.0mm (35mm equivalent: 84.0mm)
+[Composite, Composite, Image]  - Depth Of Field: 0.02 m (0.62 - 0.64)
+[Composite, Composite, Image]  - Field Of View: 22.1 deg (0.25 m)
+[Composite, Composite, Camera]  - Focal Length: 56.0 mm (35 mm equivalent: 84.0 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 31.31 m
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Light Value: 9.6

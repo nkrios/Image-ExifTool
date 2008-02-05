@@ -27,7 +27,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.40';
+$VERSION = '1.43';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -292,7 +292,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             9 => 'Sport',
             10 => 'Self Portrait',
             11 => 'Indoor',
-            12 => 'Beach&Snow',
+            12 => 'Beach & Snow',
             13 => 'Beach',
             14 => 'Snow',
             15 => 'Self Portrait+Self Timer',
@@ -308,12 +308,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             25 => 'Museum',
             26 => 'Behind Glass',
             27 => 'Auction',
-            28 => 'Shoot&Select1',
-            29 => 'Shoot&Select2',
+            28 => 'Shoot & Select1',
+            29 => 'Shoot & Select2',
             30 => 'Underwater Wide2',
             31 => 'Digital Image Stabilization',
             32 => 'Face Portrait',
             33 => 'Pet',
+            34 => 'Smile Shot',
         },
     },
     0x0404 => { #PH (D595Z, C7070WZ)
@@ -630,7 +631,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     # 0x1032 HAFFINAL? #11
     0x1033 => { #11
-        Name => 'SceneDetectArea',
+        Name => 'SceneDetectData',
         Writable => 'int32u',
         Count => 720,
         Binary => 1,
@@ -675,10 +676,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x103a => { #6
         Name => 'NoiseReduction',
         Writable => 'int16u',
-        PrintConv => {
-            0 => 'Off',
-            1 => 'On',
-        },
+        PrintConv => \%offOn,
     },
     0x103b => { #6
         Name => 'InfinityLensStep',
@@ -996,6 +994,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     # 060 = 50-200
     # 080 = EX-25
     # 101 = FL-50
+    # 272 = EC-20 #7
     0x202 => { #PH
         Name => 'LensSerialNumber',
         Writable => 'string',
@@ -1051,7 +1050,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'Extender',
         Writable => 'int8u',
         Count => 6,
-        Notes => '6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown.',
+        Notes => '6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown',
         PrintConv => 'Image::ExifTool::Olympus::PrintLensInfo($val,"Extender")',
     },
     0x302 => { #4
@@ -1084,10 +1083,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => {
             0 => 'None',
             1 => 'FL-20',
-            2 => 'FL-50',
+            2 => 'FL-50', # (or Metzblitz+SCA, ref 11)
             3 => 'RF-11',
             4 => 'TF-22',
             5 => 'FL-36',
+            6 => 'FL-50R', #11 (or Metz mecablitz digital)
+            7 => 'FL-36R', #11
         },
     },
     0x1002 => { #6
@@ -1148,10 +1149,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x201 => { #6
         Name => 'AELock',
         Writable => 'int16u',
-        PrintConv => {
-            0 => 'Off',
-            1 => 'On',
-        },
+        PrintConv => \%offOn,
     },
     0x202 => { #PH/4
         Name => 'MeteringMode',
@@ -1321,36 +1319,55 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             9 => 'Landscape+Portrait',
             10 => 'Landscape',
             11 => 'Night Scene',
+            12 => 'Self Portrait', #11
             13 => 'Panorama', #6
+            14 => '2 in 1', #11
+            15 => 'Movie', #11
             16 => 'Landscape+Portrait', #6
             17 => 'Night+Portrait',
+            18 => 'Indoor', #11
             19 => 'Fireworks',
             20 => 'Sunset',
             22 => 'Macro',
+            23 => 'Super Macro', #11
+            24 => 'Food', #11
             25 => 'Documents',
             26 => 'Museum',
-            28 => 'Beach&Snow',
+            27 => 'Shoot & Select', #11
+            28 => 'Beach & Snow',
+            29 => 'Self Protrait+Timer', #11
             30 => 'Candle',
+            31 => 'Available Light', #11
+            32 => 'Behind Glass', #11
+            33 => 'My Mode', #11
+            34 => 'Pet', #11
             35 => 'Underwater Wide1', #6
             36 => 'Underwater Macro', #6
+            37 => 'Shoot & Select1', #11
+            38 => 'Shoot & Select2', #11
             39 => 'High Key',
             40 => 'Digital Image Stabilization', #6
+            41 => 'Auction', #11
+            42 => 'Beach', #11
+            43 => 'Snow', #11
             44 => 'Underwater Wide2', #6
             45 => 'Low Key', #6
             46 => 'Children', #6
+            47 => 'Vivid', #11
             48 => 'Nature Macro', #6
+            49 => 'Underwater Snapshot', #11
+            50 => 'Shooting Guide', #11
         },
     },
     0x50a => { #PH/4/6
         Name => 'NoiseReduction',
         Writable => 'int16u',
         PrintConv => {
-            0 => 'Off',
-            1 => 'Noise Reduction',
-            2 => 'Noise Filter',
-            3 => 'Noise Reduction + Noise Filter',
-            4 => 'Noise Filter (ISO Boost)', #6
-            5 => 'Noise Reduction + Noise Filter (ISO Boost)', #6
+            BITMASK => {
+                0 => 'Noise Reduction',
+                1 => 'Noise Filter',
+                2 => 'Noise Filter (ISO Boost)',
+            },
         },
     },
     0x50b => { #6
@@ -1370,23 +1387,31 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x50f => { #6
         Name => 'Gradation',
         Writable => 'int16s',
-        Count => 3,
-        PrintConv => {
+        Notes => '3 or 4 values',
+        Count => -1,
+        Relist => [ [0..2], 3 ], # join values 0-2 for PrintConv
+        PrintConv => [{
            '-1 -1 1' => 'Low Key',
             '0 -1 1' => 'Normal',
             '1 -1 1' => 'High Key',
-        },
+        },{
+            0 => 'User-Selected',
+            1 => 'Auto-Override',
+        }],
     },
     0x520 => { #6
         Name => 'PictureMode',
         Writable => 'int16u',
-        PrintConv => {
+        Notes => '1 or 2 values',
+        Count => -1,
+        PrintConv => [{
             1 => 'Vivid',
             2 => 'Natural',
             3 => 'Muted',
+            4 => 'Portrait',
             256 => 'Monotone',
             512 => 'Sepia',
-        },
+        }],
     },
     0x521 => { #6
         Name => 'PictureModeSaturation',
@@ -1507,11 +1532,26 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             4 => 'RAW',
         },
     },
+    0x900 => { #11
+        Name => 'ManometerPressure',
+        Writable => 'int16u',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+        PrintConv => '"$val kPa"',
+        PrintConvInv => '$val=~s/ ?kPa//i; $val',
+    },
     0x901 => { #PH (u770SW)
         # 2 numbers: 1st looks like meters above sea level, 2nd is usually 3x the 1st (feet?)
         Name => 'ManometerReading',
         Writable => 'int32s',
         Count => 2,
+        PrintConv => '$val=~s/(\S+) (\S+)/$1 m, $2 ft/; $val',
+        PrintConvInv => '$val=~s/ ?(m|ft)//gi; $val',
+    },
+    0x902 => { #11
+        Name => 'ExtendedWBDetect',
+        Writable => 'int16u',
+        PrintConv => \%offOn,
     },
 );
 
@@ -1588,7 +1628,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
-                2 => 'ISO Boost',
+                2 => 'Noise Filter (ISO Boost)',
             },
         },
     },
@@ -1691,7 +1731,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
-                2 => 'ISO Boost',
+                2 => 'Noise Filter (ISO Boost)',
             },
         },
     },
@@ -1756,6 +1796,20 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16s',
         Count => 3,
     },
+    0x113 => {
+        Name => 'RawDevSaturation3',
+        Writable => 'int16s',
+        Count => 3, #(NC)
+    },
+    0x119 => {
+        Name => 'RawDevAutoGradation',
+        Writable => 'int16u', #(NC)
+        PrintConv => \%offOn,
+    },
+    0x120 => {
+        Name => 'RawDevPMNoiseFilter',
+        Writable => 'int16u', #(NC)
+    },
 );
 
 # Olympus Image processing IFD
@@ -1774,27 +1828,177 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16u',
         Count => 2,
     },
+    0x102 => { #11
+        Name => 'WB_RBLevels3000K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x103 => { #11
+        Name => 'WB_RBLevels3300K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x104 => { #11
+        Name => 'WB_RBLevels3600K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x105 => { #11
+        Name => 'WB_RBLevels3900K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x106 => { #11
+        Name => 'WB_RBLevels4000K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x107 => { #11
+        Name => 'WB_RBLevels4300K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x108 => { #11
+        Name => 'WB_RBLevels4500K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x109 => { #11
+        Name => 'WB_RBLevels4800K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x10a => { #11
+        Name => 'WB_RBLevels5300K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x10b => { #11
+        Name => 'WB_RBLevels6000K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x10c => { #11
+        Name => 'WB_RBLevels6600K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x10d => { #11
+        Name => 'WB_RBLevels7500K',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x10e => { #11
+        Name => 'WB_RBLevelsCWB1',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x10f => { #11
+        Name => 'WB_RBLevelsCWB2',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x110 => { #11
+        Name => 'WB_RBLevelsCWB3',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x111 => { #11
+        Name => 'WB_RBLevelsCWB4',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x113 => { #11
+        Name => 'WB_GLevel3000K',
+        Writable => 'int16u',
+    },
+    0x114 => { #11
+        Name => 'WB_GLevel3300K',
+        Writable => 'int16u',
+    },
+    0x115 => { #11
+        Name => 'WB_GLevel3600K',
+        Writable => 'int16u',
+    },
+    0x116 => { #11
+        Name => 'WB_GLevel3900K',
+        Writable => 'int16u',
+    },
+    0x117 => { #11
+        Name => 'WB_GLevel4000K',
+        Writable => 'int16u',
+    },
+    0x118 => { #11
+        Name => 'WB_GLevel4300K',
+        Writable => 'int16u',
+    },
+    0x119 => { #11
+        Name => 'WB_GLevel4500K',
+        Writable => 'int16u',
+    },
+    0x11a => { #11
+        Name => 'WB_GLevel4800K',
+        Writable => 'int16u',
+    },
+    0x11b => { #11
+        Name => 'WB_GLevel5300K',
+        Writable => 'int16u',
+    },
+    0x11c => { #11
+        Name => 'WB_GLevel6000K',
+        Writable => 'int16u',
+    },
+    0x11d => { #11
+        Name => 'WB_GLevel6600K',
+        Writable => 'int16u',
+    },
+    0x11e => { #11
+        Name => 'WB_GLevel7500K',
+        Writable => 'int16u',
+    },
+    0x11f => { #11
+        Name => 'WB_GLevel',
+        Writable => 'int16u',
+    },
     0x200 => { #6
         Name => 'ColorMatrix',
         Writable => 'int16u',
         Format => 'int16s',
         Count => 9,
     },
-    0x300 => { #PH/4
-        Name => 'SmoothingParameter1',
+    # color matrices (ref 11):
+    # 0x0201-0x020d are sRGB color matrices
+    # 0x020e-0x021a are Adobe RGB color matrices
+    # 0x021b-0x0227 are ProPhoto RGB color matrices
+    # 0x0228 and 0x0229 are ColorMatrix for E-330
+    # 0x0250-0x0252 are sRGB color matrices
+    # 0x0253-0x0255 are Adobe RGB color matrices
+    # 0x0256-0x0258 are ProPhoto RGB color matrices
+    0x300 => { #11
+        Name => 'Enhancer',
         Writable => 'int16u',
     },
-    0x310 => { #PH/4
-        Name => 'SmoothingParameter2',
+    0x301 => { #11
+        Name => 'EnhancerValues',
+        Writable => 'int16u',
+        Count => 7,
+    },
+    0x310 => { #11
+        Name => 'CoringFilter',
         Writable => 'int16u',
     },
-    0x600 => { #PH/4
-        Name => 'SmoothingThresholds',
+    0x0311 => { #11
+        Name => 'CoringValues',
+        Writable => 'int16u',
+        Count => 7,
+    },
+    0x600 => { #11
+        Name => 'BlackLevel2',
         Writable => 'int16u',
         Count => 4,
     },
-    0x610 => { #PH/4
-        Name => 'SmoothingThreshold2',
+    0x610 => { #11
+        Name => 'GainBase',
         Writable => 'int16u',
     },
     0x611 => { #4/6
@@ -1802,35 +2006,43 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16u',
         Count => 2,
     },
-    0x614 => { #PH
-        Name => 'OlympusImageWidth2',
+    0x612 => { #11
+        Name => 'CropLeft',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x613 => { #11
+        Name => 'CropTop',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    0x614 => { #PH/11
+        Name => 'CropWidth',
         Writable => 'int32u',
     },
-    0x615 => { #PH
-        Name => 'OlympusImageHeight2',
+    0x615 => { #PH/11
+        Name => 'CropHeight',
         Writable => 'int32u',
     },
+    # 0x800 LensDistortionParams, float[9] (ref 11)
+    # 0x801 LensShadingParams, int16u[16] (ref 11)
     # 0x1010-0x1012 are the processing options used in camera or in
     # Olympus software, which 0x050a-0x050c are in-camera only (ref 6)
     0x1010 => { #PH/4
         Name => 'NoiseReduction2',
         Writable => 'int16u',
         PrintConv => {
-            0 => 'Off',
-            1 => 'Noise Filter',
-            2 => 'Noise Reduction',
-            3 => 'Noise Reduction + Noise Filter', #6
-            4 => 'Noise Filter (ISO Boost)', #6
-            5 => 'Noise Reduction + Noise Filter (ISO Boost)', #6
+            BITMASK => {
+                0 => 'Noise Reduction',
+                1 => 'Noise Filter',
+                2 => 'Noise Filter (ISO Boost)',
+            },
         },
     },
     0x1011 => { #6
         Name => 'DistortionCorrection2',
         Writable => 'int16u',
-        PrintConv => {
-            0 => 'Off',
-            1 => 'On',
-        },
+        PrintConv => \%offOn,
     },
     0x1012 => { #PH/4
         Name => 'ShadingCompensation2',
@@ -1843,6 +2055,21 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Notes => 'unknown 142kB block in ORF images, not copied to JPEG images',
         # 'Drop' because too large for APP1 in JPEG images
         Flags => [ 'Unknown', 'Binary', 'Drop' ],
+    },
+    0x1200 => { #11
+        Name => 'FaceDetect',
+        Writable => 'int32u',
+        Count => 2,
+        PrintConv => {
+            '0 0' => 'Off',
+            '1 0' => 'On',
+        },
+    },
+    0x1201 => { #11
+        Name => 'FaceDetectArea',
+        Writable => 'int16s',
+        Count => 80,
+        Binary => 1,
     },
 );
 
@@ -1863,12 +2090,37 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => \%offOn,
         Unknown => 1, #6
     },
+    0x210 => { #11
+        Name => 'SceneDetect',
+        Writable => 'int16u',
+    },
+    0x211 => { #11
+        Name => 'SceneArea',
+        Writable => 'int32u',
+        Count => 8,
+        Unknown => 1, # (numbers don't make much sense?)
+    },
+    0x212 => { #11
+        Name => 'SceneDetectData',
+        Writable => 'int32u',
+        Count => 720,
+        Binary => 1,
+        Unknown => 1, # (but what does it mean?)
+    },
     0x300 => { #6
         Name => 'ZoomStepCount',
         Writable => 'int16u',
     },
     0x301 => { #11
         Name => 'FocusStepCount',
+        Writable => 'int16u',
+    },
+    0x303 => { #11
+        Name => 'FocusStepInfinity',
+        Writable => 'int16u',
+    },
+    0x304 => { #11
+        Name => 'FocusStepNear',
         Writable => 'int16u',
     },
     0x305 => { #4
@@ -1892,17 +2144,64 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => '$val ? "$val m" : "inf"',
         PrintConvInv => '$val eq "inf" ? 0 : $val=~s/\s*m$//, $val',
     },
-    0x308 => { #11
-        Name => 'AFPoint',
-        Writable => 'int16u',
-        PrintConv => {
-            0 => 'Left',
-            1 => 'Center (1)',
-            2 => 'Right',
-            3 => 'Center (3)',
-            255 => 'None',
-        },
-    },
+    0x308 => [
+        {
+            Name => 'AFPoint',
+            Condition => '$$self{CameraModel} =~ /E-3\b/',
+            Writable => 'int16u',
+            PrintHex => 1,
+            # decoded by ref 6
+            Notes => q{
+                for E-3, the value is separated into 2 parts: low 5 bits give AP point,
+                upper bits give AF target selection mode
+            },
+            ValueConv => '($val & 0x1f) . " " . ($val & 0xffe0)',
+            ValueConvInv => 'my @v=split(" ",$val); @v == 2 ? $v[0] + $v[1] : $val',
+            PrintConv => [
+                {
+                    0x00 => '(none)',
+                    0x01 => 'Top-left (horizontal)',
+                    0x02 => 'Top-center (horizontal)',
+                    0x03 => 'Top-right (horizontal)',
+                    0x04 => 'Left (horizontal)',
+                    0x05 => 'Mid-left (horizontal)',
+                    0x06 => 'Center (horizontal)',
+                    0x07 => 'Mid-right (horizontal)',
+                    0x08 => 'Right (horizontal)',
+                    0x09 => 'Bottom-left (horizontal)',
+                    0x0a => 'Bottom-center (horizontal)',
+                    0x0b => 'Bottom-right (horizontal)',
+                    0x0c => 'Top-left (vertical)',
+                    0x0d => 'Top-center (vertical)',
+                    0x0e => 'Top-right (vertical)',
+                    0x0f => 'Left (vertical)',
+                    0x10 => 'Mid-left (vertical)',
+                    0x11 => 'Center (vertical)',
+                    0x12 => 'Mid-right (vertical)',
+                    0x13 => 'Right (vertical)',
+                    0x14 => 'Bottom-left (vertical)',
+                    0x15 => 'Bottom-center (vertical)',
+                    0x16 => 'Bottom-right (vertical)',
+                },
+                {
+                    0x00 => 'Single Target',
+                    0x40 => 'All Target',
+                    0x80 => 'Dynamic Single Target',
+                }
+            ],
+        },{ #11
+            Name => 'AFPoint',
+            Writable => 'int16u',
+            Notes => 'other models',
+            PrintConv => {
+                0 => 'Left',
+                1 => 'Center (horizontal)', #6 (E-510)
+                2 => 'Right',
+                3 => 'Center (vertical)', #6 (E-510)
+                255 => 'None',
+            },
+        }
+    ],
     # 0x31a Continuous AF parameters?
     # 0x1200-0x1209 Flash information:
     0x1201 => { #6
@@ -2074,19 +2373,19 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Count => 2,
     },
     0x612 => { #11
-        Name => 'StartOffsetX',
+        Name => 'CropLeft',
         Writable => 'int16u',
     },
     0x613 => { #11
-        Name => 'StartOffsetY',
+        Name => 'CropTop',
         Writable => 'int16u',
     },
     0x614 => {
-        Name => 'FinalImageWidth',
+        Name => 'CropWidth',
         Writable => 'int32u',
     },
     0x615 => {
-        Name => 'FinalImageHeight',
+        Name => 'CropHeight',
         Writable => 'int32u',
     },
     0x1000 => {
@@ -2268,6 +2567,7 @@ sub PrintLensInfo($$)
             '0 6 1' => 'Zuiko Digital ED 8mm F3.5 Fisheye', #9
             '0 7 0' => 'Zuiko Digital 11-22mm F2.8-3.5',
             '0 7 1' => 'Zuiko Digital 18-180mm F3.5-6.3', #6
+            '0 8'   => 'Zuiko Digital 70-300mm F4.0-5.6', #7
             '0 21'  => 'Zuiko Digital ED 7-14mm F4.0',
             '0 23'  => 'Zuiko Digital Pro ED 35-100mm F2.0', #7
             '0 24'  => 'Zuiko Digital 14-45mm F3.5-5.6',
@@ -2275,12 +2575,15 @@ sub PrintLensInfo($$)
             '0 34'  => 'Zuiko Digital 17.5-45mm F3.5-5.6', #9
             '0 35'  => 'Zuiko Digital ED 14-42mm F3.5-5.6', #PH
             '0 36'  => 'Zuiko Digital ED 40-150mm F4.0-5.6', #PH
+            '0 48'  => 'Zuiko Digital ED 50-200mm SWD F2.8-3.5', #7
+            '0 49'  => 'Zuiko Digital ED 12-60mm SWD F2.8-4.0', #7
             # Sigma lenses
             '1 1'   => '18-50mm F3.5-5.6', #8
             '1 2'   => '55-200mm F4.0-5.6 DC',
             '1 3'   => '18-125mm F3.5-5.6 DC',
             '1 4'   => '18-125mm F3.5-5.6', #7
             '1 5'   => '30mm F1.4', #10
+            '1 6'   => '50-500mm F4.0-6.3 EX DG APO HSM RF', #6
             '1 7'   => '105mm F2.8 DG', #PH
             '1 8'   => '150mm F2.8 DG HSM', #PH
             '1 17'  => '135-400mm F4.5-5.6 DG ASP APO RF', #11
@@ -2295,6 +2598,7 @@ sub PrintLensInfo($$)
             # Olympus extenders
             '0 4'   => 'Zuiko Digital EC-14 1.4x Teleconverter',
             '0 8'   => 'EX-25 Extension Tube',
+            '0 16'  => 'Zuiko Digital EC-20 2.0x Teleconverter', #7
         },
     );
     my %release = (
@@ -2371,7 +2675,7 @@ Olympus or Epson maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

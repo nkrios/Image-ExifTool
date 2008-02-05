@@ -45,7 +45,7 @@ my %mandatory = (
         0xa000 => '0100',   # FlashpixVersion
         0xa001 => 0xffff,   # ColorSpace (uncalibrated)
       # 0xa002 => ????,     # ExifImageWidth
-      # 0xa003 => ????,     # ExifImageLength
+      # 0xa003 => ????,     # ExifImageHeight
     },
     GPS => {
         0x0000 => '2 2 0 0',# GPSVersionID
@@ -217,7 +217,7 @@ my %writeTable = (
         Writable => 'string',
         Shift => 'Time',
         WriteGroup => 'IFD0',
-        PrintConvInv => 'Image::ExifTool::Exif::ExifDateTime($val)', 
+        PrintConvInv => '$self->InverseDateTime($val,0)', 
     },
     0x013b => {             # Artist
         Writable => 'string',
@@ -301,7 +301,7 @@ my %writeTable = (
         Writable => 'int16u',
         WriteGroup => 'InteropIFD',
     },
-    0x1002 => {             # RelatedImageLength (is really the height)
+    0x1002 => {             # RelatedImageHeight (more commonly RelatedImageLength)
         Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'InteropIFD',
@@ -360,14 +360,15 @@ my %writeTable = (
     0x9003 => {             # DateTimeOriginal
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => 'Image::ExifTool::Exif::ExifDateTime($val)', 
+        PrintConvInv => '$self->InverseDateTime($val,0)', 
     },
     0x9004 => {             # CreateDate
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => 'Image::ExifTool::Exif::ExifDateTime($val)', 
+        PrintConvInv => '$self->InverseDateTime($val,0)', 
     },
     0x9101 => {             # ComponentsConfiguration
+        Protected => 1,
         Writable => 'undef',
         PrintConv => '$_=$val;s/\0.*//s;tr/\x01-\x06/YXWRGB/;s/X/Cb/g;s/W/Cr/g;$_',
         PrintConvInv => q{
@@ -377,7 +378,10 @@ my %writeTable = (
             return $_ . "\0";
         },
     },
-    0x9102 => 'rational64u',# CompressedBitsPerPixel
+    0x9102 => {             # CompressedBitsPerPixel
+        Protected => 1,
+        Writable => 'rational64u',
+    },
     0x9201 => {             # ShutterSpeedValue
         Writable => 'rational64s',
         ValueConvInv => '$val>0 ? -log($val)/log(2) : -100',
@@ -429,6 +433,7 @@ my %writeTable = (
     0x935c => {             # ImageSourceData
         Writable => 'undef',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
 #    0x9928 => 'undef',      # Opto-ElectricConversionFactor
     0x9c9b => {             # XPTitle
@@ -466,7 +471,7 @@ my %writeTable = (
     0xa000 => 'undef',      # FlashpixVersion
     0xa001 => 'int16u',     # ColorSpace
     0xa002 => 'int16u',     # ExifImageWidth (could also be int32u)
-    0xa003 => 'int16u',     # ExifImageLength (could also be int32u)
+    0xa003 => 'int16u',     # ExifImageHeight (could also be int32u)
     0xa004 => 'string',     # RelatedSoundFile
     0xa20b => {             # FlashEnergy
         Writable => 'rational64u',
@@ -484,8 +489,7 @@ my %writeTable = (
     0xa217 => 'int16u',     # SensingMethod
     0xa300 => {             # FileSource
         Writable => 'undef',
-        ValueConvInv => 'chr($val)',
-        PrintConvInv => 3,
+        ValueConvInv => '($val=~/^\d+$/ and $val < 256) ? chr($val) : $val',
     },
     0xa301 => {             # SceneType
         Writable => 'undef',
@@ -793,27 +797,6 @@ my %writeTable = (
 InsertWritableProperties('Image::ExifTool::Exif::Main', \%writeTable, \&CheckExif);
 
 #------------------------------------------------------------------------------
-# Change date/time string to standard EXIF formatting
-# Inputs: 0) Date/Time string
-# Returns: formatted date/time string (or undef and issues warning on error)
-sub ExifDateTime($)
-{
-    my $val = shift;
-    my $rtnVal;
-    if ($val =~ /(\d{4})/g) {           # get YYYY
-        my $yr = $1;
-        my @a = ($val =~ /\d{2}/g);     # get MM, DD, and maybe hh, mm, ss
-        if (@a >= 2) {
-            push @a, '00' while @a < 5; # add hh, mm, ss if not given
-            # construct properly formatted date/time string
-            $rtnVal = "$yr:$a[0]:$a[1] $a[2]:$a[3]:$a[4]";
-        }
-    }
-    $rtnVal or warn "Improperly formatted date/time\n";
-    return $rtnVal;
-}
-
-#------------------------------------------------------------------------------
 # Get binary CFA Pattern from a text string
 # Inputs: CFA pattern string (ie. '[Blue,Green][Green,Red]')
 # Returns: Binary CFA data or prints warning and returns undef on error
@@ -1106,6 +1089,7 @@ sub WriteExif($$$)
     my $newData = '';   # initialize buffer to receive new directory data
     my ($nextIfdPos, %offsetData, $inMakerNotes);
     my $deleteAll = 0;
+    my @imageData;      # image data blocks if requested
 
     # allow multiple IFD's in IFD0-IFD1-IFD2... chain
     $$dirInfo{Multi} = 1 if $dirName eq 'IFD0' or $dirName eq 'SubIFD';
@@ -1217,7 +1201,7 @@ sub WriteExif($$$)
                     # check for proper sequence (but ignore null entries at end)
                     if ($tagID < $lastID and $tagID) {
                         SortIFD($dataPt, $dirStart, $numEntries);
-                        $exifTool->Warn("Entries in $dirName were out of sequence. Fixed.");
+                        $exifTool->Warn("Entries in $dirName were out of sequence. Fixed.",1);
                         last;
                     }
                     $lastID = $tagID;
@@ -1227,8 +1211,8 @@ sub WriteExif($$$)
             $numEntries = $len = 0;
         }
 
-        # fix base offsets
-        if ($dirName eq 'MakerNotes' and $$dirInfo{Parent} eq 'ExifIFD' and
+        # fix base offsets (some cameras incorrectly write maker notes in IFD0)
+        if ($dirName eq 'MakerNotes' and $$dirInfo{Parent} =~ /^(ExifIFD|IFD0)$/ and
             Image::ExifTool::MakerNotes::FixBase($exifTool, $dirInfo))
         {
             # update local variables from fixed values
@@ -1285,6 +1269,7 @@ sub WriteExif($$$)
         my ($entry, $valueDataPt, $valueDataPos, $valueDataLen, $valuePtr, $valEnd);
         my $oldID = -1;
         my $newID = -1;
+        my $ignoreCount = 0;
 #..............................................................................
 # loop through entries in new directory
 #
@@ -1301,7 +1286,11 @@ Entry:  for (;;) {
                     $readCount = $oldCount = Get32u($dataPt, $entry+4);
                     if ($oldFormat < 1 or $oldFormat > 13) {
                         # don't write out null directory entry
-                        unless ($oldFormat or $oldCount or not $index) {
+                        if ($oldFormat==0 and $index and ($oldCount==0 or
+                            # patch for Canon EOS 40D firmware 1.0.4 bug:
+                            ($index==$numEntries-1 and $$exifTool{CameraModel}=~/EOS 40D/)))
+                        {
+                            ++$ignoreCount;
                             ++$index;
                             $newID = $oldID;    # pretend we wrote this
                             # must keep same directory size to avoid messing up our fixed offsets
@@ -1366,13 +1355,28 @@ Entry:  for (;;) {
                                     $invalidPreview = 1;
                                 }
                             }
-                            if ($raf) {
-                                my $success = ($raf->Seek($base + $valuePtr + $dataPos, 0) and
+                            # copy huge data blocks later instead of loading into memory
+                            if ($oldSize > BINARY_DATA_LIMIT and $_[1]->{ImageData} and
+                                (not $oldInfo or not $$oldInfo{SubDirectory}))
+                            {
+                                $oldValue = ''; # dummy empty value
+                                # copy this value later unless writing a new value
+                                unless ($set{$oldID}) {                                
+                                    my $pad = $oldSize & 0x01 ? 1 : 0;
+                                    # save block information to copy later (plus directory
+                                    # offset to write proper offset/size later)
+                                    push @imageData, [$base+$valuePtr+$dataPos, $oldSize, $pad,
+                                                      $newStart + length($dirBuff) + 2];
+                                    $_[1]->{ImageData} = \@imageData;
+                                }
+                            } elsif ($raf) {
+                                my $success = ($raf->Seek($base+$valuePtr+$dataPos, 0) and
                                                $raf->Read($oldValue, $oldSize) == $oldSize);
                                 if (defined $pos) {
                                     $raf->Seek($pos, 0);
                                     undef $raf;
-                                    unless ($success and $oldValue =~ /^(\xff\xd8\xff|.\xd8\xff\xdb)/s) {
+                                    # (sony A700 has 32-byte header on PreviewImage)
+                                    unless ($success and $oldValue =~ /^(\xff\xd8\xff|(.|.{33})\xd8\xff\xdb)/s) {
                                         $exifTool->Error("Bad PreviewImage pointer in $dirName", 1);
                                         $invalidPreview = 1;
                                         $success = 1;   # continue writing directory
@@ -1556,6 +1560,8 @@ DropTag:                    ++$index;
                         if ($isNew >= 0) {
                             $newCount = length($newValue) / $formatSize[$newFormat];
                             ++$exifTool->{CHANGED};
+                            # not all mandatory if we are writing any tag specifically
+                            undef $allMandatory if $newValueHash;
                             if ($verbose > 1) {
                                 $val = $exifTool->Printable($val);
                                 $newVal = $exifTool->Printable($newVal);
@@ -1646,9 +1652,11 @@ NoOverwrite:            next if $isNew > 0;
                         $offsetData{$dataTag} = $exifTool->GetNewValues($dataTag);
                         my $err;
                         if (defined $offsetData{$dataTag}) {
-                            if ($exifTool->{FILE_TYPE} eq 'JPEG' and
-                                $dataTag ne 'PreviewImage' and length($offsetData{$dataTag}) > 60000)
-                            {
+                            my $len = length $offsetData{$dataTag};
+                            if ($dataTag eq 'PreviewImage') {
+                                # must set DEL_PREVIEW flag now if preview fit into IFD
+                                $$exifTool{DEL_PREVIEW} = 1 if $len <= 4;
+                            } elsif ($exifTool->{FILE_TYPE} eq 'JPEG' and $len > 60000) {
                                 delete $offsetData{$dataTag};
                                 $err = "$dataTag not written (too large for JPEG segment)";
                             }
@@ -1741,8 +1749,10 @@ NoOverwrite:            next if $isNew > 0;
                             }
                             # rewrite maker notes
                             $subdir = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
-                        } else {
+                        } elsif ($$exifTool{FILE_TYPE} eq 'JPEG') {
                             $exifTool->Warn('Maker notes could not be parsed',1);
+                        } else {
+                            $exifTool->Error('Maker notes could not be parsed',1);
                         }
                         if (defined $subdir) {
                             next unless length $subdir;
@@ -1778,6 +1788,8 @@ NoOverwrite:            next if $isNew > 0;
                                 my $baseShift = $base - $subdirInfo{Base};
                                 $makerFixup->{Start} += $valLen + $loc;
                                 $makerFixup->{Shift} += $baseShift;
+                                # permanently fix makernote offset errors
+                                $makerFixup->{Shift} += $subdirInfo{FixedBy} || 0;
                                 push @valFixups, $makerFixup;
                                 if ($previewInfo and not $previewInfo->{NoBaseShift}) {
                                     $previewInfo->{BaseShift} = $baseShift;
@@ -1932,7 +1944,10 @@ NoOverwrite:            next if $isNew > 0;
                             RAF => $raf,
                         );
                         my $subTable = GetTagTable($$subdir{TagTable});
+                        my $oldOrder = GetByteOrder();
+                        SetByteOrder($$subdir{ByteOrder}) if $$subdir{ByteOrder};
                         $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
+                        SetByteOrder($oldOrder);
                         if (defined $newValue) {
                             my $hdrLen = $subdirStart - $valuePtr;
                             if ($hdrLen) {
@@ -1981,6 +1996,42 @@ NoOverwrite:            next if $isNew > 0;
                             $newValue = "\0" x length($$newValuePt);
                             $newValuePt = \$newValue;
                         }
+                    } elsif ($dataTag eq 'OriginalDecisionData') {
+                        # handle Canon OriginalDecisionData (no associated length tag)
+                        # - I'm going out of my way here to preserve data which is likely
+                        #   invalidated anyway by our edits
+                        my $odd;
+                        my $oddInfo = $Image::ExifTool::Composite{OriginalDecisionData};
+                        if ($oddInfo and $exifTool->{NEW_VALUE}->{$oddInfo}) {
+                            $odd = $exifTool->GetNewValues($dataTag);
+                            if ($verbose > 1) {
+                                print $out "    - $dirName:$dataTag\n" if $$newValuePt ne "\0\0\0\0";
+                                print $out "    + $dirName:$dataTag\n" if $odd;
+                            }
+                            ++$exifTool->{CHANGED};
+                        } elsif ($$newValuePt ne "\0\0\0\0") {
+                            if (length($$newValuePt) == 4) {
+                                require Image::ExifTool::Canon;
+                                my $offset = Get32u($newValuePt,0);
+                                # absolute offset in JPEG images only
+                                $offset += $base unless $$exifTool{FILE_TYPE} eq 'JPEG';
+                                $odd = Image::ExifTool::Canon::ReadODD($exifTool, $offset);
+                                $odd = $$odd if ref $odd;
+                            } else {
+                                $exifTool->Error("Invalid $$newInfo{Name}",1);
+                            }
+                        }
+                        if ($odd) {
+                            my $newOffset = length($valBuff);
+                            # (ODD offset is absolute in JPEG, so add base offset!)
+                            $newOffset += $base if $$exifTool{FILE_TYPE} eq 'JPEG';
+                            $newValue = Set32u($newOffset);
+                            $dirFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                            $valBuff .= $odd;   # add original decision data
+                        } else {
+                            $newValue = "\0\0\0\0";
+                        }
+                        $newValuePt = \$newValue;
                     } else {
                         my $offsetInfo = $offsetInfo[$ifd];
                         # save original values (for updating TIFF_END later)
@@ -2081,13 +2132,28 @@ NoOverwrite:            next if $isNew > 0;
                 undef $allMandatory;
             }
         }
+        if ($ignoreCount) {
+            my $y = $ignoreCount > 1 ? 'ies' : 'y';
+            $exifTool->Warn("Removed $ignoreCount invalid entr$y from $dirName",1);
+        }
 #..............................................................................
 # write directory counts and nextIFD pointer and add value data to end of IFD
 #
+        # determine now if there is or will be another IFD after this one
+        my $nextIfdOffset;
+        if ($dirStart + $len + 4 <= $dataLen) {
+            $nextIfdOffset = Get32u($dataPt, $dirStart + $len);
+        } else {
+            $nextIfdOffset = 0;
+        }
+        my $isNextIFD = ($$dirInfo{Multi} and ($nextIfdOffset or
+                        # account for the case where we will create the next IFD
+                        ($dirName eq 'IFD0' and $exifTool->{ADD_DIRS}->{'IFD1'})));
         # calculate number of entries in new directory
         my $newEntries = length($dirBuff) / 12;
-        # delete entire directory if only mandatory tags remain
-        if ($newEntries < $numEntries and $allMandatory) {
+        # delete entire directory if we deleted a tag and only mandatory tags remain or we
+        # attempted to create a directory with only mandatory tags and there is no nextIFD
+        if ($allMandatory and not $isNextIFD and ($newEntries < $numEntries or $numEntries == 0)) {
             $newEntries = 0;
             $dirBuff = '';
             $valBuff = '';
@@ -2162,19 +2228,12 @@ NoOverwrite:            next if $isNew > 0;
             $fixup->AddFixup($valFixup);
         }
         # stop if no next IFD pointer
-        last unless $$dirInfo{Multi};  # stop unless scanning for multiple IFD's
-        my $offset;
-        if ($dirStart + $len + 4 <= $dataLen) {
-            $offset = Get32u($dataPt, $dirStart + $len);
-        } else {
-            $offset = 0;
-        }
-        if ($offset) {
+        last unless $isNextIFD;   # stop unless scanning for multiple IFD's
+        if ($nextIfdOffset) {
             # continue with next IFD
-            $dirStart = $offset - $dataPos;
+            $dirStart = $nextIfdOffset - $dataPos;
         } else {
             # create IFD1 if necessary
-            last unless $dirName eq 'IFD0' and $exifTool->{ADD_DIRS}->{'IFD1'};
             $verbose and print $out "  Creating IFD1\n";
             my $ifd1 = "\0" x 2;  # empty IFD1 data (zero entry count)
             $dataPt = \$ifd1;
@@ -2185,10 +2244,10 @@ NoOverwrite:            next if $isNew > 0;
         $dirName =~ s/(\d+)$//;
         $dirName .= ($1 || 0) + 1;
         $exifTool->{DIR_NAME} = $dirName;
-        next unless $offset;
+        next unless $nextIfdOffset;
 
         # guard against writing the same directory twice
-        my $addr = $offset + $base;
+        my $addr = $nextIfdOffset + $base;
         if ($exifTool->{PROCESSED}->{$addr}) {
             $exifTool->Error("$dirName pointer references previous $exifTool->{PROCESSED}->{$addr} directory", 1);
             last;
@@ -2227,12 +2286,30 @@ NoOverwrite:            next if $isNew > 0;
     # do our fixups now so we can more easily calculate offsets below
     $fixup->ApplyFixup(\$newData);
 #
+# copy over tag values which were too large for memory
+#
+    my $blockSize = 0;  # total size of blocks to copy later
+    my $blockInfo;
+    foreach $blockInfo (@imageData) {
+        my ($pos, $size, $pad, $entry) = @$blockInfo;
+        next unless defined $entry; # (just to be safe)
+        my $format = Get16u(\$newData, $entry + 2);
+        if ($format < 1 or $format > 13) {
+            $exifTool->Error('Internal error copying huge value');
+        } else {
+            # set count and offset in directory entry
+            Set32u($size / $formatSize[$format], \$newData, $entry + 4);
+            Set32u(length($newData)+$blockSize, \$newData, $entry + 8);
+            $fixup->AddFixup($entry + 8);
+            $blockSize += $size + $pad;
+        }
+    }
+#
 # copy over image data for IFD's, starting with the last IFD first
 #
-    my @imageData; # image data blocks if requested
-    my $blockSize = 0;  # total size of blocks to copy later
     if (@offsetInfo) {
-        my @writeLater;  # write image data last
+        my $ttwLen;     # length of MRW TTW segment
+        my @writeLater; # write image data last
         for ($ifd=$#offsetInfo; $ifd>=-1; --$ifd) {
             # build list of offsets to process
             my @offsetList;
@@ -2288,6 +2365,9 @@ NoOverwrite:            next if $isNew > 0;
                     $dbase = $base;
                     $dpos = $dataPos;
                 }
+                my $oldOrder = GetByteOrder();
+                # use different byte order for values of this offset pair if required (Minolta A200)
+                SetByteOrder($$tagInfo{ByteOrder}) if $$tagInfo{ByteOrder};
                 # transfer the data referenced by all offsets of this tag
                 for ($n=0; $n<$count; ++$n) {
                     my $oldEnd;
@@ -2301,6 +2381,7 @@ NoOverwrite:            next if $isNew > 0;
                     my $byteCountPos = $byteCounts + $n * $formatSize[$format];
                     my $size = ReadValue(\$newData, $byteCountPos, $formatStr, 1, 4);
                     my $offset = Get32u(\$newData, $offsetPos) - $dpos;
+                    my $newOffset = length($newData) + $blockSize;
                     my $buff;
                     # look for 'feed' code to use our new data
                     if ($size == 0xfeedfeed) {
@@ -2344,6 +2425,14 @@ NoOverwrite:            next if $isNew > 0;
                     } elsif ($offset >= 0 and $offset+$size <= $dataLen) {
                         # take data from old dir data buffer
                         $buff = substr($$dataPt, $offset, $size);
+                    } elsif ($$exifTool{TIFF_TYPE} eq 'MRW') {
+                        # TTW segment must be an even 4 bytes long, so pad now if necessary
+                        my $n = length $newData;
+                        $buff = ($n & 0x03) ? "\0" x (4 - ($n & 0x03)) : '';
+                        $size = length($buff);
+                        # data exists after MRW TTW segment
+                        $ttwLen = length($newData) + $size unless defined $ttwLen;
+                        $newOffset = $offset + $dpos + $ttwLen - $dataLen;
                     } elsif ($raf and $raf->Seek($offset+$dbase+$dpos,0) and
                              $raf->Read($buff,$size) == $size)
                     {
@@ -2387,7 +2476,7 @@ NoOverwrite:            next if $isNew > 0;
                         $buff = '';
                     }
                     # update offset accordingly and add to end of new data
-                    Set32u(length($newData)+$blockSize, \$newData, $offsetPos);
+                    Set32u($newOffset, \$newData, $offsetPos);
                     # add a pointer to fix up this offset value (marked with DataTag name)
                     $fixup->AddFixup($offsetPos, $$tagInfo{DataTag});
                     if ($ifd >= 0) {
@@ -2397,7 +2486,12 @@ NoOverwrite:            next if $isNew > 0;
                         $blockSize += $size;    # keep track of total size
                     }
                 }
+                SetByteOrder($oldOrder);
             }
+        }
+        # verify that nothing else got written after determining TTW length
+        if (defined $ttwLen and $ttwLen != length($newData)) {
+            $exifTool->Error('Internal error writing MRW TTW');
         }
     }
 #
@@ -2407,7 +2501,9 @@ NoOverwrite:            next if $isNew > 0;
         my $newDataPos = $$dirInfo{NewDataPos} || 0;
         # adjust CanonVRD offset to point to end of regular TIFF if necessary
         # (NOTE: This will be incorrect if multiple trailers exist,
-        #  but it is unlikely that it could ever be correct in this case anyway)
+        #  but it is unlikely that it could ever be correct in this case anyway.
+        #  Also, this doesn't work for JPEG images (but CanonDPP doesn't set
+        #  this when editing JPEG images anyway))
         $fixup->SetMarkerPointers(\$newData, 'CanonVRD', length($newData) + $blockSize);
         if ($newDataPos) {
             $fixup->{Shift} += $newDataPos;
@@ -2475,7 +2571,7 @@ This file contains routines to write EXIF metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

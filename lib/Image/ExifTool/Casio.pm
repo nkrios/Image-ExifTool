@@ -326,8 +326,8 @@ $VERSION = '1.21';
     0x001d => {
         Name => 'FocalLength',
         Writable => 'rational64u',
-        PrintConv => 'sprintf("%.1fmm",$val)',
-        PrintConvInv => '$val=~s/mm$//;$val',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     0x001f => {
         Name => 'Saturation',
@@ -558,7 +558,7 @@ Casio maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

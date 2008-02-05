@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Minolta.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 13 kB
@@ -34,21 +34,21 @@
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.4
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
-[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown (0)
+[EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 42.3mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 42.3 mm
 [EXIF, ExifIFD, Camera] 37396 - Subject Location: 960 960 320 192
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2560
-[EXIF, ExifIFD, Image] 40963 - Exif Image Length: 1920
+[EXIF, ExifIFD, Image] 40963 - Exif Image Height: 1920
 [EXIF, InteropIFD, Image] 1 - Interoperability Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Custom
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: 0
-[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 167mm
+[EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 167 mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: None
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
@@ -80,7 +80,7 @@
 [MakerNotes, Minolta, Camera] 14 - Bracket Step: 1/3 EV
 [MakerNotes, Minolta, Camera] 16 - Interval Length: 0
 [MakerNotes, Minolta, Camera] 17 - Interval Number: 2
-[MakerNotes, Minolta, Camera] 18 - Focal Length: 41.4mm
+[MakerNotes, Minolta, Camera] 18 - Focal Length: 41.4 mm
 [MakerNotes, Minolta, Camera] 19 - Focus Distance: 2 m
 [MakerNotes, Minolta, Camera] 20 - Flash Fired: No
 [MakerNotes, Minolta, Time] 21 - Minolta Date: 2002:06:01
@@ -121,7 +121,8 @@
 [Composite, Composite, Image]  - Shutter Speed: 1/180
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.008 mm
-[Composite, Composite, Image]  - Depth of Field: 0.19 m (1.91 - 2.10)
-[Composite, Composite, Camera]  - Focal Length: 42.3mm (35mm equivalent: 167.0mm)
+[Composite, Composite, Image]  - Depth Of Field: 0.19 m (1.91 - 2.10)
+[Composite, Composite, Image]  - Field Of View: 12.0 deg (0.42 m)
+[Composite, Composite, Camera]  - Focal Length: 42.3 mm (35 mm equivalent: 167.0 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 42.01 m
 [Composite, Composite, Image]  - Light Value: 12.5

@@ -116,6 +116,8 @@ they are initialized to '' instead of being deleted.</p>
 
 <tr><td>OPTIONS</td><td>ExifTool options</td></tr>
 
+<tr><td>PDF_CAPTURE</td><td>Used by PDF module to store information when writing</td></tr>
+
 <tr><td>PREVIEW_INFO</td><td>Information about preview image used while writing JPEG
     images only.  This is a reference to a hash with the following entries:
     <table class='clear'>
@@ -149,6 +151,8 @@ they are initialized to '' instead of being deleted.</p>
     are found.  May start with a '+' sign to add to existing group name</td></tr>
 
 <tr><td>TAG_INFO</td><td>Hash of tagInfo hash references, keyed by tag key</td></tr>
+
+<tr><td>TAGS_FROM_FILE</td><td>Flag used during extraction when called from SetNewValuesFromFile()</td></tr>
 
 <tr><td>TIFF_END</td><td>Location of end of regular TIFF file set by WriteExif()</td></tr>
 

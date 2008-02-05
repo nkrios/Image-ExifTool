@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Writer_13_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 4 kB
@@ -26,7 +26,7 @@
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:11:10 17:39:26
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
-[EXIF, ExifIFD, Camera] 37386 - Focal Length: 24.0mm
+[EXIF, ExifIFD, Camera] 37386 - Focal Length: 24.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
@@ -35,7 +35,7 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: High
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
-[MakerNotes, Canon, Camera] 2 - Self-timer: Off
+[MakerNotes, Canon, Camera] 2 - Self Timer: Off
 [MakerNotes, Canon, Camera] 3 - Quality: RAW
 [MakerNotes, Canon, Camera] 4 - Canon Flash Mode: On
 [MakerNotes, Canon, Camera] 5 - Continuous Drive: Continuous
@@ -46,15 +46,15 @@
 [MakerNotes, Canon, Camera] 12 - Digital Zoom: Unknown (-1)
 [MakerNotes, Canon, Camera] 13 - Contrast: +1
 [MakerNotes, Canon, Camera] 14 - Saturation: +1
-[MakerNotes, Canon, Camera] 15 - Sharpness: +1
+[MakerNotes, Canon, Camera] 15 - Sharpness: 1
 [MakerNotes, Canon, Camera] 16 - Camera ISO: n/a
 [MakerNotes, Canon, Camera] 17 - Metering Mode: Evaluative
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 19 - AF Point: Manual AF point selection
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Program AE
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
-[MakerNotes, Canon, Camera] 23 - Long Focal: 55mm
-[MakerNotes, Canon, Camera] 24 - Short Focal: 18mm
+[MakerNotes, Canon, Camera] 23 - Long Focal: 55 mm
+[MakerNotes, Canon, Camera] 24 - Short Focal: 18 mm
 [MakerNotes, Canon, Camera] 25 - Focal Units: 1
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 3.6
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 22
@@ -64,9 +64,9 @@
 [MakerNotes, Canon, Camera] 37 - Zoom Target Width: 3072
 [MakerNotes, Canon, Camera] 41 - Manual Flash Output: n/a
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
-[MakerNotes, Canon, Image] 1 - Focal Length: 24mm
-[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22mm
-[MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49mm
+[MakerNotes, Canon, Image] 1 - Focal Length: 24 mm
+[MakerNotes, Canon, Image] 2 - Focal Plane X Size: 23.22 mm
+[MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49 mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 100
 [MakerNotes, Canon, Image] 3 - Measured EV: -5.00
@@ -80,6 +80,7 @@
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: +2/3
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
+[MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: 1.42
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 1.19
 [MakerNotes, Canon, Image] 21 - F Number: 3.6
@@ -88,7 +89,7 @@
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
-[MakerNotes, Canon, Image] 29 - Self-timer 2: 0
+[MakerNotes, Canon, Image] 29 - Self Timer 2: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
 [MakerNotes, Canon, Camera] 8 - File Number: 116-1602
@@ -106,6 +107,7 @@
 [MakerNotes, Canon, Camera] 8 - AF Area X Positions: 1014 608 0 0 0 -608 -1014
 [MakerNotes, Canon, Camera] 9 - AF Area Y Positions: 0 0 -506 0 506 0 0
 [MakerNotes, Canon, Camera] 10 - AF Points In Focus: 3
+[MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 1
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
@@ -121,7 +123,7 @@
 [MakerNotes, Canon, Camera] 32 - WB RGGB Levels Kelvin: 1722 832 831 988
 [MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
-[XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0mm
+[XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 2048
@@ -132,7 +134,7 @@
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Camera]  - Flash Type: Built-In Flash
 [Composite, Composite, Camera]  - ISO: 100
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
 [Composite, Composite, Camera]  - Red Eye Reduction: Off
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Program AE
@@ -141,9 +143,10 @@
 [Composite, Composite, Camera]  - WB RGGB Levels: 1740 832 831 931
 [Composite, Composite, Camera]  - Blue Balance: 1.119663
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.019 mm
-[Composite, Composite, Camera]  - Focal Length: 24.0mm (35mm equivalent: 37.2mm)
+[Composite, Composite, Image]  - Field Of View: 51.6 deg
+[Composite, Composite, Camera]  - Focal Length: 24.0 mm (35 mm equivalent: 37.2 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 8.25 m
 [Composite, Composite, Image]  - Image Size: 8x8
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0mm (35mm equivalent: 27.9 - 85.3mm)
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm (35mm equivalent: 27.9 - 85.3 mm)
 [Composite, Composite, Image]  - Light Value: 9.7
 [Composite, Composite, Camera]  - Red Balance: 2.092604

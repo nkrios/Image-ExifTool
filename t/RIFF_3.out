@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.44
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
 [File, File, Image]  - File Name: RIFF.avi
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 390 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:09:29 07:06:20
+[File, File, Time]  - File Modification Date/Time: 2006:09:29 10:06:20
 [File, File, Image]  - File Type: AVI
 [File, File, Image]  - MIME Type: video/avi
 [RIFF, RIFF, Video] 0 - Frame Rate: 15
@@ -36,5 +36,5 @@
 [BMP, BMP, Image] 28 - Pixels Per Meter Y: 0
 [BMP, BMP, Image] 32 - Num Colors: Use BitDepth
 [BMP, BMP, Image] 36 - Num Important Colors: All
-[Composite, Composite, Other]  - Duration: 15.53s
+[Composite, Composite, Other]  - Duration: 15.53 s
 [Composite, Composite, Image]  - Image Size: 320x240

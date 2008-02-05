@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..18\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..23\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -162,7 +162,6 @@ my $testnum = 1;
         my $testfile = "t/${testname}_${testnum}_failed.xmp";
         unlink $testfile;
         $exifTool->SetNewValue('XMP:Author' => 'Phil');
-        my $image;
         $exifTool->WriteInfo("t/images/$file", $testfile);
         print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
         print "ok $testnum\n";
@@ -186,11 +185,64 @@ my $testnum = 1;
         my $exifTool = new Image::ExifTool;
         my $testfile = "t/${testname}_${testnum}_failed.xmp";
         unlink $testfile;
-        print 'not ' unless writeCheck($writeListRef, $testname, $testnum, 't/images/XMP.xmp',
-                                       [ 'XMP-dc:*' ]);
+        print 'not ' unless writeCheck($writeListRef, $testname, $testnum,
+                                       't/images/XMP.xmp', ['XMP-dc:*']);
         print "ok $testnum\n";
     }
 }
 
+# test 19: Delete some family 1 XMP groups
+{
+    ++$testnum;
+    my @writeInfo = (
+        [ 'xmp-xmpmm:all' => undef ],
+        [ 'XMP-PHOTOSHOP:all' => undef ],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/IPTC-XMP.jpg', ['XMP:all']);
+    print "ok $testnum\n";
+}
+
+# test 20-21: Copy from XMP to EXIF with and without PrintConv enabled
+{
+    my $exifTool = new Image::ExifTool;
+    while ($testnum < 21) {
+        ++$testnum;
+        my $testfile = "t/${testname}_${testnum}_failed.jpg";
+        unlink $testfile;
+        $exifTool->SetNewValue();
+        $exifTool->SetNewValuesFromFile('t/images/XMP.xmp', 'XMP:all>EXIF:all');
+        $exifTool->WriteInfo("t/images/Writer.jpg", $testfile);
+        my $info = $exifTool->ImageInfo($testfile, 'EXIF:all');
+        if (check($exifTool, $info, $testname, $testnum)) {
+            unlink $testfile;
+        } else {
+            print 'not ';
+        }
+        print "ok $testnum\n";
+        $exifTool->Options(PrintConv => 0);
+    }
+}
+
+# test 22-23: Copy from EXIF to XMP with and without PrintConv enabled
+{
+    my $exifTool = new Image::ExifTool;
+    while ($testnum < 23) {
+        ++$testnum;
+        my $testfile = "t/${testname}_${testnum}_failed.xmp";
+        unlink $testfile;
+        $exifTool->SetNewValue();
+        $exifTool->SetNewValuesFromFile('t/images/Canon.jpg', 'EXIF:* > XMP:*');
+        $exifTool->WriteInfo(undef, $testfile);
+        my $info = $exifTool->ImageInfo($testfile, 'XMP:*');
+        if (check($exifTool, $info, $testname, $testnum)) {
+            unlink $testfile;
+        } else {
+            print 'not ';
+        }
+        print "ok $testnum\n";
+        $exifTool->Options(PrintConv => 0);
+    }
+}
 
 # end

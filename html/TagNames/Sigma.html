@@ -144,29 +144,49 @@ These tags are used in Sigma/Foveon cameras.
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x001a</td>
+<td>PreviewImageStart</td>
+<td class=c>int32u*</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x001b</td>
+<td>PreviewImageLength</td>
+<td class=c>int32u*</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x001c</td>
+<td>PreviewImageSize</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x001d</td>
 <td>MakerNoteVersion</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0022</td>
 <td>AdjustmentMode?</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0030</td>
 <td>LensApertureRange</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0031</td>
 <td>FNumber</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0032</td>
 <td>ExposureTime</td>
 <td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0033</td>
+<td>ExposureTime2</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0035</td>
@@ -192,7 +212,7 @@ These tags are used in Sigma/Foveon cameras.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 20, 2007</i>
+<br><i>Last revised Feb 5, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

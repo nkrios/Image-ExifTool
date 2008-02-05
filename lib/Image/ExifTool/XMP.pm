@@ -16,6 +16,7 @@
 #               3) http://www.portfoliofaq.com/pfaq/v7mappings.htm
 #               4) http://www.iptc.org/IPTC4XMP/
 #               5) http://creativecommons.org/technology/xmp
+#                  --> changed to http://wiki.creativecommons.org/Companion_File_metadata_specification (2007/12/21)
 #               6) http://www.optimasc.com/products/fileid/xmp-extensions.pdf
 #               7) Lou Salkind private communication
 #               8) http://partners.adobe.com/public/developer/en/xmp/sdk/XMPspecification.pdf
@@ -35,12 +36,12 @@
 package Image::ExifTool::XMP;
 
 use strict;
-use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK);
+use vars qw($VERSION $AUTOLOAD @ISA @EXPORT_OK $xlatNamespace %nsURI);
 use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.78';
+$VERSION = '1.82';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -52,6 +53,66 @@ sub SaveBlankInfo($$$;$);
 sub ProcessBlankInfo($$$;$);
 sub ValidateXMP($;$);
 sub UnescapeChar($$);
+
+# lookup for translating namespaces
+# Note: Use $xlatNamespace (only valid during processing) to do the translation
+my %stdXlatNS = (
+    # shorten ugly IPTC Core namespace prefix
+    'Iptc4xmpCore' => 'iptcCore',
+    'photomechanic'=> 'photomech',
+    'MicrosoftPhoto' => 'microsoft',
+);
+
+# Lookup to translate our namespace prefixes into URI's.  This list need
+# not be complete, but it must contain an entry for each namespace prefix
+# (NAMESPACE) for writable tags in the XMP tables or in the %xmpStruct table
+%nsURI = (
+    aux       => 'http://ns.adobe.com/exif/1.0/aux/',
+    cc        => 'http://creativecommons.org/ns#', # changed 2007/12/21 - PH
+    crs       => 'http://ns.adobe.com/camera-raw-settings/1.0/',
+    crss      => 'http://ns.adobe.com/camera-raw-saved-settings/1.0/',
+    dc        => 'http://purl.org/dc/elements/1.1/',
+    exif      => 'http://ns.adobe.com/exif/1.0/',
+    iX        => 'http://ns.adobe.com/iX/1.0/',
+    pdf       => 'http://ns.adobe.com/pdf/1.3/',
+    pdfx      => 'http://ns.adobe.com/pdfx/1.3/',
+    photoshop => 'http://ns.adobe.com/photoshop/1.0/',
+    rdf       => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+    rdfs      => 'http://www.w3.org/2000/01/rdf-schema#',
+    stDim     => 'http://ns.adobe.com/xap/1.0/sType/Dimensions#',
+    stEvt     => 'http://ns.adobe.com/xap/1.0/sType/ResourceEvent#',
+    stFnt     => 'http://ns.adobe.com/xap/1.0/sType/Font#',
+    stJob     => 'http://ns.adobe.com/xap/1.0/sType/Job#',
+    stRef     => 'http://ns.adobe.com/xap/1.0/sType/ResourceRef#',
+    stVer     => 'http://ns.adobe.com/xap/1.0/sType/Version#',
+    tiff      => 'http://ns.adobe.com/tiff/1.0/',
+   'x'        => 'adobe:ns:meta/',
+    xapG      => 'http://ns.adobe.com/xap/1.0/g/',
+    xapGImg   => 'http://ns.adobe.com/xap/1.0/g/img/',
+    xmp       => 'http://ns.adobe.com/xap/1.0/',
+    xmpBJ     => 'http://ns.adobe.com/xap/1.0/bj/',
+    xmpDM     => 'http://ns.adobe.com/xmp/1.0/DynamicMedia/',
+    xmpMM     => 'http://ns.adobe.com/xap/1.0/mm/',
+    xmpRights => 'http://ns.adobe.com/xap/1.0/rights/',
+    xmpTPg    => 'http://ns.adobe.com/xap/1.0/t/pg/',
+    xmpidq    => 'http://ns.adobe.com/xmp/Identifier/qual/1.0/',
+    xmpPLUS   => 'http://ns.adobe.com/xap/1.0/PLUS/',
+    dex       => 'http://ns.optimasc.com/dex/1.0/',
+    mediapro  => 'http://ns.iview-multimedia.com/mediapro/1.0/',
+    Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
+    MicrosoftPhoto => 'http://ns.microsoft.com/photo/1.0',
+    lr        => 'http://ns.adobe.com/lightroom/1.0/',
+    DICOM     => 'http://ns.adobe.com/DICOM/',
+);
+
+# build reverse namespace lookup
+my %uri2ns;
+{
+    my $ns;
+    foreach $ns (keys %nsURI) {
+        $uri2ns{$nsURI{$ns}} = $ns;
+    }
+}
 
 # conversions for GPS coordinates
 sub ToDegrees
@@ -80,27 +141,16 @@ my %longConv = (
     PrintConvInv => \&ToDegrees,
 );
 my %dateTimeInfo = (
-    Groups => { 2 => 'Time'   },
+    # NOTE: Do NOT put "Groups" here because Groups hash must not be common!
     Writable => 'date',
     Shift => 'Time',
     PrintConv => '$self->ConvertDateTime($val)',
+    PrintConvInv => '$self->InverseDateTime($val,1,1)',
 );
 
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
-my %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1);
-
-# translate XMP namespaces when reading
-my %xlatNamespace = (
-    # shorten ugly IPTC Core namespace prefix
-    'Iptc4xmpCore' => 'iptcCore',
-    'photomechanic'=> 'photomech',
-    'MicrosoftPhoto' => 'microsoft',
-    # also translate older 'xap...' prefixes to 'xmp...'
-    'xap'          => 'xmp',
-    'xapBJ'        => 'xmpBJ',
-    'xapMM'        => 'xmpMM',
-    'xapRights'    => 'xmpRights',
-);
+# (Note: namespaces with non-standard prefixes aren't currently ignored)
+my %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1 );
 
 # these are the attributes that we handle for properties that contain
 # sub-properties.  Attributes for simple properties are easy, and we
@@ -238,7 +288,7 @@ my %xmpTableDefaults = (
     contributor => { Groups => { 2 => 'Author' }, List => 'Bag' },
     coverage    => { },
     creator     => { Groups => { 2 => 'Author' }, List => 'Seq' },
-    date        => { %dateTimeInfo, List => 'Seq' },
+    date        => { Groups => { 2 => 'Time' },   List => 'Seq', %dateTimeInfo },
     description => { Groups => { 2 => 'Image'  }, Writable => 'lang-alt' },
    'format'     => { Groups => { 2 => 'Image'  } },
     identifier  => { Groups => { 2 => 'Image'  } },
@@ -264,12 +314,12 @@ my %xmpTableDefaults = (
     },
     Advisory    => { List => 'Bag' },
     BaseURL     => { },
-    CreateDate  => { %dateTimeInfo },
+    CreateDate  => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     CreatorTool => { },
     Identifier  => { Avoid => 1, List => 'Bag' },
     Label       => { },
-    MetadataDate=> { %dateTimeInfo },
-    ModifyDate  => { %dateTimeInfo },
+    MetadataDate=> { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    ModifyDate  => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     Nickname    => { },
     Rating      => { Writable => 'integer' },
     Thumbnails  => {
@@ -333,7 +383,7 @@ my %xmpTableDefaults = (
     HistoryInstanceID       => { List => 1 },
     HistoryParameters       => { List => 1 },
     HistorySoftwareAgent    => { List => 1 },
-    HistoryWhen             => { List => 1, %dateTimeInfo },
+    HistoryWhen             => { List => 1, Groups => { 2 => 'Time' }, %dateTimeInfo },
     InstanceID      => { }, #PH (CS3)
     ManagedFrom     => { SubDirectory => { }, Struct => 'ResourceRef' },
     ManagedFromInstanceID       => { },
@@ -364,8 +414,8 @@ my %xmpTableDefaults = (
     VersionsEventInstanceID     => { List => 1 },
     VersionsEventParameters     => { List => 1 },
     VersionsEventSoftwareAgent  => { List => 1 },
-    VersionsEventWhen           => { List => 1, %dateTimeInfo },
-    VersionsModifyDate          => { List => 1, %dateTimeInfo },
+    VersionsEventWhen           => { List => 1, Groups => { 2 => 'Time' }, %dateTimeInfo },
+    VersionsModifyDate          => { List => 1, Groups => { 2 => 'Time' }, %dateTimeInfo },
     VersionsModifier            => { List => 1 },
     VersionsVersion             => { List => 1 },
     LastURL                     => { },
@@ -515,7 +565,7 @@ my %xmpTableDefaults = (
     duration            => { },
     scene               => { Avoid => 1 },
     shotName            => { },
-    shotDate            => { %dateTimeInfo },
+    shotDate            => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     shotLocation        => { },
     logComment          => { },
     markers => {
@@ -543,15 +593,15 @@ my %xmpTableDefaults = (
     contributedMediaWebStatement => { List => 1 },
     absPeakAudioFilePath => { },
     relativePeakAudioFilePath => { },
-    videoModDate    => { %dateTimeInfo },
-    audioModDate    => { %dateTimeInfo },
-    metadataModDate => { %dateTimeInfo },
+    videoModDate    => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    audioModDate    => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    metadataModDate => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     artist          => { Avoid => 1, Groups => { 2 => 'Author' } },
     album           => { },
     trackNumber     => { Writable => 'integer' },
     genre           => { },
     copyright       => { Avoid => 1, Groups => { 2 => 'Author' } },
-    releaseDate     => { %dateTimeInfo },
+    releaseDate     => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     composer        => { Groups => { 2 => 'Author' } },
     engineer        => { },
     tempo           => { Writable => 'real' },
@@ -598,8 +648,8 @@ my %xmpTableDefaults = (
         when writing due to name conflicts with XMP-dc tags.
     },
     Author      => { Groups => { 2 => 'Author' } }, #PH
-    ModDate     => { %dateTimeInfo }, #PH
-    CreationDate=> { %dateTimeInfo }, #PH
+    ModDate     => { Groups => { 2 => 'Time' }, %dateTimeInfo }, #PH
+    CreationDate=> { Groups => { 2 => 'Time' }, %dateTimeInfo }, #PH
     Creator     => { Groups => { 2 => 'Author' }, Avoid => 1 },
     Subject     => { Avoid => 1 },
     Title       => { Avoid => 1 },
@@ -621,7 +671,7 @@ my %xmpTableDefaults = (
     Country         => { Groups => { 2 => 'Location' } },
     ColorMode       => { }, #PH
     Credit          => { Groups => { 2 => 'Author' } },
-    DateCreated     => { %dateTimeInfo },
+    DateCreated     => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     History         => { }, #PH (CS3)
     Headline        => { },
     Instructions    => { },
@@ -772,6 +822,7 @@ my %xmpTableDefaults = (
     ImageWidth  => { Writable => 'integer' },
     ImageLength => {
         Name => 'ImageHeight',
+        Notes => 'called ImageLength in the XMP specification',
         Writable => 'integer',
     },
     BitsPerSample => { Writable => 'integer', List => 'Seq' },
@@ -829,6 +880,7 @@ my %xmpTableDefaults = (
     ReferenceBlackWhite   => { Writable => 'rational', List => 'Seq' },
     DateTime => {
         Description => 'Date/Time Modified',
+        Groups => { 2 => 'Time' },
         %dateTimeInfo,
     },
     ImageDescription => { Writable => 'lang-alt' },
@@ -881,10 +933,12 @@ my %xmpTableDefaults = (
     },
     PixelXDimension => {
         Name => 'ExifImageWidth',
+        Notes => 'called PixelXDimension by the XMP spec',
         Writable => 'integer',
     },
     PixelYDimension => {
-        Name => 'ExifImageLength',
+        Name => 'ExifImageHeight',
+        Notes => 'called PixelYDimension by the XMP spec',
         Writable => 'integer',
     },
     MakerNote => { },
@@ -894,10 +948,12 @@ my %xmpTableDefaults = (
     RelatedSoundFile => { },
     DateTimeOriginal => {
         Description => 'Date/Time Original',
+        Groups => { 2 => 'Time' },
         %dateTimeInfo,
     },
     DateTimeDigitized => {
         Description => 'Date/Time Digitized',
+        Groups => { 2 => 'Time' },
         %dateTimeInfo,
     },
     ExposureTime => {
@@ -1049,8 +1105,8 @@ my %xmpTableDefaults = (
     FocalLength=> {
         Groups => { 2 => 'Camera' },
         Writable => 'rational',
-        PrintConv => 'sprintf("%.1fmm",$val)',
-        PrintConvInv => '$val=~s/mm$//;$val',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     SubjectArea => {
         Writable => 'integer',
@@ -1263,7 +1319,17 @@ my %xmpTableDefaults = (
         PrintConv => '$val eq "inf" ? $val : "$val m"',
         PrintConvInv => '$val=~s/\s*m$//;$val',
     },
-    GPSTimeStamp    => { %dateTimeInfo },
+    GPSTimeStamp => {
+        Name => 'GPSDateTime',
+        Groups => { 2 => 'Time' },
+        Notes => q{
+            a date/time tag called GPSTimeStamp by the XMP specification.  This tag is
+            renamed here to prevent direct copy from EXIF:GPSTimeStamp which is a
+            time-only tag.  Instead, the value of this tag should be taken from
+            Composite:GPSDateTime when copying from EXIF
+        },
+        %dateTimeInfo,
+    },
     GPSSatellites   => { Groups => { 2 => 'Location' } },
     GPSStatus => {
         Groups => { 2 => 'Location' },
@@ -1502,7 +1568,7 @@ my %xmpTableDefaults = (
         "XMP-microsoft" in the family 1 group name.
     },
     CameraSerialNumber => { },
-    DateAcquired       => { %dateTimeInfo },
+    DateAcquired       => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     FlashManufacturer  => { },
     FlashModel         => { },
     LastKeywordIPTC    => { List => 'Bag' },
@@ -1540,15 +1606,16 @@ my %xmpTableDefaults = (
     PatientSex              => { Name => 'PatientsSex' },
     PatientDOB              => {
         Name => 'PatientsBirthDate',
+        Groups => { 2 => 'Time' },
         %dateTimeInfo,
     },
     StudyID                 => { },
     StudyPhysician          => { },
-    StudyDateTime           => { %dateTimeInfo },
+    StudyDateTime           => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     StudyDescription        => { },
     SeriesNumber            => { },
     SeriesModality          => { },
-    SeriesDateTime          => { %dateTimeInfo },
+    SeriesDateTime          => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     SeriesDescription       => { },
     EquipmentInstitution    => { },
     EquipmentManufacturer   => { },
@@ -1706,7 +1773,7 @@ sub GetXMPTagID($)
         } else {
             # all uppercase is ugly, so convert it
             if ($nm !~ /[a-z]/) {
-                my $xlatNS = $xlatNamespace{$ns} || $ns;
+                my $xlatNS = $$xlatNamespace{$ns} || $ns;
                 my $info = $Image::ExifTool::XMP::Main{$xlatNS};
                 my $table;
                 if (ref $info eq 'HASH' and $info->{SubDirectory}) {
@@ -1831,7 +1898,7 @@ sub FoundXMP($$$$;$)
     return 0 unless $tag;   # ignore things that aren't valid tags
 
     # translate namespace if necessary
-    $namespace = $xlatNamespace{$namespace} if $xlatNamespace{$namespace};
+    $namespace = $$xlatNamespace{$namespace} if $$xlatNamespace{$namespace};
     my $info = $tagTablePtr->{$namespace};
     my $table;
     if ($info) {
@@ -1993,10 +2060,22 @@ sub ParseXMPElement($$$;$$$)
                 $ns = '';
                 $name = $propName;
             }
+            # keep track of the namespace prefixes used
+            if ($ns eq 'xmlns') {
+                my $stdNS = $uri2ns{$attrs{$shortName}};
+                # translate namespace if non-standard (except 'x' and 'iX')
+                if ($stdNS and $name ne $stdNS and $stdNS ne 'x' and $stdNS ne 'iX') {
+                    # make a copy of the standard translations so we can modify it
+                    $xlatNamespace = { %stdXlatNS } if $xlatNamespace eq \%stdXlatNS;
+                    # translate this namespace prefix to the standard version
+                    $$xlatNamespace{$name} = $stdXlatNS{$stdNS} || $stdNS;
+                }
+            }
             if ($isWriting) {
                 # keep track of our namespaces when writing
                 if ($ns eq 'xmlns') {
-                    unless ($name eq 'x' or $name eq 'iX') {
+                    my $stdNS = $uri2ns{$attrs{$shortName}};
+                    unless ($stdNS and ($stdNS eq 'x' or $stdNS eq 'iX')) {
                         my $nsUsed = $exifTool->{XMP_NS};
                         $$nsUsed{$name} = $attrs{$shortName} unless defined $$nsUsed{$name};
                     }
@@ -2085,15 +2164,17 @@ sub ProcessXMP($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my $dirStart = $$dirInfo{DirStart} || 0;
-    my $dirLen = $$dirInfo{DirLen};
-    my $dataLen = $$dirInfo{DataLen};
+    my ($dirStart, $dirLen, $dataLen);
+    my ($buff, $fmt, $isXML);
     my $rtnVal = 0;
     my $bom = 0;
-    my ($buff, $fmt, $isXML);
 
-    # read information from XMP file if necessary
-    unless ($dataPt) {
+    if ($dataPt) {
+        $dirStart = $$dirInfo{DirStart} || 0;
+        $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $dirStart);
+        $dataLen = $$dirInfo{DataLen} || length($$dataPt);
+    } else {
+        # read information from XMP file
         my $raf = $$dirInfo{RAF} or return 0;
         $raf->Read($buff, 128) or return 0;
         my ($buf2, $double);
@@ -2161,7 +2242,7 @@ sub ProcessXMP($$;$)
         $dirLen = $dataLen = $size;
         $exifTool->SetFileType();
     }
-   
+
     # take substring if necessary
     if ($dataLen != $dirStart + $dirLen) {
         $buff = substr($$dataPt, $dirStart, $dirLen);
@@ -2225,6 +2306,9 @@ sub ProcessXMP($$;$)
         $dataPt = \$buff;
         $dirStart = 0;
     }
+    # initialize namespace translation
+    $xlatNamespace = \%stdXlatNS;
+
     # avoid scanning for XMP later in case ScanForXMP is set
     $$exifTool{FoundXMP} = 1;
 
@@ -2260,7 +2344,7 @@ information.
 
 =head1 AUTHOR
 
-Copyright 2003-2007, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

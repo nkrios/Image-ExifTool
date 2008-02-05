@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.83
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
 [File, File, Image]  - File Name: Sigma.x3f
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1464 bytes
@@ -44,13 +44,14 @@
 [SigmaRaw, SigmaRaw, Camera] AP_DESC - Aperture Displayed: 8
 [SigmaRaw, SigmaRaw, Camera] LENSARANGE - Lens Aperture Range: 29 to 4.5
 [SigmaRaw, SigmaRaw, Camera] LENSFRANGE - Lens Focal Range: 15 to 30
-[SigmaRaw, SigmaRaw, Camera] FLENGTH - Focal Length: 30.0mm
+[SigmaRaw, SigmaRaw, Camera] FLENGTH - Focal Length: 30.0 mm
 [SigmaRaw, SigmaRaw, Camera] FLEQ35MM - Focal Length In 35mm Format: 51
 [Composite, Composite, Image]  - Aperture: 8.4
 [Composite, Composite, Image]  - Image Size: 2268x1512
 [Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.7
 [Composite, Composite, Image]  - Shutter Speed: 1/108
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.018 mm
-[Composite, Composite, Camera]  - Focal Length: 30.0mm (35mm equivalent: 51.0mm)
+[Composite, Composite, Image]  - Field Of View: 38.9 deg
+[Composite, Composite, Camera]  - Focal Length: 30.0 mm (35 mm equivalent: 51.0 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 6.10 m
 [Composite, Composite, Image]  - Light Value: 12.9
