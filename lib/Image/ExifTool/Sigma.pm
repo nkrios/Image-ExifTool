@@ -50,7 +50,7 @@ $VERSION = '1.05';
     0x000c => [
         {
             Name => 'ExposureCompensation',
-            Condition => '$$self{CameraModel} !~ /SD14$/',
+            Condition => '$$self{Model} !~ /SD14$/',
             ValueConv => '$val =~ s/Expo:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Expo:%+.1f",$val) : undef',
         },
@@ -63,7 +63,7 @@ $VERSION = '1.05';
     0x000d => [
         {
             Name => 'Contrast',
-            Condition => '$$self{CameraModel} !~ /SD14$/',
+            Condition => '$$self{Model} !~ /SD14$/',
             ValueConv => '$val =~ s/Cont:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Cont:%+.1f",$val) : undef',
         },
@@ -75,7 +75,7 @@ $VERSION = '1.05';
     0x000e => [
         {
             Name => 'Shadow',
-            Condition => '$$self{CameraModel} !~ /SD14$/',
+            Condition => '$$self{Model} !~ /SD14$/',
             ValueConv => '$val =~ s/Shad:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Shad:%+.1f",$val) : undef',
         },
@@ -87,7 +87,7 @@ $VERSION = '1.05';
     0x000f => [
         {
             Name => 'Highlight',
-            Condition => '$$self{CameraModel} !~ /SD14$/',
+            Condition => '$$self{Model} !~ /SD14$/',
             ValueConv => '$val =~ s/High:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("High:%+.1f",$val) : undef',
         },
@@ -99,7 +99,7 @@ $VERSION = '1.05';
     0x0010 => [
         {
             Name => 'Saturation',
-            Condition => '$$self{CameraModel} !~ /SD14$/',
+            Condition => '$$self{Model} !~ /SD14$/',
             ValueConv => '$val =~ s/Satu:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Satu:%+.1f",$val) : undef',
         },
@@ -111,7 +111,7 @@ $VERSION = '1.05';
     0x0011 => [
         {
             Name => 'Sharpness',
-            Condition => '$$self{CameraModel} !~ /SD14$/',
+            Condition => '$$self{Model} !~ /SD14$/',
             ValueConv => '$val =~ s/Shar:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Shar:%+.1f",$val) : undef',
         },
@@ -123,7 +123,7 @@ $VERSION = '1.05';
     0x0012 => [
         {
             Name => 'X3FillLight',
-            Condition => '$$self{CameraModel} !~ /SD14$/',
+            Condition => '$$self{Model} !~ /SD14$/',
             ValueConv => '$val =~ s/Fill:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Fill:%+.1f",$val) : undef',
         },
@@ -135,7 +135,7 @@ $VERSION = '1.05';
     0x0014 => [
         {
             Name => 'ColorAdjustment',
-            Condition => '$$self{CameraModel} !~ /SD14$/',
+            Condition => '$$self{Model} !~ /SD14$/',
             ValueConv => '$val =~ s/CC:\s*//, $val',
             ValueConvInv => 'IsInt($val) ? "CC:$val" : undef',
         },

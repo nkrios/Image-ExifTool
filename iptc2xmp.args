@@ -5,7 +5,9 @@
 #
 # Usage:        exiftool -tagsFromFile src.jpg -@ iptc2xmp.args dst.jpg
 #
-# Author:       2005/05/14 - P. Harvey
+# Revisions:    2005/05/14 - P. Harvey Created
+#				2008/03/04 - PH Changed Location translation and added
+#							 IntellectualGenre and SubjectCode
 #
 # References:   http://www.iptc.org/IPTC4XMP/
 #               http://www.iptc.org/IIM/
@@ -38,5 +40,8 @@
 -IPTC:Caption-Abstract > XMP-dc:Description
 -IPTC:Writer-Editor > XMP-photoshop:CaptionWriter
 -IPTC:Country-PrimaryLocationCode > XMP-iptcCore:CountryCode
--IPTC:ContentLocationName > XMP-iptcCore:Location
+-IPTC:Sub-location > XMP-iptcCore:Location
+# these tags are not free-form text, and may need special handling:
+#-IPTC:ObjectAttributeReference > XMP-iptcCore:IntellectualGenre
+#-IPTC:SubjectReference > XMP-iptcCore:SubjectCode
 # end

@@ -43,7 +43,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.82';
+$VERSION = '1.85';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -104,6 +104,7 @@ my %nikonLensIDs = (
     '2F 48 30 44 24 24 29 02' => 'AF Zoom-Nikkor 20-35mm f/2.8D IF',
     '31 54 56 56 24 24 25 02' => 'AF Micro-Nikkor 60mm f/2.8D',
     '32 54 6A 6A 24 24 35 02' => 'AF Micro-Nikkor 105mm f/2.8D',
+  # '32 54 6A 6A 24 24 35 02' => 'Sigma MACRO 105mm f/2.8 EX DG', #19
     '33 48 2D 2D 24 24 31 02' => 'AF Nikkor 18mm f/2.8D',
     '34 48 29 29 24 24 32 02' => 'AF Fisheye Nikkor 16mm f/2.8D',
     '36 48 37 37 24 24 34 02' => 'AF Nikkor 24mm f/2.8D',
@@ -328,7 +329,7 @@ my %retouchValues = (
 # Nikon maker note tags
 %Image::ExifTool::Nikon::Main = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
-    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikon,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -487,7 +488,6 @@ my %retouchValues = (
         Name => 'SerialNumber',
         Writable => 0,
         Notes => 'Not writable because this value is used as a key to decrypt other information',
-        RawConv => '$self->{NikonInfo}->{SerialNumber} = $val',
     },
     0x001e => { #14
         Name => 'ColorSpace',
@@ -524,7 +524,10 @@ my %retouchValues = (
     # 00 3c 00 02 (D300), fe d4 00 01 (D300), 00 00 00 00 (D300), 02 1c 00 00 (D3)
     0x0025 => { #PH
         Name => 'ISOInfo',
-        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::ISOInfo' },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::ISOInfo',
+            ByteOrder => 'BigEndian', #(NC)
+        },
     },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
     0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
@@ -583,12 +586,23 @@ my %retouchValues = (
             9 => 'Fired, TTL Mode',
         },
     },
-    0x0088 => {
-        Name => 'AFInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Nikon::AFInfo',
+    0x0088 => [
+        {
+            Name => 'AFInfo',
+            Condition => '$$self{Model} =~ /^NIKON D/i',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::AFInfo',
+                ByteOrder => 'BigEndian',
+            },
         },
-    },
+        {
+            Name => 'AFInfo',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::AFInfo',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+    ],
     0x0089 => { #5
         Name => 'ShootingMode',
         Writable => 'int16u',
@@ -612,7 +626,7 @@ my %retouchValues = (
                 1 => 'Delay',
                 2 => 'PC Control',
                 4 => 'Exposure Bracketing',
-                5 => $$self{CameraModel}=~/D70\b/ ? 'Unused LE-NR Slowdown' : 'Auto ISO',
+                5 => $$self{Model}=~/D70\b/ ? 'Unused LE-NR Slowdown' : 'Auto ISO',
                 6 => 'White-Balance Bracketing',
                 7 => 'IR Control',
             });
@@ -638,7 +652,7 @@ my %retouchValues = (
         Count => 4,
     },
     0x008c => {
-        Name => 'NEFCurve1',
+        Name => 'ContrastCurve', #19
         Writable => 0,
         Binary => 1,
     },
@@ -654,23 +668,34 @@ my %retouchValues = (
         {
             Condition => '$$valPt =~ /^0208/',
             Name => 'ShotInfo0208',
-            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ShotInfo0208',
-                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 4,
                 DecryptLen => 764,
+                # (Capture NX can change the makernote byte order, but this stays big-endian)
+                ByteOrder => 'BigEndian',
+            },
+        },
+        { #PH
+            Condition => '$$valPt =~ /^0209/',
+            Name => 'ShotInfo0209',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ShotInfo0209',
+                DecryptStart => 4,
+                DecryptLen => 748,
+                ByteOrder => 'BigEndian',
             },
         },
         {
             Condition => '$$valPt =~ /^02/',
             Name => 'ShotInfo02xx',
-            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ShotInfo',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 4,
-                DecryptLen => 0x1ae,
+                DecryptLen => 0x279,
+                ByteOrder => 'BigEndian',
             },
         },
         {
@@ -680,6 +705,7 @@ my %retouchValues = (
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ShotInfo',
                 DirOffset => 4,
+                ByteOrder => 'BigEndian',
             },
         },
     ],
@@ -701,11 +727,12 @@ my %retouchValues = (
     0x0094 => { Name => 'Saturation',       Writable => 'int16s' },
     0x0095 => { Name => 'NoiseReduction',   Writable => 'string' },
     0x0096 => {
-        Name => 'NEFCurve2',
+        Name => 'LinearizationTable', # same table as DNG LinearizationTable (ref 19)
         Writable => 0,
         Binary => 1,
     },
     0x0097 => [ #4
+        # (NOTE: these are byte-swapped by NX when byte order changes)
         {
             Condition => '$$valPt =~ /^0100/', # (D100)
             Name => 'ColorBalance0100',
@@ -735,22 +762,34 @@ my %retouchValues = (
         {
             Condition => '$$valPt =~ /^0205/', # (D50)
             Name => 'ColorBalance0205',
-            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 4,
                 DecryptLen => 22, # 284 bytes encrypted, but don't need to decrypt it all
                 DirOffset => 14,
             },
         },
         {
+            Condition => '$$valPt =~ /^0209/', # (D3)
+            Name => 'ColorBalance0209',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance4',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 284,
+                DecryptLen => 18, # but don't need to decrypt it all
+                DirOffset => 10,
+            },
+        },
+        {
             Condition => '$$valPt =~ /^02/', # (D2X=0204,D2Hs=0206,D200=0207,D40=0208)
             Name => 'ColorBalance02',
-            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 284,
                 DecryptLen => 14, # 324 bytes encrypted, but don't need to decrypt it all
                 DirOffset => 6,
@@ -765,16 +804,12 @@ my %retouchValues = (
         { #8
             Condition => '$$valPt =~ /^0100/', # D100, D1X - PH
             Name => 'LensData0100',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Nikon::LensData00',
-            },
+            SubDirectory => { TagTable => 'Image::ExifTool::Nikon::LensData00' },
         },
         { #8
             Condition => '$$valPt =~ /^0101/', # D70, D70s - PH
             Name => 'LensData0101',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Nikon::LensData01',
-            },
+            SubDirectory => { TagTable => 'Image::ExifTool::Nikon::LensData01' },
         },
         # note: this information is encrypted if the version is 02xx
         { #8
@@ -783,10 +818,10 @@ my %retouchValues = (
             # 0203 - D300
             Condition => '$$valPt =~ /^020[1-3]/',
             Name => 'LensData0201',
-            Writable => 0, # can't yet write encrypted data
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensData01',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 4,
             },
         },
@@ -857,12 +892,23 @@ my %retouchValues = (
         Name => 'ShutterCount',
         Writable => 0,
         Notes => 'Not writable because this value is used as a key to decrypt other information',
-        RawConv => '$self->{NikonInfo}->{ShutterCount} = $val',
     },
-    0x00a8 => { #19
-        Name => 'FlashInfo',
-        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::FlashInfo' },
-    },
+    0x00a8 => [#19
+        {
+            Name => 'FlashInfo0100',
+            Condition => '$$valPt =~ /^010[01]/',
+            SubDirectory => { TagTable => 'Image::ExifTool::Nikon::FlashInfo0100' },
+        },
+        {
+            Name => 'FlashInfo0102',
+            Condition => '$$valPt =~ /^0102/',
+            SubDirectory => { TagTable => 'Image::ExifTool::Nikon::FlashInfo0102' },
+        },
+        {
+            Name => 'FlashInfoUnknown',
+            SubDirectory => { TagTable => 'Image::ExifTool::Nikon::FlashInfoUnknown' },
+        },
+    ],
     0x00a9 => { #2
         Name => 'ImageOptimization',
         Writable => 'string',
@@ -875,9 +921,7 @@ my %retouchValues = (
     0x00b0 => { #PH
         Name => 'MultiExposure',
         Condition => '$$valPt =~ /^0100/',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Nikon::MultiExposure',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::MultiExposure' },
     },
     0x00b1 => { #14/PH/19 (D80)
         Name => 'HighISONoiseReduction',
@@ -894,6 +938,10 @@ my %retouchValues = (
     0x00b3 => { #14
         Name => 'ToningEffect',
         Writable => 'string',
+    },
+    0x00b7 => { #19
+        Name => 'AFInfo2',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::AFInfo2' },
     },
     0x0e00 => {
         Name => 'PrintIM',
@@ -1013,9 +1061,11 @@ my %retouchValues = (
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0 => {
         Name => 'VRInfoVersion',
         Format => 'undef[4]',
+        Writable => 0,
     },
     4 => {
         Name => 'VibrationReduction',
@@ -1036,9 +1086,11 @@ my %retouchValues = (
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0 => {
         Name => 'PictureControlVersion',
         Format => 'undef[4]',
+        Writable => 0,
     },
     4 => {
         Name => 'PictureControlName',
@@ -1301,6 +1353,28 @@ my %retouchValues = (
     },
 );
 
+# Nikon AF information for D3 and D300 (ref 19)
+%Image::ExifTool::Nikon::AFInfo2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
+    0 => {
+        Name => 'AFInfo2Version',
+        Format => 'undef[4]',
+        Writable => 0,
+    },
+    8 => {
+        Name => 'AFPointsUsed',
+        Format => 'undef[7]',
+        Notes => 'D3/D300 AF points -- 5 rows: A1-9, B1-11, C1-11, D1-11, E1-9, center point is C6',
+        PrintConv => 'Image::ExifTool::Nikon::PrintAFPointsD3($val)',
+    },
+);
+
 # ref PH
 %Image::ExifTool::Nikon::CaptureOffsets = (
     PROCESS_PROC => \&ProcessNikonCaptureOffsets,
@@ -1335,10 +1409,7 @@ my %retouchValues = (
     FORMAT => 'int16u',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => q{
-        This information is encrypted for most camera models, and if encrypted is
-        not currently writable by exiftool.
-    },
+    NOTES => 'This information is encrypted for most camera models.',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'WB_RGGBLevels',
@@ -1358,6 +1429,22 @@ my %retouchValues = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'WB_RGBGLevels',
+        Format => 'int16u[4]',
+        Protected => 1,
+    },
+);
+
+# ref 4
+%Image::ExifTool::Nikon::ColorBalance4 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'WB_GRBGLevels',
         Format => 'int16u[4]',
         Protected => 1,
     },
@@ -1458,9 +1545,11 @@ my %nikonFocalConversions = (
     FIRST_ENTRY => 0,
     NOTES => 'This structure is used by the D100, and D1X with firmware version 1.1.',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0x00 => {
         Name => 'LensDataVersion',
         Format => 'undef[4]',
+        Writable => 0,
     },
     0x06 => { #8
         Name => 'LensIDNumber',
@@ -1495,6 +1584,9 @@ my %nikonFocalConversions = (
 # Nikon lens data (note: needs decrypting if LensDataVersion is 020x)
 %Image::ExifTool::Nikon::LensData01 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FIRST_ENTRY => 0,
     NOTES => q{
         Nikon encrypts the LensData information below if LensDataVersion is 0201 or
@@ -1503,9 +1595,11 @@ my %nikonFocalConversions = (
         complications which make writing more difficult.
     },
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0x00 => {
         Name => 'LensDataVersion',
         Format => 'string[4]',
+        Writable => 0,
     },
     0x04 => { #8
         Name => 'ExitPupilPosition',
@@ -1580,6 +1674,9 @@ my %nikonFocalConversions = (
 # shot information (encrypted in some cameras) - ref 18
 %Image::ExifTool::Nikon::ShotInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     DATAMEMBER => [ 0 ],
@@ -1591,6 +1688,7 @@ my %nikonFocalConversions = (
         Name => 'ShotInfoVersion',
         RawConv => '$$self{ShotInfoVersion} = $val',
         Format => 'string[4]',
+        Writable => 0,
     },
     0x66 => {
         Name => 'VR_0x66',
@@ -1665,25 +1763,56 @@ my %nikonFocalConversions = (
             0x0f => 'On',
         },
     },
-    # note: DecryptLen currently set to 0x1ae
     # 0x276 - could be 4 byte ShutterCount for D3 (ref 19)
     # 0x279 - could be 4 byte ShutterCount for D300 (ref 19)
-    # 0x256 and 0x26b are encoded ISO for D3 (ref 19)
-    # 0x25c and 0x26e are encoded ISO for D300 (ref 19)
+    0x256 => { #19 (same value found at offset 0x26b)
+        Name => 'ISO2',
+        Condition => '$$self{Model} =~ /D3\b/', # ShotInfoVersion 0210
+        Notes => 'D3',
+        ValueConv => '100*exp(($val/12-5)*log(2))',
+        ValueConvInv => '(log($val/100)/log(2)+5)*12',
+        PrintConv => 'int($val + 0.5)',
+        PrintConvInv => '$val',
+    },
+    0x25c => { #19 (same value found at offset 0x26e)
+        Name => 'ISO2',
+        Condition => '$$self{Model} =~ /D300\b/', # ShotInfoVersion 0210
+        Notes => 'D300',
+        ValueConv => '100*exp(($val/12-5)*log(2))',
+        ValueConvInv => '(log($val/100)/log(2)+5)*12',
+        PrintConv => 'int($val + 0.5)',
+        PrintConvInv => '$val',
+    },
+    0x276 => { #19
+        Name => 'ShutterCount',
+        Condition => '$$self{Model} =~ /D3\b/',
+        Format => 'int32u',
+        Priority => 0,
+        Notes => 'D3',
+    },
+    0x279 => { #19
+        Name => 'ShutterCount',
+        Condition => '$$self{Model} =~ /D300\b/',
+        Format => 'int32u',
+        Priority => 0,
+        Notes => 'D300',
+    },
+    # note: DecryptLen currently set to 0x279
 );
 
 # shot information for D80 (encrypted) - ref 19
 %Image::ExifTool::Nikon::ShotInfo0208 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+    WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => q{
-        These tags are extracted from encrypted data in D80 images, and are not
-        currently writable because the information is encrypted.
-    },
+    NOTES => 'These tags are extracted from encrypted data in D80 images.',
     0x00 => {
         Name => 'ShotInfoVersion',
         Format => 'string[4]',
+        Writable => 0,
     },
     586 => {
         Name => 'ShutterCount',
@@ -1693,7 +1822,6 @@ my %nikonFocalConversions = (
     # split 590 into a few different tags
     590.1 => {
         Name => 'Rotation',
-        PrintHex => 1,
         Mask => 0x07,
         PrintConv => {
             0x00 => 'Horizontal',
@@ -1704,7 +1832,6 @@ my %nikonFocalConversions = (
     },
     590.2 => {
         Name => 'VibrationReduction',
-        PrintHex => 1,
         Mask => 0x18,
         PrintConv => {
             0x00 => 'Off',
@@ -1713,7 +1840,6 @@ my %nikonFocalConversions = (
     },
     590.3 => {
         Name => 'FlashFired',
-        PrintHex => 1,
         Mask => 0xe0,
         PrintConv => { BITMASK => {
             6 => 'Internal',
@@ -1724,7 +1850,6 @@ my %nikonFocalConversions = (
     748.1 => { # CS1
         Name => 'Beep',
         Mask => 0x80,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'On',
             0x80 => 'Off',
@@ -1733,7 +1858,6 @@ my %nikonFocalConversions = (
     748.2 => { # CS4
         Name => 'AFAssist',
         Mask => 0x40,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'On',
             0x40 => 'Off',
@@ -1742,7 +1866,6 @@ my %nikonFocalConversions = (
     748.3 => { # CS5
         Name => 'NoMemoryCard',
         Mask => 0x20,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Release Locked',
             0x20 => 'Enable Release',
@@ -1751,43 +1874,38 @@ my %nikonFocalConversions = (
     748.4 => { # CS6
         Name => 'ImageReview',
         Mask => 0x10,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'On',
             0x10 => 'Off',
         },
     },
-    748.5 => { # CS10
-        Name => 'EVStepSize',
-        Mask => 0x01,
-        PrintHex => 1,
-        PrintConv => {
-            0x00 => '1/3 EV',
-            0x01 => '1/2 EV',
-        },
-    },
-    748.6 => { # CS11
-        Name => 'MainDialExposureComp',
-        Mask => 0x04,
-        PrintHex => 1,
-        PrintConv => {
-            0x00 => 'Off',
-            0x04 => 'On',
-        },
-    },
-    748.7 => { # CS17
+    748.5 => { # CS17
         Name => 'Illumination',
         Mask => 0x08,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x08 => 'On',
         },
     },
+    748.6 => { # CS11
+        Name => 'MainDialExposureComp',
+        Mask => 0x04,
+        PrintConv => {
+            0x00 => 'Off',
+            0x04 => 'On',
+        },
+    },
+    748.7 => { # CS10
+        Name => 'EVStepSize',
+        Mask => 0x01,
+        PrintConv => {
+            0x00 => '1/3 EV',
+            0x01 => '1/2 EV',
+        },
+    },
     749.1 => { # CS7
         Name => 'AutoISO',
         Mask => 0x40,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x40 => 'On',
@@ -1796,7 +1914,6 @@ my %nikonFocalConversions = (
     749.2 => { # CS7-a
         Name => 'AutoISOMax',
         Mask => 0x30,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 200,
             0x10 => 400,
@@ -1807,7 +1924,6 @@ my %nikonFocalConversions = (
     749.3 => { # CS7-b
         Name => 'AutoISOMinShutterSpeed',
         Mask => 0x0f,
-        PrintHex => 1,
         PrintConv => {
             0x00 => '1/125 s',
             0x01 => '1/100 s',
@@ -1825,7 +1941,6 @@ my %nikonFocalConversions = (
     750.1 => { # CS13
         Name => 'AutoBracketMode',
         Mask => 0xc0,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'AE & Flash',
             0x40 => 'AE Only',
@@ -1836,7 +1951,6 @@ my %nikonFocalConversions = (
     750.2 => { # CS14
         Name => 'AutoBracketOrder',
         Mask => 0x20,
-        PrintHex => 1,
         PrintConv => {
             0x00 => '0,-,+',
             0x20 => '-,0,+',
@@ -1845,7 +1959,6 @@ my %nikonFocalConversions = (
     751.1 => { # CS27
         Name => 'MonitorOffTime',
         Mask => 0xe0,
-        PrintHex => 1,
         PrintConv => {
             0x00 => '5 s',
             0x20 => '10 s',
@@ -1858,7 +1971,6 @@ my %nikonFocalConversions = (
     751.2 => { # CS28
         Name => 'MeteringTime',
         Mask => 0x1c,
-        PrintHex => 1,
         PrintConv => {
             0x00 => '4 s',
             0x04 => '6 s',
@@ -1871,7 +1983,6 @@ my %nikonFocalConversions = (
     751.3 => { # CS29
         Name => 'SelfTimerTime',
         Mask => 0x03,
-        PrintHex => 1,
         PrintConv => {
             0x00 => '2 s',
             0x01 => '5 s',
@@ -1882,11 +1993,10 @@ my %nikonFocalConversions = (
     752.1 => { # CS18
         Name => 'AELockButton',
         Mask => 0x1e,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'AE/AF Lock',
             0x02 => 'AE Lock Only',
-            0x04 => 'AF Lock',
+            0x04 => 'AF Lock Only',
             0x06 => 'AE Lock Hold',
             0x08 => 'AF-ON',
             0x0a => 'FV Lock',
@@ -1900,7 +2010,6 @@ my %nikonFocalConversions = (
     752.2 => { # CS19
         Name => 'AELock',
         Mask => 0x01,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x01 => 'On',
@@ -1909,7 +2018,6 @@ my %nikonFocalConversions = (
     752.3 => { # CS30
         Name => 'RemoteOnDuration',
         Mask => 0xc0,
-        PrintHex => 1,
         PrintConv => {
             0x00 => '1 min',
             0x40 => '5 min',
@@ -1920,7 +2028,6 @@ my %nikonFocalConversions = (
     753.1 => { # CS15
         Name => 'CommandDials',
         Mask => 0x80,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Standard (Main Shutter, Sub Aperture)',
             0x80 => 'Reversed (Main Aperture, Sub Shutter)',
@@ -1929,7 +2036,6 @@ my %nikonFocalConversions = (
     753.2 => { # CS16
         Name => 'FunctionButton',
         Mask => 0x78,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'ISO Display',
             0x08 => 'Framing Grid',
@@ -1945,7 +2051,6 @@ my %nikonFocalConversions = (
     754.1 => { # CS8
         Name => 'GridDisplay',
         Mask => 0x80,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x80 => 'On',
@@ -1954,7 +2059,6 @@ my %nikonFocalConversions = (
     754.2 => { # CS9
         Name => 'ViewfinderWarning',
         Mask => 0x40,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'On',
             0x40 => 'Off',
@@ -1963,7 +2067,6 @@ my %nikonFocalConversions = (
     754.3 => { # CS12
         Name => 'CenterWeightedAreaSize',
         Mask => 0x0c,
-        PrintHex => 1,
         PrintConv => {
             0x00 => '6 mm',
             0x04 => '8 mm',
@@ -1973,7 +2076,6 @@ my %nikonFocalConversions = (
     754.4 => { # CS31
         Name => 'ExposureDelayMode',
         Mask => 0x20,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x20 => 'On',
@@ -1982,7 +2084,6 @@ my %nikonFocalConversions = (
     754.5 => { #CS32
         Name => 'MB-D80Batteries',
         Mask => 0x03,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'LR6 (AA Alkaline)',
             0x01 => 'HR6 (AA Ni-MH)',
@@ -1993,7 +2094,6 @@ my %nikonFocalConversions = (
     755.1 => { # CS23
         Name => 'FlashWarning',
         Mask => 0x80,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'On',
             0x80 => 'Off',
@@ -2003,12 +2103,13 @@ my %nikonFocalConversions = (
         Name => 'FlashShutterSpeed',
         Mask => 0x78,
         ValueConv => '2 ** (($val >> 3) - 6)',
+        ValueConvInv => '$val>0 ? int(log($val)/log(2)+6+0.5) << 3 : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
     },
     755.2 => { # CS25
         Name => 'AutoFP',
         Mask => 0x04,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x04 => 'On',
@@ -2017,7 +2118,6 @@ my %nikonFocalConversions = (
     755.3 => { # CS26
         Name => 'ModelingFlash',
         Mask => 0x02,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x02 => 'On',
@@ -2026,7 +2126,6 @@ my %nikonFocalConversions = (
     756.1 => { # CS22
         Name => 'InternalFlash',
         Mask => 0xc0,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'TTL',
             0x40 => 'Manual',
@@ -2038,37 +2137,44 @@ my %nikonFocalConversions = (
         Name => 'ManualFlashOutput',
         Mask => 0x07,
         ValueConv => '2 ** (-$val)',
+        ValueConvInv => '$val > 0 ? -log($val)/log(2) : 0',
         PrintConv => q{
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
+        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
     },
     757.1 => { # CS22-b
         Name => 'RepeatingFlashOutput',
         Mask => 0x70,
         ValueConv => '2 ** (-($val>>4)-2)',
+        ValueConvInv => '$val > 0 ? int(-log($val)/log(2)-2+0.5)<<4 : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
     },
     757.2 => { # CS22-c
         Name => 'RepeatingFlashCount',
         Mask => 0x0f,
         ValueConv => '$val < 10 ? $val + 1 : 5 * ($val - 7)',
+        ValueConvInv => '$val <= 10 ? $val - 1 : $val / 5 + 7',
     },
     758.1 => { # CS22-d
         Name => 'RepeatingFlashRate',
         Mask => 0xf0,
         ValueConv => 'my $v=($val>>4); $v < 10 ? $v + 1 : 10 * ($val - 8)',
+        ValueConvInv => 'int(($val <= 10 ? $val - 1 : $val / 10 + 8) + 0.5) << 4',
         PrintConv => '"$val Hz"',
+        PrintConvInv => '$val=~/(\d+)/; $1 || 0',
     },
     758.2 => { # CS22-n
         Name => 'CommanderChannel',
         Mask => 0x03,
         ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
     },
     759.1 => { # CS22-e
         Name => 'CommanderInternalFlash',
         Mask => 0xc0,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'TTL',
             0x40 => 'Manual',
@@ -2078,7 +2184,6 @@ my %nikonFocalConversions = (
     759.2 => { # CS22-h
         Name => 'CommanderGroupAMode',
         Mask => 0x30,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'TTL',
             0x10 => 'Auto Aperture',
@@ -2089,7 +2194,6 @@ my %nikonFocalConversions = (
     759.3 => { # CS22-k
         Name => 'CommanderGroupBMode',
         Mask => 0x0c,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'TTL',
             0x04 => 'Auto Aperture',
@@ -2101,51 +2205,62 @@ my %nikonFocalConversions = (
         Name => 'CommanderInternalTTLComp',
         Mask => 0x1f,
         ValueConv => '($val - 9) / 3',
+        ValueConvInv => '$val * 3 + 9',
         PrintConv => '$val ? sprintf("%+.1f",$val) : 0',
+        PrintConvInv => '$val',
     },
     760.2 => { # CS22-g
         Name => 'CommanderInternalManualOutput',
         Mask => 0xe0,
         ValueConv => '2 ** (-($val>>5))',
+        ValueConvInv => '$val > 0 ? int(-log($val)/log(2)+0.5) << 5 : 0',
         PrintConv => q{
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
+        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
     },
     761.1 => { # CS22-i
         Name => 'CommanderGroupA_TTL-AAComp',
         Mask => 0x1f,
         ValueConv => '($val - 9) / 3',
+        ValueConvInv => '$val * 3 + 9',
         PrintConv => '$val ? sprintf("%+.1f",$val) : 0',
+        PrintConvInv => '$val',
     },
     761.2 => { # CS22-j
         Name => 'CommanderGroupA_ManualOutput',
         Mask => 0xe0,
-        ValueConv => '2 ** (-($val>>4))',
+        ValueConv => '2 ** (-($val>>5))',
+        ValueConvInv => '$val > 0 ? int(-log($val)/log(2)+0.5) << 5 : 0',
         PrintConv => q{
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
+        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
     },
     762.1 => { # CS22-l
         Name => 'CommanderGroupB_TTL-AAComp',
         Mask => 0x1f,
         ValueConv => '($val - 9) / 3',
+        ValueConvInv => '$val * 3 + 9',
         PrintConv => '$val ? sprintf("%+.1f",$val) : 0',
+        PrintConvInv => '$val',
     },
     762.2 => { # CS22-m
         Name => 'CommanderGroupB_ManualOutput',
         Mask => 0xe0,
         ValueConv => '2 ** (-($val>>5))',
+        ValueConvInv => '$val > 0 ? int(-log($val)/log(2)+0.5) << 5 : 0',
         PrintConv => q{
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
+        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
     },
     763.1 => { # CS3
         Name => 'CenterAFArea',
         Mask => 0x80,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Normal Zone',
             0x80 => 'Wide Zone',
@@ -2154,7 +2269,6 @@ my %nikonFocalConversions = (
     763.2 => { # CS20
         Name => 'FocusAreaSelection',
         Mask => 0x04,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'No Wrap',
             0x04 => 'Wrap',
@@ -2163,7 +2277,6 @@ my %nikonFocalConversions = (
     763.3 => { # CS21
         Name => 'AFAreaIllumination',
         Mask => 0x03,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Auto',
             0x01 => 'Off',
@@ -2173,7 +2286,6 @@ my %nikonFocalConversions = (
     764 => { # CS2
         Name => 'AFAreaMode',
         Mask => 0xc0,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Single Area',
             0x40 => 'Dynamic Area',
@@ -2183,8 +2295,252 @@ my %nikonFocalConversions = (
     # note: DecryptLen currently set to 764
 );
 
+# shot information for D40 and D40X (encrypted) - ref PH
+%Image::ExifTool::Nikon::ShotInfo0209 = (
+    PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+    WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'These tags are extracted from encrypted data in D40 and D40X images.',
+    0x00 => {
+        Name => 'ShotInfoVersion',
+        Format => 'string[4]',
+        Writable => 0,
+    },
+    582 => {
+        Name => 'ShutterCount',
+        Format => 'int32u',
+        Priority => 0,
+    },
+    586.1 => { #19
+        Name => 'VibrationReduction',
+        Mask => 0x08,
+        PrintConv => {
+            0x00 => 'Off',
+            0x08 => 'On',
+        },
+    },
+    729.1 => { # CS1
+        Name => 'Beep',
+        Mask => 0x80,
+        PrintConv => {
+            0x00 => 'On',
+            0x80 => 'Off',
+        },
+    },
+    729.2 => { # CS9
+        Name => 'AFAssist',
+        Mask => 0x40,
+        PrintConv => {
+            0x00 => 'On',
+            0x40 => 'Off',
+        },
+    },
+    729.3 => { # CS6
+        Name => 'NoMemoryCard',
+        Mask => 0x20,
+        PrintConv => {
+            0x00 => 'Release Locked',
+            0x20 => 'Enable Release',
+        },
+    },
+    729.4 => { # CS7
+        Name => 'ImageReview',
+        Mask => 0x10,
+        PrintConv => {
+            0x00 => 'On',
+            0x10 => 'Off',
+        },
+    },
+    730.1 => { # CS10-a
+        Name => 'AutoISO',
+        Mask => 0x80,
+        PrintConv => {
+            0x00 => 'Off',
+            0x80 => 'On',
+        },
+    },
+    730.2 => { # CS10-b
+        Name => 'AutoISOMax',
+        Mask => 0x30,
+        PrintConv => {
+            0x10 => 400,
+            0x20 => 800,
+            0x30 => 1600,
+        },
+    },
+    730.3 => { # CS10-c
+        Name => 'AutoISOMinShutterSpeed',
+        Mask => 0x07,
+        PrintConv => {
+            0x00 => '1/125 s',
+            0x01 => '1/60 s',
+            0x02 => '1/30 s',
+            0x03 => '1/15 s',
+            0x04 => '1/8 s',
+            0x05 => '1/4 s',
+            0x06 => '1/2 s',
+            0x07 => '1 s',
+        },
+    },
+    731 => { # CS15-b
+        Name => 'ImageReviewTime',
+        Mask => 0x07,
+        PrintConv => {
+            0x00 => '4 s',
+            0x01 => '8 s',
+            0x02 => '20 s',
+            0x03 => '1 min',
+            0x04 => '10 min',
+        },
+    },
+    732.1 => { # CS15-a
+        Name => 'MonitorOffTime',
+        Mask => 0xe0,
+        PrintConv => {
+            0x00 => '4 s',
+            0x20 => '8 s',
+            0x40 => '20 s',
+            0x60 => '1 min',
+            0x80 => '10 min',
+        },
+    },
+    732.2 => { # CS15-c
+        Name => 'MeteringTime',
+        Mask => 0x1c,
+        PrintConv => {
+            0x00 => '4 s',
+            0x04 => '8 s',
+            0x08 => '20 s',
+            0x0c => '1 min',
+            0x10 => '30 min',
+        },
+    },
+    732.3 => { # CS16
+        Name => 'SelfTimerTime',
+        Mask => 0x03,
+        PrintConv => {
+            0x00 => '2 s',
+            0x01 => '5 s',
+            0x02 => '10 s',
+            0x03 => '20 s',
+        },
+    },
+    733.1 => { # CS17
+        Name => 'RemoteOnDuration',
+        Mask => 0xc0,
+        PrintConv => {
+            0x00 => '1 min',
+            0x40 => '5 min',
+            0x80 => '10 min',
+            0xc0 => '15 min',
+        },
+    },
+    733.2 => { # CS12
+        Name => 'AELockButton',
+        Mask => 0x0e,
+        PrintConv => {
+            0x00 => 'AE/AF Lock',
+            0x02 => 'AE Lock Only',
+            0x04 => 'AF Lock Only',
+            0x06 => 'AE Lock Hold',
+            0x08 => 'AF-ON',
+        },
+    },
+    733.3 => { # CS13
+        Name => 'AELock',
+        Mask => 0x01,
+        PrintConv => {
+            0x00 => 'Off',
+            0x01 => 'On',
+        },
+    },
+    734.1 => { # CS4
+        Name => 'ShootingModeSetting',
+        Mask => 0x70,
+        PrintConv => {
+            0x00 => 'Single Frame',
+            0x10 => 'Continuous',
+            0x20 => 'Self-timer',
+            0x30 => 'Delayed Remote',
+            0x40 => 'Quick-response Remote',
+        },
+    },
+    734.2 => { # CS11
+        Name => 'TimerFunctionButton',
+        Mask => 0x07,
+        PrintConv => {
+            0x00 => 'Shooting Mode',
+            0x01 => 'Image Quality/Size',
+            0x02 => 'ISO',
+            0x03 => 'White Balance',
+            0x04 => 'Self-timer',
+        },
+    },
+    735 => { # CS5
+        Name => 'Metering',
+        Mask => 0x03,
+        PrintConv => {
+            0x00 => 'Matrix',
+            0x01 => 'Center-weighted',
+            0x02 => 'Spot',
+        },
+    },
+    737.1 => { # CS14-a
+        Name => 'InternalFlash',
+        Mask => 0x10,
+        PrintConv => {
+            0x00 => 'TTL',
+            0x10 => 'Manual',
+        },
+    },
+    737.2 => { # CS14-b
+        Name => 'ManualFlashOutput',
+        Mask => 0x07,
+        ValueConv => '2 ** (-$val)',
+        ValueConvInv => '$val > 0 ? -log($val)/log(2) : 0',
+        PrintConv => q{
+            return 'Full' if $val > 0.99;
+            Image::ExifTool::Exif::PrintExposureTime($val);
+        },
+        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
+    },
+    738 => { # CS8
+        Name => 'FlashLevel',
+        Format => 'int8s',
+        ValueConv => '$val / 6',
+        ValueConvInv => '$val * 6',
+        PrintConv => 'sprintf("%+.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    739 => { # CS2
+        Name => 'FocusModeSetting',
+        # (may differ from FocusMode if lens switch is set to Manual)
+        Mask => 0xc0,
+        PrintConv => {
+            0x00 => 'Manual',
+            0x40 => 'AF-S',
+            0x80 => 'AF-C',
+            0xc0 => 'AF-A',
+        },
+    },
+    740 => { # CS3
+        Name => 'AFAreaModeSetting',
+        # (may differ from AFAreaMode for Manual focus)
+        Mask => 0x30,
+        PrintConv => {
+            0x00 => 'Single Area',
+            0x10 => 'Dynamic Area',
+            0x20 => 'Closest Subject',
+        },
+    }
+    # note: DecryptLen currently set to 748
+);
+
 # Flash information (ref 19)
-%Image::ExifTool::Nikon::FlashInfo = (
+%Image::ExifTool::Nikon::FlashInfo0100 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -2192,14 +2548,39 @@ my %nikonFocalConversions = (
     FIRST_ENTRY => 0,
     DATAMEMBER => [ 9.2, 15, 16 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0 => {
         Name => 'FlashInfoVersion',
         Format => 'string[4]',
+        Writable => 0,
+    },
+    # If byte 6 and 7 are both 0 either a internal flash was used, or no flash
+    # - that depends on byte 4 and 5:
+    # 00 36 = Internal flash (D50, D70 or D70s)
+    # 02 2E = Internal flash (D80)
+    # 02 30 = Internal flash (D200 or D40)
+    # 02 32 = Internal flash (D300)
+    # 
+    # 00 00 = No flash used
+    # 00 48 = No flash used (D50)
+    # 00 4E = No flash used (D70 or D70s)
+    # 
+    # If byte 6 and 7 are not 0, they need to be interpreted instead of byte 4 and 5:
+    # 02 04 = SB-600
+    # 02 05 = SB-600
+    # 
+    # 01 01 = SB-800 (or Metz 58 AF-1)
+    # 02 01 = SB-800
+    # 01 03 = SB-800
+    8 => {
+        Name => 'ExternalFlashFlags',
+        PrintConv => { BITMASK => {
+            4 => 'Wide Flash Adapter',
+        }},
     },
     9.1 => {
         Name => 'FlashCommanderMode',
         Mask => 0x80,
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x80 => 'On',
@@ -2210,7 +2591,6 @@ my %nikonFocalConversions = (
         Mask => 0x7f,
         DataMember => 'FlashControlMode',
         RawConv => '$$self{FlashControlMode} = $val',
-        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x01 => 'iTTL-BL',
@@ -2322,6 +2702,167 @@ my %nikonFocalConversions = (
     ],
 );
 
+# Flash information for D40, D40x, D3 and D300 (ref 19)
+%Image::ExifTool::Nikon::FlashInfo0102 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    DATAMEMBER => [ 9.2, 15, 16 ],
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'These tags are used by the D40, D40X, D60, D3 and D300.',
+    # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
+    0 => {
+        Name => 'FlashInfoVersion',
+        Format => 'string[4]',
+        Writable => 0,
+    },
+    8 => {
+        Name => 'ExternalFlashFlags',
+        PrintConv => { BITMASK => {
+            4 => 'Wide Flash Adapter',
+        }},
+    },
+    9.1 => {
+        Name => 'FlashCommanderMode',
+        Mask => 0x80,
+        PrintConv => {
+            0x00 => 'Off',
+            0x80 => 'On',
+        },
+    },
+    9.2 => {
+        Name => 'FlashControlMode',
+        Mask => 0x7f,
+        DataMember => 'FlashControlMode',
+        RawConv => '$$self{FlashControlMode} = $val',
+        PrintConv => {
+            0x00 => 'Off',
+            0x01 => 'iTTL-BL',
+            0x02 => 'iTTL',
+            0x03 => 'Auto Aperture',
+            0x06 => 'Manual',
+            0x07 => 'Repeating Flash',
+        },
+    },
+    10 => [
+        {
+            Name => 'FlashOutput',
+            Condition => '$$self{FlashControlMode} >= 0x06',
+            ValueConv => '2 ** (-$val/6)',
+            ValueConvInv => '$val>0 ? -6*log($val)/log(2) : 0',
+            PrintConv => '$val>0.99 ? "Full" : sprintf("%.0f%%",$val*100)',
+            PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
+        },
+        {
+            Name => 'FlashExposureComp',
+            Description => 'Flash Exposure Compensation',
+            Format => 'int8s',
+            Priority => 0,
+            ValueConv => '-$val/6',
+            ValueConvInv => '-6 * $val',
+            PrintConv => '$val ? sprintf("%+.1f",$val) : 0',
+            PrintConvInv => '$val',
+        },
+    ],
+    12 => {
+        Name => 'FlashFocalLength',
+        RawConv => '$val ? $val : undef',
+        PrintConv => '"$val mm"',
+        PrintConvInv => '$val=~/(\d+)/; $1 || 0',
+    },
+    13 => {
+        Name => 'RepeatingFlashRate',
+        RawConv => '$val ? $val : undef',
+        PrintConv => '"$val Hz"',
+        PrintConvInv => '$val=~/(\d+)/; $1 || 0',
+    },
+    14 => {
+        Name => 'RepeatingFlashCount',
+        RawConv => '$val ? $val : undef',
+    },
+    16 => {
+        Name => 'FlashGroupAControlMode',
+        Mask => 0x0f,
+        DataMember => 'FlashGroupAControlMode',
+        RawConv => '$$self{FlashGroupAControlMode} = $val',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'iTTL-BL',
+            2 => 'iTTL',
+            3 => 'Auto Aperture',
+            6 => 'Manual',
+            7 => 'Repeating Flash',
+        },
+    },
+    17 => {
+        Name => 'FlashGroupBControlMode',
+        Mask => 0x0f,
+        DataMember => 'FlashGroupBControlMode',
+        RawConv => '$$self{FlashGroupBControlMode} = $val',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'iTTL-BL',
+            2 => 'iTTL',
+            3 => 'Auto Aperture',
+            6 => 'Manual',
+            7 => 'Repeating Flash',
+        },
+    },
+    18 => [
+        {
+            Name => 'FlashGroupAOutput',
+            Condition => '$$self{FlashGroupAControlMode} >= 0x06',
+            ValueConv => '2 ** (-$val/6)',
+            ValueConvInv => '$val>0 ? -6*log($val)/log(2) : 0',
+            PrintConv => '$val>0.99 ? "Full" : sprintf("%.0f%%",$val*100)',
+            PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
+        },
+        {
+            Name => 'FlashGroupAExposureComp',
+            Format => 'int8s',
+            ValueConv => '-$val/6',
+            ValueConvInv => '-6 * $val',
+            PrintConv => '$val ? sprintf("%+.1f",$val) : 0',
+            PrintConvInv => '$val',
+        },
+    ],
+    19 => [
+        {
+            Name => 'FlashGroupBOutput',
+            Condition => '$$self{FlashGroupBControlMode} >= 0x06',
+            ValueConv => '2 ** (-$val/6)',
+            ValueConvInv => '$val>0 ? -6*log($val)/log(2) : 0',
+            PrintConv => '$val>0.99 ? "Full" : sprintf("%.0f%%",$val*100)',
+            PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
+        },
+        {
+            Name => 'FlashGroupBExposureComp',
+            Format => 'int8s',
+            ValueConv => '-$val/6',
+            ValueConvInv => '-6 * $val',
+            PrintConv => '$val ? sprintf("%+.1f",$val) : 0',
+            PrintConvInv => '$val',
+        },
+    ],
+);
+
+# Unknown Flash information (ref 19)
+%Image::ExifTool::Nikon::FlashInfoUnknown = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'FlashInfoVersion',
+        Format => 'string[4]',
+        Writable => 0,
+    },
+);
+
 # Multi exposure / image overlay information (ref PH)
 %Image::ExifTool::Nikon::MultiExposure = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -2331,9 +2872,11 @@ my %nikonFocalConversions = (
     FIRST_ENTRY => 0,
     FORMAT => 'int32u',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0 => {
         Name => 'MultiExposureVersion',
         Format => 'string[4]',
+        Writable => 0,
     },
     1 => {
         Name => 'MultiExposureMode',
@@ -2351,24 +2894,24 @@ my %nikonFocalConversions = (
 );
 
 # tags in Nikon QuickTime videos (PH - observations with Coolpix S3)
-# (note: very similar to information in Pentax videos)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
 %Image::ExifTool::Nikon::MOV = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
     NOTES => q{
-        This information is found in Nikon QT video images, and is very similar to
-        information found in Pentax MOV videos.
+        This information is found in Nikon MOV and QT videos.
     },
     0x00 => {
         Name => 'Make',
-        Format => 'string[5]',
-        PrintConv => 'ucfirst(lc($val))',
+        Format => 'string[24]',
     },
     0x18 => {
         Name => 'Model',
         Description => 'Camera Model Name',
         Format => 'string[8]',
     },
+    # (01 00 at offset 0x20)
     0x26 => {
         Name => 'ExposureTime',
         Format => 'int32u',
@@ -2377,14 +2920,12 @@ my %nikonFocalConversions = (
     },
     0x2a => {
         Name => 'FNumber',
-        Format => 'int32u',
-        ValueConv => '$val * 0.1',
+        Format => 'rational64u',
         PrintConv => 'sprintf("%.1f",$val)',
     },
     0x32 => {
         Name => 'ExposureCompensation',
-        Format => 'int32s',
-        ValueConv => '$val * 0.1',
+        Format => 'rational64s',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x44 => {
@@ -2401,8 +2942,7 @@ my %nikonFocalConversions = (
     },
     0x48 => {
         Name => 'FocalLength',
-        Writable => 'int32u',
-        ValueConv => '$val * 0.1',
+        Format => 'rational64u',
         PrintConv => 'sprintf("%.1f mm",$val)',
     },
     0xaf => {
@@ -2412,6 +2952,7 @@ my %nikonFocalConversions = (
     0xdf => { # (this is a guess ... could also be offset 0xdb)
         Name => 'ISO',
         Format => 'int16u',
+        RawConv => '$val < 50 ? undef : $val', # (not valid for Coolpix L10)
     },
 );
 
@@ -2448,6 +2989,43 @@ my %nikonFocalConversions = (
 
 # add our composite tags
 Image::ExifTool::AddCompositeTags('Image::ExifTool::Nikon');
+
+#------------------------------------------------------------------------------
+# Print D3/D300 AF points (similar to Canon::PrintAFPoints1D)
+# Inputs: 0) value to convert (undef[7])
+# Focus point pattern:
+#        A1  A2  A3  A4  A5  A6  A7  A8  A9
+#    B1  B2  B3  B4  B5  B6  B7  B8  B9  B10  B11
+#    C1  C2  C3  C4  C5  C6  C7  C9  C9  C10  C11
+#    D1  D2  D3  D4  D5  D6  D7  D8  D9  D10  D11
+#        E1  E2  E3  E4  E5  E6  E7  E8  E9
+sub PrintAFPointsD3($)
+{
+    my $val = shift;
+    return 'Unknown' unless length $val == 7;
+    # list of byte/bit positions for each focus point (upper/lower nibble)
+    my @focusPts = (
+             0x55,0x50,0x43,0x14,0x02,0x07,0x21,0x26,0x33,
+        0x61,0x54,0x47,0x42,0x13,0x01,0x06,0x20,0x25,0x32,0x37,
+        0x60,0x53,0x46,0x41,0x12,0x00,0x05,0x17,0x24,0x31,0x36,
+        0x62,0x56,0x51,0x44,0x15,0x03,0x10,0x22,0x27,0x34,0x40,
+             0x57,0x52,0x45,0x16,0x04,0x11,0x23,0x30,0x35
+    );
+    my ($focusPt, @points);
+    my @dat = unpack('C*', $val);
+    my @cols = (9,11,11,11,9);
+    my $cols = shift @cols;
+    my ($row, $col) = ('A', 1);
+    foreach $focusPt (@focusPts) {
+        push @points, $row . $col if $dat[$focusPt >> 4] & (0x01 << ($focusPt & 0x0f));
+        if (++$col > $cols) {
+            $cols = shift @cols;
+            $col = 1;
+            ++$row;
+        }
+    }
+    return join(',',@points);
+}
 
 #------------------------------------------------------------------------------
 # Print PictureControl value
@@ -2541,13 +3119,15 @@ my @xlat = (
 # Inputs: 0) reference to data block, 1) serial number key, 2) shutter count key
 #         4) optional start offset (default 0)
 #         5) optional number of bytes to decode (default to the end of the data)
-# Returns: Decrypted data block
+# Returns: data block with specified data decrypted
 sub Decrypt($$$;$$)
 {
     my ($dataPt, $serial, $count, $start, $len) = @_;
+    my ($i, $dat);
+
     $start or $start = 0;
-    my $end = $len ? $start + $len : length($$dataPt);
-    my $i;
+    $len = length($$dataPt) - $start if not defined $len or $len > length($$dataPt) - $start;
+    return $$dataPt if $len <= 0;
     my $key = 0;
     for ($i=0; $i<4; ++$i) {
         $key ^= ($count >> ($i*8)) & 0xff;
@@ -2555,38 +3135,177 @@ sub Decrypt($$$;$$)
     my $ci = $xlat[0][$serial & 0xff];
     my $cj = $xlat[1][$key];
     my $ck = 0x60;
-    my @data = unpack('C*',$$dataPt);
-    for ($i=$start; $i<$end; ++$i) {
+    my @data = unpack("x${start}C$len", $$dataPt);
+    foreach $dat (@data) {
         $cj = ($cj + $ci * $ck) & 0xff;
         $ck = ($ck + 1) & 0xff;
-        $data[$i] ^= $cj;
+        $dat ^= $cj;
     }
-    return pack('C*',@data);
+    my $end = $start + $len;
+    my $pre = $start ? substr($$dataPt, 0, $start) : '';
+    my $post = $end < length($$dataPt) ? substr($$dataPt, $end) : '';
+    return $pre . pack('C*',@data) . $post;
 }
 
 #------------------------------------------------------------------------------
-# process Nikon Encrypted data block
-# Inputs: 0) ExifTool object reference, 1) reference to directory information
-#         2) pointer to tag table
-# Returns: 1 on success
+# Read/Write Nikon Encrypted data block
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success when reading, or new directory when writing (IsWriting set)
 sub ProcessNikonEncrypted($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    # get the encrypted directory data
-    my $buff = substr(${$$dirInfo{DataPt}}, $$dirInfo{DirStart}, $$dirInfo{DirLen});
-    # save it until we have enough information to decrypt it later
-    push @{$exifTool->{NikonInfo}->{Encrypted}}, [ $tagTablePtr, $buff, $$dirInfo{TagInfo}];
-    if ($exifTool->Options('Verbose')) {
-        my $indent = substr($exifTool->{INDENT}, 0, -2);
-        $exifTool->VPrint(0, $indent, "[$dirInfo->{TagInfo}->{Name} directory to be decrypted later]\n");
+    $exifTool or return 1;    # allow dummy access
+    my $serial = $exifTool->{NikonSerialNumber};
+    my $count = $exifTool->{NikonShutterCount};
+    unless (defined $count) {
+        if (defined $serial) {
+            $exifTool->Warn("Can't decrypt Nikon information (no ShutterCount key)");
+            delete $exifTool->{NikonSerialNumber};
+        }
+        return 0;
+    }
+    my $verbose = $$dirInfo{IsWriting} ? 0 : $exifTool->Options('Verbose');
+    my $tagInfo = $$dirInfo{TagInfo};
+    my $data = substr(${$$dirInfo{DataPt}}, $$dirInfo{DirStart}, $$dirInfo{DirLen});
+
+    my ($start, $len, $offset, $byteOrder);
+
+    if ($tagInfo and $$tagInfo{SubDirectory}) {
+        $start = $tagInfo->{SubDirectory}->{DecryptStart};
+        # may decrypt only part of the information to save time
+        if ($verbose < 3 and $exifTool->Options('Unknown') < 2) {
+            $len = $tagInfo->{SubDirectory}->{DecryptLen};
+        }
+        $offset = $tagInfo->{SubDirectory}->{DirOffset};
+        $byteOrder = $tagInfo->{SubDirectory}->{ByteOrder};
+    }
+    $start or $start = 0;
+    if (defined $offset) {
+        # offset, if specified, is releative to start of encrypted data
+        $offset += $start;
+    } else {
+        $offset = 0;
+    }
+    my $maxLen = length($data) - $start;
+    # decrypt all the data unless DecryptLen is given
+    $len = $maxLen unless $len and $len <= $maxLen;
+    # use fixed serial numbers if no good serial number found
+    unless ($serial =~ /^\d+$/) {
+        if ($exifTool->{Model} =~ /\bD50$/) {
+            $serial = 0x22; # D50 (ref 8)
+        } else {
+            $serial = 0x60; # D200 (ref 10), D40X (ref PH)
+        }
+    }
+    $data = Decrypt(\$data, $serial, $count, $start, $len);
+
+    if ($verbose > 2) {
+        $exifTool->VerboseDir("Decrypted $$tagInfo{Name}");
+        my %parms = (
+            Prefix  => $exifTool->{INDENT} . '  ',
+            Out     => $exifTool->Options('TextOut'),
+            DataPos => $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base} || 0),
+        );
+        $parms{MaxLen} = 96 unless $verbose > 3;
+        Image::ExifTool::HexDump(\$data, undef, %parms);
+    }
+    # process the decrypted information
+    my %subdirInfo = (
+        DataPt   => \$data,
+        DirStart => $offset,
+        DirLen   => length($data) - $offset,
+        DirName  => $$dirInfo{DirName},
+        DataPos  => $$dirInfo{DataPos} + $$dirInfo{DirStart},
+        Base     => $$dirInfo{Base},
+    );
+    my $rtnVal;
+    my $oldOrder = GetByteOrder();
+    SetByteOrder($byteOrder) if $byteOrder;
+    if ($$dirInfo{IsWriting}) {
+        my $changed = $$exifTool{CHANGED};
+        $rtnVal = $exifTool->WriteBinaryData(\%subdirInfo, $tagTablePtr);
+        if ($changed == $$exifTool{CHANGED}) {
+            undef $rtnVal;  # nothing changed so use original data
+        } else {
+            # re-encrypt data (symmetrical algorithm)
+            $rtnVal = Decrypt(\$rtnVal, $serial, $count, $start, $len);
+        }
+    } else {
+        $rtnVal = $exifTool->ProcessBinaryData(\%subdirInfo, $tagTablePtr);
+    }
+    SetByteOrder($oldOrder);
+    return $rtnVal;
+}
+
+#------------------------------------------------------------------------------
+# Pre-scan EXIF directory to extract specific tags
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) required tagID hash ref
+# Returns: 1 if directory was scanned successfully
+sub PrescanExif($$$)
+{
+    my ($exifTool, $dirInfo, $tagHash) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dataPos = $$dirInfo{DataPos} || 0;
+    my $dataLen = $$dirInfo{DataLen};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $base = $$dirInfo{Base} || 0;
+    my $raf = $$dirInfo{RAF};
+    my ($index, $numEntries, $data, $buff);
+
+    # get number of entries in IFD
+    if ($dirStart >= 0 and $dirStart <= $dataLen-2) {
+        $numEntries = Get16u($dataPt, $dirStart);
+        # reset $numEntries to read from file if necessary
+        undef $numEntries if $dirStart + 2 + 12 * $numEntries > $dataLen; 
+    }
+    # read IFD from file if necessary
+    unless ($numEntries) {
+        $raf or return 0;
+        $dataPos += $dirStart;  # read data from the start of the directory
+        $raf->Seek($dataPos + $base, 0) and $raf->Read($data, 2) == 2 or return 0;
+        $numEntries = Get16u(\$data, 0);
+        my $len = 12 * $numEntries;
+        $raf->Read($buff, $len) == $len or return 0;
+        $data .= $buff;
+        # update variables for the newly loaded IFD (already updated dataPos)
+        $dataPt = \$data;
+        $dataLen = length $data;
+        $dirStart = 0;
+    }
+    # loop through necessary IFD entries
+    my ($lastTag) = sort { $b <=> $a } keys %$tagHash; # (reverse sort)
+    for ($index=0; $index<$numEntries; ++$index) {
+        my $entry = $dirStart + 2 + 12 * $index;
+        my $tagID = Get16u($dataPt, $entry);
+        last if $tagID > $lastTag;  # (assuming tags are in order)
+        next unless exists $$tagHash{$tagID};   # only extract required tags
+        my $format = Get16u($dataPt, $entry+2);
+        next if $format < 1 or $format > 13;
+        my $count = Get32u($dataPt, $entry+4);
+        my $size = $count * $Image::ExifTool::Exif::formatSize[$format];
+        my $formatStr = $Image::ExifTool::Exif::formatName[$format];
+        my $valuePtr = $entry + 8;      # pointer to value within $$dataPt
+        if ($size > 4) {
+            next if $size > 0x1000000;  # set a reasonable limit on data size (16MB)
+            $valuePtr = Get32u($dataPt, $valuePtr);
+            # convert offset to pointer in $$dataPt
+            # (don't yet handle EntryBased or FixOffsets)
+            $valuePtr -= $dataPos;
+            if ($valuePtr < 0 or $valuePtr+$size > $dataLen) {
+                next unless $raf and $raf->Seek($base + $valuePtr + $dataPos,0) and
+                                     $raf->Read($buff,$size) == $size;
+                $$tagHash{$tagID} = ReadValue(\$buff,0,$formatStr,$count,$size);
+                next;
+            }
+        }
+        $$tagHash{$tagID} = ReadValue($dataPt,$valuePtr,$formatStr,$count,$size);
     }
     return 1;
 }
 
 #------------------------------------------------------------------------------
 # process Nikon Capture Offsets IFD (ref PH)
-# Inputs: 0) ExifTool object reference, 1) reference to directory information
-#         2) pointer to tag table
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 # Notes: This isn't a normal IFD, but is close...
 sub ProcessNikonCaptureOffsets($$$)
@@ -2618,80 +3337,40 @@ sub ProcessNikonCaptureOffsets($$$)
 }
 
 #------------------------------------------------------------------------------
-# Process Nikon Makernotes directory
-# Inputs: 0) ExifTool object reference
-#         1) Reference to directory information hash
-#         2) Pointer to tag table for this directory
-# Returns: 1 on success, otherwise returns 0 and sets a Warning
+# Read/write Nikon Makernotes directory
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success, otherwise returns 0 and sets a Warning when reading
+#          or new directory when writing (IsWriting set in dirInfo)
 sub ProcessNikon($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    $exifTool or return 1;    # allow dummy access
     my $verbose = $exifTool->Options('Verbose');
     my $nikonInfo = $exifTool->{NikonInfo} = { };
-    my @encrypted;  # list to save encrypted data
 
-    # process Nikon makernotes, saving encrypted information for later
-    $$nikonInfo{Encrypted} = \@encrypted;
-    my $rtnVal = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
-
-    # process any encrypted information we found
-    my $encryptedDir;
-    if (@encrypted) {
-        my $serial = $exifTool->{NikonInfo}->{SerialNumber} || 0;
-        my $count = $exifTool->{NikonInfo}->{ShutterCount};
-        unless (defined $count) {
-            $exifTool->Warn("Can't decrypt Nikon information (no ShutterCount key)");
-            undef @encrypted;
-        }
-        foreach $encryptedDir (@encrypted) {
-            my ($subTablePtr, $data, $tagInfo) = @$encryptedDir;
-            my ($start, $len, $offset);
-            if ($tagInfo and $$tagInfo{SubDirectory}) {
-                $start = $tagInfo->{SubDirectory}->{DecryptStart};
-                # may decrypt only part of the information to save time
-                if ($verbose < 3 and $exifTool->Options('Unknown') < 2) {
-                    $len = $tagInfo->{SubDirectory}->{DecryptLen};
-                }
-                $offset = $tagInfo->{SubDirectory}->{DirOffset};
-            }
-            $start or $start = 0;
-            if (defined $offset) {
-                # offset, if specified, is releative to start of encrypted data
-                $offset += $start;
-            } else {
-                $offset = 0;
-            }
-            my $maxLen = length($data) - $start;
-            # decrypt all the data unless DecryptLen is given
-            $len = $maxLen unless $len and $len <= $maxLen;
-            # use fixed serial numbers if no good serial number found
-            unless ($serial =~ /^\d+$/) {
-                if ($exifTool->{CameraModel} =~ /\bD50$/) {
-                    $serial = 0x22; # D50 (ref 8)
-                } else {
-                    $serial = 0x60; # D200 (ref 10), D40X (ref PH)
-                }
-            }
-            $data = Decrypt(\$data, $serial, $count, $start, $len);
-            my %subdirInfo = (
-                DataPt   => \$data,
-                DirStart => $offset,
-                DirLen   => length($data) - $offset,
-            );
-            if ($verbose > 2) {
-                $exifTool->VerboseDir("Decrypted $$tagInfo{Name}");
-                my %parms = (
-                    Prefix => $exifTool->{INDENT},
-                    Out => $exifTool->Options('TextOut'),
-                );
-                $parms{MaxLen} = 96 unless $verbose > 3;
-                Image::ExifTool::HexDump(\$data, undef, %parms);
-            }
-            # process the decrypted information
-            $exifTool->ProcessBinaryData(\%subdirInfo, $subTablePtr);
+    # pre-scan IFD to get SerialNumber (0x001d) and ShutterCount (0x00a7) for use in decryption
+    my %needTags = ( 0x001d => 0, 0x00a7 => undef );
+    PrescanExif($exifTool, $dirInfo, \%needTags);
+    my $serial = $needTags{0x001d};
+    unless ($serial =~ /^\d+$/) {
+        if ($exifTool->{Model} =~ /\bD50$/) {
+            $serial = 0x22; # D50 (ref 8)
+        } else {
+            $serial = 0x60; # D200 (ref 10), D40X (ref PH)
         }
     }
-    delete $exifTool->{NikonInfo};
+    $exifTool->{NikonSerialNumber} = $serial;
+    $exifTool->{NikonShutterCount} = $needTags{0x00a7};
+
+    # process Nikon makernotes
+    my $rtnVal;
+    if ($$dirInfo{IsWriting}) {
+        $rtnVal = Image::ExifTool::Exif::WriteExif($exifTool, $dirInfo, $tagTablePtr);
+    } else {
+        $rtnVal = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+    }
+    delete $exifTool->{NikonSerialNumber};
+    delete $exifTool->{NikonShutterCount};
     return $rtnVal;
 }
 
@@ -2740,9 +3419,9 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Joseph Heled, Thomas Walter, Brian Ristuccia, Danek Duvall, Tom
-Christiansen, Robert Rottmerhusen, Werner Kober, Roger Larsson and Jens
-Duttke for their help figuring out some Nikon tags, and Bruce Stevens for
-his additions to the LensID list.
+Christiansen, Robert Rottmerhusen, Werner Kober, Roger Larsson, Jens Duttke
+and Gregor Dorlars for their help figuring out some Nikon tags, and Bruce
+Stevens and Vladimir Sauta for their additions to the LensID list.
 
 =head1 SEE ALSO
 

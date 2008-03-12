@@ -22,7 +22,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.46';
+$VERSION = '1.47';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -167,7 +167,7 @@ sub BuildMakerNotes($$$$$$);
     0x1033 => [
         {
             Name => 'CustomFunctions10D',
-            Condition => '$self->{CameraModel} =~ /EOS 10D/',
+            Condition => '$self->{Model} =~ /EOS 10D/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::Functions10D',
@@ -175,7 +175,7 @@ sub BuildMakerNotes($$$$$$);
         },
         {
             Name => 'CustomFunctionsD30',
-            Condition => '$self->{CameraModel} =~ /EOS D30\b/',
+            Condition => '$self->{Model} =~ /EOS D30\b/',
             SubDirectory => {
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
                 TagTable => 'Image::ExifTool::CanonCustom::FunctionsD30',
@@ -183,7 +183,7 @@ sub BuildMakerNotes($$$$$$);
         },
         {
             Name => 'CustomFunctionsD60',
-            Condition => '$self->{CameraModel} =~ /EOS D60\b/',
+            Condition => '$self->{Model} =~ /EOS D60\b/',
             SubDirectory => {
                 # the stored size in the D60 apparently doesn't include the size word:
                 Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size-2,$size)',
@@ -270,7 +270,7 @@ sub BuildMakerNotes($$$$$$);
             # D30
             Name => 'SerialNumber',
             Description => 'Camera Body No.',
-            Condition => '$$self{CameraModel} =~ /EOS D30\b/',
+            Condition => '$$self{Model} =~ /EOS D30\b/',
             Writable => 'int32u',
             PrintConv => 'sprintf("%x-%.5d",$val>>16,$val&0xffff)',
             PrintConvInv => '$val=~/(.*)-(\d+)/ ? (hex($1)<<16)+$2 : undef',
@@ -279,7 +279,7 @@ sub BuildMakerNotes($$$$$$);
             # all EOS models (D30, 10D, 300D)
             Name => 'SerialNumber',
             Description => 'Camera Body No.',
-            Condition => '$$self{CameraModel} =~ /EOS/',
+            Condition => '$$self{Model} =~ /EOS/',
             Writable => 'int32u',
             PrintConv => 'sprintf("%.10d",$val)',
             PrintConvInv => '$val',
@@ -314,7 +314,7 @@ sub BuildMakerNotes($$$$$$);
     0x1814 => { #3
         Name => 'MeasuredEV',
         Notes => q{
-            this the Canon name for what should properly be called MeasuredLV, and is
+            this the Canon name for what could better be called MeasuredLV, and is
             offset by about -5 EV from the calculated LV for most models
         },
         Format => 'float',
@@ -434,15 +434,15 @@ sub BuildMakerNotes($$$$$$);
     0 => {
         Name => 'Make',
         Format => 'string[6]',  # "Canon\0"
-        DataMember => 'CameraMake',
-        RawConv => '$self->{CameraMake} = $val',
+        DataMember => 'Make',
+        RawConv => '$self->{Make} = $val',
     },
     6 => {
         Name => 'Model',
-        Format => 'string[$size-6]',
+        Format => 'string', # no size = to the end of the data
         Description => 'Camera Model Name',
-        DataMember => 'CameraModel',
-        RawConv => '$self->{CameraModel} = $val',
+        DataMember => 'Model',
+        RawConv => '$self->{Model} = $val',
     },
 );
 

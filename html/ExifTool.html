@@ -116,7 +116,8 @@ $exifTool-&gt;<a href="#WriteInfo">WriteInfo</a>('image.jpg','modified_image.jpg
 
 <hr><h2><a name="Config">Configuration</a></h2>
 
-<p>User-defined tags can be added via the ExifTool configuration file.  See
+<p>User-defined tags can be added via the ExifTool configuration file or by defining
+the %Image::ExifTool::UserDefined hash before calling any ExifTool functions.  See
 "<a href="config.html">ExifTool_config</a>" in the ExifTool distribution for
 more details. If necessary, the configuration feature can be disabled by setting
 the ExifTool "noConfig" flag before loading Image::ExifTool.  ie)</p>
@@ -547,7 +548,8 @@ my $isVerbose = $exifTool-&gt;<b>Options</b>('Verbose');
 </table></blockquote>
 <p>The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:</p>
 <blockquote>
-Binary, Composite, DateFormat, Unknown and Verbose.
+Binary, Charset, Composite, FastScan, FixBase, HtmlDump, HtmlDumpBase,
+IgnoreMinorErrors, MakerNotes, ScanForXMP, TextOut, Unknown and Verbose.
 </blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -583,7 +585,8 @@ $info = $exifTool-&gt;<b>GetInfo</b>({Group2 =&gt; ['Author', 'Location']});
 </pre></td></tr></table></blockquote>
 <p>The following options are effective in the call to <a href="#GetInfo">GetInfo</a>:</p>
 <blockquote>
-Duplicates, Exclude, Group#, PrintConv (and Sort if tag list reference is given).
+Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, List,
+StrictDate, PrintConv (and Sort if a tag list reference is given).
 </blockquote>
 
 <hr><h2><a name="WriteInfo">WriteInfo</a></h2>
@@ -684,7 +687,7 @@ or <a href="#GetInfo">GetInfo</a> for this object.</p>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
     <br><b>1)</b> [<i>optional</i>] Sort order ('File', 'Input', 'Alpha' or 'Group#')
 </td></tr>
-<tr><td><b>Returns</b></td><td>List of tags in specified order</td></tr>
+<tr><td><b>Returns</b></td><td>List of tag keys in the specified order</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -702,8 +705,8 @@ in the list.</p>
 <tr><td><b>Prototype</b></td><td>GetRequestedTags($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
-<tr><td><b>Returns</b></td><td>List of requested tags (empty if no tags
-specifically requested)</td></tr>
+<tr><td><b>Returns</b></td><td>List of tag keys for requested tags
+(empty if no tags specifically requested)</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -830,8 +833,8 @@ errors are printed to STDERR.
     <td><table class='clear'>
     <tr><td valign='top' align=left colspan=2><b>undef</b>&nbsp;= No shift</td></tr>
     <tr><td valign='top' align=right><b>0</b>&nbsp;=</td><td>Shift if shiftable:<br>
-    <b>1</b> if AddValue set<br>
-    <b>-1</b> if DelValue set</td></tr>
+    Positive if AddValue set, or<br>
+    Negative if DelValue set</td></tr>
     <tr><td valign='top' align=right><b>1</b>&nbsp;=</td><td>Positive shift</td></tr>
     <tr><td valign='top' align=right><b>-1</b>&nbsp;=</td><td>Negative shift</td></tr>
     </table></td><td align=center>undef</td></tr>
@@ -866,6 +869,10 @@ $exifTool-&gt;<b>SetNewValue</b>('XMP:Headline' =&gt; $val);  <span class='com'>
 
 <span class='com'># shift original date/time back by 1 hour</span>
 $exifTool-&gt;<b>SetNewValue</b>(DateTimeOriginal =&gt; '1:00', Shift =&gt; -1);
+
+<span class='com'># delete all but EXIF tags</span>
+$exifTool-&gt;<b>SetNewValue</b>('*');  <span class='com'># delete all...</span>
+$exifTool-&gt;<b>SetNewValue</b>('EXIF:*', undef, Replace =&gt; 2); <span class='com'># ...but EXIF</span>
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="SetNewValuesFromFile">SetNewValuesFromFile</a></h2>
@@ -1308,20 +1315,20 @@ GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
 HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
 ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC, InteropIFD,
 JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
-KyoceraRaw, Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc,
-MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
-MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
-MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown,
-MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan,
-Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
-PictureInfo, PostScript, PrintIM, QuickTime, RAF, RAF2, RIFF, RMETA, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, Sanyo, Sigma, SigmaRaw,
-Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-PixelLive, XMP-aux,
-XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-lr,
-XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop,
-XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS,
-XMP-xmpRights, XMP-xmpTPg
+KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC, MIE-Audio, MIE-Camera,
+MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens,
+MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Test,
+MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG,
+MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture,
+NikonPreview, NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax,
+PhotoMechanic, Photoshop, PictureInfo, PostScript, PrintIM, QuickTime, RAF,
+RAF2, RIFF, RMETA, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
+Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
+SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
+XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif,
+XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech,
+XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
+XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
@@ -1402,7 +1409,8 @@ my $writable = Image::ExifTool::<b>CanWrite</b>($filename);
 <tr><td valign='top'><b>Inputs</b></td>
 <td><b>0)</b> File name, file extension, or file type</td></tr>
 <tr><td><b>Returns</b></td><td>True if the file type can be created
-from scratch.  Currently, this can only be done with XMP files.</td></tr>
+from scratch.  Currently, this can only be done with XMP, MIE, ICC
+and VRD files.</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>

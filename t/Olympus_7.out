@@ -1,8 +1,8 @@
-  ExifToolVersion = 7.08
+  ExifToolVersion = 7.21
   FileName = Olympus_7_failed.jpg
   Directory = t
   FileSize = 7335
-  FileModifyDate = 1198250161
+  FileModifyDate = 1205171234
   FileType = JPEG
   MIMEType = image/jpeg
 JPEG APP1 (7080 bytes):
@@ -121,10 +121,10 @@ JPEG APP1 (7080 bytes):
   | | | | 10) AFSearch = 0
   | | | |     - Tag 0x0303 (2 bytes, int16u[1])
   | | | | 11) AFAreas = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [snip]
-  | | | |     - Tag 0x0304 (256 bytes, int32u[64] read as int32u[64])
+  | | | |     - Tag 0x0304 (256 bytes, int32u[64])
   | | | | 12) FlashMode = 0
   | | | |     - Tag 0x0400 (2 bytes, int16u[1])
-  | | | | 13) FlashExposureCompensation = 0
+  | | | | 13) FlashExposureComp = 0
   | | | |     - Tag 0x0401 (8 bytes, rational64s[1])
   | | | | 14) Olympus_CameraSettings_0x0402 = 0
   | | | |     - Tag 0x0402 (2 bytes, int16u[1])

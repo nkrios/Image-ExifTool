@@ -10,6 +10,7 @@
 #               2) Joachim Loehr private communication
 #               3) http://homepage3.nifty.com/kamisaka/makernote/makernote_casio.htm
 #               4) http://www.gvsoft.homedns.org/exif/makernote-casio.html
+#               5) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Casio;
@@ -18,7 +19,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 # older Casio maker notes (ref 1)
 %Image::ExifTool::Casio::Main = (
@@ -60,7 +61,7 @@ $VERSION = '1.21';
     0x0004 => [
         {
             Name => 'FlashMode',
-            Condition => '$self->{CameraModel} =~ /^QV-(3500EX|8000SX)/',
+            Condition => '$self->{Model} =~ /^QV-(3500EX|8000SX)/',
             Writable => 'int16u',
             PrintConv => {
                 1 => 'Auto',
@@ -167,6 +168,35 @@ $VERSION = '1.21';
         Writable => 'int16u',
         Priority => 0,
     },
+    0x0015 => { #5 (Similar to Type2 0x2001)
+        Name => 'FirmwareDate',
+        Writable => 'string',
+        Format => 'undef', # the 'string' contains nulls
+        Count => 18,
+        PrintConv => q{
+            $_ = $val;
+            if (/^(\d{2})(\d{2})\0\0(\d{2})(\d{2})\0\0(\d{2})(.{2})\0{2}$/) {
+                my $yr = $1 + ($1 < 70 ? 2000 : 1900);
+                my $sec = $6;
+                $val = "$yr:$2:$3 $4:$5";
+                $val .= ":$sec" if $sec=~/^\d{2}$/;
+                return $val;
+            }
+            tr/\0/./;  s/\.+$//;
+            return "Unknown ($_)";
+        },
+        PrintConvInv => q{
+            $_ = $val;
+            if (/^(19|20)(\d{2}):(\d{2}):(\d{2}) (\d{2}):(\d{2})$/) {
+                return "$2$3\0\0$4$5\0\0$6\0\0\0\0";
+            } elsif (/^Unknown\s*\((.*)\)$/i) {
+                $_ = $1;  tr/./\0/;
+                return $_;
+            } else {
+                return undef;
+            }
+        },
+    },
     0x0016 => { #4
         Name => 'Enhancement',
         Writable => 'int16u',
@@ -196,6 +226,7 @@ $VERSION = '1.21';
     0x0018 => { #4
         Name => 'AFPoint',
         Writable => 'int16u',
+        Notes => 'may not be valid for all models', #5
         PrintConv => {
             1 => 'Center',
             2 => 'Upper Left',
@@ -416,6 +447,14 @@ $VERSION = '1.21';
            12 => 'Flash',
         },
     },
+    0x2021 => { #5 (guess)
+        Name => 'AFPointPosition',
+        PrintConv => q{
+            my @v = split ' ', $val;
+            return 'n/a' if $v[0] == 65535 or not $v[1] or not $v[3];
+            sprintf"%.0f%% %.0f%%", 100*$v[0]/$v[1], 100*$v[2]/$v[3];
+        },
+    },
     0x2022 => {
         Name => 'ObjectDistance',
         Writable => 'int32u',
@@ -438,6 +477,9 @@ $VERSION = '1.21';
             4 => 'Aperture Priority', #3
             5 => 'Manual', #3
             6 => 'Best Shot', #3
+            17 => 'Movie', #PH (UHQ?)
+            19 => 'Movie (19)', #PH (HQ?, EX-P505)
+            20 => 'YouTube Movie', #PH
         },
     },
     # 0x3001 is ShutterMode according to ref 3!
@@ -459,8 +501,8 @@ $VERSION = '1.21';
         Name => 'FocusMode',
         Writable => 'int16u',
         PrintConv => {
-           0 => 'Manual?',
-           1 => 'Fixation?',
+           0 => 'Manual', #(guess at translation)
+           1 => 'Focus Lock', #(guess at translation)
            2 => 'Macro', #3
            3 => 'Single-Area Auto Focus',
            6 => 'Multi-Area Auto Focus',
@@ -473,10 +515,10 @@ $VERSION = '1.21';
     0x3007 => {
         Name => 'BestShotMode',
         Writable => 'int16u',
-        PrintConv => {
-           0 => 'Off',
-           1 => 'On?',
-        },
+        # unfortunately these numbers are model-dependent,
+        # so we can't use a lookup as usual - PH
+        PrintConv => '$val ? $val : "Off"',
+        PrintConvInv => '$val=~/(\d+)/ ? $1 : 0',
     },
     0x3008 => { #3
         Name => 'AutoISO',
@@ -535,9 +577,23 @@ $VERSION = '1.21';
             0 => 'Off',
             1 => 'On',
             2 => 'Best Shot',
+            # 3 observed in MOV videos (EX-V7)
         },
     },
 );
+
+# tags in Casio AVI videos (ref PH)
+%Image::ExifTool::Casio::AVI = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => 'This information is found in Casio GV-10 AVI videos.',
+    0 => {
+        Name => 'Software', # (equivalent to RIFF Software tag)
+        Format => 'string',
+    },
+);
+
 
 1;  # end
 

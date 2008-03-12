@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.16
 [File, File, Image]  - File Name: Canon.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Time]  - File Modification Date/Time: 2007:05:01 07:34:38
@@ -55,7 +55,7 @@
 [Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
+[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4
 [Composite, Composite, Camera]  - WB RGGB Levels: 1719 832 831 990
@@ -64,6 +64,6 @@
 [Composite, Composite, Image]  - Field Of View: 37.7 deg
 [Composite, Composite, Camera]  - Focal Length: 34.0 mm (35 mm equivalent: 52.7 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 4.26 m
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm (35mm equivalent: 27.9 - 85.3 mm)
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm (35 mm equivalent: 27.9 - 85.3 mm)
 [Composite, Composite, Image]  - Light Value: 5.6
 [Composite, Composite, Camera]  - Red Balance: 2.067348

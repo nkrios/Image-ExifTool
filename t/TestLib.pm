@@ -217,7 +217,8 @@ sub check($$$;$$)
             # make sure there are no linefeeds in output
             $val =~ tr/\x0a\x0d/;/;
             # translate unknown characters
-            $val =~ tr/\x01-\x1f\x80-\xff/\./;
+           # $val =~ tr/\x01-\x1f\x80-\xff/\./;
+            $val =~ tr/\x01-\x1f\x7f/./;
             # remove NULL chars
             $val =~ s/\x00//g;
         }

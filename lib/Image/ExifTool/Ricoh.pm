@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -55,7 +55,7 @@ sub ProcessRicohRMETA($$$);
     0x2001 => [
         {
             Name => 'RicohSubdir',
-            Condition => '$self->{CameraModel} !~ /^Caplio RR1\b/',
+            Condition => '$self->{Model} !~ /^Caplio RR1\b/',
             SubDirectory => {
                 Validate => '$val =~ /^\[Ricoh Camera Info\]/',
                 TagTable => 'Image::ExifTool::Ricoh::Subdir',
@@ -256,6 +256,34 @@ sub ProcessRicohRMETA($$$);
         15 => 'NW',
         16 => 'NNW',
     } },
+);
+
+# information stored in Ricoh AVI images (ref PH)
+%Image::ExifTool::Ricoh::AVI = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
+    ucmt => {
+        Name => 'Comment',
+        ValueConv => '$_=$val; s/^Unicode//; tr/\0//d; s/\s+$//; $_',
+    },
+    mnrt => {
+        Name => 'MakerNoteRicoh',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Ricoh::Main',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'BigEndian',
+            Base => '8',
+        },
+    },
+    rdc2 => {
+        Name => 'RicohRDC2',
+        Unknown => 1,
+        ValueConv => 'unpack("H*",$val)',
+        # have seen values like 0a000444 and 00000000 - PH
+    },
+    thum => {
+        Name => 'ThumbnailImage',
+        Binary => 1,
+    },
 );
 
 #------------------------------------------------------------------------------

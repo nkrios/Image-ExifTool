@@ -336,7 +336,7 @@ while ($_ = shift) {
         /^G(\d*)$/ and $showGroup = $1, $allGroup=1, next;
         /^h$/  and $htmlOutput = 1, $escapeHTML = 1, next;
         /^H$/  and $showTagID = 'H', next;
-        if (/^htmldump(-?\d+)?$/i) {
+        if (/^htmldump([-+]?\d+)?$/i) {
             $verbose = ($verbose || 0) + 1;
             $htmlOutput = 2;
             $mainTool->Options(HtmlDumpBase => $1) if defined $1;
@@ -691,13 +691,10 @@ sub GetImageInfo($$)
         undef $evalWarning;
 
         my %info;
-        my $oldVerbose = $exifTool->Options(Verbose => 0);
-        my $oldDups = $exifTool->Options(Duplicates => 1);
         # extract information and build expression for evaluation
-        $info = $exifTool->ImageInfo($pipe, \@foundTags);
+        my $opts = { Duplicates => 1, Verbose => 0 };
+        $info = $exifTool->ImageInfo($pipe, \@foundTags, $opts);
         my $cond = $exifTool->InsertTagValues(\@foundTags, $condition, \%info);
-        $exifTool->Options(Verbose => $oldVerbose);
-        $exifTool->Options(Duplicates => $oldDups);
 
         #### eval "-if" condition (%info)
         my $result = eval $cond;
@@ -767,9 +764,15 @@ sub GetImageInfo($$)
             }
         } else {
             # request specified tags unless using print format option
-            @foundTags = @tags unless @printFmt;
+            my $oldDups = $exifTool->Options('Duplicates');
+            if (@printFmt) {
+                $exifTool->Options(Duplicates => 1);
+            } else {
+                @foundTags = @tags;
+            }
             # extract the information
             $info = $exifTool->ImageInfo($pipe, \@foundTags);
+            $exifTool->Options(Duplicates => $oldDups);
         }
         # all done now if we already wrote output file
         if ($fp) {
@@ -1801,13 +1804,13 @@ option.
 
 =item B<-ext> I<EXT> (or B<--ext> I<EXT>)
 
-Process only files with the specified extension, or use B<--ext> to exclude
-files.  There may be multiple B<-ext> and B<--ext> options.  Extensions may
+Process only files with (B<-ext>) or without (B<--ext>) a specified
+extension.  There may be multiple B<-ext> and B<--ext> options.  Extensions may
 begin with a leading '.', and case is not significant.  For example:
 
-    exiftool -ext .JPG *            # process only JPG files
-    exiftool --ext crw --ext dng *  # process all but CRW and DNG
-    exiftool --ext . *              # ignore if no extension
+    exiftool -ext .JPG DIR            # process only JPG files in
+    exiftool --ext crw --ext dng DIR  # process all but CRW and DNG
+    exiftool --ext . DIR              # ignore if no extension
 
 =item B<-f>
 

@@ -1201,7 +1201,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0101 => [
         {
             Name => 'ExposureLevelIncrements',
-            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Condition => '$$self{Model} =~ /\b40D\b/',
             Notes => '40D',
             PrintConv => {
                 0 => '1/3 Stop',
@@ -1228,7 +1228,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0103 => [
         {
             Name => 'ISOExpansion',
-            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Condition => '$$self{Model} =~ /\b40D\b/',
             Notes => '40D',
             PrintConv => {
                 0 => 'Off',
@@ -1392,7 +1392,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x010f => [
         {
             Name => 'FlashSyncSpeedAv',
-            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Condition => '$$self{Model} =~ /\b40D\b/',
             Notes => '40D',
             PrintConv => {
                 0 => 'Auto',
@@ -1664,7 +1664,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0704 => [
         {
             Name => 'SetButtonWhenShooting',
-            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Condition => '$$self{Model} =~ /\b40D\b/',
             Notes => '40D',
             PrintConv => {
                 0 => 'Normal (disabled)',
@@ -1733,7 +1733,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x080b => [
         {
             Name => 'FocusingScreen',
-            Condition => '$$self{CameraModel} =~ /\b40D\b/',
+            Condition => '$$self{Model} =~ /\b40D\b/',
             Notes => '40D',
             PrintConv => {
                 0 => 'Ef-A',
@@ -1939,7 +1939,7 @@ sub ProcessCanonCustom($$$)
 
     # first entry in array must be the size
     my $len = Get16u($dataPt,$offset);
-    unless ($len == $size or ($$exifTool{CameraModel}=~/\bD60\b/ and $len+2 == $size)) {
+    unless ($len == $size or ($$exifTool{Model}=~/\bD60\b/ and $len+2 == $size)) {
         $exifTool->Warn("Invalid CanonCustom data");
         return 0;
     }
@@ -1988,7 +1988,7 @@ sub WriteCanonCustom($$$)
 
     # first entry in array must be the size
     my $len = Get16u($dataPt, 0);
-    unless ($len == $dirLen or ($$exifTool{CameraModel}=~/\bD60\b/ and $len+2 == $dirLen)) {
+    unless ($len == $dirLen or ($$exifTool{Model}=~/\bD60\b/ and $len+2 == $dirLen)) {
         $exifTool->Warn("Invalid CanonCustom data");
         return undef;
     }

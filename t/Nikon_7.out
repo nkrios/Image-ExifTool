@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.21
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
@@ -108,16 +108,16 @@
 [MakerNotes, Nikon, Camera] 135 - Flash Mode: Did Not Fire
 [MakerNotes, Nikon, Camera] 0 - AF Area Mode: Single Area
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
-[MakerNotes, Nikon, Camera] 2 - AF Points In Focus: Lower-right
+[MakerNotes, Nikon, Camera] 2 - AF Points In Focus: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Single-Frame
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 5.33
-[MakerNotes, Nikon, Camera] 140 - NEF Curve 1: (Binary data 17 bytes)
+[MakerNotes, Nikon, Camera] 140 - Contrast Curve: (Binary data 17 bytes)
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode2
 [MakerNotes, Nikon, Camera] 144 - Light Source: Natural
 [MakerNotes, Nikon, Camera] 146 - Hue Adjustment: 0
 [MakerNotes, Nikon, Camera] 147 - NEF Compression: Lossy (type 1)
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
-[MakerNotes, Nikon, Camera] 150 - NEF Curve 2: (Binary data 17 bytes)
+[MakerNotes, Nikon, Camera] 150 - Linearization Table: (Binary data 17 bytes)
 [MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 478 265 493 265
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
 [MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 102.4 mm

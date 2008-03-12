@@ -372,7 +372,7 @@ sub ProcessFujiDir($$$);
     0x121 => [
         {
             Name => 'RawImageSize',
-            Condition => '$$self{CameraModel} eq "FinePixS2Pro"',
+            Condition => '$$self{Model} eq "FinePixS2Pro"',
             Format => 'int16u',
             Count => 2,
             ValueConv => q{
@@ -591,12 +591,12 @@ sub ProcessRAF($$)
         my $start = unpack('N',$buff);
         next unless $start;
 
-        my $tagTablePtr = GetTagTable('Image::ExifTool::FujiFilm::RAF');
         %dirInfo = (
             RAF      => $raf,
             DirStart => $start,
         );
         $$exifTool{SET_GROUP1} = "RAF$num";
+        my $tagTablePtr = GetTagTable('Image::ExifTool::FujiFilm::RAF');
         $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr) or $warn = 1;
         delete $$exifTool{SET_GROUP1};
 

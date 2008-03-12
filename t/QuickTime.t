@@ -21,7 +21,7 @@ use t::TestLib;
 my $testname = 'QuickTime';
 my $testnum = 1;
 
-# tests 3-4: Extract information from QuickTime.mov and QuickTime.m4a
+# tests 2-3: Extract information from QuickTime.mov and QuickTime.m4a
 {
     my $ext;
     foreach $ext (qw(mov m4a)) {

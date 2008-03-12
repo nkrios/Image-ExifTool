@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.20
 [File, File, Image]  - File Name: RIFF.avi
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 390 bytes
@@ -30,7 +30,7 @@
 [BMP, BMP, Image] 8 - Image Height: 240
 [BMP, BMP, Image] 12 - Planes: 1
 [BMP, BMP, Image] 14 - Bit Depth: 24
-[BMP, BMP, Image] 16 - Compression: Unknown (MJPG)
+[BMP, BMP, Image] 16 - Compression: MJPG
 [BMP, BMP, Image] 20 - Image Length: 230400
 [BMP, BMP, Image] 24 - Pixels Per Meter X: 0
 [BMP, BMP, Image] 28 - Pixels Per Meter Y: 0

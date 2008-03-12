@@ -18,6 +18,7 @@
 #              10) Lilo Huang private communication (E-330)
 #              11) http://olypedia.de/Olympus_Makernotes
 #              12) Ioannis Panagiotopoulos private communication (E-510)
+#              13) Chris Shaw private communication (E-3)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -27,7 +28,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.43';
+$VERSION = '1.45';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -1155,7 +1156,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'MeteringMode',
         Writable => 'int16u',
         PrintConv => {
-            2 => 'Center Weighted',
+            2 => 'Center-weighted average',
             3 => 'Spot',
             5 => 'ESP',
             261 => 'Pattern+AF', #6
@@ -1221,7 +1222,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         },
     },
     0x401 => { #6
-        Name => 'FlashExposureCompensation',
+        Name => 'FlashExposureComp',
         Writable => 'rational64s',
     },
     0x500 => { #6
@@ -1264,7 +1265,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Notes => '3 numbers: 1. CS Value, 2. Min, 3. Max',
         PrintConv => q{
             my ($a,$b,$c)=split ' ',$val;
-            if ($self->{CameraModel} =~ /^E-1\b/) {
+            if ($self->{Model} =~ /^E-1\b/) {
                 $a-=$b; $c-=$b;
                 return "CS$a (min CS0, max CS$c)";
             } else {
@@ -2147,7 +2148,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x308 => [
         {
             Name => 'AFPoint',
-            Condition => '$$self{CameraModel} =~ /E-3\b/',
+            Condition => '$$self{Model} =~ /E-3\b/',
             Writable => 'int16u',
             PrintHex => 1,
             # decoded by ref 6
@@ -2487,6 +2488,137 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
 );
 
+# tags in Olympus QuickTime videos (ref PH)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
+%Image::ExifTool::Olympus::MOV1 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        This information is found in MOV videos from Olympus models such as the
+        D540Z, D595Z, FE100, FE110, FE115, FE170 and FE200.
+    },
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[24]',
+    },
+    0x18 => {
+        Name => 'Model',
+        Format => 'string[8]',
+    },
+    # (01 00 at offset 0x20)
+    0x26 => {
+        Name => 'ExposureUnknown',
+        Unknown => 1,
+        Format => 'int32u',
+        # this conversion doesn't work for all models (ie. gives "1/100000")
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x2a => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x32 => { #(NC)
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+  # 0x44 => WhiteBalance ?
+    0x48 => {
+        Name => 'FocalLength',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+    },
+  # 0xb1 => 'ISO', #(I don't think this works - PH)
+);
+
+# tags in Olympus QuickTime videos (ref PH)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
+%Image::ExifTool::Olympus::MOV2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        This information is found in MOV videos from Olympus models such as the
+        FE120, FE140 and FE190.
+    },
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[24]',
+    },
+    0x18 => {
+        Name => 'Model',
+        Format => 'string[24]',
+    },
+    # (01 00 at offset 0x30)
+    0x36 => {
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x3a => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x42 => { #(NC)
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    0x58 => {
+        Name => 'FocalLength',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+    },
+    0xc1 => {
+        Name => 'ISO',
+        Format => 'int16u',
+    },
+);
+
+# tags in Olympus AVI videos (ref PH)
+%Image::ExifTool::Olympus::AVI = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => 'This information is found in Olympus AVI videos.',
+    0x12 => {
+        Name => 'Make',
+        Format => 'string[24]',
+    },
+    0x2c => {
+        Name => 'ModelType',
+        Format => 'string[24]',
+    },
+    0x5e => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x83 => {
+        Name => 'DateTime1',
+        Format => 'string[24]',
+    },
+    0x9d => {
+        Name => 'DateTime2',
+        Format => 'string[24]',
+    },
+    0x12d => {
+        Name => 'ThumbnailLength',
+        Format => 'int32u',
+    },
+    0x131 => {
+        Name => 'ThumbnailImage',
+        Format => 'undef[$val{0x12d}]',
+        Notes => '160x120 JPEG thumbnail image',
+        ValueConv => '$self->ValidateImage(\$val,$tag)',
+    },
+);
+
 # Olympus composite tags
 %Image::ExifTool::Olympus::Composite = (
     GROUPS => { 2 => 'Camera' },
@@ -2591,6 +2723,7 @@ sub PrintLensInfo($$)
             # Leica lenses (ref 11)
             '2 1'   => 'D Vario Elmarit 14-50mm, F2.8-3.5 Asph.',
             '2 2'   => 'D Summilux 25mm, F1.4 Asph.',
+            '2 4'   => 'Vario Elmar 14~150mm f3.5-5.6', #13
             '3 1'   => 'D Vario Elmarit 14-50mm, F2.8-3.5 Asph.',
             '3 2'   => 'D Summilux 25mm, F1.4 Asph.',
         },
@@ -2698,7 +2831,7 @@ under the same terms as Perl itself.
 
 Thanks to Markku Hanninen, Remi Guyomarch, Frank Ledwon, Michael Meissner,
 Mark Dapoz and Ioannis Panagiotopoulos for their help figuring out some
-Olympus tags, and Lilo Huang for adding to the LensType list.
+Olympus tags, and Lilo Huang and Chris Shaw for adding to the LensType list.
 
 =head1 SEE ALSO
 

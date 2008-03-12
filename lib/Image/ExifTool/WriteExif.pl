@@ -536,11 +536,13 @@ my %writeTable = (
         Writable => 'int8u',
         WriteGroup => 'IFD0',
         Count => 4,
+        Protected => 1, # (confuses Apple Preview if written to a TIFF image)
     },
     0xc613 => {             # DNGBackwardVersion
         Writable => 'int8u',
         WriteGroup => 'IFD0',
         Count => 4,
+        Protected => 1,
     },
     0xc614 => {             # UniqueCameraModel
         Writable => 'string',
@@ -555,41 +557,50 @@ my %writeTable = (
         Writable => 'rational64u',
         WriteGroup => 'SubIFD',
         Count => 2,
+        Protected => 1,
     },
     0xc61f => {             # DefaultCropOrigin
         Writable => 'int32u',
         WriteGroup => 'SubIFD',
         Count => 2,
+        Protected => 1,
     },
     0xc620 => {             # DefaultCropSize
         Writable => 'int32u',
         WriteGroup => 'SubIFD',
         Count => 2,
+        Protected => 1,
     },
     0xc629 => {             # AsShotWhiteXY
         Writable => 'rational64u',
         WriteGroup => 'IFD0',
         Count => 2,
+        Protected => 1,
     },
     0xc62a => {             # BaselineExposure
         Writable => 'rational64s',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc62b => {             # BaselineNoise
         Writable => 'rational64u',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc62c => {             # BaselineSharpness
         Writable => 'rational64u',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc62d => {             # BayerGreenSplit
         Writable => 'int32u',
         WriteGroup => 'SubIFD',
+        Protected => 1,
     },
     0xc62e => {             # LinearResponseLimit
         Writable => 'rational64u',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc62f => {             # CameraSerialNumber
         Writable => 'string',
@@ -604,14 +615,17 @@ my %writeTable = (
     0xc631 => {             # ChromaBlurRadius
         Writable => 'rational64u',
         WriteGroup => 'SubIFD',
+        Protected => 1,
     },
     0xc632 => {             # AntiAliasStrength
         Writable => 'rational64u',
         WriteGroup => 'SubIFD',
+        Protected => 1,
     },
     0xc633 => {             # ShadowScale
         Writable => 'rational64u',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc635 => {             # MakerNoteSafety
         Writable => 'int16u',
@@ -620,38 +634,46 @@ my %writeTable = (
     0xc65a => {             # CalibrationIlluminant1
         Writable => 'int16u',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc65b => {             # CalibrationIlluminant2
         Writable => 'int16u',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc65c => {             # BestQualityScale
         Writable => 'rational64u',
         WriteGroup => 'SubIFD',
+        Protected => 1,
     },
     0xc65d => {             # RawDataUniqueID
         Writable => 'int8u',
         WriteGroup => 'IFD0',
         Count => 16,
         ValueConvInv => 'pack("H*",$val)',
+        Protected => 1,
     },
     0xc68b => {             # OriginalRawFileName
         Writable => 'string',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc68c => {             # OriginalRawFileData (a writable directory)
         Writable => 'undef',
         WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xc68d => {             # ActiveArea
         Writable => 'int32u',
         WriteGroup => 'SubIFD',
         Count => 4,
+        Protected => 1,
     },
     0xc68e => {             # MaskedAreas
         Writable => 'int32u',
         WriteGroup => 'SubIFD',
         Count => 4,
+        Protected => 1,
     },
     0xc68f => {             # AsShotICCProfile
         Writable => 'undef',
@@ -925,7 +947,7 @@ sub RebuildMakerNotes($$$)
         # don't copy over preview image
         $newTool->SetNewValue(PreviewImage => '');
         # copy all transient members over in case they are used for writing
-        # (CameraMake, CameraModel, etc)
+        # (Make, Model, etc)
         foreach (grep /[a-z]/, keys %$exifTool) {
             $$newTool{$_} = $$exifTool{$_};
         }
@@ -1092,7 +1114,7 @@ sub WriteExif($$$)
     my @imageData;      # image data blocks if requested
 
     # allow multiple IFD's in IFD0-IFD1-IFD2... chain
-    $$dirInfo{Multi} = 1 if $dirName eq 'IFD0' or $dirName eq 'SubIFD';
+    $$dirInfo{Multi} = 1 if $dirName =~ /^(IFD0|SubIFD)$/ and not defined $$dirInfo{Multi};
     $inMakerNotes = 1 if $tagTablePtr->{GROUPS}->{0} eq 'MakerNotes';
     my $ifd;
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1288,7 +1310,7 @@ Entry:  for (;;) {
                         # don't write out null directory entry
                         if ($oldFormat==0 and $index and ($oldCount==0 or
                             # patch for Canon EOS 40D firmware 1.0.4 bug:
-                            ($index==$numEntries-1 and $$exifTool{CameraModel}=~/EOS 40D/)))
+                            ($index==$numEntries-1 and $$exifTool{Model}=~/EOS 40D/)))
                         {
                             ++$ignoreCount;
                             ++$index;
@@ -1833,15 +1855,15 @@ NoOverwrite:            next if $isNew > 0;
                                 $subdirBase += eval $$subdir{Base};
                             }
                             my %subdirInfo = (
-                                Base => $subdirBase,
-                                DataPt => $dataPt,
-                                DataPos => $dataPos - $subdirBase + $base,
-                                DataLen => $dataLen,
+                                Base     => $subdirBase,
+                                DataPt   => $dataPt,
+                                DataPos  => $dataPos - $subdirBase + $base,
+                                DataLen  => $dataLen,
                                 DirStart => $subdirStart,
-                                DirName => $subdirName . ($i ? $i : ''),
-                                Parent => $dirName,
-                                Fixup => new Image::ExifTool::Fixup,
-                                RAF => $raf,
+                                DirName  => $subdirName . ($i ? $i : ''),
+                                Parent   => $dirName,
+                                Fixup    => new Image::ExifTool::Fixup,
+                                RAF      => $raf,
                             );
                             # read IFD from file if necessary
                             if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
@@ -1932,21 +1954,22 @@ NoOverwrite:            next if $isNew > 0;
                         }
                         my $subFixup = new Image::ExifTool::Fixup;
                         my %subdirInfo = (
-                            Base => $subdirBase,
-                            DataPt => $valueDataPt,
-                            DataPos => $valueDataPos - $subdirBase + $base,
-                            DataLen => $valueDataLen,
+                            Base     => $subdirBase,
+                            DataPt   => $valueDataPt,
+                            DataPos  => $valueDataPos - $subdirBase + $base,
+                            DataLen  => $valueDataLen,
                             DirStart => $subdirStart,
-                            DirName => $$subdir{DirName},
-                            DirLen => $oldSize,
-                            Parent => $dirName,
-                            Fixup => $subFixup,
-                            RAF => $raf,
+                            DirName  => $$subdir{DirName},
+                            DirLen   => $oldSize,
+                            Parent   => $dirName,
+                            Fixup    => $subFixup,
+                            RAF      => $raf,
+                            TagInfo  => $newInfo,
                         );
                         my $subTable = GetTagTable($$subdir{TagTable});
                         my $oldOrder = GetByteOrder();
                         SetByteOrder($$subdir{ByteOrder}) if $$subdir{ByteOrder};
-                        $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
+                        $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable, $$subdir{WriteProc});
                         SetByteOrder($oldOrder);
                         if (defined $newValue) {
                             my $hdrLen = $subdirStart - $valuePtr;
@@ -2061,7 +2084,7 @@ NoOverwrite:            next if $isNew > 0;
 
                 } elsif ($$newInfo{DataMember}) {
 
-                    # save any necessary data members (CameraMake, CameraModel)
+                    # save any necessary data members (Make, Model)
                     $exifTool->{$$newInfo{DataMember}} = $$newValuePt;
                 }
             }
@@ -2241,8 +2264,8 @@ NoOverwrite:            next if $isNew > 0;
             $dirLen = $dataLen = 2;
         }
         # increment IFD name
-        $dirName =~ s/(\d+)$//;
-        $dirName .= ($1 || 0) + 1;
+        my $ifdNum = $dirName =~ s/(\d+)$// ? $1 : 0;
+        $dirName .= $ifdNum + 1;
         $exifTool->{DIR_NAME} = $dirName;
         next unless $nextIfdOffset;
 

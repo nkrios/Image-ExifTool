@@ -26,6 +26,7 @@
 #              14) http://www.asmail.be/msg0054681802.html
 #              15) http://crousseau.free.fr/imgfmt_raw.htm
 #              16) http://www.cybercom.net/~dcoffin/dcraw/
+#              17) http://www.digitalpreservation.gov/formats/content/tiff_tags.shtml
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -36,7 +37,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.49';
+$VERSION = '2.53';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -117,11 +118,15 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     8 => 'Adobe Deflate', #3
     9 => 'JBIG B&W', #3
     10 => 'JBIG Color', #3
+    99 => 'JPEG', #16
+    262 => 'Kodak 262', #16
     32766 => 'Next', #3
-    32769 => 'Epson ERF Compressed', #PH
+    32767 => 'Sony ARW Compressed', #16
+    32769 => 'Epson ERF Compressed', #PH (also used by Nikon? ref 16)
     32771 => 'CCIRLEW', #3
     32773 => 'PackBits',
     32809 => 'Thunderscan', #3
+    32867 => 'Kodak KDC Compressed', #PH
     32895 => 'IT8CTPAD', #3
     32896 => 'IT8LW', #3
     32897 => 'IT8MP', #3
@@ -275,23 +280,23 @@ my %longBin = (
     0x10f => {
         Name => 'Make',
         Groups => { 2 => 'Camera' },
-        DataMember => 'CameraMake',
+        DataMember => 'Make',
         # save this value as an ExifTool member variable
-        RawConv => '$$self{CameraMake} = $val',
+        RawConv => '$$self{Make} = $val',
     },
     0x110 => {
         Name => 'Model',
         Description => 'Camera Model Name',
         Groups => { 2 => 'Camera' },
-        DataMember => 'CameraModel',
+        DataMember => 'Model',
         # save this value as an ExifTool member variable
-        RawConv => '$$self{CameraModel} = $val',
+        RawConv => '$$self{Model} = $val',
     },
     0x111 => [
         {
             Condition => q[
                 $$self{TIFF_TYPE} eq 'MRW' and $$self{DIR_NAME} eq 'IFD0' and
-                $$self{CameraModel} =~ /^DiMAGE A200/
+                $$self{Model} =~ /^DiMAGE A200/
             ],
             Name => 'StripOffsets',
             IsOffset => 1,
@@ -364,7 +369,7 @@ my %longBin = (
         {
             Condition => q[
                 $$self{TIFF_TYPE} eq 'MRW' and $$self{DIR_NAME} eq 'IFD0' and
-                $$self{CameraModel} =~ /^DiMAGE A200/
+                $$self{Model} =~ /^DiMAGE A200/
             ],
             Name => 'StripByteCounts',
             OffsetPair => 0x111,   # point to associated offset
@@ -550,7 +555,7 @@ my %longBin = (
     0x14a => [
         {
             Name => 'SubIFD',
-            Condition => '$$self{TIFF_TYPE} ne "ARW" or $$self{CameraModel} ne "DSLR-A100"',
+            Condition => '$$self{TIFF_TYPE} ne "ARW" or $$self{Model} ne "DSLR-A100"',
             Groups => { 1 => 'SubIFD' },
             Flags => 'SubIFD',
             SubDirectory => {
@@ -578,14 +583,29 @@ my %longBin = (
     0x152 => 'ExtraSamples',
     0x153 => {
         Name => 'SampleFormat',
-        PrintConv => {
+        Notes => 'SamplesPerPixel values',
+        PrintConv => [{
             1 => 'Unsigned integer',
             2 => "Two's complement signed integer",
             3 => 'IEEE floating point',
             4 => 'Undefined',
             5 => 'Complex integer', #3
             6 => 'IEEE floating point', #3
-        },
+        },{
+            1 => 'Unsigned integer',
+            2 => "Two's complement signed integer",
+            3 => 'IEEE floating point',
+            4 => 'Undefined',
+            5 => 'Complex integer', #3
+            6 => 'IEEE floating point', #3
+        },{
+            1 => 'Unsigned integer',
+            2 => "Two's complement signed integer",
+            3 => 'IEEE floating point',
+            4 => 'Undefined',
+            5 => 'Complex integer', #3
+            6 => 'IEEE floating point', #3
+        }],
     },
     0x154 => 'SMinSampleValue',
     0x155 => 'SMaxSampleValue',
@@ -798,6 +818,9 @@ my %longBin = (
     0x22f => 'StripRowCounts',
     0x2bc => {
         Name => 'ApplicationNotes',
+        Writable => 'int8u',
+        Format => 'undef',
+        Flags => ['Protected', 'Binary'],
         # this could be an XMP block
         SubDirectory => {
             DirName => 'XMP',
@@ -820,11 +843,22 @@ my %longBin = (
     0x80e5 => 'ImageDepth', #9
     0x80e6 => 'TileDepth', #9
     0x827d => 'Model2',
-    0x828d => 'CFARepeatPatternDim',
-    0x828e => 'CFAPattern2',
-    0x828f => {
+    0x828d => 'CFARepeatPatternDim', #12
+    0x828e => 'CFAPattern2', #12
+    0x828f => { #12
         Name => 'BatteryLevel',
         Groups => { 2 => 'Camera' },
+    },
+    0x8290 => {
+        Name => 'KodakIFD',
+        Groups => { 1 => 'KodakIFD' },
+        Flags => 'SubIFD',
+        Notes => 'used in various types of Kodak images',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::IFD',
+            DirName => 'KodakIFD',
+            Start => '$val',
+        },
     },
     0x8298 => {
         Name => 'Copyright',
@@ -850,7 +884,7 @@ my %longBin = (
     0x82ab => 'MDPrepTime', #3
     0x82ac => 'MDFileUnits', #3
     0x830e => 'PixelScale',
-    0x83bb => {
+    0x83bb => { #12
         Name => 'IPTC-NAA',
         SubDirectory => {
             DirName => 'IPTC',
@@ -879,6 +913,8 @@ my %longBin = (
     0x84ec => 'TransparencyIndicator', #9
     0x84ed => 'ColorCharacterization', #9
     0x84ee => 'HCUsage', #9
+    0x84ef => 'TrapIndicator', #17
+    0x84f0 => 'CMYKEquivalent', #17
     0x8546 => { #11
         Name => 'SEMInfo',
         Notes => 'found in some scanning electron microscope images',
@@ -894,6 +930,11 @@ my %longBin = (
         Name => 'ModelTransform',
         Groups => { 2 => 'Location' },
     },
+    0x8602 => { #16
+        Name => 'WB_GRGBLevels',
+        Notes => 'found in IFD0 of Leaf MOS images',
+    },
+    # 0x8603 - Leaf CatchLight color matrix (ref 16)
     0x8606 => {
         Name => 'LeafData',
         Format => 'undef',    # avoid converting huge block to string of int8u's!
@@ -978,9 +1019,9 @@ my %longBin = (
         Notes => 'called OECF by the EXIF spec',
         Binary => 1,
     },
-    0x8829 => 'Interlace',
-    0x882a => 'TimeZoneOffset',
-    0x882b => 'SelfTimerMode',
+    0x8829 => 'Interlace', #12
+    0x882a => 'TimeZoneOffset', #12
+    0x882b => 'SelfTimerMode', #12
     0x885c => 'FaxRecvParams', #9
     0x885d => 'FaxSubAddress', #9
     0x885e => 'FaxRecvTime', #9
@@ -1098,15 +1139,15 @@ my %longBin = (
     },
     # Note: tags 0x920b-0x9217 are duplicates of 0xa20b-0xa217
     # (The TIFF standard uses 0xa2xx, but you'll find both in images)
-    0x920b => {
+    0x920b => { #12
         Name => 'FlashEnergy',
         Groups => { 2 => 'Camera' },
     },
-    0x920c => 'SpatialFrequencyResponse',   # ?? (not in Fuji images - PH)
-    0x920d => 'Noise',
-    0x920e => 'FocalPlaneXResolution',
-    0x920f => 'FocalPlaneYResolution',
-    0x9210 => {
+    0x920c => 'SpatialFrequencyResponse', #12 (not in Fuji images - PH)
+    0x920d => 'Noise', #12
+    0x920e => 'FocalPlaneXResolution', #12
+    0x920f => 'FocalPlaneYResolution', #12
+    0x9210 => { #12
         Name => 'FocalPlaneResolutionUnit',
         Groups => { 2 => 'Camera' },
         PrintConv => {
@@ -1117,7 +1158,7 @@ my %longBin = (
             5 => 'um',
         },
     },
-    0x9211 => 'ImageNumber',
+    0x9211 => 'ImageNumber', #12
     0x9212 => { #12
         Name => 'SecurityClassification',
         PrintConv => {
@@ -1128,14 +1169,14 @@ my %longBin = (
             U => 'Unclassified',
         },
     },
-    0x9213 => 'ImageHistory',
+    0x9213 => 'ImageHistory', #12
     0x9214 => {
         Name => 'SubjectLocation',
         Groups => { 2 => 'Camera' },
     },
-    0x9215 => 'ExposureIndex',
-    0x9216 => 'TIFF-EPStandardID',
-    0x9217 => {
+    0x9215 => 'ExposureIndex', #12
+    0x9216 => 'TIFF-EPStandardID', #12
+    0x9217 => { #12
         Name => 'SensingMethod',
         Groups => { 2 => 'Camera' },
         PrintConv => {
@@ -1204,7 +1245,7 @@ my %longBin = (
         Name => 'ColorSpace',
         Notes => q{
             the value of 2 is not standard EXIF.  Instead, an Adobe RGB image is
-            indicated by "Uncalibrated" with an InteropIndex of "R03"'
+            indicated by "Uncalibrated" with an InteropIndex of "R03"
         },
         PrintConv => {
             1 => 'sRGB',
@@ -1806,7 +1847,7 @@ my %longBin = (
         PrintConv => '$val[1] ? sprintf("%.1f mm (35 mm equivalent: %.1f mm)", $val[0], $val) : sprintf("%.1f mm", $val)',
     },
     ScaleFactor35efl => {
-        Description => 'Scale Factor To 35mm Equivalent',
+        Description => 'Scale Factor To 35 mm Equivalent',
         Notes => 'this value and any derived values may be incorrect if image has been resized',
         Groups => { 2 => 'Camera' },
         Desire => {
@@ -1819,10 +1860,10 @@ my %longBin = (
             6 => 'FocalPlaneResolutionUnit',
             7 => 'FocalPlaneXResolution',
             8 => 'FocalPlaneYResolution',
-            9 => 'CanonImageWidth',
-           10 => 'CanonImageHeight',
-           11 => 'ExifImageWidth',
-           12 => 'ExifImageHeight',
+            9 => 'ExifImageWidth',
+           10 => 'ExifImageHeight',
+           11 => 'CanonImageWidth',
+           12 => 'CanonImageHeight',
            13 => 'ImageWidth',
            14 => 'ImageHeight',
         },
@@ -2039,9 +2080,10 @@ my %longBin = (
             2 => 'WB_RBGGLevels',
             3 => 'WB_GRBGLevels',
             4 => 'WB_GRGBLevels',
-            5 => 'WB_RBLevels',
-            6 => 'WBRedLevel',
-            7 => 'WBGreenLevel',
+            5 => 'WB_RGBLevels',
+            6 => 'WB_RBLevels',
+            7 => 'WBRedLevel', # red
+            8 => 'WBGreenLevel',
         },
         ValueConv => 'Image::ExifTool::Exif::RedBlueBalance(0,@val)',
         PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
@@ -2054,9 +2096,10 @@ my %longBin = (
             2 => 'WB_RBGGLevels',
             3 => 'WB_GRBGLevels',
             4 => 'WB_GRGBLevels',
-            5 => 'WB_RBLevels',
-            6 => 'WBBlueLevel',
-            7 => 'WBGreenLevel',
+            5 => 'WB_RGBLevels',
+            6 => 'WB_RBLevels',
+            7 => 'WBBlueLevel', # blue
+            8 => 'WBGreenLevel',
         },
         ValueConv => 'Image::ExifTool::Exif::RedBlueBalance(1,@val)',
         PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
@@ -2099,7 +2142,7 @@ sub CalculateLV($$$)
     # do validity checks on arguments
     return undef unless @_ >= 3;
     foreach (@_) {
-        return undef unless $_ and /([+-]?(?=\d|\.\d)\d*(\.\d*)?)/ and $1 > 0;
+        return undef unless $_ and /([+-]?(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?)/ and $1 > 0;
         $_ = $1;    # extract float from any other garbage
     }
     # (A light value of 0 is defined as f/1.0 at 1 second with ISO 100)
@@ -2127,11 +2170,17 @@ sub CalcScaleFactor35efl
     my $digz = shift || 1;
     my $diag = shift;
     unless ($diag and Image::ExifTool::IsFloat($diag)) {
+        undef $diag;
         my $xsize = shift;
         my $ysize = shift;
         if ($xsize and $ysize) {
-            $diag = sqrt($xsize * $xsize + $ysize * $ysize);
-        } else {
+            # validate by checking aspect ratio because FocalPlaneX/YSize is not reliable
+            my $a = $xsize / $ysize;
+            if (abs($a-1.3333) < .1 or abs($a-1.5) < .1) {
+                $diag = sqrt($xsize * $xsize + $ysize * $ysize);
+            }
+        }
+        unless ($diag) {
             # get number of mm in units (assume inches unless otherwise specified)
             my $units = { 3=>10, 4=>1, 5=>0.001 }->{ shift() || '' } || 25.4;
             my $x_res = shift || return undef;
@@ -2272,14 +2321,16 @@ sub ConvertParameter($)
 
 #------------------------------------------------------------------------------
 # Calculate Red/BlueBalance
-# Inputs: 0) 0=red, 1=blue, 1-6) WB_RGGB/RGBG/RBGG/GRBG/GRGB/RBLevels,
-#         7) red or blue level, 8) green level
+# Inputs: 0) 0=red, 1=blue, 1-7) WB_RGGB/RGBG/RBGG/GRBG/GRGB/RGB/RBLevels,
+#         8) red or blue level, 9) green level
 my @rggbLookup = (
+    # indices for R, G, G and B components in input value
     [ 0, 1, 2, 3 ], # RGGB
     [ 0, 1, 3, 2 ], # RGBG
     [ 0, 2, 3, 1 ], # RBGG
     [ 1, 0, 3, 2 ], # GRBG
     [ 1, 0, 2, 3 ], # GRGB
+    [ 0, 1, 1, 2 ], # RGB
     [ 0, 256, 256, 1 ], # RB (green level is 256)
 );
 sub RedBlueBalance($@)
@@ -2293,7 +2344,7 @@ sub RedBlueBalance($@)
         my $lookup = $rggbLookup[$i];
         my $g = $$lookup[1];    # get green level or index
         if ($g < 4) {
-            next if @levels < 4;
+            next if @levels < 3;
             $g = ($levels[$g] + $levels[$$lookup[2]]) / 2 or next;
         }
         $val = $levels[$$lookup[$blue * 3]] / $g;
@@ -2427,7 +2478,7 @@ sub ProcessExif($$$)
 
     $verbose = -1 if $htmlDump; # mix htmlDump into verbose so we can test for both at once
     $dirName eq 'EXIF' and $dirName = $$dirInfo{DirName} = 'IFD0';
-    $$dirInfo{Multi} = 1 if $dirName eq 'IFD0' or $dirName eq 'SubIFD';
+    $$dirInfo{Multi} = 1 if $dirName =~ /^(IFD0|SubIFD)$/ and not defined $$dirInfo{Multi};
     $htmlDump and $name = ($dirName eq 'MakerNotes') ? $$dirInfo{Name} : $dirName;
 
     my ($numEntries, $dirEnd);
@@ -2657,12 +2708,12 @@ sub ProcessExif($$$)
         if (defined $tagInfo) {
             if ($$tagInfo{Format}) {
                 $formatStr = $$tagInfo{Format};
-                # must adjust number of items for new format size
                 my $newNum = $formatNumber{$formatStr};
-                if ($newNum) {
+                if ($newNum and $newNum != $format) {
                     $origFormStr = $formatName[$format] . '[' . $count . ']';
                     $format = $newNum;
-                    $count = $size / $formatSize[$format];
+                    # adjust number of items for new format size
+                    $count = int($size / $formatSize[$format]);
                 }
             }
         } else {
@@ -2684,8 +2735,9 @@ sub ProcessExif($$$)
                 my $dname = sprintf("${name}-%.2d", $index);
                 # build our tool tip
                 $size < 0 and $size = $count * $formatSize[$format];
+                my $fstr = $origFormStr || "$formatName[$format]\[$count]";
                 my $tip = sprintf("Tag ID: 0x%.4x\\n", $tagID) .
-                          "Format: $formatName[$format]\[$count]\\nSize: $size bytes\\n";
+                          "Format: $fstr\\nSize: $size bytes\\n";
                 if ($size > 4) {
                     my $offPt = Get32u($dataPt,$entry+8);
                     $tip .= sprintf("Value offset: 0x%.4x\\n", $offPt);
@@ -2730,7 +2782,7 @@ sub ProcessExif($$$)
                 }
             } else {
                 my $fstr = $formatName[$format];
-                $origFormStr and $fstr = "$origFormStr read as $fstr";
+                $fstr = "$origFormStr read as $fstr" if $origFormStr;
                 $exifTool->VerboseInfo($tagID, $tagInfo,
                     Table   => $tagTablePtr,
                     Index   => $index,
@@ -3005,8 +3057,8 @@ sub ProcessExif($$$)
             my %newDirInfo = %$dirInfo;
             $newDirInfo{DirStart} = $subdirStart;
             # increment IFD number
-            $newDirInfo{DirName} =~ s/(\d+)$//;
-            $newDirInfo{DirName} .= ($1 || 0) + 1;
+            my $ifdNum = $newDirInfo{DirName} =~ s/(\d+)$// ? $1 : 0;
+            $newDirInfo{DirName} .= $ifdNum + 1;
             # must validate SubIFD1 because the nextIFD pointer is invalid for some RAW formats
             if ($newDirInfo{DirName} ne 'SubIFD1' or ValidateIFD(\%newDirInfo)) {
                 $exifTool->{INDENT} =~ s/..$//; # keep indent the same
@@ -3074,6 +3126,10 @@ under the same terms as Perl itself.
 =item L<http://www.asmail.be/msg0054681802.html>
 
 =item L<http://crousseau.free.fr/imgfmt_raw.htm>
+
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
+
+=item L<http://www.digitalpreservation.gov/formats/content/tiff_tags.shtml>
 
 =back
 

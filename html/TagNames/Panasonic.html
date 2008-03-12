@@ -196,8 +196,10 @@ and LC80)</span>
 <td>NoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Standard
-  <br>1 = Low
-  <br>2 = High</span></td></tr>
+  <br>1 = Low (-1)
+  <br>2 = High (+1)
+  <br>3 = Lowest (-2)
+  <br>4 = Highest (+2)</span></td></tr>
 <tr>
 <td>0x002e</td>
 <td>SelfTimer</td>
@@ -376,6 +378,172 @@ and LC80)</span>
 <td><span class=s><span class=n>(or pet age)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Leica2'>Panasonic Leica2 Tags</a></h2>
+<p>These tags are used by the Leica M8.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0x0300</td>
+<td>Quality</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Fine
+  <br>2 = Basic</span></td></tr>
+<tr class=b>
+<td>0x0302</td>
+<td>UserProfile</td>
+<td class=c>int32u</td>
+<td><span class=s>1 = User Profile 1
+  <br>2 = User Profile 2
+  <br>3 = User Profile 3
+  <br>4 = User Profile 0 (Dynamic)</span></td></tr>
+<tr>
+<td>0x0303</td>
+<td>SerialNumber</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0304</td>
+<td>WhiteBalance</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(values above 0x8000 are converted to Kelvin color temperatures)</span>
+  <br>0 = Auto or Manual
+  <br>1 = Daylight
+  <br>2 = Fluorescent
+  <br>3 = Tungsten
+  <br>4 = Flash
+  <br>10 = Cloudy
+  <br>11 = Shadow</span></td></tr>
+<tr>
+<td>0x0310</td>
+<td>LensType</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(lower 3 bits split into a separate value for the frame selector position)</span>
+  <br>[Value 0]
+  <br>1 = Elmarit-M 21mm f/2.8
+  <br>3 = Elmarit-M 28mm f/2.8 (III)
+  <br>4 = Tele-Elmarit-M 90mm f/2.8 (II)
+  <br>5 = Summilux-M 50mm f/1.4 (II)
+  <br>6 = Summicron-M 35mm f/2 (IV)
+  <br>7 = Summicron-M 90mm f/2 (II)
+  <br>9 = Elmarit-M 135mm f/2.8 (I/II)
+  <br>16 = Tri-Elmar-M 16-18-21mm f/4 ASPH.
+  <br>23 = Summicron-M 50mm f/2 (III)
+  <br>24 = Elmarit-M 21mm f/2.8 ASPH.
+  <br>25 = Elmarit-M 24mm f/2.8 ASPH.
+  <br>26 = Summicron-M 28mm f/2 ASPH.
+  <br>27 = Elmarit-M 28mm f/2.8 (IV)
+  <br>28 = Elmarit-M 28mm f/2.8 ASPH.
+  <br>29 = Summilux-M 35mm f/1.4 ASPH.
+  <br>30 = Summicron-M 35mm f/2 ASPH.
+  <br>31 = Noctilux-M 50mm f/1
+  <br>32 = Summilux-M 50mm f/1.4 ASPH.
+  <br>33 = Summicron-M 50mm f/2 (IV, V)
+  <br>34 = Elmar-M 50mm f/2.8
+  <br>35 = Summilux-M 75mm f/1.4
+  <br>36 = Apo-Summicron-M 75mm f/2 ASPH.
+  <br>37 = Apo-Summicron-M 90mm f/2 ASPH.
+  <br>38 = Elmarit-M 90mm f/2.8
+  <br>39 = Macro-Elmar-M 90mm f/4
+  <br>40 = Macro-Adapter M
+  <br>42 = Tri-Elmar-M 28-35-50mm f/4 ASPH.
+  <br>43 = Summarit-M 35mm f/2.5
+  <br>44 = Summarit-M 50mm f/2.5
+  <br>45 = Summarit-M 75mm f/2.5
+  <br>46 = Summarit-M 90mm f/2.5
+  <br>[Value 1]
+  <br>1 = 28/90mm frame lines engaged
+  <br>2 = 24/35mm frame lines engaged
+  <br>3 = 50/75mm frame lines engaged</span></td></tr>
+<tr class=b>
+<td>0x0311</td>
+<td>ExternalSensorBrightnessValue</td>
+<td class=c>rational64s</td>
+<td><span class=s><span class=n>(&quot;blue dot&quot; measurement)</span></span></td></tr>
+<tr>
+<td>0x0312</td>
+<td>MeasuredLV</td>
+<td class=c>rational64s</td>
+<td><span class=s><span class=n>(imaging sensor or TTL exposure meter measurement)</span></span></td></tr>
+<tr class=b>
+<td>0x0313</td>
+<td>ApproximateFNumber</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0320</td>
+<td>CameraTemperature</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0321</td>
+<td>ColorTemperature</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0322</td>
+<td>WBRedLevel</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0323</td>
+<td>WBGreenLevel</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0324</td>
+<td>WBBlueLevel</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0325</td>
+<td>UV-IRFilterCorrection</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Not Active
+  <br>1 = Active</span></td></tr>
+<tr>
+<td>0x0330</td>
+<td>CCDVersion</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0331</td>
+<td>CCDBoardVersion</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0332</td>
+<td>ControllerBoardVersion</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0333</td>
+<td>M16CVersion</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0340</td>
+<td>ImageIDNumber</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Leica3'>Panasonic Leica3 Tags</a></h2>
+<p>These tags are used by the Leica R8 and R9 digital backs.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0x000d</td>
+<td>WB_RGBLevels</td>
+<td class=c>int16u[3]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Type2'>Panasonic Type2 Tags</a></h2>
 <p>This type of maker notes is used by models such as the NV-DS65, PV-D2002,
 PV-DC3000, PV-DV203, PV-DV401, PV-DV702, PV-L2001, PV-SD4090, PV-SD5000 and
@@ -525,7 +693,7 @@ iPalm.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 17, 2008</i>
+<br><i>Last revised Mar 11, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

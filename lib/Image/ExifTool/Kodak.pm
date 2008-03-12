@@ -7,6 +7,7 @@
 #
 # References:   1) http://search.cpan.org/dist/Image-MetaData-JPEG/
 #               2) http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html
+#               3) http://www.cybercom.net/~dcoffin/dcraw/
 #
 # Notes:        There really isn't much public information about Kodak formats.
 #               The only source I could find was Image::MetaData::JPEG, which
@@ -21,9 +22,10 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.11';
+$VERSION = '1.14';
 
 sub ProcessKodakIFD($$$);
+sub ProcessKodakText($$$);
 sub WriteKodakIFD($$$);
 
 # Kodak type 1 maker notes (ref 1)
@@ -102,8 +104,8 @@ sub WriteKodakIFD($$$);
     0x1c => {
         Name => 'MeteringMode',
         PrintConv => { #PH
-            0 => 'Multi-pattern',
-            1 => 'Center-Weighted',
+            0 => 'Multi-segment',
+            1 => 'Center-weighted average',
             2 => 'Spot',
         },
     },
@@ -510,7 +512,7 @@ sub WriteKodakIFD($$$);
 );
 
 # Kodak IFD-format maker notes (ref PH)
-%Image::ExifTool::Kodak::IFD = (
+%Image::ExifTool::Kodak::Type8 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -936,6 +938,136 @@ my %sceneModeUsed = (
     FIRST_ENTRY => 0,
 );
 
+# tags found in the KodakIFD (in IFD0 of KDC, DCR, TIFF and JPEG images) (ref PH)
+%Image::ExifTool::Kodak::IFD = (
+    GROUPS => { 0 => 'EXIF', 1 => 'KodakIFD', 2 => 'Image'},
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITE_GROUP => 'KodakIFD',
+    SET_GROUP1 => 1,
+    NOTES => q{
+        These tags are found in a separate IFD of JPEG, TIFF, DCR and KDC images
+        from some older Kodak models such as the DC50, DC120, DCS760C, DCS Pro 14N,
+        14nx, SLR/n, Pro Back and Canon EOS D2000.
+    },
+    # 0x0000: int8u[4]    - values: "1 0 0 0" (DC50), "1 1 0 0" (DC120)
+    0x0001 => {
+        # (related to EV but exact meaning unknown)
+        Name => 'UnknownEV',
+        Writable => 'rational64u',
+        Unknown => 1,
+    },
+    # 0x0002: int8u       - values: 0
+    0x0003 => {
+        Name => 'ExposureValue',
+        Writable => 'rational64u',
+    },
+    # 0x0004: rational64u - values: 2.875,3.375,3.625,4,4.125,7.25
+    # 0x0005: int8u       - values: 0
+    # 0x0006: int32u[12]  - ?
+    # 0x0007: int32u[3]   - values: "65536 67932 69256"
+    0x03e9 => { Name => 'OriginalFileName', Writable => 'string' },
+    0x03eb => 'SensorLeftBorder',
+    0x03ec => 'SensorTopBorder',
+    0x03ed => 'SensorImageWidth',
+    0x03ee => 'SensorImageHeight',
+    0x03f1 => {
+        Name => 'TextualInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::TextualInfo',
+        },
+    },
+    # 0x03fc: some sort of white balance index (ref 3)
+    # 0x03fd: manual white balance information (ref 3)
+    0x0401 => {
+        Name => 'SubSecTime',
+        Groups => { 2 => 'Time' },
+        Writable => 'string',
+    },
+    0x0414 => { Name => 'NCDFileInfo',      Writable => 'string' },
+    0x0846 => { Name => 'ColorTemperature', Writable => 'int16u' }, #3
+    # 0x0852: used in calculating WB levels (ref 3)
+    # 0x085c: used in calculating WB levels (ref 3)
+    # 0x090d: linear table (ref 3)
+    # 0x0c81: some sort of date (manufacture date?) - PH
+    0x0ce5 => { Name => 'FirmwareVersion',  Writable => 'string' },
+    # 0x1390: value: "DCSProSLRn" (tone curve name?) - PH
+    0x1391 => { Name => 'ToneCurveFileName',Writable => 'string' },
+    0x1784 => { Name => 'ISO',              Writable => 'int32u' }, #3
+);
+
+# textual-based Kodak TextualInfo tags (not found in KDC images) (ref PH)
+%Image::ExifTool::Kodak::TextualInfo = (
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Kodak', 2 => 'Image'},
+    PROCESS_PROC => \&ProcessKodakText,
+    NOTES => q{
+        Below is a list of tags which have been observed in the Kodak TextualInfo
+        data, however ExifTool will extract information from any tags found here.
+    },
+    'Actual Compensation' => 'ActualCompensation',
+    'AF Function'   => 'AFMode', # values: "S" (=Single?, then maybe C for Continuous, M for Manual?) - PH
+    'Aperture'      => {
+        Name => 'Aperture',
+        ValueConv => '$val=~s/^f//i; $val',
+    },
+    'Auto Bracket'  => 'AutoBracket',
+    'Brightness Value' => 'BrightnessValue',
+    'Camera'        => 'CameraModel',
+    'Camera body'   => 'CameraBody',
+    'Compensation'  => 'ExposureCompensation',
+    'Date'          => {
+        Name => 'Date',
+        Groups => { 2 => 'Time' },
+    },
+    'Exposure Bias' => 'ExposureBias',
+    'Exposure Mode' => {
+        Name => 'ExposureMode',
+        PrintConv => {
+            'M' => 'Manual',
+            'A' => 'Aperture Priority', #(NC -- I suppose this could be "Auto" too)
+            'S' => 'Shutter Priority', #(NC)
+            'P' => 'Program', #(NC)
+            'B' => 'Bulb', #(NC)
+        },
+    },
+    'Firmware Version' => 'FirmwareVersion',
+    'Flash Compensation' => 'FlashExposureComp',
+    'Flash Fired'   => 'FlashFired',
+    'Flash Sync Mode' => 'FlashSyncMode',
+    'Focal Length'  => {
+        Name => 'FocalLength',
+        PrintConv => '"$val mm"',
+    },
+    'Height'        => 'KodakImageHeight',
+    'Image Number'  => 'ImageNumber',
+    'ISO'           => 'ISO',
+    'ISO Speed'     => 'ISO',
+    'Max Aperture'  => {
+        Name => 'MaxAperture',
+        ValueConv => '$val=~s/^f//i; $val',
+    },
+    'Meter Mode'    => 'MeterMode',
+    'Min Aperture'  => {
+        Name => 'MinAperture',
+        ValueConv => '$val=~s/^f//i; $val',
+    },
+    'Popup Flash'   => 'PopupFlash',
+    'Serial Number' => 'SerialNumber',
+    'Shooting Mode' => 'ShootingMode',
+    'Shutter'       => 'ShutterSpeed',
+    'Temperature'   => 'Temperature', # with a value of 15653, what could this be? - PH
+    'Time'          => {
+        Name => 'SubSecTime',
+        Groups => { 2 => 'Time' },
+    },
+    'White balance' => 'Whitebalance',
+    'Width'         => 'KodakImageWidth',
+    '_other_info'   => {
+        Name => 'OtherInfo',
+        Notes => 'any other information without a tag name',
+    },
+);
+
 # Kodak APP3 "Meta" tags (ref 2)
 %Image::ExifTool::Kodak::Meta = (
     GROUPS => { 0 => 'Meta', 1 => 'MetaIFD', 2 => 'Image'},
@@ -1032,6 +1164,50 @@ my %sceneModeUsed = (
     8 => 'WatermarkType',
 );
 
+# tags in Kodak MOV videos (ref PH)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
+%Image::ExifTool::Kodak::MOV = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => 'This information is found in Kodak MOV videos from models such as the P880.',
+    0 => {
+        Name => 'Make',
+        Format => 'string[21]',
+    },
+    0x16 => {
+        Name => 'Model',
+        Format => 'string[42]',
+    },
+    0x40 => {
+        Name => 'ModelType',
+        Format => 'string[8]',
+    },
+    # (01 00 at offset 0x48)
+    0x4e => {
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x52 => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x5a => {
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    # 0x6c => 'WhiteBalance', ?
+    0x70 => {
+        Name => 'FocalLength',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+    },
+);
+
 # Kodak composite tags
 %Image::ExifTool::Kodak::Composite = (
     DateCreated => {
@@ -1046,6 +1222,53 @@ my %sceneModeUsed = (
 
 # add our composite tags
 Image::ExifTool::AddCompositeTags('Image::ExifTool::Kodak');
+
+#------------------------------------------------------------------------------
+# Process Kodak textual TextualInfo
+# Inputs: 0) ExifTool object ref, 1) dirInfo hash ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessKodakText($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
+    my $data = substr($$dataPt, $dirStart, $dirLen);
+    $data =~ s/\0.*//s;     # truncate at null if it exists
+    my @lines = split /[\n\r]+/, $data;
+    my ($line, $success, @other, $tagInfo);
+    foreach $line (@lines) {
+        if ($line =~ /(.*?):\s*(.*)/) {
+            my ($tag, $val) = ($1, $2);
+            if ($$tagTablePtr{$tag}) {
+                $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+            } else {
+                my $tagName = $tag;
+                $tagName =~ s/([A-Z])\s+([A-Za-z])/${1}_\U$2/g;
+                $tagName =~ s/([a-z])\s+([A-Za-z0-9])/${1}\U$2/g;
+                $tagName =~ s/\s+//g;
+                $tagName =~ s/[^-\w]+//g;   # delete remaining invalid characters
+                $tagName = 'NoName' unless $tagName;
+                $tagInfo = { Name => $tagName };
+                Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            }
+            $exifTool->FoundTag($tagInfo, $val);
+            $success = 1;
+        } else {
+            # strip off leading/trailing white space and ignore blank lines
+            push @other, $1 if $line =~ /^\s*(\S.*?)\s*$/;
+        }
+    }
+    if ($success) {
+        if (@other) {
+            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, '_other_info');
+            $exifTool->FoundTag($tagInfo, \@other);
+        }
+    } else {
+        $exifTool->Warn("Can't parse Kodak TextualInfo data", 1);
+    }
+    return $success;
+}
 
 #------------------------------------------------------------------------------
 # Process Kodak IFD (with leading byte order mark)
@@ -1122,6 +1345,8 @@ under the same terms as Perl itself.
 =item L<Image::MetaData::JPEG|Image::MetaData::JPEG>
 
 =item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/meta.html>
+
+=item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
 =item (...plus lots of testing with my daughter's CX4200!)
 

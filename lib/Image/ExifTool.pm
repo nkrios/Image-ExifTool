@@ -24,7 +24,7 @@ use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old
             @loadAllTables %UserDefined $evalWarning);
 
-$VERSION = '7.15';
+$VERSION = '7.21';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -132,6 +132,7 @@ my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF PNG MIE PSD XMP PPM EPS PS
                     PDF ICC VRD JP2);
 
 # file types that we can create from scratch
+# - must update CanCreate() documentation if this list is changed!
 my @createTypes = qw(XMP ICC MIE VRD);
 
 # file type lookup for all recognized file extensions
@@ -485,10 +486,10 @@ sub DummyWriteProc { return 1; }
     GROUPS => { 0 => 'File', 1 => 'File', 2 => 'Image' },
     NOTES => 'This information is extracted from the JPEG Start Of Frame segment.',
     VARS => { NO_ID => 1 },
-	EncodingProcess => {
-	    PrintHex => 1,
-	    PrintConv => {
-	        0x0 => 'Baseline DCT, Huffman coding',
+    EncodingProcess => {
+        PrintHex => 1,
+        PrintConv => {
+            0x0 => 'Baseline DCT, Huffman coding',
             0x1 => 'Extended sequential DCT, Huffman coding',
             0x2 => 'Progressive DCT, Huffman coding',
             0x3 => 'Lossless, Huffman coding',
@@ -1099,7 +1100,7 @@ sub GetTagList($;$$)
 #------------------------------------------------------------------------------
 # Get list of found tags in specified sort order
 # Inputs: 0) ExifTool object reference, 1) sort order ('File', 'Input', ...)
-# Returns: List of tags in specified order
+# Returns: List of tag keys in specified order
 # Notes: If not specified, sort order is taken from OPTIONS
 sub GetFoundTags($;$)
 {
@@ -1112,7 +1113,7 @@ sub GetFoundTags($;$)
 #------------------------------------------------------------------------------
 # Get list of requested tags
 # Inputs: 0) ExifTool object reference
-# Returns: List of requested tags
+# Returns: List of requested tag keys
 sub GetRequestedTags($)
 {
     local $_;
@@ -1215,9 +1216,13 @@ sub GetValue($$;$)
                     unless (defined($value = $$conv{$val})) {
                         if ($$conv{BITMASK}) {
                             $value = DecodeBits($val, $$conv{BITMASK});
-                        } else {
-                            if ($$tagInfo{PrintHex} and $val and IsInt($val) and
-                                $convType eq 'PrintConv')
+                        } elsif (not $$conv{OTHER} or
+                                 # use alternate conversion routine if available
+                                 not defined($value = &{$$conv{OTHER}}($val)))
+                        {
+                            if (($$tagInfo{PrintHex} or
+                                ($$tagInfo{Mask} and not defined $$tagInfo{PrintHex}))
+                                and $val and IsInt($val) and $convType eq 'PrintConv')
                             {
                                 $val = sprintf('0x%x',$val);
                             }
@@ -1638,8 +1643,8 @@ sub Init($)
     $self->{INDENT}     = '  ';     # initial indent for verbose messages
     $self->{PRIORITY_DIR} = '';     # the priority directory name
     $self->{TIFF_TYPE}  = '';       # type of TIFF data (APP1, TIFF, NEF, etc...)
-    $self->{CameraMake} = '';       # camera make
-    $self->{CameraModel}= '';       # camera model
+    $self->{Make}       = '';       # camera make
+    $self->{Model}      = '';       # camera model
     $self->{CameraType} = '';       # Olympus camera type
     if ($self->Options('HtmlDump')) {
         require Image::ExifTool::HtmlDump;
@@ -2930,7 +2935,7 @@ sub ProcessJPEG($$)
                 # preview is 508 bytes into the trailer, and the K-M Maxxum 7D preview
                 # is 979 bytes in, but Minolta previews can have a random first byte...
                 if ($raf->Read($buff, 1024) and ($buff =~ /\xff\xd8\xff./g or
-                    ($self->{CameraMake} =~ /Minolta/i and $buff =~ /.\xd8\xff\xdb/g)))
+                    ($self->{Make} =~ /Minolta/i and $buff =~ /.\xd8\xff\xdb/g)))
                 {
                     # adjust PreviewImageStart to this location
                     my $start = $self->{VALUE}->{PreviewImageStart};
@@ -3813,7 +3818,7 @@ sub HandleTag($$$$;%)
 {
     my ($self, $tagTablePtr, $tag, $val, %parms) = @_;
     my $verbose = $self->{OPTIONS}->{Verbose};
-    my $tagInfo = $parms{TagInfo} || $self->GetTagInfo($tagTablePtr, $tag);
+    my $tagInfo = $parms{TagInfo} || $self->GetTagInfo($tagTablePtr, $tag, \$val);
     my $dataPt = $parms{DataPt};
     my $subdir;
 
@@ -3852,16 +3857,21 @@ sub HandleTag($$$$;%)
             $dataPt or $dataPt = \$val;
             # process subdirectory information
             my %dirInfo = (
-                DirName  => $$tagInfo{Name},
+                DirName  => $$subdir{DirName} || $$tagInfo{Name},
                 DataPt   => $dataPt,
                 DataLen  => length $$dataPt,
                 DataPos  => $parms{DataPos},
                 DirStart => $subdirStart,
                 DirLen   => $parms{Size},
                 Parent   => $parms{Parent},
+                Base     => $parms{Base},
+                Multi    => $$subdir{Multi},
             );
+            my $oldOrder = GetByteOrder();
+            SetByteOrder($$subdir{ByteOrder}) if $$subdir{ByteOrder};
             my $subTablePtr = GetTagTable($$subdir{TagTable}) || $tagTablePtr;
             $self->ProcessDirectory(\%dirInfo, $subTablePtr, $$subdir{ProcessProc});
+            SetByteOrder($oldOrder);
         } else {
             return $self->FoundTag($tagInfo, $val);
         }
@@ -4220,8 +4230,11 @@ sub ProcessBinaryData($$$)
                 $@ and warn("Format $$tagInfo{Name}: $@"), next;
                 next if $count < 0;
             } elsif ($format eq 'string') {
-                # allow string with no specified count to run to end of block
+                # string with no specified count runs to end of block
                 $count = ($size > $entry) ? $size - $entry : 0;
+            } elsif ($format eq 'pstring') {
+                $count = ($size > $entry) ? Get8u($dataPt, ($entry++)+$offset) : 0;
+                $format = 'string';
             }
         } else {
             $format = $defaultFormat;

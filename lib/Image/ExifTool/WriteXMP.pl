@@ -641,7 +641,8 @@ sub WriteXMP($$;$)
             # translate namespace if necessary
             $namespace = $$xlatNamespace{$namespace} if $$xlatNamespace{$namespace};
             my $grp = "XMP-$namespace";
-            if ($$del{uc($grp)}) {
+            my $ucg = uc $grp;
+            if ($$del{$ucg} or ($$del{'XMP-*'} and not $$del{"-$ucg"})) {
                 if ($verbose > 1) {
                     my $val = $capture{$path}->[0];
                     $exifTool->VPrint(1, "    - $grp:$tag = '$val'\n");

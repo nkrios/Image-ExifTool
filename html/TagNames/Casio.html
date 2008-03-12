@@ -124,6 +124,11 @@
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>0x0015</td>
+<td>FirmwareDate</td>
+<td class=c>string[18]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0016</td>
 <td>Enhancement</td>
 <td class=c>int16u</td>
@@ -132,7 +137,7 @@
   <br>3 = Green
   <br>4 = Blue
   <br>5 = Flesh Tones</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0017</td>
 <td>ColorFilter</td>
 <td class=c>int16u</td>
@@ -145,11 +150,12 @@
   <br>7 = Yellow
   <br>8 = Pink
   <br>9 = Purple</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0018</td>
 <td>AFPoint</td>
 <td class=c>int16u</td>
-<td><span class=s>1 = Center
+<td><span class=s><span class=n>(may not be valid for all models)</span>
+  <br>1 = Center
   <br>2 = Upper Left
   <br>3 = Upper Right
   <br>4 = Near Left/Right of Center
@@ -166,14 +172,14 @@
   <br>15 = Bottom Left
   <br>16 = Bottom Center
   <br>17 = Bottom Right</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0019</td>
 <td>FlashIntensity</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Normal
   <br>2 = Weak
   <br>3 = Strong</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
@@ -301,16 +307,21 @@
   <br>10 = Tungsten
   <br>12 = Flash</span></td></tr>
 <tr class=b>
+<td>0x2021</td>
+<td>AFPointPosition</td>
+<td class=c>Y~</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x2022</td>
 <td>ObjectDistance</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x2034</td>
 <td>FlashDistance</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x3000</td>
 <td>RecordMode</td>
 <td class=c>int16u</td>
@@ -318,91 +329,93 @@
   <br>3 = Shutter Priority
   <br>4 = Aperture Priority
   <br>5 = Manual
-  <br>6 = Best Shot</span></td></tr>
-<tr>
+  <br>6 = Best Shot
+  <br>17 = Movie
+  <br>19 = Movie (19)
+  <br>20 = YouTube Movie</span></td></tr>
+<tr class=b>
 <td>0x3001</td>
 <td>SelfTimer</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x3002</td>
 <td>Quality</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Economy
   <br>2 = Normal
   <br>3 = Fine</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x3003</td>
 <td>FocusMode</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Manual?
-  <br>1 = Fixation?
+<td><span class=s>0 = Manual
+  <br>1 = Focus Lock
   <br>2 = Macro
   <br>3 = Single-Area Auto Focus
   <br>6 = Multi-Area Auto Focus</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x3006</td>
 <td>HometownCity</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x3007</td>
 <td>BestShotMode</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Off
-  <br>1 = On?</span></td></tr>
-<tr class=b>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0x3008</td>
 <td>AutoISO</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = On
   <br>2 = Off</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x3011</td>
 <td>Sharpness</td>
 <td class=c>undef[2]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x3012</td>
 <td>Contrast</td>
 <td class=c>undef[2]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x3013</td>
 <td>Saturation</td>
 <td class=c>undef[2]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x3014</td>
 <td>ISO</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x3015</td>
 <td>ColorMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x3016</td>
 <td>Enhancement</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x3017</td>
 <td>Filter</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x301c</td>
 <td>SequenceNumber</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x301d</td>
 <td>BracketSequence</td>
 <td class=c>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x3020</td>
 <td>ImageStabilization</td>
 <td class=c>int16u</td>
@@ -411,9 +424,23 @@
   <br>2 = Best Shot</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='AVI'>Casio AVI Tags</a></h2>
+<p>This information is found in Casio GV-10 AVI videos.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>Software</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 10, 2007</i>
+<br><i>Last revised Mar 10, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

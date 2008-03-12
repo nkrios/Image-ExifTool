@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.18
 [File, File, Image]  - File Name: MIE_3_failed.mie
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
+[File, File, Time]  - File Modification Date/Time: 2008:02:21 08:27:01
 [File, File, Image]  - File Type: MIE
 [File, File, Image]  - MIME Type: image/x-mie-jpeg
 [File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
@@ -31,19 +31,19 @@
 [MIE, MIE-Camera, Camera] Sharpness - Sharpness: 1
 [MIE, MIE-Camera, Camera] ShootingMode - Shooting Mode: Manual
 [MIE, MIE-Doc, Document] Comment - Comment: I can eat glass and it doesn't hurt me.
-[MIE, MIE-Doc, Document] Comment-cn_ZH - Comment (cn_ZH): ....................................
+[MIE, MIE-Doc, Document] Comment-cn_ZH - Comment (cn_ZH): 我能吞下玻璃而不伤身体。
 [MIE, MIE-Doc, Document] Comment-de_DE - Comment (de_DE): Ich kann Glas essen, ohne mir weh zu tun.
-[MIE, MIE-Doc, Document] Comment-el_GR - Comment (el_GR): .......... .... ...... ................ ............ .......... .... ........ .............
+[MIE, MIE-Doc, Document] Comment-el_GR - Comment (el_GR): Μπορώ να φάω σπασμένα γυαλιά χωρίς να πάθω τίποτα.
 [MIE, MIE-Doc, Document] Comment-en_CA - Comment (en_CA): I can eat glass and it doesn't hurt me, eh.
 [MIE, MIE-Doc, Document] Comment-en_GB - Comment (en_GB): I say, I can eat glass and it doesn't hurt me old boy.
 [MIE, MIE-Doc, Document] Comment-en_US - Comment (en_US): Dude! Munching glass don't bust my chops.
-[MIE, MIE-Doc, Document] Comment-es_ES - Comment (es_ES): Puedo comer vidrio, no me hace da..o.
-[MIE, MIE-Doc, Document] Comment-fr_FR - Comment (fr_FR): Je peux manger du verre, ..a ne me fait pas de mal.
-[MIE, MIE-Doc, Document] Comment-hi_IN - Comment (hi_IN): ......... ............ ...... ............ ........., ............ ...... ...... ......... ............ ............ .............
+[MIE, MIE-Doc, Document] Comment-es_ES - Comment (es_ES): Puedo comer vidrio, no me hace daño.
+[MIE, MIE-Doc, Document] Comment-fr_FR - Comment (fr_FR): Je peux manger du verre, ça ne me fait pas de mal.
+[MIE, MIE-Doc, Document] Comment-hi_IN - Comment (hi_IN): मैं काँच खा सकता हूँ, मुझे उस से कोई पीडा नहीं होती.
 [MIE, MIE-Doc, Document] Comment-it_IT - Comment (it_IT): Posso mangiare il vetro e non mi fa male.
-[MIE, MIE-Doc, Document] Comment-ja_JP - Comment (ja_JP): ...........................................................................
-[MIE, MIE-Doc, Document] Comment-ru_RU - Comment (ru_RU): .. ........ ........ ............, ...... ...... .... .............
-[MIE, MIE-Doc, Author] Copyright - Copyright: .. Copyright Phil Harvey
+[MIE, MIE-Doc, Document] Comment-ja_JP - Comment (ja_JP): 私はガラスを食べられます。それは私を傷つけません。
+[MIE, MIE-Doc, Document] Comment-ru_RU - Comment (ru_RU): Я могу есть стекло, оно мне не вредит.
+[MIE, MIE-Doc, Author] Copyright - Copyright: © Copyright Phil Harvey
 [MIE, MIE-Doc, Time] CreateDate - Create Date: 2001:05:19 18:36:41
 [MIE, MIE-Doc, Document] Keywords - Keywords: ExifTool, Test, MIE
 [MIE, MIE-Doc, Time] ModifyDate - Modify Date: 2004:02:26 09:36:46

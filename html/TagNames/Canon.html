@@ -59,9 +59,9 @@
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0x000a</td>
-<td>ColorInfoD30</td>
+<td>UnknownD30</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Canon.html#ColorInfoD30'>Canon ColorInfoD30 Tags</a></td></tr>
+<td>--&gt; <a href='Canon.html#UnknownD30'>Canon UnknownD30 Tags</a></td></tr>
 <tr>
 <td>0x000c</td>
 <td>SerialNumber</td>
@@ -216,9 +216,10 @@
 <td>&nbsp;</td></tr>
 <tr>
 <td>0x0096</td>
-<td>InternalSerialNumber</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td>SerialInfo
+  <br>InternalSerialNumber</td>
+<td class=c>-<br>string</td>
+<td>--&gt; <a href='Canon.html#SerialInfo'>Canon SerialInfo Tags</a></td></tr>
 <tr class=b>
 <td>0x0097</td>
 <td>DustRemovalData</td>
@@ -485,7 +486,8 @@
   <br>2 = Normal
   <br>3 = Fine
   <br>4 = RAW
-  <br>5 = Superfine</span></td></tr>
+  <br>5 = Superfine
+  <br>130 = Normal Movie</span></td></tr>
 <tr class=b>
 <td class=r>4</td>
 <td>CanonFlashMode</td>
@@ -542,7 +544,9 @@
   <br>6 = Medium 2
   <br>7 = Medium 3
   <br>8 = Postcard
-  <br>9 = Widescreen</span></td></tr>
+  <br>9 = Widescreen
+  <br>129 = Medium Movie
+  <br>130 = Small Movie</span></td></tr>
 <tr>
 <td class=r>11</td>
 <td>EasyMode</td>
@@ -602,8 +606,8 @@
 <td class=r>15</td>
 <td>Sharpness</td>
 <td class=c>int16s</td>
-<td><span class=s><span class=n>(some models use a range of -2 to +2 where 0 is normal sharpening, and others
-use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
+<td><span class=s><span class=n>(some models use a range of -2 to +2 where 0 is normal sharpening, and
+others use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
 <tr class=b>
 <td class=r>16</td>
 <td>CameraISO</td>
@@ -618,7 +622,7 @@ use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
   <br>2 = Average
   <br>3 = Evaluative
   <br>4 = Partial
-  <br>5 = Center-weighted averaging</span></td></tr>
+  <br>5 = Center-weighted average</span></td></tr>
 <tr class=b>
 <td class=r>18</td>
 <td>FocusRange</td>
@@ -710,7 +714,8 @@ use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
 <td>FocusContinuous</td>
 <td class=c>int16s</td>
 <td><span class=s>0 = Single
-  <br>1 = Continuous</span></td></tr>
+  <br>1 = Continuous
+  <br>8 = Manual</span></td></tr>
 <tr class=b>
 <td class=r>33</td>
 <td>AESetting</td>
@@ -902,14 +907,16 @@ use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r>2</td>
-<td>FocalPlaneXSize</td>
-<td class=c>int16u</td>
-<td><span class=s><span class=n>(not valid for 1DmkIII)</span></span></td></tr>
+<td>FocalPlaneXSize
+  <br>FocalPlaneXUnknown?</td>
+<td class=c>int16u<br>int16u</td>
+<td><span class=s><span class=n>(reported focal plane sizes are affected by digital zoom if applied)</span></span></td></tr>
 <tr class=b>
 <td class=r>3</td>
-<td>FocalPlaneYSize</td>
-<td class=c>int16u</td>
-<td><span class=s><span class=n>(not valid for 1DmkIII)</span></span></td></tr>
+<td>FocalPlaneYSize
+  <br>FocalPlaneYUnknown?</td>
+<td class=c>int16u<br>int16u</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ShotInfo'>Canon ShotInfo Tags</a></h2>
@@ -932,7 +939,7 @@ use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
 <td class=r>3</td>
 <td>MeasuredEV</td>
 <td class=c>int16s</td>
-<td><span class=s><span class=n>(this the Canon name for what should properly be called MeasuredLV, and is
+<td><span class=s><span class=n>(this the Canon name for what could better be called MeasuredLV, and is
 offset by about -5 EV from the calculated LV for most models)</span></span></td></tr>
 <tr class=b>
 <td class=r>4</td>
@@ -1123,22 +1130,13 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
   <br>4 = 2x2 Matrix (Clockwise)</span></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='ColorInfoD30'>Canon ColorInfoD30 Tags</a></h2>
+<h2><a name='UnknownD30'>Canon UnknownD30 Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r>9</td>
-<td>ColorTemperature</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r>10</td>
-<td>ColorMatrix</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
+<tr><td colspan=4 class=c>[no tags known]</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo1D'>Canon CameraInfo1D Tags</a></h2>
@@ -1328,7 +1326,9 @@ lists CameraInfo tags for the 1D and 1DS.</p>
   <br>6 = Medium 2
   <br>7 = Medium 3
   <br>8 = Postcard
-  <br>9 = Widescreen</span></td></tr>
+  <br>9 = Widescreen
+  <br>129 = Medium Movie
+  <br>130 = Small Movie</span></td></tr>
 <tr class=b>
 <td class=r>102</td>
 <td>JPEGQuality</td>
@@ -1514,7 +1514,7 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r>370</td>
-<td>FileNumber</td>
+<td>FileIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -1523,6 +1523,11 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(may be valid only for some 1DmkIII copies, even running the same firmware)</span></span></td></tr>
 <tr class=b>
+<td class=r>382</td>
+<td>DirectoryIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td class=r>1118</td>
 <td>TimeStamp</td>
 <td class=c>int32u</td>
@@ -1911,6 +1916,16 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>FirmwareVersion</td>
 <td class=c>string[6]</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>307</td>
+<td>FileIndex</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(combined with DirectoryIndex to give the Composite FileNumber tag)</span></span></td></tr>
+<tr>
+<td class=r>319</td>
+<td>DirectoryIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfoPowerShot'>Canon CameraInfoPowerShot Tags</a></h2>
@@ -2291,7 +2306,8 @@ images with a directory number of 164 or greater)</span></span></td></tr>
   <br>2 = Normal
   <br>3 = Fine
   <br>4 = RAW
-  <br>5 = Superfine</span></td></tr>
+  <br>5 = Superfine
+  <br>130 = Normal Movie</span></td></tr>
 <tr class=b>
 <td class=r>7</td>
 <td>RawJpgSize</td>
@@ -2303,7 +2319,9 @@ images with a directory number of 164 or greater)</span></span></td></tr>
   <br>6 = Medium 2
   <br>7 = Medium 3
   <br>8 = Postcard
-  <br>9 = Widescreen</span></td></tr>
+  <br>9 = Widescreen
+  <br>129 = Medium Movie
+  <br>130 = Small Movie</span></td></tr>
 <tr>
 <td class=r>8</td>
 <td>NoiseReduction</td>
@@ -2348,6 +2366,19 @@ images with a directory number of 164 or greater)</span></span></td></tr>
   <br>2 = Blue
   <br>3 = Purple
   <br>4 = Green</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SerialInfo'>Canon SerialInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>9</td>
+<td>InternalSerialNumber</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Processing'>Canon Processing Tags</a></h2>
@@ -2581,7 +2612,8 @@ images with a directory number of 164 or greater)</span></span></td></tr>
   <br>2 = Normal
   <br>3 = Fine
   <br>4 = RAW
-  <br>5 = Superfine</span></td></tr>
+  <br>5 = Superfine
+  <br>130 = Normal Movie</span></td></tr>
 <tr class=b>
 <td class=r>2</td>
 <td>PreviewImageLength</td>
@@ -3455,7 +3487,7 @@ the average black level)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 5, 2008</i>
+<br><i>Last revised Mar 11, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

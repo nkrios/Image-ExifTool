@@ -269,12 +269,36 @@ sub SetNewValue($;$$%)
                 if (@del) {
                     ++$numSet;
                     my @donegrps;
+                    my $delGroup = $self->{DEL_GROUP};
                     foreach $grp (@del) {
                         if ($remove) {
-                            exists $self->{DEL_GROUP}->{$grp} or next;
-                            delete $self->{DEL_GROUP}->{$grp};
+                            my $didExcl;
+                            if ($grp =~ /^XMP(-.*)?$/) {
+                                if ($grp eq 'XMP') {
+                                    # exclude all XMP family 1 groups too
+                                    foreach (keys %$delGroup) {
+                                        next unless /^-?XMP-/;
+                                        push @donegrps, $_ if /^XMP/;
+                                        delete $$delGroup{$_};
+                                    }
+                                } elsif ($$delGroup{'XMP-*'} and not $$delGroup{"-$grp"}) {
+                                    # flag XMP family 1 group for exclusion with leading '-'
+                                    $$delGroup{"-$grp"} = 1;
+                                    $didExcl = 1;
+                                }
+                            }
+                            if (exists $$delGroup{$grp}) {
+                                delete $$delGroup{$grp};
+                            } else {
+                                next unless $didExcl;
+                            }
                         } else {
-                            $self->{DEL_GROUP}->{$grp} = 1;
+                            $$delGroup{$grp} = 1;
+                            # add flag for XMP family 1 groups if deleting all XMP
+                            if ($grp eq 'XMP') {
+                                $$delGroup{'XMP-*'} = 1;
+                                push @donegrps, 'XMP-*';
+                            }
                             # remove all of this group from previous new values
                             $self->RemoveNewValuesForGroup($grp);
                         }
@@ -851,6 +875,7 @@ sub SetNewValuesFromFile($$;@)
         DateFormat  => $$options{DateFormat},
         PrintConv   => $$options{PrintConv},
         Composite   => $$options{Composite},
+        Charset     => $$options{Charset},
         MissingTagValue   => $$options{MissingTagValue},
         IgnoreMinorErrors => $$options{IgnoreMinorErrors},
     );
@@ -1786,7 +1811,7 @@ sub InsertTagValues($$$;$)
     my ($self, $foundTags, $line, $opt) = @_;
     my $rtnStr = '';
     while ($line =~ /(.*?)\$(\{?[\w-]+|\$|\/)(.*)/s) {
-        my (@tags, $pre, $var, $group, $family, $val, $tg, @vals);
+        my (@tags, $pre, $var, $val, $tg, @vals);
         ($pre, $var, $line) = ($1, $2, $3);
         if ($var eq '$') {      # "$$" represents a "$" symbol
             $rtnStr .= "$pre$var";
@@ -1797,7 +1822,7 @@ sub InsertTagValues($$$;$)
         }
         # check to see if this is a group name
         if ($line =~ /^:([\w-]+)(.*)/s) {
-            $group = $var;
+            my $group = $var;
             ($var, $line) = ($1, $2);
             $line =~ s/^\}// if $group =~ s/^\{//;
             $var = "$group:$var";
@@ -1810,9 +1835,9 @@ sub InsertTagValues($$$;$)
 
         for (;;) {
             my $tag = shift @tags;
-            my ($group, $family);
-            if ($tag =~ /(.+?)(\d+)?:(.+)/) {
-                ($group, $family, $tag) = ($1, $2, $3);
+            if ($tag =~ /(\d+)?(.+?):(.+)/) {
+                my ($group, $family);
+                ($family, $group, $tag) = ($1, $2, $3);
                 $group = '*' if lc($group) eq 'all';
                 # find the specified tag
                 my @matches = grep /^$tag(\s|$)/i, @$foundTags;
@@ -1975,7 +2000,11 @@ sub ReverseLookup($$)
             last;
         }
         unless ($found) {
-            undef $val;
+            if ($$conv{OTHER}) {
+                $val = &{$$conv{OTHER}}($val,1);
+            } else {
+                undef $val;
+            }
             $multi = 1 if $matches > 1;
         }
     }
@@ -2366,9 +2395,11 @@ sub InitWriteDirs($$;$)
     if (%{$self->{DEL_GROUP}}) {
         # add delete groups to list of edited groups
         foreach (keys %{$self->{DEL_GROUP}}) {
+            next if /^-/;   # ignore excluded groups
             my $dirName = $_;
             # translate necessary group 0 names
             $dirName = $translateWriteGroup{$dirName} if $translateWriteGroup{$dirName};
+            # convert XMP group 1 names
             $dirName = 'XMP' if $dirName =~ /^XMP-/;
             my @dirNames;
             while ($dirName) {
@@ -2447,6 +2478,7 @@ sub WriteDirectory($$$;$)
                         DirName => $$dirInfo{DirName},
                         DirStart => 0,
                         DirLen => 0,
+                        DataPt => \$data,
                         NewDataPos => $$dirInfo{NewDataPos},
                         Fixup => $$dirInfo{Fixup},
                     );
@@ -2497,6 +2529,7 @@ sub WriteDirectory($$$;$)
     my $saveOrder = GetByteOrder();
     my $oldChanged = $self->{CHANGED};
     $self->{DIR_NAME} = $dirName;
+    $$dirInfo{IsWriting} = 1;
     my $newData = &$writeProc($self, $dirInfo, $tagTablePtr);
     $self->{DIR_NAME} = $oldDir;
     $self->{CHANGED} = $oldChanged unless defined $newData; # nothing changed if error occurred
@@ -2682,8 +2715,8 @@ sub VerboseInfo($$$%)
     if ($verbose > 2 and $parms{DataPt}) {
         $parms{Out} = $out;
         $parms{Prefix} = $indent;
-        # limit dump length unless verbose > 3
-        $parms{MaxLen} = 96 unless $verbose > 3;
+        # limit dump length if Verbose < 5
+        $parms{MaxLen} = $verbose == 3 ? 96 : 2048 if $verbose < 5;
         HexDump($dataPt, $size, %parms);
     }
 }
@@ -2990,14 +3023,15 @@ sub UTF82Unicode($$;$)
 {
     my ($str, $fmt, $exifTool) = @_;
     undef $evalWarning;
-    if ($] >= 5.006001) {
+    if ($] < 5.006001) {
+        # do it ourself
+        $str = pack("$fmt*", UnpackUTF8($str));
+    } else {
         # handle warnings from malformed UTF-8
         local $SIG{'__WARN__'} = \&SetWarning;
         # repack UTF-8 string in specified format
-        $str = pack("$fmt*", unpack('U0U*',$str));
-    } else {
-        # do it ourself
-        $str = pack("$fmt*", UnpackUTF8($str));
+        # (somehow the meaning of "U0" was reversed in Perl 5.10.0!)
+        $str = pack("$fmt*", unpack($] < 5.010000 ? 'U0U*' : 'C0U*', $str));
     }
     if ($evalWarning and $exifTool and not $$exifTool{WarnBadUTF8}) {
         $exifTool->Warn('Malformed UTF-8 character(s)');
@@ -3706,7 +3740,12 @@ sub WriteJPEG($$)
                     DirStart => 0,
                     DirLen   => length $jfif,
                 );
+                # must temporarily remove JFIF from DEL_GROUP so we can
+                # delete JFIF and add it back again in a single step
+                my $delJFIF = $$delGroup{JFIF};
+                delete $$delGroup{JFIF};
                 my $newData = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
+                $$delGroup{JFIF} = $delJFIF if defined $delJFIF;
                 if (defined $newData and length $newData) {
                     my $app0hdr = "\xff\xe0" . pack('n', length($newData) + 7);
                     Write($outfile,$app0hdr,"JFIF\0",$newData) or $err = 1;
@@ -3918,7 +3957,7 @@ sub WriteJPEG($$)
                 if ($buff =~ m/(\xff\xd8\xff.|.\xd8\xff\xdb)/sg) {
                     $junkLen = pos($buff) - 4;
                     # Sony previewimage trailer has a 32 byte header
-                    $junkLen -= 32 if $$self{CameraMake} =~/SONY/i and $junkLen > 32;
+                    $junkLen -= 32 if $$self{Make} =~/SONY/i and $junkLen > 32;
                     $newPos += $junkLen;
                 }
                 # fix up the preview offsets to point to the start of the new image
@@ -4053,6 +4092,12 @@ sub WriteJPEG($$)
                     $doneDir{IFD0} and $self->Warn('Multiple APP1 EXIF segments');
                     $doneDir{IFD0} = 1;
                     last unless $$editDirs{IFD0};
+                    # check del groups now so we can change byte order in one step
+                    if ($$delGroup{IFD0} or $$delGroup{EXIF}) {
+                        delete $doneDir{IFD0};  # delete so we will create a new one
+                        $del = 1;
+                        last;
+                    }
                     # write new EXIF data to memory
                     my $buff = $exifAPP1hdr; # start with APP1 EXIF header
                     # rewrite EXIF as if this were a TIFF file in memory
@@ -4442,6 +4487,7 @@ sub WriteBinaryData($$$)
     $self or return 1;    # allow dummy access to autoload this package
 
     # get default format ('int8u' unless specified)
+    my $dataPt = $$dirInfo{DataPt} or return undef;
     my $defaultFormat = $$tagTablePtr{FORMAT} || 'int8u';
     my $increment = FormatSize($defaultFormat);
     unless ($increment) {
@@ -4454,7 +4500,6 @@ sub WriteBinaryData($$$)
         $self->ProcessBinaryData($dirInfo, $tagTablePtr);
         delete $$dirInfo{DataMember};
     }
-    my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
@@ -4469,6 +4514,7 @@ sub WriteBinaryData($$$)
         next unless $writeInfo and $writeInfo eq $tagInfo;
         my $count = 1;
         my $format = $$tagInfo{Format};
+        my $entry = int($tagID) * $increment;   # relative offset of this entry
         if ($format) {
             if ($format =~ /(.*)\[(.*)\]/) {
                 $format = $1;
@@ -4478,11 +4524,13 @@ sub WriteBinaryData($$$)
                 #### eval Format size (%val, $size)
                 $count = eval $count;
                 $@ and warn($@), next;
+            } elsif ($format eq 'string') {
+                # string with no specified count runs to end of block
+                $count = ($dirLen > $entry) ? $dirLen - $entry : 0;
             }
         } else {
             $format = $defaultFormat;
         }
-        my $entry = int($tagID) * $increment;   # relative offset of this entry
         my $val = ReadValue($dataPt, $entry, $format, $count, $dirLen-$entry);
         next unless defined $val;
         my $newValueHash = $self->GetNewValueHash($tagInfo);

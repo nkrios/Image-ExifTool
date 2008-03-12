@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # BMP chunks
 %Image::ExifTool::BMP::Main = (
@@ -53,6 +53,9 @@ $VERSION = '1.02';
             3 => 'Bitfields',
             4 => 'JPEG', #2
             5 => 'PNG', #2
+            'MJPG' => 'MJPG',
+            'XVID' => 'XVID',
+            'M4S2' => 'M4S2',
         },
     },
     20 => {

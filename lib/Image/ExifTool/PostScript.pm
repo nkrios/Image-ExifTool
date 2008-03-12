@@ -404,8 +404,8 @@ sub ProcessPS($$)
                 DataPt => \$buff,
                 DataLen => length $buff,
                 DirStart => 0,
-            	DirLen => length $buff,
-            	Parent => 'PostScript',
+                DirLen => length $buff,
+                Parent => 'PostScript',
             );
             my $subTablePtr = GetTagTable("Image::ExifTool::${mode}::Main");
             unless ($exifTool->ProcessDirectory(\%dirInfo, $subTablePtr)) {

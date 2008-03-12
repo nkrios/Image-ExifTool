@@ -10,7 +10,8 @@
 <p>
 EXIF stands for &quot;Exchangeable Image File Format&quot;.  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, MIFF and HDP images, as well as many TIFF-based RAW images.</p>
+TIFF, PNG, MIFF and HDP images, as well as many TIFF-based RAW images, and
+even some AVI and MOV videos.</p>
 
 <p>The EXIF meta information is organized into different Image File Directories
 (IFD&#39;s) within an image.  The names of these IFD&#39;s correspond to the
@@ -100,11 +101,15 @@ images.
   <br>8 = Adobe Deflate
   <br>9 = JBIG B&amp;W
   <br>10 = JBIG Color
+  <br>99 = JPEG
+  <br>262 = Kodak 262
   <br>32766 = Next
+  <br>32767 = Sony ARW Compressed
   <br>32769 = Epson ERF Compressed
   <br>32771 = CCIRLEW
   <br>32773 = PackBits
   <br>32809 = Thunderscan
+  <br>32867 = Kodak KDC Compressed
   <br>32895 = IT8CTPAD
   <br>32896 = IT8LW
   <br>32897 = IT8MP
@@ -501,7 +506,23 @@ JpgFromRawLength in SubIFD2 of DNG images)</span></span></td></tr>
 <td>SampleFormat</td>
 <td class=c>N</td>
 <td class=c>-</td>
-<td><span class=s>1 = Unsigned integer
+<td><span class=s><span class=n>(SamplesPerPixel values)</span>
+  <br>[Value 0]
+  <br>1 = Unsigned integer
+  <br>2 = Two&#39;s complement signed integer
+  <br>3 = IEEE floating point
+  <br>4 = Undefined
+  <br>5 = Complex integer
+  <br>6 = IEEE floating point
+  <br>[Value 1]
+  <br>1 = Unsigned integer
+  <br>2 = Two&#39;s complement signed integer
+  <br>3 = IEEE floating point
+  <br>4 = Undefined
+  <br>5 = Complex integer
+  <br>6 = IEEE floating point
+  <br>[Value 2]
+  <br>1 = Unsigned integer
   <br>2 = Two&#39;s complement signed integer
   <br>3 = IEEE floating point
   <br>4 = Undefined
@@ -726,8 +747,8 @@ JpgFromRawLength in SubIFD2 of DNG images)</span></span></td></tr>
 <tr>
 <td>0x02bc</td>
 <td>ApplicationNotes</td>
-<td class=c>-</td>
-<td class=c>-</td>
+<td class=c>int8u!</td>
+<td class=c>ExifIFD</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
 <tr class=b>
 <td>0x1000</td>
@@ -820,215 +841,240 @@ JpgFromRawLength in SubIFD2 of DNG images)</span></span></td></tr>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>0x8290</td>
+<td>KodakIFD</td>
+<td class=c>-</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#IFD'>Kodak IFD Tags</a>
+  <br><span class='n s'>(used in various types of Kodak images)</span></td></tr>
+<tr class=b>
 <td>0x8298</td>
 <td>Copyright</td>
 <td class=c>string</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x829a</td>
 <td>ExposureTime</td>
 <td class=c>rational64u</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x829d</td>
 <td>FNumber</td>
 <td class=c>rational64u</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x82a5</td>
 <td>MDFileTag</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td><span class=s><span class=n>(tags 0x82a5-0x82ac are used in Molecular Dynamics GEL files)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>0x82a6</td>
 <td>MDScalePixel</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x82a7</td>
 <td>MDColorTable</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x82a8</td>
 <td>MDLabName</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x82a9</td>
 <td>MDSampleInfo</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x82aa</td>
 <td>MDPrepDate</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x82ab</td>
 <td>MDPrepTime</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x82ac</td>
 <td>MDFileUnits</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x830e</td>
 <td>PixelScale</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x83bb</td>
 <td>IPTC-NAA</td>
 <td class=c>int32u</td>
 <td class=c>IFD0</td>
 <td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x847e</td>
 <td>IntergraphPacketData</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x847f</td>
 <td>IntergraphFlagRegisters</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x8480</td>
 <td>IntergraphMatrix</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x8482</td>
 <td>ModelTiePoint</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x84e0</td>
 <td>Site</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x84e1</td>
 <td>ColorSequence</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x84e2</td>
 <td>IT8Header</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x84e3</td>
 <td>RasterPadding</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x84e4</td>
 <td>BitsPerRunLength</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x84e5</td>
 <td>BitsPerExtendedRunLength</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x84e6</td>
 <td>ColorTable</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x84e7</td>
 <td>ImageColorIndicator</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x84e8</td>
 <td>BackgroundColorIndicator</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x84e9</td>
 <td>ImageColorValue</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x84ea</td>
 <td>BackgroundColorValue</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x84eb</td>
 <td>PixelIntensityRange</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x84ec</td>
 <td>TransparencyIndicator</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x84ed</td>
 <td>ColorCharacterization</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x84ee</td>
 <td>HCUsage</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x84ef</td>
+<td>TrapIndicator</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
 <tr>
+<td>0x84f0</td>
+<td>CMYKEquivalent</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x8546</td>
 <td>SEMInfo</td>
 <td class=c>string</td>
 <td class=c>IFD0</td>
 <td><span class=s><span class=n>(found in some scanning electron microscope images)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>0x8568</td>
 <td>AFCP_IPTC</td>
 <td class=c>-</td>
 <td class=c>-</td>
 <td>--&gt; <a href='IPTC.html'>IPTC Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x85d8</td>
 <td>ModelTransform</td>
 <td class=c>N</td>
 <td class=c>-</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>0x8602</td>
+<td>WB_GRGBLevels</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td><span class=s><span class=n>(found in IFD0 of Leaf MOS images)</span></span></td></tr>
 <tr class=b>
 <td>0x8606</td>
 <td>LeafData</td>
@@ -1421,7 +1467,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteKodak6a
   <br>MakerNoteKodak6b
   <br>MakerNoteKodak7
-  <br>MakerNoteKodakIFD
+  <br>MakerNoteKodak8
   <br>MakerNoteKodakUnknown
   <br>MakerNoteKyocera
   <br>MakerNoteMinolta
@@ -1433,6 +1479,8 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteOlympus
   <br>MakerNoteOlympus2
   <br>MakerNoteLeica
+  <br>MakerNoteLeica2
+  <br>MakerNoteLeica3
   <br>MakerNotePanasonic
   <br>MakerNotePanasonic2
   <br>MakerNotePentax
@@ -1450,8 +1498,8 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteSony2
   <br>MakerNoteSonySRF
   <br>MakerNoteUnknown</td>
-<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -1471,7 +1519,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Kodak.html#Type6'>Kodak Type6 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type6'>Kodak Type6 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type7'>Kodak Type7 Tags</a>
-  <br>--&gt; <a href='Kodak.html#IFD'>Kodak IFD Tags</a>
+  <br>--&gt; <a href='Kodak.html#Type8'>Kodak Type8 Tags</a>
   <br>--&gt; <a href='Kodak.html#Unknown'>Kodak Unknown Tags</a>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a>
   <br>--&gt; <a href='Minolta.html'>Minolta Tags</a>
@@ -1483,6 +1531,8 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Olympus.html'>Olympus Tags</a>
   <br>--&gt; <a href='Olympus.html'>Olympus Tags</a>
   <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
+  <br>--&gt; <a href='Panasonic.html#Leica2'>Panasonic Leica2 Tags</a>
+  <br>--&gt; <a href='Panasonic.html#Leica3'>Panasonic Leica3 Tags</a>
   <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
   <br>--&gt; <a href='Panasonic.html#Type2'>Panasonic Type2 Tags</a>
   <br>--&gt; <a href='Pentax.html'>Pentax Tags</a>
@@ -1575,7 +1625,7 @@ ImageDescription exists)</span></span></td></tr>
 <td class=c>int16u</td>
 <td class=c>ExifIFD</td>
 <td><span class=s><span class=n>(the value of 2 is not standard EXIF.  Instead, an Adobe RGB image is
-indicated by &quot;Uncalibrated&quot; with an InteropIndex of &quot;R03&quot;&#39;)</span>
+indicated by &quot;Uncalibrated&quot; with an InteropIndex of &quot;R03&quot;)</span>
   <br>1 = sRGB
   <br>2 = Adobe RGB
   <br>65535 = Uncalibrated</span></td></tr>
@@ -2024,13 +2074,13 @@ unnecessary clutter)</span>
 <tr class=b>
 <td>0xc612</td>
 <td>DNGVersion</td>
-<td class=c>int8u[4]</td>
+<td class=c>int8u[4]!</td>
 <td class=c>IFD0</td>
 <td><span class=s><span class=n>(tags 0xc612-0xc65d are used in DNG images)</span></span></td></tr>
 <tr>
 <td>0xc613</td>
 <td>DNGBackwardVersion</td>
-<td class=c>int8u[4]</td>
+<td class=c>int8u[4]!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -2100,19 +2150,19 @@ unnecessary clutter)</span>
 <tr class=b>
 <td>0xc61e</td>
 <td>DefaultScale</td>
-<td class=c>rational64u[2]</td>
+<td class=c>rational64u[2]!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc61f</td>
 <td>DefaultCropOrigin</td>
-<td class=c>int32u[2]</td>
+<td class=c>int32u[2]!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0xc620</td>
 <td>DefaultCropSize</td>
-<td class=c>int32u[2]</td>
+<td class=c>int32u[2]!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -2166,37 +2216,37 @@ unnecessary clutter)</span>
 <tr>
 <td>0xc629</td>
 <td>AsShotWhiteXY</td>
-<td class=c>rational64u[2]</td>
+<td class=c>rational64u[2]!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0xc62a</td>
 <td>BaselineExposure</td>
-<td class=c>rational64s</td>
+<td class=c>rational64s!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc62b</td>
 <td>BaselineNoise</td>
-<td class=c>rational64u</td>
+<td class=c>rational64u!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0xc62c</td>
 <td>BaselineSharpness</td>
-<td class=c>rational64u</td>
+<td class=c>rational64u!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc62d</td>
 <td>BayerGreenSplit</td>
-<td class=c>int32u</td>
+<td class=c>int32u!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0xc62e</td>
 <td>LinearResponseLimit</td>
-<td class=c>rational64u</td>
+<td class=c>rational64u!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -2214,19 +2264,19 @@ unnecessary clutter)</span>
 <tr>
 <td>0xc631</td>
 <td>ChromaBlurRadius</td>
-<td class=c>rational64u</td>
+<td class=c>rational64u!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0xc632</td>
 <td>AntiAliasStrength</td>
-<td class=c>rational64u</td>
+<td class=c>rational64u!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc633</td>
 <td>ShadowScale</td>
-<td class=c>rational64u</td>
+<td class=c>rational64u!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -2257,7 +2307,7 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <tr>
 <td>0xc65a</td>
 <td>CalibrationIlluminant1</td>
-<td class=c>int16u</td>
+<td class=c>int16u!</td>
 <td class=c>IFD0</td>
 <td><span class=s>0 = Unknown
   <br>1 = Daylight
@@ -2283,7 +2333,7 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <tr class=b>
 <td>0xc65b</td>
 <td>CalibrationIlluminant2</td>
-<td class=c>int16u</td>
+<td class=c>int16u!</td>
 <td class=c>IFD0</td>
 <td><span class=s>0 = Unknown
   <br>1 = Daylight
@@ -2309,13 +2359,13 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <tr>
 <td>0xc65c</td>
 <td>BestQualityScale</td>
-<td class=c>rational64u</td>
+<td class=c>rational64u!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0xc65d</td>
 <td>RawDataUniqueID</td>
-<td class=c>int8u[16]</td>
+<td class=c>int8u[16]!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -2327,31 +2377,31 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <tr class=b>
 <td>0xc68b</td>
 <td>OriginalRawFileName</td>
-<td class=c>string</td>
+<td class=c>string!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc68c</td>
 <td>OriginalRawFileData</td>
-<td class=c>undef</td>
+<td class=c>undef!</td>
 <td class=c>IFD0</td>
 <td>--&gt; <a href='DNG.html#OriginalRaw'>DNG OriginalRaw Tags</a></td></tr>
 <tr class=b>
 <td>0xc68d</td>
 <td>ActiveArea</td>
-<td class=c>int32u[4]</td>
+<td class=c>int32u[4]!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc68e</td>
 <td>MaskedAreas</td>
-<td class=c>int32u[4]</td>
+<td class=c>int32u[4]!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0xc68f</td>
 <td>AsShotICCProfile</td>
-<td class=c>undef</td>
+<td class=c>undef!</td>
 <td class=c>IFD0</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
 <tr>
@@ -2363,7 +2413,7 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <tr class=b>
 <td>0xc691</td>
 <td>CurrentICCProfile</td>
-<td class=c>undef</td>
+<td class=c>undef!</td>
 <td class=c>IFD0</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
 <tr>
@@ -2474,7 +2524,7 @@ writing these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 5, 2008</i>
+<br><i>Last revised Mar 11, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

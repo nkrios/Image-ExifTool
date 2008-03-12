@@ -94,10 +94,11 @@ supported by ExifTool (r = read, w = write, c = create):
 
 =head1 CONFIGURATION
 
-User-defined tags can be added via the ExifTool configuration file.  See
-"ExifTool_config" in the ExifTool distribution for more details.  If
-necessary, the configuration feature can be disabled by setting the ExifTool
-C<noConfig> flag before loading Image::ExifTool.  For example:
+User-defined tags can be added via the ExifTool configuration file, or by
+defining the %Image::ExifTool::UserDefined hash before calling any ExifTool
+functions.  See "ExifTool_config" in the ExifTool distribution for more
+details.  If necessary, the configuration feature can be disabled by setting
+the ExifTool C<noConfig> flag before loading Image::ExifTool.  For example:
 
     BEGIN { $Image::ExifTool::noConfig = 1 }
     use Image::ExifTool;
@@ -233,7 +234,7 @@ keys are identifiers, which are similar to the tag names but may have an
 embedded instance number if multiple tags with the same name were extracted
 from the image.  Many of the ExifTool functions require a tag key as an
 argument. Use L</GetTagName [static]> to get the tag name for a given tag
-key.  Note that the case of the tag names may not be the same as requested. 
+key.  Note that the case of the tag names may not be the same as requested.
 Here is a simple example to print out the information returned by
 L</ImageInfo>:
 
@@ -564,7 +565,8 @@ difference is that a list of tag keys is not returned if an ARRAY reference
 is given.  The following options are effective in the call to
 L</ExtractInfo>:
 
-Binary, Composite, DateFormat, Unknown and Verbose.
+Binary, Charset, Composite, FastScan, FixBase, HtmlDump, HtmlDumpBase,
+IgnoreMinorErrors, MakerNotes, ScanForXMP, TextOut, Unknown and Verbose.
 
 =item Return Value:
 
@@ -595,8 +597,8 @@ L</ImageInfo>.
 Inputs are the same as L</ExtractInfo> and L</ImageInfo> except that an
 image can not be specified.  Options in effect are:
 
-Duplicates, Exclude, Group#, PrintConv (and Sort if tag list reference is
-given).
+Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, List,
+StrictDate, PrintConv (and Sort if a tag list reference is given).
 
 =item Return Value:
 
@@ -733,7 +735,7 @@ used.
 
 =item Return Values:
 
-A list of tags in the specified order.
+A list of tag keys in the specified order.
 
 =back
 
@@ -754,7 +756,7 @@ tags are expanded in the list.
 
 =item Return Values:
 
-List of requested tags in the same order that they were specified.
+List of requested tag keys in the same order that the tags were specified.
 Note that this list will be empty if tags were not specifically requested
 (ie. If extracting all tags).
 
@@ -863,6 +865,10 @@ name for each value, or call with a reference to the list of values.
     # shift original date/time back by 1 hour
     $exifTool->SetNewValue(DateTimeOriginal => '1:00', Shift => -1);
 
+    # delete all but EXIF tags
+    $exifTool->SetNewValue('*');  # delete all...
+    $exifTool->SetNewValue('EXIF:*', undef, Replace => 2); # ...but EXIF
+
 =over 4
 
 =item Inputs:
@@ -931,9 +937,9 @@ value only).
 
 Shift the tag by the specified value.  Currently only date/time tags can be
 shifted.  Undefined for no shift, 1 for a positive shift, or -1 for a
-negative shift.  If 0, the shift is applied only if the tag is shiftable.
-In this case, the direction of the shift is positive if AddValue is set, or
-negative if DelValue is set.  Default is undef.  See
+negative shift.  If 0, the shift is applied only if the tag is shiftable,
+and the shift is positive if AddValue is set, or negative if DelValue is
+set.  Default is undef.  See
 L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for more information.
 
 =back
@@ -1476,20 +1482,20 @@ GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
 HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
 ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC, InteropIFD,
 JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
-KyoceraRaw, Leaf, LeafSubIFD, MAC, MIE-Audio, MIE-Camera, MIE-Doc,
-MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
-MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
-MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown,
-MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan,
-Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
-PictureInfo, PostScript, PrintIM, QuickTime, RAF, RAF2, RIFF, RMETA, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, Sanyo, Sigma, SigmaRaw,
-Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-PixelLive, XMP-aux,
-XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-lr,
-XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop,
-XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpPLUS,
-XMP-xmpRights, XMP-xmpTPg
+KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC, MIE-Audio, MIE-Camera,
+MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens,
+MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Test,
+MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG,
+MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture,
+NikonPreview, NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax,
+PhotoMechanic, Photoshop, PictureInfo, PostScript, PrintIM, QuickTime, RAF,
+RAF2, RIFF, RMETA, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
+Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
+SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
+XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif,
+XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech,
+XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
+XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 
 =item Family 2 (Category):
 
@@ -1586,7 +1592,7 @@ Can the specified file or file type be created?
 =item Return Value:
 
 True if the specified file type can be created from scratch.  Currently,
-this can only be done with XMP files.
+this can only be done with XMP, MIE, ICC and VRD files.
 
 =back
 

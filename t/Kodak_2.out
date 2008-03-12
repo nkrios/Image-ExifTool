@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.19
 [File, File, Image]  - File Name: Kodak.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -60,7 +60,7 @@
 [MakerNotes, Kodak, Time] 18 - Month Day Created: 05:01
 [MakerNotes, Kodak, Time] 20 - Time Created: 10:22:28.62
 [MakerNotes, Kodak, Camera] 27 - Shutter Mode: Auto
-[MakerNotes, Kodak, Camera] 28 - Metering Mode: Multi-pattern
+[MakerNotes, Kodak, Camera] 28 - Metering Mode: Multi-segment
 [MakerNotes, Kodak, Camera] 29 - Sequence Number: 0
 [MakerNotes, Kodak, Camera] 30 - F Number: 6.73
 [MakerNotes, Kodak, Camera] 32 - Exposure Time: 1/216

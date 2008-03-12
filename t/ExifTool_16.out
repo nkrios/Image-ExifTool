@@ -56,11 +56,11 @@ MacroMode : Unknown (0)
 ManualFlashOutput : n/a
 MaxAperture : 4
 MeasuredEV : -6.25
-MeteringMode : Center-weighted averaging
+MeteringMode : Center-weighted average
 MinAperture : 27
 NDFilter : Unknown (-1)
 NumAFPoints : 7
-OpticalZoomCode : 8
+OpticalZoomCode : n/a
 OwnerName : Phil Harvey
 Quality : RAW
 RecordMode : CRW+THM
@@ -100,7 +100,7 @@ HyperfocalDistance : 4.26 m
 ISO (1) : 100
 ImageSize : 8x8
 Lens : 18.0 - 55.0 mm
-Lens35efl : 18.0 - 55.0 mm (35mm equivalent: 27.9 - 85.3 mm)
+Lens35efl : 18.0 - 55.0 mm (35 mm equivalent: 27.9 - 85.3 mm)
 LightValue : 5.6
 RedBalance : 2.067348
 ScaleFactor35efl : 1.6

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.20
 [File, File, Image]  - File Name: DNG.dng
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 13 kB
@@ -172,7 +172,7 @@
 [MakerNotes, Canon, Camera] 13 - Contrast: Normal
 [MakerNotes, Canon, Camera] 14 - Saturation: Normal
 [MakerNotes, Canon, Camera] 15 - Sharpness: 0
-[MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
+[MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted average
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Aperture-priority AE
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
@@ -202,7 +202,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
-[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: 8
+[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: n/a
 [MakerNotes, Canon, Image] 13 - Flash Guide Number: 0
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
@@ -308,7 +308,7 @@
 [Composite, Composite, Image]  - Jpg From Raw: (Binary data 29 bytes)
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
+[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Aperture-priority AE
 [Composite, Composite, Image]  - Shutter Speed: 1/15
 [Composite, Composite, Camera]  - WB RGGB Levels: 2002 1185 1187 2364
@@ -317,6 +317,6 @@
 [Composite, Composite, Image]  - Field Of View: 23.7 deg
 [Composite, Composite, Camera]  - Focal Length: 55.0 mm (35 mm equivalent: 85.9 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 19.66 m
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm (35mm equivalent: 28.1 - 85.9 mm)
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm (35 mm equivalent: 28.1 - 85.9 mm)
 [Composite, Composite, Image]  - Light Value: 7.9
 [Composite, Composite, Camera]  - Red Balance: 1.688027

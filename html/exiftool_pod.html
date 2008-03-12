@@ -277,15 +277,15 @@ option.
 <dt><strong><a name="item_ext"><strong>-ext</strong> <em>EXT</em> (or <strong>--ext</strong> <em>EXT</em>)</a></strong><br />
 </dt>
 <dd>
-Process only files with the specified extension, or use <strong>--ext</strong> to exclude
-files.  There may be multiple <strong>-ext</strong> and <strong>--ext</strong> options.  Extensions may
+Process only files with (<strong>-ext</strong>) or without (<strong>--ext</strong>) a specified
+extension.  There may be multiple <strong>-ext</strong> and <strong>--ext</strong> options.  Extensions may
 begin with a leading '.', and case is not significant.  For example:
 </dd>
 <dd>
 <pre>
-    exiftool -ext .JPG *            # process only JPG files
-    exiftool --ext crw --ext dng *  # process all but CRW and DNG
-    exiftool --ext . *              # ignore if no extension</pre>
+    exiftool -ext .JPG DIR            # process only JPG files in
+    exiftool --ext crw --ext dng DIR  # process all but CRW and DNG
+    exiftool --ext . DIR              # ignore if no extension</pre>
 </dd>
 <p></p>
 <dt><strong><a name="item__2df"><strong>-f</strong></a></strong><br />

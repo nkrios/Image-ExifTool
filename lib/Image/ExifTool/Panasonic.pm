@@ -15,6 +15,7 @@
 #               8) Marcel Coenen private communication (DMC-FZ50)
 #               9) http://forums.dpreview.com/forums/read.asp?forum=1033&message=22756430
 #              10) Jens Duttke private communication (TZ3,FZ30,FZ50)
+#              11) http://bretteville.com/pdfs/M8Metadata_v2.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Panasonic;
@@ -23,9 +24,10 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 sub ProcessPanasonicType2($$$);
+sub WhiteBalanceConv($;$);
 
 # conversions for ShootingMode and SceneMode
 my %shootingMode = (
@@ -301,8 +303,10 @@ my %shootingMode = (
         Writable => 'int16u',
         PrintConv => {
             0 => 'Standard',
-            1 => 'Low',
-            2 => 'High',
+            1 => 'Low (-1)',
+            2 => 'High (+1)',
+            3 => 'Lowest (-2)', #10
+            4 => 'Highest (+2)', #10
         },
     },
     0x2e => { #4
@@ -486,6 +490,153 @@ my %shootingMode = (
     },
 );
 
+# Leica type2 maker notes (ref 11)
+%Image::ExifTool::Panasonic::Leica2 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    WRITABLE => 1,
+    NOTES => 'These tags are used by the Leica M8.',
+    0x300 => {
+        Name => 'Quality',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Fine',
+            2 => 'Basic',
+        },
+    },
+    0x302 => {
+        Name => 'UserProfile',
+        Writable => 'int32u',
+        PrintConv => {
+            1 => 'User Profile 1',
+            2 => 'User Profile 2',
+            3 => 'User Profile 3',
+            4 => 'User Profile 0 (Dynamic)',
+        },
+    },
+    0x303 => {
+        Name => 'SerialNumber',
+        Writable => 'int32u',
+        PrintConv => 'sprintf("%.7d", $val)',
+        PrintConvInv => '$val',
+    },
+    0x304 => {
+        Name => 'WhiteBalance',
+        Writable => 'int16u',
+        Notes => 'values above 0x8000 are converted to Kelvin color temperatures',
+        PrintConv => {
+            0 => 'Auto or Manual',
+            1 => 'Daylight',
+            2 => 'Fluorescent',
+            3 => 'Tungsten',
+            4 => 'Flash',
+            10 => 'Cloudy',
+            11 => 'Shadow',
+            OTHER => \&WhiteBalanceConv,
+        },
+    },
+    0x310 => {
+        Name => 'LensType',
+        Writable => 'int32u',
+        Notes => 'lower 3 bits split into a separate value for the frame selector position',
+        ValueConv => '($val >> 2) . " " . ($val & 0x03)',
+        ValueConvInv => 'my @a=split " ",$val; ($a[0] << 2) + ($a[1] & 0x03)',
+        PrintConv => [{
+            1 => 'Elmarit-M 21mm f/2.8',
+            3 => 'Elmarit-M 28mm f/2.8 (III)',
+            4 => 'Tele-Elmarit-M 90mm f/2.8 (II)',
+            5 => 'Summilux-M 50mm f/1.4 (II)',
+            6 => 'Summicron-M 35mm f/2 (IV)',
+            7 => 'Summicron-M 90mm f/2 (II)',
+            9 => 'Elmarit-M 135mm f/2.8 (I/II)',
+            16 => 'Tri-Elmar-M 16-18-21mm f/4 ASPH.',
+            23 => 'Summicron-M 50mm f/2 (III)',
+            24 => 'Elmarit-M 21mm f/2.8 ASPH.',
+            25 => 'Elmarit-M 24mm f/2.8 ASPH.',
+            26 => 'Summicron-M 28mm f/2 ASPH.',
+            27 => 'Elmarit-M 28mm f/2.8 (IV)',
+            28 => 'Elmarit-M 28mm f/2.8 ASPH.',
+            29 => 'Summilux-M 35mm f/1.4 ASPH.',
+            30 => 'Summicron-M 35mm f/2 ASPH.',
+            31 => 'Noctilux-M 50mm f/1',
+            32 => 'Summilux-M 50mm f/1.4 ASPH.',
+            33 => 'Summicron-M 50mm f/2 (IV, V)',
+            34 => 'Elmar-M 50mm f/2.8',
+            35 => 'Summilux-M 75mm f/1.4',
+            36 => 'Apo-Summicron-M 75mm f/2 ASPH.',
+            37 => 'Apo-Summicron-M 90mm f/2 ASPH.',
+            38 => 'Elmarit-M 90mm f/2.8',
+            39 => 'Macro-Elmar-M 90mm f/4',
+            40 => 'Macro-Adapter M',
+            42 => 'Tri-Elmar-M 28-35-50mm f/4 ASPH.',
+            43 => 'Summarit-M 35mm f/2.5',
+            44 => 'Summarit-M 50mm f/2.5',
+            45 => 'Summarit-M 75mm f/2.5',
+            46 => 'Summarit-M 90mm f/2.5',
+        },{
+            1 => '28/90mm frame lines engaged',
+            2 => '24/35mm frame lines engaged',
+            3 => '50/75mm frame lines engaged',
+        }],
+    },
+    0x311 => {
+        Name => 'ExternalSensorBrightnessValue',
+        Format => 'rational64s', # (incorrectly unsigned in JPEG images)
+        Writable => 'rational64s',
+        Notes => '"blue dot" measurement',
+        PrintConv => 'sprintf("%.2f", $val)',
+        PrintConvInv => '$val',
+    },
+    0x312 => {
+        Name => 'MeasuredLV',
+        Format => 'rational64s', # (incorrectly unsigned in JPEG images)
+        Writable => 'rational64s',
+        Notes => 'imaging sensor or TTL exposure meter measurement',
+        PrintConv => 'sprintf("%.2f", $val)',
+        PrintConvInv => '$val',
+    },
+    0x313 => {
+        Name => 'ApproximateFNumber',
+        Writable => 'rational64u',
+        PrintConv => 'sprintf("%.1f", $val)',
+        PrintConvInv => '$val',
+    },
+    0x320 => { Name => 'CameraTemperature', Writable => 'int32s' },
+    0x321 => { Name => 'ColorTemperature',  Writable => 'int32u' },
+    0x322 => { Name => 'WBRedLevel',        Writable => 'rational64u' },
+    0x323 => { Name => 'WBGreenLevel',      Writable => 'rational64u' },
+    0x324 => { Name => 'WBBlueLevel',       Writable => 'rational64u' },
+    0x325 => {
+        Name => 'UV-IRFilterCorrection',
+        Description => 'UV/IR Filter Correction',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'Not Active',
+            1 => 'Active',
+        },
+    },
+    0x330 => { Name => 'CCDVersion',        Writable => 'int32u' },
+    0x331 => { Name => 'CCDBoardVersion',   Writable => 'int32u' },
+    0x332 => { Name => 'ControllerBoardVersion', Writable => 'int32u' },
+    0x333 => { Name => 'M16CVersion',       Writable => 'int32u' },
+    0x340 => { Name => 'ImageIDNumber',     Writable => 'int32u' },
+);
+
+# Leica type3 maker notes (ref PH)
+%Image::ExifTool::Panasonic::Leica3 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    WRITABLE => 1,
+    NOTES => 'These tags are used by the Leica R8 and R9 digital backs.',
+    0x0d => {
+        Name => 'WB_RGBLevels',
+        Writable => 'int16u',
+        Count => 3,
+    },
+);
+
 # Type 2 tags (ref PH)
 %Image::ExifTool::Panasonic::Type2 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -572,18 +723,18 @@ my %shootingMode = (
         Name => 'Make',
         Groups => { 2 => 'Camera' },
         Writable => 'string',
-        DataMember => 'CameraMake',
+        DataMember => 'Make',
         # save this value as an ExifTool member variable
-        RawConv => '$self->{CameraMake} = $val',
+        RawConv => '$self->{Make} = $val',
     },
     0x110 => {
         Name => 'Model',
         Description => 'Camera Model Name',
         Groups => { 2 => 'Camera' },
         Writable => 'string',
-        DataMember => 'CameraModel',
+        DataMember => 'Model',
         # save this value as an ExifTool member variable
-        RawConv => '$self->{CameraModel} = $val',
+        RawConv => '$self->{Model} = $val',
     },
     0x111 => {
         Name => 'StripOffsets',
@@ -628,6 +779,21 @@ my %shootingMode = (
     },
 );
 
+#------------------------------------------------------------------------------
+# Convert Leica Kelvin white balance
+# Inputs: 0) value, 1) flag to perform inverse conversion
+# Returns: Converted value, or undef on error
+sub WhiteBalanceConv($;$)
+{
+    my ($val, $inv) = @_;
+    if ($inv) {
+        return $1 + 0x8000 if $val =~ /(\d+)\s*K/i;
+    } else {
+        return ($val - 0x8000) . ' Kelvin' if $val > 0x8000;
+    }
+    return undef;
+}
+
 1;  # end
 
 __END__
@@ -663,6 +829,8 @@ under the same terms as Perl itself.
 =item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
 =item L<http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm>
+
+=item L<http://bretteville.com/pdfs/M8Metadata_v2.pdf>
 
 =back
 

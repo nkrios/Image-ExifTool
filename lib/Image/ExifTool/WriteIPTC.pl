@@ -181,18 +181,21 @@ sub FormatIPTC($$$$$;$)
 #------------------------------------------------------------------------------
 # generate IPTC-format date
 # Inputs: 0) EXIF-format date string (YYYY:MM:DD) or date/time string
-# Returns: IPTC-format date string (YYYYMMDD), or undef on error
+# Returns: IPTC-format date string (YYYYMMDD), or undef and issue warning on error
 sub IptcDate($)
 {
     my $val = shift;
-    $val =~ s/.*(\d{4}):?(\d{2}):?(\d{2}).*/$1$2$3/ or undef $val;
+    unless ($val =~ s/.*(\d{4}):?(\d{2}):?(\d{2}).*/$1$2$3/) {
+        warn "Invalid date format (use YYYY:MM:DD)\n";
+        undef $val;
+    }
     return $val;
 }
 
 #------------------------------------------------------------------------------
 # generate IPTC-format time
 # Inputs: 0) EXIF-format time string (HH:MM:SS[+/-HH:MM]) or date/time string
-# Returns: IPTC-format time string (HHMMSS+HHMM), or undef on error
+# Returns: IPTC-format time string (HHMMSS+HHMM), or undef and issue warning on error
 sub IptcTime($)
 {
     my $val = shift;
@@ -205,6 +208,7 @@ sub IptcTime($)
             $val .= '+0000';    # don't know the time zone
         }
     } else {
+        warn "Invalid time format (use HH:MM:SS[+/-HH:MM])\n";
         undef $val;     # time format error
     }
     return $val;

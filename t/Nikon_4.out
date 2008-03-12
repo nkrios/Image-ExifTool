@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.18
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
+[File, File, Time]  - File Modification Date/Time: 2008:02:20 08:45:57
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
@@ -118,6 +118,7 @@
 [MakerNotes, Nikon, Camera] 162 - Image Data Size: 2361498
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 526
 [MakerNotes, Nikon, Camera] 0 - Flash Info Version: 0100
+[MakerNotes, Nikon, Camera] 8 - External Flash Flags: (none)
 [MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
 [MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
 [MakerNotes, Nikon, Camera] 10 - Flash Exposure Compensation: 0
@@ -140,7 +141,7 @@
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Camera]  - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
 [Composite, Composite, Camera]  - Lens: 18-70mm f/3.5-4.5 G
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
+[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/60
 [Composite, Composite, Camera]  - Blue Balance: 1.410156
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.020 mm

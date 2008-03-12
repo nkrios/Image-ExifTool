@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.21
 [File, File, Image]  - File Name: Canon1DmkIII.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 8 kB
@@ -94,7 +94,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
-[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: 8
+[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: n/a
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
@@ -125,8 +125,9 @@
 [MakerNotes, Canon, Camera] 275 - Short Focal: 16 mm
 [MakerNotes, Canon, Camera] 277 - Long Focal: 35 mm
 [MakerNotes, Canon, Camera] 310 - Firmware Version: 5.3.1
-[MakerNotes, Canon, Image] 370 - File Number: 232
+[MakerNotes, Canon, Image] 370 - File Index: 232
 [MakerNotes, Canon, Camera] 374 - Shutter Count: 1
+[MakerNotes, Canon, Image] 382 - Directory Index: 108
 [MakerNotes, Canon, Time] 1118 - Time Stamp: 1970:01:02 01:30:10
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS-1D Mark III
 [MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
@@ -259,12 +260,13 @@
 [MakerNotes, Canon, Camera] 117 - Color Temp Flash: 6777
 [Composite, Composite, Image]  - Aperture: 5.6
 [Composite, Composite, Camera]  - Drive Mode: Continuous shooting
+[Composite, Composite, Image]  - File Number: 108-0232
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - ISO: 3200
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 16.0 - 35.0 mm
 [Composite, Composite, Camera]  - Original Decision Data: (Binary data 512 bytes)
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.3
+[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.3
 [Composite, Composite, Camera]  - Shooting Mode: Program AE
 [Composite, Composite, Image]  - Shutter Speed: 1/125
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
@@ -274,7 +276,7 @@
 [Composite, Composite, Image]  - Field Of View: 43.7 deg
 [Composite, Composite, Camera]  - Focal Length: 35.0 mm (35 mm equivalent: 44.8 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 9.33 m
-[Composite, Composite, Camera]  - Lens: 16.0 - 35.0 mm (35mm equivalent: 20.5 - 44.8 mm)
+[Composite, Composite, Camera]  - Lens: 16.0 - 35.0 mm (35 mm equivalent: 20.5 - 44.8 mm)
 [Composite, Composite, Image]  - Light Value: 6.9
 [Composite, Composite, Camera]  - Red Balance: 2.22168
 [Composite, Composite, Image]  - Date/Time Original: 2007:02:22 17:02:42.81

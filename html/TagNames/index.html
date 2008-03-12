@@ -44,9 +44,9 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='Sony.html'>Sony</a><br>
 <a href='Unknown.html'>Unknown</a><br>
 <a href='DNG.html'>DNG</a><br>
-<a href='MinoltaRaw.html'>MinoltaRaw</a><br>
 <a href='CanonRaw.html'>CanonRaw</a><br>
 <a href='KyoceraRaw.html'>KyoceraRaw</a><br>
+<a href='MinoltaRaw.html'>MinoltaRaw</a><br>
 <a href='SigmaRaw.html'>SigmaRaw</a><br>
 <a href='JFIF.html'>JFIF</a><br>
 <a href='FlashPix.html'>FlashPix</a><br>
@@ -56,15 +56,15 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='FotoStation.html'>FotoStation</a><br>
 <a href='PhotoMechanic.html'>PhotoMechanic</a><br>
 <a href='MIE.html'>MIE</a><br>
-<a href='ID3.html'>ID3</a><br>
 <a href='Jpeg2000.html'>Jpeg2000</a><br>
 <a href='BMP.html'>BMP</a><br>
 <a href='PICT.html'>PICT</a><br>
 <a href='PNG.html'>PNG</a><br>
 <a href='MNG.html'>MNG</a><br>
-<a href='MIFF.html'>MIFF</a></td><td width='16%'>
-<a href='PDF.html'>PDF</a><br>
+<a href='MIFF.html'>MIFF</a><br>
+<a href='PDF.html'>PDF</a></td><td width='16%'>
 <a href='PostScript.html'>PostScript</a><br>
+<a href='ID3.html'>ID3</a><br>
 <a href='ITC.html'>ITC</a><br>
 <a href='Vorbis.html'>Vorbis</a><br>
 <a href='FLAC.html'>FLAC</a><br>
@@ -94,12 +94,12 @@ block, and <b>Sequence</b> gives the order of values for a serial data stream.</
 ExifTool.  In some instances, more than one name may correspond to a single
 tag ID.  In these cases, the actual name used depends on the context in
 which the information is found.  Case is not significant for tag names.  A
-question mark after a tag name indicates that the information is either not
-understood, not verified, or not very useful -- these tags are not extracted
-by ExifTool unless the Unknown (-u) option is enabled.  Be aware that some
-tag names are different than the descriptions printed out by default when
-extracting information with exiftool.  To see the tag names instead of the
-descriptions, use <code>exiftool -s</code>.</p>
+question mark (<code>?</code>) after a tag name indicates that the information is
+either not understood, not verified, or not very useful -- these tags are
+not extracted by ExifTool unless the Unknown (-u) option is enabled.  Be
+aware that some tag names are different than the descriptions printed out by
+default when extracting information with exiftool.  To see the tag names
+instead of the descriptions, use <code>exiftool -s</code>.</p>
 
 <p>The <b>Writable</b> column indicates whether the tag is writable by ExifTool.
 Anything but an <code>N</code> in this column means the tag is writable.  A <code>Y</code>
@@ -136,7 +136,7 @@ question.
 </p>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 5, 2008</i>
+<br><i>Last revised Mar 11, 2008</i>
 <p class=lf><a href='../index.html'>&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -8,9 +8,9 @@
 <body>
 <h2 class=top>Kodak Tags</h2>
 <p>
-The Kodak maker notes aren&#39;t in standard IFD format, and the format varies
-frequently with different models.  Some information has been decoded, but
-much of the Kodak information remains unknown.
+Many Kodak models don&#39;t store the maker notes in standard IFD format, and
+these formats vary with different models.  Some information has been
+decoded, but much of the Kodak information remains unknown.
 </p>
 <p>The table below contains the most common set of Kodak tags.  The following
 Kodak camera models have been tested and found to use these tags: C360,
@@ -82,8 +82,8 @@ Z7590.</p>
 <td class=r>28</td>
 <td>MeteringMode</td>
 <td class=c>int8u</td>
-<td><span class=s>0 = Multi-pattern
-  <br>1 = Center-Weighted
+<td><span class=s>0 = Multi-segment
+  <br>1 = Center-weighted average
   <br>2 = Spot</span></td></tr>
 <tr class=b>
 <td class=r>29</td>
@@ -442,7 +442,7 @@ by 8 digits.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='IFD'>Kodak IFD Tags</a></h2>
+<h2><a name='Type8'>Kodak Type8 Tags</a></h2>
 <p>Newer Kodak models such as the P712, P850, P880, Z612 and Z712 use standard
 TIFF IFD format for the maker notes.  There is a large amount of information
 stored in these maker notes (with apparently much duplication), but
@@ -824,6 +824,261 @@ relatively few tags have so far been decoded.</p>
 <tr><td colspan=4 class=c>[no tags known]</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='IFD'>Kodak IFD Tags</a></h2>
+<p>These tags are found in a separate IFD of JPEG, TIFF, DCR and KDC images
+from some older Kodak models such as the DC50, DC120, DCS760C, DCS Pro 14N,
+14nx, SLR/n, Pro Back and Canon EOS D2000.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0x0001</td>
+<td>UnknownEV?</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0003</td>
+<td>ExposureValue</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x03e9</td>
+<td>OriginalFileName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x03eb</td>
+<td>SensorLeftBorder</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x03ec</td>
+<td>SensorTopBorder</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x03ed</td>
+<td>SensorImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x03ee</td>
+<td>SensorImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x03f1</td>
+<td>TextualInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#TextualInfo'>Kodak TextualInfo Tags</a></td></tr>
+<tr>
+<td>0x0401</td>
+<td>SubSecTime</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0414</td>
+<td>NCDFileInfo</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0846</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0ce5</td>
+<td>FirmwareVersion</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x1391</td>
+<td>ToneCurveFileName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x1784</td>
+<td>ISO</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='TextualInfo'>Kodak TextualInfo Tags</a></h2>
+<p>Below is a list of tags which have been observed in the Kodak TextualInfo
+data, however ExifTool will extract information from any tags found here.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'AF Function'</td>
+<td>AFMode</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Actual Compensation'</td>
+<td>ActualCompensation</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Aperture'</td>
+<td>Aperture</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Auto Bracket'</td>
+<td>AutoBracket</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Brightness Value'</td>
+<td>BrightnessValue</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Camera'</td>
+<td>CameraModel</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Camera body'</td>
+<td>CameraBody</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Compensation'</td>
+<td>ExposureCompensation</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Date'</td>
+<td>Date</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Exposure Bias'</td>
+<td>ExposureBias</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Exposure Mode'</td>
+<td>ExposureMode</td>
+<td class=c>N</td>
+<td><span class=s>&#39;A&#39; = Aperture Priority
+  <br>&#39;B&#39; = Bulb
+  <br>&#39;M&#39; = Manual
+  <br>&#39;P&#39; = Program
+  <br>&#39;S&#39; = Shutter Priority</span></td></tr>
+<tr class=b>
+<td>'Firmware Version'</td>
+<td>FirmwareVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Flash Compensation'</td>
+<td>FlashExposureComp</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Flash Fired'</td>
+<td>FlashFired</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Flash Sync Mode'</td>
+<td>FlashSyncMode</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Focal Length'</td>
+<td>FocalLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Height'</td>
+<td>KodakImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'ISO'</td>
+<td>ISO</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'ISO Speed'</td>
+<td>ISO</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Image Number'</td>
+<td>ImageNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Max Aperture'</td>
+<td>MaxAperture</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Meter Mode'</td>
+<td>MeterMode</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Min Aperture'</td>
+<td>MinAperture</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Popup Flash'</td>
+<td>PopupFlash</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Serial Number'</td>
+<td>SerialNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Shooting Mode'</td>
+<td>ShootingMode</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Shutter'</td>
+<td>ShutterSpeed</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'Temperature'</td>
+<td>Temperature</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Time'</td>
+<td>SubSecTime</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'White balance'</td>
+<td>Whitebalance</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'Width'</td>
+<td>KodakImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'_other_info'</td>
+<td>OtherInfo</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(any other information without a tag name)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Meta'>Kodak Meta Tags</a></h2>
 <p>These tags are found in the APP3 &quot;Meta&quot; segment of JPEG images from Kodak
 cameras such as the DC280, DC3400, DC5000 and MC3.  The structure of this
@@ -1071,9 +1326,53 @@ Kodak JPEG APP3 &quot;Meta&quot; segment.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='MOV'>Kodak MOV Tags</a></h2>
+<p>This information is found in Kodak MOV videos from models such as the P880.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>Make</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>22</td>
+<td>Model</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>64</td>
+<td>ModelType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>78</td>
+<td>ExposureTime</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>82</td>
+<td>FNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>90</td>
+<td>ExposureCompensation</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>112</td>
+<td>FocalLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Aug 24, 2007</i>
+<br><i>Last revised Mar 7, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

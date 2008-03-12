@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..34\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..35\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -603,5 +603,25 @@ my $testOK;
     }
     print "ok $testnum\n";
 }
+
+# test 35: Add back JFIF information after deleting everything
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue('*');
+    $exifTool->SetNewValue('JFIF:XResolution' => 1);
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    $exifTool->Options(Composite => 0);
+    my $info = $exifTool->ImageInfo($testfile, '-File:*', '-exiftoolversion');
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
 
 # end

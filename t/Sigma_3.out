@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.16
 [File, File, Image]  - File Name: Sigma_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 1575 bytes
-[File, File, Time]  - File Modification Date/Time: 2008:01:23 14:06:16
+[File, File, Time]  - File Modification Date/Time: 2008:02:11 08:13:34
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -81,7 +81,7 @@
 [Composite, Composite, Image]  - Aperture: 8.0
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Image]  - Image Size: 8x8
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.7
+[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.7
 [Composite, Composite, Image]  - Shutter Speed: 1/320
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.018 mm

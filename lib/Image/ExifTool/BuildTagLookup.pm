@@ -29,7 +29,7 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '1.65';
+$VERSION = '1.68';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -77,12 +77,12 @@ A B<Tag Name> is the handle by which the information is accessed in
 ExifTool.  In some instances, more than one name may correspond to a single
 tag ID.  In these cases, the actual name used depends on the context in
 which the information is found.  Case is not significant for tag names.  A
-question mark after a tag name indicates that the information is either not
-understood, not verified, or not very useful -- these tags are not extracted
-by ExifTool unless the Unknown (-u) option is enabled.  Be aware that some
-tag names are different than the descriptions printed out by default when
-extracting information with exiftool.  To see the tag names instead of the
-descriptions, use C<exiftool -s>.
+question mark (C<?>) after a tag name indicates that the information is
+either not understood, not verified, or not very useful -- these tags are
+not extracted by ExifTool unless the Unknown (-u) option is enabled.  Be
+aware that some tag names are different than the descriptions printed out by
+default when extracting information with exiftool.  To see the tag names
+instead of the descriptions, use C<exiftool -s>.
 
 The B<Writable> column indicates whether the tag is writable by ExifTool.
 Anything but an C<N> in this column means the tag is writable.  A C<Y>
@@ -120,7 +120,8 @@ question.
     EXIF => q{
 EXIF stands for "Exchangeable Image File Format".  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, MIFF and HDP images, as well as many TIFF-based RAW images.
+TIFF, PNG, MIFF and HDP images, as well as many TIFF-based RAW images, and
+even some AVI and MOV videos.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
@@ -219,9 +220,9 @@ The format of the PrintIM information is known, however no PrintIM tags have
 been decoded.  Use the Unknown (-u) option to extract PrintIM information.
 },
     Kodak => q{
-The Kodak maker notes aren't in standard IFD format, and the format varies
-frequently with different models.  Some information has been decoded, but
-much of the Kodak information remains unknown.
+Many Kodak models don't store the maker notes in standard IFD format, and
+these formats vary with different models.  Some information has been
+decoded, but much of the Kodak information remains unknown.
 },
     'Kodak SpecialEffects' => q{
 The Kodak SpecialEffects and Borders tags are found in sub-IFD's within the
@@ -487,7 +488,10 @@ TagID:  foreach $tagID (@keys) {
                     }
                 }
                 my $printConv = $$tagInfo{PrintConv};
-                push @values, sprintf('[Mask 0x%x]',$$tagInfo{Mask}) if $$tagInfo{Mask};
+                if ($$tagInfo{Mask}) {
+                    push @values, sprintf('[Mask 0x%x]',$$tagInfo{Mask});
+                    $$tagInfo{PrintHex} = 1 unless defined $$tagInfo{PrintHex};
+                }
                 if (ref($printConv) =~ /^(HASH|ARRAY)$/) {
                     my (@printConvList, @indexList, $index);
                     if (ref $printConv eq 'ARRAY') {
@@ -536,6 +540,7 @@ TagID:  foreach $tagID (@keys) {
                             foreach (@pk) {
                                 next if $_ eq '';
                                 $_ eq 'BITMASK' and $bits = $$printConv{$_}, next;
+                                $_ eq 'OTHER' and next;
                                 my $index;
                                 if ($$tagInfo{PrintHex} or $$printConv{BITMASK}) {
                                     $index = sprintf('0x%x',$_);
@@ -564,9 +569,9 @@ TagID:  foreach $tagID (@keys) {
                         $index = shift @indexList;
                     }
                 } elsif ($printConv and $printConv =~ /DecodeBits\(\$val,\s*(\{.*\})\s*\)/s) {
-                    $$self{CameraModel} = '';   # needed for Nikon ShootingMode
+                    $$self{Model} = '';   # needed for Nikon ShootingMode
                     my $bits = eval $1;
-                    delete $$self{CameraModel};
+                    delete $$self{Model};
                     if ($@) {
                         warn $@;
                     } else {
@@ -578,7 +583,9 @@ TagID:  foreach $tagID (@keys) {
                 }
                 if ($subdir and not $$tagInfo{SeparateTable}) {
                     # subdirectories are only writable if specified explicitly
-                    $writable = '-' . ($$tagInfo{Writable} ? $writable : '');
+                    my $tw = $$tagInfo{Writable};
+                    $writable = '-' . ($tw ? $writable : '');
+                    $writable .= '!' if $tw and ($$tagInfo{Protected} || 0) & 0x01;
                 } else {
                     # not writable if we can't do the inverse conversions
                     my $noPrintConvInv;
@@ -962,7 +969,7 @@ sub GetTableOrder()
         }
     }
     # insert back in better order
-    foreach $pos (reverse sort { $a <=> $b } keys %fixPos) {
+    foreach $pos (sort { $b <=> $a } keys %fixPos) { # (reverse sort)
         my $fix = $fixPos{$pos};
         foreach (@$fix) {
             splice(@sortedTables, $pos, 0, @{$fixOrder{$_}});
@@ -974,10 +981,16 @@ sub GetTableOrder()
         IPTC    => 'Exif',  # put IPTC after EXIF,
         GPS     => 'XMP',   # etc...
         GeoTiff => 'GPS',
+        Kodak   => 'JVC',
+       'Kodak::IFD' => 'Kodak::Unknown',
+       'Kodak::TextualInfo' => 'Kodak::IFD',
         Leaf    => 'Kodak',
+        Minolta => 'Leaf',
         Unknown => 'Sony',
         DNG     => 'Unknown',
         PrintIM => 'ICC_Profile',
+        ID3     => 'PostScript',
+        MinoltaRaw => 'KyoceraRaw',
         Olympus => 'NikonCapture',
         Pentax  => 'Panasonic',
         Ricoh   => 'Pentax',

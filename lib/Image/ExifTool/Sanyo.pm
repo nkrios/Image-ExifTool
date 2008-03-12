@@ -215,24 +215,21 @@ my %offOn = (
 );
 
 # tags in Sanyo MOV videos (PH - observations from an E6 sample)
-# (note: very similar to information in Nikon/Pentax videos)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
 %Image::ExifTool::Sanyo::MOV = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => q{
-        This information is found in Sanyo MOV video images, and is very similar to
-        information found in Pentax MOV and Nikon QT videos.
-    },
+    NOTES => 'This information is found in Sanyo MOV videos.',
     0x00 => {
         Name => 'Make',
-        Format => 'string[5]',
-        PrintConv => 'ucfirst(lc($val))',
+        Format => 'string[24]',
     },
     0x18 => {
         Name => 'Model',
         Description => 'Camera Model Name',
         Format => 'string[8]',
     },
+    # (01 00 at offset 0x20)
     0x26 => {
         Name => 'ExposureTime',
         Format => 'int32u',
@@ -265,7 +262,7 @@ my %offOn = (
     },
     0x48 => {
         Name => 'FocalLength',
-        Writable => 'int32u',
+        Format => 'int32u',
         ValueConv => '$val * 0.1',
         PrintConv => 'sprintf("%.1f mm",$val)',
     },
@@ -276,7 +273,7 @@ my %offOn = (
 %Image::ExifTool::Sanyo::MP4 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => 'This information is found in Sanyo MP4 video images.',
+    NOTES => 'This information is found in Sanyo MP4 videos.',
     0x00 => {
         Name => 'Make',
         Format => 'string[5]',
@@ -287,6 +284,7 @@ my %offOn = (
         Description => 'Camera Model Name',
         Format => 'string[8]',
     },
+    # (01 00 at offset 0x28)
     # (0x2e has values 0x31, 0x33 and 0x3c in my samples, but
     # some of the shutter speeds should be around 1/500 or so)
     0x32 => {

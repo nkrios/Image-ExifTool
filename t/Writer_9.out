@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.20
 [File, File, Image]  - File Name: Writer_9_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 9 kB
-[File, File, Time]  - File Modification Date/Time: 2008:02:04 12:37:05
+[File, File, Time]  - File Modification Date/Time: 2008:03:03 14:11:27
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -35,7 +35,7 @@
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 14.0
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 4.5
-[EXIF, ExifIFD, Camera] 37383 - Metering Mode: Average
+[EXIF, ExifIFD, Camera] 37383 - Metering Mode: Center-weighted average
 [EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: No Flash
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 34.0 mm
@@ -79,7 +79,7 @@
 [MakerNotes, Canon, Camera] 14 - Saturation: +1
 [MakerNotes, Canon, Camera] 15 - Sharpness: 1
 [MakerNotes, Canon, Camera] 16 - Camera ISO: n/a
-[MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted averaging
+[MakerNotes, Canon, Camera] 17 - Metering Mode: Center-weighted average
 [MakerNotes, Canon, Camera] 18 - Focus Range: Not Known
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Manual
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
@@ -105,7 +105,7 @@
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
 [MakerNotes, Canon, Image] 8 - Slow Shutter: None
 [MakerNotes, Canon, Image] 9 - Shot Number In Continuous Burst: 0
-[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: 8
+[MakerNotes, Canon, Camera] 10 - Optical Zoom Code: n/a
 [MakerNotes, Canon, Image] 13 - Flash Guide Number: 0
 [MakerNotes, Canon, Image] 15 - Flash Exposure Compensation: 0
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
@@ -206,7 +206,7 @@
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.6
+[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
@@ -217,6 +217,6 @@
 [Composite, Composite, Camera]  - Focal Length: 34.0 mm (35 mm equivalent: 52.7 mm)
 [Composite, Composite, Camera]  - Hyperfocal Distance: 4.26 m
 [Composite, Composite, Image]  - Image Size: 8x8
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm (35mm equivalent: 27.9 - 85.3 mm)
+[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm (35 mm equivalent: 27.9 - 85.3 mm)
 [Composite, Composite, Image]  - Light Value: 5.6
 [Composite, Composite, Camera]  - Red Balance: 2.067348

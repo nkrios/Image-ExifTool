@@ -11,6 +11,8 @@
 #               2) http://search.cpan.org/dist/MP4-Info-1.04/
 #               3) http://www.geocities.com/xhelmboyx/quicktime/formats/mp4-layout.txt
 #               4) http://wiki.multimedia.cx/index.php?title=Apple_QuickTime
+#               5) ISO 14496-12 (http://neuron2.net/library/avc/c041828_ISO_IEC_14496-12_2005(E).pdf)
+#               6) ISO 14496-16 (http://www.iec-normen.de/previewpdf/info_isoiec14496-16%7Bed2.0%7Den.pdf)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::QuickTime;
@@ -20,7 +22,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.12';
+$VERSION = '1.14';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -34,8 +36,19 @@ my %timeInfo = (
 );
 # information for duration tags
 my %durationInfo = (
-    ValueConv => '$self->{TimeScale} ? $val / $self->{TimeScale} : $val',
-    PrintConv => '$self->{TimeScale} ? sprintf("%.2f s", $val) : $val',
+    ValueConv => '$$self{TimeScale} ? $val / $$self{TimeScale} : $val',
+    PrintConv => '$$self{TimeScale} ? sprintf("%.2f s", $val) : $val',
+);
+
+# 4-character Vendor ID codes (ref PH)
+my %vendorID = (
+    appl => 'Apple',
+    kdak => 'Kodak',
+    KMPI => 'Konica-Minolta',
+    niko => 'Nikon',
+    olym => 'Olympus',
+    pana => 'Panasonic',
+    pent => 'Pentax',
 );
 
 # QuickTime atoms
@@ -43,9 +56,11 @@ my %durationInfo = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => q{
-        These tags are used in QuickTime MOV and MP4 videos, and QTIF images.  Tags
-        with a question mark after their name are not extracted unless the Unknown
-        option is set.
+        The QuickTime file format is used for MOV and MP4 videos and QTIF images.
+        Exiftool extracts meta information from the UserData atom (including some
+        proprietary manufacturer-specific information), as well as extracting
+        various audio, video and image parameters.  Tags with a question mark after
+        their name are not extracted unless the Unknown option is set.
     },
     free => { Unknown => 1, Binary => 1 },
     skip => { Unknown => 1, Binary => 1 },
@@ -94,17 +109,31 @@ my %durationInfo = (
 %Image::ExifTool::QuickTime::ImageDesc = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Image' },
-    4 => { Name => 'CompressorID',  Format => 'string[4]' },
-    20 => { Name => 'VendorID',     Format => 'string[4]' },
-    28 => { Name => 'Quality',      Format => 'int32u' },
-    32 => { Name => 'ImageWidth',   Format => 'int16u' },
-    34 => { Name => 'ImageHeight',  Format => 'int16u' },
-    36 => { Name => 'XResolution',  Format => 'int32u' },
-    40 => { Name => 'YResolution',  Format => 'int32u' },
-    48 => { Name => 'FrameCount',   Format => 'int16u' },
-    50 => { Name => 'NameLength',   Format => 'int8u' },
-    51 => { Name => 'Compressor',   Format => 'string[$val{46}]' },
-    82 => { Name => 'BitDepth',     Format => 'int16u' },
+    FORMAT => 'int16u',
+    2 => { Name => 'CompressorID',  Format => 'string[4]' },
+    10 => {
+        Name => 'VendorID',
+        Format => 'string[4]',
+        RawConv => 'length $val ? $val : undef',
+        PrintConv => \%vendorID,
+        SeparateTable => 'VendorID',
+    },
+  # 14 - ("Quality" in QuickTime docs) ??
+    16 => 'ImageWidth',
+    17 => 'ImageHeight',
+    18 => { Name => 'XResolution',  Format => 'fixed32u' },
+    20 => { Name => 'YResolution',  Format => 'fixed32u' },
+  # 24 => 'FrameCount', # always 1 (what good is this?)
+    25 => {
+        Name => 'CompressorName',
+        Format => 'string[32]',
+        # (sometimes this is a Pascal string, and sometimes it is a C string)
+        RawConv => q{
+            $val=substr($val,1,ord($1)) if $val=~/^([\0-\x1f])/ and ord($1)<length($val);
+            length $val ? $val : undef;
+        },
+    },
+    41 => 'BitDepth',
 );
 
 # preview data block
@@ -159,7 +188,7 @@ my %durationInfo = (
     },
     3 => {
         Name => 'TimeScale',
-        RawConv => '$self->{TimeScale} = $val',
+        RawConv => '$$self{TimeScale} = $val',
     },
     4 => { Name => 'Duration', %durationInfo },
     5 => {
@@ -306,7 +335,7 @@ my %durationInfo = (
         Name => 'Meta',
         SubDirectory => {
             TagTable => 'Image::ExifTool::QuickTime::Meta',
-            HasVersion => 1, # must skip 4-byte version number header
+            Start => 4, # must skip 4-byte version number header
         },
     },
    'ptv '=> {
@@ -315,14 +344,30 @@ my %durationInfo = (
     },
     # hnti => 'HintInfo',
     # hinf => 'HintTrackInfo',
-    TAGS => [
+    TAGS => [ #PH
+        # these tags were initially discovered in a Pentax movie,
+        # but similar information is found in videos from other manufacturers
         {
-            # these tags were initially discovered in a Pentax movie, but
-            # seem very similar to those used by Nikon
-            Name => 'PentaxTags',
-            Condition => '$$valPt =~ /^PENTAX DIGITAL CAMERA\0/',
+            Name => 'KodakTags',
+            Condition => '$$valPt =~ /^EASTMAN KODAK COMPANY/',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Pentax::MOV',
+                TagTable => 'Image::ExifTool::Kodak::MOV',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
+            Name => 'KonicaMinoltaTags',
+            Condition => '$$valPt =~ /^KONICA MINOLTA DIGITAL CAMERA/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Minolta::MOV1',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
+            Name => 'MinoltaTags',
+            Condition => '$$valPt =~ /^MINOLTA DIGITAL CAMERA/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Minolta::MOV2',
                 ByteOrder => 'LittleEndian',
             },
         },
@@ -331,6 +376,30 @@ my %durationInfo = (
             Condition => '$$valPt =~ /^NIKON DIGITAL CAMERA\0/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::MOV',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
+            Name => 'OlympusTags1',
+            Condition => '$$valPt =~ /^OLYMPUS DIGITAL CAMERA\0.{9}\x01\0/s',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::MOV1',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
+            Name => 'OlympusTags2',
+            Condition => '$$valPt =~ /^OLYMPUS DIGITAL CAMERA\0/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::MOV2',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
+            Name => 'PentaxTags',
+            Condition => '$$valPt =~ /^PENTAX DIGITAL CAMERA\0/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Pentax::MOV',
                 ByteOrder => 'LittleEndian',
             },
         },
@@ -362,6 +431,24 @@ my %durationInfo = (
             Binary => 1
         },
     ],
+    QVMI => { #PH
+        Name => 'CasioQVMI',
+        # Casio stores standard EXIF-format information in MOV videos (ie. EX-S880)
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+            DirName => 'IFD0',
+            Start => 10,
+            ByteOrder => 'BigEndian',
+        },
+    },
+    MMA0 => { #PH
+        Name => 'MinoltaMMA0', # (DiMage 7Hi)
+        SubDirectory => { TagTable => 'Image::ExifTool::Minolta::MMA' },
+    },
+    MMA1 => { #PH
+        Name => 'MinoltaMMA1', # (Dimage A2)
+        SubDirectory => { TagTable => 'Image::ExifTool::Minolta::MMA' },
+    },
 );
 
 # meta atoms
@@ -375,6 +462,22 @@ my %durationInfo = (
             HasData => 1, # process atoms as containers with 'data' elements
         },
     },
+    # MP4 tags (ref 5)
+    hdlr => {
+        Name => 'Handler',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Handler' },
+    },
+    # dinf - MP4 data information
+    # ipmc - MP4 IPMP control
+    # iloc - MP4 item location
+    # ipro - MP4 item protection
+    # iinf - MP4 item information
+   'xml ' => {
+        Name => 'XML',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
+    },
+    # bxml - MP4 binary XML
+    # pitm - MP4 primary item reference
 );
 
 # info list atoms
@@ -460,42 +563,410 @@ my %durationInfo = (
     },
 );
 
-# MP4 media
+# MP4 media box (ref 5)
 %Image::ExifTool::QuickTime::Media = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     GROUPS => { 2 => 'Video' },
-    NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
+    NOTES => 'MP4 media box.',
+    mdhd => [{
+        Name => 'MediaHeader',
+        Condition => '$$valPt =~ /^\0{4}/',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MediaHeader0' },
+    },{
+        Name => 'MediaHeader',
+        Condition => '$$valPt =~ /^\0{3}\x01/',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MediaHeader1' },
+    }],
+    hdlr => {
+        Name => 'Handler',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Handler' },
+    },
     minf => {
-        Name => 'Minf',
-        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Minf' },
+        Name => 'MediaInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MediaInfo' },
     },
 );
 
-%Image::ExifTool::QuickTime::Minf = (
+# MP4 media header box, version 0 (ref 5)
+%Image::ExifTool::QuickTime::MediaHeader0 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    NOTES => 'MP4 media header version 0.',
+    FORMAT => 'int32u',
+    0 => {
+        Name => 'MediaHeaderVersion',
+        Notes => 'version 0',
+    },
+    1 => {
+        Name => 'MediaCreateDate',
+        %timeInfo,
+    },
+    2 => {
+        Name => 'MediaModifyDate',
+        %timeInfo,
+    },
+    3 => {
+        Name => 'MediaTimeScale',
+        RawConv => '$$self{MediaTS} = $val',
+    },
+    4 => {
+        Name => 'MediaDuration',
+        RawConv => '$$self{MediaTS} ? $val / $$self{MediaTS} : $val',
+        PrintConv => '$$self{MediaTS} ? sprintf("%.2f s", $val) : $val',
+    },
+    5 => {
+        Name => 'MediaLanguageCode',
+        Format => 'int16u',
+        RawConv => '$val ? $val : undef',
+        ValueConv => 'pack "C*", map({ (($val>>$_)&0x1f)+0x60 } 10, 5, 0)',
+    },
+);
+
+# MP4 media header box, version 1 (ref 5)
+%Image::ExifTool::QuickTime::MediaHeader1 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    NOTES => 'MP4 media header version 1.',
+    FORMAT => 'int32u',
+    0 => {
+        Name => 'MediaHeaderVersion',
+        Notes => 'version 1',
+    },
+    1 => {
+        Name => 'MediaCreateDate',
+        Format => 'int64u',
+        %timeInfo,
+    },
+    3 => {
+        Name => 'MediaModifyDate',
+        Format => 'int64u',
+        %timeInfo,
+    },
+    5 => {
+        Name => 'MediaTimescale',
+        RawConv => '$$self{MediaTS} = $val',
+    },
+    6 => {
+        Name => 'MediaDuration',
+        Format => 'int64u',
+        RawConv => '$$self{MediaTS} ? $val / $$self{MediaTS} : $val',
+        PrintConv => '$$self{MediaTS} ? sprintf("%.2f s", $val) : $val',
+    },
+    8 => {
+        Name => 'MediaLanguageCode',
+        Format => 'undef[4]',
+        ValueConv => 'pack "C*", map({ (($val>>$_)&0x1f)+0x60 } 10, 5, 0)',
+    },
+);
+
+# MP4 media information box (ref 5)
+%Image::ExifTool::QuickTime::MediaInfo = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     GROUPS => { 2 => 'Video' },
-    NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
+    NOTES => 'MP4 media info box.',
+    vmhd => {
+        Name => 'VideoHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::VideoHeader' },
+    },
+    smhd => {
+        Name => 'AudioHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::AudioHeader' },
+    },
+    hmhd => {
+        Name => 'HintHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::HintHeader' },
+    },
+    # nmhd - null media header
     dinf => {
-        Name => 'Dinf',
-        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Dinf' },
+        Name => 'DataInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::DataInfo' },
+    },
+    hdlr => { #PH
+        Name => 'Handler',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Handler' },
     },
     stbl => {
-        Name => 'Stbl',
-        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Stbl' },
+        Name => 'SampleTable',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::SampleTable' },
     },
 );
 
-%Image::ExifTool::QuickTime::Stbl = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+# MP4 video media header (ref 5)
+%Image::ExifTool::QuickTime::VideoHeader = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Video' },
-    NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
+    NOTES => 'MP4 video media header.',
+    FORMAT => 'int16u',
+    2 => {
+        Name => 'GraphicsMode',
+        PrintHex => 1,
+        PrintConv => {  
+            # (ref http://homepage.mac.com/vanhoek/MovieGuts%20docs/64.html)
+            0x00 => 'srcCopy',
+            0x01 => 'srcOr',
+            0x02 => 'srcXor',
+            0x03 => 'srcBic',
+            0x04 => 'notSrcCopy',
+            0x05 => 'notSrcOr',
+            0x06 => 'notSrcXor',
+            0x07 => 'notSrcBic',
+            0x08 => 'patCopy',
+            0x09 => 'patOr',
+            0x0a => 'patXor',
+            0x0b => 'patBic',
+            0x0c => 'notPatCopy',
+            0x0d => 'notPatOr',
+            0x0e => 'notPatXor',
+            0x0f => 'notPatBic',
+            0x20 => 'blend',
+            0x21 => 'addPin',
+            0x22 => 'addOver',
+            0x23 => 'subPin',
+            0x24 => 'transparent',
+            0x25 => 'addMax',
+            0x26 => 'subOver',
+            0x27 => 'addMin',
+            0x31 => 'grayishTextOr',
+            0x32 => 'hilite',
+            0x40 => 'ditherCopy',
+            # the following ref ISO/IEC 15444-3
+            0x100 => 'Alpha',
+            0x101 => 'White Alpha',
+            0x102 => 'Pre-multiplied Black Alpha',
+            0x110 => 'Component Alpha',
+        },
+    },
+    3 => { Name => 'OpColor', Format => 'int16u[3]' },
 );
 
-%Image::ExifTool::QuickTime::Dinf = (
+# MP4 audio media header (ref 5)
+%Image::ExifTool::QuickTime::AudioHeader = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Audio' },
+    NOTES => 'MP4 audio media header.',
+    FORMAT => 'int16u',
+    2 => { Name => 'Balance', Format => 'fixed16s' },
+);
+
+# MP4 hint media header (ref 5)
+%Image::ExifTool::QuickTime::HintHeader = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    NOTES => 'MP4 hint media header.',
+    FORMAT => 'int16u',
+    2 => 'MaxPDUSize',
+    3 => 'AvgPDUSize',
+    4 => { Name => 'MaxBitrate', Format => 'int32u' },
+    6 => { Name => 'AvgBitrate', Format => 'int32u' },
+);
+
+# MP4 sample table box (ref 5)
+%Image::ExifTool::QuickTime::SampleTable = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     GROUPS => { 2 => 'Video' },
-    NOTES => 'MP4 only (most tags unknown because ISO charges for the specification).',
+    NOTES => 'MP4 sample table box.',
+    stsd => [
+        {
+            Name => 'AudioSampleDesc',
+            Condition => '$$self{HandlerType} and $$self{HandlerType} eq "soun"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::QuickTime::AudioSampleDesc',
+                Start => 8, # skip version number and count
+            },
+        },{
+            Name => 'VideoSampleDesc',
+            Condition => '$$self{HandlerType} and $$self{HandlerType} eq "vide"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::QuickTime::ImageDesc',
+                Start => 8, # skip version number and count
+            },
+        },{
+            Name => 'HintSampleDesc',
+            Condition => '$$self{HandlerType} and $$self{HandlerType} eq "hint"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::QuickTime::HintSampleDesc',
+                Start => 8, # skip version number and count
+            },
+        },{
+            Name => 'OtherSampleDesc',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::QuickTime::OtherSampleDesc',
+                Start => 8, # skip version number and count
+            },
+        },
+        # (Note: "alis" HandlerType handled by the parent audio or video handler)
+    ],
+    stts => [ # decoding time-to-sample table
+        {
+            Name => 'VideoFrameRate',
+            Notes => 'average rate calculated from time-to-sample table for video media',
+            Condition => '$$self{HandlerType} and $$self{HandlerType} eq "vide"',
+            # (must be RawConv so appropriate MediaTS is used in calculation)
+            RawConv => 'Image::ExifTool::QuickTime::CalcSampleRate($self, \$val)',
+            PrintConv => 'sprintf("%.1f", $val)',
+        },
+    ],
+    # ctts - (composition) time to sample
+    # stsc - sample to chunk
+    # stsz - sample sizes
+    # stz2 - compact sample sizes
+    # stco - chunk offset
+    # co64 - 64-bit chunk offset
+    # stss - sync sample table
+    # stsh - shadow sync sample table
+    # padb - sample padding bits
+    # stdp - sample degradation priority
+    # sdtp - independent and disposable samples
+    # sbgp - sample to group
+    # sgpd - sample group description
+    # subs - sub-sample information
 );
+
+# MP4 audio sample description box (ref 5)
+%Image::ExifTool::QuickTime::AudioSampleDesc = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Audio' },
+    FORMAT => 'int16u',
+    NOTES => 'MP4 audio sample description.',
+    2  => {
+        Name => 'AudioFormat',
+        Format => 'undef[4]',
+        RawConv => '$val =~ /^[\w ]{4}$/i ? $val : undef',
+    },
+    10 => { #PH
+        Name => 'AudioVendorID',
+        Format => 'undef[4]',
+        RawConv => '$val eq "\0\0\0\0" ? undef : $val',
+        PrintConv => \%vendorID,
+        SeparateTable => 'VendorID',
+    },
+    12 => 'AudioChannels',
+    13 => 'AudioBitsPerSample',
+    16 => { Name => 'AudioSampleRate', Format => 'fixed32u' },
+    28 => { #PH
+        Name => 'AudioFormat',
+        Format => 'undef[4]',
+        RawConv => '$val =~ /^[\w ]{4}$/i ? $val : undef',
+        Notes => 'in Casio MOV videos',
+    },
+);
+
+# MP4 hint sample description box (ref 5)
+%Image::ExifTool::QuickTime::HintSampleDesc = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    NOTES => 'MP4 hint sample description.',
+    2 => { Name => 'HintFormat', Format => 'undef[4]' },
+);
+
+# MP4 generic sample description box
+%Image::ExifTool::QuickTime::OtherSampleDesc = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    2 => { Name => 'OtherFormat', Format => 'undef[4]' },
+);
+
+# MP4 data information box (ref 5)
+%Image::ExifTool::QuickTime::DataInfo = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    NOTES => 'MP4 data information box.',
+    dref => {
+        Name => 'DataRef',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::DataRef',
+            Start => 8,
+        },
+    },
+);
+
+# MP4 data reference box (ref 5)
+%Image::ExifTool::QuickTime::DataRef = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    NOTES => 'MP4 data reference box.',
+    'url ' => {
+        Name => 'URL',
+        RawConv => q{
+            # ignore if self-contained (flags bit 0 set)
+            return undef if unpack("N",$val) & 0x01;
+            $_ = substr($val,4); s/\0.*//s; $_;
+        },
+    },
+    'urn ' => {
+        Name => 'URN',
+        RawConv => q{
+            return undef if unpack("N",$val) & 0x01;
+            $_ = substr($val,4); s/\0.*//s; $_;
+        },
+    },
+);
+
+# MP4 handler box (ref 5)
+%Image::ExifTool::QuickTime::Handler = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    4 => { #PH
+        Name => 'HandlerClass',
+        Format => 'undef[4]',
+        RawConv => '$val eq "\0\0\0\0" ? undef : $val',
+        PrintConv => {
+            mhlr => 'Media Handler',
+            dhlr => 'Data Handler',
+        },
+    },
+    8 => {
+        Name => 'HandlerType',
+        Format => 'undef[4]',
+        RawConv => '$$self{HandlerType} = $val unless $val eq "alis"; $val',
+        PrintConv => {
+            vide => 'Video Track',
+            soun => 'Audio Track',
+            hint => 'Hint Track',
+            alis => 'Alias Data', #PH
+            mdir => 'Metadata', #3
+            odsm => 'Object Descriptor', #3
+            sdsm => 'Scene Description', #3
+            crsm => 'Clock Reference', #3
+            m7sm => 'MPEG-7 Stream', #3
+            ocsm => 'Object Content', #3
+            ipsm => 'IPMP', #3
+            mjsm => 'MPEG-J', #3
+           'url '=> 'URL', #3
+        },
+    },
+    12 => { #PH
+        Name => 'HandlerVendorID',
+        Format => 'undef[4]',
+        RawConv => '$val eq "\0\0\0\0" ? undef : $val',
+        PrintConv => \%vendorID,
+        SeparateTable => 'VendorID',
+    },
+    24 => {
+        Name => 'HandlerDescription',
+        Format => 'string',
+        # (sometimes this is a Pascal string, and sometimes it is a C string)
+        RawConv => q{
+            $val=substr($val,1,ord($1)) if $val=~/^([\0-\x1f])/ and ord($1)<length($val);
+            length $val ? $val : undef;
+        },
+    },
+);
+
+#------------------------------------------------------------------------------
+# Determine the average sample rate from a time-to-sample table
+# Inputs: 0) ExifTool object ref, 1) time-to-sample table data ref
+# Returns: average sample rate (in Hz)
+sub CalcSampleRate($$)
+{
+    my ($exifTool, $valPt) = @_;
+    my @dat = unpack('N*', $$valPt);
+    my ($num, $dur) = (0, 0);
+    my $i;
+    for ($i=2; $i<@dat-1; $i+=2) {
+        $num += $dat[$i];               # total number of samples
+        $dur += $dat[$i] * $dat[$i+1];  # total sample duration
+    }
+    return undef unless $num and $dur and $$exifTool{MediaTS};
+    return $num * $$exifTool{MediaTS} / $dur;
+}
 
 #------------------------------------------------------------------------------
 # Fix incorrect format for ImageWidth/Height as written by Pentax
@@ -525,8 +996,11 @@ sub ProcessMOV($$;$)
 
     # more convenient to package data as a RandomAccess file
     $raf or $raf = new File::RandomAccess($dataPt);
-    # skip leading 4-byte version number if necessary
-    ($raf->Read($buff,4) == 4 and $dataPos += 4) or return 0 if $$dirInfo{HasVersion};
+    # skip leading bytes if necessary
+    if ($$dirInfo{DirStart}) {
+        $raf->Seek($$dirInfo{DirStart}, 1) or return 0;
+        $dataPos += $$dirInfo{DirStart};
+    }
     # read size/tag name atom header
     $raf->Read($buff,8) == 8 or return 0;
     $dataPos += 8;
@@ -606,15 +1080,17 @@ sub ProcessMOV($$;$)
             if ($tagInfo) {
                 my $subdir = $$tagInfo{SubDirectory};
                 if ($subdir) {
+                    my $start = $$subdir{Start} || 0;
                     my %dirInfo = (
-                        DataPt => \$val,
-                        DirStart => 0,
-                        DirLen => $size,
-                        DirName => $$tagInfo{Name},
-                        HasData => $$subdir{HasData},
-                        HasVersion => $$subdir{HasVersion},
+                        DataPt   => \$val,
+                        DataLen  => $size,
+                        DirStart => $start,
+                        DirLen   => $size - $start,
+                        DirName  => $$tagInfo{Name},
+                        HasData  => $$subdir{HasData},
+                        DataPos  => 0,
                         # Base needed for IsOffset tags in binary data
-                        Base => $dataPos,
+                        Base     => $dataPos,
                     );
                     if ($$subdir{ByteOrder} and $$subdir{ByteOrder} =~ /^Little/) {
                         SetByteOrder('II');
@@ -624,7 +1100,7 @@ sub ProcessMOV($$;$)
                         $exifTool->{SET_GROUP1} = 'Track' . (++$track);
                     }
                     my $subTable = GetTagTable($$subdir{TagTable});
-                    $exifTool->ProcessDirectory(\%dirInfo, $subTable);
+                    $exifTool->ProcessDirectory(\%dirInfo, $subTable) if $size > $start;
                     delete $exifTool->{SET_GROUP1};
                     SetByteOrder('MM');
                 } elsif ($hasData) {
@@ -649,12 +1125,12 @@ sub ProcessMOV($$;$)
                             }
                         }
                         $exifTool->VerboseInfo($tag, $tagInfo,
-                            Value => ref $value ? $$value : $value,
-                            DataPt => \$val,
+                            Value   => ref $value ? $$value : $value,
+                            DataPt  => \$val,
                             DataPos => $dataPos,
-                            Start => $pos,
-                            Size => $len,
-                            Extra => sprintf(", Type='$type', Flags=0x%x",$flags)
+                            Start   => $pos,
+                            Size    => $len,
+                            Extra   => sprintf(", Type='$type', Flags=0x%x",$flags)
                         ) if $verbose;
                         $exifTool->FoundTag($tagInfo, $value) if defined $value;
                         $pos += $len;
@@ -664,8 +1140,8 @@ sub ProcessMOV($$;$)
                         # parse international text to extract first string
                         my $len = unpack('n', $val);
                         # $len should include 4 bytes for length and type words,
-                        # but Pentax forgets to add these in, so allow for this
-                        $len += 4 if $len == $size - 4;
+                        # but Pentax and Kodak forget to add these in, so allow for this
+                        $len += 4 if $len <= $size - 4;
                         $val = substr($val, 4, $len - 4) if $len <= $size;
                     } elsif ($$tagInfo{Format}) {
                         $val = ReadValue(\$val, 0, $$tagInfo{Format}, $$tagInfo{Count}, length($val));
@@ -710,11 +1186,6 @@ This module is used by Image::ExifTool
 This module contains routines required by Image::ExifTool to extract
 information from QuickTime and MP4 video, and M4A audio files.
 
-=head1 BUGS
-
-The MP4 support is rather pathetic since the specification documentation is
-not freely available (yes, ISO sucks).
-
 =head1 AUTHOR
 
 Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
@@ -727,6 +1198,12 @@ under the same terms as Perl itself.
 =over 4
 
 =item L<http://developer.apple.com/documentation/QuickTime/>
+
+=item L<http://search.cpan.org/dist/MP4-Info-1.04/>
+
+=item L<http://www.geocities.com/xhelmboyx/quicktime/formats/mp4-layout.txt>
+
+=item L<http://wiki.multimedia.cx/index.php?title=Apple_QuickTime>
 
 =back
 

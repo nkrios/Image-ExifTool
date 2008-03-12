@@ -89,6 +89,7 @@ each special key:
     ifd         - Unsigned 32-bit integer sub-IFD pointer (EXIF 'IFD')
     ifd8        - Unsigned 64-bit integer sub-IFD pointer (BigTIFF 'IFD8')
     string      - Series of 8-bit ASCII characters        (EXIF 'ASCII')
+    pstring     - Pascal string [BinaryData tables only]
     undef       - Undefined-format binary data            (EXIF 'UNDEFINED')
     binary      - Binary data
 
@@ -264,7 +265,7 @@ numerical.
                   MakerNotes tags are permanent unless otherwise specified.
 
                   'PrintHex' - specifies that unknown PrintConv values should
-                  be printed in hex (ie. 'Unknown (0x0)')
+                  be printed in hex (ie. 'Unknown (0x01)')
 
                   'Priority' - gives the priority of this tag while reading.  If
                   set to zero, this tag will not override the value of previous
@@ -327,16 +328,20 @@ numerical.
                   value is converted by the associated entry in the ValueConv
                   list.  If a hash reference is used and the Raw value doesn't
                   appear as one of the keys, then the converted value is set to
-                  "Unknown (X)", where X is the Raw value (unless a special
-                  'BITMASK' key exists, in which case the hash referenced by
-                  'BITMASK' is used to decode individual value bits).  In an
-                  expression, $self is a reference to the current ExifTool
-                  object, $val is the Raw value, and $tag is the tag name.  The
-                  subroutine takes 2 arguments: the Raw value and a reference to
-                  the current ExifTool object.  The expression or subroutine is
-                  evaluated when and if the tag value is requested (ie. only
-                  after all extraction is complete), so if necessary at this
-                  time the values of all other tags are available via calls to
+                  "Unknown (X)", where X is the Raw value (unless either of the
+                  special keys exist: 'BITMASK', a reference to a hash used to
+                  decode individual value bits; or 'OTHER', a reference to a
+                  subroutine used to convert unknown values.  The subroutine
+                  takes 2 arguments: the value, and a flag which is set for the
+                  inverse conversion, and returns the converted value or undef
+                  on error).  In an expression, $self is a reference to the
+                  current ExifTool object, $val is the Raw value, and $tag is
+                  the tag name.  The subroutine takes 2 arguments: the Raw value
+                  and a reference to the current ExifTool object.  The
+                  expression or subroutine is evaluated when and if the tag
+                  value is requested (ie. only after all extraction is
+                  complete), so if necessary at this time the values of all
+                  other tags are available via calls to
                   $self->GetValue("Tag","Raw"). (Note: In theory, types other
                   than "Raw" may be accessed, but they are slower and may lead
                   to cyclical dependencies so they should be avoided). When
@@ -383,11 +388,14 @@ numerical.
                   when ValueConv is specified (except WriteAlso tags).  Note
                   that DataMember tags may NOT be used in the inverse
                   conversions because these conversions are done before the
-                  input file is parsed. Instead, a Condition or RawConvInv must
-                  be used.
+                  input file is parsed.  Instead, a Condition or RawConvInv must
+                  be used.  May return undef on conversion error and call warn()
+                  to issue a warning.  If warn() is not called, a generic
+                  warning is generated when undef is returned.
 
   PrintConvInv  : The inverse of PrintConv.  Only necessary if for Writable tags
-                  when PrintConv is specified (unless WriteAlso is used).
+                  when PrintConv is specified (unless WriteAlso is used).  See
+                  ValueConvInv above for more details.
 
   DelValue      : Raw value to be used when deleting a permanent tag.  (Note all
                   MakerNotes tags are permanent.)  If not specified, an attempt
@@ -401,7 +409,10 @@ numerical.
                   until this ability is added to the writer.)
 
   Mask          : [BinaryData tags only] Bitmask for this value.  (Multiple tags
-                  may have the same index by using floating point indices.)
+                  may have the same index by using floating point indices.  An
+                  unknown tag will only be generated for a certain TagID if
+                  there is no integral TagID for that tag.) When Mask is used,
+                  PrintHex=1 is implied unless otherwise defined.
 
   Condition     : If given, specifies scalar which is evaluated as a Perl
                   expression at extraction time to decide whether the tag is
@@ -579,6 +590,10 @@ numerical.
                   problems with some EXIF maker note offsets.  May access the
                   following variables: $valuePtr, $valEnd, $size, $tagID and
                   $wFlag.  May return undef when writing to ignore the entry.
+
+     Multi      : [EXIF directories only] Flag to allow multiple linked IFD's.
+                  1 is assumed if DirName is IFD0 or SubIFD unless otherwise
+                  defined.
   }
 
 --------------------------------------------------------------------------------

@@ -229,6 +229,7 @@ t/ExifTool_17.out
 t/ExifTool_2.out
 t/ExifTool_20.out
 t/ExifTool_21.out
+t/ExifTool_22.out
 t/ExifTool_3.out
 t/ExifTool_4.out
 t/ExifTool_5.out
@@ -279,6 +280,9 @@ t/IPTC-XMP_20.out
 t/IPTC-XMP_21.out
 t/IPTC-XMP_22.out
 t/IPTC-XMP_23.out
+t/IPTC-XMP_24.out
+t/IPTC-XMP_25.out
+t/IPTC-XMP_26.out
 t/IPTC-XMP_4.out
 t/IPTC-XMP_6.out
 t/IPTC-XMP_7.out
@@ -415,6 +419,7 @@ t/Writer_30.out
 t/Writer_31.out
 t/Writer_32.out
 t/Writer_33.out
+t/Writer_35.out
 t/Writer_4.out
 t/Writer_6.out
 t/Writer_7.out

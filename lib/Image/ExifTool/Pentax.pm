@@ -43,7 +43,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '1.70';
+$VERSION = '1.75';
 
 sub CryptShutterCount($$);
 
@@ -185,12 +185,16 @@ my %pentaxLensType = (
     '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
+    '7 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #19
     '7 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #19
+    '7 233' => 'smc PENTAX-DA 35mm F2.8 Macro Limited', #19
+    '7 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM (SDM unused)', #PH (NC)
     '7 238' => 'TAMRON AF 18-250mm F3.5-6.3 Di II LD Aspherical [IF] MACRO', #19
-    '7 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM', #PH
-    '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM', #20
+    '7 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM (SDM unused)', #PH
+    '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #20
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM', #19
     '8 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM', #19
     '8 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM', #19
 );
@@ -340,27 +344,6 @@ my %pentaxCities = (
     70 => 'Lisbon', #14
 );
 
-# Pentax modulo-8 ISO values
-my %mod8ISO = (
-     32 => 100,
-     35 => 125,
-     36 => 140,
-     37 => 160,
-     40 => 200,
-     43 => 250,
-     44 => 280,
-     45 => 320,
-     48 => 400,
-     51 => 500,
-     52 => 560,
-     53 => 640,
-     56 => 800,
-     59 => 1000,
-     60 => 1100,
-     61 => 1250,
-     64 => 1600,
-);
-
 # decoding for Pentax Firmware ID tags - PH
 my %pentaxFirmwareID = (
     # the first 2 numbers are the firmware version, I'm not sure what the second 2 mean
@@ -382,6 +365,16 @@ my %pentaxFirmwareID = (
     },
     PrintConv => '$val=~tr/ /./; $val',
     PrintConvInv => '$val=~s/^(\d+)\.(\d+)\.(\d+)\.(\d+)/$1 $2 $3 $4/ ? $val : undef',
+);
+
+# convert 16 metering segment values to approximate LV equivalent - PH
+my %convertMeteringSegments = (
+    PrintConv    => sub { join ' ', map(
+        { $_==255 ? 'n/a' : $_==0 ? '0' : sprintf '%.1f', $_ / 8 - 6 } split(' ',$_[0])
+    ) },
+    PrintConvInv => sub { join ' ', map(
+        { /^n/i ? 255 : $_==0 ? '0' : int(($_ + 6) * 8 + 0.5) }        split(' ',$_[0])
+    ) },
 );
 
 # Pentax makernote tags
@@ -562,18 +555,19 @@ my %pentaxFirmwareID = (
             0x109 => 'On, Slow-sync',
             0x10a => 'On, Slow-sync, Red-eye reduction',
             0x10b => 'On, Trailing-curtain Sync',
-        },{
-            0x03f => 'Internal', #20
-            0x100 => 'External A Mode', #20 (AF-540FGZ)
-            0x304 => 'External P-TTL Mode', #20 (AF-540FGZ)
-            0x306 => 'External High Speed Sync Mode', #20 (AF-540FGZ)
-            # 0x30c - seen in 1 photo, but I was trying to get wireless mode
-            # working sans manual so am not exactly sure how the flash was setÉ (ref 20)
+        },{ #20 (AF-540FGZ flash)
+            0x03f => 'Internal',
+            0x100 => 'External, Auto',
+            0x300 => 'External, Manual',
+            0x304 => 'External, P-TTL Auto',
+            0x306 => 'External, High-speed Sync',
+            0x30c => 'External, Wireless',
+            0x30d => 'External, Wireless, High-speed Sync',
         }],
     },
     0x000d => [ #2
         {
-            Condition => '$self->{CameraMake} =~ /^PENTAX/',
+            Condition => '$self->{Make} =~ /^PENTAX/',
             Name => 'FocusMode',
             Notes => 'Pentax models',
             Writable => 'int16u',
@@ -729,8 +723,8 @@ my %pentaxFirmwareID = (
         Name => 'MeteringMode',
         Writable => 'int16u',
         PrintConv => {
-            0 => 'Multi Segment',
-            1 => 'Center Weighted',
+            0 => 'Multi-segment',
+            1 => 'Center-weighted average',
             2 => 'Spot',
         },
     },
@@ -793,8 +787,8 @@ my %pentaxFirmwareID = (
             9 => 'Flash', #13
             10 => 'Cloudy', #13
             17 => 'Kelvin', #PH
-            65534 => 'Unknown', #13
-            65535 => 'User Selected', #13
+            0xfffe => 'Unknown', #13
+            0xffff => 'User-Selected', #13
         },
     },
     0x001a => { #5
@@ -809,9 +803,9 @@ my %pentaxFirmwareID = (
             7 => 'Auto (DaywhiteFluorescent)', #17 (K100D guess)
             8 => 'Auto (WhiteFluorescent)', #17 (K100D guess)
             10 => 'Auto (Cloudy)', #17 (K100D guess)
-            0xffff => 'User-Selected',
-            0xfffe => 'Preset (Fireworks?)', #PH
             # 0xfffd observed in K100D (ref 17)
+            0xfffe => 'Unknown', #PH (you get this when shooting night sky shots)
+            0xffff => 'User-Selected',
         },
     },
     0x001b => { #6
@@ -831,7 +825,7 @@ my %pentaxFirmwareID = (
         {
             # Optio 30, 33WR, 43WR, 450, 550, 555, 750Z, X
             Name => 'FocalLength',
-            Condition => '$self->{CameraModel} =~ /^PENTAX Optio (30|33WR|43WR|450|550|555|750Z|X)\b/',
+            Condition => '$self->{Model} =~ /^PENTAX Optio (30|33WR|43WR|450|550|555|750Z|X)\b/',
             Writable => 'int32u',
             Priority => 0,
             ValueConv => '$val / 10',
@@ -992,6 +986,7 @@ my %pentaxFirmwareID = (
         PrintConv => [{
             # Program dial modes (from K110D)
             '0 0'  => 'Program',
+            '0 3'  => 'MTF Program (0 3)', #20 (K10D, custom settings: Program Line 4, e-dial in Program 4)
             '0 4'  => 'Standard', #13
             '0 5'  => 'Portrait',
             '0 6'  => 'Landscape',
@@ -1206,7 +1201,7 @@ my %pentaxFirmwareID = (
         ValueConv => \&CryptShutterCount,
         ValueConvInv => '$val',
     },
-    # 0x0062: int16u - 1 in all my K10D images, but 3 in K20D samples (K10D,K20D,K200D) - PH
+    # 0x0062: int16u - values: 1 for K10D/K200D, 3 for K20D (K10D,K20D,K200D)
     # 0x0067: int16u - values: 1 (K20D,K200D) - PH
     # 0x0068: int8u  - values: 1 (K20D,K200D) - PH
     # 0x0069: undef[4] - values: "\0\0\0\0", "\x01\0\0\0" (K20D,K200D) - PH
@@ -1228,10 +1223,29 @@ my %pentaxFirmwareID = (
         Writable => 'int16u',
         Count => 4,
     },
-    0x0205 => {
-        Name => 'ShotInfo',
+    # 0x0202: int16u[4] - values: all 0's in all my samples
+    0x0203 => { #19 (not really sure what these mean)
+        Name => 'ColorMatrixA',
+        Writable => 'int16s',
+        Count => 9,
+        ValueConv => 'join(" ",map({ $_/8192 } split(" ",$val)))',
+        ValueConvInv => 'join(" ",map({ int($_*8192 + ($_<0?-0.5:0.5)) } split(" ",$val)))',
+        PrintConv => 'join(" ",map({sprintf("%.5f",$_)} split(" ",$val)))',
+        PrintConvInv => '"$val"',
+    },
+    0x0204 => { #19
+        Name => 'ColorMatrixB',
+        Writable => 'int16s',
+        Count => 9,
+        ValueConv => 'join(" ",map({ $_/8192 } split(" ",$val)))',
+        ValueConvInv => 'join(" ",map({ int($_*8192 + ($_<0?-0.5:0.5)) } split(" ",$val)))',
+        PrintConv => 'join(" ",map({sprintf("%.5f",$_)} split(" ",$val)))',
+        PrintConvInv => '"$val"',
+    },
+    0x0205 => { #20
+        Name => 'CameraSettings',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::ShotInfo',
+            TagTable => 'Image::ExifTool::Pentax::CameraSettings',
         },
     },
     0x0206 => { #PH
@@ -1256,9 +1270,8 @@ my %pentaxFirmwareID = (
         Name => 'AEMeteringSegments',
         Format => 'int8u',
         Count => 16,
-        Notes => q{
-            measurements from each of the 16 AE metering segments, converted to LV
-        },
+        Notes => 'measurements from each of the 16 AE metering segments, converted to LV',
+        %convertMeteringSegments,
         # metering segment locations (ref 19):
         # +-------------------------+
         # |           14            |
@@ -1271,31 +1284,19 @@ my %pentaxFirmwareID = (
         # |    +---+---+---+---+    |
         # |           15            |
         # +-------------------------+
-        # convert to approximate LV equivalent - PH:
-        ValueConv => q{
-            my @a;
-            foreach (split ' ', $val) { push @a, $_ / 8 - 6; }
-            return join(' ', @a);
-        },
-        ValueConvInv => q{
-            my @a;
-            foreach (split ' ', $val) { push @a, int(($_ + 6) * 8 + 0.5); }
-            return join(' ', @a);
-        },
-        PrintConv => q{
-            my @a;
-            foreach (split ' ', $val) { push @a, sprintf('%.1f', $_); }
-            return join(' ', @a);
-        },
-        PrintConvInv => '$val',
     },
-    0x020a => {
-        Name => 'FlashADump',
-        Flags => ['Unknown','Binary'],
+    0x020a => { #PH/19/20
+        Name => 'FlashMeteringSegments',
+        Format => 'int8u',
+        Count => 16,
+        %convertMeteringSegments,
     },
-    0x020b => {
-        Name => 'FlashBDump',
-        Flags => ['Unknown','Binary'],
+    0x020b => { #PH/19/20
+        Name => 'SlaveFlashMeteringSegments',
+        Format => 'int8u',
+        Count => 16,
+        Notes => 'used in wireless control mode',
+        %convertMeteringSegments,
     },
     0x020d => { #PH
         Name => 'WB_RGGBLevelsDaylight',
@@ -1367,7 +1368,6 @@ my %pentaxFirmwareID = (
         },
     },
     # 0x0226: undef[9] (K20D,K200D) - PH
-    # 0x020a,0x020b: undef[16] - all zeros (all DSLR models) - PH
     0x03fe => { #PH
         Name => 'DataDump',
         Writable => 0,
@@ -1418,8 +1418,12 @@ my %pentaxFirmwareID = (
     },
     1 => {
         Name => 'ShakeReduction',
-        # (have seen values of 4 and 7 in K20D and K200D - PH)
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            4 => 'Off (4)', #(NC) (K20D, K200D)
+            7 => 'On (7)', #(NC) (K20D, K200D)
+        },
     },
     2 => {
         Name => 'SRHalfPressTime',
@@ -1446,7 +1450,7 @@ my %pentaxFirmwareID = (
 );
 
 # shot information (ref 20)
-%Image::ExifTool::Pentax::ShotInfo = (
+%Image::ExifTool::Pentax::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -1476,10 +1480,89 @@ my %pentaxFirmwareID = (
             16 => 'Flash X-Sync Speed AE', #PH
         },
     },
+    1 => {
+        Name => 'PictureModeFlags',
+        Unknown => 1, # not sure what these mean, but associated with PictureMode
+        PrintConv => { BITMASK => { } },
+    },
+    2 => {
+        Name => 'FlashOptions',
+        Notes => 'the camera flash options settings, set even if the flash is off',
+        Mask => 0xf0,
+        ValueConv => '$val>>4',
+        # Note: these tags relate to closely to InternalFlashMode values
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Red-eye reduction',
+            2 => 'Auto',
+            3 => 'Auto, Red-eye reduction', #PH
+            5 => 'Wireless (Master)',
+            6 => 'Wireless (Control)',
+            8 => 'Slow-sync',
+            9 => 'Slow-sync, Red-eye reduction',
+            10 => 'Trailing-curtain Sync'
+        },
+    },
+    2.1 => {
+        Name => 'MeteringMode2',
+        Mask => 0x0f,
+        Notes => 'may not be valid for some models, ie. *ist D',
+        PrintConv => {
+            0 => 'Multi-segment',
+            BITMASK => {
+                0 => 'Center-weighted average',
+                1 => 'Spot',
+            },
+        },
+    },
+    3 => {
+        Name => 'AFPointMode',
+        Mask => 0xf0,
+        PrintConv => {
+            0x00 => 'Auto',
+            BITMASK => {
+                4 => 'Select',
+                5 => 'Fixed Center',
+                # have seen bit 6 set in pre-production images (firmware 0.20) - PH
+            },
+        },
+    },
+    3.1 => {
+        Name => 'FocusMode2',
+        Mask => 0x0f,
+        PrintConv => {
+            0 => 'Manual',
+            BITMASK => {
+                0 => 'AF-S',
+                1 => 'AF-C',
+            },
+        },
+    },
+    4 => {
+        Name => 'AFPointSelected2',
+        Format => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            BITMASK => {
+                0 => 'Upper-left',
+                1 => 'Top',
+                2 => 'Upper-right',
+                3 => 'Left',
+                4 => 'Mid-left',
+                5 => 'Center',
+                6 => 'Mid-right',
+                7 => 'Right',
+                8 => 'Lower-left',
+                9 => 'Bottom',
+                10 => 'Lower-right',
+            },
+        },
+    },
     6 => {
         Name => 'ISOFloor', #PH
         # manual ISO or minimum ISO in Auto ISO mode - PH
-        PrintConv => \%mod8ISO,
+        ValueConv => 'int(100*exp(Image::ExifTool::Pentax::PentaxEv($val-32)*log(2))+0.5)',
+        ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv(log($val/100)/log(2))+32',
     },
     7 => {
         Name => 'DriveMode2',
@@ -1530,7 +1613,7 @@ my %pentaxFirmwareID = (
     },
     13 => {
         Name => 'RawAndJpgRecording',
-        Condition => '$$self{CameraModel} =~ /K10D/',
+        Condition => '$$self{Model} =~ /K10D/',
         Notes => 'K10D only',
         # this is actually a bit field: - PH
         # bit 0=JPEG, bit 1=RAW; high nibble: 0x0=best, 0x1=better, 0x2=good
@@ -1555,7 +1638,7 @@ my %pentaxFirmwareID = (
     },
     14 => { #PH
         Name => 'JpgRecordedPixels',
-        Condition => '$$self{CameraModel} =~ /K10D/',
+        Condition => '$$self{Model} =~ /K10D/',
         Notes => 'K10D only',
         PrintConv => {
             0 => '10 MP',
@@ -1564,14 +1647,41 @@ my %pentaxFirmwareID = (
             # have seen 80,108,240,252 for *istD models - PH
         },
     },
-    20 => {
-        Name => 'SvISOSetting', #PH
+    18 => { #20
+        Name => 'TvExposureTimeSetting',
+        Condition => '$$self{Model} =~ /K10D/',
+        Notes => 'K10D only',
+        ValueConv => 'exp(-Image::ExifTool::Pentax::PentaxEv($val-68)*log(2))',
+        ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv(-log($val)/log(2))+68',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    19 => { #20
+        Name => 'AvApertureSetting',
+        Condition => '$$self{Model} =~ /K10D/',
+        Notes => 'K10D only',
+        ValueConv => 'exp(Image::ExifTool::Pentax::PentaxEv($val-68)*log(2)/2)',
+        ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv(log($val)*2/log(2))+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    20 => { #PH
+        Name => 'SvISOSetting',
+        Condition => '$$self{Model} =~ /K10D/',
+        Notes => 'K10D only',
         # ISO setting for sensitivity-priority mode
-        PrintConv => \%mod8ISO,
+        # (conversion may not give actual displayed values:)
+        # 32 => 100, 35 => 125, 36 => 140, 37 => 160,
+        # 40 => 200, 43 => 250, 44 => 280, 45 => 320,
+        # 48 => 400, 51 => 500, 52 => 560, 53 => 640,
+        # 56 => 800, 59 => 1000,60 => 1100,61 => 1250, 64 => 1600
+        ValueConv => 'int(100*exp(Image::ExifTool::Pentax::PentaxEv($val-32)*log(2))+0.5)',
+        ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv(log($val/100)/log(2))+32',
     },
     21 => { #PH
         Name => 'BaseExposureCompensation',
-        Notes => 'exposure compensation without auto bracketing',
+        Condition => '$$self{Model} =~ /K10D/',
+        Notes => 'exposure compensation without auto bracketing, K10D only',
         ValueConv => 'Image::ExifTool::Pentax::PentaxEv(64-$val)',
         ValueConvInv => '64-Image::ExifTool::Pentax::PentaxEvInv($val)',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
@@ -1587,6 +1697,7 @@ my %pentaxFirmwareID = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
+    # instead of /8, should these be PentaxEV(), as in CameraSettings? - PH
     0 => {
         Name => 'AEExposureTime',
         Notes => 'val = 24 * 2**((32-raw)/8)',
@@ -1597,10 +1708,9 @@ my %pentaxFirmwareID = (
     },
     1 => {
         Name => 'AEAperture',
-        Notes => 'val = (2**((raw-4)/16)) / 16',
-        # (same as val=2**((raw-68)/16), but 68 isn't a nice power of 2)
-        ValueConv => 'exp(($val-4)*log(2)/16)/16',
-        ValueConvInv => 'log($val*16)*16/log(2)+4',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
         PrintConv => 'sprintf("%.1f",$val)',
         PrintConvInv => '$val',
     },
@@ -1622,7 +1732,7 @@ my %pentaxFirmwareID = (
         Name => 'AEBXv',
         Format => 'int8s',
         Notes => 'val = raw / 8',
-        ValueConv => '$val/8',
+        ValueConv => '$val / 8',
         ValueConvInv => '$val * 8',
     },
     5 => {
@@ -1643,6 +1753,7 @@ my %pentaxFirmwareID = (
             8 => 'Hi-speed Program',
             16 => 'DOF Program', #20
             24 => 'MTF Program', #20
+            27 => 'MTF Program (27)', #20
             35 => 'Standard',
             43 => 'Portrait',
             51 => 'Landscape',
@@ -1663,6 +1774,28 @@ my %pentaxFirmwareID = (
     7 => {
         Name => 'AEExtra',
         Unknown => 1,
+    },
+    12 => { #20
+        Name => 'AEMeteringMode',
+        PrintConv => {
+            0 => 'Multi-segment',
+            BITMASK => {
+                4 => 'Center-weighted average',
+                5 => 'Spot',
+            },
+        },
+    },
+    14 => { #20
+        Name => 'FlashExposureCompUsed',
+        Format => 'int8s',
+        Notes => q{
+            reports 0 if flash was on but did not fire, unlike tag 0x004d which reports
+            the camera setting
+        },
+        ValueConv => 'Image::ExifTool::Pentax::PentaxEv($val)',
+        ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv($val)',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConvInv => 'eval $val',
     },
 );
 
@@ -1688,7 +1821,7 @@ my %pentaxFirmwareID = (
         #  test, although 0x80 would also work with all samples seen so far)
         RawConv => q{
             my ($v) = split(' ',$val);
-            if ($v & 0xf0 or $$self{CameraModel} =~ /^PENTAX K10D\b/) {
+            if ($v & 0xf0 or $$self{Model} =~ /^PENTAX K10D\b/) {
                 $$self{ShiftLensCodes} = 1;
             }
             return $val;
@@ -1748,34 +1881,65 @@ my %pentaxFirmwareID = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    0 => 'FlashStatus',
-    1 => {
-        Name => 'FlashModeCode',
-        PrintConv => {
-            134 => 'On, Wireless (Control)', #20
-            149 => 'On, Wireless (Master)', #20
-            192 => 'On', # K10D
-            193 => 'On, Red-eye reduction', # *istDS2, K10D
-            194 => 'Auto, Fired', # K100D, K110D
-            200 => 'On, Slow-sync', # K10D
-            201 => 'On, Slow-sync, Red-eye reduction', # K10D
-            202 => 'On, Trailing-curtain Sync', # K10D
-            240 => 'Off (240)', # *istD, *istDS, K100D, K10D
-            241 => 'Off (241)', # *istDL
-            242 => 'Off (242)', # *istDS, *istDL2, K100D, K110D
-            244 => 'Off (244)', # K100D, K110D (either "Auto, Did not fire" or "Off")
-            245 => 'Off (245)', # K10D
-            248 => 'On, Slow-sync, External', #20
+    0 => {
+        Name => 'FlashStatus',
+        PrintHex => 1,
+        PrintConv => { #20
+            0x00 => 'Off',
+            0x02 => 'External, Did not fire', # 0010
+            0x06 => 'External, Fired',        # 0110
+            0x09 => 'Internal, Did not fire', # 1001
+            0x0d => 'Internal, Fired',        # 1101
         },
     },
-    2 => 'ExternalFlashMode',
-    3 => 'InternalFlashMagni',
+    1 => {
+        Name => 'InternalFlashMode',
+        PrintHex => 1,
+        PrintConv => {
+            0x86 => 'On, Wireless (Control)', #20
+            0x95 => 'On, Wireless (Master)', #20
+            0xc0 => 'On', # K10D
+            0xc1 => 'On, Red-eye reduction', # *istDS2, K10D
+            0xc2 => 'On, Auto', # K100D, K110D
+            0xc3 => 'On, Auto, Red-eye reduction', #PH
+            0xc8 => 'On, Slow-sync', # K10D
+            0xc9 => 'On, Slow-sync, Red-eye reduction', # K10D
+            0xca => 'On, Trailing-curtain Sync', # K10D
+            0xf0 => 'Off, Normal', #20
+            0xf1 => 'Off, Red-eye reduction', #20
+            0xf2 => 'Off, Auto', #20
+            0xf3 => 'Off, Auto, Red-eye reduction', #20
+            0xf4 => 'Off, (Unknown 0xf4)', #20
+            0xf5 => 'Off, Wireless (Master)', #20
+            0xf6 => 'Off, Wireless (Control)', #20
+            0xf8 => 'Off, Slow-sync', #20
+            0xf9 => 'Off, Slow-sync, Red-eye reduction', #20
+            0xfa => 'Off, Trailing-curtain Sync', #20
+        },
+    },
+    2 => {
+        Name => 'ExternalFlashMode',
+        PrintHex => 1,
+        PrintConv => { #20
+            0x3f => 'Off',
+            0x40 => 'On, Auto',
+            0xc0 => 'On, Manual',
+            0xc4 => 'On, P-TTL Auto',
+            0xc6 => 'On, High-speed Sync',
+            0xcc => 'On, Wireless',
+            0xcd => 'On, Wireless, High-speed Sync',
+        },
+    },
+    3 => {
+        Name => 'InternalFlashStrength',
+        Notes => 'saved from the most recent flash picture, on a scale of about 0 to 100',
+    },
     4 => 'TTL_DA_AUp',
     5 => 'TTL_DA_ADown',
     6 => 'TTL_DA_BUp',
     7 => 'TTL_DA_BDown',
-    # ? => 'ExternalFlashMagniA',
-    # ? => 'ExternalFlashMagniB',
+    # ? => 'ExternalFlashAOutput',
+    # ? => 'ExternalFlashBOutput',
 );
 
 # camera manufacture information (ref PH)
@@ -1795,6 +1959,10 @@ my %pentaxFirmwareID = (
     },
     1 => {
         Name => 'ManufactureDate',
+        Notes => q{
+            this value, and the values of the tags below, may change if the camera is
+            serviced
+        },
         ValueConv => q{
             $val =~ /^(\d{4})(\d{2})(\d{2})$/ and return "$1:$2:$3";
             # Optio A10 and A20 leave "200" off the year
@@ -1834,7 +2002,7 @@ my %pentaxFirmwareID = (
     1 => [
         {
             Name => 'BatteryStates',
-            Condition => '$$self{CameraModel} =~ /K10D/',
+            Condition => '$$self{Model} =~ /K10D/',
             Notes => 'decoded for K10D only',
             ValueConv => '($val >> 4) . " " . ($val & 0x0f)',
             ValueConvInv => 'my @a=split(" ",$val); ($a[0] << 4) + $a[1]',
@@ -1861,7 +2029,7 @@ my %pentaxFirmwareID = (
     2 => [
         {
             Name => 'BatteryADBodyNoLoad',
-            Condition => '$$self{CameraModel} =~ /K10D/',
+            Condition => '$$self{Model} =~ /K10D/',
             Notes => 'roughly calibrated for K10D with a new Pentax battery',
             # rough linear calibration drops quickly below 30% - PH
             # DVM readings: 8.18V=186, 8.42-8.40V=192 (full), 6.86V=155 (empty)
@@ -1875,7 +2043,7 @@ my %pentaxFirmwareID = (
     3 => [
         {
             Name => 'BatteryADBodyLoad',
-            Condition => '$$self{CameraModel} =~ /K10D/',
+            Condition => '$$self{Model} =~ /K10D/',
             # [have seen 187] - PH
             PrintConv => 'sprintf("%d (%.1fV, %d%%)",$val,$val*8.18/186,($val-152)*100/34)',
             PrintConvInv => '$val=~s/ .*//; $val',
@@ -2030,59 +2198,6 @@ my %pentaxFirmwareID = (
     # also changing are bytes 10,11,14,15
 );
 
-# tags in Pentax QuickTime videos (PH - tests with Optio WP)
-# (note: very similar to information in Nikon videos)
-%Image::ExifTool::Pentax::MOV = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => 'This information is found in Pentax MOV video images.',
-    0x00 => {
-        Name => 'Make',
-        Format => 'string[6]',
-        PrintConv => 'ucfirst(lc($val))',
-    },
-    0x26 => {
-        Name => 'ExposureTime',
-        Format => 'int32u',
-        ValueConv => '$val ? 10 / $val : 0',
-        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-    },
-    0x2a => {
-        Name => 'FNumber',
-        Format => 'int32u',
-        ValueConv => '$val / 10',
-        PrintConv => 'sprintf("%.1f",$val)',
-    },
-    0x32 => {
-        Name => 'ExposureCompensation',
-        Format => 'int32s',
-        ValueConv => '$val / 10',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-    },
-    0x44 => {
-        Name => 'WhiteBalance',
-        Format => 'int16u',
-        PrintConv => {
-            0 => 'Auto',
-            1 => 'Daylight',
-            2 => 'Shade',
-            3 => 'Fluorescent', #2
-            4 => 'Tungsten',
-            5 => 'Manual',
-        },
-    },
-    0x48 => {
-        Name => 'FocalLength',
-        Writable => 'int32u',
-        ValueConv => '$val / 10',
-        PrintConv => 'sprintf("%.1f mm",$val)',
-    },
-    0xaf => {
-        Name => 'ISO',
-        Format => 'int16u',
-    },
-);
-
 # Pentax type 2 (Casio-like) maker notes (ref 1)
 %Image::ExifTool::Pentax::Type2 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -2221,6 +2336,57 @@ my %pentaxFirmwareID = (
         ASCII text in a format very similar to some HP models.
     },
    'F/W Version' => 'FirmwareVersion',
+);
+
+# tags in Pentax QuickTime videos (PH - tests with Optio WP)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
+%Image::ExifTool::Pentax::MOV = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => 'This information is found in Pentax MOV videos.',
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[24]',
+    },
+    # (01 00 at offset 0x20)
+    0x26 => {
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x2a => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x32 => {
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    0x44 => {
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Daylight',
+            2 => 'Shade',
+            3 => 'Fluorescent', #2
+            4 => 'Tungsten',
+            5 => 'Manual',
+        },
+    },
+    0x48 => {
+        Name => 'FocalLength',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+    },
+    0xaf => {
+        Name => 'ISO',
+        Format => 'int16u',
+    },
 );
 
 #------------------------------------------------------------------------------

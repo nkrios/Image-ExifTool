@@ -17,12 +17,13 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
 sub ProcessAdobeMakN($$$);
 sub ProcessAdobeCRW($$$);
+sub ProcessAdobeRAF($$$);
 sub ProcessAdobeMRW($$$);
 sub ProcessAdobeSR2($$$);
 sub WriteAdobeStuff($$$);
@@ -91,7 +92,10 @@ sub WriteAdobeStuff($$$);
     },
    'RAF ' => {
         Name => 'AdobeRAF',
-        Flags => [qw(Binary Unknown)],
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::FujiFilm::RAF',
+            ProcessProc => \&ProcessAdobeRAF,
+        },
     },
 );
 
@@ -123,6 +127,7 @@ sub ProcessOriginalRaw($$$)
     my $end = $start + $$dirInfo{DirLen};
     my $pos = $start;
     my ($index, $err);
+
     SetByteOrder('MM'); # pointers are always big-endian in this structure
     for ($index=0; $index<8; ++$index) {
         last if $pos + 4 > $end;
@@ -463,6 +468,7 @@ sub ProcessAdobeMRW($$$)
     my $dirLen = $$dirInfo{DirLen};
     my $dirStart = $$dirInfo{DirStart};
     my $outfile = $$dirInfo{OutFile};
+
     # construct fake MRW file
     my $buff = "\0MRM" . pack('N', $dirLen - 4);
     # ignore leading byte order and directory count words
@@ -475,6 +481,56 @@ sub ProcessAdobeMRW($$$)
         $$outfile = substr($$dataPt, $dirStart, 4) . substr($$outfile, 8);
     }
     return $rtnVal;
+}
+
+#------------------------------------------------------------------------------
+# Process Adobe RAF directory
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success, otherwise returns 0 and sets a Warning
+sub ProcessAdobeRAF($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = $$dirInfo{DirStart};
+    my $dirEnd = $$dirInfo{DirLen} + $pos;
+    my ($readIt, $warn);
+
+    # we don't yet write this information, but don't issue
+    # warning just because data isn't edited
+    return 0 if $$dirInfo{OutFile};
+
+    # set byte order according to first 2 bytes of Adobe RAF data
+    if ($pos + 2 <= $dirEnd and SetByteOrder(substr($$dataPt, $pos, 2))) {
+        $pos += 2;
+    } else {
+        $exifTool->Warn('Invalid DNG RAF data');
+        return 0;
+    }
+    $exifTool->VerboseDir($dirInfo);
+    # make fake RAF object for processing (same acronym, different meaning)
+    my $raf = new File::RandomAccess($dataPt);
+    my $num = '';
+    # loop through all records in Adobe RAF data:
+    # 0 - RAF table (not processed)
+    # 1 - first RAF directory
+    # 2 - second RAF directory (if available)
+    for (;;) {
+        last if $pos + 4 > $dirEnd;
+        my $len = Get32u($dataPt, $pos);
+        $pos += 4 + $len;   # step to next entry in Adobe RAF record
+        $len or last;       # ends with an empty entry
+        $readIt or $readIt = 1, next;   # ignore first entry (RAF table)
+        my %dirInfo = (
+            RAF      => $raf,
+            DirStart => $pos - $len,
+        );
+        $$exifTool{SET_GROUP1} = "RAF$num";
+        $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr) or $warn = 1;
+        delete $$exifTool{SET_GROUP1};
+        $num = ($num || 1) + 1;
+    }
+    $warn and $exifTool->Warn('Possibly corrupt RAF information');
+    return 1;
 }
 
 #------------------------------------------------------------------------------

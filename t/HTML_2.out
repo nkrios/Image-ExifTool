@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.77
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.18
 [File, File, Image]  - File Name: HTML.html
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2007:02:17 19:32:41
+[File, File, Time]  - File Modification Date/Time: 2007:02:18 10:47:47
 [File, File, Image]  - File Type: HTML
 [File, File, Image]  - MIME Type: text/html
 [HTML, HTML, Document] title - Title: ExifTool HTML Test
@@ -15,7 +15,7 @@
 [HTML, HTML-dc, Document] language - Language: EN
 [HTML, HTML-dc, Author] publisher - Publisher: TPB
 [HTML, HTML-dc, Author] source - Source: 0-065-01022-1
-[HTML, HTML-dc, Document] subject - Subject: Greek: .. .. ..
+[HTML, HTML-dc, Document] subject - Subject: Greek: α β γ
 [HTML, HTML-ncc, Time] sourcedate - Source Date: 1993
 [HTML, HTML-ncc, Document] sourceedition - Source Edition: 1
 [HTML, HTML-ncc, Document] sourcepublisher - Source Publisher: Phil's Desktop

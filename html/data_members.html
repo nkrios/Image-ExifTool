@@ -15,9 +15,9 @@ but this is Perl, so I couldn't do that...)</p>
 <p>Aside from the variables defined below, there may be other temporary
 variables added by individual modules. Temporary variables are identified by
 at least one lower case letter in their name, and are deleted before reading or
-writing each new image. CameraMake, CameraModel and CameraType are temporary
-variables, but are guaranteed to be defined while processing an image because
-they are initialized to '' instead of being deleted.</p>
+writing each new image. Make, Model and CameraType are temporary variables,
+but are guaranteed to be defined while processing an image because they are
+initialized to '' instead of being deleted.</p>
 
 <blockquote><table class='norm'><tr><th>Name</th><th>Description</th></tr>
 
@@ -28,9 +28,9 @@ they are initialized to '' instead of being deleted.</p>
 <tr><td>BASE</td><td>Absolute position of current image in containing file
     (for example, when processing JPEG image in FujiFilm RAF file)</td></tr>
 
-<tr><td>CameraMake</td><td>Camera make set during reading and writing</td></tr>
+<tr><td>Make</td><td>Camera make set during reading and writing</td></tr>
 
-<tr><td>CameraModel</td><td>Camera model name set during reading and writing</td></tr>
+<tr><td>Model</td><td>Camera model name set during reading and writing</td></tr>
 
 <tr><td>CameraType</td><td>Camera type used for decoding some Olympus tags</td></tr>
 

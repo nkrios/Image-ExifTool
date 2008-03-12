@@ -14,6 +14,7 @@
 #               7) http://www.onicos.com/staff/iz/formats/wav.html
 #               8) http://graphics.cs.uni-sb.de/NMM/dist-0.9.1/Docs/Doxygen/html/mmreg_8h-source.html
 #               9) http://developers.videolan.org/vlc/vlc/doc/doxygen/html/codecs_8h-source.html
+#              10) http://wiki.multimedia.cx/index.php?title=TwoCC
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::RIFF;
@@ -22,12 +23,13 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 # type of current stream
 $Image::ExifTool::RIFF::streamType = '';
 
-my %riffEncoding = ( #2
+%Image::ExifTool::RIFF::audioEncoding = ( #2
+    Notes => 'These "TwoCC" audio encoding codes are used in RIFF and ASF files.',
     0x01 => 'Microsoft PCM',
     0x02 => 'Microsoft ADPCM',
     0x03 => 'Microsoft IEEE float',
@@ -38,6 +40,7 @@ my %riffEncoding = ( #2
     0x08 => 'Microsoft DTS', #4
     0x09 => 'DRM', #4
     0x0a => 'WMA 9 Speech', #9
+    0x0b => 'Microsoft Windows Media RT Voice', #10
     0x10 => 'OKI-ADPCM',
     0x11 => 'Intel IMA/DVI-ADPCM',
     0x12 => 'Videologic Mediaspace ADPCM', #4
@@ -48,6 +51,7 @@ my %riffEncoding = ( #2
     0x17 => 'Dialoic OKI ADPCM', #6
     0x18 => 'Media Vision ADPCM', #6
     0x19 => 'HP CU', #7
+    0x1a => 'HP Dynamic Voice', #10
     0x20 => 'Yamaha ADPCM', #6
     0x21 => 'SONARC Speech Compression', #6
     0x22 => 'DSP Group True Speech', #6
@@ -74,6 +78,7 @@ my %riffEncoding = ( #2
     0x40 => 'Antex G.721 ADPCM',
     0x41 => 'Antex G.728 CELP',
     0x42 => 'Microsoft MSG723', #7
+    0x43 => 'IBM AVC ADPCM', #10
     0x45 => 'ITU-T G.726', #9
     0x50 => 'Microsoft MPEG',
     0x51 => 'RT23 or PAC', #7
@@ -100,6 +105,8 @@ my %riffEncoding = ( #2
     0x77 => 'Voxware VR12', #7
     0x78 => 'Voxware VR18', #7
     0x79 => 'Voxware TQ40', #7
+    0x7a => 'Voxware SC3', #10
+    0x7b => 'Voxware SC3', #10
     0x80 => 'Soundsoft', #6
     0x81 => 'Voxware TQ60', #7
     0x82 => 'Microsoft MSRT24', #7
@@ -109,6 +116,10 @@ my %riffEncoding = ( #2
     0x86 => 'DataFusion GSM610', #7
     0x88 => 'Iterated Systems Audio', #7
     0x89 => 'Onlive', #7
+    0x8a => 'Multitude, Inc. FT SX20', #10
+    0x8b => 'Infocom ITS A/S G.721 ADPCM', #10
+    0x8c => 'Convedia G729', #10
+    0x8d => 'Not specified congruency, Inc.', #10
     0x91 => 'Siemens SBC24', #7
     0x92 => 'Sonic Foundry Dolby AC3 APDIF', #7
     0x93 => 'MediaSonic G.723', #8
@@ -117,12 +128,20 @@ my %riffEncoding = ( #2
     0x98 => 'Philips LPCBB', #7
     0x99 => 'Studer Professional Audio Packed', #7
     0xa0 => 'Malden PhonyTalk', #8
+    0xa1 => 'Racal Recorder GSM', #10
+    0xa2 => 'Racal Recorder G720.a', #10
+    0xa3 => 'Racal G723.1', #10
+    0xa4 => 'Racal Tetra ACELP', #10
+    0xb0 => 'NEC AAC NEC Corporation', #10
+    0xff => 'AAC', #10
     0x100 => 'Rhetorex ADPCM', #6
     0x101 => 'IBM u-Law', #3
     0x102 => 'IBM a-Law', #3
     0x103 => 'IBM ADPCM', #3
     0x111 => 'Vivo G.723', #7
     0x112 => 'Vivo Siren', #7
+    0x120 => 'Philips Speech Processing CELP', #10
+    0x121 => 'Philips Speech Processing GRUNDIG', #10
     0x123 => 'Digital G.723', #7
     0x125 => 'Sanyo LD ADPCM', #8
     0x130 => 'Sipro Lab ACEPLNET', #8
@@ -131,37 +150,127 @@ my %riffEncoding = ( #2
     0x133 => 'Sipro Lab G.729', #8
     0x134 => 'Sipro Lab G.729A', #8
     0x135 => 'Sipro Lab Kelvin', #8
+    0x136 => 'VoiceAge AMR', #10
     0x140 => 'Dictaphone G.726 ADPCM', #8
     0x150 => 'Qualcomm PureVoice', #8
     0x151 => 'Qualcomm HalfRate', #8
     0x155 => 'Ring Zero Systems TUBGSM', #8
     0x160 => 'Microsoft Audio1', #8
+    0x161 => 'Windows Media Audio V2 V7 V8 V9 / DivX audio (WMA) / Alex AC3 Audio', #10
+    0x162 => 'Windows Media Audio Professional V9', #10
+    0x163 => 'Windows Media Audio Lossless V9', #10
+    0x164 => 'WMA Pro over S/PDIF', #10
+    0x170 => 'UNISYS NAP ADPCM', #10
+    0x171 => 'UNISYS NAP ULAW', #10
+    0x172 => 'UNISYS NAP ALAW', #10
+    0x173 => 'UNISYS NAP 16K', #10
+    0x174 => 'MM SYCOM ACM SYC008 SyCom Technologies', #10
+    0x175 => 'MM SYCOM ACM SYC701 G726L SyCom Technologies', #10
+    0x176 => 'MM SYCOM ACM SYC701 CELP54 SyCom Technologies', #10
+    0x177 => 'MM SYCOM ACM SYC701 CELP68 SyCom Technologies', #10
+    0x178 => 'Knowledge Adventure ADPCM', #10
+    0x180 => 'Fraunhofer IIS MPEG2AAC', #10
+    0x190 => 'Digital Theater Systems DTS DS', #10
     0x200 => 'Creative Labs ADPCM', #6
     0x202 => 'Creative Labs FASTSPEECH8', #6
     0x203 => 'Creative Labs FASTSPEECH10', #6
     0x210 => 'UHER ADPCM', #8
+    0x215 => 'Ulead DV ACM', #10
+    0x216 => 'Ulead DV ACM', #10
     0x220 => 'Quarterdeck Corp.', #6
     0x230 => 'I-Link VC', #8
     0x240 => 'Aureal Semiconductor Raw Sport', #8
+    0x241 => 'ESST AC3', #10
     0x250 => 'Interactive Products HSX', #8
     0x251 => 'Interactive Products RPELP', #8
     0x260 => 'Consistent CS2', #8
     0x270 => 'Sony SCX', #8
+    0x271 => 'Sony SCY', #10
+    0x272 => 'Sony ATRAC3', #10
+    0x273 => 'Sony SPC', #10
+    0x280 => 'TELUM Telum Inc.', #10
+    0x281 => 'TELUMIA Telum Inc.', #10
+    0x285 => 'Norcom Voice Systems ADPCM', #10
     0x300 => 'Fujitsu FM TOWNS SND', #6
+    0x301 => 'Fujitsu (not specified)', #10
+    0x302 => 'Fujitsu (not specified)', #10
+    0x303 => 'Fujitsu (not specified)', #10
+    0x304 => 'Fujitsu (not specified)', #10
+    0x305 => 'Fujitsu (not specified)', #10
+    0x306 => 'Fujitsu (not specified)', #10
+    0x307 => 'Fujitsu (not specified)', #10
+    0x308 => 'Fujitsu (not specified)', #10
+    0x350 => 'Micronas Semiconductors, Inc. Development', #10
+    0x351 => 'Micronas Semiconductors, Inc. CELP833', #10
     0x400 => 'Brooktree Digital', #6
+    0x401 => 'Intel Music Coder (IMC)', #10
+    0x402 => 'Ligos Indeo Audio', #10
     0x450 => 'QDesign Music', #8
+    0x500 => 'On2 VP7 On2 Technologies', #10
+    0x501 => 'On2 VP6 On2 Technologies', #10
     0x680 => 'AT&T VME VMPCM', #7
     0x681 => 'AT&T TCP', #8
+    0x700 => 'YMPEG Alpha (dummy for MPEG-2 compressor)', #10
+    0x8ae => 'ClearJump LiteWave (lossless)', #10
     0x1000 => 'Olivetti GSM', #6
     0x1001 => 'Olivetti ADPCM', #6
     0x1002 => 'Olivetti CELP', #6
     0x1003 => 'Olivetti SBC', #6
     0x1004 => 'Olivetti OPR', #6
     0x1100 => 'Lernout & Hauspie', #6
+    0x1101 => 'Lernout & Hauspie CELP codec', #10
+    0x1102 => 'Lernout & Hauspie SBC codec', #10
+    0x1103 => 'Lernout & Hauspie SBC codec', #10
+    0x1104 => 'Lernout & Hauspie SBC codec', #10
     0x1400 => 'Norris Comm. Inc.', #6
     0x1401 => 'ISIAudio', #7
     0x1500 => 'AT&T Soundspace Music Compression', #7
+    0x181c => 'VoxWare RT24 speech codec', #10
+    0x181e => 'Lucent elemedia AX24000P Music codec', #10
+    0x1971 => 'Sonic Foundry LOSSLESS', #10
+    0x1979 => 'Innings Telecom Inc. ADPCM', #10
+    0x1c07 => 'Lucent SX8300P speech codec', #10
+    0x1c0c => 'Lucent SX5363S G.723 compliant codec', #10
+    0x1f03 => 'CUseeMe DigiTalk (ex-Rocwell)', #10
+    0x1fc4 => 'NCT Soft ALF2CD ACM', #10
     0x2000 => 'FAST Multimedia DVM', #7
+    0x2001 => 'Dolby DTS (Digital Theater System)', #10
+    0x2002 => 'RealAudio 1 / 2 14.4', #10
+    0x2003 => 'RealAudio 1 / 2 28.8', #10
+    0x2004 => 'RealAudio G2 / 8 Cook (low bitrate)', #10
+    0x2005 => 'RealAudio 3 / 4 / 5 Music (DNET)', #10
+    0x2006 => 'RealAudio 10 AAC (RAAC)', #10
+    0x2007 => 'RealAudio 10 AAC+ (RACP)', #10
+    0x2500 => 'Reserved range to 0x2600 Microsoft', #10
+    0x3313 => 'makeAVIS (ffvfw fake AVI sound from AviSynth scripts)', #10
+    0x4143 => 'Divio MPEG-4 AAC audio', #10
+    0x4201 => 'Nokia adaptive multirate', #10
+    0x4243 => 'Divio G726 Divio, Inc.', #10
+    0x434c => 'LEAD Speech', #10
+    0x564c => 'LEAD Vorbis', #10
+    0x5756 => 'WavPack Audio', #10
+    0x674f => 'Ogg Vorbis (mode 1)', #10
+    0x6750 => 'Ogg Vorbis (mode 2)', #10
+    0x6751 => 'Ogg Vorbis (mode 3)', #10
+    0x676f => 'Ogg Vorbis (mode 1+)', #10
+    0x6770 => 'Ogg Vorbis (mode 2+)', #10
+    0x6771 => 'Ogg Vorbis (mode 3+)', #10
+    0x7000 => '3COM NBX 3Com Corporation', #10
+    0x706d => 'FAAD AAC', #10
+    0x7a21 => 'GSM-AMR (CBR, no SID)', #10
+    0x7a22 => 'GSM-AMR (VBR, including SID)', #10
+    0xa100 => 'Comverse Infosys Ltd. G723 1', #10
+    0xa101 => 'Comverse Infosys Ltd. AVQSBC', #10
+    0xa102 => 'Comverse Infosys Ltd. OLDSBC', #10
+    0xa103 => 'Symbol Technologies G729A', #10
+    0xa104 => 'VoiceAge AMR WB VoiceAge Corporation', #10
+    0xa105 => 'Ingenient Technologies Inc. G726', #10
+    0xa106 => 'ISO/MPEG-4 advanced audio Coding', #10
+    0xa107 => 'Encore Software Ltd G726', #10
+    0xa109 => 'Speex ACM Codec xiph.org', #10
+    0xdfac => 'DebugMode SonicFoundry Vegas FrameServer ACM Codec', #10
+    0xe708 => 'Unknown -', #10
+    0xf1ac => 'Free Lossless Audio Codec FLAC', #10
     0xfffe => 'Extensible', #7
     0xffff => 'Development', #4
 );
@@ -170,9 +279,12 @@ my %riffEncoding = ( #2
 %Image::ExifTool::RIFF::Main = (
     PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
     NOTES => q{
-        Windows WAV and AVI files are RIFF format files.  Meta information embedded
-        in two types of RIFF C<LIST> chunks: C<INFO> and C<exif>.  As well, some
-        information about the audio content is extracted from the C<fmt > chunk.
+        Windows WAV and AVI files are RIFF format files.  According to the EXIF
+        specification, Meta information is embedded in two types of RIFF C<LIST>
+        chunks: C<INFO> and C<exif>, and information about the audio content is
+        stored in the C<fmt > chunk.  As well as this information, some video
+        information and proprietary manufacturer-specific information is also
+        extracted.
     },
    'fmt ' => {
         Name => 'AudioFormat',
@@ -190,6 +302,44 @@ my %riffEncoding = ( #2
         Name => 'Hdrl',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Hdrl' },
     },
+    JUNK => [
+        {
+            Name => 'OlympusJunk',
+            Condition => '$$valPt =~ /^OLYMDigital Camera/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::AVI',
+            },
+        },
+        {
+            Name => 'CasioJunk',
+            Condition => '$$valPt =~ /^QVMI/',
+            # Casio stores standard EXIF-format information in AVI videos (EX-S600)
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Exif::Main',
+                DirName => 'IFD0',
+                Multi => 0, # (IFD1 is not written)
+                Start => 10,
+                ByteOrder => 'BigEndian',
+            },
+        },
+        {
+            Name => 'RicohJunk',
+            # the Ricoh Caplio GX stores sub-chunks in here
+            Condition => '$$valPt =~ /^ucmt/',
+            SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::AVI' },
+        },
+        {
+            Name => 'UnknownJunk',
+            # try to interpret unknown junk as a string
+            RawConv => '$_=$val; s/\0.*//s; /^[^\0-\x1f\x7f-\xff]+$/ ? $_ : undef',
+        }
+    ],
+);
+
+# the maker notes used by some digital cameras
+%Image::ExifTool::RIFF::Junk = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Audio' },
 );
 
 # Format and Audio Stream Format chunk data
@@ -200,7 +350,8 @@ my %riffEncoding = ( #2
     0 => {
         Name => 'Encoding',
         PrintHex => 1,
-        PrintConv => \%riffEncoding,
+        PrintConv => \%Image::ExifTool::RIFF::audioEncoding,
+        SeparateTable => 'AudioEncoding',
     },
     1 => 'NumChannels',
     2 => {
@@ -242,7 +393,10 @@ my %riffEncoding = ( #2
     IPLT => 'NumColors',
     IPRD => 'Product',
     ISBJ => 'Subject',
-    ISFT => 'Software',
+    ISFT => {
+        Name => 'Software',
+        ValueConv => '$val=~s/\0.*//s; $val', # truncate at null
+    },
     ISHP => 'Sharpness',
     ISRC => 'Source',
     ISRF => 'SourceForm',
@@ -377,15 +531,24 @@ my %riffEncoding = ( #2
 %Image::ExifTool::RIFF::StreamData = ( #PH
     PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessStreamData,
     GROUPS => { 2 => 'Video' },
-    NOTES => 'This chunk contains EXIF information in FujiFilm F30 AVI files.',
+    NOTES => 'This chunk contains EXIF information in FujiFilm AVI videos.',
     AVIF => {
         Name => 'AVIF',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Exif::Main',
             DirName => 'IFD0',
             Start => 8,
-            ByteOrder => 'II',
+            ByteOrder => 'LittleEndian',
         },
+    },
+    CASI => { # (used by Casio GV-10)
+        Name => 'CasioData',
+        SubDirectory => { TagTable => 'Image::ExifTool::Casio::AVI' },
+    },
+    unknown => {
+        Name => 'UnknownData',
+        # try to interpret unknown stream data as a string
+        RawConv => '$_=$val; s/\0.*//s; /^[^\0-\x1f\x7f-\xff]+$/ ? $_ : undef',
     },
 );
 
@@ -444,8 +607,12 @@ sub ProcessStreamData($$$)
     }
     my $tag = substr($$dataPt, $start, 4);
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+    unless ($tagInfo) {
+        $tagInfo = $exifTool->GetTagInfo($tagTablePtr, 'unknown');
+        return 1 unless $tagInfo;
+    }
     my $subdir = $$tagInfo{SubDirectory};
-    if ($subdir) {
+    if ($$tagInfo{SubDirectory}) {
         my $offset = $$subdir{Start} || 0;
         my $baseShift = $$dirInfo{DataPos} + $$dirInfo{DirStart} + $offset;
         my %subdirInfo = (
@@ -458,10 +625,23 @@ sub ProcessStreamData($$$)
             DirName => $$subdir{DirName},
             Parent  => $$dirInfo{DirName},
         );
+        unless ($offset) {
+            # allow processing of 2nd directory at the same address
+            my $addr = $subdirInfo{DirStart} + $subdirInfo{DataPos} + $subdirInfo{Base};
+            delete $exifTool->{PROCESSED}->{$addr}
+        }
         # (we could set FIRST_EXIF_POS to $subdirInfo{Base} here to make
         #  htmlDump offsets relative to EXIF base if we wanted...)
         my $subTable = GetTagTable($$subdir{TagTable});
         $exifTool->ProcessDirectory(\%subdirInfo, $subTable);
+    } else {
+        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+            DataPt  => $dataPt,
+            DataPos => $$dirInfo{DataPos},
+            Start   => $start,
+            Size    => $size,
+            TagInfo => $tagInfo,
+        );
     }
     return 1;
 }
@@ -495,11 +675,19 @@ sub ProcessChunks($$$)
             $len -= 4;
             $start += 4;
         }
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        my $baseShift = 0;
+        if ($tagInfo and $$tagInfo{SubDirectory}) {
+            # adjust base if necessary (needed for Ricoh maker notes)
+            my $newBase = $tagInfo->{SubDirectory}->{Base};
+            $baseShift = $newBase - $$dirInfo{Base} if defined $newBase;
+        }
         $exifTool->HandleTag($tagTablePtr, $tag, undef,
-            DataPt => $dataPt,
-            DataPos => $$dirInfo{DataPos},
-            Start => $start,
-            Size => $len,
+            DataPt  => $dataPt,
+            DataPos => $$dirInfo{DataPos} - $baseShift,
+            Start   => $start,
+            Size    => $len,
+            Base    => $$dirInfo{Base} + $baseShift,
         );
         ++$len if $len & 0x01;  # must account for padding if odd number of bytes
         $start += $len;
@@ -517,6 +705,7 @@ sub ProcessRIFF($$)
     my $raf = $$dirInfo{RAF};
     my ($buff, $err);
     my %types = ( 'WAVE' => 'WAV', 'AVI ' => 'AVI' );
+    my $verbose = $exifTool->Options('Verbose');
 
     # verify this is a valid RIFF file
     return 0 unless $raf->Read($buff, 12) == 12;
@@ -546,19 +735,17 @@ sub ProcessRIFF($$)
             $exifTool->VPrint(0, "(end of parsing)\n");
             last;
         }
-        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         # RIFF chunks are padded to an even number of bytes
         my $len2 = $len + ($len & 0x01);
-        if ($tagInfo and $$tagInfo{SubDirectory}) {
+        if ($$tagTablePtr{$tag}) {
             $raf->Read($buff, $len2) == $len2 or $err=1, last;
-            my %dirInfo = (
-                DataPt => \$buff,
-                DataPos => $pos,
-                DirStart => 0,
-                DirLen => $len,
+            $exifTool->HandleTag($tagTablePtr, $tag, $buff,
+                DataPt  => \$buff,
+                DataPos => 0,   # (relative to Base)
+                Start   => 0,
+                Size    => $len2,
+                Base    => $pos,
             );
-            my $tagTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-            $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
         } else {
             $raf->Seek($len2, 1) or $err=1, last;
         }
@@ -606,6 +793,8 @@ under the same terms as Perl itself.
 =item L<http://www.codeproject.com/audio/wavefiles.asp>
 
 =item L<http://msdn.microsoft.com/archive/en-us/directx9_c/directx/htm/avirifffilereference.asp>
+
+=item L<http://wiki.multimedia.cx/index.php?title=TwoCC>
 
 =back
 

@@ -9,8 +9,100 @@
 <!-- Use line width of 80 -->
 <h1 class='up'>ExifTool Version History</h1>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.15.tar.gz">Version 7.15</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.21.tar.gz">Version 7.21</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
+
+<b>Mar. 12, 2008 - Version 7.21 (production release)</b>
+<ul>
+<li>Added support for Leica M8 maker notes (in both DNG and JPEG images)
+<li>Added ability to write encrypted Nikon makernote information (!!)
+<li>Added a new Olympus Leica lens (thanks Chris Shaw)
+<li>Decode a couple of new Canon 40D and 1DmkIII tags (thanks Chris Huebsch)
+<li>Decode Adobe RAF data in DNG images
+<li>Decode a few new Nikon D3 and D300 tags (thanks Jens Duttke)
+<li>Calculate VideoFrameRate for QuickTime MOV videos
+<li>Marked DNG OriginalRawFileName and OriginalRawFileData as "unsafe" to copy
+<li>Changed decoding of Casio BestShotMode
+<li>Renamed Nikon NEFCurve tags (thanks Jens Duttke)
+<li>Patched problem parsing original decision data for the Canon EOS 5D
+</ul>
+
+<b>Mar. 7, 2008 - Version 7.20</b>
+<ul>
+<li>Added a few new Minolta LensID's
+<li>Added two more TIFF-IT tags to the EXIF table
+<li>Added a number of new RIFF and ASF Audio Encoding values
+<li>Added a new new values for some Canon tags (thanks Dave Nicholson)
+<li>Decode a number of new Pentax K10D tags (thanks Dave Nicholson)
+<li>Decode a number of new MP4/QuickTime tags
+<li>Decode makernotes in Casio, Kodak, Minolta, Olympus and Ricoh AVI and MOV
+    videos
+<li>Improved decoding of Casio maker notes and decode a few new tags (thanks
+    Jens Duttke)
+<li>Removed incorrect CanonD30 ColorTemperature and ColorMatrix tags
+<li>Fixed Location translation in iptc2xmp.args and xmp2iptc.args
+<li>Fixed problem decoding some Nikon tags in images edited by Capture NX
+<li>Fixed decoding of InternalSerialNumber for Canon 5D
+<li>Fixed decoding of Nikon D3 color balance information
+<li>Fixed decoding of Minolta 7D FocusMode (thanks Jens Duttke)
+</ul>
+
+<b>Feb. 25, 2008 - Version 7.19</b>
+<ul>
+<li>Added a new Pentax LensType and some new Panasonic NoiseReduction values
+    (thanks Jens Duttke)
+<li>Decode Nikon D40 and D40X custom settings plus a couple of other tags
+<li>Decode a couple of new Pentax K10D tags (thanks Dave Nicholson)
+<li>Improved reliability of Canon FocalPlaneXSize and FocalPlaneYSize tags
+<li>Recognize HP Type2 maker notes in images from other makes
+<li>Write TIFF ApplicationNotes in 'int8u' format as per XMP specification
+<li>Made TIFF ApplicationNotes writable as a block
+<li>Changed HtmlDump to show actual IFD format if different than read format
+<li>Changed some MeteringMode strings to be more consistent
+<li>Fixed problem adding back JFIF information after deleting JFIF group
+</ul>
+
+<b>Feb. 21, 2008 - Version 7.18</b>
+<ul>
+<li>Added ability to exclude XMP family 1 groups from deletion
+<li>Added patch to recognize new Ricoh R50 maker notes
+<li>Added a new Minolta LensID (thanks Jens Duttke)
+<li>Decode AFPointsUsed for Nikon D3 and D300 (thanks Jens Duttke)
+<li>Decode a couple of new Pentax K10D tags (thanks Dave Nicholson)
+<li>Improved decoding of Nikon FlashInfo tags (thanks Jens Duttke)
+<li>Renamed Olympus FlashExposureCompensation tag to FlashExposureComp
+<li>Patched problem with Perl 5.10.x which broke conversion of UTF8 strings
+<li>Fixed problem where an ExposureTime of 1 second was ignored in CRW images
+<li>Fixed problem where special characters were not handled properly when using
+    the -L option while copying IPTC tags
+<li>Fixed bug which could cause a runtime error when attempting to write JFIF
+    information after deleting JFIF:all in the same step
+</ul>
+
+<b>Feb. 16, 2008 - Version 7.17</b>
+<ul>
+<li>Extract duplicate tags when -p option is used
+<li>Fixed bug introduced in 7.00 which broke the use of group family numbers and
+    groups ending with a digit in tag format strings (ie. "$IFD0:Model")
+</ul>
+
+<b>Feb. 14, 2008 - Version 7.16</b>
+<ul>
+<li>Added a couple of new Pentax LensTypes (thanks Jens Duttke)
+<li>Added a few more EXIF:Compression values
+<li>Decode color balance levels in Leaf MOS images
+<li>Decode a number of new tags from JPEG, TIFF, KDC and DCR images of older
+    Kodak models
+<li>Improved decoding of TIFF SampleFormat tag
+<li>Made a number of DNG tags "unsafe" so they aren't copied by default
+<li>Allow JPEG EXIF segment to be deleted and a new EXIF segment to be created
+    with a different byte order in a single command
+<li>Attempted to improve reliability of ScaleFactor35efl calculation for newer
+    Canon models
+<li>Fixed a couple more places where we still needed a space before "mm"
+<li>Fixed problem with LightValue calculation which caused failed tests for Perl
+    5.6.2 on Darwin
+</ul>
 
 <b>Feb. 5, 2008 - Version 7.15</b> (production release)
 <ul>
@@ -19,13 +111,13 @@ considered development releases, and are not uploaded to <a href="http://search.
 <li>Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
 <li>Decode a few new Sigma tags, including PreviewImage
 <li>Decode a few more tags in Canon CRW images (thanks Dave Nicholson)
-<li>Recognize a few more FLV AudioEncoding and VideoEncoding values
-<li>Allow "pseudo" tags to be copied from unrecognized file types
-<li>Made FileModifyDate an "unsafe" tag so it isn't copied unless specified
 <li>Improved Sony ARW parsing (fix some problems and extract more tags)
 <li>Improved handling of timezone when writing EXIF and XMP information (the
     timezone is now added to XMP date/time values and removed from EXIF
     date/time values if necessary unless the -n option is used)
+<li>Recognize a few more FLV AudioEncoding and VideoEncoding values
+<li>Allow "pseudo" tags to be copied from unrecognized file types
+<li>Made FileModifyDate an "unsafe" tag so it isn't copied unless specified
 <li>Changed all "sec" units to "s" with a leading space for consistency
 <li>Fixed bug introduced in version 6.91 that could prevent some XMP date/time
     tags from being written when copying with "-all:all"

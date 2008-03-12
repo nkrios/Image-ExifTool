@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -1232,17 +1232,13 @@ sub WriteMIEGroup($$$)
                     if ($isUTF8 > 0) {
                         $writable = 'utf8';
                         # write UTF-16 or UTF-32 if it is more compact
-                        # (only if Perl version is 5.6.1 or greater)
-                        if ($] >= 5.006001) {
-                            # pack with current byte order
-                            my $pk = (GetByteOrder() eq 'MM') ? 'n' : 'v';
-                            $pk = uc($pk) if $isUTF8 > 1;
-                            # translate to utf16 or utf32
-                            my $tmp = pack("$pk*",unpack('U0U*',$newVal));
-                            if (length $tmp < length $newVal) {
-                                $newVal = $tmp;
-                                $writable = ($isUTF8 > 1) ? 'utf32' : 'utf16';
-                            }
+                        my $pk = (GetByteOrder() eq 'MM') ? 'n' : 'v';
+                        $pk = uc($pk) if $isUTF8 > 1;
+                        # translate to utf16 or utf32
+                        my $tmp = Image::ExifTool::UTF82Unicode($newVal,$pk);
+                        if (length $tmp < length $newVal) {
+                            $newVal = $tmp;
+                            $writable = ($isUTF8 > 1) ? 'utf32' : 'utf16';
                         }
                     }
                     # write as a list if we have multiple values

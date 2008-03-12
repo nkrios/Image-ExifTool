@@ -23,6 +23,7 @@
 #              13) http://www.mhohner.de/minolta/lenses.php
 #              14) Jeffery Small private communication (tests with 7D)
 #              15) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm
+#              16) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
@@ -32,7 +33,7 @@ use vars qw($VERSION %minoltaLensIDs %minoltaColorMode);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.36';
+$VERSION = '1.38';
 
 # lens ID numbers (ref 3)
 %minoltaLensIDs = (
@@ -56,36 +57,45 @@ $VERSION = '1.36';
     17 => 'Minolta AF 20-35mm F3.5-4.5',
     18 => 'Minolta AF 28-80mm F3.5-5.6 II',
     19 => 'Minolta AF 35mm F1.4',
-    20 => 'Minolta STF 135mm F2.8 [T4.5]',
+    20 => 'Minolta/Sony STF 135mm F2.8 [T4.5]',
     22 => 'Minolta AF 35-80mm F4-5.6',
     23 => 'Minolta AF 200mm F4 G APO Macro',
-    24 => 'Minolta AF 24-105mm F3.5-4.5 (D)', # or Sigma 18-50mm F2.8 or Sigma 17-70mm F2.8-4.5 (D)',
-    25 => 'Minolta AF 100-300mm F4.5-5.6 (D)',
+    24 => 'Minolta/Sony AF 24-105mm F3.5-4.5 (D)', # or Sigma 18-50mm F2.8 or Sigma 17-70mm F2.8-4.5 (D)',
+    25 => 'Minolta AF 100-300mm F4.5-5.6 (APO D)',
     27 => 'Minolta AF 85mm F1.4 G',
     28 => 'Minolta AF 100mm F2.8 Macro (D)',
     29 => 'Minolta AF 75-300mm F4.5-5.6 (D)',
     30 => 'Minolta AF 28-80mm F3.5-5.6 (D)', # or Sigma AF 12-24mm F4.5-5.6 EX DG',
-    31 => 'Minolta AF 50mm F2.8 Macro (D) or AF 50mm F3.5 Macro',
+    31 => 'Minolta/Sony AF 50mm F2.8 Macro (D) or AF 50mm F3.5 Macro',
     # 32 => 'AF 100-400mm F4.5-6.7 (D) x1.5', ??
     32 => 'Minolta AF 300mm F2.8 G',
-    33 => 'Minolta AF 70-200mm F2.8 G (D) SSM',
+    33 => 'Minolta/Sony AF 70-200mm F2.8 G (D) SSM',
     35 => 'Minolta AF 85mm F1.4 G (D) Limited',
     36 => 'Minolta AF 28-100mm F3.5-5.6 (D)',
-    38 => 'KonicaMinolta AF 17-35mm F2.8-4 (D)',
+    38 => 'Minolta AF 17-35mm F2.8-4 (D)',
     39 => 'Minolta AF 28-75mm F2.8 (D)',
-    40 => 'KonicaMinolta or Sony AF DT 18-70mm F3.5-5.6 (D)',
-    41 => 'Minolta AF DT 11-18mm F4.5-5.6 (D)',
+    40 => 'Minolta/Sony AF DT 18-70mm F3.5-5.6 (D)',
+    41 => 'Minolta/Sony AF DT 11-18mm F4.5-5.6 (D)',
     42 => 'Minolta AF DT 18-200mm F3.5-6.3 (D)',
     43 => 'Minolta AF 35mm F1.4 G',
     44 => 'Minolta AF 50mm F1.4',
     45 => 'Carl Zeiss Planar T* 85mm F1.4 ZA',
     46 => 'Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA',
     47 => 'Carl Zeiss Sonnar T* 135mm F1.8 ZA',
-    51 => 'Sony - AF DT 16-105mm F3.5-5.6', #11
-    128 => 'Tamron 18-200, 28-300 or 80-300mm F3.5-6.3',
-    129 => 'Tamron 200-400mm F5.6 LD', #12
+    50 => 'Sony AF DT 18-250mm F3.5-6.3', #11
+    51 => 'Sony AF DT 16-105mm F3.5-5.6 or 55-200mm f/4-5.5', #11
+    128 => 'Tamron Lens (various models)',
+  # 128 => 'Tamron 18-200, 28-300 or 80-300mm F3.5-6.3',
+  # 128 => 'Tamron AF 28-200mm F3.8-5.6 XR Di Aspherical [IF] MACRO', (ref 16)
+    129 => 'Tamron 200-400mm F5.6 or 70-300mm f/4-5.6 LD', #12
     137 => 'Cosina 70-210mm F2.8-4 AF', #11
     138 => 'Soligor 19-35mm F3.5-4.5', #11
+    255 => 'Tamron Lens (various models)',
+  # 255 => 'Tamron SP AF 17-50mm f/2.8 XR Di II LD Aspherical',
+  # 255 => 'Tamron AF 55-200mm f/4-5.6 Di II',
+  # 255 => 'Tamron AF 70-300mm f/4-5.6 Di LD MACRO 1:2',
+  # 255 => 'Tamron SP AF 200-500mm f/5.0-6.3 Di LD IF',
+    255 => 'Tamron AF 70-300mm f/4-5.6 Di LD MACRO 1:2', #16
     25501 => 'Minolta AF 50mm F1.7', #7
     25511 => 'Minolta AF 35-70mm F4', # or Sigma UC AF 28-70mm F3.5-4.5 or Sigma M-AF 70-200mm F2.8 EX Aspherical', #/12/12
     25521 => 'Minolta AF 28-85mm F3.5-4.5 [New]',
@@ -100,22 +110,22 @@ $VERSION = '1.36';
     25581 => 'Minolta AF 24-50mm F4',
     25601 => 'Minolta AF 100-200mm F4.5',
     25611 => 'Minolta AF 75-300mm F4.5-5.6', #13 # or Sigma 70-300mm F4-5.6 or Sigma 300mm F4 APO Macro', #12/3/7
-    25621 => 'Minolta AF 50mm F1.4 [New]', #13
+    25621 => 'Minolta/Sony AF 50mm F1.4 [New]', #13
     25631 => 'Minolta AF 300mm F2.8 G',
     25641 => 'Minolta AF 50mm F2.8 Macro',
     25651 => 'Minolta AF 600mm F4',
     25661 => 'Minolta AF 24mm F2.8',
-    25721 => 'Minolta AF 500mm F8 Reflex',
+    25721 => 'Minolta/Sony AF 500mm F8 Reflex',
     25781 => 'Minolta AF 16mm F2.8 Fisheye', # or Sigma 8mm F4 Fisheye or Sigma 14mm F3.5',
     25791 => 'Minolta AF 20mm F2.8',
-    25811 => 'Minolta AF 100mm F2.8 Macro New', # or Tamron 90mm F2.8 Macro or Sigma 180mm F5.6 Macro',
+    25811 => 'Minolta/Sony AF 100mm F2.8 Macro New', # or Tamron 90mm F2.8 Macro or Sigma 180mm F5.6 Macro',
     25858 => 'Minolta AF 35-105mm F3.5-4.5 New', # or Tamron 24-135mm F3.5-5.6',
     25881 => 'Minolta AF 70-210mm F3.5-4.5',
     25891 => 'Minolta AF 80-200 F2.8 APO', # or Tokina 80-200mm F2.8',
     25911 => 'Minolta AF 35mm F1.4', #(from Sony list)
     25921 => 'Minolta AF 85mm F1.4 G (D)',
     25931 => 'Minolta AF 200mm F2.8 G APO',
-    25941 => 'Minolta AF 3X-1X F1.7-2.8 Macro',
+    25941 => 'Minolta AF 3x-1x F1.7-2.8 Macro',
     25961 => 'Minolta AF 28mm F2',
     25971 => 'Minolta AF 35mm F2',
     25981 => 'Minolta AF 100mm F2',
@@ -136,8 +146,7 @@ $VERSION = '1.36';
     26241 => 'Minolta AF 35-80mm F4-5.6 Power Zoom',
     26281 => 'Minolta AF 80-200mm F2.8 G', #11
     26291 => 'Minolta AF 85mm F1.4 New',
-    26311 => 'Minolta AF 100-300mm F4.5-5.6 APO', #11
-    # 26311 => 'Sony AF 100-300mm F4.5-5.6 APO', #11
+    26311 => 'Minolta/Sony AF 100-300mm F4.5-5.6 APO', #11
     26321 => 'Minolta AF 24-50mm F4 New',
     26381 => 'Minolta AF 50mm F2.8 Macro New',
     26391 => 'Minolta AF 100mm F2.8 Macro',
@@ -190,7 +199,7 @@ $VERSION = '1.36';
     0x0003 => {
         Name => 'MinoltaCameraSettings',
         # These camera settings are different for the DiMAGE X31
-        Condition => '$self->{CameraModel} ne "DiMAGE X31"',
+        Condition => '$self->{Model} ne "DiMAGE X31"',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::CameraSettings',
             ByteOrder => 'BigEndian',
@@ -207,7 +216,7 @@ $VERSION = '1.36';
     # but it is an 8kB binary data block!
     0x0018 => {
         Name => 'ImageStabilization',
-        Condition => '$self->{CameraModel} =~ /^DiMAGE (A1|A2|X1)$/',
+        Condition => '$self->{Model} =~ /^DiMAGE (A1|A2|X1)$/',
         Notes => q{
             a block of binary data which exists in DiMAGE A2 (and A1/X1?) images only if
             image stabilization is enabled
@@ -255,7 +264,7 @@ $VERSION = '1.36';
     0x0101 => [
         {
             Name => 'ColorMode',
-            Condition => '$self->{CameraMake} !~ /^SONY/',
+            Condition => '$self->{Make} !~ /^SONY/',
             Priority => 0, # Other ColorMode is more reliable for A2
             Writable => 'int32u',
             PrintConv => \%minoltaColorMode,
@@ -296,7 +305,7 @@ $VERSION = '1.36';
         {
             Name => 'MinoltaQuality',
             Writable => 'int32u',
-            Condition => '$self->{CameraModel} =~ /^DiMAGE (A2|7Hi)$/',
+            Condition => '$self->{Model} =~ /^DiMAGE (A2|7Hi)$/',
             Notes => 'quality for DiMAGE A2/7Hi',
             Priority => 0, # lower priority because this doesn't work for A200
             PrintConv => { #4
@@ -311,7 +320,7 @@ $VERSION = '1.36';
         { #PH
             Name => 'MinoltaImageSize',
             Writable => 'int32u',
-            Condition => '$self->{CameraModel} !~ /^DiMAGE A200$/',
+            Condition => '$self->{Model} !~ /^DiMAGE A200$/',
             Notes => 'image size for other models except A200',
             PrintConv => {
                 1 => '1600x1200',
@@ -369,7 +378,7 @@ $VERSION = '1.36';
     # 0x010e - WhiteBalance according to ref #10
     0x0113 => { #PH
         Name => 'ImageStabilization',
-        Condition => '$self->{CameraModel} eq "DSLR-A100"',
+        Condition => '$self->{Model} eq "DSLR-A100"',
         Notes => 'valid for Sony A100 only',
         Writable => 'int32u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
@@ -377,7 +386,7 @@ $VERSION = '1.36';
     0x0114 => [
         { #8
             Name => 'MinoltaCameraSettings5D',
-            Condition => '$self->{CameraModel} =~ /^(DYNAX 5D|MAXXUM 5D|ALPHA SWEET)/',
+            Condition => '$self->{Model} =~ /^(DYNAX 5D|MAXXUM 5D|ALPHA SWEET)/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Minolta::CameraSettings5D',
                 ByteOrder => 'BigEndian',
@@ -385,7 +394,7 @@ $VERSION = '1.36';
         },
         { #PH
             Name => 'MinoltaCameraSettingsA100',
-            Condition => '$self->{CameraModel} eq "DSLR-A100"',
+            Condition => '$self->{Model} eq "DSLR-A100"',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Minolta::CameraSettingsA100',
                 ByteOrder => 'BigEndian', # required because order differs for ARW and JPG images
@@ -485,7 +494,7 @@ $VERSION = '1.36';
         Name => 'MeteringMode',
         PrintConv => {
             0 => 'Multi-segment',
-            1 => 'Center weighted',
+            1 => 'Center-weighted average',
             2 => 'Spot',
         },
     },
@@ -609,15 +618,15 @@ $VERSION = '1.36';
     },
     31 => {
         Name => 'Saturation',
-        ValueConv => '$val - ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
-        ValueConvInv => '$val + ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConv => '$val - ($self->{Model}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConvInv => '$val + ($self->{Model}=~/DiMAGE A2/ ? 5 : 3)',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
         PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
     32 => {
         Name => 'Contrast',
-        ValueConv => '$val - ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
-        ValueConvInv => '$val + ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConv => '$val - ($self->{Model}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConvInv => '$val + ($self->{Model}=~/DiMAGE A2/ ? 5 : 3)',
         PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
         PrintConvInv => '$val=~/normal/i ? 0 : $val',
     },
@@ -698,8 +707,8 @@ $VERSION = '1.36';
     },
     41 => {
         Name => 'ColorFilter',
-        ValueConv => '$val - ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
-        ValueConvInv => '$val + ($self->{CameraModel}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConv => '$val - ($self->{Model}=~/DiMAGE A2/ ? 5 : 3)',
+        ValueConvInv => '$val + ($self->{Model}=~/DiMAGE A2/ ? 5 : 3)',
     },
     42 => 'BWFilter',
     43 => {
@@ -752,7 +761,7 @@ $VERSION = '1.36';
     # 7Hi only:
     51 => {
         Name => 'ColorProfile',
-        Condition => '$self->{CameraModel} eq "DiMAGE 7Hi"',
+        Condition => '$self->{Model} eq "DiMAGE 7Hi"',
         Notes => 'DiMAGE 7Hi only',
         PrintConv => {
             0 => 'Not Embedded',
@@ -762,7 +771,7 @@ $VERSION = '1.36';
     # (the following may be entry 51 for other models?)
     52 => {
         Name => 'DataImprint',
-        Condition => '$self->{CameraModel} eq "DiMAGE 7Hi"',
+        Condition => '$self->{Model} eq "DiMAGE 7Hi"',
         Notes => 'DiMAGE 7Hi only',
         PrintConv => {
             0 => 'None',
@@ -799,7 +808,7 @@ $VERSION = '1.36';
             1 => 'Aperture Priority',
             2 => 'Shutter Priority',
             3 => 'Manual',
-            4 => 'Auto?',
+            4 => 'Auto',
             5 => 'Program-shift A',
             6 => 'Program-shift S',
         },
@@ -840,8 +849,9 @@ $VERSION = '1.36';
         PrintConv => {
             0 => 'Single-shot AF',
             1 => 'Continuous AF',
-            3 => 'Automatic AF',
-            4 => 'Manual',
+            # Note: these two are reversed in ref 8
+            3 => 'Manual', #16
+            4 => 'Automatic AF', #16
         },
     },
     0x10 => {
@@ -1050,7 +1060,7 @@ $VERSION = '1.36';
         Name => 'MeteringMode',
         PrintConv => {
             0 => 'Multi-segment',
-            1 => 'Center weighted',
+            1 => 'Center-weighted average',
             2 => 'Spot',
         },
     },
@@ -1305,6 +1315,110 @@ $VERSION = '1.36';
         Name => 'ImageStabilization',
         Writable => 'int32u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+);
+
+# tags in Konica Minolta MOV videos (ref PH)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
+%Image::ExifTool::Minolta::MOV1 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        This information is found in MOV videos from some Konica Minolta models such
+        as the DiMage Z10 and X50.
+    },
+    0 => {
+        Name => 'Make',
+        Format => 'string[32]',
+    },
+    0x20 => {
+        Name => 'ModelType',
+        Format => 'string[8]',
+    },
+    # (01 00 at offset 0x28)
+    0x2e => {
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x32 => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x3a => {
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    # 0x4c => 'WhiteBalance', ?
+    0x50 => {
+        Name => 'FocalLength',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+    },
+);
+
+# tags in Minolta MOV videos (ref PH)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
+%Image::ExifTool::Minolta::MOV2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        This information is found in MOV videos from some Minolta models such as the
+        DiMAGE X and Xt.
+    },
+    0 => {
+        Name => 'Make',
+        Format => 'string[32]',
+    },
+    0x18 => {
+        Name => 'ModelType',
+        Format => 'string[8]',
+    },
+    # (01 00 at offset 0x20)
+    0x26 => {
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x2a => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x32 => {
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    # 0x44 => 'WhiteBalance', ?
+    0x48 => {
+        Name => 'FocalLength',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+    },
+);
+
+# more tags in Minolta MOV videos (ref PH)
+%Image::ExifTool::Minolta::MMA = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        This information is found in MOV videos from Minolta models such as the
+        DiMAGE A2, S414 and 7Hi.
+    },
+    0 => {
+        Name => 'Make',
+        Format => 'string[20]',
+    },
+    20 => {
+        Name => 'SoftwareVersion',
+        Format => 'string[16]',
     },
 );
 

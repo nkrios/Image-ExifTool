@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.21
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
@@ -105,24 +105,9 @@
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 7.33
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode3
 [MakerNotes, Nikon, Camera] 144 - Light Source: Colored
+[MakerNotes, Nikon, Camera] 0 - Shot Info Version: 0206
 [MakerNotes, Nikon, Camera] 146 - Hue Adjustment: 0
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
-[MakerNotes, Nikon, Camera] 154 - Sensor Pixel Size: 9.4 x 9.4 um
-[MakerNotes, Nikon, Camera] 162 - Image Data Size: 1369271
-[MakerNotes, Nikon, Camera] 165 - Image Count: 2
-[MakerNotes, Nikon, Camera] 166 - Deleted Image Count: 0
-[MakerNotes, Nikon, Camera] 167 - Shutter Count: 2
-[MakerNotes, Nikon, Camera] 0 - Flash Info Version: 0100
-[MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
-[MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
-[MakerNotes, Nikon, Camera] 10 - Flash Exposure Compensation: 0
-[MakerNotes, Nikon, Camera] 15 - Flash Group A Control Mode: Off
-[MakerNotes, Nikon, Camera] 16 - Flash Group B Control Mode: Off
-[MakerNotes, Nikon, Camera] 17 - Flash Group A Exposure Comp: 0
-[MakerNotes, Nikon, Camera] 18 - Flash Group B Exposure Comp: 0
-[MakerNotes, Nikon, Camera] 170 - Saturation: Normal
-[MakerNotes, Nikon, Camera] 177 - High ISO Noise Reduction: Normal
-[MakerNotes, Nikon, Camera] 0 - Shot Info Version: 0206
 [MakerNotes, Nikon, Camera] 0 - WB RGGB Levels: 562 256 256 537
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0201
 [MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 60.2 mm
@@ -138,12 +123,28 @@
 [MakerNotes, Nikon, Camera] 16 - Max Aperture At Max Focal: 1.8
 [MakerNotes, Nikon, Camera] 17 - MCU Version: 122
 [MakerNotes, Nikon, Camera] 18 - Effective Max Aperture: 1.8
+[MakerNotes, Nikon, Camera] 154 - Sensor Pixel Size: 9.4 x 9.4 um
+[MakerNotes, Nikon, Camera] 162 - Image Data Size: 1369271
+[MakerNotes, Nikon, Camera] 165 - Image Count: 2
+[MakerNotes, Nikon, Camera] 166 - Deleted Image Count: 0
+[MakerNotes, Nikon, Camera] 167 - Shutter Count: 2
+[MakerNotes, Nikon, Camera] 0 - Flash Info Version: 0100
+[MakerNotes, Nikon, Camera] 8 - External Flash Flags: (none)
+[MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
+[MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
+[MakerNotes, Nikon, Camera] 10 - Flash Exposure Compensation: 0
+[MakerNotes, Nikon, Camera] 15 - Flash Group A Control Mode: Off
+[MakerNotes, Nikon, Camera] 16 - Flash Group B Control Mode: Off
+[MakerNotes, Nikon, Camera] 17 - Flash Group A Exposure Comp: 0
+[MakerNotes, Nikon, Camera] 18 - Flash Group B Exposure Comp: 0
+[MakerNotes, Nikon, Camera] 170 - Saturation: Normal
+[MakerNotes, Nikon, Camera] 177 - High ISO Noise Reduction: Normal
 [Composite, Composite, Image]  - Aperture: 4.0
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - Lens ID: AF Nikkor 50mm f/1.8D
 [Composite, Composite, Camera]  - Lens: 50mm f/1.8 D
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 1.5
+[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.5
 [Composite, Composite, Image]  - Shutter Speed: 1/125
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Blue Balance: 2.097656

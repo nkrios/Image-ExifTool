@@ -549,7 +549,7 @@ sub WritePDF($$)
 
         # connect linked list of free object in our xref table
         my $prevFree = 0;
-        foreach $id (reverse sort { $a <=> $b } keys %newXRef) {
+        foreach $id (sort { $b <=> $a } keys %newXRef) { # (reverse sort)
             next unless $newXRef{$id}->[2] eq 'f';  # skip if not free
             # no need to add free entry for objects added by us
             # in previous edits then freed again
@@ -679,8 +679,8 @@ This file contains routines to write PDF metadata.
 
 When writing a PDF, exiftool does not modify the existing data.  Instead,
 the PDF file is appended with an incremental update which can easily be
-removed to revert the file.  This is done by deleting the special
-C<PDF-update> pseudo group.
+removed to revert the file (by using ExifTool to delete the special
+C<PDF-update> pseudo group).
 
 =head1 AUTHOR
 
@@ -688,6 +688,14 @@ Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 REFERENCES
+
+=over 4
+
+=item L<http://partners.adobe.com/public/developer/pdf/index_reference.html>
+
+=back
 
 =head1 SEE ALSO
 

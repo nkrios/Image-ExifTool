@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.20
 [File, File, Image]  - File Name: Casio2.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1699 bytes
@@ -65,6 +65,7 @@
 [MakerNotes, Casio, Camera] 8193 - Firmware Date: 2003:02:28 09:45
 [MakerNotes, Casio, Camera] 8209 - White Balance Bias: 87 93
 [MakerNotes, Casio, Camera] 8210 - White Balance: Unknown (13)
+[MakerNotes, Casio, Camera] 8225 - AF Point Position: 50% 50%
 [MakerNotes, Casio, Camera] 8226 - Object Distance: 1 m
 [MakerNotes, Casio, Camera] 8244 - Flash Distance: 0
 [MakerNotes, Casio, Camera] 12288 - Record Mode: Program AE
@@ -83,7 +84,7 @@
 [Composite, Composite, Image]  - Aperture: 3.9
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
-[Composite, Composite, Camera]  - Scale Factor To 35mm Equivalent: 6.1
+[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 6.1
 [Composite, Composite, Image]  - Shutter Speed: 1/80
 [Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
 [Composite, Composite, Camera]  - Circle Of Confusion: 0.005 mm

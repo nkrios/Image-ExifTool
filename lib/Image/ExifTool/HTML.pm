@@ -20,7 +20,7 @@ use Image::ExifTool::PostScript;
 use Image::ExifTool::XMP qw(EscapeXML UnescapeXML);
 require Exporter;
 
-$VERSION = '1.03';
+$VERSION = '1.05';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -271,7 +271,13 @@ my %entityName; # look up entity names by number (built as necessary)
 sub EscapeChar($)
 {
     my $ch = shift;
-    my ($val) = ($] >= 5.006001) ? unpack('U0U',$ch) : UnpackUTF8($ch);
+    my $val;
+    if ($] < 5.006001) {
+        ($val) = UnpackUTF8($ch);
+    } else {
+        # the meaning of "U0" is reversed as of Perl 5.10.0!
+        ($val) = unpack($] < 5.010000 ? 'U0U' : 'C0U', $ch);
+    }
     return '?' unless defined $val;
     return "&$entityName{$val};" if $entityName{$val};
     return sprintf('&#x%x;',$val);

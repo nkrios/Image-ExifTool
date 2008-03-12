@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.14
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.18
 [File, File, Image]  - File Name: Sony_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2008:01:23 14:06:16
+[File, File, Time]  - File Modification Date/Time: 2008:02:21 08:27:10
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel)
@@ -61,14 +61,14 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 2490
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Sony, Camera] 8192 - Sony 0x2000: 0
-[MakerNotes, Sony, Camera] 36865 - Sony 0x9001: ...mQV..V....9.9.Ju....].^...[...]
-[MakerNotes, Sony, Camera] 36866 - Sony 0x9002: .J.`.p.V!.!....0.0.V!.Pp,..0c[...]
-[MakerNotes, Sony, Camera] 36867 - Sony 0x9003: ..sF.&...B............;..utN......(.^w.[...]
-[MakerNotes, Sony, Camera] 36868 - Sony 0x9004: ..,.,.,.,................l.o.@.o..,..,..o.3.M[...]
+[MakerNotes, Sony, Camera] 36865 - Sony 0x9001: ..­mQV„ûV„û.³9°9ŠJuÿ.Å¬]è^Ž¸.[...]
+[MakerNotes, Sony, Camera] 36866 - Sony 0x9002: .JÚ`.p.V!.!¾ê¾ê0ÿ0ÿV!ˆPp,×.0c[...]
+[MakerNotes, Sony, Camera] 36867 - Sony 0x9003: .ÜsF®&.¡ÒB.¯.....È..ûÙ;›Õ.utN½½½½½½(¶^w’[...]
+[MakerNotes, Sony, Camera] 36868 - Sony 0x9004: ..,.,.,.,.ô.ô.ô.ô.ô.ô.ô.ôlêoÄ@.o”.,‚.,Ï.o‰3úM[...]
 [MakerNotes, Sony, Camera] 36869 - Sony 0x9005: ..@o........}[...]
-[MakerNotes, Sony, Camera] 36870 - Sony 0x9006: ....r...{...n..GeG....`z.[...]
-[MakerNotes, Sony, Camera] 36871 - Sony 0x9007: ..;.|.c.f.V......b......^O[...]
-[MakerNotes, Sony, Camera] 36872 - Sony 0x9008: ...........i....@..]:......;..;....H[...]
+[MakerNotes, Sony, Camera] 36870 - Sony 0x9006: .ð™ârï‘.{.•ân‡öGeG‘š‘`zâ[...]
+[MakerNotes, Sony, Camera] 36871 - Sony 0x9007: .ç;.|.cçf.VØÌ£.üêbêØ.ßç¶^O[...]
+[MakerNotes, Sony, Camera] 36872 - Sony 0x9008: ..ªø..¼·’.³ôi.Þ.Ð@÷.]:þïó•±ö;Žî;ä‚.ÕH[...]
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000000
 [XMP, XMP-exif, Camera] FlashFired - Flash Fired: True

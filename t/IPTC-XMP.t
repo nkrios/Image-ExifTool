@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..23\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..26\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -244,5 +244,43 @@ my $testnum = 1;
         $exifTool->Options(PrintConv => 0);
     }
 }
+
+# test 24: Delete all tags except two specific XMP family 1 groups
+{
+    ++$testnum;
+    my @writeInfo = (
+        [ 'all' => undef ],
+        [ 'xmp-dc:all'  => undef, Replace => 2 ],
+        [ 'xmp-xmp:all' => undef, Replace => 2 ],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/XMP.xmp', ['XMP:all']);
+    print "ok $testnum\n";
+}
+
+# test 25: Delete all tags except XMP
+{
+    ++$testnum;
+    my @writeInfo = (
+        [ 'all' => undef ],
+        [ 'xmp:all' => undef, Replace => 2 ],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/IPTC-XMP.jpg', ['-file:all']);
+    print "ok $testnum\n";
+}
+
+# test 26: Test IPTC special characters
+{
+    ++$testnum;
+    my @writeInfo = (
+        ['IPTC:CopyrightNotice' => "\xc2\xa9 2008 Phil Harvey"],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/Writer.jpg', 1);
+    print "ok $testnum\n";
+}
+
+
 
 # end
