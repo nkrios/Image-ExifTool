@@ -34,7 +34,7 @@ sub SourceFile($);
 sub OpenOutputFile($);
 sub AcceptFile($);
 sub SlurpFile($$);
-sub PrintTagList(@);
+sub PrintTagList($@);
 sub PrintErrors($$$);
 
 # do cleanup on Ctrl-C
@@ -246,26 +246,20 @@ while ($_ = shift) {
                     shift;
                     $group =~ /IFD/i and warn("Can't list tags for specific IFD\n"), next;
                 }
-                print $wr ? 'Writable' : 'Available', $group ? " $group" : '', " tags:\n";
-                PrintTagList($wr ? GetWritableTags($group) : GetAllTags($group));
+                my $msg = ($wr ? 'Writable' : 'Available') . ($group ? " $group" : '') . ' tags';
+                PrintTagList($msg, $wr ? GetWritableTags($group) : GetAllTags($group));
                 # also print shortcuts if listing all tags
                 next if $group or $wr;
                 my @tagList = GetShortcuts();
-                if (@tagList) {
-                    print "Command-line shortcuts:\n";
-                    PrintTagList(@tagList);
-                }
+                PrintTagList('Command-line shortcuts', @tagList) if @tagList;
             } elsif ($1 eq 'f') {
-                print "Recognized file extensions:\n";
-                PrintTagList(GetFileType());
+                PrintTagList('Recognized file extensions', GetFileType());
             } elsif ($1 eq 'd') {
-                print "Deletable groups:\n";
-                PrintTagList(GetDeleteGroups());
+                PrintTagList('Deletable groups', GetDeleteGroups());
             } else { # 'g(\d*)'
                 # list all groups in specified family
                 my $family = $2 || 0;
-                print "Groups in family $family:\n";
-                PrintTagList(GetAllGroups($family));
+                PrintTagList("Groups in family $family", GetAllGroups($family));
             }
             next;
         }
@@ -1405,13 +1399,13 @@ sub FilenameSPrintf($;$)
     while ($fmt =~ /(%([-+]?)(\d*)\.?(\d*)([lu]?)([dfe]))/g) {
         $filename .= substr($fmt, $pos, pos($fmt) - $pos - length($1));
         $pos = pos($fmt);
-        my ($sign, $wid, $skip, $case, $code) = ($2, $3, $4 || 0, $5, $6);
+        my ($sign, $wid, $skip, $mod, $code) = ($2, $3, $4 || 0, $5, $6);
         my $len = length $part{$code};
         next unless $skip < $len;
         $wid = $len - $skip if $wid eq '' or $wid + $skip > $len;
         $skip = $len - $wid - $skip if $sign eq '-';
         my $part = substr($part{$code}, $skip, $wid);
-        $part = ($case eq 'u') ? uc($part) : lc($part) if $case;
+        $part = ($mod eq 'u') ? uc($part) : lc($part) if $mod;
         $filename .= $part;
     }
     $filename .= substr($fmt, $pos); # add rest of file name
@@ -1426,26 +1420,27 @@ sub FilenameSPrintf($;$)
 sub NextUnusedFilename($;$)
 {
     my ($fmt, $okfile) = @_;
-    return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*[lu]?c/;
+    return $fmt unless $fmt =~ /%[-+]?\d*\.?\d*[lun]?c/;
     my %sep = ( '-' => '-', '+' => '_' );
     my ($copy, $alpha) = (0, 'a');
     for (;;) {
         my ($filename, $pos) = ('', 0);
-        while ($fmt =~ /(%([-+]?)(\d*)(\.?)(\d*)([lu]?)c)/g) {
+        while ($fmt =~ /(%([-+]?)(\d*)(\.?)(\d*)([lun]?)c)/g) {
             $filename .= substr($fmt, $pos, pos($fmt) - $pos - length($1));
             $pos = pos($fmt);
-            my ($sign, $wid, $dec, $wid2, $case) = ($2, $3 || 0, $4, $5 || 0, $6);
+            my ($sign, $wid, $dec, $wid2, $mod) = ($2, $3 || 0, $4, $5 || 0, $6);
             next unless $dec or $copy;
             # add dash or underline separator if '-' or '+' specified
             $filename .= $sep{$sign} if $sign;
             $wid = $wid2 if $wid < $wid2;
-            if ($case) {
+            if ($mod and $mod ne 'n') {
                 my $str = ($wid and $wid > length $alpha) ? 'a' x ($wid - length($alpha)) : '';
                 $str .= $alpha;
-                $str = uc $str if $case eq 'u';
+                $str = uc $str if $mod eq 'u';
                 $filename .= $str;
             } else {
-                $filename .= $wid ? sprintf("%.${wid}d",$copy) : $copy;
+                my $num = $copy + ($mod ? 1 : 0);
+                $filename .= $wid ? sprintf("%.${wid}d",$num) : $num;
             }
         }
         $filename .= substr($fmt, $pos); # add rest of file name
@@ -1494,7 +1489,7 @@ sub OpenOutputFile($)
     my ($fp, $outfile);
     if ($outputExt) {
         ($outfile = $file) =~ tr/\\/\//;
-        if ($outputExt =~ /%[-+]?\d*\.?\d*[lu]?[dfec]/) {
+        if ($outputExt =~ /%[-+]?\d*\.?\d*[lun]?[dfec]/) {
             # make filename from printf-like $outputExt
             $outfile = FilenameSPrintf($outputExt, $file);
             return () unless defined $outfile;
@@ -1550,12 +1545,13 @@ sub SlurpFile($$)
 
 #------------------------------------------------------------------------------
 # Print list of tags
-# Inputs: 0) Reference to hash whose keys are the tags to print
-sub PrintTagList(@)
+# Inputs: 0) message, 1-N) list of tag names
+sub PrintTagList($@)
 {
+    my $msg = shift;
+    print $msg, ":\n ";
     my $len = 1;
     my $tag;
-    print ' ';
     foreach $tag (@_) {
         my $taglen = length($tag);
         if ($len + $taglen > 78) {
@@ -1634,32 +1630,33 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       ITC   r       PNG   r/w    |  EXIF           r/w/c
-  ACR   r       JNG   r/w     PPM   r/w    |  GPS            r/w/c
-  AI    r       JP2   r/w     PPT   r      |  IPTC           r/w/c
-  AIFF  r       JPEG  r/w     PS    r/w    |  XMP            r/w/c
-  APE   r       K25   r       PSD   r/w    |  MakerNotes     r/w/c
-  ARW   r       KDC   r       QTIF  r      |  Photoshop IRB  r/w/c
-  ASF   r       M4A   r       RA    r      |  ICC Profile    r/w/c
-  AVI   r       MEF   r/w     RAF   r/w    |  MIE            r/w/c
-  BMP   r       MIE   r/w/c   RAM   r      |  JFIF           r/w/c
-  BTF   r       MIFF  r       RAW   r/w    |  Ducky APP12    r/w/c
-  CR2   r/w     MNG   r/w     RIFF  r      |  CIFF           r/w
-  CRW   r/w     MOS   r/w     RM    r      |  AFCP           r/w
-  CS1   r/w     MOV   r       SR2   r      |  JPEG 2000      r
-  DCM   r       MP3   r       SRF   r      |  DICOM          r
+  3FR   r       ITC   r       PPM   r/w    |  EXIF           r/w/c
+  ACR   r       JNG   r/w     PPT   r      |  GPS            r/w/c
+  AI    r       JP2   r/w     PS    r/w    |  IPTC           r/w/c
+  AIFF  r       JPEG  r/w     PSD   r/w    |  XMP            r/w/c
+  APE   r       K25   r       QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       KDC   r       RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       M4A   r       RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       MEF   r/w     RAM   r      |  MIE            r/w/c
+  BMP   r       MIE   r/w/c   RAW   r/w    |  JFIF           r/w/c
+  BTF   r       MIFF  r       RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MNG   r/w     RM    r      |  CIFF           r/w
+  CRW   r/w     MOS   r/w     SR2   r      |  AFCP           r/w
+  CS1   r/w     MOV   r       SRF   r      |  JPEG 2000      r
+  DCM   r       MP3   r       SVG   r      |  DICOM          r
   DCR   r       MP4   r       SWF   r      |  Flash          r
-  DNG   r/w     MPC   r       THM   r/w    |  FlashPix       r
-  DOC   r       MPG   r       TIFF  r/w    |  GeoTIFF        r
-  EPS   r/w     MRW   r/w     VRD   r/w/c  |  PrintIM        r
-  ERF   r/w     NEF   r/w     WAV   r      |  ID3            r
-  FLAC  r       OGG   r       WDP   r/w    |  Kodak Meta     r
-  FLV   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
-  FPX   r       PBM   r/w     WMV   r      |  Picture Info   r
-  GIF   r/w     PDF   r/w     X3F   r      |  Adobe APP14    r
-  HDP   r/w     PEF   r/w     XLS   r      |  APE            r
-  HTML  r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
-  ICC   r/w/c   PICT  r                    |  (and more)
+  DIVX  r       MPC   r       THM   r/w    |  FlashPix       r
+  DNG   r/w     MPG   r       TIFF  r/w    |  QuickTime      r
+  DOC   r       MRW   r/w     VRD   r/w/c  |  GeoTIFF        r
+  EPS   r/w     NEF   r/w     WAV   r      |  PrintIM        r
+  ERF   r/w     OGG   r       WDP   r/w    |  ID3            r
+  FLAC  r       ORF   r/w     WMA   r      |  Kodak Meta     r
+  FLV   r       PBM   r/w     WMV   r      |  Ricoh RMETA    r
+  FPX   r       PDF   r/w     X3F   r      |  Picture Info   r
+  GIF   r/w     PEF   r/w     XLS   r      |  Adobe APP14    r
+  HDP   r/w     PGM   r/w     XMP   r/w/c  |  APE            r
+  HTML  r       PICT  r                    |  Vorbis         r
+  ICC   r/w/c   PNG   r/w                  |  (and more)
 
 Note:  If I<FILE> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are written.
@@ -1692,12 +1689,18 @@ if used on the command line to prevent shell globbing.)
 
 If no tags are specified, all available information is extracted.
 
+Note:  Descriptions, not tag names, are shown by default when extracting
+information.  Use the B<-s> option to see the tag names instead.
+
 =item B<-->I<TAG>
 
 Exclude specified tag from extracted information.  Same as the B<-x> option.
 May also be used following a B<-TagsFromFile> option to exclude tags from
 being copied, or to exclude groups from being deleted when deleting all
 information (ie. C<-all= --exif:all> deletes all but EXIF information).
+
+Note that this will not exclude individual tags from a group delete.
+Instead, the tags must be recovered using the B<-TagsFromFile> option.
 
 =item B<->I<TAG>[+-]B<=>[I<VALUE>]
 
@@ -1808,7 +1811,7 @@ Process only files with (B<-ext>) or without (B<--ext>) a specified
 extension.  There may be multiple B<-ext> and B<--ext> options.  Extensions may
 begin with a leading '.', and case is not significant.  For example:
 
-    exiftool -ext .JPG DIR            # process only JPG files in
+    exiftool -ext .JPG DIR            # process only JPG files
     exiftool --ext crw --ext dng DIR  # process all but CRW and DNG
     exiftool --ext . DIR              # ignore if no extension
 
@@ -2209,13 +2212,15 @@ adding a decimal point to the modifier.  For example:
     -w C%.c.txt       # C0.txt, C1.txt, C2.txt ...
     -w D%-.c.txt      # D-0.txt, D-1.txt, D-2.txt ...
     -w E%-.4c.txt     # E-0000.txt, E-0001.txt, E-0002.txt ...
-    -w F%+c.txt       # F.txt, F_1.txt F_2.txt ...
-    -w G%-lc.txt      # G.txt, G-b.txt, G-c.txt ...
+    -w F%-.4nc.txt    # F-0001.txt, F-0002.txt, F-0003.txt ...
+    -w G%+c.txt       # G.txt, G_1.txt G_2.txt ...
+    -w H%-lc.txt      # H.txt, H-b.txt, H-c.txt ...
 
-All format codes may also be modified by 'l' or 'u' to specify lower or
-upper case respectively (ie. "%le" for a lower case file extension).  When
-used to modify the copy number, the numbers are changed to an alphabetical
-base (ie. as with "%lc" in the last example above).
+All format codes may be modified by 'l' or 'u' to specify lower or upper
+case respectively (ie. "%le" for a lower case file extension).  When used to
+modify the copy number (%c), the numbers are changed to an alphabetical base
+(see example H above).  Also, %c may be modified by 'n' to count using
+natural numbers starting from 1, instead of 0 (see example F).
 
 This same I<FMT> syntax is used with the B<-o> and B<-TagsFromFile> options,
 although %c is only valid for output file names.

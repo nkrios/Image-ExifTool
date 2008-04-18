@@ -30,8 +30,8 @@
 #              16) Axel Kellner private communication (K10D)
 #              17) Cvetan Ivanov private communication (K100D)
 #              18) http://www.gvsoft.homedns.org/exif/makernote-pentax-type3.html
-#              19) Jens Duttke private communication
-#              20) Dave Nicholson private communication (K10D)
+#              19) Dave Nicholson private communication (K10D)
+#              JD) Jens Duttke private communication
 #
 # Notes:        See POD documentation at the bottom of this file
 #------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '1.75';
+$VERSION = '1.79';
 
 sub CryptShutterCount($$);
 
@@ -71,10 +71,10 @@ my %pentaxLensType = (
     '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or SIGMA or Tokina',
     # or '3 25' => SIGMA AF 28-300 F3.5-5.6 DL IF', #11
     # or '3 25' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
-    # or '3 25' => 'SIGMA 55-200mm F4-5.6 DC', #19
+    # or '3 25' => 'SIGMA 55-200mm F4-5.6 DC', #JD
     '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
     '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5',
-    # or '3 27' => 'Tokina AT-X Pro AF 28-70mm F2.6-2.8', #19
+    # or '3 27' => 'Tokina AT-X Pro AF 28-70mm F2.6-2.8', #JD
     '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5',
     # or '3 28' => 'Tokina 19-35mm F3.5-4.5 AF', #12
     '3 29' => 'PENTAX-F 28-80mm F3.5-4.5 or SIGMA AF 18-125mm F3.5-5.6 DC', #11 (sigma)
@@ -92,13 +92,13 @@ my %pentaxLensType = (
     '3 41' => 'smc PENTAX-F MACRO 50mm F2.8 or Sigma 50mm F2,8 MACRO', #4,16
     #'3 44' => 'SIGMA 17-70mm F2.8-4.5 DC MACRO', (Bart Hickman)
     #'3 44' => 'SIGMA 18-50mm F3.5-5.6 DC, 12-24mm F4.5 EX DG or Tamron 35-90mm F4 AF', #4,12,12
-    #'3 44' => 'SIGMA AF 10-20mm F4-5.6 EX DC', #19
-    '3 44' => 'Tamron 35-90mm F4 AF or various SIGMA models', #4,12,Bart,19
-    '3 46' => 'SIGMA APO 70-200mm F2.8 EX',
+    #'3 44' => 'SIGMA AF 10-20mm F4-5.6 EX DC', #JD
+    '3 44' => 'Tamron 35-90mm F4 AF or various SIGMA models', #4,12,Bart,JD
+    '3 46' => 'SIGMA APO 70-200mm F2.8 EX or EX APO 100-300mm F4 IF', #JD(100-300)
     '3 50' => 'smc PENTAX-FA 28-70mm F4 AL',
     '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
     '3 52' => 'smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF]',
-    # or '3 52' => 'Tamron AF LD 28-200mm F3.8-5.6 (IF) Aspherical (171D), #19
+    # or '3 52' => 'Tamron AF LD 28-200mm F3.8-5.6 (IF) Aspherical (171D), #JD
     '3 53' => 'smc PENTAX-FA 28-80mm F3.5-5.6 AL',
     '3 247' => 'smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]',
     '3 248' => 'smc PENTAX-DA 12-24mm F4 ED AL[IF]',
@@ -112,7 +112,7 @@ my %pentaxLensType = (
     # '3 255' => 'SIGMA DL-II 35-80mm F4-5.6', #12
     # '3 255' => 'SIGMA DL Zoom 75-300mm F4-5.6', #12
     # '3 255' => 'SIGMA DF EX Aspherical 28-70mm F2.8', #12
-    # '3 255' => 'SIGMA AF Tele 400mm F5.6 Multi-coated', #19
+    # '3 255' => 'SIGMA AF Tele 400mm F5.6 Multi-coated', #JD
     '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
     '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
     '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
@@ -127,12 +127,12 @@ my %pentaxLensType = (
     '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
     '4 25' => 'TAMRON SP AF 14mm F2.8', #13
     '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
-    '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF] MACRO (285D)',
+    '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF] MACRO (185D/285D)',
     '4 28' => 'smc PENTAX-FA 35mm F2 AL',
-    '4 29' => 'TAMRON AF 28-200mm F/3.8-5.6 LD Super II MACRO (371D)', #19
+    '4 29' => 'TAMRON AF 28-200mm F/3.8-5.6 LD Super II MACRO (371D)', #JD
     '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
     '4 35' => 'smc PENTAX-FA 100-300mm F4.7-5.8',
-    '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO', # both 572D and A17 (Di) - ref 19
+    '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO', # both 572D and A17 (Di) - ref JD
     '4 37' => 'TAMRON SP AF 24-135mm F3.5-5.6 AD AL (190D)', #13
     '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
     '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
@@ -145,10 +145,11 @@ my %pentaxLensType = (
     '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
     '4 51' => 'smc PENTAX-D FA 50mm F2.8 MACRO',
     '4 52' => 'smc PENTAX-D FA 100mm F2.8 MACRO',
+    '4 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #JD
     '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
     '4 245' => 'Schneider D-XENON 50-200mm', #15
     '4 246' => 'Schneider D-XENON 18-55mm', #15
-    '4 247' => 'smc PENTAX-DA 10-17mm F3.5-4.5 ED [IF] Fisheye zoom', #10
+    '4 247' => 'smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]', #10
     '4 248' => 'smc PENTAX-DA 12-24mm F4 ED AL [IF]', #10
     '4 249' => 'TAMRON XR DiII 18-200mm F3.5-6.3 (A14)',
     '4 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED', #8
@@ -185,18 +186,19 @@ my %pentaxLensType = (
     '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
-    '7 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #19
-    '7 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #19
-    '7 233' => 'smc PENTAX-DA 35mm F2.8 Macro Limited', #19
+    '7 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
+    '7 230' => 'Tamron AF 17-50mm F2.8 XR Di-II LD (Model A16)', #JD
+    '7 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #JD
+    '7 233' => 'smc PENTAX-DA 35mm F2.8 Macro Limited', #JD
     '7 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM (SDM unused)', #PH (NC)
-    '7 238' => 'TAMRON AF 18-250mm F3.5-6.3 Di II LD Aspherical [IF] MACRO', #19
+    '7 238' => 'TAMRON AF 18-250mm F3.5-6.3 Di II LD Aspherical [IF] MACRO', #JD
     '7 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM (SDM unused)', #PH
-    '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #20
+    '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
-    '8 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM', #19
-    '8 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM', #19
-    '8 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM', #19
+    '8 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM', #JD
+    '8 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM', #JD
+    '8 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM', #JD
 );
 
 # Pentax model ID codes - PH
@@ -241,7 +243,7 @@ my %pentaxModelID = (
     0x12b80 => 'Samsung GX-1L',
     0x12b9c => 'K100D',
     0x12b9d => 'K110D',
-    0x12ba2 => 'K100D Super', #19
+    0x12ba2 => 'K100D Super', #JD
     0x12bb0 => 'Optio T10/T20',
     0x12be2 => 'Optio W10',
     0x12bf6 => 'Optio M10',
@@ -377,6 +379,13 @@ my %convertMeteringSegments = (
     ) },
 );
 
+# lens code conversions
+my %lensCode = (
+    Unknown => 1,
+    PrintConv => 'sprintf("0x%.2x", $val)',
+    PrintConvInv => 'hex($val)',
+);
+
 # Pentax makernote tags
 %Image::ExifTool::Pentax::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -459,6 +468,7 @@ my %convertMeteringSegments = (
             2 => 'Best',
             3 => 'TIFF', #5
             4 => 'RAW', #5
+            5 => 'Premium', #PH (K20D)
         },
     },
     0x0009 => { #3
@@ -501,6 +511,7 @@ my %convertMeteringSegments = (
         Notes => '1 or 2 values',
         PrintConv => [{
             0 => 'Program', #PH
+            1 => 'Shutter Speed Priority', #JD
             2 => 'Program AE', #13
             3 => 'Manual', #13
             5 => 'Portrait',
@@ -543,23 +554,25 @@ my %convertMeteringSegments = (
         PrintConv => [{
             0x000 => 'Auto, Did not fire',
             0x001 => 'Off',
-            0x002 => 'On, Did not fire', #20
+            0x002 => 'On, Did not fire', #19
             0x003 => 'Auto, Did not fire, Red-eye reduction',
             0x100 => 'Auto, Fired',
             0x102 => 'On',
             0x103 => 'Auto, Fired, Red-eye reduction',
             0x104 => 'On, Red-eye reduction',
-            0x105 => 'On, Wireless (Master)', #20
-            0x106 => 'On, Wireless (Control)', #20
+            0x105 => 'On, Wireless (Master)', #19
+            0x106 => 'On, Wireless (Control)', #19
             0x108 => 'On, Soft',
             0x109 => 'On, Slow-sync',
             0x10a => 'On, Slow-sync, Red-eye reduction',
             0x10b => 'On, Trailing-curtain Sync',
-        },{ #20 (AF-540FGZ flash)
+        },{ #19 (AF-540FGZ flash)
             0x03f => 'Internal',
             0x100 => 'External, Auto',
+            0x23f => 'External, Flash Problem', #JD
             0x300 => 'External, Manual',
             0x304 => 'External, P-TTL Auto',
+            0x305 => 'External, Contrast-control Sync', #JD
             0x306 => 'External, High-speed Sync',
             0x30c => 'External, Wireless',
             0x30d => 'External, Wireless, High-speed Sync',
@@ -567,8 +580,8 @@ my %convertMeteringSegments = (
     },
     0x000d => [ #2
         {
-            Condition => '$self->{Make} =~ /^PENTAX/',
             Name => 'FocusMode',
+            Condition => '$self->{Make} =~ /^PENTAX/',
             Notes => 'Pentax models',
             Writable => 'int16u',
             PrintConv => { #PH
@@ -576,6 +589,7 @@ my %convertMeteringSegments = (
                 1 => 'Macro',
                 2 => 'Infinity',
                 3 => 'Manual',
+                4 => 'Super Macro', #JD
                 5 => 'Pan Focus',
                 16 => 'AF-S', #17
                 17 => 'AF-C', #17
@@ -599,6 +613,8 @@ my %convertMeteringSegments = (
         PrintConv => {
             0xffff => 'Auto',
             0xfffe => 'Fixed Center',
+            0xfffd => 'Automatic Tracking AF', #JD
+            0xfffc => 'Face Recognition AF', #JD
             1 => 'Upper-left',
             2 => 'Top',
             3 => 'Upper-right',
@@ -641,7 +657,7 @@ my %convertMeteringSegments = (
         Priority => 0,
         ValueConv => '$val * 1e-5',
         ValueConvInv => '$val * 1e5',
-        # value may be 0xffffffff in Bulb mode (ref 19)
+        # value may be 0xffffffff in Bulb mode (ref JD)
         PrintConv => '$val > 42949 ? "Unknown (Bulb)" : Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => '$val=~/(unknown|bulb)/i ? $val : eval $val',
     },
@@ -679,6 +695,9 @@ my %convertMeteringSegments = (
             19 => 2000, #PH (NC)
             20 => 2500, #PH (NC)
             21 => 3200, #(NC)
+            22 => 4000, #(NC)
+            23 => 5000, #(NC)
+            24 => 6400, #PH (K20D)
             50 => 50, #PH
             100 => 100, #PH
             200 => 200, #PH
@@ -688,15 +707,15 @@ my %convertMeteringSegments = (
             3200 => 3200, #PH
             258 => 50, #PH (NC)
             259 => 70, #PH (NC)
-            260 => 100, #20
-            261 => 140, #20
-            262 => 200, #20
-            263 => 280, #20
-            264 => 400, #20
-            265 => 560, #20
-            266 => 800, #20
-            267 => 1100, #20
-            268 => 1600, #20
+            260 => 100, #19
+            261 => 140, #19
+            262 => 200, #19
+            263 => 280, #19
+            264 => 400, #19
+            265 => 560, #19
+            266 => 800, #19
+            267 => 1100, #19
+            268 => 1600, #19
             269 => 2200, #PH (NC)
             270 => 3200, #PH (NC)
         },
@@ -716,7 +735,7 @@ my %convertMeteringSegments = (
         Writable => 'int16u',
         ValueConv => '($val - 50) / 10',
         ValueConvInv => 'int($val * 10 + 50.5)',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
         PrintConvInv => 'eval $val',
     },
     0x0017 => { #3
@@ -799,7 +818,7 @@ my %convertMeteringSegments = (
             2 => 'Auto (Shade)',
             3 => 'Auto (Flash)',
             4 => 'Auto (Tungsten)',
-            6 => 'Auto (DaylightFluorescent)', #20 (NC)
+            6 => 'Auto (DaylightFluorescent)', #19 (NC)
             7 => 'Auto (DaywhiteFluorescent)', #17 (K100D guess)
             8 => 'Auto (WhiteFluorescent)', #17 (K100D guess)
             10 => 'Auto (Cloudy)', #17 (K100D guess)
@@ -866,7 +885,9 @@ my %convertMeteringSegments = (
             4 => 'Med High', #2
             5 => 'Very Low', #(NC)
             6 => 'Very High', #(NC)
+            65535 => 'None', #PH (Monochrome)
         }],
+        # (the K20D supports -4 to +4 -- this needs decoding)
     },
     0x0020 => {
         Name => 'Contrast',
@@ -985,8 +1006,10 @@ my %convertMeteringSegments = (
         Relist => [ [0, 1], 2 ], # join values 0 and 1 for PrintConv
         PrintConv => [{
             # Program dial modes (from K110D)
-            '0 0'  => 'Program',
-            '0 3'  => 'MTF Program (0 3)', #20 (K10D, custom settings: Program Line 4, e-dial in Program 4)
+            '0 0'  => 'Program',    # (also on K10D, custom settings: Program Line 1, e-dial in Program 3, 4 or 5)
+            '0 1'  => 'Hi-speed Program', #19 (K10D, custom settings: Program Line 2, e-dial in Program 3, 4 or 5)
+            '0 2'  => 'DOF Program', #19      (K10D, custom settings: Program Line 3, e-dial in Program 3, 4 or 5)
+            '0 3'  => 'MTF Program', #19      (K10D, custom settings: Program Line 4, e-dial in Program 3, 4 or 5)
             '0 4'  => 'Standard', #13
             '0 5'  => 'Portrait',
             '0 6'  => 'Landscape',
@@ -1010,15 +1033,15 @@ my %convertMeteringSegments = (
             '1 7'  => 'Auto PICT (Macro)', #13
             '1 8'  => 'Auto PICT (Sport)', #13
             # *istD modes (ref 7)
-            '2 0'  => 'Program AE', #13
-            '2 1'  => 'Hi-speed Program',
-            '2 2'  => 'DOF Program',
-            '2 3'  => 'MTF Program',
+            '2 0'  => 'Program (HyP)', #13
+            '2 1'  => 'Hi-speed Program (HyP)', #19 (K10D, custom settings: Program Line 2, e-dial in Program 1, 2)
+            '2 2'  => 'DOF Program (HyP)', #19      (K10D, custom settings: Program Line 3, e-dial in Program 1, 2)
+            '2 3'  => 'MTF Program (HyP)', #19      (K10D, custom settings: Program Line 4, e-dial in Program 1, 2)
             '3 0'  => 'Green Mode', #16
             '4 0'  => 'Shutter Speed Priority',
             '5 0'  => 'Aperture Priority',
             '6 0'  => 'Program Tv Shift',
-            '7 0'  => 'Program Av Shift', #20
+            '7 0'  => 'Program Av Shift', #19
             '8 0'  => 'Manual',
             '9 0'  => 'Bulb',
             '10 0' => 'Aperture Priority, Off-Auto-Aperture',
@@ -1029,7 +1052,7 @@ my %convertMeteringSegments = (
             '15 0' => 'Sensitivity Priority AE',
             '16 0' => 'Flash X-Sync Speed AE',
         },{
-            # EV step size (ref 20)
+            # EV step size (ref 19)
             0 => '1/2 EV steps',
             1 => '1/3 EV steps',
         }],
@@ -1042,15 +1065,16 @@ my %convertMeteringSegments = (
             0 => 'Single-frame',
             1 => 'Continuous',
             2 => 'Continuous (Hi)', #PH (NC) (K200D)
-            # (K20D also has new Burst and Interval modes that need decoding)
+            3 => 'Burst', #PH (K20D)
+            # (K20D also has an Interval mode that needs decoding)
         },{
             0 => 'No Timer',
             1 => 'Self-timer (12 s)',
             2 => 'Self-timer (2 s)',
         },{
             0 => 'Shutter Button', # (also computer remote control - PH)
-            1 => 'Remote Control (3 s delay)', #20
-            2 => 'Remote Control', #20
+            1 => 'Remote Control (3 s delay)', #19
+            2 => 'Remote Control', #19
         },{
             0 => 'Single Exposure',
             1 => 'Multiple Exposure',
@@ -1125,7 +1149,7 @@ my %convertMeteringSegments = (
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
         PrintConvInv => '$val',
     },
-    0x0041 => { #20
+    0x0041 => { #19
         Name => 'ImageProcessingCount',
         Writable => 'int16u',
     },
@@ -1135,7 +1159,7 @@ my %convertMeteringSegments = (
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?c$//i; $val',
     },
-    0x0048 => { #20
+    0x0048 => { #19
         Name => 'AELock',
         Writable => 'int16u',
         PrintConv => {
@@ -1154,7 +1178,7 @@ my %convertMeteringSegments = (
         ValueConv => '$val / 256',
         ValueConvInv => 'int($val * 256 + ($val > 0 ? 0.5 : -0.5))',
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
-        PrintConvInv => '$val',
+        PrintConvInv => 'eval $val',
     },
     0x004f => { #PH
         Name => 'ImageTone', # (Called CustomImageMode in K20D manual)
@@ -1164,7 +1188,8 @@ my %convertMeteringSegments = (
             1 => 'Bright',
             2 => 'Portrait', # K20D/K200D
             3 => 'Landscape', # K20D
-            # (also Vibrant and B&W not yet decoded for K20D)
+            4 => 'Vibrant', # K20D
+            5 => 'Monochrome', # K20D
         },
     },
     0x0050 => { #PH
@@ -1182,9 +1207,9 @@ my %convertMeteringSegments = (
             TagTable => 'Image::ExifTool::Pentax::SRInfo',
         },
     },
-    0x005d => { #19/PH
+    0x005d => { #JD/PH
         # (used by all Pentax DSLR's except *istD and *istDS until firmware 2.0 - PH)
-        # Observed values for the first shot of a new K10D are:  81 [PH], 181 [20],
+        # Observed values for the first shot of a new K10D are:  81 [PH], 181 [19],
         # 246 [7], and 209 [18 (one of the first 20 shots)], so there must be a number
         # of test images shot in the factory.
         # This count includes shutter actuations even if they don't result in a
@@ -1202,13 +1227,34 @@ my %convertMeteringSegments = (
         ValueConvInv => '$val',
     },
     # 0x0062: int16u - values: 1 for K10D/K200D, 3 for K20D (K10D,K20D,K200D)
-    # 0x0067: int16u - values: 1 (K20D,K200D) - PH
+    # 0x0067: int16u - values: 1 [and 65535 in Monochrome] (K20D,K200D) - PH
     # 0x0068: int8u  - values: 1 (K20D,K200D) - PH
-    # 0x0069: undef[4] - values: "\0\0\0\0", "\x01\0\0\0" (K20D,K200D) - PH
+    0x0069 => { #PH (K20D)
+        Name => 'DynamicRangeExpansion',
+        Writable => 'undef',
+        Format => 'int8u',
+        Count => 4,
+        PrintConv => {
+            '0 0 0 0' => 'Off',
+            '1 0 0 0' => 'On',
+        },
+    },
     # 0x0070: in8u   - values: 0, 1 (K20D,K200D) - PH
-    # 0x0071: in8u   - values: 0 (K20D,K200D) - PH
-    # 0x0072: int16s - values: 0 (K20D,K200D) - PH
-    # 0x0073,0x0074: int16u - values: 65535 (K20D,K200D) - PH
+    0x0071 => { #PH (K20D)
+        Name => 'HighISONoiseReduction',
+        Format => 'int8u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Weakest',
+            2 => 'Weak',
+            3 => 'Strong',
+        },
+    },
+    0x0072 => { #JD (K20D)
+        Name => 'AFAdjustment',
+        Writable => 'int16s',
+    },
+    # 0x0073,0x0074: int16u - values: 65535 [and 0,4,8 in Monochrome] (K20D,K200D) - PH
     0x0200 => { #5
         Name => 'BlackPoint',
         Writable => 'int16u',
@@ -1224,7 +1270,7 @@ my %convertMeteringSegments = (
         Count => 4,
     },
     # 0x0202: int16u[4] - values: all 0's in all my samples
-    0x0203 => { #19 (not really sure what these mean)
+    0x0203 => { #JD (not really sure what these mean)
         Name => 'ColorMatrixA',
         Writable => 'int16s',
         Count => 9,
@@ -1233,7 +1279,7 @@ my %convertMeteringSegments = (
         PrintConv => 'join(" ",map({sprintf("%.5f",$_)} split(" ",$val)))',
         PrintConvInv => '"$val"',
     },
-    0x0204 => { #19
+    0x0204 => { #JD
         Name => 'ColorMatrixB',
         Writable => 'int16s',
         Count => 9,
@@ -1242,7 +1288,7 @@ my %convertMeteringSegments = (
         PrintConv => 'join(" ",map({sprintf("%.5f",$_)} split(" ",$val)))',
         PrintConvInv => '"$val"',
     },
-    0x0205 => { #20
+    0x0205 => { #19
         Name => 'CameraSettings',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::CameraSettings',
@@ -1254,12 +1300,27 @@ my %convertMeteringSegments = (
             TagTable => 'Image::ExifTool::Pentax::AEInfo',
         },
     },
-    0x0207 => { #PH
-        Name => 'LensInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::LensInfo',
-        },
-    },
+    0x0207 => [ #PH
+        {
+            Name => 'LensInfo',
+            # the *ist series (and Samsung GX-1) always use the old format, and all
+            # other models but the K100D, K110D and K100D Super always use the newer
+            # format, and for the K110D/K110D we expect ff or 00 00 at byte 20 if
+            # it is the old format.)
+            Condition => q{
+                $$self{Model}=~/(\*ist|GX-1[LS])/ or
+               ($$self{Model}=~/(K100D|K110D)/ and $$valPt=~/^.{20}(\xff|\0\0)/s)
+            },
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Pentax::LensInfo',
+            },
+        },{
+            Name => 'LensInfo',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Pentax::LensInfo2',
+            },
+        }
+    ],
     0x0208 => { #PH
         Name => 'FlashInfo',
         SubDirectory => {
@@ -1272,7 +1333,7 @@ my %convertMeteringSegments = (
         Count => 16,
         Notes => 'measurements from each of the 16 AE metering segments, converted to LV',
         %convertMeteringSegments,
-        # metering segment locations (ref 19):
+        # metering segment locations (ref JD):
         # +-------------------------+
         # |           14            |
         # |    +---+---+---+---+    |
@@ -1285,13 +1346,13 @@ my %convertMeteringSegments = (
         # |           15            |
         # +-------------------------+
     },
-    0x020a => { #PH/19/20
+    0x020a => { #PH/JD/19
         Name => 'FlashMeteringSegments',
         Format => 'int8u',
         Count => 16,
         %convertMeteringSegments,
     },
-    0x020b => { #PH/19/20
+    0x020b => { #PH/JD/19
         Name => 'SlaveFlashMeteringSegments',
         Format => 'int8u',
         Count => 16,
@@ -1350,7 +1411,7 @@ my %convertMeteringSegments = (
             TagTable => 'Image::ExifTool::Pentax::BatteryInfo',
         },
     },
-    0x021f => { #19
+    0x021f => { #JD
         Name => 'AFInfo',
         SubDirectory => {
             # NOTE: Most of these subdirectories are 'undef' format, and as such the
@@ -1408,7 +1469,7 @@ my %convertMeteringSegments = (
     NOTES => 'Shake reduction information.',
     0 => {
         Name => 'SRResult',
-        PrintConv => { #PH/19
+        PrintConv => { #PH/JD
             0 => 'Not stabilized',
             BITMASK => {
                 0 => 'Stabilized',
@@ -1440,7 +1501,7 @@ my %convertMeteringSegments = (
         PrintConv => 'sprintf("%.2f s",$val) . ($val > 254.5/60 ? " or longer" : "")',
         PrintConvInv => '$val=~tr/0-9.//dc; $val',
     },
-    3 => { #19
+    3 => { #JD
         Name => 'SRFocalLength',
         ValueConv => '$val & 0x01 ? $val * 4 : $val / 2',
         ValueConvInv => '$val <= 127 ? int($val) * 2 : int($val / 4) | 0x01',
@@ -1449,7 +1510,7 @@ my %convertMeteringSegments = (
     },
 );
 
-# shot information (ref 20)
+# shot information (ref 19)
 %Image::ExifTool::Pentax::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -1480,10 +1541,33 @@ my %convertMeteringSegments = (
             16 => 'Flash X-Sync Speed AE', #PH
         },
     },
-    1 => {
-        Name => 'PictureModeFlags',
-        Unknown => 1, # not sure what these mean, but associated with PictureMode
-        PrintConv => { BITMASK => { } },
+    1.1 => {
+        Name => 'ProgramLine',
+        # only set to other than Normal when in Program AE mode
+        Mask => 0x03,
+        PrintConv => {
+            0 => 'Normal',
+            1 => 'Hi Speed',
+            2 => 'Depth',
+            3 => 'MTF',
+        },
+    },
+    1.2 => {
+        Name => 'EVSteps',
+        Mask => 0x20,
+        PrintConv => {
+            0x00 => '1/2 EV steps',
+            0x20 => '1/3 EV steps',
+        },
+    },
+    1.3 => {
+        Name => 'E-DialInProgram',
+        # always set even when not in Program AE mode
+        Mask => 0x40,
+        PrintConv => {
+            0x00 => 'Tv or Av',
+            0x40 => 'P Shift',
+        },
     },
     2 => {
         Name => 'FlashOptions',
@@ -1574,7 +1658,7 @@ my %convertMeteringSegments = (
                 3 => 'Self-timer (2 s)', #PH
                 4 => 'Remote Control (3 s delay)',
                 5 => 'Remote Control',
-                6 => 'Exposure Bracket', #PH/20
+                6 => 'Exposure Bracket', #PH/19
                 7 => 'Multiple Exposure',
             },
         },
@@ -1596,7 +1680,7 @@ my %convertMeteringSegments = (
             16 => '2.0', #PH
         },
     },
-    9 => { #PH/20
+    9 => { #PH/19
         Name => 'BracketShotNumber',
         PrintHex => 1,
         PrintConv => {
@@ -1613,7 +1697,7 @@ my %convertMeteringSegments = (
     },
     13 => {
         Name => 'RawAndJpgRecording',
-        Condition => '$$self{Model} =~ /K10D/',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
         Notes => 'K10D only',
         # this is actually a bit field: - PH
         # bit 0=JPEG, bit 1=RAW; high nibble: 0x0=best, 0x1=better, 0x2=good
@@ -1638,7 +1722,7 @@ my %convertMeteringSegments = (
     },
     14 => { #PH
         Name => 'JpgRecordedPixels',
-        Condition => '$$self{Model} =~ /K10D/',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
         Notes => 'K10D only',
         PrintConv => {
             0 => '10 MP',
@@ -1647,18 +1731,49 @@ my %convertMeteringSegments = (
             # have seen 80,108,240,252 for *istD models - PH
         },
     },
-    18 => { #20
+    16 => {
+        Name => 'FlashOptions2',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
+        Notes => 'K10D only, set even if the flash is off',
+        Mask => 0xf0,
+        # Note: these tags relate closely to InternalFlashMode values
+        PrintConv => {
+            0x00 => 'Normal or Auto (0)',  # not sure why normal and auto can be either 0 or 2
+            0x10 => 'Red-eye reduction',
+            0x20 => 'Normal or Auto (2)',  # not sure why normal and auto can be either 0 or 2
+            0x30 => 'Normal or Auto (2), Red-eye reduction',
+            0x50 => 'Wireless (Master)',
+            0x60 => 'Wireless (Control)',
+            0x80 => 'Slow-sync',
+            0x90 => 'Slow-sync, Red-eye reduction',
+            0xa0 => 'Trailing-curtain Sync'
+        },
+    },
+    16.1 => {
+        Name => 'MeteringMode3',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
+        Notes => 'K10D only',
+        Mask => 0x0f,
+        PrintConv => {
+            0 => 'Multi-segment',
+            BITMASK => {
+                0 => 'Center-weighted average',
+                1 => 'Spot',
+            },
+        },
+    },
+    18 => {
         Name => 'TvExposureTimeSetting',
-        Condition => '$$self{Model} =~ /K10D/',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
         Notes => 'K10D only',
         ValueConv => 'exp(-Image::ExifTool::Pentax::PentaxEv($val-68)*log(2))',
         ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv(-log($val)/log(2))+68',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
-    19 => { #20
+    19 => {
         Name => 'AvApertureSetting',
-        Condition => '$$self{Model} =~ /K10D/',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
         Notes => 'K10D only',
         ValueConv => 'exp(Image::ExifTool::Pentax::PentaxEv($val-68)*log(2)/2)',
         ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv(log($val)*2/log(2))+68',
@@ -1667,7 +1782,7 @@ my %convertMeteringSegments = (
     },
     20 => { #PH
         Name => 'SvISOSetting',
-        Condition => '$$self{Model} =~ /K10D/',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
         Notes => 'K10D only',
         # ISO setting for sensitivity-priority mode
         # (conversion may not give actual displayed values:)
@@ -1680,11 +1795,11 @@ my %convertMeteringSegments = (
     },
     21 => { #PH
         Name => 'BaseExposureCompensation',
-        Condition => '$$self{Model} =~ /K10D/',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
         Notes => 'exposure compensation without auto bracketing, K10D only',
         ValueConv => 'Image::ExifTool::Pentax::PentaxEv(64-$val)',
         ValueConvInv => '64-Image::ExifTool::Pentax::PentaxEvInv($val)',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
         PrintConvInv => 'eval $val',
     },
 );
@@ -1738,7 +1853,7 @@ my %convertMeteringSegments = (
     5 => {
         Name => 'AEFlashTv',
         Notes => 'val = 24 * 2**((32-raw)/8)',
-        ValueConv => '24*exp(-($val-32)*log(2)/8)', #19
+        ValueConv => '24*exp(-($val-32)*log(2)/8)', #JD
         ValueConvInv => '-log($val/24)*8/log(2)+32',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
@@ -1751,9 +1866,11 @@ my %convertMeteringSegments = (
             2 => 'Tv',
             3 => 'Sv or Green Mode',
             8 => 'Hi-speed Program',
-            16 => 'DOF Program', #20
-            24 => 'MTF Program', #20
-            27 => 'MTF Program (27)', #20
+            11 => 'Hi-speed Program (P-Shift)', #19
+            16 => 'DOF Program', #19
+            19 => 'DOF Program (P-Shift)', #19
+            24 => 'MTF Program', #19
+            27 => 'MTF Program (P-Shift)', #19
             35 => 'Standard',
             43 => 'Portrait',
             51 => 'Landscape',
@@ -1775,7 +1892,7 @@ my %convertMeteringSegments = (
         Name => 'AEExtra',
         Unknown => 1,
     },
-    12 => { #20
+    12 => { #19
         Name => 'AEMeteringMode',
         PrintConv => {
             0 => 'Multi-segment',
@@ -1785,16 +1902,17 @@ my %convertMeteringSegments = (
             },
         },
     },
-    14 => { #20
-        Name => 'FlashExposureCompUsed',
+    14 => { #19
+        Name => 'FlashExposureCompSet',
         Format => 'int8s',
         Notes => q{
-            reports 0 if flash was on but did not fire, unlike tag 0x004d which reports
-            the camera setting
+            reports the camera setting, unlike tag 0x004d which reports 0 in Green mode
+            or if flash was on but did not fire. Both this tag and 0x004d report the
+            setting even if the flash is off
         },
         ValueConv => 'Image::ExifTool::Pentax::PentaxEv($val)',
         ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv($val)',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
         PrintConvInv => 'eval $val',
     },
 );
@@ -1805,71 +1923,201 @@ my %convertMeteringSegments = (
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    VARS => { HAS_SUBDIR => 1 },
     DATAMEMBER => [ 0 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
+    NOTES => 'Pentax lens information structure.',
+    0 => {
+        Name => 'LensType',
+        Format => 'int8u[2]',
+        Priority => 0,
+        PrintConv => \%pentaxLensType,
+        SeparateTable => 1,
+    },
+    3 => {
+        Name => 'LensData',
+        Format => 'undef[17]',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensData' },
+    },
+);
+
+# lens information for newer models (ref PH)
+%Image::ExifTool::Pentax::LensInfo2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    VARS => { HAS_SUBDIR => 1 },
+    DATAMEMBER => [ 0 ],
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    NOTES => 'Pentax lens information structure for newer models (K10D and later).',
     0 => {
         Name => 'LensType',
         Format => 'int8u[4]',
         Priority => 0,
-        Notes => q{
-            for most models the first 2 bytes are LensType, but for the K10D the
-            decoding is a bit different
-        },
-        # determine whether or not the LensCodes are shifted by one byte
-        # (this is a bit funny -- more testing would be useful.  Using 0xf0 for
-        #  test, although 0x80 would also work with all samples seen so far)
-        RawConv => q{
-            my ($v) = split(' ',$val);
-            if ($v & 0xf0 or $$self{Model} =~ /^PENTAX K10D\b/) {
-                $$self{ShiftLensCodes} = 1;
-            }
-            return $val;
-        },
         ValueConv => q{
             my @v = split(' ',$val);
-            if ($$self{ShiftLensCodes}) {
-                $v[0] &= 0x0f;
-                $v[1] = $v[2] * 256 + $v[3]; # (always high byte first)
-            }
+            $v[0] &= 0x0f;
+            $v[1] = $v[2] * 256 + $v[3]; # (always high byte first)
             return "$v[0] $v[1]";
         },
         PrintConv => \%pentaxLensType,
         SeparateTable => 1,
     },
     4 => {
-        Condition => 'not $$self{ShiftLensCodes}',
-        Name => 'LensCodes',
-        Format => 'int8u[16]',
-        Notes => q{
-            sometimes the LensInfo record has an extra byte, as with the K10D, so this
-            tag is sometimes found at index 5 instead
-        },
-        PrintConv => 'sprintf(join(" ",("%.2x")x16),split(" ",$val))',
-        # (ref patent 5617173 and 5999753 [+notes by PH])
-        # LC0 = lens kind + version data
-        # LC1 = lens data
-        # LC2 = distance data
-        # LC3 = K-value data (AF pulses to displace image by unit length)
-        # LC4 = abberation correction, near distance data
-        # LC5 = light color abberation correction data
-        # LC6 = open abberation data
-        # LC7 = AF minimum actuation condition
-        # LC8 = focal length data [lens-dependent conversion]
-        # LC9 = nominal AVmin/AVmax data (open/closed aperture values)
-        # LC10 = mv'/nv' data (full-aperture metering error compensation/marginal lumination compensation)
-        # LC11 = AVC 1/EXP data
-        # LC12 = mv1 AVminsif data
-        # LC13 = AVmin (open aperture value) [MaxAperture=(2**((AVmin-1)/32))]
-        # LC14 = UNT_12 UNT_6 data
-        # LC15 = incorporated flash suited END data
+        Name => 'LensData',
+        Format => 'undef[17]',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensData' },
     },
-    5 => {
-        Condition => '$$self{ShiftLensCodes}',
-        Name => 'LensCodes',
-        Format => 'int8u[16]',
-        Notes => 'K10D only',
-        PrintConv => 'sprintf(join(" ",("%.2x")x16),split(" ",$val))',
+);
+
+# lens data information, including lens codes (ref PH)
+%Image::ExifTool::Pentax::LensData = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    DATAMEMBER => [ 0 ],
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        Pentax lens data information.  Some of these tags require interesting binary
+        gymnastics to decode them into useful values.
+    },
+    # this byte comes from the lens electrical contacts
+    # (see http://kmp.bdimitrov.de/technology/K-mount/Ka.html)
+    0.1 => { #JD
+        Name => 'AutoAperture',
+        Mask => 0x01,
+        PrintConv => {
+            0 => 'On',
+            1 => 'Off',
+        },
+    },
+    0.2 => { #JD
+        Name => 'MinAperture',
+        Mask => 0x06,
+        PrintConv => {
+            0x00 => 22,
+            0x02 => 32,
+            0x04 => 45,
+            0x06 => 16,
+        },
+    },
+    0.3 => { #JD
+        Name => 'LensFStops',
+        Mask => 0x70,
+        ValueConv => '5 + (($val >> 4) ^ 0x07) / 2',
+        ValueConvInv => '((($val - 5) * 2) ^ 0x07) << 4',
+    },
+    # 1-16 look like Lens Codes LC0-LC15, ref patent 5617173 and 5999753 [+notes by PH]
+    1 => { # LC0 = lens kind + version data
+        Name => 'LensKind',
+        %lensCode,
+    },
+    2 => { # LC1 = lens data
+        Name => 'LC1',
+        %lensCode,
+    },
+    3 => { # LC2 = distance data
+        Name => 'LC2',
+        %lensCode,
+        # FocusRange decoding needs more testing with various lenses - PH
+        TestName => 'FocusRange',
+        TestPrintConv => q{
+            my @v;
+            my $lsb = $val & 0x07;
+            my $msb = $val >> 3;
+            my $ls2 = $lsb ^ 0x07;
+            $ls2 ^= 0x01 if $ls2 & 0x02;
+            $ls2 ^= 0x03 if $ls2 & 0x04;
+            foreach ($ls2, $ls2+1) {
+                push(@v,'inf'), next if $_ > 7;
+                push @v, sprintf("%.2f m", 2 ** ($msb / 4) * 0.18 * ($_ + 4) / 16);
+            }
+            return join ' - ', @v;
+        },
+    },
+    4 => { # LC3 = K-value data (AF pulses to displace image by unit length)
+        Name => 'LC3',
+        %lensCode,
+    },
+    5 => { # LC4 = abberation correction, near distance data
+        Name => 'LC4',
+        %lensCode,
+    },
+    6 => { # LC5 = light color abberation correction data
+        Name => 'LC5',
+        %lensCode,
+    },
+    7 => { # LC6 = open abberation data
+        Name => 'LC6',
+        %lensCode,
+    },
+    8 => { # LC7 = AF minimum actuation condition
+        Name => 'LC7',
+        %lensCode,
+    },
+    9 => { # LC8 = focal length data
+        Name => 'FocalLength',
+        Priority => 0,
+        ValueConv => '10*($val>>2) * 4**(($val&0x03)-2)', #JD
+        ValueConvInv => q{
+            my $range = int(log($val/10)/(2*log(2)));
+            warn("Value out of range") and return undef if $range < 0 or $range > 3;
+            return $range + (int($val/(10*4**($range-2))+0.5) << 2);
+        },
+        PrintConv => 'sprintf("%.1f mm", $val)',
+        PrintConvInv => '$val=~s/\s*mm//; $val',
+    },
+    10 => { # LC9 = nominal AVmin/AVmax data (open/closed aperture values)
+        Name => 'NominalMaxAperture',
+        Mask => 0xf0,
+        ValueConv => '2**(($val>>4)/4)', #JD
+        ValueConvInv => '4*log($val)/log(2) << 4',
+        PrintConv => 'sprintf("%.1f", $val)',
+        PrintConvInv => '$val',
+    },
+    10.1 => { # LC9 = nominal AVmin/AVmax data (open/closed aperture values)
+        Name => 'NominalMinAperture',
+        Mask => 0x0f,
+        ValueConv => '2**(($val+10)/4)', #JD
+        ValueConvInv => '4*log($val)/log(2) - 10',
+        PrintConv => 'sprintf("%.0f", $val)',
+        PrintConvInv => '$val',
+    },
+    11 => { # LC10 = mv'/nv' data (full-aperture metering error compensation/marginal lumination compensation)
+        Name => 'LC10',
+        %lensCode,
+    },
+    12 => { # LC11 = AVC 1/EXP data
+        Name => 'LC11',
+        %lensCode,
+    },
+    13 => { # LC12 = mv1 AVminsif data
+        Name => 'LC12',
+        %lensCode,
+    },
+    14.1 => { # LC13 = AVmin (open aperture value) [MaxAperture=(2**((AVmin-1)/32))]
+        Name => 'MaxAperture',
+        Notes => 'effective wide open aperture for current focal length',
+        Mask => 0x7f, # (not sure what the high bit indicates)
+        # (a value of 1 seems to indicate 'n/a')
+        RawConv => '$val > 1 ? $val : undef',
+        ValueConv => '2**(($val-1)/32)',
+        ValueConvInv => '32*log($val)/log(2) + 1',
+        PrintConv => 'sprintf("%.1f", $val)',
+        PrintConvInv => '$val',
+    },
+    15 => { # LC14 = UNT_12 UNT_6 data
+        Name => 'LC14',
+        %lensCode,
+    },
+    16 => { # LC15 = incorporated flash suited END data
+        Name => 'LC15',
+        %lensCode,
     },
 );
 
@@ -1884,7 +2132,7 @@ my %convertMeteringSegments = (
     0 => {
         Name => 'FlashStatus',
         PrintHex => 1,
-        PrintConv => { #20
+        PrintConv => { #19
             0x00 => 'Off',
             0x02 => 'External, Did not fire', # 0010
             0x06 => 'External, Fired',        # 0110
@@ -1896,8 +2144,8 @@ my %convertMeteringSegments = (
         Name => 'InternalFlashMode',
         PrintHex => 1,
         PrintConv => {
-            0x86 => 'On, Wireless (Control)', #20
-            0x95 => 'On, Wireless (Master)', #20
+            0x86 => 'On, Wireless (Control)', #19
+            0x95 => 'On, Wireless (Master)', #19
             0xc0 => 'On', # K10D
             0xc1 => 'On, Red-eye reduction', # *istDS2, K10D
             0xc2 => 'On, Auto', # K100D, K110D
@@ -1905,26 +2153,28 @@ my %convertMeteringSegments = (
             0xc8 => 'On, Slow-sync', # K10D
             0xc9 => 'On, Slow-sync, Red-eye reduction', # K10D
             0xca => 'On, Trailing-curtain Sync', # K10D
-            0xf0 => 'Off, Normal', #20
-            0xf1 => 'Off, Red-eye reduction', #20
-            0xf2 => 'Off, Auto', #20
-            0xf3 => 'Off, Auto, Red-eye reduction', #20
-            0xf4 => 'Off, (Unknown 0xf4)', #20
-            0xf5 => 'Off, Wireless (Master)', #20
-            0xf6 => 'Off, Wireless (Control)', #20
-            0xf8 => 'Off, Slow-sync', #20
-            0xf9 => 'Off, Slow-sync, Red-eye reduction', #20
-            0xfa => 'Off, Trailing-curtain Sync', #20
+            0xf0 => 'Off, Normal', #19
+            0xf1 => 'Off, Red-eye reduction', #19
+            0xf2 => 'Off, Auto', #19
+            0xf3 => 'Off, Auto, Red-eye reduction', #19
+            0xf4 => 'Off, (Unknown 0xf4)', #19
+            0xf5 => 'Off, Wireless (Master)', #19
+            0xf6 => 'Off, Wireless (Control)', #19
+            0xf8 => 'Off, Slow-sync', #19
+            0xf9 => 'Off, Slow-sync, Red-eye reduction', #19
+            0xfa => 'Off, Trailing-curtain Sync', #19
         },
     },
     2 => {
         Name => 'ExternalFlashMode',
         PrintHex => 1,
-        PrintConv => { #20
+        PrintConv => { #19
             0x3f => 'Off',
             0x40 => 'On, Auto',
+            0xbf => 'On, Flash Problem', #JD
             0xc0 => 'On, Manual',
             0xc4 => 'On, P-TTL Auto',
+            0xc5 => 'On, Contrast-control Sync', #JD
             0xc6 => 'On, High-speed Sync',
             0xcc => 'On, Wireless',
             0xcd => 'On, Wireless, High-speed Sync',
@@ -1988,7 +2238,7 @@ my %convertMeteringSegments = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    0 => { #20
+    0 => { #19
         Name => 'PowerSource',
         PrintHex => 1,
         # have seen the upper bit set (value of 0x82) for the
@@ -2002,11 +2252,11 @@ my %convertMeteringSegments = (
     1 => [
         {
             Name => 'BatteryStates',
-            Condition => '$$self{Model} =~ /K10D/',
+            Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
             Notes => 'decoded for K10D only',
             ValueConv => '($val >> 4) . " " . ($val & 0x0f)',
             ValueConvInv => 'my @a=split(" ",$val); ($a[0] << 4) + $a[1]',
-            PrintConv => [{ #20
+            PrintConv => [{ #19
                  1 => 'Body Battery Empty or Missing',
                  2 => 'Body Battery Almost Empty',
                  3 => 'Body Battery Running Low',
@@ -2029,7 +2279,7 @@ my %convertMeteringSegments = (
     2 => [
         {
             Name => 'BatteryADBodyNoLoad',
-            Condition => '$$self{Model} =~ /K10D/',
+            Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
             Notes => 'roughly calibrated for K10D with a new Pentax battery',
             # rough linear calibration drops quickly below 30% - PH
             # DVM readings: 8.18V=186, 8.42-8.40V=192 (full), 6.86V=155 (empty)
@@ -2043,7 +2293,7 @@ my %convertMeteringSegments = (
     3 => [
         {
             Name => 'BatteryADBodyLoad',
-            Condition => '$$self{Model} =~ /K10D/',
+            Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
             # [have seen 187] - PH
             PrintConv => 'sprintf("%d (%.1fV, %d%%)",$val,$val*8.18/186,($val-152)*100/34)',
             PrintConvInv => '$val=~s/ .*//; $val',
@@ -2132,7 +2382,7 @@ my %convertMeteringSegments = (
         PrintConvInv => '$val=~tr/0-9//dc; $val',
     },
     # 0x0a - values: 00,05,0d,15,86,8e,a6,ae
-    0x0b => { #19
+    0x0b => { #JD
         Name => 'AFPointsInFocus',
         Notes => q{
             may report two points in focus even though a single AFPoint has been
@@ -2364,7 +2614,7 @@ my %convertMeteringSegments = (
     0x32 => {
         Name => 'ExposureCompensation',
         Format => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
     },
     0x44 => {
         Name => 'WhiteBalance',

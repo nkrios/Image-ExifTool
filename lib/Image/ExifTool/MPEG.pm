@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -324,12 +324,7 @@ $VERSION = '1.04';
             return undef if $val[2] and not $val[2] =~ /^\d+$/;
             return (8 * $val[0]) / (($prt[1]||0) + ($val[2]||0));
         },
-        PrintConv => q{
-            my $h = int($val / 3600);
-            my $m = int($val / 60 - $h * 60);
-            my $s = $val - $h * 3600 - $m * 60;
-            return sprintf("%d:%.2d:%05.2f (approx)",$h,$m,$s);
-        },
+        PrintConv => 'ConvertDuration($val) . " (approx)"',
     },
 );
 

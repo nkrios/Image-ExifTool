@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 # type of current stream
 $Image::ExifTool::RIFF::streamType = '';
@@ -560,7 +560,7 @@ $Image::ExifTool::RIFF::streamType = '';
             1 => 'FrameCount',
         },
         ValueConv => '$val[0] ? $val[1] / $val[0] : undef',
-        PrintConv => 'sprintf("%.2f s",$val)',
+        PrintConv => 'ConvertDuration($val)',
     },
 );
 

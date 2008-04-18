@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.20
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.24
 [File, File, Image]  - File Name: CanonRaw_7_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 12 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:03 14:11:06
+[File, File, Time]  - File Modification Date/Time: 2008:03:28 14:38:54
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] ImageWidth - Image Width: 8
 [File, File, Image] ImageHeight - Image Height: 8
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
@@ -149,7 +149,6 @@
 [MakerNotes, Canon, Image] 14 - Filter Effect: None
 [MakerNotes, Canon, Image] 15 - Toning Effect: None
 [MakerNotes, Canon, Image] 1 - Tone Curve: Standard
-[MakerNotes, Canon, Image] 2 - Canon Processing 0x0002: 0
 [MakerNotes, Canon, Image] 3 - Sharpness Frequency: n/a
 [MakerNotes, Canon, Image] 4 - Sensor Red Level: 0
 [MakerNotes, Canon, Image] 5 - Sensor Blue Level: 0
@@ -193,7 +192,6 @@
 [MakerNotes, Canon, Camera] 70 - WB RGGB Levels Custom 2: 2312 1022 1024 1501
 [MakerNotes, Canon, Camera] 74 - Color Temp Custom 2: 5200
 [MakerNotes, Canon, Camera] 16386 - Unknown Block 1: (Binary data 5352 bytes)
-[MakerNotes, Canon, Camera] 1 - Canon Color Info 0x0001: 0
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: unknown

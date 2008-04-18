@@ -111,16 +111,21 @@ instead of 1/100, etc.
 <p>5. <b>"How do I format date and time information for writing?"</b></p>
 
 <blockquote>All information (including date/time information) is written in the
-same format as it is read out.  ExifTool converts all date and time information
-to standard EXIF format, so this is also the way it is specified when writing.
-The standard EXIF date/time format is "<code>YYYY:MM:DD hh:mm:ss</code>",
-and a timezone may be specified by adding
-"<code>+hh:mm</code>", "<code>&#8209;hh:mm</code>" or "<code>Z</code>".
-If the meta information format requires a timezone and one is not specified,
-"<code>+00:00</code>" (or "<code>Z</code>") is assumed.  For example:
+same format as it is read out.  When reading, ExifTool converts all date and
+time information to standard EXIF format, so this is also the way it is
+specified when writing. The standard EXIF date/time format is "<code>YYYY:MM:DD
+hh:mm:ss</code>", and some meta information formats such as XMP also allow
+sub-seconds and a timezone to be specified.  The timezone format is
+"<code>+hh:mm</code>", "<code>&#8209;hh:mm</code>" or "<code>Z</code>". If a
+timezone is required but not specified, exiftool adds the local timezone if
+possible (ie. if strftime supports "%z" on your system), otherwise
+"<code>Z</code>" is assumed. For example:
 
-<pre>exiftool "-dateTimeOriginal=2005:10:23 20:06:34-05:00" a.jpg
+<pre>exiftool "-xmp:dateTimeOriginal=2005:10:23 20:06:34.33-05:00" a.jpg
 </pre>
+
+ExifTool will attempt to reformat input date/time values into this standard
+format unless the <code>-n</code> option is used.
 </blockquote>
 
 <a name="Q6"></a>
@@ -539,7 +544,7 @@ to be written, but note that some Makernote information may be lost when
 ignoring some types of errors like this.
 </blockquote>
 <hr>
-<i>Last revised Feb. 1, 2008</i>
+<i>Last revised Apr. 11, 2008</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

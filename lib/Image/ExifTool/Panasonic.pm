@@ -14,8 +14,8 @@
 #               7) http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm (2007/10/02)
 #               8) Marcel Coenen private communication (DMC-FZ50)
 #               9) http://forums.dpreview.com/forums/read.asp?forum=1033&message=22756430
-#              10) Jens Duttke private communication (TZ3,FZ30,FZ50)
-#              11) http://bretteville.com/pdfs/M8Metadata_v2.pdf
+#              10) http://bretteville.com/pdfs/M8Metadata_v2.pdf
+#              JD) Jens Duttke private communication (TZ3,FZ30,FZ50)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Panasonic;
@@ -53,7 +53,7 @@ my %shootingMode = (
     20 => 'Snow',
     21 => 'Night Scenery',
     22 => 'Food', #7
-    23 => 'Baby', #10
+    23 => 'Baby', #JD
     24 => 'Soft Skin', #PH (LZ6)
     25 => 'Candlelight', #PH (LZ6)
     26 => 'Starry Night', #PH (LZ6)
@@ -63,7 +63,7 @@ my %shootingMode = (
     30 => 'Beach', #PH (LZ6)
     31 => 'Aerial Photo', #PH (LZ6)
     32 => 'Sunset', #PH (LZ6)
-    33 => 'Pet', #10
+    33 => 'Pet', #JD
     34 => 'Intelligent ISO', #PH (LZ6)
     # 35 => 'NOTE?', #7
     36 => 'High Speed Continuous Shooting', #7
@@ -225,7 +225,7 @@ my %shootingMode = (
             5 => 'Sepia',
         },
     },
-    0x29 => { #10
+    0x29 => { #JD
         Name => 'TimeSincePowerOn',
         Writable => 'int32u',
         Notes => q{
@@ -305,8 +305,8 @@ my %shootingMode = (
             0 => 'Standard',
             1 => 'Low (-1)',
             2 => 'High (+1)',
-            3 => 'Lowest (-2)', #10
-            4 => 'Highest (+2)', #10
+            3 => 'Lowest (-2)', #JD
+            4 => 'Highest (+2)', #JD
         },
     },
     0x2e => { #4
@@ -338,7 +338,7 @@ my %shootingMode = (
             2 => 'Vivid',
         },
     },
-    0x33 => { #10
+    0x33 => { #JD
         Name => 'BabyAge',
         Writable => 'string',
         Notes => 'or pet age', #PH
@@ -490,7 +490,7 @@ my %shootingMode = (
     },
 );
 
-# Leica type2 maker notes (ref 11)
+# Leica type2 maker notes (ref 10)
 %Image::ExifTool::Panasonic::Leica2 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -670,8 +670,8 @@ my %shootingMode = (
     },
     0x02 => 'SensorWidth', #5/PH
     0x03 => 'SensorHeight', #5/PH
-    0x04 => 'SensorTopBorder', #10
-    0x05 => 'SensorLeftBorder', #10
+    0x04 => 'SensorTopBorder', #JD
+    0x05 => 'SensorLeftBorder', #JD
     0x06 => 'ImageHeight', #5/PH
     0x07 => 'ImageWidth', #5/PH
     # observed values for unknown tags - PH
@@ -685,14 +685,14 @@ my %shootingMode = (
     # 0x18,0x19,0x1a,0x1c,0x1d,0x1e: 0
     # 0x1b,0x27,0x29,0x2a,0x2b,0x2c: [binary data]
     # 0x2d: 2,3
-    0x11 => { #10
+    0x11 => { #JD
         Name => 'RedBalance',
         Writable => 'int16u',
         ValueConv => '$val / 256',
         ValueConvInv => 'int($val * 256 + 0.5)',
         Notes => 'found in Digilux 2 RAW images',
     },
-    0x12 => { #10
+    0x12 => { #JD
         Name => 'BlueBalance',
         Writable => 'int16u',
         ValueConv => '$val / 256',
@@ -714,7 +714,7 @@ my %shootingMode = (
         Name => 'WBBlueLevel',
         Writable => 'int16u',
     },
-    0x2e => { #10
+    0x2e => { #JD
         Name => 'PreviewImage',
         Writable => 'undef',
         Binary => 1,
@@ -787,7 +787,7 @@ sub WhiteBalanceConv($;$)
 {
     my ($val, $inv) = @_;
     if ($inv) {
-        return $1 + 0x8000 if $val =~ /(\d+)\s*K/i;
+        return $1 + 0x8000 if $val =~ /(\d+)/;
     } else {
         return ($val - 0x8000) . ' Kelvin' if $val > 0x8000;
     }

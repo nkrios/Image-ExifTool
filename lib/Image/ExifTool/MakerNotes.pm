@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -60,8 +60,8 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        # The Fuji programmers really botched this one up,
-        # but with a bit of work we can still read this directory
+        # The Fuji maker notes use a structure similar to a self-contained
+        # TIFF file, but with "FUJIFILM" instead of the standard TIFF header
         Name => 'MakerNoteFujiFilm',
         # (starts with "FUJIFILM" -- also used by some Leica, Minolta and Sharp models)
         Condition => '$$valPt =~ /^FUJIFILM/',
@@ -113,6 +113,17 @@ my $debug;          # set to 1 to enabled debugging code
             TagTable => 'Image::ExifTool::HP::Type6',
             Start => '$valuePtr',
             ByteOrder => 'LittleEndian',
+        },
+    },
+    {
+        Name => 'MakerNoteISL', # (used in Samsung GX20 samples)
+        Condition => '$$valPt =~ /^ISLMAKERNOTE000\0/',
+        # this maker notes starts with a TIFF-like header at offset 0x10
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Unknown::Main',
+            Start => '$valuePtr + 24',
+            Base => '$start - 8',
+            ByteOrder => 'Unknown',
         },
     },
     {
@@ -550,7 +561,27 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        Name => 'MakerNoteSony2', # used in SR2 and ARW images
+        Name => 'MakerNoteSony2',
+        # (starts with "SONY PI\0" -- DSC-S650/S700/S750)
+        Condition => '$$self{Make}=~/^SONY/ and $$valPt=~/^SONY PI\0/ and $$self{OlympusCAMER}=1',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::Main',
+            Start => '$valuePtr + 12',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteSony3',
+        # (starts with "PREMI\0" -- DSC-S45/S500)
+        Condition => '$$self{Make}=~/^SONY/ and $$valPt=~/^(PREMI)\0/ and $$self{OlympusCAMER}=1',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::Main',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteSony4', # used in SR2 and ARW images
         Condition => '$$self{Make}=~/^SONY/ and $$valPt!~/^\x01\x00/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
@@ -626,8 +657,15 @@ sub GetMakerNoteOffset($)
         $model =~ /^(C2500L|C-1Z?|C-5000Z|X-2|C720UZ|C725UZ|C150|C2Z|E-10|E-20|FerrariMODEL2003|u20D|u10D)\b/)
     {
         # no expected offset --> determine offset empirically via FixBase()
-    } elsif ($make =~ /^(Panasonic|SONY|JVC)\b/) {
+    } elsif ($make =~ /^(Panasonic|JVC)\b/) {
         push @offsets, 0;
+    } elsif ($make =~ /^SONY/) {
+        # DSLR and "PREMI" models use an offset of 4
+        if ($model =~ /DSLR/ or $$exifTool{OlympusCAMER}) {
+            push @offsets, 4;
+        } else {
+            push @offsets, 0;
+        }
     } elsif ($make eq 'FUJIFILM') {
         # some models have offset of 6, so allow that too (A345,A350,A360,A370)
         push @offsets, 4, 6;
@@ -811,6 +849,8 @@ sub FixBase($$)
             undef $entryBased;
             undef $relative;
         }
+        # (used for testing to extract differences)
+        # $exifTool->FoundTag('Diff', $diff);
     }
 #
 # handle entry-based offsets

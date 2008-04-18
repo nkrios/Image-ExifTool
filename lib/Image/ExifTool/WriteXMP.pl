@@ -308,7 +308,7 @@ sub CheckXMP($$$)
             ($t, $tz) = ($1, $2);
             $$valPtr = $t;
         } else {
-            return "Invalid date or time format (should be YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM])";
+            return "Invalid date/time (use YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM|Z])";
         }
         if ($tz) {
             $tz =~ /^(Z|[+-]\d{2}:\d{2})$/ or return "Invalid time zone (must be Z or +/-HH:MM)";
@@ -577,7 +577,7 @@ sub WriteXMP($$;$)
     $exifTool->{XMP_CAPTURE} = \%capture;
     $exifTool->{XMP_NS} = \%nsUsed;
 
-    if ($dataPt or $xmpFile) {
+    if ($xmpFile or ($dataPt and length $$dataPt)) {
         delete $exifTool->{XMP_ERROR};
         delete $exifTool->{XMP_UUID};
         # extract all existing XMP information (to the XMP_CAPTURE hash)

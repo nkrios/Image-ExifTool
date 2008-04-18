@@ -37,7 +37,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.53';
+$VERSION = '2.55';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -817,7 +817,7 @@ my %longBin = (
     },
     0x22f => 'StripRowCounts',
     0x2bc => {
-        Name => 'ApplicationNotes',
+        Name => 'ApplicationNotes', # (writable directory!)
         Writable => 'int8u',
         Format => 'undef',
         Flags => ['Protected', 'Binary'],
@@ -885,7 +885,15 @@ my %longBin = (
     0x82ac => 'MDFileUnits', #3
     0x830e => 'PixelScale',
     0x83bb => { #12
-        Name => 'IPTC-NAA',
+        Name => 'IPTC-NAA', # (writable directory!)
+        # this should actually be written as 'undef' (see
+        # http://www.awaresystems.be/imaging/tiff/tifftags/iptc.html),
+        # but Photoshop writes it as int32u and Nikon Capture won't read
+        # anything else, so we do the same thing here...  Doh!
+        Format => 'undef',      # convert binary values as undef
+        Writable => 'int32u',   # but write int32u format code in IFD
+        WriteGroup => 'IFD0',
+        Flags => [ 'Binary', 'Protected' ],
         SubDirectory => {
             DirName => 'IPTC',
             TagTable => 'Image::ExifTool::IPTC::Main',
@@ -1196,7 +1204,7 @@ my %longBin = (
     0x927c => \@Image::ExifTool::MakerNotes::Main,
     0x9286 => {
         Name => 'UserComment',
-        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+        RawConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
     },
     0x9290 => {
         Name => 'SubSecTime',
@@ -1251,6 +1259,10 @@ my %longBin = (
             1 => 'sRGB',
             2 => 'Adobe RGB',
             0xffff => 'Uncalibrated',
+            # Sony uses these definitions: (ref 19)
+            # 0xffff => 'AdobeRGB',
+            # 0xfffe => 'ICC Profile',
+            # 0xfffd => 'Wide Gamut RGB',
         },
     },
     0xa002 => {
@@ -1590,9 +1602,10 @@ my %longBin = (
     0xc42a => 'OceImageLogic', #3
     0xc44f => 'Annotations', #7
     0xc4a5 => {
-        Name => 'PrintIM',
+        Name => 'PrintIM', # (writable directory!)
         # must set Writable here so this tag will be saved with MakerNotes option
         Writable => 'undef',
+        WriteGroup => 'IFD0',
         Description => 'Print Image Matching',
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
@@ -1744,7 +1757,10 @@ my %longBin = (
         Format => 'string', # sometimes written as int8u
     },
     0xc68c => {
-        Name => 'OriginalRawFileData',
+        Name => 'OriginalRawFileData', # (writable directory!)
+        Writable => 'undef', # must be defined here so tag will be extracted if specified
+        WriteGroup => 'IFD0',
+        Flags => [ 'Binary', 'Protected' ],
         SubDirectory => {
             TagTable => 'Image::ExifTool::DNG::OriginalRaw',
         },

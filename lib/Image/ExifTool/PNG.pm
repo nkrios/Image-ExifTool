@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -847,6 +847,8 @@ sub ProcessPNG($$)
         unless ($foundHdr) {
             if ($chunk eq $hdrChunk) {
                 $foundHdr = 1;
+            } elsif ($hdrChunk eq 'IHDR' and $chunk eq 'CgBI') {
+                $exifTool->Warn('Non-standard PNG image (Apple iPhone format)');
             } else {
                 $exifTool->Warn("$fileType image did not start with $hdrChunk");
                 last;
@@ -863,7 +865,7 @@ sub ProcessPNG($$)
             }
             print $out "$fileType $chunk ($len bytes):\n";
             if ($verbose > 2) {
-                my %dumpParms = ( Out => $out );
+                my %dumpParms = ( Out => $out, Addr => $raf->Tell() - $len - 4 );
                 $dumpParms{MaxLen} = 96 if $verbose <= 4;
                 Image::ExifTool::HexDump(\$dbuf, undef, %dumpParms);
             }

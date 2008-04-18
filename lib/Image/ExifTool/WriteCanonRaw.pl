@@ -196,8 +196,19 @@ sub WriteCR2($$$)
     my $outfile = $$dirInfo{OutFile} or return 0;
 
     # check CR2 signature
-    return 0 if $$dataPt !~ /^.{8}CR\x02\0/s and
-        $exifTool->Error("Unsupported Canon RAW file. May cause problems if rewritten", 1);
+    if ($$dataPt !~ /^.{8}CR\x02\0/s) {
+        my ($msg, $minor);
+        if ($$dataPt =~ /^.{8}CR/s) {
+            $msg = 'Unsupported Canon RAW file. May cause problems if rewritten';
+            $minor = 1;
+        } elsif ($$dataPt =~ /^.{8}\xba\xb0\xac\xbb/s) {
+            $msg = 'Can not currently write Canon 1D RAW images';
+        } else {
+            $msg = 'Unrecognized Canon RAW file';
+        }
+        return 0 if $exifTool->Error($msg, $minor);
+    }
+
     # CR2 has a 16-byte header
     $$dirInfo{NewDataPos} = 16;
     my $newData = $exifTool->WriteDirectory($dirInfo, $tagTablePtr);

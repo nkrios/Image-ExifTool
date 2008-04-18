@@ -63,7 +63,8 @@ The Pentax tags are also used in Asahi cameras.
   <br>1 = Better
   <br>2 = Best
   <br>3 = TIFF
-  <br>4 = RAW</span></td></tr>
+  <br>4 = RAW
+  <br>5 = Premium</span></td></tr>
 <tr class=b>
 <td>0x0009</td>
 <td>PentaxImageSize</td>
@@ -101,6 +102,7 @@ The Pentax tags are also used in Asahi cameras.
 <td><span class=s><span class=n>(1 or 2 values)</span>
   <br>[Value 0]
   <br>0 = Program
+  <br>1 = Shutter Speed Priority
   <br>2 = Program AE
   <br>3 = Manual
   <br>5 = Portrait
@@ -154,8 +156,10 @@ The Pentax tags are also used in Asahi cameras.
   <br>[Value 1]
   <br>0x3f = Internal
   <br>0x100 = External, Auto
+  <br>0x23f = External, Flash Problem
   <br>0x300 = External, Manual
   <br>0x304 = External, P-TTL Auto
+  <br>0x305 = External, Contrast-control Sync
   <br>0x306 = External, High-speed Sync
   <br>0x30c = External, Wireless
   <br>0x30d = External, Wireless, High-speed Sync</span></td></tr>
@@ -168,6 +172,7 @@ The Pentax tags are also used in Asahi cameras.
   <br>1 = Macro
   <br>2 = Infinity
   <br>3 = Manual
+  <br>4 = Super Macro
   <br>5 = Pan Focus
   <br>16 = AF-S
   <br>17 = AF-C
@@ -191,6 +196,8 @@ The Pentax tags are also used in Asahi cameras.
   <br>9 = Lower-left
   <br>10 = Bottom
   <br>11 = Lower-right
+  <br>65532 = Face Recognition AF
+  <br>65533 = Automatic Tracking AF
   <br>65534 = Fixed Center
   <br>65535 = Auto</span></td></tr>
 <tr>
@@ -247,6 +254,9 @@ The Pentax tags are also used in Asahi cameras.
   <br>19 = 2000
   <br>20 = 2500
   <br>21 = 3200
+  <br>22 = 4000
+  <br>23 = 5000
+  <br>24 = 6400
   <br>50 = 50
   <br>100 = 100
   <br>200 = 200
@@ -357,7 +367,8 @@ step size)</span></span></td></tr>
   <br>3 = Med Low
   <br>4 = Med High
   <br>5 = Very Low
-  <br>6 = Very High</span></td></tr>
+  <br>6 = Very High
+  <br>65535 = None</span></td></tr>
 <tr>
 <td>0x0020</td>
 <td>Contrast</td>
@@ -448,7 +459,9 @@ step size)</span></span></td></tr>
 <td class=c>int8u[3]</td>
 <td><span class=s>[Values 0 and 1]
   <br>&#39;0 0&#39; = Program
-  <br>&#39;0 3&#39; = MTF Program (0 3)
+  <br>&#39;0 1&#39; = Hi-speed Program
+  <br>&#39;0 2&#39; = DOF Program
+  <br>&#39;0 3&#39; = MTF Program
   <br>&#39;0 4&#39; = Standard
   <br>&#39;0 5&#39; = Portrait
   <br>&#39;0 6&#39; = Landscape
@@ -469,10 +482,10 @@ step size)</span></span></td></tr>
   <br>&#39;1 6&#39; = Auto PICT (Landscape)
   <br>&#39;1 7&#39; = Auto PICT (Macro)
   <br>&#39;1 8&#39; = Auto PICT (Sport)
-  <br>&#39;2 0&#39; = Program AE
-  <br>&#39;2 1&#39; = Hi-speed Program
-  <br>&#39;2 2&#39; = DOF Program
-  <br>&#39;2 3&#39; = MTF Program
+  <br>&#39;2 0&#39; = Program (HyP)
+  <br>&#39;2 1&#39; = Hi-speed Program (HyP)
+  <br>&#39;2 2&#39; = DOF Program (HyP)
+  <br>&#39;2 3&#39; = MTF Program (HyP)
   <br>&#39;3 0&#39; = Green Mode
   <br>&#39;4 0&#39; = Shutter Speed Priority
   <br>&#39;5 0&#39; = Aperture Priority
@@ -497,6 +510,7 @@ step size)</span></span></td></tr>
   <br>0 = Single-frame
   <br>1 = Continuous
   <br>2 = Continuous (Hi)
+  <br>3 = Burst
   <br>[Value 1]
   <br>0 = No Timer
   <br>1 = Self-timer (12 s)
@@ -589,7 +603,9 @@ step size)</span></span></td></tr>
 <td><span class=s>0 = Natural
   <br>1 = Bright
   <br>2 = Portrait
-  <br>3 = Landscape</span></td></tr>
+  <br>3 = Landscape
+  <br>4 = Vibrant
+  <br>5 = Monochrome</span></td></tr>
 <tr class=b>
 <td>0x0050</td>
 <td>ColorTemperature</td>
@@ -606,141 +622,161 @@ step size)</span></span></td></tr>
 <td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>0x0069</td>
+<td>DynamicRangeExpansion</td>
+<td class=c>undef[4]</td>
+<td><span class=s>&#39;0 0 0 0&#39; = Off
+  <br>&#39;1 0 0 0&#39; = On</span></td></tr>
+<tr class=b>
+<td>0x0071</td>
+<td>HighISONoiseReduction</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = Off
+  <br>1 = Weakest
+  <br>2 = Weak
+  <br>3 = Strong</span></td></tr>
+<tr>
+<td>0x0072</td>
+<td>AFAdjustment</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0x0200</td>
 <td>BlackPoint</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0201</td>
 <td>WhitePoint</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0203</td>
 <td>ColorMatrixA</td>
 <td class=c>int16s[9]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0204</td>
 <td>ColorMatrixB</td>
 <td class=c>int16s[9]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0205</td>
 <td>CameraSettings</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#CameraSettings'>Pentax CameraSettings Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0206</td>
 <td>AEInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#AEInfo'>Pentax AEInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0207</td>
 <td>LensInfo</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Pentax.html#LensInfo'>Pentax LensInfo Tags</a></td></tr>
-<tr class=b>
+<td>--&gt; <a href='Pentax.html#LensInfo'>Pentax LensInfo Tags</a>
+  <br>--&gt; <a href='Pentax.html#LensInfo2'>Pentax LensInfo2 Tags</a></td></tr>
+<tr>
 <td>0x0208</td>
 <td>FlashInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#FlashInfo'>Pentax FlashInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0209</td>
 <td>AEMeteringSegments</td>
 <td class=c>int8u[16]</td>
 <td><span class=s><span class=n>(measurements from each of the 16 AE metering segments, converted to LV)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>0x020a</td>
 <td>FlashMeteringSegments</td>
 <td class=c>int8u[16]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x020b</td>
 <td>SlaveFlashMeteringSegments</td>
 <td class=c>int8u[16]</td>
 <td><span class=s><span class=n>(used in wireless control mode)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>0x020d</td>
 <td>WB_RGGBLevelsDaylight</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x020e</td>
 <td>WB_RGGBLevelsShade</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x020f</td>
 <td>WB_RGGBLevelsCloudy</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0210</td>
 <td>WB_RGGBLevelsTungsten</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0211</td>
 <td>WB_RGGBLevelsFluorescentD</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0212</td>
 <td>WB_RGGBLevelsFluorescentN</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0213</td>
 <td>WB_RGGBLevelsFluorescentW</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0214</td>
 <td>WB_RGGBLevelsFlash</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0215</td>
 <td>CameraInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#CameraInfo'>Pentax CameraInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0216</td>
 <td>BatteryInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#BatteryInfo'>Pentax BatteryInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x021f</td>
 <td>AFInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#AFInfo'>Pentax AFInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0222</td>
 <td>ColorInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#ColorInfo'>Pentax ColorInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x03fe</td>
 <td>DataDump</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x03ff</td>
 <td>UnknownInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#UnknownInfo'>Pentax UnknownInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0402</td>
 <td>ToneCurve</td>
 <td class=c>Y~</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0403</td>
 <td>ToneCurves</td>
 <td class=c>Y~</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
@@ -936,7 +972,7 @@ identified by cameras running older firmware versions.
 </tr><tr><td>'3 40'</td><td>= smc PENTAX-F MACRO 100mm F2.8</td>
 </tr><tr><td>'3 41'</td><td>= smc PENTAX-F MACRO 50mm F2.8 or Sigma 50mm F2,8 MACRO</td>
 </tr><tr><td>'3 44'</td><td>= Tamron 35-90mm F4 AF or various SIGMA models</td>
-</tr><tr><td>'3 46'</td><td>= SIGMA APO 70-200mm F2.8 EX</td>
+</tr><tr><td>'3 46'</td><td>= SIGMA APO 70-200mm F2.8 EX or EX APO 100-300mm F4 IF</td>
 </tr><tr><td>'3 50'</td><td>= smc PENTAX-FA 28-70mm F4 AL</td>
 </tr><tr><td>'3 51'</td><td>= SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO</td>
 </tr><tr><td>'3 52'</td><td>= smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF]</td>
@@ -963,7 +999,7 @@ identified by cameras running older firmware versions.
 </tr><tr><td>'4 24'</td><td>= smc PENTAX-FA 77mm F1.8 Limited</td>
 </tr><tr><td>'4 25'</td><td>= TAMRON SP AF 14mm F2.8</td>
 </tr><tr><td>'4 26'</td><td>= smc PENTAX-FA MACRO 100mm F3.5</td>
-</tr><tr><td>'4 27'</td><td>= TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF] MACRO (285D)</td>
+</tr><tr><td>'4 27'</td><td>= TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF] MACRO (185D/285D)</td>
 </tr><tr><td>'4 28'</td><td>= smc PENTAX-FA 35mm F2 AL</td>
 </tr><tr><td>'4 29'</td><td>= TAMRON AF 28-200mm F/3.8-5.6 LD Super II MACRO (371D)</td>
 </tr><tr><td>'4 34'</td><td>= smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]</td>
@@ -981,10 +1017,11 @@ identified by cameras running older firmware versions.
 </tr><tr><td>'4 49'</td><td>= TAMRON SP AF 28-75mm F2.8 XR Di (A09)</td>
 </tr><tr><td>'4 51'</td><td>= smc PENTAX-D FA 50mm F2.8 MACRO</td>
 </tr><tr><td>'4 52'</td><td>= smc PENTAX-D FA 100mm F2.8 MACRO</td>
+</tr><tr><td>'4 243'</td><td>= smc PENTAX-DA 70mm F2.4 Limited</td>
 </tr><tr><td>'4 244'</td><td>= smc PENTAX-DA 21mm F3.2 AL Limited</td>
 </tr><tr><td>'4 245'</td><td>= Schneider D-XENON 50-200mm</td>
 </tr><tr><td>'4 246'</td><td>= Schneider D-XENON 18-55mm</td>
-</tr><tr><td>'4 247'</td><td>= smc PENTAX-DA 10-17mm F3.5-4.5 ED [IF] Fisheye zoom</td>
+</tr><tr><td>'4 247'</td><td>= smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]</td>
 </tr><tr><td>'4 248'</td><td>= smc PENTAX-DA 12-24mm F4 ED AL [IF]</td>
 </tr><tr><td>'4 249'</td><td>= TAMRON XR DiII 18-200mm F3.5-6.3 (A14)</td>
 </tr><tr><td>'4 250'</td><td>= smc PENTAX-DA 50-200mm F4-5.6 ED</td>
@@ -1022,6 +1059,7 @@ identified by cameras running older firmware versions.
 </tr><tr><td>'6 14'</td><td>= smc PENTAX-FA* MACRO 200mm F4 ED[IF]</td>
 </tr><tr><td>'7 0'</td><td>= smc PENTAX-DA 21mm F3.2 AL Limited</td>
 </tr><tr><td>'7 229'</td><td>= smc PENTAX-DA 18-55mm F3.5-5.6 AL II</td>
+</tr><tr><td>'7 230'</td><td>= Tamron AF 17-50mm F2.8 XR Di-II LD (Model A16)</td>
 </tr><tr><td>'7 231'</td><td>= smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]</td>
 </tr><tr><td>'7 233'</td><td>= smc PENTAX-DA 35mm F2.8 Macro Limited</td>
 </tr><tr><td>'7 235'</td><td>= smc PENTAX-DA* 200mm F2.8 ED [IF] SDM (SDM unused)</td>
@@ -1098,10 +1136,28 @@ released, including time for focusing)</span></span></td></tr>
   <br>15 = Sensitivity Priority AE
   <br>16 = Flash X-Sync Speed AE</span></td></tr>
 <tr class=b>
-<td class=r>1</td>
-<td>PictureModeFlags?</td>
+<td class=r>1.1</td>
+<td>ProgramLine</td>
 <td class=c>int8u</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>[Mask 0x3]
+  <br>0x0 = Normal
+  <br>0x1 = Hi Speed
+  <br>0x2 = Depth
+  <br>0x3 = MTF</span></td></tr>
+<tr>
+<td class=r>1.2</td>
+<td>EVSteps</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x20]
+  <br>0x0 = 1/2 EV steps
+  <br>0x20 = 1/3 EV steps</span></td></tr>
+<tr class=b>
+<td class=r>1.3</td>
+<td>E-DialInProgram</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x40]
+  <br>0x0 = Tv or Av
+  <br>0x40 = P Shift</span></td></tr>
 <tr>
 <td class=r>2</td>
 <td>FlashOptions</td>
@@ -1229,6 +1285,30 @@ released, including time for focusing)</span></span></td></tr>
   <br>1 = 6 MP
   <br>2 = 2 MP</span></td></tr>
 <tr class=b>
+<td class=r>16</td>
+<td>FlashOptions2</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(K10D only, set even if the flash is off)</span>
+  <br>[Mask 0xf0]
+  <br>0x0 = Normal or Auto (0)
+  <br>0x10 = Red-eye reduction
+  <br>0x20 = Normal or Auto (2)
+  <br>0x30 = Normal or Auto (2), Red-eye reduction
+  <br>0x50 = Wireless (Master)
+  <br>0x60 = Wireless (Control)
+  <br>0x80 = Slow-sync
+  <br>0x90 = Slow-sync, Red-eye reduction
+  <br>0xa0 = Trailing-curtain Sync</span></td></tr>
+<tr>
+<td class=r>16.1</td>
+<td>MeteringMode3</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(K10D only)</span>
+  <br>[Mask 0xf]
+  <br>0x0 = Multi-segment
+  <br>Bit 0 = Center-weighted average
+  <br>Bit 1 = Spot</span></td></tr>
+<tr class=b>
 <td class=r>18</td>
 <td>TvExposureTimeSetting</td>
 <td class=c>int8u</td>
@@ -1295,9 +1375,11 @@ released, including time for focusing)</span></span></td></tr>
   <br>2 = Tv
   <br>3 = Sv or Green Mode
   <br>8 = Hi-speed Program
+  <br>11 = Hi-speed Program (P-Shift)
   <br>16 = DOF Program
+  <br>19 = DOF Program (P-Shift)
   <br>24 = MTF Program
-  <br>27 = MTF Program (27)
+  <br>27 = MTF Program (P-Shift)
   <br>35 = Standard
   <br>43 = Portrait
   <br>51 = Landscape
@@ -1327,13 +1409,34 @@ released, including time for focusing)</span></span></td></tr>
   <br>Bit 5 = Spot</span></td></tr>
 <tr class=b>
 <td class=r>14</td>
-<td>FlashExposureCompUsed</td>
+<td>FlashExposureCompSet</td>
 <td class=c>int8s</td>
-<td><span class=s><span class=n>(reports 0 if flash was on but did not fire, unlike tag 0x004d which reports
-the camera setting)</span></span></td></tr>
+<td><span class=s><span class=n>(reports the camera setting, unlike tag 0x004d which reports 0 in Green mode
+or if flash was on but did not fire. Both this tag and 0x004d report the
+setting even if the flash is off)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='LensInfo'>Pentax LensInfo Tags</a></h2>
+<p>Pentax lens information structure.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>LensType</td>
+<td class=c>int8u[2]</td>
+<td>--&gt; <a href='Pentax.html#LensType'>Pentax LensType Values</a></td></tr>
+<tr class=b>
+<td class=r>3</td>
+<td>LensData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Pentax.html#LensData'>Pentax LensData Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='LensInfo2'>Pentax LensInfo2 Tags</a></h2>
+<p>Pentax lens information structure for newer models (K10D and later).</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1343,20 +1446,129 @@ the camera setting)</span></span></td></tr>
 <td class=r>0</td>
 <td>LensType</td>
 <td class=c>N</td>
-<td>--&gt; <a href='Pentax.html#LensType'>Pentax LensType Values</a>
-  <br><span class='n s'>(for most models the first 2 bytes are LensType, but for the K10D the
-decoding is a bit different)</span></td></tr>
+<td>--&gt; <a href='Pentax.html#LensType'>Pentax LensType Values</a></td></tr>
 <tr class=b>
 <td class=r>4</td>
-<td>LensCodes</td>
-<td class=c>int8u[16]~</td>
-<td><span class=s><span class=n>(sometimes the LensInfo record has an extra byte, as with the K10D, so this
-tag is sometimes found at index 5 instead)</span></span></td></tr>
+<td>LensData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Pentax.html#LensData'>Pentax LensData Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='LensData'>Pentax LensData Tags</a></h2>
+<p>Pentax lens data information.  Some of these tags require interesting binary
+gymnastics to decode them into useful values.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td class=r>0.1</td>
+<td>AutoAperture</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1]
+  <br>0x0 = On
+  <br>0x1 = Off</span></td></tr>
+<tr class=b>
+<td class=r>0.2</td>
+<td>MinAperture</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x6]
+  <br>0x0 = 22
+  <br>0x2 = 32
+  <br>0x4 = 45
+  <br>0x6 = 16</span></td></tr>
+<tr>
+<td class=r>0.3</td>
+<td>LensFStops</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x70]</span></td></tr>
+<tr class=b>
+<td class=r>1</td>
+<td>LensKind?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>2</td>
+<td>LC1?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>3</td>
+<td>LC2?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>4</td>
+<td>LC3?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r>5</td>
-<td>LensCodes</td>
-<td class=c>int8u[16]~</td>
-<td><span class=s><span class=n>(K10D only)</span></span></td></tr>
+<td>LC4?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>6</td>
+<td>LC5?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>7</td>
+<td>LC6?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>8</td>
+<td>LC7?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>9</td>
+<td>FocalLength</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>10</td>
+<td>NominalMaxAperture</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf0]</span></td></tr>
+<tr class=b>
+<td class=r>10.1</td>
+<td>NominalMinAperture</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf]</span></td></tr>
+<tr>
+<td class=r>11</td>
+<td>LC10?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>12</td>
+<td>LC11?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>13</td>
+<td>LC12?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>14.1</td>
+<td>MaxAperture</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(effective wide open aperture for current focal length)</span>
+  <br>[Mask 0x7f]</span></td></tr>
+<tr>
+<td class=r>15</td>
+<td>LC14?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>16</td>
+<td>LC15?</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FlashInfo'>Pentax FlashInfo Tags</a></h2>
@@ -1403,8 +1615,10 @@ tag is sometimes found at index 5 instead)</span></span></td></tr>
 <td class=c>int8u</td>
 <td><span class=s>0x3f = Off
   <br>0x40 = On, Auto
+  <br>0xbf = On, Flash Problem
   <br>0xc0 = On, Manual
   <br>0xc4 = On, P-TTL Auto
+  <br>0xc5 = On, Contrast-control Sync
   <br>0xc6 = On, High-speed Sync
   <br>0xcc = On, Wireless
   <br>0xcd = On, Wireless, High-speed Sync</span></td></tr>
@@ -1800,7 +2014,7 @@ ASCII text in a format very similar to some HP models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 7, 2008</i>
+<br><i>Last revised Apr 16, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

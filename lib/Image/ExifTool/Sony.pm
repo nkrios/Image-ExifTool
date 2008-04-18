@@ -9,6 +9,7 @@
 #               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm (2006/08/06)
 #               3) Thomas Bodenmann private communication
 #               4) Philippe Devaux private communication (A700)
+#               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Sony;
@@ -19,7 +20,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -42,7 +43,7 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
         Writable => 'undef',
         DataTag => 'PreviewImage',
         WriteCheck => 'return $val=~/^(none|.{32}\xff\xd8\xff)/s ? undef : "Not a valid image"',
-        ValueConv => q{
+        RawConv => q{
             return $val if $val =~ /^Binary/;
             $val = substr($val,0x20) if length($val) > 0x20;
             return $self->ValidateImage(\$val,$tag);
@@ -71,16 +72,7 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     0xb023 => { #PH (A100)
         Name => 'SceneMode',
         Writable => 'int32u',
-        PrintConv => {
-            0 => 'Manual (P,A,S or M)',
-            1 => 'Portrait',
-            4 => 'Sunset',
-            5 => 'Sports',
-            6 => 'Landscape',
-            8 => 'Macro',
-            16 => 'Auto',
-            17 => 'Night Portrait',
-        },
+        PrintConv => \%Image::ExifTool::Minolta::minoltaSceneMode,
     },
     0xb024 => { #PH (A100)
         Name => 'ZoneMatching',
@@ -97,7 +89,12 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
         PrintConv => {
             0 => 'Off',
             1 => 'Standard',
-            2 => 'Advanced',
+            2 => 'Advanced Auto',
+            8 => 'Advanced Lv1', #JD
+            9 => 'Advanced Lv2', #JD
+            10 => 'Advanced Lv3', #JD
+            11 => 'Advanced Lv4', #JD
+            12 => 'Advanced Lv5', #JD
         },
     },
     0xb026 => { #PH (A100)
@@ -122,17 +119,7 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     0xb029 => { #2
         Name => 'ColorMode',
         Writable => 'int32u',
-        PrintConv => {
-            0 => 'Standard',
-            1 => 'Vivid',
-            2 => 'Portrait',
-            3 => 'Landscape',
-            4 => 'Sunset',
-            5 => 'Night Scene',
-            6 => 'B&W',
-            7 => 'Adobe RGB',
-            12 => 'Neutral', #4
-        },
+        PrintConv => \%Image::ExifTool::Minolta::sonyColorMode,
     },
     0xb040 => { #2
         Name => 'Macro',

@@ -283,6 +283,7 @@ t/IPTC-XMP_23.out
 t/IPTC-XMP_24.out
 t/IPTC-XMP_25.out
 t/IPTC-XMP_26.out
+t/IPTC-XMP_27.out
 t/IPTC-XMP_4.out
 t/IPTC-XMP_6.out
 t/IPTC-XMP_7.out
@@ -498,6 +499,7 @@ t/images/Sony.jpg
 t/images/Unknown.jpg
 t/images/Vorbis.ogg
 t/images/Writer.jpg
+t/images/XMP.svg
 t/images/XMP.xmp
 t/images/XMP2.xmp
 t/images/XMP3.xmp

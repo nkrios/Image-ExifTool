@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -48,6 +48,7 @@ my %profileClass = (
     spac => 'ColorSpace Conversion Profile',
     abst => 'Abstract Profile',
     nmcl => 'NamedColor Profile',
+    nkpf => 'Nikon Input Device Profile (NON-STANDARD!)', # (written by Nikon utilities)
 );
 
 # ICC_Profile tag table

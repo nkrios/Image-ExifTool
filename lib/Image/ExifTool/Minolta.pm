@@ -23,17 +23,17 @@
 #              13) http://www.mhohner.de/minolta/lenses.php
 #              14) Jeffery Small private communication (tests with 7D)
 #              15) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm
-#              16) Jens Duttke private communication
+#              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Minolta;
 
 use strict;
-use vars qw($VERSION %minoltaLensIDs %minoltaColorMode);
+use vars qw($VERSION %minoltaLensIDs %minoltaColorMode %sonyColorMode %minoltaSceneMode);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 # lens ID numbers (ref 3)
 %minoltaLensIDs = (
@@ -86,7 +86,7 @@ $VERSION = '1.38';
     51 => 'Sony AF DT 16-105mm F3.5-5.6 or 55-200mm f/4-5.5', #11
     128 => 'Tamron Lens (various models)',
   # 128 => 'Tamron 18-200, 28-300 or 80-300mm F3.5-6.3',
-  # 128 => 'Tamron AF 28-200mm F3.8-5.6 XR Di Aspherical [IF] MACRO', (ref 16)
+  # 128 => 'Tamron AF 28-200mm F3.8-5.6 XR Di Aspherical [IF] MACRO', (ref JD)
     129 => 'Tamron 200-400mm F5.6 or 70-300mm f/4-5.6 LD', #12
     137 => 'Cosina 70-210mm F2.8-4 AF', #11
     138 => 'Soligor 19-35mm F3.5-4.5', #11
@@ -95,7 +95,7 @@ $VERSION = '1.38';
   # 255 => 'Tamron AF 55-200mm f/4-5.6 Di II',
   # 255 => 'Tamron AF 70-300mm f/4-5.6 Di LD MACRO 1:2',
   # 255 => 'Tamron SP AF 200-500mm f/5.0-6.3 Di LD IF',
-    255 => 'Tamron AF 70-300mm f/4-5.6 Di LD MACRO 1:2', #16
+    255 => 'Tamron AF 70-300mm f/4-5.6 Di LD MACRO 1:2', #JD
     25501 => 'Minolta AF 50mm F1.7', #7
     25511 => 'Minolta AF 35-70mm F4', # or Sigma UC AF 28-70mm F3.5-4.5 or Sigma M-AF 70-200mm F2.8 EX Aspherical', #/12/12
     25521 => 'Minolta AF 28-85mm F3.5-4.5 [New]',
@@ -178,6 +178,39 @@ $VERSION = '1.38';
     18 => 'Night Portrait', #10
 );
 
+%sonyColorMode = ( #15
+    0 => 'Standard',
+    1 => 'Vivid', #PH
+    2 => 'Portrait',
+    3 => 'Landscape',
+    4 => 'Sunset',
+    5 => 'Night Portrait',
+    6 => 'B&W',
+    7 => 'Adobe RGB',
+    12 => 'Neutral', #Sony4
+    100 => 'Neutral', #JD
+    101 => 'Clear', #JD
+    102 => 'Deep', #JD
+    103 => 'Light', #JD
+    104 => 'Night View', #JD
+    105 => 'Autumn Leaves', #JD
+);
+
+%minoltaSceneMode = (
+    0 => 'Standard',
+    1 => 'Portrait',
+    2 => 'Text',
+    3 => 'Night Scene',
+    4 => 'Sunset',
+    5 => 'Sports',
+    6 => 'Landscape',
+    7 => 'Night Portrait', #JD
+    8 => 'Macro',
+    9 => 'Super Macro',
+    16 => 'Auto',
+    17 => 'Night View/Portrait',
+);
+
 # Minolta tag table
 %Image::ExifTool::Minolta::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -250,16 +283,7 @@ $VERSION = '1.38';
     0x0100 => { #10
         Name => 'SceneMode',
         Writable => 'int32u',
-        PrintConv => {
-            0 => 'Standard',
-            1 => 'Portrait',
-            2 => 'Text',
-            3 => 'Night Scene',
-            4 => 'Evening Scene',
-            5 => 'Sports',
-            6 => 'Landscape',
-            9 => 'Super Macro',
-        },
+        PrintConv => \%minoltaSceneMode,
     },
     0x0101 => [
         {
@@ -272,17 +296,8 @@ $VERSION = '1.38';
         { #15
             Name => 'ColorMode',
             Writable => 'int32u',
-            Notes => 'Sony DSLR-A100',
-            PrintConv => {
-                0 => 'Standard',
-                1 => 'Vivid', #PH
-                2 => 'Portrait',
-                3 => 'Landscape',
-                4 => 'Sunset',
-                5 => 'Night Scene',
-                6 => 'B&W',
-                7 => 'Adobe RGB',
-            },
+            Notes => 'Sony models',
+            PrintConv => \%sonyColorMode,
         },
     ],
     0x0102 => {
@@ -850,8 +865,8 @@ $VERSION = '1.38';
             0 => 'Single-shot AF',
             1 => 'Continuous AF',
             # Note: these two are reversed in ref 8
-            3 => 'Manual', #16
-            4 => 'Automatic AF', #16
+            3 => 'Manual', #JD
+            4 => 'Automatic AF', #JD
         },
     },
     0x10 => {

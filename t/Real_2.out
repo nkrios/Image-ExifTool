@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.43
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.25
 [File, File, Image]  - File Name: Real.rm
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1915 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:05:24 08:33:34
+[File, File, Time]  - File Modification Date/Time: 2006:05:24 08:37:37
 [File, File, Image]  - File Type: RM
 [File, File, Image]  - MIME Type: audio/x-pn-realaudio
 [Real, Real-PROP, Video] 0 - Max Bit Rate: 32041
@@ -10,8 +10,8 @@
 [Real, Real-PROP, Video] 2 - Max Packet Size: 465
 [Real, Real-PROP, Video] 3 - Avg Packet Size: 465
 [Real, Real-PROP, Video] 4 - Num Packets: 16
-[Real, Real-PROP, Video] 5 - Duration: 0.095
-[Real, Real-PROP, Video] 6 - Preroll: 1.857
+[Real, Real-PROP, Video] 5 - Duration: 0.10 s
+[Real, Real-PROP, Video] 6 - Preroll: 1.86 s
 [Real, Real-PROP, Video] 9 - Num Streams: 2
 [Real, Real-PROP, Video] 10 - Flags: Allow Recording, Allow Download
 [Real, Real-MDPR, Video] 0 - Stream Number: 0
@@ -20,8 +20,8 @@
 [Real, Real-MDPR, Video] 3 - Stream Max Packet Size: 465
 [Real, Real-MDPR, Video] 4 - Stream Avg Packet Size: 465
 [Real, Real-MDPR, Video] 5 - Stream Start Time: 0
-[Real, Real-MDPR, Video] 6 - Stream Preroll: 1.857
-[Real, Real-MDPR, Video] 7 - Stream Duration: 1857
+[Real, Real-MDPR, Video] 6 - Stream Preroll: 1.86 s
+[Real, Real-MDPR, Video] 7 - Stream Duration: 1.86 s
 [Real, Real-MDPR, Video] 9 - Stream Name: Audio Stream
 [Real, Real-MDPR, Video] 11 - Stream Mime Type: audio/x-pn-realaudio
 [Real, Real-MDPR2, Video] 0 - Stream Number: 1
@@ -30,8 +30,8 @@
 [Real, Real-MDPR2, Video] 3 - Stream Max Packet Size: 0
 [Real, Real-MDPR2, Video] 4 - Stream Avg Packet Size: 0
 [Real, Real-MDPR2, Video] 5 - Stream Start Time: 0
-[Real, Real-MDPR2, Video] 6 - Stream Preroll: 0
-[Real, Real-MDPR2, Video] 7 - Stream Duration: 0
+[Real, Real-MDPR2, Video] 6 - Stream Preroll: 0 s
+[Real, Real-MDPR2, Video] 7 - Stream Duration: 0 s
 [Real, Real-MDPR2, Video] 11 - Stream Mime Type: logical-fileinfo
 [Real, Real-MDPR2, Video] 14 - File Info Version: 0
 [Real, Real-MDPR2, Video] Content Rating - Content Rating: All Ages

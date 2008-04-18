@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.00
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
 [File, File, Image]  - File Type: TIFF
 [File, File, Image]  - MIME Type: image/tiff
-[File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
+[File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
 [EXIF, IFD0, Image] 254 - Subfile Type: Full-resolution Image
 [EXIF, IFD0, Image] 256 - Image Width: 160
 [EXIF, IFD0, Image] 257 - Image Height: 120

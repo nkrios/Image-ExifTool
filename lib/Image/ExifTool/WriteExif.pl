@@ -331,15 +331,6 @@ my %writeTable = (
         Writable => 'rational64u',
         PrintConvInv => '$val',
     },
-    0x83bb => {             # IPTC-NAA
-        # this should actually be written as 'undef' (see
-        # http://www.awaresystems.be/imaging/tiff/tifftags/iptc.html),
-        # but Photoshop writes it as int32u and Nikon Capture won't read
-        # anything else, so we do the same thing here...  Doh!
-        Format => 'undef',      # convert binary values as undef
-        Writable => 'int32u',   # but write int32u format code in IFD
-        WriteGroup => 'IFD0',
-    },
     0x8546 => {             # SEMInfo
         Writable => 'string',
         WriteGroup => 'IFD0',
@@ -423,9 +414,9 @@ my %writeTable = (
         Count => 4,  # write this SubjectLocation with 4 and the other with 2 values
     },
 #    0x927c => 'undef',      # MakerNotes
-    0x9286 => {             # UserComment (string that starts with "ASCII\0\0\0")
+    0x9286 => {             # UserComment (starts with "ASCII\0\0\0" or "UNICODE\0")
         Writable => 'undef',
-        PrintConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
+        RawConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
     0x9290 => 'string',     # SubSecTime
     0x9291 => 'string',     # SubSecTimeOriginal
@@ -525,10 +516,6 @@ my %writeTable = (
     0xa40c => 'int16u',     # SubjectDistanceRange
     0xa420 => 'string',     # ImageUniqueID
     0xa500 => 'rational64u',# Gamma
-    0xc4a5 => {             # PrintIM
-        Writable => 'undef',
-        WriteGroup => 'IFD0',
-    },
 #
 # DNG stuff (back in IFD0)
 #
@@ -658,11 +645,6 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Protected => 1,
     },
-    0xc68c => {             # OriginalRawFileData (a writable directory)
-        Writable => 'undef',
-        WriteGroup => 'IFD0',
-        Protected => 1,
-    },
     0xc68d => {             # ActiveArea
         Writable => 'int32u',
         WriteGroup => 'SubIFD',
@@ -675,8 +657,7 @@ my %writeTable = (
         Count => 4,
         Protected => 1,
     },
-    0xc68f => {             # AsShotICCProfile
-        Writable => 'undef',
+    0xc68f => {             # AsShotICCProfile (writable directory)
         WriteGroup => 'IFD0',
         Protected => 1,
         WriteCheck => q{
@@ -690,7 +671,7 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Protected => 1,
     },
-    0xc691 => {             # CurrentICCProfile
+    0xc691 => {             # CurrentICCProfile (writable directory)
         Writable => 'undef',
         WriteGroup => 'IFD0',
         Protected => 1,
@@ -869,12 +850,14 @@ sub CheckExif($$$)
 # encode exif ASCII/Unicode text from UTF8 or Latin
 # Inputs: 0) ExifTool ref, 1) text string
 # Returns: encoded string
+# Note: MUST be called Raw conversion time so the EXIF byte order is known!
 sub EncodeExifText($$)
 {
     my ($exifTool, $val) = @_;
     # does the string contain special characters?
     if ($val =~ /[\x80-\xff]/) {
-        return "UNICODE\0" . $exifTool->Charset2Unicode($val);
+        my $order = $exifTool->GetNewValues('ExifUnicodeByteOrder');
+        return "UNICODE\0" . $exifTool->Charset2Unicode($val, $order);
     } else {
         return "ASCII\0\0\0$val";
     }
@@ -1065,11 +1048,18 @@ sub UpdateTiffEnd($$)
 
 #------------------------------------------------------------------------------
 # Handle error while writing EXIF
-# Inputs: 0) ExifTool ref, 1) error string, 2) flag set for minor error
+# Inputs: 0) ExifTool ref, 1) error string, 2) tag table ref
 # Returns: undef on fatal error, or '' if minor error is ignored
 sub ExifErr($$$)
 {
-    my ($exifTool, $errStr, $minor) = @_;
+    my ($exifTool, $errStr, $tagTablePtr) = @_;
+    # MakerNote errors are minor by default
+    my $minor = ($tagTablePtr->{GROUPS}->{0} eq 'MakerNotes');
+    if ($tagTablePtr->{VARS} and $tagTablePtr->{VARS}->{MINOR_ERRORS}) {
+        $exifTool->Warn("$errStr. IFD dropped.") and return '' if $minor;
+        $minor = 1;
+    }
+    # all MakerNote errors are minor by default
     return undef if $exifTool->Error($errStr, $minor);
     return '';
 }
@@ -1181,38 +1171,45 @@ sub WriteExif($$$)
             $mustRead = 1 if $dirStart + $len > $dataLen;
         }
         # read IFD from file if necessary
-        if ($raf and $mustRead) {
-            # read the count of entries in this IFD
-            my $offset = $dirStart + $dataPos;
-            my ($buff, $buf2);
-            unless ($raf->Seek($offset + $base, 0) and $raf->Read($buff,2) == 2) {
-                return ExifErr($exifTool, "Bad IFD or truncated file in $dirName", $inMakerNotes);
+        if ($mustRead) {
+            if ($raf) {
+                # read the count of entries in this IFD
+                my $offset = $dirStart + $dataPos;
+                my ($buff, $buf2);
+                unless ($raf->Seek($offset + $base, 0) and $raf->Read($buff,2) == 2) {
+                    return ExifErr($exifTool, "Bad IFD or truncated file in $dirName", $tagTablePtr);
+                }
+                my $len = 12 * Get16u(\$buff,0);
+                # (also read next IFD pointer if available)
+                unless ($raf->Read($buf2, $len+4) >= $len) {
+                    return ExifErr($exifTool, "Error reading $dirName", $tagTablePtr);
+                }
+                $buff .= $buf2;
+                # make copy of dirInfo since we're going to modify it
+                my %newDirInfo = %$dirInfo;
+                $dirInfo = \%newDirInfo;
+                # update directory parameters for the newly loaded IFD
+                $dataPt = $$dirInfo{DataPt} = \$buff;
+                $dirStart = $$dirInfo{DirStart} = 0;
+                $dataPos = $$dirInfo{DataPos} = $offset;
+                $dataLen = $$dirInfo{DataLen} = length $buff;
+                $dirLen = $$dirInfo{DirLen} = $dataLen;
+                # only account for nextIFD pointer if we are going to use it
+                $len += 4 if $dataLen==$len+6 and ($$dirInfo{Multi} or $buff =~ /\0{4}$/);
+                UpdateTiffEnd($exifTool, $offset+$base+2+$len);
+            } elsif ($dirLen) {
+                # error if we can't load IFD (unless we are creating
+                # from scratch, in which case dirLen will be zero)
+                my $str = $exifTool->Options('IgnoreMinorErrors') ? "Deleted bad" : "Bad";
+                $exifTool->Error("$str $dirName directory", 1);
             }
-            my $len = 12 * Get16u(\$buff,0);
-            # (also read next IFD pointer if available)
-            unless ($raf->Read($buf2, $len+4) >= $len) {
-                return ExifErr($exifTool, "Error reading $dirName", $inMakerNotes);
-            }
-            $buff .= $buf2;
-            # make copy of dirInfo since we're going to modify it
-            my %newDirInfo = %$dirInfo;
-            $dirInfo = \%newDirInfo;
-            # update directory parameters for the newly loaded IFD
-            $dataPt = $$dirInfo{DataPt} = \$buff;
-            $dirStart = $$dirInfo{DirStart} = 0;
-            $dataPos = $$dirInfo{DataPos} = $offset;
-            $dataLen = $$dirInfo{DataLen} = length $buff;
-            $dirLen = $$dirInfo{DirLen} = $dataLen;
-            # only account for nextIFD pointer if we are going to use it
-            $len += 4 if $dataLen==$len+6 and ($$dirInfo{Multi} or $buff =~ /\0{4}$/);
-            UpdateTiffEnd($exifTool, $offset+$base+2+$len);
         }
         my ($len, $numEntries);
         if ($dirStart + 4 < $dataLen) {
             $numEntries = Get16u($dataPt, $dirStart);
             $len = 2 + 12 * $numEntries;
             if ($dirStart + $len > $dataLen) {
-                return ExifErr($exifTool, "Truncated $dirName directory", $inMakerNotes);
+                return ExifErr($exifTool, "Truncated $dirName directory", $tagTablePtr);
             }
             # sort entries if necessary (but not in maker notes IFDs)
             unless ($inMakerNotes) {
@@ -1319,7 +1316,8 @@ Entry:  for (;;) {
                             $dirBuff .= ("\0" x 12) if $$dirInfo{FixBase};
                             next;
                         }
-                        return ExifErr($exifTool, "Bad format ($oldFormat) for $dirName entry $index", $inMakerNotes);
+                        my $msg = "Bad format ($oldFormat) for $dirName entry $index";
+                        return ExifErr($exifTool, $msg, $tagTablePtr);
                     }
                     $readFormName = $oldFormName = $formatName[$oldFormat];
                     $valueDataPt = $dataPt;
@@ -1583,7 +1581,10 @@ DropTag:                    ++$index;
                             $newCount = length($newValue) / $formatSize[$newFormat];
                             ++$exifTool->{CHANGED};
                             # not all mandatory if we are writing any tag specifically
-                            undef $allMandatory if $newValueHash;
+                            if ($newValueHash and defined $allMandatory) {
+                                undef $allMandatory;
+                                undef $deleteAll;
+                            }
                             if ($verbose > 1) {
                                 $val = $exifTool->Printable($val);
                                 $newVal = $exifTool->Printable($newVal);
@@ -1865,6 +1866,10 @@ NoOverwrite:            next if $isNew > 0;
                                 Fixup    => new Image::ExifTool::Fixup,
                                 RAF      => $raf,
                             );
+                            my $subTable = $tagTablePtr;
+                            if ($$subdir{TagTable}) {
+                                $subTable = GetTagTable($$subdir{TagTable});
+                            }
                             # read IFD from file if necessary
                             if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
                                 my ($buff, $buf2, $subSize);
@@ -1873,12 +1878,18 @@ NoOverwrite:            next if $isNew > 0;
                                         $subSize = 12 * Get16u(\$buff, 0) and
                                         $raf->Read($buf2,$subSize+4) >= $subSize)
                                 {
+                                    my @err;
                                     if (defined $subSize and not $subSize) {
-                                        return undef if $exifTool->Error("$subdirName IFD has zero entries", 1);
-                                        next Entry;
+                                        @err = ("$subdirName IFD has zero entries", 1);
+                                    } else {
+                                        @err = ("Can't read $subdirName data", $inMakerNotes);
                                     }
-                                    return undef if $exifTool->Error("Can't read $subdirName data", $inMakerNotes);
-                                    next Entry;
+                                    if ($$subTable{VARS} and $subTable->{VARS}->{MINOR_ERRORS}) {
+                                        $exifTool->Warn($err[0] . '. Ignored.');
+                                    } elsif ($exifTool->Error(@err)) {
+                                        return undef;
+                                    }
+                                    next Entry; # don't write this directory
                                 }
                                 $buff .= $buf2;
                                 # change subdirectory information to data we just read
@@ -1890,10 +1901,6 @@ NoOverwrite:            next if $isNew > 0;
                                 $subSize += 4 if length($buff)==$subSize+6 and 
                                     ($$newInfo{Name} eq 'SubIFD' or $buff =~ /\0{4}$/);
                                 UpdateTiffEnd($exifTool, $pt+$base+2+$subSize);
-                            }
-                            my $subTable = $tagTablePtr;
-                            if ($$subdir{TagTable}) {
-                                $subTable = GetTagTable($$subdir{TagTable});
                             }
                             my $subdirData = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
                             return undef unless defined $subdirData;

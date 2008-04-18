@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -129,7 +129,7 @@ my %coordConv = (
             V => 'Measurement Interoperability',
         },
     },
-    0x000A => {
+    0x000a => {
         Name => 'GPSMeasureMode',
         Writable => 'string',
         Count => 2,
@@ -138,12 +138,12 @@ my %coordConv = (
             3 => '3-Dimensional Measurement',
         },
     },
-    0x000B => {
+    0x000b => {
         Name => 'GPSDOP',
         Description => 'GPS Dilution Of Precision',
         Writable => 'rational64u',
     },
-    0x000C => {
+    0x000c => {
         Name => 'GPSSpeedRef',
         Writable => 'string',
         Count => 2,
@@ -153,11 +153,11 @@ my %coordConv = (
             N => 'knots',
         },
     },
-    0x000D => {
+    0x000d => {
         Name => 'GPSSpeed',
         Writable => 'rational64u',
     },
-    0x000E => {
+    0x000e => {
         Name => 'GPSTrackRef',
         Writable => 'string',
         Count => 2,
@@ -166,7 +166,7 @@ my %coordConv = (
             T => 'True North',
         },
     },
-    0x000F => {
+    0x000f => {
         Name => 'GPSTrack',
         Writable => 'rational64u',
     },
@@ -240,23 +240,23 @@ my %coordConv = (
             N => 'Nautical Miles',
         },
     },
-    0x001A => {
+    0x001a => {
         Name => 'GPSDestDistance',
         Writable => 'rational64u',
     },
-    0x001B => {
+    0x001b => {
         Name => 'GPSProcessingMethod',
         Writable => 'undef',
-        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-        PrintConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
+        RawConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+        RawConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
-    0x001C => {
+    0x001c => {
         Name => 'GPSAreaInformation',
         Writable => 'undef',
-        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
-        PrintConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
+        RawConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+        RawConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
-    0x001D => {
+    0x001d => {
         Name => 'GPSDateStamp',
         Groups => { 2 => 'Time' },
         Writable => 'string',
@@ -268,7 +268,7 @@ my %coordConv = (
         # pull date out of any format date/time string
         PrintConvInv => '$val=~/(\d{4}).*?(\d{2}).*?(\d{2})/ ? "$1:$2:$3" : $val',
     },
-    0x001E => {
+    0x001e => {
         Name => 'GPSDifferential',
         Writable => 'int16u',
         PrintConv => {

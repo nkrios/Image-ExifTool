@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Canon;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessRealMeta($$$);
 sub ProcessRealProperties($$$);
@@ -88,14 +88,15 @@ my %metadataFlag = (
 %Image::ExifTool::Real::Properties = (
     GROUPS => { 1 => 'Real-PROP', 2 => 'Video' },
     PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
+    VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int32u',
     0  => 'MaxBitRate',
     1  => 'AvgBitRate',
     2  => 'MaxPacketSize',
     3  => 'AvgPacketSize',
     4  => 'NumPackets',
-    5 => { Name => 'Duration',      ValueConv => '$val / 1000' },
-    6 => { Name => 'Preroll',       ValueConv => '$val / 1000' },
+    5 => { Name => 'Duration',      ValueConv => '$val / 1000',  PrintConv => 'ConvertDuration($val)' },
+    6 => { Name => 'Preroll',       ValueConv => '$val / 1000',  PrintConv => 'ConvertDuration($val)' },
     7 => { Name => 'IndexOffset',   Unknown => 1 },
     8 => { Name => 'DataOffset',    Unknown => 1 },
     9 => { Name => 'NumStreams',    Format => 'int16u' },
@@ -114,6 +115,7 @@ my %metadataFlag = (
 %Image::ExifTool::Real::MediaProps = (
     GROUPS => { 1 => 'Real-MDPR', 2 => 'Video' },
     PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
+    VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int32u',
     PRIORITY => 0,  # first stream takes priority
     0  => { Name => 'StreamNumber',  Format => 'int16u' },
@@ -122,8 +124,8 @@ my %metadataFlag = (
     3  => { Name => 'StreamMaxPacketSize' },
     4  => { Name => 'StreamAvgPacketSize' },
     5  => { Name => 'StreamStartTime' },
-    6  => { Name => 'StreamPreroll',       ValueConv => '$val / 1000' },
-    7  => { Name => 'StreamDuration',      FValueConv => '$val / 1000' },
+    6  => { Name => 'StreamPreroll', ValueConv => '$val / 1000',  PrintConv => 'ConvertDuration($val)' },
+    7  => { Name => 'StreamDuration',ValueConv => '$val / 1000',  PrintConv => 'ConvertDuration($val)' },
     8  => { Name => 'StreamNameLen', Format => 'int8u', Unknown => 1 },
     9  => { Name => 'StreamName',    Format => 'string[$val{8}]' },
     10 => { Name => 'StreamMimeLen', Format => 'int8u', Unknown => 1 },
@@ -234,6 +236,7 @@ my %metadataFlag = (
 %Image::ExifTool::Real::ContentDescr = (
     GROUPS => { 1 => 'Real-CONT', 2 => 'Video' },
     PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
+    VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int16u',
     0 => { Name => 'TitleLen',      Unknown => 1 },
     1 => { Name => 'Title',         Format => 'string[$val{0}]' },
@@ -267,6 +270,7 @@ my %metadataFlag = (
 %Image::ExifTool::Real::AudioV3 = (
     GROUPS => { 1 => 'Real-RA3', 2 => 'Audio' },
     PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
+    VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int8u',
     0  => { Name => 'Channels',       Format => 'int16u' },
     1  => { Name => 'Unknown',        Format => 'int16u[3]', Unknown => 1 },
@@ -285,6 +289,7 @@ my %metadataFlag = (
 %Image::ExifTool::Real::AudioV4 = (
     GROUPS => { 1 => 'Real-RA4', 2 => 'Audio' },
     PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
+    VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int16u',
     0  => { Name => 'FourCC1',        Format => 'undef[4]', Unknown => 1 },
     1  => { Name => 'AudioFileSize',  Format => 'int32u',   Unknown => 1 },
@@ -322,6 +327,7 @@ my %metadataFlag = (
 %Image::ExifTool::Real::AudioV5 = (
     GROUPS => { 1 => 'Real-RA5', 2 => 'Audio' },
     PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
+    VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int16u',
     0  => { Name => 'FourCC1',        Format => 'undef[4]', Unknown => 1 },
     1  => { Name => 'AudioFileSize',  Format => 'int32u',   Unknown => 1 },

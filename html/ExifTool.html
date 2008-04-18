@@ -601,9 +601,10 @@ to additional files without the need to call
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>WriteInfo($$;$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
-    <br><b>1)</b> Source file name, file reference, scalar reference, or undefined
-    to create a file from scratch
-    <br><b>2)</b> [<i>optional</i>] Destination file name, file or scalar reference
+    <br><b>1)</b> Source file name, file reference, scalar reference, or undef to
+    create a file from scratch
+    <br><b>2)</b> [<i>optional</i>] Destination file name, file reference, scalar
+    reference, or undef to edit in place
     <br><b>3)</b> [<i>optional</i>] Destination file type
 </td></tr>
 <tr><td><b>Returns</b></td><td>1 if file was written OK, 2 if file was written
@@ -614,10 +615,11 @@ but no changes made, 0 on file write error.
 (currently only XMP, ICC and MIE files can be created in this way).  If
 undefined, the destination file type is required unless the type can be
 determined from the destination file name.</p>
-<p>The destination file name may be undefined to edit a file in place (make
-sure you have backups!).  If a destination file name is given, the specified
-file must not exist because existing destination files will not be
-overwritten.</p>
+<p>If a destination file name is given, the specified file must not exist
+because an existing destination file will not be overwritten.  The
+destination file name may be undefined to edit the source file in place
+(make sure you have backups!).  In this case, a temporary file is created
+and renamed to replace the source file if no errors occurred while writing.</p>
 <p>The destination file type is only used if the source file is undefined.</p>
 <p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -780,7 +782,7 @@ the same tag name for each value, or call with a reference to the list of values
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>SetNewValue($;$$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
- <br><b>1)</b> [<i>optional</i>] Tag key or tag name, or undefined to clear all
+ <br><b>1)</b> [<i>optional</i>] Tag key or tag name, or undef to clear all
  new values. A tag name of '<code>*</code>' can be used when deleting tags to
  delete all tags, or all tags in a specified group.  The tag name may be
  prefixed by group name, separated by a colon (ie. '<code>GROUP:TAG</code>'),
@@ -1305,7 +1307,7 @@ CanonVRD, Composite, DICOM, DNG, Ducky, EXIF, ExifTool, FLAC, File, Flash,
 FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, ITC, JFIF,
 JPEG, Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF,
 PICT, PNG, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
-RIFF, Real, SigmaRaw, Vorbis, XMP
+RIFF, Real, SVG, SigmaRaw, Vorbis, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
@@ -1324,11 +1326,11 @@ NikonPreview, NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax,
 PhotoMechanic, Photoshop, PictureInfo, PostScript, PrintIM, QuickTime, RAF,
 RAF2, RIFF, RMETA, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
 Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
-SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
-XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif,
-XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+SRF#, SVG, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP,
+XMP-DICOM, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
+XMP-exif, XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
+XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,

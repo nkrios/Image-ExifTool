@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.18
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.24
 [File, File, Image]  - File Name: Minolta_4_failed.mrw
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2008:02:21 08:27:01
+[File, File, Time]  - File Modification Date/Time: 2008:03:28 14:39:04
 [File, File, Image]  - File Type: MRW
 [File, File, Image]  - MIME Type: image/x-raw
-[File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
+[File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
 [MakerNotes, MinoltaRaw, Camera] 0 - Firmware ID: 27200001
 [MakerNotes, MinoltaRaw, Camera] 8 - Sensor Height: 2456
 [MakerNotes, MinoltaRaw, Camera] 10 - Sensor Width: 3272
@@ -63,8 +63,6 @@
 [MakerNotes, Minolta, Camera] 48 - Focus Mode: MF
 [MakerNotes, Minolta, Camera] 49 - Focus Area: Spot Focus
 [MakerNotes, Minolta, Camera] 50 - DEC Position: Filter
-[MakerNotes, Minolta, Camera] 51 - Minolta Camera Settings 0x0033: 0
-[MakerNotes, Minolta, Camera] 52 - Minolta Camera Settings 0x0034: 1
 [MakerNotes, Minolta, Camera] 63 - Flash Metering: ADI (Advanced Distance Integration)
 [MakerNotes, Minolta, Camera] 16 - Minolta 0x0010: ¯¯¯¯.vÿð......#.....[...]
 [MakerNotes, Minolta, Camera] 24 - Image Stabilization: On

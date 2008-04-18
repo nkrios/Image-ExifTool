@@ -20,7 +20,7 @@ use Image::ExifTool::PostScript;
 use Image::ExifTool::XMP qw(EscapeXML UnescapeXML);
 require Exporter;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -332,8 +332,8 @@ sub ProcessHTML($$)
 
     # validate HTML or XHTML file
     $raf->Read($buff, 256) or return 0;
-    $buff =~ /^<(!DOCTYPE HTML|HTML|\?xml)/i or return 0;
-    $buff =~ /<(!DOCTYPE )?HTML/i or return 0 if $1 eq '?xml';
+    $buff =~ /^<(!DOCTYPE\s+HTML|HTML|\?xml)/i or return 0;
+    $buff =~ /<(!DOCTYPE\s+)?HTML/i or return 0 if $1 eq '?xml';
     $exifTool->SetFileType();
 
     $raf->Seek(0,0) or $exifTool->Warn('Seek error'), return 1;

@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.18
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
 [File, File, Image]  - File Name: MIE_3_failed.mie
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2008:02:21 08:27:01
+[File, File, Time]  - File Modification Date/Time: 2008:03:13 09:33:28
 [File, File, Image]  - File Type: MIE
 [File, File, Image]  - MIME Type: image/x-mie-jpeg
-[File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
+[File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
 [MIE, MIE-Main, Other] 0Type - Subfile Type: JPEG
 [MIE, MIE-Main, Other] 0Vers - MIE Version: 1.1
 [MIE, MIE-Main, Other] 1Name - Subfile Name: dummy.jpg

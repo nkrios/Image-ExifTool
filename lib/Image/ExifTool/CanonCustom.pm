@@ -18,7 +18,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1793,6 +1793,13 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         PrintConv => {
             0 => 'Disable (LCD auto adjust)',
             1 => 'Enable (simulates exposure)',
+        },
+    },
+    0x0811 => {
+        Name => 'LCDDisplayAtPowerOn',
+        PrintConv => {
+            0 => 'Display',
+            1 => 'Retain power off status',
         },
     },
 );

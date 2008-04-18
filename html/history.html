@@ -9,8 +9,79 @@
 <!-- Use line width of 80 -->
 <h1 class='up'>ExifTool Version History</h1>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.21.tar.gz">Version 7.21</a>. (Other versions are
+(I'll be away from about Apr. 25 to May 11/08, and only online occasionally via
+my iPod, so don't expect any updates or prompt/lengthy email/forum responses
+during this period. - PH)<p>
+
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.25.tar.gz">Version 7.25</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
+
+<b>Apr. 18, 2008 - Version 7.25 (production release)</b>
+<ul>
+<li>Added read support for DIVX video files
+<li>Added a new Nikon LensID (thanks Tanel Kuusk)
+<li>Decode a number of new Pentax K10D tags and values (thanks Dave Nicholson)
+<li>Decode a few new Nikon tags (thanks Jens Duttke)
+<li>Decode Nikon VignetteControl tag found in D3 images with new 1.10 firmware
+    (thanks Alexandre Naaman)
+<li>Improved formatting of video duration times
+<li>Improved print conversion for video Compression values
+<li>Apply print conversion for XMP:FocalLengthIn35mmFormat to add "mm"
+<li>Fixed MIME type of JPEG 2000 images
+<li>Fixed problem decoding new Nikon D300 AFPrioritySelection tags
+<li>API Changes:
+    <ul>
+    <li>Fixed CanCreate so it returns false for non-writable TIFF-based files
+    </ul>
+</ul>
+
+<b>Apr. 10, 2008 - Version 7.24</b>
+<ul>
+<li>Added read support for SVG (Scalable Vector Graphics) images
+<li>Added support for non-standard Apple iPhone PNG images
+<li>Added support for ISL maker note format
+<li>Added a couple of new Olympus LensType's
+<li>Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Added values for various Sony tags (thanks Jens Duttke)
+<li>Decode Nikon D300 custom settings (thanks Jens Duttke)
+<li>Decode Nikon D300 AFFineTuneAdj (thanks Neil Nappe)
+<li>Decode a number of new Pentax tags and values (thanks Jens Duttke)
+<li>Decode a number of new QuickTime tags, including 'mdta' information
+<li>Decode a missing Custom Function for Canon 450D (thanks Laurent Clevy)
+<li>Avoid extracting any unknown tag in binary data tables when -u option used
+<li>Avoid writing Canon 1D/1DS RAW images masquerading as TIF (writing 1D
+    RAW images is not yet supported)
+<li>Improved parsing of AFCP ThumbnailImage and PreviewImage
+<li>Downgraded errors in the NikonScan and NikonPreview IFD's to allow writing
+    of images with these problems without requiring the -m option
+</ul>
+
+<b>Mar. 27, 2008 - Version 7.23</b>
+<ul>
+<li>Decode a number of new Pentax K20D/K200D tags and values
+<li>Fixed bug introduced in 7.18 which caused "Error parsing XMP" warning when
+    deleting all XMP and writing new XMP tags in the same step
+</ul>
+
+<b>Mar. 25, 2008 - Version 7.22</b>
+<ul>
+<li>Added support for Olympus-style Sony makernotes (DSC-S45/500/650/700/750)
+<li>Added %c 'n' modifier to number output files from 1 instead of 0
+<li>Added Extra "Now" tag used for setting a tag value to the current date/time
+<li>Added a new Nikon LensID (thanks Jens Duttke)
+<li>Added ability to specify byte order for EXIF Unicode text and fixed problem
+    where text wasn't always written in EXIF byte order by default
+<li>Added a new Canon LensType (thanks Hal Williamson)
+<li>Added a few new CanonModelID values
+<li>Decode a new Pentax K20D tag and add a few new values to other tags (thanks
+    Jens Duttke)
+<li>Recognize non-standard Nikon ICC Profile files
+<li>Improved error checking when writing a JPEG image with a bad IFD
+<li>Fixed bug where IFD0 could be deleted when writing JPEG with a bad IFD1
+<li>Fixed some Olympus LensType names for Leica lenses
+<li>Fixed problem extracting some writable directories as a block
+<li>Fixed bug which could cause "Not an ARRAY" error when reading PDF files
+</ul>
 
 <b>Mar. 12, 2008 - Version 7.21 (production release)</b>
 <ul>
@@ -24,7 +95,7 @@ considered development releases, and are not uploaded to <a href="http://search.
 <li>Marked DNG OriginalRawFileName and OriginalRawFileData as "unsafe" to copy
 <li>Changed decoding of Casio BestShotMode
 <li>Renamed Nikon NEFCurve tags (thanks Jens Duttke)
-<li>Patched problem parsing original decision data for the Canon EOS 5D
+<li>Patched problem parsing OriginalDecisionData for the Canon EOS 5D
 </ul>
 
 <b>Mar. 7, 2008 - Version 7.20</b>

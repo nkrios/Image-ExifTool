@@ -22,7 +22,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
 
 # main tag table IPTC-format records in CanonVRD trailer
 %Image::ExifTool::CanonVRD::Main = (
-    VARS => { INDEX => 1 },
+    VARS => { ID_LABEL => 'Index' }, # change TagID label in documentation
     NOTES => q{
         Canon Digital Photo Professional writes VRD (Recipe Data) information as a
         trailer record to JPEG, TIFF, CRW and CR2 images, or as a stand-alone VRD

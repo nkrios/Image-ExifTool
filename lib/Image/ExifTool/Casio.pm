@@ -10,7 +10,7 @@
 #               2) Joachim Loehr private communication
 #               3) http://homepage3.nifty.com/kamisaka/makernote/makernote_casio.htm
 #               4) http://www.gvsoft.homedns.org/exif/makernote-casio.html
-#               5) Jens Duttke private communication
+#               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Casio;
@@ -168,7 +168,7 @@ $VERSION = '1.23';
         Writable => 'int16u',
         Priority => 0,
     },
-    0x0015 => { #5 (Similar to Type2 0x2001)
+    0x0015 => { #JD (Similar to Type2 0x2001)
         Name => 'FirmwareDate',
         Writable => 'string',
         Format => 'undef', # the 'string' contains nulls
@@ -226,7 +226,7 @@ $VERSION = '1.23';
     0x0018 => { #4
         Name => 'AFPoint',
         Writable => 'int16u',
-        Notes => 'may not be valid for all models', #5
+        Notes => 'may not be valid for all models', #JD
         PrintConv => {
             1 => 'Center',
             2 => 'Upper Left',
@@ -447,7 +447,7 @@ $VERSION = '1.23';
            12 => 'Flash',
         },
     },
-    0x2021 => { #5 (guess)
+    0x2021 => { #JD (guess)
         Name => 'AFPointPosition',
         PrintConv => q{
             my @v = split ' ', $val;

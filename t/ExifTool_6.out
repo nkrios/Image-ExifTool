@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.16
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
 [File, File, Image]  - File Name: Canon.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Time]  - File Modification Date/Time: 2007:05:01 07:34:38
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
 [File, File, Image] BitsPerSample - Bits Per Sample: 8
 [File, File, Image] ColorComponents - Color Components: 3

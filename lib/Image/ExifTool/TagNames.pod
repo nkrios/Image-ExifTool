@@ -408,6 +408,7 @@ images.
            MakerNoteHP2              ExifIFD    HP Type2
            MakerNoteHP4              ExifIFD    HP Type4
            MakerNoteHP6              ExifIFD    HP Type6
+           MakerNoteISL              ExifIFD    Unknown
            MakerNoteJVC              ExifIFD    JVC
            MakerNoteJVCText          ExifIFD    JVC Text
            MakerNoteKodak1a          ExifIFD    Kodak
@@ -447,7 +448,9 @@ images.
            MakerNoteSanyoPatch       ExifIFD    Sanyo
            MakerNoteSigma            ExifIFD    Sigma
            MakerNoteSony             ExifIFD    Sony
-           MakerNoteSony2            ExifIFD    Sony
+           MakerNoteSony2            ExifIFD    Olympus
+           MakerNoteSony3            ExifIFD    Olympus
+           MakerNoteSony4            ExifIFD    Sony
            MakerNoteSonySRF          ExifIFD    Sony SRF
            MakerNoteUnknown          ExifIFD    Unknown
   0x9286   UserComment               ExifIFD    undef
@@ -762,9 +765,9 @@ own set of tags.
 
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
-embedded in many different image file types including JPG, JP2, TIFF, PNG,
-MIFF, PS, PDF, PSD and DNG, as well as audio file formats supporting ID3v2
-information.
+embedded in many different image file types including JPG, JP2, TIFF, PS,
+PDF, PSD, DNG, PNG, SVG and MIFF, as well as audio file formats supporting
+ID3v2 information.
 
 The XMP B<Tag ID>'s aren't listed because in most cases they are identical
 to the B<Tag Name>.
@@ -1504,6 +1507,22 @@ XMP Paged-Text schema tags.
   NPages                                        integer
   PlateNames                                    string+
 
+=head3 XMP SVG Tags
+
+SVG (Scalable Vector Graphics) image tags.  By default, only the top-level
+SVG and Metadata tags are extracted from these images, but all graphics tags
+may be extracted by setting the Unknown option to 2 (-U on the command
+line).  The SVG tags are not part of XMP as such, but are included with the
+XMP module for convenience.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  ImageHeight                                   N
+  ID                                            N
+  MetadataID                                    N
+  SVGVersion                                    N
+  ImageWidth                                    N
+
 =head2 GPS Tags
 
 These GPS tags are part of the EXIF standard, and are stored in a separate
@@ -1898,6 +1917,7 @@ This information is found in the PSD file header.
   0x0024   FaceDetect1                          Canon FaceDetect1
   0x0025   FaceDetect2                          Canon FaceDetect2
   0x0026   CanonAFInfo2                         Canon AFInfo2
+  0x0081   RawDataOffset                        N
   0x0083   OriginalDecisionDataOffset           int32u*
   0x0090   CustomFunctions1D                    CanonCustom Functions1D
   0x0091   PersonalFunctions                    CanonCustom PersonalFuncs
@@ -2928,6 +2948,7 @@ changes), as well as defining additional new tags of their own.
   0x080e   AddAspectRatioInfo                   int32s
   0x080f   AddOriginalDecisionData              int32s
   0x0810   LiveViewExposureSimulation           int32s
+  0x0811   LCDDisplayAtPowerOn                  int32s
 
 =head2 Casio Tags
 
@@ -4014,7 +4035,9 @@ DiMAGE X and Xt.
   0x0020   ImageAuthentication                  int8u
   0x0022   ActiveD-Lighting                     int16u
   0x0023   PictureControl                       Nikon PictureControl
+  0x0024   WorldTime                            Nikon WorldTime
   0x0025   ISOInfo                              Nikon ISOInfo
+  0x002a   VignetteControl                      int16u
   0x0080   ImageAdjustment                      string
   0x0081   ToneComp                             string
   0x0082   AuxiliaryLens                        string
@@ -4032,8 +4055,9 @@ DiMAGE X and Xt.
   0x008d   ColorHue                             string
   0x008f   SceneMode                            string
   0x0090   LightSource                          string
-  0x0091   ShotInfo0208                         Nikon ShotInfo0208
-           ShotInfo0209                         Nikon ShotInfo0209
+  0x0091   ShotInfoD80                          Nikon ShotInfoD80
+           ShotInfoD40                          Nikon ShotInfoD40
+           ShotInfoD300                         Nikon ShotInfoD300
            ShotInfo02xx                         Nikon ShotInfo
            ShotInfoUnknown?                     Nikon ShotInfo
   0x0092   HueAdjustment                        int16s
@@ -4073,6 +4097,8 @@ DiMAGE X and Xt.
   0x00b1   HighISONoiseReduction                int16u
   0x00b3   ToningEffect                         string
   0x00b7   AFInfo2                              Nikon AFInfo2
+  0x00b8   FileInfo                             Nikon FileInfo
+  0x00b9   Nikon_0x00b9?                        Y~
   0x0e00   PrintIM                              PrintIM
   0x0e01   NikonCaptureData                     NikonCapture
   0x0e09   NikonCaptureVersion                  string
@@ -4116,6 +4142,14 @@ DiMAGE X and Xt.
      56    ToningEffect                         int8u
      57    ToningSaturation                     int8u
 
+=head3 Nikon WorldTime Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    Timezone                             int16s
+      2    DaylightSavings                      int8u
+      3    DateFormat                           int8u
+
 =head3 Nikon ISOInfo Tags
 
    Index   Tag Name                             Writable
@@ -4133,101 +4167,163 @@ DiMAGE X and Xt.
       1    AFPoint                              int8u
       2    AFPointsInFocus                      int16u
 
-=head3 Nikon ShotInfo0208 Tags
+=head3 Nikon ShotInfoD80 Tags
 
 These tags are extracted from encrypted data in D80 images.
 
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0000   ShotInfoVersion                      N
-  0x024a   ShutterCount                         int32u
-  590.1    Rotation                             Y
-  590.2    VibrationReduction                   Y
-  590.3    FlashFired                           Y
-  748.1    Beep                                 Y
-  748.2    AFAssist                             Y
-  748.3    NoMemoryCard                         Y
-  748.4    ImageReview                          Y
-  748.5    Illumination                         Y
-  748.6    MainDialExposureComp                 Y
-  748.7    EVStepSize                           Y
-  749.1    AutoISO                              Y
-  749.2    AutoISOMax                           Y
-  749.3    AutoISOMinShutterSpeed               Y
-  750.1    AutoBracketMode                      Y
-  750.2    AutoBracketOrder                     Y
-  751.1    MonitorOffTime                       Y
-  751.2    MeteringTime                         Y
-  751.3    SelfTimerTime                        Y
-  752.1    AELockButton                         Y
-  752.2    AELock                               Y
-  752.3    RemoteOnDuration                     Y
-  753.1    CommandDials                         Y
-  753.2    FunctionButton                       Y
-  754.1    GridDisplay                          Y
-  754.2    ViewfinderWarning                    Y
-  754.3    CenterWeightedAreaSize               Y
-  754.4    ExposureDelayMode                    Y
-  754.5    MB-D80Batteries                      Y
-  755.1    FlashShutterSpeed                    Y
-  755.2    AutoFP                               Y
-  755.3    ModelingFlash                        Y
-  756.1    InternalFlash                        Y
-  756.2    ManualFlashOutput                    Y
-  757.1    RepeatingFlashOutput                 Y
-  757.2    RepeatingFlashCount                  Y
-  758.1    RepeatingFlashRate                   Y
-  758.2    CommanderChannel                     Y
-  759.1    CommanderInternalFlash               Y
-  759.2    CommanderGroupAMode                  Y
-  759.3    CommanderGroupBMode                  Y
-  760.1    CommanderInternalTTLComp             Y
-  760.2    CommanderInternalManualOutput        Y
-  761.1    CommanderGroupA_TTL-AAComp           Y
-  761.2    CommanderGroupA_ManualOutput         Y
-  762.1    CommanderGroupB_TTL-AAComp           Y
-  762.2    CommanderGroupB_ManualOutput         Y
-  763.1    CenterAFArea                         Y
-  763.2    FocusAreaSelection                   Y
-  763.3    AFAreaIllumination                   Y
-  0x02fc   AFAreaMode                           Y
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ShotInfoVersion                      N
+    586    ShutterCount                         int32u
+  590.1    Rotation                             int8u
+  590.2    VibrationReduction                   int8u
+  590.3    FlashFired                           int8u
+  748.1    Beep                                 int8u
+  748.2    AFAssist                             int8u
+  748.3    NoMemoryCard                         int8u
+  748.4    ImageReview                          int8u
+  748.5    Illumination                         int8u
+  748.6    MainDialExposureComp                 int8u
+  748.7    EVStepSize                           int8u
+  749.1    AutoISO                              int8u
+  749.2    AutoISOMax                           int8u
+  749.3    AutoISOMinShutterSpeed               int8u
+  750.1    AutoBracketSet                       int8u
+  750.2    AutoBracketOrder                     int8u
+  751.1    MonitorOffTime                       int8u
+  751.2    MeteringTime                         int8u
+  751.3    SelfTimerTime                        int8u
+  752.1    AELockButton                         int8u
+  752.2    AELock                               int8u
+  752.3    RemoteOnDuration                     int8u
+  753.1    CommandDials                         int8u
+  753.2    FunctionButton                       int8u
+  754.1    GridDisplay                          int8u
+  754.2    ViewfinderWarning                    int8u
+  754.3    CenterWeightedAreaSize               int8u
+  754.4    ExposureDelayMode                    int8u
+  754.5    MB-D80Batteries                      int8u
+  755.1    FlashShutterSpeed                    int8u
+  755.2    AutoFP                               int8u
+  755.3    ModelingFlash                        int8u
+  756.1    InternalFlash                        int8u
+  756.2    ManualFlashOutput                    int8u
+  757.1    RepeatingFlashOutput                 int8u
+  757.2    RepeatingFlashCount                  int8u
+  758.1    RepeatingFlashRate                   int8u
+  758.2    CommanderChannel                     int8u
+  759.1    CommanderInternalFlash               int8u
+  759.2    CommanderGroupAMode                  int8u
+  759.3    CommanderGroupBMode                  int8u
+  760.1    CommanderInternalTTLComp             int8u
+  760.2    CommanderInternalManualOutput        int8u
+  761.1    CommanderGroupA_TTL-AAComp           int8u
+  761.2    CommanderGroupA_ManualOutput         int8u
+  762.1    CommanderGroupB_TTL-AAComp           int8u
+  762.2    CommanderGroupB_ManualOutput         int8u
+  763.1    CenterAFArea                         int8u
+  763.2    FocusAreaSelection                   int8u
+  763.3    AFAreaIllumination                   int8u
+    764    AFAreaMode                           int8u
 
-=head3 Nikon ShotInfo0209 Tags
+=head3 Nikon ShotInfoD40 Tags
 
 These tags are extracted from encrypted data in D40 and D40X images.
 
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0000   ShotInfoVersion                      N
-  0x0246   ShutterCount                         int32u
-  586.1    VibrationReduction                   Y
-  729.1    Beep                                 Y
-  729.2    AFAssist                             Y
-  729.3    NoMemoryCard                         Y
-  729.4    ImageReview                          Y
-  730.1    AutoISO                              Y
-  730.2    AutoISOMax                           Y
-  730.3    AutoISOMinShutterSpeed               Y
-  0x02db   ImageReviewTime                      Y
-  732.1    MonitorOffTime                       Y
-  732.2    MeteringTime                         Y
-  732.3    SelfTimerTime                        Y
-  733.1    RemoteOnDuration                     Y
-  733.2    AELockButton                         Y
-  733.3    AELock                               Y
-  734.1    ShootingModeSetting                  Y
-  734.2    TimerFunctionButton                  Y
-  0x02df   Metering                             Y
-  737.1    InternalFlash                        Y
-  737.2    ManualFlashOutput                    Y
-  0x02e2   FlashLevel                           int8s
-  0x02e3   FocusModeSetting                     Y
-  0x02e4   AFAreaModeSetting                    Y
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ShotInfoVersion                      N
+    582    ShutterCount                         int32u
+  586.1    VibrationReduction                   int8u
+  729.1    Beep                                 int8u
+  729.2    AFAssist                             int8u
+  729.3    NoMemoryCard                         int8u
+  729.4    ImageReview                          int8u
+  730.1    AutoISO                              int8u
+  730.2    AutoISOMax                           int8u
+  730.3    AutoISOMinShutterSpeed               int8u
+    731    ImageReviewTime                      int8u
+  732.1    MonitorOffTime                       int8u
+  732.2    MeteringTime                         int8u
+  732.3    SelfTimerTime                        int8u
+  733.1    RemoteOnDuration                     int8u
+  733.2    AELockButton                         int8u
+  733.3    AELock                               int8u
+  734.1    ShootingModeSetting                  int8u
+  734.2    TimerFunctionButton                  int8u
+    735    Metering                             int8u
+  737.1    InternalFlash                        int8u
+  737.2    ManualFlashOutput                    int8u
+    738    FlashLevel                           int8s
+    739    FocusModeSetting                     int8u
+    740    AFAreaModeSetting                    int8u
+
+=head3 Nikon ShotInfoD300 Tags
+
+These tags are extracted from encrypted data in D300 images.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+    604    ISO2                                 int8u
+    633    ShutterCount                         int32u
+    721    AFFineTuneAdj                        int16u
+  791.1    AF-CPrioritySelection                int8u
+  791.2    AF-SPrioritySelection                int8u
+  791.3    AFPointSelection                     int8u
+  791.4    DynamicAFArea                        int8u
+  791.5    FocusTrackingLockOn                  int8u
+  792.1    AFActivation                         int8u
+  792.2    FocusPointWrap                       int8u
+  792.3    AFPointIllumination                  int8u
+  792.4    AFAssistIlluminator                  int8u
+  793.1    AF-OnForMB-D10                       int8u
+  796.1    ISOStepSize                          int8u
+  796.2    ExposureControlStepSize              int8u
+  796.3    FineTuneStepSize                     int8u
+  796.4    EasyExposureCompensation             int8u
+  797.1    CenterWeightedAreaSize               int8u
+  797.2    FineTuneOptCenterWeighted            int8u
+  798.1    FineTuneOptMatrixMetering            int8u
+  798.2    FineTuneOptSpotMetering              int8u
+  799.1    MultiSelectorShootMode               int8u
+  799.2    MultiSelectorPlaybackMode            int8u
+  799.3    InitialZoomSetting                   int8u
+  799.4    MultiSelector                        int8u
+  800.1    ExposureDelayMode                    int8u
+  800.2    CLModeShootingSpeed                  int8u
+  801.1    MaxContinuousRelease                 int8u
+  802.1    ReverseIndicators                    int8u
+  802.2    FileNumberSequence                   int8u
+  802.3    BatteryOrder                         int8u
+  802.4    MB-D10Batteries                      int8u
+  803.1    Beep                                 int8u
+  803.2    ShootingInfoDisplay                  int8u
+  803.3    GridDisplay                          int8u
+  803.4    ViewfinderWarning                    int8u
+  807.1    CommandDialsReverseRotation          int8u
+  807.2    CommandDialsChangeMainSub            int8u
+  807.3    CommandDialsApertureSetting          int8u
+  807.4    CommandDialsMenuAndPlayback          int8u
+  807.5    LCDIllumination                      int8u
+  807.6    PhotoInfoPlayback                    int8u
+  807.7    ShutterReleaseButtonAE-L             int8u
+  807.8    ReleaseButtonToUseDial               int8u
+  808.1    SelfTimerTime                        int8u
+  808.2    MonitorOffTime                       int8u
+  810.1    FlashSyncSpeed                       int8u
+  810.2    FlashShutterSpeed                    int8u
+  811.1    AutoBracketSet                       int8u
+  811.2    AutoBracketModeM                     int8u
+  811.3    AutoBracketOrder                     int8u
+  811.4    ModelingFlash                        int8u
+  812.1    NoMemoryCard                         int8u
+  812.2    MeteringTime                         int8u
+  813.1    InternalFlash                        int8u
 
 =head3 Nikon ShotInfo Tags
 
 This information is encrypted for ShotInfoVersion 02xx, and some tags are
-only valid for specific versions.
+only valid for specific models.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -4240,9 +4336,7 @@ only valid for specific versions.
     343    ShutterCount                         undef[2]
     430    VibrationReduction                   int8u
     598    ISO2                                 int8u
-    604    ISO2                                 int8u
     630    ShutterCount                         int32u
-    633    ShutterCount                         int32u
 
 =head3 Nikon ColorBalance1 Tags
 
@@ -4372,6 +4466,14 @@ These tags are used by the D40, D40X, D60, D3 and D300.
    -----   --------                             --------
       0    AFInfo2Version                       N
       8    AFPointsUsed                         undef[7]~
+
+=head3 Nikon FileInfo Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    FileInfoVersion                      N
+      6    DirectoryNumber                      int16u
+      8    FileNumber                           int16u
 
 =head3 Nikon CaptureOffsets Tags
 
@@ -5209,6 +5311,9 @@ The Pentax tags are also used in Asahi cameras.
   0x0050   ColorTemperature                     int16u
   0x005c   ShakeReductionInfo                   Pentax SRInfo
   0x005d   ShutterCount                         undef[4]
+  0x0069   DynamicRangeExpansion                undef[4]
+  0x0071   HighISONoiseReduction                int8u
+  0x0072   AFAdjustment                         int16s
   0x0200   BlackPoint                           int16u[4]
   0x0201   WhitePoint                           int16u[4]
   0x0203   ColorMatrixA                         int16s[9]
@@ -5216,6 +5321,7 @@ The Pentax tags are also used in Asahi cameras.
   0x0205   CameraSettings                       Pentax CameraSettings
   0x0206   AEInfo                               Pentax AEInfo
   0x0207   LensInfo                             Pentax LensInfo
+                                                Pentax LensInfo2
   0x0208   FlashInfo                            Pentax FlashInfo
   0x0209   AEMeteringSegments                   int8u[16]
   0x020a   FlashMeteringSegments                int8u[16]
@@ -5256,7 +5362,9 @@ Shot information written by Pentax DSLR cameras.
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    PictureMode2                         int8u
-      1    PictureModeFlags?                    int8u
+    1.1    ProgramLine                          int8u
+    1.2    EVSteps                              int8u
+    1.3    E-DialInProgram                      int8u
       2    FlashOptions                         N
     2.1    MeteringMode2                        int8u
       3    AFPointMode                          int8u
@@ -5268,6 +5376,8 @@ Shot information written by Pentax DSLR cameras.
       9    BracketShotNumber                    int8u
      13    RawAndJpgRecording                   int8u
      14    JpgRecordedPixels                    int8u
+     16    FlashOptions2                        int8u
+   16.1    MeteringMode3                        int8u
      18    TvExposureTimeSetting                int8u
      19    AvApertureSetting                    int8u
      20    SvISOSetting                         int8u
@@ -5286,15 +5396,53 @@ Shot information written by Pentax DSLR cameras.
       6    AEProgramMode                        int8u
       7    AEExtra?                             int8u
      12    AEMeteringMode                       int8u
-     14    FlashExposureCompUsed                int8s
+     14    FlashExposureCompSet                 int8s
 
 =head3 Pentax LensInfo Tags
+
+Pentax lens information structure.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    LensType                             int8u[2]
+      3    LensData                             Pentax LensData
+
+=head3 Pentax LensInfo2 Tags
+
+Pentax lens information structure for newer models (K10D and later).
 
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    LensType                             N
-      4    LensCodes                            int8u[16]~
-      5    LensCodes                            int8u[16]~
+      4    LensData                             Pentax LensData
+
+=head3 Pentax LensData Tags
+
+Pentax lens data information.  Some of these tags require interesting binary
+gymnastics to decode them into useful values.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+    0.1    AutoAperture                         int8u
+    0.2    MinAperture                          int8u
+    0.3    LensFStops                           int8u
+      1    LensKind?                            int8u
+      2    LC1?                                 int8u
+      3    LC2?                                 int8u
+      4    LC3?                                 int8u
+      5    LC4?                                 int8u
+      6    LC5?                                 int8u
+      7    LC6?                                 int8u
+      8    LC7?                                 int8u
+      9    FocalLength                          int8u
+     10    NominalMaxAperture                   int8u
+   10.1    NominalMinAperture                   int8u
+     11    LC10?                                int8u
+     12    LC11?                                int8u
+     13    LC12?                                int8u
+   14.1    MaxAperture                          int8u
+     15    LC14?                                int8u
+     16    LC15?                                int8u
 
 =head3 Pentax FlashInfo Tags
 
@@ -5693,6 +5841,7 @@ who wants to use this information).
            MakerNoteHP2                         HP Type2
            MakerNoteHP4                         HP Type4
            MakerNoteHP6                         HP Type6
+           MakerNoteISL                         Unknown
            MakerNoteJVC                         JVC
            MakerNoteJVCText                     JVC Text
            MakerNoteKodak1a                     Kodak
@@ -5732,7 +5881,9 @@ who wants to use this information).
            MakerNoteSanyoPatch                  Sanyo
            MakerNoteSigma                       Sigma
            MakerNoteSony                        Sony
-           MakerNoteSony2                       Sony
+           MakerNoteSony2                       Olympus
+           MakerNoteSony3                       Olympus
+           MakerNoteSony4                       Sony
            MakerNoteSonySRF                     Sony SRF
            MakerNoteUnknown                     Unknown
   'RAF '   AdobeRAF                             FujiFilm RAF
@@ -6657,7 +6808,7 @@ is present.
   '1Name'              RelatedAudioFileName     string
   'Channels'           Channels                 int8u
   'Compression'        AudioCompression         string
-  'Duration'           Duration                 rational64u
+  'Duration'           Duration                 rational64u~
   'SampleBits'         SampleBits               int16u
   'SampleRate'         SampleRate               int32u
   'data'               RelatedAudioFile         undef
@@ -6876,7 +7027,7 @@ been defined.
   '0Type'      RelatedVideoFileType             string
   '1Name'      RelatedVideoFileName             string
   'Codec'      Codec                            string
-  'Duration'   Duration                         rational64u
+  'Duration'   Duration                         rational64u~
   'data'       RelatedVideoFile                 undef
 
 =head2 Jpeg2000 Tags
@@ -8100,9 +8251,105 @@ their name are not extracted unless the Unknown option is set.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  'meta'   Meta                                 QuickTime Meta
   'mvhd'   MovieHeader                          QuickTime MovieHdr
   'trak'   Track                                QuickTime Track
   'udta'   UserData                             QuickTime UserData
+
+=head3 QuickTime Meta Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'hdlr'   Handler                              QuickTime Handler
+  'ilst'   InfoList                             QuickTime InfoList
+  'keys'   Keys                                 QuickTime Keys
+  'xml '   XML                                  XMP
+
+=head3 QuickTime Handler Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      4    HandlerClass                         N
+      8    HandlerType                          N
+     12    HandlerVendorID                      N
+     24    HandlerDescription                   N
+
+=head3 QuickTime InfoList Tags
+
+As well as these tags, the 'mdta' handler uses numerical tag ID's which are
+added dynamically to this table after processing the Meta Keys information.
+
+  Tag ID       Tag Name                         Writable
+  ------       --------                         --------
+  '----'       iTunesInfo                       QuickTime iTunesInfo
+  'aART'       AlbumArtist                      N
+  'apID'       AppleStoreID                     N
+  'auth'       Author                           N
+  'catg'       Category                         N
+  'covr'       CoverArt                         N
+  'cpil'       Compilation                      N
+  'cprt'       Copyright                        N
+  'desc'       Description                      N
+  'disk'       DiskNumber                       N
+  'dscp'       Description                      N
+  'egid'       EpisodeGlobalUniqueID            N
+  'gnre'       Genre                            N
+  'keyw'       Keyword                          N
+  'pcst'       Podcast                          N
+  'perf'       Performer                        N
+  'pgap'       PlayGap                          N
+  'purd'       PurchaseDate                     N
+  'purl'       PodcastURL                       N
+  'rtng'       Rating                           N
+  'stik'       ContentType                      N
+  'titl'       Title                            N
+  'tmpo'       BeatsPerMinute                   N
+  'trkn'       TrackNumber                      N
+  'tven'       TVEpisodeNumber                  N
+  'tves'       TVEpisode                        N
+  'tvnn'       TVNetworkName                    N
+  'tvsn'       TVSeason                         N
+  "\xa9ART"    Artist                           N
+  "\xa9alb"    Album                            N
+  "\xa9cmt"    Comment                          N
+  "\xa9com"    Composer                         N
+  "\xa9day"    Year                             N
+  "\xa9des"    Description                      N
+  "\xa9gen"    Genre                            N
+  "\xa9grp"    Grouping                         N
+  "\xa9lyr"    Lyrics                           N
+  "\xa9nam"    Title                            N
+  "\xa9too"    Encoder                          N
+  "\xa9trk"    Track                            N
+  "\xa9wrt"    Composer                         N
+
+=head3 QuickTime iTunesInfo Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
+
+=head3 QuickTime Keys Tags
+
+This directory contains a list of key names which are used to decode
+InfoList tags written by the "mdta" handler.  The prefix of
+"com.apple.quicktime." has been removed from all TagID's below.
+
+  Tag ID                          Tag Name      Writable
+  ------                          --------      --------
+  'player.movie.audio.balance'    Balance       N
+  'player.movie.audio.bass'       Bass          N
+  'player.movie.audio.gain'       AudioGain     N
+  'player.movie.audio.mute'       Mute          N
+  'player.movie.audio.pitchshift' PitchShift    N
+  'player.movie.audio.treble'     Trebel        N
+  'player.movie.visual.brightness'
+                                  Brightness    N
+  'player.movie.visual.color'     Color         N
+  'player.movie.visual.contrast'  Contrast      N
+  'player.movie.visual.tint'      Tint          N
+  'player.version'                PlayerVersion N
+  'version'                       Version       N
 
 =head3 QuickTime MovieHdr Tags
 
@@ -8141,15 +8388,6 @@ MP4 media box.
   'mdhd'   MediaHeader                          QuickTime MediaHeader0
                                                 QuickTime MediaHeader1
   'minf'   MediaInfo                            QuickTime MediaInfo
-
-=head3 QuickTime Handler Tags
-
-   Index   Tag Name                             Writable
-   -----   --------                             --------
-      4    HandlerClass                         N
-      8    HandlerType                          N
-     12    HandlerVendorID                      N
-     24    HandlerDescription                   N
 
 =head3 QuickTime MediaHeader0 Tags
 
@@ -8349,54 +8587,6 @@ if they don't exist in this table.
   "\xa9req"    Requirements                     N
   "\xa9src"    Source                           N
   "\xa9wrt"    Writer                           N
-
-=head3 QuickTime Meta Tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  'hdlr'   Handler                              QuickTime Handler
-  'ilst'   InfoList                             QuickTime InfoList
-  'xml '   XML                                  XMP
-
-=head3 QuickTime InfoList Tags
-
-  Tag ID       Tag Name                         Writable
-  ------       --------                         --------
-  '----'       iTunesInfo                       QuickTime iTunesInfo
-  'aART'       AlbumArtist                      N
-  'apid'       AppleStoreID                     N
-  'auth'       Author                           N
-  'covr'       CoverArt                         N
-  'cpil'       Compilation                      N
-  'cprt'       Copyright                        N
-  'disk'       DiskNumber                       N
-  'dscp'       Description                      N
-  'gnre'       Genre                            N
-  'perf'       Performer                        N
-  'pgap'       PlayGap                          N
-  'rtng'       Rating                           N
-  'titl'       Title                            N
-  'tmpo'       BeatsPerMinute                   N
-  'trkn'       TrackNumber                      N
-  "\xa9ART"    Artist                           N
-  "\xa9alb"    Album                            N
-  "\xa9cmt"    Comment                          N
-  "\xa9com"    Composer                         N
-  "\xa9day"    Year                             N
-  "\xa9des"    Description                      N
-  "\xa9gen"    Genre                            N
-  "\xa9grp"    Grouping                         N
-  "\xa9lyr"    Lyrics                           N
-  "\xa9nam"    Title                            N
-  "\xa9too"    Encoder                          N
-  "\xa9trk"    Track                            N
-  "\xa9wrt"    Composer                         N
-
-=head3 QuickTime iTunesInfo Tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  [no tags known]
 
 =head3 QuickTime Video Tags
 
@@ -8898,9 +9088,9 @@ Only the tags decoded by ExifTool are listed in this table.
 
 =head2 ASF Tags
 
-ASF format is used by Windows WMA and WMV files.  Tag ID's aren't listed
-because they are huge 128-bit GUID's that would ruin the formatting of this
-table.
+The ASF format is used by Windows WMA and WMV files, and DIVX videos.  Tag
+ID's aren't listed because they are huge 128-bit GUID's that would ruin the
+formatting of this table.
 
   Tag Name                                      Writable
   --------                                      --------
@@ -11366,10 +11556,11 @@ These tags have a family 1 group name of "HTTP-equiv".
 
 =head2 Extra Tags
 
-The extra tags represent information found in the image but not associated
-with any other tag group.  The three writable "pseudo" tags (Filename,
-Directory and FileModifyDate) may be written without the need to rewrite the
-file since their values are not contained within the file data.
+The extra tags represent extra information extracted or generated by
+ExifTool that is not associated with another tag group.  The three writable
+"pseudo" tags (Filename, Directory and FileModifyDate) may be written
+without the need to rewrite the file since their values are not contained
+within the file data.
 
   Tag Name                                      Writable
   --------                                      --------
@@ -11381,6 +11572,7 @@ file since their values are not contained within the file data.
   Error                                         N
   ExifByteOrder                                 Y
   ExifToolVersion                               N
+  ExifUnicodeByteOrder                          Y
   FileModifyDate                                Y!
   FileName                                      Y!
   FileSize                                      N
@@ -11390,6 +11582,7 @@ file since their values are not contained within the file data.
   ImageWidth                                    N
   MIMEType                                      N
   MaxVal                                        N
+  Now                                           N
   Warning                                       N
   XMP                                           Y
   XResolution                                   N
@@ -11655,6 +11848,7 @@ for more details.
                        MakerNoteHP2
                        MakerNoteHP4
                        MakerNoteHP6
+                       MakerNoteISL
                        MakerNoteJVC
                        MakerNoteJVCText
                        MakerNoteKodak1a
@@ -11694,6 +11888,8 @@ for more details.
                        MakerNoteSigma
                        MakerNoteSony
                        MakerNoteSony2
+                       MakerNoteSony3
+                       MakerNoteSony4
                        MakerNoteSonySRF
                        MakerNoteUnknown
   Nikon                Model                    Y

@@ -11,7 +11,7 @@
 #               3) Michael Meissner private communication
 #               4) Paul Samuelson private communication (S5)
 #               5) http://www.cybercom.net/~dcoffin/dcraw/
-#               6) Jens Duttke private communication
+#               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::FujiFilm;
@@ -126,7 +126,7 @@ sub ProcessFujiDir($$$);
         Name => 'ColorTemperature',
         Writable => 'int16u',
     },
-    0x1006 => { #6
+    0x1006 => { #JD
         Name => 'Contrast',
         Flags => 'PrintHex',
         Writable => 'int16u',
@@ -160,11 +160,11 @@ sub ProcessFujiDir($$$);
             1 => 'On',
             2 => 'Off',
             3 => 'Red-eye reduction',
-            4 => 'External', #6
+            4 => 'External', #JD
         },
     },
     0x1011 => {
-        Name => 'FlashExposureComp', #6
+        Name => 'FlashExposureComp', #JD
         Writable => 'rational64s',
     },
     0x1020 => {
@@ -204,13 +204,13 @@ sub ProcessFujiDir($$$);
             0x0 => 'Auto',
             0x1 => 'Portrait',
             0x2 => 'Landscape',
-            0x3 => 'Macro', #6
+            0x3 => 'Macro', #JD
             0x4 => 'Sports',
             0x5 => 'Night Scene',
             0x6 => 'Program AE',
             0x7 => 'Natural Light', #3
             0x8 => 'Anti-blur', #3
-            0x9 => 'Beach & Snow', #6
+            0x9 => 'Beach & Snow', #JD
             0xa => 'Sunset', #3
             0xb => 'Museum', #3
             0xc => 'Party', #3

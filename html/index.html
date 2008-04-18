@@ -75,9 +75,9 @@ div.index       { float: right; clear: both;
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-7.21.tar.gz">
-Download        Version 7.21</a> (1.5 MB) -
-<a href="history.html">Mar. 12, 2008</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-7.25.tar.gz">
+Download        Version 7.25</a> (1.5 MB) -
+<a href="history.html">Apr. 18, 2008</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -115,12 +115,12 @@ as well as the maker notes of many digital cameras by
 <p>ExifTool is also available as a <b>stand-alone Windows executable</b> and a
 <b>Macintosh OS X package</b>.  Note that these versions contain the executable
 only, and do not include the HTML documentation or other files of the full
-distribution:</p>
+distribution above.</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-7.21.zip">
-         exiftool-7.21.zip</a> (1.9 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-7.25.zip">
+         exiftool-7.25.zip</a> (1.9 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -130,8 +130,8 @@ drag-and-drop files and folders to view meta information, or rename to
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-7.21.dmg">
-         ExifTool-7.21.dmg</a> (877 kB)</b></td></tr></table></blockquote>
+<a href="ExifTool-7.25.dmg">
+         ExifTool-7.25.dmg</a> (890 kB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -165,6 +165,7 @@ installing ExifTool on Windows, Mac OS X and Unix systems.</p>
     <a href="TagNames/Photoshop.html">Photoshop IRB</a>,
     <a href="TagNames/AFCP.html">AFCP</a> and more...</li>
 <li>Reads and writes maker notes of many digital cameras</li>
+<li>Decodes a riddle wrapped in a mystery inside an enigma</li>
 <li><a href="#shift">Shifts date/time values</a> to fix timestamps in images</li>
 <li><a href="#filename">Renames files and organizes in directories</a> (by date
     or by any other meta information)</li>
@@ -231,6 +232,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td>CS1</td><td>R/W</td><td>Sinar CaptureShop 1-shot RAW (<a href="TagNames/Photoshop.html">PSD</a>-based)</td></tr>
 <tr><td><a href="TagNames/DICOM.html">DCM, DC3, DIC, DICM</a></td><td>R</td><td>DICOM - Digital Imaging and Communications in Medicine</td></tr>
 <tr><td>DCR</td><td>R</td><td>Kodak Digital Camera RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
+<tr><td>DIVX</td><td>R</td><td>DivX media format (<a href="TagNames/ASF.html">ASF</a>-based)</td></tr>
 <tr><td><a href="TagNames/DNG.html">DNG</a></td><td>R/W</td><td>Digital Negative (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td>DOC</td><td>R</td><td>Microsoft Word Document (<a href="TagNames/FlashPix.html">FPX</a>-like)</td></tr>
 <tr><td><a href="TagNames/PostScript.html">EPS, EPSF, PS</a></td><td>R/W</td><td>[Encapsulated] PostScript Format</td></tr>
@@ -278,6 +280,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/Real.html">RM, RV, RMVB</a></td><td>R</td><td>Real Media/Video [Variable Bitrate]</td></tr>
 <tr><td>SR2</td><td>R</td><td>Sony RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td>SRF</td><td>R</td><td>Sony RAW Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
+<tr><td><a href="TagNames/XMP.html#SVG">SVG</a></td><td>R</td><td>Scalable Vector Graphics (XML-based)</td></tr>
 <tr><td><a href="TagNames/Flash.html">SWF</a></td><td>R</td><td>Shockwave Flash</td></tr>
 <tr><td>THM</td><td>R/W</td><td>Canon Thumbnail (<a href="TagNames/JPEG.html">JPEG</a>)</td></tr>
 <tr><td><a href="TagNames/EXIF.html">TIFF, TIF</a></td><td>R/W</td><td>Tagged Image File Format</td></tr>
@@ -481,7 +484,7 @@ descriptions for all information in a file.  It may also be helpful to use the
 
 <ol><li>Tag names sometimes differ from their descriptions.  Use the
 <code>&#8209;s</code> command-line option to see the actual tag names instead of the
-descriptions when extracting information.</li>
+descriptions shown when extracting information.</li>
 <li>When extracting information, tags will not appear in the output unless they
 exist in the file, even if they are specified on the command line.  The
 <code>&#8209;f</code> option may be used to force all specified tags to be displayed.</li>
@@ -535,7 +538,7 @@ CanonVRD, Composite, DICOM, DNG, Ducky, EXIF, ExifTool, FLAC, File, Flash,
 FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, ITC, JFIF,
 JPEG, Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF,
 PICT, PNG, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
-RIFF, Real, SigmaRaw, Vorbis, XMP
+RIFF, Real, SVG, SigmaRaw, Vorbis, XMP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
@@ -554,11 +557,11 @@ NikonPreview, NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax,
 PhotoMechanic, Photoshop, PictureInfo, PostScript, PrintIM, QuickTime, RAF,
 RAF2, RIFF, RMETA, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
 Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
-SRF#, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
-XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif,
-XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech,
-XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+SRF#, SVG, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP,
+XMP-DICOM, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
+XMP-exif, XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
+XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
@@ -789,7 +792,8 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="writing.html">Comments on the Subject of Writing Meta Information</a></li>
 <li><a href="canon_raw.html">Canon RAW (CRW) File Format Specification</a></li>
 <li><a href="MIE1.1-20070121.pdf">MIE 1.1 File Format Specification (pdf)</a></li>
-<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/sample_images.html">JPEG Image Samples</a></li>
+<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/sample_images.html">JPEG Image Samples</a> (and
+    <a href="http://owl.phy.queensu.ca/~phil/exiftool/makernote_types.html">table of Makernote types</a>)</li>
 <li><a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool Forum</a> (CPAN Forum)</li>
 <li><a href="http://search.cpan.org/dist/Image-ExifTool/">Image::ExifTool at CPAN</a> (CPAN Search)</li>
 <li><a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Image-ExifTool">ExifTool Bug Reports</a> (CPAN Request Tracker)</li>
@@ -804,8 +808,8 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/Extract%20Preview.sit">Download</a>
 a stand-alone Mac OS X droplet to extract preview images from RAW files (thanks to Brett Gross)</li>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/List_Exif_Metadata.sit">Download</a>
-three Mac OS X droplets to extract information [exiftool must be installed]
-(thanks to Rob Lewis)</li>
+three Mac OS X droplets to extract information [exiftool must be installed] (thanks to Rob Lewis)</li>
+<li><a href="http://fidel.vido.info/show/applescript/Tierprogramm/">Tierprogramm</a>: Mac OS X droplet to perform some basic operations</li>
 <li><a href="https://puszcza.gnu.org.ua/projects/renrot/">renrot</a>: Perl utility to perform various processing tasks on images</li>
 <li><a href="http://www.proxel.se/exif.html">Proxel EXIF Tool</a>: Photoshop plugin based on ExifTool</li>
 <li><a href="http://kde-apps.org/content/show.php?content=30971">rawimage:</a> A kfile plugin and thumbnail image handler for RAW formats</li>
@@ -819,14 +823,14 @@ three Mac OS X droplets to extract information [exiftool must be installed]
 <li><a href="http://freeweb.siol.net/hrastni3/foto/exif/exiftoolgui.htm">ExifTool GUI for Windows</a>: A nice Windows GUI for viewing meta information with some editing features</li>
 <li><a href="http://6v8.gamboni.org/Move-Rename-files-according-to.html">MetaDataMover</a>: A GUI-based Mac OS X automator utility for moving/renaming images</li>
 <li><a href="http://www.lintburger.com/software.php">CS1ToCR2</a>: Mac OS X utility that uses Sony GPS-CS1 log files to add GPS information to CR2 images</li>
-<li><a href="http://82.94.219.20/~marcvos/software/realbasic/sed.html">SetEXIFData</a>: Mac OS X utility to set EXIF data
-<li><a href="http://basepath.com/ImageIngester/">ImageIngester</a>: Windows and Mac OS X image workflow automator
-<li><a href="http://www.geosetter.de/en/">GeoSetter</a>: Windows utility for showing and changing geo data of image files
-</ul>
+<li><a href="http://82.94.219.20/~marcvos/software/realbasic/sed.html">SetEXIFData</a>: Mac OS X utility to set EXIF data</li>
+<li><a href="http://basepath.com/ImageIngester/">ImageIngester</a>: Windows and Mac OS X image workflow automator</li>
+<li><a href="http://www.geosetter.de/en/">GeoSetter</a>: Windows utility for showing and changing geo data of image files</li>
+<li><a href="http://code.google.com/p/gpicsync/">GPicSync</a>: Windows/Linux utility to geocode photos from a GPX track log and create KML files</ul>
 
 <p>Also notable, but not directly based on ExifTool:</p>
 
-<ul><li><a href="http://www.photome.de/">PhotoME</a>: Windows utility to read/write meta information
+<ul><li><a href="http://www.photome.de/">PhotoME</a>: Windows utility to read/write meta information</li>
 </ul>
 
 <h3>References</h3>

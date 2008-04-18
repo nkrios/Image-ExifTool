@@ -21,7 +21,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::FLAC;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessMeta($$$;$);
 
@@ -40,7 +40,7 @@ sub ProcessMeta($$$;$);
     FrameCount   => { },
     Duration => {
         Notes => 'calculated from FrameRate and FrameCount',
-        PrintConv => 'sprintf("%.2f s",$val)',
+        PrintConv => 'ConvertDuration($val)',
     },
 );
 
@@ -155,7 +155,7 @@ sub ProcessMeta($$$;$);
     'datasize'      => 'DataSize',
     'duration' => {
         Name => 'Duration',
-        PrintConv => 'sprintf("%.3f s",$val)',
+        PrintConv => 'ConvertDuration($val)',
     },
     'filesize'      => 'FileSizeBytes',
     'framerate'     => {

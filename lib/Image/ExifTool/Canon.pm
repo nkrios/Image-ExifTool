@@ -38,6 +38,7 @@
 #              25) Laurent Clevy private communication (40D)
 #              26) Steve Balcombe private communication
 #              27) Chris Huebsch private communication (40D)
+#              28) Hal Williamson private communication (XTi)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -50,7 +51,7 @@ use Image::ExifTool::Exif;
 sub WriteCanon($$$);
 sub ProcessSerialData($$$);
 
-$VERSION = '1.91';
+$VERSION = '1.93';
 
 # Note: Remove 'USM' from 'L' lenses since it is redundant - PH
 my %canonLensTypes = ( #4
@@ -58,7 +59,7 @@ my %canonLensTypes = ( #4
     2 => 'Canon EF 28mm f/2.8',
     # (3 removed in current Kamisaka list)
     # 3 => 'Canon EF 135mm f/2.8 Soft', #15
-    4 => 'Sigma UC Zoom 35-135mm f/4-5.6',
+    4 => 'Canon EF 35-105mm f/3.5-4.5 or Sigma UC Zoom 35-135mm f/4-5.6', #28 (Canon)
     # 6 can be Sigma 18-50mm f/3.5-5.6 DC (ref 23)
     #       or Sigma 18-125mm f/3.5-5.6 DC IF ASP
     6 => 'Tokina AF193-2 19-35mm f/3.5-4.5 or Sigma Lens',
@@ -282,6 +283,9 @@ my %canonLensTypes = ( #4
     0x2290000 => 'PowerShot SX100 IS',
     0x2300000 => 'PowerShot SD950 IS / Digital IXUS 960 IS / IXY Digital 2000 IS',
     0x2310000 => 'PowerShot SD870 IS / Digital IXUS 860 IS / IXY Digital 910 IS',
+    0x2320000 => 'PowerShot SD890 IS / Digital IXUS 970 IS / IXY DIGITAL 820 IS',
+    0x2360000 => 'PowerShot SD790 IS / Digital IXUS 90 IS / IXY DIGITAL 95 IS',
+    0x2370000 => 'PowerShot SD770 IS / Digital IXUS 85 IS / IXY DIGITAL 25 IS',
     0x2380000 => 'PowerShot A590 IS',
     0x2390000 => 'PowerShot A580',
     0x2420000 => 'PowerShot A470',
@@ -757,7 +761,13 @@ my %printParameter = (
         },
     },
     # 0x27 - value 1 is 1 for high ISO pictures, 0 otherwise
-    # 0x28 - 16-bytes: 0-1=sequence number (encrypted), 2-5=date/time (encrypted) (Jens Duttke)
+    # 0x28 - 16-bytes: 0-1=sequence number (encrypted), 2-5=date/time (encrypted) (ref JD)
+    0x81 => { #13
+        Name => 'RawDataOffset',
+        # (can't yet write 1D raw files)
+        # Writable => 'int32u',
+        # Protected => 2,
+    },
     0x83 => { #PH
         Name => 'OriginalDecisionDataOffset',
         Writable => 'int32u',
@@ -2547,6 +2557,7 @@ my %printParameter = (
 # AF information (MakerNotes tag 0x12) - PH
 %Image::ExifTool::Canon::AFInfo = (
     PROCESS_PROC => \&ProcessSerialData,
+    VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int16u',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
@@ -2617,6 +2628,7 @@ my %printParameter = (
 # (Note: this tag is out of sequence in A570IS maker notes)
 %Image::ExifTool::Canon::AFInfo2 = (
     PROCESS_PROC => \&ProcessSerialData,
+    VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int16u',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{

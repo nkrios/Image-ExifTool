@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessBitStream($$$);
 
@@ -63,7 +63,7 @@ sub ProcessBitStream($$$);
             2 => 'FLAC:TotalSamples',
         },
         ValueConv => '$val[0] and $val[1] and $val[2] ? $val[2] / ($val[0] * $val[1]) : undef',
-        PrintConv => 'sprintf("%.2f s",$val)',
+        PrintConv => 'ConvertDuration($val)',
     },
 );
 

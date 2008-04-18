@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 # BMP chunks
 %Image::ExifTool::BMP::Main = (
@@ -53,9 +53,13 @@ $VERSION = '1.03';
             3 => 'Bitfields',
             4 => 'JPEG', #2
             5 => 'PNG', #2
-            'MJPG' => 'MJPG',
-            'XVID' => 'XVID',
-            'M4S2' => 'M4S2',
+            # pass through ASCII video compression codec ID's
+            OTHER => sub {
+                my $val = shift;
+                # convert non-ascii characters
+                $val =~ s/([\0-\x1f\x7f-\xff])/sprintf('\\x%.2x',ord $1)/eg;
+                return $val;
+            },
         },
     },
     20 => {

@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.17';
+$VERSION = '1.19';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -150,6 +150,7 @@ $VERSION = '1.17';
         'MakerNoteHP2',
         'MakerNoteHP4',
         'MakerNoteHP6',
+        'MakerNoteISL',
         'MakerNoteJVC',
         'MakerNoteJVCText',
         'MakerNoteKodak1a',
@@ -189,6 +190,8 @@ $VERSION = '1.17';
         'MakerNoteSigma',
         'MakerNoteSony',
         'MakerNoteSony2',
+        'MakerNoteSony3',
+        'MakerNoteSony4',
         'MakerNoteSonySRF',
         'MakerNoteUnknown',
     ],

@@ -42,7 +42,7 @@ sub ProcessHP($$$);
     NOTES => 'These tags are used by the PhotoSmart E427.',
    'PreviewImage' => {
         Name => 'PreviewImage',
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
    'Serial Number' => 'SerialNumber',
    'Lens Shading'  => 'LensShading',

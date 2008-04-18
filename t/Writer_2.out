@@ -49,10 +49,10 @@ Directory: t
 DriveMode: Continuous shooting
 EasyMode: Manual
 EncodingProcess: Baseline DCT, Huffman coding
-ExifByteOrder: Little-endian (Intel)
+ExifByteOrder: Little-endian (Intel, II)
 ExifImageHeight: 120
 ExifImageWidth: 160
-ExifToolVersion: 7.20
+ExifToolVersion: 7.22
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -62,7 +62,7 @@ ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
 FOV: 37.7 deg
-FileModifyDate: 2008:03:03 14:11:26
+FileModifyDate: 2008:03:13 09:33:39
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FileSize: 3 kB

@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.98
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
 [File, File, Image]  - File Name: GeoTiff.tif
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 3 kB
 [File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
 [File, File, Image]  - File Type: TIFF
 [File, File, Image]  - MIME Type: image/tiff
-[File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
+[File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
 [EXIF, IFD0, Image] 256 - Image Width: 25
 [EXIF, IFD0, Image] 257 - Image Height: 24
 [EXIF, IFD0, Image] 258 - Bits Per Sample: 8

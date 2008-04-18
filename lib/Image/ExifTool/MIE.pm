@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -455,8 +455,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     data => {
         Name => 'FullSizeImage',
         %binaryConv,
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
-        ValueConvInv => '$val',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
 );
 
@@ -478,8 +477,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     data => {
         Name => 'PreviewImage',
         %binaryConv,
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
-        ValueConvInv => '$val',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
 );
 
@@ -501,8 +499,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     data => {
         Name => 'ThumbnailImage',
         %binaryConv,
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
-        ValueConvInv => '$val',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
 );
 
@@ -522,7 +519,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     SampleBits  => { Writable => 'int16u' },
     Channels    => { Writable => 'int8u' },
     Compression => { Name => 'AudioCompression' },
-    Duration    => { Writable => 'rational64u' },
+    Duration    => { Writable => 'rational64u', PrintConv => 'ConvertDuration($val)' },
     SampleRate  => { Writable => 'int32u' },
     data        => { Name => 'RelatedAudioFile', %binaryConv },
 );
@@ -535,7 +532,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
    '0Type'      => { Name => 'RelatedVideoFileType', Notes => 'MOV if not specified' },
    '1Name'      => { Name => 'RelatedVideoFileName' },
     Codec       => { },
-    Duration    => { Writable => 'rational64u' },
+    Duration    => { Writable => 'rational64u', PrintConv => 'ConvertDuration($val)' },
     data        => { Name => 'RelatedVideoFile', %binaryConv },
 );
 

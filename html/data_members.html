@@ -13,11 +13,12 @@ was C++, these would be documented next to the definitions in the header file,
 but this is Perl, so I couldn't do that...)</p>
 
 <p>Aside from the variables defined below, there may be other temporary
-variables added by individual modules. Temporary variables are identified by
-at least one lower case letter in their name, and are deleted before reading or
-writing each new image. Make, Model and CameraType are temporary variables,
-but are guaranteed to be defined while processing an image because they are
-initialized to '' instead of being deleted.</p>
+variables added by individual modules. Temporary variables are identified by at
+least one lower case letter in their name, and are deleted before reading or
+writing each new image. Make, Model and CameraType are temporary variables like
+this, but these three are special because they are initialized to an empty
+string instead of being deleted at the start of processing for each image, which
+allows them to be tested without having to check for an undefined value.</p>
 
 <blockquote><table class='norm'><tr><th>Name</th><th>Description</th></tr>
 
@@ -65,9 +66,9 @@ initialized to '' instead of being deleted.</p>
 <tr><td>FILE_ORDER</td><td>Hash of numbers to give the sequence the tags were
     extracted from file, keyed by tag key</td></tr>
 
-<tr><td>FILE_EXT</td><td>File extension (JPG, PEF, etc...)</td></tr>
+<tr><td>FILE_EXT</td><td>File extension (JPG, PEF, AVI, etc...)</td></tr>
 
-<tr><td>FILE_TYPE</td><td>File type (JPEG, TIFF, etc...)</td></tr>
+<tr><td>FILE_TYPE</td><td>Root file format type (JPEG, TIFF, RIFF, etc...)</td></tr>
 
 <tr><td>FIRST_EXIF_POS</td><td>Position of first EXIF in file</td></tr>
 

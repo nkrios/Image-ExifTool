@@ -35,8 +35,7 @@ my %offOn = (
         Name => 'SanyoThumbnail',
         Writable => 'undef',
         WriteCheck => '$self->CheckImage(\$val)',
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
-        ValueConvInv => '$val',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
     0x0200 => {
         Name => 'SpecialMode',
@@ -313,7 +312,7 @@ my %offOn = (
         Name => 'ThumbnailImage',
         Notes => 'position varies',
         Format => 'undef[$size - 0x800]',
-        ValueConv => '$val=~s/.*(?=\xff\xd8\xff\xc4)//; $self->ValidateImage(\$val,$tag)',
+        RawConv => '$val=~s/.*(?=\xff\xd8\xff\xc4)//; $self->ValidateImage(\$val,$tag)',
     },
 );
 

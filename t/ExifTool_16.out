@@ -142,7 +142,7 @@ BitsPerSample : 8
 ColorComponents : 3
 Directory : t/images
 EncodingProcess : Baseline DCT, Huffman coding
-ExifByteOrder : Little-endian (Intel)
+ExifByteOrder : Little-endian (Intel, II)
 FileModifyDate : 2007:05:01 07:34:38
 FileName : Canon.jpg
 FileSize : 3 kB

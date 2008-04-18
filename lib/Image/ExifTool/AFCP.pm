@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessAFCP($$);
 
@@ -33,16 +33,23 @@ images, but not other image formats.
     TEXT => 'Text',
     Nail => {
         Name => 'ThumbnailImage',
-        ValueConv => q{
-            my $img = substr($val, 18);
-            return $self->ValidateImage(\$img,$tag);
+        # (the specification allows for a variable amount of padding before
+        #  the image after a 10-byte header, so look for the JPEG SOI marker,
+        #  otherwise assume a fixed 8 bytes of padding)
+        RawConv => q{
+            pos($val) = 10;
+            my $start = ($val =~ /\xff\xd8\xff/g) ? pos($val) - 3 : 18;
+            my $img = substr($val, $start);
+            return $self->ValidateImage(\$img, $tag);
         },
     },
     PrVw => {
         Name => 'PreviewImage',
-        ValueConv => q{
-            my $img = substr($val, 18);
-            return $self->ValidateImage(\$img,$tag);
+        RawConv => q{
+            pos($val) = 10;
+            my $start = ($val =~ /\xff\xd8\xff/g) ? pos($val) - 3 : 18;
+            my $img = substr($val, $start);
+            return $self->ValidateImage(\$img, $tag);
         },
     },
 );

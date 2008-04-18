@@ -28,7 +28,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.45';
+$VERSION = '1.47';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -398,7 +398,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name =>'ExposureCompensation',
         Writable => 'rational64s',
     },
-    0x1007 => { #6
+    0x1007 => { #6 (E-10, E-20 and C2500L - numbers usually around 30-40)
         Name => 'SensorTemperature',
         Writable => 'int16s',
     },
@@ -832,6 +832,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         },
         {
             # ASCII-based camera parameters if makernotes starts with "CAMER\0"
+            # (or for Sony models starting with "SONY PI\0" or "PREMI\0")
             Name => 'CameraParameters',
             Writable => 'undef',
             Binary => 1,
@@ -2257,6 +2258,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x1500 => { #6
         Name => 'SensorTemperature',
         Writable => 'int16s',
+        Notes => q{
+            approximately Celsius for E-1, unknown calibration for E-3/410/420/510, and
+            always zero for E-300/330/400/500
+        },
     },
     0x1600 => { # ref http://fourthirdsphoto.com/vbb/showpost.php?p=107607&postcount=15
         Name => 'ImageStabilization',
@@ -2615,7 +2620,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ThumbnailImage',
         Format => 'undef[$val{0x12d}]',
         Notes => '160x120 JPEG thumbnail image',
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
 );
 
@@ -2707,8 +2712,10 @@ sub PrintLensInfo($$)
             '0 34'  => 'Zuiko Digital 17.5-45mm F3.5-5.6', #9
             '0 35'  => 'Zuiko Digital ED 14-42mm F3.5-5.6', #PH
             '0 36'  => 'Zuiko Digital ED 40-150mm F4.0-5.6', #PH
-            '0 48'  => 'Zuiko Digital ED 50-200mm SWD F2.8-3.5', #7
-            '0 49'  => 'Zuiko Digital ED 12-60mm SWD F2.8-4.0', #7
+            '0 48'  => 'Zuiko Digital ED 50-200mm F2.8-3.5 SWD', #7
+            '0 49'  => 'Zuiko Digital ED 12-60mm F2.8-4.0 SWD', #7
+            '0 50'  => 'Zuiko Digital ED 14-35mm F2.0 SWD', #PH
+            '0 51'  => 'Zuiko Digital 25mm F2.8', #PH
             # Sigma lenses
             '1 1'   => '18-50mm F3.5-5.6', #8
             '1 2'   => '55-200mm F4.0-5.6 DC',
@@ -2721,11 +2728,11 @@ sub PrintLensInfo($$)
             '1 17'  => '135-400mm F4.5-5.6 DG ASP APO RF', #11
             '1 18'  => '300-800mm F5.6 EX DG APO', #11
             # Leica lenses (ref 11)
-            '2 1'   => 'D Vario Elmarit 14-50mm, F2.8-3.5 Asph.',
-            '2 2'   => 'D Summilux 25mm, F1.4 Asph.',
-            '2 4'   => 'Vario Elmar 14~150mm f3.5-5.6', #13
-            '3 1'   => 'D Vario Elmarit 14-50mm, F2.8-3.5 Asph.',
-            '3 2'   => 'D Summilux 25mm, F1.4 Asph.',
+            '2 1'   => 'D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
+            '2 2'   => 'D Summilux 25mm F1.4 Asph.',
+            '2 4'   => 'D Vario Elmar 14-150mm F3.5-5.6', #13
+            '3 1'   => 'D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
+            '3 2'   => 'D Summilux 25mm F1.4 Asph.',
         },
         Extender => {
             # Olympus extenders

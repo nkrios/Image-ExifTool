@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.21
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 6 kB
 [File, File, Time]  - File Modification Date/Time: 2007:01:05 12:52:24
 [File, File, Image]  - File Type: NEF
 [File, File, Image]  - MIME Type: image/x-raw
-[File, File, Image]  - Exif Byte Order: Little-endian (Intel)
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
 [EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
 [EXIF, IFD0, Image] 256 - Image Width: 160
 [EXIF, IFD0, Image] 257 - Image Height: 106

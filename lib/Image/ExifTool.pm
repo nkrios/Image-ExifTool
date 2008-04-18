@@ -22,9 +22,9 @@ use File::RandomAccess;
     
 use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old
-            @loadAllTables %UserDefined $evalWarning);
+            @loadAllTables %UserDefined $evalWarning @noWriteTIFF);
 
-$VERSION = '7.21';
+$VERSION = '7.25';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -117,7 +117,7 @@ sub UnpackUTF8($);
     FujiFilm::RAF Panasonic::Raw Sony::SR2SubIFD ITC ID3 Vorbis FLAC APE
     APE::NewHeader APE::OldHeader MPC MPEG::Audio MPEG::Video QuickTime
     QuickTime::ImageFile Flash Flash::FLV Real::Media Real::Audio
-    Real::Metafile RIFF AIFF ASF DICOM MIE HTML
+    Real::Metafile RIFF AIFF ASF DICOM MIE HTML XMP::SVG
 );
 
 # recognized file types, in the order we test unknown files
@@ -130,6 +130,9 @@ sub UnpackUTF8($);
 # file types that we can write (edit)
 my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF PNG MIE PSD XMP PPM EPS PS
                     PDF ICC VRD JP2);
+
+# TIFF-based file extensions that we can't write
+@noWriteTIFF = qw(3FR DCR K25 KDC ARW SRF SR2);
 
 # file types that we can create from scratch
 # - must update CanCreate() documentation if this list is changed!
@@ -158,6 +161,7 @@ my %fileTypeLookup = (
     DIB  => ['BMP',  'Device Independent Bitmap (aka. BMP)'],
     DIC  => ['DICM', 'DICOM image file'],
     DICM => ['DICM', 'DICOM image file'],
+    DIVX => ['ASF',  'DivX media format (ASF-based)'],
     DNG  => ['TIFF', 'Digital Negative (TIFF-like)'],
     DCR  => ['TIFF', 'Kodak Digital Camera RAW (TIFF-like)'],
     DOC  => ['FPX',  'Microsoft Word Document (FPX-like)'],
@@ -225,6 +229,7 @@ my %fileTypeLookup = (
     RV   => ['Real', 'Real Video'],
     SR2  => ['TIFF', 'Sony RAW Format 2 (TIFF-like)'],
     SRF  => ['TIFF', 'Sony RAW Format (TIFF-like)'],
+    SVG  => ['XMP',  'Scalable Vector Graphics (XML-based)'],
     SWF  => ['SWF',  'Shockwave Flash'],
     THM  => ['JPEG', 'Canon Thumbnail (aka. JPG)'],
     TIF  => ['TIFF', 'Tagged Image File Format'],
@@ -251,12 +256,14 @@ my %mimeType = (
     AVI  => 'video/avi',
     BMP  => 'image/bmp',
     BTF  => 'application/unknown', #TEMPORARY!
+   'Canon 1D RAW' => 'image/x-raw', # (uses .TIF file extension)
     CR2  => 'image/x-raw',
     CRW  => 'image/x-raw',
     EPS  => 'application/postscript',
     ERF  => 'image/x-raw',
     DCR  => 'image/x-raw',
     DICM => 'application/dicom',
+    DIVX => 'video/divx',
     DNG  => 'image/x-raw',
     DOC  => 'application/msword',
     FLAC => 'audio/flac',
@@ -267,7 +274,7 @@ my %mimeType = (
     HTML => 'text/html',
     ITC  => 'application/itunes',
     JNG  => 'image/jng',
-    JP2  => 'image/jpeg2000',
+    JP2  => 'image/jp2',
     JPEG => 'image/jpeg',
     K25  => 'image/x-raw',
     KDC  => 'image/x-raw',
@@ -307,6 +314,7 @@ my %mimeType = (
     RV   => 'video/vnd.rn-realvideo',
     SR2  => 'image/x-raw',
     SRF  => 'image/x-raw',
+    SVG  => 'image/svg+xml',
     SWF  => 'application/x-shockwave-flash',
     TIFF => 'image/tiff',
     WAV  => 'audio/x-wav',
@@ -371,7 +379,7 @@ sub DummyWriteProc { return 1; }
     # we allow preview image to be set to '', but we don't want a zero-length value
     # in the IFD, so set it temorarily to 'none'.  Note that the length is <= 4,
     # so this value will fit in the IFD so the preview fixup won't be generated.
-    ValueConv => '$self->ValidateImage(\$val,$tag)',
+    RawConv => '$self->ValidateImage(\$val,$tag)',
     ValueConvInv => '$val eq "" and $val="none"; $val',
 );
 
@@ -445,6 +453,8 @@ sub DummyWriteProc { return 1; }
     XMP => {
         Notes => 'the full XMP data block',
         Groups => { 0 => 'XMP' },
+        # (not necessary to make this Protected since it
+        # isn't extracted with the Binary option)
         Flags => [ 'Writable', 'Binary' ],
         WriteCheck => q{
             require Image::ExifTool::XMP;
@@ -467,13 +477,39 @@ sub DummyWriteProc { return 1; }
         Writable => 1,
         Notes => 'only writable for newly created EXIF segments',
         PrintConv => {
-            II => 'Little-endian (Intel)',
-            MM => 'Big-endian (Motorola)',
+            II => 'Little-endian (Intel, II)',
+            MM => 'Big-endian (Motorola, MM)',
+        },
+    },
+    ExifUnicodeByteOrder => {
+        Writable => 1,
+        Notes => q{
+            the EXIF specification is particularly vague about the byte ordering for
+            Unicode text, and different applications use different conventions.  By
+            default ExifTool writes Unicode text in EXIF byte order, but this write-only
+            tag may be used to force a specific byte order
+        },
+        PrintConv => {
+            II => 'Little-endian (Intel, II)',
+            MM => 'Big-endian (Motorola, MM)',
         },
     },
     ExifToolVersion => {
         Description => 'ExifTool Version Number',
-        Groups      => \%allGroupsExifTool
+        Groups => \%allGroupsExifTool,
+    },
+    Now => {
+        Groups => { 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'Time' },
+        Notes => q{
+            used to set the value of a tag to the current date/time. Not generated unless
+            specified
+        },
+        ValueConv => q{
+            my @tm = localtime;
+            sprintf("%4d:%.2d:%.2d %.2d:%.2d:%.2d", $tm[5]+1900, $tm[4]+1, $tm[3],
+                    $tm[2], $tm[1], $tm[0]);
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     Error       => { Priority => 0, Groups => \%allGroupsExifTool },
     Warning     => { Priority => 0, Groups => \%allGroupsExifTool },
@@ -577,7 +613,7 @@ my $didTagID;       # flag indicating we are accessing tag ID's
     GROUPS => { 0 => 'JFIF', 1 => 'JFIF', 2 => 'Image' },
     0x10 => {
         Name => 'ThumbnailImage',
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
 );
 
@@ -795,6 +831,7 @@ sub ExtractInfo($;@)
 
     # return our version number
     $self->FoundTag('ExifToolVersion', "$VERSION$RELEASE");
+    $self->FoundTag('Now', 0) if $self->{REQ_TAG_LOOKUP}->{now} or $self->{TAGS_FROM_FILE};
 
     local *EXIFTOOL_FILE;   # avoid clashes with global namespace
 
@@ -1588,20 +1625,25 @@ sub GetFileType(;$$)
 
 #------------------------------------------------------------------------------
 # Return true if we can write the specified file type
-# Inputs: 0) file name or ext,
+# Inputs: 0) file name or ext
 # Returns: true if writable, 0 if not writable, undef if unrecognized
-# Note: This will return true for some TIFF-based RAW images which we shouldn't really write
 sub CanWrite($)
 {
     local $_;
     my $file = shift or return undef;
     my $type = GetFileType($file) or return undef;
-    return scalar(grep /^$type$/, @writeTypes);
+    if ($type eq 'TIFF') {
+        # can't write TIFF files with certain extensions (various RAW formats)
+        my $ext = GetFileExtension($file);
+        return grep(/^$ext$/, @noWriteTIFF) ? 0 : 1;
+    } else {
+        return scalar(grep /^$type$/, @writeTypes);
+    }
 }
 
 #------------------------------------------------------------------------------
 # Return true if we can create the specified file type
-# Inputs: 0) file name or ext,
+# Inputs: 0) file name or ext
 # Returns: true if creatable, 0 if not writable, undef if unrecognized
 sub CanCreate($)
 {
@@ -2541,13 +2583,9 @@ sub ReadValue($$$$$)
         # truncate string at null terminator if necessary
         $vals[0] =~ s/\0.*//s if $format eq 'string';
     }
-    if (wantarray) {
-        return @vals;
-    } elsif (@vals > 1) {
-        return join(' ', @vals);
-    } else {
-        return $vals[0];
-    }
+    return @vals if wantarray;
+    return join(' ', @vals) if @vals > 1;
+    return $vals[0];
 }
 
 #------------------------------------------------------------------------------
@@ -2608,8 +2646,9 @@ sub DecodeBits($$;$)
 
 #------------------------------------------------------------------------------
 # Validate an extracted image and repair if necessary
-# Inputs: 0) ExifTool object reference, 1) image reference, 2) tag name
+# Inputs: 0) ExifTool object reference, 1) image reference, 2) tag name or key
 # Returns: image reference or undef if it wasn't valid
+# Note: should be called from RawConv, not ValueConv
 sub ValidateImage($$$)
 {
     my ($self, $imagePt, $tag) = @_;
@@ -2617,11 +2656,11 @@ sub ValidateImage($$$)
     unless ($$imagePt =~ /^(Binary data|\xff\xd8\xff)/ or
             # the first byte of the preview of some Minolta cameras is wrong,
             # so check for this and set it back to 0xff if necessary
-            $$imagePt =~ s/^.(\xd8\xff\xdb)/\xff$1/ or
+            $$imagePt =~ s/^.(\xd8\xff\xdb)/\xff$1/s or
             $self->Options('IgnoreMinorErrors'))
     {
         # issue warning only if the tag was specifically requested
-        if ($self->{REQ_TAG_LOOKUP}->{lc($tag)}) {
+        if ($self->{REQ_TAG_LOOKUP}->{lc GetTagName($tag)}) {
             $self->Warn("$tag is not a valid JPEG image",1);
             return undef;
         }
@@ -2715,6 +2754,27 @@ sub GetUnixTime($;$)
     $tm[1] -= 1;        # convert month
     @tm = reverse @tm;  # change to order required by timelocal()
     return shift() ? Time::Local::timelocal(@tm) : Time::Local::timegm(@tm);
+}
+
+#------------------------------------------------------------------------------
+# Convert seconds to duration string
+# Inputs: 0) Unix time value
+# Returns: duration string in form "S.SS s", "MM:SS" or "H:MM:SS"
+sub ConvertDuration($;$)
+{
+    my $time = shift;
+    return $time unless IsFloat($time);
+    return '0 s' if $time == 0;
+    return sprintf('%.2f s', $time) if $time < 60;
+    my $str = '';
+    if ($time >= 3600) {
+        my $h = int($time / 3600);
+        $str = "$h:";
+        $time -= $h * 3600;
+    }
+    my $m = int($time / 60);
+    $time -= $m * 60;
+    return sprintf('%s%.2d:%.2d', $str, $m, int($time));
 }
 
 #------------------------------------------------------------------------------
@@ -3360,9 +3420,9 @@ sub ProcessTIFF($$;$)
         if ($identifier == 0x2a and $offset >= 16) {
             $raf->Read($canonSig, 8) == 8 or return 0;
             $$dataPt .= $canonSig;
-            if ($canonSig =~ /^CR\x02\0/) {
-                $fileType = 'CR2';
-                $self->HtmlDump($base+8, 8, '[CR2 header]') if $self->{HTML_DUMP};
+            if ($canonSig =~ /^(CR\x02\0|\xba\xb0\xac\xbb)/) {
+                $fileType = $canonSig =~ /^CR/ ? 'CR2' : 'Canon 1D RAW';
+                $self->HtmlDump($base+8, 8, "[$fileType header]") if $self->{HTML_DUMP};
             } else {
                 undef $canonSig;
             }
@@ -3407,7 +3467,7 @@ sub ProcessTIFF($$;$)
         DataLen  => length $$dataPt,
         DataPos  => 0,
         DirStart => $offset,
-        DirLen   => length $$dataPt,
+        DirLen   => length($$dataPt) - $offset,
         RAF      => $raf,
         DirName  => 'IFD0',
         Parent   => $fileType,
@@ -4172,7 +4232,7 @@ sub ProcessBinaryData($$$)
     my $base = $$dirInfo{Base} || 0;
     my $verbose = $self->{OPTIONS}->{Verbose};
     my $unknown = $self->{OPTIONS}->{Unknown};
-    my $dataPos;
+    my $dataPos = $$dirInfo{DataPos} || 0;
 
     # get default format ('int8u' unless specified)
     my $defaultFormat = $$tagTablePtr{FORMAT} || 'int8u';
@@ -4197,10 +4257,9 @@ sub ProcessBinaryData($$$)
         # extract known tags in numerical order
         @tags = sort { $a <=> $b } TagTableKeys($tagTablePtr);
     }
-    if ($verbose) {
-        $self->VerboseDir('BinaryData', undef, $size);
-        $dataPos = $$dirInfo{DataPos} || 0;
-    }
+    $self->VerboseDir('BinaryData', undef, $size) if $verbose;
+    # avoid creating unknown tags for tags that fail condition if Unknown is 1
+    $$self{NO_UNKNOWN} = 1 if $unknown < 2;
     my $index;
     my $nextIndex = 0;
     my %val;
@@ -4217,9 +4276,9 @@ sub ProcessBinaryData($$$)
             $tagInfo = $self->GetTagInfo($tagTablePtr, $index) or next;
             $$tagInfo{Unknown} = 2;    # set unknown to 2 for binary unknowns
         }
+        my $entry = int($index) * $increment;   # relative offset of this entry
         my $count = 1;
         my $format = $$tagInfo{Format};
-        my $entry = int($index) * $increment;   # relative offset of this entry
         if ($format) {
             if ($format =~ /(.*)\[(.*)\]/) {
                 $format = $1;
@@ -4239,10 +4298,22 @@ sub ProcessBinaryData($$$)
         } else {
             $format = $defaultFormat;
         }
+        # allow nested BinaryData directories
         if ($unknown > 1) {
             # calculate next valid index for unknown tag
             my $ni = int($index) + ($formatSize{$format} * $count) / $increment;
             $nextIndex = $ni unless $nextIndex > $ni;
+        }
+        if ($$tagInfo{SubDirectory}) {
+            my %subdirInfo = (
+                DataPt   => $dataPt,
+                DirStart => $entry + $offset,
+                DirLen   => $size - $entry,
+                Base     => $base,
+            );
+            my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
+            $self->ProcessDirectory(\%subdirInfo, $subTablePtr);
+            next;
         }
         my $val = ReadValue($dataPt, $entry+$offset, $format, $count, $size-$entry);
         next unless defined $val;
@@ -4265,6 +4336,7 @@ sub ProcessBinaryData($$$)
         $val{$index} = $val;
         $self->FoundTag($tagInfo,$val);
     }
+    delete $$self{NO_UNKNOWN};
     return 1;
 }
 

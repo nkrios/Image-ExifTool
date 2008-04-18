@@ -10,9 +10,9 @@
 <p>
 XMP stands for &quot;Extensible Metadata Platform&quot;, an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
-embedded in many different image file types including JPG, JP2, TIFF, PNG,
-MIFF, PS, PDF, PSD and DNG, as well as audio file formats supporting ID3v2
-information.</p>
+embedded in many different image file types including JPG, JP2, TIFF, PS,
+PDF, PSD, DNG, PNG, SVG and MIFF, as well as audio file formats supporting
+ID3v2 information.</p>
 
 <p>The XMP <b>Tag ID</b>&#39;s aren&#39;t listed because in most cases they are identical
 to the <b>Tag Name</b>.</p>
@@ -2578,9 +2578,42 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='SVG'>XMP SVG Tags</a></h2>
+<p>SVG (Scalable Vector Graphics) image tags.  By default, only the top-level
+SVG and Metadata tags are extracted from these images, but all graphics tags
+may be extracted by setting the Unknown option to 2 (-U on the command
+line).  The SVG tags are not part of XMP as such, but are included with the
+XMP module for convenience.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>ImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>MetadataID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SVGVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 11, 2008</i>
+<br><i>Last revised Apr 8, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

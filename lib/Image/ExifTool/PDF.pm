@@ -17,7 +17,7 @@ use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -1085,6 +1085,7 @@ sub ProcessDict($$$$;$$)
             # convert from UTF-16 (big endian) to UTF-8 or Latin if necessary
             # unless this is binary data (hex-encoded strings would not have been converted)
             if (ref $val) {
+                next if ref $val ne 'ARRAY';
                 my $v;
                 foreach $v (@$val) {
                     $exifTool->FoundTag($tagInfo, $v);

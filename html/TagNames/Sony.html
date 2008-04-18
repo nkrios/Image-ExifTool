@@ -42,14 +42,18 @@ tags.
 <td>0xb023</td>
 <td>SceneMode</td>
 <td class=c>int32u</td>
-<td><span class=s>0 = Manual (P,A,S or M)
+<td><span class=s>0 = Standard
   <br>1 = Portrait
+  <br>2 = Text
+  <br>3 = Night Scene
   <br>4 = Sunset
   <br>5 = Sports
   <br>6 = Landscape
+  <br>7 = Night Portrait
   <br>8 = Macro
+  <br>9 = Super Macro
   <br>16 = Auto
-  <br>17 = Night Portrait</span></td></tr>
+  <br>17 = Night View/Portrait</span></td></tr>
 <tr class=b>
 <td>0xb024</td>
 <td>ZoneMatching</td>
@@ -63,7 +67,12 @@ tags.
 <td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = Standard
-  <br>2 = Advanced</span></td></tr>
+  <br>2 = Advanced Auto
+  <br>8 = Advanced Lv1
+  <br>9 = Advanced Lv2
+  <br>10 = Advanced Lv3
+  <br>11 = Advanced Lv4
+  <br>12 = Advanced Lv5</span></td></tr>
 <tr class=b>
 <td>0xb026</td>
 <td>ImageStabilization</td>
@@ -258,10 +267,16 @@ tags.
   <br>2 = Portrait
   <br>3 = Landscape
   <br>4 = Sunset
-  <br>5 = Night Scene
+  <br>5 = Night Portrait
   <br>6 = B&amp;W
   <br>7 = Adobe RGB
-  <br>12 = Neutral</span></td></tr>
+  <br>12 = Neutral
+  <br>100 = Neutral
+  <br>101 = Clear
+  <br>102 = Deep
+  <br>103 = Light
+  <br>104 = Night View
+  <br>105 = Autumn Leaves</span></td></tr>
 <tr class=b>
 <td>0xb040</td>
 <td>Macro</td>
@@ -397,7 +412,7 @@ containing these tags.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 27, 2008</i>
+<br><i>Last revised Apr 7, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

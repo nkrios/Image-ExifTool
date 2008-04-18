@@ -36,6 +36,8 @@ my $testnum = 1;
     my @writeInfo = (
         ['ThumbnailImage'],     # delete thumbnail image
         ['WhiteBalance' => 'Tungsten', 'Group' => 'MakerNotes'],
+        ['FocalLength' => 22 ],
+        ['MaxAperture' => 2.0 ],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
     print "ok $testnum\n";

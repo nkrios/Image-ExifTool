@@ -13,6 +13,7 @@
 #               4) http://wiki.multimedia.cx/index.php?title=Apple_QuickTime
 #               5) ISO 14496-12 (http://neuron2.net/library/avc/c041828_ISO_IEC_14496-12_2005(E).pdf)
 #               6) ISO 14496-16 (http://www.iec-normen.de/previewpdf/info_isoiec14496-16%7Bed2.0%7Den.pdf)
+#               7) http://atomicparsley.sourceforge.net/mpeg-4files.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::QuickTime;
@@ -22,10 +23,11 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.14';
+$VERSION = '1.16';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
+sub ProcessKeys($$$);
 
 # information for time/date-based tags (time zero is Jan 1, 1904)
 my %timeInfo = (
@@ -37,7 +39,7 @@ my %timeInfo = (
 # information for duration tags
 my %durationInfo = (
     ValueConv => '$$self{TimeScale} ? $val / $$self{TimeScale} : $val',
-    PrintConv => '$$self{TimeScale} ? sprintf("%.2f s", $val) : $val',
+    PrintConv => '$$self{TimeScale} ? ConvertDuration($val) : $val',
 );
 
 # 4-character Vendor ID codes (ref PH)
@@ -45,10 +47,13 @@ my %vendorID = (
     appl => 'Apple',
     kdak => 'Kodak',
     KMPI => 'Konica-Minolta',
+    mino => 'Minolta',
     niko => 'Nikon',
+    NIKO => 'Nikon',
     olym => 'Olympus',
     pana => 'Panasonic',
     pent => 'Pentax',
+    sany => 'Sanyo',
 );
 
 # QuickTime atoms
@@ -169,6 +174,10 @@ my %vendorID = (
     udta => {
         Name => 'UserData',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::UserData' },
+    },
+    meta => { # 'meta' is found here in my EX-F1 MOV sample - PH
+        Name => 'Meta',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Meta' },
     },
 );
 
@@ -476,6 +485,10 @@ my %vendorID = (
         Name => 'XML',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
+   'keys' => {
+        Name => 'Keys',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Keys' },
+    },
     # bxml - MP4 binary XML
     # pitm - MP4 primary item reference
 );
@@ -484,6 +497,10 @@ my %vendorID = (
 # -> these atoms are unique, and contain one or more 'data' atoms
 %Image::ExifTool::QuickTime::InfoList = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    NOTES => q{
+        As well as these tags, the 'mdta' handler uses numerical tag ID's which are
+        added dynamically to this table after processing the Meta Keys information.
+    },
     GROUPS => { 2 => 'Audio' },
     "\xa9ART" => 'Artist',
     "\xa9alb" => 'Album',
@@ -503,8 +520,10 @@ my %vendorID = (
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::iTunesInfo' },
     },
     aART => 'AlbumArtist',
-    apid => 'AppleStoreID',
+    apID => 'AppleStoreID',
+    # (also cnID,atID,cmID,plID,geID,sfID,akID)
     auth => 'Author',
+    catg => 'Category', #7
     covr => 'CoverArt',
     cpil => {
         Name => 'Compilation',
@@ -516,7 +535,11 @@ my %vendorID = (
         ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
     },
     dscp => 'Description',
+    desc => 'Description', #7
     gnre => 'Genre',
+    egid => 'EpisodeGlobalUniqueID', #7
+    keyw => 'Keyword', #7
+    pcst => 'Podcast', #7
     perf => 'Performer',
     pgap => {
         Name => 'PlayGap',
@@ -525,12 +548,61 @@ my %vendorID = (
             1 => 'No Gap',
         },
     },
+    purd => 'PurchaseDate', #7
+    purl => 'PodcastURL', #7
     rtng => 'Rating', # int
+    stik => { #(requires testing)
+        Name => 'ContentType', #(PH guess)
+        PrintConv => { #(http://weblog.xanga.com/gryphondwb/615474010/iphone-ringtones---what-did-itunes-741-really-do.html)
+            0 => 'Movie',
+            1 => 'Normal',
+            2 => 'Audiobook',
+            5 => 'Whacked Bookmark',
+            6 => 'Music Video',
+            9 => 'Short Film',
+            10 => 'TV Show',
+            11 => 'Booklet',
+            14 => 'Ringtone',
+        },
+    },
     titl => 'Title',
-    tmpo => 'BeatsPerMinute', # int
+    tmpo => {
+        Name => 'BeatsPerMinute',
+        Format => 'int16u', # marked as boolean but really int16u in my sample
+    },
     trkn => {
         Name => 'TrackNumber',
         ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
+    },
+    tvnn => 'TVNetworkName', #7
+    tven => 'TVEpisodeNumber', #7
+    tvsn => 'TVSeason', #7
+    tves => 'TVEpisode', #7
+);
+
+# info list keys
+%Image::ExifTool::QuickTime::Keys = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessKeys,
+    NOTES => q{
+        This directory contains a list of key names which are used to decode
+        InfoList tags written by the "mdta" handler.  The prefix of
+        "com.apple.quicktime." has been removed from all TagID's below.
+    },
+    'version'                       => 'Version',
+    'player.version'                => 'PlayerVersion',
+    'player.movie.visual.brightness'=> 'Brightness',
+    'player.movie.visual.color'     => 'Color',
+    'player.movie.visual.tint'      => 'Tint',
+    'player.movie.visual.contrast'  => 'Contrast',
+    'player.movie.audio.gain'       => 'AudioGain',
+    'player.movie.audio.treble'     => 'Trebel',
+    'player.movie.audio.bass'       => 'Bass',
+    'player.movie.audio.balance'    => 'Balance',
+    'player.movie.audio.pitchshift' => 'PitchShift',
+    'player.movie.audio.mute' => {
+        Name => 'Mute',
+        Format => 'int8u',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
     },
 );
 
@@ -612,7 +684,7 @@ my %vendorID = (
     4 => {
         Name => 'MediaDuration',
         RawConv => '$$self{MediaTS} ? $val / $$self{MediaTS} : $val',
-        PrintConv => '$$self{MediaTS} ? sprintf("%.2f s", $val) : $val',
+        PrintConv => '$$self{MediaTS} ? ConvertDuration($val) : $val',
     },
     5 => {
         Name => 'MediaLanguageCode',
@@ -650,7 +722,7 @@ my %vendorID = (
         Name => 'MediaDuration',
         Format => 'int64u',
         RawConv => '$$self{MediaTS} ? $val / $$self{MediaTS} : $val',
-        PrintConv => '$$self{MediaTS} ? sprintf("%.2f s", $val) : $val',
+        PrintConv => '$$self{MediaTS} ? ConvertDuration($val) : $val',
     },
     8 => {
         Name => 'MediaLanguageCode',
@@ -922,6 +994,7 @@ my %vendorID = (
             hint => 'Hint Track',
             alis => 'Alias Data', #PH
             mdir => 'Metadata', #3
+            mdta => 'Metadata Tags', #PH
             odsm => 'Object Descriptor', #3
             sdsm => 'Scene Description', #3
             crsm => 'Clock Reference', #3
@@ -981,9 +1054,61 @@ sub FixWrongFormat($)
 }
 
 #------------------------------------------------------------------------------
+# Process Meta keys and add tags to the InfoList table ('mdta' handler) (ref PH)
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessKeys($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirLen = length $$dataPt;
+    my $out;
+    if ($exifTool->Options('Verbose')) {
+        $exifTool->VerboseDir('Keys');
+        $out = $exifTool->Options('TextOut');
+    }
+    my $pos = 8;
+    my $index = 1;
+    my $infoTable = GetTagTable('Image::ExifTool::QuickTime::InfoList');
+    while ($pos < $dirLen - 4) {
+        my $len = unpack("x${pos}N", $$dataPt);
+        last if $len < 4 or $pos + $len > $dirLen;
+        delete $$tagTablePtr{$index};
+        my $tag = substr($$dataPt, $pos + 4, $len - 4);
+        $tag =~ s/\0.*//s; # truncate at null
+        $tag =~ s/^mdta//; # remove 'mdta' prefix
+        $tag =~ s/^com\.apple\.quicktime\.//;   # remove common apple quicktime domain
+        next unless $tag;
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        my $newInfo;
+        if ($tagInfo) {
+            $newInfo = {
+                Name      => $$tagInfo{Name},
+                Format    => $$tagInfo{Format},
+                ValueConv => $$tagInfo{ValueConv},
+                PrintConv => $$tagInfo{PrintConv},
+            };
+        } elsif ($tag =~ /^[-\w.]+$/) {
+            # create info for tags with reasonable id's
+            my $name = $1;
+            $name =~ s/\.(.)/\U$1/g;
+            $newInfo = { Name => ucfirst($name) };
+        } else {
+            next;
+        }
+        # substitute this tag in the InfoList table with the given index
+        delete $$infoTable{$index};
+        Image::ExifTool::AddTagToTable($infoTable, $index, $newInfo);
+        $out and printf $out "%sAdded InfoList Tag 0x%.4x = $tag\n", $exifTool->{INDENT}, $index;
+        $pos += $len;
+        ++$index;
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
 # Process a QuickTime atom
-# Inputs: 0) ExifTool object reference, 1) directory information reference
-#         2) optional tag table reference
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) optional tag table ref
 # Returns: 1 on success
 sub ProcessMOV($$;$)
 {
@@ -1039,12 +1164,22 @@ sub ProcessMOV($$;$)
         }
         $size -= 8;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        # allow numerical tag ID's
+        unless ($tagInfo) {
+            my $num = unpack('N', $tag);
+            if ($$tagTablePtr{$num}) {
+                $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $num);
+                $tag = $num;
+            }
+        }
         # generate tagInfo if Unknown option set
         if (not defined $tagInfo and ($exifTool->{OPTIONS}->{Unknown} or
-            $tag =~ /^\xa9/))
+            $verbose or $tag =~ /^\xa9/))
         {
             my $name = $tag;
-            $name =~ s/([\x00-\x1f\x7f-\xff])/'x'.unpack('H*',$1)/eg;
+            my $n = ($name =~ s/([\x00-\x1f\x7f-\xff])/'x'.unpack('H*',$1)/eg);
+            # print in hex if tag is numerical
+            $name = sprintf('0x%.4x',unpack('N',$tag)) if $n > 2;
             if ($name =~ /^xa9(.*)/) {
                 $tagInfo = {
                     Name => "UserData_$1",
@@ -1111,13 +1246,22 @@ sub ProcessMOV($$;$)
                         my ($len, $type, $flags) = unpack("x${pos}Na4N", $val);
                         last if $pos + $len > $size;
                         my $value;
+                        my $format = $$tagInfo{Format};
                         if ($type eq 'data' and $len >= 16) {
                             $pos += 16;
                             $len -= 16;
                             $value = substr($val, $pos, $len);
-                            # format flags: 0x0=binary, 0x1=text, 0xd=image, 0x15=boolean 
-                            if ($flags == 0x0015) {
-                                $value = $len ? ReadValue(\$value, $len-1, 'int8u', 1, 1) : '';
+                            # format flags: 0x0=binary, 0x1=text, 0xd=image,
+                            #   0x15=boolean, 0x17=float
+                            unless ($format) {
+                                if ($flags == 0x0015) {
+                                    $format = 'int8u';
+                                } elsif ($flags == 0x0017) {
+                                    $format = 'float';
+                                }
+                            }
+                            if ($format) {
+                                $value = ReadValue(\$value, 0, $format, $$tagInfo{Count}, $len);
                             } elsif ($flags != 0x01 and not $$tagInfo{ValueConv}) {
                                 # make binary data a scalar reference unless a ValueConv exists
                                 my $buf = $value;
@@ -1130,6 +1274,7 @@ sub ProcessMOV($$;$)
                             DataPos => $dataPos,
                             Start   => $pos,
                             Size    => $len,
+                            Format  => $format,
                             Extra   => sprintf(", Type='$type', Flags=0x%x",$flags)
                         ) if $verbose;
                         $exifTool->FoundTag($tagInfo, $value) if defined $value;
@@ -1204,6 +1349,8 @@ under the same terms as Perl itself.
 =item L<http://www.geocities.com/xhelmboyx/quicktime/formats/mp4-layout.txt>
 
 =item L<http://wiki.multimedia.cx/index.php?title=Apple_QuickTime>
+
+=item L<http://atomicparsley.sourceforge.net/mpeg-4files.html>
 
 =back
 

@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.20
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
 [File, File, Image]  - File Name: DNG.dng
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 13 kB
 [File, File, Time]  - File Modification Date/Time: 2006:02:26 09:30:53
 [File, File, Image]  - File Type: DNG
 [File, File, Image]  - MIME Type: image/x-raw
-[File, File, Image]  - Exif Byte Order: Big-endian (Motorola)
+[File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
 [EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
 [EXIF, IFD0, Image] 256 - Image Width: 8
 [EXIF, IFD0, Image] 257 - Image Height: 8

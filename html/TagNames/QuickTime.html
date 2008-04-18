@@ -66,20 +66,418 @@ their name are not extracted unless the Unknown option is set.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>'meta'</td>
+<td>Meta</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
+<tr class=b>
 <td>'mvhd'</td>
 <td>MovieHeader</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#MovieHdr'>QuickTime MovieHdr Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'trak'</td>
 <td>Track</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Track'>QuickTime Track Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'udta'</td>
 <td>UserData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#UserData'>QuickTime UserData Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Meta'>QuickTime Meta Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'hdlr'</td>
+<td>Handler</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Handler'>QuickTime Handler Tags</a></td></tr>
+<tr class=b>
+<td>'ilst'</td>
+<td>InfoList</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#InfoList'>QuickTime InfoList Tags</a></td></tr>
+<tr>
+<td>'keys'</td>
+<td>Keys</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Keys'>QuickTime Keys Tags</a></td></tr>
+<tr class=b>
+<td>'xml '</td>
+<td>XML</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Handler'>QuickTime Handler Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>4</td>
+<td>HandlerClass</td>
+<td class=c>N</td>
+<td><span class=s>&#39;dhlr&#39; = Data Handler
+  <br>&#39;mhlr&#39; = Media Handler</span></td></tr>
+<tr class=b>
+<td class=r>8</td>
+<td>HandlerType</td>
+<td class=c>N</td>
+<td><span class=s>&#39;alis&#39; = Alias Data
+  <br>&#39;crsm&#39; = Clock Reference
+  <br>&#39;hint&#39; = Hint Track
+  <br>&#39;ipsm&#39; = IPMP
+  <br>&#39;m7sm&#39; = MPEG-7 Stream
+  <br>&#39;mdir&#39; = Metadata
+  <br>&#39;mdta&#39; = Metadata Tags
+  <br>&#39;mjsm&#39; = MPEG-J
+  <br>&#39;ocsm&#39; = Object Content
+  <br>&#39;odsm&#39; = Object Descriptor
+  <br>&#39;sdsm&#39; = Scene Description
+  <br>&#39;soun&#39; = Audio Track
+  <br>&#39;url &#39; = URL
+  <br>&#39;vide&#39; = Video Track</span></td></tr>
+<tr>
+<td class=r>12</td>
+<td>HandlerVendorID</td>
+<td class=c>N</td>
+<td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
+<tr class=b>
+<td class=r>24</td>
+<td>HandlerDescription</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='VendorID'>QuickTime VendorID Values</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th></tr>
+<tr><td>'KMPI'</td><td>= Konica-Minolta</td>
+<td class=b>'niko'</td><td class=b>= Nikon</td>
+</tr><tr><td>'NIKO'</td><td>= Nikon</td>
+<td class=b>'olym'</td><td class=b>= Olympus</td>
+</tr><tr><td>'appl'</td><td>= Apple</td>
+<td class=b>'pana'</td><td class=b>= Panasonic</td>
+</tr><tr><td>'kdak'</td><td>= Kodak</td>
+<td class=b>'pent'</td><td class=b>= Pentax</td>
+</tr><tr><td>'mino'</td><td>= Minolta</td>
+<td class=b>'sany'</td><td class=b>= Sanyo</td>
+</tr></table></td></tr></table></blockquote>
+
+<h2><a name='InfoList'>QuickTime InfoList Tags</a></h2>
+<p>As well as these tags, the &#39;mdta&#39; handler uses numerical tag ID&#39;s which are
+added dynamically to this table after processing the Meta Keys information.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'----'</td>
+<td>iTunesInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#iTunesInfo'>QuickTime iTunesInfo Tags</a></td></tr>
+<tr class=b>
+<td>'aART'</td>
+<td>AlbumArtist</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'apID'</td>
+<td>AppleStoreID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'auth'</td>
+<td>Author</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'catg'</td>
+<td>Category</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'covr'</td>
+<td>CoverArt</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'cpil'</td>
+<td>Compilation</td>
+<td class=c>N</td>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr class=b>
+<td>'cprt'</td>
+<td>Copyright</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'desc'</td>
+<td>Description</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'disk'</td>
+<td>DiskNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'dscp'</td>
+<td>Description</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'egid'</td>
+<td>EpisodeGlobalUniqueID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'gnre'</td>
+<td>Genre</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'keyw'</td>
+<td>Keyword</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'pcst'</td>
+<td>Podcast</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'perf'</td>
+<td>Performer</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'pgap'</td>
+<td>PlayGap</td>
+<td class=c>N</td>
+<td><span class=s>0 = Insert Gap
+  <br>1 = No Gap</span></td></tr>
+<tr class=b>
+<td>'purd'</td>
+<td>PurchaseDate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'purl'</td>
+<td>PodcastURL</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'rtng'</td>
+<td>Rating</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'stik'</td>
+<td>ContentType</td>
+<td class=c>N</td>
+<td><span class=s>0 = Movie
+  <br>1 = Normal
+  <br>2 = Audiobook
+  <br>5 = Whacked Bookmark
+  <br>6 = Music Video
+  <br>9 = Short Film
+  <br>10 = TV Show
+  <br>11 = Booklet
+  <br>14 = Ringtone</span></td></tr>
+<tr class=b>
+<td>'titl'</td>
+<td>Title</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'tmpo'</td>
+<td>BeatsPerMinute</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'trkn'</td>
+<td>TrackNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'tven'</td>
+<td>TVEpisodeNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'tves'</td>
+<td>TVEpisode</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'tvnn'</td>
+<td>TVNetworkName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'tvsn'</td>
+<td>TVSeason</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"\xa9ART"</td>
+<td>Artist</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>"\xa9alb"</td>
+<td>Album</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"\xa9cmt"</td>
+<td>Comment</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>"\xa9com"</td>
+<td>Composer</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"\xa9day"</td>
+<td>Year</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>"\xa9des"</td>
+<td>Description</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"\xa9gen"</td>
+<td>Genre</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>"\xa9grp"</td>
+<td>Grouping</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"\xa9lyr"</td>
+<td>Lyrics</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>"\xa9nam"</td>
+<td>Title</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"\xa9too"</td>
+<td>Encoder</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>"\xa9trk"</td>
+<td>Track</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"\xa9wrt"</td>
+<td>Composer</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='iTunesInfo'>QuickTime iTunesInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=4 class=c>[no tags known]</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Keys'>QuickTime Keys Tags</a></h2>
+<p>This directory contains a list of key names which are used to decode
+InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
+&quot;com.apple.quicktime.&quot; has been removed from all TagID&#39;s below.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'player.movie.audio.balance'</td>
+<td>Balance</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'player.movie.audio.bass'</td>
+<td>Bass</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'player.movie.audio.gain'</td>
+<td>AudioGain</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'player.movie.audio.mute'</td>
+<td>Mute</td>
+<td class=c>N</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td>'player.movie.audio.pitchshift'</td>
+<td>PitchShift</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'player.movie.audio.treble'</td>
+<td>Trebel</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'player.movie.visual.brightness'</td>
+<td>Brightness</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'player.movie.visual.color'</td>
+<td>Color</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'player.movie.visual.contrast'</td>
+<td>Contrast</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'player.movie.visual.tint'</td>
+<td>Tint</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'player.version'</td>
+<td>PlayerVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'version'</td>
+<td>Version</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='MovieHdr'>QuickTime MovieHdr Tags</a></h2>
@@ -207,62 +605,6 @@ their name are not extracted unless the Unknown option is set.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#MediaInfo'>QuickTime MediaInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
-
-<h2><a name='Handler'>QuickTime Handler Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r>4</td>
-<td>HandlerClass</td>
-<td class=c>N</td>
-<td><span class=s>&#39;dhlr&#39; = Data Handler
-  <br>&#39;mhlr&#39; = Media Handler</span></td></tr>
-<tr class=b>
-<td class=r>8</td>
-<td>HandlerType</td>
-<td class=c>N</td>
-<td><span class=s>&#39;alis&#39; = Alias Data
-  <br>&#39;crsm&#39; = Clock Reference
-  <br>&#39;hint&#39; = Hint Track
-  <br>&#39;ipsm&#39; = IPMP
-  <br>&#39;m7sm&#39; = MPEG-7 Stream
-  <br>&#39;mdir&#39; = Metadata
-  <br>&#39;mjsm&#39; = MPEG-J
-  <br>&#39;ocsm&#39; = Object Content
-  <br>&#39;odsm&#39; = Object Descriptor
-  <br>&#39;sdsm&#39; = Scene Description
-  <br>&#39;soun&#39; = Audio Track
-  <br>&#39;url &#39; = URL
-  <br>&#39;vide&#39; = Video Track</span></td></tr>
-<tr>
-<td class=r>12</td>
-<td>HandlerVendorID</td>
-<td class=c>N</td>
-<td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
-<tr class=b>
-<td class=r>24</td>
-<td>HandlerDescription</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='VendorID'>QuickTime VendorID Values</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class='inner sep' cellspacing=1>
-<tr class=h><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th></tr>
-<tr><td>'KMPI'</td><td>= Konica-Minolta</td>
-<td class=b>'olym'</td><td class=b>= Olympus</td>
-</tr><tr><td>'appl'</td><td>= Apple</td>
-<td class=b>'pana'</td><td class=b>= Panasonic</td>
-</tr><tr><td>'kdak'</td><td>= Kodak</td>
-<td class=b>'pent'</td><td class=b>= Pentax</td>
-</tr><tr><td>'niko'</td><td>= Nikon</td>
-<td class=b>&nbsp;</td><td class=b>&nbsp;</td>
-</tr></table></td></tr></table></blockquote>
 
 <h2><a name='MediaHeader0'>QuickTime MediaHeader0 Tags</a></h2>
 <p>MP4 media header version 0.</p>
@@ -878,193 +1220,6 @@ if they don&#39;t exist in this table.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='Meta'>QuickTime Meta Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'hdlr'</td>
-<td>Handler</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Handler'>QuickTime Handler Tags</a></td></tr>
-<tr class=b>
-<td>'ilst'</td>
-<td>InfoList</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#InfoList'>QuickTime InfoList Tags</a></td></tr>
-<tr>
-<td>'xml '</td>
-<td>XML</td>
-<td class=c>-</td>
-<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='InfoList'>QuickTime InfoList Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'----'</td>
-<td>iTunesInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#iTunesInfo'>QuickTime iTunesInfo Tags</a></td></tr>
-<tr class=b>
-<td>'aART'</td>
-<td>AlbumArtist</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'apid'</td>
-<td>AppleStoreID</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'auth'</td>
-<td>Author</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'covr'</td>
-<td>CoverArt</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'cpil'</td>
-<td>Compilation</td>
-<td class=c>N</td>
-<td><span class=s>0 = No
-  <br>1 = Yes</span></td></tr>
-<tr>
-<td>'cprt'</td>
-<td>Copyright</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'disk'</td>
-<td>DiskNumber</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'dscp'</td>
-<td>Description</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'gnre'</td>
-<td>Genre</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'perf'</td>
-<td>Performer</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'pgap'</td>
-<td>PlayGap</td>
-<td class=c>N</td>
-<td><span class=s>0 = Insert Gap
-  <br>1 = No Gap</span></td></tr>
-<tr>
-<td>'rtng'</td>
-<td>Rating</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'titl'</td>
-<td>Title</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'tmpo'</td>
-<td>BeatsPerMinute</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'trkn'</td>
-<td>TrackNumber</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"\xa9ART"</td>
-<td>Artist</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>"\xa9alb"</td>
-<td>Album</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"\xa9cmt"</td>
-<td>Comment</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>"\xa9com"</td>
-<td>Composer</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"\xa9day"</td>
-<td>Year</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>"\xa9des"</td>
-<td>Description</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"\xa9gen"</td>
-<td>Genre</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>"\xa9grp"</td>
-<td>Grouping</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"\xa9lyr"</td>
-<td>Lyrics</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>"\xa9nam"</td>
-<td>Title</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"\xa9too"</td>
-<td>Encoder</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>"\xa9trk"</td>
-<td>Track</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"\xa9wrt"</td>
-<td>Composer</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='iTunesInfo'>QuickTime iTunesInfo Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr><td colspan=4 class=c>[no tags known]</td></tr>
-</table></td></tr></table></blockquote>
-
 <h2><a name='Video'>QuickTime Video Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -1142,7 +1297,7 @@ if they don&#39;t exist in this table.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 10, 2008</i>
+<br><i>Last revised Apr 4, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

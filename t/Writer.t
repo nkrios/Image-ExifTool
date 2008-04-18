@@ -604,17 +604,18 @@ my $testOK;
     print "ok $testnum\n";
 }
 
-# test 35: Add back JFIF information after deleting everything
+# test 35: Add back all information after deleting everything
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValue('*');
-    $exifTool->SetNewValue('JFIF:XResolution' => 1);
+    $exifTool->SetNewValuesFromFile('t/images/ExifTool.jpg', 'all:all',
+                                    'icc_profile', 'canonvrd');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
     $exifTool->Options(Composite => 0);
-    my $info = $exifTool->ImageInfo($testfile, '-File:*', '-exiftoolversion');
+    my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
     } else {
@@ -622,6 +623,5 @@ my $testOK;
     }
     print "ok $testnum\n";
 }
-
 
 # end

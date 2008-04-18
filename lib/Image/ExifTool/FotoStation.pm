@@ -39,14 +39,12 @@ sub ProcessFotoStation($$);
     0x03 => {
         Name => 'ThumbnailImage',
         Writable => 1,
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
-        ValueConvInv => '$val',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
     0x04 => {
         Name => 'PreviewImage',
         Writable => 1,
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
-        ValueConvInv => '$val',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
 );
 

@@ -106,7 +106,7 @@ my %psdMap = (
     0x0409 => {
         Name => 'PhotoshopBGRThumbnail',
         Notes => 'this is a JPEG image, but in BGR format instead of RGB',
-        ValueConv => 'my $img=substr($val,0x1c);$self->ValidateImage(\$img,$tag)',
+        RawConv => 'my $img=substr($val,0x1c);$self->ValidateImage(\$img,$tag)',
     },
     0x040a => {
         Name => 'CopyrightFlag',
@@ -126,7 +126,7 @@ my %psdMap = (
     },
     0x040c => {
         Name => 'PhotoshopThumbnail',
-        ValueConv => 'my $img=substr($val,0x1c);$self->ValidateImage(\$img,$tag)',
+        RawConv => 'my $img=substr($val,0x1c);$self->ValidateImage(\$img,$tag)',
     },
     0x040d => {
         Name => 'GlobalAngle',

@@ -22,7 +22,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.47';
+$VERSION = '1.48';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -370,16 +370,14 @@ sub BuildMakerNotes($$$$$$);
         Name => 'JpgFromRaw',
         Writable => 'resize',  # 'resize' allows this value to change size
         Permanent => 0,
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
-        ValueConvInv => '$val',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
     0x2008 => {
         Name => 'ThumbnailImage',
         Writable => 'resize',  # 'resize' allows this value to change size
         WriteCheck => '$self->CheckImage(\$val)',
         Permanent => 0,
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
-        ValueConvInv => '$val',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
     # the following entries are subdirectories
     # (any 0x28 and 0x30 tag types are handled automatically by the decoding logic)

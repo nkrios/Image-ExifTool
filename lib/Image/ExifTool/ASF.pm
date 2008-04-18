@@ -16,7 +16,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -63,9 +63,9 @@ my %advancedContentEncryption = (
 %Image::ExifTool::ASF::Main = (
     PROCESS_PROC => \&Image::ExifTool::ASF::ProcessASF,
     NOTES => q{
-        ASF format is used by Windows WMA and WMV files.  Tag ID's aren't listed
-        because they are huge 128-bit GUID's that would ruin the formatting of this
-        table.
+        The ASF format is used by Windows WMA and WMV files, and DIVX videos.  Tag
+        ID's aren't listed because they are huge 128-bit GUID's that would ruin the
+        formatting of this table.
     },
     '75B22630-668E-11CF-A6D9-00AA0062CE6C' => {
         Name => 'Header',
@@ -183,7 +183,7 @@ my %advancedContentEncryption = (
     DRM_LASignatureRootCert => {},
     DRM_LicenseAcqURL => {},
     DRM_V1LicenseAcqURL => {},
-    Duration => {},
+    Duration => { PrintConv => 'ConvertDuration($val)' },
     FileSize => {},
     HasArbitraryDataStream => {},
     HasAttachedImages => {},
@@ -346,7 +346,7 @@ my %advancedContentEncryption = (
     2 => 'PreviewDescription',
     3 => {
         Name => 'PreviewImage',
-        ValueConv => '$self->ValidateImage(\$val,$tag)',
+        RawConv => '$self->ValidateImage(\$val,$tag)',
     },
 );
 
@@ -374,13 +374,13 @@ my %advancedContentEncryption = (
         Name => 'PlayDuration',
         Format => 'int64u',
         ValueConv => '$val / 1e7',
-        PrintConv => '"$val s"',
+        PrintConv => 'ConvertDuration($val)',
     },
     48 => {
         Name => 'SendDuration',
         Format => 'int64u',
         ValueConv => '$val / 1e7',
-        PrintConv => '"$val s"',
+        PrintConv => 'ConvertDuration($val)',
     },
     56 => { Name => 'Preroll',      Format => 'int64u' },
     64 => { Name => 'Flags',        Format => 'int32u' },
@@ -743,7 +743,7 @@ sub ProcessASF($$;$)
             # verify this is a valid ASF file
             last unless $tag eq '75B22630-668E-11CF-A6D9-00AA0062CE6C';
             my $fileType = $exifTool->{FILE_EXT};
-            $fileType = 'ASF' unless $fileType and $fileType =~ /^(ASF|WMV|WMA)$/;
+            $fileType = 'ASF' unless $fileType and $fileType =~ /^(ASF|WMV|WMA|DIVX)$/;
             $exifTool->SetFileType($fileType);
             SetByteOrder('II');
             $tagTablePtr = GetTagTable('Image::ExifTool::ASF::Main');

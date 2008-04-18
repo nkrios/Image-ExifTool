@@ -20,6 +20,7 @@
 #               6) http://www.optimasc.com/products/fileid/xmp-extensions.pdf
 #               7) Lou Salkind private communication
 #               8) http://partners.adobe.com/public/developer/en/xmp/sdk/XMPspecification.pdf
+#               9) http://www.w3.org/TR/SVG11/
 #
 # Notes:      - I am handling property qualifiers as if they were separate
 #               properties (with no associated namespace).
@@ -41,7 +42,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.83';
+$VERSION = '1.84';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -103,6 +104,7 @@ my %stdXlatNS = (
     MicrosoftPhoto => 'http://ns.microsoft.com/photo/1.0',
     lr        => 'http://ns.adobe.com/lightroom/1.0/',
     DICOM     => 'http://ns.adobe.com/DICOM/',
+    svg       => 'http://www.w3.org/2000/svg',
 );
 
 # build reverse namespace lookup
@@ -150,7 +152,7 @@ my %dateTimeInfo = (
 
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
 # (Note: namespaces with non-standard prefixes aren't currently ignored)
-my %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1 );
+my %ignoreNamespace = ( 'x'=>1, 'rdf'=>1, 'xmlns'=>1, 'xml'=>1, 'svg'=>1 );
 
 # these are the attributes that we handle for properties that contain
 # sub-properties.  Attributes for simple properties are easy, and we
@@ -1222,6 +1224,8 @@ my %xmpTableDefaults = (
         Name => 'FocalLengthIn35mmFormat',
         Writable => 'integer',
         Groups => { 2 => 'Camera' },
+        PrintConv => '"$val mm"',
+        PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
     SceneCaptureType => {
         Groups => { 2 => 'Camera' },
@@ -1621,6 +1625,31 @@ my %xmpTableDefaults = (
     EquipmentManufacturer   => { },
 );
 
+# SVG schema properties (ref 9)
+%Image::ExifTool::XMP::SVG = (
+    GROUPS => { 0 => 'SVG', 1 => 'SVG', 2 => 'Image' },
+    NAMESPACE => 'svg',
+    LANG_INFO => \&GetLangInfo,
+    NOTES => q{
+        SVG (Scalable Vector Graphics) image tags.  By default, only the top-level
+        SVG and Metadata tags are extracted from these images, but all graphics tags
+        may be extracted by setting the Unknown option to 2 (-U on the command
+        line).  The SVG tags are not part of XMP as such, but are included with the
+        XMP module for convenience.
+    },
+    version    => 'SVGVersion',
+    id         => 'ID',
+    metadataId => 'MetadataID',
+    width      => 'ImageWidth',
+    height     => 'ImageHeight',
+);
+
+# table to add tags in other namespaces
+%Image::ExifTool::XMP::otherSVG = (
+    GROUPS => { 0 => 'SVG', 2 => 'Unknown' },
+    LANG_INFO => \&GetLangInfo,
+);
+
 # table to add tags in other namespaces
 %Image::ExifTool::XMP::other = (
     GROUPS => { 2 => 'Unknown' },
@@ -1791,7 +1820,7 @@ sub GetXMPTagID($)
             }
         }
         # save namespace of first property to contribute to tag name
-        $namespace = $ns unless defined $namespace;
+        $namespace = $ns unless $namespace;
     }
     if (wantarray) {
         return ($tag, $namespace);
@@ -1903,9 +1932,19 @@ sub FoundXMP($$$$;$)
     my $table;
     if ($info) {
         $table = $info->{SubDirectory}->{TagTable} or warn "Missing TagTable for $tag!\n";
-    } else {
-        $table = 'Image::ExifTool::XMP::other';
+    } elsif ($$props[0] eq 'svg:svg') {
+        if (not $namespace) {
+            # disambiguate MetadataID by adding back the 'metadata' we ignored
+            $tag = 'metadataId' if $tag eq 'id' and $$props[1] eq 'svg:metadata';
+            # use SVG namespace in SVG files if nothing better to use
+            $table = 'Image::ExifTool::XMP::SVG';
+        } elsif (not grep /^rdf:/, @$props) {
+            # only other SVG information if not inside RDF (call it XMP if in RDF)
+            $table = 'Image::ExifTool::XMP::otherSVG';
+        }
     }
+    $table or $table = 'Image::ExifTool::XMP::other';
+
     # change pointer to the table for this namespace
     $tagTablePtr = GetTagTable($table);
 
@@ -1949,7 +1988,7 @@ sub FoundXMP($$$$;$)
         }
     }
     $tag = $exifTool->FoundTag($tagInfo, UnescapeXML($val));
-    $exifTool->SetGroup1($tag, "XMP-$namespace") if $namespace;
+    $exifTool->SetGroup1($tag, "$tagTablePtr->{GROUPS}->{0}-$namespace") if $namespace;
 
     if ($exifTool->Options('Verbose')) {
         my $tagID = join('/',@$props);
@@ -1972,6 +2011,8 @@ sub ParseXMPElement($$$;$$$)
     my ($exifTool, $tagTablePtr, $dataPt, $start, $propListPt, $blankInfo) = @_;
     my $count = 0;
     my $isWriting = $exifTool->{XMP_CAPTURE};
+    my $isSVG = $$exifTool{XMP_IS_SVG};
+
     $start or $start = 0;
     $propListPt or $propListPt = [ ];
 
@@ -2039,6 +2080,20 @@ sub ParseXMPElement($$$;$$$)
 
         # push this property name onto our hierarchy list
         push @$propListPt, $prop;
+
+        if ($isSVG) {
+            # ignore everything but top level SVG tags and metadata unless Unknown set
+            unless ($exifTool->{OPTIONS}->{Unknown} > 1 or $exifTool->{OPTIONS}->{Verbose}) {
+                if (@$propListPt > 1 and $$propListPt[1] !~ /\b(metadata|desc|title)$/) {
+                    pop @$propListPt;
+                    next;
+                }
+            }
+            if ($prop eq 'svg' or $prop eq 'metadata') {
+                # add svg namespace prefix if missing to ignore these entries in the tag name
+                $$propListPt[-1] = "svg:$prop";
+            }
+        }
 
         # handle properties inside element attributes (RDF shorthand format):
         # (attributes take the form a:b='c' or a:b="c")
@@ -2165,7 +2220,7 @@ sub ProcessXMP($$;$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my ($dirStart, $dirLen, $dataLen);
-    my ($buff, $fmt, $isXML);
+    my ($buff, $fmt, $isXML, $isSVG);
     my $rtnVal = 0;
     my $bom = 0;
 
@@ -2176,7 +2231,7 @@ sub ProcessXMP($$;$)
     } else {
         # read information from XMP file
         my $raf = $$dirInfo{RAF} or return 0;
-        $raf->Read($buff, 128) or return 0;
+        $raf->Read($buff, 256) or return 0;
         my ($buf2, $double);
         ($buf2 = $buff) =~ tr/\0//d;    # cheap conversion to UTF-8
         # check to see if this is XMP format
@@ -2196,7 +2251,19 @@ sub ProcessXMP($$;$)
             }
             $bom = 1 if $1;
             if ($2 eq '<?xml') {
-                return 0 unless $buf2 =~ /<x(mp)?:xmpmeta/;
+                unless ($buf2 =~ /<x(mp)?:xmpmeta/) {
+                    # identify SVG images by DOCTYPE if available
+                    if ($buf2 =~ /<!DOCTYPE\s+(\w+)/) {
+                        return 0 unless $1 eq 'svg';
+                    } else {
+                        return 0 unless $buf2 =~ /<svg[\s>]/;
+                    }
+                    if ($exifTool->{XMP_CAPTURE}) {
+                        $exifTool->Error("ExifTool does not yet support writing of SVG images");
+                        return 0;
+                    }
+                    $isSVG = 1;
+                }
                 $isXML = 1;
             }
             if ($buff =~ /^\0\0/) {
@@ -2240,7 +2307,7 @@ sub ProcessXMP($$;$)
         $dataPt = \$buff;
         $dirStart = 0;
         $dirLen = $dataLen = $size;
-        $exifTool->SetFileType();
+        $exifTool->SetFileType($isSVG ? 'SVG' : undef);
     }
 
     # take substring if necessary
@@ -2249,11 +2316,12 @@ sub ProcessXMP($$;$)
         $dataPt = \$buff;
         $dirStart = 0;
     }
-    if ($exifTool->{REQ_TAG_LOOKUP}->{xmp}) {
+    # extract XMP as a block if specified
+    if ($exifTool->{REQ_TAG_LOOKUP}->{xmp} and not $isSVG) {
         $exifTool->FoundTag('XMP', substr($$dataPt, $dirStart, $dirLen));
     }
     if ($exifTool->Options('Verbose') and not $exifTool->{XMP_CAPTURE}) {
-        $exifTool->VerboseDir('XMP', 0, $dirLen);
+        $exifTool->VerboseDir($isSVG ? 'SVG' : 'XMP', 0, $dirLen);
     }
 #
 # convert UTF-16 or UTF-32 encoded XMP to UTF-8 if necessary
@@ -2261,8 +2329,10 @@ sub ProcessXMP($$;$)
     my $begin = '<?xpacket begin=';
     pos($$dataPt) = $dirStart;
     delete $$exifTool{XMP_IS_XML};
+    delete $$exifTool{XMP_IS_SVG};
     if ($isXML) {
         $$exifTool{XMP_IS_XML} = 1;
+        $$exifTool{XMP_IS_SVG} = 1 if $isSVG;
         $$exifTool{XMP_NO_XPACKET} = 1 + $bom;
     } elsif ($$dataPt =~ /\G\Q$begin\E/gc) {
         delete $$exifTool{XMP_NO_XPACKET};
@@ -2364,6 +2434,8 @@ under the same terms as Perl itself.
 =item L<http://creativecommons.org/technology/xmp>
 
 =item L<http://www.optimasc.com/products/fileid/xmp-extensions.pdf>
+
+=item L<http://www.w3.org/TR/SVG11/>
 
 =back
 

@@ -1107,6 +1107,8 @@ sub GetNewValues($;$$)
         my $vals = $newValueHash->{Value};
         # do inverse raw conversion if necessary
         if ($newValueHash->{TagInfo}->{RawConvInv}) {
+            my @copyVals = @$vals;  # modify a copy of the values
+            $vals = \@copyVals;
             my $tagInfo = $$newValueHash{TagInfo};
             my $conv = $$tagInfo{RawConvInv};
             my $self = $newValueHash->{Self};
@@ -1141,11 +1143,8 @@ sub GetNewValues($;$$)
             }
         }
         # return our value(s)
-        if (wantarray) {
-            return @$vals;
-        } else {
-            return $$vals[0];
-        }
+        return @$vals if wantarray;
+        return $$vals[0];
     }
     return () if wantarray;  # return empty list
     return undef;
@@ -1517,7 +1516,7 @@ sub WriteInfo($$;$$)
                 $rtnVal = $self->WriteJPEG(\%dirInfo);
             } elsif ($type eq 'TIFF') {
                 # disallow writing of some TIFF-based RAW images:
-                if ($tiffType =~ /^(3FR|SRF|SR2|ARW|RAW|DCR|K25|KDC)$/) {
+                if (grep /^$tiffType$/, @noWriteTIFF) {
                     $fileType = $tiffType;
                     undef $rtnVal;
                 } else {
@@ -1991,28 +1990,21 @@ sub ReverseLookup($$)
             # multiple matches are bad unless they were exact
             last if $matches > 1 and $pattern !~ /\$$/;
             foreach (sort keys %$conv) {
-                if ($$conv{$_} =~ /$pattern/) {
-                    $val = $_;
-                    $found = 1;
-                    last;
-                }
+                next unless $$conv{$_} =~ /$pattern/;
+                $val = $_;
+                $found = 1;
+                last;
             }
             last;
         }
         unless ($found) {
-            if ($$conv{OTHER}) {
-                $val = &{$$conv{OTHER}}($val,1);
-            } else {
-                undef $val;
-            }
+            # call OTHER conversion routine if available
+            $val = $$conv{OTHER} ? &{$$conv{OTHER}}($val,1) : undef;
             $multi = 1 if $matches > 1;
         }
     }
-    if (wantarray) {
-        return ($val, $multi);
-    } else {
-        return $val;
-    }
+    return ($val, $multi) if wantarray;
+    return $val;
 }
 
 #------------------------------------------------------------------------------
@@ -2305,11 +2297,8 @@ sub GetAddDirHash($$;$)
             }
         }
     }
-    if (wantarray) {
-        return (\%addDirHash, \%editDirHash);
-    } else {
-        return \%addDirHash;
-    }
+    return (\%addDirHash, \%editDirHash) if wantarray;
+    return \%addDirHash;
 }
 
 #------------------------------------------------------------------------------
@@ -4557,7 +4546,7 @@ sub WriteBinaryData($$$)
         }
     }
     # add necessary fixups for any offsets
-    if ($tagTablePtr->{IS_OFFSET} and $$dirInfo{Fixup}) {
+    if ($$tagTablePtr{IS_OFFSET} and $$dirInfo{Fixup}) {
         my $fixup = $$dirInfo{Fixup};
         my $tagID;
         foreach $tagID (@{$tagTablePtr->{IS_OFFSET}}) {
@@ -4585,6 +4574,19 @@ sub WriteBinaryData($$$)
                     $previewInfo->{Data} = 'LOAD'; # flag to load preview later
                 }
             }
+        }
+    }
+    # write any necessary SubDirectories
+    if ($$tagTablePtr{VARS} and $tagTablePtr->{VARS}->{HAS_SUBDIR}) {
+        my $tagID;
+        foreach $tagID (TagTableKeys($tagTablePtr)) {
+            my $tagInfo = $self->GetTagInfo($tagTablePtr, $tagID);
+            next unless $tagInfo and $$tagInfo{SubDirectory};
+            my $entry = int($tagID) * $increment;
+            my %subdirInfo = ( DataPt => \$newData, DirStart => $entry );
+            my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
+            my $dat = $self->WriteDirectory(\%subdirInfo, $subTablePtr);
+            substr($newData, $entry) = $dat if defined $dat and length $dat;
         }
     }
     return $newData;
