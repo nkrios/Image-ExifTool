@@ -42,7 +42,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.84';
+$VERSION = '1.85';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -1338,8 +1338,8 @@ my %xmpTableDefaults = (
     GPSStatus => {
         Groups => { 2 => 'Location' },
         PrintConv => {
-            A => 'Measurement In Progress',
-            V => 'Measurement Interoperability',
+            A => 'Measurement Active',
+            V => 'Measurement Void',
         },
     },
     GPSMeasureMode => {

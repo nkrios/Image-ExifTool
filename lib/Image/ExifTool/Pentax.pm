@@ -43,7 +43,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '1.79';
+$VERSION = '1.82';
 
 sub CryptShutterCount($$);
 
@@ -190,12 +190,15 @@ my %pentaxLensType = (
     '7 230' => 'Tamron AF 17-50mm F2.8 XR Di-II LD (Model A16)', #JD
     '7 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #JD
     '7 233' => 'smc PENTAX-DA 35mm F2.8 Macro Limited', #JD
+    '7 234' => 'smc PENTAX-DA* 300mm F4 ED [IF] SDM (SDM unused)', #19 (NC)
     '7 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM (SDM unused)', #PH (NC)
+    '7 236' => 'smc PENTAX-DA 55-300mm f/4-5.8 ED', #JD
     '7 238' => 'TAMRON AF 18-250mm F3.5-6.3 Di II LD Aspherical [IF] MACRO', #JD
     '7 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM (SDM unused)', #PH
     '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 234' => 'smc PENTAX-DA* 300mm F4 ED [IF] SDM', #19
     '8 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM', #JD
     '8 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM', #JD
     '8 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM', #JD
@@ -567,6 +570,7 @@ my %lensCode = (
             0x10a => 'On, Slow-sync, Red-eye reduction',
             0x10b => 'On, Trailing-curtain Sync',
         },{ #19 (AF-540FGZ flash)
+            0x000 => 'n/a - Off-Auto-Aperture', #19
             0x03f => 'Internal',
             0x100 => 'External, Auto',
             0x23f => 'External, Flash Problem', #JD
@@ -1327,7 +1331,7 @@ my %lensCode = (
             TagTable => 'Image::ExifTool::Pentax::FlashInfo',
         },
     },
-    0x0209 => {
+    0x0209 => { #PH
         Name => 'AEMeteringSegments',
         Format => 'int8u',
         Count => 16,
@@ -1428,6 +1432,12 @@ my %lensCode = (
             TagTable => 'Image::ExifTool::Pentax::ColorInfo',
         },
     },
+    0x0224 => { #19
+        Name => 'EVStepInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::EVStepInfo',
+        },
+    },
     # 0x0226: undef[9] (K20D,K200D) - PH
     0x03fe => { #PH
         Name => 'DataDump',
@@ -1473,6 +1483,7 @@ my %lensCode = (
             0 => 'Not stabilized',
             BITMASK => {
                 0 => 'Stabilized',
+                # have seen 1 for 0.5 sec exposure time, NR On - ref 19
                 6 => 'Not ready',
             },
         },
@@ -1569,17 +1580,27 @@ my %lensCode = (
             0x40 => 'P Shift',
         },
     },
+    1.4 => {
+        Name => 'ApertureRingUse',
+        # always set even Aperture Ring is in A mode
+        Mask => 0x80,
+        PrintConv => {
+            0x00 => 'Prohibited',
+            0x80 => 'Permitted',
+        },
+    },
     2 => {
         Name => 'FlashOptions',
         Notes => 'the camera flash options settings, set even if the flash is off',
         Mask => 0xf0,
         ValueConv => '$val>>4',
-        # Note: these tags relate to closely to InternalFlashMode values
+        # Note: These tags correlate with the FlashMode and InternalFlashMode values,
+        # and match what is displayed by the Pentax software
         PrintConv => {
-            0 => 'Normal',
-            1 => 'Red-eye reduction',
-            2 => 'Auto',
-            3 => 'Auto, Red-eye reduction', #PH
+            0 => 'Normal', # (this value can occur in Green Mode) - ref 19
+            1 => 'Red-eye reduction', # (this value can occur in Green Mode) - ref 19
+            2 => 'Auto', # (this value can occur in other than Green Mode) - ref 19
+            3 => 'Auto, Red-eye reduction', #PH (this value can occur in other than Green Mode) - ref 19
             5 => 'Wireless (Master)',
             6 => 'Wireless (Control)',
             8 => 'Slow-sync',
@@ -1734,14 +1755,19 @@ my %lensCode = (
     16 => {
         Name => 'FlashOptions2',
         Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
-        Notes => 'K10D only, set even if the flash is off',
+        Notes => 'K10D only; set even if the flash is off',
         Mask => 0xf0,
-        # Note: these tags relate closely to InternalFlashMode values
+        # Note: the Normal and Auto values (0x00 to 0x30) do not tags always
+        # correlate with the FlashMode, InternalFlashMode and FlashOptions values
+        # however, these values seem to better match the K10D's actual functionality
+        # (always Auto in Green mode always Normal otherwise if one of the other options
+        # isn't selected) - ref 19
+        # (these tags relate closely to InternalFlashMode values - PH)
         PrintConv => {
-            0x00 => 'Normal or Auto (0)',  # not sure why normal and auto can be either 0 or 2
-            0x10 => 'Red-eye reduction',
-            0x20 => 'Normal or Auto (2)',  # not sure why normal and auto can be either 0 or 2
-            0x30 => 'Normal or Auto (2), Red-eye reduction',
+            0x00 => 'Normal', # (this value never occurs in Green Mode) - ref 19
+            0x10 => 'Red-eye reduction', # (this value never occurs in Green Mode) - ref 19
+            0x20 => 'Auto',  # (this value only occurs in Green Mode) - ref 19
+            0x30 => 'Auto, Red-eye reduction', # (this value only occurs in Green Mode) - ref 19
             0x50 => 'Wireless (Master)',
             0x60 => 'Wireless (Control)',
             0x80 => 'Slow-sync',
@@ -1760,6 +1786,53 @@ my %lensCode = (
                 0 => 'Center-weighted average',
                 1 => 'Spot',
             },
+        },
+    },
+    17.1 => {
+        Name => 'SRActive',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
+        Notes => q{
+            K10D only; SR is active only when ShakeReduction is On, DriveMode is not
+            Remote or Self-timer, and Internal/ExternalFlashMode is not "On, Wireless"
+        },
+        Mask => 0x80,
+        PrintConv => {
+            0x00 => 'No',
+            0x80 => 'Yes',
+        },
+    },
+    17.2 => {
+        Name => 'Rotation',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
+        Notes => 'K10D only',
+        Mask => 0x60,
+        PrintConv => {
+            0x00 => 'Horizontal (normal)',
+            0x20 => 'Rotate 180',
+            0x40 => 'Rotate 90 CW',
+            0x60 => 'Rotate 270 CW',
+        },
+    },
+    # Bit 0x08 is set on 3 of my 3000 shots to (All 3 were Shutter Priority
+    # but this may not mean anything with such a small sample) - ref 19
+    17.3 => {
+        Name => 'ISOSetting',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
+        Notes => 'K10D only',
+        Mask => 0x04,
+        PrintConv => {
+            0x00 => 'Manual',
+            0x04 => 'Auto',
+        },
+    },
+    17.4 => {
+        Name => 'SensitivitySteps',
+        Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
+        Notes => 'K10D only',
+        Mask => 0x02,
+        PrintConv => {
+            0x00 => '1 EV Steps',
+            0x02 => 'As EV Steps',
         },
     },
     18 => {
@@ -1796,7 +1869,7 @@ my %lensCode = (
     21 => { #PH
         Name => 'BaseExposureCompensation',
         Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
-        Notes => 'exposure compensation without auto bracketing, K10D only',
+        Notes => 'K10D only; exposure compensation without auto bracketing',
         ValueConv => 'Image::ExifTool::Pentax::PentaxEv(64-$val)',
         ValueConvInv => '64-Image::ExifTool::Pentax::PentaxEvInv($val)',
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
@@ -1851,7 +1924,7 @@ my %lensCode = (
         ValueConvInv => '$val * 8',
     },
     5 => {
-        Name => 'AEFlashTv',
+        Name => 'AEMinExposureTime', #19
         Notes => 'val = 24 * 2**((32-raw)/8)',
         ValueConv => '24*exp(-($val-32)*log(2)/8)', #JD
         ValueConvInv => '-log($val/24)*8/log(2)+32',
@@ -1891,6 +1964,30 @@ my %lensCode = (
     7 => {
         Name => 'AEExtra',
         Unknown => 1,
+    },
+    9 => { #19
+        Name => 'AEMaxAperture',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    10 => { #19
+        Name => 'AEMaxAperture2',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    11 => { #19
+        Name => 'AEMinAperture',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.0f",$val)',
+        PrintConvInv => '$val',
     },
     12 => { #19
         Name => 'AEMeteringMode',
@@ -2144,6 +2241,7 @@ my %lensCode = (
         Name => 'InternalFlashMode',
         PrintHex => 1,
         PrintConv => {
+            0x00 => 'n/a - Off-Auto-Aperture', #19
             0x86 => 'On, Wireless (Control)', #19
             0x95 => 'On, Wireless (Master)', #19
             0xc0 => 'On', # K10D
@@ -2169,6 +2267,7 @@ my %lensCode = (
         Name => 'ExternalFlashMode',
         PrintHex => 1,
         PrintConv => { #19
+            0x00 => 'n/a - Off-Auto-Aperture',
             0x3f => 'Off',
             0x40 => 'On, Auto',
             0xbf => 'On, Flash Problem', #JD
@@ -2188,6 +2287,62 @@ my %lensCode = (
     5 => 'TTL_DA_ADown',
     6 => 'TTL_DA_BUp',
     7 => 'TTL_DA_BDown',
+    24.1 => { #19/17
+        Name => 'ExternalFlashGuideNumber',
+        Mask => 0x1f,
+        Notes => 'val = 2**(raw/16 + 4), with a few exceptions',
+        ValueConv => q{
+            return 0 unless $val;
+            $val = -3 if $val == 29;  # -3 is stored as 0x1d
+            return 2**($val/16 + 4);
+        },
+        ValueConvInv => q{
+            return 0 unless $val;
+            my $raw = int((log($val)/log(2)-4)*16+0.5);
+            $raw = 29 if $raw < 0;   # guide number of 14 gives -3 which is stored as 0x1d
+            $raw = 31 if $raw > 31;  # maximum value is 0x1f
+            return $raw;
+        },
+        PrintConv => '$val ? int($val + 0.5) : "n/a"',
+        PrintConvInv => '$val=~/^n/ ? 0 : $val',
+        # observed values for various flash focal lengths/guide numbers:
+        #  AF-540FGZ (ref 19)  AF-360FGZ (ref 17)
+        #     6 => 20mm/21       29 => 20mm/14   (wide angle panel used)
+        #    16 => 24mm/32        6 => 24mm/21
+        #    18 => 28mm/35        7 => 28mm/22
+        #    21 => 35mm/39       10 => 35mm/25
+        #    24 => 50mm/45       14 => 50mm/30
+        #    26 => 70mm/50       17 => 70mm/33
+        #    28 => 85mm/54       19 => 85mm/36
+        # (I have also seen a value of 31 when both flashes are used together
+        # in a wired configuration, but I don't know exactly what this means - PH)
+    },
+    # 24 - have seen bit 0x80 set when 2 external wired flashes are used - PH
+    # 24 - have seen bit 0x40 set when wireless high speed sync is used - ref 19
+    25 => { #19
+        Name => 'ExternalFlashExposureComp',
+        PrintConv => {
+            0 => 'n/a', # Off or Auto Modes
+            144 => 'n/a (Manual Mode)', # Manual Flash Output
+            164 => '-3.0',
+            167 => '-2.5',
+            168 => '-2.0',
+            171 => '-1.5',
+            172 => '-1.0',
+            175 => '-0.5',
+            176 => '0.0',
+            179 => '0.5',
+            180 => '1.0',
+        },
+    },
+    26 => { #17
+        Name => 'ExternalFlashBounce',
+        PrintConv => {
+             0 => 'n/a',
+            16 => 'Direct',
+            48 => 'Bounce',
+        },
+    },
     # ? => 'ExternalFlashAOutput',
     # ? => 'ExternalFlashBOutput',
 );
@@ -2222,10 +2377,14 @@ my %lensCode = (
         ValueConvInv => '$val=~tr/0-9//dc; $val',
     },
     2 => {
-        Name => 'ModelRevision',
+        #(see http://www.pentaxforums.com/forums/pentax-dslr-discussion/25711-k10d-update-model-revision-8-1-yes-no-8.html)
+        Name => 'ProductionCode', #(previously ModelRevision)
         Format => 'int32u[2]',
+        Note => 'values of 8.x indicate that the camera has been serviced',
         ValueConv => '$val=~tr/ /./; $val',
         ValueConvInv => '$val=~tr/./ /; $val',
+        PrintConv => '$val=~/^8\./ ? "$val (camera has been serviced)" : $val',
+        PrintConvInv => '$val=~s/\s+.*//s; $val',
     },
     4 => 'InternalSerialNumber',
 );
@@ -2430,6 +2589,31 @@ my %lensCode = (
     17 => {
         Name => 'WBShiftMG',
         Notes => 'positive is a shift toward green',
+    },
+);
+
+# EV step size information - ref 19
+%Image::ExifTool::Pentax::EVStepInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    0 => {
+        Name => 'EVSteps',
+        PrintConv => {
+            0 => '1/2 EV Steps',
+            1 => '1/3 EV Steps',
+        },
+    },
+    1 => {
+        Name => 'SensitivitySteps',
+        PrintConv => {
+            0 => '1 EV Steps',
+            1 => 'As EV Steps',
+        },
     },
 );
 

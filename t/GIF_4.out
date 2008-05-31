@@ -1,5 +1,4 @@
-City: Kingston
-Comment: a new comment
+Country: Canada
 ExifToolVersion: 7.27
 FileSize: 4 kB
 FileType: GIF
@@ -8,4 +7,4 @@ ImageHeight: 8
 ImageSize: 8x8
 ImageWidth: 8
 MIMEType: image/gif
-Title: GIF with XMP
+Subject: one, two, three

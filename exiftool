@@ -164,7 +164,7 @@ my $doneCommonArgs;
 $rtnVal = 0 unless defined $rtnVal;
 
 # initialize all static variables
-# (not done: @commonArgs, $helped, $pause)
+# (not done: @commonArgs, $helped, $mainTool, $pause, $rtnVal)
 undef @dynamicFiles;
 undef @dynamicValues;
 undef @exclude;
@@ -492,7 +492,7 @@ if (@newValues) {
             Die "Need file name for -TagsFromFile\n" unless defined $newVal;
             ++$isWriting;
             if ($newVal eq '@' or not defined FilenameSPrintf($newVal)) {
-                push @dynamicFiles, $newVal;
+                push @dynamicFiles, $newVal unless grep /^$newVal$/, @dynamicFiles;
                 next;   # set tags from dynamic file later
             }
             unless (-e $newVal) {
@@ -981,6 +981,7 @@ sub SetImageInfo($$)
     my ($outfile, $restored, $isTemporary, $isStdout);
     my $file = SourceFile($orig);
     my $infile = $file;    # save infile in case we change it again
+    my $tagsFromSrc;
 
     undef $tmpFile; # make sure this isn't defined
 
@@ -1007,31 +1008,38 @@ sub SetImageInfo($$)
                 my $srcType = GetFileType($file) || '';
                 my $outType = GetFileType($outfile);
                 if ($outType and ($srcType ne $outType or $outType eq 'ICC')) {
-                    if (CanCreate($outfile)) {
-                        if ($file ne '') {
-                            # restore previous new values unless done already
-                            $exifTool->RestoreNewValues();
-                            $restored = 1;
-                            # translate to this type by setting specified tags from file
-                            my @setTags = @tags;
-                            foreach (@exclude) {
-                                push @setTags, "-$_";
-                            }
-                            # force some tags to be copied for certain file types
-                            my %forceCopy = (
-                                ICC => 'ICC_Profile',
-                                VRD => 'CanonVRD',
-                            );
-                            push @setTags, $forceCopy{$outType} if $forceCopy{$outType};
-                            return 0 unless DoSetFromFile($exifTool, $file, \@setTags);
-                            # all done with source file -- create from meta information alone
-                            $file = '';
-                        }
-                    } else {
+                    unless (CanCreate($outfile)) {
                         my $what = $srcType ? 'other types' : 'scratch';
                         WarnOnce "Error: Can't create $outType files from $what\n";
                         ++$countBadCr;
                         return 0;
+                    }
+                    if ($file ne '') {
+                        # restore previous new values unless done already
+                        $exifTool->RestoreNewValues();
+                        $restored = 1;
+                        # translate to this type by setting specified tags from file
+                        my @setTags = @tags;
+                        foreach (@exclude) {
+                            push @setTags, "-$_";
+                        }
+                        # force some tags to be copied for certain file types
+                        my %forceCopy = (
+                            ICC => 'ICC_Profile',
+                            VRD => 'CanonVRD',
+                        );
+                        push @setTags, $forceCopy{$outType} if $forceCopy{$outType};
+                        # assume "-tagsFromFile @" unless -tagsFromFile already specified
+                        # (%setTags won't be empty if -tagsFromFile used) 
+                        if (not %setTags or (@setTags and not $setTags{'@'})) {
+                            return 0 unless DoSetFromFile($exifTool, $file, \@setTags);
+                        } elsif (@setTags) {
+                            # add orphaned tags to existing "-tagsFromFile @" for this file only
+                            push @setTags, @{$setTags{'@'}};
+                            $tagsFromSrc = \@setTags;
+                        }
+                        # all done with source file -- create from meta information alone
+                        $file = '';
                     }
                 }
             }
@@ -1069,15 +1077,17 @@ sub SetImageInfo($$)
         $exifTool->RestoreNewValues() unless $restored;
         my $dyFile;
         foreach $dyFile (@dynamicFiles) {
-            my $fromFile;
+            my ($fromFile, $setTags);
             if ($dyFile eq '@') {
                 $fromFile = $orig;
+                $setTags = $tagsFromSrc || $setTags{$dyFile};
             } else {
                 $fromFile = FilenameSPrintf($dyFile, $orig);
                 ++$countBadWr, return 0 unless defined $fromFile;
+                $setTags = $setTags{$dyFile};
             }
             # set new values values from file
-            return 0 unless DoSetFromFile($exifTool, $fromFile, $setTags{$dyFile});
+            return 0 unless DoSetFromFile($exifTool, $fromFile, $setTags);
         }
     }
     if ($isStdout) {

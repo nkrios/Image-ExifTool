@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool;    # only for FinishTiffDump()
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 sub DumpTable($$$;$$$$$);
 sub Open($$$;@);
@@ -210,57 +210,36 @@ sub Print($$;$$$$$)
     $bkgStart = $bkgEnd = 0;
     $bkgSpan = '';
     my $index = 0;  # initialize tooltip index
-    my @names;
+    my (@names, $wasUnused);
     for ($i=0; $i<@starts; ++$i) {
         my $start = $starts[$i];
+        my $parmList = $$block{$start};
         my $len = $start - $pos;
-        if ($len > 0) {
-            # only load as much of the block as we are going to dump
-            my $size = ($len > $limit) ? $limit / 2 : $len;
-            if ($pos >= $dataPos and $pos + $len <= $dataEnd) {
-                $buff = substr($$dataPt, $pos-$dataPos, $size);
-                if ($len != $size) {
-                    $buff .= substr($$dataPt, $pos-$dataPos+$len-$size, $size);
-                }
-            } else {
-                $buff = '';
-                unless ($raf->Seek($pos, 0) and $raf->Read($buff, $size) == $size) {
-                    $err = 'unused bytes',
-                }
-                if ($len != $size) {
-                    my $buf2 = '';
-                    unless ($raf->Seek($pos+$len-$size, 0) and
-                            $raf->Read($buf2, $size) == $size)
-                    {
-                        $err = 'unused bytes',
-                    }
-                    $buff .= $buf2;
-                    undef $buf2;
-                }
-            }
-            if (length $buff) {
-                my $str = ($len > 1) ? "unused $len bytes" : 'pad byte';
-                $self->DumpTable($pos-$dataPos, \$buff, "[$str]", "t$index",
-                                 0x108, $len);
-                ++$index;
-                undef $buff;
-            }
-            $pos = $start;  # dumped unused data up to the start of this block
+        if ($len > 0 and not $wasUnused) {
+            # we have an unused bytes before this data block
+            --$i;           # dump the data block next time around
+            $start = $pos;  # dump the unused bytes now
+            my $str = ($len > 1) ? "unused $len bytes" : 'pad byte';
+            $parmList = [ [ $len, "[$str]", undef, 0x108 ] ];
+            $wasUnused = 1; # avoid re-dumping unused bytes if we get a read error
+        } else {
+            undef $wasUnused;
         }
         my $parms;
-        my $parmList = $$block{$start};
         foreach $parms (@$parmList) {
             my ($len, $msg, $tip, $flag, $tipNum) = @$parms;
             next unless $len > 0;
             $flag = 0 unless defined $flag;
             # generate same name for all blocks indexed by this tooltip
-            my $name = $names[$tipNum];
+            my $name;
+            $name = $names[$tipNum] if defined $tipNum;
             my $idx = $index;
             if ($name) {
                 # get index from existing ID
                 $idx = substr($name, 1);
             } else {
-                $name = $names[$tipNum] = "t$index";
+                $name = "t$index";
+                $names[$tipNum] = $name if defined $tipNum;
                 ++$index;
             }
             if ($flag == 4) {
@@ -270,33 +249,43 @@ sub Print($$;$$$$$)
                 push @{$self->{MSpanList}}, $name;
                 next;
             }
-            $tip and $self->{TipList}->[$idx] = $tip;
-            my $end = $start + $len;
-            # only load as much of the block as we are going to dump
-            my $size = ($len > $limit) ? $limit / 2 : $len;
-            if ($start >= $dataPos and $end <= $dataEnd) {
-                $buff = substr($$dataPt, $start-$dataPos, $size);
-                if ($len != $size) {
-                    $buff .= substr($$dataPt, $start-$dataPos+$len-$size, $size);
-                }
-            } else {
-                $buff = '';
-                unless ($raf->Seek($start, 0) and
-                        $raf->Read($buff, $size) == $size)
-                {
-                    $err = $msg;
-                }
-                if ($len != $size) {
-                    my $buf2 = '';
-                    unless ($raf->Seek($start+$len-$size, 0) and
-                            $raf->Read($buf2, $size) == $size)
-                    {
+            # loop until we read the value properly
+            my ($end, $try);
+            for ($try=0; $try<2; ++$try) {
+                $end = $start + $len;
+                # only load as much of the block as we are going to dump
+                my $size = ($len > $limit) ? $limit / 2 : $len;
+                if ($start >= $dataPos and $end <= $dataEnd) {
+                    $buff = substr($$dataPt, $start-$dataPos, $size);
+                    if ($len != $size) {
+                        $buff .= substr($$dataPt, $start-$dataPos+$len-$size, $size);
+                    }
+                } else {
+                    $buff = '';
+                    if ($raf->Seek($start, 0) and $raf->Read($buff, $size) == $size) {
+                        # read end of block
+                        if ($len != $size) {
+                            my $buf2 = '';
+                            unless ($raf->Seek($start+$len-$size, 0) and
+                                    $raf->Read($buf2, $size) == $size)
+                            {
+                                $err = $msg;
+                                # reset $len to the actual length of available data
+                                $raf->Seek(0, 2);
+                                $len = $raf->Tell() - $start;
+                                $tip .= "\\nError: Only $len bytes available!" if $tip;
+                                next;
+                            }
+                            $buff .= $buf2;
+                            undef $buf2;
+                        }
+                    } else {
                         $err = $msg;
                     }
-                    $buff .= $buf2;
-                    undef $buf2;
                 }
+                last;
             }
+            $tip and $self->{TipList}->[$idx] = $tip;
             next unless length $buff;
             # set flag to continue this line if next block is contiguous
             if ($i+1 < @starts and $parms eq $$parmList[-1] and

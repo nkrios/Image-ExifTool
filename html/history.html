@@ -9,14 +9,87 @@
 <!-- Use line width of 80 -->
 <h1 class='up'>ExifTool Version History</h1>
 
-(I'll be away from about Apr. 25 to May 11/08, and only online occasionally via
-my iPod, so don't expect any updates or prompt/lengthy email/forum responses
-during this period. - PH)<p>
-
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.25.tar.gz">Version 7.25</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.30.tar.gz">Version 7.30</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
 
-<b>Apr. 18, 2008 - Version 7.25 (production release)</b>
+<b>May 31, 2008 - Version 7.30</b> (production release)
+<ul>
+<li>Adjusted MakerNote error checks to be a compromise between 7.28 and 7.29
+<li>Fixed various htmlDump problems
+<li>Fixed bug which could cause runtime warnings when attempting to write
+    certain types of unsupported images
+</ul>
+
+<b>May 28, 2008 - Version 7.29</b>
+<ul>
+<li>Renamed Pentax ModelRevision tag to ProductionCode and improved print
+    conversion to indicate if camera has been serviced
+<li>Added check to prevent EXIF tags from being written to JPEG images if they
+    would obviously exceed the maximimum JPEG segment size limit
+<li>Relaxed error checks when writing JPEG images to allow MakerNotes to be
+    rebuilt if the MakerNote IFD is not contained within the MakerNotes data
+<li>Fixed decoding of Pentax ExternalFlashGuideNumber when AF360 is used with
+    the wide angle panel
+<li>Fixed unnecessary "Multiple new values for IFD0 tag 0x927c" warning which
+    could occur when copying MakerNotes from some images
+</ul>
+
+<b>May 26, 2008 - Version 7.28</b>
+<ul>
+<li>Added new Canon CustomFunctions values from the EOS 1DmkIII firmware update,
+    and a new CanonExposureMode value (thanks David Pitcher)
+<li>Added a new Olympus LensType (thanks &#1042;&#1080;&#1082;&#1090;&#1086;&#1088; &#1051;&#1091;&#1096;&#1085;&#1080;&#1082;&#1086;&#1074;)
+<li>Decode Pentax ExternalFlashBounce tag (thanks Cvetan Ivanov)
+<li>Renamed Pentax ExternalFlashZoom tag to ExternalFlashGuideNumber and
+    improved decoding (thanks Cvetan Ivanov)
+<li>Fixed bug which could prevent maker notes from being copied when copying all
+    tags from a file containing a PreviewImage
+<li>Fixed problems decoding some Sony ARW images
+<li>Fixed problem writing some makernote values in sub-IFD's
+<li>Fixed "APP1 segment to large" problem where PreviewImage was not dropped
+    as it should have been when copying all tags from some RAW images
+</ul>
+
+<b>May 24, 2008 - Version 7.27</b> (GIF+XMP)
+<ul>
+<li>Added ability to read/write XMP in GIF images
+<li>Added ability to write to GIF87a images (by upgrading them to GIF89a)
+<li>Added GIFVersion tag
+<li>Improved decoding of Canon 1DmkIII/1DSmkIII TimeStamp tags
+<li>Changed print conversion of EXIF/XMP GPSStatus tags to make more sense
+<li>Fixed bug introduced in version 7.22 that could cause exiftool to abort with
+    an "'x' outside string" error when processing some DNG images
+<li>API Changes:
+    <ul>
+    <li>Extract FileSize information from images passed as a scalar reference
+    </ul>
+</ul>
+
+<b>May 21, 2008 - Version 7.26</b>
+<ul>
+<li>Added write support for FujiFilm FinePix S5 Pro V1.04 RAF images
+<li>Added support for new Kodak TIFF-format maker notes used by the Z1085
+<li>Added new Pentax and Nikon LensType's (thanks Jens Duttke, Dave Nicholson
+    and Robert Rottmerhusen)
+<li>Added some new Minolta LensID's (thanks Thomas K&auml;&szlig;ner)
+<li>Added new CanonModelID's and a 1DmkIII TimeStamp (thanks Ger Vermeulen)
+<li>Decode a number of new Pentax K10D tags (thanks Dave Nicholson)
+<li>Decode Panasonic Title tag (thanks Jens Duttke)
+<li>Recognize a few more uncommon top-level QuickTime atoms
+<li>Changed decoding of some Olympus tags for new E-520
+<li>Changed warning when empty PrintIM data is encountered (ie. as written in
+    Sony A700 ARW files when Adobe RGB color mode is used)
+<li>Dropped Canon PreviewFocalPlaneX/YResolution tags since they never really
+    existed (thanks Ger Vermeulen for pointing out the Canon bug which lead to
+    this false assumption)
+<li>Fixed duplicate tag problem with Pentax LensData when -U option used
+<li>Fixed bug which could cause a runtime warning when copying Nikon maker notes
+<li>Fixed bug in exiftool application which could cause all tags to be copied
+    instead of just the specified tags when creating an output XMP or MIE file
+    and using the -tagsFromFile option
+</ul>
+
+<b>Apr. 18, 2008 - Version 7.25</b> (production release)
 <ul>
 <li>Added read support for DIVX video files
 <li>Added a new Nikon LensID (thanks Tanel Kuusk)
@@ -31,7 +104,7 @@ considered development releases, and are not uploaded to <a href="http://search.
 <li>Fixed problem decoding new Nikon D300 AFPrioritySelection tags
 <li>API Changes:
     <ul>
-    <li>Fixed CanCreate so it returns false for non-writable TIFF-based files
+    <li>Fixed CanWrite so it returns false for non-writable TIFF-based files
     </ul>
 </ul>
 
@@ -83,7 +156,7 @@ considered development releases, and are not uploaded to <a href="http://search.
 <li>Fixed bug which could cause "Not an ARRAY" error when reading PDF files
 </ul>
 
-<b>Mar. 12, 2008 - Version 7.21 (production release)</b>
+<b>Mar. 12, 2008 - Version 7.21</b> (production release)
 <ul>
 <li>Added support for Leica M8 maker notes (in both DNG and JPEG images)
 <li>Added ability to write encrypted Nikon makernote information (!!)

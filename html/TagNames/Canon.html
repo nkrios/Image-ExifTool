@@ -451,6 +451,9 @@
 </tr><tr><td class=r>0x4007d675</td><td>= HV10</td>
 </tr><tr><td class=r>0x4007d777</td><td>= iVIS DC50</td>
 </tr><tr><td class=r>0x4007d778</td><td>= iVIS HV20</td>
+</tr><tr><td class=r>0x4007d779</td><td>= DC211</td>
+</tr><tr><td class=r>0x4007d77b</td><td>= iVIS HR10</td>
+</tr><tr><td class=r>0x4007d880</td><td>= iVIS HF10</td>
 </tr><tr><td class=r>0x80000001</td><td>= EOS-1D</td>
 </tr><tr><td class=r>0x80000167</td><td>= EOS-1DS</td>
 </tr><tr><td class=r>0x80000168</td><td>= EOS 10D</td>
@@ -668,7 +671,8 @@ others use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
   <br>3 = Aperture-priority AE
   <br>4 = Manual
   <br>5 = Depth-of-field AE
-  <br>6 = M-Dep</span></td></tr>
+  <br>6 = M-Dep
+  <br>7 = Bulb</span></td></tr>
 <tr>
 <td class=r>22</td>
 <td>LensType</td>
@@ -1536,10 +1540,15 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r>1114</td>
+<td>TimeStamp1</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(only valid for some versions of the 1DmkIII firmware)</span></span></td></tr>
+<tr class=b>
 <td class=r>1118</td>
 <td>TimeStamp</td>
 <td class=c>int32u</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(valid for the 1DSmkIII and some versions of the 1DmkIII firmware)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo5D'>Canon CameraInfo5D Tags</a></h2>
@@ -2642,16 +2651,6 @@ images with a directory number of 164 or greater)</span></span></td></tr>
 <td>PreviewImageStart</td>
 <td class=c>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r>6</td>
-<td>PreviewFocalPlaneXResolution</td>
-<td class=c>rational64s</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r>8</td>
-<td>PreviewFocalPlaneYResolution</td>
-<td class=c>rational64s</td>
-<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SensorInfo'>Canon SensorInfo Tags</a></h2>
@@ -3495,7 +3494,7 @@ the average black level)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 9, 2008</i>
+<br><i>Last revised May 26, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

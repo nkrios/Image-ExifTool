@@ -29,7 +29,7 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '1.69';
+$VERSION = '1.72';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -104,7 +104,7 @@ under normal circumstances.  These "unsafe" tags are not set when calling
 SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  A plus sign
-(C<+>) indicates a "list" tag which supports multiple values while allowing
+(C<+>) indicates a "list" tag which supports multiple values and allows
 individual values to be added and deleted.
 
 The HTML version of these tables also list possible B<Values> for
@@ -152,9 +152,9 @@ API).
     XMP => q{
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
-embedded in many different image file types including JPG, JP2, TIFF, PS,
-PDF, PSD, DNG, PNG, SVG and MIFF, as well as audio file formats supporting
-ID3v2 information.
+embedded in many different image file types including JPG, JP2, TIFF, GIF,
+PS, PDF, PSD, DNG, PNG, SVG and MIFF, as well as audio file formats
+supporting ID3v2 information.
 
 The XMP B<Tag ID>'s aren't listed because in most cases they are identical
 to the B<Tag Name>.
@@ -241,10 +241,10 @@ the same as Konica/Minolta tags.  The Olympus tags are also used for Epson
 and Agfa cameras.
 },
     Panasonic => q{
-Panasonic tags are also used for Leica cameras.
+These tags are used in Panasonic/Leica cameras.
 },
     Pentax => q{
-The Pentax tags are also used in Asahi cameras.
+These tags are used in Pentax/Asahi cameras.
 },
     Sigma => q{
 These tags are used in Sigma/Foveon cameras.
@@ -491,6 +491,7 @@ TagID:  foreach $tagID (@keys) {
                     if (ref $printConv eq 'ARRAY') {
                         for ($index=0; $index<@$printConv; ++$index) {
                             next if ref $$printConv[$index] ne 'HASH';
+                            next unless %{$$printConv[$index]};
                             push @printConvList, $$printConv[$index];
                             push @indexList, $index;
                         }

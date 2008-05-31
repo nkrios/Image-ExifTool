@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -125,8 +125,9 @@ my %coordConv = (
         Writable => 'string',
         Count => 2,
         PrintConv => {
-            A => 'Measurement In Progress',
-            V => 'Measurement Interoperability',
+            A => 'Measurement Active', # Exif2.2 "Measurement in progress"
+            V => 'Measurement Void',   # Exif2.2 "Measurement Interoperability" (WTF?)
+            # (meaning for 'V' taken from status code in NMEA GLL and RMC sentences)
         },
     },
     0x000a => {

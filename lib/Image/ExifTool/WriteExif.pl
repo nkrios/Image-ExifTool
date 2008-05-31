@@ -686,6 +686,11 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Protected => 1,
     },
+    0xc6d2 => {             # Title (Panasonic DMC-TZ5)
+        Writable => 'string',
+        Avoid => 1,
+        WriteGroup => 'IFD0',
+    },
     0xea1d => {             # OffsetSchema
         Writable => 'int32s',
     },
@@ -927,6 +932,7 @@ sub RebuildMakerNotes($$$)
         my $makerFixup = $subdirInfo{Fixup} = new Image::ExifTool::Fixup;
         # create new exiftool object to rewrite the directory without changing it
         my $newTool = new Image::ExifTool;
+        $newTool->Init();   # must do this before calling WriteDirectory()!
         # don't copy over preview image
         $newTool->SetNewValue(PreviewImage => '');
         # copy all transient members over in case they are used for writing
@@ -1156,6 +1162,18 @@ sub WriteExif($$$)
                         lc($newValueHash->{WantGroup}) eq lc($wrongDir);
                 # remove this tag if found in this IFD
                 $xDelete{$tagID} = 1;
+            }
+            if ($set{$tagID}) {
+                # this tag is being set twice, which can happen if two Condition's
+                # were true for this tag.  Hopefully the only case where this can
+                # happen is the MakerNotes tag since it may store two very different
+                # types of information (MakerNotes and PreviewImage), but we want
+                # to store the MakerNotes if both are available
+                if ($tagID == 0x927c and $dirName =~ /^(ExifIFD|IFD0)$/) {
+                    next if $$tagInfo{Name} eq 'PreviewImage';
+                } else {
+                    $exifTool->Warn(sprintf("Multiple new values for $dirName tag 0x%.4x",$tagID));
+                }
             }
             $set{$tagID} = $tagInfo;
         }
@@ -1502,7 +1520,7 @@ DropTag:                    ++$index;
 #
                     $newInfo = $set{$newID};
                     $newCount = $$newInfo{Count};
-                    my ($val, $newVal);
+                    my ($val, $newVal, $n);
                     my $newValueHash = $exifTool->GetNewValueHash($newInfo, $dirName);
                     if ($isNew > 0) {
                         # don't create new entry unless requested
@@ -1571,6 +1589,13 @@ DropTag:                    ++$index;
                             $newValue = WriteValue($newVal, $newFormName, $newCount);
                             unless (defined $newValue) {
                                 $exifTool->Warn("Error writing $dirName:$$newInfo{Name}");
+                                goto NoOverwrite;
+                            }
+                            # limit maximum value length in JPEG images
+                            # (max segment size is 65533 bytes and the min EXIF size is 96 incl an additional IFD entry)
+                            if ($$exifTool{FILE_TYPE} eq 'JPEG' and length($newValue) > 65436) {
+                                my $name = $$newInfo{MakerNotes} ? 'MakerNotes' : $$newInfo{Name};
+                                $exifTool->Warn("$name too large to write in JPEG segment");
                                 goto NoOverwrite;
                             }
                         } else {
@@ -1722,16 +1747,16 @@ NoOverwrite:            next if $isNew > 0;
                     } else {
                         # update maker notes if possible
                         my %subdirInfo = (
-                            Base => $base,
-                            DataPt => $valueDataPt,
-                            DataPos => $valueDataPos,
-                            DataLen => $valueDataLen,
+                            Base     => $base,
+                            DataPt   => $valueDataPt,
+                            DataPos  => $valueDataPos,
+                            DataLen  => $valueDataLen,
                             DirStart => $valuePtr,
-                            DirLen => $oldSize,
-                            DirName => 'MakerNotes',
-                            Parent => $dirName,
-                            TagInfo => $newInfo,
-                            RAF => $raf,
+                            DirLen   => $oldSize,
+                            DirName  => 'MakerNotes',
+                            Parent   => $dirName,
+                            TagInfo  => $newInfo,
+                            RAF      => $raf,
                         );
                         if ($$newInfo{SubDirectory}) {
                             my $sub = $$newInfo{SubDirectory};
@@ -1834,7 +1859,14 @@ NoOverwrite:            next if $isNew > 0;
 #
 # rewrite existing sub IFD's
 #
+                        my $subTable = $tagTablePtr;
+                        if ($$subdir{TagTable}) {
+                            $subTable = GetTagTable($$subdir{TagTable});
+                        }
+                        # determine directory name for this IFD
                         my $subdirName = $newInfo->{Groups}->{1} || $$newInfo{Name};
+                        # all makernotes directory names must be 'MakerNotes'
+                        $subdirName = 'MakerNotes' if $subTable->{GROUPS}->{0} eq 'MakerNotes';
                         # must handle sub-IFD's specially since the values
                         # are actually offsets to subdirectories
                         unless ($readCount) {   # can't have zero count
@@ -1866,10 +1898,6 @@ NoOverwrite:            next if $isNew > 0;
                                 Fixup    => new Image::ExifTool::Fixup,
                                 RAF      => $raf,
                             );
-                            my $subTable = $tagTablePtr;
-                            if ($$subdir{TagTable}) {
-                                $subTable = GetTagTable($$subdir{TagTable});
-                            }
                             # read IFD from file if necessary
                             if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
                                 my ($buff, $buf2, $subSize);

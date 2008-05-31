@@ -27,7 +27,7 @@ pre { color: #800; margin-left: 2em }
 <li><a href="#Q9">Tag locations when copying</a>
 <li><a href="#Q10">Coded character sets</a>
 <li><a href="#Q11">User-defined tags</a>
-<li><a href="#Q12">Database import</a>
+<li><a href="#Q12">Export to database</a>
 <li><a href="#Q13">Output file size</a>
 <li><a href="#Q14">GPS coordinate format</a>
 <li><a href="#Q15">MakerNote errors</a>
@@ -409,26 +409,23 @@ use Image::ExifTool;
 </pre></blockquote>
 
 <a name="Q12"></a>
-<p>12. <b>"How do I import information into a database from exiftool?"</b></p>
+<p>12. <b>"How do I export information from exiftool into a database?"</b></p>
 
 <blockquote>
-It is usually easiest to import information which is formatted as a
-tab-delimited list of values.  The following exiftool options may be useful
-for this purpose:
+It is usually easiest to export information formatted as a tab-delimited list of
+values.  The following exiftool options may be useful for this purpose:
 <pre>-t  - use a tab instead of spaces to separate output values
 -S  - very short format (with -t, prints only tag values)
 -q  - quiet (supresses any other messages)
 -f  - force '-' to be printed for non-existent values
+-T  - shortcut for the combination of all above options (-t -S -q -f)
 -r  - recursively process files in subdirectories
 </pre>
 
-And here is an example of an actual command using these options:
+And here is an example command line:
 
-<pre>exiftool -t -S -q -f -r -filename -aperture -ISO t/images > out.txt
-</pre>
-
-(Note that <code>-T</code> option may be used in place of
-<code>-t -S -q -f</code>.)</blockquote>
+<pre>exiftool -T -r -filename -aperture -ISO t/images > out.txt
+</pre></blockquote>
 
 <blockquote>This command recursively processes all images in the
 "<code>t/images</code>" directory, extracting FileName, Aperture and ISO tags,
@@ -544,7 +541,7 @@ to be written, but note that some Makernote information may be lost when
 ignoring some types of errors like this.
 </blockquote>
 <hr>
-<i>Last revised Apr. 11, 2008</i>
+<i>Last revised May 16, 2008</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

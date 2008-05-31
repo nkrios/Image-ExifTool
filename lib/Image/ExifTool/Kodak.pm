@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -517,10 +517,13 @@ sub WriteKodakIFD($$$);
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
-        Newer Kodak models such as the P712, P850, P880, Z612 and Z712 use standard
-        TIFF IFD format for the maker notes.  There is a large amount of information
-        stored in these maker notes (with apparently much duplication), but
-        relatively few tags have so far been decoded.
+        Kodak models such as the P712, P850, P880, Z612 and Z712 use standard TIFF
+        IFD format for the maker notes.  In keeping with Kodak's strategy of
+        inconsitent makernotes, some models such as the Z1085 also use these tags,
+        but for these models the makernotes begin with a TIFF header instead of an
+        IFD entry count and use relative instead of absolute offsets.  There is a
+        large amount of information stored in these maker notes (apparently with
+        much duplication), but relatively few tags have so far been decoded.
     },
     0xfc00 => {
         Name => 'SubIFD0',

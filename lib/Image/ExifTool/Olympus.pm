@@ -19,6 +19,7 @@
 #              11) http://olypedia.de/Olympus_Makernotes
 #              12) Ioannis Panagiotopoulos private communication (E-510)
 #              13) Chris Shaw private communication (E-3)
+#              14) Viktor Lushnikov private communication (E-400)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -28,7 +29,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.47';
+$VERSION = '1.49';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -1177,21 +1178,25 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x301 => { #6
         Name => 'FocusMode',
         Writable => 'int16u',
-        PrintConv => {
+        Count => -1,
+        Notes => '1 or 2 values',
+        PrintConv => [{
             0 => 'Single AF',
             1 => 'Sequential shooting AF',
             2 => 'Continuous AF',
             3 => 'Multi AF',
             10 => 'MF',
-        },
+        }, {}], # (E-520 writes 2 values, 2nd is unknown - PH)
     },
     0x302 => { #6
         Name => 'FocusProcess',
         Writable => 'int16u',
-        PrintConv => {
+        Count => -1,
+        Notes => '1 or 2 values',
+        PrintConv => [{
             0 => 'AF Not Used',
             1 => 'AF Used',
-        },
+        }, {}], # (E-520 writes 2 values, 2nd is unknown - PH)
     },
     0x303 => { #6
         Name => 'AFSearch',
@@ -2061,11 +2066,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x1200 => { #11
         Name => 'FaceDetect',
         Writable => 'int32u',
-        Count => 2,
-        PrintConv => {
+        Count => -1,
+        Notes => '2 or 3 values',
+        Relist => [ [0, 1], 2 ],
+        PrintConv => [{
             '0 0' => 'Off',
             '1 0' => 'On',
-        },
+        }, {}],
     },
     0x1201 => { #11
         Name => 'FaceDetectArea',
@@ -2730,6 +2737,7 @@ sub PrintLensInfo($$)
             # Leica lenses (ref 11)
             '2 1'   => 'D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
             '2 2'   => 'D Summilux 25mm F1.4 Asph.',
+            '2 3 1' => 'D Vario Elmar 14-50mm F3.8-5.6 Asph.', #14 (L10 kit)
             '2 4'   => 'D Vario Elmar 14-150mm F3.5-5.6', #13
             '3 1'   => 'D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
             '3 2'   => 'D Summilux 25mm F1.4 Asph.',
@@ -2838,7 +2846,8 @@ under the same terms as Perl itself.
 
 Thanks to Markku Hanninen, Remi Guyomarch, Frank Ledwon, Michael Meissner,
 Mark Dapoz and Ioannis Panagiotopoulos for their help figuring out some
-Olympus tags, and Lilo Huang and Chris Shaw for adding to the LensType list.
+Olympus tags, and Lilo Huang, Chris Shaw and Viktor Lushnikov for adding to
+the LensType list.
 
 =head1 SEE ALSO
 

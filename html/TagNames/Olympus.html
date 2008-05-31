@@ -906,8 +906,10 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <tr>
 <td>0x0301</td>
 <td>FocusMode</td>
-<td class=c>int16u</td>
-<td><span class=s>0 = Single AF
+<td class=c>int16u[n]</td>
+<td><span class=s><span class=n>(1 or 2 values)</span>
+  <br>[Value 0]
+  <br>0 = Single AF
   <br>1 = Sequential shooting AF
   <br>2 = Continuous AF
   <br>3 = Multi AF
@@ -915,8 +917,10 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <tr class=b>
 <td>0x0302</td>
 <td>FocusProcess</td>
-<td class=c>int16u</td>
-<td><span class=s>0 = AF Not Used
+<td class=c>int16u[n]</td>
+<td><span class=s><span class=n>(1 or 2 values)</span>
+  <br>[Value 0]
+  <br>0 = AF Not Used
   <br>1 = AF Used</span></td></tr>
 <tr>
 <td>0x0303</td>
@@ -1673,8 +1677,10 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <tr class=b>
 <td>0x1200</td>
 <td>FaceDetect</td>
-<td class=c>int32u[2]</td>
-<td><span class=s>&#39;0 0&#39; = Off
+<td class=c>int32u[n]</td>
+<td><span class=s><span class=n>(2 or 3 values)</span>
+  <br>[Values 0 and 1]
+  <br>&#39;0 0&#39; = Off
   <br>&#39;1 0&#39; = On</span></td></tr>
 <tr>
 <td>0x1201</td>
@@ -2174,7 +2180,7 @@ FE120, FE140 and FE190.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 4, 2008</i>
+<br><i>Last revised May 20, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -39,6 +39,8 @@
 #              26) Steve Balcombe private communication
 #              27) Chris Huebsch private communication (40D)
 #              28) Hal Williamson private communication (XTi)
+#              29) Ger Vermeulen private communication
+#              30) David Pitcher private communication (1DmkIII)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -51,7 +53,7 @@ use Image::ExifTool::Exif;
 sub WriteCanon($$$);
 sub ProcessSerialData($$$);
 
-$VERSION = '1.93';
+$VERSION = '1.96';
 
 # Note: Remove 'USM' from 'L' lenses since it is redundant - PH
 my %canonLensTypes = ( #4
@@ -296,6 +298,9 @@ my %canonLensTypes = ( #4
     0x4007d675 => 'HV10',
     0x4007d777 => 'iVIS DC50',
     0x4007d778 => 'iVIS HV20',
+    0x4007d779 => 'DC211', #29
+    0x4007d77b => 'iVIS HR10', #29
+    0x4007d880 => 'iVIS HF10', #29
     0x80000001 => 'EOS-1D',
     0x80000167 => 'EOS-1DS',
     0x80000168 => 'EOS 10D',
@@ -893,7 +898,8 @@ my %printParameter = (
     0xb6 => {
         Name => 'PreviewImageInfo',
         SubDirectory => {
-            # Note: first word if this block is the total number of words, not bytes!
+            # Note: the first word of this block gives the correct block size in bytes, but
+            # the size is wrong by a factor of 2 in the IFD, so we must account for this
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size/2)',
             TagTable => 'Image::ExifTool::Canon::PreviewImageInfo',
         },
@@ -935,7 +941,7 @@ my %printParameter = (
                 TagTable => 'Image::ExifTool::Canon::ColorBalance3',
             },
         },
-        {   # (int16u[674|702]) - 40D (692), 1DmkIII (674), 1DSmkIII (702)
+        {   # (int16u[692|674|702]) - 40D (692), 1DmkIII (674), 1DSmkIII (702)
             Condition => '$count == 692 or $count == 674 or $count == 702',
             Name => 'ColorBalance4',
             SubDirectory => {
@@ -1187,6 +1193,7 @@ my %printParameter = (
             4 => 'Manual',
             5 => 'Depth-of-field AE',
             6 => 'M-Dep', #PH
+            7 => 'Bulb', #30
         },
     },
     22 => { #4
@@ -2114,13 +2121,6 @@ my %printParameter = (
         ValueConv => '$val + 1',
         ValueConvInv => '$val - 1',
     },
-    0x17e => { #(NC)
-        Name => 'DirectoryIndex',
-        Groups => { 2 => 'Image' },
-        Format => 'int32u',
-        ValueConv => '$val - 1',
-        ValueConvInv => '$val + 1',
-    },
     0x176 => {
         Name => 'ShutterCount',
         Notes => 'may be valid only for some 1DmkIII copies, even running the same firmware',
@@ -2128,10 +2128,34 @@ my %printParameter = (
         ValueConv => '$val + 1',
         ValueConvInv => '$val - 1',
     },
+    0x17e => { #(NC)
+        Name => 'DirectoryIndex',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val - 1',
+        ValueConvInv => '$val + 1',
+    },
+    0x45a => { #29
+        Name => 'TimeStamp1',
+        Condition => '$$self{Model} =~ /\b1D Mark III$/',
+        Format => 'int32u',
+        Groups => { 2 => 'Time' },
+        # observed in 1DmkIII firmware 5.3.1 (pre-production), 1.0.3, 1.0.8
+        Notes => 'only valid for some versions of the 1DmkIII firmware',
+        Shift => 'Time',
+        RawConv => '$val ? $val : undef',
+        ValueConv => 'ConvertUnixTime($val)',
+        ValueConvInv => 'GetUnixTime($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)',
+    },
     0x45e => {
         Name => 'TimeStamp',
         Format => 'int32u',
         Groups => { 2 => 'Time' },
+        # observed in 1DmkIII firmware 1.1.0, 1.1.3 and
+        # 1DSmkIII firmware 1.0.0, 1.0.4, 2.1.2, 2.7.1
+        Notes => 'valid for the 1DSmkIII and some versions of the 1DmkIII firmware',
         Shift => 'Time',
         RawConv => '$val ? $val : undef',
         ValueConv => 'ConvertUnixTime($val)',
@@ -2857,28 +2881,9 @@ my %printParameter = (
         DataTag => 'PreviewImage',
         Protected => 2,
     },
-    6 => {
-        Name => 'PreviewFocalPlaneXResolution',
-        Format => 'rational64s',
-        PrintConv => 'sprintf("%.1f",$val)',
-        PrintConvInv => '$val',
-    },
-    8 => {
-        Name => 'PreviewFocalPlaneYResolution',
-        Format => 'rational64s',
-        PrintConv => 'sprintf("%.1f",$val)',
-        PrintConvInv => '$val',
-    },
-# the following 2 values look like they are really 4 shorts
-# taking the values of 1,4,4 and 2 respectively - don't know what they are though
-#    10 => {
-#        Name => 'PreviewImageUnknown1',
-#        PrintConv => 'sprintf("0x%x",$val)',
-#    },
-#    11 => {
-#        Name => 'PreviewImageUnknown2',
-#        PrintConv => 'sprintf("0x%x",$val)',
-#    },
+    # NOTE: The size of the PreviewImageInfo structure is incorrectly
+    # written as 48 bytes (Count=12, Format=int32u), but only the first
+    # 6 int32u values actually exist
 );
 
 # Sensor information (MakerNotes tag 0xe0) (ref 12)
@@ -4053,10 +4058,10 @@ under the same terms as Perl itself.
 Thanks Michael Rommel and Daniel Pittman for information they provided about
 the Digital Ixus and PowerShot S70 cameras, Juha Eskelinen and Emil Sit for
 figuring out the 20D and 30D FileNumber, Denny Priebe for figuring out a
-couple of 1D tags, and Michael Tiemann, Rainer Honle, Dave Nicholson and
-Chris Huebsch for decoding a number of new tags.  Also thanks to everyone
-who made contributions to the LensType lookup list or the meanings of other
-tag values.
+couple of 1D tags, and Michael Tiemann, Rainer Honle, Dave Nicholson, Chris
+Huebsch and Ger Vermeulen for decoding a number of new tags.  Also thanks to
+everyone who made contributions to the LensType lookup list or the meanings
+of other tag values.
 
 =head1 SEE ALSO
 

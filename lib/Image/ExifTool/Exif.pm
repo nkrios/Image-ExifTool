@@ -37,7 +37,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.55';
+$VERSION = '2.59';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -1787,6 +1787,10 @@ my %longBin = (
         },
     },
     0xc692 => 'CurrentPreProfileMatrix',
+    0xc6d2 => { #JD (Panasonic DMC-TZ5)
+        Name => 'Title',
+        Notes => 'proprietary Panasonic tag',
+    },
     0xea1c => { #13
         Name => 'Padding',
         Binary => 1,
@@ -2630,7 +2634,8 @@ sub ProcessExif($$$)
                         if ($tagInfo) {
                             # make large unknown blocks binary data
                             $$tagInfo{Binary} = 1 if $$tagInfo{Unknown};
-                            last unless $$tagInfo{Binary};   # must read non-binary data
+                            last unless $$tagInfo{Binary};      # must read non-binary data
+                            last if $$tagInfo{SubDirectory};    # must read SubDirectory data
                             if ($exifTool->{OPTIONS}->{Binary}) {
                                 # read binary data if specified unless tagsFromFile won't use it
                                 last unless $$exifTool{TAGS_FROM_FILE} and $$tagInfo{Protected};

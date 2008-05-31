@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessPrintIM($$$);
 
@@ -27,8 +27,7 @@ sub ProcessPrintIM($$$);
 
 #------------------------------------------------------------------------------
 # Process PrintIM IFD
-# Inputs: 0) ExifTool object reference, 1) reference to directory information
-#         2) pointer to tag table
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 sub ProcessPrintIM($$$)
 {
@@ -38,12 +37,15 @@ sub ProcessPrintIM($$$)
     my $size = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
 
+    unless ($size) {
+        $exifTool->Warn('Empty PrintIM data');
+        return 0;
+    }
     unless ($size > 15) {
         $exifTool->Warn('Bad PrintIM data');
         return 0;
     }
-    my $header = substr($$dataPt, $offset, 7);
-    unless ($header eq 'PrintIM') {
+    unless (substr($$dataPt, $offset, 7) eq 'PrintIM') {
         $exifTool->Warn('Invalid PrintIM header');
         return 0;
     }

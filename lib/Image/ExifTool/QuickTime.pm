@@ -14,6 +14,7 @@
 #               5) ISO 14496-12 (http://neuron2.net/library/avc/c041828_ISO_IEC_14496-12_2005(E).pdf)
 #               6) ISO 14496-16 (http://www.iec-normen.de/previewpdf/info_isoiec14496-16%7Bed2.0%7Den.pdf)
 #               7) http://atomicparsley.sourceforge.net/mpeg-4files.html
+#               8) http://wiki.multimedia.cx/index.php?title=QuickTime_container
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::QuickTime;
@@ -23,7 +24,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -84,11 +85,17 @@ my %vendorID = (
         Name => 'PreviewPICT',
         Binary => 1,
     },
+    pict => { #8
+        Name => 'PreviewPICT',
+        Binary => 1,
+    },
     moov => {
         Name => 'Movie',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Movie' },
     },
     mdat => { Unknown => 1, Binary => 1 },
+    junk => { Unknown => 1, Binary => 1 }, #8
+    uuid => { Unknown => 1, Binary => 1 }, #8
 );
 
 # atoms used in QTIF files
@@ -1351,6 +1358,8 @@ under the same terms as Perl itself.
 =item L<http://wiki.multimedia.cx/index.php?title=Apple_QuickTime>
 
 =item L<http://atomicparsley.sourceforge.net/mpeg-4files.html>
+
+=item L<http://wiki.multimedia.cx/index.php?title=QuickTime_container>
 
 =back
 

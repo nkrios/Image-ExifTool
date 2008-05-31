@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.41';
+$VERSION = '1.42';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -250,7 +250,7 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        Name => 'MakerNoteKodak8',
+        Name => 'MakerNoteKodak8a',
         # IFD-format maker notes: look for reasonable number of
         # entries and check format and count of first IFD entry
         Condition => q{
@@ -262,6 +262,21 @@ my $debug;          # set to 1 to enabled debugging code
             TagTable => 'Image::ExifTool::Kodak::Type8',
             ProcessProc => \&ProcessUnknown,
             ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteKodak8b',
+        # TIFF-format maker notes
+        Condition => q{
+            $$self{Make}=~/Kodak/i and
+            $$valPt =~ /^(MM\0\x2a\0\0\0\x08|II\x2a\0\x08\0\0\0)/
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type8',
+            ProcessProc => \&ProcessUnknown,
+            ByteOrder => 'Unknown',
+            Start => '$valuePtr + 8',
+            Base => '$start - 8',
         },
     },
     {
@@ -936,7 +951,9 @@ sub LocateIFD($$)
     my ($exifTool, $dirInfo) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart} || 0;
-    my $size = $$dirInfo{DirLen} || ($$dirInfo{DataLen} - $dirStart);
+    # (ignore MakerNotes DirLen since sometimes this is incorrect)
+    my $size = $$dirInfo{DataLen} - $dirStart;
+    my $dirLen = $$dirInfo{DirLen} || $size;
     my $tagInfo = $$dirInfo{TagInfo};
     my $ifdOffsetPos;
     # the IFD should be within the first 32 bytes
@@ -992,10 +1009,10 @@ sub LocateIFD($$)
 #
 # scan for something that looks like an IFD
 #
-    if ($size >= 14 + $firstTry) {  # minimum size for an IFD
+    if ($dirLen >= 14 + $firstTry) {  # minimum size for an IFD
         my $offset;
 IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
-            last if $offset + 14 > $size;    # 14 bytes is minimum size for an IFD
+            last if $offset + 14 > $dirLen;    # 14 bytes is minimum size for an IFD
             my $pos = $dirStart + $offset;
 #
 # look for a standard TIFF header (Nikon uses it, others may as well),
@@ -1008,7 +1025,7 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
             if (defined $ifdOffsetPos) {
                 # get pointer to IFD
                 my $ptr = Get32u($dataPt, $pos + $ifdOffsetPos);
-                if ($ptr >= $ifdOffsetPos + 4 and $ptr + $offset + 14 <= $size) {
+                if ($ptr >= $ifdOffsetPos + 4 and $ptr + $offset + 14 <= $dirLen) {
                     # shift directory start and shorten dirLen accordingly
                     $$dirInfo{DirStart} += $ptr + $offset;
                     $$dirInfo{DirLen} -= $ptr + $offset;

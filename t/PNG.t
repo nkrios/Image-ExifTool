@@ -30,17 +30,16 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 3: Write a bunch of new information to the PNG
+# test 3: Write a bunch of new information a PNG in memory
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg');
     $exifTool->SetNewValue('PNG:Comment');  # and delete a tag
-    # must write image to memory because size is variable (depends on Zlib
-    # availability), and images in memory don't generate a 'FileSize' tag.
     my $image;  
     my $rtnVal = $exifTool->WriteInfo('t/images/PNG.png', \$image);
-    my $info = $exifTool->ImageInfo(\$image);
+    # must ignore FileSize because size is variable (depends on Zlib availability)
+    my $info = $exifTool->ImageInfo(\$image, '-filesize');
     my $testfile = "t/${testname}_${testnum}_failed.png";
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;   # erase results of any bad test

@@ -21,7 +21,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessFujiDir($$$);
 
@@ -481,6 +481,7 @@ sub WriteRAF($$)
     }
     # the following RAF version numbers have been tested:
     # 0100 - E550 V1.00, E900 V1.00, S5600 V1.00, S6000fd V1.00, S6500fd V2.00
+    # 0104 - S5Pro V1.04
     # 0106 - S5Pro V1.06
     # 0114 - S9600 V1.00
     # 0159 - S2Pro V1.00
@@ -488,7 +489,7 @@ sub WriteRAF($$)
     # 0218 - S3Pro V2.18
     # 0264 - F700  V2.00
     # 0269 - S9500 V1.02
-    if ($ver !~ /^(0100|0106|0114|0159|0212|0218|0264|0269)$/) {
+    if ($ver !~ /^(0100|0104|0106|0114|0159|0212|0218|0264|0269)$/) {
         $exifTool->Error("RAF version $ver not yet tested", 1) and return 1;
     }
     # read the embedded JPEG

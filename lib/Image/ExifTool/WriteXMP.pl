@@ -563,7 +563,8 @@ sub WriteXMP($$;$)
     my (%capture, %nsUsed, $xmpErr, $uuid);
     my $changed = 0;
     my $xmpFile = (not $tagTablePtr);   # this is an XMP data file if no $tagTablePtr
-    my $preferred = $xmpFile;   # write XMP as preferred if this is an XMP file
+    # write XMP as preferred if this is an XMP file or a GIF file
+    my $preferred = $xmpFile || ($$exifTool{FILE_TYPE} and $$exifTool{FILE_TYPE} eq 'GIF');
     my $verbose = $exifTool->Options('Verbose');
 #
 # extract existing XMP information into %capture hash

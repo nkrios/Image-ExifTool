@@ -20,7 +20,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -110,6 +110,9 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     0xb028 => { #2
         # (used by the DSLR-A100)
         Name => 'MinoltaMakerNote',
+        # must check for zero since apparently a value of zero indicates the IFD doesn't exist
+        # (dumb Sony -- they shouldn't write this tag if the IFD is missing!)
+        Condition => '$$valPt ne "\0\0\0\0"',
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Minolta::Main',
@@ -374,7 +377,9 @@ sub ProcessSR2($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $result = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
     return $result unless $result;
-    my $offset = $exifTool->{SR2SubIFDOffset};
+    # only take first offset value if more than one!
+    my @offsets = split ' ', $exifTool->{SR2SubIFDOffset};
+    my $offset = shift @offsets;
     my $length = $exifTool->{SR2SubIFDLength};
     my $key = $exifTool->{SR2SubIFDKey};
     my $raf = $$dirInfo{RAF};
@@ -400,16 +405,23 @@ sub ProcessSR2($$$)
                 $parms{MaxLen} = 96 unless $verbose > 3;
                 Image::ExifTool::HexDump(\$buff, $length, %parms);
             }
-            my %dirInfo = (
-                Base => $base,
-                DataPt => \$buff,
-                DataLen => length $buff,
-                DirStart => 0,
-                DirName => 'SR2SubIFD',
-                DataPos => $offset,
-            );
-            my $subTable = Image::ExifTool::GetTagTable('Image::ExifTool::Sony::SR2SubIFD');
-            $result = $exifTool->ProcessDirectory(\%dirInfo, $subTable);
+            my $num = '';
+            my $dPos = $offset;
+            for (;;) {
+                my %dirInfo = (
+                    Base => $base,
+                    DataPt => \$buff,
+                    DataLen => length $buff,
+                    DirStart => $offset - $dPos,
+                    DirName => "SR2SubIFD$num",
+                    DataPos => $dPos,
+                );
+                my $subTable = Image::ExifTool::GetTagTable('Image::ExifTool::Sony::SR2SubIFD');
+                $result = $exifTool->ProcessDirectory(\%dirInfo, $subTable);
+                last unless @offsets;
+                $offset = shift @offsets;
+                $num = ($num || 1) + 1;
+            }
 
         } else {
             $exifTool->Warn('Error reading SR2 data');

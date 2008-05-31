@@ -75,9 +75,9 @@ div.index       { float: right; clear: both;
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-7.25.tar.gz">
-Download        Version 7.25</a> (1.5 MB) -
-<a href="history.html">Apr. 18, 2008</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-7.30.tar.gz">
+Download        Version 7.30</a> (1.5 MB) -
+<a href="history.html">May 31, 2008</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -119,8 +119,8 @@ distribution above.</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-7.25.zip">
-         exiftool-7.25.zip</a> (1.9 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-7.30.zip">
+         exiftool-7.30.zip</a> (1.9 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -130,8 +130,8 @@ drag-and-drop files and folders to view meta information, or rename to
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-7.25.dmg">
-         ExifTool-7.25.dmg</a> (890 kB)</b></td></tr></table></blockquote>
+<a href="ExifTool-7.30.dmg">
+         ExifTool-7.30.dmg</a> (896 kB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -671,12 +671,9 @@ writing.</li>
 <h2><font color='#cc6600'><a name="problems">Known Problems</a></font>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 <ul>
-<li>There is a bug in the Apple RAW file support (OS X 10.4.10) which prevents
-edited PEF images from being displayed properly.  However, the images can still
-be displayed using the Pentax Silkypix software, and converted with dcraw.
-(<i>Update: This still appears to be a problem with OS X 10.4.11, although
-edited K10D images seem to display correctly provided the Make, Model and
-Software tags are not changed.</i>)</li>
+<li>There is a bug in the Apple RAW file support (OS X 10.4.11) which prevents
+some edited PEF images from being displayed properly.  Other software such as
+the Pentax Silkypix software and dcraw have no problems with these images.
 <li>Some Macintosh applications may store information in the resource fork of a
 file.  ExifTool does not process the resource fork, so this information is lost
 if the file is rewritten.  (The resource fork is also typically dropped if the
@@ -813,7 +810,7 @@ three Mac OS X droplets to extract information [exiftool must be installed] (tha
 <li><a href="https://puszcza.gnu.org.ua/projects/renrot/">renrot</a>: Perl utility to perform various processing tasks on images</li>
 <li><a href="http://www.proxel.se/exif.html">Proxel EXIF Tool</a>: Photoshop plugin based on ExifTool</li>
 <li><a href="http://kde-apps.org/content/show.php?content=30971">rawimage:</a> A kfile plugin and thumbnail image handler for RAW formats</li>
-<li><a href="http://www.thezeal.com/blog/?p=145">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc</li>
+<li><a href="http://www.thezeal.com/blog/?p=145">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc (Windows)</li>
 <li><a href="http://www.carto.net/projects/photoTools/gpsPhoto/">gpsPhoto</a>: Geotag your images from a GPS (GPX) track log</li>
 <li><a href="http://www.scriptamac.at/geotaggingactions.html">Geotagging Automator Action</a>: Mac OS X application to geotag images from GPX tracks</li>
 <li><a href="http://xray.bmc.uu.se/markh/photos/macmetamod.html">MacMetaMod</a>: Mac OS X droplet for adding Keywords to images</li>
@@ -826,8 +823,9 @@ three Mac OS X droplets to extract information [exiftool must be installed] (tha
 <li><a href="http://82.94.219.20/~marcvos/software/realbasic/sed.html">SetEXIFData</a>: Mac OS X utility to set EXIF data</li>
 <li><a href="http://basepath.com/ImageIngester/">ImageIngester</a>: Windows and Mac OS X image workflow automator</li>
 <li><a href="http://www.geosetter.de/en/">GeoSetter</a>: Windows utility for showing and changing geo data of image files</li>
-<li><a href="http://code.google.com/p/gpicsync/">GPicSync</a>: Windows/Linux utility to geocode photos from a GPX track log and create KML files</ul>
-
+<li><a href="http://code.google.com/p/gpicsync/">GPicSync</a>: Windows/Linux utility to geocode photos from a GPX track log and create KML files</li>
+<li><a href="http://sagittarius.berlios.de/">Sagittarius</a>: Linux XMP metadata editor</li>
+</ul>
 <p>Also notable, but not directly based on ExifTool:</p>
 
 <ul><li><a href="http://www.photome.de/">PhotoME</a>: Windows utility to read/write meta information</li>

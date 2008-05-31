@@ -2333,6 +2333,8 @@ sub GetLangInfo($$)
 # need to be created or will have tags changed in them
 # Inputs: 0) ExifTool object reference, 1) file type string (or map hash ref)
 #         2) preferred family 0 group name for creating tags
+# Notes: The ADD_DIRS and EDIT_DIRS keys are the directory names, and the values
+#        are the names of the parent directories (undefined for a top-level directory)
 sub InitWriteDirs($$;$)
 {
     my ($self, $fileType, $preferredGroup) = @_;
@@ -2350,6 +2352,18 @@ sub InitWriteDirs($$;$)
         for (;;) {
             # are we creating this tag? (otherwise just deleting or editing it)
             my $isCreating = $newValueHash->{IsCreating};
+            if ($isCreating) {
+                # if another group is taking priority, only create
+                # directory if specifically adding tags to this group
+                # or if this tag isn't being added to the priority group
+                $isCreating = 0 if $preferredGroup and
+                    $preferredGroup ne $self->GetGroup($tagInfo, 0) and
+                    $newValueHash->{CreateGroups}->{$preferredGroup};
+            } else {
+                # creating this directory if any tag is preferred and has a value
+                $isCreating = 1 if $preferredGroup and $$newValueHash{Value} and
+                    $preferredGroup eq $self->GetGroup($tagInfo, 0);
+            }
             # tag belongs to directory specified by WriteGroup, or by
             # the Group0 name if WriteGroup not defined
             my $dirName = $newValueHash->{WriteGroup};
@@ -2365,15 +2379,7 @@ sub InitWriteDirs($$;$)
                     $parent = pop @dirNames;
                 }
                 $$editDirs{$dirName} = $parent;
-                # (if another group is taking priority, only create
-                # directory if specifically adding tags to this group
-                # or if this tag isn't being added to the priority group
-                if ($isCreating and (not $preferredGroup or
-                    $preferredGroup eq $self->GetGroup($tagInfo, 0) or not
-                    $newValueHash->{CreateGroups}->{$preferredGroup}))
-                {
-                    $$addDirs{$dirName} = $parent;
-                }
+                $$addDirs{$dirName} = $parent if $isCreating;
                 $dirName = $parent || shift @dirNames
             }
             last unless $newValueHash->{Next};
@@ -3040,7 +3046,7 @@ sub Unicode2Charset($$;$) {
     # check for (and remove) byte order mark and set byte order accordingly if it exists
     $val =~ s/^(\xff\xfe|\xfe\xff)// and $byteOrder = ($1 eq "\xff\xfe") ? 'MM' : 'II';
     my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
-    # convert to Latin if specified or if no UTF-8 support in this Perl version
+    # convert to Latin if specified, otherwise UTF-8
     if ($self->Options('Charset') eq 'Latin') {
         return Unicode2Latin($val, $fmt, $self);
     } else {
@@ -3133,7 +3139,11 @@ sub AssembleRational($$@)
 # Convert a floating point number into a rational
 # Inputs: 0) floating point number, 1) optional maximum value (defaults to 0x7fffffff)
 # Returns: numerator, denominator (in list context)
-# Notes: these routines were a bit tricky, but fun to write!
+# Notes:
+# - the returned rational will be accurate to at least 8 significant figures if possible
+# - ie. an input of 3.14159265358979 returns a rational of 104348/33215,
+#   which equals    3.14159265392142 and is accurate to 10 significant figures
+# - these routines were a bit tricky, but fun to write!
 sub Rationalize($;$)
 {
     my $val = shift;

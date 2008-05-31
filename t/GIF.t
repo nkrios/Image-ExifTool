@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..4\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..5\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load ExifTool
@@ -34,7 +34,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# tests 3/4: Test removing comment then adding it back again to GIF in memory
+# tests 3-5: Test adding/editing/deleting Comment and XMP of images in memory
 {
     ++$testnum;
     open(TESTFILE, 't/images/GIF.gif');
@@ -43,7 +43,8 @@ my $testnum = 1;
     read(TESTFILE, $gifImage, 100000);
     close(TESTFILE);
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValue('Comment');
+    $exifTool->SetNewValue(Comment => 'a new comment');
+    $exifTool->SetNewValue(City => 'Kingston');
     my $image1;
     $exifTool->WriteInfo(\$gifImage, \$image1);
     my $info = ImageInfo(\$image1);
@@ -51,14 +52,36 @@ my $testnum = 1;
     print "ok $testnum\n";
 
     ++$testnum;
-    $info = ImageInfo(\$gifImage);
-    my $gifComment = $info->{Comment};
-    $exifTool->SetNewValue('Comment',$gifComment);
+    $exifTool->SetNewValue();       # clear previous new values
+    $exifTool->SetNewValue('all');  # delete everything
+    # add back some XMP tags
+    $exifTool->SetNewValue(Subject => ['one','two','three']);
+    $exifTool->SetNewValue(Country => 'Canada');
     my $image2;
     $exifTool->WriteInfo(\$image1, \$image2);
-    print 'not ' unless $image2 eq $gifImage;
+    $info = ImageInfo(\$image2);
+    print 'not ' unless check($info, $testname, $testnum);
+    print "ok $testnum\n";
+
+    ++$testnum;
+    $info = ImageInfo(\$gifImage, 'Comment', 'XMP');
+    $exifTool->SetNewValue();       # clear previous new values
+    $exifTool->SetNewValue(Comment => $$info{Comment});
+    $exifTool->SetNewValue(XMP => $$info{XMP});
+    my $image3;
+    $exifTool->WriteInfo(\$image2, \$image3);
+    my $testfile = "t/${testname}_${testnum}_failed.gif";
+    if ($image3 eq $gifImage) {
+        unlink $testfile;
+    } else {
+        # save the bad image
+        open(TESTFILE,">$testfile");
+        binmode(TESTFILE);
+        print TESTFILE $image3;
+        close(TESTFILE);
+        print 'not ';
+    }
     print "ok $testnum\n";
 }
-
 
 # end

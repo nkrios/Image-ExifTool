@@ -6,8 +6,9 @@
 # Revisions:    11/25/2003  - P. Harvey Created
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
-#               2) Christian Koller private communication (tests with the 20D)
-#               3) Rainer Honle private communication (tests with the 5D)
+#               2) Christian Koller private communication (20D)
+#               3) Rainer Honle private communication (5D)
+#               4) David Pitcher private communication (1DmkIII firmware upgrade)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonCustom;
@@ -18,7 +19,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1548,6 +1549,9 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             0 => '19 points',
             1 => 'Inner 9 points',
             2 => 'Outer 9 points',
+            3 => '19 Points, Multi-controller selectable', #4
+            4 => 'Inner 9 Points, Multi-controller selectable', #4
+            5 => 'Outer 9 Points, Multi-controller selectable', #4
         },
     },
     0x050a => {
@@ -1659,6 +1663,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             0 => 'Exposure comp/Aperture',
             1 => 'AF point selection',
             2 => 'ISO speed',
+            3 => 'AF point selection swapped with Exposure comp', #4
+            4 => 'ISO speed swapped with Exposure comp', #4
         },
     },
     0x0704 => [
@@ -2059,7 +2065,8 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Christian Koller for his work in decoding the 20D custom
-functions, and Rainer Honle for decoding the 5D custom functions.
+functions, Rainer Honle for decoding the 5D custom functions and David
+Pitcher for adding a few undocumented 1DmkIII settings.
 
 =head1 SEE ALSO
 

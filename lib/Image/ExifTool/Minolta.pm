@@ -23,6 +23,7 @@
 #              13) http://www.mhohner.de/minolta/lenses.php
 #              14) Jeffery Small private communication (tests with 7D)
 #              15) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm
+#              16) Thomas Kassner private communication
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -33,7 +34,7 @@ use vars qw($VERSION %minoltaLensIDs %minoltaColorMode %sonyColorMode %minoltaSc
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.39';
+$VERSION = '1.40';
 
 # lens ID numbers (ref 3)
 %minoltaLensIDs = (
@@ -43,7 +44,7 @@ $VERSION = '1.39';
     3 => 'Minolta AF 28-80mm F4-5.6',
     5 => 'Minolta AF 35-70mm F3.5-4.5',
     6 => 'Minolta AF 24-85mm F3.5-4.5 [New]',
-    # 7 => 'AF 100-400mm F4.5-6.7 (D)', ??
+  # 7 => 'AF 100-400mm F4.5-6.7 (D)', ??
     7 => 'Minolta AF 100-300mm F4.5-5.6 APO [New]',
     8 => 'Minolta AF 70-210mm F4.5-5.6',
     9 => 'Minolta AF 50mm F3.5 Macro',
@@ -65,9 +66,11 @@ $VERSION = '1.39';
     27 => 'Minolta AF 85mm F1.4 G',
     28 => 'Minolta AF 100mm F2.8 Macro (D)',
     29 => 'Minolta AF 75-300mm F4.5-5.6 (D)',
-    30 => 'Minolta AF 28-80mm F3.5-5.6 (D)', # or Sigma AF 12-24mm F4.5-5.6 EX DG',
+    30 => 'Minolta AF 28-80mm F3.5-5.6 (D)',
+  # 30 => 'Sigma AF 12-24mm F4.5-5.6 EX DG',
+  # 30 => 'Sigma 28-70mm EX DG F2.8', #16
     31 => 'Minolta/Sony AF 50mm F2.8 Macro (D) or AF 50mm F3.5 Macro',
-    # 32 => 'AF 100-400mm F4.5-6.7 (D) x1.5', ??
+  # 32 => 'AF 100-400mm F4.5-6.7 (D) x1.5', ??
     32 => 'Minolta AF 300mm F2.8 G',
     33 => 'Minolta/Sony AF 70-200mm F2.8 G (D) SSM',
     35 => 'Minolta AF 85mm F1.4 G (D) Limited',
@@ -88,6 +91,7 @@ $VERSION = '1.39';
   # 128 => 'Tamron 18-200, 28-300 or 80-300mm F3.5-6.3',
   # 128 => 'Tamron AF 28-200mm F3.8-5.6 XR Di Aspherical [IF] MACRO', (ref JD)
     129 => 'Tamron 200-400mm F5.6 or 70-300mm f/4-5.6 LD', #12
+    135 => 'Vivitar 28-210mm F3.5-5.6', #16
     137 => 'Cosina 70-210mm F2.8-4 AF', #11
     138 => 'Soligor 19-35mm F3.5-4.5', #11
     255 => 'Tamron Lens (various models)',
@@ -97,12 +101,16 @@ $VERSION = '1.39';
   # 255 => 'Tamron SP AF 200-500mm f/5.0-6.3 Di LD IF',
     255 => 'Tamron AF 70-300mm f/4-5.6 Di LD MACRO 1:2', #JD
     25501 => 'Minolta AF 50mm F1.7', #7
-    25511 => 'Minolta AF 35-70mm F4', # or Sigma UC AF 28-70mm F3.5-4.5 or Sigma M-AF 70-200mm F2.8 EX Aspherical', #/12/12
+    25511 => 'Minolta AF 35-70mm F4',
+  # 25511 => 'Sigma UC AF 28-70mm F3.5-4.5', #12
+  # 25511 => 'Sigma M-AF 70-200mm F2.8 EX Aspherical', #12
+  # 25511 => 'Sigma UC 28-70mm F3.5-4.5 HighSpeed-AF', #16
     25521 => 'Minolta AF 28-85mm F3.5-4.5 [New]',
-    # 25521 => 'Tokina 19-35mm F3.5-4.5', #3
-    # 25521 => 'Tokina 28-70mm F2.8 AT-X', #7
-    # 25521 => 'Tokina 80-400mm F4.5-5.6 AT-X AF II 840', #Jens
+  # 25521 => 'Tokina 19-35mm F3.5-4.5', #3
+  # 25521 => 'Tokina 28-70mm F2.8 AT-X', #7
+  # 25521 => 'Tokina 80-400mm F4.5-5.6 AT-X AF II 840', #Jens
     25531 => 'Minolta AF 28-135mm F4-4.5',
+  # 25531 => 'Sigma ZOOM-alpha 35-135mm F3.5-4.5', #16
     25541 => 'Minolta AF 35-105mm F3.5-4.5', #13
     25551 => 'Minolta AF 70-210mm F4 Macro', # or Sigma 70-210mm F4-5.6 APO or Sigma M-AF 70-200mm F2.8 EX APO', #7/6
     25561 => 'Minolta AF 135mm F2.8',
@@ -119,6 +127,7 @@ $VERSION = '1.39';
     25781 => 'Minolta AF 16mm F2.8 Fisheye', # or Sigma 8mm F4 Fisheye or Sigma 14mm F3.5',
     25791 => 'Minolta AF 20mm F2.8',
     25811 => 'Minolta/Sony AF 100mm F2.8 Macro New', # or Tamron 90mm F2.8 Macro or Sigma 180mm F5.6 Macro',
+    25851 => 'Beroflex 35-135mm F3.5-4.5', #16
     25858 => 'Minolta AF 35-105mm F3.5-4.5 New', # or Tamron 24-135mm F3.5-5.6',
     25881 => 'Minolta AF 70-210mm F3.5-4.5',
     25891 => 'Minolta AF 80-200 F2.8 APO', # or Tokina 80-200mm F2.8',
@@ -1523,7 +1532,8 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Jay Al-Saadi, Niels Kristian Bech Jensen, Shingo Noguchi, Pedro
-Corte-Real and Jeffery Small for the information they provided.
+Corte-Real, Jeffery Small, Jens Duttke and  Thomas Kassner for the
+information they provided.
 
 =head1 SEE ALSO
 

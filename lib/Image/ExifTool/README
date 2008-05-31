@@ -591,7 +591,8 @@ numerical.
                   the subdirectory data.  The following variables may be used in
                   the expression: $val (value of the tag), $dirData (reference
                   to directory data), $subdirStart (offset to subdirectory
-                  start) and $size (size of subdirectory).
+                  start) and $size (size of subdirectory).  Returns true if
+                  subirectory is valid.
 
      ProcessProc: If given, specifies processing procedure used to decode this
                   subdirectory data.  This overrides the default procedure

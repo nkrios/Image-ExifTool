@@ -122,7 +122,7 @@ my $testfile;
     $exifTool->SetNewValue(Description);
     my $image;
     $exifTool->WriteInfo($testfile1, \$image);
-    $info = $exifTool->ImageInfo(\$image);
+    $info = $exifTool->ImageInfo(\$image, '-filesize');
     my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile1;
@@ -147,14 +147,15 @@ my $testfile;
     my $tag;
     foreach $tag (keys %$info) {
         my $group = $exifTool->GetGroup($tag);
-        # eat return values so warning don't get printed
+        # eat return values so warnings don't get printed
         my @rtns = $exifTool->SetNewValue($tag,$info->{$tag},Group=>$group);
     }
     undef $info;
     my $image;
     $exifTool->WriteInfo('t/images/Canon.jpg', \$image);
     $exifTool->Options(Unknown => 1, Binary => 0, List => 0);
-    $info = $exifTool->ImageInfo(\$image);
+    # (must ignore filesize because it changes as null padding is discarded)
+    $info = $exifTool->ImageInfo(\$image, '-filesize');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     if (check($exifTool, $info, $testname, $testnum, 7)) {
         unlink $testfile;

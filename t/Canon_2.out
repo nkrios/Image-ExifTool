@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.27
 [File, File, Image]  - File Name: Canon1DmkIII.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 8 kB
@@ -128,6 +128,7 @@
 [MakerNotes, Canon, Image] 370 - File Index: 232
 [MakerNotes, Canon, Camera] 374 - Shutter Count: 1
 [MakerNotes, Canon, Image] 382 - Directory Index: 108
+[MakerNotes, Canon, Time] 1114 - Time Stamp 1: 2007:02:22 17:02:42
 [MakerNotes, Canon, Time] 1118 - Time Stamp: 1970:01:02 01:30:10
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS-1D Mark III
 [MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112

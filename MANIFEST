@@ -256,6 +256,7 @@ t/FujiFilm_5.out
 t/GIF.t
 t/GIF_2.out
 t/GIF_3.out
+t/GIF_4.out
 t/GPS.t
 t/GPS_2.out
 t/GPS_3.out

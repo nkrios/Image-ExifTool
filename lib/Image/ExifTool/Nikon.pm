@@ -45,7 +45,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.88';
+$VERSION = '1.89';
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -194,6 +194,7 @@ my %nikonLensIDs = (
     '9A 40 2D 53 2C 3C 9C 0E' => 'AF-S DX VR Zoom-Nikkor 18-55mm f/3.5-5.6G',
     '9C 54 56 56 24 24 9E 06' => 'AF-S Micro Nikkor 60mm f/2.8G ED',
 #
+    'FE 47 00 00 24 24 4B 06' => 'Sigma 4.5mm f/2.8 EX DC HSM Circular Fisheye', #JD
     '26 48 11 11 30 30 1C 02' => 'Sigma 8mm F4 EX Circular Fisheye',
     '79 40 11 11 2C 2C 1C 06' => 'Sigma 8mm F3.5 EX', #JD
     '02 3F 24 24 2C 2C 02 00' => 'Sigma 14mm F3.5',
@@ -232,6 +233,7 @@ my %nikonLensIDs = (
     '26 40 2D 80 2C 40 1C 06' => 'Sigma 18-200mm F3.5-6.3 DC',
     '26 48 31 49 24 24 1C 02' => 'Sigma 20-40mm F2.8',
     '26 48 37 56 24 24 1C 02' => 'Sigma 24-60mm F2.8 EX DG',
+    'B6 48 37 56 24 24 1C 02' => 'Sigma 24-60mm F2.8 EX DG',
     '26 54 37 5C 24 24 1C 02' => 'Sigma 24-70mm F2.8 EX DG Macro',
     '67 54 37 5C 24 24 1C 02' => 'Sigma 24-70mm F2.8 EX DG Macro',
     '26 40 37 5C 2C 3C 1C 02' => 'Sigma 24-70mm F3.5-5.6 Aspherical HF',
@@ -259,7 +261,7 @@ my %nikonLensIDs = (
     '26 3C 5C 82 30 3C 1C 02' => 'Sigma 70-210mm F4-5.6 UC-II',
     '26 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 DG Macro',
     '56 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 APO Macro Super II',
-    'E0 3C 5C 8E 30 3C 4B 06' => 'Sigma 70-300mm F4-5.6 APO DG MACRO HSM', #22
+    'E0 3C 5C 8E 30 3C 4B 06' => 'Sigma 70-300mm F4-5.6 APO DG Macro HSM', #22
     '02 37 5E 8E 35 3D 02 00' => 'Sigma 75-300mm F4.5-5.6 APO',
     '02 3A 5E 8E 32 3D 02 00' => 'Sigma 75-300mm F4.0-5.6',
     '77 44 61 98 34 3C 7B 0E' => 'Sigma 80-400mm f4.5-5.6 EX OS',
@@ -276,6 +278,7 @@ my %nikonLensIDs = (
     '00 53 2B 50 24 24 00 06' => 'Tamron SP AF17-50mm f/2.8 (A16)', #PH
     '00 3F 2D 80 2B 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)',
     '00 3F 2D 80 2C 40 00 06' => 'Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro',
+    '00 40 2D 88 2C 40 62 06' => 'Tamron AF18-250mm F/3.5-6.3 Di II LD Aspherical (IF) Macro',
     '07 40 2F 44 2C 34 03 02' => 'Tamron AF19-35mm f/3.5-4.5 N',
     '07 40 30 45 2D 35 03 02' => 'Tamron AF19-35mm f/3.5-4.5',
     '00 49 30 48 22 2B 00 02' => 'Tamron SP AF20-40mm f/2.7-3.5',
@@ -291,8 +294,6 @@ my %nikonLensIDs = (
     '4D 41 3C 8E 2C 40 62 02' => 'Tamron AF28-300mm f/3.5-6.3 XR LD Aspherical (IF)',
     '00 47 53 80 30 3C 00 06' => 'Tamron AF55-200mm f/4-5.6 Di II LD',
     '69 48 5C 8E 30 3C 6F 02' => 'Tamron AF70-300mm f/4-5.6 LD Macro 1:2',
-    '32 53 64 64 24 24 35 02' => 'Tamron SP AF90mm f/2.8 Di Macro 1:2 (272E)',
-    '00 4C 7C 7C 2C 2C 00 02' => 'Tamron SP AF180mm f/3.5 Di Model B01',
     '20 3C 80 98 3D 3D 1E 02' => 'Tamron AF200-400mm f/5.6 LD IF',
     '00 3E 80 A0 38 3F 00 02' => 'Tamron SP AF200-500mm f/5-6.3 Di LD (IF)',
     '00 3F 80 A0 38 3F 00 02' => 'Tamron SP AF200-500mm f/5-6.3 Di',
@@ -1622,7 +1623,6 @@ my %retouchValues = (
         OffsetPair => 0x202, # point to associated byte count
         DataTag => 'PreviewImage',
         Writable => 'int32u',
-        WriteGroup => 'NikonPreview',
         Protected => 2,
     },
     0x202 => {
@@ -1631,7 +1631,6 @@ my %retouchValues = (
         OffsetPair => 0x201, # point to associated offset
         DataTag => 'PreviewImage',
         Writable => 'int32u',
-        WriteGroup => 'NikonPreview',
         Protected => 2,
     },
     0x213 => {

@@ -24,7 +24,7 @@ use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $psAPP13hdr $psAPP13old
             @loadAllTables %UserDefined $evalWarning @noWriteTIFF);
 
-$VERSION = '7.25';
+$VERSION = '7.30';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -498,6 +498,7 @@ sub DummyWriteProc { return 1; }
         Description => 'ExifTool Version Number',
         Groups => \%allGroupsExifTool,
     },
+    GIFVersion => { },
     Now => {
         Groups => { 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'Time' },
         Notes => q{
@@ -873,8 +874,11 @@ sub ExtractInfo($;@)
     }
 
     if ($raf) {
-        # get file size and last modified time if this is a plain file
-        if ($raf->{FILE_PT} and -f $raf->{FILE_PT}) {
+        if (not $raf->{FILE_PT}) {
+            # get file size from image in memory
+            $self->FoundTag('FileSize', length ${$raf->{BUFF_PT}});
+        } elsif (-f $raf->{FILE_PT}) {
+            # get file size and last modified time if this is a plain file
             my $fileSize = -s _;
             my $fileTime = -M _;
             $self->FoundTag('FileSize', $fileSize) if defined $fileSize;
@@ -1635,10 +1639,9 @@ sub CanWrite($)
     if ($type eq 'TIFF') {
         # can't write TIFF files with certain extensions (various RAW formats)
         my $ext = GetFileExtension($file);
-        return grep(/^$ext$/, @noWriteTIFF) ? 0 : 1;
-    } else {
-        return scalar(grep /^$type$/, @writeTypes);
+        return grep(/^$ext$/, @noWriteTIFF) ? 0 : 1 if $ext;
     }
+    return scalar(grep /^$type$/, @writeTypes);
 }
 
 #------------------------------------------------------------------------------
@@ -3279,30 +3282,31 @@ sub ProcessJPEG($$)
             if ($$segDataPt =~ /^$psAPP13hdr/ or ($$segDataPt =~ /^$psAPP13old/ and $isOld=1)) {
                 $dumpType = 'Photoshop';
                 # add this data to the combined data if it exists
+                my $dataPt = $segDataPt;
                 if (defined $combinedSegData) {
                     $combinedSegData .= substr($$segDataPt,length($psAPP13hdr));
-                    $segDataPt = \$combinedSegData;
-                    $length = length $combinedSegData;  # update length
+                    $dataPt = \$combinedSegData;
                 }
                 # peek ahead to see if the next segment is photoshop data too
                 if ($nextMarker == $marker and $$nextSegDataPt =~ /^$psAPP13hdr/) {
                     # initialize combined data if necessary
                     $combinedSegData = $$segDataPt unless defined $combinedSegData;
-                    next;   # will handle the combined data the next time around
+                    # (will handle the Photoshop data the next time around)
+                } else {
+                    my $hdrlen = $isOld ? 27 : 14;
+                    # process APP13 Photoshop record
+                    my $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
+                    my %dirInfo = (
+                        DataPt   => $dataPt,
+                        DataPos  => $segPos,
+                        DataLen  => length $$dataPt,
+                        DirStart => $hdrlen,    # directory starts after identifier
+                        DirLen   => length($$dataPt) - $hdrlen,
+                        Parent   => $markerName,
+                    );
+                    $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
+                    undef $combinedSegData;
                 }
-                my $hdrlen = $isOld ? 27 : 14;
-                # process APP13 Photoshop record
-                my $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
-                my %dirInfo = (
-                    DataPt   => $segDataPt,
-                    DataPos  => $segPos,
-                    DataLen  => $length,
-                    DirStart => $hdrlen,    # directory starts after identifier
-                    DirLen   => $length - $hdrlen,
-                    Parent   => $markerName,
-                );
-                $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
-                undef $combinedSegData;
             } elsif ($$segDataPt =~ /^Adobe_CM/) {
                 $dumpType = 'Adobe_CM';
                 SetByteOrder('MM');
@@ -4305,10 +4309,18 @@ sub ProcessBinaryData($$$)
             $nextIndex = $ni unless $nextIndex > $ni;
         }
         if ($$tagInfo{SubDirectory}) {
+            my $len = $size - $entry;
+            # use specified subdirectory length if given
+            if ($$tagInfo{Format} and $formatSize{$format}) {
+                my $n = $count * $formatSize{$format};
+                $len = $n if $n < $len;
+            } else {
+                $len = $size - $entry;  # subdirectory runs to end of this one
+            }
             my %subdirInfo = (
                 DataPt   => $dataPt,
                 DirStart => $entry + $offset,
-                DirLen   => $size - $entry,
+                DirLen   => $len,
                 Base     => $base,
             );
             my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
