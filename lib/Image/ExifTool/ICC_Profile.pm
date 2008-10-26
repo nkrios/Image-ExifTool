@@ -3,7 +3,7 @@
 #
 # Description:  Read ICC Profile meta information
 #
-# Revisions:    11/16/04 - P. Harvey Created
+# Revisions:    11/16/2004 - P. Harvey Created
 #
 # References:   1) http://www.color.org/icc_specs2.html (ICC.1:2003-09)
 #               2) http://www.color.org/icc_specs2.html (ICC.1:2001-04)
@@ -269,10 +269,12 @@ my %profileClass = (
     48 => {
         Name => 'DeviceManufacturer',
         Format => 'string[4]',
+        # KODA = Kodak
     },
     52 => {
         Name => 'DeviceModel',
         Format => 'string[4]',
+        # ROMM = Refrence Output Medium Metric
     },
     56 => {
         Name => 'DeviceAttributes',
@@ -302,6 +304,7 @@ my %profileClass = (
     80 => {
         Name => 'ProfileCreator',
         Format => 'string[4]',
+        # KODA = Kodak
     },
     84 => {
         Name => 'ProfileID',

@@ -1,7 +1,7 @@
 City: Kingston
 Comment: a new comment
-ExifToolVersion: 7.27
-FileSize: 4 kB
+ExifToolVersion: 7.50
+FileSize: 4.0 kB
 FileType: GIF
 GIFVersion: 89a
 ImageHeight: 8
@@ -9,3 +9,4 @@ ImageSize: 8x8
 ImageWidth: 8
 MIMEType: image/gif
 Title: GIF with XMP
+XMPToolkit: Image::ExifTool 7.50

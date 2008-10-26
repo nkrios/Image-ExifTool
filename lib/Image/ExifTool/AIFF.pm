@@ -4,6 +4,7 @@
 # Description:  Read AIFF meta information
 #
 # Revisions:    01/06/2006 - P. Harvey Created
+#               09/22/2008 - PH Added DjVu support
 #
 # References:   1) http://developer.apple.com/documentation/QuickTime/INMAC/SOUND/imsoundmgr.30.htm#pgfId=3190
 #               2) http://astronomy.swin.edu.au/~pbourke/dataformats/aiff/
@@ -17,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::ID3;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # information for time/date-based tags (time zero is Jan 1, 1904)
 my %timeInfo = (
@@ -28,7 +29,6 @@ my %timeInfo = (
 
 # AIFF info
 %Image::ExifTool::AIFF::Main = (
-    PROCESS_PROC => \&Image::ExifTool::AIFF::ProcessSubChunks,
     GROUPS => { 2 => 'Audio' },
     NOTES => 'Only the tags decoded by ExifTool are listed in this table.',
 #    FORM => 'Format',
@@ -137,17 +137,33 @@ sub ProcessAIFF($$)
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my $verbose = $exifTool->Options('Verbose');
-    my ($buff, $err);
+    my ($buff, $err, $tagTablePtr, $page, $type);
 
     # verify this is a valid AIFF file
     return 0 unless $raf->Read($buff, 12) == 12;
-    return 0 unless $buff =~ /^FORM....(AIF(F|C))/s;
-    $exifTool->SetFileType($1);
-    SetByteOrder('MM');
-    my $tagTablePtr = GetTagTable('Image::ExifTool::AIFF::Main');
     my $pos = 12;
+    # check for DjVu image
+    if ($buff =~ /^AT&TFORM/) {
+        # http://www.djvu.org/
+        # http://djvu.sourceforge.net/specs/djvu3changes.txt
+        my $buf2;
+        return 0 unless $raf->Read($buf2, 4) == 4 and $buf2 =~ /^(DJVU|DJVM)/;
+        $pos += 4;
+        $buff = substr($buff, 4) . $buf2;
+        $tagTablePtr = GetTagTable('Image::ExifTool::DjVu::Main');
+        $exifTool->SetFileType('DJVU');
+        # modifiy FileType to indicate a multi-page document
+        $exifTool->{VALUE}->{FileType} .= " (multi-page)" if $buf2 eq 'DJVM';
+        $type = 'DjVu';
+    } else {
+        return 0 unless $buff =~ /^FORM....(AIF(F|C))/s;
+        $exifTool->SetFileType($1);
+        $tagTablePtr = GetTagTable('Image::ExifTool::AIFF::Main');
+        $type = 'AIFF';
+    }
+    SetByteOrder('MM');
 #
-# Read chunks in AIFF image
+# Read through the IFF chunks
 #
     for (;;) {
         $raf->Read($buff, 8) == 8 or last;
@@ -158,7 +174,12 @@ sub ProcessAIFF($$)
         # AIFF chunks are padded to an even number of bytes
         my $len2 = $len + ($len & 0x01);
         if ($tagInfo) {
-            $raf->Read($buff, $len2) == $len2 or $err=1, last;
+            if ($$tagInfo{TypeOnly}) {
+                $len = $len2 = 4;
+                $page = ($page || 0) + 1;
+                $exifTool->VPrint(0, $exifTool->{INDENT} . "Page $page:\n");
+            }
+            $raf->Read($buff, $len2) >= $len or $err=1, last;
             $exifTool->HandleTag($tagTablePtr, $tag, $buff,
                 DataPt => \$buff,
                 DataPos => $pos,
@@ -170,7 +191,7 @@ sub ProcessAIFF($$)
         }
         $pos += $len2;
     }
-    $err and $exifTool->Warn('Error reading AIFF file (corrupted?)');
+    $err and $exifTool->Warn("Error reading $type file (corrupted?)");
     return 1;
 }
 
@@ -216,4 +237,3 @@ L<Image::ExifTool::TagNames/AIFF Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut
-

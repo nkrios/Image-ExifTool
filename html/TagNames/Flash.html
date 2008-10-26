@@ -7,13 +7,25 @@
 </head>
 <body>
 <h2 class=top>Flash Tags</h2>
-<p>The information below is extracted from the header of SWF (Shockwave Flash)
-files.</p>
+<p>The information below is extracted from SWF (Shockwave Flash) files.  Tags
+with string ID&#39;s represent information extracted from the file header.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>0x0045</td>
+<td>FileAttributes</td>
+<td class=c>N</td>
+<td><span class=s>Bit 0 = UseNetwork
+  <br>Bit 3 = ActionScript3
+  <br>Bit 4 = HasMetadata</span></td></tr>
+<tr class=b>
+<td>0x004d</td>
+<td>XMP</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
 <tr>
 <td>'Compressed'</td>
 <td>Compressed</td>
@@ -254,36 +266,41 @@ information from any tag found.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'liveXML'</td>
+<td>XMP</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+<tr>
 <td>'metadatacreator'</td>
 <td>MetadataCreator</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'metadatadate'</td>
 <td>MetadataDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'stereo'</td>
 <td>Stereo</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'videocodecid'</td>
 <td>VideoCodecID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'videodatarate'</td>
 <td>VideoBitrate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'videosize'</td>
 <td>VideoSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'width'</td>
 <td>ImageWidth</td>
 <td class=c>N</td>
@@ -333,7 +350,7 @@ existing parameters, with tag names like &quot;CuePoint0ParameterXxx&quot;.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 5, 2008</i>
+<br><i>Last revised Oct 24, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

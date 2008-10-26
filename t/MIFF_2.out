@@ -1,10 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: MIFF.miff
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21
+[File, File, Image]  - File Size: 3.7 kB
+[File, File, Time]  - File Modification Date/Time: 2005:11:14 14:47:21-05:00
 [File, File, Image]  - File Type: MIFF
 [File, File, Image]  - MIME Type: application/x-magick-image
+[File, File, Image]  - Current IPTC Digest: b9ee34aec50758de410ed147d4b80eca
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
 [MIFF, MIFF, Image] id - ID: ImageMagick
 [MIFF, MIFF, Image] class - Class: DirectClass
@@ -26,6 +27,7 @@
 [IPTC, IPTC, Other] 10 - Urgency: 8
 [IPTC, IPTC, Other] 25 - Keywords: ExifTool, Test, MIFF
 [IPTC, IPTC, Other] 120 - Caption-Abstract: MIFF test
+[Photoshop, Photoshop, Image] 1061 - IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
 [Photoshop, Photoshop, Image] 0 - X Resolution: 72
 [Photoshop, Photoshop, Image] 2 - Displayed Units X: inches
 [Photoshop, Photoshop, Image] 4 - Y Resolution: 72
@@ -81,6 +83,7 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 854
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 0
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 5.47
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey

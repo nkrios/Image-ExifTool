@@ -5,10 +5,10 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..35\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..36\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
-# test 1: Load ExifTool
+# test 1: Load the module(s)
 use Image::ExifTool 'ImageInfo';
 $loaded = 1;
 print "ok 1\n";
@@ -329,8 +329,10 @@ my $testOK;
     $exifTool->SetNewValue(Artist => 'Phil', Group => 'IFD0');
     $exifTool->SetNewValue(Artist => 'Harvey', Group => 'ExifIFD');
     $exifTool->SetNewValue(DateTimeOriginal => '2006:03:27 16:25:00');
+    $exifTool->SetNewValue(Keywords => ['one','two']);
     $exifTool->SaveNewValues();
     $exifTool->SetNewValue(Artist => 'nobody');
+    $exifTool->SetNewValue(Keywords => 'three');
     $exifTool->SetNewValuesFromFile('t/images/FujiFilm.jpg');
     $exifTool->RestoreNewValues();
     $testfile = "t/${testname}_${testnum}_failed.jpg";
@@ -573,35 +575,43 @@ my $testOK;
     print "ok $testnum\n";
 }
 
-# test 34: copy list tag to list and non-list tags
+# test 34: copy list tag to list and non-list tags with different options
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(List => 1);
     $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg',
-            'xmp:subject<iptc:keywords', 'comment<iptc:keywords');
+            { Replace => 1 },
+            'xmp:subject<filename',
+            'xmp:subject<iptc:keywords',
+            'comment<iptc:keywords',
+            { Replace => 0 },
+            'xmp:HierarchicalSubject<filename',
+            'xmp:HierarchicalSubject<iptc:keywords',
+    );
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
-    $info = $exifTool->ImageInfo($testfile, 'xmp:subject', 'comment');
-    my $err = '';
-    my $val = $$info{Comment} || '';
-    my $expected = 'ExifTool, Test, XMP';
-    $err .= "  Comment is '$val', but expected '$expected'\n" unless $val eq $expected;
-    $val = $$info{Subject} || '';
-    if (ref $val eq 'ARRAY') {
-        unless (@$val == 3) {
-            $err .= "  Subject does not contain 3 values: '" . join(', ', @$val) . "'\n";
+    $info = $exifTool->ImageInfo($testfile, 'xmp:subject', 'comment', 'HierarchicalSubject');
+    my $err;
+    if (check($exifTool, $info, $testname, $testnum)) {
+        # make sure it was an array reference
+        my $val = $$info{Subject} || '';
+        my $err;
+        if (ref $val ne 'ARRAY') {
+            $err = "Subject is not an ARRAY: '$val'";
+        } elsif (@$val != 3) {
+            $err = "Subject does not contain 3 values: '" . join(', ', @$val) . "'";
+        }
+        if ($err) {
+            warn "\n  $err\n";
+        } else {
+            unlink $testfile;
         }
     } else {
-        $err .= "  Subject is not an ARRAY: '$val'\n";
+        $err = 1;
     }
-    if ($err) {
-        warn "\n$err";
-        print 'not ';
-    } else {
-        unlink $testfile;
-    }
+    print 'not ' if $err;
     print "ok $testnum\n";
 }
 
@@ -617,6 +627,24 @@ my $testOK;
     $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
     $exifTool->Options(Composite => 0);
     my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 36: Test adding and deleting from the same list
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue('IPTC:Keywords', 'out', DelValue => 1);
+    $exifTool->SetNewValue('IPTC:Keywords', 'in', AddValue => 1);
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile, 'IPTC:all');
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
     } else {

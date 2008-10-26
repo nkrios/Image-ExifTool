@@ -1,11 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.49
 [File, File, Image]  - File Name: GPS_3_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 2 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:13 09:33:23
+[File, File, Image]  - File Size: 2.1 kB
+[File, File, Time]  - File Modification Date/Time: 2008:10:14 11:38:12-04:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image]  - Current IPTC Digest: 09f7f522cf163e96cf778a81de1a9c2b
 [File, File, Image] ImageWidth - Image Width: 120
 [File, File, Image] ImageHeight - Image Height: 80
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
@@ -75,7 +76,7 @@
 [IPTC, IPTC, Time] 55 - Date Created: 2002:06:20
 [IPTC, IPTC, Location] 90 - City:  
 [IPTC, IPTC, Location] 95 - Province-State:  
-[IPTC, IPTC, Location] 101 - Country-Primary Location Name: Ubited Kingdom
+[IPTC, IPTC, Location] 101 - Country-Primary Location Name: United Kingdom
 [IPTC, IPTC, Other] 15 - Category: BUS
 [IPTC, IPTC, Other] 20 - Supplemental Categories: Communications
 [IPTC, IPTC, Other] 10 - Urgency: 5

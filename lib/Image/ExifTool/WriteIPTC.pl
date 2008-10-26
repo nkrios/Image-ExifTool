@@ -70,7 +70,7 @@ my %iptcCharsetInv = ( 'UTF8' => "\x1b%G" );
 # Control chars (designated and invoked)
 #   C0 : 0x1b 0x21 F (0x21 = '!')
 #   C1 : 0x1b 0x22 F (0x22 = '"')
-# Complete codes (control+graphics, designated and involked)
+# Complete codes (control+graphics, designated and invoked)
 #   0x1b 0x25 F   (0x25 = '%')
 #   0x1b 0x25 I F
 #   0x1b 0x25 0x47 ("\x1b%G") - UTF-8
@@ -199,14 +199,23 @@ sub IptcDate($)
 sub IptcTime($)
 {
     my $val = shift;
-    if ($val =~ /\s*\b(\d{1,2}):?(\d{1,2}):?(\d{1,2})(\S*)\s*$/) {
+    if ($val =~ /\s*\b(\d{1,2}):?(\d{2}):?(\d{2})(\S*)\s*$/) {
         $val = sprintf("%.2d%.2d%.2d",$1,$2,$3);
         my $tz = $4;
-        if ($tz =~ /([+-]\d{1,2}):?(\d{1,2})/) {
-            $val .= sprintf("%+.2d%.2d",$1,$2);
+        if ($tz =~ /([+-]\d{1,2}):?(\d{2})/) {
+            $tz = sprintf("%+.2d%.2d",$1,$2);
+        } elsif ($tz !~ /Z/i and eval 'require Time::Local') {
+            # use local system timezone by default (note: it is difficult to use
+            # the proper local timezone for this date/time because the date tag
+            # is written separately so we don't know what the local timezone offset
+            # really should be for this date/time)
+            my @tm = localtime(time());
+            my $diff = Time::Local::timegm(@tm) - Image::ExifTool::TimeLocal(@tm);
+            ($tz = Image::ExifTool::TimeZoneString($diff / 60)) =~ tr/://d;
         } else {
-            $val .= '+0000';    # don't know the time zone
+            $tz = '+0000';  # don't know the time zone
         }
+        $val .= $tz;
     } else {
         warn "Invalid time format (use HH:MM:SS[+/-HH:MM])\n";
         undef $val;     # time format error
@@ -260,14 +269,23 @@ sub InvConvertPictureNumber($)
 
 #------------------------------------------------------------------------------
 # Write IPTC data record
-# Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
-#         2) tag table reference
+# Inputs: 0) ExifTool object ref, 1) source dirInfo ref, 2) tag table ref
 # Returns: IPTC data block (may be empty if no IPTC data)
 # Notes: Increments ExifTool CHANGED flag for each tag changed
-sub WriteIPTC($$$)
+sub DoWriteIPTC($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    $exifTool or return 1;    # allow dummy access to autoload this package
+    my $verbose = $exifTool->Options('Verbose');
+    my $out = $exifTool->Options('TextOut');
+
+    # avoid editing IPTC directory unless necessary:
+    # - improves speed
+    # - avoids changing current MD5 digest unnecessarily
+    # - avoids adding mandatory tags unless some other IPTC is changed
+    unless (exists $exifTool->{EDIT_DIRS}->{$$dirInfo{DirName}}) {
+        print $out "$$exifTool{INDENT}  [nothing changed]\n" if $verbose;
+        return undef;
+    }
     my $dataPt = $$dirInfo{DataPt};
     unless ($dataPt) {
         my $emptyData = '';
@@ -275,8 +293,6 @@ sub WriteIPTC($$$)
     }
     my $start = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen};
-    my $verbose = $exifTool->Options('Verbose');
-    my $out = $exifTool->Options('TextOut');
     my ($tagInfo, %iptcInfo, $tag);
 
     # begin by assuming IPTC is coded in Latin unless otherwise specified
@@ -542,6 +558,32 @@ sub WriteIPTC($$$)
     return $newData;
 }
 
+#------------------------------------------------------------------------------
+# Write IPTC data record and calculate NewIPTCDigest
+# Inputs: 0) ExifTool object ref, 1) source dirInfo ref, 2) tag table ref
+# Returns: IPTC data block (may be empty if no IPTC data)
+# Notes: Increments ExifTool CHANGED flag for each tag changed
+sub WriteIPTC($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    $exifTool or return 1;    # allow dummy access to autoload this package
+    my $newData = DoWriteIPTC($exifTool, $dirInfo, $tagTablePtr);
+    return $newData unless eval 'require Digest::MD5';
+    my $dataPt;
+    if (defined $newData) {
+        $dataPt = \$newData;
+    } else {
+        $dataPt = $$dirInfo{DataPt};
+        if ($$dirInfo{DirStart} or length($$dataPt) != $$dirInfo{DirLen}) {
+            my $buff = substr($$dataPt, $$dirInfo{DirStart}, $$dirInfo{DirLen});
+            $dataPt = \$buff;
+        }
+    }
+    # set NewIPTCDigest data member unless IPTC is being deleted
+    $$exifTool{NewIPTCDigest} = Digest::MD5::md5($$dataPt) if length $$dataPt;
+    return $newData;
+}
+        
 
 1; # end
 

@@ -11,7 +11,7 @@
 #
 # References:   0) http://www.exif.org/Exif2-2.PDF
 #               1) http://partners.adobe.com/asn/developer/pdfs/tn/TIFF6.pdf
-#               2) http://www.adobe.com/products/dng/pdfs/dng_spec.pdf
+#               2) http://www.adobe.com/products/dng/pdfs/dng_spec_1_2_0_0.pdf
 #               3) http://www.awaresystems.be/imaging/tiff/tifftags.html
 #               4) http://www.remotesensing.org/libtiff/TIFFTechNote2.html
 #               5) http://www.exif.org/dcf.PDF
@@ -27,6 +27,7 @@
 #              15) http://crousseau.free.fr/imgfmt_raw.htm
 #              16) http://www.cybercom.net/~dcoffin/dcraw/
 #              17) http://www.digitalpreservation.gov/formats/content/tiff_tags.shtml
+#              18) http://www.asmail.be/msg0055568584.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
@@ -37,7 +38,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.59';
+$VERSION = '2.67';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -45,6 +46,7 @@ sub CheckExif($$$);
 sub RebuildMakerNotes($$$);
 sub EncodeExifText($$);
 sub ValidateIFD($;$);
+sub ProcessTiffIFD($$$);
 
 # size limit for loading binary data block into memory
 sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
@@ -140,9 +142,11 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     34677 => 'SGILog24', #3
     34712 => 'JPEG 2000', #3
     34713 => 'Nikon NEF Compressed', #PH
+    34718 => 'Microsoft Document Imaging (MDI) Binary Level Codec', #18
+    34719 => 'Microsoft Document Imaging (MDI) Progressive Transform Codec', #18
+    34720 => 'Microsoft Document Imaging (MDI) Vector', #18
     65000 => 'Kodak DCR Compressed', #PH
     65535 => 'Pentax PEF Compressed', #Jens
-    
 );
 
 %photometricInterpretation = (
@@ -205,7 +209,7 @@ my %longBin = (
     0xfe => {
         Name => 'SubfileType',
         # set priority directory if this is the full resolution image
-        RawConv => '$self->SetPriorityDir() if $val == 0; $val',
+        RawConv => '$self->SetPriorityDir() if $val eq "0"; $val',
         PrintConv => {
             0 => 'Full-resolution Image',
             1 => 'Reduced-resolution image',
@@ -220,7 +224,7 @@ my %longBin = (
     0xff => {
         Name => 'OldSubfileType',
         # set priority directory if this is the full resolution image
-        RawConv => '$self->SetPriorityDir() if $val == 1; $val',
+        RawConv => '$self->SetPriorityDir() if $val eq "1"; $val',
         PrintConv => {
             1 => 'Full-resolution image',
             2 => 'Reduced-resolution image',
@@ -555,7 +559,7 @@ my %longBin = (
     0x14a => [
         {
             Name => 'SubIFD',
-            Condition => '$$self{TIFF_TYPE} ne "ARW" or $$self{Model} ne "DSLR-A100"',
+            Condition => '$$self{TIFF_TYPE} ne "ARW" or $$self{Model} !~ /^DSLR-A100\b/',
             Groups => { 1 => 'SubIFD' },
             Flags => 'SubIFD',
             SubDirectory => {
@@ -690,7 +694,7 @@ my %longBin = (
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
-            WriteCondition => '$$self{FILE_TYPE} ne "TIFF"',
+            WriteCondition => '$$self{FILE_TYPE} ne "TIFF" or $$self{TIFF_TYPE} eq "CR2"',
             Protected => 2,
         },
         {
@@ -744,7 +748,7 @@ my %longBin = (
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
-            WriteCondition => '$$self{FILE_TYPE} ne "TIFF"',
+            WriteCondition => '$$self{FILE_TYPE} ne "TIFF" or $$self{TIFF_TYPE} eq "CR2"',
             Protected => 2,
         },
         {
@@ -793,14 +797,7 @@ my %longBin = (
     },
     0x212 => {
         Name => 'YCbCrSubSampling',
-        PrintConv => {
-            '1 1' => 'YCbCr4:4:4 (1 1)', #PH
-            '2 1' => 'YCbCr4:2:2 (2 1)', #14
-            '2 2' => 'YCbCr4:2:0 (2 2)', #14
-            '4 1' => 'YCbCr4:1:1 (4 1)', #14
-            '4 2' => 'YCbCr4:1:0 (4 2)', #PH
-            '1 2' => 'YCbCr4:4:0 (1 2)', #PH
-        },
+        PrintConv => \%Image::ExifTool::JPEG::yCbCrSubSampling,
         Priority => 0,
     },
     0x213 => {
@@ -863,6 +860,19 @@ my %longBin = (
     0x8298 => {
         Name => 'Copyright',
         Groups => { 2 => 'Author' },
+        Format => 'undef',
+        Notes => q{
+            may contain copyright notices for photographer and editor, separated by a
+            newline
+        },
+        # internally the strings are separated by a null character in this format:
+        # Photographer only: photographer + NULL
+        # Both:              photographer + NULL + editor + NULL
+        # Editor only:       SPACE + NULL + editor + NULL
+        # 1) translate first NULL (and surrounding whitespace) to a newline
+        # 2) truncate at second NULL
+        # 3) remove trailing newline if it exists
+        ValueConv => '$val=~s/\s*\0\s*/\n/; $val=~s/\0.*//; $val=~s/\n+$//; $val',
     },
     0x829a => {
         Name => 'ExposureTime',
@@ -1600,7 +1610,7 @@ my %longBin = (
     0xc428 => 'OceApplicationSelector', #3
     0xc429 => 'OceIDNumber', #3
     0xc42a => 'OceImageLogic', #3
-    0xc44f => 'Annotations', #7
+    0xc44f => { Name => 'Annotations', Binary => 1 }, #7
     0xc4a5 => {
         Name => 'PrintIM', # (writable directory!)
         # must set Writable here so this tag will be saved with MakerNotes option
@@ -1612,11 +1622,14 @@ my %longBin = (
         },
     },
 #
-# DNG tags 0xc6XX (ref 2 unless otherwise stated)
+# DNG tags 0xc6XX and 0xc7XX (ref 2 unless otherwise stated)
 #
     0xc612 => {
         Name => 'DNGVersion',
-        Notes => 'tags 0xc612-0xc65d are used in DNG images',
+        Notes => 'tags 0xc612-0xc726 are used in DNG images unless otherwise noted',
+        DataMember => 'DNGVersion',
+        RawConv => '$$self{DNGVersion} = $val',
+        PrintConv => '$val =~ tr/ /./; $val',
     },
     0xc613 => 'DNGBackwardVersion',
     0xc614 => 'UniqueCameraModel',
@@ -1643,10 +1656,7 @@ my %longBin = (
             5 => 'Even rows offset left 1/2 column',
         },
     },
-    0xc618 => {
-        Name => 'LinearizationTable',
-        Binary => 1,
-    },
+    0xc618 => { Name => 'LinearizationTable', Binary => 1 },
     0xc619 => 'BlackLevelRepeatDim',
     0xc61a => 'BlackLevel',
     0xc61b => { Name => 'BlackLevelDeltaH', %longBin },
@@ -1705,6 +1715,7 @@ my %longBin = (
             Condition => '$$valPt =~ /^PENTAX \0/',
             Name => 'DNGPentaxData',
             DNGMakerNotes => 1,
+            MakerNotes => 1,    # (causes "MakerNotes header" to be identified in HtmlDump output)
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Pentax::Main',
                 Start => '$valuePtr + 10',
@@ -1750,7 +1761,7 @@ my %longBin = (
     },
     0xc660 => { #3
         Name => 'AliasLayerMetadata',
-        Notes => 'used by Alias Sketchbook Pro, not a DNG tag',
+        Notes => 'used by Alias Sketchbook Pro',
     },
     0xc68b => {
         Name => 'OriginalRawFileName',
@@ -1791,6 +1802,75 @@ my %longBin = (
         Name => 'Title',
         Notes => 'proprietary Panasonic tag',
     },
+    0xc6bf => 'ColorimetricReference',
+    0xc6f3 => 'CameraCalibrationSig',
+    0xc6f4 => 'ProfileCalibrationSig',
+    0xc6f5 => {
+        Name => 'ProfileIFD', # (ExtraCameraProfiles)
+        Groups => { 1 => 'ProfileIFD' },
+        Flags => 'SubIFD',
+        SubDirectory => {
+            ProcessProc => \&ProcessTiffIFD,
+            WriteProc => \&ProcessTiffIFD,
+            DirName => 'ProfileIFD',
+            Start => '$val',
+            Base => '$start',   # offsets relative to start of TIFF-like header
+            MaxSubdirs => 10,
+            Magic => 0x4352,    # magic number for TIFF-like header
+        },
+    },
+    0xc6f6 => 'AsShotProfileName',
+    0xc6f7 => 'NoiseReductionApplied',
+    0xc6f8 => 'ProfileName',
+    0xc6f9 => 'ProfileHueSatMapDims',
+    0xc6fa => 'ProfileHueSatMapData1',
+    0xc6fb => 'ProfileHueSatMapData2',
+    0xc6fc => {
+        Name => 'ProfileToneCurve',
+        Binary => 1,
+    },
+    0xc6fd => {
+        Name => 'ProfileEmbedPolicy',
+        PrintConv => {
+            0 => 'Allow Copying',
+            1 => 'Embed if Used',
+            2 => 'Never Embed',
+            3 => 'No Restrictions',
+        },
+    },
+    0xc6fe => 'ProfileCopyright',
+    0xc714 => 'ForwardMatrix1',
+    0xc715 => 'ForwardMatrix2',
+    0xc716 => 'PreviewApplicationName',
+    0xc717 => 'PreviewApplicationVersion',
+    0xc718 => 'PreviewSettingsName',
+    0xc719 => {
+        Name => 'PreviewSettingsDigest',
+        Format => 'undef',
+        ValueConv => 'unpack("H*", $val)',
+    },
+    0xc71a => 'PreviewColorSpace',
+    0xc71b => {
+        Name => 'PreviewDateTime',
+        ValueConv => q{
+            require Image::ExifTool::XMP;
+            return Image::ExifTool::XMP::ConvertXMPDate($val);
+        },
+    },
+    0xc71c => {
+        Name => 'RawImageDigest',
+        Format => 'undef',
+        ValueConv => 'unpack("H*", $val)',
+    },
+    0xc71d => {
+        Name => 'OriginalRawFileDigest',
+        Format => 'undef',
+        ValueConv => 'unpack("H*", $val)',
+    },
+    0xc71e => 'SubTileBlockSize',
+    0xc71f => 'RowInterleaveFactor',
+    0xc725 => 'ProfileLookTableDims',
+    0xc726 => 'ProfileLookTableData',
     0xea1c => { #13
         Name => 'Padding',
         Binary => 1,
@@ -1803,6 +1883,30 @@ my %longBin = (
     0xea1d => {
         Name => 'OffsetSchema',
         Notes => "Microsoft's ill-conceived maker note offset difference",
+        # From the Microsoft documentation:
+        # 
+        #     Any time the "Maker Note" is relocated by Windows, the Exif MakerNote
+        #     tag (37500) is updated automatically to reference the new location. In
+        #     addition, Windows records the offset (or difference) between the old and
+        #     new locations in the Exif OffsetSchema tag (59933). If the "Maker Note"
+        #     contains relative references, the developer can add the value in
+        #     OffsetSchema to the original references to find the correct information.
+        # 
+        # My recommendation is for other developers to ignore this tag because the
+        # information it contains is unreliable. It will be wrong if the image has
+        # been subsequently edited by another application that doesn't recognize the
+        # new Microsoft tag.
+        # 
+        # The new tag unfortunately only gives the difference between the new maker
+        # note offset and the original offset. Instead, it should have been designed
+        # to store the original offset. The new offset may change if the image is
+        # edited, which will invalidate the tag as currently written. If instead the
+        # original offset had been stored, the new difference could be easily
+        # calculated because the new maker note offset is known.
+        # 
+        # I exchanged emails with a Microsoft technical representative, pointing out
+        # this problem shortly after they released the update (Feb 2007), but so far
+        # they have taken no steps to address this (over a year later).
     },
 
     # tags in the range 0xfde8-0xfe58 have been observed in PS7 files
@@ -1863,7 +1967,7 @@ my %longBin = (
         Desire => {
             1 => 'ScaleFactor35efl',
         },
-        ValueConv => '$val[0] * ($val[1] ? $val[1] : 1)',
+        ValueConv => 'ToFloat(@val); ($val[0] || 0) * ($val[1] || 1)',
         PrintConv => '$val[1] ? sprintf("%.1f mm (35 mm equivalent: %.1f mm)", $val[0], $val) : sprintf("%.1f mm", $val)',
     },
     ScaleFactor35efl => {
@@ -1909,7 +2013,8 @@ my %longBin = (
             2 => 'CircleOfConfusion',
         },
         ValueConv => q{
-            return undef unless $val[1] and $val[2];
+            ToFloat(@val);
+            return 'inf' unless $val[1] and $val[2];
             return $val[0] * $val[0] / ($val[1] * $val[2] * 1000);
         },
         PrintConv => 'sprintf("%.2f m", $val)',
@@ -1924,7 +2029,8 @@ my %longBin = (
             3 => 'CircleOfConfusion',
         },
         ValueConv => q{
-            return undef unless $val[1] and $val[3];
+            ToFloat(@val);
+            return 0 unless $val[1] and $val[3];
             $val[0] or $val[0] = 1e10;  # use a large number for 'inf'
             my ($s, $f) = ($val[0], $val[1]);
             my $t = $val[2] * $val[3] * ($s * 1000 - $f) / ($f * $f);
@@ -1955,6 +2061,7 @@ my %longBin = (
         # ref http://www.bobatkins.com/photography/technical/field_of_view.html
         # (calculations below apply to rectilinear lenses only, not fisheye)
         ValueConv => q{
+            ToFloat(@val);
             return undef unless $val[0] and $val[1];
             my $corr = 1;
             if ($val[2]) {
@@ -1982,7 +2089,8 @@ my %longBin = (
             0 => 'DateCreated',
             1 => 'TimeCreated',
         },
-        ValueConv => '"$val[0] $val[1]"',
+        # (XMP:DateCreated may contain time too, so use this if it does)
+        ValueConv => '$val[0]=~/ / ? $val[0] : "$val[0] $val[1]"',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     # create DateTimeOriginal from DateTimeCreated if not set already
@@ -2087,7 +2195,7 @@ my %longBin = (
         ValueConv => q{
             my @a = split / /, $val[0];
             my @b = split / /, $val[1];
-            return undef unless @a==2 and @b==$a[0]*$a[1];
+            return '?' unless @a==2 and @b==$a[0]*$a[1];
             return Set16u($a[0]) . Set16u($a[1]) . pack('C*', @b);
         },
         PrintConv => 'Image::ExifTool::Exif::PrintCFAPattern($val)',
@@ -2131,6 +2239,27 @@ my %longBin = (
         },
         ValueConv => '"$val[0] $val[1]"',
         PrintConv => '"$prt[0], $prt[1]"',
+    },
+    LensID => {
+        Groups => { 2 => 'Camera' },
+        Require => {
+            0 => 'LensType',
+        },
+        Desire => {
+            1 => 'FocalLength',
+            2 => 'MaxAperture',
+            3 => 'MaxApertureValue',
+            4 => 'ShortFocal',
+            5 => 'LongFocal',
+            6 => 'LensModel',
+        },
+        Notes => q{
+            attempt to identify the actual lens from all lenses with a given LensType.
+            Applies only to LensType values with a lookup table.  May be configured
+            by adding user-defined lenses
+        },
+        ValueConv => '$val[0]',
+        PrintConv => 'Image::ExifTool::Exif::PrintLensID($self, @val)',
     },
 );
 
@@ -2182,6 +2311,8 @@ sub CalculateLV($$$)
 # Returns: 35mm conversion factor (or undefined if it can't be calculated)
 sub CalcScaleFactor35efl
 {
+    my $res = $_[6];    # save resolution units (in case they have been converted to string)
+    Image::ExifTool::ToFloat(@_);
     my $focal = shift;
     my $foc35 = shift;
 
@@ -2202,7 +2333,8 @@ sub CalcScaleFactor35efl
         }
         unless ($diag) {
             # get number of mm in units (assume inches unless otherwise specified)
-            my $units = { 3=>10, 4=>1, 5=>0.001 }->{ shift() || '' } || 25.4;
+            my %lkup = ( 3=>10, 4=>1, 5=>0.001 , cm=>10, mm=>1, um=>0.001 );
+            my $units = $lkup{ shift() || $res || '' } || 25.4;
             my $x_res = shift || return undef;
             my $y_res = shift || return undef;
             Image::ExifTool::IsFloat($x_res) and $x_res != 0 or return undef;
@@ -2416,6 +2548,84 @@ sub PrintCFAPattern($)
 }
 
 #------------------------------------------------------------------------------
+# Attempt to identify the specific lens if multiple lenses have the same LensType
+# Inputs: 0) ExifTool object ref, 1) LensType, 2) FocalLength, 3) MaxAperture,
+#         4) MaxApertureValue, 5) ShortFocal, 6) LongFocal, 7) LensModel
+sub PrintLensID(@)
+{
+    my ($exifTool, $lensType, $focalLength, $maxAperture, $maxApertureValue,
+        $shortFocal, $longFocal, $lensModel) = @_;
+    # the rest of the logic relies on the LensType lookup:
+    return undef unless defined $lensType;
+    my $printConv = $exifTool->{TAG_INFO}->{LensType}->{PrintConv};
+    return undef unless ref $printConv eq 'HASH';
+    # use MaxApertureValue if MaxAperture is not available
+    $maxAperture = $maxApertureValue unless $maxAperture;
+    if ($shortFocal and $longFocal) {
+        # Canon includes makernote information which allows better lens identification
+        require Image::ExifTool::Canon;
+        return Image::ExifTool::Canon::PrintLensID($printConv, $lensType,
+                    $shortFocal, $longFocal, $maxAperture, $lensModel);
+    }
+    my $lens = $$printConv{$lensType};
+    return "Unknown ($lensType)" unless $lens;
+    return $lens unless $$printConv{"$lensType.1"};
+    $lens =~ s/ or .*//s;    # remove everything after "or"
+    # make list of all possible matching lenses
+    my @lenses = ( $lens );
+    my $i;
+    for ($i=1; $$printConv{"$lensType.$i"}; ++$i) {
+        push @lenses, $$printConv{"$lensType.$i"};
+    }
+    # attempt to determine actual lens
+    my (@matches, @best, $diff);
+    foreach $lens (@lenses) {
+        return $lens if $Image::ExifTool::userLens{$lens};
+        # extract focal length and aperture ranges for this lens
+        next unless $lens =~ /(\d+)(?:-(\d+))?mm.*?(?:[fF]\/?)(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?/;
+        # ($1=short focal, $2=long focal, $3=max aperture wide, $4=max aperture tele)
+        my ($sf, $lf, $sa, $la) = ($1, $2, $3, $4);
+        # see if we can rule out this lens using FocalLength and MaxAperture
+        $lf = $sf if $sf and not $lf;
+        $la = $sa if $sa and not $la;
+        if ($focalLength) {
+            next if $focalLength < $sf - 0.5;
+            next if $focalLength > $lf + 0.5;
+        }
+        if ($maxAperture) {
+            # it seems that most manufacturers set MaxAperture and MaxApertureValue
+            # to the maximum aperture (minimum F-number) for the current focal length
+            # of the lens, so assume that MaxAperture varies with focal length and find
+            # the closest match (this is somewhat contrary to the EXIF specification which
+            # states "The smallest F number of the lens", without mention of focal length)
+            next if $maxAperture < $sa - 0.15;  # (0.15 is arbitrary)
+            next if $maxAperture > $la + 0.15;
+            # now determine the best match for this aperture
+            my $aa; # approximate maximum aperture at this focal length
+            if ($sf == $lf or $sa == $la) {
+                $aa = $sa;
+            } else {
+                # assume a log-log variation of max aperture with focal length
+                # (see http://regex.info/blog/2006-10-05/263)
+                $aa = exp(log($sa) + (log($la)-log($sa)) / (log($lf)-log($sf)) *
+                                     (log($focalLength)-log($sf)));
+            }
+            my $d = abs($maxAperture - $aa);
+            if (defined $diff) {
+                $d > $diff + 0.15 and next;     # (0.15 is arbitrary)
+                $d < $diff - 0.15 and undef @best;
+            }
+            $diff = $d;
+            push @best, $lens;
+        }
+        push @matches, $lens;
+    }
+    return join(' or ', @best) if @best;
+    return join(' or ', @matches) if @matches;
+    return $$printConv{$lensType};
+}
+
+#------------------------------------------------------------------------------
 # translate date into standard EXIF format
 # Inputs: 0) date
 # Returns: date in format '2003:10:22'
@@ -2535,6 +2745,7 @@ sub ProcessExif($$$)
                     $dataPos = $$dirInfo{DataPos} = $offset;
                     $dataLen = $$dirInfo{DataLen} = length $buff;
                     $dirStart = $$dirInfo{DirStart} = 0;
+                    $dirLen = $$dirInfo{DirLen} = length $buff;
                     $success = 1;
                 }
             }
@@ -2913,30 +3124,13 @@ sub ProcessExif($$$)
                 }
                 if ($subdirStart < 0 or $subdirStart + 2 > $subdirDataLen) {
                     # convert $subdirStart back to a file offset
-                    $subdirStart += $subdirDataPos;
                     my $dirOK;
                     if ($raf) {
-                        # read the directory from the file
-                        if ($raf->Seek($subdirStart + $base,0)) {
-                            my ($buff, $buf2);
-                            if ($raf->Read($buff,2) == 2) {
-                                # get no. dir entries
-                                $size = 12 * Get16u(\$buff, 0);
-                                # read dir (plus next IFD pointer)
-                                if ($raf->Read($buf2,$size+4) >= $size) {
-                                    # set up variables to process new subdir data
-                                    $buff .= $buf2;
-                                    $size = length $buff;
-                                    $subdirDataPt = \$buff;
-                                    $subdirDataPos = $subdirStart;
-                                    $subdirDataLen = $size;
-                                    $subdirStart = 0;
-                                    $dirOK = 1;
-                                }
-                            }
-                        }
-                    }
-                    unless ($dirOK) {
+                        # reset SubDirectory buffer (we will load it later)
+                        my $buff = '';
+                        $subdirDataPt = \$buff;
+                        $subdirDataLen = $size = length $buff;
+                    } else {
                         my $msg = "Bad $tagStr SubDirectory start";
                         if ($verbose > 0) {
                             if ($subdirStart < 0) {
@@ -2970,6 +3164,7 @@ sub ProcessExif($$$)
                     EntryBased => $$subdir{EntryBased},
                     TagInfo    => $tagInfo,
                     SubIFD     => $$tagInfo{SubIFD},
+                    Subdir     => $subdir,
                 );
                 # (remember: some cameras incorrectly write maker notes in IFD0)
                 if ($$tagInfo{MakerNotes}) {

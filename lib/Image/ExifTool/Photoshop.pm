@@ -3,20 +3,21 @@
 #
 # Description:  Read/write Photoshop IRB meta information
 #
-# Revisions:    02/06/04 - P. Harvey Created
-#               02/25/04 - P. Harvey Added hack for problem with old photoshops
-#               10/04/04 - P. Harvey Added a bunch of tags (ref Image::MetaData::JPEG)
-#                          but left most of them commented out until I have enough
-#                          information to write PrintConv routines for them to
-#                          display something useful
-#               07/08/05 - P. Harvey Added support for reading PSD files
-#               01/07/06 - P. Harvey Added PSD write support
-#               11/04/06 - P. Harvey Added handling of resource name
+# Revisions:    02/06/2004 - P. Harvey Created
+#               02/25/2004 - P. Harvey Added hack for problem with old photoshops
+#               10/04/2004 - P. Harvey Added a bunch of tags (ref Image::MetaData::JPEG)
+#                            but left most of them commented out until I have enough
+#                            information to write PrintConv routines for them to
+#                            display something useful
+#               07/08/2005 - P. Harvey Added support for reading PSD files
+#               01/07/2006 - P. Harvey Added PSD write support
+#               11/04/2006 - P. Harvey Added handling of resource name
 #
 # References:   1) http://www.fine-view.com/jp/lab/doc/ps6ffspecsv2.pdf
 #               2) http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html
 #               3) Matt Mueller private communication (tests with PS CS2)
 #               4) http://www.fileformat.info/format/psd/egff.htm
+#               5) http://www.telegraphics.com.au/svn/psdparse/trunk/resources.c
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Photoshop;
@@ -25,7 +26,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.33';
+$VERSION = '1.36';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -169,12 +170,39 @@ my %psdMap = (
             WriteProc => \&Image::ExifTool::WriteTIFF,
         },
     },
+    0x0423 => { Unknown => 1, Name => 'ExifInfo2', Binary => 1 }, #5
     0x0424 => {
         Name => 'XMP',
         SubDirectory => {
             TagTable => 'Image::ExifTool::XMP::Main',
         },
     },
+    0x0425 => {
+        Name => 'IPTCDigest',
+        Writable => 'string',
+        Protected => 1,
+        Notes => q{
+            when writing, a special value of "new" represents the new IPTC digest of the
+            output file, or deletes this tag if no IPTC exists
+        },
+        # also note the 'new' feature requires that the IPTC comes before this tag is written
+        ValueConv => 'unpack("H*", $val)',
+        ValueConvInv => q{
+            if (lc($val) eq 'new') {
+                return 'new' if eval 'require Digest::MD5';
+                warn "Digest::MD5 must be installed\n";
+                return undef;
+            }
+            return pack('H*', $val) if $val =~ /^[0-9a-f]{32}$/i;
+            warn "Value must be 32 hexadecimal digits or 'new'\n";
+            return undef;
+        }
+    },
+    0x0426 => { Unknown => 1, Name => 'PrintScale' }, #5
+    0x0428 => { Unknown => 1, Name => 'PixelAspectRatio' }, #5
+    0x0429 => { Unknown => 1, Name => 'LayerComps' }, #5
+    0x042a => { Unknown => 1, Name => 'AlternateDuotoneColors' }, #5
+    0x042b => { Unknown => 1, Name => 'AlternateSpotColors' }, #5
     # 0x07d0-0x0bb6 Path information
     0x0bb7 => { Unknown => 1, Name => 'ClippingPathName' },
     0x2710 => { Unknown => 1, Name => 'PrintFlagsInfo' },

@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessMRW($$;$);
 
@@ -229,6 +229,7 @@ sub ConvertWBMode($)
 # Read or write Minolta MRW file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid MRW file, or -1 on write error
+# Notes: File pointer must be set to start of MRW in RAF upon entry
 sub ProcessMRW($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -255,8 +256,8 @@ sub ProcessMRW($$;$)
         $exifTool->InitWriteDirs('TIFF'); # use same write dirs as TIFF
         $outBuff = '';
     }
-    my $offset = Get32u(\$data, 4) + 8;
-    my $pos = 8;
+    my $pos = $raf->Tell();
+    my $offset = Get32u(\$data, 4) + $pos;
     my $rtnVal = 1;
     $verbose and printf $out "  [MRW Data Offset: 0x%x]\n", $offset;
     # loop through MRW segments (ref 1)

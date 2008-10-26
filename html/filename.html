@@ -59,6 +59,10 @@ To do this, a dummy file name or directory (to be overridden by the
 be valid (ie. in the form "<code>YYYY:mm:dd HH:MM:SS</code>"), otherwise the
 date formatting will fail and the file will not be renamed or moved.</p>
 
+<p>In a Windows batch file, all <code>%</code> characters must be escaped as
+<code>%%</code>.  This can result in extreme format codes like
+<code>%%%%f</code> when using the <code>-d</code> option.</p>
+
 <h2>Examples</h2>
 
 <table cellpadding=6><tr><td valign='top'>&nbsp;1.</td><td bgcolor='#dddddd'><code class='blk'>

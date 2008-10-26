@@ -25,6 +25,13 @@ $VERSION = '1.04';
         There really isn't much meta information in a BMP file as such, just a bit
         of image related information.
     },
+    # 0 => size of bitmap structure:
+    #        12  bytes => 'OS/2 V1',
+    #        40  bytes => 'Windows V3',
+    #        64  bytes => 'OS/2 V2',
+    #        68  bytes => some bitmap structure in AVI videos
+    #        108 bytes => 'Windows V4',
+    #        124 bytes => 'Windows V5',
     4 => {
         Name => 'ImageWidth',
         Format => 'int32u',

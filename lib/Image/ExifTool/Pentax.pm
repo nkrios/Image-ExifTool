@@ -31,6 +31,10 @@
 #              17) Cvetan Ivanov private communication (K100D)
 #              18) http://www.gvsoft.homedns.org/exif/makernote-pentax-type3.html
 #              19) Dave Nicholson private communication (K10D)
+#              20) Bogdan and yeryry (http://www.cpanforum.com/posts/8037)
+#              21) Peter (*istD, http://www.cpanforum.com/posts/8078)
+#              22) Bozi (K10D, http://www.cpanforum.com/posts/8480)
+#              23) Anton Bondar private communication
 #              JD) Jens Duttke private communication
 #
 # Notes:        See POD documentation at the bottom of this file
@@ -43,23 +47,26 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '1.82';
+$VERSION = '1.92';
 
 sub CryptShutterCount($$);
 
 # pentax lens type codes (ref 4)
 # The first number gives the lens series, and the 2nd gives the model number
 # Series numbers: K=1; A=2; F=3; FAJ,DFA=4; FA=3,4,5,6; FA*=5,6; DA=3,4,7; DA*=7,8
-my %pentaxLensType = (
+my %pentaxLensTypes = (
     Notes => q{
         The first number gives the series of the lens, and the second identifies the
         lens model.  Note that newer series numbers may not always be properly
-        identified by cameras running older firmware versions.
+        identified by cameras running older firmware versions.  Decimal values
+        differentiate lenses which would otherwise have the same LensType, and are
+        used by the Composite LensID tag when attempting to identify the specific
+        lens model.
     },
     '0 0' => 'M-42 or No Lens', #17
-    '1 0' => 'K,M Lens',
+    '1 0' => 'K or M Lens',
     '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mm F5.6)
-    '3 0' => 'SIGMA',
+    '3 0' => 'Sigma',
     '3 17' => 'smc PENTAX-FA SOFT 85mm F2.8',
     '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
     '3 19' => 'smc PENTAX-F 24-50mm F4',
@@ -68,37 +75,44 @@ my %pentaxLensType = (
     '3 22' => 'smc PENTAX-F FISH-EYE 17-28mm F3.5-4.5',
     '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6',
     '3 24' => 'smc PENTAX-F 35-135mm F3.5-4.5',
-    '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or SIGMA or Tokina',
-    # or '3 25' => SIGMA AF 28-300 F3.5-5.6 DL IF', #11
-    # or '3 25' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
-    # or '3 25' => 'SIGMA 55-200mm F4-5.6 DC', #JD
+    '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or Sigma or Tokina Lens',
+    '3 25.1' => 'Sigma AF 28-300mm F3.5-5.6 DL IF', #11
+    '3 25.2' => 'Sigma 55-200mm F4-5.6 DC', #JD
+    '3 25.3' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
     '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
-    '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5',
-    # or '3 27' => 'Tokina AT-X Pro AF 28-70mm F2.6-2.8', #JD
-    '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5',
-    # or '3 28' => 'Tokina 19-35mm F3.5-4.5 AF', #12
-    '3 29' => 'PENTAX-F 28-80mm F3.5-4.5 or SIGMA AF 18-125mm F3.5-5.6 DC', #11 (sigma)
+    '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5 or Tokina Lens',
+    '3 27.1' => 'Tokina AT-X Pro AF 28-70mm F2.6-2.8', #JD
+    '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5 or Tokina Lens',
+    '3 28.1' => 'Tokina 19-35mm F3.5-4.5 AF', #12
+    '3 29' => 'PENTAX-F 28-80mm F3.5-4.5 or Sigma or Tokina Lens',
+    '3 29.1' => 'Sigma AF 18-125mm F3.5-5.6 DC', #11
+    '3 29.2' => 'Tokina AT-X PRO 28-70mm F2.6-2.8', #22
     '3 30' => 'PENTAX-F 70-200mm F4-5.6',
-    '3 31' => 'smc PENTAX-F 70-210mm F4-5.6',
-    # or '3 31' => 'Tokina AF 730 75-300mm F4.5-5.6',
+    '3 31' => 'smc PENTAX-F 70-210mm F4-5.6 or Tokina Lens',
+    '3 31.1' => 'Tokina AF 730 75-300mm F4.5-5.6',
     '3 32' => 'smc PENTAX-F 50mm F1.4',
     '3 33' => 'smc PENTAX-F 50mm F1.7',
     '3 34' => 'smc PENTAX-F 135mm F2.8 [IF]',
     '3 35' => 'smc PENTAX-F 28mm F2.8',
-    '3 36' => 'SIGMA 20mm F1.8 EX DG ASPHERICAL RF',
+    '3 36' => 'Sigma 20mm F1.8 EX DG Aspherical RF',
     '3 38' => 'smc PENTAX-F* 300mm F4.5 ED[IF]',
     '3 39' => 'smc PENTAX-F* 600mm F4 ED[IF]',
     '3 40' => 'smc PENTAX-F MACRO 100mm F2.8',
-    '3 41' => 'smc PENTAX-F MACRO 50mm F2.8 or Sigma 50mm F2,8 MACRO', #4,16
-    #'3 44' => 'SIGMA 17-70mm F2.8-4.5 DC MACRO', (Bart Hickman)
-    #'3 44' => 'SIGMA 18-50mm F3.5-5.6 DC, 12-24mm F4.5 EX DG or Tamron 35-90mm F4 AF', #4,12,12
-    #'3 44' => 'SIGMA AF 10-20mm F4-5.6 EX DC', #JD
-    '3 44' => 'Tamron 35-90mm F4 AF or various SIGMA models', #4,12,Bart,JD
-    '3 46' => 'SIGMA APO 70-200mm F2.8 EX or EX APO 100-300mm F4 IF', #JD(100-300)
+    '3 41' => 'smc PENTAX-F MACRO 50mm F2.8 or Sigma Lens', #4
+    '3 41.1' => 'Sigma 50mm F2.8 Macro', #16
+    '3 44' => 'Sigma or Tamron Lens (3 44)',
+    '3 44.1' => 'Sigma AF 10-20mm F4-5.6 EX DC', #JD
+    '3 44.2' => 'Sigma 12-24mm F4.5 EX DG', #12
+    '3 44.3' => 'Sigma 17-70mm F2.8-4.5 DC Macro', # (Bart Hickman)
+    '3 44.4' => 'Sigma 18-50mm F3.5-5.6 DC', #4
+    '3 44.5' => 'Tamron 35-90mm F4 AF', #12
+    '3 46' => 'Sigma Lens (3 46)',
+    '3 46.1' => 'Sigma APO 70-200mm F2.8 EX',
+    '3 46.2' => 'Sigma EX APO 100-300mm F4 IF', #JD
     '3 50' => 'smc PENTAX-FA 28-70mm F4 AL',
-    '3 51' => 'SIGMA 28mm F1.8 EX DG ASPHERICAL MACRO',
-    '3 52' => 'smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF]',
-    # or '3 52' => 'Tamron AF LD 28-200mm F3.8-5.6 (IF) Aspherical (171D), #JD
+    '3 51' => 'Sigma 28mm F1.8 EX DG Aspherical Macro',
+    '3 52' => 'smc PENTAX-FA 28-200mm F3.8-5.6 AL[IF] or Tamron Lens',
+    '3 52.1' => 'Tamron AF LD 28-200mm F3.8-5.6 [IF] Aspherical (171D)', #JD
     '3 53' => 'smc PENTAX-FA 28-80mm F3.5-5.6 AL',
     '3 247' => 'smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]',
     '3 248' => 'smc PENTAX-DA 12-24mm F4 ED AL[IF]',
@@ -107,51 +121,57 @@ my %pentaxLensType = (
     '3 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL',
     '3 253' => 'smc PENTAX-DA 14mm F2.8 ED[IF]',
     '3 254' => 'smc PENTAX-DA 16-45mm F4 ED AL',
-    '3 255' => 'SIGMA',
-    # '3 255' => 'SIGMA 18-200mm F3.5-6.3 DC', #8
-    # '3 255' => 'SIGMA DL-II 35-80mm F4-5.6', #12
-    # '3 255' => 'SIGMA DL Zoom 75-300mm F4-5.6', #12
-    # '3 255' => 'SIGMA DF EX Aspherical 28-70mm F2.8', #12
-    # '3 255' => 'SIGMA AF Tele 400mm F5.6 Multi-coated', #JD
+    '3 255' => 'Sigma Lens (3 255)',
+    '3 255.1' => 'Sigma 18-200mm F3.5-6.3 DC', #8
+    '3 255.2' => 'Sigma DL-II 35-80mm F4-5.6', #12
+    '3 255.3' => 'Sigma DL Zoom 75-300mm F4-5.6', #12
+    '3 255.4' => 'Sigma DF EX Aspherical 28-70mm F2.8', #12
+    '3 255.5' => 'Sigma AF Tele 400mm F5.6 Multi-coated', #JD
     '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
     '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
     '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
     '4 6' => 'smc PENTAX-FA 35-80mm F4-5.6',
     '4 12' => 'smc PENTAX-FA 50mm F1.4', #17
     '4 15' => 'smc PENTAX-FA 28-105mm F4-5.6 [IF]',
-    '4 16' => 'TAMRON AF 80-210mm F4-5.6 (178D)', #13
-    '4 19' => 'TAMRON SP AF 90mm F2.8 (172E)',
+    '4 16' => 'Tamron AF 80-210mm F4-5.6 (178D)', #13
+    '4 19' => 'Tamron SP AF 90mm F2.8 (172E)',
     '4 20' => 'smc PENTAX-FA 28-80mm F3.5-5.6',
-    '4 22' => 'TOKINA 28-80mm F3.5-5.6', #13
+    '4 21' => 'Cosina AF 100-300mm F5.6-6.7', #20
+    '4 22' => 'Tokina 28-80mm F3.5-5.6', #13
     '4 23' => 'smc PENTAX-FA 20-35mm F4 AL',
     '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
-    '4 25' => 'TAMRON SP AF 14mm F2.8', #13
+    '4 25' => 'Tamron SP AF 14mm F2.8', #13
     '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
-    '4 27' => 'TAMRON AF28-300mm F/3.5-6.3 LD Aspherical[IF] MACRO (185D/285D)',
+    '4 27' => 'Tamron AF28-300mm F3.5-6.3 LD Aspherical[IF] Macro (185D/285D)',
     '4 28' => 'smc PENTAX-FA 35mm F2 AL',
-    '4 29' => 'TAMRON AF 28-200mm F/3.8-5.6 LD Super II MACRO (371D)', #JD
+    '4 29' => 'Tamron AF 28-200mm F3.8-5.6 LD Super II Macro (371D)', #JD
     '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
     '4 35' => 'smc PENTAX-FA 100-300mm F4.7-5.8',
-    '4 36' => 'TAMRON AF70-300mm F/4-5.6 LD MACRO', # both 572D and A17 (Di) - ref JD
-    '4 37' => 'TAMRON SP AF 24-135mm F3.5-5.6 AD AL (190D)', #13
+    '4 36' => 'Tamron AF70-300mm F4-5.6 LD Macro', # both 572D and A17 (Di) - ref JD
+    '4 37' => 'Tamron SP AF 24-135mm F3.5-5.6 AD AL (190D)', #13
     '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
     '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
-    '4 41' => 'TAMRON AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] MACRO (A03)',
+    '4 41' => 'Tamron AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] Macro (A03)',
     '4 43' => 'smc PENTAX-FA 28-90mm F3.5-5.6',
     '4 44' => 'smc PENTAX-FA J 75-300mm F4.5-5.8 AL',
-    '4 45' => 'TAMRON 28-300mm F3.5-6.3 Ultra zoom XR',
+    '4 45' => 'Tamron 28-300mm F3.5-6.3 Ultra zoom XR',
     '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
     '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
-    '4 49' => 'TAMRON SP AF 28-75mm F2.8 XR Di (A09)',
+    '4 49' => 'Tamron SP AF 28-75mm F2.8 XR Di (A09)',
     '4 51' => 'smc PENTAX-D FA 50mm F2.8 MACRO',
     '4 52' => 'smc PENTAX-D FA 100mm F2.8 MACRO',
+    '4 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #JD
+    '4 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
+    '4 230' => 'Tamron SP AF 17-50mm F2.8 XR Di II', #20
+    '4 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #21
+    '4 237' => 'Samsung/Schneider D-XENOGON 10-17mm F3.5-4.5', #JD
     '4 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #JD
     '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
-    '4 245' => 'Schneider D-XENON 50-200mm', #15
-    '4 246' => 'Schneider D-XENON 18-55mm', #15
+    '4 245' => 'Schneider D-XENON 50-200mm F4-5.6', #15
+    '4 246' => 'Schneider D-XENON 18-55mm F3.5-5.6', #15
     '4 247' => 'smc PENTAX-DA FISH-EYE 10-17mm F3.5-4.5 ED[IF]', #10
     '4 248' => 'smc PENTAX-DA 12-24mm F4 ED AL [IF]', #10
-    '4 249' => 'TAMRON XR DiII 18-200mm F3.5-6.3 (A14)',
+    '4 249' => 'Tamron XR DiII 18-200mm F3.5-6.3 (A14)',
     '4 250' => 'smc PENTAX-DA 50-200mm F4-5.6 ED', #8
     '4 251' => 'smc PENTAX-DA 40mm F2.8 Limited', #9
     '4 252' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL', #8
@@ -186,22 +206,26 @@ my %pentaxLensType = (
     '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
+    '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #23
+    '7 222' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #PH (tag 0x003f -- was '7 229' in LensInfo)
     '7 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
     '7 230' => 'Tamron AF 17-50mm F2.8 XR Di-II LD (Model A16)', #JD
     '7 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #JD
     '7 233' => 'smc PENTAX-DA 35mm F2.8 Macro Limited', #JD
     '7 234' => 'smc PENTAX-DA* 300mm F4 ED [IF] SDM (SDM unused)', #19 (NC)
     '7 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM (SDM unused)', #PH (NC)
-    '7 236' => 'smc PENTAX-DA 55-300mm f/4-5.8 ED', #JD
-    '7 238' => 'TAMRON AF 18-250mm F3.5-6.3 Di II LD Aspherical [IF] MACRO', #JD
+    '7 236' => 'smc PENTAX-DA 55-300mm F4-5.8 ED', #JD
+    '7 238' => 'Tamron AF 18-250mm F3.5-6.3 Di II LD Aspherical [IF] Macro', #JD
     '7 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM (SDM unused)', #PH
     '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 232' => 'smc PENTAX-DA 17-70mm F4 AL [IF] SDM', #JD
     '8 234' => 'smc PENTAX-DA* 300mm F4 ED [IF] SDM', #19
     '8 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM', #JD
     '8 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM', #JD
     '8 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM', #JD
+    '8 255' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #JD
 );
 
 # Pentax model ID codes - PH
@@ -259,6 +283,7 @@ my %pentaxModelID = (
     0x12c46 => 'Optio A20',
     0x12c8c => 'Optio M30',
     0x12c78 => 'Optio E30',
+    0x12c7d => 'Optio E35',
     0x12c82 => 'Optio T30',
     0x12c96 => 'Optio W30',
     0x12ca0 => 'Optio A30',
@@ -272,6 +297,12 @@ my %pentaxModelID = (
     0x12cfa => 'K200D',
     0x12d0e => 'Optio E50',
     0x12d18 => 'Optio M50',
+    0x12d2c => 'Optio V20',
+    0x12d40 => 'Optio W60',
+    0x12d4a => 'Optio M60',
+    0x12d68 => 'Optio E60',
+    0x12d72 => 'K-m / K2000 (a)',
+    0x12d73 => 'K-m / K2000',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -449,7 +480,11 @@ my %lensCode = (
         DataMember => 'PentaxDate',
         RawConv => '$$self{PentaxDate} = $val', # save to decrypt ShutterCount
         ValueConv => 'length($val)==4 ? sprintf("%.4d:%.2d:%.2d",unpack("nC2",$val)) : "Unknown ($val)"',
-        ValueConvInv => 'my @v=split /:/, $val;pack("nC2",$v[0],$v[1],$v[2])',
+        ValueConvInv => q{
+            $val =~ s/(\d) .*/$1/;          # remove Time
+            my @v = split /:/, $val;
+            return pack("nC2",$v[0],$v[1],$v[2]);
+        },
     },
     0x0007 => { #5
         Name => 'Time',
@@ -460,7 +495,10 @@ my %lensCode = (
         DataMember => 'PentaxTime',
         RawConv => '$$self{PentaxTime} = $val', # save to decrypt ShutterCount
         ValueConv => 'length($val)>=3 ? sprintf("%.2d:%.2d:%.2d",unpack("C3",$val)) : "Unknown ($val)"',
-        ValueConvInv => 'pack("C3",split(/:/,$val))',
+        ValueConvInv => q{
+            $val =~ s/^[0-9:]+ (\d)/$1/;    # remove Date
+            return pack("C3",split(/:/,$val));
+        },
     },
     0x0008 => { #2
         Name => 'Quality',
@@ -1141,9 +1179,10 @@ my %lensCode = (
         Writable => 'int8u',
         Count => 2,
         SeparateTable => 1,
-        ValueConv => '$val=~s/^(\d+ \d+) 0$/$1/; $val',
+        # the K-m adds two zeros to the LensType, some other models add only 1
+        ValueConv => '$val=~s/^(\d+ \d+)( 0){1,2}$/$1/; $val',
         ValueConvInv => '$val',
-        PrintConv => \%pentaxLensType,
+        PrintConv => \%pentaxLensTypes,
     },
     0x0040 => { #PH
         Name => 'SensitivityAdjust',
@@ -1415,6 +1454,19 @@ my %lensCode = (
             TagTable => 'Image::ExifTool::Pentax::BatteryInfo',
         },
     },
+    0x021b => { #19
+        Name => 'SaturationInfo',
+        Flags => [ 'Unknown', 'Binary' ],
+        Notes => 'only in PEF and DNG images',
+        # K10D values with various Saturation settings (ref 19):
+        # Very Low: 000000022820f9a0fe4000802660f92002e0fee01e402c40f880fb40ffc02b20f52002e0fe401ee0
+        # Low:      000000022ae0f700fe20ff402840f88001e0fcc021602f60f560fb40fe602d20f48001c0fbc02280
+        # Med Low:  000000022dc0f420fe20fe002a20f7e000c0fa8024c032c0f220fb20fce02f60f3c000a0f9202640
+        # Normal:   000000023120f0e0fe00fc802c40f740ffa0f7e028803660ee80fb20fb4031c0f300ff60f6202a80
+        # Med High: 0000000234e0ed40fde0fae02ea0f680fe60f5002ca03a80ea80fb00f9603480f220fe00f2e02f20
+        # High:     0000000238c0e960fde0f9203140f5a0fce0f1e031403f00e600fb00f7803760f120fc60ef403460
+        # Very High:000000023d20e520fdc0f7203420f4c0fb60ee6036404400e120fae0f5403aa0f020fac0eb403a00
+    },
     0x021f => { #JD
         Name => 'AFInfo',
         SubDirectory => {
@@ -1521,7 +1573,7 @@ my %lensCode = (
     },
 );
 
-# shot information (ref 19)
+# camera settings (ref 19)
 %Image::ExifTool::Pentax::CameraSettings = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -1714,6 +1766,38 @@ my %lensCode = (
             0x25 => '3 of 5',
             0x35 => '4 of 5',
             0x45 => '5 of 5',
+        },
+    },
+    10 => {
+        Name => 'WhiteBalanceSet',
+        Mask => 0xf0,
+        # Not necessarily the white balance used; for example if the custom menu is set to
+        # "WB when using flash" -> "2 Flash", then this tag reports the camera setting while
+        # tag 0x0019 reports Flash if the Flash was used.
+        PrintConv => {
+            0 => 'Auto',
+            16 => 'Daylight',
+            32 => 'Shade',
+            48 => 'Cloudy',
+            64 => 'DaylightFluorescent',
+            80 => 'DaywhiteFluorescent',
+            96 => 'WhiteFluorescent',
+            112 => 'Tungsten',
+            128 => 'Flash',
+            144 => 'Manual',
+            # The three Set Color Temperature settings refer to the 3 preset settings which
+            # can be saved in the menu (see page 123 of the K10D manual)
+            192 => 'Set Color Temperature 1',
+            208 => 'Set Color Temperature 2',
+            224 => 'Set Color Temperature 3',
+        },
+    },
+    10.1 => {
+        Name => 'MultipleExposureSet',
+        Mask => 0x0f,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
         },
     },
     13 => {
@@ -2029,7 +2113,7 @@ my %lensCode = (
         Name => 'LensType',
         Format => 'int8u[2]',
         Priority => 0,
-        PrintConv => \%pentaxLensType,
+        PrintConv => \%pentaxLensTypes,
         SeparateTable => 1,
     },
     3 => {
@@ -2060,7 +2144,7 @@ my %lensCode = (
             $v[1] = $v[2] * 256 + $v[3]; # (always high byte first)
             return "$v[0] $v[1]";
         },
-        PrintConv => \%pentaxLensType,
+        PrintConv => \%pentaxLensTypes,
         SeparateTable => 1,
     },
     4 => {
@@ -2169,6 +2253,7 @@ my %lensCode = (
         PrintConv => 'sprintf("%.1f mm", $val)',
         PrintConvInv => '$val=~s/\s*mm//; $val',
     },
+    # the following aperture values change with focal length
     10 => { # LC9 = nominal AVmin/AVmax data (open/closed aperture values)
         Name => 'NominalMaxAperture',
         Mask => 0xf0,
@@ -2337,6 +2422,7 @@ my %lensCode = (
     },
     26 => { #17
         Name => 'ExternalFlashBounce',
+        Notes => 'saved from the most recent external flash picture', #19
         PrintConv => {
              0 => 'n/a',
             16 => 'Direct',
@@ -2360,6 +2446,7 @@ my %lensCode = (
         Name => 'PentaxModelID',
         Priority => 0, # (Optio SVi uses incorrect Optio SV ID here)
         SeparateTable => 1,
+        PrintHex => 1,
         PrintConv => \%pentaxModelID,
     },
     1 => {
@@ -2402,6 +2489,7 @@ my %lensCode = (
         PrintHex => 1,
         # have seen the upper bit set (value of 0x82) for the
         # *istDS and K100D, but I'm not sure what this means - PH
+        # I've also seen 0x42 for the K2000 - PH
         PrintConv => {
             2 => 'Body Battery',
             3 => 'Grip Battery',
@@ -2938,9 +3026,9 @@ the information should be stored to deduce the correct offsets.
 
 Thanks to Wayne Smith, John Francis, Douglas O'Brien Cvetan Ivanov, Jens
 Duttke and Dave Nicholson for help figuring out some Pentax tags, Denis
-Bourez, Kazumichi Kawabata, David Buret, Barney Garrett and Axel Kellner for
-adding to the LensType list, and Ger Vermeulen for contributing print
-conversion values for some tags.
+Bourez, Kazumichi Kawabata, David Buret, Barney Garrett, Axel Kellner and
+Anton Bondar for adding to the LensType list, and Ger Vermeulen for
+contributing print conversion values for some tags.
 
 =head1 AUTHOR
 

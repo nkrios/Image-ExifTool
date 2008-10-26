@@ -123,6 +123,9 @@ images.
   <br>34677 = SGILog24
   <br>34712 = JPEG 2000
   <br>34713 = Nikon NEF Compressed
+  <br>34718 = Microsoft Document Imaging (MDI) Binary Level Codec
+  <br>34719 = Microsoft Document Imaging (MDI) Progressive Transform Codec
+  <br>34720 = Microsoft Document Imaging (MDI) Vector
   <br>65000 = Kodak DCR Compressed
   <br>65535 = Pentax PEF Compressed</span></td></tr>
 <tr class=b>
@@ -721,8 +724,10 @@ JpgFromRawLength in SubIFD2 of DNG images)</span></span></td></tr>
 <td class=c>IFD0</td>
 <td><span class=s>&#39;1 1&#39; = YCbCr4:4:4 (1 1)
   <br>&#39;1 2&#39; = YCbCr4:4:0 (1 2)
+  <br>&#39;1 4&#39; = YCbCr4:4:1 (1 4)
   <br>&#39;2 1&#39; = YCbCr4:2:2 (2 1)
   <br>&#39;2 2&#39; = YCbCr4:2:0 (2 2)
+  <br>&#39;2 4&#39; = YCbCr4:2:1 (2 4)
   <br>&#39;4 1&#39; = YCbCr4:1:1 (4 1)
   <br>&#39;4 2&#39; = YCbCr4:1:0 (4 2)</span></td></tr>
 <tr class=b>
@@ -852,7 +857,8 @@ JpgFromRawLength in SubIFD2 of DNG images)</span></span></td></tr>
 <td>Copyright</td>
 <td class=c>string</td>
 <td class=c>IFD0</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(may contain copyright notices for photographer and editor, separated by a
+newline)</span></span></td></tr>
 <tr>
 <td>0x829a</td>
 <td>ExposureTime</td>
@@ -2084,7 +2090,7 @@ unnecessary clutter)</span>
 <td>DNGVersion</td>
 <td class=c>int8u[4]!</td>
 <td class=c>IFD0</td>
-<td><span class=s><span class=n>(tags 0xc612-0xc65d are used in DNG images)</span></span></td></tr>
+<td><span class=s><span class=n>(tags 0xc612-0xc726 are used in DNG images unless otherwise noted)</span></span></td></tr>
 <tr>
 <td>0xc613</td>
 <td>DNGBackwardVersion</td>
@@ -2134,8 +2140,8 @@ unnecessary clutter)</span>
 <tr class=b>
 <td>0xc61a</td>
 <td>BlackLevel</td>
-<td class=c>N</td>
-<td class=c>-</td>
+<td class=c>rational64u[n]!</td>
+<td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc61b</td>
@@ -2152,8 +2158,8 @@ unnecessary clutter)</span>
 <tr>
 <td>0xc61d</td>
 <td>WhiteLevel</td>
-<td class=c>N</td>
-<td class=c>-</td>
+<td class=c>int32u[n]!</td>
+<td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>0xc61e</td>
@@ -2218,8 +2224,8 @@ unnecessary clutter)</span>
 <tr class=b>
 <td>0xc628</td>
 <td>AsShotNeutral</td>
-<td class=c>N</td>
-<td class=c>-</td>
+<td class=c>rational64u[n]!</td>
+<td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc629</td>
@@ -2381,7 +2387,7 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <td>AliasLayerMetadata</td>
 <td class=c>N</td>
 <td class=c>-</td>
-<td><span class=s><span class=n>(used by Alias Sketchbook Pro, not a DNG tag)</span></span></td></tr>
+<td><span class=s><span class=n>(used by Alias Sketchbook Pro)</span></span></td></tr>
 <tr class=b>
 <td>0xc68b</td>
 <td>OriginalRawFileName</td>
@@ -2431,24 +2437,193 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0xc6bf</td>
+<td>ColorimetricReference</td>
+<td class=c>int16u!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>0xc6d2</td>
 <td>Title</td>
 <td class=c>string/</td>
 <td class=c>IFD0</td>
 <td><span class=s><span class=n>(proprietary Panasonic tag)</span></span></td></tr>
+<tr class=b>
+<td>0xc6f3</td>
+<td>CameraCalibrationSig</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
 <tr>
+<td>0xc6f4</td>
+<td>ProfileCalibrationSig</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc6f5</td>
+<td>ProfileIFD</td>
+<td class=c>-</td>
+<td class=c>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
+<tr>
+<td>0xc6f6</td>
+<td>AsShotProfileName</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc6f7</td>
+<td>NoiseReductionApplied</td>
+<td class=c>rational64u!</td>
+<td class=c>SubIFD</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc6f8</td>
+<td>ProfileName</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc6f9</td>
+<td>ProfileHueSatMapDims</td>
+<td class=c>int32u[3]!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc6fa</td>
+<td>ProfileHueSatMapData1</td>
+<td class=c>float[n]!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc6fb</td>
+<td>ProfileHueSatMapData2</td>
+<td class=c>float[n]!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc6fc</td>
+<td>ProfileToneCurve</td>
+<td class=c>float[n]!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc6fd</td>
+<td>ProfileEmbedPolicy</td>
+<td class=c>int32u!</td>
+<td class=c>IFD0</td>
+<td><span class=s>0 = Allow Copying
+  <br>1 = Embed if Used
+  <br>2 = Never Embed
+  <br>3 = No Restrictions</span></td></tr>
+<tr>
+<td>0xc6fe</td>
+<td>ProfileCopyright</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc714</td>
+<td>ForwardMatrix1</td>
+<td class=c>rational64s[n]!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc715</td>
+<td>ForwardMatrix2</td>
+<td class=c>rational64s[n]!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc716</td>
+<td>PreviewApplicationName</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc717</td>
+<td>PreviewApplicationVersion</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc718</td>
+<td>PreviewSettingsName</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc719</td>
+<td>PreviewSettingsDigest</td>
+<td class=c>int8u!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc71a</td>
+<td>PreviewColorSpace</td>
+<td class=c>int32u!</td>
+<td class=c>IFD0</td>
+<td><span class=s>0 = Unknown
+  <br>1 = Gray Gamma 2.2
+  <br>2 = sRGB
+  <br>3 = Adobe RGB
+  <br>4 = ProPhoto RGB</span></td></tr>
+<tr>
+<td>0xc71b</td>
+<td>PreviewDateTime</td>
+<td class=c>string!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc71c</td>
+<td>RawImageDigest</td>
+<td class=c>int8u!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc71d</td>
+<td>OriginalRawFileDigest</td>
+<td class=c>int8u!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc71e</td>
+<td>SubTileBlockSize</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc71f</td>
+<td>RowInterleaveFactor</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xc725</td>
+<td>ProfileLookTableDims</td>
+<td class=c>int32u[3]!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xc726</td>
+<td>ProfileLookTableData</td>
+<td class=c>float[n]!</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0xea1c</td>
 <td>Padding</td>
 <td class=c>undef</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0xea1d</td>
 <td>OffsetSchema</td>
 <td class=c>int32s</td>
 <td class=c>ExifIFD</td>
 <td><span class=s><span class=n>(Microsoft&#39;s ill-conceived maker note offset difference)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>0xfde8</td>
 <td>OwnerName</td>
 <td class=c>string/</td>
@@ -2456,79 +2631,79 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <td><span class=s><span class=n>(tags 0xfde8-0xfe58 are generated by Photoshop Camera RAW -- some
 names are the same as other EXIF tags, but ExifTool will avoid
 writing these unless they already exist in the file)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>0xfde9</td>
 <td>SerialNumber</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0xfdea</td>
 <td>Lens</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0xfe4c</td>
 <td>RawFile</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0xfe4d</td>
 <td>Converter</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0xfe4e</td>
 <td>WhiteBalance</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0xfe51</td>
 <td>Exposure</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0xfe52</td>
 <td>Shadows</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0xfe53</td>
 <td>Brightness</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0xfe54</td>
 <td>Contrast</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0xfe55</td>
 <td>Saturation</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0xfe56</td>
 <td>Sharpness</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0xfe57</td>
 <td>Smoothness</td>
 <td class=c>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0xfe58</td>
 <td>MoireFilter</td>
 <td class=c>string/</td>
@@ -2538,7 +2713,7 @@ writing these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 20, 2008</i>
+<br><i>Last revised Sep 30, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

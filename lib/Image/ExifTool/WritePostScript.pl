@@ -545,7 +545,7 @@ sub WritePS($$)
                 delete $$newTags{$tag}; # write it then forget it
                 # decode comment string (reading continuation lines if necessary)
                 $val = DecodeComment($val, $raf, \@lines, \$data);
-                $val = join ', ', @$val if ref $val eq 'ARRAY';
+                $val = join $exifTool->Options('ListSep'), @$val if ref $val eq 'ARRAY';
                 my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
                 if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
                     $verbose > 1 and print $out "    - PostScript:$$tagInfo{Name} = '$val'\n";

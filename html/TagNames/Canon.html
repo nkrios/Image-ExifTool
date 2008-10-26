@@ -75,17 +75,23 @@
   <br>CanonCameraInfo1DmkIII
   <br>CanonCameraInfo5D
   <br>CanonCameraInfo40D
+  <br>CanonCameraInfo50D
+  <br>CanonCameraInfo450D
+  <br>CanonCameraInfo1000D
   <br>CanonCameraInfoPowerShot
   <br>CanonCameraInfoUnknown32
   <br>CanonCameraInfoUnknown16
   <br>CanonCameraInfoUnknown</td>
-<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Canon.html#CameraInfo1D'>Canon CameraInfo1D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkII'>Canon CameraInfo1DmkII Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkIIN'>Canon CameraInfo1DmkIIN Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkIII'>Canon CameraInfo1DmkIII Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo5D'>Canon CameraInfo5D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo40D'>Canon CameraInfo40D Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfo50D'>Canon CameraInfo50D Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfo450D'>Canon CameraInfo450D Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfo1000D'>Canon CameraInfo1000D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfoPowerShot'>Canon CameraInfoPowerShot Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfoUnknown32'>Canon CameraInfoUnknown32 Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfoUnknown16'>Canon CameraInfoUnknown16 Tags</a>
@@ -165,153 +171,165 @@
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>0x0023</td>
+<td>Categories</td>
+<td class=c>int32u[2]</td>
+<td><span class=s><span class=n>(2 values: 1. always 8, 2. Categories)</span>
+  <br>Bit 0 = People
+  <br>Bit 1 = Scenery
+  <br>Bit 2 = Events
+  <br>Bit 3 = User 1
+  <br>Bit 4 = User 2
+  <br>Bit 5 = User 3
+  <br>Bit 6 = To Do</span></td></tr>
+<tr class=b>
 <td>0x0024</td>
 <td>FaceDetect1</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#FaceDetect1'>Canon FaceDetect1 Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0025</td>
 <td>FaceDetect2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#FaceDetect2'>Canon FaceDetect2 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0026</td>
 <td>CanonAFInfo2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#AFInfo2'>Canon AFInfo2 Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0081</td>
 <td>RawDataOffset</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0083</td>
 <td>OriginalDecisionDataOffset</td>
 <td class=c>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0090</td>
 <td>CustomFunctions1D</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0091</td>
 <td>PersonalFunctions</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#PersonalFuncs'>CanonCustom PersonalFuncs Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0092</td>
 <td>PersonalFunctionValues</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#PersonalFuncValues'>CanonCustom PersonalFuncValues Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0093</td>
 <td>CanonFileInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#FileInfo'>Canon FileInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0094</td>
 <td>AFPointsInFocus1D</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(EOS 1D -- 5 rows: A1-7, B1-10, C1-11, D1-10, E1-7, center point is C6)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0095</td>
-<td>LensType</td>
+<td>LensModel</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0096</td>
 <td>SerialInfo
   <br>InternalSerialNumber</td>
 <td class=c>-<br>string</td>
 <td>--&gt; <a href='Canon.html#SerialInfo'>Canon SerialInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x0097</td>
 <td>DustRemovalData</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0099</td>
 <td>CustomFunctions2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions2'>CanonCustom Functions2 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x00a0</td>
 <td>ProccessingInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#Processing'>Canon Processing Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x00a1</td>
 <td>ToneCurveTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x00a2</td>
 <td>SharpnessTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x00a3</td>
 <td>SharpnessFreqTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x00a4</td>
 <td>WhiteBalanceTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x00a9</td>
 <td>ColorBalance</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ColorBalance'>Canon ColorBalance Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x00ae</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x00b0</td>
 <td>CanonFlags</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#Flags'>Canon Flags Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x00b1</td>
 <td>ModifiedInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ModifiedInfo'>Canon ModifiedInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x00b2</td>
 <td>ToneCurveMatching</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x00b3</td>
 <td>WhiteBalanceMatching</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x00b4</td>
 <td>ColorSpace</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = sRGB
   <br>2 = Adobe RGB</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x00b6</td>
 <td>PreviewImageInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#PreviewImageInfo'>Canon PreviewImageInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x00d0</td>
 <td>VRDOffset</td>
 <td class=c>int32u*</td>
 <td><span class=s><span class=n>(offset of VRD &quot;recipe data&quot; if it exists)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>0x00e0</td>
 <td>SensorInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#SensorInfo'>Canon SensorInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x4001</td>
 <td>ColorBalance1
   <br>ColorBalance2
@@ -323,22 +341,22 @@
   <br>--&gt; <a href='Canon.html#ColorBalance2'>Canon ColorBalance2 Tags</a>
   <br>--&gt; <a href='Canon.html#ColorBalance3'>Canon ColorBalance3 Tags</a>
   <br>--&gt; <a href='Canon.html#ColorBalance4'>Canon ColorBalance4 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x4002</td>
 <td>UnknownBlock1?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x4003</td>
 <td>ColorInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ColorInfo'>Canon ColorInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>0x4005</td>
 <td>UnknownBlock2?</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(unknown 49kB block, not copied to JPEG images)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>0x4008</td>
 <td>BlackLevel?</td>
 <td class=c>N</td>
@@ -438,13 +456,22 @@
 </tr><tr><td class=r>0x2290000</td><td>= PowerShot SX100 IS</td>
 </tr><tr><td class=r>0x2300000</td><td>= PowerShot SD950 IS / Digital IXUS 960 IS / IXY Digital 2000 IS</td>
 </tr><tr><td class=r>0x2310000</td><td>= PowerShot SD870 IS / Digital IXUS 860 IS / IXY Digital 910 IS</td>
-</tr><tr><td class=r>0x2320000</td><td>= PowerShot SD890 IS / Digital IXUS 970 IS / IXY DIGITAL 820 IS</td>
-</tr><tr><td class=r>0x2360000</td><td>= PowerShot SD790 IS / Digital IXUS 90 IS / IXY DIGITAL 95 IS</td>
-</tr><tr><td class=r>0x2370000</td><td>= PowerShot SD770 IS / Digital IXUS 85 IS / IXY DIGITAL 25 IS</td>
+</tr><tr><td class=r>0x2320000</td><td>= PowerShot SD890 IS / Digital IXUS 970 IS / IXY Digital 820 IS</td>
+</tr><tr><td class=r>0x2360000</td><td>= PowerShot SD790 IS / Digital IXUS 90 IS / IXY Digital 95 IS</td>
+</tr><tr><td class=r>0x2370000</td><td>= PowerShot SD770 IS / Digital IXUS 85 IS / IXY Digital 25 IS</td>
 </tr><tr><td class=r>0x2380000</td><td>= PowerShot A590 IS</td>
 </tr><tr><td class=r>0x2390000</td><td>= PowerShot A580</td>
 </tr><tr><td class=r>0x2420000</td><td>= PowerShot A470</td>
 </tr><tr><td class=r>0x2430000</td><td>= PowerShot SD1100 IS / Digital IXUS 80 IS / IXY Digital 20 IS</td>
+</tr><tr><td class=r>0x2460000</td><td>= PowerShot SX1 IS</td>
+</tr><tr><td class=r>0x2470000</td><td>= PowerShot SX10 IS</td>
+</tr><tr><td class=r>0x2480000</td><td>= PowerShot A1000 IS</td>
+</tr><tr><td class=r>0x2490000</td><td>= PowerShot G10</td>
+</tr><tr><td class=r>0x2510000</td><td>= PowerShot A2000 IS</td>
+</tr><tr><td class=r>0x2520000</td><td>= PowerShot SX110 IS</td>
+</tr><tr><td class=r>0x2530000</td><td>= PowerShot SD990 IS / Digital IXUS 980 IS / IXY Digital 3000 IS</td>
+</tr><tr><td class=r>0x2540000</td><td>= PowerShot SD880 IS / Digital IXUS 870 IS / IXY Digital 920 IS</td>
+</tr><tr><td class=r>0x2550000</td><td>= PowerShot E1</td>
 </tr><tr><td class=r>0x3010000</td><td>= PowerShot Pro90 IS</td>
 </tr><tr><td class=r>0x4040000</td><td>= PowerShot G1</td>
 </tr><tr><td class=r>0x6040000</td><td>= PowerShot S100 / Digital IXUS / IXY Digital</td>
@@ -467,9 +494,12 @@
 </tr><tr><td class=r>0x80000190</td><td>= EOS 40D</td>
 </tr><tr><td class=r>0x80000213</td><td>= EOS 5D</td>
 </tr><tr><td class=r>0x80000215</td><td>= EOS-1Ds Mark III</td>
+</tr><tr><td class=r>0x80000218</td><td>= EOS 5D Mark II</td>
 </tr><tr><td class=r>0x80000232</td><td>= EOS-1D Mark II N</td>
 </tr><tr><td class=r>0x80000234</td><td>= EOS 30D</td>
-</tr><tr><td class=r>0x80000236</td><td>= EOS Digital Rebel XTi / 400D / Kiss Digital X</td>
+</tr><tr><td class=r>0x80000236</td><td>= EOS Digital Rebel XTi / 400D / Kiss Digital X (and rare K236)</td>
+</tr><tr><td class=r>0x80000254</td><td>= EOS Rebel XS / 1000D / Kiss F</td>
+</tr><tr><td class=r>0x80000261</td><td>= EOS 50D</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Canon CameraSettings Tags</a></h2>
@@ -795,109 +825,208 @@ others use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='LensType'>Canon LensType Values</a></h2>
+Decimal values differentiate lenses which would otherwise have the same
+LensType, and are used by the Composite LensID tag when attempting to
+identify the specific lens model.
 <blockquote>
 <table class=frame><tr><td>
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>LensType</th></tr>
-<tr><td class=r>1</td><td>= Canon EF 50mm f/1.8</td>
-</tr><tr><td class=r>2</td><td>= Canon EF 28mm f/2.8</td>
-</tr><tr><td class=r>4</td><td>= Canon EF 35-105mm f/3.5-4.5 or Sigma UC Zoom 35-135mm f/4-5.6</td>
-</tr><tr><td class=r>6</td><td>= Tokina AF193-2 19-35mm f/3.5-4.5 or Sigma Lens</td>
-</tr><tr><td class=r>7</td><td>= Canon EF 100-300mm f/5.6L</td>
-</tr><tr><td class=r>8</td><td>= Sigma 70-300mm F4-5.6 DG MACRO or Tokina AT-X242AF 24-200mm F3.5-5.6</td>
-</tr><tr><td class=r>10</td><td>= Canon EF 50mm f/2.5 Macro or Sigma Lens</td>
-</tr><tr><td class=r>11</td><td>= Canon EF 35mm f/2</td>
-</tr><tr><td class=r>13</td><td>= Canon EF 15mm f/2.8</td>
-</tr><tr><td class=r>21</td><td>= Canon EF 80-200mm f/2.8L</td>
-</tr><tr><td class=r>22</td><td>= Tokina AT-X280AF PRO 28-80mm f/2.8 ASPHERICAL</td>
-</tr><tr><td class=r>26</td><td>= Canon EF 100mm f/2.8 Macro or Cosina 100mm f/3.5 Macro AF or Tamron</td>
-</tr><tr><td class=r>28</td><td>= Tamron Lens (various models)</td>
-</tr><tr><td class=r>29</td><td>= Canon EF 50mm f/1.8 MkII</td>
-</tr><tr><td class=r>31</td><td>= Tamron SP AF 300mm f/2.8 LD IF</td>
-</tr><tr><td class=r>32</td><td>= Canon EF 24mm f/2.8 or Sigma 15mm f/2.8 EX Fisheye</td>
-</tr><tr><td class=r>39</td><td>= Canon EF 75-300mm f/4-5.6</td>
-</tr><tr><td class=r>40</td><td>= Canon EF 28-80mm f/3.5-5.6</td>
-</tr><tr><td class=r>42</td><td>= Tamron AF 28-300mm F3.5-6.3 XR Di VC LD Aspherical [IF] Macro Model A20</td>
-</tr><tr><td class=r>43</td><td>= Canon EF 28-105mm f/4-5.6</td>
-</tr><tr><td class=r>45</td><td>= Canon EF-S 18-55mm f/3.5-5.6</td>
-</tr><tr><td class=r>48</td><td>= Canon EF-S 18-55mm f/3.5-5.6 IS</td>
-</tr><tr><td class=r>49</td><td>= Canon EF-S 55-250mm f/4-5.6 IS</td>
-</tr><tr><td class=r>124</td><td>= Canon MP-E 65mm f/2.8 1-5x Macro Photo</td>
-</tr><tr><td class=r>125</td><td>= Canon TS-E 24mm f/3.5L</td>
-</tr><tr><td class=r>126</td><td>= Canon TS-E 45mm f/2.8</td>
-</tr><tr><td class=r>127</td><td>= Canon TS-E 90mm f/2.8</td>
-</tr><tr><td class=r>130</td><td>= Canon EF 50mm f/1.0L</td>
-</tr><tr><td class=r>131</td><td>= Sigma Lens (various models)</td>
-</tr><tr><td class=r>134</td><td>= Canon EF 600mm f/4L IS</td>
-</tr><tr><td class=r>135</td><td>= Canon EF 200mm f/1.8L</td>
-</tr><tr><td class=r>136</td><td>= Canon EF 300mm f/2.8L</td>
-</tr><tr><td class=r>137</td><td>= Canon EF 85mm f/1.2L</td>
-</tr><tr><td class=r>139</td><td>= Canon EF 400mm f/2.8L</td>
-</tr><tr><td class=r>141</td><td>= Canon EF 500mm f/4.5L</td>
-</tr><tr><td class=r>142</td><td>= Canon EF 300mm f/2.8L IS</td>
-</tr><tr><td class=r>143</td><td>= Canon EF 500mm f/4L IS</td>
-</tr><tr><td class=r>144</td><td>= Canon EF 35-135mm f/4-5.6 USM</td>
-</tr><tr><td class=r>149</td><td>= Canon EF 100mm f/2</td>
-</tr><tr><td class=r>150</td><td>= Canon EF 14mm f/2.8L or Sigma 20mm EX f/1.8</td>
-</tr><tr><td class=r>151</td><td>= Canon EF 200mm f/2.8L</td>
-</tr><tr><td class=r>152</td><td>= Canon EF 300mm F4L IS or Sigma Lens</td>
-</tr><tr><td class=r>153</td><td>= Canon EF 35-350mm f/3.5-5.6L or Tamron or Sigma Bigma</td>
-</tr><tr><td class=r>154</td><td>= Canon EF 20mm f/2.8 USM</td>
-</tr><tr><td class=r>155</td><td>= Canon EF 85mm f/1.8 USM</td>
-</tr><tr><td class=r>156</td><td>= Canon EF 28-105mm f/3.5-4.5 USM</td>
-</tr><tr><td class=r>160</td><td>= Canon EF 20-35mm f/3.5-4.5 USM</td>
-</tr><tr><td class=r>161</td><td>= Canon EF 28-70mm f/2.8L or Sigma 24-70mm EX f/2.8 or Tamron 90mm f/2.8</td>
-</tr><tr><td class=r>165</td><td>= Canon EF 70-200mm f/2.8 L</td>
-</tr><tr><td class=r>166</td><td>= Canon EF 70-200mm f/2.8 L + x1.4</td>
-</tr><tr><td class=r>167</td><td>= Canon EF 70-200mm f/2.8 L + x2</td>
-</tr><tr><td class=r>168</td><td>= Canon EF 28mm f/1.8 USM</td>
-</tr><tr><td class=r>169</td><td>= Canon EF17-35mm f/2.8L or Sigma Lens</td>
-</tr><tr><td class=r>170</td><td>= Canon EF 200mm f/2.8L II</td>
-</tr><tr><td class=r>171</td><td>= Canon EF 300mm F4L</td>
-</tr><tr><td class=r>173</td><td>= Canon EF 180mm Macro f/3.5L or Sigma 180mm f/3.5 or 150mm f/2.8 Macro</td>
-</tr><tr><td class=r>174</td><td>= Canon EF 135mm f/2L</td>
-</tr><tr><td class=r>176</td><td>= Canon EF 24-85mm f/3.5-4.5 USM</td>
-</tr><tr><td class=r>177</td><td>= Canon EF 300mm f/4L IS</td>
-</tr><tr><td class=r>178</td><td>= Canon EF 28-135mm f/3.5-5.6 IS</td>
-</tr><tr><td class=r>179</td><td>= Canon EF 24mm f/1.4L</td>
-</tr><tr><td class=r>180</td><td>= Canon EF 35mm f/1.4L</td>
-</tr><tr><td class=r>181</td><td>= Canon EF 100-400mm f/4.5-5.6L IS + x1.4</td>
-</tr><tr><td class=r>182</td><td>= Canon EF 100-400mm f/4.5-5.6L IS + x2</td>
-</tr><tr><td class=r>183</td><td>= Canon EF 100-400mm f/4.5-5.6L IS</td>
-</tr><tr><td class=r>184</td><td>= Canon EF 400mm f/2.8L + x2</td>
-</tr><tr><td class=r>186</td><td>= Canon EF 70-200mm f/4L</td>
-</tr><tr><td class=r>187</td><td>= Canon EF 70-200mm f/4L + x1.4</td>
-</tr><tr><td class=r>188</td><td>= Canon EF 70-200mm f/4L + x2</td>
-</tr><tr><td class=r>190</td><td>= Canon EF 100mm f/2.8 Macro</td>
-</tr><tr><td class=r>191</td><td>= Canon EF 400mm f/4 DO IS</td>
-</tr><tr><td class=r>197</td><td>= Canon EF 75-300mm f/4-5.6 IS</td>
-</tr><tr><td class=r>198</td><td>= Canon EF 50mm f/1.4 USM</td>
-</tr><tr><td class=r>202</td><td>= Canon EF 28-80 f/3.5-5.6 USM IV</td>
-</tr><tr><td class=r>211</td><td>= Canon EF 28-200mm f/3.5-5.6</td>
-</tr><tr><td class=r>212</td><td>= Canon EF 28-105mm f/4-5.6 USM</td>
-</tr><tr><td class=r>213</td><td>= Canon EF 90-300mm f/4.5-5.6</td>
-</tr><tr><td class=r>214</td><td>= Canon EF-S 18-55mm f/3.5-4.5 USM</td>
-</tr><tr><td class=r>215</td><td>= Canon EF 55-200 4.5-5.6 II USM</td>
-</tr><tr><td class=r>224</td><td>= Canon EF 70-200mm f/2.8L IS</td>
-</tr><tr><td class=r>225</td><td>= Canon EF 70-200mm f/2.8L IS + x1.4</td>
-</tr><tr><td class=r>226</td><td>= Canon EF 70-200mm f/2.8L IS + x2</td>
-</tr><tr><td class=r>229</td><td>= Canon EF 16-35mm f/2.8L</td>
-</tr><tr><td class=r>230</td><td>= Canon EF 24-70mm f/2.8L</td>
-</tr><tr><td class=r>231</td><td>= Canon EF 17-40mm f/4L</td>
-</tr><tr><td class=r>232</td><td>= Canon EF 70-300mm f/4.5-5.6 DO IS USM</td>
-</tr><tr><td class=r>233</td><td>= Canon EF 28-300mm f/3.5-5.6L IS</td>
-</tr><tr><td class=r>234</td><td>= Canon EF-S 17-85mm f4-5.6 IS USM</td>
-</tr><tr><td class=r>235</td><td>= Canon EF-S 10-22mm f/3.5-4.5 USM</td>
-</tr><tr><td class=r>236</td><td>= Canon EF-S 60mm f/2.8 Macro USM</td>
-</tr><tr><td class=r>237</td><td>= Canon EF 24-105mm f/4L IS</td>
-</tr><tr><td class=r>238</td><td>= Canon EF 70-300mm f/4-5.6 IS USM</td>
-</tr><tr><td class=r>239</td><td>= Canon EF 85mm f/1.2L II</td>
-</tr><tr><td class=r>240</td><td>= Canon EF-S 17-55mm f/2.8 IS USM</td>
-</tr><tr><td class=r>241</td><td>= Canon EF 50mm f/1.2L</td>
-</tr><tr><td class=r>242</td><td>= Canon EF 70-200mm f/4L IS</td>
-</tr><tr><td class=r>243</td><td>= Canon EF 70-200mm f/4L IS + x1.4</td>
-</tr><tr><td class=r>244</td><td>= Canon EF 70-200mm f/4L IS + x2</td>
-</tr><tr><td class=r>246</td><td>= Canon EF 16-35mm f/2.8L II</td>
+<tr><td>1</td><td>= Canon EF 50mm f/1.8</td>
+</tr><tr><td>2</td><td>= Canon EF 28mm f/2.8</td>
+</tr><tr><td>3</td><td>= Canon EF 135mm f/2.8 Soft</td>
+</tr><tr><td>4</td><td>= Canon EF 35-105mm f/3.5-4.5 or Sigma Lens</td>
+</tr><tr><td>4.1</td><td>= Sigma UC Zoom 35-135mm f/4-5.6</td>
+</tr><tr><td>5</td><td>= Canon EF 35-70mm f/3.5-4.5</td>
+</tr><tr><td>6</td><td>= Canon EF 28-70mm f/3.5-4.5 or Sigma or Tokina Lens</td>
+</tr><tr><td>6.1</td><td>= Sigma 18-50mm f/3.5-5.6 DC</td>
+</tr><tr><td>6.2</td><td>= Sigma 18-125mm f/3.5-5.6 DC IF ASP</td>
+</tr><tr><td>6.3</td><td>= Tokina AF193-2 19-35mm f/3.5-4.5</td>
+</tr><tr><td>7</td><td>= Canon EF 100-300mm f/5.6L</td>
+</tr><tr><td>8</td><td>= Canon EF 100-300mm f/5.6 or Sigma or Tokina Lens</td>
+</tr><tr><td>8.1</td><td>= Sigma 70-300mm f/4-5.6 DG Macro</td>
+</tr><tr><td>8.2</td><td>= Tokina AT-X242AF 24-200mm f/3.5-5.6</td>
+</tr><tr><td>9</td><td>= Canon EF 70-210mm f/4</td>
+</tr><tr><td>9.1</td><td>= Sigma 55-200mm f/4-5.6 DC</td>
+</tr><tr><td>10</td><td>= Canon EF 50mm f/2.5 Macro or Sigma Lens</td>
+</tr><tr><td>10.1</td><td>= Sigma 50mm f/2.8 EX</td>
+</tr><tr><td>10.2</td><td>= Sigma 28mm f/1.8</td>
+</tr><tr><td>10.3</td><td>= Sigma 105mm f/2.8 Macro EX</td>
+</tr><tr><td>11</td><td>= Canon EF 35mm f/2</td>
+</tr><tr><td>13</td><td>= Canon EF 15mm f/2.8 Fisheye</td>
+</tr><tr><td>14</td><td>= Canon EF 50-200mm f/3.5-4.5L</td>
+</tr><tr><td>15</td><td>= Canon EF 50-200mm f/3.5-4.5</td>
+</tr><tr><td>16</td><td>= Canon EF 35-135mm f/3.5-4.5</td>
+</tr><tr><td>17</td><td>= Canon EF 35-70mm f/3.5-4.5A</td>
+</tr><tr><td>18</td><td>= Canon EF 28-70mm f/3.5-4.5</td>
+</tr><tr><td>20</td><td>= Canon EF 100-200mm f/4.5A</td>
+</tr><tr><td>21</td><td>= Canon EF 80-200mm f/2.8L</td>
+</tr><tr><td>22</td><td>= Canon EF 20-35mm f/2.8L or Tokina Lens</td>
+</tr><tr><td>22.1</td><td>= Tokina AT-X280AF PRO 28-80mm f/2.8 Aspherical</td>
+</tr><tr><td>23</td><td>= Canon EF 35-105mm f/3.5-4.5</td>
+</tr><tr><td>24</td><td>= Canon EF 35-80mm f/4-5.6 Power Zoom</td>
+</tr><tr><td>25</td><td>= Canon EF 35-80mm f/4-5.6 Power Zoom</td>
+</tr><tr><td>26</td><td>= Canon EF 100mm f/2.8 Macro or Cosina or Tamron Lens</td>
+</tr><tr><td>26.1</td><td>= Cosina 100mm f/3.5 Macro AF</td>
+</tr><tr><td>26.2</td><td>= Tamron SP AF 90mm f/2.8 Di Macro</td>
+</tr><tr><td>26.3</td><td>= Tamron SP AF 180mm f/3.5 Di Macro</td>
+</tr><tr><td>27</td><td>= Canon EF 35-80mm f/4-5.6</td>
+</tr><tr><td>28</td><td>= Canon EF 80-200mm f/4.5-5.6 or Tamron Lens</td>
+</tr><tr><td>28.1</td><td>= Tamron SP AF 28-105mm f/2.8 LD Aspherical IF</td>
+</tr><tr><td>28.2</td><td>= Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical [IF] Macro</td>
+</tr><tr><td>28.3</td><td>= Tamron AF 70-300mm f/4.5-5.6 Di LD 1:2 Macro Zoom</td>
+</tr><tr><td>28.4</td><td>= Tamron AF Aspherical 28-200mm f/3.8-5.6</td>
+</tr><tr><td>29</td><td>= Canon EF 50mm f/1.8 MkII</td>
+</tr><tr><td>30</td><td>= Canon EF 35-105mm f/4.5-5.6</td>
+</tr><tr><td>31</td><td>= Canon EF 75-300mm f/4-5.6 or Tamron Lens</td>
+</tr><tr><td>31.1</td><td>= Tamron SP AF 300mm f/2.8 LD IF</td>
+</tr><tr><td>32</td><td>= Canon EF 24mm f/2.8 or Sigma Lens</td>
+</tr><tr><td>32.1</td><td>= Sigma 15mm f/2.8 EX Fisheye</td>
+</tr><tr><td>35</td><td>= Canon EF 35-80mm f/4-5.6</td>
+</tr><tr><td>36</td><td>= Canon EF 38-76mm f/4.5-5.6</td>
+</tr><tr><td>37</td><td>= Canon EF 35-80mm f/4-5.6 or Tamron Lens</td>
+</tr><tr><td>37.1</td><td>= Tamron 70-200mm f/2.8 Di LD IF Macro</td>
+</tr><tr><td>38</td><td>= Canon EF 80-200mm f/4.5-5.6</td>
+</tr><tr><td>39</td><td>= Canon EF 75-300mm f/4-5.6</td>
+</tr><tr><td>40</td><td>= Canon EF 28-80mm f/3.5-5.6</td>
+</tr><tr><td>41</td><td>= Canon EF 28-90mm f/4-5.6</td>
+</tr><tr><td>42</td><td>= Canon EF 28-200mm f/3.5-5.6 or Tamron Lens</td>
+</tr><tr><td>42.1</td><td>= Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical [IF] Macro Model A20</td>
+</tr><tr><td>43</td><td>= Canon EF 28-105mm f/4-5.6</td>
+</tr><tr><td>44</td><td>= Canon EF 90-300mm f/4.5-5.6</td>
+</tr><tr><td>45</td><td>= Canon EF-S 18-55mm f/3.5-5.6</td>
+</tr><tr><td>46</td><td>= Canon EF 28-90mm f/4-5.6</td>
+</tr><tr><td>48</td><td>= Canon EF-S 18-55mm f/3.5-5.6 IS</td>
+</tr><tr><td>49</td><td>= Canon EF-S 55-250mm f/4-5.6 IS</td>
+</tr><tr><td>50</td><td>= Canon EF-S 18-200mm f/3.5-5.6 IS</td>
+</tr><tr><td>124</td><td>= Canon MP-E 65mm f/2.8 1-5x Macro Photo</td>
+</tr><tr><td>125</td><td>= Canon TS-E 24mm f/3.5L</td>
+</tr><tr><td>126</td><td>= Canon TS-E 45mm f/2.8</td>
+</tr><tr><td>127</td><td>= Canon TS-E 90mm f/2.8</td>
+</tr><tr><td>129</td><td>= Canon EF 300mm f/2.8L</td>
+</tr><tr><td>130</td><td>= Canon EF 50mm f/1.0L</td>
+</tr><tr><td>131</td><td>= Canon EF 28-80mm f/2.8-4L or Sigma Lens</td>
+</tr><tr><td>131.1</td><td>= Sigma 8mm f/3.5 EX DG Circular Fisheye</td>
+</tr><tr><td>131.2</td><td>= Sigma 17-35mm f/2.8-4 EX DG Aspherical HSM</td>
+</tr><tr><td>131.3</td><td>= Sigma 17-70mm F2.8-4.5 DC Macro</td>
+</tr><tr><td>131.4</td><td>= Sigma APO 50-150mm f/2.8 EX DC HSM</td>
+</tr><tr><td>131.5</td><td>= Sigma APO 120-300mm f/2.8 EX DG HSM</td>
+</tr><tr><td>132</td><td>= Canon EF 1200mm f/5.6L</td>
+</tr><tr><td>134</td><td>= Canon EF 600mm f/4L IS</td>
+</tr><tr><td>135</td><td>= Canon EF 200mm f/1.8L</td>
+</tr><tr><td>136</td><td>= Canon EF 300mm f/2.8L</td>
+</tr><tr><td>137</td><td>= Canon EF 85mm f/1.2L</td>
+</tr><tr><td>138</td><td>= Canon EF 28-80mm f/2.8-4L</td>
+</tr><tr><td>139</td><td>= Canon EF 400mm f/2.8L</td>
+</tr><tr><td>140</td><td>= Canon EF 500mm f/4.5L</td>
+</tr><tr><td>141</td><td>= Canon EF 500mm f/4.5L</td>
+</tr><tr><td>142</td><td>= Canon EF 300mm f/2.8L IS</td>
+</tr><tr><td>143</td><td>= Canon EF 500mm f/4L IS</td>
+</tr><tr><td>144</td><td>= Canon EF 35-135mm f/4-5.6 USM</td>
+</tr><tr><td>145</td><td>= Canon EF 100-300mm f/4.5-5.6 USM</td>
+</tr><tr><td>146</td><td>= Canon EF 70-210mm f/3.5-4.5 USM</td>
+</tr><tr><td>147</td><td>= Canon EF 35-135mm f/4-5.6 USM</td>
+</tr><tr><td>148</td><td>= Canon EF 28-80mm f/3.5-5.6 USM</td>
+</tr><tr><td>149</td><td>= Canon EF 100mm f/2 USM</td>
+</tr><tr><td>150</td><td>= Canon EF 14mm f/2.8L or Sigma Lens</td>
+</tr><tr><td>150.1</td><td>= Sigma 20mm EX f/1.8</td>
+</tr><tr><td>150.2</td><td>= Sigma 30mm f/1.4 DC HSM</td>
+</tr><tr><td>150.3</td><td>= Sigma 24mm f/1.8 DG Macro EX</td>
+</tr><tr><td>151</td><td>= Canon EF 200mm f/2.8L</td>
+</tr><tr><td>152</td><td>= Canon EF 300mm f/4L IS or Sigma Lens</td>
+</tr><tr><td>152.1</td><td>= Sigma 12-24mm f/4.5-5.6 EX DG ASPHERICAL HSM</td>
+</tr><tr><td>152.2</td><td>= Sigma 14mm f/2.8 EX Aspherical HSM</td>
+</tr><tr><td>152.3</td><td>= Sigma 10-20mm f/4-5.6</td>
+</tr><tr><td>152.4</td><td>= Sigma 100-300mm f/4</td>
+</tr><tr><td>153</td><td>= Canon EF 35-350mm f/3.5-5.6L or Sigma or Tamron Lens</td>
+</tr><tr><td>153.1</td><td>= Sigma 50-500mm f/4-6.3 APO HSM EX</td>
+</tr><tr><td>153.2</td><td>= Tamron AF 28-300mm f/3.5-6.3 XR LD Aspherical [IF] Macro</td>
+</tr><tr><td>153.3</td><td>= Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical [IF] Macro Model A14</td>
+</tr><tr><td>153.4</td><td>= Tamron 18-250mm f/3.5-6.3 Di II_LD Aspherical [IF] Macro</td>
+</tr><tr><td>154</td><td>= Canon EF 20mm f/2.8 USM</td>
+</tr><tr><td>155</td><td>= Canon EF 85mm f/1.8 USM</td>
+</tr><tr><td>156</td><td>= Canon EF 28-105mm f/3.5-4.5 USM</td>
+</tr><tr><td>160</td><td>= Canon EF 20-35mm f/3.5-4.5 USM</td>
+</tr><tr><td>161</td><td>= Canon EF 28-70mm f/2.8L or Sigma or Tamron Lens</td>
+</tr><tr><td>161.1</td><td>= Sigma 24-70mm EX f/2.8</td>
+</tr><tr><td>161.2</td><td>= Tamron 90mm f/2.8</td>
+</tr><tr><td>162</td><td>= Canon EF 200mm f/2.8L</td>
+</tr><tr><td>163</td><td>= Canon EF 300mm f/4L</td>
+</tr><tr><td>164</td><td>= Canon EF 400mm f/5.6L</td>
+</tr><tr><td>165</td><td>= Canon EF 70-200mm f/2.8 L</td>
+</tr><tr><td>166</td><td>= Canon EF 70-200mm f/2.8 L + 1.4x</td>
+</tr><tr><td>167</td><td>= Canon EF 70-200mm f/2.8 L + 2x</td>
+</tr><tr><td>168</td><td>= Canon EF 28mm f/1.8 USM</td>
+</tr><tr><td>169</td><td>= Canon EF 17-35mm f/2.8L or Sigma Lens</td>
+</tr><tr><td>169.1</td><td>= Sigma 18-200mm f/3.5-6.3 DC OS</td>
+</tr><tr><td>169.2</td><td>= Sigma 15-30mm f/3.5-4.5 EX DG Aspherical</td>
+</tr><tr><td>169.3</td><td>= Sigma 18-50mm f/2.8 Macro</td>
+</tr><tr><td>170</td><td>= Canon EF 200mm f/2.8L II</td>
+</tr><tr><td>171</td><td>= Canon EF 300mm f/4L</td>
+</tr><tr><td>172</td><td>= Canon EF 400mm f/5.6L</td>
+</tr><tr><td>173</td><td>= Canon EF 180mm Macro f/3.5L or Sigma Lens</td>
+</tr><tr><td>173.1</td><td>= Sigma 180mm EX HSM Macro f/3.5</td>
+</tr><tr><td>173.2</td><td>= Sigma APO Macro 150mm f/3.5 EX DG IF HSM</td>
+</tr><tr><td>174</td><td>= Canon EF 135mm f/2L</td>
+</tr><tr><td>175</td><td>= Canon EF 400mm f/2.8L</td>
+</tr><tr><td>176</td><td>= Canon EF 24-85mm f/3.5-4.5 USM</td>
+</tr><tr><td>177</td><td>= Canon EF 300mm f/4L IS</td>
+</tr><tr><td>178</td><td>= Canon EF 28-135mm f/3.5-5.6 IS</td>
+</tr><tr><td>179</td><td>= Canon EF 24mm f/1.4L</td>
+</tr><tr><td>180</td><td>= Canon EF 35mm f/1.4L</td>
+</tr><tr><td>181</td><td>= Canon EF 100-400mm f/4.5-5.6L IS + 1.4x</td>
+</tr><tr><td>182</td><td>= Canon EF 100-400mm f/4.5-5.6L IS + 2x</td>
+</tr><tr><td>183</td><td>= Canon EF 100-400mm f/4.5-5.6L IS</td>
+</tr><tr><td>184</td><td>= Canon EF 400mm f/2.8L + 2x</td>
+</tr><tr><td>185</td><td>= Canon EF 600mm f/4L IS</td>
+</tr><tr><td>186</td><td>= Canon EF 70-200mm f/4L</td>
+</tr><tr><td>187</td><td>= Canon EF 70-200mm f/4L + 1.4x</td>
+</tr><tr><td>188</td><td>= Canon EF 70-200mm f/4L + 2x</td>
+</tr><tr><td>189</td><td>= Canon EF 70-200mm f/4L + 2.8x</td>
+</tr><tr><td>190</td><td>= Canon EF 100mm f/2.8 Macro</td>
+</tr><tr><td>191</td><td>= Canon EF 400mm f/4 DO IS</td>
+</tr><tr><td>193</td><td>= Canon EF 35-80mm f/4-5.6 USM</td>
+</tr><tr><td>194</td><td>= Canon EF 80-200mm f/4.5-5.6 USM</td>
+</tr><tr><td>195</td><td>= Canon EF 35-105mm f/4.5-5.6 USM</td>
+</tr><tr><td>196</td><td>= Canon EF 75-300mm f/4-5.6 USM</td>
+</tr><tr><td>197</td><td>= Canon EF 75-300mm f/4-5.6 IS USM</td>
+</tr><tr><td>198</td><td>= Canon EF 50mm f/1.4 USM</td>
+</tr><tr><td>199</td><td>= Canon EF 28-80mm f/3.5-5.6 USM</td>
+</tr><tr><td>200</td><td>= Canon EF 75-300mm f/4-5.6 USM</td>
+</tr><tr><td>201</td><td>= Canon EF 28-80mm f/3.5-5.6 USM</td>
+</tr><tr><td>202</td><td>= Canon EF 28-80mm f/3.5-5.6 USM IV</td>
+</tr><tr><td>208</td><td>= Canon EF 22-55mm f/4-5.6 USM</td>
+</tr><tr><td>209</td><td>= Canon EF 55-200mm f/4.5-5.6</td>
+</tr><tr><td>210</td><td>= Canon EF 28-90mm f/4-5.6 USM</td>
+</tr><tr><td>211</td><td>= Canon EF 28-200mm f/3.5-5.6 USM</td>
+</tr><tr><td>212</td><td>= Canon EF 28-105mm f/4-5.6 USM</td>
+</tr><tr><td>213</td><td>= Canon EF 90-300mm f/4.5-5.6 USM</td>
+</tr><tr><td>214</td><td>= Canon EF-S 18-55mm f/3.5-4.5 USM</td>
+</tr><tr><td>215</td><td>= Canon EF 55-200mm f/4.5-5.6 II USM</td>
+</tr><tr><td>224</td><td>= Canon EF 70-200mm f/2.8L IS</td>
+</tr><tr><td>225</td><td>= Canon EF 70-200mm f/2.8L IS + 1.4x</td>
+</tr><tr><td>226</td><td>= Canon EF 70-200mm f/2.8L IS + 2x</td>
+</tr><tr><td>227</td><td>= Canon EF 70-200mm f/2.8L IS + 2.8x</td>
+</tr><tr><td>228</td><td>= Canon EF 28-105mm f/3.5-4.5 USM</td>
+</tr><tr><td>229</td><td>= Canon EF 16-35mm f/2.8L</td>
+</tr><tr><td>230</td><td>= Canon EF 24-70mm f/2.8L</td>
+</tr><tr><td>231</td><td>= Canon EF 17-40mm f/4L</td>
+</tr><tr><td>232</td><td>= Canon EF 70-300mm f/4.5-5.6 DO IS USM</td>
+</tr><tr><td>233</td><td>= Canon EF 28-300mm f/3.5-5.6L IS</td>
+</tr><tr><td>234</td><td>= Canon EF-S 17-85mm f4-5.6 IS USM</td>
+</tr><tr><td>235</td><td>= Canon EF-S 10-22mm f/3.5-4.5 USM</td>
+</tr><tr><td>236</td><td>= Canon EF-S 60mm f/2.8 Macro USM</td>
+</tr><tr><td>237</td><td>= Canon EF 24-105mm f/4L IS</td>
+</tr><tr><td>238</td><td>= Canon EF 70-300mm f/4-5.6 IS USM</td>
+</tr><tr><td>239</td><td>= Canon EF 85mm f/1.2L II</td>
+</tr><tr><td>240</td><td>= Canon EF-S 17-55mm f/2.8 IS USM</td>
+</tr><tr><td>241</td><td>= Canon EF 50mm f/1.2L</td>
+</tr><tr><td>242</td><td>= Canon EF 70-200mm f/4L IS</td>
+</tr><tr><td>243</td><td>= Canon EF 70-200mm f/4L IS + 1.4x</td>
+</tr><tr><td>244</td><td>= Canon EF 70-200mm f/4L IS + 2x</td>
+</tr><tr><td>245</td><td>= Canon EF 70-200mm f/4L IS + 2.8x</td>
+</tr><tr><td>246</td><td>= Canon EF 16-35mm f/2.8L II</td>
+</tr><tr><td>247</td><td>= Canon EF 14mm f/2.8L II USM</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='FocalLength'>Canon FocalLength Tags</a></h2>
@@ -1039,7 +1168,8 @@ offset by about -5 EV from the calculated LV for most models)</span></span></td>
 <td class=r>19</td>
 <td>FocusDistanceUpper</td>
 <td class=c>int16s</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(FocusDistance tags are only extracted if FocusDistanceUpper is non-zero
+since they are not used by some newer models such as 450D and 1000D)</span></span></td></tr>
 <tr class=b>
 <td class=r>20</td>
 <td>FocusDistanceLower</td>
@@ -1943,6 +2073,168 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>2347</td>
+<td>LensModel</td>
+<td class=c>string[64]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfo50D'>Canon CameraInfo50D Tags</a></h2>
+<p>CameraInfo tags for the EOS 50D.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>80</td>
+<td>FocusDistanceUpper</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>82</td>
+<td>FocusDistanceLower</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>115</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>235</td>
+<td>LensType</td>
+<td class=c>int8u</td>
+<td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
+<tr>
+<td class=r>346</td>
+<td>FirmwareVersion</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(at this location for firmware 2.6.1)</span></span></td></tr>
+<tr class=b>
+<td class=r>350</td>
+<td>FirmwareVersion</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(at this location for firmware 3.1.1)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfo450D'>Canon CameraInfo450D Tags</a></h2>
+<p>CameraInfo tags for the EOS 450D.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>29</td>
+<td>FocalLength</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>67</td>
+<td>FocusDistanceUpper</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>69</td>
+<td>FocusDistanceLower</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>111</td>
+<td>WhiteBalance</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Values</a></td></tr>
+<tr>
+<td class=r>115</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>223</td>
+<td>LensType</td>
+<td class=c>int8u</td>
+<td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
+<tr>
+<td class=r>263</td>
+<td>FirmwareVersion</td>
+<td class=c>string[6]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>307</td>
+<td>DirectoryIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>319</td>
+<td>FileIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>2355</td>
+<td>LensModel</td>
+<td class=c>string[64]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfo1000D'>Canon CameraInfo1000D Tags</a></h2>
+<p>CameraInfo tags for the EOS 1000D.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>29</td>
+<td>FocalLength</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>67</td>
+<td>FocusDistanceUpper</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>69</td>
+<td>FocusDistanceLower</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>111</td>
+<td>WhiteBalance</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Values</a></td></tr>
+<tr>
+<td class=r>115</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>227</td>
+<td>LensType</td>
+<td class=c>int8u</td>
+<td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
+<tr>
+<td class=r>267</td>
+<td>FirmwareVersion</td>
+<td class=c>string[6]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>311</td>
+<td>DirectoryIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>323</td>
+<td>FileIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>2359</td>
+<td>LensModel</td>
+<td class=c>string[64]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfoPowerShot'>Canon CameraInfoPowerShot Tags</a></h2>
@@ -2415,7 +2707,7 @@ images with a directory number of 164 or greater)</span></span></td></tr>
 <td class=r>2</td>
 <td>Sharpness</td>
 <td class=c>int16s</td>
-<td><span class=s><span class=n>(1D and 5D only)</span></span></td></tr>
+<td><span class=s><span class=n>(1D, 5D and 450D only)</span></span></td></tr>
 <tr>
 <td class=r>3</td>
 <td>SharpnessFrequency</td>
@@ -3260,7 +3552,7 @@ the average black level)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ColorBalance4'>Canon ColorBalance4 Tags</a></h2>
-<p>These tags are used by the 40D, 1DmkIII and 1DSmkIII.</p>
+<p>These tags are used by the 40D, 1DmkIII, 1DSmkIII, 450D and 1000D.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -3494,7 +3786,7 @@ the average black level)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 26, 2008</i>
+<br><i>Last revised Oct 21, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

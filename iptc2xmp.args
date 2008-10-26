@@ -8,6 +8,7 @@
 # Revisions:    2005/05/14 - P. Harvey Created
 #				2008/03/04 - PH Changed Location translation and added
 #							 IntellectualGenre and SubjectCode
+#				2008/09/30 - PH Added writing of Photoshop:IPTCDigest
 #
 # References:   http://www.iptc.org/IPTC4XMP/
 #               http://www.iptc.org/IIM/
@@ -23,6 +24,8 @@
 #               XMP-pdf but we want to write it to XMP-dc:Subject, so we
 #               exclude these tags from the mass copy and handle them
 #               separately.
+#
+#				Also updates Photoshop:IPTCDigest as per MWG recommendation.
 #
 -IPTC:* > XMP:*
 --IPTC:Source
@@ -44,4 +47,5 @@
 # these tags are not free-form text, and may need special handling:
 #-IPTC:ObjectAttributeReference > XMP-iptcCore:IntellectualGenre
 #-IPTC:SubjectReference > XMP-iptcCore:SubjectCode
+-Photoshop:IPTCDigest=new
 # end

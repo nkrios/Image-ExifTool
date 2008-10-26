@@ -1,11 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.24
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: Writer_6_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:28 14:39:14
+[File, File, Image]  - File Size: 5.7 kB
+[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:44-04:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image]  - Current IPTC Digest: ae7f9febdd814f389d9302d1585ea86e
 [File, File, Image] ImageWidth - Image Width: 8
 [File, File, Image] ImageHeight - Image Height: 8
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
@@ -153,6 +154,7 @@
 [MakerNotes, Canon, Camera] 0 - Canon 0x0000: 0 0 0 0 0 0 3072000 892 2048000 595 65540 262146
 [IPTC, IPTC, Other] 15 - Category: IPTC test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
 [XMP, XMP-dc, Image] description - Description: New description
 [XMP, XMP-exif, Camera] Contrast - Contrast: High
 [Composite, Composite, Image]  - Aperture: 14.0
@@ -160,6 +162,7 @@
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
+[Composite, Composite, Camera]  - Lens ID: Unknown 18-55mm
 [Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4

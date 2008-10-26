@@ -33,6 +33,10 @@ $VERSION = '1.07';
         Condition => '$$valPt =~ /^Exif\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::Exif::Main' },
       }, {
+        Name => 'ExtendedXMP',
+        Condition => '$$valPt =~ m{^http://ns.adobe.com/xmp/extension/\0}',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
+      }, {
         Name => 'XMP',
         Condition => '$$valPt =~ /^http/ or $$valPt =~ /<exif:/',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },

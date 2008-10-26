@@ -65,33 +65,35 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       ITC   r       PPM   r/w    |  EXIF           r/w/c
-  ACR   r       JNG   r/w     PPT   r      |  GPS            r/w/c
-  AI    r       JP2   r/w     PS    r/w    |  IPTC           r/w/c
-  AIFF  r       JPEG  r/w     PSD   r/w    |  XMP            r/w/c
-  APE   r       K25   r       QTIF  r      |  MakerNotes     r/w/c
-  ARW   r       KDC   r       RA    r      |  Photoshop IRB  r/w/c
-  ASF   r       M4A   r       RAF   r/w    |  ICC Profile    r/w/c
-  AVI   r       MEF   r/w     RAM   r      |  MIE            r/w/c
-  BMP   r       MIE   r/w/c   RAW   r/w    |  JFIF           r/w/c
-  BTF   r       MIFF  r       RIFF  r      |  Ducky APP12    r/w/c
-  CR2   r/w     MNG   r/w     RM    r      |  CIFF           r/w
-  CRW   r/w     MOS   r/w     SR2   r      |  AFCP           r/w
-  CS1   r/w     MOV   r       SRF   r      |  JPEG 2000      r
-  DCM   r       MP3   r       SVG   r      |  DICOM          r
-  DCR   r       MP4   r       SWF   r      |  Flash          r
-  DIVX  r       MPC   r       THM   r/w    |  FlashPix       r
-  DNG   r/w     MPG   r       TIFF  r/w    |  QuickTime      r
-  DOC   r       MRW   r/w     VRD   r/w/c  |  GeoTIFF        r
-  EPS   r/w     NEF   r/w     WAV   r      |  PrintIM        r
-  ERF   r/w     OGG   r       WDP   r/w    |  ID3            r
-  FLAC  r       ORF   r/w     WMA   r      |  Kodak Meta     r
-  FLV   r       PBM   r/w     WMV   r      |  Ricoh RMETA    r
-  FPX   r       PDF   r/w     X3F   r      |  Picture Info   r
-  GIF   r/w     PEF   r/w     XLS   r      |  Adobe APP14    r
-  HDP   r/w     PGM   r/w     XMP   r/w/c  |  APE            r
-  HTML  r       PICT  r                    |  Vorbis         r
-  ICC   r/w/c   PNG   r/w                  |  (and more)
+  3FR   r       HTML  r       PPM   r/w    |  EXIF           r/w/c
+  ACR   r       ICC   r/w/c   PPT   r      |  GPS            r/w/c
+  AI    r       ITC   r       PS    r/w    |  IPTC           r/w/c
+  AIFF  r       JNG   r/w     PSD   r/w    |  XMP            r/w/c
+  APE   r       JP2   r/w     QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       JPEG  r/w     RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       K25   r       RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       KDC   r       RAM   r      |  MIE            r/w/c
+  BMP   r       M4A   r       RAW   r/w    |  JFIF           r/w/c
+  BTF   r       MEF   r/w     RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MIE   r/w/c   RWZ   r      |  PDF            r/w/c
+  CRW   r/w     MIFF  r       RM    r      |  CIFF           r/w
+  CS1   r/w     MNG   r/w     SO    r      |  AFCP           r/w
+  DCM   r       MOS   r/w     SR2   r      |  JPEG 2000      r
+  DCR   r       MOV   r       SRF   r      |  DICOM          r
+  DIVX  r       MP3   r       SVG   r      |  Flash          r
+  DJVU  r       MP4   r       SWF   r      |  FlashPix       r
+  DLL   r       MPC   r       THM   r/w    |  QuickTime      r
+  DNG   r/w     MPG   r       TIFF  r/w    |  GeoTIFF        r
+  DOC   r       MRW   r/w     VRD   r/w/c  |  PrintIM        r
+  DYLIB r       NEF   r/w     WAV   r      |  ID3            r
+  EPS   r/w     OGG   r       WDP   r/w    |  Kodak Meta     r
+  EXE   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
+  ERF   r/w     PBM   r/w     WMV   r      |  Picture Info   r
+  FLAC  r       PDF   r/w     X3F   r      |  Adobe APP14    r
+  FLV   r       PEF   r/w     XLS   r      |  APE            r
+  FPX   r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
+  GIF   r/w     PICT  r       ZIP   r      |  SPIFF          r
+  HDP   r/w     PNG   r/w                  |  (and more)
 
 =head1 CONFIGURATION
 
@@ -397,8 +399,8 @@ unchanged unless the StrictDate option is set.  Timezones are ignored.
 
 =item Duplicates
 
-Flag to preserve values of duplicate tags (instead of overwriting existing
-value).  Default is 1.
+Flag to return values from tags with duplicate names when extracting
+information.  Default is 1.
 
 =item Exclude
 
@@ -408,13 +410,18 @@ case of tag names is not significant.  This option is ignored for
 specifically requested tags.  Tags may also be excluded by preceeding their
 name with a '-' in the arguments to L</ImageInfo>.
 
+=item ExtractEmbedded
+
+Flag to extract information from embedded documents in PostScript files.
+Default is 0.
+
 =item FastScan
 
 Flag to increase speed of extracting information from JPEG images.  With
 this option set, ExifTool will not scan to the end of a JPEG image to check
 for an AFCP, CanonVRD, FotoStation, PhotoMechanic, MIE or PreviewImage
 trailer.  Also, when combined with the ScanForXMP option, prevents scanning
-for XMP in recognized file types.  Default 0.
+for XMP in recognized file types.  Default is 0.
 
 =item FixBase
 
@@ -456,8 +463,14 @@ message.
 
 =item List
 
-Flag to extract lists of PrintConv values into arrays instead of
-concatenating them into comma-separated strings.  Default is 0.
+Flag to extract lists of PrintConv values into arrays instead of joining
+them into a string of values.  The L</ListSep> option specifies the
+separator used when combining values.  Default is 0.
+
+=item ListSep
+
+Separator string used to join lists of PrintConv values when L</List> option
+is not set.  Default is ', '.
 
 =item MakerNotes
 
@@ -777,10 +790,10 @@ unless the PrintConv option is disabled.
 
 Tags which represent lists of multiple values (as may happen with 'Keywords'
 for example) are handled specially.  In scalar context, the returned
-PrintConv value for these tags is either a comma-separated string of values
-or a list reference (depending on the List option setting), and the
-ValueConv value is always a list reference.  But in list context,
-L</GetValue> always returns the list itself.
+PrintConv value for these tags is either a string of values or a list
+reference (depending on the List option setting), and the ValueConv value is
+always a list reference.  But in list context, L</GetValue> always returns
+the list itself.
 
     # PrintConv example
     my $val = $exifTool->GetValue($tag);
@@ -819,10 +832,10 @@ ValueConv and PrintConv values as a list.
 =item Return Values:
 
 The value of the specified tag.  If the tag represents a list of values and
-the List option is disabled then PrintConv returns a comma separated string
-of values, otherwise a reference to the list is returned in scalar context.
-The list itself is returned in list context.  Values may also be scalar
-references to binary data.
+the List option is disabled then PrintConv returns a string of values,
+otherwise a reference to the list is returned in scalar context.  The list
+itself is returned in list context.  Values may also be scalar references to
+binary data.
 
 Note: It is possible for L</GetValue> to return an undefined ValueConv or
 PrintConv value (or an empty list in list context) even if the tag exists,
@@ -953,6 +966,14 @@ In scalar context, returns the number of tags set and error messages are
 printed to STDERR.  In list context, returns the number of tags set and the
 error string.
 
+=item Notes:
+
+When deleting groups of tags, the Replace option may be used as in the last
+example above to exclude specific groups from a mass delete.  However, this
+technique may not be used to exclude individual tags.  Instead, use
+L</SetNewValuesFromFile> to recover the values of individual tags after
+deleting a group.
+
 =back
 
 =head2 SetNewValuesFromFile
@@ -981,6 +1002,10 @@ in a specified file.
     $exifTool->SetNewValuesFromFile($file,
         'Comment<ISO=$ISO Aperture=$aperture Exposure=$shutterSpeed');
 
+    # set keywords list from the values of multiple tags
+    $exifTool->SetNewValuesFromFile($file, { Replace => 0 },
+        'keywords<xmp:subject', 'keywords<filename');
+
 =over 4
 
 =item Inputs:
@@ -989,24 +1014,27 @@ in a specified file.
 
 1) File name, file reference, or scalar reference
 
-2-N) [optional] List of tag names to set.  All writable tags are set if none
-are specified.  The tag names are not case sensitive, and may be prefixed by
-an optional family 0 or 1 group name, separated by a colon (ie. 'exif:iso').
-A leading '-' indicates tags to be excluded (ie. '-comment').  An asterisk
-('*') may be used for the tag name, and is useful when a group is specified
-to set all tags from a group (ie. 'XMP:*').  A special feature allows tag
-names of the form 'SRCTAG>DSTTAG' (or 'DSTTAGE<lt>SRCTAG') to be specified
-to copy information to a tag with a different name or a specified group.
-Both 'SRCTAG' and 'DSTTAG' may use '*' and/or be prefixed by a group name
-(ie. 'modifyDate>fileModifyDate' or '*>xmp:*').  Copied tags may also be
-added or deleted from a list with arguments of the form 'SRCTAG+>DSTTAG' or
-'SRCTAG->DSTTAG'.  Tags are evaluated in order, so exclusions apply only to
-tags included earlier in the list.  An extension of this feature allows the
-tag value to be set from an expression containing tag names with leading '$'
-symbols (ie. 'CommentE<lt>Filename: $filename').  Braces '{}' may be used
-around the tag name to separate it from subsequent text, and a '$$' is used
-to to represent a '$' symbol.  (The behaviour for missing tags in
-expressions is defined by the L</MissingTagValue> option.)
+2-N) [optional] List of tag names to set or options hash references.  All
+writable tags are set if none are specified.  The tag names are not case
+sensitive, and may be prefixed by an optional family 0 or 1 group name,
+separated by a colon (ie. 'exif:iso'). A leading '-' indicates tags to be
+excluded (ie. '-comment').  An asterisk ('*') may be used for the tag name,
+and is useful when a group is specified to set all tags from a group (ie.
+'XMP:*').  A special feature allows tag names of the form 'SRCTAG>DSTTAG'
+(or 'DSTTAGE<lt>SRCTAG') to be specified to copy information to a tag with a
+different name or a specified group. Both 'SRCTAG' and 'DSTTAG' may use '*'
+and/or be prefixed by a group name (ie. 'modifyDate>fileModifyDate' or
+'*>xmp:*').  Copied tags may also be added or deleted from a list with
+arguments of the form 'SRCTAG+>DSTTAG' or 'SRCTAG->DSTTAG'.  Tags are
+evaluated in order, so exclusions apply only to tags included earlier in the
+list.  An extension of this feature allows the tag value to be set from an
+expression containing tag names with leading '$' symbols (ie.
+'CommentE<lt>Filename: $filename').  Braces '{}' may be used around the tag
+name to separate it from subsequent text, and a '$$' is used to to represent
+a '$' symbol.  (The behaviour for missing tags in expressions is defined by
+the L</MissingTagValue> option.)  Multiple options hash references may be
+passed to set different options for different tags.  Options apply to
+subsequent tags in the argument list.
 
 By default, this routine will commute information between same-named tags in
 different groups, allowing information to be translated between images with
@@ -1015,6 +1043,22 @@ name for extracted tags (even if '*' is used as a group name), in which case
 the information is written to the original group, unless redirected to a
 different group.  (For example, a tag name of '*:*' may be specified to copy
 all information while preserving the original groups.)
+
+=item SetNewValuesFromFile Options:
+
+The options are the same was for L<SetNewValue>, and are passed directly
+to L<SetNewValue> internally, with a few exceptions:
+
+- The Replace option defaults to 1 instead of 0 as with L<SetNewValue>.
+
+- The AddValue or DelValue option is set for individual tags if '+>' or '->'
+(or '+E<lt>' or '-E<lt>') are used.
+
+- The Group option is set for tags where a group name is given.
+
+- The Protected flag is set to 1 for individually specified tags.
+
+- The Type option also applies to extracted tags.
 
 =item Return Values:
 
@@ -1027,7 +1071,7 @@ The PrintConv option applies to this routine, but it normally should be left
 on to provide more reliable transfer of information between groups.
 
 If a preview image exists, it is not copied.  The preview image must be
-transferred separately if desired.
+transferred separately if desired, in a separate call to L</WriteInfo>
 
 When simply copying all information between files of the same type, it is
 usually desirable to preserve the original groups by specifying '*:*' for
@@ -1470,35 +1514,37 @@ Here is a complete list of groups for each family:
 =item Family 0 (Information Type):
 
 AFCP, AIFF, APE, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
-CanonVRD, Composite, DICOM, DNG, Ducky, EXIF, ExifTool, FLAC, File, Flash,
-FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC, ITC, JFIF,
-JPEG, Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes, Meta, PDF,
-PICT, PNG, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
-RIFF, Real, SVG, SigmaRaw, Vorbis, XMP
+CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool, FLAC,
+File, Flash, FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC,
+ITC, JFIF, JPEG, Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MakerNotes,
+Meta, PDF, PICT, PNG, PhotoMechanic, Photoshop PostScript, PrintIM,
+QuickTime, RAF, RIFF, Rawzor, Real, Ricoh, SVG, SigmaRaw, Vorbis, XMP, ZIP
 
 =item Family 1 (Specific Location):
 
 AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
-CanonVRD, Casio, Composite, DICOM, DNG, Ducky, EPPIM, ExifIFD, ExifTool,
-FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS, GeoTiff,
-GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96,
-HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
-ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC, InteropIFD,
-JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD,
-KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC, MIE-Audio, MIE-Camera,
-MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens,
-MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Test,
-MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG,
-MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture,
-NikonPreview, NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax,
-PhotoMechanic, Photoshop, PictureInfo, PostScript, PrintIM, QuickTime, RAF,
-RAF2, RIFF, RMETA, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
-Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
-SRF#, SVG, Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP,
-XMP-DICOM, XMP-PixelLive, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex,
-XMP-exif, XMP-iptcCore, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
-XMP-photomech, XMP-photoshop, XMP-tiff, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
-XMP-xmpMM, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg
+CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
+ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS,
+GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod,
+HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
+ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC,
+InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC,
+MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
+MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
+MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF,
+MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw,
+Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF, PICT, PNG,
+Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
+PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor, Real,
+Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
+Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo, Sigma, SigmaRaw,
+Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-PixelLive, XMP-album,
+XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore,
+XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech,
+XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff,
+XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS,
+XMP-xmpRights, XMP-xmpTPg, ZIP
 
 =item Family 2 (Category):
 

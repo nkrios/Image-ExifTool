@@ -1,11 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: CanonRaw_6_failed.cr2
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 11 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:13 09:33:16
+[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:29-04:00
 [File, File, Image]  - File Type: CR2
 [File, File, Image]  - MIME Type: image/x-raw
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image]  - Current IPTC Digest: 74386a2844191f61317ffa999148834a
 [EXIF, IFD0, Image] 256 - Image Width: 1536
 [EXIF, IFD0, Image] 257 - Image Height: 1024
 [EXIF, IFD0, Image] 258 - Bits Per Sample: 8 8 8
@@ -63,6 +64,7 @@
 [EXIF, IFD3, Image] 273 - Strip Offsets: 11474
 [EXIF, IFD3, Image] 279 - Strip Byte Counts: 16
 [EXIF, IFD3, Image] 50752 - Raw Image Segmentation: 1 1758 1758
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [IPTC, IPTC, Other] 25 - Keywords: CR2 test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
@@ -115,8 +117,6 @@
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
-[MakerNotes, Canon, Image] 19 - Focus Distance Upper: 0
-[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 0
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
@@ -211,6 +211,7 @@
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - ISO: 400
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
+[Composite, Composite, Camera]  - Lens ID: Unknown 18-55mm
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Aperture-priority AE

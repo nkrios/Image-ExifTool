@@ -1,7 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Type: PNG
 [File, File, Image]  - MIME Type: image/png
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image]  - Current IPTC Digest: 32acda5aea9ad1d96e5b56b502e33ff2
 [PNG, PNG, Image] 0 - Image Width: 16
 [PNG, PNG, Image] 4 - Image Height: 16
 [PNG, PNG, Image] 8 - Bit Depth: 1
@@ -20,6 +21,7 @@
 [PNG, PNG, Image] Title - Title: Test IPTC picture
 [PNG, PNG, Image] URL - URL: http://owl.phy.queensu.ca/~phil/exiftool/
 [PNG, PNG, Time] tIME - Modify Date: 2004:02:26 09:36:46
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
@@ -37,6 +39,7 @@
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 80
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 100
 [XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Co-sited
+[XMP, XMP-tiff, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:4:4 (1 1)
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
 [XMP, XMP-xmpRights, Author] Marked - Marked: False
@@ -106,5 +109,5 @@
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Image]  - Shutter Speed: 1/64
 [Composite, Composite, Camera]  - Focal Length: 6.0 mm
-[Composite, Composite, Image]  - Image Size: 100x80
+[Composite, Composite, Image]  - Image Size: 16x16
 [Composite, Composite, Image]  - Light Value: 9.6

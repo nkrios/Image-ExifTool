@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: Nikon_4_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:13 09:33:30
+[File, File, Image]  - File Size: 6.2 kB
+[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:37-04:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
@@ -118,6 +118,7 @@
 [MakerNotes, Nikon, Camera] 162 - Image Data Size: 2361498
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 526
 [MakerNotes, Nikon, Camera] 0 - Flash Info Version: 0100
+[MakerNotes, Nikon, Camera] 4 - Flash Model: Internal
 [MakerNotes, Nikon, Camera] 8 - External Flash Flags: (none)
 [MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
 [MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
@@ -129,6 +130,8 @@
 [MakerNotes, Nikon, Camera] 169 - Image Optimization: Custom
 [MakerNotes, Nikon, Camera] 170 - Saturation: Enhanced
 [MakerNotes, Nikon, Camera] 171 - Vari Program: 
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
+[XMP, XMP-microsoft, Image] FlashModel - Flash Model: Internal
 [XMP, XMP-aux, Camera] Lens - Lens: 18-70mm f/3.5-4.5
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: No= 20025585
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 4
@@ -137,6 +140,7 @@
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 47
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 71
 [XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Co-sited
+[XMP, XMP-tiff, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [Composite, Composite, Image]  - Aperture: 5.0
 [Composite, Composite, Camera]  - Flash: On
 [Composite, Composite, Camera]  - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED

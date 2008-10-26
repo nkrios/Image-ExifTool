@@ -8,10 +8,9 @@
 BEGIN { $| = 1; print "1..3\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
-# test 1: Load ExifTool
+# test 1: Load the module(s)
 use Image::ExifTool 'ImageInfo';
-use Image::ExifTool::ID3;
-use Image::ExifTool::MPEG;
+use Image::ExifTool::APE;
 $loaded = 1;
 print "ok 1\n";
 

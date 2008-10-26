@@ -3,8 +3,8 @@
 #
 # Description:  Read PDF meta information
 #
-# Revisions:    07/11/05 - P. Harvey Created
-#               07/25/05 - P. Harvey Add support for encrypted documents
+# Revisions:    07/11/2005 - P. Harvey Created
+#               07/25/2005 - P. Harvey Add support for encrypted documents
 #
 # References:   1) http://partners.adobe.com/public/developer/pdf/index_reference.html
 #               2) http://search.cpan.org/dist/Crypt-RC4/
@@ -17,7 +17,7 @@ use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.14';
+$VERSION = '1.18';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -88,7 +88,7 @@ my $pdfVer;         # version of PDF file being processed
         PrintConvInv => '$self->InverseDateTime($val)', 
     },
     Trapped => {
-        Writable => 0,
+        Protected => 1,
         # remove leading '/' from '/True' or '/False'
         ValueConv => '$val=~s{^/}{}; $val',
         ValueConvInv => '"/$val"',
@@ -260,6 +260,35 @@ sub WarnOnce($$)
 }
 
 #------------------------------------------------------------------------------
+# Convert PDFDocEncoding characters to Unicode
+# Inputs: 0) PDF text string, 1) Unicode pack format (n,N,v or V)
+# Returns: Unicode string
+my %pdf2unicode = (
+    0x18 => 0x02d8,    0x82 => 0x2021,    0x8c => 0x201e,    0x96 => 0x0152,
+    0x19 => 0x02c7,    0x83 => 0x2026,    0x8d => 0x201c,    0x97 => 0x0160,
+    0x1a => 0x02c6,    0x84 => 0x2014,    0x8e => 0x201d,    0x98 => 0x0178,
+    0x1b => 0x02d9,    0x85 => 0x2013,    0x8f => 0x2018,    0x99 => 0x017d,
+    0x1c => 0x02dd,    0x86 => 0x0192,    0x90 => 0x2019,    0x9a => 0x0131,
+    0x1d => 0x02db,    0x87 => 0x2044,    0x91 => 0x201a,    0x9b => 0x0142,
+    0x1e => 0x02da,    0x88 => 0x2039,    0x92 => 0x2122,    0x9c => 0x0153,
+    0x1f => 0x02dc,    0x89 => 0x203a,    0x93 => 0xfb01,    0x9d => 0x0161,
+    0x80 => 0x2022,    0x8a => 0x2212,    0x94 => 0xfb02,    0x9e => 0x017e,
+    0x81 => 0x2020,    0x8b => 0x2030,    0x95 => 0x0141,    0xa0 => 0x20ac,
+);
+sub PDF2Unicode($$)
+{
+    local $_;
+    my ($val, $fmt) = @_;
+    my @pdf = unpack('C*',$val);
+    foreach (@pdf) {
+        next unless $pdf2unicode{$_};
+        $_ = $pdf2unicode{$_};
+    }
+    # repack as a Unicode string
+    return pack("$fmt*", @pdf);
+}
+
+#------------------------------------------------------------------------------
 # Convert from PDF to EXIF-style date/time
 # Inputs: 0) PDF date/time string (D:yyyymmddhhmmss+hh'mm')
 # Returns: EXIF date string (yyyy:mm:dd hh:mm:ss+hh:mm)
@@ -329,7 +358,8 @@ sub LocateAnyObject($$)
                 my $w = $$dict{W};
                 for ($j=0; $j<3; ++$j) {
                     # use default value if W entry is 0 (as per spec)
-                    $$w[$j] or $t[$j] = ($j ? 1 : 0), next;
+                    # - 0th element defaults to 1, others default to 0
+                    $$w[$j] or $t[$j] = ($j ? 0 : 1), next;
                     $t[$j] = shift(@c);
                     for ($k=1; $k < $$w[$j]; ++$k) {
                         $t[$j] = 256 * $t[$j] + shift(@c);
@@ -415,7 +445,7 @@ sub FetchObject($$$$)
             return undef unless @table == $num;
             # remove everything before first object in stream
             $$obj{_stream} = substr($$obj{_stream}, $$obj{First});
-            $table[$num-1] =~ s/^(\d+).*/$1/;  # trim excess from last number
+            $table[$num-1] =~ s/^(\d+).*/$1/s;  # trim excess from last number
             $$obj{_table} = \@table;
             # save the object stream so we don't have to re-load it later
             $streamObjs{$ref} = $obj;
@@ -557,7 +587,7 @@ sub ExtractObject($$;$$)
 # extract array
 #
     } elsif ($delim eq '[') {
-        $objData =~ /.*?\[(.*)\]/s or return;
+        $objData =~ /.*?\[(.*)\]/s or return undef;
         my $data = $1;    # brackets removed
         my @list;
         for (;;) {
@@ -861,7 +891,7 @@ sub RC4Crypt($$)
 # Initialize decryption
 # Inputs: 0) ExifTool object reference, 1) Encrypt dictionary reference,
 #         2) ID from file trailer dictionary
-# Returns: error string or undef on success
+# Returns: error string or undef on success (and generates Encryption tag)
 sub DecryptInit($$$)
 {
     my ($exifTool, $encrypt, $id) = @_;
@@ -1027,7 +1057,10 @@ sub ProcessDict($$$$;$$)
                 } else {
                     $fetched{$$val} = 1;
                     $val = FetchObject($exifTool, $$val, $xref, $tag);
-                    $val2 = '<err>' unless defined $val;
+                    unless (defined $val) {
+                        $val2 = '<err>';
+                        $exifTool->VPrint(0, "$$exifTool{INDENT}Error reading object:\n");
+                    }
                 }
             } elsif (ref $val eq 'HASH') {
                 $extra = ', direct dictionary';
@@ -1091,7 +1124,10 @@ sub ProcessDict($$$$;$$)
                     $exifTool->FoundTag($tagInfo, $v);
                 }
             } else {
-                if ($val =~ s/^\xfe\xff// and not $$tagInfo{Binary}) {
+                if (not $$tagInfo{Binary} and $val =~ /[\x18-\x1f\x80-\xff]/) {
+                    # text string is already in Unicode if it starts with "\xfe\xff",
+                    # otherwise we must first convert from PDFDocEncoding
+                    $val = PDF2Unicode($val, 'n') unless $val =~ s/^\xfe\xff//;
                     $val = $exifTool->Unicode2Charset($val, 'MM');
                 }
                 if ($$tagInfo{List}) {
@@ -1122,8 +1158,9 @@ sub ProcessDict($$$$;$$)
                 next if $fetched{$$subDict};
                 # load dictionary via an indirect reference
                 $fetched{$$subDict} = 1;
-                $subDict = FetchObject($exifTool, $$subDict, $xref, $tag);
-                $subDict or $exifTool->Warn("Error reading $tag object"), next;
+                my $obj = FetchObject($exifTool, $$subDict, $xref, $tag);
+                $obj or $exifTool->Warn("Error reading $tag object ($$subDict)"), next;
+                $subDict = $obj;
             }
             if (ref $subDict eq 'ARRAY') {
                 # convert array of key/value pairs to a hash
@@ -1220,7 +1257,7 @@ sub ReadPDF($$)
     $raf->Seek(-$len, 2) or return -2;
     $raf->Read($buff, $len) == $len or return -3;
     # find the last xref table in the file (may be multiple %%EOF marks)
-    $buff =~ /.*startxref(\x0d\x0a|\x0a\x0a|\x0d|\x0a)(\d+)\1%%EOF/s or return -4;
+    $buff =~ /.*startxref *(\x0d\x0a|\x0d|\x0a)\s*?(\d+)\s+%%EOF/s or return -4;
     $/ = $1;    # set input record separator
     push @xrefOffsets, $2, 'Main';
     my (%xref, @mainDicts, %loaded, $mainFree);
@@ -1257,7 +1294,7 @@ sub ReadPDF($$)
                 last if $buff =~ s/^\s*trailer\s+//s;
                 $buff =~ s/\s*(\d+)\s+(\d+)\s+//s or return -4;
                 my ($start, $num) = ($1, $2);
-                $num and $raf->Seek(-length($buff), 1) or return -4;
+                $raf->Seek(-length($buff), 1) or return -4;
                 my $i;
                 for ($i=0; $i<$num; ++$i) {
                     $raf->Read($buff, 20) == 20 or return -6;
@@ -1277,7 +1314,8 @@ sub ReadPDF($$)
                         $xref{"$num $gen R"} = $offset;
                     }
                 }
-                %xref or return -4; # xref table may not be empty
+                # (I have a sample from Adobe which has an empty xref table)
+                # %xref or return -4; # xref table may not be empty
                 $buff = '';
             }
             undef $mainFree;    # only do this for the last xref table

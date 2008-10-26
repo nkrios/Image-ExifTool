@@ -27,7 +27,7 @@ use Image::ExifTool::Exif;
 $VERSION = '1.30';
 
 sub ProcessPanasonicType2($$$);
-sub WhiteBalanceConv($;$);
+sub WhiteBalanceConv($;$$);
 
 # conversions for ShootingMode and SceneMode
 my %shootingMode = (
@@ -783,7 +783,7 @@ my %shootingMode = (
 # Convert Leica Kelvin white balance
 # Inputs: 0) value, 1) flag to perform inverse conversion
 # Returns: Converted value, or undef on error
-sub WhiteBalanceConv($;$)
+sub WhiteBalanceConv($;$$)
 {
     my ($val, $inv) = @_;
     if ($inv) {

@@ -651,7 +651,7 @@ sub ProcessReal($$)
     # override MIMEType with stream MIME type if we only have one stream
     if (@mimeTypes == 1 and length $mimeTypes[0]) {
         $exifTool->{VALUE}->{MIMEType} = $mimeTypes[0];
-        $verbose and $exifTool->VPrint(0, "  MIMEType = $mimeTypes[0]\n");
+        $exifTool->VPrint(0, "  MIMEType = $mimeTypes[0]\n");
     }
 #
 # Process footer containing Real metadata and ID3 information

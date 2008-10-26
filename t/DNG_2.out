@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: DNG.dng
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 13 kB
-[File, File, Time]  - File Modification Date/Time: 2006:02:26 09:30:53
+[File, File, Time]  - File Modification Date/Time: 2006:02:26 09:30:53-05:00
 [File, File, Image]  - File Type: DNG
 [File, File, Image]  - MIME Type: image/x-raw
 [File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
@@ -101,7 +101,7 @@
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, IFD0, Image] 37393 - Image Number: 24
-[EXIF, IFD0, Image] 50706 - DNG Version: 1 1 0 0
+[EXIF, IFD0, Image] 50706 - DNG Version: 1.1.0.0
 [EXIF, IFD0, Image] 50707 - DNG Backward Version: 1 1 0 0
 [EXIF, IFD0, Image] 50708 - Unique Camera Model: Canon EOS 350D
 [EXIF, IFD0, Image] 50709 - Localized Camera Model: Canon EOS 350D Digital
@@ -122,6 +122,7 @@
 [EXIF, IFD0, Image] 50779 - Calibration Illuminant 2: D65
 [EXIF, IFD0, Image] 50781 - Raw Data Unique ID: 0358DB4E08632D90925171A6BB8848A2
 [EXIF, IFD0, Image] 50827 - Original Raw File Name: Canon350D.CR2
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: XMP toolkit 3.0-28, framework 1.6
 [XMP, XMP-exif, Image] ExifVersion - Exif Version: 0221
 [XMP, XMP-exif, Image] ExposureTime - Exposure Time: 1/15
 [XMP, XMP-exif, Image] ShutterSpeedValue - Shutter Speed Value: 1/15
@@ -208,8 +209,6 @@
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
-[MakerNotes, Canon, Image] 19 - Focus Distance Upper: 0
-[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 0
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
@@ -307,6 +306,7 @@
 [Composite, Composite, Image]  - Image Size: 3516x2328
 [Composite, Composite, Image]  - Jpg From Raw: (Binary data 29 bytes)
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
+[Composite, Composite, Camera]  - Lens ID: Unknown 18-55mm
 [Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Aperture-priority AE

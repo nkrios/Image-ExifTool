@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -81,6 +81,8 @@ my %coordConv = (
     0x0006 => {
         Name => 'GPSAltitude',
         Writable => 'rational64u',
+        # extricate unsigned decimal number from string
+        ValueConvInv => '$val=~/((?=\d|\.\d)\d*(?:\.\d*)?)/ ? $1 : undef',
         PrintConv => '$val eq "inf" ? $val : "$val m"',
         PrintConvInv => '$val=~s/\s*m$//;$val',
     },
@@ -306,6 +308,14 @@ my %coordConv = (
         },
         ValueConv => '$val[1] =~ /^W/i ? -$val[0] : $val[0]',
         PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")',
+    },
+    GPSAltitude => {
+        Require => {
+            0 => 'GPS:GPSAltitude',
+            1 => 'GPS:GPSAltitudeRef',
+        },
+        ValueConv => '$val[1] ? "-$val[0]" : $val[0]',
+        PrintConv => '($val =~ s/^-// ? "$val m Below" : "$val m Above") . " Sea Level"'
     },
 );
 

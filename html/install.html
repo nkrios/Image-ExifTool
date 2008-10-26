@@ -13,8 +13,8 @@ li { margin-top: .5em }
 <body>
 <h1 class='up'>Installing ExifTool</h1>
 
-<p>See the appropriate section below with instructions for installing ExifTool
-on your specific platform:</p>
+<p>See the appropriate section below with instructions for installing or
+uninstalling ExifTool on your specific platform:</p>
 
 <ul>
 <li><a href="#Windows">Windows</a></li>
@@ -56,6 +56,13 @@ following steps:</p>
 </ol>
 <p>You can now run exiftool by typing "<code>exiftool</code>" at the command
 prompt.</p>
+<p><b>Uninstalling:</b></p>
+<ol type='i'>
+<li>Drag "<code>exiftool(-k).exe</code>" (or "<code>C:\WINDOWS\exiftool.exe</code>")
+into the Recycle bin.</li>
+<li>Drag the directory "<code>C:\Documents and Settings\USER\Temp\par-USER</code>"
+into the Recycle bin (where "<code>USER</code>" is your Windows user name).</li>
+</ol>
 <h3>Full Perl Distribution</h3>
 <p>You must have Perl installed to use this version.  (A free version of Perl
 can be downloaded from
@@ -76,6 +83,14 @@ in the "<code>C:\WINDOWS</code>" directory.</li>
 can run exiftool by typing "<code>exiftool.pl</code>" at the
 "<code>cmd.exe</code>" prompt.  Otherwise you should type
 "<code>perl&nbsp;c:\windows\exiftool.pl</code>".</p>
+<p><b>Uninstalling:</b></p>
+<ol type='i'>
+<li>Drag "<code>C:\WINDOWS\exiftool.pl</code>" and
+"<code>C:\WINDOWS\lib</code>" into the Recycle bin.  (First, confirm
+that "<code>C:\WINDOWS\lib</code>" contains only the "<code>File</code>"
+and "<code>Image</code>" sub-directories.  Do not delete it if it
+contains anything else.)</li>
+</ol>
 
 <hr>
 <h2><a name="OSX">Macintosh OS X</a></h2>
@@ -126,6 +141,19 @@ below puts exiftool in /usr/bin and the individual libraries in
 libraries exist, /usr/bin/lib takes precedence for exiftool, but
 /Library/Perl/#.## is the default for any other Perl scripts.)</span></p>
 
+<h3>Uninstalling</h3>
+<ol type='i'>
+<li>Open the "Terminal" application.</li>
+<li>Type "<code>open /usr/bin</code>" (without the quotes) in the Terminal
+window, then press RETURN. (This opens a folder that you normally can't access
+from OS X.)</li>
+<li>Drag "<code>exiftool</code>" and "<code>lib</code>" into the trash from the
+"<code>bin</code>" folder you opened. You should first confirm that
+"<code>lib</code>" contains only two sub-folders: "<code>File</code>" and
+"<code>Image</code>". If it contains anything else, don't trash it because you
+have the wrong "<code>lib</code>" folder.</li>
+</ol>
+
 <hr>
 <h2><a name="Unix">Unix Platforms</a></h2>
 
@@ -156,6 +184,12 @@ perldoc Image::ExifTool::TagNames
 man Image::ExifTool
 man Image::ExifTool::TagNames
 </pre></blockquote>
+
+<h3>Uninstalling</h3>
+<ol type='i'>
+<li>Type "<code>sudo make uninstall</code>" from the distribution directory.</li>
+</ol>
+
 <hr>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>

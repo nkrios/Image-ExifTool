@@ -1,6 +1,6 @@
 Summary: perl module for image data extraction 
 Name: perl-Image-ExifTool
-Version: 7.30
+Version: 7.50
 Release: 1
 License: Artistic/GPL
 Group: Development/Libraries/Perl
@@ -21,33 +21,35 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       ITC   r       PPM   r/w    |  EXIF           r/w/c
-  ACR   r       JNG   r/w     PPT   r      |  GPS            r/w/c
-  AI    r       JP2   r/w     PS    r/w    |  IPTC           r/w/c
-  AIFF  r       JPEG  r/w     PSD   r/w    |  XMP            r/w/c
-  APE   r       K25   r       QTIF  r      |  MakerNotes     r/w/c
-  ARW   r       KDC   r       RA    r      |  Photoshop IRB  r/w/c
-  ASF   r       M4A   r       RAF   r/w    |  ICC Profile    r/w/c
-  AVI   r       MEF   r/w     RAM   r      |  MIE            r/w/c
-  BMP   r       MIE   r/w/c   RAW   r/w    |  JFIF           r/w/c
-  BTF   r       MIFF  r       RIFF  r      |  Ducky APP12    r/w/c
-  CR2   r/w     MNG   r/w     RM    r      |  CIFF           r/w
-  CRW   r/w     MOS   r/w     SR2   r      |  AFCP           r/w
-  CS1   r/w     MOV   r       SRF   r      |  JPEG 2000      r
-  DCM   r       MP3   r       SVG   r      |  DICOM          r
-  DCR   r       MP4   r       SWF   r      |  Flash          r
-  DIVX  r       MPC   r       THM   r/w    |  FlashPix       r
-  DNG   r/w     MPG   r       TIFF  r/w    |  QuickTime      r
-  DOC   r       MRW   r/w     VRD   r/w/c  |  GeoTIFF        r
-  EPS   r/w     NEF   r/w     WAV   r      |  PrintIM        r
-  ERF   r/w     OGG   r       WDP   r/w    |  ID3            r
-  FLAC  r       ORF   r/w     WMA   r      |  Kodak Meta     r
-  FLV   r       PBM   r/w     WMV   r      |  Ricoh RMETA    r
-  FPX   r       PDF   r/w     X3F   r      |  Picture Info   r
-  GIF   r/w     PEF   r/w     XLS   r      |  Adobe APP14    r
-  HDP   r/w     PGM   r/w     XMP   r/w/c  |  APE            r
-  HTML  r       PICT  r                    |  Vorbis         r
-  ICC   r/w/c   PNG   r/w                  |  (and more)
+  3FR   r       HTML  r       PPM   r/w    |  EXIF           r/w/c
+  ACR   r       ICC   r/w/c   PPT   r      |  GPS            r/w/c
+  AI    r       ITC   r       PS    r/w    |  IPTC           r/w/c
+  AIFF  r       JNG   r/w     PSD   r/w    |  XMP            r/w/c
+  APE   r       JP2   r/w     QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       JPEG  r/w     RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       K25   r       RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       KDC   r       RAM   r      |  MIE            r/w/c
+  BMP   r       M4A   r       RAW   r/w    |  JFIF           r/w/c
+  BTF   r       MEF   r/w     RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MIE   r/w/c   RWZ   r      |  PDF            r/w/c
+  CRW   r/w     MIFF  r       RM    r      |  CIFF           r/w
+  CS1   r/w     MNG   r/w     SO    r      |  AFCP           r/w
+  DCM   r       MOS   r/w     SR2   r      |  JPEG 2000      r
+  DCR   r       MOV   r       SRF   r      |  DICOM          r
+  DIVX  r       MP3   r       SVG   r      |  Flash          r
+  DJVU  r       MP4   r       SWF   r      |  FlashPix       r
+  DLL   r       MPC   r       THM   r/w    |  QuickTime      r
+  DNG   r/w     MPG   r       TIFF  r/w    |  GeoTIFF        r
+  DOC   r       MRW   r/w     VRD   r/w/c  |  PrintIM        r
+  DYLIB r       NEF   r/w     WAV   r      |  ID3            r
+  EPS   r/w     OGG   r       WDP   r/w    |  Kodak Meta     r
+  EXE   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
+  ERF   r/w     PBM   r/w     WMV   r      |  Picture Info   r
+  FLAC  r       PDF   r/w     X3F   r      |  Adobe APP14    r
+  FLV   r       PEF   r/w     XLS   r      |  APE            r
+  FPX   r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
+  GIF   r/w     PICT  r       ZIP   r      |  SPIFF          r
+  HDP   r/w     PNG   r/w                  |  (and more)
 
 See html/index.html for more details about ExifTool features.
 

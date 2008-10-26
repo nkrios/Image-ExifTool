@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -757,6 +757,7 @@ sub ProcessID3($$)
     my ($buff, %id3Header, %id3Trailer, $hBuff, $tBuff, $tBuffPos, $tagTablePtr);
     my $rtnVal = 0;
     my $hdrEnd = 0;
+    my $id3Len = 0;
 
     # read first 3 bytes of file
     $raf->Seek(0, 0);
@@ -810,6 +811,7 @@ sub ProcessID3($$)
             Version  => $vers,
             DirName  => "ID3v$verStr",
         );
+        $id3Len += length($hBuff) + 10;
         if ($vers >= 0x0400) {
             $tagTablePtr = GetTagTable('Image::ExifTool::ID3::v2_4');
         } elsif ($vers >= 0x0300) {
@@ -831,6 +833,7 @@ sub ProcessID3($$)
             DirStart => 0,
             DirLen   => length($tBuff),
         );
+        $id3Len += length($tBuff);
         $rtnVal = 1;
     }
 #
@@ -861,6 +864,8 @@ sub ProcessID3($$)
         }
         # set file type to MP3 if we didn't find audio data
         $exifTool->SetFileType('MP3') unless $exifTool->{VALUE}->{FileType};
+        # record the size if the ID3 metadata
+        $exifTool->FoundTag('ID3Size', $id3Len);
         # process ID3v2 header if it exists
         if (%id3Header) {
             $exifTool->VPrint(0, "$id3Header{DirName}:\n");
@@ -889,8 +894,7 @@ sub ProcessMP3($$)
 
     # must first check for leading/trailing ID3 information
     unless ($exifTool->{DONE_ID3}) {
-        require Image::ExifTool::ID3;
-        Image::ExifTool::ID3::ProcessID3($exifTool, $dirInfo) and return 1;
+        ProcessID3($exifTool, $dirInfo) and return 1;
     }
     my $raf = $$dirInfo{RAF};
     my $rtnVal = 0;

@@ -29,10 +29,6 @@ allows them to be tested without having to check for an undefined value.</p>
 <tr><td>BASE</td><td>Absolute position of current image in containing file
     (for example, when processing JPEG image in FujiFilm RAF file)</td></tr>
 
-<tr><td>Make</td><td>Camera make set during reading and writing</td></tr>
-
-<tr><td>Model</td><td>Camera model name set during reading and writing</td></tr>
-
 <tr><td>CameraType</td><td>Camera type used for decoding some Olympus tags</td></tr>
 
 <tr><td>CHANGED</td><td>Number of tags changed during writing</td></tr>
@@ -81,6 +77,12 @@ allows them to be tested without having to check for an undefined value.</p>
 
 <tr><td>IO_TAG_LIST</td><td>List for output of requested tags in proper case and order</td></tr>
 
+<tr><td>LIST_TAGS</td><td>Hash of tag keys by tagInfo reference for active List-type
+    tags.  This hash is cleared at the start of processing for each directory.
+    Not used during when writing.</td></tr>
+
+<tr><td>Make</td><td>Camera make set during reading and writing</td></tr>
+
 <tr><td>MAKER_NOTE_BYTE_ORDER</td><td>Byte order of extracted maker notes if extracted
     as a block.</td></tr>
 
@@ -91,6 +93,8 @@ allows them to be tested without having to check for an undefined value.</p>
 <tr><td>MAKER_NOTE_FIXUP</td><td>Fixup information for maker notes extracted with the MakerNotes
     option (unless MakerNotes option is 2). Used by SetNewValuesFromFile() to adjust offsets
     in maker note IFD</td></tr>
+
+<tr><td>Model</td><td>Camera model name set during reading and writing</td></tr>
 
 <tr><td>MOVED_KEY</td><td>Tag key of last tag replaced by a higher priority tag
     in a call to FoundTag().</td></tr>
@@ -108,6 +112,9 @@ allows them to be tested without having to check for an undefined value.</p>
     <tr valign='top'><td>Save</td><td>-</td><td>flag set by call to SaveNewValues() if this value
         should be saved</td></tr>
     </table></td></tr>
+
+<tr><td>NewIPTCDigest</td><td>MD5 digest for most recently written IPTC data (undefined if IPTC doesn't
+    exist or if it was deleted</td></tr>
 
 <tr><td>NO_LIST</td><td>Set if List tags shouldn't be accumulated into a list</td></tr>
 

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.45
 [File, File, Image]  - File Name: NikonD2Hs.jpg
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27
+[File, File, Image]  - File Size: 3.4 kB
+[File, File, Time]  - File Modification Date/Time: 2006:01:04 14:02:27-05:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
@@ -129,6 +129,7 @@
 [MakerNotes, Nikon, Camera] 166 - Deleted Image Count: 0
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 2
 [MakerNotes, Nikon, Camera] 0 - Flash Info Version: 0100
+[MakerNotes, Nikon, Camera] 4 - Flash Model: (none)
 [MakerNotes, Nikon, Camera] 8 - External Flash Flags: (none)
 [MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
 [MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off

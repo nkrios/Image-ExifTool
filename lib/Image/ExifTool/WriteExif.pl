@@ -319,6 +319,14 @@ my %writeTable = (
     0x8298 => {             # Copyright
         Writable => 'string',
         WriteGroup => 'IFD0',
+        ValueConvInv => q{
+            if ($val =~ /(.*?)\s*[\n\r]+\s*(.*)/s) {
+                return $1 . "\0" unless length $2;
+                # photographer copyright set to ' ' if it doesn't exist, according to spec.
+                return((length($1) ? $1 : ' ') . "\0" . $2 . "\0");
+            }
+            return $val . "\0";
+        },
     },
 #
 # Most of the tags below this belong in the ExifIFD...
@@ -524,6 +532,7 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Count => 4,
         Protected => 1, # (confuses Apple Preview if written to a TIFF image)
+        PrintConvInv => '$val =~ tr/./ /; $val',
     },
     0xc613 => {             # DNGBackwardVersion
         Writable => 'int8u',
@@ -539,6 +548,18 @@ my %writeTable = (
         Writable => 'string',
         WriteGroup => 'IFD0',
         PrintConvInv => '$val',
+    },
+    0xc61a => {             # BlackLevel
+        Writable => 'rational64u',
+        WriteGroup => 'SubIFD',
+        Count => -1,
+        Protected => 1,
+    },
+    0xc61d => {             # WhiteLevel
+        Writable => 'int32u',
+        WriteGroup => 'SubIFD',
+        Count => -1,
+        Protected => 1,
     },
     0xc61e => {             # DefaultScale
         Writable => 'rational64u',
@@ -556,6 +577,12 @@ my %writeTable = (
         Writable => 'int32u',
         WriteGroup => 'SubIFD',
         Count => 2,
+        Protected => 1,
+    },
+    0xc628 => {             # AsShotNeutral
+        Writable => 'rational64u',
+        WriteGroup => 'IFD0',
+        Count => -1,
         Protected => 1,
     },
     0xc629 => {             # AsShotWhiteXY
@@ -637,7 +664,7 @@ my %writeTable = (
         Writable => 'int8u',
         WriteGroup => 'IFD0',
         Count => 16,
-        ValueConvInv => 'pack("H*",$val)',
+        ValueConvInv => 'pack("H*", $val)',
         Protected => 1,
     },
     0xc68b => {             # OriginalRawFileName
@@ -686,10 +713,153 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Protected => 1,
     },
-    0xc6d2 => {             # Title (Panasonic DMC-TZ5)
+    0xc6bf => {             # ColorimetricReference
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6d2 => {             # Title (Panasonic DMC-TZ5, not a DNG tag)
         Writable => 'string',
         Avoid => 1,
         WriteGroup => 'IFD0',
+    },
+    0xc6f3 => {             # CameraCalibrationSig
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6f4 => {             # ProfileCalibrationSig
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6f6 => {             # AsShotProfileName
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6f7 => {             # NoiseReductionApplied
+        Writable => 'rational64u',
+        WriteGroup => 'SubIFD',
+        Protected => 1,
+    },
+    0xc6f8 => {             # ProfileName
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6f9 => {             # ProfileHueSatMapDims
+        Writable => 'int32u',
+        Count => 3,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6fa => {             # ProfileHueSatMapData1
+        Writable => 'float',
+        Count => -1,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6fb => {             # ProfileHueSatMapData2
+        Writable => 'float',
+        Count => -1,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6fc => {             # ProfileToneCurve
+        Writable => 'float',
+        Count => -1,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6fd => {             # ProfileEmbedPolicy
+        Writable => 'int32u',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc6fe => {             # ProfileCopyright
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc714 => {             # ForwardMatrix1
+        Writable => 'rational64s',
+        Count => -1,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc715 => {             # ForwardMatrix2
+        Writable => 'rational64s',
+        Count => -1,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc716 => {             # PreviewApplicationName
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc717 => {             # PreviewApplicationVersion
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc718 => {             # PreviewSettingsName
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc719 => {             # PreviewSettingsDigest
+        Writable => 'int8u',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+        ValueConvInv => 'pack("H*", $val)',
+    },
+    0xc71a => {             # PreviewColorSpace
+        Writable => 'int32u',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+        PrintConv => {
+            0 => 'Unknown',
+            1 => 'Gray Gamma 2.2',
+            2 => 'sRGB',
+            3 => 'Adobe RGB',
+            4 => 'ProPhoto RGB',
+        },
+    },
+    0xc71b => {             # PreviewDateTime
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+        ValueConvInv => q{
+            require Image::ExifTool::XMP;
+            return Image::ExifTool::XMP::FormatXMPDate($val);
+        },
+        PrintConvInv => '$self->InverseDateTime($val,1,1)',
+    },
+    0xc71c => {             # RawImageDigest
+        Writable => 'int8u',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+        ValueConvInv => 'pack("H*", $val)',
+    },
+    0xc71d => {             # OriginalRawFileDigest
+        Writable => 'int8u',
+        WriteGroup => 'IFD0',
+        Protected => 1,
+        ValueConvInv => 'pack("H*", $val)',
+    },
+    0xc725 => {             # ProfileLookTableDims
+        Writable => 'int32u',
+        Count => 3,
+        WriteGroup => 'IFD0',
+        Protected => 1,
+    },
+    0xc726 => {             # ProfileLookTableData
+        Writable => 'float',
+        Count => -1,
+        WriteGroup => 'IFD0',
+        Protected => 1,
     },
     0xea1d => {             # OffsetSchema
         Writable => 'int32s',
@@ -887,10 +1057,10 @@ sub InsertWritableProperties($$;$)
                 if (ref $writeInfo) {
                     my $key;
                     foreach $key (%$writeInfo) {
-                        $$tagInfo{$key} = $$writeInfo{$key};
+                        $$tagInfo{$key} = $$writeInfo{$key} unless defined $$tagInfo{$key};
                     }
                 } else {
-                    $$tagInfo{Writable} = $writeInfo;
+                    $$tagInfo{Writable} = $writeInfo unless defined $$tagInfo{Writable};
                 }
             }
         } else {
@@ -949,7 +1119,7 @@ sub RebuildMakerNotes($$$)
         # rewrite maker notes
         $rtnValue = $newTool->WriteDirectory(\%subdirInfo, $tagTablePtr);
         if (defined $rtnValue and length $rtnValue) {
-            # add the dummy preview image if necessary
+            # add the dummy/empty preview image if necessary
             if ($newTool->{PREVIEW_INFO}) {
                 $makerFixup->SetMarkerPointers(\$rtnValue, 'PreviewImage', length($rtnValue));
                 $rtnValue .= $newTool->{PREVIEW_INFO}->{Data};
@@ -1068,6 +1238,63 @@ sub ExifErr($$$)
     # all MakerNote errors are minor by default
     return undef if $exifTool->Error($errStr, $minor);
     return '';
+}
+
+#------------------------------------------------------------------------------
+# Read/Write IFD with TIFF-like header (used by DNG 1.2)
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: Reading: 1 on success, otherwise returns 0 and sets a Warning
+#          Writing: new data block or undef on error
+sub ProcessTiffIFD($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    $exifTool or return 1;    # allow dummy access
+    my $raf = $$dirInfo{RAF};
+    my $base = $$dirInfo{Base} || 0;
+    my $dirName = $$dirInfo{DirName};
+    my $magic = $dirInfo->{Subdir}->{Magic} || 0x002a;
+    my $buff;
+
+    # structured with a TIFF-like header and relative offsets
+    $raf->Seek($base, 0) and $raf->Read($buff, 8) == 8 or return 0;
+    unless (SetByteOrder(substr($buff,0,2)) and Get16u(\$buff, 2) == $magic) {
+        my $msg = "Invalid $dirName header";
+        if ($$dirInfo{IsWriting}) {
+            $exifTool->Error($msg);
+            return undef;
+        } else {
+            $exifTool->Warn($msg);
+            return 0;
+        }
+    }
+    my $offset = Get32u(\$buff, 4);
+    my %dirInfo = (
+        DirName  => $$dirInfo{DirName},
+        Parent   => $$dirInfo{Parent},
+        Base     => $base,
+        DataPt   => \$buff,
+        DataLen  => length $buff,
+        DataPos  => 0,
+        DirStart => $offset,
+        DirLen   => length($buff) - $offset,
+        RAF      => $raf,
+        NewDataPos => 8,
+    );
+    if ($$dirInfo{IsWriting}) {
+        # rewrite the Camera Profile IFD
+        my $newDir = WriteExif($exifTool, \%dirInfo, $tagTablePtr);
+        # don't add header if error writing directory ($newDir is undef)
+        # or if directory is being deleted ($newDir is empty)
+        return $newDir unless $newDir;
+        # return directory with TIFF-like header
+        return GetByteOrder() . Set16u($magic) . Set32u(8) . $newDir;
+    }
+    if ($exifTool->{HTML_DUMP}) {
+        my $tip = sprintf('Byte order: %s endian\\nIdentifier: 0x%.4x\\n%s offset: 0x%.4x',
+                          (GetByteOrder() eq 'II') ? 'Little' : 'Big', $magic, $dirName, $offset);
+        $exifTool->HtmlDump($base, 8, "$dirName header", $tip, 0);
+    }
+    return ProcessExif($exifTool, \%dirInfo, $tagTablePtr);
 }
 
 #------------------------------------------------------------------------------
@@ -1218,7 +1445,7 @@ sub WriteExif($$$)
             } elsif ($dirLen) {
                 # error if we can't load IFD (unless we are creating
                 # from scratch, in which case dirLen will be zero)
-                my $str = $exifTool->Options('IgnoreMinorErrors') ? "Deleted bad" : "Bad";
+                my $str = $exifTool->Options('IgnoreMinorErrors') ? 'Deleted bad' : 'Bad';
                 $exifTool->Error("$str $dirName directory", 1);
             }
         }
@@ -1322,6 +1549,16 @@ Entry:  for (;;) {
                     $readFormat = $oldFormat = Get16u($dataPt, $entry+2);
                     $readCount = $oldCount = Get32u($dataPt, $entry+4);
                     if ($oldFormat < 1 or $oldFormat > 13) {
+                        # patch to preserve invalid directory entries in SubIFD3 of
+                        # various Kodak Z-series cameras (Z812, Z1085IS, Z1275)
+                        if ($dirName eq 'MakerNotes' and $$exifTool{Make}=~/KODAK/i and
+                            $$dirInfo{Name} and $$dirInfo{Name} eq 'SubIFD3')
+                        {
+                            $dirBuff .= substr($$dataPt, $entry, 12);
+                            ++$index;
+                            $newID = $oldID;
+                            next;
+                        }
                         # don't write out null directory entry
                         if ($oldFormat==0 and $index and ($oldCount==0 or
                             # patch for Canon EOS 40D firmware 1.0.4 bug:
@@ -1754,6 +1991,7 @@ NoOverwrite:            next if $isNew > 0;
                             DirStart => $valuePtr,
                             DirLen   => $oldSize,
                             DirName  => 'MakerNotes',
+                            Name     => $$newInfo{Name},
                             Parent   => $dirName,
                             TagInfo  => $newInfo,
                             RAF      => $raf,
@@ -1832,8 +2070,21 @@ NoOverwrite:            next if $isNew > 0;
                                     $previewInfo->{Relative} = 1;
                                 }
                             } elsif (not defined $subdirInfo{Relative}) {
-                                # don't shift anything if relative flag set to zero (Pentax patch)
+                                # ^^ don't shift anything if relative flag set to zero (Pentax patch)
+                                # shift offset base if shifted in the original image or if FixBase
+                                # was used, but be careful with negative shifts since they may lead
+                                # to negative (invalid) offsets
                                 my $baseShift = $base - $subdirInfo{Base};
+                                if ($baseShift < 0) {
+                                    my $fixBase = $exifTool->Options('FixBase');
+                                    if (not defined $fixBase) {
+                                        my $str = $exifTool->Options('IgnoreMinorErrors') ? 'ignored' : 'fix or ignore?';
+                                        $exifTool->Error("MakerNotes offsets may be incorrect ($str)", 1);
+                                    } elsif ($fixBase eq '') {
+                                        $exifTool->Warn('Fixed incorrect MakerNotes offsets');
+                                        $baseShift = 0;
+                                    }
+                                }
                                 $makerFixup->{Start} += $valLen + $loc;
                                 $makerFixup->{Shift} += $baseShift;
                                 # permanently fix makernote offset errors
@@ -1883,7 +2134,7 @@ NoOverwrite:            next if $isNew > 0;
                             my $subdirStart = $pt - $dataPos;
                             my $subdirBase = $base;
                             if ($$subdir{Base}) {
-                                my $start = $subdirStart + $valueDataPos;
+                                my $start = $subdirStart + $dataPos;
                                 #### eval Base ($start)
                                 $subdirBase += eval $$subdir{Base};
                             }
@@ -1894,24 +2145,21 @@ NoOverwrite:            next if $isNew > 0;
                                 DataLen  => $dataLen,
                                 DirStart => $subdirStart,
                                 DirName  => $subdirName . ($i ? $i : ''),
+                                Name     => $$newInfo{Name},
                                 Parent   => $dirName,
                                 Fixup    => new Image::ExifTool::Fixup,
                                 RAF      => $raf,
+                                Subdir   => $subdir,
                             );
-                            # read IFD from file if necessary
+                            # is the subdirectory outside our current data?
                             if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
-                                my ($buff, $buf2, $subSize);
-                                unless ($raf and $raf->Seek($pt + $base, 0) and
-                                        $raf->Read($buff,2) == 2 and
-                                        $subSize = 12 * Get16u(\$buff, 0) and
-                                        $raf->Read($buf2,$subSize+4) >= $subSize)
-                                {
-                                    my @err;
-                                    if (defined $subSize and not $subSize) {
-                                        @err = ("$subdirName IFD has zero entries", 1);
-                                    } else {
-                                        @err = ("Can't read $subdirName data", $inMakerNotes);
-                                    }
+                                if ($raf) {
+                                    # reset SubDirectory buffer (we will load it later)
+                                    my $buff = '';
+                                    $subdirInfo{DataPt} = \$buff;
+                                    $subdirInfo{DataLen} = 0;
+                                } else {
+                                    my @err = ("Can't read $subdirName data", $inMakerNotes);
                                     if ($$subTable{VARS} and $subTable->{VARS}->{MINOR_ERRORS}) {
                                         $exifTool->Warn($err[0] . '. Ignored.');
                                     } elsif ($exifTool->Error(@err)) {
@@ -1919,19 +2167,12 @@ NoOverwrite:            next if $isNew > 0;
                                     }
                                     next Entry; # don't write this directory
                                 }
-                                $buff .= $buf2;
-                                # change subdirectory information to data we just read
-                                $subdirInfo{DataPt} = \$buff;
-                                $subdirInfo{DirStart} = 0;
-                                $subdirInfo{DataPos} = $pt;
-                                $subdirInfo{DataLen} = length $buff;
-                                # only account for nextIFD pointer if we will use it
-                                $subSize += 4 if length($buff)==$subSize+6 and 
-                                    ($$newInfo{Name} eq 'SubIFD' or $buff =~ /\0{4}$/);
-                                UpdateTiffEnd($exifTool, $pt+$base+2+$subSize);
                             }
-                            my $subdirData = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
-                            return undef unless defined $subdirData;
+                            my $subdirData = $exifTool->WriteDirectory(\%subdirInfo, $subTable, $$subdir{WriteProc});
+                            unless (defined $subdirData) {
+                                $exifTool->Error("Error writing $subdirInfo{DirName}");
+                                return undef;
+                            }
                             next unless length($subdirData);
                             # temporarily set value to subdirectory index
                             # (will set to actual offset later when we know what it is)
@@ -2120,6 +2361,7 @@ NoOverwrite:            next if $isNew > 0;
                 } elsif ($$newInfo{DataMember}) {
 
                     # save any necessary data members (Make, Model)
+                    # (note that this will not trim null from string values, etc)
                     $exifTool->{$$newInfo{DataMember}} = $$newValuePt;
                 }
             }
@@ -2538,7 +2780,8 @@ NoOverwrite:            next if $isNew > 0;
                     # add a pointer to fix up this offset value (marked with DataTag name)
                     $fixup->AddFixup($offsetPos, $$tagInfo{DataTag});
                     if ($ifd >= 0) {
-                        $buff .= "\0" if $size & 0x01;  # must be even size
+                        # buff length must be even (Note: may have changed since $size was set)
+                        $buff .= "\0" if length($buff) & 0x01;
                         $newData .= $buff;      # add this strip to the data
                     } else {
                         $blockSize += $size;    # keep track of total size

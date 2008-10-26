@@ -3,12 +3,12 @@
 #
 # Description:  Canon EXIF maker notes tags
 #
-# Revisions:    11/25/03 - P. Harvey Created
-#               12/03/03 - P. Harvey Decode lots more tags and add CanonAFInfo
-#               02/17/04 - Michael Rommel Added IxusAFPoint
-#               01/27/05 - P. Harvey Disable validation of CanonAFInfo
-#               01/30/05 - P. Harvey Added a few more tags (ref 4)
-#               02/10/06 - P. Harvey Decode a lot of new tags (ref 12)
+# Revisions:    11/25/2003 - P. Harvey Created
+#               12/03/2003 - P. Harvey Decode lots more tags and add CanonAFInfo
+#               02/17/2004 - Michael Rommel Added IxusAFPoint
+#               01/27/2005 - P. Harvey Disable validation of CanonAFInfo
+#               01/30/2005 - P. Harvey Added a few more tags (ref 4)
+#               02/10/2006 - P. Harvey Decode a lot of new tags (ref 12)
 #
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               2) Michael Rommel private communication (Digital Ixus)
@@ -41,6 +41,10 @@
 #              28) Hal Williamson private communication (XTi)
 #              29) Ger Vermeulen private communication
 #              30) David Pitcher private communication (1DmkIII)
+#              31) Darryl Zurn private communication (A590IS)
+#              32) Rich Taylor private communication (5D)
+#              33) D.J. Cristi private communication
+#              34) Andreas Huggel and Pascal de Bruijn private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -53,129 +57,195 @@ use Image::ExifTool::Exif;
 sub WriteCanon($$$);
 sub ProcessSerialData($$$);
 
-$VERSION = '1.96';
+$VERSION = '2.08';
 
-# Note: Remove 'USM' from 'L' lenses since it is redundant - PH
+# Note: Removed 'USM' from 'L' lenses since it is redundant - PH
+# (or is it?  Ref 32 shows 5 non-USM L-type lenses)
 my %canonLensTypes = ( #4
-    1 => 'Canon EF 50mm f/1.8',
-    2 => 'Canon EF 28mm f/2.8',
-    # (3 removed in current Kamisaka list)
-    # 3 => 'Canon EF 135mm f/2.8 Soft', #15
-    4 => 'Canon EF 35-105mm f/3.5-4.5 or Sigma UC Zoom 35-135mm f/4-5.6', #28 (Canon)
-    # 6 can be Sigma 18-50mm f/3.5-5.6 DC (ref 23)
-    #       or Sigma 18-125mm f/3.5-5.6 DC IF ASP
-    6 => 'Tokina AF193-2 19-35mm f/3.5-4.5 or Sigma Lens',
-    7 => 'Canon EF 100-300mm f/5.6L', #15
-    8 => 'Sigma 70-300mm F4-5.6 DG MACRO or Tokina AT-X242AF 24-200mm F3.5-5.6', #15
-    # 10 can be 3 different Sigma lenses:
-    # Sigma 50mm f/2.8 EX or Sigma 28mm f/1.8
-    # or Sigma 105mm f/2.8 Macro EX (ref 15)
-    10 => 'Canon EF 50mm f/2.5 Macro or Sigma Lens', #10/4/15
+     Notes => q{
+        Decimal values differentiate lenses which would otherwise have the same
+        LensType, and are used by the Composite LensID tag when attempting to
+        identify the specific lens model.
+     },
+     1 => 'Canon EF 50mm f/1.8',
+     2 => 'Canon EF 28mm f/2.8',
+     # (3 removed in current Kamisaka list)
+     3 => 'Canon EF 135mm f/2.8 Soft', #15/32
+     4 => 'Canon EF 35-105mm f/3.5-4.5 or Sigma Lens', #28
+     4.1 => 'Sigma UC Zoom 35-135mm f/4-5.6',
+     5 => 'Canon EF 35-70mm f/3.5-4.5', #32
+     6 => 'Canon EF 28-70mm f/3.5-4.5 or Sigma or Tokina Lens', #32
+     6.1 => 'Sigma 18-50mm f/3.5-5.6 DC', #23
+     6.2 => 'Sigma 18-125mm f/3.5-5.6 DC IF ASP',
+     6.3 => 'Tokina AF193-2 19-35mm f/3.5-4.5',
+     7 => 'Canon EF 100-300mm f/5.6L', #15
+     8 => 'Canon EF 100-300mm f/5.6 or Sigma or Tokina Lens', #32
+     8.1 => 'Sigma 70-300mm f/4-5.6 DG Macro', #15
+     8.2 => 'Tokina AT-X242AF 24-200mm f/3.5-5.6', #15
+     9 => 'Canon EF 70-210mm f/4', #32
+     9.1 => 'Sigma 55-200mm f/4-5.6 DC', #34
+    10 => 'Canon EF 50mm f/2.5 Macro or Sigma Lens', #10
+    10.1 => 'Sigma 50mm f/2.8 EX', #4
+    10.2 => 'Sigma 28mm f/1.8',
+    10.3 => 'Sigma 105mm f/2.8 Macro EX', #15
     11 => 'Canon EF 35mm f/2', #9
-    13 => 'Canon EF 15mm f/2.8', #9
+    13 => 'Canon EF 15mm f/2.8 Fisheye', #9
+    14 => 'Canon EF 50-200mm f/3.5-4.5L', #32
+    15 => 'Canon EF 50-200mm f/3.5-4.5', #32
+    16 => 'Canon EF 35-135mm f/3.5-4.5', #32
+    17 => 'Canon EF 35-70mm f/3.5-4.5A', #32
+    18 => 'Canon EF 28-70mm f/3.5-4.5', #32
+    20 => 'Canon EF 100-200mm f/4.5A', #32
     21 => 'Canon EF 80-200mm f/2.8L',
-    22 => 'Tokina AT-X280AF PRO 28-80mm f/2.8 ASPHERICAL', #15
-    # 26 can also be 2 Tamron lenses: (ref 15)
-    # Tamron SP AF 90mm f/2.8 Di Macro or Tamron SP AF 180mm f/3.5 Di Macro
-    26 => 'Canon EF 100mm f/2.8 Macro or Cosina 100mm f/3.5 Macro AF or Tamron',
-    # 28 can be: (ref 15,4,11,14)
-    # - Tamron SP AF 28-105mm f/2.8 LD Aspherical IF
-    # - Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical [ IF ] Macro
-    # - Tamron AF 70-300mm f/4.5-5.6 Di LD 1:2 Macro Zoom
-    # - Tamron AF Aspherical 28-200mm f/3.8-5.6
-    28 => 'Tamron Lens (various models)',
+    22 => 'Canon EF 20-35mm f/2.8L or Tokina Lens', #32
+    22.1 => 'Tokina AT-X280AF PRO 28-80mm f/2.8 Aspherical', #15
+    23 => 'Canon EF 35-105mm f/3.5-4.5', #32
+    24 => 'Canon EF 35-80mm f/4-5.6 Power Zoom', #32
+    25 => 'Canon EF 35-80mm f/4-5.6 Power Zoom', #32
+    26 => 'Canon EF 100mm f/2.8 Macro or Cosina or Tamron Lens',
+    26.1 => 'Cosina 100mm f/3.5 Macro AF',
+    26.2 => 'Tamron SP AF 90mm f/2.8 Di Macro', #15
+    26.3 => 'Tamron SP AF 180mm f/3.5 Di Macro', #15
+    27 => 'Canon EF 35-80mm f/4-5.6', #32
+    28 => 'Canon EF 80-200mm f/4.5-5.6 or Tamron Lens', #32
+    28.1 => 'Tamron SP AF 28-105mm f/2.8 LD Aspherical IF', #15
+    28.2 => 'Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical [IF] Macro', #4
+    28.3 => 'Tamron AF 70-300mm f/4.5-5.6 Di LD 1:2 Macro Zoom', #11
+    28.4 => 'Tamron AF Aspherical 28-200mm f/3.8-5.6', #14
     29 => 'Canon EF 50mm f/1.8 MkII',
-    31 => 'Tamron SP AF 300mm f/2.8 LD IF', #15
-    32 => 'Canon EF 24mm f/2.8 or Sigma 15mm f/2.8 EX Fisheye', #10/11
+    30 => 'Canon EF 35-105mm f/4.5-5.6', #32
+    31 => 'Canon EF 75-300mm f/4-5.6 or Tamron Lens', #32
+    31.1 => 'Tamron SP AF 300mm f/2.8 LD IF', #15
+    32 => 'Canon EF 24mm f/2.8 or Sigma Lens', #10
+    32.1 => 'Sigma 15mm f/2.8 EX Fisheye', #11
+    35 => 'Canon EF 35-80mm f/4-5.6', #32
+    36 => 'Canon EF 38-76mm f/4.5-5.6', #32
+    37 => 'Canon EF 35-80mm f/4-5.6 or Tamron Lens', #32
+    37.1 => 'Tamron 70-200mm f/2.8 Di LD IF Macro', #PH
+    38 => 'Canon EF 80-200mm f/4.5-5.6', #32
     39 => 'Canon EF 75-300mm f/4-5.6',
     40 => 'Canon EF 28-80mm f/3.5-5.6',
-    42 => 'Tamron AF 28-300mm F3.5-6.3 XR Di VC LD Aspherical [IF] Macro Model A20', #15
+    41 => 'Canon EF 28-90mm f/4-5.6', #32
+    42 => 'Canon EF 28-200mm f/3.5-5.6 or Tamron Lens', #32
+    42.1 => 'Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical [IF] Macro Model A20', #15
     43 => 'Canon EF 28-105mm f/4-5.6', #10
+    44 => 'Canon EF 90-300mm f/4.5-5.6', #32
     45 => 'Canon EF-S 18-55mm f/3.5-5.6', #PH (same ID for mkII version, ref 20)
+    46 => 'Canon EF 28-90mm f/4-5.6', #32
     48 => 'Canon EF-S 18-55mm f/3.5-5.6 IS', #20
     49 => 'Canon EF-S 55-250mm f/4-5.6 IS', #23
+    50 => 'Canon EF-S 18-200mm f/3.5-5.6 IS', #25
     124 => 'Canon MP-E 65mm f/2.8 1-5x Macro Photo', #9
     125 => 'Canon TS-E 24mm f/3.5L',
     126 => 'Canon TS-E 45mm f/2.8', #15
     127 => 'Canon TS-E 90mm f/2.8', #15
+    129 => 'Canon EF 300mm f/2.8L', #32
     130 => 'Canon EF 50mm f/1.0L', #10/15
-    # 131 can be: (ref 15)
-    # Sigma 17-35mm F2.8-4 EX DG Aspherical HSM
-    # Sigma 8mm F3.5 EX DG Circular Fisheye
-    # Sigma APO 120-300mm F2.8 EX DG HSM
-    # Sigma APO 120-300mm F2.8 EX DG HSM x1.4
-    # Sigma APO 120-300mm F2.8 EX DG HSM x2
-    # Sigma APO 50-150mm F2.8 EX DC HSM
-    131 => 'Sigma Lens (various models)',
+    131 => 'Canon EF 28-80mm f/2.8-4L or Sigma Lens', #32
+    131.1 => 'Sigma 8mm f/3.5 EX DG Circular Fisheye', #15
+    131.2 => 'Sigma 17-35mm f/2.8-4 EX DG Aspherical HSM', #15
+    131.3 => 'Sigma 17-70mm F2.8-4.5 DC Macro', #PH (NC)
+    131.4 => 'Sigma APO 50-150mm f/2.8 EX DC HSM', #15
+    131.5 => 'Sigma APO 120-300mm f/2.8 EX DG HSM', #15
+           # 'Sigma APO 120-300mm f/2.8 EX DG HSM + 1.4x', #15
+           # 'Sigma APO 120-300mm f/2.8 EX DG HSM + 2x', #15
+    132 => 'Canon EF 1200mm f/5.6L', #32
     134 => 'Canon EF 600mm f/4L IS', #15
     135 => 'Canon EF 200mm f/1.8L',
     136 => 'Canon EF 300mm f/2.8L',
     137 => 'Canon EF 85mm f/1.2L', #10
+    138 => 'Canon EF 28-80mm f/2.8-4L', #32
     139 => 'Canon EF 400mm f/2.8L',
+    140 => 'Canon EF 500mm f/4.5L', #32
     141 => 'Canon EF 500mm f/4.5L',
     142 => 'Canon EF 300mm f/2.8L IS', #15
     143 => 'Canon EF 500mm f/4L IS', #15
     144 => 'Canon EF 35-135mm f/4-5.6 USM', #26
-    149 => 'Canon EF 100mm f/2', #9
-    # 150 can be: (ref 15)
-    # Sigma 20mm EX f/1.8, Sigma 30mm f/1.4 DC HSM or Sigma 24mm f/1.8 DG Macro EX
-    150 => 'Canon EF 14mm f/2.8L or Sigma 20mm EX f/1.8', #10/4
+    145 => 'Canon EF 100-300mm f/4.5-5.6 USM', #32
+    146 => 'Canon EF 70-210mm f/3.5-4.5 USM', #32
+    147 => 'Canon EF 35-135mm f/4-5.6 USM', #32
+    148 => 'Canon EF 28-80mm f/3.5-5.6 USM', #32
+    149 => 'Canon EF 100mm f/2 USM', #9
+    150 => 'Canon EF 14mm f/2.8L or Sigma Lens', #10
+    150.1 => 'Sigma 20mm EX f/1.8', #4
+    150.2 => 'Sigma 30mm f/1.4 DC HSM', #15
+    150.3 => 'Sigma 24mm f/1.8 DG Macro EX', #15
     151 => 'Canon EF 200mm f/2.8L',
-    # 152 can be: (ref 15)
-    # Sigma 12-24mm f/4.5-5.6 EX DG ASPHERICAL HSM
-    # Sigma 14mm f/2.8 EX Aspherical HSM
-    # Sigma 10-20mm f/4-5.6 (ref 14)
-    # Sigma 100-300 f/4 (ref Bozi)
-    152 => 'Canon EF 300mm F4L IS or Sigma Lens', #15
-    # 153 is Tamron AF 28-300mm, 18-200mm f/3.5-6.3 Di II or
-    #        Tamron 18-250mm f/3.5-6.3 Di II_LD Aspherical (IF) Macro (ref PH)
-    153 => 'Canon EF 35-350mm f/3.5-5.6L or Tamron or Sigma Bigma', #PH/15
+    152 => 'Canon EF 300mm f/4L IS or Sigma Lens', #15
+    152.1 => 'Sigma 12-24mm f/4.5-5.6 EX DG ASPHERICAL HSM', #15
+    152.2 => 'Sigma 14mm f/2.8 EX Aspherical HSM', #15
+    152.3 => 'Sigma 10-20mm f/4-5.6', #14
+    152.4 => 'Sigma 100-300mm f/4', # (ref Bozi)
+    153 => 'Canon EF 35-350mm f/3.5-5.6L or Sigma or Tamron Lens', #PH
+    153.1 => 'Sigma 50-500mm f/4-6.3 APO HSM EX', #15
+    153.2 => 'Tamron AF 28-300mm f/3.5-6.3 XR LD Aspherical [IF] Macro',
+    153.3 => 'Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical [IF] Macro Model A14', #15
+    153.4 => 'Tamron 18-250mm f/3.5-6.3 Di II_LD Aspherical [IF] Macro', #PH
     154 => 'Canon EF 20mm f/2.8 USM', #15
     155 => 'Canon EF 85mm f/1.8 USM',
     156 => 'Canon EF 28-105mm f/3.5-4.5 USM',
     160 => 'Canon EF 20-35mm f/3.5-4.5 USM',
-    161 => 'Canon EF 28-70mm f/2.8L or Sigma 24-70mm EX f/2.8 or Tamron 90mm f/2.8',
+    161 => 'Canon EF 28-70mm f/2.8L or Sigma or Tamron Lens',
+    161.1 => 'Sigma 24-70mm EX f/2.8',
+    161.2 => 'Tamron 90mm f/2.8',
+    162 => 'Canon EF 200mm f/2.8L', #32
+    163 => 'Canon EF 300mm f/4L', #32
+    164 => 'Canon EF 400mm f/5.6L', #32
     165 => 'Canon EF 70-200mm f/2.8 L',
-    166 => 'Canon EF 70-200mm f/2.8 L + x1.4',
-    167 => 'Canon EF 70-200mm f/2.8 L + x2',
+    166 => 'Canon EF 70-200mm f/2.8 L + 1.4x',
+    167 => 'Canon EF 70-200mm f/2.8 L + 2x',
     168 => 'Canon EF 28mm f/1.8 USM', #15
-    # 169 can be Sigma 18-200mm f/3.5-6.3 DC OS (ref 23)
-    #         or Sigma 15-30mm f/3.5-4.5 EX DG Aspherical (ref 4)
-    #         or Sigma 18-50/2.8 Macro (ref 26)
-    169 => 'Canon EF17-35mm f/2.8L or Sigma Lens', #15
+    169 => 'Canon EF 17-35mm f/2.8L or Sigma Lens', #15
+    169.1 => 'Sigma 18-200mm f/3.5-6.3 DC OS', #23
+    169.2 => 'Sigma 15-30mm f/3.5-4.5 EX DG Aspherical', #4
+    169.3 => 'Sigma 18-50mm f/2.8 Macro', #26
     170 => 'Canon EF 200mm f/2.8L II', #9
-    171 => 'Canon EF 300mm F4L', #15
-    # the following value is used by 2 different Sigma lenses (ref 14):
-    # Sigma 180mm EX HSM Macro f/3.5 or Sigma APO Macro 150mm f/3.5 EX DG IF HSM
-    # 173 => 'Canon EF 180mm Macro f/3.5L or Sigma 180mm EX HSM Macro f/3.5', #9
-    173 => 'Canon EF 180mm Macro f/3.5L or Sigma 180mm f/3.5 or 150mm f/2.8 Macro',
+    171 => 'Canon EF 300mm f/4L', #15
+    172 => 'Canon EF 400mm f/5.6L', #32
+    173 => 'Canon EF 180mm Macro f/3.5L or Sigma Lens', #9
+    173.1 => 'Sigma 180mm EX HSM Macro f/3.5', #14
+    173.2 => 'Sigma APO Macro 150mm f/3.5 EX DG IF HSM', #14
     174 => 'Canon EF 135mm f/2L', #9
+    175 => 'Canon EF 400mm f/2.8L', #32
     176 => 'Canon EF 24-85mm f/3.5-4.5 USM',
     177 => 'Canon EF 300mm f/4L IS', #9
     178 => 'Canon EF 28-135mm f/3.5-5.6 IS',
     179 => 'Canon EF 24mm f/1.4L', #20
     180 => 'Canon EF 35mm f/1.4L', #9
-    181 => 'Canon EF 100-400mm f/4.5-5.6L IS + x1.4', #15
-    182 => 'Canon EF 100-400mm f/4.5-5.6L IS + x2',
+    181 => 'Canon EF 100-400mm f/4.5-5.6L IS + 1.4x', #15
+    182 => 'Canon EF 100-400mm f/4.5-5.6L IS + 2x',
     183 => 'Canon EF 100-400mm f/4.5-5.6L IS',
-    184 => 'Canon EF 400mm f/2.8L + x2', #15
+    184 => 'Canon EF 400mm f/2.8L + 2x', #15
+    185 => 'Canon EF 600mm f/4L IS', #32
     186 => 'Canon EF 70-200mm f/4L', #9
-    187 => 'Canon EF 70-200mm f/4L + x1.4', #26
-    188 => 'Canon EF 70-200mm f/4L + x2', #PH (NC)
+    187 => 'Canon EF 70-200mm f/4L + 1.4x', #26
+    188 => 'Canon EF 70-200mm f/4L + 2x', #PH
+    189 => 'Canon EF 70-200mm f/4L + 2.8x', #32
     190 => 'Canon EF 100mm f/2.8 Macro',
     191 => 'Canon EF 400mm f/4 DO IS', #9
-    # 196 Canon 75-300mm f/4? #15
-    197 => 'Canon EF 75-300mm f/4-5.6 IS',
+    193 => 'Canon EF 35-80mm f/4-5.6 USM', #32
+    194 => 'Canon EF 80-200mm f/4.5-5.6 USM', #32
+    195 => 'Canon EF 35-105mm f/4.5-5.6 USM', #32
+    196 => 'Canon EF 75-300mm f/4-5.6 USM', #15/32
+    197 => 'Canon EF 75-300mm f/4-5.6 IS USM',
     198 => 'Canon EF 50mm f/1.4 USM', #9
-    202 => 'Canon EF 28-80 f/3.5-5.6 USM IV',
-    211 => 'Canon EF 28-200mm f/3.5-5.6', #15
+    199 => 'Canon EF 28-80mm f/3.5-5.6 USM', #32
+    200 => 'Canon EF 75-300mm f/4-5.6 USM', #32
+    201 => 'Canon EF 28-80mm f/3.5-5.6 USM', #32
+    202 => 'Canon EF 28-80mm f/3.5-5.6 USM IV',
+    208 => 'Canon EF 22-55mm f/4-5.6 USM', #32
+    209 => 'Canon EF 55-200mm f/4.5-5.6', #32
+    210 => 'Canon EF 28-90mm f/4-5.6 USM', #32
+    211 => 'Canon EF 28-200mm f/3.5-5.6 USM', #15
     212 => 'Canon EF 28-105mm f/4-5.6 USM', #15
-    213 => 'Canon EF 90-300mm f/4.5-5.6',
+    213 => 'Canon EF 90-300mm f/4.5-5.6 USM',
     214 => 'Canon EF-S 18-55mm f/3.5-4.5 USM', #PH
-    215 => 'Canon EF 55-200 4.5-5.6 II USM', #25
+    215 => 'Canon EF 55-200mm f/4.5-5.6 II USM', #25
     224 => 'Canon EF 70-200mm f/2.8L IS', #11
-    225 => 'Canon EF 70-200mm f/2.8L IS + x1.4', #11
-    226 => 'Canon EF 70-200mm f/2.8L IS + x2', #14
+    225 => 'Canon EF 70-200mm f/2.8L IS + 1.4x', #11
+    226 => 'Canon EF 70-200mm f/2.8L IS + 2x', #14
+    227 => 'Canon EF 70-200mm f/2.8L IS + 2.8x', #32
+    228 => 'Canon EF 28-105mm f/3.5-4.5 USM', #32
     229 => 'Canon EF 16-35mm f/2.8L', #PH
     230 => 'Canon EF 24-70mm f/2.8L', #9
     231 => 'Canon EF 17-40mm f/4L',
@@ -190,9 +260,11 @@ my %canonLensTypes = ( #4
     240 => 'Canon EF-S 17-55mm f/2.8 IS USM', #15
     241 => 'Canon EF 50mm f/1.2L', #15
     242 => 'Canon EF 70-200mm f/4L IS', #PH
-    243 => 'Canon EF 70-200mm f/4L IS + x1.4', #15
-    244 => 'Canon EF 70-200mm f/4L IS + x2', #PH (NC)
+    243 => 'Canon EF 70-200mm f/4L IS + 1.4x', #15
+    244 => 'Canon EF 70-200mm f/4L IS + 2x', #PH
+    245 => 'Canon EF 70-200mm f/4L IS + 2.8x', #32
     246 => 'Canon EF 16-35mm f/2.8L II', #PH
+    247 => 'Canon EF 14mm f/2.8L II USM', #32
 );
 
 # Canon model ID numbers (PH)
@@ -285,13 +357,22 @@ my %canonLensTypes = ( #4
     0x2290000 => 'PowerShot SX100 IS',
     0x2300000 => 'PowerShot SD950 IS / Digital IXUS 960 IS / IXY Digital 2000 IS',
     0x2310000 => 'PowerShot SD870 IS / Digital IXUS 860 IS / IXY Digital 910 IS',
-    0x2320000 => 'PowerShot SD890 IS / Digital IXUS 970 IS / IXY DIGITAL 820 IS',
-    0x2360000 => 'PowerShot SD790 IS / Digital IXUS 90 IS / IXY DIGITAL 95 IS',
-    0x2370000 => 'PowerShot SD770 IS / Digital IXUS 85 IS / IXY DIGITAL 25 IS',
+    0x2320000 => 'PowerShot SD890 IS / Digital IXUS 970 IS / IXY Digital 820 IS',
+    0x2360000 => 'PowerShot SD790 IS / Digital IXUS 90 IS / IXY Digital 95 IS',
+    0x2370000 => 'PowerShot SD770 IS / Digital IXUS 85 IS / IXY Digital 25 IS',
     0x2380000 => 'PowerShot A590 IS',
     0x2390000 => 'PowerShot A580',
     0x2420000 => 'PowerShot A470',
     0x2430000 => 'PowerShot SD1100 IS / Digital IXUS 80 IS / IXY Digital 20 IS',
+    0x2460000 => 'PowerShot SX1 IS',
+    0x2470000 => 'PowerShot SX10 IS',
+    0x2480000 => 'PowerShot A1000 IS',
+    0x2490000 => 'PowerShot G10',
+    0x2510000 => 'PowerShot A2000 IS',
+    0x2520000 => 'PowerShot SX110 IS',
+    0x2530000 => 'PowerShot SD990 IS / Digital IXUS 980 IS / IXY Digital 3000 IS',
+    0x2540000 => 'PowerShot SD880 IS / Digital IXUS 870 IS / IXY Digital 920 IS',
+    0x2550000 => 'PowerShot E1',
     0x3010000 => 'PowerShot Pro90 IS',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
@@ -314,9 +395,12 @@ my %canonLensTypes = ( #4
     0x80000190 => 'EOS 40D',
     0x80000213 => 'EOS 5D',
     0x80000215 => 'EOS-1Ds Mark III',
+    0x80000218 => 'EOS 5D Mark II', #25
     0x80000232 => 'EOS-1D Mark II N',
     0x80000234 => 'EOS 30D',
-    0x80000236 => 'EOS Digital Rebel XTi / 400D / Kiss Digital X',
+    0x80000236 => 'EOS Digital Rebel XTi / 400D / Kiss Digital X (and rare K236)',
+    0x80000254 => 'EOS Rebel XS / 1000D / Kiss F',
+    0x80000261 => 'EOS 50D',
 );
 
 my %canonQuality = (
@@ -546,6 +630,27 @@ my %printParameter = (
             },
         },
         {
+            Name => 'CanonCameraInfo50D',
+            Condition => '$$self{Model} =~ /EOS 50D$/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::CameraInfo50D',
+            },
+        },
+        {
+            Name => 'CanonCameraInfo450D',
+            Condition => '$$self{Model} =~ /\b(450D|REBEL XSi|Kiss X2)\b/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::CameraInfo450D',
+            },
+        },
+        {
+            Name => 'CanonCameraInfo1000D',
+            Condition => '$$self{Model} =~ /\b1000D\b/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::CameraInfo1000D',
+            },
+        },
+        {
             Name => 'CanonCameraInfoPowerShot',
             # valid if format is int32u[138] or int32u[148]
             Condition => '$format eq "int32u" and ($count == 138 or $count == 148)',
@@ -745,6 +850,25 @@ my %printParameter = (
     },
     # 0x1f - used for red-eye-corrected images - PH (A570IS)
     # 0x22 - values 1 and 2 are 2 and 1 for flash pics, 0 otherwise - PH (A570IS)
+    0x23 => { #31
+        Name => 'Categories',
+        Writable => 'int32u',
+        Format => 'int32u', # (necessary to perform conversion for Condition)
+        Notes => '2 values: 1. always 8, 2. Categories',
+        Count => '2',
+        Condition => '$$valPt =~ /^\x08\0\0\0/',
+        ValueConv => '$val =~ s/^8 //; $val',
+        ValueConvInv => '"8 $val"',
+        PrintConv => { BITMASK => {
+            0 => 'People',
+            1 => 'Scenery',
+            2 => 'Events',
+            3 => 'User 1',
+            4 => 'User 2',
+            5 => 'User 3',
+            6 => 'To Do',
+        } },
+    },
     0x24 => { #PH
         Name => 'FaceDetect1',
         SubDirectory => {
@@ -767,6 +891,7 @@ my %printParameter = (
     },
     # 0x27 - value 1 is 1 for high ISO pictures, 0 otherwise
     # 0x28 - 16-bytes: 0-1=sequence number (encrypted), 2-5=date/time (encrypted) (ref JD)
+    # 0x2d - changes with categories (ref 31)
     0x81 => { #13
         Name => 'RawDataOffset',
         # (can't yet write 1D raw files)
@@ -818,7 +943,7 @@ my %printParameter = (
         PrintConv => 'Image::ExifTool::Canon::PrintAFPoints1D($val)',
     },
     0x95 => { #PH (observed in 5D sample image)
-        Name => 'LensType',
+        Name => 'LensModel',
         Writable => 'string',
     },
     0x96 => [ #PH
@@ -941,8 +1066,12 @@ my %printParameter = (
                 TagTable => 'Image::ExifTool::Canon::ColorBalance3',
             },
         },
-        {   # (int16u[692|674|702]) - 40D (692), 1DmkIII (674), 1DSmkIII (702)
-            Condition => '$count == 692 or $count == 674 or $count == 702',
+        {   # (int16u[692|674|702|1227])
+            # 40D (692), 1DmkIII (674), 1DSmkIII (702), 450D/1000D (1227)
+            Condition => q{
+                $count == 692 or $count == 674 or
+                $count == 702 or $count == 1227
+            },
             Name => 'ColorBalance4',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::ColorBalance4',
@@ -1380,7 +1509,7 @@ my %printParameter = (
             Name => 'FocalPlaneXSize',
             Notes => 'reported focal plane sizes are affected by digital zoom if applied',
             # this conversion is not valid for the 1DmkIII, 1DSmkIII, 40D or 450D
-            Condition => '$$self{Model} !~ /\b(III|40D|450D|Rebel XSi|Kiss X2)\b/',
+            Condition => '$$self{Model} !~ /\b(III|40D|450D|REBEL XSi|Kiss X2)\b/',
             # focal plane image dimensions in 1/1000 inch -- convert to mm
             RawConv => '$val < 40 ? undef : $val',  # must be reasonable
             ValueConv => '$val * 25.4 / 1000',
@@ -1395,7 +1524,7 @@ my %printParameter = (
     3 => [ #4
         {
             Name => 'FocalPlaneYSize',
-            Condition => '$$self{Model} !~ /\b(III|40D|450D|Rebel XSi|Kiss X2)\b/',
+            Condition => '$$self{Model} !~ /\b(III|40D|450D|REBEL XSi|Kiss X2)\b/',
             RawConv => '$val < 40 ? undef : $val',  # must be reasonable
             ValueConv => '$val * 25.4 / 1000',
             ValueConvInv => 'int($val * 1000 / 25.4 + 0.5)',
@@ -1418,6 +1547,7 @@ my %printParameter = (
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    DATAMEMBER => [ 19 ],
     1 => { #PH
         Name => 'AutoISO',
         Notes => 'actual ISO used = BaseISO * AutoISO / 100',
@@ -1557,11 +1687,18 @@ my %printParameter = (
     },
     19 => {
         Name => 'FocusDistanceUpper',
+        DataMember => 'FocusDistanceUpper',
+        Notes => q{
+            FocusDistance tags are only extracted if FocusDistanceUpper is non-zero
+            since they are not used by some newer models such as 450D and 1000D
+        },
+        RawConv => '($$self{FocusDistanceUpper} = $val) || undef',
         ValueConv => '$val * 0.01',
         ValueConvInv => '$val / 0.01',
     },
     20 => {
         Name => 'FocusDistanceLower',
+        Condition => '$$self{FocusDistanceUpper}',
         ValueConv => '$val * 0.01',
         ValueConvInv => '$val / 0.01',
     },
@@ -1691,7 +1828,7 @@ my %printParameter = (
     0x0e => {
         Name => 'ShortFocal',
         Format => 'int16u',
-        # the EXIF ShortFocal is more reliable, so set this priority to zero
+        # the other ShortFocal is more reliable, so set this priority to zero
         Priority => 0,
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s*mm//;$val',
@@ -1699,7 +1836,7 @@ my %printParameter = (
     0x10 => {
         Name => 'LongFocal',
         Format => 'int16u',
-        # the EXIF ShortFocal is more reliable, so set this priority to zero
+        # the other LongFocal is more reliable, so set this priority to zero
         Priority => 0,
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s*mm//;$val',
@@ -1944,7 +2081,7 @@ my %printParameter = (
     0x11 => {
         Name => 'ShortFocal',
         Format => 'int16u',
-        # the EXIF ShortFocal is more reliable, so set this priority to zero
+        # the other ShortFocal is more reliable, so set this priority to zero
         Priority => 0,
         ValueConv => 'unpack("n",pack("v",$val))',
         ValueConvInv => 'unpack("v",pack("n",$val))',
@@ -1954,7 +2091,7 @@ my %printParameter = (
     0x13 => {
         Name => 'LongFocal',
         Format => 'int16u',
-        # the EXIF LongFocal is more reliable, so set this priority to zero
+        # the other LongFocal is more reliable, so set this priority to zero
         Priority => 0,
         ValueConv => 'unpack("n",pack("v",$val))',
         ValueConvInv => 'unpack("v",pack("n",$val))',
@@ -2091,7 +2228,7 @@ my %printParameter = (
     0x113 => {
         Name => 'ShortFocal',
         Format => 'int16u',
-        # the EXIF ShortFocal is more reliable, so set this priority to zero
+        # the other ShortFocal is more reliable, so set this priority to zero
         Priority => 0,
         # byte order is big-endian
         ValueConv => 'unpack("n",pack("v",$val))',
@@ -2102,7 +2239,7 @@ my %printParameter = (
     0x115 => {
         Name => 'LongFocal',
         Format => 'int16u',
-        # the EXIF LongFocal is more reliable, so set this priority to zero
+        # the other LongFocal is more reliable, so set this priority to zero
         Priority => 0,
         # byte order is big-endian
         ValueConv => 'unpack("n",pack("v",$val))',
@@ -2478,6 +2615,218 @@ my %printParameter = (
         Format => 'int32u',
         ValueConv => '$val - 1', # yes, minus (opposite to FileIndex)
         ValueConvInv => '$val + 1',
+    },
+    0x92b => { #33
+        Name => 'LensModel',
+        Format => 'string[64]',
+    },
+);
+
+# Canon camera information for 50D (MakerNotes tag 0x0d)
+%Image::ExifTool::Canon::CameraInfo50D = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'CameraInfo tags for the EOS 50D.',
+    0x50 => { #33
+        Name => 'FocusDistanceUpper',
+        Format => 'int16u',
+        ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
+        ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    },
+    0x52 => { #33
+        Name => 'FocusDistanceLower',
+        Format => 'int16u',
+        ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
+        ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    },
+    0x73 => { #33
+        Name => 'ColorTemperature',
+        Format => 'int16u',
+    },
+    0xeb => { #33
+        Name => 'LensType',
+        SeparateTable => 1,
+        Priority => 0,
+        PrintConv => \%canonLensTypes,
+    },
+    0x15a => { #PH
+        Name => 'FirmwareVersion',
+        Format => 'string[6]',
+        Notes => 'at this location for firmware 2.6.1',
+        Writable => 0,
+        RawConv => '$val=~/^\d+\.\d+\.\d+\s*$/ ? $val : undef',
+    },
+    0x15e => { #33
+        Name => 'FirmwareVersion',
+        Format => 'string[6]',
+        Notes => 'at this location for firmware 3.1.1',
+        Writable => 0,
+        RawConv => '$val=~/^\d+\.\d+\.\d+\s*$/ ? $val : undef',
+    },
+);
+
+# Canon camera information for 450D (MakerNotes tag 0x0d)
+%Image::ExifTool::Canon::CameraInfo450D = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'CameraInfo tags for the EOS 450D.',
+    0x1d => { #PH
+        Name => 'FocalLength',
+        Format => 'int16u',
+        # the EXIF FocalLength is more reliable, so set this priority to zero
+        Priority => 0,
+        # ignore if zero
+        RawConv => '$val ? $val : undef',
+        # (just to make things confusing, the focal lengths are big-endian)
+        ValueConv => 'unpack("n",pack("v",$val))',
+        ValueConvInv => 'unpack("v",pack("n",$val))',
+        PrintConv => '"$val mm"',
+        PrintConvInv => '$val=~s/\s*mm//;$val',
+    },
+    0x43 => { #20
+        Name => 'FocusDistanceUpper',
+        Format => 'int16u',
+        # this is very odd (little-endian number on odd boundary),
+        # but it does seem to work better with my sample images - PH
+        ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
+        ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    },
+    0x45 => { #20
+        Name => 'FocusDistanceLower',
+        Format => 'int16u',
+        ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
+        ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    },
+    0x6f => { #PH
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        PrintConv => \%canonWhiteBalance,
+        SeparateTable => 1,
+    },
+    0x73 => { #PH
+        Name => 'ColorTemperature',
+        Format => 'int16u',
+    },
+    0xdf => { #33
+        Name => 'LensType',
+        Condition => '$$self{Model} !~ /\b1000D\b/',
+        SeparateTable => 1,
+        Priority => 0,
+        PrintConv => \%canonLensTypes,
+    },
+    0x107 => { #PH
+        Name => 'FirmwareVersion',
+        Condition => '$$self{Model} !~ /\b1000D\b/',
+        Format => 'string[6]',
+    },
+    0x133 => { #20
+        Name => 'DirectoryIndex',
+        Condition => '$$self{Model} !~ /\b1000D\b/',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+    },
+    0x13f => { #20
+        Name => 'FileIndex',
+        Condition => '$$self{Model} !~ /\b1000D\b/',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0x933 => { #33
+        Name => 'LensModel',
+        Condition => '$$self{Model} !~ /\b1000D\b/',
+        Format => 'string[64]',
+    },
+);
+
+# Canon camera information for 1000D (MakerNotes tag 0x0d)
+%Image::ExifTool::Canon::CameraInfo1000D = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'CameraInfo tags for the EOS 1000D.',
+    0x1d => { #PH
+        Name => 'FocalLength',
+        Format => 'int16u',
+        # the EXIF FocalLength is more reliable, so set this priority to zero
+        Priority => 0,
+        # ignore if zero
+        RawConv => '$val ? $val : undef',
+        # (just to make things confusing, the focal lengths are big-endian)
+        ValueConv => 'unpack("n",pack("v",$val))',
+        ValueConvInv => 'unpack("v",pack("n",$val))',
+        PrintConv => '"$val mm"',
+        PrintConvInv => '$val=~s/\s*mm//;$val',
+    },
+    0x43 => { #20
+        Name => 'FocusDistanceUpper',
+        Format => 'int16u',
+        # this is very odd (little-endian number on odd boundary),
+        # but it does seem to work better with my sample images - PH
+        ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
+        ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    },
+    0x45 => { #20
+        Name => 'FocusDistanceLower',
+        Format => 'int16u',
+        ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
+        ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    },
+    0x6f => { #PH
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        PrintConv => \%canonWhiteBalance,
+        SeparateTable => 1,
+    },
+    0x73 => { #PH
+        Name => 'ColorTemperature',
+        Format => 'int16u',
+    },
+    0xe3 => { #PH
+        Name => 'LensType',
+        Condition => '$$self{Model} =~ /\b1000D\b/',
+        SeparateTable => 1,
+        Priority => 0,
+        PrintConv => \%canonLensTypes,
+    },
+    0x10b => { #PH
+        Name => 'FirmwareVersion',
+        Condition => '$$self{Model} =~ /\b1000D\b/',
+        Format => 'string[6]',
+    },
+    0x137 => { #PH (NC)
+        Name => 'DirectoryIndex',
+        Condition => '$$self{Model} =~ /\b1000D\b/',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+    },
+    0x143 => { #PH
+        Name => 'FileIndex',
+        Condition => '$$self{Model} =~ /\b1000D\b/',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0x937 => { #PH
+        Name => 'LensModel',
+        Condition => '$$self{Model} =~ /\b1000D\b/',
+        Format => 'string[64]',
     },
 );
 
@@ -3097,8 +3446,8 @@ my %printParameter = (
     },
     2 => { #12
         Name => 'Sharpness',
-        Notes => '1D and 5D only',
-        Condition => '$$self{Model} =~ /\b(1D|5D)/',
+        Notes => '1D, 5D and 450D only',
+        Condition => '$$self{Model} =~ /\b(1D|5D|450D|XSi|Kiss X2)/',
     },
     3 => { #PH
         Name => 'SharpnessFrequency',
@@ -3319,12 +3668,12 @@ my %printParameter = (
     132 => 'ColorTempCustom',
 );
 
-# Color balance (MakerNotes tag 0x4001, count=674|692|702) (ref PH)
+# Color balance (MakerNotes tag 0x4001, count=674|692|702|1227) (ref PH)
 %Image::ExifTool::Canon::ColorBalance4 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    NOTES => 'These tags are used by the 40D, 1DmkIII and 1DSmkIII.',
+    NOTES => 'These tags are used by the 40D, 1DmkIII, 1DSmkIII, 450D and 1000D.',
     FORMAT => 'int16u',
     FIRST_ENTRY => 0,
     WRITABLE => 1,
@@ -3470,7 +3819,7 @@ my %printParameter = (
     },
 );
 
-# canon composite tags
+# Canon composite tags
 %Image::ExifTool::Canon::Composite = (
     GROUPS => { 2 => 'Camera' },
     DriveMode => {
@@ -3618,7 +3967,8 @@ my %printParameter = (
             2 => 'Canon:DigitalZoom',
         },
         RawConv => q{
-            return undef unless $val[2] == 3 and $val[0];
+            ToFloat(@val);
+            return undef unless $val[2] and $val[2] == 3 and $val[0] and $val[1];
             return $val[1] / $val[0];
         },
         PrintConv => 'sprintf("%.2fx",$val)',
@@ -3642,6 +3992,77 @@ my %printParameter = (
 # add our composite tags
 Image::ExifTool::AddCompositeTags('Image::ExifTool::Canon');
 
+#------------------------------------------------------------------------------
+# Attempt to identify the specific lens if multiple lenses have the same LensType
+# Inputs: 0) PrintConv hash ref, 1) LensType, 2) ShortFocal, 3) LongFocal
+#         4) MaxAperture, 5) LensModel
+# Notes: PrintConv, LensType, ShortFocal and LongFocal must be defined. 
+#        Other inputs are optional.
+sub PrintLensID(@)
+{
+    my ($printConv, $lensType, $shortFocal, $longFocal, $maxAperture, $lensModel) = @_;
+    my $lens = $$printConv{$lensType};
+    if ($lens) {
+        return $lens unless $$printConv{"$lensType.1"};
+        $lens =~ s/ or .*//s;    # remove everything after "or"
+        # make list of all possible matching lenses
+        my @lenses = ( $lens );
+        my $i;
+        for ($i=1; $$printConv{"$lensType.$i"}; ++$i) {
+            push @lenses, $$printConv{"$lensType.$i"};
+        }
+        my ($tc, @maybe, @matches);
+        # look for lens in user-defined lenses
+        foreach $lens (@lenses) {
+            next unless $Image::ExifTool::userLens{$lens} and $lens =~ /(\d+)/;
+            my $sf = $1;    # short focal length
+            # add teleconverter multiplication factor if applicable
+            foreach $tc (1, 1.4, 2, 2.8) {
+                next if abs($shortFocal - $sf * $tc) > 0.9;
+                $lens .= " + ${tc}x" if $tc > 1;
+                last;
+            }
+            return $lens;
+        }
+        # attempt to determine actual lens
+        foreach $tc (1, 1.4, 2, 2.8) {  # loop through teleconverter scaling factors
+            foreach $lens (@lenses) {
+                next unless $lens =~ /(\d+)(?:-(\d+))?mm.*?(?:[fF]\/?)(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?/;
+                # ($1=short focal, $2=long focal, $3=max aperture wide, $4=max aperture tele)
+                my ($sf, $lf, $sa, $la) = ($1, $2, $3, $4);
+                # see if we can rule out this lens by focal length or aperture
+                $lf = $sf if $sf and not $lf;
+                $la = $sa if $sa and not $la;
+                next if abs($shortFocal - $sf * $tc) > 0.9;
+                my $tclens = $lens;
+                $tclens .= " + ${tc}x" if $tc > 1;
+                push @maybe, $tclens;
+                next if abs($longFocal  - $lf * $tc) > 0.9;
+                if ($maxAperture) {
+                    # (not 100% sure that TC affects MaxAperture, but it should!)
+                    next if $maxAperture < $sa * $tc - 0.15;
+                    next if $maxAperture > $la * $tc + 0.15;
+                }
+                push @matches, $tclens;
+            }
+            last if @maybe;
+        }
+        return join(' or ', @matches) if @matches;
+        return join(' or ', @maybe) if @maybe;
+    } elsif ($lensModel and $lensModel =~ /\d/) {
+        # use lens model as written by the camera (add "Canon" to the start
+        # since the camera only understands Canon lenses anyway)
+        return "Canon $lensModel";
+    }
+    my $str = '';
+    if ($shortFocal) {
+        $str .= sprintf(' %d', $shortFocal);
+        $str .= sprintf('-%d', $longFocal) if $longFocal and $longFocal != $shortFocal;
+        $str .= 'mm';
+    }
+    return "Unknown$str" if $lensType < 0;
+    return "Unknown ($lensType)$str";
+}
 
 #------------------------------------------------------------------------------
 # Validate first word of Canon binary data
@@ -3925,16 +4346,13 @@ sub PrintAFPoints1D($)
 
 #------------------------------------------------------------------------------
 # Decide whether flash was on or off
+# Inputs: 0) Flashbits, 1) Flash
 sub FlashOn(@)
 {
     my @val = @_;
-
-    if (defined $val[0]) {
-        return $val[0] ? 1 : 0;
-    }
-    if (defined $val[1]) {
-        return $val[1]&0x07 ? 1 : 0;
-    }
+    Image::ExifTool::ToFloat(@val);
+    return $val[0] ? 1 : 0 if defined $val[0];
+    return $val[1]&0x07 ? 1 : 0 if defined $val[1];
     return undef;
 }
 
@@ -4059,9 +4477,9 @@ Thanks Michael Rommel and Daniel Pittman for information they provided about
 the Digital Ixus and PowerShot S70 cameras, Juha Eskelinen and Emil Sit for
 figuring out the 20D and 30D FileNumber, Denny Priebe for figuring out a
 couple of 1D tags, and Michael Tiemann, Rainer Honle, Dave Nicholson, Chris
-Huebsch and Ger Vermeulen for decoding a number of new tags.  Also thanks to
-everyone who made contributions to the LensType lookup list or the meanings
-of other tag values.
+Huebsch, Ger Vermeulen, Darryl Zurn and D.J. Cristi for decoding a number of
+new tags.  Also thanks to everyone who made contributions to the LensType
+lookup list or the meanings of other tag values.
 
 =head1 SEE ALSO
 

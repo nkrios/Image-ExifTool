@@ -339,11 +339,14 @@
 <td>LensData0100
   <br>LensData0101
   <br>LensData0201
+  <br>LensData0204
   <br>LensDataUnknown</td>
-<td class=c>-<br>-<br>-<br>N</td>
+<td class=c>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Nikon.html#LensData00'>Nikon LensData00 Tags</a>
   <br>--&gt; <a href='Nikon.html#LensData01'>Nikon LensData01 Tags</a>
-  <br>--&gt; <a href='Nikon.html#LensData01'>Nikon LensData01 Tags</a></td></tr>
+  <br>--&gt; <a href='Nikon.html#LensData01'>Nikon LensData01 Tags</a>
+  <br>--&gt; <a href='Nikon.html#LensData0204'>Nikon LensData0204 Tags</a>
+  <br>--&gt; <a href='Nikon.html#LensDataUnknown'>Nikon LensDataUnknown Tags</a></td></tr>
 <tr>
 <td>0x0099</td>
 <td>RawImageCenter</td>
@@ -405,10 +408,12 @@
 <td>0x00a8</td>
 <td>FlashInfo0100
   <br>FlashInfo0102
+  <br>FlashInfo0103
   <br>FlashInfoUnknown</td>
-<td class=c>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Nikon.html#FlashInfo0100'>Nikon FlashInfo0100 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfo0102'>Nikon FlashInfo0102 Tags</a>
+  <br>--&gt; <a href='Nikon.html#FlashInfo0103'>Nikon FlashInfo0103 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfoUnknown'>Nikon FlashInfoUnknown Tags</a></td></tr>
 <tr>
 <td>0x00a9</td>
@@ -494,6 +499,16 @@
 <td>NikonScanIFD</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#Scan'>Nikon Scan Tags</a></td></tr>
+<tr>
+<td>0x0e1d</td>
+<td>NikonICCProfile</td>
+<td class=c>undef!</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<tr class=b>
+<td>0x0e1e</td>
+<td>NikonCaptureOutput</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Nikon.html#CaptureOutput'>Nikon CaptureOutput Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PreviewImage'>Nikon PreviewImage Tags</a></h2>
@@ -538,6 +553,9 @@
   <br>34677 = SGILog24
   <br>34712 = JPEG 2000
   <br>34713 = Nikon NEF Compressed
+  <br>34718 = Microsoft Document Imaging (MDI) Binary Level Codec
+  <br>34719 = Microsoft Document Imaging (MDI) Progressive Transform Codec
+  <br>34720 = Microsoft Document Imaging (MDI) Vector
   <br>65000 = Kodak DCR Compressed
   <br>65535 = Pentax PEF Compressed</span></td></tr>
 <tr class=b>
@@ -2156,6 +2174,101 @@ complications which make writing more difficult.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='LensData0204'>Nikon LensData0204 Tags</a></h2>
+<p>Nikon encrypts the LensData information below if LensDataVersion is 0201 or
+higher, but  the decryption algorithm is known so the information can be
+extracted.  It isn&#39;t yet writable, however, because the encryption adds
+complications which make writing more difficult.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>LensDataVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>4</td>
+<td>ExitPupilPosition</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>5</td>
+<td>AFAperture</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>8</td>
+<td>FocusPosition</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>10</td>
+<td>FocusDistance</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(this focus distance is approximate, and not very accurate for some lenses)</span></span></td></tr>
+<tr class=b>
+<td class=r>11</td>
+<td>FocalLength</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>12</td>
+<td>LensIDNumber</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(see LensID values below)</span></span></td></tr>
+<tr class=b>
+<td class=r>13</td>
+<td>LensFStops</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>14</td>
+<td>MinFocalLength</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>15</td>
+<td>MaxFocalLength</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>16</td>
+<td>MaxApertureAtMinFocal</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>17</td>
+<td>MaxApertureAtMaxFocal</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>18</td>
+<td>MCUVersion</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>19</td>
+<td>EffectiveMaxAperture</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='LensDataUnknown'>Nikon LensDataUnknown Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>LensDataVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='FlashInfo0100'>Nikon FlashInfo0100 Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -2168,18 +2281,39 @@ complications which make writing more difficult.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td class=r>4</td>
+<td>FlashModel</td>
+<td class=c>int8u[4]</td>
+<td><span class=s>&#39;0 0 0 0&#39; = (none)
+  <br>&#39;0 54 0 0&#39; = Internal
+  <br>&#39;0 72 0 0&#39; = (none)
+  <br>&#39;0 78 0 0&#39; = (none)
+  <br>&#39;2 46 0 0&#39; = Internal
+  <br>&#39;2 48 0 0&#39; = Internal
+  <br>&#39;2 50 0 0&#39; = Internal
+  <br>&#39;x x 1 1&#39; = SB-800 (or Metz 58 AF-1)
+  <br>&#39;x x 1 3&#39; = SB-800
+  <br>&#39;x x 2 1&#39; = SB-800
+  <br>&#39;x x 2 4&#39; = SB-600
+  <br>&#39;x x 2 5&#39; = SB-600
+  <br>&#39;x x 3 1&#39; = SU-800 Remote Commander
+  <br>&#39;x x 4 1&#39; = SB-400
+  <br>&#39;x x 4 2&#39; = SB-400
+  <br>&#39;x x 4 4&#39; = SB-400
+  <br>&#39;x x 5 1&#39; = SB-900</span></td></tr>
+<tr>
 <td class=r>8</td>
 <td>ExternalFlashFlags</td>
 <td class=c>int8u</td>
 <td><span class=s>Bit 4 = Wide Flash Adapter</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>9.1</td>
 <td>FlashCommanderMode</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0x80]
   <br>0x0 = Off
   <br>0x80 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r>9.2</td>
 <td>FlashControlMode</td>
 <td class=c>int8u</td>
@@ -2190,28 +2324,28 @@ complications which make writing more difficult.</p>
   <br>0x3 = Auto Aperture
   <br>0x6 = Manual
   <br>0x7 = Repeating Flash</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>10</td>
 <td>FlashOutput
   <br>FlashExposureComp</td>
 <td class=c>int8u<br>int8s</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>11</td>
 <td>FlashFocalLength</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>12</td>
 <td>RepeatingFlashRate</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>13</td>
 <td>RepeatingFlashCount</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>15</td>
 <td>FlashGroupAControlMode</td>
 <td class=c>int8u</td>
@@ -2222,7 +2356,7 @@ complications which make writing more difficult.</p>
   <br>0x3 = Auto Aperture
   <br>0x6 = Manual
   <br>0x7 = Repeating Flash</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r>16</td>
 <td>FlashGroupBControlMode</td>
 <td class=c>int8u</td>
@@ -2233,13 +2367,13 @@ complications which make writing more difficult.</p>
   <br>0x3 = Auto Aperture
   <br>0x6 = Manual
   <br>0x7 = Repeating Flash</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>17</td>
 <td>FlashGroupAOutput
   <br>FlashGroupAExposureComp</td>
 <td class=c>int8u<br>int8s</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>18</td>
 <td>FlashGroupBOutput
   <br>FlashGroupBExposureComp</td>
@@ -2260,18 +2394,39 @@ complications which make writing more difficult.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td class=r>4</td>
+<td>FlashModel</td>
+<td class=c>int8u[4]</td>
+<td><span class=s>&#39;0 0 0 0&#39; = (none)
+  <br>&#39;0 54 0 0&#39; = Internal
+  <br>&#39;0 72 0 0&#39; = (none)
+  <br>&#39;0 78 0 0&#39; = (none)
+  <br>&#39;2 46 0 0&#39; = Internal
+  <br>&#39;2 48 0 0&#39; = Internal
+  <br>&#39;2 50 0 0&#39; = Internal
+  <br>&#39;x x 1 1&#39; = SB-800 (or Metz 58 AF-1)
+  <br>&#39;x x 1 3&#39; = SB-800
+  <br>&#39;x x 2 1&#39; = SB-800
+  <br>&#39;x x 2 4&#39; = SB-600
+  <br>&#39;x x 2 5&#39; = SB-600
+  <br>&#39;x x 3 1&#39; = SU-800 Remote Commander
+  <br>&#39;x x 4 1&#39; = SB-400
+  <br>&#39;x x 4 2&#39; = SB-400
+  <br>&#39;x x 4 4&#39; = SB-400
+  <br>&#39;x x 5 1&#39; = SB-900</span></td></tr>
+<tr>
 <td class=r>8</td>
 <td>ExternalFlashFlags</td>
 <td class=c>int8u</td>
 <td><span class=s>Bit 4 = Wide Flash Adapter</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>9.1</td>
 <td>FlashCommanderMode</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0x80]
   <br>0x0 = Off
   <br>0x80 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r>9.2</td>
 <td>FlashControlMode</td>
 <td class=c>int8u</td>
@@ -2282,29 +2437,29 @@ complications which make writing more difficult.</p>
   <br>0x3 = Auto Aperture
   <br>0x6 = Manual
   <br>0x7 = Repeating Flash</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r>10</td>
 <td>FlashOutput
   <br>FlashExposureComp</td>
 <td class=c>int8u<br>int8s</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>12</td>
 <td>FlashFocalLength</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r>13</td>
 <td>RepeatingFlashRate</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r>14</td>
 <td>RepeatingFlashCount</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
-<tr>
-<td class=r>16</td>
+<tr class=b>
+<td class=r>16.1</td>
 <td>FlashGroupAControlMode</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0xf]
@@ -2314,9 +2469,20 @@ complications which make writing more difficult.</p>
   <br>0x3 = Auto Aperture
   <br>0x6 = Manual
   <br>0x7 = Repeating Flash</span></td></tr>
-<tr class=b>
-<td class=r>17</td>
+<tr>
+<td class=r>17.1</td>
 <td>FlashGroupBControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf0]
+  <br>0x0 = Off
+  <br>0x10 = iTTL-BL
+  <br>0x20 = iTTL
+  <br>0x30 = Auto Aperture
+  <br>0x60 = Manual
+  <br>0x70 = Repeating Flash</span></td></tr>
+<tr class=b>
+<td class=r>17.2</td>
+<td>FlashGroupCControlMode</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0xf]
   <br>0x0 = Off
@@ -2335,6 +2501,127 @@ complications which make writing more difficult.</p>
 <td class=r>19</td>
 <td>FlashGroupBOutput
   <br>FlashGroupBExposureComp</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>20</td>
+<td>FlashGroupCOutput
+  <br>FlashGroupCExposureComp</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FlashInfo0103'>Nikon FlashInfo0103 Tags</a></h2>
+<p>These tags are used by the D90 and D700.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>0</td>
+<td>FlashInfoVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>4</td>
+<td>FlashModel</td>
+<td class=c>int8u[4]</td>
+<td><span class=s>&#39;0 0 0 0&#39; = (none)
+  <br>&#39;0 54 0 0&#39; = Internal
+  <br>&#39;0 72 0 0&#39; = (none)
+  <br>&#39;0 78 0 0&#39; = (none)
+  <br>&#39;2 46 0 0&#39; = Internal
+  <br>&#39;2 48 0 0&#39; = Internal
+  <br>&#39;2 50 0 0&#39; = Internal
+  <br>&#39;x x 1 1&#39; = SB-800 (or Metz 58 AF-1)
+  <br>&#39;x x 1 3&#39; = SB-800
+  <br>&#39;x x 2 1&#39; = SB-800
+  <br>&#39;x x 2 4&#39; = SB-600
+  <br>&#39;x x 2 5&#39; = SB-600
+  <br>&#39;x x 3 1&#39; = SU-800 Remote Commander
+  <br>&#39;x x 4 1&#39; = SB-400
+  <br>&#39;x x 4 2&#39; = SB-400
+  <br>&#39;x x 4 4&#39; = SB-400
+  <br>&#39;x x 5 1&#39; = SB-900</span></td></tr>
+<tr>
+<td class=r>8</td>
+<td>ExternalFlashFlags</td>
+<td class=c>int8u</td>
+<td><span class=s>Bit 4 = Wide Flash Adapter</span></td></tr>
+<tr class=b>
+<td class=r>9.1</td>
+<td>FlashCommanderMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x80]
+  <br>0x0 = Off
+  <br>0x80 = On</span></td></tr>
+<tr>
+<td class=r>9.2</td>
+<td>FlashControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x7f]
+  <br>0x0 = Off
+  <br>0x1 = iTTL-BL
+  <br>0x2 = iTTL
+  <br>0x3 = Auto Aperture
+  <br>0x6 = Manual
+  <br>0x7 = Repeating Flash</span></td></tr>
+<tr class=b>
+<td class=r>10</td>
+<td>FlashOutput
+  <br>FlashExposureComp</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>17.1</td>
+<td>FlashGroupAControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf]
+  <br>0x0 = Off
+  <br>0x1 = iTTL-BL
+  <br>0x2 = iTTL
+  <br>0x3 = Auto Aperture
+  <br>0x6 = Manual
+  <br>0x7 = Repeating Flash</span></td></tr>
+<tr class=b>
+<td class=r>18.1</td>
+<td>FlashGroupBControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf0]
+  <br>0x0 = Off
+  <br>0x10 = iTTL-BL
+  <br>0x20 = iTTL
+  <br>0x30 = Auto Aperture
+  <br>0x60 = Manual
+  <br>0x70 = Repeating Flash</span></td></tr>
+<tr>
+<td class=r>18.2</td>
+<td>FlashGroupCControlMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf]
+  <br>0x0 = Off
+  <br>0x1 = iTTL-BL
+  <br>0x2 = iTTL
+  <br>0x3 = Auto Aperture
+  <br>0x6 = Manual
+  <br>0x7 = Repeating Flash</span></td></tr>
+<tr class=b>
+<td class=r>19</td>
+<td>FlashGroupAOutput
+  <br>FlashGroupAExposureComp</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>20</td>
+<td>FlashGroupBOutput
+  <br>FlashGroupBExposureComp</td>
+<td class=c>int8u<br>int8s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>21</td>
+<td>FlashGroupCOutput
+  <br>FlashGroupCExposureComp</td>
 <td class=c>int8u<br>int8s</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -2394,6 +2681,20 @@ complications which make writing more difficult.</p>
 <td>AFInfo2Version</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>5</td>
+<td>AFAreaMode</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = Single Area
+  <br>4 = Dynamic Area
+  <br>7 = Dynamic Area (3D-tracking)
+  <br>8 = Auto-area AF</span></td></tr>
+<tr>
+<td class=r>6</td>
+<td>AutoFocus</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
 <tr class=b>
 <td class=r>8</td>
 <td>AFPointsUsed</td>
@@ -2522,6 +2823,29 @@ complications which make writing more difficult.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='CaptureOutput'>Nikon CaptureOutput Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>2</td>
+<td>OutputImageWidth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>3</td>
+<td>OutputImageHeight</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>4</td>
+<td>OutputResolution</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Type2'>Nikon Type2 Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -2640,26 +2964,29 @@ that order.  (source:
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>LensID</th></tr>
 <tr><td>'00 00 00 00 00 00 00 01'</td><td>= Manual Lens No CPU</td>
-</tr><tr><td>'00 36 1C 2D 34 3C 00 06'</td><td>= Tamron SP AF11-18mm f/4.5-5.6 Di II LD Aspherical (IF)</td>
+</tr><tr><td>'00 36 1C 2D 34 3C 00 06'</td><td>= Tamron SP AF 11-18mm f/4.5-5.6 Di II LD Aspherical (IF)</td>
 </tr><tr><td>'00 3C 1F 37 30 30 00 06'</td><td>= Tokina AT-X 124 AF PRO DX - AF 12-24mm f/4</td>
-</tr><tr><td>'00 3E 80 A0 38 3F 00 02'</td><td>= Tamron SP AF200-500mm f/5-6.3 Di LD (IF)</td>
-</tr><tr><td>'00 3F 2D 80 2B 40 00 06'</td><td>= Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)</td>
-</tr><tr><td>'00 3F 2D 80 2C 40 00 06'</td><td>= Tamron AF18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro</td>
-</tr><tr><td>'00 3F 80 A0 38 3F 00 02'</td><td>= Tamron SP AF200-500mm f/5-6.3 Di</td>
-</tr><tr><td>'00 40 18 2B 2C 34 00 06'</td><td>= Tokina AT-X 107 DX Fish-Eye -AF 10-17mm f/3.5-4.5</td>
+</tr><tr><td>'00 3E 80 A0 38 3F 00 02'</td><td>= Tamron SP AF 200-500mm f/5-6.3 Di LD (IF)</td>
+</tr><tr><td>'00 3F 2D 80 2B 40 00 06'</td><td>= Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)</td>
+</tr><tr><td>'00 3F 2D 80 2C 40 00 06'</td><td>= Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro</td>
+</tr><tr><td>'00 3F 80 A0 38 3F 00 02'</td><td>= Tamron SP AF 200-500mm f/5-6.3 Di</td>
+</tr><tr><td>'00 40 18 2B 2C 34 00 06'</td><td>= Tokina AT-X 107 DX Fisheye -AF 10-17mm f/3.5-4.5</td>
 </tr><tr><td>'00 40 2B 2B 2C 2C 00 02'</td><td>= Tokina AT-X 17 AF PRO - AF 17mm f/3.5</td>
-</tr><tr><td>'00 40 2D 88 2C 40 62 06'</td><td>= Tamron AF18-250mm F/3.5-6.3 Di II LD Aspherical (IF) Macro</td>
-</tr><tr><td>'00 44 60 98 34 3C 00 02'</td><td>= Tokina AT-X 840D 80-400mm f/4.5-5.6</td>
-</tr><tr><td>'00 47 44 44 24 24 00 06'</td><td>= Tokina AT-X M35 Pro DX - 35mm f/2.8</td>
-</tr><tr><td>'00 47 53 80 30 3C 00 06'</td><td>= Tamron AF55-200mm f/4-5.6 Di II LD</td>
+</tr><tr><td>'00 40 2D 88 2C 40 00 06'</td><td>= Tamron AF 18-250mm f/3.5-6.3 Di II LD Aspherical (IF) Macro (A18NII)</td>
+</tr><tr><td>'00 40 2D 88 2C 40 62 06'</td><td>= Tamron AF 18-250mm f/3.5-6.3 Di II LD Aspherical (IF) Macro</td>
+</tr><tr><td>'00 44 60 98 34 3C 00 02'</td><td>= Tokina AT-X 840 D 80-400mm f/4.5-5.6</td>
+</tr><tr><td>'00 47 44 44 24 24 00 06'</td><td>= Tokina AT-X M35 PRO DX - 35mm f/2.8</td>
+</tr><tr><td>'00 47 53 80 30 3C 00 06'</td><td>= Tamron AF 55-200mm f/4-5.6 Di II LD</td>
 </tr><tr><td>'00 48 1C 29 24 24 00 06'</td><td>= Tokina AT-X 116 PRO DX AF 11-16mm f/2.8</td>
 </tr><tr><td>'00 48 29 50 24 24 00 06'</td><td>= Tokina AT-X 165 PRO DX - AF 16-50mm f/2.8</td>
 </tr><tr><td>'00 48 3C 60 24 24 00 02'</td><td>= Tokina AT-X 280 AF PRO 28-80mm f/2.8 Aspherical</td>
-</tr><tr><td>'00 48 3C 6A 24 24 00 02'</td><td>= Tamron SP AF28-105mm f/2.8</td>
+</tr><tr><td>'00 48 3C 6A 24 24 00 02'</td><td>= Tamron SP AF 28-105mm f/2.8</td>
 </tr><tr><td>'00 48 50 72 24 24 00 06'</td><td>= Tokina AT-X 535 PRO DX - AF 50-135mm f/2.8</td>
-</tr><tr><td>'00 49 30 48 22 2B 00 02'</td><td>= Tamron SP AF20-40mm f/2.7-3.5</td>
-</tr><tr><td>'00 4C 7C 7C 2C 2C 00 02'</td><td>= Tamron SP AF180mm f/3.5 Di Model B01</td>
-</tr><tr><td>'00 53 2B 50 24 24 00 06'</td><td>= Tamron SP AF17-50mm f/2.8 (A16)</td>
+</tr><tr><td>'00 48 5C 8E 30 3C 00 06'</td><td>= Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2</td>
+</tr><tr><td>'00 49 30 48 22 2B 00 02'</td><td>= Tamron SP AF 20-40mm f/2.7-3.5</td>
+</tr><tr><td>'00 4C 7C 7C 2C 2C 00 02'</td><td>= Tamron SP AF 180mm f/3.5 Di Model B01</td>
+</tr><tr><td>'00 53 2B 50 24 24 00 06'</td><td>= Tamron SP AF 17-50mm f/2.8 (A16)</td>
+</tr><tr><td>'00 54 2B 50 24 24 00 06'</td><td>= Tamron SP AF 17-50mm f/2.8 XR Di II LD Aspherical [IF] (A16NII)</td>
 </tr><tr><td>'00 54 48 48 18 18 00 00'</td><td>= Voigtlander Ultron SL2 40mm f/2 SL II Aspherical</td>
 </tr><tr><td>'00 54 55 55 0C 0C 00 00'</td><td>= Voigtlander Nokton SL2 58mm f/1.4 SL II</td>
 </tr><tr><td>'00 54 56 56 30 30 00 00'</td><td>= Coastal Optical Systems 60mm 1:4 UV-VIS-IR Macro Apo</td>
@@ -2687,22 +3014,24 @@ that order.  (source:
 </tr><tr><td>'05 54 50 50 0C 0C 04 00'</td><td>= AF Nikkor 50mm f/1.4</td>
 </tr><tr><td>'06 3F 68 68 2C 2C 06 00'</td><td>= Cosina 100mm f/3.5 Macro</td>
 </tr><tr><td>'06 54 53 53 24 24 06 00'</td><td>= AF Micro-Nikkor 55mm f/2.8</td>
+</tr><tr><td>'07 36 3D 5F 2C 3C 03 00'</td><td>= Cosina AF Zoom 28-80mm f/3.5-5.6 MC Macro</td>
 </tr><tr><td>'07 3E 30 43 2D 35 03 00'</td><td>= Soligor AF Zoom 19-35mm 1:3.5-4.5</td>
-</tr><tr><td>'07 40 2F 44 2C 34 03 02'</td><td>= Tamron AF19-35mm f/3.5-4.5 N</td>
-</tr><tr><td>'07 40 30 45 2D 35 03 02'</td><td>= Tamron AF19-35mm f/3.5-4.5</td>
+</tr><tr><td>'07 40 2F 44 2C 34 03 02'</td><td>= Tamron AF 19-35mm f/3.5-4.5 N</td>
+</tr><tr><td>'07 40 30 45 2D 35 03 02'</td><td>= Tamron AF 19-35mm f/3.5-4.5</td>
 </tr><tr><td>'07 40 3C 62 2C 34 03 00'</td><td>= AF Zoom-Nikkor 28-85mm f/3.5-4.5</td>
-</tr><tr><td>'07 46 2B 44 24 30 03 02'</td><td>= Tamron SP AF17-35mm f/2.8-4 Di LD Aspherical (IF)</td>
+</tr><tr><td>'07 46 2B 44 24 30 03 02'</td><td>= Tamron SP AF 17-35mm f/2.8-4 Di LD Aspherical (IF)</td>
+</tr><tr><td>'07 48 3C 5C 24 24 03 00'</td><td>= Tokina AT-X AF 28-70mm f/2.8</td>
 </tr><tr><td>'08 40 44 6A 2C 34 04 00'</td><td>= AF Zoom-Nikkor 35-105mm f/3.5-4.5</td>
 </tr><tr><td>'09 48 37 37 24 24 04 00'</td><td>= AF Nikkor 24mm f/2.8</td>
 </tr><tr><td>'0A 48 8E 8E 24 24 03 00'</td><td>= AF Nikkor 300mm f/2.8 IF-ED</td>
-</tr><tr><td>'0B 3E 3D 7F 2F 3D 0E 00'</td><td>= Tamron AF28-200mm f/3.8-5.6</td>
-</tr><tr><td>'0B 3E 3D 7F 2F 3D 0E 02'</td><td>= Tamron AF28-200mm f/3.8-5.6D</td>
+</tr><tr><td>'0B 3E 3D 7F 2F 3D 0E 00'</td><td>= Tamron AF 28-200mm f/3.8-5.6</td>
+</tr><tr><td>'0B 3E 3D 7F 2F 3D 0E 02'</td><td>= Tamron AF 28-200mm f/3.8-5.6D</td>
 </tr><tr><td>'0B 48 7C 7C 24 24 05 00'</td><td>= AF Nikkor 180mm f/2.8 IF-ED</td>
 </tr><tr><td>'0D 40 44 72 2C 34 07 00'</td><td>= AF Zoom-Nikkor 35-135mm f/3.5-4.5</td>
 </tr><tr><td>'0E 48 5C 81 30 30 05 00'</td><td>= AF Zoom-Nikkor 70-210mm f/4</td>
-</tr><tr><td>'0E 4A 31 48 23 2D 0E 02'</td><td>= Tamron SP AF20-40mm f/2.7-3.5</td>
+</tr><tr><td>'0E 4A 31 48 23 2D 0E 02'</td><td>= Tamron SP AF 20-40mm f/2.7-3.5</td>
 </tr><tr><td>'0F 58 50 50 14 14 05 00'</td><td>= AF Nikkor 50mm f/1.8 N</td>
-</tr><tr><td>'10 3D 3C 60 2C 3C D2 02'</td><td>= Tamron AF28-80mm f/3.5-5.6 Aspherical</td>
+</tr><tr><td>'10 3D 3C 60 2C 3C D2 02'</td><td>= Tamron AF 28-80mm f/3.5-5.6 Aspherical</td>
 </tr><tr><td>'10 48 8E 8E 30 30 08 00'</td><td>= AF Nikkor 300mm f/4 IF-ED</td>
 </tr><tr><td>'11 48 44 5C 24 24 08 00'</td><td>= AF Zoom-Nikkor 35-70mm f/2.8</td>
 </tr><tr><td>'12 36 5C 81 35 3D 09 00'</td><td>= Cosina AF Zoom 70-210mm f/4.5-5.6 MC Macro</td>
@@ -2713,7 +3042,7 @@ that order.  (source:
 </tr><tr><td>'14 48 68 8E 30 30 0B 00'</td><td>= Tokina AT-X 340 AF II 100-300mm f/4</td>
 </tr><tr><td>'14 54 60 80 24 24 0B 00'</td><td>= Tokina AT-X 828 AF 80-200mm f/2.8</td>
 </tr><tr><td>'15 4C 62 62 14 14 0C 00'</td><td>= AF Nikkor 85mm f/1.8</td>
-</tr><tr><td>'17 3C A0 A0 30 30 11 00'</td><td>= Nikkor 500mm f/4 P</td>
+</tr><tr><td>'17 3C A0 A0 30 30 11 00'</td><td>= Nikkor 500mm f/4 P ED IF</td>
 </tr><tr><td>'18 40 44 72 2C 34 0E 00'</td><td>= AF Zoom-Nikkor 35-135mm f/3.5-4.5 N</td>
 </tr><tr><td>'1A 54 44 44 18 18 11 00'</td><td>= AF Nikkor 35mm f/2</td>
 </tr><tr><td>'1B 44 5E 8E 34 3C 10 00'</td><td>= AF Zoom-Nikkor 75-300mm f/4.5-5.6</td>
@@ -2722,10 +3051,11 @@ that order.  (source:
 </tr><tr><td>'1E 54 56 56 24 24 13 00'</td><td>= AF Micro-Nikkor 60mm f/2.8</td>
 </tr><tr><td>'1E 5D 64 64 20 20 13 00'</td><td>= Unknown 90mm f/2.5</td>
 </tr><tr><td>'1F 54 6A 6A 24 24 14 00'</td><td>= AF Micro-Nikkor 105mm f/2.8</td>
-</tr><tr><td>'20 3C 80 98 3D 3D 1E 02'</td><td>= Tamron AF200-400mm f/5.6 LD IF</td>
+</tr><tr><td>'20 3C 80 98 3D 3D 1E 02'</td><td>= Tamron AF 200-400mm f/5.6 LD IF</td>
 </tr><tr><td>'20 48 60 80 24 24 15 00'</td><td>= AF Zoom-Nikkor ED 80-200mm f/2.8</td>
 </tr><tr><td>'21 40 3C 5C 2C 34 16 00'</td><td>= AF Zoom-Nikkor 28-70mm f/3.5-4.5</td>
 </tr><tr><td>'22 48 72 72 18 18 16 00'</td><td>= AF DC-Nikkor 135mm f/2</td>
+</tr><tr><td>'23 30 BE CA 3C 48 17 00'</td><td>= Zoom-Nikkor 1200-1700mm f/5.6-8 P ED IF</td>
 </tr><tr><td>'24 44 60 98 34 3C 1A 02'</td><td>= Tokina AT-X 840 AF II 80-400mm f/4.5-5.6</td>
 </tr><tr><td>'24 48 60 80 24 24 1A 02'</td><td>= AF Zoom-Nikkor ED 80-200mm f/2.8D</td>
 </tr><tr><td>'25 48 3C 5C 24 24 1B 02'</td><td>= Tokina AT-X 287 AF PRO SV 28-70mm f/2.8</td>
@@ -2750,7 +3080,7 @@ that order.  (source:
 </tr><tr><td>'26 41 3C 8E 2C 40 1C 02'</td><td>= Sigma 28-300mm F3.5-6.3 DG Macro</td>
 </tr><tr><td>'26 44 73 98 34 3C 1C 02'</td><td>= Sigma 135-400mm F4.5-5.6 APO Aspherical</td>
 </tr><tr><td>'26 48 11 11 30 30 1C 02'</td><td>= Sigma 8mm F4 EX Circular Fisheye</td>
-</tr><tr><td>'26 48 27 27 24 24 1C 02'</td><td>= Sigma 15mm F2.8 EX Diagonal Fish-Eye</td>
+</tr><tr><td>'26 48 27 27 24 24 1C 02'</td><td>= Sigma 15mm F2.8 EX Diagonal Fisheye</td>
 </tr><tr><td>'26 48 2D 50 24 24 1C 06'</td><td>= Sigma 18-50mm F2.8 EX DC</td>
 </tr><tr><td>'26 48 31 49 24 24 1C 02'</td><td>= Sigma 20-40mm F2.8</td>
 </tr><tr><td>'26 48 37 56 24 24 1C 02'</td><td>= Sigma 24-60mm F2.8 EX DG</td>
@@ -2763,7 +3093,7 @@ that order.  (source:
 </tr><tr><td>'26 54 37 73 24 34 1C 02'</td><td>= Sigma 24-135mm F2.8-4.5</td>
 </tr><tr><td>'26 54 3C 5C 24 24 1C 02'</td><td>= Sigma 28-70mm F2.8 EX</td>
 </tr><tr><td>'26 58 31 31 14 14 1C 02'</td><td>= Sigma 20mm F1.8 EX Aspherical DG DF RF</td>
-</tr><tr><td>'26 58 37 37 14 14 1C 02'</td><td>= Sigma 24mm F1.8 EX Aspherical DG DF MACRO</td>
+</tr><tr><td>'26 58 37 37 14 14 1C 02'</td><td>= Sigma 24mm F1.8 EX Aspherical DG DF Macro</td>
 </tr><tr><td>'26 58 3C 3C 14 14 1C 02'</td><td>= Sigma 28mm F1.8 EX DG DF</td>
 </tr><tr><td>'27 48 8E 8E 24 24 1D 02'</td><td>= AF-I Nikkor 300mm f/2.8D IF-ED</td>
 </tr><tr><td>'27 48 8E 8E 24 24 E1 02'</td><td>= AF-I Nikkor 300mm f/2.8D IF-ED + TC-17E</td>
@@ -2776,12 +3106,13 @@ that order.  (source:
 </tr><tr><td>'2E 48 5C 82 30 3C 28 02'</td><td>= AF Nikkor 70-210mm f/4-5.6D</td>
 </tr><tr><td>'2F 40 30 44 2C 34 29 02'</td><td>= Unknown 20-35mm f/3.5-4.5D</td>
 </tr><tr><td>'2F 48 30 44 24 24 29 02'</td><td>= AF Zoom-Nikkor 20-35mm f/2.8D IF</td>
+</tr><tr><td>'30 48 98 98 24 24 24 02'</td><td>= AF-I Nikkor 400mm f/2.8D IF-ED</td>
 </tr><tr><td>'31 54 56 56 24 24 25 02'</td><td>= AF Micro-Nikkor 60mm f/2.8D</td>
-</tr><tr><td>'32 53 64 64 24 24 35 02'</td><td>= Tamron SP AF90mm f/2.8 Di Macro 1:1 (272E)</td>
+</tr><tr><td>'32 53 64 64 24 24 35 02'</td><td>= Tamron SP AF 90mm f/2.8 Di Macro 1:1 (272E)</td>
 </tr><tr><td>'32 54 50 50 24 24 35 02'</td><td>= Sigma 50mm F2.8 EX DG Macro</td>
-</tr><tr><td>'32 54 6A 6A 24 24 35 02'</td><td>= AF Micro-Nikkor 105mm f/2.8D</td>
+</tr><tr><td>'32 54 6A 6A 24 24 35 02'</td><td>= AF Micro-Nikkor 105mm f/2.8D or Sigma 105mm f/2.8 EX DG MACRO</td>
 </tr><tr><td>'33 48 2D 2D 24 24 31 02'</td><td>= AF Nikkor 18mm f/2.8D</td>
-</tr><tr><td>'33 54 3C 5E 24 24 62 02'</td><td>= Tamron SP AF28-75mm f/2.8 XR Di LD Aspherical (IF) Macro</td>
+</tr><tr><td>'33 54 3C 5E 24 24 62 02'</td><td>= Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical (IF) Macro</td>
 </tr><tr><td>'34 48 29 29 24 24 32 02'</td><td>= AF Fisheye Nikkor 16mm f/2.8D</td>
 </tr><tr><td>'35 3C A0 A0 30 30 33 02'</td><td>= AF-I Nikkor 500mm f/4D IF-ED</td>
 </tr><tr><td>'36 48 37 37 24 24 34 02'</td><td>= AF Nikkor 24mm f/2.8D</td>
@@ -2789,6 +3120,7 @@ that order.  (source:
 </tr><tr><td>'38 4C 62 62 14 14 37 02'</td><td>= AF Nikkor 85mm f/1.8D</td>
 </tr><tr><td>'3A 40 3C 5C 2C 34 39 02'</td><td>= AF Zoom-Nikkor 28-70mm f/3.5-4.5D</td>
 </tr><tr><td>'3B 48 44 5C 24 24 3A 02'</td><td>= AF Zoom-Nikkor 35-70mm f/2.8D N</td>
+</tr><tr><td>'3C 48 60 80 24 24 3B 02'</td><td>= AF Nikkor 80-200mm f/2.8 ED</td>
 </tr><tr><td>'3D 3C 44 60 30 3C 3E 02'</td><td>= AF Zoom-Nikkor 35-80mm f/4-5.6D</td>
 </tr><tr><td>'3E 48 3C 3C 24 24 3D 02'</td><td>= AF Nikkor 28mm f/2.8D</td>
 </tr><tr><td>'3F 40 44 6A 2C 34 45 02'</td><td>= AF Zoom-Nikkor 35-105mm f/3.5-4.5D</td>
@@ -2796,15 +3128,16 @@ that order.  (source:
 </tr><tr><td>'42 54 44 44 18 18 44 02'</td><td>= AF Nikkor 35mm f/2D</td>
 </tr><tr><td>'43 54 50 50 0C 0C 46 02'</td><td>= AF Nikkor 50mm f/1.4D</td>
 </tr><tr><td>'44 44 60 80 34 3C 47 02'</td><td>= AF Nikkor 80-200mm f/4.5-5.6D</td>
-</tr><tr><td>'45 3D 3C 60 2C 3C 48 02'</td><td>= Tamron AF28-80mm f/3.5-5.6 Aspherical</td>
+</tr><tr><td>'45 3D 3C 60 2C 3C 48 02'</td><td>= Tamron AF 28-80mm f/3.5-5.6 Aspherical</td>
 </tr><tr><td>'45 40 3C 60 2C 3C 48 02'</td><td>= AF Zoom-Nikkor 28-80mm F/3.5-5.6D</td>
-</tr><tr><td>'45 41 37 72 2C 3C 48 02'</td><td>= Tamron SP AF24-135mm f/3.5-5.6 AD Aspherical (IF) Macro</td>
+</tr><tr><td>'45 41 37 72 2C 3C 48 02'</td><td>= Tamron SP AF 24-135mm f/3.5-5.6 AD Aspherical (IF) Macro</td>
 </tr><tr><td>'46 3C 44 60 30 3C 49 02'</td><td>= AF Zoom-Nikkor 35-80mm f/4-5.6D N</td>
 </tr><tr><td>'47 42 37 50 2A 34 4A 02'</td><td>= AF Zoom-Nikkor 24-50mm f/3.3-4.5D</td>
 </tr><tr><td>'48 38 1F 37 34 3C 4B 06'</td><td>= Sigma 12-24mm F4.5-5.6 EX Aspherical DG HSM</td>
 </tr><tr><td>'48 3C 19 31 30 3C 4B 06'</td><td>= Sigma 10-20mm F4-5.6 EX DC HSM</td>
 </tr><tr><td>'48 3C 50 A0 30 40 4B 02'</td><td>= Sigma 50-500mm F4-6.3 EX APO RF HSM</td>
 </tr><tr><td>'48 3C 8E B0 3C 3C 4B 02'</td><td>= Sigma APO 300-800 F5.6 EX DG HSM</td>
+</tr><tr><td>'48 3C B0 B0 3C 3C 4B 02'</td><td>= Sigma APO 800mm F5.6 EX HSM</td>
 </tr><tr><td>'48 44 A0 A0 34 34 4B 02'</td><td>= Sigma APO 500mm F4.5 EX HSM</td>
 </tr><tr><td>'48 48 24 24 24 24 4B 02'</td><td>= Sigma 14mm F2.8 EX Aspherical HSM</td>
 </tr><tr><td>'48 48 2B 44 24 30 4B 06'</td><td>= Sigma 17-35mm F2.8-4 EX DG  Aspherical HSM</td>
@@ -2826,8 +3159,8 @@ that order.  (source:
 </tr><tr><td>'4B 3C A0 A0 30 30 F2 02'</td><td>= AF-S Nikkor 500mm f/4D IF-ED + TC-20E</td>
 </tr><tr><td>'4C 40 37 6E 2C 3C 4F 02'</td><td>= AF Zoom-Nikkor 24-120mm f/3.5-5.6D IF</td>
 </tr><tr><td>'4D 40 3C 80 2C 3C 62 02'</td><td>= AF Zoom-Nikkor 28-200mm f/3.5-5.6D IF</td>
-</tr><tr><td>'4D 41 3C 8E 2B 40 62 02'</td><td>= Tamron AF28-300mm f/3.5-6.3 XR Di LD Aspherical (IF)</td>
-</tr><tr><td>'4D 41 3C 8E 2C 40 62 02'</td><td>= Tamron AF28-300mm f/3.5-6.3 XR LD Aspherical (IF)</td>
+</tr><tr><td>'4D 41 3C 8E 2B 40 62 02'</td><td>= Tamron AF 28-300mm f/3.5-6.3 XR Di LD Aspherical (IF)</td>
+</tr><tr><td>'4D 41 3C 8E 2C 40 62 02'</td><td>= Tamron AF 28-300mm f/3.5-6.3 XR LD Aspherical (IF)</td>
 </tr><tr><td>'4E 48 72 72 18 18 51 02'</td><td>= AF DC-Nikkor 135mm f/2D</td>
 </tr><tr><td>'4F 40 37 5C 2C 3C 53 06'</td><td>= IX-Nikkor 24-70mm f/3.5-5.6</td>
 </tr><tr><td>'53 48 60 80 24 24 60 02'</td><td>= AF Zoom-Nikkor 80-200mm f/2.8D ED</td>
@@ -2848,7 +3181,7 @@ that order.  (source:
 </tr><tr><td>'67 48 37 62 24 30 6D 02'</td><td>= AF Zoom-Nikkor 24-85mm f/2.8-4D IF</td>
 </tr><tr><td>'67 54 37 5C 24 24 1C 02'</td><td>= Sigma 24-70mm F2.8 EX DG Macro</td>
 </tr><tr><td>'68 42 3C 60 2A 3C 6E 06'</td><td>= AF Zoom-Nikkor 28-80mm f/3.3-5.6G</td>
-</tr><tr><td>'69 48 5C 8E 30 3C 6F 02'</td><td>= Tamron AF70-300mm f/4-5.6 LD Macro 1:2</td>
+</tr><tr><td>'69 48 5C 8E 30 3C 6F 02'</td><td>= Tamron AF 70-300mm f/4-5.6 LD Macro 1:2</td>
 </tr><tr><td>'69 48 5C 8E 30 3C 6F 06'</td><td>= AF Zoom-Nikkor 70-300mm f/4-5.6G</td>
 </tr><tr><td>'6A 48 8E 8E 30 30 70 02'</td><td>= AF-S Nikkor 300mm f/4D IF-ED</td>
 </tr><tr><td>'6B 48 24 24 24 24 71 02'</td><td>= AF Nikkor ED 14mm f/2.8D</td>
@@ -2860,22 +3193,23 @@ that order.  (source:
 </tr><tr><td>'74 40 37 62 2C 34 78 06'</td><td>= AF-S Zoom-Nikkor 24-85mm f/3.5-4.5G IF-ED</td>
 </tr><tr><td>'75 40 3C 68 2C 3C 79 06'</td><td>= AF Zoom-Nikkor 28-100mm f/3.5-5.6G</td>
 </tr><tr><td>'76 58 50 50 14 14 7A 02'</td><td>= AF Nikkor 50mm f/1.8D</td>
-</tr><tr><td>'77 44 61 98 34 3C 7B 0E'</td><td>= Sigma 80-400mm f4.5-5.6 EX OS</td>
+</tr><tr><td>'77 44 61 98 34 3C 7B 0E'</td><td>= Sigma 80-400mm F4.5-5.6 EX OS</td>
 </tr><tr><td>'77 48 5C 80 24 24 7B 0E'</td><td>= AF-S VR Zoom-Nikkor 70-200mm f/2.8G IF-ED</td>
 </tr><tr><td>'78 40 37 6E 2C 3C 7C 0E'</td><td>= AF-S VR Zoom-Nikkor 24-120mm f/3.5-5.6G IF-ED</td>
-</tr><tr><td>'79 40 11 11 2C 2C 1C 06'</td><td>= Sigma 8mm F3.5 EX</td>
+</tr><tr><td>'79 40 11 11 2C 2C 1C 06'</td><td>= Sigma 8mm F3.5 EX Circular Fisheye</td>
 </tr><tr><td>'79 40 3C 80 2C 3C 7F 06'</td><td>= AF Zoom-Nikkor 28-200mm f/3.5-5.6G IF-ED</td>
 </tr><tr><td>'79 48 5C 5C 24 24 1C 06'</td><td>= Sigma 70mm F2.8 EX DG Macro</td>
 </tr><tr><td>'7A 3B 53 80 30 3C 4B 06'</td><td>= Sigma 55-200mm F4-5.6 DC HSM</td>
 </tr><tr><td>'7A 3C 1F 37 30 30 7E 06'</td><td>= AF-S DX Zoom-Nikkor 12-24mm f/4G IF-ED</td>
 </tr><tr><td>'7A 40 2D 50 2C 3C 4B 06'</td><td>= Sigma 18-50mm F3.5-5.6 DC HSM</td>
 </tr><tr><td>'7A 47 2B 5C 24 34 4B 06'</td><td>= Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM</td>
-</tr><tr><td>'7A 47 50 76 24 24 4B 06'</td><td>= Sigma APO 50-150mm F2.8 EX DC HSM</td>
+</tr><tr><td>'7A 47 50 76 24 24 4B 06'</td><td>= Sigma 50-150mm F2.8 EX APO DC HSM</td>
 </tr><tr><td>'7A 48 2D 50 24 24 4B 06'</td><td>= Sigma 18-50mm F2.8 EX DC HSM</td>
 </tr><tr><td>'7B 48 80 98 30 30 80 0E'</td><td>= AF-S VR Zoom-Nikkor 200-400mm f/4G IF-ED</td>
 </tr><tr><td>'7D 48 2B 53 24 24 82 06'</td><td>= AF-S DX Zoom-Nikkor 17-55mm f/2.8G IF-ED</td>
 </tr><tr><td>'7F 40 2D 5C 2C 34 84 06'</td><td>= AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED</td>
 </tr><tr><td>'7F 48 2B 5C 24 34 1C 06'</td><td>= Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF</td>
+</tr><tr><td>'7F 48 2D 50 24 24 1C 06'</td><td>= Sigma 18-50mm F2.8 EX DC Macro</td>
 </tr><tr><td>'80 48 1A 1A 24 24 85 06'</td><td>= AF DX Fisheye-Nikkor 10.5mm f/2.8G ED</td>
 </tr><tr><td>'81 54 80 80 18 18 86 0E'</td><td>= AF-S VR Nikkor 200mm f/2G IF-ED</td>
 </tr><tr><td>'82 48 8E 8E 24 24 87 0E'</td><td>= AF-S VR Nikkor 300mm f/2.8G IF-ED</td>
@@ -2897,16 +3231,35 @@ that order.  (source:
 </tr><tr><td>'98 3C A6 A6 30 30 9A 0E'</td><td>= AF-S VR Nikkor 600mm f/4G ED</td>
 </tr><tr><td>'99 40 29 62 2C 3C 9B 0E'</td><td>= AF-S DX VR Zoom-Nikkor 16-85mm f/3.5-5.6G ED</td>
 </tr><tr><td>'9A 40 2D 53 2C 3C 9C 0E'</td><td>= AF-S DX VR Zoom-Nikkor 18-55mm f/3.5-5.6G</td>
+</tr><tr><td>'9B 00 4C 4C 24 24 9D 02'</td><td>= PC-E Micro Nikkor 45mm f/2.8D ED</td>
+</tr><tr><td>'9B 54 4C 4C 24 24 9D 02'</td><td>= PC-E Micro Nikkor 45mm f/2.8D ED</td>
 </tr><tr><td>'9C 54 56 56 24 24 9E 06'</td><td>= AF-S Micro Nikkor 60mm f/2.8G ED</td>
+</tr><tr><td>'9D 00 62 62 24 24 9F 06'</td><td>= PC-E Micro Nikkor 85mm f/2.8D</td>
+</tr><tr><td>'9D 54 62 62 24 24 9F 06'</td><td>= PC-E Micro Nikkor 85mm f/2.8D</td>
+</tr><tr><td>'9E 40 2D 6A 2C 3C A0 0E'</td><td>= AF-S DX VR Zoom-Nikkor 18-105mm f/3.5-5.6G ED</td>
 </tr><tr><td>'B6 48 37 56 24 24 1C 02'</td><td>= Sigma 24-60mm F2.8 EX DG</td>
+</tr><tr><td>'CE 34 76 A0 38 40 4B 0E'</td><td>= Sigma 150-500mm F5-6.3 DG OS APO HSM</td>
+</tr><tr><td>'CF 38 6E 98 34 3C 4B 0E'</td><td>= Sigma APO 120-400mm F4.5-5.6 DG OS HSM</td>
+</tr><tr><td>'DC 48 19 19 24 24 4B 06'</td><td>= Sigma 10mm F2.8 EX DC HSM Fisheye</td>
+</tr><tr><td>'DE 54 50 50 0C 0C 4B 06'</td><td>= Sigma 50mm F1.4 EX DG HSM</td>
 </tr><tr><td>'E0 3C 5C 8E 30 3C 4B 06'</td><td>= Sigma 70-300mm F4-5.6 APO DG Macro HSM</td>
+</tr><tr><td>'E5 54 6A 6A 24 24 35 02'</td><td>= Sigma Macro 105mm F2.8 EX DG</td>
+</tr><tr><td>'ED 40 2D 80 2C 40 4B 0E'</td><td>= Sigma 18-200mm F3.5-6.3 DC OS HSM</td>
+</tr><tr><td>'EE 48 5C 80 24 24 4B 06'</td><td>= Sigma 70-200mm F2.8 EX APO DG Macro HSM II</td>
+</tr><tr><td>'F5 40 2C 8A 2C 40 40 0E'</td><td>= Tamron AF 18-270mm f/3.5-6.3 Di II VC LD Aspherical [IF] Macro</td>
+</tr><tr><td>'F5 48 76 76 24 24 4B 06'</td><td>= Sigma 150mm F2.8 EX DG APO Macro HSM</td>
+</tr><tr><td>'F6 3F 18 37 2C 34 84 06'</td><td>= Tamron SP AF 10-24mm f/3.5-4.5 Di II LD Aspherical (IF)</td>
+</tr><tr><td>'F8 54 3E 3E 0C 0C 4B 06'</td><td>= Sigma 30mm F1.4 EX DC HSM</td>
+</tr><tr><td>'F8 55 64 64 24 24 84 06'</td><td>= Tamron SP AF 90mm f/2.8 Di Macro 1:1</td>
 </tr><tr><td>'F9 3C 19 31 30 3C 4B 06'</td><td>= Sigma 10-20mm F4-5.6 EX DC HSM</td>
-</tr><tr><td>'FE 47 00 00 24 24 4B 06'</td><td>= Sigma 4.5mm f/2.8 EX DC HSM Circular Fisheye</td>
+</tr><tr><td>'FA 54 3C 5E 24 24 84 06'</td><td>= Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical (IF) Macro</td>
+</tr><tr><td>'FB 54 8E 8E 24 24 4B 02'</td><td>= Sigma APO 300mm F2.8 EX DG HSM</td>
+</tr><tr><td>'FE 47 00 00 24 24 4B 06'</td><td>= Sigma 4.5mm F2.8 EX DC Circular Fisheye HSM</td>
 </tr></table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 20, 2008</i>
+<br><i>Last revised Oct 10, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

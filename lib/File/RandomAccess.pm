@@ -3,16 +3,16 @@
 #
 # Description:  Buffer to support random access reading of sequential file
 #
-# Revisions:    02/11/04 - P. Harvey Created
-#               02/20/04 - P. Harvey Added flag to disable SeekTest in new()
-#               11/18/04 - P. Harvey Fixed bug with seek relative to end of file
-#               01/02/05 - P. Harvey Added DEBUG code
-#               01/09/06 - P. Harvey Fixed bug in ReadLine() when using
-#                          multi-character EOL sequences
-#               02/20/06 - P. Harvey Fixed bug where seek past end of file could
-#                          generate "substr outside string" warning
-#               06/10/06 - P. Harvey Decreased $CHUNK_SIZE from 64k to 8k
-#               11/23/06 - P. Harvey Limit reads to < 0x80000000 bytes
+# Revisions:    02/11/2004 - P. Harvey Created
+#               02/20/2004 - P. Harvey Added flag to disable SeekTest in new()
+#               11/18/2004 - P. Harvey Fixed bug with seek relative to end of file
+#               01/02/2005 - P. Harvey Added DEBUG code
+#               01/09/2006 - P. Harvey Fixed bug in ReadLine() when using
+#                            multi-character EOL sequences
+#               02/20/2006 - P. Harvey Fixed bug where seek past end of file could
+#                            generate "substr outside string" warning
+#               06/10/2006 - P. Harvey Decreased $CHUNK_SIZE from 64k to 8k
+#               11/23/2006 - P. Harvey Limit reads to < 0x80000000 bytes
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.

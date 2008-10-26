@@ -1,15 +1,16 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Size: 20 kB
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image]  - Current IPTC Digest: 30eba87481af134de06b2d99216678c0
 [File, File, Image] ImageWidth - Image Width: 100
 [File, File, Image] ImageHeight - Image Height: 80
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
 [File, File, Image] BitsPerSample - Bits Per Sample: 8
 [File, File, Image] ColorComponents - Color Components: 3
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:4:4 (1 1)
-[JFIF, JFIF, Image] 0 - JFIF Version: 1.2
+[JFIF, JFIF, Image] 0 - JFIF Version: 1.02
 [JFIF, JFIF, Image] 2 - Resolution Unit: inches
 [JFIF, JFIF, Image] 3 - X Resolution: 80
 [JFIF, JFIF, Image] 5 - Y Resolution: 80
@@ -79,6 +80,7 @@
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright 2004 Phil Harvey-v2
 [IPTC, IPTC, Other] 120 - Caption-Abstract: A witty caption-v2
 [IPTC, IPTC, Author] 122 - Writer-Editor: I wrote it-v2
+[Photoshop, Photoshop, Image] 1061 - IPTC Digest: 05ad1770b1a95f1f9788ac995fa647da
 [Photoshop, Photoshop, Image] 0 - X Resolution: 80
 [Photoshop, Photoshop, Image] 2 - Displayed Units X: inches
 [Photoshop, Photoshop, Image] 4 - Y Resolution: 80
@@ -90,11 +92,12 @@
 [Photoshop, Photoshop, Image] 0 - Photoshop Quality: 8
 [Photoshop, Photoshop, Image] 1 - Photoshop Format: Standard
 [Photoshop, Photoshop, Image] 2 - Progressive Scans: 3 Scans
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
+[XMP, XMP-rdf, Document] about - About: uuid:80056b68-1045-fa97-3401-6f4ed84cd53d
 [XMP, XMP-iptcCore, Author] CreatorContactInfoCiAdrCtry - Creator Country: Canada
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey-v2
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP-v2
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey-v2
-[XMP, XMP-dc, Author] source - Source: I'm the source-v2
 [XMP, XMP-dc, Image] subject - Subject: ExifTool, Test, XMP, v2
 [XMP, XMP-dc, Image] title - Title: Test IPTC picture-v2
 [XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position-v2

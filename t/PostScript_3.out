@@ -1,11 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: PostScript_3_failed.eps
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 13 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:13 09:33:35
+[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:41-04:00
 [File, File, Image]  - File Type: EPS
 [File, File, Image]  - MIME Type: application/postscript
-[File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
+[File, File, Image]  - Current IPTC Digest: 32acda5aea9ad1d96e5b56b502e33ff2
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
 [PostScript, PostScript, Image] Creator - Creator: phil made it
 [PostScript, PostScript, Image] Title - Title: new title
 [PostScript, PostScript, Time] CreationDate - Create Date: 7/18/05 2:33 PM
@@ -32,6 +33,7 @@
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright 2004 Phil Harvey
 [IPTC, IPTC, Other] 120 - Caption-Abstract: A witty caption
 [IPTC, IPTC, Author] 122 - Writer-Editor: I wrote it
+[Photoshop, Photoshop, Image] 1061 - IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
 [Photoshop, Photoshop, Author] 1034 - Copyright Flag: False
 [Photoshop, Photoshop, Author] 1035 - URL: http://owl.phy.queensu.ca/~phil/exiftool/
 [Photoshop, Photoshop, Image] 1037 - Global Angle: 30
@@ -77,6 +79,8 @@
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
+[XMP, XMP-rdf, Document] about - About: uuid:b691db36-f92a-11d9-99a4-8c8e8269c120
 [XMP, XMP-dc, Author] creator - Creator: phil made it
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey

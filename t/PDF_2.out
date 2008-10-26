@@ -1,10 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: PDF.pdf
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 9 kB
-[File, File, Time]  - File Modification Date/Time: 2007:12:14 12:57:34
+[File, File, Image]  - File Size: 8.7 kB
+[File, File, Time]  - File Modification Date/Time: 2007:12:14 13:10:55-05:00
 [File, File, Image]  - File Type: PDF
 [File, File, Image]  - MIME Type: application/pdf
+[File, File, Image]  - Current IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
 [PDF, PDF, Other] Version - PDF Version: 1.3
 [PDF, PDF, Image] Creator - Creator: Adobe Photoshop 7.0
@@ -32,6 +33,7 @@
 [IPTC, IPTC, Other] 10 - Urgency: 8
 [IPTC, IPTC, Other] 25 - Keywords: ExifTool, Test, XMP
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright 2004 Phil Harvey
+[Photoshop, Photoshop, Image] 1061 - IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
 [Photoshop, Photoshop, Image] 0 - X Resolution: 72
 [Photoshop, Photoshop, Image] 2 - Displayed Units X: inches
 [Photoshop, Photoshop, Image] 4 - Y Resolution: 72
@@ -83,6 +85,8 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 842
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 0
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: XMP toolkit 2.8.2-33, framework 1.5
+[XMP, XMP-rdf, Document] about - About: uuid:b691db33-f92a-11d9-99a4-8c8e8269c120
 [XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
 [XMP, XMP-photoshop, Image] Category - Category: 1

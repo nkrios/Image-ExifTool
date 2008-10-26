@@ -1268,15 +1268,13 @@ Mark III.</p>
 
 <h2><a name='Functions2'>CanonCustom Functions2 Tags</a></h2>
 <p>Beginning with the EOS 1D Mark III, Canon finally created a set of custom
-function tags which are consistent across models.  The EOS 1D Mark III has
-57 custom function tags divided into four main groups: 1. Exposure
-(0x0101-0x010f), 2. Image (0x0201-0x0203), Flash Exposure (0x0304-0x0306)
-and Display (0x0407-0x0409), 3. Auto Focus (0x0501-0x050e) and Drive
-(0x060f-0x0611), and 4. Operation (0x0701-0x070a) and Others
+function tags which are (reasonably) consistent across models.  The EOS 1D
+Mark III has 57 custom function tags divided into four main groups: 1.
+Exposure (0x0101-0x010f), 2. Image (0x0201-0x0203), Flash Exposure
+(0x0304-0x0306) and Display (0x0407-0x0409), 3. Auto Focus (0x0501-0x050e)
+and Drive (0x060f-0x0611), and 4. Operation (0x0701-0x070a) and Others
 (0x080b-0x0810).  The table below lists tags used by the EOS 1D Mark III, as
-well as newer values and tags used by the EOS 40D.  It is expected that
-future models will re-use some of these tags (possibly with minor value
-changes), as well as defining additional new tags of their own.</p>
+well as newer tags and values added by later models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1286,13 +1284,13 @@ changes), as well as defining additional new tags of their own.</p>
 <td>0x0101</td>
 <td>ExposureLevelIncrements</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(40D)</span>
-  <br>0 = 1/3 Stop
-  <br>1 = 1/2 Stop
-  <br><span class=n>(1D Mark III)</span>
+<td><span class=s><span class=n>(1D Mark III)</span>
   <br>0 = 1/3-stop set, 1/3-stop comp.
   <br>1 = 1-stop set, 1/3-stop comp.
-  <br>2 = 1/2-stop set, 1/2-stop comp.</span></td></tr>
+  <br>2 = 1/2-stop set, 1/2-stop comp.
+  <br><span class=n>(other models)</span>
+  <br>0 = 1/3 Stop
+  <br>1 = 1/2 Stop</span></td></tr>
 <tr class=b>
 <td>0x0102</td>
 <td>ISOSpeedIncrements</td>
@@ -1304,7 +1302,7 @@ changes), as well as defining additional new tags of their own.</p>
 <td>ISOExpansion
   <br>ISOSpeedRange</td>
 <td class=c>int32s<br>int32s[3]</td>
-<td><span class=s><span class=n>(40D)</span>
+<td><span class=s><span class=n>(40D and 50D)</span>
   <br>0 = Off
   <br>1 = On
   <br><span class=n>(1D Mark III)</span>
@@ -1321,7 +1319,7 @@ changes), as well as defining additional new tags of their own.</p>
 <td>0x0105</td>
 <td>AEBSequence</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D and 50D)</span>
   <br>0 = 0,-,+
   <br>1 = -,0,+
   <br>2 = +,0,-</span></td></tr>
@@ -1343,7 +1341,7 @@ changes), as well as defining additional new tags of their own.</p>
 <td>0x0108</td>
 <td>SafetyShift</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D and 50D)</span>
   <br>0 = Disable
   <br>1 = Enable (Tv/Av)
   <br>2 = Enable (ISO speed)</span></td></tr>
@@ -1398,6 +1396,13 @@ changes), as well as defining additional new tags of their own.</p>
 <td><span class=s><span class=n>(40D)</span>
   <br>0 = Auto
   <br>1 = 1/250 Fixed
+  <br><span class=n>(50D)</span>
+  <br>0 = Auto
+  <br>1 = 1/250-1/60 Auto
+  <br>2 = 1/250 Fixed
+  <br><span class=n>(450D and 1000D)</span>
+  <br>0 = Auto
+  <br>1 = 1/200 Fixed
   <br><span class=n>(1D Mark III)</span>
   <br>0 = Auto
   <br>1 = 1/300 Fixed</span></td></tr>
@@ -1412,7 +1417,13 @@ changes), as well as defining additional new tags of their own.</p>
 <td>0x0202</td>
 <td>HighISONoiseReduction</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = Off
+<td><span class=s><span class=n>(50D)</span>
+  <br>0 = Standard
+  <br>1 = Low
+  <br>2 = Strong
+  <br>3 = Disable
+  <br><span class=n>(other models)</span>
+  <br>0 = Off
   <br>1 = On</span></td></tr>
 <tr class=b>
 <td>0x0203</td>
@@ -1424,7 +1435,13 @@ changes), as well as defining additional new tags of their own.</p>
 <td>0x0204</td>
 <td>AutoLightingOptimizer</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = Enable
+<td><span class=s><span class=n>(50D and 5DmkII)</span>
+  <br>0 = Standard
+  <br>1 = Low
+  <br>2 = Strong
+  <br>3 = Disable
+  <br><span class=n>(other models)</span>
+  <br>0 = Enable
   <br>1 = Disable</span></td></tr>
 <tr class=b>
 <td>0x0304</td>
@@ -1501,7 +1518,7 @@ changes), as well as defining additional new tags of their own.</p>
 <td>0x0506</td>
 <td>LensAFStopButton</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 6 not used by 40D)</span>
+<td><span class=s><span class=n>(value of 6 not used by 40D or 50D)</span>
   <br>0 = AF stop
   <br>1 = AF start
   <br>2 = AE lock
@@ -1585,13 +1602,18 @@ changes), as well as defining additional new tags of their own.</p>
 <td>0x0511</td>
 <td>AFDuringLiveView</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = Disable
-  <br>1 = Enable</span></td></tr>
+<td><span class=s><span class=n>(40D)</span>
+  <br>0 = Disable
+  <br>1 = Enable
+  <br><span class=n>(450D and 1000D)</span>
+  <br>0 = Disable
+  <br>1 = Quick mode
+  <br>2 = Live mode</span></td></tr>
 <tr>
 <td>0x060f</td>
 <td>MirrorLockup</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 450D or 1000D)</span>
   <br>0 = Disable
   <br>1 = Enable
   <br>2 = Enable: Down with Set</span></td></tr>
@@ -1611,9 +1633,16 @@ changes), as well as defining additional new tags of their own.</p>
   <br>1 = Enable</span></td></tr>
 <tr class=b>
 <td>0x0701</td>
-<td>ShutterButtonAFOnButton</td>
-<td class=c>int32s</td>
-<td><span class=s>0 = Metering + AF start
+<td>Shutter-AELock
+  <br>ShutterButtonAFOnButton</td>
+<td class=c>int32s<br>int32s</td>
+<td><span class=s><span class=n>(1000D)</span>
+  <br>0 = AF/AE lock
+  <br>1 = AE lock/AF
+  <br>2 = AF/AF lock, No AE lock
+  <br>3 = AE/AF, No AE lock
+  <br><span class=n>(other models)</span>
+  <br>0 = Metering + AF start
   <br>1 = Metering + AF start/AF stop
   <br>2 = Metering start/Meter + AF start
   <br>3 = AE lock/Metering + AF start
@@ -1637,12 +1666,25 @@ changes), as well as defining additional new tags of their own.</p>
 <td>0x0704</td>
 <td>SetButtonWhenShooting</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(40D)</span>
+<td><span class=s><span class=n>(40D and 50D, value of 5 is new for 50D)</span>
   <br>0 = Normal (disabled)
   <br>1 = Image quality
   <br>2 = Picture style
   <br>3 = Menu display
   <br>4 = Image playback
+  <br>5 = Quick control screen
+  <br><span class=n>(450D)</span>
+  <br>0 = Normal (disabled)
+  <br>1 = Image quality
+  <br>2 = Flash exposure compensation
+  <br>3 = LCD monitor On/Off
+  <br>4 = Menu display
+  <br><span class=n>(1000D)</span>
+  <br>0 = LCD monitor On/Off
+  <br>1 = Image quality
+  <br>2 = Flash exposure compensation
+  <br>3 = Menu display
+  <br>4 = Disabled
   <br><span class=n>(1D Mark III)</span>
   <br>0 = Normal (disabled)
   <br>1 = White balance
@@ -1689,10 +1731,19 @@ changes), as well as defining additional new tags of their own.</p>
 <td><span class=s>0 = Normal (enable)
   <br>1 = Disable main, Control, Multi-control</span></td></tr>
 <tr class=b>
+<td>0x070b</td>
+<td>AssignFuncButton</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = LCD brightness
+  <br>1 = Image quality
+  <br>2 = Exposure comp./AEB setting
+  <br>3 = Image jump with main dial
+  <br>4 = Live view function settings</span></td></tr>
+<tr>
 <td>0x080b</td>
 <td>FocusingScreen</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(40D)</span>
+<td><span class=s><span class=n>(40D and 50D)</span>
   <br>0 = Ef-A
   <br>1 = Ef-D
   <br>2 = Ef-S
@@ -1701,20 +1752,20 @@ changes), as well as defining additional new tags of their own.</p>
   <br>1 = Ec-A,B,C,CII,CIII,D,H,I,L
   <br>2 = Ec-S
   <br>3 = Ec-N,R</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x080c</td>
 <td>TimerLength</td>
 <td class=c>int32s[4]</td>
 <td><span class=s>[Value 0]
   <br>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x080d</td>
 <td>ShortReleaseTimeLag</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable
   <br>1 = Enable</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x080e</td>
 <td>AddAspectRatioInfo</td>
 <td class=c>int32s</td>
@@ -1725,19 +1776,19 @@ changes), as well as defining additional new tags of their own.</p>
   <br>4 = 6:7
   <br>5 = 10:12
   <br>6 = 5:7</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x080f</td>
 <td>AddOriginalDecisionData</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0810</td>
 <td>LiveViewExposureSimulation</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Disable (LCD auto adjust)
   <br>1 = Enable (simulates exposure)</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0811</td>
 <td>LCDDisplayAtPowerOn</td>
 <td class=c>int32s</td>
@@ -1747,7 +1798,7 @@ changes), as well as defining additional new tags of their own.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 26, 2008</i>
+<br><i>Last revised Oct 6, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

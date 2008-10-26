@@ -1,18 +1,19 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: IPTC-XMP.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 20 kB
-[File, File, Time]  - File Modification Date/Time: 2005:12:31 16:05:50
+[File, File, Time]  - File Modification Date/Time: 2005:12:31 16:05:50-05:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image]  - Current IPTC Digest: de30771e941ad1020a826a76d0be7a77
 [File, File, Image] ImageWidth - Image Width: 100
 [File, File, Image] ImageHeight - Image Height: 80
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
 [File, File, Image] BitsPerSample - Bits Per Sample: 8
 [File, File, Image] ColorComponents - Color Components: 3
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:4:4 (1 1)
-[JFIF, JFIF, Image] 0 - JFIF Version: 1.2
+[JFIF, JFIF, Image] 0 - JFIF Version: 1.02
 [JFIF, JFIF, Image] 2 - Resolution Unit: inches
 [JFIF, JFIF, Image] 3 - X Resolution: 72
 [JFIF, JFIF, Image] 5 - Y Resolution: 72
@@ -80,6 +81,7 @@
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright 2004 Phil Harvey
 [IPTC, IPTC, Other] 10 - Urgency: 8
 [IPTC, IPTC, Author] 115 - Source: I'm the source
+[Photoshop, Photoshop, Image] 1061 - IPTC Digest: 05ad1770b1a95f1f9788ac995fa647da
 [Photoshop, Photoshop, Image] 0 - X Resolution: 72
 [Photoshop, Photoshop, Image] 2 - Displayed Units X: inches
 [Photoshop, Photoshop, Image] 4 - Y Resolution: 72
@@ -91,6 +93,8 @@
 [Photoshop, Photoshop, Image] 0 - Photoshop Quality: 7
 [Photoshop, Photoshop, Image] 1 - Photoshop Format: Standard
 [Photoshop, Photoshop, Image] 2 - Progressive Scans: 3 Scans
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 4.73
+[XMP, XMP-rdf, Document] about - About: uuid:80056b68-1045-fa97-3401-6f4ed84cd53d
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey

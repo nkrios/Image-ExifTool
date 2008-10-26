@@ -1,14 +1,14 @@
 # Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/AFCP.t'
+# `make test'. After `make install' it should work as `perl t/PhotoMechanic.t'
 
 ######################### We start with some black magic to print on failure.
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN {$Image::ExifTool::noConfig = 1; $| = 1; print "1..3\n";}
+BEGIN { $| = 1; print "1..3\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
-# test 1: Load ExifTool
+# test 1: Load the module(s)
 use Image::ExifTool 'ImageInfo';
 use Image::ExifTool::PhotoMechanic;
 $loaded = 1;

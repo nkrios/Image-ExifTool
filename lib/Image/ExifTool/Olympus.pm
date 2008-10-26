@@ -29,7 +29,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.49';
+$VERSION = '1.50';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -1552,6 +1552,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ManometerReading',
         Writable => 'int32s',
         Count => 2,
+        ValueConv => 'my @a=split(" ",$val); $_ /= 10 foreach @a; "@a"',
+        ValueConvInv => 'my @a=split(" ",$val); $_ *= 10 foreach @a; "@a"',
         PrintConv => '$val=~s/(\S+) (\S+)/$1 m, $2 ft/; $val',
         PrintConvInv => '$val=~s/ ?(m|ft)//gi; $val',
     },

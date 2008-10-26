@@ -1,11 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.24
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.45
 [File, File, Image]  - File Name: Minolta_3_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 13 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:28 14:39:03
+[File, File, Time]  - File Modification Date/Time: 2008:09:29 10:59:47-04:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
+[File, File, Image]  - Current IPTC Digest: 55a74ece68e6b31776ae6870c7a02dd6
 [File, File, Image] ImageWidth - Image Width: 8
 [File, File, Image] ImageHeight - Image Height: 8
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding

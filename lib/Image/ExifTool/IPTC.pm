@@ -3,8 +3,8 @@
 #
 # Description:  Read IPTC meta information
 #
-# Revisions:    Jan. 08/03 - P. Harvey Created
-#               Feb. 05/04 - P. Harvey Added support for records other than 2
+# Revisions:    Jan. 08/2003 - P. Harvey Created
+#               Feb. 05/2004 - P. Harvey Added support for records other than 2
 #
 # References:   1) http://www.iptc.org/IIM/
 #------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.24';
+$VERSION = '1.27';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -875,7 +875,7 @@ sub HandleCodedCharset($$)
         # no need to translate if destination is the same
         undef $xlat if $xlat eq $iptcCharset{$val};
     } elsif ($val =~ /^\x1b\x25/) {
-        # some unknown character set involked
+        # some unknown character set invoked
         $xlat = 'bad';  # flag unsupported coding
     } else {
         # translate all other codes as Latin
@@ -927,7 +927,7 @@ sub ProcessIPTC($$$)
     my $dirEnd = $pos + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
     my $success = 0;
-    my (%listTags, $lastRec, $recordPtr, $recordName);
+    my ($lastRec, $recordPtr, $recordName);
 
     # begin by assuming IPTC is Latin (so no translation if Charset is Latin)
     my $xlat = $exifTool->Options('Charset');
@@ -938,6 +938,16 @@ sub ProcessIPTC($$$)
         my $dirCount = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
         $exifTool->{DIR_COUNT}->{IPTC} = $dirCount;
         $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
+    }
+    # calculate MD5 if Digest::MD5 is available
+    if (eval 'require Digest::MD5') {
+        my $md5;
+        if ($pos or $dirLen != length($$dataPt)) {
+            $md5 = Digest::MD5::md5(substr $$dataPt, $pos, $dirLen);
+        } else {
+            $md5 = Digest::MD5::md5($$dataPt);
+        }
+        $exifTool->FoundTag('CurrentIPTCDigest', $md5);
     }
     # quick check for improperly byte-swapped IPTC
     if ($dirLen >= 4 and substr($$dataPt, $pos, 1) ne "\x1c" and
@@ -1045,15 +1055,7 @@ sub ProcessIPTC($$$)
             Start   => $pos,
             Extra   => ", $recordName record",
         );
-        # prevent adding tags to list from another IPTC directory
-        if ($tagInfo) {
-            if ($$tagInfo{List}) {
-                $exifTool->{NO_LIST} = 1 unless $listTags{$tagInfo};
-                $listTags{$tagInfo} = 1;    # list the next one we see
-            }
-            $exifTool->FoundTag($tagInfo, $val);
-        }
-        delete $exifTool->{NO_LIST};
+        $exifTool->FoundTag($tagInfo, $val) if $tagInfo;
         $success = 1;
 
         $pos += $len;   # increment to next field

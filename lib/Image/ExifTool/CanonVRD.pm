@@ -4,6 +4,8 @@
 # Description:  Read/write Canon VRD information
 #
 # Revisions:    10/30/2006 - P. Harvey Created
+#
+# References:   1) Bogdan private communication (Canon DPP v3.4.1.1)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonVRD;
@@ -12,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessCanonVRD($$);
 
@@ -56,6 +58,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     WRITABLE => 1,
     GROUPS => { 2 => 'Image' },
+    DATAMEMBER => [ 0x002 ],   # necessary for writing
 #
 # RAW image adjustment
 #
@@ -63,6 +66,8 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Name => 'VRDVersion',
         Format => 'int16u',
         Writable => 0,
+        DataMember => 'VRDVersion',
+        RawConv => '$$self{VRDVersion} = $val',
         PrintConv => 'sprintf("%.2f", $val / 100)',
     },
     # 0x006 related somehow to RGB levels
@@ -400,34 +405,99 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Format => 'int16s',
     },
     # (VRD 2.0 edit data ends here -- offset 0xb2)
-    0xbc => {
+    0xbc => [{
         Name => 'ChrominanceNoiseReduction',
+        Condition => '$$self{VRDVersion} < 330', 
         Format => 'int16u',
+        Notes => 'VRDVersion prior to 3.30',
         PrintConv => {
             0   => 'Off',
             58  => 'Low',
             100 => 'High',
         },
-    },
-    0xbe => {
-        Name => 'LuminanceNoiseReduction',
+    },{ #1
+        Name => 'ChrominanceNoiseReduction',
         Format => 'int16u',
+        Notes => 'VRDVersion 3.30 or later',
+        PrintConv => {
+            0x00 => 0,
+            0x10 => 1,
+            0x21 => 2,
+            0x32 => 3,
+            0x42 => 4,
+            0x53 => 5,
+            0x64 => 6,
+            0x74 => 7,
+            0x85 => 8,
+            0x96 => 9,
+            0xa6 => 10,
+        },
+    }],
+    0xbe => [{
+        Name => 'LuminanceNoiseReduction',
+        Condition => '$$self{VRDVersion} < 330', 
+        Format => 'int16u',
+        Notes => 'VRDVersion prior to 3.30',
         PrintConv => {
             0   => 'Off',
             65  => 'Low',
             100 => 'High',
         },
-    },
-    0xc0 => {
-        Name => 'ChrominanceNR_TIFF_JPEG',
+    },{ #1
+        Name => 'LuminanceNoiseReduction',
         Format => 'int16u',
+        Notes => 'VRDVersion 3.30 or later',
+        PrintConv => {
+            0x00 => 0,
+            0x41 => 1,
+            0x64 => 2,
+            0x6e => 3,
+            0x78 => 4,
+            0x82 => 5,
+            0x8c => 6,
+            0x96 => 7,
+            0xa0 => 8,
+            0xaa => 9,
+            0xb4 => 10,
+        },
+    }],
+    0xc0 => [{
+        Name => 'ChrominanceNR_TIFF_JPEG',
+        Condition => '$$self{VRDVersion} < 330', 
+        Format => 'int16u',
+        Notes => 'VRDVersion prior to 3.30',
         PrintConv => {
             0   => 'Off',
             33  => 'Low',
             100 => 'High',
         },
-    }
+    },{ #1
+        Name => 'ChrominanceNR_TIFF_JPEG',
+        Format => 'int16u',
+        Notes => 'VRDVersion 3.30 or later',
+        PrintConv => {
+            0x00 => 0,
+            0x10 => 1,
+            0x21 => 2,
+            0x32 => 3,
+            0x42 => 4,
+            0x53 => 5,
+            0x64 => 6,
+            0x74 => 7,
+            0x85 => 8,
+            0x96 => 9,
+            0xa6 => 10,
+        },
+    }],
     # (VRD 3.0 edit data ends here -- offset 0xc4)
+    0xda => { #1
+        Name => 'LuminanceNR_TIFF_JPEG',
+        Format => 'int16u',
+        Notes => 'val = raw / 10',
+        ValueConv => '$val / 10',
+        ValueConvInv => 'int($val * 10 + 0.5)',
+    },
+    # (VRD 3.4 edit data ends here -- offset 0xdc)
 );
 
 #------------------------------------------------------------------------------
@@ -693,6 +763,10 @@ Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Bogdan for decoding some new tags written by Canon DPP v3.4.1.
 
 =head1 SEE ALSO
 

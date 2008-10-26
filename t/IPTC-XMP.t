@@ -5,10 +5,29 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..27\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..31\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
-# test 1: Load ExifTool
+# definitions for user-defined tag test (#28)
+%Image::ExifTool::UserDefined = (
+    'Image::ExifTool::XMP::Main' => {
+        myXMPns => {
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::UserDefined::myXMPns',
+                # (see the definition of this table below)
+            },
+        },
+    },
+);
+use vars %Image::ExifTool::UserDefined::myXMPns;    # avoid "typo" warning
+%Image::ExifTool::UserDefined::myXMPns = (
+    GROUPS    => { 0 => 'XMP', 1 => 'XMP-myXMPns'},
+    NAMESPACE => { 'myXMPns' => 'http://ns.exiftool.ca/t/IPTC-XMP.t' },
+    WRITABLE  => 'string',
+    ATestTag  => { List => 'Bag', Resource => 1 },
+);
+
+# test 1: Load the module(s)
 use Image::ExifTool 'ImageInfo';
 use Image::ExifTool::IPTC;
 use Image::ExifTool::XMP;
@@ -79,7 +98,7 @@ my $testnum = 1;
     $exifTool->WriteInfo('t/images/IPTC-XMP.jpg',\$image);
     # this is effectively what the RHEL 3 UTF8 LANG problem does:
     # $image = pack("U*", unpack("C*", $image));
-    
+
     my $exifTool2 = new Image::ExifTool;
     $exifTool2->Options(Duplicates => 1);
     $info = $exifTool2->ImageInfo(\$image);
@@ -157,7 +176,7 @@ my $testnum = 1;
         my $info = $exifTool->ImageInfo("t/images/$file", {Duplicates => 1});
         print 'not ' unless check($exifTool, $info, $testname, $testnum);
         print "ok $testnum\n";
-    
+
         ++$testnum;
         my $testfile = "t/${testname}_${testnum}_failed.xmp";
         unlink $testfile;
@@ -251,10 +270,10 @@ my $testnum = 1;
     my @writeInfo = (
         [ 'all' => undef ],
         [ 'xmp-dc:all'  => undef, Replace => 2 ],
-        [ 'xmp-xmp:all' => undef, Replace => 2 ],
+        [ 'xmp-xmprights:all' => undef, Replace => 2 ],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
-                                   't/images/XMP.xmp', ['XMP:all']);
+                                   't/images/IPTC-XMP.jpg', ['XMP:all']);
     print "ok $testnum\n";
 }
 
@@ -287,6 +306,60 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     my $info = $exifTool->ImageInfo('t/images/XMP.svg', {Duplicates => 1});
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 28: Test creating a variety of XMP information
+#          (including x:xmptk, rdf:about and rdf:resource attributes)
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $testfile = "t/${testname}_${testnum}_failed.xmp";
+    unlink $testfile;
+    $exifTool->SetNewValue('XMP-x:XMPToolkit' => "What's this?", Protected => 1);
+    $exifTool->SetNewValue('XMP-rdf:About' => "http://www.exiftool.ca/t/$testname.t#$testnum", Protected => 1);
+    $exifTool->SetNewValue('XMP:ImageType' => 'Video');
+    $exifTool->SetNewValue('LicenseeImageNotes-en' => 'english notes');
+    $exifTool->SetNewValue('LicenseeImageNotes-de' => 'deutsche anmerkungen');
+    $exifTool->SetNewValue('LicenseeImageNotes' => 'default notes');
+    $exifTool->SetNewValue('LicenseeName' => 'Phil');
+    $exifTool->SetNewValue('CopyrightStatus' => 'public');
+    $exifTool->SetNewValue('Custom1-en' => 'a');
+    $exifTool->SetNewValue('Custom1-en' => 'b');
+    $exifTool->SetNewValue('ATestTag' => "http://www.exiftool.ca/t/$testname.t#$testnum-one");
+    $exifTool->SetNewValue('ATestTag' => "http://www.exiftool.ca/t/$testname.t#$testnum-two");
+    $exifTool->WriteInfo(undef,$testfile);
+    print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
+    print "ok $testnum\n";
+}
+
+# test 29: Extract information from exiftool RDF/XML output file
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/images/XMP.xml', {Duplicates => 1});
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 30: Write information to exiftool RDF/XML output file
+{
+    ++$testnum;
+    my @writeInfo = (
+        [ 'all' => undef ],
+        [ 'ifd0:all' => undef, Replace => 2 ],
+        [ 'XML-file:all' => undef, Replace => 2 ],
+        [ 'author' => 'Phil' ],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/XMP.xml');
+    print "ok $testnum\n";
+}
+
+# test 31: Rewrite extended XMP segment
+{
+    ++$testnum;
+    my @writeInfo = ( [ 'author' => 'Test' ] );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/ExtendedXMP.jpg');
     print "ok $testnum\n";
 }
 

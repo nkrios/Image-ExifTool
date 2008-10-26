@@ -1,4 +1,6 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.18
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 4.73
+[XMP, XMP-rdf, Document] about - About: uuid:80056b68-1045-fa97-3401-6f4ed84cd53d
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey

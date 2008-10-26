@@ -8,6 +8,7 @@
 # Revisions:    2005/05/14 - P. Harvey Created
 #				2008/03/04 - PH Changed Location translation and added
 #							 IntellectualGenre and SubjectCode
+#				2008/09/30 - PH Added writing of Photoshop:IPTCDigest
 #
 # References:   http://www.iptc.org/IPTC4XMP/
 #               http://www.iptc.org/IIM/
@@ -17,6 +18,8 @@
 #               so they are covered by the first argument:  Category, City,
 #               Credit, DateCreated, Headline, Source, SupplementalCategories
 #               and Urgency.
+#
+#				Also updates Photoshop:IPTCDigest as per MWG recommendation.
 #
 -XMP:* > IPTC:*
 -XMP-dc:Title > IPTC:ObjectName
@@ -35,4 +38,5 @@
 # these tags are not free-form text, and may need special handling:
 #-XMP-iptcCore:IntellectualGenre > IPTC:ObjectAttributeReference
 #-XMP-iptcCore:SubjectCode > IPTC:SubjectReference
+-Photoshop:IPTCDigest=new
 # end

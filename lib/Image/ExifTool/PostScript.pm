@@ -3,7 +3,7 @@
 #
 # Description:  Read PostScript meta information
 #
-# Revisions:    07/08/05 - P. Harvey Created
+# Revisions:    07/08/2005 - P. Harvey Created
 #
 # References:   1) http://partners.adobe.com/public/developer/en/ps/5002.EPSF_Spec.pdf
 #               2) http://partners.adobe.com/public/developer/en/ps/5001.DSC_Spec.pdf
@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 sub WritePS($$);
 
@@ -361,14 +361,19 @@ sub ProcessPS($$)
                 }
                 next;
             }
-        } elsif ($data =~ /^(%{1,2})(Begin)(_xml_packet|Photoshop|ICCProfile|Binary)/i) {
+        } elsif ($data =~ /^(%{1,2})(Begin)(_xml_packet|Photoshop|ICCProfile|Binary|Document)/i) {
+            my $type = lc $3;
+            if ($type eq 'document') {
+                $mode = 'Document' unless $exifTool->Options('ExtractEmbedded');
+                next;
+            }
             # the beginning of a data block
             my %modeLookup = (
                 _xml_packet => 'XMP',
                 iccprofile  => 'ICC_Profile',
                 photoshop   => 'Photoshop',
             );
-            $mode = $modeLookup{lc($3)};
+            $mode = $modeLookup{$type};
             unless ($mode or @lines) {
                 # skip binary data
                 $raf->Seek($1, 1) or last if $data =~ /^%{1,2}BeginBinary:\s*(\d+)/i;
@@ -376,9 +381,6 @@ sub ProcessPS($$)
             }
             $buff = '';
             $endToken = $1 . ($2 eq 'begin' ? 'end' : 'End') . $3;
-            next;
-        } elsif ($data =~ /^(%{1,2})(Begin)(Document)/i) {
-            $mode = 'Document';
             next;
         } elsif ($data =~ /^<\?xpacket begin=.{7,13}W5M0MpCehiHzreSzNTczkc9d/) {
             # pick up any stray XMP data
@@ -399,7 +401,7 @@ sub ProcessPS($$)
             next;
         }
         # extract information from buffered data
-        if ($mode ne 'Document'){
+        if ($mode ne 'Document') {
             my %dirInfo = (
                 DataPt => \$buff,
                 DataLen => length $buff,

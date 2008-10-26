@@ -8,9 +8,9 @@
 <body>
 <h2 class=top>Composite Tags</h2>
 <p>
-The values of the composite tags are derived from the values of other tags.
-These are convenience tags which are calculated after all other information
-is extracted.
+The values of the composite tags are <b>Derived From</b> the values of other
+tags.  These are convenience tags which are calculated after all other
+information is extracted.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -105,8 +105,12 @@ D/1440, where D is the focal plane diagonal in mm)</span></span></td></tr>
 <td>Duration</td>
 <td class=c>N</td>
 <td>FileSize
+  <br>ID3Size
   <br>MPEG:AudioBitrate
-  <br>MPEG:VideoBitrate</td>
+  <br>MPEG:VideoBitrate
+  <br>MPEG:VBRFrames
+  <br>MPEG:SampleRate
+  <br>MPEG:MPEGAudioVersion</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>Duration</td>
@@ -160,86 +164,92 @@ fisheye lenses, or if the image has been resized)</span></span></td></tr>
   <br>ScaleFactor35efl</td>
 <td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
 <tr>
+<td>GPSAltitude</td>
+<td class=c>N</td>
+<td>GPS:GPSAltitude
+  <br>GPS:GPSAltitudeRef</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>GPSDateTime</td>
 <td class=c>N</td>
 <td>GPS:GPSDateStamp
   <br>GPS:GPSTimeStamp</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GPSLatitude</td>
 <td class=c>N</td>
 <td>GPS:GPSLatitude
   <br>GPS:GPSLatitudeRef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GPSLatitudeRef</td>
 <td class=c>N</td>
 <td>XMP:GPSLatitude</td>
 <td><span class=s>&#39;N&#39; = North
   <br>&#39;S&#39; = South</span></td></tr>
-<tr class=b>
+<tr>
 <td>GPSLongitude</td>
 <td class=c>N</td>
 <td>GPS:GPSLongitude
   <br>GPS:GPSLongitudeRef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GPSLongitudeRef</td>
 <td class=c>N</td>
 <td>XMP:GPSLongitude</td>
 <td><span class=s>&#39;E&#39; = East
   <br>&#39;W&#39; = West</span></td></tr>
-<tr class=b>
+<tr>
 <td>GPSPosition</td>
 <td class=c>N</td>
 <td>GPSLatitude
   <br>GPSLongitude</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HyperfocalDistance</td>
 <td class=c>N</td>
 <td>FocalLength
   <br>Aperture
   <br>CircleOfConfusion</td>
 <td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>ISO</td>
 <td class=c>N</td>
 <td>Canon:CameraISO
   <br>Canon:BaseISO
   <br>Canon:AutoISO</td>
 <td><span class=s><span class=n>(use CameraISO if numerical, otherwise calculate as BaseISO * AutoISO / 100)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td>PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ImageSize</td>
 <td class=c>N</td>
 <td>ImageWidth
   <br>ImageHeight</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td>PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>JpgFromRaw</td>
 <td class=c>Y</td>
 <td>JpgFromRawStart
   <br>JpgFromRawLength</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Lens</td>
 <td class=c>N</td>
 <td>ShortFocal
   <br>LongFocal</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Lens35efl</td>
 <td class=c>N</td>
 <td>ShortFocal
@@ -247,6 +257,19 @@ fisheye lenses, or if the image has been resized)</span></span></td></tr>
   <br>Lens
   <br>ScaleFactor35efl</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>LensID</td>
+<td class=c>N</td>
+<td>LensType
+  <br>FocalLength
+  <br>MaxAperture
+  <br>MaxApertureValue
+  <br>ShortFocal
+  <br>LongFocal
+  <br>LensModel</td>
+<td><span class=s><span class=n>(attempt to identify the actual lens from all lenses with a given LensType.
+Applies only to LensType values with a lookup table.  May be configured
+by adding user-defined lenses)</span></span></td></tr>
 <tr>
 <td>LensID</td>
 <td class=c>N</td>
@@ -393,7 +416,7 @@ fisheye lenses, or if the image has been resized)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 11, 2008</i>
+<br><i>Last revised Oct 22, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

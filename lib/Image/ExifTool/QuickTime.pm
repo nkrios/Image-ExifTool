@@ -15,6 +15,7 @@
 #               6) ISO 14496-16 (http://www.iec-normen.de/previewpdf/info_isoiec14496-16%7Bed2.0%7Den.pdf)
 #               7) http://atomicparsley.sourceforge.net/mpeg-4files.html
 #               8) http://wiki.multimedia.cx/index.php?title=QuickTime_container
+#               9) http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart3.pdf (Oct 2008)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::QuickTime;
@@ -24,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.17';
+$VERSION = '1.20';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -46,6 +47,7 @@ my %durationInfo = (
 # 4-character Vendor ID codes (ref PH)
 my %vendorID = (
     appl => 'Apple',
+    FFMP => 'FFmpeg',
     kdak => 'Kodak',
     KMPI => 'Konica-Minolta',
     mino => 'Minolta',
@@ -95,7 +97,21 @@ my %vendorID = (
     },
     mdat => { Unknown => 1, Binary => 1 },
     junk => { Unknown => 1, Binary => 1 }, #8
-    uuid => { Unknown => 1, Binary => 1 }, #8
+    uuid => [
+        { #9 (MP4 files)
+            Name => 'UUID-XMP',
+            Condition => '$$valPt=~/^\xbe\x7a\xcf\xcb\x97\xa9\x42\xe8\x9c\x71\x99\x94\x91\xe3\xaf\xac/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::XMP::Main',
+                Start => 16,
+            },
+        },
+        { #8
+            Name => 'UUID-Unknown',
+            Unknown => 1,
+            Binary => 1,
+        },
+    ],
 );
 
 # atoms used in QTIF files
@@ -354,12 +370,24 @@ my %vendorID = (
             Start => 4, # must skip 4-byte version number header
         },
     },
+    DcMD => {
+        Name => 'DcMD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::DcMD',
+        },
+    },
    'ptv '=> {
         Name => 'PrintToVideo',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Video' },
     },
-    # hnti => 'HintInfo',
-    # hinf => 'HintTrackInfo',
+   'hnti'=> {
+        Name => 'HintInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::HintInfo' },
+    },
+   'hinf' => {
+        Name => 'HintTrackInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::HintTrackInfo' },
+    },
     TAGS => [ #PH
         # these tags were initially discovered in a Pentax movie,
         # but similar information is found in videos from other manufacturers
@@ -464,6 +492,10 @@ my %vendorID = (
     MMA1 => { #PH
         Name => 'MinoltaMMA1', # (Dimage A2)
         SubDirectory => { TagTable => 'Image::ExifTool::Minolta::MMA' },
+    },
+    XMP_ => { #PH (Adobe CS3 Bridge)
+        Name => 'XMP',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
 );
 
@@ -640,6 +672,90 @@ my %vendorID = (
             1 => 'Yes',
         },
     },
+);
+
+# 'hnti' atoms
+%Image::ExifTool::QuickTime::HintInfo = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    'rtp ' => {
+        Name => 'RealtimeStreamingProtocol',
+        PrintConv => '$val=~s/^sdp /(SDP) /; $val',
+    },
+    'sdp ' => 'StreamingDataProtocol',
+);
+
+# 'hinf' atoms
+%Image::ExifTool::QuickTime::HintTrackInfo = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    trpY => { Name => 'TotalBytes', Format => 'int64u' }, #(documented)
+    trpy => { Name => 'TotalBytes', Format => 'int64u' }, #(observed)
+    totl => { Name => 'TotalBytes', Format => 'int32u' },
+    nump => { Name => 'NumPackets', Format => 'int64u' },
+    npck => { Name => 'NumPackets', Format => 'int32u' },
+    tpyl => { Name => 'TotalBytesNoRTPHeaders', Format => 'int64u' },
+    tpaY => { Name => 'TotalBytesNoRTPHeaders', Format => 'int32u' }, #(documented)
+    tpay => { Name => 'TotalBytesNoRTPHeaders', Format => 'int32u' }, #(observed)
+    maxr => {
+        Name => 'MaxDataRate',
+        Format => 'int32u',
+        Count => 2,
+        PrintConv => 'my @a=split(" ",$val);sprintf("%d bytes in %.3f s",$a[1],$a[0]/1000)',
+    },
+    dmed => { Name => 'MediaTrackBytes',    Format => 'int64u' },
+    dimm => { Name => 'ImmediateDataBytes', Format => 'int64u' },
+    drep => { Name => 'RepeatedDataBytes',  Format => 'int64u' },
+    tmin => {
+        Name => 'MinTransmissionTime',
+        Format => 'int32u',
+        PrintConv => 'sprintf("%.3f s",$val/1000)',
+    },
+    tmax => {
+        Name => 'MaxTransmissionTime',
+        Format => 'int32u',
+        PrintConv => 'sprintf("%.3f s",$val/1000)',
+    },
+    pmax => { Name => 'LargestPacketSize',  Format => 'int32u' },
+    dmax => {
+        Name => 'LargestPacketDuration',
+        Format => 'int32u',
+        PrintConv => 'sprintf("%.3f s",$val/1000)',
+    },
+    payt => {
+        Name => 'PayloadType',
+        ValueConv => 'unpack("N",$val) . " " . substr($val, 5)',
+        PrintConv => '$val=~s/ /, /;$val',
+    },
+);
+
+# DcMD atoms
+%Image::ExifTool::QuickTime::DcMD = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    NOTES => 'Metadata directory found in MOV videos from some Kodak cameras.',
+    Cmbo => {
+        Name => 'CameraByteOrder',
+        PrintConv => {
+            II => 'Little-endian (Intel, II)',
+            MM => 'Big-endian (Motorola, MM)',
+        },
+    },
+    DcME => {
+        Name => 'DcME',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::DcME',
+        },
+    },
+);
+
+# DcME atoms
+%Image::ExifTool::QuickTime::DcME = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    # Mtmd = binary data
+    # Keyw = keywords?
+    # Rate = 2 bytes "00 00"
 );
 
 # MP4 media box (ref 5)
@@ -1097,16 +1213,16 @@ sub ProcessKeys($$$)
             };
         } elsif ($tag =~ /^[-\w.]+$/) {
             # create info for tags with reasonable id's
-            my $name = $1;
+            my $name = $tag;
             $name =~ s/\.(.)/\U$1/g;
             $newInfo = { Name => ucfirst($name) };
-        } else {
-            next;
         }
         # substitute this tag in the InfoList table with the given index
         delete $$infoTable{$index};
-        Image::ExifTool::AddTagToTable($infoTable, $index, $newInfo);
-        $out and printf $out "%sAdded InfoList Tag 0x%.4x = $tag\n", $exifTool->{INDENT}, $index;
+        if ($newInfo) {
+            Image::ExifTool::AddTagToTable($infoTable, $index, $newInfo);
+            $out and printf $out "%sAdded InfoList Tag 0x%.4x = $tag\n", $exifTool->{INDENT}, $index;
+        }
         $pos += $len;
         ++$index;
     }

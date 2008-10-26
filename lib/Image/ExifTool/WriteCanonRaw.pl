@@ -515,7 +515,7 @@ sub WriteCRW($$)
 
     if ($exifTool->{DEL_GROUP}->{MakerNotes}) {
         if ($type eq 'CCDR') {
-            $exifTool->Error("Can't delete Makernotes group in CRW file");
+            $exifTool->Error("Can't delete MakerNotes group in CRW file");
             return 0;
         } else {
             ++$exifTool->{CHANGED};

@@ -1,11 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: MIE_3_failed.mie
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:13 09:33:28
+[File, File, Image]  - File Size: 6.1 kB
+[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:36-04:00
 [File, File, Image]  - File Type: MIE
 [File, File, Image]  - MIME Type: image/x-mie-jpeg
-[File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
+[File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image]  - Current IPTC Digest: ff6b1fa510bbe0d2c2323752af38a86b
 [MIE, MIE-Main, Other] 0Type - Subfile Type: JPEG
 [MIE, MIE-Main, Other] 0Vers - MIE Version: 1.1
 [MIE, MIE-Main, Other] 1Name - Subfile Name: dummy.jpg
@@ -119,6 +120,7 @@
 [MakerNotes, Nikon, Camera] 16 - Data Dump: (Binary data 122 bytes)
 [IPTC, IPTC, Other] 25 - Keywords: cool
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
 [XMP, XMP-dc, Author] creator - Creator: phil
 [Composite, Composite, Image]  - Aperture: 9.4
 [Composite, Composite, Camera]  - Flash: Off

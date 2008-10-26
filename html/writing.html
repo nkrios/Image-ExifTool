@@ -8,9 +8,9 @@
 <body>
 <h1 class='up'>Writing Meta Information</h1>
 <h3>Abstract</h3>
-<p>Writing meta information is more complicated than it may appear at first glance,
-this may be one reason why there are very few utilities around that do it.
-ExifTool uses tag names to identify the different pieces of meta information
+<p>Writing meta information is more complicated than it may appear at first
+glance, which may be one reason why there are very few utilities around that do
+it. ExifTool uses tag names to identify the different pieces of meta information
 that can be extracted from a file.  There are thousands of different tags that
 ExifTool recognizes, and many of these tag names are common between different
 metadata formats (the WhiteBalance tag is the worst offender, and can be found
@@ -157,10 +157,10 @@ will simply remove the preview when rewriting the file.</p>
 
 <p>However, as of ExifTool version 5, the preview images are handled properly
 when writing EXIF information in JPEG files.  But for reasons of efficiency, the
-EXIF segment is not edited when writing information unless some EXIF tags are
-being changed (ie. if only XMP or IPTC information is being edited).  In this
-case, the preview image pointers could be invalidated because the length of the
-data between the EXIF segment (which comes near the start of the file) and the
+EXIF segment is not edited when writing information if no EXIF tags are being
+changed (ie. if only XMP or IPTC information is being edited).  In this case,
+the preview image pointers could be invalidated because the length of the data
+between the EXIF segment (which comes near the start of the file) and the
 preview image (at the end of the file) is likely to change.  ExifTool gets
 around this when reading JPEG images by looking for the preview at the end of
 the file and updating pointers if necessary, but the preview image may not be
@@ -181,6 +181,7 @@ delete the tag if it exists in IFD0 when it is written to ExifIFD, and vice
 versa.</p>
 
 <hr>
+<i>Created Dec. 30, 2004</i><br>
 <i>Last revised Oct. 16, 2006</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>

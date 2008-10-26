@@ -22,7 +22,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.48';
+$VERSION = '1.49';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -548,8 +548,21 @@ sub BuildMakerNotes($$$$$$);
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     0 => 'ExposureCompensation',
-    1 => 'TvValue',
-    2 => 'AvValue',
+    1 => {
+        Name => 'ShutterSpeedValue',
+        ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
+        ValueConvInv => '$val>0 ? -log($val)/log(2) : -100',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        # do eval to convert things like '1/100'
+        PrintConvInv => 'eval $val',
+    },
+    2 => {
+        Name => 'ApertureValue',
+        ValueConv => '2 ** ($val / 2)',
+        ValueConvInv => '$val>0 ? 2*log($val)/log(2) : 0',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
 );
 
 %Image::ExifTool::CanonRaw::ImageInfo = (

@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -896,7 +896,7 @@ sub ReadFPXValue($$$$$;$)
             push @vals, $val;
         }
         # join VT_ values with commas unless we want an array
-        @vals = ( join ', ', @vals ) if @vals > 1 and not wantarray;
+        @vals = ( join $exifTool->Options('ListSep'), @vals ) if @vals > 1 and not wantarray;
         last;   # didn't really want to loop
     }
     $_[2] = $valPos;    # return updated value position

@@ -6,6 +6,7 @@
 # Revisions:    12/23/2005 - P. Harvey Created
 #
 # References:   1) http://www.microsoft.com/windows/windowsmedia/format/asfspec.aspx
+#               2) http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart3.pdf (Oct 2008)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::ASF;
@@ -16,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -76,6 +77,10 @@ my %advancedContentEncryption = (
     'D6E229D3-35DA-11D1-9034-00A0C90349BE' => 'Index',
     'FEB103F8-12AD-4C64-840F-2A1D2F7AD48C' => 'MediaIndex',
     '3CB73FD0-0C4A-4803-953D-EDF7B6228F0C' => 'TimecodeIndex',
+    'BE7ACFCB-97A9-42E8-9C71-999491E3AFAC' => { #2
+        Name => 'XMP',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
+    },
 );
 
 # ASF header objects

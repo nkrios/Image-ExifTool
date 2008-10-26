@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 # type of current stream
 $Image::ExifTool::RIFF::streamType = '';
@@ -302,6 +302,10 @@ $Image::ExifTool::RIFF::streamType = '';
         Name => 'Hdrl',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Hdrl' },
     },
+    LIST_Tdat => { #PH (Adobe CS3 Bridge)
+        Name => 'Tdat',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Tdat' },
+    },
     JUNK => [
         {
             Name => 'OlympusJunk',
@@ -334,6 +338,15 @@ $Image::ExifTool::RIFF::streamType = '';
             RawConv => '$_=$val; s/\0.*//s; /^[^\0-\x1f\x7f-\xff]+$/ ? $_ : undef',
         }
     ],
+    _PMX => { #PH (Adobe CS3 Bridge)
+        Name => 'XMP',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
+    },
+    JUNQ => { #PH (Adobe CS3 Bridge)
+        # old XMP is preserved when metadata is replaced in Bridge
+        Name => 'OldXMP',
+        Binary => 1,
+    },
 );
 
 # the maker notes used by some digital cameras
@@ -439,6 +452,13 @@ $Image::ExifTool::RIFF::streamType = '';
         Name => 'Stream',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Stream' },
     },
+);
+
+# Sub chunks of Tdat LIST chunk (ref PH)
+%Image::ExifTool::RIFF::Tdat = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
+    GROUPS => { 2 => 'Video' },
+    # (have seen tc_O, tc_A, rn_O and rn_A)
 );
 
 %Image::ExifTool::RIFF::AVIHeader = (
@@ -716,10 +736,14 @@ sub ProcessRIFF($$)
     my $tagTablePtr = GetTagTable('Image::ExifTool::RIFF::Main');
     my $pos = 12;
 #
-# Read chunks in RIFF image until we get to the 'data' chunk
+# Read chunks in RIFF image
 #
     for (;;) {
-        $raf->Read($buff, 8) == 8 or $err=1, last;
+        my $num = $raf->Read($buff, 8);
+        if ($num < 8) {
+            $err = 1 if $num;
+            last;
+        }
         $pos += 8;
         my ($tag, $len) = unpack('a4V', $buff);
         # special case: construct new tag name from specific LIST type
@@ -731,10 +755,11 @@ sub ProcessRIFF($$)
         }
         $exifTool->VPrint(0, "RIFF '$tag' chunk ($len bytes of data):\n");
         # stop when we hit the audio data or AVI index or AVI movie data
-        if ($tag eq 'data' or $tag eq 'idx1' or $tag eq 'LIST_movi') {
-            $exifTool->VPrint(0, "(end of parsing)\n");
-            last;
-        }
+        # --> no more because Adobe Bridge stores XMP after this!!
+        #if ($tag eq 'data' or $tag eq 'idx1' or $tag eq 'LIST_movi') {
+        #    $exifTool->VPrint(0, "(end of parsing)\n");
+        #    last;
+        #}
         # RIFF chunks are padded to an even number of bytes
         my $len2 = $len + ($len & 0x01);
         if ($$tagTablePtr{$tag}) {

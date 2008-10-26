@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>exiftool Application Documentation</title>
-<link rev="made" href="mailto:root@b05.apple.com" />
+<link rev="made" href="mailto:root@b49.apple.com" />
 </head>
 
 <body style="background-color: white">
@@ -65,43 +65,46 @@ to the console (or written to an output text file with the <strong>-w</strong> o
 -<em>TAG</em>=[<em>VALUE</em>] syntax or the <strong>-TagsFromFile</strong> option.  This causes
 <em>FILE</em> to be rewritten, and by default the original file is preserved with
 <code>_original</code> appended to the file name.  (Be sure to verify that the new
-file is OK before erasing the original.)</p>
+file is OK before erasing the original.)  Once in write mode, exiftool will
+ignore any read-specific options.</p>
 <p>Below is a list of file types and meta information formats currently
 supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       ITC   r       PPM   r/w    |  EXIF           r/w/c
-  ACR   r       JNG   r/w     PPT   r      |  GPS            r/w/c
-  AI    r       JP2   r/w     PS    r/w    |  IPTC           r/w/c
-  AIFF  r       JPEG  r/w     PSD   r/w    |  XMP            r/w/c
-  APE   r       K25   r       QTIF  r      |  MakerNotes     r/w/c
-  ARW   r       KDC   r       RA    r      |  Photoshop IRB  r/w/c
-  ASF   r       M4A   r       RAF   r/w    |  ICC Profile    r/w/c
-  AVI   r       MEF   r/w     RAM   r      |  MIE            r/w/c
-  BMP   r       MIE   r/w/c   RAW   r/w    |  JFIF           r/w/c
-  BTF   r       MIFF  r       RIFF  r      |  Ducky APP12    r/w/c
-  CR2   r/w     MNG   r/w     RM    r      |  CIFF           r/w
-  CRW   r/w     MOS   r/w     SR2   r      |  AFCP           r/w
-  CS1   r/w     MOV   r       SRF   r      |  JPEG 2000      r
-  DCM   r       MP3   r       SVG   r      |  DICOM          r
-  DCR   r       MP4   r       SWF   r      |  Flash          r
-  DIVX  r       MPC   r       THM   r/w    |  FlashPix       r
-  DNG   r/w     MPG   r       TIFF  r/w    |  QuickTime      r
-  DOC   r       MRW   r/w     VRD   r/w/c  |  GeoTIFF        r
-  EPS   r/w     NEF   r/w     WAV   r      |  PrintIM        r
-  ERF   r/w     OGG   r       WDP   r/w    |  ID3            r
-  FLAC  r       ORF   r/w     WMA   r      |  Kodak Meta     r
-  FLV   r       PBM   r/w     WMV   r      |  Ricoh RMETA    r
-  FPX   r       PDF   r/w     X3F   r      |  Picture Info   r
-  GIF   r/w     PEF   r/w     XLS   r      |  Adobe APP14    r
-  HDP   r/w     PGM   r/w     XMP   r/w/c  |  APE            r
-  HTML  r       PICT  r                    |  Vorbis         r
-  ICC   r/w/c   PNG   r/w                  |  (and more)</pre>
+  3FR   r       HTML  r       PPM   r/w    |  EXIF           r/w/c
+  ACR   r       ICC   r/w/c   PPT   r      |  GPS            r/w/c
+  AI    r       ITC   r       PS    r/w    |  IPTC           r/w/c
+  AIFF  r       JNG   r/w     PSD   r/w    |  XMP            r/w/c
+  APE   r       JP2   r/w     QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       JPEG  r/w     RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       K25   r       RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       KDC   r       RAM   r      |  MIE            r/w/c
+  BMP   r       M4A   r       RAW   r/w    |  JFIF           r/w/c
+  BTF   r       MEF   r/w     RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MIE   r/w/c   RWZ   r      |  PDF            r/w/c
+  CRW   r/w     MIFF  r       RM    r      |  CIFF           r/w
+  CS1   r/w     MNG   r/w     SO    r      |  AFCP           r/w
+  DCM   r       MOS   r/w     SR2   r      |  JPEG 2000      r
+  DCR   r       MOV   r       SRF   r      |  DICOM          r
+  DIVX  r       MP3   r       SVG   r      |  Flash          r
+  DJVU  r       MP4   r       SWF   r      |  FlashPix       r
+  DLL   r       MPC   r       THM   r/w    |  QuickTime      r
+  DNG   r/w     MPG   r       TIFF  r/w    |  GeoTIFF        r
+  DOC   r       MRW   r/w     VRD   r/w/c  |  PrintIM        r
+  DYLIB r       NEF   r/w     WAV   r      |  ID3            r
+  EPS   r/w     OGG   r       WDP   r/w    |  Kodak Meta     r
+  EXE   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
+  ERF   r/w     PBM   r/w     WMV   r      |  Picture Info   r
+  FLAC  r       PDF   r/w     X3F   r      |  Adobe APP14    r
+  FLV   r       PEF   r/w     XLS   r      |  APE            r
+  FPX   r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
+  GIF   r/w     PICT  r       ZIP   r      |  SPIFF          r
+  HDP   r/w     PNG   r/w                  |  (and more)</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
-extensions are processed when reading, and only writable types are written.
-However, the <strong>-ext</strong> option may be used to force processing of files with
-any extension.</p>
+extensions are processed when reading, and only writable types are processed
+when any tag is written.  However, the <strong>-ext</strong> option may be used to force
+processing of files with any extension.</p>
 <p>
 </p>
 <hr />
@@ -221,20 +224,21 @@ directory or the exiftool directory unless an absolute pathname is given.
     -copyright&lt;Copyright $createdate, Phil Harvey</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2da"><strong>-a</strong></a></strong><br />
+<dt><strong><a name="item__2da_2c__2d_2da"><strong>-a</strong>, <strong>--a</strong></a></strong><br />
 </dt>
 <dd>
-<strong>A</strong>llow duplicate tag names in the output.  Without this option, duplicates
-are suppressed.
+<strong>A</strong>llow (<strong>-a</strong>) or supress (<strong>--a</strong>) duplicate tag names in the output.  By
+default, duplicate tags are suppressed unless the <strong>-X</strong> option is used.
 </dd>
 <p></p>
 <dt><strong><a name="item__2db"><strong>-b</strong></a></strong><br />
 </dt>
 <dd>
 Output requested data in <strong>b</strong>inary format without tag names or descriptions.
-This option is mainly used for extracting embedded images, but it may also
-be useful in separating values of list-type tags since a newline is used
-instead of a comma to separate these values in the <strong>-b</strong> output.
+This option is mainly used for extracting embedded images or other binary
+data, but it may also be useful for some text strings since control
+characters (such as newlines) are not replaced by '.' as they are in the
+default output.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dc_fmt"><strong>-c</strong> <em>FMT</em></a></strong><br />
@@ -260,8 +264,9 @@ various formats:
 <dd>
 Set the format for <strong>d</strong>ate/time tag values.  Consult <code>strftime</code> man page
 for <em>FMT</em> syntax. The default format is equivalent to ``%Y:%m:%d %H:%M:%S''.
-This option has no effect on date-only or time-only tags, ignores timezone
-information if present, and currently doesn't apply when writing.
+This option has no effect on date-only or time-only tags and ignores
+timezone information if present.  The inverse operation (ie. un-formatting a
+date/time value) is currently not applied when writing a date/time tag.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dd"><strong>-D</strong></a></strong><br />
@@ -283,7 +288,7 @@ Print <strong>e</strong>xisting tags only -- don't calculate composite tags.
 option.
 </dd>
 <p></p>
-<dt><strong><a name="item_ext"><strong>-ext</strong> <em>EXT</em> (or <strong>--ext</strong> <em>EXT</em>)</a></strong><br />
+<dt><strong><a name="item__2dext_ext_2c__2d_2dext_ext"><strong>-ext</strong> <em>EXT</em>, <strong>--ext</strong> <em>EXT</em></a></strong><br />
 </dt>
 <dd>
 Process only files with (<strong>-ext</strong>) or without (<strong>--ext</strong>) a specified
@@ -345,7 +350,9 @@ Same as <strong>-g</strong> but print <strong>G</strong>roup name for each tag.
 <dt><strong><a name="item__2dh"><strong>-h</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>H</strong>TML formatting for output.  Implies <strong>-E</strong> option.
+Use <strong>H</strong>TML formatting for output.  Implies <strong>-E</strong> option.  The formatting
+options <strong>-D</strong>, <strong>-H</strong>, <strong>-g</strong>, <strong>-G</strong>, <strong>-l</strong> and <strong>-s</strong> may be used in
+combination with <strong>-h</strong> to influence the HTML format.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dh"><strong>-H</strong></a></strong><br />
@@ -412,7 +419,8 @@ Windows drag and drop application.
 <dt><strong><a name="item__2dl"><strong>-l</strong></a></strong><br />
 </dt>
 <dd>
-Use <strong>l</strong>ong 2-line Canon-style output format.
+Use <strong>l</strong>ong 2-line Canon-style output format.  Adds a description to the XML
+output when <strong>-X</strong> is used.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dl"><strong>-L</strong></a></strong><br />
@@ -423,16 +431,18 @@ instead of the default UTF-8.  When writing, -L is used to specify that
 input text values are Latin1 instead of UTF-8.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dlist_2c__2dlistw_2c__2dlistf_2c__2dlistg_5bnum_"><strong>-list</strong>, <strong>-listw</strong>, <strong>-listf</strong>, <strong>-listg</strong>[<em>NUM</em>], <strong>-listd</strong></a></strong><br />
+<dt><strong><a name="item__2dlist_2c__2dlistw_2c__2dlistf_2c__2dlistwf_2c__2"><strong>-list</strong>, <strong>-listw</strong>, <strong>-listf</strong>, <strong>-listwf</strong>, <strong>-listg</strong>[<em>NUM</em>],
+<strong>-listd</strong></a></strong><br />
 </dt>
 <dd>
 Print a <strong>list</strong> of all valid tag names (<strong>-list</strong>), all <strong>w</strong>ritable tag names
-(<strong>-listw</strong>), all recognized <strong>f</strong>ile extensions (<strong>-listf</strong>), all tag
-<strong>g</strong>roups [in a specified family] (<strong>-listg</strong>[<em>NUM</em>]), or all <strong>d</strong>eletable
-tag groups (<strong>-listd</strong>).  The <strong>-list</strong> and <strong>-listw</strong> options may be followed
-by an additional argument of the form <code>-GROUP:All</code> to list all tags in a
-specific group.  With <strong>-listg</strong>, <em>NUM</em> may be given to specify the group
-family, otherwise family 0 is assumed. For example:
+(<strong>-listw</strong>), all recognized <strong>f</strong>ile extensions (<strong>-listf</strong>), all <strong>w</strong>ritable
+<strong>f</strong>ile extensions (<strong>-listwf</strong>), all tag <strong>g</strong>roups [in a specified family]
+(<strong>-listg</strong>[<em>NUM</em>]), or all <strong>d</strong>eletable tag groups (<strong>-listd</strong>).  The
+<strong>-list</strong> and <strong>-listw</strong> options may be followed by an additional argument of
+the form <code>-GROUP:All</code> to list all tags in a specific group.  With
+<strong>-listg</strong>, <em>NUM</em> may be given to specify the group family, otherwise family
+0 is assumed. For example:
 </dd>
 <dd>
 <pre>
@@ -440,6 +450,7 @@ family, otherwise family 0 is assumed. For example:
     -list -EXIF:All     # list all EXIF tags
     -listw -XMP-dc:All  # list all writable XMP-dc tags
     -listf              # list all recognized file extensions
+    -listwf             # list all writable file extensions
     -listg1             # list all groups in family 1
     -listd              # list all deletable groups</pre>
 </dd>
@@ -590,7 +601,7 @@ format.  Add up to 3 <strong>-s</strong> options for even shorter formats:
     -s -s -s  - print values only</pre>
 </dd>
 <dd>
-<p>Also effective when combined with <strong>-t</strong> or <strong>-h</strong> options.</p>
+<p>Also effective when combined with <strong>-t</strong>, <strong>-h</strong> or <strong>-X</strong> options.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2ds"><strong>-S</strong></a></strong><br />
@@ -606,6 +617,12 @@ to column-align values are not printed.
 Scan all files (even unrecognized formats) for XMP information unless found
 already.  When combined with the <strong>-fast</strong> option, only unrecognized file
 types are scanned.  Warning: It can be time consuming to scan large files.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dsep_str"><strong>-sep</strong> <em>STR</em></a></strong><br />
+</dt>
+<dd>
+Specify separator for values in List-type tags.  Default is ``, ''.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dt"><strong>-t</strong></a></strong><br />
@@ -715,6 +732,16 @@ command line.)  For example, the following two commands are not equivalent:</p>
 <pre>
     # (batch mode):  Preserves original title if it exists
     exiftool -tagsfromfile @ -xmp:title -xmp:title=NEW a.jpg</pre>
+</dd>
+<dd>
+<p>4) The normal behaviour of copied tags differs subtly from assigned tags for
+List-type tags.  When copying to a list, each copied tag overrides any
+previous operations on the list.  While this avoids duplicate list items
+when copying groups of tags from a file containing redundant information, it
+also prevents values from different tags from being copied into the same
+list when this is the intent.  To change this, a <strong>-addTagsFromFile</strong> option
+is provided to allow multiple items to be copied to the same list.  Other
+than this difference, <strong>-addTagsFromFile</strong> is equivalent to <strong>-tagsFromFile</strong>.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2du"><strong>-u</strong></a></strong><br />
@@ -832,6 +859,20 @@ has the same effect as --<em>TAG</em> on the command line.  May also be used
 following a <strong>-TagsFromFile</strong> option to exclude tags from being copied.
 </dd>
 <p></p>
+<dt><strong><a name="item__2dx"><strong>-X</strong></a></strong><br />
+</dt>
+<dd>
+Use RDF/<strong>X</strong>ML formatting for console output.  Implies the <strong>-a</strong> option so
+duplicate tags are extracted.  The formatting options <strong>-D</strong>, <strong>-H</strong>, <strong>-l</strong>
+and <strong>-s</strong> may be used in combination with <strong>-X</strong> to affect the output, but
+note that tag ID's (<strong>-D</strong> and <strong>-H</strong> options) may not be added to the short
+(<strong>-s</strong>) output.  Another restriction of <strong>-s</strong> is that only one tag with a
+given group and name may appear in the output.  By default, list-type tags
+with multiple values are formatted as an RDF Bag, but they are combined into
+a single string when <strong>-sep</strong> or <strong>-s</strong> is used.  Using <strong>-L</strong> changes the XML
+encoding from ``UTF-8'' to ``windows-1252''.
+</dd>
+<p></p>
 <dt><strong><a name="item__2dz"><strong>-z</strong></a></strong><br />
 </dt>
 <dd>
@@ -893,6 +934,13 @@ tags, sorted by group (for family 1).
 </dt>
 <dd>
 Print common meta information for all images in <code>dir</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dt__2dcreatedate__2daperture__2dshutter">exiftool -T -createdate -aperture -shutterspeed -iso dir &gt; out.txt</a></strong><br />
+</dt>
+<dd>
+List meta information in tab-delimited column form for all images in ``dir''
+to an output text file named ``out.txt''.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2ds__2dimagesize__2dexposuretime_b_2ejpg">exiftool -s -ImageSize -ExposureTime b.jpg</a></strong><br />
@@ -1247,6 +1295,22 @@ Exposure=1/60''.
 </dt>
 <dd>
 Copy ICC_Profile from one image to another.
+</dd>
+<p></p>
+<dt><strong>exiftool -TagsFromFile src.jpg -all:all dst.mie</strong><br />
+</dt>
+<dd>
+Copy all meta information in its original form from a JPEG image to a MIE
+file.  The MIE file will be created if it doesn't exist.  This technique can
+be used to store the metadata of an image so it can be inserted back into
+the image (with the inverse command) later in a workflow.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2do_dst_2emie__2dall_3aall_src_2ejpg">exiftool -o dst.mie -all:all src.jpg</a></strong><br />
+</dt>
+<dd>
+This command performs exactly the same task as the command above, except
+that the <code>-o</code> option will not write to an output file that already exists.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dif__27_24jpgfromraw_27__2db__2djpgfrom">exiftool -if '$jpgfromraw' -b -jpgfromraw -w %d%f_%ue.jpg -execute

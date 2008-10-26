@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.24
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.49
 [File, File, Image]  - File Name: XMP.svg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 1402 bytes
-[File, File, Time]  - File Modification Date/Time: 2008:04:07 08:40:21
+[File, File, Time]  - File Modification Date/Time: 2008:04:08 13:45:42-04:00
 [File, File, Image]  - File Type: SVG
 [File, File, Image]  - MIME Type: image/svg+xml
 [SVG, SVG, Image] width - Image Width: 4in
@@ -13,6 +13,7 @@
 [SVG, SVG-myfoo, Unknown] descSceneWhat - Desc Scene What: widget $growth
 [SVG, SVG-myfoo, Unknown] descSceneContains - Desc Scene Contains: $three $graph-bar
 [SVG, SVG-myfoo, Unknown] descSceneWhen - Desc Scene When: 1998 $through 2000
+[XMP, XMP-rdf, Document] about - About: http://example.org/myfoo
 [XMP, XMP-dc, Image] title - Title: MyFoo Financial Report
 [XMP, XMP-dc, Image] description - Description: $three $bar $thousands $dollars $from 1998 $through 2000
 [XMP, XMP-dc, Author] publisher - Publisher: Example Organization

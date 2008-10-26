@@ -11,6 +11,7 @@
 #               Oct. 30/04 - P. Harvey Split testCompare() into separate sub.
 #               May  18/05 - P. Harvey Tolerate round-off errors in floats.
 #               Feb. 02/08 - P. Harvey Allow different timezones in time values
+#               Sep. 16/08 - P. Harvey Improve timezone testing
 #------------------------------------------------------------------------------
 
 package t::TestLib;
@@ -21,7 +22,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.09';
+$VERSION = '1.11';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare binaryCompare testVerbose);
 
@@ -70,12 +71,26 @@ sub testCompare($$$)
             $success = 1;
             my ($line1, $line2);
             my $linenum = 0;
-            foreach (<FILE1>) {
+            for (;;) {
+                $line1 = <FILE1>;
+                last unless defined $line1;
                 ++$linenum;
-                $line1 = $_;
                 $line2 = <FILE2>;
                 if (defined $line2) {
                     next if $line1 eq $line2;
+                    # allow CurrentIPTCDigest to be missing if Digest::MD5 isn't installed
+                    if ($line1 =~ /Current IPTC Digest/ and not
+                        $line2 =~ /Current IPTC Digest/ and not
+                        eval 'require Digest::MD5')
+                    {
+                        for (;;) {
+                            $line1 = <FILE1>;
+                            last unless defined $line1;
+                            last unless $line1 =~ /Current IPTC Digest/;
+                        }
+                        last unless defined $line1;
+                        next if $line1 eq $line2;
+                    }
                     next if closeEnough($line1, $line2);
                 }
                 $success = 0;
@@ -132,39 +147,62 @@ sub closeEnough($$)
     my @toks1 = split /\s+/, $line1;
     my @toks2 = split /\s+/, $line2;
     my $lenChanged = 0;
-    for (;;) {
-        return 1 unless @toks1 or @toks2;   # all tokens were OK
-        last unless @toks1 and @toks2;
-        my $tok1 = shift @toks1;
-        my $tok2 = shift @toks2;
+    my $i;
+    for ($i=0; ; ++$i) {
+        return 1 if $i >= @toks1 and $i >= @toks2;  # all tokens were OK
+        my $tok1 = $toks1[$i];
+        my $tok2 = $toks2[$i];
+        last unless defined $tok1 and defined $tok2;
         next if $tok1 eq $tok2;
         # can't compare any more if either line was truncated (ie. ends with '[...]')
         return $lenChanged if $tok1 =~ /\Q[...]\E$/ or $tok2 =~ /\Q[...]\E$/;
-        # allow times with different timezones
-        if ($tok1 =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/) {
-            my $date = $1;  # remove timezone
-            next if $tok2 =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/ and $date eq $1;
-        }
-        # check to see if both tokens are floating point numbers (with decimal points!)
-        $tok1 =~ s/[^\d.]+$//; $tok2 =~ s/[^\d.]+$//;   # remove trailing units
-        last unless Image::ExifTool::IsFloat($tok1) and
-                    Image::ExifTool::IsFloat($tok2) and
-                    $tok1 =~ /\./ and $tok2 =~ /\./;
-        last if $tok1 == 0 or $tok2 == 0;
-        # numbers are bad if not the same to 5 significant figures
-        if (abs(($tok1-$tok2)/($tok1+$tok2)) > 1e-5) {
-            # (but allow last digit to be different due to round-off errors)
-            my ($int1, $int2);
-            ($int1 = $tok1) =~ tr/0-9//dc;
-            ($int2 = $tok2) =~ tr/0-9//dc;
-            if (length($int1) != length($int2)) {
-                if (length($int1) > length($int2)) {
-                    $int1 = substr($int1, 0, length($int2));
-                } else {
-                    $int2 = substr($int2, 0, length($int1));
+        # account for different timezones
+        if ($tok1 =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/i) {
+            my $time = $1;  # remove timezone
+            # timezone may be wrong if writing date/time value in a different timezone
+            next if $tok2 =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/i and $time eq $1;
+            # date/time may be wrong to if converting GMT value to local time
+            last unless $i and $toks1[$i-1] =~ /^\d{4}:\d{2}:\d{2}$/ and
+                               $toks1[$i-1] =~ /^\d{4}:\d{2}:\d{2}$/;
+            $tok1 = $toks1[$i-1] . ' ' . $tok1; # add date to give date/time value
+            $tok2 = $toks2[$i-1] . ' ' . $tok2;
+            my $t1 = Image::ExifTool::GetUnixTime($tok1, 'local') or last;
+            my $t2 = Image::ExifTool::GetUnixTime($tok2, 'local') or last;
+            last unless $t1 == $t2;
+        # date may be different if timezone shifted into next day
+        } elsif ($tok1 =~ /^\d{4}:\d{2}:\d{2}$/ and $tok2 =~ /^\d{4}:\d{2}:\d{2}$/ and
+                 defined $toks1[$i+1] and defined $toks2[$i+1] and
+                 $toks1[$i+1] =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/i and
+                 $toks2[$i+1] =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/i)
+        {
+            ++$i;
+            $tok1 .= ' ' . $toks1[$i];          # add time to give date/time value
+            $tok2 .= ' ' . $toks2[$i];
+            my $t1 = Image::ExifTool::GetUnixTime($tok1, 'local') or last;
+            my $t2 = Image::ExifTool::GetUnixTime($tok2, 'local') or last;
+            last unless $t1 == $t2;
+        } else {
+            # check to see if both tokens are floating point numbers (with decimal points!)
+            $tok1 =~ s/[^\d.]+$//; $tok2 =~ s/[^\d.]+$//;   # remove trailing units
+            last unless Image::ExifTool::IsFloat($tok1) and
+                        Image::ExifTool::IsFloat($tok2) and
+                        $tok1 =~ /\./ and $tok2 =~ /\./;
+            last if $tok1 == 0 or $tok2 == 0;
+            # numbers are bad if not the same to 5 significant figures
+            if (abs(($tok1-$tok2)/($tok1+$tok2)) > 1e-5) {
+                # (but allow last digit to be different due to round-off errors)
+                my ($int1, $int2);
+                ($int1 = $tok1) =~ tr/0-9//dc;
+                ($int2 = $tok2) =~ tr/0-9//dc;
+                if (length($int1) != length($int2)) {
+                    if (length($int1) > length($int2)) {
+                        $int1 = substr($int1, 0, length($int2));
+                    } else {
+                        $int2 = substr($int2, 0, length($int1));
+                    }
                 }
+                last if abs($int1-$int2) > 1.00001;
             }
-            last if abs($int1-$int2) > 1.00001;
         }
         # set flag if length changed
         $lenChanged = 1 if length($tok1) ne length($tok2);

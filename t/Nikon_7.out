@@ -1,11 +1,13 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.47
 [File, File, Image]  - File Name: Nikon.nef
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 6 kB
-[File, File, Time]  - File Modification Date/Time: 2007:01:05 12:52:24
+[File, File, Image]  - File Size: 6.0 kB
+[File, File, Time]  - File Modification Date/Time: 2007:01:05 12:52:24-05:00
 [File, File, Image]  - File Type: NEF
 [File, File, Image]  - MIME Type: image/x-raw
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image]  - Current IPTC Digest: 4996c61239acf3d1d9fa08228a6f6825
+[File, File2, Image]  - Current IPTC Digest: f19115790adcedaaf800a0a41179efa2
 [EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
 [EXIF, IFD0, Image] 256 - Image Width: 160
 [EXIF, IFD0, Image] 257 - Image Height: 106
@@ -156,25 +158,28 @@
 [MakerNotes, NikonCapture, Image] 38 - Crop Top: 0
 [MakerNotes, NikonCapture, Image] 46 - Crop Right: 3008
 [MakerNotes, NikonCapture, Image] 54 - Crop Bottom: 2000
-[MakerNotes, NikonCapture, Image] 142 - Output Width Inches: 10.0266666666667
-[MakerNotes, NikonCapture, Image] 150 - Output Height Inches: 6.66666666666667
-[MakerNotes, NikonCapture, Image] 158 - Scaled Resolution: 300
-[MakerNotes, NikonCapture, Image] 174 - Source Resolution: 300
-[MakerNotes, NikonCapture, Image] 182 - Output Resolution: 300
+[MakerNotes, NikonCapture, Image] 142 - Crop Output Width Inches: 10.0266666666667
+[MakerNotes, NikonCapture, Image] 150 - Crop Output Height Inches: 6.66666666666667
+[MakerNotes, NikonCapture, Image] 158 - Crop Scaled Resolution: 300
+[MakerNotes, NikonCapture, Image] 174 - Crop Source Resolution: 300
+[MakerNotes, NikonCapture, Image] 182 - Crop Output Resolution: 300
 [MakerNotes, NikonCapture, Image] 190 - Crop Output Scale: 1
-[MakerNotes, NikonCapture, Image] 198 - Output Width: 3008
-[MakerNotes, NikonCapture, Image] 206 - Output Height: 2000
-[MakerNotes, NikonCapture, Image] 214 - Output Pixels: 6016000
+[MakerNotes, NikonCapture, Image] 198 - Crop Output Width: 3008
+[MakerNotes, NikonCapture, Image] 206 - Crop Output Height: 2000
+[MakerNotes, NikonCapture, Image] 214 - Crop Output Pixels: 6016000
 [MakerNotes, NikonCapture, Image] 1990472195 - Advanced Raw: On
+[MakerNotes, NikonCapture, Image] 0 - Exposure Adj: 0.3
+[MakerNotes, NikonCapture, Image] 18 - Exposure Adj 2: 0.3000
 [MakerNotes, NikonCapture, Image] 1990472196 - White Balance Adj: On
 [MakerNotes, NikonCapture, Image] 0 - WB Adj Red Balance: 2.015162472363
 [MakerNotes, NikonCapture, Image] 8 - WB Adj Blue Balance: 1.6951313394899
 [MakerNotes, NikonCapture, Image] 16 - WB Adj Mode: Use Temperature
+[MakerNotes, NikonCapture, Image] 20 - WB Adj Lighting Subtype: 3
 [MakerNotes, NikonCapture, Image] 21 - WB Adj Lighting: High Color Rendering Fluorescent
 [MakerNotes, NikonCapture, Image] 24 - WB Adj Temperature: 5000
 [MakerNotes, NikonCapture, Image] 1966984128 - Noise Reduction: On
 [MakerNotes, NikonCapture, Image] 4 - Edge Noise Reduction: Off
-[MakerNotes, NikonCapture, Image] 5 - Color Moire Reduction: Off
+[MakerNotes, NikonCapture, Image] 5 - Color Moire Reduction Mode: Off
 [MakerNotes, NikonCapture, Image] 9 - Noise Reduction Intensity: 0
 [MakerNotes, NikonCapture, Image] 13 - Noise Reduction Sharpness: 5
 [MakerNotes, NikonCapture, Image] 17 - Noise Reduction Method: Faster
@@ -183,6 +188,7 @@
 [MakerNotes, NikonCapture, Image] 1 - Color Boost Level: 10
 [MakerNotes, NikonCapture, Image] 1990472197 - Vignette Control: Off
 [MakerNotes, NikonCapture, Image] 2892748224 - Vignette Control Intensity: 80
+[MakerNotes, NikonCapture, Image] 4264076367 - Auto Red Eye: On
 [MakerNotes, NikonCapture, Image] 0 - Red Eye Correction: Off
 [MakerNotes, NikonCapture, Image] 2875116126 - Photo Effects: On
 [MakerNotes, NikonCapture, Image] 0 - Brightness Adj: 0
@@ -198,9 +204,9 @@
 [MakerNotes, NikonCapture, Image] 0 - D-Lighting HS Adjustment: 25
 [MakerNotes, NikonCapture, Image] 1 - D-Lighting HS Color Boost: 60
 [MakerNotes, NikonCapture, Image] 561376120 - D-Lighting HQ: Off
-[MakerNotes, NikonCapture, Image] 0 - D-Lighting HS Shadow: 50
-[MakerNotes, NikonCapture, Image] 1 - D-Lighting HS Highlight: 1
-[MakerNotes, NikonCapture, Image] 2 - D-Lighting HS Color Boost: 60
+[MakerNotes, NikonCapture, Image] 0 - D-Lighting HQ Shadow: 50
+[MakerNotes, NikonCapture, Image] 1 - D-Lighting HQ Highlight: 1
+[MakerNotes, NikonCapture, Image] 2 - D-Lighting HQ Color Boost: 60
 [MakerNotes, Nikon, Camera] 1 - IFD0 Offset: 8
 [MakerNotes, Nikon, Camera] 2 - Preview IFD Offset: 11362
 [MakerNotes, Nikon, Camera] 3 - Sub IFD Offset: 1440

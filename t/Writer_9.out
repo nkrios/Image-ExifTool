@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: Writer_9_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 9 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:13 09:33:40
+[File, File, Image]  - File Size: 9.1 kB
+[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:45-04:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
@@ -154,6 +154,7 @@
 [MakerNotes, Canon, Camera] 9 - AF Area Y Positions: 0 0 -506 0 506 0 0
 [MakerNotes, Canon, Camera] 10 - AF Points In Focus: (none)
 [MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
@@ -162,6 +163,7 @@
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 8
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 8
 [XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Centered
+[XMP, XMP-tiff, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [ICC_Profile, ICC-header, Image] 4 - Profile CMM Type: Lino
 [ICC_Profile, ICC-header, Image] 8 - Profile Version: 2.1.0
 [ICC_Profile, ICC-header, Image] 12 - Profile Class: Display Device Profile
@@ -206,6 +208,7 @@
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
+[Composite, Composite, Camera]  - Lens ID: Unknown 18-55mm
 [Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4

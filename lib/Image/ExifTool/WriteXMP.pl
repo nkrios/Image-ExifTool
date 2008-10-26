@@ -4,6 +4,10 @@
 # Description:  Write XMP meta information
 #
 # Revisions:    12/19/2004 - P. Harvey Created
+#
+# Notes:      - The x-default entry is not currently handled automatically in
+#               Bags of lang-alt lists as it is in normal lang-alt lists
+#               (ie. XMP-plus:Custom tags)
 #------------------------------------------------------------------------------
 package Image::ExifTool::XMP;
 
@@ -15,21 +19,48 @@ sub SetPropertyPath($$;$$);
 sub CaptureXMP($$$;$);
 
 my $debug = 0;
+my $numPadLines = 24;       # number of blank padding lines
+
+# when writing extended XMP, resources bigger than this get placed in their own
+# rdf:Description so they can be moved to the extended segements if necessary
+my $newDescThresh = 10000;  # 10 kB
+
+# individual resources and namespaces to place last inseparate rdf:Description's
+# so they can be moved to extended XMP segments if required (see Oct. 2008 XMP spec)
+my %extendedRes = (
+    'photoshop:History' => 1,
+    'xap:Thumbnails' => 1,
+    'xmp:Thumbnails' => 1,
+    'crs' => 1,
+    'crss' => 1,
+);
 
 # XMP structures (each structure is similar to a tag table so we can
 # recurse through them in SetPropertyPath() as if they were tag tables)
+# There are two special members of the structure:
+#   NAMESPACE - namespace prefix used for elements of this structure
+#   TYPE - [optional] resource rdf:type to be included in XMP
+# Note: User-defined structures defined in Image::ExifTool::UserDefined::xmpStruct
 my %xmpStruct = (
     ResourceRef => {
         NAMESPACE => 'stRef',
-        InstanceID      => { },
-        DocumentID      => { },
-        VersionID       => { },
-        RenditionClass  => { },
-        RenditionParams => { },
-        Manager         => { },
-        ManagerVariant  => { },
-        ManageTo        => { },
-        ManageUI        => { },
+        documentID      => { },
+        instanceID      => { },
+        manager         => { },
+        managerVariant  => { },
+        manageTo        => { },
+        manageUI        => { },
+        renditionClass  => { },
+        renditionParams => { },
+        versionID       => { },
+        # added Oct 2008
+        alternatePaths  => { List => 'Seq' },
+        filePath        => { },
+        fromPart        => { },
+        lastModifyDate  => { },
+        maskMarkers     => { },
+        partMapping     => { },
+        toPart          => { },
     },
     ResourceEvent => {
         NAMESPACE => 'stEvt',
@@ -38,19 +69,21 @@ my %xmpStruct = (
         parameters      => { },
         softwareAgent   => { },
         when            => { },
+        # added Oct 2008
+        changed         => { },
     },
     JobRef => {
         NAMESPACE => 'stJob',
-        name        => { },
         id          => { },
+        name        => { },
         url         => { },
     },
     Version => {
         NAMESPACE => 'stVer',
         comments    => { },
         event       => { Struct => 'ResourceEvent' },
-        modifyDate  => { },
         modifier    => { },
+        modifyDate  => { },
         version     => { },
     },
     Thumbnail => {
@@ -141,33 +174,43 @@ my %xmpStruct = (
     # Dynamic Media structures
     BeatSpliceStretch => {
         NAMESPACE => 'xmpDM',
-        useFileBeatsMarker  => { },
         riseInDecibel       => { },
-        riseInTimeDuration  => { },
+        riseInTimeDuration  => { Struct => 'Time' },
+        useFileBeatsMarker  => { },
+    },
+    CuePointParam => {
+        NAMESPACE => 'xmpDM',
+        key         => { },
+        value       => { },
     },
     Marker => {
         NAMESPACE => 'xmpDM',
-        startTime   => { },
-        duration    => { },
         comment     => { },
-        name        => { },
+        duration    => { },
         location    => { },
+        name        => { },
+        startTime   => { },
         target      => { },
         type        => { },
+        # added Oct 2008
+        cuePointParams => { Struct => 'CuePointParam', List => 'Seq' },
+        cuePointType=> { },
+        probability => { },
+        speaker     => { },
     },
     Media => {
         NAMESPACE => 'xmpDM',
-        path        => { },
-        track       => { },
-        startTime   => { },
-        duration    => { },
+        duration    => { Struct => 'Time' },
         managed     => { },
+        path        => { },
+        startTime   => { Struct => 'Time' },
+        track       => { },
         webStatement=> { },
     },
     ProjectLink => {
         NAMESPACE => 'xmpDM',
-        type        => { },
         path        => { },
+        type        => { },
     },
     ResampleStretch => {
         NAMESPACE => 'xmpDM',
@@ -175,30 +218,134 @@ my %xmpStruct = (
     },
     Time => {
         NAMESPACE => 'xmpDM',
-        value       => { },
         scale       => { },
+        value       => { },
     },
     Timecode => {
         NAMESPACE => 'xmpDM',
-        timeValue   => { },
         timeFormat  => { },
+        timeValue   => { },
+        value       => { },
     },
     TimeScaleStretch => {
         NAMESPACE => 'xmpDM',
-        quality     => { },
-        frameSize   => { },
         frameOverlappingPercentage => { },
+        frameSize   => { },
+        quality     => { },
+    },
+    Track => {
+        NAMESPACE => 'xmpDM',
+        frameRate => { },
+        markers   => { Struct => 'Marker', List => 'Seq' },
+        trackName => { },
+        trackType => { },
+    },
+    # PLUS License Data Format 1.2.0 structures
+    # (this seems crazy to me -- why did they define different ID/Name structures
+    #  for each element rather than just re-using the same structure?)
+    Licensee => {
+        NAMESPACE => 'plus',
+        TYPE => 'plus:LicenseeDetail',
+        LicenseeID  => { },
+        LicenseeName=> { },
+    },
+    EndUser => {
+        NAMESPACE => 'plus',
+        TYPE => 'plus:EndUserDetail',
+        EndUserID   => { },
+        EndUserName => { },
+    },
+    Licensor => {
+        NAMESPACE => 'plus',
+        TYPE => 'plus:LicensorDetail',
+        LicensorID              => { },
+        LicensorName            => { },
+        LicensorStreetAddress   => { },
+        LicensorExtendedAddress => { },
+        LicensorCity            => { },
+        LicensorRegion          => { },
+        LicensorPostalCode      => { },
+        LicensorCountry         => { },
+        LicensorTelephoneType1  => { },
+        LicensorTelephone1      => { },
+        LicensorTelephoneType2  => { },
+        LicensorTelephone2      => { },
+        LicensorEmail           => { },
+        LicensorURL             => { },
+    },
+    CopyrightOwner => {
+        NAMESPACE => 'plus',
+        TYPE => 'plus:CopyrightOwnerDetail',
+        CopyrightOwnerID    => { },
+        CopyrightOwnerName  => { },
+    },
+    ImageCreator => {
+        NAMESPACE => 'plus',
+        TYPE => 'plus:ImageCreatorDetail',
+        ImageCreatorID      => { },
+        ImageCreatorName    => { },
+    },
+    ImageSupplier => {
+        NAMESPACE => 'plus',
+        TYPE => 'plus:ImageSupplierDetail',
+        ImageSupplierID     => { },
+        ImageSupplierName   => { },
+    },
+    # new LR2 crs structures (PH)
+    Correction => {
+        NAMESPACE => 'crs',
+        What => { },
+        CorrectionMasks => {
+            Struct => 'CorrectionMask',
+            List => 'Seq',
+        },
+    },
+    CorrectionMask => {
+        NAMESPACE => 'crs',
+        What         => { },
+        MaskValue    => { },
+        Radius       => { },
+        Flow         => { },
+        CenterWeight => { },
+        Dabs         => { List => 'Seq' },
+        ZeroX        => { },
+        ZeroY        => { },
+        FullX        => { },
+        FullY        => { },
+    },
+    # IPTC Extension 1.0 structures
+    ArtworkOrObjectDetails => {
+        NAMESPACE => 'Iptc4xmpExt',
+        AOCopyrightNotice => { },
+        AOCreator    => { List => 'Seq' },
+        AODateCreated=> { },
+        AOSource     => { },
+        AOSourceInvNo=> { },
+        AOTitle      => { },
+    },
+    RegistryEntryDetails => {
+        NAMESPACE => 'Iptc4xmpExt',
+        RegItemId    => { },
+        RegOrgId     => { },
+    },
+    LocationDetails => {
+        NAMESPACE => 'Iptc4xmpExt',
+        City         => { },
+        CountryCode  => { },
+        CountryName  => { },
+        ProvinceState=> { },
+        Sublocation  => { },
+        WorldRegion  => { },
     },
 );
 
-my $x_toolkit = "x:xmptk='Image::ExifTool $Image::ExifTool::VERSION'";
 my $rdfDesc = 'rdf:Description';
 #
 # packet/xmp/rdf headers and trailers
 #
 my $pktOpen = "<?xpacket begin='\xef\xbb\xbf' id='W5M0MpCehiHzreSzNTczkc9d'?>\n";
 my $xmlOpen = "<?xml version='1.0' encoding='UTF-8'?>\n";
-my $xmpOpen = "<x:xmpmeta xmlns:x='$nsURI{x}' $x_toolkit>\n";
+my $xmpOpenPrefix = "<x:xmpmeta xmlns:x='$nsURI{x}'";
 my $rdfOpen = "<rdf:RDF xmlns:rdf='$nsURI{rdf}'>\n";
 my $rdfClose = "</rdf:RDF>\n";
 my $xmpClose = "</x:xmpmeta>\n";
@@ -209,14 +356,47 @@ my $pktCloseR =  "<?xpacket end='r'?>";
 # - generate all TagID's (required when writing)
 # - generate PropertyPath for structure elements
 # - add necessary inverse conversion routines
+# - process NAMESPACE entries and add new namespaces to our %nsURI lookup
 {
+    my ($mainTag, $ns, $tag);
+    # add user-defined structure namespaces
+    if (%Image::ExifTool::UserDefined::xmpStruct) {
+        foreach $tag (keys %Image::ExifTool::UserDefined::xmpStruct) {
+            my $struct = $Image::ExifTool::UserDefined::xmpStruct{$tag};
+            next unless ref $$struct{NAMESPACE};
+            # add new namespace
+            my $nsRef = $$struct{NAMESPACE};
+            # recognize as either a list or hash
+            if (ref $nsRef eq 'ARRAY') {
+                $ns = $$nsRef[0];
+                $nsURI{$ns} = $$nsRef[1];
+            } else { # must be a hash
+                ($ns) = keys %$nsRef;
+                $nsURI{$ns} = $$nsRef{$ns};
+            }
+            $$struct{NAMESPACE} = $ns;
+        }
+    }
+    # update XMP tag tables
     my $mainTable = GetTagTable('Image::ExifTool::XMP::Main');
     GenerateTagIDs($mainTable);
-    my ($mainTag, $ns, $tag);
     foreach $mainTag (keys %$mainTable) {
         my $mainInfo = $mainTable->{$mainTag};
         next unless ref $mainInfo eq 'HASH' and $mainInfo->{SubDirectory};
         my $table = GetTagTable($mainInfo->{SubDirectory}->{TagTable});
+        # add new namespace if NAMESPACE is ns/uri pair
+        if (ref $$table{NAMESPACE}) {
+            my $nsRef = $$table{NAMESPACE};
+            # recognize as either a list or hash
+            if (ref $nsRef eq 'ARRAY') {
+                $ns = $$nsRef[0];
+                $nsURI{$ns} = $$nsRef[1];
+            } else { # must be a hash
+                ($ns) = keys %$nsRef;
+                $nsURI{$ns} = $$nsRef{$ns};
+            }
+            $$table{NAMESPACE} = $ns;
+        }
         $$table{WRITE_PROC} = \&WriteXMP;   # set WRITE_PROC for all tables
         GenerateTagIDs($table);
         $table->{CHECK_PROC} = \&CheckXMP;  # add our write check routine
@@ -228,19 +408,27 @@ my $pktCloseR =  "<?xpacket end='r'?>";
             SetPropertyPath($table, $tag) if $$tagInfo{Struct};
             my $format = $$tagInfo{Writable};
         }
-        # add new namespace if NAMESPACE is ns/uri pair
-        next unless ref $$table{NAMESPACE};
-        my $nsRef = $$table{NAMESPACE};
-        # recognize as either a list or hash
-        if (ref $nsRef eq 'ARRAY') {
-            $ns = $$nsRef[0];
-            $nsURI{$ns} = $$nsRef[1];
-        } else { # must be a hash
-            ($ns) = keys %$nsRef;
-            $nsURI{$ns} = $$nsRef{$ns};
-        }
-        $$table{NAMESPACE} = $ns;
     }
+}
+
+#------------------------------------------------------------------------------
+# Get XMP opening tag (and set x:xmptk appropriately)
+# Inputs: 0) ExifTool object ref
+# Returns: x:xmpmeta opening tag
+sub XMPOpen($)
+{
+    my $exifTool = shift;
+    my $nv = $exifTool->{NEW_VALUE}->{$Image::ExifTool::XMP::x{xmptk}};
+    my $tk;
+    if (defined $nv) {
+        $tk = Image::ExifTool::GetNewValues($nv);
+        $exifTool->VPrint(1, $tk ? "    + XMP-x:XMPToolkit = '$tk'\n" : "    - XMP-x:XMPToolkit\n");
+        ++$exifTool->{CHANGED};
+    } else {
+        $tk = "Image::ExifTool $Image::ExifTool::VERSION";
+    }
+    my $str = $tk ? (" x:xmptk='" . EscapeXML($tk) . "'") : '';
+    return "$xmpOpenPrefix$str>\n";
 }
 
 #------------------------------------------------------------------------------
@@ -251,7 +439,7 @@ sub ValidateXMP($;$)
 {
     my ($xmpPt, $mode) = @_;
     unless ($$xmpPt =~ /^\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/) {
-        return '' unless $$xmpPt =~ /^<x(mp)?:xmpmeta/;
+        return '' unless $$xmpPt =~ /^<x(mp)?:x[ma]pmeta/;
         # add required xpacket header/trailer
         $$xmpPt = $pktOpen . $$xmpPt . $pktCloseW;
     }
@@ -261,6 +449,34 @@ sub ValidateXMP($;$)
     return '' unless $end =~ s/(e\0*n\0*d\0*=\0*['"]\0*)([rw])(\0*['"]\0*\?\0*>)/$1$mode$3/;
     substr($$xmpPt, -32, 32) = $end if $2 ne $mode;
     return 1;
+}
+
+#------------------------------------------------------------------------------
+# Check XMP date values for validity and format accordingly
+# Inputs: 1) date string
+# Returns: XMP date/time string (or undef on error)
+sub FormatXMPDate($)
+{
+    my $val = shift;
+    my ($y, $m, $d, $t, $tz);
+    if ($val =~ /(\d{4}):(\d{2}):(\d{2}) (\d{2}:\d{2}(?::\d{2}(?:\.\d*)?)?)(.*)/) {
+        ($y, $m, $d, $t, $tz) = ($1, $2, $3, $4, $5);
+        $val = "$y-$m-${d}T$t";
+    } elsif ($val =~ /^\s*\d{4}(:\d{2}){0,2}\s*$/) {
+        # this is just a date (YYYY, YYYY-MM or YYYY-MM-DD)
+        $val =~ tr/:/-/;
+    } elsif ($val =~ /^\s*(\d{2}:\d{2}(?::\d{2}(?:\.\d*)?)?)(.*)\s*$/) {
+        # this is just a time
+        ($t, $tz) = ($1, $2);
+        $val = $t;
+    } else {
+        return undef;
+    }
+    if ($tz) {
+        $tz =~ /^(Z|[+-]\d{2}:\d{2})$/ or return undef;
+        $val .= $tz;
+    }
+    return $val;
 }
 
 #------------------------------------------------------------------------------
@@ -296,24 +512,9 @@ sub CheckXMP($$$)
             return 'Not an integer';
         }
     } elsif ($format eq 'date') {
-        my ($y, $m, $d, $t, $tz);
-        if ($$valPtr =~ /(\d{4}):(\d{2}):(\d{2}) (\d{2}:\d{2}(?::\d{2}(?:\.\d*)?)?)(.*)/) {
-            ($y, $m, $d, $t, $tz) = ($1, $2, $3, $4, $5);
-            $$valPtr = "$y-$m-${d}T$t";
-        } elsif ($$valPtr =~ /^\s*\d{4}(:\d{2}){0,2}\s*$/) {
-            # this is just a date (YYYY, YYYY-MM or YYYY-MM-DD)
-            $$valPtr =~ tr/:/-/;
-        } elsif ($$valPtr =~ /^\s*(\d{2}:\d{2}(?::\d{2}(?:\.\d*)?)?)(.*)\s*$/) {
-            # this is just a time
-            ($t, $tz) = ($1, $2);
-            $$valPtr = $t;
-        } else {
-            return "Invalid date/time (use YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM|Z])";
-        }
-        if ($tz) {
-            $tz =~ /^(Z|[+-]\d{2}:\d{2})$/ or return "Invalid time zone (must be Z or +/-HH:MM)";
-            $$valPtr .= $tz;
-        }
+        my $newDate = FormatXMPDate($$valPtr);
+        return "Invalid date/time (use YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM|Z])" unless $newDate;
+        $$valPtr = $newDate;
     } elsif ($format eq 'lang-alt') {
         # nothing to do
     } elsif ($format eq 'boolean') {
@@ -347,7 +548,7 @@ sub GetPropertyPath($)
 #------------------------------------------------------------------------------
 # Set PropertyPath for specified tag (also for any structure elements)
 # Inputs: 0) tagTable reference, 1) tagID, 2) structure reference (or undef),
-#         3) property list up to this point (or undef), 4) true if tag is a list
+#         3) property list up to this point (or undef)
 sub SetPropertyPath($$;$$)
 {
     my ($tagTablePtr, $tagID, $structPtr, $propList) = @_;
@@ -365,18 +566,24 @@ sub SetPropertyPath($$;$$)
         $listType = 'Alt';
         # remove language code from property path if it exists
         $propList[-1] =~ s/-$$tagInfo{LangCode}$// if $$tagInfo{LangCode};
+        # handle lists of lang-alt lists (ie. XMP-plus:Custom tags)
+        if ($$tagInfo{List} and $$tagInfo{List} ne '1') {
+            push @propList, "rdf:$$tagInfo{List}", 'rdf:li 000';
+        }
     } else {
         $listType = $$tagInfo{List};
     }
     # add required properties if this is a list
     push @propList, "rdf:$listType", 'rdf:li 000' if $listType and $listType ne '1';
     # set PropertyPath for all elements of this structure if necessary
-    if ($$tagInfo{Struct}) {
-        my $struct = $xmpStruct{$$tagInfo{Struct}};
+    my $structName = $$tagInfo{Struct};
+    if ($structName) {
+        my $struct = $xmpStruct{$structName} || 
+                     $Image::ExifTool::UserDefined::xmpStruct{$structName};
         $struct or warn("No XMP $$tagInfo{Struct} structure!\n"), return;
         my $tag;
         foreach $tag (keys %$struct) {
-            next if $tag eq 'NAMESPACE';
+            next if $tag eq 'NAMESPACE' or $tag eq 'TYPE';
             SetPropertyPath($tagTablePtr, $tag, $struct, \@propList);
         }
     }
@@ -385,6 +592,8 @@ sub SetPropertyPath($$;$$)
         my $tagName = GetXMPTagID(\@propList);
         $$tagTablePtr{$tagName} or warn("Tag $tagName not found!\n"), return;
         $tagInfo = $$tagTablePtr{$tagName};
+        # save structure TYPE in tagInfo if necessary
+        $$tagInfo{StructType} = $$structPtr{TYPE} if $$structPtr{TYPE};
         # must check again for List's at this level
         if ($$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt') {
             $listType = 'Alt';
@@ -406,7 +615,7 @@ sub CaptureXMP($$$;$)
 {
     my ($exifTool, $propList, $val, $attrs) = @_;
     return unless defined $val and @$propList > 2;
-    if ($$propList[0] =~ /^x:x(a|m)pmeta$/ and
+    if ($$propList[0] =~ /^x:x[ma]pmeta$/ and
         $$propList[1] eq 'rdf:RDF' and
         $$propList[2] =~ /$rdfDesc( |$)/)
     {
@@ -420,6 +629,14 @@ sub CaptureXMP($$$;$)
         } else {
             $$capture{$path} = [$val, $attrs || { }];
         }
+    } elsif ($$propList[0] eq 'rdf:RDF' and
+             $$propList[1] =~ /$rdfDesc( |$)/)
+    {
+        # set flag so we don't write x:xmpmeta element
+        $exifTool->{XMP_NO_XMPMETA} = 1;
+        # add missing x:xmpmeta element and try again
+        unshift @$propList, 'x:xmpmeta';    
+        CaptureXMP($exifTool, $propList, $val, $attrs);
     } else {
         $exifTool->{XMP_ERROR} = 'Improperly enclosed XMP property: ' . join('/',@$propList);
     }
@@ -540,10 +757,96 @@ sub ConformPathToNamespace($$)
 }
 
 #------------------------------------------------------------------------------
+# Utility routine to encode data in base64
+# Inputs: 0) binary data string
+# Returns:   base64-encoded string
+sub EncodeBase64($)
+{
+    # encode the data in 45-byte chunks
+    my $chunkSize = 45;
+    my $len = length $_[0];
+    my $str = '';
+    my $i;
+    for ($i=0; $i<$len; $i+=$chunkSize) {
+        my $n = $len - $i;
+        $n = $chunkSize if $n > $chunkSize;
+        # add uuencoded data to output (minus size byte, but including trailing newline)
+        $str .= substr(pack('u', substr($_[0], $i, $n)), 1);
+    }
+    # convert to base64 (remember that "\0" may be encoded as ' ' or '`')
+    $str =~ tr/` -_/AA-Za-z0-9+\//;
+    # convert pad characters at the end (remember to account for trailing newline)
+    my $pad = 3 - ($len % 3);
+    substr($str, -$pad-1, $pad) = ('=' x $pad) if $pad < 3;
+    return $str;
+}
+
+#------------------------------------------------------------------------------
 # sort tagInfo hash references by tag name
 sub ByTagName
 {
     return $$a{Name} cmp $$b{Name};
+}
+
+#------------------------------------------------------------------------------
+# sort alphabetically, but with rdf:type first in the structure
+sub TypeFirst
+{
+    if ($a =~ /rdf:type$/) {
+        return substr($a, 0, -8) cmp $b unless $b =~ /rdf:type$/;
+    } elsif ($b =~ /rdf:type$/) {
+        return $a cmp substr($b, 0, -8);
+    }
+    return $a cmp $b;
+}
+
+#------------------------------------------------------------------------------
+# Limit size of XMP
+# Inputs: 0) ExifTool object ref, 1) XMP data ref (written up to start of $rdfClose),
+#         2) max XMP len, 3) rdf:about string, 4) list ref for description start offsets
+#         5) start offset of first description recommended for extended XMP
+# Returns: 0) extended XMP ref, 1) GUID and updates $$dataPt (or undef if no extended XMP)
+sub LimitXMPSize($$$$$$)
+{
+    my ($exifTool, $dataPt, $maxLen, $about, $startPt, $extStart) = @_;
+
+    # return straight away if it isn't too big
+    return undef if length($$dataPt) < $maxLen;
+
+    push @$startPt, length($$dataPt);  # add end offset to list
+    my $newData = substr($$dataPt, 0, $$startPt[0]);
+    my $guid = '0' x 32;
+    # write the required xmpNote:HasExtendedXMP property
+    $newData .= "\n <$rdfDesc rdf:about='$about'\n  xmlns:xmpNote='$nsURI{xmpNote}'>\n" .
+                  "  <xmpNote:HasExtendedXMP>$guid</xmpNote:HasExtendedXMP>\n" .
+                  " </$rdfDesc>\n";
+
+    my ($i, %descSize, $start);
+    # calculate all description block sizes
+    for ($i=1; $i<@$startPt; ++$i) {
+        $descSize{$$startPt[$i-1]} = $$startPt[$i] - $$startPt[$i-1];
+    }
+    pop @$startPt;    # remove end offset
+    # write the descriptions from smallest to largest, as many in main XMP as possible
+    my @descStart = sort { $descSize{$a} <=> $descSize{$b} } @$startPt;
+    my $extData = XMPOpen($exifTool) . $rdfOpen;
+    for ($i=0; $i<2; ++$i) {
+      foreach $start (@descStart) {
+        # write main XMP first (in order of size), then extended XMP afterwards (in order)
+        next if $i xor $start >= $extStart;
+        my $pt = (length($newData) + $descSize{$start} > $maxLen) ? \$extData : \$newData;
+        $$pt .= substr($$dataPt, $start, $descSize{$start});
+      }
+    }
+    $extData .= $rdfClose . $xmpClose;  # close rdf:RDF and x:xmpmeta
+    # calculate GUID from MD5 of extended XMP data
+    if (eval 'require Digest::MD5') {
+        $guid = uc unpack('H*', Digest::MD5::md5($extData));
+        $newData =~ s/0{32}/$guid/;     # update GUID in main XMP segment
+    }
+    $exifTool->VPrint(1, "    + XMP-xmpNote:HasExtendedXMP = '$guid'\n");
+    $$dataPt = $newData;        # return main XMP block
+    return (\$extData, $guid);  # return extended XMP and its GUID
 }
 
 #------------------------------------------------------------------------------
@@ -554,13 +857,15 @@ sub ByTagName
 #          without tag table: 1 on success, 0 if not valid XMP file, -1 on write error
 # Notes: May set dirInfo InPlace flag to rewrite with specified DirLen
 #        May set dirInfo ReadOnly flag to write as read-only XMP ('r' mode and no padding)
+#        May set dirInfo MaxDataLen to limit output data length -- this causes ExtendedXMP
+#          and ExtendedGUID to be returned in dirInfo if extended XMP was required
 sub WriteXMP($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart} || 0;
-    my (%capture, %nsUsed, $xmpErr, $uuid);
+    my (%capture, %nsUsed, $xmpErr, $tagInfo, $about);
     my $changed = 0;
     my $xmpFile = (not $tagTablePtr);   # this is an XMP data file if no $tagTablePtr
     # write XMP as preferred if this is an XMP file or a GIF file
@@ -577,10 +882,14 @@ sub WriteXMP($$;$)
     # following entries: 0) value, 1) attribute hash reference.
     $exifTool->{XMP_CAPTURE} = \%capture;
     $exifTool->{XMP_NS} = \%nsUsed;
+    delete $exifTool->{XMP_NO_XMPMETA};
+    delete $exifTool->{XMP_NO_XPACKET};
+    delete $exifTool->{XMP_IS_XML};
+    delete $exifTool->{XMP_IS_SVG};
 
     if ($xmpFile or ($dataPt and length $$dataPt)) {
         delete $exifTool->{XMP_ERROR};
-        delete $exifTool->{XMP_UUID};
+        delete $exifTool->{XMP_ABOUT};
         # extract all existing XMP information (to the XMP_CAPTURE hash)
         my $success = ProcessXMP($exifTool, $dirInfo, $tagTablePtr);
         # don't continue if there is nothing to parse or if we had a parsing error
@@ -605,17 +914,29 @@ sub WriteXMP($$;$)
                 }
             }
         }
-        $uuid = $exifTool->{XMP_UUID} || '';
+        $tagInfo = $Image::ExifTool::XMP::rdf{about};
+        if (defined $exifTool->{NEW_VALUE}->{$tagInfo}) {
+            $about = Image::ExifTool::GetNewValues($exifTool->{NEW_VALUE}->{$tagInfo}) || '';
+            if ($verbose > 1) {
+                my $wasAbout = $exifTool->{XMP_ABOUT};
+                $exifTool->VPrint(1, "    - XMP-rdf:About = '", UnescapeXML($wasAbout), "'\n") if defined $wasAbout;
+                $exifTool->VPrint(1, "    + XMP-rdf:About = '$about'\n");
+            }
+            $about = EscapeXML($about); # must escape for XML
+            ++$changed;
+        } else {
+            $about = $exifTool->{XMP_ABOUT} || '';
+        }
         delete $exifTool->{XMP_ERROR};
-        delete $exifTool->{XMP_UUID};
+        delete $exifTool->{XMP_ABOUT};
     } else {
-        $uuid = '';
+        $about = '';
     }
 #
 # handle writing XMP as a block to XMP file
 #
     if ($xmpFile) {
-        my $tagInfo = $Image::ExifTool::Extra{XMP};
+        $tagInfo = $Image::ExifTool::Extra{XMP};
         if ($tagInfo and $exifTool->{NEW_VALUE}->{$tagInfo}) {
             my $rtnVal = 1;
             my $newVal = Image::ExifTool::GetNewValues($exifTool->{NEW_VALUE}->{$tagInfo});
@@ -633,39 +954,70 @@ sub WriteXMP($$;$)
 #
 # delete groups in family 1 if requested
 #
-    if (grep /^XMP-.+$/, keys %{$exifTool->{DEL_GROUP}}) {
+    if (%{$exifTool->{DEL_GROUP}} and (grep /^XMP-.+$/, keys %{$exifTool->{DEL_GROUP}} or
+        # (logic is a bit more complex for group names in exiftool XML files)
+        grep m{^http://ns.exiftool.ca/}, values %nsUsed))
+    {
         my $del = $exifTool->{DEL_GROUP};
         my $path;
         foreach $path (keys %capture) {
             my @propList = split('/',$path); # get property list
-            my ($tag, $namespace) = GetXMPTagID(\@propList);
+            my ($tag, $ns) = GetXMPTagID(\@propList);
             # translate namespace if necessary
-            $namespace = $$xlatNamespace{$namespace} if $$xlatNamespace{$namespace};
-            my $grp = "XMP-$namespace";
-            my $ucg = uc $grp;
-            if ($$del{$ucg} or ($$del{'XMP-*'} and not $$del{"-$ucg"})) {
-                if ($verbose > 1) {
-                    my $val = $capture{$path}->[0];
-                    $exifTool->VPrint(1, "    - $grp:$tag = '$val'\n");
+            $ns = $$xlatNamespace{$ns} if $$xlatNamespace{$ns};
+            my ($grp, @g);
+            # no "XMP-" added to most groups in exiftool RDF/XML output file
+            if ($nsUsed{$ns} and (@g = ($nsUsed{$ns} =~ m{^http://ns.exiftool.ca/(.*?)/(.*?)/}))) {
+                if ($g[1] =~ /^\d/) {
+                    $grp = "XML-$g[0]";
+                    #(all XML-* groups stored as uppercase DEL_GROUP key)
+                    my $ucg = uc $grp;
+                    next unless $$del{$ucg} or ($$del{'XML-*'} and not $$del{"-$ucg"});
+                } else {
+                    $grp = $g[1];
+                    next unless $$del{$grp} or ($$del{$g[0]} and not $$del{"-$grp"});
                 }
-                delete $capture{$path};
-                ++$changed;
+            } else {
+                $grp = "XMP-$ns";
+                my $ucg = uc $grp;
+                next unless $$del{$ucg} or ($$del{'XMP-*'} and not $$del{"-$ucg"});
             }
+            if ($verbose > 1) {
+                my $val = $capture{$path}->[0];
+                $exifTool->VPrint(1, "    - $grp:$tag = '$val'\n");
+            }
+            delete $capture{$path};
+            ++$changed;
         }
     }
+    # delete HasExtendedXMP tag (we create it as needed)
+    my $hasExtTag = 'xmpNote:HasExtendedXMP';
+    if ($capture{$hasExtTag}) {
+        if ($verbose > 1) {
+            my $val = $capture{$hasExtTag}->[0];
+            $exifTool->VPrint(1, "    - XMP-$hasExtTag = '$val'\n");
+        }
+        delete $capture{$hasExtTag};
+    }
+    # set $xmpOpen now to to handle xmptk tag first
+    my $xmpOpen = $exifTool->{XMP_NO_XMPMETA} ? '' : XMPOpen($exifTool);
 #
 # add, delete or change information as specified
 #
     # get hash of all information we want to change
     # (sorted by tag name so alternate languages come last)
     my @tagInfoList = sort ByTagName $exifTool->GetNewTagInfoList();
-    my $tagInfo;
     foreach $tagInfo (@tagInfoList) {
         next unless $exifTool->GetGroup($tagInfo, 0) eq 'XMP';
         my $tag = $tagInfo->{TagID};
         my $path = GetPropertyPath($tagInfo);
         unless ($path) {
             $exifTool->Warn("Can't write XMP:$tag (namespace unknown)");
+            next;
+        }
+        # skip tags that were handled specially
+        if ($path eq 'rdf:about' or $path eq 'x:xmptk') {
+            ++$changed;
             next;
         }
         # change our property path namespace prefixes to conform
@@ -731,8 +1083,15 @@ sub WriteXMP($$;$)
                         %attrs = %$attrs;
                         $delPath = $path;
                     }
+                    # delete this tag
                     delete $capture{$path};
                     ++$changed;
+                    # delete rdf:type tag if it is the only thing left in this structure
+                    if ($path =~ /^(.*)\// and $capture{"$1/rdf:type"}) {
+                        my $pp = $1;
+                        my @a = grep /^\Q$pp\E\/[^\/]+/, keys %capture;
+                        delete $capture{"$pp/rdf:type"} if @a == 1;
+                    }
                 }
                 next unless $delPath or $$tagInfo{List} or $oldLang;
                 if ($delPath) {
@@ -742,10 +1101,11 @@ sub WriteXMP($$;$)
                     # don't change tag if we couldn't delete old copy
                     # unless this is a list or an lang-alt tag
                     next unless $$tagInfo{List} or $oldLang;
-                    $path =~ m/ (\d{3})/g or warn "Internal error: no list index!\n", next;
+                    # (match last index to put in same lang-alt list for Bag of lang-alt items)
+                    $path =~ m/.* (\d{3})/g or warn "Internal error: no list index!\n", next;
                     $added = $1;
                 }
-            } elsif ($path =~ m/ (\d{3})/g) {
+            } elsif ($path =~ m/.* (\d{3})/g) {  # (match last index)
                 $added = $1;
             }
             if (defined $added) {
@@ -785,20 +1145,29 @@ sub WriteXMP($$;$)
                     my $grp = $exifTool->GetGroup($tagInfo, 1);
                     $exifTool->VPrint(1, "    + $grp:$tagName = '$newValue'\n");
                 }
-                $path =~ s/ 000/ 001/ or warn "Internal error: no list index!\n", next;
+                $path =~ s/(.*) 000/$1 001/ or warn "Internal error: no list index!\n", next;
             }
         }
         
         # add new value(s) to %capture hash
         for (;;) {
             my $newValue = EscapeXML(shift @newValues);
-            $capture{$path} = [ $newValue, \%attrs ];
+            if ($$tagInfo{Resource}) {
+                $capture{$path} = [ '', { %attrs, 'rdf:resource' => $newValue } ]; 
+            } else {
+                $capture{$path} = [ $newValue, \%attrs ];
+            }
             if ($verbose > 1) {
                 my $grp = $exifTool->GetGroup($tagInfo, 1);
                 $exifTool->VPrint(1, "    + $grp:$$tagInfo{Name} = '$newValue'\n");
             }
             ++$changed;
+            # add rdf:type if necessary
+            if ($$tagInfo{StructType} and $path =~ /^(.*)\// and not $capture{"$1/rdf:type"}) {
+                $capture{"$1/rdf:type"} = [ '', { 'rdf:resource' => $$tagInfo{StructType} } ];
+            }
             last unless @newValues;
+            # (match first index to put in different lang-alt list for Bag of lang-alt items)
             $path =~ m/ (\d{3})/g or warn("Internal error: no list index!\n"), next;
             my $listIndex = $1;
             my $pos = pos($path) - 3;
@@ -814,7 +1183,8 @@ sub WriteXMP($$;$)
     delete $exifTool->{XMP_NS};
 
     # return now if we didn't change anything
-    unless ($changed) {
+    my $maxDataLen = $$dirInfo{MaxDataLen};
+    unless ($changed or ($maxDataLen and length($$dirInfo{DataPt}) > $maxDataLen)) {
         return undef unless $xmpFile;   # just rewrite original XMP
         # get DataPt again because it may have been set by ProcessXMP
         $dataPt = $$dirInfo{DataPt};
@@ -840,17 +1210,52 @@ sub WriteXMP($$;$)
     $newData .= $xmpOpen . $rdfOpen;
 
     # initialize current property path list
-    my @curPropList;
-    my (%nsCur, $prop, $n);
-    my @pathList = sort keys %capture;
+    my (@curPropList, @writeLast, @descStart, $extStart);
+    my (%nsCur, $prop, $n, $lastDesc, $path);
+    my @pathList = sort TypeFirst keys %capture;
 
-    while (@pathList) {
-        my $path = shift @pathList;
+    # order properties to write large values last if we have a MaxDataLen limit
+    if ($maxDataLen and @pathList) {
+        my @pathTmp;
+        my ($lastProp, $lastNS, $propSize) = ('', '', 0);
+        my @pathLoop = (@pathList, ''); # add empty path to end of list for loop
+        undef @pathList;
+        foreach $path (@pathLoop) {
+            $path =~ /^((\w*)[^\/]*)/;  # get path element ($1) and ns ($2)
+            if ($1 eq $lastProp) {
+                push @pathTmp, $path;   # accumulate all paths with same root
+            } else {
+                # put in list to write last if recommended or values are too large
+                if ($extendedRes{$lastProp} or $extendedRes{$lastNS} or
+                    $propSize > $newDescThresh)
+                {
+                    push @writeLast, @pathTmp;
+                } else {
+                    push @pathList, @pathTmp;
+                }
+                last unless $path;      # all done if we hit empty path
+                @pathTmp = ( $path );
+                ($lastProp, $lastNS, $propSize) = ($1, $2, 0);
+            }
+            $propSize += length $capture{$path}->[0];
+        }
+    }
+
+    # write out all properties
+    for (;;) {
+        my (%nsNew, $newDesc);
+        unless (@pathList) {
+            last unless @writeLast;
+            @pathList = @writeLast;
+            undef @writeLast;
+            $extStart = length $newData;
+            $newDesc = 1;   # start with a new description
+        }
+        $path = shift @pathList;
         my @propList = split('/',$path); # get property list
         # must open/close rdf:Description too
         unshift @propList, $rdfDesc;
         # make sure we have defined all necessary namespaces
-        my (%nsNew, $newDesc);
         foreach $prop (@propList) {
             $prop =~ /(.*):/ or next;
             $1 eq 'rdf' and next;   # rdf namespace already defined
@@ -897,11 +1302,19 @@ sub WriteXMP($$;$)
             $newData .= (' ' x scalar(@curPropList)) . " </$prop>\n";
         }
         if ($newDesc) {
+            # save rdf:Description start positions so we can reorder them if necessary
+            push @descStart, length($newData) if $maxDataLen;
             # open the new description
             $prop = $rdfDesc;
             %nsCur = %nsNew;            # save current namespaces
-            $newData .= "\n <$prop rdf:about='$uuid'";
-            foreach (sort keys %nsCur) {
+            $newData .= "\n <$prop rdf:about='$about'";
+            my @ns = sort keys %nsCur;
+            # generate et:toolkit attribute if this is an exiftool RDF/XML output file
+            if (@ns and $nsCur{$ns[0]} =~ m{^http://ns.exiftool.ca/}) {
+                $newData .= "\n  xmlns:et='http://ns.exiftool.ca/1.0/'" .
+                            " et:toolkit='Image::ExifTool $Image::ExifTool::VERSION'";
+            }
+            foreach (@ns) {
                 $newData .= "\n  xmlns:$_='$nsCur{$_}'";
             }
             $newData .= ">\n";
@@ -919,7 +1332,9 @@ sub WriteXMP($$;$)
             # remove list index if it exists
             $prop =~ s/ .*//;
             $attr = '';
-            if ($prop ne $rdfDesc and $propList[$n+1] !~ /^rdf:/) {
+            if ($prop ne $rdfDesc and ($propList[$n+1] !~ /^rdf:/ or
+                ($propList[$n+1] eq 'rdf:type' and $n+1 == $#propList)))
+            {
                 # need parseType='Resource' to avoid new 'rdf:Description'
                 $attr = " rdf:parseType='Resource'";
             }
@@ -934,21 +1349,36 @@ sub WriteXMP($$;$)
             my $quot = ($attrVal =~ /'/) ? '"' : "'";
             $newData .= " $attr=$quot$attrVal$quot";
         }
-        $newData .= ">$val</$prop2>\n";
+        $newData .= length $val ? ">$val</$prop2>\n" : "/>\n";
     }
     # close off any open elements
     while ($prop = pop @curPropList) {
         $prop =~ s/ .*//;   # remove list index if it exists
         $newData .= (' ' x scalar(@curPropList)) . " </$prop>\n";
     }
+    # limit XMP length and re-arrange if necessary to fit inside specified size
+    my $compact = $exifTool->Options('Compact');
+    if ($maxDataLen) {
+        # adjust maxDataLen to allow room for closing elements
+        $maxDataLen -= length($rdfClose) + length($xmpClose) + length($pktCloseW);
+        $extStart or $extStart = length $newData;
+        my @rtn = LimitXMPSize($exifTool, \$newData, $maxDataLen, $about, \@descStart, $extStart);
+        # return extended XMP information in $dirInfo
+        $$dirInfo{ExtendedXMP} = $rtn[0];
+        $$dirInfo{ExtendedGUID} = $rtn[1];
+        # compact if necessary to fit
+        $compact = 1 if length($newData) + 101 * $numPadLines > $maxDataLen;
+    }
 #
-# clean up, close out the XMP, and return our data
+# close out the XMP, clean up, and return our data
 #
+    $newData .= $rdfClose;
+    $newData .= $xmpClose unless $exifTool->{XMP_NO_XMPMETA};
+
     # remove the ExifTool members we created
     delete $exifTool->{XMP_CAPTURE};
     delete $exifTool->{XMP_NS};
-
-    $newData .= $rdfClose . $xmpClose;
+    delete $exifTool->{XMP_NO_XMPMETA};
 
     # (the XMP standard recommends writing 2k-4k of white space before the
     # packet trailer, with a newline every 100 characters)
@@ -968,10 +1398,8 @@ sub WriteXMP($$;$)
                 $len += length($pad) * $num;
             }
             $len < $dirLen and $newData .= (' ' x ($dirLen - $len - 1)) . "\n";
-        } elsif (not $exifTool->Options('Compact') and
-                 not $xmpFile and not $$dirInfo{ReadOnly})
-        {
-            $newData .= $pad x 24;
+        } elsif (not $compact and not $xmpFile and not $$dirInfo{ReadOnly}) {
+            $newData .= $pad x $numPadLines;
         }
         $newData .= ($$dirInfo{ReadOnly} ? $pktCloseR : $pktCloseW);
     }

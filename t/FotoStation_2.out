@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.94
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.45
 [File, File, Image]  - File Name: FotoStation.jpg
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2006:10:28 14:44:59
+[File, File, Image]  - File Size: 4.2 kB
+[File, File, Time]  - File Modification Date/Time: 2006:10:28 14:44:59-04:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image] ImageWidth - Image Width: 8
@@ -11,6 +11,7 @@
 [File, File, Image] BitsPerSample - Bits Per Sample: 8
 [File, File, Image] ColorComponents - Color Components: 3
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
+[File, File, Image]  - Current IPTC Digest: bc597612485b6c41e4354707cda07da6
 [FotoStation, FotoStation, Image] 0 - Original Image Width: 1536
 [FotoStation, FotoStation, Image] 1 - Original Image Height: 1024
 [FotoStation, FotoStation, Image] 2 - Color Planes: 3

@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.19';
+$VERSION = '1.23';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -833,21 +833,27 @@ sub IsUTF8($)
 #         4) valid data length relative to offset
 # Returns: converted value, or undefined if data isn't there
 #          or list of values in list context
+# Notes: all string formats are converted to UTF8
 sub ReadMIEValue($$$$$)
 {
     my ($dataPt, $offset, $format, $count, $size) = @_;
     my $val;
-    if ($format =~ /^utf(8|16|32)/) {
-        if ($1 == 8) {
-            # return UTF8 string
+    if ($format =~ /^(utf(8|16|32)|string)/) {
+        if ($1 eq 'utf8' or $1 eq 'string') {
+            # read the 8-bit string
             $val = substr($$dataPt, $offset, $size);
+            # convert ISO 8859-1 string to UTF-8 if necessary
+            if ($1 eq 'string' and $val =~ /[\x80-\xff]/) {
+                $val = Image::ExifTool::Latin2Unicode($val,'n');
+                $val = Image::ExifTool::Unicode2UTF8($val,'n');
+            }
         } else {
             # convert to UTF8
             my $fmt;
             if (GetByteOrder() eq 'MM') {
-                $fmt = ($1 == 16) ? 'n' : 'N';
+                $fmt = ($1 eq 'utf16') ? 'n' : 'N';
             } else {
-                $fmt = ($1 == 16) ? 'v' : 'V';
+                $fmt = ($1 eq 'utf16') ? 'v' : 'V';
             }
             my @unpk = unpack("x$offset$fmt$size",$$dataPt);
             if ($] >= 5.006001) {
@@ -857,13 +863,13 @@ sub ReadMIEValue($$$$$)
             }
         }
         # truncate at null unless this is a list
+        # (strings shouldn't have a null, but just in case)
         $val =~ s/\0.*//s unless $format =~ /_list$/;
-        return $val;
     } else {
-        # don't modify string lists
-        $format = 'undef' if $format eq 'string_list' or $format eq 'free';
+        $format = 'undef' if $format eq 'free'; # read 'free' as 'undef'
         return ReadValue($dataPt, $offset, $format, $count, $size);
     }
+    return $val;
 }
 
 #------------------------------------------------------------------------------
@@ -889,6 +895,13 @@ sub CheckMIE($$$)
     } elsif ($format !~ /^(utf|string|undef)/ and $$valPtr =~ /\)$/) {
         return 'Units not supported';
     } else {
+        if ($format eq 'string' and $exifTool->{OPTIONS}->{Charset} eq 'Latin' and
+            $$valPtr =~ /[\x80-\xff]/)
+        {
+            # convert from Latin to UTF-8
+            my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
+            $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
+        }
         $err = Image::ExifTool::CheckValue($valPtr, $format, $$tagInfo{Count});
     }
     return $err;
@@ -1418,6 +1431,7 @@ sub ProcessMIEGroup($$$)
     my $raf = $$dirInfo{RAF};
     my $verbose = $exifTool->Options('Verbose');
     my $out = $exifTool->Options('TextOut');
+    my $notUTF8 = ($exifTool->{OPTIONS}->{Charset} ne 'UTF8');
     my ($msg, $buff, $ok, $oldIndent, $mime);
     my $lastTag = '';
 
@@ -1596,15 +1610,25 @@ sub ProcessMIEGroup($$$)
                     );
                     my $processProc = $tagInfo->{SubDirectory}->{ProcessProc};
                     delete $exifTool->{SET_GROUP1};
+                    delete $exifTool->{NO_LIST};
                     $exifTool->ProcessDirectory(\%subdirInfo, $subTablePtr, $processProc);
                     $exifTool->{SET_GROUP1} = $grp1;
-                } elsif ($formatStr =~ /_list$/) {
-                    # split list value into separate strings
-                    my @vals = split "\0", $val;
-                    $exifTool->FoundTag($tagInfo, \@vals);
+                    $exifTool->{NO_LIST} = 1;
                 } else {
-                    # add units to value if specified
-                    $val .= "($units)" if defined $units;
+                    # convert to specified character set if necessary
+                    if ($notUTF8 and $formatStr =~ /^(utf|string)/ and $val =~ /[\x80-\xff]/) {
+                        $val = $exifTool->UTF82Charset($val);
+                    }
+                    if ($formatStr =~ /_list$/) {
+                        # split list value into separate strings
+                        my @vals = split "\0", $val;
+                        $val = \@vals;
+                    }
+                    if (defined $units) {
+                        $val = "@$val" if ref $val; # convert string list to number list
+                        # add units to value if specified
+                        $val .= "($units)" if defined $units;
+                    }
                     $exifTool->FoundTag($tagInfo, $val);
                 }
             } else {
@@ -1647,7 +1671,7 @@ sub ProcessMIE($$)
             last unless $buff =~ /~\0\0\x06.{4}(\x10|\x18)(\x04)$/s or
                         $buff =~ /(\x10|\x18)(\x08)$/s;
             SetByteOrder($1 eq "\x10" ? 'MM' : 'II');
-            my $len = ($2 eq "\x04") ? Get32u(\$buff, 4) : Get64u(\$buff);
+            my $len = ($2 eq "\x04") ? Get32u(\$buff, 4) : Get64u(\$buff, 0);
             my $curPos = $raf->Tell() or last;
             last if $len < 12 or $len > $curPos;
             # validate element header if 8-byte offset was used
@@ -1707,7 +1731,8 @@ sub ProcessMIE($$)
             return 0 if $num or not $outfile;
             # we have the ability to create a MIE file from scratch
             $buff = ''; # start from nothing
-            SetByteOrder('MM'); # write big-endian
+            # set byte order according to preferences
+            $exifTool->SetPreferredByteOrder();
             $isCreating = 1;
         }
         if ($msg) {

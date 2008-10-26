@@ -8,7 +8,7 @@
 BEGIN { $| = 1; print "1..2\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
-# test 1: Load ExifTool
+# test 1: Load the module(s)
 use Image::ExifTool 'ImageInfo';
 use Image::ExifTool::AIFF;
 $loaded = 1;

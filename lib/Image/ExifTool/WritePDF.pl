@@ -35,7 +35,10 @@ sub CheckPDF($$$)
     if (not $format) {
         return 'No writable format';
     } elsif ($format eq 'string') {
-        # no constraints
+        # convert to Unicode if necessary
+        if ($$valPtr =~ /[\x80-\xff]/) {
+            $$valPtr = "\xfe\xff" . $exifTool->Charset2Unicode($$valPtr, 'MM');
+        }
     } elsif ($format eq 'date') {
         # be flexible about this for now
         return 'Bad date format' unless $$valPtr =~ /^\d{4}/;
@@ -225,6 +228,12 @@ sub WritePDF($$)
     my ($buff, $len, %capture, %newXRef, %newObj, $objRef);
     my ($out, $id, $gen, $obj);
 
+    # make sure this is a PDF file
+    my $pos = $raf->Tell();
+    $raf->Read($buff, 10) >= 8 or return 0;
+    $buff =~ /^%PDF-(\d+\.\d+)/ or return 0;
+    $raf->Seek($pos, 0);
+
     # create a new ExifTool object and use it to read PDF and XMP information
     my $newTool = new Image::ExifTool;
     $newTool->Options(List => 1);
@@ -256,10 +265,12 @@ sub WritePDF($$)
     }
 
     # copy file up to start of previous exiftool update or end of file
+    # (comment, startxref & EOF with 11-digit offsets and 2-byte newlines is 63 bytes)
     $raf->Seek(-64,2) and $raf->Read($buff,64) and $raf->Seek(0,0) or return -1;
     my $rtn = 1;
     my $prevUpdate;
-    if ($buff =~ /$endComment(\d+)\s+$/s) {
+    # (now $endComment is before "startxref", but pre-7.41 we wrote it after the EOF)
+    if ($buff =~ /$endComment(\d+)\s+(startxref\s+\d+\s+%%EOF\s+)?$/s) {
         $prevUpdate = $1;
         # rewrite the file up to the original EOF
         my $size = $prevUpdate;
@@ -405,7 +416,7 @@ sub WritePDF($$)
             }
             $val = @vals ? \@vals : undef;
         } else {
-            $val = WritePDFValue(join(', ', @vals), $writable);
+            $val = WritePDFValue(join($exifTool->Options('ListSep'), @vals), $writable);
         }
         if (defined $val) {
             $$infoDict{$tagID} = $val;
@@ -638,11 +649,11 @@ sub WritePDF($$)
             Write($outfile, 'trailer') or $rtn = -1;
             WriteObject($outfile, $mainDict) or $rtn = -1;
         }
-        # write pointer to main xref table and EOF marker
-        Write($outfile, $/, 'startxref', $/, $startxref, $/, '%%EOF', $/) or $rtn = -1;
+        # write trailing comment (marker to allow edits to be reverted)
+        Write($outfile, $/, $endComment, $oldEOF, $/) or $rtn = -1;
 
-        # write trailing comment to allow our edit to be easily reverted
-        Write($outfile, $endComment, $oldEOF, $/) or $rtn = -1;
+        # write pointer to main xref table and EOF marker
+        Write($outfile, 'startxref', $/, $startxref, $/, '%%EOF', $/) or $rtn = -1;
 
     } elsif ($prevUpdate) {
 

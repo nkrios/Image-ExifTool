@@ -21,6 +21,8 @@ html/TagNames/Casio.html
 html/TagNames/Composite.html
 html/TagNames/DICOM.html
 html/TagNames/DNG.html
+html/TagNames/DjVu.html
+html/TagNames/EXE.html
 html/TagNames/EXIF.html
 html/TagNames/Extra.html
 html/TagNames/FLAC.html
@@ -64,6 +66,7 @@ html/TagNames/PostScript.html
 html/TagNames/PrintIM.html
 html/TagNames/QuickTime.html
 html/TagNames/RIFF.html
+html/TagNames/Rawzor.html
 html/TagNames/Real.html
 html/TagNames/Ricoh.html
 html/TagNames/Sanyo.html
@@ -74,6 +77,7 @@ html/TagNames/Sony.html
 html/TagNames/Unknown.html
 html/TagNames/Vorbis.html
 html/TagNames/XMP.html
+html/TagNames/ZIP.html
 html/TagNames/index.html
 html/TagNames/style.css
 html/canon_raw.html
@@ -103,6 +107,7 @@ lib/Image/ExifTool/APE.pm
 lib/Image/ExifTool/APP12.pm
 lib/Image/ExifTool/ASF.pm
 lib/Image/ExifTool/BMP.pm
+lib/Image/ExifTool/BZZ.pm
 lib/Image/ExifTool/BigTIFF.pm
 lib/Image/ExifTool/BuildTagLookup.pm
 lib/Image/ExifTool/Canon.pm
@@ -112,6 +117,8 @@ lib/Image/ExifTool/CanonVRD.pm
 lib/Image/ExifTool/Casio.pm
 lib/Image/ExifTool/DICOM.pm
 lib/Image/ExifTool/DNG.pm
+lib/Image/ExifTool/DjVu.pm
+lib/Image/ExifTool/EXE.pm
 lib/Image/ExifTool/Exif.pm
 lib/Image/ExifTool/FLAC.pm
 lib/Image/ExifTool/Fixup.pm
@@ -160,6 +167,7 @@ lib/Image/ExifTool/PrintIM.pm
 lib/Image/ExifTool/QuickTime.pm
 lib/Image/ExifTool/README
 lib/Image/ExifTool/RIFF.pm
+lib/Image/ExifTool/Rawzor.pm
 lib/Image/ExifTool/Real.pm
 lib/Image/ExifTool/Ricoh.pm
 lib/Image/ExifTool/Sanyo.pm
@@ -182,6 +190,8 @@ lib/Image/ExifTool/WritePostScript.pl
 lib/Image/ExifTool/WriteXMP.pl
 lib/Image/ExifTool/Writer.pl
 lib/Image/ExifTool/XMP.pm
+lib/Image/ExifTool/XMP2.pm
+lib/Image/ExifTool/ZIP.pm
 perl-Image-ExifTool.spec
 t/AFCP.t
 t/AFCP_2.out
@@ -223,6 +233,12 @@ t/DICOM_2.out
 t/DNG.t
 t/DNG_2.out
 t/DNG_3.out
+t/DjVu.t
+t/DjVu_2.out
+t/EXE.t
+t/EXE_2.out
+t/EXE_3.out
+t/EXE_4.out
 t/ExifTool.t
 t/ExifTool_16.out
 t/ExifTool_17.out
@@ -285,6 +301,10 @@ t/IPTC-XMP_24.out
 t/IPTC-XMP_25.out
 t/IPTC-XMP_26.out
 t/IPTC-XMP_27.out
+t/IPTC-XMP_28.out
+t/IPTC-XMP_29.out
+t/IPTC-XMP_30.out
+t/IPTC-XMP_31.out
 t/IPTC-XMP_4.out
 t/IPTC-XMP_6.out
 t/IPTC-XMP_7.out
@@ -421,11 +441,15 @@ t/Writer_30.out
 t/Writer_31.out
 t/Writer_32.out
 t/Writer_33.out
+t/Writer_34.out
 t/Writer_35.out
+t/Writer_36.out
 t/Writer_4.out
 t/Writer_6.out
 t/Writer_7.out
 t/Writer_9.out
+t/ZIP.t
+t/ZIP_2.out
 t/images/AFCP.jpg
 t/images/AIFF.aif
 t/images/APE.ape
@@ -441,8 +465,13 @@ t/images/Casio.jpg
 t/images/Casio2.jpg
 t/images/DICOM.dcm
 t/images/DNG.dng
+t/images/DjVu.djvu
+t/images/EXE.elf
+t/images/EXE.exe
+t/images/EXE.macho
 t/images/ExifTool.jpg
 t/images/ExifTool.tif
+t/images/ExtendedXMP.jpg
 t/images/FLAC.flac
 t/images/FLAC.ogg
 t/images/Flash.flv
@@ -501,7 +530,9 @@ t/images/Unknown.jpg
 t/images/Vorbis.ogg
 t/images/Writer.jpg
 t/images/XMP.svg
+t/images/XMP.xml
 t/images/XMP.xmp
 t/images/XMP2.xmp
 t/images/XMP3.xmp
+t/images/ZIP.zip
 xmp2iptc.args

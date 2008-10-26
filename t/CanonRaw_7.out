@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.24
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: CanonRaw_7_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 12 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:28 14:38:54
+[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:29-04:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
@@ -99,8 +99,6 @@
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
-[MakerNotes, Canon, Image] 19 - Focus Distance Upper: 0
-[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 0
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
@@ -193,21 +191,23 @@
 [MakerNotes, Canon, Camera] 74 - Color Temp Custom 2: 5200
 [MakerNotes, Canon, Camera] 16386 - Unknown Block 1: (Binary data 5352 bytes)
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: unknown
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0123456789
-[XMP, XMP-crs, Image] ToneCurve - Tone Curve: Standard
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 1024
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 1536
 [XMP, XMP-tiff, Image] PhotometricInterpretation - Photometric Interpretation: RGB
 [XMP, XMP-tiff, Image] PlanarConfiguration - Planar Configuration: Chunky
 [XMP, XMP-tiff, Image] SamplesPerPixel - Samples Per Pixel: 3
+[XMP, XMP-crs, Image] ToneCurve - Tone Curve: Standard
 [Composite, Composite, Image]  - Aperture: 8.0
 [Composite, Composite, Camera]  - Drive Mode: Single-frame shooting
 [Composite, Composite, Camera]  - Flash: Off
 [Composite, Composite, Camera]  - ISO: 400
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
+[Composite, Composite, Camera]  - Lens ID: Unknown 18-55mm
 [Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Aperture-priority AE
 [Composite, Composite, Image]  - Shutter Speed: 1/15

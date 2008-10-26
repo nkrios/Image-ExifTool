@@ -3,8 +3,8 @@ File:         Image/ExifTool/README
 
 Description:  ExifTool support modules documentation
 
-The ExifTool support modules are loaded by ExifTool to interpret various formats
-of meta information.
+The ExifTool support modules are loaded by ExifTool to allow processing of
+various meta information formats.
 
 The tables in these files are used as lookups based on the tag ID values.  The
 hash keys are the tag IDs (in decimal or hexadecimal if the ID is numerical as
@@ -151,7 +151,7 @@ each special key:
                   not converted to hexadecimal notation. Unless otherwise set,
                   an ID_LABEL of "Index" is assumed for tables which use
                   ProcessBinaryData.
-    
+
     NO_ID         Avoid printing "Tag ID" column in tag name documentation.
 
     CAPTURE       Used by PDF module to name dictionaries to capture when
@@ -170,8 +170,8 @@ each special key:
   DATAMEMBER : BinaryData tables only.  A reference to a list of tag ID's which
   must be extracted as data members when writing.
 
-  SET_GROUP1 : [EXIF tables only] Set group1 name to the directory name for all
-  tags in the table.
+  SET_GROUP1 : [EXIF tables only] Flag to set group1 name to the directory name
+  for all tags in the table.
 
 The remaining entries in a tag table are the tag IDs with their associated
 information.  The information may exist in one of three forms:  1) A simple
@@ -183,14 +183,16 @@ entries are optional, except for the tag Name which is required if the tag ID is
 numerical.
 
   Name          : The tag name.  Tag names need not be unique.  If they aren't
-                  unique, duplicate tags overwrite values of previous tags
-                  unless the Duplicates option is set or the new tag has lower
-                  Priority.  With Duplicates set, to allow multiple tags with
-                  the same name to exist in the tag information hash, the key of
-                  the previous tag is changed to the form "TagName (N)", where N
-                  starts at 1 and increments for subsequent duplicate tags.  A
-                  tag name should start with an uppercase letter, and contain
-                  only the charcters in the set [A-Za-z0-9_-].
+                  unique, then duplicate tags will hide the values of previous
+                  tags when extracting information unless the Duplicates option
+                  is set or the new tag has lower Priority.  With Duplicates
+                  set, to allow multiple tags with the same name to exist in the
+                  tag information hash, the key of the previous tag is changed
+                  to the form "TagName (N)", where N starts at 1 and increments
+                  for subsequent duplicate tags.  A tag name should start with
+                  an uppercase letter, and contain only the charcters in the set
+                  [A-Za-z0-9_-].  If not given, the Name is taken from the tag
+                  ID with the first character changed to upper case.
 
   Description   : A more readable description of tag name.  If a tag doesn't
                   specify a Description, then the tag Name is used instead, with
@@ -212,6 +214,8 @@ numerical.
                   of an EXIF entry is taken from the EXIF information, and the
                   format of a BinaryData entry is taken from the FORMAT
                   specified for the table (or int8u if FORMAT is not specified).
+                  Must be specified for Writable tags where the value must be
+                  converted for a Condition.
 
   Count         : Used when writing EXIF information to specify the number
                   values to write, or the number of characters in a fixed-length
@@ -229,7 +233,8 @@ numerical.
                   and may be written directly as members if desired. The
                   available flag names are:
 
-                  'Avoid' - avoid creating this tag if possible.
+                  'Avoid' - avoid creating this tag if possible.  This is only
+                  effective if another tag exists with the same name.
 
                   'Binary' - set to 1 for binary data.  This has the same effect
                   as setting ValueConv to '\$val', but it it a bit cleaner and
@@ -261,16 +266,19 @@ numerical.
                   expression to be evaluated.  Expression may access $val and
                   $exifTool.
 
-                  'List' - indicates that duplicate entries of this tag are
-                  allowed, and will be accumulated in a list.  Note that for XMP
-                  information, 3 different types of lists are supported and the
-                  List value specifies the type: 'Bag', 'Seq' or 'Alt'.
+                  'List' - flag indicating that duplicate entries of this tag
+                  are allowed, and will be accumulated in a list.  Note that for
+                  XMP information, 3 different types of lists are supported and
+                  the List value specifies the type: 'Bag', 'Seq' or 'Alt'.  As
+                  well, a value of '1' is used in XMP to allow list behaviour
+                  for a tag which is itself not a list element (ie. a member of
+                  list of structures).
 
                   'MakerNotes' - set if this tag is maker note data.
 
                   'NotIFD' - set for 'MakerNotes' tags only if the data is not
                   in standard EXIF IFD format.
-                  
+
                   'OffsetPair' - set if the tag represents half of an offset/
                   byte count pair.  Data for these tags must be handled
                   separately.  Value is the tagID for the paired tag.
@@ -281,6 +289,9 @@ numerical.
 
                   'PrintHex' - specifies that unknown PrintConv values should
                   be printed in hex (ie. 'Unknown (0x01)')
+
+                  'PrintString' - flag set to force PrintConv values to be
+                  printed as strings in the documentation.
 
                   'Priority' - gives the priority of this tag while reading.  If
                   set to zero, this tag will not override the value of previous
@@ -296,6 +307,9 @@ numerical.
                   SetNewValuesFromFile() unless specified explicitly.
                   Bit 0x02 indicates a 'protected' tag, which should not be set
                   directly by the user.
+
+                  'Resource' - [XMP only] flag to write value as an rdf:resource
+                  in an empty element instead of as a normal string.
 
                   'SeparateTable' - set to list PrintConv values in a separate
                   table in the HTML documentation.  Value is 1 for a table name
@@ -347,16 +361,16 @@ numerical.
                   special keys exist: 'BITMASK', a reference to a hash used to
                   decode individual value bits; or 'OTHER', a reference to a
                   subroutine used to convert unknown values.  The subroutine
-                  takes 2 arguments: the value, and a flag which is set for the
-                  inverse conversion, and returns the converted value or undef
-                  on error).  In an expression, $self is a reference to the
-                  current ExifTool object, $val is the Raw value, and $tag is
-                  the tag key.  The subroutine takes 2 arguments: the Raw value
-                  and a reference to the current ExifTool object.  The
-                  expression or subroutine is evaluated when and if the tag
-                  value is requested (ie. only after all extraction is
-                  complete), so if necessary at this time the values of all
-                  other tags are available via calls to
+                  takes 3 arguments: the value, a flag which is set for the
+                  inverse conversion, and a reference to the PrintConv hash, and
+                  returns the converted value or undef on error).  In an
+                  expression, $self is a reference to the current ExifTool
+                  object, $val is the Raw value, and $tag is the tag key.  The
+                  subroutine takes 2 arguments: the Raw value and a reference to
+                  the current ExifTool object.  The expression or subroutine is
+                  evaluated when and if the tag value is requested (ie. only
+                  after all extraction is complete), so if necessary at this
+                  time the values of all other tags are available via calls to
                   $self->GetValue("Tag","Raw"). (Note: In theory, types other
                   than "Raw" may be accessed, but they are slower and may lead
                   to cyclical dependencies so they should be avoided). When
@@ -524,7 +538,11 @@ numerical.
                   associated with offset/length tags.
 
   Struct        : [XMP tags only] Used by XMP writer code to specify name of XMP
-                  structure so the PropertyPath can be determined.
+                  structure so the PropertyPath can be determined.  Tags with
+                  Struct entries should also include a dummy SubDirectory entry
+                  to prevent the tag name from showing up in the documentation.
+                  Tags for each element in the flattened structure hierarchy
+                  should be included parallel to each tag defining a Struct.
 
   Units         : [MIE tags only] Reference to a list of valid units strings.
                   The default units are the first item in the list.
@@ -536,6 +554,9 @@ numerical.
 
   PropertyPath  : [reserved] Used internally by XMP writer to save property path
                   name.
+
+  PropertyPath  : [StructType] Used internally by XMP writer to save name of
+                  structure for tags contained in a structure.
 
   Module        : [reserved] Used internally to store module name for writable
                   Composite tags.
@@ -571,7 +592,7 @@ numerical.
                   automatic validation of base offsets is disabled for maker
                   notes directories.
 
-     EntryBased : Flag indicating that the offsets are based on the indidual
+     EntryBased : Flag indicating that the offsets are based on the individual
                   directory entry position, so offsets are incremented by 12
                   times the corresponding entry index.
 
@@ -579,7 +600,7 @@ numerical.
                   (if the tag specifies multiple values).  If not specified, the
                   tag value ($val) is used as-is.  If MaxSubdirs is specified,
                   then one subdirectory is parsed for each value found up to the
-                  maximum number specified.
+                  maximum number specified.  Ignored when writing.
 
      ByteOrder  : Specifies byte ordering if different than than the rest of the
                   file.  Must be either BigEndian, LittleEndian or Unknown.  If
@@ -598,6 +619,10 @@ numerical.
                   subdirectory data.  This overrides the default procedure
                   specified by PROCESS_PROC in the tag table.
 
+     WriteProc:  If given, specifies processing procedure used to write this
+                  subdirectory data.  This overrides the default procedure
+                  specified by WRITE_PROC in the tag table.
+
      DirName    : Name of this subdirectory.  If not specified, the name is
                   taken from the tag name.  DirName is important because it is
                   used when writing to compare against names in the directory
@@ -615,6 +640,9 @@ numerical.
      Multi      : [EXIF directories only] Flag to allow multiple linked IFD's.
                   1 is assumed if DirName is IFD0 or SubIFD unless otherwise
                   defined.
+
+     Magic      : [TiffIFD directories only] Magic number used in TIFF-like
+                  header.
   }
 
 --------------------------------------------------------------------------------

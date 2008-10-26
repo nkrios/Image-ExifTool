@@ -4,6 +4,7 @@
 # Description:  Read/write Nikon Capture information
 #
 # Revisions:    11/08/2005 - P. Harvey Created
+#               10/10/2008 - P. Harvey Updated for Capture NX 2
 #
 # References:   1) http://www.cybercom.net/~dcoffin/dcraw/
 #------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.04';
 
 # common print conversions
 my %offOn = ( 0 => 'Off', 1 => 'On' );
@@ -40,6 +41,7 @@ my %unsharpColor = (
         This information is written by the Nikon Capture software in tag 0x0e01 of
         the maker notes of NEF images.
     },
+    # 0x007ddc9d contains contrast information
     0x008ae85e => {
         Name => 'LCHEditor',
         Writable => 'int8u',
@@ -49,6 +51,12 @@ my %unsharpColor = (
         Name => 'ColorAberrationControl',
         Writable => 'int8u',
         PrintConv => \%offOn,
+    },
+    0x116fea21 => {
+        Name => 'HighlightData',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::NikonCapture::HighlightData',
+        },
     },
     0x2175eb78 => {
         Name => 'D-LightingHQ',
@@ -65,10 +73,23 @@ my %unsharpColor = (
             TagTable => 'Image::ExifTool::NikonCapture::CropData',
         },
     },
+    0x39c456ac => {
+        Name => 'PictureCtrl',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::NikonCapture::PictureCtrl',
+        },
+    },
     0x3cfc73c6 => {
         Name => 'RedEyeData',
         SubDirectory => {
             TagTable => 'Image::ExifTool::NikonCapture::RedEyeData',
+        },
+    },
+    # 0x3e726567 added when I rotated by 90 degrees
+    0x56a54260 => {
+        Name => 'Exposure',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::NikonCapture::Exposure',
         },
     },
     0x5f0e7d23 => {
@@ -125,6 +146,7 @@ my %unsharpColor = (
         Name => 'Rotation',
         Writable => 'int16u',
     },
+  # 0x083a1a25 XML histogram data
     0x84589434 => {
         Name => 'BrightnessData',
         SubDirectory => {
@@ -149,6 +171,7 @@ my %unsharpColor = (
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
+  # 0xa7264a72, 0x88f55e48 and 0x416391c6 all change from 0 to 1 when QuickFix is turned on
     0xab5eca5e => {
         Name => 'PhotoEffects',
         Writable => 'int8u',
@@ -181,6 +204,11 @@ my %unsharpColor = (
         Writable => 'int8u',
         PrintConv => \%offOn,
     },
+    0xe2173c47 => {
+        Name => 'PictureControl',
+        Writable => 'int8u',
+        PrintConv => \%offOn,
+    },
     0xe37b4337 => {
         Name => 'D-LightingHSData',
         SubDirectory => {
@@ -192,6 +220,12 @@ my %unsharpColor = (
         SubDirectory => {
             TagTable => 'Image::ExifTool::NikonCapture::UnsharpData',
         },
+    },
+    # 0xe9651831 - photo effect history (XML data)
+    0xfe28a44f => {
+        Name => 'AutoRedEye',
+        Writable => 'int8u',
+        PrintConv => \%offOn, # (have seen a value of 28 here for older software?)
     },
     0xfe443a45 => {
         Name => 'ImageDustOff',
@@ -248,9 +282,9 @@ my %unsharpColor = (
     FORMAT => 'int32u',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    0 => 'D-LightingHSShadow',
-    1 => 'D-LightingHSHighlight',
-    2 => 'D-LightingHSColorBoost',
+    0 => 'D-LightingHQShadow',
+    1 => 'D-LightingHQHighlight',
+    2 => 'D-LightingHQColorBoost',
 );
 
 %Image::ExifTool::NikonCapture::ColorBoost = (
@@ -299,6 +333,11 @@ my %unsharpColor = (
             4 => 'Calculate Automatically'
         },
     },
+    0x14 => {
+        Name => 'WBAdjLightingSubtype',
+        # this varies for different lighting types
+        # (ie. for Daylight, this is 0 => 'Direct', 1 => 'Shade', 2 => 'Cloudy')
+    },
     0x15 => {
         Name => 'WBAdjLighting',
         PrintConv => {
@@ -313,6 +352,10 @@ my %unsharpColor = (
     0x18 => {
         Name => 'WBAdjTemperature',
         Format => 'int16u',
+    },
+    0x25 => {
+        Name => 'WBAdjTint',
+        Format => 'int32s',
     },
 );
 
@@ -375,12 +418,12 @@ my %unsharpColor = (
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    4 => {
+    0x04 => {
         Name => 'EdgeNoiseReduction',
         PrintConv => \%offOn,
     },
-    5 => {
-        Name => 'ColorMoireReduction',
+    0x05 => {
+        Name => 'ColorMoireReductionMode',
         PrintConv => {
             0 => 'Off',
             1 => 'Low',
@@ -388,21 +431,37 @@ my %unsharpColor = (
             3 => 'High',
         },
     },
-    9 => {
+    0x09 => {
         Name => 'NoiseReductionIntensity',
         Format => 'int32u',
     },
-    13 => {
+    0x0d => {
         Name => 'NoiseReductionSharpness',
         Format => 'int32u',
     },
-    17 => {
+    0x11 => {
         Name => 'NoiseReductionMethod',
         Format => 'int16u',
         PrintConv => {
             0 => 'Faster',
             1 => 'Better Quality',
         },
+    },
+    0x15 => {
+        Name => 'ColorMoireReduction',
+        PrintConv => \%offOn,
+    },
+    0x17 => {
+        Name => 'NoiseReduction',
+        PrintConv => \%offOn,
+    },
+    0x18 => {
+        Name => 'ColorNoiseReductionIntensity',
+        Format => 'int32u',
+    },
+    0x1c => {
+        Name => 'ColorNoiseReductionSharpness',
+        Format => 'int32u',
     },
 );
 
@@ -439,25 +498,25 @@ my %unsharpColor = (
         ValueConvInv => '$val * 2',
     },
     0x8e => {
-        Name => 'OutputWidthInches',
+        Name => 'CropOutputWidthInches',
         Format => 'double',
     },
     0x96 => {
-        Name => 'OutputHeightInches',
+        Name => 'CropOutputHeightInches',
         Format => 'double',
     },
     0x9e => {
-        Name => 'ScaledResolution',
+        Name => 'CropScaledResolution',
         Format => 'double',
     },
     0xae => {
-        Name => 'SourceResolution',
+        Name => 'CropSourceResolution',
         Format => 'double',
         ValueConv => '$val / 2',
         ValueConvInv => '$val * 2',
     },
     0xb6 => {
-        Name => 'OutputResolution',
+        Name => 'CropOutputResolution',
         Format => 'double',
     },
     0xbe => {
@@ -465,17 +524,67 @@ my %unsharpColor = (
         Format => 'double',
     },
     0xc6 => {
-        Name => 'OutputWidth',
+        Name => 'CropOutputWidth',
         Format => 'double',
     },
     0xce => {
-        Name => 'OutputHeight',
+        Name => 'CropOutputHeight',
         Format => 'double',
     },
     0xd6 => {
-        Name => 'OutputPixels',
+        Name => 'CropOutputPixels',
         Format => 'double',
     },
+);
+
+%Image::ExifTool::NikonCapture::PictureCtrl = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0x00 => {
+        Name => 'PictureControlActive',
+        PrintConv => \%offOn,
+    },
+    0x13 => {
+        Name => 'PictureControlMode',
+        Format => 'string[16]',
+    },
+    # 0x29 changes with Hue and Sharpening
+    0x2a => {
+        Name => 'QuickAdjust',
+        ValueConv => '$val - 128',
+        ValueConvInv => '$val + 128',
+    },
+    0x2b => {
+        Name => 'SharpeningAdj',
+        ValueConv => '$val ? $val - 128 : "Auto"',
+        ValueConvInv => '$val=~/\d/ ? $val + 128 : 0',
+    },
+    0x2c => {
+        Name => 'ContrastAdj',
+        ValueConv => '$val ? $val - 128 : "Auto"',
+        ValueConvInv => '$val=~/\d/ ? $val + 128 : 0',
+    },
+    0x2d => {
+        Name => 'BrightnessAdj',
+        ValueConv => '$val ? $val - 128 : "Auto"', # no "Auto" mode (yet) for this setting
+        ValueConvInv => '$val=~/\d/ ? $val + 128 : 0',
+    },
+    0x2e => {
+        Name => 'SaturationAdj',
+        ValueConv => '$val ? $val - 128 : "Auto"',
+        ValueConvInv => '$val=~/\d/ ? $val + 128 : 0',
+    },
+    0x2f => {
+        Name => 'HueAdj',
+        ValueConv => '$val - 128',
+        ValueConvInv => '$val + 128',
+    },
+    # 0x37 changed from 0 to 2 when Picture Control is enabled (and no active DLighting)
 );
 
 %Image::ExifTool::NikonCapture::RedEyeData = (
@@ -494,6 +603,56 @@ my %unsharpColor = (
             2 => 'Click on Eyes',
         },
     },
+);
+
+%Image::ExifTool::NikonCapture::Exposure = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0x00 => {
+        Name => 'ExposureAdj',
+        Format => 'int16s',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+    },
+    0x12 => {
+        Name => 'ExposureAdj2',
+        Format => 'double',
+        PrintConv => 'sprintf("%.4f", $val)',
+        PrintConvInvn => '$val',
+    },
+    0x24 => {
+        Name => 'ActiveD-Lighting',
+        PrintConv => \%offOn,
+    },
+    0x25 => {
+        Name => 'ActiveD-LightingMode',
+        PrintConv => {
+            0 => 'Unchanged',
+            1 => 'Off',
+            2 => 'Low',
+            3 => 'Normal',
+            4 => 'High',
+            6 => 'Extra High',
+        },
+    },
+);
+
+%Image::ExifTool::NikonCapture::HighlightData = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8s',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0 => 'ShadowProtection',
+    1 => 'SaturationAdj',
+    6 => 'HighlightProtection',
 );
 
 #------------------------------------------------------------------------------
@@ -593,8 +752,7 @@ sub WriteNikonCapture($$$)
 
 #------------------------------------------------------------------------------
 # process Nikon Capture data (ref 1)
-# Inputs: 0) ExifTool object reference, 1) reference to directory information
-#         2) pointer to tag table
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 sub ProcessNikonCapture($$$)
 {

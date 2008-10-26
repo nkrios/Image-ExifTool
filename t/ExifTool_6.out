@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.41
 [File, File, Image]  - File Name: Canon.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Time]  - File Modification Date/Time: 2007:05:01 07:34:38
@@ -55,6 +55,7 @@
 [Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Image]  - Image Size: 8x8
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
+[Composite, Composite, Camera]  - Lens ID: Unknown 18-55mm
 [Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Manual
 [Composite, Composite, Image]  - Shutter Speed: 4

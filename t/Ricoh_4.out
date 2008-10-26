@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.27
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.42
 [File, File, Image]  - File Name: Ricoh2.jpg
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 3 kB
+[File, File, Image]  - File Size: 3.1 kB
 [File, File, Time]  - File Modification Date/Time: 2006:09:29 19:47:55
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
@@ -95,6 +95,7 @@
 [APP5, RMETA, Image] Condition - Condition: Good
 [APP5, RMETA, Image] Azimuth - Azimuth: E
 [Composite, Composite, Image]  - Aperture: 5.5
+[Composite, Composite, Other]  - GPS Altitude: 117 m Above Sea Level
 [Composite, Composite, Time]  - GPS Date/Time: 2006:05:26 10:47:24
 [Composite, Composite, Other]  - GPS Latitude: 42 deg 2' 4.47" N
 [Composite, Composite, Other]  - GPS Longitude: 0 deg 30' 27.01" W

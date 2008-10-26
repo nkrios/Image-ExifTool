@@ -1,10 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.94
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: PostScript.eps
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 9 kB
-[File, File, Time]  - File Modification Date/Time: 2005:11:22 09:04:38
+[File, File, Image]  - File Size: 9.4 kB
+[File, File, Time]  - File Modification Date/Time: 2005:11:22 09:04:38-05:00
 [File, File, Image]  - File Type: EPS
 [File, File, Image]  - MIME Type: application/postscript
+[File, File, Image]  - Current IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
 [PostScript, PostScript, Image] Creator - Creator: Adobe Photoshop Version 7.0.1
 [PostScript, PostScript, Image] Title - Title: c.eps
 [PostScript, PostScript, Time] CreationDate - Create Date: 7/18/05 2:33 PM
@@ -30,6 +31,9 @@
 [IPTC, IPTC, Other] 10 - Urgency: 8
 [IPTC, IPTC, Other] 25 - Keywords: ExifTool, Test, XMP
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright 2004 Phil Harvey
+[Photoshop, Photoshop, Image] 1061 - IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: XMP toolkit 2.8.2-33, framework 1.5
+[XMP, XMP-rdf, Document] about - About: uuid:b691db36-f92a-11d9-99a4-8c8e8269c120
 [XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
 [XMP, XMP-photoshop, Image] Category - Category: 1

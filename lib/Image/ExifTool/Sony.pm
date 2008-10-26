@@ -9,6 +9,7 @@
 #               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm (2006/08/06)
 #               3) Thomas Bodenmann private communication
 #               4) Philippe Devaux private communication (A700)
+#               5) Marcus Holland-Moritz private communication (A700)
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -20,12 +21,12 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.16';
+$VERSION = '1.19';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
 
-my %sonyLensIDs;    # filled in based on Minolta LensID's
+my %sonyLensTypes;  # filled in based on Minolta LensType's
 
 %Image::ExifTool::Sony::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -36,6 +37,38 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
         Description => 'Print Image Matching',
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
+        },
+    },
+    0x0102 => { #5/JD
+        Name => 'Quality',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'RAW',
+            1 => 'Super Fine',
+            2 => 'Fine',
+            3 => 'Standard',
+            4 => 'Economy',
+            5 => 'Extra Fine',
+            6 => 'RAW + JPEG',
+            7 => 'Compressed RAW',
+            8 => 'Compressed RAW + JPEG',
+        },
+    },
+    0x0104 => { #5/JD
+        Name => 'FlashExposureComp',
+        Description => 'Flash Exposure Compensation',
+        Writable => 'rational64s',
+    },
+    0x0105 => { #5/JD
+        Name => 'Teleconverter',
+        Writable => 'int32u',
+        PrintHex => 1,
+        PrintConv => {
+            0 => 'None',
+            72 => 'Minolta AF 2x APO (D)',
+            80 => 'Minolta AF 2x APO II',
+            136 => 'Minolta AF 1.4x APO (D)',
+            144 => 'Minolta AF 1.4x APO II',
         },
     },
     0x2001 => { #PH (A700)
@@ -103,9 +136,14 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
     0xb027 => { #2
-        Name => 'LensID',
+        Name => 'LensType',
         Writable => 'int32u',
-        PrintConv => \%sonyLensIDs,
+        Notes => q{
+            decimal values differentiate lenses which would otherwise have the same
+            LensType, and are used by the Composite LensID tag when attempting to
+            identify the specific lens model
+        },
+        PrintConv => \%sonyLensTypes,
     },
     0xb028 => { #2
         # (used by the DSLR-A100)
@@ -251,14 +289,30 @@ my %sonyLensIDs;    # filled in based on Minolta LensID's
     },
 );
 
-# fill in Sony LensID lookup based on Minolta values
+# fill in Sony LensType lookup based on Minolta values
 {
-    %sonyLensIDs = %Image::ExifTool::Minolta::minoltaLensIDs;
+    %sonyLensTypes = %Image::ExifTool::Minolta::minoltaLensTypes;
     my $id;
-    foreach $id (keys %Image::ExifTool::Minolta::minoltaLensIDs) {
+    foreach $id (sort { $a <=> $b } keys %Image::ExifTool::Minolta::minoltaLensTypes) {
         # higher numbered lenses are missing last digit of ID for some Sony models
         next if $id < 10000;
-        $sonyLensIDs{int($id/10)} = $Image::ExifTool::Minolta::minoltaLensIDs{$id};
+        my $sid = int($id/10);
+        my $i;
+        my $lens = $Image::ExifTool::Minolta::minoltaLensTypes{$id};
+        if ($sonyLensTypes{$sid}) {
+            # put lens name with "or" first in list
+            if ($lens =~ / or /) {
+                my $tmp = $sonyLensTypes{$sid};
+                $sonyLensTypes{$sid} = $lens;
+                $lens = $tmp;
+            }
+            for (;;) {
+                $i = ($i || 0) + 1;
+                $sid = int($id/10) . ".$i";
+                last unless $sonyLensTypes{$sid};
+            }
+        }
+        $sonyLensTypes{$sid} = $lens;
     }
 }
 
@@ -365,14 +419,27 @@ sub ProcessSRF($$$)
 sub ProcessSR2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $raf = $$dirInfo{RAF};
     my $dataPt = $$dirInfo{DataPt};
+    my $dataPos = $$dirInfo{DataPos};
+    my $dataLen = $$dirInfo{DataLen} || length $$dataPt;
+    my $base = $$dirInfo{Base} || 0;
+
+    # make sure we have the first 4 bytes available to test directory type
+    my $buff;
+    if ($dataLen < 4 and $raf) {
+        my $pos = $dataPos + ($$dirInfo{DirStart}||0) + $base;
+        if ($raf->Seek($pos, 0) and $raf->Read($buff, 4) == 4) {
+            $dataPt = \$buff;
+            undef $$dirInfo{DataPt};    # must load data from file
+            $raf->Seek($pos, 0);
+        }
+    }
     # this may either be a normal IFD, or a MRW-file-like data block in newer ARW images
     if ($dataPt and $$dataPt =~ /^\0MR[IM]/) {
         require Image::ExifTool::MinoltaRaw;
         return Image::ExifTool::MinoltaRaw::ProcessMRW($exifTool, $dirInfo);
     }
-    my $dataPos = $$dirInfo{DataPos};
-    my $dataLen = $$dirInfo{DataLen} || length $$dataPt;
     my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
     my $result = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
@@ -382,8 +449,6 @@ sub ProcessSR2($$$)
     my $offset = shift @offsets;
     my $length = $exifTool->{SR2SubIFDLength};
     my $key = $exifTool->{SR2SubIFDKey};
-    my $raf = $$dirInfo{RAF};
-    my $base = $$dirInfo{Base} || 0;
     if ($offset and $length and defined $key) {
         my $buff;
         # read encrypted SR2SubIFD from file
@@ -475,8 +540,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Thomas Bodenmann for providing information about the LensID's
-and Philippe Devaux for decoding a ColorMode value.
+Thanks to Thomas Bodenmann, Philippe Devaux, JensDuttke and Marcus
+Holland-Moritz for help decoding some tags.
 
 =head1 SEE ALSO
 

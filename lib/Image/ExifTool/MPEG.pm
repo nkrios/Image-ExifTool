@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -186,6 +186,7 @@ $VERSION = '1.05';
     # Bit 23 - private bit
     'Bit24-25' => {
         Name => 'ChannelMode',
+        RawConv => '$self->{MPEG_Mode} = $val',
         PrintConv => {
             0 => 'Stereo',
             1 => 'Joint Stereo',
@@ -305,6 +306,15 @@ $VERSION = '1.05';
     #'Bit62'    => 'IntraQuantMatrixFlag',
 );
 
+%Image::ExifTool::MPEG::VBR = (
+    GROUPS => { 2 => 'Audio' },
+    VARS => { NO_ID => 1 },
+    NOTES => 'These tags are extracted for variable bitrate audio.',
+    1 => { Name => 'VBRFrames' },
+    2 => { Name => 'VBRBytes' },
+    3 => { Name => 'VBRScale' },
+);
+
 # composite tags
 %Image::ExifTool::MPEG::Composite = (
     Duration => {
@@ -313,16 +323,26 @@ $VERSION = '1.05';
             0 => 'FileSize',
         },
         Desire => {
-            1 => 'MPEG:AudioBitrate',
-            2 => 'MPEG:VideoBitrate',
+            1 => 'ID3Size',
+            2 => 'MPEG:AudioBitrate',
+            3 => 'MPEG:VideoBitrate',
+            4 => 'MPEG:VBRFrames',
+            5 => 'MPEG:SampleRate',
+            6 => 'MPEG:MPEGAudioVersion',
         },
-        # calculate duration as file size divided by total bitrate
-        # (note: this is only approximate!)
         ValueConv => q{
-            return undef unless $val[1] or $val[2];
-            return undef if $prt[1] and not $prt[1] =~ /^\d+$/;
-            return undef if $val[2] and not $val[2] =~ /^\d+$/;
-            return (8 * $val[0]) / (($prt[1]||0) + ($val[2]||0));
+            if ($val[4] and defined $val[5] and defined $val[6]) {
+                # calculate from number of VBR audio frames
+                my $mfs = $prt[5] / ($val[6] == 3 ? 144 : 72);
+                # calculate using VBR length
+                return 8 * $val[4] / $mfs;
+            }
+            # calculate duration as file size divided by total bitrate
+            # (note: this is only approximate!)
+            return undef unless $val[2] or $val[3];
+            return undef if $prt[2] and not $prt[2] =~ /^\d+$/;
+            return undef if $val[3] and not $val[3] =~ /^\d+$/;
+            return (8 * ($val[0] - ($val[1]||0))) / (($prt[2]||0) + ($val[3]||0));
         },
         PrintConv => 'ConvertDuration($val) . " (approx)"',
     },
@@ -360,7 +380,7 @@ sub ProcessFrameHeader($$@)
 sub ProcessMPEGAudio($$)
 {
     my ($exifTool, $buffPt) = @_;
-    my $word;
+    my ($word, $pos);
 
     for (;;) {
         # find frame sync
@@ -379,6 +399,7 @@ sub ProcessMPEGAudio($$)
         {
             return 0;   # invalid frame header
         }
+        $pos = pos($$buffPt);
         last;
     }
     # set file type if not done already
@@ -386,6 +407,41 @@ sub ProcessMPEGAudio($$)
 
     my $tagTablePtr = GetTagTable('Image::ExifTool::MPEG::Audio');
     ProcessFrameHeader($exifTool, $tagTablePtr, $word);
+
+    # extract the VBR information (ref MP3::Info)
+    my ($v, $m) = ($$exifTool{MPEG_Vers}, $$exifTool{MPEG_Mode});
+    while (defined $v and defined $m) {
+        my $len = length $$buffPt;
+        $pos += $v == 3 ? ($m == 3 ? 17 : 32) : ($m == 3 ?  9 : 17);
+        last if $pos + 8 > $len;
+        my $buff = substr($$buffPt, $pos, 8);
+        last unless $buff =~ /^(Xing|Info)/;
+        my $vbrTable = GetTagTable('Image::ExifTool::MPEG::VBR');
+        my $flags = unpack('x4N', $buff);
+        $pos += 8;
+        if ($flags & 0x01) {    # VBRFrames
+            last if $pos + 4 > $len;
+            $exifTool->HandleTag($vbrTable, 1, unpack("x${pos}N", $$buffPt));
+            $pos += 4;
+        }
+        if ($flags & 0x02) {    # VBRBytes
+            last if $pos + 4 > $len;
+            $exifTool->HandleTag($vbrTable, 2, unpack("x${pos}N", $$buffPt));
+            $pos += 4;
+        }
+        if ($flags & 0x04) {    # VBR_TOC
+            last if $pos + 100 > $len;
+            # (ignore toc for now)
+            $pos += 100;
+        }
+        if ($flags & 0x08) {    # VBRScale
+            last if $pos + 4 > $len;
+            $exifTool->HandleTag($vbrTable, 3, unpack("x${pos}N", $$buffPt));
+            $pos += 4;
+        }
+        last;
+	}
+
     return 1;
 }
 
@@ -509,6 +565,7 @@ under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/MPEG Tags>,
+L<MP3::Info(3pm)|MP3::Info>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

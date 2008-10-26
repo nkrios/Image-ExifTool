@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.22
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
 [File, File, Image]  - File Name: Writer_13_failed.jpg
 [File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 4 kB
-[File, File, Time]  - File Modification Date/Time: 2008:03:13 09:33:40
+[File, File, Image]  - File Size: 4.5 kB
+[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:45-04:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
@@ -123,6 +123,7 @@
 [MakerNotes, Canon, Camera] 32 - WB RGGB Levels Kelvin: 1722 832 831 988
 [MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
@@ -135,6 +136,7 @@
 [Composite, Composite, Camera]  - Flash Type: Built-In Flash
 [Composite, Composite, Camera]  - ISO: 100
 [Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
+[Composite, Composite, Camera]  - Lens ID: Unknown 18-55mm
 [Composite, Composite, Camera]  - Red Eye Reduction: Off
 [Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
 [Composite, Composite, Camera]  - Shooting Mode: Program AE

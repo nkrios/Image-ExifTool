@@ -107,13 +107,20 @@ sub WritePhotoshop($$$)
             # check to see if we are overwriting this tag
             $value = substr($$dataPt, $pos, $size);
             if (Image::ExifTool::IsOverwriting($newValueHash, $value)) {
-                $verbose > 1 and print $out "    - Photoshop:$$tagInfo{Name} = '$value'\n";
-                $value = Image::ExifTool::GetNewValues($newValueHash);
+                $exifTool->VerboseValue("- Photoshop:$$tagInfo{Name}", $value);
+                # handle IPTCDigest specially because we want to write it last
+                # so the new IPTC digest will be known
+                if ($tagID == 0x0425) {
+                    $$newTags{$tagID} = $tagInfo;   # add later
+                    $value = undef;
+                } else {
+                    $value = Image::ExifTool::GetNewValues($newValueHash);
+                }
                 ++$exifTool->{CHANGED};
                 next unless defined $value;     # next if tag is being deleted
                 # set resource name if necessary
                 SetResourceName($tagInfo, $name, \$value);
-                $verbose > 1 and print $out "    + Photoshop:$$tagInfo{Name} = '$value'\n";
+                $exifTool->VerboseValue("+ Photoshop:$$tagInfo{Name}", $value);
             }
         } else {
             if ($type eq '8BIM') {
@@ -169,10 +176,14 @@ sub WritePhotoshop($$$)
             $tagInfo = $$newTags{$tagID};
             my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
             $value = Image::ExifTool::GetNewValues($newValueHash);
+            # handle new IPTCDigest value specially
+            if ($tagID == 0x0425 and defined $value and $value eq 'new') {
+                $value = $$exifTool{NewIPTCDigest};
+            }
             next unless defined $value;     # next if tag is being deleted
             # don't add this tag unless specified
             next unless Image::ExifTool::IsCreating($newValueHash);
-            $verbose > 1 and print $out "    + Photoshop:$$tagInfo{Name} = '$value'\n";
+            $exifTool->VerboseValue("+ Photoshop:$$tagInfo{Name}", $value);
             ++$exifTool->{CHANGED};
         } else {
             $tagInfo = $$addDirs{$tagID};

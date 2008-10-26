@@ -5,7 +5,7 @@
 #
 # Revisions:    01/09/2006 - P. Harvey Created
 #
-# References:   1) http://www.adobe.com/products/dng/pdfs/dng_spec.pdf
+# References:   1) http://www.adobe.com/products/dng/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::DNG;
@@ -737,7 +737,7 @@ under the same terms as Perl itself.
 
 =over 4
 
-=item L<http://www.adobe.com/products/dng/pdfs/dng_spec.pdf>
+=item L<http://www.adobe.com/products/dng/>
 
 =back
 
