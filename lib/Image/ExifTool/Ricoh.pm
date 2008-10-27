@@ -15,6 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
+use Image::ExifTool::RIFF;
 
 $VERSION = '1.06';
 

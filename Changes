@@ -5,8 +5,13 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 7.50. (Other versions are
+Note: The most recent production release is Version 7.51. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Oct. 27, 2008 - Version 7.51 (production release)
+
+  - Fixed problems which caused failed test or warning with Perl 5.6 or older
+    (does do not affect Mac or Windows versions)
 
 Oct. 26, 2008 - Version 7.50 (production release) "XMP 2008"
 

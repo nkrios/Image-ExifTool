@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ParseAnt($);
 sub ProcessAnt($$$);
@@ -215,8 +215,12 @@ Tok: for (;;) {
             $tok = '';
             for (;;) {
                 # get string up to the next quotation mark
-                last Tok unless $$dataPt =~ /(.*?)"/sg;
-                $tok .= $1;
+                # this doesn't work in perl 5.6.2! grrrr
+                # last Tok unless $$dataPt =~ /(.*?)"/sg;
+                # $tok .= $1;
+                my $pos = pos($$dataPt);
+                last Tok unless $$dataPt =~ /"/sg;
+                $tok .= substr($$dataPt, $pos, pos($$dataPt)-1-$pos);
                 # we're good unless quote was escaped by odd number of backslashes
                 last unless $tok =~ /(\\+)$/ and length($1) & 0x01;
                 $tok .= '"';    # quote is part of the string
